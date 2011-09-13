@@ -205,7 +205,10 @@ public final class ClientSession extends Session {
         try {
           while(true) {
             final BufferInput bi = new BufferInput(in);
-            notifiers.get(bi.readString()).notify(bi.readString());
+            final EventNotifier n = notifiers.get(bi.readString());
+            final String l = bi.readString();
+            // [CG] TODO: check when n will be null
+            if(n != null) n.notify(l);
           }
         } catch(final IOException ex) { }
       }

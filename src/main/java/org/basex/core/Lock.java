@@ -69,7 +69,7 @@ final class Lock {
    * Modifications after executing a command.
    * @param w writing flag
    */
-  synchronized void unlock(final boolean w) {
+  void unlock(final boolean w) {
     synchronized(mutex) {
       if(w) {
         writer = false;

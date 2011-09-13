@@ -7,6 +7,8 @@ import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.Scanner;
+
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.LoginException;
@@ -20,6 +22,8 @@ import org.basex.server.LoginException;
  * @author Christian Gruen
  */
 public final class Util {
+  /** Flag for using default standard input. */
+  private static final boolean NOCONSOLE = System.console() == null;
   /** Language (applied after restart). */
   public static String language = LANGUAGE;
   /** Flag for showing language keys. */
@@ -87,6 +91,27 @@ public final class Util {
    */
   public static String name(final Class<?> o) {
     return o.getSimpleName();
+  }
+
+  /**
+   * Returns a single line from standard input.
+   * @return string
+   */
+  public static String input() {
+    final Scanner sc = new Scanner(System.in);
+    return sc.hasNextLine() ? sc.nextLine().trim() : "";
+  }
+
+  /**
+   * Returns a password from standard input.
+   * @return password
+   */
+  public static String password() {
+    // use standard input if no console if defined (such as in Eclipse)
+    if(NOCONSOLE) return input();
+    // hide password
+    final char[] pw = System.console().readPassword();
+    return pw != null ? new String(pw) : "";
   }
 
   /**

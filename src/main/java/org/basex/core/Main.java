@@ -24,8 +24,6 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public abstract class Main {
-  /** Flag for using default standard input. */
-  private static final boolean NOCONSOLE = System.console() == null;
   /** Database context. */
   public final Context context;
 
@@ -116,7 +114,7 @@ public abstract class Main {
 
         if(i != -1) {
           Util.out(SERVERPW + COLS);
-          cmd.args[i] = md5(password());
+          cmd.args[i] = md5(Util.password());
         }
         execute(cmd, verbose);
       }
@@ -156,27 +154,6 @@ public abstract class Main {
     // no more input: send exit command
     if(sl.size() == 0) sl.add(Cmd.EXIT.toString());
     return sl;
-  }
-
-  /**
-   * Returns a single line from standard input.
-   * @return string
-   */
-  protected final String input() {
-    final Scanner sc = new Scanner(System.in);
-    return sc.hasNextLine() ? sc.nextLine().trim() : "";
-  }
-
-  /**
-   * Returns a password from standard input.
-   * @return password
-   */
-  protected final String password() {
-    // use standard input if no console if defined (such as in Eclipse)
-    if(NOCONSOLE) return input();
-    // hide password
-    final char[] pw = System.console().readPassword();
-    return pw != null ? new String(pw) : "";
   }
 
   /**

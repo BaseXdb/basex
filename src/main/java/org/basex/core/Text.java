@@ -133,18 +133,19 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-cdeJhnpPsSUWz] [stop]" + NL +
+    " [-cdehnpPRsUWz] [stop]" + NL +
     "  stop      Stop existing server" + NL +
     "  -c        Start in client/server mode" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
-    "  -h<num>   Set HTTP server port" + NL +
-    "  -n<name>  Set server (host) name" + NL +
-    "  -p<num>   Set database server port" + NL +
+    "  -h<num>   Set port of HTTP server" + NL +
+    "  -n<name>  Set name of database server" + NL +
+    "  -p<num>   Set port of database server" + NL +
     "  -P<pass>  Specify user password" + NL +
-    "  -s        Start database as service" + NL +
+    "  -R        Deactivate REST service" + NL +
+    "  -s        Start server as service" + NL +
     "  -U<name>  Specify user name" + NL +
-    "  -W        Deactivate WebDAV" + NL +
+    "  -W        Deactivate WebDAV service" + NL +
     "  -z        Suppress logging";
 
   // SERVER ===================================================================
