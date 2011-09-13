@@ -162,6 +162,22 @@ public final class ClientSession extends Session {
     send(input);
   }
 
+  @Override
+  public void store(final String path, final InputStream input)
+      throws IOException {
+
+    sout.write(ServerCmd.STORE.code);
+    send(path);
+    send(input);
+  }
+
+  @Override
+  public void retrieve(final String path) throws IOException {
+    sout.write(ServerCmd.RETRIEVE.code);
+    send(path);
+    receive(new BufferInput(sin), sout);
+  }
+
   /**
    * Watches an event.
    * @param name event name
@@ -276,13 +292,24 @@ public final class ClientSession extends Session {
     return bi.read() == 0;
   }
 
+  /**
+   * Retrieves data from the server.
+   * @param si buffered server input
+   * @param os output stream
+   * @throws IOException I/O exception
+   */
+  void receive(final BufferInput si, final OutputStream os)
+      throws IOException {
+    for(int b; (b = si.read()) != 0;) os.write(b == 0xFF ? si.read() : b);
+  }
+  
   @Override
   protected void execute(final String cmd, final OutputStream os)
       throws IOException {
 
     send(cmd);
     final BufferInput bi = new BufferInput(sin);
-    for(int b; (b = bi.read()) != 0;) os.write(b);
+    receive(bi, os);
     info = bi.readString();
     if(!ok(bi)) throw new BaseXException(info);
   }

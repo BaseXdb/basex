@@ -80,6 +80,14 @@ public final class IOFile extends IO {
     this(new File(dir.file, n));
   }
 
+  /**
+   * Returns the file reference.
+   * @return file reference
+   */
+  public File file() {
+    return file;
+  }
+
   @Override
   public void cache() throws IOException {
     final DataInputStream dis = new DataInputStream(new FileInputStream(file));

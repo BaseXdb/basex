@@ -21,6 +21,8 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
+import org.basex.core.cmd.Retrieve;
+import org.basex.core.cmd.Store;
 import org.basex.io.in.BufferInput;
 import org.basex.io.in.ClientInputStream;
 import org.basex.io.out.PrintOutput;
@@ -141,6 +143,10 @@ public final class ClientListener extends Thread {
             unwatch();
           } else if(sc == REPLACE) {
             replace();
+          } else if(sc == STORE) {
+            store();
+          } else if(sc == RETRIEVE) {
+            retrieve();
           } else if(sc != COMMAND) {
             query(sc);
           } else {
@@ -369,6 +375,41 @@ public final class ClientListener extends Thread {
       info(false, ex.getMessage(), perf);
     }
     out.flush();
+  }
+
+  /**
+   * Stores raw data in a database.
+   * @throws IOException I/O exception
+   */
+  private void store() throws IOException {
+    final Performance perf = new Performance();
+    final String path = in.readString();
+    log.write(this, STORE + " " + path + " [...]");
+
+    final ClientInputStream cis = new ClientInputStream(in);
+    try {
+      info(true, Store.store(path, cis, context, true), perf);
+    } catch(final BaseXException ex) {
+      cis.close();
+      info(false, ex.getMessage(), perf);
+    }
+    out.flush();
+  }
+
+  /**
+   * Retrieves raw data from a database.
+   * @throws IOException I/O exception
+   */
+  private void retrieve() throws IOException {
+    final Performance perf = new Performance();
+    final String source = in.readString();
+    log.write(this, RETRIEVE + " " + source);
+
+    try {
+      info(true, Retrieve.retrieve(source, out, context), perf);
+    } catch(final BaseXException ex) {
+      info(false, ex.getMessage(), perf);
+    }
   }
 
   /**

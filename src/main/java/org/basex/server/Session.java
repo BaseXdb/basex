@@ -80,13 +80,29 @@ public abstract class Session {
       final InputStream input) throws IOException;
 
   /**
-   * Replace a document in an open database.
+   * Replaces a document in an open database.
    * @param path document(s) to replace
    * @param input new content
    * @throws IOException I/O exception
    */
   public abstract void replace(final String path, final InputStream input)
       throws IOException;
+
+  /**
+   * Stores raw data in an open database.
+   * @param path target path
+   * @param input binary input
+   * @throws IOException I/O exception
+   */
+  public abstract void store(final String path, final InputStream input)
+      throws IOException;
+
+  /**
+   * Retrieves raw data from an open database.
+   * @param path source path
+   * @throws IOException I/O exception
+   */
+  public abstract void retrieve(final String path) throws IOException;
 
   /**
    * Returns command info as a string, regardless of whether an output stream

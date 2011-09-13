@@ -33,6 +33,10 @@ public enum ServerCmd {
   UNWATCH(11),
   /** Code for replacing a document in a database: {path}0{input}0. */
   REPLACE(12),
+  /** Code for storing raw data in a database: {path}0{input}0. */
+  STORE(13),
+  /** Code for retrieving raw data from a database: {path}0. */
+  RETRIEVE(14),
   /** Code for running a database command: {command}0. */
   COMMAND(-1);
 
