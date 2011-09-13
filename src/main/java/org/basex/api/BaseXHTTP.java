@@ -62,6 +62,15 @@ public final class BaseXHTTP {
       return;
     }
 
+    // set user (use 'admin' as default)
+    if(System.getProperty(DBUSER) != null) {
+      // set password if only user was specified
+      while(System.getProperty(DBPASS) == null) {
+        Util.out(SERVERPW + COLS);
+        System.setProperty(DBPASS, Util.password());
+      }
+    }
+
     if(HTTPSession.client()) {
       server = new BaseXServer(ctx, quiet ? "-z" : "");
     } else {

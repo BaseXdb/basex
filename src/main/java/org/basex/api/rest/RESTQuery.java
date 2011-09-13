@@ -79,9 +79,10 @@ class RESTQuery extends RESTCode {
       if(val.length == 2) qu.bind(e.getKey(), val[0], val[1]);
       if(val.length == 1) qu.bind(e.getKey(), val[0]);
     }
+
     // initializes the output
-    final SerializerProp prop = new SerializerProp(qu.options());
-    initOutput(prop, ctx);
+    initOutput(new SerializerProp(qu.options()), ctx);
+
     // run query
     qu.execute();
   }
