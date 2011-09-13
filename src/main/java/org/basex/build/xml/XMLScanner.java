@@ -747,9 +747,8 @@ final class XMLScanner extends Progress {
       }
       if(!consume(COND)) return found;
       found = true;
-      //pe = true;
 
-      s(); // [61
+      s(); // [61]
       final boolean incl = consume(INCL);
       if(!incl) check(IGNO);
       s();

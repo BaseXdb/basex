@@ -265,9 +265,7 @@ public final class Token {
   }
 
   /** Character lengths. */
-  private static final int[] CHLEN = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 4
-  };
+  private static final int[] CHLEN = { 1, 1, 1, 1, 2, 2, 3, 4 };
 
   /**
    * Returns the length of the specified UTF8 byte.
@@ -275,7 +273,7 @@ public final class Token {
    * @return character length
    */
   public static int cl(final byte cp) {
-    return cp >= 0 ? 1 : CHLEN[cp >> 4 & 0xF];
+    return cp >= 0 ? 1 : CHLEN[cp >> 4 & 0x7];
   }
 
   /**

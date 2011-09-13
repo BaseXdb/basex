@@ -43,7 +43,7 @@ public final class DataInput extends BufferInput {
     final int l = readNum();
     if(l == 0) return Token.EMPTY;
     final byte[] array = new byte[l];
-    for(int i = 0; i < l; ++i) array[i] = readByte();
+    for(int i = 0; i < l; ++i) array[i] = (byte) read();
     return array;
   }
 

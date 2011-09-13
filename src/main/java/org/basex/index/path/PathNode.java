@@ -51,7 +51,7 @@ public final class PathNode {
    */
   PathNode(final DataInput in, final PathNode p) throws IOException {
     name = (short) in.readNum();
-    kind = in.readByte();
+    kind = (byte) in.read();
     size = in.readNum();
     ch = new PathNode[in.readNum()];
     in.readDouble();

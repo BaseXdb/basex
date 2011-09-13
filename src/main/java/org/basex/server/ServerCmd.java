@@ -57,7 +57,7 @@ public enum ServerCmd {
    * @param b control byte
    * @return server command
    */
-  static ServerCmd get(final byte b) {
+  static ServerCmd get(final int b) {
     for(final ServerCmd s : values()) if(s.code == b) return s;
     // current default for unknown codes: database command.
     return COMMAND;

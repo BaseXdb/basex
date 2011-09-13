@@ -122,22 +122,19 @@ public class BufferInput extends InputStream {
     }
   }
 
-  @Override
-  public final int read() throws IOException {
-    return readByte() & 0xFF;
-  }
-
   /**
-   * Returns the next byte. {@code 0} is returned if all bytes have been read.
+   * Returns the next byte (see {@link InputStream#read}.
+   * {@code 0} is returned if all bytes have been read.
    * @return next byte
    * @throws IOException I/O exception
    */
-  public byte readByte() throws IOException {
+  @Override
+  public int read() throws IOException {
     if(pos >= size) {
       next();
       if(size <= 0) return 0;
     }
-    return buffer[pos++];
+    return buffer[pos++] & 0xFF;
   }
 
   /**
@@ -156,7 +153,7 @@ public class BufferInput extends InputStream {
    */
   public final ByteList token() throws IOException {
     final ByteList bl = new ByteList();
-    for(byte l; (l = readByte()) != 0;) bl.add(l);
+    for(int l; (l = read()) > 0;) bl.add(l);
     return bl;
   }
 
@@ -178,24 +175,23 @@ public class BufferInput extends InputStream {
    */
   public final int readChar() throws IOException {
     // handle different encodings
-    final byte ch = readByte();
+    final int ch = read();
     // encoding can be safely compared by references...
+    if(enc == UTF16LE) return ch | read() << 8;
+    if(enc == UTF16BE) return ch << 8 | read();
+    if(ch < 0x80) return ch;
     if(enc == UTF8) {
-      final int cl = cl(ch);
-      if(cl == 1) return ch & 0xFF;
-      cache[0] = ch;
-      for(int c = 1; c < cl; ++c) cache[c] = readByte();
+      final int cl = cl((byte) ch);
+      cache[0] = (byte) ch;
+      for(int c = 1; c < cl; ++c) cache[c] = (byte) read();
       return cp(cache, 0);
     }
-    if(enc == UTF16LE) return ch & 0xFF | (readByte() & 0xFF) << 8;
-    if(enc == UTF16BE) return (ch & 0xFF) << 8 | readByte() & 0xFF;
-    if(ch >= 0) return ch;
 
     // convert other encodings.. loop until all needed bytes have been read
     int p = 0;
     while(true) {
       if(p == 4) return -cache[0];
-      cache[p++] = ch;
+      cache[p++] = (byte) ch;
       try {
         final CharBuffer cb = csd.decode(
             ByteBuffer.wrap(Arrays.copyOf(cache, p)));
@@ -204,7 +200,7 @@ public class BufferInput extends InputStream {
         return i;
       } catch(final CharacterCodingException ex) {
         // tolerate erroneous characters
-        return ch & 0xFF;
+        return ch;
       }
     }
   }

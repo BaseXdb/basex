@@ -15,12 +15,8 @@ public final class ArrayInput extends BufferInput {
     super(input);
   }
 
-  /**
-   * Returns the next byte.
-   * @return next byte
-   */
   @Override
-  public byte readByte() {
-    return pos < length ? buffer[pos++] : 0;
+  public int read() {
+    return pos < length ? buffer[pos++] & 0xFF : 0;
   }
 }

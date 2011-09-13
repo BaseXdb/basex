@@ -130,7 +130,7 @@ public final class ClientListener extends Thread {
     try {
       while(running) {
         try {
-          final byte b = in.readByte();
+          final int b = in.read();
           sc = get(b);
           cmd = null;
           if(sc == CREATE) {
