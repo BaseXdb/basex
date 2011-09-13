@@ -493,10 +493,10 @@ public enum Function {
   DBREPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
   /** Database function: optimize database structures. */
   DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
-  /** Database function: gets a value binary data. */
-  DBGET(FNDb.class, "get(database,path)", B64, STR, STR),
+  /** Database function: retrieves binary data. */
+  DBRETRIEVE(FNDb.class, "retrieve(database,path)", B64, STR, STR),
   /** Database function: stores binary data. */
-  DBPUT(FNDb.class, "put(database,path,value)", EMP, STR, STR, ITEM),
+  DBSTORE(FNDb.class, "store(database,path,value)", EMP, STR, STR, ITEM),
   /** Database function: checks if the specified resource is an xml document. */
   DBISXML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
   /** Database function: checks if the specified resource is a raw file. */

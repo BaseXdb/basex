@@ -108,8 +108,8 @@ public final class FNDb extends FuncCall {
       case DBRENAME:   return rename(ctx);
       case DBREPLACE:  return replace(ctx);
       case DBOPTIMIZE: return optimize(ctx);
-      case DBPUT:      return put(ctx);
-      case DBGET:      return get(ctx);
+      case DBSTORE:    return store(ctx);
+      case DBRETRIEVE: return retrieve(ctx);
       case DBISRAW:    return isRaw(ctx);
       case DBISXML:    return isXML(ctx);
       default:         return super.item(ctx, ii);
@@ -447,7 +447,7 @@ public final class FNDb extends FuncCall {
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item put(final QueryContext ctx) throws QueryException {
+  private Item store(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
@@ -465,7 +465,7 @@ public final class FNDb extends FuncCall {
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item get(final QueryContext ctx) throws QueryException {
+  private Item retrieve(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String key = path(1, ctx);
 
@@ -540,12 +540,12 @@ public final class FNDb extends FuncCall {
     final boolean up =
       def == Function.DBADD || def == Function.DBDELETE ||
       def == Function.DBRENAME || def == Function.DBREPLACE ||
-      def == Function.DBOPTIMIZE || def == Function.DBPUT;
+      def == Function.DBOPTIMIZE || def == Function.DBSTORE;
     return
       u == Use.CTX && (
         def == Function.DBTEXT || def == Function.DBATTR ||
         def == Function.DBFULLTEXT || def == Function.DBEVENT ||
-        def == Function.DBGET || up) ||
+        def == Function.DBRETRIEVE || up) ||
       u == Use.UPD && up ||
       super.uses(u);
   }

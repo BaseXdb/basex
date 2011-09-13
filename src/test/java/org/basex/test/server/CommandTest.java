@@ -43,9 +43,11 @@ import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Rename;
 import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Restore;
+import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowUsers;
+import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
 import org.basex.io.IOFile;
@@ -447,10 +449,10 @@ public class CommandTest {
     ok(new Replace(FN, "<a/>"));
     no(new Replace(FN, ""));
     // create binary file
-    ok(new XQuery("db:put('" + NAME + "', 'a', 'a')"));
+    ok(new XQuery("db:store('" + NAME + "', 'a', 'a')"));
     ok(new Replace("a", "<b/>"));
     assertTrue(!ok(new XQuery("db:open('" + NAME + "')")).isEmpty());
-    ok(new XQuery("db:get('" + NAME + "', 'a')"));
+    ok(new XQuery("db:retrieve('" + NAME + "', 'a')"));
     // a failing replace should not remove existing documents
     no(new Replace(FN, "<a>"));
     assertTrue(!ok(new XQuery("doc('" + NAME + "')")).isEmpty());
@@ -477,6 +479,28 @@ public class CommandTest {
     ok(new DropBackup("test-1"));
     ok(new DropDB("test-1"));
     ok(new Close());
+  }
+
+  /** Retrieves raw data. */
+  @Test
+  public final void retrieve() {
+    ok(new CreateDB(NAME));
+    // retrieve non-existing file
+    no(new Retrieve(NAME2));
+    // retrieve existing file
+    ok(new Store(NAME2, FILE));
+    ok(new Retrieve(NAME2));
+  }
+
+  /** Stores raw data. */
+  @Test
+  public final void store() {
+    ok(new CreateDB(NAME));
+    ok(new Store(NAME2, FILE));
+    // file can be overwritten
+    ok(new Store(NAME2, FILE));
+    // reject invalid names
+    no(new Store("", FILE));
   }
 
   /** Command test. */

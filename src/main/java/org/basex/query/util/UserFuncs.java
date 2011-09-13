@@ -114,7 +114,7 @@ public final class UserFuncs extends ExprInfo {
       ctx.updating |= fun.def == Function.PUT || fun.def == Function.DBADD ||
         fun.def == Function.DBDELETE || fun.def == Function.DBRENAME ||
         fun.def == Function.DBREPLACE || fun.def == Function.DBOPTIMIZE ||
-        fun.def == Function.DBPUT;
+        fun.def == Function.DBSTORE;
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 

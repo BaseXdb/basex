@@ -9,7 +9,7 @@ import org.basex.io.IOFile;
 import org.basex.util.list.IntList;
 
 /**
- * Evaluates the 'rename' command and renames document or document paths
+ * Evaluates the 'rename' command and renames resources or directories
  * in a collection.
  *
  * @author BaseX Team 2005-11, BSD License

@@ -610,6 +610,10 @@ ch_repo2=Installiert, entfernt oder listet installierte Pakete auf:
 ch_repo3=entfernt das Paket mit dem Namen [%] oder dem Verzeichnis [%]
 ch_repo4=installiert das Paket mit dem Pfad [%]
 ch_repo5=listet alle installierten Pakete auf
+ch_retrieve1=Anfrage von Rohdaten.
+ch_retrieve2=Liefert Rohdaten vom Pfad [%] zurück.
+ch_store1=Speicherung von Rohdaten.
+ch_store2=Speichert Rohdaten am angegebenen Pfad [%].
 
 # Help Texts
 h_hist=Auswahl der letzten Texteingaben.

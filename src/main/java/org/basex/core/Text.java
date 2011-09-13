@@ -390,15 +390,6 @@ public interface Text {
     "([" + C_PW + "])", lang("ch_password1"), lang("ch_password2")
   };
   /** Command help. */
-  String[] HELPHELP = {
-    "([command])", lang("ch_help1", NAME), lang("ch_help2", "command")
-  };
-  /** Command help. */
-  String[] HELPEXIT = {
-    "", lang("ch_exit1", NAME), lang("ch_exit2", NAME)
-  };
-
-  /** Command help. */
   String[] HELPREPO = {
       "[" + CmdRepo.DELETE + "|" + CmdRepo.INSTALL + "|" + CmdRepo.LIST + "]",
       lang("ch_repo1"),
@@ -409,6 +400,23 @@ public interface Text {
       "  " + lang("ch_repo4", C_PKGPATH) + NL +
       LI + CmdRepo.LIST + ":" + NL +
       "  " + lang("ch_repo5")
+  };
+  /** Command help. */
+  String[] HELPRETRIEVE= {
+    "[" + C_PATH + "]", lang("ch_retrieve1"), lang("ch_retrieve2", C_PATH)
+  };
+  /** Command help. */
+  String[] HELPSTORE= {
+    "[" + C_PATH + "] [" + C_INPUT + "]",
+    lang("ch_store1"), lang("ch_store2", C_PATH)
+  };
+  /** Command help. */
+  String[] HELPHELP = {
+    "([command])", lang("ch_help1", NAME), lang("ch_help2", "command")
+  };
+  /** Command help. */
+  String[] HELPEXIT = {
+    "", lang("ch_exit1", NAME), lang("ch_exit2", NAME)
   };
 
   // COMMAND INFOS ============================================================
@@ -548,6 +556,8 @@ public interface Text {
   String DBBACKNF = lang("db_backnf");
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
+  /** File not stored. */
+  String DBNOTSTORED = lang("db_notstored");
 
   /** Index created. */
   String INDCREATED = lang("in_created");

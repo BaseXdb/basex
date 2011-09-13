@@ -13,7 +13,7 @@ import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 
 /**
- * Update primitive for the db:put() function.
+ * Update primitive for the db:store() function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

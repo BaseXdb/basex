@@ -306,10 +306,10 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("count(collection('" + DB + "/newtest'))", NFLDR);
 
     // rename binary file
-    query("db:put('" + DB + "', 'one', '')");
+    query("db:store('" + DB + "', 'one', '')");
     query(fun + "('" + DB + "', 'one', 'two')");
-    query("db:get('" + DB + "', 'two')");
-    error("db:get('" + DB + "', 'one')", Err.RESFNF);
+    query("db:retrieve('" + DB + "', 'two')");
+    error("db:retrieve('" + DB + "', 'one')", Err.RESFNF);
   }
 
   /**
@@ -346,24 +346,24 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the db:get() function.
+   * Test method for the db:retrieve() function.
    */
   @Test
-  public void dbGet() {
-    final String fun = check(Function.DBGET);
+  public void dbRetrieve() {
+    final String fun = check(Function.DBRETRIEVE);
     error(fun + "('" + DB + "', 'raw')", Err.RESFNF);
-    query("db:put('" + DB + "', 'raw', xs:hexBinary('41'))");
+    query("db:store('" + DB + "', 'raw', xs:hexBinary('41'))");
     query(fun + "('" + DB + "', 'raw')");
     query("db:delete('" + DB + "', 'raw')");
     error(fun + "('" + DB + "', 'raw')", Err.RESFNF);
   }
 
   /**
-   * Test method for the db:put() function.
+   * Test method for the db:store() function.
    */
   @Test
-  public void dbPut() {
-    final String fun = check(Function.DBPUT);
+  public void dbStore() {
+    final String fun = check(Function.DBSTORE);
     query(fun + "('" + DB + "', 'raw1', xs:hexBinary('41'))");
     query(fun + "('" + DB + "', 'raw2', 'b')");
     query(fun + "('" + DB + "', 'raw3', 123)");
@@ -376,7 +376,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbIsRaw() {
     final String fun = check(Function.DBISRAW);
     query("db:add('" + DB + "', '<a/>', 'xml')");
-    query("db:put('" + DB + "', 'raw', 'bla')");
+    query("db:store('" + DB + "', 'raw', 'bla')");
     query(fun + "('" + DB + "', 'xml')", "false");
     query(fun + "('" + DB + "', 'raw')", "true");
     query(fun + "('" + DB + "', 'xxx')", "false");
@@ -390,7 +390,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbIsXML() {
     final String fun = check(Function.DBISXML);
     query("db:add('" + DB + "', '<a/>', 'xml')");
-    query("db:put('" + DB + "', 'raw', 'bla')");
+    query("db:store('" + DB + "', 'raw', 'bla')");
     query(fun + "('" + DB + "', 'xml')", "true");
     query(fun + "('" + DB + "', 'raw')", "false");
     query(fun + "('" + DB + "', 'xxx')", "false");
