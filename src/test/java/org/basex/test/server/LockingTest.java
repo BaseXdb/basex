@@ -28,18 +28,23 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public final class LockingTest {
+  /** Positions to check in the query. */
+  private static final int POS = 50;
+  /** Number of performance tests. */
+  private static final int TESTS = 5;
+
   /** Test file. */
   private static final String FILE = "etc/test/factbook.zip";
   /** Test name. */
   private static final String NAME = "factbook";
   /** Test query. */
   private static final String READ1 =
-    "for $c in (//country)[position() < 10] " +
+    "for $c in (//country)[position() < " + POS + "] " +
     "for $n in //city where $c/@id = $n/@country and $n/name = 'Tirane' " +
     "return $n/population/text()";
   /** Test update query. */
   private static final String WRITE1 =
-    "for $i in (//members)[position() < 10] " +
+    "for $i in (//members)[position() < " + POS + "] " +
     "return insert node <aa/> into $i";
   /** Test update query. */
   private static final String WRITE2 =
@@ -51,9 +56,6 @@ public final class LockingTest {
     "for $n at $p in doc('factbook')//city " +
     "where $c/@id = $n/@country and $n/name = 'Tirane' " +
     "return $n/population/text()";
-
-  /** Number of performance tests. */
-  private static final int TESTS = 3;
 
   /** Server reference. */
   static BaseXServer server;

@@ -324,7 +324,7 @@ public final class ClientListener extends Thread {
         CreateDB.create(name, cis, context);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.close();
+      cis.flush();
       info(false, ex.getMessage(), perf);
     }
   }
@@ -348,7 +348,7 @@ public final class ClientListener extends Thread {
       final String info = Add.add(name, path, is, context, null, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.close();
+      cis.flush();
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -371,7 +371,7 @@ public final class ClientListener extends Thread {
       final String info = Replace.replace(path, is, context, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.close();
+      cis.flush();
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -390,7 +390,7 @@ public final class ClientListener extends Thread {
     try {
       info(true, Store.store(path, cis, context, true), perf);
     } catch(final BaseXException ex) {
-      cis.close();
+      cis.flush();
       info(false, ex.getMessage(), perf);
     }
     out.flush();

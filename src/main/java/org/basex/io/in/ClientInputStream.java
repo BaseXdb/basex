@@ -5,10 +5,10 @@ import java.io.InputStream;
 
 /**
  * This class wraps a {@link BufferInput} reference to a standard input stream.
- * {@code -1} is returned if the end of the stream is reached.
- * The method {@link #curr()} can be called to return the current stream
- * value, which is the first value to be returned, or the most recent value
- * that has been returned by {@link #read()}.
+ * {@code -1} is returned if the end of the stream is reached. The method
+ * {@link #curr()} returns the current stream value, which is the first value to
+ * be returned or the most recent value that has been returned by
+ * {@link #read()}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -47,9 +47,11 @@ public final class ClientInputStream extends InputStream {
     return v;
   }
 
-  @Override
-  public void close() throws IOException {
+  /**
+   * Flushes the remaining client data.
+   * @throws IOException I/O exception
+   */
+  public void flush() throws IOException {
     while(read() != -1);
-    super.close();
   }
 }
