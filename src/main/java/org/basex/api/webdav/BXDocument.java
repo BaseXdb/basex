@@ -78,7 +78,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       public void run() throws IOException {
         s.setOutputStream(out);
         final String query = raw ?
-          "declare option output:method 'raw'; db:get($db, $path)" :
+          "declare option output:method 'raw'; db:retrieve($db, $path)" :
           "db:open($db, $path)";
         final Query q = s.query(query);
         q.bind("db", db);

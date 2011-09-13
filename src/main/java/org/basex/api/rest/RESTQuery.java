@@ -65,7 +65,7 @@ class RESTQuery extends RESTCode {
       final String raw = "db:is-raw(" + args + ")";
       if(session.query(raw).execute().equals("true"))
         query = "declare option output:method '" + M_RAW + "';" +
-            "db:get(" + args + ")";
+            "db:retrieve(" + args + ")";
     }
 
     // redirect output stream
