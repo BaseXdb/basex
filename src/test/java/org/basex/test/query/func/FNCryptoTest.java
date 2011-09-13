@@ -1,6 +1,11 @@
 package org.basex.test.query.func;
 
+import org.basex.core.BaseXException;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
+import org.basex.util.Util;
+import org.junit.AfterClass;
 import org.junit.Test;
 
 /**
@@ -10,6 +15,9 @@ import org.junit.Test;
  * @author Lukas Kircher
  */
 public class FNCryptoTest extends AdvancedQueryTest {
+
+  /** Test database name. */
+  private static final String DB = Util.name(FNCryptoTest.class);
 
   /**
    * Test method for crypto:encrypt and crypto:decrypt.
@@ -33,8 +41,36 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "\"4E4748E62B463521F6775FBF921234B5\"");
   }
 
-  // ADDITIONAL TESTS
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   * @throws BaseXException basex exception 
+   */
+  @Test
+  public void generatesignature() throws BaseXException {
+    new CreateDB(DB, "<n/>").execute(CONTEXT);
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:generate-signature(/n,'','','','','')",
+        "");
+  }
 
-  /*declare namespace c = 'http://expath.org/ns/crypto';
-  c:generate-signature(/n,'','','','','')*/
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   * @throws BaseXException basex exception 
+   */
+  @Test
+  public void validatesignature() throws BaseXException {
+    new CreateDB(DB, "<n/>").execute(CONTEXT);
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(/n,'','','','',''))");
+  }
+  
+  /**
+   * Deletes the test db.
+   * @throws Exception exception
+   */
+  @AfterClass
+  public static void end() throws Exception {
+    new DropDB(DB).execute(CONTEXT);
+    CONTEXT.close();
+  }
 }
