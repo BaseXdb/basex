@@ -1,6 +1,5 @@
 package org.basex.test.query.func;
 
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
@@ -43,10 +42,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
 
   /**
    * Test method for crypto:encrypt and crypto:decrypt.
-   * @throws BaseXException basex exception 
    */
   @Test
-  public void generatesignature() throws BaseXException {
+  public void generatesignature() throws Exception {
     new CreateDB(DB, "<n/>").execute(CONTEXT);
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:generate-signature(/n,'','','','','')",
@@ -55,13 +53,13 @@ public class FNCryptoTest extends AdvancedQueryTest {
 
   /**
    * Test method for crypto:encrypt and crypto:decrypt.
-   * @throws BaseXException basex exception 
    */
   @Test
-  public void validatesignature() throws BaseXException {
+  public void validatesignature() throws Exception {
     new CreateDB(DB, "<n/>").execute(CONTEXT);
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(/n,'','','','',''))");
+        "c:validate-signature(c:generate-signature(/n,'','','','',''))",
+        "true");
   }
   
   /**

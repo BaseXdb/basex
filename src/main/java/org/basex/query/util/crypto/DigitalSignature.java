@@ -13,6 +13,8 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.Collections;
@@ -207,6 +209,12 @@ public final class DigitalSignature {
           new ByteArrayInputStream(byteOut.toByteArray()));
       nl = doc.getElementsByTagName("Signature");
 
+      final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), nl.item(0));
+      final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
+      final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
+
+      return Bln.get(signature.validate(valContext));
+
     } catch(FileNotFoundException e1) {
       e1.printStackTrace();
     } catch(IOException e1) {
@@ -215,19 +223,6 @@ public final class DigitalSignature {
       e.printStackTrace();
     } catch(ParserConfigurationException e) {
       e.printStackTrace();
-    }
-
-    DOMValidateContext valContext = new DOMValidateContext(
-        new X509KeySelector(), nl.item(0));
-    final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
-
-    XMLSignature signature = null;
-
-    try {
-      signature = fac.unmarshalXMLSignature(valContext);
-      Bln res = Bln.get(signature.validate(valContext));
-      return res;
-
     } catch(MarshalException e) {
       e.printStackTrace();
     } catch(XMLSignatureException e) {
