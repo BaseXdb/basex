@@ -6,7 +6,7 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * This is a simple container for sessions.
+ * Database exception, extending the {@link IOException}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

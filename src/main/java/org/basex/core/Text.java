@@ -50,7 +50,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version (must contain major, minor and optional patch number). */
-  String VERSION = "6.7.2 beta";
+  String VERSION = "6.8 beta";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
@@ -131,32 +131,20 @@ public interface Text {
     " [file]" + NL +
     "  [file]  Open specified XML or XQuery file";
 
-  /** Start information. */
-  String JAXRXINFO =
-    " [-jpPsUz]" + NL +
-    "  -j<num>   Set JAX-RX server port" + NL +
-    "  -p<num>   Set database server port" + NL +
-    "  -P<pass>  Specify user password" + NL +
-    "  -s        Start as service" + NL +
-    "  -S<pars>  Set serialization parameter(s)" + NL +
-    "  -U<name>  Specify user name" + NL +
-    "  -z        Suppress logging";
-
   /** HTTP information. */
   String HTTPINFO =
-    " [-cdejnpPsSUwz] [stop]" + NL +
+    " [-cdeJhnpPsSUWz] [stop]" + NL +
     "  stop      Stop existing server" + NL +
     "  -c        Start in client/server mode" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
-    "  -j<num>   Set JAX-RX server port" + NL +
+    "  -h<num>   Set HTTP server port" + NL +
     "  -n<name>  Set server (host) name" + NL +
     "  -p<num>   Set database server port" + NL +
     "  -P<pass>  Specify user password" + NL +
     "  -s        Start database as service" + NL +
-    "  -S<pars>  Set serialization parameter(s)" + NL +
     "  -U<name>  Specify user name" + NL +
-    "  -w<num>   Set WebDAV server port" + NL +
+    "  -W        Deactivate WebDAV" + NL +
     "  -z        Suppress logging";
 
   // SERVER ===================================================================

@@ -31,7 +31,7 @@ public final class FNMap extends FuncCall {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case MAPGET:  return get(ctx).iter();
-      case MAPKEYS: return getMap(ctx).keys().iter();
+      case MAPKEYS: return map(ctx).keys().iter();
       default:      return super.iter(ctx);
     }
   }
@@ -40,7 +40,7 @@ public final class FNMap extends FuncCall {
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
       case MAPGET:  return get(ctx);
-      case MAPKEYS: return getMap(ctx).keys();
+      case MAPKEYS: return map(ctx).keys();
       default:      return super.value(ctx);
     }
   }
@@ -52,9 +52,9 @@ public final class FNMap extends FuncCall {
       case MAPNEW:   return newMap(ctx, ii);
       case MAPENTRY: return entry(ctx, ii);
       case MAPCONT:  return contains(ctx, ii);
-      case MAPSIZE:  return getMap(ctx).mapSize();
+      case MAPSIZE:  return map(ctx).mapSize();
       case MAPREM:   return remove(ctx, ii);
-      case MAPCOLL:  return getMap(ctx).collation();
+      case MAPCOLL:  return map(ctx).collation();
       default:       return super.item(ctx, ii);
     }
   }
@@ -68,7 +68,7 @@ public final class FNMap extends FuncCall {
    */
   private Map remove(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return getMap(ctx).delete(expr[1].item(ctx, ii), ii);
+    return map(ctx).delete(expr[1].item(ctx, ii), ii);
   }
 
   /**
@@ -80,7 +80,8 @@ public final class FNMap extends FuncCall {
    */
   private Map entry(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return Map.entry(expr[0].item(ctx, ii), expr[1].value(ctx), ii);
+    
+    return Map.EMPTY.insert(expr[0].item(ctx, ii), expr[1].value(ctx), ii);
   }
 
   /**
@@ -109,7 +110,7 @@ public final class FNMap extends FuncCall {
    * @throws QueryException query exception
    */
   private Value get(final QueryContext ctx) throws QueryException {
-    return getMap(ctx).get(expr[1].item(ctx, input), input);
+    return map(ctx).get(expr[1].item(ctx, input), input);
   }
 
   /**
@@ -121,16 +122,16 @@ public final class FNMap extends FuncCall {
    */
   private Bln contains(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return getMap(ctx).contains(expr[1].item(ctx, ii), ii);
+    return map(ctx).contains(expr[1].item(ctx, ii), ii);
   }
 
   /**
-   * Gets the map at the given argument position.
+   * Gets the map at the first argument position.
    * @param ctx query context
    * @return map
    * @throws QueryException query exception
    */
-  private Map getMap(final QueryContext ctx) throws QueryException {
+  private Map map(final QueryContext ctx) throws QueryException {
     return checkMap(checkItem(expr[0], ctx));
   }
 

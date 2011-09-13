@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.basex.core.BaseXException;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.junit.After;
@@ -38,27 +37,29 @@ public abstract class SessionTest {
     }
   }
 
-  /** Runs a query command and retrieves the result as string.
-   * @throws BaseXException command exception */
+  /**
+   * Runs a query command and retrieves the result as string.
+   * @throws IOException I/O exception
+   */
   @Test
-  public final void command() throws BaseXException {
+  public final void command() throws IOException {
     session.execute("set serializer wrap-prefix=,wrap-uri=");
     check("A", session.execute("xquery 'A'"));
   }
 
   /** Runs a query command and wraps the result.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public final void commandSerial1() throws BaseXException {
+  public final void commandSerial1() throws IOException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     check("<db:results xmlns:db=\"ns\"/>",
         session.execute("xquery ()"));
   }
 
   /** Runs a query command and wraps the result.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public final void commandSerial2() throws BaseXException {
+  public final void commandSerial2() throws IOException {
     check("<db:results xmlns:db=\"ns\">" +
           "  <db:result>1</db:result>" +
           "</db:results>",
@@ -66,25 +67,25 @@ public abstract class SessionTest {
   }
 
   /** Runs an erroneous query command.
-   * @throws BaseXException expected exception */
+   * @throws IOException I/O exception */
   @Test(expected = org.basex.core.BaseXException.class)
-  public final void commandError() throws BaseXException {
+  public final void commandError() throws IOException {
     session.execute("xquery (");
   }
 
   /** Runs a query and retrieves the result as string.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void query() throws BaseXException {
+  public void query() throws IOException {
     final Query query = session.query("1");
     check("1", query.execute());
     check("", query.close());
   }
 
   /** Runs a query and retrieves the result as string.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void query2() throws BaseXException {
+  public void query2() throws IOException {
     final Query query = session.query("1");
     if(!query.more()) fail("No result returned");
     check("1", query.next());
@@ -92,18 +93,18 @@ public abstract class SessionTest {
   }
 
   /** Runs a query and retrieves the empty result as string.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryEmpty() throws BaseXException {
+  public void queryEmpty() throws IOException {
     final Query query = session.query("()");
     assertFalse("No result was expected.", query.more());
     query.close();
   }
 
   /** Tolerate multiple close calls.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryClose() throws BaseXException {
+  public void queryClose() throws IOException {
     final Query query = session.query("()");
     check("", query.close());
     check("", query.close());
@@ -111,9 +112,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query, using init().
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryInit() throws BaseXException {
+  public void queryInit() throws IOException {
     final Query query = session.query("()");
     check("", query.init());
     assertFalse("No result was expected.", query.more());
@@ -121,9 +122,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query and retrieves multiple results as string.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryMore() throws BaseXException {
+  public void queryMore() throws IOException {
     final Query query = session.query("1 to 3");
     int c = 0;
     query.init();
@@ -132,9 +133,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query, omitting more().
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryNoMore() throws BaseXException {
+  public void queryNoMore() throws IOException {
     final Query query = session.query("1 to 2");
     check("1", query.next());
     check("2", query.next());
@@ -143,9 +144,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query with additional serialization parameters.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void querySerial1() throws BaseXException {
+  public void querySerial1() throws IOException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     final Query query = session.query(WRAPPER + "()");
     check("<db:results xmlns:db=\"ns\"", query.init());
@@ -154,9 +155,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query with additional serialization parameters.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void querySerial2() throws BaseXException {
+  public void querySerial2() throws IOException {
     // avoid query evaluation, if more()/next() isn't called
     final Query query = session.query(WRAPPER + "1 to 10000000000000");
     check("<db:results xmlns:db=\"ns\"", query.init());
@@ -164,9 +165,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query with additional serialization parameters.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void querySerial3() throws BaseXException {
+  public void querySerial3() throws IOException {
     final Query query = session.query(WRAPPER + "1 to 2");
     check("<db:results xmlns:db=\"ns\"", query.init());
     check("><db:result>1</db:result>", query.next());
@@ -175,9 +176,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query with an external variable declaration.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryBind() throws BaseXException {
+  public void queryBind() throws IOException {
     final Query query = session.query("declare variable $a external; $a");
     query.bind("$a", "5");
     check("5", query.next());
@@ -185,17 +186,17 @@ public abstract class SessionTest {
   }
 
   /** Runs a query with an external variable declaration.
-   * @throws BaseXException exception
+   * @throws IOException exception
    */
   @Test(expected = org.basex.core.BaseXException.class)
-  public void queryBind2() throws BaseXException {
+  public void queryBind2() throws IOException {
     session.query("declare variable $a external; $a").next();
   }
 
   /** Runs a query with an external variable declaration.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryBindURI() throws BaseXException {
+  public void queryBindURI() throws IOException {
     final Query query = session.query(
         "declare variable $a external; $a");
     query.bind("$a", "X", "xs:anyURI");
@@ -204,9 +205,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query with an external variable declaration.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryBindInt() throws BaseXException {
+  public void queryBindInt() throws IOException {
     final Query query = session.query(
         "declare variable $a as xs:integer external; $a");
     query.bind("a", "5", "xs:integer");
@@ -215,9 +216,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query with an external variable declaration.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryBindDynamic() throws BaseXException {
+  public void queryBindDynamic() throws IOException {
     final Query query = session.query(
         "declare variable $a as xs:integer external; $a");
     query.bind("a", "1");
@@ -226,9 +227,9 @@ public abstract class SessionTest {
   }
 
   /** Runs a query, omitting more().
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryInfo() throws BaseXException {
+  public void queryInfo() throws IOException {
     final Query query = session.query("1 to 2");
     query.execute();
     final String info = query.info();
@@ -238,17 +239,17 @@ public abstract class SessionTest {
   }
 
   /** Runs an erroneous query.
-   * @throws BaseXException expected exception*/
+   * @throws IOException expected exception*/
   @Test(expected = org.basex.core.BaseXException.class)
-  public void queryError() throws BaseXException {
+  public void queryError() throws IOException {
     final Query query = session.query("(");
     query.next();
   }
 
   /** Runs an erroneous query.
-   * @throws BaseXException expected exception*/
+   * @throws IOException expected exception*/
   @Test(expected = org.basex.core.BaseXException.class)
-  public void queryError3() throws BaseXException {
+  public void queryError3() throws IOException {
       final Query query = session.query("(1,'a')[. eq 1]");
       query.init();
       check("1", query.next());
@@ -256,9 +257,9 @@ public abstract class SessionTest {
   }
 
   /** Runs two queries in parallel.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void queryParallel() throws BaseXException {
+  public void queryParallel() throws IOException {
     final Query query1 = session.query("1 to 2");
     final Query query2 = session.query("reverse(3 to 4)");
     check("1", query1.next());
@@ -272,9 +273,9 @@ public abstract class SessionTest {
   }
 
   /** Runs 5 queries in parallel.
-   * @throws BaseXException command exception */
+   * @throws IOException I/O exception */
   @Test
-  public void query8() throws BaseXException {
+  public void query8() throws IOException {
     final int size = 8;
     final Query[] cqs = new Query[size];
     for(int q = 0; q < size; q++) cqs[q] = session.query(Integer.toString(q));

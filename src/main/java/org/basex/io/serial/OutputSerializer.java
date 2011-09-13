@@ -30,21 +30,24 @@ public abstract class OutputSerializer extends Serializer {
   protected static final TokenList EMPTIES = new TokenList();
   /** (X)HTML: URI attributes. */
   protected static final TokenSet URIS = new TokenSet();
+
   /** System document type. */
   protected String docsys;
   /** Public document type. */
   protected String docpub;
-
+  /** Flag for printing content type. */
+  protected int ct;
   /** Indentation flag (used for formatting). */
   protected boolean ind;
   /** Item flag (used for formatting). */
   protected boolean item;
+  /** Script flag. */
+  protected boolean script;
+
   /** URI escape flag. */
   protected final boolean escape;
   /** CData elements. */
   protected final TokenList cdata = new TokenList();
-  /** Script flag. */
-  protected boolean script;
   /** Indentation flag. */
   protected final boolean indent;
   /** Include content type flag. */
@@ -453,6 +456,36 @@ public abstract class OutputSerializer extends Serializer {
     } else {
       out.write(s.getBytes(encoding));
     }
+  }
+
+  /**
+   * Prints the content type declaration.
+   * @param empty empty flag
+   * @param html method
+   * @return {@code true} if declaration was printed
+   * @throws IOException I/O exception
+   */
+  protected boolean ct(final boolean empty, final boolean html)
+      throws IOException {
+
+    if(ct != 1) return false;
+    ct++;
+    if(empty) finishOpen();
+    level++;
+    startOpen(META);
+    attribute(HTTPEQUIV, token(CONTENT_TYPE));
+    final String m = media.isEmpty() ? TEXT_HTML : media;
+    attribute(CONTENT,
+        new TokenBuilder(m).add(CHARSET).addExt(encoding).finish());
+    if(html) {
+      print(ELEM_C);
+    } else {
+      print(' ');
+      print(ELEM_SC);
+    }
+    level--;
+    if(empty) finishClose();
+    return true;
   }
 
   // HTML Serializer: cache elements

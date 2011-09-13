@@ -331,7 +331,7 @@ public abstract class Command extends Progress {
         return error(PROCMEM + ((flags & (User.CREATE | User.WRITE)) != 0 ?
             PROCMEMCREATE : ""));
       }
-      return error(Util.bug(Util.toArray(ex)));
+      return error(Util.bug(ex));
     } finally {
       // flushes the output
       try { if(out != null) out.flush(); } catch(final IOException ex) { }

@@ -6,7 +6,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -154,8 +153,6 @@ public final class HTTPClient {
       throw HTTPERR.thrw(ii, "Invalid URL");
     } catch(final ProtocolException ex) {
       throw HTTPERR.thrw(ii, "Invalid HTTP method");
-    } catch(final FileNotFoundException ex) {
-      throw HTTPFNF.thrw(ii, ex);
     } catch(final IOException ex) {
       throw HTTPERR.thrw(ii, ex);
     }

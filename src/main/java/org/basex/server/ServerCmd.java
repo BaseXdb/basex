@@ -19,6 +19,8 @@ public enum ServerCmd {
   EXEC(5),
   /** Code for showing the query info: {id}0. */
   INFO(6),
+  /** Code for showing the serializations options: {id}0. */
+  OPTIONS(7),
   /** Code for closing the iterator: {id}0. */
   CLOSE(2),
   /** Code for creating a database: {name}0{input}0. */

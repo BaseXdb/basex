@@ -190,7 +190,7 @@ public final class Add extends ACreate {
   }
 
   /**
-   * Writes data to the specified file.
+   * Writes binary data to the specified file.
    * @param target target file
    * @param input new content
    * @return info string

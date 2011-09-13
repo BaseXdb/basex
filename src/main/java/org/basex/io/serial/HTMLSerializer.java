@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenSet;
 import org.basex.util.list.TokenList;
 
@@ -22,8 +21,6 @@ public class HTMLSerializer extends OutputSerializer {
   private static final TokenList SCRIPTS = new TokenList();
   /** HTML: boolean attributes. */
   private static final TokenSet BOOLEAN = new TokenSet();
-  /** Flag for printing content type. */
-  private int ct;
 
   /**
    * Constructor, specifying serialization options.
@@ -104,12 +101,12 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    if(ct(false)) return;
+    if(ct(false, true)) return;
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    if(ct(true)) return;
+    if(ct(true, true)) return;
     print(ELEM_C);
     if(EMPTIES.contains(lc(tag))) return;
     ind = false;
@@ -120,27 +117,6 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishClose() throws IOException {
     super.finishClose();
     script &= !SCRIPTS.contains(lc(tag));
-  }
-
-  /**
-   * Prints the content type declaration.
-   * @param empty empty flag
-   * @return {@code true} if declaration was printed
-   * @throws IOException I/O exception
-   */
-  private boolean ct(final boolean empty) throws IOException {
-    if(ct != 1) return false;
-    ct++;
-    if(empty) finishOpen();
-    level++;
-    startOpen(META);
-    attribute(HTTPEQUIV, CONTTYPE);
-    attribute(CONTENT,
-        new TokenBuilder(media).add(CHARSET).addExt(encoding).finish());
-    print(ELEM_C);
-    level--;
-    if(empty) finishClose();
-    return true;
   }
 
   // HTML Serializer: cache elements

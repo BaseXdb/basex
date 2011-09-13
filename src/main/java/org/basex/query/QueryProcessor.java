@@ -23,6 +23,8 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 
@@ -61,6 +63,32 @@ public final class QueryProcessor extends Progress {
     query = qu;
     ctx = new QueryContext(cx);
     ctx.nodes = nodes;
+    progress(ctx);
+  }
+
+  /**
+   * Constructor with an initial context set.
+   * @param qu query
+   * @param o initial context expression
+   * @param cx database context
+   * @throws QueryException query exception
+   */
+  public QueryProcessor(final String qu, final Object o, final Context cx)
+      throws QueryException {
+    this(qu, o instanceof ItemCache ? ((ItemCache) o).value() :
+        o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null), cx);
+  }
+
+  /**
+   * Constructor with an initial context set.
+   * @param qu query
+   * @param expr initial context expression
+   * @param cx database context
+   */
+  public QueryProcessor(final String qu, final Expr expr, final Context cx) {
+    query = qu;
+    ctx = new QueryContext(cx);
+    ctx.initExpr = expr;
     progress(ctx);
   }
 
@@ -130,24 +158,32 @@ public final class QueryProcessor extends Progress {
   /**
    * Binds an object to a global variable. If the object is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type.
+   * appropriate XQuery type. If {@code "map"} is specified as data type,
+   * the value is interpreted according to the rules specified in
+   * {@link Map#create(String)}.
    * @param n name of variable
    * @param o object to be bound
    * @param t data type
+   * @return self reference
    * @throws QueryException query exception
    */
-  public void bind(final String n, final Object o, final String t)
+  public QueryProcessor bind(final String n, final Object o, final String t)
       throws QueryException {
 
     Object obj = o;
     if(t != null && !t.isEmpty()) {
-      final QNm type = new QNm(token(t));
-      if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
-      final Type typ = Types.find(type, true);
-      if(typ != null) obj = typ.e(obj, null);
-      else NOTYPE.thrw(null, type);
+      if(t.equals(QueryText.MAPSTR)) {
+        obj = Map.create(o.toString());
+      } else {
+        final QNm type = new QNm(token(t));
+        if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
+        final Type typ = Types.find(type, true);
+        if(typ != null) obj = typ.e(obj, null);
+        else NOTYPE.thrw(null, type);
+      }
     }
     bind(n, obj);
+    return this;
   }
 
   /**
@@ -156,9 +192,12 @@ public final class QueryProcessor extends Progress {
    * appropriate XQuery type.
    * @param n name of variable
    * @param o object to be bound
+   * @return self reference
    * @throws QueryException query exception
    */
-  public void bind(final String n, final Object o) throws QueryException {
+  public QueryProcessor bind(final String n, final Object o)
+      throws QueryException {
+
     final Expr ex = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
     // remove optional $ prefix
     final QNm nm = new QNm(token(n.indexOf('$') == 0 ? n.substring(1) : n));
@@ -173,6 +212,7 @@ public final class QueryProcessor extends Progress {
       gl.bind(gl.type != null ? gl.type.type.e(ex.item(ctx, null),
           ctx, null) : ex, ctx);
     }
+    return this;
   }
 
   /**
@@ -180,10 +220,12 @@ public final class QueryProcessor extends Progress {
    * instance, it is directly assigned. Otherwise, it is first cast to the
    * appropriate XQuery type.
    * @param o object to be bound
+   * @return self reference
    * @throws QueryException query exception
    */
-  public void context(final Object o) throws QueryException {
+  public QueryProcessor context(final Object o) throws QueryException {
     ctx.initExpr = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
+    return this;
   }
 
   /**

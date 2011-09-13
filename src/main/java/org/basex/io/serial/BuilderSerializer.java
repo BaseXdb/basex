@@ -1,9 +1,7 @@
 package org.basex.io.serial;
 
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.build.Builder;
 import org.basex.query.item.Item;
 import org.basex.util.Atts;
@@ -58,6 +56,7 @@ public class BuilderSerializer extends Serializer {
   @Override
   protected void finishEmpty() throws IOException {
     build.emptyElem(tag, att);
+    att.reset();
   }
 
   @Override

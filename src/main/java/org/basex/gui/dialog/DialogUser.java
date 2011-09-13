@@ -1,9 +1,12 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
+import java.io.IOException;
+
 import javax.swing.JScrollPane;
-import org.basex.core.BaseXException;
+
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.CreateUser;
@@ -223,7 +226,7 @@ final class DialogUser extends BaseXBack {
         setData();
         addUser.requestFocusInWindow();
       }
-    } catch(final BaseXException ex) {
+    } catch(final IOException ex) {
       msg = Util.message(ex);
       ok = false;
     }
@@ -258,9 +261,9 @@ final class DialogUser extends BaseXBack {
 
   /**
    * Sets new data.
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  public void setData() throws BaseXException {
+  public void setData() throws IOException {
     users = table(null);
 
     if(global) {
@@ -294,18 +297,18 @@ final class DialogUser extends BaseXBack {
    * Returns a global or local user table.
    * @param db database (optional)
    * @return table
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  private Table table(final String db) throws BaseXException {
+  private Table table(final String db) throws IOException {
     return new Table(sess.execute(new ShowUsers(db)));
   }
 
   /**
    * Sets session.
    * @param s session
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  public void setSess(final Session s) throws BaseXException {
+  public void setSess(final Session s) throws IOException {
     sess = s;
     if(!global) {
       final Table dbs = new Table(sess.execute(new List()));

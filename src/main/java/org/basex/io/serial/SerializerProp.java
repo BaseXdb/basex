@@ -1,7 +1,10 @@
 package org.basex.io.serial;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.data.DataText.*;
+import static org.basex.query.util.Err.*;
+
+import java.util.Map.Entry;
+
 import org.basex.core.AProp;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -39,7 +42,7 @@ public final class SerializerProp extends AProp {
     "indent", YES };
   /** Serialization parameter. */
   public static final Object[] S_MEDIA_TYPE = {
-    "media-type", "text/html" };
+    "media-type", "" };
   /** Serialization parameter: xml/xhtml/html/text. */
   public static final Object[] S_METHOD = {
     "method", M_XML };
@@ -139,5 +142,15 @@ public final class SerializerProp extends AProp {
     } catch(final SerializerException ex) {
       return ex;
     }
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Entry<String, Object> e : props.entrySet()) {
+      if(tb.size() != 0) tb.add(',');
+      tb.add(e.getKey()).add('=').addExt(e.getValue());
+    }
+    return tb.toString();
   }
 }
