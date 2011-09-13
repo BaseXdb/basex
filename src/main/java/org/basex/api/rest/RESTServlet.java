@@ -2,7 +2,6 @@ package org.basex.api.rest;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
-import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import javax.servlet.http.HttpServlet;
@@ -58,35 +57,20 @@ public final class RESTServlet extends HttpServlet {
     try {
       ctx.session = new HTTPSession(req).login();
     } catch(final LoginException ex) {
-      error(SC_UNAUTHORIZED, ex.getMessage(), ctx);
+      ctx.status(SC_UNAUTHORIZED, ex.getMessage());
       return;
     }
 
     try {
       code.run(ctx);
+      ctx.status(SC_OK, null);
     } catch(final RESTException ex) {
-      error(ex.getStatus(), ex.getMessage(), ctx);
+      ctx.status(ex.getStatus(), ex.getMessage());
     } catch(final IOException ex) {
-      error(SC_BAD_REQUEST, Util.message(ex), ctx);
+      ctx.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));
-      error(SC_INTERNAL_SERVER_ERROR, ERR_UNEXPECTED + ex.getMessage(), ctx);
-    } finally {
-      ctx.session.close();
+      ctx.status(SC_INTERNAL_SERVER_ERROR, ERR_UNEXPECTED + ex.getMessage());
     }
-  }
-
-  /**
-   * Sends the specified error as result.
-   * @param code error code
-   * @param message info message
-   * @param ctx REST context
-   * @throws IOException I/O exception
-   */
-  private void error(final int code, final String message,
-      final RESTContext ctx) throws IOException {
-
-    ctx.res.setStatus(code);
-    ctx.out.write(token(message));
   }
 }

@@ -115,4 +115,16 @@ final class RESTContext {
     }
     return tb.toString();
   }
+
+  /**
+   * Sets a status and sends an info message.
+   * @param code status code
+   * @param message info message
+   * @throws IOException I/O exception
+   */
+  void status(final int code, final String message) throws IOException {
+    session.close();
+    res.setStatus(code);
+    if(message != null) out.write(token(message));
+  }
 }

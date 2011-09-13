@@ -2,7 +2,6 @@ package org.basex.api.rest;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
-import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -31,9 +30,7 @@ public class RESTPut extends RESTCode {
       open(ctx);
       session.replace(ctx.dbpath(), ctx.req.getInputStream());
     }
-
     // return correct status and command info
-    ctx.res.setStatus(SC_CREATED);
-    ctx.out.write(token(session.info()));
+    throw new RESTException(SC_CREATED, session.info());
   }
 }

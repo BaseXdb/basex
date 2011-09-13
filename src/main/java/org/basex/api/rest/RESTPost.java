@@ -2,7 +2,6 @@ package org.basex.api.rest;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
-import static org.basex.util.Token.*;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -120,10 +119,8 @@ public class RESTPost extends RESTCode {
       }
       final Session session = ctx.session;
       session.add(name, path, ctx.req.getInputStream());
-
       // return correct status and command info
-      ctx.res.setStatus(SC_CREATED);
-      ctx.out.write(token(session.info()));
+      throw new RESTException(SC_CREATED, session.info());
     }
   }
 

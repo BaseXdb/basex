@@ -3,7 +3,7 @@ package org.basex.api.rest;
 import org.basex.util.Util;
 
 /**
- * REST exception.
+ * REST exception. Also thrown to pass on correct status codes.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -15,7 +15,7 @@ public final class RESTException extends Exception {
   /**
    * Constructs an exception with the specified message and extension.
    * @param status status code
-   * @param message message
+   * @param message message, or {@code null}
    * @param extension message extension
    */
   public RESTException(final int status, final String message,

@@ -26,6 +26,9 @@ import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.Text;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
@@ -74,11 +77,17 @@ public final class HTTPClientTest {
   private static final byte[] METHOD = token("method");
   /** Example url. */
   private static final String URL = "'http://localhost:8984/rest/books'";
+  /** Books document. */
+  private static final String BOOKS = "<books>" + "<book id='1'>"
+      + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
+      + "<book id='2'>" + "<name>Winnetou</name>" + "<author>May</author>"
+      + "</book>" + "<book id='3'>" + "<name>Tom Sawyer</name>"
+      + "<author>Twain</author>" + "</book>" + "</books>";
   /** Carriage return/Line feed. */
   private static final String CRLF = "\r\n";
 
   /** Database context. */
-  static Context context;
+  private static Context context;
   /** HTTP servers. */
   private static BaseXHTTP http;
 
@@ -90,7 +99,7 @@ public final class HTTPClientTest {
   public static void start() throws Exception {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
-    http = new BaseXHTTP("-czWU" + ADMIN + " -P" + ADMIN);
+    http = new BaseXHTTP("-zU" + ADMIN + " -P" + ADMIN);
   }
 
   /**
@@ -99,8 +108,8 @@ public final class HTTPClientTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    context.close();
     http.stop();
+    context.close();
   }
 
   /**
@@ -109,15 +118,8 @@ public final class HTTPClientTest {
    */
   @Before
   public void init() throws BaseXException {
-    final Command put = new XQuery("http:send-request("
-        + "<http:request method='put' status-only='true'>"
-        + "<http:body media-type='text/xml'>" + "<books>" + "<book id='1'>"
-        + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
-        + "<book id='2'>" + "<name>Winnetou</name>" + "<author>May</author>"
-        + "</book>" + "<book id='3'>" + "<name>Tom Sawyer</name>"
-        + "<author>Twain</author>" + "</book>" + "</books>" + "</http:body>"
-        + "</http:request>, " + URL + ")");
-    put.execute(context);
+    new CreateDB("books", BOOKS).execute(context);
+    new Close().execute(context);
   }
 
   /**
@@ -126,9 +128,7 @@ public final class HTTPClientTest {
    */
   @After
   public void finish() throws BaseXException {
-    final Command delete = new XQuery("http:send-request("
-        + "<http:request method='delete' status-only='true'/>, " + URL + ")");
-    delete.execute(context);
+    new DropDB("books").execute(context);
   }
 
   /**
@@ -139,11 +139,7 @@ public final class HTTPClientTest {
   public void testPUT() throws Exception {
     final Command put = new XQuery("http:send-request("
         + "<http:request method='put' status-only='true'>"
-        + "<http:body media-type='text/xml'>" + "<books>" + "<book id='1'>"
-        + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
-        + "<book id='2'>" + "<name>Winnetou</name>" + "<author>May</author>"
-        + "</book>" + "<book id='3'>" + "<name>Tom Sawyer</name>"
-        + "<author>Twain</author>" + "</book>" + "</books>" + "</http:body>"
+        + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
         + "</http:request>, " + URL + ")");
     put.execute(context);
     checkResponse(put, HttpURLConnection.HTTP_CREATED, 1);
@@ -717,7 +713,6 @@ public final class HTTPClientTest {
    */
   @Test
   public void testGetMultipartResponse() throws IOException, QueryException {
-
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -745,11 +740,11 @@ public final class HTTPClientTest {
     conn.content = token("--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
         + "...plain text version of message goes here...." + CRLF + CRLF
-        + "--boundary42\r" + NL + "Content-Type: text/richtext" + CRLF + CRLF
+        + "--boundary42" + CRLF + "Content-Type: text/richtext" + CRLF + CRLF
         + ".... richtext version of same message goes here ..." + CRLF
-        + "--boundary42\r" + NL + "Content-Type: text/x-whatever" + CRLF + CRLF
+        + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
-        + "message  goes  here\n..."  + CRLF + "--boundary42--");
+        + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
     final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
 
@@ -780,12 +775,12 @@ public final class HTTPClientTest {
     final Parser reqParser = Parser.xmlParser(io, context.prop, "");
     final DBNode dbNode = new DBNode(reqParser, context.prop);
     resultIter.add(dbNode.children().next());
-    resultIter.add(Str.get(token("...plain text version of message "
-        + "goes here....\n\n")));
-    resultIter.add(Str.get(token(".... richtext version of same message "
-        + "goes here ...\n")));
-    resultIter.add(Str.get(token(".... fanciest formatted version of same  "
-        + "message  goes  here\n...\n")));
+    resultIter.add(Str.get("...plain text version of message "
+        + "goes here....\n\n"));
+    resultIter.add(Str.get(".... richtext version of same message "
+        + "goes here ...\n"));
+    resultIter.add(Str.get(".... fanciest formatted version of same  "
+        + "message  goes  here\n...\n"));
 
     // Compare response with expected result
     assertTrue(FNSimple.deep(null, resultIter, i));
@@ -886,7 +881,7 @@ public final class HTTPClientTest {
    * @param itemsCount expected number of items
    * @throws QueryException query exception
    */
-  private void checkResponse(final Command c, final int expStatus,
+  private static void checkResponse(final Command c, final int expStatus,
       final int itemsCount) throws QueryException {
 
     assertTrue(c.result() instanceof ValueIter);
@@ -897,8 +892,8 @@ public final class HTTPClientTest {
     assertNotNull(response.attributes());
     final NodeIter resAttr = response.attributes();
     for(ANode attr; (attr = resAttr.next()) != null;) {
-      if(eq(attr.nname(), STATUS)) {
-        assertTrue(eq(attr.atom(), token(expStatus)));
+      if(eq(attr.nname(), STATUS) && !eq(attr.atom(), token(expStatus))) {
+        fail("Expected: " + expStatus + "\nFound: " + string(attr.atom()));
       }
     }
   }
