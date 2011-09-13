@@ -10,8 +10,8 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class is a simple Java client to demonstrate the REST implementation.
- * It shows the query function of the HTTP POST method.
+ * This class is a simple example to demonstrate the REST implementation.
+ * It shows the function of the HTTP DELETE method.
  *
  * @author BaseX Team 2005-11, BSD License
  */
@@ -78,8 +78,7 @@ public final class RESTPostQuery {
   }
 
   /**
-   * This method demonstrates the POST method. In this example, a query on a
-   * resource is processed.
+   * Main method.
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */

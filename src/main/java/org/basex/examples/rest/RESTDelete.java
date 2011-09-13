@@ -7,7 +7,7 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class is a simple Java client to demonstrate the REST implementation.
+ * This class is a simple example to demonstrate the REST implementation.
  * It shows the function of the HTTP DELETE method.
  *
  * @author BaseX Team 2005-11, BSD License
@@ -51,17 +51,16 @@ public final class RESTDelete {
   }
 
   /**
-   * This method demonstrates the DELETE method. In this example, an XML
-   * database is deleted.
+   * Main method.
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
-    // Start servers
-    final BaseXHTTP http = new BaseXHTTP("-W -Uadmin -Padmin");
+    // Start server
+    final BaseXHTTP http = new BaseXHTTP("-Uadmin -Padmin");
     // Run example
     run();
-    // Stop servers
+    // Stop server
     http.stop();
   }
 }

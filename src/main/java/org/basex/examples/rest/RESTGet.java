@@ -9,7 +9,7 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 
 /**
- * This class is a simple Java client to demonstrate the REST implementation.
+ * This class is a simple example to demonstrate the REST implementation.
  * It shows the function of the HTTP GET method.
  *
  * @author BaseX Team 2005-11, BSD License
@@ -57,14 +57,13 @@ public final class RESTGet {
   }
 
   /**
-   * This method demonstrates the GET method. In this example, a query on a
-   * resource is processed.
+   * Main method.
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
   public static void main(final String... args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP("-W -Uadmin -Padmin");
+    final BaseXHTTP http = new BaseXHTTP("-Uadmin -Padmin");
     // Run example
     run();
     // Stop servers
