@@ -328,6 +328,8 @@ public enum Err {
   SERANY(SEPM, 16, "%."),
   /** SEPM0017: Serialization exception. */
   SERUNKNOWN(SEPM, 17, "Serialization: unknown element %."),
+  /** SEPM0017: Serialization exception. */
+  SERNOVAL(SEPM, 17, "Serialization: missing 'value' attribute."),
 
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),

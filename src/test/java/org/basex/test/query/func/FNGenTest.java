@@ -44,6 +44,6 @@ public final class FNGenTest extends AdvancedQueryTest {
     contains(fun + "(<x/>)", "&lt;x/&gt;");
     contains(fun + "(<x/>, " + serialParams("") + ")", "&lt;x/&gt;");
     contains(fun + "(<x>a</x>, " +
-        serialParams("<method>text</method>") + ")", "a");
+        serialParams("<method value='text'/>") + ")", "a");
   }
 }

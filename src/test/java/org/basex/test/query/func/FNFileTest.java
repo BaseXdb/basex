@@ -194,11 +194,11 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:delete('" + PATH1 + "')");
 
     query(fun + "('" + PATH1 + "', 'a\u00e4',"
-        + serialParams("<encoding>CP1252</encoding>") + ")");
+        + serialParams("<encoding value='CP1252'/>") + ")");
     query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
 
     query(fun + "('" + PATH1 + "', '<a/>',"
-        + serialParams("<method>text</method>") + ")");
+        + serialParams("<method value='text'/>") + ")");
     query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }
@@ -219,12 +219,12 @@ public final class FNFileTest extends AdvancedQueryTest {
     query("file:delete('" + PATH1 + "')");
 
     query(fun + "('" + PATH1 + "', 'a\u00e4',"
-        + serialParams("<encoding>CP1252</encoding>") + ")");
+        + serialParams("<encoding value='CP1252'/>") + ")");
     query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
     query("file:delete('" + PATH1 + "')");
 
     query(fun + "('" + PATH1 + "', '<a/>',"
-        + serialParams("<method>text</method>") + ")");
+        + serialParams("<method value='text'/>") + ")");
     query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
     query("file:delete('" + PATH1 + "')");
   }
