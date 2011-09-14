@@ -44,6 +44,42 @@ public class FNCryptoTest extends AdvancedQueryTest {
    * Test method for crypto:encrypt and crypto:decrypt.
    */
   @Test
+  public void generatesignatureSyntax() throws Exception {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:generate-signature(<a/>,'','','','','')");
+  }
+  
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   */
+  @Test
+  public void generatesignatureSyntax2() throws Exception {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:generate-signature(<a/>,'','','','','','')");
+  }
+  
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   */
+  @Test
+  public void generatesignatureSyntax3() throws Exception {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:generate-signature(<a/>,'','','','','',<a/>)");
+  }
+  
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   */
+  @Test
+  public void generatesignatureSyntax4() throws Exception {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:generate-signature(<a/>,'','','','','','',<a/>)");
+  }
+  
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   */
+  @Test
   public void generatesignature() throws Exception {
     new CreateDB(DB, "<n/>").execute(CONTEXT);
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
