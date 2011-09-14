@@ -9,6 +9,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
+import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.query.func.Function;
@@ -395,5 +396,18 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(fun + "('" + DB + "', 'raw')", "false");
     query(fun + "('" + DB + "', 'xxx')", "false");
     query(fun + "('" + DB + "', 'xxx')", "false");
+  }
+
+  /**
+   * Test method for the db:content-type() function.
+   */
+  @Test
+  public void dbContentType() {
+    final String fun = check(Function.DBCTYPE);
+    query("db:add('" + DB + "', '<a/>', 'xml')");
+    query("db:store('" + DB + "', 'raw', 'bla')");
+    query(fun + "('" + DB + "', 'xml')", DataText.APP_XML);
+    query(fun + "('" + DB + "', 'raw')", DataText.APP_OCTET);
+    error(fun + "('" + DB + "', 'test')", Err.RESFNF);
   }
 }
