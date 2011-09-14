@@ -339,10 +339,10 @@ public abstract class W3CTS {
         final SerializerProp sp = new SerializerProp();
         sp.set(SerializerProp.S_INDENT, context.prop.is(Prop.CHOP) ?
             DataText.YES : DataText.NO);
-        final Serializer xml = Serializer.get(ao, sp);
+        final Serializer ser = Serializer.get(ao, sp);
         iter = xq.value().cache();
-        for(Item it; (it = iter.next()) != null;) it.serialize(xml);
-        xml.close();
+        for(Item it; (it = iter.next()) != null;) it.serialize(ser);
+        ser.close();
       } catch(final Exception ex) {
         if(!(ex instanceof QueryException || ex instanceof IOException)) {
           System.err.println("\n*** " + outname + " ***");

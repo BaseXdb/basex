@@ -19,6 +19,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -161,7 +162,7 @@ public final class NamespaceTest {
     try {
       if(!FNSimple.deep(null, getIter(exp), getIter(actual)))
         assertEquals(exp, actual);
-    } catch(final QueryException ex) { fail(ex.getMessage()); }
+    } catch(final QueryException ex) { fail(Util.message(ex)); }
   }
 
   /**
@@ -173,7 +174,7 @@ public final class NamespaceTest {
     try {
       final Data ex = CreateDB.xml(new IOContent(token(xml)), context);
       return new NodeCache(new ANode[]{new DBNode(ex, 0)}, 1);
-    } catch(final IOException ex) { fail(ex.getMessage()); }
+    } catch(final IOException ex) { fail(Util.message(ex)); }
     return null;
   }
 
@@ -238,7 +239,7 @@ public final class NamespaceTest {
       assertEquals(expected.replaceAll("\\\"", "'"),
           result.replaceAll("\\\"", "'"));
     } catch(final BaseXException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 }
