@@ -176,7 +176,7 @@ public final class Util {
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
     else if(ex instanceof SocketException) return SERVERBIND;
     else if(ex instanceof UnknownHostException) return info(SERVERUNKNOWN, msg);
-    return msg != null ? msg : ex.toString();
+    return msg != null && !msg.isEmpty() ? msg : ex.toString();
   }
 
   /**

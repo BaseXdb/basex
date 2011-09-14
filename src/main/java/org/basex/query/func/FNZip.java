@@ -358,12 +358,10 @@ public final class FNZip extends FuncCall {
               // serialize new nodes
               try {
                 // [CG] update zip files: remove zip namespace
-                final Serializer xml =
-                  Serializer.get(zos, serialPar(node, ctx));
-                do {
-                  n.serialize(xml);
-                } while((n = ch.next()) != null);
-                xml.close();
+                final Serializer ser =
+                    Serializer.get(zos, serialPar(node, ctx));
+                do n.serialize(ser); while((n = ch.next()) != null);
+                ser.close();
               } catch(final SerializerException ex) {
                 throw new QueryException(input, ex);
               }

@@ -44,6 +44,16 @@ public abstract class Serializer {
   private boolean elem;
 
   /**
+   * Returns an XML serializer.
+   * @param os output stream reference
+   * @return serializer
+   * @throws IOException I/O exception
+   */
+  public static XMLSerializer get(final OutputStream os) throws IOException {
+    return new XMLSerializer(os, PROPS);
+  }
+
+  /**
    * Returns a specific serializer.
    * @param os output stream reference
    * @param props serialization properties (can be {@code null})
@@ -53,16 +63,15 @@ public abstract class Serializer {
   public static Serializer get(final OutputStream os,
       final SerializerProp props) throws IOException {
 
-    if(props != null) {
-      final String m = props.check(S_METHOD,
-          M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_RAW);
-      if(M_XHTML.equals(m))  return new XHTMLSerializer(os, props);
-      if(M_HTML.equals(m))   return new HTMLSerializer(os, props);
-      if(M_TEXT.equals(m))   return new TextSerializer(os, props);
-      if(M_JSON.equals(m))   return new JSONSerializer(os, props);
-      if(M_JSONML.equals(m)) return new JsonMLSerializer(os, props);
-      if(M_RAW.equals(m))    return new RawSerializer(os, props);
-    }
+    if(props == null) return get(os);
+    final String m = props.check(S_METHOD,
+        M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_RAW);
+    if(M_XHTML.equals(m))  return new XHTMLSerializer(os, props);
+    if(M_HTML.equals(m))   return new HTMLSerializer(os, props);
+    if(M_TEXT.equals(m))   return new TextSerializer(os, props);
+    if(M_JSON.equals(m))   return new JSONSerializer(os, props);
+    if(M_JSONML.equals(m)) return new JsonMLSerializer(os, props);
+    if(M_RAW.equals(m))    return new RawSerializer(os, props);
     return new XMLSerializer(os, props);
   }
 

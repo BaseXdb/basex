@@ -114,7 +114,7 @@ public final class PoolTest {
     try {
       session.execute(cmd);
     } catch(final IOException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 

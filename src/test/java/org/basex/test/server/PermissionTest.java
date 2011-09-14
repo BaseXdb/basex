@@ -69,9 +69,9 @@ public final class PermissionTest {
 
   /** Server reference. */
   private static BaseXServer server;
-  /** Socket reference. */
+  /** Admin session. */
   private Session adminSession;
-  /** Socket reference. */
+  /** Test session. */
   private Session testSession;
 
   /**
@@ -100,7 +100,7 @@ public final class PermissionTest {
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
       ok(new Close(), adminSession);
     } catch(final Exception ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
   }
 
@@ -285,9 +285,9 @@ public final class PermissionTest {
     ok(new RepoDelete("http://www.pkg3.com", null), testSession);
   }
 
-  /** Tests some usability stuff. */
+  /** Drops users. */
   @Test
-  public void use() {
+  public void dropUsers() {
     no(new DropUser(NAME), testSession);
     no(new DropUser(NAME), adminSession);
     ok(new Exit(), testSession);
@@ -303,7 +303,7 @@ public final class PermissionTest {
     try {
       s.execute(cmd);
     } catch(final IOException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 
@@ -330,7 +330,7 @@ public final class PermissionTest {
       adminSession.execute(new DropDB(NAME));
       adminSession.close();
     } catch(final Exception ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
   }
 

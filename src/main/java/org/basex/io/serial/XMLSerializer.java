@@ -12,15 +12,6 @@ import java.io.OutputStream;
  */
 public class XMLSerializer extends OutputSerializer {
   /**
-   * Default constructor.
-   * @param os output stream reference
-   * @throws IOException I/O exception
-   */
-  public XMLSerializer(final OutputStream os) throws IOException {
-    this(os, PROPS);
-  }
-
-  /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
    * @param p serialization properties

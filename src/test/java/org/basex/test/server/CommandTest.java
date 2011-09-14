@@ -511,7 +511,7 @@ public class CommandTest {
     try {
       io.write(token("// li"));
     } catch(final Exception ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
     no(new Run(io.path()));
     ok(new CreateDB(NAME, FILE));
@@ -577,7 +577,7 @@ public class CommandTest {
     try {
       return session.execute(cmd);
     } catch(final IOException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
       return null;
     }
   }

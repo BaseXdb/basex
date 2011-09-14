@@ -114,7 +114,7 @@ public final class DirParser extends TargetParser {
           try {
             // cache file contents to allow or speed up a second run
             bi = io.buffer();
-            in = new IOContent(bi.token().toArray());
+            in = new IOContent(bi.readBytes());
             in.name(io.name());
             parser = Parser.fileParser(in, prop, targ);
             MemBuilder.build("", parser, prop);

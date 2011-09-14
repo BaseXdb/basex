@@ -18,7 +18,7 @@ import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Store;
-import org.basex.io.in.LookupInputStream;
+import org.basex.io.in.LookupInput;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -88,7 +88,7 @@ public final class LocalSession extends Session {
   public void create(final String name, final InputStream input)
     throws IOException {
 
-    final LookupInputStream lis = new LookupInputStream(input);
+    final LookupInput lis = new LookupInput(input);
     try {
       info = lis.lookup() == -1 ?
           CreateDB.create(name, Parser.emptyParser(), ctx) :

@@ -102,7 +102,7 @@ public final class DiskTableTest {
       tda.close();
       tda = new TableDiskAccess(data.meta, DATATBL);
     } catch(final IOException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 

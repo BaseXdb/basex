@@ -11,7 +11,7 @@ import java.io.InputStream;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ClientInputStream extends InputStream {
+public final class DecodingInput extends InputStream {
   /** Input stream. */
   private final InputStream input;
   /** All bytes have been read. */
@@ -21,7 +21,7 @@ public final class ClientInputStream extends InputStream {
    * Constructor.
    * @param in buffer input to be wrapped
    */
-  public ClientInputStream(final InputStream in) {
+  public DecodingInput(final InputStream in) {
     input = in;
   }
 

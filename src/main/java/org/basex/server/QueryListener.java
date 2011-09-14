@@ -40,7 +40,7 @@ final class QueryListener extends Progress {
   private int hits;
 
   /** Serializer. */
-  private Serializer xml;
+  private Serializer ser;
   /** Monitored flag. */
   private boolean monitored;
   /** Iterator. */
@@ -86,7 +86,7 @@ final class QueryListener extends Progress {
     }
     monitored = true;
     ctx.register(qp.ctx.updating);
-    xml = qp.getSerializer(out);
+    ser = qp.getSerializer(out);
     iter = qp.iter();
   }
 
@@ -97,8 +97,8 @@ final class QueryListener extends Progress {
    * @throws QueryException query exception
    */
   boolean next() throws IOException, QueryException {
-    if(xml == null) init();
-    xml.reset();
+    if(ser == null) init();
+    ser.reset();
     final Item it = iter.next();
     if(it == null) return false;
     next(it);
@@ -111,7 +111,7 @@ final class QueryListener extends Progress {
    * @throws QueryException query exception
    */
   void execute() throws IOException, QueryException {
-    if(xml == null) init();
+    if(ser == null) init();
     for(Item it; (it = iter.next()) != null;) next(it);
     close(false);
   }
@@ -140,7 +140,7 @@ final class QueryListener extends Progress {
    * @throws QueryException query exception
    */
   String options() throws IOException, QueryException {
-    if(xml == null) init();
+    if(ser == null) init();
     return qp.ctx.serProp(false).toString();
   }
 
@@ -151,7 +151,7 @@ final class QueryListener extends Progress {
    */
   void close(final boolean forced) throws IOException {
     if(closed) return;
-    if(xml != null && !forced) xml.close();
+    if(ser != null && !forced) ser.close();
     qp.stopTimeout();
     qp.close();
     if(monitored) ctx.unregister(qp.ctx.updating);
@@ -167,9 +167,9 @@ final class QueryListener extends Progress {
    */
   private void next(final Item it) throws IOException, QueryException {
     if(stopped) SERVERTIME.thrw(null);
-    xml.openResult();
-    it.serialize(xml);
-    xml.closeResult();
+    ser.openResult();
+    it.serialize(ser);
+    ser.closeResult();
     hits++;
   }
 

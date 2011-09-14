@@ -15,7 +15,6 @@ import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Set;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Util;
@@ -206,8 +205,8 @@ public final class IndexOptimizeTest {
     QueryProcessor qp = new QueryProcessor(query, CONTEXT);
     try {
       ArrayOutput ao = new ArrayOutput();
-      Serializer xml = qp.getSerializer(ao);
-      qp.execute().serialize(xml);
+      Serializer ser = qp.getSerializer(ao);
+      qp.execute().serialize(ser);
       qp.close();
       final String info = qp.info();
       if(result != null)
@@ -215,21 +214,21 @@ public final class IndexOptimizeTest {
 
       // fetch query plan
       plan = new ArrayOutput();
-      qp.plan(new XMLSerializer(plan));
+      qp.plan(Serializer.get(plan));
 
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
           "[self::IndexAccess|self::FTIndexAccess]", CONTEXT);
       ao = new ArrayOutput();
-      xml = qp.getSerializer(ao);
-      qp.execute().serialize(xml);
+      ser = qp.getSerializer(ao);
+      qp.execute().serialize(ser);
 
       // check if IndexAccess is used
       assertTrue("No index used:\nQuery: " + query + "\nInfo: " + info +
           "\nPlan: " + plan, !ao.toString().isEmpty());
     } catch(final QueryException ex) {
-      fail(ex.getMessage() + "\nQuery: " + query + "\nPlan: " + plan);
+      fail(Util.message(ex) + "\nQuery: " + query + "\nPlan: " + plan);
     } catch(final IOException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 }

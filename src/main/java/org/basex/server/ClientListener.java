@@ -24,8 +24,9 @@ import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Store;
 import org.basex.io.in.BufferInput;
-import org.basex.io.in.LookupInputStream;
-import org.basex.io.in.ClientInputStream;
+import org.basex.io.in.LookupInput;
+import org.basex.io.in.DecodingInput;
+import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -158,7 +159,7 @@ public final class ClientListener extends Thread {
             query(sc);
           } else {
             // database command
-            cmd = new ByteList().add(b).add(in.token().toArray()).toString();
+            cmd = new ByteList().add(b).add(in.readBytes()).toString();
           }
         } catch(final IOException ex) {
           // this exception may be thrown if a session is stopped
@@ -185,12 +186,6 @@ public final class ClientListener extends Thread {
           continue;
         }
 
-        // stop console
-        if(command instanceof Exit) {
-          exit();
-          break;
-        }
-
         // start timeout
         command.startTimeout(context.mprop.num(MainProp.TIMEOUT));
         log.write(this,
@@ -200,7 +195,7 @@ public final class ClientListener extends Thread {
         boolean ok = true;
         String info = null;
         try {
-          command.execute(context, out);
+          command.execute(context, new EncodingOutput(out));
           info = command.info();
         } catch(final BaseXException ex) {
           ok = false;
@@ -214,6 +209,12 @@ public final class ClientListener extends Thread {
         out.write(0);
         // send info
         info(ok, info, perf);
+
+        // stop console
+        if(command instanceof Exit) {
+          exit();
+          break;
+        }
       }
     } catch(final IOException ex) {
       log.write(this, sc == COMMAND ? cmd : sc, INFOERROR + ex.getMessage());
@@ -325,15 +326,15 @@ public final class ClientListener extends Thread {
     final String name = in.readString();
     log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
 
-    final ClientInputStream cis = new ClientInputStream(in);
-    final LookupInputStream lis = new LookupInputStream(cis);
+    final DecodingInput di = new DecodingInput(in);
+    final LookupInput lis = new LookupInput(di);
     try {
       final String info = lis.lookup() == -1 ?
         CreateDB.create(name, Parser.emptyParser(), context) :
         CreateDB.create(name, lis, context);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.flush();
+      di.flush();
       info(false, ex.getMessage(), perf);
     }
   }
@@ -351,13 +352,13 @@ public final class ClientListener extends Thread {
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
     log.write(this, sb.append("[...]"));
 
-    final ClientInputStream cis = new ClientInputStream(in);
-    final InputSource is = new InputSource(cis);
+    final DecodingInput di = new DecodingInput(in);
+    final InputSource is = new InputSource(di);
     try {
       final String info = Add.add(name, path, is, context, null, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.flush();
+      di.flush();
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -374,13 +375,13 @@ public final class ClientListener extends Thread {
     if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
     log.write(this, sb.append("[...]"));
 
-    final ClientInputStream cis = new ClientInputStream(in);
+    final DecodingInput di = new DecodingInput(in);
     try {
-      final InputSource is = new InputSource(cis);
+      final InputSource is = new InputSource(di);
       final String info = Replace.replace(path, is, context, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.flush();
+      di.flush();
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -395,7 +396,7 @@ public final class ClientListener extends Thread {
     final String path = in.readString();
     log.write(this, STORE + " " + path + " [...]");
 
-    final ClientInputStream cis = new ClientInputStream(in);
+    final DecodingInput cis = new DecodingInput(in);
     try {
       info(true, Store.store(path, cis, context, true), perf);
     } catch(final BaseXException ex) {
@@ -415,7 +416,8 @@ public final class ClientListener extends Thread {
     log.write(this, RETRIEVE + " " + source);
 
     try {
-      info(true, Retrieve.retrieve(source, out, context), perf);
+      final EncodingOutput eo = new EncodingOutput(out);
+      info(true, Retrieve.retrieve(source, eo, context), perf);
     } catch(final BaseXException ex) {
       info(false, ex.getMessage(), perf);
     }

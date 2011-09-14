@@ -1,6 +1,7 @@
 package org.basex.io.in;
 
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -141,15 +142,24 @@ public class BufferInput extends InputStream {
    * @throws IOException IO Exception
    */
   public final String readString() throws IOException {
-    return token().toString();
+    return bytes().toString();
   }
 
   /**
-   * Reads a token from the input stream, suffixed by a {@code 0} byte.
+   * Reads a bytes array from the input stream, suffixed by a {@code 0} byte.
    * @return token
    * @throws IOException IO Exception
    */
-  public final ByteList token() throws IOException {
+  public final byte[] readBytes() throws IOException {
+    return bytes().toArray();
+  }
+
+  /**
+   * Reads bytes from the input stream, suffixed by a {@code 0} byte.
+   * @return byte list
+   * @throws IOException IO Exception
+   */
+  private final ByteList bytes() throws IOException {
     final ByteList bl = new ByteList();
     for(int l; (l = read()) > 0;) bl.add(l);
     return bl;

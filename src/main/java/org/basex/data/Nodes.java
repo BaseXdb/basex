@@ -7,7 +7,6 @@ import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
 
@@ -235,7 +234,7 @@ public final class Nodes implements Result {
   public String toString() {
     final ArrayOutput ao = new ArrayOutput();
     try {
-      serialize(new XMLSerializer(ao));
+      serialize(Serializer.get(ao));
     } catch(final IOException ex) {
       Util.notexpected(ex);
     }

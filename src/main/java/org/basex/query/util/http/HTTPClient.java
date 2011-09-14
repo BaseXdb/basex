@@ -382,11 +382,11 @@ public final class HTTPClient {
     }
     // serialize items according to the parameters
     final SerializerProp prop = new SerializerProp(tb.toString());
-    final Serializer xml = Serializer.get(out, prop);
+    final Serializer ser = Serializer.get(out, prop);
     try {
-      payload.serialize(xml);
+      payload.serialize(ser);
     } finally {
-      xml.close();
+      ser.close();
     }
   }
 

@@ -38,7 +38,7 @@ public final class Retrieve extends ACreate {
     out.write(bin.read());
     return info(QUERYEXEC, perf);
   }
-  
+
   /**
    * Sends raw data to the specified output stream.
    * @param source source path

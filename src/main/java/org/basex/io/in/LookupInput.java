@@ -10,7 +10,7 @@ import java.io.InputStream;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class LookupInputStream extends InputStream {
+public final class LookupInput extends InputStream {
   /** Input stream. */
   private final InputStream input;
   /** Current value. */
@@ -21,7 +21,7 @@ public final class LookupInputStream extends InputStream {
    * @param in buffer input to be wrapped
    * @throws IOException I/O exception
    */
-  public LookupInputStream(final InputStream in) throws IOException {
+  public LookupInput(final InputStream in) throws IOException {
     input = in;
     read();
   }

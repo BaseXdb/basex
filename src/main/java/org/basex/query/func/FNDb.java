@@ -18,8 +18,8 @@ import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -514,10 +514,10 @@ public final class FNDb extends FuncCall {
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
-      final XMLSerializer xml = new XMLSerializer(ao);
+      final Serializer ser = Serializer.get(ao, ctx.serProp(true));
       final ValueIter ir = expr[1].value(ctx).iter();
-      for(Item it; (it = ir.next()) != null;) it.serialize(xml);
-      xml.close();
+      for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+      ser.close();
     } catch(final SerializerException ex) {
       throw new QueryException(input, ex);
     } catch(final IOException ex) {

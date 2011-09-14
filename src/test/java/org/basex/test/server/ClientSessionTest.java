@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.basex.BaseXServer;
 import org.basex.server.ClientSession;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,7 +46,7 @@ public class ClientSessionTest extends SessionTest {
     try {
       session = new ClientSession(server.context, ADMIN, ADMIN, out);
     } catch(final IOException ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
   }
 }

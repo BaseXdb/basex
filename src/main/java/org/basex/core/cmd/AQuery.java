@@ -16,7 +16,6 @@ import org.basex.io.out.NullOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.DOTSerializer;
 import org.basex.io.serial.Serializer;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -64,7 +63,7 @@ abstract class AQuery extends Command {
     String err = null;
     String inf = "";
     try {
-      final boolean ser = prop.is(Prop.SERIALIZE);
+      final boolean serial = prop.is(Prop.SERIALIZE);
       long hits = 0;
       int updates = 0;
       for(int i = 0; i < runs; ++i) {
@@ -79,32 +78,32 @@ abstract class AQuery extends Command {
         comp += per.getTime();
         if(i == 0) plan(true);
 
-        final PrintOutput po = i == 0 && ser ? out : new NullOutput();
-        Serializer xml;
+        final PrintOutput po = i == 0 && serial ? out : new NullOutput();
+        Serializer ser;
 
         if(prop.is(Prop.CACHEQUERY)) {
           result = qp.execute();
           eval += per.getTime();
-          xml = qp.getSerializer(po);
-          result.serialize(xml);
+          ser = qp.getSerializer(po);
+          result.serialize(ser);
           hits = result.size();
         } else {
           final Iter ir = qp.iter();
           eval += per.getTime();
           hits = 0;
           Item it = ir.next();
-          xml = qp.getSerializer(po);
+          ser = qp.getSerializer(po);
           while(it != null) {
             checkStop();
-            xml.openResult();
-            it.serialize(xml);
-            xml.closeResult();
+            ser.openResult();
+            it.serialize(ser);
+            ser.closeResult();
             it = ir.next();
             ++hits;
           }
         }
         updates = qp.updates();
-        xml.close();
+        ser.close();
         qp.close();
         prnt += per.getTime();
       }
@@ -215,7 +214,7 @@ abstract class AQuery extends Command {
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
         final ArrayOutput ao = new ArrayOutput();
-        qp.plan(new XMLSerializer(ao));
+        qp.plan(Serializer.get(ao));
         info(NL + QUERYPLAN);
         info(ao.toString());
       }

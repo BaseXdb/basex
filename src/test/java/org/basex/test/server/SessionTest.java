@@ -8,6 +8,7 @@ import java.io.IOException;
 
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Test;
 
@@ -33,7 +34,7 @@ public abstract class SessionTest {
     try {
       session.close();
     } catch(final IOException ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
   }
 

@@ -2,6 +2,7 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
+
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
@@ -96,7 +97,7 @@ public final class SemaphoreTest {
     try {
       return session.execute(cmd);
     } catch(final IOException ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
       return null;
     }
   }
@@ -122,7 +123,7 @@ public final class SemaphoreTest {
       try {
         session = newSession();
       } catch(final IOException ex) {
-        fail(ex.toString());
+        fail(Util.message(ex));
       }
     }
 
@@ -132,7 +133,7 @@ public final class SemaphoreTest {
         final int t = rand.nextInt(2);
         session.execute(QUERIES[t]);
       } catch(final IOException ex) {
-        fail(ex.toString());
+        fail(Util.message(ex));
       }
     }
   }

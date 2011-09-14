@@ -293,9 +293,9 @@ public final class FNGen extends FuncCall {
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
-      final Serializer xml = Serializer.get(ao, serialPar(this, 1, ctx));
-      node.serialize(xml);
-      xml.close();
+      final Serializer ser = Serializer.get(ao, serialPar(this, 1, ctx));
+      node.serialize(ser);
+      ser.close();
     } catch(final SerializerException ex) {
       throw new QueryException(input, ex);
     } catch(final IOException ex) {

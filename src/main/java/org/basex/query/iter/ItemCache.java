@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.Result;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Value;
@@ -150,7 +149,7 @@ public final class ItemCache extends ValueIter implements Result {
   public String toString() {
     final ArrayOutput ao = new ArrayOutput();
     try {
-      serialize(new XMLSerializer(ao));
+      serialize(Serializer.get(ao));
     } catch(final IOException ex) {
       // [LW] is that OK? Example: (1, 2, upper-case#1)
       Util.notexpected(ex);

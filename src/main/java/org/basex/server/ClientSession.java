@@ -15,6 +15,8 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.io.in.BufferInput;
+import org.basex.io.in.DecodingInput;
+import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.util.Token;
 
@@ -43,7 +45,7 @@ public final class ClientSession extends Session {
   final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
-  final PrintOutput sout;
+  final EncodingOutput sout;
   /** Server input. */
   final InputStream sin;
 
@@ -120,7 +122,7 @@ public final class ClientSession extends Session {
     final String ts = bi.readString();
 
     // send user name and hashed password/timestamp
-    sout = PrintOutput.get(socket.getOutputStream());
+    sout = new EncodingOutput(PrintOutput.get(socket.getOutputStream()));
     send(user);
     send(Token.md5(Token.md5(pass) + ts));
     sout.flush();
@@ -195,10 +197,10 @@ public final class ClientSession extends Session {
       // initialize event socket
       esocket = new Socket();
       esocket.connect(new InetSocketAddress(ehost, eport), 5000);
-      final PrintOutput po = PrintOutput.get(esocket.getOutputStream());
-      po.print(bi.readString());
-      po.write(0);
-      po.flush();
+      final OutputStream so = esocket.getOutputStream();
+      so.write(bi.readBytes());
+      so.write(0);
+      so.flush();
       final InputStream is = esocket.getInputStream();
       is.read();
       listen(is);
@@ -250,13 +252,7 @@ public final class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {
-    for(int b; (b = input.read()) != -1;) {
-      // 0x00 and 0xFF are prefixed by 0xFF and
-      // later decoded in {@link ClientInputStream}
-      if(b == 0x00 || b == 0xFF) sout.write(0xFF);
-      sout.write(b);
-    }
-    sout.write(0);
+    sout.write(input);
     sout.flush();
     final BufferInput bi = new BufferInput(sin);
     info = bi.readString();
@@ -275,7 +271,7 @@ public final class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   void send(final String s) throws IOException {
-    sout.print(s);
+    sout.write(Token.token(s));
     sout.write(0);
     sout.flush();
   }
@@ -287,7 +283,7 @@ public final class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   boolean ok(final BufferInput bi) throws IOException {
-    return bi.read() <= 0;
+    return bi.read() == 0;
   }
 
   /**
@@ -296,11 +292,11 @@ public final class ClientSession extends Session {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  void receive(final BufferInput bi, final OutputStream os)
-      throws IOException {
-    for(int b; (b = bi.read()) > 0;) os.write(b == 0xFF ? bi.read() : b);
+  void receive(final BufferInput bi, final OutputStream os) throws IOException {
+    final DecodingInput di = new DecodingInput(bi);
+    for(int b; (b = di.read()) != -1;) os.write(b);
   }
-  
+
   @Override
   protected void execute(final String cmd, final OutputStream os)
       throws IOException {

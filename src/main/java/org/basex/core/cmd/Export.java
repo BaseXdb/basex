@@ -75,9 +75,9 @@ public final class Export extends Command {
 
       // serialize file
       final PrintOutput po = new PrintOutput(unique(exported, file.path()));
-      final Serializer xml = Serializer.get(po, sp);
-      xml.node(data, pre);
-      xml.close();
+      final Serializer ser = Serializer.get(po, sp);
+      ser.node(data, pre);
+      ser.close();
       po.close();
     }
 

@@ -44,7 +44,7 @@ public final class Store extends ACreate {
       return error(DBNOTSTORED, in);
     }
   }
-  
+
   /**
    * Stores data from the specified input stream in the database.
    * @param target target path
@@ -69,7 +69,7 @@ public final class Store extends ACreate {
     new IOFile(bin.dir()).md();
     try {
       if(lock) ctx.register(true);
-      final DataOutput out = new DataOutput(bin.file()); 
+      final DataOutput out = new DataOutput(bin.file());
       try {
         for(int b; (b = input.read()) != -1;) out.write(b);
       } finally {

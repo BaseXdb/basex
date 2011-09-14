@@ -349,9 +349,9 @@ public final class FNFile extends FuncCall {
       final PrintOutput out = PrintOutput.get(
           new FileOutputStream(path, append));
       try {
-        final Serializer xml = Serializer.get(out, serialPar(this, 2, ctx));
-        for(Item it; (it = ir.next()) != null;) it.serialize(xml);
-        xml.close();
+        final Serializer ser = Serializer.get(out, serialPar(this, 2, ctx));
+        for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+        ser.close();
       } catch(final SerializerException ex) {
         throw new QueryException(input, ex);
       } finally {

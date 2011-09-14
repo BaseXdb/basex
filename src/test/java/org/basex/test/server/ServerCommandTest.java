@@ -10,6 +10,7 @@ import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Kill;
 import org.basex.server.ClientSession;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,7 +48,7 @@ public final class ServerCommandTest extends CommandTest {
     try {
       if(session != null) session.close();
     } catch(final Exception ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
     // stop server instance
     if(server != null) server.stop();
