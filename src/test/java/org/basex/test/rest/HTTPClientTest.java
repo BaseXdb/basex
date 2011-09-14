@@ -70,7 +70,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class HTTPClientTest {
+public class HTTPClientTest {
   /** Test database name. */
   private static final String DB = Util.name(HTTPClientTest.class);
   /** Status code. */
@@ -150,7 +150,7 @@ public final class HTTPClientTest {
    * @throws Exception exception
    */
   @Test
-  public void testPUT() throws Exception {
+  public void put() throws Exception {
     final QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
@@ -164,7 +164,7 @@ public final class HTTPClientTest {
    * @throws Exception exception
    */
   @Test
-  public void testPOSTQuery() throws Exception {
+  public void postQuery() throws Exception {
     // POST - query
     QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='post'>"
@@ -195,7 +195,7 @@ public final class HTTPClientTest {
    * @throws Exception exception
    */
   @Test
-  public void testPOSTAdd() throws Exception {
+  public void postAdd() throws Exception {
     // POST - add content
     final QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='post' status-only='true'>"
@@ -212,7 +212,7 @@ public final class HTTPClientTest {
    * @throws Exception exception
    */
   @Test
-  public void testPOSTGet() throws Exception {
+  public void postGet() throws Exception {
     // GET1 - just send a GET request
     QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='get' href=" + URL + "/>)", context);
@@ -245,7 +245,7 @@ public final class HTTPClientTest {
    * @throws Exception exception
    */
   @Test
-  public void testPOSTDelete() throws Exception {
+  public void postDelete() throws Exception {
     // DELETE
     final QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='delete' status-only='true'/>, " + URL + ")",
@@ -288,7 +288,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testParseRequest() throws IOException, QueryException {
+  public void parseRequest() throws IOException, QueryException {
     // Simple HTTP request with no errors
     final byte[] req = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
@@ -314,7 +314,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testParseMultipartReq() throws IOException, QueryException {
+  public void parseMultipartReq() throws IOException, QueryException {
     final byte[] multiReq = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
         + "method='POST' href='http://www.basex.org'>"
@@ -368,7 +368,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testParseMultipartReqBodies() throws IOException, QueryException {
+  public void parseMultipartReqBodies() throws IOException, QueryException {
     final byte[] multiReq = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
         + "method='POST' href='http://www.basex.org'>"
@@ -424,7 +424,7 @@ public final class HTTPClientTest {
    * @throws IOException IO exception
    */
   @Test
-  public void testErrors() throws IOException {
+  public void errors() throws IOException {
 
     // Incorrect requests
     final List<byte[]> falseReqs = new ArrayList<byte[]>();
@@ -515,7 +515,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testWriteMultipartMessage() throws IOException, QueryException {
+  public void writeMultipartMessage() throws IOException, QueryException {
     final Request req = new Request();
     req.isMultipart = true;
     req.payloadAttrs.add(token("media-type"), token("multipart/alternative"));
@@ -567,7 +567,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testWriteMessage() throws IOException, QueryException {
+  public void writeMessage() throws IOException, QueryException {
 
     // Case 1: No method, media-type='text/xml'
     final Request req1 = new Request();
@@ -620,7 +620,7 @@ public final class HTTPClientTest {
    * @throws IOException IO exception
    */
   @Test
-  public void testWriteBase64() throws IOException, QueryException {
+  public void writeBase64() throws IOException, QueryException {
     // Case 1: content is xs:base64Binary
     final Request req1 = new Request();
     req1.payloadAttrs.add(METHOD, token("http:base64Binary"));
@@ -648,7 +648,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testWriteHex() throws IOException, QueryException {
+  public void writeHex() throws IOException, QueryException {
     // Case 1: content is xs:hexBinary
     final Request req1 = new Request();
     req1.payloadAttrs.add(METHOD, token("http:hexBinary"));
@@ -676,7 +676,7 @@ public final class HTTPClientTest {
    * @throws IOException IO exception
    */
   @Test
-  public void testWriteFromResource() throws IOException, QueryException {
+  public void writeFromResource() throws IOException, QueryException {
     // Create a file form which will be read
     final File f = new File(Prop.TMP + Util.name(HTTPClientTest.class));
     final FileOutputStream out = new FileOutputStream(f);
@@ -705,7 +705,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void getResponseWithCharset() throws IOException, QueryException {
+  public void responseWithCharset() throws IOException, QueryException {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -728,7 +728,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testGetMultipartResponse() throws IOException, QueryException {
+  public void multipartResponse() throws IOException, QueryException {
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
@@ -809,7 +809,7 @@ public final class HTTPClientTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testGetMutipartRespPreamble() throws IOException, QueryException {
+  public void multipartRespPreamble() throws IOException, QueryException {
 
     // Create fake HTTP connection
     final FakeHttpConnection conn = new FakeHttpConnection(new URL(
