@@ -271,7 +271,8 @@ public final class FNDb extends FuncCall {
       final String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
       return Str.get(ct == null ? DataText.APP_OCTET : ct);
     }
-    return Str.get(DataText.APP_XML);
+    if(isXML(ctx).bool(input)) return Str.get(DataText.APP_XML);
+    throw RESFNF.thrw(input, path);
   }
 
   /**

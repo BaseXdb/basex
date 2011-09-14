@@ -408,5 +408,6 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("db:store('" + DB + "', 'raw', 'bla')");
     query(fun + "('" + DB + "', 'xml')", DataText.APP_XML);
     query(fun + "('" + DB + "', 'raw')", DataText.APP_OCTET);
+    error(fun + "('" + DB + "', 'test')", Err.RESFNF);
   }
 }
