@@ -13,6 +13,7 @@ import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
+import org.basex.io.in.LookupInput;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
@@ -80,7 +81,12 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final String doc = path.isEmpty() ? newName : path + SEP + newName;
         // check if document with this path already exists
         if(count(s, db, doc) == 0) {
-          s.add(newName, path, input);
+          final LookupInput li = new LookupInput(input);
+          if(li.lookup() == '<')
+            s.add(newName, path, li);
+          else
+            s.store(path + SEP + newName, li);
+
           deleteDummy(s, db, path);
         } else {
           s.replace(doc, input);
