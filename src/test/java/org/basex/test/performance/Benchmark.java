@@ -44,7 +44,7 @@ public abstract class Benchmark {
   public static void init() throws IOException {
     // Check if server is (not) running
     server = !local && !BaseXServer.ping(LOCALHOST,
-        CONTEXT.mprop.num(MainProp.SERVERPORT)) ? new BaseXServer("") : null;
+        CONTEXT.mprop.num(MainProp.SERVERPORT)) ? new BaseXServer("-z") : null;
 
     session = local ? new LocalSession(CONTEXT) :
       new ClientSession(CONTEXT, Text.ADMIN, Text.ADMIN);
