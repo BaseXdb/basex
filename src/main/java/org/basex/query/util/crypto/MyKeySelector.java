@@ -23,7 +23,7 @@ public class MyKeySelector extends KeySelector {
 
     @Override
     public Key getKey() {
-      return null;
+      return publicKey;
     }
 
     MyKeySelectorResult(PublicKey key) {
