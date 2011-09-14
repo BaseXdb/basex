@@ -85,6 +85,7 @@ public class BXRootResource extends BXResource implements
       @Override
       public BXDatabase get() throws IOException {
         final String dbname = dbname(newName);
+        // [DP] WebDAV: handle binary files
         s.create(dbname, inputStream);
         s.execute(new Close());
         return new BXDatabase(dbname, session);

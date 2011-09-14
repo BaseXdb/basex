@@ -80,6 +80,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final String doc = path.isEmpty() ? newName : path + SEP + newName;
         // check if document with this path already exists
         if(count(s, db, doc) == 0) {
+          // [DP] WebDAV: handle binary files
           s.add(newName, path, input);
           deleteDummy(s, db, path);
         } else {
