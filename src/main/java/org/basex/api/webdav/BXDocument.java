@@ -8,7 +8,6 @@ import java.util.Map;
 import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
-import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.server.Query;
 import org.basex.server.Session;
@@ -65,7 +64,12 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
   @Override
   public String getContentType(final String accepts) {
-    return raw ? DataText.APP_OCTET : DataText.APP_XML;
+    return new BXCode<String>(this) {
+      @Override
+      public String get() throws IOException {
+        return contentType(s, db, path);
+      }
+    }.evalNoEx();
   }
 
   @Override
