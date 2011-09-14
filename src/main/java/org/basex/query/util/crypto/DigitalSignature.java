@@ -132,12 +132,12 @@ public final class DigitalSignature {
    * @return signed node
    * @throws QueryException query exception
    */
-  public Item generateSignature(final ANode node, final byte[] canonicalization,
+  public ANode generateSignature(final ANode node, final byte[] canonicalization,
       final byte[] digest, final byte[] signature,
       final byte[] nsPrefix, final byte[] type)
           throws QueryException {
     
-    // variables to check parameters for correctnes
+    // variables to check if parameters correct
     int l = 0;
     int i = 0;
     byte[] b = canonicalization;
@@ -184,7 +184,7 @@ public final class DigitalSignature {
       CRYPTOSIGTYPINV.thrw(input, b);
     final String ST = "enveloped";
     
-    Item signedNode = null;
+    ANode signedNode = null;
 
     try {
 
@@ -222,7 +222,7 @@ public final class DigitalSignature {
       final DOMSignContext dsc = new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
-      signedNode = NodeType.DOC.e(doc, input);
+      signedNode = (ANode) NodeType.DOC.e(doc, input);
 
     } catch(NoSuchAlgorithmException e) {
       e.printStackTrace();
