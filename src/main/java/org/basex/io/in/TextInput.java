@@ -61,6 +61,7 @@ public final class TextInput {
    */
   public static TokenBuilder content(final IO in, final String enc)
       throws IOException {
+
     final TextInput ti = new TextInput(in);
     if(enc != null) ti.encoding(enc);
     final int len = (int) ti.length();
@@ -105,7 +106,7 @@ public final class TextInput {
     if(pp != 0) return last[lp + pp++ & 0x0F];
 
     int ch = in[ip].readChar();
-    while(ch == 0 && ip != 0) ch = in[--ip].readChar();
+    while(ch == -1 && ip != 0) ch = in[--ip].readChar();
     last[lp++] = ch;
     lp &= 0x0F;
     if(ip == 0 && ch == '\n') ++line;

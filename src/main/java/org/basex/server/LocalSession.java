@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
@@ -17,6 +18,7 @@ import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Store;
+import org.basex.io.in.LookupInputStream;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -84,8 +86,16 @@ public final class LocalSession extends Session {
 
   @Override
   public void create(final String name, final InputStream input)
-    throws BaseXException {
-    info = CreateDB.create(name, input, ctx);
+    throws IOException {
+
+    final LookupInputStream lis = new LookupInputStream(input);
+    try {
+      info = lis.lookup() == -1 ?
+          CreateDB.create(name, Parser.emptyParser(), ctx) :
+          CreateDB.create(name, lis, ctx);
+    } catch(final BaseXException ex) {
+      throw ex;
+    }
   }
 
   @Override
@@ -121,7 +131,7 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     try {
       final ListIterator<LocalQuery> i = queries.listIterator();
       while(i.hasNext()) {

@@ -24,6 +24,7 @@ import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Store;
 import org.basex.io.in.BufferInput;
+import org.basex.io.in.LookupInputStream;
 import org.basex.io.in.ClientInputStream;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
@@ -131,6 +132,12 @@ public final class ClientListener extends Thread {
       while(running) {
         try {
           final int b = in.read();
+          // end of stream: exit session
+          if(b == -1) {
+            exit();
+            break;
+          }
+
           sc = get(b);
           cmd = null;
           if(sc == CREATE) {
@@ -154,7 +161,7 @@ public final class ClientListener extends Thread {
             cmd = new ByteList().add(b).add(in.token().toArray()).toString();
           }
         } catch(final IOException ex) {
-          // this exception is thrown for each session if the server is stopped
+          // this exception may be thrown if a session is stopped
           exit();
           break;
         }
@@ -181,7 +188,6 @@ public final class ClientListener extends Thread {
         // stop console
         if(command instanceof Exit) {
           exit();
-          running = false;
           break;
         }
 
@@ -209,7 +215,6 @@ public final class ClientListener extends Thread {
         // send info
         info(ok, info, perf);
       }
-      if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
       log.write(this, sc == COMMAND ? cmd : sc, INFOERROR + ex.getMessage());
       Util.stack(ex);
@@ -221,6 +226,8 @@ public final class ClientListener extends Thread {
    * Exits the session.
    */
   public synchronized void exit() {
+    running = false;
+
     // close remaining query processes
     for(final QueryListener q : queries.values()) {
       try { q.close(true); } catch(final IOException ex) { }
@@ -239,6 +246,7 @@ public final class ClientListener extends Thread {
       if(command != null) command.stop();
       context.delete(this);
       socket.close();
+      log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final Exception ex) {
       log.write(ex.getMessage());
       Util.stack(ex);
@@ -318,13 +326,14 @@ public final class ClientListener extends Thread {
     log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
 
     final ClientInputStream cis = new ClientInputStream(in);
+    final LookupInputStream lis = new LookupInputStream(cis);
     try {
-      final String info = cis.curr() == -1 ?
+      final String info = lis.lookup() == -1 ?
         CreateDB.create(name, Parser.emptyParser(), context) :
-        CreateDB.create(name, cis, context);
+        CreateDB.create(name, lis, context);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.flush();
+      while(cis.read() != -1);
       info(false, ex.getMessage(), perf);
     }
   }
@@ -348,7 +357,7 @@ public final class ClientListener extends Thread {
       final String info = Add.add(name, path, is, context, null, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.flush();
+      while(cis.read() != -1);
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -371,7 +380,7 @@ public final class ClientListener extends Thread {
       final String info = Replace.replace(path, is, context, true);
       info(true, info, perf);
     } catch(final BaseXException ex) {
-      cis.flush();
+      while(cis.read() != -1);
       info(false, ex.getMessage(), perf);
     }
     out.flush();
@@ -390,7 +399,7 @@ public final class ClientListener extends Thread {
     try {
       info(true, Store.store(path, cis, context, true), perf);
     } catch(final BaseXException ex) {
-      cis.flush();
+      while(cis.read() != -1);
       info(false, ex.getMessage(), perf);
     }
     out.flush();

@@ -311,7 +311,7 @@ public final class Map extends FItem {
     boolean quote = false, error = false;
     final int pl = s.length();
     for(int p = 0; p < pl; p++) {
-      char ch = s.charAt(p);
+      final char ch = s.charAt(p);
       if(quote) {
         if(ch == '"' && (p + 1 == pl || s.charAt(p + 1) != '"')) {
           quote = false;

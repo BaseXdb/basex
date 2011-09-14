@@ -199,7 +199,7 @@ public final class ClientSession extends Session {
       po.print(bi.readString());
       po.write(0);
       po.flush();
-      InputStream is = esocket.getInputStream();
+      final InputStream is = esocket.getInputStream();
       is.read();
       listen(is);
     }
@@ -264,8 +264,8 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public void close() throws IOException {
-    send(Cmd.EXIT.toString());
+  public synchronized void close() throws IOException {
+    //send(Cmd.EXIT.toString());
     if(esocket != null) esocket.close();
     socket.close();
   }
@@ -288,18 +288,18 @@ public final class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   boolean ok(final BufferInput bi) throws IOException {
-    return bi.read() == 0;
+    return bi.read() <= 0;
   }
 
   /**
    * Retrieves data from the server.
-   * @param si buffered server input
+   * @param bi buffered server input
    * @param os output stream
    * @throws IOException I/O exception
    */
-  void receive(final BufferInput si, final OutputStream os)
+  void receive(final BufferInput bi, final OutputStream os)
       throws IOException {
-    for(int b; (b = si.read()) != 0;) os.write(b == 0xFF ? si.read() : b);
+    for(int b; (b = bi.read()) > 0;) os.write(b == 0xFF ? bi.read() : b);
   }
   
   @Override

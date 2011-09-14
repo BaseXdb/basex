@@ -10,6 +10,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,14 +25,14 @@ public final class SemaphoreTest {
   /** Create random number. */
   static Random rand = new Random();
   /** Test database name. */
-  private static final String NAME = "factbook";
+  private static final String NAME = Util.name(SemaphoreTest.class);
   /** Test file. */
   private static final String FILE = "etc/test/factbook.zip";
   /** Test queries. */
   static final String [] QUERIES = {
-      "xquery for $n in (doc('factbook')//province)[position() < 100] " +
-      "       return insert node <test/> into $n",
-      "xquery for $n in 1 to 100000 where $n = 0 return $n"
+    "xquery for $n in (db:open('" + NAME + "')//province)[position() < 100] " +
+    "       return insert node <test/> into $n",
+    "xquery for $n in 1 to 100000 where $n = 0 return $n"
   };
   /** Number of performance tests. */
   private static final int TESTS = 5;

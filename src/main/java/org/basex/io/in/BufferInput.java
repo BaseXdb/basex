@@ -17,9 +17,7 @@ import org.basex.io.IO;
 import org.basex.util.list.ByteList;
 
 /**
- * This class serves as a buffered wrapper for textual input streams.
- * In contrast to default input streams, the value {@code 0}
- * (instead of {@code -1}) indicates the end of the stream.
+ * This class uses a byte buffer to speed up input stream processing.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -132,7 +130,7 @@ public class BufferInput extends InputStream {
   public int read() throws IOException {
     if(pos >= size) {
       next();
-      if(size <= 0) return 0;
+      if(size <= 0) return -1;
     }
     return buffer[pos++] & 0xFF;
   }
@@ -176,6 +174,8 @@ public class BufferInput extends InputStream {
   public final int readChar() throws IOException {
     // handle different encodings
     final int ch = read();
+    if(ch == -1) return ch;
+
     // encoding can be safely compared by references...
     if(enc == UTF16LE) return ch | read() << 8;
     if(enc == UTF16BE) return ch << 8 | read();

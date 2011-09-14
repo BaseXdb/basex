@@ -114,10 +114,10 @@ public final class CSVParser extends SingleParser {
     bi.encoding(encoding);
 
     boolean quoted = false, open = true;
-    int ch = 0;
+    int ch = -1;
     while(true) {
-      if(ch == 0) ch = bi.readChar();
-      if(ch == 0) break;
+      if(ch == -1) ch = bi.readChar();
+      if(ch == -1) break;
       if(quoted) {
         if(ch == '"') {
           ch = bi.readChar();
@@ -150,7 +150,7 @@ public final class CSVParser extends SingleParser {
       } else {
         tb.add(ch);
       }
-      ch = 0;
+      ch = -1;
     }
     bi.close();
 

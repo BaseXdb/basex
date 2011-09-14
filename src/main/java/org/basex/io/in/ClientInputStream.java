@@ -4,54 +4,28 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * This class wraps a {@link BufferInput} reference to a standard input stream.
- * {@code -1} is returned if the end of the stream is reached. The method
- * {@link #curr()} returns the current stream value, which is the first value to
- * be returned or the most recent value that has been returned by
- * {@link #read()}.
+ * This server-side class wraps an {@link InputStream} filled by a database
+ * client. The incoming bytes are decoded: {@code 0x00} is treated as
+ * end of stream. {@code 0xFF} is treated as encoding flag and skipped.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class ClientInputStream extends InputStream {
   /** Input stream. */
-  private final BufferInput input;
-  /** Current value. */
-  private int curr;
+  private final InputStream input;
 
   /**
    * Constructor.
    * @param in buffer input to be wrapped
-   * @throws IOException I/O exception
    */
-  public ClientInputStream(final BufferInput in) throws IOException {
+  public ClientInputStream(final InputStream in) {
     input = in;
-    read();
-  }
-
-  /**
-   * Returns the current value.
-   * @return current value
-   */
-  public int curr() {
-    return curr;
   }
 
   @Override
   public int read() throws IOException {
-    final int v = curr;
-    if(v == -1) return -1;
-    curr = input.read();
-    if(curr == 0xFF) curr = input.read();
-    else if(curr == 0) curr = -1;
-    return v;
-  }
-
-  /**
-   * Flushes the remaining client data.
-   * @throws IOException I/O exception
-   */
-  public void flush() throws IOException {
-    while(read() != -1);
+    final int b = input.read();
+    return b == 0 ? -1 : b == 0xFF ? input.read() : b;
   }
 }

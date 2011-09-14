@@ -67,9 +67,7 @@ public final class TextParser extends SingleParser {
     bi.encoding(encoding);
 
     final TokenBuilder tb = new TokenBuilder();
-    while(true) {
-      final int ch = bi.readChar();
-      if(ch == 0) break;
+    for(int ch; (ch = bi.readChar()) != -1;) {
       if(ch == '\n' && lines) {
         builder.startElem(LINE, atts);
         builder.text(tb.finish());

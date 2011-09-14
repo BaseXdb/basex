@@ -109,6 +109,7 @@ public final class DataInput extends BufferInput {
    */
   public int readNum() throws IOException {
     final int v = read();
+    if(v == -1) return 0;
     switch((v & 0xC0) >>> 6) {
       case 0:
         return v;
