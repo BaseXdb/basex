@@ -1,5 +1,6 @@
 package org.basex.query.util.crypto;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.ByteArrayInputStream;
@@ -67,25 +68,43 @@ public final class DigitalSignature {
     token("exclusive-with-comment"),
     token("inclusive-with-comment")
     };
+  private static final String[] CANONICALIZATIONMETHODS =
+    {
+    CanonicalizationMethod.EXCLUSIVE,
+    CanonicalizationMethod.INCLUSIVE,
+    CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
+    CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS
+    };
   /** Tokens. */
   private static final byte[][] DIGESTS =
     {
     token("SHA1"),
     token("SHA256"),
-    token("SHA512"),
+    token("SHA512")
+    };
+  private static final String[] DIGESTMETHODS =
+    {
+    DigestMethod.SHA1,
+    DigestMethod.SHA256,
+    DigestMethod.SHA512
     };
   /** Tokens. */
   private static final byte[][] SIGNATURES =
     {
-    token("DSA-SHA1"),
     token("RSA-SHA1"),
+    token("DSA-SHA1")
+    };
+  private static final String[] SIGNATUREMETHODS =
+    {
+    SignatureMethod.RSA_SHA1,
+    SignatureMethod.DSA_SHA1
     };
   /** Tokens. */
   private static final byte[][] SIGNATURETYPES =
     {
     token("enveloped"),
     token("enveloping"),
-    token("detached"),
+    token("detached")
     };
   /** Index of default values in token arrays. */
   private static final int DEFAULT = 0;
@@ -103,49 +122,86 @@ public final class DigitalSignature {
 
   /**
    * Generates a signature.
+   * @param node node to be signed
+   * @param canonicalization canonicalization algorithm
+   * @param digest digest algorithm
+   * @param signature signature algorithm
+   * @param nsPrefix signature element namespace prefix
+   * @param type signature type (enveloped, enveloping, detached)
    *
-   * @return signature
+   * @return signed node
+   * @throws QueryException query exception
    */
-  public Item generateSignature(final ANode node, final byte[] canonAlg,
-      final byte[] digestAlg, final byte[] signatureAlg,
-      final byte[] signatureNS, final byte[] signatureType)
+  public Item generateSignature(final ANode node, final byte[] canonicalization,
+      final byte[] digest, final byte[] signature,
+      final byte[] nsPrefix, final byte[] type)
           throws QueryException {
-
-    // initialize default values if arguments empty
-    final byte[] a = canonAlg == null ? CANONICALIZATIONS[DEFAULT] : canonAlg;
-    final byte[] d = digestAlg == null ? DIGESTS[DEFAULT] : digestAlg;
-    final byte[] s = signatureAlg == null ? SIGNATURES[DEFAULT] : signatureAlg;
-    final byte[] t = signatureType == null ? SIGNATURETYPES[DEFAULT] :
-      signatureType;
-
-    // check if arguments are valid
-//    if(!eq(canonAlg, CANONICALIZATIONS))
-//      CRYPTOCANINV.thrw(input, canonAlg);
-//    if(!eq(digestAlg, DIGESTS))
-//      CRYPTODIGINV.thrw(input, digestAlg);
-//    if(!eq(signatureAlg, SIGNATURES))
-//      CRYPTOSIGINV.thrw(input, signatureAlg);
-//    if(!eq(signatureType, SIGNATURETYPES))
-//      CRYPTOSIGINV.thrw(input, signatureType);
-
+    
+    // variables to check parameters for correctnes
+    int l = 0;
+    int i = 0;
+    byte[] b = canonicalization;
+    
+    // check if given canonicalization method is valid and initialize if so
+    if(b.length == 0)
+      b = CANONICALIZATIONS[DEFAULT];
+    l = CANONICALIZATIONS.length;
+    // compare input to valid options
+    while(i < l && !eq(CANONICALIZATIONS[i], b)) i++;
+    // if all options have been considered and none fits ...
+    if(i == l)
+      CRYPTOCANINV.thrw(input, b);
+    // map to right canonicalization method
+    final String CM = CANONICALIZATIONMETHODS[i];
+    
+    b = digest;
+    l = 0;
+    i = 0;
+    if(b.length == 0)
+      b = DIGESTS[DEFAULT];
+    l = DIGESTS.length;
+    while(i < l && !eq(DIGESTS[i], b)) i++;
+    if(i == l)
+      CRYPTODIGINV.thrw(input, b);
+    final String DA = DIGESTMETHODS[i];
+    
+    b = signature;
+    l = 0;
+    i = 0;
+    if(b.length == 0)
+      b = SIGNATURES[DEFAULT];
+    l = SIGNATURES.length;
+    while(i < l && !eq(SIGNATURES[i], b)) i++;
+    if(i == l)
+      CRYPTOSIGINV.thrw(input, b);
+    final String SA = SIGNATUREMETHODS[i];
+    final String keytype = string(substring(SIGNATURES[i], 0, 3));
+    
+    b = type;
+    if(b.length == 0)
+      b = SIGNATURETYPES[DEFAULT];
+    else if(!eq(b, SIGNATURETYPES))
+      CRYPTOSIGTYPINV.thrw(input, b);
+    final String ST = "enveloped";
+    
     Item signedNode = null;
 
     try {
 
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
       final Reference ref = fac.newReference("",
-          fac.newDigestMethod(DigestMethod.SHA1, null), Collections.
+          fac.newDigestMethod(DA, null), Collections.
           singletonList(fac.newTransform(Transform.ENVELOPED,
               (TransformParameterSpec) null)), null, null);
 
-      final SignedInfo si = fac.newSignedInfo(fac.
-          newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
+      final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CM,
               (C14NMethodParameterSpec) null),
-              fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null),
+              fac.newSignatureMethod(SA, null),
               Collections.singletonList(ref));
 
       // auto-generated keypair and signature
-      final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
+      final KeyPairGenerator gen =
+          KeyPairGenerator.getInstance(keytype);
       gen.initialize(512);
       final KeyPair kp = gen.generateKeyPair();
       final KeyInfoFactory kif = fac.getKeyInfoFactory();
@@ -155,8 +211,7 @@ public final class DigitalSignature {
 
       // enveloped certificate
       final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-      final Serializer ser = Serializer.
-          get(byteOut, null);
+      final Serializer ser = Serializer.get(byteOut, null);
       node.serialize(ser);
       ser.close();
 

@@ -5,6 +5,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -74,6 +75,15 @@ public class FNCryptoTest extends AdvancedQueryTest {
   public void generatesignatureSyntax4() throws Exception {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:generate-signature(<a/>,'','','','','','',<a/>)");
+  }
+  
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt.
+   */
+  @Test
+  public void generatesignatureSyntax5() throws Exception {
+    // general syntax test equiv. FNDbTest.java check()
+    Assert.fail();
   }
   
   /**

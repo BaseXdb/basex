@@ -807,7 +807,9 @@ public enum Err {
   /** CX21: Encoding not supported. */
   CRYPTOINVALGO(CX, 21, "Algorithm is not supported."),
   /** CX22: Encoding not supported. */
-  CRYPTODECTYP(CX, 22, "Decryption type is not supported.");
+  CRYPTODECTYP(CX, 22, "Decryption type is not supported."),
+  /** CX22: Encoding not supported. */
+  CRYPTOSIGTYPINV(CX, 23, "Signature type is not supported.");
 
   /** Error type. */
   public final ErrType type;
