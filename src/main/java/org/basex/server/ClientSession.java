@@ -265,7 +265,6 @@ public final class ClientSession extends Session {
 
   @Override
   public synchronized void close() throws IOException {
-    //send(Cmd.EXIT.toString());
     if(esocket != null) esocket.close();
     socket.close();
   }

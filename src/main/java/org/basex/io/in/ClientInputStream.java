@@ -14,6 +14,8 @@ import java.io.InputStream;
 public final class ClientInputStream extends InputStream {
   /** Input stream. */
   private final InputStream input;
+  /** All bytes have been read. */
+  private boolean more = true;
 
   /**
    * Constructor.
@@ -25,7 +27,19 @@ public final class ClientInputStream extends InputStream {
 
   @Override
   public int read() throws IOException {
-    final int b = input.read();
-    return b == 0 ? -1 : b == 0xFF ? input.read() : b;
+    if(more) {
+      final int b = input.read();
+      if(b != 0) return b == 0xFF ? input.read() : b;
+      more = false;
+    }
+    return -1;
+  }
+
+  /**
+   * Flushes the remaining client data.
+   * @throws IOException I/O exception
+   */
+  public void flush() throws IOException {
+    while(read() != -1);
   }
 }
