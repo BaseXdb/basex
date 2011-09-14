@@ -154,18 +154,18 @@ public final class RunQueries {
     Iter iter = proc.iter();
 
     // ------------------------------------------------------------------------
-    // Create an XML serializer
-    Serializer xml = proc.getSerializer(System.out);
+    // Create a serializer instance
+    Serializer ser = proc.getSerializer(System.out);
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
     for(Item item; (item = iter.next()) != null;) {
-      item.serialize(xml);
+      item.serialize(ser);
     }
 
     // ------------------------------------------------------------------------
     // Close the serializer
-    xml.close();
+    ser.close();
     System.out.println();
 
     // ------------------------------------------------------------------------
