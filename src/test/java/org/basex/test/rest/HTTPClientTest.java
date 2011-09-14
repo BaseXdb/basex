@@ -516,6 +516,12 @@ public class HTTPClientTest {
    */
   @Test
   public void writeMultipartMessage() throws IOException, QueryException {
+    final String plain = "...plain text version of message goes here...."
+        + Prop.NL;
+    final String rich = ".... richtext version of same message goes here ...";
+    final String fancy = ".... fanciest formatted version of same  message  "
+        + "goes  here...";
+
     final Request req = new Request();
     req.isMultipart = true;
     req.payloadAttrs.add(token("media-type"), token("multipart/alternative"));
@@ -524,20 +530,17 @@ public class HTTPClientTest {
     p1.headers.add(token("Content-Type"), token("text/plain; "
         + "charset=us-ascii"));
     p1.bodyAttrs.add(token("media-type"), token("text/plain"));
-    p1.bodyContent.add(Str.get(token("...plain text version of message "
-        + "goes here....\n")));
+    p1.bodyContent.add(Str.get(plain));
 
     final Part p2 = new Part();
     p2.headers.add(token("Content-Type"), token("text/richtext"));
     p2.bodyAttrs.add(token("media-type"), token("text/richtext"));
-    p2.bodyContent.add(Str.get(token(".... richtext version "
-        + "of same message goes here ...")));
+    p2.bodyContent.add(Str.get(rich));
 
     final Part p3 = new Part();
     p3.headers.add(token("Content-Type"), token("text/x-whatever"));
     p3.bodyAttrs.add(token("media-type"), token("text/x-whatever"));
-    p3.bodyContent.add(Str.get(token(".... fanciest formatted version "
-        + "of same  message  goes  here...")));
+    p3.bodyContent.add(Str.get(fancy));
 
     req.parts.add(p1);
     req.parts.add(p2);
@@ -548,12 +551,12 @@ public class HTTPClientTest {
     HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
-        + "...plain text version of message goes here...." + CRLF + CRLF
+        + plain + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/richtext" + CRLF + CRLF
-        + ".... richtext version of same message goes here ..." + CRLF
+        + rich + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
-        + ".... fanciest formatted version of same  message  goes  here..."
-        + CRLF + "--boundary42--" + CRLF;
+        + fancy + CRLF
+        + "--boundary42--" + CRLF;
 
     // Compare results
     final String fake = fakeConn.getOutputStream().toString();
@@ -881,10 +884,10 @@ public class HTTPClientTest {
     final Parser reqParser = Parser.xmlParser(io, context.prop, "");
     final DBNode dbNode = new DBNode(reqParser, context.prop);
     resultIter.add(dbNode.children().next());
-    resultIter.add(Str.get(token("This is implicitly typed plain ASCII text.\n"
-        + "It does NOT end with a linebreak.\n")));
-    resultIter.add(Str.get(token("This is explicitly typed plain ASCII text.\n"
-        + "It DOES end with a linebreak.\n\n")));
+    resultIter.add(Str.get("This is implicitly typed plain ASCII text.\n"
+        + "It does NOT end with a linebreak.\n"));
+    resultIter.add(Str.get("This is explicitly typed plain ASCII text.\n"
+        + "It DOES end with a linebreak.\n\n"));
 
     // Compare response with expected result
     assertTrue(FNSimple.deep(null, resultIter, i));

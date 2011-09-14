@@ -264,4 +264,20 @@ public abstract class BXResource implements Resource {
     final String qu = "db:is-raw('" + db + "','" + path + "')";
     return s.query(qu).execute().equals("true");
   }
+
+  /**
+   * Get content type of a database resource.
+   * @param s active session
+   * @param db database name
+   * @param p resource path
+   * @return content type
+   * @throws IOException I/O exception
+   */
+  static String contentType(final Session s, final String db, final String p)
+      throws IOException {
+    final Query q = s.query("db:content-type($d, $p)");
+    q.bind("$d", db);
+    q.bind("$p", p);
+    return q.execute();
+  }
 }
