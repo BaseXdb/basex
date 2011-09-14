@@ -1,8 +1,6 @@
-package org.basex.query.util.pkg;
+package org.basex.util;
 
 import static org.basex.util.Token.*;
-
-import org.basex.util.Token;
 
 /**
  * Version according to the SemVer syntax.
@@ -10,7 +8,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class PkgVersion implements Comparable<PkgVersion> {
+public final class Version implements Comparable<Version> {
   /** Major version. */
   private final int major;
   /** Minor version. */
@@ -22,7 +20,15 @@ public final class PkgVersion implements Comparable<PkgVersion> {
    * Constructor.
    * @param version according to semantic versioning
    */
-  public PkgVersion(final byte[] version) {
+  public Version(final String version) {
+    this(Token.token(version));
+  }
+
+  /**
+   * Constructor.
+   * @param version according to semantic versioning
+   */
+  public Version(final byte[] version) {
     final byte[][] versions = split(version, '.');
     major = Token.toInt(versions[0]);
     minor = versions.length > 1 ? Token.toInt(versions[1]) : -1;
@@ -34,7 +40,7 @@ public final class PkgVersion implements Comparable<PkgVersion> {
    * @param ver version template
    * @return result
    */
-  public boolean isCompatible(final PkgVersion ver) {
+  public boolean isCompatible(final Version ver) {
     if(major != ver.major) return false;
     if(ver.minor == -1) return true;
     if(ver.patch == -1) return minor == ver.minor;
@@ -42,8 +48,14 @@ public final class PkgVersion implements Comparable<PkgVersion> {
   }
 
   @Override
-  public int compareTo(final PkgVersion ver) {
+  public int compareTo(final Version ver) {
     return major != ver.major ? major - ver.major :
            minor != ver.minor ? minor - ver.minor : patch - ver.patch;
+  }
+
+  @Override
+  public String toString() {
+    return major + (minor == -1 ? "" : "." + minor +
+        (patch == -1 ? "" : "." + patch));
   }
 }

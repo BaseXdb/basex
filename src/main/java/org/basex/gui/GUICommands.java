@@ -1,12 +1,11 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
-import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.net.URI;
 import javax.swing.AbstractButton;
 import org.basex.core.Context;
 import org.basex.core.Command;
@@ -765,29 +764,19 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens the community webpage. */
+  /** Opens the community web page. */
   SHOWCOMMUNITY(GUISHOWCOMMUNITY, null, GUISHOWCOMMUNITYTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      final String url = COMMUNITY_URL;
-      try {
-        Desktop.getDesktop().browse(new URI(url));
-      } catch(final Exception ex) {
-        Dialog.error(gui, Util.info(INFOBROSERERR, url));
-      }
+      Dialog.browse(gui, COMMUNITY_URL);
     }
   },
 
-  /** Opens the update webpage. */
+  /** Opens the update web page. */
   SHOWUPDATES(GUISHOWUPDATES, null, GUISHOWUPDATESTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      final String url = UPDATE_URL;
-      try {
-        Desktop.getDesktop().browse(new URI(url));
-      } catch(final Exception ex) {
-        Dialog.error(gui, Util.info(INFOBROSERERR, url));
-      }
+      Dialog.browse(gui, UPDATE_URL);
     }
   },
 

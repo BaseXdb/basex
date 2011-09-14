@@ -107,6 +107,7 @@ dc_separatorinfo=Separator
 do_title=Datenbank öffnen
 do_large=Die zu öffnende Datenbank ist % groß. Wollen Sie einige\nVisualisierungen schließen, um die Arbeit zu beschleunigen?
 do_nodbquestion=Wollen Sie eine neue Datenbank erstellen?
+do_checkver=Eine neue Version ist verfügbar (% %)!\nWollen Sie updaten?
 
 dr_title=Datenbank umbenennen
 dr_title2=Dokumente löschen

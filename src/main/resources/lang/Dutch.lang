@@ -107,6 +107,7 @@ dc_separatorinfo=Scheidingsteken
 do_title=Open database
 do_large=De database is % groot. Wil je enkele visualisaties\nsluiten om sneller te kunnen werken?
 do_nodbquestion=Wil je een nieuwe maken?
+do_checkver=A new version is available (% %)!\nDo you want to update?
 
 dr_title=Hernoem database
 dr_title2=Verwijder documenten

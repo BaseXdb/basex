@@ -14,12 +14,12 @@ import org.xml.sax.InputSource;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class IOUrl extends IO {
+public final class IOUrl extends IO {
   /**
    * Constructor.
    * @param u url
    */
-  IOUrl(final String u) {
+  public IOUrl(final String u) {
     super(u);
   }
 

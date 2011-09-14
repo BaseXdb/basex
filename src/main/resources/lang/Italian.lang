@@ -107,6 +107,7 @@ dc_separatorinfo=Separator
 do_title=Apri base di dati
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Vuoi crearne una nuova?
+do_checkver=A new version is available (% %)!\nDo you want to update?
 
 dr_title=Rinomina la base di dati
 dr_title2=Delete documents

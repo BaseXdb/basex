@@ -25,7 +25,12 @@ public interface Text {
   // FREQUENTLY USED CHARACTERS ===============================================
 
   /** New line. */
-  String NL = org.basex.core.Prop.NL;
+  String NL = Prop.NL;
+  /** Project name. */
+  String NAME = Prop.NAME;
+  /** Code version (must contain major, minor and optional patch number). */
+  String VERSION = Prop.VERSION;
+
   /** Colon. */
   String COL = ":";
   /** Colon/space. */
@@ -37,8 +42,6 @@ public interface Text {
   /** List. */
   String LI = "- ";
 
-  /** Project name. */
-  String NAME = "BaseX";
   /** Project namespace. */
   String NAMELC = NAME.toLowerCase();
   /** URL. */
@@ -47,10 +50,10 @@ public interface Text {
   String COMMUNITY_URL = URL + "/community";
   /** URL of the update page. */
   String UPDATE_URL = URL + "/products/download/all-downloads/";
+  /** Version URL. */
+  String VERSION_URL = "http://files." + NAMELC + ".org/version.txt";
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
-  /** Code version (must contain major, minor and optional patch number). */
-  String VERSION = "6.8 beta";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
@@ -1241,6 +1244,8 @@ public interface Text {
   String OPENLARGE = lang("do_large") + NL + " ";
   /** Dialog asking if a new database should be be created. */
   String NODBQUESTION = INFONODB + NL + lang("do_nodbquestion") + NL + " ";
+  /** Dialog for downloading a new version. */
+  String GUICHECKVER = lang("do_checkver");
 
   /** File dialog error. */
   String NOTOPENED = lang("c_notopened");

@@ -12,6 +12,7 @@ import org.basex.query.QueryException;
 import org.basex.query.util.pkg.Package.Component;
 import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.InputInfo;
+import org.basex.util.Version;
 import org.basex.util.hash.TokenSet;
 import org.basex.util.list.ObjList;
 
@@ -135,35 +136,35 @@ public final class PkgValidator {
     } else if(dep.semver != null) {
       // version template - version of secondary package or BaseX version must
       // be compatible with the defined template
-      final PkgVersion semVer = new PkgVersion(dep.semver);
+      final Version semVer = new Version(dep.semver);
       for(final byte[] v : currentVers)
-        if(new PkgVersion(v).isCompatible(semVer)) return v;
+        if(new Version(v).isCompatible(semVer)) return v;
     } else if(dep.semverMin != null && dep.semverMax != null) {
       // version templates for minimal and maximal acceptable version - version
       // of secondary package or BaseX version must be equal or above
       // the minimal and strictly below the maximal
-      final PkgVersion min = new PkgVersion(dep.semverMin);
-      final PkgVersion max = new PkgVersion(dep.semverMax);
+      final Version min = new Version(dep.semverMin);
+      final Version max = new Version(dep.semverMax);
       for(final byte[] nextVer : currentVers) {
-        final PkgVersion v = new PkgVersion(nextVer);
+        final Version v = new Version(nextVer);
         if(v.compareTo(min) >= 0 && v.compareTo(max) < 0) return nextVer;
       }
     } else if(dep.semverMin != null) {
       // version template for minimal acceptable version - version of secondary
       // package or BaseX version must be either compatible with this template
       // or greater than it
-      final PkgVersion semVer = new PkgVersion(dep.semverMin);
+      final Version semVer = new Version(dep.semverMin);
       for(final byte[] nextVer : currentVers) {
-        final PkgVersion v = new PkgVersion(nextVer);
+        final Version v = new Version(nextVer);
         if(v.isCompatible(semVer) || v.compareTo(semVer) >= 0) return nextVer;
       }
     } else if(dep.semverMax != null) {
       // version template for maximal acceptable version - version of secondary
       // package or BaseX version must be either compatible with this template
       // or smaller than it
-      final PkgVersion semVer = new PkgVersion(dep.semverMax);
+      final Version semVer = new Version(dep.semverMax);
       for(final byte[] nextVer : currentVers) {
-        final PkgVersion v = new PkgVersion(nextVer);
+        final Version v = new Version(nextVer);
         if(v.isCompatible(semVer) || v.compareTo(semVer) <= 0) return nextVer;
       }
     } else {

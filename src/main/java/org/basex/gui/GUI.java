@@ -2,12 +2,16 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -21,9 +25,9 @@ import javax.swing.border.EtchedBorder;
 
 import org.basex.core.AProp;
 import org.basex.core.BaseXException;
+import org.basex.core.Command;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
-import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Find;
 import org.basex.core.cmd.Set;
@@ -51,11 +55,13 @@ import org.basex.gui.view.plot.PlotView;
 import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
+import org.basex.io.IOUrl;
 import org.basex.io.out.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.basex.util.Version;
 
 /**
  * This class is the main window of the GUI. It is the central instance
@@ -268,6 +274,7 @@ public final class GUI extends AGUI {
     new Thread() {
       @Override
       public void run() {
+        checkVersion();
         views.run();
       }
     }.start();
@@ -694,5 +701,35 @@ public final class GUI extends AGUI {
     refreshControls();
     updateControl(menu, !full, BorderLayout.NORTH);
     setVisible(!full);
+  }
+
+  /**
+   * Checks for a new version and shows a confirmation dialog.
+   */
+  void checkVersion() {
+    final Version disk = new Version(gprop.get(GUIProp.UPDATEVERSION));
+    final Version used = new Version(VERSION.replaceAll(" .*", ""));
+    if(disk.compareTo(used) < 0) {
+      // update version property to latest used version
+      gprop.set(GUIProp.UPDATEVERSION, used.toString());
+    } else {
+      try {
+        final String page = Token.string(new IOUrl(VERSION_URL).read());
+        final Matcher m = Pattern.compile("^(Version )?([\\w\\d.]*?)( .*|$)",
+            Pattern.DOTALL).matcher(page);
+        if(m.matches()) {
+          final Version latest = new Version(m.group(2));
+          if(disk.compareTo(latest) < 0 &&
+              Dialog.confirm(this, Util.info(GUICHECKVER, NAME, latest))) {
+            Dialog.browse(this, UPDATE_URL);
+          } else {
+            // don't show update dialog anymore if it has been rejected once
+            gprop.set(GUIProp.UPDATEVERSION, latest.toString());
+          }
+        }
+      } catch(final Exception ex) {
+        // ignore connection failure
+      }
+    }
   }
 }
