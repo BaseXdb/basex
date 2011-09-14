@@ -492,7 +492,7 @@ public enum Function {
   /** Database function: replace document(s). */
   DBREPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
   /** Database function: optimize database structures. */
-  DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
+  DBOPTIMIZE(FNDb.class, "optimize(database[,all])", EMP, 1, STR, BLN),
   /** Database function: gets a value binary data. */
   DBGET(FNDb.class, "get(database,path)", B64, STR, STR),
   /** Database function: stores binary data. */
@@ -621,8 +621,8 @@ public enum Function {
 //      NOD, -6, NOD, STR, STR, STR, STR, STR),
   GENSIG(FNCrypto.class,
       "generate-signature" +
-      "(node,string,string,string,string,string[,string][,node])",
-      NOD, 6, NOD, STR, STR, STR, STR, STR, STR_ZO, NOD_ZO),
+      "(node,string,string,string,string,string[,item][,item])",
+      NOD, 6, NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO),
   /** Validate signature. */
   VALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
 
