@@ -63,7 +63,7 @@ abstract class RESTCode {
     if(ctx.db() == null) return;
     try {
       ctx.session.execute(new Open(ctx.all()));
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       throw new RESTException(SC_NOT_FOUND, ex.getMessage());
     }
   }

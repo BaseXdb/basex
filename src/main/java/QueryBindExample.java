@@ -18,15 +18,15 @@ public final class QueryBindExample {
   public static void main(final String[] args) {
     try {
       // create session
-      BaseXClient session =
+      final BaseXClient session =
         new BaseXClient("localhost", 1984, "admin", "admin");
 
       try {
         // create query instance
-        String input = "declare variable $name external; " +
+        final String input = "declare variable $name external; " +
             "for $i in 1 to 10 return element { $name } { $i }";
 
-        BaseXClient.Query query = session.query(input);
+        final BaseXClient.Query query = session.query(input);
 
         // bind variable
         query.bind("$name", "number");
@@ -37,7 +37,7 @@ public final class QueryBindExample {
         // close query instance
         System.out.print(query.close());
 
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         // print exception
         ex.printStackTrace();
       }
@@ -45,7 +45,7 @@ public final class QueryBindExample {
       // close session
       session.close();
 
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       // print exception
       ex.printStackTrace();
     }

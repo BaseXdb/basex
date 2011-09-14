@@ -7,8 +7,6 @@ import static org.junit.Assert.*;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,8 +17,12 @@ import java.net.URL;
 
 import org.basex.api.BaseXHTTP;
 import org.basex.api.rest.RESTText;
+import org.basex.core.MainProp;
 import org.basex.core.Text;
 import org.basex.data.DataText;
+import org.basex.io.in.ArrayInput;
+import org.basex.io.in.BufferInput;
+import org.basex.io.out.ArrayOutput;
 import org.basex.util.Base64;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -28,12 +30,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class tests the REST implementation.
+ * This class tests the embedded REST implementation.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class RESTTest {
+public class RESTTest {
+  /** Test database. */
+  private static final String DB = Util.name(RESTTest.class);
   /** REST identified. */
   private static final String NAME = "rest";
   /** REST URI. */
@@ -42,11 +46,10 @@ public final class RESTTest {
   private static final String WRAP =
       "<" + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
   /** Root path. */
-  private static final String ROOT = "http://localhost:8984/" + NAME + '/';
+  private static final String ROOT =
+      "http://" + LOCALHOST + ":" + MainProp.HTTPPORT[1] + "/" + NAME + "/";
   /** Input file. */
   private static final String FILE = "etc/test/input.xml";
-  /** Test database. */
-  private static final String DB = NAME;
   /** Start servers. */
   private static BaseXHTTP http;
 
@@ -58,7 +61,17 @@ public final class RESTTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    http = new BaseXHTTP("-czWU" + Text.ADMIN + " -P" + Text.ADMIN);
+    init(false);
+  }
+
+  /**
+   * Initializes the test.
+   * @param client client/server flag
+   * @throws Exception exception
+   */
+  public static void init(final boolean client) throws Exception {
+    final String cs = client ? "-c" : "";
+    http = new BaseXHTTP(cs + " -zU" + Text.ADMIN + " -P" + Text.ADMIN);
   }
 
   /**
@@ -248,7 +261,7 @@ public final class RESTTest {
   @Test
   public void post1() throws IOException {
     put(DB, null);
-    post(DB, stream("<a>A</a>"));
+    post(DB, new ArrayInput(token("<a/>")));
     assertEquals("1", get(DB + "?query=count(/)"));
     delete(DB);
   }
@@ -270,7 +283,7 @@ public final class RESTTest {
    */
   @Test
   public void put2() throws IOException {
-    put(DB, stream("<a>A</a>"));
+    put(DB, new ArrayInput(token("<a>A</a>")));
     assertEquals("A", get(DB + "?query=/*/text()"));
     delete(DB);
   }
@@ -294,8 +307,8 @@ public final class RESTTest {
   @Test
   public void put4() throws IOException {
     put(DB, null);
-    put(DB + "/a", stream("<a>A</a>"));
-    put(DB + "/b", stream("<b>B</b>"));
+    put(DB + "/a", new ArrayInput(token("<a>A</a>")));
+    put(DB + "/b", new ArrayInput(token("<b>B</b>")));
     assertEquals("2", get(DB + "?query=count(//text())"));
     assertEquals("2", get("?query=count(db:open('" + DB + "')//text())"));
     assertEquals("1", get("?query=count(db:open('" + DB + "/b')/*)"));
@@ -326,9 +339,9 @@ public final class RESTTest {
   @Test
   public void delete2() throws IOException {
     put(DB, null);
-    post(DB + "/a", stream("<a/>"));
-    post(DB + "/a", stream("<a/>"));
-    post(DB + "/b", stream("<b/>"));
+    post(DB + "/a", new ArrayInput(token("<a/>")));
+    post(DB + "/a", new ArrayInput(token("<a/>")));
+    post(DB + "/b", new ArrayInput(token("<b/>")));
     // delete 'a' directory
     assertContains(delete(DB + "/a"), "2 document");
     // delete 'b' directory
@@ -446,7 +459,7 @@ public final class RESTTest {
   }
 
   /**
-   * Executes the specified PUT request.
+   * Executes the specified POST request.
    * @param query request
    * @param is input stream
    * @return string result, or {@code null} for a failure.
@@ -498,19 +511,10 @@ public final class RESTTest {
    * @throws IOException I/O exception
    */
   private String read(final InputStream is) throws IOException {
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final BufferedInputStream bis = new BufferedInputStream(is);
+    final ArrayOutput baos = new ArrayOutput();
+    final BufferInput bis = new BufferInput(is);
     for(int i; (i = bis.read()) != -1;) baos.write(i);
     bis.close();
     return baos.toString();
-  }
-
-  /**
-   * Creates a byte input stream for the specified string.
-   * @param str string
-   * @return stream
-   */
-  private InputStream stream(final String str) {
-    return new ByteArrayInputStream(token(str));
   }
 }

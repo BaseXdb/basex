@@ -24,15 +24,18 @@ import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
+import org.basex.data.Result;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
 import org.basex.query.func.FNSimple;
 import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
@@ -48,7 +51,6 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Err;
 import org.basex.query.util.http.HTTPClient;
 import org.basex.query.util.http.Request;
@@ -63,12 +65,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class tests the HTTP Client.
+ * This class tests the server-based HTTP Client.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
 public final class HTTPClientTest {
+  /** Test database name. */
+  private static final String DB = Util.name(HTTPClientTest.class);
   /** Status code. */
   private static final byte[] STATUS = token("status");
   /** Body attribute media-type. */
@@ -76,7 +80,8 @@ public final class HTTPClientTest {
   /** Body attribute method. */
   private static final byte[] METHOD = token("method");
   /** Example url. */
-  private static final String URL = "'http://localhost:8984/rest/books'";
+  private static final String URL =
+      "'http://" + LOCALHOST + ":" + MainProp.HTTPPORT[1] + "/rest/" + DB + "'";
   /** Books document. */
   private static final String BOOKS = "<books>" + "<book id='1'>"
       + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
@@ -92,14 +97,23 @@ public final class HTTPClientTest {
   private static BaseXHTTP http;
 
   /**
-   * Prepare test.
+   * Start server.
    * @throws Exception exception
    */
   @BeforeClass
   public static void start() throws Exception {
+    init(false);
+  }
+
+  /**
+   * Initializes the test.
+   * @param client client/server flag
+   * @throws Exception exception
+   */
+  public static void init(final boolean client) throws Exception {
+    final String cs = client ? "-c" : "";
     context = new Context();
-    context.prop.set(Prop.CACHEQUERY, true);
-    http = new BaseXHTTP("-zU" + ADMIN + " -P" + ADMIN);
+    http = new BaseXHTTP(cs + " -zU" + Text.ADMIN + " -P" + Text.ADMIN);
   }
 
   /**
@@ -118,7 +132,7 @@ public final class HTTPClientTest {
    */
   @Before
   public void init() throws BaseXException {
-    new CreateDB("books", BOOKS).execute(context);
+    new CreateDB(DB, BOOKS).execute(context);
     new Close().execute(context);
   }
 
@@ -128,7 +142,7 @@ public final class HTTPClientTest {
    */
   @After
   public void finish() throws BaseXException {
-    new DropDB("books").execute(context);
+    new DropDB(DB).execute(context);
   }
 
   /**
@@ -137,12 +151,12 @@ public final class HTTPClientTest {
    */
   @Test
   public void testPUT() throws Exception {
-    final Command put = new XQuery("http:send-request("
+    final QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
-        + "</http:request>, " + URL + ")");
-    put.execute(context);
-    checkResponse(put, HttpURLConnection.HTTP_CREATED, 1);
+        + "</http:request>, " + URL + ")", context);
+    checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
+    qp.close();
   }
 
   /**
@@ -152,29 +166,28 @@ public final class HTTPClientTest {
   @Test
   public void testPOSTQuery() throws Exception {
     // POST - query
-    final Command postQuery = new XQuery("http:send-request("
+    QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='post'>"
         + "<http:body media-type='application/query+xml'>"
         + "<query xmlns='" + Text.URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>" + "</http:body>"
-        + "</http:request>, " + URL + ")");
-    postQuery.execute(context);
-    checkResponse(postQuery, HttpURLConnection.HTTP_OK, 2);
+        + "</http:request>, " + URL + ")", context);
+    checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
+    qp.close();
 
     // Execute the same query but with content set from $bodies
-    final Command postQuery2 = new XQuery("http:send-request("
+    qp = new QueryProcessor("http:send-request("
         + "<http:request method='post'>"
         + "<http:body media-type='application/query+xml'/></http:request>"
         + "," + URL + ","
         + "<query xmlns='" + Text.URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
-        + "</query>)");
-    postQuery2.execute(context);
-    checkResponse(postQuery2, HttpURLConnection.HTTP_OK, 2);
-
+        + "</query>)", context);
+    checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
+    qp.close();
   }
 
   /**
@@ -184,14 +197,14 @@ public final class HTTPClientTest {
   @Test
   public void testPOSTAdd() throws Exception {
     // POST - add content
-    final Command postAdd = new XQuery("http:send-request("
+    final QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='post' status-only='true'>"
         + "<http:body media-type='text/xml'>" + "<book id='4'>"
         + "<name>The Celebrated Jumping Frog of Calaveras County</name>"
         + "<author>Twain</author>" + "</book>" + "</http:body>"
-        + "</http:request>, " + URL + ")");
-    postAdd.execute(context);
-    checkResponse(postAdd, HttpURLConnection.HTTP_CREATED, 1);
+        + "</http:request>, " + URL + ")", context);
+    checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
+    qp.close();
   }
 
   /**
@@ -201,27 +214,30 @@ public final class HTTPClientTest {
   @Test
   public void testPOSTGet() throws Exception {
     // GET1 - just send a GET request
-    final Command get1 = new XQuery("http:send-request("
-        + "<http:request method='get' href=" + URL + "/>)");
-    get1.execute(context);
-    checkResponse(get1, HttpURLConnection.HTTP_OK, 2);
+    QueryProcessor qp = new QueryProcessor("http:send-request("
+        + "<http:request method='get' href=" + URL + "/>)", context);
+    Result r = qp.execute();
+    checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertTrue(((ItemCache) get1.result()).item[1].type == NodeType.DOC);
+    assertTrue(((ItemCache) r).item[1].type == NodeType.DOC);
+    qp.close();
 
     // GET2 - with override-media-type='text/plain'
-    final Command get2 = new XQuery("http:send-request("
+    qp = new QueryProcessor("http:send-request("
         + "<http:request method='get' override-media-type='text/plain'/>,"
-        + URL + ")");
-    get2.execute(context);
-    checkResponse(get2, HttpURLConnection.HTTP_OK, 2);
+        + URL + ")", context);
+    r = qp.execute();
+    checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertTrue(((ItemCache) get2.result()).item[1].type == AtomType.STR);
+    assertTrue(((ItemCache) r).item[1].type == AtomType.STR);
+    qp.close();
 
     // Get3 - with status-only='true'
-    final Command get3 = new XQuery("http:send-request("
-        + "<http:request method='get' status-only='true'/>," + URL + ")");
-    get3.execute(context);
-    checkResponse(get3, HttpURLConnection.HTTP_OK, 1);
+    qp = new QueryProcessor("http:send-request("
+        + "<http:request method='get' status-only='true'/>," + URL + ")",
+        context);
+    checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
+    qp.close();
   }
 
   /**
@@ -231,10 +247,11 @@ public final class HTTPClientTest {
   @Test
   public void testPOSTDelete() throws Exception {
     // DELETE
-    final Command delete = new XQuery("http:send-request("
-        + "<http:request method='delete' status-only='true'/>, " + URL + ")");
-    delete.execute(context);
-    checkResponse(delete, HttpURLConnection.HTTP_OK, 1);
+    final QueryProcessor qp = new QueryProcessor("http:send-request("
+        + "<http:request method='delete' status-only='true'/>, " + URL + ")",
+        context);
+    checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
+    qp.close();
   }
 
   /**
@@ -243,9 +260,8 @@ public final class HTTPClientTest {
    */
   @Test
   public void sendEmptyReq() {
-    final Command c = new XQuery("http:send-request(<http:request/>)");
     try {
-      c.execute(context);
+      new XQuery("http:send-request(<http:request/>)").execute(context);
     } catch(final BaseXException ex) {
       assertTrue(indexOf(token(ex.getMessage()),
           token(Err.ErrType.FOHC.toString())) != -1);
@@ -876,17 +892,17 @@ public final class HTTPClientTest {
 
   /**
    * Checks the response to an HTTP request.
-   * @param c command
+   * @param r query result
    * @param expStatus expected status
    * @param itemsCount expected number of items
    * @throws QueryException query exception
    */
-  private static void checkResponse(final Command c, final int expStatus,
+  private static void checkResponse(final Result r, final int expStatus,
       final int itemsCount) throws QueryException {
 
-    assertTrue(c.result() instanceof ValueIter);
-    final ValueIter res = (ValueIter) c.result();
-    assertEquals(itemsCount, res.size());
+    assertTrue(r instanceof Iter);
+    final Iter res = (Iter) r;
+    assertEquals(itemsCount, r.size());
     assertTrue(res.get(0) instanceof FElem);
     final FElem response = (FElem) res.get(0);
     assertNotNull(response.attributes());

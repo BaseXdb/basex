@@ -1,19 +1,23 @@
 package org.basex.test.xmldb;
 
 import static org.basex.core.Text.*;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
+import junit.textui.TestRunner;
+
 import org.basex.api.xmldb.BXCollection;
 import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.cmd.DropDB;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.modules.XMLResource;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 /**
  * This class registers and runs all available XMLDB/API tests.
@@ -23,9 +27,10 @@ import junit.textui.TestRunner;
  */
 public final class AllTests {
   /** XMLDB driver. */
-  static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
+  static final String DRIVER = org.basex.api.xmldb.BXDatabase.class.getName();
   /** Database/document path. */
-  static final String URL = "xmldb:basex://localhost:1984/";
+  static final String URL =
+      "xmldb:" + NAMELC + "://" + LOCALHOST + ":" + MainProp.PORT[1] + '/';
   /** Name of the collection. */
   static final String COLL = "XMLDB";
   /** Database/document path. */
