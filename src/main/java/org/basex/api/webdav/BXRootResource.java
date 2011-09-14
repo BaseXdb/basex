@@ -11,6 +11,7 @@ import java.util.Map;
 import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
+import org.basex.io.in.LookupInput;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.CollectionResource;
@@ -85,7 +86,13 @@ public class BXRootResource extends BXResource implements
       @Override
       public BXDatabase get() throws IOException {
         final String dbname = dbname(newName);
-        s.create(dbname, inputStream);
+        final LookupInput li = new LookupInput(inputStream);
+        if(li.lookup() == '<') {
+          s.create(dbname, li);
+        } else {
+          s.execute(new CreateDB(dbname));
+          s.store(newName, li);
+        }
         s.execute(new Close());
         return new BXDatabase(dbname, session);
       }
