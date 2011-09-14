@@ -2,19 +2,21 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.io.out.DataOutput;
+import org.basex.io.in.BufferInput;
+import org.basex.io.out.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.xml.sax.InputSource;
 
 /**
  * Evaluates the 'store' command and stores binary content into the database.
@@ -34,14 +36,13 @@ public final class Store extends ACreate {
 
   @Override
   protected boolean run() throws IOException {
-    final IOFile in = new IOFile(args[1]);
+    final IO in = IO.get(args[1]);
     if(!in.exists() || in.isDir()) return error(FILEWHICH, in);
+
     try {
-      final BufferedInputStream bis =
-          new BufferedInputStream(new FileInputStream(in.file()));
-      return info(store(args[0], bis, context, false));
+      return info(store(args[0], in.buffer(), context, false));
     } catch(final BaseXException ex) {
-      return error(DBNOTSTORED, in);
+      return error(DBNOTSTORED, ex.getMessage());
     }
   }
 
@@ -57,7 +58,6 @@ public final class Store extends ACreate {
   public static String store(final String target, final InputStream input,
       final Context ctx, final boolean lock) throws BaseXException {
 
-    final Performance perf = new Performance();
     final Data data = ctx.data();
     if(data == null) throw new BaseXException(PROCNODB);
 
@@ -65,20 +65,52 @@ public final class Store extends ACreate {
     if(target.isEmpty() || !bin.valid())
       throw new BaseXException(NAMEINVALID, target);
 
-
-    new IOFile(bin.dir()).md();
     try {
       if(lock) ctx.register(true);
-      final DataOutput out = new DataOutput(bin.file());
-      try {
-        for(int b; (b = input.read()) != -1;) out.write(b);
-      } finally {
-        out.close();
-      }
+      final String info = store(bin, new InputSource(input));
+      return info;
     } catch(final IOException ex) {
       throw new BaseXException(DBNOTSTORED, target);
     } finally {
       if(lock) ctx.unregister(true);
+    }
+  }
+
+  /**
+   * Stores data from the specified input stream in the database.
+   * @param target target file
+   * @param input new content
+   * @return info string
+   * @throws BaseXException database exception
+   */
+  public static String store(final IOFile target, final InputSource input)
+      throws BaseXException {
+
+    final Performance perf = new Performance();
+    new IOFile(target.dir()).md();
+
+    PrintOutput out = null;
+    try {
+      out = new PrintOutput(target.path());
+      final Reader r = input.getCharacterStream();
+      final InputStream is = input.getByteStream();
+      final String  id = input.getSystemId();
+      if(r != null) {
+        for(int c; (c = r.read()) != -1;) out.utf8(c);
+      } else if(is != null) {
+        for(int b; (b = is.read()) != -1;) out.write(b);
+      } else if(id != null) {
+        final BufferInput bi = IO.get(id).buffer();
+        try {
+          for(int b; (b = bi.read()) != -1;) out.write(b);
+        } finally {
+          bi.close();
+        }
+      }
+    } catch(final IOException ex) {
+      throw new BaseXException(DBNOTSTORED, target);
+    } finally {
+      if(out != null) try { out.close(); } catch(final IOException ex) { }
     }
     return Util.info(QUERYEXEC, perf);
   }

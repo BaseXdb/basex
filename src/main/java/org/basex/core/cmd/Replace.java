@@ -79,9 +79,12 @@ public final class Replace extends ACreate {
     try {
       if(lock) ctx.register(true);
 
-      // replace binary or document
-      if(!replace(data, pth, input)) {
-        // add new document
+      // replace binary file if it already exists
+      final IOFile io = data.meta.binary(path);
+      if(io.exists()) {
+        Store.store(io, input);
+      } else {
+        // otherwise, add new document as xml
         Add.add(pth, trg, input, ctx, null, false);
         // delete old documents if addition was successful
         for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
@@ -92,22 +95,5 @@ public final class Replace extends ACreate {
       if(lock) ctx.unregister(true);
     }
     return Util.info(PATHREPLACED, docs.size());
-  }
-
-  /**
-   * Replace the specified document with a new content.
-   * @param data data reference
-   * @param input new content
-   * @param path file path
-   * @return info string
-   * @throws BaseXException database exception
-   */
-  public static boolean replace(final Data data, final String path,
-      final InputSource input) throws BaseXException {
-
-    final IOFile io = data.meta.binary(path);
-    if(!io.exists()) return false;
-    if(!Add.add(io, input)) throw new BaseXException(PARSEERR, path);
-    return true;
   }
 }

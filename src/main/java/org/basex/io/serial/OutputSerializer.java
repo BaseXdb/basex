@@ -409,25 +409,8 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected void write(final int ch) throws IOException {
     // comparison by reference
-    if(utf8) {
-      if(ch <= 0x7F) {
-        out.write(ch);
-      } else if(ch <= 0x7FF) {
-        out.write(ch >>  6 & 0x1F | 0xC0);
-        out.write(ch >>  0 & 0x3F | 0x80);
-      } else if(ch <= 0xFFFF) {
-        out.write(ch >> 12 & 0x0F | 0xE0);
-        out.write(ch >>  6 & 0x3F | 0x80);
-        out.write(ch >>  0 & 0x3F | 0x80);
-      } else {
-        out.write(ch >> 18 & 0x07 | 0xF0);
-        out.write(ch >> 12 & 0x3F | 0x80);
-        out.write(ch >>  6 & 0x3F | 0x80);
-        out.write(ch >>  0 & 0x3F | 0x80);
-      }
-    } else {
-      out.write(new TokenBuilder(4).add(ch).toString().getBytes(encoding));
-    }
+    if(utf8) out.utf8(ch);
+    else out.write(new TokenBuilder(4).add(ch).toString().getBytes(encoding));
   }
 
   /**

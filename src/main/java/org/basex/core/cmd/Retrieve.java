@@ -2,8 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -11,6 +9,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.IOFile;
+import org.basex.io.in.BufferInput;
 import org.basex.util.Performance;
 import org.basex.util.Util;
 
@@ -31,12 +30,11 @@ public final class Retrieve extends ACreate {
 
   @Override
   protected boolean run() throws IOException {
-    final Data data = context.data();
-    final IOFile bin = data.meta.binary(args[0]);
-    if(!bin.exists() || bin.isDir()) return error(FILEWHICH, args[0]);
-
-    out.write(bin.read());
-    return info(QUERYEXEC, perf);
+    try {
+      return info(retrieve(args[0], out, context));
+    } catch(final BaseXException ex) {
+      return error(DBNOTSTORED, ex.getMessage());
+    }
   }
 
   /**
@@ -59,12 +57,11 @@ public final class Retrieve extends ACreate {
       throw new BaseXException(FILEWHICH, source);
 
     try {
+      final BufferInput bi = new BufferInput(bin.file());
       try {
-        final BufferedInputStream bis =
-            new BufferedInputStream(new FileInputStream(bin.file()));
-        for(int b; (b = bis.read()) != -1;) out.write(b);
+        for(int b; (b = bi.read()) != -1;) out.write(b);
       } finally {
-        out.close();
+        bi.close();
       }
     } catch(final IOException ex) {
       throw new BaseXException(ex.getMessage());
