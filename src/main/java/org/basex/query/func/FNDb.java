@@ -2,9 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
+import java.net.URLConnection;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -15,6 +14,7 @@ import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
@@ -111,6 +111,7 @@ public final class FNDb extends FuncCall {
       case DBSTORE:    return store(ctx);
       case DBRETRIEVE: return retrieve(ctx);
       case DBISRAW:    return isRaw(ctx);
+      case DBCTYPE:    return contentType(ctx);
       case DBISXML:    return isXML(ctx);
       default:         return super.item(ctx, ii);
     }
@@ -254,6 +255,23 @@ public final class FNDb extends FuncCall {
     final String path = path(1, ctx);
     final IOFile io = data.meta.binary(path);
     return Bln.get(io.exists() && !io.isDir());
+  }
+
+  /**
+   * Performs the content-type function.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Str contentType(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    final String path = path(1, ctx);
+    final IOFile io = data.meta.binary(path);
+    if(io.exists() && !io.isDir()) {
+      final String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
+      return Str.get(ct == null ? DataText.APP_OCTET : ct);
+    }
+    return Str.get(DataText.APP_XML);
   }
 
   /**

@@ -49,6 +49,15 @@ public class Str extends Item {
 
   /**
    * Returns an instance of this class.
+   * @param v string value (will be converted to token)
+   * @return instance
+   */
+  public static Str get(final String v) {
+    return get(Token.token(v));
+  }
+
+  /**
+   * Returns an instance of this class.
    * @param v object (will be converted to token)
    * @return instance
    */
