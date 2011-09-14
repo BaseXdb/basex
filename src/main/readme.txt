@@ -54,6 +54,12 @@ class Session:
   // Replaces a document with the specified input stream
   void replace(String path, InputStream in)
 
+  // Stores raw data at the specified path
+  void store(String path, InputStream in)
+
+  // Retrieves raw data from the specified path
+  void retrieve(String path)
+
   // Watches the specified events
   void watch(String name, Event notifier) 
 
@@ -89,6 +95,9 @@ class Query:
   // Returns query information
   String info()
 
+  // Returns serialization options
+  String options()
+
   // Closes the iterator and query
   String close()
 
@@ -108,12 +117,15 @@ TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
  - create:        -> \8 {name} \0 {input} \0
  - add:           -> \9 {name} \0 {path} \0 {input} \0
  - watch:         -> \10 {name} \0
- - unwatch:       -> \10 {name} \0
+ - unwatch:       -> \11 {name} \0
  - replace:       -> \12 {path} \0 {input} \0
+ - store:         -> \13 {path} \0 {input} \0
+ - retrieve:      -> \14 {path} \0
  - query: start   -> \0 {query} \0
           bind    -> \3 {id} \0 {variable} \0 {value}\0 {type}\0
           execute -> \5 {id} \0
           info    -> \6 {id} \0
+          options -> \7 {id} \0
           next    -> \1 {id} \0
           init    -> \4 {id} \0
           end     -> \2 {id} \0
@@ -127,6 +139,7 @@ TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
           bind    -> \0 \0
           execute -> {result} \0 \0
           init    -> {result} \0 \0
+          options -> {result} \0 \0
           next    -> {result} \0 \0
           info    -> {result} \0 \0
           close   -> {result} \0 \0
