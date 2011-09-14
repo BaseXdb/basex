@@ -28,6 +28,7 @@ import javax.xml.xquery.XQStaticContext;
 import junit.framework.TestCase;
 
 import org.basex.io.out.ArrayOutput;
+import org.basex.util.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -153,7 +154,7 @@ public final class XQJTest extends TestCase {
       conn.createItemFromByte((byte) 123,
           conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
     } catch(final Exception ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 
@@ -172,7 +173,7 @@ public final class XQJTest extends TestCase {
     try {
       conn.createItemFromNode(doc, null);
     } catch(final Exception ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 
@@ -316,7 +317,7 @@ public final class XQJTest extends TestCase {
       result.next();
       assertEquals(123, result.getInt());
     } catch(final XQException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 
@@ -563,7 +564,7 @@ public final class XQJTest extends TestCase {
       xqs.next();
       assertTrue(xqs.getInt() == 2);
     } catch(final XQException ex) { /* ignored */
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
   }
 }

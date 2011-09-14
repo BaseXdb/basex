@@ -5,7 +5,8 @@ import java.util.ArrayList;
 
 import org.basex.data.Result;
 import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
+import org.basex.util.Token;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.Resource;
@@ -61,11 +62,11 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
   public Resource getMembersAsResource() throws XMLDBException {
     final ArrayOutput ao = new ArrayOutput();
     try {
-      final XMLSerializer xml = new XMLSerializer(ao);
+      final Serializer ser = Serializer.get(ao);
       for(final Resource r : getIterator()) {
-        xml.openResult();
-        ao.print(r.getContent().toString());
-        xml.closeResult();
+        ser.openResult();
+        ser.text(Token.token(r.getContent().toString()));
+        ser.closeResult();
       }
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());

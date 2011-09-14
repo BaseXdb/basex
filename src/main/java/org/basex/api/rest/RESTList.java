@@ -52,22 +52,22 @@ final class RESTList extends RESTCode {
   /**
    * Lists the table contents.
    * @param table table reference
-   * @param xml serializer
+   * @param ser serializer
    * @param header table header
    * @param skip number of columns to skip
    * @throws IOException I/O exceptions
    */
-  private void list(final Table table, final Serializer xml,
+  private void list(final Table table, final Serializer ser,
       final byte[] header, final int skip) throws IOException {
 
     for(final TokenList l : table.contents) {
-      xml.openElement(header);
+      ser.openElement(header);
       // don't show last attribute (input path)
       for(int i = 1; i < l.size() - skip; i++) {
-        xml.attribute(lc(table.header.get(i)), l.get(i));
+        ser.attribute(lc(table.header.get(i)), l.get(i));
       }
-      xml.text(l.get(0));
-      xml.closeElement();
+      ser.text(l.get(0));
+      ser.closeElement();
     }
   }
 }

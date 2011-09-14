@@ -21,7 +21,7 @@ import javax.xml.xquery.XQResultSequence;
 
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.SAXSerializer;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.ItemCache;
@@ -203,12 +203,12 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
     final ArrayOutput ao = new ArrayOutput();
     try {
-      final XMLSerializer xml = new XMLSerializer(ao);
+      final Serializer ser = Serializer.get(ao);
       do {
         final BXQItem item = item();
-        item.serialize(item.it, xml);
+        item.serialize(item.it, ser);
       } while(next());
-      xml.close();
+      ser.close();
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

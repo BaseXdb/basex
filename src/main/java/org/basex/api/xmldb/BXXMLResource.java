@@ -15,7 +15,7 @@ import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.item.DBNode;
 import org.basex.util.TokenBuilder;
 import org.w3c.dom.Document;
@@ -109,11 +109,11 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         // serialize and cache content
         final ArrayOutput ao = new ArrayOutput();
-        final XMLSerializer xml = new XMLSerializer(ao);
+        final Serializer ser = Serializer.get(ao);
         if(data != null) {
-          new DBNode(data, pre).serialize(xml);
+          new DBNode(data, pre).serialize(ser);
         } else if(result != null) {
-          result.serialize(xml, pre);
+          result.serialize(ser, pre);
         } else {
           return null;
         }
@@ -213,7 +213,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     /** Cached output. */
     private final ArrayOutput out = new ArrayOutput();
     /** Serializer. */
-    private final XMLSerializer xml;
+    private final Serializer ser;
     /** XMLResource. */
     private final BXXMLResource res;
 
@@ -223,7 +223,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
      * @throws IOException I/O exception
      */
     BXSAXContentHandler(final BXXMLResource r) throws IOException {
-      xml = new XMLSerializer(out);
+      ser = Serializer.get(out);
       res = r;
     }
 
@@ -233,7 +233,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         final TokenBuilder tb = new TokenBuilder();
         for(int k = 0; k < j; ++k) tb.add(ac[i + k]);
-        xml.text(tb.finish());
+        ser.text(tb.finish());
       } catch(final IOException ex) {
         throw new SAXException(ex);
       }
@@ -248,7 +248,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     public void endElement(final String s, final String s1, final String s2)
         throws SAXException {
       try {
-        xml.closeElement();
+        ser.closeElement();
       } catch(final IOException ex) {
         throw new SAXException(ex);
       }
@@ -264,7 +264,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     public void processingInstruction(final String s, final String s1)
         throws SAXException {
       try {
-        xml.pi(token(s), s1 != null ? token(s1) : EMPTY);
+        ser.pi(token(s), s1 != null ? token(s1) : EMPTY);
       } catch(final IOException ex)  {
         throw new SAXException(ex);
       }
@@ -275,11 +275,11 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         final Attributes atts) throws SAXException {
 
       try {
-        xml.openElement(token(s2));
+        ser.openElement(token(s2));
         for(int i = 0; i < atts.getLength(); ++i)
-          xml.attribute(token(atts.getQName(i)), token(atts.getValue(i)));
+          ser.attribute(token(atts.getQName(i)), token(atts.getValue(i)));
         for(final Entry<String, String> e : ns.entrySet())
-          xml.attribute(concat(XMLNSC, token(e.getKey())), token(e.getValue()));
+          ser.attribute(concat(XMLNSC, token(e.getKey())), token(e.getValue()));
       } catch(final IOException ex)  {
         throw new SAXException(ex);
       }

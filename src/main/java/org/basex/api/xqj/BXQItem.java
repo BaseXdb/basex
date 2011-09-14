@@ -20,7 +20,7 @@ import javax.xml.xquery.XQResultItem;
 
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.SAXSerializer;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
@@ -230,9 +230,9 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    */
   private void serialize(final OutputStream os) throws XQException {
     try {
-      final XMLSerializer xml = new XMLSerializer(os);
-      serialize(it, xml);
-      xml.close();
+      final Serializer ser = Serializer.get(os);
+      serialize(it, ser);
+      ser.close();
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
