@@ -170,8 +170,9 @@ public final class HTTPClient {
   private static HttpURLConnection openConnection(final String dest,
       final InputInfo ii) throws QueryException, IOException {
     final URL url = new URL(dest);
-    if(!url.getProtocol().equalsIgnoreCase("HTTP")) HTTPERR.thrw(ii,
-        "Invalid URL");
+    final String protocol = url.getProtocol();
+    if(!protocol.equalsIgnoreCase("HTTP") &&
+        !protocol.equalsIgnoreCase("HTTPS")) HTTPERR.thrw(ii, "Invalid URL");
     return (HttpURLConnection) url.openConnection();
   }
 
