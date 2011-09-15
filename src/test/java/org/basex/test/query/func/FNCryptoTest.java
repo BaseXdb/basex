@@ -20,17 +20,30 @@ public class FNCryptoTest extends AdvancedQueryTest {
   private static final String DB = Util.name(FNCryptoTest.class);
 
   /**
-   * Test method for crypto:encrypt and crypto:decrypt.
+   * Test method for crypto:encrypt and crypto:decrypt with symmetric keys.
    */
   @Test
   public void encryption1() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
+    //DES/CBC/PKCS5Padding
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa','')" +
-        "return c:decrypt($e,'symmetric','aaabbbaa','')", msg);
+        "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa','DES/CBC/PKCS5Padding')" +
+        "return c:decrypt($e,'symmetric','aaabbbaa','DES/CBC/PKCS5Padding')", msg);
   }
+  
+  /**
+   * Test method for crypto:encrypt and crypto:decrypt with asymmetric keys.
+   */
+  @Test
+  public void encryption2() {
+    final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "let $e := c:encrypt('" + msg + "','asymmetric','aaabbbaa','DSA')" +
+        "return c:decrypt($e,'asymmetric','aaabbbaa','DSA')", msg);
+  }
+  
   /**
    * Test method for crypto:encrypt and crypto:decrypt.
    */

@@ -55,40 +55,49 @@ public final class Encryption {
   /**
    * Encrypts or decrypts the given input.
    * @param in input
-   * @param encrType encryption type
+   * @param encryptionType encryption type
    * @param key secret key
-   * @param algo encryption algorithm
+   * @param algorithm encryption algorithm
    * @param encrypt encrypt or decrypt
    * @return encrypted or decrypted input
    * @throws QueryException query exception
    */
-  public Item encryption(final byte[] in, final byte[] encrType,
-      final byte[] key, final byte[] algo, final boolean encrypt)
+  public Item encryption(final byte[] in, final byte[] encryptionType,
+      final byte[] key, final byte[] algorithm, final boolean encrypt)
           throws QueryException {
- // encryption type must be 'symmetric' or 'asymmetric'
-    if(!eq(encrType, SYM) && !eq(encrType, ASYM))
-      if(encrypt) CRYPTOENCTYP.thrw(input, encrType);
-      else CRYPTODECTYP.thrw(input, encrType);
-
-    // [LK] symmetric/asymmetric encryption?
+    
+    boolean symmetric = eq(encryptionType, SYM); 
+    // encryption type must be 'symmetric' or 'asymmetric'
+    if(!symmetric && !eq(encryptionType, ASYM))
+      if(encrypt) CRYPTOENCTYP.thrw(input, encryptionType);
+      else CRYPTODECTYP.thrw(input, encryptionType);
 
     // transformed input
     byte[] t = null;
+    final String a = string(algorithm);
     try {
 
-      SecretKeySpec keyspec = new SecretKeySpec(key, "DES");
-      IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
-      // algorithm/mode/padding
-      Cipher cip = Cipher.getInstance("DES/CBC/PKCS5Padding");
+      if(symmetric) {
+        SecretKeySpec keyspec = new SecretKeySpec(key, "DES");
+        IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
+        // algorithm/mode/padding
+        Cipher cip = Cipher.getInstance(a);
+        
+        // encrypt/decrypt
+        if(encrypt)
+          cip.init(Cipher.ENCRYPT_MODE, keyspec, iv);
+        else
+          cip.init(Cipher.DECRYPT_MODE, keyspec, iv);
+        
+        t = new byte[cip.getOutputSize(in.length)];
+        cip.doFinal(t, cip.update(in, 0, in.length, t, 0));
+      
+        // asymmetric encryption 
+      } else {
 
-      // encrypt/decrypt
-      if(encrypt)
-        cip.init(Cipher.ENCRYPT_MODE, keyspec, iv);
-      else
-        cip.init(Cipher.DECRYPT_MODE, keyspec, iv);
-
-      t = new byte[cip.getOutputSize(in.length)];
-      cip.doFinal(t, cip.update(in, 0, in.length, t, 0));
+        CRYPTONOTSUPP.thrw(input, "asymmetric encryption");
+        
+      }
 
     } catch(NoSuchPaddingException e) {
       e.printStackTrace();
@@ -105,12 +114,14 @@ public final class Encryption {
       // [LK] how to treat this one?
     } catch(ShortBufferException e) {
       e.printStackTrace();
+      CRYPTONOTSUPP.thrw(input, "short buffer");
     } catch(IllegalBlockSizeException e) {
       e.printStackTrace();
       CRYPTOILLBLO.thrw(input, e);
    // [LK] how to treat this one?
     } catch(InvalidAlgorithmParameterException e) {
       e.printStackTrace();
+      CRYPTONOTSUPP.thrw(input, "invalid algorithm parameter");
     }
 
     return Str.get(t);
