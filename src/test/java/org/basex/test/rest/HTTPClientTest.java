@@ -219,7 +219,7 @@ public class HTTPClientTest {
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertTrue(((ItemCache) r).item[1].type == NodeType.DOC);
+    assertEquals(NodeType.DOC, ((ItemCache) r).item[1].type);
     qp.close();
 
     // GET2 - with override-media-type='text/plain'
@@ -229,7 +229,7 @@ public class HTTPClientTest {
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertTrue(((ItemCache) r).item[1].type == AtomType.STR);
+    assertEquals(AtomType.STR, ((ItemCache) r).item[1].type);
     qp.close();
 
     // Get3 - with status-only='true'
@@ -559,7 +559,7 @@ public class HTTPClientTest {
 
     // Compare results
     final String fake = fakeConn.getOutputStream().toString();
-    assertTrue(expResult.equals(fake));
+    assertEquals(expResult, fake);
   }
 
   /**
@@ -583,8 +583,7 @@ public class HTTPClientTest {
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
     HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
-    assertTrue(eq(fakeConn1.out.toByteArray(),
-        token("<a>a</a> &lt;b&gt;b&lt;/b&gt;")));
+    assertEquals("<a>a</a> &lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
 
     // Case 2: No method, media-type='text/plain'
     final Request req2 = new Request();
@@ -598,7 +597,7 @@ public class HTTPClientTest {
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
     HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
-    assertTrue(eq(fakeConn2.out.toByteArray(), token("a&lt;b&gt;b&lt;/b&gt;")));
+    assertEquals("a&lt;b&gt;b&lt;/b&gt;", fakeConn2.out.toString());
 
     // Case 3: method='text', media-type='text/xml'
     final Request req3 = new Request();
@@ -613,7 +612,7 @@ public class HTTPClientTest {
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
     HTTPClient.setRequestContent(fakeConn3.getOutputStream(), req3, null);
-    assertTrue(eq(fakeConn3.out.toByteArray(), token("a&lt;b&gt;b&lt;/b&gt;")));
+    assertEquals("a&lt;b&gt;b&lt;/b&gt;", fakeConn3.out.toString());
   }
 
   /**
@@ -630,7 +629,7 @@ public class HTTPClientTest {
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
     HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
-    assertTrue(eq(token("dGVzdA=="), fakeConn1.out.toByteArray()));
+    assertEquals(fakeConn1.out.toString(), "dGVzdA==");
 
     // Case 2: content is a node
     final Request req2 = new Request();
@@ -641,7 +640,7 @@ public class HTTPClientTest {
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
     HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
-    assertTrue(eq(token("dGVzdA=="), fakeConn2.out.toByteArray()));
+    assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
 
   /**
@@ -658,7 +657,7 @@ public class HTTPClientTest {
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
     HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
-    assertTrue(eq(token("74657374"), fakeConn1.out.toByteArray()));
+    assertEquals(fakeConn1.out.toString(), "74657374");
 
     // Case 2: content is a node
     final Request req2 = new Request();
@@ -669,7 +668,7 @@ public class HTTPClientTest {
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
     HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
-    assertTrue(eq(token("74657374"), fakeConn2.out.toByteArray()));
+    assertEquals(fakeConn2.out.toString(), "74657374");
   }
 
   /**
@@ -696,8 +695,7 @@ public class HTTPClientTest {
     // Delete file
     f.delete();
 
-    assertTrue(eq(token("test"), fakeConn.out.toByteArray()));
-
+    assertEquals(fakeConn.out.toString(), "test");
   }
 
   /**
@@ -721,7 +719,7 @@ public class HTTPClientTest {
     final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
         context.prop, null);
     // compare results
-    assertTrue(eq(i.get(1).atom(null), token(test)));
+    assertEquals(test, string(i.get(1).atom(null)));
   }
 
   /**
