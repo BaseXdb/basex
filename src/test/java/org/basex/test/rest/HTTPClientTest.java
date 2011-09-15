@@ -516,8 +516,7 @@ public class HTTPClientTest {
    */
   @Test
   public void writeMultipartMessage() throws IOException, QueryException {
-    final String plain = "...plain text version of message goes here...."
-        + Prop.NL;
+    final String plain = "...plain text version of message goes here....";
     final String rich = ".... richtext version of same message goes here ...";
     final String fancy = ".... fanciest formatted version of same  message  "
         + "goes  here...";
@@ -530,7 +529,7 @@ public class HTTPClientTest {
     p1.headers.add(token("Content-Type"), token("text/plain; "
         + "charset=us-ascii"));
     p1.bodyAttrs.add(token("media-type"), token("text/plain"));
-    p1.bodyContent.add(Str.get(plain));
+    p1.bodyContent.add(Str.get(plain + '\n'));
 
     final Part p2 = new Part();
     p2.headers.add(token("Content-Type"), token("text/richtext"));
@@ -551,7 +550,7 @@ public class HTTPClientTest {
     HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
-        + plain + CRLF
+        + plain + Prop.NL + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/richtext" + CRLF + CRLF
         + rich + CRLF
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
