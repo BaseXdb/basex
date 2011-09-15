@@ -45,7 +45,7 @@ public final class ClientSession extends Session {
   final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
-  final EncodingOutput sout;
+  final PrintOutput sout;
   /** Server input. */
   final InputStream sin;
 
@@ -122,7 +122,7 @@ public final class ClientSession extends Session {
     final String ts = bi.readString();
 
     // send user name and hashed password/timestamp
-    sout = new EncodingOutput(PrintOutput.get(socket.getOutputStream()));
+    sout = PrintOutput.get(socket.getOutputStream());
     send(user);
     send(Token.md5(Token.md5(pass) + ts));
     sout.flush();
@@ -132,52 +132,57 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public ClientQuery query(final String query) throws IOException {
-    return new ClientQuery(query, this);
-  }
-
-  @Override
   public void create(final String name, final InputStream input)
       throws IOException {
-
-    sout.write(ServerCmd.CREATE.code);
-    send(name);
-    send(input);
+    send(ServerCmd.CREATE, input, name);
   }
 
   @Override
   public void add(final String name, final String target,
       final InputStream input) throws IOException {
-
-    sout.write(ServerCmd.ADD.code);
-    send(name);
-    send(target);
-    send(input);
+    send(ServerCmd.ADD, input, name, target);
   }
 
   @Override
   public void replace(final String path, final InputStream input)
       throws IOException {
-
-    sout.write(ServerCmd.REPLACE.code);
-    send(path);
-    send(input);
+    send(ServerCmd.REPLACE, input, path);
   }
 
   @Override
   public void store(final String path, final InputStream input)
       throws IOException {
-
-    sout.write(ServerCmd.STORE.code);
-    send(path);
-    send(input);
+    send(ServerCmd.STORE, input, path);
   }
 
   @Override
-  public void retrieve(final String path) throws IOException {
+  public String retrieve(final String path) throws IOException {
     sout.write(ServerCmd.RETRIEVE.code);
-    send(path);
-    receive(new BufferInput(sin), sout);
+    return execute(path);
+  }
+
+  @Override
+  public ClientQuery query(final String query) throws IOException {
+    return new ClientQuery(query, this);
+  }
+
+  @Override
+  public synchronized void close() throws IOException {
+    if(esocket != null) esocket.close();
+    socket.close();
+  }
+
+  @Override
+  protected void execute(final String cmd, final OutputStream os)
+      throws IOException {
+    send(cmd);
+    receive(os);
+  }
+
+  @Override
+  protected void execute(final Command cmd, final OutputStream os)
+      throws IOException {
+    execute(cmd.toString(), os);
   }
 
   /**
@@ -206,10 +211,20 @@ public final class ClientSession extends Session {
       listen(is);
     }
     send(name);
-    final BufferInput bi = new BufferInput(sin);
-    info = bi.readString();
-    if(!ok(bi)) throw new IOException(info);
+    receive(null);
     notifiers.put(name, notifier);
+  }
+
+  /**
+   * Unwatches an event.
+   * @param name event name
+   * @throws IOException I/O exception
+   */
+  public void unwatch(final String name) throws IOException {
+    sout.write(ServerCmd.UNWATCH.code);
+    send(name);
+    receive(null);
+    notifiers.remove(name);
   }
 
   /**
@@ -233,47 +248,29 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Unwatches an event.
-   * @param name event name
-   * @throws IOException I/O exception
-   */
-  public void unwatch(final String name) throws IOException {
-    sout.write(ServerCmd.UNWATCH.code);
-    send(name);
-    final BufferInput bi = new BufferInput(sin);
-    info = bi.readString();
-    if(!ok(bi)) throw new IOException(info);
-    notifiers.remove(name);
-  }
-
-  /**
    * Sends the specified stream to the server.
    * @param input input stream
    * @throws IOException I/O exception
    */
   private void send(final InputStream input) throws IOException {
-    sout.write(input);
+    final EncodingOutput eo = new EncodingOutput(sout);
+    for(int b; (b = input.read()) != -1;) eo.write(b);
+    sout.write(0);
     sout.flush();
-    final BufferInput bi = new BufferInput(sin);
-    info = bi.readString();
-    if(!ok(bi)) throw new IOException(info);
-  }
-
-  @Override
-  public synchronized void close() throws IOException {
-    if(esocket != null) esocket.close();
-    socket.close();
+    receive(null);
   }
 
   /**
-   * Sends a string to the server.
-   * @param s string to be sent
+   * Receives the info string.
+   * @param os output stream to send result to. If {@code null}, no result
+   *           will be requested
    * @throws IOException I/O exception
    */
-  void send(final String s) throws IOException {
-    sout.write(Token.token(s));
-    sout.write(0);
-    sout.flush();
+  private void receive(final OutputStream os) throws IOException {
+    final BufferInput bi = new BufferInput(sin);
+    if(os != null) receive(bi, os);
+    info = bi.readString();
+    if(!ok(bi)) throw new BaseXException(info);
   }
 
   /**
@@ -287,6 +284,20 @@ public final class ClientSession extends Session {
   }
 
   /**
+   * Sends the specified command, string arguments and input.
+   * @param cmd command
+   * @param input input stream
+   * @param strings string arguments
+   * @throws IOException I/O exception
+   */
+  void send(final ServerCmd cmd, final InputStream input,
+      final String... strings) throws IOException {
+    sout.write(cmd.code);
+    for(final String s : strings) send(s);
+    send(input);
+  }
+
+  /**
    * Retrieves data from the server.
    * @param bi buffered server input
    * @param os output stream
@@ -297,20 +308,14 @@ public final class ClientSession extends Session {
     for(int b; (b = di.read()) != -1;) os.write(b);
   }
 
-  @Override
-  protected void execute(final String cmd, final OutputStream os)
-      throws IOException {
-
-    send(cmd);
-    final BufferInput bi = new BufferInput(sin);
-    receive(bi, os);
-    info = bi.readString();
-    if(!ok(bi)) throw new BaseXException(info);
-  }
-
-  @Override
-  protected void execute(final Command cmd, final OutputStream os)
-      throws IOException {
-    execute(cmd.toString(), os);
+  /**
+   * Sends a string to the server.
+   * @param s string to be sent
+   * @throws IOException I/O exception
+   */
+  void send(final String s) throws IOException {
+    sout.write(Token.token(s));
+    sout.write(0);
+    sout.flush();
   }
 }

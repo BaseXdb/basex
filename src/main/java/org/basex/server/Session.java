@@ -30,7 +30,7 @@ public abstract class Session {
    * Executes a {@link Command} and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be executed
-   * @return result
+   * @return result, or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final Command command) throws IOException {
@@ -43,7 +43,7 @@ public abstract class Session {
    * Executes a command and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be parsed
-   * @return result
+   * @return result, or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final String command) throws IOException {
@@ -100,9 +100,10 @@ public abstract class Session {
   /**
    * Retrieves raw data from an open database.
    * @param path source path
+   * @return result, or {@code null} reference
    * @throws IOException I/O exception
    */
-  public abstract void retrieve(final String path) throws IOException;
+  public abstract String retrieve(final String path) throws IOException;
 
   /**
    * Returns command info as a string, regardless of whether an output stream

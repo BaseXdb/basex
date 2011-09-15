@@ -19,6 +19,7 @@ import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Store;
 import org.basex.io.in.LookupInput;
+import org.basex.io.out.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -113,12 +114,16 @@ public final class LocalSession extends Session {
   @Override
   public void store(final String target, final InputStream input)
       throws BaseXException {
-    info = Store.store(target, input, ctx, true);
+    final Store s = new Store(target, input);
+    s.execute(ctx);
+    info = s.info();
   }
 
   @Override
-  public void retrieve(final String target) throws BaseXException {
-    info = Retrieve.retrieve(target, out, ctx);
+  public String retrieve(final String target) throws BaseXException {
+    final ArrayOutput ao = out != null ? null : new ArrayOutput();
+    info = Retrieve.retrieve(target, out != null ? out : ao, ctx);
+    return ao != null ? ao.toString() : null;
   }
 
   @Override

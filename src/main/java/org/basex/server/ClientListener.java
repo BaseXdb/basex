@@ -397,8 +397,10 @@ public final class ClientListener extends Thread {
     log.write(this, STORE + " " + path + " [...]");
 
     final DecodingInput cis = new DecodingInput(in);
+    final Store s = new Store(path, cis);
     try {
-      info(true, Store.store(path, cis, context, true), perf);
+      s.execute(context);
+      info(true, s.info(), perf);
     } catch(final BaseXException ex) {
       cis.flush();
       info(false, ex.getMessage(), perf);
@@ -417,8 +419,11 @@ public final class ClientListener extends Thread {
 
     try {
       final EncodingOutput eo = new EncodingOutput(out);
-      info(true, Retrieve.retrieve(source, eo, context), perf);
+      final String info = Retrieve.retrieve(source, eo, context);
+      out.write(0);
+      info(true, info, perf);
     } catch(final BaseXException ex) {
+      out.write(0);
       info(false, ex.getMessage(), perf);
     }
   }

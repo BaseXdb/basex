@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.basex.io.in.ArrayInput;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -19,6 +20,8 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public abstract class SessionTest {
+  /** Test database name. */
+  protected static final String DB = Util.name(SessionTest.class);
   /** Output stream. */
   protected ByteArrayOutputStream out;
   /** Serialization parameters to wrap query result with an element. */
@@ -74,6 +77,57 @@ public abstract class SessionTest {
     session.execute("xquery (");
   }
 
+  /**
+   * Runs a query command and retrieves the result as string.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void commandErr() throws IOException {
+    session.execute("1,<a/>+''");
+  }
+
+  /**
+   * Stores binary content in the database.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void store() throws IOException {
+    session.execute("create db " + DB);
+    session.store("X", new ArrayInput("!"));
+    check("true", session.query("db:is-raw('" + DB + "','X')").execute());
+    session.execute("drop db " + DB);
+  }
+
+  /**
+   * Stores binary content in the database.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void storeNoDB() throws IOException {
+    session.store("X", new ArrayInput("!"));
+  }
+
+  /**
+   * Retrieves binary content from the database.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void retrieve() throws IOException {
+    session.execute("create db " + DB);
+    session.execute("store X <a/>");
+    check("<a/>", session.retrieve("X"));
+    session.execute("drop db " + DB);
+  }
+
+  /**
+   * Stores binary content in the database.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void retrieveNoDB() throws IOException {
+    session.retrieve("X");
+  }
+  
   /** Runs a query and retrieves the result as string.
    * @throws IOException I/O exception */
   @Test
@@ -250,11 +304,18 @@ public abstract class SessionTest {
   /** Runs an erroneous query.
    * @throws IOException expected exception*/
   @Test(expected = org.basex.core.BaseXException.class)
+  public void queryError2() throws IOException {
+    session.query("(1,'a')[. eq 1]").execute();
+  }
+
+  /** Runs an erroneous query.
+   * @throws IOException expected exception*/
+  @Test(expected = org.basex.core.BaseXException.class)
   public void queryError3() throws IOException {
-      final Query query = session.query("(1,'a')[. eq 1]");
-      query.init();
-      check("1", query.next());
-      query.next();
+    final Query query = session.query("(1,'a')[. eq 1]");
+    query.init();
+    check("1", query.next());
+    query.next();
   }
 
   /** Runs two queries in parallel.
@@ -276,7 +337,7 @@ public abstract class SessionTest {
   /** Runs 5 queries in parallel.
    * @throws IOException I/O exception */
   @Test
-  public void query8() throws IOException {
+  public void queryParallel2() throws IOException {
     final int size = 8;
     final Query[] cqs = new Query[size];
     for(int q = 0; q < size; q++) cqs[q] = session.query(Integer.toString(q));
@@ -290,13 +351,8 @@ public abstract class SessionTest {
    * @param ret string returned from the client API
    */
   protected final void check(final Object exp, final Object ret) {
-    String result;
-    if(out == null) {
-      result = ret.toString();
-    } else {
-      result = out.toString();
-      out.reset();
-    }
+    final String result = (out != null ? out : ret).toString();
+    if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));
   }
 }

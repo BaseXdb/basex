@@ -27,20 +27,8 @@ public final class EncodingOutput extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
+    if(b == 0x00 || b == 0xFF) os.write(0xFF);
     os.write(b);
-  }
-
-  /**
-   * Passes on all bytes from the specified input stream.
-   * @param is input stream
-   * @throws IOException I/O exception
-   */
-  public void write(final InputStream is) throws IOException {
-    for(int b; (b = is.read()) != -1;) {
-      if(b == 0x00 || b == 0xFF) os.write(0xFF);
-      write(b);
-    }
-    os.write(0);
   }
 
   @Override

@@ -7,9 +7,7 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.User;
-import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
@@ -25,6 +23,9 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class Store extends ACreate {
+  /** Input stream. */
+  private InputStream is;
+  
   /**
    * Default constructor.
    * @param target target path
@@ -34,45 +35,32 @@ public final class Store extends ACreate {
     super(DATAREF | User.WRITE, target, input);
   }
 
-  @Override
-  protected boolean run() throws IOException {
-    final IO in = IO.get(args[1]);
-    if(!in.exists() || in.isDir()) return error(FILEWHICH, in);
-
-    try {
-      return info(store(args[0], in.buffer(), context, false));
-    } catch(final BaseXException ex) {
-      return error(DBNOTSTORED, ex.getMessage());
-    }
-  }
-
   /**
-   * Stores data from the specified input stream in the database.
+   * Default constructor.
    * @param target target path
    * @param input input stream
-   * @param ctx database context
-   * @param lock if {@code true}, register a write lock in context
-   * @return info string
-   * @throws BaseXException database exception
    */
-  public static String store(final String target, final InputStream input,
-      final Context ctx, final boolean lock) throws BaseXException {
+  public Store(final String target, final InputStream input) {
+    super(DATAREF | User.WRITE, target);
+    is = input;
+  }
 
-    final Data data = ctx.data();
-    if(data == null) throw new BaseXException(PROCNODB);
+  @Override
+  protected boolean run() throws IOException {
+    if(is == null) {
+      final IO in = IO.get(args[1]);
+      if(!in.exists() || in.isDir()) return error(FILEWHICH, in);
+      is = in.buffer();
+    }
 
-    final IOFile bin = data.meta.binary(target);
-    if(target.isEmpty() || !bin.valid())
-      throw new BaseXException(NAMEINVALID, target);
+    final String target = args[0];
+    final IOFile bin = context.data().meta.binary(target);
+    if(target.isEmpty() || !bin.valid()) return error(NAMEINVALID, target);
 
     try {
-      if(lock) ctx.register(true);
-      final String info = store(bin, new InputSource(input));
-      return info;
+      return info(store(bin, new InputSource(is)));
     } catch(final IOException ex) {
-      throw new BaseXException(DBNOTSTORED, target);
-    } finally {
-      if(lock) ctx.unregister(true);
+      return error(DBNOTSTORED, ex.getMessage());
     }
   }
 

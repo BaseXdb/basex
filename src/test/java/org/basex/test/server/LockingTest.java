@@ -15,7 +15,6 @@ import org.basex.io.in.ArrayInput;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -190,7 +189,7 @@ public final class LockingTest {
    */
   @Test
   public void createDBTest() throws IOException {
-    final byte[] hello = Token.token("<xml/>");
+    final String hello = "<xml/>";
     session1.create("database", new ArrayInput(hello));
     session1.create("database2", new ArrayInput(hello));
     session1.execute("drop db database");
