@@ -1,9 +1,9 @@
 package org.basex.query.item;
 
+import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.Util;
 
 /**
  * Base64Binary item. Derived from java.util.prefs.Base64.
@@ -26,30 +26,22 @@ public abstract class Bin extends Item {
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
-    return atom();
+  public final byte[] toJava() throws QueryException {
+    return val(null);
   }
 
   /**
-   * Returns an atomized string.
-   * @return string representation
+   * Returns the binary content.
+   * @param ii input info
+   * @return content
+   * @throws QueryException query exception
    */
-  public abstract byte[] atom();
-
-  @Override
-  public final byte[] toJava() {
-    return val;
-  }
+  protected abstract byte[] val(final InputInfo ii) throws QueryException;
 
   @Override
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Bin)) return false;
     final Bin b = (Bin) cmp;
     return type == b.type && Token.eq(val, b.val);
-  }
-
-  @Override
-  public final String toString() {
-    return Util.info("\"%\"", atom());
   }
 }

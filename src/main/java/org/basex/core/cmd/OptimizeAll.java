@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.basex.build.Builder;
@@ -19,6 +18,7 @@ import org.basex.data.DiskData;
 import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.serial.BuilderSerializer;
 import org.basex.io.serial.Serializer;
 import org.basex.util.Util;
@@ -118,8 +118,8 @@ public final class OptimizeAll extends ACreate {
       d.meta.users    = m.users;
       d.meta.dirty    = true;
       // move binary files
-      final File bin = data.meta.binaries();
-      if(bin.exists()) bin.renameTo(d.meta.binaries());
+      final IOFile bin = data.meta.binaries();
+      if(bin.exists()) bin.rename(d.meta.binaries());
       d.close();
     } finally {
       try {

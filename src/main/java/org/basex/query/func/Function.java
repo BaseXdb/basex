@@ -494,7 +494,7 @@ public enum Function {
   /** Database function: optimize database structures. */
   DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
   /** Database function: retrieves binary data. */
-  DBRETRIEVE(FNDb.class, "retrieve(database,path)", B64, STR, STR),
+  DBRETRIEVE(FNDb.class, "retrieve(database,path)", RAW, STR, STR),
   /** Database function: stores binary data. */
   DBSTORE(FNDb.class, "store(database,path,value)", EMP, STR, STR, ITEM),
   /** Database function: checks if the specified resource is an xml document. */
@@ -539,7 +539,7 @@ public enum Function {
   READLINES(FNFile.class, "read-text-lines(path[,encoding])", STR_ZM, 1, STR,
       STR),
   /** XQuery function */
-  READBIN(FNFile.class, "read-binary(path)", B64, STR),
+  READBIN(FNFile.class, "read-binary(path)", RAW, STR),
   /** XQuery function */
   WRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */

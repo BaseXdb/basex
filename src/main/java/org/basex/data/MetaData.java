@@ -214,8 +214,8 @@ public final class MetaData {
    * Returns the binary directory.
    * @return binary directory
    */
-  public File binaries() {
-    return new File(path, M_RAW);
+  public IOFile binaries() {
+    return new IOFile(path, M_RAW);
   }
 
   /**
@@ -224,7 +224,11 @@ public final class MetaData {
    * @return binary directory
    */
   public IOFile binary(final String pth) {
-    return new IOFile(binaries(), pth);
+    final IOFile dir = binaries();
+    final IOFile file = new IOFile(dir, pth);
+    // [CG] return only valid database paths...
+    //if(file.path().startsWith(dir.path())) ...
+    return file;
   }
 
   /**

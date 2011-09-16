@@ -1,10 +1,15 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
+
+import java.io.InputStream;
+
+import org.basex.io.in.ArrayInput;
 import org.basex.query.QueryException;
 import org.basex.util.Base64;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Base64Binary item.
@@ -33,22 +38,24 @@ public final class B64 extends Bin {
 
   /**
    * Constructor.
-   * @param h hex item
+   * @param b binary item
+   * @param ii input info
+   * @throws QueryException query exception
    */
-  B64(final Hex h) {
-    this(h.val);
+  B64(final Bin b, final InputInfo ii) throws QueryException {
+    this(b.val(ii));
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
     // at this stage, item will always be of the same type
-    return Token.eq(val, it instanceof Bin ? ((Bin) it).val :
+    return Token.eq(val, it instanceof Bin ? ((Bin) it).val(ii) :
       decode(it.atom(ii), ii));
   }
 
   @Override
-  public byte[] atom() {
+  public byte[] atom(final InputInfo ii) {
     return Base64.encode(val);
   }
 
@@ -67,5 +74,20 @@ public final class B64 extends Bin {
       final String chars = ex.getMessage().replaceAll(".*?: |\\.$", "");
       throw FUNCAST.thrw(ii, AtomType.B64, chars);
     }
+  }
+
+  @Override
+  protected byte[] val(InputInfo ii) {
+    return val;
+  }
+
+  @Override
+  public InputStream input() {
+    return new ArrayInput(val);
+  }
+
+  @Override
+  public final String toString() {
+    return Util.info("\"%\"", atom(null));
   }
 }

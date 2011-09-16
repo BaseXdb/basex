@@ -11,7 +11,6 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.User;
 import org.basex.data.MetaData;
-import org.basex.io.IOFile;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -61,7 +60,7 @@ public final class InfoDB extends AInfo {
     format(tb, INFONODES, Integer.toString(meta.size));
 
     // count number of raw files
-    final int raw = new IOFile(meta.binaries()).descendants().size();
+    final int raw = meta.binaries().descendants().size();
     format(tb, INFONRES, Integer.toString(meta.ndocs + raw));
 
     tb.add(NL).addExt(header, INFOCREATE);

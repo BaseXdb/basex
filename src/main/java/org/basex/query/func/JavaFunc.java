@@ -147,8 +147,9 @@ public final class JavaFunc extends Arr {
    * invoked.
    * @param v XQuery value
    * @return Java object
+   * @throws QueryException query exception
    */
-  private Object instObj(final Value v) {
+  private Object instObj(final Value v) throws QueryException {
     return cls.isInstance(v) ? v :
       v instanceof Jav ? ((Jav) v).val : v.toJava();
   }
@@ -159,9 +160,10 @@ public final class JavaFunc extends Arr {
    * @param args arguments
    * @param stat static flag
    * @return argument array or {@code null}
+   * @throws QueryException query exception
    */
   private Object[] args(final Class<?>[] params, final Value[] args,
-      final boolean stat) {
+      final boolean stat) throws QueryException {
 
     final int s = stat ? 0 : 1;
     final int l = args.length - s;

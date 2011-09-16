@@ -88,8 +88,6 @@ public final class SeqType {
   public static final SeqType BLN = AtomType.BLN.seq();
   /** Zero or one xs:boolean. */
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
-  /** Single xs:base64Binary. */
-  public static final SeqType B64 = AtomType.B64.seq();
   /** Double number. */
   public static final SeqType DBL = AtomType.DBL.seq();
   /** Double number. */
@@ -134,8 +132,6 @@ public final class SeqType {
   public static final SeqType STR_ZM = new SeqType(AtomType.STR, Occ.ZM);
   /** Zero or one NCName. */
   public static final SeqType NCN_ZO = new SeqType(AtomType.NCN, Occ.ZO);
-  /** One xs:hexBinary. */
-  public static final SeqType HEX = AtomType.HEX.seq();
   /** Single date. */
   public static final SeqType DAT = AtomType.DAT.seq();
   /** Zero or one date. */
@@ -181,6 +177,12 @@ public final class SeqType {
   /** Single function. */
   public static final SeqType MAP_O = new SeqType(
       MapType.get(AtomType.AAT, ITEM_ZM));
+  /** One xs:raw. */
+  public static final SeqType RAW = AtomType.RAW.seq();
+  /** One xs:hexBinary. */
+  public static final SeqType HEX = AtomType.HEX.seq();
+  /** Single xs:base64Binary. */
+  public static final SeqType B64 = AtomType.B64.seq();
 
   /** Sequence type. */
   public final Type type;

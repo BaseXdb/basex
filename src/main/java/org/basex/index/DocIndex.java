@@ -164,7 +164,7 @@ public final class DocIndex implements Index {
     final String np = IOFile.normalize(path);
     final String exct = Prop.WIN ? np.toLowerCase() : np;
     final String pref = exct + '/';
-    for(final String f : new IOFile(data.meta.binaries()).descendants()) {
+    for(final String f : data.meta.binaries().descendants()) {
       final String lc = Prop.WIN ? f.toLowerCase() : f;
       if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
     }

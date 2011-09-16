@@ -2,8 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.net.URLConnection;
+
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -25,7 +27,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.item.ANode;
-import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
@@ -33,6 +34,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Raw;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -486,15 +488,10 @@ public final class FNDb extends FuncCall {
    */
   private Item retrieve(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String key = path(1, ctx);
-
-    final IOFile bin = data.meta.binary(key);
-    if(!bin.exists()) RESFNF.thrw(input, key);
-    try {
-      return new B64(bin.read());
-    } catch(final IOException ex) {
-      throw IOERR.thrw(input, ex);
-    }
+    final String path = path(1, ctx);
+    final IOFile file = data.meta.binary(path);
+    if(!file.exists() || file.isDir()) RESFNF.thrw(input, path);
+    return new Raw(file, path);
   }
 
   /**
@@ -563,8 +560,7 @@ public final class FNDb extends FuncCall {
     return
       u == Use.CTX && (
         def == Function.DBTEXT || def == Function.DBATTR ||
-        def == Function.DBFULLTEXT || def == Function.DBEVENT ||
-        def == Function.DBRETRIEVE || up) ||
+        def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||
       u == Use.UPD && up ||
       super.uses(u);
   }

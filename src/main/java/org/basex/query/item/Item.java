@@ -1,10 +1,13 @@
 package org.basex.query.item;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 
+import org.basex.io.in.ArrayInput;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -167,6 +170,19 @@ public abstract class Item extends Value {
    */
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     throw (this == it ? TYPECMP : XPTYPECMP).thrw(ii, type, it.type);
+  }
+
+  /**
+   * Returns an input stream.
+   * @return content
+   * @throws IOException I/O exception
+   */
+  public InputStream input() throws IOException {
+    try {
+      return new ArrayInput(atom(null));
+    } catch(final QueryException ex) {
+      throw new IOException(ex.getMessage(), ex);
+    }
   }
 
   @Override

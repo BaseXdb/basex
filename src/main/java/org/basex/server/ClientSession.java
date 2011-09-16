@@ -176,6 +176,7 @@ public final class ClientSession extends Session {
   protected void execute(final String cmd, final OutputStream os)
       throws IOException {
     send(cmd);
+    sout.flush();
     receive(os);
   }
 
@@ -211,6 +212,7 @@ public final class ClientSession extends Session {
       listen(is);
     }
     send(name);
+    sout.flush();
     receive(null);
     notifiers.put(name, notifier);
   }
@@ -223,6 +225,7 @@ public final class ClientSession extends Session {
   public void unwatch(final String name) throws IOException {
     sout.write(ServerCmd.UNWATCH.code);
     send(name);
+    sout.flush();
     receive(null);
     notifiers.remove(name);
   }
@@ -316,6 +319,5 @@ public final class ClientSession extends Session {
   void send(final String s) throws IOException {
     sout.write(Token.token(s));
     sout.write(0);
-    sout.flush();
   }
 }

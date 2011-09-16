@@ -87,7 +87,6 @@ public final class JsonMLSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     finishOpen();
     print(']');
-    //finishClose();
   }
 
   @Override

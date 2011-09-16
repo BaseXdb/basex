@@ -58,11 +58,11 @@ public abstract class OutputSerializer extends Serializer {
   protected final Charset encoding;
   /** New line. */
   protected final byte[] nl;
+  /** Output stream. */
+  protected final PrintOutput out;
 
   /** UTF8 flag. */
   private final boolean utf8;
-  /** Output stream. */
-  private final PrintOutput out;
 
   // project specific properties
 
@@ -211,7 +211,7 @@ public abstract class OutputSerializer extends Serializer {
     for(int k = 0; k < v.length; k += cl(v, k)) {
       final int ch = cp(v, k);
       if(!format) {
-        print(ch);
+        printChar(ch);
       } else if(ch == '"') {
         print(E_QU);
       } else if(ch == 0x9 || ch == 0xA) {
@@ -241,7 +241,7 @@ public abstract class OutputSerializer extends Serializer {
           }
           c = 0;
         }
-        print(ch);
+        printChar(ch);
       }
       print(CDATA_C);
     }
@@ -295,7 +295,7 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected void code(final int ch) throws IOException {
     if(!format) {
-      print(ch);
+      printChar(ch);
     } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch > 0x7F && ch < 0xA0) {
       hex(ch);
     } else if(ch == '&') {
@@ -305,7 +305,7 @@ public abstract class OutputSerializer extends Serializer {
     } else if(ch == '<') {
       print(E_LT);
     } else {
-      print(ch);
+      printChar(ch);
     }
   }
 
@@ -392,14 +392,14 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   /**
-   * Writes a character in the current encoding. Converts newlines to the
-   * operating system default.
+   * Writes a character in the current encoding.
+   * Converts newlines to the operating system default.
    * @param ch character to be printed
    * @throws IOException I/O exception
    */
-  protected final void print(final int ch) throws IOException {
+  protected final void printChar(final int ch) throws IOException {
     if(ch == '\n') out.write(nl);
-    else write(ch);
+    else print(ch);
   }
 
   /**
@@ -407,7 +407,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character to be printed
    * @throws IOException I/O exception
    */
-  protected void write(final int ch) throws IOException {
+  protected void print(final int ch) throws IOException {
     // comparison by reference
     if(utf8) out.utf8(ch);
     else out.write(new TokenBuilder(4).add(ch).toString().getBytes(encoding));

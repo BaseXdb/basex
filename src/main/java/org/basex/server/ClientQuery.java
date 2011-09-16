@@ -126,6 +126,7 @@ public final class ClientQuery extends Query {
 
     cs.sout.write(cmd.code);
     cs.send(arg);
+    cs.sout.flush();
     final BufferInput bi = new BufferInput(cs.sin);
     cs.receive(bi, os);
     if(!cs.ok(bi)) throw new BaseXException(bi.readString());

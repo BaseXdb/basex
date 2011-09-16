@@ -131,8 +131,9 @@ public abstract class Value extends Expr {
   /**
    * Returns a Java representation of the value.
    * @return Java object
+   * @throws QueryException query exception
    */
-  public abstract Object toJava();
+  public abstract Object toJava() throws QueryException;
 
   @Override
   public boolean uses(final Use u) {

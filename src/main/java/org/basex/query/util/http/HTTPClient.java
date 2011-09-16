@@ -27,6 +27,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.http.Request.Part;
+import org.basex.util.Base64;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenMap;
@@ -269,8 +270,7 @@ public final class HTTPClient {
    * @return encoded credentials
    */
   private static String encodeCredentials(final String u, final String p) {
-    final B64 b64 = new B64(token(u + ":" + p));
-    return AUTH_BASIC + string(b64.atom());
+    return AUTH_BASIC + Base64.encode(u + ':' + p);
   }
 
   /**

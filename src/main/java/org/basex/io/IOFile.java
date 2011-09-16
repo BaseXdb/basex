@@ -301,8 +301,8 @@ public final class IOFile extends IO {
    * @param trg target reference
    * @return success flag
    */
-  public boolean rename(final IO trg) {
-    return trg instanceof IOFile && file.renameTo(((IOFile) trg).file);
+  public boolean rename(final IOFile trg) {
+    return file.renameTo(trg.file);
   }
 
   /**

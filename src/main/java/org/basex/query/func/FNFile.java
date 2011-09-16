@@ -286,7 +286,6 @@ public final class FNFile extends FuncCall {
   private B64 readBinary(final File path) throws QueryException {
     if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
-
     try {
       return new B64(new IOFile(path).read());
     } catch(final IOException ex) {
