@@ -124,7 +124,7 @@ final class RESTContext {
    */
   void status(final int code, final String message) throws IOException {
     if(session != null) session.close();
-    res.setStatus(code);
+    if(res != null) res.setStatus(code);
     if(message != null) out.write(token(message));
   }
 }
