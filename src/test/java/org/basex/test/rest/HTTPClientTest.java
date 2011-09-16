@@ -298,7 +298,7 @@ public class HTTPClientTest {
         + "<http:body media-type='text/xml'>" + "Test body content"
         + "</http:body>" + "</http:request>");
     final IO io = new IOContent(req);
-    final Parser reqParser = Parser.xmlParser(io, context.prop, "");
+    final Parser reqParser = Parser.xmlParser(io, context.prop);
     final DBNode dbNode = new DBNode(reqParser, context.prop);
     final Request r = RequestParser.parse(dbNode.children().next(), null, null);
 
@@ -332,7 +332,7 @@ public class HTTPClientTest {
         + "</http:request>");
 
     final IO io = new IOContent(multiReq);
-    final Parser p = Parser.xmlParser(io, context.prop, "");
+    final Parser p = Parser.xmlParser(io, context.prop);
     final DBNode dbNode1 = new DBNode(p, context.prop);
     final Request r =
       RequestParser.parse(dbNode1.children().next(), null, null);
@@ -384,7 +384,7 @@ public class HTTPClientTest {
         + "</http:multipart>" + "</http:request>");
 
     final IO io = new IOContent(multiReq);
-    final Parser p = Parser.xmlParser(io, context.prop, "");
+    final Parser p = Parser.xmlParser(io, context.prop);
     final DBNode dbNode1 = new DBNode(p, context.prop);
 
     final ItemCache bodies = new ItemCache();
@@ -496,7 +496,7 @@ public class HTTPClientTest {
     while(i.hasNext()) {
       it = i.next();
       io = new IOContent(it);
-      p = Parser.xmlParser(io, context.prop, "");
+      p = Parser.xmlParser(io, context.prop);
       dbNode = new DBNode(p, context.prop);
       try {
         RequestParser.parse(dbNode.children().next(), null, null);
@@ -788,7 +788,7 @@ public class HTTPClientTest {
         + "</http:multipart>" + "</http:response> ");
 
     final IO io = new IOContent(reqItem);
-    final Parser reqParser = Parser.xmlParser(io, context.prop, "");
+    final Parser reqParser = Parser.xmlParser(io, context.prop);
     final DBNode dbNode = new DBNode(reqParser, context.prop);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("...plain text version of message "
@@ -878,7 +878,7 @@ public class HTTPClientTest {
         + "</part>" + "</http:multipart>" + "</http:response>");
 
     final IO io = new IOContent(reqItem);
-    final Parser reqParser = Parser.xmlParser(io, context.prop, "");
+    final Parser reqParser = Parser.xmlParser(io, context.prop);
     final DBNode dbNode = new DBNode(reqParser, context.prop);
     resultIter.add(dbNode.children().next());
     resultIter.add(Str.get("This is implicitly typed plain ASCII text.\n"
