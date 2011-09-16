@@ -9,7 +9,7 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public abstract class TargetParser extends Parser {
-  /** Target path. */
+  /** Target path (empty or suffixed with a single slash). */
   protected final String trg;
 
   /**
@@ -19,6 +19,6 @@ public abstract class TargetParser extends Parser {
    */
   public TargetParser(final IO source, final String target) {
     super(source);
-    trg = target;
+    trg = target.isEmpty() ? "" : (target + '/').replaceAll("//+", "/");
   }
 }

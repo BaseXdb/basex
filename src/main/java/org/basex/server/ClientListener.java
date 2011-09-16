@@ -21,7 +21,6 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
-import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Store;
 import org.basex.io.in.BufferInput;
 import org.basex.io.in.LookupInput;
@@ -34,7 +33,6 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ByteList;
 import org.basex.util.list.StringList;
-import org.xml.sax.InputSource;
 
 /**
  * Server-side client session in the client-server architecture.
@@ -47,6 +45,8 @@ public final class ClientListener extends Thread {
   /** Active queries. */
   private final HashMap<String, QueryListener> queries =
     new HashMap<String, QueryListener>();
+  /** Performance measurement. */
+  final Performance perf = new Performance();
   /** Database context. */
   private final Context context;
   /** Socket reference. */
@@ -133,12 +133,13 @@ public final class ClientListener extends Thread {
       while(running) {
         try {
           final int b = in.read();
-          // end of stream: exit session
           if(b == -1) {
+            // end of stream: exit session
             exit();
             break;
           }
 
+          perf.getTime();
           sc = get(b);
           cmd = null;
           if(sc == CREATE) {
@@ -153,8 +154,6 @@ public final class ClientListener extends Thread {
             replace();
           } else if(sc == STORE) {
             store();
-          } else if(sc == RETRIEVE) {
-            retrieve();
           } else if(sc != COMMAND) {
             query(sc);
           } else {
@@ -169,7 +168,6 @@ public final class ClientListener extends Thread {
         if(sc != COMMAND) continue;
 
         // parse input and create command instance
-        final Performance perf = new Performance();
         command = null;
         try {
           command = new CommandParser(cmd, context).parseSingle();
@@ -208,7 +206,7 @@ public final class ClientListener extends Thread {
         // send 0 to mark end of result
         out.write(0);
         // send info
-        info(ok, info, perf);
+        info(info, ok);
 
         // stop console
         if(command instanceof Exit) {
@@ -293,7 +291,7 @@ public final class ClientListener extends Thread {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder("[");
     tb.add(socket.getInetAddress().getHostAddress());
-    tb.add(':').addExt(socket.getPort()).add(']');
+    tb.add(COL).addExt(socket.getPort()).add(']');
     if(context.data() != null) tb.add(COLS).add(context.data().meta.name);
     return tb.toString();
   }
@@ -301,15 +299,30 @@ public final class ClientListener extends Thread {
   // PRIVATE METHODS ==========================================================
 
   /**
-   * Returns user feedback.
-   * @param ok success flag
-   * @param info information string
-   * @param perf performance reference
+   * Returns error feedback.
+   * @param info error string
    * @throws IOException I/O exception
    */
-  private void info(final boolean ok, final String info,
-      final Performance perf) throws IOException {
+  private void error(final String info) throws IOException {
+    info(info, false);
+  }
 
+  /**
+   * Returns user feedback.
+   * @param info information string
+   * @throws IOException I/O exception
+   */
+  private void success(final String info) throws IOException {
+    info(info, true);
+  }
+
+  /**
+   * Returns user feedback.
+   * @param info information string
+   * @param ok success/error flag
+   * @throws IOException I/O exception
+   */
+  private void info(final String info, final boolean ok) throws IOException {
     // write feedback to log file
     log.write(this, ok ? OK : INFOERROR + info, perf);
     // send {MSG}0 and (0|1) as (success|error) flag
@@ -322,7 +335,6 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void create() throws IOException {
-    final Performance perf = new Performance();
     final String name = in.readString();
     log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
 
@@ -332,10 +344,10 @@ public final class ClientListener extends Thread {
       final String info = lis.lookup() == -1 ?
         CreateDB.create(name, Parser.emptyParser(), context) :
         CreateDB.create(name, lis, context);
-      info(true, info, perf);
+      success(info);
     } catch(final BaseXException ex) {
       di.flush();
-      info(false, ex.getMessage(), perf);
+      error(ex.getMessage());
     }
   }
 
@@ -344,24 +356,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void add() throws IOException {
-    final Performance perf = new Performance();
-    final String name = in.readString();
-    final String path = in.readString();
-    final StringBuilder sb = new StringBuilder(ADD + " ");
-    if(!name.isEmpty()) sb.append(AS + ' ' + name + ' ');
-    if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
-    log.write(this, sb.append("[...]"));
-
-    final DecodingInput di = new DecodingInput(in);
-    final InputSource is = new InputSource(di);
-    try {
-      final String info = Add.add(name, path, is, context, null, true);
-      info(true, info, perf);
-    } catch(final BaseXException ex) {
-      di.flush();
-      info(false, ex.getMessage(), perf);
-    }
-    out.flush();
+    execute(new Add(null, in.readString(), in.readString()));
   }
 
   /**
@@ -369,22 +364,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void replace() throws IOException {
-    final Performance perf = new Performance();
-    final String path = in.readString();
-    final StringBuilder sb = new StringBuilder(REPLACE + " ");
-    if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
-    log.write(this, sb.append("[...]"));
-
-    final DecodingInput di = new DecodingInput(in);
-    try {
-      final InputSource is = new InputSource(di);
-      final String info = Replace.replace(path, is, context, true);
-      info(true, info, perf);
-    } catch(final BaseXException ex) {
-      di.flush();
-      info(false, ex.getMessage(), perf);
-    }
-    out.flush();
+    execute(new Replace(in.readString()));
   }
 
   /**
@@ -392,39 +372,24 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void store() throws IOException {
-    final Performance perf = new Performance();
-    final String path = in.readString();
-    log.write(this, STORE + " " + path + " [...]");
-
-    final DecodingInput cis = new DecodingInput(in);
-    final Store s = new Store(path, cis);
-    try {
-      s.execute(context);
-      info(true, s.info(), perf);
-    } catch(final BaseXException ex) {
-      cis.flush();
-      info(false, ex.getMessage(), perf);
-    }
-    out.flush();
+    execute(new Store(in.readString()));
   }
 
   /**
-   * Retrieves raw data from a database.
+   * Executes the specified command.
+   * @param cmd command to be executed
    * @throws IOException I/O exception
    */
-  private void retrieve() throws IOException {
-    final Performance perf = new Performance();
-    final String source = in.readString();
-    log.write(this, RETRIEVE + " " + source);
-
+  private void execute(final Command cmd) throws IOException {
+    final DecodingInput di = new DecodingInput(in);
+    cmd.input(di);
+    log.write(this, cmd + "[...]");
     try {
-      final EncodingOutput eo = new EncodingOutput(out);
-      final String info = Retrieve.retrieve(source, eo, context);
-      out.write(0);
-      info(true, info, perf);
+      cmd.execute(context);
+      success(cmd.info());
     } catch(final BaseXException ex) {
-      out.write(0);
-      info(false, ex.getMessage(), perf);
+      di.flush();
+      error(ex.getMessage());
     }
   }
 
@@ -433,7 +398,6 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void watch() throws IOException {
-    final Performance perf = new Performance();
     // initialize server-based event handling
     if(events == null) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
@@ -454,7 +418,7 @@ public final class ClientListener extends Thread {
     } else {
       message = EVENTALR;
     }
-    info(ok, Util.info(message, name), perf);
+    info(Util.info(message, name), ok);
   }
 
   /**
@@ -462,7 +426,6 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void unwatch() throws IOException {
-    final Performance perf = new Performance();
     final String name = in.readString();
 
     final Sessions s = context.events.get(name);
@@ -477,7 +440,7 @@ public final class ClientListener extends Thread {
     } else {
       message = EVENTNOUW;
     }
-    info(ok, Util.info(message, name), perf);
+    info(Util.info(message, name), ok);
     out.flush();
   }
 

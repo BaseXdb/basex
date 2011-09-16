@@ -9,6 +9,7 @@ import org.basex.core.Text;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Kill;
 import org.basex.server.ClientSession;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -68,5 +69,7 @@ public final class ServerCommandTest extends CommandTest {
     ok(new Kill(NAME2));
     no(new Kill(NAME2 + "?"));
     cs.close();
+    // may be superfluous
+    Performance.sleep(100);
   }
 }

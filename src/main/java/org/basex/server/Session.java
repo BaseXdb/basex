@@ -98,14 +98,6 @@ public abstract class Session {
       throws IOException;
 
   /**
-   * Retrieves raw data from an open database.
-   * @param path source path
-   * @return result, or {@code null} reference
-   * @throws IOException I/O exception
-   */
-  public abstract String retrieve(final String path) throws IOException;
-
-  /**
    * Returns command info as a string, regardless of whether an output stream
    * was specified.
    * @return command info

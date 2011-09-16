@@ -147,7 +147,7 @@ public final class FNZip extends FuncCall {
     final IO io = new IOContent(entry(ctx));
     try {
       return new DBNode(html ? new HTMLParser(io, "", prop) :
-        Parser.xmlParser(io, prop, ""), prop);
+        Parser.xmlParser(io, prop), prop);
     } catch(final IOException ex) {
       throw SAXERR.thrw(input, ex);
     }

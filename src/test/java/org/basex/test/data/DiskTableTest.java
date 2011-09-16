@@ -62,8 +62,7 @@ public final class DiskTableTest {
   @Before
   public void setUp() {
     try {
-      final Parser parser = Parser.xmlParser(
-          IO.get(TESTFILE), CONTEXT.prop, "");
+      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), CONTEXT.prop);
       data = new DiskBuilder(DB, parser, CONTEXT).build();
       size = data.meta.size;
       data.close();

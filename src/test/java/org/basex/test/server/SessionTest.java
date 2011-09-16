@@ -123,27 +123,6 @@ public abstract class SessionTest {
     session.store("..", new ArrayInput("!"));
   }
 
-  /**
-   * Retrieves binary content from the database.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public final void retrieve() throws IOException {
-    session.execute("create db " + DB);
-    session.execute("store X <a/>");
-    check("<a/>", session.retrieve("X"));
-    session.execute("drop db " + DB);
-  }
-
-  /**
-   * Stores binary content in the database.
-   * @throws IOException I/O exception
-   */
-  @Test(expected = org.basex.core.BaseXException.class)
-  public final void retrieveNoDB() throws IOException {
-    session.retrieve("X");
-  }
-
   /** Runs a query and retrieves the result as string.
    * @throws IOException I/O exception */
   @Test

@@ -96,7 +96,7 @@ public final class DirParser extends TargetParser {
         b.meta.filesize += src.length();
 
         // use global target as prefix
-        String targ = !trg.isEmpty() ? trg + '/' : "";
+        String targ = trg;
         final String name = src.name();
         String path = src.path();
         // add relative path without root (prefix) and file name (suffix)
@@ -106,10 +106,10 @@ public final class DirParser extends TargetParser {
           targ = (targ + path).replace("//", "/");
         }
 
-        // parse file twice to ensure that it is well-formed
         boolean ok = true;
         IO in = io;
         if(skip) {
+          // parse file twice to ensure that it is well-formed
           BufferInput bi = null;
           try {
             // cache file contents to allow or speed up a second run

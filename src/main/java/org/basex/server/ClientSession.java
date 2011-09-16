@@ -156,12 +156,6 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public String retrieve(final String path) throws IOException {
-    sout.write(ServerCmd.RETRIEVE.code);
-    return execute(path);
-  }
-
-  @Override
   public ClientQuery query(final String query) throws IOException {
     return new ClientQuery(query, this);
   }

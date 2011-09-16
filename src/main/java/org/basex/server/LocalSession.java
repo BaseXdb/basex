@@ -16,14 +16,11 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
-import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Store;
 import org.basex.io.in.LookupInput;
-import org.basex.io.out.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.Util;
-import org.xml.sax.InputSource;
 
 /**
  * This class offers methods to locally execute database commands.
@@ -90,47 +87,32 @@ public final class LocalSession extends Session {
     throws IOException {
 
     final LookupInput lis = new LookupInput(input);
-    try {
-      info = lis.lookup() == -1 ?
-          CreateDB.create(name, Parser.emptyParser(), ctx) :
-          CreateDB.create(name, lis, ctx);
-    } catch(final BaseXException ex) {
-      throw ex;
-    }
+    info = lis.lookup() != -1 ? CreateDB.create(name, lis, ctx) :
+      CreateDB.create(name, Parser.emptyParser(), ctx);
   }
 
   @Override
   public void add(final String name, final String target,
-      final InputStream input) throws BaseXException {
-    info = Add.add(name, target, new InputSource(input), ctx, null, true);
+      final InputStream input) throws IOException {
+    execute(new Add(name, target).input(input));
   }
 
   @Override
   public void replace(final String path, final InputStream input)
-      throws BaseXException {
-    info = Replace.replace(path, new InputSource(input), ctx, true);
+      throws IOException {
+    execute(new Replace(path).input(input));
   }
 
   @Override
   public void store(final String target, final InputStream input)
-      throws BaseXException {
-    final Store s = new Store(target, input);
-    s.execute(ctx);
-    info = s.info();
-  }
-
-  @Override
-  public String retrieve(final String target) throws BaseXException {
-    final ArrayOutput ao = out != null ? null : new ArrayOutput();
-    info = Retrieve.retrieve(target, out != null ? out : ao, ctx);
-    return ao != null ? ao.toString() : null;
+      throws IOException {
+    execute(new Store(target).input(input));
   }
 
   @Override
   public LocalQuery query(final String query) throws BaseXException {
-    final LocalQuery q = out == null ?
-        new LocalQuery(this, query, ctx) :
-        new LocalQuery(this, query, ctx, out);
+    final LocalQuery q = out == null ? new LocalQuery(this, query, ctx) :
+      new LocalQuery(this, query, ctx, out);
     queries.add(q);
     return q;
   }

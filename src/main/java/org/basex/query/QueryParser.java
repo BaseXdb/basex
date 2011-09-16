@@ -1895,7 +1895,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses a literal map. TODO adapt to actual spec when available.
+   * Parses a literal map. [LW] adapt to actual spec when available.
    * @return map literal
    * @throws QueryException query exception
    */

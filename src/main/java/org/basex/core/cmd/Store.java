@@ -23,9 +23,6 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class Store extends ACreate {
-  /** Input stream. */
-  private InputStream is;
-
   /**
    * Default constructor.
    * @param target target path
@@ -38,11 +35,9 @@ public final class Store extends ACreate {
   /**
    * Default constructor.
    * @param target target path
-   * @param input input stream
    */
-  public Store(final String target, final InputStream input) {
+  public Store(final String target) {
     super(DATAREF | User.WRITE, target);
-    is = input;
   }
 
   @Override
@@ -50,7 +45,7 @@ public final class Store extends ACreate {
     if(is == null) {
       final IO in = IO.get(args[1]);
       if(!in.exists() || in.isDir()) return error(FILEWHICH, in);
-      is = in.buffer();
+      is = in.inputSource();
     }
 
     final String target = args[0];
@@ -59,7 +54,7 @@ public final class Store extends ACreate {
       return error(NAMEINVALID, target);
 
     try {
-      return info(store(file, new InputSource(is)));
+      return info(store(file, is));
     } catch(final IOException ex) {
       return error(DBNOTSTORED, ex.getMessage());
     }

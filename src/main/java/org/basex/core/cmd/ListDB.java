@@ -48,7 +48,7 @@ public final class ListDB extends Command {
       // add xml documents
       final Data data = Open.open(db, context);
       final IntList il = data.docs(path);
-      for(int i = 0, is = il.size(); i < is; i++) {
+      for(int i = 0, ds = il.size(); i < ds; i++) {
         final int pre = il.get(i);
         final TokenList tl = new TokenList(3);
         tl.add(data.text(pre, true));

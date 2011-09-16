@@ -12,9 +12,7 @@ import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.SAXWrapper;
-import org.basex.core.BaseXException;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -22,7 +20,6 @@ import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.util.Performance;
 import org.basex.util.Util;
-import org.xml.sax.InputSource;
 
 /**
  * Evaluates the 'add' command and adds a document to a collection.
@@ -48,7 +45,7 @@ public final class Add extends ACreate {
    * @param name name of document
    */
   public Add(final String input, final String name) {
-    this(input, name, null);
+    this(input, name, (String) null);
   }
 
   /**
@@ -59,94 +56,43 @@ public final class Add extends ACreate {
    * @param target target. If {@code null}, target will be set to root
    */
   public Add(final String input, final String name, final String target) {
-    super(DATAREF | User.WRITE, input, name, target == null ? "" : target);
+    super(DATAREF | User.WRITE, name, target == null ? "" : target, input);
   }
 
   @Override
   protected boolean run() {
-    final String input = args[0];
-    final IO io = IO.get(input);
-    if(!io.exists()) return error(FILEWHICH, io);
+    String name = args[0];
+    String target = IOFile.normalize(args[1]);
+    if(!target.isEmpty()) target += '/';
 
-    String name = args[1];
-    if(name != null && !name.isEmpty()) {
-      // set specified document name
-      io.name(name);
-    } else if(io instanceof IOContent) {
-      // if no name exists, set database name as document name
-      name = context.data().meta.name + IO.XMLSUFFIX;
-      io.name(name);
+    Parser parser;
+    if(is == null) {
+      final String input = args[2];
+      final IO io = IO.get(input);
+      if(!io.exists()) return error(FILEWHICH, io);
+
+      if(name != null && !name.isEmpty()) {
+        // set specified document name
+        io.name(name);
+      } else if(io instanceof IOContent) {
+        // if no name exists, set database name as document name
+        name = context.data().meta.name + IO.XMLSUFFIX;
+        io.name(name);
+      }
+      parser = new DirParser(io, target, prop);
+    } else {
+      final SAXSource sax = new SAXSource(is);
+      parser = new SAXWrapper(sax, name, target, context.prop);
     }
 
-    final String trg = IOFile.normalize(args[2]);
-    final DirParser p = new DirParser(io, trg, prop);
-    try {
-      return info(add(p, context, trg, name, this));
-    } catch(final BaseXException ex) {
-      return error(ex.getMessage());
-    }
-  }
-
-  @Override
-  public void build(final CommandBuilder cb) {
-    cb.init().arg(AS, 1).arg(TO, 2).arg(0);
-  }
-
-  /**
-   * Adds a document to the database.
-   * @param name name of document. If {@code null}, the name of the input
-   *   will be used
-   * @param target target. If {@code null}, target will be set to root
-   * @param input XML input source
-   * @param ctx database context
-   * @param cmd calling command
-   * @param lock if {@code true}, register a write lock in context
-   * @return info string
-   * @throws BaseXException database exception
-   */
-  public static String add(final String name, final String target,
-      final InputSource input, final Context ctx, final Add cmd,
-      final boolean lock) throws BaseXException {
-
-    final Data data = ctx.data();
-    if(data == null) throw new BaseXException(PROCNODB);
-
-    String trg = IOFile.normalize(target);
-    if(!trg.isEmpty()) trg += '/';
-
-    final SAXSource sax = new SAXSource(input);
-    final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
-    try {
-      if(lock) ctx.register(true);
-      return add(parser, ctx, trg, name, cmd);
-    } finally {
-      if(lock) ctx.unregister(true);
-    }
-  }
-
-  /**
-   * Adds the specified input to the database.
-   * @param parser parser instance
-   * @param ctx database context
-   * @param target target
-   * @param name name
-   * @param cmd calling command
-   * @return info string
-   * @throws BaseXException database exception
-   */
-  private static String add(final Parser parser, final Context ctx,
-      final String target, final String name, final Add cmd)
-      throws BaseXException {
-
-    final Performance p = new Performance();
     final String input = name == null ? parser.src.path() : name;
     // ensure that the name contains no slashes and trailing dots
     final String nm = name == null ? parser.src.name() : name;
-    if(nm.endsWith(".") || nm.indexOf('/') != -1)
-      throw new BaseXException(NAMEINVALID, nm);
+    if(nm.endsWith(".") || nm.indexOf('/') != -1) return error(NAMEINVALID, nm);
+
     final String path = target + (target.isEmpty() ? "/" : "") + nm;
     // ensure that the path is valid
-    if(!new IOFile(path).isValid()) throw new BaseXException(NAMEINVALID, path);
+    if(!new IOFile(path).isValid()) return error(NAMEINVALID, path);
 
     // create disk instances for large documents
     // test does not work for input streams and directories
@@ -159,11 +105,10 @@ public final class Add extends ACreate {
     }
 
     // create random database name
-    final Data data = ctx.data();
-    final String dbname = large ? ctx.mprop.random(data.meta.name) : path;
-    final Builder build = large ? new DiskBuilder(dbname, parser, ctx) :
-      new MemBuilder(dbname, parser, ctx.prop);
-    if(cmd != null) cmd.build = build;
+    final Data data = context.data();
+    final String dbname = large ? context.mprop.random(data.meta.name) : path;
+    build = large ? new DiskBuilder(dbname, parser, context) :
+      new MemBuilder(dbname, parser, context.prop);
 
     Data tmp = null;
     try {
@@ -171,19 +116,24 @@ public final class Add extends ACreate {
       // ignore empty fragments
       if(tmp.meta.size > 1) {
         data.insert(data.meta.size, -1, tmp);
-        ctx.update();
+        context.update();
         data.flush();
       }
-      return Util.info(parser.info() + PATHADDED, input, p);
+      return info(parser.info() + PATHADDED, input, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw new BaseXException(ex);
+      return error(Util.message(ex));
     } finally {
       // close and drop intermediary database instance
       try { build.close(); } catch(final IOException e) { }
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
-      if(large) DropDB.drop(dbname, ctx.mprop);
+      if(large) DropDB.drop(dbname, context.mprop);
     }
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init().arg(AS, 0).arg(TO, 1).arg(2);
   }
 
   @Override

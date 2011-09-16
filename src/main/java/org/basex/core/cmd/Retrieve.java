@@ -3,14 +3,11 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
-import org.basex.util.Performance;
 import org.basex.util.Util;
 
 /**
@@ -22,7 +19,7 @@ import org.basex.util.Util;
 public final class Retrieve extends ACreate {
   /**
    * Default constructor.
-   * @param path path
+   * @param path source path
    */
   public Retrieve(final String path) {
     super(DATAREF, path);
@@ -31,7 +28,7 @@ public final class Retrieve extends ACreate {
   @Override
   protected boolean run() throws IOException {
     try {
-      return info(retrieve(args[0], out, context));
+      return info(retrieve(args[0]));
     } catch(final BaseXException ex) {
       return error(DBNOTSTORED, ex.getMessage());
     }
@@ -40,16 +37,11 @@ public final class Retrieve extends ACreate {
   /**
    * Sends raw data to the specified output stream.
    * @param source source path
-   * @param ctx database context
-   * @param out output stream
    * @return info string
    * @throws BaseXException database exception
    */
-  public static String retrieve(final String source, final OutputStream out,
-      final Context ctx) throws BaseXException {
-
-    final Performance perf = new Performance();
-    final Data data = ctx.data();
+  public String retrieve(final String source) throws BaseXException {
+    final Data data = context.data();
     if(data == null) throw new BaseXException(PROCNODB);
 
     final IOFile bin = data.meta.binary(source);

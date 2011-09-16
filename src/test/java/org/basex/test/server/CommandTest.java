@@ -442,20 +442,29 @@ public class CommandTest {
   /** Command test. */
   @Test
   public final void replace() {
-    // database must be opened to rename paths
+    // query to count number of documents
+    final String count = "count(db:open('" + NAME + "'))";
+    // database must be opened to replace resources
     no(new Replace(FILE, "xxx"));
     ok(new CreateDB(NAME, FILE));
+    assertEquals("1", ok(new XQuery(count)));
+    // replace existing document
     ok(new Replace(FN, "<a/>"));
+    assertEquals("1", ok(new XQuery(count)));
+    // replace existing document (again)
     ok(new Replace(FN, "<a/>"));
+    assertEquals("1", ok(new XQuery(count)));
+    // invalid content
     no(new Replace(FN, ""));
-    // create binary file
+    assertEquals("1", ok(new XQuery(count)));
+    // create and replace binary file
     ok(new XQuery("db:store('" + NAME + "', 'a', 'a')"));
     ok(new Replace("a", "<b/>"));
-    assertTrue(!ok(new XQuery("db:open('" + NAME + "')")).isEmpty());
+    assertTrue(ok(new XQuery("db:open('" + NAME + "')")).length() != 0);
     ok(new XQuery("db:retrieve('" + NAME + "', 'a')"));
     // a failing replace should not remove existing documents
     no(new Replace(FN, "<a>"));
-    assertTrue(!ok(new XQuery("doc('" + NAME + "')")).isEmpty());
+    assertEquals("1", ok(new XQuery(count)));
   }
 
   /** Command test. */

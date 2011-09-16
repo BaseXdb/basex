@@ -4,14 +4,12 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
+import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.Util;
 import org.basex.util.list.IntList;
-import org.xml.sax.InputSource;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
@@ -29,71 +27,59 @@ public final class Replace extends ACreate {
     super(DATAREF | User.WRITE, source, input);
   }
 
-  @Override
-  protected boolean run() {
-    // check if input exists
-    final IO io = IO.get(args[1]);
-    if(!io.exists()) return error(FILEWHICH, io);
-
-    try {
-      return info(replace(args[0], io.inputSource(), context, false), perf);
-    } catch(final BaseXException ex) {
-      return error(ex.getMessage());
-    }
+  /**
+   * Constructor.
+   * @param source source path
+   */
+  public Replace(final String source) {
+    super(DATAREF | User.WRITE, source);
   }
 
-  /**
-   * Replace the specified document with a new content.
-   * @param path path to replace
-   * @param input new content
-   * @param ctx database context
-   * @param lock if {@code true}, register a write lock in context
-   * @return info string
-   * @throws BaseXException database exception
-   */
-  public static String replace(final String path, final InputSource input,
-      final Context ctx, final boolean lock) throws BaseXException {
+  @Override
+  protected boolean run() {
+    // check if the input source has already been initialized
+    if(is == null) {
+      final IO io = IO.get(args[1]);
+      if(!io.exists()) return error(FILEWHICH, io);
+      is = io.inputSource();
+    }
 
-    final Data data = ctx.data();
-    if(data == null) throw new BaseXException(PROCNODB);
+    String name = IOFile.normalize(args[0]);
+    if(name.isEmpty()) return error(DIRERR, name);
 
-    String pth = IOFile.normalize(path);
-    String trg = "";
-    if(pth.isEmpty()) throw new BaseXException(DIRERR, pth);
-
-    final byte[] src = token(pth);
-    final IntList docs = data.docs(path);
-    final int is = docs.size();
+    final byte[] src = token(name);
+    final Data data = context.data();
+    final IntList docs = data.docs(name);
+    final int ds = docs.size();
     // check if path points exclusively to files
-    for(int i = 0; i < is; i++) {
-      if(!eq(data.text(docs.get(i), true), src))
-        throw new BaseXException(DIRERR, pth);
+    for(int i = 0; i < ds; i++) {
+      if(!eq(data.text(docs.get(i), true), src)) return error(DIRERR, name);
     }
 
-    final int i = pth.lastIndexOf('/');
-    if(i != -1) {
-      trg = pth.substring(0, i);
-      pth = pth.substring(i + 1);
-    }
-
+    final IOFile file = data.meta.binary(name);
     try {
-      if(lock) ctx.register(true);
-
-      // replace binary file if it already exists
-      final IOFile file = data.meta.binary(path);
       if(file != null && file.exists()) {
-        Store.store(file, input);
+        // replace binary file if it already exists
+        Store.store(file, is);
       } else {
         // otherwise, add new document as xml
-        Add.add(pth, trg, input, ctx, null, false);
+        String trg = "";
+        final int i = name.lastIndexOf('/');
+        if(i != -1) {
+          trg = name.substring(0, i);
+          name = name.substring(i + 1);
+        }
+        final Command add = new Add(null, name, trg).input(is);
+        if(!add.run(context)) return error(add.info());
+
         // delete old documents if addition was successful
-        for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
+        for(int d = ds - 1; d >= 0; d--) data.delete(docs.get(d));
         // flushes changes
         data.flush();
       }
-    } finally {
-      if(lock) ctx.unregister(true);
+    } catch(final BaseXException ex) {
+      return error(ex.getMessage());
     }
-    return Util.info(PATHREPLACED, docs.size());
+    return info(PATHREPLACED, ds);
   }
 }

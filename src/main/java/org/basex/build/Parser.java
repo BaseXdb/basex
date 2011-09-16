@@ -86,6 +86,18 @@ public abstract class Parser extends Progress {
    * Returns an XML parser instance.
    * @param source input
    * @param prop database properties
+   * @return xml parser
+   * @throws IOException I/O exception
+   */
+  public static SingleParser xmlParser(final IO source, final Prop prop)
+      throws IOException {
+    return xmlParser(source, prop, "");
+  }
+
+  /**
+   * Returns an XML parser instance.
+   * @param source input
+   * @param prop database properties
    * @param target relative path reference
    * @return xml parser
    * @throws IOException I/O exception

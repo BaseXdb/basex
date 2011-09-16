@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.basex.core.Commands.CmdPerm;
@@ -17,6 +18,7 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
+import org.xml.sax.InputSource;
 
 /**
  * This class provides the architecture for all internal command
@@ -43,6 +45,8 @@ public abstract class Command extends Progress {
   protected Context context;
   /** Output stream. */
   protected PrintOutput out;
+  /** Optional input source. */
+  protected InputSource is;
   /** Database properties. */
   protected Prop prop;
   /** Main properties. */
@@ -53,12 +57,12 @@ public abstract class Command extends Progress {
 
   /**
    * Constructor.
-   * @param f command flags
-   * @param a arguments
+   * @param flag command flags
+   * @param arg arguments
    */
-  public Command(final int f, final String... a) {
-    flags = f;
-    args = a;
+  public Command(final int flag, final String... arg) {
+    flags = flag;
+    args = arg;
   }
 
   /**
@@ -84,6 +88,25 @@ public abstract class Command extends Progress {
     final ArrayOutput ao = new ArrayOutput();
     execute(ctx, ao);
     return ao.toString();
+  }
+
+  /**
+   * Attaches an input stream.
+   * @param input input stream
+   * @return self reference
+   */
+  public Command input(final InputStream input) {
+    return input(new InputSource(input));
+  }
+
+  /**
+   * Attaches an input source.
+   * @param input input source
+   * @return self reference
+   */
+  public Command input(final InputSource input) {
+    is = input;
+    return this;
   }
 
   /**
