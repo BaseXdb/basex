@@ -89,7 +89,7 @@ public final class OptimizeAll extends ACreate {
    * @throws BaseXException database exception
    */
   public static void optimizeAll(final Data data, final Context ctx,
-      final OptimizeAll cmd) throws IOException, BaseXException {
+      final OptimizeAll cmd) throws IOException {
 
     if(!(data instanceof DiskData)) throw new BaseXException(PROCMM);
 
