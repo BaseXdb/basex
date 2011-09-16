@@ -501,6 +501,7 @@ public class CommandTest {
     ok(new Store(NAME2, FILE));
     // reject invalid names
     no(new Store("", FILE));
+    no(new Store("../x", FILE));
   }
 
   /** Command test. */

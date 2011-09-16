@@ -54,11 +54,12 @@ public final class Store extends ACreate {
     }
 
     final String target = args[0];
-    final IOFile bin = context.data().meta.binary(target);
-    if(target.isEmpty() || !bin.valid()) return error(NAMEINVALID, target);
+    final IOFile file = context.data().meta.binary(target);
+    if(file == null || file.isDir() || !file.isValid())
+      return error(NAMEINVALID, target);
 
     try {
-      return info(store(bin, new InputSource(is)));
+      return info(store(file, new InputSource(is)));
     } catch(final IOException ex) {
       return error(DBNOTSTORED, ex.getMessage());
     }

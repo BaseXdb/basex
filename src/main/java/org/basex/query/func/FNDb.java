@@ -44,7 +44,7 @@ import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.DBAdd;
 import org.basex.query.up.primitives.DBDelete;
 import org.basex.query.up.primitives.DBOptimize;
-import org.basex.query.up.primitives.DBPut;
+import org.basex.query.up.primitives.DBStore;
 import org.basex.query.up.primitives.DBRename;
 import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
@@ -342,7 +342,7 @@ public final class FNDb extends FuncCall {
     final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
     // ensure that the path is valid
     final String path = expr.length < 4 ? null : path(3, ctx);
-    if(path != null && !new IOFile(path).valid()) RESINV.thrw(input, path);
+    if(path != null && !new IOFile(path).isValid()) RESINV.thrw(input, path);
 
     // get all items representing document(s):
     final ObjList<Item> docs = new ObjList<Item>(
@@ -389,9 +389,10 @@ public final class FNDb extends FuncCall {
     docs.add(doc);
     ctx.updates.add(new DBAdd(data, input, docs, name, path, ctx.context), ctx);
 
-    if(data.meta.binary(path).exists()) {
+    final IOFile file = data.meta.binary(trg);
+    if(file != null && file.exists() && !file.isDir()) {
       final byte[] val = checkBin(doc, ctx);
-      ctx.updates.add(new DBPut(data, token(trg), val, input), ctx);
+      ctx.updates.add(new DBStore(data, token(trg), val, input), ctx);
     }
     return null;
   }
@@ -431,7 +432,7 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String src = path(1, ctx);
     final String trg = path(2, ctx);
-    if(!new IOFile(trg).valid()) RESINV.thrw(input, trg);
+    if(!new IOFile(trg).isValid()) RESINV.thrw(input, trg);
 
     // the first step of the path should be the database name
     final IntList il = data.docs(src);
@@ -442,8 +443,11 @@ public final class FNDb extends FuncCall {
       ctx.updates.add(new ReplaceValue(pre, data, input, token(target)), ctx);
     }
     // rename files
-    ctx.updates.add(new DBRename(data, data.meta.binary(src),
-        data.meta.binary(trg), input), ctx);
+    final IOFile source = data.meta.binary(src);
+    final IOFile target = data.meta.binary(trg);
+    if(source != null && target != null)
+      ctx.updates.add(new DBRename(data, source, target, input), ctx);
+
     return null;
   }
 
@@ -472,11 +476,13 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String key = path(1, ctx);
-    if(!new IOFile(key).valid()) RESINV.thrw(input, key);
+    final String path = path(1, ctx);
+    final IOFile file = data.meta.binary(path);
+    if(file == null || file.isDir() || !file.isValid())
+      RESINV.thrw(input, path);
 
     final byte[] val = checkBin(expr[2], ctx);
-    ctx.updates.add(new DBPut(data, token(key), val, input), ctx);
+    ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
     return null;
   }
 
@@ -490,7 +496,7 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
     final IOFile file = data.meta.binary(path);
-    if(!file.exists() || file.isDir()) RESFNF.thrw(input, path);
+    if(file == null || !file.exists() || file.isDir()) RESFNF.thrw(input, path);
     return new Raw(file, path);
   }
 

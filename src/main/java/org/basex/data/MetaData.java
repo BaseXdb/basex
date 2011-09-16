@@ -219,16 +219,15 @@ public final class MetaData {
   }
 
   /**
-   * Returns the specified binary file.
+   * Returns the specified binary file, or {@code null} if the resource
+   * path cannot be resolved (e.g. points to a parent directory).
    * @param pth internal file path
    * @return binary directory
    */
   public IOFile binary(final String pth) {
     final IOFile dir = binaries();
     final IOFile file = new IOFile(dir, pth);
-    // [CG] return only valid database paths...
-    //if(file.path().startsWith(dir.path())) ...
-    return file;
+    return file.path().startsWith(dir.path()) ? file : null;
   }
 
   /**

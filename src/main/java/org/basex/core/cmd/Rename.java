@@ -31,7 +31,7 @@ public final class Rename extends ACreate {
     final String src = IOFile.normalize(args[0]);
     final String trg = IOFile.normalize(args[1]);
     // ensure that the name contains no slashes and trailing dots
-    if(!new IOFile(trg).valid()) return error(NAMEINVALID, trg);
+    if(!new IOFile(trg).isValid()) return error(NAMEINVALID, trg);
 
     boolean ok = true;
     int c = 0;
@@ -51,8 +51,8 @@ public final class Rename extends ACreate {
     if(c != 0) data.flush();
 
     // rename binary resources
-    final IOFile io = data.meta.binary(src);
-    if(io.exists() && !io.rename(data.meta.binary(trg))) {
+    final IOFile file = data.meta.binary(src);
+    if(file == null || file.exists() && !file.rename(data.meta.binary(trg))) {
       ok = false;
       info(NAMEINVALID, trg);
     } else {

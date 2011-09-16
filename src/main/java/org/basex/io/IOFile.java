@@ -134,7 +134,7 @@ public final class IOFile extends IO {
     }
 
     // process zip files
-    if(is instanceof ZipInputStream || archive()) {
+    if(is instanceof ZipInputStream || isArchive()) {
       if(is == null) {
         // keep stream open until last file was parsed...
         is = new ZipInputStream(new FileInputStream(file)) {
@@ -162,12 +162,12 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public boolean archive() {
+  public boolean isArchive() {
     return isSuffix(ZIPSUFFIXES);
   }
 
   @Override
-  public boolean xml() {
+  public boolean isXML() {
     return isSuffix(XMLSUFFIXES);
   }
 
@@ -309,7 +309,7 @@ public final class IOFile extends IO {
    * Checks if this is a valid file reference.
    * @return result of check
    */
-  public boolean valid() {
+  public boolean isValid() {
     // note that not all invalid names can be caught by this test
     try {
       // the result must not reference a directory

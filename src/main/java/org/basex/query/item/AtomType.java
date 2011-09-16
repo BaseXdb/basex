@@ -610,7 +610,7 @@ public enum AtomType implements Type {
   },
 
   /** Implementation specific: raw type. */
-  RAW("raw", BIN, XSURI, false, false, false, false, false),
+  RAW("raw", HEX, XSURI, false, false, false, false, false),
 
   /** Any URI type. */
   URI("anyURI", AAT, XSURI, false, false, true, false, false) {

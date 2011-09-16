@@ -146,7 +146,7 @@ public final class Add extends ACreate {
       throw new BaseXException(NAMEINVALID, nm);
     final String path = target + (target.isEmpty() ? "/" : "") + nm;
     // ensure that the path is valid
-    if(!new IOFile(path).valid()) throw new BaseXException(NAMEINVALID, path);
+    if(!new IOFile(path).isValid()) throw new BaseXException(NAMEINVALID, path);
 
     // create disk instances for large documents
     // test does not work for input streams and directories

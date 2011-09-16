@@ -53,7 +53,7 @@ public final class Retrieve extends ACreate {
     if(data == null) throw new BaseXException(PROCNODB);
 
     final IOFile bin = data.meta.binary(source);
-    if(!bin.exists() || bin.isDir())
+    if(bin == null || !bin.exists() || bin.isDir() || !bin.isValid())
       throw new BaseXException(FILEWHICH, source);
 
     try {

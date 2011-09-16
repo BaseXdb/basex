@@ -87,7 +87,7 @@ public final class DirParser extends TargetParser {
       for(final IO f : ((IOFile) io).children()) parse(b, f);
     } else {
       src = io;
-      if(!archives && src.archive()) return;
+      if(!archives && src.isArchive()) return;
 
       // multiple archive files may be parsed in this loop
       while(io.more()) {

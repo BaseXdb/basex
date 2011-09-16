@@ -80,9 +80,9 @@ public final class Replace extends ACreate {
       if(lock) ctx.register(true);
 
       // replace binary file if it already exists
-      final IOFile io = data.meta.binary(path);
-      if(io.exists()) {
-        Store.store(io, input);
+      final IOFile file = data.meta.binary(path);
+      if(file != null && file.exists()) {
+        Store.store(file, input);
       } else {
         // otherwise, add new document as xml
         Add.add(pth, trg, input, ctx, null, false);

@@ -99,8 +99,8 @@ public abstract class SessionTest {
     check("true", session.query("db:is-raw('" + DB + "','X')").execute());
     session.store("X", new ArrayInput(""));
     check("", session.query("db:retrieve('" + DB + "','X')").execute());
-    session.store("X", new ArrayInput(new byte[] { 0, -1 }));
-    check("00FF", session.query("db:retrieve('" + DB + "','X')").execute());
+    session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
+    check("0001FF", session.query("db:retrieve('" + DB + "','X')").execute());
     session.execute("drop db " + DB);
   }
 

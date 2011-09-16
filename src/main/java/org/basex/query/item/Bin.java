@@ -1,5 +1,9 @@
 package org.basex.query.item;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.basex.io.in.ArrayInput;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
@@ -25,18 +29,26 @@ public abstract class Bin extends Item {
     val = d;
   }
 
-  @Override
-  public final byte[] toJava() throws QueryException {
-    return val(null);
-  }
-
   /**
    * Returns the binary content.
    * @param ii input info
    * @return content
    * @throws QueryException query exception
    */
-  protected abstract byte[] val(final InputInfo ii) throws QueryException;
+  @SuppressWarnings("unused")
+  protected byte[] val(final InputInfo ii) throws QueryException {
+    return val;
+  }
+
+  @Override
+  public InputStream input() throws IOException {
+    return new ArrayInput(val);
+  }
+
+  @Override
+  public final byte[] toJava() throws QueryException {
+    return val(null);
+  }
 
   @Override
   public final boolean sameAs(final Expr cmp) {

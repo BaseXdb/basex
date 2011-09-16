@@ -65,7 +65,8 @@ public final class Delete extends ACreate {
    */
   public static byte[] delete(final Data data, final TokenList res) {
     for(final byte[] key : res) {
-      if(!data.meta.binary(string(key)).delete()) return key;
+      final IOFile file = data.meta.binary(string(key));
+      if(file == null || !file.delete()) return key;
     }
     return null;
   }
@@ -81,7 +82,7 @@ public final class Delete extends ACreate {
     final TokenList tl = data.files(res);
     // if necessary, delete root directory
     final IOFile bin = data.meta.binary(res);
-    if(bin.isDir()) tl.add(res);
+    if(bin != null && bin.isDir()) tl.add(res);
     return tl;
   }
 }

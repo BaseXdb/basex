@@ -201,7 +201,7 @@ public abstract class IO {
    * Checks if this file is an archive.
    * @return result of check
    */
-  public boolean archive() {
+  public boolean isArchive() {
     return false;
   }
 
@@ -209,7 +209,7 @@ public abstract class IO {
    * Checks if this file contains XML.
    * @return result of check
    */
-  public boolean xml() {
+  public boolean isXML() {
     return false;
   }
 

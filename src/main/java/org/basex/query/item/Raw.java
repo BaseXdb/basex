@@ -9,7 +9,6 @@ import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -18,7 +17,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Raw extends Bin {
+public final class Raw extends Hex {
   /** File reference. */
   private final IOFile file;
   /** String path. */
@@ -30,7 +29,7 @@ public final class Raw extends Bin {
    * @param p path to resource
    */
   public Raw(final IOFile f, final String p) {
-    super(null, AtomType.RAW);
+    super(AtomType.RAW);
     file = f;
     path = p;
   }
@@ -38,15 +37,7 @@ public final class Raw extends Bin {
   @Override
   public boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-
-    if(it instanceof Raw) return file.eq(((Raw) it).file);
-    return Token.eq(toJava(), it instanceof Bin ?
-        ((Bin) it).toJava() : it.atom(ii));
-  }
-
-  @Override
-  public byte[] atom(final InputInfo ii) {
-    return Token.token(path);
+    return type == it.type ? file.eq(((Raw) it).file) : super.eq(ii, it);
   }
 
   @Override
