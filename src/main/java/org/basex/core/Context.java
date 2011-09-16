@@ -13,7 +13,7 @@ import org.basex.server.Sessions;
  * This class serves as a central database context.
  * It references the currently opened database. Moreover, it provides
  * references to the currently used, marked and copied node sets.
- * 
+ *
  * This class should only be instantiated once in a project; otherwise,
  * database updates may lead to conflicts.
  *

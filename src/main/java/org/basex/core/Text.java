@@ -405,11 +405,11 @@ public interface Text {
       "  " + lang("ch_repo5")
   };
   /** Command help. */
-  String[] HELPRETRIEVE= {
+  String[] HELPRETRIEVE = {
     "[" + C_PATH + "]", lang("ch_retrieve1"), lang("ch_retrieve2", C_PATH)
   };
   /** Command help. */
-  String[] HELPSTORE= {
+  String[] HELPSTORE = {
     "[" + C_PATH + "] [" + C_INPUT + "]",
     lang("ch_store1"), lang("ch_store2", C_PATH)
   };

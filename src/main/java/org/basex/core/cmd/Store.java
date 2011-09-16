@@ -25,7 +25,7 @@ import org.xml.sax.InputSource;
 public final class Store extends ACreate {
   /** Input stream. */
   private InputStream is;
-  
+
   /**
    * Default constructor.
    * @param target target path

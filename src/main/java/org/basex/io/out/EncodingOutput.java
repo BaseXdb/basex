@@ -32,12 +32,12 @@ public final class EncodingOutput extends OutputStream {
   }
 
   @Override
-  public final void flush() throws IOException {
+  public void flush() throws IOException {
     os.flush();
   }
 
   @Override
-  public final void close() throws IOException {
+  public void close() throws IOException {
     os.close();
   }
 }

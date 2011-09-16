@@ -23,7 +23,7 @@ public final class Raw extends Bin {
   private final IOFile file;
   /** String path. */
   private final String path;
-  
+
   /**
    * Constructor.
    * @param f file reference
@@ -67,7 +67,7 @@ public final class Raw extends Bin {
   }
 
   @Override
-  public final String toString() {
+  public String toString() {
     return Util.info("\"%\"", path);
   }
 }
