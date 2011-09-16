@@ -46,7 +46,8 @@ public class FNCrypto extends FuncCall {
         return new DigitalSignature(ii).generateSignature(
             checkNode(expr[0].item(ctx, ii)), checkStr(expr[1], ctx),
             checkStr(expr[2], ctx), checkStr(expr[3], ctx),
-            checkStr(expr[4], ctx), checkStr(expr[5], ctx));
+            checkStr(expr[4], ctx), checkStr(expr[5], ctx),
+            expr.length > 6 ? checkNode(expr[6].item(ctx, ii)) : null);
       case VALSIG:
         return new DigitalSignature(ii).
             validateSignature(checkNode(expr[0].item(ctx, ii)));

@@ -49,6 +49,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.util.InputInfo;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -134,7 +135,7 @@ public final class DigitalSignature {
    */
   public ANode generateSignature(final ANode node, final byte[] canonicalization,
       final byte[] digest, final byte[] signature,
-      final byte[] nsPrefix, final byte[] type)
+      final byte[] nsPrefix, final byte[] type, final ANode certificate)
           throws QueryException {
     
     // variables to check if parameters correct
@@ -187,7 +188,7 @@ public final class DigitalSignature {
     ANode signedNode = null;
 
     try {
-
+      
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
       final Reference ref = fac.newReference("",
           fac.newDigestMethod(DA, null), Collections.
@@ -198,26 +199,49 @@ public final class DigitalSignature {
               (C14NMethodParameterSpec) null),
               fac.newSignatureMethod(SA, null),
               Collections.singletonList(ref));
-
+      
+      DocumentBuilderFactory dbf = null;
+      Document cert = null;
+      String kst = null;
+      String kspw = null;
+      String kal = null;
+      String pkpw = null;
+      String ksuri = null;
+      
+      PrivateKey pk = null;
+      KeyInfo ki = null;
+      
+      // dealing with given certificate details to initialize the keystore
+      if(certificate != null) {
+        cert = toDOMNode(certificate);
+        final NodeList childs = cert.getDocumentElement().getChildNodes();
+        final int s = childs.getLength();
+        int ci = 0;
+        while(ci < s) {
+          final Node n = childs.item(ci++);
+          final String name = n.getNodeName();
+          if(name.equals("keystore-type")) kst = n.getTextContent();
+          else if(name.equals("keystore-password")) kspw = n.getTextContent();
+          else if(name.equals("key-alias")) kal = n.getTextContent();
+          else if(name.equals("private-key-password")) pkpw = n.getTextContent();
+          else if(name.equals("keystore-uri")) ksuri = n.getTextContent();
+        }
+        
       // auto-generated keypair and signature
-      final KeyPairGenerator gen =
-          KeyPairGenerator.getInstance(keytype);
-      gen.initialize(512);
-      final KeyPair kp = gen.generateKeyPair();
-      final KeyInfoFactory kif = fac.getKeyInfoFactory();
-      final KeyValue kv = kif.newKeyValue(kp.getPublic());
-      final KeyInfo ki = kif.newKeyInfo(Collections.singletonList(kv));
-      final PrivateKey pk = kp.getPrivate();
+      } else {
+        final KeyPairGenerator gen =
+            KeyPairGenerator.getInstance(keytype);
+        gen.initialize(512);
+        final KeyPair kp = gen.generateKeyPair();
+        final KeyInfoFactory kif = fac.getKeyInfoFactory();
+        final KeyValue kv = kif.newKeyValue(kp.getPublic());
+        ki = kif.newKeyInfo(Collections.singletonList(kv));
+        pk = kp.getPrivate();
+      }
+
 
       // enveloped certificate
-      final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-      final Serializer ser = Serializer.get(byteOut, null);
-      node.serialize(ser);
-      ser.close();
-
-      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      final Document doc = dbf.newDocumentBuilder().parse(
-          new ByteArrayInputStream(byteOut.toByteArray()));
+      final Document doc = toDOMNode(node);
 
       final DOMSignContext dsc = new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
@@ -240,7 +264,7 @@ public final class DigitalSignature {
 
     return signedNode;
   }
-
+  
   /**
    * Validates a signature.
    * @param node input node
@@ -248,21 +272,10 @@ public final class DigitalSignature {
    * @return true if signature valid
    */
   public Item validateSignature(final ANode node) {
-    Serializer ser;
-    Document doc = null;
-    NodeList nl = null;
     try {
 
-      final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-      ser = Serializer.
-          get(byteOut, null);
-      node.serialize(ser);
-      ser.close();
-      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      dbf.setNamespaceAware(true);
-      doc = dbf.newDocumentBuilder().parse(
-          new ByteArrayInputStream(byteOut.toByteArray()));
-      nl = doc.getElementsByTagName("Signature");
+      final Document doc = toDOMNode(node);
+      final NodeList nl = doc.getElementsByTagName("Signature");
 
       final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), nl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
@@ -285,5 +298,17 @@ public final class DigitalSignature {
     }
 
     return Bln.get(false);
+  }
+  
+  private static Document toDOMNode(final ANode n)
+      throws SAXException, IOException, ParserConfigurationException {
+    final ByteArrayOutputStream b = new ByteArrayOutputStream();
+    final Serializer s = Serializer.get(b, null);
+    n.serialize(s);
+    s.close();
+    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    dbf.setNamespaceAware(true);
+    return dbf.newDocumentBuilder().parse(
+        new ByteArrayInputStream(b.toByteArray()));
   }
 }

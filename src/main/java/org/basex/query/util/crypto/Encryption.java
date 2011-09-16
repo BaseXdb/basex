@@ -7,6 +7,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -75,12 +76,16 @@ public final class Encryption {
     // transformed input
     byte[] t = null;
     final String a = string(algorithm);
+    final String ka = a.substring(0, 3);
     try {
 
       if(symmetric) {
-        SecretKeySpec keyspec = new SecretKeySpec(key, "DES");
-        IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
-        // algorithm/mode/padding
+        SecretKeySpec keyspec = new SecretKeySpec(key, ka);
+        // TODO random IV?
+        final byte[] iVector = new byte[key.length];
+        new Random().nextBytes(iVector);
+        IvParameterSpec iv = new IvParameterSpec(iVector);
+//        IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
         Cipher cip = Cipher.getInstance(a);
         
         // encrypt/decrypt
@@ -111,19 +116,20 @@ public final class Encryption {
     } catch(InvalidKeyException e) {
       e.printStackTrace();
       CRYPTOKEYINV.thrw(input, e);
-      // [LK] how to treat this one?
+      // TODO how to treat this one?
     } catch(ShortBufferException e) {
       e.printStackTrace();
       CRYPTONOTSUPP.thrw(input, "short buffer");
     } catch(IllegalBlockSizeException e) {
       e.printStackTrace();
       CRYPTOILLBLO.thrw(input, e);
-   // [LK] how to treat this one?
+   // TODO how to treat this one?
     } catch(InvalidAlgorithmParameterException e) {
       e.printStackTrace();
       CRYPTONOTSUPP.thrw(input, "invalid algorithm parameter");
     }
 
+    // TODO remove padding leftovers?
     return Str.get(t);
   }
 
@@ -153,6 +159,8 @@ public final class Encryption {
     } catch(InvalidKeyException e) {
       CRYPTOKEYINV.thrw(input, key);
     }
+    
+    // TODO [LK] possible encodings base64 and hex
 
     // convert to specified encoding, base64 as a standard
     Str hmac = null;
