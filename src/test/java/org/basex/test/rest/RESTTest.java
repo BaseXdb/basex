@@ -408,9 +408,7 @@ public class RESTTest {
     conn.setRequestMethod("POST");
     conn.setRequestProperty(DataText.CONTENT_TYPE, DataText.APP_QUERYXML);
     // basic authentication example
-    final String user = Text.ADMIN;
-    final String pw = Text.ADMIN;
-    final String userpw = user + ":" + pw;
+    final String userpw = Text.ADMIN + ':' + Text.ADMIN;
     final String encoded = Base64.encode(userpw);
     conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' + encoded);
     // send query

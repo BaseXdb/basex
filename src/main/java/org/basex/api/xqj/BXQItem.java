@@ -149,14 +149,18 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     try {
       return new URI(Token.string(node.base()));
     } catch(final URISyntaxException ex) {
-      throw new BXQException(ex.toString());
+      throw new BXQException(ex);
     }
   }
 
   @Override
   public Object getObject() throws XQException {
     opened();
-    return it.toJava();
+    try {
+      return it.toJava();
+    } catch(final QueryException ex) {
+      throw new BXQException(ex);
+    }
   }
 
   @Override
