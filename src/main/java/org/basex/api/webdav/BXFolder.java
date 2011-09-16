@@ -13,7 +13,7 @@ import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
-import org.basex.io.in.LookupInput;
+import org.basex.data.DataText;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
@@ -68,32 +68,6 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   @Override
   public void sendContent(final OutputStream out, final Range range,
       final Map<String, String> params, final String contentType) {
-  }
-
-  @Override
-  public BXDocument createNew(final String newName, final InputStream input,
-      final Long length, final String contentType) throws BadRequestException {
-
-    return new BXCode<BXDocument>(this) {
-      @Override
-      public BXDocument get() throws IOException {
-        s.execute(new Open(db));
-        final String doc = path.isEmpty() ? newName : path + SEP + newName;
-        // check if document with this path already exists
-        if(count(s, db, doc) == 0) {
-          final LookupInput li = new LookupInput(input);
-          if(li.lookup() == '<')
-            s.add(newName, path, li);
-          else
-            s.store(path + SEP + newName, li);
-
-          deleteDummy(s, db, path);
-        } else {
-          s.replace(doc, input);
-        }
-        return new BXDocument(db, doc, session, isRaw(s, db, doc));
-      }
-    }.eval();
   }
 
   @Override
@@ -157,6 +131,86 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
+  public BXResource createNew(final String newName, final InputStream input,
+      final Long length, final String contentType) throws BadRequestException {
+
+    return new BXCode<BXResource>(this) {
+      @Override
+      public BXDocument get() throws IOException {
+        s.execute(new Open(db));
+        final String doc = path.isEmpty() ? newName : path + SEP + newName;
+        // check if document with this path already exists
+        if(count(s, db, doc) == 0) {
+          addFile(s, newName, input, contentType);
+          deleteDummy(s, db, path);
+        } else {
+          s.replace(doc, input);
+        }
+        return new BXDocument(db, doc, session, isRaw(s, db, doc));
+      }
+    }.eval();
+  }
+
+  /**
+   * Add file content in the current folder.
+   * @param s active session
+   * @param n file name
+   * @param in file content
+   * @param mime content type
+   * @throws IOException I/O exception
+   */
+  protected void addFile(final Session s, final String n, final InputStream in,
+      final String mime)
+      throws IOException {
+
+    // decide if file will be added as an XML document or raw file
+    final String c = contentType(n);
+    if(c == null && DataText.APP_OCTET.equals(mime)) {
+      final BufferedInputStream bi = new BufferedInputStream(in);
+      bi.mark(BufferedInputStream.MAX);
+      try {
+        addXML(s, n, bi);
+      } catch(final IOException e) {
+        if(bi.pos() >= BufferedInputStream.MAX) throw e;
+        bi.reset();
+        addRaw(s, n, bi);
+      } finally {
+        if(bi.pos() < BufferedInputStream.MAX) bi.reset();
+        bi.close();
+      }
+    } else {
+      if(mime.contains("xml"))
+        addXML(s, n, in);
+      else
+        addRaw(s, n, in);
+    }
+  }
+
+  /**
+   * Add XML document in the current folder.
+   * @param s active session
+   * @param n file name
+   * @param in file content
+   * @throws IOException I/O exception
+   */
+  protected void addXML(final Session s, final String n, final InputStream in)
+      throws IOException {
+    s.add(n, path, in);
+  }
+
+  /**
+   * Add raw file in the current folder.
+   * @param s active session
+   * @param n file name
+   * @param in file content
+   * @throws IOException I/O exception
+   */
+  protected void addRaw(final Session s, final String n, final InputStream in)
+      throws IOException {
+    s.store(path + SEP + n, in);
+  }
+
+  @Override
   protected void copyToRoot(final Session s, final String n)
       throws IOException {
     // folder is copied to the root: create new database with it
@@ -199,5 +253,41 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   @Override
   public boolean isLockedOutRecursive(final Request request) {
     return false;
+  }
+}
+
+/**
+ * Simple wrapper around {@link java.io.BufferedInputStream} which provides the
+ * following extensions:<br/>
+ * 1) the current position of the input stream is accessible<br/>
+ * 2) {@link #close()} does nothing, if {@link #mark(int)} has been called, and
+ * {@link #reset()} not, yet.
+ *
+ * @author BaseX Team 2005-11, BSD License
+ * @author Dimitar Popov
+ */
+class BufferedInputStream extends java.io.BufferedInputStream {
+  /** Max number of resettable bytes. */
+  public static final int MAX = 1000000;
+
+  /**
+   * Constructor.
+   * @param input wrapped input stream.
+   */
+  public BufferedInputStream(final InputStream input) {
+    super(input);
+  }
+
+  /**
+   * Current position of the input stream.
+   * @return position
+   */
+  public int pos() {
+    return pos;
+  }
+
+  @Override
+  public void close() {
+    if(markpos < 0 || markpos == pos) close();
   }
 }
