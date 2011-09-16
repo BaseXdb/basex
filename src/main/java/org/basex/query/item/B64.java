@@ -77,7 +77,7 @@ public final class B64 extends Bin {
   }
 
   @Override
-  protected byte[] val(InputInfo ii) {
+  protected byte[] val(final InputInfo ii) {
     return val;
   }
 
@@ -87,7 +87,7 @@ public final class B64 extends Bin {
   }
 
   @Override
-  public final String toString() {
+  public String toString() {
     return Util.info("\"%\"", atom(null));
   }
 }

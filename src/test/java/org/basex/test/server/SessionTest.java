@@ -87,7 +87,7 @@ public abstract class SessionTest {
   }
 
   // [CG] Sessions: add tests for create, add and replace
-  
+
   /**
    * Stores binary content in the database.
    * @throws IOException I/O exception
@@ -133,7 +133,7 @@ public abstract class SessionTest {
   public final void retrieveNoDB() throws IOException {
     session.retrieve("X");
   }
-  
+
   /** Runs a query and retrieves the result as string.
    * @throws IOException I/O exception */
   @Test

@@ -159,7 +159,7 @@ public class BufferInput extends InputStream {
    * @return byte list
    * @throws IOException IO Exception
    */
-  private final ByteList bytes() throws IOException {
+  private ByteList bytes() throws IOException {
     final ByteList bl = new ByteList();
     for(int l; (l = read()) > 0;) bl.add(l);
     return bl;
