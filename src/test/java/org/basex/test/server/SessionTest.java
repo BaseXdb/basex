@@ -114,6 +114,16 @@ public abstract class SessionTest {
   }
 
   /**
+   * Stores binary content in the database.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void storeInvalid() throws IOException {
+    session.execute("create db " + DB);
+    session.store("..", new ArrayInput("!"));
+  }
+
+  /**
    * Retrieves binary content from the database.
    * @throws IOException I/O exception
    */

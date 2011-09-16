@@ -2,9 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.InputStream;
-
-import org.basex.io.in.ArrayInput;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -16,28 +13,28 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Hex extends Bin {
+public class Hex extends Bin {
   /**
    * Constructor.
-   * @param v value
+   * @param b bytes
    */
-  public Hex(final byte[] v) {
-    super(v, AtomType.HEX);
+  public Hex(final byte[] b) {
+    super(b, AtomType.HEX);
   }
 
   /**
    * Constructor.
-   * @param v value
+   * @param v textual representation
    * @param ii input info
    * @throws QueryException query exception
    */
   public Hex(final byte[] v, final InputInfo ii) throws QueryException {
-    super(hex(Token.trim(v), ii), AtomType.HEX);
+    super(decode(Token.trim(v), ii), AtomType.HEX);
   }
 
   /**
    * Constructor.
-   * @param b base64 data
+   * @param b binary data
    * @param ii input info
    * @throws QueryException query exception
    */
@@ -45,37 +42,43 @@ public final class Hex extends Bin {
     this(b.val(ii));
   }
 
-  @Override
-  public boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
-    // at this stage, item will always be of the same type
-    return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
-      hex(Token.trim(it.atom(ii)), ii));
+  /**
+   * Constructor.
+   * @param t data type
+   */
+  protected Hex(final AtomType t) {
+    super(null, t);
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public final byte[] atom(final InputInfo ii) throws QueryException {
     return Token.hex(val(ii), true);
   }
 
+  @Override
+  public boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
+    return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
+      decode(it.atom(ii), ii));
+  }
+
   /**
-   * Converts the hex input into a byte array.
-   * @param h hex input
+   * Converts the input into a byte array.
+   * @param h input
    * @param ii input info
    * @return byte array
    * @throws QueryException query exception
    */
-  private static byte[] hex(final byte[] h, final InputInfo ii)
+  private static byte[] decode(final byte[] h, final InputInfo ii)
       throws QueryException {
 
     if((h.length & 1) != 0) throw FUNCAST.thrw(ii, AtomType.HEX, (char) h[0]);
     final int l = h.length >>> 1;
-    final byte[] val = new byte[l];
-
+    final byte[] v = new byte[l];
     for(int i = 0; i < l; ++i) {
-      val[i] = (byte) ((hex(h[i << 1], ii) << 4) + hex(h[(i << 1) + 1], ii));
+      v[i] = (byte) ((dec(h[i << 1], ii) << 4) + dec(h[(i << 1) + 1], ii));
     }
-    return val;
+    return v;
   }
 
   /**
@@ -85,26 +88,16 @@ public final class Hex extends Bin {
    * @return byte value
    * @throws QueryException query exception
    */
-  private static int hex(final byte b, final InputInfo ii)
+  private static int dec(final byte b, final InputInfo ii)
       throws QueryException {
 
     if(b >= '0' && b <= '9') return b - '0';
-    if(b >= 'a' && b <= 'f' || b >= 'A' && b <= 'F') return (b & 15) + 9;
+    if(b >= 'a' && b <= 'f' || b >= 'A' && b <= 'F') return (b & 0x0F) + 9;
     throw FUNCAST.thrw(ii, AtomType.HEX, (char) b);
   }
 
   @Override
-  protected byte[] val(final InputInfo ii) {
-    return val;
-  }
-
-  @Override
-  public InputStream input() {
-    return new ArrayInput(val);
-  }
-
-  @Override
   public String toString() {
-    return Util.info("\"%\"", atom(null));
+    return Util.info("\"%\"", Token.hex(val, true));
   }
 }

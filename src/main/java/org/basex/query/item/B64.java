@@ -1,10 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-
-import java.io.InputStream;
-
-import org.basex.io.in.ArrayInput;
 import org.basex.query.QueryException;
 import org.basex.util.Base64;
 import org.basex.util.InputInfo;
@@ -20,20 +16,20 @@ import org.basex.util.Util;
 public final class B64 extends Bin {
   /**
    * Constructor.
-   * @param d textual data
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public B64(final byte[] d, final InputInfo ii) throws QueryException {
-    super(decode(d, ii), AtomType.B64);
-  }
-
-  /**
-   * Constructor.
    * @param d binary data
    */
   public B64(final byte[] d) {
     super(d, AtomType.B64);
+  }
+
+  /**
+   * Constructor.
+   * @param v textual representation
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  public B64(final byte[] v, final InputInfo ii) throws QueryException {
+    super(decode(v, ii), AtomType.B64);
   }
 
   /**
@@ -47,20 +43,19 @@ public final class B64 extends Bin {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
-    // at this stage, item will always be of the same type
-    return Token.eq(val, it instanceof Bin ? ((Bin) it).val(ii) :
-      decode(it.atom(ii), ii));
-  }
-
-  @Override
   public byte[] atom(final InputInfo ii) {
     return Base64.encode(val);
   }
 
+  @Override
+  public boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
+    return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
+      decode(it.atom(ii), ii));
+  }
+
   /**
-   * Constructor.
+   * Converts the input into a byte array.
    * @param d textual data
    * @param ii input info
    * @return decoded string
@@ -74,16 +69,6 @@ public final class B64 extends Bin {
       final String chars = ex.getMessage().replaceAll(".*?: |\\.$", "");
       throw FUNCAST.thrw(ii, AtomType.B64, chars);
     }
-  }
-
-  @Override
-  protected byte[] val(final InputInfo ii) {
-    return val;
-  }
-
-  @Override
-  public InputStream input() {
-    return new ArrayInput(val);
   }
 
   @Override
