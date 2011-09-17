@@ -3,7 +3,6 @@ package org.basex.api.rest;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import org.basex.core.Context;
 import org.basex.data.DataText;
 import org.basex.data.Result;
 import org.basex.io.IOContent;
+import org.basex.io.in.BufferInput;
 import org.basex.io.in.TextInput;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
@@ -43,7 +43,7 @@ public class RESTPost extends RESTCode {
 
     if(DataText.APP_QUERYXML.equals(ctx.req.getContentType())) {
       // perform queries
-      final BufferedInputStream bis = new BufferedInputStream(is);
+      final BufferInput bis = new BufferInput(is);
       final ByteList bl = new ByteList();
       for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
       final IOContent cont = new IOContent(bl.toArray());
