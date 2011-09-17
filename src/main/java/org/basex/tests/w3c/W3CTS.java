@@ -367,7 +367,7 @@ public abstract class W3CTS {
       for(int o = 0; o < expOut.size(); ++o) {
         final String resFile = string(data.atom(expOut.list[o]));
         final IOFile exp = new IOFile(expected + pth + resFile);
-        result.add(read(exp));
+        result.add(read(exp).replaceAll("\r\n|\r|\n", Prop.NL));
       }
 
       final Nodes cmpFiles = nodes("*:output-file/@compare", state);
@@ -428,9 +428,7 @@ public abstract class W3CTS {
           inspect |= s < cmpFiles.list.length &&
             eq(data.atom(cmpFiles.list[s]), INSPECT);
 
-          // normalize newlines
-          final String expect =
-              string(result.get(s)).replaceAll("\r\n|\r|\n", Prop.NL);
+          final String expect = string(result.get(s));
           final String actual = ao.toString();
           if(expect.equals(actual)) break;
 
