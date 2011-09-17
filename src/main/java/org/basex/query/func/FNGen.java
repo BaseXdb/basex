@@ -29,6 +29,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 import org.basex.util.list.ByteList;
 
 /**
@@ -204,10 +205,19 @@ public final class FNGen extends FuncCall {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     try {
-      byte[] txt = TextInput.content(io, enc).finish();
-      if(contains(txt, '\r')) txt = contains(txt, '\n') ?
-          delete(txt, '\r') : replace(txt, '\r', '\n');
-      return Str.get(txt);
+      final TokenBuilder tb = TextInput.content(io, enc);
+      final ByteList bl = new ByteList();
+      final int ts = tb.size();
+      for(int t = 0; t < ts; t++) {
+        int c = tb.get(t);
+        if(c == '\r') {
+          // skip carriage returns followed be newlines
+          if(t + 1 < ts && tb.get(t + 1) == '\n') continue;
+          c = '\n';
+        }
+        bl.add(c);
+      }
+      return Str.get(bl.toArray());
     } catch(final IOException ex) {
       throw WRONGINPUT.thrw(input, io, ex);
     }

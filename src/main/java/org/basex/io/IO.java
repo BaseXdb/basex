@@ -63,7 +63,7 @@ public abstract class IO {
   /** Offset for compressing texts (see bit layout in {@link Data} class). */
   public static final long OFFCOMP = 0x4000000000L;
 
-  /** File path and name. */
+  /** File path. The path uses forward slashes, no matter which OS is used. */
   protected String path;
   /** File contents. */
   protected byte[] cont;
@@ -243,6 +243,7 @@ public abstract class IO {
 
   /**
    * Returns the path.
+   * The path uses forward slashes, no matter which OS is used.
    * @return path
    */
   public final String path() {
