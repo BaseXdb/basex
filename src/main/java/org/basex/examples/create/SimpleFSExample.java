@@ -36,7 +36,9 @@ public final class SimpleFSExample {
     final String name = "fsexample";
 
     final Parser parser = new SimpleFSParser(path);
-    new CreateDB(name, path, parser).execute(ctx);
+    final CreateDB create = new CreateDB(name, path);
+    create.setParser(parser);
+    create.execute(ctx);
 
     System.out.println("\n* Number of created elements:");
 
