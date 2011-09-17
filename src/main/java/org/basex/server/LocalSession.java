@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
@@ -17,7 +16,6 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Store;
-import org.basex.io.in.LookupInput;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -85,28 +83,38 @@ public final class LocalSession extends Session {
   @Override
   public void create(final String name, final InputStream input)
     throws IOException {
-
-    final LookupInput lis = new LookupInput(input);
-    info = lis.lookup() != -1 ? CreateDB.create(name, lis, ctx) :
-      CreateDB.create(name, Parser.emptyParser(), ctx);
+    execute(new CreateDB(name), input);
   }
 
   @Override
   public void add(final String name, final String target,
       final InputStream input) throws IOException {
-    execute(new Add(name, target).input(input));
+    execute(new Add(null, name, target), input);
   }
 
   @Override
   public void replace(final String path, final InputStream input)
       throws IOException {
-    execute(new Replace(path).input(input));
+    execute(new Replace(path), input);
   }
 
   @Override
   public void store(final String target, final InputStream input)
       throws IOException {
-    execute(new Store(target).input(input));
+    execute(new Store(target), input);
+  }
+
+  /**
+   * Executes a command, passing the specified input.
+   * @param cmd command
+   * @param input input stream
+   * @throws BaseXException database exception
+   */
+  private void execute(final Command cmd, final InputStream input)
+      throws BaseXException {
+    cmd.setInput(input);
+    cmd.execute(ctx);
+    info = cmd.info();
   }
 
   @Override

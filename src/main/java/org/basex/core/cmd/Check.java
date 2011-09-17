@@ -1,7 +1,11 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import org.basex.build.DirParser;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -66,11 +70,14 @@ public final class Check extends Command {
       if(found) throw new IOException(Util.info(PERMNO, CmdPerm.READ));
     }
 
-    // if found, an existing database is opened
-    return MetaData.found(path, name, ctx.mprop) ? Open.open(name, ctx) :
-      // if flag is set to true, a new database instance is created on disk
-      ctx.prop.is(Prop.FORCECREATE) ? CreateDB.xml(name, io, ctx) :
-        // otherwise, a main memory instance is created
-        CreateDB.xml(io, ctx);
+    // open database if it already exists
+    if(MetaData.found(path, name, ctx.mprop)) return Open.open(name, ctx);
+
+    // if force flag is set to false, create a main memory instance
+    if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(io, ctx);
+
+    // otherwise, create a persistent database instance
+    if(!io.exists()) throw new FileNotFoundException(Util.info(FILEWHICH, io));
+    return CreateDB.create(name, new DirParser(io, ctx.prop), ctx);
   }
 }

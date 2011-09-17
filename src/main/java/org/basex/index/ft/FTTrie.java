@@ -62,7 +62,7 @@ final class FTTrie extends FTIndex {
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   protected FTTrie(final Data d) throws IOException {
     super(d);

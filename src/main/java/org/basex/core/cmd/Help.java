@@ -31,11 +31,11 @@ public final class Help extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    final String in = args[0];
+    final String key = args[0];
     final boolean wiki = args[1] != null;
 
-    if(in != null) {
-      final Cmd cmd = getOption(in, Cmd.class);
+    if(key != null) {
+      final Cmd cmd = getOption(key, Cmd.class);
       if(cmd == null) return error(CMDUNKNOWN, this);
       out.print(cmd.help(true, wiki));
     } else {

@@ -19,7 +19,7 @@ public final class DataInput extends BufferInput {
   /**
    * Constructor.
    * @param file the file to be read
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public DataInput(final File file) throws IOException {
     super(file);
@@ -28,7 +28,7 @@ public final class DataInput extends BufferInput {
   /**
    * Reads a boolean value.
    * @return boolean value
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public boolean readBool() throws IOException {
     return read() == 1;
@@ -37,7 +37,7 @@ public final class DataInput extends BufferInput {
   /**
    * Reads a token.
    * @return byte array
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public byte[] readToken() throws IOException {
     final int l = readNum();
@@ -50,7 +50,7 @@ public final class DataInput extends BufferInput {
   /**
    * Reads a double value.
    * @return byte array
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public double readDouble() throws IOException {
     return Token.toDouble(readToken());
@@ -59,7 +59,7 @@ public final class DataInput extends BufferInput {
   /**
    * Reads a distance-mapped integer array.
    * @return integer array
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public IntList readDiffs() throws IOException {
     final int[] array = new int[readNum()];
@@ -72,7 +72,7 @@ public final class DataInput extends BufferInput {
   /**
    * Reads a compressed integer array.
    * @return integer array
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public int[] readNums() throws IOException {
     return readNums(readNum());
@@ -82,7 +82,7 @@ public final class DataInput extends BufferInput {
    * Reads compressed integer values of the specified size.
    * @param s array size
    * @return integer array
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public int[] readNums(final int s) throws IOException {
     final int[] array = new int[s];
@@ -93,7 +93,7 @@ public final class DataInput extends BufferInput {
   /**
    * Reads a token array.
    * @return double array
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public byte[][] readTokens() throws IOException {
     final int l = readNum();
@@ -105,7 +105,7 @@ public final class DataInput extends BufferInput {
   /**
    * Reads a compressed integer value; see {@link Num} for more.
    * @return read value
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public int readNum() throws IOException {
     final int v = read();
@@ -126,7 +126,7 @@ public final class DataInput extends BufferInput {
    * Reads an array of long values.
    * @param s array size
    * @return array of longs
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public long[] readLongs(final int s) throws IOException {
     final long[] array = new long[s];
@@ -137,7 +137,7 @@ public final class DataInput extends BufferInput {
   /**
    * Read a long value.
    * @return read value
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public long read8() throws IOException {
     return ((long) read() << 56) + ((long) (read() & 255) << 48)

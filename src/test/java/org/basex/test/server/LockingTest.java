@@ -29,8 +29,6 @@ import org.junit.Test;
 public final class LockingTest {
   /** Positions to check in the query. */
   private static final int POS = 10;
-  /** Number of performance tests. */
-  private static final int TESTS = 5;
 
   /** Test name. */
   static final String NAME = Util.name(LockingTest.class);
@@ -75,7 +73,6 @@ public final class LockingTest {
     server = new BaseXServer("-z");
     session1 = newSession();
     session2 = newSession();
-    session1.execute(new CreateDB(NAME, FILE));
   }
 
   /**
@@ -87,7 +84,6 @@ public final class LockingTest {
     session1.close();
     session2.execute(new DropDB(NAME));
     session2.close();
-    // stop server instance
     server.stop();
   }
 
@@ -171,19 +167,6 @@ public final class LockingTest {
   }
 
   /**
-   * Concurrent query test.
-   * @throws Exception exception
-   */
-  @Test
-  public void efficiencyTest() throws Exception {
-    final Client[] cl = new Client[TESTS];
-    for(int i = 0; i < TESTS; ++i) cl[i] = new Client();
-    for(final Client c : cl) c.start();
-    for(final Client c : cl) c.join();
-    for(final Client c : cl) c.session.close();
-  }
-
-  /**
    * Create db method test.
    * @throws IOException I/O exception
    */
@@ -256,25 +239,6 @@ public final class LockingTest {
     } catch(final IOException ex) {
       fail(Util.message(ex));
       return null;
-    }
-  }
-
-  /** Single client. */
-  private static final class Client extends Thread {
-    /** Client session. */
-    final ClientSession session;
-
-    /**
-     * Default constructor.
-     * @throws IOException exception
-     */
-    Client() throws IOException {
-      session = newSession();
-    }
-
-    @Override
-    public void run() {
-      assertEquals("192000", execute(new XQuery(PERF), session));
     }
   }
 }

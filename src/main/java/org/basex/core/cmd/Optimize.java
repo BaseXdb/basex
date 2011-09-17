@@ -67,7 +67,7 @@ public final class Optimize extends ACreate {
    * Optimize data structures.
    * @param d data
    * @param p database properties
-   * @throws IOException IO exception during index rebuild
+   * @throws IOException I/O Exception during index rebuild
    */
   public static void optimize(final Data d, final Prop p) throws IOException {
     optimize(d, p, null);
@@ -78,7 +78,7 @@ public final class Optimize extends ACreate {
    * @param d data
    * @param p database properties
    * @param c calling command (can be null)
-   * @throws IOException IO exception during index rebuild
+   * @throws IOException I/O Exception during index rebuild
    */
   private static void optimize(final Data d, final Prop p, final Optimize c)
       throws IOException {

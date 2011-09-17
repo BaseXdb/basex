@@ -109,7 +109,7 @@ public final class ResponseHandler {
    * @param prop query context properties
    * @param ii input info
    * @return result sequence of <http:response/> and content items
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   public static ValueIter getResponse(final HttpURLConnection conn,
@@ -159,7 +159,7 @@ public final class ResponseHandler {
    * attributes of <http:response/>.
    * @param conn http connection
    * @return node cache with attributes
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static NodeCache extractAttrs(final HttpURLConnection conn)
       throws IOException {
@@ -210,7 +210,7 @@ public final class ResponseHandler {
    * @param io connection input stream
    * @param cs response content charset
    * @return payload as byte array
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static byte[] extractPayload(final InputStream io, final String cs)
     throws IOException {
@@ -233,7 +233,7 @@ public final class ResponseHandler {
    * @param prop context properties
    * @param ii input info
    * @return interpreted payload
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static Item interpretPayload(final byte[] p, final byte[] c,
@@ -259,7 +259,7 @@ public final class ResponseHandler {
    * @param prop context properties
    * @param ii input info
    * @return array list will all parts
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static NodeCache extractParts(final InputStream io,
@@ -299,7 +299,7 @@ public final class ResponseHandler {
    * @param prop context properties
    * @param ii input info
    * @return part
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static FElem extractNextPart(final InputStream io,
@@ -362,7 +362,7 @@ public final class ResponseHandler {
    * Reads a line of HTTP multipart content.
    * @param in connection input stream
    * @return line
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static byte[] readLine(final InputStream in) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
@@ -396,7 +396,7 @@ public final class ResponseHandler {
    * @param end closing boundary
    * @param cs part content encoding
    * @return payload part content
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static byte[] extractPartPayload(final InputStream io,
       final byte[] sep, final byte[] end, final String cs) throws IOException {

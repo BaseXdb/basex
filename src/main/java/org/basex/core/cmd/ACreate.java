@@ -120,17 +120,6 @@ public abstract class ACreate extends Command {
   }
 
   /**
-   * Runs the specified command and adopts its info message.
-   * @param cmd command
-   * @return success flag
-   */
-  protected boolean run(final Command cmd) {
-    final boolean ok = cmd.run(context);
-    error(cmd.info());
-    return ok;
-  }
-
-  /**
    * Builds the specified index.
    * @param type index to be built
    * @param data data reference

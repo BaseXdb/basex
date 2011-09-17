@@ -37,7 +37,7 @@ public abstract class IndexBuilder extends Progress {
   /**
    * Builds the index structure and returns an index instance.
    * @return index instance
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public abstract Index build() throws IOException;
 

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.basex.io.IOFile;
-import org.basex.io.in.BufferInput;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -54,7 +53,7 @@ public final class Raw extends Hex {
 
   @Override
   public InputStream input() throws IOException {
-    return new BufferInput(file.file());
+    return file.buffer();
   }
 
   @Override

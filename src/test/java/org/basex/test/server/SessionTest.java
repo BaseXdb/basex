@@ -86,7 +86,104 @@ public abstract class SessionTest {
     session.execute("1,<a/>+''");
   }
 
-  // [CG] Sessions: add tests for create, add and replace
+  /**
+   * Creates new databases.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void create() throws IOException {
+    session.create(DB, new ArrayInput(""));
+    check("", session.query("doc('" + DB + "')").execute());
+    session.create(DB, new ArrayInput("<X/>"));
+    check("<X/>", session.query("doc('" + DB + "')").execute());
+  }
+
+  /**
+   * Stops because of invalid input.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void createErr() throws IOException {
+    session.create(DB, new ArrayInput("<"));
+  }
+
+  /**
+   * Stops because of an invalid database name.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void createNameErr() throws IOException {
+    session.create("", new ArrayInput(""));
+  }
+
+  /**
+   * Adds documents to a database.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void add() throws IOException {
+    session.execute("create db " + DB);
+    session.add(DB, "", new ArrayInput("<X/>"));
+    check("1", session.query("count(db:open('" + DB + "'))").execute());
+    for(int i = 0; i < 9; i++) session.add(DB, "", new ArrayInput("<X/>"));
+    check("10", session.query("count(db:open('" + DB + "'))").execute());
+  }
+
+  /**
+   * Adds a file with an invalid file name.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void addNameErr() throws IOException {
+    session.execute("create db " + DB);
+    session.add("", "", new ArrayInput("<X/>"));
+  }
+
+  /**
+   * Adds a file with missing input.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void addNoInput() throws IOException {
+    session.execute("create db " + DB);
+    session.add("", "", new ArrayInput(""));
+  }
+
+  /**
+   * Replaces documents in a database.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void replace() throws IOException {
+    session.execute("create db " + DB);
+    check("0", session.query("count(db:open('" + DB + "'))").execute());
+    session.replace(DB, new ArrayInput("<X/>"));
+    check("1", session.query("count(db:open('" + DB + "'))").execute());
+    session.replace(DB + "2", new ArrayInput("<X/>"));
+    check("2", session.query("count(db:open('" + DB + "'))").execute());
+    session.replace(DB + "2", new ArrayInput("<X/>"));
+    check("2", session.query("count(db:open('" + DB + "'))").execute());
+  }
+
+  /**
+   * Replaces a file with an invalid file name.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void replaceNameErr() throws IOException {
+    session.execute("create db " + DB);
+    session.replace("", new ArrayInput("<X/>"));
+  }
+
+  /**
+   * Adds a file with missing input.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void replaceNoInput() throws IOException {
+    session.execute("create db " + DB);
+    session.replace("", new ArrayInput(""));
+  }
 
   /**
    * Stores binary content in the database.
@@ -292,8 +389,7 @@ public abstract class SessionTest {
    * @throws IOException expected exception*/
   @Test(expected = org.basex.core.BaseXException.class)
   public void queryError() throws IOException {
-    final Query query = session.query("(");
-    query.next();
+    session.query("(").next();
   }
 
   /** Runs an erroneous query.

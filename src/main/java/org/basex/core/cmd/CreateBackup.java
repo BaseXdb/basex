@@ -65,12 +65,12 @@ public final class CreateBackup extends Command {
    */
   private boolean backup(final String db) {
     try {
-      final File in = mprop.dbpath(db);
+      final File path = mprop.dbpath(db);
       final IOFile file = new IOFile(mprop.dbpath(db + "-" +
           DATE.format(new Date()) + IO.ZIPSUFFIX));
 
       final Zip zip = progress(new Zip(file));
-      zip.zip(in);
+      zip.zip(path);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

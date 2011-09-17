@@ -290,7 +290,7 @@ public final class MetaData {
   /**
    * Writes the meta data to the specified output stream.
    * @param out output stream
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTR,    STORAGE);

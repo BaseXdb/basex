@@ -27,36 +27,27 @@ public class BufferInput extends InputStream {
   /** UTF8 cache. */
   private final byte[] cache = new byte[4];
   /** Byte buffer. */
-  protected byte[] buffer;
+  protected final byte[] buffer;
   /** Current buffer position. */
   protected int pos;
-  /** Input length. */
-  protected long length;
-
   /** Current buffer size. */
-  private int size;
-  /** Number of read bytes. */
-  private int len;
+  protected int size;
+
   /** Reference to the data input stream. */
   private InputStream in;
   /** Default encoding for text files. */
   private String enc = UTF8;
   /** Charset decoder. */
   private CharsetDecoder csd;
+  /** Total input length. */
+  private long length;
+  /** Number of read bytes. */
+  private int read;
 
   /**
    * Initializes the file reader.
    * @param file the file to be read
-   * @throws IOException IO Exception
-   */
-  public BufferInput(final String file) throws IOException {
-    this(new File(file));
-  }
-
-  /**
-   * Initializes the file reader.
-   * @param file the file to be read
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public BufferInput(final File file) throws IOException {
     this(new FileInputStream(file));
@@ -66,12 +57,10 @@ public class BufferInput extends InputStream {
   /**
    * Initializes the file reader.
    * @param is input stream
-   * @throws IOException IO Exception
    */
-  public BufferInput(final InputStream is) throws IOException {
-    this(new byte[IO.BLOCKSIZE]);
+  public BufferInput(final InputStream is) {
+    buffer = new byte[IO.BLOCKSIZE];
     in = is;
-    next();
   }
 
   /**
@@ -80,14 +69,18 @@ public class BufferInput extends InputStream {
    */
   protected BufferInput(final byte[] buf) {
     buffer = buf;
-    length = buf.length;
+    size = buf.length;
+    length = size;
   }
 
   /**
    * Determines the file encoding.
    * @return guessed encoding
+   * @throws IOException I/O exception
    */
-  public final String encoding() {
+  public final String encoding() throws IOException {
+    // cache first bytes
+    if(size == 0) next();
     final byte a = length > 0 ? buffer[0] : 0;
     final byte b = length > 1 ? buffer[1] : 0;
     final byte c = length > 2 ? buffer[2] : 0;
@@ -110,7 +103,7 @@ public class BufferInput extends InputStream {
   /**
    * Sets a new encoding.
    * @param encoding encoding
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public final void encoding(final String encoding) throws IOException {
     try {
@@ -139,7 +132,7 @@ public class BufferInput extends InputStream {
   /**
    * Reads a string from the input stream, suffixed by a {@code 0} byte.
    * @return string
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public final String readString() throws IOException {
     return bytes().toString();
@@ -148,7 +141,7 @@ public class BufferInput extends InputStream {
   /**
    * Reads a bytes array from the input stream, suffixed by a {@code 0} byte.
    * @return token
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public final byte[] readBytes() throws IOException {
     return bytes().toArray();
@@ -157,7 +150,7 @@ public class BufferInput extends InputStream {
   /**
    * Reads bytes from the input stream, suffixed by a {@code 0} byte.
    * @return byte list
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   private ByteList bytes() throws IOException {
     final ByteList bl = new ByteList();
@@ -171,7 +164,7 @@ public class BufferInput extends InputStream {
    */
   private void next() throws IOException {
     pos = 0;
-    len += size;
+    read += size;
     size = in.read(buffer);
   }
 
@@ -225,7 +218,7 @@ public class BufferInput extends InputStream {
    * @return read bytes
    */
   final int size() {
-    return len + pos;
+    return read + pos;
   }
 
   /**

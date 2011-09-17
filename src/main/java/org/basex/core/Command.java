@@ -46,7 +46,7 @@ public abstract class Command extends Progress {
   /** Output stream. */
   protected PrintOutput out;
   /** Optional input source. */
-  protected InputSource is;
+  protected InputSource in;
   /** Database properties. */
   protected Prop prop;
   /** Main properties. */
@@ -92,21 +92,18 @@ public abstract class Command extends Progress {
 
   /**
    * Attaches an input stream.
-   * @param input input stream
-   * @return self reference
+   * @param is input stream
    */
-  public Command input(final InputStream input) {
-    return input(new InputSource(input));
+  public void setInput(final InputStream is) {
+    setInput(new InputSource(is));
   }
 
   /**
    * Attaches an input source.
-   * @param input input source
-   * @return self reference
+   * @param is input source
    */
-  public Command input(final InputSource input) {
-    is = input;
-    return this;
+  public void setInput(final InputSource is) {
+    in = is;
   }
 
   /**
@@ -205,7 +202,7 @@ public abstract class Command extends Progress {
   // PROTECTED METHODS ========================================================
 
   /**
-   * Executes the command and serializes the result.
+   * Executes the command and serializes the result (internal call).
    * @return success of operation
    * @throws IOException I/O exception
    */

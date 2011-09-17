@@ -191,7 +191,7 @@ public final class IOFile extends IO {
   @Override
   public BufferInput buffer() throws IOException {
     // return file stream
-    if(is == null) return new BufferInput(path);
+    if(is == null) return new BufferInput(file);
     // return input stream
     final BufferInput in = new BufferInput(is);
     if(zip != null && zip.getSize() != -1) in.length(zip.getSize());

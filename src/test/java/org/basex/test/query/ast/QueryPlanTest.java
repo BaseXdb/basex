@@ -9,9 +9,9 @@ import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
 import org.basex.io.serial.BuilderSerializer;
 import org.basex.query.QueryProcessor;
+import org.basex.query.QueryText;
 
 import static org.junit.Assert.*;
-import static org.basex.util.Token.token;
 import static org.basex.core.Prop.NL;
 
 /**
@@ -37,10 +37,10 @@ public abstract class QueryPlanTest {
     try {
       // parse compiled query plan
       qp.compile();
-      final Data plan = CreateDB.xml(new Parser("") {
+      final Data plan = CreateDB.mainMem(new Parser("") {
         @Override
         public void parse(final Builder build) throws IOException {
-          build.startDoc(token("QueryPlan"));
+          build.startDoc(QueryText.PLAN);
           qp.plan(new BuilderSerializer(build));
           build.endDoc();
         }

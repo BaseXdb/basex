@@ -25,12 +25,12 @@ public final class ArrayInput extends BufferInput {
    * @param input input bytes
    */
   public ArrayInput(final String input) {
-    super(Token.token(input));
+    this(Token.token(input));
   }
 
   @Override
   public int read() {
-    return pos < length ? buffer[pos++] & 0xFF : -1;
+    return pos < size ? buffer[pos++] & 0xFF : -1;
   }
 
   @Override

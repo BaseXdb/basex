@@ -8,11 +8,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 
-import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
-import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.User;
@@ -23,7 +21,6 @@ import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Store;
 import org.basex.io.in.BufferInput;
-import org.basex.io.in.LookupInput;
 import org.basex.io.in.DecodingInput;
 import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
@@ -335,20 +332,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void create() throws IOException {
-    final String name = in.readString();
-    log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
-
-    final DecodingInput di = new DecodingInput(in);
-    final LookupInput lis = new LookupInput(di);
-    try {
-      final String info = lis.lookup() == -1 ?
-        CreateDB.create(name, Parser.emptyParser(), context) :
-        CreateDB.create(name, lis, context);
-      success(info);
-    } catch(final BaseXException ex) {
-      di.flush();
-      error(ex.getMessage());
-    }
+    execute(new CreateDB(in.readString()));
   }
 
   /**
@@ -381,10 +365,10 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void execute(final Command cmd) throws IOException {
-    final DecodingInput di = new DecodingInput(in);
-    cmd.input(di);
     log.write(this, cmd + "[...]");
+    final DecodingInput di = new DecodingInput(in);
     try {
+      cmd.setInput(di);
       cmd.execute(context);
       success(cmd.info());
     } catch(final BaseXException ex) {

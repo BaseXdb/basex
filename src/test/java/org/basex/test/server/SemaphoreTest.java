@@ -77,14 +77,15 @@ public final class SemaphoreTest {
   }
 
   /** Efficiency test.
-   * @throws InterruptedException exception
+   * @throws Exception exception
    */
   @Test
-  public void runClients() throws InterruptedException {
+  public void runClients() throws Exception {
     final Client[] cl = new Client[TESTS];
     for(int i = 0; i < TESTS; ++i) cl[i] = new Client();
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
+    for(final Client c : cl) c.session.close();
   }
 
   /**
@@ -114,7 +115,7 @@ public final class SemaphoreTest {
   /** Single client. */
   static class Client extends Thread {
     /** Client session. */
-    private ClientSession session;
+    ClientSession session;
 
     /**
      * Default constructor.

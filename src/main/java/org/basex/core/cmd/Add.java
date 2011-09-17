@@ -66,7 +66,7 @@ public final class Add extends ACreate {
     if(!target.isEmpty()) target += '/';
 
     Parser parser;
-    if(is == null) {
+    if(in == null) {
       final String input = args[2];
       final IO io = IO.get(input);
       if(!io.exists()) return error(FILEWHICH, io);
@@ -81,14 +81,15 @@ public final class Add extends ACreate {
       }
       parser = new DirParser(io, target, prop);
     } else {
-      final SAXSource sax = new SAXSource(is);
+      final SAXSource sax = new SAXSource(in);
       parser = new SAXWrapper(sax, name, target, context.prop);
     }
 
     final String input = name == null ? parser.src.path() : name;
-    // ensure that the name contains no slashes and trailing dots
     final String nm = name == null ? parser.src.name() : name;
-    if(nm.endsWith(".") || nm.indexOf('/') != -1) return error(NAMEINVALID, nm);
+    // ensure that the name contains no slashes and trailing dots
+    if(nm.isEmpty() || nm.endsWith(".") || nm.indexOf('/') != -1)
+      return error(NAMEINVALID, nm);
 
     final String path = target + (target.isEmpty() ? "/" : "") + nm;
     // ensure that the path is valid

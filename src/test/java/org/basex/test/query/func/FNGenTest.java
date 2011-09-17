@@ -31,7 +31,7 @@ public final class FNGenTest extends AdvancedQueryTest {
     final String fun = check(Function.PARSETXT);
     contains(fun + "('" + TEXT + "')", "?&gt;&lt;html");
     contains(fun + "('" + TEXT + "', 'US-ASCII')", "?&gt;&lt;html");
-    IOFile io = new IOFile(Prop.TMP, NAME);
+    final IOFile io = new IOFile(Prop.TMP, NAME);
     io.write(token("A\r\nB"));
     assertEquals(query("string-length(" + fun + "('" + io.path() + "'))"), "3");
     io.write(token("A\nB"));

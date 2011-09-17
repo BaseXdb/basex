@@ -63,7 +63,7 @@ public final class Open extends Command {
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static synchronized Data open(final String name, final Context ctx)
+  public static Data open(final String name, final Context ctx)
       throws IOException {
 
     Data data = ctx.pin(name);

@@ -126,8 +126,9 @@ public final class TextInput {
    * @param val values to insert
    * @param s add spaces
    * @return true if everything went alright
+   * @throws IOException I/O exception
    */
-  public boolean add(final byte[] val, final boolean s) {
+  public boolean add(final byte[] val, final boolean s) throws IOException {
     if(s) add(new ArrayInput(Token.SPACE));
     add(new ArrayInput(val));
     if(s) add(new ArrayInput(Token.SPACE));
@@ -137,8 +138,9 @@ public final class TextInput {
   /**
    * Inserts a cached input buffer.
    * @param ci buffer to be added
+   * @throws IOException I/O exception
    */
-  private void add(final ArrayInput ci) {
+  private void add(final ArrayInput ci) throws IOException {
     if(++ip == in.length) in = Arrays.copyOf(in, ip << 1);
     in[ip] = ci;
     ci.encoding();

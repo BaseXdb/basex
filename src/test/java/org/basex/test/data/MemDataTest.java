@@ -34,7 +34,7 @@ public final class MemDataTest {
    */
   @Before
   public void setUp() throws IOException {
-    data = CreateDB.xml(new IOContent(XML), CTX);
+    data = CreateDB.mainMem(new IOContent(XML), CTX);
     CTX.openDB(data);
   }
 

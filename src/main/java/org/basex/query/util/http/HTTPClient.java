@@ -165,7 +165,7 @@ public final class HTTPClient {
    * @param ii input info
    * @return HHTP connection
    * @throws QueryException query exception
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
   private static HttpURLConnection openConnection(final String dest,
@@ -323,7 +323,7 @@ public final class HTTPClient {
    * @param payload payload
    * @param out connection output stream
    * @param ii input info
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static void writeBase64(final ItemCache payload,
@@ -345,7 +345,7 @@ public final class HTTPClient {
    * @param payload payload
    * @param out connection output stream
    * @param ii input info
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static void writeHex(final ItemCache payload, final OutputStream out,
@@ -367,7 +367,7 @@ public final class HTTPClient {
    * @param payloadAttrs payload attributes
    * @param method serialization method
    * @param out connection output stream
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static void write(final ItemCache payload,
       final TokenMap payloadAttrs, final byte[] method, final OutputStream out)
@@ -395,7 +395,7 @@ public final class HTTPClient {
    * Reads the content of the linked resource.
    * @param src resource link
    * @param out output stream
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static void writeResource(final byte[] src, final OutputStream out)
       throws IOException {

@@ -110,7 +110,7 @@ public final class CSVParser extends SingleParser {
     builder.startElem(CSV, atts);
 
     final TokenBuilder tb = new TokenBuilder();
-    final BufferInput bi = new BufferInput(src.path());
+    final BufferInput bi = src.buffer();
     bi.encoding(encoding);
 
     boolean quoted = false, open = true;
