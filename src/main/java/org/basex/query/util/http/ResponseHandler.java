@@ -272,9 +272,8 @@ public final class ResponseHandler {
       // RFC 1341: Preamble shall be ignored -> read till 1st boundary
       while(next != null && !eq(sep, next))
         next = readLine(io);
-      if(next == null) {
-        REQINV.thrw(ii, "No body specified for http:part");
-      }
+      if(next == null) REQINV.thrw(ii, "No body specified for http:part");
+
       final byte[] end = concat(sep, token("--"));
       FElem nextPart = extractNextPart(io, statusOnly, payloads, sep, end,
           prop, ii);
@@ -307,6 +306,7 @@ public final class ResponseHandler {
       final boolean statusOnly, final ItemCache payloads, final byte[] sep,
       final byte[] end, final Prop prop, final InputInfo ii)
       throws IOException, QueryException {
+
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
     byte[] partContType = TXT_PLAIN;
@@ -394,13 +394,13 @@ public final class ResponseHandler {
    * @param io connection input stream
    * @param sep separation boundary
    * @param end closing boundary
-   * @param charset part content encoding
+   * @param cs part content encoding
    * @return payload part content
    * @throws IOException IO exception
    */
   private static byte[] extractPartPayload(final InputStream io,
-      final byte[] sep, final byte[] end, final String charset)
-      throws IOException {
+      final byte[] sep, final byte[] end, final String cs) throws IOException {
+
     final ByteList bl = new ByteList();
     while(true) {
       final byte[] next = readLine(io);
@@ -412,7 +412,7 @@ public final class ResponseHandler {
       }
       bl.add(next).add('\n');
     }
-    return TextInput.content(new IOContent(bl.toArray()), charset).finish();
+    return TextInput.content(new IOContent(bl.toArray()), cs).finish();
   }
 
   /**
@@ -454,8 +454,8 @@ public final class ResponseHandler {
   private static String extractCharset(final String c) {
     // content type is unknown
     if(c == null) return null;
-    final int index = c.toLowerCase().lastIndexOf("charset=");
-    if(index == -1) return null;
-    return c.substring(index + 8); // 8 for "charset="
+    final String cs = "charset=";
+    final int i = c.toLowerCase().lastIndexOf(cs);
+    return i == -1 ? null : c.substring(i + cs.length());
   }
 }

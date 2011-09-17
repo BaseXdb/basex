@@ -370,7 +370,7 @@ public final class FNUtil extends FuncCall {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Item toString(final QueryContext ctx) throws QueryException {
+  private Str toString(final QueryContext ctx) throws QueryException {
     final byte[] val = checkBin(expr[0], ctx);
     final String enc = expr.length == 2 ? string(checkStr(expr[1], ctx)) : UTF8;
     try {

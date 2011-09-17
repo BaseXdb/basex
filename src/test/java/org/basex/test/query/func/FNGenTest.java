@@ -42,7 +42,7 @@ public final class FNGenTest extends AdvancedQueryTest {
     assertEquals(query("util:to-bytes(" + fun + "('" + io.path() + "'))"),
         "65 10 66 10 67 10 68");
     assertTrue(io.delete());
-    error(fun + "('" + TEXT + "', 'xyz')", Err.WRONGINPUT);
+    error(fun + "('" + TEXT + "', 'xyz')", Err.WHICHENC);
   }
 
   /**

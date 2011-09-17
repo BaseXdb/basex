@@ -9,7 +9,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This class provides a convenient access to text input.
- * The encoding will be determined by analyzing the input.
+ * The encoding will initially be guessed by analyzing the first bytes.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -41,7 +41,6 @@ public final class TextInput {
     in[0].encoding();
     file = f;
   }
-
   /**
    * Returns the contents of the specified file.
    * @param in input path
@@ -62,12 +61,21 @@ public final class TextInput {
   public static TokenBuilder content(final IO in, final String enc)
       throws IOException {
 
+    final TokenBuilder tb = new TokenBuilder();
     final TextInput ti = new TextInput(in);
-    if(enc != null) ti.encoding(enc);
-    final int len = (int) ti.length();
-    final TokenBuilder tb = new TokenBuilder(len);
-    while(ti.pos() < len) tb.add(ti.next());
-    ti.close();
+    try {
+      if(enc != null) ti.encoding(enc);
+      for(int ch; (ch = ti.next()) != -1;) {
+        // normalize newlines
+        if(ch == '\r') {
+          if(ti.next() != '\n') ti.prev(1);
+          ch = '\n';
+        }
+        tb.add(ch);
+      }
+    } finally {
+      ti.close();
+    }
     return tb;
   }
 

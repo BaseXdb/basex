@@ -701,6 +701,8 @@ public enum Err {
   PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
   /** FOUT1170: Parsing exception. */
   WRONGINPUT(FOUT, 1170, "Failed to read \"%\": %."),
+  /** FOUT1190: Evaluation exception. */
+  WHICHENC(FOFL, 1190, "Encoding '%' is not supported."),
 
   // [CG] check error messages: FOUT1190, FOUT1200, add to Wiki
 
