@@ -147,14 +147,6 @@ public final class Context {
   }
 
   /**
-   * Returns all document nodes.
-   * @return result of check
-   */
-  public int[] doc() {
-    return current.root ? current.list : data.docs().toArray();
-  }
-
-  /**
    * Sets the specified data instance as current database.
    * @param d data reference
    */

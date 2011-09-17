@@ -38,9 +38,6 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
-  /** Optionally defined parser. */
-  private Parser parser;
-
   /**
    * Default constructor.
    * @param name name of database
@@ -58,42 +55,31 @@ public final class CreateDB extends ACreate {
     super(name, input);
   }
 
-  /**
-   * Sets a parser.
-   * @param p parser to be set
-   */
-  public void setParser(final Parser p) {
-    parser = p;
-  }
-
   @Override
   protected boolean run() {
     final String name = args[0];
-    if(parser == null) {
-      parser = Parser.emptyParser();
-
-      if(args.length < 1 || args[1] == null) {
-        if(in != null && in.getByteStream() != null) {
-          InputStream is = in.getByteStream();
-          if(!(is instanceof BufferedInputStream ||
-              is instanceof BufferInput)) is = new BufferedInputStream(is);
-          try {
-            final LookupInput li = new LookupInput(is);
-            if(li.lookup() != -1) {
-              parser = new SAXWrapper(new SAXSource(new InputSource(li)),
-                  name + IO.XMLSUFFIX, "", context.prop);
-            }
-          } catch(final IOException ex) {
-            Util.debug(ex);
-            return error(Util.message(ex));
+    Parser parser = Parser.emptyParser();
+    if(args.length < 1 || args[1] == null) {
+      if(in != null && in.getByteStream() != null) {
+        InputStream is = in.getByteStream();
+        if(!(is instanceof BufferedInputStream ||
+            is instanceof BufferInput)) is = new BufferedInputStream(is);
+        try {
+          final LookupInput li = new LookupInput(is);
+          if(li.lookup() != -1) {
+            parser = new SAXWrapper(new SAXSource(new InputSource(li)),
+                name + IO.XMLSUFFIX, "", context.prop);
           }
+        } catch(final IOException ex) {
+          Util.debug(ex);
+          return error(Util.message(ex));
         }
-      } else {
-        final IO io = IO.get(args[1]);
-        if(!io.exists()) return error(FILEWHICH, io);
-        if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
-        parser = new DirParser(io, prop);
       }
+    } else {
+      final IO io = IO.get(args[1]);
+      if(!io.exists()) return error(FILEWHICH, io);
+      if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
+      parser = new DirParser(io, prop);
     }
     return build(parser, name);
   }

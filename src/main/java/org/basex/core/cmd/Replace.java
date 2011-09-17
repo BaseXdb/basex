@@ -77,6 +77,6 @@ public final class Replace extends ACreate {
       // flushes changes
       data.flush();
     }
-    return info(PATHREPLACED, ds);
+    return info(PATHREPLACED, ds, perf);
   }
 }

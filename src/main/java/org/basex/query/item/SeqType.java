@@ -92,8 +92,6 @@ public final class SeqType {
   public static final SeqType DBL = AtomType.DBL.seq();
   /** Double number. */
   public static final SeqType DBL_ZM = new SeqType(AtomType.DBL, Occ.ZM);
-  /** Float number. */
-  public static final SeqType FLT = AtomType.FLT.seq();
   /** Zero or one double. */
   public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZO);
   /** Zero or one decimal number. */
@@ -136,8 +134,6 @@ public final class SeqType {
   public static final SeqType DAT = AtomType.DAT.seq();
   /** Zero or one date. */
   public static final SeqType DAT_ZO = new SeqType(AtomType.DAT, Occ.ZO);
-  /** Zero or more dates. */
-  public static final SeqType DAT_ZM = new SeqType(AtomType.DAT, Occ.ZM);
   /** One day-time-duration. */
   public static final SeqType DTD = AtomType.DTD.seq();
   /** Zero or one day-time-duration. */
@@ -150,8 +146,6 @@ public final class SeqType {
   public static final SeqType TIM = AtomType.TIM.seq();
   /** Zero or one time. */
   public static final SeqType TIM_ZO = new SeqType(AtomType.TIM, Occ.ZO);
-  /** One duration. */
-  public static final SeqType DUR = AtomType.DUR.seq();
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZO);
   /** Single function. */

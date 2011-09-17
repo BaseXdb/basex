@@ -124,16 +124,6 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   /**
-   * Indents the next text.
-   * @throws IOException I/O exception
-   */
-  protected void ind() throws IOException {
-    ++level;
-    indent();
-    --level;
-  }
-
-  /**
    * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details

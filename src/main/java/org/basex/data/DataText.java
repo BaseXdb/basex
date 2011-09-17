@@ -35,8 +35,6 @@ public interface DataText {
   String DBENC = "ENCODING";
   /** Whitespace chopping. */
   String DBCHOP = "CHOPPED";
-  /** Entity parsing. */
-  String DBENTITY = "ENTITY";
   /** Path indexing. */
   String DBPTHIDX = "PTHINDEX";
   /** Text indexing. */
