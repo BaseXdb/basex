@@ -172,7 +172,7 @@ public abstract class W3CTS {
     context.prop.set(Prop.CHOP, false);
 
     //new Check(path + input).execute(context);
-    data = CreateDB.xml(new IOFile(path + input), context);
+    data = CreateDB.mainMem(new IOFile(path + input), context);
 
     final Nodes root = new Nodes(0, data);
     Util.outln(NL + Util.name(this) + " Test Suite " +
@@ -540,7 +540,7 @@ public abstract class W3CTS {
     final ItemCache it = new ItemCache();
     try {
       final String str = frag ? "<X>" + xml + "</X>" : xml;
-      final Data d = CreateDB.xml(IO.get(str), context);
+      final Data d = CreateDB.mainMem(IO.get(str), context);
 
       for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p)))
         it.add(new DBNode(d, p));

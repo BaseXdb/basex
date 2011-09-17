@@ -172,7 +172,7 @@ public final class NamespaceTest {
    */
   private static Iter getIter(final String xml) {
     try {
-      final Data ex = CreateDB.xml(new IOContent(token(xml)), context);
+      final Data ex = CreateDB.mainMem(new IOContent(token(xml)), context);
       return new NodeCache(new ANode[]{new DBNode(ex, 0)}, 1);
     } catch(final IOException ex) { fail(Util.message(ex)); }
     return null;
