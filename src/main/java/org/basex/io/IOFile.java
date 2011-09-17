@@ -185,7 +185,7 @@ public final class IOFile extends IO {
 
   @Override
   public InputSource inputSource() {
-    return is == null ? new InputSource(url()) : new InputSource(is);
+    return is == null ? new InputSource(path) : new InputSource(is);
   }
 
   @Override
@@ -321,8 +321,15 @@ public final class IOFile extends IO {
   @Override
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
+    // add leading slash for Windows paths
     if(!path.startsWith("/")) tb.add('/');
-    return tb.add(path).toString();
+    for(int p = 0; p < path.length(); p++) {
+      // replace spaces with %20
+      final char ch = path.charAt(p);
+      if(ch == ' ') tb.add("%20");
+      else tb.add(ch);
+    }
+    return tb.toString();
   }
 
   /**

@@ -64,7 +64,7 @@ public final class IOUrl extends IO {
       if(file.indexOf("%") != -1) file = URLDecoder.decode(file, Prop.ENCODING);
     } catch(final Exception ex) { /* ignored. */ }
     // remove file scheme, duplicate slashes and leading slash in Windows paths
-    return file.replaceAll("^" + FILEPREF, "").replace("//+", "/").
+    return file.replaceAll("^" + FILEPREF, "").replaceAll("//+", "/").
         replaceFirst("^/(\\w:)", "$1");
   }
 }
