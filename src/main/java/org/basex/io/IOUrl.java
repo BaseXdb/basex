@@ -3,7 +3,9 @@ package org.basex.io;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
 
+import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
 import org.basex.util.list.ByteList;
 import org.xml.sax.InputSource;
@@ -49,5 +51,20 @@ public final class IOUrl extends IO {
   @Override
   public IO merge(final String f) {
     return this;
+  }
+
+  /**
+   * Creates a file path from the specified URL.
+   * @param url url to be converted
+   * @return file path
+   */
+  public static String file(final String url) {
+    String file = url;
+    try {
+      if(file.indexOf("%") != -1) file = URLDecoder.decode(file, Prop.ENCODING);
+    } catch(final Exception ex) { /* ignored. */ }
+    // remove file scheme, duplicate slashes and leading slash in Windows paths
+    return file.replaceAll("^" + FILEPREF, "").replace("//+", "/").
+        replaceFirst("^/(\\w:)", "$1");
   }
 }

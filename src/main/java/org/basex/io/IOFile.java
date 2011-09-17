@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -41,7 +40,7 @@ public final class IOFile extends IO {
    * @param f file path
    */
   public IOFile(final String f) {
-    this(new File(file(f)));
+    this(new File(f));
   }
 
   /**
@@ -312,7 +311,6 @@ public final class IOFile extends IO {
   public boolean isValid() {
     // note that not all invalid names can be caught by this test
     try {
-      // the result must not reference a directory
       file.getCanonicalFile();
       return true;
     } catch(final IOException ex) {
@@ -322,39 +320,9 @@ public final class IOFile extends IO {
 
   @Override
   public String url() {
-    String pre = FILEPREF;
-    if(!path.startsWith("/")) {
-      pre += '/';
-      if(path.length() < 2 || path.charAt(1) != ':') {
-        // [CG] IO paths: check if the HOME reference is really needed here
-        pre += "/" + Prop.HOME.replace('\\', '/');
-        if(!pre.endsWith("/")) pre += '/';
-      }
-    }
-    return pre + path.replace('\\', '/');
-  }
-
-  /**
-   * Creates a file path from the specified URL.
-   * @param url url to be converted
-   * @return file path
-   */
-  public static String file(final String url) {
-    String file = url;
-    // [CG] IO paths: check if '+' is correctly recognized/handled
-    if(file.indexOf("%") != -1) {
-      try {
-        file = URLDecoder.decode(file, Prop.ENCODING);
-      } catch(final Exception ex) { /* ignored. */ }
-    }
-    // remove file scheme
-    String fn = file.startsWith(FILEPREF) ?
-        file.substring(FILEPREF.length()) : file;
-        // remove leading slashes
-    while(fn.startsWith("//")) fn = fn.substring(1);
-    // remove slash on Windows systems
-    return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
-        fn.substring(1) : fn;
+    final TokenBuilder tb = new TokenBuilder(FILEPREF);
+    if(!path.startsWith("/")) tb.add('/');
+    return tb.add(path).toString();
   }
 
   /**
