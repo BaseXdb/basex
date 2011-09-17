@@ -3,7 +3,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * This example shows how documents can be added to databases.
+ * This example shows how documents can be added to databases, and how
+ * existing documents can be replaced.
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
@@ -43,7 +44,16 @@ public final class AddExample {
         System.out.println(session.info());
 
         // run query on database
-        System.out.println();
+        System.out.println(session.execute("xquery collection('database')"));
+
+        // define input stream
+        bais = new ByteArrayInputStream("<x>Hello Replacement!</x>".getBytes());
+
+        // add document
+        session.replace("universe.xml", bais);
+        System.out.println(session.info());
+
+        // run query on database
         System.out.println(session.execute("xquery collection('database')"));
 
         // drop database

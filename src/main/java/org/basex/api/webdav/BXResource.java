@@ -11,7 +11,6 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
-import org.basex.data.DataText;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -21,7 +20,6 @@ import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
 import com.bradmcevoy.http.Request.Method;
 import com.bradmcevoy.http.Resource;
-import com.bradmcevoy.http.exceptions.BadRequestException;
 
 /**
  * Base class for all WebDAV resources.
@@ -128,27 +126,6 @@ public abstract class BXResource implements Resource {
    */
   static String stripLeadingSlash(final String s) {
     return s == null || s.isEmpty() || s.charAt(0) != SEP ? s : s.substring(1);
-  }
-
-  /**
-   * Check if content type is supported.
-   * @param ctype content type
-   * @return {@code true} if BaseX can handle the content type
-   */
-  static boolean supported(final String ctype) {
-    // [DP] additional content types can be supported in the future
-    return ctype != null && ctype.indexOf(DataText.APP_XML) >= 0;
-  }
-
-  /**
-   * Prints exception message to standard error.
-   * @param ex exception
-   * @return bad request exception
-   * @throws BadRequestException bad request exception
-   */
-  BadRequestException error(final Exception ex) throws BadRequestException {
-    Util.errln(ex);
-    throw new BadRequestException(this, ex.getMessage());
   }
 
   /**

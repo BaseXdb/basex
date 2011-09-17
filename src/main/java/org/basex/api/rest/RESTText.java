@@ -34,8 +34,6 @@ public interface RESTText {
   /** Error message. */
   String ERR_NOPATH = "No path specified.";
   /** Error message. */
-  String ERR_INVBODY = "Invalid query: %.";
-  /** Error message. */
   String ERR_NOPARAM = "No parameters supported.";
   /** Error message. */
   String ERR_ONLYONE = "Only one operation can be specified.";
