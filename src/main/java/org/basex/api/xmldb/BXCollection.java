@@ -56,7 +56,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     ctx = c;
     try {
-      ctx.openDB(open ? Open.open(name, ctx) : CreateDB.empty(name, ctx));
+      ctx.openDB(open ? Open.open(name, ctx) :
+        CreateDB.create(name, Parser.emptyParser(), ctx));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

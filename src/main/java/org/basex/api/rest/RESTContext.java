@@ -123,7 +123,7 @@ final class RESTContext {
    * @throws IOException I/O exception
    */
   void status(final int code, final String message) throws IOException {
-    session.close();
+    if(session != null) session.close();
     res.setStatus(code);
     if(message != null) out.write(token(message));
   }

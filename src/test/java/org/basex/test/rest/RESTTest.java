@@ -261,7 +261,7 @@ public class RESTTest {
   @Test
   public void post1() throws IOException {
     put(DB, null);
-    post(DB, new ArrayInput(token("<a/>")));
+    post(DB + "/doc.xml", new ArrayInput(token("<a/>")));
     assertEquals("1", get(DB + "?query=count(/)"));
     delete(DB);
   }

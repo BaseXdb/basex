@@ -107,15 +107,15 @@ public class RESTPost extends RESTCode {
             replaceAll("\\r?\\n+", " ").replaceAll(".*\\[\\w+\\d*\\] ", ""));
       }
     } else {
-      if(ctx.depth() == 0) throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
+      if(ctx.depth() < 2) throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
       // add resources
       open(ctx);
       String name = ctx.dbpath();
       String path = "";
       final int i = name.indexOf('/');
       if(i != -1) {
-        path = name.substring(i + 1);
-        name = name.substring(i);
+        path = name.substring(0, i);
+        name = name.substring(i + 1);
       }
       final Session session = ctx.session;
       session.add(name, path, ctx.req.getInputStream());

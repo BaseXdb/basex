@@ -13,6 +13,8 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
+
+import org.basex.build.xml.SAXWrapper;
 import org.basex.core.cmd.CreateDB;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -233,7 +235,8 @@ abstract class BXQAbstract {
   private DBNode createNode(final SAXSource s) throws XQException {
     opened();
     try {
-      return checkNode(CreateDB.xml(s, ctx.context));
+      return checkNode(CreateDB.mainMem(
+          new SAXWrapper(s, ctx.context.prop) , ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -250,7 +253,7 @@ abstract class BXQAbstract {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
-      return checkNode(CreateDB.xml(new XMLStreamWrapper(sr), ctx.context));
+      return checkNode(CreateDB.mainMem(new XMLStreamWrapper(sr), ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -264,7 +267,7 @@ abstract class BXQAbstract {
    */
   protected final DBNode createNode(final IO io) throws BXQException {
     try {
-      return checkNode(CreateDB.xml(io, ctx.context));
+      return checkNode(CreateDB.mainMem(io, ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

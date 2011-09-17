@@ -81,7 +81,7 @@ public class HTTPClientTest {
   private static final byte[] METHOD = token("method");
   /** Example url. */
   private static final String URL =
-      "'http://" + LOCALHOST + ":" + MainProp.HTTPPORT[1] + "/rest/" + DB + "'";
+      "http://" + LOCALHOST + ":" + MainProp.HTTPPORT[1] + "/rest/" + DB;
   /** Books document. */
   private static final String BOOKS = "<books>" + "<book id='1'>"
       + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
@@ -154,7 +154,7 @@ public class HTTPClientTest {
     final QueryProcessor qp = new QueryProcessor("http:send-request("
         + "<http:request method='put' status-only='true'>"
         + "<http:body media-type='text/xml'>" + BOOKS + "</http:body>"
-        + "</http:request>, " + URL + ")", context);
+        + "</http:request>, '" + URL + "')", context);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
     qp.close();
   }
@@ -173,7 +173,7 @@ public class HTTPClientTest {
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
         + "</query>" + "</http:body>"
-        + "</http:request>, " + URL + ")", context);
+        + "</http:request>, '" + URL + "')", context);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 2);
     qp.close();
 
@@ -181,7 +181,7 @@ public class HTTPClientTest {
     qp = new QueryProcessor("http:send-request("
         + "<http:request method='post'>"
         + "<http:body media-type='application/query+xml'/></http:request>"
-        + "," + URL + ","
+        + ", '" + URL + "',"
         + "<query xmlns='" + Text.URL + "/rest'>"
         + "<text>1</text>"
         + "<parameter name='wrap' value='yes'/>"
@@ -202,7 +202,7 @@ public class HTTPClientTest {
         + "<http:body media-type='text/xml'>" + "<book id='4'>"
         + "<name>The Celebrated Jumping Frog of Calaveras County</name>"
         + "<author>Twain</author>" + "</book>" + "</http:body>"
-        + "</http:request>, " + URL + ")", context);
+        + "</http:request>, '" + URL + "/doc.xml')", context);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_CREATED, 1);
     qp.close();
   }
@@ -215,7 +215,7 @@ public class HTTPClientTest {
   public void postGet() throws Exception {
     // GET1 - just send a GET request
     QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' href=" + URL + "/>)", context);
+        + "<http:request method='get' href='" + URL + "'/>)", context);
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -224,8 +224,8 @@ public class HTTPClientTest {
 
     // GET2 - with override-media-type='text/plain'
     qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' override-media-type='text/plain'/>,"
-        + URL + ")", context);
+        + "<http:request method='get' override-media-type='text/plain'/>, '"
+        + URL + "')", context);
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -234,7 +234,7 @@ public class HTTPClientTest {
 
     // Get3 - with status-only='true'
     qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' status-only='true'/>," + URL + ")",
+        + "<http:request method='get' status-only='true'/>, '" + URL + "')",
         context);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
@@ -248,7 +248,7 @@ public class HTTPClientTest {
   public void postDelete() throws Exception {
     // DELETE
     final QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='delete' status-only='true'/>, " + URL + ")",
+        + "<http:request method='delete' status-only='true'/>, '" + URL + "')",
         context);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
@@ -284,7 +284,7 @@ public class HTTPClientTest {
 
   /**
    * Tests RequestParser.parse() with normal(not multipart) request.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
@@ -310,7 +310,7 @@ public class HTTPClientTest {
 
   /**
    * Tests RequestParser.parse() with multipart request.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
@@ -364,7 +364,7 @@ public class HTTPClientTest {
   /**
    * Tests parsing of multipart request when the contents for each part are set
    * from the $bodies parameter.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
@@ -421,7 +421,7 @@ public class HTTPClientTest {
   /**
    * Tests if errors are thrown when some mandatory attributes are missing in a
    * <http:request/>, <http:body/> or <http:multipart/>.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   @Test
   public void errors() throws IOException {
@@ -511,7 +511,7 @@ public class HTTPClientTest {
 
   /**
    * Tests method setRequestContent of HttpClient.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
@@ -618,7 +618,7 @@ public class HTTPClientTest {
   /**
    * Tests writing of body content when @method is http:base64Binary.
    * @throws QueryException query exception
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   @Test
   public void writeBase64() throws IOException, QueryException {
@@ -645,7 +645,7 @@ public class HTTPClientTest {
 
   /**
    * Tests writing of body content when @method is http:hexBinary.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
@@ -674,7 +674,7 @@ public class HTTPClientTest {
   /**
    * Tests writing of request content when @src is set.
    * @throws QueryException query exception
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   @Test
   public void writeFromResource() throws IOException, QueryException {
@@ -701,7 +701,7 @@ public class HTTPClientTest {
   /**
    * Tests response handling with specified charset in the header
    * 'Content-Type'.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
@@ -724,7 +724,7 @@ public class HTTPClientTest {
 
   /**
    * Tests ResponseHandler.getResponse() with multipart response.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
@@ -805,7 +805,7 @@ public class HTTPClientTest {
   /**
    * Tests ResponseHandler.getResponse() with multipart response having preamble
    * and epilogue.
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   @Test
