@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 /**
  * This example shows how documents can be added to databases.
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License

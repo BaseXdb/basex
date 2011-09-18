@@ -16,6 +16,7 @@ import java.util.Map;
 /**
  * Java client for BaseX.
  * Works with BaseX 6.3.1 and later
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-11, BSD License
@@ -143,6 +144,19 @@ public final class BaseXClient {
   }
 
   /**
+   * Stores a binary resource in a database.
+   * @param path path to document
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  public void store(final String path, final InputStream input)
+      throws IOException {
+    out.write(13);
+    send(path);
+    send(input);
+  }
+
+  /**
    * Watches an event.
    * @param name event name
    * @param notifier event notification
@@ -171,30 +185,6 @@ public final class BaseXClient {
   }
 
   /**
-   * Starts the listener thread.
-   * @param is input stream
-   */
-  private void listen(final InputStream is) {
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          final BufferedInputStream bi = new BufferedInputStream(is);
-          while(true) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            receive(bi, baos);
-            final String name = baos.toString("UTF-8");
-            baos = new ByteArrayOutputStream();
-            receive(bi, baos);
-            final String data = baos.toString("UTF-8");
-            notifiers.get(name).notify(data);
-          }
-        } catch(final Exception ex) { }
-      }
-    }.start();
-  }
-
-  /**
    * Unwatches an event.
    * @param name event name
    * @throws IOException I/O exception
@@ -205,25 +195,6 @@ public final class BaseXClient {
     info = receive();
     if(!ok()) throw new IOException(info);
     notifiers.remove(name);
-  }
-
-  /**
-   * Sends an input stream to the server.
-   * @param input xml input
-   * @throws IOException I/O exception
-   */
-  private void send(final InputStream input) throws IOException {
-    final BufferedInputStream bis = new BufferedInputStream(input);
-    final BufferedOutputStream bos = new BufferedOutputStream(out);
-    for(int b; (b = bis.read()) != -1;) {
-      // 0x00 and 0xFF will be prefixed by 0xFF
-      if(b == 0x00 || b == 0xFF) bos.write(0xFF);
-      bos.write(b);
-    }
-    bos.write(0);
-    bos.flush();
-    info = receive();
-    if(!ok()) throw new IOException(info);
   }
 
   /**
@@ -290,6 +261,49 @@ public final class BaseXClient {
   }
 
   /**
+   * Starts the listener thread.
+   * @param is input stream
+   */
+  private void listen(final InputStream is) {
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          final BufferedInputStream bi = new BufferedInputStream(is);
+          while(true) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            receive(bi, baos);
+            final String name = baos.toString("UTF-8");
+            baos = new ByteArrayOutputStream();
+            receive(bi, baos);
+            final String data = baos.toString("UTF-8");
+            notifiers.get(name).notify(data);
+          }
+        } catch(final Exception ex) { }
+      }
+    }.start();
+  }
+
+  /**
+   * Sends an input stream to the server.
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  private void send(final InputStream input) throws IOException {
+    final BufferedInputStream bis = new BufferedInputStream(input);
+    final BufferedOutputStream bos = new BufferedOutputStream(out);
+    for(int b; (b = bis.read()) != -1;) {
+      // 0x00 and 0xFF will be prefixed by 0xFF
+      if(b == 0x00 || b == 0xFF) bos.write(0xFF);
+      bos.write(b);
+    }
+    bos.write(0);
+    bos.flush();
+    info = receive();
+    if(!ok()) throw new IOException(info);
+  }
+
+  /**
    * Returns an MD5 hash.
    * @param pw String
    * @return String
@@ -328,16 +342,6 @@ public final class BaseXClient {
     public Query(final String query) throws IOException {
       id = exec(0, query);
     }
-
-    /**
-     * Initializes the query.
-     * @return result header
-     * @throws IOException I/O exception
-     */
-    public String init() throws IOException {
-      return exec(4, id);
-    }
-
     /**
      * Binds a variable.
      * @param name name of variable
@@ -377,8 +381,7 @@ public final class BaseXClient {
     }
 
     /**
-     * Returns query info as a string, regardless of whether an output stream
-     * was specified.
+     * Returns query info in a string.
      * @return query info
      * @throws IOException I/O exception
      */
@@ -387,14 +390,20 @@ public final class BaseXClient {
     }
 
     /**
-     * Closes the query.
-     * @return result footer
+     * Returns serialization parameters in a string.
+     * @return query info
      * @throws IOException I/O exception
      */
-    public String close() throws IOException {
-      final String s = exec(2, id);
-      out.flush();
-      return s;
+    public String options() throws IOException {
+      return exec(7, id);
+    }
+
+    /**
+     * Closes the query.
+     * @throws IOException I/O exception
+     */
+    public void close() throws IOException {
+      exec(2, id);
     }
 
     /**

@@ -6,6 +6,7 @@ import java.io.InputStream;
 
 /**
  * This example shows how new databases can be created.
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
