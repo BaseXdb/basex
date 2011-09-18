@@ -1,4 +1,5 @@
-﻿' This example shows how new databases can be created.
+' This example shows how new databases can be created.
+'
 ' Documentation: http://docs.basex.org/wiki/Clients
 '
 ' (C) BaseX Team 2005-11, BSD License
@@ -9,7 +10,6 @@ Imports System.IO
 Module CreateExample
   Sub Main()
     Try
-
       ' create session
       Dim session As New Session("localhost", 1984, "admin", "admin")
       ' define InputStream
@@ -21,7 +21,7 @@ Module CreateExample
       ' run query on database
       Console.WriteLine(session.Execute("xquery /"))
 	  
-	  ' drop database
+	    ' drop database
       session.Execute("drop db database")
       
       ' close session

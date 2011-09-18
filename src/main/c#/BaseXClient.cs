@@ -1,6 +1,7 @@
 /*
  * Language Binding for BaseX.
  * Works with BaseX 6.3.1 and later
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-11, BSD License
@@ -91,6 +92,14 @@ namespace BaseXClient
     public void Replace(string path, Stream s)
     {
       stream.WriteByte(12);
+      Send(path);
+      Send(s);
+    }
+    
+    /** see readme.txt */
+    public void Store(string path, Stream s)
+    {
+      stream.WriteByte(13);
       Send(path);
       Send(s);
     }
@@ -277,12 +286,6 @@ namespace BaseXClient
     }
 
     /** see readme.txt */
-    public string Init()
-    {
-      return Exec(4, id);
-    }
-
-    /** see readme.txt */
     public void Bind(string name, string value)
     {
       Exec(3, id + '\0' + name + '\0' + value + '\0');
@@ -314,9 +317,15 @@ namespace BaseXClient
     }
 
     /** see readme.txt */
+    public string Options()
+    {
+      return Exec(7, id);
+    }
+
+    /** see readme.txt */
     public string Close()
     {
-      return Exec(2, id);
+      Exec(2, id);
     }
 
     /** see readme.txt */

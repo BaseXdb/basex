@@ -57,9 +57,6 @@ class Session:
   // Stores raw data at the specified path
   void store(String path, InputStream in)
 
-  // Retrieves raw data from the specified path
-  void retrieve(String path)
-
   // Watches the specified events
   void watch(String name, Event notifier) 
 
@@ -74,36 +71,35 @@ class Session:
 
 class Query:
 
-  // Creates query object with session and query
-  constructor(Session s, String query)
+	// Creates query object with session and query
+	constructor(Session s, String query)
 
-  // Binds an external variable
-  void bind(String name, String value)
+	// Binds an external variable
+	void bind(String name, String value)
 
-  // Initializes the iterator
-  String init()
+	// Executes the query
+	String execute()
 
-  // Executes the query
-  String execute()
+	// Iterator: checks if a query returns more items
+	boolean more()
 
-  // Iterator: checks if a query returns more items
-  boolean more()
+	// Returns next item
+	String next()
 
-  // Returns next item
-  String next()
+	// Returns query information
+	String info()
 
-  // Returns query information
-  String info()
+	// Returns serialization options
+	String options()
 
-  // Returns serialization options
-  String options()
-
-  // Closes the iterator and query
-  String close()
+	// Closes the iterator and query
+	close()
 
 TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
 
- {...} = string; \n = single byte
+ \x: single byte. 
+ {...}: strings, which are transfered in the UTF8 encoding. 
+ [...]: binary data. All 00 and FF bytes are prefixed with FF.
 
  Authentication:
  1. Client connects to server socket
@@ -112,7 +108,7 @@ TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
     {username} \0 {md5(md5(password) + timestamp)} \0
  4. Server sends \0 (success) or \1 (error)
 
- Client transfer:
+ Client Request:
  - command:       -> {command} \0
  - create:        -> \8 {name} \0 {input} \0
  - add:           -> \9 {name} \0 {path} \0 {input} \0
@@ -120,29 +116,27 @@ TRANSFER PROTOCOL (BaseX 6.3.1 ff.) --------------------------------------------
  - unwatch:       -> \11 {name} \0
  - replace:       -> \12 {path} \0 {input} \0
  - store:         -> \13 {path} \0 {input} \0
- - retrieve:      -> \14 {path} \0
  - query: start   -> \0 {query} \0
-          bind    -> \3 {id} \0 {variable} \0 {value}\0 {type}\0
+          bind    -> \3 {id} \0 {variable} \0 {value} \0 {type} \0
+          next    -> \1 {id} \0
           execute -> \5 {id} \0
           info    -> \6 {id} \0
           options -> \7 {id} \0
-          next    -> \1 {id} \0
-          init    -> \4 {id} \0
-          end     -> \2 {id} \0
+          close   -> \2 {id} \0
 
- Server streams:
+ Server Response:
  - command:       -> {result} \0 {info} \0 \0
  - create:        -> {info} \0 \0
  - add:           -> {info} \0 \0
           error   -> \0 {error} \0 \1
+
  - query: start   -> {id} \0 \0
           bind    -> \0 \0
-          execute -> {result} \0 \0
-          init    -> {result} \0 \0
-          options -> {result} \0 \0
           next    -> {result} \0 \0
+          execute -> {result} \0 \0
           info    -> {result} \0 \0
-          close   -> {result} \0 \0
+          options -> {result} \0 \0
+          close   -> \0 \0
           error   -> \0 \1 {error} \0
 
 ================================================================================

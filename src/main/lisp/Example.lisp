@@ -1,4 +1,5 @@
 ; This example shows how database commands can be executed.
+;
 ; Documentation: http://docs.basex.org/wiki/Clients
 ;
 ; (C) Andy Chambers, Formedix Ltd 2010, BSD License

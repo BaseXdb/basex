@@ -1,5 +1,6 @@
 # Perl client for BaseX.
 # Works with BaseX 6.3.1 and later
+#
 # Documentation: http://docs.basex.org/wiki/Clients
 # 
 # (C) BaseX Team 2005-11, BSD License
@@ -87,6 +88,32 @@ sub add {
 }
 
 # see readme.txt
+sub replace {
+  my $self = shift;
+  my $path = shift;
+  my $input = shift;
+  
+  $self->send(chr(12).$path.chr(0).$input);
+  $self->{info} = $self->_receive();
+  if (!$self->ok()) {
+    die $self->{info};
+  }
+}
+
+# see readme.txt
+sub store {
+  my $self = shift;
+  my $path = shift;
+  my $input = shift;
+  
+  $self->send(chr(13).$path.chr(0).$input);
+  $self->{info} = $self->_receive();
+  if (!$self->ok()) {
+    die $self->{info};
+  }
+}
+
+# see readme.txt
 sub info {
   my $self = shift;
   return $self->{info};
@@ -142,13 +169,8 @@ sub new {
   $session = shift;
   my $cmd = shift;
   my $self = bless({}, $class);
-  $id = execu(chr(0), $cmd);
+  $id = exc(chr(0), $cmd);
   return $self;
-}
-
-# see readme.txt
-sub init {
-  return execu(chr(4), $id);
 }
 
 # see readme.txt
@@ -156,12 +178,12 @@ sub bind {
   shift;
   my $name = shift;
   my $value = shift;
-  execu(chr(3), $id.chr(0).$name.chr(0).$value.chr(0));
+  exc(chr(3), $id.chr(0).$name.chr(0).$value.chr(0));
 }
 
 # see readme.txt
 sub more {
-  $next = execu(chr(1), $id);
+  $next = exc(chr(1), $id);
   return length($next);
 }
 
@@ -172,21 +194,26 @@ sub next {
 
 # see readme.txt
 sub execute {
-  return execu(chr(5), $id);
+  return exc(chr(5), $id);
 }
 
 # see readme.txt
 sub info {
-  return execu(chr(6), $id);
+  return exc(chr(6), $id);
+}
+
+# see readme.txt
+sub options {
+  return exc(chr(7), $id);
 }
 
 # see readme.txt
 sub close {
-  return execu(chr(2), $id);
+  exc(chr(2), $id);
 }
 
 # see readme.txt
-sub execu {
+sub exc {
   my $cmd = shift;
   my $arg = shift;
   $session->send($cmd.$arg);

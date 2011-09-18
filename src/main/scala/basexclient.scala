@@ -6,6 +6,7 @@ import java.util._
 /**
  * Scala client for BaseX.
  * Works with BaseX 6.3.1 and later
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-11, BSD License
@@ -89,6 +90,30 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     out.write(9)
     send(name)
     send(target)
+    send(input)
+  }
+
+  /**
+   * Replaces a resource.
+   * @param source source path
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  def replace(path: String, input: InputStream) {
+    out.write(12)
+    send(path)
+    send(input)
+  }
+
+  /**
+   * Stores a binary resource.
+   * @param source source path
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  def store(path: String, input: InputStream) {
+    out.write(13)
+    send(path)
     send(input)
   }
 
@@ -199,15 +224,6 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
     var nxt = ""
 
     /**
-     * Initializes the query.
-     * @return result header
-     * @throws IOException I/O exception
-     */
-    def init() : String = {
-      exec(4, id)
-    }
-
-    /**
      * Binds a variable.
      * @param name name of variable
      * @param value value
@@ -259,10 +275,8 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
      * @return result footer
      * @throws IOException I/O exception
      */
-    def close() : String = {
-      val s = exec(2, id)
-      out.flush
-      s
+    def close() {
+      exec(2, id)
     }
 
     /**

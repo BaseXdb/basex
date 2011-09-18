@@ -1,8 +1,8 @@
 import java.io._
 
 /**
- * This example shows how queries can be executed in an iterative manner.
- * The database server must be started first to make this example work.
+ * This example shows how external variables can be bound to XQuery expressions.
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
@@ -28,7 +28,7 @@ object querybindexample {
     println(query.execute)
 
     // close query instance
-    print(query.close)
+    query.close
 
     // close session
     session.close

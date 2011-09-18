@@ -1,5 +1,6 @@
-﻿' Visual Basic client for BaseX.
+' Visual Basic client for BaseX.
 ' Works with BaseX 6.3.1 and later
+'
 ' Documentation: http://docs.basex.org/wiki/Clients
 '
 ' (C) BaseX Team 2005-11, BSD License
@@ -69,7 +70,7 @@ Module BaseXClient
       End If
     End Sub
     
-        ' see readme.txt
+    ' see readme.txt
     Public Sub Create(name As String, target As String, ms As Stream)
       stream.WriteByte(9)
       Send(name)
@@ -182,11 +183,6 @@ End Class
       session = s
       id = Exec(0, query)
     End Sub
-    
-    ' see readme.txt
-    Public Function Init() As String
-      Return Exec(4, id)
-    End Function
       
     ' see readme.txt
     Public Sub Bind(name As String, value As String)
@@ -223,8 +219,8 @@ End Class
     End Function
 
     ' see readme.txt 
-    Public Function Close() As String
-      Return Exec(2, id)
+    Public Function Close()
+      Exec(2, id)
     End Function
     
     

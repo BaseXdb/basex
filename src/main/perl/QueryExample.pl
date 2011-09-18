@@ -1,4 +1,5 @@
 # This example shows how queries can be executed in an iterative manner.
+#
 # Documentation: http://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team 2005-11, BSD License
@@ -16,16 +17,13 @@ eval {
   my $input = "for \$i in 1 to 10 return <xml>Text { \$i }</xml>";
   my $query = $session->query($input);
 
-  # initialize query
-  print $query->init();
-
   # loop through all results
   while ($query->more()) {
     print $query->next()."\n";
   }
 
   # close query
-  print $query->close();
+  $query->close();
 
   # close session
   $session->close();

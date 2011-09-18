@@ -1,4 +1,5 @@
-# This example shows how queries can be executed in an iterative manner.
+# This example shows how external variables can be bound to XQuery expressions.
+#
 # Documentation: http://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team 2005-11, BSD License
@@ -18,18 +19,13 @@ eval {
   my $query = $session->query($input);
 	
   # bind variable
-  $query->bind("$name", "number");
-  		
-  # initialize query
-  print $query->init();
+  $query->bind("name", "number");
 
-  # loop through all results
-  while ($query->more()) {
-    print $query->next()."\n";
-  }
+  # print result
+  print $query->execute()."\n";
 
   # close query
-  print $query->close();
+  $query->close();
 
   # close session
   $session->close();

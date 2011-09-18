@@ -2,6 +2,7 @@
 /*
  * PHP client for BaseX.
  * Works with BaseX 6.3.1 and later
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  * 
  * (C) BaseX Team 2005-11, BSD License
@@ -69,6 +70,24 @@ class Session {
   }
 
   /* see readme.txt */
+  public function replace($path, $input) {
+    socket_write($this->socket, chr(12).$path.chr(0).$input.chr(0));
+    $this->info = $this->receive();
+    if($this->ok() != True) {
+      throw new Exception($this->info);
+    }
+  }
+
+  /* see readme.txt */
+  public function store($path, $input) {
+    socket_write($this->socket, chr(13).$path.chr(0).$input.chr(0));
+    $this->info = $this->receive();
+    if($this->ok() != True) {
+      throw new Exception($this->info);
+    }
+  }
+  
+  /* see readme.txt */
   public function info() {
     return $this->info;
   }
@@ -131,11 +150,6 @@ class Query {
   }
   
   /* see readme.txt */
-  function init() {
-    return $this->exec(chr(4), $this->id);
-  }
-  
-  /* see readme.txt */
   function bind($name, $value) {
     $this->exec(chr(3), $this->id.chr(0).$name.chr(0).$value.chr(0));
   }
@@ -162,8 +176,13 @@ class Query {
   }
   
   /* see readme.txt */
+  public function options() {
+    return $this->exec(chr(7), $this->id);
+  }
+  
+  /* see readme.txt */
   public function close() {
-  	return $this->exec(chr(2), $this->id);   
+  	$this->exec(chr(2), $this->id);   
   }
   
   /* see readme.txt */

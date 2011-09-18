@@ -1,5 +1,6 @@
 ﻿/*
- * This example shows how queries can be executed in an iterative manner.
+ * This example shows how external variables can be bound to XQuery expressions.
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-11, BSD License
@@ -29,18 +30,12 @@ namespace BaseXClient
 		  
 		      // bind variable
 		      query.Bind("$name", "number");
-		  	
-          // initialize query
-          Console.WriteLine(query.Init());
 
-          // loop through all results
-          while (query.More()) 
-          {
-            Console.WriteLine(query.Next());
-          }
+          // print result
+          Console.WriteLine(query.Execute());
 
           // close query
-          Console.WriteLine(query.Close());
+          query.Close();
         }
         catch (IOException e)
         {

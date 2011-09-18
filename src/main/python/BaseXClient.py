@@ -1,5 +1,6 @@
 # Python client for BaseX.
 # Works with BaseX 6.3.1 and later
+#
 # Documentation: http://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team 2005-11, BSD License
@@ -49,6 +50,13 @@ class Session():
         return Query(self, q)
     
     # see readme.txt
+    def create(self, name, input):
+        self.__s.send(chr(8) + name + chr(0) + input + chr(0))
+        self.__info = self.readString()
+        if not self.ok():
+            raise IOError(self.info())
+
+    # see readme.txt
     def add(self, name, target, input):
         self.__s.send(chr(9) + name + chr(0) + target + chr(0) + input + chr(0))
         self.__info = self.readString()
@@ -56,8 +64,15 @@ class Session():
             raise IOError(self.info())
             
     # see readme.txt
-    def create(self, name, input):
-        self.__s.send(chr(8) + name + chr(0) + input + chr(0))
+    def replace(self, path, input):
+        self.__s.send(chr(12) + path + chr(0) + input + chr(0))
+        self.__info = self.readString()
+        if not self.ok():
+            raise IOError(self.info())
+
+    # see readme.txt
+    def store(self, path, input):
+        self.__s.send(chr(13) + path + chr(0) + input + chr(0))
         self.__info = self.readString()
         if not self.ok():
             raise IOError(self.info())
@@ -132,19 +147,15 @@ class Query():
     # see readme.txt
     def __init__(self, session, q):
         self.__session = session
-        self.__id = self.execu(chr(0), q)
-  
-    # see readme.txt  
-    def init(self):
-        return self.execu(chr(4), self.__id)
-    
+        self.__id = self.exc(chr(0), q)
+
     # see readme.txt  
     def bind(self, name, value):
-        self.execu(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0))
+        self.exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0))
   
     # see readme.txt
     def more(self):
-        self.__next = self.execu(chr(1), self.__id)  
+        self.__next = self.exc(chr(1), self.__id)  
         return len(self.__next) != 0  
     
     # see readme.txt
@@ -153,18 +164,22 @@ class Query():
   
     # see readme.txt  
     def execute(self):
-        return self.execu(chr(5), self.__id)
+        return self.exc(chr(5), self.__id)
   
     # see readme.txt  
     def info(self):
-        return self.execu(chr(6), self.__id)
+        return self.exc(chr(6), self.__id)
+  
+    # see readme.txt  
+    def options(self):
+        return self.exc(chr(7), self.__id)
   
     # see readme.txt  
     def close(self):
-        return self.execu(chr(2), self.__id)
+        self.exc(chr(2), self.__id)
   
     # see readme.txt  
-    def execu(self, cmd, arg):
+    def exc(self, cmd, arg):
         self.__session.send(cmd + arg)
         s = self.__session.receive()
         if not self.__session.ok():

@@ -1,4 +1,5 @@
-# This example shows how queries can be executed in an iterative manner.
+# This example shows how external variables can be bound to XQuery expressions.
+#
 # Documentation: http://docs.basex.org/wiki/Clients
 #
 # (C) BaseX Team 2005-11, BSD License
@@ -17,13 +18,8 @@ begin
     # bind variable
     query.bind("$name", "number")
     
-    # initializes query
-    print query.init
-    
-    # loop through all results
-    while query.more do
-      print query.next
-    end
+    # print result
+    print query.execute
 
     # close query instance
     print query.close()

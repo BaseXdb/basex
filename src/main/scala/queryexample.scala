@@ -2,7 +2,8 @@ import java.io._
 
 /**
  * This example shows how queries can be executed in an iterative manner.
- * The database server must be started first to make this example work.
+ * Iterative evaluation will be slower, as more server requests are performed.
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
@@ -20,14 +21,11 @@ object queryexample {
     val input = "for $i in 1 to 10 return <xml>Text { $i }</xml>"
     val query = session.query(input)
 
-    // initialize iterator
-    print(query.init)
-
     // loop through all results
     while(query.more) println(query.next)
 
     // close query instance
-    print(query.close)
+    query.close
 
     // close session
     session.close

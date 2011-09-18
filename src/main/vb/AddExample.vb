@@ -1,4 +1,5 @@
-﻿' This example shows how new documents can be added.
+' This example shows how new documents can be added.
+'
 ' Documentation: http://docs.basex.org/wiki/Clients
 '
 ' (C) BaseX Team 2005-11, BSD License
@@ -9,7 +10,6 @@ Imports System.IO
 Module CreateExample
   Sub Main()
     Try
-
       ' create session
       Dim session As New Session("localhost", 1984, "admin", "admin")
       

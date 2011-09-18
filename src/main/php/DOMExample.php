@@ -2,6 +2,7 @@
 /*
  * This example shows how database commands can be executed 
  * and the result of a query can be processed in a dom document.
+ *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-11, BSD License
