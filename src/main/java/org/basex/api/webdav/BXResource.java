@@ -3,6 +3,7 @@ package org.basex.api.webdav;
 import static java.lang.Integer.*;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.Date;
 
 import org.basex.api.HTTPSession;
@@ -256,5 +257,14 @@ public abstract class BXResource implements Resource {
     q.bind("$d", db);
     q.bind("$p", p);
     return q.execute();
+  }
+
+  /**
+   * Get content type of a file using its name.
+   * @param n file name
+   * @return content type
+   */
+  static String contentType(final String n) {
+    return URLConnection.getFileNameMap().getContentTypeFor(n);
   }
 }
