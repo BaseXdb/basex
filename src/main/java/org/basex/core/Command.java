@@ -286,8 +286,7 @@ public abstract class Command extends Progress {
   protected static final boolean close(final Context ctx, final String db) {
     final boolean close = ctx.data() != null &&
       db.equals(ctx.data().meta.name) && ctx.datas.pins(db) == 1;
-    if(close) new Close().run(ctx);
-    return close;
+    return close && new Close().run(ctx);
   }
 
   // PRIVATE METHODS ==========================================================
