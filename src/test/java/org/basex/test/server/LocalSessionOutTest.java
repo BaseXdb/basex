@@ -1,13 +1,8 @@
 package org.basex.test.server;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
-import org.basex.server.Query;
 import org.junit.Before;
-import org.junit.Test;
 
 /**
  * This class tests the local API with an output stream.
@@ -22,17 +17,5 @@ public final class LocalSessionOutTest extends LocalSessionTest {
   public void startSession() {
     out = new ByteArrayOutputStream();
     super.startSession();
-  }
-
-  /**
-   * Runs a query and retrieves the result as string.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public void query22() throws IOException {
-    final Query query = session.query("1");
-    if(!query.more()) fail("No result returned");
-    check("1", query.next());
-    check("", query.close());
   }
 }

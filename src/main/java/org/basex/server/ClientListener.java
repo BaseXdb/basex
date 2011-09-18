@@ -223,12 +223,6 @@ public final class ClientListener extends Thread {
    */
   public synchronized void exit() {
     running = false;
-
-    // close remaining query processes
-    for(final QueryListener q : queries.values()) {
-      try { q.close(true); } catch(final IOException ex) { }
-    }
-
     try {
       // remove this session from all events in pool
       if(events != null) {
@@ -434,7 +428,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void query(final ServerCmd sc) throws IOException {
-    // iterator argument
+    // iterator argument (query or identifier)
     String arg = in.readString();
 
     QueryListener qp = null;
@@ -447,7 +441,6 @@ public final class ClientListener extends Thread {
         queries.put(arg, qp);
         // send {ID}0
         out.writeString(arg);
-
         // write log file
         log.write(this, sc + "(" + arg + ")", query, OK);
       } else {
@@ -463,16 +456,16 @@ public final class ClientListener extends Thread {
           final String typ = in.readString();
           qp.bind(key, val, typ);
           log.write(this, sc + "(" + arg + ")", key, val, typ, OK);
-        } else if(sc == INIT) {
-          qp.init();
         } else if(sc == NEXT) {
           qp.next();
         } else if(sc == EXEC) {
           qp.execute();
         } else if(sc == INFO) {
-          qp.printInfo();
+          out.print(qp.info());
+        } else if(sc == OPTIONS) {
+          out.print(qp.options());
         } else if(sc == CLOSE) {
-          qp.close(false);
+          qp.close();
           queries.remove(arg);
         }
         // send 0 as end marker
@@ -487,8 +480,7 @@ public final class ClientListener extends Thread {
       // log exception (static or runtime)
       err = ex.getMessage();
       log.write(this, sc + "(" + arg + ")", INFOERROR + err);
-
-      if(qp != null) qp.close(true);
+      if(qp != null) qp.close();
       queries.remove(arg);
     }
     if(err != null) {

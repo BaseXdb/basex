@@ -65,7 +65,9 @@ public final class QueryContext extends Progress {
   public NSLocal ns = new NSLocal();
 
   /** Query resources. */
-  public final QueryResources resource;
+  public final QueryResources resource = new QueryResources(this);
+  /** Opened connections to relational databases. */
+  public final JDBCConnections jdbc = new JDBCConnections();
   /** Database context. */
   public final Context context;
   /** Query string. */
@@ -79,9 +81,6 @@ public final class QueryContext extends Progress {
   public HashMap<String, String> thes;
   /** Modified properties. */
   public HashMap<String, Object> props;
-
-  /** Opened connections to relational databases. */
-  public JDBCConnections jdbc;
 
   /** Root expression of the query. */
   public Expr root;
@@ -182,14 +181,12 @@ public final class QueryContext extends Progress {
    * @param ctx database context
    */
   public QueryContext(final Context ctx) {
-    resource = new QueryResources(this);
     context = ctx;
     nodes = ctx.current();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
-    jdbc = new JDBCConnections();
   }
 
   /**

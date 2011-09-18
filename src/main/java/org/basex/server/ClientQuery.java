@@ -54,11 +54,6 @@ public final class ClientQuery extends Query {
   }
 
   @Override
-  public String init() throws IOException {
-    return execute(ServerCmd.INIT, id);
-  }
-
-  @Override
   public String execute() throws IOException {
     return execute(ServerCmd.EXEC, id);
   }
@@ -80,8 +75,8 @@ public final class ClientQuery extends Query {
   }
 
   @Override
-  public String close() throws IOException {
-    return execute(ServerCmd.CLOSE, id);
+  public void close() throws IOException {
+    execute(ServerCmd.CLOSE, id);
   }
 
   /**

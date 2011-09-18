@@ -226,7 +226,6 @@ public abstract class SessionTest {
   public void query() throws IOException {
     final Query query = session.query("1");
     check("1", query.execute());
-    check("", query.close());
   }
 
   /** Runs a query and retrieves the result as string.
@@ -236,7 +235,6 @@ public abstract class SessionTest {
     final Query query = session.query("1");
     if(!query.more()) fail("No result returned");
     check("1", query.next());
-    check("", query.close());
   }
 
   /** Runs a query and retrieves the empty result as string.
@@ -253,19 +251,16 @@ public abstract class SessionTest {
   @Test
   public void queryClose() throws IOException {
     final Query query = session.query("()");
-    check("", query.close());
-    check("", query.close());
+    query.close();
     query.close();
   }
 
-  /** Runs a query, using init().
+  /** Runs a query, using more().
    * @throws IOException I/O exception */
   @Test
   public void queryInit() throws IOException {
     final Query query = session.query("()");
-    check("", query.init());
     assertFalse("No result was expected.", query.more());
-    check("", query.close());
   }
 
   /** Runs a query and retrieves multiple results as string.
@@ -274,7 +269,6 @@ public abstract class SessionTest {
   public void queryMore() throws IOException {
     final Query query = session.query("1 to 3");
     int c = 0;
-    query.init();
     while(query.more()) check(++c, query.next());
     query.close();
   }
@@ -296,30 +290,19 @@ public abstract class SessionTest {
   public void querySerial1() throws IOException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     final Query query = session.query(WRAPPER + "()");
-    check("<db:results xmlns:db=\"ns\"", query.init());
-    assertFalse("No result was expected.", query.more());
-    check("/>", query.close());
+    assertTrue("Result expected.", query.more());
+    check("<db:results xmlns:db=\"ns\"/>", query.next());
+    assertFalse("No result expected.", query.more());
   }
 
   /** Runs a query with additional serialization parameters.
    * @throws IOException I/O exception */
   @Test
   public void querySerial2() throws IOException {
-    // avoid query evaluation, if more()/next() isn't called
-    final Query query = session.query(WRAPPER + "1 to 10000000000000");
-    check("<db:results xmlns:db=\"ns\"", query.init());
-    check("/>", query.close());
-  }
-
-  /** Runs a query with additional serialization parameters.
-   * @throws IOException I/O exception */
-  @Test
-  public void querySerial3() throws IOException {
     final Query query = session.query(WRAPPER + "1 to 2");
-    check("<db:results xmlns:db=\"ns\"", query.init());
-    check("><db:result>1</db:result>", query.next());
-    check("<db:result>2</db:result>", query.next());
-    check("</db:results>", query.close());
+    assertTrue("Result expected.", query.more());
+    check("<db:results xmlns:db=\"ns\">  <db:result>1</db:result>" +
+        "  <db:result>2</db:result></db:results>", query.next());
   }
 
   /** Runs a query with an external variable declaration.
@@ -404,7 +387,6 @@ public abstract class SessionTest {
   @Test(expected = org.basex.core.BaseXException.class)
   public void queryError3() throws IOException {
     final Query query = session.query("(1,'a')[. eq 1]");
-    query.init();
     check("1", query.next());
     query.next();
   }

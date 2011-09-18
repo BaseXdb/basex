@@ -3,9 +3,6 @@ package org.basex.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.ListIterator;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
@@ -27,8 +24,6 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class LocalSession extends Session {
-  /** Currently registered queries. */
-  private final LinkedList<LocalQuery> queries = new LinkedList<LocalQuery>();
   /** Database context. */
   private final Context ctx;
 
@@ -119,20 +114,13 @@ public final class LocalSession extends Session {
 
   @Override
   public LocalQuery query(final String query) throws BaseXException {
-    final LocalQuery q = out == null ? new LocalQuery(this, query, ctx) :
-      new LocalQuery(this, query, ctx, out);
-    queries.add(q);
-    return q;
+    return out == null ? new LocalQuery(query, ctx) :
+      new LocalQuery(query, ctx, out);
   }
 
   @Override
   public synchronized void close() {
     try {
-      final ListIterator<LocalQuery> i = queries.listIterator();
-      while(i.hasNext()) {
-        i.next().closeListener();
-        i.remove();
-      }
       execute(new Exit());
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -154,13 +142,5 @@ public final class LocalSession extends Session {
       throws BaseXException {
     cmd.execute(ctx, os);
     info = cmd.info();
-  }
-
-  /**
-   * Remove a query from the list of queries in this session.
-   * @param q query to remove
-   */
-  void removeQuery(final LocalQuery q) {
-    queries.remove(q);
   }
 }

@@ -288,7 +288,6 @@ public final class QueryProcessor extends Progress {
    * @throws IOException I/O exception
    */
   public void close() throws IOException {
-    ctx.resource.close();
     // reset database properties to initial value
     if(ctx.props != null) {
       for(final Entry<String, Object> e : ctx.props.entrySet()) {
@@ -296,7 +295,8 @@ public final class QueryProcessor extends Progress {
       }
       ctx.props = null;
     }
-    // close all connections to relational databases
+    // close all database connections
+    ctx.resource.close();
     ctx.jdbc.close();
   }
 
