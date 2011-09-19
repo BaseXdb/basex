@@ -140,12 +140,12 @@ public final class DigitalSignature {
       final byte[] digest, final byte[] signature,
       final byte[] nsPrefix, final byte[] type, final ANode certificate)
           throws QueryException {
-    
+
     // variables to check if parameters correct
     int l = 0;
     int i = 0;
     byte[] b = canonicalization;
-    
+
     // check if given canonicalization method is valid and initialize if so
     if(b.length == 0)
       b = CANONICALIZATIONS[DEFAULT];
@@ -157,7 +157,7 @@ public final class DigitalSignature {
       CRYPTOCANINV.thrw(input, b);
     // map to right canonicalization method
     final String CM = CANONICALIZATIONMETHODS[i];
-    
+
     b = digest;
     l = 0;
     i = 0;
@@ -168,7 +168,7 @@ public final class DigitalSignature {
     if(i == l)
       CRYPTODIGINV.thrw(input, b);
     final String DA = DIGESTMETHODS[i];
-    
+
     b = signature;
     l = 0;
     i = 0;
@@ -180,18 +180,18 @@ public final class DigitalSignature {
       CRYPTOSIGINV.thrw(input, b);
     final String SA = SIGNATUREMETHODS[i];
     final String keytype = string(substring(SIGNATURES[i], 0, 3));
-    
+
     b = type;
     if(b.length == 0)
       b = SIGNATURETYPES[DEFAULT];
     else if(!eq(b, SIGNATURETYPES))
       CRYPTOSIGTYPINV.thrw(input, b);
     final String ST = "enveloped";
-    
+
     ANode signedNode = null;
 
     try {
-      
+
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
       final Reference ref = fac.newReference("",
           fac.newDigestMethod(DA, null), Collections.
@@ -202,7 +202,7 @@ public final class DigitalSignature {
               (C14NMethodParameterSpec) null),
               fac.newSignatureMethod(SA, null),
               Collections.singletonList(ref));
-      
+
       DocumentBuilderFactory dbf = null;
       Document cert = null;
       String kst = null;
@@ -210,11 +210,11 @@ public final class DigitalSignature {
       String kal = null;
       String pkpw = null;
       String ksuri = null;
-      
+
       PrivateKey pk = null;
       PublicKey puk = null;
       KeyInfo ki = null;
-      
+
       // dealing with given certificate details to initialize the keystore
       if(certificate != null) {
         cert = toDOMNode(certificate);
@@ -235,7 +235,7 @@ public final class DigitalSignature {
           else if(name.equals("keystore-uri"))
             ksuri = n.getTextContent();
         }
-        
+
         // initialize the keystore
         KeyStore ks = KeyStore.getInstance(kst);
         ks.load(new FileInputStream(ksuri), kspw.toCharArray());
@@ -252,11 +252,11 @@ public final class DigitalSignature {
             x509cert.getSerialNumber());
         x509Content.add(x509cert.getSubjectX500Principal().getName());
         x509Content.add(issuer);
-        x509Content.add(cert);
+        x509Content.add(x509cert);
         X509Data x509Data = kif.newX509Data(x509Content);
         content.add(x509Data);
         ki = kif.newKeyInfo(content);
-        
+
       // auto-generated keypair and signature
       } else {
         final KeyPairGenerator gen =
@@ -271,7 +271,8 @@ public final class DigitalSignature {
 
       // enveloped certificate
       final Document doc = toDOMNode(node);
-      final DOMSignContext dsc = new DOMSignContext(pk, doc.getDocumentElement());
+      final DOMSignContext dsc =
+          new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
       signedNode = (ANode) NodeType.DOC.e(doc, input);

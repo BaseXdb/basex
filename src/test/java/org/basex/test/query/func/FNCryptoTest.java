@@ -69,31 +69,31 @@ public class FNCryptoTest extends AdvancedQueryTest {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:generate-signature(<a/>,'','','','','')");
   }
-  
+
   @Test
   public void generateSignatureSyntax2() throws Exception {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:generate-signature(<a/>,'','','','','','')");
   }
-  
+
   @Test
   public void generateSignatureSyntax3() throws Exception {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:generate-signature(<a/>,'','','','','',<a/>)");
   }
-  
+
   @Test
   public void generateSignatureSyntax4() throws Exception {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:generate-signature(<a/>,'','','','','','',<a/>)");
   }
-  
+
   @Test
   public void generateSignatureSyntax5() throws Exception {
     // TODO general syntax test equiv. FNDbTest.java check()
     Assert.fail();
   }
-  
+
   @Test
   public void generateSignature1() throws Exception {
     new CreateDB(DB, "<n/>").execute(CONTEXT);
@@ -101,10 +101,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:generate-signature(/n,'','','','','')",
         "");
   }
-  
+
   @Test
   public void generateSignature2() throws Exception {
-    final String certificate = 
+    final String certificate =
         "<digital-certificate>" +
         "<keystore-type>JKS</keystore-type>" +
         "<keystore-password>password</keystore-password>" +
@@ -112,7 +112,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "<private-key-password>password</private-key-password>" +
         "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
         "</digital-certificate>";
-    
+
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:generate-signature(<a/>,'','','','',''," + certificate + ")",
         "");
@@ -125,7 +125,24 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:validate-signature(c:generate-signature(/n,'','','','',''))",
         "true");
   }
-  
+
+  @Test
+  public void validateSignature2() throws Exception {
+    final String certificate =
+        "<digital-certificate>" +
+        "<keystore-type>JKS</keystore-type>" +
+        "<keystore-password>password</keystore-password>" +
+        "<key-alias>basexselfsigned</key-alias>" +
+        "<private-key-password>password</private-key-password>" +
+        "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
+        "</digital-certificate>";
+
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','','','',''," +
+        certificate + "))",
+        "true");
+  }
+
   /**
    * Deletes the test db.
    * @throws Exception exception
