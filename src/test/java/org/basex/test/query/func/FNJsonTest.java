@@ -1,6 +1,6 @@
 package org.basex.test.query.func;
 
-import org.basex.query.func.Function;
+import static org.basex.query.func.Function.*;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
@@ -18,7 +18,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
     { "{" },
     { "[]", "<json arrays=\"json\"/>" },
     { "{}", "<json objects=\"json\"/>" },
-    { "  { } ", "<json objects=\"json\"/>" },
+    { "{ } ", "<json objects=\"json\"/>" },
     { "{ \"" },
     { "{ \"\\c\" : 0 }" },
     { "{ \"\\t\" : 0 }",
@@ -78,9 +78,9 @@ public final class FNJsonTest extends AdvancedQueryTest {
    */
   @Test
   public void jsonParse() {
-    final String fun = check(Function.JPARSE);
+    check(JSONPARSE);
     for(final String[] f : TOXML) {
-      final String qu = fun + "('" + f[0] + "')";
+      final String qu = JSONPARSE.args(f[0]);
       if(f.length == 1) {
         error(qu, Err.JSONPARSE);
       } else if(f[1].startsWith("...")) {
@@ -96,9 +96,9 @@ public final class FNJsonTest extends AdvancedQueryTest {
    */
   @Test
   public void jsonSerialize() {
-    final String fun = check(Function.JSERIALIZE);
+    check(JSONSER);
     for(final String[] f : TOJSON) {
-      final String qu = fun + "(" + f[0] + ")";
+      final String qu = JSONSER.args(f[0]);
       if(f.length == 1) {
         error(qu, Err.JSONSER);
       } else if(f[1].startsWith("...")) {

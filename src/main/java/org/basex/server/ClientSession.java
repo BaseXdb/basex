@@ -157,7 +157,7 @@ public final class ClientSession extends Session {
 
   @Override
   public ClientQuery query(final String query) throws IOException {
-    return new ClientQuery(query, this);
+    return new ClientQuery(query, this, out);
   }
 
   @Override

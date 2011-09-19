@@ -1,5 +1,6 @@
 package org.basex.test.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.basex.core.Prop;
-import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -62,13 +62,12 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void binaryEntry() {
-    final String fun = check(Function.ZIPBIN);
-    query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
-    contains("xs:hexBinary(" + fun + "('" + ZIP + "', '" + ENTRY1 + "'))",
-        "610A61626F");
+    check(ZIPBIN);
+    query(ZIPBIN.args(ZIP, ENTRY1));
+    contains("xs:hexBinary(" + ZIPBIN.args(ZIP, ENTRY1) + ")", "610A61626F");
 
-    error(fun + "('abc', 'xyz')", Err.ZIPNOTFOUND);
-    error(fun + "('" + ZIP + "', '')", Err.ZIPNOTFOUND);
+    error(ZIPBIN.args("abc", "xyz"), Err.ZIPNOTFOUND);
+    error(ZIPBIN.args(ZIP, ""), Err.ZIPNOTFOUND);
   }
 
   /**
@@ -76,12 +75,12 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void textEntry() {
-    final String fun = check(Function.ZIPTEXT);
-    query(fun + "('" + ZIP + "', '" + ENTRY1 + "')");
-    query(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'US-ASCII')");
-    error(fun + "('" + ZIP + "', '" + ENTRY1 + "', 'xyz')", Err.ZIPFAIL);
+    check(ZIPTEXT);
+    query(ZIPTEXT.args(ZIP, ENTRY1));
+    query(ZIPTEXT.args(ZIP, ENTRY1, "US-ASCII"));
+    error(ZIPTEXT.args(ZIP, ENTRY1, "xyz"), Err.ZIPFAIL);
     // newlines are removed from the result..
-    contains(fun + "('" + ZIP + "', '" + ENTRY1 + "')", "aaboutab");
+    contains(ZIPTEXT.args(ZIP, ENTRY1), "aaboutab");
   }
 
   /**
@@ -89,9 +88,9 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void xmlEntry() {
-    final String fun = check(Function.ZIPXML);
-    query(fun + "('" + ZIP + "', '" + ENTRY2 + "')");
-    query(fun + "('" + ZIP + "', '" + ENTRY2 + "')//title/text()", "XML");
+    check(ZIPXML);
+    query(ZIPXML.args(ZIP, ENTRY2));
+    query(ZIPXML.args(ZIP, ENTRY2) + "//title/text()", "XML");
   }
 
   /**
@@ -99,8 +98,8 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void entries() {
-    final String fun = check(Function.ZIPENTRIES);
-    query(fun + "('" + ZIP + "')");
+    check(ZIPENTRIES);
+    query(ZIPENTRIES.args(ZIP));
   }
 
   /**
@@ -109,38 +108,38 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void zipFile() throws IOException {
-    final String fun = check(Function.ZIPFILE);
+    check(ZIPFILE);
     // check first file
-    query(fun + "(" + zipParams("<entry name='one'/>") + ")");
+    query(ZIPFILE.args(zipParams("<entry name='one'/>")));
     checkZipEntry("one", new byte[0]);
     // check second file
-    query(fun + "(" + zipParams("<entry name='two'>!</entry>") + ")");
+    query(ZIPFILE.args(zipParams("<entry name='two'>!</entry>")));
     checkZipEntry("two", new byte[] { '!' });
     // check third file
-    query(fun + "(" +
-        zipParams("<entry name='three' encoding='UTF-16'>!</entry>") + ")");
+    query(ZIPFILE.args(
+        zipParams("<entry name='three' encoding='UTF-16'>!</entry>")));
     checkZipEntry("three", new byte[] { '\0', '!' });
     // check fourth file
-    query(fun + "(" + zipParams("<entry name='four' src='" +
-        TMPFILE + "'/>") + ")");
+    query(ZIPFILE.args(zipParams("<entry name='four' src='" +
+        TMPFILE + "'/>")));
     checkZipEntry("four", new byte[] { '!' });
     // check fifth file
-    query(fun + "(" + zipParams("<entry src='" + TMPFILE + "'/>") + ")");
+    query(ZIPFILE.args(zipParams("<entry src='" + TMPFILE + "'/>")));
     checkZipEntry(NAME, new byte[] { '!' });
     // check sixth file
-    query(fun + "(" + zipParams("<dir name='a'><entry name='b' src='" +
-        TMPFILE + "'/></dir>") + ")");
+    query(ZIPFILE.args(zipParams("<dir name='a'><entry name='b' src='" +
+        TMPFILE + "'/></dir>")));
     checkZipEntry("a/b", new byte[] { '!' });
     /* [CG] update zip files: remove zip namespace
-    query(fun + "(" + zipParams("<entry name='seven'><a/></entry>") + ")");
+    query(ZIPFILE.string(zipParams("<entry name='seven'><a/></entry>")));
     checkZipEntry("seven", token("<a/>"));
     */
 
     // error: no entry specified
-    error(fun + "(" + zipParams("") + ")", Err.ZIPFAIL);
+    error(ZIPFILE.args(zipParams("")), Err.ZIPFAIL);
     // error: duplicate entry specified
-    error(fun + "(" + zipParams("<entry src='" + TMPFILE + "'/>" +
-        "<entry src='" + TMPFILE + "'/>") + ")", Err.ZIPFAIL);
+    error(ZIPFILE.args(zipParams("<entry src='" + TMPFILE + "'/>" +
+        "<entry src='" + TMPFILE + "'/>")), Err.ZIPFAIL);
   }
 
   /**
@@ -149,10 +148,10 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void zipZip() throws IOException {
-    final String fun = check(Function.ZIPFILE);
+    check(ZIPFILE);
     // check fourth file
-    query(fun + "(" + zipParams("<entry name='four' src='" +
-        TMPFILE + "'/>") + ")");
+    query(ZIPFILE.args(
+        zipParams("<entry name='four' src='" + TMPFILE + "'/>")));
   }
 
   /**
@@ -161,23 +160,23 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void updateEntries() throws IOException {
-    final String fun = check(Function.ZIPUPDATE);
-    String list = query("zip:entries('" + ZIP + "')");
+    check(ZIPUPDATE);
+    String list = query(ZIPENTRIES.args(ZIP));
 
     // create and compare identical zip file
-    query(fun + "(" + list + ", '" + TMPZIP + "')");
-    final String list2 = query("zip:entries('" + TMPZIP + "')");
+    query(ZIPUPDATE.args(list, TMPZIP));
+    final String list2 = query(ZIPENTRIES.args(TMPZIP));
     assertEquals(list.replaceAll(" href=\\\".*?\\\"", ""),
         list2.replaceAll(" href=\\\".*?\\\"", ""));
 
     // remove one directory
     list = list.replaceAll("<zip:dir name=.test.>.*</zip:dir>", "");
-    query(fun + "(" + list + ", '" + TMPZIP + "')");
+    query(ZIPUPDATE.args(list, TMPZIP));
 
     // new file has no entries
     list = list.replaceAll("<zip:dir.*</zip:dir>", "");
-    error(fun + "(" + list + ", '" +
-        new File(TMPZIP).getCanonicalPath() + "')", Err.ZIPFAIL);
+    error(ZIPUPDATE.args(list,
+        new File(TMPZIP).getCanonicalPath()), Err.ZIPFAIL);
   }
 
   /**

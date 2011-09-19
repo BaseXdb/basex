@@ -1,5 +1,6 @@
 package org.basex.test.query;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -88,7 +89,7 @@ public final class IndexOptimizeTest {
   @Test
   public void docTest() throws Exception {
     createDoc();
-    final String doc = "doc('" + NAME + "')";
+    final String doc = DOC.args(NAME);
     check(doc + "//*[text() = '1']");
     check(doc + "//*[text() contains text '2']");
   }
@@ -100,7 +101,7 @@ public final class IndexOptimizeTest {
   @Test
   public void collTest() throws Exception {
     createColl();
-    final String doc = "collection('" + NAME + "')";
+    final String doc = COLL.args(NAME);
     check(doc + "//*[text() = '1']");
     check(doc + "//*[text() contains text '2']");
   }
@@ -112,7 +113,7 @@ public final class IndexOptimizeTest {
   @Test
   public void dbOpenTest() throws Exception {
     createColl();
-    final String doc = "db:open('" + NAME + "')";
+    final String doc = DBOPEN.args(NAME);
     check(doc + "//*[text() = '1']");
     check(doc + "//*[text() <- '2']");
   }
@@ -124,7 +125,7 @@ public final class IndexOptimizeTest {
   @Test
   public void dbOpenExtTest() throws Exception {
     createColl();
-    final String doc = "db:open('" + NAME + "/two')";
+    final String doc = DBOPEN.args(NAME + "/two");
     check(doc + "//*[text() = '1']", "");
     check(doc + "//*[text() = '4']", "<a>4</a>");
   }
@@ -151,7 +152,7 @@ public final class IndexOptimizeTest {
   @Test
   public void functionTest() throws Exception {
     createColl();
-    final String doc = "db:open('" + NAME + "')";
+    final String doc = DBOPEN.args(NAME);
     // text: search term must be string
     check("declare function local:x() {" + doc +
         "//text()[. = '1'] }; local:x()", "1");

@@ -36,23 +36,23 @@ public final class FNHof extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case SORTWITH: return sortWith(ctx);
+      case HOFSORTWITH: return sortWith(ctx);
       case HOFID:
-      case CONST:    return expr[0].iter(ctx);
-      case UNTIL:    return until(ctx).iter();
-      case ITERATE:  return iterate(ctx);
-      default:       return super.iter(ctx);
+      case HOFCONST:    return expr[0].iter(ctx);
+      case HOFUNTIL:    return until(ctx).iter();
+      case HOFITERATE:  return iterate(ctx);
+      default:          return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case FOLDLEFT1: return foldLeft1(ctx);
-      case UNTIL:     return until(ctx);
+      case HOFFOLDLEFT: return foldLeft1(ctx);
+      case HOFUNTIL:    return until(ctx);
       case HOFID:
-      case CONST:     return expr[0].value(ctx);
-      default:        return super.value(ctx);
+      case HOFCONST:    return expr[0].value(ctx);
+      default:          return super.value(ctx);
     }
   }
 
@@ -61,8 +61,8 @@ public final class FNHof extends FuncCall {
       throws QueryException {
     switch(def) {
       case HOFID:
-      case CONST: return expr[0].item(ctx, ii);
-      default:    return super.item(ctx, ii);
+      case HOFCONST: return expr[0].item(ctx, ii);
+      default:       return super.item(ctx, ii);
     }
   }
 

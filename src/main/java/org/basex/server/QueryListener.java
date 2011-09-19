@@ -2,15 +2,14 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import static org.basex.io.serial.SerializerProp.*;
-import static org.basex.query.util.Err.*;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.MainProp;
 import org.basex.core.Progress;
-import org.basex.io.out.ArrayOutput;
+import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
@@ -20,7 +19,6 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.util.list.TokenList;
 
 /**
  * Server-side query session in the client-server architecture.
@@ -36,28 +34,19 @@ final class QueryListener extends Progress {
   private final QueryProcessor qp;
   /** Database context. */
   private final Context ctx;
-  /** Print output. */
-  private final PrintOutput out;
 
   /** Query info. */
   private String info = "";
   /** Serialization options. */
   private String options = "";
 
-  /** Cached results. */
-  private TokenList cache;
-  /** Result iterator. */
-  private int pos;
-
   /**
    * Constructor.
    * @param qu query string
-   * @param po output stream
    * @param c database context
    */
-  QueryListener(final String qu, final PrintOutput po, final Context c) {
+  QueryListener(final String qu, final Context c) {
     qp = new QueryProcessor(qu, c);
-    out = po;
     ctx = c;
   }
 
@@ -77,27 +66,6 @@ final class QueryListener extends Progress {
   }
 
   /**
-   * Serializes the next item and tests if more items can be returned.
-   * @return {@code true} if a new item was serialized
-   * @throws IOException Exception
-   */
-  boolean next() throws IOException {
-    if(cache == null) execute(true);
-    if(pos == cache.size()) return false;
-    out.print(cache.get(pos));
-    cache.set(pos++, null);
-    return true;
-  }
-
-  /**
-   * Evaluates the complete query.
-   * @throws IOException Exception
-   */
-  void execute() throws IOException {
-    execute(false);
-  }
-
-  /**
    * Returns the query info.
    * @return query info
    */
@@ -114,19 +82,14 @@ final class QueryListener extends Progress {
   }
 
   /**
-   * Closes the query.
-   */
-  void close() {
-    if(cache != null) cache = null;
-  }
-
-  /**
-   * Initializes the iterative evaluation.
-   * @param caching cache results
+   * Executes the query.
+   * @param iter iterative evaluation
+   * @param out output stream
+   * @param enc encode stream
    * @throws IOException Exception
    */
-  private void execute(final boolean caching) throws IOException {
-    startTimeout(ctx.mprop.num(MainProp.TIMEOUT));
+  void execute(final boolean iter, final OutputStream out, final boolean enc)
+      throws IOException {
     boolean mon = false;
     try {
       qp.parse();
@@ -134,34 +97,36 @@ final class QueryListener extends Progress {
       mon = true;
 
       // create serializer
-      final Iter iter = qp.iter();
+      final Iter ir = qp.iter();
       final SerializerProp sprop = qp.ctx.serProp(false);
       final boolean wrap = !sprop.get(S_WRAP_PREFIX).isEmpty();
       options = qp.ctx.serProp(false).toString();
 
-      // prepare caching
-      ArrayOutput ao = new ArrayOutput();
-      cache = new TokenList();
-
       // iterate through results
-      final Serializer ser = Serializer.get(caching ? ao : out, sprop);
+      final PrintOutput po =
+          PrintOutput.get(enc ? new EncodingOutput(out) : out);
+      if(iter && wrap) po.write(1);
+
+      final Serializer ser = Serializer.get(po, sprop);
       int c = 0;
-      for(Item it; (it = iter.next()) != null;) {
-        if(stopped) SERVERTIME.thrw(null);
-        if(caching && !wrap) ser.reset();
+      for(Item it; (it = ir.next()) != null;) {
+        if(iter && !wrap) {
+          po.write(1);
+          ser.reset();
+        }
         ser.openResult();
         it.serialize(ser);
         ser.closeResult();
-        if(caching && !wrap) {
-          cache.add(ao.toArray());
-          ao.reset();
+        if(iter && !wrap) {
+          po.flush();
+          out.write(0);
         }
         c++;
       }
       ser.close();
-      if(caching && ao.size() != 0) {
-        cache.add(ao.toArray());
-        ao.reset();
+      if(iter) {
+        if(wrap) out.write(0);
+        out.write(0);
       }
 
       // generate query info
@@ -173,12 +138,10 @@ final class QueryListener extends Progress {
       info = tb.toString();
 
     } catch(final QueryException ex) {
-      close();
       throw new BaseXException(ex);
     } finally {
       try { qp.close(); } catch(final IOException ex) { }
       if(mon) ctx.unregister(qp.ctx.updating);
-      qp.stopTimeout();
     }
   }
 }

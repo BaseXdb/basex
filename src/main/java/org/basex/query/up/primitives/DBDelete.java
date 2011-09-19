@@ -5,11 +5,12 @@ import static org.basex.query.util.Err.*;
 import org.basex.core.cmd.Delete;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
+import org.basex.query.func.Function;
 import org.basex.util.InputInfo;
 import org.basex.util.list.TokenList;
 
 /**
- * Update primitive for the db:delete() function.
+ * Update primitive for the {@link Function#DBDELETE} function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

@@ -8,10 +8,11 @@ import java.util.Map.Entry;
 import org.basex.data.Data;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
+import org.basex.query.func.Function;
 import org.basex.util.InputInfo;
 
 /**
- * Update primitive for the db:rename() function.
+ * Update primitive for the {@link Function#DBRENAME} function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

@@ -42,13 +42,13 @@ public final class FNJson extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case JPARSE:
+      case JSONPARSE:
         return new JSONConverter(input).parse(checkStr(expr[0], ctx));
-      case JPARSEML:
+      case JSONPARSEML:
         return new JsonMLConverter(input).parse(checkStr(expr[0], ctx));
-      case JSERIALIZE:
+      case JSONSER:
         return serialize(false, ctx);
-      case JSERIALIZEML:
+      case JSONSERML:
         return serialize(true, ctx);
       default:
         return super.item(ctx, ii);

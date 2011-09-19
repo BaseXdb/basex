@@ -431,12 +431,12 @@ public final class ClientListener extends Thread {
     // iterator argument (query or identifier)
     String arg = in.readString();
 
-    QueryListener qp = null;
     String err = null;
     try {
+      final QueryListener qp;
       if(sc == QUERY) {
         final String query = arg;
-        qp = new QueryListener(query, out, context);
+        qp = new QueryListener(query, context);
         arg = Integer.toString(id++);
         queries.put(arg, qp);
         // send {ID}0
@@ -456,31 +456,30 @@ public final class ClientListener extends Thread {
           final String typ = in.readString();
           qp.bind(key, val, typ);
           log.write(this, sc + "(" + arg + ")", key, val, typ, OK);
-        } else if(sc == NEXT) {
-          qp.next();
+        } else if(sc == ITER) {
+          qp.execute(true, out, true);
         } else if(sc == EXEC) {
-          qp.execute();
+          qp.execute(false, out, true);
         } else if(sc == INFO) {
           out.print(qp.info());
         } else if(sc == OPTIONS) {
           out.print(qp.options());
         } else if(sc == CLOSE) {
-          qp.close();
           queries.remove(arg);
+        } else if(sc == NEXT) {
+          throw new Exception("Protocol for query iteration is out-of-dated.");
         }
         // send 0 as end marker
         out.write(0);
       }
       // send 0 as success flag
       out.write(0);
-
-      // write log file (skip next calls; bind has been logged before)
-      if(sc != NEXT && sc != BIND) log.write(this, sc + "(" + arg + ")", OK);
+      // write log file (bind has been logged before)
+      if(sc != BIND) log.write(this, sc + "(" + arg + ")", OK);
     } catch(final Exception ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
       log.write(this, sc + "(" + arg + ")", INFOERROR + err);
-      if(qp != null) qp.close();
       queries.remove(arg);
     }
     if(err != null) {

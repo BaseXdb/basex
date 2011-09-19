@@ -225,7 +225,7 @@ public class BufferInput extends InputStream {
    * Returns the input length.
    * @return input length
    */
-  final long length() {
+  public final long length() {
     return length;
   }
 

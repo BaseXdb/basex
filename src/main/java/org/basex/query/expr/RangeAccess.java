@@ -71,8 +71,8 @@ public final class RangeAccess extends Simple {
 
   @Override
   public String toString() {
-    return new TokenBuilder("db:").addExt(ind.type().toString().toLowerCase()).
-      add("-range(").addExt(ind.min).add(SEP).
-      addExt(ind.max).add(')').toString();
+    return new TokenBuilder(DB).add(':').
+      addExt(ind.type().toString().toLowerCase()).add("-range(").
+      addExt(ind.min).add(SEP).addExt(ind.max).add(')').toString();
   }
 }

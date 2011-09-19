@@ -5,8 +5,11 @@ import java.io.InputStream;
 
 /**
  * This server-side class wraps an {@link InputStream} filled by a database
- * client. The incoming bytes are decoded: {@code 0x00} is treated as
- * end of stream. {@code 0xFF} is treated as encoding flag and skipped.
+ * client. The incoming bytes are decoded:
+ * <ul>
+ * <li> {@code 0x00} is treated as end of stream, and -1 is returned</li>
+ * <li> {@code 0xFF} is treated as encoding flag and skipped</li>
+ * </ul>
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
