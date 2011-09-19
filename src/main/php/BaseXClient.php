@@ -1,7 +1,7 @@
 <?php
 /*
  * PHP client for BaseX.
- * Works with BaseX 6.3.1 and later
+ * Works with BaseX 6.8 and later
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  * 
@@ -141,7 +141,7 @@ class Session {
 
 class Query {
   /* Class variables.*/
-  var $session, $id, $open, $next;
+  var $session, $id, $open;
  
   /* see readme.txt */
   function __construct($s, $q) {
@@ -154,17 +154,6 @@ class Query {
     $this->exec(chr(3), $this->id.chr(0).$name.chr(0).$value.chr(0));
   }
 
-  /* see readme.txt */
-  public function more() {
-    $this->next = $this->exec(chr(1), $this->id);
-    return strlen($this->next) > 0; 
-  }
-
-  /* see readme.txt */
-  public function next() {
-    return $this->next;
-  }
-  
   /* see readme.txt */
   public function execute() {
     return $this->exec(chr(5), $this->id);

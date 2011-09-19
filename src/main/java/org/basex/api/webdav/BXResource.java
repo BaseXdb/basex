@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import static org.basex.query.func.Function.*;
 import static java.lang.Integer.*;
 
 import java.io.IOException;
@@ -101,7 +102,7 @@ public abstract class BXResource implements Resource {
    */
   static StringList listDBs(final Session s) throws IOException {
     final StringList result = new StringList();
-    final Query q = s.query("db:list()");
+    final Query q = s.query(DBLIST.args());
     try {
       while(q.more()) result.add(q.next());
     } finally {
@@ -139,7 +140,7 @@ public abstract class BXResource implements Resource {
    */
   static int count(final Session s, final String db, final String path)
       throws IOException {
-    final Query q = s.query("count(db:list($d, $p))");
+    final Query q = s.query(COUNT.args(DBLIST.args("$d", "$p")));
     q.bind("d", db);
     q.bind("p", path);
     return parseInt(q.execute());
@@ -157,7 +158,7 @@ public abstract class BXResource implements Resource {
       throws IOException {
 
     final String path = stripLeadingSlash(p);
-    final Query q = s.query("exists(db:list($d, $p)[. = $p])");
+    final Query q = s.query(EXISTS.args(DBLIST.args("$d", "$b") + "[. = $p]"));
     q.bind("d", db);
     q.bind("p", path);
     return Boolean.parseBoolean(q.execute());
@@ -239,8 +240,10 @@ public abstract class BXResource implements Resource {
   static boolean isRaw(final Session s, final String db,
       final String path) throws IOException {
 
-    final String qu = "db:is-raw('" + db + "','" + path + "')";
-    return s.query(qu).execute().equals("true");
+    final Query q = s.query(DBISRAW.args("$d", "$p"));
+    q.bind("d", db);
+    q.bind("p", path);
+    return q.execute().equals("true");
   }
 
   /**
@@ -253,9 +256,9 @@ public abstract class BXResource implements Resource {
    */
   static String contentType(final Session s, final String db, final String p)
       throws IOException {
-    final Query q = s.query("db:content-type($d, $p)");
-    q.bind("$d", db);
-    q.bind("$p", p);
+    final Query q = s.query(DBCTYPE.args("$d", "$p"));
+    q.bind("d", db);
+    q.bind("p", p);
     return q.execute();
   }
 

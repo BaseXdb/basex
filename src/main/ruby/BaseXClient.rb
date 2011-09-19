@@ -1,5 +1,5 @@
 # Ruby client for BaseX.
-# Works with BaseX 6.3.1 and later
+# Works with BaseX 6.8 and later
 #
 # Documentation: http://docs.basex.org/wiki/Clients
 #
@@ -120,17 +120,6 @@ class Query
   # see readme.txt
   def bind(name, value)
     exec(3.chr, @id + 0.chr + name + 0.chr + value + 0.chr)
-  end
-  
-  # see readme.txt  
-  def more()
-    @next = exec(1.chr, @id)
-    return @next.length != 0
-  end
-  
-  # see readme.txt
-  def next()
-    return @next
   end
   
   # see readme.txt

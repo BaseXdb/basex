@@ -5,7 +5,7 @@ import java.util._
 
 /**
  * Scala client for BaseX.
- * Works with BaseX 6.3.1 and later
+ * Works with BaseX 6.8 and later
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
@@ -221,7 +221,6 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
    */
   class Query(query: String) {
     val id = exec(0, query)
-    var nxt = ""
 
     /**
      * Binds a variable.
@@ -231,24 +230,6 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
      */
     def bind(name: String, value: String) {
       exec(3, id + '\0' + name + '\0' + value + '\0')
-    }
-
-    /**
-     * Checks for the next item.
-     * @return result of check
-     * @throws IOException I/O exception
-     */
-    def more() : Boolean = {
-      nxt = exec(1, id)
-      nxt.length != 0
-    }
-
-    /**
-     * Returns the next item.
-     * @return item string
-     */
-    def next() : String = {
-      nxt
     }
 
     /**

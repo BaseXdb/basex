@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import static org.basex.query.func.Function.*;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,7 +43,7 @@ public class BXDatabase extends BXFolder {
       final String info = new BXCode<String>(this) {
         @Override
         public String get() throws IOException {
-          final Query q = s.query("db:info($p)");
+          final Query q = s.query(DBINFO.args("$p"));
           q.bind("p", db);
           return q.execute();
         }

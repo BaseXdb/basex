@@ -1,5 +1,5 @@
 ' Visual Basic client for BaseX.
-' Works with BaseX 6.3.1 and later
+' Works with BaseX 6.8 and later
 '
 ' Documentation: http://docs.basex.org/wiki/Clients
 '
@@ -176,7 +176,6 @@ End Class
   Class Query
     Private session As Session
     Private id As String
-    Private nextItem As String
 
     ' see readme.txt
     Public Sub New(s As Session, query As String)
@@ -196,17 +195,6 @@ End Class
         Throw New IOException(session.Receive())
       End If  
     End Sub
-
-    ' see readme.txt 
-    Public Function More() As Boolean
-      nextItem = Exec(1, id)
-      Return nextItem.Length <> 0
-    End Function
-
-    ' see readme.txt
-    Public Function Nexty() As String
-      Return nextItem
-    End Function
 
     ' see readme.txt 
     Public Function Execute() As String

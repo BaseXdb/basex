@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import static org.basex.query.func.Function.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
@@ -81,10 +82,8 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       @Override
       public void run() throws IOException {
         s.setOutputStream(out);
-        final String query = raw ?
-          "declare option output:method 'raw'; db:retrieve($db, $path)" :
-          "db:open($db, $path)";
-        final Query q = s.query(query);
+        final Query q = s.query(raw ? "declare option output:method 'raw'; " +
+            DBRETRIEVE.args("$db", "$path") : DBOPEN.args("$db", "$path"));
         q.bind("db", db);
         q.bind("path", path);
         q.execute();
@@ -124,7 +123,8 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   protected void add(final Session s, final String trgdb, final String trgdir,
       final String name) throws IOException {
 
-    final Query q = s.query("db:add($db, db:open($sdb, $spath), $name, $path)");
+    final Query q = s.query(DBADD.args("$db",
+        DBOPEN.args("$sdb", "$spath"), "$name", "$path"));
     q.bind("db", trgdb);
     q.bind("sdb", db);
     q.bind("spath", path);

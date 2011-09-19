@@ -1,6 +1,6 @@
 /*
  * Language Binding for BaseX.
- * Works with BaseX 6.3.1 and later
+ * Works with BaseX 6.8 and later
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
@@ -276,7 +276,6 @@ namespace BaseXClient
   {
     private Session session;
     private string id;
-    private string next;
 
     /** see readme.txt */
     public Query(Session s, string query)
@@ -289,19 +288,6 @@ namespace BaseXClient
     public void Bind(string name, string value)
     {
       Exec(3, id + '\0' + name + '\0' + value + '\0');
-    }
-
-    /** see readme.txt */
-    public bool More()
-    {
-      next = Exec(1, id);
-      return next.Length != 0;
-    }
-
-    /** see readme.txt */
-    public string Next()
-    {
-      return next;
     }
 
     /** see readme.txt */

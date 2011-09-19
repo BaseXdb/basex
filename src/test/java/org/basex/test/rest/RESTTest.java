@@ -1,5 +1,6 @@
 package org.basex.test.rest;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
@@ -310,8 +311,8 @@ public class RESTTest {
     put(DB + "/a", new ArrayInput(token("<a>A</a>")));
     put(DB + "/b", new ArrayInput(token("<b>B</b>")));
     assertEquals("2", get(DB + "?query=count(//text())"));
-    assertEquals("2", get("?query=count(db:open('" + DB + "')//text())"));
-    assertEquals("1", get("?query=count(db:open('" + DB + "/b')/*)"));
+    assertEquals("2", get("?query=count(" + DBOPEN.args(DB) + "//text())"));
+    assertEquals("1", get("?query=count(" + DBOPEN.args(DB + "/b") + "/*)"));
     delete(DB);
   }
 

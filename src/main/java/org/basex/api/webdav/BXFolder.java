@@ -1,5 +1,6 @@
 package org.basex.api.webdav;
 
+import static org.basex.query.func.Function.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -105,7 +106,8 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final List<BXResource> ch = new ArrayList<BXResource>();
         final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
-            "for $r in db:list($d, $p) return substring-after($r,$p)");
+            "for $r in " + DBLIST.args("$d", "$p") +
+            "return " + SUBAFTER.args("$r", "$p"));
         q.bind("d", db);
         q.bind("p", path);
         while(q.more()) {
@@ -237,12 +239,12 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   private void add(final Session s, final String trgdb, final String trgdir)
       throws IOException {
     final Query q = s.query(
-        "for $d in db:list($db, $path) " +
+        "for $d in " + DBLIST.args("$db", "$path") +
+        "let $t := tokenize(substring($d, string-length($path) + 1), '/') " +
         "let $t := tokenize(substring($d, string-length($path) + 1), '/') " +
         "let $p := string-join(($trgdir, $t[position() < last()]), '/') " +
-        "let $n := $t[last()] " +
-        "return " +
-        "db:add($trgdb, db:open($db, $d), $n, $p)");
+        "let $n := $t[last()] return " +
+        DBADD.args("$trgdb", DBOPEN.args("$db", "$d"), "$n", "$p"));
     q.bind("db", db);
     q.bind("path", path);
     q.bind("trgdb", trgdb);

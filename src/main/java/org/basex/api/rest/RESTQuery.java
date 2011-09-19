@@ -1,5 +1,6 @@
 package org.basex.api.rest;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.data.DataText.*;
 
@@ -61,11 +62,10 @@ class RESTQuery extends RESTCode {
     String query = in.isEmpty() ? "." : in;
     if(query.equals(".") && ctx.depth() > 1) {
       // retrieve binary contents if no query is specified
-      final String args = "'" + ctx.db() + "','" + ctx.dbpath() + "'";
-      final String raw = "db:is-raw(" + args + ")";
+      final String raw = DBISRAW.args(ctx.db(), ctx.dbpath());
       if(session.query(raw).execute().equals("true"))
         query = "declare option output:method '" + M_RAW + "';" +
-            "db:retrieve(" + args + ")";
+            DBRETRIEVE.args(ctx.db(), ctx.dbpath());
     }
 
     // redirect output stream

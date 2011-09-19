@@ -1,5 +1,5 @@
 # Perl client for BaseX.
-# Works with BaseX 6.3.1 and later
+# Works with BaseX 6.8 and later
 #
 # Documentation: http://docs.basex.org/wiki/Clients
 # 
@@ -161,7 +161,6 @@ package Query;
 
 our $session;
 our $id;
-our $next;
 
 # see readme.txt
 sub new {
@@ -179,17 +178,6 @@ sub bind {
   my $name = shift;
   my $value = shift;
   exc(chr(3), $id.chr(0).$name.chr(0).$value.chr(0));
-}
-
-# see readme.txt
-sub more {
-  $next = exc(chr(1), $id);
-  return length($next);
-}
-
-# see readme.txt
-sub next {
-  return $next;
 }
 
 # see readme.txt

@@ -6,31 +6,35 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Java client for BaseX.
- * Works with BaseX 6.3.1 and later
+ * Works with BaseX 6.8 and later
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * (C) BaseX Team 2005-11, BSD License
  */
 public final class BaseXClient {
+  /** UTF-8 charset. */
+  static final Charset UTF8 = Charset.forName("UTF-8");
   /** Event notifications. */
   final Map<String, EventNotifier> notifiers =
     new HashMap<String, EventNotifier>();
   /** Output stream. */
   final OutputStream out;
   /** Socket. */
-  private final Socket socket;
+  final Socket socket;
   /** Cache. */
-  private final BufferedInputStream in;
+  final BufferedInputStream in;
   /** Command info. */
-  private String info;
+  String info;
   /** Socket event reference. */
   Socket esocket;
   /** Socket host name. */
@@ -87,7 +91,7 @@ public final class BaseXClient {
   public String execute(final String cmd) throws IOException {
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     execute(cmd, os);
-    return os.toString("UTF-8");
+    return new String(os.toByteArray(), UTF8);
   }
 
   /**
@@ -232,7 +236,7 @@ public final class BaseXClient {
   String receive() throws IOException {
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     receive(in, os);
-    return os.toString("UTF-8");
+    return new String(os.toByteArray(), UTF8);
   }
 
   /**
@@ -241,7 +245,7 @@ public final class BaseXClient {
    * @throws IOException I/O exception
    */
   void send(final String s) throws IOException {
-    out.write((s + '\0').getBytes("UTF8"));
+    out.write((s + '\0').getBytes(UTF8));
   }
 
   /**
@@ -269,12 +273,12 @@ public final class BaseXClient {
         try {
           final BufferedInputStream bi = new BufferedInputStream(is);
           while(true) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            receive(bi, baos);
-            final String name = baos.toString("UTF-8");
-            baos = new ByteArrayOutputStream();
-            receive(bi, baos);
-            final String data = baos.toString("UTF-8");
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            receive(bi, os);
+            final String name = new String(os.toByteArray(), UTF8);
+            os = new ByteArrayOutputStream();
+            receive(bi, os);
+            final String data = new String(os.toByteArray(), UTF8);
             notifiers.get(name).notify(data);
           }
         } catch(final Exception ex) { }
@@ -329,8 +333,10 @@ public final class BaseXClient {
   public final class Query {
     /** Query id. */
     private final String id;
-    /** Next result item. */
-    private String next;
+    /** Cached results. */
+    private ArrayList<byte[]> cache;
+    /** Cache pointer. */
+    private int pos;
 
     /**
      * Standard constructor.
@@ -340,6 +346,7 @@ public final class BaseXClient {
     public Query(final String query) throws IOException {
       id = exec(0, query);
     }
+
     /**
      * Binds a variable.
      * @param name name of variable
@@ -357,16 +364,28 @@ public final class BaseXClient {
      * @throws IOException I/O exception
      */
     public boolean more() throws IOException {
-      next = exec(1, id);
-      return next.length() != 0;
+      if(cache == null) {
+        out.write(4);
+        send(id);
+        cache = new ArrayList<byte[]>();
+        final ByteArrayOutputStream os = new ByteArrayOutputStream();
+        while(in.read() == 1) {
+          receive(in, os);
+          cache.add(os.toByteArray());
+          os.reset();
+        }
+        if(!ok()) throw new IOException(receive());
+      }
+      return pos < cache.size();
     }
 
     /**
      * Returns the next item.
      * @return item string
+     * @throws IOException I/O Exception
      */
-    public String next() {
-      return next;
+    public String next() throws IOException {
+      return more() ? new String(cache.get(pos++), UTF8) : null;
     }
 
     /**

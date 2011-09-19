@@ -1,5 +1,5 @@
 # Python client for BaseX.
-# Works with BaseX 6.3.1 and later
+# Works with BaseX 6.8 and later
 #
 # Documentation: http://docs.basex.org/wiki/Clients
 #
@@ -152,15 +152,6 @@ class Query():
     # see readme.txt  
     def bind(self, name, value):
         self.exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0))
-  
-    # see readme.txt
-    def more(self):
-        self.__next = self.exc(chr(1), self.__id)  
-        return len(self.__next) != 0  
-    
-    # see readme.txt
-    def next(self):
-        return self.__next
   
     # see readme.txt  
     def execute(self):
