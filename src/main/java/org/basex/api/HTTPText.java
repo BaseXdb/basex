@@ -21,6 +21,8 @@ public interface HTTPText {
 
   /** Authorization string. */
   String AUTHORIZATION = "Authorization";
+  /** WWW-Authentication string. */
+  String WWW_AUTHENTICATE = "WWW-Authenticate";
   /** Basic string. */
   String BASIC = "Basic";
 

@@ -1,5 +1,6 @@
 package org.basex.api.rest;
 
+import static org.basex.api.HTTPText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
@@ -19,22 +20,22 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 final class RESTContext {
-  /** Path. */
-  private final String[] path;
-
   /** Servlet request. */
-  protected HttpServletRequest req;
+  protected final HttpServletRequest req;
   /** Servlet response. */
-  protected HttpServletResponse res;
+  protected final HttpServletResponse res;
+  /** Output stream. */
+  protected final OutputStream out;
   /** Database session. */
   protected Session session;
-  /** Output stream. */
-  protected OutputStream out;
 
   /** Serialization parameters. */
   protected String serialization = "";
   /** Result wrapping. */
   protected boolean wrapping;
+
+  /** Path. */
+  private final String[] path;
 
   /**
    * Constructor.
@@ -124,7 +125,8 @@ final class RESTContext {
    */
   void status(final int code, final String message) throws IOException {
     if(session != null) session.close();
-    if(res != null) res.setStatus(code);
+    res.setStatus(code);
+    if(code == 401) res.setHeader(WWW_AUTHENTICATE, BASIC);
     if(message != null) out.write(token(message));
   }
 }
