@@ -107,10 +107,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
     final String certificate = 
         "<digital-certificate>" +
         "<keystore-type>JKS</keystore-type>" +
-        "<keystore-password>ab987c</keystore-password>" +
-        "<key-alias>eXist</key-alias>" +
-        "<private-key-password>kpi135</private-key-password>" +
-        "<keystore-uri>/db/mykeystoreEXist</keystore-uri>" +
+        "<keystore-password>password</keystore-password>" +
+        "<key-alias>basexselfsigned</key-alias>" +
+        "<private-key-password>password</private-key-password>" +
+        "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
         "</digital-certificate>";
     
     query("declare namespace c = 'http://expath.org/ns/crypto';" +

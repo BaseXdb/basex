@@ -7,20 +7,21 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
 
-import javax.xml.crypto.KeySelector;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
@@ -36,6 +37,8 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -209,6 +212,7 @@ public final class DigitalSignature {
       String ksuri = null;
       
       PrivateKey pk = null;
+      PublicKey puk = null;
       KeyInfo ki = null;
       
       // dealing with given certificate details to initialize the keystore
@@ -220,12 +224,37 @@ public final class DigitalSignature {
         while(ci < s) {
           final Node n = childs.item(ci++);
           final String name = n.getNodeName();
-          if(name.equals("keystore-type")) kst = n.getTextContent();
-          else if(name.equals("keystore-password")) kspw = n.getTextContent();
-          else if(name.equals("key-alias")) kal = n.getTextContent();
-          else if(name.equals("private-key-password")) pkpw = n.getTextContent();
-          else if(name.equals("keystore-uri")) ksuri = n.getTextContent();
+          if(name.equals("keystore-type"))
+            kst = n.getTextContent();
+          else if(name.equals("keystore-password"))
+            kspw = n.getTextContent();
+          else if(name.equals("key-alias"))
+            kal = n.getTextContent();
+          else if(name.equals("private-key-password"))
+            pkpw = n.getTextContent();
+          else if(name.equals("keystore-uri"))
+            ksuri = n.getTextContent();
         }
+        
+        // initialize the keystore
+        KeyStore ks = KeyStore.getInstance(kst);
+        ks.load(new FileInputStream(ksuri), kspw.toCharArray());
+        pk = (PrivateKey) ks.getKey(kal, pkpw.toCharArray());
+        X509Certificate x509cert = (X509Certificate) ks.getCertificate(kal);
+        puk = x509cert.getPublicKey();
+        final KeyInfoFactory kif = fac.getKeyInfoFactory();
+        KeyValue keyValue = kif.newKeyValue(puk);
+        Vector content = new Vector();
+        content.add(keyValue);
+        List x509Content = new ArrayList();
+        X509IssuerSerial issuer = kif.newX509IssuerSerial(x509cert.getIssuerX500Principal().getName(),
+            x509cert.getSerialNumber());
+        x509Content.add(x509cert.getSubjectX500Principal().getName());
+        x509Content.add(issuer);
+        x509Content.add(cert);
+        X509Data x509Data = kif.newX509Data(x509Content);
+        content.add(x509Data);
+        ki = kif.newKeyInfo(content);
         
       // auto-generated keypair and signature
       } else {
@@ -239,10 +268,8 @@ public final class DigitalSignature {
         pk = kp.getPrivate();
       }
 
-
       // enveloped certificate
       final Document doc = toDOMNode(node);
-
       final DOMSignContext dsc = new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
