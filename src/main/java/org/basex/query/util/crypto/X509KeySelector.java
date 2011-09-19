@@ -211,10 +211,11 @@ public class X509KeySelector extends KeySelector {
     private KeySelectorResult certSelect(X509Certificate xcert, 
 	SignatureMethod sm) throws KeyStoreException {
         // skip non-signer certs
-        boolean[] keyUsage = xcert.getKeyUsage();
-        if (keyUsage[0] == false) {
-            return null;
-        }
+      // TODO delete this - necessary?
+//        boolean[] keyUsage = xcert.getKeyUsage();
+//        if (keyUsage[0] == false) {
+//            return null;
+//        }
         String alias = ks.getCertificateAlias(xcert);
         if (alias != null) {
             PublicKey pk = ks.getCertificate(alias).getPublicKey();

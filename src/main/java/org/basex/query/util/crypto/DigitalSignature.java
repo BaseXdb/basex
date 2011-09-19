@@ -13,9 +13,11 @@ import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -136,10 +138,10 @@ public final class DigitalSignature {
    * @return signed node
    * @throws QueryException query exception
    */
-  public ANode generateSignature(final ANode node, final byte[] canonicalization,
-      final byte[] digest, final byte[] signature,
-      final byte[] nsPrefix, final byte[] type, final ANode certificate)
-          throws QueryException {
+  public ANode generateSignature(final ANode node,
+      final byte[] canonicalization, final byte[] digest,
+      final byte[] signature, final byte[] nsPrefix, final byte[] type,
+      final ANode certificate) throws QueryException {
 
     // variables to check if parameters correct
     int l = 0;
@@ -293,7 +295,7 @@ public final class DigitalSignature {
 
     return signedNode;
   }
-  
+
   /**
    * Validates a signature.
    * @param node input node
@@ -301,18 +303,30 @@ public final class DigitalSignature {
    * @return true if signature valid
    */
   public Item validateSignature(final ANode node) {
+    boolean coreVal = false;
+
     try {
 
       final Document doc = toDOMNode(node);
+
       final NodeList nl = doc.getElementsByTagName("Signature");
 
       // TODO change to X509KeySelector
+//      final KeyStore keystore = KeyStore.getInstance("JKS");
+//      keystore.load(new FileInputStream("/Users/lukas/keystore.jks"),
+//          "password".toCharArray());
+//      final DOMValidateContext valContext =
+//          new DOMValidateContext(new X509KeySelector(keystore), nl.item(0));
       final DOMValidateContext valContext =
           new DOMValidateContext(new MyKeySelector(), nl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
 
-      return Bln.get(signature.validate(valContext));
+      coreVal = signature.validate(valContext);
+      if(!coreVal) {
+      }
+
+      return Bln.get(coreVal);
 
     } catch(FileNotFoundException e1) {
       e1.printStackTrace();
@@ -326,11 +340,17 @@ public final class DigitalSignature {
       e.printStackTrace();
     } catch(XMLSignatureException e) {
       e.printStackTrace();
+//    } catch(KeyStoreException e) {
+//      e.printStackTrace();
+//    } catch(NoSuchAlgorithmException e) {
+//      e.printStackTrace();
+//    } catch(CertificateException e) {
+//      e.printStackTrace();
     }
 
-    return Bln.get(false);
+    return Bln.get(coreVal);
   }
-  
+
   private static Document toDOMNode(final ANode n)
       throws SAXException, IOException, ParserConfigurationException {
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
