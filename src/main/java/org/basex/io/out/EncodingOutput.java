@@ -29,7 +29,7 @@ public final class EncodingOutput extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    if(b == 0x00 || b == 0xFF) os.write(0xFF);
+    if(b == 0x00 || (b & 0xFF) == 0xFF) os.write(0xFF);
     os.write(b);
   }
 
