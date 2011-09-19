@@ -247,7 +247,8 @@ public final class DigitalSignature {
         Vector content = new Vector();
         content.add(keyValue);
         List x509Content = new ArrayList();
-        X509IssuerSerial issuer = kif.newX509IssuerSerial(x509cert.getIssuerX500Principal().getName(),
+        X509IssuerSerial issuer = kif.newX509IssuerSerial(x509cert.
+            getIssuerX500Principal().getName(),
             x509cert.getSerialNumber());
         x509Content.add(x509cert.getSubjectX500Principal().getName());
         x509Content.add(issuer);
@@ -304,7 +305,9 @@ public final class DigitalSignature {
       final Document doc = toDOMNode(node);
       final NodeList nl = doc.getElementsByTagName("Signature");
 
-      final DOMValidateContext valContext = new DOMValidateContext(new MyKeySelector(), nl.item(0));
+      // TODO change to X509KeySelector
+      final DOMValidateContext valContext =
+          new DOMValidateContext(new MyKeySelector(), nl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
 
