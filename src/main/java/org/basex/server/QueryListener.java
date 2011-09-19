@@ -124,10 +124,7 @@ final class QueryListener extends Progress {
         c++;
       }
       ser.close();
-      if(iter) {
-        if(wrap) out.write(0);
-        out.write(0);
-      }
+      if(iter && wrap) out.write(0);
 
       // generate query info
       final int up = qp.updates();
