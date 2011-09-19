@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.util.Token.*;
+import static java.lang.Float.*;
 import org.basex.util.InputInfo;
 
 /**
@@ -38,7 +39,13 @@ abstract class Num extends Item {
   public final int hash(final InputInfo ii) {
     // makes sure the hashing is good for very small and very big numbers
     final long l = itr(ii);
-    int h = (int) (Float.floatToIntBits(flt(ii)) ^ l ^ l >>> 32);
+    final float f = flt(ii);
+
+    // extract fractional part from a finite float
+    int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY || isNaN(f) ? 0
+        : floatToIntBits(f - l);
+
+    int h = frac ^ (int) (l ^ l >>> 32);
 
     // this part ensures better distribution of bits (from java.util.HashMap)
     h ^= h >>> 20 ^ h >>> 12;
