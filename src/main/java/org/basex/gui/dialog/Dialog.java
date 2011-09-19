@@ -2,15 +2,19 @@ package org.basex.gui.dialog;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URI;
+
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import org.basex.gui.GUI;
@@ -19,6 +23,7 @@ import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.TableLayout;
+import org.basex.util.Util;
 
 /**
  * This class provides the architecture for consistent dialog windows.
@@ -252,5 +257,18 @@ public abstract class Dialog extends JDialog {
    */
   public static void error(final GUI gui, final String text) {
     new DialogMessage(gui, text.trim(), Msg.ERROR);
+  }
+
+  /**
+   * Browses the specified url.
+   * @param gui parent reference
+   * @param url url to be browsed
+   */
+  public static void browse(final GUI gui, final String url) {
+    try {
+      Desktop.getDesktop().browse(new URI(url));
+    } catch(final Exception ex) {
+      error(gui, Util.info(INFOBROSERERR, URL));
+    }
   }
 }

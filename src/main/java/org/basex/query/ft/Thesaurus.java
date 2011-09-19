@@ -113,7 +113,7 @@ public final class Thesaurus {
   private void init(final InputInfo ii) throws QueryException {
     try {
       final Data data = MemBuilder.build(
-          Parser.xmlParser(file, ctx.prop, ""), ctx.prop);
+          Parser.xmlParser(file, ctx.prop), ctx.prop);
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); ++n) {
         build(new Nodes(result.list[n], data));

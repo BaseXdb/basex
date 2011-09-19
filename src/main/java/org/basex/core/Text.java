@@ -25,7 +25,12 @@ public interface Text {
   // FREQUENTLY USED CHARACTERS ===============================================
 
   /** New line. */
-  String NL = org.basex.core.Prop.NL;
+  String NL = Prop.NL;
+  /** Project name. */
+  String NAME = Prop.NAME;
+  /** Code version (must contain major, minor and optional patch number). */
+  String VERSION = Prop.VERSION;
+
   /** Colon. */
   String COL = ":";
   /** Colon/space. */
@@ -37,8 +42,6 @@ public interface Text {
   /** List. */
   String LI = "- ";
 
-  /** Project name. */
-  String NAME = "BaseX";
   /** Project namespace. */
   String NAMELC = NAME.toLowerCase();
   /** URL. */
@@ -47,10 +50,10 @@ public interface Text {
   String COMMUNITY_URL = URL + "/community";
   /** URL of the update page. */
   String UPDATE_URL = URL + "/products/download/all-downloads/";
+  /** Version URL. */
+  String VERSION_URL = "http://files." + NAMELC + ".org/version.txt";
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
-  /** Code version (must contain major, minor and optional patch number). */
-  String VERSION = "6.8 beta";
   /** Company info. */
   String COMPANY = NAME + " Team";
   /** Title and version. */
@@ -133,18 +136,19 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-cdeJhnpPsSUWz] [stop]" + NL +
+    " [-cdehnpPRsUWz] [stop]" + NL +
     "  stop      Stop existing server" + NL +
     "  -c        Start in client/server mode" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
-    "  -h<num>   Set HTTP server port" + NL +
-    "  -n<name>  Set server (host) name" + NL +
-    "  -p<num>   Set database server port" + NL +
+    "  -h<num>   Set port of HTTP server" + NL +
+    "  -n<name>  Set name of database server" + NL +
+    "  -p<num>   Set port of database server" + NL +
     "  -P<pass>  Specify user password" + NL +
-    "  -s        Start database as service" + NL +
+    "  -R        Deactivate REST service" + NL +
+    "  -s        Start server as service" + NL +
     "  -U<name>  Specify user name" + NL +
-    "  -W        Deactivate WebDAV" + NL +
+    "  -W        Deactivate WebDAV service" + NL +
     "  -z        Suppress logging";
 
   // SERVER ===================================================================
@@ -389,15 +393,6 @@ public interface Text {
     "([" + C_PW + "])", lang("ch_password1"), lang("ch_password2")
   };
   /** Command help. */
-  String[] HELPHELP = {
-    "([command])", lang("ch_help1", NAME), lang("ch_help2", "command")
-  };
-  /** Command help. */
-  String[] HELPEXIT = {
-    "", lang("ch_exit1", NAME), lang("ch_exit2", NAME)
-  };
-
-  /** Command help. */
   String[] HELPREPO = {
       "[" + CmdRepo.DELETE + "|" + CmdRepo.INSTALL + "|" + CmdRepo.LIST + "]",
       lang("ch_repo1"),
@@ -408,6 +403,23 @@ public interface Text {
       "  " + lang("ch_repo4", C_PKGPATH) + NL +
       LI + CmdRepo.LIST + ":" + NL +
       "  " + lang("ch_repo5")
+  };
+  /** Command help. */
+  String[] HELPRETRIEVE = {
+    "[" + C_PATH + "]", lang("ch_retrieve1"), lang("ch_retrieve2", C_PATH)
+  };
+  /** Command help. */
+  String[] HELPSTORE = {
+    "[" + C_PATH + "] [" + C_INPUT + "]",
+    lang("ch_store1"), lang("ch_store2", C_PATH)
+  };
+  /** Command help. */
+  String[] HELPHELP = {
+    "([command])", lang("ch_help1", NAME), lang("ch_help2", "command")
+  };
+  /** Command help. */
+  String[] HELPEXIT = {
+    "", lang("ch_exit1", NAME), lang("ch_exit2", NAME)
   };
 
   // COMMAND INFOS ============================================================
@@ -547,6 +559,8 @@ public interface Text {
   String DBBACKNF = lang("db_backnf");
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
+  /** File not stored. */
+  String DBNOTSTORED = lang("db_notstored");
 
   /** Index created. */
   String INDCREATED = lang("in_created");
@@ -1230,6 +1244,8 @@ public interface Text {
   String OPENLARGE = lang("do_large") + NL + " ";
   /** Dialog asking if a new database should be be created. */
   String NODBQUESTION = INFONODB + NL + lang("do_nodbquestion") + NL + " ";
+  /** Dialog for downloading a new version. */
+  String GUICHECKVER = lang("do_checkver");
 
   /** File dialog error. */
   String NOTOPENED = lang("c_notopened");

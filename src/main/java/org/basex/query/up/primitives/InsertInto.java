@@ -30,7 +30,7 @@ public final class InsertInto extends InsertBase {
   public void apply() {
     super.apply();
 
-    /* TODO [LK] add checks for this loc attribute: if they exceed the
+    /* [LK] add checks for this loc attribute: if they exceed the
      * table limit -> add general loc() method or similar for all update
      * primitives. + Create test cases.
      */

@@ -107,6 +107,7 @@ dc_separatorinfo=Separator
 do_title=Open Database
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Do you want to create a new one?
+do_checkver=A new version is available (% %)!\nDo you want to update?
 
 dr_title=Rename Database
 dr_title2=Delete documents
@@ -390,6 +391,7 @@ db_notdeleted=File '%' could not be deleted.
 db_exists=Database '%' exists already.
 db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
+db_notstored=File '%' could not be stored.
 
 # Index commands
 in_created=Index '%' created in %.
@@ -557,7 +559,7 @@ ch_alter2=Alters the name of a database or the user password:
 ch_alterpw=alters the password of a user.
 ch_alterdb=alters the name of a database.
 ch_optimize1=Optimize the database.
-ch_optimize2=Optimizes the currently opened database.\nIf % is specified, the database size is minimized.  
+ch_optimize2=Optimizes the currently opened database.\nIf % is specified, the database size is minimized.
 ch_export1=Export database to XML.
 ch_export2=Exports the database to [%].
 ch_xquery1=Run XQuery.
@@ -610,6 +612,10 @@ ch_repo2=installs, deletes or lists packages from the repository
 ch_repo3=deletes the package with name [%] or directory [%]
 ch_repo4=installs package with path [%]
 ch_repo5=lists all installed packages
+ch_retrieve1=Retrieve raw data.
+ch_retrieve2=Retrieves raw data from the specified [%].
+ch_store1=Store raw data.
+ch_store2=Stores raw data to the specified [%].
 
 # Help Texts
 h_hist=Show input history.

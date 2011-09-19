@@ -1,9 +1,8 @@
 package org.basex.io.serial;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.basex.query.item.Bin;
 import org.basex.query.item.Item;
 
 /**
@@ -28,11 +27,13 @@ public final class RawSerializer extends TextSerializer {
 
   @Override
   public void finishItem(final Item it) throws IOException {
-    print(it instanceof Bin ? ((Bin) it).toJava() : atom(it));
+    final InputStream is = it.input();
+    for(int i; (i = is.read()) != -1;) out.write(i);
+    is.close();
   }
 
   @Override
   protected void code(final int ch) throws IOException {
-    print(ch);
+    printChar(ch);
   }
 }

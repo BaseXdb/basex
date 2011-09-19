@@ -31,8 +31,6 @@ public interface BuildText {
   String PARSEINV = "%: % expected, % found.";
   /** Parser error: Tag Mismatch. */
   String CLOSINGTAG = "%: </%> found, </%> expected.";
-  /** Parser error. */
-  String PARSEEXP = "%: % expected.";
 
   /** Scanner error. */
   String DOCEMPTY = "Document is empty.";

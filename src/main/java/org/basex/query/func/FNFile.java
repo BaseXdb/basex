@@ -286,7 +286,6 @@ public final class FNFile extends FuncCall {
   private B64 readBinary(final File path) throws QueryException {
     if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
-
     try {
       return new B64(new IOFile(path).read());
     } catch(final IOException ex) {
@@ -308,12 +307,8 @@ public final class FNFile extends FuncCall {
     if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
     if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
-
     try {
-      byte[] txt = TextInput.content(new IOFile(path), enc).finish();
-      if(contains(txt, '\r')) txt = contains(txt, '\n') ?
-          delete(txt, '\r') : replace(txt, '\r', '\n');
-      return Str.get(txt);
+      return Str.get(TextInput.content(new IOFile(path), enc).finish());
     } catch(final IOException ex) {
       throw FILEERROR.thrw(input, ex);
     }
@@ -349,9 +344,9 @@ public final class FNFile extends FuncCall {
       final PrintOutput out = PrintOutput.get(
           new FileOutputStream(path, append));
       try {
-        final Serializer xml = Serializer.get(out, serialPar(this, 2, ctx));
-        for(Item it; (it = ir.next()) != null;) it.serialize(xml);
-        xml.close();
+        final Serializer ser = Serializer.get(out, serialPar(this, 2, ctx));
+        for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+        ser.close();
       } catch(final SerializerException ex) {
         throw new QueryException(input, ex);
       } finally {

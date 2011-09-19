@@ -8,11 +8,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 
-import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
-import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.User;
@@ -21,8 +19,10 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Replace;
+import org.basex.core.cmd.Store;
 import org.basex.io.in.BufferInput;
-import org.basex.io.in.ClientInputStream;
+import org.basex.io.in.DecodingInput;
+import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
@@ -30,7 +30,6 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ByteList;
 import org.basex.util.list.StringList;
-import org.xml.sax.InputSource;
 
 /**
  * Server-side client session in the client-server architecture.
@@ -43,6 +42,8 @@ public final class ClientListener extends Thread {
   /** Active queries. */
   private final HashMap<String, QueryListener> queries =
     new HashMap<String, QueryListener>();
+  /** Performance measurement. */
+  final Performance perf = new Performance();
   /** Database context. */
   private final Context context;
   /** Socket reference. */
@@ -128,7 +129,14 @@ public final class ClientListener extends Thread {
     try {
       while(running) {
         try {
-          final byte b = in.readByte();
+          final int b = in.read();
+          if(b == -1) {
+            // end of stream: exit session
+            exit();
+            break;
+          }
+
+          perf.getTime();
           sc = get(b);
           cmd = null;
           if(sc == CREATE) {
@@ -141,21 +149,22 @@ public final class ClientListener extends Thread {
             unwatch();
           } else if(sc == REPLACE) {
             replace();
+          } else if(sc == STORE) {
+            store();
           } else if(sc != COMMAND) {
             query(sc);
           } else {
             // database command
-            cmd = new ByteList().add(b).add(in.token().toArray()).toString();
+            cmd = new ByteList().add(b).add(in.readBytes()).toString();
           }
         } catch(final IOException ex) {
-          // this exception is thrown for each session if the server is stopped
+          // this exception may be thrown if a session is stopped
           exit();
           break;
         }
         if(sc != COMMAND) continue;
 
         // parse input and create command instance
-        final Performance perf = new Performance();
         command = null;
         try {
           command = new CommandParser(cmd, context).parseSingle();
@@ -172,13 +181,6 @@ public final class ClientListener extends Thread {
           continue;
         }
 
-        // stop console
-        if(command instanceof Exit) {
-          exit();
-          running = false;
-          break;
-        }
-
         // start timeout
         command.startTimeout(context.mprop.num(MainProp.TIMEOUT));
         log.write(this,
@@ -188,7 +190,7 @@ public final class ClientListener extends Thread {
         boolean ok = true;
         String info = null;
         try {
-          command.execute(context, out);
+          command.execute(context, new EncodingOutput(out));
           info = command.info();
         } catch(final BaseXException ex) {
           ok = false;
@@ -201,9 +203,14 @@ public final class ClientListener extends Thread {
         // send 0 to mark end of result
         out.write(0);
         // send info
-        info(ok, info, perf);
+        info(info, ok);
+
+        // stop console
+        if(command instanceof Exit) {
+          exit();
+          break;
+        }
       }
-      if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
       log.write(this, sc == COMMAND ? cmd : sc, INFOERROR + ex.getMessage());
       Util.stack(ex);
@@ -215,11 +222,7 @@ public final class ClientListener extends Thread {
    * Exits the session.
    */
   public synchronized void exit() {
-    // close remaining query processes
-    for(final QueryListener q : queries.values()) {
-      try { q.close(true); } catch(final IOException ex) { }
-    }
-
+    running = false;
     try {
       // remove this session from all events in pool
       if(events != null) {
@@ -233,6 +236,7 @@ public final class ClientListener extends Thread {
       if(command != null) command.stop();
       context.delete(this);
       socket.close();
+      log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final Exception ex) {
       log.write(ex.getMessage());
       Util.stack(ex);
@@ -278,7 +282,7 @@ public final class ClientListener extends Thread {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder("[");
     tb.add(socket.getInetAddress().getHostAddress());
-    tb.add(':').addExt(socket.getPort()).add(']');
+    tb.add(COL).addExt(socket.getPort()).add(']');
     if(context.data() != null) tb.add(COLS).add(context.data().meta.name);
     return tb.toString();
   }
@@ -286,15 +290,30 @@ public final class ClientListener extends Thread {
   // PRIVATE METHODS ==========================================================
 
   /**
-   * Returns user feedback.
-   * @param ok success flag
-   * @param info information string
-   * @param perf performance reference
+   * Returns error feedback.
+   * @param info error string
    * @throws IOException I/O exception
    */
-  private void info(final boolean ok, final String info,
-      final Performance perf) throws IOException {
+  private void error(final String info) throws IOException {
+    info(info, false);
+  }
 
+  /**
+   * Returns user feedback.
+   * @param info information string
+   * @throws IOException I/O exception
+   */
+  private void success(final String info) throws IOException {
+    info(info, true);
+  }
+
+  /**
+   * Returns user feedback.
+   * @param info information string
+   * @param ok success/error flag
+   * @throws IOException I/O exception
+   */
+  private void info(final String info, final boolean ok) throws IOException {
     // write feedback to log file
     log.write(this, ok ? OK : INFOERROR + info, perf);
     // send {MSG}0 and (0|1) as (success|error) flag
@@ -307,20 +326,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void create() throws IOException {
-    final Performance perf = new Performance();
-    final String name = in.readString();
-    log.write(this, CREATE + " " + CmdCreate.DATABASE + " " + name + " [...]");
-
-    final ClientInputStream cis = new ClientInputStream(in);
-    try {
-      final String info = cis.curr() == -1 ?
-        CreateDB.create(name, Parser.emptyParser(), context) :
-        CreateDB.create(name, cis, context);
-      info(true, info, perf);
-    } catch(final BaseXException ex) {
-      cis.close();
-      info(false, ex.getMessage(), perf);
-    }
+    execute(new CreateDB(in.readString()));
   }
 
   /**
@@ -328,24 +334,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void add() throws IOException {
-    final Performance perf = new Performance();
-    final String name = in.readString();
-    final String path = in.readString();
-    final StringBuilder sb = new StringBuilder(ADD + " ");
-    if(!name.isEmpty()) sb.append(AS + ' ' + name + ' ');
-    if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
-    log.write(this, sb.append("[...]"));
-
-    final ClientInputStream cis = new ClientInputStream(in);
-    final InputSource is = new InputSource(cis);
-    try {
-      final String info = Add.add(name, path, is, context, null, true);
-      info(true, info, perf);
-    } catch(final BaseXException ex) {
-      cis.close();
-      info(false, ex.getMessage(), perf);
-    }
-    out.flush();
+    execute(new Add(null, in.readString(), in.readString()));
   }
 
   /**
@@ -353,22 +342,33 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void replace() throws IOException {
-    final Performance perf = new Performance();
-    final String path = in.readString();
-    final StringBuilder sb = new StringBuilder(REPLACE + " ");
-    if(!path.isEmpty()) sb.append(TO + ' ' + path + ' ');
-    log.write(this, sb.append("[...]"));
+    execute(new Replace(in.readString()));
+  }
 
-    final ClientInputStream cis = new ClientInputStream(in);
+  /**
+   * Stores raw data in a database.
+   * @throws IOException I/O exception
+   */
+  private void store() throws IOException {
+    execute(new Store(in.readString()));
+  }
+
+  /**
+   * Executes the specified command.
+   * @param cmd command to be executed
+   * @throws IOException I/O exception
+   */
+  private void execute(final Command cmd) throws IOException {
+    log.write(this, cmd + "[...]");
+    final DecodingInput di = new DecodingInput(in);
     try {
-      final InputSource is = new InputSource(cis);
-      final String info = Replace.replace(path, is, context, true);
-      info(true, info, perf);
+      cmd.setInput(di);
+      cmd.execute(context);
+      success(cmd.info());
     } catch(final BaseXException ex) {
-      cis.close();
-      info(false, ex.getMessage(), perf);
+      di.flush();
+      error(ex.getMessage());
     }
-    out.flush();
   }
 
   /**
@@ -376,7 +376,6 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void watch() throws IOException {
-    final Performance perf = new Performance();
     // initialize server-based event handling
     if(events == null) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
@@ -397,7 +396,7 @@ public final class ClientListener extends Thread {
     } else {
       message = EVENTALR;
     }
-    info(ok, Util.info(message, name), perf);
+    info(Util.info(message, name), ok);
   }
 
   /**
@@ -405,7 +404,6 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void unwatch() throws IOException {
-    final Performance perf = new Performance();
     final String name = in.readString();
 
     final Sessions s = context.events.get(name);
@@ -420,7 +418,7 @@ public final class ClientListener extends Thread {
     } else {
       message = EVENTNOUW;
     }
-    info(ok, Util.info(message, name), perf);
+    info(Util.info(message, name), ok);
     out.flush();
   }
 
@@ -430,7 +428,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void query(final ServerCmd sc) throws IOException {
-    // iterator argument
+    // iterator argument (query or identifier)
     String arg = in.readString();
 
     QueryListener qp = null;
@@ -443,7 +441,6 @@ public final class ClientListener extends Thread {
         queries.put(arg, qp);
         // send {ID}0
         out.writeString(arg);
-
         // write log file
         log.write(this, sc + "(" + arg + ")", query, OK);
       } else {
@@ -459,16 +456,16 @@ public final class ClientListener extends Thread {
           final String typ = in.readString();
           qp.bind(key, val, typ);
           log.write(this, sc + "(" + arg + ")", key, val, typ, OK);
-        } else if(sc == INIT) {
-          qp.init();
         } else if(sc == NEXT) {
           qp.next();
         } else if(sc == EXEC) {
           qp.execute();
         } else if(sc == INFO) {
-          qp.printInfo();
+          out.print(qp.info());
+        } else if(sc == OPTIONS) {
+          out.print(qp.options());
         } else if(sc == CLOSE) {
-          qp.close(false);
+          qp.close();
           queries.remove(arg);
         }
         // send 0 as end marker
@@ -483,8 +480,7 @@ public final class ClientListener extends Thread {
       // log exception (static or runtime)
       err = ex.getMessage();
       log.write(this, sc + "(" + arg + ")", INFOERROR + err);
-
-      if(qp != null) qp.close(true);
+      if(qp != null) qp.close();
       queries.remove(arg);
     }
     if(err != null) {

@@ -9,7 +9,7 @@ import org.basex.io.IOFile;
 import org.basex.util.list.IntList;
 
 /**
- * Evaluates the 'rename' command and renames document or document paths
+ * Evaluates the 'rename' command and renames resources or directories
  * in a collection.
  *
  * @author BaseX Team 2005-11, BSD License
@@ -31,13 +31,13 @@ public final class Rename extends ACreate {
     final String src = IOFile.normalize(args[0]);
     final String trg = IOFile.normalize(args[1]);
     // ensure that the name contains no slashes and trailing dots
-    if(!new IOFile(trg).valid()) return error(NAMEINVALID, trg);
+    if(!new IOFile(trg).isValid()) return error(NAMEINVALID, trg);
 
     boolean ok = true;
     int c = 0;
-    final IntList il = data.docs(src);
-    for(int i = 0, is = il.size(); i < is; i++) {
-      final int pre = il.get(i);
+    final IntList docs = data.docs(src);
+    for(int i = 0, ds = docs.size(); i < ds; i++) {
+      final int pre = docs.get(i);
       final String target = target(data, pre, src, trg);
       if(target.isEmpty()) {
         info(NAMEINVALID, target);
@@ -51,8 +51,8 @@ public final class Rename extends ACreate {
     if(c != 0) data.flush();
 
     // rename binary resources
-    final IOFile io = data.meta.binary(src);
-    if(io.exists() && !io.rename(data.meta.binary(trg))) {
+    final IOFile file = data.meta.binary(src);
+    if(file == null || file.exists() && !file.rename(data.meta.binary(trg))) {
       ok = false;
       info(NAMEINVALID, trg);
     } else {

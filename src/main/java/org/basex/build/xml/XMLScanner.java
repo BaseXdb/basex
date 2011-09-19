@@ -563,7 +563,7 @@ final class XMLScanner extends Progress {
   private int consume() throws IOException {
     while(true) {
       final int ch = input.next();
-      if(ch < 0) error(XMLCHAR, -ch);
+      if(ch < 0) return 0;
       if(ch > 0 && ch < ' ' && !ws(ch)) error(XMLCHAR, ch);
 
       if(ch == '%' && pe) { // [69]
@@ -747,9 +747,8 @@ final class XMLScanner extends Progress {
       }
       if(!consume(COND)) return found;
       found = true;
-      //pe = true;
 
-      s(); // [61
+      s(); // [61]
       final boolean incl = consume(INCL);
       if(!incl) check(IGNO);
       s();

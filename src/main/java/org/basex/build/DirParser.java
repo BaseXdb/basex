@@ -87,7 +87,7 @@ public final class DirParser extends TargetParser {
       for(final IO f : ((IOFile) io).children()) parse(b, f);
     } else {
       src = io;
-      if(!archives && src.archive()) return;
+      if(!archives && src.isArchive()) return;
 
       // multiple archive files may be parsed in this loop
       while(io.more()) {
@@ -96,7 +96,7 @@ public final class DirParser extends TargetParser {
         b.meta.filesize += src.length();
 
         // use global target as prefix
-        String targ = !trg.isEmpty() ? trg + '/' : "";
+        String targ = trg;
         final String name = src.name();
         String path = src.path();
         // add relative path without root (prefix) and file name (suffix)
@@ -106,15 +106,15 @@ public final class DirParser extends TargetParser {
           targ = (targ + path).replace("//", "/");
         }
 
-        // parse file twice to ensure that it is well-formed
         boolean ok = true;
         IO in = io;
         if(skip) {
+          // parse file twice to ensure that it is well-formed
           BufferInput bi = null;
           try {
             // cache file contents to allow or speed up a second run
             bi = io.buffer();
-            in = new IOContent(bi.token().toArray());
+            in = new IOContent(bi.readBytes());
             in.name(io.name());
             parser = Parser.fileParser(in, prop, targ);
             MemBuilder.build("", parser, prop);

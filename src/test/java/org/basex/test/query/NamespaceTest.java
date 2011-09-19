@@ -500,7 +500,7 @@ public final class NamespaceTest {
       final String exp = expected.replaceAll("\\\"", "'");
       if(!exp.equals(res)) fail("\nExpected: " + exp + "\nFound: " + res);
     } catch(final BaseXException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 }

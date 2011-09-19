@@ -35,8 +35,6 @@ public interface DataText {
   String DBENC = "ENCODING";
   /** Whitespace chopping. */
   String DBCHOP = "CHOPPED";
-  /** Entity parsing. */
-  String DBENTITY = "ENTITY";
   /** Path indexing. */
   String DBPTHIDX = "PTHINDEX";
   /** Text indexing. */
@@ -166,7 +164,7 @@ public interface DataText {
   String APP_JSON = "application/json";
   /** Media type: application/query+xml. */
   String APP_QUERYXML = "application/query+xml";
-  
+
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");
   /** Quote entity. */

@@ -30,7 +30,7 @@ public abstract class Session {
    * Executes a {@link Command} and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be executed
-   * @return result
+   * @return result, or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final Command command) throws IOException {
@@ -43,7 +43,7 @@ public abstract class Session {
    * Executes a command and returns the result as string or serializes
    * it to the specified output stream.
    * @param command command to be parsed
-   * @return result
+   * @return result, or {@code null} reference
    * @throws IOException I/O exception
    */
   public final String execute(final String command) throws IOException {
@@ -80,12 +80,21 @@ public abstract class Session {
       final InputStream input) throws IOException;
 
   /**
-   * Replace a document in an open database.
+   * Replaces a document in an open database.
    * @param path document(s) to replace
    * @param input new content
    * @throws IOException I/O exception
    */
   public abstract void replace(final String path, final InputStream input)
+      throws IOException;
+
+  /**
+   * Stores raw data in an open database.
+   * @param path target path
+   * @param input binary input
+   * @throws IOException I/O exception
+   */
+  public abstract void store(final String path, final InputStream input)
       throws IOException;
 
   /**

@@ -189,21 +189,6 @@ public enum Err {
   /** PACK0011: Evaluation exception. */
   JARREADFAIL(PACK, 11, "Reading jar descriptor failed: %."),
 
-  /** XSQL0001: Evaluation exception. */
-  SQLEXC(XSQL, 1, "An SQL exception occurred: '%'"),
-  /** XSQL0002: Evaluation exception. */
-  NOCONN(XSQL, 2, "No opened connection with id %"),
-  /** XSQL0003: Evaluation exception. */
-  PARAMS(XSQL, 3, "Number of parameters differs from number of placeholders"),
-  /** XSQL0004: Evaluation exception. */
-  NOPARAMTYPE(XSQL, 4, "No parameter type specified."),
-  /** XSQL0005: Evaluation exception. */
-  NOTEXPATTR(XSQL, 5, "Not expected attribute: %"),
-  /** XSQL0006: Evaluation exception. */
-  ILLFORMAT(XSQL, 6, "Illegal % format"),
-  /** XSQL0007: Evaluation exception. */
-  SQLINIT(XSQL, 7, "Could not initialize specified driver: '%'"),
-
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
 
@@ -261,6 +246,21 @@ public enum Err {
   FUNREGREP(FORX, 4, "Invalid replacement expression."),
   /** FORX0004: Evaluation exception. */
   REGERR(FORX, 4, "Regular expression: '%'."),
+
+  /** FOSQ0001: Evaluation exception. */
+  SQLEXC(FOSQ, 1, "An SQL exception occurred: '%'"),
+  /** FOSQ0002: Evaluation exception. */
+  NOCONN(FOSQ, 2, "No opened connection with id %"),
+  /** FOSQ0003: Evaluation exception. */
+  PARAMS(FOSQ, 3, "Number of parameters differs from number of placeholders"),
+  /** FOSQ0004: Evaluation exception. */
+  NOPARAMTYPE(FOSQ, 4, "No parameter type specified."),
+  /** FOSQ0005: Evaluation exception. */
+  NOTEXPATTR(FOSQ, 5, "Not expected attribute: %"),
+  /** FOSQ0006: Evaluation exception. */
+  ILLFORMAT(FOSQ, 6, "Illegal % format"),
+  /** FOSQ0007: Evaluation exception. */
+  SQLINIT(FOSQ, 7, "Could not initialize specified driver: '%'"),
 
   // [LW] please add to http://docs.basex.org/wiki/XQuery_Errors
 
@@ -328,6 +328,8 @@ public enum Err {
   SERANY(SEPM, 16, "%."),
   /** SEPM0017: Serialization exception. */
   SERUNKNOWN(SEPM, 17, "Serialization: unknown element %."),
+  /** SEPM0017: Serialization exception. */
+  SERNOVAL(SEPM, 17, "Serialization: missing 'value' attribute."),
 
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
@@ -699,8 +701,8 @@ public enum Err {
   PICCOMP(FOFD, 1350, "Invalid component in string: \"%\"."),
   /** FOUT1170: Parsing exception. */
   WRONGINPUT(FOUT, 1170, "Failed to read \"%\": %."),
-
-  // [CG] check error messages: FOUT1190, FOUT1200, add to Wiki
+  /** FOUT1190: Evaluation exception. */
+  WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
 
   /** XUDY0009: XQuery Update dynamic exception. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
@@ -886,6 +888,7 @@ public enum Err {
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
+    /** FOSQ Error type. */ FOSQ,
     /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
     /** FOFD Error type. */ FOUT,
@@ -902,7 +905,6 @@ public enum Err {
     /** XQDY Error type. */ XQDY,
     /** XQST Error type. */ XQST,
     /** XQTY Error type. */ XQTY,
-    /** XSQL Error type. */ XSQL,
     /** XUDY Error type. */ XUDY,
     /** XUST Error type. */ XUST,
     /** XUTY Error type. */ XUTY;

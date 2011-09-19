@@ -39,6 +39,8 @@ public abstract class FuncCall extends Arr {
   /** Element: output:serialization-parameter. */
   private static final QNm E_PARAM =
     new QNm(token("serialization-parameters"), U_OUTPUT);
+  /** Attribute: value. */
+  private static final QNm A_VALUE = new QNm(token("value"));
 
   /** Function definition. */
   public Function def;
@@ -141,7 +143,9 @@ public abstract class FuncCall extends Arr {
           while((n = ai.next()) != null) {
             final QNm qn = n.qname();
             if(!qn.uri().eq(U_OUTPUT)) SERUNKNOWN.thrw(fun.input, qn);
-            tm.add(qn.ln(), n.atom());
+            final byte[] val = n.attribute(A_VALUE);
+            if(val == null) SERNOVAL.thrw(fun.input);
+            tm.add(qn.ln(), val);
           }
         }
       }

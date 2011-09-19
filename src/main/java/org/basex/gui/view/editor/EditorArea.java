@@ -97,7 +97,7 @@ final class EditorArea extends BaseXEditor {
     gui.context.query = file;
     last = in;
 
-    if(file.xml()) {
+    if(file.isXML()) {
       view.info("", true);
       exec = false;
     } else {

@@ -107,6 +107,7 @@ dc_separatorinfo=Scheidingsteken
 do_title=Open database
 do_large=De database is % groot. Wil je enkele visualisaties\nsluiten om sneller te kunnen werken?
 do_nodbquestion=Wil je een nieuwe maken?
+do_checkver=A new version is available (% %)!\nDo you want to update?
 
 dr_title=Hernoem database
 dr_title2=Verwijder documenten
@@ -557,7 +558,7 @@ ch_alter2=Wijzigt gebruiker's wachtwoord of database naam:
 ch_alterpw=wijzigt het wachtwoord van een gebruiker.
 ch_alterdb=wijzigt de naam of a database.
 ch_optimize1=Optimaliseer de database.
-ch_optimize2=Optimaliseert de geopende database.\nAls % gespecificeerd is, wordt de database grootte geminimaliseerd.  
+ch_optimize2=Optimaliseert de geopende database.\nAls % gespecificeerd is, wordt de database grootte geminimaliseerd.
 ch_export1=Exporteer database naar XML.
 ch_export2=Exporteert de database naar [%].
 ch_xquery1=Evalueer XQuery.
@@ -610,6 +611,10 @@ ch_repo2=installs, deletes or lists packages from the repository
 ch_repo3=deletes the package with name [%] or directory [%]
 ch_repo4=installs package with path [%]
 ch_repo5=lists all installed packages
+ch_retrieve1=Retrieve raw data.
+ch_retrieve2=Retrieves raw data from the specified [%].
+ch_store1=Store raw data.
+ch_store2=Stores raw data to the specified [%].
 
 # Help Texts
 h_hist=Toon input geschiedenis.

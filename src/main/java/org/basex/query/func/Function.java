@@ -492,15 +492,17 @@ public enum Function {
   /** Database function: replace document(s). */
   DBREPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
   /** Database function: optimize database structures. */
-  DBOPTIMIZE(FNDb.class, "optimize(database[,all])", EMP, 1, STR, BLN),
-  /** Database function: gets a value binary data. */
-  DBGET(FNDb.class, "get(database,path)", B64, STR, STR),
+  DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
+  /** Database function: retrieves binary data. */
+  DBRETRIEVE(FNDb.class, "retrieve(database,path)", RAW, STR, STR),
   /** Database function: stores binary data. */
-  DBPUT(FNDb.class, "put(database,path,value)", EMP, STR, STR, ITEM),
+  DBSTORE(FNDb.class, "store(database,path,value)", EMP, STR, STR, ITEM),
   /** Database function: checks if the specified resource is an xml document. */
   DBISXML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
   /** Database function: checks if the specified resource is a raw file. */
   DBISRAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
+  /** Database function: returns the content type of a database file. */
+  DBCTYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
 
   /* FNFile functions (EXPath). */
 
@@ -537,7 +539,7 @@ public enum Function {
   READLINES(FNFile.class, "read-text-lines(path[,encoding])", STR_ZM, 1, STR,
       STR),
   /** XQuery function */
-  READBIN(FNFile.class, "read-binary(path)", B64, STR),
+  READBIN(FNFile.class, "read-binary(path)", RAW, STR),
   /** XQuery function */
   WRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */

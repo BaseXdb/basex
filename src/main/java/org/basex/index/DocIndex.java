@@ -135,13 +135,13 @@ public final class DocIndex implements Index {
 
     // empty path: return all documents
     final IntList doc = docs();
-    if(path.isEmpty()) return doc;
+    final byte[] np = token(IOFile.normalize(path));
+    if(np.length == 0) return doc;
 
     // initialize and sort document paths
     if(paths == null) initPaths();
 
     // normalize paths
-    final byte[] np = token(IOFile.normalize(path));
     final byte[] exct = concat(SLASH, Prop.WIN ? lc(np) : np);
     final byte[] pref = concat(exct, SLASH);
 
@@ -164,7 +164,7 @@ public final class DocIndex implements Index {
     final String np = IOFile.normalize(path);
     final String exct = Prop.WIN ? np.toLowerCase() : np;
     final String pref = exct + '/';
-    for(final String f : new IOFile(data.meta.binaries()).descendants()) {
+    for(final String f : data.meta.binaries().descendants()) {
       final String lc = Prop.WIN ? f.toLowerCase() : f;
       if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
     }

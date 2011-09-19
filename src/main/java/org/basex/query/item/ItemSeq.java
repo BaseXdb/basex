@@ -35,7 +35,7 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Object toJava() {
+  public Object toJava() throws QueryException {
     final Object[] obj = new Object[(int) size];
     for(int s = 0; s != size; ++s) obj[s] = item[s].toJava();
     return obj;

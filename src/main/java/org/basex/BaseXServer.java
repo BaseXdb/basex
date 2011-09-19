@@ -159,12 +159,12 @@ public class BaseXServer extends Main implements Runnable {
     while(running) {
       try {
         final Socket s = socket.accept();
-        final ClientListener cl = new ClientListener(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit();
         } else {
           final byte[] address = s.getInetAddress().getAddress();
+          final ClientListener cl = new ClientListener(s, context, log);
           if(cl.init()) {
             blocked.delete(address);
             context.add(cl);

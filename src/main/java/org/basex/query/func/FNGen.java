@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -203,11 +204,9 @@ public final class FNGen extends FuncCall {
   private Str unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
+    if(enc != null && !Charset.isSupported(enc)) WHICHENC.thrw(input, enc);
     try {
-      byte[] txt = TextInput.content(io, enc).finish();
-      if(contains(txt, '\r')) txt = contains(txt, '\n') ?
-          delete(txt, '\r') : replace(txt, '\r', '\n');
-      return Str.get(txt);
+      return Str.get(TextInput.content(io, enc).finish());
     } catch(final IOException ex) {
       throw WRONGINPUT.thrw(input, io, ex);
     }
@@ -293,9 +292,9 @@ public final class FNGen extends FuncCall {
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
-      final Serializer xml = Serializer.get(ao, serialPar(this, 1, ctx));
-      node.serialize(xml);
-      xml.close();
+      final Serializer ser = Serializer.get(ao, serialPar(this, 1, ctx));
+      node.serialize(ser);
+      ser.close();
     } catch(final SerializerException ex) {
       throw new QueryException(input, ex);
     } catch(final IOException ex) {

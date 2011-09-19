@@ -578,12 +578,15 @@ public enum AtomType implements Type {
     }
   },
 
+  /** Implementation specific: binary type. */
+  BIN("binary", AAT, XSURI, false, false, false, false, false),
+
   /** Base64 binary type. */
-  B64("base64Binary", AAT, XSURI, false, false, false, false, false) {
+  B64("base64Binary", BIN, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == HEX ? new B64((Hex) it) : str(it) ?
+      return it instanceof Bin ? new B64((Bin) it, ii) : str(it) ?
           new B64(it.atom(ii), ii) : error(it, ii);
     }
     @Override
@@ -593,11 +596,11 @@ public enum AtomType implements Type {
   },
 
   /** Hex binary type. */
-  HEX("hexBinary", AAT, XSURI, false, false, false, false, false) {
+  HEX("hexBinary", BIN, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == B64 ? new Hex((B64) it) : str(it) ?
+      return it instanceof Bin ? new Hex((Bin) it, ii) : str(it) ?
           new Hex(it.atom(ii), ii) : error(it, ii);
     }
     @Override
@@ -605,6 +608,9 @@ public enum AtomType implements Type {
       return new Hex((byte[]) o, ii);
     }
   },
+
+  /** Implementation specific: raw type. */
+  RAW("raw", HEX, XSURI, false, false, false, false, false),
 
   /** Any URI type. */
   URI("anyURI", AAT, XSURI, false, false, true, false, false) {

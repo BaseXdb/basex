@@ -81,7 +81,7 @@ public class HTMLSerializer extends OutputSerializer {
 
   @Override
   protected void code(final int ch) throws IOException {
-    if(script) print(ch);
+    if(script) printChar(ch);
     else if(ch > 0x7F && ch < 0xA0) SERILL.thrwSerial(Integer.toHexString(ch));
     else if(ch == 0xA0) print(E_NBSP);
     else super.code(ch);

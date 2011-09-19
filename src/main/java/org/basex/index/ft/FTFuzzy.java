@@ -66,7 +66,7 @@ final class FTFuzzy extends FTIndex {
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   protected FTFuzzy(final Data d) throws IOException {
     super(d);

@@ -59,6 +59,13 @@ public final class ArrayOutput extends PrintOutput {
     return buf;
   }
 
+  /**
+   * Resets the internal buffer.
+   */
+  public void reset() {
+    size = 0;
+  }
+
   @Override
   public String toString() {
     return Token.string(buf, 0, size);

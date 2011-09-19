@@ -43,9 +43,11 @@ import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Rename;
 import org.basex.core.cmd.Replace;
 import org.basex.core.cmd.Restore;
+import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowUsers;
+import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
 import org.basex.io.IOFile;
@@ -440,20 +442,29 @@ public class CommandTest {
   /** Command test. */
   @Test
   public final void replace() {
-    // database must be opened to rename paths
+    // query to count number of documents
+    final String count = "count(db:open('" + NAME + "'))";
+    // database must be opened to replace resources
     no(new Replace(FILE, "xxx"));
     ok(new CreateDB(NAME, FILE));
+    assertEquals("1", ok(new XQuery(count)));
+    // replace existing document
     ok(new Replace(FN, "<a/>"));
+    assertEquals("1", ok(new XQuery(count)));
+    // replace existing document (again)
     ok(new Replace(FN, "<a/>"));
+    assertEquals("1", ok(new XQuery(count)));
+    // invalid content
     no(new Replace(FN, ""));
-    // create binary file
-    ok(new XQuery("db:put('" + NAME + "', 'a', 'a')"));
+    assertEquals("1", ok(new XQuery(count)));
+    // create and replace binary file
+    ok(new XQuery("db:store('" + NAME + "', 'a', 'a')"));
     ok(new Replace("a", "<b/>"));
-    assertTrue(!ok(new XQuery("db:open('" + NAME + "')")).isEmpty());
-    ok(new XQuery("db:get('" + NAME + "', 'a')"));
+    assertTrue(ok(new XQuery("db:open('" + NAME + "')")).length() != 0);
+    ok(new XQuery("db:retrieve('" + NAME + "', 'a')"));
     // a failing replace should not remove existing documents
     no(new Replace(FN, "<a>"));
-    assertTrue(!ok(new XQuery("doc('" + NAME + "')")).isEmpty());
+    assertEquals("1", ok(new XQuery(count)));
   }
 
   /** Command test. */
@@ -479,6 +490,29 @@ public class CommandTest {
     ok(new Close());
   }
 
+  /** Retrieves raw data. */
+  @Test
+  public final void retrieve() {
+    ok(new CreateDB(NAME));
+    // retrieve non-existing file
+    no(new Retrieve(NAME2));
+    // retrieve existing file
+    ok(new Store(NAME2, FILE));
+    ok(new Retrieve(NAME2));
+  }
+
+  /** Stores raw data. */
+  @Test
+  public final void store() {
+    ok(new CreateDB(NAME));
+    ok(new Store(NAME2, FILE));
+    // file can be overwritten
+    ok(new Store(NAME2, FILE));
+    // reject invalid names
+    no(new Store("", FILE));
+    no(new Store("../x", FILE));
+  }
+
   /** Command test. */
   @Test
   public final void run() {
@@ -487,7 +521,7 @@ public class CommandTest {
     try {
       io.write(token("// li"));
     } catch(final Exception ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
     no(new Run(io.path()));
     ok(new CreateDB(NAME, FILE));
@@ -553,7 +587,7 @@ public class CommandTest {
     try {
       return session.execute(cmd);
     } catch(final IOException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
       return null;
     }
   }

@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.net.URLConnection;
 
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
@@ -15,17 +16,17 @@ import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.item.ANode;
-import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
@@ -33,6 +34,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Raw;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -42,7 +44,7 @@ import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.DBAdd;
 import org.basex.query.up.primitives.DBDelete;
 import org.basex.query.up.primitives.DBOptimize;
-import org.basex.query.up.primitives.DBPut;
+import org.basex.query.up.primitives.DBStore;
 import org.basex.query.up.primitives.DBRename;
 import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
@@ -108,9 +110,10 @@ public final class FNDb extends FuncCall {
       case DBRENAME:   return rename(ctx);
       case DBREPLACE:  return replace(ctx);
       case DBOPTIMIZE: return optimize(ctx);
-      case DBPUT:      return put(ctx);
-      case DBGET:      return get(ctx);
+      case DBSTORE:    return store(ctx);
+      case DBRETRIEVE: return retrieve(ctx);
       case DBISRAW:    return isRaw(ctx);
+      case DBCTYPE:    return contentType(ctx);
       case DBISXML:    return isXML(ctx);
       default:         return super.item(ctx, ii);
     }
@@ -257,6 +260,24 @@ public final class FNDb extends FuncCall {
   }
 
   /**
+   * Performs the content-type function.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Str contentType(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    final String path = path(1, ctx);
+    final IOFile io = data.meta.binary(path);
+    if(io.exists() && !io.isDir()) {
+      final String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
+      return Str.get(ct == null ? DataText.APP_OCTET : ct);
+    }
+    if(isXML(ctx).bool(input)) return Str.get(DataText.APP_XML);
+    throw RESFNF.thrw(input, path);
+  }
+
+  /**
    * Performs the is-xml function.
    * @param ctx query context
    * @return result
@@ -321,7 +342,7 @@ public final class FNDb extends FuncCall {
     final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
     // ensure that the path is valid
     final String path = expr.length < 4 ? null : path(3, ctx);
-    if(path != null && !new IOFile(path).valid()) RESINV.thrw(input, path);
+    if(path != null && !new IOFile(path).isValid()) RESINV.thrw(input, path);
 
     // get all items representing document(s):
     final ObjList<Item> docs = new ObjList<Item>(
@@ -368,9 +389,10 @@ public final class FNDb extends FuncCall {
     docs.add(doc);
     ctx.updates.add(new DBAdd(data, input, docs, name, path, ctx.context), ctx);
 
-    if(data.meta.binary(path).exists()) {
+    final IOFile file = data.meta.binary(trg);
+    if(file != null && file.exists() && !file.isDir()) {
       final byte[] val = checkBin(doc, ctx);
-      ctx.updates.add(new DBPut(data, token(trg), val, input), ctx);
+      ctx.updates.add(new DBStore(data, token(trg), val, input), ctx);
     }
     return null;
   }
@@ -410,7 +432,7 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String src = path(1, ctx);
     final String trg = path(2, ctx);
-    if(!new IOFile(trg).valid()) RESINV.thrw(input, trg);
+    if(!new IOFile(trg).isValid()) RESINV.thrw(input, trg);
 
     // the first step of the path should be the database name
     final IntList il = data.docs(src);
@@ -421,8 +443,11 @@ public final class FNDb extends FuncCall {
       ctx.updates.add(new ReplaceValue(pre, data, input, token(target)), ctx);
     }
     // rename files
-    ctx.updates.add(new DBRename(data, data.meta.binary(src),
-        data.meta.binary(trg), input), ctx);
+    final IOFile source = data.meta.binary(src);
+    final IOFile target = data.meta.binary(trg);
+    if(source != null && target != null)
+      ctx.updates.add(new DBRename(data, source, target, input), ctx);
+
     return null;
   }
 
@@ -447,15 +472,17 @@ public final class FNDb extends FuncCall {
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item put(final QueryContext ctx) throws QueryException {
+  private Item store(final QueryContext ctx) throws QueryException {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String key = path(1, ctx);
-    if(!new IOFile(key).valid()) RESINV.thrw(input, key);
+    final String path = path(1, ctx);
+    final IOFile file = data.meta.binary(path);
+    if(file == null || file.isDir() || !file.isValid())
+      RESINV.thrw(input, path);
 
     final byte[] val = checkBin(expr[2], ctx);
-    ctx.updates.add(new DBPut(data, token(key), val, input), ctx);
+    ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
     return null;
   }
 
@@ -465,17 +492,12 @@ public final class FNDb extends FuncCall {
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item get(final QueryContext ctx) throws QueryException {
+  private Item retrieve(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final String key = path(1, ctx);
-
-    final IOFile bin = data.meta.binary(key);
-    if(!bin.exists()) RESFNF.thrw(input, key);
-    try {
-      return new B64(bin.read());
-    } catch(final IOException ex) {
-      throw IOERR.thrw(input, ex);
-    }
+    final String path = path(1, ctx);
+    final IOFile file = data.meta.binary(path);
+    if(file == null || !file.exists() || file.isDir()) RESFNF.thrw(input, path);
+    return new Raw(file, path);
   }
 
   /**
@@ -514,10 +536,10 @@ public final class FNDb extends FuncCall {
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
-      final XMLSerializer xml = new XMLSerializer(ao);
+      final Serializer ser = Serializer.get(ao, ctx.serProp(true));
       final ValueIter ir = expr[1].value(ctx).iter();
-      for(Item it; (it = ir.next()) != null;) it.serialize(xml);
-      xml.close();
+      for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+      ser.close();
     } catch(final SerializerException ex) {
       throw new QueryException(input, ex);
     } catch(final IOException ex) {
@@ -540,12 +562,11 @@ public final class FNDb extends FuncCall {
     final boolean up =
       def == Function.DBADD || def == Function.DBDELETE ||
       def == Function.DBRENAME || def == Function.DBREPLACE ||
-      def == Function.DBOPTIMIZE || def == Function.DBPUT;
+      def == Function.DBOPTIMIZE || def == Function.DBSTORE;
     return
       u == Use.CTX && (
         def == Function.DBTEXT || def == Function.DBATTR ||
-        def == Function.DBFULLTEXT || def == Function.DBEVENT ||
-        def == Function.DBGET || up) ||
+        def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||
       u == Use.UPD && up ||
       super.uses(u);
   }

@@ -78,7 +78,7 @@ public class DBNode extends ANode {
    * @throws IOException I/O exception
    */
   public DBNode(final IO input, final Prop prop) throws IOException {
-    this(Parser.xmlParser(input, prop, ""), prop);
+    this(Parser.xmlParser(input, prop), prop);
   }
 
   /**

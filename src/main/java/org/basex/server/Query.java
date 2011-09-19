@@ -34,13 +34,6 @@ public abstract class Query {
       throws IOException;
 
   /**
-   * Initializes the query expression and starts serialization.
-   * @return result header or {@code null}.
-   * @throws IOException I/O exception
-   */
-  public abstract String init() throws IOException;
-
-  /**
    * Returns {@code true} if more items are available.
    * @return result of check
    * @throws IOException I/O exception
@@ -76,9 +69,8 @@ public abstract class Query {
   public abstract String info() throws IOException;
 
   /**
-   * Finishes result serialization and closes the iterator.
-   * @return result footer or {@code null}.
+   * Closes the query.
    * @throws IOException I/O exception
    */
-  public abstract String close() throws IOException;
+  public abstract void close() throws IOException;
 }

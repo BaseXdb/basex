@@ -1,6 +1,7 @@
 package org.basex.io.in;
 
 import static org.basex.util.Token.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,9 +18,7 @@ import org.basex.io.IO;
 import org.basex.util.list.ByteList;
 
 /**
- * This class serves as a buffered wrapper for textual input streams.
- * In contrast to default input streams, the value {@code 0}
- * (instead of {@code -1}) indicates the end of the stream.
+ * This class uses a byte buffer to speed up input stream processing.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -28,36 +27,27 @@ public class BufferInput extends InputStream {
   /** UTF8 cache. */
   private final byte[] cache = new byte[4];
   /** Byte buffer. */
-  protected byte[] buffer;
+  protected final byte[] buffer;
   /** Current buffer position. */
   protected int pos;
-  /** Input length. */
-  protected long length;
-
   /** Current buffer size. */
-  private int size;
-  /** Number of read bytes. */
-  private int len;
+  protected int size;
+
   /** Reference to the data input stream. */
   private InputStream in;
   /** Default encoding for text files. */
   private String enc = UTF8;
   /** Charset decoder. */
   private CharsetDecoder csd;
+  /** Total input length. */
+  private long length;
+  /** Number of read bytes. */
+  private int read;
 
   /**
    * Initializes the file reader.
    * @param file the file to be read
-   * @throws IOException IO Exception
-   */
-  public BufferInput(final String file) throws IOException {
-    this(new File(file));
-  }
-
-  /**
-   * Initializes the file reader.
-   * @param file the file to be read
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public BufferInput(final File file) throws IOException {
     this(new FileInputStream(file));
@@ -67,12 +57,10 @@ public class BufferInput extends InputStream {
   /**
    * Initializes the file reader.
    * @param is input stream
-   * @throws IOException IO Exception
    */
-  public BufferInput(final InputStream is) throws IOException {
-    this(new byte[IO.BLOCKSIZE]);
+  public BufferInput(final InputStream is) {
+    buffer = new byte[IO.BLOCKSIZE];
     in = is;
-    next();
   }
 
   /**
@@ -81,14 +69,18 @@ public class BufferInput extends InputStream {
    */
   protected BufferInput(final byte[] buf) {
     buffer = buf;
-    length = buf.length;
+    size = buf.length;
+    length = size;
   }
 
   /**
    * Determines the file encoding.
    * @return guessed encoding
+   * @throws IOException I/O exception
    */
-  public final String encoding() {
+  public final String encoding() throws IOException {
+    // cache first bytes
+    if(size == 0) next();
     final byte a = length > 0 ? buffer[0] : 0;
     final byte b = length > 1 ? buffer[1] : 0;
     final byte c = length > 2 ? buffer[2] : 0;
@@ -111,7 +103,7 @@ public class BufferInput extends InputStream {
   /**
    * Sets a new encoding.
    * @param encoding encoding
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public final void encoding(final String encoding) throws IOException {
     try {
@@ -122,41 +114,47 @@ public class BufferInput extends InputStream {
     }
   }
 
-  @Override
-  public final int read() throws IOException {
-    return readByte() & 0xFF;
-  }
-
   /**
-   * Returns the next byte. {@code 0} is returned if all bytes have been read.
+   * Returns the next byte (see {@link InputStream#read}.
+   * {@code 0} is returned if all bytes have been read.
    * @return next byte
    * @throws IOException I/O exception
    */
-  public byte readByte() throws IOException {
+  @Override
+  public int read() throws IOException {
     if(pos >= size) {
       next();
-      if(size <= 0) return 0;
+      if(size <= 0) return -1;
     }
-    return buffer[pos++];
+    return buffer[pos++] & 0xFF;
   }
 
   /**
    * Reads a string from the input stream, suffixed by a {@code 0} byte.
    * @return string
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public final String readString() throws IOException {
-    return token().toString();
+    return bytes().toString();
   }
 
   /**
-   * Reads a token from the input stream, suffixed by a {@code 0} byte.
+   * Reads a bytes array from the input stream, suffixed by a {@code 0} byte.
    * @return token
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
-  public final ByteList token() throws IOException {
+  public final byte[] readBytes() throws IOException {
+    return bytes().toArray();
+  }
+
+  /**
+   * Reads bytes from the input stream, suffixed by a {@code 0} byte.
+   * @return byte list
+   * @throws IOException I/O Exception
+   */
+  private ByteList bytes() throws IOException {
     final ByteList bl = new ByteList();
-    for(byte l; (l = readByte()) != 0;) bl.add(l);
+    for(int l; (l = read()) > 0;) bl.add(l);
     return bl;
   }
 
@@ -166,7 +164,7 @@ public class BufferInput extends InputStream {
    */
   private void next() throws IOException {
     pos = 0;
-    len += size;
+    read += size;
     size = in.read(buffer);
   }
 
@@ -178,24 +176,25 @@ public class BufferInput extends InputStream {
    */
   public final int readChar() throws IOException {
     // handle different encodings
-    final byte ch = readByte();
+    final int ch = read();
+    if(ch == -1) return ch;
+
     // encoding can be safely compared by references...
+    if(enc == UTF16LE) return ch | read() << 8;
+    if(enc == UTF16BE) return ch << 8 | read();
+    if(ch < 0x80) return ch;
     if(enc == UTF8) {
-      final int cl = cl(ch);
-      if(cl == 1) return ch & 0xFF;
-      cache[0] = ch;
-      for(int c = 1; c < cl; ++c) cache[c] = readByte();
+      final int cl = cl((byte) ch);
+      cache[0] = (byte) ch;
+      for(int c = 1; c < cl; ++c) cache[c] = (byte) read();
       return cp(cache, 0);
     }
-    if(enc == UTF16LE) return ch & 0xFF | (readByte() & 0xFF) << 8;
-    if(enc == UTF16BE) return (ch & 0xFF) << 8 | readByte() & 0xFF;
-    if(ch >= 0) return ch;
 
     // convert other encodings.. loop until all needed bytes have been read
     int p = 0;
     while(true) {
       if(p == 4) return -cache[0];
-      cache[p++] = ch;
+      cache[p++] = (byte) ch;
       try {
         final CharBuffer cb = csd.decode(
             ByteBuffer.wrap(Arrays.copyOf(cache, p)));
@@ -204,7 +203,7 @@ public class BufferInput extends InputStream {
         return i;
       } catch(final CharacterCodingException ex) {
         // tolerate erroneous characters
-        return ch & 0xFF;
+        return ch;
       }
     }
   }
@@ -219,7 +218,7 @@ public class BufferInput extends InputStream {
    * @return read bytes
    */
   final int size() {
-    return len + pos;
+    return read + pos;
   }
 
   /**

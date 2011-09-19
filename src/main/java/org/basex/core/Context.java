@@ -14,6 +14,9 @@ import org.basex.server.Sessions;
  * It references the currently opened database. Moreover, it provides
  * references to the currently used, marked and copied node sets.
  *
+ * This class should only be instantiated once in a project; otherwise,
+ * database updates may lead to conflicts.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -58,7 +61,7 @@ public final class Context {
   private Data data;
 
   /**
-   * Constructor.
+   * Default constructor, which should only be called once in a project.
    */
   public Context() {
     listener = null;
@@ -73,7 +76,8 @@ public final class Context {
   }
 
   /**
-   * Constructor. {@link #user} reference must be set after calling this.
+   * Constructor, passing on the main context.
+   * The {@link #user} reference must be set after calling this method.
    * @param ctx parent database context
    * @param cl client listener
    */
@@ -140,14 +144,6 @@ public final class Context {
    */
   public void current(final Nodes curr) {
     current = curr;
-  }
-
-  /**
-   * Returns all document nodes.
-   * @return result of check
-   */
-  public int[] doc() {
-    return current.root ? current.list : data.docs().toArray();
   }
 
   /**

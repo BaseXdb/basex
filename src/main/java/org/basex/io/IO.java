@@ -63,7 +63,7 @@ public abstract class IO {
   /** Offset for compressing texts (see bit layout in {@link Data} class). */
   public static final long OFFCOMP = 0x4000000000L;
 
-  /** File path and name. */
+  /** File path. The path uses forward slashes, no matter which OS is used. */
   protected String path;
   /** File contents. */
   protected byte[] cont;
@@ -114,8 +114,9 @@ public abstract class IO {
   public static IO get(final String source) {
     if(source == null) return new IOContent(Token.EMPTY);
     final String s = source.trim();
-    if(s.startsWith("<")) return new IOContent(Token.token(s));
-    if(!s.contains("://") || s.startsWith(FILEPREF)) return new IOFile(s);
+    if(s.startsWith(FILEPREF)) return new IOFile(IOUrl.file(s));
+    if(s.startsWith("<"))      return new IOContent(Token.token(s));
+    if(!s.contains("://"))     return new IOFile(s);
     return new IOUrl(s);
   }
 
@@ -201,7 +202,7 @@ public abstract class IO {
    * Checks if this file is an archive.
    * @return result of check
    */
-  public boolean archive() {
+  public boolean isArchive() {
     return false;
   }
 
@@ -209,7 +210,7 @@ public abstract class IO {
    * Checks if this file contains XML.
    * @return result of check
    */
-  public boolean xml() {
+  public boolean isXML() {
     return false;
   }
 
@@ -243,6 +244,7 @@ public abstract class IO {
 
   /**
    * Returns the path.
+   * The path uses forward slashes, no matter which OS is used.
    * @return path
    */
   public final String path() {

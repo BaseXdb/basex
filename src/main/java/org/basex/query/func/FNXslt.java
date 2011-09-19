@@ -16,7 +16,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -152,7 +152,7 @@ public final class FNXslt extends FuncCall {
   }
 
   /**
-   * Returns the input reference of the specified input.
+   * Returns an input reference (possibly cached) to the specified input.
    * @param e expression to be evaluated
    * @param ctx query context
    * @return item
@@ -163,9 +163,9 @@ public final class FNXslt extends FuncCall {
     final Item in = checkEmpty(e.item(ctx, input));
     if(in.node()) {
       final ArrayOutput ao = new ArrayOutput();
-      final XMLSerializer xml = new XMLSerializer(ao);
-      in.serialize(xml);
-      xml.close();
+      final Serializer ser = Serializer.get(ao);
+      in.serialize(ser);
+      ser.close();
       return new IOContent(ao.toArray());
     }
     if(in.str()) return IO.get(string(in.atom(input)));

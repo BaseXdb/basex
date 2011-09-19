@@ -11,7 +11,7 @@ import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 
 /**
- * Update primitive for the db:put() function.
+ * Update primitive for the db:rename() function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

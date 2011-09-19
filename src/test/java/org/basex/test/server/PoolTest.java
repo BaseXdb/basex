@@ -13,6 +13,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +28,7 @@ public final class PoolTest {
   /** Test file. */
   private static final String FILE = "etc/test/input.xml";
   /** Test database name. */
-  private static final String NAME = "input";
+  private static final String NAME = Util.name(PoolTest.class);
 
   /** Server reference. */
   static BaseXServer server;
@@ -113,7 +114,7 @@ public final class PoolTest {
     try {
       session.execute(cmd);
     } catch(final IOException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 

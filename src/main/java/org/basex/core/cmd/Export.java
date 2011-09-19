@@ -75,17 +75,17 @@ public final class Export extends Command {
 
       // serialize file
       final PrintOutput po = new PrintOutput(unique(exported, file.path()));
-      final Serializer xml = Serializer.get(po, sp);
-      xml.node(data, pre);
-      xml.close();
+      final Serializer ser = Serializer.get(po, sp);
+      ser.node(data, pre);
+      ser.close();
       po.close();
     }
 
     // export raw files
-    final File bin = data.meta.binaries();
-    for(final String s : new IOFile(bin).descendants()) {
+    final IOFile bin = data.meta.binaries();
+    for(final String s : bin.descendants()) {
       final String u = unique(exported, new IOFile(root.path(), s).path());
-      Copy.copy(new File(bin, s), new File(u));
+      Copy.copy(new File(bin.file(), s), new File(u));
     }
   }
 

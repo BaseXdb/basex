@@ -56,6 +56,7 @@ import org.basex.core.cmd.RepoDelete;
 import org.basex.core.cmd.RepoInstall;
 import org.basex.core.cmd.RepoList;
 import org.basex.core.cmd.Restore;
+import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowBackups;
@@ -63,6 +64,7 @@ import org.basex.core.cmd.ShowDatabases;
 import org.basex.core.cmd.ShowEvents;
 import org.basex.core.cmd.ShowSessions;
 import org.basex.core.cmd.ShowUsers;
+import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
@@ -300,6 +302,10 @@ public final class CommandParser extends InputParser {
           default:
         }
         break;
+      case RETRIEVE:
+        return new Retrieve(string(cmd));
+      case STORE:
+        return new Store(string(cmd), string(cmd));
       default:
     }
     throw Util.notexpected("command specified, but not implemented yet");

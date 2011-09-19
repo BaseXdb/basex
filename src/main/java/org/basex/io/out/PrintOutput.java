@@ -66,6 +66,29 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
+   * Writes a character as UTF8.
+   * @param ch character to be printed
+   * @throws IOException I/O exception
+   */
+  public void utf8(final int ch) throws IOException {
+    if(ch <= 0x7F) {
+      write(ch);
+    } else if(ch <= 0x7FF) {
+      write(ch >>  6 & 0x1F | 0xC0);
+      write(ch >>  0 & 0x3F | 0x80);
+    } else if(ch <= 0xFFFF) {
+      write(ch >> 12 & 0x0F | 0xE0);
+      write(ch >>  6 & 0x3F | 0x80);
+      write(ch >>  0 & 0x3F | 0x80);
+    } else {
+      write(ch >> 18 & 0x07 | 0xF0);
+      write(ch >> 12 & 0x3F | 0x80);
+      write(ch >>  6 & 0x3F | 0x80);
+      write(ch >>  0 & 0x3F | 0x80);
+    }
+  }
+
+  /**
    * Writes a string to the output stream, suffixed by a 0 byte.
    * @param str string to be written
    * @throws IOException I/O exception

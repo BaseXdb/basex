@@ -127,10 +127,10 @@ public final class SAXWrapper extends SingleParser {
     } finally {
       if(is == null) return;
       try {
-        final InputStream ist = is.getByteStream();
-        if(ist != null) ist.close();
         final Reader r = is.getCharacterStream();
         if(r != null) r.close();
+        final InputStream ist = is.getByteStream();
+        if(ist != null) ist.close();
       } catch(final IOException ex) {
         Util.debug(ex);
       }

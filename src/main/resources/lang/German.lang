@@ -107,6 +107,7 @@ dc_separatorinfo=Separator
 do_title=Datenbank öffnen
 do_large=Die zu öffnende Datenbank ist % groß. Wollen Sie einige\nVisualisierungen schließen, um die Arbeit zu beschleunigen?
 do_nodbquestion=Wollen Sie eine neue Datenbank erstellen?
+do_checkver=Eine neue Version ist verfügbar (% %)!\nWollen Sie updaten?
 
 dr_title=Datenbank umbenennen
 dr_title2=Dokumente löschen
@@ -557,7 +558,7 @@ ch_alter2=Ändert ein Benutzerpasswort oder einen Datenbanknamen:
 ch_alterpw=ändert das Passwort eines Benutzers.
 ch_alterdb=ändert den Namen einer Datenbank.
 ch_optimize1=Optimierung der Datenbank.
-ch_optimize2=Optimiert die geöffnete Datenbank.\nWenn % angegeben wurde, wird die Datenbankgröße minimiert.  
+ch_optimize2=Optimiert die geöffnete Datenbank.\nWenn % angegeben wurde, wird die Datenbankgröße minimiert.
 ch_export1=Export der Datenbank nach XML.
 ch_export2=Exportiert die Datenbank nach [%].
 ch_xquery1=Ausführung einer XQuery-Anfrage.
@@ -610,6 +611,10 @@ ch_repo2=Installiert, entfernt oder listet installierte Pakete auf:
 ch_repo3=entfernt das Paket mit dem Namen [%] oder dem Verzeichnis [%]
 ch_repo4=installiert das Paket mit dem Pfad [%]
 ch_repo5=listet alle installierten Pakete auf
+ch_retrieve1=Anfrage von Rohdaten.
+ch_retrieve2=Liefert Rohdaten vom Pfad [%] zurück.
+ch_store1=Speicherung von Rohdaten.
+ch_store2=Speichert Rohdaten am angegebenen Pfad [%].
 
 # Help Texts
 h_hist=Auswahl der letzten Texteingaben.

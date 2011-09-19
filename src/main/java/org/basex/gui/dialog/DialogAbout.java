@@ -4,10 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URI;
 
 import javax.swing.Box;
 import javax.swing.SwingConstants;
@@ -23,7 +21,6 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.TableLayout;
-import org.basex.util.Util;
 
 /**
  * Dialog window for displaying information about the project.
@@ -51,11 +48,7 @@ public final class DialogAbout extends Dialog {
     label.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
-        try {
-          Desktop.getDesktop().browse(new URI(URL));
-        } catch(final Exception ex) {
-          Dialog.error(gui, Util.info(INFOBROSERERR, URL));
-        }
+        Dialog.browse(gui, URL);
       }
     });
 

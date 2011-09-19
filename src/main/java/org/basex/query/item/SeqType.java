@@ -88,14 +88,10 @@ public final class SeqType {
   public static final SeqType BLN = AtomType.BLN.seq();
   /** Zero or one xs:boolean. */
   public static final SeqType BLN_ZO = new SeqType(AtomType.BLN, Occ.ZO);
-  /** Single xs:base64Binary. */
-  public static final SeqType B64 = AtomType.B64.seq();
   /** Double number. */
   public static final SeqType DBL = AtomType.DBL.seq();
   /** Double number. */
   public static final SeqType DBL_ZM = new SeqType(AtomType.DBL, Occ.ZM);
-  /** Float number. */
-  public static final SeqType FLT = AtomType.FLT.seq();
   /** Zero or one double. */
   public static final SeqType DBL_ZO = new SeqType(AtomType.DBL, Occ.ZO);
   /** Zero or one decimal number. */
@@ -134,14 +130,10 @@ public final class SeqType {
   public static final SeqType STR_ZM = new SeqType(AtomType.STR, Occ.ZM);
   /** Zero or one NCName. */
   public static final SeqType NCN_ZO = new SeqType(AtomType.NCN, Occ.ZO);
-  /** One xs:hexBinary. */
-  public static final SeqType HEX = AtomType.HEX.seq();
   /** Single date. */
   public static final SeqType DAT = AtomType.DAT.seq();
   /** Zero or one date. */
   public static final SeqType DAT_ZO = new SeqType(AtomType.DAT, Occ.ZO);
-  /** Zero or more dates. */
-  public static final SeqType DAT_ZM = new SeqType(AtomType.DAT, Occ.ZM);
   /** One day-time-duration. */
   public static final SeqType DTD = AtomType.DTD.seq();
   /** Zero or one day-time-duration. */
@@ -154,8 +146,6 @@ public final class SeqType {
   public static final SeqType TIM = AtomType.TIM.seq();
   /** Zero or one time. */
   public static final SeqType TIM_ZO = new SeqType(AtomType.TIM, Occ.ZO);
-  /** One duration. */
-  public static final SeqType DUR = AtomType.DUR.seq();
   /** Zero or one duration. */
   public static final SeqType DUR_ZO = new SeqType(AtomType.DUR, Occ.ZO);
   /** Single function. */
@@ -181,6 +171,12 @@ public final class SeqType {
   /** Single function. */
   public static final SeqType MAP_O = new SeqType(
       MapType.get(AtomType.AAT, ITEM_ZM));
+  /** One xs:raw. */
+  public static final SeqType RAW = AtomType.RAW.seq();
+  /** One xs:hexBinary. */
+  public static final SeqType HEX = AtomType.HEX.seq();
+  /** Single xs:base64Binary. */
+  public static final SeqType B64 = AtomType.B64.seq();
 
   /** Sequence type. */
   public final Type type;

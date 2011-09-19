@@ -155,6 +155,9 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWMENU = { "SHOWMENU", true };
   /** Flag for activated help view. */
   public static final Object[] SHOWHELP = { "SHOWHELP", false };
+  /** Last updated version. */
+  public static final Object[] UPDATEVERSION = { "UPDATEVERSION",
+    Prop.VERSION.replaceAll(" .*", "") };
 
   /** Server user. */
   public static final Object[] SERVERUSER = { "SERVERUSER", "admin" };

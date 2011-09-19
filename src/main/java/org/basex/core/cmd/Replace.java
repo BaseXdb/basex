@@ -3,15 +3,11 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.Util;
 import org.basex.util.list.IntList;
-import org.xml.sax.InputSource;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
@@ -29,85 +25,58 @@ public final class Replace extends ACreate {
     super(DATAREF | User.WRITE, source, input);
   }
 
+  /**
+   * Constructor.
+   * @param source source path
+   */
+  public Replace(final String source) {
+    super(DATAREF | User.WRITE, source);
+  }
+
   @Override
   protected boolean run() {
-    // check if input exists
-    final IO io = IO.get(args[1]);
-    if(!io.exists()) return error(FILEWHICH, io);
-
-    try {
-      return info(replace(args[0], io.inputSource(), context, false), perf);
-    } catch(final BaseXException ex) {
-      return error(ex.getMessage());
+    // check if the input source has already been initialized
+    if(in == null) {
+      final IO io = IO.get(args[1]);
+      if(!io.exists()) return error(FILEWHICH, io);
+      in = io.inputSource();
     }
-  }
 
-  /**
-   * Replace the specified document with a new content.
-   * @param path path to replace
-   * @param input new content
-   * @param ctx database context
-   * @param lock if {@code true}, register a write lock in context
-   * @return info string
-   * @throws BaseXException database exception
-   */
-  public static String replace(final String path, final InputSource input,
-      final Context ctx, final boolean lock) throws BaseXException {
+    String name = IOFile.normalize(args[0]);
+    if(name.isEmpty()) return error(DIRERR, name);
 
-    final Data data = ctx.data();
-    if(data == null) throw new BaseXException(PROCNODB);
-
-    String pth = IOFile.normalize(path);
-    String trg = "";
-    if(pth.isEmpty()) throw new BaseXException(DIRERR, pth);
-
-    final byte[] src = token(pth);
-    final IntList docs = data.docs(path);
-    final int is = docs.size();
+    final byte[] source = token(name);
+    final Data data = context.data();
+    final IntList docs = data.docs(name);
+    final int ds = docs.size();
     // check if path points exclusively to files
-    for(int i = 0; i < is; i++) {
-      if(!eq(data.text(docs.get(i), true), src))
-        throw new BaseXException(DIRERR, pth);
+    for(int i = 0; i < ds; i++) {
+      if(!eq(data.text(docs.get(i), true), source)) return error(DIRERR, name);
     }
 
-    final int i = pth.lastIndexOf('/');
-    if(i != -1) {
-      trg = pth.substring(0, i);
-      pth = pth.substring(i + 1);
-    }
-
-    try {
-      if(lock) ctx.register(true);
-
-      // replace binary or document
-      if(!replace(data, pth, input)) {
-        // add new document
-        Add.add(pth, trg, input, ctx, null, false);
-        // delete old documents if addition was successful
-        for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
-        // flushes changes
-        data.flush();
+    final IOFile file = data.meta.binary(name);
+    if(file != null && file.exists()) {
+      // replace binary file if it already exists
+      final Store store = new Store(name);
+      store.setInput(in);
+      if(!store.run(context)) return error(store.info());
+    } else {
+      // otherwise, add new document as xml
+      String trg = "";
+      final int i = name.lastIndexOf('/');
+      if(i != -1) {
+        trg = name.substring(0, i);
+        name = name.substring(i + 1);
       }
-    } finally {
-      if(lock) ctx.unregister(true);
+      final Add add = new Add(null, name, trg);
+      add.setInput(in);
+      if(!add.run(context)) return error(add.info());
+
+      // delete old documents if addition was successful
+      for(int d = ds - 1; d >= 0; d--) data.delete(docs.get(d));
+      // flushes changes
+      data.flush();
     }
-    return Util.info(PATHREPLACED, docs.size());
-  }
-
-  /**
-   * Replace the specified document with a new content.
-   * @param data data reference
-   * @param input new content
-   * @param path file path
-   * @return info string
-   * @throws BaseXException database exception
-   */
-  public static boolean replace(final Data data, final String path,
-      final InputSource input) throws BaseXException {
-
-    final IOFile io = data.meta.binary(path);
-    if(!io.exists()) return false;
-    if(!Add.add(io, input)) throw new BaseXException(PARSEERR, path);
-    return true;
+    return info(PATHREPLACED, ds, perf);
   }
 }

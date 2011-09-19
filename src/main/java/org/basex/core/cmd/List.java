@@ -41,21 +41,21 @@ public final class List extends Command {
     if(create) table.header.add(INFOPATH);
 
     for(final String name : list(context)) {
-      DataInput in = null;
+      DataInput di = null;
       String file = null;
       long size = 0;
       int ndocs = 0;
       final MetaData meta = new MetaData(name, context);
       try {
-        in = new DataInput(meta.dbfile(DATAINF));
-        meta.read(in);
+        di = new DataInput(meta.dbfile(DATAINF));
+        meta.read(di);
         size = meta.dbsize();
         ndocs = meta.ndocs;
         if(context.perm(User.READ, meta)) file = meta.original.toString();
       } catch(final IOException ex) {
         file = INFODBERR;
       } finally {
-        if(in != null) try { in.close(); } catch(final IOException ex) { }
+        if(di != null) try { di.close(); } catch(final IOException ex) { }
       }
 
       // count number of raw files

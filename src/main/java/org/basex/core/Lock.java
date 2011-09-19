@@ -6,7 +6,7 @@ import org.basex.util.Util;
 /**
  * Management of executing read/write processes.
  * Supports multiple readers, limited by {@link MainProp#PARALLEL},
- * and single writers (readers/writer lock).
+ * and a single writer (readers/writer lock).
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -37,28 +37,28 @@ final class Lock {
    * @param w writing flag
    */
   void lock(final boolean w) {
+    final Object o = new Object();
+
     synchronized(mutex) {
-      final Object o = new Object();
       queue.add(o);
 
-      try {
-        while(true) {
-          if(o == queue.get(0) && !writer) {
-            if(w) {
-              if(readers == 0) {
-                writer = true;
-                break;
-              }
-            } else if(readers <
-                Math.max(ctx.mprop.num(MainProp.PARALLEL), 1)) {
-              ++readers;
+      while(true) {
+        if(!writer && o == queue.get(0)) {
+          if(w) {
+            if(readers == 0) {
+              writer = true;
               break;
             }
+          } else if(readers < Math.max(ctx.mprop.num(MainProp.PARALLEL), 1)) {
+            ++readers;
+            break;
           }
-          mutex.wait();
         }
-      } catch(final InterruptedException ex) {
-        Util.stack(ex);
+        try {
+          mutex.wait();
+        } catch(final InterruptedException ex) {
+          Util.stack(ex);
+        }
       }
 
       queue.remove(0);
@@ -69,7 +69,7 @@ final class Lock {
    * Modifications after executing a command.
    * @param w writing flag
    */
-  synchronized void unlock(final boolean w) {
+  void unlock(final boolean w) {
     synchronized(mutex) {
       if(w) {
         writer = false;

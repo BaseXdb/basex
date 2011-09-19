@@ -92,7 +92,7 @@ public abstract class FTBuilder extends IndexBuilder {
 
   /**
    * Extracts and indexes words from the specified data reference.
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   protected final void index() throws IOException {
     // delete old index

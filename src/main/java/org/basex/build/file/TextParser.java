@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.io.in.BufferInput;
+import org.basex.io.in.TextInput;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -63,23 +63,28 @@ public final class TextParser extends SingleParser {
   public void parse() throws IOException {
     builder.startElem(TEXT, atts);
 
-    final BufferInput bi = new BufferInput(src.path());
-    bi.encoding(encoding);
-
     final TokenBuilder tb = new TokenBuilder();
-    while(true) {
-      final int ch = bi.readChar();
-      if(ch == 0) break;
-      if(ch == '\n' && lines) {
-        builder.startElem(LINE, atts);
-        builder.text(tb.finish());
-        builder.endElem();
-        tb.reset();
-      } else if(ch != 0x0D) {
-        tb.add(ch);
+    final TextInput ti = new TextInput(src);
+    try {
+      ti.encoding(encoding);
+      for(int ch; (ch = ti.next()) != -1;) {
+        // normalize newlines
+        if(ch == '\r') {
+          if(ti.next() != '\n') ti.prev(1);
+          ch = '\n';
+        }
+        if(ch == '\n' && lines) {
+          builder.startElem(LINE, atts);
+          builder.text(tb.finish());
+          builder.endElem();
+          tb.reset();
+        } else {
+          tb.add(ch);
+        }
       }
+    } finally {
+      ti.close();
     }
-    bi.close();
     if(!lines) builder.text(tb.finish());
     builder.endElem();
   }

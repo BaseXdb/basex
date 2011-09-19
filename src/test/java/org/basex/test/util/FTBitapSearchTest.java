@@ -2,9 +2,11 @@ package org.basex.test.util;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
+
 import java.util.NoSuchElementException;
 import org.basex.query.QueryException;
 import org.basex.query.ft.FTTokens;
+import org.basex.util.Util;
 import org.basex.util.ft.FTBitapSearch;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
 import org.basex.util.ft.FTIterator;
@@ -170,7 +172,7 @@ public final class FTBitapSearchTest {
               " hits, got more!");
       }
     } catch(final QueryException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 }

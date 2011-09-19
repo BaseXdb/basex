@@ -107,6 +107,7 @@ dc_separatorinfo=Separator
 do_title=Mở cơ sở dữ liệu
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Bạn muốn tạo một cái mới không?
+do_checkver=A new version is available (% %)!\nDo you want to update?
 
 dr_title=Đổi tên cơ sở dữ liệu
 dr_title2=Delete documents
@@ -557,7 +558,7 @@ ch_alter2=Alters the name of a database or the user password:
 ch_alterpw=alters the password of a user.
 ch_alterdb=alters the name of a database.
 ch_optimize1=Tối ưu cơ sở dữ liệu.
-ch_optimize2=Optimizes the currently opened database.\nIf % is specified, the database size is minimized.  
+ch_optimize2=Optimizes the currently opened database.\nIf % is specified, the database size is minimized.
 ch_export1=Xuất khẩu cơ sở dữ liệu ra kiểu XML.
 ch_export2=Xuất khẩu thiết lập hiện tại ra XML [%].
 ch_xquery1=Đánh giá lệnh hỏi XQuery.
@@ -610,6 +611,10 @@ ch_repo2=installs, deletes or lists packages from the repository
 ch_repo3=deletes the package with name [%] or directory [%]
 ch_repo4=installs package with path [%]
 ch_repo5=lists all installed packages
+ch_retrieve1=Retrieve raw data.
+ch_retrieve2=Retrieves raw data from the specified [%].
+ch_store1=Store raw data.
+ch_store2=Stores raw data to the specified [%].
 
 # Help Texts
 h_hist=Hiển thị lich sử thông tin nhập.

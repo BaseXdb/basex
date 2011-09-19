@@ -66,7 +66,7 @@ public class Str extends Item {
    * @return Returns an atomized string.
    */
   public final byte[] atom() {
-    return atom(null);
+    return val;
   }
 
   @Override

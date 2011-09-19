@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
+import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
-import org.basex.build.xml.XMLParser;
 import org.basex.core.Prop;
 import org.basex.io.IOContent;
 import org.basex.io.in.TextInput;
@@ -109,7 +109,7 @@ public final class ResponseHandler {
    * @param prop query context properties
    * @param ii input info
    * @return result sequence of <http:response/> and content items
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   public static ValueIter getResponse(final HttpURLConnection conn,
@@ -159,7 +159,7 @@ public final class ResponseHandler {
    * attributes of <http:response/>.
    * @param conn http connection
    * @return node cache with attributes
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static NodeCache extractAttrs(final HttpURLConnection conn)
       throws IOException {
@@ -210,7 +210,7 @@ public final class ResponseHandler {
    * @param io connection input stream
    * @param cs response content charset
    * @return payload as byte array
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static byte[] extractPayload(final InputStream io, final String cs)
     throws IOException {
@@ -233,7 +233,7 @@ public final class ResponseHandler {
    * @param prop context properties
    * @param ii input info
    * @return interpreted payload
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static Item interpretPayload(final byte[] p, final byte[] c,
@@ -241,11 +241,11 @@ public final class ResponseHandler {
 
     if(eq(c, TXT_XML) || eq(c, TXT_EXT_XML) || eq(c, APPL_XML) ||
         eq(c, APPL_EXT_XML) || endsWith(c, MIME_XML_SUFFIX)) {
-      return new DBNode(new XMLParser(new IOContent(p), null, prop), prop);
+      return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
     }
     if(eq(c, TXT_HTML)) {
       if(!HTMLParser.available()) throw HTMLERR.thrw(ii);
-      return new DBNode(new HTMLParser(new IOContent(p), null, prop), prop);
+      return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
     }
     return startsWith(c, MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
   }
@@ -259,7 +259,7 @@ public final class ResponseHandler {
    * @param prop context properties
    * @param ii input info
    * @return array list will all parts
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static NodeCache extractParts(final InputStream io,
@@ -272,9 +272,8 @@ public final class ResponseHandler {
       // RFC 1341: Preamble shall be ignored -> read till 1st boundary
       while(next != null && !eq(sep, next))
         next = readLine(io);
-      if(next == null) {
-        REQINV.thrw(ii, "No body specified for http:part");
-      }
+      if(next == null) REQINV.thrw(ii, "No body specified for http:part");
+
       final byte[] end = concat(sep, token("--"));
       FElem nextPart = extractNextPart(io, statusOnly, payloads, sep, end,
           prop, ii);
@@ -300,13 +299,14 @@ public final class ResponseHandler {
    * @param prop context properties
    * @param ii input info
    * @return part
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
   private static FElem extractNextPart(final InputStream io,
       final boolean statusOnly, final ItemCache payloads, final byte[] sep,
       final byte[] end, final Prop prop, final InputInfo ii)
       throws IOException, QueryException {
+
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
     byte[] partContType = TXT_PLAIN;
@@ -362,7 +362,7 @@ public final class ResponseHandler {
    * Reads a line of HTTP multipart content.
    * @param in connection input stream
    * @return line
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static byte[] readLine(final InputStream in) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
@@ -394,13 +394,13 @@ public final class ResponseHandler {
    * @param io connection input stream
    * @param sep separation boundary
    * @param end closing boundary
-   * @param charset part content encoding
+   * @param cs part content encoding
    * @return payload part content
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   private static byte[] extractPartPayload(final InputStream io,
-      final byte[] sep, final byte[] end, final String charset)
-      throws IOException {
+      final byte[] sep, final byte[] end, final String cs) throws IOException {
+
     final ByteList bl = new ByteList();
     while(true) {
       final byte[] next = readLine(io);
@@ -412,7 +412,7 @@ public final class ResponseHandler {
       }
       bl.add(next).add('\n');
     }
-    return TextInput.content(new IOContent(bl.toArray()), charset).finish();
+    return TextInput.content(new IOContent(bl.toArray()), cs).finish();
   }
 
   /**
@@ -454,8 +454,8 @@ public final class ResponseHandler {
   private static String extractCharset(final String c) {
     // content type is unknown
     if(c == null) return null;
-    final int index = c.toLowerCase().lastIndexOf("charset=");
-    if(index == -1) return null;
-    return c.substring(index + 8); // 8 for "charset="
+    final String cs = "charset=";
+    final int i = c.toLowerCase().lastIndexOf(cs);
+    return i == -1 ? null : c.substring(i + cs.length());
   }
 }

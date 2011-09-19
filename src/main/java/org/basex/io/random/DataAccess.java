@@ -29,7 +29,7 @@ public final class DataAccess {
   /**
    * Constructor, initializing the file reader.
    * @param f the file to be read
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   public DataAccess(final File f) throws IOException {
     file = new RandomAccessFile(f, "rw");

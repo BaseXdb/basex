@@ -184,7 +184,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * Returns a zip archive description.
    * @param arg zip arguments
    * @return parameter string
-   * @throws IOException IO exception
+   * @throws IOException I/O Exception
    */
   protected static String zipParams(final String arg) throws IOException {
     return "<file xmlns='http://expath.org/ns/zip' href='" +

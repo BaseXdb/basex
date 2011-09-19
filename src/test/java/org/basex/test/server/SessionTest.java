@@ -6,8 +6,10 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.basex.io.in.ArrayInput;
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Test;
 
@@ -18,6 +20,8 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public abstract class SessionTest {
+  /** Test database name. */
+  protected static final String DB = Util.name(SessionTest.class);
   /** Output stream. */
   protected ByteArrayOutputStream out;
   /** Serialization parameters to wrap query result with an element. */
@@ -33,7 +37,7 @@ public abstract class SessionTest {
     try {
       session.close();
     } catch(final IOException ex) {
-      fail(ex.toString());
+      fail(Util.message(ex));
     }
   }
 
@@ -73,13 +77,155 @@ public abstract class SessionTest {
     session.execute("xquery (");
   }
 
+  /**
+   * Runs a query command and retrieves the result as string.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void commandErr() throws IOException {
+    session.execute("1,<a/>+''");
+  }
+
+  /**
+   * Creates new databases.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void create() throws IOException {
+    session.create(DB, new ArrayInput(""));
+    check("", session.query("doc('" + DB + "')").execute());
+    session.create(DB, new ArrayInput("<X/>"));
+    check("<X/>", session.query("doc('" + DB + "')").execute());
+  }
+
+  /**
+   * Stops because of invalid input.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void createErr() throws IOException {
+    session.create(DB, new ArrayInput("<"));
+  }
+
+  /**
+   * Stops because of an invalid database name.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void createNameErr() throws IOException {
+    session.create("", new ArrayInput(""));
+  }
+
+  /**
+   * Adds documents to a database.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void add() throws IOException {
+    session.execute("create db " + DB);
+    session.add(DB, "", new ArrayInput("<X/>"));
+    check("1", session.query("count(db:open('" + DB + "'))").execute());
+    for(int i = 0; i < 9; i++) session.add(DB, "", new ArrayInput("<X/>"));
+    check("10", session.query("count(db:open('" + DB + "'))").execute());
+  }
+
+  /**
+   * Adds a file with an invalid file name.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void addNameErr() throws IOException {
+    session.execute("create db " + DB);
+    session.add("", "", new ArrayInput("<X/>"));
+  }
+
+  /**
+   * Adds a file with missing input.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void addNoInput() throws IOException {
+    session.execute("create db " + DB);
+    session.add("", "", new ArrayInput(""));
+  }
+
+  /**
+   * Replaces documents in a database.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void replace() throws IOException {
+    session.execute("create db " + DB);
+    check("0", session.query("count(db:open('" + DB + "'))").execute());
+    session.replace(DB, new ArrayInput("<X/>"));
+    check("1", session.query("count(db:open('" + DB + "'))").execute());
+    session.replace(DB + "2", new ArrayInput("<X/>"));
+    check("2", session.query("count(db:open('" + DB + "'))").execute());
+    session.replace(DB + "2", new ArrayInput("<X/>"));
+    check("2", session.query("count(db:open('" + DB + "'))").execute());
+  }
+
+  /**
+   * Replaces a file with an invalid file name.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void replaceNameErr() throws IOException {
+    session.execute("create db " + DB);
+    session.replace("", new ArrayInput("<X/>"));
+  }
+
+  /**
+   * Adds a file with missing input.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void replaceNoInput() throws IOException {
+    session.execute("create db " + DB);
+    session.replace("", new ArrayInput(""));
+  }
+
+  /**
+   * Stores binary content in the database.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public final void store() throws IOException {
+    session.execute("create db " + DB);
+    session.store("X", new ArrayInput("!"));
+    check("true", session.query("db:is-raw('" + DB + "','X')").execute());
+    session.store("X", new ArrayInput(""));
+    check("", session.query("db:retrieve('" + DB + "','X')").execute());
+    session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
+    check("0001FF", session.query("db:retrieve('" + DB + "','X')").execute());
+    session.execute("drop db " + DB);
+  }
+
+  /**
+   * Stores binary content in the database.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void storeNoDB() throws IOException {
+    session.store("X", new ArrayInput("!"));
+  }
+
+  /**
+   * Stores binary content in the database.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = org.basex.core.BaseXException.class)
+  public final void storeInvalid() throws IOException {
+    session.execute("create db " + DB);
+    session.store("..", new ArrayInput("!"));
+  }
+
   /** Runs a query and retrieves the result as string.
    * @throws IOException I/O exception */
   @Test
   public void query() throws IOException {
     final Query query = session.query("1");
     check("1", query.execute());
-    check("", query.close());
   }
 
   /** Runs a query and retrieves the result as string.
@@ -89,7 +235,6 @@ public abstract class SessionTest {
     final Query query = session.query("1");
     if(!query.more()) fail("No result returned");
     check("1", query.next());
-    check("", query.close());
   }
 
   /** Runs a query and retrieves the empty result as string.
@@ -106,19 +251,16 @@ public abstract class SessionTest {
   @Test
   public void queryClose() throws IOException {
     final Query query = session.query("()");
-    check("", query.close());
-    check("", query.close());
+    query.close();
     query.close();
   }
 
-  /** Runs a query, using init().
+  /** Runs a query, using more().
    * @throws IOException I/O exception */
   @Test
   public void queryInit() throws IOException {
     final Query query = session.query("()");
-    check("", query.init());
     assertFalse("No result was expected.", query.more());
-    check("", query.close());
   }
 
   /** Runs a query and retrieves multiple results as string.
@@ -127,7 +269,6 @@ public abstract class SessionTest {
   public void queryMore() throws IOException {
     final Query query = session.query("1 to 3");
     int c = 0;
-    query.init();
     while(query.more()) check(++c, query.next());
     query.close();
   }
@@ -149,30 +290,19 @@ public abstract class SessionTest {
   public void querySerial1() throws IOException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     final Query query = session.query(WRAPPER + "()");
-    check("<db:results xmlns:db=\"ns\"", query.init());
-    assertFalse("No result was expected.", query.more());
-    check("/>", query.close());
+    assertTrue("Result expected.", query.more());
+    check("<db:results xmlns:db=\"ns\"/>", query.next());
+    assertFalse("No result expected.", query.more());
   }
 
   /** Runs a query with additional serialization parameters.
    * @throws IOException I/O exception */
   @Test
   public void querySerial2() throws IOException {
-    // avoid query evaluation, if more()/next() isn't called
-    final Query query = session.query(WRAPPER + "1 to 10000000000000");
-    check("<db:results xmlns:db=\"ns\"", query.init());
-    check("/>", query.close());
-  }
-
-  /** Runs a query with additional serialization parameters.
-   * @throws IOException I/O exception */
-  @Test
-  public void querySerial3() throws IOException {
     final Query query = session.query(WRAPPER + "1 to 2");
-    check("<db:results xmlns:db=\"ns\"", query.init());
-    check("><db:result>1</db:result>", query.next());
-    check("<db:result>2</db:result>", query.next());
-    check("</db:results>", query.close());
+    assertTrue("Result expected.", query.more());
+    check("<db:results xmlns:db=\"ns\">  <db:result>1</db:result>" +
+        "  <db:result>2</db:result></db:results>", query.next());
   }
 
   /** Runs a query with an external variable declaration.
@@ -242,18 +372,23 @@ public abstract class SessionTest {
    * @throws IOException expected exception*/
   @Test(expected = org.basex.core.BaseXException.class)
   public void queryError() throws IOException {
-    final Query query = session.query("(");
-    query.next();
+    session.query("(").next();
+  }
+
+  /** Runs an erroneous query.
+   * @throws IOException expected exception*/
+  @Test(expected = org.basex.core.BaseXException.class)
+  public void queryError2() throws IOException {
+    session.query("(1,'a')[. eq 1]").execute();
   }
 
   /** Runs an erroneous query.
    * @throws IOException expected exception*/
   @Test(expected = org.basex.core.BaseXException.class)
   public void queryError3() throws IOException {
-      final Query query = session.query("(1,'a')[. eq 1]");
-      query.init();
-      check("1", query.next());
-      query.next();
+    final Query query = session.query("(1,'a')[. eq 1]");
+    check("1", query.next());
+    query.next();
   }
 
   /** Runs two queries in parallel.
@@ -275,7 +410,7 @@ public abstract class SessionTest {
   /** Runs 5 queries in parallel.
    * @throws IOException I/O exception */
   @Test
-  public void query8() throws IOException {
+  public void queryParallel2() throws IOException {
     final int size = 8;
     final Query[] cqs = new Query[size];
     for(int q = 0; q < size; q++) cqs[q] = session.query(Integer.toString(q));
@@ -289,13 +424,8 @@ public abstract class SessionTest {
    * @param ret string returned from the client API
    */
   protected final void check(final Object exp, final Object ret) {
-    String result;
-    if(out == null) {
-      result = ret.toString();
-    } else {
-      result = out.toString();
-      out.reset();
-    }
+    final String result = (out != null ? out : ret).toString();
+    if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));
   }
 }

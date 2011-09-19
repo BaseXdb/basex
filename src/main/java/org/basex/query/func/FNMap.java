@@ -80,7 +80,6 @@ public final class FNMap extends FuncCall {
    */
   private Map entry(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    
     return Map.EMPTY.insert(expr[0].item(ctx, ii), expr[1].value(ctx), ii);
   }
 

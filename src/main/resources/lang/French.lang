@@ -107,6 +107,7 @@ dc_separatorinfo=Separator
 do_title=Ouvrir une base de données
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Voulez-vous en créer une nouvelle ?
+do_checkver=A new version is available (% %)!\nDo you want to update?
 
 dr_title=Renommer la base de données
 dr_title2=Delete documents
@@ -557,7 +558,7 @@ ch_alter2=Alters the name of a database or the user password:
 ch_alterpw=alters the password of a user.
 ch_alterdb=alters the name of a database.
 ch_optimize1=Optimize the base de données.
-ch_optimize2=Optimizes the currently opened database.\nIf % is specified, the database size is minimized.  
+ch_optimize2=Optimizes the currently opened database.\nIf % is specified, the database size is minimized.
 ch_export1=Export base de données to XML.
 ch_export2=Exporte la base de données vers [%].
 ch_xquery1=Evalue l'expression XQuery.
@@ -584,7 +585,7 @@ ch_show22=montre les bases de données actullement ouvertes.
 ch_show23=montre les sessions de base de données courante.
 ch_show24=montre les utilisateurs (sur une base de données).
 ch_show25=montre les backups.
-ch_show26=montre les events. 
+ch_show26=montre les events.
 ch_grant1=Octroyer les permissions utilisateur.
 ch_grant2=Octroie les permissions à un utilisateur (sur une base de données).
 ch_set1=Définir les options globales.
@@ -610,6 +611,10 @@ ch_repo2=installs, deletes or lists packages from the repository
 ch_repo3=deletes the package with name [%] or directory [%]
 ch_repo4=installs package with path [%]
 ch_repo5=lists all installed packages
+ch_retrieve1=Retrieve raw data.
+ch_retrieve2=Retrieves raw data from the specified [%].
+ch_store1=Store raw data.
+ch_store2=Stores raw data to the specified [%].
 
 # Aide Texts
 h_hist=Afficher l'historique des saisies.

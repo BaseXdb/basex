@@ -13,47 +13,48 @@ import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 
 /**
- * Update primitive for the db:put() function.
+ * Update primitive for the db:store() function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DBPut extends UpdatePrimitive {
+public final class DBStore extends UpdatePrimitive {
   /** Keys. */
   private final TokenMap map = new TokenMap();
 
   /**
    * Constructor.
    * @param d data
-   * @param key key to be stored
+   * @param path target path
    * @param val value to be stored
    * @param info input info
    */
-  public DBPut(final Data d, final byte[] key, final byte[] val,
+  public DBStore(final Data d, final byte[] path, final byte[] val,
       final InputInfo info) {
 
     super(PrimitiveType.DBPUT, -1, d, info);
-    map.add(key, val);
+    map.add(path, val);
   }
 
   @Override
   public void merge(final UpdatePrimitive p) {
-    final DBPut put = (DBPut) p;
-    for(final byte[] key : put.map) {
-      map.add(key, put.map.get(key));
+    final DBStore put = (DBStore) p;
+    for(final byte[] path : put.map) {
+      map.add(path, put.map.get(path));
     }
   }
 
   @Override
   public void apply() throws QueryException {
-    for(final byte[] key : map) {
+    for(final byte[] path : map) {
       try {
-        final IOFile file = data.meta.binary(string(key));
+        final IOFile file = data.meta.binary(string(path));
+        if(file == null) UPDBPUTERR.thrw(input, path);
         new IOFile(file.dir()).md();
-        file.write(map.get(key));
+        file.write(map.get(path));
       } catch(final IOException ex) {
         Util.debug(ex);
-        UPDBPUTERR.thrw(input, key);
+        UPDBPUTERR.thrw(input, path);
       }
     }
   }

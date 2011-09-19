@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.basex.core.Commands.CmdPerm;
@@ -17,6 +18,7 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
+import org.xml.sax.InputSource;
 
 /**
  * This class provides the architecture for all internal command
@@ -43,6 +45,8 @@ public abstract class Command extends Progress {
   protected Context context;
   /** Output stream. */
   protected PrintOutput out;
+  /** Optional input source. */
+  protected InputSource in;
   /** Database properties. */
   protected Prop prop;
   /** Main properties. */
@@ -53,12 +57,12 @@ public abstract class Command extends Progress {
 
   /**
    * Constructor.
-   * @param f command flags
-   * @param a arguments
+   * @param flag command flags
+   * @param arg arguments
    */
-  public Command(final int f, final String... a) {
-    flags = f;
-    args = a;
+  public Command(final int flag, final String... arg) {
+    flags = flag;
+    args = arg;
   }
 
   /**
@@ -84,6 +88,22 @@ public abstract class Command extends Progress {
     final ArrayOutput ao = new ArrayOutput();
     execute(ctx, ao);
     return ao.toString();
+  }
+
+  /**
+   * Attaches an input stream.
+   * @param is input stream
+   */
+  public void setInput(final InputStream is) {
+    setInput(new InputSource(is));
+  }
+
+  /**
+   * Attaches an input source.
+   * @param is input source
+   */
+  public void setInput(final InputSource is) {
+    in = is;
   }
 
   /**
@@ -182,7 +202,7 @@ public abstract class Command extends Progress {
   // PROTECTED METHODS ========================================================
 
   /**
-   * Executes the command and serializes the result.
+   * Executes the command and serializes the result (internal call).
    * @return success of operation
    * @throws IOException I/O exception
    */
@@ -266,8 +286,7 @@ public abstract class Command extends Progress {
   protected static final boolean close(final Context ctx, final String db) {
     final boolean close = ctx.data() != null &&
       db.equals(ctx.data().meta.name) && ctx.datas.pins(db) == 1;
-    if(close) new Close().run(ctx);
-    return close;
+    return close && new Close().run(ctx);
   }
 
   // PRIVATE METHODS ==========================================================

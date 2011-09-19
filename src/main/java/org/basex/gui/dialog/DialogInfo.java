@@ -31,7 +31,7 @@ import org.basex.gui.layout.BaseXTabs;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.Serializer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -117,7 +117,7 @@ public final class DialogInfo extends Dialog {
             PrintOutput out = null;
             try {
               out = new PrintOutput(file.path());
-              data.pthindex.plan(new XMLSerializer(out));
+              data.pthindex.plan(Serializer.get(out));
             } catch(final IOException ex) {
               Dialog.error(gui, NOTSAVED);
             } finally {

@@ -14,7 +14,7 @@ final class FTTrieList extends FTList {
    * Constructor, initializing the index structure.
    * @param d data reference
    * @param cf current file
-   * @throws IOException IO Exception
+   * @throws IOException I/O Exception
    */
   FTTrieList(final Data d, final int cf) throws IOException {
     super(d, cf, 'a', 'b');

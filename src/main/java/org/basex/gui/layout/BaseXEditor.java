@@ -190,7 +190,7 @@ public class BaseXEditor extends BaseXPanel {
    */
   public final void setSyntax(final IO file) {
     setSyntax(file.name().endsWith(IO.JSONSUFFIX) ? new JSONSyntax() :
-      file.xml() ? new XMLSyntax() : new XQuerySyntax());
+      file.isXML() ? new XMLSyntax() : new XQuerySyntax());
   }
 
   /**

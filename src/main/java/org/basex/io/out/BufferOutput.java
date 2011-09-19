@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import org.basex.io.IO;
 
 /**
- * This class serves as a buffered wrapper for output streams.
+ * This class uses a byte buffer to speed up output stream processing.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

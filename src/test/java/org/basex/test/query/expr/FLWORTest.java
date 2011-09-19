@@ -1,9 +1,11 @@
 package org.basex.test.query.expr;
 
 import static org.junit.Assert.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.XQuery;
+import org.basex.util.Util;
 import org.junit.Test;
 
 /**
@@ -36,7 +38,7 @@ public final class FLWORTest {
       assertEquals(expected.replaceAll("\\\"", "'"),
           result.replaceAll("\\\"", "'"));
     } catch(final BaseXException ex) {
-      fail(ex.getMessage());
+      fail(Util.message(ex));
     }
   }
 }

@@ -32,10 +32,6 @@ public interface PkgText {
   byte[] SPEC = token("spec");
 
   /** <package/> children. */
-  /** Element title. */
-  byte[] TITLE = token("title");
-  /** Element home. */
-  byte[] HOME = token("home");
   /** Element dependency. */
   byte[] DEPEND = token("dependency");
   /** Element xquery. */
@@ -56,8 +52,6 @@ public interface PkgText {
   byte[] SEMVERMAX = token("semver-max");
 
   /** <xquery/> children. */
-  /** Attribute import-uri. */
-  byte[] IMPURI = token("import-uri");
   /** Attribute namespace. */
   byte[] NSPC = token("namespace");
   /** Attribute file. */

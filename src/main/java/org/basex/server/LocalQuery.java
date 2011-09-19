@@ -1,13 +1,11 @@
 package org.basex.server;
 
-import static org.basex.util.Token.*;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import org.basex.core.BaseXException;
+
 import org.basex.core.Context;
+import org.basex.io.out.ArrayOutput;
 import org.basex.io.out.PrintOutput;
-import org.basex.query.QueryException;
 
 /**
  * This class defines all methods for iteratively evaluating queries locally.
@@ -21,36 +19,28 @@ public class LocalQuery extends Query {
   /** Active query listener. */
   private final QueryListener qp;
   /** Buffer output; {@code null} if an {@link OutputStream} is specified. */
-  private final ByteArrayOutputStream buf;
-  /** Owning local session. */
-  private final LocalSession session;
-
+  private final ArrayOutput buf;
   /** Iterator flag. */
   private boolean more;
 
   /**
    * Constructor. Query output will be returned by each called methods.
-   * @param s owning session
    * @param q query string
    * @param ctx database context
    */
-  LocalQuery(final LocalSession s, final String q, final Context ctx) {
-    session = s;
-    buf = new ByteArrayOutputStream();
+  LocalQuery(final String q, final Context ctx) {
+    buf = new ArrayOutput();
     qp = new QueryListener(q, PrintOutput.get(buf), ctx);
   }
 
   /**
    * Constructor. Query output will be written to the provided output stream.
    * All methods will return {@code null}.
-   * @param s owning session
    * @param q query string
    * @param ctx database context
    * @param o output stream to write query output
    */
-  LocalQuery(final LocalSession s, final String q, final Context ctx,
-      final OutputStream o) {
-    session = s;
+  LocalQuery(final String q, final Context ctx, final OutputStream o) {
     buf = null;
     qp = new QueryListener(q, PrintOutput.get(o), ctx);
   }
@@ -58,51 +48,25 @@ public class LocalQuery extends Query {
   @Override
   public void bind(final String n, final Object v, final String t)
       throws IOException {
-    try {
-      qp.bind(n, v, t);
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
-  }
-
-  @Override
-  public String init() throws IOException {
-    try {
-      qp.init();
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
-    return output();
+    qp.bind(n, v, t);
   }
 
   @Override
   public boolean more() throws IOException {
-    try {
-      more = true;
-      return qp.next();
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
+    more = true;
+    return qp.next();
   }
 
   @Override
   public String next() throws IOException {
-    try {
-      if(more) more = false;
-      else qp.next();
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
+    if(more) more = false;
+    else qp.next();
     return output();
   }
 
   @Override
   public String execute() throws IOException {
-    try {
-      qp.execute();
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
+    qp.execute();
     return output();
   }
 
@@ -113,27 +77,12 @@ public class LocalQuery extends Query {
 
   @Override
   public String options() throws IOException {
-    try {
-      return qp.options();
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
+    return qp.options();
   }
 
   @Override
-  public String close() throws IOException {
-    session.removeQuery(this);
-    return closeListener();
-  }
-
-  /**
-   * Close the query listener.
-   * @return output
-   * @throws IOException I/O exception
-   */
-  String closeListener() throws IOException {
-    qp.close(false);
-    return output();
+  public void close() throws IOException {
+    qp.close();
   }
 
   /**
@@ -144,7 +93,7 @@ public class LocalQuery extends Query {
     // if another output stream is specified, the query process has already
     // written the data, so there is nothing to output
     if(buf == null) return null;
-    final String result = string(buf.toByteArray());
+    final String result = buf.toString();
     buf.reset();
     return result;
   }

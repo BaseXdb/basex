@@ -87,7 +87,6 @@ public final class JsonMLSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     finishOpen();
     print(']');
-    //finishClose();
   }
 
   @Override
@@ -122,16 +121,6 @@ public final class JsonMLSerializer extends OutputSerializer {
   @Override
   public void finishItem(final Item value) throws IOException {
     error("Items cannot be serialized");
-  }
-
-  /**
-   * Indents the next text.
-   * @throws IOException I/O exception
-   */
-  protected void ind() throws IOException {
-    ++level;
-    indent();
-    --level;
   }
 
   /**

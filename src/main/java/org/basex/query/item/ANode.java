@@ -31,7 +31,7 @@ public abstract class ANode extends Item {
     NodeType.COM, NodeType.PI
   };
   /** Static node counter. */
-  // [CG] XQuery/ID: move to query context?
+  // [CG] XQuery/ID: move to query context to reduce chance of overflow
   private static int sid;
   /** Unique node id. */
   public final int id = ++sid;
