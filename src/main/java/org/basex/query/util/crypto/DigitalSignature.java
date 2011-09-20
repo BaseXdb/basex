@@ -21,6 +21,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -310,13 +311,6 @@ public final class DigitalSignature {
       final Document doc = toDOMNode(node);
 
       final NodeList nl = doc.getElementsByTagName("Signature");
-
-      // TODO change to X509KeySelector
-//      final KeyStore keystore = KeyStore.getInstance("JKS");
-//      keystore.load(new FileInputStream("/Users/lukas/keystore.jks"),
-//          "password".toCharArray());
-//      final DOMValidateContext valContext =
-//          new DOMValidateContext(new X509KeySelector(keystore), nl.item(0));
       final DOMValidateContext valContext =
           new DOMValidateContext(new MyKeySelector(), nl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
@@ -324,7 +318,22 @@ public final class DigitalSignature {
 
       coreVal = signature.validate(valContext);
       if(!coreVal) {
+        System.err.println("Signature failed core validation");
+        boolean sv = signature.getSignatureValue().validate(valContext);
+        System.out.println("signature validation status: " + sv);
+        if(!sv) {
+          // Check the validation status of each Reference.
+          Iterator i = signature.getSignedInfo().getReferences().iterator();
+          for (int j = 0; i.hasNext(); j++) {
+            boolean refValid = ((Reference) i.next()).validate(valContext);
+            System.out.println("ref[" + j + "] validity status: " + refValid);
+          }
+        }
+
+      } else {
+        System.out.println("Signature passed core validation");
       }
+
 
       return Bln.get(coreVal);
 
@@ -340,12 +349,6 @@ public final class DigitalSignature {
       e.printStackTrace();
     } catch(XMLSignatureException e) {
       e.printStackTrace();
-//    } catch(KeyStoreException e) {
-//      e.printStackTrace();
-//    } catch(NoSuchAlgorithmException e) {
-//      e.printStackTrace();
-//    } catch(CertificateException e) {
-//      e.printStackTrace();
     }
 
     return Bln.get(coreVal);

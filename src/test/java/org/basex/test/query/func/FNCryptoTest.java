@@ -141,6 +141,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:validate-signature(c:generate-signature(<a/>,'','','','',''," +
         certificate + "))",
         "true");
+//    System.out.println(query("declare namespace c = 'http://expath.org/ns/crypto';" +
+//        "c:generate-signature(<a/>,'','','','',''," + certificate + ")"));
   }
 
   /**
