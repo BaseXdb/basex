@@ -303,20 +303,6 @@ public final class IOFile extends IO {
     return file.renameTo(trg.file);
   }
 
-  /**
-   * Checks if this is a valid file reference.
-   * @return result of check
-   */
-  public boolean isValid() {
-    // note that not all invalid names can be caught by this test
-    try {
-      file.getCanonicalFile();
-      return true;
-    } catch(final IOException ex) {
-      return false;
-    }
-  }
-
   @Override
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
@@ -381,16 +367,6 @@ public final class IOFile extends IO {
       if(!suf && sub) sb.append(".*");
     }
     return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
-  }
-
-  /**
-   * Normalizes the specified path. Converts backslashes and
-   * removes duplicate, leading and trailing slashes.
-   * @param path input path
-   * @return normalized path
-   */
-  public static String normalize(final String path) {
-    return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
   }
 
   /**

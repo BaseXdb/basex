@@ -188,17 +188,6 @@ public abstract class Command extends Progress {
     return cb.toString();
   }
 
-  /**
-   * Checks if the specified database name is valid; allows only letters,
-   * digits, the underscore, and dash.
-   * @param name name to be checked
-   * @param glob allow glob syntax
-   * @return result of check
-   */
-  public static final boolean validName(final String name, final boolean glob) {
-    return name != null && name.matches(glob ? "[-\\w*?,]+" : "[-\\w]+");
-  }
-
   // PROTECTED METHODS ========================================================
 
   /**

@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.basex.core.Command;
 import org.basex.core.User;
+import org.basex.data.MetaData;
 import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
@@ -39,8 +40,8 @@ public final class Copy extends Command {
     final String db = args[0];
     final String newdb = args[1];
     // check if names are valid
-    if(!validName(db, false)) return error(NAMEINVALID, db);
-    if(!validName(newdb, false)) return error(NAMEINVALID, newdb);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(newdb, false)) return error(NAMEINVALID, newdb);
 
     // database does not exist
     if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);

@@ -8,6 +8,7 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 
@@ -28,7 +29,7 @@ public final class DropBackup extends Command {
 
   @Override
   protected boolean run() {
-    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!MetaData.validName(args[0], true)) return error(NAMEINVALID, args[0]);
 
     // loop through all databases and drop backups
     for(final String db : databases(args[0])) {

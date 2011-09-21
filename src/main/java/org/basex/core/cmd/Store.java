@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import org.basex.core.User;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
@@ -44,10 +45,11 @@ public final class Store extends ACreate {
       in = file.inputSource();
     }
 
-    final String target = args[0];
-    final IOFile file = context.data().meta.binary(target);
-    if(file == null || file.isDir() || !file.isValid())
-      return error(NAMEINVALID, target);
+    final String path = MetaData.normPath(args[0]);
+    if(path == null) return error(NAMEINVALID, args[0]);
+
+    final IOFile file = context.data().meta.binary(path);
+    if(file == null || file.isDir()) return error(NAMEINVALID, path);
 
     new IOFile(file.dir()).md();
 

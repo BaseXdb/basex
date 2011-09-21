@@ -38,25 +38,25 @@ import org.basex.util.hash.TokenIntMap;
 public class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
   public boolean running;
-
-  /** Quiet mode (no logging). */
-  protected boolean quiet;
-  /** Start as daemon. */
-  protected boolean service;
-  /** Stopped flag. */
-  protected boolean stopped;
-  /** Log. */
-  protected Log log;
-
   /** Event server socket. */
   ServerSocket esocket;
   /** Stop file. */
   IOFile stop;
+  /** Log. */
+  Log log;
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
   /** Blocked clients. */
   private final TokenIntMap blocked = new TokenIntMap();
+
+  /** Quiet mode (no logging). */
+  private boolean quiet;
+  /** Start as daemon. */
+  private boolean service;
+  /** Stopped flag. */
+  private boolean stopped;
+
   /** Server socket. */
   private ServerSocket socket;
   /** User query. */
@@ -217,8 +217,8 @@ public class BaseXServer extends Main implements Runnable {
 
   @Override
   protected void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE,
-        SERVERMODE));
+    final Args arg = new Args(args, this, SERVERINFO,
+        Util.info(CONSOLE, SERVERMODE));
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {

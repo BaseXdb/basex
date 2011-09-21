@@ -14,6 +14,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.data.MetaData;
 import org.basex.index.IndexBuilder;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.FTBuilder;
@@ -74,7 +75,7 @@ public abstract class ACreate extends Command {
    * @return success of operation
    */
   protected final boolean build(final Parser parser, final String db) {
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
 
     // close open database
     new Close().run(context);

@@ -434,6 +434,7 @@ public class CommandTest {
     // target path must not be empty
     no(new Rename(FN, "/"));
     no(new Rename(FN, ""));
+    ok(new Rename(FILE, FILE));
     ok(new Rename(FILE, "xxx"));
     // source need not exist
     ok(new Rename(FILE, "xxx"));

@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.list.IntList;
@@ -42,8 +43,8 @@ public final class Replace extends ACreate {
       in = io.inputSource();
     }
 
-    String name = IOFile.normalize(args[0]);
-    if(name.isEmpty()) return error(DIRERR, name);
+    String name = MetaData.normPath(args[0]);
+    if(name == null || name.isEmpty()) return error(DIRERR, args[0]);
 
     final byte[] source = token(name);
     final Data data = context.data();

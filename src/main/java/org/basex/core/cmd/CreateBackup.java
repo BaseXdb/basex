@@ -11,6 +11,7 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.Zip;
@@ -37,7 +38,7 @@ public final class CreateBackup extends Command {
 
   @Override
   protected boolean run() {
-    if(!validName(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!MetaData.validName(args[0], true)) return error(NAMEINVALID, args[0]);
 
     // retrieve all databases
     final String[] dbs = databases(args[0]);

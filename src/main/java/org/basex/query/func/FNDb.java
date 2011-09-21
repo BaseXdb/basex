@@ -17,6 +17,7 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
 import org.basex.data.DataText;
+import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
@@ -133,6 +134,7 @@ public final class FNDb extends FuncCall {
     byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
     if(expr.length == 2) path = checkStr(expr[1], ctx);
 
+    if(!MetaData.validName(string(db), false)) INVDB.thrw(input, db);
     final Data data = ctx.resource.data(db, input);
     return DBNodeSeq.get(data.docs(string(path)), data, true, s == -1);
   }
@@ -340,9 +342,7 @@ public final class FNDb extends FuncCall {
 
     final Data data = data(0, ctx);
     final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
-    // ensure that the path is valid
     final String path = expr.length < 4 ? null : path(3, ctx);
-    if(path != null && !new IOFile(path).isValid()) RESINV.thrw(input, path);
 
     // get all items representing document(s):
     final ObjList<Item> docs = new ObjList<Item>(
@@ -432,7 +432,6 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String src = path(1, ctx);
     final String trg = path(2, ctx);
-    if(!new IOFile(trg).isValid()) RESINV.thrw(input, trg);
 
     // the first step of the path should be the database name
     final IntList il = data.docs(src);
@@ -443,10 +442,8 @@ public final class FNDb extends FuncCall {
       ctx.updates.add(new ReplaceValue(pre, data, input, token(target)), ctx);
     }
     // rename files
-    final IOFile source = data.meta.binary(src);
-    final IOFile target = data.meta.binary(trg);
-    if(source != null && target != null)
-      ctx.updates.add(new DBRename(data, source, target, input), ctx);
+    if(data.meta.binary(src) != null && data.meta.binary(trg) != null)
+      ctx.updates.add(new DBRename(data, src, trg, input), ctx);
 
     return null;
   }
@@ -478,8 +475,7 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
     final IOFile file = data.meta.binary(path);
-    if(file == null || file.isDir() || !file.isValid())
-      RESINV.thrw(input, path);
+    if(file == null || file.isDir()) RESINV.thrw(input, path);
 
     final byte[] val = checkBin(expr[2], ctx);
     ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
@@ -531,8 +527,6 @@ public final class FNDb extends FuncCall {
    */
   private Item event(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
-    if(expr.length == 3) expr[2].value(ctx);
-
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
@@ -590,7 +584,11 @@ public final class FNDb extends FuncCall {
 
     final Item it = checkEmpty(expr[arg].item(ctx, input));
     if(it.node()) return checkDBNode(it).data;
-    if(it.str())  return ctx.resource.data(it.atom(input), input);
+    if(it.str())  {
+      final byte[] name = it.atom(input);
+      if(!MetaData.validName(string(name), false)) INVDB.thrw(input, name);
+      return ctx.resource.data(name, input);
+    }
     throw STRNODTYPE.thrw(input, this, it.type);
   }
 
@@ -608,7 +606,8 @@ public final class FNDb extends FuncCall {
   }
 
   /**
-   * Normalizes the specified expression as normalized database path.
+   * Returns the specified expression as normalized database path.
+   * Throws an exception if the path is invalid.
    * @param i expression index
    * @param ctx query context
    * @return normalized path
@@ -616,6 +615,10 @@ public final class FNDb extends FuncCall {
    */
   private String path(final int i, final QueryContext ctx)
       throws QueryException {
-    return IOFile.normalize(string(checkStr(expr[i], ctx)));
+
+    final String path = string(checkStr(expr[i], ctx));
+    final String norm = MetaData.normPath(path);
+    if(norm == null) RESINV.thrw(input, path);
+    return norm;
   }
 }

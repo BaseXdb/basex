@@ -18,8 +18,8 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class DBRename extends UpdatePrimitive {
-  /** Keys. */
-  private final HashMap<IOFile, IOFile> map = new HashMap<IOFile, IOFile>();
+  /** Source and target paths. */
+  private final HashMap<String, String> map = new HashMap<String, String>();
 
   /**
    * Constructor.
@@ -28,7 +28,7 @@ public final class DBRename extends UpdatePrimitive {
    * @param trg target path
    * @param info input info
    */
-  public DBRename(final Data d, final IOFile src, final IOFile trg,
+  public DBRename(final Data d, final String src, final String trg,
       final InputInfo info) {
 
     super(PrimitiveType.DBRENAME, -1, d, info);
@@ -36,15 +36,19 @@ public final class DBRename extends UpdatePrimitive {
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) {
-    map.putAll(((DBRename) p).map);
+  public void merge(final UpdatePrimitive p) throws QueryException {
+    for(final Entry<String, String> e : (((DBRename) p).map).entrySet()) {
+      final String src = e.getKey();
+      if(map.containsKey(src)) UPPATHREN.thrw(input, src);
+      map.put(src, e.getValue());
+    }
   }
 
   @Override
   public void apply() throws QueryException {
-    for(final Entry<IOFile, IOFile> op : map.entrySet()) {
-      final IOFile src = op.getKey();
-      if(src.exists() && !src.rename(op.getValue()))
+    for(final Entry<String, String> op : map.entrySet()) {
+      final IOFile src = data.meta.binary(op.getKey());
+      if(src.exists() && !src.rename(data.meta.binary(op.getValue())))
         UPDBRENAMEERR.thrw(input, src);
     }
   }

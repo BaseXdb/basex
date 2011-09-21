@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.data.MetaData;
 import org.basex.io.IOFile;
 
 /**
@@ -56,8 +57,8 @@ abstract class AUser extends Command {
     final String u = args[off];
     final String d = off + 1 < args.length ? args[off + 1] : null;
 
-    if(!validName(u, true)) return error(NAMEINVALID, u);
-    if(d != null && !validName(d, true)) return error(NAMEINVALID, d);
+    if(!MetaData.validName(u, true)) return error(NAMEINVALID, u);
+    if(d != null && !MetaData.validName(d, true)) return error(NAMEINVALID, d);
 
     // retrieve all users; stop if no user is found
     final String[] users = users(u);

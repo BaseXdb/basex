@@ -92,14 +92,14 @@ public enum Err {
   RESFNF(FODC, 2, "Resource \"%\" does not exist."),
   /** FODC0004: Evaluation exception. */
   NOCOLL(FODC, 4, "%"),
-  /** FODC0005: Evaluation exception. */
-  INVDOC(FODC, 5, "Invalid document \"%\"."),
   /** FODC0006: Evaluation exception. */
   SAXERR(FODC, 6, "SAX: %."),
   /** FODC0007: Evaluation exception. */
   BASEINV(FODC, 7, "Base URI % is invalid."),
   /** FODC0007: Evaluation exception. */
   RESINV(FODC, 7, "Resource path \"%\" is invalid."),
+  /** FODC0007: Typing Exception. */
+  INVDB(FODC, 7, "Invalid database name: \"%\"."),
 
   /** FODF1280: Evaluation exception. */
   FORMNUM(FODF, 1280, "Unknown decimal format: %."),
@@ -710,6 +710,8 @@ public enum Err {
   UPNOTCOPIED(XUDY, 14, "% was not copied by copy clause."),
   /** XUDY0015: XQuery Update dynamic exception. */
   UPMULTREN(XUDY, 15, "Multiple renames on %."),
+  /** XUDY0015: XQuery Update dynamic exception. */
+  UPPATHREN(XUDY, 15, "Multiple renames on path \"%\"."),
   /** XUDY0016: XQuery Update dynamic exception. */
   UPMULTREPL(XUDY, 16, "Multiple replaces on %."),
   /** XUDY0017: XQuery Update dynamic exception. */

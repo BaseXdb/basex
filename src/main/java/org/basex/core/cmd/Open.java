@@ -8,6 +8,7 @@ import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
+import org.basex.data.MetaData;
 import org.basex.util.Util;
 
 /**
@@ -36,7 +37,7 @@ public final class Open extends Command {
       path = db.substring(i + 1);
       db = db.substring(0, i);
     }
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
 
     try {
       final Data data = open(db, context);

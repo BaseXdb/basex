@@ -3,8 +3,10 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.IOFile;
 import org.basex.util.list.IntList;
 
@@ -28,10 +30,10 @@ public final class Rename extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    final String src = IOFile.normalize(args[0]);
-    final String trg = IOFile.normalize(args[1]);
-    // ensure that the name contains no slashes and trailing dots
-    if(!new IOFile(trg).isValid()) return error(NAMEINVALID, trg);
+    final String src = MetaData.normPath(args[0]);
+    if(src == null) return error(NAMEINVALID, args[0]);
+    final String trg = MetaData.normPath(args[1]);
+    if(trg == null) return error(NAMEINVALID, args[1]);
 
     boolean ok = true;
     int c = 0;
@@ -76,7 +78,8 @@ public final class Rename extends ACreate {
 
     // source references a file
     final String path = string(data.text(pre, true));
-    if(path.equals(src)) return trg;
+    if(Prop.WIN ? path.equalsIgnoreCase(src) : path.equals(src)) return trg;
+
     // source references a directory: merge target path and file name
     final String name = path.substring(src.length() + 1);
     return !trg.isEmpty() ? trg + '/' + name : name;

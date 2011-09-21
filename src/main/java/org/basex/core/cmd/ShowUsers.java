@@ -9,6 +9,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.util.Util;
 
 /**
@@ -36,7 +37,8 @@ public final class ShowUsers extends Command {
   @Override
   protected boolean run() throws IOException {
     final String name = args[0];
-    if(name != null && !validName(name, false)) return error(NAMEINVALID, name);
+    if(name != null && !MetaData.validName(name, false))
+      return error(NAMEINVALID, name);
 
     if(name == null) {
       out.println(context.users.info(null));

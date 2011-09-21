@@ -10,6 +10,7 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
+import org.basex.data.MetaData;
 import org.basex.util.Table;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
@@ -36,7 +37,7 @@ public final class ListDB extends Command {
     final int s = str.indexOf('/');
     final String db = s == -1 ? str : str.substring(0, s);
     final String path = s == -1 ? "" : str.substring(s + 1);
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
 
     final Table table = new Table();
     table.description = INFONRES;

@@ -5,8 +5,8 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import org.basex.core.Command;
 import org.basex.core.cmd.List;
+import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
@@ -97,7 +97,7 @@ public final class DialogInput extends Dialog {
       ok = db.contains(in) || in.equals(old);
       if(ok) msg = Util.info(DBEXISTS, in);
       if(!ok) {
-        ok = Command.validName(in, false);
+        ok = MetaData.validName(in, false);
         if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
       }
     } else {
