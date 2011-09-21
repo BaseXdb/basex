@@ -43,7 +43,10 @@ public final class DataAccess {
    */
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
-    if(changed) file.setLength(len);
+    if(changed) {
+      file.setLength(len);
+      changed = false;
+    }
   }
 
   /**
