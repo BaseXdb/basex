@@ -8,7 +8,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyException;
@@ -46,7 +45,6 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -55,25 +53,20 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
-import org.basex.io.serial.XMLSerializer;
+import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
 import org.basex.util.InputInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -214,6 +207,7 @@ public final class DigitalSignature {
     try {
 
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+      // TODO problem poss. due to empty reference?
       final Reference ref = fac.newReference("",
           fac.newDigestMethod(DA, null), Collections.
           singletonList(fac.newTransform(Transform.ENVELOPED,
@@ -225,12 +219,6 @@ public final class DigitalSignature {
               Collections.singletonList(ref));
 
       DocumentBuilderFactory dbf = null;
-      Document cert = null;
-      String kst = null;
-      String kspw = null;
-      String kal = null;
-      String pkpw = null;
-      String ksuri = null;
 
       PrivateKey pk = null;
       PublicKey puk = null;
@@ -238,6 +226,13 @@ public final class DigitalSignature {
 
       // dealing with given certificate details to initialize the keystore
       if(certificate != null) {
+        Document cert = null;
+        String kst = null;
+        String kspw = null;
+        String kal = null;
+        String pkpw = null;
+        String ksuri = null;
+
         cert = toDOMNode(certificate);
         final NodeList childs = cert.getDocumentElement().getChildNodes();
         final int s = childs.getLength();
@@ -329,21 +324,24 @@ public final class DigitalSignature {
 
       final Document doc = toDOMNode(node);
 
-      final NodeList nl = doc.getElementsByTagName("Signature");
+      // TODO with specified namespace? what to change?
+//      final NodeList nl = doc.getElementsByTagName("Signature");
       final DOMValidateContext valContext =
-          new DOMValidateContext(new MyKeySelector(), nl.item(0));
-      final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
+          new DOMValidateContext(new MyKeySelector(), doc);
+      valContext.setNode(
+          doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature").item(0));
+      final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
-
       coreVal = signature.validate(valContext);
+
       if(!coreVal) {
-        System.err.println("Signature failed core validation");
+        System.out.println("Signature failed core validation");
         boolean sv = signature.getSignatureValue().validate(valContext);
         System.out.println("signature validation status: " + sv);
         if(!sv) {
           // Check the validation status of each Reference.
           Iterator i = signature.getSignedInfo().getReferences().iterator();
-          for (int j = 0; i.hasNext(); j++) {
+          for(int j = 0; i.hasNext(); j++) {
             boolean refValid = ((Reference) i.next()).validate(valContext);
             System.out.println("ref[" + j + "] validity status: " + refValid);
           }
@@ -352,7 +350,6 @@ public final class DigitalSignature {
       } else {
         System.out.println("Signature passed core validation");
       }
-
 
       return Bln.get(coreVal);
 
@@ -395,6 +392,7 @@ public final class DigitalSignature {
     DBNode dbn = null;
 
     try {
+
       final Parser parser = Parser.xmlParser(IO.get(xmlString), new Prop());
       final MemBuilder builder = new MemBuilder("", parser, new Prop());
       final Data mem = builder.build();
@@ -410,9 +408,10 @@ public final class DigitalSignature {
   private static Document toDOMNode(final ANode n)
       throws SAXException, IOException, ParserConfigurationException {
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
-    final Serializer s = XMLSerializer.get(b);
+    final Serializer s = Serializer.get(b, new SerializerProp("omit-xml-declaration=no,standalone=no"));
     n.serialize(s);
     s.close();
+    System.out.println(new String(b.toByteArray()) + "\n\n");
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     return dbf.newDocumentBuilder().parse(

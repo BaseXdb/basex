@@ -139,6 +139,19 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   @Test
+  public void validateSignature1c() throws Exception {
+    String input = "<?xml version='1.0' encoding='UTF-8' standalone='no'?><a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'><SignedInfo><CanonicalizationMethod Algorithm='http://www.w3.org/TR/2001/REC-xml-c14n-20010315'/><SignatureMethod Algorithm='http://www.w3.org/2000/09/xmldsig#rsa-sha1'/><Reference URI=''><Transforms><Transform Algorithm='http://www.w3.org/2000/09/xmldsig#enveloped-signature'/></Transforms><DigestMethod Algorithm='http://www.w3.org/2000/09/xmldsig#sha1'/><DigestValue>9hvH4qztnIYgYfJDRLnEMPJdoaY=</DigestValue></Reference></SignedInfo><SignatureValue>W/BpXt9odK+Ot2cU0No0+tzwAJyqSx+CRMXG2BT6NRc2qbMMSB7l+RcR6jwsu2Smt0LCltR1YFLTPoD+GCarZA==</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>mH+uHBX+3mE9bgWzcDym0pnyuW3ca6EexNvQ/sAKgDNmO1xFNgVWSgKGMxmaGRzGyPi+8+KeGKGM0mS1jpRPQQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue></KeyInfo></Signature></a>";
+    input = "<a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'><SignedInfo><CanonicalizationMethod Algorithm='http://www.w3.org/TR/2001/REC-xml-c14n-20010315'/><SignatureMethod Algorithm='http://www.w3.org/2000/09/xmldsig#rsa-sha1'/><Reference URI=''><Transforms><Transform Algorithm='http://www.w3.org/2000/09/xmldsig#enveloped-signature'/></Transforms><DigestMethod Algorithm='http://www.w3.org/2000/09/xmldsig#sha1'/><DigestValue>9hvH4qztnIYgYfJDRLnEMPJdoaY=</DigestValue></Reference></SignedInfo><SignatureValue>W/BpXt9odK+Ot2cU0No0+tzwAJyqSx+CRMXG2BT6NRc2qbMMSB7l+RcR6jwsu2Smt0LCltR1YFLT\nPoD+GCarZA==</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>mH+uHBX+3mE9bgWzcDym0pnyuW3ca6EexNvQ/sAKgDNmO1xFNgVWSgKGM\nxmaGRzGyPi+8+KeGKGM0mS1jpRPQQ==</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue></KeyInfo></Signature></a>";
+    
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(" + input + ")",
+        "true");
+//    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+//        "c:validate-signature(doc('workingsigned')/root())",
+//        "true");
+  }
+
+  @Test
   public void validateSignature2() throws Exception {
     final String certificate =
         "<digital-certificate>" +
