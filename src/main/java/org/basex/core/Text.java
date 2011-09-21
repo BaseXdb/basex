@@ -136,7 +136,7 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-cdehnpPRsUWz] [stop]" + NL +
+    " [-cdehnpPRUWz] [stop]" + NL +
     "  stop      Stop existing server" + NL +
     "  -c        Start in client/server mode" + NL +
     "  -d        Activate debugging mode" + NL +
@@ -146,10 +146,12 @@ public interface Text {
     "  -p<num>   Set port of database server" + NL +
     "  -P<pass>  Specify user password" + NL +
     "  -R        Deactivate REST service" + NL +
-    "  -s        Start server as service" + NL +
     "  -U<name>  Specify user name" + NL +
     "  -W        Deactivate WebDAV service" + NL +
     "  -z        Suppress logging";
+
+  /** Bug info. */
+  String BUGINFO = "Potential bug? Improper use? Your feedback is welcome:";
 
   // SERVER ===================================================================
 

@@ -44,8 +44,7 @@ public final class Util {
    * @return dummy object
    */
   public static String bug(final Throwable ex) {
-    final TokenBuilder tb = new TokenBuilder(
-      "Potential bug? Improper use? Your feedback is welcome:");
+    final TokenBuilder tb = new TokenBuilder(BUGINFO);
     tb.add(NL).add("Contact: ").add(MAIL);
     tb.add(NL).add("Version: ").add(TITLE);
     tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));
