@@ -88,14 +88,15 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public void cache() throws IOException {
+  public byte[] read() throws IOException {
     final DataInputStream dis = new DataInputStream(new FileInputStream(file));
-    cont = new byte[(int) file.length()];
+    final byte[] cont = new byte[(int) file.length()];
     try {
       dis.readFully(cont);
     } finally {
       dis.close();
     }
+    return cont;
   }
 
   @Override
@@ -275,13 +276,11 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final byte[] c) throws IOException {
-    FileOutputStream out = null;
+    final FileOutputStream out = new FileOutputStream(path);
     try {
-      out = new FileOutputStream(path);
       out.write(c);
-      cont = c;
     } finally {
-      if(out != null) try { out.close(); } catch(final IOException ex) { }
+      try { out.close(); } catch(final IOException ex) { }
     }
   }
 

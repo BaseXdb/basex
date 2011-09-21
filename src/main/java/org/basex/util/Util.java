@@ -1,7 +1,10 @@
 package org.basex.util;
 
 import java.io.File;
+import java.io.IOException;
+
 import static org.basex.core.Text.*;
+
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketException;
@@ -12,6 +15,7 @@ import java.util.Scanner;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.LoginException;
+import org.basex.util.list.StringList;
 
 /**
  * This class contains static methods, which are used throughout the project.
@@ -320,6 +324,25 @@ public final class Util {
       // use default path; not expected to occur
       stack(ex);
       return tb.toString();
+    }
+  }
+
+  /**
+   * Starts the specified class in a separate process.
+   * @param clz class to start
+   * @param args command-line arguments
+   */
+  public static void start(final Class<?> clz, final String... args) {
+    final StringList sl = new StringList();
+    final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
+        "-cp", System.getProperty("java.class.path"), clz.getName(), "-D", };
+    for(final String a : largs) sl.add(a);
+    for(final String a : args) sl.add(a);
+
+    try {
+      new ProcessBuilder(sl.toArray()).start();
+    } catch(final IOException ex) {
+      notexpected(ex);
     }
   }
 }

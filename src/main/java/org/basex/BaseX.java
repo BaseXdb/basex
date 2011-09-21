@@ -66,37 +66,40 @@ public class BaseX extends Main {
   public BaseX(final String... args) throws IOException {
     super(args);
 
-    // create session to show optional login request
-    session();
+    try {
+      // create session to show optional login request
+      session();
 
-    // open initial document or database
-    if(input != null) {
-      execute(new Check(input), verbose);
+      // open initial document or database
+      if(input != null) {
+        execute(new Check(input), verbose);
+      }
+
+      // open specified file
+      if(file != null) {
+        // query file contents
+        final IO io = IO.get(file);
+        if(!io.exists()) throw new BaseXException(INFOERROR + FILEWHICH, file);
+        query = TextInput.content(io).toString().trim();
+        context.query = io;
+      }
+
+      if(query != null) {
+        // run query
+        execute(new XQuery(query), verbose);
+      } else if(commands != null) {
+        // run command-line arguments
+        execute(commands);
+      } else {
+        // enter interactive mode
+        Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
+        console();
+      }
+
+      if(writeProps) context.mprop.write();
+    } finally {
+      quit();
     }
-
-    // open specified file
-    if(file != null) {
-      // query file contents
-      final IO io = IO.get(file);
-      if(!io.exists()) throw new BaseXException(INFOERROR + FILEWHICH, file);
-      query = TextInput.content(io).toString().trim();
-      context.query = io;
-    }
-
-    if(query != null) {
-      // run query
-      execute(new XQuery(query), verbose);
-    } else if(commands != null) {
-      // run command-line arguments
-      execute(commands);
-    } else {
-      // enter interactive mode
-      Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
-      console();
-    }
-
-    if(writeProps) context.mprop.write();
-    quit();
   }
 
   /**
@@ -129,7 +132,6 @@ public class BaseX extends Main {
           // set/add variable binding
           if(bind.length() != 0) bind.append(',');
           bind.append(arg.string());
-          options.put(Prop.BINDINGS, bind);
         } else if(c == 'c') {
           // specify command to be evaluated
           commands = arg.remaining();
@@ -165,7 +167,6 @@ public class BaseX extends Main {
           // set/add serialization parameter
           if(serial.length() != 0) serial.append(',');
           serial.append(arg.string());
-          options.put(Prop.SERIALIZER, serial);
         } else if(c == 'u') {
           // activate write-back for updates
           options.put(Prop.WRITEBACK, true);
@@ -180,13 +181,13 @@ public class BaseX extends Main {
           verbose = true;
           options.put(Prop.QUERYINFO, true);
         } else if(c == 'w') {
-          // activate write-back for updates
+          // do not chop text nodes
           options.put(Prop.CHOP, false);
         } else if(c == 'W') {
           // hidden option: write properties before exit
           writeProps = true;
         } else if(c == 'x' && sa()) {
-          // hidden option: show original query plan
+          // hidden option: show query plan before compilation
           options.put(Prop.COMPPLAN, false);
         } else if(c == 'X') {
           // hidden option: show xml query plan
@@ -205,11 +206,14 @@ public class BaseX extends Main {
     console = file == null && commands == null && query == null;
 
     // set cached options
+    if(serial.length() != 0) options.put(Prop.SERIALIZER, serial);
+    if(bind.length() != 0) options.put(Prop.BINDINGS, bind);
     for(final Map.Entry<Object[], Object> entry : options.entrySet()) {
       try {
         execute(new Set(entry.getKey(), entry.getValue()), false);
       } catch(final IOException ex) {
         Util.errln(ex);
+        out.close();
         arg.usage();
       }
     }

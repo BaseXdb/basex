@@ -12,6 +12,7 @@ import javax.swing.event.ChangeListener;
 
 import org.basex.BaseXServer;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.cmd.Exit;
@@ -299,10 +300,12 @@ public final class DialogServer extends Dialog {
           gui.setMain(MainProp.PORT, p);
           portc.setText(ports.getText());
         }
-        msg = BaseXServer.start(p, BaseXServer.class);
-        if(msg.equals(SERVERSTART)) {
+        try {
+          BaseXServer.start(p);
+          msg = SERVERSTART;
           running = true;
-        } else {
+        } catch(final BaseXException ex) {
+          msg = ex.getMessage();
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {

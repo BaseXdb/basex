@@ -26,16 +26,16 @@ public final class IOUrl extends IO {
   }
 
   @Override
-  public void cache() throws IOException {
+  public byte[] read() throws IOException {
     final ByteList bl = new ByteList();
-    BufferedInputStream bis = null;
+    final BufferedInputStream bis = new BufferedInputStream(
+        new URL(path).openStream());
     try {
-      bis = new BufferedInputStream(new URL(path).openStream());
       for(int b; (b = bis.read()) != -1;) bl.add(b);
     } finally {
-      if(bis != null) try { bis.close(); } catch(final IOException ex) { }
+      try { bis.close(); } catch(final IOException ex) { }
     }
-    cont = bl.toArray();
+    return bl.toArray();
   }
 
   @Override
@@ -46,6 +46,11 @@ public final class IOUrl extends IO {
   @Override
   public BufferInput buffer() throws IOException {
     return new BufferInput(new URL(path).openStream());
+  }
+
+  @Override
+  public long length() {
+    return 0;
   }
 
   @Override
