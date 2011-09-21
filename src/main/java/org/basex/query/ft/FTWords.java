@@ -161,7 +161,7 @@ public final class FTWords extends FTExpr {
                 ++d;
               } else {
                 final FTIndexIterator ir = lex.get().length > MAXLEN ?
-                    scan(lex) : (FTIndexIterator) data.ids(lex);
+                    scan(lex) : (FTIndexIterator) data.iter(lex);
                 if(ia == null) {
                   ia = ir;
                 } else {
@@ -401,7 +401,7 @@ public final class FTWords extends FTExpr {
           }
         }
         // reduce number of expected results to favor full-text index requests
-        ic.addCosts(Math.max(1, ic.data.nrIDs(ft) >> 2));
+        ic.addCosts(Math.max(1, ic.data.count(ft) >> 2));
       }
     }
     return true;

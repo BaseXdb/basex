@@ -224,12 +224,12 @@ public final class DocIndex implements Index {
   public void close() { }
 
   @Override
-  public IndexIterator ids(final IndexToken token) {
+  public IndexIterator iter(final IndexToken token) {
     throw Util.notexpected();
   }
 
   @Override
-  public int nrIDs(final IndexToken token) {
+  public int count(final IndexToken token) {
     throw Util.notexpected();
   }
 
