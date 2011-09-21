@@ -95,19 +95,18 @@ public class BaseXServer extends Main implements Runnable {
       throws IOException {
 
     super(args, ctx);
-    if(stopped) {
-      stop(context.mprop.num(MainProp.SERVERPORT),
-          context.mprop.num(MainProp.EVENTPORT));
-      Performance.sleep(1000);
-      return;
-    }
-
     final int port = context.mprop.num(MainProp.SERVERPORT);
     final int eport = context.mprop.num(MainProp.EVENTPORT);
 
     if(service) {
       start(port, args);
       Util.outln(SERVERSTART);
+      Performance.sleep(1000);
+      return;
+    }
+
+    if(stopped) {
+      stop(port, eport);
       Performance.sleep(1000);
       return;
     }
