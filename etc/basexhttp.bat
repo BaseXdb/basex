@@ -4,7 +4,7 @@ setlocal
 REM Path to this script
 set PWD=%~dp0
 
-REM Paths to distributed files or source directories
+REM Paths to distributed files (basex.jar, basex-api.jar) or class files
 set BASEX=%PWD%/../../basex/target/classes
 set BASEXAPI=%PWD%/../target/classes
 

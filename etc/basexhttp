@@ -3,7 +3,7 @@
 # Path to this script
 PWD=`dirname $0`
 
-# Paths to distributed files or source directories
+# Paths to distributed files (basex.jar, basex-api.jar) or class files
 BASEX=$PWD/../../basex/target/classes
 BASEXAPI=$PWD/../target/classes
 
