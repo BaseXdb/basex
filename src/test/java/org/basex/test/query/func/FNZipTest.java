@@ -130,16 +130,58 @@ public final class FNZipTest extends AdvancedQueryTest {
     query(ZIPFILE.args(zipParams("<dir name='a'><entry name='b' src='" +
         TMPFILE + "'/></dir>")));
     checkZipEntry("a/b", new byte[] { '!' });
-    /* [CG] update zip files: remove zip namespace
-    query(ZIPFILE.string(zipParams("<entry name='seven'><a/></entry>")));
-    checkZipEntry("seven", token("<a/>"));
-    */
 
     // error: no entry specified
     error(ZIPFILE.args(zipParams("")), Err.ZIPFAIL);
     // error: duplicate entry specified
     error(ZIPFILE.args(zipParams("<entry src='" + TMPFILE + "'/>" +
         "<entry src='" + TMPFILE + "'/>")), Err.ZIPFAIL);
+  }
+
+  /**
+   * Test method for the zip:zip-file() function and namespaces.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void zipFileNS() throws IOException {
+    // ZIP namespace must be removed from zipped node
+    query(ZIPFILE.args(zipParams("<entry name='1'><a/></entry>")));
+    checkZipEntry("1", token("<a/>"));
+    // ZIP namespace must be removed from zipped node
+    query(ZIPFILE.args(zipParams("<entry name='2'><a b='c'/></entry>")));
+    checkZipEntry("2", token("<a b=\"c\"/>"));
+    // ZIP namespace must be removed from zipped node and its descendants
+    query(ZIPFILE.args(zipParams("<entry name='3'><a><b/></a></entry>")));
+    checkZipEntry("3", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
+    // ZIP namespace must be removed from zipped entry
+    query(ZIPFILE.args(zipParams("<entry name='4'><a xmlns=''/></entry>")));
+    checkZipEntry("4", token("<a/>"));
+
+    // ZIP namespace must be removed from zipped entry
+    query(ZIPFILE.args(zipParamsPref("5", "<a/>")));
+    checkZipEntry("5", token("<a/>"));
+    query(ZIPFILE.args(zipParamsPref("6", "<a><b/></a>")));
+    checkZipEntry("6", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
+    query(ZIPFILE.args(zipParamsPref("7", "<z:a xmlns:z='z'/>")));
+    checkZipEntry("7", token("<z:a xmlns:z=\"z\"/>"));
+    query(ZIPFILE.args(zipParamsPref("8", "<zip:a xmlns:zip='z'/>")));
+    checkZipEntry("8", token("<zip:a xmlns:zip=\"z\"/>"));
+    query(ZIPFILE.args(zipParamsPref("9", "<a xmlns='z'/>")));
+    checkZipEntry("9", token("<a xmlns=\"z\"/>"));
+  }
+
+  /**
+   * Returns a zip archive description with ZIP prefix.
+   * @param name file name
+   * @param entry entry
+   * @return parameter string
+   * @throws IOException I/O Exception
+   */
+  private static String zipParamsPref(final String name,
+      final String entry) throws IOException {
+    return "<zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
+        new File(TMPZIP).getCanonicalPath() + "'>" +
+        "<zip:entry name='" + name + "'>" + entry + "</zip:entry></zip:file>";
   }
 
   /**
