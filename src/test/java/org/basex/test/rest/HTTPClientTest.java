@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.api.BaseXHTTP;
+import org.basex.api.HTTPSession;
 import org.basex.build.Parser;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -110,9 +111,9 @@ public class HTTPClientTest {
    * @param client client/server flag
    * @throws Exception exception
    */
-  public static void init(final boolean client) throws Exception {
+  protected static void init(final boolean client) throws Exception {
     final String cs = client ? "-c" : "";
-    context = new Context();
+    context = HTTPSession.context();
     http = new BaseXHTTP(cs + " -zU" + Text.ADMIN + " -P" + Text.ADMIN);
   }
 

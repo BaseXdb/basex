@@ -17,5 +17,4 @@ public class ServerHTTPClientTest extends HTTPClientTest {
   public static void start() throws Exception {
     init(true);
   }
-
 }
