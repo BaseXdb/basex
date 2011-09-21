@@ -318,7 +318,7 @@ public final class CmpG extends Cmp {
       final SeqType t = it.type();
       if(!(t.type.str() || t.type.node())) return false;
 
-      final int is = ic.data.nrIDs(new ValuesToken(ind, it.atom(input)));
+      final int is = ic.data.count(new ValuesToken(ind, it.atom(input)));
       // add only expressions that yield results
       if(is != 0) {
         iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));

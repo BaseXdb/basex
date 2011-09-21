@@ -20,11 +20,13 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
-public final class MemDataTest {
+public class MemDataTest {
   /** XML document. */
-  private static final byte[] XML = Token.token("<a><b>test</b><c/></a>");
+  static final String XMLSTR = "<a><b>test</b><c/><f>test1</f><f>test3</f></a>";
+  /** XML document. */
+  private static final byte[] XML = Token.token(XMLSTR);
   /** Database context. */
-  private static final Context CTX = new Context();
+  protected static final Context CTX = new Context();
   /** Tested {@link MemData} instance. */
   private Data data;
 
@@ -64,10 +66,10 @@ public final class MemDataTest {
    */
   @Test
   public void testReplaceNode() throws BaseXException {
-    new XQuery("replace node /a/b with <d f='test4'/>").execute(CTX);
+    new XQuery("replace node /a/b with <d f='test2'/>").execute(CTX);
     final String o = new XQuery("/a/b").execute(CTX);
     assertTrue("Old node found", o.length() == 0);
-    final String n = new XQuery("//d[@f = 'test4']").execute(CTX);
+    final String n = new XQuery("//d[@f = 'test2']").execute(CTX);
     assertTrue("New node not found", n.length() > 0);
   }
 
@@ -77,9 +79,26 @@ public final class MemDataTest {
    */
   @Test
   public void testInsertNode() throws BaseXException {
-    new XQuery("insert node <d>test3</d> as first into /a").execute(CTX);
-    final String r = new XQuery("//*[text() = 'test3']").execute(CTX);
+    new XQuery("insert node <d>test2</d> as first into /a").execute(CTX);
+    final String r = new XQuery("//d[text() = 'test2']").execute(CTX);
     assertTrue("Node not found", r.length() > 0);
+    new XQuery("insert node <d>test2</d> as first into /a").execute(CTX);
+    final String c = new XQuery("count(//d[text() = 'test2'])").execute(CTX);
+    assertTrue("Second node not found", 2 == Integer.parseInt(c));
+  }
+
+
+  /**
+   * Insert node update test.
+   * @throws BaseXException query exception
+   */
+  @Test
+  public void testInsertDuplicateNode() throws BaseXException {
+    new XQuery("insert node <d>test</d> as first into /a").execute(CTX);
+    final String r = new XQuery("//d[text() = 'test']").execute(CTX);
+    assertTrue("Node not found", r.length() > 0);
+    final String c = new XQuery("count(//*[text() = 'test'])").execute(CTX);
+    assertTrue("Second node not found", 2 == Integer.parseInt(c));
   }
 
   /**
@@ -99,7 +118,7 @@ public final class MemDataTest {
    */
   @Test
   public void testFindNonexistingNode() throws BaseXException {
-    final String r = new XQuery("//*[text() = 'test1']").execute(CTX);
+    final String r = new XQuery("//*[text() = 'test0']").execute(CTX);
     assertTrue("Found non-existing node", r.length() == 0);
   }
 }
