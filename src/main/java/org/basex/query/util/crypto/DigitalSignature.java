@@ -8,16 +8,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,17 +46,34 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
+import org.basex.core.Context;
+import org.basex.core.Prop;
+import org.basex.core.cmd.XQuery;
+import org.basex.data.Data;
+import org.basex.data.MemData;
+import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Bln;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.util.InputInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -70,10 +87,10 @@ public final class DigitalSignature {
   /** Tokens. */
   private static final byte[][] CANONICALIZATIONS =
     {
+    token("inclusive-with-comment"),
     token("exclusive"),
     token("inclusive"),
     token("exclusive-with-comment"),
-    token("inclusive-with-comment")
     };
   private static final String[] CANONICALIZATIONMETHODS =
     {
@@ -143,6 +160,7 @@ public final class DigitalSignature {
       final byte[] canonicalization, final byte[] digest,
       final byte[] signature, final byte[] nsPrefix, final byte[] type,
       final ANode certificate) throws QueryException {
+    // TODO ns prefix ...
 
     // variables to check if parameters correct
     int l = 0;
@@ -195,7 +213,7 @@ public final class DigitalSignature {
 
     try {
 
-      final XMLSignatureFactory fac = XMLSignatureFactory.getInstance();
+      final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final Reference ref = fac.newReference("",
           fac.newDigestMethod(DA, null), Collections.
           singletonList(fac.newTransform(Transform.ENVELOPED,
@@ -278,7 +296,8 @@ public final class DigitalSignature {
           new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
-      signedNode = (ANode) NodeType.DOC.e(doc, input);
+//      signedNode = (ANode) NodeType.DOC.e(doc, input);
+      signedNode = toDBNode(doc);
 
     } catch(NoSuchAlgorithmException e) {
       e.printStackTrace();
@@ -354,10 +373,44 @@ public final class DigitalSignature {
     return Bln.get(coreVal);
   }
 
+  private static ANode toDBNode(final Node n) {
+    String xmlString = null;
+
+    try {
+
+      TransformerFactory transfac = TransformerFactory.newInstance();
+      Transformer trans = transfac.newTransformer();
+
+      //create string from xml tree
+      StringWriter sw = new StringWriter();
+      StreamResult result = new StreamResult(sw);
+      DOMSource source = new DOMSource(n);
+      trans.transform(source, result);
+      xmlString = sw.toString();
+
+    } catch(TransformerException e) {
+      e.printStackTrace();
+    }
+
+    DBNode dbn = null;
+
+    try {
+      final Parser parser = Parser.xmlParser(IO.get(xmlString), new Prop());
+      final MemBuilder builder = new MemBuilder("", parser, new Prop());
+      final Data mem = builder.build();
+      dbn = new DBNode(mem, 1);
+
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+
+    return dbn;
+  }
+
   private static Document toDOMNode(final ANode n)
       throws SAXException, IOException, ParserConfigurationException {
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
-    final Serializer s = Serializer.get(b, null);
+    final Serializer s = XMLSerializer.get(b);
     n.serialize(s);
     s.close();
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

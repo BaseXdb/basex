@@ -56,7 +56,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "let $e := c:encrypt('" + msg + "','asymmetric','aaabbbaa','DSA')" +
         "return c:decrypt($e,'asymmetric','aaabbbaa','DSA')", msg);
   }
-  
+
   @Test
   public void hmac1() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -119,11 +119,23 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   @Test
-  public void validateSignature() throws Exception {
-    new CreateDB(DB, "<n/>").execute(CONTEXT);
+  public void validateSignature1() throws Exception {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(/n,'','','','',''))",
+        "c:validate-signature(c:generate-signature(<a/>,'','','','',''))",
         "true");
+  }
+
+  @Test
+  public void validateSignature1b() throws Exception {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(" +
+        "c:generate-signature(" +
+        "<a/>,'','SHA1','DSA-SHA1','','enveloped'))",
+        "true");
+//    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+//        "c:generate-signature(" +
+//        "<a/>,'','SHA1','DSA-SHA1','','enveloped')",
+//        "true");
   }
 
   @Test
