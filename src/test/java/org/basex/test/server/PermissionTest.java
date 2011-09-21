@@ -187,6 +187,8 @@ public final class PermissionTest {
     no(new Grant("none", NAME), testSession);
     no(new AlterUser(NAME, Token.md5(NAME)), testSession);
     no(new Flush(), testSession);
+    // [CG] to be tested...
+    ok(new Close(), testSession);
   }
 
   /** Tests all commands where write permission is needed. */
