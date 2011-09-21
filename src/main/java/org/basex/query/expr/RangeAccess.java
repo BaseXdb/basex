@@ -49,7 +49,7 @@ public final class RangeAccess extends Simple {
     final byte kind = ind.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
 
     return new Iter() {
-      final IndexIterator it = data.ids(ind);
+      final IndexIterator it = data.iter(ind);
       @Override
       public Item next() {
         return it.more() ? new DBNode(data, it.next(), kind) : null;

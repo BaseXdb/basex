@@ -164,21 +164,21 @@ public abstract class Data {
   public abstract void setIndex(IndexType type, Index index);
 
   /**
-   * Returns the indexed id references for the specified token.
+   * Returns the indexed pre references for the specified token.
    * @param token index token reference
-   * @return id array
+   * @return array of sorted pre values
    */
-  public final IndexIterator ids(final IndexToken token) {
-    return index(token.type()).ids(token);
+  public final IndexIterator iter(final IndexToken token) {
+    return index(token.type()).iter(token);
   }
 
   /**
-   * Returns the number of indexed id references for the specified token.
+   * Returns the number of indexed pre references for the specified token.
    * @param token text to be found
    * @return number of hits
    */
-  public final int nrIDs(final IndexToken token) {
-    return index(token.type()).nrIDs(token);
+  public final int count(final IndexToken token) {
+    return index(token.type()).count(token);
   }
 
   /**

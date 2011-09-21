@@ -85,7 +85,7 @@ final class FTFuzzy extends FTIndex {
   }
 
   @Override
-  public synchronized int nrIDs(final IndexToken ind) {
+  public synchronized int count(final IndexToken ind) {
     if(ind.get().length > MAXLEN) return Integer.MAX_VALUE;
 
     // estimate costs for queries which stretch over multiple index entries
@@ -108,7 +108,7 @@ final class FTFuzzy extends FTIndex {
   }
 
   @Override
-  public synchronized IndexIterator ids(final IndexToken ind) {
+  public synchronized IndexIterator iter(final IndexToken ind) {
     final byte[] tok = ind.get();
 
     // support fuzzy search
