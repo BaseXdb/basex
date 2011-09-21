@@ -6,6 +6,8 @@ import static org.basex.core.Text.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.URL;
 
 import org.basex.BaseXServer;
@@ -14,6 +16,8 @@ import org.basex.api.webdav.WebDAVServlet;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
+import org.basex.core.Prop;
+import org.basex.io.IOFile;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Util;
@@ -30,17 +34,17 @@ public final class BaseXHTTP {
   private boolean webdav = true;
   /** Activate REST. */
   private boolean rest = true;
-  /** Start as daemon. */
-  protected boolean service;
 
   /** Database server. */
   private BaseXServer server;
-  /** HTTP server. */
-  private Server jetty;
-  /** Quiet flag. */
-  private boolean quiet;
+  /** Start as daemon. */
+  private boolean service;
   /** Stopped flag. */
   private boolean stopped;
+  /** HTTP server. */
+  protected Server jetty;
+  /** Quiet flag. */
+  private boolean quiet;
 
   /**
    * Main method, launching the HTTP services.
@@ -68,18 +72,18 @@ public final class BaseXHTTP {
     final MainProp mprop = context.mprop;
 
     final int port = mprop.num(MainProp.SERVERPORT);
-    final int eport = context.mprop.num(MainProp.EVENTPORT);
-    final int http = mprop.num(MainProp.HTTPPORT);
+    final int eport = mprop.num(MainProp.EVENTPORT);
+    final int hport = mprop.num(MainProp.HTTPPORT);
 
     if(service) {
-      start(http, args);
+      start(hport, args);
       Util.outln(HTTP + ' ' + SERVERSTART);
       Performance.sleep(1000);
       return;
     }
 
     if(stopped) {
-      stop(port, eport);
+      BaseXServer.stop(port, eport);
       return;
     }
 
@@ -98,7 +102,7 @@ public final class BaseXHTTP {
       Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
     }
 
-    jetty = new Server(mprop.num(MainProp.HTTPPORT));
+    jetty = new Server(hport);
     final org.mortbay.jetty.servlet.Context jcontext =
         new org.mortbay.jetty.servlet.Context(jetty, "/");
 
@@ -106,6 +110,10 @@ public final class BaseXHTTP {
     if(webdav) jcontext.addServlet(WebDAVServlet.class, "/webdav/*");
 
     jetty.start();
+
+    final ServerSocket socket = new ServerSocket();
+    socket.setReuseAddress(true);
+    socket.bind(new InetSocketAddress(hport + 1));
   }
 
   /**
@@ -125,7 +133,6 @@ public final class BaseXHTTP {
   protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     final Context ctx = HTTPSession.context();
-    boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
@@ -135,9 +142,6 @@ public final class BaseXHTTP {
             break;
           case 'd':
             ctx.mprop.set(MainProp.DEBUG, true);
-            break;
-          case 'D':
-            daemon = true;
             break;
           case 'e':
             ctx.mprop.set(MainProp.EVENTPORT, arg.num());
@@ -158,10 +162,6 @@ public final class BaseXHTTP {
             break;
           case 'P':
             System.setProperty(DBPASS, arg.string());
-            break;
-          case 's':
-            // set service flag
-            service = !daemon;
             break;
           case 'U':
             System.setProperty(DBUSER, arg.string());
@@ -210,13 +210,12 @@ public final class BaseXHTTP {
   }
 
   /**
-   * Stops the server.
+   * Generates a stop file for the specified port.
    * @param port server port
-   * @param eport event port
-   * @throws IOException I/O exception
+   * @return stop file
    */
-  public static void stop(final int port, final int eport) throws IOException {
-    BaseXServer.stop(port, eport);
+  static IOFile stopFile(final int port) {
+    return new IOFile(Prop.TMP, Util.name(BaseXHTTP.class) + port);
   }
 
   /**
@@ -233,7 +232,7 @@ public final class BaseXHTTP {
       conn.getInputStream();
       return true;
     } catch(final IOException ex) {
-      // if login was checked, server is running
+      // if page is not found, server is running
       return ex instanceof FileNotFoundException;
     }
   }
