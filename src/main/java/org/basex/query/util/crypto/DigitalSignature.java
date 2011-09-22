@@ -408,7 +408,8 @@ public final class DigitalSignature {
   private static Document toDOMNode(final ANode n)
       throws SAXException, IOException, ParserConfigurationException {
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
-    final Serializer s = Serializer.get(b, new SerializerProp("omit-xml-declaration=no,standalone=no"));
+    final Serializer s = Serializer.get(b,
+        new SerializerProp("omit-xml-declaration=no,standalone=no,indent=no"));
     n.serialize(s);
     s.close();
     System.out.println(new String(b.toByteArray()) + "\n\n");
