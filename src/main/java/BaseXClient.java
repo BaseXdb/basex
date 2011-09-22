@@ -176,7 +176,7 @@ public final class BaseXClient {
       receive(in, os);
       os.write(0);
       os.flush();
-      InputStream is = esocket.getInputStream();
+      final InputStream is = esocket.getInputStream();
       is.read();
       listen(is);
     }

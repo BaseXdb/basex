@@ -448,7 +448,7 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
-  public void testContextItem() throws Exception {
+  public void contextItem() throws Exception {
     final XQConnection conn = conn(drv);
     conn.getStaticContext().setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
@@ -468,7 +468,7 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void testExec() throws Exception {
+  public void exec() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     try {
@@ -487,7 +487,7 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void testCreateVar() throws Exception {
+  public void createVar() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     expr.executeQuery("declare variable $x := 1; $x");
@@ -499,7 +499,7 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void testContext() throws Exception {
+  public void context() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     XQResultSequence result =
@@ -520,7 +520,7 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void testBind() throws Exception {
+  public void bind() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     expr.bindInt(new QName("x"), 21, null);
@@ -536,7 +536,7 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void testBindWithType() throws Exception {
+  public void bindWithType() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     expr.bindInt(new QName("x"), 21, null);
@@ -548,7 +548,7 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void testBindTwice() throws Exception {
+  public void bindTwice() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     XQResultSequence xqs;
