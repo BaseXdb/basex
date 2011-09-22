@@ -68,7 +68,7 @@ final class RESTGet extends RESTCode {
     } else if(operation.equals(QUERY)) {
       code = new RESTQuery(input, vars, item);
     } else if(operation.equals(RUN)) {
-      code = new RESTQuery(input, vars, item);
+      code = new RESTRun(input, vars, item);
     } else {
       code = new RESTCommand(input);
     }
