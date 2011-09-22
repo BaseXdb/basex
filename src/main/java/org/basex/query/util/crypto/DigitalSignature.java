@@ -145,6 +145,9 @@ public final class DigitalSignature {
    * @param signature signature algorithm
    * @param nsPrefix signature element namespace prefix
    * @param type signature type (enveloped, enveloping, detached)
+   * @param xpathExpr XPath expression which specifies node to be signed
+   * @param certificate certificate which contains keystore information for
+   *        signing the node, may be null
    *
    * @return signed node
    * @throws QueryException query exception
@@ -152,8 +155,7 @@ public final class DigitalSignature {
   public ANode generateSignature(final ANode node,
       final byte[] canonicalization, final byte[] digest,
       final byte[] signature, final byte[] nsPrefix, final byte[] type,
-      final ANode certificate) throws QueryException {
-    // TODO ns prefix ...
+      final byte[] xpathExpr, final ANode certificate) throws QueryException {
 
     // variables to check if parameters correct
     int l = 0;
@@ -290,6 +292,11 @@ public final class DigitalSignature {
       final DOMSignContext dsc =
           new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
+
+      // set Signature element prefix, if given
+      if(nsPrefix.length > 0)
+        dsc.setDefaultNamespacePrefix(new String(nsPrefix));
+
       xmlsig.sign(dsc);
       signedNode = toDBNode(doc);
 
@@ -412,7 +419,9 @@ public final class DigitalSignature {
     //new SerializerProp("omit-xml-declaration=no,standalone=no,indent=no"));
     n.serialize(s);
     s.close();
+
 //    System.out.println(new String(b.toByteArray()) + "\n\n");
+
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     return dbf.newDocumentBuilder().parse(

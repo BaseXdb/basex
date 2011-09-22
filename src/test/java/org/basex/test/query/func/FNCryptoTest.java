@@ -1,6 +1,5 @@
 package org.basex.test.query.func;
 
-import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -65,53 +64,23 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   @Test
-  public void generateSignatureSyntax() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:generate-signature(<a/>,'','','','','')");
-  }
-
-  @Test
-  public void generateSignatureSyntax2() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:generate-signature(<a/>,'','','','','','')");
-  }
-
-  @Test
-  public void generateSignatureSyntax3() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:generate-signature(<a/>,'','','','','',<a/>)");
-  }
-
-  @Test
-  public void generateSignatureSyntax4() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:generate-signature(<a/>,'','','','','','',<a/>)");
-  }
-
-  @Test
-  public void generateSignatureSyntax5() throws Exception {
-    // TODO general syntax test equiv. FNDbTest.java check()
-    Assert.fail();
-  }
-
-  @Test
-  public void validateSignature1() throws Exception {
+  public void validateSignature1() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:validate-signature(c:generate-signature(<a/>,'','','','',''))",
         "true");
   }
 
   @Test
-  public void validateSignature1b() throws Exception {
+  public void validateSignature1b() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:validate-signature(" +
         "c:generate-signature(" +
-        "<a/>,'','SHA1','DSA-SHA1','','enveloped'))",
+        "<a/>,'','SHA1','DSA_SHA1','','enveloped'))",
         "true");
   }
 
   @Test
-  public void validateSignature1c() throws Exception {
+  public void validateSignature1c() {
     String input = "<a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'>" +
         "<SignedInfo><CanonicalizationMethod " +
         "Algorithm='http://www.w3.org/TR/2001/REC-xml-c14n-20010315'/>" +
@@ -133,7 +102,123 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   @Test
-  public void validateSignature2() throws Exception {
+  public void validateSignatureWithCanonicalization() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>," +
+        "'exclusive','','','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithCanonicalization2() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>," +
+        "'exclusive-with-comments','','','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithCanonicalization3() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>," +
+        "'inclusive','','','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithCanonicalization4() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>," +
+        "'inclusive-with-comments','','','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithDigestAlgorithm() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','SHA1','','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithDigestAlgorithm2() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','SHA256','','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithDigestAlgorithm3() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','SHA512','','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithSignatureAlgorithm() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'',''," +
+        "'DSA_SHA1','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithSignatureAlgorithm2() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'',''," +
+        "'RSA_SHA1','',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithSignatureNamespace3() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','','','prefix',''))",
+        "true");
+  }
+
+  @Test
+  public void validateSignatureWithSignatureType() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
+        "'enveloped'))",
+        "true");
+
+    Assert.fail();
+  }
+
+  @Test
+  public void validateSignatureWithSignatureType2() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
+        "'enveloping'))",
+        "true");
+
+    Assert.fail();
+  }
+
+  @Test
+  public void validateSignatureWithSignatureType3() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
+        "'detached'))",
+        "true");
+
+    Assert.fail();
+  }
+
+  @Test
+  public void validateSignatureWithXPath() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
+        "'','/n'))",
+        "true");
+
+    Assert.fail();
+  }
+
+  @Test
+  public void validateSignatureWithCertificate() {
     final String certificate =
         "<digital-certificate>" +
         "<keystore-type>JKS</keystore-type>" +
@@ -150,106 +235,40 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   @Test
-  public void validateSignature3Canonicalization() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'exclusive','','','',''))",
-        "true");
-  }
+  public void validateSignatureWithXPathAndCertificate() {
+    final String certificate =
+        "<digital-certificate>" +
+        "<keystore-type>JKS</keystore-type>" +
+        "<keystore-password>password</keystore-password>" +
+        "<key-alias>basexselfsigned</key-alias>" +
+        "<private-key-password>password</private-key-password>" +
+        "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
+        "</digital-certificate>";
 
-  @Test
-  public void validateSignature4Canonicalization() throws Exception {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'exclusive-with-comments','','','',''))",
+        "c:validate-signature(c:generate-signature(<a/>,'','','','','','/n'," +
+        certificate + "))",
         "true");
-  }
 
-  @Test
-  public void validateSignature5Canonicalization() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'inclusive','','','',''))",
-        "true");
-  }
-
-  @Test
-  public void validateSignature6Canonicalization() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>," +
-        "'inclusive-with-comments','','','',''))",
-        "true");
-  }
-
-  @Test
-  public void validateSignature7DigestAlgorithm() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','SHA1','','',''))",
-        "true");
-  }
-
-  @Test
-  public void validateSignature8DigestAlgorithm() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','SHA256','','',''))",
-        "true");
-  }
-
-  @Test
-  public void validateSignature9DigestAlgorithm() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','SHA512','','',''))",
-        "true");
-  }
-
-  @Test
-  public void validateSignature10SignatureAlgorithm() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'',''," +
-        "'DSA_SHA1','',''))",
-        "true");
-  }
-
-  @Test
-  public void validateSignature11SignatureAlgorithm() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'',''," +
-        "'RSA_SHA1','',''))",
-        "true");
-  }
-
-  @Test
-  public void validateSignature12SignatureNamespace() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','','prefix',''))",
-        "true");
     Assert.fail();
   }
 
   @Test
-  public void validateSignature13SignatureType() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'enveloped'))",
-        "true");
-    Assert.fail();
-  }
+  public void validateSignatureFullySpecified() {
+    final String certificate =
+        "<digital-certificate>" +
+        "<keystore-type>JKS</keystore-type>" +
+        "<keystore-password>password</keystore-password>" +
+        "<key-alias>basexselfsigned</key-alias>" +
+        "<private-key-password>password</private-key-password>" +
+        "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
+        "</digital-certificate>";
 
-  @Test
-  public void validateSignature14SignatureType() throws Exception {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'enveloping'))",
+        "c:validate-signature(c:generate-signature(<a><n/></a>,'exclusive'," +
+        "'SHA512','RSA_SHA1','myPrefix','enveloped','/n'," + certificate + "))",
         "true");
-    Assert.fail();
-  }
 
-  @Test
-  public void validateSignature15SignatureType() throws Exception {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'detached'))",
-        "true");
     Assert.fail();
   }
 
