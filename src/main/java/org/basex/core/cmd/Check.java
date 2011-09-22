@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -62,6 +63,9 @@ public final class Check extends Command {
   public static synchronized Data check(final Context ctx, final String path)
       throws IOException {
 
+    // choose OPEN if user has no create permissions, or if database exists
+    final boolean create = ctx.user.perm(User.CREATE);
+
     final IO io = IO.get(path);
     final String name = io.dbname();
 
@@ -76,14 +80,17 @@ public final class Check extends Command {
       if(found) throw new IOException(Util.info(PERMNO, CmdPerm.READ));
     }
 
-    // open database if it already exists
-    if(MetaData.found(path, name, ctx.mprop)) return Open.open(name, ctx);
+    // choose OPEN if user has no create permissions, or if database exists
+    if(!create || MetaData.found(path, name, ctx.mprop))
+      return Open.open(name, ctx);
+
+    // check if file exists
+    if(!io.exists()) throw new FileNotFoundException(Util.info(FILEWHICH, io));
 
     // if force flag is set to false, create a main memory instance
     if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(io, ctx);
 
     // otherwise, create a persistent database instance
-    if(!io.exists()) throw new FileNotFoundException(Util.info(FILEWHICH, io));
     return CreateDB.create(name, new DirParser(io, ctx.prop), ctx);
   }
 }

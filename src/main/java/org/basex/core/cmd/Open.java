@@ -1,6 +1,8 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
@@ -73,7 +75,7 @@ public final class Open extends Command {
     if(data == null) {
       // check if document exists
       if(!ctx.mprop.dbexists(name))
-        throw new IOException(Util.info(DBNOTFOUND, name));
+        throw new FileNotFoundException(Util.info(DBNOTFOUND, name));
 
       data = new DiskData(name, ctx);
       ctx.pin(data);
