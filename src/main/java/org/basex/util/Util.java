@@ -344,4 +344,33 @@ public final class Util {
       notexpected(ex);
     }
   }
+
+  /**
+   * Checks if the specified string is "yes", "true" or "on".
+   * @param string string to be checked
+   * @return result of check
+   */
+  public static boolean yes(final String string) {
+    return YES.equals(string) || TRUE.equals(string) || ON.equals(string) ||
+        INFOOFF.equals(string);
+  }
+
+  /**
+   * Checks if the specified string is "no", "false" or "off".
+   * @param string string to be checked
+   * @return result of check
+   */
+  public static boolean no(final String string) {
+    return NO.equals(string) || FALSE.equals(string) || OFF.equals(string) ||
+        INFOON.equals(string);
+  }
+
+  /**
+   * Returns an info message for the specified flag.
+   * @param flag current flag status
+   * @return ON/OFF message
+   */
+  public static String flag(final boolean flag) {
+    return flag ? INFOON : INFOOFF;
+  }
 }

@@ -1,8 +1,7 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.data.DataText.*;
+import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
-
 import java.io.IOException;
 
 import org.basex.data.Data;
@@ -54,7 +53,6 @@ public final class Put extends UpdatePrimitive {
         final SerializerProp pr = ctx.serProp(false);
         // try to reproduce non-chopped documents correctly
         pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
-
         node.serialize(Serializer.get(out, pr));
       } catch(final IOException ex) {
         UPPUTERR.thrw(input, path(i));

@@ -192,12 +192,18 @@ public interface Text {
   String TO = "TO";
   /** Command keyword. */
   String ON = "ON";
+  /** Command keyword. */
+  String OFF = "OFF";
   /** Keyword. */
   String OK = "OK";
 
-  /** True keyword. */
+  /** Yes flag. */
+  String YES = "yes";
+  /** No flag. */
+  String NO = "no";
+  /** True flag. */
   String TRUE = "true";
-  /** False keyword. */
+  /** False flag. */
   String FALSE = "false";
 
   /** Command help. */

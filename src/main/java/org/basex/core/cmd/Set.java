@@ -82,10 +82,10 @@ public final class Set extends AGet {
 
     String v = val;
     if(type instanceof Boolean) {
-      final boolean b = val == null || val.isEmpty() ? !((Boolean) type) :
-        val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
+      final boolean b = val == null || val.isEmpty() ?
+          !((Boolean) type) : Util.yes(val);
       prop.set(key, b);
-      v = AInfo.flag(b);
+      v = Util.flag(b);
     } else if(type instanceof Integer) {
       prop.set(key, Integer.parseInt(val));
       v = String.valueOf(prop.get(key));

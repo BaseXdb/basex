@@ -13,6 +13,7 @@ import org.basex.core.User;
 import org.basex.data.MetaData;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'info database' command and returns information on the
@@ -69,7 +70,7 @@ public final class InfoDB extends AInfo {
     if(meta.filesize != 0)
       format(tb, INFODOCSIZE, Performance.format(meta.filesize));
     format(tb, INFOENCODING, meta.encoding);
-    format(tb, INFOCHOP, flag(meta.chop));
+    format(tb, INFOCHOP, Util.flag(meta.chop));
 
     if(index) {
       tb.add(NL).addExt(header, INFOINDEX);
@@ -77,10 +78,10 @@ public final class InfoDB extends AInfo {
         tb.add(" " + INDUPDATE + NL);
       } else {
         format(tb, INFOUPTODATE, String.valueOf(meta.uptodate));
-        format(tb, INFOPATHINDEX, flag(meta.pathindex));
-        format(tb, INFOTEXTINDEX, flag(meta.textindex));
-        format(tb, INFOATTRINDEX, flag(meta.attrindex));
-        format(tb, INFOFTINDEX, flag(meta.ftindex) + (meta.ftindex &&
+        format(tb, INFOPATHINDEX, Util.flag(meta.pathindex));
+        format(tb, INFOTEXTINDEX, Util.flag(meta.textindex));
+        format(tb, INFOATTRINDEX, Util.flag(meta.attrindex));
+        format(tb, INFOFTINDEX, Util.flag(meta.ftindex) + (meta.ftindex &&
             meta.wildcards ? " (" + INFOWCINDEX + ")" : ""));
       }
     }

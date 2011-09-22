@@ -30,13 +30,4 @@ public abstract class AInfo extends Command {
       final String val) {
     tb.add(' ').add(key).add(COLS).add(val).add(NL);
   }
-
-  /**
-   * Returns an info message for the specified flag.
-   * @param flag current flag status
-   * @return ON/OFF message
-   */
-  public static String flag(final boolean flag) {
-    return flag ? INFOON : INFOOFF;
-  }
 }

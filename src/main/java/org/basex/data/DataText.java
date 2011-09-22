@@ -96,10 +96,6 @@ public interface DataText {
 
   // XML SERIALIZATION ========================================================
 
-  /** Yes flag. */
-  String YES = "yes";
-  /** No flag. */
-  String NO = "no";
   /** Omit flag. */
   String OMIT = "omit";
   /** Version. */

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.core.cmd.AInfo;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.index.IndexIterator;
@@ -17,6 +16,7 @@ import org.basex.util.Levenshtein;
 import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
 
 /**
@@ -132,9 +132,9 @@ final class FTFuzzy extends FTIndex {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INDEXSTRUC + FUZZYSTRUC + NL);
-    tb.addExt("- %: %" + NL, CREATEST, AInfo.flag(data.meta.stemming));
-    tb.addExt("- %: %" + NL, CREATECS, AInfo.flag(data.meta.casesens));
-    tb.addExt("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.diacritics));
+    tb.addExt("- %: %" + NL, CREATEST, Util.flag(data.meta.stemming));
+    tb.addExt("- %: %" + NL, CREATECS, Util.flag(data.meta.casesens));
+    tb.addExt("- %: %" + NL, CREATEDC, Util.flag(data.meta.diacritics));
     if(data.meta.language != null)
       tb.addExt("- %: %" + NL, CREATELN, data.meta.language);
     final long l = inX.length() + inY.length() + inZ.length();

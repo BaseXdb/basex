@@ -990,11 +990,13 @@ final class XMLScanner extends Progress {
     if(!consume(STANDALONE)) return null;
     s(); check('='); s();
     final int d = qu();
-    final boolean yes = consume(YES);
-    final boolean no = !yes && consume(NO);
+    byte[] sd = token(YES);
+    if(!consume(sd)) {
+      sd = token(NO);
+      if(!consume(sd)) error(DECLSTANDALONE);
+    }
     check((char) d);
-    if(!yes && !no) error(DECLSTANDALONE);
-    return yes ? YES : NO;
+    return sd;
   }
 
   /**
