@@ -183,8 +183,6 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
         "'enveloped'))",
         "true");
-
-    Assert.fail();
   }
 
   @Test
@@ -193,8 +191,6 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
         "'enveloping'))",
         "true");
-
-    Assert.fail();
   }
 
   @Test
@@ -203,18 +199,15 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
         "'detached'))",
         "true");
-
-    Assert.fail();
   }
 
   @Test
   public void validateSignatureWithXPath() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'','/n'))",
+        "c:validate-signature(c:generate-signature(<a><n/><n/></a>," +
+        "'','','',''," +
+        "'','/a/n'))",
         "true");
-
-    Assert.fail();
   }
 
   @Test
@@ -246,11 +239,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "</digital-certificate>";
 
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','','','','/n'," +
+        "c:validate-signature(c:generate-signature(<a><n/><n/></a>," +
+        "'','','','','','/a/n'," +
         certificate + "))",
         "true");
-
-    Assert.fail();
   }
 
   @Test
@@ -265,11 +257,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "</digital-certificate>";
 
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a><n/></a>,'exclusive'," +
-        "'SHA512','RSA_SHA1','myPrefix','enveloped','/n'," + certificate + "))",
+        "c:validate-signature(c:generate-signature(<a><n/></a>," +
+        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n',"
+        + certificate + "))",
         "true");
-
-    Assert.fail();
   }
 
   /**

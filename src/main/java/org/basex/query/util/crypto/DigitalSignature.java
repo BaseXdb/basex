@@ -14,9 +14,12 @@ import java.security.KeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +60,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
+import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
@@ -287,10 +291,21 @@ public final class DigitalSignature {
         pk = kp.getPrivate();
       }
 
+      if(eq(type, SIGNATURETYPES[1]))
+        CRYPTONOTSUPP.thrw(input, type);
+      if(eq(type, SIGNATURETYPES[2]))
+        CRYPTONOTSUPP.thrw(input, type);
+
       // enveloped certificate
       final Document doc = toDOMNode(node);
       final DOMSignContext dsc =
           new DOMSignContext(pk, doc.getDocumentElement());
+
+      if(xpathExpr.length > 0) {
+//        final String frag = string(nodeToBytes(node));
+        CRYPTONOTSUPP.thrw(input, xpathExpr);
+        }
+
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
 
       // set Signature element prefix, if given
@@ -310,7 +325,17 @@ public final class DigitalSignature {
       e.printStackTrace();
     } catch(XMLSignatureException e) {
       e.printStackTrace();
-    } catch(Exception e) {
+    } catch(SAXException e) {
+      e.printStackTrace();
+    } catch(IOException e) {
+      e.printStackTrace();
+    } catch(ParserConfigurationException e) {
+      e.printStackTrace();
+    } catch(KeyStoreException e) {
+      e.printStackTrace();
+    } catch(CertificateException e) {
+      e.printStackTrace();
+    } catch(UnrecoverableKeyException e) {
       e.printStackTrace();
     }
 
@@ -411,20 +436,24 @@ public final class DigitalSignature {
     return dbn;
   }
 
-  private static Document toDOMNode(final ANode n)
-      throws SAXException, IOException, ParserConfigurationException {
+  private static byte[] nodeToBytes(final ANode n)
+      throws SerializerException, IOException {
+
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
     final Serializer s = Serializer.get(b,
         new SerializerProp("format=no"));
     //new SerializerProp("omit-xml-declaration=no,standalone=no,indent=no"));
     n.serialize(s);
     s.close();
+    return b.toByteArray();
+  }
 
-//    System.out.println(new String(b.toByteArray()) + "\n\n");
+  private static Document toDOMNode(final ANode n)
+      throws SAXException, IOException, ParserConfigurationException {
 
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     return dbf.newDocumentBuilder().parse(
-        new ByteArrayInputStream(b.toByteArray()));
+        new ByteArrayInputStream(nodeToBytes(n)));
   }
 }
