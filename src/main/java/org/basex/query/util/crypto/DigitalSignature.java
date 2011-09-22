@@ -80,10 +80,10 @@ public final class DigitalSignature {
   /** Tokens. */
   private static final byte[][] CANONICALIZATIONS =
     {
-    token("inclusive-with-comment"),
+    token("inclusive-with-comments"),
     token("exclusive"),
     token("inclusive"),
-    token("exclusive-with-comment"),
+    token("exclusive-with-comments"),
     };
   private static final String[] CANONICALIZATIONMETHODS =
     {
@@ -108,8 +108,8 @@ public final class DigitalSignature {
   /** Tokens. */
   private static final byte[][] SIGNATURES =
     {
-    token("RSA-SHA1"),
-    token("DSA-SHA1")
+    token("RSA_SHA1"),
+    token("DSA_SHA1")
     };
   private static final String[] SIGNATUREMETHODS =
     {
@@ -291,7 +291,6 @@ public final class DigitalSignature {
           new DOMSignContext(pk, doc.getDocumentElement());
       XMLSignature xmlsig = fac.newXMLSignature(si, ki);
       xmlsig.sign(dsc);
-//      signedNode = (ANode) NodeType.DOC.e(doc, input);
       signedNode = toDBNode(doc);
 
     } catch(NoSuchAlgorithmException e) {
@@ -409,10 +408,11 @@ public final class DigitalSignature {
       throws SAXException, IOException, ParserConfigurationException {
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
     final Serializer s = Serializer.get(b,
-        new SerializerProp("omit-xml-declaration=no,standalone=no,indent=no"));
+        new SerializerProp("format=no"));
+    //new SerializerProp("omit-xml-declaration=no,standalone=no,indent=no"));
     n.serialize(s);
     s.close();
-    System.out.println(new String(b.toByteArray()) + "\n\n");
+//    System.out.println(new String(b.toByteArray()) + "\n\n");
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
     return dbf.newDocumentBuilder().parse(
