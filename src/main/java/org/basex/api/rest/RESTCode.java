@@ -6,9 +6,10 @@ import static org.basex.data.DataText.*;
 
 import java.io.IOException;
 
+import org.basex.core.Text;
 import org.basex.core.cmd.Open;
-import org.basex.data.DataText;
 import org.basex.io.serial.SerializerProp;
+import org.basex.util.Util;
 
 /**
  * Abstract class for performing REST operations.
@@ -75,10 +76,10 @@ abstract class RESTCode {
    * @throws RESTException REST exception
    */
   void wrap(final String val, final RESTContext ctx) throws RESTException {
-    ctx.wrapping = DataText.YES.equals(val);
-    if(!ctx.wrapping && !DataText.NO.equals(val)) {
+    ctx.wrapping = Util.yes(val);
+    if(!ctx.wrapping && !Util.no(val)) {
       throw new RESTException(SC_BAD_REQUEST, SerializerProp.error(WRAP,
-          val, DataText.YES, DataText.NO).getMessage());
+          val, Text.YES, Text.NO).getMessage());
     }
   }
 }
