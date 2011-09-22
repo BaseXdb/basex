@@ -256,6 +256,7 @@ class DummyIdPreMap extends IdPreMap {
    * Size of the map.
    * @return number of stored records
    */
+  @Override
   public int size() {
     return ids.size();
   }
