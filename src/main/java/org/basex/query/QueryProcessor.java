@@ -243,11 +243,11 @@ public final class QueryProcessor extends Progress {
    */
   public void close() throws IOException {
     // reset database properties to initial value
-    if(ctx.props != null) {
-      for(final Entry<String, Object> e : ctx.props.entrySet()) {
+    if(ctx.globalOpt != null) {
+      for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {
         ctx.context.prop.set(e.getKey(), e.getValue());
       }
-      ctx.props = null;
+      ctx.globalOpt = null;
     }
     // close all database connections
     ctx.resource.close();

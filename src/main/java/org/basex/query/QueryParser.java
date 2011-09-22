@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 import org.basex.core.Prop;
-import org.basex.core.cmd.Set;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.serial.SerializerProp;
@@ -518,10 +517,12 @@ public class QueryParser extends InputParser {
       final Object obj = ctx.context.prop.get(key);
       if(obj == null) error(NOOPTION, key);
       // cache old value (to be reset after query evaluation)
-      if(ctx.props == null) ctx.props = new HashMap<String, Object>();
-      ctx.props.put(key, obj);
-      // set value
-      Set.set(key, string(val), ctx.context.prop);
+      if(ctx.queryOpt == null) {
+        ctx.queryOpt = new HashMap<String, String>();
+        ctx.globalOpt = new HashMap<String, Object>();
+      }
+      ctx.globalOpt.put(key, obj);
+      ctx.queryOpt.put(key, string(val));
     }
   }
 

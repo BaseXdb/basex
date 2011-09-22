@@ -8,10 +8,12 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Set;
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
@@ -84,8 +86,10 @@ public final class QueryContext extends Progress {
   public HashMap<String, String> stop;
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
-  /** Modified properties. */
-  public HashMap<String, Object> props;
+  /** Query options (are valid during query execution). */
+  public HashMap<String, String> queryOpt;
+  /** Global options (will be set after query execution). */
+  public HashMap<String, Object> globalOpt;
 
   /** Root expression of the query. */
   public Expr root;
@@ -221,6 +225,13 @@ public final class QueryContext extends Progress {
   public void compile() throws QueryException {
     // dump compilation info
     if(inf) compInfo(NL + QUERYCOMP);
+
+    // temporarily set database values
+    if(queryOpt != null) {
+      for(final Entry<String, String> e : queryOpt.entrySet()) {
+        Set.set(e.getKey(), e.getValue(), context.prop);
+      }
+    }
 
     if(initExpr != null) {
       // evaluate initial expression
