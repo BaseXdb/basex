@@ -9,8 +9,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.basex.api.HTTPSession;
+import org.basex.core.Context;
 import org.basex.core.MainProp;
+import org.basex.core.Prop;
+import org.basex.core.cmd.Set;
 import org.basex.io.IO;
+import org.basex.server.Session;
 import org.basex.util.Util;
 
 /**
@@ -32,12 +36,17 @@ public class RESTRun extends RESTQuery {
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
     // get root directory for files
-    final String path = HTTPSession.context().mprop.get(MainProp.HTTPPATH);
+    final Context context = HTTPSession.context();
+    final String path = context.mprop.get(MainProp.HTTPPATH);
     final IO io = IO.get(path + '/' + input);
 
     // file not found...
     if(!io.exists()) throw new RESTException(HttpServletResponse.SC_NOT_FOUND,
         Util.info(FILEWHICH, input));
+
+    // set query path
+    final Session session = ctx.session;
+    session.execute(new Set(Prop.QUERYPATH, io.path()));
 
     // perform query
     query(string(io.read()), ctx);
