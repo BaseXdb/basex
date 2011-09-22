@@ -5,47 +5,35 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import org.basex.BaseX;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.cmd.CreateDB;
-import org.basex.io.IOFile;
-import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Test;
 
 /**
- * Tests the command-line arguments of the standalone starter class.
+ * Tests the command-line arguments of the starter class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class BaseXTest {
-  /** Test database name. */
-  private static final String DB = Util.name(BaseXTest.class);
-  /** Output file. */
-  private static final IOFile OUT = new IOFile(Prop.TMP + DB + ".out");
-  /** Input file. */
-  private static final IOFile IN = new IOFile(Prop.TMP + DB + ".in");
-
+public abstract class BaseXTest extends MainTest {
   /** Delete the test files. */
   @After
   public void clean() {
     assertTrue("Could not delete input file.", !IN.exists() || IN.delete());
-    assertTrue("Could not delete output file.", !OUT.exists() || OUT.delete());
   }
 
   /**
-   * Tests q query file.
+   * Tests a query file.
    * @throws IOException I/O exception
    */
   @Test
   public void queryFile() throws IOException {
     final String query = "1";
     IN.write(token(query));
-    new BaseX("-o" + OUT + " " + IN);
-    assertEquals(query, string(OUT.read()));
+    equals(query, IN.path());
   }
 
   /**
@@ -54,45 +42,11 @@ public final class BaseXTest {
    */
   @Test
   public void bind() throws IOException {
+    equals("1", "-ba=1 -q$a");
+    equals("2", "-ba=1 -bb=1 -q$a+$b");
+    equals("3", "-ba=1,b=2 -q$a+$b");
     IN.write(token("$a"));
-    new BaseX("-ba=1 -o" + OUT + " " + IN);
-    assertEquals("1", string(OUT.read()));
-
-    IN.write(token("$a + $b"));
-    new BaseX("-ba=1 -bb=2 -o" + OUT + " " + IN);
-    assertEquals("3", string(OUT.read()));
-
-    new BaseX("-ba=1,b=2 -o" + OUT + " " + IN);
-    assertEquals("3", string(OUT.read()));
-  }
-
-  /**
-   * Test variable bindings.
-   * @throws IOException I/O exception
-   */
-  @Test(expected = BaseXException.class)
-  public void bindErr() throws IOException {
-    IN.write(token("declare variable $a as xs:integer external; $a"));
-    new BaseX("-ba=A -o" + OUT + " " + IN);
-  }
-
-  /**
-   * Test command execution.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public void command() throws IOException {
-    new BaseX("-o" + OUT + " -cxquery 1");
-    assertEquals("1", string(OUT.read()));
-  }
-
-  /**
-   * Command error.
-   * @throws IOException I/O exception
-   */
-  @Test(expected = BaseXException.class)
-  public void commandErr() throws IOException {
-    new BaseX("-c1");
+    equals("4", "-ba=4 " + IN);
   }
 
   /**
@@ -103,10 +57,36 @@ public final class BaseXTest {
   public void input() throws IOException {
     final String in = "<a/>";
     final Context ctx = new Context();
-    new CreateDB(DB, in).execute(ctx);
-    new BaseX("-i" + DB + " -o" + OUT + " -q.");
-    assertEquals(in, string(OUT.read()));
+    new CreateDB(NAME, in).execute(ctx);
+    equals(in, "-i" + NAME + " -q.");
     ctx.close();
+  }
+
+  /**
+   * Test variable bindings.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = BaseXException.class)
+  public void bindErr() throws IOException {
+    run("-ba=A -qdeclare variable $a as xs:integer external; $a");
+  }
+
+  /**
+   * Test command execution.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void command() throws IOException {
+    equals("1", "-cxquery 1");
+  }
+
+  /**
+   * Command error.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = BaseXException.class)
+  public void commandErr() throws IOException {
+    run("-1");
   }
 
   /**
@@ -115,8 +95,7 @@ public final class BaseXTest {
    */
   @Test
   public void query() throws IOException {
-    new BaseX("-o" + OUT + " -q1+2");
-    assertEquals("3", string(OUT.read()));
+    equals("3", "-q1+2");
   }
 
   /**
@@ -125,7 +104,7 @@ public final class BaseXTest {
    */
   @Test(expected = BaseXException.class)
   public void queryErr() throws IOException {
-    new BaseX("-q1+");
+    run("-q1+");
   }
 
   /**
@@ -134,8 +113,7 @@ public final class BaseXTest {
    */
   @Test
   public void runs() throws IOException {
-    new BaseX("-r10 -o" + OUT + " -q2");
-    assertEquals("2", string(OUT.read()));
+    equals("2", "-r10 -q2");
   }
 
   /**
@@ -144,7 +122,7 @@ public final class BaseXTest {
    */
   @Test(expected = BaseXException.class)
   public void runErr() throws IOException {
-    new BaseX("-rx -o" + OUT + " -q2");
+    run("-rx -q2");
   }
 
   /**
@@ -153,8 +131,17 @@ public final class BaseXTest {
    */
   @Test
   public void serial() throws IOException {
-    new BaseX("-smethod=text -o" + OUT + " -q<a>1</a>");
-    assertEquals("1", string(OUT.read()));
+    equals("1", "-smethod=text -q<a>1</a>");
+  }
+
+  /**
+   * Test verbose mode.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void verbose() throws IOException {
+    contains(Text.QUERYEXEC.replaceAll(" %.*", ""), "-v -q1");
+    contains(Text.QUERYTOTAL, "-V -q1");
   }
 
   /**
@@ -163,18 +150,7 @@ public final class BaseXTest {
    */
   @Test(expected = BaseXException.class)
   public void serialErr() throws IOException {
-    new BaseX("-sm=x -o" + OUT + " -q2");
-  }
-
-  /**
-   * Write back updates.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public void writeBack() throws IOException {
-    IN.write(token("<a>X</a>"));
-    new BaseX("-i " + IN + " -u -qdelete node //text() ");
-    assertEquals("<a/>", string(IN.read()));
+    run("-sm=x -q2");
   }
 
   /**
@@ -185,8 +161,7 @@ public final class BaseXTest {
   public void chop() throws IOException {
     final String in = "<a> X </a>";
     IN.write(token(in));
-    new BaseX("-w -i" + IN + " -o" + OUT + " -q.");
-    assertEquals(in, string(OUT.read()));
+    equals(in, "-w -i" + IN + " -q.");
   }
 
   /**
@@ -195,7 +170,6 @@ public final class BaseXTest {
    */
   @Test
   public void noSerialization() throws IOException {
-    new BaseX("-z -o" + OUT + " -q1");
-    assertEquals("", string(OUT.read()));
+    equals("", "-z -q1");
   }
 }
