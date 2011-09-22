@@ -97,7 +97,7 @@ public class RESTPost extends RESTCode {
 
         // handle input
         byte[] item = null;
-        qp = new QueryProcessor(".//*:input/node()", node, context);
+        qp = new QueryProcessor(".//*:context/node()", node, context);
         ir = qp.iter();
         for(Item n; (n = ir.next()) != null;) {
           if(item != null) throw new RESTException(SC_BAD_REQUEST, ERR_CTXITEM);
@@ -171,7 +171,7 @@ public class RESTPost extends RESTCode {
     add("n:c($input/*:text/text(), '<text/> element has no content.'), ").
     add("for $ch in $input/* return ( ").
     add("n:c(name($ch) = ('text', 'parameter', ").
-    add("if(name($input) = 'command') then () else ('input','variable')), ").
+    add("if(name($input) = 'command') then () else ('context','variable')), ").
     add("\"Invalid child: <\" || name($ch) || \"/>.\"), ").
     add("for $p in $ch/(self::*:parameter|self::*:variable) ").
     add("let $atts := ('name','value', if(name($p) = 'parameter') ").

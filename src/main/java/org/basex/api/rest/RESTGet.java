@@ -48,7 +48,7 @@ final class RESTGet extends RESTCode {
       } else if(key.equals(WRAP)) {
         // wrapping flag
         wrap(val, ctx);
-      } else if(key.equals(INPUT)) {
+      } else if(key.equals(CONTEXT)) {
         // wrapping flag
         item = Token.token(val);
       } else {

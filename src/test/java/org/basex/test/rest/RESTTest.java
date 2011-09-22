@@ -110,7 +110,7 @@ public class RESTTest {
    */
   @Test
   public void getInput() throws Exception {
-    assertEquals("<a/>", get("?query=.&input=<a/>"));
+    assertEquals("<a/>", get("?query=.&context=<a/>"));
   }
 
   /**
@@ -119,7 +119,7 @@ public class RESTTest {
   @Test
   public void getInputError() {
     try {
-      assertEquals("<a/>", get("?query=.&input=<"));
+      assertEquals("<a/>", get("?query=.&context=<"));
       fail("Error expected.");
     } catch(final IOException ex) {
       /** expected. */
@@ -275,7 +275,7 @@ public class RESTTest {
     assertEquals("<a/>", postQuery("",
         "<query xmlns=\"" + URI + "\">" +
         "<text>.</text>" +
-        "<input><a/></input>" +
+        "<context><a/></context>" +
         "</query>"));
   }
 

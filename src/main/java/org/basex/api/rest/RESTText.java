@@ -49,6 +49,6 @@ public interface RESTText {
 
   /** Wrap parameter. */
   String WRAP = "wrap";
-  /** Input parameter. */
-  String INPUT = "input";
+  /** Initial context. */
+  String CONTEXT = "context";
 }
