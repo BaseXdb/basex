@@ -243,7 +243,7 @@ public abstract class BXResource implements Resource {
     final Query q = s.query(DBISRAW.args("$d", "$p"));
     q.bind("d", db);
     q.bind("p", path);
-    return q.execute().equals("true");
+    return q.execute().equals(Text.TRUE);
   }
 
   /**

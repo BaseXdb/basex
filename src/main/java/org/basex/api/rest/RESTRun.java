@@ -14,7 +14,6 @@ import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
-import org.basex.server.Session;
 import org.basex.util.Util;
 
 /**
@@ -28,9 +27,10 @@ public class RESTRun extends RESTQuery {
    * Constructor.
    * @param in input file to be executed
    * @param vars external variables
+   * @param it context item
    */
-  RESTRun(final String in, final Map<String, String[]> vars) {
-    super(in, vars);
+  RESTRun(final String in, final Map<String, String[]> vars, final byte[] it) {
+    super(in, vars, it);
   }
 
   @Override
@@ -45,8 +45,7 @@ public class RESTRun extends RESTQuery {
         Util.info(FILEWHICH, input));
 
     // set query path
-    final Session session = ctx.session;
-    session.execute(new Set(Prop.QUERYPATH, io.path()));
+    ctx.session.execute(new Set(Prop.QUERYPATH, io.path()));
 
     // perform query
     query(string(io.read()), ctx);

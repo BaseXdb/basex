@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.basex.io.serial.SerializerProp;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -23,7 +24,10 @@ final class RESTGet extends RESTCode {
     final Map<String, String[]> vars = new HashMap<String, String[]>();
 
     // handle query parameters
-    RESTCode code = null;
+    String operation = null;
+    String input = null;
+    byte[] item = null;
+
     final TokenBuilder ser = new TokenBuilder();
     final Map<?, ?> map = ctx.req.getParameterMap();
     final SerializerProp sp = new SerializerProp();
@@ -34,16 +38,21 @@ final class RESTGet extends RESTCode {
       final String val = vals[0];
 
       if(key.equals(COMMAND) || key.equals(QUERY) || key.equals(RUN)) {
-        if(code != null || vals.length > 1)
+        if(operation != null || vals.length > 1)
           throw new RESTException(SC_BAD_REQUEST, ERR_ONLYONE);
-        code = key.equals(QUERY) ? new RESTQuery(val, vars) : key.equals(RUN) ?
-            new RESTRun(val, vars) : new RESTCommand(val);
+        operation = key;
+        input = val;
       } else if(key.startsWith("$")) {
+        // external variables
         vars.put(key, new String[] { val });
       } else if(key.equals(WRAP)) {
+        // wrapping flag
         wrap(val, ctx);
+      } else if(key.equals(INPUT)) {
+        // wrapping flag
+        item = Token.token(val);
       } else {
-        // handle serialization parameters
+        // serialization parameters
         if(sp.get(key) != null) {
           for(final String v : vals) ser.add(key).add('=').add(v).add(',');
         } else {
@@ -52,6 +61,17 @@ final class RESTGet extends RESTCode {
       }
     }
     ctx.serialization = ser.toString();
-    (code == null ? new RESTList() : code).run(ctx);
+
+    final RESTCode code;
+    if(operation == null) {
+      code = new RESTList();
+    } else if(operation.equals(QUERY)) {
+      code = new RESTQuery(input, vars, item);
+    } else if(operation.equals(RUN)) {
+      code = new RESTQuery(input, vars, item);
+    } else {
+      code = new RESTCommand(input);
+    }
+    code.run(ctx);
   }
 }

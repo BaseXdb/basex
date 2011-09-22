@@ -15,11 +15,15 @@ import org.basex.data.Result;
 import org.basex.io.IOContent;
 import org.basex.io.in.BufferInput;
 import org.basex.io.in.TextInput;
+import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.DataBuilder;
 import org.basex.server.Session;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -91,15 +95,28 @@ public class RESTPost extends RESTCode {
           vars.put(name, new String[] { value, type });
         }
 
+        // handle input
+        byte[] item = null;
+        qp = new QueryProcessor(".//*:input/node()", node, context);
+        ir = qp.iter();
+        for(Item n; (n = ir.next()) != null;) {
+          if(item != null) throw new RESTException(SC_BAD_REQUEST, ERR_CTXITEM);
+          // create main memory instance of the specified node
+          n = DataBuilder.stripNS((ANode) n, RESTURI, qp.ctx);
+          final ArrayOutput ao = new ArrayOutput();
+          n.serialize(Serializer.get(ao));
+          item = ao.toArray();
+        }
+
         // handle request
         final String request = value("name(.)", node, context);
         final String text = value("*:text/text()", node, context);
         if(request.equals(COMMAND)) {
           code = new RESTCommand(text);
         } else if(request.equals(RUN)) {
-          code = new RESTRun(text, vars);
+          code = new RESTRun(text, vars, item);
         } else {
-          code = new RESTQuery(text, vars);
+          code = new RESTQuery(text, vars, item);
         }
         code.run(ctx);
       } catch(final QueryException ex) {
@@ -135,7 +152,8 @@ public class RESTPost extends RESTCode {
   private String value(final String query, final Object item,
       final Context context) throws QueryException {
     final QueryProcessor qp = new QueryProcessor(query, item, context);
-    return Token.string(qp.iter().next().atom(null));
+    final Item it = qp.iter().next();
+    return it == null ? null : Token.string(it.atom(null));
   }
 
   /** XQuery for checking the syntax of the POST request. */
@@ -153,7 +171,7 @@ public class RESTPost extends RESTCode {
     add("n:c($input/*:text/text(), '<text/> element has no content.'), ").
     add("for $ch in $input/* return ( ").
     add("n:c(name($ch) = ('text', 'parameter', ").
-    add("if(name($input) = 'command') then () else 'variable'), ").
+    add("if(name($input) = 'command') then () else ('input','variable')), ").
     add("\"Invalid child: <\" || name($ch) || \"/>.\"), ").
     add("for $p in $ch/(self::*:parameter|self::*:variable) ").
     add("let $atts := ('name','value', if(name($p) = 'parameter') ").

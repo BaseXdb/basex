@@ -106,6 +106,28 @@ public class RESTTest {
 
   /**
    * GET Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void getInput() throws Exception {
+    assertEquals("<a/>", get("?query=.&input=<a/>"));
+  }
+
+  /**
+   * GET Test.
+   */
+  @Test
+  public void getInputError() {
+    try {
+      assertEquals("<a/>", get("?query=.&input=<"));
+      fail("Error expected.");
+    } catch(final IOException ex) {
+      /** expected. */
+    }
+  }
+
+  /**
+   * GET Test.
    * @throws IOException I/O exception
    */
   @Test
@@ -241,6 +263,19 @@ public class RESTTest {
         "<parameter name='wrap' value='no'/>" +
         "<parameter name='omit-xml-declaration' value='no'/>" +
         "<parameter name='omit-xml-declaration' value='yes'/>" +
+        "</query>"));
+  }
+
+  /**
+   * POST Test: execute a query with an initial context.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void postQuery6() throws IOException {
+    assertEquals("<a/>", postQuery("",
+        "<query xmlns=\"" + URI + "\">" +
+        "<text>.</text>" +
+        "<input><a/></input>" +
         "</query>"));
   }
 

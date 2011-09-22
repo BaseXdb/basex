@@ -37,13 +37,18 @@ public interface RESTText {
   String ERR_NOPARAM = "No parameters supported.";
   /** Error message. */
   String ERR_ONLYONE = "Only one operation can be specified.";
+  /** Error message. */
+  String ERR_CTXITEM = "Multiple context items specified.";
+
+  /** Command operation. */
+  String COMMAND = "command";
+  /** Run operation. */
+  String RUN = "run";
+  /** Query operation. */
+  String QUERY = "query";
 
   /** Wrap parameter. */
   String WRAP = "wrap";
-  /** Command parameter. */
-  String COMMAND = "command";
-  /** Run parameter. */
-  String RUN = "run";
-  /** Query parameter. */
-  String QUERY = "query";
+  /** Input parameter. */
+  String INPUT = "input";
 }

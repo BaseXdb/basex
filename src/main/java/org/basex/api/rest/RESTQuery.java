@@ -1,18 +1,23 @@
 package org.basex.api.rest;
 
-import static org.basex.query.func.Function.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.data.DataText.*;
+import static org.basex.query.func.Function.*;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.basex.core.Prop;
+import org.basex.core.Text;
+import org.basex.core.cmd.Get;
 import org.basex.core.cmd.Set;
+import org.basex.io.in.ArrayInput;
 import org.basex.io.serial.SerializerProp;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * REST-based evaluation of XQuery expressions.
@@ -25,15 +30,20 @@ class RESTQuery extends RESTCode {
   protected Map<String, String[]> variables;
   /** Query input. */
   protected final String input;
+  /** Optional context item. */
+  protected final byte[] item;
 
   /**
    * Constructor.
    * @param in query to be executed
    * @param vars external variables
+   * @param it context item
    */
-  RESTQuery(final String in, final Map<String, String[]> vars) {
+  RESTQuery(final String in, final Map<String, String[]> vars,
+      final byte[] it) {
     input = in;
     variables = vars;
+    item = it;
   }
 
   @Override
@@ -51,8 +61,17 @@ class RESTQuery extends RESTCode {
   protected void query(final String in, final RESTContext ctx)
       throws RESTException, IOException {
 
-    // try to open addressed database
-    open(ctx);
+    if(item != null) {
+      // create main memory instance of the context item
+      final boolean mm = ctx.session.execute(
+          new Get(Prop.MAINMEM)).split(Text.COLS)[1].equals(Text.TRUE);
+      ctx.session.execute(new Set(Prop.MAINMEM, true));
+      ctx.session.create(Util.name(RESTQuery.class), new ArrayInput(item));
+      if(!mm) ctx.session.execute(new Set(Prop.MAINMEM, false));
+    } else {
+      // try to open addressed database
+      open(ctx);
+    }
 
     // set specified serialization options
     final Session session = ctx.session;
@@ -63,7 +82,7 @@ class RESTQuery extends RESTCode {
     if(query.equals(".") && ctx.depth() > 1) {
       // retrieve binary contents if no query is specified
       final String raw = DBISRAW.args(ctx.db(), ctx.dbpath());
-      if(session.query(raw).execute().equals("true"))
+      if(session.query(raw).execute().equals(Text.TRUE))
         query = "declare option output:method '" + M_RAW + "';" +
             DBRETRIEVE.args(ctx.db(), ctx.dbpath());
     }
