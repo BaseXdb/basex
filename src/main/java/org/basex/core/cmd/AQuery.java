@@ -204,8 +204,9 @@ abstract class AQuery extends Command {
         qp.plan(d);
         d.close();
 
-        final String dot = context.query == null ? "plan.dot" :
-            context.query.name().replaceAll("\\..*?$", ".dot");
+        final String path = context.prop.get(Prop.QUERYPATH);
+        final String dot = path.isEmpty() ? "plan.dot" :
+            new IOFile(path).name().replaceAll("\\..*?$", ".dot");
         new IOFile(dot).write(ao.toArray());
 
         if(prop.is(Prop.DOTDISPLAY))

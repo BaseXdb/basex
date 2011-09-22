@@ -17,6 +17,7 @@ import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
@@ -185,7 +186,8 @@ public final class QueryContext extends Progress {
     nodes = ctx.current();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
-    if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
+    final String path = ctx.prop.get(Prop.QUERYPATH);
+    if(!path.isEmpty()) baseURI = Uri.uri(token(new IOFile(path).url()));
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
   }
 

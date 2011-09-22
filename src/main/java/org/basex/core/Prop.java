@@ -69,6 +69,8 @@ public final class Prop extends AProp {
 
   /** Caches the query results. */
   public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
+  /** Path to current query. */
+  public static final Object[] QUERYPATH = { "QUERYPATH", "" };
   /** Writes original files back after updates. */
   public static final Object[] WRITEBACK = { "WRITEBACK", false };
   /** Forces database creation for unknown documents. */

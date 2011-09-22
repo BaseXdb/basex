@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
-import org.basex.io.IO;
 import org.basex.query.util.pkg.Repo;
 import org.basex.server.ClientListener;
 import org.basex.server.Sessions;
@@ -40,8 +39,6 @@ public final class Context {
 
   /** User reference. */
   public User user;
-  /** Current query file. */
-  public IO query;
 
   // GUI references
   /** Marked nodes. */

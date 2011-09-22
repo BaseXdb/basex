@@ -81,7 +81,7 @@ public class BaseX extends Main {
         final IO io = IO.get(file);
         if(!io.exists()) throw new BaseXException(INFOERROR + FILEWHICH, file);
         query = TextInput.content(io).toString().trim();
-        context.query = io;
+        execute(new Set(Prop.QUERYPATH, io.path()), false);
       }
 
       if(query != null) {
