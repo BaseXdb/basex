@@ -28,12 +28,15 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.Reference;
 import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.SignedInfo;
 import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
@@ -124,8 +127,8 @@ public final class DigitalSignature {
   private static final byte[][] SIGNATURETYPES =
     {
     token("enveloped"),
-    token("enveloping"),
-    token("detached")
+    token("detached"),
+    token("enveloping")
     };
   /** Index of default values in token arrays. */
   private static final int DEFAULT = 0;
@@ -224,8 +227,6 @@ public final class DigitalSignature {
               fac.newSignatureMethod(SA, null),
               Collections.singletonList(ref));
 
-      DocumentBuilderFactory dbf = null;
-
       PrivateKey pk = null;
       PublicKey puk = null;
       KeyInfo ki = null;
@@ -291,22 +292,41 @@ public final class DigitalSignature {
         pk = kp.getPrivate();
       }
 
-      if(eq(type, SIGNATURETYPES[1]))
-        CRYPTONOTSUPP.thrw(input, type);
-      if(eq(type, SIGNATURETYPES[2]))
-        CRYPTONOTSUPP.thrw(input, type);
+      Document doc = toDOMNode(node);
+      DOMSignContext dsc = null;
+      XMLSignature xmlsig = null;
 
-      // enveloped certificate
-      final Document doc = toDOMNode(node);
-      final DOMSignContext dsc =
-          new DOMSignContext(pk, doc.getDocumentElement());
+      // enveloped
+      if(eq(type, SIGNATURETYPES[0])) {
+        dsc = new DOMSignContext(pk, doc.getDocumentElement());
+        xmlsig = fac.newXMLSignature(si, ki);
+
+        // detached
+      } else if(eq(type, SIGNATURETYPES[1])) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        doc = dbf.newDocumentBuilder().newDocument();
+        dsc = new DOMSignContext(pk, doc);
+        xmlsig = fac.newXMLSignature(si, ki);
+//        CRYPTONOTSUPP.thrw(input, type);
+
+        // enveloping
+      } else {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        XMLStructure cont = new DOMStructure(doc.getDocumentElement());
+        XMLObject obj = fac.newXMLObject(Collections.singletonList(cont),
+            "", null, null);
+        xmlsig = fac.newXMLSignature(si, ki, Collections.singletonList(obj),
+            null, null);
+        dsc = new DOMSignContext(pk, doc);
+//        CRYPTONOTSUPP.thrw(input, type);
+      }
 
       if(xpathExpr.length > 0) {
 //        final String frag = string(nodeToBytes(node));
         CRYPTONOTSUPP.thrw(input, xpathExpr);
         }
-
-      XMLSignature xmlsig = fac.newXMLSignature(si, ki);
 
       // set Signature element prefix, if given
       if(nsPrefix.length > 0)
@@ -445,6 +465,7 @@ public final class DigitalSignature {
     //new SerializerProp("omit-xml-declaration=no,standalone=no,indent=no"));
     n.serialize(s);
     s.close();
+    System.out.println(b.toString() + "\n");
     return b.toByteArray();
   }
 
