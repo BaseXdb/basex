@@ -22,8 +22,6 @@ import java.util.zip.ZipOutputStream;
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
 import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -362,7 +360,7 @@ public final class FNZip extends FuncCall {
               try {
                 final Serializer ser = Serializer.get(zos, serPar(node, ctx));
                 do {
-                  stripNS(n, ctx).serialize(ser);
+                  DataBuilder.stripNS(n, ZIPURI, ctx).serialize(ser);
                 } while((n = ch.next()) != null);
                 ser.close();
               } catch(final SerializerException ex) {
@@ -374,46 +372,6 @@ public final class FNZip extends FuncCall {
         zos.closeEntry();
       }
     }
-  }
-
-  /**
-   * Returns a new node with our ZIP namespaces.
-   * @param ctx query context
-   * @param node node to be copied
-   * @return new node
-   */
-  private ANode stripNS(final ANode node, final QueryContext ctx) {
-    if(node.type != NodeType.ELM) return node;
-
-    final MemData md = new MemData(ctx.context.prop);
-    final DataBuilder db = new DataBuilder(md);
-    db.build(node);
-
-    // flag indicating if ZIP namespace should be completely removed
-    boolean del = true;
-    // loop through alll nodes
-    for(int pre = 0; pre < md.meta.size; pre++) {
-      // only check elements and attributes
-      final int kind = md.kind(pre);
-      if(kind != Data.ELEM && kind != Data.ATTR) continue;
-      // check if ZIP namespace is referenced
-      final byte[] uri = md.ns.uri(md.uri(pre, kind));
-      if(uri == null || !eq(uri, ZIPURI)) continue;
-
-      final byte[] name = md.name(pre, kind);
-      if(pref(name).length == 0) {
-        // no prefix: remove ZIP namespace from element
-        if(kind == Data.ELEM) {
-          md.update(pre, kind, name, EMPTY);
-          md.nsFlag(pre, false);
-        }
-      } else {
-        // zip prefix: retain ZIP namespace
-        del = false;
-      }
-    }
-    if(del) md.ns.delete(ZIPURI);
-    return new DBNode(md, 0);
   }
 
   /**

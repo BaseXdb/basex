@@ -533,7 +533,6 @@ public class CommandTest {
   /** Command test. */
   @Test
   public final void set() {
-    ok(new Set(CmdSet.CHOP, Text.ON));
     ok(new Set(CmdSet.CHOP, false));
     ok(new Set(CmdSet.CHOP, true));
     ok(new Set("chop", true));

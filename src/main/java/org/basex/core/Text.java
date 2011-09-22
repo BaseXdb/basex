@@ -189,10 +189,13 @@ public interface Text {
   String TO = "TO";
   /** Command keyword. */
   String ON = "ON";
-  /** Command keyword. */
-  String TRUE = "TRUE";
   /** Keyword. */
   String OK = "OK";
+
+  /** True keyword. */
+  String TRUE = "true";
+  /** False keyword. */
+  String FALSE = "false";
 
   /** Command help. */
   String C_QUERY = "query";

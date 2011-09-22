@@ -9,6 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.AxisIter;
@@ -340,5 +341,47 @@ public final class DataBuilder {
       for(ANode i; (i = ai.next()) != null;) s += size(i, a);
     }
     return s;
+  }
+
+  /**
+   * Returns a new node without the specified namespace.
+   * @param node node to be copied
+   * @param ns namespace to be stripped
+   * @param ctx query context
+   * @return new node
+   */
+  public static ANode stripNS(final ANode node, final byte[] ns,
+      final QueryContext ctx) {
+    if(node.type != NodeType.ELM) return node;
+
+    final MemData md = new MemData(ctx.context.prop);
+    final DataBuilder db = new DataBuilder(md);
+    db.build(node);
+
+    // flag indicating if ZIP namespace should be completely removed
+    boolean del = true;
+    // loop through all nodes
+    for(int pre = 0; pre < md.meta.size; pre++) {
+      // only check elements and attributes
+      final int kind = md.kind(pre);
+      if(kind != Data.ELEM && kind != Data.ATTR) continue;
+      // check if ZIP namespace is referenced
+      final byte[] uri = md.ns.uri(md.uri(pre, kind));
+      if(uri == null || !eq(uri, ns)) continue;
+
+      final byte[] name = md.name(pre, kind);
+      if(pref(name).length == 0) {
+        // no prefix: remove ZIP namespace from element
+        if(kind == Data.ELEM) {
+          md.update(pre, kind, name, EMPTY);
+          md.nsFlag(pre, false);
+        }
+      } else {
+        // zip prefix: retain ZIP namespace
+        del = false;
+      }
+    }
+    if(del) md.ns.delete(ns);
+    return new DBNode(md, 0);
   }
 }
