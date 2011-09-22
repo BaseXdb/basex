@@ -74,7 +74,6 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.Levenshtein;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
@@ -319,17 +318,17 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
-    final TokenBuilder tb = new TokenBuilder();
+    final StringBuilder sb = new StringBuilder();
     consumeWS();
     boolean q = false;
     while(more()) {
       final char c = curr();
       if(!q && (c <= ' ' || c == ';')) break;
       if(c == '"') q ^= true;
-      else tb.add(c);
+      else sb.append(c);
       consume();
     }
-    return finish(cmd, tb);
+    return finish(cmd, sb);
   }
 
   /**
@@ -340,10 +339,10 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   private String remaining(final Cmd cmd) throws QueryException {
-    final TokenBuilder tb = new TokenBuilder();
+    final StringBuilder sb = new StringBuilder();
     consumeWS();
-    while(more()) tb.add(consume());
-    String arg = finish(cmd, tb);
+    while(more()) sb.append(consume());
+    String arg = finish(cmd, sb);
     if(arg != null) {
       // chop quotes; substrings are faster than replaces...
       if(arg.startsWith("\"")) arg = arg.substring(1);
@@ -360,15 +359,15 @@ public final class CommandParser extends InputParser {
    */
   private String xquery(final Cmd cmd) throws QueryException {
     consumeWS();
-    final TokenBuilder tb = new TokenBuilder();
+    final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
       final QueryParser p = new QueryParser(query, new QueryContext(ctx));
       p.qp = qp;
-      p.parse(null, false);
-      tb.add(query.substring(qp, p.qp));
+      p.parse(null);
+      sb.append(query.substring(qp, p.qp));
       qp = p.qp;
     }
-    return finish(cmd, tb);
+    return finish(cmd, sb);
   }
 
   /**
@@ -380,9 +379,9 @@ public final class CommandParser extends InputParser {
    */
   private String name(final Cmd cmd) throws QueryException {
     consumeWS();
-    final TokenBuilder tb = new TokenBuilder();
-    while(letterOrDigit(curr()) || curr('-')) tb.add(consume());
-    return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
+    final StringBuilder sb = new StringBuilder();
+    while(letterOrDigit(curr()) || curr('-')) sb.append(consume());
+    return finish(cmd, !more() || curr(';') || ws(curr()) ? sb : null);
   }
 
   /**
@@ -395,13 +394,13 @@ public final class CommandParser extends InputParser {
    */
   private String glob(final Cmd cmd) throws QueryException {
     consumeWS();
-    final TokenBuilder tb = new TokenBuilder();
+    final StringBuilder sb = new StringBuilder();
     while(true) {
       final char c = curr();
       if(!letterOrDigit(c) && c != '-' && c != '*' && c != '?' && c != ',') {
-        return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
+        return finish(cmd, !more() || curr(';') || ws(curr()) ? sb : null);
       }
-      tb.add(consume());
+      sb.append(consume());
     }
   }
 
@@ -431,9 +430,9 @@ public final class CommandParser extends InputParser {
    * @return string result, or {@code null}
    * @throws QueryException query exception
    */
-  private String finish(final Cmd cmd, final TokenBuilder s)
+  private String finish(final Cmd cmd, final StringBuilder s)
       throws QueryException {
-    if(s != null && s.size() != 0) return s.toString();
+    if(s != null && s.length() != 0) return s.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
   }
@@ -446,10 +445,10 @@ public final class CommandParser extends InputParser {
    */
   private String number(final Cmd cmd) throws QueryException {
     consumeWS();
-    final TokenBuilder tb = new TokenBuilder();
-    if(curr() == '-') tb.add(consume());
-    while(digit(curr())) tb.add(consume());
-    return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
+    final StringBuilder sb = new StringBuilder();
+    if(curr() == '-') sb.append(consume());
+    while(digit(curr())) sb.append(consume());
+    return finish(cmd, !more() || curr(';') || ws(curr()) ? sb : null);
   }
 
   /**

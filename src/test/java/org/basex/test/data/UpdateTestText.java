@@ -18,7 +18,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void testInsertTextAsOnly1() throws IOException {
+  public void insertTextAsOnly1() throws IOException {
     final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(3, 0, JUNIT, Data.TEXT);
@@ -46,7 +46,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void testInsertTextAsOnly2() throws IOException {
+  public void insertTextAsOnly2() throws IOException {
     final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(3, 1, JUNIT, Data.TEXT);
@@ -74,7 +74,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void testInsertTextAsOnly3() throws IOException {
+  public void insertTextAsOnly3() throws IOException {
     final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(3, 2, JUNIT, Data.TEXT);
@@ -102,7 +102,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void testInsertTextAfterAttsAsFirst() throws IOException {
+  public void insertTextAfterAttsAsFirst() throws IOException {
     final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(6, 1, JUNIT, Data.TEXT);
@@ -128,7 +128,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void testInsertTextAfterAttsAsSecond() throws IOException {
+  public void insertTextAfterAttsAsSecond() throws IOException {
     final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(6, 2, JUNIT, Data.TEXT);
@@ -155,7 +155,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void testInsertTextAfterAttsAsLast() throws IOException {
+  public void insertTextAfterAttsAsLast() throws IOException {
     final Data data = CONTEXT.data();
     final int nextid = data.meta.lastid;
     insertText(6, 0, JUNIT, Data.TEXT);
@@ -181,7 +181,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test(expected = IOException.class)
-  public void testInsertTextBeforeText() throws IOException {
+  public void insertTextBeforeText() throws IOException {
     insertText(9, 1, FOO, Data.TEXT);
   }
 
@@ -190,7 +190,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test(expected = IOException.class)
-  public void testInsertTextAfterTextAsSecond() throws IOException {
+  public void insertTextAfterTextAsSecond() throws IOException {
     insertText(9, 2, FOO, Data.TEXT);
   }
 
@@ -199,7 +199,7 @@ public final class UpdateTestText extends UpdateTest {
    * @throws IOException I/O exception
    */
   @Test(expected = IOException.class)
-  public void testInsertTextAfterTextAsLast() throws IOException {
+  public void insertTextAfterTextAsLast() throws IOException {
     insertText(9, 0, FOO, Data.TEXT);
   }
 
@@ -207,7 +207,7 @@ public final class UpdateTestText extends UpdateTest {
    * Tests updateText.
    */
   @Test
-  public void testUpdateText() {
+  public void updateText() {
     final Data data = CONTEXT.data();
     data.update(10, Data.TEXT, JUNIT);
     assertEquals(Data.TEXT, data.kind(10));

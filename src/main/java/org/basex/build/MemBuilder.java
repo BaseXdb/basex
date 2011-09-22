@@ -34,7 +34,7 @@ public final class MemBuilder extends Builder {
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static Data build(final Parser parser, final Prop prop)
+  public static MemData build(final Parser parser, final Prop prop)
       throws IOException {
     return build(parser.src.name(), parser, prop);
   }

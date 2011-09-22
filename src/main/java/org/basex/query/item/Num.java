@@ -42,8 +42,8 @@ abstract class Num extends Item {
     final float f = flt(ii);
 
     // extract fractional part from a finite float
-    int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY || isNaN(f) ? 0
-        : floatToIntBits(f - l);
+    final int frac = f == POSITIVE_INFINITY || f == NEGATIVE_INFINITY ||
+        isNaN(f) ? 0 : floatToIntBits(f - l);
 
     int h = frac ^ (int) (l ^ l >>> 32);
 

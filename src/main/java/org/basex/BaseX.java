@@ -141,7 +141,7 @@ public class BaseX extends Main {
         } else if(c == 'D' && sa()) {
           // hidden option: show dot query graph
           options.put(Prop.DOTPLAN, true);
-        } else if(c == 'i' && sa()) {
+        } else if(c == 'i') {
           // open initial file or database
           input = arg.string();
         } else if(c == 'n' && !sa()) {
@@ -186,13 +186,13 @@ public class BaseX extends Main {
         } else if(c == 'W') {
           // hidden option: write properties before exit
           writeProps = true;
-        } else if(c == 'x' && sa()) {
-          // hidden option: show query plan before compilation
-          options.put(Prop.COMPPLAN, false);
-        } else if(c == 'X') {
+        } else if(c == 'x') {
           // hidden option: show xml query plan
           options.put(Prop.XMLPLAN, true);
           verbose = true;
+        } else if(c == 'X') {
+          // hidden option: show query plan before compiling the query
+          options.put(Prop.COMPPLAN, false);
         } else if(c == 'z') {
           // turn off result serialization
           options.put(Prop.SERIALIZE, false);

@@ -47,7 +47,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
   /** Tests repository initialization. */
   @Test
-  public void testRepoInit() {
+  public void repoInit() {
     // check namespace dictionary
     final TokenObjMap<TokenSet> nsDict = ctx.repo.nsDict();
     final TokenMap pkgDict = ctx.repo.pkgDict();
@@ -213,7 +213,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   @Test
-  public void testRepoInstall() throws BaseXException {
+  public void repoInstall() throws BaseXException {
     // try to install non-existing package
     try {
       new RepoManager(ctx.repo).install("etc/pkg", null);
@@ -238,7 +238,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testInstallJar() throws BaseXException, QueryException {
+  public void installJar() throws BaseXException, QueryException {
     // install package
     new RepoInstall(REPO + "testJar.xar", null).execute(ctx);
     final String dirName = normalize("jarPkg-1.0.0");
@@ -268,7 +268,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @throws QueryException query exception
    */
   @Test
-  public void testImport() throws QueryException {
+  public void importPkg() throws QueryException {
     // try with a package without dependencies
     final QueryProcessor qp1 = new QueryProcessor(
         "import module namespace ns3='ns3';\nns3:test()", ctx);
@@ -287,7 +287,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   @Test
-  public void testDelete() throws BaseXException {
+  public void delete() throws BaseXException {
     // try to delete a package which is not installed
     try {
       new RepoManager(ctx.repo).delete("xyz", null);

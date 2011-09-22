@@ -379,7 +379,7 @@ public class IdPreMap {
     int low = 0;
     int high = rows - 1;
     while(low <= high) {
-      int mid = (low + high) >>> 1;
+      final int mid = low + high >>> 1;
       final int midValMin = pres[mid];
       final int midValMax = midValMin + nids[mid] - fids[mid];
       if(midValMax < pre) low = mid + 1;

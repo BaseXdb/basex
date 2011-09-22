@@ -52,7 +52,7 @@ public class MemDataTest {
    * @throws BaseXException query exception
    */
   @Test
-  public void testReplaceValue() throws BaseXException {
+  public void replaceValue() throws BaseXException {
     new XQuery("replace value of node /a/b with 'test2'").execute(CTX);
     final String o = new XQuery("/a/b[text() = 'test']").execute(CTX);
     assertTrue("Old node found", o.length() == 0);
@@ -65,7 +65,7 @@ public class MemDataTest {
    * @throws BaseXException query exception
    */
   @Test
-  public void testReplaceNode() throws BaseXException {
+  public void replaceNode() throws BaseXException {
     new XQuery("replace node /a/b with <d f='test2'/>").execute(CTX);
     final String o = new XQuery("/a/b").execute(CTX);
     assertTrue("Old node found", o.length() == 0);
@@ -78,7 +78,7 @@ public class MemDataTest {
    * @throws BaseXException query exception
    */
   @Test
-  public void testInsertNode() throws BaseXException {
+  public void insertNode() throws BaseXException {
     new XQuery("insert node <d>test2</d> as first into /a").execute(CTX);
     final String r = new XQuery("//d[text() = 'test2']").execute(CTX);
     assertTrue("Node not found", r.length() > 0);
@@ -93,7 +93,7 @@ public class MemDataTest {
    * @throws BaseXException query exception
    */
   @Test
-  public void testInsertDuplicateNode() throws BaseXException {
+  public void insertDuplicateNode() throws BaseXException {
     new XQuery("insert node <d>test</d> as first into /a").execute(CTX);
     final String r = new XQuery("//d[text() = 'test']").execute(CTX);
     assertTrue("Node not found", r.length() > 0);
@@ -106,7 +106,7 @@ public class MemDataTest {
    * @throws BaseXException query exception
    */
   @Test
-  public void testDeleteNode() throws BaseXException {
+  public void deleteNode() throws BaseXException {
     new XQuery("delete node //b").execute(CTX);
     final String r = new XQuery("//*[text() = 'test']").execute(CTX);
     assertTrue("Node not deleted", r.length() == 0);
@@ -117,7 +117,7 @@ public class MemDataTest {
    * @throws BaseXException query exception
    */
   @Test
-  public void testFindNonexistingNode() throws BaseXException {
+  public void findNonexistingNode() throws BaseXException {
     final String r = new XQuery("//*[text() = 'test0']").execute(CTX);
     assertTrue("Found non-existing node", r.length() == 0);
   }

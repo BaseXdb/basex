@@ -23,6 +23,7 @@ import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
+import org.basex.query.func.JavaFunc;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
@@ -30,8 +31,11 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Tim;
+import org.basex.query.item.Type;
+import org.basex.query.item.Types;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
@@ -327,6 +331,60 @@ public final class QueryContext extends Progress {
       ic.add(it);
     }
     return ic;
+  }
+
+  /**
+   * Binds an object to a global variable. If the object is an {@link Expr}
+   * instance, it is directly assigned. Otherwise, it is first cast to the
+   * appropriate XQuery type.
+   * @param n name of variable
+   * @param o object to be bound
+   * @throws QueryException query exception
+   */
+  public void bind(final String n, final Object o) throws QueryException {
+    final Expr ex = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
+    // remove optional $ prefix
+    final QNm nm = new QNm(token(n.indexOf('$') == 0 ? n.substring(1) : n));
+    ns.uri(nm);
+    final Var gl = vars.global().get(nm);
+    if(gl == null) {
+      // assign new variable
+      vars.setGlobal(Var.create(this, null, nm).bind(ex, this));
+    } else {
+      // reset declaration state and bind new expression
+      gl.declared = false;
+      gl.bind(gl.type != null ? gl.type.type.e(ex.item(this, null),
+          this, null) : ex, this);
+    }
+  }
+
+  /**
+   * Binds an object to a global variable. If the object is an {@link Expr}
+   * instance, it is directly assigned. Otherwise, it is first cast to the
+   * appropriate XQuery type. If {@code "map"} is specified as data type,
+   * the value is interpreted according to the rules specified in
+   * {@link Map#create(String)}.
+   * @param n name of variable
+   * @param o object to be bound
+   * @param t data type
+   * @throws QueryException query exception
+   */
+  public void bind(final String n, final Object o, final String t)
+      throws QueryException {
+
+    Object obj = o;
+    if(t != null && !t.isEmpty()) {
+      if(t.equals(QueryText.MAPSTR)) {
+        obj = Map.create(o.toString());
+      } else {
+        final QNm type = new QNm(token(t));
+        if(type.ns()) type.uri(ns.uri(type.pref(), false, null));
+        final Type typ = Types.find(type, true);
+        if(typ != null) obj = typ.e(obj, null);
+        else NOTYPE.thrw(null, type);
+      }
+    }
+    bind(n, obj);
   }
 
   /**

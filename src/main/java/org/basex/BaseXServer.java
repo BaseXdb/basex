@@ -353,7 +353,7 @@ public class BaseXServer extends Main implements Runnable {
             break;
           }
           final BufferInput bi = new BufferInput(es.getInputStream());
-          final long id = Long.parseLong(bi.readString());
+          final long id = Token.toLong(bi.readString());
           for(final ClientListener s : context.sessions) {
             if(s.getId() == id) {
               s.register(es);

@@ -22,19 +22,19 @@ public final class CompressTest {
   /** Test. */
   @Test
   public void test1() {
-    test(token(" abcdefghijklmnopqrstuvwxyz"));
+    run(token(" abcdefghijklmnopqrstuvwxyz"));
   }
 
   /** Test. */
   @Test
   public void test2() {
-    test(token("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+    run(token("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
   }
 
   /** Test. */
   @Test
   public void test3() {
-    test(token("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ " +
+    run(token("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ " +
         "1234567890"));
   }
 
@@ -43,7 +43,7 @@ public final class CompressTest {
   public void test4() {
     final byte[] b = new byte[65];
     for(int i = 0; i < b.length; i++) b[i] = (byte) i;
-    test(b);
+    run(b);
   }
 
   /** Test. */
@@ -51,7 +51,7 @@ public final class CompressTest {
   public void test5() {
     final byte[] b = new byte[256];
     for(int i = 0; i < b.length; i++) b[i] = (byte) i;
-    test(b);
+    run(b);
   }
 
   /** Test. */
@@ -59,21 +59,21 @@ public final class CompressTest {
   public void test6() {
     final byte[] b = new byte[4096];
     for(int i = 0; i < b.length; i++) b[i] = (byte) (i & 0xFF);
-    test(b);
+    run(b);
   }
 
   /** Test.
    * @throws Exception exception */
   @Test
   public void test7() throws Exception {
-    testTexts("etc/test/xmark.xml");
+    texts("etc/test/xmark.xml");
   }
 
   /** Test.
    * @throws Exception exception */
   @Test
   public void test8() throws Exception {
-    testTexts("etc/test/factbook.zip");
+    texts("etc/test/factbook.zip");
   }
 
   /**
@@ -81,7 +81,7 @@ public final class CompressTest {
    * @param file file to be parsed
    * @throws Exception exception
    */
-  private void testTexts(final String file) throws Exception {
+  private void texts(final String file) throws Exception {
     final Context ctx = new Context();
     final String query = "let $doc := doc('" + file + "')" +
       "for $i in $doc//(@hohoho | text()) return data($i)";
@@ -97,8 +97,8 @@ public final class CompressTest {
     }
     qp.close();
 
-    test(tl.toArray());
-    test(tb.finish());
+    run(tl.toArray());
+    run(tb.finish());
     ctx.close();
   }
 
@@ -106,7 +106,7 @@ public final class CompressTest {
    * Tests the correctness of the compressed tokens.
    * @param tokens test tokens
    */
-  private void test(final byte[]... tokens) {
+  private void run(final byte[]... tokens) {
     final Compress comp = new Compress();
     for(final byte[] token : tokens) {
       final byte[] cpr = comp.pack(token);

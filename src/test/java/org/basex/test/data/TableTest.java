@@ -66,7 +66,7 @@ public final class TableTest {
    * @throws BaseXException exception during query execution
    */
   @Test
-  public void testTableSize() throws BaseXException {
+  public void tableSize() throws BaseXException {
     final long s = tbl.length();
 
     final String n = new XQuery(SELECT).execute(ctx);

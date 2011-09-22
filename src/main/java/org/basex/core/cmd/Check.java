@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -29,17 +28,24 @@ public final class Check extends Command {
    * @param path file path
    */
   public Check(final String path) {
-    super(User.CREATE, path);
+    super(STANDARD, path);
   }
 
   @Override
   protected boolean run() {
+    // close existing database
     new Close().run(context);
 
+    // get path and database name
     final String path = args[0];
     final String name = IO.get(path).dbname();
-    final Command cmd = MetaData.found(path, name, mprop) ?
+
+    // choose OPEN if user has no create permissions, or if database exists
+    final boolean create = context.user.perm(User.CREATE);
+    final Command cmd = !create || MetaData.found(path, name, mprop) ?
       new Open(name) : new CreateDB(name, path);
+
+    // execute command
     final boolean ok = cmd.run(context);
     final String msg = cmd.info().trim();
     return ok ? info(msg) : error(msg);

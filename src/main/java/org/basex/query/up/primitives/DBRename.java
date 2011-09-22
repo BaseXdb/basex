@@ -37,7 +37,7 @@ public final class DBRename extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    for(final Entry<String, String> e : (((DBRename) p).map).entrySet()) {
+    for(final Entry<String, String> e : ((DBRename) p).map.entrySet()) {
       final String src = e.getKey();
       if(map.containsKey(src)) UPPATHREN.thrw(input, src);
       map.put(src, e.getValue());

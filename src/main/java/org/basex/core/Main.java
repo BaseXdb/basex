@@ -120,6 +120,7 @@ public abstract class Main {
         execute(cmd, verbose);
       }
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new BaseXException(ex);
     }
     return true;

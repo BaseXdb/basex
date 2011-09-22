@@ -7,6 +7,7 @@ import org.junit.Test;
 
 /**
  * ID -> PRE mapping test.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
@@ -16,7 +17,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
   /** Maximal number of bulk inserted/deleted records. */
   private final int bulkcount = 30;
   /** Number of times to repeat each test. */
-  private final int iterations = 50;
+  private final int iterations = 30;
 
   /** Set-up method. */
   @Before
@@ -32,7 +33,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
    * positions.
    */
   @Test
-  public void testBulkInsertCorrectness() {
+  public void bulkInsertCorrectness() {
     for(int k = 0; k < iterations; ++k) {
       setUp();
       for(int c = 1, id = baseid + 1, i = 0; i < opcount; i += c) {
@@ -46,7 +47,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
 
   /** Delete correctness: delete values at random positions. */
   @Test
-  public void testBulkDeleteCorrectness() {
+  public void bulkDeleteCorrectness() {
     for(int k = 0; k < iterations; ++k) {
       setUp();
       for(int id = baseid; id > 0;) {
@@ -62,7 +63,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
 
   /** Delete correctness: delete values at random positions. */
   @Test
-  public void testBulkDeleteCorrectness2() {
+  public void bulkDeleteCorrectness2() {
     for(int k = 0; k < iterations; ++k) {
       setUp();
       int n = baseid + 1;
@@ -92,7 +93,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
 
   /** Correctness: randomly insert/delete value at random positions. */
   @Test
-  public void testBulkInsertDeleteCorrectness() {
+  public void bulkInsertDeleteCorrectness() {
     for(int k = 0; k < iterations; ++k) {
       setUp();
       for(int i = 0, n = baseid, id = baseid + 1; i < opcount; ++i) {

@@ -1,13 +1,14 @@
 package org.basex.core.cmd;
 
-import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.xml.transform.sax.SAXSource;
+
 import org.basex.build.Builder;
 import org.basex.build.DirParser;
 import org.basex.build.DiskBuilder;
@@ -15,12 +16,14 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.core.CommandBuilder;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
-import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.FTBuilder;
 import org.basex.index.value.ValueBuilder;
@@ -130,7 +133,7 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data mainMem(final Parser parser,
+  public static synchronized MemData mainMem(final Parser parser,
       final Context ctx) throws IOException {
 
     if(!ctx.user.perm(User.CREATE))
@@ -145,7 +148,7 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data mainMem(final IO source, final Context ctx)
+  public static synchronized MemData mainMem(final IO source, final Context ctx)
       throws IOException {
     if(!source.exists()) throw new FileNotFoundException(
         Util.info(FILEWHICH, source));

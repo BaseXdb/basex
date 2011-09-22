@@ -28,9 +28,11 @@ public final class Open extends Command {
 
   @Override
   protected boolean run() {
-    String db = args[0];
-
+    // close existing database
     new Close().run(context);
+
+    // split database name and path
+    String db = args[0];
     final int i = db.indexOf('/');
     String path = null;
     if(i != -1) {

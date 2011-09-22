@@ -154,7 +154,7 @@ public final class FTBitapSearchTest {
 
   /** Test search. */
   @Test
-  public void testSearchIter() {
+  public void searchIter() {
     try {
       for(int i = 0; i < TESTS.length; i++) {
         final FTBitapSearch s = searches[i];

@@ -80,52 +80,55 @@ public interface Text {
   /** Start information. */
   String LOCALINFO =
     " [-bdiosuvVwz] [-cq] [file]" + NL +
-    "  [file]     Execute XQuery file" + NL +
-    "  -b<pars>   Bind external XQuery variables" + NL +
-    "  -c<cmd>    Execute database command(s)" + NL +
-    "  -d         Activate debugging mode" + NL +
-    "  -i<input>  Open initial file or database" + NL +
-    "  -o<file>   Write output to file" + NL +
-    "  -q<expr>   Execute XQuery expression" + NL +
-    "  -s<pars>   Set serialization parameter(s)" + NL +
-    "  -u         Write updates back to original files" + NL +
-    "  -v/V       Show (all) process info" + NL +
-    "  -w         Retain whitespaces from source files" + NL +
-    "  -z         Skip output of results";
+    "  [file]      Execute XQuery file" + NL +
+    "  -b<pars>    Bind external XQuery variables" + NL +
+    "  -c<cmd>     Execute database command(s)" + NL +
+    "  -d          Activate debugging mode" + NL +
+    "  -i<input>   Open initial file or database" + NL +
+    "  -o<file>    Write output to file" + NL +
+    "  -q<expr>    Execute XQuery expression" + NL +
+    "  -s<pars>    Set serialization parameter(s)" + NL +
+    "  -u          Write updates back to original files" + NL +
+    "  -v/V        Show (all) process info" + NL +
+    "  -w          Preserve whitespaces from input files" + NL +
+    "  -x          Show query execution plan" + NL +
+    "  -z          Skip output of results";
 
   /** Client mode. */
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
     " [-dnopPsUvVwz] [-cq] [file]" + NL +
-    "  [file]     Execute XQuery file" + NL +
-    "  -b<pars>   Bind external XQuery variables" + NL +
-    "  -c<cmd>    Execute database command(s)" + NL +
-    "  -d         Activate debugging mode" + NL +
-    "  -n<name>   Set server (host) name" + NL +
-    "  -o<file>   Write output to file" + NL +
-    "  -p<num>    Set server port" + NL +
-    "  -P<pass>   Specify user password" + NL +
-    "  -q<expr>   Execute XQuery expression" + NL +
-    "  -s<pars>   Set serialization parameter(s)" + NL +
-    "  -U<name>   Specify user name" + NL +
-    "  -v/V       Show (all) process info" + NL +
-    "  -w         Retain whitespaces from source files" + NL +
-    "  -z         Skip XQuery serialization";
+    "  [file]      Execute XQuery file" + NL +
+    "  -b<pars>    Bind external XQuery variables" + NL +
+    "  -c<cmd>     Execute database command(s)" + NL +
+    "  -d          Activate debugging mode" + NL +
+    "  -i<input>   Open initial file or database" + NL +
+    "  -n<name>    Set server (host) name" + NL +
+    "  -o<file>    Write output to file" + NL +
+    "  -p<num>     Set server port" + NL +
+    "  -P<pass>    Specify user password" + NL +
+    "  -q<expr>    Execute XQuery expression" + NL +
+    "  -s<pars>    Set serialization parameter(s)" + NL +
+    "  -U<name>    Specify user name" + NL +
+    "  -v/V        Show (all) process info" + NL +
+    "  -w          Preserve whitespaces from input files" + NL +
+    "  -x          Show query execution plan" + NL +
+    "  -z          Skip output of results";
 
   /** Server mode. */
   String SERVERMODE = "Server";
   /** Server start information. */
   String SERVERINFO =
     " [-dpsz] [-c] [stop]" + NL +
-    "  stop     Stop existing server" + NL +
-    "  -c<cmd>  Execute initial database command(s)" + NL +
-    "  -d       Activate debugging mode" + NL +
-    "  -e<num>  Set event port" + NL +
-    "  -i       Enter interactive mode" + NL +
-    "  -p<num>  Set server port" + NL +
-    "  -s       Start as service" + NL +
-    "  -z       Suppress logging";
+    "  stop      Stop existing server" + NL +
+    "  -c<cmd>   Execute initial database command(s)" + NL +
+    "  -d        Activate debugging mode" + NL +
+    "  -e<num>   Set event port" + NL +
+    "  -i        Enter interactive mode" + NL +
+    "  -p<num>   Set server port" + NL +
+    "  -s        Start as service" + NL +
+    "  -z        Suppress logging";
 
   /** GUI mode. */
   String GUIMODE = "GUI";
@@ -137,18 +140,18 @@ public interface Text {
   /** HTTP information. */
   String HTTPINFO =
     " [-cdehnpPRUWz] [stop]" + NL +
-    "  stop      Stop existing server" + NL +
-    "  -c        Start in client/server mode" + NL +
-    "  -d        Activate debugging mode" + NL +
-    "  -e<num>   Set event port" + NL +
-    "  -h<num>   Set port of HTTP server" + NL +
-    "  -n<name>  Set name of database server" + NL +
-    "  -p<num>   Set port of database server" + NL +
-    "  -P<pass>  Specify user password" + NL +
-    "  -R        Deactivate REST service" + NL +
-    "  -U<name>  Specify user name" + NL +
-    "  -W        Deactivate WebDAV service" + NL +
-    "  -z        Suppress logging";
+    "  stop       Stop existing server" + NL +
+    "  -c         Start in client/server mode" + NL +
+    "  -d         Activate debugging mode" + NL +
+    "  -e<num>    Set event port" + NL +
+    "  -h<num>    Set port of HTTP server" + NL +
+    "  -n<name>   Set name of database server" + NL +
+    "  -p<num>    Set port of database server" + NL +
+    "  -P<pass>   Specify user password" + NL +
+    "  -R         Deactivate REST service" + NL +
+    "  -U<name>   Specify user name" + NL +
+    "  -W         Deactivate WebDAV service" + NL +
+    "  -z         Suppress logging";
 
   /** Bug info. */
   String BUGINFO = "Potential bug? Improper use? Your feedback is welcome:";

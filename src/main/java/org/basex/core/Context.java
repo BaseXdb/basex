@@ -22,7 +22,7 @@ import org.basex.server.Sessions;
 public final class Context {
   /** Client listener. Set to {@code null} in standalone/server mode. */
   public final ClientListener listener;
-  /** Database properties. */
+  /** Client-related properties. */
   public final Prop prop = new Prop();
   /** Main properties. */
   public final MainProp mprop;
