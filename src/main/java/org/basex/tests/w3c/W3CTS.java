@@ -295,8 +295,9 @@ public abstract class W3CTS {
       final Nodes state = new Nodes(nodes.list[n], nodes.data);
 
       final String inname = text("*:query/@name", state);
-      context.query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
-      final String in = read(context.query);
+      final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
+      context.prop.set(Prop.QUERYPATH, query.path());
+      final String in = read(query);
       String er = null;
       ItemCache iter = null;
 
