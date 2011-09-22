@@ -205,12 +205,11 @@ public final class DiskValues implements Index {
     while(l <= h) {
       final int m = l + h >>> 1;
       final long pos = idxr.read5(m * 5L);
-      idxl.readNum(pos);
-      final int pre = idxl.readNum();
       // get text from cache, of add entry to cache
       byte[] txt = ctext.get(m);
       if(txt == null) {
-        txt = data.text(pre, text);
+        idxl.readNum(pos);
+        txt = data.text(idxl.readNum(), text);
         ctext.add(m, txt);
       }
       final int d = diff(txt, key);
