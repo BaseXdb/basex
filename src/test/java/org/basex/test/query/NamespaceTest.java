@@ -450,6 +450,16 @@ public final class NamespaceTest {
   }
 
   /**
+   * Checks a path optimization fix.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void queryPathOpt2() throws BaseXException {
+    create(17);
+    query("doc('d17')/*:a/*:b", "<b/>");
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */

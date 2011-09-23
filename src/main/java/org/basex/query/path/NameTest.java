@@ -51,10 +51,8 @@ public final class NameTest extends Test {
   @Override
   public boolean comp(final QueryContext ctx) throws QueryException {
     // check namespace context
-    if(ctx.ns.size() != 0) {
-      if(name != null && !name.hasUri()) {
-        name.uri(ctx.ns.uri(name.pref(), false, input));
-      }
+    if(ctx.ns.size() != 0 && name != null && !name.hasUri()) {
+      name.uri(ctx.ns.uri(name.pref(), false, input));
     }
 
     // retrieve current data reference

@@ -296,22 +296,24 @@ public abstract class Path extends ParseExpr {
       break;
     }
 
-    // check if the all children in the path exist
-    LOOP:
-    for(int s = 0; s < path.steps.length; ++s) {
-      // only verify child steps; ignore namespaces
-      final AxisStep st = path.axisStep(s);
-      if(st == null || st.axis != Axis.CHILD) break;
-      if(st.test.test == Name.ALL || st.test.test == null) continue;
-      if(st.test.test != Name.NAME) break;
+    // check if the all children in the path exist; don't test with namespaces
+    if(data.ns.size() == 0) {
+      LOOP:
+      for(int s = 0; s < path.steps.length; ++s) {
+        // only verify child steps; ignore namespaces
+        final AxisStep st = path.axisStep(s);
+        if(st == null || st.axis != Axis.CHILD) break;
+        if(st.test.test == Name.ALL || st.test.test == null) continue;
+        if(st.test.test != Name.NAME) break;
 
-      // check if one of the addressed nodes is on the correct level
-      final int name = data.tagindex.id(st.test.name.ln());
-      for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
-        if(pn.level() == s + 1) continue LOOP;
+        // check if one of the addressed nodes is on the correct level
+        final int name = data.tagindex.id(st.test.name.ln());
+        for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
+          if(pn.level() == s + 1) continue LOOP;
+        }
+        ctx.compInfo(OPTPATH, path);
+        return Empty.SEQ;
       }
-      ctx.compInfo(OPTPATH, path);
-      return Empty.SEQ;
     }
     return path;
   }
