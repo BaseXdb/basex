@@ -171,7 +171,8 @@ public class RESTPost extends RESTCode {
     add("n:c($input/*:text/text(), '<text/> element has no content.'), ").
     add("for $ch in $input/* return ( ").
     add("n:c(local-name($ch) = ('text', 'parameter', ").
-    add("if(local-name($input) = 'command') then () else ('context','variable')), ").
+    add("if(local-name($input) = 'command') then () ").
+    add("else ('context','variable')), ").
     add("\"Invalid child: <\" || name($ch) || \"/>.\"), ").
     add("for $p in $ch/(self::*:parameter|self::*:variable) ").
     add("let $atts := ('name','value', if(local-name($p) = 'parameter') ").
