@@ -59,7 +59,7 @@ import org.basex.util.list.IntList;
 
 /**
  * This abstract query expression provides the architecture for a compiled
- * query. // *
+ * query.
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */

@@ -458,9 +458,8 @@ public abstract class OutputSerializer extends Serializer {
     level++;
     startOpen(META);
     attribute(HTTPEQUIV, token(CONTENT_TYPE));
-    final String m = media.isEmpty() ? TEXT_HTML : media;
-    attribute(CONTENT,
-        new TokenBuilder(m).add(CHARSET).addExt(encoding).finish());
+    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? TEXT_HTML : media).
+        add(CHARSET).addExt(encoding).finish());
     if(html) {
       print(ELEM_C);
     } else {

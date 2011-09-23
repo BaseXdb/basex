@@ -75,73 +75,54 @@ public abstract class Serializer {
     return new XMLSerializer(os, props);
   }
 
-  // ABSTRACT METHODS =========================================================
+  // FINAL PUBLIC METHODS =====================================================
 
   /**
-   * Starts an element.
+   * Opens an element.
    * @param t tag
+   * @param a attributes
    * @throws IOException I/O exception
    */
-  protected abstract void startOpen(final byte[] t) throws IOException;
+  public final void openElement(final byte[] t, final byte[]... a)
+      throws IOException {
 
-  /**
-   * Serializes an attribute.
-   * @param n name
-   * @param v value
-   * @throws IOException I/O exception
-   */
-  public abstract void attribute(final byte[] n, final byte[] v)
-    throws IOException;
-
-  /**
-   * Finishes an opening element node.
-   * @throws IOException I/O exception
-   */
-  protected abstract void finishOpen() throws IOException;
-
-  /**
-   * Closes an empty element.
-   * @throws IOException I/O exception
-   */
-  protected abstract void finishEmpty() throws IOException;
+    finishElement();
+    nsl.push(ns.size);
+    elem = true;
+    tag = t;
+    startOpen(t);
+    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
+  }
 
   /**
    * Closes an element.
    * @throws IOException I/O exception
    */
-  protected abstract void finishClose() throws IOException;
+  public final void closeElement() throws IOException {
+    ns.size = nsl.pop();
+    if(elem) {
+      finishEmpty();
+      elem = false;
+    } else {
+      tag = tags.pop();
+      level--;
+      finishClose();
+    }
+  }
 
   /**
-   * Serializes a text.
-   * @param b text bytes
+   * Opens and closes an empty element.
+   * @param t tag
+   * @param a attributes
    * @throws IOException I/O exception
    */
-  public abstract void finishText(final byte[] b) throws IOException;
+  public final void emptyElement(final byte[] t, final byte[]... a)
+      throws IOException {
 
-  /**
-   * Serializes a comment.
-   * @param b comment
-   * @throws IOException I/O exception
-   */
-  public abstract void finishComment(final byte[] b) throws IOException;
+    openElement(t, a);
+    closeElement();
+  }
 
-  /**
-   * Serializes a processing instruction.
-   * @param n name
-   * @param v value
-   * @throws IOException I/O exception
-   */
-  public abstract void finishPi(final byte[] n, final byte[] v)
-      throws IOException;
-
-  /**
-   * Serializes an item.
-   * @param b text bytes
-   * @throws IOException I/O exception
-   */
-  public abstract void finishItem(final Item b) throws IOException;
-
-  // IMPLEMENTED METHODS ======================================================
 
   /**
    * Serializes a text.
@@ -175,138 +156,14 @@ public abstract class Serializer {
   }
 
   /**
-   * Serializes an item.
+   * Serializes an item. This method is internally called;
+   * call {@link Item#serialize} instead.
    * @param b text bytes
    * @throws IOException I/O exception
    */
   public final void item(final Item b) throws IOException {
     finishElement();
     finishItem(b);
-  }
-
-  /**
-   * Returns the string representation of the specified item.
-   * @param it item to be atomized
-   * @return string
-   * @throws IOException I/O exception
-   */
-  protected final byte[] atom(final Item it) throws IOException {
-    try {
-      return it.atom(null);
-    } catch(final QueryException ex) {
-      throw new IOException(ex.getMessage(), ex);
-    }
-  }
-
-  /**
-   * Opens an element.
-   * @param expr expression info
-   * @param a attributes
-   * @throws IOException I/O exception
-   */
-  public final void openElement(final ExprInfo expr, final byte[]... a)
-      throws IOException {
-    openElement(name(expr), a);
-  }
-
-  /**
-   * Opens an element.
-   * @param t tag
-   * @param a attributes
-   * @throws IOException I/O exception
-   */
-  public final void openElement(final byte[] t, final byte[]... a)
-      throws IOException {
-
-    finishElement();
-    nsl.push(ns.size);
-    elem = true;
-    tag = t;
-    startOpen(t);
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-  }
-
-  /**
-   * Serializes a namespace.
-   * @param n name
-   * @param v value
-   * @throws IOException I/O exception
-   */
-  public void namespace(final byte[] n, final byte[] v) throws IOException {
-    if(!undecl && n.length != 0 && v.length == 0) return;
-    final byte[] uri = ns(n);
-    if(uri == null || !eq(uri, v)) {
-      attribute(n.length == 0 ? XMLNS : concat(XMLNSC, n), v);
-      ns.add(n, v);
-    }
-  }
-
-  /**
-   * Closes an element.
-   * @throws IOException I/O exception
-   */
-  public final void closeElement() throws IOException {
-    ns.size = nsl.pop();
-    if(elem) {
-      finishEmpty();
-      elem = false;
-    } else {
-      tag = tags.pop();
-      level--;
-      finishClose();
-    }
-  }
-
-  /**
-   * Opens and closes an empty element.
-   * @param t tag
-   * @param a attributes
-   * @throws IOException I/O exception
-   */
-  public final void emptyElement(final byte[] t, final byte[]... a)
-      throws IOException {
-
-    openElement(t);
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
-    closeElement();
-  }
-
-  /**
-   * Opens and closes an empty element.
-   * @param expr expression info
-   * @param a attributes
-   * @throws IOException I/O exception
-   */
-  public final void emptyElement(final ExprInfo expr, final byte[]... a)
-      throws IOException {
-    emptyElement(name(expr), a);
-  }
-
-  /**
-   * Tests if the serialization was interrupted.
-   * @return result of check
-   */
-  public boolean finished() {
-    return false;
-  }
-
-  /**
-   * Returns the current level.
-   * @return level
-   */
-  public final int level() {
-    return tags.size();
-  }
-
-  /**
-   * Gets the URI currently bound by the given prefix.
-   * @param pre namespace prefix
-   * @return URI if found, {@code null} otherwise
-   */
-  private byte[] ns(final byte[] pre) {
-    for(int i = ns.size - 1; i >= 0; i--)
-      if(eq(ns.key[i], pre)) return ns.val[i];
-    return null;
   }
 
   /**
@@ -374,7 +231,7 @@ public abstract class Serializer {
         // add namespace definitions
         byte[] empty = names.get(l);
         if(nsp != null) {
-          // collect namespaces from database
+          // add namespaces from database
           nsp.reset();
           int pp = p;
           do {
@@ -390,7 +247,7 @@ public abstract class Serializer {
             }
             pp = data.parent(pp, data.kind(pp));
           } while(pp >= 0 && data.kind(pp) == Data.ELEM &&
-              l == 0 && level == 1);
+              l == 0 && level == 0);
 
           // check namespace of current element
           final byte[] key = pref(name);
@@ -423,33 +280,37 @@ public abstract class Serializer {
   }
 
   /**
-   * Serializes a text.
-   * @param b text bytes
-   * @param ftp full-text positions, used for visualization highlighting
+   * Opens an element, adopting the expression name as element name.
+   * @param expr expression info
+   * @param a attributes
    * @throws IOException I/O exception
    */
-  private void text(final byte[] b, final FTPos ftp) throws IOException {
-    finishElement();
-    finishText(b, ftp);
+  public final void openElement(final ExprInfo expr, final byte[]... a)
+      throws IOException {
+    openElement(name(expr), a);
   }
 
   /**
-   * Serializes a text.
-   * @param b text bytes
-   * @param ftp full-text positions, used for visualization highlighting
+   * Opens and closes an empty element, adopting the expression name as
+   * element name.
+   * @param expr expression info
+   * @param a attributes
    * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
-  public void finishText(final byte[] b, final FTPos ftp) throws IOException {
-    text(b);
+  public final void emptyElement(final ExprInfo expr, final byte[]... a)
+      throws IOException {
+    emptyElement(name(expr), a);
   }
 
-  // OVERWRITABLE METHODS =====================================================
-
   /**
-   * Resets the serializer (indentation, etc).
+   * Returns the current level.
+   * @return level
    */
-  public void reset() { }
+  public final int level() {
+    return tags.size();
+  }
+
+  // OVERWRITABLE PUBLIC METHODS ==============================================
 
   /**
    * Starts a result.
@@ -473,6 +334,112 @@ public abstract class Serializer {
   public void close() throws IOException { }
 
   /**
+   * Serializes a namespace.
+   * @param n name
+   * @param v value
+   * @throws IOException I/O exception
+   */
+  public void namespace(final byte[] n, final byte[] v) throws IOException {
+    if(!undecl && n.length != 0 && v.length == 0) return;
+    final byte[] uri = ns(n);
+    if(uri == null || !eq(uri, v)) {
+      attribute(n.length == 0 ? XMLNS : concat(XMLNSC, n), v);
+      ns.add(n, v);
+    }
+  }
+
+  /**
+   * Tests if the serialization was interrupted.
+   * @return result of check
+   */
+  public boolean finished() {
+    return false;
+  }
+
+  /**
+   * Resets the serializer (indentation, etc).
+   */
+  public void reset() { }
+
+  /**
+   * Serializes an attribute.
+   * @param n name
+   * @param v value
+   * @throws IOException I/O exception
+   */
+  public abstract void attribute(final byte[] n, final byte[] v)
+      throws IOException;
+
+  // PROTECTED METHODS ========================================================
+
+  /**
+   * Starts an element.
+   * @param t tag
+   * @throws IOException I/O exception
+   */
+  protected abstract void startOpen(final byte[] t) throws IOException;
+
+  /**
+   * Finishes an opening element node.
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishOpen() throws IOException;
+
+  /**
+   * Closes an empty element.
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishEmpty() throws IOException;
+
+  /**
+   * Closes an element.
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishClose() throws IOException;
+
+  /**
+   * Serializes a text.
+   * @param b text bytes
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishText(final byte[] b) throws IOException;
+
+  /**
+   * Serializes a comment.
+   * @param b comment
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishComment(final byte[] b) throws IOException;
+
+  /**
+   * Serializes a processing instruction.
+   * @param n name
+   * @param v value
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishPi(final byte[] n, final byte[] v)
+      throws IOException;
+
+  /**
+   * Serializes an item.
+   * @param b text bytes
+   * @throws IOException I/O exception
+   */
+  protected abstract void finishItem(final Item b) throws IOException;
+
+  /**
+   * Serializes a text.
+   * @param b text bytes
+   * @param ftp full-text positions, used for visualization highlighting
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void finishText(final byte[] b, final FTPos ftp)
+      throws IOException {
+    text(b);
+  }
+
+  /**
    * Opens a document.
    * @param name name
    * @throws IOException I/O exception
@@ -494,6 +461,44 @@ public abstract class Serializer {
    */
   protected byte[] name(final ExprInfo expr) {
     return token(expr.name());
+  }
+
+  /**
+   * Returns the string representation of the specified item.
+   * @param it item to be atomized
+   * @return string
+   * @throws IOException I/O exception
+   */
+  protected final byte[] atom(final Item it) throws IOException {
+    try {
+      return it.atom(null);
+    } catch(final QueryException ex) {
+      throw new IOException(ex.getMessage(), ex);
+    }
+  }
+
+  // PRIVATE METHODS ==========================================================
+
+  /**
+   * Gets the URI currently bound by the given prefix.
+   * @param pre namespace prefix
+   * @return URI if found, {@code null} otherwise
+   */
+  private byte[] ns(final byte[] pre) {
+    for(int i = ns.size - 1; i >= 0; i--)
+      if(eq(ns.key[i], pre)) return ns.val[i];
+    return null;
+  }
+
+  /**
+   * Serializes a text.
+   * @param b text bytes
+   * @param ftp full-text positions, used for visualization highlighting
+   * @throws IOException I/O exception
+   */
+  private void text(final byte[] b, final FTPos ftp) throws IOException {
+    finishElement();
+    finishText(b, ftp);
   }
 
   /**

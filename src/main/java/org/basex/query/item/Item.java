@@ -222,7 +222,7 @@ public abstract class Item extends Value {
    * @throws IOException I/O exception
    */
   public void serialize(final Serializer ser) throws IOException {
-    // this method is overwritten by some items
+    // this method is overwritten by some data types
     ser.item(this);
   }
 

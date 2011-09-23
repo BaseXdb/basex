@@ -329,7 +329,7 @@ public final class NamespaceTest {
     query(
         "insert node doc('d3') into doc('d1')/x",
         "doc('d1')/x/*/*",
-        "<b:y xmlns:b='bb'/>");
+        "<b:y xmlns:b='bb' xmlns:a='aa'/>");
   }
 
   /**
@@ -446,7 +446,7 @@ public final class NamespaceTest {
   @Test
   public void queryPathOpt() throws BaseXException {
     create(17);
-    query("doc('d17')/descendant::*:b", "<b/>");
+    query("doc('d17')/descendant::*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**
@@ -456,7 +456,7 @@ public final class NamespaceTest {
   @Test
   public void queryPathOpt2() throws BaseXException {
     create(17);
-    query("doc('d17')/*:a/*:b", "<b/>");
+    query("doc('d17')/*:a/*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**
