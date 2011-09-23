@@ -207,9 +207,11 @@ public final class DigitalSignature {
     b = type;
     if(b.length == 0)
       b = SIGNATURETYPES[DEFAULT];
-    else if(!eq(b, SIGNATURETYPES))
-      CRYPTOSIGTYPINV.thrw(input, b);
-    final String ST = "enveloped";
+//    l = SIGNATURETYPES.length;
+//    while(i < l && !eq(SIGNATURES[i], b)) i++;
+//    if(i == l)
+//      CRYPTOSIGINV.thrw(input, b);
+//    final String ST = SIGNATUREMETHODS[i];
 
     ANode signedNode = null;
 
@@ -217,10 +219,14 @@ public final class DigitalSignature {
 
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       // TODO problem poss. due to empty reference?
-      final Reference ref = fac.newReference("",
-          fac.newDigestMethod(DA, null), Collections.
-          singletonList(fac.newTransform(Transform.ENVELOPED,
-              (TransformParameterSpec) null)), null, null);
+      Reference ref = null;
+      if(xpathExpr.length == 0)
+        ref = fac.newReference("",
+            fac.newDigestMethod(DA, null), Collections.
+            singletonList(fac.newTransform(Transform.ENVELOPED,
+                (TransformParameterSpec) null)), null, null);
+      else
+        CRYPTONOTSUPP.thrw(input, xpathExpr);
 
       final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CM,
               (C14NMethodParameterSpec) null),

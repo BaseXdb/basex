@@ -212,6 +212,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
 
   @Test
   public void validateSignatureWithCertificate() {
+    // Command to create java keystore
+    // keytool -genkey -keyalg RSA -alias basexselfsigned -keystore
+    // keystore.jks -storepass password -validity 360
+
     final String certificate =
         "<digital-certificate>" +
         "<keystore-type>JKS</keystore-type>" +
