@@ -69,7 +69,7 @@ public class RESTPost extends RESTCode {
       try {
         // handle serialization parameters
         final TokenBuilder ser = new TokenBuilder();
-        qp = new QueryProcessor(".//*:parameter", node, context);
+        qp = new QueryProcessor("*:parameter", node, context);
         Iter ir = qp.iter();
         for(Item param; (param = ir.next()) != null;) {
           final String name = value("data(@name)", param, context);
@@ -86,7 +86,7 @@ public class RESTPost extends RESTCode {
 
         // handle variables
         final Map<String, String[]> vars = new HashMap<String, String[]>();
-        qp = new QueryProcessor(".//*:variable", node, context);
+        qp = new QueryProcessor("*:variable", node, context);
         ir = qp.iter();
         for(Item var; (var = ir.next()) != null;) {
           final String name = value("data(@name)", var, context);
@@ -97,7 +97,7 @@ public class RESTPost extends RESTCode {
 
         // handle input
         byte[] item = null;
-        qp = new QueryProcessor(".//*:context/node()", node, context);
+        qp = new QueryProcessor("*:context/node()", node, context);
         ir = qp.iter();
         for(Item n; (n = ir.next()) != null;) {
           if(item != null) throw new RESTException(SC_BAD_REQUEST, ERR_CTXITEM);
@@ -109,7 +109,7 @@ public class RESTPost extends RESTCode {
         }
 
         // handle request
-        final String request = value("name(.)", node, context);
+        final String request = value("local-name(.)", node, context);
         final String text = value("*:text/text()", node, context);
         if(request.equals(COMMAND)) {
           code = new RESTCommand(text);
@@ -165,21 +165,21 @@ public class RESTPost extends RESTCode {
     add("let $input := parse-xml(.)/* return ( ").
     add("n:c(every $x in $input/self::* satisfies namespace-uri($x) eq $n, ").
     add("\"Nodes must belong to \"\"\" || $n || \"\"\" namespace.\"), ").
-    add("n:c(name($input) = ('query','command','run'), ").
+    add("n:c(local-name($input) = ('query','command','run'), ").
     add("\"Invalid request: <\" || name($input) || \"/>.\"), ").
     add("n:c($input/*:text, 'Missing <text/> element.'), ").
     add("n:c($input/*:text/text(), '<text/> element has no content.'), ").
     add("for $ch in $input/* return ( ").
-    add("n:c(name($ch) = ('text', 'parameter', ").
-    add("if(name($input) = 'command') then () else ('context','variable')), ").
+    add("n:c(local-name($ch) = ('text', 'parameter', ").
+    add("if(local-name($input) = 'command') then () else ('context','variable')), ").
     add("\"Invalid child: <\" || name($ch) || \"/>.\"), ").
     add("for $p in $ch/(self::*:parameter|self::*:variable) ").
-    add("let $atts := ('name','value', if(name($p) = 'parameter') ").
+    add("let $atts := ('name','value', if(local-name($p) = 'parameter') ").
     add("then () else 'type') return ( ").
     add("n:c($p/@name, '''name'' attribute missing.'), ").
     add("n:c($p/@value, '''value'' attribute missing.'), ").
     add("for $a in $p/@* return ").
-    add("n:c(name($a) = $atts, ").
+    add("n:c(local-name($a) = $atts, ").
     add("\"Invalid attribute: @\" || name($a) || \".\") ").
     add(")),$input)").toString();
 }
