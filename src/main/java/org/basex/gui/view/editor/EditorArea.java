@@ -95,7 +95,7 @@ final class EditorArea extends BaseXEditor {
     if(eq && !force) return;
     view.refresh(mod || !eq, false);
     view.pos.setText(pos());
-    gui.set(Prop.QUERYPATH, file);
+    gui.context.prop.set(Prop.QUERYPATH, file.path());
     last = in;
 
     if(file.isXML()) {
