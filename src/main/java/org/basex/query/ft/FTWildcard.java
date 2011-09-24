@@ -1,7 +1,7 @@
 package org.basex.query.ft;
 
 import static org.basex.query.util.Err.*;
-
+import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 
@@ -24,12 +24,14 @@ public class FTWildcard {
 
   /**
    * Parse and construct a new wild card expression.
-   * @param q input wild card expression
+   * @param query input wild card expression
    * @param ii input info
    * @throws QueryException {@link org.basex.query.util.Err#FTREG}, if the wild
    * card expression is not valid
    */
-  public FTWildcard(final byte[] q, final InputInfo ii) throws QueryException {
+  public FTWildcard(final byte[] query, final InputInfo ii)
+      throws QueryException {
+    final char[] q = string(query).toCharArray();
     final int[] tmpchars = new int[q.length];
     final int[] tmpmin = new int[q.length];
     final int[] tmpmax = new int[q.length];
@@ -39,7 +41,7 @@ public class FTWildcard {
     while(ql < q.length) {
       // parse wildcards
       if(q[ql] == '.') {
-        byte c = ++ql < q.length ? q[ql] : 0;
+        char c = ++ql < q.length ? q[ql] : 0;
         // minimum/maximum number of occurrence
         int n = 0;
         int m = Integer.MAX_VALUE;
@@ -94,7 +96,7 @@ public class FTWildcard {
    * @return <code>true</code> if a match is found
    */
   public boolean match(final byte[] t) {
-    return match(t, 0, 0);
+    return match(string(t).toCharArray(), 0, 0);
   }
 
   /**
@@ -104,7 +106,7 @@ public class FTWildcard {
    * @param qp query position
    * @return <code>true</code> if a match is found
    */
-  private boolean match(final byte[] t, final int tp, final int qp) {
+  private boolean match(final char[] t, final int tp, final int qp) {
     int ql = qp;
     int tl = tp;
     while(ql < chars.length) {
