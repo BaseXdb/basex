@@ -6,7 +6,7 @@ import static org.basex.api.rest.RESTText.*;
 import java.io.IOException;
 import java.util.Map;
 
-import org.basex.data.DataText;
+import org.basex.io.MimeTypes;
 import org.basex.io.in.ArrayInput;
 import org.basex.server.Session;
 
@@ -27,7 +27,7 @@ public class RESTPut extends RESTCode {
     if(ctx.depth() == 0) throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
 
     final String ct = ctx.req.getContentType();
-    final boolean xml = ct == null || DataText.APP_XML.equals(ct);
+    final boolean xml = ct == null || MimeTypes.APP_XML.equals(ct);
     if(ctx.depth() == 1) {
       // store data as XML or raw file, depending on content type
       if(xml) {

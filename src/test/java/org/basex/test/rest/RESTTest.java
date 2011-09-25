@@ -1,9 +1,9 @@
 package org.basex.test.rest;
 
-import static org.basex.data.DataText.*;
-import static org.basex.query.func.Function.*;
 import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
+import static org.basex.io.MimeTypes.*;
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -20,6 +20,7 @@ import java.net.URL;
 import org.basex.api.BaseXHTTP;
 import org.basex.api.rest.RESTText;
 import org.basex.core.BaseXException;
+import org.basex.data.DataText;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.ArrayOutput;
@@ -482,7 +483,7 @@ public class RESTTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod("POST");
-    conn.setRequestProperty(CONTENT_TYPE, APP_XML);
+    conn.setRequestProperty(DataText.CONTENT_TYPE, APP_XML);
     // basic authentication example
     final String encoded = Base64.encode(ADMIN + ':' + ADMIN);
     conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' + encoded);
@@ -527,7 +528,7 @@ public class RESTTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod("PUT");
-    if(ctype != null) conn.setRequestProperty(CONTENT_TYPE, ctype);
+    if(ctype != null) conn.setRequestProperty(DataText.CONTENT_TYPE, ctype);
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     if(is != null) {
       // send input stream if it not empty

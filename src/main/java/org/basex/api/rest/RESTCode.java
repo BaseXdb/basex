@@ -3,6 +3,7 @@ package org.basex.api.rest;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.data.DataText.*;
+import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.IOException;
