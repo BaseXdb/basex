@@ -14,7 +14,7 @@ import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Open;
-import org.basex.data.DataText;
+import org.basex.io.in.ResettableInput;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
@@ -142,11 +142,12 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         s.execute(new Open(db));
         final String doc = path.isEmpty() ? newName : path + SEP + newName;
         // check if document with this path already exists
-        if(count(s, db, doc) == 0) {
-          addFile(s, newName, input, contentType);
-          deleteDummy(s, db, path);
-        } else {
+        System.out.println(doc);
+        if(pathExists(s, db, doc)) {
           s.replace(doc, input);
+        } else {
+          addFile(s, newName, input);
+          deleteDummy(s, db, path);
         }
         return new BXDocument(db, doc, session, isRaw(s, db, doc));
       }
@@ -154,42 +155,32 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   /**
-   * Add file content in the current folder.
+   * Adds a file in the current folder.
    * @param s active session
    * @param n file name
    * @param in file content
-   * @param mime content type
    * @throws IOException I/O exception
    */
-  protected void addFile(final Session s, final String n, final InputStream in,
-      final String mime)
+  protected void addFile(final Session s, final String n, final InputStream in)
       throws IOException {
 
-    // decide if file will be added as an XML document or raw file
-    final String c = contentType(n);
-    if(c == null && DataText.APP_OCTET.equals(mime)) {
-      final BufferedInputStream bi = new BufferedInputStream(in);
-      bi.mark(BufferedInputStream.MAX);
-      try {
-        addXML(s, n, bi);
-      } catch(final IOException e) {
-        if(bi.pos() >= BufferedInputStream.MAX) throw e;
-        bi.reset();
-        addRaw(s, n, bi);
-      } finally {
-        if(bi.pos() < BufferedInputStream.MAX) bi.reset();
-        bi.close();
-      }
-    } else {
-      if(mime.contains("xml"))
-        addXML(s, n, in);
-      else
-        addRaw(s, n, in);
+    // try to add every document as XML
+    final ResettableInput bi = new ResettableInput(in);
+    bi.mark(ResettableInput.MAX);
+    try {
+      addXML(s, n, bi);
+    } catch(final IOException ex) {
+      if(bi.pos() >= ResettableInput.MAX) throw ex;
+      bi.reset();
+      addRaw(s, n, bi);
+    } finally {
+      if(bi.pos() < ResettableInput.MAX) bi.reset();
+      bi.close();
     }
   }
 
   /**
-   * Add XML document in the current folder.
+   * Adds an XML document in the current folder.
    * @param s active session
    * @param n file name
    * @param in file content
@@ -201,7 +192,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   /**
-   * Add raw file in the current folder.
+   * Adds a raw file in the current folder.
    * @param s active session
    * @param n file name
    * @param in file content
@@ -230,7 +221,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   /**
-   * Add all documents in the folder to another folder.
+   * Adds all documents in the folder to another folder.
    * @param s current session
    * @param trgdb target database
    * @param trgdir target folder
@@ -258,38 +249,3 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 }
 
-/**
- * Simple wrapper around {@link java.io.BufferedInputStream} which provides the
- * following extensions:<br/>
- * 1) the current position of the input stream is accessible<br/>
- * 2) {@link #close()} does nothing, if {@link #mark(int)} has been called, and
- * {@link #reset()} not, yet.
- *
- * @author BaseX Team 2005-11, BSD License
- * @author Dimitar Popov
- */
-class BufferedInputStream extends java.io.BufferedInputStream {
-  /** Max number of resettable bytes. */
-  public static final int MAX = 1000000;
-
-  /**
-   * Constructor.
-   * @param input wrapped input stream.
-   */
-  public BufferedInputStream(final InputStream input) {
-    super(input);
-  }
-
-  /**
-   * Current position of the input stream.
-   * @return position
-   */
-  public int pos() {
-    return pos;
-  }
-
-  @Override
-  public void close() {
-    if(markpos < 0 || markpos == pos) close();
-  }
-}

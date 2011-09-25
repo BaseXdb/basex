@@ -3,12 +3,14 @@ package org.basex.api.rest;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.data.DataText.*;
+import static org.basex.query.func.Function.*;
 
 import java.io.IOException;
 
 import org.basex.core.Text;
 import org.basex.core.cmd.Open;
 import org.basex.io.serial.SerializerProp;
+import org.basex.server.Query;
 import org.basex.util.Util;
 
 /**
@@ -31,7 +33,7 @@ abstract class RESTCode {
    * @param ctx rest context
    * @param sprop serialization properties
    */
-  void initOutput(final SerializerProp sprop, final RESTContext ctx) {
+  void initResponse(final SerializerProp sprop, final RESTContext ctx) {
     // set encoding
     ctx.res.setCharacterEncoding(sprop.get(SerializerProp.S_ENCODING));
 
@@ -81,5 +83,46 @@ abstract class RESTCode {
       throw new RESTException(SC_BAD_REQUEST, SerializerProp.error(WRAP,
           val, Text.YES, Text.NO).getMessage());
     }
+  }
+
+  /**
+   * Checks if any resource with the specified name exists.
+   * @param ctx REST context
+   * @return number of documents
+   * @throws IOException I/O exception
+   */
+  protected static boolean exists(final RESTContext ctx) throws IOException {
+    final Query q = ctx.session.query(DBEXISTS.args("$d", "$p"));
+    q.bind("d", ctx.db());
+    q.bind("p", ctx.dbpath());
+    return q.execute().equals(Text.TRUE);
+  }
+
+  /**
+   * Checks if the specified path points to a binary resource.
+   * @param ctx REST context
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  protected static boolean isRaw(final RESTContext ctx) throws IOException {
+    final Query q = ctx.session.query(DBISRAW.args("$d", "$p"));
+    q.bind("d", ctx.db());
+    q.bind("p", ctx.dbpath());
+    return q.execute().equals(Text.TRUE);
+  }
+
+  /**
+   * Returns the content type of a database resource.
+   * @param ctx REST context
+   * @return content type
+   * @throws IOException I/O exception
+   */
+  protected static String contentType(final RESTContext ctx)
+      throws IOException {
+
+    final Query q = ctx.session.query(DBCTYPE.args("$d", "$p"));
+    q.bind("d", ctx.db());
+    q.bind("p", ctx.dbpath());
+    return q.execute();
   }
 }

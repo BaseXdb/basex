@@ -49,22 +49,20 @@ final class RESTGet extends RESTCode {
         // wrapping flag
         wrap(val, ctx);
       } else if(key.equals(CONTEXT)) {
-        // wrapping flag
+        // context parameter
         item = Token.token(val);
-      } else {
+      } else if(sp.get(key) != null) {
         // serialization parameters
-        if(sp.get(key) != null) {
-          for(final String v : vals) ser.add(key).add('=').add(v).add(',');
-        } else {
-          throw new RESTException(SC_BAD_REQUEST, ERR_PARAM + key);
-        }
+        for(final String v : vals) ser.add(key).add('=').add(v).add(',');
+      } else {
+        throw new RESTException(SC_BAD_REQUEST, ERR_PARAM + key);
       }
     }
     ctx.serialization = ser.toString();
 
     final RESTCode code;
     if(operation == null) {
-      code = new RESTList();
+      code = new RESTRetrieve();
     } else if(operation.equals(QUERY)) {
       code = new RESTQuery(input, vars, item);
     } else if(operation.equals(RUN)) {

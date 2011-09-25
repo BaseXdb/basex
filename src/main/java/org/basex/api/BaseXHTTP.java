@@ -95,11 +95,11 @@ public final class BaseXHTTP {
       }
     }
 
-    if(HTTPSession.client()) {
+    if(HTTPSession.local()) {
+      Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
+    } else {
       server = new BaseXServer(context, quiet ? "-z" : "");
       Util.outln(HTTP + ' ' + SERVERSTART);
-    } else {
-      Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
     }
 
     jetty = new Server(hport);
@@ -137,9 +137,6 @@ public final class BaseXHTTP {
       if(arg.dash()) {
         final char c = arg.next();
         switch(c) {
-          case 'c':
-            System.setProperty(DBCLIENT, Boolean.toString(true));
-            break;
           case 'd':
             ctx.mprop.set(MainProp.DEBUG, true);
             break;
@@ -148,6 +145,9 @@ public final class BaseXHTTP {
             break;
           case 'h':
             ctx.mprop.set(MainProp.HTTPPORT, arg.num());
+            break;
+          case 'l':
+            System.setProperty(DBLOCAL, Boolean.toString(true));
             break;
           case 'n':
             ctx.mprop.set(MainProp.HOST, arg.num());

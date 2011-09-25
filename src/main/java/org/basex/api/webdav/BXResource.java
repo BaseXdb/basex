@@ -1,10 +1,8 @@
 package org.basex.api.webdav;
 
 import static org.basex.query.func.Function.*;
-import static java.lang.Integer.*;
 
 import java.io.IOException;
-import java.net.URLConnection;
 import java.util.Date;
 
 import org.basex.api.HTTPSession;
@@ -131,40 +129,6 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Count documents which paths start with the given path.
-   * @param s active client session
-   * @param db database
-   * @param path path
-   * @return number of documents
-   * @throws IOException I/O exception
-   */
-  static int count(final Session s, final String db, final String path)
-      throws IOException {
-    final Query q = s.query(COUNT.args(DBLIST.args("$d", "$p")));
-    q.bind("d", db);
-    q.bind("p", path);
-    return parseInt(q.execute());
-  }
-
-  /**
-   * Checks if a document with the specified name exists.
-   * @param s active client session
-   * @param db database name
-   * @param p resource path
-   * @return number of documents
-   * @throws IOException I/O exception
-   */
-  static boolean exists(final Session s, final String db, final String p)
-      throws IOException {
-
-    final String path = stripLeadingSlash(p);
-    final Query q = s.query(EXISTS.args(DBLIST.args("$d", "$b") + "[. = $p]"));
-    q.bind("d", db);
-    q.bind("p", path);
-    return Boolean.parseBoolean(q.execute());
-  }
-
-  /**
    * Check a folder for a dummy document and delete it.
    * @param s active client session
    * @param db database name
@@ -176,7 +140,7 @@ public abstract class BXResource implements Resource {
       throws IOException {
 
     final String dummy = p + SEP + DUMMY;
-    if(count(s, db, dummy) == 0) return false;
+    if(!pathExists(s, db, dummy)) return false;
 
     // path contains dummy document
     s.execute(new Open(db));
@@ -195,8 +159,8 @@ public abstract class BXResource implements Resource {
    */
   static boolean createDummy(final Session s, final String db, final String p)
       throws IOException {
-    // check, if path is a folder and is empty
-    if(p.matches("[^/]") || count(s, db, p) > 0) return false;
+    // check if path is a folder and is empty
+    if(p.matches("[^/]") || pathExists(s, db, p)) return false;
 
     s.execute(new Open(db));
     s.execute(new Add(DUMMYCONTENT, DUMMY, p));
@@ -217,16 +181,47 @@ public abstract class BXResource implements Resource {
 
     try {
       // check if there is a document in the collection having this path
-      if(exists(s, db, path)) {
+      if(exists(s, db, path))
         return new BXDocument(db, path, hs, isRaw(s, db, path));
-      }
-
       // check if there are paths in the collection starting with this path
-      if(count(s, db, path) > 0) return new BXFolder(db, path, hs);
+      if(pathExists(s, db, path)) return new BXFolder(db, path, hs);
     } catch(final IOException ex) {
       Util.errln(ex);
     }
     return null;
+  }
+
+  /**
+   * Check if any resources start with the given path.
+   * @param s active client session
+   * @param db database
+   * @param path path
+   * @return number of documents
+   * @throws IOException I/O exception
+   */
+  static boolean pathExists(final Session s, final String db, final String path)
+      throws IOException {
+    final Query q = s.query(COUNT.args(DBLIST.args("$d", "$p")));
+    q.bind("d", db);
+    q.bind("p", path);
+    return !q.execute().equals("0");
+  }
+
+  /**
+   * Checks if any resource with the specified name exists.
+   * @param s active client session
+   * @param db database name
+   * @param p resource path
+   * @return number of documents
+   * @throws IOException I/O exception
+   */
+  static boolean exists(final Session s, final String db, final String p)
+      throws IOException {
+
+    final Query q = s.query(DBEXISTS.args("$d", "$p"));
+    q.bind("d", db);
+    q.bind("p", p);
+    return q.execute().equals(Text.TRUE);
   }
 
   /**
@@ -247,7 +242,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Get content type of a database resource.
+   * Returns the content type of a database resource.
    * @param s active session
    * @param db database name
    * @param p resource path
@@ -260,14 +255,5 @@ public abstract class BXResource implements Resource {
     q.bind("d", db);
     q.bind("p", p);
     return q.execute();
-  }
-
-  /**
-   * Get content type of a file using its name.
-   * @param n file name
-   * @return content type
-   */
-  static String contentType(final String n) {
-    return URLConnection.getFileNameMap().getContentTypeFor(n);
   }
 }

@@ -1,5 +1,6 @@
 package org.basex.api.rest;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
@@ -7,6 +8,8 @@ import java.io.IOException;
 
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
+import org.basex.core.cmd.Retrieve;
+import org.basex.data.DataText;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
 import org.basex.server.Session;
@@ -19,34 +22,55 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class RESTList extends RESTCode {
+final class RESTRetrieve extends RESTCode {
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
-    // try to open addressed database
+    // open addressed database
     open(ctx);
-
-    final SerializerProp sprop = new SerializerProp(ctx.serialization);
-    final Serializer ser = Serializer.get(ctx.out, sprop);
-    initOutput(sprop, ctx);
 
     final Session session = ctx.session;
     if(ctx.depth() == 0) {
-      // retrieve databases
+      // list databases
       final Table table = new Table(session.execute(new List()));
+      final SerializerProp sprop = new SerializerProp(ctx.serialization);
+      final Serializer ser = Serializer.get(ctx.out, sprop);
+      initResponse(sprop, ctx);
       ser.openElement(DATABASES, RESOURCES, token(table.contents.size()));
       ser.namespace(REST, RESTURI);
       list(table, ser, DATABASE, 1);
       ser.closeElement();
-    } else {
-      // retrieve database resources
+      ser.close();
+    } else if(!exists(ctx)) {
+      // list database resources
       final Table table = new Table(session.execute(new ListDB(ctx.all())));
-      ser.openElement(DATABASE, NAME, token(ctx.db()),
+      if(table.contents.size() == 0)
+        throw new RESTException(SC_NOT_FOUND, ERR_NORES);
+
+      final String serial = ctx.serialization;
+      final SerializerProp sprop = new SerializerProp(serial);
+      final Serializer ser = Serializer.get(ctx.out, sprop);
+      initResponse(sprop, ctx);
+
+      ser.openElement(DATABASE, DataText.NAME, token(ctx.db()),
         RESOURCES, token(table.contents.size()));
       ser.namespace(REST, RESTURI);
       list(table, ser, RESOURCE, 0);
       ser.closeElement();
+      ser.close();
+    } else if(isRaw(ctx)) {
+      // retrieve raw file; prefix user parameters with media type
+      final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + contentType(ctx);
+      initResponse(new SerializerProp(ct + "," + ctx.serialization), ctx);
+      session.setOutputStream(ctx.out);
+      session.execute(new Retrieve(ctx.dbpath()));
+    } else {
+      // retrieve xml file
+      // initializes the output
+      initResponse(new SerializerProp(ctx.serialization), ctx);
+      session.setOutputStream(ctx.out);
+      session.query(".").execute();
+
     }
-    ser.close();
   }
 
   /**

@@ -4,13 +4,11 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.basex.api.HTTPSession;
 import org.basex.core.Context;
-import org.basex.data.DataText;
 import org.basex.data.Result;
 import org.basex.io.IOContent;
 import org.basex.io.in.BufferInput;
@@ -24,7 +22,6 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.DataBuilder;
-import org.basex.server.Session;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.ByteList;
@@ -41,103 +38,85 @@ public class RESTPost extends RESTCode {
     final Map<?, ?> map = ctx.req.getParameterMap();
     if(map.size() != 0) throw new RESTException(SC_BAD_REQUEST, ERR_NOPARAM);
 
-    final InputStream is = ctx.req.getInputStream();
     String enc = ctx.req.getCharacterEncoding();
     if(enc == null) enc = Token.UTF8;
 
-    if(DataText.APP_QUERYXML.equals(ctx.req.getContentType())) {
-      // perform queries
-      final BufferInput bis = new BufferInput(is);
-      final ByteList bl = new ByteList();
-      for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
-      final IOContent cont = new IOContent(bl.toArray());
-      final String input = TextInput.content(cont, enc).toString();
+    // perform queries
+    final BufferInput bis = new BufferInput(ctx.in);
+    final ByteList bl = new ByteList();
+    for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
+    final IOContent cont = new IOContent(bl.toArray());
+    final String input = TextInput.content(cont, enc).toString();
 
-      final Context context = HTTPSession.context();
-      Result node = null;
-      try {
-        node = new QueryProcessor(CHECK, input, context).execute();
-      } catch(final QueryException ex) {
-        throw new RESTException(SC_BAD_REQUEST, ex.getMessage().
-            replaceAll("\\r?\\n+", " ").replaceAll(".*\\[\\w+\\d*\\] ", ""));
-      }
+    final Context context = HTTPSession.context();
+    Result node = null;
+    try {
+      node = new QueryProcessor(CHECK, input, context).execute();
+    } catch(final QueryException ex) {
+      throw new RESTException(SC_BAD_REQUEST, ex.getMessage().
+          replaceAll("\\r?\\n+", " ").replaceAll(".*\\[\\w+\\d*\\] ", ""));
+    }
 
-      final SerializerProp sp = new SerializerProp();
-      QueryProcessor qp;
-      RESTCode code = null;
+    final SerializerProp sp = new SerializerProp();
+    QueryProcessor qp;
+    RESTCode code = null;
 
-      try {
-        // handle serialization parameters
-        final TokenBuilder ser = new TokenBuilder();
-        qp = new QueryProcessor("*:parameter", node, context);
-        Iter ir = qp.iter();
-        for(Item param; (param = ir.next()) != null;) {
-          final String name = value("data(@name)", param, context);
-          final String value = value("data(@value)", param, context);
-          if(sp.get(name) != null) {
-            ser.add(name).add('=').add(value).add(',');
-          } else if(name.equals("wrap")) {
-            wrap(value, ctx);
-          } else {
-            throw new RESTException(SC_BAD_REQUEST, ERR_PARAM + name);
-          }
-        }
-        ctx.serialization = ser.toString();
-
-        // handle variables
-        final Map<String, String[]> vars = new HashMap<String, String[]>();
-        qp = new QueryProcessor("*:variable", node, context);
-        ir = qp.iter();
-        for(Item var; (var = ir.next()) != null;) {
-          final String name = value("data(@name)", var, context);
-          final String value = value("data(@value)", var, context);
-          final String type = value("data(@type)", var, context);
-          vars.put(name, new String[] { value, type });
-        }
-
-        // handle input
-        byte[] item = null;
-        qp = new QueryProcessor("*:context/node()", node, context);
-        ir = qp.iter();
-        for(Item n; (n = ir.next()) != null;) {
-          if(item != null) throw new RESTException(SC_BAD_REQUEST, ERR_CTXITEM);
-          // create main memory instance of the specified node
-          n = DataBuilder.stripNS((ANode) n, RESTURI, qp.ctx);
-          final ArrayOutput ao = new ArrayOutput();
-          n.serialize(Serializer.get(ao));
-          item = ao.toArray();
-        }
-
-        // handle request
-        final String request = value("local-name(.)", node, context);
-        final String text = value("*:text/text()", node, context);
-        if(request.equals(COMMAND)) {
-          code = new RESTCommand(text);
-        } else if(request.equals(RUN)) {
-          code = new RESTRun(text, vars, item);
+    try {
+      // handle serialization parameters
+      final TokenBuilder ser = new TokenBuilder();
+      qp = new QueryProcessor("*:parameter", node, context);
+      Iter ir = qp.iter();
+      for(Item param; (param = ir.next()) != null;) {
+        final String name = value("data(@name)", param, context);
+        final String value = value("data(@value)", param, context);
+        if(sp.get(name) != null) {
+          ser.add(name).add('=').add(value).add(',');
+        } else if(name.equals("wrap")) {
+          wrap(value, ctx);
         } else {
-          code = new RESTQuery(text, vars, item);
+          throw new RESTException(SC_BAD_REQUEST, ERR_PARAM + name);
         }
-        code.run(ctx);
-      } catch(final QueryException ex) {
-        throw new RESTException(SC_BAD_REQUEST, ex.getMessage().
-            replaceAll("\\r?\\n+", " ").replaceAll(".*\\[\\w+\\d*\\] ", ""));
       }
-    } else {
-      if(ctx.depth() < 2) throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
-      // add resources
-      open(ctx);
-      String name = ctx.dbpath();
-      String path = "";
-      final int i = name.indexOf('/');
-      if(i != -1) {
-        path = name.substring(0, i);
-        name = name.substring(i + 1);
+      ctx.serialization = ser.toString();
+
+      // handle variables
+      final Map<String, String[]> vars = new HashMap<String, String[]>();
+      qp = new QueryProcessor("*:variable", node, context);
+      ir = qp.iter();
+      for(Item var; (var = ir.next()) != null;) {
+        final String name = value("data(@name)", var, context);
+        final String value = value("data(@value)", var, context);
+        final String type = value("data(@type)", var, context);
+        vars.put(name, new String[] { value, type });
       }
-      final Session session = ctx.session;
-      session.add(name, path, ctx.req.getInputStream());
-      // return correct status and command info
-      throw new RESTException(SC_CREATED, session.info());
+
+      // handle input
+      byte[] item = null;
+      qp = new QueryProcessor("*:context/node()", node, context);
+      ir = qp.iter();
+      for(Item n; (n = ir.next()) != null;) {
+        if(item != null) throw new RESTException(SC_BAD_REQUEST, ERR_CTXITEM);
+        // create main memory instance of the specified node
+        n = DataBuilder.stripNS((ANode) n, RESTURI, qp.ctx);
+        final ArrayOutput ao = new ArrayOutput();
+        n.serialize(Serializer.get(ao));
+        item = ao.toArray();
+      }
+
+      // handle request
+      final String request = value("local-name(.)", node, context);
+      final String text = value("*:text/text()", node, context);
+      if(request.equals(COMMAND)) {
+        code = new RESTCommand(text);
+      } else if(request.equals(RUN)) {
+        code = new RESTRun(text, vars, item);
+      } else {
+        code = new RESTQuery(text, vars, item);
+      }
+      code.run(ctx);
+    } catch(final QueryException ex) {
+      throw new RESTException(SC_BAD_REQUEST, ex.getMessage().
+          replaceAll("\\r?\\n+", " ").replaceAll(".*\\[\\w+\\d*\\] ", ""));
     }
   }
 

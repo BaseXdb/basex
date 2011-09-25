@@ -6,6 +6,8 @@ import static org.basex.api.rest.RESTText.*;
 import java.io.IOException;
 import java.util.Map;
 
+import org.basex.data.DataText;
+import org.basex.io.in.ArrayInput;
 import org.basex.server.Session;
 
 /**
@@ -22,14 +24,28 @@ public class RESTPut extends RESTCode {
 
     // create new database or update resource
     final Session session = ctx.session;
-    if(ctx.depth() == 0) {
-      throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
-    } else if(ctx.depth() == 1) {
-      session.create(ctx.db(), ctx.req.getInputStream());
+    if(ctx.depth() == 0) throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
+
+    final String ct = ctx.req.getContentType();
+    final boolean xml = ct == null || DataText.APP_XML.equals(ct);
+    if(ctx.depth() == 1) {
+      // store data as XML or raw file, depending on content type
+      if(xml) {
+        session.create(ctx.db(), ctx.in);
+      } else {
+        session.create(ctx.db(), new ArrayInput(""));
+        session.store(ctx.db(), ctx.in);
+      }
     } else {
       open(ctx);
-      session.replace(ctx.dbpath(), ctx.req.getInputStream());
+      // store data as XML or raw file, depending on content type
+      if(xml) {
+        session.replace(ctx.dbpath(), ctx.in);
+      } else {
+        session.store(ctx.dbpath(), ctx.in);
+      }
     }
+
     // return correct status and command info
     throw new RESTException(SC_CREATED, session.info());
   }

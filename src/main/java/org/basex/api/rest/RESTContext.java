@@ -1,9 +1,11 @@
 package org.basex.api.rest;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.HTTPText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +28,8 @@ final class RESTContext {
   protected final HttpServletResponse res;
   /** Output stream. */
   protected final OutputStream out;
+  /** Input stream. */
+  protected final InputStream in;
   /** Database session. */
   protected Session session;
 
@@ -48,6 +52,7 @@ final class RESTContext {
 
     req = rq;
     res = rs;
+    in = req.getInputStream();
     out = res.getOutputStream();
     res.setCharacterEncoding(UTF8);
 
@@ -126,7 +131,7 @@ final class RESTContext {
   void status(final int code, final String message) throws IOException {
     if(session != null) session.close();
     res.setStatus(code);
-    if(code == 401) res.setHeader(WWW_AUTHENTICATE, BASIC);
+    if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
     if(message != null) out.write(token(message));
   }
 }

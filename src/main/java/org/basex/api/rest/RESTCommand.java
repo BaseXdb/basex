@@ -26,12 +26,12 @@ public class RESTCommand extends RESTCode {
 
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
-    // try to open addressed database
+    // open addressed database
     open(ctx);
     // set default content type to raw
     final String sprop = SerializerProp.S_METHOD[0] + "=" + DataText.M_TEXT +
         "," + ctx.serialization;
-    initOutput(new SerializerProp(sprop), ctx);
+    initResponse(new SerializerProp(sprop), ctx);
 
     // perform command
     final Session session = ctx.session;

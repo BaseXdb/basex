@@ -93,7 +93,7 @@ public class BXRootResource extends BXFolder {
     return new BXCode<BXDatabase>(this) {
       @Override
       public BXDatabase get() throws IOException {
-        addFile(s, newName, input, contentType);
+        addFile(s, newName, input);
         s.execute(new Close());
         return new BXDatabase(dbname(newName), session);
       }

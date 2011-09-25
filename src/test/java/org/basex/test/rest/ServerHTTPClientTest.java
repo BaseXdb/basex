@@ -15,6 +15,6 @@ public class ServerHTTPClientTest extends HTTPClientTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(true);
+    init(false);
   }
 }

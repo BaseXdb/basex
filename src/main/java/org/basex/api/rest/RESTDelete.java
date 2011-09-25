@@ -23,7 +23,7 @@ public class RESTDelete extends RESTCode {
     final Map<?, ?> map = ctx.req.getParameterMap();
     if(map.size() != 0) throw new RESTException(SC_BAD_REQUEST, ERR_NOPARAM);
 
-    // try to open addressed database
+    // open addressed database
     open(ctx);
 
     final Session session = ctx.session;

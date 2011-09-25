@@ -1,5 +1,6 @@
 package org.basex.test.rest;
 
+import static org.basex.data.DataText.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
@@ -18,9 +19,7 @@ import java.net.URL;
 
 import org.basex.api.BaseXHTTP;
 import org.basex.api.rest.RESTText;
-import org.basex.core.MainProp;
-import org.basex.core.Text;
-import org.basex.data.DataText;
+import org.basex.core.BaseXException;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.ArrayOutput;
@@ -48,7 +47,7 @@ public class RESTTest {
       "<" + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
   /** Root path. */
   private static final String ROOT =
-      "http://" + LOCALHOST + ":" + MainProp.HTTPPORT[1] + "/" + NAME + "/";
+      "http://" + LOCALHOST + ":9998/" + NAME + "/";
   /** Input file. */
   private static final String FILE = "etc/test/input.xml";
   /** Start servers. */
@@ -62,17 +61,17 @@ public class RESTTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(false);
+    init(true);
   }
 
   /**
    * Initializes the test.
-   * @param client client/server flag
+   * @param local local flag
    * @throws Exception exception
    */
-  public static void init(final boolean client) throws Exception {
-    final String cs = client ? "-c" : "";
-    http = new BaseXHTTP(cs + " -zU" + Text.ADMIN + " -P" + Text.ADMIN);
+  public static void init(final boolean local) throws Exception {
+    final String l = local ? "-l " : "";
+    http = new BaseXHTTP(l + " -h9998 -p9999 -zU" + ADMIN + " -P" + ADMIN);
   }
 
   /**
@@ -102,6 +101,19 @@ public class RESTTest {
   @Test
   public void get2() throws Exception {
     assertEquals(WRAP, get("?query=()&wrap=yes"));
+  }
+
+  /**
+   * GET Test: returns a resource.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void get3() throws IOException {
+    put(DB, new ArrayInput("<a/>"));
+    put(DB + "/raw", new ArrayInput("XXX"), APP_OCTET);
+    assertEquals("<a/>", get(DB + '/' + DB + ".xml"));
+    assertEquals("XXX", get(DB + "/raw"));
+    delete(DB);
   }
 
   /**
@@ -201,13 +213,35 @@ public class RESTTest {
   }
 
   /**
+   * GET content types.
+   * @throws Exception exception
+   */
+  @Test
+  public void getContentType() throws Exception {
+    assertEquals(APP_XML, ct("?query=1"));
+    assertEquals(TEXT_PLAIN, ct("?command=info"));
+
+    assertEquals(APP_XML, ct("?query=1&method=xml"));
+    assertEquals(TEXT_HTML, ct("?query=1&method=xhtml"));
+    assertEquals(TEXT_HTML, ct("?query=1&method=html"));
+    assertEquals(TEXT_PLAIN, ct("?query=1&method=text"));
+    assertEquals(APP_OCTET, ct("?query=1&method=raw"));
+    assertEquals(APP_JSON, ct("?query=<json+type='object'/>&method=json"));
+    assertEquals(APP_JSON, ct("?query=<json/>&method=jsonml"));
+
+    assertEquals(APP_XML, ct("?query=1&media-type=application/xml"));
+    assertEquals(TEXT_HTML, ct("?query=1&media-type=text/html"));
+    assertEquals("xxx", ct("?query=1&media-type=xxx"));
+  }
+
+  /**
    * POST Test: execute a query.
    * @throws IOException I/O exception
    */
   @Test
-  public void postQuery1() throws IOException {
+  public void post1() throws IOException {
     assertEquals("123",
-        postQuery("", "<query xmlns=\"" + URI + "\">" +
+        post("", "<query xmlns=\"" + URI + "\">" +
           "<text>123</text><parameter name='wrap' value='no'/></query>"));
   }
 
@@ -216,9 +250,9 @@ public class RESTTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void postQuery2() throws IOException {
+  public void post2() throws IOException {
     assertEquals("",
-        postQuery("", "<query xmlns=\"" + URI + "\">" +
+        post("", "<query xmlns=\"" + URI + "\">" +
           "<text>()</text><parameter name='wrap' value='no'/></query>"));
   }
 
@@ -227,10 +261,10 @@ public class RESTTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void postQuery3() throws IOException {
+  public void post3() throws IOException {
     assertEquals(
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?> 123",
-        postQuery("", "<query xmlns=\"" + URI + "\">" +
+        post("", "<query xmlns=\"" + URI + "\">" +
           "<text>123</text><parameter name='wrap' value='no'/>" +
           "<parameter name='omit-xml-declaration' value='no'/></query>"));
   }
@@ -240,9 +274,9 @@ public class RESTTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void postQuery4() throws IOException {
+  public void post4() throws IOException {
     assertEquals("<html></html>",
-        postQuery("", "<query xmlns=\"" + URI + "\">" +
+        post("", "<query xmlns=\"" + URI + "\">" +
         "<text><![CDATA[<html/>]]></text>" +
         "<parameter name='wrap' value='yes'/>" +
         "<parameter name='wrap' value='no'/>" +
@@ -256,8 +290,8 @@ public class RESTTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void postQuery5() throws IOException {
-    assertEquals("123", postQuery("",
+  public void post5() throws IOException {
+    assertEquals("123", post("",
         "<query xmlns=\"" + URI + "\">" +
         "<text>123</text>" +
         "<parameter name='wrap' value='no'/>" +
@@ -271,8 +305,8 @@ public class RESTTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void postQuery6() throws IOException {
-    assertEquals("<a/>", postQuery("",
+  public void post6() throws IOException {
+    assertEquals("<a/>", post("",
         "<query xmlns=\"" + URI + "\">" +
         "<text>.</text>" +
         "<context><a/></context>" +
@@ -281,25 +315,13 @@ public class RESTTest {
 
   /** POST Test: execute buggy query. */
   @Test
-  public void postQueryErr() {
+  public void postErr() {
     try {
-      assertEquals("", postQuery("",
+      assertEquals("", post("",
           "<query xmlns=\"" + URI + "\"><text>(</text></query>"));
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }
-  }
-
-  /**
-   * POST Test: create and add database.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public void post1() throws IOException {
-    put(DB, null);
-    post(DB + "/doc.xml", new ArrayInput(token("<a/>")));
-    assertEquals("1", get(DB + "?query=count(/)"));
-    delete(DB);
   }
 
   /**
@@ -375,11 +397,10 @@ public class RESTTest {
   @Test
   public void delete2() throws IOException {
     put(DB, null);
-    post(DB + "/a", new ArrayInput(token("<a/>")));
-    post(DB + "/a", new ArrayInput(token("<a/>")));
-    post(DB + "/b", new ArrayInput(token("<b/>")));
+    put(DB + "/a", new ArrayInput(token("<a/>")));
+    put(DB + "/b", new ArrayInput(token("<b/>")));
     // delete 'a' directory
-    assertContains(delete(DB + "/a"), "2 document");
+    assertContains(delete(DB + "/a"), "1 document");
     // delete 'b' directory
     assertContains(delete(DB + "/b"), "1 document");
     // no 'b' directory left
@@ -408,7 +429,7 @@ public class RESTTest {
   }
 
   /**
-   * Executes the specified GET request.
+   * Executes the specified GET request and returns the result.
    * @param query request
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
@@ -421,7 +442,26 @@ public class RESTTest {
     try {
       return read(conn.getInputStream()).replaceAll("\r?\n *", "");
     } catch(final IOException ex) {
-      throw new IOException(read(conn.getErrorStream()));
+      throw error(conn, ex);
+    } finally {
+      conn.disconnect();
+    }
+  }
+
+  /**
+   * Executes the specified GET request and returns the content type.
+   * @param query request
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  private String ct(final String query) throws IOException {
+    final URL url = new URL(ROOT + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    try {
+      read(conn.getInputStream());
+      return conn.getContentType();
+    } catch(final IOException ex) {
+      throw error(conn, ex);
     } finally {
       conn.disconnect();
     }
@@ -434,7 +474,7 @@ public class RESTTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private String postQuery(final String path, final String query)
+  private String post(final String path, final String query)
       throws IOException {
     final URL url = new URL(ROOT + path);
 
@@ -442,10 +482,9 @@ public class RESTTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod("POST");
-    conn.setRequestProperty(DataText.CONTENT_TYPE, DataText.APP_QUERYXML);
+    conn.setRequestProperty(CONTENT_TYPE, APP_XML);
     // basic authentication example
-    final String userpw = Text.ADMIN + ':' + Text.ADMIN;
-    final String encoded = Base64.encode(userpw);
+    final String encoded = Base64.encode(ADMIN + ':' + ADMIN);
     conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
@@ -455,7 +494,7 @@ public class RESTTest {
     try {
       return read(conn.getInputStream()).replaceAll("\r?\n *", "");
     } catch(final IOException ex) {
-      throw new IOException(read(conn.getErrorStream()));
+      throw error(conn, ex);
     } finally {
       conn.disconnect();
     }
@@ -470,11 +509,25 @@ public class RESTTest {
    */
   private String put(final String query, final InputStream is)
       throws IOException {
+    return put(query, is, null);
+  }
+
+  /**
+   * Executes the specified PUT request.
+   * @param query request
+   * @param is input stream
+   * @param ctype content type (optional)
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  private String put(final String query, final InputStream is,
+      final String ctype) throws IOException {
 
     final URL url = new URL(ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod("PUT");
+    if(ctype != null) conn.setRequestProperty(CONTENT_TYPE, ctype);
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     if(is != null) {
       // send input stream if it not empty
@@ -486,39 +539,24 @@ public class RESTTest {
     try {
       return read(conn.getInputStream());
     } catch(final IOException ex) {
-      throw new IOException(read(conn.getErrorStream()));
+      throw error(conn, ex);
     } finally {
       conn.disconnect();
     }
   }
 
   /**
-   * Executes the specified POST request.
-   * @param query request
-   * @param is input stream
-   * @return string result, or {@code null} for a failure.
+   * Returns an exception with improved error message.
+   * @param conn connection reference
+   * @param ex exception
+   * @return exception
    * @throws IOException I/O exception
    */
-  private String post(final String query, final InputStream is)
+  private IOException error(final HttpURLConnection conn, final IOException ex)
       throws IOException {
+    final String msg = read(conn.getErrorStream());
+    throw new BaseXException(msg.isEmpty() ? ex.getMessage() : msg);
 
-    final URL url = new URL(ROOT + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    conn.setDoOutput(true);
-    conn.setRequestMethod("POST");
-    conn.setRequestProperty(DataText.CONTENT_TYPE, DataText.APP_XML);
-    final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
-    final BufferedInputStream bis = new BufferedInputStream(is);
-    for(int i; (i = bis.read()) != -1;) bos.write(i);
-    bis.close();
-    bos.close();
-    try {
-      return read(conn.getInputStream());
-    } catch(final IOException ex) {
-      throw new IOException(read(conn.getErrorStream()));
-    } finally {
-      conn.disconnect();
-    }
   }
 
   /**

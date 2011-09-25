@@ -74,9 +74,9 @@ public final class HTTPSession {
    */
   public Session login() throws IOException {
     if(user == null || pass == null) throw new LoginException(NOPASSWD);
-    return client() ?
-      new ClientSession(CONTEXT, user, pass) :
-      new LocalSession(CONTEXT, user, pass);
+    return local() ?
+        new LocalSession(CONTEXT, user, pass) :
+        new ClientSession(CONTEXT, user, pass);
   }
 
   /**
@@ -88,12 +88,12 @@ public final class HTTPSession {
   }
 
   /**
-   * Indicates if the session will be client-based or local (standalone).
+   * Indicates if the session will be local or client-/server-based.
    * @return database context (default: {@code false}).
    */
-  public static boolean client() {
-    final String c = System.getProperty(DBCLIENT);
-    return c != null && c.equals(Boolean.toString(true));
+  public static boolean local() {
+    final String l = System.getProperty(DBLOCAL);
+    return l != null && l.equals(Boolean.toString(true));
   }
 
   /**

@@ -209,8 +209,8 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     if(id == null) return null;
     final Data data = ctx.data();
-    final IntList il = data.docs(id);
-    return il.size() == 0 ? null : new BXXMLResource(data, il.get(0), id, this);
+    final int pre = data.doc(id);
+    return pre == -1 ? null : new BXXMLResource(data, pre, id, this);
   }
 
   @Override

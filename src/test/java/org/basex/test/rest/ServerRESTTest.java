@@ -15,6 +15,6 @@ public class ServerRESTTest extends RESTTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(true);
+    init(false);
   }
 }

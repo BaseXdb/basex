@@ -1,8 +1,6 @@
 package org.basex.api.rest;
 
 import static org.basex.api.rest.RESTText.*;
-import static org.basex.data.DataText.*;
-import static org.basex.query.func.Function.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -62,46 +60,32 @@ class RESTQuery extends RESTCode {
       throws RESTException, IOException {
 
     if(item != null) {
-      // create main memory instance of the context item
+      // create main memory instance of the document specified as context node
       final boolean mm = ctx.session.execute(
           new Get(Prop.MAINMEM)).split(Text.COLS)[1].equals(Text.TRUE);
       ctx.session.execute(new Set(Prop.MAINMEM, true));
       ctx.session.create(Util.name(RESTQuery.class), new ArrayInput(item));
       if(!mm) ctx.session.execute(new Set(Prop.MAINMEM, false));
     } else {
-      // try to open addressed database
+      // open addressed database
       open(ctx);
     }
 
-    // set specified serialization options
+    // send serialization options to the server
     final Session session = ctx.session;
     session.execute(new Set(Prop.SERIALIZER, serial(ctx)));
-
-    // check if path points to a raw file
-    String query = in.isEmpty() ? "." : in;
-    if(query.equals(".") && ctx.depth() > 1) {
-      // retrieve binary contents if no query is specified
-      final String raw = DBISRAW.args(ctx.db(), ctx.dbpath());
-      if(session.query(raw).execute().equals(Text.TRUE))
-        query = "declare option output:method '" + M_RAW + "';" +
-            DBRETRIEVE.args(ctx.db(), ctx.dbpath());
-    }
-
-    // redirect output stream
     session.setOutputStream(ctx.out);
 
     // create query instance
-    final Query qu = session.query(query);
+    final Query qu = session.query(in);
     // bind external variables
     for(final Entry<String, String[]> e : variables.entrySet()) {
       final String[] val = e.getValue();
       if(val.length == 2) qu.bind(e.getKey(), val[0], val[1]);
       if(val.length == 1) qu.bind(e.getKey(), val[0]);
     }
-
-    // initializes the output
-    initOutput(new SerializerProp(qu.options()), ctx);
-
+    // initializes the response with query serialization options
+    initResponse(new SerializerProp(qu.options()), ctx);
     // run query
     qu.execute();
   }

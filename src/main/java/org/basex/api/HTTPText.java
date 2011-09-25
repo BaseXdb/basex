@@ -12,8 +12,8 @@ public interface HTTPText {
   /** Servlet string. */
   String SERVLET = "Servlet";
 
-  /** Configuration: client flag. */
-  String DBCLIENT = "org.basex.client";
+  /** Configuration: local flag. */
+  String DBLOCAL = "org.basex.local";
   /** Configuration: database user. */
   String DBUSER = "org.basex.user";
   /** Configuration: database user password. */

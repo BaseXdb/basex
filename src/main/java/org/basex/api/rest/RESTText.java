@@ -24,8 +24,6 @@ public interface RESTText {
 
   /** Token. */
   byte[] RESOURCES = token("resources");
-  /** Token. */
-  byte[] NAME = token("name");
 
   /** Error message. */
   String ERR_UNEXPECTED = "Unexpected error: ";
@@ -34,7 +32,9 @@ public interface RESTText {
   /** Error message. */
   String ERR_NOPATH = "No path specified.";
   /** Error message. */
-  String ERR_NOPARAM = "No parameters supported.";
+  String ERR_NORES = "Path does not exist.";
+  /** Error message. */
+  String ERR_NOPARAM = "No parameters supported here.";
   /** Error message. */
   String ERR_ONLYONE = "Only one operation can be specified.";
   /** Error message. */
