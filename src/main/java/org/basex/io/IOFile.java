@@ -6,12 +6,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.basex.core.Prop;
+import org.basex.data.DataText;
 import org.basex.io.in.BufferInput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.ObjList;
@@ -118,6 +120,15 @@ public final class IOFile extends IO {
   public long length() {
     if(len == -1) len = file.length();
     return len;
+  }
+
+  /**
+   * Returns the content type.
+   * @return content type
+   */
+  public String contentType() {
+    final String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
+    return ct == null ? DataText.APP_OCTET : ct;
   }
 
   @Override

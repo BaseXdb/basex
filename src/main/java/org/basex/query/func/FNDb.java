@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.net.URLConnection;
 
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
@@ -114,8 +113,9 @@ public final class FNDb extends FuncCall {
       case DBSTORE:    return store(ctx);
       case DBRETRIEVE: return retrieve(ctx);
       case DBISRAW:    return isRaw(ctx);
-      case DBCTYPE:    return contentType(ctx);
+      case DBEXISTS:   return exists(ctx);
       case DBISXML:    return isXML(ctx);
+      case DBCTYPE:    return contentType(ctx);
       default:         return super.item(ctx, ii);
     }
   }
@@ -262,21 +262,23 @@ public final class FNDb extends FuncCall {
   }
 
   /**
-   * Performs the content-type function.
+   * Performs the exists function.
    * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str contentType(final QueryContext ctx) throws QueryException {
-    final Data data = data(0, ctx);
-    final String path = path(1, ctx);
-    final IOFile io = data.meta.binary(path);
-    if(io.exists() && !io.isDir()) {
-      final String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
-      return Str.get(ct == null ? DataText.APP_OCTET : ct);
+  private Bln exists(final QueryContext ctx) throws QueryException {
+    try {
+      final Data data = data(0, ctx);
+      if(expr.length == 1) return Bln.TRUE;
+      // check if raw file or XML document exists
+      final String path = path(1, ctx);
+      final IOFile io = data.meta.binary(path);
+      return Bln.get(io.exists() && !io.isDir() || data.doc(path) != -1);
+    } catch(final QueryException ex) {
+      if(ex.err() == NODB) return Bln.FALSE;
+      throw ex;
     }
-    if(isXML(ctx).bool(input)) return Str.get(DataText.APP_XML);
-    throw RESFNF.thrw(input, path);
   }
 
   /**
@@ -288,17 +290,22 @@ public final class FNDb extends FuncCall {
   private Bln isXML(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
-    if(path.isEmpty()) return Bln.FALSE;
+    return Bln.get(data.doc(path) != -1);
+  }
 
-    // normalize path
-    final byte[] exct = token(Prop.WIN ? path.toLowerCase() : path);
-    final IntList il = data.docs(path);
-    // check if one of the hits is exact, i.e., is no directory entry
-    for(int i = 0; i < il.size(); i++) {
-      final byte[] txt = data.text(il.get(i), true);
-      if(eq(exct, Prop.WIN ? lc(txt) : txt)) return Bln.TRUE;
-    }
-    return Bln.FALSE;
+  /**
+   * Performs the content-type function.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Str contentType(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    final String path = path(1, ctx);
+    if(data.doc(path) != -1) return Str.get(DataText.APP_XML);
+    final IOFile io = data.meta.binary(path);
+    if(io.exists() && !io.isDir()) return Str.get(io.contentType());
+    throw RESFNF.thrw(input, path);
   }
 
   /**
@@ -370,11 +377,9 @@ public final class FNDb extends FuncCall {
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final IntList old = data.docs(trg);
-    if(old.size() > 0) {
-      final int pre = old.get(0);
-      if(old.size() > 1 || !eq(data.text(pre, true), token(trg)))
-        DOCTRGMULT.thrw(input);
+    final int pre = data.doc(trg);
+    if(pre != -1) {
+      if(data.docs(trg).size() != 1) DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
     // delete raw resources

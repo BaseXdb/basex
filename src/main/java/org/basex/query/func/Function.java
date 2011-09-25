@@ -501,6 +501,8 @@ public enum Function {
   DBISXML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
   /** Database function: checks if the specified resource is a raw file. */
   DBISRAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
+  /** Database function: checks if the specified database or resource exists. */
+  DBEXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
   /** Database function: returns the content type of a database file. */
   DBCTYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
 

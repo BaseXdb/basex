@@ -158,8 +158,6 @@ public interface DataText {
   String APP_XML = "application/xml";
   /** Media type: application/json. */
   String APP_JSON = "application/json";
-  /** Media type: application/query+xml. */
-  String APP_QUERYXML = "application/query+xml";
 
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");

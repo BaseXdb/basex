@@ -130,13 +130,12 @@ public final class DocIndex implements Index {
    * @return root nodes
    */
   public synchronized IntList docs(final String path) {
-    // no documents: return empty list
-    if(data.empty()) return new IntList(0);
+    // invalid path, or no documents: return empty list
+    final String pth = MetaData.normPath(path);
+    if(pth == null || data.empty()) return new IntList(0);
 
     // empty path: return all documents
     final IntList doc = docs();
-    final String pth = MetaData.normPath(path);
-    if(pth == null) return new IntList(0);
     if(pth.isEmpty()) return doc;
 
     // initialize and sort document paths
@@ -153,6 +152,27 @@ public final class DocIndex implements Index {
         il.add(doc.get(order[p]));
     }
     return il.sort();
+  }
+
+  /**
+   * Returns the pre values of the document node matching the specified path.
+   * @param path input path
+   * @return root nodes
+   */
+  public synchronized int doc(final String path) {
+    // invalid or empty path, or no documents: return -1
+    final String pth = MetaData.normPath(path);
+    if(pth == null || pth.isEmpty() || data.empty()) return -1;
+
+    // initialize and sort document paths
+    if(paths == null) initPaths();
+
+    // normalize paths
+    final byte[] exct = concat(SLASH, Prop.WIN ? lc(token(pth)) : token(pth));
+
+    // relevant paths: start from the first hit and return all subsequent hits
+    final int p = find(exct);
+    return p < paths.length && eq(paths[p], exct) ? docs.get(order[p]) : -1;
   }
 
   /**
@@ -175,9 +195,10 @@ public final class DocIndex implements Index {
   }
 
   /**
-   * Returns the first position matching the specified path.
+   * Returns the first position matching the specified path
+   * (might equal the array size).
    * @param v value to be found
-   * @return position or negative insertion value - 1
+   * @return position
    */
   private int find(final byte[] v) {
     // binary search

@@ -46,7 +46,7 @@ public final class Copy extends Command {
     // database does not exist
     if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);
     // target database exists already
-    if(mprop.dbexists(newdb)) return error(DBEXISTS, newdb);
+    if(mprop.dbexists(newdb)) return error(DBEXIST, newdb);
 
     // try to copy database
     return copy(db, newdb) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);

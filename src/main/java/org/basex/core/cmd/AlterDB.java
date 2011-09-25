@@ -41,7 +41,7 @@ public final class AlterDB extends Command {
     // database does not exist
     if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);
     // target database exists already
-    if(mprop.dbexists(name)) return error(DBEXISTS, name);
+    if(mprop.dbexists(name)) return error(DBEXIST, name);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);

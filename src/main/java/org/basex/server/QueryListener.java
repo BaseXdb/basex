@@ -38,7 +38,7 @@ final class QueryListener extends Progress {
   /** Query info. */
   private String info = "";
   /** Serialization options. */
-  private String options = "";
+  private SerializerProp options;
 
   /**
    * Constructor.
@@ -76,9 +76,11 @@ final class QueryListener extends Progress {
   /**
    * Returns the serialization options.
    * @return serialization options
+   * @throws IOException Exception
    */
-  String options() {
-    return options;
+  String options() throws IOException {
+    init();
+    return options.toString();
   }
 
   /**
@@ -90,24 +92,23 @@ final class QueryListener extends Progress {
    */
   void execute(final boolean iter, final OutputStream out, final boolean enc)
       throws IOException {
+
     boolean mon = false;
     try {
-      qp.parse();
+      init();
       ctx.register(qp.ctx.updating);
       mon = true;
 
       // create serializer
       final Iter ir = qp.iter();
-      final SerializerProp sprop = qp.ctx.serProp(false);
-      final boolean wrap = !sprop.get(S_WRAP_PREFIX).isEmpty();
-      options = qp.ctx.serProp(false).toString();
+      final boolean wrap = !options.get(S_WRAP_PREFIX).isEmpty();
 
       // iterate through results
       final PrintOutput po =
           PrintOutput.get(enc ? new EncodingOutput(out) : out);
       if(iter && wrap) po.write(1);
 
-      final Serializer ser = Serializer.get(po, sprop);
+      final Serializer ser = Serializer.get(po, options);
       int c = 0;
       for(Item it; (it = ir.next()) != null;) {
         if(iter && !wrap) {
@@ -140,5 +141,19 @@ final class QueryListener extends Progress {
       try { qp.close(); } catch(final IOException ex) { }
       if(mon) ctx.unregister(qp.ctx.updating);
     }
+  }
+
+  /**
+   * Parses the query and retrieves the serialization options.
+   * @throws IOException Exception
+   */
+  private void init() throws IOException {
+    if(options != null) return;
+    try {
+      qp.parse();
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    }
+    options = qp.ctx.serProp(false);
   }
 }

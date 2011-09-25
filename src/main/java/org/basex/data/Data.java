@@ -200,6 +200,16 @@ public abstract class Data {
   }
 
   /**
+   * Returns the pre value of the node that matches the specified path,
+   * or {@code -1}.
+   * @param path input path
+   * @return pre value
+   */
+  public final int doc(final String path) {
+    return docindex.doc(path);
+  }
+
+  /**
    * Returns the paths of all binary files matching the specified path.
    * @param path input path
    * @return root nodes

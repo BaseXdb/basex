@@ -373,6 +373,27 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the db:exists() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void dbExists() throws BaseXException {
+    check(DBEXISTS);
+    query(DBADD.args(DB, "\"<a/>\"", "xml", "x"));
+    query(DBSTORE.args(DB, "x/raw", "bla"));
+    // checks if the specified resources exist (false expected for directories)
+    query(DBEXISTS.args(DB), "true");
+    query(DBEXISTS.args(DB, "x/xml"), "true");
+    query(DBEXISTS.args(DB, "x/raw"), "true");
+    query(DBEXISTS.args(DB, "xxx"), "false");
+    query(DBEXISTS.args(DB, "x"), "false");
+    query(DBEXISTS.args(DB, ""), "false");
+    // false expected for missing database
+    new DropDB(DB).execute(CONTEXT);
+    query(DBEXISTS.args(DB), "false");
+  }
+
+  /**
    * Test method for the db:is-xml() function.
    */
   @Test

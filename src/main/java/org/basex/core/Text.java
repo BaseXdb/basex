@@ -79,7 +79,7 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-bdiosuvVwz] [-cq] [file]" + NL +
+    " [-bdiosuvVwxz] [-cq] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
     "  -c<cmd>     Execute database command(s)" + NL +
@@ -98,7 +98,7 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-dnopPsUvVwz] [-cq] [file]" + NL +
+    " [-bdinopPsUvVwxz] [-cq] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
     "  -c<cmd>     Execute database command(s)" + NL +
@@ -120,7 +120,7 @@ public interface Text {
   String SERVERMODE = "Server";
   /** Server start information. */
   String SERVERINFO =
-    " [-dpsz] [-c] [stop]" + NL +
+    " [-deipsz] [-c] [stop]" + NL +
     "  stop      Stop existing server" + NL +
     "  -c<cmd>   Execute initial database command(s)" + NL +
     "  -d        Activate debugging mode" + NL +
@@ -139,12 +139,12 @@ public interface Text {
 
   /** HTTP information. */
   String HTTPINFO =
-    " [-cdehnpPRUWz] [stop]" + NL +
+    " [-dehlnpPRUWz] [stop]" + NL +
     "  stop       Stop existing server" + NL +
-    "  -c         Start in client/server mode" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -e<num>    Set event port" + NL +
     "  -h<num>    Set port of HTTP server" + NL +
+    "  -l         Start in local mode" + NL +
     "  -n<name>   Set name of database server" + NL +
     "  -p<num>    Set port of database server" + NL +
     "  -P<pass>   Specify user password" + NL +
@@ -566,7 +566,7 @@ public interface Text {
   /** Database not deleted. */
   String DBNOTDELETED = lang("db_notdeleted");
   /** Database exists already. */
-  String DBEXISTS = lang("db_exists");
+  String DBEXIST = lang("db_exists");
   /** Database was dropped. */
   String DBBACKDROP = lang("db_backdrop");
   /** Backup was not found. */
