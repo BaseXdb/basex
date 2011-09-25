@@ -15,7 +15,7 @@ import org.basex.api.BaseXHTTP;
  *
  * @author BaseX Team 2005-11, BSD License
  */
-public final class RESTPostQuery {
+public final class RESTPost {
   /**
    * Runs the example.
    * @throws IOException I/O exception

@@ -29,11 +29,7 @@ public final class RESTAll {
     System.out.println();
 
     // Send a query via POST
-    RESTPostQuery.run();
-    System.out.println();
-
-    // Add a document
-    RESTPostAdd.run();
+    RESTPost.run();
     System.out.println();
 
     // Delete a document
