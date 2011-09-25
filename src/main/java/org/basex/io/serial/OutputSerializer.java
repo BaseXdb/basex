@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 
 import org.basex.core.Prop;
 import org.basex.data.FTPos;
+import org.basex.io.MimeTypes;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.item.Item;
 import org.basex.util.TokenBuilder;
@@ -458,8 +459,8 @@ public abstract class OutputSerializer extends Serializer {
     level++;
     startOpen(META);
     attribute(HTTPEQUIV, token(CONTENT_TYPE));
-    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? TEXT_HTML : media).
-        add(CHARSET).addExt(encoding).finish());
+    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MimeTypes.TEXT_HTML :
+      media).add(CHARSET).addExt(encoding).finish());
     if(html) {
       print(ELEM_C);
     } else {

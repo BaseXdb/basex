@@ -148,16 +148,6 @@ public interface DataText {
 
   /** Content-Type. */
   String CONTENT_TYPE = "Content-Type";
-  /** Media type: text/html. */
-  String TEXT_HTML = "text/html";
-  /** Media type: text/plain. */
-  String TEXT_PLAIN = "text/plain";
-  /** Media type: text/plain. */
-  String APP_OCTET = "application/octet-stream";
-  /** Media type: application/xml. */
-  String APP_XML = "application/xml";
-  /** Media type: application/json. */
-  String APP_JSON = "application/json";
 
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");

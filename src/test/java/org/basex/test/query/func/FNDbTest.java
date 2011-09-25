@@ -10,9 +10,9 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
-import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.io.MimeTypes;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -414,8 +414,8 @@ public final class FNDbTest extends AdvancedQueryTest {
     check(DBCTYPE);
     query(DBADD.args(DB, "\"<a/>\"", "xml"));
     query(DBSTORE.args(DB, "raw", "bla"));
-    query(DBCTYPE.args(DB, "xml"), DataText.APP_XML);
-    query(DBCTYPE.args(DB, "raw"), DataText.APP_OCTET);
+    query(DBCTYPE.args(DB, "xml"), MimeTypes.APP_XML);
+    query(DBCTYPE.args(DB, "raw"), MimeTypes.APP_OCTET);
     error(DBCTYPE.args(DB, "test"), Err.RESFNF);
   }
 }

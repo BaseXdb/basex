@@ -11,7 +11,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.MetaData;
-import org.basex.io.IOFile;
+import org.basex.io.MimeTypes;
 import org.basex.util.Table;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
@@ -56,18 +56,18 @@ public final class ListDB extends Command {
         final TokenList tl = new TokenList(3);
         tl.add(data.text(pre, true));
         tl.add(DataText.M_XML);
-        tl.add(DataText.APP_XML);
+        tl.add(MimeTypes.APP_XML);
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
       }
       // add binary resources
       for(final byte[] fl : data.files(path)) {
-        final IOFile io = data.meta.binary(string(fl));
+        final String file = string(fl);
         final TokenList tl = new TokenList(3);
         tl.add(fl);
         tl.add(DataText.M_RAW);
-        tl.add(io.contentType());
-        tl.add(io.length());
+        tl.add(MimeTypes.get(file));
+        tl.add(data.meta.binary(file).length());
         table.contents.add(tl);
       }
       Close.close(data, context);

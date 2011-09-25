@@ -15,10 +15,10 @@ import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IOFile;
+import org.basex.io.MimeTypes;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
@@ -302,9 +302,9 @@ public final class FNDb extends FuncCall {
   private Str contentType(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
-    if(data.doc(path) != -1) return Str.get(DataText.APP_XML);
+    if(data.doc(path) != -1) return Str.get(MimeTypes.APP_XML);
     final IOFile io = data.meta.binary(path);
-    if(io.exists() && !io.isDir()) return Str.get(io.contentType());
+    if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
     throw RESFNF.thrw(input, path);
   }
 
