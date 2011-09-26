@@ -291,10 +291,10 @@ public final class Token {
    * @param token token
    * @return codepoints
    */
-  public static long[] cps(final byte[] token) {
+  public static int[] cps(final byte[] token) {
     int pos = 0;
     final int len = token.length;
-    final long[] cp = new long[len];
+    final int[] cp = new int[len];
     for(int i = 0; i < len; i += cl(token, i)) cp[pos++] = cp(token, i);
     return pos < len ? Arrays.copyOf(cp, pos) : cp;
   }
