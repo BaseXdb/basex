@@ -154,6 +154,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests encryption algorithm arguments.
+   */
   @Test
   public void validateSignatureWithSignatureAlgorithm() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -162,6 +165,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests encryption algorithm arguments.
+   */
   @Test
   public void validateSignatureWithSignatureAlgorithm2() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -170,6 +176,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests signing a node and adding a specific namespace prefix to the
+   * signature element.
+   */
   @Test
   public void validateSignatureWithSignatureNamespace3() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -177,6 +187,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Test an enveloped signature.
+   */
   @Test
   public void validateSignatureWithSignatureType() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -185,6 +198,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests an enveloping signature.
+   */
   @Test
   public void validateSignatureWithSignatureType2() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -193,12 +209,27 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests a detached signature.
+   */
   @Test
   public void validateSignatureWithSignatureType3() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
         "'detached'))",
         "true");
+  }
+
+  /**
+   * Tests calling generate-signature with a wrong type argument.
+   */
+  @Test
+  public void validateSignatureWithSignatureTypeFAIL() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
+        "'xxx'))",
+        "true");
+    Assert.fail();
   }
 
   @Test

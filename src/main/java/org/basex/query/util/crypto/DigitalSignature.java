@@ -49,6 +49,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
+import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -56,16 +57,24 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
+import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.Result;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
@@ -218,20 +227,6 @@ public final class DigitalSignature {
     try {
 
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-      // TODO problem poss. due to empty reference?
-      Reference ref = null;
-      if(xpathExpr.length == 0)
-        ref = fac.newReference("",
-            fac.newDigestMethod(DA, null), Collections.
-            singletonList(fac.newTransform(Transform.ENVELOPED,
-                (TransformParameterSpec) null)), null, null);
-      else
-        CRYPTONOTSUPP.thrw(input, xpathExpr);
-
-      final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CM,
-              (C14NMethodParameterSpec) null),
-              fac.newSignatureMethod(SA, null),
-              Collections.singletonList(ref));
 
       PrivateKey pk = null;
       PublicKey puk = null;
@@ -299,10 +294,48 @@ public final class DigitalSignature {
       }
 
       Document doc = toDOMNode(node);
+      final List transform = new ArrayList<Transform>(1);
+
+      // validating given XPath expression to get nodes to be signed
+      if(xpathExpr.length > 0) {
+//        CRYPTONOTSUPP.thrw(input, xpathExpr);
+
+        final XPathFactory xpf = XPathFactory.newInstance();
+        final XPath xp = xpf.newXPath();
+        final XPathExpression xpexp = xp.compile(string(xpathExpr));
+        // TODO evaluate to node instead of node set? how deal with mltpl nds?
+        final NodeList xpNodes = (NodeList) xpexp.evaluate(doc,
+            XPathConstants.NODESET);
+        if(xpNodes.getLength() < 1)
+          CRYPTOXPINV.thrw(input, xpathExpr);
+        final Node nodeToSign = xpNodes.item(0);
+        final Node par = nodeToSign.getParentNode();
+        transform.add(fac.newTransform(Transform.XPATH,
+            new XPathFilterParameterSpec(string(xpathExpr))));
+        transform.add(fac.newTransform(Transform.ENVELOPED,
+            (TransformParameterSpec) null));
+
+      } else {
+        transform.add(fac.newTransform(Transform.ENVELOPED,
+            (TransformParameterSpec) null));
+      }
+
+      // TODO run find bugs
+
+      Reference ref = fac.newReference("",
+          fac.newDigestMethod(DA, null), Collections.
+          singletonList(transform), null, null);
+
+      final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CM,
+              (C14NMethodParameterSpec) null),
+              fac.newSignatureMethod(SA, null),
+              Collections.singletonList(ref));
+
       DOMSignContext dsc = null;
       XMLSignature xmlsig = null;
 
       // enveloped
+      // TODO don't test it like that
       if(eq(type, SIGNATURETYPES[0])) {
         dsc = new DOMSignContext(pk, doc.getDocumentElement());
         xmlsig = fac.newXMLSignature(si, ki);
@@ -362,6 +395,8 @@ public final class DigitalSignature {
     } catch(CertificateException e) {
       e.printStackTrace();
     } catch(UnrecoverableKeyException e) {
+      e.printStackTrace();
+    } catch(XPathExpressionException e) {
       e.printStackTrace();
     }
 
