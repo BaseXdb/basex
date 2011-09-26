@@ -16,13 +16,13 @@ import org.junit.Test;
 public class FTWildcardTest {
   /** Sample texts which should be matched. */
   private static final String[][] TEXTS_GOOD = {
-    { "well", "wall", "will", "w.ll", "wüll" },
+    { "well", "wall", "will", "w.ll", "w\u00fcll" },
     { "site", "asite" },
     { "improv", "improve", "improvement" },
     { "wisdomness", "witches" },
     { "site" },
     { "Usability\\", "Usable\\" },
-    { "überschüsse", "überschuss" }
+    { "\u00fcbersch\u00fcsse", "\u00fcberschuss" }
   };
   /** Sample texts which should NOT be matched. */
   private static final String[][] TEXTS_BAD = new String[][] {
@@ -43,7 +43,7 @@ public class FTWildcardTest {
     "wi.{4,7}s",
     "\\s\\i\\t\\e",
     "Usab.+\\\\",
-    "übersch.ss.?"
+    "\u00fcbersch.ss.?"
   };
 
   /** Valid wild card expressions. */

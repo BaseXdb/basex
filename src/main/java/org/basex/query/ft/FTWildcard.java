@@ -2,6 +2,9 @@ package org.basex.query.ft;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
+import java.util.Arrays;
+
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 
@@ -16,10 +19,10 @@ public class FTWildcard {
   /** Value encoding the wild-card dot. */
   private static final int DOT = -1;
   /** Characters. */
-  private final int[] chars;
-  /** Minimum number of occureence. */
+  private final int[] wc;
+  /** Minimum number of occurrence. */
   private final int[] min;
-  /** Maximum number of occureence. */
+  /** Maximum number of occurrence. */
   private final int[] max;
 
   /**
@@ -31,8 +34,29 @@ public class FTWildcard {
    */
   public FTWildcard(final byte[] query, final InputInfo ii)
       throws QueryException {
-    final char[] q = string(query).toCharArray();
-    final int[] tmpchars = new int[q.length];
+    this(cps(query), ii);
+  }
+
+  /**
+   * Check if the wild-card can match a sub-string in a string.
+   * @param t token to search for match
+   * @return <code>true</code> if a match is found
+   */
+  public boolean match(final byte[] t) {
+    return match(cps(t), 0, 0);
+  }
+
+  /**
+   * Parse a given wild-card query token.
+   * @param q query token
+   * @param ii input info
+   * @throws QueryException {@link org.basex.query.util.Err#FTREG}, if the wild
+   * card expression is not valid
+   */
+  private FTWildcard(final int[] q, final InputInfo ii)
+      throws QueryException {
+
+    final int[] tmpwc = new int[q.length];
     final int[] tmpmin = new int[q.length];
     final int[] tmpmax = new int[q.length];
 
@@ -41,7 +65,7 @@ public class FTWildcard {
     while(ql < q.length) {
       // parse wildcards
       if(q[ql] == '.') {
-        char c = ++ql < q.length ? q[ql] : 0;
+        int c = ++ql < q.length ? q[ql] : 0;
         // minimum/maximum number of occurrence
         int n = 0;
         int m = Integer.MAX_VALUE;
@@ -74,29 +98,22 @@ public class FTWildcard {
         }
         tmpmin[++pos] = n;
         tmpmax[pos] = m;
-        tmpchars[pos] = DOT;
+        tmpwc[pos] = DOT;
       } else {
         if(q[ql] == '\\' && ++ql == q.length) FTREG.thrw(ii, q);
-        tmpchars[++pos] = q[ql++];
+        tmpwc[++pos] = q[ql++];
       }
     }
 
-    chars = new int[pos + 1];
-    max = new int[chars.length];
-    min = new int[chars.length];
-
-    System.arraycopy(tmpchars, 0, chars, 0, chars.length);
-    System.arraycopy(tmpmax, 0, max, 0, max.length);
-    System.arraycopy(tmpmin, 0, min, 0, min.length);
-  }
-
-  /**
-   * Check if the wild-card can match a sub-string in a string.
-   * @param t token to search for match
-   * @return <code>true</code> if a match is found
-   */
-  public boolean match(final byte[] t) {
-    return match(string(t).toCharArray(), 0, 0);
+    if(++pos < tmpwc.length) {
+      wc = Arrays.copyOf(tmpwc, pos);
+      min = Arrays.copyOf(tmpmin, pos);
+      max = Arrays.copyOf(tmpmax, pos);
+    } else {
+      wc = tmpwc;
+      min = tmpmin;
+      max = tmpmax;
+    }
   }
 
   /**
@@ -106,11 +123,11 @@ public class FTWildcard {
    * @param qp query position
    * @return <code>true</code> if a match is found
    */
-  private boolean match(final char[] t, final int tp, final int qp) {
+  private boolean match(final int[] t, final int tp, final int qp) {
     int ql = qp;
     int tl = tp;
-    while(ql < chars.length) {
-      if(chars[ql] == DOT) {
+    while(ql < wc.length) {
+      if(wc[ql] == DOT) {
         int n = min[ql];
         final int m = max[ql++];
         // recursively evaluates wildcards (non-greedy)
@@ -119,7 +136,7 @@ public class FTWildcard {
         if(n > m) return false;
         tl += n;
       } else {
-        if(tl >= t.length || t[tl++] != chars[ql++]) return false;
+        if(tl >= t.length || t[tl++] != wc[ql++]) return false;
       }
     }
     return tl == t.length;
