@@ -1,11 +1,9 @@
 package org.basex.query.ft;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 import org.basex.core.Prop;
 import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
 import org.basex.util.ft.FTBitapSearch;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
@@ -150,67 +148,5 @@ public final class FTTokenizer {
     words.matches.sTokenNum++;
     words.first = false;
     return c;
-  }
-
-  /**
-   * Performs a wildcard search.
-   * @param ii input info
-   * @param t text token
-   * @param q query token
-   * @param tp input position
-   * @param qp query position
-   * @return result of check, or -1 for a negative match
-   * @throws QueryException query exception
-   */
-  static boolean wc(final InputInfo ii, final byte[] t, final byte[] q,
-      final int tp, final int qp) throws QueryException {
-
-    int ql = qp;
-    int tl = tp;
-    while(ql < q.length) {
-      // parse wildcards
-      if(q[ql] == '.') {
-        byte c = ++ql < q.length ? q[ql] : 0;
-        // minimum/maximum number of occurrence
-        int n = 0;
-        int m = Integer.MAX_VALUE;
-        if(c == '?') { // .?
-          ++ql;
-          m = 1;
-        } else if(c == '*') { // .*
-          ++ql;
-        } else if(c == '+') { // .+
-          ++ql;
-          n = 1;
-        } else if(c == '{') { // .{m,n}
-          m = 0;
-          while(true) {
-            c = ++ql < q.length ? q[ql] : 0;
-            if(c >= '0' && c <= '9') n = (n << 3) + (n << 1) + c - '0';
-            else if(c == ',') break;
-            else FTREG.thrw(ii, q);
-          }
-          while(true) {
-            c = ++ql < q.length ? q[ql] : 0;
-            if(c >= '0' && c <= '9') m = (m << 3) + (m << 1) + c - '0';
-            else if(c == '}') break;
-            else FTREG.thrw(ii, q);
-          }
-          ++ql;
-        } else { // .
-          m = 1;
-          n = 1;
-        }
-        // recursively evaluates wildcards (non-greedy)
-        while(!wc(ii, t, q, tl + n, ql))
-          if(tl + ++n > t.length) return false;
-        if(n > m) return false;
-        tl += n;
-      } else {
-        if(q[ql] == '\\' && ++ql == q.length) FTREG.thrw(ii, q);
-        if(tl >= t.length || t[tl++] != q[ql++]) return false;
-      }
-    }
-    return tl == t.length;
   }
 }
