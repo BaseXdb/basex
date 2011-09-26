@@ -22,6 +22,8 @@ import org.basex.util.list.TokenList;
  * @author Christian Gruen
  */
 public final class FTTokenizer {
+  /** Wildcard object cache. */
+  public TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
   /** Token comparator. */
   private final TokenComparator cmp;
   /** Cache. */
@@ -51,19 +53,23 @@ public final class FTTokenizer {
       public boolean equal(final byte[] in, final byte[] qu)
         throws QueryException {
 
-        // [DP] QueryException is only thrown by wc, during parsing of the wild-
-        // card expression; it might be more efficient, if an automaton is built
-        // before doing the actual search; thus the wild-card expression will
-        // not be parsed by each comparison and will also eliminate the need of
-        // throwing an exception :)
+        FTWildcard ftw = null;
+        if(opt.is(WC)) {
+          ftw = wcCache.get(qu);
+          if(ftw == null) {
+            ftw = new FTWildcard(qu, words.input);
+            wcCache.add(qu, ftw);
+          }
+        }
+
         return
           // skip stop words, i. e. if the current query token is a stop word,
           // it is always equal to the corresponding input token:
           opt.sw != null && opt.sw.id(qu) != 0 ||
           // fuzzy search:
           (opt.is(FZ) ? ls.similar(in, qu, lserr) :
-          // wildcard search:
-          opt.is(WC) ? wc(words.input, in, qu, 0, 0) :
+          // wild-card search:
+          ftw != null ? ftw.match(in) :
           // simple search:
           eq(in, qu));
       }
