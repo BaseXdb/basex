@@ -272,7 +272,9 @@ public class BaseXServer extends Main implements Runnable {
   public void stop() throws IOException {
     stop.write(Token.EMPTY);
     new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT));
-    new Socket(LOCALHOST, context.mprop.num(MainProp.SERVERPORT));
+    final int port = context.mprop.num(MainProp.SERVERPORT);
+    new Socket(LOCALHOST, port);
+    while(ping(LOCALHOST, port)) Performance.sleep(100);
   }
 
   // STATIC METHODS ===========================================================

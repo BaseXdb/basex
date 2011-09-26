@@ -53,7 +53,10 @@ public final class FNStr extends FuncCall {
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
       case STCODE:
-        return ItrSeq.get(cps(checkEStr(expr[0], ctx)), AtomType.ITR);
+        final int[] tmp = cps(checkEStr(expr[0], ctx));
+        final long[] vals = new long[tmp.length];
+        for(int i = 0; i < tmp.length; i++) vals[i] = tmp[i];
+        return ItrSeq.get(vals, AtomType.ITR);
       default:
         return super.value(ctx);
     }
@@ -223,9 +226,9 @@ public final class FNStr extends FuncCall {
    * @throws QueryException query exception
    */
   private Item trans(final QueryContext ctx) throws QueryException {
-    final long[] tok =  cps(checkEStr(expr[0], ctx));
-    final long[] srch = cps(checkStr(expr[1], ctx));
-    final long[] rep =  cps(checkStr(expr[2], ctx));
+    final int[] tok =  cps(checkEStr(expr[0], ctx));
+    final int[] srch = cps(checkStr(expr[1], ctx));
+    final int[] rep =  cps(checkStr(expr[2], ctx));
 
     final TokenBuilder tmp = new TokenBuilder(tok.length);
     for(int i = 0; i < tok.length; ++i) {
@@ -233,9 +236,9 @@ public final class FNStr extends FuncCall {
       while(++j < srch.length && tok[i] != srch[j]);
       if(j < srch.length) {
         if(j >= rep.length) continue;
-        tmp.add((int) rep[j]);
+        tmp.add(rep[j]);
       } else {
-        tmp.add((int) tok[i]);
+        tmp.add(tok[i]);
       }
     }
     return Str.get(tmp.finish());
