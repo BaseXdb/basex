@@ -89,22 +89,25 @@ public final class EventTest {
    */
   @Test
   public void createDrop() throws IOException {
+
     final String[] events = new String[EVENT_COUNT];
     for(int i = 0; i < EVENT_COUNT; i++) events[i] = NAME + i;
 
-    // create event
-    for(final String e : events) session.execute("create event " + e);
+    try {
+      // create event
+      for(final String e : events) session.execute("create event " + e);
 
-    // query must return all events
-    final HashSet<String> names = new HashSet<String>();
-    String result = session.execute("show events");
-    for(final String line : result.split("\\r?\\n|\\r"))
-      if(line.startsWith("- ")) names.add(line.substring(2));
+      // query must return all events
+      final HashSet<String> names = new HashSet<String>();
+      String result = session.execute("show events");
+      for(final String line : result.split("\\r?\\n|\\r"))
+        if(line.startsWith("- ")) names.add(line.substring(2));
 
-    for(final String ev : events) {
-      assertTrue("Event '" + ev + "' not created!", names.contains(ev));
-      // drop event
-      session.execute("drop event " + ev);
+      for(final String ev : events)
+        assertTrue("Event '" + ev + "' not created!", names.contains(ev));
+    } finally {
+      // drop events as last action, preventing leftovers
+      for(final String ev : events) session.execute("drop event " + ev);
     }
   }
 
