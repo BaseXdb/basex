@@ -1,6 +1,7 @@
 package org.basex.api.webdav;
 
 import static org.basex.query.func.Function.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -142,7 +143,6 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         s.execute(new Open(db));
         final String doc = path.isEmpty() ? newName : path + SEP + newName;
         // check if document with this path already exists
-        System.out.println(doc);
         if(pathExists(s, db, doc)) {
           s.replace(doc, input);
         } else {
@@ -232,9 +232,11 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     final Query q = s.query(
         "for $d in " + DBLIST.args("$db", "$path") +
         "let $t := tokenize(substring($d, string-length($path) + 1), '/') " +
-        "let $t := tokenize(substring($d, string-length($path) + 1), '/') " +
         "let $p := string-join(($trgdir, $t[position() < last()]), '/') " +
         "let $n := $t[last()] return " +
+        "if (" + DBISRAW.args("$db", "$d") + ") then " +
+        DBSTORE.args("$trgdb", "$p||'/'||$n", DBRETRIEVE.args("$db", "$d")) +
+        " else " +
         DBADD.args("$trgdb", DBOPEN.args("$db", "$d"), "$n", "$p"));
     q.bind("db", db);
     q.bind("path", path);
