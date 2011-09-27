@@ -46,7 +46,7 @@ public final class OptimizeAll extends ACreate {
   }
 
   @Override
-  protected boolean run() throws IOException {
+  protected boolean run() {
     try {
       final Data data = context.data();
       optimizeAll(data, context, this);
@@ -54,8 +54,9 @@ public final class OptimizeAll extends ACreate {
       final Open open = new Open(data.meta.name);
       return open.run(context) ? info(DBOPTIMIZED, data.meta.name, perf) :
         error(open.info());
-    } catch(final BaseXException ex) {
-      return error(ex.getMessage());
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return error(Util.message(ex));
     }
   }
 

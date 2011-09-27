@@ -1,8 +1,10 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
+
 import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * English stemming algorithm, based on the publication from Porter (1980):
@@ -83,6 +85,13 @@ final class EnglishStemmer extends Stemmer {
    */
   EnglishStemmer(final FTIterator fti) {
     super(fti);
+  }
+
+  @Override
+  Collection<Language> languages() {
+    final HashSet<Language> ln = new HashSet<Language>();
+    ln.add(Language.get("en"));
+    return ln;
   }
 
   @Override
@@ -274,10 +283,5 @@ final class EnglishStemmer extends Stemmer {
   @Override
   Stemmer get(final Language l, final FTIterator fti) {
     return new EnglishStemmer(fti);
-  }
-
-  @Override
-  EnumSet<Language> languages() {
-    return EnumSet.of(Language.EN);
   }
 }

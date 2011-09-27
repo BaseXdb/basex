@@ -11,7 +11,7 @@ import java.util.LinkedList;
  */
 public abstract class Stemmer extends LanguageImpl {
   /** List of available stemmers. */
-  public static final LinkedList<Stemmer> IMPL = new LinkedList<Stemmer>();
+  static final LinkedList<Stemmer> IMPL = new LinkedList<Stemmer>();
 
   /** Load stemmers and order them by precedence. */
   static {
@@ -43,6 +43,16 @@ public abstract class Stemmer extends LanguageImpl {
    */
   protected Stemmer(final FTIterator ft) {
     iter = ft;
+  }
+
+  /**
+   * Checks if the language is supported by the available stemmers.
+   * @param l language to be found
+   * @return result of check
+   */
+  public static boolean supportFor(final Language l) {
+    for(final Stemmer s : Stemmer.IMPL) if(s.supports(l)) return true;
+    return false;
   }
 
   /**

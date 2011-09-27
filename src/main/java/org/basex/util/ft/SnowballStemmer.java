@@ -1,10 +1,10 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.Language.*;
+
 import java.lang.reflect.Method;
-import java.util.EnumMap;
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashMap;
 import org.basex.util.Reflect;
 
 /**
@@ -17,10 +17,10 @@ import org.basex.util.Reflect;
  */
 final class SnowballStemmer extends Stemmer {
   /** Name of the package with all Snowball stemmers. */
-  private static final String PKG = "org.tartarus.snowball";
+  private static final String PATTERN = "org.tartarus.snowball.ext.%Stemmer";
   /** Stemmer classes which the Snowball library provides. */
-  private static final EnumMap<Language, StemmerClass> CLASSES =
-      new EnumMap<Language, StemmerClass>(Language.class);
+  private static final HashMap<Language, StemmerClass> CLASSES =
+      new HashMap<Language, StemmerClass>();
 
   /** Stemmer class corresponding to the required properties. */
   private StemmerClass clazz;
@@ -28,23 +28,16 @@ final class SnowballStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    if(Reflect.available(PKG)) {
-      add(DA); add(DE); add(EN); add(ES); add(FI); add(FR); add(HU); add(IT);
-      add(NL); add(NO); add(PT); add(RO); add(RU); add(SV); add(TR);
+    if(Reflect.avl(PATTERN, "German")) {
+      for(final Language l : Language.ALL.values()) {
+        final Class<?> clz = Reflect.find(PATTERN, l);
+        if(clz == null) continue;
+        CLASSES.put(l, new StemmerClass(clz,
+            Reflect.method(clz, "setCurrent", String.class),
+            Reflect.method(clz, "stem"),
+            Reflect.method(clz, "getCurrent")));
+      }
     }
-  }
-
-  /**
-   * Check if a stemmer class is available, and add it the the list of stemmers.
-   * @param lang language
-   */
-  private static void add(final Language lang) {
-    final Class<?> clz = Reflect.find(
-        PKG + ".ext." + lang.toString().toLowerCase() + "Stemmer");
-    CLASSES.put(lang, new StemmerClass(clz,
-        Reflect.method(clz, "setCurrent", String.class),
-        Reflect.method(clz, "stem"),
-        Reflect.method(clz, "getCurrent")));
   }
 
   /**
@@ -88,8 +81,8 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  EnumSet<Language> languages() {
-    return EnumSet.copyOf(CLASSES.keySet());
+  Collection<Language> languages() {
+    return CLASSES.keySet();
   }
 
   @Override

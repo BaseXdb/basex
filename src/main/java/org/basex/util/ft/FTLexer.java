@@ -1,10 +1,13 @@
 package org.basex.util.ft;
 
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.basex.index.IndexToken;
 import org.basex.io.serial.XMLSerializer;
 import org.basex.query.ft.FTFilter;
 import org.basex.util.Token;
+import org.basex.util.list.StringList;
 
 /**
  * Performs full-text lexing on token. Calls tokenizers, stemmers matching to
@@ -45,7 +48,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
     // check if language option is provided:
     Language lang = opt != null ? opt.ln : null;
-    if(lang == null) lang = Language.DEFAULT;
+    if(lang == null) lang = Language.def();
 
     // use default tokenizer if specific tokenizer is not available.
     Tokenizer tk = Tokenizer.IMPL.getFirst();
@@ -195,13 +198,16 @@ public final class FTLexer extends FTIterator implements IndexToken {
    * Lists all languages for which tokenizers and stemmers are available.
    * @return supported languages
    */
-  public static EnumSet<Language> languages() {
-    final EnumSet<Language> ln = EnumSet.noneOf(Language.class);
+  public static StringList languages() {
+    final Set<Language> ln = new HashSet<Language>();
     for(final Tokenizer t : Tokenizer.IMPL) ln.addAll(t.languages());
-    final EnumSet<Language> sln = EnumSet.noneOf(Language.class);
+    final Set<Language> sln = new HashSet<Language>();
     for(final Stemmer stem : Stemmer.IMPL) sln.addAll(stem.languages());
     // intersection of languages tokenizers and stemmers support
     ln.retainAll(sln);
-    return ln;
+    final StringList sl = new StringList(sln.size());
+    for(final Language l : sln) sl.add(l.toString());
+    sl.sort(true, true);
+    return sl;
   }
 }

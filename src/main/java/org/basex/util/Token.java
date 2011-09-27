@@ -650,6 +650,17 @@ public final class Token {
   }
 
   /**
+   * Compares several strings for equality.
+   * @param str first string
+   * @param strings strings to be compared
+   * @return true if the arrays are equal
+   */
+  public static boolean eq(final String str, final String... strings) {
+    for(final String s : strings) if(str.equals(s)) return true;
+    return false;
+  }
+
+  /**
    * Calculates the difference of two tokens.
    * @param token first token
    * @param compare token to be compared

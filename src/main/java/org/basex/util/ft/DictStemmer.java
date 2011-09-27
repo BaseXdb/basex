@@ -1,6 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.EnumSet;
+import java.util.Collection;
 
 /**
  * Dictionary-based stemmer.
@@ -33,12 +33,12 @@ final class DictStemmer extends Stemmer {
   }
 
   @Override
-  byte[] stem(final byte[] word) {
-    return dict.stem(word);
+  Collection<Language> languages() {
+    return Language.ALL.values();
   }
 
   @Override
-  EnumSet<Language> languages() {
-    return EnumSet.allOf(Language.class);
+  byte[] stem(final byte[] word) {
+    return dict.stem(word);
   }
 }

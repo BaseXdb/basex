@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.User;
@@ -84,6 +85,6 @@ public final class Open extends Command {
     if(ctx.perm(User.READ, data.meta)) return data;
 
     Close.close(data, ctx);
-    throw new IOException(Util.info(PERMNO, CmdPerm.READ));
+    throw new BaseXException(PERMNO, CmdPerm.READ);
   }
 }

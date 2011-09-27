@@ -86,7 +86,7 @@ public final class FTOpt extends ExprInfo {
     if(is(LC)) ser.attribute(token(LOWERCASE), TRUE);
     if(is(DC)) ser.attribute(token(DIACRITICS), TRUE);
     if(is(ST)) ser.attribute(token(STEMMING), TRUE);
-    if(ln != null) ser.attribute(token(LANGUAGE), token(ln.name()));
+    if(ln != null) ser.attribute(token(LANGUAGE), token(ln.toString()));
     if(th != null) ser.attribute(token(THESAURUS), TRUE);
   }
 
@@ -99,8 +99,7 @@ public final class FTOpt extends ExprInfo {
     if(is(LC)) s.append(' ' + USING + ' ' + LOWERCASE);
     if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + ' ' + SENSITIVE);
     if(is(ST) || sd != null) s.append(' ' + USING + ' ' + STEMMING);
-    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '" +
-        ln.name() + '\'');
+    if(ln != null) s.append(' ' + USING + ' ' + LANGUAGE + " '" + ln + '\'');
     if(th != null) s.append(' ' + USING + ' ' + THESAURUS);
     return s.toString();
   }

@@ -1,6 +1,8 @@
 package org.basex.util.ft;
 
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.basex.util.TokenBuilder;
 
 /**
@@ -21,6 +23,13 @@ final class GermanStemmer extends Stemmer {
    */
   GermanStemmer(final FTIterator fti) {
     super(fti);
+  }
+
+  @Override
+  Collection<Language> languages() {
+    final HashSet<Language> ln = new HashSet<Language>();
+    ln.add(Language.get("de"));
+    return ln;
   }
 
   @Override
@@ -182,10 +191,5 @@ final class GermanStemmer extends Stemmer {
   @Override
   int prec() {
     return 1000;
-  }
-
-  @Override
-  EnumSet<Language> languages() {
-    return EnumSet.of(Language.DE);
   }
 }

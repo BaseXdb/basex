@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -92,10 +93,10 @@ final class DialogFT extends BaseXBack {
     final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b1.add(check[F_LANG]);
     final StringList langs = new StringList();
-    for(final Language l : FTLexer.languages()) langs.add(l.toString());
+    for(final String l : FTLexer.languages()) langs.add(l);
     language = new BaseXCombo(d, langs.toArray());
-    final Language ln = Language.get(prop.get(Prop.LANGUAGE));
-    language.setSelectedItem((ln == null ? Language.DEFAULT : ln).toString());
+    final Language ln = Language.get(prop);
+    language.setSelectedItem((ln == null ? Language.def() : ln).toString());
 
     b1.add(language);
     add(b1);
@@ -171,7 +172,7 @@ final class DialogFT extends BaseXBack {
   void close() {
     final GUI gui = dialog.gui;
     gui.set(Prop.LANGUAGE, check[F_LANG].isSelected() ?
-        Language.get(language.getSelectedItem().toString()).name() : "");
+        Language.get(language.getSelectedItem().toString()).toString() : "");
     gui.set(Prop.STEMMING, check[F_STEM].isSelected());
     gui.set(Prop.CASESENS, check[F_CASE].isSelected());
     gui.set(Prop.DIACRITICS, check[F_DIA].isSelected());

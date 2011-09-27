@@ -360,7 +360,8 @@ pc_pathnf=ファイル又はディレクトリが見付かりませんでした�
 pc_skipped=Skipped
 pc_skipinfo=% more file(s) skipped
 pc_dbnf=データベース名を入力してください。
-pc_langnf=Language '%' not supported.
+pc_notok=No tokenizer available for language "%".
+pc_nostem=No stemmer available for language "%".
 pc_err="%" をパースできませんでした。
 pc_pos=% (%行、)
 pc_direrr="%" points to a directory.
@@ -391,6 +392,7 @@ db_notdeleted=ファイル '%' を削除できませんでした。
 db_exists=同じ名前のデータベース "%" が存在します。
 db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
+db_notstored=File '%' could not be stored.
 
 # Index commands
 in_created=% にインデックスが作成されました。

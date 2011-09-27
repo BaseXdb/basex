@@ -122,7 +122,7 @@ public final class MetaData {
     diacritics = prop.is(Prop.DIACRITICS);
     casesens = prop.is(Prop.CASESENS);
     scoring = prop.num(Prop.SCORING);
-    language = Language.get(prop.get(Prop.LANGUAGE));
+    language = Language.get(prop);
     users = new Users(false);
   }
 
@@ -352,7 +352,7 @@ public final class MetaData {
     writeInfo(out, DBSCTYPE, scoring);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
-    if(language != null) writeInfo(out, DBFTLN, language.name());
+    if(language != null) writeInfo(out, DBFTLN, language.toString());
     out.writeString(DBPERM);
     users.write(out);
     out.write(0);

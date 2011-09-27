@@ -1,10 +1,9 @@
 package org.basex.util.ft;
 
-import java.util.EnumSet;
+import java.util.Collection;
 
 /**
- * Functions for judging which classes (eg. tokenizers, stemmers) match to
- * chosen language.
+ * Abstract class for stemmer and tokenizer implementations.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Jens Erat
@@ -13,7 +12,7 @@ abstract class LanguageImpl extends FTIterator
     implements Comparable<LanguageImpl> {
 
   /**
-   * Returns the precedence of the processor.
+   * Returns the precedence of the processor (the higher, the better).
    * @return precedence
    */
   abstract int prec();
@@ -31,7 +30,7 @@ abstract class LanguageImpl extends FTIterator
    * Returns the supported languages.
    * @return languages
    */
-  abstract EnumSet<Language> languages();
+  abstract Collection<Language> languages();
 
   @Override
   public final boolean equals(final Object o) {
@@ -40,7 +39,6 @@ abstract class LanguageImpl extends FTIterator
 
   @Override
   public final int compareTo(final LanguageImpl o) {
-    // higher precedence value = better
     return o.prec() - prec();
   }
 

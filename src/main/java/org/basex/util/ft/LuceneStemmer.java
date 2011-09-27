@@ -1,11 +1,12 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.Language.*;
 import java.lang.reflect.Method;
-import java.util.EnumMap;
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashMap;
+
 import org.basex.util.Reflect;
+import org.basex.util.Util;
 
 /**
  * Stemmer implementation using the Lucene stemmer contributions.
@@ -17,10 +18,10 @@ import org.basex.util.Reflect;
  */
 final class LuceneStemmer extends Stemmer {
   /** Name of the package with all Lucene stemmers. */
-  private static final String PKG = "org.apache.lucene.analysis";
+  private static final String PATTERN = "org.apache.lucene.analysis.%Stemmer";
   /** Stemmer classes which the Lucene library provides. */
-  private static final EnumMap<Language, StemmerClass> CLASSES =
-      new EnumMap<Language, StemmerClass>(Language.class);
+  private static final HashMap<Language, StemmerClass> CLASSES =
+      new HashMap<Language, StemmerClass>();
 
   /** Stemmer class corresponding to the required properties. */
   private StemmerClass clazz;
@@ -28,8 +29,10 @@ final class LuceneStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    if(Reflect.available(PKG)) {
-      add(PT, "br.Brazilian"); add(DE); add(FR); add(NL); add(RU);
+    final String br = "br.Brazilian";
+    if(Reflect.avl(Util.info(PATTERN, br))) {
+      add("pt", br);
+      add("de", "fr", "nl", "ru");
     }
   }
 
@@ -37,8 +40,11 @@ final class LuceneStemmer extends Stemmer {
    * Check if a stemmer class is available, and add it the the list of stemmers.
    * @param lang language
    */
-  private static void add(final Language lang) {
-    add(lang, lang.name().toLowerCase() + '.' + lang);
+  private static void add(final String... lang) {
+    for(final String ln : lang) {
+      final Language l = Language.get(ln);
+      add(ln, l.code() + '.' + l);
+    }
   }
 
   /**
@@ -46,10 +52,10 @@ final class LuceneStemmer extends Stemmer {
    * @param lang language
    * @param path class path
    */
-  private static void add(final Language lang, final String path) {
-    final Class<?> clz = Reflect.find(PKG + '.' + path + "Stemmer");
+  private static void add(final String lang, final String path) {
+    final Class<?> clz = Reflect.find(PATTERN, path);
     final Method m = Reflect.method(clz, "stem", String.class);
-    CLASSES.put(lang, new StemmerClass(clz, m));
+    CLASSES.put(Language.get(lang), new StemmerClass(clz, m));
   }
 
   /**
@@ -78,6 +84,11 @@ final class LuceneStemmer extends Stemmer {
   }
 
   @Override
+  Collection<Language> languages() {
+    return CLASSES.keySet();
+  }
+
+  @Override
   Stemmer get(final Language l, final FTIterator fti) {
     return new LuceneStemmer(l, fti);
   }
@@ -90,11 +101,6 @@ final class LuceneStemmer extends Stemmer {
   @Override
   int prec() {
     return 200;
-  }
-
-  @Override
-  EnumSet<Language> languages() {
-    return EnumSet.copyOf(CLASSES.keySet());
   }
 
   @Override

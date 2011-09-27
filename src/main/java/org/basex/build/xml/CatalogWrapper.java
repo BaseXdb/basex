@@ -16,13 +16,13 @@ import org.xml.sax.XMLReader;
  */
 public final class CatalogWrapper {
   /** Package declaration for CatalogManager. */
-  private static final Class<?> CMP = find(
+  private static final Class<?> CMP = find(new String[] {
     "org.apache.xml.resolver.CatalogManager",
-    "com.sun.org.apache.xml.internal.resolver.CatalogManager");
+    "com.sun.org.apache.xml.internal.resolver.CatalogManager" });
   /** Package declaration for CatalogResolver constructor. */
-  private static final Constructor<?> CRP = find(find(
+  private static final Constructor<?> CRP = find(find(new String[] {
     "org.apache.xml.resolver.tools.CatalogResolver",
-    "com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver"), CMP);
+    "com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver" }), CMP);
   /** Instance of catalog manager. */
   private static final Object CM = get(CMP);
 

@@ -19,6 +19,7 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -100,14 +101,14 @@ public final class CreateDB extends ACreate {
 
     // check permissions
     if(!ctx.user.perm(User.CREATE))
-      throw new IOException(Util.info(PERMNO, CmdPerm.CREATE));
+      throw new BaseXException(PERMNO, CmdPerm.CREATE);
 
     // create main memory database instance
     final Prop prop = ctx.prop;
     if(prop.is(Prop.MAINMEM)) return MemBuilder.build(name, parser, ctx.prop);
 
     // database is currently locked by another process
-    if(ctx.pinned(name)) throw new IOException(Util.info(DBLOCKED, name));
+    if(ctx.pinned(name)) throw new BaseXException(DBLOCKED, name);
 
     // build database and index structures
     final Builder builder = new DiskBuilder(name, parser, ctx);
@@ -136,9 +137,8 @@ public final class CreateDB extends ACreate {
   public static synchronized MemData mainMem(final Parser parser,
       final Context ctx) throws IOException {
 
-    if(!ctx.user.perm(User.CREATE))
-      throw new IOException(Util.info(PERMNO, CmdPerm.CREATE));
-    return MemBuilder.build(parser, ctx.prop);
+    if(ctx.user.perm(User.CREATE)) return MemBuilder.build(parser, ctx.prop);
+    throw new BaseXException(PERMNO, CmdPerm.CREATE);
   }
 
   /**

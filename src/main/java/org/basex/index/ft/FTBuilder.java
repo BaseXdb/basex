@@ -3,7 +3,10 @@ package org.basex.index.ft;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.index.IndexBuilder;
@@ -16,7 +19,9 @@ import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.Language;
 import org.basex.util.ft.Scoring;
+import org.basex.util.ft.Stemmer;
 import org.basex.util.ft.StopWords;
+import org.basex.util.ft.Tokenizer;
 import org.basex.util.list.IntList;
 import org.basex.util.Util;
 
@@ -72,22 +77,21 @@ public abstract class FTBuilder extends IndexBuilder {
     super(d);
 
     final Prop prop = d.meta.prop;
-    final FTOpt opt = new FTOpt();
-    opt.set(FTFlag.DC, prop.is(Prop.DIACRITICS));
-    opt.set(FTFlag.CS, prop.is(Prop.CASESENS));
-    opt.set(FTFlag.ST, prop.is(Prop.STEMMING));
-    opt.sw = new StopWords(d, prop.get(Prop.STOPWORDS));
+    final FTOpt fto = new FTOpt();
+    fto.set(FTFlag.DC, prop.is(Prop.DIACRITICS));
+    fto.set(FTFlag.CS, prop.is(Prop.CASESENS));
+    fto.set(FTFlag.ST, prop.is(Prop.STEMMING));
+    fto.sw = new StopWords(d, prop.get(Prop.STOPWORDS));
+    fto.ln = Language.get(prop);
 
-    final String lang = prop.get(Prop.LANGUAGE);
-    opt.ln = Language.get(lang);
-    if(!Language.supported(opt.ln, prop.is(Prop.STEMMING)) ||
-        !lang.isEmpty() && opt.ln == null)
-      throw new IOException(Util.info(LANGWHICH, lang));
+    if(!Tokenizer.supportFor(fto.ln)) throw new BaseXException(NOTOK, fto.ln);
+    if(prop.is(Prop.STEMMING) && !Stemmer.supportFor(fto.ln))
+      throw new BaseXException(NOSTEM, fto.ln);
 
     scm = d.meta.scoring;
     max = -1;
     min = Integer.MAX_VALUE;
-    lex = new FTLexer(opt);
+    lex = new FTLexer(fto);
   }
 
   /**
