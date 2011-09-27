@@ -6,14 +6,20 @@ import static org.basex.util.Token.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Random;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -56,27 +62,56 @@ public final class Encryption {
   /**
    * Encrypts or decrypts the given input.
    * @param in input
-   * @param encryptionType encryption type
+   * @param type encryption type
    * @param key secret key
    * @param algorithm encryption algorithm
    * @param encrypt encrypt or decrypt
    * @return encrypted or decrypted input
    * @throws QueryException query exception
    */
-  public Item encryption(final byte[] in, final byte[] encryptionType,
+  public Item encryption(final byte[] in, final byte[] type,
       final byte[] key, final byte[] algorithm, final boolean encrypt)
           throws QueryException {
 
-    final boolean symmetric = eq(encryptionType, SYM);
-    // encryption type must be 'symmetric' or 'asymmetric'
-    if(!symmetric && !eq(encryptionType, ASYM))
-      if(encrypt) CRYPTOENCTYP.thrw(input, encryptionType);
-      else CRYPTODECTYP.thrw(input, encryptionType);
+    final boolean symmetric = eq(type, SYM);
+    // encryption type must be 'symmetric' or 'asymmetric', error message
+    // dependent on encryption/decryption
+    if(!symmetric && !eq(type, ASYM))
+      if(encrypt) CRYPTOENCTYP.thrw(input, type);
+      else CRYPTODECTYP.thrw(input, type);
 
     // transformed input
     byte[] t = null;
-    final String a = string(algorithm);
-    final String ka = a.substring(0, 3);
+    final String algo = string(algorithm);
+    final String ka = algo.substring(0, 3);
+
+//    try {
+//
+//      final Key k = KeyGenerator.getInstance(ka).generateKey();
+//      final Cipher cipher = Cipher.getInstance(algo);
+//      t = in;
+//
+//      if(encrypt) {
+//        cipher.init(Cipher.ENCRYPT_MODE, k);
+//        cipher.doFinal(t);
+//
+//      } else {
+//        cipher.init(Cipher.DECRYPT_MODE, k);
+//        t = cipher.doFinal(t);
+//      }
+//
+//    } catch (NoSuchPaddingException e) {
+//      e.printStackTrace();
+//    } catch(NoSuchAlgorithmException e) {
+//      e.printStackTrace();
+//    } catch(InvalidKeyException e) {
+//      e.printStackTrace();
+//    } catch(IllegalBlockSizeException e) {
+//      e.printStackTrace();
+//    } catch(BadPaddingException e) {
+//      e.printStackTrace();
+//    }
+
     try {
 
       if(symmetric) {
@@ -86,16 +121,16 @@ public final class Encryption {
         new Random().nextBytes(iVector);
         final IvParameterSpec iv = new IvParameterSpec(iVector);
 //        IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
-        final Cipher cip = Cipher.getInstance(a);
+        final Cipher cipher = Cipher.getInstance(algo);
 
         // encrypt/decrypt
         if(encrypt)
-          cip.init(Cipher.ENCRYPT_MODE, keySpec, iv);
+          cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
         else
-          cip.init(Cipher.DECRYPT_MODE, keySpec, iv);
+          cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
 
-        t = new byte[cip.getOutputSize(in.length)];
-        cip.doFinal(t, cip.update(in, 0, in.length, t, 0));
+        t = new byte[cipher.getOutputSize(in.length)];
+        cipher.doFinal(t, cipher.update(in, 0, in.length, t, 0));
 
         // asymmetric encryption
       } else {
