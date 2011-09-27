@@ -123,8 +123,11 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   protected void add(final Session s, final String trgdb, final String trgdir,
       final String name) throws IOException {
 
-    final Query q = s.query(DBADD.args("$db",
-        DBOPEN.args("$sdb", "$spath"), "$name", "$path"));
+    final Query q = s.query(
+        "if (" + DBISRAW.args("$sdb", "$spath") + ") then " +
+        DBSTORE.args("$db", "$path||'/'||$name",
+            DBRETRIEVE.args("$sdb", "$spath")) + " else " +
+        DBADD.args("$db", DBOPEN.args("$sdb", "$spath"), "$name", "$path"));
     q.bind("db", trgdb);
     q.bind("sdb", db);
     q.bind("spath", path);
