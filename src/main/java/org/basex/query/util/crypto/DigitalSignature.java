@@ -173,6 +173,15 @@ public final class DigitalSignature {
       final byte[] signature, final byte[] nsPrefix, final byte[] type,
       final byte[] xpathExpr, final ANode certificate) throws QueryException {
 
+
+    // TODO create unit tests for given xpath expression / find examples?
+    // TODO run find bugs
+    // TODO change these token arrays to maps
+    // TODO check variables for final
+    // TODO change variable names
+    // TODO make code more readable
+    // TODO documentation!
+
     // variables to check if parameters correct
     int l = 0;
     int i = 0;
@@ -293,23 +302,23 @@ public final class DigitalSignature {
         pk = kp.getPrivate();
       }
 
-      Document doc = toDOMNode(node);
+      Document inputNode = toDOMNode(node);
       List transform = null;
+
 
       // validating a given XPath expression to get nodes to be signed
       if(xpathExpr.length > 0) {
-//        CRYPTONOTSUPP.thrw(input, xpathExpr);
-
         final XPathFactory xpf = XPathFactory.newInstance();
         final XPath xp = xpf.newXPath();
         final XPathExpression xpexp = xp.compile(string(xpathExpr));
         // TODO evaluate to node instead of node set? how deal with mltpl nds?
-        final NodeList xpNodes = (NodeList) xpexp.evaluate(doc,
+        // loop through result list, add transform, unit test! possible?
+        final NodeList xpNodes = (NodeList) xpexp.evaluate(inputNode,
             XPathConstants.NODESET);
         if(xpNodes.getLength() < 1)
           CRYPTOXPINV.thrw(input, xpathExpr);
         final Node nodeToSign = xpNodes.item(0);
-        final Node par = nodeToSign.getParentNode();
+//        parentOfNodeToSign = nodeToSign.getParentNode();
         transform = new ArrayList<Transform>(2);
         transform.add(fac.newTransform(Transform.XPATH,
             new XPathFilterParameterSpec(string(xpathExpr))));
@@ -321,51 +330,58 @@ public final class DigitalSignature {
             Transform.ENVELOPED, (TransformParameterSpec) null));
       }
 
-      // TODO run find bugs
 
-      Reference ref = fac.newReference("",
+      // creating reference element
+      final Reference ref = fac.newReference("",
           fac.newDigestMethod(DA, null), transform, null, null);
 
+      // creating signed info element
       final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CM,
               (C14NMethodParameterSpec) null),
               fac.newSignatureMethod(SA, null),
               Collections.singletonList(ref));
 
+
+      // prepare document signature
       DOMSignContext dsc = null;
       XMLSignature xmlsig = null;
 
-      // enveloped
+      // enveloped signature
       // TODO don't test it like that - token maps or sth else
       if(eq(type, SIGNATURETYPES[0])) {
-        dsc = new DOMSignContext(pk, doc.getDocumentElement());
+        dsc = new DOMSignContext(pk, inputNode.getDocumentElement());
         xmlsig = fac.newXMLSignature(si, ki);
 
-        // detached
+        // detached signature
       } else if(eq(type, SIGNATURETYPES[1])) {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        doc = dbf.newDocumentBuilder().newDocument();
-        dsc = new DOMSignContext(pk, doc);
+        // TODO total crap, why do that? throwing away input ... ?
+        inputNode = dbf.newDocumentBuilder().newDocument();
+        dsc = new DOMSignContext(pk, inputNode);
         xmlsig = fac.newXMLSignature(si, ki);
 
-        // enveloping
+        // enveloping signature
       } else {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
-        XMLStructure cont = new DOMStructure(doc.getDocumentElement());
-        XMLObject obj = fac.newXMLObject(Collections.singletonList(cont),
+        final XMLStructure cont = new DOMStructure(
+            inputNode.getDocumentElement());
+        final XMLObject obj = fac.newXMLObject(Collections.singletonList(cont),
             "", null, null);
         xmlsig = fac.newXMLSignature(si, ki, Collections.singletonList(obj),
             null, null);
-        dsc = new DOMSignContext(pk, doc);
+        dsc = new DOMSignContext(pk, inputNode);
       }
 
-      // set Signature element prefix, if given
+
+      // set Signature element namespace prefix, if given
       if(nsPrefix.length > 0)
         dsc.setDefaultNamespacePrefix(new String(nsPrefix));
 
+      // actually sign the document
       xmlsig.sign(dsc);
-      signedNode = toDBNode(doc);
+      signedNode = toDBNode(inputNode);
 
     } catch(NoSuchAlgorithmException e) {
       e.printStackTrace();

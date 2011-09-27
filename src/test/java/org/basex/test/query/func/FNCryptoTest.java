@@ -223,12 +223,11 @@ public class FNCryptoTest extends AdvancedQueryTest {
   /**
    * Tests calling generate-signature with a wrong type argument.
    */
-  @Test
+  @Test/*(expected = IndexOutOfBoundsException.class)*/
   public void validateSignatureWithSignatureTypeFAIL() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'xxx'))",
-        "true");
+        "'xxx'))");
     Assert.fail();
   }
 
