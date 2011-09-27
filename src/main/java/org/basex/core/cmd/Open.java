@@ -1,6 +1,8 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
@@ -8,6 +10,7 @@ import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
+import org.basex.data.MetaData;
 import org.basex.util.Util;
 
 /**
@@ -27,16 +30,18 @@ public final class Open extends Command {
 
   @Override
   protected boolean run() {
-    String db = args[0];
-
+    // close existing database
     new Close().run(context);
+
+    // split database name and path
+    String db = args[0];
     final int i = db.indexOf('/');
     String path = null;
     if(i != -1) {
       path = db.substring(i + 1);
       db = db.substring(0, i);
     }
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
 
     try {
       final Data data = open(db, context);
@@ -70,7 +75,7 @@ public final class Open extends Command {
     if(data == null) {
       // check if document exists
       if(!ctx.mprop.dbexists(name))
-        throw new IOException(Util.info(DBNOTFOUND, name));
+        throw new FileNotFoundException(Util.info(DBNOTFOUND, name));
 
       data = new DiskData(name, ctx);
       ctx.pin(data);

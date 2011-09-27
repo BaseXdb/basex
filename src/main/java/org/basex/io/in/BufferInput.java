@@ -30,8 +30,8 @@ public class BufferInput extends InputStream {
   protected final byte[] buffer;
   /** Current buffer position. */
   protected int pos;
-  /** Current buffer size. */
-  protected int size;
+  /** Current buffer size (set to {@code -1} if buffer is still empty). */
+  protected int size = -1;
 
   /** Reference to the data input stream. */
   private InputStream in;
@@ -80,11 +80,11 @@ public class BufferInput extends InputStream {
    */
   public final String encoding() throws IOException {
     // cache first bytes
-    if(size == 0) next();
-    final byte a = length > 0 ? buffer[0] : 0;
-    final byte b = length > 1 ? buffer[1] : 0;
-    final byte c = length > 2 ? buffer[2] : 0;
-    final byte d = length > 3 ? buffer[3] : 0;
+    if(size == -1) size = in.read(buffer);
+    final byte a = size > 0 ? buffer[0] : 0;
+    final byte b = size > 1 ? buffer[1] : 0;
+    final byte c = size > 2 ? buffer[2] : 0;
+    final byte d = size > 3 ? buffer[3] : 0;
     if(a == -1 && b == -2 || a == '<' && b == 0 && c == '?' && d == 0) {
       // BOM: ff fe
       enc = UTF16LE;
@@ -123,8 +123,10 @@ public class BufferInput extends InputStream {
   @Override
   public int read() throws IOException {
     if(pos >= size) {
-      next();
+      if(size != -1) read += size;
+      size = in.read(buffer);
       if(size <= 0) return -1;
+      pos = 0;
     }
     return buffer[pos++] & 0xFF;
   }
@@ -145,27 +147,6 @@ public class BufferInput extends InputStream {
    */
   public final byte[] readBytes() throws IOException {
     return bytes().toArray();
-  }
-
-  /**
-   * Reads bytes from the input stream, suffixed by a {@code 0} byte.
-   * @return byte list
-   * @throws IOException I/O Exception
-   */
-  private ByteList bytes() throws IOException {
-    final ByteList bl = new ByteList();
-    for(int l; (l = read()) > 0;) bl.add(l);
-    return bl;
-  }
-
-  /**
-   * Reads the next buffer entry.
-   * @throws IOException I/O exception
-   */
-  private void next() throws IOException {
-    pos = 0;
-    read += size;
-    size = in.read(buffer);
   }
 
   /**
@@ -217,7 +198,7 @@ public class BufferInput extends InputStream {
    * Returns the number of read bytes.
    * @return read bytes
    */
-  final int size() {
+  public final int size() {
     return read + pos;
   }
 
@@ -225,7 +206,7 @@ public class BufferInput extends InputStream {
    * Returns the input length.
    * @return input length
    */
-  final long length() {
+  public final long length() {
     return length;
   }
 
@@ -235,5 +216,16 @@ public class BufferInput extends InputStream {
    */
   public final void length(final long l) {
     length = l;
+  }
+
+  /**
+   * Reads bytes from the input stream, suffixed by a {@code 0} byte.
+   * @return byte list
+   * @throws IOException I/O Exception
+   */
+  private ByteList bytes() throws IOException {
+    final ByteList bl = new ByteList();
+    for(int l; (l = read()) > 0;) bl.add(l);
+    return bl;
   }
 }

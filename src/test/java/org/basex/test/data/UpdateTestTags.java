@@ -17,7 +17,7 @@ public final class UpdateTestTags extends UpdateTest {
    * Tests insert as last child.
    */
   @Test
-  public void testInsertTagAsOnly1() {
+  public void insertTagAsOnly1() {
     final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 0, JUNIT, Data.ELEM);
@@ -43,7 +43,7 @@ public final class UpdateTestTags extends UpdateTest {
    * Tests insert as last child.
    */
   @Test
-  public void testInsertTagAsOnly2() {
+  public void insertTagAsOnly2() {
     final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 1, JUNIT, Data.ELEM);
@@ -69,7 +69,7 @@ public final class UpdateTestTags extends UpdateTest {
    * Tests insert as last child.
    */
   @Test
-  public void testInsertTagAsOnly3() {
+  public void insertTagAsOnly3() {
     final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(3, 2, JUNIT, Data.ELEM);
@@ -95,7 +95,7 @@ public final class UpdateTestTags extends UpdateTest {
    * Tests insert as last child.
    */
   @Test
-  public void testInsertTagAfterAttsAsFirst() {
+  public void insertTagAfterAttsAsFirst() {
     final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 1, JUNIT, Data.ELEM);
@@ -120,7 +120,7 @@ public final class UpdateTestTags extends UpdateTest {
    * Tests insert as last child.
    */
   @Test
-  public void testInsertTagAfterAttsAsSecond() {
+  public void insertTagAfterAttsAsSecond() {
     final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 2, JUNIT, Data.ELEM);
@@ -146,7 +146,7 @@ public final class UpdateTestTags extends UpdateTest {
    * Tests insert as last child.
    */
   @Test
-  public void testInsertTagAfterAttsAsLast() {
+  public void insertTagAfterAttsAsLast() {
     final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
     insertTag(6, 0, JUNIT, Data.ELEM);
@@ -171,7 +171,7 @@ public final class UpdateTestTags extends UpdateTest {
    * Tests updateTagName.
    */
   @Test
-  public void testUpdateTagName() {
+  public void updateTagName() {
     final Data data = CONTEXT.data();
     data.update(6, Data.ELEM, JUNIT, Token.EMPTY);
     assertEquals(Data.ELEM, data.kind(6));

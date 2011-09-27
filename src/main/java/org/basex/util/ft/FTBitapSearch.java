@@ -131,7 +131,7 @@ public final class FTBitapSearch {
    * @author BaseX Team 2005-11, BSD License
    * @author Dimitar Popov
    */
-  public static interface TokenComparator {
+  public interface TokenComparator {
     /**
      * Check if two tokens are equal.
      * @param t1 first token

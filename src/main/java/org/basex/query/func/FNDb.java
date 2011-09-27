@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.net.URLConnection;
 
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
@@ -16,9 +15,10 @@ import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
-import org.basex.data.DataText;
+import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IOFile;
+import org.basex.io.MimeTypes;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
@@ -113,8 +113,9 @@ public final class FNDb extends FuncCall {
       case DBSTORE:    return store(ctx);
       case DBRETRIEVE: return retrieve(ctx);
       case DBISRAW:    return isRaw(ctx);
-      case DBCTYPE:    return contentType(ctx);
+      case DBEXISTS:   return exists(ctx);
       case DBISXML:    return isXML(ctx);
+      case DBCTYPE:    return contentType(ctx);
       default:         return super.item(ctx, ii);
     }
   }
@@ -133,6 +134,7 @@ public final class FNDb extends FuncCall {
     byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
     if(expr.length == 2) path = checkStr(expr[1], ctx);
 
+    if(!MetaData.validName(string(db), false)) INVDB.thrw(input, db);
     final Data data = ctx.resource.data(db, input);
     return DBNodeSeq.get(data.docs(string(path)), data, true, s == -1);
   }
@@ -260,21 +262,23 @@ public final class FNDb extends FuncCall {
   }
 
   /**
-   * Performs the content-type function.
+   * Performs the exists function.
    * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private Str contentType(final QueryContext ctx) throws QueryException {
-    final Data data = data(0, ctx);
-    final String path = path(1, ctx);
-    final IOFile io = data.meta.binary(path);
-    if(io.exists() && !io.isDir()) {
-      final String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
-      return Str.get(ct == null ? DataText.APP_OCTET : ct);
+  private Bln exists(final QueryContext ctx) throws QueryException {
+    try {
+      final Data data = data(0, ctx);
+      if(expr.length == 1) return Bln.TRUE;
+      // check if raw file or XML document exists
+      final String path = path(1, ctx);
+      final IOFile io = data.meta.binary(path);
+      return Bln.get(io.exists() && !io.isDir() || data.doc(path) != -1);
+    } catch(final QueryException ex) {
+      if(ex.err() == NODB) return Bln.FALSE;
+      throw ex;
     }
-    if(isXML(ctx).bool(input)) return Str.get(DataText.APP_XML);
-    throw RESFNF.thrw(input, path);
   }
 
   /**
@@ -286,17 +290,22 @@ public final class FNDb extends FuncCall {
   private Bln isXML(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
-    if(path.isEmpty()) return Bln.FALSE;
+    return Bln.get(data.doc(path) != -1);
+  }
 
-    // normalize path
-    final byte[] exct = token(Prop.WIN ? path.toLowerCase() : path);
-    final IntList il = data.docs(path);
-    // check if one of the hits is exact, i.e., is no directory entry
-    for(int i = 0; i < il.size(); i++) {
-      final byte[] txt = data.text(il.get(i), true);
-      if(eq(exct, Prop.WIN ? lc(txt) : txt)) return Bln.TRUE;
-    }
-    return Bln.FALSE;
+  /**
+   * Performs the content-type function.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Str contentType(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    final String path = path(1, ctx);
+    if(data.doc(path) != -1) return Str.get(MimeTypes.APP_XML);
+    final IOFile io = data.meta.binary(path);
+    if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
+    throw RESFNF.thrw(input, path);
   }
 
   /**
@@ -340,9 +349,7 @@ public final class FNDb extends FuncCall {
 
     final Data data = data(0, ctx);
     final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
-    // ensure that the path is valid
     final String path = expr.length < 4 ? null : path(3, ctx);
-    if(path != null && !new IOFile(path).isValid()) RESINV.thrw(input, path);
 
     // get all items representing document(s):
     final ObjList<Item> docs = new ObjList<Item>(
@@ -370,11 +377,9 @@ public final class FNDb extends FuncCall {
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final IntList old = data.docs(trg);
-    if(old.size() > 0) {
-      final int pre = old.get(0);
-      if(old.size() > 1 || !eq(data.text(pre, true), token(trg)))
-        DOCTRGMULT.thrw(input);
+    final int pre = data.doc(trg);
+    if(pre != -1) {
+      if(data.docs(trg).size() != 1) DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
     // delete raw resources
@@ -432,7 +437,6 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String src = path(1, ctx);
     final String trg = path(2, ctx);
-    if(!new IOFile(trg).isValid()) RESINV.thrw(input, trg);
 
     // the first step of the path should be the database name
     final IntList il = data.docs(src);
@@ -443,10 +447,8 @@ public final class FNDb extends FuncCall {
       ctx.updates.add(new ReplaceValue(pre, data, input, token(target)), ctx);
     }
     // rename files
-    final IOFile source = data.meta.binary(src);
-    final IOFile target = data.meta.binary(trg);
-    if(source != null && target != null)
-      ctx.updates.add(new DBRename(data, source, target, input), ctx);
+    if(data.meta.binary(src) != null && data.meta.binary(trg) != null)
+      ctx.updates.add(new DBRename(data, src, trg, input), ctx);
 
     return null;
   }
@@ -478,8 +480,7 @@ public final class FNDb extends FuncCall {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
     final IOFile file = data.meta.binary(path);
-    if(file == null || file.isDir() || !file.isValid())
-      RESINV.thrw(input, path);
+    if(file == null || file.isDir()) RESINV.thrw(input, path);
 
     final byte[] val = checkBin(expr[2], ctx);
     ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
@@ -531,8 +532,6 @@ public final class FNDb extends FuncCall {
    */
   private Item event(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
-    if(expr.length == 3) expr[2].value(ctx);
-
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
@@ -590,7 +589,11 @@ public final class FNDb extends FuncCall {
 
     final Item it = checkEmpty(expr[arg].item(ctx, input));
     if(it.node()) return checkDBNode(it).data;
-    if(it.str())  return ctx.resource.data(it.atom(input), input);
+    if(it.str())  {
+      final byte[] name = it.atom(input);
+      if(!MetaData.validName(string(name), false)) INVDB.thrw(input, name);
+      return ctx.resource.data(name, input);
+    }
     throw STRNODTYPE.thrw(input, this, it.type);
   }
 
@@ -608,7 +611,8 @@ public final class FNDb extends FuncCall {
   }
 
   /**
-   * Normalizes the specified expression as normalized database path.
+   * Returns the specified expression as normalized database path.
+   * Throws an exception if the path is invalid.
    * @param i expression index
    * @param ctx query context
    * @return normalized path
@@ -616,6 +620,10 @@ public final class FNDb extends FuncCall {
    */
   private String path(final int i, final QueryContext ctx)
       throws QueryException {
-    return IOFile.normalize(string(checkStr(expr[i], ctx)));
+
+    final String path = string(checkStr(expr[i], ctx));
+    final String norm = MetaData.normPath(path);
+    if(norm == null) RESINV.thrw(input, path);
+    return norm;
   }
 }

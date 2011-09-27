@@ -1,7 +1,11 @@
 package org.basex.index;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
-
+import org.basex.io.in.DataInput;
+import org.basex.io.out.DataOutput;
+import org.basex.util.Array;
 import org.basex.util.list.IntList;
 
 /**
@@ -9,19 +13,23 @@ import org.basex.util.list.IntList;
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
- * [DP] support deleted IDs
  */
 public class IdPreMap {
   /** Base ID value. */
-  private final int baseid;
+  private int baseid;
   /** PRE values of the inserted/deleted IDs. */
-  private final IntListExt pres;
-  /** Inserted ID values. */
-  private final IntListExt ids;
+  private int[] pres;
+  /** Inserted first ID values. */
+  private int[] fids;
+  /** Inserted last ID values. */
+  private int[] nids;
   /** Increments showing how the PRE values have been modified. */
-  private final IntListExt incs;
+  private int[] incs;
   /** ID values for the PRE, before inserting/deleting a record. */
-  private final IntListExt oids;
+  private int[] oids;
+
+  /** Number of records in the table. */
+  private int rows;
 
   /**
    * Constructor.
@@ -29,23 +37,94 @@ public class IdPreMap {
    */
   public IdPreMap(final int id) {
     baseid = id;
+    pres = new int[1];
+    fids = new int[pres.length];
+    nids = new int[pres.length];
+    incs = new int[pres.length];
+    oids = new int[pres.length];
+  }
 
-    pres = new IntListExt(5);
-    ids = new IntListExt(5);
-    incs = new IntListExt(5);
-    oids = new IntListExt(5);
+  /**
+   * Construct a map by reading it from a file.
+   * @param f file to read from
+   * @throws IOException I/O error while reading from the file
+   */
+  public IdPreMap(final File f) throws IOException {
+    final DataInput in = new DataInput(f);
+    try {
+      baseid = in.readNum();
+      rows = in.readNum();
+      pres = in.readNums();
+      fids = in.readNums();
+      nids = in.readNums();
+      incs = in.readNums();
+      oids = in.readNums();
+    } finally {
+      in.close();
+    }
+  }
+
+  /**
+   * Write the map to the specified file.
+   * @param f file to write to
+   * @throws IOException I/O error while writing to the file
+   */
+  public void write(final File f) throws IOException {
+    final DataOutput out = new DataOutput(f);
+    try {
+      out.writeNum(baseid);
+      out.writeNum(rows);
+      out.writeNums(pres);
+      out.writeNums(fids);
+      out.writeNums(nids);
+      out.writeNums(incs);
+      out.writeNums(oids);
+    } finally {
+      out.close();
+    }
   }
 
   /**
    * Find the PRE value of a given ID.
    * @param id ID
-   * @return PRE
+   * @return PRE or -1 if the ID is already deleted
    */
   public int pre(final int id) {
-    if(id < pres.get(0) || pres.size() == 0) return id;
-    if(id > baseid) return pres.get(ids.indexOf(id));
-    final int i = oids.sortedLastIndexOf(id);
-    return id + incs.get(i < 0 ? -i - 2 : i);
+    // no updates or id is not affected by updates
+    if(rows == 0 || id < pres[0]) return id;
+    // id was inserted by update
+    if(id > baseid) {
+      // optimize if performance is low
+      for(int i = 0; i < rows; ++i) {
+        if(fids[i] == id) return pres[i];
+        if(fids[i] < id && id <= nids[i]) return pres[i] + id - fids[i];
+      }
+    }
+    // id is affected by updates
+    final int i = sortedLastIndexOf(oids, id);
+    return id + incs[i < 0 ? -i - 2 : i];
+  }
+
+  /**
+   * Find the PRE values of a given list of IDs.
+   * @param ids IDs
+   * @return a sorted array of PRE values
+   */
+  public int[] pre(final int[] ids) {
+    return pre(ids, 0, ids.length);
+  }
+
+  /**
+   * Find the PRE values of a given list of IDs.
+   * @param ids IDs
+   * @param off start position in ids (inclusive)
+   * @param len number of ids
+   * @return a sorted array of PRE values
+   */
+  public int[] pre(final int[] ids, final int off, final int len) {
+    final IntList p = new IntList(ids.length);
+    for(int i = off; i < len; ++i) p.add(pre(ids[i]));
+    return p.sort().toArray();
   }
 
   /**
@@ -55,182 +134,324 @@ public class IdPreMap {
    * @param c number of inserted records
    */
   public void insert(final int pre, final int id, final int c) {
-    int i = 0;
+    if(rows == 0 && pre == id && id == baseid + 1) {
+      // no mapping and we append at the end => nothing to do
+      baseid += c;
+      return;
+    }
+
+    int pos = 0;
     int inc = c;
     int oid = pre;
 
-    if(pres.size() > 0) {
-      i = pres.sortedIndexOf(pre);
-      if(i < 0) {
-        i = -i - 1;
-        if(i != 0) {
-          oid = pre - incs.get(i - 1);
-          inc += incs.get(i - 1);
+    if(rows > 0) {
+      pos = Arrays.binarySearch(pres, 0, rows, pre);
+      if(pos < 0) {
+        pos = -pos - 1;
+        if(pos != 0) {
+          // check if inserting into an existing id interval
+          final int prev = pos - 1;
+          final int prevcnt = nids[prev] - fids[prev] + 1;
+          final int prevpre = pres[prev];
+
+          if(pre < prevpre + prevcnt) {
+            // split the id interval
+            final int split = pre - prevpre;
+            final int fid = fids[prev] + split;
+
+            // add a new next interval
+            add(pos, pre, fid, nids[prev], incs[prev], oids[prev]);
+
+            // shrink the previous interval
+            nids[prev] = fid - 1;
+            incs[prev] -= prevcnt - split;
+
+            oid = oids[prev];
+            inc += incs[prev];
+          } else {
+            oid = pre - incs[prev];
+            inc += incs[prev];
+          }
         }
-      } else if(i > 0) {
-        oid = oids.get(i);
-        inc += incs.get(i - 1);
+      } else if(pos > 0) {
+        oid = oids[pos];
+        inc += incs[pos - 1];
       }
-      pres.add(pre, i);
-      incs.add(inc, i);
-      ids.add(id, i);
-      oids.add(oid, i);
-      for(int k = pres.size() - 1; k > i; --k) {
-        pres.inc(k, c);
-        incs.inc(k, c);
+
+      // apply correction to all subsequent intervals
+      for(int k = pos; k < rows; ++k) {
+        pres[k] += c;
+        incs[k] += c;
       }
-    } else {
-      pres.set(i, pre);
-      incs.set(i, inc);
-      ids.set(i, id);
-      oids.set(i, oid);
     }
+
+    // add the new interval
+    add(pos, pre, id, id + c - 1, inc, oid);
   }
 
   /**
    * Delete a record.
-   * @param pre record PRE
-   * @param id deleted record ID
+   * @param pre PRE value of the record
+   * @param id ID of the record
+   */
+  public void delete(final int pre, final int id) {
+    delete(pre, id, -1);
+  }
+
+  /**
+   * Delete records.
+   * @param pre PRE of the first record
+   * @param id ID of the first deleted record
    * @param c number of deleted records
    */
   public void delete(final int pre, final int id, final int c) {
-    int i = 0;
+    if(rows == 0 && pre == id && id - c == baseid + 1) {
+      // no mapping and we delete at the end => nothing to do
+      baseid += c;
+      return;
+    }
+
     int inc = c;
-    int oid = pre;
+    int oid = id;
 
-    if(pres.size() > 0) {
-      i = pres.sortedIndexOf(pre);
-      if(i < 0) {
-        i = -i - 1;
-        // the next entry will be the same after the correction:
-        if(i < pres.size() && pres.get(i) + c == pre) {
-          // re-use the next record:
-          pres.inc(i, c);
-          incs.inc(i, c);
-        } else {
-          if(i != 0) {
-            oid = pre - incs.get(i - 1);
-            inc += incs.get(i - 1);
-          }
-          pres.add(pre, i);
-          incs.add(inc, i);
-          ids.add(id, i);
-          oids.add(oid, i);
-        }
-      } else {
-        // the next entry will be the same after the correction:
-        if(i + 1 < pres.size() && pres.get(i + 1) + c == pre) {
-          pres.remove(i);
-          incs.remove(i);
-          ids.remove(i);
-          oids.remove(i);
+    if(rows > 0) {
+      final int pre1 = pre;
+      final int pre2 = pre - c - 1;
 
-          pres.inc(i, c);
-        }
-        incs.inc(i, c);
+      int i1 = findPre(pre1);
+      int i2 = -c > 1 ? findPre(pre2) : i1;
+
+      final boolean found1 = i1 >= 0;
+      final boolean found2 = i2 >= 0;
+
+      if(!found1) i1 = -i1 - 1;
+      if(!found2) i2 = -i2 - 1;
+
+      if(i1 >= rows) {
+        // no other intervals are affected => append the new one
+        add(i1, pre, -1, -1, incs[i1 - 1] + inc, oid);
+        return;
       }
-      // apply the correction to all subsequent records:
-      for(int k = pres.size() - 1; k > i; --k) {
-        pres.inc(k, c);
-        incs.inc(k, c);
+
+      final int min1 = pres[i1];
+      final int max1 = pres[i1] + nids[i1] - fids[i1];
+
+      final int min2;
+      final int max2;
+      if(i2 >= rows) {
+        min2 = max2 = pre2 + 1;
+      } else {
+        min2 = pres[i2];
+        max2 = pres[i2] + nids[i2] - fids[i2];
+      }
+
+      // apply correction to all subsequent intervals
+      for(int k = found2 ? i2 + 1 : i2; k < rows; ++k) {
+        pres[k] += c;
+        incs[k] += c;
+      }
+
+      if(i1 == i2) {
+        // pre1 <= pre2 <= max2
+        if(pre1 <= min1) {
+          if(pre2 == max2) {
+            if(i2 + 1 < rows && pres[i2 + 1] == pre) {
+              // remove interval if the next one (already changed) is the same
+              remove(i1, i2);
+            } else {
+              incs[i2] += c;
+              pres[i2] = pre;
+              fids[i2] = -1;
+              nids[i2] = -1;
+              //remove(i1, i2 - 1);
+            }
+          } else if(min2 <= pre2 && pre2 < max2) {
+            incs[i2] += c;
+            pres[i2] = pre;
+            fids[i2] += pre2 - min2 + 1;
+            //remove(i1, i2 - 1);
+          } else if(pre2 < min2 - 1) {
+            // the interval is not adjacent to next one => should be added
+            add(i1, pre, -1, -1, i1 > 0 ? incs[i1 - 1] + c : c, oid);
+          }
+        } else if(min1 < pre1) {
+          if(min2 < pre2 && pre2 < max2) {
+            final int fid = fids[i2] + pre2 - min2 + 1;
+            add(i2 + 1, pre2 + c + 1, fid, nids[i2], incs[i1] + c, oids[i2]);
+          }
+          final int s = max1 - pre1 + 1;
+          nids[i1] -= s;
+          incs[i1] -= s;
+        }
+      } else if(i1 < i2) {
+        // pre1 <= max1 < pre2 <= max2
+        // min1 <= max1 < min2 <= max2
+        if(pre1 <= min1) {
+          if(pre2 == max2) {
+            if(i2 + 1 < rows && pres[i2 + 1] == pre) {
+              // remove interval if the next one (already changed) is the same
+              remove(i1, i2);
+            } else {
+              incs[i2] += c;
+              pres[i2] = pre;
+              fids[i2] = -1;
+              nids[i2] = -1;
+              remove(i1, i2 - 1);
+            }
+          } else if(min2 <= pre2 && pre2 < max2) {
+            incs[i2] += c;
+            pres[i2] = pre;
+            fids[i2] += pre2 - min2 + 1;
+            remove(i1, i2 - 1);
+          } else if(pre2 < min2) {
+            if(i2 < rows && pres[i2] == pre) {
+              // remove interval if the next one (already changed) is the same
+              remove(i1, --i2);
+            } else {
+              incs[--i2] += c;
+              pres[i2] = pre;
+              fids[i2] = -1;
+              nids[i2] = -1;
+              remove(i1, i2 - 1);
+            }
+          }
+        } else if(min1 < pre1) {
+          if(pre2 == max2) {
+            inc += incs[i2];
+            oid = oids[i2];
+            remove(i1 + 1, i2);
+            nids[i1] -= max1 - pre1 + 1;
+            incs[i1] = inc;
+            oids[i1] = oid;
+          } else if(min2 <= pre2 && pre2 < max2) {
+            fids[i2] += pre2 - min2 + 1;
+            incs[i2] += c;
+            pres[i2] = pre;
+            remove(i1 + 1, i2 - 1);
+            final int s = max1 - pre1 + 1;
+            nids[i1] -= s;
+            incs[i1] -= s;
+          } else if(pre2 < min2) {
+            incs[i1] = incs[i2 - 1] + c;
+            remove(i1 + 1, i2 - 1);
+            final int s = max1 - pre1 + 1;
+            nids[i1] -= s;
+          }
+        }
       }
     } else {
-      pres.set(i, pre);
-      incs.set(i, inc);
-      ids.set(i, id);
-      oids.set(i, oid);
+      add(0, pre, -1, -1, inc, oid);
     }
   }
 
   @Override
-  public final String toString() {
+  public String toString() {
     final StringBuilder b = new StringBuilder();
 
-    b.append("pres, ids, incs, oids");
-    for(int i = 0; i < pres.size(); i++) {
+    b.append("pres, fids, nids, incs, oids");
+    for(int i = 0; i < rows; i++) {
       b.append('\n');
-      b.append(pres.get(i));
-      b.append(", ");
-      b.append(ids.get(i));
-      b.append(", ");
-      b.append(incs.get(i));
-      b.append(", ");
-      b.append(oids.get(i));
+      b.append(pres[i]); b.append(", ");
+      b.append(fids[i]); b.append(", ");
+      b.append(nids[i]); b.append(", ");
+      b.append(incs[i]); b.append(", ");
+      b.append(oids[i]);
     }
 
     return b.toString();
   }
-}
 
-/**
- * This is a simple container for int values.
- *
- * @author BaseX Team 2005-11, BSD License
- * @author Dimitar Popov
- */
-class IntListExt extends IntList {
   /**
-   * Constructor, specifying an initial array capacity.
-   * @param c array capacity
+   * Size of the mapping table (only for debugging purposes!).
+   * @return number of rows in the table
    */
-  public IntListExt(final int c) {
-    super(c);
+  public int size() {
+    return rows;
   }
 
   /**
-   * Insert an element at the specified index position.
-   * @param e element to insert
-   * @param i index where to insert the element
+   * Search for a given pre value.
+   * @param pre pre value
+   * @return index of the record where the pre was found, or the negative
+   *         insertion point - 1
    */
-  public void add(final int e, final int i) {
-    if(size == list.length) list = Arrays.copyOf(list, newSize());
-    if(i < size) System.arraycopy(list, i, list, i + 1, size - i);
-    ++size;
-    list[i] = e;
-  }
-
-  /**
-   * Remove an element from the specified index position.
-   * @param i index from where to remove the element
-   * @return the removed element
-   */
-  public int remove(final int i) {
-    final int e = list[i];
-    if(i < --size) System.arraycopy(list, i + 1, list, i, size - i);
-    return e;
+  private int findPre(final int pre) {
+    int low = 0;
+    int high = rows - 1;
+    while(low <= high) {
+      final int mid = low + high >>> 1;
+      final int midValMin = pres[mid];
+      final int midValMax = midValMin + nids[mid] - fids[mid];
+      if(midValMax < pre) low = mid + 1;
+      else if(midValMin > pre) high = mid - 1;
+      else return mid; // key found
+    }
+    return -(low + 1); // key not found.
   }
 
   /**
    * Binary search for a key in a list. If there are several hits the last one
    * is returned.
+   * @param a array to search into
    * @param e key to search for
    * @return index of the found hit or where the key ought to be inserted
    */
-  public int sortedLastIndexOf(final int e) {
-    int i = sortedIndexOf(e);
+  private int sortedLastIndexOf(final int[] a, final int e) {
+    int i = Arrays.binarySearch(a, 0, rows, e);
     if(i >= 0) {
-      while(++i < size && list[i] == e);
+      while(++i < rows && a[i] == e);
       return i - 1;
     }
     return i;
   }
 
   /**
-   * Search for a key in the list.
-   * @param e key to search for
-   * @return index of the found hit or -1 if the key is not found
+   * Add a record to the table and the ID index.
+   * @param i index in the table where the record should be inserted
+   * @param pre pre value
+   * @param fid first ID value
+   * @param nid last ID value
+   * @param inc increment value
+   * @param oid original ID value
    */
-  public int indexOf(final int e) {
-    for(int i = 0; i < size; ++i) if(list[i] == e) return i;
-    return -1;
+  private void add(final int i, final int pre, final int fid, final int nid,
+      final int inc, final int oid) {
+    if(rows == pres.length) {
+      final int s = Array.newSize(rows);
+      pres = Arrays.copyOf(pres, s);
+      fids = Arrays.copyOf(fids, s);
+      nids = Arrays.copyOf(nids, s);
+      incs = Arrays.copyOf(incs, s);
+      oids = Arrays.copyOf(oids, s);
+    }
+    if(i < rows) {
+      System.arraycopy(pres, i, pres, i + 1, rows - i);
+      System.arraycopy(fids, i, fids, i + 1, rows - i);
+      System.arraycopy(nids, i, nids, i + 1, rows - i);
+      System.arraycopy(incs, i, incs, i + 1, rows - i);
+      System.arraycopy(oids, i, oids, i + 1, rows - i);
+    }
+    pres[i] = pre;
+    fids[i] = fid;
+    nids[i] = nid;
+    incs[i] = inc;
+    oids[i] = oid;
+    ++rows;
   }
 
   /**
-   * Increment the value of the element at the specified index.
-   * @param i index of the element
-   * @param c increment value
+   * Remove a records from the table and the ID index.
+   * @param s start index of records in the table (inclusive)
+   * @param e end index of records in the table (inclusive)
    */
-  public void inc(final int i, final int c) {
-    list[i] += c;
+  private void remove(final int s, final int e) {
+    if(s <= e) {
+      System.arraycopy(pres, e + 1, pres, s, rows - (e + 1));
+      System.arraycopy(fids, e + 1, fids, s, rows - (e + 1));
+      System.arraycopy(nids, e + 1, nids, s, rows - (e + 1));
+      System.arraycopy(incs, e + 1, incs, s, rows - (e + 1));
+      System.arraycopy(oids, e + 1, oids, s, rows - (e + 1));
+      rows -= e - s + 1;
+    }
   }
 }

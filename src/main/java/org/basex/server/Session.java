@@ -21,10 +21,10 @@ import org.basex.io.out.ArrayOutput;
  * @author Christian Gruen
  */
 public abstract class Session {
+  /** Client output stream. */
+  protected OutputStream out;
   /** Command info. */
   protected String info;
-  /** Client output. */
-  protected OutputStream out;
 
   /**
    * Executes a {@link Command} and returns the result as string or serializes

@@ -9,6 +9,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'info' command and returns general database information.
@@ -46,13 +47,13 @@ public final class Info extends AInfo {
     }
     final Prop prop = context.prop;
     tb.add(NL + INFOCREATE + NL);
-    format(tb, INFOCHOP, flag(prop.is(Prop.CHOP)));
+    format(tb, INFOCHOP, Util.flag(prop.is(Prop.CHOP)));
 
     tb.add(NL + INFOINDEX + NL);
-    format(tb, INFOPATHINDEX, flag(prop.is(Prop.PATHINDEX)));
-    format(tb, INFOTEXTINDEX, flag(prop.is(Prop.TEXTINDEX)));
-    format(tb, INFOATTRINDEX, flag(prop.is(Prop.ATTRINDEX)));
-    format(tb, INFOFTINDEX, flag(prop.is(Prop.FTINDEX)) +
+    format(tb, INFOPATHINDEX, Util.flag(prop.is(Prop.PATHINDEX)));
+    format(tb, INFOTEXTINDEX, Util.flag(prop.is(Prop.TEXTINDEX)));
+    format(tb, INFOATTRINDEX, Util.flag(prop.is(Prop.ATTRINDEX)));
+    format(tb, INFOFTINDEX, Util.flag(prop.is(Prop.FTINDEX)) +
         (prop.is(Prop.FTINDEX) && prop.is(Prop.WILDCARDS) ?
         " (" + INFOWCINDEX + ")" : ""));
     return tb.finish();

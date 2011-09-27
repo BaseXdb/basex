@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.IntList;
 
 /**
  * This class stores a single namespace node.
@@ -92,6 +93,22 @@ final class NSNode {
     vals = Arrays.copyOf(vals, s + 2);
     vals[s] = p;
     vals[s + 1] = u;
+  }
+
+  /**
+   * Recursively deletes the specified namespace URI reference.
+   * @param uri namespace URI reference
+   */
+  void delete(final int uri) {
+    for(final NSNode n : ch) n.delete(uri);
+    final IntList il = new IntList(vals.length);
+    for(int v = 0; v < vals.length; v += 2) {
+      if(vals[v + 1] != uri) {
+        il.add(vals[v]);
+        il.add(vals[v + 1]);
+      }
+    }
+    if(il.size() != vals.length) vals = il.toArray();
   }
 
   // Requesting Namespaces ====================================================

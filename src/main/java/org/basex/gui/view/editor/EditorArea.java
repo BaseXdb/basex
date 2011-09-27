@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXEditor;
@@ -94,7 +95,7 @@ final class EditorArea extends BaseXEditor {
     if(eq && !force) return;
     view.refresh(mod || !eq, false);
     view.pos.setText(pos());
-    gui.context.query = file;
+    gui.context.prop.set(Prop.QUERYPATH, file.path());
     last = in;
 
     if(file.isXML()) {

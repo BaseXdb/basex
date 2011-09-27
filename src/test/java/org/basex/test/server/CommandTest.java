@@ -434,6 +434,7 @@ public class CommandTest {
     // target path must not be empty
     no(new Rename(FN, "/"));
     no(new Rename(FN, ""));
+    ok(new Rename(FILE, FILE));
     ok(new Rename(FILE, "xxx"));
     // source need not exist
     ok(new Rename(FILE, "xxx"));
@@ -532,7 +533,6 @@ public class CommandTest {
   /** Command test. */
   @Test
   public final void set() {
-    ok(new Set(CmdSet.CHOP, Text.ON));
     ok(new Set(CmdSet.CHOP, false));
     ok(new Set(CmdSet.CHOP, true));
     ok(new Set("chop", true));

@@ -1,6 +1,7 @@
 package org.basex.test.query.func;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.func.Function.*;
 
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Add;
@@ -9,10 +10,9 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.DropIndex;
-import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.query.func.Function;
+import org.basex.io.MimeTypes;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -68,20 +68,20 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbOpen() throws BaseXException {
-    final String fun = check(Function.DBOPEN);
-    query("count(" + fun + "('" + DB + "'))", "1");
-    query("count(" + fun + "('" + DB + "', ''))", "1");
-    query("count(" + fun + "('" + DB + "', 'unknown'))", "0");
+    check(DBOPEN);
+    query(COUNT.args(DBOPEN.args(DB)), "1");
+    query(COUNT.args(DBOPEN.args(DB, "")), "1");
+    query(COUNT.args(DBOPEN.args(DB, "unknown")), "0");
 
     // close database instance
     new Close().execute(CONTEXT);
-    query("count(" + fun + "(<a>" + DB + "</a>))", "1");
-    query("count(" + fun + "('" + DB + "', 'unknown'))", "0");
-    query(fun + "('" + DB + "')//title/text()", "XML");
+    query(COUNT.args(DBOPEN.args("<a>" + DB + "</a>")), "1");
+    query(COUNT.args(DBOPEN.args(DB, "unknown")), "0");
+    query(DBOPEN.args(DB) + "//title/text()", "XML");
 
     // run function on non-existing database
     new DropDB(DB).execute(CONTEXT);
-    error(fun + "('" + DB + "')", Err.NODB);
+    error(DBOPEN.args(DB), Err.NODB);
   }
 
   /**
@@ -89,9 +89,9 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbOpenPre() {
-    final String fun = check(Function.DBOPENPRE);
-    query(fun + "('" + DB + "', 0)//title/text()", "XML");
-    error(fun + "('" + DB + "', -1)", Err.IDINVALID);
+    check(DBOPENPRE);
+    query(DBOPENPRE.args(DB, 0) + "//title/text()", "XML");
+    error(DBOPENPRE.args(DB, -1), Err.IDINVALID);
   }
 
   /**
@@ -99,9 +99,9 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbOpenId() {
-    final String fun = check(Function.DBOPENID);
-    query(fun + "('" + DB + "', 0)//title/text()", "XML");
-    error(fun + "('" + DB + "', -1)", Err.IDINVALID);
+    check(DBOPENID);
+    query(DBOPENID.args(DB, 0) + "//title/text()", "XML");
+    error(DBOPENID.args(DB, -1), Err.IDINVALID);
   }
 
   /**
@@ -110,14 +110,13 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbText() throws BaseXException {
-    final String fun = check(Function.DBTEXT);
-
+    check(DBTEXT);
     // run function without and with index
     new DropIndex("text").execute(CONTEXT);
-    query(fun + "('" + DB + "', 'XML')", "XML");
+    query(DBTEXT.args(DB, "XML"), "XML");
     new CreateIndex("text").execute(CONTEXT);
-    query(fun + "('" + DB + "', 'XML')", "XML");
-    query(fun + "('" + DB + "', 'XXX')", "");
+    query(DBTEXT.args(DB, "XML"), "XML");
+    query(DBTEXT.args(DB, "XXX"), "");
   }
 
   /**
@@ -126,16 +125,15 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbAttribute() throws BaseXException {
-    final String fun = check(Function.DBATTR);
-
+    check(DBATTR);
     // run function without and with index
     new DropIndex("attribute").execute(CONTEXT);
-    query("data(" + fun + "('" + DB + "', '0'))", "0");
+    query(DATA.args(DBATTR.args(DB, "0")), "0");
     new CreateIndex("attribute").execute(CONTEXT);
-    query("data(" + fun + "('" + DB + "', '0'))", "0");
-    query("data(" + fun + "('" + DB + "', '0', 'id'))", "0");
-    query("data(" + fun + "('" + DB + "', '0', 'XXX'))", "");
-    query(fun + "('" + DB + "', 'XXX')", "");
+    query(DATA.args(DBATTR.args(DB, "0")), "0");
+    query(DATA.args(DBATTR.args(DB, "0", "id")), "0");
+    query(DATA.args(DBATTR.args(DB, "0", "XXX")), "");
+    query(DATA.args(DBATTR.args(DB, "XXX")), "");
   }
 
   /**
@@ -144,14 +142,13 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbFulltext() throws BaseXException {
-    final String fun = check(Function.DBFULLTEXT);
-
+    check(DBFULLTEXT);
     // run function without and with index
     new DropIndex("fulltext").execute(CONTEXT);
-    error(fun + "('" + DB + "', 'assignments')", Err.NOIDX);
+    error(DBFULLTEXT.args(DB, "assignments"), Err.NOIDX);
     new CreateIndex("fulltext").execute(CONTEXT);
-    query(fun + "('" + DB + "', 'assignments')", "Assignments");
-    query(fun + "('" + DB + "', 'XXX')", "");
+    query(DBFULLTEXT.args(DB, "assignments"), "Assignments");
+    query(DBFULLTEXT.args(DB, "XXX"), "");
   }
 
   /**
@@ -160,16 +157,14 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbList() throws BaseXException {
-    final String fun = check(Function.DBLIST);
-
+    check(DBLIST);
     // add documents
     new Add(FLDR, "docs", "test").execute(CONTEXT);
-    contains(fun + "('" + DB + "')", "test/");
-
+    contains(DBLIST.args(DB), "test/");
     // create two other database and compare substring
     new CreateDB(DB + 1).execute(CONTEXT);
     new CreateDB(DB + 2).execute(CONTEXT);
-    contains(fun + "()", DB + 1 + ' ' + DB + 2);
+    contains(DBLIST.args(), DB + 1 + ' ' + DB + 2);
     new DropDB(DB + 1).execute(CONTEXT);
     new DropDB(DB + 2).execute(CONTEXT);
   }
@@ -179,9 +174,8 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbSystem() {
-    // wrong arguments
-    final String fun = check(Function.DBSYSTEM);
-    contains(fun + "()", INFOON);
+    check(DBSYSTEM);
+    contains(DBSYSTEM.args(), INFOON);
   }
 
   /**
@@ -190,26 +184,21 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbInfo() throws BaseXException {
-    // wrong arguments
-    final String fun = check(Function.DBINFO);
-
+    check(DBINFO);
     // standard test
-    contains(fun + "('" + DB + "')", INFOON);
+    contains(DBINFO.args(DB), INFOON);
 
     // drop indexes and check index queries
     final String[] types = { "text", "attribute", "fulltext" };
     for(final String type : types) new DropIndex(type).execute(CONTEXT);
-    for(final String type : types) {
-      query(fun + "('" + DB + "', '" + type + "')");
-    }
+    for(final String type : types) query(DBINFO.args(DB, type));
     // create indexes and check index queries
     for(final String type : types) new CreateIndex(type).execute(CONTEXT);
-    for(final String type : types) {
-      query(fun + "('" + DB + "', '" + type + "')");
-    }
+    for(final String type : types) query(DBINFO.args(DB, type));
     // check name indexes
-    query(fun + "('" + DB + "', 'tag')");
-    query(fun + "('" + DB + "', 'attname')");
+    query(DBINFO.args(DB, "tag"));
+    query(DBINFO.args(DB, "attname"));
+    error(DBINFO.args(DB, "XXX"), Err.NOIDX);
   }
 
   /**
@@ -217,9 +206,9 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbNodeID() {
-    final String fun = check(Function.DBNODEID);
-    query(fun + "(/html)", "1");
-    query(fun + "(/ | /html)", "0 1");
+    check(DBNODEID);
+    query(DBNODEID.args(" /html"), "1");
+    query(DBNODEID.args(" / | /html"), "0 1");
   }
 
   /**
@@ -227,9 +216,9 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbNodePre() {
-    final String fun = check(Function.DBNODEPRE);
-    query(fun + "(/html)", "1");
-    query(fun + "(/ | /html)", "0 1");
+    check(DBNODEPRE);
+    query(DBNODEPRE.args(" /html"), "1");
+    query(DBNODEPRE.args(" / | /html"), "0 1");
   }
 
   /**
@@ -237,8 +226,8 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbEvent() {
-    final String fun = check(Function.DBEVENT);
-    error(fun + "('x', 'y')", Err.NOEVENT);
+    check(DBEVENT);
+    error(DBEVENT.args("X", "Y"), Err.NOEVENT);
   }
 
   /**
@@ -246,34 +235,33 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbAdd() {
-    final String fun = check(Function.DBADD);
+    check(DBADD);
+    query(DBADD.args(DB, "\"<root/>\"", "t1.xml"));
+    query(COUNT.args(COLL.args(DB + "/t1.xml") + "/root"), "1");
 
-    query(fun + "('" + DB + "', '<root/>', 'test1.xml')");
-    query("count(collection('" + DB + "/test1.xml')/root)", "1");
+    query(DBADD.args(DB, " document { <root/> }", "t2.xml"));
+    query(COUNT.args(COLL.args(DB + "/t2.xml") + "/root"), "1");
 
-    query(fun + "('" + DB + "', document { <root/> }, 'test2.xml')");
-    query("count(collection('" + DB + "/test2.xml')/root)", "1");
+    query(DBADD.args(DB, " document { <root/> }", "t3.xml", "test"));
+    query(COUNT.args(COLL.args(DB + "/test/t3.xml") + "/root"), "1");
 
-    query(fun + "('" + DB + "', document { <root/> }, 'test3.xml', 'test')");
-    query("count(collection('" + DB + "/test/test3.xml')/root)", "1");
+    query(DBADD.args(DB, FILE, "", "in"));
+    query(COUNT.args(COLL.args(DB + "/in/input.xml") + "/html"), "1");
 
-    query(fun + "('" + DB + "', 'etc/test/input.xml', '', 'test')");
-    query("count(collection('" + DB + "/test/input.xml')/html)", "1");
+    query(DBADD.args(DB, FILE, "t4.xml", "test"));
+    query(COUNT.args(COLL.args(DB + "/test/t4.xml") + "/html"), "1");
 
-    query(fun + "('" + DB + "', 'etc/test/input.xml', 'test4.xml', 'test')");
-    query("count(collection('" + DB + "/test/test4.xml')/html)", "1");
+    query(DBADD.args(DB, FLDR, "", "test/dir"));
+    query(COUNT.args(COLL.args(DB + "/test/dir")), NFLDR);
 
-    query(fun + "('" + DB + "', '" + FLDR + "', '', 'test/dir')");
-    query("count(collection('" + DB + "/test/dir'))", NFLDR);
+    query("for $f in " + FLLIST.args(FLDR) + " return " +
+        DBADD.args(DB, "$f", "", "dir"));
+    query(COUNT.args(COLL.args(DB + "/dir")), NFLDR);
 
-    query("for $f in file:list('" + FLDR + "') " +
-          "return " + fun + "('" + DB + "', $f, '', 'dir')");
-    query("count(collection('" + DB + "/dir'))", NFLDR);
-
-    query("for $i in 1 to 3 return " + fun + "('" + DB + "', '<root/>'," +
-        "'doc' || $i)");
-    query("count(for $i in 1 to 3 return collection('" + DB + "/doc' || $i))",
-        "3");
+    query("for $i in 1 to 3 return " +
+        DBADD.args(DB, "\"<root/>\"", "\"doc\" || $i"));
+    query(COUNT.args(" for $i in 1 to 3 return " +
+        COLL.args("\"" + DB + "/doc\" || $i")), 3);
   }
 
   /**
@@ -282,12 +270,10 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbDelete() throws BaseXException {
-    final String fun = check(Function.DBDELETE);
-
+    check(DBDELETE);
     new Add(FLDR, "docs", "test").execute(CONTEXT);
-
-    query(fun + "('" + DB + "', 'test')", "");
-    query("count(collection('" + DB + "/test'))", "0");
+    query(DBDELETE.args(DB, "test"));
+    query(COUNT.args(COLL.args(DB + "/test")), 0);
   }
 
   /**
@@ -296,21 +282,21 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbRename() throws BaseXException {
-    final String fun = check(Function.DBRENAME);
+    check(DBRENAME);
 
     new Add(FLDR, "docs", "test").execute(CONTEXT);
-    query("count(collection('" + DB + "/test'))", NFLDR);
+    query(COUNT.args(COLL.args(DB + "/test")), NFLDR);
 
     // rename document
-    query(fun + "('" + DB + "', 'test', 'newtest')");
-    query("count(collection('" + DB + "/test'))", "0");
-    query("count(collection('" + DB + "/newtest'))", NFLDR);
+    query(DBRENAME.args(DB, "test", "newtest"));
+    query(COUNT.args(COLL.args(DB + "/test")), 0);
+    query(COUNT.args(COLL.args(DB + "/newtest")), NFLDR);
 
     // rename binary file
-    query("db:store('" + DB + "', 'one', '')");
-    query(fun + "('" + DB + "', 'one', 'two')");
-    query("db:retrieve('" + DB + "', 'two')");
-    error("db:retrieve('" + DB + "', 'one')", Err.RESFNF);
+    query(DBSTORE.args(DB, "one", ""));
+    query(DBRENAME.args(DB, "one", "two"));
+    query(DBRETRIEVE.args(DB, "two"));
+    error(DBRETRIEVE.args(DB, "one"), Err.RESFNF);
   }
 
   /**
@@ -319,21 +305,22 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbReplace() throws BaseXException {
-    final String fun = check(Function.DBREPLACE);
+    check(DBREPLACE);
 
-    new Add("etc/test/input.xml", null, "test").execute(CONTEXT);
+    new Add(FILE, null, "test").execute(CONTEXT);
 
-    query(fun + "('" + DB + "', 'test/input.xml', '<root1/>')");
-    query("count(collection('" + DB + "/test/input.xml')/html)", "0");
-    query("count(collection('" + DB + "/test/input.xml')/root1)", "1");
+    query(DBREPLACE.args(DB, FILE, "\"<R1/>\""));
+    query(COUNT.args(COLL.args(DB + '/' + FILE) + "/R1"), 1);
+    query(COUNT.args(COLL.args(DB + '/' + FILE) + "/R2"), 0);
 
-    query(fun + "('" + DB + "', 'test/input.xml', document { <root2/> })");
-    query("count(collection('" + DB + "/test/input.xml')/root1)", "0");
-    query("count(collection('" + DB + "/test/input.xml')/root2)", "1");
+    query(DBREPLACE.args(DB, FILE, " document { <R2/> }"));
+    query(COUNT.args(COLL.args(DB + '/' + FILE) + "/R1"), 0);
+    query(COUNT.args(COLL.args(DB + '/' + FILE) + "/R2"), 1);
 
-    query(fun + "('" + DB + "', 'test/input.xml', 'etc/test/input.xml')");
-    query("count(collection('" + DB + "/test/input.xml')/html)", "1");
-    query("count(collection('" + DB + "/test/input.xml')/root2)", "0");
+    query(DBREPLACE.args(DB, FILE, FILE));
+    query(COUNT.args(COLL.args(DB + '/' + FILE) + "/R1"), 0);
+    query(COUNT.args(COLL.args(DB + '/' + FILE) + "/R2"), 0);
+    query(COUNT.args(COLL.args(DB + '/' + FILE) + "/html"), 1);
   }
 
   /**
@@ -341,9 +328,9 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbOptimize() {
-    final String fun = check(Function.DBOPTIMIZE);
-    query(fun + "('" + DB + "')");
-    query(fun + "('" + DB + "', true())");
+    check(DBOPTIMIZE);
+    query(DBOPTIMIZE.args(DB));
+    query(DBOPTIMIZE.args(DB, "true()"));
   }
 
   /**
@@ -351,12 +338,12 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbRetrieve() {
-    final String fun = check(Function.DBRETRIEVE);
-    error(fun + "('" + DB + "', 'raw')", Err.RESFNF);
-    query("db:store('" + DB + "', 'raw', xs:hexBinary('41'))");
-    query(fun + "('" + DB + "', 'raw')");
-    query("db:delete('" + DB + "', 'raw')");
-    error(fun + "('" + DB + "', 'raw')", Err.RESFNF);
+    check(DBRETRIEVE);
+    error(DBRETRIEVE.args(DB, "raw"), Err.RESFNF);
+    query(DBSTORE.args(DB, "raw", "xs:hexBinary('41')"));
+    query(DBRETRIEVE.args(DB, "raw"), "41");
+    query(DBDELETE.args(DB, "raw"));
+    error(DBRETRIEVE.args(DB, "raw"), Err.RESFNF);
   }
 
   /**
@@ -364,10 +351,12 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbStore() {
-    final String fun = check(Function.DBSTORE);
-    query(fun + "('" + DB + "', 'raw1', xs:hexBinary('41'))");
-    query(fun + "('" + DB + "', 'raw2', 'b')");
-    query(fun + "('" + DB + "', 'raw3', 123)");
+    check(DBSTORE);
+    query(DBSTORE.args(DB, "raw1", "xs:hexBinary('41')"));
+    query(DBSTORE.args(DB, "raw2", "b"));
+    query(DBRETRIEVE.args(DB, "raw2"), "62");
+    query(DBSTORE.args(DB, "raw3", 123));
+    query(DBRETRIEVE.args(DB, "raw3"), "313233");
   }
 
   /**
@@ -375,13 +364,33 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbIsRaw() {
-    final String fun = check(Function.DBISRAW);
-    query("db:add('" + DB + "', '<a/>', 'xml')");
-    query("db:store('" + DB + "', 'raw', 'bla')");
-    query(fun + "('" + DB + "', 'xml')", "false");
-    query(fun + "('" + DB + "', 'raw')", "true");
-    query(fun + "('" + DB + "', 'xxx')", "false");
-    query(fun + "('" + DB + "', 'xxx')", "false");
+    check(DBISRAW);
+    query(DBADD.args(DB, "\"<a/>\"", "xml"));
+    query(DBSTORE.args(DB, "raw", "bla"));
+    query(DBISRAW.args(DB, "xml"), "false");
+    query(DBISRAW.args(DB, "raw"), "true");
+    query(DBISRAW.args(DB, "xxx"), "false");
+  }
+
+  /**
+   * Test method for the db:exists() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void dbExists() throws BaseXException {
+    check(DBEXISTS);
+    query(DBADD.args(DB, "\"<a/>\"", "xml", "x"));
+    query(DBSTORE.args(DB, "x/raw", "bla"));
+    // checks if the specified resources exist (false expected for directories)
+    query(DBEXISTS.args(DB), "true");
+    query(DBEXISTS.args(DB, "x/xml"), "true");
+    query(DBEXISTS.args(DB, "x/raw"), "true");
+    query(DBEXISTS.args(DB, "xxx"), "false");
+    query(DBEXISTS.args(DB, "x"), "false");
+    query(DBEXISTS.args(DB, ""), "false");
+    // false expected for missing database
+    new DropDB(DB).execute(CONTEXT);
+    query(DBEXISTS.args(DB), "false");
   }
 
   /**
@@ -389,13 +398,12 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbIsXML() {
-    final String fun = check(Function.DBISXML);
-    query("db:add('" + DB + "', '<a/>', 'xml')");
-    query("db:store('" + DB + "', 'raw', 'bla')");
-    query(fun + "('" + DB + "', 'xml')", "true");
-    query(fun + "('" + DB + "', 'raw')", "false");
-    query(fun + "('" + DB + "', 'xxx')", "false");
-    query(fun + "('" + DB + "', 'xxx')", "false");
+    check(DBISXML);
+    query(DBADD.args(DB, "\"<a/>\"", "xml"));
+    query(DBSTORE.args(DB, "raw", "bla"));
+    query(DBISXML.args(DB, "xml"), "true");
+    query(DBISXML.args(DB, "raw"), "false");
+    query(DBISXML.args(DB, "xxx"), "false");
   }
 
   /**
@@ -403,11 +411,11 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbContentType() {
-    final String fun = check(Function.DBCTYPE);
-    query("db:add('" + DB + "', '<a/>', 'xml')");
-    query("db:store('" + DB + "', 'raw', 'bla')");
-    query(fun + "('" + DB + "', 'xml')", DataText.APP_XML);
-    query(fun + "('" + DB + "', 'raw')", DataText.APP_OCTET);
-    error(fun + "('" + DB + "', 'test')", Err.RESFNF);
+    check(DBCTYPE);
+    query(DBADD.args(DB, "\"<a/>\"", "xml"));
+    query(DBSTORE.args(DB, "raw", "bla"));
+    query(DBCTYPE.args(DB, "xml"), MimeTypes.APP_XML);
+    query(DBCTYPE.args(DB, "raw"), MimeTypes.APP_OCTET);
+    error(DBCTYPE.args(DB, "test"), Err.RESFNF);
   }
 }

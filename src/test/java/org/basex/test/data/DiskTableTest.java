@@ -133,7 +133,7 @@ public final class DiskTableTest {
    * Tests size of file.
    */
   @Test
-  public void testSize() {
+  public void size() {
     assertEquals("Testfile size changed!", size, tdaSize());
     assertTrue("Need at least 3 blocks for testing!", blocks > 2);
     assertEquals("Unexpected number of blocks!", blocks, tdaBlocks());
@@ -177,7 +177,7 @@ public final class DiskTableTest {
    * Tests delete.
    */
   @Test
-  public void testDeleteOneNode() {
+  public void deleteOneNode() {
     tda.delete(3, 1);
     assertEquals("One node deleted => size-1", size - 1, tdaSize());
     assertEntrysEqual(0, 0, 3);
@@ -192,7 +192,7 @@ public final class DiskTableTest {
    * Tests delete at beginning.
    */
   @Test
-  public void testDeleteAtBeginning() {
+  public void deleteAtBeginning() {
     tda.delete(0, 3);
     assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(3, 0, size - 3);
@@ -205,7 +205,7 @@ public final class DiskTableTest {
    * Tests delete at end.
    */
   @Test
-  public void testDeleteAtEnd() {
+  public void deleteAtEnd() {
     tda.delete(size - 3, 3);
     assertEquals("Three nodes deleted => size-3", size - 3, tdaSize());
     assertEntrysEqual(0, 0, size - 3);
@@ -218,7 +218,7 @@ public final class DiskTableTest {
    * Deletes first block.
    */
   @Test
-  public void testDeleteFirstBlock() {
+  public void deleteFirstBlock() {
     tda.delete(0, nodes);
     assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(nodes, 0, size - nodes);
@@ -231,7 +231,7 @@ public final class DiskTableTest {
    * Deletes the second block.
    */
   @Test
-  public void testDeleteSecondBlock() {
+  public void deleteSecondBlock() {
     tda.delete(nodes, nodes);
     assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes);
@@ -246,7 +246,7 @@ public final class DiskTableTest {
    * Deletes the last block.
    */
   @Test
-  public void testDeleteLastBlock() {
+  public void deleteLastBlock() {
     tda.delete(size / nodes * nodes, size % nodes);
     assertEquals(blocks - 1, tdaBlocks());
     assertEntrysEqual(0, 0, nodes - size % nodes);
@@ -259,7 +259,7 @@ public final class DiskTableTest {
    * Deletes the second block with some surrounding nodes.
    */
   @Test
-  public void testDeleteSecondBlockAndSurroundingNodes() {
+  public void deleteSecondBlockAndSurroundingNodes() {
     tda.delete(nodes - 1, nodes + 2);
     assertEquals(size - 2 - nodes, tdaSize());
     assertEquals(blocks - 1, tdaBlocks());
@@ -276,7 +276,7 @@ public final class DiskTableTest {
    * Tests basic insertion.
    */
   @Test
-  public void testSimpleInsert() {
+  public void simpleInsert() {
     tda.insert(4, getTestEntries(1));
     assertEquals(size + 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
@@ -293,7 +293,7 @@ public final class DiskTableTest {
    * Tests inserting multiple entries.
    */
   @Test
-  public void testInsertMultiple() {
+  public void insertMultiple() {
     tda.insert(4, getTestEntries(3));
     assertEquals(size + 3, tdaSize());
     assertEntrysEqual(0, 0, 4);
@@ -310,7 +310,7 @@ public final class DiskTableTest {
    * Tests inserting multiple entries.
    */
   @Test
-  public void testInsertMany() {
+  public void insertMany() {
     tda.insert(4, getTestEntries(nodes - 1));
     assertEquals(size + nodes - 1, tdaSize());
     assertEntrysEqual(0, 0, 4);
@@ -327,7 +327,7 @@ public final class DiskTableTest {
    * Tests inserting multiple entries.
    */
   @Test
-  public void testInsertAtBlockBoundary() {
+  public void insertAtBlockBoundary() {
     tda.insert(nodes, getTestEntries(nodes));
     assertEquals(size + nodes, tdaSize());
     assertEquals(blocks + 1, tdaBlocks());

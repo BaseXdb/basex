@@ -93,7 +93,8 @@ public abstract class Main {
    */
   protected void quit() throws IOException {
     execute(new Exit(), true);
-    out.flush();
+    if(out == System.out || out == System.err) out.flush();
+    else out.close();
   }
 
   /**
@@ -119,6 +120,7 @@ public abstract class Main {
         execute(cmd, verbose);
       }
     } catch(final QueryException ex) {
+      Util.debug(ex);
       throw new BaseXException(ex);
     }
     return true;

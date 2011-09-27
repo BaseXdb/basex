@@ -45,6 +45,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
+import org.basex.query.util.DataBuilder;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -357,10 +358,10 @@ public final class FNZip extends FuncCall {
             } else {
               // serialize new nodes
               try {
-                // [CG] update zip files: remove zip namespace
-                final Serializer ser =
-                    Serializer.get(zos, serialPar(node, ctx));
-                do n.serialize(ser); while((n = ch.next()) != null);
+                final Serializer ser = Serializer.get(zos, serPar(node, ctx));
+                do {
+                  DataBuilder.stripNS(n, ZIPURI, ctx).serialize(ser);
+                } while((n = ch.next()) != null);
                 ser.close();
               } catch(final SerializerException ex) {
                 throw new QueryException(input, ex);
@@ -380,7 +381,7 @@ public final class FNZip extends FuncCall {
    * @return properties
    * @throws SerializerException serializer exception
    */
-  private SerializerProp serialPar(final ANode node, final QueryContext ctx)
+  private SerializerProp serPar(final ANode node, final QueryContext ctx)
       throws SerializerException {
 
     // interpret query parameters

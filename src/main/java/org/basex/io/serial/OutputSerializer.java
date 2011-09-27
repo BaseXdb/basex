@@ -1,5 +1,6 @@
 package org.basex.io.serial;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.util.Err.*;
@@ -11,6 +12,7 @@ import java.nio.charset.Charset;
 
 import org.basex.core.Prop;
 import org.basex.data.FTPos;
+import org.basex.io.MimeTypes;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.item.Item;
 import org.basex.util.TokenBuilder;
@@ -96,14 +98,14 @@ public abstract class OutputSerializer extends Serializer {
 
     // project specific properties
     indents = Math.max(0, toInt(p.get(S_INDENTS)));
-    tab     = p.check(S_TABULATOR, YES, NO).equals(YES) ? '\t' : ' ';
+    tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
     wPre    = token(p.get(S_WRAP_PREFIX));
     wUri    = token(p.get(S_WRAP_URI));
     wrap    = wPre.length != 0;
     out     = PrintOutput.get(os);
 
-    final boolean decl = p.check(S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
-    final boolean bom  = p.check(S_BYTE_ORDER_MARK, YES, NO).equals(YES);
+    final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);
+    final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
     final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
     p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
@@ -114,11 +116,11 @@ public abstract class OutputSerializer extends Serializer {
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);
-    format  = p.check(S_FORMAT, YES, NO).equals(YES);
-    indent  = p.check(S_INDENT, YES, NO).equals(YES) && format;
-    escape  = p.check(S_ESCAPE_URI_ATTRIBUTES, YES, NO).equals(YES);
-    content = p.check(S_INCLUDE_CONTENT_TYPE, YES, NO).equals(YES);
-    undecl  = p.check(S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
+    format  = p.yes(S_FORMAT);
+    indent  = p.yes(S_INDENT) && format;
+    escape  = p.yes(S_ESCAPE_URI_ATTRIBUTES);
+    content = p.yes(S_INCLUDE_CONTENT_TYPE);
+    undecl  = p.yes(S_UNDECLARE_PREFIXES);
     nl = utf8 ? token(Prop.NL) : Prop.NL.getBytes(encoding);
 
     if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
@@ -457,9 +459,8 @@ public abstract class OutputSerializer extends Serializer {
     level++;
     startOpen(META);
     attribute(HTTPEQUIV, token(CONTENT_TYPE));
-    final String m = media.isEmpty() ? TEXT_HTML : media;
-    attribute(CONTENT,
-        new TokenBuilder(m).add(CHARSET).addExt(encoding).finish());
+    attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MimeTypes.TEXT_HTML :
+      media).add(CHARSET).addExt(encoding).finish());
     if(html) {
       print(ELEM_C);
     } else {

@@ -21,14 +21,14 @@ public interface Index {
    * @param token token to be found
    * @return sorted pre values for the token
    */
-  IndexIterator ids(final IndexToken token);
+  IndexIterator iter(final IndexToken token);
 
   /**
-   * Returns the (approximate/estimated) number of ids for the specified token.
+   * Returns the (approximate/estimated) number of hits for the specified token.
    * @param token token to be found
-   * @return number of ids
+   * @return number of hits
    */
-  int nrIDs(final IndexToken token);
+  int count(final IndexToken token);
 
   /**
    * Closes the index.

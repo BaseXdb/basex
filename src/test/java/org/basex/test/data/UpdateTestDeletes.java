@@ -15,7 +15,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    * Tests deletion of a simple node.
    */
   @Test
-  public void testSimpleNodeDelete() {
+  public void simpleNodeDelete() {
     final Data data = CONTEXT.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
@@ -40,7 +40,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    * Tests deletion of a node with a child.
    */
   @Test
-  public void testCascadingDelete() {
+  public void cascadingDelete() {
     final Data data = CONTEXT.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
@@ -62,7 +62,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    * Tests deletion of a node with a child (with text) and attribute.
    */
   @Test
-  public void testCascadingDelete2() {
+  public void cascadingDelete2() {
     final Data data = CONTEXT.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
@@ -87,7 +87,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    * Tests deletion of an attribute.
    */
   @Test
-  public void testDeleteAttribute() {
+  public void deleteAttribute() {
     final Data data = CONTEXT.data();
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(6, Data.ELEM);
@@ -114,7 +114,7 @@ public final class UpdateTestDeletes extends UpdateTest {
    * Tests deletion of a text-node.
    */
   @Test
-  public void testDeleteText() {
+  public void deleteText() {
     final Data data = CONTEXT.data();
     data.delete(10);
     assertEquals(size - 1, data.meta.size);

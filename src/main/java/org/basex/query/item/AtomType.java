@@ -888,10 +888,7 @@ public enum AtomType implements Type {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
-    if(uri == XSURI) {
-      tb.add(XS);
-      tb.add(':');
-    }
+    if(uri == XSURI) tb.add(XS).add(':');
     tb.add(nam);
     if(uri != XSURI) tb.add("()");
     return tb.toString();

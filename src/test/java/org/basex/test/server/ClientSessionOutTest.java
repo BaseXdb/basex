@@ -1,6 +1,6 @@
 package org.basex.test.server;
 
-import java.io.ByteArrayOutputStream;
+import org.basex.io.out.ArrayOutput;
 import org.junit.Before;
 
 /**
@@ -14,7 +14,7 @@ public final class ClientSessionOutTest extends ClientSessionTest {
   @Override
   @Before
   public void startSession() {
-    out = new ByteArrayOutputStream();
+    out = new ArrayOutput();
     super.startSession();
   }
 }

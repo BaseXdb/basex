@@ -18,7 +18,7 @@ public final class VersionTest {
    * Tests method isCompatible.
    */
   @Test
-  public void testCompatible() {
+  public void compatible() {
     // case 1: template = 3
     final Version semVer1 = new Version(token("3"));
     assertTrue(new Version(token("3.0")).isCompatible(semVer1));
@@ -50,7 +50,7 @@ public final class VersionTest {
    * given version template.
    */
   @Test
-  public void testCompatGreater() {
+  public void compatGreater() {
     // case 1: template = 3
     final Version semVer1 = new Version(token("3"));
     final Version v1 = new Version(token("3"));
@@ -100,7 +100,7 @@ public final class VersionTest {
    * given version template.
    */
   @Test
-  public void testCompatSmaller() {
+  public void compatSmaller() {
     // case 1: template = 3
     final Version semVer1 = new Version(token("3"));
     final Version v1 = new Version(token("3"));
@@ -149,7 +149,7 @@ public final class VersionTest {
    * Tests if a version is in a given interval.
    */
   @Test
-  public void testInterval() {
+  public void interval() {
     final Version semVerMin1 = new Version(token("3"));
     final Version semVerMax1 = new Version(token("7"));
     final Version test1 = new Version(token("3.0"));

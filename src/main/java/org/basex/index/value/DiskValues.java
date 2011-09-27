@@ -27,7 +27,7 @@ import org.basex.util.list.IntList;
  * @author Christian Gruen
  */
 public final class DiskValues implements Index {
-  /** Number of hash entries. */
+  /** Number of index entries. */
   private final int size;
   /** ID references. */
   private final DataAccess idxr;
@@ -84,7 +84,7 @@ public final class DiskValues implements Index {
   }
 
   @Override
-  public IndexIterator ids(final IndexToken tok) {
+  public IndexIterator iter(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
     final int id = cache.id(tok.get());
@@ -96,7 +96,7 @@ public final class DiskValues implements Index {
   }
 
   @Override
-  public int nrIDs(final IndexToken it) {
+  public int count(final IndexToken it) {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
     if(it.get().length > MAXLEN) return Integer.MAX_VALUE;
 
@@ -127,14 +127,14 @@ public final class DiskValues implements Index {
    * @return iterator
    */
   private IndexIterator iter(final int s, final long ps) {
-    final IntList ids = new IntList(s);
+    final IntList pres = new IntList(s);
     long p = ps;
     for(int l = 0, v = 0; l < s; ++l) {
       v += idxl.readNum(p);
       p = idxl.cursor();
-      ids.add(v);
+      pres.add(v);
     }
-    return iter(ids);
+    return iter(pres);
   }
 
   /**
@@ -151,7 +151,7 @@ public final class DiskValues implements Index {
     final boolean simple = len != 0 && min > 0 && (long) min == min &&
       token(min).length == len;
 
-    final IntList ids = new IntList();
+    final IntList pres = new IntList();
     for(int l = 0; l < size; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
@@ -160,7 +160,7 @@ public final class DiskValues implements Index {
       if(v >= min && v <= max) {
         // value is in range
         for(int d = 0; d < ds; ++d) {
-          ids.add(pre);
+          pres.add(pre);
           pre += idxl.readNum();
         }
       } else if(simple && v > max && data.textLen(pre, text) == len) {
@@ -170,7 +170,7 @@ public final class DiskValues implements Index {
         break;
       }
     }
-    return iter(ids.sort());
+    return iter(pres.sort());
   }
 
   /**
@@ -205,12 +205,11 @@ public final class DiskValues implements Index {
     while(l <= h) {
       final int m = l + h >>> 1;
       final long pos = idxr.read5(m * 5L);
-      idxl.readNum(pos);
-      final int pre = idxl.readNum();
       // get text from cache, of add entry to cache
       byte[] txt = ctext.get(m);
       if(txt == null) {
-        txt = data.text(pre, text);
+        idxl.readNum(pos);
+        txt = data.text(idxl.readNum(), text);
         ctext.add(m, txt);
       }
       final int d = diff(txt, key);

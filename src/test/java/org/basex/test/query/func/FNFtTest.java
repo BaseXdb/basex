@@ -1,11 +1,12 @@
 package org.basex.test.query.func;
 
+import static org.basex.query.func.Function.*;
 import org.basex.core.BaseXException;
+import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
-import org.basex.query.func.Function;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -40,18 +41,18 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftSearch() throws BaseXException {
-    // test arguments
-    final String fun = check(Function.FTSEARCH);
+    check(FTSEARCH);
 
     // check index results
-    query(fun + "(., 'assignments')", "Assignments");
-    query(fun + "(., 'XXX')", "");
+    query(FTSEARCH.args(" . ", "assignments"), "Assignments");
+    query(FTSEARCH.args(" . ", "XXX"), "");
 
     // apply index options to query term
-    new Set("stemming", true).execute(CONTEXT);
+    new Set(Prop.STEMMING, true).execute(CONTEXT);
     new CreateIndex("fulltext").execute(CONTEXT);
-    contains(fun + "(., 'Exercises')/..", "<li>Exercise 1</li>");
-    new Set("stemming", false).execute(CONTEXT);
+    contains(FTSEARCH.args(" . ", "Exercises") + "/..",
+        "<li>Exercise 1</li>");
+    new Set(Prop.STEMMING, false).execute(CONTEXT);
     new CreateIndex("fulltext").execute(CONTEXT);
   }
 
@@ -60,12 +61,12 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftCount() {
-    final String fun = check(Function.FTCOUNT);
-    query(fun + "(())", "0");
-    query(fun + "(//*[text() contains text '1'])", "1");
-    query(fun + "(//li[text() contains text 'exercise'])", "2");
-    query("for $i in //li[text() contains text 'exercise'] " +
-        "return " + fun + "($i[text() contains text 'exercise'])", "1 1");
+    check(FTCOUNT);
+    query(FTCOUNT.args("()"), "0");
+    query(FTCOUNT.args(" //*[text() contains text '1']"), "1");
+    query(FTCOUNT.args(" //li[text() contains text 'exercise']"), "2");
+    query("for $i in //li[text() contains text 'exercise'] return " +
+        FTCOUNT.args("$i[text() contains text 'exercise']"), "1 1");
   }
 
   /**
@@ -73,20 +74,19 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftMark() {
-    final String fun = check(Function.FTMARK);
-
-    query(fun + "(//*[text() contains text '1'])",
+    check(FTMARK);
+    query(FTMARK.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
-    query(fun + "(//*[text() contains text '2'], 'b')",
+    query(FTMARK.args(" //*[text() contains text '2'], 'b'"),
       "<li>Exercise <b>2</b></li>");
-    contains(fun + "(//*[text() contains text 'Exercise'])",
+    contains(FTMARK.args(" //*[text() contains text 'Exercise']"),
       "<li><mark>Exercise</mark> 1</li>");
-    query("copy $a := text { 'a b' } modify () " +
-      "return ft:mark($a[. contains text 'a'], 'b')", "<b>a</b> b");
-    query("copy $a := text { 'ab' } modify () " +
-      "return ft:mark($a[. contains text 'ab'], 'b')", "<b>ab</b>");
-    query("copy $a := text { 'a b' } modify () " +
-      "return ft:mark($a[. contains text 'a b'], 'b')", "<b>a</b> <b>b</b>");
+    query("copy $a := text { 'a b' } modify () return " +
+        FTMARK.args("$a[. contains text 'a']", "b"), "<b>a</b> b");
+    query("copy $a := text { 'ab' } modify () return " +
+        FTMARK.args("$a[. contains text 'ab'], 'b'"), "<b>ab</b>");
+    query("copy $a := text { 'a b' } modify () return " +
+        FTMARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b> <b>b</b>");
   }
 
   /**
@@ -94,14 +94,14 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftExtract() {
-    final String fun = check(Function.FTEXTRACT);
-    query(fun + "(//*[text() contains text '1'])",
+    check(FTEXTRACT);
+    query(FTEXTRACT.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
-    query(fun + "(//*[text() contains text '2'], 'b', 20)",
+    query(FTEXTRACT.args(" //*[text() contains text '2'], 'b', 20"),
       "<li>Exercise <b>2</b></li>");
-    query(fun + "(//*[text() contains text '2'], '_o_', 1)",
+    query(FTEXTRACT.args(" //*[text() contains text '2'], '_o_', 1"),
       "<li>...<_o_>2</_o_></li>");
-    contains(fun + "(//*[text() contains text 'Exercise'], 'b', 1)",
+    contains(FTEXTRACT.args(" //*[text() contains text 'Exercise'], 'b', 1"),
       "<li><b>Exercise</b>...</li>");
   }
 
@@ -110,10 +110,9 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftScore() {
-    // test arguments
-    final String fun = check(Function.FTSCORE);
-    query(fun + "(ft:search(., '2'))", "1");
-    query(fun + "(ft:search(., 'XML'))", "1 0.5");
+    check(FTSCORE);
+    query(FTSCORE.args(FTSEARCH.args(" . ", "2")), "1");
+    query(FTSCORE.args(FTSEARCH.args(" . ", "XML")), "1 0.5");
   }
 
   /**

@@ -1,13 +1,12 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.list.IntList;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
@@ -42,17 +41,13 @@ public final class Replace extends ACreate {
       in = io.inputSource();
     }
 
-    String name = IOFile.normalize(args[0]);
-    if(name.isEmpty()) return error(DIRERR, name);
+    String name = MetaData.normPath(args[0]);
+    if(name == null || name.isEmpty()) return error(DIRERR, args[0]);
 
-    final byte[] source = token(name);
     final Data data = context.data();
-    final IntList docs = data.docs(name);
-    final int ds = docs.size();
-    // check if path points exclusively to files
-    for(int i = 0; i < ds; i++) {
-      if(!eq(data.text(docs.get(i), true), source)) return error(DIRERR, name);
-    }
+    final int pre = data.doc(name);
+    // check if path points to a single file
+    if(pre != -1 && data.docs(name).size() != 1) return error(DIRERR, name);
 
     final IOFile file = data.meta.binary(name);
     if(file != null && file.exists()) {
@@ -73,10 +68,10 @@ public final class Replace extends ACreate {
       if(!add.run(context)) return error(add.info());
 
       // delete old documents if addition was successful
-      for(int d = ds - 1; d >= 0; d--) data.delete(docs.get(d));
+      if(pre != -1) data.delete(pre);
       // flushes changes
       data.flush();
     }
-    return info(PATHREPLACED, ds, perf);
+    return info(PATHREPLACED, 1, perf);
   }
 }

@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.util.Token;
@@ -30,8 +31,7 @@ public final class Run extends AQuery {
     if(!io.exists())
       return error(FILEWHICH, context.user.perm(User.CREATE) ? io : io.name());
 
-    context.query = io;
-
+    context.prop.set(Prop.QUERYPATH, io.path());
     try {
       return query(Token.string(io.read()));
     } catch(final IOException ex) {

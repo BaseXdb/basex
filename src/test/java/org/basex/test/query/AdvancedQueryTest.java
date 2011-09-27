@@ -7,7 +7,6 @@ import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.func.Function;
-import org.basex.query.func.Variable;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
@@ -99,23 +98,12 @@ public abstract class AdvancedQueryTest {
   }
 
   /**
-   * Returns the variable name.
-   * @param def function definition
-   * types are supported.
-   * @return function name
-   */
-  protected String check(final Variable def) {
-    return def.toString().replaceAll("\\(.*", "");
-  }
-
-  /**
    * Checks if the specified function correctly handles its argument types,
    * and returns the function name.
    * @param def function definition
    * types are supported.
-   * @return function name
    */
-  protected String check(final Function def) {
+  protected void check(final Function def) {
     final String desc = def.toString();
     final String name = desc.replaceAll("\\(.*", "");
 
@@ -146,7 +134,6 @@ public abstract class AdvancedQueryTest {
         else error(query, Err.XPARGS);
       }
     }
-    return name;
   }
 
   /**

@@ -8,12 +8,13 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
+import org.basex.query.func.Function;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 
 /**
- * Update primitive for the db:store() function.
+ * Update primitive for the {@link Function#DBSTORE} function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

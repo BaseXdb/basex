@@ -15,9 +15,9 @@ import org.basex.build.xml.SAXWrapper;
 import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.IOFile;
 import org.basex.util.Performance;
 import org.basex.util.Util;
 
@@ -62,7 +62,8 @@ public final class Add extends ACreate {
   @Override
   protected boolean run() {
     String name = args[0];
-    String target = IOFile.normalize(args[1]);
+    String target = MetaData.normPath(args[1]);
+    if(target == null) return error(NAMEINVALID, args[1]);
     if(!target.isEmpty()) target += '/';
 
     Parser parser;
@@ -92,8 +93,6 @@ public final class Add extends ACreate {
       return error(NAMEINVALID, nm);
 
     final String path = target + (target.isEmpty() ? "/" : "") + nm;
-    // ensure that the path is valid
-    if(!new IOFile(path).isValid()) return error(NAMEINVALID, path);
 
     // create disk instances for large documents
     // test does not work for input streams and directories

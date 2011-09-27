@@ -65,8 +65,6 @@ public abstract class IO {
 
   /** File path. The path uses forward slashes, no matter which OS is used. */
   protected String path;
-  /** File contents. */
-  protected byte[] cont;
   /** First call. */
   protected boolean more;
   /** File name. */
@@ -125,16 +123,7 @@ public abstract class IO {
    * @return contents
    * @throws IOException I/O exception
    */
-  public final byte[] read() throws IOException {
-    if(cont == null) cache();
-    return cont;
-  }
-
-  /**
-   * Caches the contents.
-   * @throws IOException I/O exception
-   */
-  public abstract void cache() throws IOException;
+  public abstract byte[] read() throws IOException;
 
   /**
    * Tests if the file exists.
@@ -164,9 +153,7 @@ public abstract class IO {
    * Returns the file length.
    * @return file length
    */
-  public long length() {
-    return cont != null ? cont.length : 0;
-  }
+  public abstract long length();
 
   /**
    * Checks if more input streams are found.

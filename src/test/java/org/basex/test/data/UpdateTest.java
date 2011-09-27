@@ -113,7 +113,7 @@ public abstract class UpdateTest {
    * Tests for correct data size.
    */
   @Test
-  public final void testSize() {
+  public final void size() {
     assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);
     reload();
     assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);

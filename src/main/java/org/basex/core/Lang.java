@@ -64,7 +64,7 @@ public final class Lang {
       final String path = "/" + SUFFIX + "/" + lang + "." + SUFFIX;
       final InputStream is = Lang.class.getResourceAsStream(path);
       if(is == null) {
-        Util.errln("%." + SUFFIX + " not found.", lang);
+        Util.errln(path + " not found.");
       } else {
         br = new BufferedReader(new InputStreamReader(is, Token.UTF8));
         for(String line; (line = br.readLine()) != null;) {

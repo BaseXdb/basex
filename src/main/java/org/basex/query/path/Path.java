@@ -28,7 +28,6 @@ import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.list.ObjList;
-import org.basex.util.list.TokenList;
 
 /**
  * Path expression.
@@ -264,31 +263,32 @@ public abstract class Path extends ParseExpr {
       if(curr == null || curr.axis != Axis.DESC || curr.uses(Use.POS)) continue;
 
       // check if child steps can be retrieved for current step
-      ObjList<PathNode> nodes = pathNodes(data, s);
-      if(nodes == null) continue;
-
-      ctx.compInfo(OPTCHILD, steps[s]);
+      ObjList<PathNode> pn = pathNodes(data, s);
+      if(pn == null) continue;
 
       // cache child steps
-      final TokenList tl = new TokenList();
-      while(nodes.get(0).par != null) {
-        byte[] tag = data.tagindex.key(nodes.get(0).name);
-        for(int j = 0; j < nodes.size(); ++j) {
-          if(nodes.get(0).name != nodes.get(j).name) tag = null;
+      final ObjList<QNm> qnm = new ObjList<QNm>();
+      while(pn.get(0).par != null) {
+        QNm nm = new QNm(data.tagindex.key(pn.get(0).name));
+        // skip children with prefixes
+        if(nm.ns()) return this;
+        for(int j = 0; j < pn.size(); ++j) {
+          if(pn.get(0).name != pn.get(j).name) nm = null;
         }
-        tl.add(tag);
-        nodes = data.pthindex.parent(nodes);
+        qnm.add(nm);
+        pn = data.pthindex.parent(pn);
       }
+      ctx.compInfo(OPTCHILD, steps[s]);
 
       // build new steps
-      int ts = tl.size();
+      int ts = qnm.size();
       final Expr[] stps = new Expr[ts + steps.length - s - 1];
       for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ?
             ((AxisStep) steps[s]).preds : new Expr[0];
-        final byte[] n = tl.get(ts - t - 1);
-        final NameTest nt = n == null ? new NameTest(false, input) :
-          new NameTest(new QNm(n), Name.NAME, false, input);
+        final QNm nm = qnm.get(ts - t - 1);
+        final NameTest nt = nm == null ? new NameTest(false, input) :
+          new NameTest(nm, Name.NAME, false, input);
         stps[t] = AxisStep.get(input, Axis.CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
@@ -296,21 +296,24 @@ public abstract class Path extends ParseExpr {
       break;
     }
 
-    // check if the all children in the path exist
-    LOOP: for(int s = 0; s < path.steps.length; ++s) {
-      // only verify child steps; ignore namespaces
-      final AxisStep st = path.axisStep(s);
-      if(st == null || st.axis != Axis.CHILD) break;
-      if(st.test.test == Name.ALL || st.test.test == null) continue;
-      if(st.test.test != Name.NAME) break;
+    // check if the all children in the path exist; don't test with namespaces
+    if(data.ns.size() == 0) {
+      LOOP:
+      for(int s = 0; s < path.steps.length; ++s) {
+        // only verify child steps; ignore namespaces
+        final AxisStep st = path.axisStep(s);
+        if(st == null || st.axis != Axis.CHILD) break;
+        if(st.test.test == Name.ALL || st.test.test == null) continue;
+        if(st.test.test != Name.NAME) break;
 
-      // check if one of the addressed nodes is on the correct level
-      final int name = data.tagindex.id(st.test.name.ln());
-      for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
-        if(pn.level() == s + 1) continue LOOP;
+        // check if one of the addressed nodes is on the correct level
+        final int name = data.tagindex.id(st.test.name.ln());
+        for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
+          if(pn.level() == s + 1) continue LOOP;
+        }
+        ctx.compInfo(OPTPATH, path);
+        return Empty.SEQ;
       }
-      ctx.compInfo(OPTPATH, this);
-      return Empty.SEQ;
     }
     return path;
   }

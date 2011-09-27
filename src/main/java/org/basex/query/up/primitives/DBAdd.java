@@ -40,18 +40,18 @@ public final class DBAdd extends InsertBase {
 
   /**
    * Constructor.
-   * @param trg target database
+   * @param d target database
    * @param i input info
-   * @param d document nodes to add
+   * @param doc document nodes to add
    * @param n document name
    * @param p document(s) path
    * @param c database context
    */
-  public DBAdd(final Data trg, final InputInfo i, final ObjList<Item> d,
+  public DBAdd(final Data d, final InputInfo i, final ObjList<Item> doc,
       final String n, final String p, final Context c) {
 
-    super(PrimitiveType.INSERTAFTER, lastDoc(trg), trg, i, null);
-    docs = d;
+    super(PrimitiveType.INSERTAFTER, lastDoc(d), d, i, null);
+    docs = doc;
     final int ndocs = docs.size();
     final byte[] name = ndocs > 1 || n == null || n.isEmpty() ? null : token(n);
     final byte[] path = p == null || p.isEmpty() ? null : token(p);
@@ -97,8 +97,9 @@ public final class DBAdd extends InsertBase {
     final Iterator<byte[]> n = names.iterator();
     final Iterator<byte[]> p = paths.iterator();
 
-    while(d.hasNext())
+    while(d.hasNext()) {
       md.insert(md.meta.size, -1, docData(d.next(),  n.next(), p.next()));
+    }
   }
 
   /**
@@ -139,8 +140,8 @@ public final class DBAdd extends InsertBase {
     final IntList pres = mdata.docs();
     if(pres.size() == 1 && name != null) {
       // name is specified and a single document is added: set the name
-      final byte[] nm = path == null ? name : concat(path, SLASH, name);
-      mdata.update(pres.get(0), Data.DOC, nm);
+      final byte[] dbpath = path == null ? name : concat(path, SLASH, name);
+      mdata.update(pres.get(0), Data.DOC, dbpath);
     } else if(path != null) {
       // path is specified: replace the path of each new document
       for(int i = 0, is = pres.size(); i < is; i++) {

@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.io.IOFile;
+import org.basex.data.MetaData;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
@@ -130,19 +130,19 @@ public final class DocIndex implements Index {
    * @return root nodes
    */
   public synchronized IntList docs(final String path) {
-    // no documents: return empty list
-    if(data.empty()) return new IntList(0);
+    // invalid path, or no documents: return empty list
+    final String pth = MetaData.normPath(path);
+    if(pth == null || data.empty()) return new IntList(0);
 
     // empty path: return all documents
     final IntList doc = docs();
-    final byte[] np = token(IOFile.normalize(path));
-    if(np.length == 0) return doc;
+    if(pth.isEmpty()) return doc;
 
     // initialize and sort document paths
     if(paths == null) initPaths();
 
     // normalize paths
-    final byte[] exct = concat(SLASH, Prop.WIN ? lc(np) : np);
+    final byte[] exct = concat(SLASH, Prop.WIN ? lc(token(pth)) : token(pth));
     final byte[] pref = concat(exct, SLASH);
 
     // relevant paths: start from the first hit and return all subsequent hits
@@ -155,13 +155,36 @@ public final class DocIndex implements Index {
   }
 
   /**
+   * Returns the pre values of the document node matching the specified path.
+   * @param path input path
+   * @return root nodes
+   */
+  public synchronized int doc(final String path) {
+    // invalid or empty path, or no documents: return -1
+    final String pth = MetaData.normPath(path);
+    if(pth == null || pth.isEmpty() || data.empty()) return -1;
+
+    // initialize and sort document paths
+    if(paths == null) initPaths();
+
+    // normalize paths
+    final byte[] exct = concat(SLASH, Prop.WIN ? lc(token(pth)) : token(pth));
+
+    // relevant paths: start from the first hit and return all subsequent hits
+    final int p = find(exct);
+    return p < paths.length && eq(paths[p], exct) ? docs.get(order[p]) : -1;
+  }
+
+  /**
    * Returns the references to all binary files matching the specified path.
    * @param path input path
    * @return root nodes
    */
   public synchronized TokenList files(final String path) {
     final TokenList tl = new TokenList();
-    final String np = IOFile.normalize(path);
+    final String np = MetaData.normPath(path);
+    if(np == null) return tl;
+
     final String exct = Prop.WIN ? np.toLowerCase() : np;
     final String pref = exct + '/';
     for(final String f : data.meta.binaries().descendants()) {
@@ -172,9 +195,10 @@ public final class DocIndex implements Index {
   }
 
   /**
-   * Returns the first position matching the specified path.
+   * Returns the first position matching the specified path
+   * (might equal the array size).
    * @param v value to be found
-   * @return position or negative insertion value - 1
+   * @return position
    */
   private int find(final byte[] v) {
     // binary search
@@ -224,12 +248,12 @@ public final class DocIndex implements Index {
   public void close() { }
 
   @Override
-  public IndexIterator ids(final IndexToken token) {
+  public IndexIterator iter(final IndexToken token) {
     throw Util.notexpected();
   }
 
   @Override
-  public int nrIDs(final IndexToken token) {
+  public int count(final IndexToken token) {
     throw Util.notexpected();
   }
 

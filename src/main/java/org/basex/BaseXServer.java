@@ -26,7 +26,6 @@ import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenIntMap;
-import org.basex.util.list.StringList;
 
 /**
  * This is the starter class for running the database server. It handles
@@ -39,25 +38,25 @@ import org.basex.util.list.StringList;
 public class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
   public boolean running;
-
-  /** Quiet mode (no logging). */
-  protected boolean quiet;
-  /** Start as daemon. */
-  protected boolean service;
-  /** Stopped flag. */
-  protected boolean stopped;
-  /** Log. */
-  protected Log log;
-
   /** Event server socket. */
   ServerSocket esocket;
   /** Stop file. */
   IOFile stop;
+  /** Log. */
+  Log log;
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
   /** Blocked clients. */
   private final TokenIntMap blocked = new TokenIntMap();
+
+  /** Quiet mode (no logging). */
+  private boolean quiet;
+  /** Start as daemon. */
+  private boolean service;
+  /** Stopped flag. */
+  private boolean stopped;
+
   /** Server socket. */
   private ServerSocket socket;
   /** User query. */
@@ -96,18 +95,18 @@ public class BaseXServer extends Main implements Runnable {
       throws IOException {
 
     super(args, ctx);
-    if(stopped) {
-      stop(context.mprop.num(MainProp.SERVERPORT),
-          context.mprop.num(MainProp.EVENTPORT));
-      Performance.sleep(1000);
-      return;
-    }
-
     final int port = context.mprop.num(MainProp.SERVERPORT);
     final int eport = context.mprop.num(MainProp.EVENTPORT);
 
     if(service) {
-      Util.outln(start(port, getClass(), args));
+      start(port, args);
+      Util.outln(SERVERSTART);
+      Performance.sleep(1000);
+      return;
+    }
+
+    if(stopped) {
+      stop(port, eport);
       Performance.sleep(1000);
       return;
     }
@@ -218,8 +217,8 @@ public class BaseXServer extends Main implements Runnable {
 
   @Override
   protected void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE,
-        SERVERMODE));
+    final Args arg = new Args(args, this, SERVERINFO,
+        Util.info(CONSOLE, SERVERMODE));
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
@@ -273,7 +272,9 @@ public class BaseXServer extends Main implements Runnable {
   public void stop() throws IOException {
     stop.write(Token.EMPTY);
     new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT));
-    new Socket(LOCALHOST, context.mprop.num(MainProp.SERVERPORT));
+    final int port = context.mprop.num(MainProp.SERVERPORT);
+    new Socket(LOCALHOST, port);
+    while(ping(LOCALHOST, port)) Performance.sleep(100);
   }
 
   // STATIC METHODS ===========================================================
@@ -281,36 +282,23 @@ public class BaseXServer extends Main implements Runnable {
   /**
    * Starts the specified class in a separate process.
    * @param port server port
-   * @param clz class to start
    * @param args command-line arguments
-   * @return error string or {@code null}
+   * @throws BaseXException database exception
    */
-  public static String start(final int port, final Class<?> clz,
-      final String... args) {
+  public static void start(final int port, final String... args)
+      throws BaseXException {
 
     // check if server is already running (needs some time)
-    if(ping(LOCALHOST, port)) return SERVERBIND;
+    if(ping(LOCALHOST, port)) throw new BaseXException(SERVERBIND);
 
-    final StringList sl = new StringList();
-    final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
-        "-cp", System.getProperty("java.class.path"), clz.getName(), "-D", };
-    for(final String a : largs)
-      sl.add(a);
-    for(final String a : args)
-      sl.add(a);
+    Util.start(BaseXServer.class, args);
 
-    try {
-      new ProcessBuilder(sl.toArray()).start();
-
-      // try to connect to the new server instance
-      for(int c = 0; c < 5; ++c) {
-        if(ping(LOCALHOST, port)) return SERVERSTART;
-        Performance.sleep(100);
-      }
-    } catch(final IOException ex) {
-      Util.notexpected(ex);
+    // try to connect to the new server instance
+    for(int c = 0; c < 10; ++c) {
+      if(ping(LOCALHOST, port)) return;
+      Performance.sleep(100);
     }
-    return SERVERERROR;
+    throw new BaseXException(SERVERERROR);
   }
 
   /**
@@ -367,7 +355,7 @@ public class BaseXServer extends Main implements Runnable {
             break;
           }
           final BufferInput bi = new BufferInput(es.getInputStream());
-          final long id = Long.parseLong(bi.readString());
+          final long id = Token.toLong(bi.readString());
           for(final ClientListener s : context.sessions) {
             if(s.getId() == id) {
               s.register(es);

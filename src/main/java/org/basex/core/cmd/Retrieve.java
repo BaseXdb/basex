@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 
+import org.basex.data.MetaData;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
 
@@ -24,10 +25,12 @@ public final class Retrieve extends ACreate {
 
   @Override
   protected boolean run() throws IOException {
-    final String source = args[0];
-    final IOFile bin = context.data().meta.binary(source);
-    if(bin == null || !bin.exists() || bin.isDir() || !bin.isValid())
-      return error(FILEWHICH, source);
+    final String path = MetaData.normPath(args[0]);
+    if(path == null) return error(NAMEINVALID, args[0]);
+
+    final IOFile bin = context.data().meta.binary(path);
+    if(bin == null || !bin.exists() || bin.isDir())
+      return error(FILEWHICH, path);
 
     try {
       final BufferInput bi = bin.buffer();

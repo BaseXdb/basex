@@ -1,7 +1,7 @@
 package org.basex.core.cmd;
 
-import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
@@ -10,6 +10,8 @@ import org.basex.core.CommandBuilder;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
+import org.basex.data.MetaData;
+import org.basex.io.MimeTypes;
 import org.basex.util.Table;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
@@ -36,12 +38,13 @@ public final class ListDB extends Command {
     final int s = str.indexOf('/');
     final String db = s == -1 ? str : str.substring(0, s);
     final String path = s == -1 ? "" : str.substring(s + 1);
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
 
     final Table table = new Table();
     table.description = INFONRES;
     table.header.add(INFOPATH);
     table.header.add(INFOTYPE);
+    table.header.add(DataText.CONTENT_TYPE);
     table.header.add(INFODBSIZE);
 
     try {
@@ -53,15 +56,18 @@ public final class ListDB extends Command {
         final TokenList tl = new TokenList(3);
         tl.add(data.text(pre, true));
         tl.add(DataText.M_XML);
+        tl.add(MimeTypes.APP_XML);
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
       }
       // add binary resources
-      for(final byte[] file : data.files(path)) {
+      for(final byte[] fl : data.files(path)) {
+        final String file = string(fl);
         final TokenList tl = new TokenList(3);
-        tl.add(file);
+        tl.add(fl);
         tl.add(DataText.M_RAW);
-        tl.add(data.meta.binary(string(file)).length());
+        tl.add(MimeTypes.get(file));
+        tl.add(data.meta.binary(file).length());
         table.contents.add(tl);
       }
       Close.close(data, context);

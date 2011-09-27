@@ -437,7 +437,9 @@ public final class GUI extends AGUI {
       // check if query feedback was evaluated in the query view
       if(!ok) {
         // display error in info view
-        if(!feedback && !info.visible()) GUICommands.SHOWINFO.execute(this);
+        if((!feedback || inf.startsWith(BUGINFO)) && !info.visible()) {
+          GUICommands.SHOWINFO.execute(this);
+        }
       } else {
         // get query result
         final Result result = c.result();

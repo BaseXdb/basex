@@ -1,5 +1,6 @@
 package org.basex.io.serial;
 
+import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 
@@ -121,6 +122,24 @@ public final class SerializerProp extends AProp {
     final String val = get(key);
     for(final String a : allowed) if(a.equals(val)) return val;
     throw error(key[0], val, allowed);
+  }
+
+  /**
+   * Retrieves a value from the specified property and checks for its boolean
+   * value.
+   * @param key property key
+   * @return value
+   * @throws SerializerException serializer exception
+   */
+  public boolean yes(final Object[] key) throws SerializerException {
+    final String val = get(key);
+    for(final String a : new String[] { YES, TRUE, ON }) {
+      if(a.equals(val)) return true;
+    }
+    for(final String a : new String[] { NO, FALSE, OFF }) {
+      if(a.equals(val)) return false;
+    }
+    throw error(key[0], val, YES, NO);
   }
 
   /**

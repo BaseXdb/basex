@@ -202,6 +202,15 @@ public final class Namespaces {
   }
 
   /**
+   * Deletes the specified namespace URI from the root node.
+   * @param u namespace URI reference
+   */
+  public void delete(final byte[] u) {
+    final int id = uri.id(u);
+    if(id != 0) current.delete(id);
+  }
+
+  /**
    * Returns the specified prefix.
    * @param id prefix reference
    * @return prefix

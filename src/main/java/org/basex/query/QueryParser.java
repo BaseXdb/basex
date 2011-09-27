@@ -10,8 +10,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Scanner;
 
-import org.basex.core.cmd.Set;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.serial.SerializerProp;
@@ -85,6 +86,7 @@ import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
 import org.basex.query.func.Variable;
+import org.basex.query.item.Atm;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
@@ -200,21 +202,34 @@ public class QueryParser extends InputParser {
    * Constructor.
    * @param q query
    * @param c query context
+   * @throws QueryException query exception
    */
-  public QueryParser(final String q, final QueryContext c) {
+  public QueryParser(final String q, final QueryContext c)
+      throws QueryException {
+
     super(q, c.base());
     ctx = c;
+
+    // parse pre-defined external variables
+    final String bind = ctx.context.prop.get(Prop.BINDINGS);
+    if(bind.isEmpty()) return;
+    final Scanner sc = new Scanner(bind).useDelimiter(",");
+    while(sc.hasNext()) {
+      final String[] sp = sc.next().split("=", 2);
+      c.bind(sp[0], new Atm(token(sp.length > 1 ? sp[1] : "")));
+    }
   }
 
   /**
    * Parses the specified query or module.
-   * @param f optional input file
-   * @param u module uri. If {@code u != null}, the input is treated as a module
+   * If a URI is specified, the query is treated as a module.
+   * @param input optional input file
+   * @param uri module uri.
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final IO f, final Uri u) throws QueryException {
-    file = f;
+  public final Expr parse(final IO input, final Uri uri) throws QueryException {
+    file = input;
     if(!more()) error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -225,21 +240,35 @@ public class QueryParser extends InputParser {
       qp = p;
       error(QUERYINV, query.codePointAt(p));
     }
-    return parse(u, true);
+    final Expr expr = parse(uri);
+    if(more()) {
+      if(alter != null) error();
+      error(QUERYEND, rest());
+    }
+
+    // completes the parsing step
+    ctx.funcs.check();
+    ctx.vars.check();
+    ctx.ns.finish(ctx.nsElem);
+
+    // set default decimal format
+    final byte[] empty = new QNm(EMPTY).full();
+    if(ctx.decFormats.get(empty) == null) {
+      ctx.decFormats.add(empty, new DecFormatter());
+    }
+    return expr;
   }
 
   /**
-   * Parses the specified query and starts with the "Module" rule. If a URI is
-   * specified, the query is treated as a module.
-   *
+   * Parses the specified query and starts with the "Module" rule.
+   * If a URI is specified, the query is treated as a module.
    * @param u module uri
-   * @param c if true, input must be completely evaluated
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final Uri u, final boolean c) throws QueryException {
-    Expr expr = null;
+  public final Expr parse(final Uri u) throws QueryException {
     try {
+      Expr expr = null;
       versionDecl();
       if(u == null) {
         expr = mainModule();
@@ -248,26 +277,12 @@ public class QueryParser extends InputParser {
       } else {
         moduleDecl(u);
       }
-      if(c && more()) {
-        if(alter != null) error();
-        error(QUERYEND, rest());
-      }
+      return expr;
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
       throw ex;
     }
-
-    // completes the parsing step
-    ctx.funcs.check();
-    ctx.vars.check();
-    ctx.ns.finish(ctx.nsElem);
-    // set default decimal format
-    final byte[] empty = new QNm(EMPTY).full();
-    if(ctx.decFormats.get(empty) == null) {
-      ctx.decFormats.add(empty, new DecFormatter());
-    }
-    return expr;
   }
 
   /**
@@ -502,10 +517,12 @@ public class QueryParser extends InputParser {
       final Object obj = ctx.context.prop.get(key);
       if(obj == null) error(NOOPTION, key);
       // cache old value (to be reset after query evaluation)
-      if(ctx.props == null) ctx.props = new HashMap<String, Object>();
-      ctx.props.put(key, obj);
-      // set value
-      Set.set(key, string(val), ctx.context.prop);
+      if(ctx.queryOpt == null) {
+        ctx.queryOpt = new HashMap<String, String>();
+        ctx.globalOpt = new HashMap<String, Object>();
+      }
+      ctx.globalOpt.put(key, obj);
+      ctx.queryOpt.put(key, string(val));
     }
   }
 

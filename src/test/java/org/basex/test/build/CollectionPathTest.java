@@ -57,7 +57,7 @@ public final class CollectionPathTest {
    * @throws Exception exception
    */
   @Test
-  public void testFindDoc() throws Exception {
+  public void findDoc() throws Exception {
     final String find =
       "for $x in collection('" + DB + "/etc/test/xmark.xml') " +
       "where $x//location contains text 'uzbekistan' " +
@@ -72,7 +72,7 @@ public final class CollectionPathTest {
    * @throws Exception exception
    */
   @Test
-  public void testFindDocs() throws Exception {
+  public void findDocs() throws Exception {
     final String find = "collection('" + DB + "/test/zipped') ";
     final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
     assertEquals(4, qp.execute().size());
@@ -84,7 +84,7 @@ public final class CollectionPathTest {
    * @throws Exception exception
    */
   @Test
-  public void testBaseUri() throws Exception {
+  public void baseUri() throws Exception {
     final String find =
       "for $x in collection('" + DB + "/etc/test/xmark.xml') " +
       "return base-uri($x)";

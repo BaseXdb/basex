@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.core.Context;
+import org.basex.io.in.ArrayInput;
 import org.basex.io.out.ArrayOutput;
-import org.basex.io.out.PrintOutput;
 
 /**
  * This class defines all methods for iteratively evaluating queries locally.
@@ -17,21 +17,7 @@ import org.basex.io.out.PrintOutput;
  */
 public class LocalQuery extends Query {
   /** Active query listener. */
-  private final QueryListener qp;
-  /** Buffer output; {@code null} if an {@link OutputStream} is specified. */
-  private final ArrayOutput buf;
-  /** Iterator flag. */
-  private boolean more;
-
-  /**
-   * Constructor. Query output will be returned by each called methods.
-   * @param q query string
-   * @param ctx database context
-   */
-  LocalQuery(final String q, final Context ctx) {
-    buf = new ArrayOutput();
-    qp = new QueryListener(q, PrintOutput.get(buf), ctx);
-  }
+  private final QueryListener ql;
 
   /**
    * Constructor. Query output will be written to the provided output stream.
@@ -41,60 +27,41 @@ public class LocalQuery extends Query {
    * @param o output stream to write query output
    */
   LocalQuery(final String q, final Context ctx, final OutputStream o) {
-    buf = null;
-    qp = new QueryListener(q, PrintOutput.get(o), ctx);
+    ql = new QueryListener(q, ctx);
+    out = o;
   }
 
   @Override
   public void bind(final String n, final Object v, final String t)
       throws IOException {
-    qp.bind(n, v, t);
+    ql.bind(n, v, t);
   }
 
   @Override
-  public boolean more() throws IOException {
-    more = true;
-    return qp.next();
-  }
-
-  @Override
-  public String next() throws IOException {
-    if(more) more = false;
-    else qp.next();
-    return output();
+  protected void cache() throws IOException {
+    final ArrayOutput ao = new ArrayOutput();
+    ql.execute(true, ao, true);
+    cache(new ArrayInput(ao.toArray()));
   }
 
   @Override
   public String execute() throws IOException {
-    qp.execute();
-    return output();
+    final OutputStream os = out == null ? new ArrayOutput() : out;
+    ql.execute(false, os, false);
+    return out == null ? os.toString() : null;
   }
 
   @Override
   public String info() throws IOException {
-    return qp.info();
+    return ql.info();
   }
 
   @Override
   public String options() throws IOException {
-    return qp.options();
+    return ql.options();
   }
 
   @Override
-  public void close() throws IOException {
-    qp.close();
-  }
-
-  /**
-   * Query output.
-   * @return {@code null} if query output is directly sent to an output stream
-   */
-  private String output() {
-    // if another output stream is specified, the query process has already
-    // written the data, so there is nothing to output
-    if(buf == null) return null;
-    final String result = buf.toString();
-    buf.reset();
-    return result;
+  public void close() {
   }
 }

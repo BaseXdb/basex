@@ -9,6 +9,7 @@ import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
+import org.basex.data.MetaData;
 
 /**
  * Evaluates the 'alter database' command and renames a database.
@@ -34,13 +35,13 @@ public final class AlterDB extends Command {
     final String db = args[0];
     final String name = args[1];
     // check if names are valid
-    if(!validName(db, false)) return error(NAMEINVALID, db);
-    if(!validName(name, false)) return error(NAMEINVALID, name);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(name, false)) return error(NAMEINVALID, name);
 
     // database does not exist
     if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);
     // target database exists already
-    if(mprop.dbexists(name)) return error(DBEXISTS, name);
+    if(mprop.dbexists(name)) return error(DBEXIST, name);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);

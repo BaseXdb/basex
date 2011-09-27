@@ -1,7 +1,10 @@
 package org.basex.util;
 
 import java.io.File;
+import java.io.IOException;
+
 import static org.basex.core.Text.*;
+
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketException;
@@ -12,6 +15,7 @@ import java.util.Scanner;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.LoginException;
+import org.basex.util.list.StringList;
 
 /**
  * This class contains static methods, which are used throughout the project.
@@ -40,8 +44,7 @@ public final class Util {
    * @return dummy object
    */
   public static String bug(final Throwable ex) {
-    final TokenBuilder tb = new TokenBuilder(
-      "Potential bug? Improper use? Your feedback is welcome:");
+    final TokenBuilder tb = new TokenBuilder(BUGINFO);
     tb.add(NL).add("Contact: ").add(MAIL);
     tb.add(NL).add("Version: ").add(TITLE);
     tb.add(NL).add("Java: ").add(System.getProperty("java.vendor"));
@@ -321,5 +324,53 @@ public final class Util {
       stack(ex);
       return tb.toString();
     }
+  }
+
+  /**
+   * Starts the specified class in a separate process.
+   * @param clz class to start
+   * @param args command-line arguments
+   */
+  public static void start(final Class<?> clz, final String... args) {
+    final StringList sl = new StringList();
+    final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
+        "-cp", System.getProperty("java.class.path"), clz.getName(), "-D", };
+    for(final String a : largs) sl.add(a);
+    for(final String a : args) sl.add(a);
+
+    try {
+      new ProcessBuilder(sl.toArray()).start();
+    } catch(final IOException ex) {
+      notexpected(ex);
+    }
+  }
+
+  /**
+   * Checks if the specified string is "yes", "true" or "on".
+   * @param string string to be checked
+   * @return result of check
+   */
+  public static boolean yes(final String string) {
+    return YES.equals(string) || TRUE.equals(string) || ON.equals(string) ||
+        INFOOFF.equals(string);
+  }
+
+  /**
+   * Checks if the specified string is "no", "false" or "off".
+   * @param string string to be checked
+   * @return result of check
+   */
+  public static boolean no(final String string) {
+    return NO.equals(string) || FALSE.equals(string) || OFF.equals(string) ||
+        INFOON.equals(string);
+  }
+
+  /**
+   * Returns an info message for the specified flag.
+   * @param flag current flag status
+   * @return ON/OFF message
+   */
+  public static String flag(final boolean flag) {
+    return flag ? INFOON : INFOOFF;
   }
 }

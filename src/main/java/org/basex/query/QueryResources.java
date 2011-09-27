@@ -20,6 +20,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 import org.basex.util.list.IntList;
 
 /**
@@ -218,6 +219,7 @@ public final class QueryResources {
     try {
       return Check.check(ctx.context, path);
     } catch(final IOException ex) {
+      Util.debug(ex);
       if(err) (col ? NOCOLL : IOERR).thrw(ii, ex);
       return null;
     }

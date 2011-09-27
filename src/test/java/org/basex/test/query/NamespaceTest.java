@@ -47,7 +47,8 @@ public final class NamespaceTest {
     { "d14", "<a xmlns='A'><b xmlns='B'/><c xmlns='C'/></a>" },
     { "d15", "<a xmlns='A'><b xmlns='B'/><c xmlns='C'><d xmlns='D'/></c>" +
     "<e xmlns='E'/></a>" },
-    { "d16", "<a><b/></a>" }
+    { "d16", "<a><b/></a>" },
+    { "d17", "<ns:a xmlns:ns='NS'><b/></ns:a>" },
   };
 
   /**
@@ -328,7 +329,7 @@ public final class NamespaceTest {
     query(
         "insert node doc('d3') into doc('d1')/x",
         "doc('d1')/x/*/*",
-        "<b:y xmlns:b='bb'/>");
+        "<b:y xmlns:b='bb' xmlns:a='aa'/>");
   }
 
   /**
@@ -436,6 +437,26 @@ public final class NamespaceTest {
     new Open("d2").execute(CONTEXT);
     CONTEXT.data().delete(0);
     assertEquals(true, CONTEXT.data().ns.rootEmpty());
+  }
+
+  /**
+   * Checks a path optimization fix.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void queryPathOpt() throws BaseXException {
+    create(17);
+    query("doc('d17')/descendant::*:b", "<b xmlns:ns='NS'/>");
+  }
+
+  /**
+   * Checks a path optimization fix.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void queryPathOpt2() throws BaseXException {
+    create(17);
+    query("doc('d17')/*:a/*:b", "<b xmlns:ns='NS'/>");
   }
 
   /**

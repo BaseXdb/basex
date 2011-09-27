@@ -109,10 +109,6 @@ public interface BuildText {
   byte[] ENCOD = token("encoding");
   /** XML document standalone flag. */
   byte[] STANDALONE = token("standalone");
-  /** XML document standalone flag. */
-  byte[] YES = token("yes");
-  /** XML document standalone flag. */
-  byte[] NO = token("no");
 
   /** DTD: XML. */
   byte[] DOCDECL = token("<?xml");

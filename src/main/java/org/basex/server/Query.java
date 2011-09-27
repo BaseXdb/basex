@@ -1,6 +1,13 @@
 package org.basex.server;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.basex.io.in.DecodingInput;
+import org.basex.util.Token;
+import org.basex.util.list.ByteList;
+import org.basex.util.list.TokenList;
 
 /**
  * <p>This class defines methods for executing queries.
@@ -13,6 +20,13 @@ import java.io.IOException;
  * @author Christian Gruen
  */
 public abstract class Query {
+  /** Client output stream. */
+  protected OutputStream out;
+  /** Cached results. */
+  private TokenList cache;
+  /** Cache pointer. */
+  private int pos;
+
   /**
    * Binds a value to an external variable.
    * @param n name of variable
@@ -38,14 +52,46 @@ public abstract class Query {
    * @return result of check
    * @throws IOException I/O exception
    */
-  public abstract boolean more() throws IOException;
+  public final boolean more() throws IOException {
+    if(cache == null) cache();
+    return pos < cache.size();
+  }
+
+  /**
+   * Caches the query result.
+   * @throws IOException I/O exception
+   */
+  protected abstract void cache() throws IOException;
 
   /**
    * Returns the next item of the query.
    * @return item string or {@code null}.
    * @throws IOException I/O exception
    */
-  public abstract String next() throws IOException;
+  public final String next() throws IOException {
+    if(!more()) return null;
+    final byte[] item = cache.get(pos);
+    cache.set(pos++, null);
+    if(out == null) return Token.string(item);
+    out.write(item);
+    return null;
+  }
+
+  /**
+   * Caches the incoming input.
+   * @param is input stream
+   * @throws IOException I/O exception
+   */
+  protected void cache(final InputStream is) throws IOException {
+    cache = new TokenList();
+    final ByteList bl = new ByteList();
+    while(is.read() == 1) {
+      final DecodingInput di = new DecodingInput(is);
+      for(int b; (b = di.read()) != -1;) bl.add(b);
+      cache.add(bl.toArray());
+      bl.reset();
+    }
+  }
 
   /**
    * Returns the complete result of the query.

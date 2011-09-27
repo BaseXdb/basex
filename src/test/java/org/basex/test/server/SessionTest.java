@@ -1,12 +1,14 @@
 package org.basex.test.server;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.func.Function.*;
+import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.basex.io.in.ArrayInput;
+import org.basex.io.out.ArrayOutput;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -22,8 +24,10 @@ import org.junit.Test;
 public abstract class SessionTest {
   /** Test database name. */
   protected static final String DB = Util.name(SessionTest.class);
+  /** Raw output method. */
+  protected static final String RAW = "declare option output:method 'raw';";
   /** Output stream. */
-  protected ByteArrayOutputStream out;
+  protected ArrayOutput out;
   /** Serialization parameters to wrap query result with an element. */
   protected static final String WRAPPER =
     "declare option output:wrap-prefix 'db';" +
@@ -124,9 +128,9 @@ public abstract class SessionTest {
   public final void add() throws IOException {
     session.execute("create db " + DB);
     session.add(DB, "", new ArrayInput("<X/>"));
-    check("1", session.query("count(db:open('" + DB + "'))").execute());
+    check("1", session.query("count(" + DBOPEN.args(DB) + ")").execute());
     for(int i = 0; i < 9; i++) session.add(DB, "", new ArrayInput("<X/>"));
-    check("10", session.query("count(db:open('" + DB + "'))").execute());
+    check("10", session.query("count(" + DBOPEN.args(DB) + ")").execute());
   }
 
   /**
@@ -156,13 +160,13 @@ public abstract class SessionTest {
   @Test
   public final void replace() throws IOException {
     session.execute("create db " + DB);
-    check("0", session.query("count(db:open('" + DB + "'))").execute());
+    check("0", session.query("count(" + DBOPEN.args(DB) + ")").execute());
     session.replace(DB, new ArrayInput("<X/>"));
-    check("1", session.query("count(db:open('" + DB + "'))").execute());
+    check("1", session.query("count(" + DBOPEN.args(DB) + ")").execute());
     session.replace(DB + "2", new ArrayInput("<X/>"));
-    check("2", session.query("count(db:open('" + DB + "'))").execute());
+    check("2", session.query("count(" + DBOPEN.args(DB) + ")").execute());
     session.replace(DB + "2", new ArrayInput("<X/>"));
-    check("2", session.query("count(db:open('" + DB + "'))").execute());
+    check("2", session.query("count(" + DBOPEN.args(DB) + ")").execute());
   }
 
   /**
@@ -193,12 +197,22 @@ public abstract class SessionTest {
   public final void store() throws IOException {
     session.execute("create db " + DB);
     session.store("X", new ArrayInput("!"));
-    check("true", session.query("db:is-raw('" + DB + "','X')").execute());
+    check("true", session.query(DBISRAW.args(DB, "X")).execute());
     session.store("X", new ArrayInput(""));
-    check("", session.query("db:retrieve('" + DB + "','X')").execute());
+    check("", session.query(DBRETRIEVE.args(DB, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
-    check("0001FF", session.query("db:retrieve('" + DB + "','X')").execute());
+    check("0001FF", session.query(DBRETRIEVE.args(DB, "X")).execute());
     session.execute("drop db " + DB);
+  }
+
+  /** Stores binary content.
+   * @throws IOException I/O exception */
+  @Test
+  public void storeBinary() throws IOException {
+    session.execute("create db " + DB);
+    session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
+    check("-128 -2 -1 0 1 127",
+        session.query(TO_BYTES.args(DBRETRIEVE.args(DB, "X"))).execute());
   }
 
   /**
@@ -218,6 +232,24 @@ public abstract class SessionTest {
   public final void storeInvalid() throws IOException {
     session.execute("create db " + DB);
     session.store("..", new ArrayInput("!"));
+  }
+
+  /** Retrieves binary content.
+   * @throws IOException I/O exception */
+  @Test
+  public void retrieveBinary() throws IOException {
+    session.execute("create db " + DB);
+    session.store("X", new ArrayInput("\0"));
+    check("\0", session.execute("retrieve X"));
+  }
+
+  /** Retrieves empty content.
+   * @throws IOException I/O exception */
+  @Test
+  public void retrieveEmpty() throws IOException {
+    session.execute("create db " + DB);
+    session.store("X", new ArrayInput(""));
+    check("", session.execute("retrieve X"));
   }
 
   /** Runs a query and retrieves the result as string.
@@ -240,7 +272,7 @@ public abstract class SessionTest {
   /** Runs a query and retrieves the empty result as string.
    * @throws IOException I/O exception */
   @Test
-  public void queryEmpty() throws IOException {
+  public void queryNoResult() throws IOException {
     final Query query = session.query("()");
     assertFalse("No result was expected.", query.more());
     query.close();
@@ -273,6 +305,74 @@ public abstract class SessionTest {
     query.close();
   }
 
+  /** Queries binary content.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryNullBinary() throws IOException {
+    session.execute("create db " + DB);
+    session.store("X", new ArrayInput("\0"));
+    check("\0", session.execute("xquery " + RAW + DBRETRIEVE.args(DB, "X")));
+    check("\0", session.query(RAW + DBRETRIEVE.args(DB, "X")).execute());
+    final Query q = session.query(RAW + DBRETRIEVE.args(DB, "X"));
+    assertTrue(q.more());
+    check("\0", q.next());
+    assertFalse(q.more());
+    assertNull(q.next());
+  }
+
+  /** Queries empty content.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryEmptyBinary() throws IOException {
+    session.execute("create db " + DB);
+    session.store("X", new ArrayInput(""));
+    check("", session.execute("xquery " + RAW + DBRETRIEVE.args(DB, "X")));
+    check("", session.query(RAW + DBRETRIEVE.args(DB, "X")).execute());
+    final Query q = session.query(RAW + DBRETRIEVE.args(DB, "X"));
+    assertTrue(q.more());
+    check("", q.next());
+    assertNull(q.next());
+  }
+
+  /** Queries empty content.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryEmptyString() throws IOException {
+    final Query q = session.query("'',1");
+    assertTrue(q.more());
+    check("", q.next());
+    assertTrue(q.more());
+    check("1", q.next());
+    assertNull(q.next());
+  }
+
+  /** Queries binary content (works only if output stream is specified).
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBinary() throws IOException {
+    if(out == null) return;
+    session.execute("create db " + DB);
+    final byte[] tmp = { 0, 1, 2, 127, 0, -1, -2, -128 };
+    session.store("X", new ArrayInput(tmp));
+    final String retr = DBRETRIEVE.args(DB, "X");
+    // check command
+    session.execute("xquery " + RAW + retr + ',' + retr);
+    assertTrue(eq(out.toArray(), concat(tmp, tmp)));
+    out.reset();
+    // check query execution
+    session.query(RAW + retr + ',' + retr).execute();
+    assertTrue(eq(out.toArray(), concat(tmp, tmp)));
+    out.reset();
+    // check iterator
+    final Query q = session.query(RAW + retr + ',' + retr);
+    q.next();
+    assertTrue(eq(out.toArray(), tmp));
+    out.reset();
+    q.next();
+    assertTrue(eq(out.toArray(), tmp));
+    assertNull(q.next());
+  }
+
   /** Runs a query, omitting more().
    * @throws IOException I/O exception */
   @Test
@@ -280,7 +380,7 @@ public abstract class SessionTest {
     final Query query = session.query("1 to 2");
     check("1", query.next());
     check("2", query.next());
-    check("", query.next());
+    assertNull(query.next());
     query.close();
   }
 
@@ -401,8 +501,8 @@ public abstract class SessionTest {
     check("4", query2.next());
     check("2", query1.next());
     check("3", query2.next());
-    check("", query1.next());
-    check("", query2.next());
+    assertNull(query1.next());
+    assertNull(query2.next());
     query1.close();
     query2.close();
   }

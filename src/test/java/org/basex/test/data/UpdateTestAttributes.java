@@ -17,7 +17,7 @@ public final class UpdateTestAttributes extends UpdateTest {
    * Tests the update of an existing attribute.
    */
   @Test
-  public void testUpdateAttribute() {
+  public void updateAttribute() {
     final Data data = CONTEXT.data();
     data.update(7, Data.ATTR, NAME, Token.EMPTY);
     data.update(7, Data.ATTR, JUNIT);
@@ -34,7 +34,7 @@ public final class UpdateTestAttributes extends UpdateTest {
    * Tests the update of an existing attribute.
    */
   @Test
-  public void testUpdateAttribute2() {
+  public void updateAttribute2() {
     final Data data = CONTEXT.data();
     data.update(8, Data.ATTR, NAME, Token.EMPTY);
     data.update(8, Data.ATTR, JUNIT);
@@ -49,7 +49,7 @@ public final class UpdateTestAttributes extends UpdateTest {
    * Tests the insertion of a new attribute.
    */
   @Test
-  public void testAddAttribute() {
+  public void addAttribute() {
     final Data data = CONTEXT.data();
     final long nextid = data.meta.lastid;
 

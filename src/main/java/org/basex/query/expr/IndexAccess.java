@@ -78,7 +78,7 @@ public final class IndexAccess extends Single {
     // otherwise, scan data sequentially
     final IndexIterator ii = term.length <= MAXLEN &&
       (itype == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
-      data.ids(new ValuesToken(itype, term)) : scan(term);
+      data.iter(new ValuesToken(itype, term)) : scan(term);
 
     return new AxisIter() {
       final byte kind = itype == IndexType.TEXT ? Data.TEXT : Data.ATTR;

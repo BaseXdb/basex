@@ -140,12 +140,12 @@ public final class Names extends TokenSet implements Index {
   // Unsupported methods ======================================================
 
   @Override
-  public IndexIterator ids(final IndexToken token) {
+  public IndexIterator iter(final IndexToken token) {
     throw Util.notexpected();
   }
 
   @Override
-  public int nrIDs(final IndexToken token) {
+  public int count(final IndexToken token) {
     throw Util.notexpected();
   }
 }

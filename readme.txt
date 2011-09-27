@@ -12,6 +12,8 @@ COMPILING BASEX ----------------------------------------------------------------
  JUnit installed, just delete the 'test' package inside the project and rebuild
  the project.
 
+ See http://docs.basex.org/wiki/Maven for how to compile BaseX using Maven.
+
  You can launch the following classes, which are all placed in the main package
  org.basex:
 

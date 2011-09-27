@@ -4,9 +4,9 @@ import static org.basex.core.Text.*;
 
 import java.awt.BorderLayout;
 
-import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
+import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.GUIProp;
@@ -125,7 +125,7 @@ public final class DialogCreate extends DialogImport {
     String inf = !valid ? PATHWHICH : !ok ? DBWHICH : null;
     Msg icon = Msg.ERROR;
     if(ok) {
-      ok = Command.validName(nm, false);
+      ok = MetaData.validName(nm, false);
       if(!ok) {
         inf = Util.info(INVALID, EDITNAME);
       } else if(pth.isEmpty()) {

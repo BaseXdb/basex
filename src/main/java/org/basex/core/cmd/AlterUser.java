@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
+import org.basex.data.MetaData;
 
 /**
  * Evaluates the 'alter user' command and alters the password of a user.
@@ -25,7 +26,7 @@ public final class AlterUser extends AUser {
   protected boolean run() {
     final String user = args[0];
     final String pass = args[1];
-    if(!validName(user, false)) return error(NAMEINVALID, user);
+    if(!MetaData.validName(user, false)) return error(NAMEINVALID, user);
     return !isMD5(pass) ? error(USERMD5) : context.users.alter(user, pass) ?
       info(USERALTER, user) : error(USERNO, user);
   }

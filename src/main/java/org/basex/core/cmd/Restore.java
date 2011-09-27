@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.User;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.Zip;
@@ -36,7 +37,7 @@ public final class Restore extends Command {
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
 
     // find backup file with or without date suffix
     File file = mprop.dbpath(db + IO.ZIPSUFFIX);

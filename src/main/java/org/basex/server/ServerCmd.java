@@ -9,13 +9,15 @@ package org.basex.server;
 public enum ServerCmd {
   /** Code for creating a query process: {query}0. */
   QUERY(0),
+  /** Code for iterating results (obsolete). */
+  NEXT(1),
   /** Code for closing the query: {id}0. */
   CLOSE(2),
-  /** Code for returning next query result: {id}0. */
-  NEXT(1),
   /** Code for binding an external query variable: {id}0{name}0{val}0{type}0. */
   BIND(3),
-  /** Code for executing the complete query: {id}0. */
+  /** Code for executing the query in an iterative manner: {id}0. */
+  ITER(4),
+  /** Code for executing the query: {id}0. */
   EXEC(5),
   /** Code for showing the query info: {id}0. */
   INFO(6),

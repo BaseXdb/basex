@@ -1,12 +1,12 @@
 package org.basex.test.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.basex.core.Prop;
-import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -45,11 +45,11 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileExists() {
-    final String fun = check(Function.FEXISTS);
-    query("file:write('" + PATH1 + "', ())");
-    query(fun + "('" + PATH1 + "')", "true");
-    query("file:delete('" + PATH1 + "')");
-    query(fun + "('" + PATH1 + "')", "false");
+    check(FLEXISTS);
+    query(FLWRITE.args(PATH1, "()"));
+    query(FLEXISTS.args(PATH1), true);
+    query(FLDELETE.args(PATH1));
+    query(FLEXISTS.args(PATH1), false);
   }
 
   /**
@@ -57,15 +57,14 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileIsDirectory() {
-    final String fun = check(Function.ISDIR);
-    query(fun + "('" + Prop.TMP + "')", "true");
-    query(fun + "('" + Prop.TMP + "')", "true");
-    query("file:write('" + PATH1 + "', ())");
-    query(fun + "('" + PATH1 + "')", "false");
-    query("file:delete('" + PATH1 + "')");
-    query("file:create-directory('" + PATH1 + "')");
-    query(fun + "('" + PATH1 + "')", "true");
-    query("file:delete('" + PATH1 + "')");
+    check(FLISDIR);
+    query(FLISDIR.args(Prop.TMP), true);
+    query(FLWRITE.args(PATH1, "()"));
+    query(FLISDIR.args(PATH1), false);
+    query(FLDELETE.args(PATH1));
+    query(FLCREATEDIR.args(PATH1));
+    query(FLISDIR.args(PATH1), true);
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -73,14 +72,14 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileIsFile() {
-    final String fun = check(Function.ISFILE);
-    query(fun + "('" + Prop.TMP + "')", "false");
-    query("file:write('" + PATH1 + "', ())");
-    query(fun + "('" + PATH1 + "')", "true");
-    query("file:delete('" + PATH1 + "')");
-    query("file:create-directory('" + PATH1 + "')");
-    query(fun + "('" + PATH1 + "')", "false");
-    query("file:delete('" + PATH1 + "')");
+    check(FLISFILE);
+    query(FLISFILE.args(Prop.TMP), false);
+    query(FLWRITE.args(PATH1, "()"));
+    query(FLISFILE.args(PATH1), true);
+    query(FLDELETE.args(PATH1));
+    query(FLCREATEDIR.args(PATH1));
+    query(FLISFILE.args(PATH1), false);
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -88,8 +87,8 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileLastModified() {
-    final String fun = check(Function.LASTMOD);
-    assertTrue(!query(fun + "('" + Prop.TMP + "')").isEmpty());
+    check(FLLASTMOD);
+    assertTrue(!query(FLLASTMOD.args(Prop.TMP)).isEmpty());
   }
 
   /**
@@ -97,10 +96,10 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileSize() {
-    final String fun = check(Function.SIZE);
-    query("file:write('" + PATH1 + "', 'abcd')");
-    query(fun + "('" + PATH1 + "')", "4");
-    query("file:delete('" + PATH1 + "')");
+    check(FLSIZE);
+    query(FLWRITE.args(PATH1, "abcd"));
+    query(FLSIZE.args(PATH1), "4");
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -108,16 +107,16 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileList() {
-    final String fun = check(Function.FLIST);
-    error(fun + "('" + PATH1 + "')", Err.NOTDIR);
-    query("file:write('" + PATH1 + "', ())");
-    error(fun + "('" + PATH1 + "')", Err.NOTDIR);
-    contains(fun + "('" + Prop.TMP + "')", NAME);
-    contains(fun + "('" + Prop.TMP + "',false())", NAME);
-    contains(fun + "('" + Prop.TMP + "',false()," + "'FN')", NAME);
-    contains(fun + "('" + Prop.TMP + "',false(),'" + NAME + "')", NAME);
-    query(fun + "('" + Prop.TMP + "', false()," + "'XXX')", "");
-    query("file:delete('" + PATH1 + "')");
+    check(FLLIST);
+    error(FLLIST.args(PATH1), Err.NOTDIR);
+    query(FLWRITE.args(PATH1, "()"));
+    error(FLLIST.args(PATH1), Err.NOTDIR);
+    contains(FLLIST.args(Prop.TMP), NAME);
+    contains(FLLIST.args(Prop.TMP, "false()"), NAME);
+    contains(FLLIST.args(Prop.TMP, "false()", "FN"), NAME);
+    contains(FLLIST.args(Prop.TMP, "false()", NAME), NAME);
+    query(FLLIST.args(Prop.TMP, "false()", "XXX"), "");
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -125,15 +124,15 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileCreateDirectory() {
-    final String fun = check(Function.CREATEDIR);
-    query(fun + "('" + PATH1 + "')");
-    query(fun + "('" + PATH1 + "')");
-    query(fun + "('" + PATH3 + "')");
-    query("file:delete('" + PATH1 + "')");
-    query("file:write('" + PATH1 + "', ())");
-    error(fun + "('" + PATH1 + "')", Err.FILEEXISTS);
-    error(fun + "('" + PATH3 + "')", Err.FILEEXISTS);
-    query("file:delete('" + PATH1 + "')");
+    check(FLCREATEDIR);
+    query(FLCREATEDIR.args(PATH1));
+    query(FLCREATEDIR.args(PATH1));
+    query(FLCREATEDIR.args(PATH3));
+    query(FLDELETE.args(PATH1));
+    query(FLWRITE.args(PATH1, "()"));
+    error(FLCREATEDIR.args(PATH1), Err.FILEEXISTS);
+    error(FLCREATEDIR.args(PATH3), Err.FILEEXISTS);
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -141,13 +140,13 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileDelete() {
-    final String fun = check(Function.DELETE);
-    query("file:create-directory('" + PATH3 + "')");
-    query(fun + "('" + PATH3 + "')");
-    query("file:create-directory('" + PATH3 + "')");
-    query("file:write('" + PATH4 + "', ())");
-    query(fun + "('" + PATH1 + "')");
-    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
+    check(FLDELETE);
+    query(FLCREATEDIR.args(PATH3));
+    query(FLDELETE.args(PATH3));
+    query(FLCREATEDIR.args(PATH3));
+    query(FLWRITE.args(PATH4, "()"));
+    query(FLDELETE.args(PATH1));
+    error(FLDELETE.args(PATH1), Err.PATHNOTEXISTS);
   }
 
   /**
@@ -155,14 +154,14 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileReadText() {
-    final String fun = check(Function.READTEXT);
-    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
-    error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
-    query("file:write('" + PATH1 + "', 'a\u00e4')");
-    query(fun + "('" + PATH1 + "')", "a\u00e4");
-    error(fun + "('" + PATH1 + "', 'UNKNOWN')", Err.ENCNOTEXISTS);
-    assertTrue(query(fun + "('" + PATH1 + "', 'CP1252')").length() == 3);
-    query("file:delete('" + PATH1 + "')");
+    check(FLREADTEXT);
+    error(FLREADTEXT.args(PATH1), Err.PATHNOTEXISTS);
+    error(FLREADTEXT.args(Prop.TMP), Err.PATHISDIR);
+    query(FLWRITE.args(PATH1, "a\u00e4"));
+    query(FLREADTEXT.args(PATH1), "a\u00e4");
+    error(FLREADTEXT.args(PATH1, "UNKNOWN"), Err.ENCNOTEXISTS);
+    assertTrue(query(FLREADTEXT.args(PATH1, "CP1252")).length() == 3);
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -170,12 +169,12 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileReadBinary() {
-    final String fun = check(Function.READBIN);
-    error(fun + "('" + PATH1 + "')", Err.PATHNOTEXISTS);
-    error(fun + "('" + Prop.TMP + "')", Err.PATHISDIR);
-    query("file:write('" + PATH1 + "', '0')");
-    query(fun + "('" + PATH1 + "')", "MA==");
-    query("file:delete('" + PATH1 + "')");
+    check(FLREADBIN);
+    error(FLREADBIN.args(PATH1), Err.PATHNOTEXISTS);
+    error(FLREADBIN.args(Prop.TMP), Err.PATHISDIR);
+    query(FLWRITE.args(PATH1, "0"));
+    query(FLREADBIN.args(PATH1), "MA==");
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -183,24 +182,24 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileWrite() {
-    final String fun = check(Function.WRITE);
+    check(FLWRITE);
 
-    error(fun + "('" + Prop.TMP + "', ())", Err.PATHISDIR);
+    error(FLWRITE.args(Prop.TMP, "()"), Err.PATHISDIR);
 
-    query(fun + "('" + PATH1 + "', '0')");
-    query("file:size('" + PATH1 + "')", "1");
-    query(fun + "('" + PATH1 + "', '0')");
-    query("file:size('" + PATH1 + "')", "1");
-    query("file:delete('" + PATH1 + "')");
+    query(FLWRITE.args(PATH1, "0"));
+    query(FLSIZE.args(PATH1), "1");
+    query(FLWRITE.args(PATH1, "0"));
+    query(FLSIZE.args(PATH1), "1");
+    query(FLDELETE.args(PATH1));
 
-    query(fun + "('" + PATH1 + "', 'a\u00e4',"
-        + serialParams("<encoding value='CP1252'/>") + ")");
-    query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
+    query(FLWRITE.args(PATH1, "a\u00e4",
+        serialParams("<encoding value='CP1252'/>")));
+    query(FLREADTEXT.args(PATH1, "CP1252"), "a\u00e4");
 
-    query(fun + "('" + PATH1 + "', '<a/>',"
-        + serialParams("<method value='text'/>") + ")");
-    query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
-    query("file:delete('" + PATH1 + "')");
+    query(FLWRITE.args(PATH1, "\"<a/>\"",
+        serialParams("<method value='text'/>")));
+    query(FLREADTEXT.args(PATH1), "&amp;lt;a/&amp;gt;");
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -208,25 +207,25 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileAppend() {
-    final String fun = check(Function.APPEND);
+    check(FLAPPEND);
 
-    error(fun + "('" + Prop.TMP + "', ())", Err.PATHISDIR);
+    error(FLAPPEND.args(Prop.TMP, "()"), Err.PATHISDIR);
 
-    query(fun + "('" + PATH1 + "', '0')");
-    query("file:size('" + PATH1 + "')", "1");
-    query(fun + "('" + PATH1 + "', '0', ())");
-    query("file:size('" + PATH1 + "')", "2");
-    query("file:delete('" + PATH1 + "')");
+    query(FLAPPEND.args(PATH1, "0"));
+    query(FLSIZE.args(PATH1), "1");
+    query(FLAPPEND.args(PATH1, "0", "()"));
+    query(FLSIZE.args(PATH1), "2");
+    query(FLDELETE.args(PATH1));
 
-    query(fun + "('" + PATH1 + "', 'a\u00e4',"
-        + serialParams("<encoding value='CP1252'/>") + ")");
-    query("file:read-text('" + PATH1 + "', 'CP1252')", "a\u00e4");
-    query("file:delete('" + PATH1 + "')");
+    query(FLAPPEND.args(PATH1, "a\u00e4",
+        serialParams("<encoding value='CP1252'/>")));
+    query(FLREADTEXT.args(PATH1, "CP1252"), "a\u00e4");
+    query(FLDELETE.args(PATH1));
 
-    query(fun + "('" + PATH1 + "', '<a/>',"
-        + serialParams("<method value='text'/>") + ")");
-    query("file:read-text('" + PATH1 + "')", "&amp;lt;a/&amp;gt;");
-    query("file:delete('" + PATH1 + "')");
+    query(FLAPPEND.args(PATH1, "\"<a/>\"",
+        serialParams("<method value='text'/>")));
+    query(FLREADTEXT.args(PATH1), "&amp;lt;a/&amp;gt;");
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -234,15 +233,15 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileWriteBinary() {
-    final String fun = check(Function.WRITEBIN);
+    check(FLWRITEBIN);
 
-    final String a = "xs:base64Binary('MA==')";
-    error(fun + "('" + Prop.TMP + "', " + a + ")", Err.PATHISDIR);
-    query(fun + "('" + PATH1 + "', " + a + ")");
-    query("file:size('" + PATH1 + "')", "1");
-    query(fun + "('" + PATH1 + "', " + a + ")");
-    query("file:size('" + PATH1 + "')", "1");
-    query("file:delete('" + PATH1 + "')");
+    final String bin = "xs:base64Binary('MA==')";
+    error(FLWRITEBIN.args(Prop.TMP, bin), Err.PATHISDIR);
+    query(FLWRITEBIN.args(PATH1, bin));
+    query(FLSIZE.args(PATH1), "1");
+    query(FLWRITEBIN.args(PATH1, bin));
+    query(FLSIZE.args(PATH1), "1");
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -250,15 +249,15 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileAppendBinary() {
-    final String fun = check(Function.APPENDBIN);
+    check(FLAPPENDBIN);
 
-    final String a = "xs:base64Binary('MA==')";
-    error(fun + "('" + Prop.TMP + "', " + a + ")", Err.PATHISDIR);
-    query(fun + "('" + PATH1 + "', " + a + ")");
-    query("file:size('" + PATH1 + "')", "1");
-    query(fun + "('" + PATH1 + "', " + a + ")");
-    query("file:read-text('" + PATH1 + "')", "00");
-    query("file:delete('" + PATH1 + "')");
+    final String bin = "xs:base64Binary('MA==')";
+    error(FLAPPENDBIN.args(Prop.TMP, bin), Err.PATHISDIR);
+    query(FLAPPENDBIN.args(PATH1, bin));
+    query(FLSIZE.args(PATH1), "1");
+    query(FLAPPENDBIN.args(PATH1, bin));
+    query(FLREADTEXT.args(PATH1), "00");
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -266,18 +265,18 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileCopy() {
-    final String fun = check(Function.COPY);
+    check(FLCOPY);
 
-    query("file:write('" + PATH1 + "', 'a')");
-    query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
-    query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
-    query(fun + "('" + PATH2 + "', '" + PATH2 + "')");
-    query("file:size('" + PATH1 + "')", "1");
-    query("file:size('" + PATH2 + "')", "1");
-    error(fun + "('" + PATH1 + "', '" + PATH3 + "')", Err.NOTDIR);
+    query(FLWRITE.args(PATH1, "A"));
+    query(FLCOPY.args(PATH1, PATH2));
+    query(FLCOPY.args(PATH1, PATH2));
+    query(FLCOPY.args(PATH2, PATH2));
+    query(FLSIZE.args(PATH1), "1");
+    query(FLSIZE.args(PATH2), "1");
+    error(FLCOPY.args(PATH1, PATH3), Err.NOTDIR);
 
-    query("file:delete('" + PATH1 + "')");
-    query("file:delete('" + PATH2 + "')");
+    query(FLDELETE.args(PATH1));
+    query(FLDELETE.args(PATH2));
   }
 
   /**
@@ -285,17 +284,17 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileMove() {
-    final String fun = check(Function.MOVE);
+    check(FLMOVE);
 
-    error(fun + "('" + PATH1 + "', '" + PATH2 + "')", Err.PATHNOTEXISTS);
-    query("file:write('" + PATH1 + "', 'a')");
-    query(fun + "('" + PATH1 + "', '" + PATH2 + "')");
-    query(fun + "('" + PATH2 + "', '" + PATH1 + "')");
-    query(fun + "('" + PATH1 + "', '" + PATH1 + "')");
-    error(fun + "('" + PATH1 + "', '" + PATH4 + "')", Err.NOTDIR);
-    query("file:size('" + PATH1 + "')", "1");
-    query("file:exists('" + PATH2 + "')", "false");
-    query("file:delete('" + PATH1 + "')");
+    error(FLMOVE.args(PATH1, PATH2), Err.PATHNOTEXISTS);
+    query(FLWRITE.args(PATH1, "a"));
+    query(FLMOVE.args(PATH1, PATH2));
+    query(FLMOVE.args(PATH2, PATH1));
+    query(FLMOVE.args(PATH1, PATH1));
+    error(FLMOVE.args(PATH1, PATH4), Err.NOTDIR);
+    query(FLSIZE.args(PATH1), "1");
+    query(FLEXISTS.args(PATH2), false);
+    query(FLDELETE.args(PATH1));
   }
 
   /**
@@ -303,8 +302,8 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileResolvePath() {
-    final String fun = check(Function.RESOLVEPATH);
-    final String path = query(fun + "('" + PATH1 + "')");
+    check(FLRESOLVEPATH);
+    final String path = query(FLRESOLVEPATH.args(PATH1));
     final String can = new File(PATH1).getAbsolutePath();
     assertEquals(path.toLowerCase(), can.toLowerCase());
   }
@@ -314,8 +313,8 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void filePathToURI() {
-    final String fun = check(Function.PATHTOURI);
-    final String path = query(fun + "('" + PATH1 + "')");
+    check(FLPATHTOURI);
+    final String path = query(FLPATHTOURI.args(PATH1));
     final String uri = new File(PATH1).toURI().toString();
     assertEquals(path.toLowerCase(), uri.toLowerCase());
   }
@@ -325,24 +324,18 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileBaseName() {
-    final String fun = check(Function.BASENAME);
+    check(FLBASENAME);
 
     // check with a simple path
-    final String name1 = query(fun + "('" + PATH1 + "')");
-    assertEquals(name1, NAME);
+    query(FLBASENAME.args(PATH1), NAME);
     // check with a path ending with a directory separator
-    final String name2 = query(fun + "('" + PATH1 + File.separator + "')");
-    assertEquals(name2, NAME);
+    query(FLBASENAME.args(PATH1 + File.separator), NAME);
     // check with a path consisting only of directory separators
-    final String name3 = query(fun + "('//')");
-    assertEquals(name3, "");
+    query(FLBASENAME.args("//"), "");
     // check with empty string path
-    final String name4 = query(fun + "('" + "" + "')");
-    assertEquals(name4, ".");
+    query(FLBASENAME.args(""), ".");
     // check using a suffix
-    final String name5 = query(fun + "('" + PATH1 + File.separator + "test.xml"
-        + "', '.xml')");
-    assertEquals(name5, "test");
+    query(FLBASENAME.args(PATH1 + File.separator + "test.xml", ".xml"), "test");
   }
 
   /**
@@ -350,14 +343,14 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void fileDirName() {
-    final String fun = check(Function.DIRNAME);
+    check(FLDIRNAME);
     // check with a simple path
-    assertEquals(norm(query(fun + "('" + PATH1 + "')")).toLowerCase(),
-        norm(Prop.TMP));
+    assertEquals(norm(Prop.TMP),
+        norm(query(FLDIRNAME.args(PATH1))).toLowerCase());
     // check with an empty path
-    assertEquals(query(fun + "('')"), ".");
+    query(FLDIRNAME.args(""), ".");
     // check with a path without directory separators
-    assertEquals(query(fun + "('" + NAME + "')"), ".");
+    query(FLDIRNAME.args(NAME), ".");
   }
 
   /**
@@ -366,15 +359,11 @@ public final class FNFileTest extends AdvancedQueryTest {
    */
   @Test
   public void filePathToNative() throws IOException {
-    final String fun = check(Function.PATHNATIVE);
-    final String path1 = query(fun + "('" + PATH1 + "')");
-    final String exp1 = new File(PATH1).getCanonicalPath();
-    assertEquals(norm(path1), norm(exp1));
-    final String path2 = query(fun + "('" + Prop.TMP + ".." + "/test.xml"
-        + "')");
-    final String exp2 =
-      new File(Prop.TMP + ".." + "/test.xml").getCanonicalPath();
-    assertEquals(path2, exp2);
+    check(FLPATHNATIVE);
+    assertEquals(norm(new File(PATH1).getCanonicalPath()),
+        norm(query(FLPATHNATIVE.args(PATH1))));
+    query(FLPATHNATIVE.args(Prop.TMP + ".." + "/test.xml"),
+        new File(Prop.TMP + ".." + "/test.xml").getCanonicalPath());
   }
 
   /**

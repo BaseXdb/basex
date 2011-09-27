@@ -50,7 +50,7 @@ public final class FNFt extends FuncCall {
       throws QueryException {
     switch(def) {
       case FTCOUNT: return count(ctx);
-      default:    return super.item(ctx, ii);
+      default:      return super.item(ctx, ii);
     }
   }
 
@@ -61,7 +61,7 @@ public final class FNFt extends FuncCall {
       case FTSCORE:   return score(ctx);
       case FTMARK:    return mark(ctx, false);
       case FTEXTRACT: return mark(ctx, true);
-      default:      return super.iter(ctx);
+      default:        return super.iter(ctx);
     }
   }
 

@@ -175,6 +175,43 @@ public final class MetaData {
     }
   }
 
+  /**
+   * Normalizes a database path. Converts backslashes and
+   * removes duplicate, leading and trailing slashes.
+   * Returns {@code null} if the path is invalid.
+   * @param path input path
+   * @return normalized path, or {@code null}
+   */
+  public static String normPath(final String path) {
+    final StringBuilder sb = new StringBuilder();
+    boolean slash = false;
+    for(int p = 0; p < path.length(); p++) {
+      final char c = path.charAt(p);
+      if(c == '\\' || c == '/') {
+        if(!slash && p != 0) slash = true;
+      } else {
+        if(Prop.WIN && ":*?\"<>\\|".indexOf(c) != -1) return null;
+        if(slash) {
+          sb.append('/');
+          slash = false;
+        }
+        sb.append(c);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Checks if the specified database name is valid; allows only letters,
+   * digits, the underscore, and dash.
+   * @param name name to be checked
+   * @param glob allow glob syntax
+   * @return result of check
+   */
+  public static boolean validName(final String name, final boolean glob) {
+    return name != null && name.matches(glob ? "[-\\w*?,]+" : "[-\\w]+");
+  }
+
   // PUBLIC METHODS ===========================================================
 
   /**

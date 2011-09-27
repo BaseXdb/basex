@@ -1,8 +1,8 @@
 package org.basex.test.query.func;
 
+import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.func.Function;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
@@ -19,12 +19,12 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilEval() {
-    final String fun = check(Function.EVAL);
-    query(fun + "('1')", "1");
-    query(fun + "('1 + 2')", "3");
-    error(fun + "('1+')", Err.INCOMPLETE);
-    error("declare variable $a := 1; " + fun + "('$a')", Err.VARUNDEF);
-    error("for $a in (1,2) return " + fun + "('$a')", Err.VARUNDEF);
+    check(EVAL);
+    query(EVAL.args("1"), 1);
+    query(EVAL.args("1 + 2"), 3);
+    error(EVAL.args("1+"), Err.INCOMPLETE);
+    error("declare variable $a := 1; " + EVAL.args("\"$a\""), Err.VARUNDEF);
+    error("for $a in (1,2) return " + EVAL.args("\"$a\""), Err.VARUNDEF);
   }
 
   /**
@@ -32,9 +32,9 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilRun() {
-    final String fun = check(Function.RUN);
-    query(fun + "('etc/test/input.xq')", "XML");
-    error(fun + "('etc/test/xxx.xq')", Err.UNDOC);
+    check(RUN);
+    query(RUN.args("etc/test/input.xq"), "XML");
+    error(RUN.args("etc/test/xxx.xq"), Err.UNDOC);
   }
 
   /**
@@ -42,10 +42,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilMB() {
-    final String fun = check(Function.MB);
-    query(fun + "(())");
-    query(fun + "(1 to 1000, false())");
-    query(fun + "(1 to 1000, true())");
+    check(MB);
+    query(MB.args("()"));
+    query(MB.args(" 1 to 1000", false));
+    query(MB.args(" 1 to 1000", true));
   }
 
   /**
@@ -53,10 +53,10 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilMS() {
-    final String fun = check(Function.MS);
-    query(fun + "(())");
-    query(fun + "(1 to 1000, false())");
-    query(fun + "(1 to 1000, true())");
+    check(MS);
+    query(MS.args("()"));
+    query(MS.args(" 1 to 1000", false));
+    query(MS.args(" 1 to 1000", true));
   }
 
   /**
@@ -64,19 +64,19 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilToBase() {
-    final String fun = check(Function.TO_BASE);
-    query(fun + "(4, 2)", "100");
-    query(fun + "(65535, 2)", "1111111111111111");
-    query(fun + "(65536, 2)", "10000000000000000");
-    query(fun + "(4, 16)", "4");
-    query(fun + "(65535, 16)", "ffff");
-    query(fun + "(65536, 16)", "10000");
-    query(fun + "(4, 10)", "4");
-    query(fun + "(65535, 10)", "65535");
-    query(fun + "(65536, 10)", "65536");
-    error(fun + "(1, 1)", Err.INVBASE);
-    error(fun + "(1, 100)", Err.INVBASE);
-    error(fun + "(1, 100)", Err.INVBASE);
+    check(TO_BASE);
+    query(TO_BASE.args(4, 2), 100);
+    query(TO_BASE.args(65535, 2), "1111111111111111");
+    query(TO_BASE.args(65536, 2), "10000000000000000");
+    query(TO_BASE.args(4, 16), 4);
+    query(TO_BASE.args(65535, 16), "ffff");
+    query(TO_BASE.args(65536, 16), "10000");
+    query(TO_BASE.args(4, 10), 4);
+    query(TO_BASE.args(65535, 10), 65535);
+    query(TO_BASE.args(65536, 10), 65536);
+    error(TO_BASE.args(1, 1), Err.INVBASE);
+    error(TO_BASE.args(1, 100), Err.INVBASE);
+    error(TO_BASE.args(1, 100), Err.INVBASE);
   }
 
   /**
@@ -84,21 +84,21 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilFromBase() {
-    final String fun = check(Function.FRM_BASE);
-    query(fun + "('100', 2)", "4");
-    query(fun + "('1111111111111111', 2)", "65535");
-    query(fun + "('10000000000000000', 2)", "65536");
-    query(fun + "('4', 16)", "4");
-    query(fun + "('ffff', 16)", "65535");
-    query(fun + "('FFFF', 16)", "65535");
-    query(fun + "('10000', 16)", "65536");
-    query(fun + "('4', 10)", "4");
-    query(fun + "('65535', 10)", "65535");
-    query(fun + "('65536', 10)", "65536");
-    error(fun + "('1', 1)", Err.INVBASE);
-    error(fun + "('1', 100)", Err.INVBASE);
-    error(fun + "('abc', 10)", Err.INVDIG);
-    error(fun + "('012', 2)", Err.INVDIG);
+    check(FRM_BASE);
+    query(FRM_BASE.args("100", 2), "4");
+    query(FRM_BASE.args("1111111111111111", 2), 65535);
+    query(FRM_BASE.args("10000000000000000", 2), 65536);
+    query(FRM_BASE.args("4", 16), 4);
+    query(FRM_BASE.args("ffff", 16), 65535);
+    query(FRM_BASE.args("FFFF", 16), 65535);
+    query(FRM_BASE.args("10000", 16), 65536);
+    query(FRM_BASE.args("4", 10), 4);
+    query(FRM_BASE.args("65535", 10), 65535);
+    query(FRM_BASE.args("65536", 10), 65536);
+    error(FRM_BASE.args("1", 1), Err.INVBASE);
+    error(FRM_BASE.args("1", 100), Err.INVBASE);
+    error(FRM_BASE.args("abc", 10), Err.INVDIG);
+    error(FRM_BASE.args("012", 2), Err.INVDIG);
   }
 
   /**
@@ -106,16 +106,16 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilHashing() {
-    final String md5 = check(Function.MD5);
-    final String sha1 = check(Function.SHA1);
-    query(md5 + "('')", "D41D8CD98F00B204E9800998ECF8427E");
-    query(sha1 + "('')", "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709");
+    check(MD5);
+    check(SHA1);
+    query(MD5.args(""), "D41D8CD98F00B204E9800998ECF8427E");
+    query(SHA1.args(""), "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709");
 
-    query(md5 + "('BaseX')", "0D65185C9E296311C0A2200179E479A2");
-    query(sha1 + "('BaseX')", "3AD5958F0F27D5AFFDCA2957560F121D0597A4ED");
+    query(MD5.args("BaseX"), "0D65185C9E296311C0A2200179E479A2");
+    query(SHA1.args("BaseX"), "3AD5958F0F27D5AFFDCA2957560F121D0597A4ED");
 
-    error(md5 + "(())", Err.XPEMPTY);
-    error(sha1 + "(())", Err.XPEMPTY);
+    error(MD5.args("()"), Err.XPEMPTY);
+    error(SHA1.args("()"), Err.XPEMPTY);
   }
 
   /**
@@ -123,9 +123,9 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilCRC32() {
-    final String fun = check(Function.CRC32);
-    query(fun + "('')", "00000000");
-    query(fun + "('BaseX')", "4C06FC7F");
+    check(CRC32);
+    query(CRC32.args(""), "00000000");
+    query(CRC32.args("BaseX"), "4C06FC7F");
   }
 
   /**
@@ -133,14 +133,14 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilToBytes() {
-    final String fun = check(Function.TO_BYTES);
-    query(fun + "(xs:base64Binary('QmFzZVggaXMgY29vbA=='))",
+    check(TO_BYTES);
+    query(TO_BYTES.args("xs:base64Binary('QmFzZVggaXMgY29vbA==')"),
       "66 97 115 101 88 32 105 115 32 99 111 111 108");
-    query(fun + "(xs:base64Binary(xs:hexBinary('4261736558')))",
+    query(TO_BYTES.args("xs:base64Binary(xs:hexBinary('4261736558'))"),
       "66 97 115 101 88");
-    query(fun + "('a')", "97");
-    query("count(" + fun + "('a\u00f4c'))", "4");
-    query("count(" + fun + "(123))", "3");
+    query(TO_BYTES.args("a"), 97);
+    query(COUNT.args(TO_BYTES.args("a\u00f4c")), 4);
+    query(COUNT.args(TO_BYTES.args(123)), 3);
   }
 
   /**
@@ -148,9 +148,9 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilUuid() {
-    final String fun = check(Function.UUID);
-    final String s1 = query(fun + "()");
-    final String s2 = query(fun + "()");
+    check(UUID);
+    final String s1 = query(UUID.args());
+    final String s2 = query(UUID.args());
     assertTrue(!s1.equals(s2));
   }
 }

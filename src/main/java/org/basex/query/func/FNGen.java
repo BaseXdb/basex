@@ -171,8 +171,6 @@ public final class FNGen extends FuncCall {
     if(it == null) return null;
 
     final byte[] in = checkEStr(it);
-    if(contains(in, '<') || contains(in, '>')) INVDOC.thrw(input, in);
-
     final Data d = ctx.resource.data(in, false, input);
     if(!d.single()) EXPSINGLE.thrw(input, in);
     return new DBNode(d, 0, Data.DOC);

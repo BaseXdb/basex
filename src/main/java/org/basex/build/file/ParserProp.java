@@ -1,10 +1,10 @@
 package org.basex.build.file;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.util.Iterator;
 import org.basex.core.AProp;
-import org.basex.data.DataText;
 import org.basex.util.Token;
 import org.basex.util.Util;
 
@@ -62,8 +62,7 @@ public final class ParserProp extends AProp {
         set(key, i);
       } else if(obj instanceof Boolean) {
         final String val = sprop.length < 2 ? TRUE : sprop[1];
-        set(key, val.equalsIgnoreCase(DataText.YES) ||
-            val.equalsIgnoreCase(TRUE));
+        set(key, Util.yes(val));
       } else {
         set(key, sprop.length < 2 ? "" : sprop[1]);
       }

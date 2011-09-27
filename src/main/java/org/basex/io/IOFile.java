@@ -88,14 +88,15 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public void cache() throws IOException {
+  public byte[] read() throws IOException {
     final DataInputStream dis = new DataInputStream(new FileInputStream(file));
-    cont = new byte[(int) file.length()];
+    final byte[] cont = new byte[(int) file.length()];
     try {
       dis.readFully(cont);
     } finally {
       dis.close();
     }
+    return cont;
   }
 
   @Override
@@ -275,13 +276,11 @@ public final class IOFile extends IO {
    * @throws IOException I/O exception
    */
   public void write(final byte[] c) throws IOException {
-    FileOutputStream out = null;
+    final FileOutputStream out = new FileOutputStream(path);
     try {
-      out = new FileOutputStream(path);
       out.write(c);
-      cont = c;
     } finally {
-      if(out != null) try { out.close(); } catch(final IOException ex) { }
+      try { out.close(); } catch(final IOException ex) { }
     }
   }
 
@@ -302,20 +301,6 @@ public final class IOFile extends IO {
    */
   public boolean rename(final IOFile trg) {
     return file.renameTo(trg.file);
-  }
-
-  /**
-   * Checks if this is a valid file reference.
-   * @return result of check
-   */
-  public boolean isValid() {
-    // note that not all invalid names can be caught by this test
-    try {
-      file.getCanonicalFile();
-      return true;
-    } catch(final IOException ex) {
-      return false;
-    }
   }
 
   @Override
@@ -382,16 +367,6 @@ public final class IOFile extends IO {
       if(!suf && sub) sb.append(".*");
     }
     return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
-  }
-
-  /**
-   * Normalizes the specified path. Converts backslashes and
-   * removes duplicate, leading and trailing slashes.
-   * @param path input path
-   * @return normalized path
-   */
-  public static String normalize(final String path) {
-    return path.replaceAll("[\\\\/]+", "/").replaceAll("^/|/$", "");
   }
 
   /**
