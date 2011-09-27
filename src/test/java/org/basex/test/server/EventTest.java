@@ -2,10 +2,8 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
-
 import java.io.IOException;
-import java.util.Arrays;
-
+import java.util.HashSet;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
@@ -93,26 +91,21 @@ public final class EventTest {
   public void createDrop() throws IOException {
     final String[] events = new String[EVENT_COUNT];
     for(int i = 0; i < EVENT_COUNT; i++) events[i] = NAME + i;
-    Arrays.sort(events);
 
     // create event
     for(final String e : events) session.execute("create event " + e);
 
     // query must return all events
+    final HashSet<String> names = new HashSet<String>();
     String result = session.execute("show events");
-    result = result.substring(result.indexOf('\n') + 1);
-    result = result.replaceAll("- ", "");
+    for(final String line : result.split("\\r?\\n|\\r"))
+      if(line.startsWith("- ")) names.add(line.substring(2));
 
-    // compare events
-    final String[] names = result.split("\\r?\\n");
-    Arrays.sort(names);
-    assertTrue(Arrays.equals(events, names));
-
-    // drop events
-    for(final String e : events) session.execute("drop event " + e);
-
-    // query must not return any event
-    assertEquals("0 ", session.execute("show events").substring(0, 2));
+    for(final String ev : events) {
+      assertTrue("Event '" + ev + "' not created!", names.contains(ev));
+      // drop event
+      session.execute("drop event " + ev);
+    }
   }
 
   /**
