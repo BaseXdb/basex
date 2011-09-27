@@ -66,8 +66,8 @@ public final class Encryption {
   public Item encryption(final byte[] in, final byte[] encryptionType,
       final byte[] key, final byte[] algorithm, final boolean encrypt)
           throws QueryException {
-    
-    boolean symmetric = eq(encryptionType, SYM); 
+
+    final boolean symmetric = eq(encryptionType, SYM);
     // encryption type must be 'symmetric' or 'asymmetric'
     if(!symmetric && !eq(encryptionType, ASYM))
       if(encrypt) CRYPTOENCTYP.thrw(input, encryptionType);
@@ -80,28 +80,26 @@ public final class Encryption {
     try {
 
       if(symmetric) {
-        SecretKeySpec keyspec = new SecretKeySpec(key, ka);
+        final SecretKeySpec keySpec = new SecretKeySpec(key, ka);
         // TODO random IV?
         final byte[] iVector = new byte[key.length];
         new Random().nextBytes(iVector);
-        IvParameterSpec iv = new IvParameterSpec(iVector);
+        final IvParameterSpec iv = new IvParameterSpec(iVector);
 //        IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
-        Cipher cip = Cipher.getInstance(a);
-        
+        final Cipher cip = Cipher.getInstance(a);
+
         // encrypt/decrypt
         if(encrypt)
-          cip.init(Cipher.ENCRYPT_MODE, keyspec, iv);
+          cip.init(Cipher.ENCRYPT_MODE, keySpec, iv);
         else
-          cip.init(Cipher.DECRYPT_MODE, keyspec, iv);
-        
+          cip.init(Cipher.DECRYPT_MODE, keySpec, iv);
+
         t = new byte[cip.getOutputSize(in.length)];
         cip.doFinal(t, cip.update(in, 0, in.length, t, 0));
-      
-        // asymmetric encryption 
-      } else {
 
+        // asymmetric encryption
+      } else {
         CRYPTONOTSUPP.thrw(input, "asymmetric encryption");
-        
       }
 
     } catch(NoSuchPaddingException e) {
@@ -146,7 +144,7 @@ public final class Encryption {
       final byte[] enc) throws QueryException {
 
     // create hash value from input message
-    Key k = new SecretKeySpec(key, string(algo));
+    final Key k = new SecretKeySpec(key, string(algo));
     byte[] hash = null;
 
     try {
@@ -159,8 +157,6 @@ public final class Encryption {
     } catch(InvalidKeyException e) {
       CRYPTOKEYINV.thrw(input, key);
     }
-    
-    // TODO [LK] possible encodings base64 and hex
 
     // convert to specified encoding, base64 as a standard
     Str hmac = null;

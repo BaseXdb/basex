@@ -57,7 +57,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -69,7 +68,6 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
@@ -109,9 +107,9 @@ public final class DigitalSignature {
   /** Default signature type. */
   private static final byte[] DEFT = token("enveloped");
   /** Signature type enveloping. */
-  private static final byte[] TENV = token("enveloping");
+  private static final byte[] ENVT = token("enveloping");
   /** Signature type detached. */
-  private static final byte[] TDET = token("detached");
+  private static final byte[] DETT = token("detached");
 
   // initializations
   static {
@@ -132,8 +130,8 @@ public final class DigitalSignature {
     SIGNATURES.add(token("DSA_SHA1"), token(SignatureMethod.DSA_SHA1));
 
     TYPES.add(DEFT);
-    TYPES.add(TENV);
-    TYPES.add(TDET);
+    TYPES.add(ENVT);
+    TYPES.add(DETT);
   }
 
   /** Input info. */
@@ -157,7 +155,7 @@ public final class DigitalSignature {
    * @param ns signature element namespace prefix
    * @param t signature type (enveloped, enveloping, detached)
    * @param expr XPath expression which specifies node to be signed
-   * @param certificate certificate which contains keystore information for
+   * @param ce certificate which contains keystore information for
    *        signing the node, may be null
    *
    * @return signed node
@@ -165,7 +163,7 @@ public final class DigitalSignature {
    */
   public ANode generateSignature(final ANode node, final byte[] c,
       final byte[] d, final byte[] sig, final byte[] ns, final byte[] t,
-      final byte[] expr, final ANode certificate) throws QueryException {
+      final byte[] expr, final ANode ce) throws QueryException {
 
     // TODO create unit tests for given xpath expression / find examples?
     // TODO run find bugs
@@ -212,55 +210,56 @@ public final class DigitalSignature {
       KeyInfo ki = null;
 
       // dealing with given certificate details to initialize the keystore
-      if(certificate != null) {
-        Document cert = null;
-        String kst = null;
-        String kspw = null;
-        String kal = null;
-        String pkpw = null;
-        String ksuri = null;
+      if(ce != null) {
+        String ksTY = null;
+        String ksPW = null;
+        String kAlias = null;
+        String pkPW = null;
+        String ksURI = null;
 
-        cert = toDOMNode(certificate);
-        final NodeList childs = cert.getDocumentElement().getChildNodes();
-        final int s = childs.getLength();
+        final Document ceDOM = toDOMNode(ce);
+        final NodeList ceChilds = ceDOM.getDocumentElement().getChildNodes();
+        final int s = ceChilds.getLength();
         int ci = 0;
+        // iterate child axis to retrieve keystore setup
         while(ci < s) {
-          final Node n = childs.item(ci++);
-          final String name = n.getNodeName();
+          final Node cn = ceChilds.item(ci++);
+          final String name = cn.getNodeName();
           if(name.equals("keystore-type"))
-            kst = n.getTextContent();
+            ksTY = cn.getTextContent();
           else if(name.equals("keystore-password"))
-            kspw = n.getTextContent();
+            ksPW = cn.getTextContent();
           else if(name.equals("key-alias"))
-            kal = n.getTextContent();
+            kAlias = cn.getTextContent();
           else if(name.equals("private-key-password"))
-            pkpw = n.getTextContent();
+            pkPW = cn.getTextContent();
           else if(name.equals("keystore-uri"))
-            ksuri = n.getTextContent();
+            ksURI = cn.getTextContent();
         }
 
         // initialize the keystore
-        KeyStore ks = KeyStore.getInstance(kst);
-        ks.load(new FileInputStream(ksuri), kspw.toCharArray());
-        pk = (PrivateKey) ks.getKey(kal, pkpw.toCharArray());
-        X509Certificate x509cert = (X509Certificate) ks.getCertificate(kal);
-        puk = x509cert.getPublicKey();
-        final KeyInfoFactory kif = fac.getKeyInfoFactory();
-        KeyValue keyValue = kif.newKeyValue(puk);
-        Vector content = new Vector();
-        content.add(keyValue);
-        List x509Content = new ArrayList();
-        X509IssuerSerial issuer = kif.newX509IssuerSerial(x509cert.
+        KeyStore ks = KeyStore.getInstance(ksTY);
+        ks.load(new FileInputStream(ksURI), ksPW.toCharArray());
+        pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
+        final X509Certificate x509ce = (X509Certificate)
+            ks.getCertificate(kAlias);
+        puk = x509ce.getPublicKey();
+        final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
+        final KeyValue keyValue = kifactory.newKeyValue(puk);
+        final Vector<XMLStructure> kiCont = new Vector<XMLStructure>();
+        kiCont.add(keyValue);
+        final List<Object> x509Content = new ArrayList<Object>();
+        final X509IssuerSerial issuer = kifactory.newX509IssuerSerial(x509ce.
             getIssuerX500Principal().getName(),
-            x509cert.getSerialNumber());
-        x509Content.add(x509cert.getSubjectX500Principal().getName());
+            x509ce.getSerialNumber());
+        x509Content.add(x509ce.getSubjectX500Principal().getName());
         x509Content.add(issuer);
-        x509Content.add(x509cert);
-        X509Data x509Data = kif.newX509Data(x509Content);
-        content.add(x509Data);
-        ki = kif.newKeyInfo(content);
+        x509Content.add(x509ce);
+        final X509Data x509Data = kifactory.newX509Data(x509Content);
+        kiCont.add(x509Data);
+        ki = kifactory.newKeyInfo(kiCont);
 
-      // auto-generated keypair and signature
+      // auto-generate keys if no certificate is provided
       } else {
         final KeyPairGenerator gen =
             KeyPairGenerator.getInstance(keytype);
@@ -273,37 +272,36 @@ public final class DigitalSignature {
       }
 
       Document inputNode = toDOMNode(node);
-      List transform = null;
+      List<Transform> tfList = null;
 
 
       // validating a given XPath expression to get nodes to be signed
       if(expr.length > 0) {
         final XPathFactory xpf = XPathFactory.newInstance();
-        final XPath xp = xpf.newXPath();
-        final XPathExpression xpexp = xp.compile(string(expr));
+        final XPathExpression xExpr = xpf.newXPath().compile(string(expr));
         // TODO evaluate to node instead of node set? how deal with mltpl nds?
         // loop through result list, add transform, unit test! possible?
-        final NodeList xpNodes = (NodeList) xpexp.evaluate(inputNode,
+        final NodeList xRes = (NodeList) xExpr.evaluate(inputNode,
             XPathConstants.NODESET);
-        if(xpNodes.getLength() < 1)
+        if(xRes.getLength() < 1)
           CRYPTOXPINV.thrw(input, expr);
-        final Node nodeToSign = xpNodes.item(0);
+//        final Node nodeToSign = xpNodes.item(0);
 //        parentOfNodeToSign = nodeToSign.getParentNode();
-        transform = new ArrayList<Transform>(2);
-        transform.add(fac.newTransform(Transform.XPATH,
+        tfList = new ArrayList<Transform>(2);
+        tfList.add(fac.newTransform(Transform.XPATH,
             new XPathFilterParameterSpec(string(expr))));
-        transform.add(fac.newTransform(Transform.ENVELOPED,
+        tfList.add(fac.newTransform(Transform.ENVELOPED,
             (TransformParameterSpec) null));
 
       } else {
-        transform = Collections.singletonList(fac.newTransform(
+        tfList = Collections.singletonList(fac.newTransform(
             Transform.ENVELOPED, (TransformParameterSpec) null));
       }
 
 
       // creating reference element
       final Reference ref = fac.newReference("",
-          fac.newDigestMethod(digest, null), transform, null, null);
+          fac.newDigestMethod(digest, null), tfList, null, null);
 
       // creating signed info element
       final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(
@@ -313,23 +311,22 @@ public final class DigitalSignature {
 
 
       // prepare document signature
-      DOMSignContext dsc = null;
-      XMLSignature xmlsig = null;
+      DOMSignContext signContext = null;
+      XMLSignature xmlSig = null;
 
       // enveloped signature
-      // TODO don't test it like that - token maps or sth else
       if(eq(type, DEFT)) {
-        dsc = new DOMSignContext(pk, inputNode.getDocumentElement());
-        xmlsig = fac.newXMLSignature(si, ki);
+        signContext = new DOMSignContext(pk, inputNode.getDocumentElement());
+        xmlSig = fac.newXMLSignature(si, ki);
 
         // detached signature
-      } else if(eq(type, TDET)) {
+      } else if(eq(type, DETT)) {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         // TODO total crap, why do that? throwing away input ... ?
         inputNode = dbf.newDocumentBuilder().newDocument();
-        dsc = new DOMSignContext(pk, inputNode);
-        xmlsig = fac.newXMLSignature(si, ki);
+        signContext = new DOMSignContext(pk, inputNode);
+        xmlSig = fac.newXMLSignature(si, ki);
 
         // enveloping signature
       } else {
@@ -339,18 +336,18 @@ public final class DigitalSignature {
             inputNode.getDocumentElement());
         final XMLObject obj = fac.newXMLObject(Collections.singletonList(cont),
             "", null, null);
-        xmlsig = fac.newXMLSignature(si, ki, Collections.singletonList(obj),
+        xmlSig = fac.newXMLSignature(si, ki, Collections.singletonList(obj),
             null, null);
-        dsc = new DOMSignContext(pk, inputNode);
+        signContext = new DOMSignContext(pk, inputNode);
       }
 
 
       // set Signature element namespace prefix, if given
       if(ns.length > 0)
-        dsc.setDefaultNamespacePrefix(new String(ns));
+        signContext.setDefaultNamespacePrefix(new String(ns));
 
       // actually sign the document
-      xmlsig.sign(dsc);
+      xmlSig.sign(signContext);
       signedNode = toDBNode(inputNode);
 
     } catch(NoSuchAlgorithmException e) {
@@ -411,7 +408,7 @@ public final class DigitalSignature {
         System.out.println("signature validation status: " + sv);
         if(!sv) {
           // Check the validation status of each Reference.
-          Iterator i = signature.getSignedInfo().getReferences().iterator();
+          Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
           for(int j = 0; i.hasNext(); j++) {
             boolean refValid = ((Reference) i.next()).validate(valContext);
             System.out.println("ref[" + j + "] validity status: " + refValid);
