@@ -54,7 +54,15 @@ public final class Rename extends ACreate {
 
     // rename binary resources
     final IOFile file = data.meta.binary(src);
-    if(file == null || file.exists() && !file.rename(data.meta.binary(trg))) {
+    final IOFile target = data.meta.binary(trg);
+    final IOFile trgdir = new IOFile(target.dir());
+
+    if(file == null ||
+       // try to create target directory
+       !(trgdir.exists() || trgdir.md()) ||
+       // try to create target file
+       file.exists() && !file.rename(target)) {
+      // rename failed
       ok = false;
       info(NAMEINVALID, trg);
     } else {
