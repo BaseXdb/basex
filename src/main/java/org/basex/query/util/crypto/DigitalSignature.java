@@ -65,21 +65,20 @@ import javax.xml.xpath.XPathFactory;
 
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.data.Result;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.util.InputInfo;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenSet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -93,54 +92,50 @@ import org.xml.sax.SAXException;
  */
 public final class DigitalSignature {
 
-  /** Tokens. */
-  private static final byte[][] CANONICALIZATIONS =
-    {
-    token("inclusive-with-comments"),
-    token("exclusive"),
-    token("inclusive"),
-    token("exclusive-with-comments"),
-    };
-  private static final String[] CANONICALIZATIONMETHODS =
-    {
-    CanonicalizationMethod.EXCLUSIVE,
-    CanonicalizationMethod.INCLUSIVE,
-    CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS,
-    CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS
-    };
-  /** Tokens. */
-  private static final byte[][] DIGESTS =
-    {
-    token("SHA1"),
-    token("SHA256"),
-    token("SHA512")
-    };
-  private static final String[] DIGESTMETHODS =
-    {
-    DigestMethod.SHA1,
-    DigestMethod.SHA256,
-    DigestMethod.SHA512
-    };
-  /** Tokens. */
-  private static final byte[][] SIGNATURES =
-    {
-    token("RSA_SHA1"),
-    token("DSA_SHA1")
-    };
-  private static final String[] SIGNATUREMETHODS =
-    {
-    SignatureMethod.RSA_SHA1,
-    SignatureMethod.DSA_SHA1
-    };
-  /** Tokens. */
-  private static final byte[][] SIGNATURETYPES =
-    {
-    token("enveloped"),
-    token("detached"),
-    token("enveloping")
-    };
-  /** Index of default values in token arrays. */
-  private static final int DEFAULT = 0;
+  /** Canonicalization algorithms. */
+  private static final TokenMap CANONICALIZATIONS = new TokenMap();
+  /** Signature digest algorithms. */
+  private static final TokenMap DIGESTS = new TokenMap();
+  /** Signature algorithms. */
+  private static final TokenMap SIGNATURES = new TokenMap();
+  /** Signature types. */
+  private static final TokenSet TYPES = new TokenSet();
+  /** Default canonicalization algorithm. */
+  private static final byte[] DEFC = token("inclusive-with-comments");
+  /** Default digest algorithm. */
+  private static final byte[] DEFD = token("SHA1");
+  /** Default signature algorithm. */
+  private static final byte[] DEFS = token("RSA_SHA1");
+  /** Default signature type. */
+  private static final byte[] DEFT = token("enveloped");
+  /** Signature type enveloping. */
+  private static final byte[] TENV = token("enveloping");
+  /** Signature type detached. */
+  private static final byte[] TDET = token("detached");
+
+  // initializations
+  static {
+    CANONICALIZATIONS.add(DEFC, token(
+        CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS));
+    CANONICALIZATIONS.add(token("exclusive-with-comments"), token(
+        CanonicalizationMethod.EXCLUSIVE_WITH_COMMENTS));
+    CANONICALIZATIONS.add(token("inclusive"), token(
+        CanonicalizationMethod.INCLUSIVE));
+    CANONICALIZATIONS.add(token("exclusive"), token(
+        CanonicalizationMethod.EXCLUSIVE));
+
+    DIGESTS.add(DEFD, token(DigestMethod.SHA1));
+    DIGESTS.add(token("SHA256"), token(DigestMethod.SHA256));
+    DIGESTS.add(token("SHA512"), token(DigestMethod.SHA512));
+
+    SIGNATURES.add(DEFS, token(SignatureMethod.RSA_SHA1));
+    SIGNATURES.add(token("DSA_SHA1"), token(SignatureMethod.DSA_SHA1));
+
+    TYPES.add(DEFT);
+    TYPES.add(TENV);
+    TYPES.add(TDET);
+  }
+
   /** Input info. */
   private final InputInfo input;
 
@@ -156,80 +151,55 @@ public final class DigitalSignature {
   /**
    * Generates a signature.
    * @param node node to be signed
-   * @param canonicalization canonicalization algorithm
-   * @param digest digest algorithm
-   * @param signature signature algorithm
-   * @param nsPrefix signature element namespace prefix
-   * @param type signature type (enveloped, enveloping, detached)
-   * @param xpathExpr XPath expression which specifies node to be signed
+   * @param c canonicalization algorithm
+   * @param d digest algorithm
+   * @param sig signature algorithm
+   * @param ns signature element namespace prefix
+   * @param t signature type (enveloped, enveloping, detached)
+   * @param expr XPath expression which specifies node to be signed
    * @param certificate certificate which contains keystore information for
    *        signing the node, may be null
    *
    * @return signed node
    * @throws QueryException query exception
    */
-  public ANode generateSignature(final ANode node,
-      final byte[] canonicalization, final byte[] digest,
-      final byte[] signature, final byte[] nsPrefix, final byte[] type,
-      final byte[] xpathExpr, final ANode certificate) throws QueryException {
-
+  public ANode generateSignature(final ANode node, final byte[] c,
+      final byte[] d, final byte[] sig, final byte[] ns, final byte[] t,
+      final byte[] expr, final ANode certificate) throws QueryException {
 
     // TODO create unit tests for given xpath expression / find examples?
     // TODO run find bugs
-    // TODO change these token arrays to maps
     // TODO check variables for final
     // TODO change variable names
     // TODO make code more readable
     // TODO documentation!
 
-    // variables to check if parameters correct
-    int l = 0;
-    int i = 0;
-    byte[] b = canonicalization;
+    // checking input variables
+    byte[] b = c;
+    if(b.length == 0) b = DEFC;
+    b = CANONICALIZATIONS.get(b);
+    if(b == null) CRYPTOCANINV.thrw(input, b);
+    final String canonicalization = string(b);
 
-    // check if given canonicalization method is valid and initialize if so
-    if(b.length == 0)
-      b = CANONICALIZATIONS[DEFAULT];
-    l = CANONICALIZATIONS.length;
-    // compare input to valid options
-    while(i < l && !eq(CANONICALIZATIONS[i], b)) i++;
-    // if all options have been considered and none fits ...
-    if(i == l)
-      CRYPTOCANINV.thrw(input, b);
-    // map to right canonicalization method
-    final String CM = CANONICALIZATIONMETHODS[i];
+    b = d;
+    if(b.length == 0) b = DEFD;
+    b = DIGESTS.get(b);
+    if(b == null) CRYPTODIGINV.thrw(input, b);
+    final String digest = string(b);
 
-    b = digest;
-    l = 0;
-    i = 0;
-    if(b.length == 0)
-      b = DIGESTS[DEFAULT];
-    l = DIGESTS.length;
-    while(i < l && !eq(DIGESTS[i], b)) i++;
-    if(i == l)
-      CRYPTODIGINV.thrw(input, b);
-    final String DA = DIGESTMETHODS[i];
+    b = sig;
+    if(b.length == 0) b = DEFS;
+    final byte[] tsig = b;
+    b = SIGNATURES.get(b);
+    if(b == null) CRYPTOSIGINV.thrw(input, b);
+    final String signature = string(b);
+    final String keytype = string(tsig).substring(0, 3);
 
-    b = signature;
-    l = 0;
-    i = 0;
-    if(b.length == 0)
-      b = SIGNATURES[DEFAULT];
-    l = SIGNATURES.length;
-    while(i < l && !eq(SIGNATURES[i], b)) i++;
-    if(i == l)
-      CRYPTOSIGINV.thrw(input, b);
-    final String SA = SIGNATUREMETHODS[i];
-    final String keytype = string(substring(SIGNATURES[i], 0, 3));
-
-    b = type;
-    if(b.length == 0)
-      b = SIGNATURETYPES[DEFAULT];
-//    l = SIGNATURETYPES.length;
-//    while(i < l && !eq(SIGNATURES[i], b)) i++;
-//    if(i == l)
-//      CRYPTOSIGINV.thrw(input, b);
-//    final String ST = SIGNATUREMETHODS[i];
+    b = t;
+    if(b.length == 0) b = DEFT;
+    final int ti = TYPES.id(b);
+    if(ti == 0) CRYPTOSIGTYPINV.thrw(input, b);
+    final byte[] type = b;
 
     ANode signedNode = null;
 
@@ -307,21 +277,21 @@ public final class DigitalSignature {
 
 
       // validating a given XPath expression to get nodes to be signed
-      if(xpathExpr.length > 0) {
+      if(expr.length > 0) {
         final XPathFactory xpf = XPathFactory.newInstance();
         final XPath xp = xpf.newXPath();
-        final XPathExpression xpexp = xp.compile(string(xpathExpr));
+        final XPathExpression xpexp = xp.compile(string(expr));
         // TODO evaluate to node instead of node set? how deal with mltpl nds?
         // loop through result list, add transform, unit test! possible?
         final NodeList xpNodes = (NodeList) xpexp.evaluate(inputNode,
             XPathConstants.NODESET);
         if(xpNodes.getLength() < 1)
-          CRYPTOXPINV.thrw(input, xpathExpr);
+          CRYPTOXPINV.thrw(input, expr);
         final Node nodeToSign = xpNodes.item(0);
 //        parentOfNodeToSign = nodeToSign.getParentNode();
         transform = new ArrayList<Transform>(2);
         transform.add(fac.newTransform(Transform.XPATH,
-            new XPathFilterParameterSpec(string(xpathExpr))));
+            new XPathFilterParameterSpec(string(expr))));
         transform.add(fac.newTransform(Transform.ENVELOPED,
             (TransformParameterSpec) null));
 
@@ -333,12 +303,12 @@ public final class DigitalSignature {
 
       // creating reference element
       final Reference ref = fac.newReference("",
-          fac.newDigestMethod(DA, null), transform, null, null);
+          fac.newDigestMethod(digest, null), transform, null, null);
 
       // creating signed info element
-      final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CM,
-              (C14NMethodParameterSpec) null),
-              fac.newSignatureMethod(SA, null),
+      final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(
+          canonicalization, (C14NMethodParameterSpec) null),
+              fac.newSignatureMethod(signature, null),
               Collections.singletonList(ref));
 
 
@@ -348,12 +318,12 @@ public final class DigitalSignature {
 
       // enveloped signature
       // TODO don't test it like that - token maps or sth else
-      if(eq(type, SIGNATURETYPES[0])) {
+      if(eq(type, DEFT)) {
         dsc = new DOMSignContext(pk, inputNode.getDocumentElement());
         xmlsig = fac.newXMLSignature(si, ki);
 
         // detached signature
-      } else if(eq(type, SIGNATURETYPES[1])) {
+      } else if(eq(type, TDET)) {
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
         // TODO total crap, why do that? throwing away input ... ?
@@ -376,8 +346,8 @@ public final class DigitalSignature {
 
 
       // set Signature element namespace prefix, if given
-      if(nsPrefix.length > 0)
-        dsc.setDefaultNamespacePrefix(new String(nsPrefix));
+      if(ns.length > 0)
+        dsc.setDefaultNamespacePrefix(new String(ns));
 
       // actually sign the document
       xmlsig.sign(dsc);
@@ -471,11 +441,17 @@ public final class DigitalSignature {
     return Bln.get(coreVal);
   }
 
+  /**
+   * Creates a BaseX database node from the given DOM node.
+   * @param n DOM node
+   * @return database node
+   */
   private static ANode toDBNode(final Node n) {
     String xmlString = null;
 
-    try {
+    DBNode dbn = null;
 
+    try {
       TransformerFactory transfac = TransformerFactory.newInstance();
       Transformer trans = transfac.newTransformer();
 
@@ -486,14 +462,6 @@ public final class DigitalSignature {
       trans.transform(source, result);
       xmlString = sw.toString();
 
-    } catch(TransformerException e) {
-      e.printStackTrace();
-    }
-
-    DBNode dbn = null;
-
-    try {
-
       final Parser parser = Parser.xmlParser(IO.get(xmlString), new Prop());
       final MemBuilder builder = new MemBuilder("", parser, new Prop());
       final Data mem = builder.build();
@@ -501,24 +469,39 @@ public final class DigitalSignature {
 
     } catch(IOException e) {
       e.printStackTrace();
+    } catch(TransformerException e) {
+      e.printStackTrace();
     }
 
     return dbn;
   }
 
+  /**
+   * Serializes the given XML node to a byte array.
+   * @param n node to be serialized
+   * @return byte array containing XML
+   * @throws IOException exception
+   */
   private static byte[] nodeToBytes(final ANode n)
-      throws SerializerException, IOException {
+      throws IOException {
 
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
     final Serializer s = Serializer.get(b,
         new SerializerProp("format=no"));
-    //new SerializerProp("omit-xml-declaration=no,standalone=no,indent=no"));
     n.serialize(s);
     s.close();
-    System.out.println(b.toString() + "\n");
+//    System.out.println(b.toString() + "\n");
     return b.toByteArray();
   }
 
+  /**
+   * Creates a DOM node for the given input node.
+   * @param n node
+   * @return DOM node representation of input node
+   * @throws SAXException exception
+   * @throws IOException exception
+   * @throws ParserConfigurationException exception
+   */
   private static Document toDOMNode(final ANode n)
       throws SAXException, IOException, ParserConfigurationException {
 

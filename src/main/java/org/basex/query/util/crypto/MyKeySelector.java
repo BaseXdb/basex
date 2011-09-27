@@ -33,6 +33,8 @@ public class MyKeySelector extends KeySelector {
     }
   }
 
+  // TODO rework that class
+
   @Override
   public KeySelectorResult select(final KeyInfo keyInfo, final Purpose purpose,
       final AlgorithmMethod method, final XMLCryptoContext context)
