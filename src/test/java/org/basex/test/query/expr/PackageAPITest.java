@@ -242,7 +242,6 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // install package
     new RepoInstall(REPO + "testJar.xar", null).execute(ctx);
     final String dirName = normalize("jarPkg-1.0.0");
-    System.out.println(dirName);
     // ensure package was properly installed
     assertTrue(dir(dirName));
     assertTrue(file(dirName + "/expath-pkg.xml"));
