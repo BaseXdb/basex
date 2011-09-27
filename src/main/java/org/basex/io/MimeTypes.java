@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLConnection;
 import java.util.HashMap;
 import org.basex.util.Util;
 
@@ -41,10 +40,7 @@ public final class MimeTypes {
     // check if file suffix exists
     final int i = path.lastIndexOf('.');
     if(i != -1) {
-      // get Java's content-type
-      String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
-      // try static list
-      if(ct == null) ct = MimeTypes.TYPES.get(path.substring(i + 1));
+      final String ct = MimeTypes.TYPES.get(path.substring(i + 1));
       // return found type
       if(ct != null) return ct;
     }

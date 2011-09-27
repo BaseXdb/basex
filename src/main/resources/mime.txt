@@ -746,6 +746,8 @@ xmz	xgl/movie
 xpix	application/x-vnd.ls-xpix
 xpm	image/x-xbitmap
 x-png	image/png
+xq application/xquery
+xquery application/xquery
 xsd	text/xml
 xsl	text/xml
 xslt	application/xslt+xml
