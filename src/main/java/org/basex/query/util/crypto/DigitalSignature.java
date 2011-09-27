@@ -294,9 +294,9 @@ public final class DigitalSignature {
       }
 
       Document doc = toDOMNode(node);
-      final List transform = new ArrayList<Transform>(1);
+      List transform = null;
 
-      // validating given XPath expression to get nodes to be signed
+      // validating a given XPath expression to get nodes to be signed
       if(xpathExpr.length > 0) {
 //        CRYPTONOTSUPP.thrw(input, xpathExpr);
 
@@ -310,21 +310,21 @@ public final class DigitalSignature {
           CRYPTOXPINV.thrw(input, xpathExpr);
         final Node nodeToSign = xpNodes.item(0);
         final Node par = nodeToSign.getParentNode();
+        transform = new ArrayList<Transform>(2);
         transform.add(fac.newTransform(Transform.XPATH,
             new XPathFilterParameterSpec(string(xpathExpr))));
         transform.add(fac.newTransform(Transform.ENVELOPED,
             (TransformParameterSpec) null));
 
       } else {
-        transform.add(fac.newTransform(Transform.ENVELOPED,
-            (TransformParameterSpec) null));
+        transform = Collections.singletonList(fac.newTransform(
+            Transform.ENVELOPED, (TransformParameterSpec) null));
       }
 
       // TODO run find bugs
 
       Reference ref = fac.newReference("",
-          fac.newDigestMethod(DA, null), Collections.
-          singletonList(transform), null, null);
+          fac.newDigestMethod(DA, null), transform, null, null);
 
       final SignedInfo si = fac.newSignedInfo(fac.newCanonicalizationMethod(CM,
               (C14NMethodParameterSpec) null),
@@ -335,7 +335,7 @@ public final class DigitalSignature {
       XMLSignature xmlsig = null;
 
       // enveloped
-      // TODO don't test it like that
+      // TODO don't test it like that - token maps or sth else
       if(eq(type, SIGNATURETYPES[0])) {
         dsc = new DOMSignContext(pk, doc.getDocumentElement());
         xmlsig = fac.newXMLSignature(si, ki);
@@ -347,7 +347,6 @@ public final class DigitalSignature {
         doc = dbf.newDocumentBuilder().newDocument();
         dsc = new DOMSignContext(pk, doc);
         xmlsig = fac.newXMLSignature(si, ki);
-//        CRYPTONOTSUPP.thrw(input, type);
 
         // enveloping
       } else {
@@ -359,13 +358,7 @@ public final class DigitalSignature {
         xmlsig = fac.newXMLSignature(si, ki, Collections.singletonList(obj),
             null, null);
         dsc = new DOMSignContext(pk, doc);
-//        CRYPTONOTSUPP.thrw(input, type);
       }
-
-      if(xpathExpr.length > 0) {
-//        final String frag = string(nodeToBytes(node));
-        CRYPTONOTSUPP.thrw(input, xpathExpr);
-        }
 
       // set Signature element prefix, if given
       if(nsPrefix.length > 0)
