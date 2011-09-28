@@ -124,9 +124,8 @@ public final class DBAdd extends InsertBase {
     } else if(doc.str()) {
       // adding file(s) from a path
       final String docpath = string(doc.atom(input));
-      final String nm = ctx.mprop.random(data.meta.name);
       final DirParser p = new DirParser(IO.get(docpath), ctx.prop);
-      final MemBuilder b = new MemBuilder(nm, p, ctx.prop);
+      final MemBuilder b = new MemBuilder(data.meta.name, p, ctx.prop);
       try {
         mdata = b.build();
       } catch(final IOException ex) {

@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.build.BuildException;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
@@ -202,14 +201,22 @@ public final class MetaData {
   }
 
   /**
-   * Checks if the specified database name is valid; allows only letters,
-   * digits, the underscore, and dash.
+   * Checks if the specified database name is valid, matching the pattern
+   * {@code "[-\\w]+"}, or {@code "[-\\w*?,]+"} if the glob flag is activated.
    * @param name name to be checked
    * @param glob allow glob syntax
    * @return result of check
    */
   public static boolean validName(final String name, final boolean glob) {
-    return name != null && name.matches(glob ? "[-\\w*?,]+" : "[-\\w]+");
+    if(name == null) return false;
+    // faster than a regular expression..
+    final int nl = name.length();
+    for(int n = 0; n < nl; n++) {
+      final char ch = name.charAt(n);
+      if((!glob || ch != '?' && ch != '*' && ch != ',') &&
+          !letterOrDigit(ch) && ch != '-') return false;
+    }
+    return nl != 0;
   }
 
   // PUBLIC METHODS ===========================================================

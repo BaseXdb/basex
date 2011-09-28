@@ -81,7 +81,7 @@ public final class Prop extends AProp {
   public static final Object[] XQUERY3 = { "XQUERY3", true };
 
   /** Use internal XML parser. */
-  public static final Object[] INTPARSE = { "INTPARSE", false };
+  public static final Object[] INTPARSE = { "INTPARSE", true };
   /** Flag for parsing DTDs in internal parser. */
   public static final Object[] DTD = { "DTD", false };
   /** Path to XML Catalog file. */

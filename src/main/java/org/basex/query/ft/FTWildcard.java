@@ -63,13 +63,13 @@ public class FTWildcard {
             c = ++qi < ql ? q[qi] : 0;
             if(c >= '0' && c <= '9') n = (n << 3) + (n << 1) + c - '0';
             else if(c == ',') break;
-            else FTREG.thrw(ii, q);
+            else FTREG.thrw(ii, query);
           }
           while(true) {
             c = ++qi < ql ? q[qi] : 0;
             if(c >= '0' && c <= '9') m = (m << 3) + (m << 1) + c - '0';
             else if(c == '}') break;
-            else FTREG.thrw(ii, q);
+            else FTREG.thrw(ii, query);
           }
           ++qi;
         } else { // .
@@ -80,7 +80,7 @@ public class FTWildcard {
         tmpmax[pos] = m;
         tmpwc[pos] = DOT;
       } else {
-        if(q[qi] == '\\' && ++qi == ql) FTREG.thrw(ii, q);
+        if(q[qi] == '\\' && ++qi == ql) FTREG.thrw(ii, query);
         tmpwc[++pos] = q[qi++];
       }
     }
