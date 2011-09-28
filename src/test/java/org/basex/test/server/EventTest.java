@@ -89,7 +89,6 @@ public final class EventTest {
    */
   @Test
   public void createDrop() throws IOException {
-
     final String[] events = new String[EVENT_COUNT];
     for(int i = 0; i < EVENT_COUNT; i++) events[i] = NAME + i;
 
