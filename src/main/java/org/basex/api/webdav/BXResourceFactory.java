@@ -1,6 +1,8 @@
 package org.basex.api.webdav;
 
-import static org.basex.api.webdav.BXNotAuthorizedResource.*;
+import static org.basex.api.webdav.BXResource.*;
+
+import java.io.IOException;
 
 import org.basex.api.HTTPSession;
 import org.basex.server.LoginException;
@@ -45,7 +47,7 @@ public class BXResourceFactory implements ResourceFactory {
       }
     } catch(final LoginException ex) {
       return BXNotAuthorizedResource.NOAUTH;
-    } catch(final Exception ex) {
+    } catch(final IOException ex) {
       Util.errln(ex);
     }
     return null;

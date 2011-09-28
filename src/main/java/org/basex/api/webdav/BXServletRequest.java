@@ -298,7 +298,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   public InputStream getInputStream() {
     try {
       return wrapped.getInputStream();
-    } catch (final IOException ex) {
+    } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
   }
@@ -307,7 +307,7 @@ class FileItemWrapper implements com.bradmcevoy.http.FileItem {
   public OutputStream getOutputStream() {
     try {
       return wrapped.getOutputStream();
-    } catch (final IOException ex) {
+    } catch(final IOException ex) {
       throw new RuntimeException(ex);
     }
   }

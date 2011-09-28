@@ -14,8 +14,9 @@ import java.util.Map;
 import org.basex.api.HTTPSession;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
-import org.basex.io.in.ResettableInput;
+import org.basex.io.in.BufferInput;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
@@ -93,7 +94,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   public BXResource child(final String childName) {
     return new BXCode<BXResource>(this) {
       @Override
-      public BXResource get() {
+      public BXResource get() throws IOException {
         return resource(s, db, path + SEP + childName, session);
       }
     }.evalNoEx();
@@ -118,7 +119,6 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
           final String p = stripLeadingSlash(q.next());
           final boolean raw = Boolean.parseBoolean(q.next());
           final String ctype = q.next();
-
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
@@ -126,10 +126,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
               ch.add(new BXDocument(db, path + SEP + p, session, raw, ctype));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
-            if(!paths.contains(folder)) {
-              paths.add(folder);
-              ch.add(new BXFolder(db, folder, session));
-            }
+            if(paths.add(folder)) ch.add(new BXFolder(db, folder, session));
           }
         }
         q.close();
@@ -146,15 +143,14 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       @Override
       public BXDocument get() throws IOException {
         s.execute(new Open(db));
-        final String doc = path.isEmpty() ? newName : path + SEP + newName;
+        final String dbp = path.isEmpty() ? newName : path + SEP + newName;
+        // delete old resource if it already exists
+        if(pathExists(s, db, dbp)) s.execute(new Delete(dbp));
+        // otherwise, delete dummy file
         // check if document with this path already exists
-        if(pathExists(s, db, doc)) {
-          s.replace(doc, input);
-        } else {
-          addFile(s, newName, input);
-          deleteDummy(s, db, path);
-        }
-        return new BXDocument(db, doc, session, isRaw(s, db, doc), contentType);
+        else deleteDummy(s, db, path);
+        addFile(s, newName, input);
+        return new BXDocument(db, dbp, session, isRaw(s, db, dbp), contentType);
       }
     }.eval();
   }
@@ -169,17 +165,17 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   protected void addFile(final Session s, final String n, final InputStream in)
       throws IOException {
 
-    // try to add every document as XML
-    final ResettableInput bi = new ResettableInput(in);
-    bi.mark(ResettableInput.MAX);
+    final BufferInput bi = new BufferInput(in, 1 << 22); // use 4MB cache
     try {
+      // try to add every document as XML
       addXML(s, n, bi);
     } catch(final IOException ex) {
-      if(bi.pos() >= ResettableInput.MAX) throw ex;
+      // if the operations fails, and if all sent bytes are buffered,
+      // store data in raw form
+      if(!bi.markSupported()) throw ex;
       bi.reset();
       addRaw(s, n, bi);
     } finally {
-      if(bi.pos() < ResettableInput.MAX) bi.reset();
       bi.close();
     }
   }

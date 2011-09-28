@@ -13,7 +13,6 @@ import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.server.Query;
 import org.basex.server.Session;
-import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
 import com.bradmcevoy.http.Auth;
@@ -174,22 +173,18 @@ public abstract class BXResource implements Resource {
    * @param db database name
    * @param path resource path
    * @param hs current session
-   * @return requested resource or {@code null} if it does not exist
+   * @return requested resource, or {@code null} if it does not exist
+   * @throws IOException I/O exception
    */
   static BXResource resource(final Session s, final String db,
-      final String path, final HTTPSession hs) {
+      final String path, final HTTPSession hs) throws IOException {
 
-    try {
-      // check if there is a document in the collection having this path
-      if(exists(s, db, path))
-        return new BXDocument(db, path, hs, isRaw(s, db, path),
-            contentType(s, db, path));
-      // check if there are paths in the collection starting with this path
-      if(pathExists(s, db, path)) return new BXFolder(db, path, hs);
-    } catch(final IOException ex) {
-      Util.errln(ex);
-    }
-    return null;
+    // check if there is a document in the collection having this path
+    if(exists(s, db, path))
+      return new BXDocument(db, path, hs, isRaw(s, db, path),
+          contentType(s, db, path));
+    // check if there are paths in the collection starting with this path
+    return pathExists(s, db, path) ? new BXFolder(db, path, hs) : null;
   }
 
   /**
