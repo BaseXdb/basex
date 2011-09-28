@@ -11,7 +11,7 @@ VM=-Xmx512m
 
 # Classpath
 LIB=$PWD/../lib
-CP=$BASEX:$LIB/lucene-stemmers-3.4.0.jar:$LIB/resolver.jar:$LIB/tagsoup-1.2.jar
+CP=$BASEX:$LIB/lucene-stemmers-3.4.0.jar:$LIB/xml-resolver-1.2.jar:$LIB/tagsoup-1.2.jar
 
 # Run code
 java -cp "$CP" $VM org.basex.BaseXServer "$@"
