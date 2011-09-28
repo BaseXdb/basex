@@ -1,5 +1,13 @@
 package org.basex.test.query.func;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+
+import javax.crypto.SecretKey;
+
 import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -53,9 +61,22 @@ public class FNCryptoTest extends AdvancedQueryTest {
   public void encryptionAsym1() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
+    PublicKey puk = null;
+    PrivateKey prk = null;
+    try {
+
+      final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
+      final KeyPair kp = gen.generateKeyPair();
+      puk = kp.getPublic();
+      prk = kp.getPrivate();
+
+    } catch(NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    }
+
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "let $e := c:encrypt('" + msg + "','asymmetric','aaabbbaa','DSA')" +
-        "return c:decrypt($e,'asymmetric','aaabbbaa','DSA')", msg);
+        "let $e := c:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
+        "return c:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
   }
 
   @Test
@@ -66,9 +87,16 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   @Test
-  public void hmac1() {
+  public void hmacHEX() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:hmac('message','key','hmacMd5', 'hex')",
+        "\"4E4748E62B463521F6775FBF921234B5\"");
+  }
+
+  @Test
+  public void hmacBASE64() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','hmacMd5', 'base64')",
         "\"4E4748E62B463521F6775FBF921234B5\"");
   }
 

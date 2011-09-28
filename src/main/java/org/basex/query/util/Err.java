@@ -808,10 +808,12 @@ public enum Err {
   CRYPTOINVALGO(CX, 21, "Algorithm is not supported."),
   /** CX22: Encoding not supported. */
   CRYPTODECTYP(CX, 22, "Decryption type is not supported."),
-  /** CX23: Encoding not supported. */
-  CRYPTOSIGTYPINV(CX, 23, "Signature type is not supported."),
   /** CX999: Encoding not supported. */
-  CRYPTONOTSUPP(CX, 999, "Operation not (yet) supported.");
+  CRYPTOSIGTYPINV(CX, 999, "Signature type is not supported."),
+  /** CX998: Encoding not supported. */
+  CRYPTONOTSUPP(CX, 998, "Operation not (yet) supported."),
+  /** CX997: Encoding not supported. */
+  CRYPTOSYMERR(CX, 997, "Algorithm not compatible with encryption type.");
 
   /** Error type. */
   public final ErrType type;
