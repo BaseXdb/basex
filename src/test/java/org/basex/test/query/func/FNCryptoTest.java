@@ -27,8 +27,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
 
     //DES/CBC/PKCS5Padding
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa','DES/CBC/PKCS5Padding')" +
-        "return c:decrypt($e,'symmetric','aaabbbaa','DES/CBC/PKCS5Padding')", msg);
+        "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa'," +
+        "'DES/CBC/PKCS5Padding') return c:decrypt($e,'symmetric'," +
+        "'aaabbbaa','DES/CBC/PKCS5Padding')", msg);
   }
 
   /**
@@ -40,8 +41,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
 
     //DES/CBC/PKCS5Padding
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "let $e := c:encrypt('" + msg + "','symmetric','abababababababab','AES/CBC/PKCS5Padding')" +
-        "return c:decrypt($e,'symmetric','abababababababab','AES/CBC/PKCS5Padding')", msg);
+        "let $e := c:encrypt('" + msg + "','symmetric','abababababababab'," +
+        "'AES/CBC/PKCS5Padding') return c:decrypt($e,'symmetric'," +
+        "'abababababababab','AES/CBC/PKCS5Padding')", msg);
   }
 
   /**
@@ -54,6 +56,13 @@ public class FNCryptoTest extends AdvancedQueryTest {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "let $e := c:encrypt('" + msg + "','asymmetric','aaabbbaa','DSA')" +
         "return c:decrypt($e,'asymmetric','aaabbbaa','DSA')", msg);
+  }
+
+  @Test
+  public void encrypt() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:encrypt('messagetobeencryted','symmetric','aaabbbaa'," +
+        "'DES/CBC/PKCS5Padding')");
   }
 
   @Test

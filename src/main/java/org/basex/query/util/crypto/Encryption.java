@@ -6,21 +6,14 @@ import static org.basex.util.Token.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.util.Random;
+import java.security.SecureRandom;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -80,62 +73,18 @@ public final class Encryption {
       if(encrypt) CRYPTOENCTYP.thrw(input, type);
       else CRYPTODECTYP.thrw(input, type);
 
-    // transformed input
-    byte[] t = null;
-    final String algo = string(algorithm);
-    final String ka = algo.substring(0, 3);
+    // asymmetric encryption not yet supported
+    if(!symmetric)
+      CRYPTONOTSUPP.thrw(input, "asymmetric encryption");
 
-//    try {
-//
-//      final Key k = KeyGenerator.getInstance(ka).generateKey();
-//      final Cipher cipher = Cipher.getInstance(algo);
-//      t = in;
-//
-//      if(encrypt) {
-//        cipher.init(Cipher.ENCRYPT_MODE, k);
-//        cipher.doFinal(t);
-//
-//      } else {
-//        cipher.init(Cipher.DECRYPT_MODE, k);
-//        t = cipher.doFinal(t);
-//      }
-//
-//    } catch (NoSuchPaddingException e) {
-//      e.printStackTrace();
-//    } catch(NoSuchAlgorithmException e) {
-//      e.printStackTrace();
-//    } catch(InvalidKeyException e) {
-//      e.printStackTrace();
-//    } catch(IllegalBlockSizeException e) {
-//      e.printStackTrace();
-//    } catch(BadPaddingException e) {
-//      e.printStackTrace();
-//    }
+    byte[] t = null;
 
     try {
 
-      if(symmetric) {
-        final SecretKeySpec keySpec = new SecretKeySpec(key, ka);
-        // TODO random IV?
-        final byte[] iVector = new byte[key.length];
-        new Random().nextBytes(iVector);
-        final IvParameterSpec iv = new IvParameterSpec(iVector);
-//        IvParameterSpec iv = new IvParameterSpec(new byte[key.length]);
-        final Cipher cipher = Cipher.getInstance(algo);
-
-        // encrypt/decrypt
-        if(encrypt)
-          cipher.init(Cipher.ENCRYPT_MODE, keySpec, iv);
-        else
-          cipher.init(Cipher.DECRYPT_MODE, keySpec, iv);
-
-        t = new byte[cipher.getOutputSize(in.length)];
-        cipher.doFinal(t, cipher.update(in, 0, in.length, t, 0));
-
-        // asymmetric encryption
-      } else {
-        CRYPTONOTSUPP.thrw(input, "asymmetric encryption");
-      }
+      if(encrypt)
+        t = encrypt(in, key, algorithm);
+      else
+        t = decrypt(in, key, algorithm);
 
     } catch(NoSuchPaddingException e) {
       e.printStackTrace();
@@ -149,21 +98,86 @@ public final class Encryption {
     } catch(InvalidKeyException e) {
       e.printStackTrace();
       CRYPTOKEYINV.thrw(input, e);
-      // TODO how to treat this one?
-    } catch(ShortBufferException e) {
-      e.printStackTrace();
-      CRYPTONOTSUPP.thrw(input, "short buffer");
     } catch(IllegalBlockSizeException e) {
       e.printStackTrace();
       CRYPTOILLBLO.thrw(input, e);
-   // TODO how to treat this one?
     } catch(InvalidAlgorithmParameterException e) {
       e.printStackTrace();
       CRYPTONOTSUPP.thrw(input, "invalid algorithm parameter");
     }
 
-    // TODO remove padding leftovers?
     return Str.get(t);
+  }
+
+  /**
+   * Encrypts the given input data.
+   *
+   * @param in input data to encrypt
+   * @param key key
+   * @param algorithm encryption algorithm
+   * @return encrypted input data
+   * @throws InvalidKeyException ex
+   * @throws InvalidAlgorithmParameterException ex
+   * @throws NoSuchAlgorithmException ex
+   * @throws NoSuchPaddingException ex
+   * @throws IllegalBlockSizeException ex
+   * @throws BadPaddingException ex
+   */
+  public byte[] encrypt(final byte[] in, final byte[] key,
+      final byte[] algorithm) throws InvalidKeyException,
+      InvalidAlgorithmParameterException, NoSuchAlgorithmException,
+      NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+
+    final String algo = string(algorithm);
+    final SecretKeySpec keySpec = new SecretKeySpec(key, algo.substring(0, 3));
+    final Cipher cipher = Cipher.getInstance(algo);
+
+    // generate random iv
+    byte[] iv = new byte[8];
+    // create new random iv if encrypting
+    final SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
+    rand.nextBytes(iv);
+    final IvParameterSpec ivspec = new IvParameterSpec(iv);
+    System.out.println("random iv: " + string(iv));
+
+    // encrypt/decrypt
+    cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivspec);
+    final byte[] t = cipher.doFinal(in);
+
+    return concat(iv, t);
+  }
+
+  /**
+   * Decrypts the given input data.
+   *
+   * @param in data to decrypt
+   * @param key secret key
+   * @param algorithm encryption algorithm
+   * @return decrypted data
+   * @throws NoSuchAlgorithmException ex
+   * @throws NoSuchPaddingException ex
+   * @throws InvalidKeyException ex
+   * @throws InvalidAlgorithmParameterException ex
+   * @throws IllegalBlockSizeException ex
+   * @throws BadPaddingException ex
+   */
+  public byte[] decrypt(final byte[] in, final byte[] key,
+      final byte[] algorithm) throws NoSuchAlgorithmException,
+      NoSuchPaddingException, InvalidKeyException,
+      InvalidAlgorithmParameterException,
+      IllegalBlockSizeException, BadPaddingException {
+
+    final String algo = string(algorithm);
+    final SecretKeySpec keySpec = new SecretKeySpec(key, algo.substring(0, 3));
+    final Cipher cipher = Cipher.getInstance(algo);
+
+    // extract iv from message beginning
+    byte[] iv = substring(in, 0, 8);
+    final IvParameterSpec ivspec = new IvParameterSpec(iv);
+    System.out.println("extracted iv: " + string(iv) + "\n");
+
+    cipher.init(Cipher.DECRYPT_MODE, keySpec, ivspec);
+    return cipher.doFinal(substring(in, 8, in.length));
   }
 
   /**
