@@ -73,7 +73,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
         }
         iter = st.get(lang, iter);
       } else {
-        iter = new DictStemmer(opt.sd, iter);
+        iter = new DictionaryStemmer(opt.sd, iter);
       }
     }
   }

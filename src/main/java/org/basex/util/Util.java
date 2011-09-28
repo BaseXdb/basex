@@ -213,8 +213,8 @@ public final class Util {
   }
 
   /**
-   * Returns a string and replaces all % characters by the specified extensions.
-   * See {@link TokenBuilder#addExt} for details.
+   * Returns a string and replaces all % characters by the specified extensions
+   * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended
    * @param ext text text extensions
    * @return extended string
@@ -224,8 +224,8 @@ public final class Util {
   }
 
   /**
-   * Returns a token and replaces all % characters by the specified extensions.
-   * (see {@link TokenBuilder#addExt} for details.
+   * Returns a token and replaces all % characters by the specified extensions
+   * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended
    * @param ext text text extensions
    * @return token

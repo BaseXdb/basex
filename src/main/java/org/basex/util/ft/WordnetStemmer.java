@@ -33,7 +33,7 @@ final class WordnetStemmer extends Stemmer {
 
   static {
     // don't try to find the other classes if Dictionary is not found:
-    if(Reflect.avl(PATTERN, "Dictionary")) {
+    if(Reflect.available(PATTERN, "Dictionary")) {
       FIND_STEMS = null;
       CTR = null;
       DICT = null;
@@ -98,28 +98,23 @@ final class WordnetStemmer extends Stemmer {
   }
 
   @Override
-  int prec() {
-    return 10;
+  protected byte prec() {
+    return 30;
   }
 
   @Override
   Collection<Language> languages() {
-    HashSet<Language> ln = new HashSet<Language>();
+    final HashSet<Language> ln = new HashSet<Language>();
     ln.add(Language.get("en"));
     return ln;
   }
 
   @Override
-  byte[] stem(final byte[] word) {
+  protected byte[] stem(final byte[] word) {
     @SuppressWarnings("unchecked")
     final List<String> l = (List<String>)
       Reflect.invoke(FIND_STEMS, stemmer, string(word));
     final byte[] result = l.size() == 0 ? word : token(l.get(0));
     return result.length == 0 ? word : result;
-  }
-
-  @Override
-  public String toString() {
-    return "WordNet";
   }
 }

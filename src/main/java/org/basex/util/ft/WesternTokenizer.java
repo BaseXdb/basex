@@ -400,8 +400,8 @@ public final class WesternTokenizer extends Tokenizer {
   }
 
   @Override
-  int prec() {
-    return 1000;
+  protected byte prec() {
+    return 10;
   }
 
   @Override

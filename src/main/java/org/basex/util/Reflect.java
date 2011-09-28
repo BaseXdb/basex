@@ -25,12 +25,12 @@ public final class Reflect {
   private Reflect() { }
 
   /**
-   * Checks if the specified class pattern is available.
+   * Checks if the class specified by the pattern is available.
    * @param pattern class pattern
-   * @param ext extension
+   * @param ext optional extension
    * @return result of check
    */
-  public static boolean avl(final String pattern, final Object... ext) {
+  public static boolean available(final String pattern, final Object... ext) {
     try {
       Class.forName(Util.info(pattern, ext));
       return true;
@@ -68,9 +68,9 @@ public final class Reflect {
 
 
   /**
-   * Returns a class reference to the specified class pattern, or {@code null}.
+   * Returns a reference to the class specified by the pattern, or {@code null}.
    * @param pattern class pattern
-   * @param ext extension
+   * @param ext optional extension
    * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String pattern, final Object... ext) {

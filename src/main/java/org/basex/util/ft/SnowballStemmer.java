@@ -29,7 +29,7 @@ final class SnowballStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    if(Reflect.avl(PATTERN, "German")) {
+    if(Reflect.available(PATTERN, "German")) {
       for(final Language l : Language.ALL.values()) {
         final Class<?> clz = Reflect.find(PATTERN, l);
         if(clz == null) continue;
@@ -81,8 +81,8 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  int prec() {
-    return 100;
+  protected byte prec() {
+    return 2;
   }
 
   @Override
@@ -91,7 +91,7 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  byte[] stem(final byte[] word) {
+  protected byte[] stem(final byte[] word) {
     Reflect.invoke(clazz.setCurrent, stemmer, string(word));
     Reflect.invoke(clazz.stem, stemmer);
     return token((String) Reflect.invoke(clazz.getCurrent, stemmer));
@@ -122,10 +122,5 @@ final class SnowballStemmer extends Stemmer {
       stem = stm;
       getCurrent = g;
     }
-  }
-
-  @Override
-  public String toString() {
-    return "Snowball";
   }
 }

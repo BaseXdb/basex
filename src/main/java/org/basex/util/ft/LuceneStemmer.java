@@ -29,7 +29,7 @@ final class LuceneStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    if(Reflect.avl(PATTERN, "de.German")) {
+    if(Reflect.available(PATTERN, "de.German")) {
       add(Language.get("cs"), "cz.Czech");
       add(Language.get("es"), "es.SpanishLight");
       add(Language.get("fi"), "fi.FinnishLight");
@@ -115,12 +115,12 @@ final class LuceneStemmer extends Stemmer {
   }
 
   @Override
-  int prec() {
-    return 200;
+  protected byte prec() {
+    return 5;
   }
 
   @Override
-  byte[] stem(final byte[] word) {
+  protected byte[] stem(final byte[] word) {
     String s = string(word);
     if(clazz.chars) {
       final char[] ch = s.toCharArray();
@@ -154,10 +154,5 @@ final class LuceneStemmer extends Stemmer {
       chars = ch;
       stem.setAccessible(true);
     }
-  }
-
-  @Override
-  public String toString() {
-    return "Lucene";
   }
 }

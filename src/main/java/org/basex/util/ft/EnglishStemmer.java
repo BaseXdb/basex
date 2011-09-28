@@ -3,17 +3,15 @@ package org.basex.util.ft;
 import static org.basex.util.Token.*;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
 /**
- * English stemming algorithm, based on the publication from Porter (1980):
- * An algorithm for suffix stripping.
+ * English stemming algorithm, based on the publication from
+ * Porter (1980), "An algorithm for suffix stripping".
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class EnglishStemmer extends Stemmer {
+final class EnglishStemmer extends InternalStemmer {
   /** Stemming character. */
   private static final byte[] AT = token("at");
   /** Stemming character. */
@@ -88,14 +86,12 @@ final class EnglishStemmer extends Stemmer {
   }
 
   @Override
-  Collection<Language> languages() {
-    final HashSet<Language> ln = new HashSet<Language>();
-    ln.add(Language.get("en"));
-    return ln;
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new EnglishStemmer(fti);
   }
 
   @Override
-  byte[] stem(final byte[] str) {
+  protected byte[] stem(final byte[] str) {
     te = str.length;
     tok = str;
     return !s() ? str : Arrays.copyOf(str, te);
@@ -273,20 +269,5 @@ final class EnglishStemmer extends Stemmer {
   private void a(final byte[] t) {
     te = tt;
     for(final byte c : t) tok[te++] = c;
-  }
-
-  @Override
-  int prec() {
-    return 1000;
-  }
-
-  @Override
-  Stemmer get(final Language l, final FTIterator fti) {
-    return new EnglishStemmer(fti);
-  }
-
-  @Override
-  public String toString() {
-    return "Internal";
   }
 }

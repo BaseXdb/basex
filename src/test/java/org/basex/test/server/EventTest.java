@@ -99,7 +99,7 @@ public final class EventTest {
 
       // query must return all events
       final HashSet<String> names = new HashSet<String>();
-      String result = session.execute("show events");
+      final String result = session.execute("show events");
       for(final String line : result.split("\\r?\\n|\\r"))
         if(line.startsWith("- ")) names.add(line.substring(2));
 

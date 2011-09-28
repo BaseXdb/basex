@@ -35,7 +35,7 @@ public abstract class Tokenizer extends LanguageImpl {
   /**
    * Factory method.
    * @param f full-text options
-   * @return tokenizer instance
+   * @return tokenizer
    */
   abstract Tokenizer get(final FTOpt f);
 
