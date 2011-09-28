@@ -192,4 +192,9 @@ final class GermanStemmer extends Stemmer {
   int prec() {
     return 1000;
   }
+
+  @Override
+  public String toString() {
+    return "Internal";
+  }
 }

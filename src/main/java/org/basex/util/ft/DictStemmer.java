@@ -41,4 +41,9 @@ final class DictStemmer extends Stemmer {
   byte[] stem(final byte[] word) {
     return dict.stem(word);
   }
+
+  @Override
+  public String toString() {
+    return "Dictionary";
+  }
 }

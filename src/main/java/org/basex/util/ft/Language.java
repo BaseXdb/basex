@@ -23,7 +23,7 @@ import org.basex.util.Util;
  * @author Dimitar Popov
  * @author Jens Erat
  */
-public final class Language {
+public final class Language implements Comparable<Language> {
   /** Available languages, indexed by language code. */
   public static final HashMap<String, Language> ALL =
       new HashMap<String, Language>();
@@ -96,6 +96,11 @@ public final class Language {
   @Override
   public int hashCode() {
     return code().hashCode();
+  }
+
+  @Override
+  public int compareTo(final Language o) {
+    return code().compareTo(o.code());
   }
 
   @Override

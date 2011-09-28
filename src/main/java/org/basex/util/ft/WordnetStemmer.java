@@ -117,4 +117,9 @@ final class WordnetStemmer extends Stemmer {
     final byte[] result = l.size() == 0 ? word : token(l.get(0));
     return result.length == 0 ? word : result;
   }
+
+  @Override
+  public String toString() {
+    return "WordNet";
+  }
 }

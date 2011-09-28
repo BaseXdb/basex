@@ -284,4 +284,9 @@ final class EnglishStemmer extends Stemmer {
   Stemmer get(final Language l, final FTIterator fti) {
     return new EnglishStemmer(fti);
   }
+
+  @Override
+  public String toString() {
+    return "Internal";
+  }
 }

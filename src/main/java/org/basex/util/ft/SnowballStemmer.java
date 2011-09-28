@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import org.basex.util.Reflect;
+import org.basex.util.Util;
 
 /**
  * Stemmer implementation using the Snowball stemmer.
@@ -32,10 +33,14 @@ final class SnowballStemmer extends Stemmer {
       for(final Language l : Language.ALL.values()) {
         final Class<?> clz = Reflect.find(PATTERN, l);
         if(clz == null) continue;
-        CLASSES.put(l, new StemmerClass(clz,
-            Reflect.method(clz, "setCurrent", String.class),
-            Reflect.method(clz, "stem"),
-            Reflect.method(clz, "getCurrent")));
+        final Method m1 = Reflect.method(clz, "setCurrent", String.class);
+        final Method m2 = Reflect.method(clz, "stem");
+        final Method m3 = Reflect.method(clz, "getCurrent");
+        if(m1 == null || m2 == null || m3 == null) {
+          Util.errln("Could not initialize \"%\" Snowball stemmer.", l);
+        } else {
+          CLASSES.put(l, new StemmerClass(clz, m1, m2, m3));
+        }
       }
     }
   }
@@ -117,5 +122,10 @@ final class SnowballStemmer extends Stemmer {
       stem = stm;
       getCurrent = g;
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Snowball";
   }
 }

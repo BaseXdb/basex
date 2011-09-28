@@ -92,11 +92,13 @@ final class DialogFT extends BaseXBack {
 
     final BaseXBack b1 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b1.add(check[F_LANG]);
-    final StringList langs = new StringList();
-    for(final String l : FTLexer.languages()) langs.add(l);
+    final StringList langs = FTLexer.languages();
     language = new BaseXCombo(d, langs.toArray());
     final Language ln = Language.get(prop);
-    language.setSelectedItem((ln == null ? Language.def() : ln).toString());
+    for(final String l : langs) {
+      final String s = l.replaceFirst(" \\(.*", "");
+      if(s.equals(ln.toString())) language.setSelectedItem(l);
+    }
 
     b1.add(language);
     add(b1);
@@ -171,8 +173,9 @@ final class DialogFT extends BaseXBack {
    */
   void close() {
     final GUI gui = dialog.gui;
+    final String lang = language.getSelectedItem().toString();
     gui.set(Prop.LANGUAGE, check[F_LANG].isSelected() ?
-        Language.get(language.getSelectedItem().toString()).toString() : "");
+        Language.get(lang.replaceFirst(" \\(.*", "")).toString() : "");
     gui.set(Prop.STEMMING, check[F_STEM].isSelected());
     gui.set(Prop.CASESENS, check[F_CASE].isSelected());
     gui.set(Prop.DIACRITICS, check[F_DIA].isSelected());

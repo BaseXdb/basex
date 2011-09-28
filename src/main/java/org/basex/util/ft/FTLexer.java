@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.TreeMap;
 
 import org.basex.index.IndexToken;
 import org.basex.io.serial.XMLSerializer;
@@ -199,14 +198,19 @@ public final class FTLexer extends FTIterator implements IndexToken {
    * @return supported languages
    */
   public static StringList languages() {
-    final Set<Language> ln = new HashSet<Language>();
-    for(final Tokenizer t : Tokenizer.IMPL) ln.addAll(t.languages());
-    final Set<Language> sln = new HashSet<Language>();
-    for(final Stemmer stem : Stemmer.IMPL) sln.addAll(stem.languages());
-    // intersection of languages tokenizers and stemmers support
-    ln.retainAll(sln);
-    final StringList sl = new StringList(sln.size());
-    for(final Language l : sln) sl.add(l.toString());
+    final TreeMap<Language, Stemmer> langs = new TreeMap<Language, Stemmer>();
+    for(final Stemmer stem : Stemmer.IMPL) {
+      for(final Language l : stem.languages()) {
+        if(langs.containsKey(l)) continue;
+        for(final Tokenizer t : Tokenizer.IMPL) {
+          if(t.languages().contains(l)) langs.put(l, stem);
+        }
+      }
+    }
+    final StringList sl = new StringList();
+    for(final Language l : langs.keySet()) {
+      sl.add(l + " (" + langs.get(l) + ")");
+    }
     sl.sort(true, true);
     return sl;
   }

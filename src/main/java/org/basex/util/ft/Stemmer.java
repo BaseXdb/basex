@@ -92,4 +92,7 @@ public abstract class Stemmer extends LanguageImpl {
   public final byte[] nextToken() {
     return stem(iter.nextToken());
   };
+
+  @Override
+  public abstract String toString();
 }

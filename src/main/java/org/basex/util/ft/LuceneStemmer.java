@@ -29,10 +29,15 @@ final class LuceneStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    final String br = "br.Brazilian";
-    if(Reflect.avl(Util.info(PATTERN, br))) {
-      add("pt", br);
-      add("de", "fr", "nl", "ru");
+    if(Reflect.avl(PATTERN, "de.German")) {
+      add(Language.get("cs"), "cz.Czech");
+      add(Language.get("es"), "es.SpanishLight");
+      add(Language.get("fi"), "fi.FinnishLight");
+      add(Language.get("hu"), "hu.HungarianLight");
+      add(Language.get("it"), "it.ItalianLight");
+      add(Language.get("pt"), "br.Brazilian");
+      add(Language.get("sv"), "sv.SwedishLight");
+      add("ar", "bg", "de", "fr", "hi", "lv", "nl", "ru");
     }
   }
 
@@ -43,19 +48,30 @@ final class LuceneStemmer extends Stemmer {
   private static void add(final String... lang) {
     for(final String ln : lang) {
       final Language l = Language.get(ln);
-      add(ln, l.code() + '.' + l);
+      add(l, l.code() + '.' + l);
     }
   }
 
   /**
    * Check if a stemmer class is available, and add it the the list of stemmers.
    * @param lang language
-   * @param path class path
+   * @param name name of language
    */
-  private static void add(final String lang, final String path) {
-    final Class<?> clz = Reflect.find(PATTERN, path);
-    final Method m = Reflect.method(clz, "stem", String.class);
-    CLASSES.put(Language.get(lang), new StemmerClass(clz, m));
+  private static void add(final Language lang, final String name) {
+    final Class<?> clz = Reflect.find(PATTERN, name);
+    if(clz == null) {
+      Util.errln("Could not initialize \"%\" Lucene stemmer class.", lang);
+      return;
+    }
+    boolean ch = false;
+    Method m = Reflect.method(clz, "stem", String.class);
+    ch = m == null;
+    if(ch) m = Reflect.method(clz, "stem", char[].class, int.class);
+    if(m == null) {
+      Util.errln("Could not initialize \"%\" Lucene stemmer method.", lang);
+    } else {
+      CLASSES.put(lang, new StemmerClass(clz, m, ch));
+    }
   }
 
   /**
@@ -105,7 +121,16 @@ final class LuceneStemmer extends Stemmer {
 
   @Override
   byte[] stem(final byte[] word) {
-    return token((String) Reflect.invoke(clazz.stem, stemmer, string(word)));
+    String s = string(word);
+    if(clazz.chars) {
+      final char[] ch = s.toCharArray();
+      final int cl = s.length();
+      final int nl = (Integer) Reflect.invoke(clazz.stem, stemmer, ch, cl);
+      s = new String(ch, 0, nl);
+    } else {
+      s = (String) Reflect.invoke(clazz.stem, stemmer, s);
+    }
+    return token(s);
   }
 
   /** Structure, containing stemming methods. */
@@ -114,16 +139,25 @@ final class LuceneStemmer extends Stemmer {
     final Class<?> clz;
     /** Method {@code stem}. */
     final Method stem;
+    /** String indicator. */
+    final boolean chars;
 
     /**
      * Constructor.
      * @param sc class implementing the stemmer
      * @param stm method {@code stem}
+     * @param ch indicator for stemming via character array
      */
-    StemmerClass(final Class<?> sc, final Method stm) {
+    StemmerClass(final Class<?> sc, final Method stm, final boolean ch) {
       clz = sc;
       stem = stm;
+      chars = ch;
       stem.setAccessible(true);
     }
+  }
+
+  @Override
+  public String toString() {
+    return "Lucene";
   }
 }
