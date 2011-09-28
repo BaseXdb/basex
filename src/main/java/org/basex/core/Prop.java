@@ -136,7 +136,7 @@ public final class Prop extends AProp {
   public static final Object[] LSERROR = { "LSERROR", 0 };
 
   /** Maximum number of index occurrences to print. */
-  public static final Object[] MAXSTAT = { "MAXSTAT", 15 };
+  public static final Object[] MAXSTAT = { "MAXSTAT", 30 };
   /** Flag for tail-call optimization. */
   public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
 

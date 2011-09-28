@@ -1,3 +1,5 @@
+==================================================== BASEX CHANGELOG ===
+
 Version 6.7.1 (July 28, 2011):
 
   XQuery:
@@ -99,3 +101,5 @@ Version 6.6.1 (Mar 30, 2011) XML Prague release:
    
   GUI:
   [FIX] language option (for Japanese, German, etc. interface) fixed
+
+========================================================================
