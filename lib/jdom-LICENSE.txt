@@ -1,4 +1,4 @@
-/*-- 
+======================================================= JDOM LICENSE ===
 
  $Id: LICENSE.txt,v 1.11 2004/02/06 09:32:57 jhunter Exp $
 
@@ -52,5 +52,4 @@
  Brett McLaughlin <brett_AT_jdom_DOT_org>.  For more information
  on the JDOM Project, please see <http://www.jdom.org/>. 
 
- */
-
+========================================================================
