@@ -273,8 +273,8 @@ public final class EventTest {
         if(!first) name += 1;
         cs.query("db:event('" + name + "', '" + value + "')").execute();
         cs.close();
-      } catch(final Exception e) {
-        e.printStackTrace();
+      } catch(final Exception ex) {
+        ex.printStackTrace();
       }
     }
   }

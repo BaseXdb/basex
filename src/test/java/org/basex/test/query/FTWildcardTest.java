@@ -58,18 +58,18 @@ public class FTWildcardTest {
     for(final String wc : VALIDWC)
       try {
         new FTWildcard(token(wc), null);
-      } catch(final Exception e) {
-        e.printStackTrace();
+      } catch(final Exception ex) {
+        ex.printStackTrace();
         fail("Parsing failed: " + wc);
       }
 
     for(final String wc : INVALIDWC)
       try {
         new FTWildcard(token(wc), null);
-        fail("Parsing did NOT failed: " + wc);
-      } catch(final QueryException e) {
-      } catch(final Exception e) {
-        e.printStackTrace();
+        fail("Parsing did NOT fail: " + wc);
+      } catch(final QueryException ex) {
+      } catch(final Exception ex) {
+        ex.printStackTrace();
         fail("Error while parsing: " + wc);
       }
   }

@@ -82,9 +82,9 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
         try {
           delete(pre, c);
           check();
-        } catch(final ArrayIndexOutOfBoundsException e) {
+        } catch(final ArrayIndexOutOfBoundsException ex) {
           dump();
-          throw e;
+          throw ex;
         }
         n += c;
       }

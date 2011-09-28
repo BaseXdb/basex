@@ -148,12 +148,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    if(obj instanceof Exception) {
-      final Exception ex = (Exception) obj;
-      err(message(ex) + NL, ext);
-    } else {
-      err(obj + NL, ext);
-    }
+    err((obj instanceof Exception ? message((Exception) obj) : obj) + NL, ext);
   }
 
   /**
