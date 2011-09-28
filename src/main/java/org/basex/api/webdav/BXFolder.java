@@ -108,17 +108,22 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
             "for $r in " + DBLIST.args("$d", "$p") +
-            "return " + SUBAFTER.args("$r", "$p"));
+            "return (" +
+                SUBAFTER.args("$r", "$p") + ',' +
+                DBISRAW.args("$d", "$r") + ',' +
+                DBCTYPE.args("$d", "$r") + ')');
         q.bind("d", db);
         q.bind("p", path);
         while(q.more()) {
           final String p = stripLeadingSlash(q.next());
+          final boolean raw = Boolean.parseBoolean(q.next());
+          final String ctype = q.next();
+
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
             if(!p.equals(DUMMY))
-              ch.add(new BXDocument(db, path + SEP + p, session,
-                  isRaw(s, db, path + SEP + p)));
+              ch.add(new BXDocument(db, path + SEP + p, session, raw, ctype));
           } else {
             final String folder = path + SEP + p.substring(0, ix);
             if(!paths.contains(folder)) {
@@ -149,7 +154,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
           addFile(s, newName, input);
           deleteDummy(s, db, path);
         }
-        return new BXDocument(db, doc, session, isRaw(s, db, doc));
+        return new BXDocument(db, doc, session, isRaw(s, db, doc), contentType);
       }
     }.eval();
   }

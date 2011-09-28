@@ -182,7 +182,8 @@ public abstract class BXResource implements Resource {
     try {
       // check if there is a document in the collection having this path
       if(exists(s, db, path))
-        return new BXDocument(db, path, hs, isRaw(s, db, path));
+        return new BXDocument(db, path, hs, isRaw(s, db, path),
+            contentType(s, db, path));
       // check if there are paths in the collection starting with this path
       if(pathExists(s, db, path)) return new BXFolder(db, path, hs);
     } catch(final IOException ex) {

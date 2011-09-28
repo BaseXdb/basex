@@ -28,6 +28,8 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
 public class BXDocument extends BXAbstractResource implements FileResource {
   /** Raw flag. */
   final boolean raw;
+  /** Content type. */
+  final String ctype;
 
   /**
    * Constructor.
@@ -35,11 +37,13 @@ public class BXDocument extends BXAbstractResource implements FileResource {
    * @param docpath document path to root
    * @param s current session
    * @param r raw flag
+   * @param c content type
    */
   public BXDocument(final String dbname, final String docpath,
-      final HTTPSession s, final boolean r) {
+      final HTTPSession s, final boolean r, final String c) {
     super(dbname, docpath, s);
     raw = r;
+    ctype = c;
   }
 
   @Override
@@ -65,12 +69,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
 
   @Override
   public String getContentType(final String accepts) {
-    return new BXCode<String>(this) {
-      @Override
-      public String get() throws IOException {
-        return contentType(s, db, path);
-      }
-    }.evalNoEx();
+    return ctype;
   }
 
   @Override
