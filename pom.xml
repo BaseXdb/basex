@@ -153,6 +153,7 @@
         <configuration>
           <connectors>
             <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+              <!-- Choose HTTP port -->
               <port>8984</port>
               <maxIdleTime>60000</maxIdleTime>
             </connector>
@@ -160,8 +161,25 @@
           <webAppConfig>
             <contextPath>/</contextPath>
           </webAppConfig>
+          <systemProperties>
+            <!-- Choose client/server or local mode -->
+            <systemProperty>
+              <name>org.basex.local</name>
+              <value>false</value>
+            </systemProperty>
+            <!-- Choose default user/password
+            <systemProperty>
+              <name>org.basex.user</name>
+              <value>admin</value>
+            </systemProperty>
+            <systemProperty>
+              <name>org.basex.password</name>
+              <value>admin</value>
+            </systemProperty>
+            -->
+          </systemProperties>
         </configuration>
-    </plugin> 
+      </plugin> 
     </plugins>
     <resources>
       <resource>
