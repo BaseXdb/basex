@@ -1,4 +1,4 @@
-BASEX TESTS ====================================================================
+======================================================== BASEX TESTS ===
 
  This package contains various tests that are used in BaseX development.
  These tests did not make it into the main repository because they are:
@@ -15,4 +15,4 @@ BASEX TESTS ====================================================================
  For questions or feedback, feel free to use the Tracker or our
  [Mailinglist](http://basex.org/open-source/ "BaseX | Open Source").
 
-================================================================================
+========================================================================
