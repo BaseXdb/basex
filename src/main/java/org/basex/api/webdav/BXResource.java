@@ -7,12 +7,13 @@ import java.util.Date;
 
 import org.basex.api.HTTPSession;
 import org.basex.core.Text;
-import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
+import org.basex.io.in.ArrayInput;
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.util.Token;
 import org.basex.util.list.StringList;
 
 import com.bradmcevoy.http.Auth;
@@ -30,10 +31,8 @@ import com.bradmcevoy.http.Resource;
 public abstract class BXResource implements Resource {
   /** File path separator. */
   static final char SEP = '/';
-  /** Dummy xml file.*/
+  /** Dummy file for empty folder.*/
   static final String DUMMY = ".empty";
-  /** Dummy xml content.*/
-  static final String DUMMYCONTENT = "<empty/>";
   /** Database. */
   protected final String db;
   /** Resource path (without leading '/'). */
@@ -162,7 +161,7 @@ public abstract class BXResource implements Resource {
     if(p.matches("[^/]") || pathExists(s, db, p)) return false;
 
     s.execute(new Open(db));
-    s.execute(new Add(DUMMYCONTENT, DUMMY, p));
+    s.store(p + SEP + DUMMY, new ArrayInput(Token.EMPTY));
     s.execute(new Close());
     return true;
   }
