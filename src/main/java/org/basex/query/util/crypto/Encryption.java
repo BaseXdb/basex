@@ -6,13 +6,8 @@ import static org.basex.util.Token.*;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -28,6 +23,8 @@ import org.basex.query.item.Str;
 import org.basex.util.Base64;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenSet;
 
 /**
  * This class encrypts and decrypts textual inputs.
@@ -37,28 +34,33 @@ import org.basex.util.Token;
  */
 public final class Encryption {
 
+  /** Input info. */
+  private final InputInfo input;
   /** Token. */
   private static final byte[] SYM = token("symmetric");
-  /** Token. */
-  private static final byte[] ASYM = token("asymmetric");
   /** Token. */
   private static final byte[] BASE64 = token("base64");
   /** Token. */
   private static final byte[] HEX = token("hex");
-  /** Input info. */
-  private final InputInfo input;
-  /** Supported asymmetric encryption algorithm. */
-  private static final byte[] RSA = token("RSA");
-  /** Supported encryption algorithms. */
-  private static final byte[][] ALG =
-    {
-      token("DES"),
-      RSA,
-      /*
-      token("DES3"),
-      token("AES")
-      */
-    };
+  /** Supported encryption algorithms, mapped to correct IV lengths. */
+  private static final TokenMap ALGE = new TokenMap();
+  /** Exact encryption algorithm JAVA names. */
+  private static final TokenMap ALGN = new TokenMap();
+  /** Supported HMAC algorithms. */
+  private static final TokenSet ALGHMAC = new TokenSet();
+  /** DES encryption token. */
+  private static final byte[] DES = token("DES");
+  /** AES encryption token. */
+  private static final byte[] AES = token("AES");
+
+  static {
+    ALGE.add(DES, token("8"));
+    ALGE.add(AES, token("16"));
+    ALGN.add(DES, token("DES/CBC/PKCS5Padding"));
+    ALGN.add(AES, token("AES/CBC/PKCS5Padding"));
+    ALGHMAC.add(token("hmacmd5"));
+    ALGHMAC.add(token("hmacsha1"));
+  }
 
   /**
    * Constructor.
@@ -84,46 +86,31 @@ public final class Encryption {
           throws QueryException {
 
     final boolean symmetric = eq(s, SYM);
-    // encryption type must be 'symmetric' or 'asymmetric', error message
-    // dependent on encryption/decryption
-    if(!symmetric && !eq(s, ASYM))
-      if(ec) CRYPTOENCTYP.thrw(input, s);
-      else CRYPTODECTYP.thrw(input, s);
-
-    // check given algorithm and combination with encryption type (symmetric...)
-    final byte[] a3 = substring(a, 0, 3);
-    if(!eq(a3, ALG))
-      CRYPTOINVALGO.thrw(input, a3);
-    if(symmetric && eq(a3, RSA))
-      CRYPTOSYMERR.thrw(input, a3);
+    final byte[] tivl = ALGE.get(a);
+    if(!symmetric || tivl == null)
+      CRYPTOINVALGO.thrw(input, s);
+    // initialization vector length
+    final int ivl = toInt(tivl);
 
     byte[] t = null;
     try {
 
       if(ec)
-        t = encrypt(in, k, string(a), symmetric);
+        t = encrypt(in, k, a, ivl);
       else
-        t = decrypt(in, k, string(a), symmetric);
+        t = decrypt(in, k, a, ivl);
 
     } catch(NoSuchPaddingException e) {
-      e.printStackTrace();
       CRYPTONOPAD.thrw(input, e);
     } catch(BadPaddingException e) {
-      e.printStackTrace();
       CRYPTOBADPAD.thrw(input, e);
     } catch(NoSuchAlgorithmException e) {
-      e.printStackTrace();
       CRYPTOINVALGO.thrw(input, e);
     } catch(InvalidKeyException e) {
-      e.printStackTrace();
       CRYPTOKEYINV.thrw(input, e);
     } catch(IllegalBlockSizeException e) {
-      e.printStackTrace();
       CRYPTOILLBLO.thrw(input, e);
     } catch(InvalidAlgorithmParameterException e) {
-      e.printStackTrace();
-      CRYPTONOTSUPP.thrw(input, "invalid algorithm parameter");
-    } catch(InvalidKeySpecException e) {
       e.printStackTrace();
     }
 
@@ -136,7 +123,7 @@ public final class Encryption {
    * @param in input data to encrypt
    * @param k key
    * @param a encryption algorithm
-   * @param s symmetric encryption
+   * @param ivl initialization vector length
    * @return encrypted input data
    * @throws InvalidKeyException ex
    * @throws InvalidAlgorithmParameterException ex
@@ -144,43 +131,29 @@ public final class Encryption {
    * @throws NoSuchPaddingException ex
    * @throws IllegalBlockSizeException ex
    * @throws BadPaddingException ex
-   * @throws InvalidKeySpecException ex
-   * @throws QueryException ex
    */
   public byte[] encrypt(final byte[] in, final byte[] k,
-      final String a, final boolean s) throws InvalidKeyException,
-      InvalidAlgorithmParameterException, NoSuchAlgorithmException,
-      NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException,
-      InvalidKeySpecException, QueryException {
+      final byte[] a, final int ivl)
+          throws InvalidKeyException, InvalidAlgorithmParameterException,
+          NoSuchAlgorithmException, NoSuchPaddingException,
+          IllegalBlockSizeException, BadPaddingException {
 
-    final Cipher cipher = Cipher.getInstance(a);
-
-    if(s) {
-      final SecretKeySpec kspec = new SecretKeySpec(k, a.substring(0, 3));
-      // generate random iv
-      byte[] iv = new byte[8];
-      // create new random iv if encrypting
-      final SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
-      rand.nextBytes(iv);
-      final IvParameterSpec ivspec = new IvParameterSpec(iv);
+    final Cipher cipher = Cipher.getInstance(string(ALGN.get(a)));
+    final SecretKeySpec kspec = new SecretKeySpec(k, string(a));
+    // generate random iv. random iv is necessary to make the encryption of a
+    // string look different every time it is encrypted.
+    byte[] iv = new byte[ivl];
+    // create new random iv if encrypting
+    final SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
+    rand.nextBytes(iv);
+    final IvParameterSpec ivspec = new IvParameterSpec(iv);
 //    System.out.println("random iv: " + string(iv));
 
-      // encrypt/decrypt
-      cipher.init(Cipher.ENCRYPT_MODE, kspec, ivspec);
-      final byte[] t = cipher.doFinal(in);
-      return concat(iv, t);
-
-    }
-
-    CRYPTONOTSUPP.thrw(input, s);
-
-    final KeyFactory kfac = KeyFactory.getInstance(a);
-    final KeySpec kspec = new PKCS8EncodedKeySpec(k);
-    final RSAPrivateKey key = (RSAPrivateKey) kfac.generatePrivate(kspec);
-
-    // asymmetric encryption
-    cipher.init(Cipher.ENCRYPT_MODE, key);
-    return cipher.doFinal(in);
+    // encrypt/decrypt
+    cipher.init(Cipher.ENCRYPT_MODE, kspec, ivspec);
+    final byte[] t = cipher.doFinal(in);
+    // initialization vector is appended to the message for later decryption
+    return concat(iv, t);
   }
 
   /**
@@ -189,7 +162,7 @@ public final class Encryption {
    * @param in data to decrypt
    * @param k secret key
    * @param a encryption algorithm
-   * @param s symmetric encryption
+   * @param ivl initialization vector length
    * @return decrypted data
    * @throws NoSuchAlgorithmException ex
    * @throws NoSuchPaddingException ex
@@ -199,21 +172,22 @@ public final class Encryption {
    * @throws BadPaddingException ex
    */
   public byte[] decrypt(final byte[] in, final byte[] k,
-      final String a, final boolean s) throws NoSuchAlgorithmException,
+      final byte[] a, final int ivl)
+          throws NoSuchAlgorithmException,
       NoSuchPaddingException, InvalidKeyException,
       InvalidAlgorithmParameterException, IllegalBlockSizeException,
       BadPaddingException {
 
-    final SecretKeySpec keySpec = new SecretKeySpec(k, a.substring(0, 3));
-    final Cipher cipher = Cipher.getInstance(a);
+    final SecretKeySpec keySpec = new SecretKeySpec(k, string(a));
+    final Cipher cipher = Cipher.getInstance(string(ALGN.get(a)));
 
     // extract iv from message beginning
-    byte[] iv = substring(in, 0, 8);
+    byte[] iv = substring(in, 0, ivl);
     final IvParameterSpec ivspec = new IvParameterSpec(iv);
 //    System.out.println("extracted iv: " + string(iv) + "\n");
 
     cipher.init(Cipher.DECRYPT_MODE, keySpec, ivspec);
-    return cipher.doFinal(substring(in, 8, in.length));
+    return cipher.doFinal(substring(in, ivl, in.length));
   }
 
   /**
@@ -232,6 +206,13 @@ public final class Encryption {
     final Key key = new SecretKeySpec(k, string(a));
     byte[] hash = null;
 
+    if(ALGHMAC.id(a) == 0)
+      CRYPTOINVHASH.thrw(input, a);
+
+    final boolean b64 = eq(enc, BASE64);
+    if(!b64 && !eq(enc, HEX))
+      CRYPTOENC.thrw(input, enc);
+
     try {
       Mac mac = Mac.getInstance(string(a));
       mac.init(key);
@@ -243,14 +224,9 @@ public final class Encryption {
       CRYPTOKEYINV.thrw(input, k);
     }
 
-    // convert to specified encoding, base64 as a standard
-    Str hmac = null;
-    if(enc == null || eq(enc, BASE64))
-      hmac = Str.get(Base64.encode(hash));
-    else if(eq(HEX, enc))
-      hmac = Str.get(Token.hex(hash, true));
-    else CRYPTOENC.thrw(input, enc);
-
-    return Str.get(hmac.toString());
+    // convert to specified encoding, base64 as a standard, else use hex
+    if(b64)
+      return Str.get(Base64.encode(hash));
+    return  Str.get(Token.hex(hash, true));
   }
 }

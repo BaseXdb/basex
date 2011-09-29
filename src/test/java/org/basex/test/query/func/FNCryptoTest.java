@@ -6,8 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import javax.crypto.SecretKey;
-
 import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -30,73 +28,80 @@ public class FNCryptoTest extends AdvancedQueryTest {
    * Test method for crypto:encrypt and crypto:decrypt with symmetric keys.
    */
   @Test
-  public void encryptionSym1() {
+  public void encryption1() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
     //DES/CBC/PKCS5Padding
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa'," +
-        "'DES/CBC/PKCS5Padding') return c:decrypt($e,'symmetric'," +
-        "'aaabbbaa','DES/CBC/PKCS5Padding')", msg);
+        "'DES') return c:decrypt($e,'symmetric'," +
+        "'aaabbbaa','DES')", msg);
   }
 
   /**
    * Test method for crypto:encrypt and crypto:decrypt with symmetric keys.
    */
   @Test
-  public void encryptionSym2() {
+  public void encryption2() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
     //DES/CBC/PKCS5Padding
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "let $e := c:encrypt('" + msg + "','symmetric','abababababababab'," +
-        "'AES/CBC/PKCS5Padding') return c:decrypt($e,'symmetric'," +
-        "'abababababababab','AES/CBC/PKCS5Padding')", msg);
+        "'AES') return c:decrypt($e,'symmetric'," +
+        "'abababababababab','AES')", msg);
   }
 
-  /**
-   * Test method for crypto:encrypt and crypto:decrypt with asymmetric keys.
-   */
-  @Test
-  public void encryptionAsym1() {
-    final String msg = "messagemessagemessagemessagemessagemessagemessage";
-
-    PublicKey puk = null;
-    PrivateKey prk = null;
-    try {
-
-      final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-      final KeyPair kp = gen.generateKeyPair();
-      puk = kp.getPublic();
-      prk = kp.getPrivate();
-
-    } catch(NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    }
-
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "let $e := c:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
-        "return c:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
-  }
-
-  @Test
-  public void encrypt() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:encrypt('messagetobeencryted','symmetric','aaabbbaa'," +
-        "'DES/CBC/PKCS5Padding')");
-  }
+//  /**
+//   * Test method for crypto:encrypt and crypto:decrypt with asymmetric keys.
+//   */
+//  @Test
+//  public void encryptionAsym1() {
+//    final String msg = "messagemessagemessagemessagemessagemessagemessage";
+//
+//    PublicKey puk = null;
+//    PrivateKey prk = null;
+//    try {
+//
+//      final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
+//      final KeyPair kp = gen.generateKeyPair();
+//      puk = kp.getPublic();
+//      prk = kp.getPrivate();
+//
+//    } catch(NoSuchAlgorithmException e) {
+//      e.printStackTrace();
+//    }
+//
+//    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+//       "let $e := c:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
+//        "return c:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
+//  }
 
   @Test
-  public void hmacHEX() {
+  public void hmacMD5hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:hmac('message','key','hmacMd5', 'hex')",
         "\"4E4748E62B463521F6775FBF921234B5\"");
   }
 
   @Test
-  public void hmacBASE64() {
+  public void hmacMD5base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:hmac('message','key','hmacMd5', 'base64')",
+        "\"4E4748E62B463521F6775FBF921234B5\"");
+  }
+
+  @Test
+  public void hmacSHA1hex() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','hmacsha1', 'hex')",
+        "\"4E4748E62B463521F6775FBF921234B5\"");
+  }
+
+  @Test
+  public void hmacSHA1base64() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','hmacsha1', 'base64')",
         "\"4E4748E62B463521F6775FBF921234B5\"");
   }
 
