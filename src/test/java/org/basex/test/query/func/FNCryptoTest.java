@@ -25,7 +25,6 @@ public class FNCryptoTest extends AdvancedQueryTest {
   public void encryption1() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
-    //DES/CBC/PKCS5Padding
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "let $e := c:encrypt('" + msg + "','symmetric','aaabbbaa'," +
         "'DES') return c:decrypt($e,'symmetric'," +
@@ -39,38 +38,15 @@ public class FNCryptoTest extends AdvancedQueryTest {
   public void encryption2() {
     final String msg = "messagemessagemessagemessagemessagemessagemessage";
 
-    //DES/CBC/PKCS5Padding
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "let $e := c:encrypt('" + msg + "','symmetric','abababababababab'," +
         "'AES') return c:decrypt($e,'symmetric'," +
         "'abababababababab','AES')", msg);
   }
 
-//  /**
-//   * Test method for crypto:encrypt and crypto:decrypt with asymmetric keys.
-//   */
-//  @Test
-//  public void encryptionAsym1() {
-//    final String msg = "messagemessagemessagemessagemessagemessagemessage";
-//
-//    PublicKey puk = null;
-//    PrivateKey prk = null;
-//    try {
-//
-//      final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-//      final KeyPair kp = gen.generateKeyPair();
-//      puk = kp.getPublic();
-//      prk = kp.getPrivate();
-//
-//    } catch(NoSuchAlgorithmException e) {
-//      e.printStackTrace();
-//    }
-//
-//    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-//       "let $e := c:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
-//        "return c:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
-//  }
-
+  /**
+   * Tests the creation of a message authentication code for the md5 algorithm.
+   */
   @Test
   public void hmacMD5hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -78,6 +54,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "4E4748E62B463521F6775FBF921234B5");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the md5 algorithm.
+   */
   @Test
   public void hmacMD5base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -85,6 +64,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "TkdI5itGNSH2d1+/khI0tQ==");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha1 algorithm.
+   */
   @Test
   public void hmacSHA1hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -92,6 +74,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha1 algorithm.
+   */
   @Test
   public void hmacSHA1base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -99,6 +84,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha256
+   * algorithm.
+   */
   @Test
   public void hmacSHA256hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -106,6 +95,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "6E9EF29B75FFFC5B7ABAE527D58FDADB2FE42E7219011976917343065F58ED4A");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha256
+   * algorithm.
+   */
   @Test
   public void hmacSHA256base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -113,6 +106,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "bp7ym3X//Ft6uuUn1Y/a2y/kLnIZARl2kXNDBl9Y7Uo=");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha384
+   * algorithm.
+   */
   @Test
   public void hmacSHA384hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -120,6 +117,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha384
+   * algorithm.
+   */
   @Test
   public void hmacSHA384base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -127,6 +128,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha512
+   * algorithm.
+   */
   @Test
   public void hmacSHA512hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -135,6 +140,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "B56EB39C36D8232F5427999B8D1A3F9CD1128FC69F4D75B434216810FA367E98");
   }
 
+  /**
+   * Tests the creation of a message authentication code for the sha512
+   * algorithm.
+   */
   @Test
   public void hmacSHA512base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -143,6 +152,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "Pxp9NdbQ0IWgQ+jZ+mA==");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignature1() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -150,6 +163,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignature1b() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -159,6 +176,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignature1c() {
     String input = "<a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'>" +
@@ -181,6 +202,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithCanonicalization() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -189,6 +214,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithCanonicalization2() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -197,6 +226,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithCanonicalization3() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -205,6 +238,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithCanonicalization4() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -213,6 +250,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithDigestAlgorithm() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -220,6 +261,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithDigestAlgorithm2() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -227,6 +272,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithDigestAlgorithm3() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -235,7 +284,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests encryption algorithm arguments.
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
    */
   @Test
   public void validateSignatureWithSignatureAlgorithm() {
@@ -246,7 +296,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests encryption algorithm arguments.
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
    */
   @Test
   public void validateSignatureWithSignatureAlgorithm2() {
@@ -257,8 +308,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests signing a node and adding a specific namespace prefix to the
-   * signature element.
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
    */
   @Test
   public void validateSignatureWithSignatureNamespace3() {
@@ -268,7 +319,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test an enveloped signature.
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
    */
   @Test
   public void validateSignatureWithSignatureType() {
@@ -279,7 +331,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests an enveloping signature.
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
    */
   @Test
   public void validateSignatureWithSignatureType2() {
@@ -290,7 +343,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests a detached signature.
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
    */
   @Test
   public void validateSignatureWithSignatureType3() {
@@ -301,7 +355,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
-   * Tests calling generate-signature with a wrong type argument.
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
    */
   @Test/*(expected = IndexOutOfBoundsException.class)*/
   public void validateSignatureWithSignatureTypeFAIL() {
@@ -311,6 +366,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
     Assert.fail();
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithXPath() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
@@ -320,6 +379,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithCertificate() {
     // Command to create java keystore
@@ -341,6 +404,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureWithXPathAndCertificate() {
     final String certificate =
@@ -359,6 +426,10 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "true");
   }
 
+  /**
+   * Tests whether validate-signature returns true for a certificate created
+   * with generate-signature.
+   */
   @Test
   public void validateSignatureFullySpecified() {
     final String certificate =
@@ -376,6 +447,31 @@ public class FNCryptoTest extends AdvancedQueryTest {
         + certificate + "))",
         "true");
   }
+
+///**
+//* Test method for crypto:encrypt and crypto:decrypt with asymmetric keys.
+//*/
+//@Test
+//public void encryptionAsym1() {
+// final String msg = "messagemessagemessagemessagemessagemessagemessage";
+//
+// PublicKey puk = null;
+// PrivateKey prk = null;
+// try {
+//
+//   final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
+//   final KeyPair kp = gen.generateKeyPair();
+//   puk = kp.getPublic();
+//   prk = kp.getPrivate();
+//
+// } catch(NoSuchAlgorithmException e) {
+//   e.printStackTrace();
+// }
+//
+// query("declare namespace c = 'http://expath.org/ns/crypto';" +
+//    "let $e := c:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
+//     "return c:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
+//}
 
   /**
    * Deletes the test db.
