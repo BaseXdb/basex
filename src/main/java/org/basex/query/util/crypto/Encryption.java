@@ -24,7 +24,6 @@ import org.basex.util.Base64;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.hash.TokenMap;
-import org.basex.util.hash.TokenSet;
 
 /**
  * This class encrypts and decrypts textual inputs.
@@ -47,19 +46,24 @@ public final class Encryption {
   /** Exact encryption algorithm JAVA names. */
   private static final TokenMap ALGN = new TokenMap();
   /** Supported HMAC algorithms. */
-  private static final TokenSet ALGHMAC = new TokenSet();
+  private static final TokenMap ALGHMAC = new TokenMap();
   /** DES encryption token. */
-  private static final byte[] DES = token("DES");
+  private static final byte[] DES = token("des");
   /** AES encryption token. */
-  private static final byte[] AES = token("AES");
+  private static final byte[] AES = token("aes");
 
   static {
     ALGE.add(DES, token("8"));
     ALGE.add(AES, token("16"));
     ALGN.add(DES, token("DES/CBC/PKCS5Padding"));
     ALGN.add(AES, token("AES/CBC/PKCS5Padding"));
-    ALGHMAC.add(token("hmacmd5"));
-    ALGHMAC.add(token("hmacsha1"));
+    ALGHMAC.add(token("md5"), token("hmacmd5"));
+    ALGHMAC.add(token("sha1"), token("hmacsha1"));
+    ALGHMAC.add(token("sha256"), token("hmacsha256"));
+    ALGHMAC.add(token("sha384"), token("hmacsha1"));
+    ALGHMAC.add(token("sha512"), token("hmacsha512"));
+    /*
+    */
   }
 
   /**
@@ -85,7 +89,7 @@ public final class Encryption {
       final byte[] k, final byte[] a, final boolean ec)
           throws QueryException {
 
-    final boolean symmetric = eq(s, SYM);
+    final boolean symmetric = eq(lc(s), SYM);
     final byte[] tivl = ALGE.get(a);
     if(!symmetric || tivl == null)
       CRYPTOINVALGO.thrw(input, s);
@@ -209,12 +213,12 @@ public final class Encryption {
     if(ALGHMAC.id(a) == 0)
       CRYPTOINVHASH.thrw(input, a);
 
-    final boolean b64 = eq(enc, BASE64);
-    if(!b64 && !eq(enc, HEX))
+    final boolean b64 = eq(lc(enc), BASE64);
+    if(!b64 && !eq(lc(enc), HEX))
       CRYPTOENC.thrw(input, enc);
 
     try {
-      Mac mac = Mac.getInstance(string(a));
+      Mac mac = Mac.getInstance(string(ALGHMAC.get(a)));
       mac.init(key);
       hash = mac.doFinal(msg);
 

@@ -1,11 +1,5 @@
 package org.basex.test.query.func;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-
 import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
@@ -80,29 +74,73 @@ public class FNCryptoTest extends AdvancedQueryTest {
   @Test
   public void hmacMD5hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','hmacMd5', 'hex')",
-        "\"4E4748E62B463521F6775FBF921234B5\"");
+        "c:hmac('message','key','md5', 'hex')",
+        "4E4748E62B463521F6775FBF921234B5");
   }
 
   @Test
   public void hmacMD5base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','hmacMd5', 'base64')",
-        "\"4E4748E62B463521F6775FBF921234B5\"");
+        "c:hmac('message','key','md5', 'base64')",
+        "TkdI5itGNSH2d1+/khI0tQ==");
   }
 
   @Test
   public void hmacSHA1hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','hmacsha1', 'hex')",
-        "\"4E4748E62B463521F6775FBF921234B5\"");
+        "c:hmac('message','key','sha1', 'hex')",
+        "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
   }
 
   @Test
   public void hmacSHA1base64() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:hmac('message','key','hmacsha1', 'base64')",
-        "\"4E4748E62B463521F6775FBF921234B5\"");
+        "c:hmac('message','key','sha1', 'base64')",
+        "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
+  }
+
+  @Test
+  public void hmacSHA256hex() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','sha256', 'hex')",
+        "6E9EF29B75FFFC5B7ABAE527D58FDADB2FE42E7219011976917343065F58ED4A");
+  }
+
+  @Test
+  public void hmacSHA256base64() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','sha256', 'base64')",
+        "bp7ym3X//Ft6uuUn1Y/a2y/kLnIZARl2kXNDBl9Y7Uo=");
+  }
+
+  @Test
+  public void hmacSHA384hex() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','sha384', 'hex')",
+        "2088DF74D5F2146B48146CAF4965377E9D0BE3A4");
+  }
+
+  @Test
+  public void hmacSHA384base64() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','sha384', 'base64')",
+        "IIjfdNXyFGtIFGyvSWU3fp0L46Q=");
+  }
+
+  @Test
+  public void hmacSHA512hex() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','sha512', 'hex')",
+        "E477384D7CA229DD1426E64B63EBF2D36EBD6D7E669A6735424E72EA6C01D3F8" +
+        "B56EB39C36D8232F5427999B8D1A3F9CD1128FC69F4D75B434216810FA367E98");
+  }
+
+  @Test
+  public void hmacSHA512base64() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','sha512', 'base64')",
+        "5Hc4TXyiKd0UJuZLY+vy0269bX5mmmc1Qk5y6mwB0/i1brOcNtgjL1QnmZuNGj+c0RK" +
+        "Pxp9NdbQ0IWgQ+jZ+mA==");
   }
 
   @Test
