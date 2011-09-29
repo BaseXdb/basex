@@ -194,6 +194,10 @@
             </systemProperty>
             -->
           </systemProperties>
+          <!-- Key and port for stopping Jetty
+          <stopKey>keyToStopJetty</stopKey> 
+          <stopPort>8985</stopPort>
+          -->
         </configuration>
       </plugin> 
     </plugins>

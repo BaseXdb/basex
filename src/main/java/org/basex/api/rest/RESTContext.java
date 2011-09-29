@@ -143,11 +143,12 @@ final class RESTContext {
    */
   boolean redirect() {
     final String uri = req.getRequestURI();
-    if(uri.endsWith("/")) return false;
+    if(uri.endsWith("/") || req.getPathInfo() == null) return false;
 
     final Map<?, ?> map = req.getParameterMap();
     if(map.size() == 0) return false;
 
+    // rebuild uri, including parameters
     char ch = '?';
     final StringBuilder sb = new StringBuilder(uri).append('/');
     for(final Entry<?, ?> s : map.entrySet()) {

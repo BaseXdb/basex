@@ -97,14 +97,18 @@ public final class BaseXHTTP {
       }
     }
 
-    if(HTTPSession.local() && !Token.eq(host, LOCALHOST, LOCALIP)) {
+    if(HTTPSession.local() || !Token.eq(host, LOCALHOST, LOCALIP)) {
       Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
     } else {
       server = new BaseXServer(context, quiet ? "-z" : "");
       Util.outln(HTTP + ' ' + SERVERSTART);
     }
 
+
+    System.setProperty("STOP.PORT", "8985");
+    System.setProperty("STOP.KEY", "8985");
     jetty = new Server(hport);
+
     final org.mortbay.jetty.servlet.Context jcontext =
         new org.mortbay.jetty.servlet.Context(jetty, "/",
             org.mortbay.jetty.servlet.Context.SESSIONS);
