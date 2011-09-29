@@ -12,6 +12,7 @@ import org.basex.core.Text;
 import org.basex.core.cmd.Open;
 import org.basex.io.serial.SerializerProp;
 import org.basex.server.Query;
+import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -47,9 +48,9 @@ abstract class RESTCode {
         type = APP_OCTET;
       } else if(method.equals(M_XML)) {
         type = APP_XML;
-      } else if(method.equals(M_JSON) || method.equals(M_JSONML)) {
+      } else if(Token.eq(method, M_JSON, M_JSONML)) {
         type = APP_JSON;
-      } else if(method.equals(M_XHTML) || method.equals(M_HTML)) {
+      } else if(Token.eq(method, M_XHTML, M_HTML)) {
         type = TEXT_HTML;
       } else {
         type = TEXT_PLAIN;

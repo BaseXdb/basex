@@ -37,7 +37,7 @@ final class RESTGet extends RESTCode {
           (String[]) s.getValue() : new String[] { s.getValue().toString() };
       final String val = vals[0];
 
-      if(key.equals(COMMAND) || key.equals(QUERY) || key.equals(RUN)) {
+      if(Token.eq(key, COMMAND, QUERY, RUN)) {
         if(operation != null || vals.length > 1)
           throw new RESTException(SC_BAD_REQUEST, ERR_ONLYONE);
         operation = key;

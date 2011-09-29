@@ -23,6 +23,8 @@ public interface HTTPText {
   String AUTHORIZATION = "Authorization";
   /** WWW-Authentication string. */
   String WWW_AUTHENTICATE = "WWW-Authenticate";
+  /** Location string. */
+  String LOCATION = "Location";
   /** Basic string. */
   String BASIC = "Basic";
 

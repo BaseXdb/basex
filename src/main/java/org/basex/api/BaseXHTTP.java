@@ -20,6 +20,7 @@ import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.util.Args;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.mortbay.jetty.Server;
 
@@ -74,6 +75,7 @@ public final class BaseXHTTP {
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
     final int hport = mprop.num(MainProp.HTTPPORT);
+    final String host = mprop.get(MainProp.HOST);
 
     if(service) {
       start(hport, args);
@@ -95,7 +97,7 @@ public final class BaseXHTTP {
       }
     }
 
-    if(HTTPSession.local()) {
+    if(HTTPSession.local() && !Token.eq(host, LOCALHOST, LOCALIP)) {
       Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
     } else {
       server = new BaseXServer(context, quiet ? "-z" : "");
@@ -104,7 +106,8 @@ public final class BaseXHTTP {
 
     jetty = new Server(hport);
     final org.mortbay.jetty.servlet.Context jcontext =
-        new org.mortbay.jetty.servlet.Context(jetty, "/");
+        new org.mortbay.jetty.servlet.Context(jetty, "/",
+            org.mortbay.jetty.servlet.Context.SESSIONS);
 
     if(rest) jcontext.addServlet(RESTServlet.class, "/rest/*");
     if(webdav) jcontext.addServlet(WebDAVServlet.class, "/webdav/*");
@@ -150,7 +153,7 @@ public final class BaseXHTTP {
             System.setProperty(DBLOCAL, Boolean.toString(true));
             break;
           case 'n':
-            ctx.mprop.set(MainProp.HOST, arg.num());
+            ctx.mprop.set(MainProp.HOST, arg.string());
             break;
           case 'p':
             final int p = arg.num();

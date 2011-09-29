@@ -83,7 +83,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     check();
     if(ver.equals("1.0")) {
-      if(nm.equals(BXQueryService.XPATH) || nm.equals(BXQueryService.XQUERY))
+      if(Token.eq(nm, BXQueryService.XPATH, BXQueryService.XQUERY))
         return new BXQueryService(this, nm, ver);
       if(nm.equals(BXCollectionManagementService.MANAGEMENT))
         return new BXCollectionManagementService(this);

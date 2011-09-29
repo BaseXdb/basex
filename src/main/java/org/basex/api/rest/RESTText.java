@@ -21,8 +21,7 @@ public interface RESTText {
   byte[] DATABASE = concat(REST, COLON, token("database"));
   /** Element. */
   byte[] RESOURCE = concat(REST, COLON, token("resource"));
-
-  /** Token. */
+  /** Attribute. */
   byte[] RESOURCES = token("resources");
 
   /** Error message. */

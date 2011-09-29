@@ -54,6 +54,8 @@ public final class RESTServlet extends HttpServlet {
       final HttpServletResponse res) throws IOException {
 
     final RESTContext ctx = new RESTContext(req, res);
+    if(ctx.redirect()) return;
+
     try {
       ctx.session = new HTTPSession(req).login();
     } catch(final LoginException ex) {
