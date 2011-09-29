@@ -90,7 +90,7 @@ public final class Encryption {
           throws QueryException {
 
     final boolean symmetric = eq(lc(s), SYM);
-    final byte[] tivl = ALGE.get(a);
+    final byte[] tivl = ALGE.get(lc(a));
     if(!symmetric || tivl == null)
       CRYPTOINVALGO.thrw(input, s);
     // initialization vector length
@@ -142,7 +142,7 @@ public final class Encryption {
           NoSuchAlgorithmException, NoSuchPaddingException,
           IllegalBlockSizeException, BadPaddingException {
 
-    final Cipher cipher = Cipher.getInstance(string(ALGN.get(a)));
+    final Cipher cipher = Cipher.getInstance(string(ALGN.get(lc(a))));
     final SecretKeySpec kspec = new SecretKeySpec(k, string(a));
     // generate random iv. random iv is necessary to make the encryption of a
     // string look different every time it is encrypted.
@@ -183,7 +183,7 @@ public final class Encryption {
       BadPaddingException {
 
     final SecretKeySpec keySpec = new SecretKeySpec(k, string(a));
-    final Cipher cipher = Cipher.getInstance(string(ALGN.get(a)));
+    final Cipher cipher = Cipher.getInstance(string(ALGN.get(lc(a))));
 
     // extract iv from message beginning
     byte[] iv = substring(in, 0, ivl);
@@ -218,7 +218,7 @@ public final class Encryption {
       CRYPTOENC.thrw(input, enc);
 
     try {
-      Mac mac = Mac.getInstance(string(ALGHMAC.get(a)));
+      Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(a))));
       mac.init(key);
       hash = mac.doFinal(msg);
 

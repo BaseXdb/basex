@@ -4,7 +4,6 @@ import org.basex.core.cmd.DropDB;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -340,30 +339,6 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
         "'enveloping'))",
         "true");
-  }
-
-  /**
-   * Tests whether validate-signature returns true for a certificate created
-   * with generate-signature.
-   */
-  @Test
-  public void validateSignatureWithSignatureType3() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'detached'))",
-        "true");
-  }
-
-  /**
-   * Tests whether validate-signature returns true for a certificate created
-   * with generate-signature.
-   */
-  @Test/*(expected = IndexOutOfBoundsException.class)*/
-  public void validateSignatureWithSignatureTypeFAIL() {
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','',''," +
-        "'xxx'))");
-    Assert.fail();
   }
 
   /**

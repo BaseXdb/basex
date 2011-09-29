@@ -23,7 +23,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -104,12 +103,12 @@ public final class DigitalSignature {
   private static final byte[] DEFD = token("SHA1");
   /** Default signature algorithm. */
   private static final byte[] DEFS = token("RSA_SHA1");
-  /** Default signature type. */
+  /** Default signature type enveloped. */
   private static final byte[] DEFT = token("enveloped");
   /** Signature type enveloping. */
   private static final byte[] ENVT = token("enveloping");
-  /** Signature type detached. */
-  private static final byte[] DETT = token("detached");
+//  /** Signature type detached. */
+//  private static final byte[] DETT = token("detached");
 
   // initializations
   static {
@@ -131,7 +130,7 @@ public final class DigitalSignature {
 
     TYPES.add(DEFT);
     TYPES.add(ENVT);
-    TYPES.add(DETT);
+//    TYPES.add(DETT);
   }
 
   /** Input info. */
@@ -279,14 +278,10 @@ public final class DigitalSignature {
       if(expr.length > 0) {
         final XPathFactory xpf = XPathFactory.newInstance();
         final XPathExpression xExpr = xpf.newXPath().compile(string(expr));
-        // TODO evaluate to node instead of node set? how deal with mltpl nds?
-        // loop through result list, add transform, unit test! possible?
         final NodeList xRes = (NodeList) xExpr.evaluate(inputNode,
             XPathConstants.NODESET);
         if(xRes.getLength() < 1)
           CRYPTOXPINV.thrw(input, expr);
-//        final Node nodeToSign = xpNodes.item(0);
-//        parentOfNodeToSign = nodeToSign.getParentNode();
         tfList = new ArrayList<Transform>(2);
         tfList.add(fac.newTransform(Transform.XPATH,
             new XPathFilterParameterSpec(string(expr))));
@@ -320,13 +315,13 @@ public final class DigitalSignature {
         xmlSig = fac.newXMLSignature(si, ki);
 
         // detached signature
-      } else if(eq(type, DETT)) {
-        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        // TODO total crap, why do that? throwing away input ... ?
-        inputNode = dbf.newDocumentBuilder().newDocument();
-        signContext = new DOMSignContext(pk, inputNode);
-        xmlSig = fac.newXMLSignature(si, ki);
+//      } else if(eq(type, DETT)) {
+//      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//        dbf.setNamespaceAware(true);
+//        // TODO total crap, why do that? throwing away input ... ?
+//        inputNode = dbf.newDocumentBuilder().newDocument();
+//        signContext = new DOMSignContext(pk, inputNode);
+//        xmlSig = fac.newXMLSignature(si, ki);
 
         // enveloping signature
       } else {
@@ -391,9 +386,6 @@ public final class DigitalSignature {
     try {
 
       final Document doc = toDOMNode(node);
-
-      // TODO with specified namespace? what to change?
-//      final NodeList nl = doc.getElementsByTagName("Signature");
       final DOMValidateContext valContext =
           new DOMValidateContext(new MyKeySelector(), doc);
       valContext.setNode(
@@ -402,22 +394,22 @@ public final class DigitalSignature {
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
       coreVal = signature.validate(valContext);
 
-      if(!coreVal) {
-        System.out.println("Signature failed core validation");
-        boolean sv = signature.getSignatureValue().validate(valContext);
-        System.out.println("signature validation status: " + sv);
-        if(!sv) {
-          // Check the validation status of each Reference.
-          Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
-          for(int j = 0; i.hasNext(); j++) {
-            boolean refValid = ((Reference) i.next()).validate(valContext);
-            System.out.println("ref[" + j + "] validity status: " + refValid);
-          }
-        }
-
-      } else {
-        System.out.println("Signature passed core validation");
-      }
+//      if(!coreVal) {
+//        System.out.println("Signature failed core validation");
+//        boolean sv = signature.getSignatureValue().validate(valContext);
+//        System.out.println("signature validation status: " + sv);
+//        if(!sv) {
+//          // Check the validation status of each Reference.
+//         Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
+//          for(int j = 0; i.hasNext(); j++) {
+//            boolean refValid = ((Reference) i.next()).validate(valContext);
+//            System.out.println("ref[" + j + "] validity status: " + refValid);
+//          }
+//        }
+//
+//      } else {
+//        System.out.println("Signature passed core validation");
+//      }
 
       return Bln.get(coreVal);
 
