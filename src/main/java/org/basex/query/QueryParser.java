@@ -300,7 +300,7 @@ public class QueryParser extends InputParser {
       // parse xquery version
       final String ver = string(stringLiteral());
       if(ver.equals(XQ10)) ctx.xquery3 = false;
-      else if(ver.equals(XQ11) || ver.equals(XQ30)) ctx.xquery3 = true;
+      else if(eq(ver, XQ11, XQ30)) ctx.xquery3 = true;
       else error(XQUERYVER, ver);
     }
     // parse xquery encoding (ignored, as input always comes in as string)

@@ -181,6 +181,8 @@ public interface Text {
 
   /** Localhost. */
   String LOCALHOST = "localhost";
+  /** Localhost IP. */
+  String LOCALIP = "127.0.0.1";
 
   // COMMANDS =================================================================
 

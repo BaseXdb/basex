@@ -346,8 +346,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean yes(final String string) {
-    return YES.equals(string) || TRUE.equals(string) || ON.equals(string) ||
-        INFOOFF.equals(string);
+    return Token.eq(string, YES, TRUE, ON, INFOON);
   }
 
   /**
@@ -356,8 +355,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean no(final String string) {
-    return NO.equals(string) || FALSE.equals(string) || OFF.equals(string) ||
-        INFOON.equals(string);
+    return Token.eq(string, NO, FALSE, OFF, INFOOFF);
   }
 
   /**

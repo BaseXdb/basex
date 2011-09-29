@@ -2,6 +2,7 @@ package org.basex.gui.view;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -14,13 +15,15 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.StringTokenizer;
+
 import org.basex.gui.AGUI;
 import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -386,7 +389,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
       final StringTokenizer st = new StringTokenizer(cnstr);
       while(st.hasMoreTokens()) {
         final String t = st.nextToken();
-        if(t.equals("H") || t.equals("V")) {
+        if(Token.eq(t, "H", "V")) {
           l[lvl + 1] = new ViewAlignment(t.equals("H"));
           if(layout == null) {
             layout = l[0];
