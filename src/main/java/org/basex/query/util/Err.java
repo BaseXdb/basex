@@ -813,7 +813,15 @@ public enum Err {
   /** CX998: Encoding not supported. */
   CRYPTONOTSUPP(CX, 998, "Operation not (yet) supported."),
   /** CX997: Encoding not supported. */
-  CRYPTOSYMERR(CX, 997, "Algorithm not compatible with encryption type.");
+  CRYPTOSYMERR(CX, 997, "Algorithm not compatible with encryption type."),
+  /** CX996: Encoding not supported. */
+  CRYPTOIOEXC(CX, 996, "IO Exception."),
+  /** CX995: Encoding not supported. */
+  CRYPTOKSEXC(CX, 995, "Keystore exception."),
+  /** CX994: Signature Exception. */
+  CRYPTOSIGEXC(CX, 994, "Signature exception."),
+  /** CX993: Signature Exception. */
+  CRYPTOALGEXC(CX, 993, "Invalid algorithm.");
 
   /** Error type. */
   public final ErrType type;

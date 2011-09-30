@@ -105,17 +105,17 @@ public final class Encryption {
         t = decrypt(in, k, a, ivl);
 
     } catch(NoSuchPaddingException e) {
-      CRYPTONOPAD.thrw(input, e);
+      CRYPTONOPAD.thrw(input, in);
     } catch(BadPaddingException e) {
-      CRYPTOBADPAD.thrw(input, e);
+      CRYPTOBADPAD.thrw(input, in);
     } catch(NoSuchAlgorithmException e) {
-      CRYPTOINVALGO.thrw(input, e);
+      CRYPTOINVALGO.thrw(input, a);
     } catch(InvalidKeyException e) {
-      CRYPTOKEYINV.thrw(input, e);
+      CRYPTOKEYINV.thrw(input, k);
     } catch(IllegalBlockSizeException e) {
-      CRYPTOILLBLO.thrw(input, e);
+      CRYPTOILLBLO.thrw(input, in);
     } catch(InvalidAlgorithmParameterException e) {
-      e.printStackTrace();
+      CRYPTOINVALGO.thrw(input, a);
     }
 
     return Str.get(t);

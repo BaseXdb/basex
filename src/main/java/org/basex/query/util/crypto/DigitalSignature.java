@@ -217,6 +217,9 @@ public final class DigitalSignature {
         String ksURI = null;
 
         final Document ceDOM = toDOMNode(ce);
+        if(!ceDOM.getDocumentElement().getNodeName().
+            equals("digital-certificate"))
+          CRYPTOINVNM.thrw(input, ceDOM);
         final NodeList ceChilds = ceDOM.getDocumentElement().getChildNodes();
         final int s = ceChilds.getLength();
         int ci = 0;
@@ -238,6 +241,9 @@ public final class DigitalSignature {
 
         // initialize the keystore
         KeyStore ks = KeyStore.getInstance(ksTY);
+
+        if(ks == null) CRYPTOKSNULL.thrw(input, ks);
+
         ks.load(new FileInputStream(ksURI), ksPW.toCharArray());
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
         final X509Certificate x509ce = (X509Certificate)
@@ -345,30 +351,30 @@ public final class DigitalSignature {
       xmlSig.sign(signContext);
       signedNode = toDBNode(inputNode);
 
-    } catch(NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    } catch(InvalidAlgorithmParameterException e) {
-      e.printStackTrace();
-    } catch(KeyException e) {
-      e.printStackTrace();
-    } catch(MarshalException e) {
-      e.printStackTrace();
-    } catch(XMLSignatureException e) {
-      e.printStackTrace();
-    } catch(SAXException e) {
-      e.printStackTrace();
-    } catch(IOException e) {
-      e.printStackTrace();
-    } catch(ParserConfigurationException e) {
-      e.printStackTrace();
-    } catch(KeyStoreException e) {
-      e.printStackTrace();
-    } catch(CertificateException e) {
-      e.printStackTrace();
-    } catch(UnrecoverableKeyException e) {
-      e.printStackTrace();
     } catch(XPathExpressionException e) {
-      e.printStackTrace();
+      CRYPTOXPINV.thrw(input, e);
+    } catch(SAXException e) {
+      CRYPTOIOEXC.thrw(input, e);
+    } catch(IOException e) {
+      CRYPTOIOEXC.thrw(input, e);
+    } catch(ParserConfigurationException e) {
+      CRYPTOIOEXC.thrw(input, e);
+    } catch(KeyStoreException e) {
+      CRYPTOKSEXC.thrw(input, e);
+    } catch(MarshalException e) {
+      CRYPTOSIGEXC.thrw(input, e);
+    } catch(XMLSignatureException e) {
+      CRYPTOSIGEXC.thrw(input, e);
+    } catch(NoSuchAlgorithmException e) {
+      CRYPTOALGEXC.thrw(input, e);
+    } catch(CertificateException e) {
+      CRYPTOALGEXC.thrw(input, e);
+    } catch(UnrecoverableKeyException e) {
+      CRYPTONOKEY.thrw(input, e);
+    } catch(KeyException e) {
+      CRYPTONOKEY.thrw(input, e);
+    } catch(InvalidAlgorithmParameterException e) {
+      CRYPTOALGEXC.thrw(input, e);
     }
 
     return signedNode;
