@@ -140,7 +140,9 @@ import org.basex.util.XMLToken;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.FTUnit;
 import org.basex.util.ft.Language;
+import org.basex.util.ft.Stemmer;
 import org.basex.util.ft.StopWords;
+import org.basex.util.ft.Tokenizer;
 import org.basex.util.hash.TokenSet;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
@@ -298,7 +300,7 @@ public class QueryParser extends InputParser {
       // parse xquery version
       final String ver = string(stringLiteral());
       if(ver.equals(XQ10)) ctx.xquery3 = false;
-      else if(ver.equals(XQ11) || ver.equals(XQ30)) ctx.xquery3 = true;
+      else if(eq(ver, XQ11, XQ30)) ctx.xquery3 = true;
       else error(XQUERYVER, ver);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
@@ -376,10 +378,9 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(NSPACE)) {
           namespaceDecl();
         } else if(wsConsumeWs(FTOPTION)) {
-          final FTOpt opt = new FTOpt();
-          while(ftMatchOption(opt))
-            ;
-          ctx.ftopt.init(opt);
+          final FTOpt fto = new FTOpt();
+          while(ftMatchOption(fto));
+          ctx.ftopt.init(fto);
         } else {
           qp = p;
           return;
@@ -2839,8 +2840,10 @@ public class QueryParser extends InputParser {
     while(ftMatchOption(fto)) found = true;
 
     // check if specified language is not available
-    if(!Language.supported(fto.ln, fto.is(ST) && fto.sd == null)) error(
-        Err.FTLAN, fto.ln);
+    if(fto.ln == null) fto.ln = Language.def();
+    if(!Tokenizer.supportFor(fto.ln)) error(Err.FTNOTOK, fto.ln);
+    if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln))
+      error(Err.FTNOSTEM, fto.ln);
 
     // consume weight option
     if(wsConsumeWs(WEIGHT)) expr = new FTWeight(input(), expr,
@@ -2983,7 +2986,7 @@ public class QueryParser extends InputParser {
       if(opt.ln != null) error(FTDUP, LANGUAGE);
       final byte[] lan = stringLiteral();
       opt.ln = Language.get(string(lan));
-      if(opt.ln == null) error(FTLAN, lan);
+      if(opt.ln == null) error(FTNOTOK, lan);
     } else if(wsConsumeWs(OPTION)) {
       optionDecl();
     } else {

@@ -43,6 +43,8 @@ public class BufferInput extends InputStream {
   private long length;
   /** Number of read bytes. */
   private int read;
+  /** Marker. */
+  private int mark;
 
   /**
    * Initializes the file reader.
@@ -59,7 +61,16 @@ public class BufferInput extends InputStream {
    * @param is input stream
    */
   public BufferInput(final InputStream is) {
-    buffer = new byte[IO.BLOCKSIZE];
+    this(is, IO.BLOCKSIZE);
+  }
+
+  /**
+   * Initializes the file reader.
+   * @param is input stream
+   * @param bs buffer size
+   */
+  public BufferInput(final InputStream is, final int bs) {
+    buffer = new byte[bs];
     in = is;
   }
 
@@ -216,6 +227,22 @@ public class BufferInput extends InputStream {
    */
   public final void length(final long l) {
     length = l;
+  }
+
+  @Override
+  public final boolean markSupported() {
+    return read < buffer.length;
+  }
+
+  @Override
+  public synchronized void mark(final int m) {
+    mark = pos;
+  }
+
+  @Override
+  public final synchronized void reset() {
+    read = mark;
+    pos = mark;
   }
 
   /**

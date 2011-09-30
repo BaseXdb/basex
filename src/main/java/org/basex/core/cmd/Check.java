@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.basex.build.DirParser;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -77,7 +78,7 @@ public final class Check extends Command {
         io.date() == in.date();
       if(found && ctx.perm(User.READ, data.meta)) return data;
       Close.close(data, ctx);
-      if(found) throw new IOException(Util.info(PERMNO, CmdPerm.READ));
+      if(found) throw new BaseXException(PERMNO, CmdPerm.READ);
     }
 
     // choose OPEN if user has no create permissions, or if database exists

@@ -25,12 +25,56 @@ public final class Reflect {
   private Reflect() { }
 
   /**
-   * Checks if the specified package is available.
-   * @param pack package name
+   * Checks if the class specified by the pattern is available.
+   * @param pattern class pattern
+   * @param ext optional extension
    * @return result of check
    */
-  public static boolean available(final String pack) {
-    return Package.getPackage(pack) != null;
+  public static boolean available(final String pattern, final Object... ext) {
+    try {
+      Class.forName(Util.info(pattern, ext));
+      return true;
+    } catch(final ClassNotFoundException ex) {
+      return false;
+    }
+  }
+
+  /**
+   * Returns a class reference to the specified class, or {@code null}.
+   * @param name class name
+   * @return reference, or {@code null} if the class is not found
+   */
+  public static Class<?> find(final String name) {
+    Class<?> c = classes.get(name);
+    try {
+      if(c == null) {
+        try {
+          c = Class.forName(name);
+          classes.put(name, c);
+          return c;
+        } catch(final ClassNotFoundException ex) {
+          if(jarLoader != null) {
+            c = Class.forName(name, true, jarLoader);
+            classes.put(name, c);
+          }
+          return c;
+        }
+      }
+      return c;
+    } catch(final Exception ex) {
+    }
+    return null;
+  }
+
+
+  /**
+   * Returns a reference to the class specified by the pattern, or {@code null}.
+   * @param pattern class pattern
+   * @param ext optional extension
+   * @return reference, or {@code null} if the class is not found
+   */
+  public static Class<?> find(final String pattern, final Object... ext) {
+    return find(Util.info(pattern, ext));
   }
 
   /**
@@ -38,26 +82,10 @@ public final class Reflect {
    * @param names class names
    * @return reference, or {@code null} if the class is not found
    */
-  public static Class<?> find(final String... names) {
+  public static Class<?> find(final String[] names) {
     for(final String n : names) {
-      Class<?> c = classes.get(n);
-      try {
-        if(c == null) {
-          try {
-            c = Class.forName(n);
-            classes.put(n, c);
-            return c;
-          } catch (final ClassNotFoundException ex) {
-            if(jarLoader != null) {
-              c = Class.forName(n, true, jarLoader);
-              classes.put(n, c);
-            }
-            return c;
-          }
-        }
-        return c;
-      } catch(final Exception ex) {
-      }
+      final Class<?> c = find(n);
+      if(c != null) return c;
     }
     return null;
   }

@@ -370,7 +370,7 @@ public final class FNSql extends FuncCall {
       }
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
-    } catch(final IllegalArgumentException e) {
+    } catch(final IllegalArgumentException ex) {
       throw ILLFORMAT.thrw(input, string(paramType));
     }
   }

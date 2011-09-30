@@ -1,5 +1,6 @@
 package org.basex.api.dom;
 
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.DocumentType;
@@ -43,7 +44,7 @@ public final class BXDomImpl implements DOMImplementation {
 
   @Override
   public boolean hasFeature(final String f, final String v) {
-    return "XML".equalsIgnoreCase(f) && (v == null || v.isEmpty() ||
-        v.equals("1.0") || v.equals("2.0") || v.equals("3.0"));
+    return "XML".equalsIgnoreCase(f) && (v == null ||
+        Token.eq(v, "", "1.0", "2.0", "3.0"));
   }
 }

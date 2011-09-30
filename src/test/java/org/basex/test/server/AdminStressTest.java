@@ -113,8 +113,8 @@ public final class AdminStressTest {
         startSignal.await();
         session.execute(cmd);
         session.close();
-      } catch(final Exception e) {
-        e.printStackTrace();
+      } catch(final Exception ex) {
+        ex.printStackTrace();
       } finally {
         stopSignal.countDown();
       }

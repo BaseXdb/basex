@@ -518,6 +518,27 @@ public abstract class SessionTest {
     for(final Query query : cqs) query.close();
   }
 
+  /** Binds maps to external variables via JSON.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindJson() throws IOException {
+    final String var = "declare variable $x external;",
+        map = "{\"foo\":[1,2,3],\"bar\":{\"a\":null,\"\":false}}";
+    final String[][] tests = {
+        {"for $k in map:keys($x) order by $k descending return $k", "foo bar"},
+        {"every $k in map:keys($x('foo')) satisfies $k eq $x('foo')($k)",
+          "true"},
+        {"empty($x('bar')('a')) and not($x('bar')(''))", "true"},
+    };
+    for(final String[] test : tests) {
+      final Query q = session.query(var + test[0]);
+      try {
+        q.bind("$x", map, "json");
+        check(test[1], q.execute());
+      } finally { q.close(); }
+    }
+  }
+
   /**
    * Checks if the most recent output equals the specified string.
    * @param exp expected string

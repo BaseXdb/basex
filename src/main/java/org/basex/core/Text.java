@@ -181,6 +181,8 @@ public interface Text {
 
   /** Localhost. */
   String LOCALHOST = "localhost";
+  /** Localhost IP. */
+  String LOCALIP = "127.0.0.1";
 
   // COMMANDS =================================================================
 
@@ -516,8 +518,10 @@ public interface Text {
   String SKIPINFO = lang("pc_skipinfo");
   /** Missing database name. */
   String DBWHICH = lang("pc_dbnf");
-  /** Language not supported. */
-  String LANGWHICH = lang("pc_langnf");
+  /** No tokenizer found. */
+  String NOTOK = lang("pc_notok");
+  /** No stemmer found. */
+  String NOSTEM = lang("pc_nostem");
   /** Points to a directory. */
   String DIRERR = lang("pc_direrr");
 

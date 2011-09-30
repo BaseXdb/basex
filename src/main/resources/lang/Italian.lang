@@ -360,7 +360,8 @@ pc_pathnf=Documento o cartella non trovati.
 pc_skipped=Skipped
 pc_skipinfo=% more file(s) skipped
 pc_dbnf=Inserisci un nome per la base di dati.
-pc_langnf=Language '%' not supported.
+pc_notok=No tokenizer available for language "%".
+pc_nostem=No stemmer available for language "%".
 pc_err="%" non può essere analizzato.
 pc_pos="%" (Linea %)
 pc_direrr="%" points to a directory.
@@ -391,6 +392,7 @@ db_notdeleted=Il documento '%' non può essere cancellato.
 db_exists=La base di dati '%' esiste già.
 db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
+db_notstored=File '%' could not be stored.
 
 # Index commands
 in_created=Indici '%' creati in %.

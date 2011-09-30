@@ -81,7 +81,7 @@ public final class Prop extends AProp {
   public static final Object[] XQUERY3 = { "XQUERY3", true };
 
   /** Use internal XML parser. */
-  public static final Object[] INTPARSE = { "INTPARSE", false };
+  public static final Object[] INTPARSE = { "INTPARSE", true };
   /** Flag for parsing DTDs in internal parser. */
   public static final Object[] DTD = { "DTD", false };
   /** Path to XML Catalog file. */
@@ -126,7 +126,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", "EN" };
+  public static final Object[] LANGUAGE = { "LANGUAGE", "en" };
   /** Flag for full-text scoring algorithm.
       Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };
@@ -136,7 +136,7 @@ public final class Prop extends AProp {
   public static final Object[] LSERROR = { "LSERROR", 0 };
 
   /** Maximum number of index occurrences to print. */
-  public static final Object[] MAXSTAT = { "MAXSTAT", 15 };
+  public static final Object[] MAXSTAT = { "MAXSTAT", 30 };
   /** Flag for tail-call optimization. */
   public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
 

@@ -360,7 +360,8 @@ pc_pathnf=Tệp hay thư mục không tìm thấy.
 pc_skipped=Skipped
 pc_skipinfo=% more file(s) skipped
 pc_dbnf=Xin nhập vào tên cơ sở dữ liệu.
-pc_langnf=Language '%' not supported.
+pc_notok=No tokenizer available for language "%".
+pc_nostem=No stemmer available for language "%".
 pc_err="%" không thể phân tích.
 pc_pos="%" (Dòng %)
 pc_direrr="%" points to a directory.
@@ -391,6 +392,7 @@ db_notdeleted=File '%' could not be deleted.
 db_exists=Cơ sở dữ liệu '%' đã có rồi
 db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
+db_notstored=File '%' could not be stored.
 
 # Index commands
 in_created=Index '%' được tạo ở %.

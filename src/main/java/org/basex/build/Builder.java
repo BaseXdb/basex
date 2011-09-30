@@ -218,7 +218,7 @@ public abstract class Builder extends Progress {
    * @param enc encoding
    */
   public final void encoding(final String enc) {
-    meta.encoding = enc.equals(UTF8) || enc.equals(UTF82) ? UTF8 : enc;
+    meta.encoding = eq(enc, UTF8, UTF82) ? UTF8 : enc;
   }
 
   // PROGRESS INFORMATION =====================================================

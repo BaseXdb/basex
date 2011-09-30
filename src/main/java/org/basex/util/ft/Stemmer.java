@@ -3,6 +3,8 @@ package org.basex.util.ft;
 import java.util.Collections;
 import java.util.LinkedList;
 
+import org.basex.util.Util;
+
 /**
  * Implementation of common stemmer methods.
  *
@@ -11,7 +13,7 @@ import java.util.LinkedList;
  */
 public abstract class Stemmer extends LanguageImpl {
   /** List of available stemmers. */
-  public static final LinkedList<Stemmer> IMPL = new LinkedList<Stemmer>();
+  static final LinkedList<Stemmer> IMPL = new LinkedList<Stemmer>();
 
   /** Load stemmers and order them by precedence. */
   static {
@@ -46,19 +48,29 @@ public abstract class Stemmer extends LanguageImpl {
   }
 
   /**
+   * Checks if the language is supported by the available stemmers.
+   * @param l language to be found
+   * @return result of check
+   */
+  public static boolean supportFor(final Language l) {
+    for(final Stemmer s : Stemmer.IMPL) if(s.supports(l)) return true;
+    return false;
+  }
+
+  /**
    * Factory method.
    * @param l language
    * @param fti full-text iterator
-   * @return span processor
+   * @return stemmer
    */
   abstract Stemmer get(final Language l, final FTIterator fti);
 
   /**
-   * Stem a word.
+   * Stems a word.
    * @param word input word to stem
    * @return the stem of the word
    */
-  abstract byte[] stem(final byte[] word);
+  protected abstract byte[] stem(final byte[] word);
 
   @Override
   public final Stemmer init(final byte[] txt) {
@@ -76,10 +88,15 @@ public abstract class Stemmer extends LanguageImpl {
     final FTSpan s = iter.next();
     s.text = stem(s.text);
     return s;
-  };
+  }
 
   @Override
   public final byte[] nextToken() {
     return stem(iter.nextToken());
-  };
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this).replace("Stemmer", "");
+  }
 }

@@ -360,7 +360,8 @@ pc_pathnf=Fichier ou dossier introuvable.
 pc_skipped=Skipped
 pc_skipinfo=% more file(s) skipped
 pc_dbnf=Entrer un nom de base de données.
-pc_langnf=Language '%' not supported.
+pc_notok=No tokenizer available for language "%".
+pc_nostem=No stemmer available for language "%".
 pc_err="%" n'a pu être parsé.
 pc_pos="%" (ligne %)
 pc_direrr="%" points to a directory.
@@ -391,6 +392,7 @@ db_notdeleted=Impossible de supprimer le fichier '%'.
 db_exists=La base de données '%' existe déjà.
 db_backdrop=Backup files '%' were dropped.
 db_backnf=No backup found for '%'.
+db_notstored=File '%' could not be stored.
 
 # Index commands
 in_created=Index '%' créé dans %.

@@ -218,10 +218,10 @@ public final class Token {
    */
   public static String normEncoding(final String encoding, final String old) {
     final String e = encoding.toUpperCase();
-    if(e.equals(UTF8) || e.equals(UTF82)) return UTF8;
+    if(eq(e, UTF8, UTF82)) return UTF8;
     if(e.equals(UTF16BE)) return UTF16BE;
     if(e.equals(UTF16LE)) return UTF16LE;
-    if(e.equals(UTF16) || e.equals(UTF162))
+    if(eq(e, UTF16, UTF162))
       return old == UTF16BE || old == UTF16LE ? old : UTF16BE;
     return encoding;
   }
@@ -642,10 +642,21 @@ public final class Token {
    * Compares several tokens for equality.
    * @param token token
    * @param tokens tokens to be compared
-   * @return true if the arrays are equal
+   * @return true if one test is successful
    */
   public static boolean eq(final byte[] token, final byte[]... tokens) {
     for(final byte[] t : tokens) if(eq(token, t)) return true;
+    return false;
+  }
+
+  /**
+   * Compares several strings for equality.
+   * @param str first string
+   * @param strings strings to be compared
+   * @return true if one test is successful
+   */
+  public static boolean eq(final String str, final String... strings) {
+    for(final String s : strings) if(str.equals(s)) return true;
     return false;
   }
 

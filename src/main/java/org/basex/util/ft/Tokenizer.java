@@ -23,9 +23,19 @@ public abstract class Tokenizer extends LanguageImpl {
   }
 
   /**
+   * Checks if the language is supported by the available tokenizers.
+   * @param l language to be found
+   * @return result of check
+   */
+  public static boolean supportFor(final Language l) {
+    for(final Tokenizer t : Tokenizer.IMPL) if(t.supports(l)) return true;
+    return false;
+  }
+
+  /**
    * Factory method.
    * @param f full-text options
-   * @return tokenizer instance
+   * @return tokenizer
    */
   abstract Tokenizer get(final FTOpt f);
 

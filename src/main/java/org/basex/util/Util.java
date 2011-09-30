@@ -148,12 +148,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    if(obj instanceof Exception) {
-      final Exception ex = (Exception) obj;
-      err(message(ex) + NL, ext);
-    } else {
-      err(obj + NL, ext);
-    }
+    err((obj instanceof Exception ? message((Exception) obj) : obj) + NL, ext);
   }
 
   /**
@@ -213,8 +208,8 @@ public final class Util {
   }
 
   /**
-   * Returns a string and replaces all % characters by the specified extensions.
-   * See {@link TokenBuilder#addExt} for details.
+   * Returns a string and replaces all % characters by the specified extensions
+   * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended
    * @param ext text text extensions
    * @return extended string
@@ -224,8 +219,8 @@ public final class Util {
   }
 
   /**
-   * Returns a token and replaces all % characters by the specified extensions.
-   * (see {@link TokenBuilder#addExt} for details.
+   * Returns a token and replaces all % characters by the specified extensions
+   * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended
    * @param ext text text extensions
    * @return token
@@ -351,8 +346,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean yes(final String string) {
-    return YES.equals(string) || TRUE.equals(string) || ON.equals(string) ||
-        INFOOFF.equals(string);
+    return Token.eq(string, YES, TRUE, ON, INFOON);
   }
 
   /**
@@ -361,8 +355,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean no(final String string) {
-    return NO.equals(string) || FALSE.equals(string) || OFF.equals(string) ||
-        INFOON.equals(string);
+    return Token.eq(string, NO, FALSE, OFF, INFOOFF);
   }
 
   /**

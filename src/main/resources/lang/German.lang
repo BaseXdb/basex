@@ -360,7 +360,8 @@ pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_skipped=Übersprungen
 pc_skipinfo=% weitere Datei(en) übersprungen
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
-pc_langnf=Sprache '%' wird nicht unterstützt.
+pc_notok=Kein Tokenizer für die Sprache "%" verfügbar.
+pc_nostem=Kein Stemmer für die Sprache "%" verfügbar.
 pc_err="%" konnte nicht eingelesen werden.
 pc_pos="%" (Zeile %)
 pc_direrr="%" verweist auf ein Verzeichnis.
@@ -391,6 +392,7 @@ db_notdeleted=Die Datei '%' konnte nicht gelöscht werden.
 db_exists=Die Datenbank '%' existiert schon.
 db_backdrop=Backup-Dateien '%' wurden gelöscht.
 db_backnf=Kein Backup wurde für '%' gefunden.
+db_notstored=Die Datei '%' konnte nicht gespeichert werden.
 
 # Index commands
 in_created=Index '%' erzeugt (%).

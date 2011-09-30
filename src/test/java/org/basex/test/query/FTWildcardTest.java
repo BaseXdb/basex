@@ -58,18 +58,18 @@ public class FTWildcardTest {
     for(final String wc : VALIDWC)
       try {
         new FTWildcard(token(wc), null);
-      } catch(final Exception e) {
-        e.printStackTrace();
+      } catch(final Exception ex) {
+        ex.printStackTrace();
         fail("Parsing failed: " + wc);
       }
 
     for(final String wc : INVALIDWC)
       try {
         new FTWildcard(token(wc), null);
-        fail("Parsing did NOT failed: " + wc);
-      } catch(final QueryException e) {
-      } catch(final Exception e) {
-        e.printStackTrace();
+        fail("Parsing did NOT fail: " + wc);
+      } catch(final QueryException ex) {
+      } catch(final Exception ex) {
+        ex.printStackTrace();
         fail("Error while parsing: " + wc);
       }
   }
@@ -86,15 +86,15 @@ public class FTWildcardTest {
       final FTWildcard wc = new FTWildcard(token(q), null);
 
       final String[] good = TEXTS_GOOD[i];
-      for(int j = 0; j < good.length; j++) {
-        assertTrue("\"" + q + "\" did NOT match \"" + good[j] + "\"",
-            wc.match(token(good[j])));
+      for(final String element : good) {
+        assertTrue("\"" + q + "\" did NOT match \"" + element + "\"",
+            wc.match(token(element)));
       }
 
       final String[] bad = TEXTS_BAD[i];
-      for(int j = 0; j < bad.length; j++) {
-        assertFalse("\"" + q + "\" matched \"" + bad[j] + "\"",
-            wc.match(token(bad[j])));
+      for(final String element : bad) {
+        assertFalse("\"" + q + "\" matched \"" + element + "\"",
+            wc.match(token(element)));
       }
     }
   }

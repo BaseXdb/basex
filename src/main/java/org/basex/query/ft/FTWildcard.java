@@ -34,64 +34,44 @@ public class FTWildcard {
    */
   public FTWildcard(final byte[] query, final InputInfo ii)
       throws QueryException {
-    this(cps(query), ii);
-  }
 
-  /**
-   * Check if the wild-card can match a sub-string in a string.
-   * @param t token to search for match
-   * @return <code>true</code> if a match is found
-   */
-  public boolean match(final byte[] t) {
-    return match(cps(t), 0, 0);
-  }
-
-  /**
-   * Parse a given wild-card query token.
-   * @param q query token
-   * @param ii input info
-   * @throws QueryException {@link org.basex.query.util.Err#FTREG}, if the wild
-   * card expression is not valid
-   */
-  private FTWildcard(final int[] q, final InputInfo ii)
-      throws QueryException {
-
+    final int[] q = cps(query);
     final int[] tmpwc = new int[q.length];
     final int[] tmpmin = new int[q.length];
     final int[] tmpmax = new int[q.length];
 
     int pos = -1;
-    int ql = 0;
-    while(ql < q.length) {
+    final int ql = q.length;
+    for(int qi = 0; qi < ql;) {
       // parse wildcards
-      if(q[ql] == '.') {
-        int c = ++ql < q.length ? q[ql] : 0;
+      if(q[qi] == '.') {
+        int c = ++qi < ql ? q[qi] : 0;
         // minimum/maximum number of occurrence
         int n = 0;
         int m = Integer.MAX_VALUE;
         if(c == '?') { // .?
-          ++ql;
+          ++qi;
           m = 1;
         } else if(c == '*') { // .*
-          ++ql;
+          ++qi;
         } else if(c == '+') { // .+
-          ++ql;
+          ++qi;
           n = 1;
         } else if(c == '{') { // .{m,n}
           m = 0;
           while(true) {
-            c = ++ql < q.length ? q[ql] : 0;
+            c = ++qi < ql ? q[qi] : 0;
             if(c >= '0' && c <= '9') n = (n << 3) + (n << 1) + c - '0';
             else if(c == ',') break;
-            else FTREG.thrw(ii, q);
+            else FTREG.thrw(ii, query);
           }
           while(true) {
-            c = ++ql < q.length ? q[ql] : 0;
+            c = ++qi < ql ? q[qi] : 0;
             if(c >= '0' && c <= '9') m = (m << 3) + (m << 1) + c - '0';
             else if(c == '}') break;
-            else FTREG.thrw(ii, q);
+            else FTREG.thrw(ii, query);
           }
-          ++ql;
+          ++qi;
         } else { // .
           m = 1;
           n = 1;
@@ -100,8 +80,8 @@ public class FTWildcard {
         tmpmax[pos] = m;
         tmpwc[pos] = DOT;
       } else {
-        if(q[ql] == '\\' && ++ql == q.length) FTREG.thrw(ii, q);
-        tmpwc[++pos] = q[ql++];
+        if(q[qi] == '\\' && ++qi == ql) FTREG.thrw(ii, query);
+        tmpwc[++pos] = q[qi++];
       }
     }
 
@@ -119,26 +99,36 @@ public class FTWildcard {
   /**
    * Check if the wild-card can match a sub-string in a string.
    * @param t token to search for match
+   * @return {@code true} if a match is found
+   */
+  public boolean match(final byte[] t) {
+    return match(cps(t), 0, 0);
+  }
+
+  /**
+   * Check if the wild-card can match a sub-string in a string.
+   * @param t token to search for match
    * @param tp input position
    * @param qp query position
-   * @return <code>true</code> if a match is found
+   * @return {@code true} if a match is found
    */
   private boolean match(final int[] t, final int tp, final int qp) {
-    int ql = qp;
-    int tl = tp;
-    while(ql < wc.length) {
-      if(wc[ql] == DOT) {
-        int n = min[ql];
-        final int m = max[ql++];
+    int qi = qp;
+    int ti = tp;
+    final int tl = t.length;
+    final int wl = wc.length;
+    while(qi < wl) {
+      if(wc[qi] == DOT) {
+        int n = min[qi];
+        final int m = max[qi++];
         // recursively evaluates wildcards (non-greedy)
-        while(!match(t, tl + n, ql))
-          if(tl + ++n > t.length) return false;
+        while(!match(t, ti + n, qi)) if(ti + ++n > tl) return false;
         if(n > m) return false;
-        tl += n;
+        ti += n;
       } else {
-        if(tl >= t.length || t[tl++] != wc[ql++]) return false;
+        if(ti >= tl || t[ti++] != wc[qi++]) return false;
       }
     }
-    return tl == t.length;
+    return ti == tl;
   }
 }

@@ -12,7 +12,7 @@ set VM=-Xmx512m
 
 REM Classpath
 set LIB=%PWD%/../lib
-set CP=%BASEX%;%LIB%/lucene-analyzers-3.0.2.jar;%LIB%/tagsoup-1.2.jar;%LIB%/snowball.jar
+set CP=%BASEX%;%LIB%/lucene-stemmers-3.4.0.jar;%LIB%/xml-resolver-1.2.jar;%LIB%/tagsoup-1.2.jar
 
 REM Run code
 java -cp "%CP%" %VM% org.basex.BaseX %*

@@ -300,7 +300,9 @@ public enum Err {
   /** FTST0008: Parsing exception. */
   NOSTOPFILE(FTST, 8, "Stop word file not found: \"%\"."),
   /** FTST0009: Parsing exception. */
-  FTLAN(FTST, 9, "Language '%' not supported."),
+  FTNOSTEM(FTST, 9, "No stemmer available for language '%'."),
+  /** FTST0009: Parsing exception. */
+  FTNOTOK(FTST, 9, "No tokenizer available for language '%'."),
   /** FTST0018: Parsing exception. */
   NOTHES(FTST, 18, "Thesaurus not found: \"%\"."),
   /** FTST0019: Parsing exception. */

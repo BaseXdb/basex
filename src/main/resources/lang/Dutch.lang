@@ -360,7 +360,8 @@ pc_pathnf=Bestand of folder niet gevonden.
 pc_skipped=Skipped
 pc_skipinfo=% more file(s) skipped
 pc_dbnf=Geef de database een naam.
-pc_langnf=Taal '%' wordt niet ondersteund.
+pc_notok=No tokenizer available for language "%".
+pc_nostem=No stemmer available for language "%".
 pc_err="%" voldoet niet aan de grammatica.
 pc_pos="%" (Regel %)
 pc_direrr="%" points to a directory.
@@ -391,6 +392,7 @@ db_notdeleted=Bestand '%' kon niet verwijderd worden.
 db_exists=Database bestaat '%' al.
 db_backdrop=Backup bestanden '%' zijn verwijderd.
 db_backnf=Geen backup gevonden voor '%'.
+db_notstored=File '%' could not be stored.
 
 # Index commands
 in_created=Index '%' in % seconden gemaakt.

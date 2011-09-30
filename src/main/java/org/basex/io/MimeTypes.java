@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLConnection;
 import java.util.HashMap;
 import org.basex.util.Util;
 
@@ -32,23 +31,17 @@ public final class MimeTypes {
   private MimeTypes() { }
 
   /**
-   * Returns the mime type for the specified file path.
-   * application/octet-stream is returned if no type is found.
+   * Returns the mime type for the suffix of the specified file path.
+   * {@code application/octet-stream} is returned if no type is found.
    * @param path path to be checked
    * @return mime-type
    */
   public static String get(final String path) {
-    // check if file suffix exists
     final int i = path.lastIndexOf('.');
     if(i != -1) {
-      // get Java's content-type
-      String ct = URLConnection.getFileNameMap().getContentTypeFor(path);
-      // try static list
-      if(ct == null) ct = MimeTypes.TYPES.get(path.substring(i + 1));
-      // return found type
+      final String ct = MimeTypes.TYPES.get(path.substring(i + 1));
       if(ct != null) return ct;
     }
-    // return default type
     return APP_OCTET;
   }
 
