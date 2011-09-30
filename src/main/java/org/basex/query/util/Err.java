@@ -796,6 +796,8 @@ public enum Err {
   CRYPTOINVHASH(CX, 13, "Hashing algorithm is not supported."),
   /** CX14: Encoding not supported. */
   CRYPTOENC(CX, 14, "The encoding method is not supported."),
+  /** CX15: Encoding not supported. */
+  CRYPTONOSIG(CX, 15, "Cannot find signature element."),
   /** CX16: Encoding not supported. */
   CRYPTONOPAD(CX, 16, "No such padding."),
   /** CX17: Encoding not supported. */

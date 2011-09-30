@@ -611,25 +611,21 @@ public enum Function {
   /* FNCrypto functions (EXPath Cryptographic module). */
 
   /** Create message authentication code (HMAC) */
-  HMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR, STR,
-      STR, STR_ZO),
+  CRYPHMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR,
+      STR, STR, STR_ZO),
   /** Encrypt message. */
-  ENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)", STR, STR,
-      STR, STR, STR),
+  CRYPENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)", STR,
+      STR, STR, STR, STR),
   /** Decrypt message. */
-  DECRYPT(FNCrypto.class, "decrypt(string, string, string, string)", STR, STR,
-      STR, STR, STR),
+  CRYPDECRYPT(FNCrypto.class, "decrypt(string, string, string, string)", STR,
+      STR, STR, STR, STR),
   /** Generate signature. */
-//  GENSIG(FNCrypto.class,
-//      "generate-signature" +
-//      "(node,string,string,string,string,string[,string[,node]])",
-//      NOD, -6, NOD, STR, STR, STR, STR, STR),
-  GENSIG(FNCrypto.class,
+  CRYPGENSIG(FNCrypto.class,
       "generate-signature" +
       "(node,string,string,string,string,string[,item][,item])",
       NOD, 6, NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO),
   /** Validate signature. */
-  VALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
+  CRYPVALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
 
   /* FNHttp functions (EXPath). */
 

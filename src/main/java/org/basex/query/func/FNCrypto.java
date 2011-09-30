@@ -36,22 +36,22 @@ public class FNCrypto extends FuncCall {
 
     switch(def) {
 
-      case HMAC:
+      case CRYPHMAC:
         return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],
             ctx), checkStr(expr[2], ctx),
             expr.length == 4 ? checkStr(expr[3], ctx) : null);
 
-      case ENCRYPT:
+      case CRYPENCRYPT:
         return new Encryption(ii).encryption(checkStr(expr[0], ctx),
             checkStr(expr[1], ctx), checkStr(expr[2], ctx),
             checkStr(expr[3], ctx), true);
 
-      case DECRYPT:
+      case CRYPDECRYPT:
         return new Encryption(ii).encryption(checkStr(expr[0], ctx),
             checkStr(expr[1], ctx), checkStr(expr[2], ctx),
             checkStr(expr[3], ctx), false);
 
-      case GENSIG:
+      case CRYPGENSIG:
 
         // determine type of 7th argument
         Item arg6 = null;
@@ -73,7 +73,7 @@ public class FNCrypto extends FuncCall {
               expr.length == 7 && !arg6Str ? checkNode(expr[6].item(ctx, ii)) :
                 null);
 
-      case VALSIG:
+      case CRYPVALSIG:
         return new DigitalSignature(ii).
             validateSignature(checkNode(expr[0].item(ctx, ii)));
 

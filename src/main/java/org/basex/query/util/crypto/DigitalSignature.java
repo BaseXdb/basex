@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.InvalidAlgorithmParameterException;
@@ -385,8 +384,9 @@ public final class DigitalSignature {
    * @param node input node
    *
    * @return true if signature valid
+   * @throws QueryException query exception
    */
-  public Item validateSignature(final ANode node) {
+  public Item validateSignature(final ANode node) throws QueryException {
     boolean coreVal = false;
 
     try {
@@ -394,43 +394,27 @@ public final class DigitalSignature {
       final Document doc = toDOMNode(node);
       final DOMValidateContext valContext =
           new DOMValidateContext(new MyKeySelector(), doc);
-      valContext.setNode(
-          doc.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature").item(0));
+      final NodeList signl = doc.getElementsByTagNameNS(XMLSignature.XMLNS,
+          "Signature");
+      if(signl.getLength() < 1)
+        CRYPTONOSIG.thrw(input, node);
+      valContext.setNode(signl.item(0));
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
       coreVal = signature.validate(valContext);
 
-//      if(!coreVal) {
-//        System.out.println("Signature failed core validation");
-//        boolean sv = signature.getSignatureValue().validate(valContext);
-//        System.out.println("signature validation status: " + sv);
-//        if(!sv) {
-//          // Check the validation status of each Reference.
-//         Iterator<?> i = signature.getSignedInfo().getReferences().iterator();
-//          for(int j = 0; i.hasNext(); j++) {
-//            boolean refValid = ((Reference) i.next()).validate(valContext);
-//            System.out.println("ref[" + j + "] validity status: " + refValid);
-//          }
-//        }
-//
-//      } else {
-//        System.out.println("Signature passed core validation");
-//      }
-
       return Bln.get(coreVal);
 
-    } catch(FileNotFoundException e1) {
-      e1.printStackTrace();
-    } catch(IOException e1) {
-      e1.printStackTrace();
-    } catch(SAXException e) {
-      e.printStackTrace();
-    } catch(ParserConfigurationException e) {
-      e.printStackTrace();
-    } catch(MarshalException e) {
-      e.printStackTrace();
     } catch(XMLSignatureException e) {
-      e.printStackTrace();
+      CRYPTOIOEXC.thrw(input, e);
+    } catch(SAXException e) {
+      CRYPTOIOEXC.thrw(input, e);
+    } catch(ParserConfigurationException e) {
+      CRYPTOIOEXC.thrw(input, e);
+    } catch(IOException e) {
+      CRYPTOIOEXC.thrw(input, e);
+    } catch(MarshalException e) {
+      CRYPTOSIGEXC.thrw(input, e);
     }
 
     return Bln.get(coreVal);
@@ -440,8 +424,9 @@ public final class DigitalSignature {
    * Creates a BaseX database node from the given DOM node.
    * @param n DOM node
    * @return database node
+   * @throws QueryException query exception
    */
-  private static ANode toDBNode(final Node n) {
+  private ANode toDBNode(final Node n) throws QueryException {
     String xmlString = null;
 
     DBNode dbn = null;
@@ -463,7 +448,7 @@ public final class DigitalSignature {
       dbn = new DBNode(mem, 1);
 
     } catch(IOException e) {
-      e.printStackTrace();
+      CRYPTOIOEXC.thrw(input, e);
     } catch(TransformerException e) {
       e.printStackTrace();
     }

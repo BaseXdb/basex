@@ -105,17 +105,17 @@ public final class Encryption {
         t = decrypt(in, k, a, ivl);
 
     } catch(NoSuchPaddingException e) {
-      CRYPTONOPAD.thrw(input, in);
+      CRYPTONOPAD.thrw(input, e);
     } catch(BadPaddingException e) {
-      CRYPTOBADPAD.thrw(input, in);
+      CRYPTOBADPAD.thrw(input, e);
     } catch(NoSuchAlgorithmException e) {
-      CRYPTOINVALGO.thrw(input, a);
+      CRYPTOINVALGO.thrw(input, e);
     } catch(InvalidKeyException e) {
-      CRYPTOKEYINV.thrw(input, k);
+      CRYPTOKEYINV.thrw(input, e);
     } catch(IllegalBlockSizeException e) {
-      CRYPTOILLBLO.thrw(input, in);
+      CRYPTOILLBLO.thrw(input, e);
     } catch(InvalidAlgorithmParameterException e) {
-      CRYPTOINVALGO.thrw(input, a);
+      CRYPTOINVALGO.thrw(input, e);
     }
 
     return Str.get(t);
@@ -213,7 +213,7 @@ public final class Encryption {
     if(ALGHMAC.id(a) == 0)
       CRYPTOINVHASH.thrw(input, a);
 
-    final boolean b64 = eq(lc(enc), BASE64);
+    final boolean b64 = eq(lc(enc), BASE64) || enc.length == 0;
     if(!b64 && !eq(lc(enc), HEX))
       CRYPTOENC.thrw(input, enc);
 
@@ -223,14 +223,13 @@ public final class Encryption {
       hash = mac.doFinal(msg);
 
     } catch(NoSuchAlgorithmException e) {
-      CRYPTOINVHASH.thrw(input, a);
+      CRYPTOINVHASH.thrw(input, e);
     } catch(InvalidKeyException e) {
-      CRYPTOKEYINV.thrw(input, k);
+      CRYPTOKEYINV.thrw(input, e);
     }
 
     // convert to specified encoding, base64 as a standard, else use hex
-    if(b64)
-      return Str.get(Base64.encode(hash));
+    if(b64) return Str.get(Base64.encode(hash));
     return  Str.get(Token.hex(hash, true));
   }
 }
