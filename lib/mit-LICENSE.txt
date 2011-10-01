@@ -1,7 +1,8 @@
 ======================================================== MIT LICENSE ===
 
 Projects licensed under the MIT license:
-- slf4j
+- slf4j: http://www.slf4j.org
+- Igo, integrated by Toshio HIRAI: http://igo.sourceforge.jp
 
 Copyright (c) 2004-2008 QOS.ch
  All rights reserved.
