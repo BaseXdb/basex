@@ -241,6 +241,7 @@ public class BufferInput extends InputStream {
 
   @Override
   public final synchronized void reset() {
+    size = read;
     read = mark;
     pos = mark;
   }
