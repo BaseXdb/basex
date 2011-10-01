@@ -35,15 +35,15 @@ public final class WesternTokenizer extends Tokenizer {
   private final IntList par = new IntList();
 
   /** Diacritics flag. */
-  private boolean dc;
+  private final boolean dc;
   /** Sensitivity flag. */
-  private boolean cs;
+  private final boolean cs;
   /** Uppercase flag. */
-  private boolean uc;
+  private final boolean uc;
   /** Lowercase flag. */
-  private boolean lc;
+  private final boolean lc;
   /** Wildcard flag. */
-  private boolean wc;
+  private final boolean wc;
   /** Flag for a paragraph. */
   private boolean pa;
 
@@ -71,15 +71,14 @@ public final class WesternTokenizer extends Tokenizer {
 
   /**
    * Constructor.
-   * @param f (optional) full-text options
+   * @param f full-text options
    */
   public WesternTokenizer(final FTOpt f) {
-    if(f == null) return;
-    lc = f.is(LC);
-    uc = f.is(UC);
-    cs = f.is(CS);
-    wc = f.is(WC);
-    dc = f.is(DC);
+    lc = f != null && f.is(LC);
+    uc = f != null && f.is(UC);
+    cs = f != null && f.is(CS);
+    wc = f != null && f.is(WC);
+    dc = f != null && f.is(DC);
   }
 
   @Override

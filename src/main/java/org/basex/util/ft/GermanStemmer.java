@@ -1,5 +1,7 @@
 package org.basex.util.ft;
 
+import java.util.Collection;
+
 import org.basex.util.TokenBuilder;
 
 /**
@@ -25,6 +27,11 @@ final class GermanStemmer extends InternalStemmer {
   @Override
   Stemmer get(final Language l, final FTIterator fti) {
     return new GermanStemmer(fti);
+  }
+
+  @Override
+  Collection<Language> languages() {
+    return collection("de");
   }
 
   @Override

@@ -19,6 +19,7 @@ public abstract class Tokenizer extends LanguageImpl {
   /** Load tokenizer classes and order them by precedence. */
   static {
     IMPL.add(new WesternTokenizer(null));
+    if(JapaneseTokenizer.available()) IMPL.add(new JapaneseTokenizer(null));
     Collections.sort(IMPL);
   }
 

@@ -3,6 +3,7 @@ package org.basex.util.ft;
 import static org.basex.util.Token.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * English stemming algorithm, based on the publication from
@@ -88,6 +89,11 @@ final class EnglishStemmer extends InternalStemmer {
   @Override
   Stemmer get(final Language l, final FTIterator fti) {
     return new EnglishStemmer(fti);
+  }
+
+  @Override
+  Collection<Language> languages() {
+    return collection("en");
   }
 
   @Override
