@@ -9,7 +9,6 @@ import java.util.Date;
 import org.basex.api.HTTPSession;
 import org.basex.core.Text;
 import org.basex.core.cmd.AlterDB;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.Query;
@@ -70,7 +69,6 @@ public class BXDatabase extends BXFolder {
 
   @Override
   protected void delete(final Session s) throws IOException {
-    s.execute(new Close());
     s.execute(new DropDB(db));
   }
 

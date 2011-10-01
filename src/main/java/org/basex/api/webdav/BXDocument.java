@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Map;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.io.IO;
 import org.basex.server.Query;
@@ -99,7 +98,6 @@ public class BXDocument extends BXAbstractResource implements FileResource {
         n.substring(0, n.length() - IO.XMLSUFFIX.length()) : n;
     s.execute(new CreateDB(nm));
     add(s, nm, "", n);
-    s.execute(new Close());
   }
 
   @Override
@@ -112,7 +110,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
   }
 
   /**
-   * Add a document to the specified target.
+   * Adds a document to the specified target.
    * @param s current session
    * @param trgdb target database
    * @param trgdir target directory

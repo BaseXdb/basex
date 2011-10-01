@@ -3,7 +3,6 @@ package org.basex.api.webdav;
 import java.io.IOException;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Rename;
@@ -88,7 +87,6 @@ public abstract class BXAbstractResource extends BXResource implements
     // create dummy, if parent is an empty folder
     final int ix = path.lastIndexOf(SEP);
     if(ix > 0) createDummy(s, db, path.substring(0, ix));
-    s.execute(new Close());
   }
 
   /**
@@ -108,8 +106,6 @@ public abstract class BXAbstractResource extends BXResource implements
     // delete dummy, if new parent is an empty folder
     final int i2 = n.lastIndexOf(SEP);
     if(i2 > 0) deleteDummy(s, db, n.substring(0, i2));
-
-    s.execute(new Close());
   }
 
   /**

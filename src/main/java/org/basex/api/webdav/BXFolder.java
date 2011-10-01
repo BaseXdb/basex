@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
@@ -210,7 +209,6 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     // folder is copied to the root: create new database with it
     s.execute(new CreateDB(n));
     add(s, n, "");
-    s.execute(new Close());
   }
 
   @Override

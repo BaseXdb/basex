@@ -7,7 +7,6 @@ import java.util.Date;
 
 import org.basex.api.HTTPSession;
 import org.basex.core.Text;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.io.in.ArrayInput;
@@ -143,7 +142,6 @@ public abstract class BXResource implements Resource {
     // path contains dummy document
     s.execute(new Open(db));
     s.execute(new Delete(dummy));
-    s.execute(new Close());
     return true;
   }
 
@@ -162,7 +160,6 @@ public abstract class BXResource implements Resource {
 
     s.execute(new Open(db));
     s.store(p + SEP + DUMMY, new ArrayInput(Token.EMPTY));
-    s.execute(new Close());
     return true;
   }
 

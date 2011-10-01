@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.basex.api.HTTPSession;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.server.Session;
 
@@ -94,7 +93,6 @@ public class BXRootResource extends BXFolder {
       @Override
       public BXDatabase get() throws IOException {
         addFile(s, newName, input);
-        s.execute(new Close());
         return new BXDatabase(dbname(newName), session);
       }
     }.eval();
