@@ -3,10 +3,10 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -96,6 +96,9 @@ public class BaseXServer extends Main implements Runnable {
 
     super(args, ctx);
     final int port = context.mprop.num(MainProp.SERVERPORT);
+    final String host = context.mprop.get(MainProp.SERVERHOST);
+    final InetAddress hostAddress = host.isEmpty() ? null :
+      InetAddress.getByName(host);
     final int eport = context.mprop.num(MainProp.EVENTPORT);
 
     if(service) {
@@ -120,10 +123,10 @@ public class BaseXServer extends Main implements Runnable {
 
       socket = new ServerSocket();
       socket.setReuseAddress(true);
-      socket.bind(new InetSocketAddress(port));
+      socket.bind(new InetSocketAddress(hostAddress, port));
       esocket = new ServerSocket();
       esocket.setReuseAddress(true);
-      esocket.bind(new InetSocketAddress(eport));
+      esocket.bind(new InetSocketAddress(hostAddress, eport));
       stop = stopFile(port);
 
       // guarantee correct shutdown...
