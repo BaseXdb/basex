@@ -1,11 +1,12 @@
 ======================================================== MIT LICENSE ===
 
 Projects licensed under the MIT license:
-- slf4j: http://www.slf4j.org
-- Igo, integrated by Toshio HIRAI: http://igo.sourceforge.jp
+- Igo, integrated by Toshio HIRAI
+  Copyright (c) 2010 Takeru Ohta <phjgt308@gmail.com> 
+  URL: http://igo.sourceforge.jp
+- slf4j
+  URL: http://www.slf4j.org
 
-Copyright (c) 2004-2008 QOS.ch
- All rights reserved.
 
  Permission is hereby granted, free  of charge, to any person obtaining
  a  copy  of this  software  and  associated  documentation files  (the
