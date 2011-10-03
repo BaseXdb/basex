@@ -14,7 +14,6 @@ import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
-import org.basex.server.ClientDelayer;
 import org.basex.server.ClientListener;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
@@ -47,8 +46,8 @@ public class BaseXServer extends Main implements Runnable {
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
-  /** Blocked clients. */
-  private final TokenIntMap blocked = new TokenIntMap();
+  /** Temporarily blocked clients. Synchronize access on {@code blocked}. */
+  public final TokenIntMap blocked = new TokenIntMap();
 
   /** Quiet mode (no logging). */
   private boolean quiet;
@@ -162,17 +161,7 @@ public class BaseXServer extends Main implements Runnable {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit();
         } else {
-          final byte[] address = s.getInetAddress().getAddress();
-          final ClientListener cl = new ClientListener(s, context, log);
-          if(cl.init()) {
-            blocked.delete(address);
-            context.add(cl);
-          } else {
-            int delay = blocked.get(address);
-            delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
-            blocked.add(address, delay);
-            new ClientDelayer(delay, cl, this);
-          }
+          new ClientListener(s, context, log, this).start();
         }
       } catch(final IOException ex) {
         // socket was closed..
