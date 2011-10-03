@@ -187,16 +187,6 @@ public class RESTTest {
   @Test
   public void getErr2() {
     try {
-      get("?query=()&wrp=no");
-      fail("Error expected.");
-    } catch(final IOException ex) {
-    }
-  }
-
-  /** GET Test. */
-  @Test
-  public void getErr3() {
-    try {
       get("?query=()&wrap=n");
       fail("Error expected.");
     } catch(final IOException ex) {
@@ -205,7 +195,7 @@ public class RESTTest {
 
   /** GET Test. */
   @Test
-  public void getErr4() {
+  public void getErr3() {
     try {
       get("?query=()&method=xxx");
       fail("Error expected.");
