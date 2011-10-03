@@ -71,7 +71,7 @@ public class RESTPost extends RESTCode {
         final String value = value("data(@value)", param, context);
         if(sp.get(name) != null) {
           ser.add(name).add('=').add(value).add(',');
-        } else if(name.equals("wrap")) {
+        } else if(name.equals(WRAP)) {
           wrap(value, ctx);
         } else {
           throw new RESTException(SC_BAD_REQUEST, ERR_PARAM + name);

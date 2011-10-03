@@ -7,8 +7,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -135,32 +133,5 @@ final class RESTContext {
     res.setStatus(code);
     if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
     if(message != null) out.write(token(message));
-  }
-
-  /**
-   * Redirects the URI to the correct database, if needed.
-   * @return {@code true} if URI was redirected
-   */
-  boolean redirect() {
-    final String uri = req.getRequestURI();
-    if(uri.endsWith("/") || req.getPathInfo() == null) return false;
-
-    final Map<?, ?> map = req.getParameterMap();
-    if(map.size() == 0) return false;
-
-    // rebuild uri, including parameters
-    char ch = '?';
-    final StringBuilder sb = new StringBuilder(uri).append('/');
-    for(final Entry<?, ?> s : map.entrySet()) {
-      final String key = s.getKey().toString();
-      for(final String v : s.getValue() instanceof String[] ?
-          (String[]) s.getValue() : new String[] { s.getValue().toString() }) {
-        sb.append(ch).append(key).append('=').append(v);
-        ch = '&';
-      }
-    }
-    res.setStatus(SC_MOVED_PERMANENTLY);
-    res.setHeader(LOCATION, sb.toString());
-    return true;
   }
 }

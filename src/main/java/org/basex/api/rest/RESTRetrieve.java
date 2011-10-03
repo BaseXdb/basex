@@ -5,11 +5,14 @@ import static org.basex.api.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Retrieve;
 import org.basex.data.DataText;
+import org.basex.io.MimeTypes;
+import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
 import org.basex.server.Session;
@@ -22,7 +25,18 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class RESTRetrieve extends RESTCode {
+final class RESTRetrieve extends RESTQuery {
+  /**
+   * Constructor.
+   * @param in input file to be executed
+   * @param vars external variables
+   * @param it context item
+   */
+  RESTRetrieve(final String in, final Map<String, String[]> vars,
+      final byte[] it) {
+    super(in, vars, it);
+  }
+
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
     // open addressed database
@@ -58,18 +72,25 @@ final class RESTRetrieve extends RESTCode {
       ser.closeElement();
       ser.close();
     } else if(isRaw(ctx)) {
-      // retrieve raw file; prefix user parameters with media type
-      final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + contentType(ctx);
-      initResponse(new SerializerProp(ct + "," + ctx.serialization), ctx);
-      session.setOutputStream(ctx.out);
-      session.execute(new Retrieve(ctx.dbpath()));
+      final String type = contentType(ctx);
+      if(type.equals(MimeTypes.APP_XQUERY)) {
+        // execute raw file as query
+        final ArrayOutput ao = new ArrayOutput();
+        session.setOutputStream(ao);
+        session.execute(new Retrieve(ctx.dbpath()));
+        query(ao.toString(), ctx);
+      } else {
+        // retrieve raw file; prefix user parameters with media type
+        final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + type;
+        initResponse(new SerializerProp(ct + "," + ctx.serialization), ctx);
+        session.setOutputStream(ctx.out);
+        session.execute(new Retrieve(ctx.dbpath()));
+      }
     } else {
       // retrieve xml file
-      // initializes the output
       initResponse(new SerializerProp(ctx.serialization), ctx);
       session.setOutputStream(ctx.out);
       session.query(".").execute();
-
     }
   }
 

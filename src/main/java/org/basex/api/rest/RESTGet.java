@@ -42,9 +42,6 @@ final class RESTGet extends RESTCode {
           throw new RESTException(SC_BAD_REQUEST, ERR_ONLYONE);
         operation = key;
         input = val;
-      } else if(key.startsWith("$")) {
-        // external variables
-        vars.put(key, new String[] { val });
       } else if(key.equals(WRAP)) {
         // wrapping flag
         wrap(val, ctx);
@@ -55,14 +52,15 @@ final class RESTGet extends RESTCode {
         // serialization parameters
         for(final String v : vals) ser.add(key).add('=').add(v).add(',');
       } else {
-        throw new RESTException(SC_BAD_REQUEST, ERR_PARAM + key);
+        // external variables
+        vars.put(key, new String[] { val });
       }
     }
     ctx.serialization = ser.toString();
 
     final RESTCode code;
     if(operation == null) {
-      code = new RESTRetrieve();
+      code = new RESTRetrieve(input, vars, item);
     } else if(operation.equals(QUERY)) {
       code = new RESTQuery(input, vars, item);
     } else if(operation.equals(RUN)) {

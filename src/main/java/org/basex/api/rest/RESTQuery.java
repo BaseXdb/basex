@@ -1,6 +1,7 @@
 package org.basex.api.rest;
 
 import static org.basex.api.rest.RESTText.*;
+import static org.basex.core.Text.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -76,18 +77,25 @@ class RESTQuery extends RESTCode {
     session.execute(new Set(Prop.SERIALIZER, serial(ctx)));
     session.setOutputStream(ctx.out);
 
-    // create query instance
-    final Query qu = session.query(in);
-    // bind external variables
-    for(final Entry<String, String[]> e : variables.entrySet()) {
-      final String[] val = e.getValue();
-      if(val.length == 2) qu.bind(e.getKey(), val[0], val[1]);
-      if(val.length == 1) qu.bind(e.getKey(), val[0]);
+    try {
+      // create query instance
+      final Query qu = session.query(in);
+      // bind external variables
+      for(final Entry<String, String[]> e : variables.entrySet()) {
+        final String[] val = e.getValue();
+        if(val.length == 2) qu.bind(e.getKey(), val[0], val[1]);
+        if(val.length == 1) qu.bind(e.getKey(), val[0]);
+      }
+      // initializes the response with query serialization options
+      initResponse(new SerializerProp(qu.options()), ctx);
+      // run query
+      qu.execute();
+    } catch(final IOException ex) {
+      // suppress information on queried file
+      final String m1 = Util.message(ex);
+      final String m2 = m1.replaceAll(STOPPED + ".*" + NL, "");
+      throw m1.equals(m2) ? ex : new IOException(m2, ex.getCause());
     }
-    // initializes the response with query serialization options
-    initResponse(new SerializerProp(qu.options()), ctx);
-    // run query
-    qu.execute();
   }
 
   /**
