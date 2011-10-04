@@ -36,7 +36,7 @@ import org.basex.util.hash.TokenIntMap;
  */
 public class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
-  public boolean running;
+  public volatile boolean running;
   /** Event server socket. */
   ServerSocket esocket;
   /** Stop file. */
@@ -54,7 +54,7 @@ public class BaseXServer extends Main implements Runnable {
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
-  private boolean stopped;
+  private volatile boolean stopped;
 
   /** Server socket. */
   private ServerSocket socket;
