@@ -60,7 +60,7 @@ public final class LocalSession extends Session {
 
     this(context, output);
     final User usr = ctx.users.get(user);
-    if(usr == null || !Token.eq(usr.password, Token.token(Token.md5(pass))))
+    if(usr == null || !usr.password.equals(Token.md5(pass)))
       throw new LoginException();
   }
 

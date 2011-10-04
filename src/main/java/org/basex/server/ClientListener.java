@@ -2,11 +2,9 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
-
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
@@ -106,7 +104,7 @@ public final class ClientListener extends Thread {
       final String pw = in.readString();
       context.user = context.users.get(us);
       running = context.user != null &&
-        md5(string(context.user.password) + ts).equals(pw);
+          md5(context.user.password + ts).equals(pw);
 
       // write log information
       if(running) {
