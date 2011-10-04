@@ -359,94 +359,13 @@ public class FNCryptoTest extends AdvancedQueryTest {
    * with generate-signature.
    */
   @Test
-  public void validateSignatureWithCertificate() {
-    // Command to create java keystore
-    // keytool -genkey -keyalg RSA -alias basexselfsigned -keystore
-    // keystore.jks -storepass password -validity 360
-
-    final String certificate =
-        "<digital-certificate>" +
-        "<keystore-type>JKS</keystore-type>" +
-        "<keystore-password>password</keystore-password>" +
-        "<key-alias>basexselfsigned</key-alias>" +
-        "<private-key-password>password</private-key-password>" +
-        "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
-        "</digital-certificate>";
-
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a/>,'','','','',''," +
-        certificate + "))",
-        "true");
-  }
-
-  /**
-   * Tests whether validate-signature returns true for a certificate created
-   * with generate-signature.
-   */
-  @Test
-  public void validateSignatureWithXPathAndCertificate() {
-    final String certificate =
-        "<digital-certificate>" +
-        "<keystore-type>JKS</keystore-type>" +
-        "<keystore-password>password</keystore-password>" +
-        "<key-alias>basexselfsigned</key-alias>" +
-        "<private-key-password>password</private-key-password>" +
-        "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
-        "</digital-certificate>";
-
-    query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(c:generate-signature(<a><n/><n/></a>," +
-        "'','','','','','/a/n'," +
-        certificate + "))",
-        "true");
-  }
-
-  /**
-   * Tests whether validate-signature returns true for a certificate created
-   * with generate-signature.
-   */
-  @Test
   public void validateSignatureFullySpecified() {
-    final String certificate =
-        "<digital-certificate>" +
-        "<keystore-type>JKS</keystore-type>" +
-        "<keystore-password>password</keystore-password>" +
-        "<key-alias>basexselfsigned</key-alias>" +
-        "<private-key-password>password</private-key-password>" +
-        "<keystore-uri>/Users/lukas/keystore.jks</keystore-uri>" +
-        "</digital-certificate>";
 
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:validate-signature(c:generate-signature(<a><n/></a>," +
-        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n',"
-        + certificate + "))",
+        "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))",
         "true");
   }
-
-///**
-//* Test method for crypto:encrypt and crypto:decrypt with asymmetric keys.
-//*/
-//@Test
-//public void encryptionAsym1() {
-// final String msg = "messagemessagemessagemessagemessagemessagemessage";
-//
-// PublicKey puk = null;
-// PrivateKey prk = null;
-// try {
-//
-//   final KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-//   final KeyPair kp = gen.generateKeyPair();
-//   puk = kp.getPublic();
-//   prk = kp.getPrivate();
-//
-// } catch(NoSuchAlgorithmException e) {
-//   e.printStackTrace();
-// }
-//
-// query("declare namespace c = 'http://expath.org/ns/crypto';" +
-//    "let $e := c:encrypt('" + msg + "','asymmetric','" + prk + "','RSA')" +
-//     "return c:decrypt($e,'asymmetric','" + puk + "','RSA')", msg);
-//}
 
   /**
    * Deletes the test db.

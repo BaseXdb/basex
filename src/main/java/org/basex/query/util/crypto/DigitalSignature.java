@@ -240,6 +240,7 @@ public final class DigitalSignature {
         pk = (PrivateKey) ks.getKey(kAlias, pkPW.toCharArray());
         final X509Certificate x509ce = (X509Certificate)
             ks.getCertificate(kAlias);
+        if(x509ce == null) CRYPTOALINV.thrw(input, kAlias);
         puk = x509ce.getPublicKey();
         final KeyInfoFactory kifactory = fac.getKeyInfoFactory();
         final KeyValue keyValue = kifactory.newKeyValue(puk);

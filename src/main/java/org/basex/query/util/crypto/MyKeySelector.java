@@ -60,8 +60,7 @@ public class MyKeySelector extends KeySelector {
       throw new KeySelectorException("KeyInfo is null");
 
     final SignatureMethod sm = (SignatureMethod) m;
-    final List<Object> l = new ArrayList<Object>();
-    l.add(ki.getContent());
+    final List<Object> l = ki.getContent();
 
     for(int i = 0; i < l.size(); i++) {
         final XMLStructure s = (XMLStructure) l.get(i);

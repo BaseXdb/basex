@@ -825,7 +825,9 @@ public enum Err {
   /** CX994: Crypto Exception. */
   CRYPTOSIGEXC(CX, 994, "Signature exception."),
   /** CX993: Crypto Exception. */
-  CRYPTOALGEXC(CX, 993, "Invalid algorithm.");
+  CRYPTOALGEXC(CX, 993, "Invalid algorithm."),
+  /** CX992: Crypto Exception. */
+  CRYPTOALINV(CX, 992, "Invalid certificate alias %.");
 
   /** Error type. */
   public final ErrType type;
