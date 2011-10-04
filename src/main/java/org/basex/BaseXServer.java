@@ -46,8 +46,8 @@ public class BaseXServer extends Main implements Runnable {
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
-  /** Temporarily blocked clients. Synchronize access on {@code blocked}. */
-  public final TokenIntMap blocked = new TokenIntMap();
+  /** Temporarily blocked clients. */
+  private final TokenIntMap blocked = new TokenIntMap();
 
   /** Quiet mode (no logging). */
   private boolean quiet;
@@ -324,6 +324,30 @@ public class BaseXServer extends Main implements Runnable {
     } catch(final IOException ex) {
       stop.delete();
       throw ex;
+    }
+  }
+
+  /**
+   * Registers the client and calculates the delay after unsuccessful logins.
+   * @param client client address
+   * @return delay
+   */
+  public int block(final byte[] client) {
+    synchronized(blocked) {
+      int delay = blocked.get(client);
+      delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
+      blocked.add(client, delay);
+      return delay;
+    }
+  }
+
+  /**
+   * Resets the login delay after successful login.
+   * @param client client address
+   */
+  public void unblock(final byte[] client) {
+    synchronized(blocked) {
+      blocked.delete(client);
     }
   }
 

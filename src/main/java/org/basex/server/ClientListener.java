@@ -112,20 +112,12 @@ public final class ClientListener extends Thread {
         log.write(this, "LOGIN " + context.user.name, OK);
         // send {OK}
         send(true);
-        synchronized(server.blocked) {
-          server.blocked.delete(address);
-        }
+        server.unblock(address);
         context.add(this);
       } else if(!us.isEmpty()) {
         log.write(this, SERVERDENIED + COLS + us);
         // Temporarily block client
-        int delay;
-        synchronized(server.blocked) {
-          delay = server.blocked.get(address);
-          delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
-          server.blocked.add(address, delay);
-        }
-        new ClientDelayer(delay, this, server);
+        new ClientDelayer(server.block(address), this, server);
       }
     } catch(final IOException ex) {
       Util.stack(ex);
