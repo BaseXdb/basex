@@ -163,13 +163,6 @@ public final class DigitalSignature {
       final byte[] d, final byte[] sig, final byte[] ns, final byte[] t,
       final byte[] expr, final ANode ce) throws QueryException {
 
-    // TODO create unit tests for given xpath expression / find examples?
-    // TODO run find bugs
-    // TODO check variables for final
-    // TODO change variable names
-    // TODO make code more readable
-    // TODO documentation!
-
     // checking input variables
     byte[] b = c;
     if(b.length == 0) b = DEFC;
@@ -323,7 +316,6 @@ public final class DigitalSignature {
 //      } else if(eq(type, DETT)) {
 //      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 //        dbf.setNamespaceAware(true);
-//        // TODO total crap, why do that? throwing away input ... ?
 //        inputNode = dbf.newDocumentBuilder().newDocument();
 //        signContext = new DOMSignContext(pk, inputNode);
 //        xmlSig = fac.newXMLSignature(si, ki);
@@ -450,7 +442,7 @@ public final class DigitalSignature {
     } catch(IOException e) {
       CRYPTOIOEXC.thrw(input, e);
     } catch(TransformerException e) {
-      e.printStackTrace();
+      CRYPTOIOEXC.thrw(input, e);
     }
 
     return dbn;
@@ -470,7 +462,6 @@ public final class DigitalSignature {
         new SerializerProp("format=no"));
     n.serialize(s);
     s.close();
-//    System.out.println(b.toString() + "\n");
     return b.toByteArray();
   }
 

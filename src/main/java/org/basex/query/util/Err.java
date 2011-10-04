@@ -767,64 +767,64 @@ public enum Err {
   /** XUTY0022: XQuery Update type exception. */
   UPATTELM2(XUTY, 22, "Insert target must be an element."),
 
-  // * EXPath Cryptographic Module Errors
-  /** CX01: Encoding not supported. */
+  /* EXPath Cryptographic Module Errors */
+  /** CX01: Crypto Exception. */
   CRYPTOCANINV(CX, 1, "Canonicalization algorithm is not supported."),
-  /** CX02: Encoding not supported. */
+  /** CX02: Crypto Exception. */
   CRYPTODIGINV(CX, 2, "Digest algorithm is not supported."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOSIGINV(CX, 3, "Signature algorithm is not supported."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOXPINV(CX, 4, "XPath expression is invalid."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOINVNM(CX, 5, "Invalid name for $digital-certificate root."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOINVCH(CX, 6, "Invalid child element of $digital-certificate."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOKSNULL(CX, 7, "Key store is null."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOIOERR(CX, 8, "I/O error while reading keystore."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOPERMDEN(CX, 9, "Permission denied to read keystore."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOKSURLINV(CX, 10, "Keystore URL is invalid."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTOKSTYPE(CX, 11, "Keystore type is not supported."),
-  /** CX03: Encoding not supported. */
+  /** CX03: Crypto Exception. */
   CRYPTONOKEY(CX, 12, "Cannot find key for alias in given keystore."),
-  /** CX13: Encoding not supported. */
+  /** CX13: Crypto Exception. */
   CRYPTOINVHASH(CX, 13, "Hashing algorithm is not supported."),
-  /** CX14: Encoding not supported. */
+  /** CX14: Crypto Exception. */
   CRYPTOENC(CX, 14, "The encoding method is not supported."),
-  /** CX15: Encoding not supported. */
+  /** CX15: Crypto Exception. */
   CRYPTONOSIG(CX, 15, "Cannot find signature element."),
-  /** CX16: Encoding not supported. */
+  /** CX16: Crypto Exception. */
   CRYPTONOPAD(CX, 16, "No such padding."),
-  /** CX17: Encoding not supported. */
+  /** CX17: Crypto Exception. */
   CRYPTOBADPAD(CX, 17, "Incorrect padding."),
-  /** CX18: Encoding not supported. */
+  /** CX18: Crypto Exception. */
   CRYPTOENCTYP(CX, 18, "Encryption type is not supported."),
-  /** CX19: Encoding not supported. */
+  /** CX19: Crypto Exception. */
   CRYPTOKEYINV(CX, 19, "Secret key is invalid."),
-  /** CX20: Encoding not supported. */
+  /** CX20: Crypto Exception. */
   CRYPTOILLBLO(CX, 20, "Illegal block size."),
-  /** CX21: Encoding not supported. */
+  /** CX21: Crypto Exception. */
   CRYPTOINVALGO(CX, 21, "Algorithm is not supported."),
-  /** CX22: Encoding not supported. */
+  /** CX22: Crypto Exception. */
   CRYPTODECTYP(CX, 22, "Decryption type is not supported."),
-  /** CX999: Encoding not supported. */
+  /** CX999: Crypto Exception. */
   CRYPTOSIGTYPINV(CX, 999, "Signature type is not supported."),
-  /** CX998: Encoding not supported. */
+  /** CX998: Crypto Exception. */
   CRYPTONOTSUPP(CX, 998, "Operation not (yet) supported."),
-  /** CX997: Encoding not supported. */
+  /** CX997: Crypto Exception. */
   CRYPTOSYMERR(CX, 997, "Algorithm not compatible with encryption type."),
-  /** CX996: Encoding not supported. */
+  /** CX996: Crypto Exception. */
   CRYPTOIOEXC(CX, 996, "IO Exception."),
-  /** CX995: Encoding not supported. */
+  /** CX995: Crypto Exception. */
   CRYPTOKSEXC(CX, 995, "Keystore exception."),
-  /** CX994: Signature Exception. */
+  /** CX994: Crypto Exception. */
   CRYPTOSIGEXC(CX, 994, "Signature exception."),
-  /** CX993: Signature Exception. */
+  /** CX993: Crypto Exception. */
   CRYPTOALGEXC(CX, 993, "Invalid algorithm.");
 
   /** Error type. */
