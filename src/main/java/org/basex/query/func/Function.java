@@ -608,6 +608,25 @@ public enum Function {
   HOFITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM,
       FuncType.arity(1).seq(), ITEM_ZM),
 
+  /* FNCrypto functions (EXPath Cryptographic module). */
+
+  /** Create message authentication code (HMAC) */
+  CRYPHMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR,
+      STR, STR, STR_ZO),
+  /** Encrypt message. */
+  CRYPENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)", STR,
+      STR, STR, STR, STR),
+  /** Decrypt message. */
+  CRYPDECRYPT(FNCrypto.class, "decrypt(string, string, string, string)", STR,
+      STR, STR, STR, STR),
+  /** Generate signature. */
+  CRYPGENSIG(FNCrypto.class,
+      "generate-signature" +
+      "(node,string,string,string,string,string[,item][,item])",
+      NOD, 6, NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO),
+  /** Validate signature. */
+  CRYPVALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
+
   /* FNHttp functions (EXPath). */
 
   /** XQuery function */
@@ -698,6 +717,7 @@ public enum Function {
     URIS.put(FNMap.class,  MAPURI);
     URIS.put(FNMath.class, MATHURI);
     // EXPath functions
+    URIS.put(FNCrypto.class, CRYPTOURI);
     URIS.put(FNFile.class, FILEURI);
     URIS.put(FNHttp.class, HTTPURI);
     URIS.put(FNZip.class,  ZIPURI);
