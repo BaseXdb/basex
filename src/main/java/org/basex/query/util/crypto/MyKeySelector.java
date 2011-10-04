@@ -3,7 +3,6 @@ package org.basex.query.util.crypto;
 import java.security.Key;
 import java.security.KeyException;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.security.cert.X509Certificate;
@@ -60,6 +59,7 @@ public class MyKeySelector extends KeySelector {
       throw new KeySelectorException("KeyInfo is null");
 
     final SignatureMethod sm = (SignatureMethod) m;
+    @SuppressWarnings("unchecked")
     final List<Object> l = ki.getContent();
 
     for(int i = 0; i < l.size(); i++) {
