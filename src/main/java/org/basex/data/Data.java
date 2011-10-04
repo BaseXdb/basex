@@ -758,7 +758,7 @@ public abstract class Data {
             // match for this candidate. therefore we iterate through ancestors
             // till we find one with a lower than or the same pre value as the
             // current candidate.
-            else if (curr.pre < ancPre) {
+            else if(curr.pre < ancPre) {
               while((ancPre = parent(ancPre, kind(ancPre))) > curr.pre);
               if(curr.pre == ancPre) cn = curr;
             }

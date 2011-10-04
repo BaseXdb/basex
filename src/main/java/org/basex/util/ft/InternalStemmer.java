@@ -1,11 +1,8 @@
 package org.basex.util.ft;
 
-import java.util.Collection;
-
-import org.basex.util.Util;
-
 /**
  * Internal stemmer implementation.
+ * The names of the implementations
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -17,11 +14,6 @@ public abstract class InternalStemmer extends Stemmer {
    */
   protected InternalStemmer(final FTIterator fti) {
     super(fti);
-  }
-
-  @Override
-  final Collection<Language> languages() {
-    return collection(Util.name(this).replace("Stemmer", ""));
   }
 
   @Override

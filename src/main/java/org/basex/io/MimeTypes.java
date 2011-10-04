@@ -24,6 +24,8 @@ public final class MimeTypes {
   public static final String APP_OCTET = "application/octet-stream";
   /** Media type: application/xml. */
   public static final String APP_XML = "application/xml";
+  /** Media type: application/xquery. */
+  public static final String APP_XQUERY = "application/xquery";
   /** Media type: application/json. */
   public static final String APP_JSON = "application/json";
 

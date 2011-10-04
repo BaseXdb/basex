@@ -34,7 +34,10 @@ public final class MainProp extends AProp {
   public static final Object[] HOST = { "HOST", Text.LOCALHOST };
   /** Client/server communication: port, used for connecting new clients. */
   public static final Object[] PORT = { "PORT", 1984 };
-  /** Client/server communication: port, used for starting the server. */
+  /** Client/server communication: host, used for binding the server. Empty
+   * string for wildcard.*/
+  public static final Object[] SERVERHOST = { "SERVERHOST", "" };
+  /** Client/server communication: port, used for binding the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
   /** Client/server communication: port, used for sending events. */
   public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };

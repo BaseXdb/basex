@@ -23,8 +23,7 @@ public final class Prop extends AProp {
   public static final String ENCODING = System.getProperty("file.encoding");
 
   /** System's temporary directory. */
-  public static final String TMP =
-    (System.getProperty("java.io.tmpdir") + "/").replaceAll("[\\\\/]+", "/");
+  public static final String TMP = System.getProperty("java.io.tmpdir") + '/';
 
   /** OS flag (should be ignored whenever possible). */
   public static final String OS = System.getProperty("os.name").toUpperCase();

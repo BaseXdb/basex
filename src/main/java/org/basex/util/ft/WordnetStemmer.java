@@ -22,7 +22,7 @@ import org.basex.util.Reflect;
 final class WordnetStemmer extends Stemmer {
   /** Name of the package of the WordNet stemmer. */
   private static final String PATTERN = "edu.mit.jwi.%";
-  /** Path to the WordNet dictionary files (currently: static). */
+  /** Path to the WordNet dictionary files. */
   private static final String PATH = "etc/wndict";
   /** WordnetStemmer class. */
   private static final Constructor<?> CTR;

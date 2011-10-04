@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -18,6 +19,8 @@ public final class Reflect {
   /** Cached classes. */
   private static HashMap<String, Class<?>> classes =
     new HashMap<String, Class<?>>();
+  /** Cached fields. */
+  private static HashMap<String, Field> fields = new HashMap<String, Field>();
   /** Class loader for jars. */
   public static JarLoader jarLoader;
 
@@ -61,11 +64,27 @@ public final class Reflect {
         }
       }
       return c;
-    } catch(final Exception ex) {
-    }
+    } catch(final Exception ex) { }
     return null;
   }
 
+  /**
+   * Returns a reference to the specified field, or {@code null}.
+   * @param clazz class to search for the constructor
+   * @param name class name
+   * @return reference, or {@code null} if the field is not found
+   */
+  public static Field field(final Class<?> clazz, final String name) {
+    final String key = clazz.getName() + name;
+    Field f = fields.get(key);
+    if(f == null) {
+      try {
+        f = clazz.getField(name);
+        fields.put(key, f);
+      } catch(final Exception ex) { }
+    }
+    return f;
+  }
 
   /**
    * Returns a reference to the class specified by the pattern, or {@code null}.
