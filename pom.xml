@@ -171,6 +171,8 @@
             <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
               <!-- Choose HTTP port -->
               <port>8984</port>
+              <!-- Optionally limit HTTP host
+              <host>8984</host> -->
               <maxIdleTime>60000</maxIdleTime>
             </connector>
           </connectors>
@@ -191,13 +193,11 @@
             <systemProperty>
               <name>org.basex.password</name>
               <value>admin</value>
-            </systemProperty>
-            -->
+            </systemProperty> -->
           </systemProperties>
           <!-- Key and port for stopping Jetty
           <stopKey>keyToStopJetty</stopKey> 
-          <stopPort>8985</stopPort>
-          -->
+          <stopPort>8985</stopPort> -->
         </configuration>
       </plugin> 
     </plugins>
