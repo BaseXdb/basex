@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 
+import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
@@ -48,6 +49,8 @@ public final class ClientListener extends Thread {
   private final Context context;
   /** Socket reference. */
   private final Socket socket;
+  /** Server reference. */
+  private final BaseXServer server;
   /** Log reference. */
   private final Log log;
 
@@ -73,20 +76,22 @@ public final class ClientListener extends Thread {
    * @param s socket
    * @param c database context
    * @param l log reference
+   * @param srv server reference
    */
-  public ClientListener(final Socket s, final Context c, final Log l) {
+  public ClientListener(final Socket s, final Context c, final Log l,
+      final BaseXServer srv) {
     context = new Context(c, this);
     socket = s;
     log = l;
+    server = srv;
   }
 
-  /**
-   * Initializes the session via cram-md5 authentication.
-   * @return success flag
-   */
-  public boolean init() {
+  @Override
+  public void run() {
+    // initialize the session via cram-md5 authentication
     try {
       final String ts = Long.toString(System.nanoTime());
+      final byte[] address = socket.getInetAddress().getAddress();
 
       // send {TIMESTAMP}0
       out = PrintOutput.get(socket.getOutputStream());
@@ -107,22 +112,19 @@ public final class ClientListener extends Thread {
         log.write(this, "LOGIN " + context.user.name, OK);
         // send {OK}
         send(true);
-        // start listener thread
-        start();
+        server.unblock(address);
+        context.add(this);
       } else if(!us.isEmpty()) {
         log.write(this, SERVERDENIED + COLS + us);
+        // Temporarily block client
+        new ClientDelayer(server.block(address), this, server);
       }
-      // return result flag
-      return running;
     } catch(final IOException ex) {
       Util.stack(ex);
       log.write(ex.getMessage());
-      return false;
     }
-  }
 
-  @Override
-  public void run() {
+    // Authentification done, start command loop
     ServerCmd sc = null;
     String cmd = null;
 
