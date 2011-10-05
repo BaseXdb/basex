@@ -44,7 +44,7 @@ public final class CreateCollection {
     System.out.println("\n* Create an empty collection and add documents.");
 
     new CreateDB("Collection").execute(context);
-    new Add("etc/").execute(context);
+    new Add("", "etc/").execute(context);
     new Optimize().execute(context);
 
     // ------------------------------------------------------------------------

@@ -10,8 +10,7 @@ import org.basex.server.ClientSession;
 
 /**
  * This class demonstrates database access via the client/server architecture.
- * It shows how to {@link #add(String, String, String)},
- * {@link #modify()} files.
+ * It shows how to {@link #add(String, String)} and {@link #modify()} files.
  * For further options see {@link QueryCollection}.
  *
  * @author BaseX Team 2005-11, BSD License
@@ -51,10 +50,12 @@ public final class ServerCollection {
     System.out.println("\n* Adding 50 documents");
 
     for(int i = 0; i < 50; i++) {
-      add(XML_1 + i + XML_2, "Chapter-" + i + ".xml", "/book/chapters/" + i);
+      String path = "/book/chapters/" + i + "/Chapter-" + i + ".xml";
+      add(path, XML_1 + i + XML_2);
     }
     // Add another Test Document in folder /book/chapters/0
-    add(XML_1 + "test" + XML_2, "Chapter-test.xml", "/book/chapters/0");
+    String path = "/book/chapters/0/Chapter-test.xml";
+    add(path, XML_1 + "test" + XML_2);
 
     // ------------------------------------------------------------------------
     // Find some documents using the collection command
@@ -110,14 +111,13 @@ public final class ServerCollection {
 
   /**
    * Adds a document to the collection.
-   * @param xmlFragment XML Fragment
-   * @param docname document name
    * @param target optional target path
+   * @param xmlFragment XML Fragment
    * @throws IOException I/O exception
    */
-  private static void add(final String xmlFragment, final String docname,
-      final String target) throws IOException {
+  private static void add(final String target, final String xmlFragment)
+      throws IOException {
 
-    session.execute(new Add(xmlFragment, docname, target));
+    session.execute(new Add(target, xmlFragment));
   }
 }
