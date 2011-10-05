@@ -128,6 +128,27 @@
           <mainClass>org.basex.BaseXGUI</mainClass>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
     </plugins>
+    <extensions>
+      <!-- Enabling the use of FTP -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+         <artifactId>wagon-ftp</artifactId>
+         <version>2.0</version>
+      </extension>
+    </extensions>
+    
   </build>
+  <distributionManagement>
+    <repository>
+      <id>basex.mvn</id>
+      <name>BaseX Maven Repository</name>
+      <url>ftp://basex.org/</url>
+    </repository>
+  </distributionManagement>
 </project>
