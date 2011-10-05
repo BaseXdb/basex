@@ -188,7 +188,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
    */
   protected void addXML(final Session s, final String n, final InputStream in)
       throws IOException {
-    s.add(n, path, in);
+    s.add(path + SEP + n, in);
   }
 
   /**
@@ -222,25 +222,23 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   /**
    * Adds all documents in the folder to another folder.
    * @param s current session
-   * @param trgdb target database
-   * @param trgdir target folder
+   * @param tdb target database
+   * @param tpath target folder
    * @throws IOException I/O exception
    */
-  private void add(final Session s, final String trgdb, final String trgdir)
+  private void add(final Session s, final String tdb, final String tpath)
       throws IOException {
+
     final Query q = s.query(
         "for $d in " + DBLIST.args("$db", "$path") +
-        "let $t := tokenize(substring($d, string-length($path) + 1), '/') " +
-        "let $p := string-join(($trgdir, $t[position() < last()]), '/') " +
-        "let $n := $t[last()] return " +
-        "if (" + DBISRAW.args("$db", "$d") + ") then " +
-        DBSTORE.args("$trgdb", "$p||'/'||$n", DBRETRIEVE.args("$db", "$d")) +
-        " else " +
-        DBADD.args("$trgdb", DBOPEN.args("$db", "$d"), "$n", "$p"));
+        "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) " +
+        "return if (" + DBISRAW.args("$db", "$d") + ") then " +
+        DBSTORE.args("$tdb", "$t", DBRETRIEVE.args("$db", "$d")) + " else " +
+        DBADD.args("$tdb", DBOPEN.args("$db", "$d"), "$t"));
     q.bind("db", db);
     q.bind("path", path);
-    q.bind("trgdb", trgdb);
-    q.bind("trgdir", trgdir);
+    q.bind("tdb", tdb);
+    q.bind("tpath", tpath);
     q.execute();
   }
 
@@ -249,4 +247,3 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     return false;
   }
 }
-

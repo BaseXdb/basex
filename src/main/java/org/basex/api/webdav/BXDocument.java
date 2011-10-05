@@ -97,7 +97,7 @@ public class BXDocument extends BXAbstractResource implements FileResource {
     final String nm = n.endsWith(IO.XMLSUFFIX) ?
         n.substring(0, n.length() - IO.XMLSUFFIX.length()) : n;
     s.execute(new CreateDB(nm));
-    add(s, nm, "", n);
+    add(s, nm, n);
   }
 
   @Override
@@ -105,31 +105,28 @@ public class BXDocument extends BXAbstractResource implements FileResource {
       throws IOException {
 
     // folder is copied to a folder in a database
-    add(s, f.db, f.path, n);
+    add(s, f.db, f.path + '/' + n);
     deleteDummy(s, f.db, f.path);
   }
 
   /**
    * Adds a document to the specified target.
    * @param s current session
-   * @param trgdb target database
-   * @param trgdir target directory
-   * @param name new name
+   * @param tdb target database
+   * @param tpath target path
    * @throws IOException I/O exception
    */
-  protected void add(final Session s, final String trgdb, final String trgdir,
-      final String name) throws IOException {
+  protected void add(final Session s, final String tdb, final String tpath)
+      throws IOException {
 
     final Query q = s.query(
-        "if (" + DBISRAW.args("$sdb", "$spath") + ") then " +
-        DBSTORE.args("$db", "$path||'/'||$name",
-            DBRETRIEVE.args("$sdb", "$spath")) + " else " +
-        DBADD.args("$db", DBOPEN.args("$sdb", "$spath"), "$name", "$path"));
-    q.bind("db", trgdb);
-    q.bind("sdb", db);
-    q.bind("spath", path);
-    q.bind("name", name);
-    q.bind("path", trgdir);
+        "if(" + DBISRAW.args("$db", "$path") + ") then " +
+        DBSTORE.args("$tdb", "$tpath", DBRETRIEVE.args("$db", "$path")) +
+        " else " + DBADD.args("$tdb", DBOPEN.args("$db", "$path"), "$tpath"));
+    q.bind("db", db);
+    q.bind("path", path);
+    q.bind("tdb", tdb);
+    q.bind("tpath", tpath);
     q.execute();
   }
 }
