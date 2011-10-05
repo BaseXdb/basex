@@ -23,7 +23,7 @@ import org.basex.util.Util;
 
 /**
  * Evaluates the 'add' command and adds a document to a collection.<br/>
- * Note that the constructors of this class have changed with Version 6.8:
+ * Note that the constructors of this class have changed with Version 7.0:
  * the target path and file name have been merged and are now specified
  * as first argument.
  *
@@ -36,7 +36,7 @@ public final class Add extends ACreate {
 
   /**
    * Constructor, specifying a target path.
-   * Note that the constructors of this class have changed with Version 6.8:
+   * Note that the constructors of this class have changed with Version 7.0:
    * the target path and file name have been merged and are now specified
    * as first argument.
    *
@@ -51,7 +51,7 @@ public final class Add extends ACreate {
 
   /**
    * Constructor, specifying a target path and an input.
-   * Note that the constructors of this class have changed with Version 6.8:
+   * Note that the constructors of this class have changed with Version 7.0:
    * the target path and file name have been merged and are now specified
    * as first argument.
    * @param path target path, optionally terminated by a new file name.
