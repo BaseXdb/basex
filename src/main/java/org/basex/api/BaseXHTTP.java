@@ -6,8 +6,6 @@ import static org.basex.core.Text.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.URL;
 
 import org.basex.BaseXServer;
@@ -104,9 +102,6 @@ public final class BaseXHTTP {
       Util.outln(HTTP + ' ' + SERVERSTART);
     }
 
-
-    System.setProperty("STOP.PORT", "8985");
-    System.setProperty("STOP.KEY", "8985");
     jetty = new Server(hport);
 
     final org.mortbay.jetty.servlet.Context jcontext =
@@ -117,10 +112,6 @@ public final class BaseXHTTP {
     if(webdav) jcontext.addServlet(WebDAVServlet.class, "/webdav/*");
 
     jetty.start();
-
-    final ServerSocket socket = new ServerSocket();
-    socket.setReuseAddress(true);
-    socket.bind(new InetSocketAddress(hport + 1));
   }
 
   /**
