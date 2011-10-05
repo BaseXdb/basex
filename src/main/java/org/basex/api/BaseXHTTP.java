@@ -20,7 +20,9 @@ import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.nio.SelectChannelConnector;
 
 /**
  * This is the main class for the starting the database HTTP services.
@@ -74,6 +76,7 @@ public final class BaseXHTTP {
     final int eport = mprop.num(MainProp.EVENTPORT);
     final int hport = mprop.num(MainProp.HTTPPORT);
     final String host = mprop.get(MainProp.HOST);
+    final String shost = mprop.get(MainProp.SERVERHOST);
 
     if(service) {
       start(hport, args);
@@ -102,7 +105,11 @@ public final class BaseXHTTP {
       Util.outln(HTTP + ' ' + SERVERSTART);
     }
 
-    jetty = new Server(hport);
+    jetty = new Server();
+    final Connector conn = new SelectChannelConnector();
+    if(!shost.isEmpty()) conn.setHost(shost);
+    conn.setPort(hport);
+    jetty.addConnector(conn);
 
     final org.mortbay.jetty.servlet.Context jcontext =
         new org.mortbay.jetty.servlet.Context(jetty, "/",
