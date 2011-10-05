@@ -487,6 +487,8 @@ public interface QueryText {
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns";
+  /** Cryptographic module URI. */
+  byte[] CRYPTOURI = token(EXPATH + "/crypto");
   /** File module URI. */
   byte[] FILEURI = token(EXPATH + "/file");
   /** HTTP Client URI. */
