@@ -14,7 +14,6 @@ import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
-import org.basex.server.ClientDelayer;
 import org.basex.server.ClientListener;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
@@ -37,7 +36,7 @@ import org.basex.util.hash.TokenIntMap;
  */
 public class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
-  public boolean running;
+  public volatile boolean running;
   /** Event server socket. */
   ServerSocket esocket;
   /** Stop file. */
@@ -47,7 +46,7 @@ public class BaseXServer extends Main implements Runnable {
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
-  /** Blocked clients. */
+  /** Temporarily blocked clients. */
   private final TokenIntMap blocked = new TokenIntMap();
 
   /** Quiet mode (no logging). */
@@ -55,7 +54,7 @@ public class BaseXServer extends Main implements Runnable {
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
-  private boolean stopped;
+  private volatile boolean stopped;
 
   /** Server socket. */
   private ServerSocket socket;
@@ -165,17 +164,7 @@ public class BaseXServer extends Main implements Runnable {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit();
         } else {
-          final byte[] address = s.getInetAddress().getAddress();
-          final ClientListener cl = new ClientListener(s, context, log);
-          if(cl.init()) {
-            blocked.delete(address);
-            context.add(cl);
-          } else {
-            int delay = blocked.get(address);
-            delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
-            blocked.add(address, delay);
-            new ClientDelayer(delay, cl, this);
-          }
+          new ClientListener(s, context, log, this).start();
         }
       } catch(final IOException ex) {
         // socket was closed..
@@ -338,6 +327,30 @@ public class BaseXServer extends Main implements Runnable {
     } catch(final IOException ex) {
       stop.delete();
       throw ex;
+    }
+  }
+
+  /**
+   * Registers the client and calculates the delay after unsuccessful logins.
+   * @param client client address
+   * @return delay
+   */
+  public int block(final byte[] client) {
+    synchronized(blocked) {
+      int delay = blocked.get(client);
+      delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
+      blocked.add(client, delay);
+      return delay;
+    }
+  }
+
+  /**
+   * Resets the login delay after successful login.
+   * @param client client address
+   */
+  public void unblock(final byte[] client) {
+    synchronized(blocked) {
+      blocked.delete(client);
     }
   }
 
