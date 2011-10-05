@@ -1,5 +1,5 @@
 # Ruby client for BaseX.
-# Works with BaseX 6.8 and later
+# Works with BaseX 7.0 and later
 #
 # Documentation: http://docs.basex.org/wiki/Clients
 #

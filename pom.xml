@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.basex</groupId>
   <artifactId>basex-api</artifactId>
-  <version>6.8-SNAPSHOT</version>
+  <version>7.0-SNAPSHOT</version>
   <name>BaseX API</name>
   <url>http://basex.org</url>
   <properties>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex</artifactId>
-      <version>6.8-SNAPSHOT</version>
+      <version>7.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.xmldb</groupId>
