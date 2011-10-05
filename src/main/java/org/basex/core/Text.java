@@ -187,8 +187,6 @@ public interface Text {
   // COMMANDS =================================================================
 
   /** Command keyword. */
-  String AS = "AS";
-  /** Command keyword. */
   String ALL = "ALL";
   /** Command keyword. */
   String TO = "TO";
@@ -260,9 +258,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPADD = {
-    "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
-    C_INPUT + "]",
-    lang("ch_add1"), lang("ch_add2", C_INPUT, C_NAME, C_TARGET)
+    "(" + TO + " [" + C_PATH + "]) [" + C_INPUT + "]",
+    lang("ch_add1"), lang("ch_add2", C_INPUT, C_PATH)
   };
   /** Command help. */
   String[] HELPDELETE = {

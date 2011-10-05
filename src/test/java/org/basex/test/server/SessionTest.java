@@ -127,9 +127,9 @@ public abstract class SessionTest {
   @Test
   public final void add() throws IOException {
     session.execute("create db " + DB);
-    session.add(DB, "", new ArrayInput("<X/>"));
+    session.add(DB, new ArrayInput("<X/>"));
     check("1", session.query("count(" + DBOPEN.args(DB) + ")").execute());
-    for(int i = 0; i < 9; i++) session.add(DB, "", new ArrayInput("<X/>"));
+    for(int i = 0; i < 9; i++) session.add(DB, new ArrayInput("<X/>"));
     check("10", session.query("count(" + DBOPEN.args(DB) + ")").execute());
   }
 
@@ -140,7 +140,7 @@ public abstract class SessionTest {
   @Test(expected = org.basex.core.BaseXException.class)
   public final void addNameErr() throws IOException {
     session.execute("create db " + DB);
-    session.add("", "", new ArrayInput("<X/>"));
+    session.add("", new ArrayInput("<X/>"));
   }
 
   /**
@@ -150,7 +150,7 @@ public abstract class SessionTest {
   @Test(expected = org.basex.core.BaseXException.class)
   public final void addNoInput() throws IOException {
     session.execute("create db " + DB);
-    session.add("", "", new ArrayInput(""));
+    session.add("", new ArrayInput(""));
   }
 
   /**

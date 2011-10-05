@@ -42,8 +42,8 @@ public final class PathTest {
   @BeforeClass
   public static void before() throws BaseXException {
     new CreateDB(INPUT).execute(CONTEXT);
-    new Add(INPUTF, "input").execute(CONTEXT);
-    new Add(INPUTF, "input2").execute(CONTEXT);
+    new Add("input", INPUTF).execute(CONTEXT);
+    new Add("input2", INPUTF).execute(CONTEXT);
     new CreateDB(WEEK1, WEEK).execute(CONTEXT);
     new CreateDB(WEEK2, WEEK).execute(CONTEXT);
     new Close().execute(CONTEXT);

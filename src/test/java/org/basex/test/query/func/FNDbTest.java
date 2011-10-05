@@ -159,7 +159,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbList() throws BaseXException {
     check(DBLIST);
     // add documents
-    new Add(FLDR, "docs", "test").execute(CONTEXT);
+    new Add("test/docs", FLDR).execute(CONTEXT);
     contains(DBLIST.args(DB), "test/");
     // create two other database and compare substring
     new CreateDB(DB + 1).execute(CONTEXT);
@@ -242,20 +242,20 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(DBADD.args(DB, " document { <root/> }", "t2.xml"));
     query(COUNT.args(COLL.args(DB + "/t2.xml") + "/root"), "1");
 
-    query(DBADD.args(DB, " document { <root/> }", "t3.xml", "test"));
+    query(DBADD.args(DB, " document { <root/> }", "test/t3.xml"));
     query(COUNT.args(COLL.args(DB + "/test/t3.xml") + "/root"), "1");
 
-    query(DBADD.args(DB, FILE, "", "in"));
+    query(DBADD.args(DB, FILE, "in/"));
     query(COUNT.args(COLL.args(DB + "/in/input.xml") + "/html"), "1");
 
-    query(DBADD.args(DB, FILE, "t4.xml", "test"));
+    query(DBADD.args(DB, FILE, "test/t4.xml"));
     query(COUNT.args(COLL.args(DB + "/test/t4.xml") + "/html"), "1");
 
-    query(DBADD.args(DB, FLDR, "", "test/dir"));
+    query(DBADD.args(DB, FLDR, "test/dir"));
     query(COUNT.args(COLL.args(DB + "/test/dir")), NFLDR);
 
     query("for $f in " + FLLIST.args(FLDR) + " return " +
-        DBADD.args(DB, "$f", "", "dir"));
+        DBADD.args(DB, "$f", "dir"));
     query(COUNT.args(COLL.args(DB + "/dir")), NFLDR);
 
     query("for $i in 1 to 3 return " +
@@ -271,7 +271,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbDelete() throws BaseXException {
     check(DBDELETE);
-    new Add(FLDR, "docs", "test").execute(CONTEXT);
+    new Add("test/docs", FLDR).execute(CONTEXT);
     query(DBDELETE.args(DB, "test"));
     query(COUNT.args(COLL.args(DB + "/test")), 0);
   }
@@ -284,7 +284,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbRename() throws BaseXException {
     check(DBRENAME);
 
-    new Add(FLDR, "docs", "test").execute(CONTEXT);
+    new Add("test/docs", FLDR).execute(CONTEXT);
     query(COUNT.args(COLL.args(DB + "/test")), NFLDR);
 
     // rename document
@@ -307,7 +307,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbReplace() throws BaseXException {
     check(DBREPLACE);
 
-    new Add(FILE, null, "test").execute(CONTEXT);
+    new Add("test", FILE).execute(CONTEXT);
 
     query(DBREPLACE.args(DB, FILE, "\"<R1/>\""));
     query(COUNT.args(COLL.args(DB + '/' + FILE) + "/R1"), 1);
@@ -379,7 +379,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbExists() throws BaseXException {
     check(DBEXISTS);
-    query(DBADD.args(DB, "\"<a/>\"", "xml", "x"));
+    query(DBADD.args(DB, "\"<a/>\"", "x/xml"));
     query(DBSTORE.args(DB, "x/raw", "bla"));
     // checks if the specified resources exist (false expected for directories)
     query(DBEXISTS.args(DB), "true");

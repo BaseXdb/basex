@@ -67,15 +67,27 @@ public final class SAXWrapper extends SingleParser {
    * Constructor.
    * @param source sax source
    * @param name name
-   * @param target target to insert into
+   * @param path target path
    * @param pr Properties
    */
   public SAXWrapper(final SAXSource source, final String name,
-      final String target, final Prop pr) {
+      final String path, final Prop pr) {
 
-    super(IO.get(source.getSystemId()), target);
+    super(IO.get(source.getSystemId()), path);
     if(!name.isEmpty()) src.name(name);
     saxs = source;
+    prop = pr;
+  }
+
+  /**
+   * Constructor.
+   * @param source sax source
+   * @param path target path
+   * @param pr Properties
+   */
+  public SAXWrapper(final IO source, final String path, final Prop pr) {
+    super(source, path);
+    saxs = new SAXSource(source.inputSource());
     prop = pr;
   }
 

@@ -336,7 +336,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void add() throws IOException {
-    execute(new Add(null, in.readString(), in.readString()));
+    execute(new Add(in.readString()));
   }
 
   /**

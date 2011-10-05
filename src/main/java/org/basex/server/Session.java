@@ -71,13 +71,12 @@ public abstract class Session {
 
   /**
    * Adds a document to the opened database.
-   * @param name name of document
-   * @param target target path
+   * @param path target path
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public abstract void add(final String name, final String target,
-      final InputStream input) throws IOException;
+  public abstract void add(final String path, final InputStream input)
+      throws IOException;
 
   /**
    * Replaces a document in an open database.

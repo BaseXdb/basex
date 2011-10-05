@@ -62,7 +62,6 @@ public final class DialogAdd extends DialogImport {
    * @return add command
    */
   public Add cmd() {
-    final String to = target.getText().trim();
-    return new Add(path.getText().trim(), null, to.isEmpty() ? null : to);
+    return new Add(target.getText().trim(), path.getText().trim());
   }
 }

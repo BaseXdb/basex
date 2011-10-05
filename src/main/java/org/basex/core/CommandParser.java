@@ -180,9 +180,8 @@ public final class CommandParser extends InputParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        String arg1 = key(AS, null) ? string(cmd) : null;
-        String arg2 = key(TO, null) ? string(cmd) : null;
-        return new Add(s ? remaining(cmd) : string(cmd), arg1, arg2);
+        final String arg = key(TO, null) ? string(cmd) : null;
+        return new Add(arg, s ? remaining(cmd) : string(cmd));
       case DELETE:
         return new Delete(string(cmd));
       case RENAME:
@@ -198,8 +197,8 @@ public final class CommandParser extends InputParser {
           case INDEX:
             return new InfoIndex(consume(CmdIndexInfo.class, null));
           case STORAGE:
-            arg1 = number(null);
-            arg2 = arg1 != null ? number(null) : null;
+            String arg1 = number(null);
+            final String arg2 = arg1 != null ? number(null) : null;
             if(arg1 == null) arg1 = xquery(null);
             return new InfoStorage(arg1, arg2);
         }

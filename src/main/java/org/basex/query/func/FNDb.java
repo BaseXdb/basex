@@ -52,7 +52,6 @@ import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -348,18 +347,14 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
-    final String path = expr.length < 4 ? null : path(3, ctx);
+    final Item it = checkItem(expr[1], ctx);
+    String path = "";
+    if(expr.length == 3) {
+      path = path(2, ctx);
+      if(endsWith(checkStr(expr[2], ctx), '/')) path += '/';
+    }
 
-    // get all items representing document(s):
-    final ObjList<Item> docs = new ObjList<Item>(
-        (int) Math.max(expr[1].size(), 1));
-    final Iter iter = ctx.iter(expr[1]);
-    for(Item i; (i = iter.next()) != null;) docs.add(i);
-
-    if(docs.size() > 0) ctx.updates.add(
-        new DBAdd(data, input, docs, name, path, ctx.context), ctx);
-
+    ctx.updates.add(new DBAdd(data, input, it, path, ctx.context), ctx);
     return null;
   }
 
@@ -373,31 +368,24 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String trg = path(1, ctx);
+    final String path = path(1, ctx);
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final int pre = data.doc(trg);
+    final int pre = data.doc(path);
     if(pre != -1) {
-      if(data.docs(trg).size() != 1) DOCTRGMULT.thrw(input);
+      if(data.docs(path).size() != 1) DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
     // delete raw resources
-    final TokenList raw = Delete.files(data, trg);
+    final TokenList raw = Delete.files(data, path);
     ctx.updates.add(new DBDelete(data, raw, input), ctx);
+    ctx.updates.add(new DBAdd(data, input, doc, path, ctx.context), ctx);
 
-    final int p = trg.lastIndexOf('/');
-    final String name = p < 0 ? trg : trg.substring(p + 1);
-    final String path = p < 0 ? null : trg.substring(0, p);
-
-    final ObjList<Item> docs = new ObjList<Item>(1);
-    docs.add(doc);
-    ctx.updates.add(new DBAdd(data, input, docs, name, path, ctx.context), ctx);
-
-    final IOFile file = data.meta.binary(trg);
+    final IOFile file = data.meta.binary(path);
     if(file != null && file.exists() && !file.isDir()) {
       final byte[] val = checkBin(doc, ctx);
-      ctx.updates.add(new DBStore(data, token(trg), val, input), ctx);
+      ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
     }
     return null;
   }
@@ -595,19 +583,6 @@ public final class FNDb extends FuncCall {
       return ctx.resource.data(name, input);
     }
     throw STRNODTYPE.thrw(input, this, it.type);
-  }
-
-  /**
-   * Normalizes and checks the specified file name.
-   * @param name input name
-   * @return normalized path
-   * @throws QueryException query exception
-   */
-  private String name(final byte[] name) throws QueryException {
-    // check if path is valid
-    final String nm = string(name);
-    if(nm.endsWith(".") || nm.indexOf('/') != -1) RESINV.thrw(input, name);
-    return nm;
   }
 
   /**

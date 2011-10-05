@@ -202,7 +202,7 @@ public final class PermissionTest {
     // replace Test
     ok(new Close(), testSession);
     ok(new Open(RENAMED), testSession);
-    ok(new Add("<xml>1</xml>", NAME + ".xml"), testSession);
+    ok(new Add(NAME + ".xml", "<xml>1</xml>"), testSession);
     ok(new Optimize(), testSession);
     ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
 

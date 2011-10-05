@@ -42,19 +42,17 @@ public final class CreateTest {
   static {
     String file = "";
     for(final IOFile c : new IOFile(FOLDER).children()) {
-      if(c.name().endsWith(IO.XMLSUFFIX)) {
-        file = c.name();
-        break;
-      }
+      file = c.name();
+      if(file.endsWith(IO.XMLSUFFIX)) break;
     }
     FOLDERFILE = file;
   }
 
   /** Test inputs (path, folder, fragment). */
-  private static final String[] INPUTS = { PATH, FRAG, FOLDER };
+  private static final String[] INPUTS = { PATH, FOLDER, FRAG };
   /** Names of test inputs (path, folder, fragment). */
   private static final String[] NAMES = {
-    PATH.replaceAll(".*/", ""), DB + IO.XMLSUFFIX, FOLDERFILE
+    PATH.replaceAll(".*/", ""), FOLDERFILE, DB + IO.XMLSUFFIX
   };
 
   /**
@@ -98,25 +96,25 @@ public final class CreateTest {
    */
   @Test
   public void createDBandAdd() throws BaseXException {
-    for(int i = 0; i < INPUTS.length; ++i) {
+    // add file and folder, skip fragment
+    for(int i = 0; i < INPUTS.length - 1; i++) {
       new CreateDB(DB).execute(CONTEXT);
-      new Add(INPUTS[i]).execute(CONTEXT);
-      // check name of document
+      new Add("", INPUTS[i]).execute(CONTEXT);
       assertEquals(NAMES[i], docName());
     }
   }
 
   /**
-   * CREATE DB {DB}; ADD AS {DOCNAME} {INPUT[]}.
+   * CREATE DB {DB}; ADD TO {DOCNAME} {INPUT[]}.
    * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddAs() throws BaseXException {
-    for(final String in : INPUTS) {
+  public void createDBandAddToName() throws BaseXException {
+    // add file and fragment, skip folder
+    for(int i = 0; i < INPUTS.length; i += 2) {
       new CreateDB(DB).execute(CONTEXT);
-      new Add(in, DOCNAME).execute(CONTEXT);
-      // check name of document (first file in folder or specified name)
-      assertEquals(in == FOLDER ? FOLDERFILE : DOCNAME, docName());
+      new Add(DOCNAME, INPUTS[i]).execute(CONTEXT);
+      assertEquals(DOCNAME, docName());
     }
   }
 
@@ -125,26 +123,26 @@ public final class CreateTest {
    * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddTo() throws BaseXException {
-    for(int i = 0; i < INPUTS.length; ++i) {
+  public void createDBandAddToTarget() throws BaseXException {
+    // add file and folder, skip fragment
+    for(int i = 0; i < INPUTS.length - 1; i++) {
       new CreateDB(DB).execute(CONTEXT);
-      new Add(INPUTS[i], null, TARGET).execute(CONTEXT);
-      // check name of document
+      new Add(TARGET, INPUTS[i]).execute(CONTEXT);
       assertEquals(TARGET + NAMES[i], docName());
     }
   }
 
   /**
-   * CREATE DB {DB}; ADD AS {DOCNAME} TO {TARGET} {INPUT[]}.
+   * CREATE DB {DB}; ADD TO {TARGET/DOCNAME} {INPUT[]}.
    * @throws BaseXException exception
    */
   @Test
-  public void createDBandAddAsTO() throws BaseXException {
-    for(final String in : INPUTS) {
+  public void createDBandAddToTargetName() throws BaseXException {
+    // add file and fragment, skip folder
+    for(int i = 0; i < INPUTS.length; i += 2) {
       new CreateDB(DB).execute(CONTEXT);
-      new Add(in, DOCNAME, TARGET).execute(CONTEXT);
-      // check name of document (first file in folder or specified name)
-      assertEquals(TARGET + (in == FOLDER ? FOLDERFILE : DOCNAME), docName());
+      new Add(TARGET + DOCNAME, INPUTS[i]).execute(CONTEXT);
+      assertEquals(TARGET + DOCNAME, docName());
     }
   }
 

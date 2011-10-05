@@ -138,9 +138,9 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public void add(final String name, final String target,
-      final InputStream input) throws IOException {
-    send(ServerCmd.ADD, input, name, target);
+  public void add(final String path, final InputStream input)
+      throws IOException {
+    send(ServerCmd.ADD, input, path);
   }
 
   @Override
