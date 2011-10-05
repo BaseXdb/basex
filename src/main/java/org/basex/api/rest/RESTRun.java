@@ -14,6 +14,7 @@ import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 
 /**
@@ -38,11 +39,15 @@ public class RESTRun extends RESTQuery {
     // get root directory for files
     final Context context = HTTPSession.context();
     final String path = context.mprop.get(MainProp.HTTPPATH);
-    final IO io = IO.get(path + '/' + input);
+    // test for parent-directory-exploit
+    final IOFile dir = new IOFile(path);
+    final IOFile file = new IOFile(path + '/' + input);
+    final IO io = file.path().startsWith(dir.path()) ? file : null;
 
     // file not found...
-    if(!io.exists()) throw new RESTException(HttpServletResponse.SC_NOT_FOUND,
-        Util.info(FILEWHICH, input));
+    if((null == io) || !io.exists()) throw new
+      RESTException(HttpServletResponse.SC_NOT_FOUND,
+      Util.info(FILEWHICH, input));
 
     // set query path
     ctx.session.execute(new Set(Prop.QUERYPATH, io.path()));
