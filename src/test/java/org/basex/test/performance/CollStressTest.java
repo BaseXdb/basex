@@ -40,7 +40,7 @@ public final class CollStressTest {
     new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
     new Set(Prop.INTPARSE, true).execute(CONTEXT);
     for(int i = 0; i < SIZE; i++) {
-      new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
+      new Add(Integer.toString(i), "<xml/>").execute(CONTEXT);
     }
     new Set(Prop.AUTOFLUSH, true).execute(CONTEXT);
   }

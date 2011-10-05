@@ -109,7 +109,7 @@ public final class CollAddTest {
     cmd.execute(CONTEXT);
     // Add documents
     for(int i = 0; i < n; i++) {
-      new Add("<xml/>", Integer.toString(i)).execute(CONTEXT);
+      new Add(Integer.toString(i), "<xml/>").execute(CONTEXT);
     }
     // Close database
     new DropDB(DB).execute(CONTEXT);
