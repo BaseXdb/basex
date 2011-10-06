@@ -50,8 +50,9 @@ public final class Store extends ACreate {
     final String path = MetaData.normPath(args[0]);
     if(path == null) return error(NAMEINVALID, args[0]);
 
+    // ensure that the name is not empty and contains no trailing dots
     final IOFile file = context.data().meta.binary(path);
-    if(file == null || file.isDir())
+    if(path.isEmpty() || path.endsWith(".") || file == null || file.isDir())
       return error(NAMEINVALID, create ? path : args[0]);
 
     new IOFile(file.dir()).md();

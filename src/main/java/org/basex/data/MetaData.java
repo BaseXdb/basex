@@ -177,7 +177,7 @@ public final class MetaData {
   /**
    * Normalizes a database path. Converts backslashes and
    * removes duplicate and leading slashes.
-   * Returns {@code null} if the path is invalid.
+   * Returns {@code null} if the path contains invalid characters.
    * @param path input path
    * @return normalized path, or {@code null}
    */

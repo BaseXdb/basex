@@ -67,14 +67,14 @@ public final class Add extends ACreate {
     final boolean create = context.user.perm(User.CREATE);
     final String path = args[0];
     String name = MetaData.normPath(path);
-    if(name == null) return error(NAMEINVALID, path);
+    if(name == null || name.endsWith(".")) return error(NAMEINVALID, path);
 
-    // add slash to the target if addressed file is a ZIP file or directory
+    // add slash to the target if the addressed file is an archive or directory
     IO io = null;
     if(in == null) {
       io = IO.get(args[1]);
       if(!io.exists()) return error(FILEWHICH, create ? io : args[1]);
-      if(!path.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
+      if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
     }
 
     String target = "";
@@ -95,8 +95,8 @@ public final class Add extends ACreate {
       parser = new SAXWrapper(new SAXSource(in), name, target, context.prop);
     }
 
-    // ensure that the name is not empty and contains no trailing dots
-    if(name.isEmpty() || name.endsWith(".")) return error(NAMEINVALID, name);
+    // ensure that the final name is not empty
+    if(name.isEmpty()) return error(NAMEINVALID, name);
 
     // create disk instances for large documents
     // (does not work for input streams and directories)

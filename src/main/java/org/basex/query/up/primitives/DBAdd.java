@@ -98,12 +98,13 @@ public final class DBAdd extends InsertBase {
 
     final MemData mdata;
     String name = string(pth);
+    if(name.endsWith(".")) RESINV.thrw(input, pth);
 
-    // add slash to the target if addressed file is a ZIP file or directory
+    // add slash to the target if the addressed file is an archive or directory
     IO io = null;
     if(doc.str()) {
       io = IO.get(string(doc.atom(input)));
-      if(!io.exists()) throw RESFNF.thrw(input, pth);
+      if(!io.exists()) RESFNF.thrw(input, pth);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
     }
 
@@ -121,8 +122,8 @@ public final class DBAdd extends InsertBase {
       else if(!(io instanceof IOContent)) name = io.name();
     }
 
-    // ensure that the name is not empty and contains no trailing dots
-    if(name.isEmpty() || name.endsWith(".")) RESINV.thrw(input, pth);
+    // ensure that the final name is not empty
+    if(name.isEmpty()) RESINV.thrw(input, pth);
 
     if(doc.node()) {
       // adding a document node
