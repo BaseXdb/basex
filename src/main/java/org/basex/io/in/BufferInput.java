@@ -134,10 +134,18 @@ public class BufferInput extends InputStream {
   @Override
   public int read() throws IOException {
     if(pos >= size) {
-      if(size != -1) read += size;
-      size = in.read(buffer);
-      if(size <= 0) return -1;
-      pos = 0;
+      if(size > 0 && size < buffer.length) {
+        int r = -1;
+        while((r = in.read(buffer, size, buffer.length - size)) <= 0)
+          if(r < 0) return -1;
+        size += r;
+        read += r;
+      } else {
+        while((size = in.read(buffer)) <= 0)
+          if(size < 0) return -1;
+        pos = 0;
+        read += size;
+      }
     }
     return buffer[pos++] & 0xFF;
   }
@@ -231,7 +239,7 @@ public class BufferInput extends InputStream {
 
   @Override
   public final boolean markSupported() {
-    return read < buffer.length;
+    return read <= buffer.length;
   }
 
   @Override
@@ -242,7 +250,6 @@ public class BufferInput extends InputStream {
   @Override
   public final synchronized void reset() {
     size = read;
-    read = mark;
     pos = mark;
   }
 
