@@ -164,6 +164,14 @@ public class BaseXServer extends Main implements Runnable {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit();
         } else {
+          // drop inactive connections
+          final long ka = context.mprop.num(MainProp.KEEPALIVE) * 1000L;
+          if(ka > 0) {
+            final long ms = System.currentTimeMillis();
+            for(final ClientListener cs : context.sessions) {
+              if(ms - cs.last > ka) cs.exit();
+            }
+          }
           new ClientListener(s, context, log, this).start();
         }
       } catch(final IOException ex) {

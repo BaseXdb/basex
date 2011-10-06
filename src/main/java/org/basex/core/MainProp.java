@@ -46,6 +46,8 @@ public final class MainProp extends AProp {
 
   /** Timeout for processing client requests; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
+  /** Keep alive time of clients; deactivated if set to 0. */
+  public static final Object[] KEEPALIVE = { "KEEPALIVE", 0 };
   /** Debug mode. */
   public static final Object[] DEBUG = { "DEBUG", false };
   /** Defines the number of parallel readers. */

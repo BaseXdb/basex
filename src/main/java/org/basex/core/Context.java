@@ -244,7 +244,7 @@ public final class Context {
   }
 
   /**
-   * Adds the specified session. Threadsafe by {@link CopyOnWriteArrayList}.
+   * Adds the specified session. Thread-safe by {@link CopyOnWriteArrayList}.
    * @param s session to be added
    */
   public void add(final ClientListener s) {

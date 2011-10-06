@@ -61,7 +61,7 @@ public abstract class Main {
     // guarantee correct shutdown of database context
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
-      public void run() {
+      public synchronized void run() {
         context.close();
       }
     });

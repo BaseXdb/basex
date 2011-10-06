@@ -91,9 +91,9 @@ public final class Events extends HashMap<String, Sessions> {
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(EVENTS, size()).add(size() != 0 ? COL : DOT);
 
-    final String[] events = keySet().toArray(new String[size()]);
-    Arrays.sort(events);
-    for(final String name : events) tb.add(NL).add(LI).add(name);
+    final String[] names = keySet().toArray(new String[size()]);
+    Arrays.sort(names);
+    for(final String n : names) tb.add(NL).add(LI).add(n);
     return tb.toString();
   }
 
@@ -111,6 +111,7 @@ public final class Events extends HashMap<String, Sessions> {
     // event was not found
     if(sess == null) return false;
 
+    // refresh timestamp for last interaction
     for(final ClientListener srv : sess) {
       // ignore active client
       if(srv == ctx.listener) continue;

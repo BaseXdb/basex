@@ -27,10 +27,8 @@ import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ByteList;
-import org.basex.util.list.StringList;
 
 /**
  * Server-side client session in the client-server architecture.
@@ -44,7 +42,8 @@ public final class ClientListener extends Thread {
   private final HashMap<String, QueryListener> queries =
     new HashMap<String, QueryListener>();
   /** Performance measurement. */
-  final Performance perf = new Performance();
+  private final Performance perf = new Performance();
+
   /** Database context. */
   private final Context context;
   /** Socket reference. */
@@ -58,8 +57,8 @@ public final class ClientListener extends Thread {
   private Socket esocket;
   /** Output for events. */
   private PrintOutput eout;
-  /** Active events. */
-  private StringList events;
+  /** Flag for active events. */
+  private boolean events;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -70,6 +69,9 @@ public final class ClientListener extends Thread {
   private int id;
   /** Indicates if the server thread is running. */
   private boolean running;
+
+  /** Timestamp of last interaction. */
+  public long last;
 
   /**
    * Constructor.
@@ -84,6 +86,7 @@ public final class ClientListener extends Thread {
     socket = s;
     log = l;
     server = srv;
+    last = System.currentTimeMillis();
   }
 
   @Override
@@ -116,7 +119,7 @@ public final class ClientListener extends Thread {
         context.add(this);
       } else if(!us.isEmpty()) {
         log.write(this, SERVERDENIED + COLS + us);
-        // Temporarily block client
+        // temporarily block client
         new ClientDelayer(server.block(address), this, server);
       }
     } catch(final IOException ex) {
@@ -124,7 +127,7 @@ public final class ClientListener extends Thread {
       log.write(ex.getMessage());
     }
 
-    // Authentification done, start command loop
+    // authentification done, start command loop
     ServerCmd sc = null;
     String cmd = null;
 
@@ -138,6 +141,7 @@ public final class ClientListener extends Thread {
             break;
           }
 
+          last = System.currentTimeMillis();
           perf.getTime();
           sc = get(b);
           cmd = null;
@@ -225,20 +229,17 @@ public final class ClientListener extends Thread {
    */
   public synchronized void exit() {
     running = false;
+    log.write(this, "LOGOUT " + context.user.name, OK);
     try {
       // remove this session from all events in pool
-      if(events != null) {
+      if(events) {
         esocket.close();
-        for(final String e : events) {
-          final Sessions sess = context.events.get(e);
-          if(sess != null) sess.remove(this);
-        }
+        for(final Sessions s : context.events.values()) s.remove(this);
       }
       new Close().execute(context);
       if(command != null) command.stop();
       context.delete(this);
       socket.close();
-      log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final Exception ex) {
       log.write(ex.getMessage());
       Util.stack(ex);
@@ -273,6 +274,8 @@ public final class ClientListener extends Thread {
    */
   public synchronized void notify(final byte[] name, final byte[] msg)
       throws IOException {
+
+    last = System.currentTimeMillis();
     eout.print(name);
     eout.write(0);
     eout.print(msg);
@@ -282,11 +285,11 @@ public final class ClientListener extends Thread {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder("[");
-    tb.add(socket.getInetAddress().getHostAddress());
-    tb.add(COL).addExt(socket.getPort()).add(']');
-    if(context.data() != null) tb.add(COLS).add(context.data().meta.name);
-    return tb.toString();
+    final StringBuilder sb = new StringBuilder("[");
+    sb.append(socket.getInetAddress().getHostAddress());
+    sb.append(COL).append(socket.getPort()).append(']');
+    if(context.data() != null) sb.append(COLS).append(context.data().meta.name);
+    return sb.toString();
   }
 
   // PRIVATE METHODS ==========================================================
@@ -379,11 +382,11 @@ public final class ClientListener extends Thread {
    */
   private void watch() throws IOException {
     // initialize server-based event handling
-    if(events == null) {
+    if(!events) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
       out.writeString(Long.toString(getId()));
       out.flush();
-      events = new StringList();
+      events = true;
     }
     final String name = in.readString();
     final Sessions s = context.events.get(name);
@@ -391,7 +394,6 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.add(this);
-      events.add(name);
       message = EVENTWAT;
     } else if(s == null) {
       message = EVENTNO;
@@ -413,7 +415,6 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.remove(this);
-      events.delete(name);
       message = EVENTUNWAT;
     } else if(s == null) {
       message = EVENTNO;
