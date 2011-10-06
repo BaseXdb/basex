@@ -31,7 +31,7 @@ public class BufferInput extends InputStream {
   /** Current buffer position. */
   protected int pos;
   /** Current buffer size (set to {@code -1} if buffer is still empty). */
-  protected int size = -1;
+  protected int size;
 
   /** Reference to the data input stream. */
   private InputStream in;
@@ -91,7 +91,7 @@ public class BufferInput extends InputStream {
    */
   public final String encoding() throws IOException {
     // cache first bytes
-    if(size == -1) size = in.read(buffer);
+    if(size <= 0) size = in.read(buffer);
     final byte a = size > 0 ? buffer[0] : 0;
     final byte b = size > 1 ? buffer[1] : 0;
     final byte c = size > 2 ? buffer[2] : 0;
@@ -134,18 +134,16 @@ public class BufferInput extends InputStream {
   @Override
   public int read() throws IOException {
     if(pos >= size) {
-      if(size > 0 && size < buffer.length) {
-        int r = -1;
-        while((r = in.read(buffer, size, buffer.length - size)) <= 0)
-          if(r < 0) return -1;
-        size += r;
-        read += r;
-      } else {
-        while((size = in.read(buffer)) <= 0)
-          if(size < 0) return -1;
+      if(size <= 0 || size >= buffer.length) {
+        // buffer is empty or full: re-fill it
+        size = 0;
         pos = 0;
-        read += size;
       }
+      int r = -1;
+      while((r = in.read(buffer, size, buffer.length - size)) <= 0)
+        if(r < 0) return -1;
+      size += r;
+      read += r;
     }
     return buffer[pos++] & 0xFF;
   }
