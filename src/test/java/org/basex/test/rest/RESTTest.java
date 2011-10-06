@@ -360,7 +360,7 @@ public class RESTTest {
     put(DB + "/b", new ArrayInput(token("<b>B</b>")));
     assertEquals("2", get(DB + "?query=count(//text())"));
     assertEquals("2", get("?query=count(" + DBOPEN.args(DB) + "//text())"));
-    assertEquals("1", get("?query=count(" + DBOPEN.args(DB + "/b") + "/*)"));
+    assertEquals("1", get("?query=count(" + DBOPEN.args(DB, "b") + "/*)"));
     delete(DB);
   }
 
