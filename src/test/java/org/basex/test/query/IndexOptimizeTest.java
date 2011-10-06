@@ -125,7 +125,7 @@ public final class IndexOptimizeTest {
   @Test
   public void dbOpenExtTest() throws Exception {
     createColl();
-    final String doc = DBOPEN.args(NAME + "/two");
+    final String doc = DBOPEN.args(NAME, "two");
     check(doc + "//*[text() = '1']", "");
     check(doc + "//*[text() = '4']", "<a>4</a>");
   }

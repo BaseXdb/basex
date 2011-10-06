@@ -126,16 +126,9 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Value open(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkStr(expr[0], ctx);
-    // deprecated solution; slash will later be disallowed
-    final int s = indexOf(str, '/');
-    final byte[] db = s == -1 ? str : substring(str, 0, s);
-    byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
-    if(expr.length == 2) path = checkStr(expr[1], ctx);
-
-    if(!MetaData.validName(string(db), false)) INVDB.thrw(input, db);
-    final Data data = ctx.resource.data(db, input);
-    return DBNodeSeq.get(data.docs(string(path)), data, true, s == -1);
+    final Data data = data(0, ctx);
+    final String path = expr.length < 2 ? "" : path(1, ctx);
+    return DBNodeSeq.get(data.docs(path), data, true, path.isEmpty());
   }
 
   /**
@@ -348,11 +341,7 @@ public final class FNDb extends FuncCall {
 
     final Data data = data(0, ctx);
     final Item it = checkItem(expr[1], ctx);
-    String path = "";
-    if(expr.length == 3) {
-      path = path(2, ctx);
-      if(endsWith(checkStr(expr[2], ctx), '/')) path += '/';
-    }
+    String path = expr.length < 3 ? "" : path(2, ctx);
 
     ctx.updates.add(new DBAdd(data, input, it, path, ctx.context), ctx);
     return null;
@@ -567,15 +556,15 @@ public final class FNDb extends FuncCall {
 
   /**
    * Returns the data instance for the specified argument.
-   * @param arg argument
+   * @param i index of argument
    * @param ctx query context
    * @return data instance
    * @throws QueryException query exception
    */
-  private Data data(final int arg, final QueryContext ctx)
+  private Data data(final int i, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmpty(expr[arg].item(ctx, input));
+    final Item it = checkEmpty(expr[i].item(ctx, input));
     if(it.node()) return checkDBNode(it).data;
     if(it.str())  {
       final byte[] name = it.atom(input);
@@ -588,7 +577,7 @@ public final class FNDb extends FuncCall {
   /**
    * Returns the specified expression as normalized database path.
    * Throws an exception if the path is invalid.
-   * @param i expression index
+   * @param i index of argument
    * @param ctx query context
    * @return normalized path
    * @throws QueryException query exception

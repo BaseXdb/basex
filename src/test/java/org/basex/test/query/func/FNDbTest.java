@@ -75,7 +75,6 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // close database instance
     new Close().execute(CONTEXT);
-    query(COUNT.args(DBOPEN.args("<a>" + DB + "</a>")), "1");
     query(COUNT.args(DBOPEN.args(DB, "unknown")), "0");
     query(DBOPEN.args(DB) + "//title/text()", "XML");
 

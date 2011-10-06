@@ -176,7 +176,7 @@ public final class MetaData {
 
   /**
    * Normalizes a database path. Converts backslashes and
-   * removes duplicate, leading and trailing slashes.
+   * removes duplicate and leading slashes.
    * Returns {@code null} if the path is invalid.
    * @param path input path
    * @return normalized path, or {@code null}
@@ -187,13 +187,11 @@ public final class MetaData {
     for(int p = 0; p < path.length(); p++) {
       final char c = path.charAt(p);
       if(c == '\\' || c == '/') {
-        if(!slash && p != 0) slash = true;
+        if(!slash && p != 0) sb.append('/');
+        slash = true;
       } else {
         if(Prop.WIN && ":*?\"<>\\|".indexOf(c) != -1) return null;
-        if(slash) {
-          sb.append('/');
-          slash = false;
-        }
+        if(slash) slash = false;
         sb.append(c);
       }
     }

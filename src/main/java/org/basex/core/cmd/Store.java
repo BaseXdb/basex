@@ -39,9 +39,11 @@ public final class Store extends ACreate {
 
   @Override
   protected boolean run() {
+    final boolean create = context.user.perm(User.CREATE);
     if(in == null) {
       final IO file = IO.get(args[1]);
-      if(!file.exists() || file.isDir()) return error(FILEWHICH, file);
+      if(!file.exists() || file.isDir())
+        return error(FILEWHICH, create ? file : args[1]);
       in = file.inputSource();
     }
 
@@ -49,7 +51,8 @@ public final class Store extends ACreate {
     if(path == null) return error(NAMEINVALID, args[0]);
 
     final IOFile file = context.data().meta.binary(path);
-    if(file == null || file.isDir()) return error(NAMEINVALID, path);
+    if(file == null || file.isDir())
+      return error(NAMEINVALID, create ? path : args[0]);
 
     new IOFile(file.dir()).md();
 

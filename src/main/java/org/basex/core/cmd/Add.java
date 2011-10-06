@@ -64,16 +64,16 @@ public final class Add extends ACreate {
 
   @Override
   protected boolean run() {
+    final boolean create = context.user.perm(User.CREATE);
     final String path = args[0];
     String name = MetaData.normPath(path);
     if(name == null) return error(NAMEINVALID, path);
-    if(path.endsWith("/")) name += '/';
 
     // add slash to the target if addressed file is a ZIP file or directory
     IO io = null;
     if(in == null) {
       io = IO.get(args[1]);
-      if(!io.exists()) return error(FILEWHICH, io);
+      if(!io.exists()) return error(FILEWHICH, create ? io : args[1]);
       if(!path.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
     }
 
