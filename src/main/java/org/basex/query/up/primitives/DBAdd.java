@@ -47,8 +47,6 @@ public final class DBAdd extends InsertBase {
   public DBAdd(final Data d, final InputInfo i, final Item it,
       final String p, final Context c) {
 
-    // [LK] ..correct?
-    //super(PrimitiveType.INSERTAFTER, lastDoc(d), d, i, null);
     super(PrimitiveType.INSERTAFTER, -1, d, i, null);
     docs.add(it);
     paths.add(token(p));
@@ -74,8 +72,6 @@ public final class DBAdd extends InsertBase {
   @Override
   public void apply() {
     super.apply();
-    // [LK] ...correct?
-    //data.insert(pre + data.size(pre, data.kind(pre)), -1, md);
     data.insert(data.meta.size, -1, md);
   }
 
@@ -148,16 +144,6 @@ public final class DBAdd extends InsertBase {
     }
     return mdata;
   }
-
-  /*
-   * Returns the last document in the database.
-   * @param data database
-   * @return pre value of the last document or {@code 0} if database is empty
-  private static int lastDoc(final Data data) {
-    final IntList docs = data.docs();
-    return docs.size() == 0 ? 0 : docs.get(docs.size() - 1);
-  }
-   */
 
   @Override
   public String toString() {

@@ -35,7 +35,6 @@ public class FNCrypto extends FuncCall {
       throws QueryException {
 
     switch(def) {
-
       case CRYPHMAC:
         return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],
             ctx), checkStr(expr[2], ctx),

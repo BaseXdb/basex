@@ -1,6 +1,7 @@
 package org.basex.test.query.func;
 
 import org.basex.core.cmd.DropDB;
+import static org.basex.query.func.Function.*;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -16,6 +17,18 @@ public class FNCryptoTest extends AdvancedQueryTest {
 
   /** Test database name. */
   private static final String DB = Util.name(FNCryptoTest.class);
+
+  /**
+   * Checks FNCrypto functions for correct argument handling.
+   */
+  @Test
+  public void checkFunctionArguments() {
+    check(CRYPENCRYPT);
+    check(CRYPDECRYPT);
+    check(CRYPHMAC);
+    check(CRYPGENSIG);
+    check(CRYPVALSIG);
+  }
 
   /**
    * Test method for crypto:encrypt and crypto:decrypt with symmetric keys.

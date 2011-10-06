@@ -85,7 +85,7 @@ public final class Encryption {
    * @return encrypted or decrypted input
    * @throws QueryException query exception
    */
-  public Item encryption(final byte[] in, final byte[] s,
+  public Str encryption(final byte[] in, final byte[] s,
       final byte[] k, final byte[] a, final boolean ec)
           throws QueryException {
 
