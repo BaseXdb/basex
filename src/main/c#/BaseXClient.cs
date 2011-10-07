@@ -283,7 +283,7 @@ namespace BaseXClient
     /** see readme.txt */
     public Query(Session s, string query)
     {
-	  pos = 0;
+      pos = 0;
       session = s;
       id = Exec(0, query);
     }
@@ -294,42 +294,42 @@ namespace BaseXClient
       Exec(3, id + '\0' + name + '\0' + value + '\0');
     }
 	
-	/** see readme.txt */
-	public bool More()
-	{
-	  if(cache == null) 
-	  {
-	    session.stream.WriteByte(4);
+    /** see readme.txt */
+    public bool More()
+    {
+      if(cache == null) 
+      {
+        session.stream.WriteByte(4);
         session.Send(id);
-		cache = new ArrayList();
-		while (true)
-		{
-		  cache.Add(session.Receive());
-		  if(session.Read() != 1)
-		  {
-			break;				
-		  }
-		}
-		if(!session.Ok())
+        cache = new ArrayList();
+        while (true)
+        {
+          cache.Add(session.Receive());
+          if(session.Read() != 1)
+          {
+             break;				
+          }
+        }
+        if(!session.Ok())
         {
           throw new IOException(session.Receive());
         }		
-	  }
-	  return pos < cache.Count;
-	}
+      }
+      return pos < cache.Count;
+    }
 	
-	/** see readme.txt */
-	public string Next()
-	{
-		if(More()) 
-		{
-		  return cache[pos++] as string;
-		}
-		else
-		{
-		  return null;		
-		}
-	}
+    /** see readme.txt */
+    public string Next()
+    {
+      if(More()) 
+      {
+        return cache[pos++] as string;
+      }
+      else
+      {
+      	return null;		
+      }
+    }
 
     /** see readme.txt */
     public string Execute()
