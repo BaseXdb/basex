@@ -10,9 +10,10 @@ using System;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BaseXClient
 {
@@ -118,7 +119,7 @@ namespace BaseXClient
         byte[] msg = System.Text.Encoding.UTF8.GetBytes(id);
         estream.Write(msg, 0, msg.Length);
         estream.WriteByte(0);
-        estrean.ReadByte();
+        estream.ReadByte();
         new Thread(Listen).Start();
       }
       Send(name);
@@ -195,7 +196,7 @@ namespace BaseXClient
     }
 
     /** Returns a single byte from the socket. */
-    private byte Read()
+    public byte Read()
     {
       if (bpos == bsize)
       {
@@ -217,7 +218,7 @@ namespace BaseXClient
     }
 
     /** Receives a string from the socket. */
-    private string Receive()
+    public string Receive()
     {
       MemoryStream ms = new MemoryStream();
       Receive(ms);
@@ -225,7 +226,7 @@ namespace BaseXClient
     }
 
     /** Sends strings to server. */
-    private void Send(string message)
+    public void Send(string message)
     {
       byte[] msg = System.Text.Encoding.UTF8.GetBytes(message);
       stream.Write(msg, 0, msg.Length);
@@ -276,10 +277,13 @@ namespace BaseXClient
   {
     private Session session;
     private string id;
+    private ArrayList cache;
+  private int pos;
 
     /** see readme.txt */
     public Query(Session s, string query)
     {
+	  pos = 0;
       session = s;
       id = Exec(0, query);
     }
@@ -289,6 +293,43 @@ namespace BaseXClient
     {
       Exec(3, id + '\0' + name + '\0' + value + '\0');
     }
+	
+	/** see readme.txt */
+	public bool More()
+	{
+	  if(cache == null) 
+	  {
+	    session.stream.WriteByte(4);
+        session.Send(id);
+		cache = new ArrayList();
+		while (true)
+		{
+		  cache.Add(session.Receive());
+		  if(session.Read() != 1)
+		  {
+			break;				
+		  }
+		}
+		if(!session.Ok())
+        {
+          throw new IOException(session.Receive());
+        }		
+	  }
+	  return pos < cache.Count;
+	}
+	
+	/** see readme.txt */
+	public string Next()
+	{
+		if(More()) 
+		{
+		  return cache[pos++] as string;
+		}
+		else
+		{
+		  return null;		
+		}
+	}
 
     /** see readme.txt */
     public string Execute()
@@ -309,7 +350,7 @@ namespace BaseXClient
     }
 
     /** see readme.txt */
-    public string Close()
+    public void Close()
     {
       Exec(2, id);
     }
@@ -320,7 +361,8 @@ namespace BaseXClient
       session.stream.WriteByte(cmd);
       session.Send(arg);
       string s = session.Receive();
-      if(!session.Ok())
+	  bool ok = session.Ok();
+      if(!ok)
       {
         throw new IOException(session.Receive());
       }
