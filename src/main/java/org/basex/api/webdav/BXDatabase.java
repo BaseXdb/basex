@@ -2,7 +2,6 @@ package org.basex.api.webdav;
 
 import static org.basex.query.func.Function.*;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -22,10 +21,9 @@ import org.basex.util.Util;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXDatabase extends BXFolder {
+public final class BXDatabase extends BXFolder {
   /** Date format of the "Time Stamp" field in INFO DB. */
-  private static final DateFormat DATEFORMAT = new SimpleDateFormat(
-      "dd.MM.yyyy HH:mm:ss");
+  private static final String DATEFORMAT = "dd.MM.yyyy HH:mm:ss";
 
   /**
    * Constructor.
@@ -54,7 +52,8 @@ public class BXDatabase extends BXFolder {
       if(p >= 0) {
         final String date = info.substring(p + timestamp.length(),
             info.indexOf(Text.NL, p));
-        if(date.length() > 0) return DATEFORMAT.parse(date);
+        if(date.length() > 0)
+          return new SimpleDateFormat(DATEFORMAT).parse(date);
       }
     } catch(final Exception ex) {
       Util.errln(ex);

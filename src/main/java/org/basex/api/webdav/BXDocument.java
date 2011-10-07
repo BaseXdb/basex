@@ -24,7 +24,9 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXDocument extends BXAbstractResource implements FileResource {
+public final class BXDocument extends BXAbstractResource
+    implements FileResource {
+
   /** Raw flag. */
   final boolean raw;
   /** Content type. */

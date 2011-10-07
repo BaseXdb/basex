@@ -103,10 +103,11 @@ public class BXServletResponse extends AbstractResponse {
 
   @Override
   public void sendRedirect(final String url) {
-    final String u = res.encodeRedirectURL(url);
     try {
-      res.sendRedirect(u);
-    } catch(final IOException ex) { }
+      res.sendRedirect(res.encodeRedirectURL(url));
+    } catch(final IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   @Override
