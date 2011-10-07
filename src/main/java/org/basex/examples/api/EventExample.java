@@ -19,9 +19,9 @@ public final class EventExample {
    */
   public static void main(final String[] args) {
     try {
-      BaseXClient session1 =
+      final BaseXClient session1 =
         new BaseXClient("localhost", 1984, "admin", "admin");
-      BaseXClient session2 =
+      final BaseXClient session2 =
         new BaseXClient("localhost", 1984, "admin", "admin");
 
       session1.execute("create event messenger");
@@ -33,7 +33,7 @@ public final class EventExample {
       session1.close();
       session2.close();
 
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
     }
   }

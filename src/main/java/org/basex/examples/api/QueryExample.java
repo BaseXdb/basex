@@ -21,23 +21,26 @@ public final class QueryExample {
   public static void main(final String[] args) {
     try {
       // create session
-      BaseXClient session =
+      final BaseXClient session =
         new BaseXClient("localhost", 1984, "admin", "admin");
 
       try {
         // create query instance
-        String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
-        BaseXClient.Query query = session.query(input);
+        final String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
+        final BaseXClient.Query query = session.query(input);
 
         // loop through all results
         while(query.more()) {
           System.out.println(query.next());
         }
 
+        // print query info
+        System.out.println(query.info());
+
         // close query instance
         query.close();
 
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         // print exception
         ex.printStackTrace();
       }
@@ -45,7 +48,7 @@ public final class QueryExample {
       // close session
       session.close();
 
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       // print exception
       ex.printStackTrace();
     }
