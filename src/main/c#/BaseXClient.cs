@@ -302,13 +302,9 @@ namespace BaseXClient
         session.stream.WriteByte(4);
         session.Send(id);
         cache = new ArrayList();
-        while (true)
+        while (session.Read() == 1)
         {
           cache.Add(session.Receive());
-          if(session.Read() != 1)
-          {
-             break;				
-          }
         }
         if(!session.Ok())
         {
