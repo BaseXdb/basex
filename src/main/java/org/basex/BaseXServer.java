@@ -271,10 +271,10 @@ public class BaseXServer extends Main implements Runnable {
    */
   public void stop() throws IOException {
     stop.write(Token.EMPTY);
-    new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT));
+    new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT)).close();
     final int port = context.mprop.num(MainProp.SERVERPORT);
-    new Socket(LOCALHOST, port);
-    while(ping(LOCALHOST, port)) Performance.sleep(100);
+    new Socket(LOCALHOST, port).close();
+    Performance.sleep(50);
   }
 
   // STATIC METHODS ===========================================================
@@ -328,9 +328,9 @@ public class BaseXServer extends Main implements Runnable {
     final IOFile stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, eport);
-      new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port)) Performance.sleep(100);
+      new Socket(LOCALHOST, eport).close();
+      new Socket(LOCALHOST, port).close();
+      Performance.sleep(50);
       Util.outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       stop.delete();

@@ -45,6 +45,7 @@ import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.After;
@@ -293,6 +294,8 @@ public final class PermissionTest {
     no(new DropUser(NAME), testSession);
     no(new DropUser(NAME), adminSession);
     ok(new Exit(), testSession);
+    // give the server some time to close the client session
+    Performance.sleep(50);
     ok(new DropUser(NAME), adminSession);
   }
 
@@ -331,6 +334,8 @@ public final class PermissionTest {
       adminSession.execute(new DropDB(RENAMED));
       adminSession.execute(new DropDB(NAME));
       adminSession.close();
+      // give the server some time to clean up the sessions before next test
+      Performance.sleep(50);
     } catch(final Exception ex) {
       fail(Util.message(ex));
     }
