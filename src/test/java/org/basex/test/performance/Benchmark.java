@@ -44,10 +44,11 @@ public abstract class Benchmark {
   public static void init() throws IOException {
     // Check if server is (not) running
     server = !local && !BaseXServer.ping(LOCALHOST,
-        CONTEXT.mprop.num(MainProp.SERVERPORT)) ? new BaseXServer("-z") : null;
+        CONTEXT.mprop.num(MainProp.SERVERPORT)) ?
+        new BaseXServer("-z -p9999 -e9998") : null;
 
     session = local ? new LocalSession(CONTEXT) :
-      new ClientSession(CONTEXT, Text.ADMIN, Text.ADMIN);
+      new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
 
     // Create test database
     session.execute(new Set(Prop.QUERYINFO, true));

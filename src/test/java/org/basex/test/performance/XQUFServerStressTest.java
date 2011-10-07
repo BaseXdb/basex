@@ -66,7 +66,7 @@ public final class XQUFServerStressTest {
    */
   private void run(final int clients, final int runs) throws Exception {
     // Run server instance
-    server = new BaseXServer("-z");
+    server = new BaseXServer("-p9999 -e9998 -z");
     insert(clients, runs);
     delete(clients, runs);
     final ClientSession s = newSession();
@@ -126,7 +126,7 @@ public final class XQUFServerStressTest {
    * @throws Exception exception
    */
   static ClientSession newSession() throws Exception {
-    return new ClientSession(server.context, Text.ADMIN, Text.ADMIN);
+    return new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
   }
 
   /** Single client. */

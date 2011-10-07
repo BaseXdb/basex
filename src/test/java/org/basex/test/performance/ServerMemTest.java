@@ -67,7 +67,7 @@ public final class ServerMemTest {
    */
   private void run(final int clients, final int parallel) throws Exception {
     // Run server instance
-    server = new BaseXServer("-zcset parallel " + parallel);
+    server = new BaseXServer("-p9999 -e9998 -zcset parallel " + parallel);
 
     // Run clients
     final Client[] cl = new Client[clients];
@@ -89,7 +89,7 @@ public final class ServerMemTest {
      * @throws Exception exception
      */
     public Client() throws Exception {
-      session = new ClientSession(server.context, Text.ADMIN, Text.ADMIN);
+      session = new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
     }
 
     @Override

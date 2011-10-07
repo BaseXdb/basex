@@ -75,7 +75,7 @@ public final class ServerStressTest {
    */
   private void run(final int clients, final int runs) throws Exception {
     // Run server instance
-    server = new BaseXServer("-z");
+    server = new BaseXServer("-p9999 -e9998 -z");
 
     // Create test database
     final ClientSession cs = newSession();
@@ -99,7 +99,7 @@ public final class ServerStressTest {
    * @throws IOException exception
    */
   static ClientSession newSession() throws IOException {
-    return new ClientSession(server.context, Text.ADMIN, Text.ADMIN);
+    return new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
   }
 
   /** Single client. */
