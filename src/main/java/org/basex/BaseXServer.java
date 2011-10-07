@@ -328,9 +328,8 @@ public class BaseXServer extends Main implements Runnable {
     final IOFile stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, eport);
-      new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port)) Performance.sleep(100);
+      new Socket(LOCALHOST, eport).close();
+      new Socket(LOCALHOST, port).close();
       Util.outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       stop.delete();
