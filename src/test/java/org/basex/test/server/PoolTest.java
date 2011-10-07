@@ -43,9 +43,9 @@ public final class PoolTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    server = new BaseXServer("-z");
-    session1 = new ClientSession(server.context, ADMIN, ADMIN);
-    session2 = new ClientSession(server.context, ADMIN, ADMIN);
+    server = new BaseXServer("-z -p9999 -e9998");
+    session1 = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
+    session2 = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
   }
 
   /** Create and Drop Tests. */

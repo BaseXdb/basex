@@ -81,14 +81,14 @@ public final class PermissionTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z");
+    server = new BaseXServer("-z -p9999 -e9998");
   }
 
   /** Set up method. */
   @Before
   public void setUp() {
     try {
-      adminSession = new ClientSession(server.context, ADMIN, ADMIN);
+      adminSession = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
       if(server.context.users.get(NAME) != null) {
         ok(new DropUser(NAME), adminSession);
       }
@@ -96,7 +96,7 @@ public final class PermissionTest {
       ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
       server.context.repo.init(REPO);
-      testSession = new ClientSession(server.context, NAME, NAME);
+      testSession = new ClientSession(LOCALHOST, 9999, NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
       ok(new Close(), adminSession);

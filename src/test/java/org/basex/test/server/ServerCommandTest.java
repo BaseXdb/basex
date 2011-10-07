@@ -35,8 +35,8 @@ public final class ServerCommandTest extends CommandTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z");
-    session = new ClientSession(CONTEXT, ADMIN, ADMIN);
+    server = new BaseXServer("-z -p9999 -e9998");
+    session = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
     cleanUp();
   }
 
@@ -65,7 +65,7 @@ public final class ServerCommandTest extends CommandTest {
     no(new Kill(Text.ADMIN + "2"));
     no(new Kill("ha*"));
     ok(new CreateUser(NAME2, Token.md5("test")));
-    final ClientSession cs = new ClientSession(CONTEXT, NAME2, "test");
+    final ClientSession cs = new ClientSession(LOCALHOST, 9999, NAME2, "test");
     ok(new Kill(NAME2));
     no(new Kill(NAME2 + "?"));
     cs.close();

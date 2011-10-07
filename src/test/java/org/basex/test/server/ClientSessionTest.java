@@ -28,7 +28,7 @@ public class ClientSessionTest extends SessionTest {
    */
   @BeforeClass
   public static void startServer() throws IOException {
-    server = new BaseXServer("-z");
+    server = new BaseXServer("-z -p9999 -e9998");
   }
 
   /**
@@ -44,7 +44,7 @@ public class ClientSessionTest extends SessionTest {
   @Before
   public void startSession() {
     try {
-      session = new ClientSession(server.context, ADMIN, ADMIN, out);
+      session = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN, out);
     } catch(final IOException ex) {
       fail(Util.message(ex));
     }

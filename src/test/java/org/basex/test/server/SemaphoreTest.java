@@ -48,7 +48,7 @@ public final class SemaphoreTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z");
+    server = new BaseXServer("-z -p9999 -e9998");
     sess = newSession();
   }
 
@@ -109,7 +109,7 @@ public final class SemaphoreTest {
    * @throws IOException exception
    */
   static ClientSession newSession() throws IOException {
-    return new ClientSession(server.context, ADMIN, ADMIN);
+    return new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
   }
 
   /** Single client. */

@@ -107,7 +107,7 @@ public final class DialogPrefs extends Dialog {
     p = new BaseXBack(new TableLayout(1, 2, 12, 0));
 
     lang = new BaseXCombo(this, LANGS[0]);
-    lang.setSelectedItem(mprop.get(MainProp.LANGUAGE));
+    lang.setSelectedItem(mprop.get(MainProp.LANG));
 
     p.add(lang);
     creds = new BaseXLabel(" ");
@@ -133,7 +133,7 @@ public final class DialogPrefs extends Dialog {
   @Override
   public void close() {
     final MainProp mprop = gui.context.mprop;
-    mprop.set(MainProp.LANGUAGE, lang.getSelectedItem().toString());
+    mprop.set(MainProp.LANG, lang.getSelectedItem().toString());
     // new database path: close existing database
     final String dbpath = path.getText().trim();
     if(!mprop.get(MainProp.DBPATH).equals(dbpath)) gui.execute(new Close());
