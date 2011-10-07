@@ -32,6 +32,9 @@ public final class QueryExample {
           System.out.println(query.next());
         }
 
+        // print query info
+        System.out.println(query.info());
+
         // close query instance
         query.close();
 

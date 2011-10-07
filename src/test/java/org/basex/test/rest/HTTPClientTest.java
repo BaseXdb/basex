@@ -79,7 +79,7 @@ public class HTTPClientTest {
   private static final byte[] METHOD = token("method");
   /** Example url. */
   private static final String RESTURL =
-      "http://" + LOCALHOST + ":9998/rest/" + DB;
+      "http://" + LOCALHOST + ":9997/rest/" + DB;
   /** Books document. */
   private static final String BOOKS = "<books>" + "<book id='1'>"
       + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
@@ -110,7 +110,8 @@ public class HTTPClientTest {
    */
   protected static void init(final boolean local) throws Exception {
     final String l = local ? "-l " : "";
-    http = new BaseXHTTP(l + " -h9998 -p9999 -zU" + ADMIN + " -P" + ADMIN);
+    http = new BaseXHTTP(l + " -h9997 -p9999 -e9998 -zU" +
+        ADMIN + " -P" + ADMIN);
   }
 
   /**

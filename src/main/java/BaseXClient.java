@@ -385,7 +385,7 @@ public final class BaseXClient {
      * @throws IOException I/O Exception
      */
     public String next() throws IOException {
-      return more() ? new String(cache.get(pos++), UTF8) : null;
+      return more() ? new String(cache.set(pos++, null), UTF8) : null;
     }
 
     /**

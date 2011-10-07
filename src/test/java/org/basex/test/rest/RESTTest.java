@@ -48,7 +48,7 @@ public class RESTTest {
       "<" + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
   /** Root path. */
   private static final String ROOT =
-      "http://" + LOCALHOST + ":9998/" + NAME + "/";
+      "http://" + LOCALHOST + ":9997/" + NAME + "/";
   /** Input file. */
   private static final String FILE = "etc/test/input.xml";
   /** Start servers. */
@@ -72,11 +72,12 @@ public class RESTTest {
    */
   public static void init(final boolean local) throws Exception {
     final String l = local ? "-l " : "";
-    http = new BaseXHTTP(l + " -h9998 -p9999 -zU" + ADMIN + " -P" + ADMIN);
+    http = new BaseXHTTP(l + " -h9997 -p9999 -e9998 -zU" +
+        ADMIN + " -P" + ADMIN);
   }
 
   /**
-   * Stop server.
+   * Finish test.
    * @throws Exception exception
    */
   @AfterClass
