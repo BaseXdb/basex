@@ -246,12 +246,15 @@ public final class FNSql extends FuncCall {
       throws QueryException {
 
     final String query = string(checkStr(ctx.iter(expr[1]).next(), ctx));
+    Statement stmt = null;
     try {
-      final Statement stmt = conn.createStatement();
+      stmt = conn.createStatement();
       final boolean result = stmt.execute(query);
       return result ? buildResult(stmt.getResultSet()) : new NodeCache();
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
+    } finally {
+      if(stmt != null) try { stmt.close(); } catch(final SQLException ex) { }
     }
   }
 

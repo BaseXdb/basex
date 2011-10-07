@@ -123,7 +123,7 @@ public final class DirParser extends TargetParser {
             skipped.add(io.path());
             ok = false;
           } finally {
-            if(bi != null) try { bi.close(); } catch(final Exception ex) { }
+            if(bi != null) bi.close();
           }
         }
         parser = Parser.fileParser(in, prop, targ);

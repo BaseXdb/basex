@@ -1,5 +1,6 @@
 package org.basex.util.ft;
 
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.basex.index.IndexToken;
@@ -208,8 +209,8 @@ public final class FTLexer extends FTIterator implements IndexToken {
       }
     }
     final StringList sl = new StringList();
-    for(final Language l : langs.keySet()) {
-      sl.add(l + " (" + langs.get(l) + ")");
+    for(final Entry<Language, Stemmer> l : langs.entrySet()) {
+      sl.add(l.getKey() + " (" + l.getValue() + ")");
     }
     sl.sort(true, true);
     return sl;

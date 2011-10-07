@@ -34,7 +34,7 @@ import org.basex.util.hash.TokenIntMap;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public class BaseXServer extends Main implements Runnable {
+public final class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
   public volatile boolean running;
   /** Event server socket. */

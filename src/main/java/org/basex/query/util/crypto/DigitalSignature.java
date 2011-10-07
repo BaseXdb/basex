@@ -232,7 +232,7 @@ public final class DigitalSignature {
         }
 
         // initialize the keystore
-        KeyStore ks = KeyStore.getInstance(ksTY);
+        final KeyStore ks = KeyStore.getInstance(ksTY);
 
         if(ks == null) CRYPTOKSNULL.thrw(input, ks);
 
@@ -269,7 +269,7 @@ public final class DigitalSignature {
         pk = kp.getPrivate();
       }
 
-      Document inputNode = toDOMNode(node);
+      final Document inputNode = toDOMNode(node);
       List<Transform> tfList = null;
 
 
@@ -343,29 +343,29 @@ public final class DigitalSignature {
       xmlSig.sign(signContext);
       signedNode = toDBNode(inputNode);
 
-    } catch(XPathExpressionException e) {
+    } catch(final XPathExpressionException e) {
       CRYPTOXPINV.thrw(input, e);
-    } catch(SAXException e) {
+    } catch(final SAXException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(ParserConfigurationException e) {
+    } catch(final ParserConfigurationException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(KeyStoreException e) {
+    } catch(final KeyStoreException e) {
       CRYPTOKSEXC.thrw(input, e);
-    } catch(MarshalException e) {
+    } catch(final MarshalException e) {
       CRYPTOSIGEXC.thrw(input, e);
-    } catch(XMLSignatureException e) {
+    } catch(final XMLSignatureException e) {
       CRYPTOSIGEXC.thrw(input, e);
-    } catch(NoSuchAlgorithmException e) {
+    } catch(final NoSuchAlgorithmException e) {
       CRYPTOALGEXC.thrw(input, e);
-    } catch(CertificateException e) {
+    } catch(final CertificateException e) {
       CRYPTOALGEXC.thrw(input, e);
-    } catch(UnrecoverableKeyException e) {
+    } catch(final UnrecoverableKeyException e) {
       CRYPTONOKEY.thrw(input, e);
-    } catch(KeyException e) {
+    } catch(final KeyException e) {
       CRYPTONOKEY.thrw(input, e);
-    } catch(InvalidAlgorithmParameterException e) {
+    } catch(final InvalidAlgorithmParameterException e) {
       CRYPTOALGEXC.thrw(input, e);
     }
 
@@ -398,15 +398,15 @@ public final class DigitalSignature {
 
       return Bln.get(coreVal);
 
-    } catch(XMLSignatureException e) {
+    } catch(final XMLSignatureException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(SAXException e) {
+    } catch(final SAXException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(ParserConfigurationException e) {
+    } catch(final ParserConfigurationException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(MarshalException e) {
+    } catch(final MarshalException e) {
       CRYPTOSIGEXC.thrw(input, e);
     }
 
@@ -425,13 +425,13 @@ public final class DigitalSignature {
     DBNode dbn = null;
 
     try {
-      TransformerFactory transfac = TransformerFactory.newInstance();
-      Transformer trans = transfac.newTransformer();
+      final TransformerFactory transfac = TransformerFactory.newInstance();
+      final Transformer trans = transfac.newTransformer();
 
       //create string from xml tree
-      StringWriter sw = new StringWriter();
-      StreamResult result = new StreamResult(sw);
-      DOMSource source = new DOMSource(n);
+      final StringWriter sw = new StringWriter();
+      final StreamResult result = new StreamResult(sw);
+      final DOMSource source = new DOMSource(n);
       trans.transform(source, result);
       xmlString = sw.toString();
 
@@ -440,9 +440,9 @@ public final class DigitalSignature {
       final Data mem = builder.build();
       dbn = new DBNode(mem, 1);
 
-    } catch(IOException e) {
+    } catch(final IOException e) {
       CRYPTOIOEXC.thrw(input, e);
-    } catch(TransformerException e) {
+    } catch(final TransformerException e) {
       CRYPTOIOEXC.thrw(input, e);
     }
 

@@ -18,21 +18,19 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 /**
- * Extracs a key from a given {@link KeyInfo} object.
+ * Extracts a key from a given {@link KeyInfo} object.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
 public class MyKeySelector extends KeySelector {
-
   /**
    * Wrapper for KeySelector results.
    *
    * @author BaseX Team 2005-11, BSD License
    * @author Lukas Kircher
    */
-  private class MyKeySelectorResult implements KeySelectorResult {
-
+  private static class MyKeySelectorResult implements KeySelectorResult {
     /** Key. */
     private final Key pk;
 
@@ -68,7 +66,7 @@ public class MyKeySelector extends KeySelector {
         if(s instanceof KeyValue) {
           try {
             pk = ((KeyValue) s).getPublicKey();
-          } catch(KeyException ke) {
+          } catch(final KeyException ke) {
             throw new KeySelectorException(ke);
           }
 

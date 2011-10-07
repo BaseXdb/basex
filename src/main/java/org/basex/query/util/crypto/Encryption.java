@@ -104,17 +104,17 @@ public final class Encryption {
       else
         t = decrypt(in, k, a, ivl);
 
-    } catch(NoSuchPaddingException e) {
+    } catch(final NoSuchPaddingException e) {
       CRYPTONOPAD.thrw(input, e);
-    } catch(BadPaddingException e) {
+    } catch(final BadPaddingException e) {
       CRYPTOBADPAD.thrw(input, e);
-    } catch(NoSuchAlgorithmException e) {
+    } catch(final NoSuchAlgorithmException e) {
       CRYPTOINVALGO.thrw(input, e);
-    } catch(InvalidKeyException e) {
+    } catch(final InvalidKeyException e) {
       CRYPTOKEYINV.thrw(input, e);
-    } catch(IllegalBlockSizeException e) {
+    } catch(final IllegalBlockSizeException e) {
       CRYPTOILLBLO.thrw(input, e);
-    } catch(InvalidAlgorithmParameterException e) {
+    } catch(final InvalidAlgorithmParameterException e) {
       CRYPTOINVALGO.thrw(input, e);
     }
 
@@ -146,7 +146,7 @@ public final class Encryption {
     final SecretKeySpec kspec = new SecretKeySpec(k, string(a));
     // generate random iv. random iv is necessary to make the encryption of a
     // string look different every time it is encrypted.
-    byte[] iv = new byte[ivl];
+    final byte[] iv = new byte[ivl];
     // create new random iv if encrypting
     final SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
     rand.nextBytes(iv);
@@ -186,7 +186,7 @@ public final class Encryption {
     final Cipher cipher = Cipher.getInstance(string(ALGN.get(lc(a))));
 
     // extract iv from message beginning
-    byte[] iv = substring(in, 0, ivl);
+    final byte[] iv = substring(in, 0, ivl);
     final IvParameterSpec ivspec = new IvParameterSpec(iv);
 //    System.out.println("extracted iv: " + string(iv) + "\n");
 
@@ -218,13 +218,13 @@ public final class Encryption {
       CRYPTOENC.thrw(input, enc);
 
     try {
-      Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(a))));
+      final Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(a))));
       mac.init(key);
       hash = mac.doFinal(msg);
 
-    } catch(NoSuchAlgorithmException e) {
+    } catch(final NoSuchAlgorithmException e) {
       CRYPTOINVHASH.thrw(input, e);
-    } catch(InvalidKeyException e) {
+    } catch(final InvalidKeyException e) {
       CRYPTOKEYINV.thrw(input, e);
     }
 

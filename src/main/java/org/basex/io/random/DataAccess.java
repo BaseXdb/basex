@@ -70,7 +70,7 @@ public final class DataAccess {
    * Sets the file length.
    * @param l file length
    */
-  public void length(final long l) {
+  public synchronized void length(final long l) {
     changed |= l != len;
     len = l;
   }

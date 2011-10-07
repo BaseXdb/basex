@@ -341,7 +341,7 @@ public final class FNDb extends FuncCall {
 
     final Data data = data(0, ctx);
     final Item it = checkItem(expr[1], ctx);
-    String path = expr.length < 3 ? "" : path(2, ctx);
+    final String path = expr.length < 3 ? "" : path(2, ctx);
 
     ctx.updates.add(new DBAdd(data, input, it, path, ctx.context), ctx);
     return null;

@@ -194,7 +194,8 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignature1c() {
-    String input = "<a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'>" +
+    final String input =
+        "<a><Signature xmlns='http://www.w3.org/2000/09/xmldsig#'>" +
         "<SignedInfo><CanonicalizationMethod " +
         "Algorithm='http://www.w3.org/TR/2001/REC-xml-c14n-20010315'/>" +
         "<SignatureMethod Algorithm='http://www.w3.org/2000/09/xmldsig#rsa-" +
