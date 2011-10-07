@@ -278,7 +278,7 @@ namespace BaseXClient
     private Session session;
     private string id;
     private ArrayList cache;
-  private int pos;
+    private int pos;
 
     /** see readme.txt */
     public Query(Session s, string query)
