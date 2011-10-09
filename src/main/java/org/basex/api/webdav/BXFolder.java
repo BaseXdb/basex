@@ -207,8 +207,9 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   protected void copyToRoot(final Session s, final String n)
       throws IOException {
     // folder is copied to the root: create new database with it
-    s.execute(new CreateDB(n));
-    add(s, n, "");
+    final String dbname = dbname(n);
+    s.execute(new CreateDB(dbname));
+    add(s, dbname, "");
   }
 
   @Override
