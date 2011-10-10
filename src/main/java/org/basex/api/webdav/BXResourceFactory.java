@@ -1,6 +1,7 @@
 package org.basex.api.webdav;
 
-import static org.basex.api.webdav.BXResource.*;
+import static org.basex.api.webdav.BXNotAuthorizedResource.*;
+import static org.basex.api.webdav.BXServletRequest.*;
 
 import java.io.IOException;
 
@@ -33,20 +34,21 @@ public class BXResourceFactory implements ResourceFactory {
     try {
       final Session s = session.login();
       try {
-        // the root is requested
-        final Path path = Path.path(dbpath).getStripFirst();
-        if(path.isRoot()) return new BXRootResource(session);
+        Path p = Path.path(dbpath);
+        if(!getRequest().getContextPath().isEmpty()) p = p.getStripFirst();
+        if(!getRequest().getServletPath().isEmpty()) p = p.getStripFirst();
 
-        // only the database is requested
-        final String db = path.getFirst();
-        return path.getLength() == 1 ?
+        if(p.isRoot()) return new BXRootResource(session);
+
+        final String db = p.getFirst();
+        return p.getLength() == 1 ?
           listDBs(s).contains(db) ? new BXDatabase(db, session) : null :
-          resource(s, db, path.getStripFirst().toString(), session);
+          resource(s, db, p.getStripFirst().toString(), session);
       } finally {
         s.close();
       }
     } catch(final LoginException ex) {
-      return BXNotAuthorizedResource.NOAUTH;
+      return NOAUTH;
     } catch(final IOException ex) {
       Util.errln(ex);
     }
