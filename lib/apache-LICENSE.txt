@@ -1,7 +1,7 @@
 ===================================================== APACHE LICENSE ===
 
 Projects licensed under the Apache license:
-- commons, jetty, log4j, lucene-stemmers, milton, mime-util,
+- commons, jetty, lucene-stemmers, milton, mime-util,
   xml-resolver, tagsoup
 
 
