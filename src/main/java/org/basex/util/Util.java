@@ -1,15 +1,15 @@
 package org.basex.util;
 
-import java.io.File;
-import java.io.IOException;
-
 import static org.basex.core.Text.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.security.ProtectionDomain;
 import java.util.Scanner;
 
 import org.basex.core.Prop;
@@ -282,23 +282,27 @@ public final class Util {
     if(new File(work, IO.BASEXSUFFIX).exists()) return work;
 
     // not found; check application directory
-    final File f = new File(applicationPath());
-    final String home = f.isFile() ? f.getParent() : f.getPath();
-    if(new File(home, IO.BASEXSUFFIX).exists()) return home;
+    final String app = applicationPath();
+    if(app != null) {
+      final File f = new File(app);
+      final String home = f.isFile() ? f.getParent() : f.getPath();
+      if(new File(home, IO.BASEXSUFFIX).exists()) return home;
+    }
 
     // not found; choose user home directory
     return System.getProperty("user.home");
   }
 
   /**
-   * Returns the absolute path to this application.
-   * @return application path
+   * Returns the absolute path to this application, or {@code null} if the
+   * path cannot be evaluated.
+   * @return application path.
    */
   private static String applicationPath() {
+    final ProtectionDomain pd = Util.class.getProtectionDomain();
+    if(pd == null) return null;
     // raw application path
-    final String path = Util.class.getProtectionDomain().
-      getCodeSource().getLocation().getPath();
-
+    final String path = pd.getCodeSource().getLocation().getPath();
     // decode path; URLDecode returns wrong results
     final TokenBuilder tb = new TokenBuilder();
     final int pl = path.length();
