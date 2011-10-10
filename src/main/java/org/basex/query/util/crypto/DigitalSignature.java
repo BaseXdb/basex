@@ -121,8 +121,8 @@ public final class DigitalSignature {
         CanonicalizationMethod.EXCLUSIVE));
 
     DIGESTS.add(DEFD, token(DigestMethod.SHA1));
-    DIGESTS.add(token("SHA256"), token(DigestMethod.SHA256));
-    DIGESTS.add(token("SHA512"), token(DigestMethod.SHA512));
+    DIGESTS.add(token("sha256"), token(DigestMethod.SHA256));
+    DIGESTS.add(token("sha512"), token(DigestMethod.SHA512));
 
     SIGNATURES.add(DEFS, token(SignatureMethod.RSA_SHA1));
     SIGNATURES.add(token("dsa_sha1"), token(SignatureMethod.DSA_SHA1));
