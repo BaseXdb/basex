@@ -813,21 +813,21 @@ public enum Err {
   /** FOCX22: Crypto Exception. */
   CRYPTODECTYP(FOCX, 22, "Decryption type is not supported."),
   /** FOCX999: Crypto Exception. */
-  CRYPTOSIGTYPINV(FOCX, 999, "Signature type is not supported."),
+  CRYPTOSIGTYPINV(FOCX, 9999, "Signature type is not supported."),
   /** FOCX998: Crypto Exception. */
-  CRYPTONOTSUPP(FOCX, 998, "Operation not (yet) supported."),
+  CRYPTONOTSUPP(FOCX, 9998, "Cryptographic operation not (yet) supported."),
   /** FOCX997: Crypto Exception. */
-  CRYPTOSYMERR(FOCX, 997, "Algorithm not compatible with encryption type."),
+  CRYPTOSYMERR(FOCX, 9997, "Algorithm not compatible with encryption type."),
   /** FOCX996: Crypto Exception. */
-  CRYPTOIOEXC(FOCX, 996, "IO Exception."),
+  CRYPTOIOEXC(FOCX, 9996, "IO Exception."),
   /** FOCX995: Crypto Exception. */
-  CRYPTOKSEXC(FOCX, 995, "Keystore exception."),
+  CRYPTOKSEXC(FOCX, 9995, "Keystore exception."),
   /** FOCX994: Crypto Exception. */
-  CRYPTOSIGEXC(FOCX, 994, "Signature exception."),
+  CRYPTOSIGEXC(FOCX, 9994, "Signature exception."),
   /** FOCX993: Crypto Exception. */
-  CRYPTOALGEXC(FOCX, 993, "Invalid algorithm."),
+  CRYPTOALGEXC(FOCX, 9993, "Invalid algorithm."),
   /** FOCX992: Crypto Exception. */
-  CRYPTOALINV(FOCX, 992, "Invalid certificate alias %.");
+  CRYPTOALINV(FOCX, 9992, "Invalid certificate alias %.");
 
   /** Error type. */
   public final ErrType type;
