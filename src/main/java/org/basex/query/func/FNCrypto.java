@@ -38,7 +38,7 @@ public class FNCrypto extends FuncCall {
       case CRYPHMAC:
         return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],
             ctx), checkStr(expr[2], ctx),
-            expr.length == 4 ? checkStr(expr[3], ctx) : null);
+            expr.length == 4 ? checkStr(expr[3], ctx) : Token.EMPTY);
 
       case CRYPENCRYPT:
         return new Encryption(ii).encryption(checkStr(expr[0], ctx),

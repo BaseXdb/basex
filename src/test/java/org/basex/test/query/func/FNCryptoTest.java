@@ -60,6 +60,16 @@ public class FNCryptoTest extends AdvancedQueryTest {
    * Tests the creation of a message authentication code for the md5 algorithm.
    */
   @Test
+  public void hmacMD5defencoding() {
+    query("declare namespace c = 'http://expath.org/ns/crypto';" +
+        "c:hmac('message','key','md5')",
+        "TkdI5itGNSH2d1+/khI0tQ==");
+  }
+
+  /**
+   * Tests the creation of a message authentication code for the md5 algorithm.
+   */
+  @Test
   public void hmacMD5hex() {
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:hmac('message','key','md5', 'hex')",
