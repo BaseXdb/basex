@@ -768,66 +768,66 @@ public enum Err {
   UPATTELM2(XUTY, 22, "Insert target must be an element."),
 
   /* EXPath Cryptographic Module Errors */
-  /** CX01: Crypto Exception. */
-  CRYPTOCANINV(CX, 1, "Canonicalization algorithm is not supported."),
-  /** CX02: Crypto Exception. */
-  CRYPTODIGINV(CX, 2, "Digest algorithm is not supported."),
-  /** CX03: Crypto Exception. */
-  CRYPTOSIGINV(CX, 3, "Signature algorithm is not supported."),
-  /** CX03: Crypto Exception. */
-  CRYPTOXPINV(CX, 4, "XPath expression is invalid."),
-  /** CX03: Crypto Exception. */
-  CRYPTOINVNM(CX, 5, "Invalid name for $digital-certificate root."),
-  /** CX03: Crypto Exception. */
-  CRYPTOINVCH(CX, 6, "Invalid child element of $digital-certificate."),
-  /** CX03: Crypto Exception. */
-  CRYPTOKSNULL(CX, 7, "Key store is null."),
-  /** CX03: Crypto Exception. */
-  CRYPTOIOERR(CX, 8, "I/O error while reading keystore."),
-  /** CX03: Crypto Exception. */
-  CRYPTOPERMDEN(CX, 9, "Permission denied to read keystore."),
-  /** CX03: Crypto Exception. */
-  CRYPTOKSURLINV(CX, 10, "Keystore URL is invalid."),
-  /** CX03: Crypto Exception. */
-  CRYPTOKSTYPE(CX, 11, "Keystore type is not supported."),
-  /** CX03: Crypto Exception. */
-  CRYPTONOKEY(CX, 12, "Cannot find key for alias in given keystore."),
-  /** CX13: Crypto Exception. */
-  CRYPTOINVHASH(CX, 13, "Hashing algorithm is not supported."),
-  /** CX14: Crypto Exception. */
-  CRYPTOENC(CX, 14, "The encoding method is not supported."),
-  /** CX15: Crypto Exception. */
-  CRYPTONOSIG(CX, 15, "Cannot find signature element."),
-  /** CX16: Crypto Exception. */
-  CRYPTONOPAD(CX, 16, "No such padding."),
-  /** CX17: Crypto Exception. */
-  CRYPTOBADPAD(CX, 17, "Incorrect padding."),
-  /** CX18: Crypto Exception. */
-  CRYPTOENCTYP(CX, 18, "Encryption type is not supported."),
-  /** CX19: Crypto Exception. */
-  CRYPTOKEYINV(CX, 19, "Secret key is invalid."),
-  /** CX20: Crypto Exception. */
-  CRYPTOILLBLO(CX, 20, "Illegal block size."),
-  /** CX21: Crypto Exception. */
-  CRYPTOINVALGO(CX, 21, "Algorithm is not supported."),
-  /** CX22: Crypto Exception. */
-  CRYPTODECTYP(CX, 22, "Decryption type is not supported."),
-  /** CX999: Crypto Exception. */
-  CRYPTOSIGTYPINV(CX, 999, "Signature type is not supported."),
-  /** CX998: Crypto Exception. */
-  CRYPTONOTSUPP(CX, 998, "Operation not (yet) supported."),
-  /** CX997: Crypto Exception. */
-  CRYPTOSYMERR(CX, 997, "Algorithm not compatible with encryption type."),
-  /** CX996: Crypto Exception. */
-  CRYPTOIOEXC(CX, 996, "IO Exception."),
-  /** CX995: Crypto Exception. */
-  CRYPTOKSEXC(CX, 995, "Keystore exception."),
-  /** CX994: Crypto Exception. */
-  CRYPTOSIGEXC(CX, 994, "Signature exception."),
-  /** CX993: Crypto Exception. */
-  CRYPTOALGEXC(CX, 993, "Invalid algorithm."),
-  /** CX992: Crypto Exception. */
-  CRYPTOALINV(CX, 992, "Invalid certificate alias %.");
+  /** FOCX01: Crypto Exception. */
+  CRYPTOCANINV(FOCX, 1, "Canonicalization algorithm is not supported."),
+  /** FOCX02: Crypto Exception. */
+  CRYPTODIGINV(FOCX, 2, "Digest algorithm is not supported."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOSIGINV(FOCX, 3, "Signature algorithm is not supported."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOXPINV(FOCX, 4, "XPath expression is invalid."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOINVNM(FOCX, 5, "Invalid name for $digital-certificate root."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOINVCH(FOCX, 6, "Invalid child element of $digital-certificate."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOKSNULL(FOCX, 7, "Key store is null."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOIOERR(FOCX, 8, "I/O error while reading keystore."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOPERMDEN(FOCX, 9, "Permission denied to read keystore."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOKSURLINV(FOCX, 10, "Keystore URL is invalid."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOKSTYPE(FOCX, 11, "Keystore type is not supported."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTONOKEY(FOCX, 12, "Cannot find key for alias in given keystore."),
+  /** FOCX13: Crypto Exception. */
+  CRYPTOINVHASH(FOCX, 13, "Hashing algorithm is not supported."),
+  /** FOCX14: Crypto Exception. */
+  CRYPTOENC(FOCX, 14, "The encoding method is not supported."),
+  /** FOCX15: Crypto Exception. */
+  CRYPTONOSIG(FOCX, 15, "Cannot find signature element."),
+  /** FOCX16: Crypto Exception. */
+  CRYPTONOPAD(FOCX, 16, "No such padding."),
+  /** FOCX17: Crypto Exception. */
+  CRYPTOBADPAD(FOCX, 17, "Incorrect padding."),
+  /** FOCX18: Crypto Exception. */
+  CRYPTOENCTYP(FOCX, 18, "Encryption type is not supported."),
+  /** FOCX19: Crypto Exception. */
+  CRYPTOKEYINV(FOCX, 19, "Secret key is invalid."),
+  /** FOCX20: Crypto Exception. */
+  CRYPTOILLBLO(FOCX, 20, "Illegal block size."),
+  /** FOCX21: Crypto Exception. */
+  CRYPTOINVALGO(FOCX, 21, "Algorithm is not supported."),
+  /** FOCX22: Crypto Exception. */
+  CRYPTODECTYP(FOCX, 22, "Decryption type is not supported."),
+  /** FOCX999: Crypto Exception. */
+  CRYPTOSIGTYPINV(FOCX, 999, "Signature type is not supported."),
+  /** FOCX998: Crypto Exception. */
+  CRYPTONOTSUPP(FOCX, 998, "Operation not (yet) supported."),
+  /** FOCX997: Crypto Exception. */
+  CRYPTOSYMERR(FOCX, 997, "Algorithm not compatible with encryption type."),
+  /** FOCX996: Crypto Exception. */
+  CRYPTOIOEXC(FOCX, 996, "IO Exception."),
+  /** FOCX995: Crypto Exception. */
+  CRYPTOKSEXC(FOCX, 995, "Keystore exception."),
+  /** FOCX994: Crypto Exception. */
+  CRYPTOSIGEXC(FOCX, 994, "Signature exception."),
+  /** FOCX993: Crypto Exception. */
+  CRYPTOALGEXC(FOCX, 993, "Invalid algorithm."),
+  /** FOCX992: Crypto Exception. */
+  CRYPTOALINV(FOCX, 992, "Invalid certificate alias %.");
 
   /** Error type. */
   public final ErrType type;
@@ -888,7 +888,7 @@ public enum Err {
    */
   public static enum ErrType {
     /** BASX Error type. */ BASX,
-    /** CX Error type. (EXPath Cryptographic) */ CX,
+    /** FOCX Error type. (EXPath Cryptographic) */ FOCX,
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,
