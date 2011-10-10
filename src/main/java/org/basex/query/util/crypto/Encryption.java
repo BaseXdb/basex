@@ -91,7 +91,9 @@ public final class Encryption {
 
     final boolean symmetric = eq(lc(s), SYM);
     final byte[] tivl = ALGE.get(lc(a));
-    if(!symmetric || tivl == null)
+    if(!symmetric)
+      CRYPTOENCTYP.thrw(input, ec);
+    if(tivl == null)
       CRYPTOINVALGO.thrw(input, s);
     // initialization vector length
     final int ivl = toInt(tivl);
