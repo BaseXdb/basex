@@ -815,7 +815,7 @@ public enum Err {
   /** FOCX999: Crypto Exception. */
   CRYPTOSIGTYPINV(FOCX, 9999, "Signature type is not supported."),
   /** FOCX998: Crypto Exception. */
-  CRYPTONOTSUPP(FOCX, 9998, "Cryptographic operation not (yet) supported."),
+  CRYPTONOTSUPP(FOCX, 9998, "Not (yet) supported."),
   /** FOCX997: Crypto Exception. */
   CRYPTOSYMERR(FOCX, 9997, "Algorithm not compatible with encryption type."),
   /** FOCX996: Crypto Exception. */
