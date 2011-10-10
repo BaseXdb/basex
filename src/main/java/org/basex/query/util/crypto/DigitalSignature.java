@@ -99,9 +99,9 @@ public final class DigitalSignature {
   /** Default canonicalization algorithm. */
   private static final byte[] DEFC = token("inclusive-with-comments");
   /** Default digest algorithm. */
-  private static final byte[] DEFD = token("SHA1");
+  private static final byte[] DEFD = token("sha1");
   /** Default signature algorithm. */
-  private static final byte[] DEFS = token("RSA_SHA1");
+  private static final byte[] DEFS = token("rsa_sha1");
   /** Default signature type enveloped. */
   private static final byte[] DEFT = token("enveloped");
   /** Signature type enveloping. */
@@ -125,7 +125,7 @@ public final class DigitalSignature {
     DIGESTS.add(token("SHA512"), token(DigestMethod.SHA512));
 
     SIGNATURES.add(DEFS, token(SignatureMethod.RSA_SHA1));
-    SIGNATURES.add(token("DSA_SHA1"), token(SignatureMethod.DSA_SHA1));
+    SIGNATURES.add(token("dsa_sha1"), token(SignatureMethod.DSA_SHA1));
 
     TYPES.add(DEFT);
     TYPES.add(ENVT);
@@ -166,28 +166,28 @@ public final class DigitalSignature {
     // checking input variables
     byte[] b = c;
     if(b.length == 0) b = DEFC;
-    b = CANONICALIZATIONS.get(b);
-    if(b == null) CRYPTOCANINV.thrw(input, b);
+    b = CANONICALIZATIONS.get(lc(b));
+    if(b == null) CRYPTOCANINV.thrw(input, c);
     final String canonicalization = string(b);
 
     b = d;
     if(b.length == 0) b = DEFD;
-    b = DIGESTS.get(b);
-    if(b == null) CRYPTODIGINV.thrw(input, b);
+    b = DIGESTS.get(lc(b));
+    if(b == null) CRYPTODIGINV.thrw(input, d);
     final String digest = string(b);
 
     b = sig;
     if(b.length == 0) b = DEFS;
     final byte[] tsig = b;
-    b = SIGNATURES.get(b);
-    if(b == null) CRYPTOSIGINV.thrw(input, b);
+    b = SIGNATURES.get(lc(b));
+    if(b == null) CRYPTOSIGINV.thrw(input, sig);
     final String signature = string(b);
     final String keytype = string(tsig).substring(0, 3);
 
     b = t;
     if(b.length == 0) b = DEFT;
-    final int ti = TYPES.id(b);
-    if(ti == 0) CRYPTOSIGTYPINV.thrw(input, b);
+    final int ti = TYPES.id(lc(b));
+    if(ti == 0) CRYPTOSIGTYPINV.thrw(input, t);
     final byte[] type = b;
 
     ANode signedNode = null;
