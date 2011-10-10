@@ -612,7 +612,7 @@ public enum Function {
 
   /** Create message authentication code (HMAC). */
   CRYPHMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR,
-      STR, STR, STR),
+      STR, STR, STR_ZO),
   /** Encrypt message. */
   CRYPENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)", STR,
       STR, STR, STR, STR),
