@@ -31,6 +31,20 @@ public class FNCryptoTest extends AdvancedQueryTest {
   }
 
   /**
+   * Checks default / empty arguments.
+   */
+  @Test
+  public void checkDefaultArguments() {
+    final String pl = "declare namespace c = 'http://expath.org/ns/crypto';";
+    query(pl + "c:hmac('msg','key','','')");
+    query(pl + "c:encrypt('msg','','keykeyke','')");
+    query(pl + "c:decrypt(c:encrypt('msg','','keykeyke',''),'','keykeyke','')");
+    query(pl + "c:generate-signature(<a/>,'','','','','')");
+    query(pl +
+        "c:validate-signature(c:generate-signature(<a/>,'','','','',''))");
+  }
+
+  /**
    * Test method for crypto:encrypt and crypto:decrypt with symmetric keys.
    */
   @Test
