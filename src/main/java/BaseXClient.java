@@ -119,16 +119,14 @@ public final class BaseXClient {
 
   /**
    * Adds a document to a database.
-   * @param name name of document
-   * @param target target path
+   * @param path path to document
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public void add(final String name, final String target,
-      final InputStream input) throws IOException {
+  public void add(final String path, final InputStream input)
+      throws IOException {
     out.write(9);
-    send(name);
-    send(target);
+    send(path);
     send(input);
   }
 

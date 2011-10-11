@@ -81,11 +81,10 @@ namespace BaseXClient
     }
     
     /** see readme.txt */
-    public void Add(string name, string target, Stream s)
+    public void Add(string path, Stream s)
     {
       stream.WriteByte(9);
-      Send(name);
-      Send(target);
+      Send(path);
       Send(s);
     }
     

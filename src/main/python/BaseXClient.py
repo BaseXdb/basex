@@ -57,8 +57,8 @@ class Session():
             raise IOError(self.info())
 
     # see readme.txt
-    def add(self, name, target, input):
-        self.__s.send(chr(9) + name + chr(0) + target + chr(0) + input + chr(0))
+    def add(self, path, input):
+        self.__s.send(chr(9) + path + chr(0) + input + chr(0))
         self.__info = self.readString()
         if not self.ok():
             raise IOError(self.info())

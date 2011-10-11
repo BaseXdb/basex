@@ -61,8 +61,8 @@ class Session {
   }
   
   /* see readme.txt */
-  public function add($name, $target, $input) {
-    socket_write($this->socket, chr(9).$name.chr(0).$target.chr(0).$input.chr(0));
+  public function add($path, $input) {
+    socket_write($this->socket, chr(9).$path.chr(0).$input.chr(0));
     $this->info = $this->receive();
     if($this->ok() != True) {
       throw new Exception($this->info);

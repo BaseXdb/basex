@@ -81,21 +81,19 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
 
   /**
    * Adds a database.
-   * @param name name of document
-   * @param target target path
+   * @param path source path
    * @param input xml input
    * @throws IOException I/O exception
    */
-  def add(name: String, target: String, input: InputStream) {
+  def add(path: String, input: InputStream) {
     out.write(9)
-    send(name)
-    send(target)
+    send(path)
     send(input)
   }
 
   /**
    * Replaces a resource.
-   * @param source source path
+   * @param path source path
    * @param input xml input
    * @throws IOException I/O exception
    */
@@ -107,8 +105,8 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
 
   /**
    * Stores a binary resource.
-   * @param source source path
-   * @param input xml input
+   * @param path source path
+   * @param input binary input
    * @throws IOException I/O exception
    */
   def store(path: String, input: InputStream) {

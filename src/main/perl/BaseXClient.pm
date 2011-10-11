@@ -68,23 +68,18 @@ sub create {
   
   $self->send(chr(8).$name.chr(0).$input);
   $self->{info} = $self->_receive();
-  if (!$self->ok()) {
-    die $self->{info};
-  }
+  die $self->{info} if !$self->ok();
 }
 
 # see readme.txt
 sub add {
   my $self = shift;
-  my $name = shift;
-  my $target = shift;
+  my $path = shift;
   my $input = shift;
   
-  $self->send(chr(9).$name.chr(0).$target.chr(0).$input);
+  $self->send(chr(9).$path.chr(0).$input);
   $self->{info} = $self->_receive();
-  if (!$self->ok()) {
-    die $self->{info};
-  }
+  die $self->{info} if !$self->ok();
 }
 
 # see readme.txt
@@ -95,9 +90,7 @@ sub replace {
   
   $self->send(chr(12).$path.chr(0).$input);
   $self->{info} = $self->_receive();
-  if (!$self->ok()) {
-    die $self->{info};
-  }
+  die $self->{info} if !$self->ok();
 }
 
 # see readme.txt
@@ -108,9 +101,7 @@ sub store {
   
   $self->send(chr(13).$path.chr(0).$input);
   $self->{info} = $self->_receive();
-  if (!$self->ok()) {
-    die $self->{info};
-  }
+  die $self->{info} if !$self->ok();
 }
 
 # see readme.txt
@@ -160,6 +151,8 @@ sub send {
 package Query;
 
 our $session;
+our @cache;
+our $pos = 0;
 our $id;
 
 # see readme.txt
@@ -183,6 +176,21 @@ sub bind {
 # see readme.txt
 sub execute {
   return exc(chr(5), $id);
+}
+
+# see readme.txt
+sub more {
+  if(!@cache) {
+    $session->send(chr(4).$id.chr(0));
+    push(@cache, $session->_receive()) while $session->_read();
+    die $session->{info} if !$session->ok();
+  }
+  return $pos < @cache;
+}
+
+# see readme.txt
+sub next {
+  return more() && $cache[$pos++];
 }
 
 # see readme.txt
