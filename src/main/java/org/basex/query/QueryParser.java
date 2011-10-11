@@ -97,13 +97,13 @@ import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
 import org.basex.query.item.SeqType.Occ;
-import org.basex.query.item.map.Map;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.query.item.Uri;
+import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisStep;
 import org.basex.query.path.KindTest;
@@ -2274,14 +2274,15 @@ public class QueryParser extends InputParser {
    */
   private Expr dirElemContent(final QNm tag) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
+    boolean strip = true;
     do {
       final char c = curr();
       if(c == '<') {
         if(wsConsume(CDATA)) {
           tb.add(cDataSection());
-          tb.ent = true;
+          strip = false;
         } else {
-          final Str txt = text(tb);
+          final Str txt = text(tb, strip);
           return txt != null ? txt : next() == '/' ? null : constructor();
         }
       } else if(c == '{') {
@@ -2289,7 +2290,7 @@ public class QueryParser extends InputParser {
           tb.add(consume());
           consume();
         } else {
-          final Str txt = text(tb);
+          final Str txt = text(tb, strip);
           return txt != null ? txt : enclosed(NOENCLEXPR);
         }
       } else if(c == '}') {
@@ -2297,7 +2298,7 @@ public class QueryParser extends InputParser {
         check('}');
         tb.add('}');
       } else if(c != 0) {
-        entity(tb);
+        strip &= !entity(tb);
       } else {
         error(NOCLOSING, tag.atom());
       }
@@ -2307,11 +2308,12 @@ public class QueryParser extends InputParser {
   /**
    * Returns a string item.
    * @param tb token builder
+   * @param strip strip flag
    * @return text or {@code null}
    */
-  private Str text(final TokenBuilder tb) {
+  private Str text(final TokenBuilder tb, final boolean strip) {
     final byte[] t = tb.finish();
-    return t.length == 0 || !tb.ent && !ctx.spaces && ws(t) ? null : Str.get(t);
+    return t.length == 0 || strip && !ctx.spaces && ws(t) ? null : Str.get(t);
   }
 
   /**
@@ -3260,11 +3262,13 @@ public class QueryParser extends InputParser {
   /**
    * Parses and converts entities.
    * @param tb token builder
+   * @return true if an entity was found
    * @throws QueryException query exception
    */
-  private void entity(final TokenBuilder tb) throws QueryException {
+  private boolean entity(final TokenBuilder tb) throws QueryException {
     final int p = qp;
-    if(consume('&')) {
+    final boolean ent = consume('&');
+    if(ent) {
       if(consume('#')) {
         final int b = consume('x') ? 16 : 10;
         int n = 0;
@@ -3297,7 +3301,6 @@ public class QueryParser extends InputParser {
         }
         if(!consume(';')) entityError(p, INVENTITY);
       }
-      tb.ent = true;
     } else {
       final char c = consume();
       int ch = c;
@@ -3311,6 +3314,7 @@ public class QueryParser extends InputParser {
       }
       tb.add(ch);
     }
+    return ent;
   }
 
   /**

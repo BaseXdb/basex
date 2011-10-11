@@ -27,8 +27,6 @@ public final class TokenBuilder {
 
   /** Character array. */
   private byte[] chars;
-  /** Entity flag. */
-  public boolean ent;
   /** Current token size. */
   private int size;
 
