@@ -47,6 +47,8 @@ public final class Encryption {
   private static final TokenMap ALGN = new TokenMap();
   /** Supported HMAC algorithms. */
   private static final TokenMap ALGHMAC = new TokenMap();
+  /** Default hash algorithm. */
+  private static final byte[] DEFA = token("md5");
   /** DES encryption token. */
   private static final byte[] DES = token("des");
   /** AES encryption token. */
@@ -57,7 +59,7 @@ public final class Encryption {
     ALGE.add(AES, token("16"));
     ALGN.add(DES, token("DES/CBC/PKCS5Padding"));
     ALGN.add(AES, token("AES/CBC/PKCS5Padding"));
-    ALGHMAC.add(token("md5"), token("hmacmd5"));
+    ALGHMAC.add(DEFA, token("hmacmd5"));
     ALGHMAC.add(token("sha1"), token("hmacsha1"));
     ALGHMAC.add(token("sha256"), token("hmacsha256"));
     ALGHMAC.add(token("sha384"), token("hmacsha1"));
@@ -89,8 +91,9 @@ public final class Encryption {
       final byte[] k, final byte[] a, final boolean ec)
           throws QueryException {
 
-    final boolean symmetric = eq(lc(s), SYM);
-    final byte[] tivl = ALGE.get(lc(a));
+    final boolean symmetric = eq(lc(s), SYM) || s.length == 0;
+    byte[] aa = a.length == 0 ? DES : a;
+    final byte[] tivl = ALGE.get(lc(aa));
     if(!symmetric)
       CRYPTOENCTYP.thrw(input, ec);
     if(tivl == null)
@@ -102,9 +105,9 @@ public final class Encryption {
     try {
 
       if(ec)
-        t = encrypt(in, k, a, ivl);
+        t = encrypt(in, k, aa, ivl);
       else
-        t = decrypt(in, k, a, ivl);
+        t = decrypt(in, k, aa, ivl);
 
     } catch(final NoSuchPaddingException e) {
       CRYPTONOPAD.thrw(input, e);
@@ -212,15 +215,16 @@ public final class Encryption {
     final Key key = new SecretKeySpec(k, string(a));
     byte[] hash = null;
 
-    if(ALGHMAC.id(a) == 0)
-      CRYPTOINVHASH.thrw(input, a);
+    byte[] aa = a.length == 0 ? DEFA : a;
+    if(ALGHMAC.id(lc(aa)) == 0)
+      CRYPTOINVHASH.thrw(input, aa);
 
     final boolean b64 = eq(lc(enc), BASE64) || enc.length == 0;
     if(!b64 && !eq(lc(enc), HEX))
       CRYPTOENC.thrw(input, enc);
 
     try {
-      final Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(a))));
+      final Mac mac = Mac.getInstance(string(ALGHMAC.get(lc(aa))));
       mac.init(key);
       hash = mac.doFinal(msg);
 
