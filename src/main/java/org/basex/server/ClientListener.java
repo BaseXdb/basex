@@ -364,7 +364,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void execute(final Command cmd) throws IOException {
-    log.write(this, cmd + "[...]");
+    log.write(this, cmd + " [...]");
     final DecodingInput di = new DecodingInput(in);
     try {
       cmd.setInput(di);
