@@ -156,7 +156,6 @@ public final class Encryption {
     final SecureRandom rand = SecureRandom.getInstance("SHA1PRNG");
     rand.nextBytes(iv);
     final IvParameterSpec ivspec = new IvParameterSpec(iv);
-//    System.out.println("random iv: " + string(iv));
 
     // encrypt/decrypt
     cipher.init(Cipher.ENCRYPT_MODE, kspec, ivspec);
@@ -193,8 +192,6 @@ public final class Encryption {
     // extract iv from message beginning
     final byte[] iv = substring(in, 0, ivl);
     final IvParameterSpec ivspec = new IvParameterSpec(iv);
-//    System.out.println("extracted iv: " + string(iv) + "\n");
-
     cipher.init(Cipher.DECRYPT_MODE, keySpec, ivspec);
     return cipher.doFinal(substring(in, ivl, in.length));
   }
