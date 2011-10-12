@@ -92,7 +92,7 @@ public final class Encryption {
           throws QueryException {
 
     final boolean symmetric = eq(lc(s), SYM) || s.length == 0;
-    byte[] aa = a.length == 0 ? DES : a;
+    final byte[] aa = a.length == 0 ? DES : a;
     final byte[] tivl = ALGE.get(lc(aa));
     if(!symmetric)
       CRYPTOENCTYP.thrw(input, ec);
@@ -212,7 +212,7 @@ public final class Encryption {
     final Key key = new SecretKeySpec(k, string(a));
     byte[] hash = null;
 
-    byte[] aa = a.length == 0 ? DEFA : a;
+    final byte[] aa = a.length == 0 ? DEFA : a;
     if(ALGHMAC.id(lc(aa)) == 0)
       CRYPTOINVHASH.thrw(input, aa);
 
