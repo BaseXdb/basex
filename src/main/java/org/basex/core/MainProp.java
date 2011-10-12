@@ -42,7 +42,7 @@ public final class MainProp extends AProp {
   /** Client/server communication: port, used for sending events. */
   public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };
   /** Client/server communication: port, used for starting the HTTP server. */
-  public static final Object[] HTTPPORT = { "HTTPPORT", 8981 };
+  public static final Object[] HTTPPORT = { "HTTPPORT", 8984 };
 
   /** Timeout for processing client requests; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
