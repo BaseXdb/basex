@@ -21,14 +21,14 @@ Module CreateExample
       Dim ms As New MemoryStream(System.Text.Encoding.UTF8.GetBytes("<xml>Hello World!</xml>"))
       
       ' add document
-      session.Add("World.xml", "/World", ms)
+      session.Add("world/World.xml", ms)
       Console.WriteLine(session.Info)
       
       ' define InputStream
       Dim ms As New MemoryStream(System.Text.Encoding.UTF8.GetBytes("<xml>Hello Universe!</xml>"))
       
       ' add document
-      session.Add("Universe.xml", "", ms)
+      session.Add("Universe.xml", ms)
       Console.WriteLine(session.Info)
 
       ' run query on database

@@ -47,67 +47,38 @@ sub execute {
   $self->send($cmd);
   $self->{result} = $self->_receive();
   $self->{info} = $self->_receive();
-  if (!$self->ok()) {
-    die $self->{info};
-  }
+  die $self->{info} if !$self->ok();
   return $self->{result};
 }
 
 # see readme.txt
 sub query {
-  my $self = shift;
-  my $cmd = shift;
-  return Query->new($self, $cmd);
+  return Query->new(shift, shift);
 }
 
 # see readme.txt
 sub create {
-  my $self = shift;
-  my $name = shift;
-  my $input = shift;
-  
-  $self->send(chr(8).$name.chr(0).$input);
-  $self->{info} = $self->_receive();
-  die $self->{info} if !$self->ok();
+  shift->sendInput(chr(8), shift, shift);
 }
 
 # see readme.txt
 sub add {
-  my $self = shift;
-  my $path = shift;
-  my $input = shift;
-  
-  $self->send(chr(9).$path.chr(0).$input);
-  $self->{info} = $self->_receive();
-  die $self->{info} if !$self->ok();
+  shift->sendInput(chr(9), shift, shift);
 }
 
 # see readme.txt
 sub replace {
-  my $self = shift;
-  my $path = shift;
-  my $input = shift;
-  
-  $self->send(chr(12).$path.chr(0).$input);
-  $self->{info} = $self->_receive();
-  die $self->{info} if !$self->ok();
+  shift->sendInput(chr(12), shift, shift);
 }
 
 # see readme.txt
 sub store {
-  my $self = shift;
-  my $path = shift;
-  my $input = shift;
-  
-  $self->send(chr(13).$path.chr(0).$input);
-  $self->{info} = $self->_receive();
-  die $self->{info} if !$self->ok();
+  shift->sendInput(chr(13), shift, shift);
 }
 
 # see readme.txt
 sub info {
-  my $self = shift;
-  return $self->{info};
+  return shift->{info};
 }
 
 # see readme.txt
@@ -120,33 +91,51 @@ sub close {
 # Receives a string from the socket.
 sub _receive {
   my $self = shift;
-  my $text = "";
-  $text .= $_ while $self->_read();
-  return $text;
+  my $data = "";
+  while($self->_read()) {
+    $self->_read() if ord($_) == 255;
+    $data .= $_;
+  }
+  return $data;
 }
 
 # Returns a single byte from the socket.
 sub _read {
-  my $self = shift;
-  $self->{sock}->recv($_, 1);
+  shift->{sock}->recv($_, 1);
   return ord();
 }
 
 # Returns success check.
 sub ok {
-  my $self = shift;
-  return !$self->_read();
+  return !shift->_read();
 }
 
-# Sends the defined str.
+# Sends the specified string.
 sub send {
+  shift->{sock}->send((shift).chr(0));
+}
+
+# Sends the specified input.
+sub sendInput {
   my $self = shift;
+  my $code = shift;
   my $str = shift;
-  $self->{sock}->send($str.chr(0));
+  my $input = shift;
+
+  $self->send($code.$str);
+  foreach my $b(unpack("C*", $input)) {
+    if($b == 0xFF || $b == 0x00) {
+      $self->{sock}->send(0xFF);
+    }
+    $self->{sock}->send(chr($b));
+  }
+  $self->{sock}->send(chr(0));
+
+  $self->{info} = $self->_receive();
+  die $self->{info} if !$self->ok();
 }
 
 1;
-
 
 package Query;
 

@@ -15,18 +15,18 @@ eval {
 
   # create empty database
   $session->execute("create db database");
-  print "\n".$session->info();
+  print $session->info()."\n";
   
   # add document
-  $session->add("World.xml", "/world", "<x>Hello World!</x>");
-  print "\n".$session->info()."\n";
+  $session->add("world/World.xml", "<x>Hello World!</x>");
+  print $session->info()."\n";
   
   # add document
-  $session->add("Universe.xml", "", "<x>Hello Universe!</x>");
-  print "\n".$session->info()."\n";
+  $session->add("Universe.xml", "<x>Hello Universe!</x>");
+  print $session->info()."\n";
   
   # run query on database
-  print "\n".$session->execute("xquery collection('database')")."\n";
+  print $session->execute("xquery collection('database')")."\n";
   
   # drop database
   $session->execute("drop db database");

@@ -23,14 +23,14 @@ object addexample {
     var bais = new ByteArrayInputStream("<x>Hello World!</x>".getBytes)
 
     // add document
-    session.add("world.xml", "/world", bais)
+    session.add("world/world.xml", bais)
     println(session.info)
 
     // define input stream
     bais = new ByteArrayInputStream("<x>Hello Universe!</x>".getBytes)
 
     // add document
-    session.add("universe.xml", "", bais)
+    session.add("universe.xml", bais)
     println(session.info)
 
     // run query on database

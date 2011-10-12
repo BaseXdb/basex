@@ -144,13 +144,13 @@ class Query {
   var $session, $id, $open;
  
   /* see readme.txt */
-  function __construct($s, $q) {
+  public function __construct($s, $q) {
     $this->session = $s;
     $this->id = $this->exec(chr(0), $q);
   }
   
   /* see readme.txt */
-  function bind($name, $value) {
+  public function bind($name, $value) {
     $this->exec(chr(3), $this->id.chr(0).$name.chr(0).$value.chr(0));
   }
 
@@ -171,17 +171,17 @@ class Query {
   
   /* see readme.txt */
   public function close() {
-  	$this->exec(chr(2), $this->id);   
+    $this->exec(chr(2), $this->id);   
   }
   
   /* see readme.txt */
   public function exec($cmd, $arg) {
-  	$this->session->send($cmd.$arg);
-  	$s = $this->session->receive();
-  	if($this->session->ok() != True) {
-  	  throw new Exception($this->session->readString());
-  	}
-  	return $s;
+    $this->session->send($cmd.$arg);
+    $s = $this->session->receive();
+    if($this->session->ok() != True) {
+      throw new Exception($this->session->readString());
+    }
+    return $s;
   }
 }
 ?>

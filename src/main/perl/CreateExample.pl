@@ -15,10 +15,10 @@ eval {
 
   # create new database
   $session->create("database", "<x>Hello World!</x>");
-  print "\n".$session->info()."\n";
+  print $session->info()."\n";
   
   # run query on database
-  print "\n".$session->execute("xquery doc('database')")."\n";
+  print $session->execute("xquery doc('database')")."\n";
   
   # drop database
   $session->execute("drop db database");

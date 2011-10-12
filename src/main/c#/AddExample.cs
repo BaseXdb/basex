@@ -29,7 +29,7 @@ namespace BaseXClient
           System.Text.Encoding.UTF8.GetBytes("<xml>Hello World!</xml>"));
           
         // add document
-        session.Add("world.xml", "/world", ms);
+        session.Add("world/world.xml", ms);
         Console.WriteLine(session.Info);
         
         // define InputStream
@@ -37,7 +37,7 @@ namespace BaseXClient
           System.Text.Encoding.UTF8.GetBytes("<xml>Hello Universe!</xml>"));
           
         // add document
-        session.Add("Universe.xml", "", ms);
+        session.Add("Universe.xml", ms);
         Console.WriteLine(session.Info);  
 
         // run query on database

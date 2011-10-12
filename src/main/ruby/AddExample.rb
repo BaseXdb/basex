@@ -16,11 +16,11 @@ begin
   print "\n" + session.info()
   
   # add document
-  session.add("World.xml", "/world", "<x>Hello World!</x>")
+  session.add("world/World.xml", "<x>Hello World!</x>")
   print "\n" + session.info()
   
   # add document
-  session.add("Universe.xml", "", "<x>Hello Universe!</x>")
+  session.add("Universe.xml", "<x>Hello Universe!</x>")
   print "\n" + session.info() + "\n"
   
   # run query on database
