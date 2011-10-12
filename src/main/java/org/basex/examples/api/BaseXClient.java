@@ -121,16 +121,14 @@ public final class BaseXClient {
 
   /**
    * Adds a document to a database.
-   * @param name name of document
-   * @param target target path
+   * @param path path to document
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public void add(final String name, final String target,
-      final InputStream input) throws IOException {
+  public void add(final String path, final InputStream input)
+      throws IOException {
     out.write(9);
-    send(name);
-    send(target);
+    send(path);
     send(input);
   }
 
@@ -257,10 +255,9 @@ public final class BaseXClient {
    * @throws IOException I/O exception
    */
   void receive(final InputStream is, final OutputStream os) throws IOException {
-    while(true) {
-      final int b = is.read();
-      if(b == 0 || b == -1) break;
-      os.write(b);
+    for(int b; (b = is.read()) > 0;) {
+      // read next byte if 0xFF is received
+      os.write(b == 0xFF ? is.read() : b);
     }
   }
 

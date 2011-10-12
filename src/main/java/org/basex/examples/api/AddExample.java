@@ -19,60 +19,52 @@ public final class AddExample {
   /**
    * Main method.
    * @param args command-line arguments
+   * @throws IOException I/O exception
    */
-  public static void main(final String[] args) {
+  public static void main(final String[] args) throws IOException {
+    // create session
+    final BaseXClient session =
+      new BaseXClient("localhost", 1984, "admin", "admin");
+
     try {
-      // create session
-      final BaseXClient session =
-        new BaseXClient("localhost", 1984, "admin", "admin");
+      // create empty database
+      session.execute("create db database");
+      System.out.println(session.info());
 
-      try {
-        // create empty database
-        session.execute("create db database");
-        System.out.println(session.info());
+      // define input stream
+      InputStream bais =
+        new ByteArrayInputStream("<x>Hello World!</x>".getBytes());
 
-        // define input stream
-        InputStream bais =
-          new ByteArrayInputStream("<x>Hello World!</x>".getBytes());
+      // add document
+      session.add("world/world.xml", bais);
+      System.out.println(session.info());
 
-        // add document
-        session.add("world.xml", "/world", bais);
-        System.out.println(session.info());
+      // define input stream
+      bais = new ByteArrayInputStream("<x>Hello Universe!</x>".getBytes());
 
-        // define input stream
-        bais = new ByteArrayInputStream("<x>Hello Universe!</x>".getBytes());
+      // add document
+      session.add("universe.xml", bais);
+      System.out.println(session.info());
 
-        // add document
-        session.add("universe.xml", "", bais);
-        System.out.println(session.info());
+      // run query on database
+      System.out.println(session.execute("xquery collection('database')"));
 
-        // run query on database
-        System.out.println(session.execute("xquery collection('database')"));
+      // define input stream
+      bais = new ByteArrayInputStream("<x>Hello Replacement!</x>".getBytes());
 
-        // define input stream
-        bais = new ByteArrayInputStream("<x>Hello Replacement!</x>".getBytes());
+      // add document
+      session.replace("universe.xml", bais);
+      System.out.println(session.info());
 
-        // add document
-        session.replace("universe.xml", bais);
-        System.out.println(session.info());
+      // run query on database
+      System.out.println(session.execute("xquery collection('database')"));
 
-        // run query on database
-        System.out.println(session.execute("xquery collection('database')"));
+      // drop database
+      session.execute("drop db database");
 
-        // drop database
-        session.execute("drop db database");
-
-      } catch(final IOException ex) {
-        // print exception
-        ex.printStackTrace();
-      }
-
+    } finally {
       // close session
       session.close();
-
-    } catch(final IOException ex) {
-      // print exception
-      ex.printStackTrace();
     }
   }
 }
