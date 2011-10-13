@@ -3,6 +3,8 @@ package org.basex.api.webdav;
 import static org.basex.query.func.Function.*;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.basex.api.HTTPSession;
@@ -13,6 +15,7 @@ import org.basex.io.in.ArrayInput;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
 import com.bradmcevoy.http.Auth;
@@ -28,6 +31,8 @@ import com.bradmcevoy.http.Resource;
  * @author Dimitar Popov
  */
 public abstract class BXResource implements Resource {
+  /** Date format of the "Time Stamp" field in INFO DB. */
+  private static final String DATEFORMAT = "dd.MM.yyyy HH:mm:ss";
   /** File path separator. */
   static final char SEP = '/';
   /** Dummy file for empty folder.*/
@@ -38,6 +43,8 @@ public abstract class BXResource implements Resource {
   protected final String path;
   /** Information on current session. */
   protected final HTTPSession session;
+  /** Last modified date. */
+  protected final Date mdate;
 
   /**
    * Constructor.
@@ -48,6 +55,22 @@ public abstract class BXResource implements Resource {
   public BXResource(final String d, final String p, final HTTPSession s) {
     db = d;
     path = stripLeadingSlash(p);
+    mdate = null;
+    session = s;
+  }
+
+  /**
+   * Constructor.
+   * @param d database name
+   * @param p resource path
+   * @param m last modification date
+   * @param s current session
+   */
+  public BXResource(final String d, final String p, final long m,
+      final HTTPSession s) {
+    db = d;
+    path = stripLeadingSlash(p);
+    mdate = new Date(m);
     session = s;
   }
 
@@ -86,7 +109,7 @@ public abstract class BXResource implements Resource {
 
   @Override
   public Date getModifiedDate() {
-    return null;
+    return mdate;
   }
 
   /**
@@ -166,86 +189,135 @@ public abstract class BXResource implements Resource {
   /**
    * Create a folder or document resource.
    * @param s active client session
-   * @param db database name
-   * @param path resource path
+   * @param d database name
+   * @param p resource path
    * @param hs current session
    * @return requested resource, or {@code null} if it does not exist
    * @throws IOException I/O exception
    */
-  static BXResource resource(final Session s, final String db,
-      final String path, final HTTPSession hs) throws IOException {
+  static BXResource resource(final Session s, final String d, final String p,
+      final HTTPSession hs) throws IOException {
+    return exists(s, d, p) ? file(s, d, p, hs) :
+      pathExists(s, d, p) ? folder(s, d, p, hs) : null;
+  }
 
-    // check if there is a document in the collection having this path
-    if(exists(s, db, path))
-      return new BXDocument(db, path, hs, isRaw(s, db, path),
-          contentType(s, db, path));
-    // check if there are paths in the collection starting with this path
-    return pathExists(s, db, path) ? new BXFolder(db, path, hs) : null;
+  /**
+   * Create a file resource.
+   * @param s active client session
+   * @param d database name
+   * @param p resource path
+   * @param hs current session
+   * @return requested resource, or {@code null} if it does not exist
+   * @throws IOException I/O exception
+   */
+  static BXFile file(final Session s, final String d, final String p,
+      final HTTPSession hs) throws IOException {
+    final Query q = s.query(
+        "let $a := " + DBDETAILS.args("$d", "$p") +
+        "return (" +
+            "$a/@path/data()," +
+            "$a/@raw/data()," +
+            "$a/@content-type/data()," +
+            "$a/@modified-date/data()," +
+            "$a/@size/data())");
+    q.bind("d", d);
+    q.bind("p", p);
+    try {
+      final String path = stripLeadingSlash(q.next());
+      final boolean raw = Boolean.parseBoolean(q.next());
+      final String ctype = q.next();
+      final long mod = Long.parseLong(q.next());
+      final Long size = raw ? Long.valueOf(q.next()) : null;
+      return new BXFile(d, path, mod, raw, ctype, size, hs);
+    } finally {
+      q.close();
+    }
+  }
+
+  /**
+   * Create a folder resource.
+   * @param s active client session
+   * @param d database name
+   * @param p resource path
+   * @param hs current session
+   * @return requested resource
+   * @throws IOException I/O exception
+   */
+  static BXFolder folder(final Session s, final String d, final String p,
+      final HTTPSession hs) throws IOException {
+    return new BXFolder(d, p, databaseTimestamp(s, d), hs);
+  }
+
+  /**
+   * Create a database folder resource.
+   * @param s active client session
+   * @param d database name
+   * @param hs current session
+   * @return requested resource
+   * @throws IOException I/O exception
+   */
+  static BXDatabase database(final Session s, final String d,
+      final HTTPSession hs) throws IOException {
+    return new BXDatabase(d, databaseTimestamp(s, d), hs);
+  }
+
+  /**
+   * Retrieve the time stamp of a database.
+   * @param s active session
+   * @param d database name
+   * @return database time stamp
+   * @throws IOException I/O exception
+   */
+  private static Long databaseTimestamp(final Session s, final String d)
+      throws IOException {
+    final Query q = s.query(DBINFO.args("$p"));
+    q.bind("p", d);
+    final String inf = q.execute();
+    // parse the timestamp
+    final String ts = Text.INFOTIME + Text.COLS;
+    final int p = inf.indexOf(ts);
+    if(p >= 0) {
+      final String dt = inf.substring(p + ts.length(), inf.indexOf(Text.NL, p));
+      if(!dt.isEmpty()) {
+        try {
+          return new SimpleDateFormat(DATEFORMAT).parse(dt).getTime();
+        } catch(final ParseException e) {
+          Util.errln(e);
+        }
+      }
+    }
+    return null;
   }
 
   /**
    * Check if any resources start with the given path.
    * @param s active client session
-   * @param db database
-   * @param path path
+   * @param d database
+   * @param p path
    * @return number of documents
    * @throws IOException I/O exception
    */
-  static boolean pathExists(final Session s, final String db, final String path)
+  static boolean pathExists(final Session s, final String d, final String p)
       throws IOException {
     final Query q = s.query(COUNT.args(DBLIST.args("$d", "$p")));
-    q.bind("d", db);
-    q.bind("p", path);
+    q.bind("d", d);
+    q.bind("p", p);
     return !q.execute().equals("0");
   }
 
   /**
    * Checks if any resource with the specified name exists.
    * @param s active client session
-   * @param db database name
+   * @param d database name
    * @param p resource path
    * @return number of documents
    * @throws IOException I/O exception
    */
-  static boolean exists(final Session s, final String db, final String p)
+  private static boolean exists(final Session s, final String d, final String p)
       throws IOException {
-
     final Query q = s.query(DBEXISTS.args("$d", "$p"));
-    q.bind("d", db);
+    q.bind("d", d);
     q.bind("p", p);
     return q.execute().equals(Text.TRUE);
-  }
-
-  /**
-   * Checks if the specified path points to a binary resource.
-   * @param s active client session
-   * @param db database name
-   * @param path resource path
-   * @return result of check
-   * @throws IOException I/O exception
-   */
-  static boolean isRaw(final Session s, final String db,
-      final String path) throws IOException {
-
-    final Query q = s.query(DBISRAW.args("$d", "$p"));
-    q.bind("d", db);
-    q.bind("p", path);
-    return q.execute().equals(Text.TRUE);
-  }
-
-  /**
-   * Returns the content type of a database resource.
-   * @param s active session
-   * @param db database name
-   * @param p resource path
-   * @return content type
-   * @throws IOException I/O exception
-   */
-  static String contentType(final Session s, final String db, final String p)
-      throws IOException {
-    final Query q = s.query(DBCTYPE.args("$d", "$p"));
-    q.bind("d", db);
-    q.bind("p", p);
-    return q.execute();
   }
 }

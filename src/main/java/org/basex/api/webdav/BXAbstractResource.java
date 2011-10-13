@@ -26,13 +26,14 @@ public abstract class BXAbstractResource extends BXResource implements
 
   /**
    * Constructor.
-   * @param dbname database name
-   * @param folderPath path to folder
+   * @param d database name
+   * @param p path to folder
+   * @param m last modified date
    * @param s current session
    */
-  public BXAbstractResource(final String dbname, final String folderPath,
+  public BXAbstractResource(final String d, final String p, final long m,
       final HTTPSession s) {
-    super(dbname, folderPath, s);
+    super(d, p, m, s);
   }
 
   @Override

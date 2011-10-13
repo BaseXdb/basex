@@ -25,7 +25,7 @@ public class BXRoot extends BXFolder {
    * @param s current session
    */
   public BXRoot(final HTTPSession s) {
-    super(null, null, s);
+    super(null, null, 0L, s);
   }
 
   @Override
@@ -54,7 +54,7 @@ public class BXRoot extends BXFolder {
       @Override
       public BXResource get() throws IOException {
         return listDBs(s).contains(childName) ?
-            new BXDatabase(childName, session) : null;
+            database(s, childName, session) : null;
       }
     }.evalNoEx();
   }
@@ -65,7 +65,7 @@ public class BXRoot extends BXFolder {
       @Override
       public List<BXResource> get() throws IOException {
         final List<BXResource> dbs = new ArrayList<BXResource>();
-        for(final String d : listDBs(s)) dbs.add(new BXDatabase(d, session));
+        for(final String d : listDBs(s)) dbs.add(database(s, d, session));
         return dbs;
       }
     }.evalNoEx();
@@ -74,13 +74,12 @@ public class BXRoot extends BXFolder {
   @Override
   public BXDatabase createCollection(final String newName)
       throws BadRequestException {
-
     return new BXCode<BXDatabase>(this) {
       @Override
       public BXDatabase get() throws IOException {
         final String dbname = dbname(newName);
         s.execute(new CreateDB(dbname));
-        return new BXDatabase(dbname, session);
+        return database(s, dbname, session);
       }
     }.eval();
   }
@@ -93,7 +92,7 @@ public class BXRoot extends BXFolder {
       @Override
       public BXDatabase get() throws IOException {
         addFile(s, newName, input);
-        return new BXDatabase(dbname(newName), session);
+        return database(s, dbname(newName), session);
       }
     }.eval();
   }

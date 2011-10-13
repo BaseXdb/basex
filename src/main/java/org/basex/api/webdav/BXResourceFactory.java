@@ -42,7 +42,7 @@ public class BXResourceFactory implements ResourceFactory {
 
         final String db = p.getFirst();
         return p.getLength() == 1 ?
-          listDBs(s).contains(db) ? new BXDatabase(db, session) : null :
+          listDBs(s).contains(db) ? database(s, db, session) : null :
           resource(s, db, p.getStripFirst().toString(), session);
       } finally {
         s.close();

@@ -38,13 +38,14 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
   /**
    * Constructor.
-   * @param dbname database name
-   * @param folderPath path to folder
+   * @param d database name
+   * @param p path to folder
+   * @param m last modified date
    * @param s current session
    */
-  public BXFolder(final String dbname, final String folderPath,
+  public BXFolder(final String d, final String p, final long m,
       final HTTPSession s) {
-    super(dbname, folderPath, s);
+    super(d, p, m, s);
   }
 
   @Override
@@ -73,6 +74,11 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
+  public boolean isLockedOutRecursive(final Request request) {
+    return false;
+  }
+
+  @Override
   public BXFolder createCollection(final String folder)
       throws BadRequestException {
 
@@ -84,7 +90,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         deleteDummy(s, db, path);
         final String newFolder = path + SEP + folder;
         createDummy(s, db, newFolder);
-        return new BXFolder(db, newFolder, session);
+        return folder(s, db, newFolder, session);
       }
     }.eval();
   }
@@ -108,24 +114,30 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
             "for $r in " + DBLIST.args("$d", "$p") +
+            "let $a := " + DBDETAILS.args("$d", "$r") +
             "return (" +
-                SUBAFTER.args("$r", "$p") + ',' +
-                DBISRAW.args("$d", "$r") + ',' +
-                DBCTYPE.args("$d", "$r") + ')');
+                SUBAFTER.args("$a/@path/data()", "$p") + ',' +
+                "$a/@raw/data()," +
+                "$a/@content-type/data()," +
+                "$a/@modified-date/data()," +
+                "$a/@size/data())");
         q.bind("d", db);
         q.bind("p", path);
         while(q.more()) {
           final String p = stripLeadingSlash(q.next());
           final boolean raw = Boolean.parseBoolean(q.next());
           final String ctype = q.next();
+          final long mod = Long.parseLong(q.next());
+          final Long size = raw ? Long.valueOf(q.next()) : null;
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {
             if(!p.equals(DUMMY))
-              ch.add(new BXDocument(db, path + SEP + p, session, raw, ctype));
+              ch.add(new BXFile(db, path + SEP + p, mod, raw, ctype, size,
+                  session));
           } else {
-            final String folder = path + SEP + p.substring(0, ix);
-            if(paths.add(folder)) ch.add(new BXFolder(db, folder, session));
+            final String dir = path + SEP + p.substring(0, ix);
+            if(paths.add(dir)) ch.add(new BXFolder(db, dir, mod, session));
           }
         }
         q.close();
@@ -140,16 +152,15 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
 
     return new BXCode<BXResource>(this) {
       @Override
-      public BXDocument get() throws IOException {
+      public BXResource get() throws IOException {
         s.execute(new Open(db));
         final String dbp = path.isEmpty() ? newName : path + SEP + newName;
         // delete old resource if it already exists
         if(pathExists(s, db, dbp)) s.execute(new Delete(dbp));
         // otherwise, delete dummy file
-        // check if document with this path already exists
         else deleteDummy(s, db, path);
         addFile(s, newName, input);
-        return new BXDocument(db, dbp, session, isRaw(s, db, dbp), contentType);
+        return file(s, db, dbp, session);
       }
     }.eval();
   }
@@ -253,10 +264,5 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     q.bind("tdb", tdb);
     q.bind("tpath", tpath);
     q.execute();
-  }
-
-  @Override
-  public boolean isLockedOutRecursive(final Request request) {
-    return false;
   }
 }
