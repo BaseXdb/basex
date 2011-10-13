@@ -26,12 +26,13 @@ import org.basex.util.list.ByteList;
 public class BufferInput extends InputStream {
   /** UTF8 cache. */
   private final byte[] cache = new byte[4];
+
   /** Byte buffer. */
   protected final byte[] buffer;
   /** Current buffer position. */
-  protected int pos;
-  /** Current buffer size (set to {@code -1} if buffer is still empty). */
-  protected int size;
+  protected int bpos;
+  /** Current buffer size. */
+  protected int bsize;
 
   /** Reference to the data input stream. */
   private InputStream in;
@@ -39,12 +40,13 @@ public class BufferInput extends InputStream {
   private String enc = UTF8;
   /** Charset decoder. */
   private CharsetDecoder csd;
-  /** Total input length. */
+
+  /** Total length of input to be processed (may be {@code 0}). */
   private long length;
+  /** Buffer marker to jump back (not available when set to {@code -1}. */
+  private int bmark;
   /** Number of read bytes. */
   private int read;
-  /** Marker. */
-  private int mark;
 
   /**
    * Initializes the file reader.
@@ -80,34 +82,36 @@ public class BufferInput extends InputStream {
    */
   protected BufferInput(final byte[] buf) {
     buffer = buf;
-    size = buf.length;
-    length = size;
+    bsize = buf.length;
+    length = bsize;
   }
 
   /**
-   * Determines the file encoding.
-   * @return guessed encoding
+   * Guesses the file encoding, based on the first characters.
+   * @return encoding
    * @throws IOException I/O exception
    */
   public final String encoding() throws IOException {
-    // cache first bytes
-    if(size <= 0) size = in.read(buffer);
-    final byte a = size > 0 ? buffer[0] : 0;
-    final byte b = size > 1 ? buffer[1] : 0;
-    final byte c = size > 2 ? buffer[2] : 0;
-    final byte d = size > 3 ? buffer[3] : 0;
-    if(a == -1 && b == -2 || a == '<' && b == 0 && c == '?' && d == 0) {
-      // BOM: ff fe
+    final int a = read();
+    final int b = read();
+    final int c = read();
+    final int d = read();
+    int skip = 0;
+    if(a == 0xFF && b == 0xFE) { // BOM: FF FE
       enc = UTF16LE;
-      if(a == -1) pos = 2;
-    } else if(a == -2 && b == -1 || a == 0 && b == '<' && c == 0 && d == '?') {
-      // BOM: fe ff
+      skip = 2;
+    } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
       enc = UTF16BE;
-      if(a == -2) pos = 2;
-    } else if(a == -0x11 && b == -0x45 && c == -0x41) {
-      // BOM: ef bb bf
-      pos = 3;
+      skip = 2;
+    } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
+      skip = 3;
+    } else if(a == '<' && b == 0 && c == '?' && d == 0) {
+      enc = UTF16LE;
+    } else if(a == 0 && b == '<' && c == 0 && d == '?') {
+      enc = UTF16BE;
     }
+    reset();
+    for(int s = 0; s < skip; s++) read();
     return enc;
   }
 
@@ -133,19 +137,20 @@ public class BufferInput extends InputStream {
    */
   @Override
   public int read() throws IOException {
-    if(pos >= size) {
-      if(size <= 0 || size >= buffer.length) {
+    if(bpos >= bsize) {
+      if(bsize == 0 || bsize == buffer.length) {
         // buffer is empty or full: re-fill it
-        size = 0;
-        pos = 0;
+        bsize = 0;
+        bmark = -1;
+        bpos = 0;
       }
-      int r = -1;
-      while((r = in.read(buffer, size, buffer.length - size)) <= 0)
-        if(r < 0) return -1;
-      size += r;
+      int r;
+      while((r = in.read(buffer, bsize, buffer.length - bsize)) == 0);
+      if(r < 0) return -1;
+      bsize += r;
       read += r;
     }
-    return buffer[pos++] & 0xFF;
+    return buffer[bpos++] & 0xFF;
   }
 
   /**
@@ -216,7 +221,7 @@ public class BufferInput extends InputStream {
    * @return read bytes
    */
   public final int size() {
-    return read + pos;
+    return read + bpos;
   }
 
   /**
@@ -237,18 +242,17 @@ public class BufferInput extends InputStream {
 
   @Override
   public final boolean markSupported() {
-    return read <= buffer.length;
+    return bmark != -1;
   }
 
   @Override
   public synchronized void mark(final int m) {
-    mark = pos;
+    bmark = bpos;
   }
 
   @Override
   public final synchronized void reset() {
-    size = read;
-    pos = mark;
+    bpos = Math.max(0, bmark);
   }
 
   /**
