@@ -417,4 +417,30 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(DBCTYPE.args(DB, "raw"), MimeTypes.APP_OCTET);
     error(DBCTYPE.args(DB, "test"), Err.RESFNF);
   }
+
+  /**
+   * Test method for the db:details() function.
+   */
+  @Test
+  public void dbDetails() {
+    check(DBDETAILS);
+    query(DBADD.args(DB, "\"<a/>\"", "xml"));
+    query(DBSTORE.args(DB, "raw", "bla"));
+
+    final String xmlCall = DBDETAILS.args(DB, "xml");
+    query(xmlCall + "/@path/data()", "xml");
+    query(xmlCall + "/@raw/data()", "false");
+    query(xmlCall + "/@content-type/data()", MimeTypes.APP_XML);
+    query(xmlCall + "/@modified-date/data()", CONTEXT.data().meta.time);
+    query(xmlCall + "/@size/data()", "");
+
+    final String rawCall = DBDETAILS.args(DB, "raw");
+    query(rawCall + "/@path/data()", "raw");
+    query(rawCall + "/@raw/data()", "true");
+    query(rawCall + "/@content-type/data()", MimeTypes.APP_OCTET);
+    query(rawCall + "/@modified-date/data() > 0", "true");
+    query(rawCall + "/@size/data()", "3");
+
+    error(DBDETAILS.args(DB, "test"), Err.RESFNF);
+  }
 }

@@ -31,6 +31,9 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
+import org.basex.query.item.FAttr;
+import org.basex.query.item.FElem;
+import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
@@ -44,8 +47,8 @@ import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.DBAdd;
 import org.basex.query.up.primitives.DBDelete;
 import org.basex.query.up.primitives.DBOptimize;
-import org.basex.query.up.primitives.DBStore;
 import org.basex.query.up.primitives.DBRename;
+import org.basex.query.up.primitives.DBStore;
 import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
@@ -62,6 +65,21 @@ import org.basex.util.list.TokenList;
  * @author Dimitar Popov
  */
 public final class FNDb extends FuncCall {
+  /** Resource element name. */
+  private static final QNm RESOURCE = new QNm(token("resource"));
+  /** Path element name. */
+  private static final QNm PATH = new QNm(token("path"));
+  /** Raw element name. */
+  private static final QNm RAW = new QNm(token("raw"));
+  /** Size element name. */
+  private static final QNm SIZE = new QNm(token("size"));
+  /** Content type element name. */
+  private static final QNm CTYPE = new QNm(token("content-type"));
+  /** Modified date element name. */
+  private static final QNm MDATE = new QNm(token("modified-date"));
+  /** MIME type application/xml. */
+  private static final byte[] APP_XML = token(MimeTypes.APP_XML);
+
   /**
    * Constructor.
    * @param ii input info
@@ -115,6 +133,7 @@ public final class FNDb extends FuncCall {
       case DBEXISTS:   return exists(ctx);
       case DBISXML:    return isXML(ctx);
       case DBCTYPE:    return contentType(ctx);
+      case DBDETAILS:  return details(ctx);
       default:         return super.item(ctx, ii);
     }
   }
@@ -298,6 +317,48 @@ public final class FNDb extends FuncCall {
     final IOFile io = data.meta.binary(path);
     if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
     throw RESFNF.thrw(input, path);
+  }
+
+  /**
+   * Performs the details function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Item details(final QueryContext ctx) throws QueryException {
+    final Data d = data(0, ctx);
+    final String path = path(1, ctx);
+
+    final IntList il = d.docs(path);
+    final TokenList tl = d.files(path);
+    if(il.size() + tl.size() != 1) throw RESFNF.thrw(input, path);
+
+    // xml resource
+    if(il.size() == 1)
+      return resource(d.text(il.get(0), true), false, 0, APP_XML, d.meta.time);
+    // binary resource
+    final byte[] file = tl.get(0);
+    final IOFile f = d.meta.binary(string(file));
+    return resource(file, true, f.length(), MimeTypes.get(file), f.date());
+  }
+
+  /**
+   * Create a <code>&lt;resource/&gt;</code> node.
+   * @param path path
+   * @param raw is the resource a raw file
+   * @param size size
+   * @param ctype content type
+   * @param mdate modified date
+   * @return <code>&lt;resource/&gt;</code> node
+   */
+  private static FNode resource(final byte[] path, final boolean raw,
+      final long size, final byte[] ctype, final long mdate) {
+    final FNode res = new FElem(RESOURCE).
+        add(new FAttr(PATH, path)).
+        add(new FAttr(RAW, token(raw))).
+        add(new FAttr(CTYPE, ctype)).
+        add(new FAttr(MDATE, token(mdate)));
+    return raw ? res.add(new FAttr(SIZE, token(size))) : res;
   }
 
   /**
