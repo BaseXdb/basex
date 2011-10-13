@@ -164,15 +164,27 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   protected void addFile(final Session s, final String n, final InputStream in)
       throws IOException {
 
-    final BufferInput bi = new BufferInput(in, 1 << 22); // use 4MB cache
+    // use 4MB as buffer input
+    final BufferInput bi = new BufferInput(in, 1 << 22); // use 4MB as cache
     try {
-      // try to add every document as XML
-      addXML(s, n, bi);
-    } catch(final IOException ex) {
-      // if the operations fails, and if all sent bytes are buffered,
-      // store data in raw form
-      if(!bi.markSupported()) throw ex;
+      // guess the content type from the first character
+      bi.encoding();
+      final boolean xml = bi.readChar() == '<';
       bi.reset();
+
+      if(xml) {
+        try {
+          // try to add resource as XML
+          addXML(s, n, bi);
+          return;
+        } catch(final IOException ex) {
+          // if the operations fails, and if all sent bytes are buffered,
+          // store data in raw form
+          if(!bi.markSupported()) throw ex;
+          bi.reset();
+        }
+      }
+
       addRaw(s, n, bi);
     } finally {
       bi.close();

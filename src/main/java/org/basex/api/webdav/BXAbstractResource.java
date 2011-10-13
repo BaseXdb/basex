@@ -52,7 +52,7 @@ public abstract class BXAbstractResource extends BXResource implements
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        if(target instanceof BXRootResource)
+        if(target instanceof BXRoot)
           copyToRoot(s, name);
         else if(target instanceof BXFolder)
           copyTo(s, (BXFolder) target, name);
@@ -67,7 +67,7 @@ public abstract class BXAbstractResource extends BXResource implements
     new BXCode<Object>(this) {
       @Override
       public void run() throws IOException {
-        if(target instanceof BXRootResource)
+        if(target instanceof BXRoot)
           moveToRoot(s, name);
         else if(target instanceof BXFolder)
           moveTo(s, (BXFolder) target, name);

@@ -19,12 +19,12 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public class BXRootResource extends BXFolder {
+public class BXRoot extends BXFolder {
   /**
    * Constructor.
    * @param s current session
    */
-  public BXRootResource(final HTTPSession s) {
+  public BXRoot(final HTTPSession s) {
     super(null, null, s);
   }
 

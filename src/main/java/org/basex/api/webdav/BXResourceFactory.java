@@ -38,7 +38,7 @@ public class BXResourceFactory implements ResourceFactory {
         if(!getRequest().getContextPath().isEmpty()) p = p.getStripFirst();
         if(!getRequest().getServletPath().isEmpty()) p = p.getStripFirst();
 
-        if(p.isRoot()) return new BXRootResource(session);
+        if(p.isRoot()) return new BXRoot(session);
 
         final String db = p.getFirst();
         return p.getLength() == 1 ?
