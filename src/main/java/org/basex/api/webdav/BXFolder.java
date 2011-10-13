@@ -165,7 +165,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       throws IOException {
 
     // use 4MB as buffer input
-    final BufferInput bi = new BufferInput(in, 1 << 22); // use 4MB as cache
+    final BufferInput bi = new BufferInput(in, 1 << 22);
     try {
       // guess the content type from the first character
       bi.encoding();
