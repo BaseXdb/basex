@@ -284,7 +284,7 @@ public class BaseXEditor extends BaseXPanel {
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    if(SwingUtilities.isLeftMouseButton(e)) rend.stopSelect();
+    if(SwingUtilities.isLeftMouseButton(e)) copy();
   }
 
   @Override

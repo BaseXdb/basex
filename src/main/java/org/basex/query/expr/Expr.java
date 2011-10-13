@@ -26,9 +26,10 @@ import org.basex.util.InputInfo;
 public abstract class Expr extends ExprInfo {
   /** Flags that influence query compilation. */
   public enum Use {
-    /** Expression depends on context and cannot be rewritten in all cases.
+    /**
+     * Expression depends on context and cannot be rewritten in all cases.
      * Examples: context node, non-deterministic expressions such as
-     *  math:random(). */
+     * math:random(). Should be split up in two distinct flags. */
     CTX,
     /** Fragment constructors, which will create unique fragments and
      *  thus cannot be pre-evaluated.  */
