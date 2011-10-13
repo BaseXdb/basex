@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.basex.build.BuildException;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
@@ -34,18 +35,19 @@ public final class MetaData {
   /** Database users. */
   public Users users;
 
-  /** Encoding of XML document. */
+  /** Encoding of original document. */
   public String encoding = UTF8;
-  /** Path to original input. */
+  /** Path to original document. */
   public String original = "";
-  /** Size of original documents. */
+  /** Size of original document. */
   public long filesize;
-  /** Number of XML documents. */
+  /** Number of stored documents. */
   public int ndocs;
-  /** Database timestamp. */
+  /** Timestamp of original document. */
   public long time;
   /** Flag for whitespace chopping. */
   public boolean chop;
+
   /** Flag for activated text index. */
   public boolean textindex;
   /** Flag for activated attribute value index. */
@@ -220,11 +222,19 @@ public final class MetaData {
   // PUBLIC METHODS ===========================================================
 
   /**
-   * Returns the size of the database.
+   * Returns the disk size of the database.
    * @return database size
    */
   public long dbsize() {
     return path != null ? dbsize(new IOFile(path)) : 0;
+  }
+
+  /**
+   * Returns the disk timestamp of the database.
+   * @return database size
+   */
+  public long dbtime() {
+    return path != null ? new IOFile(path).date() : 0;
   }
 
   /**

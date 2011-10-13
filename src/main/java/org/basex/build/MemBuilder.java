@@ -64,7 +64,7 @@ public final class MemBuilder extends Builder {
     final IO file = parser.src;
     meta.original = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;
-    meta.time = System.currentTimeMillis();
+    meta.time = file != null ? file.date() : System.currentTimeMillis();
 
     parse();
     data.init();

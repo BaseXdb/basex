@@ -812,8 +812,8 @@ public interface Text {
 
   /** Info on database. */
   String INFODB = lang("info_db");
-  /** Info on document creation. */
-  String INFOCREATE = lang("info_create");
+  /** Info on input resource. */
+  String INFORESOURCE = lang("info_resource");
   /** Database info. */
   String INFOGENERAL = lang("info_general");
   /** Database info. */
