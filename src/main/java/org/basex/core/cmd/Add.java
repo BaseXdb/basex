@@ -39,10 +39,6 @@ public final class Add extends ACreate {
    * Note that the constructors of this class have changed with Version 7.0:
    * the target path and file name have been merged and are now specified
    * as first argument.
-   *
-   * OLD: input, name, target
-   * NEW: path, input
-   *
    * @param path target path, optionally terminated by a new file name
    */
   public Add(final String path) {
@@ -65,9 +61,8 @@ public final class Add extends ACreate {
   @Override
   protected boolean run() {
     final boolean create = context.user.perm(User.CREATE);
-    final String path = args[0];
-    String name = MetaData.normPath(path);
-    if(name == null || name.endsWith(".")) return error(NAMEINVALID, path);
+    String name = MetaData.normPath(args[0]);
+    if(name == null || name.endsWith(".")) return error(NAMEINVALID, args[0]);
 
     // add slash to the target if the addressed file is an archive or directory
     IO io = null;

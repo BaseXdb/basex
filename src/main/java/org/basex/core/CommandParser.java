@@ -180,8 +180,13 @@ public final class CommandParser extends InputParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        final String arg = key(TO, null) ? string(cmd) : null;
+        String arg = key(TO, null) ? string(cmd) : null;
         return new Add(arg, s ? remaining(cmd) : string(cmd));
+      case STORE:
+        arg = key(TO, null) ? string(cmd) : null;
+        return new Store(arg, s ? remaining(cmd) : string(cmd));
+      case RETRIEVE:
+        return new Retrieve(string(cmd));
       case DELETE:
         return new Delete(string(cmd));
       case RENAME:
@@ -300,10 +305,6 @@ public final class CommandParser extends InputParser {
           default:
         }
         break;
-      case RETRIEVE:
-        return new Retrieve(string(cmd));
-      case STORE:
-        return new Store(string(cmd), string(cmd));
       default:
     }
     throw Util.notexpected("command specified, but not implemented yet");

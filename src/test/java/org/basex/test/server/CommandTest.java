@@ -509,8 +509,10 @@ public class CommandTest {
     ok(new Store(NAME2, FILE));
     // file can be overwritten
     ok(new Store(NAME2, FILE));
-    // reject invalid names
-    no(new Store("", FILE));
+    // adopt name from specified file
+    ok(new Store("", FILE));
+    // reject invalid or missing names
+    no(new Store("", "</a>"));
     no(new Store("../x", FILE));
   }
 

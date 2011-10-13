@@ -262,6 +262,15 @@ public interface Text {
     lang("ch_add1"), lang("ch_add2", C_INPUT, C_PATH)
   };
   /** Command help. */
+  String[] HELPSTORE = {
+    "(" + TO + " [" + C_PATH + "]) [" + C_INPUT + "]",
+    lang("ch_store1"), lang("ch_store2", C_PATH)
+  };
+  /** Command help. */
+  String[] HELPRETRIEVE = {
+    "[" + C_PATH + "]", lang("ch_retrieve1"), lang("ch_retrieve2", C_PATH)
+  };
+  /** Command help. */
   String[] HELPDELETE = {
     "[" + C_PATH  + "]", lang("ch_delete1"), lang("ch_delete2")
   };
@@ -416,15 +425,6 @@ public interface Text {
       "  " + lang("ch_repo4", C_PKGPATH) + NL +
       LI + CmdRepo.LIST + ":" + NL +
       "  " + lang("ch_repo5")
-  };
-  /** Command help. */
-  String[] HELPRETRIEVE = {
-    "[" + C_PATH + "]", lang("ch_retrieve1"), lang("ch_retrieve2", C_PATH)
-  };
-  /** Command help. */
-  String[] HELPSTORE = {
-    "[" + C_PATH + "] [" + C_INPUT + "]",
-    lang("ch_store1"), lang("ch_store2", C_PATH)
   };
   /** Command help. */
   String[] HELPHELP = {
