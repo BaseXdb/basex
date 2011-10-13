@@ -470,7 +470,7 @@ public enum Function {
       ITEM, ITEM, STR),
   /** Database function: searches the full-text index. */
   DBFULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
-  /** Database function: lists all database. */
+  /** Database function: lists all databases or documents in a database. */
   DBLIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   DBSYSTEM(FNDb.class, "system()", STR),
@@ -505,6 +505,8 @@ public enum Function {
   DBEXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
   /** Database function: returns the content type of a database file. */
   DBCTYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
+  /** Database function: returns details for a resource. */
+  DBDETAILS(FNDb.class, "details(database,path)", ITEM, STR, STR),
 
   /* FNFile functions (EXPath). */
 
