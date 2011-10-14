@@ -7,9 +7,11 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Map;
 
+import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.ListDB;
 import org.basex.core.cmd.Retrieve;
+import org.basex.core.cmd.Set;
 import org.basex.data.DataText;
 import org.basex.io.MimeTypes;
 import org.basex.io.out.ArrayOutput;
@@ -89,6 +91,7 @@ final class RESTRetrieve extends RESTQuery {
     } else {
       // retrieve xml file
       initResponse(new SerializerProp(ctx.serialization), ctx);
+      session.execute(new Set(Prop.SERIALIZER, serial(ctx)));
       session.setOutputStream(ctx.out);
       session.query(".").execute();
     }
