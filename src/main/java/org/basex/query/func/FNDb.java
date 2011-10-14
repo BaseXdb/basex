@@ -332,7 +332,7 @@ public final class FNDb extends FuncCall {
     // xml resource
     final int pre = d.doc(path);
     if(pre != -1)
-      return resource(d.text(pre, true), false, 0, APP_XML, d.meta.time);
+      return resource(token(path), false, 0, APP_XML, d.meta.time);
 
     // binary resource
     final IOFile io = d.meta.binary(path);
