@@ -181,21 +181,28 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       // guess the content type from the first character
       bi.encoding();
       final boolean xml = bi.readChar() == '<';
-      bi.reset();
+      try {
+        bi.reset();
+      } catch(final IOException e) {
+      }
 
       if(xml) {
         try {
-          // try to add resource as XML
+          // add input as XML document
           addXML(s, n, bi);
           return;
         } catch(final IOException ex) {
-          // if the operations fails, and if all sent bytes are buffered,
-          // store data in raw form
-          if(!bi.markSupported()) throw ex;
-          bi.reset();
+          // reset stream if it did not work out
+          try {
+            bi.reset();
+          } catch(final IOException e) {
+            // throw original exception if input cannot be reset
+            throw ex;
+          }
         }
       }
 
+      // add input as raw file
       addRaw(s, n, bi);
     } finally {
       bi.close();
