@@ -137,15 +137,17 @@ public class BufferInput extends InputStream {
    */
   @Override
   public int read() throws IOException {
+    final int blen = buffer.length;
     if(bpos >= bsize) {
-      if(bsize == 0 || bsize == buffer.length) {
+      if(bsize == 0 || bsize == blen) {
+        // reset mark if buffer is full
+        if(bsize == blen) bmark = -1;
         // buffer is empty or full: re-fill it
         bsize = 0;
-        bmark = -1;
         bpos = 0;
       }
       int r;
-      while((r = in.read(buffer, bsize, buffer.length - bsize)) == 0);
+      while((r = in.read(buffer, bsize, blen - bsize)) == 0);
       if(r < 0) return -1;
       bsize += r;
       read += r;
@@ -242,7 +244,7 @@ public class BufferInput extends InputStream {
 
   @Override
   public final boolean markSupported() {
-    return bmark != -1;
+    return true;
   }
 
   @Override
@@ -251,8 +253,9 @@ public class BufferInput extends InputStream {
   }
 
   @Override
-  public final synchronized void reset() {
-    bpos = Math.max(0, bmark);
+  public final synchronized void reset() throws IOException {
+    if(bmark == -1) throw new IOException("Mark cannot be reset.");
+    bpos = bmark;
   }
 
   /**

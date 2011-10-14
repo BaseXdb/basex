@@ -1,5 +1,5 @@
 # LANGUAGE FILE, TRANSLATED BY
-# Project Team
+# BaseX Team
 #
 # The '%' character serves as placeholder for texts to be inserted
 
@@ -183,7 +183,7 @@ dz_help=If memory is low, please launch\nBaseX with the Java flag -Xmx<size>
 
 da_title=About %
 da_license=BSD License
-da_dev=Main Developer
+da_dev=Chief Architect
 da_cont1=Team
 da_cont2=and others
 da_translation=Translation
