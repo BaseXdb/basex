@@ -315,8 +315,8 @@ public final class FNDb extends FuncCall {
     final String path = path(1, ctx);
     if(data.doc(path) != -1) return Str.get(MimeTypes.APP_XML);
     final IOFile io = data.meta.binary(path);
-    if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
-    throw RESFNF.thrw(input, path);
+    if(!io.exists() || io.isDir()) RESFNF.thrw(input, path);
+    return Str.get(MimeTypes.get(path));
   }
 
   /**
@@ -329,17 +329,16 @@ public final class FNDb extends FuncCall {
     final Data d = data(0, ctx);
     final String path = path(1, ctx);
 
-    final IntList il = d.docs(path);
-    final TokenList tl = d.files(path);
-    if(il.size() + tl.size() != 1) throw RESFNF.thrw(input, path);
-
     // xml resource
-    if(il.size() == 1)
-      return resource(d.text(il.get(0), true), false, 0, APP_XML, d.meta.time);
+    final int pre = d.doc(path);
+    if(pre != -1)
+      return resource(d.text(pre, true), false, 0, APP_XML, d.meta.time);
+
     // binary resource
-    final byte[] file = tl.get(0);
-    final IOFile f = d.meta.binary(string(file));
-    return resource(file, true, f.length(), MimeTypes.get(file), f.date());
+    final IOFile io = d.meta.binary(path);
+    if(!io.exists() || io.isDir()) RESFNF.thrw(input, path);
+    return resource(token(path), true, io.length(),
+        token(MimeTypes.get(path)), io.date());
   }
 
   /**
