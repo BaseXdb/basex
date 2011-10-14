@@ -23,32 +23,35 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */
-public final class BXDocument extends BXAbstractResource
-    implements FileResource {
-
+public final class BXFile extends BXAbstractResource implements FileResource {
   /** Raw flag. */
   final boolean raw;
   /** Content type. */
   final String ctype;
+  /** Size in bytes. */
+  final Long size;
 
   /**
    * Constructor.
-   * @param dbname name of database this document belongs to.
-   * @param docpath document path to root
-   * @param s current session
+   * @param d name of database this document belongs to.
+   * @param p document path to root
+   * @param m last modified date
    * @param r raw flag
    * @param c content type
+   * @param s size or null
+   * @param sess current session
    */
-  public BXDocument(final String dbname, final String docpath,
-      final HTTPSession s, final boolean r, final String c) {
-    super(dbname, docpath, s);
+  public BXFile(final String d, final String p, final long m, final boolean r,
+      final String c, final Long s, final HTTPSession sess) {
+    super(d, p, m, sess);
     raw = r;
     ctype = c;
+    size = s;
   }
 
   @Override
   public Long getContentLength() {
-    return null;
+    return size;
   }
 
   @Override
