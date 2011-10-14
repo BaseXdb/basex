@@ -1,6 +1,43 @@
 ==================================================== BASEX CHANGELOG ===
 
-Version 6.7.1 (July 28, 2011):
+Version 7.0 (October 14, 2010) TEI release:
+
+  API
+  - [MOD] Native and tightly integrated REST implementation replaces JAXRX
+  - [ADD] WebDAV provides a file system like access to BaseX databases
+  
+  XQuery
+  - [ADD] Parsing and serializing JSON documents
+  - [ADD] SQL module builds a JDBC bridge to access relational databases 
+  - [ADD] EXPath Cryptographic Module for encryption and XML Signatures
+  - [ADD] Full text engine tokenizes Japanese texts (thx to Toshio Hirai!)
+  - [ADD] db:retrieve() and db:store() handle raw data
+  - [ADD] util:uuid() to create random universally unique identifier
+  - [ADD] db:content-type() retrieves the content type of a resource
+  - [ADD] db:exists() checks if the specified database or resource exists
+  - [ADD] db:is-raw(), db:is-xml() check existence and type of a resource
+  - [MOD] db:list(), db:open() uses two separate arguments to specify
+          database and resource path
+  - [MOD] further modifications: db:add(), 
+  
+  SERVER
+  - [ADD] BaseX HTTP Server activates the REST and WebDAV services
+  - [MOD] ITER command returns all results in one go and the client
+          handles the iterative execution
+  
+  COMMANDS
+  - [ADD] FLUSH command to write all database buffers to disk
+  - [ADD] STORE command to store raw data in a database
+  - [ADD] RETRIEVE command to get raw data from the database
+  - [MOD] modified ADD command
+  
+  OPTIONS
+  - [ADD] SERVERHOST: to specify a server
+  - [ADD] KEEPALIVE: optional timeout to close inactive client sessions
+  - [ADD] AUTOFLUSH database buffers
+  - [ADD] QUERYPATH: path to executed query
+
+Version 6.7.1 (July 28, 2011) Balisage release::
 
   XQuery:
   - New database functions for adding, deleting, renaming
