@@ -91,13 +91,13 @@ public class Filter extends Preds {
       }
     }
 
-    // faster runtime evaluation of variable counters (array[$pos] ...)
+    // check if offset will not be deterministic; e.g.:
+    // (1 to 10)[xs:int(math:random() * 10)]
     final boolean off = preds.length == 1 && preds[0].type().num() &&
-      !preds[0].uses(Use.CTX);
-    final boolean iter = !off && useIterator();
+      !preds[0].uses(Use.CTX) && !preds[0].uses(Use.NDT);
 
     // iterator for simple positional predicate
-    return off || iter ? new IterPosFilter(this, off) : this;
+    return off || useIterator() ? new IterPosFilter(this, off) : this;
   }
 
   @Override

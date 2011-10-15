@@ -520,6 +520,6 @@ public final class FNSql extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX || super.uses(u);
+    return u == Use.NDT || super.uses(u);
   }
 }

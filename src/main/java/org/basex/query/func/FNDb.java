@@ -600,6 +600,7 @@ public final class FNDb extends FuncCall {
       def == Function.DBRENAME || def == Function.DBREPLACE ||
       def == Function.DBOPTIMIZE || def == Function.DBSTORE;
     return
+      // skip evaluation at compile time
       u == Use.CTX && (
         def == Function.DBTEXT || def == Function.DBATTR ||
         def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||

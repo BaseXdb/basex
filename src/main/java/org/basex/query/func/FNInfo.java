@@ -113,7 +113,7 @@ public final class FNInfo extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     return u == Use.X30 && (def == Function.ENVAR || def == Function.ENVARS) ||
-      u == Use.CTX && (def == Function.ERROR || def == Function.TRACE) ||
+      u == Use.NDT && (def == Function.ERROR || def == Function.TRACE) ||
       super.uses(u);
   }
 }

@@ -174,7 +174,7 @@ public final class FNXslt extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && def == Function.TRANSFORM || super.uses(u);
+    return u == Use.NDT && def == Function.TRANSFORM || super.uses(u);
   }
 
   /**

@@ -302,6 +302,7 @@ public final class FNPat extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == Function.ANALZYE || super.uses(u);
+    return def == Function.ANALZYE && (u == Use.X30 || u == Use.CNS) ||
+        super.uses(u);
   }
 }

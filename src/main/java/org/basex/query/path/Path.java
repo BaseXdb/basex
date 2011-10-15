@@ -114,7 +114,7 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final boolean uses(final Use use) {
-    // initial context will be used as input
+    // first step or root expression will be used as context
     if(use == Use.CTX) return root == null || root.uses(use);
     for(final Expr s : steps) if(s.uses(use)) return true;
     return root != null && root.uses(use);

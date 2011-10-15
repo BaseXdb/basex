@@ -453,7 +453,6 @@ public final class FNFile extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    // prevent instant execution
-    return u == Use.CTX || super.uses(u);
+    return u == Use.NDT || super.uses(u);
   }
 }
