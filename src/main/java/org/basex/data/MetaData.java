@@ -48,6 +48,8 @@ public final class MetaData {
   /** Flag for whitespace chopping. */
   public boolean chop;
 
+  /** Flag for activated automatic index update. */
+  public boolean updindex;
   /** Indicates if a text index exists. */
   public boolean textindex;
   /** Indicates if a attribute index exists. */
@@ -138,6 +140,7 @@ public final class MetaData {
     scoring = prop.num(Prop.SCORING);
     language = Language.get(prop);
     users = new Users(false);
+    updindex = prop.is(Prop.UPDINDEX);
   }
 
   // STATIC METHODS ==========================================================
@@ -330,6 +333,7 @@ public final class MetaData {
         else if(k.equals(DBENC))    encoding   = v;
         else if(k.equals(DBCHOP))   chop       = toBool(v);
         else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
+        else if(k.equals(DBUPDIDX)) updindex   = toBool(v);
         else if(k.equals(DBTXTIDX)) textindex  = toBool(v);
         else if(k.equals(DBATVIDX)) attrindex  = toBool(v);
         else if(k.equals(DBFTXIDX)) ftxtindex    = toBool(v);
@@ -369,6 +373,7 @@ public final class MetaData {
     writeInfo(out, DBSIZE,   size);
     writeInfo(out, DBCHOP,   chop);
     writeInfo(out, DBPTHIDX, pathindex);
+    writeInfo(out, DBUPDIDX, updindex);
     writeInfo(out, DBTXTIDX, textindex);
     writeInfo(out, DBATVIDX, attrindex);
     writeInfo(out, DBFTXIDX, ftxtindex);
@@ -399,9 +404,10 @@ public final class MetaData {
     time = System.currentTimeMillis();
     uptodate = false;
     dirty = true;
-    // reset of flags might be skipped if id/pre mapping is supported
-    textindex = false;
-    attrindex = false;
+    if(!updindex) {
+      textindex = false;
+      attrindex = false;
+    }
     ftxtindex = false;
   }
 

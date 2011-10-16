@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import org.basex.core.Prop;
+import org.basex.index.IdPreMap;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.path.PathSummary;
@@ -30,9 +31,10 @@ public final class MemData extends Data {
       final PathSummary s, final Prop pr) {
 
     meta = new MetaData(pr);
+    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     table = new TableMemAccess(meta);
-    txtindex = new MemValues();
-    atvindex = new MemValues();
+    txtindex = new MemValues(this);
+    atvindex = new MemValues(this);
     tagindex = tag;
     atnindex = att;
     ns = n;
@@ -105,12 +107,31 @@ public final class MemData extends Data {
   }
 
   @Override
-  public void text(final int pre, final byte[] val, final boolean txt) {
-    textOff(pre, index(meta.size, val, txt));
+  public void updateText(final int pre, final byte[] val, final int kind) {
+    final boolean txt = kind != ATTR;
+    final int id = id(pre);
+    if(meta.updindex) {
+      ((MemValues) (txt ? txtindex : atvindex)).delete(text(pre, txt), id);
+    }
+    textOff(pre, index(id, val, kind));
   }
 
   @Override
-  protected long index(final int pre, final byte[] txt, final boolean text) {
-    return ((MemValues) (text ? txtindex : atvindex)).index(txt, pre);
+  protected long index(final int id, final byte[] txt, final int kind) {
+    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).index(txt, id);
+  }
+
+  @Override
+  protected void indexDelete(final int pre, final int size) {
+    final int l = pre + size;
+    for(int p = pre; p < l; ++p) {
+      final int k = kind(p);
+      final boolean isAttr = k == ATTR;
+      // skip nodes which are not attribute, text, comment, or proc. instruction
+      if(isAttr || k == TEXT || k == COMM || k == PI) {
+        final byte[] key = text(p, !isAttr);
+        ((MemValues) (isAttr ? atvindex : txtindex)).delete(key, id(p));
+      }
+    }
   }
 }

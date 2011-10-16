@@ -2,6 +2,7 @@ package org.basex.index.value;
 
 import java.util.Arrays;
 
+import org.basex.data.Data;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -19,9 +20,19 @@ import org.basex.util.hash.TokenSet;
  */
 public final class MemValues extends TokenSet implements Index {
   /** IDs. */
-  int[][] ids = new int[CAP][];
+  private int[][] ids = new int[CAP][];
   /** ID array lengths. */
-  int[] len = new int[CAP];
+  private int[] len = new int[CAP];
+  /** ID->PRE mapping. */
+  private final Data data;
+
+  /**
+   * Constructor.
+   * @param m id->pre mapping
+   */
+  public MemValues(final Data m) {
+    data = m;
+  }
 
   /**
    * Indexes the specified keys and values.
@@ -43,22 +54,44 @@ public final class MemValues extends TokenSet implements Index {
     return i;
   }
 
+  /**
+   * Remove record from the index.
+   * @param key record key
+   * @param id record id
+   */
+  public void delete(final byte[] key, final int id) {
+    final int i = id(key);
+    if(i == 0 || len[i] == 0) return;
+
+    // find the position where the id is stored
+    int p = -1;
+    while(++p < len[i]) if(ids[i][p] == id) break;
+
+    // if not the last element, we need to shift forwards
+    if(p < len[i] - 1) Array.move(ids[i], p + 1, -1, len[i] - (p + 1));
+    len[i]--;
+  }
+
   @Override
   public IndexIterator iter(final IndexToken tok) {
     final int i = id(tok.get());
-    if(i == 0) return IndexIterator.EMPTY;
-
-    return new IndexIterator() {
-      int p = -1;
-      @Override
-      public boolean more() { return ++p < len[i]; }
-      @Override
-      public int next() { return ids[i][p]; }
-      @Override
-      public double score() { return -1; }
-      @Override
-      public int size() { return len[i]; }
-    };
+    if(i > 0) {
+      final int[] pres = data.pre(ids[i], 0, len[i]);
+      if(pres.length > 0) {
+        return new IndexIterator() {
+          int p = -1;
+          @Override
+          public boolean more() { return ++p < pres.length; }
+          @Override
+          public int next() { return pres[p]; }
+          @Override
+          public double score() { return -1; }
+          @Override
+          public int size() { return pres.length; }
+        };
+      }
+    }
+    return IndexIterator.EMPTY;
   }
 
   @Override

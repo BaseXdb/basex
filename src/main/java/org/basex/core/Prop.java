@@ -103,6 +103,8 @@ public final class Prop extends AProp {
   public static final Object[] RUNS = { "RUNS", 1 };
   /** Flag for whitespace chopping. */
   public static final Object[] CHOP = { "CHOP", true };
+  /** Flag for automatic index update. */
+  public static final Object[] UPDINDEX = { "UPDINDEX", false };
   /** Flag for creating a text index. */
   public static final Object[] TEXTINDEX = { "TEXTINDEX", true };
   /** Flag for creating an attribute value index. */
