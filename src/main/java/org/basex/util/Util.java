@@ -279,18 +279,20 @@ public final class Util {
   public static String homeDir() {
     // check working directory for property file
     final String work = System.getProperty("user.dir");
-    if(new File(work, IO.BASEXSUFFIX).exists()) return work;
+    final File wconf = new File(work, IO.BASEXSUFFIX);
+    if(wconf.exists()) return wconf.getParent() + File.separator;
 
     // not found; check application directory
     final String app = applicationPath();
     if(app != null) {
       final File f = new File(app);
       final String home = f.isFile() ? f.getParent() : f.getPath();
-      if(new File(home, IO.BASEXSUFFIX).exists()) return home;
+      final File hconf = new File(home, IO.BASEXSUFFIX);
+      if(hconf.exists()) return hconf.getParent() + File.separator;
     }
 
     // not found; choose user home directory
-    return System.getProperty("user.home");
+    return Prop.USERHOME;
   }
 
   /**

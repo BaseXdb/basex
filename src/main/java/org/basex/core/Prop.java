@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.io.File;
+
 import org.basex.util.Util;
 
 /**
@@ -32,8 +34,11 @@ public final class Prop extends AProp {
   /** Flag denoting if OS belongs to Windows family. */
   public static final boolean WIN = OS.startsWith("WIN");
 
+  /** User home directory. */
+  public static final String USERHOME =
+      System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = Util.homeDir() + '/';
+  public static final String HOME = Util.homeDir();
 
   /** Property information. */
   static final String PROPHEADER = "# Property File." + Prop.NL

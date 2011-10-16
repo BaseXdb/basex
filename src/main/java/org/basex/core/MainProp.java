@@ -14,16 +14,18 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class MainProp extends AProp {
+  /** Home path for project directories. */
+  private static final boolean USERHOME = Prop.HOME.equals(Prop.USERHOME);
 
   /** Database path. */
-  public static final Object[] DBPATH =
-    { "DBPATH", Prop.HOME + Text.NAME + "Data" };
-  /** Web path. */
-  public static final Object[] HTTPPATH =
-    { "HTTPPATH", Prop.HOME + Text.NAME + "HTTP" };
+  public static final Object[] DBPATH = { "DBPATH",
+    Prop.HOME + (USERHOME ? Text.NAME + "Data" : "data") };
+  /** HTTP path. */
+  public static final Object[] HTTPPATH = { "HTTPPATH",
+    Prop.HOME + (USERHOME ? Text.NAME + "HTTP" : "http") };
   /** Package repository path. */
-  public static final Object[] REPOPATH =
-    { "REPOPATH", Prop.HOME + Text.NAME + "Repo" };
+  public static final Object[] REPOPATH = { "REPOPATH",
+    Prop.HOME + (USERHOME ? Text.NAME + "Repo" : "repo") };
 
   /** Language name. */
   public static final Object[] LANG = { "LANG", Text.LANGUAGE };
