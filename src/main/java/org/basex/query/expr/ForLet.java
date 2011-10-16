@@ -35,8 +35,17 @@ public abstract class ForLet extends Single {
   final void bind(final QueryContext ctx) throws QueryException {
     if(!simple(true)) return;
 
-    // don't bind variable if expression uses variables, context, or fragments
-    if(expr.hasFreeVars(ctx) || expr.uses(Use.CTX) || expr.uses(Use.NDT) ||
+    /* don't bind variable if expression...
+       - has free variables, eg:
+         for $a in 1 to 2 let $b := $a return $b
+       - is non-deterministic, eg:
+         let $x := random() return ($x, $x)
+       - creates fragments, eg:
+         let $x := <x/> return $x is $x
+       - depends on context, eg:
+         (<a/>,<b/>)/(let $a := position() return $a=last())
+     */
+    if(expr.hasFreeVars(ctx) || expr.uses(Use.NDT) || expr.uses(Use.CTX) ||
         expr.uses(Use.CNS) || ctx.grouping) return;
 
     ctx.compInfo(OPTBIND, var);

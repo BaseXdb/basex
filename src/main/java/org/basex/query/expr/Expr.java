@@ -282,7 +282,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */
-  public boolean hasFreeVars(final QueryContext ctx) {
+  boolean hasFreeVars(final QueryContext ctx) {
     final VarList global = ctx.vars.global();
     for(int i = global.size; --i >= 0;) {
       if(count(global.vars[i]) > 0) return true;
