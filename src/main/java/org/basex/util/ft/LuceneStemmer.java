@@ -48,7 +48,7 @@ final class LuceneStemmer extends Stemmer {
   private static void add(final String... lang) {
     for(final String ln : lang) {
       final Language l = Language.get(ln);
-      add(l, l.code() + '.' + l);
+      if(l != null) add(l, l.code() + '.' + l);
     }
   }
 
