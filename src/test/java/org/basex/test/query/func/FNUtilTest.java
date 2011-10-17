@@ -144,6 +144,18 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the util:to-string() function.
+   */
+  @Test
+  public void utilToString() {
+    check(TO_STRING);
+    query(TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
+    query(TO_STRING.args("xs:hexBinary('41')"), "A");
+    query(TO_STRING.args("xs:hexBinary('41')", "CP1252"), "A");
+    error(TO_STRING.args("xs:hexBinary('41')", "X"), Err.CONVERT);
+  }
+
+  /**
    * Test method for the util:uuid() function.
    */
   @Test
