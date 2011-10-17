@@ -133,16 +133,27 @@
         <artifactId>maven-deploy-plugin</artifactId>
         <version>2.7</version>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <extensions>
-      <!-- Enabling the use of FTP -->
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
          <artifactId>wagon-ftp</artifactId>
          <version>2.0</version>
       </extension>
     </extensions>
-    
   </build>
   <distributionManagement>
     <repository>
