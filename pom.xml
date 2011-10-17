@@ -6,7 +6,6 @@
   <artifactId>basex-api</artifactId>
   <version>7.0.1-SNAPSHOT</version>
   <name>BaseX API</name>
-  <url>http://basex.org</url>
   <properties>
     <compileSource>1.6</compileSource>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,7 +41,7 @@
   </repositories>
   <organization>
     <name>BaseX Team</name>
-    <url>http://www.basex.org</url>
+    <url>http://basex.org</url>
   </organization>
   <developers>
     <developer>
@@ -237,6 +236,19 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
         <version>2.7</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.8</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
     <extensions>
