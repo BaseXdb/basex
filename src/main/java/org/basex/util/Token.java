@@ -656,7 +656,9 @@ public final class Token {
    * @return true if one test is successful
    */
   public static boolean eq(final String str, final String... strings) {
-    for(final String s : strings) if(str.equals(s)) return true;
+    for(final String s : strings) {
+      if(str == null ? s == null : str.equals(s)) return true;
+    }
     return false;
   }
 

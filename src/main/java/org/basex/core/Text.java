@@ -141,11 +141,12 @@ public interface Text {
   String HTTPINFO =
     " [-dehlnpPRUWz] [stop]" + NL +
     "  stop       Stop existing server" + NL +
+    "  -c         Start in client mode" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -e<num>    Set event port" + NL +
     "  -h<num>    Set port of HTTP server" + NL +
     "  -l         Start in local mode" + NL +
-    "  -n<name>   Set name of database server" + NL +
+    "  -n<name>   Set host name of database server" + NL +
     "  -p<num>    Set port of database server" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -R         Deactivate REST service" + NL +
