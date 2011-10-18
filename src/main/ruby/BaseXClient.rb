@@ -84,7 +84,7 @@ class Session
   def receive()
     complete = ""
     while ((t = read) != 0.chr)
-    complete += t
+    complete << t
     end
     return complete
   end
@@ -99,6 +99,10 @@ class Session
     return @socket.read(1)
   end
   
+  def write(i)
+    @socket.write(i)
+  end
+  
   # Returns success check. 
   def ok()
     return read == 0.chr
@@ -110,18 +114,34 @@ class Query
   def initialize(s, q)
     @session = s
     @id = exec(0.chr, q)
+    
+    @cache = []
+    @pos = 0
   end
-  
-  # see readme.txt
-  def init()
-    return exec(4.chr, @id)
-  end
-  
+
   # see readme.txt
   def bind(name, value)
     exec(3.chr, @id + 0.chr + name + 0.chr + value + 0.chr)
   end
-  
+
+  def more()
+    if @cache.length == 0
+      @session.write(4.chr)
+      @session.send(@id)
+      while(@session.read == 1.chr)
+        @cache << @session.receive
+      end
+    end
+    return @pos < @cache.length
+  end
+
+  def next
+    if more()
+      @pos += 1
+      return @cache[@pos - 1]
+    end
+  end
+
   # see readme.txt
   def execute()
     return exec(5.chr, @id)
