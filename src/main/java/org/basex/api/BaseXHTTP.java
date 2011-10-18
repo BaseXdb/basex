@@ -75,7 +75,6 @@ public final class BaseXHTTP {
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
     final int hport = mprop.num(MainProp.HTTPPORT);
-    final String host = mprop.get(MainProp.HOST);
     final String shost = mprop.get(MainProp.SERVERHOST);
 
     if(service) {
@@ -90,7 +89,7 @@ public final class BaseXHTTP {
       return;
     }
 
-    // set password if only user was specified
+    // request password on command line if only the user was specified
     if(System.getProperty(DBUSER) != null) {
       while(System.getProperty(DBPASS) == null) {
         Util.out(SERVERPW + COLS);
@@ -98,9 +97,11 @@ public final class BaseXHTTP {
       }
     }
 
-    if(HTTPSession.local() || !Token.eq(host, LOCALHOST, LOCALIP)) {
+    if(Token.eq(System.getProperty(DBMODE), LOCAL, CLIENT)) {
+      // local or client mode
       Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
     } else {
+      // default mode: start database server
       server = new BaseXServer(context, quiet ? "-z" : "");
       Util.outln(HTTP + ' ' + SERVERSTART);
     }
@@ -138,10 +139,15 @@ public final class BaseXHTTP {
   protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     final Context ctx = HTTPSession.context();
+    boolean local = false, client = false;
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
         switch(c) {
+          case 'c':
+            System.setProperty(DBMODE, CLIENT);
+            client = true;
+            break;
           case 'd':
             ctx.mprop.set(MainProp.DEBUG, true);
             break;
@@ -152,7 +158,8 @@ public final class BaseXHTTP {
             ctx.mprop.set(MainProp.HTTPPORT, arg.num());
             break;
           case 'l':
-            System.setProperty(DBLOCAL, Boolean.toString(true));
+            System.setProperty(DBMODE, LOCAL);
+            local = true;
             break;
           case 'n':
             ctx.mprop.set(MainProp.HOST, arg.string());
@@ -187,6 +194,12 @@ public final class BaseXHTTP {
           arg.usage();
         }
       }
+    }
+
+    // only allow local or client mode
+    if(local && client) {
+      Util.errln(INVMODE);
+      arg.usage();
     }
   }
 

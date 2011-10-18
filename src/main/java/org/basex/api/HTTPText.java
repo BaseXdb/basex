@@ -12,12 +12,18 @@ public interface HTTPText {
   /** Servlet string. */
   String SERVLET = "Servlet";
 
-  /** Configuration: local flag. */
-  String DBLOCAL = "org.basex.local";
   /** Configuration: database user. */
   String DBUSER = "org.basex.user";
   /** Configuration: database user password. */
   String DBPASS = "org.basex.password";
+  /** Configuration: operation mode:
+      "local", "client", or default ({@code null}). */
+  String DBMODE = "org.basex.mode";
+
+  /** Mode: local. */
+  String LOCAL = "local";
+  /** Mode: client. */
+  String CLIENT = "client";
 
   /** Authorization string. */
   String AUTHORIZATION = "Authorization";
@@ -32,5 +38,6 @@ public interface HTTPText {
   String NOPASSWD = "No username/password specified.";
   /** Error: unsupported authorization method. */
   String WHICHAUTH = "Unsupported authorization method: %.";
-
+  /** Error: only allow local or client mode. */
+  String INVMODE = "You cannot use both local and client mode.";
 }

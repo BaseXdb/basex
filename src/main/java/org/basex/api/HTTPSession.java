@@ -1,7 +1,6 @@
 package org.basex.api;
 
 import static org.basex.api.HTTPText.*;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,15 +67,17 @@ public final class HTTPSession {
   }
 
   /**
-   * Returns a new session instance.
+   * Returns a new session instance. By default, a {@link LocalSession}
+   * instance will be generated. A {@link ClientSession} will be created
+   * if "client" has been chosen an operation mode.
    * @return session
    * @throws IOException I/O exception
    */
   public Session login() throws IOException {
     if(user == null || pass == null) throw new LoginException(NOPASSWD);
-    return local() ?
-        new LocalSession(CONTEXT, user, pass) :
-        new ClientSession(CONTEXT, user, pass);
+    return CLIENT.equals(System.getProperty(DBMODE)) ?
+        new ClientSession(CONTEXT, user, pass) :
+        new LocalSession(CONTEXT, user, pass);
   }
 
   /**
@@ -85,15 +86,6 @@ public final class HTTPSession {
    */
   public static Context context() {
     return CONTEXT;
-  }
-
-  /**
-   * Indicates if the session will be local or client-/server-based.
-   * @return database context (default: {@code false}).
-   */
-  public static boolean local() {
-    final String l = System.getProperty(DBLOCAL);
-    return l != null && l.equals(Boolean.toString(true));
   }
 
   /**
