@@ -61,8 +61,8 @@ public abstract class Preds extends ParseExpr {
       } else {
         preds[p] = pr;
 
-        // replace AND expression with predicates
-        if(preds[p] instanceof And) {
+        // replace AND expression with predicates (don't swap position tests)
+        if(preds[p] instanceof And && !preds[p].uses(Use.POS)) {
           ctx.compInfo(OPTPRED, preds[p].desc());
           final Expr[] and = ((And) preds[p]).expr;
           final int m = and.length - 1;

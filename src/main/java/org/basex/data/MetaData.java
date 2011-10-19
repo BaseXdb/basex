@@ -202,7 +202,7 @@ public final class MetaData {
 
   /**
    * Checks if the specified database name is valid, matching the pattern
-   * {@code "[-\\w]+"}, or {@code "[-\\w*?,]+"} if the glob flag is activated.
+   * {@code [-\w]+}, or {@code [-\w*?,]+} if the glob flag is activated.
    * @param name name to be checked
    * @param glob allow glob syntax
    * @return result of check
