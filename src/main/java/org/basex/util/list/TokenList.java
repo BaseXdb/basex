@@ -2,9 +2,7 @@ package org.basex.util.list;
 
 import static org.basex.util.Token.*;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
-
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -180,12 +178,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @return self reference
    */
   public TokenList sort(final boolean cs) {
-    Arrays.sort(list, 0, size, new Comparator<byte[]>() {
-      @Override
-      public int compare(final byte[] s1, final byte[] s2) {
-        return cs ? diff(s1, s2) : diff(lc(s1), lc(s2));
-      }
-    });
+    Arrays.sort(list, 0, size, cs ? COMP : LC_COMP);
     return this;
   }
 
