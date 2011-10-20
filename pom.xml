@@ -33,11 +33,6 @@
       <name>Milton Maven Repository</name>
       <url>http://www.ettrema.com/maven2</url>
     </repository>
-    <repository>
-      <id>karatachi</id>
-      <name>Karatachi Maven Repository</name>
-      <url>http://repo.karatachi.org/mvn/</url>
-    </repository>
   </repositories>
   <organization>
     <name>BaseX Team</name>
@@ -120,26 +115,6 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
       <version>1.2.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.ccil.cowan.tagsoup</groupId>
-      <artifactId>tagsoup</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>xml-resolver</groupId>
-      <artifactId>xml-resolver</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache</groupId>
-      <artifactId>lucene-stemmers</artifactId>
-      <version>3.4.0</version>
-    </dependency>
-    <dependency>
-      <groupId>jp.sourceforge.igo</groupId>
-      <artifactId>igo</artifactId>
-      <version>0.4.3</version>
     </dependency>
     <dependency>
     	<groupId>org.slf4j</groupId>
