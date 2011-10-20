@@ -23,6 +23,16 @@
       <name>Central Maven Repository</name>
       <url>http://repo2.maven.org/maven2/</url>
     </repository>
+    <repository>
+      <id>basex</id>
+      <name>BaseX Maven Repository</name>
+      <url>http://files.basex.org/maven</url>
+    </repository>
+    <repository>
+      <id>karatachi</id>
+      <name>Karatachi Maven Repository</name>
+      <url>http://repo.karatachi.org/mvn/</url>
+    </repository>
   </repositories>
   <organization>
     <name>BaseX Team</name>
@@ -57,6 +67,34 @@
       <artifactId>junit</artifactId>
       <version>4.8.2</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>jp.sourceforge.igo</groupId>
+    	<artifactId>igo</artifactId>
+    	<version>0.4.3</version>
+    	<scope>runtime</scope>
+    	<optional>true</optional>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache</groupId>
+    	<artifactId>lucene-stemmers</artifactId>
+    	<version>3.4.0</version>
+    	<scope>runtime</scope>
+    	<optional>true</optional>
+    </dependency>
+    <dependency>
+    	<groupId>org.ccil.cowan.tagsoup</groupId>
+    	<artifactId>tagsoup</artifactId>
+    	<version>1.2</version>
+    	<scope>runtime</scope>
+    	<optional>true</optional>
+    </dependency>
+    <dependency>
+    	<groupId>xml-resolver</groupId>
+    	<artifactId>xml-resolver</artifactId>
+    	<version>1.2</version>
+    	<scope>runtime</scope>
+    	<optional>true</optional>
     </dependency>
   </dependencies>
   <build>
