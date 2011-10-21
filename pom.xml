@@ -171,7 +171,7 @@
         <artifactId>maven-deploy-plugin</artifactId>
         <version>2.7</version>
       </plugin>
-      <plugin>
+      <!--<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.8</version>
@@ -183,7 +183,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
     </plugins>
     <extensions>
       <extension>
