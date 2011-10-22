@@ -124,7 +124,7 @@ public final class GUIConstants {
     Prop.MAC ? null : PREFS
   }, {
     SHOWHELP, Prop.MAC ? null : EMPTY,
-    SHOWCOMMUNITY, SHOWUPDATES, Prop.MAC ? null : EMPTY,
+    SHOWCOMMUNITY, SHOWDOC, SHOWUPDATES, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : ABOUT
   }};
 

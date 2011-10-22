@@ -3,15 +3,12 @@
 # Path to this script
 PWD=`dirname $0`
 
-# Paths to distributed files or source directories
-BASEX=$PWD/../target/classes
+# Core and library classes
+CP=$PWD/../target/classes
+CP=$CP:$(echo $PWD/../lib/*.jar | tr ' ' ':')
 
 # Options for virtual machine
 VM=-Xmx512m
-
-# Classpath
-LIB=$PWD/../lib
-CP=$BASEX:$LIB/igo-0.4.3.jar:$LIB/lucene-stemmers-3.4.0.jar:$LIB/xml-resolver-1.2.jar:$LIB/tagsoup-1.2.jar
 
 # Run code
 java -cp "$CP" $VM org.basex.BaseX -q "$@"

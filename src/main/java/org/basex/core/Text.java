@@ -48,6 +48,8 @@ public interface Text {
   String URL = "http://www." + NAMELC + ".org";
   /** URL of the community page. */
   String COMMUNITY_URL = URL + "/community";
+  /** URL of the documentation. */
+  String DOC_URL = "http://docs." + NAMELC + ".org";
   /** URL of the update page. */
   String UPDATE_URL = URL + "/products/download/all-downloads/";
   /** Version URL. */
@@ -987,6 +989,10 @@ public interface Text {
   String GUISHOWCOMMUNITY = lang("c_community");
   /** Command info. */
   String GUISHOWCOMMUNITYTT = lang("c_communitytt");
+  /** Command info. */
+  String GUISHOWDOC = lang("c_doc");
+  /** Command info. */
+  String GUISHOWDOCTT = lang("c_doctt");
   /** Command info. */
   String GUISHOWUPDATES = lang("c_updates");
   /** Command info. */
