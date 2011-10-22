@@ -3,13 +3,28 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.0.1 (October 23, 2011) ---------------------------------------
+
+  DISTRIBUTIONS
+  - Windows installer updated to support latest features
+  - ZIP file updated (initial config & directories added)
+  - Short directory names chosen if config file resides in app.dir.
+  - Improved start scripts
+
+  XQUERY
+  - much faster execution of count() when applied to opened databases
+
+  API
+  - HTTP Server: -c flag added to connect to an existing database server
+  - Ruby, Jaba: clients updated
+
 VERSION 7.0 (October 14, 2010) TEI EDITION -----------------------------
 
   API
   - Native and tightly integrated REST implementation replaces JAXRX
   - WebDAV provides a file system like access to BaseX databases
   
-  XQuery
+  XQUERY
   - Parsing and serializing JSON documents
   - SQL module builds a JDBC bridge to access relational databases 
   - EXPath Cryptographic Module for encryption and XML Signatures
