@@ -21,9 +21,7 @@ try {
   echo "<td style='text-align:center;background-color:#D7D7D7;border:#ffffff 1px solid;font-size:12pt;'>Population</td>";
   try {
     $query = $session->query($cmd);
-    print $query->init();
     $query2 = $session->query($cmd2);
-    print $query2->init();
     $count = 0;
     while($query->more()) {
       $next = $query->next();

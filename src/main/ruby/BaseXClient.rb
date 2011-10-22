@@ -131,6 +131,9 @@ class Query
       while(@session.read == 1.chr)
         @cache << @session.receive
       end
+      if(@session.read != 0.chr)
+        raise receive
+      end
     end
     return @pos < @cache.length
   end
