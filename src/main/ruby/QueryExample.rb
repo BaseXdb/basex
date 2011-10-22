@@ -14,9 +14,6 @@ begin
     input = "for $i in 1 to 10 return <xml>Text { $i }</xml>"
     query = session.query(input)
     
-    # initializes query
-    print query.init
-    
     # loop through all results
     while query.more do
       print query.next

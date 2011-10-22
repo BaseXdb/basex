@@ -40,7 +40,7 @@ class Session
     # receive result
     result = receive
     @info = receive
-    if ok != true
+    if !ok
       raise @info
     end
     return result
@@ -53,20 +53,22 @@ class Session
   
   # see readme.txt
   def create(name, input)
-    send(8.chr + name + 0.chr + input)
-    @info = receive
-    if ok != true
-      raise @info
-    end
+    sendCmd(8.chr, name, input)
   end
   
   # see readme.txt
-  def add(name, target, input)
-    send(9.chr + name + 0.chr + target + 0.chr + input)
-    @info = receive
-    if ok != true
-      raise @info
-    end
+  def add(path, input)
+    sendCmd(9.chr, path, input)
+  end
+
+  # see readme.txt
+  def replace(path, input)
+    sendCmd(12.chr, path, input)
+  end
+
+  # see readme.txt
+  def store(path, input)
+    sendCmd(13.chr, path, input)
   end
 
   # see readme.txt
@@ -83,8 +85,8 @@ class Session
   # Receives a string from the socket.
   def receive()
     complete = ""
-    while ((t = read) != 0.chr)
-    complete << t
+    while (t = read) != 0.chr
+      complete << t
     end
     return complete
   end
@@ -92,6 +94,15 @@ class Session
   # Sends the defined str.
   def send(str)
     @socket.write(str + 0.chr)
+  end
+
+  # see readme.txt
+  def sendCmd(cmd, arg, input)
+    send(cmd + arg + 0.chr + input)
+    @info = receive
+    if !ok
+      raise @info
+    end
   end
 
   # Returns a single byte from the socket.
@@ -114,7 +125,6 @@ class Query
   def initialize(s, q)
     @session = s
     @id = exec(0.chr, q)
-    
     @cache = []
     @pos = 0
   end
@@ -128,8 +138,11 @@ class Query
     if @cache.length == 0
       @session.write(4.chr)
       @session.send(@id)
-      while(@session.read == 1.chr)
+      while @session.read == 1.chr
         @cache << @session.receive
+      end
+      if !@session.ok
+        raise receive
       end
     end
     return @pos < @cache.length
@@ -161,7 +174,7 @@ class Query
   def exec(cmd, arg)
     @session.send(cmd + arg)
     s = @session.receive
-    if @session.ok != true
+    if !@session.ok
       raise @session.receive
     end
     return s
