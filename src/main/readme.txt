@@ -6,7 +6,8 @@
  improved: your feedback is welcome!
 
  More information is found at:
- http://docs.basex.org/wiki/Server_Protocol
+
+   http://docs.basex.org/wiki/Server_Protocol
 
  BaseX Team, 2011
 

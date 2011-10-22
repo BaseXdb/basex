@@ -9,26 +9,25 @@ import hashlib, socket, array
 import string
 
 class Session():
-
     # see readme.txt
     def __init__(self, host, port, user, pw):
         # allocate buffer for speeding up communication
         self.__buf = array.array('B', chr(0) * 0x1000)
         self.init()
-        
+
         # create server connection
         self.__s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.__s.connect((host, port))
-        
+
         # receive timestamp
         ts = self.readString()
-        
+
         # send username and hashed password/timestamp
         m = hashlib.md5()
         m.update(hashlib.md5(pw).hexdigest())
         m.update(ts)
         self.send(user + chr(0) + m.hexdigest())
-        
+
         # evaluate success flag
         if self.__s.recv(1) != chr(0):
             raise IOError('Access Denied.')
@@ -37,45 +36,33 @@ class Session():
     def execute(self, com):
         # send command to server
         self.send(com)
-        
+
         # receive result
         result = self.receive()
         self.__info = self.readString()
         if not self.ok():
             raise IOError(self.__info)
         return result
-  
+
     # see readme.txt
     def query(self, q):
         return Query(self, q)
-    
+
     # see readme.txt
     def create(self, name, input):
-        self.__s.send(chr(8) + name + chr(0) + input + chr(0))
-        self.__info = self.readString()
-        if not self.ok():
-            raise IOError(self.info())
+        self.sendInput(8, name, input)
 
     # see readme.txt
     def add(self, path, input):
-        self.__s.send(chr(9) + path + chr(0) + input + chr(0))
-        self.__info = self.readString()
-        if not self.ok():
-            raise IOError(self.info())
-            
+        self.sendInput(9, path, input)
+
     # see readme.txt
     def replace(self, path, input):
-        self.__s.send(chr(12) + path + chr(0) + input + chr(0))
-        self.__info = self.readString()
-        if not self.ok():
-            raise IOError(self.info())
+        self.sendInput(12, path, input)
 
     # see readme.txt
     def store(self, path, input):
-        self.__s.send(chr(13) + path + chr(0) + input + chr(0))
-        self.__info = self.readString()
-        if not self.ok():
-            raise IOError(self.info())
+        self.sendInput(13, path, input)
 
     # see readme.txt
     def info(self):
@@ -109,7 +96,7 @@ class Session():
         b = self.__buf[self.__bpos]
         self.__bpos += 1
         return b
-    
+
     # Reads until byte is found.
     def read_until(self, byte):
         # Cache next bytes
@@ -128,21 +115,27 @@ class Session():
             substr = self.__buf[self.__bpos:self.__bsize].tostring()
             self.__bpos = self.__bsize
         return (found, substr)
-    
+
     # Sends the defined str.
     def send(self, str):
         self.__s.send(str + chr(0))
-  
+
+    # see readme.txt
+    def sendInput(self, code, arg, input):
+        self.__s.send(chr(code) + arg + chr(0) + input + chr(0))
+        self.__info = self.readString()
+        if not self.ok():
+            raise IOError(self.info())
+
     # Returns success check.
     def ok(self):
         return self.read() == 0
-   
+
     # Returns the received string.
     def receive(self):
         self.init()
         return self.readString()
-   
-   
+
 class Query():
     # see readme.txt
     def __init__(self, session, q):
@@ -152,23 +145,23 @@ class Query():
     # see readme.txt  
     def bind(self, name, value):
         self.exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0))
-  
+
     # see readme.txt  
     def execute(self):
         return self.exc(chr(5), self.__id)
-  
+
     # see readme.txt  
     def info(self):
         return self.exc(chr(6), self.__id)
-  
+
     # see readme.txt  
     def options(self):
         return self.exc(chr(7), self.__id)
-  
+
     # see readme.txt  
     def close(self):
         self.exc(chr(2), self.__id)
-  
+
     # see readme.txt  
     def exc(self, cmd, arg):
         self.__session.send(cmd + arg)

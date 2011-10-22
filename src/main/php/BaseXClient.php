@@ -53,38 +53,22 @@ class Session {
   
   /* see readme.txt */
   public function create($name, $input) {
-    socket_write($this->socket, chr(8).$name.chr(0).$input.chr(0));
-    $this->info = $this->receive();
-    if($this->ok() != True) {
-      throw new Exception($this->info);
-    }
+    $this->sendCmd(8, $path, $input);
   }
   
   /* see readme.txt */
   public function add($path, $input) {
-    socket_write($this->socket, chr(9).$path.chr(0).$input.chr(0));
-    $this->info = $this->receive();
-    if($this->ok() != True) {
-      throw new Exception($this->info);
-    }
+    $this->sendCmd(9, $path, $input);
   }
 
   /* see readme.txt */
   public function replace($path, $input) {
-    socket_write($this->socket, chr(12).$path.chr(0).$input.chr(0));
-    $this->info = $this->receive();
-    if($this->ok() != True) {
-      throw new Exception($this->info);
-    }
+    $this->sendCmd(12, $path, $input);
   }
 
   /* see readme.txt */
   public function store($path, $input) {
-    socket_write($this->socket, chr(13).$path.chr(0).$input.chr(0));
-    $this->info = $this->receive();
-    if($this->ok() != True) {
-      throw new Exception($this->info);
-    }
+    $this->sendCmd(13, $path, $input);
   }
   
   /* see readme.txt */
@@ -120,6 +104,15 @@ class Session {
       $this->bpos = 0;
     }
     return $this->buffer[$this->bpos++];
+  }
+  
+  /* see readme.txt */
+  private function sendCmd($code, $arg, $input) {
+    socket_write($this->socket, chr($code).$arg.chr(0).$input.chr(0));
+    $this->info = $this->receive();
+    if($this->ok() != True) {
+      throw new Exception($this->info);
+    }
   }
   
   /* Sends the str. */

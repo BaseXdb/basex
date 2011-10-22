@@ -58,22 +58,22 @@ sub query {
 
 # see readme.txt
 sub create {
-  shift->sendInput(chr(8), shift, shift);
+  shift->sendInput(8, shift, shift);
 }
 
 # see readme.txt
 sub add {
-  shift->sendInput(chr(9), shift, shift);
+  shift->sendInput(9, shift, shift);
 }
 
 # see readme.txt
 sub replace {
-  shift->sendInput(chr(12), shift, shift);
+  shift->sendInput(12, shift, shift);
 }
 
 # see readme.txt
 sub store {
-  shift->sendInput(chr(13), shift, shift);
+  shift->sendInput(13, shift, shift);
 }
 
 # see readme.txt
@@ -122,7 +122,7 @@ sub sendInput {
   my $str = shift;
   my $input = shift;
 
-  $self->send($code.$str);
+  $self->send(chr($code).$str);
   foreach my $b(unpack("C*", $input)) {
     if($b == 0xFF || $b == 0x00) {
       $self->{sock}->send(0xFF);
