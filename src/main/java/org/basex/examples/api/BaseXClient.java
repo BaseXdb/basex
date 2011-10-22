@@ -114,9 +114,7 @@ public final class BaseXClient {
    */
   public void create(final String name, final InputStream input)
       throws IOException {
-    out.write(8);
-    send(name);
-    send(input);
+    send(8, name, input);
   }
 
   /**
@@ -127,9 +125,7 @@ public final class BaseXClient {
    */
   public void add(final String path, final InputStream input)
       throws IOException {
-    out.write(9);
-    send(path);
-    send(input);
+    send(9, path, input);
   }
 
   /**
@@ -140,9 +136,7 @@ public final class BaseXClient {
    */
   public void replace(final String path, final InputStream input)
       throws IOException {
-    out.write(12);
-    send(path);
-    send(input);
+    send(12, path, input);
   }
 
   /**
@@ -153,9 +147,7 @@ public final class BaseXClient {
    */
   public void store(final String path, final InputStream input)
       throws IOException {
-    out.write(13);
-    send(path);
-    send(input);
+    send(13, path, input);
   }
 
   /**
@@ -262,6 +254,20 @@ public final class BaseXClient {
   }
 
   /**
+   * Sends a command, argument, and input.
+   * @param cmd command
+   * @param path path to document
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  private void send(final int cmd, final String path, final InputStream input)
+      throws IOException {
+    out.write(cmd);
+    send(path);
+    send(input);
+  }
+
+  /**
    * Starts the listener thread.
    * @param is input stream
    */
@@ -280,7 +286,9 @@ public final class BaseXClient {
             final String data = new String(os.toByteArray(), UTF8);
             notifiers.get(name).notify(data);
           }
-        } catch(final Exception ex) { }
+        } catch(final IOException ex) {
+          // [CG] check if exception should be thrown
+        }
       }
     }.start();
   }
