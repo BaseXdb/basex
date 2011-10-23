@@ -123,7 +123,7 @@ public interface Text {
   /** Server start information. */
   String SERVERINFO =
     " [-deipsz] [-c] [stop]" + NL +
-    "  stop      Stop existing server" + NL +
+    "  stop      Stop running server" + NL +
     "  -c<cmd>   Execute initial database command(s)" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
@@ -142,7 +142,7 @@ public interface Text {
   /** HTTP information. */
   String HTTPINFO =
     " [-dehlnpPRUWz] [stop]" + NL +
-    "  stop       Stop existing server" + NL +
+    "  stop       Stop running server" + NL +
     "  -c         Start in client mode" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -e<num>    Set event port" + NL +

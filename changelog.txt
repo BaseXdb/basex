@@ -6,21 +6,22 @@
 VERSION 7.0.1 (October 23, 2011) ---------------------------------------
 
   DISTRIBUTIONS
-  - Windows installer updated to support latest features
-  - ZIP file updated (initial config & directories added)
-  - Short directory names chosen if config file resides in app.dir.
-  - Improved start scripts
+  - Windows installer was updated to support latest features
+  - ZIP file was updated (initial config & directories added)
+  - Short directory names are chosen if config file resides in app.dir.
+  - Start scripts have been improved
 
   XQUERY
   - much faster execution of count() when applied to opened databases
 
-  API
-  - HTTP Server: -c flag added to connect to an existing database server
-  - HTTP Server: -S flag added to start server as a service
-  - Ruby, Jaba: clients updated
-
   SERVER
-  - wait for writing transactions if server is stopped
+  - Flag -c connects to an existing database server
+  - Flag -s specifies a port for stopping the HTTP server (Jetty)
+  - Flag -S starts the HTTP server as a service
+  - running write operations will be completed before server is stopped
+
+  API
+  - Ruby, Python, PHP, Java: clients updated
 
 VERSION 7.0 (October 14, 2010) TEI EDITION -----------------------------
 

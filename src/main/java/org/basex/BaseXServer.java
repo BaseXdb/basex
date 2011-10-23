@@ -133,7 +133,7 @@ public final class BaseXServer extends Main implements Runnable {
       esocket.bind(new InetSocketAddress(addr, eport));
       stop = stopFile(port);
 
-      // guarantee correct shutdown...
+      // show info when server is aborted
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
