@@ -94,6 +94,7 @@ public final class BaseXHTTP {
     if(service) {
       start(hport, args);
       Util.outln(HTTP + ' ' + SERVERSTART);
+      if(start) Util.outln(SERVERSTART);
       Performance.sleep(1000);
       return;
     }
