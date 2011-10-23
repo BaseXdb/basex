@@ -32,19 +32,21 @@ public final class MainProp extends AProp {
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
 
-  /** Client/server communication: host, used for connecting new clients. */
+  /** Server: host, used for connecting new clients. */
   public static final Object[] HOST = { "HOST", Text.LOCALHOST };
-  /** Client/server communication: port, used for connecting new clients. */
+  /** Server: port, used for connecting new clients. */
   public static final Object[] PORT = { "PORT", 1984 };
-  /** Client/server communication: host, used for binding the server. Empty
+  /** Server: host, used for binding the server. Empty
    * string for wildcard.*/
   public static final Object[] SERVERHOST = { "SERVERHOST", "" };
-  /** Client/server communication: port, used for binding the server. */
+  /** Server: port, used for binding the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
-  /** Client/server communication: port, used for sending events. */
+  /** Server: port, used for sending events. */
   public static final Object[] EVENTPORT = { "EVENTPORT", 1985 };
-  /** Client/server communication: port, used for starting the HTTP server. */
+  /** Server: port, used for starting the HTTP server. */
   public static final Object[] HTTPPORT = { "HTTPPORT", 8984 };
+  /** Server: port, used for stopping the HTTP server. */
+  public static final Object[] HTTPSTOP = { "HTTPSTOP", 8985 };
 
   /** Timeout for processing client requests; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };

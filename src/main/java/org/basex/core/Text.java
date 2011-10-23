@@ -152,6 +152,7 @@ public interface Text {
     "  -p<num>    Set port of database server" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -R         Deactivate REST service" + NL +
+    "  -s         Start as service" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -W         Deactivate WebDAV service" + NL +
     "  -z         Suppress logging";

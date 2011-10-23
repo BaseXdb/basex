@@ -222,33 +222,33 @@ public final class BaseXServer extends Main implements Runnable {
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
-        final char c = arg.next();
-        if(c == 'c') {
-          // send database commands
-          commands = arg.remaining();
-        } else if(c == 'd') {
-          // activate debug mode
-          context.mprop.set(MainProp.DEBUG, true);
-        } else if(c == 'D') {
-          // hidden flag: daemon mode
-          daemon = true;
-        } else if(c == 'e') {
-          // parse event port
-          context.mprop.set(MainProp.EVENTPORT, arg.num());
-        } else if(c == 'i') {
-          // activate interactive mode
-          console = true;
-        } else if(c == 'p') {
-          // parse server port
-          context.mprop.set(MainProp.SERVERPORT, arg.num());
-        } else if(c == 's') {
-          // set service flag
-          service = !daemon;
-        } else if(c == 'z') {
-          // suppress logging
-          quiet = true;
-        } else {
-          arg.usage();
+        switch(arg.next()) {
+          case 'c': // send database commands
+            commands = arg.remaining();
+            break;
+          case 'd': // activate debug mode
+            context.mprop.set(MainProp.DEBUG, true);
+            break;
+          case 'D': // hidden flag: daemon mode
+            daemon = true;
+            break;
+          case 'e': // parse event port
+            context.mprop.set(MainProp.EVENTPORT, arg.num());
+            break;
+          case 'i': // activate interactive mode
+            console = true;
+            break;
+          case 'p': // parse server port
+            context.mprop.set(MainProp.SERVERPORT, arg.num());
+            break;
+          case 's': // set service flag
+            service = !daemon;
+            break;
+          case 'z': // suppress logging
+            quiet = true;
+            break;
+          default:
+            arg.usage();
         }
       } else {
         if(arg.string().equalsIgnoreCase("stop")) {
