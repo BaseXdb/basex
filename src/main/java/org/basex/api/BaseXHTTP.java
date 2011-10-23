@@ -142,6 +142,14 @@ public final class BaseXHTTP {
 
     jetty.start();
     new StopServer(sport, shost).start();
+
+    // show info when HTTP server is aborted
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        Util.outln(HTTP + ' ' + SERVERSTOPPED);
+      }
+    });
   }
 
   /**
