@@ -6,6 +6,10 @@ import static org.basex.core.Text.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 
 import org.basex.BaseXServer;
@@ -69,12 +73,13 @@ public final class BaseXHTTP {
   public BaseXHTTP(final String... args) throws Exception {
     parseArguments(args);
 
-    final Context context = HTTPSession.context();
-    final MainProp mprop = context.mprop;
+    final Context ctx = HTTPSession.context();
+    final MainProp mprop = ctx.mprop;
 
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
     final int hport = mprop.num(MainProp.HTTPPORT);
+    final int sport = mprop.num(MainProp.HTTPSTOP);
     final String shost = mprop.get(MainProp.SERVERHOST);
 
     if(service) {
@@ -86,6 +91,7 @@ public final class BaseXHTTP {
 
     if(stopped) {
       BaseXServer.stop(port, eport);
+      stop(sport);
       return;
     }
 
@@ -102,7 +108,7 @@ public final class BaseXHTTP {
       Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
     } else {
       // default mode: start database server
-      server = new BaseXServer(context, quiet ? "-z" : "");
+      server = new BaseXServer(ctx, quiet ? "-z" : "");
       Util.outln(HTTP + ' ' + SERVERSTART);
     }
 
@@ -120,6 +126,7 @@ public final class BaseXHTTP {
     if(webdav) jcontext.addServlet(WebDAVServlet.class, "/webdav/*");
 
     jetty.start();
+    new StopServer(sport, shost).start();
   }
 
   /**
@@ -139,49 +146,54 @@ public final class BaseXHTTP {
   protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     final Context ctx = HTTPSession.context();
-    boolean local = false, client = false;
+    boolean daemon = false, local = false, client = false;
     while(arg.more()) {
       if(arg.dash()) {
-        final char c = arg.next();
-        switch(c) {
-          case 'c':
+        switch(arg.next()) {
+          case 'c': // use client mode
             System.setProperty(DBMODE, CLIENT);
             client = true;
             break;
-          case 'd':
+          case 'd': // activate debug mode
             ctx.mprop.set(MainProp.DEBUG, true);
             break;
-          case 'e':
+          case 'D': // hidden flag: daemon mode
+            daemon = true;
+            break;
+          case 'e': // parse event port
             ctx.mprop.set(MainProp.EVENTPORT, arg.num());
             break;
-          case 'h':
+          case 'h': // parse HTTP port
             ctx.mprop.set(MainProp.HTTPPORT, arg.num());
             break;
-          case 'l':
+          case 'l': // use local mode
             System.setProperty(DBMODE, LOCAL);
             local = true;
             break;
-          case 'n':
+          case 'n': // parse host name
             ctx.mprop.set(MainProp.HOST, arg.string());
             break;
-          case 'p':
+          case 'p': // parse server port
             final int p = arg.num();
             ctx.mprop.set(MainProp.PORT, p);
             ctx.mprop.set(MainProp.SERVERPORT, p);
             break;
-          case 'R':
+          case 'R': // deactivate REST service
             rest = false;
             break;
-          case 'P':
+          case 'P': // specify password
             System.setProperty(DBPASS, arg.string());
             break;
-          case 'U':
+          case 's': // set service flag
+            service = !daemon;
+            break;
+          case 'U': // specify user name
             System.setProperty(DBUSER, arg.string());
             break;
-          case 'W':
+          case 'W': // deactivate WebDAV service
             webdav = false;
             break;
-          case 'z':
+          case 'z': // suppress logging
             quiet = true;
             break;
           default:
@@ -237,6 +249,23 @@ public final class BaseXHTTP {
   }
 
   /**
+   * Stops the server.
+   * @param port server port
+   * @throws IOException I/O exception
+   */
+  public static void stop(final int port) throws IOException {
+    final IOFile stop = stopFile(port);
+    try {
+      stop.write(Token.EMPTY);
+      new Socket(LOCALHOST, port).close();
+      Performance.sleep(50);
+    } catch(final IOException ex) {
+      stop.delete();
+      throw ex;
+    }
+  }
+
+  /**
    * Checks if a server is running.
    * @param host host
    * @param port server port
@@ -252,6 +281,46 @@ public final class BaseXHTTP {
     } catch(final IOException ex) {
       // if page is not found, server is running
       return ex instanceof FileNotFoundException;
+    }
+  }
+
+  /** Monitor for stopping the Jetty server. */
+  private final class StopServer extends Thread {
+    /** Server socket. */
+    private final ServerSocket ss;
+    /** Stop file. */
+    private final IOFile stop;
+
+    /**
+     * Constructor.
+     * @param hport HTTP port
+     * @param host host address
+     * @throws IOException I/O exception
+     */
+    StopServer(final int hport, final String host) throws IOException {
+      final InetAddress addr = host.isEmpty() ? null :
+        InetAddress.getByName(host);
+      ss = new ServerSocket();
+      ss.setReuseAddress(true);
+      ss.bind(new InetSocketAddress(addr, hport));
+      stop = stopFile(hport);
+      setDaemon(true);
+    }
+
+    @Override
+    public void run() {
+      try {
+        while(true) {
+          ss.accept().close();
+          if(!stop.exists()) continue;
+          stop.delete();
+          BaseXHTTP.this.stop();
+          ss.close();
+          break;
+        }
+      } catch(final Exception ex) {
+        Util.errln(ex);
+      }
     }
   }
 }
