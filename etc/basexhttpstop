@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# Path to this script
+PWD=`dirname $0`
+
+# Core and library classes
+CP=$PWD/../target/classes
+CP=$CP:$(echo $PWD/../lib/*.jar | tr ' ' ':')
+CP=$CP:$PWD/../../basex/target/classes
+CP=$CP:$(echo $PWD/../../basex/lib/*.jar | tr ' ' ':')
+
+# Options for virtual machine
+VM=-Xmx512m
+
+# Run code
+java -cp "$CP" $VM org.basex.api.BaseXHTTP "$@" stop

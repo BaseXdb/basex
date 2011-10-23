@@ -73,13 +73,22 @@ public final class BaseXHTTP {
   public BaseXHTTP(final String... args) throws Exception {
     parseArguments(args);
 
+    // flag for starting/stopping the database server
+    final boolean start = !Token.eq(System.getProperty(DBMODE), LOCAL, CLIENT);
+
     final Context ctx = HTTPSession.context();
     final MainProp mprop = ctx.mprop;
-
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
     final int hport = mprop.num(MainProp.HTTPPORT);
-    final int sport = mprop.num(MainProp.HTTPSTOP);
+    final int sport = mprop.num(MainProp.STOPPORT);
+    // check if ports are distinct
+    int same = -1;
+    if(port == eport || port == hport || port == sport) same = port;
+    else if(eport == hport || eport == sport) same = eport;
+    else if(hport == sport) same = hport;
+    if(same != -1) throw new BaseXException(SERVERPORTS, same);
+
     final String shost = mprop.get(MainProp.SERVERHOST);
 
     if(service) {
@@ -90,8 +99,13 @@ public final class BaseXHTTP {
     }
 
     if(stopped) {
-      BaseXServer.stop(port, eport);
       stop(sport);
+      Util.outln(HTTP + ' ' + SERVERSTOPPED);
+      if(start) {
+        BaseXServer.stop(port, eport);
+        Util.outln(SERVERSTOPPED);
+      }
+      Performance.sleep(1000);
       return;
     }
 
@@ -103,13 +117,13 @@ public final class BaseXHTTP {
       }
     }
 
-    if(Token.eq(System.getProperty(DBMODE), LOCAL, CLIENT)) {
-      // local or client mode
-      Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
-    } else {
+    if(start) {
       // default mode: start database server
       server = new BaseXServer(ctx, quiet ? "-z" : "");
       Util.outln(HTTP + ' ' + SERVERSTART);
+    } else {
+      // local or client mode
+      Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
     }
 
     jetty = new Server();
@@ -174,9 +188,8 @@ public final class BaseXHTTP {
             ctx.mprop.set(MainProp.HOST, arg.string());
             break;
           case 'p': // parse server port
-            final int p = arg.num();
-            ctx.mprop.set(MainProp.PORT, p);
-            ctx.mprop.set(MainProp.SERVERPORT, p);
+            ctx.mprop.set(MainProp.PORT, arg.num());
+            ctx.mprop.set(MainProp.SERVERPORT, ctx.mprop.num(MainProp.PORT));
             break;
           case 'R': // deactivate REST service
             rest = false;
@@ -184,7 +197,10 @@ public final class BaseXHTTP {
           case 'P': // specify password
             System.setProperty(DBPASS, arg.string());
             break;
-          case 's': // set service flag
+          case 's': // parse stop port
+            ctx.mprop.set(MainProp.STOPPORT, arg.num());
+            break;
+          case 'S': // set service flag
             service = !daemon;
             break;
           case 'U': // specify user name
