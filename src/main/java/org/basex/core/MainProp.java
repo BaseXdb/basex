@@ -46,7 +46,7 @@ public final class MainProp extends AProp {
   /** Server: port, used for starting the HTTP server. */
   public static final Object[] HTTPPORT = { "HTTPPORT", 8984 };
   /** Server: port, used for stopping the HTTP server. */
-  public static final Object[] HTTPSTOP = { "HTTPSTOP", 8985 };
+  public static final Object[] STOPPORT = { "STOPPORT", 8985 };
 
   /** Timeout for processing client requests; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };

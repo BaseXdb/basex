@@ -117,15 +117,16 @@ public final class ClientListener extends Thread {
         send(true);
         server.unblock(address);
         context.add(this);
-      } else if(!us.isEmpty()) {
-        log.write(this, SERVERDENIED + COLS + us);
-        // temporarily block client
-        new ClientDelayer(server.block(address), this, server);
+      } else {
+        if(!us.isEmpty()) log.write(this, SERVERDENIED + COLS + us);
+        new ClientDelayer(server.block(address), this, server).start();
       }
     } catch(final IOException ex) {
       Util.stack(ex);
       log.write(ex.getMessage());
+      return;
     }
+    if(!running) return;
 
     // authentification done, start command loop
     ServerCmd sc = null;
@@ -133,11 +134,12 @@ public final class ClientListener extends Thread {
 
     try {
       while(running) {
+        command = null;
         try {
           final int b = in.read();
           if(b == -1) {
             // end of stream: exit session
-            exit();
+            quit();
             break;
           }
 
@@ -165,13 +167,12 @@ public final class ClientListener extends Thread {
           }
         } catch(final IOException ex) {
           // this exception may be thrown if a session is stopped
-          exit();
+          quit();
           break;
         }
         if(sc != COMMAND) continue;
 
         // parse input and create command instance
-        command = null;
         try {
           command = new CommandParser(cmd, context).parseSingle();
         } catch(final QueryException ex) {
@@ -213,33 +214,40 @@ public final class ClientListener extends Thread {
 
         // stop console
         if(command instanceof Exit) {
-          exit();
-          break;
+          command = null;
+          quit();
         }
       }
     } catch(final IOException ex) {
       log.write(this, sc == COMMAND ? cmd : sc, INFOERROR + ex.getMessage());
-      Util.stack(ex);
-      exit();
+      Util.debug(ex);
+      command = null;
+      quit();
     }
+    command = null;
   }
 
   /**
    * Exits the session.
    */
-  public synchronized void exit() {
+  public synchronized void quit() {
     running = false;
+    // wait until running command was stopped
+    if(command != null) {
+      command.stop();
+      while(command != null) Performance.sleep(50);
+    }
     log.write(this, "LOGOUT " + context.user.name, OK);
+    context.delete(this);
+
     try {
-      // remove this session from all events in pool
+      new Close().execute(context);
+      socket.close();
       if(events) {
         esocket.close();
+        // remove this session from all events in pool
         for(final Sessions s : context.events.values()) s.remove(this);
       }
-      new Close().execute(context);
-      if(command != null) command.stop();
-      context.delete(this);
-      socket.close();
     } catch(final Exception ex) {
       log.write(ex.getMessage());
       Util.stack(ex);

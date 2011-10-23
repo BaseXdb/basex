@@ -94,11 +94,15 @@ public final class BaseXServer extends Main implements Runnable {
       throws IOException {
 
     super(args, ctx);
-    final int port = context.mprop.num(MainProp.SERVERPORT);
-    final String host = context.mprop.get(MainProp.SERVERHOST);
-    final InetAddress hostAddress = host.isEmpty() ? null :
+    final MainProp mprop = context.mprop;
+    final int port = mprop.num(MainProp.SERVERPORT);
+    final int eport = mprop.num(MainProp.EVENTPORT);
+    // check if ports are distinct
+    if(port == eport) throw new BaseXException(SERVERPORTS, port);
+
+    final String host = mprop.get(MainProp.SERVERHOST);
+    final InetAddress addr = host.isEmpty() ? null :
       InetAddress.getByName(host);
-    final int eport = context.mprop.num(MainProp.EVENTPORT);
 
     if(service) {
       start(port, args);
@@ -109,6 +113,7 @@ public final class BaseXServer extends Main implements Runnable {
 
     if(stopped) {
       stop(port, eport);
+      Util.outln(SERVERSTOPPED);
       Performance.sleep(1000);
       return;
     }
@@ -122,10 +127,10 @@ public final class BaseXServer extends Main implements Runnable {
 
       socket = new ServerSocket();
       socket.setReuseAddress(true);
-      socket.bind(new InetSocketAddress(hostAddress, port));
+      socket.bind(new InetSocketAddress(addr, port));
       esocket = new ServerSocket();
       esocket.setReuseAddress(true);
-      esocket.bind(new InetSocketAddress(hostAddress, eport));
+      esocket.bind(new InetSocketAddress(addr, eport));
       stop = stopFile(port);
 
       // guarantee correct shutdown...
@@ -169,7 +174,7 @@ public final class BaseXServer extends Main implements Runnable {
           if(ka > 0) {
             final long ms = System.currentTimeMillis();
             for(final ClientListener cs : context.sessions) {
-              if(ms - cs.last > ka) cs.exit();
+              if(ms - cs.last > ka) cs.quit();
             }
           }
           new ClientListener(s, context, log, this).start();
@@ -194,7 +199,9 @@ public final class BaseXServer extends Main implements Runnable {
   public void quit() throws IOException {
     if(!running) return;
     running = false;
+    for(final ClientListener cs : context.sessions) cs.quit();
     super.quit();
+    context.close();
 
     try {
       // close interactive input if server was stopped by another process
@@ -206,7 +213,6 @@ public final class BaseXServer extends Main implements Runnable {
       Util.stack(ex);
     }
     console = false;
-    context.close();
   }
 
   @Override
@@ -241,7 +247,7 @@ public final class BaseXServer extends Main implements Runnable {
           case 'p': // parse server port
             context.mprop.set(MainProp.SERVERPORT, arg.num());
             break;
-          case 's': // set service flag
+          case 'S': // set service flag
             service = !daemon;
             break;
           case 'z': // suppress logging
@@ -258,11 +264,6 @@ public final class BaseXServer extends Main implements Runnable {
         }
       }
     }
-
-    if(context.mprop.num(MainProp.SERVERPORT) ==
-       context.mprop.num(MainProp.EVENTPORT)) {
-      throw new BaseXException(SERVERPORTS);
-    }
   }
 
   /**
@@ -270,11 +271,9 @@ public final class BaseXServer extends Main implements Runnable {
    * @throws IOException I/O exception
    */
   public void stop() throws IOException {
-    stop.write(Token.EMPTY);
-    new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT)).close();
     final int port = context.mprop.num(MainProp.SERVERPORT);
-    new Socket(LOCALHOST, port).close();
-    Performance.sleep(50);
+    final int eport = context.mprop.num(MainProp.EVENTPORT);
+    stop(port, eport);
   }
 
   // STATIC METHODS ===========================================================
@@ -330,8 +329,9 @@ public final class BaseXServer extends Main implements Runnable {
       stop.write(Token.EMPTY);
       new Socket(LOCALHOST, eport).close();
       new Socket(LOCALHOST, port).close();
+      // check if server was really stopped
+      while(ping(LOCALHOST, port)) Performance.sleep(50);
       Performance.sleep(50);
-      Util.outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       stop.delete();
       throw ex;

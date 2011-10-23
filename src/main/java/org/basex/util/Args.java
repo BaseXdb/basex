@@ -88,13 +88,13 @@ public final class Args {
   }
 
   /**
-   * Returns the next number.
+   * Returns the next positive number.
    * @return number as int value
    * @throws BaseXException database exception
    */
   public int num() throws BaseXException {
     final int i = Token.toInt(string());
-    if(i == Integer.MIN_VALUE) usage();
+    if(i < 0) usage();
     return i;
   }
 

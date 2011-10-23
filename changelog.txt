@@ -16,7 +16,11 @@ VERSION 7.0.1 (October 23, 2011) ---------------------------------------
 
   API
   - HTTP Server: -c flag added to connect to an existing database server
+  - HTTP Server: -S flag added to start server as a service
   - Ruby, Jaba: clients updated
+
+  SERVER
+  - wait for writing transactions if server is stopped
 
 VERSION 7.0 (October 14, 2010) TEI EDITION -----------------------------
 

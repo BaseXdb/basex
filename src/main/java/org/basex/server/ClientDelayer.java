@@ -32,13 +32,13 @@ public final class ClientDelayer extends Thread {
     delay = del;
     server = srv;
     listener = cl;
-    start();
+    setDaemon(true);
   }
 
   @Override
   public void run() {
     // loop until delay is exhausted, or until server is stopped
-    do Performance.sleep(1000); while(server.running && --delay > 0);
+    while(server.running && --delay > 0) Performance.sleep(1000);
 
     try {
       // send negative flag

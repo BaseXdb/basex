@@ -129,7 +129,7 @@ public interface Text {
     "  -e<num>   Set event port" + NL +
     "  -i        Enter interactive mode" + NL +
     "  -p<num>   Set server port" + NL +
-    "  -s        Start as service" + NL +
+    "  -S        Start as service" + NL +
     "  -z        Suppress logging";
 
   /** GUI mode. */
@@ -152,7 +152,8 @@ public interface Text {
     "  -p<num>    Set port of database server" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -R         Deactivate REST service" + NL +
-    "  -s         Start as service" + NL +
+    "  -s         Specify port to stop HTTP server" + NL +
+    "  -S         Start as service" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -W         Deactivate WebDAV service" + NL +
     "  -z         Suppress logging";
