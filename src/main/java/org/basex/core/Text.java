@@ -122,7 +122,7 @@ public interface Text {
   String SERVERMODE = "Server";
   /** Server start information. */
   String SERVERINFO =
-    " [-deipsz] [-c] [stop]" + NL +
+    " [-deipSz] [-c] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -c<cmd>   Execute initial database command(s)" + NL +
     "  -d        Activate debugging mode" + NL +
