@@ -174,7 +174,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the next character, or {@code 0} if all bytes have been read.
+   * Returns the next character, or {@code -1} if end of stream is reached.
    * Erroneous characters are ignored.
    * @return next character
    * @throws IOException I/O exception

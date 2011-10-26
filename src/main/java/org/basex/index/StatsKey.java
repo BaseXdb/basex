@@ -1,4 +1,4 @@
-package org.basex.data;
+package org.basex.index;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;

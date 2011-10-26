@@ -76,7 +76,7 @@ public final class Events extends HashMap<String, Sessions> {
     try {
       final DataOutput out = new DataOutput(file);
       out.writeNum(size());
-      for(final String name : keySet()) out.writeString(name);
+      for(final String name : keySet()) out.writeToken(token(name));
       out.close();
     } catch(final IOException ex) {
       Util.debug(ex);

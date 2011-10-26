@@ -35,7 +35,7 @@ public final class DataInput extends BufferInput {
   }
 
   /**
-   * Reads a token.
+   * Reads a token, represented by its compressed length and its byte array.
    * @return byte array
    * @throws IOException I/O Exception
    */

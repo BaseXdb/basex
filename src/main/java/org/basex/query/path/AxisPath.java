@@ -2,7 +2,7 @@ package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
-import org.basex.data.StatsKey;
+import org.basex.index.StatsKey;
 import org.basex.index.path.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;

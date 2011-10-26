@@ -479,8 +479,6 @@ public enum Err {
   INVALPI(XPST, 3, "Invalid PI name: \"%\"."),
   /** XPST0003: Parsing exception. */
   INTEXP(XPST, 3, "Integer expected."),
-  /** XPST0003: Parsing exception. */
-  INVIN(XPST, 3, "Invalid input: % found."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),

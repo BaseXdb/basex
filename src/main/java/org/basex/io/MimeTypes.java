@@ -1,6 +1,5 @@
 package org.basex.io;
 
-import static org.basex.util.Token.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,16 +45,6 @@ public final class MimeTypes {
       if(ct != null) return ct;
     }
     return APP_OCTET;
-  }
-
-  /**
-   * Returns the mime type for the suffix of the specified file path.
-   * {@code application/octet-stream} is returned if no type is found.
-   * @param path path to be checked
-   * @return mime-type
-   */
-  public static byte[] get(final byte[] path) {
-    return token(get(string(path)));
   }
 
 

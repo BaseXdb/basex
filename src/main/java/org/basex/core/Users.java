@@ -164,7 +164,7 @@ public final class Users {
     // skip writing of local rights
     out.writeNum(list.size());
     for(final User user : list) {
-      out.writeString(user.name);
+      out.writeToken(token(user.name));
       out.writeToken(user.password);
       out.writeNum(user.perm);
     }

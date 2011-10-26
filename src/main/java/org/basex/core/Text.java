@@ -186,8 +186,6 @@ public interface Text {
 
   /** Localhost. */
   String LOCALHOST = "localhost";
-  /** Localhost IP. */
-  String LOCALIP = "127.0.0.1";
 
   // COMMANDS =================================================================
 
@@ -221,8 +219,6 @@ public interface Text {
   String C_NAME = "name";
   /** Command help. */
   String C_PW = "password";
-  /** Command help. */
-  String C_TARGET = "target";
   /** Command help. */
   String C_PKGPATH = "path";
   /** Command help. */

@@ -92,14 +92,6 @@ public final class DataAccess {
   }
 
   /**
-   * Reads a byte value.
-   * @return integer value
-   */
-  public synchronized byte read1() {
-    return (byte) read();
-  }
-
-  /**
    * Reads a byte value from the specified position.
    * @param p position
    * @return integer value
@@ -110,11 +102,11 @@ public final class DataAccess {
   }
 
   /**
-   * Reads an integer value.
+   * Reads a byte value.
    * @return integer value
    */
-  public synchronized int read4() {
-    return (read() << 24) + (read() << 16) + (read() << 8) + read();
+  public synchronized byte read1() {
+    return (byte) read();
   }
 
   /**
@@ -125,6 +117,14 @@ public final class DataAccess {
   public synchronized int read4(final long p) {
     cursor(p);
     return read4();
+  }
+
+  /**
+   * Reads an integer value.
+   * @return integer value
+   */
+  public synchronized int read4() {
+    return (read() << 24) + (read() << 16) + (read() << 8) + read();
   }
 
   /**

@@ -368,7 +368,7 @@ public final class MetaData {
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
     if(language != null) writeInfo(out, DBFTLN, language.toString());
-    out.writeString(DBPERM);
+    out.writeToken(token(DBPERM));
     users.write(out);
     out.write(0);
   }
@@ -431,8 +431,8 @@ public final class MetaData {
    */
   private void writeInfo(final DataOutput out, final String k,
       final String v) throws IOException {
-    out.writeString(k);
-    out.writeString(v);
+    out.writeToken(token(k));
+    out.writeToken(token(v));
   }
 
   /**
