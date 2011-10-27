@@ -62,4 +62,16 @@ public class TCOTest extends QueryPlanTest {
         "count(//BaseFuncCall) eq 2"
     );
   }
+
+  /** Checks if a function only containing a tail call is properly optimized. */
+  @Test
+  public void tightLoopTest() {
+    check("declare function local:foo() { local:foo() }; local:foo()",
+
+        null,
+
+        "exists(//UserFunc/TailFuncCall)",
+        "exists(//BaseFuncCall)"
+    );
+  }
 }
