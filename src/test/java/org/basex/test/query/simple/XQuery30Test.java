@@ -63,6 +63,10 @@ public final class XQuery30Test extends QueryTest {
       { "Concat 3", str("abc"), "'a' || 'b' || 'c'" },
       { "Concat 4", str("1true3"), "1 || true() || '3'" },
 
+      { "Try/catch 1", str("X"), "try { 1+'a' } catch * { 'X' }" },
+      { "Try/catch 2",
+        "declare function local:x() { local:x() }; " +
+        "try { local:x() } catch * { 1 }" },
     };
   }
 }
