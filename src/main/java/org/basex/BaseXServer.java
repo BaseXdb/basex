@@ -163,7 +163,6 @@ public final class BaseXServer extends Main implements Runnable {
     events.start();
     running = true;
     while(running) {
-      System.out.println("?");
       try {
         final Socket s = socket.accept();
         if(stop.exists()) {

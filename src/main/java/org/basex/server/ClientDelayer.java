@@ -37,7 +37,6 @@ public final class ClientDelayer extends Thread {
 
   @Override
   public void run() {
-    System.out.println(delay);
     // loop until delay is exhausted, or until server is stopped
     while(server.running && --delay > 0) Performance.sleep(1000);
 

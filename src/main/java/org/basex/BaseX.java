@@ -66,10 +66,10 @@ public class BaseX extends Main {
   public BaseX(final String... args) throws IOException {
     super(args);
 
-    try {
-      // create session to show optional login request
-      session();
+    // create session to show optional login request
+    session();
 
+    try {
       // open initial document or database
       if(input != null) {
         execute(new Check(input), verbose);
