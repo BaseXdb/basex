@@ -74,7 +74,8 @@ public final class BaseXHTTP {
     parseArguments(args);
 
     // flag for starting/stopping the database server
-    final boolean start = !Token.eq(System.getProperty(DBMODE), LOCAL, CLIENT);
+    final boolean start =
+        !Token.eqic(System.getProperty(DBMODE), LOCAL, CLIENT);
 
     final Context ctx = HTTPSession.context();
     final MainProp mprop = ctx.mprop;

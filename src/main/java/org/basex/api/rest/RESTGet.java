@@ -37,15 +37,15 @@ final class RESTGet extends RESTCode {
           (String[]) s.getValue() : new String[] { s.getValue().toString() };
       final String val = vals[0];
 
-      if(Token.eq(key, COMMAND, QUERY, RUN)) {
+      if(Token.eqic(key, COMMAND, QUERY, RUN)) {
         if(operation != null || vals.length > 1)
           throw new RESTException(SC_BAD_REQUEST, ERR_ONLYONE);
         operation = key;
         input = val;
-      } else if(key.equals(WRAP)) {
+      } else if(key.equalsIgnoreCase(WRAP)) {
         // wrapping flag
         wrap(val, ctx);
-      } else if(key.equals(CONTEXT)) {
+      } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         item = Token.token(val);
       } else if(sp.get(key) != null) {
