@@ -352,7 +352,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean yes(final String string) {
-    return Token.eq(string, YES, TRUE, ON, INFOON);
+    return Token.eqic(string, YES, TRUE, ON, INFOON);
   }
 
   /**
@@ -361,7 +361,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean no(final String string) {
-    return Token.eq(string, NO, FALSE, OFF, INFOOFF);
+    return Token.eqic(string, NO, FALSE, OFF, INFOOFF);
   }
 
   /**

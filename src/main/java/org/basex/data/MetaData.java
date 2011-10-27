@@ -307,9 +307,9 @@ public final class MetaData {
       } else {
         final String v = string(in.readToken());
         if(k.equals(DBSTR))         storage    = v;
+        else if(k.equals(IDBSTR))   istorage   = v;
         else if(k.equals(DBFNAME))  original   = v;
         else if(k.equals(DBTIME))   time       = toLong(v);
-        else if(k.equals(IDBSTR))   istorage   = v;
         else if(k.equals(DBSIZE))   size       = toInt(v);
         else if(k.equals(DBFSIZE))  filesize   = toLong(v);
         else if(k.equals(DBNDOCS))  ndocs      = toInt(v);

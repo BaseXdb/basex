@@ -42,12 +42,10 @@ public final class DocIndex implements Index {
   /**
    * Reads the document index.
    * @param in input stream
-   * @return success flag
    * @throws IOException I/O exception
    */
-  public synchronized boolean read(final DataInput in) throws IOException {
+  public synchronized void read(final DataInput in) throws IOException {
     docs = in.readDiffs();
-    return true;
   }
 
   /**

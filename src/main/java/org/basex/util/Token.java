@@ -663,6 +663,21 @@ public final class Token {
   }
 
   /**
+   * Compares several strings for equality, ignoring the case.
+   * @param str first string
+   * @param strings strings to be compared
+   * @return true if one test is successful
+   */
+  public static boolean eqic(final String str,
+      final String... strings) {
+    for(final String s : strings) {
+      if(str == null ? s == null : str.equalsIgnoreCase(s))
+        return true;
+    }
+    return false;
+  }
+
+  /**
    * Calculates the difference of two tokens.
    * @param token first token
    * @param compare token to be compared
