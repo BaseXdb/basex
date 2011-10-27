@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+import static org.basex.query.util.Err.*;
 
 import java.io.IOException;
 
@@ -124,6 +125,9 @@ abstract class AQuery extends Command {
     } catch(final RuntimeException ex) {
       Util.debug(qp.info());
       throw ex;
+    } catch(final StackOverflowError ex) {
+      Util.debug(ex);
+      err = XPSTACK.desc;
     }
     // close processor after exceptions
     if(qp != null) try { qp.close(); } catch(final IOException ex) { }
