@@ -27,7 +27,7 @@ public abstract class QueryPlanTest {
   /**
    * Checks the query plan and the result.
    * @param qu query
-   * @param res result
+   * @param res result or {@code null} for no comparison
    * @param pr queries on the query plan
    */
   protected final void check(final String qu, final String res,
@@ -47,7 +47,8 @@ public abstract class QueryPlanTest {
       }, CTX);
 
       // compare results
-      assertEquals("Query result:", res, qp.execute().toString());
+      if(res != null)
+        assertEquals("Query result:", res, qp.execute().toString());
 
       // check query plan
       CTX.openDB(plan);
