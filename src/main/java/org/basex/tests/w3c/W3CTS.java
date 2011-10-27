@@ -177,7 +177,7 @@ public abstract class W3CTS {
     Util.outln(NL + Util.name(this) + " Test Suite " +
         text("/*:test-suite/@version", root));
 
-    Util.outln(NL + "Caching Sources...");
+    Util.outln("Caching Sources...");
     for(final int s : nodes("//*:source", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
