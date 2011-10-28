@@ -799,7 +799,7 @@ public abstract class W3CTS {
   protected final void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this,
         " [options] [pat]" + NL +
-        " [pat] perform only tests with the specified pattern" + NL +
+        " [pat] perform tests starting with a pattern" + NL +
         " -c     print compilation steps" + NL +
         " -C     run tests depending on current time" + NL +
         " -g     <test-group> test group to test" + NL +
