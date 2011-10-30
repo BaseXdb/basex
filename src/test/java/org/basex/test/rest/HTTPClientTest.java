@@ -749,7 +749,7 @@ public class HTTPClientTest {
     // Construct expected result
     final ItemCache resultIter = new ItemCache();
     final byte[] reqItem = token("<http:response "
-        + "xmlns:http=\"http://expath.org/ns/http\" "
+        + "xmlns:http=\"http://expath.org/ns/http-client\" "
         + "status=\"200\" message=\"OK\">"
         + "<http:header name=\"Subject\" value=\"Formatted text mail\"/>"
         + "<http:header name=\"Content-Type\" "
@@ -841,7 +841,7 @@ public class HTTPClientTest {
     // Construct expected result
     final ItemCache resultIter = new ItemCache();
     final byte[] reqItem = token("<http:response "
-        + "xmlns:http=\"http://expath.org/ns/http\" "
+        + "xmlns:http=\"http://expath.org/ns/http-client\" "
         + "status=\"200\" message=\"OK\">"
         + "<http:header name=\"Subject\" value=\"Formatted text mail\"/>"
         + "<http:header name=\"To\" value=\"Ned "
