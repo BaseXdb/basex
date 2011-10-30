@@ -494,7 +494,7 @@ public interface QueryText {
   /** File module URI. */
   byte[] FILEURI = token(EXPATH + "/file");
   /** HTTP Client URI. */
-  byte[] HTTPURI = token(EXPATH + "/http");
+  byte[] HTTPURI = token(EXPATH + "/http-client");
   /** Package API URI. */
   byte[] PKGURI = token(EXPATH + "/pkg");
   /** ZIP URI.*/
