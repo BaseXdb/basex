@@ -57,12 +57,7 @@ public final class FNContext extends FuncCall {
    * @throws QueryException query exception
    */
   private Item currDate(final QueryContext ctx) throws QueryException {
-    if(ctx.date != null) return ctx.date;
-    final Date d = Calendar.getInstance().getTime();
-    final String zone = new SimpleDateFormat("Z").format(d);
-    final String form = new SimpleDateFormat("yyyy-MM-dd").format(d);
-    ctx.date = new Dat(Token.token(form + zone.substring(0, 3) + ":" +
-        zone.substring(3)), input);
+    if(ctx.date == null) initDateTime(ctx);
     return ctx.date;
   }
 
@@ -73,13 +68,7 @@ public final class FNContext extends FuncCall {
    * @throws QueryException query exception
    */
   private Item currDTM(final QueryContext ctx) throws QueryException {
-    if(ctx.dtm != null) return ctx.dtm;
-    final Date d = Calendar.getInstance().getTime();
-    final String zone = new SimpleDateFormat("Z").format(d);
-    final String df1 = new SimpleDateFormat("yyyy-MM-dd").format(d);
-    final String df2 = new SimpleDateFormat("HH:mm:ss.S").format(d);
-    ctx.dtm = new Dtm(Token.token(df1 + "T" + df2 + zone.substring(0, 3) +
-        ":" + zone.substring(3)), input);
+    if(ctx.dtm == null) initDateTime(ctx);
     return ctx.dtm;
   }
 
@@ -90,13 +79,25 @@ public final class FNContext extends FuncCall {
    * @throws QueryException query exception
    */
   private Item currTIM(final QueryContext ctx) throws QueryException {
-    if(ctx.time != null) return ctx.time;
-    final Date dat = Calendar.getInstance().getTime();
-    final String zone = new SimpleDateFormat("Z").format(dat);
-    final String form = new SimpleDateFormat("HH:mm:ss.S").format(dat);
-    ctx.time = new Tim(Token.token(form + zone.substring(0, 3) + ":" +
-        zone.substring(3)), input);
+    if(ctx.time == null) initDateTime(ctx);
     return ctx.time;
+  }
+
+
+  /**
+   * Initializes the static date and time context of a query.
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  private void initDateTime(final QueryContext ctx) throws QueryException {
+    final Date d = Calendar.getInstance().getTime();
+    final String zon = new SimpleDateFormat("Z").format(d);
+    final String ymd = new SimpleDateFormat("yyyy-MM-dd").format(d);
+    final String hms = new SimpleDateFormat("HH:mm:ss.S").format(d);
+    final String zone = zon.substring(0, 3) + ":" + zon.substring(3);
+    ctx.date = new Dat(Token.token(ymd + zone), input);
+    ctx.time = new Tim(Token.token(hms + zone), input);
+    ctx.dtm = new Dtm(Token.token(ymd + "T" + hms + zone), input);
   }
 
   /**
