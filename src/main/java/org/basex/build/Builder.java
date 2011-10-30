@@ -163,7 +163,9 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     addElem(nm, att);
-    ns.close(pstack.get(lvl));
+    final int pre = pstack.get(lvl);
+    ns.close(pre);
+    if(att.size > IO.MAXATTS) setSize(pre, meta.size - pre);
   }
 
   /**
