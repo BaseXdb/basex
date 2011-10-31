@@ -86,9 +86,8 @@ public final class RunQueries {
    * The resulting items are passed on to an {@link XMLSerializer} instance.
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
-   * @throws IOException if an error occurs while serializing the results
    */
-  static void process(final String query) throws QueryException, IOException {
+  static void process(final String query) throws QueryException {
     // ------------------------------------------------------------------------
     // Create a query processor
     QueryProcessor proc = new QueryProcessor(query, context);
@@ -113,9 +112,8 @@ public final class RunQueries {
    * efficient if large result sets are expected.
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
-   * @throws IOException if an error occurs while serializing the results
    */
-  static void iterate(final String query) throws QueryException, IOException {
+  static void iterate(final String query) throws QueryException {
     // ------------------------------------------------------------------------
     // Create a query processor
     QueryProcessor proc = new QueryProcessor(query, context);

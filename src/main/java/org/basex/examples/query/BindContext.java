@@ -1,6 +1,5 @@
 package org.basex.examples.query;
 
-import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Result;
 import org.basex.query.QueryException;
@@ -16,11 +15,9 @@ public final class BindContext {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
-   * @throws IOException if an error occurs while serializing the results
    * @throws QueryException if an error occurs while evaluating the query
    */
-  public static void main(final String[] args)
-      throws IOException, QueryException {
+  public static void main(final String[] args) throws QueryException {
 
     /** Database context. */
     Context context = new Context();
