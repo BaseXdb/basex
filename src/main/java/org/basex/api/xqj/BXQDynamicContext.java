@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -278,7 +277,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   public final void close() throws XQException {
     try {
       if(!closed) qp.close();
-    } catch(final IOException ex) {
+    } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage());
     }
     super.close();
