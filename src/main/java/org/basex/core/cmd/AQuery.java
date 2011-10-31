@@ -130,7 +130,7 @@ abstract class AQuery extends Command {
       err = XPSTACK.desc;
     }
     // close processor after exceptions
-    if(qp != null) try { qp.close(); } catch(final IOException ex) { }
+    if(qp != null) try { qp.close(); } catch(final QueryException ex) { }
 
     error(err);
     if(Util.debug || err.startsWith(PROGERR)) {

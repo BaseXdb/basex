@@ -286,12 +286,12 @@ public final class FNGen extends FuncCall {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final ANode node = checkNode(checkItem(expr[0], ctx));
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
       final Serializer ser = Serializer.get(ao, serialPar(this, 1, ctx));
-      node.serialize(ser);
+      final Iter ir = expr[0].iter(ctx);
+      for(Item it; (it = ir.next()) != null;) it.serialize(ser);
       ser.close();
     } catch(final SerializerException ex) {
       throw new QueryException(input, ex);

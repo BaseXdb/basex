@@ -237,9 +237,9 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Closes the processor.
-   * @throws IOException I/O exception
+   * @throws QueryException query exception
    */
-  public void close() throws IOException {
+  public void close() throws QueryException {
     // reset database properties to initial value
     if(ctx.globalOpt != null) {
       for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {

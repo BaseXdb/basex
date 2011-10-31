@@ -8,6 +8,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
 import org.basex.io.serial.BuilderSerializer;
+import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.QueryText;
 
@@ -60,7 +61,7 @@ public abstract class QueryPlanTest {
     } catch(final Exception ex) {
       throw new Error(ex.getMessage(), ex);
     } finally {
-      try { qp.close(); } catch(final IOException ex) { }
+      try { qp.close(); } catch(final QueryException ex) { }
     }
   }
 }

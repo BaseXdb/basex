@@ -28,6 +28,8 @@ public enum Err {
   IDINVALID(BASX, 4, "%: value '%' out of range."),
   /** BASX0005: Evaluation exception. */
   PERMNO(BASX, 5, Text.PERMNO),
+  /** BASX0006: Evaluation exception. */
+  DBCLOSE(BASX, 6, "Not all databases properly closed."),
   /** BASX0007: Evaluation exception. */
   QUERYNODES(BASX, 7, Text.QUERYNODESERR),
   /** BASX0008: Evaluation exception. */

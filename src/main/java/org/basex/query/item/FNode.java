@@ -4,7 +4,6 @@ import java.util.Arrays;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
-import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -39,7 +38,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
+  public final byte[] atom() {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < children.size(); ++c) {

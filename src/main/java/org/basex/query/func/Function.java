@@ -197,7 +197,7 @@ public enum Function {
   /** XQuery function. */
   URICOLL(FNGen.class, "uri-collection([uri])", URI_ZM, 0, STR_ZO),
   /** XQuery function. */
-  SERIALIZE(FNGen.class, "serialize(node[,params])", STR, 1, ITEM_ZM, ITEM),
+  SERIALIZE(FNGen.class, "serialize(items[,params])", STR, 1, ITEM_ZM, ITEM),
 
   /* FNId functions. */
 

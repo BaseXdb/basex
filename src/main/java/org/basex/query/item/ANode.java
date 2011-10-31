@@ -1,5 +1,7 @@
 package org.basex.query.item;
 
+import java.io.IOException;
+
 import org.basex.api.dom.BXAttr;
 import org.basex.api.dom.BXComm;
 import org.basex.api.dom.BXDoc;
@@ -8,6 +10,7 @@ import org.basex.api.dom.BXNode;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
 import org.basex.data.Data;
+import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.NodeCache;
@@ -55,17 +58,15 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
-    return val;
+  public final byte[] atom(final InputInfo ii) {
+    return atom();
   }
 
   /**
    * Returns an atomized string.
    * @return Returns an atomized string.
    */
-  public final byte[] atom() {
-    return atom(null);
-  }
+  public abstract byte[] atom();
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
@@ -179,6 +180,9 @@ public abstract class ANode extends Item {
   public byte[] base() {
     return Token.EMPTY;
   }
+
+  @Override
+  public abstract void serialize(final Serializer ser) throws IOException;
 
   /**
    * Compares the identity of two nodes.

@@ -68,7 +68,7 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns an atomized string.
+   * Returns the string value of an item.
    * @param ii input info, use {@code null} if none is available
    * @return string representation
    * @throws QueryException if the item can't be atomized

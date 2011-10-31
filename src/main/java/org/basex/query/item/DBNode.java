@@ -110,7 +110,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
+  public final byte[] atom() {
     if(val == null) val = data.atom(pre);
     return val;
   }

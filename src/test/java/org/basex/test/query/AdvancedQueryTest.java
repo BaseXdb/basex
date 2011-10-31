@@ -2,7 +2,6 @@ package org.basex.test.query;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -35,7 +34,7 @@ public abstract class AdvancedQueryTest {
       fail("Query failed:\n" + query + "\nMessage: " + ex.getMessage());
       return null;
     } finally {
-      try { qp.close(); } catch(final IOException e) { }
+      try { qp.close(); } catch(final QueryException ex) { }
     }
   }
 
@@ -78,7 +77,7 @@ public abstract class AdvancedQueryTest {
     } catch(final QueryException ex) {
       check(ex, error);
     } finally {
-      try { qp.close(); } catch(final IOException e) { }
+      try { qp.close(); } catch(final QueryException ex) { }
     }
   }
 
