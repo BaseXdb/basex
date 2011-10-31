@@ -112,7 +112,7 @@ What is the two-letter country code for this unit?
      puk = kp.getPublic();
      prk = kp.getPrivate();
 
-   } catch(NoSuchAlgorithmException e) {
+   } catch(final NoSuchAlgorithmException e) {
      e.printStackTrace();
    }
 

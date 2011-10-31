@@ -1,35 +1,32 @@
 package org.basex.tests.w3c;
 
 import static org.basex.core.Text.*;
+import static org.basex.tests.w3c.QT3Constants.*;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
 
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
-import org.basex.io.out.ArrayOutput;
 import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.func.FNSimple;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
+import org.basex.query.item.SeqType;
+import org.basex.tests.w3c.qt3api.XQEmpty;
+import org.basex.tests.w3c.qt3api.XQException;
+import org.basex.tests.w3c.qt3api.XQItem;
+import org.basex.tests.w3c.qt3api.XQValue;
+import org.basex.tests.w3c.qt3api.XQuery;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
-import org.basex.util.hash.TokenSet;
 import org.basex.util.list.ObjList;
-import org.basex.util.list.StringList;
 
 /**
  * XQuery Test Suite wrapper.
@@ -56,7 +53,9 @@ public final class QT3TS {
   private boolean verbose;
 
   /** Database context. */
-  protected final Context context = new Context();
+  protected final Context ctx = new Context();
+  /** Global environments. */
+  private ObjList<QT3Env> genvs = new ObjList<QT3Env>();
   /** Default path to the test suite. */
   protected String path = "g:/XML/w3c/qt3ts/";
 
@@ -83,19 +82,23 @@ public final class QT3TS {
     parseArguments(args);
 
     final Performance perf = new Performance();
-    new Set(Prop.CHOP, false).execute(context);
+    new Set(Prop.CHOP, false).execute(ctx);
 
-    final Query qudoc = new Query("doc(' " + path + "/catalog.xml')");
-    final Value doc = qudoc.value();
-    final String version = string("/*:catalog/@version", doc);
+    final XQuery qdoc = new XQuery("doc(' " + path + "/" + CATALOG + "')", ctx);
+    final XQItem doc = qdoc.next();
+    final String version = string("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
     Util.out("Parsing queries");
 
-    final String quset = "for $f in //*:test-set/@file return string($f)";
-    final Query qpset = new Query(quset, doc);
-    for(Item it; (it = qpset.next()) != null;) testSet(it.toJava().toString());
-    qpset.close();
-    qudoc.close();
+    final XQuery qenv = new XQuery("*:catalog/*:environment", ctx).context(doc);
+    for(final XQItem ienv : qenv) genvs.add(new QT3Env(ctx, ienv, ""));
+    qenv.close();
+
+    final XQuery qset = new XQuery(
+        "for $f in //*:test-set/@file return string($f)", ctx).context(doc);
+    for(final XQItem it : qset) testSet(it.getString());
+    qset.close();
+    qdoc.close();
 
     Util.outln(NL + "Writing log file...");
     final PrintOutput po = new PrintOutput(path + "qt3ts.log");
@@ -107,9 +110,11 @@ public final class QT3TS {
     po.println("WRONG __________________________________");
     po.print(NL);
     po.print(wrong.finish());
-    //po.println("CORRECT ________________________________");
-    //po.print(NL);
-    //po.print(right.finish());
+    if(verbose) {
+      po.println("CORRECT ________________________________");
+      po.print(NL);
+      po.print(right.finish());
+    }
     po.close();
 
     Util.outln(NL + "Total #Queries: " + total);
@@ -124,40 +129,23 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    final Query qudoc = new Query("doc(' " + path + '/' + name + "')");
-    final ANode doc = (ANode) qudoc.value();
-    final String base = IO.get(Token.string(doc.base())).dir();
+    // feature: schemaImport schemaValidation staticTyping
+    // spec: XQ10+ XP30+ XQ30+ XT30+
+    // xsd-version: 1.1
 
-    final Query qpenv = new Query("/*:test-set/*:environment", doc);
-    final ObjList<Environment> envs = new ObjList<Environment>();
-    for(Item itenv; (itenv = qpenv.next()) != null;) {
-      final Environment env = new Environment();
-      env.name = string("@name", itenv);
+    final XQuery qudoc = new XQuery("doc(' " + path + '/' + name + "')", ctx);
+    final XQItem doc = qudoc.next();
+    final String base = IO.get(doc.getBaseURI()).dir();
 
-      final Query qpsrc = new Query("*:source", itenv);
-      for(Item itsrc; (itsrc = qpsrc.next()) != null;) {
-        env.sources.add(string("@role", itsrc));
-        env.sources.add(base + string("@file", itsrc));
-        env.sources.add(string("@uri", itsrc));
-      }
-      qpsrc.close();
+    final XQuery qenv = new XQuery("*:test-set/*:environment", ctx).
+        context(doc);
+    final ObjList<QT3Env> envs = new ObjList<QT3Env>();
+    for(final XQItem ienv : qenv) envs.add(new QT3Env(ctx, ienv, base));
+    qenv.close();
 
-      final Query qppar = new Query("*:param", itenv);
-      for(Item itpar; (itpar = qppar.next()) != null;) {
-        env.params.add(string("@name", itpar));
-        env.params.add(string("@as", itpar));
-        env.params.add(string("@select", itpar));
-        env.params.add(string("@declared", itpar));
-      }
-      qppar.close();
-
-      envs.add(env);
-    }
-    qpenv.close();
-
-    final Query qpts = new Query("/*:test-set/*:test-case", doc);
-    for(Item itts; (itts = qpts.next()) != null;) testCase(itts, envs);
-    qpts.close();
+    final XQuery qts = new XQuery("*:test-set/*:test-case", ctx).context(doc);
+    for(final XQItem its : qts) testCase(its, envs, base);
+    qts.close();
     qudoc.close();
   }
 
@@ -165,47 +153,72 @@ public final class QT3TS {
    * Runs a single test case.
    * @param test node
    * @param envs environments
+   * @param base base uri
    * @throws Exception exception
    */
-  private void testCase(final Item test, final ObjList<Environment> envs)
-      throws Exception {
+  private void testCase(final XQItem test, final ObjList<QT3Env> envs,
+      final String base) throws Exception {
 
     final String name = string("@name", test);
     // skip queries that do not match filter
     if(!name.startsWith(single)) return;
 
     final String quvalue = string("data(*:test)", test);
-    final Query quexp = new Query("*:result/*[1]", test);
-    final ANode expected = (ANode) quexp.next();
+    final XQuery qexp = new XQuery("*:result/*[1]", ctx).context(test);
+    final XQItem expected = qexp.next();
 
     final Performance perf = new Performance();
-    Query qusrc = null;
+    final HashMap<String, XQuery> vars = new HashMap<String, XQuery>();
+    XQuery qusrc = null;
 
-    final String env = string("*:environment/@ref", test);
-    for(final Environment e : envs) {
-      if(!e.name.equals(env)) continue;
-      // role, file, URIs
-      final StringList src = e.sources;
-      for(int i = 0, is = src.size(); i < is; i += 3) {
-        final String role = src.get(i);
-        if(role.isEmpty()) continue;
-        if(role.equals(".")) {
-          qusrc = new Query("doc('" + src.get(i + 1) + "')");
-        }
+    // check for local environment
+    QT3Env e = null;
+    final XQuery qenv = new XQuery("*:environment[not(@*)]", ctx).context(test);
+    final XQItem ienv = qenv.next();
+    if(ienv != null) e = new QT3Env(ctx, ienv, base);
+    qenv.close();
+
+    if(e == null) {
+      final String env = string("*:environment/@ref", test);
+      if(!env.isEmpty()) {
+        // check for set-based and global environments
+        e = envs(envs, env);
+        if(e == null) e = envs(genvs, env);
+        if(e == null) Util.errln("%: environment '%' not found.", name, env);
       }
-      break;
     }
 
-    Query qpvalue = null;
-    final Result result = new Result();
+    if(e != null) {
+      for(final HashMap<String, String> src : e.sources) {
+        final String role = src.get(ROLE);
+        if(".".equals(role)) {
+          qusrc = new XQuery("doc('" + src.get(FILE) + "')", ctx);
+        }
+      }
+      for(final HashMap<String, String> par : e.params) {
+        final String select = par.get(SELECT).replaceAll("\"|'", "");
+        for(final HashMap<String, String> src : e.sources) {
+          if(!select.equals(src.get(URI))) continue;
+          vars.put(par.get(NNAME),
+              new XQuery("'" + src.get(FILE) + "'", ctx));
+          break;
+        }
+      }
+    }
+
+    XQuery qvalue = null;
+    final QT3Result result = new QT3Result();
     try {
       // open context document
-      final Value src = qusrc != null ? qusrc.value() : null;
+      final XQItem context = qusrc != null ? qusrc.next() : null;
       // run query
-      qpvalue = new Query(quvalue, src);
-      result.value = qpvalue.value();
-    } catch(final QueryException ex) {
-      result.exception = ex;
+      qvalue = new XQuery(quvalue, ctx).context(context);
+      for(final Entry<String, XQuery> s : vars.entrySet()) {
+        qvalue.bind(s.getKey(), s.getValue().next());
+      }
+      result.value = qvalue.value();
+    } catch(final XQException ex) {
+      result.exc = ex.getException();
     } catch(final Throwable ex) {
       result.error = ex;
     }
@@ -216,8 +229,18 @@ public final class QT3TS {
     final String msg = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
-    tmp.add("Query : ").add(norm(quvalue)).add(NL);
-    tmp.add("Result: " + norm(result.toString())).add(NL);
+    tmp.add(norm(quvalue)).add(NL);
+
+    String res;
+    try {
+      res = result.error != null ? "Error: " + result.error.toString() :
+        result.exc != null ? "Error: " + result.exc.getLocalizedMessage() :
+          string("serialize(., map {'indent':='no'})", result.value);
+    } catch(final Exception ex) {
+      res = ex.getLocalizedMessage();
+    }
+
+    tmp.add("Result: " + norm(res)).add(NL);
     if(msg == null) {
       tmp.add(NL);
       right.add(tmp.finish());
@@ -228,9 +251,21 @@ public final class QT3TS {
     }
     if(++total % 500 == 0) Util.out(".");
 
-    if(qpvalue != null) qpvalue.close();
+    for(final String s : vars.keySet()) vars.get(s).close();
+    if(qvalue != null) qvalue.close();
     if(qusrc != null) qusrc.close();
-    quexp.close();
+    qexp.close();
+  }
+
+  /**
+   * Returns the specified environment, or {@code null}.
+   * @param envs environments
+   * @param ref reference
+   * @return environment
+   */
+  private QT3Env envs(final ObjList<QT3Env> envs, final String ref) {
+    for(final QT3Env e : envs) if(e.name.equals(ref)) return e;
+    return null;
   }
 
   /**
@@ -240,11 +275,11 @@ public final class QT3TS {
    * @return optional expected test suite result
    * @throws Exception exception
    */
-  private String test(final Result result, final ANode expected)
+  private String test(final QT3Result result, final XQItem expected)
       throws Exception {
 
-    final String type = Token.string(expected.qname().ln());
-    final Value value = result.value;
+    final String type = expected.getName();
+    final XQValue value = result.value;
 
     String msg;
     if(type.equals("error")) {
@@ -282,9 +317,25 @@ public final class QT3TS {
         msg = "Test type not supported: " + type;
       }
     } else {
-      msg = serialize(expected);
+      msg = expected.toString();
     }
     return msg;
+  }
+
+  /**
+   * Tests error.
+   * @param result query result
+   * @param expected expected result
+   * @return optional expected test suite result
+   */
+  private String assertError(final QT3Result result, final XQItem expected) {
+    final String exp = string("@" + CODE, expected);
+    if(result.exc == null)
+      return Util.info("Error code '%' expected.", exp);
+
+    final String res = result.exc.code();
+    return exp.equals("*") || exp.equals(res) ? null :
+      Util.info("Error code '%' expected, '%' found.", exp, res);
   }
 
   /**
@@ -294,19 +345,19 @@ public final class QT3TS {
    * @return optional expected test suite result
    * @throws Exception exception
    */
-  private String allOf(final Result result, final ANode expected)
+  private String allOf(final QT3Result result, final XQItem expected)
       throws Exception {
 
-    final Query qp = new Query("*", expected);
+    final XQuery query = new XQuery("*", ctx).context(expected);
     try {
       final TokenBuilder tb = new TokenBuilder();
-      for(Item it; (it = qp.next()) != null;) {
-        final String msg = test(result, (ANode) it);
+      for(final XQItem it : query) {
+        final String msg = test(result, it);
         if(msg != null) tb.add(tb.size() != 0 ? ", " : "").add(msg);
       }
       return tb.size() == 0 ? null : tb.toString();
     } finally {
-      qp.close();
+      query.close();
     }
   }
 
@@ -317,20 +368,20 @@ public final class QT3TS {
    * @return optional expected test suite result
    * @throws Exception exception
    */
-  private String anyOf(final Result result, final ANode expected)
+  private String anyOf(final QT3Result result, final XQItem expected)
       throws Exception {
 
-    final Query qp = new Query("*", expected);
+    final XQuery query = new XQuery("*", ctx).context(expected);
     final TokenBuilder tb = new TokenBuilder();
     try {
-      for(Item it; (it = qp.next()) != null;) {
-        final String msg = test(result, (ANode) it);
+      for(final XQItem it : query) {
+        final String msg = test(result, it);
         if(msg == null) return null;
         tb.add(tb.size() != 0 ? ", " : "").add(msg);
       }
       return tb.toString();
     } finally {
-      qp.close();
+      query.close();
     }
   }
 
@@ -339,24 +390,33 @@ public final class QT3TS {
    * @param value resulting value
    * @param expected expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String assertQuery(final Value value, final ANode expected)
-      throws Exception {
-
+  private String assertQuery(final XQValue value, final XQItem expected) {
     final String string = string("data(.)", expected);
-    final Query qp = new Query(string);
+    final XQuery query = new XQuery(string, ctx);
     try {
-      qp.bind("result", value);
-      final Item exp = qp.next();
-      return exp instanceof Bln && ((Bln) exp).bool(null) ? null :
+      final XQItem exp = query.bind("result", value).next();
+      return exp.getBoolean() ? null :
         Util.info("'true' expected for: %", string);
-    } catch(final QueryException ex) {
+    } catch(final XQException ex) {
       // should not occur
-      return ex.getMessage();
+      return ex.getException().getMessage();
     } finally {
-      qp.close();
+      query.close();
     }
+  }
+
+  /**
+   * Tests count.
+   * @param value resulting value
+   * @param expected expected result
+   * @return optional expected test suite result
+   */
+  private String assertCount(final XQValue value, final XQItem expected) {
+    final int exp = Token.toInt(string("data(.)", expected));
+    final int res = value.getSize();
+    return exp == res ? null :
+      Util.info("% items expected, % found.", exp, res);
   }
 
   /**
@@ -366,20 +426,19 @@ public final class QT3TS {
    * @return optional expected test suite result
    * @throws Exception exception
    */
-  private String assertEq(final Value value, final ANode expected)
+  private String assertEq(final XQValue value, final XQItem expected)
       throws Exception {
 
-    final String string = string("data(.)", expected);
-    final Query qp = new Query(string);
+    final XQuery query = new XQuery(string(".", expected), ctx);
     try {
-      final Item exp = qp.next();
-      final Item res = value instanceof Item ? (Item) value : null;
-      return res != null && exp.eq(null, res) ? null : Util.info(exp);
-    } catch(final QueryException ex) {
-      // should not occur
-      return ex.getMessage();
+      final XQItem exp = query.next();
+      final XQItem res = value instanceof XQItem ? (XQItem) value : null;
+      return res != null && exp.internal().eq(null, res.internal()) ?
+          null : Util.info(exp);
+    } catch(final XQException err) {
+      return err.getException().getMessage();
     } finally {
-      qp.close();
+      query.close();
     }
   }
 
@@ -390,20 +449,17 @@ public final class QT3TS {
    * @return optional expected test suite result
    * @throws Exception exception
    */
-  private String assertDeepEq(final Value value, final ANode expected)
+  private String assertDeepEq(final XQValue value, final XQItem expected)
       throws Exception {
 
-    final String string = string("data(.)", expected);
-    final Query qp = new Query(string);
+    final XQuery query = new XQuery(string("data(.)", expected), ctx);
     try {
-      final Value exp = qp.value();
-      return FNSimple.deep(null, exp.iter(), value.iter()) ? null :
+      final XQValue exp = query.value();
+      return FNSimple.deep(null, exp.internal().iter(),
+          value.internal().iter()) ? null :
         Util.info(exp);
-    } catch(final QueryException ex) {
-      // should not occur
-      return ex.getMessage();
     } finally {
-      qp.close();
+      query.close();
     }
   }
 
@@ -412,54 +468,46 @@ public final class QT3TS {
    * @param value resulting value
    * @param expected expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String assertPermutation(final Value value, final ANode expected)
-      throws Exception {
-
-    final String string = string("data(.)", expected);
-    final Query qp = new Query(string);
+  private String assertPermutation(final XQValue value, final XQItem expected) {
+    final XQuery query = new XQuery(string("data(.)", expected), ctx);
     try {
       // cache expected results
-      final TokenSet exp = new TokenSet();
-      for(Item it; (it = qp.next()) != null;) exp.add(it.atom(null));
+      final HashSet<String> exp = new HashSet<String>();
+      for(final XQItem it : query) exp.add(it.getString());
       // cache actual results
-      final TokenSet res = new TokenSet();
-      final Iter ir = value.iter();
-      for(Item it; (it = ir.next()) != null;) res.add(it.atom(null));
+      final HashSet<String> res = new HashSet<String>();
+      for(final XQItem it : value) res.add(it.getString());
 
       if(exp.size() != res.size()) return Util.info(
           "Result sizes are different (% vs. %).", exp.size(), res.size());
 
-      for(int i = 1; i <= exp.size(); i++) {
-        if(res.id(exp.key(i)) == 0)
-          return Util.info("'%' missing in actual result.", exp.key(i));
-        if(exp.id(res.key(i)) == 0)
-          return Util.info("'%' missing in expected result.", res.key(i));
+      for(final Object s : exp.toArray()) {
+        if(!res.contains(s))
+          return Util.info("'%' missing in actual result.", s);
+      }
+      for(final Object s : res.toArray()) {
+        if(!exp.contains(s))
+          return Util.info("'%' missing in expected result.", s);
       }
       return null;
-    } catch(final QueryException ex) {
-      // should not occur
-      return ex.getMessage();
     } finally {
-      qp.close();
+      query.close();
     }
   }
 
   /**
-   * Tests count.
+   * Tests string value.
    * @param value resulting value
    * @param expected expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String assertCount(final Value value, final ANode expected)
-      throws Exception {
+  private String assertSerialization(final XQValue value,
+      final XQItem expected) {
 
-    final int exp = Token.toInt(string("data(.)", expected));
-    final long res = value.size();
-    return exp == res ? null :
-      Util.info("% items expected, % found.", exp, res);
+    final String exp = normNL(string("data(.)", expected));
+    final String res = string("serialize(., map {'indent':='no'})", value);
+    return exp.equals(normNL(res)) ? null : Util.info(exp);
   }
 
   /**
@@ -467,32 +515,14 @@ public final class QT3TS {
    * @param value resulting value
    * @param expected expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String assertSerialization(final Value value, final ANode expected)
-      throws Exception {
-
-    final String exp = string("data(.)", expected);
-    final String res = serialize(value);
-    return exp.equals(res) ? null : Util.info(exp);
-  }
-
-  /**
-   * Tests string value.
-   * @param value resulting value
-   * @param expected expected result
-   * @return optional expected test suite result
-   * @throws Exception exception
-   */
-  private String assertSerialError(final Value value, final ANode expected)
-      throws Exception {
-
-    final String exp = string("@code", expected);
+  private String assertSerialError(final XQValue value, final XQItem expected) {
+    final String exp = string("@" + CODE, expected);
     try {
-      serialize(value);
+      value.toString();
       return Util.info("Serialization error '%' expected.", exp);
-    } catch(final SerializerException qe) {
-      final String res = new QueryException(null, qe).code();
+    } catch(final RuntimeException qe) {
+      final String res = qe.getMessage().replaceAll("\\[|\\].*\r?\n?.*", "");
       return exp.equals("*") || exp.equals(res) ? null :
         Util.info("Error code '%' expected, '%' found.", exp, res);
     }
@@ -503,16 +533,15 @@ public final class QT3TS {
    * @param value resulting value
    * @param expected expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String assertStringValue(final Value value, final ANode expected)
-      throws Exception {
-
+  private String assertStringValue(final XQValue value, final XQItem expected) {
     final String exp = string("data(.)", expected);
     final TokenBuilder tb = new TokenBuilder();
-    final Iter ir = value.iter();
-    for(Item it; (it = ir.next()) != null;) {
-      tb.add(tb.size() != 0 ? " " : "").add(it.atom(null));
+    int c = 0;
+    for(final XQItem it : value) {
+      if(c != 0) tb.add(' ');
+      tb.add(it.getString());
+      c++;
     }
     final String res = tb.toString();
     return res != null && exp.equals(res) ? null : Util.info(exp);
@@ -524,9 +553,9 @@ public final class QT3TS {
    * @param exp expected
    * @return optional expected test suite result
    */
-  private String assertBoolean(final Value value, final boolean exp) {
-    final Bln res = value instanceof Bln ? (Bln) value : null;
-    return res != null && res.bool(null) == exp ? null : Util.info(exp);
+  private String assertBoolean(final XQValue value, final boolean exp) {
+    return value.getType().eq(SeqType.BLN) &&
+      (((XQItem) value).getBoolean()) == exp ? null : Util.info(exp);
   }
 
   /**
@@ -534,27 +563,8 @@ public final class QT3TS {
    * @param value resulting value
    * @return optional expected test suite result
    */
-  private String assertEmpty(final Value value) {
-    return value instanceof Empty ? null : Util.info("");
-  }
-
-  /**
-   * Tests error.
-   * @param result query result
-   * @param expected expected result
-   * @return optional expected test suite result
-   * @throws Exception exception
-   */
-  private String assertError(final Result result, final ANode expected)
-      throws Exception {
-
-    final String exp = string("@code", expected);
-    if(result.exception == null)
-      return Util.info("Error code '%' expected.", exp);
-
-    final String res = result.exception.code();
-    return exp.equals("*") || exp.equals(res) ? null :
-      Util.info("Error code '%' expected, '%' found.", exp, res);
+  private String assertEmpty(final XQValue value) {
+    return value == XQEmpty.EMPTY ? null : Util.info("");
   }
 
   /**
@@ -562,13 +572,10 @@ public final class QT3TS {
    * @param value resulting value
    * @param expected expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String assertType(final Value value, final ANode expected)
-      throws Exception {
-
+  private String assertType(final XQValue value, final XQItem expected) {
     final String exp = string("data(.)", expected);
-    final String res = value.type().toString();
+    final String res = value.getType().toString();
     return exp.equals(res) ? null :
       Util.info("Type '%' expected, '%' found.", exp, res);
   }
@@ -576,33 +583,11 @@ public final class QT3TS {
   /**
    * Returns the string representation of a query result.
    * @param query query string
-   * @param ctx optional context
+   * @param value optional context value
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String string(final String query, final Value ctx) throws Exception {
-    final Query qp = new Query(query, ctx);
-    try {
-      final Item it = qp.next();
-      return it == null ? "" : Token.string(it.atom(null));
-    } finally {
-      qp.close();
-    }
-  }
-
-  /**
-   * Serializes the specified value.
-   * @param value value to be serialized
-   * @return serialized string
-   * @throws Exception exception
-   */
-  static String serialize(final Value value) throws Exception {
-    final ArrayOutput ao = new ArrayOutput();
-    final SerializerProp sp = new SerializerProp("indent=no");
-    final Serializer ser = Serializer.get(ao, sp);
-    final Iter ir = value.iter();
-    for(Item it; (it = ir.next()) != null;) it.serialize(ser);
-    return ao.toString();
+  String string(final String query, final XQValue value) {
+    return XQuery.string(query, value, ctx);
   }
 
   /**
@@ -611,7 +596,7 @@ public final class QT3TS {
    * @param t total value
    * @return percentage
    */
-  private String pc(final int v, final long t) {
+  private static String pc(final int v, final long t) {
     return (t == 0 ? 100 : v * 10000 / t / 100d) + "%";
   }
 
@@ -622,6 +607,15 @@ public final class QT3TS {
    */
   private String norm(final String in) {
     return QueryProcessor.removeComments(in, maxout);
+  }
+
+  /**
+   * Removes comments from the specified string.
+   * @param in input string
+   * @return result
+   */
+  private static String normNL(final String in) {
+    return in.replaceAll("\r\n|\r|\n", Prop.NL);
   }
 
   /**
@@ -646,101 +640,6 @@ public final class QT3TS {
       } else {
         single = arg.string();
         maxout = Integer.MAX_VALUE;
-      }
-    }
-  }
-
-  /** Query instance. */
-  class Query {
-    /** Query processor. */
-    final QueryProcessor qp;
-    /** Query iterator. */
-    Iter ir;
-
-    /**
-     * Constructor.
-     * @param query query
-     */
-    Query(final String query) {
-      qp = new QueryProcessor(query, context);
-    }
-
-    /**
-     * Constructor with an initial context.
-     * @param query query
-     * @param ctx initial context
-     * @throws QueryException query exception
-     */
-    Query(final String query, final Value ctx) throws QueryException {
-      qp = new QueryProcessor(query, context);
-      if(ctx != null) qp.context(ctx);
-    }
-
-    /**
-     * Binds a variable.
-     * @param s key
-     * @param v value
-     * @throws Exception exception
-     */
-    void bind(final String s, final Value v) throws Exception {
-      qp.bind(s, v);
-    }
-
-    /**
-     * Returns the next result item.
-     * @return next item
-     * @throws Exception exception
-     */
-    Item next() throws Exception {
-      if(ir == null) ir = qp.iter();
-      return ir.next();
-    }
-
-    /**
-     * Returns the result value.
-     * @return result value
-     * @throws Exception exception
-     */
-    Value value() throws Exception {
-      return qp.value();
-    }
-
-    /**
-     * Closes the query.
-     * @throws IOException I/O exception
-     */
-    void close() throws IOException {
-      qp.close();
-    }
-  }
-
-  /** Environment structure. */
-  static class Environment {
-    /** Name of environment. */
-    String name;
-    /** Sources (role, file, URIs). */
-    final StringList sources = new StringList();
-    /** Parameters (Names, types, URIs, declared flag). */
-    final StringList params = new StringList();
-  }
-
-  /** Result instance. */
-  static class Result {
-    /** Resulting value. */
-    Value value;
-    /** Resulting exception. */
-    QueryException exception;
-    /** Resulting error. */
-    Throwable error;
-
-    @Override
-    public String toString() {
-      if(exception != null) return exception.getLocalizedMessage();
-      if(error != null) return error.toString();
-      try {
-        return serialize(value);
-      } catch(final Exception ex) {
-        return ex.getLocalizedMessage();
       }
     }
   }

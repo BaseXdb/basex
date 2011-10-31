@@ -2,7 +2,6 @@ package org.basex.test.performance;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
 import java.util.Random;
 
 import org.basex.core.Context;
@@ -146,7 +145,7 @@ public final class IncUpdateTest {
     try {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
     } finally {
-      try { qp.close(); } catch(final IOException e) { }
+      try { qp.close(); } catch(final QueryException ex) { }
     }
   }
 
