@@ -2094,11 +2094,13 @@ public class QueryParser extends InputParser {
     ap = qp;
     ctx.ns.uri(name);
     name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
+
+    final Var[] vars = new Var[args.length];
+    final boolean part = partial(args, vars);
     final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
     if(f != null) {
       alter = null;
-      final Var[] part = new Var[args.length];
-      return partial(args, part) ? new PartFunApp(input(), f, part) : f.fun;
+      return part ? new PartFunApp(input(), f, vars) : f.fun;
     }
     qp = p;
     return null;
