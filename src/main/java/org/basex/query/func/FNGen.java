@@ -117,7 +117,8 @@ public final class FNGen extends FuncCall {
    */
   private Value collection(final QueryContext ctx) throws QueryException {
     final Item it = expr.length != 0 ? expr[0].item(ctx, input) : null;
-    return ctx.resource.collection(it != null ? checkEStr(it) : null, input);
+    return ctx.resource.collection(
+        it != null ? string(checkEStr(it)) : null, input);
   }
 
   /**
@@ -170,7 +171,7 @@ public final class FNGen extends FuncCall {
     final Item it = expr[0].item(ctx, input);
     if(it == null) return null;
 
-    final byte[] in = checkEStr(it);
+    final String in = string(checkEStr(it));
     final Data d = ctx.resource.data(in, false, input);
     if(!d.single()) EXPSINGLE.thrw(input, in);
     return new DBNode(d, 0, Data.DOC);

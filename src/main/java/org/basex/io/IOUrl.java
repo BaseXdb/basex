@@ -56,7 +56,8 @@ public final class IOUrl extends IO {
 
   @Override
   public IO merge(final String f) {
-    return this;
+    return IO.get((path.endsWith("/") ? path :
+      path.replace("^(.*/).*", "$1")) + f);
   }
 
   /** Pattern for duplicate slashes. */

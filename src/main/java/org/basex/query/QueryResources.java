@@ -1,7 +1,6 @@
 package org.basex.query;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.core.User;
@@ -40,7 +39,7 @@ public final class QueryResources {
   /** Collections: single nodes and sequences. */
   private Value[] coll = new Value[1];
   /** Names of collections. */
-  private byte[][] collName = new byte[1][];
+  private String[] collName = new String[1];
   /** Number of collections. */
   private int colls;
 
@@ -69,7 +68,7 @@ public final class QueryResources {
     // create default collection: use initial node set if it contains all
     // documents of the database. otherwise, create new node set
     addCollection(nodes.root ? ctx.value :
-        DBNodeSeq.get(d.docs(), d, true, true), token(d.meta.name));
+        DBNodeSeq.get(d.docs(), d, true, true), d.meta.name);
 
     addData(d);
   }
@@ -97,20 +96,21 @@ public final class QueryResources {
    * @return database instance
    * @throws QueryException query exception
    */
-  public Data data(final byte[] name, final InputInfo ii)
+  public Data data(final String name, final InputInfo ii)
       throws QueryException {
 
     // check if a database with the same name has already been opened
-    final String in = string(name);
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.name.equals(in)) return data[d];
+      if(data[d].meta.name.equals(name)) return data[d];
     }
 
     try {
       // open and add new data reference
-      return addData(Open.open(in, ctx.context));
+      final Data d = Open.open(name, ctx.context);
+      addData(d);
+      return d;
     } catch(final IOException ex) {
-      throw NODB.thrw(ii, in);
+      throw NODB.thrw(ii, name);
     }
   }
 
@@ -123,25 +123,27 @@ public final class QueryResources {
    * @return data reference
    * @throws QueryException query exception
    */
-  public Data data(final byte[] input, final boolean col, final InputInfo ii)
+  public Data data(final String input, final boolean col, final InputInfo ii)
       throws QueryException {
 
     // check if a database with the same name has already been opened
-    final String in = string(input);
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.name.equals(in)) return data[d];
+      if(data[d].meta.name.equals(input)) return data[d];
     }
 
     // check if a database with the same file path has already been opened
-    final IO io = IO.get(in);
+    final IO io = IO.get(input);
     for(int d = 0; d < datas; ++d) {
       if(IO.get(data[d].meta.original).eq(io)) return data[d];
     }
 
-    // retrieve and add new data reference
-    Data d = doc(in, ctx.baseURI == Uri.EMPTY, col, ii);
-    if(d == null) d = doc(ctx.base().merge(in).path(), true, col, ii);
-    return addData(d);
+    // retrieve new data reference
+    Data d = doc(input, ctx.baseURI == Uri.EMPTY, col, ii);
+    // throws an exception if reference is not found
+    if(d == null) d = doc(ctx.base().merge(input).path(), true, col, ii);
+    // add reference to pool of opened databases
+    addData(d);
+    return d;
   }
 
   /**
@@ -151,7 +153,7 @@ public final class QueryResources {
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final byte[] input, final InputInfo ii)
+  public Value collection(final String input, final InputInfo ii)
       throws QueryException {
 
     // no collection specified.. return default collection/current context set
@@ -161,37 +163,60 @@ public final class QueryResources {
       if(colls == 0) NODEFCOLL.thrw(ii);
     } else {
       // invalid collection reference
-      if(contains(input, '<') || contains(input, '\\')) COLLINV.thrw(ii, input);
+      if(input.contains("<") || input.contains("\\")) COLLINV.thrw(ii, input);
+
       // find specified collection
-      while(c < colls && !eq(collName[c], input)) ++c;
+      while(c < colls && !collName[c].equals(input)) ++c;
+      if(c == colls) {
+        final IO base = ctx.base();
+        if(base != null) {
+          c = 0;
+          final String in = base.merge(input).path();
+          while(c < colls && !collName[c].equals(in)) ++c;
+        }
+      }
 
       // add new collection if not found
       if(c == colls) {
-        final int s = indexOf(input, '/');
+        final int s = input.indexOf('/');
         if(s == -1) {
-          addCollection(data(input, true, ii), EMPTY);
+          addCollection(data(input, true, ii), "");
         } else {
-          addCollection(data(substring(input, 0, s), true, ii),
-              substring(input, s + 1));
+          addCollection(data(input.substring(0, s), true, ii),
+              input.substring(s + 1));
         }
       }
     }
     return coll[c];
   }
 
+  // API METHODS ==============================================================
+
   /**
-   * Adds documents of the specified data reference as a collection.
-   * @param name name of collection
-   * @param inputs documents
+   * Adds a document with the specified path.
+   * @param name name of document, or {@code null}
+   * @param path documents path
    * @throws QueryException query exception
    */
-  public void addCollection(final byte[] name, final byte[][] inputs)
+  public void addDoc(final String name, final String path)
+      throws QueryException {
+    final Data d = data(path, false, null);
+    if(name != null) d.meta.name = name;
+  }
+
+  /**
+   * Adds a collection with the specified paths.
+   * @param name name of collection
+   * @param paths documents paths
+   * @throws QueryException query exception
+   */
+  public void addCollection(final String name, final String[] paths)
       throws QueryException {
 
-    final int ns = inputs.length;
+    final int ns = paths.length;
     final DBNode[] nodes = new DBNode[ns];
     for(int n = 0; n < ns; n++) {
-      nodes[n] = new DBNode(data(inputs[n], true, null), 0, Data.DOC);
+      nodes[n] = new DBNode(data(paths[n], true, null), 0, Data.DOC);
     }
     addCollection(Seq.get(nodes, ns), name);
   }
@@ -203,9 +228,9 @@ public final class QueryResources {
    * @param d data reference
    * @param path inner collection path
    */
-  private void addCollection(final Data d, final byte[] path) {
-    addCollection(DBNodeSeq.get(d.docs(string(path)), d, true,
-        path.length == 0), token(d.meta.name));
+  private void addCollection(final Data d, final String path) {
+    addCollection(DBNodeSeq.get(d.docs(path), d, true,
+        path.isEmpty()), d.meta.name);
   }
 
   /**
@@ -233,24 +258,22 @@ public final class QueryResources {
   /**
    * Adds a data reference to the global list.
    * @param d data reference to be added
-   * @return data reference
    */
-  private Data addData(final Data d) {
+  private void addData(final Data d) {
     if(datas == data.length) {
       final Data[] tmp = new Data[Array.newSize(datas)];
       System.arraycopy(data, 0, tmp, 0, datas);
       data = tmp;
     }
     data[datas++] = d;
-    return d;
   }
 
   /**
    * Adds a collection to the global collection list.
    * @param nodes collection nodes
-   * @param name name
+   * @param name collection name
    */
-  private void addCollection(final Value nodes, final byte[] name) {
+  private void addCollection(final Value nodes, final String name) {
     if(colls == coll.length) {
       coll = Arrays.copyOf(coll, colls << 1);
       collName = Array.copyOf(collName, colls << 1);

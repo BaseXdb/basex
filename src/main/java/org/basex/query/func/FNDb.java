@@ -628,8 +628,8 @@ public final class FNDb extends FuncCall {
     final Item it = checkEmpty(expr[i].item(ctx, input));
     if(it.node()) return checkDBNode(it).data;
     if(it.str())  {
-      final byte[] name = it.atom(input);
-      if(!MetaData.validName(string(name), false)) INVDB.thrw(input, name);
+      final String name = string(it.atom(input));
+      if(!MetaData.validName(name, false)) INVDB.thrw(input, name);
       return ctx.resource.data(name, input);
     }
     throw STRNODTYPE.thrw(input, this, it.type);

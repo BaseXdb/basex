@@ -492,11 +492,19 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns an IO representation of the base uri.
+   * Returns an IO representation of the base URI.
    * @return IO reference
    */
   public IO base() {
     return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
+  }
+
+  /**
+   * Sets the base URI.
+   * @param uri uri to be set
+   */
+  public void base(final String uri) {
+    baseURI = Uri.uri(token(uri));
   }
 
   /**
