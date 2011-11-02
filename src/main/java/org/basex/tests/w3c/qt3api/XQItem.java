@@ -2,6 +2,7 @@ package org.basex.tests.w3c.qt3api;
 
 import java.util.Iterator;
 
+import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.util.Util;
@@ -26,7 +27,21 @@ public abstract class XQItem extends XQValue {
   }
 
   @Override
-  public abstract Item internal();
+  abstract Item internal();
+
+  /**
+   * Checks if the two items are equal, according to XQuery.
+   * @param item second item
+   * @return result of check
+   * @throws XQException exception
+   */
+  public boolean equal(final XQItem item) {
+    try {
+      return item != null && internal().eq(null, item.internal());
+    } catch(final QueryException ex) {
+      throw new XQException(ex);
+    }
+  }
 
   @Override
   public final Iterator<XQItem> iterator() {

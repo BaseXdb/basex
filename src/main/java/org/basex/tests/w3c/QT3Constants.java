@@ -36,4 +36,9 @@ interface QT3Constants {
   String URI = "uri";
   /** QT3TS String. */
   String SELECT = "select";
+
+  /** QT3TS String. */
+  String SCHEMA_IMPORT = "schemaImport";
+  /** QT3TS String. */
+  String SCHEMA_VALIDATION = "schemaValidation";
 }

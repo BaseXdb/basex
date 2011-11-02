@@ -1,5 +1,7 @@
 package org.basex.tests.w3c.qt3api;
 
+import org.basex.query.QueryException;
+import org.basex.query.func.FNSimple;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -47,6 +49,18 @@ public abstract class XQValue implements Iterable<XQItem> {
   }
 
   /**
+   * Returns the integer value.
+   * @return node name
+   */
+  public final long getInteger() {
+    try {
+      return Long.parseLong(getString());
+    } catch(final NumberFormatException ex) {
+      throw Util.notexpected("Value has no integer representation.");
+    }
+  }
+
+  /**
    * Returns the string value.
    * @return node name
    */
@@ -61,11 +75,18 @@ public abstract class XQValue implements Iterable<XQItem> {
   public abstract int getSize();
 
   /**
-   * Returns the internal value representation.
-   * Should be made invisible to other packages.
-   * @return value
+   * Checks if the two values are deep-equal, according to XQuery.
+   * @param value second value
+   * @return result of check
+   * @throws XQException exception
    */
-  public abstract Value internal();
+  public boolean deepEqual(final XQValue value) {
+    try {
+      return FNSimple.deep(null, internal().iter(), value.internal().iter());
+    } catch(final QueryException ex) {
+      throw new XQException(ex);
+    }
+  }
 
   /**
    * Returns the item type.
@@ -75,4 +96,13 @@ public abstract class XQValue implements Iterable<XQItem> {
 
   @Override
   public abstract String toString();
+
+  // PACKAGE PROTECTED METHODS ================================================
+
+  /**
+   * Returns the internal value representation.
+   * Should be made invisible to other packages.
+   * @return value
+   */
+  abstract Value internal();
 }

@@ -43,25 +43,15 @@ class XQAtomic extends XQItem {
     return item.type();
   }
 
-  /**
-   * Returns the Java representation.
-   * @return node name
-   */
-  public Object getJava() {
-    try {
-      return item.toJava();
-    } catch(final QueryException ex) {
-      throw new XQException(ex);
-    }
-  }
-
-  @Override
-  public Item internal() {
-    return item;
-  }
-
   @Override
   public String toString() {
     return item.toString();
+  }
+
+  // PACKAGE PROTECTED METHODS ================================================
+
+  @Override
+  Item internal() {
+    return item;
   }
 }

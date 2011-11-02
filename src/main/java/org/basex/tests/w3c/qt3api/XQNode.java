@@ -40,26 +40,13 @@ final class XQNode extends XQItem {
   }
 
   @Override
-  public SeqType getType() {
-    return node.type();
-  }
-
-  /**
-   * Returns the Java representation.
-   * @return node name
-   */
-  public Object getJava() {
-    return node.toJava();
-  }
-
-  @Override
   public boolean getBoolean() {
     return node.bool(null);
   }
 
   @Override
-  public ANode internal() {
-    return node;
+  public SeqType getType() {
+    return node.type();
   }
 
   @Override
@@ -73,5 +60,12 @@ final class XQNode extends XQItem {
     } catch(final IOException ex) {
       throw Util.notexpected(ex.getMessage());
     }
+  }
+
+  // PACKAGE PROTECTED METHODS ================================================
+
+  @Override
+  ANode internal() {
+    return node;
   }
 }
