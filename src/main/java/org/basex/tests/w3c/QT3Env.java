@@ -7,9 +7,13 @@ import org.basex.core.Context;
 import org.basex.tests.w3c.qt3api.XQItem;
 import org.basex.tests.w3c.qt3api.XQuery;
 import org.basex.util.list.ObjList;
+import org.basex.util.list.StringList;
 
 /**
- * Structure for handling test environments.
+ * Driver environment for the {@link QT3TS} test suite driver.
+ *
+ * @author BaseX Team 2005-11, BSD License
+ * @author Christian Gruen
  */
 class QT3Env {
   /** Namespaces: prefix, uri. */
@@ -26,34 +30,46 @@ class QT3Env {
   final HashMap<String, String> schemas;
   /** Collations: uri, default. */
   final HashMap<String, String> collations;
-  /** Collection: uri. */
-  final String collection;
   /** Static Base URI: uri. */
   final String baseURI;
   /** Name. */
   final String name;
 
+  /** Collection uri. */
+  String collURI;
+  /** Collection context flag. */
+  boolean collContext;
+  /** Collection sources. */
+  StringList collSources;
+
   /**
    * Constructor.
    * @param ctx database context
-   * @param itenv environment item
-   * @param base base uri
+   * @param env environment item
    */
-  QT3Env(final Context ctx, final XQItem itenv, final String base) {
-    name = XQuery.string("@" + NNAME, itenv, ctx);
-    sources = list(ctx, itenv, SOURCE);
-    params = list(ctx, itenv, PARAM);
-    namespaces = list(ctx, itenv, NAMESPACE);
-    formats = list(ctx, itenv, DECIMAL_FORMAT);
-    schemas = list(ctx, itenv, SCHEMA).get(0);
-    collations = list(ctx, itenv, COLLATION).get(0);
-    collection = string(COLLECTION, ctx, itenv);
-    baseURI = string(STATIC_BASE_URI, ctx, itenv);
+  QT3Env(final Context ctx, final XQItem env) {
+    name = XQuery.string("@" + NNAME, env, ctx);
+    sources = list(ctx, env, SOURCE);
+    params = list(ctx, env, PARAM);
+    namespaces = list(ctx, env, NAMESPACE);
+    formats = list(ctx, env, DECIMAL_FORMAT);
+    schemas = list(ctx, env, SCHEMA).get(0);
+    collations = list(ctx, env, COLLATION).get(0);
+    baseURI = string(STATIC_BASE_URI, ctx, env);
 
-    if(base.isEmpty()) return;
-    for(final HashMap<String, String> src : sources) {
-     src.put(FILE, base + src.get(FILE));
-    }
+    // collections
+    collURI = XQuery.string("*:collection/@uri", env, ctx);
+
+    final XQuery cc = new XQuery("*:collection/*:source/@role = '.'", ctx).
+        context(env);
+    collContext = cc.next().getBoolean();
+    cc.close();
+
+    collSources = new StringList();
+    final XQuery qsrc = new XQuery("*:collection/*:source/@file", ctx).
+        context(env);
+    for(final XQItem iatt : qsrc) collSources.add(iatt.getString());
+    qsrc.close();
   }
 
   /**

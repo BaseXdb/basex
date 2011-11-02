@@ -43,6 +43,7 @@ import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -115,8 +116,8 @@ public abstract class W3CTS {
   /** Cached module files. */
   private final HashMap<String, String> mods = new HashMap<String, String>();
   /** Cached collections. */
-  private final HashMap<String, byte[][]> colls =
-    new HashMap<String, byte[][]>();
+  private final HashMap<String, String[]> colls =
+    new HashMap<String, String[]>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -196,10 +197,10 @@ public abstract class W3CTS {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
 
-      final TokenList dl = new TokenList();
+      final StringList dl = new StringList();
       final Nodes doc = nodes("*:input-document", nodes);
       for(int d = 0; d < doc.size(); ++d) {
-        dl.add(token(sources + string(data.atom(doc.list[d])) + IO.XMLSUFFIX));
+        dl.add(sources + string(data.atom(doc.list[d])) + IO.XMLSUFFIX);
       }
       colls.put(cname, dl.toArray());
     }
@@ -631,7 +632,7 @@ public abstract class W3CTS {
   private Uri coll(final byte[] name, final QueryProcessor qp)
       throws QueryException {
 
-    qp.ctx.resource.addCollection(name, colls.get(string(name)));
+    qp.ctx.resource.addCollection(string(name), colls.get(string(name)));
     return Uri.uri(name);
   }
 

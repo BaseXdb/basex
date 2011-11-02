@@ -6,15 +6,18 @@ import static org.basex.tests.w3c.QT3Constants.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map.Entry;
 
 import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
 import org.basex.io.out.PrintOutput;
+import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.func.Function;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Str;
 import org.basex.tests.w3c.qt3api.XQEmpty;
 import org.basex.tests.w3c.qt3api.XQException;
 import org.basex.tests.w3c.qt3api.XQItem;
@@ -27,7 +30,8 @@ import org.basex.util.Util;
 import org.basex.util.list.ObjList;
 
 /**
- * XQuery Test Suite wrapper.
+ * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
+ * {@code http://dev.w3.org/2011/QT3-test-suite/}.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -89,7 +93,7 @@ public final class QT3TS {
     Util.out("Parsing queries");
 
     final XQuery qenv = new XQuery("*:catalog/*:environment", ctx).context(doc);
-    for(final XQItem ienv : qenv) genvs.add(new QT3Env(ctx, ienv, ""));
+    for(final XQItem ienv : qenv) genvs.add(new QT3Env(ctx, ienv));
     qenv.close();
 
     final XQuery qset = new XQuery(
@@ -108,7 +112,7 @@ public final class QT3TS {
     po.println("WRONG __________________________________");
     po.print(NL);
     po.print(wrong.finish());
-    if(verbose) {
+    if(verbose || !single.isEmpty()) {
       po.println("CORRECT ________________________________");
       po.print(NL);
       po.print(right.finish());
@@ -132,19 +136,21 @@ public final class QT3TS {
     final String base = IO.get(doc.getBaseURI()).dir();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XQItem set = qset.next();
+    qdoc.close();
 
     if(supported(set)) {
+      // parse environment of test-set
       final XQuery qenv = new XQuery("*:environment", ctx).context(set);
       final ObjList<QT3Env> envs = new ObjList<QT3Env>();
-      for(final XQItem ienv : qenv) envs.add(new QT3Env(ctx, ienv, base));
+      for(final XQItem ienv : qenv) envs.add(new QT3Env(ctx, ienv));
       qenv.close();
 
+      // run all test cases
       final XQuery qts = new XQuery("*:test-case", ctx).context(set);
       for(final XQItem its : qts) testCase(its, envs, base);
       qts.close();
     }
     qset.close();
-    qdoc.close();
   }
 
   /**
@@ -163,65 +169,74 @@ public final class QT3TS {
     // skip queries that do not match filter
     if(!name.startsWith(single)) return;
 
-    final String quvalue = string("data(*:test)", test);
+    // query to be run
+    final String string = string("data(*:test)", test);
+    final XQuery query = new XQuery(string, ctx);
+
+    // expected result
     final XQuery qexp = new XQuery("*:result/*[1]", ctx).context(test);
     final XQItem expected = qexp.next();
 
     final Performance perf = new Performance();
-    final HashMap<String, XQuery> vars = new HashMap<String, XQuery>();
-    XQuery qusrc = null;
 
     QT3Env e = null;
     // check for environment defined in test-case
     final XQuery qenv = new XQuery("*:environment[*]", ctx).context(test);
     final XQItem ienv = qenv.next();
-    if(ienv != null) e = new QT3Env(ctx, ienv, base);
+    if(ienv != null) e = new QT3Env(ctx, ienv);
     qenv.close();
 
+    String b = base;
     if(e == null) {
       final String env = string("*:environment/@ref", test);
       if(!env.isEmpty()) {
         // check for environment defined in test-set
         e = envs(envs, env);
         // check for environment defined in catalog
-        if(e == null) e = envs(genvs, env);
+        if(e == null) {
+          e = envs(genvs, env);
+          b = null;
+        }
         if(e == null) Util.errln("%: environment '%' not found.", name, env);
       }
     }
+    if(b != null) query.baseURI(base);
 
-    if(e != null) {
-      for(final HashMap<String, String> src : e.sources) {
-        final String role = src.get(ROLE);
-        if(".".equals(role)) {
-          qusrc = new XQuery("doc('" + src.get(FILE) + "')", ctx);
-        }
-      }
-      for(final HashMap<String, String> par : e.params) {
-        final String select = par.get(SELECT).replaceAll("\"|'", "");
-        for(final HashMap<String, String> src : e.sources) {
-          if(!select.equals(src.get(URI))) continue;
-          vars.put(par.get(NNAME),
-              new XQuery("'" + src.get(FILE) + "'", ctx));
-          break;
-        }
-      }
-    }
-
-    XQuery qvalue = null;
     final QT3Result result = new QT3Result();
     try {
-      // open context document
-      final XQItem context = qusrc != null ? qusrc.next() : null;
-      // run query
-      qvalue = new XQuery(quvalue, ctx).context(context);
-      for(final Entry<String, XQuery> s : vars.entrySet()) {
-        qvalue.bind(s.getKey(), s.getValue().next());
+      if(e != null) {
+        // bind variables
+        for(final HashMap<String, String> par : e.params) {
+          query.bind(par.get(NNAME), new XQuery(par.get(SELECT), ctx).next());
+        }
+        // bind documents
+        for(final HashMap<String, String> src : e.sources) {
+          // add document reference
+          query.addDocument(src.get(URI), src.get(FILE));
+          final String role = src.get(ROLE);
+          if(role == null) continue;
+          final Object call = Function.DOC.get(null, Str.get(src.get(FILE)));
+          if(role.equals(".")) query.context(call);
+          else query.bind(role, call);
+        }
+        // bind collections
+        query.addCollection(e.collURI, e.collSources.toArray());
+        if(e.collContext) {
+          query.context(Function.COLL.get(null, Str.get(e.collURI)));
+        }
+        // set base uri
+        if(e.baseURI != null) query.baseURI(e.baseURI);
       }
-      result.value = qvalue.value();
+
+      // run query
+      result.value = query.value();
     } catch(final XQException ex) {
       result.exc = ex.getException();
     } catch(final Throwable ex) {
+      // unexpected error (potential bug)
       result.error = ex;
+      Util.errln("Query: " + name);
+      ex.printStackTrace();
     }
 
     final long time = perf.getTime() / 1000000;
@@ -230,7 +245,7 @@ public final class QT3TS {
     final String msg = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
-    tmp.add(norm(quvalue)).add(NL);
+    tmp.add(norm(string)).add(NL);
 
     String res;
     try {
@@ -252,9 +267,7 @@ public final class QT3TS {
     }
     if(++total % 500 == 0) Util.out(".");
 
-    for(final String s : vars.keySet()) vars.get(s).close();
-    if(qvalue != null) qvalue.close();
-    if(qusrc != null) qusrc.close();
+    query.close();
     qexp.close();
   }
 
@@ -634,6 +647,7 @@ public final class QT3TS {
   private void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, " -v [pat]" + NL +
         " [pat] perform tests starting with a pattern" + NL +
+        " -d     debugging mode" + NL +
         " -v     verbose output",
         Util.info(CONSOLE, Util.name(this)));
 
@@ -642,6 +656,8 @@ public final class QT3TS {
         final char c = arg.next();
         if(c == 'v') {
           verbose = true;
+        } else if(c == 'd') {
+          ctx.mprop.set(MainProp.DEBUG, true);
         } else {
           arg.usage();
         }
@@ -650,5 +666,17 @@ public final class QT3TS {
         maxout = Integer.MAX_VALUE;
       }
     }
+  }
+
+  /**
+   * Structure for storing XQuery results.
+   */
+  static class QT3Result {
+    /** Query result. */
+    XQValue value;
+    /** Query exception. */
+    QueryException exc;
+    /** Query error. */
+    Throwable error;
   }
 }

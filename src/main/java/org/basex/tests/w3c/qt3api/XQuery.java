@@ -7,6 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.iter.Iter;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Wrapper for evaluating XQuery expressions.
@@ -32,13 +33,53 @@ public final class XQuery implements Iterable<XQItem> {
    * @return self reference
    * @throws XQException exception
    */
-  public XQuery context(final XQValue value) {
+  public XQuery context(final Object value) {
     try {
-      if(value != null) qp.context(value.internal());
+      if(value != null) qp.context(value instanceof XQValue ?
+          ((XQValue) value).internal() : value);
     } catch(final QueryException ex) {
       throw new XQException(ex);
     }
     return this;
+  }
+
+  /**
+   * Adds a collection.
+   * @param name name of the collection
+   * @param paths document paths
+   * @throws XQException exception
+   */
+  public void addCollection(final String name, final String[] paths) {
+    final StringList sl = new StringList();
+    for(final String p : paths) sl.add(p);
+    try {
+      qp.ctx.resource.addCollection(name, sl.toArray());
+    } catch(final QueryException ex) {
+      throw new XQException(ex);
+    }
+  }
+
+  /**
+   * Adds a document.
+   * @param name name of the collection
+   * @param path document path
+   * @throws XQException exception
+   */
+  public void addDocument(final String name, final String path) {
+    try {
+      qp.ctx.resource.addDoc(name, path);
+    } catch(final QueryException ex) {
+      throw new XQException(ex);
+    }
+  }
+
+  /**
+   * Sets the base URI.
+   * @param base base URI
+   * @throws XQException exception
+   */
+  public void baseURI(final String base) {
+    qp.ctx.base(base);
   }
 
   /**
@@ -48,9 +89,10 @@ public final class XQuery implements Iterable<XQItem> {
    * @return self reference
    * @throws XQException exception
    */
-  public XQuery bind(final String key, final XQValue value) {
+  public XQuery bind(final String key, final Object value) {
     try {
-      qp.bind(key, value.internal());
+      qp.bind(key, value instanceof XQValue ?
+          ((XQValue) value).internal() : value);
     } catch(final QueryException ex) {
       throw new XQException(ex);
     }
