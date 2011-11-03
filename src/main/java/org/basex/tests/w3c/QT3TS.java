@@ -52,6 +52,8 @@ public final class QT3TS {
   private String single = "";
   /** Verbose flag. */
   private boolean verbose;
+  /** Error code flag. */
+  private boolean errors;
 
   /** Database context. */
   protected final Context ctx = new Context();
@@ -375,9 +377,8 @@ public final class QT3TS {
   private String assertError(final QT3Result result, final XQValue expect) {
     final String exp = string("@" + CODE, expect);
     if(result.exc == null) return exp;
-
     final String res = result.exc.getCode();
-    return exp.equals("*") || exp.equals(res) ? null : exp;
+    return !errors || exp.equals("*") || exp.equals(res) ? null : exp;
   }
 
   /**
@@ -469,7 +470,7 @@ public final class QT3TS {
     try {
       final XQItem exp = query.next();
       final XQItem res = value instanceof XQItem ? (XQItem) value : null;
-      return exp.equal(res) ? null : Util.info(exp);
+      return exp.equal(res) ? null : exp.toString();
     } catch(final XQException err) {
       return err.getException().getMessage();
     } finally {
@@ -487,7 +488,7 @@ public final class QT3TS {
     final XQuery query = new XQuery(expect.getString(), ctx);
     try {
       final XQValue exp = query.value();
-      return exp.deepEqual(value) ? null : Util.info(exp);
+      return exp.deepEqual(value) ? null : exp.toString();
     } finally {
       query.close();
     }
@@ -536,7 +537,7 @@ public final class QT3TS {
 
     final String exp = normNL(expect.getString());
     final String res = string("serialize(., map {'indent':='no'})", value);
-    return exp.equals(normNL(res)) ? null : Util.info(exp);
+    return exp.equals(normNL(res)) ? null : exp;
   }
 
   /**
@@ -552,7 +553,7 @@ public final class QT3TS {
       return exp;
     } catch(final RuntimeException qe) {
       final String res = qe.getMessage().replaceAll("\\[|\\].*\r?\n?.*", "");
-      return exp.equals("*") || exp.equals(res) ? null :
+      return !errors || exp.equals("*") || exp.equals(res) ? null :
         Util.info("% (found: %)", exp, res);
     }
   }
@@ -578,7 +579,7 @@ public final class QT3TS {
       c++;
     }
     final String exp = expect.getString();
-    return exp.equals(res.toString()) ? null : Util.info(exp);
+    return exp.equals(res.toString()) ? null : exp;
   }
 
   /**
@@ -598,7 +599,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertEmpty(final XQValue value) {
-    return value == XQEmpty.EMPTY ? null : Util.info("");
+    return value == XQEmpty.EMPTY ? null : "";
   }
 
   /**
@@ -667,6 +668,7 @@ public final class QT3TS {
     final Args arg = new Args(args, this, " -v [pat]" + NL +
         " [pat] perform tests starting with a pattern" + NL +
         " -d     debugging mode" + NL +
+        " -e     check error codes" + NL +
         " -v     verbose output",
         Util.info(CONSOLE, Util.name(this)));
 
@@ -677,6 +679,8 @@ public final class QT3TS {
           verbose = true;
         } else if(c == 'd') {
           ctx.mprop.set(MainProp.DEBUG, true);
+        } else if(c == 'e') {
+          errors = true;
         } else {
           arg.usage();
         }
