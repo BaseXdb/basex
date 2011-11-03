@@ -772,6 +772,14 @@ public enum GUICommands implements GUICommand {
     }
   },
 
+  /** Opens the community web page. */
+  SHOWDOC(GUISHOWDOC, null, GUISHOWDOCTT, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      Dialog.browse(gui, DOC_URL);
+    }
+  },
+
   /** Opens the update web page. */
   SHOWUPDATES(GUISHOWUPDATES, null, GUISHOWUPDATESTT, false, false) {
     @Override

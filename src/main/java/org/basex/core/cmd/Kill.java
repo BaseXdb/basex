@@ -37,7 +37,7 @@ public final class Kill extends AUser {
     final Sessions ss = context.sessions;
     for(int i = 0; i < ss.size(); ++i) {
       if(user.equals(ss.get(i).user().name)) {
-        ss.get(i--).exit();
+        ss.get(i--).quit();
         count++;
       }
     }

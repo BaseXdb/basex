@@ -9,9 +9,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ArrayInput extends BufferInput {
-  /** Marker. */
-  private int mark;
-
   /**
    * Constructor, specifying the byte array to be read.
    * @param input input bytes
@@ -30,21 +27,6 @@ public final class ArrayInput extends BufferInput {
 
   @Override
   public int read() {
-    return pos < size ? buffer[pos++] & 0xFF : -1;
-  }
-
-  @Override
-  public boolean markSupported() {
-    return true;
-  }
-
-  @Override
-  public synchronized void mark(final int m) {
-    mark = m;
-  }
-
-  @Override
-  public synchronized void reset() {
-    pos = mark;
+    return bpos < bsize ? buffer[bpos++] & 0xFF : -1;
   }
 }

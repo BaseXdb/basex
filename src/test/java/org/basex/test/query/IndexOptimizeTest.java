@@ -125,7 +125,7 @@ public final class IndexOptimizeTest {
   @Test
   public void dbOpenExtTest() throws Exception {
     createColl();
-    final String doc = DBOPEN.args(NAME + "/two");
+    final String doc = DBOPEN.args(NAME, "two");
     check(doc + "//*[text() = '1']", "");
     check(doc + "//*[text() = '4']", "<a>4</a>");
   }
@@ -180,8 +180,8 @@ public final class IndexOptimizeTest {
    */
   private void createColl() throws Exception {
     new CreateDB(NAME).execute(CONTEXT);
-    new Add("<xml><a>1</a><a>2 3</a></xml>", "one").execute(CONTEXT);
-    new Add("<xml><a>4</a><a>5 6</a></xml>", "two").execute(CONTEXT);
+    new Add("one", "<xml><a>1</a><a>2 3</a></xml>").execute(CONTEXT);
+    new Add("two", "<xml><a>4</a><a>5 6</a></xml>").execute(CONTEXT);
     new Optimize().execute(CONTEXT);
     new Close().execute(CONTEXT);
   }

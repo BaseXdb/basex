@@ -87,4 +87,10 @@ public final class HigherOrderTest extends AdvancedQueryTest {
   public void emptyFunTest() {
     error("()()", Err.XPEMPTY);
   }
+
+  /**  Tests the creation of a cast function as function item. */
+  @Test
+  public void xsNCNameTest() {
+    query("xs:NCName(?)('two')", "two");
+  }
 }

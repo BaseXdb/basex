@@ -29,7 +29,7 @@ public final class Run extends AQuery {
   protected boolean run() {
     final IO io = IO.get(args[0]);
     if(!io.exists())
-      return error(FILEWHICH, context.user.perm(User.CREATE) ? io : io.name());
+      return error(FILEWHICH, context.user.perm(User.CREATE) ? io : args[0]);
 
     context.prop.set(Prop.QUERYPATH, io.path());
     try {

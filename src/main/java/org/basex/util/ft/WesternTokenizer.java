@@ -2,8 +2,11 @@ package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
+
 import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -16,21 +19,31 @@ import org.basex.util.list.IntList;
  * @author Christian Gruen
  */
 public final class WesternTokenizer extends Tokenizer {
+  /** Supported languages. */
+  private static final HashSet<Language> SUPPORTED = new HashSet<Language>();
+
+  static {
+    final String[] nonw = { "ar", "ja", "ko", "th", "zh" };
+    for(final Language l : Language.ALL.values()) {
+      if(!eq(l.code(), nonw)) SUPPORTED.add(l);
+    }
+  }
+
   /** Cached sentence positions. */
   private final IntList sen = new IntList();
   /** Cached paragraph positions. */
   private final IntList par = new IntList();
 
   /** Diacritics flag. */
-  private boolean dc;
+  private final boolean dc;
   /** Sensitivity flag. */
-  private boolean cs;
+  private final boolean cs;
   /** Uppercase flag. */
-  private boolean uc;
+  private final boolean uc;
   /** Lowercase flag. */
-  private boolean lc;
+  private final boolean lc;
   /** Wildcard flag. */
-  private boolean wc;
+  private final boolean wc;
   /** Flag for a paragraph. */
   private boolean pa;
 
@@ -58,15 +71,19 @@ public final class WesternTokenizer extends Tokenizer {
 
   /**
    * Constructor.
-   * @param f (optional) full-text options
+   * @param f full-text options
    */
   public WesternTokenizer(final FTOpt f) {
-    if(f == null) return;
-    lc = f.is(LC);
-    uc = f.is(UC);
-    cs = f.is(CS);
-    wc = f.is(WC);
-    dc = f.is(DC);
+    lc = f != null && f.is(LC);
+    uc = f != null && f.is(UC);
+    cs = f != null && f.is(CS);
+    wc = f != null && f.is(WC);
+    dc = f != null && f.is(DC);
+  }
+
+  @Override
+  Collection<Language> languages() {
+    return SUPPORTED;
   }
 
   @Override
@@ -382,13 +399,8 @@ public final class WesternTokenizer extends Tokenizer {
   }
 
   @Override
-  int prec() {
-    return 1000;
-  }
-
-  @Override
-  EnumSet<Language> languages() {
-    return Language.WESTERN;
+  protected byte prec() {
+    return 10;
   }
 
   @Override

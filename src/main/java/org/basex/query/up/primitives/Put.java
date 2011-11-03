@@ -46,18 +46,18 @@ public final class Put extends UpdatePrimitive {
   @Override
   public void apply() throws QueryException {
     for(int i = 0; i < uri.length; i++) {
-      PrintOutput out = null;
+      PrintOutput po = null;
       final DBNode node = new DBNode(data, pre);
       try {
-        out = new PrintOutput(path(i));
+        po = new PrintOutput(path(i));
         final SerializerProp pr = ctx.serProp(false);
         // try to reproduce non-chopped documents correctly
         pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
-        node.serialize(Serializer.get(out, pr));
+        node.serialize(Serializer.get(po, pr));
       } catch(final IOException ex) {
         UPPUTERR.thrw(input, path(i));
       } finally {
-        if(out != null) try { out.close(); } catch(final Exception ex) { }
+        if(po != null) try { po.close(); } catch(final IOException ex) { }
       }
     }
   }

@@ -59,15 +59,6 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a byte array.
-   * @param bytes array to be written
-   * @throws IOException I/O exception
-   */
-  public void writeBytes(final byte[] bytes) throws IOException {
-    for(final byte b : bytes) write(b);
-  }
-
-  /**
    * Writes a boolean value.
    * @param b boolean value
    * @throws IOException I/O exception
@@ -77,16 +68,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a string.
-   * @param s string
-   * @throws IOException I/O exception
-   */
-  public void writeString(final String s) throws IOException {
-    writeToken(Token.token(s));
-  }
-
-  /**
-   * Writes a token.
+   * Writes a token, represented by its compressed length and its byte array.
    * @param tok array to be written
    * @return number of written bytes
    * @throws IOException I/O exception
@@ -179,34 +161,6 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes a long value.
-   * @param v value to be written
-   * @throws IOException I/O exception
-   */
-  public void write8(final long v) throws IOException {
-    write((byte) (v >>> 56));
-    write((byte) (v >>> 48));
-    write((byte) (v >>> 40));
-    write((byte) (v >>> 32));
-    write((byte) (v >>> 24));
-    write((byte) (v >>> 16));
-    write((byte) (v >>>  8));
-    write((byte)  v);
-  }
-
-  /**
-   * Writes an integer value.
-   * @param v value to be written
-   * @throws IOException I/O exception
-   */
-  public void write4(final int v) throws IOException {
-    write(v >>> 24);
-    write(v >>> 16);
-    write(v >>>  8);
-    write(v);
-  }
-
-  /**
    * Writes a byte value.
    * @param v value to be written
    * @throws IOException I/O exception
@@ -226,6 +180,18 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
+   * Writes an integer value.
+   * @param v value to be written
+   * @throws IOException I/O exception
+   */
+  public void write4(final int v) throws IOException {
+    write(v >>> 24);
+    write(v >>> 16);
+    write(v >>>  8);
+    write(v);
+  }
+
+  /**
    * Writes 5 bytes of a long value.
    * @param v value to be written
    * @throws IOException I/O exception
@@ -237,6 +203,32 @@ public final class DataOutput extends OutputStream {
     write((byte) (v >>>  8));
     write((byte) v);
   }
+
+  /**
+   * Writes a long value.
+   * @param v value to be written
+   * @throws IOException I/O exception
+   */
+  public void write8(final long v) throws IOException {
+    write((byte) (v >>> 56));
+    write((byte) (v >>> 48));
+    write((byte) (v >>> 40));
+    write((byte) (v >>> 32));
+    write((byte) (v >>> 24));
+    write((byte) (v >>> 16));
+    write((byte) (v >>>  8));
+    write((byte)  v);
+  }
+
+  /**
+   * Writes a byte array.
+   * @param bytes array to be written
+   * @throws IOException I/O exception
+   */
+  public void writeBytes(final byte[] bytes) throws IOException {
+    for(final byte b : bytes) write(b);
+  }
+
 
   /**
    * Returns the number of written bytes.

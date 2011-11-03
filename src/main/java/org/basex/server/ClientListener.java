@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 
+import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
@@ -26,10 +27,8 @@ import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ByteList;
-import org.basex.util.list.StringList;
 
 /**
  * Server-side client session in the client-server architecture.
@@ -43,11 +42,14 @@ public final class ClientListener extends Thread {
   private final HashMap<String, QueryListener> queries =
     new HashMap<String, QueryListener>();
   /** Performance measurement. */
-  final Performance perf = new Performance();
+  private final Performance perf = new Performance();
+
   /** Database context. */
   private final Context context;
   /** Socket reference. */
   private final Socket socket;
+  /** Server reference. */
+  private final BaseXServer server;
   /** Log reference. */
   private final Log log;
 
@@ -55,8 +57,8 @@ public final class ClientListener extends Thread {
   private Socket esocket;
   /** Output for events. */
   private PrintOutput eout;
-  /** Active events. */
-  private StringList events;
+  /** Flag for active events. */
+  private boolean events;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -68,25 +70,31 @@ public final class ClientListener extends Thread {
   /** Indicates if the server thread is running. */
   private boolean running;
 
+  /** Timestamp of last interaction. */
+  public long last;
+
   /**
    * Constructor.
    * @param s socket
    * @param c database context
    * @param l log reference
+   * @param srv server reference
    */
-  public ClientListener(final Socket s, final Context c, final Log l) {
+  public ClientListener(final Socket s, final Context c, final Log l,
+      final BaseXServer srv) {
     context = new Context(c, this);
     socket = s;
     log = l;
+    server = srv;
+    last = System.currentTimeMillis();
   }
 
-  /**
-   * Initializes the session via cram-md5 authentication.
-   * @return success flag
-   */
-  public boolean init() {
+  @Override
+  public void run() {
+    // initialize the session via cram-md5 authentication
     try {
       final String ts = Long.toString(System.nanoTime());
+      final byte[] address = socket.getInetAddress().getAddress();
 
       // send {TIMESTAMP}0
       out = PrintOutput.get(socket.getOutputStream());
@@ -107,35 +115,35 @@ public final class ClientListener extends Thread {
         log.write(this, "LOGIN " + context.user.name, OK);
         // send {OK}
         send(true);
-        // start listener thread
-        start();
-      } else if(!us.isEmpty()) {
-        log.write(this, SERVERDENIED + COLS + us);
+        server.unblock(address);
+        context.add(this);
+      } else {
+        if(!us.isEmpty()) log.write(this, SERVERDENIED + COLS + us);
+        new ClientDelayer(server.block(address), this, server).start();
       }
-      // return result flag
-      return running;
     } catch(final IOException ex) {
       Util.stack(ex);
       log.write(ex.getMessage());
-      return false;
+      return;
     }
-  }
+    if(!running) return;
 
-  @Override
-  public void run() {
+    // authentification done, start command loop
     ServerCmd sc = null;
     String cmd = null;
 
     try {
       while(running) {
+        command = null;
         try {
           final int b = in.read();
           if(b == -1) {
             // end of stream: exit session
-            exit();
+            quit();
             break;
           }
 
+          last = System.currentTimeMillis();
           perf.getTime();
           sc = get(b);
           cmd = null;
@@ -159,13 +167,12 @@ public final class ClientListener extends Thread {
           }
         } catch(final IOException ex) {
           // this exception may be thrown if a session is stopped
-          exit();
+          quit();
           break;
         }
         if(sc != COMMAND) continue;
 
         // parse input and create command instance
-        command = null;
         try {
           command = new CommandParser(cmd, context).parseSingle();
         } catch(final QueryException ex) {
@@ -207,36 +214,40 @@ public final class ClientListener extends Thread {
 
         // stop console
         if(command instanceof Exit) {
-          exit();
-          break;
+          command = null;
+          quit();
         }
       }
     } catch(final IOException ex) {
       log.write(this, sc == COMMAND ? cmd : sc, INFOERROR + ex.getMessage());
-      Util.stack(ex);
-      exit();
+      Util.debug(ex);
+      command = null;
+      quit();
     }
+    command = null;
   }
 
   /**
    * Exits the session.
    */
-  public synchronized void exit() {
+  public synchronized void quit() {
     running = false;
+    // wait until running command was stopped
+    if(command != null) {
+      command.stop();
+      while(command != null) Performance.sleep(50);
+    }
+    log.write(this, "LOGOUT " + context.user.name, OK);
+    context.delete(this);
+
     try {
-      // remove this session from all events in pool
-      if(events != null) {
-        esocket.close();
-        for(final String e : events) {
-          final Sessions sess = context.events.get(e);
-          if(sess != null) sess.remove(this);
-        }
-      }
       new Close().execute(context);
-      if(command != null) command.stop();
-      context.delete(this);
       socket.close();
-      log.write(this, "LOGOUT " + context.user.name, OK);
+      if(events) {
+        esocket.close();
+        // remove this session from all events in pool
+        for(final Sessions s : context.events.values()) s.remove(this);
+      }
     } catch(final Exception ex) {
       log.write(ex.getMessage());
       Util.stack(ex);
@@ -271,6 +282,8 @@ public final class ClientListener extends Thread {
    */
   public synchronized void notify(final byte[] name, final byte[] msg)
       throws IOException {
+
+    last = System.currentTimeMillis();
     eout.print(name);
     eout.write(0);
     eout.print(msg);
@@ -280,11 +293,11 @@ public final class ClientListener extends Thread {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder("[");
-    tb.add(socket.getInetAddress().getHostAddress());
-    tb.add(COL).addExt(socket.getPort()).add(']');
-    if(context.data() != null) tb.add(COLS).add(context.data().meta.name);
-    return tb.toString();
+    final StringBuilder sb = new StringBuilder("[");
+    sb.append(socket.getInetAddress().getHostAddress());
+    sb.append(COL).append(socket.getPort()).append(']');
+    if(context.data() != null) sb.append(COLS).append(context.data().meta.name);
+    return sb.toString();
   }
 
   // PRIVATE METHODS ==========================================================
@@ -334,7 +347,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void add() throws IOException {
-    execute(new Add(null, in.readString(), in.readString()));
+    execute(new Add(in.readString()));
   }
 
   /**
@@ -359,7 +372,7 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void execute(final Command cmd) throws IOException {
-    log.write(this, cmd + "[...]");
+    log.write(this, cmd + " [...]");
     final DecodingInput di = new DecodingInput(in);
     try {
       cmd.setInput(di);
@@ -377,11 +390,11 @@ public final class ClientListener extends Thread {
    */
   private void watch() throws IOException {
     // initialize server-based event handling
-    if(events == null) {
+    if(!events) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));
       out.writeString(Long.toString(getId()));
       out.flush();
-      events = new StringList();
+      events = true;
     }
     final String name = in.readString();
     final Sessions s = context.events.get(name);
@@ -389,7 +402,6 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.add(this);
-      events.add(name);
       message = EVENTWAT;
     } else if(s == null) {
       message = EVENTNO;
@@ -411,7 +423,6 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.remove(this);
-      events.delete(name);
       message = EVENTUNWAT;
     } else if(s == null) {
       message = EVENTNO;

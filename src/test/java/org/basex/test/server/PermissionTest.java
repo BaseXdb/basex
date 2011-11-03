@@ -45,6 +45,7 @@ import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.junit.After;
@@ -80,14 +81,14 @@ public final class PermissionTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z");
+    server = new BaseXServer("-z -p9999 -e9998");
   }
 
   /** Set up method. */
   @Before
   public void setUp() {
     try {
-      adminSession = new ClientSession(server.context, ADMIN, ADMIN);
+      adminSession = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
       if(server.context.users.get(NAME) != null) {
         ok(new DropUser(NAME), adminSession);
       }
@@ -95,7 +96,7 @@ public final class PermissionTest {
       ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
       server.context.repo.init(REPO);
-      testSession = new ClientSession(server.context, NAME, NAME);
+      testSession = new ClientSession(LOCALHOST, 9999, NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
       ok(new Close(), adminSession);
@@ -202,7 +203,7 @@ public final class PermissionTest {
     // replace Test
     ok(new Close(), testSession);
     ok(new Open(RENAMED), testSession);
-    ok(new Add("<xml>1</xml>", NAME + ".xml"), testSession);
+    ok(new Add(NAME + ".xml", "<xml>1</xml>"), testSession);
     ok(new Optimize(), testSession);
     ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
 
@@ -293,6 +294,8 @@ public final class PermissionTest {
     no(new DropUser(NAME), testSession);
     no(new DropUser(NAME), adminSession);
     ok(new Exit(), testSession);
+    // give the server some time to close the client session
+    Performance.sleep(50);
     ok(new DropUser(NAME), adminSession);
   }
 
@@ -331,6 +334,8 @@ public final class PermissionTest {
       adminSession.execute(new DropDB(RENAMED));
       adminSession.execute(new DropDB(NAME));
       adminSession.close();
+      // give the server some time to clean up the sessions before next test
+      Performance.sleep(50);
     } catch(final Exception ex) {
       fail(Util.message(ex));
     }

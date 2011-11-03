@@ -27,8 +27,6 @@ public final class TokenBuilder {
 
   /** Character array. */
   private byte[] chars;
-  /** Entity flag. */
-  public boolean ent;
   /** Current token size. */
   private int size;
 
@@ -290,11 +288,17 @@ public final class TokenBuilder {
   }
 
   /**
-   * Replaces all % characters in the input string by the specified extension
-   * objects, which can be byte arrays or any other object.
-   * If a digit is found after %, it is interpreted as insertion position.
+   * Adds the string representation of an object to the token:
+   * <ul>
+   * <li> If extensions are specified, all characters {@code "%"} in the object
+   *      string are replaced by the specified extensions.</li>
+   * <li> Extensions can either be tokens (byte arrays) or any other objects,
+   *      which will be represented as strings.</li>
+   * <li> If a digit is found after the character {@code "%"}, it is interpreted
+   *      as insertion position.</li>
+   * </ul>
    * @param str string to be extended
-   * @param ext extensions
+   * @param ext optional extensions
    * @return self reference
    */
   public TokenBuilder addExt(final Object str, final Object... ext) {

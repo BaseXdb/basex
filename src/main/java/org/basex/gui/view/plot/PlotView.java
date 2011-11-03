@@ -20,7 +20,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -32,6 +31,7 @@ import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
+import org.basex.index.StatsKey.Kind;
 import org.basex.util.list.IntList;
 
 /**

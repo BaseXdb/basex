@@ -70,16 +70,6 @@ public class StringList extends ElementList implements Iterable<String> {
   }
 
   /**
-   * Deletes the specified element.
-   * @param e element to be deleted
-   */
-  public final void delete(final String e) {
-    for(int s = size - 1; s >= 0; --s) {
-      if(list[s].equals(e)) delete(s);
-    }
-  }
-
-  /**
    * Returns an array with all elements.
    * @return array
    */

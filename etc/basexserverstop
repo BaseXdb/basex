@@ -3,8 +3,8 @@
 # Path to this script
 PWD=`dirname $0`
 
-# Paths to distributed files or source directories
-BASEX=$PWD/../target/classes
+# Core classes
+CP=$PWD/../target/classes
 
 # Run code
-java -cp "$BASEX" org.basex.BaseXServer "$@" stop
+java -cp "$CP" org.basex.BaseXServer "$@" stop

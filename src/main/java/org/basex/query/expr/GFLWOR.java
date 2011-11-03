@@ -136,8 +136,10 @@ public class GFLWOR extends ParseExpr {
     // remove declarations of statically bound or unused variables
     for(int f = 0; f < fl.length; ++f) {
       final ForLet l = fl[f];
+      // do not optimize non-deterministic expressions. example:
+      // let $a := file:write('file', 'content') return ...
       if(l.var.expr() != null || l.simple(true) && count(l.var, f) == 0 &&
-          !l.expr.uses(Use.CTX)) {
+          !l.expr.uses(Use.NDT)) {
         ctx.compInfo(OPTVAR, l.var);
         fl = Array.delete(fl, f--);
       }
@@ -192,10 +194,12 @@ public class GFLWOR extends ParseExpr {
     int m = 0;
     for(int i = 1; i < fl.length; i++) {
       final ForLet in = fl[i];
-      // move clauses upwards that contain a single value.
-      // expressions that depend on the current context (e.g. math:random())
-      // or fragment constructors creating unique nodes are ignored
-      if(in.size() != 1 || in.uses(Use.CTX) || in.uses(Use.CNS)) continue;
+      /* move clauses upwards that contain a single value.
+         non-deterministic expressions or fragment constructors creating
+         unique nodes are ignored. example:
+         for $a in 1 to 2 let $b := math:random() return $b
+       */
+      if(in.size() != 1 || in.uses(Use.NDT) || in.uses(Use.CNS)) continue;
 
       // find most outer clause that declares no variables that are used in the
       // inner clause

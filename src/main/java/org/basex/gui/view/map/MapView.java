@@ -46,7 +46,7 @@ public final class MapView extends View implements Runnable {
   /** Array of current rectangles. */
   private MapRects mainRects;
   /** Data specific map layout. */
-  private MapPainter painter;
+  private transient MapPainter painter;
   /** Text lengths. */
   private int[] textLen;
 

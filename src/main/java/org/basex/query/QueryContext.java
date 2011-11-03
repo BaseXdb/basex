@@ -4,12 +4,10 @@ import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -37,7 +35,6 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
-import org.basex.query.item.map.Map;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
@@ -47,6 +44,7 @@ import org.basex.query.util.UserFuncs;
 import org.basex.query.util.Var;
 import org.basex.query.util.Variables;
 import org.basex.query.util.format.DecFormatter;
+import org.basex.query.util.json.JsonMapConverter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -372,9 +370,9 @@ public final class QueryContext extends Progress {
   /**
    * Binds an object to a global variable. If the object is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type. If {@code "map"} is specified as data type,
+   * appropriate XQuery type. If {@code "json"} is specified as data type,
    * the value is interpreted according to the rules specified in
-   * {@link Map#create(String)}.
+   * {@link JsonMapConverter}.
    * @param n name of variable
    * @param o object to be bound
    * @param t data type
@@ -385,8 +383,8 @@ public final class QueryContext extends Progress {
 
     Object obj = o;
     if(t != null && !t.isEmpty()) {
-      if(t.equals(QueryText.MAPSTR)) {
-        obj = Map.create(o.toString());
+      if(t.equals(QueryText.JSONSTR)) {
+        obj = JsonMapConverter.parse(token(o.toString()), null);
       } else {
         final QNm type = new QNm(token(t));
         if(type.ns()) type.uri(ns.uri(type.pref(), false, null));
@@ -494,11 +492,19 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns an IO representation of the base uri.
+   * Returns an IO representation of the base URI.
    * @return IO reference
    */
   public IO base() {
     return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
+  }
+
+  /**
+   * Sets the base URI.
+   * @param uri uri to be set
+   */
+  public void base(final String uri) {
+    baseURI = Uri.uri(token(uri));
   }
 
   /**

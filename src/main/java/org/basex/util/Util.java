@@ -1,15 +1,15 @@
 package org.basex.util;
 
-import java.io.File;
-import java.io.IOException;
-
 import static org.basex.core.Text.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.security.ProtectionDomain;
 import java.util.Scanner;
 
 import org.basex.core.Prop;
@@ -148,12 +148,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    if(obj instanceof Exception) {
-      final Exception ex = (Exception) obj;
-      err(message(ex) + NL, ext);
-    } else {
-      err(obj + NL, ext);
-    }
+    err((obj instanceof Exception ? message((Exception) obj) : obj) + NL, ext);
   }
 
   /**
@@ -177,7 +172,7 @@ public final class Util {
     else if(ex instanceof LoginException) return SERVERDENIED;
     else if(ex instanceof ConnectException) return SERVERERROR;
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
-    else if(ex instanceof SocketException) return SERVERBIND;
+    else if(ex instanceof SocketException) return SERVERERROR;
     else if(ex instanceof UnknownHostException) return info(SERVERUNKNOWN, msg);
     return msg != null && !msg.isEmpty() ? msg : ex.toString();
   }
@@ -213,8 +208,8 @@ public final class Util {
   }
 
   /**
-   * Returns a string and replaces all % characters by the specified extensions.
-   * See {@link TokenBuilder#addExt} for details.
+   * Returns a string and replaces all % characters by the specified extensions
+   * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended
    * @param ext text text extensions
    * @return extended string
@@ -224,8 +219,8 @@ public final class Util {
   }
 
   /**
-   * Returns a token and replaces all % characters by the specified extensions.
-   * (see {@link TokenBuilder#addExt} for details.
+   * Returns a token and replaces all % characters by the specified extensions
+   * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended
    * @param ext text text extensions
    * @return token
@@ -289,26 +284,32 @@ public final class Util {
     
     // check working directory for property file
     final String work = System.getProperty("user.dir");
-    if(new File(work, IO.BASEXSUFFIX).exists()) return work;
+    final File wconf = new File(work, IO.BASEXSUFFIX);
+    if(wconf.exists()) return wconf.getParent() + File.separator;
 
     // not found; check application directory
-    final File f = new File(applicationPath());
-    final String home = f.isFile() ? f.getParent() : f.getPath();
-    if(new File(home, IO.BASEXSUFFIX).exists()) return home;
+    final String app = applicationPath();
+    if(app != null) {
+      final File f = new File(app);
+      final String home = f.isFile() ? f.getParent() : f.getPath();
+      final File hconf = new File(home, IO.BASEXSUFFIX);
+      if(hconf.exists()) return hconf.getParent() + File.separator;
+    }
 
     // not found; choose user home directory
-    return System.getProperty("user.home");
+    return Prop.USERHOME;
   }
 
   /**
-   * Returns the absolute path to this application.
-   * @return application path
+   * Returns the absolute path to this application, or {@code null} if the
+   * path cannot be evaluated.
+   * @return application path.
    */
   private static String applicationPath() {
+    final ProtectionDomain pd = Util.class.getProtectionDomain();
+    if(pd == null) return null;
     // raw application path
-    final String path = Util.class.getProtectionDomain().
-      getCodeSource().getLocation().getPath();
-
+    final String path = pd.getCodeSource().getLocation().getPath();
     // decode path; URLDecode returns wrong results
     final TokenBuilder tb = new TokenBuilder();
     final int pl = path.length();
@@ -356,8 +357,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean yes(final String string) {
-    return YES.equals(string) || TRUE.equals(string) || ON.equals(string) ||
-        INFOOFF.equals(string);
+    return Token.eqic(string, YES, TRUE, ON, INFOON);
   }
 
   /**
@@ -366,8 +366,7 @@ public final class Util {
    * @return result of check
    */
   public static boolean no(final String string) {
-    return NO.equals(string) || FALSE.equals(string) || OFF.equals(string) ||
-        INFOON.equals(string);
+    return Token.eqic(string, NO, FALSE, OFF, INFOOFF);
   }
 
   /**

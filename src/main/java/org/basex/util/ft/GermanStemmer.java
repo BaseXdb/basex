@@ -1,6 +1,7 @@
 package org.basex.util.ft;
 
-import java.util.EnumSet;
+import java.util.Collection;
+
 import org.basex.util.TokenBuilder;
 
 /**
@@ -11,7 +12,7 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class GermanStemmer extends Stemmer {
+final class GermanStemmer extends InternalStemmer {
   /** Removed characters. */
   private int subst;
 
@@ -24,7 +25,17 @@ final class GermanStemmer extends Stemmer {
   }
 
   @Override
-  byte[] stem(final byte[] word) {
+  Stemmer get(final Language l, final FTIterator fti) {
+    return new GermanStemmer(fti);
+  }
+
+  @Override
+  Collection<Language> languages() {
+    return collection("de");
+  }
+
+  @Override
+  protected byte[] stem(final byte[] word) {
     subst = 0;
     return part(resub(opt(strip(subst(new TokenBuilder(word)))))).finish();
   }
@@ -172,20 +183,5 @@ final class GermanStemmer extends Stemmer {
       }
     }
     return tb;
-  }
-
-  @Override
-  Stemmer get(final Language l, final FTIterator fti) {
-    return new GermanStemmer(fti);
-  }
-
-  @Override
-  int prec() {
-    return 1000;
-  }
-
-  @Override
-  EnumSet<Language> languages() {
-    return EnumSet.of(Language.DE);
   }
 }

@@ -17,19 +17,19 @@ import org.basex.io.IOFile;
 public final class Replace extends ACreate {
   /**
    * Default constructor.
-   * @param source source path
+   * @param path resource path
    * @param input input file or XML string
    */
-  public Replace(final String source, final String input) {
-    super(DATAREF | User.WRITE, source, input);
+  public Replace(final String path, final String input) {
+    super(DATAREF | User.WRITE, path, input);
   }
 
   /**
    * Constructor.
-   * @param source source path
+   * @param path resource path
    */
-  public Replace(final String source) {
-    super(DATAREF | User.WRITE, source);
+  public Replace(final String path) {
+    super(DATAREF | User.WRITE, path);
   }
 
   @Override
@@ -41,29 +41,23 @@ public final class Replace extends ACreate {
       in = io.inputSource();
     }
 
-    String name = MetaData.normPath(args[0]);
-    if(name == null || name.isEmpty()) return error(DIRERR, args[0]);
+    final String path = MetaData.normPath(args[0]);
+    if(path == null || path.isEmpty()) return error(DIRERR, args[0]);
 
     final Data data = context.data();
-    final int pre = data.doc(name);
+    final int pre = data.doc(path);
     // check if path points to a single file
-    if(pre != -1 && data.docs(name).size() != 1) return error(DIRERR, name);
+    if(pre != -1 && data.docs(path).size() != 1) return error(DIRERR, path);
 
-    final IOFile file = data.meta.binary(name);
+    final IOFile file = data.meta.binary(path);
     if(file != null && file.exists()) {
       // replace binary file if it already exists
-      final Store store = new Store(name);
+      final Store store = new Store(path);
       store.setInput(in);
       if(!store.run(context)) return error(store.info());
     } else {
       // otherwise, add new document as xml
-      String trg = "";
-      final int i = name.lastIndexOf('/');
-      if(i != -1) {
-        trg = name.substring(0, i);
-        name = name.substring(i + 1);
-      }
-      final Add add = new Add(null, name, trg);
+      final Add add = new Add(path);
       add.setInput(in);
       if(!add.run(context)) return error(add.info());
 

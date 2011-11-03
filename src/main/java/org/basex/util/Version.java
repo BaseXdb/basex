@@ -54,6 +54,16 @@ public final class Version implements Comparable<Version> {
   }
 
   @Override
+  public boolean equals(final Object o) {
+    return o instanceof Version && compareTo((Version) o) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return major + (minor << 8) + (patch << 16);
+  }
+
+  @Override
   public String toString() {
     return major + (minor == -1 ? "" : "." + minor +
         (patch == -1 ? "" : "." + patch));

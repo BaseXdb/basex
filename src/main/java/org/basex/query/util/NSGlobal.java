@@ -35,6 +35,7 @@ public final class NSGlobal {
     NS.add(MAP, MAPURI);
     NS.add(PKG, PKGURI);
     NS.add(SQL, SQLURI);
+    NS.add(CRYPTO, CRYPTOURI);
   }
 
   /** Private constructor. */

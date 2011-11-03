@@ -110,15 +110,15 @@ public final class DiskData extends Data {
   private void write() throws IOException {
     final DataOutput out = new DataOutput(meta.dbfile(DATAINF));
     meta.write(out);
-    out.writeString(DBTAGS);
+    out.writeToken(token(DBTAGS));
     tagindex.write(out);
-    out.writeString(DBATTS);
+    out.writeToken(token(DBATTS));
     atnindex.write(out);
-    out.writeString(DBPATH);
+    out.writeToken(token(DBPATH));
     pthindex.write(out);
-    out.writeString(DBNS);
+    out.writeToken(token(DBNS));
     ns.write(out);
-    out.writeString(DBDOCS);
+    out.writeToken(token(DBDOCS));
     docindex.write(out);
     out.write(0);
     out.close();

@@ -82,9 +82,9 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public void add(final String name, final String target,
-      final InputStream input) throws IOException {
-    execute(new Add(null, name, target), input);
+  public void add(final String path, final InputStream input)
+      throws IOException {
+    execute(new Add(path), input);
   }
 
   @Override
@@ -94,9 +94,9 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public void store(final String target, final InputStream input)
+  public void store(final String path, final InputStream input)
       throws IOException {
-    execute(new Store(target), input);
+    execute(new Store(path), input);
   }
 
   /**

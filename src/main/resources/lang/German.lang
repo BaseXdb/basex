@@ -1,5 +1,5 @@
 # LANGUAGE FILE, TRANSLATED BY
-# Project Team
+# BaseX Team
 #
 # The '%' character serves as placeholder for texts to be inserted
 
@@ -282,6 +282,8 @@ c_showhelp=Hilfe
 c_showhelptt=Zeigt die Hilfsansicht an. Diese Ansicht bietet interaktive Informationen über die derzeit ausgewählten Komponenten.
 c_community=Community
 c_communitytt=Zeigt die Community-Webseite.
+c_doc=Dokumentation
+c_doctt=Zeigt die Dokumentations-Webseite.
 c_updates=Nach Updates suchen
 c_updatestt=Zeigt die Update-Webseite.
 c_showinfo=Anfrage-Info
@@ -360,7 +362,8 @@ pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_skipped=Übersprungen
 pc_skipinfo=% weitere Datei(en) übersprungen
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
-pc_langnf=Sprache '%' wird nicht unterstützt.
+pc_notok=Kein Tokenizer für die Sprache "%" verfügbar.
+pc_nostem=Kein Stemmer für die Sprache "%" verfügbar.
 pc_err="%" konnte nicht eingelesen werden.
 pc_pos="%" (Zeile %)
 pc_direrr="%" verweist auf ein Verzeichnis.
@@ -391,6 +394,7 @@ db_notdeleted=Die Datei '%' konnte nicht gelöscht werden.
 db_exists=Die Datenbank '%' existiert schon.
 db_backdrop=Backup-Dateien '%' wurden gelöscht.
 db_backnf=Kein Backup wurde für '%' gefunden.
+db_notstored=Die Datei '%' konnte nicht gespeichert werden.
 
 # Index commands
 in_created=Index '%' erzeugt (%).
@@ -399,12 +403,12 @@ in_notdropped=Index '%' konnte nicht gelöscht werden.
 in_notavl=Nicht verfügbar
 
 # Server Info
-srv_denied=Zugriff wurde verweigert.
-srv_connect=Server ist nicht erreichbar.
-srv_timeout=Prozess hat Time-Out überschritten.
-srv_bind=Server läuft, oder der Zugriff wurde untersagt.
-srv_ports=Identischer Server- und Event-Port.
-srv_unknown=Unbekannter Host '%'.
+srv_denied=Der Zugriff wurde verweigert.
+srv_connect=Der Server ist nicht erreichbar.
+srv_timeout=Überschreitung des Time-Outs.
+srv_bind=Der Server läuft, oder der Zugriff wurde untersagt.
+srv_ports=Der Port '%' wurde mehrfach angegeben.
+srv_unknown=Der Host '%' ist unbekannt.
 srv_start=Server wurde gestartet.
 srv_stop=Server wurde gestoppt.
 srv_user=Benutzer
@@ -507,8 +511,8 @@ info_atvindex=Attribut-Index
 info_ftindex=Volltext-Index
 info_wcindex=Wildcards
 info_outofdate=veraltet
-info_db=Datenbank-Eigenschaften
-info_create=Datenbankerstellung
+info_db=Datenbankeigenschaften
+info_resource=Ressourcen-Eigenschaften:
 info_general=Allgemeines
 info_resultchop=gekürzt
 info_on=AN
@@ -531,7 +535,7 @@ ch_check2=Öffnet eine existierende Datenbank oder erstellt eine neue Instanz.
 ch_copy1=Kopiert Datenbank.
 ch_copy2=Kopiert eine Datenbank.
 ch_add1=Hinzufügen von Dokumenten.
-ch_add2=Fügt der geöffneten Datenbank ein Dokument\n[%] mit [%] und [%] hinzu.
+ch_add2=Fügt der Datenbank ein Dokument [%] als [%] hinzu.
 ch_delete1=Entfernen von Dokumenten.
 ch_delete2=Entfernt Dokumente aus der geöffneten Datenbank.
 ch_open1=Öffnen einer Datenbank.

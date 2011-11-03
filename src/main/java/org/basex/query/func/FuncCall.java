@@ -62,8 +62,9 @@ public abstract class FuncCall extends Arr {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     // compile all arguments
     super.comp(ctx);
-    // skip functions based on context or with non-values as arguments
-    if(uses(Use.CTX) || !values()) return optPre(cmp(ctx), ctx);
+    // skip context-based or non-deterministic functions, and non-values
+    if(uses(Use.CTX) || uses(Use.NDT) || !values())
+      return optPre(cmp(ctx), ctx);
     // pre-evaluate function
     return optPre(def.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
   }

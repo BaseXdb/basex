@@ -159,7 +159,8 @@ public final class FNNode extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == Function.GENID || expr.length == 0 &&
+    return u == Use.X30 && (def == Function.GENID || def == Function.PATH ||
+        def == Function.CHILDREN || expr.length == 0 &&
         (def == Function.DOCURI || def == Function.NODENAME)) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
   }

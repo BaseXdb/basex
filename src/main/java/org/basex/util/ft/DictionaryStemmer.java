@@ -1,6 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.EnumSet;
+import java.util.Collection;
 
 /**
  * Dictionary-based stemmer.
@@ -8,7 +8,7 @@ import java.util.EnumSet;
  * @author BaseX Team 2005-11, BSD License
  * @author Dimitar Popov
  */
-final class DictStemmer extends Stemmer {
+final class DictionaryStemmer extends Stemmer {
   /** Stem dictionary. */
   final StemDir dict;
 
@@ -17,28 +17,28 @@ final class DictStemmer extends Stemmer {
    * @param d stem dictionary
    * @param fti full-text iterator
    */
-  DictStemmer(final StemDir d, final FTIterator fti) {
+  DictionaryStemmer(final StemDir d, final FTIterator fti) {
     super(fti);
     dict = d;
   }
 
   @Override
   Stemmer get(final Language l, final FTIterator fti) {
-    return new DictStemmer(dict, fti);
+    return new DictionaryStemmer(dict, fti);
   }
 
   @Override
-  int prec() {
-    return 1001;
+  protected byte prec() {
+    return 20;
   }
 
   @Override
-  byte[] stem(final byte[] word) {
+  Collection<Language> languages() {
+    return Language.ALL.values();
+  }
+
+  @Override
+  protected byte[] stem(final byte[] word) {
     return dict.stem(word);
-  }
-
-  @Override
-  EnumSet<Language> languages() {
-    return EnumSet.allOf(Language.class);
   }
 }

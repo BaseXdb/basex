@@ -38,9 +38,9 @@ public final class CollectionPathTest {
   public static void before() throws BaseXException {
     new CreateDB(DB).execute(CONTEXT);
     for(final String file : FILES) {
-      new Add(file, null, "etc/test").execute(CONTEXT);
+      new Add("etc/test/", file).execute(CONTEXT);
     }
-    new Add(ZIP, null, "test/zipped").execute(CONTEXT);
+    new Add("test/zipped", ZIP).execute(CONTEXT);
   }
 
   /**

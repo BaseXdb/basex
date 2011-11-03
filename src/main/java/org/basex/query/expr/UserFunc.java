@@ -88,7 +88,7 @@ public class UserFunc extends Single {
     ctx.vars.reset(s);
 
     // convert all function calls in tail position to proper tail calls
-    if(tco()) expr.markTailCalls();
+    if(tco()) expr = expr.markTailCalls();
 
     // remove redundant cast
     if(ret != null && (ret.type == AtomType.BLN || ret.type == AtomType.FLT ||

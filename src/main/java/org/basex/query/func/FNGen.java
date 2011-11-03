@@ -117,7 +117,8 @@ public final class FNGen extends FuncCall {
    */
   private Value collection(final QueryContext ctx) throws QueryException {
     final Item it = expr.length != 0 ? expr[0].item(ctx, input) : null;
-    return ctx.resource.collection(it != null ? checkEStr(it) : null, input);
+    return ctx.resource.collection(
+        it != null ? string(checkEStr(it)) : null, input);
   }
 
   /**
@@ -170,7 +171,7 @@ public final class FNGen extends FuncCall {
     final Item it = expr[0].item(ctx, input);
     if(it == null) return null;
 
-    final byte[] in = checkEStr(it);
+    final String in = string(checkEStr(it));
     final Data d = ctx.resource.data(in, false, input);
     if(!d.single()) EXPSINGLE.thrw(input, in);
     return new DBNode(d, 0, Data.DOC);
@@ -286,12 +287,12 @@ public final class FNGen extends FuncCall {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final ANode node = checkNode(checkItem(expr[0], ctx));
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
       final Serializer ser = Serializer.get(ao, serialPar(this, 1, ctx));
-      node.serialize(ser);
+      final Iter ir = expr[0].iter(ctx);
+      for(Item it; (it = ir.next()) != null;) it.serialize(ser);
       ser.close();
     } catch(final SerializerException ex) {
       throw new QueryException(input, ex);
@@ -304,6 +305,7 @@ public final class FNGen extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     return
+      u == Use.CNS && def == Function.PARSEXML ||
       u == Use.UPD && def == Function.PUT ||
       u == Use.X30 && (def == Function.DATA && expr.length == 0 ||
         def == Function.PARSETXT || def == Function.PARSETXTLIN ||

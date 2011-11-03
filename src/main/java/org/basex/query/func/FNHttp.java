@@ -53,6 +53,6 @@ public final class FNHttp extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX;
+    return u == Use.NDT || super.uses(u);
   }
 }

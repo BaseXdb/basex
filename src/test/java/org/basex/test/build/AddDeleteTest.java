@@ -82,11 +82,11 @@ public final class AddDeleteTest {
    */
   @Test
   public void addXMLString() throws BaseXException {
-    new Add(XMLFRAG, "index.xml").execute(CONTEXT);
+    new Add("index.xml", XMLFRAG).execute(CONTEXT);
     assertEquals(1, docs());
-    new Add(XMLFRAG, "index2.xml", "a/b/c").execute(CONTEXT);
+    new Add("a/b/c/index2.xml", XMLFRAG).execute(CONTEXT);
     assertEquals(2, docs());
-    new Add(XMLFRAG, null, "a/d/c").execute(CONTEXT);
+    new Add("a/d/c", XMLFRAG).execute(CONTEXT);
     assertEquals(3, docs());
   }
 
@@ -96,7 +96,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void addFile() throws BaseXException {
-    new Add(FILE).execute(CONTEXT);
+    new Add(null, FILE).execute(CONTEXT);
     assertEquals(1, docs());
   }
 
@@ -106,11 +106,11 @@ public final class AddDeleteTest {
    */
   @Test
   public void addZip() throws BaseXException {
-    new Add(ZIPFILE, null, "target").execute(CONTEXT);
+    new Add("target", ZIPFILE).execute(CONTEXT);
     assertEquals(4, docs());
     // do not add archives
     new Set(Prop.ADDARCHIVES, false).execute(CONTEXT);
-    new Add(ZIPFILE).execute(CONTEXT);
+    new Add("", ZIPFILE).execute(CONTEXT);
     assertEquals(4, docs());
     new Set(Prop.ADDARCHIVES, true).execute(CONTEXT);
   }
@@ -121,8 +121,8 @@ public final class AddDeleteTest {
    */
   @Test
   public void addGzip() throws BaseXException {
-    new Add(GZIPFILE).execute(CONTEXT);
-    new Add(GZIPFILE, null, "bar").execute(CONTEXT);
+    new Add("", GZIPFILE).execute(CONTEXT);
+    new Add("bar", GZIPFILE).execute(CONTEXT);
     new Delete("bar").execute(CONTEXT);
     assertEquals(1, docs());
   }
@@ -133,7 +133,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void addFolder() throws BaseXException {
-    new Add(FLDR).execute(CONTEXT);
+    new Add("", FLDR).execute(CONTEXT);
     assertEquals(NFLDR, docs());
   }
 
@@ -143,12 +143,12 @@ public final class AddDeleteTest {
    */
   @Test
   public void deletePath() throws BaseXException {
-    new Add(FLDR, null, "foo/pub").execute(CONTEXT);
+    new Add("foo/pub", FLDR).execute(CONTEXT);
     assertEquals(NFLDR, docs());
     new Delete("foo").execute(CONTEXT);
     assertEquals(0, docs());
-    new Add(FILE, null, "/foo///bar////").execute(CONTEXT);
-    new Add(FLDR, null, "foobar").execute(CONTEXT);
+    new Add("/foo///bar////", FILE).execute(CONTEXT);
+    new Add("foobar", FLDR).execute(CONTEXT);
     new Delete("foo").execute(CONTEXT);
     assertEquals(NFLDR, docs());
   }
@@ -159,8 +159,8 @@ public final class AddDeleteTest {
    */
   @Test
   public void addFoldersDeleteFiles() throws BaseXException {
-    new Add(FLDR, null, "folder").execute(CONTEXT);
-    new Add(FILE).execute(CONTEXT);
+    new Add("folder", FLDR).execute(CONTEXT);
+    new Add("", FILE).execute(CONTEXT);
     new Delete("input.xml").execute(CONTEXT);
     new Delete("folder/input.xml").execute(CONTEXT);
     assertEquals(NFLDR - 1, docs());
@@ -172,7 +172,7 @@ public final class AddDeleteTest {
    */
   @Test(expected = BaseXException.class)
   public void addFileFail() throws BaseXException {
-    new Add(FILE + "/doesnotexist").execute(CONTEXT);
+    new Add("", FILE + "/doesnotexist").execute(CONTEXT);
   }
 
   /**
@@ -185,7 +185,7 @@ public final class AddDeleteTest {
     final IOFile io = new IOFile(Prop.TMP, DB);
     io.write(Token.token("<x"));
     try {
-      new Add(io.path()).execute(CONTEXT);
+      new Add("", io.path()).execute(CONTEXT);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
 
@@ -224,13 +224,13 @@ public final class AddDeleteTest {
 
     new Set(Prop.SKIPCORRUPT, true).execute(CONTEXT);
     assertEquals(0, CONTEXT.data().docs("").size());
-    new Add("<x").execute(CONTEXT);
-    new Add(CORRUPT).execute(CONTEXT);
+    new Add("x", "<x").execute(CONTEXT);
+    new Add("x", CORRUPT).execute(CONTEXT);
     assertEquals(0, CONTEXT.data().docs("").size());
     new Set(Prop.SKIPCORRUPT, false).execute(CONTEXT);
 
     try {
-      new Add("<x").execute(CONTEXT);
+      new Add("", "<x").execute(CONTEXT);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
 

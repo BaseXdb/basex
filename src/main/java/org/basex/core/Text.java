@@ -48,6 +48,8 @@ public interface Text {
   String URL = "http://www." + NAMELC + ".org";
   /** URL of the community page. */
   String COMMUNITY_URL = URL + "/community";
+  /** URL of the documentation. */
+  String DOC_URL = "http://docs." + NAMELC + ".org";
   /** URL of the update page. */
   String UPDATE_URL = URL + "/products/download/all-downloads/";
   /** Version URL. */
@@ -120,14 +122,14 @@ public interface Text {
   String SERVERMODE = "Server";
   /** Server start information. */
   String SERVERINFO =
-    " [-deipsz] [-c] [stop]" + NL +
-    "  stop      Stop existing server" + NL +
+    " [-deipSz] [-c] [stop]" + NL +
+    "  stop      Stop running server" + NL +
     "  -c<cmd>   Execute initial database command(s)" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
     "  -i        Enter interactive mode" + NL +
     "  -p<num>   Set server port" + NL +
-    "  -s        Start as service" + NL +
+    "  -S        Start as service" + NL +
     "  -z        Suppress logging";
 
   /** GUI mode. */
@@ -140,15 +142,18 @@ public interface Text {
   /** HTTP information. */
   String HTTPINFO =
     " [-dehlnpPRUWz] [stop]" + NL +
-    "  stop       Stop existing server" + NL +
+    "  stop       Stop running server" + NL +
+    "  -c         Start in client mode" + NL +
     "  -d         Activate debugging mode" + NL +
     "  -e<num>    Set event port" + NL +
     "  -h<num>    Set port of HTTP server" + NL +
     "  -l         Start in local mode" + NL +
-    "  -n<name>   Set name of database server" + NL +
+    "  -n<name>   Set host name of database server" + NL +
     "  -p<num>    Set port of database server" + NL +
     "  -P<pass>   Specify user password" + NL +
     "  -R         Deactivate REST service" + NL +
+    "  -s         Specify port to stop HTTP server" + NL +
+    "  -S         Start as service" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -W         Deactivate WebDAV service" + NL +
     "  -z         Suppress logging";
@@ -185,8 +190,6 @@ public interface Text {
   // COMMANDS =================================================================
 
   /** Command keyword. */
-  String AS = "AS";
-  /** Command keyword. */
   String ALL = "ALL";
   /** Command keyword. */
   String TO = "TO";
@@ -216,8 +219,6 @@ public interface Text {
   String C_NAME = "name";
   /** Command help. */
   String C_PW = "password";
-  /** Command help. */
-  String C_TARGET = "target";
   /** Command help. */
   String C_PKGPATH = "path";
   /** Command help. */
@@ -258,9 +259,17 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPADD = {
-    "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
-    C_INPUT + "]",
-    lang("ch_add1"), lang("ch_add2", C_INPUT, C_NAME, C_TARGET)
+    "(" + TO + " [" + C_PATH + "]) [" + C_INPUT + "]",
+    lang("ch_add1"), lang("ch_add2", C_INPUT, C_PATH)
+  };
+  /** Command help. */
+  String[] HELPSTORE = {
+    "(" + TO + " [" + C_PATH + "]) [" + C_INPUT + "]",
+    lang("ch_store1"), lang("ch_store2", C_PATH)
+  };
+  /** Command help. */
+  String[] HELPRETRIEVE = {
+    "[" + C_PATH + "]", lang("ch_retrieve1"), lang("ch_retrieve2", C_PATH)
   };
   /** Command help. */
   String[] HELPDELETE = {
@@ -419,15 +428,6 @@ public interface Text {
       "  " + lang("ch_repo5")
   };
   /** Command help. */
-  String[] HELPRETRIEVE = {
-    "[" + C_PATH + "]", lang("ch_retrieve1"), lang("ch_retrieve2", C_PATH)
-  };
-  /** Command help. */
-  String[] HELPSTORE = {
-    "[" + C_PATH + "] [" + C_INPUT + "]",
-    lang("ch_store1"), lang("ch_store2", C_PATH)
-  };
-  /** Command help. */
   String[] HELPHELP = {
     "([command])", lang("ch_help1", NAME), lang("ch_help2", "command")
   };
@@ -516,8 +516,10 @@ public interface Text {
   String SKIPINFO = lang("pc_skipinfo");
   /** Missing database name. */
   String DBWHICH = lang("pc_dbnf");
-  /** Language not supported. */
-  String LANGWHICH = lang("pc_langnf");
+  /** No tokenizer found. */
+  String NOTOK = lang("pc_notok");
+  /** No stemmer found. */
+  String NOSTEM = lang("pc_nostem");
   /** Points to a directory. */
   String DIRERR = lang("pc_direrr");
 
@@ -811,8 +813,8 @@ public interface Text {
 
   /** Info on database. */
   String INFODB = lang("info_db");
-  /** Info on document creation. */
-  String INFOCREATE = lang("info_create");
+  /** Info on input resource. */
+  String INFORESOURCE = lang("info_resource");
   /** Database info. */
   String INFOGENERAL = lang("info_general");
   /** Database info. */
@@ -985,6 +987,10 @@ public interface Text {
   String GUISHOWCOMMUNITY = lang("c_community");
   /** Command info. */
   String GUISHOWCOMMUNITYTT = lang("c_communitytt");
+  /** Command info. */
+  String GUISHOWDOC = lang("c_doc");
+  /** Command info. */
+  String GUISHOWDOCTT = lang("c_doctt");
   /** Command info. */
   String GUISHOWUPDATES = lang("c_updates");
   /** Command info. */
@@ -1447,11 +1453,11 @@ public interface Text {
   String CONTRIBUTE1 = lang("da_cont1") +
   ": Michael Seiferle, Alexander Holupirek,";
   /** Developer names. */
-  String CONTRIBUTE2 = "Leo W\u00F6rteler, Rositsa Shadura, Dimitar Popov,";
+  String CONTRIBUTE2 = "Dimitar Popov, Rositsa Shadura, Lukas Kircher,";
   /** Developer names. */
-  String CONTRIBUTE3 = "Lukas Kircher, Andreas Weiler " + lang("da_cont2");
+  String CONTRIBUTE3 = "Leo W\u00F6rteler, Andreas Weiler " + lang("da_cont2");
   /** Translation. */
-  String TRANSLATION = lang("da_translation") + COLS;
+  String TRANSLATION = lang("da_translation");
 
   // HELP TEXTS ===============================================================
 

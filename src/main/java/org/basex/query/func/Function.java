@@ -197,7 +197,7 @@ public enum Function {
   /** XQuery function. */
   URICOLL(FNGen.class, "uri-collection([uri])", URI_ZM, 0, STR_ZO),
   /** XQuery function. */
-  SERIALIZE(FNGen.class, "serialize(node[,params])", STR, 1, ITEM_ZM, ITEM),
+  SERIALIZE(FNGen.class, "serialize(items[,params])", STR, 1, ITEM_ZM, ITEM),
 
   /* FNId functions. */
 
@@ -470,7 +470,7 @@ public enum Function {
       ITEM, ITEM, STR),
   /** Database function: searches the full-text index. */
   DBFULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
-  /** Database function: lists all database. */
+  /** Database function: lists all databases or documents in a database. */
   DBLIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   DBSYSTEM(FNDb.class, "system()", STR),
@@ -505,6 +505,8 @@ public enum Function {
   DBEXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
   /** Database function: returns the content type of a database file. */
   DBCTYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
+  /** Database function: returns details for a resource. */
+  DBDETAILS(FNDb.class, "details(database,path)", ITEM, STR, STR),
 
   /* FNFile functions (EXPath). */
 
@@ -608,6 +610,25 @@ public enum Function {
   HOFITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM,
       FuncType.arity(1).seq(), ITEM_ZM),
 
+  /* FNCrypto functions (EXPath Cryptographic module). */
+
+  /** Create message authentication code (HMAC). */
+  CRYPHMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR,
+      STR, STR, STR_ZO),
+  /** Encrypt message. */
+  CRYPENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)", STR,
+      STR, STR, STR, STR),
+  /** Decrypt message. */
+  CRYPDECRYPT(FNCrypto.class, "decrypt(string, string, string, string)", STR,
+      STR, STR, STR, STR),
+  /** Generate signature. */
+  CRYPGENSIG(FNCrypto.class,
+      "generate-signature" +
+      "(node,string,string,string,string,string[,item][,item])",
+      NOD, 6, NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO),
+  /** Validate signature. */
+  CRYPVALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
+
   /* FNHttp functions (EXPath). */
 
   /** XQuery function */
@@ -698,6 +719,7 @@ public enum Function {
     URIS.put(FNMap.class,  MAPURI);
     URIS.put(FNMath.class, MATHURI);
     // EXPath functions
+    URIS.put(FNCrypto.class, CRYPTOURI);
     URIS.put(FNFile.class, FILEURI);
     URIS.put(FNHttp.class, HTTPURI);
     URIS.put(FNZip.class,  ZIPURI);

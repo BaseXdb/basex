@@ -3,10 +3,10 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -14,7 +14,6 @@ import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
-import org.basex.server.ClientDelayer;
 import org.basex.server.ClientListener;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
@@ -35,9 +34,9 @@ import org.basex.util.hash.TokenIntMap;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public class BaseXServer extends Main implements Runnable {
+public final class BaseXServer extends Main implements Runnable {
   /** Flag for server activity. */
-  public boolean running;
+  public volatile boolean running;
   /** Event server socket. */
   ServerSocket esocket;
   /** Stop file. */
@@ -47,7 +46,7 @@ public class BaseXServer extends Main implements Runnable {
 
   /** EventsListener. */
   private final EventListener events = new EventListener();
-  /** Blocked clients. */
+  /** Temporarily blocked clients. */
   private final TokenIntMap blocked = new TokenIntMap();
 
   /** Quiet mode (no logging). */
@@ -55,7 +54,7 @@ public class BaseXServer extends Main implements Runnable {
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
-  private boolean stopped;
+  private volatile boolean stopped;
 
   /** Server socket. */
   private ServerSocket socket;
@@ -95,8 +94,15 @@ public class BaseXServer extends Main implements Runnable {
       throws IOException {
 
     super(args, ctx);
-    final int port = context.mprop.num(MainProp.SERVERPORT);
-    final int eport = context.mprop.num(MainProp.EVENTPORT);
+    final MainProp mprop = context.mprop;
+    final int port = mprop.num(MainProp.SERVERPORT);
+    final int eport = mprop.num(MainProp.EVENTPORT);
+    // check if ports are distinct
+    if(port == eport) throw new BaseXException(SERVERPORTS, port);
+
+    final String host = mprop.get(MainProp.SERVERHOST);
+    final InetAddress addr = host.isEmpty() ? null :
+      InetAddress.getByName(host);
 
     if(service) {
       start(port, args);
@@ -107,6 +113,7 @@ public class BaseXServer extends Main implements Runnable {
 
     if(stopped) {
       stop(port, eport);
+      Util.outln(SERVERSTOPPED);
       Performance.sleep(1000);
       return;
     }
@@ -120,13 +127,13 @@ public class BaseXServer extends Main implements Runnable {
 
       socket = new ServerSocket();
       socket.setReuseAddress(true);
-      socket.bind(new InetSocketAddress(port));
+      socket.bind(new InetSocketAddress(addr, port));
       esocket = new ServerSocket();
       esocket.setReuseAddress(true);
-      esocket.bind(new InetSocketAddress(eport));
+      esocket.bind(new InetSocketAddress(addr, eport));
       stop = stopFile(port);
 
-      // guarantee correct shutdown...
+      // show info when server is aborted
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
@@ -162,17 +169,15 @@ public class BaseXServer extends Main implements Runnable {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit();
         } else {
-          final byte[] address = s.getInetAddress().getAddress();
-          final ClientListener cl = new ClientListener(s, context, log);
-          if(cl.init()) {
-            blocked.delete(address);
-            context.add(cl);
-          } else {
-            int delay = blocked.get(address);
-            delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
-            blocked.add(address, delay);
-            new ClientDelayer(delay, cl, this);
+          // drop inactive connections
+          final long ka = context.mprop.num(MainProp.KEEPALIVE) * 1000L;
+          if(ka > 0) {
+            final long ms = System.currentTimeMillis();
+            for(final ClientListener cs : context.sessions) {
+              if(ms - cs.last > ka) cs.quit();
+            }
           }
+          new ClientListener(s, context, log, this).start();
         }
       } catch(final IOException ex) {
         // socket was closed..
@@ -194,7 +199,9 @@ public class BaseXServer extends Main implements Runnable {
   public void quit() throws IOException {
     if(!running) return;
     running = false;
+    for(final ClientListener cs : context.sessions) cs.quit();
     super.quit();
+    context.close();
 
     try {
       // close interactive input if server was stopped by another process
@@ -206,7 +213,6 @@ public class BaseXServer extends Main implements Runnable {
       Util.stack(ex);
     }
     console = false;
-    context.close();
   }
 
   @Override
@@ -222,33 +228,34 @@ public class BaseXServer extends Main implements Runnable {
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
-        final char c = arg.next();
-        if(c == 'c') {
-          // send database commands
-          commands = arg.remaining();
-        } else if(c == 'd') {
-          // activate debug mode
-          context.mprop.set(MainProp.DEBUG, true);
-        } else if(c == 'D') {
-          // hidden flag: daemon mode
-          daemon = true;
-        } else if(c == 'e') {
-          // parse event port
-          context.mprop.set(MainProp.EVENTPORT, arg.num());
-        } else if(c == 'i') {
-          // activate interactive mode
-          console = true;
-        } else if(c == 'p') {
-          // parse server port
-          context.mprop.set(MainProp.SERVERPORT, arg.num());
-        } else if(c == 's') {
-          // set service flag
-          service = !daemon;
-        } else if(c == 'z') {
-          // suppress logging
-          quiet = true;
-        } else {
-          arg.usage();
+        switch(arg.next()) {
+          case 'c': // send database commands
+            commands = arg.remaining();
+            break;
+          case 'd': // activate debug mode
+            context.mprop.set(MainProp.DEBUG, true);
+            break;
+          case 'D': // hidden flag: daemon mode
+            daemon = true;
+            break;
+          case 'e': // parse event port
+            context.mprop.set(MainProp.EVENTPORT, arg.num());
+            break;
+          case 'i': // activate interactive mode
+            console = true;
+            break;
+          case 'p': // parse server port
+            context.mprop.set(MainProp.SERVERPORT, arg.num());
+            break;
+          case 's': // set service flag (deprecated)
+          case 'S': // set service flag
+            service = !daemon;
+            break;
+          case 'z': // suppress logging
+            quiet = true;
+            break;
+          default:
+            arg.usage();
         }
       } else {
         if(arg.string().equalsIgnoreCase("stop")) {
@@ -258,11 +265,6 @@ public class BaseXServer extends Main implements Runnable {
         }
       }
     }
-
-    if(context.mprop.num(MainProp.SERVERPORT) ==
-       context.mprop.num(MainProp.EVENTPORT)) {
-      throw new BaseXException(SERVERPORTS);
-    }
   }
 
   /**
@@ -270,9 +272,9 @@ public class BaseXServer extends Main implements Runnable {
    * @throws IOException I/O exception
    */
   public void stop() throws IOException {
-    stop.write(Token.EMPTY);
-    new Socket(LOCALHOST, context.mprop.num(MainProp.EVENTPORT));
-    new Socket(LOCALHOST, context.mprop.num(MainProp.SERVERPORT));
+    final int port = context.mprop.num(MainProp.SERVERPORT);
+    final int eport = context.mprop.num(MainProp.EVENTPORT);
+    stop(port, eport);
   }
 
   // STATIC METHODS ===========================================================
@@ -326,13 +328,38 @@ public class BaseXServer extends Main implements Runnable {
     final IOFile stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
-      new Socket(LOCALHOST, eport);
-      new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port)) Performance.sleep(100);
-      Util.outln(SERVERSTOPPED);
+      new Socket(LOCALHOST, eport).close();
+      new Socket(LOCALHOST, port).close();
+      // check if server was really stopped
+      while(ping(LOCALHOST, port)) Performance.sleep(50);
+      Performance.sleep(50);
     } catch(final IOException ex) {
       stop.delete();
       throw ex;
+    }
+  }
+
+  /**
+   * Registers the client and calculates the delay after unsuccessful logins.
+   * @param client client address
+   * @return delay
+   */
+  public int block(final byte[] client) {
+    synchronized(blocked) {
+      int delay = blocked.get(client);
+      delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
+      blocked.add(client, delay);
+      return delay;
+    }
+  }
+
+  /**
+   * Resets the login delay after successful login.
+   * @param client client address
+   */
+  public void unblock(final byte[] client) {
+    synchronized(blocked) {
+      blocked.delete(client);
     }
   }
 

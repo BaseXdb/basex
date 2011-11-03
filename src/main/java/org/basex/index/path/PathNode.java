@@ -24,7 +24,7 @@ public final class PathNode {
   public final byte kind;
   /** Parent. */
   public final PathNode par;
-  /** Counter. */
+  /** Number of occurrences. */
   public int size;
   /** Children. */
   PathNode[] ch;

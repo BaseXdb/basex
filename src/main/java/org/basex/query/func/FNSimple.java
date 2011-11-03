@@ -124,8 +124,8 @@ public final class FNSimple extends FuncCall {
     switch(def) {
       case EMPTY:
       case EXISTS:
-        // context-based expressions (e.g.: error()) will be dropped
-        return e.size() == -1 || e.uses(Use.CTX) ? this :
+        // ignore non-deterministic expressions (e.g.: error())
+        return e.size() == -1 || e.uses(Use.NDT) ? this :
           Bln.get(def == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)

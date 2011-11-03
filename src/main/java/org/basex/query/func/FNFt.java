@@ -189,6 +189,7 @@ public final class FNFt extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
+    // skip evaluation at compile time
     return u == Use.CTX && def == Function.FTSEARCH || super.uses(u);
   }
 }

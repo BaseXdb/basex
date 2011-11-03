@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
@@ -93,7 +94,7 @@ public final class Context {
    * Closes the database context.
    */
   public synchronized void close() {
-    while(sessions.size() > 0) sessions.get(0).exit();
+    while(sessions.size() > 0) sessions.get(0).quit();
     datas.close();
   }
 
@@ -243,7 +244,7 @@ public final class Context {
   }
 
   /**
-   * Adds the specified session.
+   * Adds the specified session. Thread-safe by {@link CopyOnWriteArrayList}.
    * @param s session to be added
    */
   public void add(final ClientListener s) {

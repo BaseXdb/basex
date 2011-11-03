@@ -448,12 +448,6 @@ public final class SeqType {
     return type == t.type && occ == t.occ;
   }
 
-  @Override
-  public String toString() {
-    final String str = type.toString();
-    return (str.contains(" ") && occ != Occ.O ? '(' + str + ')' : str) + occ;
-  }
-
   /**
    * Checks if the specified SeqType is an instance of the current SeqType.
    * @param t SeqType to check
@@ -461,5 +455,11 @@ public final class SeqType {
    */
   public boolean instance(final SeqType t) {
     return type.instance(t.type) && occ.instance(t.occ);
+  }
+
+  @Override
+  public String toString() {
+    final String str = type.toString();
+    return (str.contains(" ") && occ != Occ.O ? '(' + str + ')' : str) + occ;
   }
 }

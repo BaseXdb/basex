@@ -28,6 +28,8 @@ public enum Err {
   IDINVALID(BASX, 4, "%: value '%' out of range."),
   /** BASX0005: Evaluation exception. */
   PERMNO(BASX, 5, Text.PERMNO),
+  /** BASX0006: Evaluation exception. */
+  DBCLOSE(BASX, 6, "Not all databases properly closed."),
   /** BASX0007: Evaluation exception. */
   QUERYNODES(BASX, 7, Text.QUERYNODESERR),
   /** BASX0008: Evaluation exception. */
@@ -300,7 +302,9 @@ public enum Err {
   /** FTST0008: Parsing exception. */
   NOSTOPFILE(FTST, 8, "Stop word file not found: \"%\"."),
   /** FTST0009: Parsing exception. */
-  FTLAN(FTST, 9, "Language '%' not supported."),
+  FTNOSTEM(FTST, 9, "No stemmer available for language '%'."),
+  /** FTST0009: Parsing exception. */
+  FTNOTOK(FTST, 9, "No tokenizer available for language '%'."),
   /** FTST0018: Parsing exception. */
   NOTHES(FTST, 18, "Thesaurus not found: \"%\"."),
   /** FTST0019: Parsing exception. */
@@ -477,8 +481,6 @@ public enum Err {
   INVALPI(XPST, 3, "Invalid PI name: \"%\"."),
   /** XPST0003: Parsing exception. */
   INTEXP(XPST, 3, "Integer expected."),
-  /** XPST0003: Parsing exception. */
-  INVIN(XPST, 3, "Invalid input: % found."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
@@ -763,7 +765,69 @@ public enum Err {
   UPCOPYMULT(XUTY, 13,
       "Source expression in copy clause must return a single node."),
   /** XUTY0022: XQuery Update type exception. */
-  UPATTELM2(XUTY, 22, "Insert target must be an element.");
+  UPATTELM2(XUTY, 22, "Insert target must be an element."),
+
+  /* EXPath Cryptographic Module Errors */
+  /** FOCX01: Crypto Exception. */
+  CRYPTOCANINV(FOCX, 1, "Canonicalization algorithm is not supported."),
+  /** FOCX02: Crypto Exception. */
+  CRYPTODIGINV(FOCX, 2, "Digest algorithm is not supported."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOSIGINV(FOCX, 3, "Signature algorithm is not supported."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOXPINV(FOCX, 4, "XPath expression is invalid."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOINVNM(FOCX, 5, "Invalid name for $digital-certificate root."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOINVCH(FOCX, 6, "Invalid child element of $digital-certificate."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOKSNULL(FOCX, 7, "Key store is null."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOIOERR(FOCX, 8, "I/O error while reading keystore."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOPERMDEN(FOCX, 9, "Permission denied to read keystore."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOKSURLINV(FOCX, 10, "Keystore URL is invalid."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTOKSTYPE(FOCX, 11, "Keystore type is not supported."),
+  /** FOCX03: Crypto Exception. */
+  CRYPTONOKEY(FOCX, 12, "Cannot find key for alias in given keystore."),
+  /** FOCX13: Crypto Exception. */
+  CRYPTOINVHASH(FOCX, 13, "Hashing algorithm is not supported."),
+  /** FOCX14: Crypto Exception. */
+  CRYPTOENC(FOCX, 14, "The encoding method is not supported."),
+  /** FOCX15: Crypto Exception. */
+  CRYPTONOSIG(FOCX, 15, "Cannot find signature element."),
+  /** FOCX16: Crypto Exception. */
+  CRYPTONOPAD(FOCX, 16, "No such padding."),
+  /** FOCX17: Crypto Exception. */
+  CRYPTOBADPAD(FOCX, 17, "Incorrect padding."),
+  /** FOCX18: Crypto Exception. */
+  CRYPTOENCTYP(FOCX, 18, "Encryption type is not supported."),
+  /** FOCX19: Crypto Exception. */
+  CRYPTOKEYINV(FOCX, 19, "Secret key is invalid."),
+  /** FOCX20: Crypto Exception. */
+  CRYPTOILLBLO(FOCX, 20, "Illegal block size."),
+  /** FOCX21: Crypto Exception. */
+  CRYPTOINVALGO(FOCX, 21, "Algorithm is not supported."),
+  /** FOCX22: Crypto Exception. */
+  CRYPTODECTYP(FOCX, 22, "Decryption type is not supported."),
+  /** FOCX999: Crypto Exception. */
+  CRYPTOSIGTYPINV(FOCX, 9999, "Signature type is not supported."),
+  /** FOCX998: Crypto Exception. */
+  CRYPTONOTSUPP(FOCX, 9998, "Not (yet) supported."),
+  /** FOCX997: Crypto Exception. */
+  CRYPTOSYMERR(FOCX, 9997, "Algorithm not compatible with encryption type."),
+  /** FOCX996: Crypto Exception. */
+  CRYPTOIOEXC(FOCX, 9996, "IO Exception."),
+  /** FOCX995: Crypto Exception. */
+  CRYPTOKSEXC(FOCX, 9995, "Keystore exception."),
+  /** FOCX994: Crypto Exception. */
+  CRYPTOSIGEXC(FOCX, 9994, "Signature exception."),
+  /** FOCX993: Crypto Exception. */
+  CRYPTOALGEXC(FOCX, 9993, "Invalid algorithm."),
+  /** FOCX992: Crypto Exception. */
+  CRYPTOALINV(FOCX, 9992, "Invalid certificate alias %.");
 
   /** Error type. */
   public final ErrType type;
@@ -824,6 +888,7 @@ public enum Err {
    */
   public static enum ErrType {
     /** BASX Error type. */ BASX,
+    /** FOCX Error type. (EXPath Cryptographic) */ FOCX,
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,

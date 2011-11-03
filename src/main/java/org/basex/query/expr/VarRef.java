@@ -86,7 +86,7 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.VAR || u != Use.CTX &&
+    return u == Use.VAR || u != Use.CTX && u != Use.NDT &&
       var.expr() != null && var.expr().uses(u);
   }
 

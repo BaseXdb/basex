@@ -23,7 +23,7 @@ public final class AdminStressTest {
   /** Number of clients/events. */
   private static final int NUM = 100;
   /** Server reference. */
-  static BaseXServer server;
+  private static BaseXServer server;
 
   /**
    * Starts the server.
@@ -31,7 +31,7 @@ public final class AdminStressTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z");
+    server = new BaseXServer("-z -p9999 -e9998");
   }
 
   /**
@@ -61,7 +61,7 @@ public final class AdminStressTest {
     stop.await();
 
     final ClientSession cs = new ClientSession(
-        server.context, Text.ADMIN, Text.ADMIN);
+        Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
     for(int i = 0; i < NUM; ++i) cs.execute("drop event " + NAME + i);
     cs.close();
   }
@@ -100,7 +100,7 @@ public final class AdminStressTest {
      */
     public Client(final String c, final CountDownLatch start,
         final CountDownLatch stop) throws IOException {
-      session = new ClientSession(server.context, Text.ADMIN, Text.ADMIN);
+      session = new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
       cmd = c;
       startSignal = start;
       stopSignal = stop;
@@ -113,8 +113,8 @@ public final class AdminStressTest {
         startSignal.await();
         session.execute(cmd);
         session.close();
-      } catch(final Exception e) {
-        e.printStackTrace();
+      } catch(final Exception ex) {
+        ex.printStackTrace();
       } finally {
         stopSignal.countDown();
       }

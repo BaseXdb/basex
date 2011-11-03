@@ -1,11 +1,14 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+
 import org.basex.util.Reflect;
 
 /**
@@ -18,8 +21,8 @@ import org.basex.util.Reflect;
  */
 final class WordnetStemmer extends Stemmer {
   /** Name of the package of the WordNet stemmer. */
-  private static final String PKG = "edu.mit.jwi";
-  /** Path to the WordNet dictionary files (currently: static). */
+  private static final String PATTERN = "edu.mit.jwi.%";
+  /** Path to the WordNet dictionary files. */
   private static final String PATH = "etc/wndict";
   /** WordnetStemmer class. */
   private static final Constructor<?> CTR;
@@ -30,14 +33,14 @@ final class WordnetStemmer extends Stemmer {
 
   static {
     // don't try to find the other classes if Dictionary is not found:
-    if(Reflect.available(PKG)) {
+    if(Reflect.available(PATTERN, "Dictionary")) {
       FIND_STEMS = null;
       CTR = null;
       DICT = null;
     } else {
-      final Class<?> dict = Reflect.find(PKG + ".Dictionary");
-      final Class<?> wn = Reflect.find(PKG + ".morph.WordnetStemmer");
-      CTR = Reflect.find(wn, Reflect.find(PKG + ".IDictionary"));
+      final Class<?> dict = Reflect.find(PATTERN, "Dictionary");
+      final Class<?> wn = Reflect.find(PATTERN, "morph.WordnetStemmer");
+      CTR = Reflect.find(wn, Reflect.find(PATTERN, "IDictionary"));
       FIND_STEMS = Reflect.method(wn, "findStems", String.class);
       DICT = newDict(dict);
     }
@@ -91,21 +94,23 @@ final class WordnetStemmer extends Stemmer {
 
   @Override
   public boolean supports(final Language lang) {
-    return lang == Language.EN;
+    return lang.equals(Language.get("en"));
   }
 
   @Override
-  EnumSet<Language> languages() {
-    return EnumSet.of(Language.EN);
+  protected byte prec() {
+    return 30;
   }
 
   @Override
-  int prec() {
-    return 10;
+  Collection<Language> languages() {
+    final HashSet<Language> ln = new HashSet<Language>();
+    ln.add(Language.get("en"));
+    return ln;
   }
 
   @Override
-  byte[] stem(final byte[] word) {
+  protected byte[] stem(final byte[] word) {
     @SuppressWarnings("unchecked")
     final List<String> l = (List<String>)
       Reflect.invoke(FIND_STEMS, stemmer, string(word));

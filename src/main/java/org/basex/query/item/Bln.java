@@ -6,6 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Boolean item.
@@ -127,6 +128,7 @@ public final class Bln extends Item {
 
   @Override
   public String toString() {
-    return val ? "true()" : "false()";
+    return new TokenBuilder(val ? Token.TRUE : Token.FALSE).
+        add("()").toString();
   }
 }

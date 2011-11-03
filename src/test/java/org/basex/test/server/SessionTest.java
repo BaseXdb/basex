@@ -127,9 +127,9 @@ public abstract class SessionTest {
   @Test
   public final void add() throws IOException {
     session.execute("create db " + DB);
-    session.add(DB, "", new ArrayInput("<X/>"));
+    session.add(DB, new ArrayInput("<X/>"));
     check("1", session.query("count(" + DBOPEN.args(DB) + ")").execute());
-    for(int i = 0; i < 9; i++) session.add(DB, "", new ArrayInput("<X/>"));
+    for(int i = 0; i < 9; i++) session.add(DB, new ArrayInput("<X/>"));
     check("10", session.query("count(" + DBOPEN.args(DB) + ")").execute());
   }
 
@@ -140,7 +140,7 @@ public abstract class SessionTest {
   @Test(expected = org.basex.core.BaseXException.class)
   public final void addNameErr() throws IOException {
     session.execute("create db " + DB);
-    session.add("", "", new ArrayInput("<X/>"));
+    session.add("", new ArrayInput("<X/>"));
   }
 
   /**
@@ -150,7 +150,7 @@ public abstract class SessionTest {
   @Test(expected = org.basex.core.BaseXException.class)
   public final void addNoInput() throws IOException {
     session.execute("create db " + DB);
-    session.add("", "", new ArrayInput(""));
+    session.add("", new ArrayInput(""));
   }
 
   /**
@@ -516,6 +516,27 @@ public abstract class SessionTest {
     for(int q = 0; q < size; q++) cqs[q] = session.query(Integer.toString(q));
     for(int q = 0; q < size; q++) check(q, cqs[q].next());
     for(final Query query : cqs) query.close();
+  }
+
+  /** Binds maps to external variables via JSON.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindJson() throws IOException {
+    final String var = "declare variable $x external;",
+        map = "{\"foo\":[1,2,3],\"bar\":{\"a\":null,\"\":false}}";
+    final String[][] tests = {
+        {"for $k in map:keys($x) order by $k descending return $k", "foo bar"},
+        {"every $k in map:keys($x('foo')) satisfies $k eq $x('foo')($k)",
+          "true"},
+        {"empty($x('bar')('a')) and not($x('bar')(''))", "true"},
+    };
+    for(final String[] test : tests) {
+      final Query q = session.query(var + test[0]);
+      try {
+        q.bind("$x", map, "json");
+        check(test[1], q.execute());
+      } finally { q.close(); }
+    }
   }
 
   /**

@@ -89,7 +89,7 @@ public final class FNAcc extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     final boolean pos = def == Function.POS || def == Function.LAST;
-    return u == Use.CTX && (pos || expr.length == 0) ||
+    return u == Use.CTX && (expr.length == 0 || pos) ||
       u == Use.POS && pos || super.uses(u);
   }
 }

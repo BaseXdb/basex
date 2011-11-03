@@ -138,7 +138,7 @@ final class QueryListener extends Progress {
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     } finally {
-      try { qp.close(); } catch(final IOException ex) { }
+      try { qp.close(); } catch(final QueryException ex) { }
       if(mon) ctx.unregister(qp.ctx.updating);
     }
   }

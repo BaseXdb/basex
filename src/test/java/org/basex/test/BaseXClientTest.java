@@ -87,11 +87,12 @@ public final class BaseXClientTest extends BaseXTest {
   private String run(final String args, final String sargs) throws IOException {
     System.setOut(NULL);
     System.setErr(NULL);
-    final BaseXServer bxs = new BaseXServer(sargs);
+    final BaseXServer bxs = new BaseXServer("-p9999 -e9998 " + sargs);
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));
     try {
-      new BaseXClient("-U" + Text.ADMIN + " -P" + Text.ADMIN + " " + args);
+      new BaseXClient("-p9999 -U" + Text.ADMIN + " -P" + Text.ADMIN +
+          " " + args);
       return ao.toString();
     } finally {
       bxs.stop();

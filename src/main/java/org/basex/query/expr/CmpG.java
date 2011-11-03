@@ -301,9 +301,14 @@ public final class CmpG extends Cmp {
     final Expr arg = expr[1];
     if(!arg.value()) {
       final SeqType t = arg.type();
-      // index access not possible if returned type is no string or node,
-      // and if expression depends on context
-      if(arg.uses(Use.CTX) || !(t.type.str() || t.type.node())) return false;
+      /* index access is not possible if returned type is no string or node, if
+         expression depends on context, or if it is non-deterministic. examples:
+         //*[text() = 1]
+         //*[text() = .]
+         //*[text() = (if(math:random() < .5) then 'X' else 'Y')]
+       */
+      if(!t.type.str() && !t.type.node() ||
+          arg.uses(Use.CTX) || arg.uses(Use.NDT)) return false;
 
       ic.addCosts(ic.data.meta.size / 10);
       iacc = Array.add(iacc, new IndexAccess(input, arg, ind, ic));

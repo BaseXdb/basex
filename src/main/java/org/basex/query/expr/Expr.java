@@ -26,22 +26,13 @@ import org.basex.util.InputInfo;
 public abstract class Expr extends ExprInfo {
   /** Flags that influence query compilation. */
   public enum Use {
-    /** Expression depends on context and cannot be rewritten in all cases.
-     * Examples: context node, non-deterministic expressions such as
-     *  math:random(). */
-    CTX,
-    /** Fragment constructors, which will create unique fragments and
-     *  thus cannot be pre-evaluated.  */
-    CNS,
-    /** Expression evaluates context position.
-     * Examples: position() and last() functions. */
-    POS,
-    /** Expression performs updates. */
-    UPD,
-    /** Expression references a variable. Example: {@link VarRef} instance. */
-    VAR,
-    /** XQuery 3.0 expression. */
-    X30,
+    /** Creates new fragments. Example: node constructor. */ CNS,
+    /** Depends on context. Example: context node. */        CTX,
+    /** Non-deterministic. Example: random(). */             NDT,
+    /** Context position. Examples: position(). */           POS,
+    /** Performs updates. Example: insert expression. */     UPD,
+    /** References a variable. Example: {@link VarRef}. */   VAR,
+    /** Based on XQuery 3.0. Example: group by statement. */ X30,
   }
 
   /**
@@ -291,7 +282,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */
-  public boolean hasFreeVars(final QueryContext ctx) {
+  boolean hasFreeVars(final QueryContext ctx) {
     final VarList global = ctx.vars.global();
     for(int i = global.size; --i >= 0;) {
       if(count(global.vars[i]) > 0) return true;

@@ -44,13 +44,6 @@ public final class DialogAbout extends Dialog {
     final BaseXLabel label = new BaseXLabel();
     label.setIcon(BaseXLayout.icon("logo"));
     label.setVerticalAlignment(SwingConstants.TOP);
-    label.setCursor(GUIConstants.CURSORHAND);
-    label.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(final MouseEvent e) {
-        Dialog.browse(gui, URL);
-      }
-    });
 
     p.add(label, BorderLayout.WEST);
 
@@ -58,7 +51,18 @@ public final class DialogAbout extends Dialog {
         new TableLayout(16, 1));
 
     pp.add(new BaseXLabel(Text.TITLE, false, true));
-    pp.add(new BaseXLabel(Text.URL));
+    final BaseXLabel url = new BaseXLabel(
+        "<html><u>" + Text.URL + "</u></html>");
+    url.setForeground(GUIConstants.BLUE);
+    url.setCursor(GUIConstants.CURSORHAND);
+    url.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(final MouseEvent e) {
+        Dialog.browse(gui, URL);
+      }
+    });
+
+    pp.add(url);
     pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(COPYRIGHT));
     pp.add(new BaseXLabel(LICENSE));
@@ -69,8 +73,9 @@ public final class DialogAbout extends Dialog {
     pp.add(new BaseXLabel(CONTRIBUTE2));
     pp.add(new BaseXLabel(CONTRIBUTE3));
     pp.add(Box.createVerticalStrut(7));
-    final String lang = main.context.mprop.get(MainProp.LANGUAGE);
-    pp.add(new BaseXLabel(TRANSLATION + DialogPrefs.creds(lang)));
+    final String lang = main.context.mprop.get(MainProp.LANG);
+    pp.add(new BaseXLabel(TRANSLATION + " (" + lang + "): " +
+        DialogPrefs.creds(lang)));
     p.add(pp, BorderLayout.EAST);
     add(p, BorderLayout.NORTH);
 

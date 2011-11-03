@@ -114,14 +114,14 @@ public final class DialogInfo extends Dialog {
         public void actionPerformed(final ActionEvent e) {
           final IO file = save(gui, true);
           if(file != null) {
-            PrintOutput out = null;
+            PrintOutput po = null;
             try {
-              out = new PrintOutput(file.path());
-              data.pthindex.plan(Serializer.get(out));
+              po = new PrintOutput(file.path());
+              data.pthindex.plan(Serializer.get(po));
             } catch(final IOException ex) {
               Dialog.error(gui, NOTSAVED);
             } finally {
-              if(out != null) try { out.close(); } catch(final Exception x) { }
+              if(po != null) try { po.close(); } catch(final IOException x) { }
             }
           }
         }

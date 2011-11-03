@@ -64,7 +64,7 @@ public final class FNMath extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     // random() is non-deterministic; don't pre-evaluate
-    return u == Use.X30 || u == Use.CTX && def == Function.RANDOM ||
+    return u == Use.X30 || u == Use.NDT && def == Function.RANDOM ||
       super.uses(u);
   }
 }

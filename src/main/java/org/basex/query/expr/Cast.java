@@ -1,14 +1,16 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
 
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.AtomType;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -36,6 +38,7 @@ public final class Cast extends Single {
     super.comp(ctx);
 
     Expr e = this;
+    final SeqType t = expr.type();
     if(expr.value()) {
       // pre-evaluate value
       e = preEval(ctx);
@@ -43,11 +46,12 @@ public final class Cast extends Single {
         type.type == AtomType.DBL || type.type == AtomType.QNM ||
         type.type == AtomType.URI) {
       // skip cast if specified and return types are equal
-      final SeqType t = expr.type();
       if(t.eq(type) || t.type == type.type && t.one() && type.zeroOrOne())
         e = expr;
       if(e != this) optPre(e, ctx);
     }
+    // adopt occurrence of argument
+    if(e == this && t.one()) type = SeqType.get(type.type, Occ.O);
     return e;
   }
 

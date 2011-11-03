@@ -146,6 +146,8 @@ public interface QueryText {
   /** Parser token. */
   String ITEMM = "item";
   /** Parser token. */
+  String JSONSTR = "json";
+  /** Parser token. */
   String LANGUAGE = "language";
   /** Parser token. */
   String LAST = "last";
@@ -447,13 +449,15 @@ public interface QueryText {
   /** HOF token. */
   byte[] HOF = token("hof");
   /** JSON token. */
-  byte[] JSON = token("json");
+  byte[] JSON = token(JSONSTR);
   /** MAP token. */
   byte[] MAP = token(MAPSTR);
   /** Package token. */
   byte[] PKG = token("pkg");
   /** SQL token. */
   byte[] SQL = token("sql");
+  /** Crypto token. */
+  byte[] CRYPTO = token("crytpo");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -485,10 +489,12 @@ public interface QueryText {
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns";
+  /** Cryptographic module URI. */
+  byte[] CRYPTOURI = token(EXPATH + "/crypto");
   /** File module URI. */
   byte[] FILEURI = token(EXPATH + "/file");
   /** HTTP Client URI. */
-  byte[] HTTPURI = token(EXPATH + "/http");
+  byte[] HTTPURI = token(EXPATH + "/http-client");
   /** Package API URI. */
   byte[] PKGURI = token(EXPATH + "/pkg");
   /** ZIP URI.*/
@@ -519,7 +525,8 @@ public interface QueryText {
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
 
   /** Static modules. */
-  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI, SQLURI);
+  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI, SQLURI,
+      CRYPTOURI);
 
   // QUERY PLAN ===============================================================
 

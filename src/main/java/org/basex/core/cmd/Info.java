@@ -46,7 +46,7 @@ public final class Info extends AInfo {
       format(tb, INFOMEM, Performance.getMem());
     }
     final Prop prop = context.prop;
-    tb.add(NL + INFOCREATE + NL);
+    tb.add(NL + INFORESOURCE + NL);
     format(tb, INFOCHOP, Util.flag(prop.is(Prop.CHOP)));
 
     tb.add(NL + INFOINDEX + NL);

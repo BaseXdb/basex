@@ -33,7 +33,7 @@ public final class DBStore extends UpdatePrimitive {
   public DBStore(final Data d, final byte[] path, final byte[] val,
       final InputInfo info) {
 
-    super(PrimitiveType.DBPUT, -1, d, info);
+    super(PrimitiveType.DBSTORE, -1, d, info);
     map.add(path, val);
   }
 

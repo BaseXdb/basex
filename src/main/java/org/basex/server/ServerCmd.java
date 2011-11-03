@@ -25,7 +25,7 @@ public enum ServerCmd {
   OPTIONS(7),
   /** Code for creating a database: {name}0{input}0. */
   CREATE(8),
-  /** Code for adding a document to a database: {name}0{path}0{input}0. */
+  /** Code for adding a document to a database: {path}0{input}0. */
   ADD(9),
   /** Code for watching an event: {name}0. */
   WATCH(10),

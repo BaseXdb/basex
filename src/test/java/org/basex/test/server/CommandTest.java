@@ -121,11 +121,11 @@ public class CommandTest {
   @Test
   public final void add() {
     // database must be opened to add files
-    no(new Add(FILE));
+    no(new Add("", FILE));
     ok(new CreateDB(NAME));
-    ok(new Add(FILE, FN));
-    ok(new Add(FILE, FN, "target"));
-    no(new Add(FILE, "/"));
+    ok(new Add(FN, FILE));
+    ok(new Add("target/" + FN, FILE));
+    ok(new Add("/", FILE));
   }
 
   /** Command test. */
@@ -238,7 +238,7 @@ public class CommandTest {
     ok(new CreateDB(NAME));
     // target need not exist
     ok(new Delete(FILE));
-    ok(new Add(FILE));
+    ok(new Add("", FILE));
     ok(new Delete(FILE));
     ok(new Delete(FILE));
   }
@@ -509,8 +509,10 @@ public class CommandTest {
     ok(new Store(NAME2, FILE));
     // file can be overwritten
     ok(new Store(NAME2, FILE));
-    // reject invalid names
-    no(new Store("", FILE));
+    // adopt name from specified file
+    ok(new Store("", FILE));
+    // reject invalid or missing names
+    no(new Store("", "</a>"));
     no(new Store("../x", FILE));
   }
 

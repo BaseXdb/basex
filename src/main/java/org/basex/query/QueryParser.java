@@ -97,13 +97,13 @@ import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
 import org.basex.query.item.SeqType.Occ;
-import org.basex.query.item.map.Map;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.query.item.Uri;
+import org.basex.query.item.Value;
+import org.basex.query.item.map.Map;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisStep;
 import org.basex.query.path.KindTest;
@@ -140,7 +140,9 @@ import org.basex.util.XMLToken;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.ft.FTUnit;
 import org.basex.util.ft.Language;
+import org.basex.util.ft.Stemmer;
 import org.basex.util.ft.StopWords;
+import org.basex.util.ft.Tokenizer;
 import org.basex.util.hash.TokenSet;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
@@ -298,7 +300,7 @@ public class QueryParser extends InputParser {
       // parse xquery version
       final String ver = string(stringLiteral());
       if(ver.equals(XQ10)) ctx.xquery3 = false;
-      else if(ver.equals(XQ11) || ver.equals(XQ30)) ctx.xquery3 = true;
+      else if(eq(ver, XQ11, XQ30)) ctx.xquery3 = true;
       else error(XQUERYVER, ver);
     }
     // parse xquery encoding (ignored, as input always comes in as string)
@@ -376,10 +378,9 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(NSPACE)) {
           namespaceDecl();
         } else if(wsConsumeWs(FTOPTION)) {
-          final FTOpt opt = new FTOpt();
-          while(ftMatchOption(opt))
-            ;
-          ctx.ftopt.init(opt);
+          final FTOpt fto = new FTOpt();
+          while(ftMatchOption(fto));
+          ctx.ftopt.init(fto);
         } else {
           qp = p;
           return;
@@ -2093,11 +2094,13 @@ public class QueryParser extends InputParser {
     ap = qp;
     ctx.ns.uri(name);
     name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
+
+    final Var[] vars = new Var[args.length];
+    final boolean part = partial(args, vars);
     final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
     if(f != null) {
       alter = null;
-      final Var[] part = new Var[args.length];
-      return partial(args, part) ? new PartFunApp(input(), f, part) : f.fun;
+      return part ? new PartFunApp(input(), f, vars) : f.fun;
     }
     qp = p;
     return null;
@@ -2273,14 +2276,15 @@ public class QueryParser extends InputParser {
    */
   private Expr dirElemContent(final QNm tag) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
+    boolean strip = true;
     do {
       final char c = curr();
       if(c == '<') {
         if(wsConsume(CDATA)) {
           tb.add(cDataSection());
-          tb.ent = true;
+          strip = false;
         } else {
-          final Str txt = text(tb);
+          final Str txt = text(tb, strip);
           return txt != null ? txt : next() == '/' ? null : constructor();
         }
       } else if(c == '{') {
@@ -2288,7 +2292,7 @@ public class QueryParser extends InputParser {
           tb.add(consume());
           consume();
         } else {
-          final Str txt = text(tb);
+          final Str txt = text(tb, strip);
           return txt != null ? txt : enclosed(NOENCLEXPR);
         }
       } else if(c == '}') {
@@ -2296,7 +2300,7 @@ public class QueryParser extends InputParser {
         check('}');
         tb.add('}');
       } else if(c != 0) {
-        entity(tb);
+        strip &= !entity(tb);
       } else {
         error(NOCLOSING, tag.atom());
       }
@@ -2306,11 +2310,12 @@ public class QueryParser extends InputParser {
   /**
    * Returns a string item.
    * @param tb token builder
+   * @param strip strip flag
    * @return text or {@code null}
    */
-  private Str text(final TokenBuilder tb) {
+  private Str text(final TokenBuilder tb, final boolean strip) {
     final byte[] t = tb.finish();
-    return t.length == 0 || !tb.ent && !ctx.spaces && ws(t) ? null : Str.get(t);
+    return t.length == 0 || strip && !ctx.spaces && ws(t) ? null : Str.get(t);
   }
 
   /**
@@ -2839,8 +2844,10 @@ public class QueryParser extends InputParser {
     while(ftMatchOption(fto)) found = true;
 
     // check if specified language is not available
-    if(!Language.supported(fto.ln, fto.is(ST) && fto.sd == null)) error(
-        Err.FTLAN, fto.ln);
+    if(fto.ln == null) fto.ln = Language.def();
+    if(!Tokenizer.supportFor(fto.ln)) error(Err.FTNOTOK, fto.ln);
+    if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln))
+      error(Err.FTNOSTEM, fto.ln);
 
     // consume weight option
     if(wsConsumeWs(WEIGHT)) expr = new FTWeight(input(), expr,
@@ -2983,7 +2990,7 @@ public class QueryParser extends InputParser {
       if(opt.ln != null) error(FTDUP, LANGUAGE);
       final byte[] lan = stringLiteral();
       opt.ln = Language.get(string(lan));
-      if(opt.ln == null) error(FTLAN, lan);
+      if(opt.ln == null) error(FTNOTOK, lan);
     } else if(wsConsumeWs(OPTION)) {
       optionDecl();
     } else {
@@ -3257,11 +3264,13 @@ public class QueryParser extends InputParser {
   /**
    * Parses and converts entities.
    * @param tb token builder
+   * @return true if an entity was found
    * @throws QueryException query exception
    */
-  private void entity(final TokenBuilder tb) throws QueryException {
+  private boolean entity(final TokenBuilder tb) throws QueryException {
     final int p = qp;
-    if(consume('&')) {
+    final boolean ent = consume('&');
+    if(ent) {
       if(consume('#')) {
         final int b = consume('x') ? 16 : 10;
         int n = 0;
@@ -3294,7 +3303,6 @@ public class QueryParser extends InputParser {
         }
         if(!consume(';')) entityError(p, INVENTITY);
       }
-      tb.ent = true;
     } else {
       final char c = consume();
       int ch = c;
@@ -3308,6 +3316,7 @@ public class QueryParser extends InputParser {
       }
       tb.add(ch);
     }
+    return ent;
   }
 
   /**

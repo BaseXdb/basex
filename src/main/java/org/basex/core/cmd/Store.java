@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.PrintOutput;
@@ -21,36 +23,47 @@ import org.basex.io.out.PrintOutput;
  */
 public final class Store extends ACreate {
   /**
-   * Default constructor.
-   * @param target target path
-   * @param input input file
+   * Constructor, specifying a target path.
+   * @param path target path
    */
-  public Store(final String target, final String input) {
-    super(DATAREF | User.WRITE, target, input);
+  public Store(final String path) {
+    this(path, null);
   }
 
   /**
-   * Default constructor.
-   * @param target target path
+   * Constructor, specifying a target path and an input.
+   * @param path target path
+   * @param input input file
    */
-  public Store(final String target) {
-    super(DATAREF | User.WRITE, target);
+  public Store(final String path, final String input) {
+    super(DATAREF | User.WRITE, path == null ? "" : path, input);
   }
 
   @Override
   protected boolean run() {
+    final boolean create = context.user.perm(User.CREATE);
+    String path = MetaData.normPath(args[0]);
+    if(path == null || path.endsWith(".")) return error(NAMEINVALID, args[0]);
+
     if(in == null) {
-      final IO file = IO.get(args[1]);
-      if(!file.exists() || file.isDir()) return error(FILEWHICH, file);
-      in = file.inputSource();
+      final IO io = IO.get(args[1]);
+      if(!io.exists() || io.isDir())
+        return error(FILEWHICH, create ? io : args[1]);
+      in = io.inputSource();
+      // set/add name of document
+      if((path.isEmpty() || path.endsWith("/")) && !(io instanceof IOContent))
+        path += io.name();
     }
 
-    final String path = MetaData.normPath(args[0]);
-    if(path == null) return error(NAMEINVALID, args[0]);
+    // ensure that the final name is not empty
+    if(path.isEmpty()) return error(NAMEINVALID, path);
 
+    // ensure that the name is not empty and contains no trailing dots
     final IOFile file = context.data().meta.binary(path);
-    if(file == null || file.isDir()) return error(NAMEINVALID, path);
+    if(path.isEmpty() || path.endsWith(".") || file == null || file.isDir())
+      return error(NAMEINVALID, create ? path : args[0]);
 
+    // add directory if it does not exist anyway
     new IOFile(file.dir()).md();
 
     PrintOutput po = null;
@@ -79,5 +92,10 @@ public final class Store extends ACreate {
       return error(DBNOTSTORED, ex.getMessage());
     }
     return info(QUERYEXEC, perf);
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init().arg(TO, 0).arg(1);
   }
 }

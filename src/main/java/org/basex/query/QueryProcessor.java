@@ -3,11 +3,9 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map.Entry;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.data.Nodes;
@@ -17,9 +15,9 @@ import org.basex.io.serial.SerializerException;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.JavaFunc;
 import org.basex.query.item.Value;
-import org.basex.query.item.map.Map;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.json.JsonMapConverter;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.
@@ -139,9 +137,9 @@ public final class QueryProcessor extends Progress {
   /**
    * Binds an object to a global variable. If the object is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type. If {@code "map"} is specified as data type,
+   * appropriate XQuery type. If {@code "json"} is specified as data type,
    * the value is interpreted according to the rules specified in
-   * {@link Map#create(String)}.
+   * {@link JsonMapConverter}.
    * @param n name of variable
    * @param o object to be bound
    * @param t data type
@@ -238,10 +236,18 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Closes the processor.
-   * @throws IOException I/O exception
+   * Returns the query string.
+   * @return query
    */
-  public void close() throws IOException {
+  public String query() {
+    return query;
+  }
+
+  /**
+   * Closes the processor.
+   * @throws QueryException query exception
+   */
+  public void close() throws QueryException {
     // reset database properties to initial value
     if(ctx.globalOpt != null) {
       for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {

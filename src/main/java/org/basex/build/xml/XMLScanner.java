@@ -489,7 +489,7 @@ final class XMLScanner extends Progress {
       return ent.finish();
     }
 
-    // scans predefined entities // [68]
+    // scans predefined entities [68]
     final byte[] name = name(false);
     if(!consume(';')) return QUESTION;
 

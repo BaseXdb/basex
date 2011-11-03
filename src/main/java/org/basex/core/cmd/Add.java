@@ -22,7 +22,10 @@ import org.basex.util.Performance;
 import org.basex.util.Util;
 
 /**
- * Evaluates the 'add' command and adds a document to a collection.
+ * Evaluates the 'add' command and adds a document to a collection.<br/>
+ * Note that the constructors of this class have changed with Version 7.0:
+ * the target path and file name have been merged and are now specified
+ * as first argument.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -32,70 +35,66 @@ public final class Add extends ACreate {
   private Builder build;
 
   /**
-   * Default constructor.
-   * @param input input file or XML string
+   * Constructor, specifying a target path.
+   * Note that the constructors of this class have changed with Version 7.0:
+   * the target path and file name have been merged and are now specified
+   * as first argument.
+   * @param path target path, optionally terminated by a new file name
    */
-  public Add(final String input) {
-    this(input, null);
+  public Add(final String path) {
+    this(path, null);
   }
 
   /**
-   * Constructor, specifying a document name.
+   * Constructor, specifying a target path and an input.
+   * Note that the constructors of this class have changed with Version 7.0:
+   * the target path and file name have been merged and are now specified
+   * as first argument.
+   * @param path target path, optionally terminated by a new file name.
+   * If {@code null}, the name of the input will be set as path.
    * @param input input file or XML string
-   * @param name name of document
    */
-  public Add(final String input, final String name) {
-    this(input, name, (String) null);
-  }
-
-  /**
-   * Constructor, specifying a document name and a target.
-   * @param input input XML file or XML string
-   * @param name name of document. If {@code null}, the name of the input
-   *   will be used
-   * @param target target. If {@code null}, target will be set to root
-   */
-  public Add(final String input, final String name, final String target) {
-    super(DATAREF | User.WRITE, name, target == null ? "" : target, input);
+  public Add(final String path, final String input) {
+    super(DATAREF | User.WRITE, path == null ? "" : path, input);
   }
 
   @Override
   protected boolean run() {
-    String name = args[0];
-    String target = MetaData.normPath(args[1]);
-    if(target == null) return error(NAMEINVALID, args[1]);
-    if(!target.isEmpty()) target += '/';
+    final boolean create = context.user.perm(User.CREATE);
+    String name = MetaData.normPath(args[0]);
+    if(name == null || name.endsWith(".")) return error(NAMEINVALID, args[0]);
 
-    Parser parser;
+    // add slash to the target if the addressed file is an archive or directory
+    IO io = null;
     if(in == null) {
-      final String input = args[2];
-      final IO io = IO.get(input);
-      if(!io.exists()) return error(FILEWHICH, io);
-
-      if(name != null && !name.isEmpty()) {
-        // set specified document name
-        io.name(name);
-      } else if(io instanceof IOContent) {
-        // if no name exists, set database name as document name
-        name = context.data().meta.name + IO.XMLSUFFIX;
-        io.name(name);
-      }
-      parser = new DirParser(io, target, prop);
-    } else {
-      final SAXSource sax = new SAXSource(in);
-      parser = new SAXWrapper(sax, name, target, context.prop);
+      io = IO.get(args[1]);
+      if(!io.exists()) return error(FILEWHICH, create ? io : args[1]);
+      if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
     }
 
-    final String input = name == null ? parser.src.path() : name;
-    final String nm = name == null ? parser.src.name() : name;
-    // ensure that the name contains no slashes and trailing dots
-    if(nm.isEmpty() || nm.endsWith(".") || nm.indexOf('/') != -1)
-      return error(NAMEINVALID, nm);
+    String target = "";
+    final int s = name.lastIndexOf('/');
+    if(s != -1) {
+      target = name.substring(0, s);
+      name = name.substring(s + 1);
+    }
 
-    final String path = target + (target.isEmpty() ? "/" : "") + nm;
+    Parser parser;
+    if(io != null) {
+      // set name of document
+      if(!name.isEmpty()) io.name(name);
+      // get name from io reference
+      else if(!(io instanceof IOContent)) name = io.name();
+      parser = new DirParser(io, target, prop);
+    } else {
+      parser = new SAXWrapper(new SAXSource(in), name, target, context.prop);
+    }
+
+    // ensure that the final name is not empty
+    if(name.isEmpty()) return error(NAMEINVALID, name);
 
     // create disk instances for large documents
-    // test does not work for input streams and directories
+    // (does not work for input streams and directories)
     final long fl = parser.src.length();
     boolean large = false;
     final Runtime rt = Runtime.getRuntime();
@@ -104,9 +103,10 @@ public final class Add extends ACreate {
       large = fl > rt.freeMemory() / 3;
     }
 
-    // create random database name
+    // create random database name for disk-based creation
     final Data data = context.data();
-    final String dbname = large ? context.mprop.random(data.meta.name) : path;
+    final String dbname = large ? context.mprop.random(data.meta.name) : name;
+
     build = large ? new DiskBuilder(dbname, parser, context) :
       new MemBuilder(dbname, parser, context.prop);
 
@@ -114,12 +114,13 @@ public final class Add extends ACreate {
     try {
       tmp = build.build();
       // ignore empty fragments
+      // [CG] check if fragments can be empty at all
       if(tmp.meta.size > 1) {
         data.insert(data.meta.size, -1, tmp);
         context.update();
         data.flush();
       }
-      return info(parser.info() + PATHADDED, input, perf);
+      return info(parser.info() + PATHADDED, name, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(Util.message(ex));
@@ -133,7 +134,7 @@ public final class Add extends ACreate {
 
   @Override
   public void build(final CommandBuilder cb) {
-    cb.init().arg(AS, 0).arg(TO, 1).arg(2);
+    cb.init().arg(TO, 0).arg(1);
   }
 
   @Override

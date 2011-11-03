@@ -1,11 +1,12 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.Language.*;
+
 import java.lang.reflect.Method;
-import java.util.EnumMap;
-import java.util.EnumSet;
+import java.util.Collection;
+import java.util.HashMap;
 import org.basex.util.Reflect;
+import org.basex.util.Util;
 
 /**
  * Stemmer implementation using the Snowball stemmer.
@@ -17,10 +18,10 @@ import org.basex.util.Reflect;
  */
 final class SnowballStemmer extends Stemmer {
   /** Name of the package with all Snowball stemmers. */
-  private static final String PKG = "org.tartarus.snowball";
+  private static final String PATTERN = "org.tartarus.snowball.ext.%Stemmer";
   /** Stemmer classes which the Snowball library provides. */
-  private static final EnumMap<Language, StemmerClass> CLASSES =
-      new EnumMap<Language, StemmerClass>(Language.class);
+  private static final HashMap<Language, StemmerClass> CLASSES =
+      new HashMap<Language, StemmerClass>();
 
   /** Stemmer class corresponding to the required properties. */
   private StemmerClass clazz;
@@ -28,23 +29,20 @@ final class SnowballStemmer extends Stemmer {
   private Object stemmer;
 
   static {
-    if(Reflect.available(PKG)) {
-      add(DA); add(DE); add(EN); add(ES); add(FI); add(FR); add(HU); add(IT);
-      add(NL); add(NO); add(PT); add(RO); add(RU); add(SV); add(TR);
+    if(Reflect.available(PATTERN, "German")) {
+      for(final Language l : Language.ALL.values()) {
+        final Class<?> clz = Reflect.find(PATTERN, l);
+        if(clz == null) continue;
+        final Method m1 = Reflect.method(clz, "setCurrent", String.class);
+        final Method m2 = Reflect.method(clz, "stem");
+        final Method m3 = Reflect.method(clz, "getCurrent");
+        if(m1 == null || m2 == null || m3 == null) {
+          Util.errln("Could not initialize \"%\" Snowball stemmer.", l);
+        } else {
+          CLASSES.put(l, new StemmerClass(clz, m1, m2, m3));
+        }
+      }
     }
-  }
-
-  /**
-   * Check if a stemmer class is available, and add it the the list of stemmers.
-   * @param lang language
-   */
-  private static void add(final Language lang) {
-    final Class<?> clz = Reflect.find(
-        PKG + ".ext." + lang.toString().toLowerCase() + "Stemmer");
-    CLASSES.put(lang, new StemmerClass(clz,
-        Reflect.method(clz, "setCurrent", String.class),
-        Reflect.method(clz, "stem"),
-        Reflect.method(clz, "getCurrent")));
   }
 
   /**
@@ -83,17 +81,17 @@ final class SnowballStemmer extends Stemmer {
   }
 
   @Override
-  int prec() {
-    return 100;
+  protected byte prec() {
+    return 2;
   }
 
   @Override
-  EnumSet<Language> languages() {
-    return EnumSet.copyOf(CLASSES.keySet());
+  Collection<Language> languages() {
+    return CLASSES.keySet();
   }
 
   @Override
-  byte[] stem(final byte[] word) {
+  protected byte[] stem(final byte[] word) {
     Reflect.invoke(clazz.setCurrent, stemmer, string(word));
     Reflect.invoke(clazz.stem, stemmer);
     return token((String) Reflect.invoke(clazz.getCurrent, stemmer));

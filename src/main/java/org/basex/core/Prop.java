@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.io.File;
+
 import org.basex.util.Util;
 
 /**
@@ -15,7 +17,7 @@ public final class Prop extends AProp {
   /** Project name. */
   public static final String NAME = "BaseX";
   /** Code version (may contain major, minor and optional patch number). */
-  public static final String VERSION = "6.8 beta";
+  public static final String VERSION = "7.0.2 beta";
 
   /** New line string. */
   public static final String NL = System.getProperty("line.separator");
@@ -23,8 +25,7 @@ public final class Prop extends AProp {
   public static final String ENCODING = System.getProperty("file.encoding");
 
   /** System's temporary directory. */
-  public static final String TMP =
-    (System.getProperty("java.io.tmpdir") + "/").replaceAll("[\\\\/]+", "/");
+  public static final String TMP = System.getProperty("java.io.tmpdir") + '/';
 
   /** OS flag (should be ignored whenever possible). */
   public static final String OS = System.getProperty("os.name").toUpperCase();
@@ -33,8 +34,11 @@ public final class Prop extends AProp {
   /** Flag denoting if OS belongs to Windows family. */
   public static final boolean WIN = OS.startsWith("WIN");
 
+  /** User home directory. */
+  public static final String USERHOME =
+      System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = Util.homeDir() + '/';
+  public static final String HOME = Util.homeDir();
 
   /** Property information. */
   static final String PROPHEADER = "# Property File." + Prop.NL
@@ -81,7 +85,7 @@ public final class Prop extends AProp {
   public static final Object[] XQUERY3 = { "XQUERY3", true };
 
   /** Use internal XML parser. */
-  public static final Object[] INTPARSE = { "INTPARSE", false };
+  public static final Object[] INTPARSE = { "INTPARSE", true };
   /** Flag for parsing DTDs in internal parser. */
   public static final Object[] DTD = { "DTD", false };
   /** Path to XML Catalog file. */
@@ -126,7 +130,7 @@ public final class Prop extends AProp {
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
-  public static final Object[] LANGUAGE = { "LANGUAGE", "EN" };
+  public static final Object[] LANGUAGE = { "LANGUAGE", "en" };
   /** Flag for full-text scoring algorithm.
       Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };
@@ -136,7 +140,7 @@ public final class Prop extends AProp {
   public static final Object[] LSERROR = { "LSERROR", 0 };
 
   /** Maximum number of index occurrences to print. */
-  public static final Object[] MAXSTAT = { "MAXSTAT", 15 };
+  public static final Object[] MAXSTAT = { "MAXSTAT", 30 };
   /** Flag for tail-call optimization. */
   public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
 

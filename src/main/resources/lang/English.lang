@@ -1,5 +1,5 @@
 # LANGUAGE FILE, TRANSLATED BY
-# Project Team
+# BaseX Team
 #
 # The '%' character serves as placeholder for texts to be inserted
 
@@ -183,7 +183,7 @@ dz_help=If memory is low, please launch\nBaseX with the Java flag -Xmx<size>
 
 da_title=About %
 da_license=BSD License
-da_dev=Main Developer
+da_dev=Chief Architect
 da_cont1=Team
 da_cont2=and others
 da_translation=Translation
@@ -280,6 +280,8 @@ c_showhelp=Help
 c_showhelptt=Show the help view. which provides information on the currently focused component.
 c_community=Community
 c_communitytt=Show the community web page.
+c_doc=Documentation
+c_doctt=Show the documentation web page.
 c_updates=Check for Updates
 c_updatestt=Show the update web page.
 c_showfolder=Folder
@@ -360,7 +362,8 @@ pc_pathnf=File or directory not found.
 pc_skipped=Skipped
 pc_skipinfo=% more file(s) skipped
 pc_dbnf=Please enter a database name.
-pc_langnf=Language '%' not supported.
+pc_notok=No tokenizer available for language "%".
+pc_nostem=No stemmer available for language "%".
 pc_err="%" could not be parsed.
 pc_pos="%" (Line %)
 pc_direrr="%" points to a directory.
@@ -404,7 +407,7 @@ srv_denied=Access denied.
 srv_connect=Can't communicate with the server.
 srv_timeout=Timeout exceeded.
 srv_bind=Server is running or permission was denied.
-srv_ports=Same server and event port specified.
+srv_ports=Port '%' was specified twice.
 srv_unknown=Unknown host '%'.
 srv_start=Server was started.
 srv_stop=Server was stopped.
@@ -487,7 +490,7 @@ info_docsize=Input Size
 info_dbsize=Size
 info_type=Type
 info_path=Input Path
-info_time=Time Stamp
+info_time=Timestamp
 info_mem=Used Main Memory
 info_nodes=Nodes
 info_encoding=Encoding
@@ -509,7 +512,7 @@ info_ftindex=Full-Text Index
 info_wcindex=wildcards
 info_outofdate=out-of-date
 info_db=Database Properties
-info_create=Database Creation
+info_resource=Resource Properties
 info_general=General Information
 info_resultchop=chopped
 info_on=ON
@@ -532,7 +535,7 @@ ch_check2=Opens an existing database or creates a new instance.
 ch_copy1=Copy database.
 ch_copy2=Copies a database.
 ch_add1=Add document to database.
-ch_add2=Adds [%] as [%] to the database, using an optional\n[%] path.
+ch_add2=Adds [%] as [%] to the database.
 ch_delete1=Delete documents from database.
 ch_delete2=Deletes documents from the currently opened database.
 ch_open1=Open database.

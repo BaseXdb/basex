@@ -390,7 +390,7 @@ public final class FNUtil extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && (
+    return u == Use.NDT && (
       def == Function.EVAL || def == Function.RUN || def == Function.MB ||
       def == Function.MS || def == Function.UUID) ||
       super.uses(u);

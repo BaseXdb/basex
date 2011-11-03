@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.regex.Pattern;
 
 import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
@@ -55,8 +56,14 @@ public final class IOUrl extends IO {
 
   @Override
   public IO merge(final String f) {
-    return this;
+    return IO.get((path.endsWith("/") ? path :
+      path.replace("^(.*/).*", "$1")) + f);
   }
+
+  /** Pattern for duplicate slashes. */
+  private static final Pattern DUPLSLASH = Pattern.compile("//+");
+  /** Pattern for leading slash in Windows paths. */
+  private static final Pattern LEADSLASH = Pattern.compile("^/([A-Za-z]:)");
 
   /**
    * Creates a file path from the specified URL.
@@ -68,8 +75,10 @@ public final class IOUrl extends IO {
     try {
       if(file.indexOf("%") != -1) file = URLDecoder.decode(file, Prop.ENCODING);
     } catch(final Exception ex) { /* ignored. */ }
-    // remove file scheme, duplicate slashes and leading slash in Windows paths
-    return file.replaceAll("^" + FILEPREF, "").replaceAll("//+", "/").
-        replaceFirst("^/(\\w:)", "$1");
+    // remove file scheme
+    if(file.startsWith(FILEPREF)) file = file.substring(FILEPREF.length());
+    // remove duplicate slashes and leading slash in Windows paths
+    if(file.contains("//")) file = DUPLSLASH.matcher(file).replaceAll("/");
+    return LEADSLASH.matcher(file).replaceFirst("$1");
   }
 }

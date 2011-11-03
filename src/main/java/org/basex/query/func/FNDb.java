@@ -31,6 +31,9 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
+import org.basex.query.item.FAttr;
+import org.basex.query.item.FElem;
+import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
@@ -44,15 +47,14 @@ import org.basex.query.path.NameTest;
 import org.basex.query.up.primitives.DBAdd;
 import org.basex.query.up.primitives.DBDelete;
 import org.basex.query.up.primitives.DBOptimize;
-import org.basex.query.up.primitives.DBStore;
 import org.basex.query.up.primitives.DBRename;
+import org.basex.query.up.primitives.DBStore;
 import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -63,6 +65,21 @@ import org.basex.util.list.TokenList;
  * @author Dimitar Popov
  */
 public final class FNDb extends FuncCall {
+  /** Resource element name. */
+  private static final QNm RESOURCE = new QNm(token("resource"));
+  /** Path element name. */
+  private static final QNm PATH = new QNm(token("path"));
+  /** Raw element name. */
+  private static final QNm RAW = new QNm(token("raw"));
+  /** Size element name. */
+  private static final QNm SIZE = new QNm(token("size"));
+  /** Content type element name. */
+  private static final QNm CTYPE = new QNm(token("content-type"));
+  /** Modified date element name. */
+  private static final QNm MDATE = new QNm(token("modified-date"));
+  /** MIME type application/xml. */
+  private static final byte[] APP_XML = token(MimeTypes.APP_XML);
+
   /**
    * Constructor.
    * @param ii input info
@@ -116,6 +133,7 @@ public final class FNDb extends FuncCall {
       case DBEXISTS:   return exists(ctx);
       case DBISXML:    return isXML(ctx);
       case DBCTYPE:    return contentType(ctx);
+      case DBDETAILS:  return details(ctx);
       default:         return super.item(ctx, ii);
     }
   }
@@ -127,16 +145,9 @@ public final class FNDb extends FuncCall {
    * @throws QueryException query exception
    */
   private Value open(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkStr(expr[0], ctx);
-    // deprecated solution; slash will later be disallowed
-    final int s = indexOf(str, '/');
-    final byte[] db = s == -1 ? str : substring(str, 0, s);
-    byte[] path = s == -1 ? EMPTY : substring(str, s + 1);
-    if(expr.length == 2) path = checkStr(expr[1], ctx);
-
-    if(!MetaData.validName(string(db), false)) INVDB.thrw(input, db);
-    final Data data = ctx.resource.data(db, input);
-    return DBNodeSeq.get(data.docs(string(path)), data, true, s == -1);
+    final Data data = data(0, ctx);
+    final String path = expr.length < 2 ? "" : path(1, ctx);
+    return DBNodeSeq.get(data.docs(path), data, true, path.isEmpty());
   }
 
   /**
@@ -304,8 +315,49 @@ public final class FNDb extends FuncCall {
     final String path = path(1, ctx);
     if(data.doc(path) != -1) return Str.get(MimeTypes.APP_XML);
     final IOFile io = data.meta.binary(path);
-    if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
-    throw RESFNF.thrw(input, path);
+    if(!io.exists() || io.isDir()) RESFNF.thrw(input, path);
+    return Str.get(MimeTypes.get(path));
+  }
+
+  /**
+   * Performs the details function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Item details(final QueryContext ctx) throws QueryException {
+    final Data d = data(0, ctx);
+    final String path = path(1, ctx);
+
+    // xml resource
+    final int pre = d.doc(path);
+    if(pre != -1)
+      return resource(token(path), false, 0, APP_XML, d.meta.time);
+
+    // binary resource
+    final IOFile io = d.meta.binary(path);
+    if(!io.exists() || io.isDir()) RESFNF.thrw(input, path);
+    return resource(token(path), true, io.length(),
+        token(MimeTypes.get(path)), io.date());
+  }
+
+  /**
+   * Create a <code>&lt;resource/&gt;</code> node.
+   * @param path path
+   * @param raw is the resource a raw file
+   * @param size size
+   * @param ctype content type
+   * @param mdate modified date
+   * @return <code>&lt;resource/&gt;</code> node
+   */
+  private static FNode resource(final byte[] path, final boolean raw,
+      final long size, final byte[] ctype, final long mdate) {
+    final FNode res = new FElem(RESOURCE).
+        add(new FAttr(PATH, path)).
+        add(new FAttr(RAW, token(raw))).
+        add(new FAttr(CTYPE, ctype)).
+        add(new FAttr(MDATE, token(mdate)));
+    return raw ? res.add(new FAttr(SIZE, token(size))) : res;
   }
 
   /**
@@ -348,18 +400,10 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String name = expr.length < 3 ? null : name(checkStr(expr[2], ctx));
-    final String path = expr.length < 4 ? null : path(3, ctx);
+    final Item it = checkItem(expr[1], ctx);
+    final String path = expr.length < 3 ? "" : path(2, ctx);
 
-    // get all items representing document(s):
-    final ObjList<Item> docs = new ObjList<Item>(
-        (int) Math.max(expr[1].size(), 1));
-    final Iter iter = ctx.iter(expr[1]);
-    for(Item i; (i = iter.next()) != null;) docs.add(i);
-
-    if(docs.size() > 0) ctx.updates.add(
-        new DBAdd(data, input, docs, name, path, ctx.context), ctx);
-
+    ctx.updates.add(new DBAdd(data, input, it, path, ctx.context), ctx);
     return null;
   }
 
@@ -373,31 +417,24 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String trg = path(1, ctx);
+    final String path = path(1, ctx);
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final int pre = data.doc(trg);
+    final int pre = data.doc(path);
     if(pre != -1) {
-      if(data.docs(trg).size() != 1) DOCTRGMULT.thrw(input);
+      if(data.docs(path).size() != 1) DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
     // delete raw resources
-    final TokenList raw = Delete.files(data, trg);
+    final TokenList raw = Delete.files(data, path);
     ctx.updates.add(new DBDelete(data, raw, input), ctx);
+    ctx.updates.add(new DBAdd(data, input, doc, path, ctx.context), ctx);
 
-    final int p = trg.lastIndexOf('/');
-    final String name = p < 0 ? trg : trg.substring(p + 1);
-    final String path = p < 0 ? null : trg.substring(0, p);
-
-    final ObjList<Item> docs = new ObjList<Item>(1);
-    docs.add(doc);
-    ctx.updates.add(new DBAdd(data, input, docs, name, path, ctx.context), ctx);
-
-    final IOFile file = data.meta.binary(trg);
+    final IOFile file = data.meta.binary(path);
     if(file != null && file.exists() && !file.isDir()) {
       final byte[] val = checkBin(doc, ctx);
-      ctx.updates.add(new DBStore(data, token(trg), val, input), ctx);
+      ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
     }
     return null;
   }
@@ -563,6 +600,7 @@ public final class FNDb extends FuncCall {
       def == Function.DBRENAME || def == Function.DBREPLACE ||
       def == Function.DBOPTIMIZE || def == Function.DBSTORE;
     return
+      // skip evaluation at compile time
       u == Use.CTX && (
         def == Function.DBTEXT || def == Function.DBATTR ||
         def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||
@@ -579,41 +617,28 @@ public final class FNDb extends FuncCall {
 
   /**
    * Returns the data instance for the specified argument.
-   * @param arg argument
+   * @param i index of argument
    * @param ctx query context
    * @return data instance
    * @throws QueryException query exception
    */
-  private Data data(final int arg, final QueryContext ctx)
+  private Data data(final int i, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmpty(expr[arg].item(ctx, input));
+    final Item it = checkEmpty(expr[i].item(ctx, input));
     if(it.node()) return checkDBNode(it).data;
     if(it.str())  {
-      final byte[] name = it.atom(input);
-      if(!MetaData.validName(string(name), false)) INVDB.thrw(input, name);
+      final String name = string(it.atom(input));
+      if(!MetaData.validName(name, false)) INVDB.thrw(input, name);
       return ctx.resource.data(name, input);
     }
     throw STRNODTYPE.thrw(input, this, it.type);
   }
 
   /**
-   * Normalizes and checks the specified file name.
-   * @param name input name
-   * @return normalized path
-   * @throws QueryException query exception
-   */
-  private String name(final byte[] name) throws QueryException {
-    // check if path is valid
-    final String nm = string(name);
-    if(nm.endsWith(".") || nm.indexOf('/') != -1) RESINV.thrw(input, name);
-    return nm;
-  }
-
-  /**
    * Returns the specified expression as normalized database path.
    * Throws an exception if the path is invalid.
-   * @param i expression index
+   * @param i index of argument
    * @param ctx query context
    * @return normalized path
    * @throws QueryException query exception

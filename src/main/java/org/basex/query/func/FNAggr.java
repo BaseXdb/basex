@@ -61,7 +61,7 @@ public final class FNAggr extends FuncCall {
   public Expr cmp(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
     final long c = e.size();
-    if(c < 0 || e.uses(Use.CTX)) return this;
+    if(c < 0 || e.uses(Use.NDT)) return this;
 
     switch(def) {
       case COUNT:

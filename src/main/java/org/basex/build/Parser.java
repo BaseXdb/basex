@@ -1,9 +1,6 @@
 package org.basex.build;
 
 import java.io.IOException;
-
-import javax.xml.transform.sax.SAXSource;
-
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
 import org.basex.build.file.MAB2Parser;
@@ -108,8 +105,7 @@ public abstract class Parser extends Progress {
     // XML: use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(source, target, prop);
     // use default parser
-    final SAXSource s = new SAXSource(source.inputSource());
-    return new SAXWrapper(s, source.name(), target, prop);
+    return new SAXWrapper(source, target, prop);
   }
 
   /**

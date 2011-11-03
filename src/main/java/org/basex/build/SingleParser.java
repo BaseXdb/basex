@@ -17,10 +17,10 @@ public abstract class SingleParser extends TargetParser {
   /**
    * Constructor.
    * @param source document source
-   * @param target target path
+   * @param path target path
    */
-  public SingleParser(final IO source, final String target) {
-    super(source, target);
+  public SingleParser(final IO source, final String path) {
+    super(source, path);
   }
 
   @Override

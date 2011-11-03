@@ -11,7 +11,7 @@ import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 
 /**
- * Evaluates the 'delete' command and deletes documents from a collection.
+ * Evaluates the 'delete' command and deletes resources from a database.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -29,7 +29,6 @@ public final class Delete extends ACreate {
   protected boolean run() {
     final Data data = context.data();
     final String target = args[0];
-    if(target.endsWith(".")) return error(NAMEINVALID, target);
 
     // delete documents
     final IntList docs = data.docs(target);

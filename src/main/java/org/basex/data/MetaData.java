@@ -35,18 +35,19 @@ public final class MetaData {
   /** Database users. */
   public Users users;
 
-  /** Encoding of XML document. */
+  /** Encoding of original document. */
   public String encoding = UTF8;
-  /** Path to original input. */
+  /** Path to original document. */
   public String original = "";
-  /** Size of original documents. */
+  /** Size of original document. */
   public long filesize;
-  /** Number of XML documents. */
+  /** Number of stored documents. */
   public int ndocs;
-  /** Database timestamp. */
+  /** Timestamp of original document. */
   public long time;
   /** Flag for whitespace chopping. */
   public boolean chop;
+
   /** Flag for activated text index. */
   public boolean textindex;
   /** Flag for activated attribute value index. */
@@ -122,7 +123,7 @@ public final class MetaData {
     diacritics = prop.is(Prop.DIACRITICS);
     casesens = prop.is(Prop.CASESENS);
     scoring = prop.num(Prop.SCORING);
-    language = Language.get(prop.get(Prop.LANGUAGE));
+    language = Language.get(prop);
     users = new Users(false);
   }
 
@@ -177,8 +178,8 @@ public final class MetaData {
 
   /**
    * Normalizes a database path. Converts backslashes and
-   * removes duplicate, leading and trailing slashes.
-   * Returns {@code null} if the path is invalid.
+   * removes duplicate and leading slashes.
+   * Returns {@code null} if the path contains invalid characters.
    * @param path input path
    * @return normalized path, or {@code null}
    */
@@ -188,13 +189,11 @@ public final class MetaData {
     for(int p = 0; p < path.length(); p++) {
       final char c = path.charAt(p);
       if(c == '\\' || c == '/') {
-        if(!slash && p != 0) slash = true;
+        if(!slash && p != 0) sb.append('/');
+        slash = true;
       } else {
         if(Prop.WIN && ":*?\"<>\\|".indexOf(c) != -1) return null;
-        if(slash) {
-          sb.append('/');
-          slash = false;
-        }
+        if(slash) slash = false;
         sb.append(c);
       }
     }
@@ -202,24 +201,40 @@ public final class MetaData {
   }
 
   /**
-   * Checks if the specified database name is valid; allows only letters,
-   * digits, the underscore, and dash.
+   * Checks if the specified database name is valid, matching the pattern
+   * {@code [-\w]+}, or {@code [-\w*?,]+} if the glob flag is activated.
    * @param name name to be checked
    * @param glob allow glob syntax
    * @return result of check
    */
   public static boolean validName(final String name, final boolean glob) {
-    return name != null && name.matches(glob ? "[-\\w*?,]+" : "[-\\w]+");
+    if(name == null) return false;
+    // faster than a regular expression..
+    final int nl = name.length();
+    for(int n = 0; n < nl; n++) {
+      final char ch = name.charAt(n);
+      if((!glob || ch != '?' && ch != '*' && ch != ',') &&
+          !letterOrDigit(ch) && ch != '-') return false;
+    }
+    return nl != 0;
   }
 
   // PUBLIC METHODS ===========================================================
 
   /**
-   * Returns the size of the database.
+   * Returns the disk size of the database.
    * @return database size
    */
   public long dbsize() {
     return path != null ? dbsize(new IOFile(path)) : 0;
+  }
+
+  /**
+   * Returns the disk timestamp of the database.
+   * @return database size
+   */
+  public long dbtime() {
+    return path != null ? new IOFile(path).date() : 0;
   }
 
   /**
@@ -292,9 +307,9 @@ public final class MetaData {
       } else {
         final String v = string(in.readToken());
         if(k.equals(DBSTR))         storage    = v;
+        else if(k.equals(IDBSTR))   istorage   = v;
         else if(k.equals(DBFNAME))  original   = v;
         else if(k.equals(DBTIME))   time       = toLong(v);
-        else if(k.equals(IDBSTR))   istorage   = v;
         else if(k.equals(DBSIZE))   size       = toInt(v);
         else if(k.equals(DBFSIZE))  filesize   = toLong(v);
         else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
@@ -352,8 +367,8 @@ public final class MetaData {
     writeInfo(out, DBSCTYPE, scoring);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
-    if(language != null) writeInfo(out, DBFTLN, language.name());
-    out.writeString(DBPERM);
+    if(language != null) writeInfo(out, DBFTLN, language.toString());
+    out.writeToken(token(DBPERM));
     users.write(out);
     out.write(0);
   }
@@ -416,8 +431,8 @@ public final class MetaData {
    */
   private void writeInfo(final DataOutput out, final String k,
       final String v) throws IOException {
-    out.writeString(k);
-    out.writeString(v);
+    out.writeToken(token(k));
+    out.writeToken(token(v));
   }
 
   /**
