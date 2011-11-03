@@ -125,7 +125,7 @@ final class FormatterEN extends Formatter {
       if(r == 0) {
         tb.add((ord != null ? ORDINALS10 : WORDS10)[(int) n / 10]);
       } else {
-        tb.add(WORDS10[(int) n / 10]).add('-');
+        tb.add(WORDS10[(int) n / 10]).add(' ');
         tb.add((ord != null ? ORDINALS : WORDS)[r]);
       }
     } else {
