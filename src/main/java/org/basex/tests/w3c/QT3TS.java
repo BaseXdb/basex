@@ -24,6 +24,7 @@ import org.basex.tests.w3c.qt3api.XQValue;
 import org.basex.tests.w3c.qt3api.XQuery;
 import org.basex.util.Args;
 import org.basex.util.Performance;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ObjList;
@@ -565,6 +566,13 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertStringValue(final XQValue value, final XQValue expect) {
+    String exp = expect.getString();
+    // normalize space
+    final XQuery qspace = new XQuery("@normalize-space = 'true'", ctx);
+    if(qspace.context(expect).next().getBoolean())
+      exp = Token.string(Token.norm(Token.token(exp)));
+    qspace.close();
+
     /*final XQuery qu =
         new XQuery("serialize(for $i in $result return string($i))", ctx);
     final String res = qu.bind("result", value).next().getString();
@@ -578,7 +586,6 @@ public final class QT3TS {
       res.add(it.getString());
       c++;
     }
-    final String exp = expect.getString();
     return exp.equals(res.toString()) ? null : exp;
   }
 
