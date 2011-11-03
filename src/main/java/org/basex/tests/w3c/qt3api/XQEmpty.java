@@ -56,6 +56,6 @@ public final class XQEmpty extends XQValue {
 
   @Override
   public String toString() {
-    return "";
+    return "()";
   }
 }

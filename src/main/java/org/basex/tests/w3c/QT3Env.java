@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.basex.core.Context;
 import org.basex.tests.w3c.qt3api.XQItem;
+import org.basex.tests.w3c.qt3api.XQValue;
 import org.basex.tests.w3c.qt3api.XQuery;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
@@ -47,7 +48,7 @@ class QT3Env {
    * @param ctx database context
    * @param env environment item
    */
-  QT3Env(final Context ctx, final XQItem env) {
+  QT3Env(final Context ctx, final XQValue env) {
     name = XQuery.string("@" + NNAME, env, ctx);
     sources = list(ctx, env, SOURCE);
     params = list(ctx, env, PARAM);
@@ -75,16 +76,16 @@ class QT3Env {
   /**
    * Returns a list of all attributes of the specified element in a map.
    * @param ctx database context
-   * @param itenv root element
+   * @param env root element
    * @param elem element to be parsed
    * @return map list
    */
-  ObjList<HashMap<String, String>> list(final Context ctx, final XQItem itenv,
+  ObjList<HashMap<String, String>> list(final Context ctx, final XQValue env,
       final String elem) {
 
     final ObjList<HashMap<String, String>> list =
         new ObjList<HashMap<String, String>>();
-    final XQuery query = new XQuery("*:" + elem, ctx).context(itenv);
+    final XQuery query = new XQuery("*:" + elem, ctx).context(env);
     for(final XQItem it : query) list.add(map(ctx, it));
     query.close();
     return list;
@@ -93,12 +94,12 @@ class QT3Env {
   /**
    * Returns all attributes of the specified element in a map.
    * @param ctx database context
-   * @param itenv root element
+   * @param env root element
    * @return map
    */
-  HashMap<String, String> map(final Context ctx, final XQItem itenv) {
+  HashMap<String, String> map(final Context ctx, final XQValue env) {
     final HashMap<String, String> map = new HashMap<String, String>();
-    final XQuery query = new XQuery("@*", ctx).context(itenv);
+    final XQuery query = new XQuery("@*", ctx).context(env);
     for(final XQItem it : query) map.put(it.getName(), it.getString());
     query.close();
     return map;
@@ -108,12 +109,12 @@ class QT3Env {
    * Returns a single attribute string.
    * @param elem name of element
    * @param ctx database context
-   * @param itenv root element
+   * @param env root element
    * @return map
    */
-  String string(final String elem, final Context ctx, final XQItem itenv) {
+  String string(final String elem, final Context ctx, final XQValue env) {
     String value = null;
-    final XQuery query = new XQuery("*:" + elem, ctx).context(itenv);
+    final XQuery query = new XQuery("*:" + elem, ctx).context(env);
     final XQItem it = query.next();
     if(it != null) {
       final XQuery qattr = new XQuery("string(@*)", ctx).context(it);

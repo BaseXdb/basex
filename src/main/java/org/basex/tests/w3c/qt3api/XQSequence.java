@@ -60,8 +60,11 @@ final class XQSequence extends XQValue {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final XQItem it : this) sb.append(it.toString());
-    return sb.toString();
+    final StringBuilder sb = new StringBuilder("(");
+    for(final XQItem it : this) {
+      if(sb.length() != 1) sb.append(',');
+      sb.append(it.toString());
+    }
+    return sb.append(")").toString();
   }
 }

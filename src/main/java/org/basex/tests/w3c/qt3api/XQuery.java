@@ -44,6 +44,23 @@ public final class XQuery implements Iterable<XQItem> {
   }
 
   /**
+   * Binds a variable.
+   * @param key key
+   * @param value value to be bound
+   * @return self reference
+   * @throws XQException exception
+   */
+  public XQuery bind(final String key, final Object value) {
+    try {
+      qp.bind(key, value instanceof XQValue ?
+          ((XQValue) value).internal() : value);
+    } catch(final QueryException ex) {
+      throw new XQException(ex);
+    }
+    return this;
+  }
+
+  /**
    * Adds a collection.
    * @param name name of the collection
    * @param paths document paths
@@ -83,25 +100,8 @@ public final class XQuery implements Iterable<XQItem> {
   }
 
   /**
-   * Binds a variable.
-   * @param key key
-   * @param value value to be bound
-   * @return self reference
-   * @throws XQException exception
-   */
-  public XQuery bind(final String key, final Object value) {
-    try {
-      qp.bind(key, value instanceof XQValue ?
-          ((XQValue) value).internal() : value);
-    } catch(final QueryException ex) {
-      throw new XQException(ex);
-    }
-    return this;
-  }
-
-  /**
-   * Returns the next result item.
-   * @return next item
+   * Returns the next item, or {@code null} if all items have been returned.
+   * @return next result item
    * @throws XQException exception
    */
   public XQItem next() {
@@ -182,5 +182,10 @@ public final class XQuery implements Iterable<XQItem> {
     } finally {
       qp.close();
     }
+  }
+
+  @Override
+  public String toString() {
+    return qp.query();
   }
 }

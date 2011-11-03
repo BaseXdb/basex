@@ -23,6 +23,14 @@ public final class XQException extends RuntimeException {
     return (QueryException) getCause();
   }
 
+  /**
+   * Returns the error code.
+   * @return error code
+   */
+  public String getCode() {
+    return getException().code();
+  }
+
   @Override
   public String getLocalizedMessage() {
     return getCause().getLocalizedMessage();

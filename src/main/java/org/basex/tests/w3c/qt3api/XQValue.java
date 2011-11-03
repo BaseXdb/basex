@@ -89,8 +89,8 @@ public abstract class XQValue implements Iterable<XQItem> {
   }
 
   /**
-   * Returns the item type.
-   * @return node name
+   * Returns the value type.
+   * @return value type
    */
   public abstract SeqType getType();
 
