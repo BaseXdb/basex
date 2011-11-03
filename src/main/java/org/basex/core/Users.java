@@ -91,7 +91,7 @@ public final class Users {
   public synchronized boolean create(final String usern, final String pass) {
     // check if user exists already
     return get(usern) == null &&
-      create(new User(usern, token(pass), User.WRITE));
+        create(new User(usern, token(pass), User.NONE));
   }
 
   /**
