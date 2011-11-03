@@ -277,6 +277,11 @@ public final class Util {
    * @return application path
    */
   public static String homeDir() {
+    
+    // check whether the homeDir has been explicitely set
+    final String userSetHome = System.getProperty("basexdb.home");
+    if (userSetHome != null) return userSetHome;
+    
     // check working directory for property file
     final String work = System.getProperty("user.dir");
     final File wconf = new File(work, IO.BASEXSUFFIX);
