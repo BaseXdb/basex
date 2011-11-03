@@ -236,6 +236,14 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
+   * Returns the query string.
+   * @return query
+   */
+  public String query() {
+    return query;
+  }
+
+  /**
    * Closes the processor.
    * @throws QueryException query exception
    */

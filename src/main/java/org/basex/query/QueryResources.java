@@ -178,13 +178,14 @@ public final class QueryResources {
 
       // add new collection if not found
       if(c == colls) {
-        final int s = input.indexOf('/');
-        if(s == -1) {
-          addCollection(data(input, true, ii), "");
-        } else {
-          addCollection(data(input.substring(0, s), true, ii),
-              input.substring(s + 1));
+        String root = input.replaceFirst("/+$", "");
+        String path = "";
+        final int s = root.indexOf('/');
+        if(s != -1) {
+          path = root.substring(s + 1);
+          root = root.substring(0, s);
         }
+        addCollection(data(root, true, ii), path);
       }
     }
     return coll[c];
