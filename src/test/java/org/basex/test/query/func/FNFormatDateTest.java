@@ -40,7 +40,7 @@ public final class FNFormatDateTest extends QueryTest {
         "format-date(xs:date('2002-12-31'), '[[[Y0001]-[M01]-[D01]]]') " },
       { "formdate 120", str("Two Thousand and Two"),
         "format-date(xs:date('2002-12-31'), '[YWw]', 'en', (), ()) " },
-      { "formdate 130", str("thirty-first December"),
+      { "formdate 130", str("thirty first December"),
         "format-date(xs:date('2002-12-31'), '[Dwo] [MNn]', 'de', (), ()) " },
       { "formdate 140", str("3:58 PM"),
         "format-time(xs:time('15:58:45.762+02:00'), " +
