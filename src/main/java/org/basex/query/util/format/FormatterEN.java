@@ -130,35 +130,21 @@ final class FormatterEN extends Formatter {
       }
     } else {
       for(int w = WORDS100.length - 1; w >= 0; w--) {
-        if(addWord(tb, n, UNITS100[w], WORDS100[w], ord)) break;
+        final long f = UNITS100[w];
+        if(n < f) continue;
+
+        word(tb, n / f, null);
+        tb.add(' ').add(WORDS100[w]);
+        final long r = n % f;
+        if(r == 0) {
+          if(ord != null) tb.add(ORDSUFFIX[3]);
+        } else {
+          tb.add(' ');
+          if(r < 100) tb.add(AND).add(' ');
+        }
+        word(tb, r, ord);
+        break;
       }
     }
-  }
-
-  /**
-   * Adds a unit if the number is large enough.
-   * @param tb token builder
-   * @param n number
-   * @param f factor
-   * @param unit unit
-   * @param ord ordinal numbering
-   * @return true if word was added
-   */
-  private boolean addWord(final TokenBuilder tb, final long n, final long f,
-      final byte[] unit, final byte[] ord) {
-
-    final boolean ge = n >= f;
-    if(ge) {
-      word(tb, n / f, null);
-      final long r = n % f;
-      tb.add(' ').add(unit);
-      if(ord != null) tb.add(ORDSUFFIX[3]);
-      if(r > 0) {
-        tb.add(' ');
-        if(r < 100) tb.add(AND).add(' ');
-      }
-      word(tb, r, ord);
-    }
-    return ge;
   }
 }

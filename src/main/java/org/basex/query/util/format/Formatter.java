@@ -127,11 +127,12 @@ public abstract class Formatter extends FormatUtil {
         // print literal
         tb.add(ch);
       } else {
-        byte[] m = dp.marker();
-        if(m.length == 0) PICDATE.thrw(ii, pic);
-        final int spec = ch(m, 0);
-        m = substring(m, cl(m, 0));
+        byte[] p = dp.marker();
+        if(p.length == 0) PICDATE.thrw(ii, pic);
+        final int spec = ch(p, 0);
+        p = substring(p, cl(p, 0));
         byte[] pres = ONE;
+        boolean max = false;
         long num = 0;
 
         final boolean dat = date.type == AtomType.DAT;
@@ -140,7 +141,8 @@ public abstract class Formatter extends FormatUtil {
         boolean err = false;
         switch(spec) {
           case 'Y':
-            num = gc.getYear();
+            num = Math.abs(gc.getYear());
+            max = true;
             err = tim;
             break;
           case 'M':
@@ -213,7 +215,14 @@ public abstract class Formatter extends FormatUtil {
         }
         if(err) PICCOMP.thrw(ii, pic);
 
-        final FormatParser fp = new FormatParser(ii, m, pres);
+        final FormatParser fp = new FormatParser(ii, p, pres);
+        if(max) {
+          // limit maximum length of numeric output
+          int mx = 0;
+          for(int s = 0; s < fp.primary.length; s += cl(fp.primary, s)) mx++;
+          if(mx > 1) fp.max = mx;
+        }
+
         if(fp.digit == 'n') {
           byte[] in = EMPTY;
           if(spec == 'M') {
@@ -241,21 +250,21 @@ public abstract class Formatter extends FormatUtil {
   /**
    * Returns a formatted integer.
    * @param num integer to be formatted
-   * @param mp marker parser
+   * @param fp format parser
    * @return string representation
    */
-  public final byte[] formatInt(final long num, final FormatParser mp) {
+  public final byte[] formatInt(final long num, final FormatParser fp) {
     // choose sign
     long n = num;
     final boolean sign = n < 0;
     if(sign) n = -n;
 
     final TokenBuilder tb = new TokenBuilder();
-    final int ch = mp.digit;
-    final boolean single = mp.primary.length == cl(mp.primary, 0);
+    final int ch = fp.digit;
+    final boolean single = fp.primary.length == cl(fp.primary, 0);
 
     if(ch == 'w') {
-      tb.add(word(n, mp.ordinal));
+      tb.add(word(n, fp.ordinal));
     } else if(ch == KANJI[1]) {
       japanese(tb, n);
     } else if(single && ch == 'i') {
@@ -266,13 +275,13 @@ public abstract class Formatter extends FormatUtil {
     } else {
       final String seq = sequence(ch);
       if(seq != null) alpha(tb, num, seq);
-      else tb.add(number(n, mp, zeroes(ch)));
+      else tb.add(number(n, fp, zeroes(ch)));
     }
 
     // finalize formatted string
     byte[] in = tb.finish();
-    if(mp.cs == Case.LOWER) in = lc(in);
-    if(mp.cs == Case.UPPER) in = uc(in);
+    if(fp.cs == Case.LOWER) in = lc(in);
+    if(fp.cs == Case.UPPER) in = uc(in);
     return sign ? concat(new byte[] { '-' }, in) : in;
   }
 
@@ -287,7 +296,8 @@ public abstract class Formatter extends FormatUtil {
 
     final int al = a.length();
     if(n > al) alpha(tb, (n - 1) / al, a);
-    tb.add(a.charAt((int) ((n - 1) % al)));
+    if(n > 0) tb.add(a.charAt((int) ((n - 1) % al)));
+    else tb.add(ZERO);
   }
 
   /**
@@ -365,16 +375,16 @@ public abstract class Formatter extends FormatUtil {
 
   /**
    * Creates a number character sequence.
-   * @param n number to be formatted
-   * @param mp marker parser
+   * @param num number to be formatted
+   * @param fp format parser
    * @param z zero digit
    * @return number character sequence
    */
-  private byte[] number(final long n, final FormatParser mp, final int z) {
+  private byte[] number(final long num, final FormatParser fp, final int z) {
     // cache characters of presentation modifier
-    final IntList pr = new IntList(mp.primary.length);
-    for(int p = 0; p < mp.primary.length; p += cl(mp.primary, p)) {
-      pr.add(cp(mp.primary, p));
+    final IntList pr = new IntList(fp.primary.length);
+    for(int p = 0; p < fp.primary.length; p += cl(fp.primary, p)) {
+      pr.add(cp(fp.primary, p));
     }
 
     // check for a regular separator pattern
@@ -391,28 +401,37 @@ public abstract class Formatter extends FormatUtil {
 
     // build string representation in a reverse order
     final IntList cache = new IntList();
-    final byte[] s = token(n);
-    int b = s.length - 1, p = pr.size() - 1;
-    while(p >= 0 && b >= 0) {
-      final int ch = pr.get(p--);
-      if(ch == '#' && cache.size() % rp == rp - 1) cache.add(rc);
-      cache.add(ch == '#' || ch >= z && ch <= z + 9 ? s[b--] - '0' + z : ch);
-    }
-    // add remaining numbers
-    while(b >= 0) {
-      if(cache.size() % rp == rp - 1) cache.add(rc);
-      cache.add(s[b--] - '0' + z);
-    }
-    // add remaining modifiers
-    while(p >= 0) {
-      final int ch = pr.get(p--);
-      if(ch == '#') break;
-      cache.add(ch >= z && ch <= z + 9 ? z : ch);
+    final byte[] n = token(num);
+    int b = n.length - 1, p = pr.size() - 1;
+
+    // add numbers and separators
+    int mn = fp.min;
+    int mx = fp.max;
+    while((--mn >= 0 || b >= 0 || p >= 0) && --mx >= 0) {
+      final boolean sep = cache.size() % rp == rp - 1;
+      if(p >= 0) {
+        final int c = pr.get(p--);
+        if(b >= 0) {
+          if(c == '#' && sep) cache.add(rc);
+          cache.add(c == '#' || c >= z && c <= z + 9 ? n[b--] - '0' + z : c);
+        } else {
+          // add remaining modifiers
+          if(c == '#') break;
+          cache.add(c >= z && c <= z + 9 ? z : c);
+        }
+      } else if(b >= 0) {
+        // add remaining numbers
+        if(sep) cache.add(rc);
+        cache.add(n[b--] - '0' + z);
+      } else {
+        // add minimum numbers
+        cache.add(z);
+      }
     }
 
     // reverse result and add ordinal suffix
     final TokenBuilder tb = new TokenBuilder();
     for(int c = cache.size() - 1; c >= 0; --c) tb.add(cache.get(c));
-    return tb.add(ordinal(n, mp.ordinal)).finish();
+    return tb.add(ordinal(num, fp.ordinal)).finish();
   }
 }

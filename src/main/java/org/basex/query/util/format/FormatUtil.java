@@ -106,7 +106,7 @@ abstract class FormatUtil {
   }
 
   /**
-   * Returns the zero base for the specified code point, or {@code null}.
+   * Returns the zero base for the specified code point, or {@code -1}.
    * @param ch character
    * @return zero base
    */

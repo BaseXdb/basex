@@ -94,7 +94,7 @@ public final class QueryContext extends Progress {
   /** Current context value. */
   public Value value;
   /** Current context position. */
-  public long pos;
+  public long pos = 1;
   /** Current context size. */
   public long size;
   /** Optional initial context set. */

@@ -132,13 +132,13 @@ public enum Function {
       ITR_ZO, STR, STR),
   /** XQuery function. */
   FORMDTM(FNFormat.class,
-      "format-dateTime(number,picture,[lang[,cal[,place]]])",
+      "format-dateTime(number,picture,[lang,cal,place])",
       STR_ZO, 2, DTM_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
   /** XQuery function. */
-  FORMDAT(FNFormat.class, "format-date(date,picture,[lang[,cal[,place]]])",
+  FORMDAT(FNFormat.class, "format-date(date,picture,[lang,cal,place])",
       STR_ZO, 2, DAT_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
   /** XQuery function. */
-  FORMTIM(FNFormat.class, "format-time(number,picture,[lang[,cal[,place]]])",
+  FORMTIM(FNFormat.class, "format-time(number,picture,[lang,cal,place])",
       STR_ZO, 2, TIM_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
 
   /* FNFunc functions. */

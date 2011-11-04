@@ -44,7 +44,7 @@ public final class FormatParser extends FormatUtil {
    * Constructor.
    * @param ii input info
    * @param p info picture
-   * @param df default presentation modifier (may be {@code null}).
+   * @param df default presentation modifier (may be {@code null})
    * @throws QueryException query exception
    */
   public FormatParser(final InputInfo ii, final byte[] p, final byte[] df)
@@ -74,6 +74,7 @@ public final class FormatParser extends FormatUtil {
       }
     }
     // choose first character and case
+    if(pm.length == 0) pm = ONE;
     cs = cl(pm, 0) < pm.length ? Case.STANDARD :
       (ch(pm, 0) & ' ') == 0 ? Case.UPPER : Case.LOWER;
     primary = lc(pm);
@@ -105,6 +106,9 @@ public final class FormatParser extends FormatUtil {
     } else if((ch | ' ') == 'w' || (ch | ' ') == 'n' && ext) {
       // word-wise output (incl. title-case check)
       if((ch & ' ') == 0 && ch(pic, pos) == (ch | ' ')) pos += cl(pic, pos);
+    } else if(ch == ',') {
+      // width modifier
+      pos = 0;
     } else {
       // mandatory-digit-sign
       int z = -1;
