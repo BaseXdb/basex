@@ -9,10 +9,7 @@
 *.class
 
 # Maven target dir
-/doc
-/target
-
-# /.settings/
 /.settings/org.maven.ide.eclipse.prefs
-/lib/*.jar
-
+/doc
+/lib
+/target
