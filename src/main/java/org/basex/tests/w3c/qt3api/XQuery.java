@@ -1,10 +1,13 @@
 package org.basex.tests.w3c.qt3api;
 
+import static org.basex.util.Token.*;
+
 import java.util.Iterator;
 
 import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
@@ -37,10 +40,10 @@ public final class XQuery implements Iterable<XQItem> {
     try {
       if(value != null) qp.context(value instanceof XQValue ?
           ((XQValue) value).internal() : value);
+      return this;
     } catch(final QueryException ex) {
       throw new XQException(ex);
     }
-    return this;
   }
 
   /**
@@ -54,10 +57,28 @@ public final class XQuery implements Iterable<XQItem> {
     try {
       qp.bind(key, value instanceof XQValue ?
           ((XQValue) value).internal() : value);
+      return this;
     } catch(final QueryException ex) {
       throw new XQException(ex);
     }
-    return this;
+  }
+
+  /**
+   * Declares a namespace. A namespace is undeclared if the {@code uri} is
+   * an empty string.
+   * @param prefix namespace prefix
+   * @param uri namespace uri
+   * @return self reference
+   */
+  public XQuery namespace(final String prefix, final String uri) {
+    final QNm name = new QNm(token(prefix), token(uri));
+    try {
+      if(!uri.isEmpty()) qp.ctx.ns.add(name, null);
+      else qp.ctx.ns.delete(name);
+      return this;
+    } catch(final QueryException ex) {
+      throw new XQException(ex);
+    }
   }
 
   /**
@@ -93,10 +114,12 @@ public final class XQuery implements Iterable<XQItem> {
   /**
    * Sets the base URI.
    * @param base base URI
+   * @return self reference
    * @throws XQException exception
    */
-  public void baseURI(final String base) {
+  public XQuery baseURI(final String base) {
     qp.ctx.base(base);
+    return this;
   }
 
   /**

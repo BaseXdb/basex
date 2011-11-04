@@ -36,6 +36,8 @@ interface QT3Constants {
   String URI = "uri";
   /** QT3TS String. */
   String SELECT = "select";
+  /** QT3TS String. */
+  String PREFIX = "prefix";
 
   /** QT3TS String. */
   String SCHEMA_IMPORT = "schemaImport";

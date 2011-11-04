@@ -12,6 +12,7 @@ import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.out.PrintOutput;
 import org.basex.query.QueryProcessor;
 import org.basex.query.func.Function;
@@ -48,6 +49,8 @@ public final class QT3TS {
   private int total;
   /** Number of correct queries. */
   private int correct;
+  /** Current base uri. */
+  private String base;
 
   /** Query filter string. */
   private String single = "";
@@ -135,9 +138,9 @@ public final class QT3TS {
   private void testSet(final String name) throws Exception {
     final XQuery qdoc = new XQuery("doc(' " + path + '/' + name + "')", ctx);
     final XQValue doc = qdoc.value();
-    final String base = IO.get(doc.getBaseURI()).dir();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XQValue set = qset.value();
+    base = IO.get(doc.getBaseURI()).dir();
     qdoc.close();
 
     if(supported(set)) {
@@ -149,7 +152,7 @@ public final class QT3TS {
 
       // run all test cases
       final XQuery qts = new XQuery("*:test-case", ctx).context(set);
-      for(final XQItem its : qts) testCase(its, envs, base);
+      for(final XQItem its : qts) testCase(its, envs);
       qts.close();
     }
     qset.close();
@@ -159,11 +162,10 @@ public final class QT3TS {
    * Runs a single test case.
    * @param test node
    * @param envs environments
-   * @param base base uri
    * @throws Exception exception
    */
-  private void testCase(final XQItem test, final ObjList<QT3Env> envs,
-      final String base) throws Exception {
+  private void testCase(final XQItem test, final ObjList<QT3Env> envs)
+      throws Exception {
 
     if(!supported(test)) return;
 
@@ -207,6 +209,10 @@ public final class QT3TS {
     final QT3Result result = new QT3Result();
     try {
       if(e != null) {
+        // bind namespaces
+        for(final HashMap<String, String> ns : e.namespaces) {
+          query.namespace(ns.get(PREFIX), ns.get(URI));
+        }
         // bind variables
         for(final HashMap<String, String> par : e.params) {
           query.bind(par.get(NNAME), new XQuery(par.get(SELECT), ctx).value());
@@ -536,9 +542,19 @@ public final class QT3TS {
   private String assertSerialization(final XQValue value,
       final XQValue expect) {
 
-    final String exp = normNL(expect.getString());
-    final String res = string("serialize(., map {'indent':='no'})", value);
-    return exp.equals(normNL(res)) ? null : exp;
+    final String file = string("@" + FILE, expect);
+    final String exp;
+    try {
+      if(file.isEmpty()) {
+        exp = normNL(expect.getString());
+      } else {
+        exp = normNL(Token.string(new IOFile(base, file).read()));
+      }
+      final String res = string("serialize(., map {'indent':='no'})", value);
+      return exp.equals(normNL(res)) ? null : exp;
+    } catch(final IOException ex) {
+      return Util.message(ex);
+    }
   }
 
   /**
