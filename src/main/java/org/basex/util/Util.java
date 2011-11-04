@@ -272,26 +272,41 @@ public final class Util {
   }
 
   /**
-   * Returns the the preferred directory for storing the property file,
-   * databases directory, etc.
-   * @return application path
+   * <p>Determines the project's home directory for storing property files
+   * and directories. The directory is chosen as follows:</p>
+   * <ol>
+   * <li>First, the <b>system property</b> {@code "org.basex.path"} is checked.
+   *   If it contains a value, it is chosen as directory path.</li>
+   * <li>If not, the <b>current user directory</b> (defined by the system
+   *   property {@code "user.dir"}) is chosen if the {@code .basex}
+   *   configuration file is found in this directory.</li>
+   * <li>Otherwise, the configuration file is searched in the <b>application
+   *   directory</b> (the folder in which the project is located).</li>
+   * <li>In all other cases, the <b>user's home directory</b> (defined in
+   *   {@code "user.home"}) is chosen.</li>
+   * </ol>
+   * @return home directory
    */
   public static String homeDir() {
+    // check user specific property
+    String path = System.getProperty("org.basex.path");
+    if(path != null) return path + File.separator;
+
     // check working directory for property file
-    final String work = System.getProperty("user.dir");
-    final File wconf = new File(work, IO.BASEXSUFFIX);
-    if(wconf.exists()) return wconf.getParent() + File.separator;
+    path = System.getProperty("user.dir");
+    File config = new File(path, IO.BASEXSUFFIX);
+    if(config.exists()) return config.getParent() + File.separator;
 
     // not found; check application directory
-    final String app = applicationPath();
-    if(app != null) {
-      final File f = new File(app);
-      final String home = f.isFile() ? f.getParent() : f.getPath();
-      final File hconf = new File(home, IO.BASEXSUFFIX);
-      if(hconf.exists()) return hconf.getParent() + File.separator;
+    path = applicationPath();
+    if(path != null) {
+      final File app = new File(path);
+      final String dir = app.isFile() ? app.getParent() : app.getPath();
+      config = new File(dir, IO.BASEXSUFFIX);
+      if(config.exists()) return config.getParent() + File.separator;
     }
 
-    // not found; choose user home directory
+    // not found; choose user home directory as default
     return Prop.USERHOME;
   }
 
