@@ -7,10 +7,14 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.basex.api.HTTPSession;
+import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Get;
 import org.basex.core.cmd.Set;
+import org.basex.io.IOFile;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.serial.SerializerProp;
 import org.basex.server.Query;
@@ -76,6 +80,11 @@ class RESTQuery extends RESTCode {
     final Session session = ctx.session;
     session.execute(new Set(Prop.SERIALIZER, serial(ctx)));
     session.setOutputStream(ctx.out);
+
+    // set query path to http path
+    final Context context = HTTPSession.context();
+    final String path = context.mprop.get(MainProp.HTTPPATH);
+    session.execute(new Set(Prop.QUERYPATH, new IOFile(path).path()));
 
     try {
       // create query instance
