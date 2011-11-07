@@ -54,11 +54,15 @@ final class IterPosStep extends AxisStep {
 
           // evaluate node test
           if(test.eval(node)) {
-            // set context item and position
-            ctx.pos = ++cpos;
-
             // evaluate predicates
-            if(preds(node, ctx)) {
+            final long cp = ctx.pos;
+            final long cs = ctx.size;
+            ctx.size = 0;
+            ctx.pos = ++cpos;
+            final boolean p = preds(node, ctx);
+            ctx.pos = cp;
+            ctx.size = cs;
+            if(p) {
               // check if no more results are to be expected
               skip = pos != null && pos.skip(ctx);
               return node.finish();

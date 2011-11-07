@@ -6,7 +6,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 
 /**
- * Iterative filter expression with position predicates.
+ * Iterative filter expression without position predicates.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -37,10 +37,7 @@ final class IterFilter extends Filter {
           ctx.checkStop();
           final Item it = iter.next();
           if(it == null) return null;
-          // set context item and position
-          ctx.value = it;
           if(preds(it, ctx)) return it;
-          // remember last node
         }
       }
     };

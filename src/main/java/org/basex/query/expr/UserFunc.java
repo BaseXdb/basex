@@ -104,7 +104,7 @@ public class UserFunc extends Single {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    // evaluate function and reset variable scope
+    // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
     final Item it = expr.item(ctx, ii);
@@ -115,7 +115,7 @@ public class UserFunc extends Single {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    // evaluate function and reset variable scope
+    // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
     final Value v = expr.value(ctx);

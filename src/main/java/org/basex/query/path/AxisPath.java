@@ -277,10 +277,10 @@ public class AxisPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Value c = ctx.value;
+    final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    Value r = root != null ? root.value(ctx) : c;
+    Value r = root != null ? root.value(ctx) : cv;
 
     if(!cache || citer == null || lvalue.type != NodeType.DOC ||
         r.type != NodeType.DOC || !((ANode) lvalue).is((ANode) r)) {
@@ -301,7 +301,7 @@ public class AxisPath extends Path {
       citer.reset();
     }
 
-    ctx.value = c;
+    ctx.value = cv;
     ctx.size = cs;
     ctx.pos = cp;
     return citer;

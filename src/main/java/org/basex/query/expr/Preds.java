@@ -111,14 +111,17 @@ public abstract class Preds extends ParseExpr {
   public boolean preds(final Item it, final QueryContext ctx)
       throws QueryException {
 
+    if(preds.length == 0) return true;
+
     // set context item and position
-    ctx.value = it;
+    Item i = null;
     for(final Expr p : preds) {
-      final Item i = p.test(ctx, input);
+      ctx.value = it;
+      i = p.test(ctx, input);
       if(i == null) return false;
-      // item accepted.. adopt last scoring value
-      it.score(i.score());
     }
+    // item accepted.. adopt last scoring value
+    it.score(i.score());
     return true;
   }
 

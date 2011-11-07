@@ -10,6 +10,7 @@ import org.basex.query.path.Axis;
 import org.basex.query.path.AxisStep;
 import org.basex.query.path.Path;
 import org.basex.query.path.Test;
+import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
@@ -50,6 +51,11 @@ public final class Context extends Simple {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return checkCtx(ctx).item(ctx, input);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return false;
   }
 
   @Override

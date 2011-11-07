@@ -62,40 +62,30 @@ public final class MixedPath extends Path {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Value v = root != null ? root.value(ctx) : checkCtx(ctx);
-    final Value c = ctx.value;
+    final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    ctx.value = v;
-    final Iter ir = eval(ctx);
-    ctx.value = c;
-    ctx.size = cs;
-    ctx.pos = cp;
-    return ir;
-  }
 
-  /**
-   * Evaluates the mixed path expression.
-   * @param ctx query context
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  private Iter eval(final QueryContext ctx) throws QueryException {
     // creates an initial item cache
-    Iter res = ctx.value.iter();
+    Iter res = v.iter();
+
     // loop through all expressions
     final int el = steps.length;
     for(int ex = 0; ex < el; ex++) {
       final Expr e = steps[ex];
       final boolean last = ex + 1 == el;
       final ItemCache ic = new ItemCache();
-      ctx.size = res.size();
-      ctx.pos = 1;
+
       // this flag indicates if the resulting items contain nodes
       boolean nodes = false;
+      ctx.size = res.size();
+      ctx.pos = 1;
+
       // loop through all input items
       for(Item it; (it = res.next()) != null;) {
         if(!it.node()) NODESPATH.thrw(input, this, it.type);
         ctx.value = it;
+
         // loop through all resulting items
         final Iter ir = ctx.iter(e);
         for(Item i; (i = ir.next()) != null;) {
@@ -107,6 +97,7 @@ public final class MixedPath extends Path {
         }
         ctx.pos++;
       }
+
       if(nodes) {
         // remove potential duplicates from node sets
         final NodeCache nc = new NodeCache().random();
@@ -116,6 +107,10 @@ public final class MixedPath extends Path {
         res = ic;
       }
     }
+
+    ctx.value = cv;
+    ctx.size = cs;
+    ctx.pos = cp;
     return res;
   }
 

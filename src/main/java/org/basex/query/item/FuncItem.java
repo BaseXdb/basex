@@ -107,7 +107,7 @@ public final class FuncItem extends FItem {
     // move variables to stack
     final int s = bindVars(ctx, args);
 
-    // evaluate function
+    // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
     final Value v = ctx.value(expr);
@@ -135,7 +135,7 @@ public final class FuncItem extends FItem {
     // move variables to stack
     final int s = bindVars(ctx, args);
 
-    // evaluate function
+    // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
     final Item it = expr.item(ctx, ii);
