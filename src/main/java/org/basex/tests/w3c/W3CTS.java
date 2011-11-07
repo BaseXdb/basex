@@ -333,7 +333,7 @@ public abstract class W3CTS {
         for(final int p : nodes("*:module", root).list) {
           final String uri = text("@namespace", new Nodes(p, data));
           final String file = mods.get(string(data.atom(p))) + IO.XQSUFFIX;
-          xq.module(file, uri);
+          xq.module(uri, file);
         }
 
         // evaluate and serialize query

@@ -168,6 +168,7 @@ public final class QT3TS {
       throws Exception {
 
     if(!supported(test)) return;
+    if(++total % 500 == 0) Util.out(".");
 
     final String name = string("@name", test);
     // skip queries that do not match filter
@@ -219,7 +220,7 @@ public final class QT3TS {
       final XQItem uri = qmod.next();
       if(uri == null) break;
       final XQItem file = qmod.next();
-      query.addModule(base + file.getString(), uri.getString());
+      query.addModule(uri.getString(), base + file.getString());
     }
 
     final QT3Result result = new QT3Result();
@@ -295,7 +296,6 @@ public final class QT3TS {
       tmp.add("Expect: " + norm(msg)).add(NL).add(NL);;
       wrong.add(tmp.finish());
     }
-    if(++total % 500 == 0) Util.out(".");
 
     query.close();
     qexp.close();
