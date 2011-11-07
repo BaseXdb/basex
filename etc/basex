@@ -1,11 +1,17 @@
 #!/bin/bash
 
 # Path to this script
-PWD=`dirname $0`
+FILE="${BASH_SOURCE[0]}"
+while [ -h "$FILE" ] ; do
+  SOURCE="$(readlink "$FILE")"
+  FILE="$( cd -P "$(dirname "$FILE")" && \
+           cd -P "$(dirname "$SOURCE")" && pwd )/$(basename "$SOURCE")"
+done
+BASEX_DIR="$( cd -P "$(dirname $FILE)" && pwd )"
 
 # Core and library classes
-CP=$PWD/../target/classes
-CP=$CP:$(echo $PWD/../lib/*.jar | tr ' ' ':')
+CP=$BASEX_DIR/../target/classes
+CP=$CP:$(echo $BASEX_DIR/../lib/*.jar | tr ' ' ':')
 
 # Options for virtual machine
 VM=-Xmx512m
