@@ -18,10 +18,9 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.util.RegEx;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.ByteList;
 
 /**
  * String pattern functions.
@@ -44,13 +43,6 @@ public final class FNPat extends FuncCall {
   private static final QNm MGROUP = new QNm(token("fn:group"), U_FN);
   /** Attribute for the analyze-string-result function. */
   private static final QNm NR = new QNm(token("nr"));
-
-  /** Classes pattern. */
-  private static final Pattern CLASSES =
-    Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
-  /** Excluded classes pattern. */
-  private static final Pattern EX =
-    Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\].*");
 
   /**
    * Constructor.
@@ -225,8 +217,8 @@ public final class FNPat extends FuncCall {
   }
 
   /**
-   * Checks the regular expression modifiers.
-   * @param pattern pattern
+   * Returns a regular expression pattern.
+   * @param pattern input pattern
    * @param mod modifier item
    * @param ctx query context
    * @return modified pattern
@@ -235,69 +227,8 @@ public final class FNPat extends FuncCall {
   private Pattern pattern(final Expr pattern, final Expr mod,
       final QueryContext ctx) throws QueryException {
 
-    // process modifiers
-    byte[] pt = checkStr(pattern, ctx);
-    int m = Pattern.UNIX_LINES;
-    if(mod != null) {
-      for(final byte b : checkStr(mod, ctx)) {
-        if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
-        else if(b == 'm') m |= Pattern.MULTILINE;
-        else if(b == 's') m |= Pattern.DOTALL;
-        else if(b == 'q' && ctx.xquery3) m |= Pattern.LITERAL;
-        else if(b == 'x') {
-          boolean cc = false;
-          final ByteList bl = new ByteList();
-          for(final byte p : pt) {
-            if(cc || p < 0 || p > ' ') bl.add(p);
-            cc |= p == '[';
-            cc &= p != ']';
-          }
-          pt = bl.toArray();
-        } else {
-          REGMOD.thrw(input, (char) b);
-        }
-      }
-    }
-
-    final ByteList bl = new ByteList();
-    for(int i = 0; i < pt.length; ++i) {
-      final byte b = pt[i];
-      bl.add(b);
-      if(b == '\\' && i + 1 != pt.length && pt[i + 1] == ' ') bl.add(b);
-    }
-
-    try {
-      String str = bl.toString();
-      if((m & Pattern.LITERAL) == 0 && str.indexOf('[') != -1 &&
-          str.indexOf('-') != -1) {
-        // replace classes by single characters to support Unicode matches
-        while(true) {
-          final Matcher mt = CLASSES.matcher(str);
-          if(!mt.matches()) break;
-          final char c1 = mt.group(1).charAt(0);
-          final char c2 = mt.group(2).charAt(0);
-          final TokenBuilder tb2 = new TokenBuilder("[");
-          for(char c = c1; c <= c2; ++c) tb2.add(c);
-          str = str.replaceAll("\\[" + c1 + "-" + c2, tb2.toString());
-        }
-
-        // remove excluded characters in classes
-        String old = "";
-        for(Matcher mt; (mt = EX.matcher(str)).matches() && !old.equals(str);) {
-          old = str;
-          final String in = mt.group(1);
-          final String ex = mt.group(2);
-          String out = in;
-          for(int e = 0; e < ex.length(); ++e) {
-            out = out.replaceAll(ex.substring(e, e + 1), "");
-          }
-          str = str.replaceAll("\\[" + in + "-\\[.*?\\]", "[" + out);
-        }
-      }
-      return Pattern.compile(str, m);
-    } catch(final Exception ex) {
-      throw REGINV.thrw(input, pt);
-    }
+    return new RegEx(string(checkStr(pattern, ctx)), input).pattern(
+        mod != null ? checkStr(mod, ctx) : null, ctx.xquery3);
   }
 
   @Override

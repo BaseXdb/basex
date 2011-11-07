@@ -238,6 +238,10 @@ public enum Err {
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
   /** FORX0002: Evaluation exception. */
   REGINV(FORX, 2, "Invalid regular expression: '%'."),
+  /** FORX0002: Evaluation exception. */
+  REGESC(FORX, 2, "Invalid escape character: '\\%'."),
+  /** FORX0002: Evaluation exception. */
+  REGCC(FORX, 2, "Invalid character class: '\\%'."),
   /** FORX0003: Evaluation exception. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
   /** FORX0004: Evaluation exception. */
