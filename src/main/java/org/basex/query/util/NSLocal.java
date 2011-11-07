@@ -16,7 +16,7 @@ import org.basex.util.InputInfo;
  */
 public final class NSLocal {
   /** Namespaces. */
-  public final Atts ns = new Atts();
+  private final Atts ns = new Atts();
   /** Number of default namespaces. */
   private int def;
 
@@ -67,6 +67,7 @@ public final class NSLocal {
    */
   public byte[] uri(final byte[] pre, final boolean dn, final InputInfo ii)
       throws QueryException {
+
     byte[] uri = find(pre);
     if(uri == null) uri = NSGlobal.uri(pre);
     if(uri.length == 0 && pre.length != 0) {
@@ -97,6 +98,16 @@ public final class NSLocal {
       if(eq(ns.val[s], uri)) return ns.key[s];
     }
     return NSGlobal.prefix(uri);
+  }
+
+  /**
+   * Returns all prefixes.
+   * @return prefixes
+   */
+  public byte[][] prefixes() {
+    final byte[][] pre = new byte[ns.size][];
+    for(int p = 0; p < pre.length; ++p) pre[p] = ns.key[p];
+    return pre;
   }
 
   /**

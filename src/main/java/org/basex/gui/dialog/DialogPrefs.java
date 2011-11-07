@@ -112,7 +112,8 @@ public final class DialogPrefs extends Dialog {
     p.add(lang);
     creds = new BaseXLabel(" ");
     p.add(creds);
-    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
+    creds.setText(TRANSLATION + COLS +
+        creds(lang.getSelectedItem().toString()));
 
     pp.add(p);
 
@@ -126,7 +127,8 @@ public final class DialogPrefs extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
+    creds.setText(TRANSLATION + COLS +
+        creds(lang.getSelectedItem().toString()));
     gui.notify.layout();
   }
 

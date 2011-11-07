@@ -654,18 +654,17 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void moduleImport() throws QueryException {
-    QNm name = null;
+    byte[] ns = EMPTY;
     if(wsConsumeWs(NSPACE)) {
-      name = new QNm(ncName(XPNAME));
+      ns = ncName(XPNAME);
       wsCheck(IS);
-    } else {
-      name = new QNm();
     }
     final byte[] uri = stringLiteral();
     if(uri.length == 0) error(NSMODURI);
     if(modules.contains(uri)) error(DUPLMODULE, uri);
-    name.uri(uri);
-    ctx.ns.add(name, input());
+
+    final QNm name = new QNm(ns, uri);
+    if(ns != EMPTY) ctx.ns.add(name, input());
 
     try {
       if(wsConsumeWs(AT)) {
