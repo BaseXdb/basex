@@ -173,30 +173,31 @@ public final class QT3TS {
     // skip queries that do not match filter
     if(!name.startsWith(single)) return;
 
-    // query to be run
-    final String string = string("data(*:test)", test);
-    final XQuery query = new XQuery(string, ctx);
-
     // expected result
     final XQuery qexp = new XQuery("*:result/*[1]", ctx).context(test);
     final XQValue expected = qexp.value();
 
-    final Performance perf = new Performance();
+    // use XQuery 1.0 if XQ10 or XP20 is specified
+    final XQuery q = new XQuery("*:dependency[@type='spec']" +
+        "[matches(@value,'(XQ10|XP20)([^+]|$)')]", ctx);
+    if(q.context(test).next() != null) ctx.prop.set(Prop.XQUERY3, false);
+    q.close();
 
+    // check if environment is defined in test-case
     QT3Env e = null;
-    // check for environment defined in test-case
     final XQuery qenv = new XQuery("*:environment[*]", ctx).context(test);
     final XQValue ienv = qenv.next();
     if(ienv != null) e = new QT3Env(ctx, ienv);
     qenv.close();
 
+    // set base uri
     String b = base;
     if(e == null) {
       final String env = string("*:environment/@ref", test);
       if(!env.isEmpty()) {
-        // check for environment defined in test-set
+        // check if environment is defined in test-set
         e = envs(envs, env);
-        // check for environment defined in catalog
+        // check if environment is defined in catalog
         if(e == null) {
           e = envs(genvs, env);
           b = null;
@@ -204,7 +205,22 @@ public final class QT3TS {
         if(e == null) Util.errln("%: environment '%' not found.", name, env);
       }
     }
-    if(b != null) query.baseURI(base);
+
+    // query to be run
+    final Performance perf = new Performance();
+    final String string = string("data(*:test)", test);
+    final XQuery query = new XQuery(string, ctx);
+    if(b != null) query.baseURI(b);
+
+    // add modules
+    final XQuery qmod = new XQuery(
+        "for $m in *:module return ($m/@uri, $m/@file)", ctx).context(test);
+    while(true) {
+      final XQItem uri = qmod.next();
+      if(uri == null) break;
+      final XQItem file = qmod.next();
+      query.addModule(base + file.getString(), uri.getString());
+    }
 
     final QT3Result result = new QT3Result();
     try {
@@ -249,6 +265,9 @@ public final class QT3TS {
 
     final long time = perf.getTime() / 1000000;
     if(verbose) Util.outln(name + ": " + time + " ms");
+
+    // revert to XQuery as default
+    ctx.prop.set(Prop.XQUERY3, true);
 
     final String msg = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();

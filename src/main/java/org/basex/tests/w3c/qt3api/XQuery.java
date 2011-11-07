@@ -112,6 +112,17 @@ public final class XQuery implements Iterable<XQItem> {
   }
 
   /**
+   * Adds a module.
+   * @param file file reference
+   * @param uri module uri
+   * @throws XQException exception
+   */
+  public void addModule(final String file, final String uri) {
+    qp.module(file, uri);
+  }
+
+
+  /**
    * Sets the base URI.
    * @param base base URI
    * @return self reference
