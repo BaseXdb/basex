@@ -11,7 +11,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
-import org.basex.util.Atts;
 
 /**
  * Java XQuery API - Static Context.
@@ -136,9 +135,9 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String[] getNamespacePrefixes() {
-    final Atts atts = ctx.ns.ns;
-    final String[] pre = new String[atts.size];
-    for(int p = 0; p < pre.length; ++p) pre[p] = string(atts.key[p]);
+    final byte[][] atts = ctx.ns.prefixes();
+    final String[] pre = new String[atts.length];
+    for(int p = 0; p < pre.length; ++p) pre[p] = string(atts[p]);
     return pre;
   }
 
