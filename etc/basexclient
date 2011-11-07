@@ -1,10 +1,16 @@
 #!/bin/bash
 
 # Path to this script
-PWD=`dirname $0`
+FILE="${BASH_SOURCE[0]}"
+while [ -h "$FILE" ] ; do
+  SOURCE="$(readlink "$FILE")"
+  FILE="$( cd -P "$(dirname "$FILE")" && \
+           cd -P "$(dirname "$SOURCE")" && pwd )/$(basename "$SOURCE")"
+done
+BASEX_DIR="$( cd -P "$(dirname $FILE)" && pwd )"
 
 # Core classes
-CP=$PWD/../target/classes
+CP=$BASEX_DIR/../target/classes
 
 # Run code
 java -cp "$CP" org.basex.BaseXClient "$@"
