@@ -9,7 +9,7 @@ import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeIter;
 
 /**
- * Iterative step expression with position predicates.
+ * Iterative step expression with numeric predicates.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -42,34 +42,33 @@ final class IterPosStep extends AxisStep {
           ai = axis.iter((ANode) v);
         }
 
-        ANode lnod = null;
+        ANode lnode = null, node;
         while(true) {
           ctx.checkStop();
-
-          final ANode node = ai.next();
+          node = ai.next();
           if(node == null) {
             skip = last;
-            return lnod;
+            return lnode;
           }
 
           // evaluate node test
-          if(test.eval(node)) {
-            // evaluate predicates
-            final long cp = ctx.pos;
-            final long cs = ctx.size;
-            ctx.size = 0;
-            ctx.pos = ++cpos;
-            final boolean p = preds(node, ctx);
-            ctx.pos = cp;
-            ctx.size = cs;
-            if(p) {
-              // check if no more results are to be expected
-              skip = pos != null && pos.skip(ctx);
-              return node.finish();
-            }
-            // remember last node
-            if(last) lnod = node.finish();
+          if(!test.eval(node)) continue;
+
+          // evaluate predicates
+          final long cp = ctx.pos;
+          final long cs = ctx.size;
+          ctx.size = 0;
+          ctx.pos = ++cpos;
+          final boolean p = preds(node, ctx);
+          ctx.pos = cp;
+          ctx.size = cs;
+          if(p) {
+            // check if more results can be expected
+            skip = pos != null && pos.skip(ctx);
+            return node.finish();
           }
+          // remember last node
+          if(last) lnode = node.finish();
         }
       }
 

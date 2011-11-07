@@ -7,7 +7,7 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 
 /**
- * Iterative filter expression with position predicates.
+ * Iterative filter expression with numeric predicates.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -33,13 +33,8 @@ final class IterPosFilter extends Filter {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      /** Indicates if more items can be expected. */
-      boolean skip;
-      /** Fast evaluation. */
-      boolean direct;
-      /** Iterator. */
+      boolean skip, direct;
       Iter iter;
-      /** Current position. */
       long cpos;
 
       @Override
@@ -77,6 +72,7 @@ final class IterPosFilter extends Filter {
         // cache context
         final Value cv = ctx.value;
         final long cp = ctx.pos;
+        final long cs = ctx.size;
 
         Item item = null;
         if(direct) {
@@ -85,18 +81,20 @@ final class IterPosFilter extends Filter {
           ctx.pos = cpos++;
         } else {
           // loop through all items
-          Item old = null;
+          Item lnode = null;
           while((item = iter.next()) != null) {
+            // evaluate predicates
             ctx.checkStop();
-            // set context position
+            ctx.size = 0;
             ctx.pos = cpos++;
-
             if(preds(item, ctx)) break;
             // remember last node
-            old = item;
+            lnode = item;
+            ctx.pos = cp;
+            ctx.size = cs;
           }
           // returns the last item
-          if(last) item = old;
+          if(last) item = lnode;
         }
 
         // check if more items can be expected
@@ -106,6 +104,7 @@ final class IterPosFilter extends Filter {
         // reset context and return result
         ctx.value = cv;
         ctx.pos = cp;
+        ctx.size = cs;
         return item;
       }
     };

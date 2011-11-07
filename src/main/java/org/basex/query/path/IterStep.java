@@ -11,7 +11,7 @@ import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
 
 /**
- * Iterative step expression without positional predicates.
+ * Iterative step expression without numeric predicates.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

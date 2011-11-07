@@ -40,7 +40,7 @@ public final class And extends Logical {
     for(final Expr e : expr) {
       Expr tmp = null;
       if(e instanceof Pos) {
-        // merge position predicates
+        // merge numeric predicates
         tmp = ps == null ? e : ps.intersect((Pos) e, input);
         if(!(tmp instanceof Pos)) return tmp;
         ps = (Pos) tmp;

@@ -258,7 +258,7 @@ public abstract class Path extends ParseExpr {
       final AxisStep prev = s > 0 ? axisStep(s - 1) : null;
       if(prev != null && prev.preds.length != 0) break;
 
-      // ignore axes other than descendant, or position predicates
+      // ignore axes other than descendant, or numeric predicates
       final AxisStep curr = axisStep(s);
       if(curr == null || curr.axis != Axis.DESC || curr.uses(Use.POS)) continue;
 

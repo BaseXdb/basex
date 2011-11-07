@@ -62,6 +62,7 @@ final class IterPath extends AxisPath {
 
         final Value cv = ctx.value;
         final long cp = ctx.pos;
+        final long cs = ctx.size;
 
         while(true) {
           final Item item = iter[p].next();
@@ -87,6 +88,7 @@ final class IterPath extends AxisPath {
         // reset context and return result
         ctx.value = cv;
         ctx.pos = cp;
+        ctx.size = cs;
         return node;
       }
 

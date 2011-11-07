@@ -78,7 +78,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if the iterator can be dissolved into an effective boolean value.
    * If not, returns an error. If yes, returns the first value - which can be
-   * also be e.g. an integer, which is later evaluated as position predicate.
+   * also be e.g. an integer, which is later evaluated as numeric predicate.
    * @param ctx query context
    * @param ii input info
    * @return item

@@ -41,7 +41,7 @@ public class Filter extends Preds {
     root = checkUp(root, ctx).comp(ctx);
     // return empty root
     if(root.empty()) return optPre(null, ctx);
-    // convert filters without position predicates to axis paths
+    // convert filters without numeric predicates to axis paths
     if(root instanceof AxisPath && !super.uses(Use.POS))
       return ((AxisPath) root).copy().addPreds(preds).comp(ctx);
 
@@ -80,7 +80,7 @@ public class Filter extends Preds {
           t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
     }
 
-    // no positional predicates.. use simple iterator
+    // no numeric predicates.. use simple iterator
     if(!super.uses(Use.POS)) return new IterFilter(this);
 
     // one single position() or last() function specified:
@@ -96,7 +96,7 @@ public class Filter extends Preds {
     final boolean off = preds.length == 1 && preds[0].type().num() &&
       !preds[0].uses(Use.CTX) && !preds[0].uses(Use.NDT);
 
-    // iterator for simple positional predicate
+    // iterator for simple numeric predicate
     return off || useIterator() ? new IterPosFilter(this, off) : this;
   }
 

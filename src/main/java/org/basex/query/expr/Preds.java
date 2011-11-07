@@ -87,7 +87,7 @@ public abstract class Preds extends ParseExpr {
    * @return result of check
    */
   protected boolean useIterator() {
-    // position predicate
+    // numeric predicate
     pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
     last = preds[0].isFun(Function.LAST);
 

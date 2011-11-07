@@ -6,7 +6,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 
 /**
- * Iterative filter expression without position predicates.
+ * Iterative filter expression without numeric predicates.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

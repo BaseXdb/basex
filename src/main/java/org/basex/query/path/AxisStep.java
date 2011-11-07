@@ -102,13 +102,13 @@ public class AxisStep extends Preds {
     // return optimized step / don't re-optimize step
     if(e != this || e instanceof IterStep) return e;
 
-    // no positional predicates.. use simple iterator
+    // no numeric predicates.. use simple iterator
     if(!uses(Use.POS)) return new IterStep(input, axis, test, preds);
 
     // don't re-optimize step
     if(this instanceof IterPosStep) return this;
 
-    // use iterator for simple positional predicate
+    // use iterator for simple numeric predicate
     return useIterator() ? new IterPosStep(this) : this;
   }
 
