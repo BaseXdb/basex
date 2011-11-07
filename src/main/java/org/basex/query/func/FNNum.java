@@ -59,6 +59,7 @@ public final class FNNum extends FuncCall {
    */
   private Item rnd(final Item it, final double d, final boolean h2e,
       final QueryContext ctx) throws QueryException {
+
     final int p = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
     return round(it, d, p, h2e, input);
   }
@@ -114,18 +115,24 @@ public final class FNNum extends FuncCall {
 
     // calculate precision factor
     double p = 1;
-    for(long i = prec; i > 0; i--) p *= 10;
+    for(long i = prec; i > 0; --i) p *= 10;
     for(long i = prec; i < 0; ++i) p /= 10;
 
     double c = d;
-    if(h2e) {
-      c = p == 1 && (c % 2 == .5 || c % 2 == -1.5) ? c - .5 :
-        StrictMath.floor(c * p + .5) / p;
-    } else if(!Double.isNaN(d) && d != 0
-        && d >= Long.MIN_VALUE && d < Long.MAX_VALUE) {
-      final double dp = d * p;
-      c = (dp >= -.5d && dp < 0 ? -0d : StrictMath.round(dp)) / p;
+    if(!Double.isNaN(c) && !Double.isInfinite(c)) {
+      if(h2e) {
+        c *= p;
+        if(d < 0) c = -c;
+        final double r = c % 1;
+        c += r == .5 ? c % 2 == 1.5 ? .5 : -.5 : r > .5 ? 1 - r : -r;
+        c /= p;
+        if(d < 0) c = -c;
+      } else if(c >= Long.MIN_VALUE && c < Long.MAX_VALUE) {
+        final double dp = d * p;
+        c = (dp >= -.5d && dp < 0 ? -0d : StrictMath.round(dp)) / p;
+      }
     }
+
     return num(it, d, c);
   }
 
