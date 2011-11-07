@@ -218,11 +218,11 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Adds a module reference.
-   * @param file file name
    * @param uri module uri
+   * @param file file name
    */
-  public void module(final String file, final String uri) {
-    ctx.modDeclared.add(token(file), token(uri));
+  public void module(final String uri, final String file) {
+    ctx.modDeclared.add(token(uri), token(file));
   }
 
   /**

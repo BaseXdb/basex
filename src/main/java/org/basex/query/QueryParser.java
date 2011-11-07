@@ -680,17 +680,14 @@ public class QueryParser extends InputParser {
             if(pkg != null) loadPackage(pkg, new TokenSet(), new TokenSet());
           }
         } else {
-          // compare with static modules
+          // check statically known modules
           boolean found = false;
           for(final byte[] u : MODULES) found |= eq(uri, u);
-          // check if pre-declared modules can be parsed
-          for(final byte[] path : ctx.modDeclared) {
-            if(eq(ctx.modDeclared.get(path), uri)) {
-              module(path, name.uri());
-              found = true;
-            }
-          }
-          if(!found) error(NOMODULE, uri);
+          // check pre-declared modules
+          final byte[] path = ctx.modDeclared.get(uri);
+          if(path != null) module(path, name.uri());
+          // module not found: show error
+          else if(!found) error(NOMODULE, uri);
         }
       }
     } catch(final StackOverflowError ex) {

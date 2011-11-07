@@ -3,8 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import org.basex.core.User;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
@@ -404,8 +406,9 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     checkAdmin(ctx);
-    final byte[] name = checkStr(e, ctx);
-    final IO io = IO.get(string(name));
+    final String name = string(checkStr(e, ctx));
+    IO io = IO.get(name);
+    if(!io.exists()) io = new IOFile(string(ctx.baseURI.atom()), name);
     if(!io.exists()) RESFNF.thrw(input, name);
     return io;
   }

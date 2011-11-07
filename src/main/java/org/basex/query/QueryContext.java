@@ -157,7 +157,7 @@ public final class QueryContext extends Progress {
   /** Counter for variable IDs. */
   public int varIDs;
 
-  /** Pre-declared modules, containing the file path and module uri. */
+  /** Pre-declared modules, containing module uri and their file paths. */
   final TokenMap modDeclared = new TokenMap();
   /** Parsed modules, containing the file path and module uri. */
   final TokenMap modParsed = new TokenMap();
