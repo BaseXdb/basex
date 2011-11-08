@@ -296,7 +296,7 @@ public final class WesternTokenizer extends Tokenizer {
    * @param t token to be converted
    * @return converted token
    */
-  private static byte[] dia(final byte[] t) {
+  static byte[] dia(final byte[] t) {
     // find first character to be normalized
     final int tl = t.length;
     for(int i = 0; i < tl; i += cl(t, i)) {
@@ -320,7 +320,7 @@ public final class WesternTokenizer extends Tokenizer {
    * @param a ascii flag
    * @return the converted token
    */
-  private static byte[] upper(final byte[] t, final boolean a) {
+  static byte[] upper(final byte[] t, final boolean a) {
     final int tl = t.length;
     if(a) {
       for(int i = 0; i < tl; ++i)
@@ -339,7 +339,7 @@ public final class WesternTokenizer extends Tokenizer {
    * @param a ascii flag
    * @return the converted token
    */
-  private static byte[] lower(final byte[] t, final boolean a) {
+  static byte[] lower(final byte[] t, final boolean a) {
     final int tl = t.length;
     if(a) {
       for(int i = 0; i < tl; ++i)
