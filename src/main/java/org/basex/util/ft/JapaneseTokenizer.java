@@ -13,6 +13,7 @@ import java.util.Iterator;
 
 import org.basex.core.Prop;
 import org.basex.util.Reflect;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -22,7 +23,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Toshio HIRAI
  */
-class JapaneseTokenizer extends Tokenizer {
+public class JapaneseTokenizer extends Tokenizer {
   /** Flag available. */
   private static boolean available = true;
 
@@ -30,10 +31,37 @@ class JapaneseTokenizer extends Tokenizer {
   private static final String PATTERN = "net.reduls.igo.Tagger";
   /** Name of Japanese dictionary. */
   private static final String LANG = "ja";
-  /** A part of speech, KIGOU(Mark). */
-  private static final int HINSHI_MARK = 1;
-  /** A part of speech, Others(only a mark is distinguished). */
-  private static final int HINSHI_OTHERS = 0;
+
+  /** The kind of POS(Noun). */
+  static final String MEISHI = "\u540D\u8A5E";
+  /** The kind of POS(Pre-noun Adjectival). */
+  static final String RENTAISHI = "\u9023\u4F53\u8A5E";
+  /** The kind of POS(Adverb). */
+  static final String HUKUSHI = "\u526F\u8A5E";
+  /** The kind of POS(Verb). */
+  static final String DOUSHI = "\u52D5\u8A5E";
+  /** The kind of POS(Conjunction). */
+  static final String SETSUZOKUSHI = "\u63A5\u982D\u8A5E";
+  /** The kind of POS(Modal verbs). */
+  static final String JYODOUSHI = "\u52A9\u52D5\u8A5E";
+  /** The kind of POS(Postpositional particle). */
+  static final String JYOSHI = "\u52A9\u8A5E";
+  /** The kind of POS(Adjective). */
+  static final String KEIYOUSHI = "\u5F62\u5BB9\u8A5E";
+  /** The kind of POS(Mark). */
+  static final String KIGOU = "\u8A18\u53F7";
+  /** The kind of POS(Interjection). */
+  static final String KANDOUSHI = "\u8A18\u53F7";
+  /** The kind of POS(Filler). */
+  static final String FILLER = "\u30D5\u30A3\u30E9\u30FC";
+  /** The kind of POS(Others). */
+  static final String SONOTA = "\u305D\u306E;\u4ED6";
+
+  /** Constant of Feature(Mark). */
+  static final String KIGOU_FEATURE = "\u8A18\u53F7,*,*,*,*,*,*,*,*";
+  /** Constant of Feature(Noun). */
+  static final String MEISHI_FEATURE = "\u540D\u8A5E,*,*,*,*,*,*,*,*";
+
   /** Igo constructor. */
   private static Constructor<?> tgr;
   /** Igo instance. */
@@ -49,14 +77,29 @@ class JapaneseTokenizer extends Tokenizer {
 
   /** Token iterator. */
   private Iterator<Morpheme> tokens;
+  /** Token list. */
+  private ArrayList<Morpheme> tokenList = new ArrayList<Morpheme>();
+  /** Current position of the Token list. */
+  private int cpos;
+  /** Current token. */
+  private Morpheme currToken;
+
+  /** Diacritics flag. */
+  private final boolean dc;
   /** Sensitivity flag. */
   private final boolean cs;
   /** Uppercase flag. */
   private final boolean uc;
   /** Lowercase flag. */
   private final boolean lc;
+  /** Wildcard flag. */
+  private final boolean wc;
+  /** Stemming flag. */
+  private final boolean st;
   /** Token position. */
   private int pos = -1;
+  /** Flag indicating a special character. */
+  private boolean sc;
 
   static {
     File dic = null;
@@ -108,10 +151,13 @@ class JapaneseTokenizer extends Tokenizer {
    * Constructor.
    * @param fto (optional) full-text options
    */
-  JapaneseTokenizer(final FTOpt fto) {
+  public JapaneseTokenizer(final FTOpt fto) {
     lc = fto != null && fto.is(LC);
     uc = fto != null && fto.is(UC);
     cs = fto != null && fto.is(CS);
+    wc = fto != null && fto.is(WC);
+    dc = fto != null && fto.is(DC);
+    st = fto != null && fto.is(ST);
   }
 
   @Override
@@ -121,10 +167,12 @@ class JapaneseTokenizer extends Tokenizer {
 
   @Override
   public JapaneseTokenizer init(final byte[] txt) {
-    final String source = string(txt);
+    String source = string(txt);
+    if(wc) { //Convert Wide-Space to Space
+      source = source.replaceAll("\u3000", "\u0020");
+    }
     final ArrayList<?> morpheme =
-      (ArrayList<?>) Reflect.invoke(parse, tagger, source);
-
+        (ArrayList<?>) Reflect.invoke(parse, tagger, source);
     final ArrayList<Morpheme> list = new ArrayList<Morpheme>();
     try {
       int prev = 0;
@@ -132,51 +180,220 @@ class JapaneseTokenizer extends Tokenizer {
         final Object m = morpheme.get(i);
         final String srfc = surface.get(m).toString();
         final String ftr = feature.get(m).toString();
-        final int hinshi = getHinshi(srfc, ftr);
         final int s = start.getInt(m);
         if(i != 0) {
           final int l = s - prev;
           if(l != 0) {
             list.add(new Morpheme(
-                source.substring(s - 1, s + l - 1), HINSHI_MARK)
+                source.substring(s - 1, s + l - 1), KIGOU_FEATURE)
             );
           }
         }
         prev = srfc.length() + s;
-        list.add(new Morpheme(srfc, hinshi));
+
+        //Separates continuous mark (ASCII)
+        boolean cont = true;
+        ArrayList<Morpheme> marks = new ArrayList<Morpheme>();
+        for(int j = 0; j < srfc.length(); j++) {
+          String c = String.valueOf(srfc.charAt(j));
+          final byte[] t = token(c);
+          if(t.length == 1)
+            if(letter(t[0]) || digit(t[0])) cont = false;
+            else marks.add(new Morpheme(c, KIGOU_FEATURE));
+          else cont = false;
+        }
+
+        if(cont) list.addAll(marks);
+        else list.add(new Morpheme(srfc, ftr));
       }
     } catch(final Exception ex) {
       Util.errln(Util.name(this) + ": " + ex);
     }
+    tokenList = list;
     tokens = list.iterator();
 
     return this;
   }
 
+  /**
+   * Returns whether the special character.
+   * @param s string
+   * @return resule
+   */
+  private static boolean isFtChar(final String s) {
+    if(s.equals(".") || s.equals("?") ||
+       s.equals("*") || s.equals("+") || s.equals("\\") ||
+       s.equals("{") || s.equals("}")) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Returns whether the following token exists (using wildcards).
+   * @return result
+   */
+  private boolean moreWC() {
+    StringBuffer word = new StringBuffer();
+    int size = tokenList.size();
+    boolean period = false;
+    boolean bs = false;
+    boolean more = false;
+
+    for(; cpos < size; cpos++) {
+      String cSrfc = tokenList.get(cpos).getSurface();
+      boolean cMark = tokenList.get(cpos).isMark();
+      String nSrfc = null;
+      boolean nMark = false;
+      if(cpos < (size - 1)) {
+        nSrfc = tokenList.get(cpos + 1).getSurface();
+        nMark = tokenList.get(cpos + 1).isMark();
+      }
+
+      if(nSrfc != null) {
+        if(cSrfc.equals("\\")) bs = true;
+
+        //Delimiter
+        if((cMark && !isFtChar(cSrfc)) ||
+          (cSrfc.equals("\\") && nMark)) {
+            period = false;
+            bs = false;
+            if (word.length() != 0) {
+              more = true;
+              break;
+            }
+            if (cSrfc.equals("\\") && nMark) cpos++;
+            continue;
+        }
+
+        word.append(cSrfc);
+
+        if(bs || nSrfc.equals("\\")) {
+          more = true;
+          continue;
+        }
+
+        if(cSrfc.equals(".") || nSrfc.equals(".")) {
+          period = true;
+          continue;
+        }
+        if(period) {
+          if(cSrfc.equals("{")) {
+            cpos++;
+            for(; cpos < size; cpos++) {
+              cSrfc = tokenList.get(cpos).getSurface();
+              word.append(cSrfc);
+              if(cSrfc.equals("}")) {
+                more = true;
+                break;
+              }
+            }
+            cpos++;
+            break;
+          }
+          continue;
+        }
+      } else {
+        //Last token.
+        if(cMark) {
+          if (cSrfc.equals("\\")) continue;
+          if (word.length() != 0) {
+            word.append(cSrfc);
+          }
+          more = true;
+          continue;
+        }
+      }
+
+      if(period) {
+        word.append(cSrfc);
+      } else {
+        if(bs)
+          if(!isFtChar(cSrfc)) word.append(cSrfc);
+        else
+          word.setLength(0);
+      }
+      more = true;
+      cpos++;
+      break;
+    }
+    if(more) {
+      currToken = word.length() != 0 ?
+        new Morpheme(word.toString(), MEISHI_FEATURE) : tokenList.get(cpos - 1);
+    }
+    return more;
+  }
+
+  /**
+   * Returns whether the following token exists.
+   * @return result
+   */
+  private boolean more() {
+    if (special) {
+      return tokens.hasNext();
+    }
+
+    while(true) {
+      if(!tokens.hasNext())
+        break;
+      currToken = tokens.next();
+      if(currToken.isMark())
+        continue;
+      if(currToken.isAttachedWord())
+        continue;
+      return true;
+    }
+    return false;
+
+  }
   @Override
   public boolean hasNext() {
-    return tokens.hasNext();
+    return wc ? moreWC() : more();
   }
 
   @Override
   public FTSpan next() {
-    return new FTSpan(nextToken(), pos, false);
+      return new FTSpan(nextToken(), pos, sc);
+  }
+
+  /**
+   * Returns the effective token.
+   * @return token
+   */
+  private byte[] get() {
+    pos++;
+    String n = currToken.getSurface();
+    if (st &&
+       (currToken.getHinshi() == Morpheme.HINSHI_DOUSHI ||
+        currToken.getHinshi() == Morpheme.HINSHI_KEIYOUSHI)) {
+        n = currToken.getBaseForm();
+    }
+    byte[] token = token(n);
+    final boolean a = Token.ascii(token);
+    if(!a && !dc) token = WesternTokenizer.dia(token);
+    if(uc) token = WesternTokenizer.upper(token, a);
+    if(lc || !cs) token = WesternTokenizer.lower(token, a);
+    return toHankaku(token);
+  }
+
+  /**
+   * Returns the token which contains special character.
+   * @return token
+   */
+  private byte[] getSC() {
+    Morpheme m = tokens.next();
+    String n = m.getSurface();
+    if (m.isMark() || m.isAttachedWord()) sc = true;
+    else {
+      pos++;
+      sc = false;
+    }
+    return token(n);
   }
 
   @Override
   public byte[] nextToken() {
-    final Morpheme m = tokens.next();
-    String n = m.mSurface;
-    pos++;
-    if(special) {
-      return token(n);
-    }
-    if(m.mHinshi == HINSHI_MARK) {
-      return EMPTY;
-    }
-    if(uc) n = n.toUpperCase();
-    if(lc || !cs) n = n.toLowerCase();
-    return toHankaku(token(n));
+    return special ? getSC() : get();
   }
 
   @Override
@@ -187,30 +404,6 @@ class JapaneseTokenizer extends Tokenizer {
   @Override
   Collection<Language> languages() {
     return collection(LANG);
-  }
-
-  /**
-   * Return the mark or not.
-   * @param srfc Morpheme surface
-   * @param ftr Morpheme feature
-   * @return mark or not
-   */
-  private static int getHinshi(final String srfc, final String ftr) {
-    int hinshi = 0;
-    //morphological analyzer certainly returns
-    //the single ascii char as a "noun".
-    final byte[] s = token(srfc);
-    if(s.length == 1 && !letter(s[0]) && !digit(s[0])) {
-      hinshi = HINSHI_MARK;
-    } else {
-      final String[] parts = ftr.split(",");
-      if(parts[0].equals("\u8A18\u53F7")) {
-        hinshi = HINSHI_MARK;
-      } else {
-        hinshi = HINSHI_OTHERS;
-      }
-    }
-    return hinshi;
   }
 
   /**
@@ -300,20 +493,144 @@ class JapaneseTokenizer extends Tokenizer {
   }
 
   /** Morpheme class. */
-  private static class Morpheme {
+  static class Morpheme {
+    /** A part of speech in the context, NEISHI(Noun). */
+    private static final int HINSHI_MEISHI = 1;
+    /** A part of speech in the context, RENTAISHI(Pre-noun Adjectival). */
+    private static final int HINSHI_RENTAISHI = 2;
+    /** A part of speech in the context, HUKUSHI(Adverb). */
+    private static final int HINSHI_HUKUSHI = 3;
+    /** A part of speech in the context, DOUSHI(Verb). */
+    private static final int HINSHI_DOUSHI = 4;
+    /** A part of speech in the context, SETSUZOKUSHI(Conjunction). */
+    private static final int HINSHI_SETSUZOKUSHI = 5;
+    /** A part of speech in the context, JYODOUSHI(Modal verbs). */
+    private static final int HINSHI_JYODOUSHI = 6;
+    /** A part of speech in the context, JYOSHI(Postpositional particle). */
+    private static final int HINSHI_JYOSHI = 7;
+    /** A part of speech in the context, KEIYOUSHI(Adjective). */
+    private static final int HINSHI_KEIYOUSHI = 8;
+    /** A part of speech in the context, KIGOU(Mark). */
+    private static final int HINSHI_KIGOU = 9;
+    /** A part of speech in the context, KANDOUSHI(Interjection). */
+    private static final int HINSHI_KANDOUSHI = 10;
+    /** A part of speech in the context, FILLER(Filler). */
+    private static final int HINSHI_FILLER = 11;
+    /** A part of speech in the context, Others. */
+    private static final int HINSHI_SONOTA = 0;
+
     /** Surface of Morpheme. */
-    final String mSurface;
+    private final String mSurface;
     /** Feature of Morpheme. */
-    final int mHinshi;
+    private final String mFeature;
 
     /**
      * Constructor.
      * @param srfc surface
-     * @param hinshi a part of speech
+     * @param ftr feature
     */
-    Morpheme(final String srfc, final int hinshi) {
+    Morpheme(final String srfc, final String ftr) {
       mSurface = srfc;
-      mHinshi = hinshi;
+      mFeature = ftr;
+    }
+
+    /**
+     * Returns surface.
+     * @return Surface
+     */
+    public String getSurface() {
+      return mSurface;
+    }
+
+    /**
+     * Returns whether the avoid token.
+     * @return result
+     */
+    public boolean isMark() {
+      if (getHinshi() == Morpheme.HINSHI_KIGOU ||
+          getHinshi() == Morpheme.HINSHI_FILLER) {
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Tests an attached word(FUZOKU-GO).
+     * @return result
+     */
+    public boolean isAttachedWord() {
+      if (getHinshi() == Morpheme.HINSHI_JYODOUSHI ||
+          getHinshi() == Morpheme.HINSHI_JYOSHI) {
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Returns the Part of speach.
+     * @return Part of speach
+     */
+    public int getHinshi() {
+      int hinshi = 0;
+      //morphological analyzer certainly returns
+      //the single ascii char as a "noun".
+      final byte[] s = token(mSurface);
+      if(s.length == 1 && !letter(s[0]) && !digit(s[0])) {
+        hinshi = HINSHI_KIGOU;
+      } else {
+        String h = getPos();
+        if(h.equals(MEISHI)) {
+          hinshi = HINSHI_MEISHI;
+        } else if(h.equals(RENTAISHI)) {
+          hinshi = HINSHI_RENTAISHI;
+        } else if(h.equals(HUKUSHI)) {
+          hinshi = HINSHI_HUKUSHI;
+        } else if(h.equals(DOUSHI)) {
+          hinshi = HINSHI_DOUSHI;
+        } else if(h.equals(SETSUZOKUSHI)) {
+          hinshi = HINSHI_SETSUZOKUSHI;
+        } else if(h.equals(JYODOUSHI)) {
+          hinshi = HINSHI_JYODOUSHI;
+        } else if(h.equals(JYOSHI)) {
+          hinshi = HINSHI_JYOSHI;
+        } else if(h.equals(KEIYOUSHI)) {
+          hinshi = HINSHI_KEIYOUSHI;
+        } else if(h.equals(KIGOU)) {
+          hinshi = HINSHI_KIGOU;
+        } else if(h.equals(KANDOUSHI)) {
+          hinshi = HINSHI_KANDOUSHI;
+        } else if(h.equals(FILLER)) {
+          hinshi = HINSHI_FILLER;
+        } else if(h.equals(SONOTA)) {
+          hinshi = HINSHI_SONOTA;
+        } else {
+          hinshi = HINSHI_SONOTA;
+        }
+      }
+      return hinshi;
+    }
+
+    /**
+     * Retrieves base form from feature.
+     * @return base form
+     */
+    public String getBaseForm() {
+      String[] parts = mFeature.split(",");
+      return parts[6];
+    }
+
+    /**
+     * Retrieves parts of speech from feature.
+     * @return parts of speech(coding in Japanese)
+     */
+    private String getPos() {
+      String[] parts = mFeature.split(",");
+      return parts[0];
+    }
+
+    @Override
+    public String toString() {
+      return mSurface;
     }
   }
 }
