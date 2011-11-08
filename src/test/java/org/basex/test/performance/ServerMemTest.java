@@ -82,7 +82,7 @@ public final class ServerMemTest {
   /** Single client. */
   static final class Client extends Thread {
     /** Client session. */
-    private ClientSession session;
+    private final ClientSession session;
 
     /**
      * Default constructor.

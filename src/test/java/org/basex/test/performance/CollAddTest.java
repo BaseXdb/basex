@@ -105,7 +105,7 @@ public final class CollAddTest {
     new Set(Prop.AUTOFLUSH, flush).execute(CONTEXT);
 
     // Create test database
-    Command cmd = new CreateDB(DB);
+    final Command cmd = new CreateDB(DB);
     cmd.execute(CONTEXT);
     // Add documents
     for(int i = 0; i < n; i++) {

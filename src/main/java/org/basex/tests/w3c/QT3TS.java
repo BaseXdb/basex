@@ -62,7 +62,7 @@ public final class QT3TS {
   /** Database context. */
   protected final Context ctx = new Context();
   /** Global environments. */
-  private ObjList<QT3Env> genvs = new ObjList<QT3Env>();
+  private final ObjList<QT3Env> genvs = new ObjList<QT3Env>();
   /** Default path to the test suite. */
   protected String path = "g:/XML/w3c/qt3ts/";
 

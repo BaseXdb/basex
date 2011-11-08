@@ -105,7 +105,7 @@ public final class ServerStressTest {
   /** Single client. */
   static final class Client extends Thread {
     /** Client session. */
-    private ClientSession session;
+    private final ClientSession session;
     /** Number of runs. */
     private final int runs;
 
@@ -127,7 +127,7 @@ public final class ServerStressTest {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
           // Return nth text of the database
-          final int n = (RND.nextInt() % MAX) + 1;
+          final int n = RND.nextInt() % MAX + 1;
           final String qu = Util.info(QUERY, n);
           session.execute("xquery " + qu);
         }

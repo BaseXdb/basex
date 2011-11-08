@@ -132,7 +132,7 @@ public final class XQUFServerStressTest {
   /** Single client. */
   static final class Client extends Thread {
     /** Client session. */
-    private ClientSession session;
+    private final ClientSession session;
     /** Query to be executed by this client. */
     final String query;
     /** Number of runs. */
