@@ -168,8 +168,8 @@ public class JapaneseTokenizer extends Tokenizer {
   @Override
   public JapaneseTokenizer init(final byte[] txt) {
     String source = string(txt);
-    if(wc) { //Convert Wide-Space to Space
-      source = source.replaceAll("\u3000", "\u0020");
+    if(wc) { // convert wide-space to space
+      source = source.replace('\u3000', '\u0020');
     }
     final ArrayList<?> morpheme =
         (ArrayList<?>) Reflect.invoke(parse, tagger, source);
@@ -191,11 +191,11 @@ public class JapaneseTokenizer extends Tokenizer {
         }
         prev = srfc.length() + s;
 
-        //Separates continuous mark (ASCII)
+        // separates continuous mark (ASCII)
         boolean cont = true;
-        ArrayList<Morpheme> marks = new ArrayList<Morpheme>();
+        final ArrayList<Morpheme> marks = new ArrayList<Morpheme>();
         for(int j = 0; j < srfc.length(); j++) {
-          String c = String.valueOf(srfc.charAt(j));
+          final String c = String.valueOf(srfc.charAt(j));
           final byte[] t = token(c);
           if(t.length == 1)
             if(letter(t[0]) || digit(t[0])) cont = false;
@@ -218,7 +218,7 @@ public class JapaneseTokenizer extends Tokenizer {
   /**
    * Returns whether the special character.
    * @param s string
-   * @return resule
+   * @return result of check
    */
   private static boolean isFtChar(final String s) {
     if(s.equals(".") || s.equals("?") ||
@@ -231,21 +231,21 @@ public class JapaneseTokenizer extends Tokenizer {
 
   /**
    * Returns whether the following token exists (using wildcards).
-   * @return result
+   * @return result of check
    */
   private boolean moreWC() {
-    StringBuffer word = new StringBuffer();
-    int size = tokenList.size();
+    final StringBuilder word = new StringBuilder();
+    final int size = tokenList.size();
     boolean period = false;
     boolean bs = false;
     boolean more = false;
 
     for(; cpos < size; cpos++) {
       String cSrfc = tokenList.get(cpos).getSurface();
-      boolean cMark = tokenList.get(cpos).isMark();
+      final boolean cMark = tokenList.get(cpos).isMark();
       String nSrfc = null;
       boolean nMark = false;
-      if(cpos < (size - 1)) {
+      if(cpos < size - 1) {
         nSrfc = tokenList.get(cpos + 1).getSurface();
         nMark = tokenList.get(cpos + 1).isMark();
       }
@@ -253,16 +253,16 @@ public class JapaneseTokenizer extends Tokenizer {
       if(nSrfc != null) {
         if(cSrfc.equals("\\")) bs = true;
 
-        //Delimiter
-        if((cMark && !isFtChar(cSrfc)) ||
-          (cSrfc.equals("\\") && nMark)) {
+        // delimiter
+        if(cMark && !isFtChar(cSrfc) ||
+          cSrfc.equals("\\") && nMark) {
             period = false;
             bs = false;
-            if (word.length() != 0) {
+            if(word.length() != 0) {
               more = true;
               break;
             }
-            if (cSrfc.equals("\\") && nMark) cpos++;
+            if(cSrfc.equals("\\") && nMark) cpos++;
             continue;
         }
 
@@ -294,10 +294,10 @@ public class JapaneseTokenizer extends Tokenizer {
           continue;
         }
       } else {
-        //Last token.
+        // last token.
         if(cMark) {
-          if (cSrfc.equals("\\")) continue;
-          if (word.length() != 0) {
+          if(cSrfc.equals("\\")) continue;
+          if(word.length() != 0) {
             word.append(cSrfc);
           }
           more = true;
@@ -329,19 +329,13 @@ public class JapaneseTokenizer extends Tokenizer {
    * @return result
    */
   private boolean more() {
-    if (special) {
+    if(special) {
       return tokens.hasNext();
     }
 
-    while(true) {
-      if(!tokens.hasNext())
-        break;
+    while(tokens.hasNext()) {
       currToken = tokens.next();
-      if(currToken.isMark())
-        continue;
-      if(currToken.isAttachedWord())
-        continue;
-      return true;
+      if(!currToken.isMark() && !currToken.isAttachedWord()) return true;
     }
     return false;
 
@@ -353,7 +347,7 @@ public class JapaneseTokenizer extends Tokenizer {
 
   @Override
   public FTSpan next() {
-      return new FTSpan(nextToken(), pos, sc);
+    return new FTSpan(nextToken(), pos, sc);
   }
 
   /**
@@ -363,9 +357,10 @@ public class JapaneseTokenizer extends Tokenizer {
   private byte[] get() {
     pos++;
     String n = currToken.getSurface();
-    if (st &&
-       (currToken.getHinshi() == Morpheme.HINSHI_DOUSHI ||
-        currToken.getHinshi() == Morpheme.HINSHI_KEIYOUSHI)) {
+    final int hinshi = currToken.getHinshi();
+    if(st &&
+       (hinshi == Morpheme.HINSHI_DOUSHI ||
+        hinshi == Morpheme.HINSHI_KEIYOUSHI)) {
         n = currToken.getBaseForm();
     }
     byte[] token = token(n);
@@ -381,9 +376,9 @@ public class JapaneseTokenizer extends Tokenizer {
    * @return token
    */
   private byte[] getSC() {
-    Morpheme m = tokens.next();
-    String n = m.getSurface();
-    if (m.isMark() || m.isAttachedWord()) sc = true;
+    final Morpheme m = tokens.next();
+    final String n = m.getSurface();
+    if(m.isMark() || m.isAttachedWord()) sc = true;
     else {
       pos++;
       sc = false;
@@ -547,11 +542,9 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return result
      */
     public boolean isMark() {
-      if (getHinshi() == Morpheme.HINSHI_KIGOU ||
-          getHinshi() == Morpheme.HINSHI_FILLER) {
-        return true;
-      }
-      return false;
+      final int hinshi = getHinshi();
+      return hinshi == Morpheme.HINSHI_KIGOU ||
+             hinshi == Morpheme.HINSHI_FILLER;
     }
 
     /**
@@ -559,26 +552,24 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return result
      */
     public boolean isAttachedWord() {
-      if (getHinshi() == Morpheme.HINSHI_JYODOUSHI ||
-          getHinshi() == Morpheme.HINSHI_JYOSHI) {
-        return true;
-      }
-      return false;
+      final int hinshi = getHinshi();
+      return hinshi == Morpheme.HINSHI_JYODOUSHI ||
+             hinshi == Morpheme.HINSHI_JYOSHI;
     }
 
     /**
-     * Returns the Part of speach.
-     * @return Part of speach
+     * Returns the part of speech.
+     * @return part of speech
      */
     public int getHinshi() {
       int hinshi = 0;
-      //morphological analyzer certainly returns
-      //the single ascii char as a "noun".
+      // morphological analyzer certainly returns
+      // the single ascii char as a "noun".
       final byte[] s = token(mSurface);
       if(s.length == 1 && !letter(s[0]) && !digit(s[0])) {
         hinshi = HINSHI_KIGOU;
       } else {
-        String h = getPos();
+        final String h = getPos();
         if(h.equals(MEISHI)) {
           hinshi = HINSHI_MEISHI;
         } else if(h.equals(RENTAISHI)) {
@@ -615,7 +606,7 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return base form
      */
     public String getBaseForm() {
-      String[] parts = mFeature.split(",");
+      final String[] parts = mFeature.split(",");
       return parts[6];
     }
 
@@ -624,7 +615,7 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return parts of speech(coding in Japanese)
      */
     private String getPos() {
-      String[] parts = mFeature.split(",");
+      final String[] parts = mFeature.split(",");
       return parts[0];
     }
 
