@@ -254,6 +254,19 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests a simple call of the optimize command.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void optimize() throws BaseXException {
+    createDB(null);
+    query("let $w := //item[@id = 'item0'] " +
+        "return (if($w/@id) " +
+        "then (delete node $w/@id, db:optimize('" + DB + "')) else ())"
+        );
+  }
+
+  /**
    * Deletes the test db.
    * @throws Exception exception
    */
