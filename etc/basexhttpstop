@@ -3,17 +3,18 @@
 # Path to this script
 FILE="${BASH_SOURCE[0]}"
 while [ -h "$FILE" ] ; do
-  SOURCE="$(readlink "$FILE")"
+  SRC="$(readlink "$FILE")"
   FILE="$( cd -P "$(dirname "$FILE")" && \
-           cd -P "$(dirname "$SOURCE")" && pwd )/$(basename "$SOURCE")"
+           cd -P "$(dirname "$SRC")" && pwd )/$(basename "$SRC")"
 done
-BASEX_DIR="$( cd -P "$(dirname $FILE)" && pwd )"
+BXAPI="$( cd -P "$(dirname "$FILE")/.." && pwd )"
+BX="$( cd -P "$BXAPI/../basex" && pwd )"
 
-# Core and library classes
-CP=$BASEX_DIR/../target/classes
-CP=$CP:$(echo $BASEX_DIR/../lib/*.jar | tr ' ' ':')
-CP=$CP:$BASEX_DIR/../../basex/target/classes
-CP=$CP:$(echo $BASEX_DIR/../../basex/lib/*.jar | tr ' ' ':')
+# API, core, and library classes
+CP="$BXAPI/target/classes"
+CP="$CP$(for JAR in "$BXAPI"/lib/*.jar; do echo -n ":$JAR"; done)"
+CP="$CP:$BX/target/classes"
+CP="$CP$(for JAR in "$BX"/lib/*.jar; do echo -n ":$JAR"; done)"
 
 # Options for virtual machine
 VM=-Xmx512m
