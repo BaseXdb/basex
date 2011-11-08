@@ -91,8 +91,11 @@ final class DatabaseUpdates {
     while(p >= 0) {
       // parent of a previous attribute has already been checked
       if(par == nodes.get(p) && --p < 0) break;
-
       int pre = nodes.get(p);
+
+      // catching optimize statements which have PRE == -1 as a target
+      if(pre == -1) return;
+
       final int k = data.kind(pre);
       if(k == Data.ATTR) {
         par = data.parent(pre, k);
