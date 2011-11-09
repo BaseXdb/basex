@@ -54,7 +54,7 @@ public final class NamespaceRDFTest {
    */
   @Before
   public void setUp() throws IOException {
-    session = new ClientSession("localhost", 1984, "admin", "admin");
+    session = new ClientSession("localhost", 9999, "admin", "admin");
     session.execute(String.format("create db %s <default/>", DB));
 
     // Loads documents.
