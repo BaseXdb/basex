@@ -719,6 +719,7 @@ public abstract class Data {
     int dpre = -1;
     final NSNode t = ns.current;
     final Set<NSNode> newNodes = new HashSet<NSNode>();
+    final IntList flagPres = new IntList();
 
     while(++dpre != dsize) {
       if(dpre != 0 && dpre % buf == 0) insert(ipre + dpre - buf);
@@ -726,6 +727,7 @@ public abstract class Data {
       final int pre = ipre + dpre;
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
+      // [LK] if ipar == -1 wrong dis is calculated?
       final int dis = dpar >= 0 ? dpre - dpar : pre - ipar;
       final int par = pre - dis;
 
@@ -819,7 +821,9 @@ public abstract class Data {
           if(data.nsFlag(dpre)) {
             ns.add(par, preStack.size() == 0 ? ipar : preStack.peek(), pref(nm),
                 data.ns.uri(data.uri(dpre, dkind)));
-            table.write2(ipar, 1, 1 << 15 | name(ipar));
+            // save pre value to set ns flag later for this node. can't be done
+            // here as direct table access would interfere with the buffer
+            flagPres.add(par);
           }
           attr(pre, dis, atnindex.index(nm, null, false),
               data.text(dpre, false), ns.uri(nm, false), false);
@@ -833,6 +837,11 @@ public abstract class Data {
     if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);
     // reset buffer to old size
     buffer(1);
+
+    // set ns flags
+    for(final int toFlag : flagPres.toArray()) {
+      table.write2(toFlag, 1, name(toFlag));
+    }
 
     // increase size of ancestors
     int p = ipar;

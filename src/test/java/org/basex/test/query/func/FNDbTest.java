@@ -18,7 +18,6 @@ import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -267,7 +266,6 @@ public final class FNDbTest extends AdvancedQueryTest {
   /**
    * Test method for the db:add() function with document with namespaces.
    */
-  @Ignore("GH-250: AIOOB in db:add(...)")
   @Test
   public void dbAddWithNS() {
     query(DBADD.args(DB, " document { <x xmlns:a='a' a:y='' /> }", "x"));
