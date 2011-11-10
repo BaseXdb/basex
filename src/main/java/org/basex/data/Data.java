@@ -703,7 +703,7 @@ public abstract class Data {
     // resize buffer to cache more entries
     buffer(buf);
 
-    // find all namespaces in scope
+    // find all namespaces in scope to avoid duplicate declarations
     final TokenMap nsScope = new TokenMap();
     NSNode n = ns.current;
     do {
@@ -790,6 +790,7 @@ public abstract class Data {
           if(data.nsFlag(dpre)) {
             final Atts at = data.ns(dpre);
             for(int a = 0; a < at.size; ++a) {
+              // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.key[a]);
               if(old == null || !eq(old, at.val[a])) {
                 // we have to keep track of all new NSNodes that are added
@@ -818,8 +819,12 @@ public abstract class Data {
         case ATTR:
           // add attribute
           nm = data.name(dpre, dkind);
-          if(data.nsFlag(dpre)) {
-            ns.add(par, preStack.size() == 0 ? ipar : preStack.peek(), pref(nm),
+          // check if prefix already in nsScope or not
+          final byte[] attPref = pref(nm);
+          // check if prefix of attribute has already been declared, otherwise
+          // add declaration to parent node
+          if(data.nsFlag(dpre) && (nsScope.get(attPref) == null)) {
+            ns.add(par, preStack.size() == 0 ? ipar : preStack.peek(), attPref,
                 data.ns.uri(data.uri(dpre, dkind)));
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
