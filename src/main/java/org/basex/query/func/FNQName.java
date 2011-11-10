@@ -87,8 +87,10 @@ public final class FNQName extends FuncCall {
         if(it == null) return null;
         final Uri rel = Uri.uri(checkEStr(it));
         if(!rel.valid()) URIINV.thrw(input, it);
+        if(rel.absolute()) return rel;
         final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkEStr(it2));
         if(!base.valid()) URIINV.thrw(input, base);
+        if(!base.absolute()) URIABS.thrw(input, base);
         return base.resolve(rel);
       default:
         return super.item(ctx, ii);

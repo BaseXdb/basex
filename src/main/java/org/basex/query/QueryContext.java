@@ -115,9 +115,9 @@ public final class QueryContext extends Progress {
   /** Decimal-format declarations. */
   public final TokenObjMap<DecFormatter> decFormats =
     new TokenObjMap<DecFormatter>();
-  /** Default function namespace. */
+  /** URI of the Default function namespace. */
   public byte[] nsFunc = FNURI;
-  /** Default element namespace. */
+  /** URI of the default element namespace. */
   public byte[] nsElem = EMPTY;
   /** Static Base URI. */
   public Uri baseURI = Uri.EMPTY;

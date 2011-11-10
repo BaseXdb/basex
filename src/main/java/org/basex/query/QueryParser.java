@@ -478,15 +478,15 @@ public class QueryParser extends InputParser {
     final boolean elem = wsConsumeWs(ELEMENT);
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
     wsCheck(NSPACE);
-    final byte[] ns = stringLiteral();
+    final byte[] uri = stringLiteral();
     if(elem) {
       if(declElem) error(DUPLNS);
       declElem = true;
-      ctx.nsElem = ns;
+      ctx.nsElem = uri;
     } else {
       if(declFunc) error(DUPLNS);
       declFunc = true;
-      ctx.nsFunc = ns;
+      ctx.nsFunc = uri;
     }
     return true;
   }

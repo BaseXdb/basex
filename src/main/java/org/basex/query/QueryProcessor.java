@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map.Entry;
@@ -14,6 +15,7 @@ import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.JavaFunc;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
@@ -177,6 +179,31 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor context(final Object o) throws QueryException {
     ctx.initExpr = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
+    return this;
+  }
+
+  /**
+   * Declares a namespace.
+   * A namespace is undeclared if the {@code uri} is an empty string.
+   * The default element namespaces is set if the {@code prefix} is empty.
+   * @param prefix namespace prefix
+   * @param uri namespace uri
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public QueryProcessor namespace(final String prefix, final String uri)
+      throws QueryException {
+
+    if(prefix.isEmpty()) {
+      ctx.nsElem = token(uri);
+    } else {
+      final QNm name = new QNm(token(prefix), token(uri));
+      if(!uri.isEmpty()) {
+        ctx.ns.add(name, null);
+      } else {
+        ctx.ns.delete(name);
+      }
+    }
     return this;
   }
 
