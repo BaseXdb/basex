@@ -1,13 +1,10 @@
 package org.basex.tests.w3c.qt3api;
 
-import static org.basex.util.Token.*;
-
 import java.util.Iterator;
 
 import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
@@ -64,17 +61,16 @@ public final class XQuery implements Iterable<XQItem> {
   }
 
   /**
-   * Declares a namespace. A namespace is undeclared if the {@code uri} is
-   * an empty string.
+   * Declares a namespace.
+   * A namespace is undeclared if the {@code uri} is an empty string.
+   * The default element namespaces is set if the {@code prefix} is empty.
    * @param prefix namespace prefix
    * @param uri namespace uri
    * @return self reference
    */
   public XQuery namespace(final String prefix, final String uri) {
-    final QNm name = new QNm(token(prefix), token(uri));
     try {
-      if(!uri.isEmpty()) qp.ctx.ns.add(name, null);
-      else qp.ctx.ns.delete(name);
+      qp.namespace(prefix, uri);
       return this;
     } catch(final QueryException ex) {
       throw new XQException(ex);
