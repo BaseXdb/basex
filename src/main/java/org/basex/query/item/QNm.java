@@ -206,8 +206,8 @@ public final class QNm extends Item {
   }
 
   /**
-   * Returns a unique representation of the QName,
-   * including its URI and local name.
+   * Returns the Clark notation, represented by the URI in curly braces
+   * and the local name.
    * @return full name
    */
   public byte[] full() {
