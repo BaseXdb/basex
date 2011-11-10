@@ -176,6 +176,7 @@ public abstract class Formatter extends FormatUtil {
             break;
           case 'h':
             num = gc.getHour() % 12;
+            if(num == 0) num = 12;
             err = dat;
             break;
           case 'P':
