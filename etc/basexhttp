@@ -7,14 +7,14 @@ while [ -h "$FILE" ] ; do
   FILE="$( cd -P "$(dirname "$FILE")" && \
            cd -P "$(dirname "$SRC")" && pwd )/$(basename "$SRC")"
 done
-BXAPI="$( cd -P "$(dirname "$FILE")/.." && pwd )"
-BX="$( cd -P "$BXAPI/../basex" && pwd )"
+BX="$( cd -P "$(dirname "$FILE")/.." && pwd )"
+BXCORE="$( cd -P "$BX/../basex" && pwd )"
 
 # API, core, and library classes
-CP="$BXAPI/target/classes"
-CP="$CP$(for JAR in "$BXAPI"/lib/*.jar; do echo -n ":$JAR"; done)"
-CP="$CP:$BX/target/classes"
+CP="$BX/target/classes"
 CP="$CP$(for JAR in "$BX"/lib/*.jar; do echo -n ":$JAR"; done)"
+CP="$CP:$BXCORE/target/classes"
+CP="$CP$(for JAR in "$BXCORE"/lib/*.jar; do echo -n ":$JAR"; done)"
 
 # Options for virtual machine
 VM=-Xmx512m
