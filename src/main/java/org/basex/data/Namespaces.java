@@ -143,12 +143,35 @@ public final class Namespaces {
    * @return number of uri references
    */
   public int size() {
-    /* [LK] returns the size of the uri container - if we delete nodes from
+    /* returns the size of the uri container - if we delete nodes from
      * the namespace structure via this.delete(pre,s) the container size isn't
      * changed at all, as only NSNodes in the range pre,pre+s-1 are deleted.
      * COUNTERINTUITIVE?
      */
     return uri.size();
+  }
+
+  /**
+   * Determines the number of {NSNode}s in this namespace hierarchy, which is
+   * the number of nodes that declare a namspace in the document. FOR TESTING
+   * ONLY.
+   * @return number of NSNodes
+   */
+  public int numberNSNodes() {
+    return nrDescendants(root);
+  }
+
+  /**
+   * Determines the number of descendant-or-self nodes for the given node.
+   * @param n node
+   * @return number of descendants-or-self nodes
+   */
+  private int nrDescendants(final NSNode n) {
+    int i = root.equals(n) ? 0 : 1;
+    for(final NSNode child : n.ch)
+      i += nrDescendants(child);
+
+    return i;
   }
 
   /**

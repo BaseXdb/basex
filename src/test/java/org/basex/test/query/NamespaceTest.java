@@ -49,6 +49,7 @@ public final class NamespaceTest {
     "<e xmlns='E'/></a>" },
     { "d16", "<a><b/></a>" },
     { "d17", "<ns:a xmlns:ns='NS'><b/></ns:a>" },
+    { "d18", "<n xmlns:ns='ns'><a/></n>"},
   };
 
   /**
@@ -460,6 +461,21 @@ public final class NamespaceTest {
   }
 
   /**
+   * GH-249: Inserts an element with a prefixed attribute and checks
+   * if there are superfluous namespace declarations for the element.
+   * @throws BaseXException basex exception
+   */
+  @Test
+  public void superfluousPrefixDeclaration() throws BaseXException {
+    create(18);
+    query(
+        "declare namespace ns='ns'; " +
+        "insert node <b ns:id='0'/> into /n/a",
+        "");
+    assertEquals(1, CONTEXT.data().ns.numberNSNodes());
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */
@@ -514,7 +530,7 @@ public final class NamespaceTest {
 
     try {
       if(first != null) new XQuery(first).execute(CONTEXT);
-      final String result = new XQuery(second).execute(CONTEXT);
+      final String result = new XQuery(second).execute(CONTEXT).trim();
 
       // quotes are replaced by apostrophes to simplify comparison
       final String res = result.replaceAll("\\\"", "'");
