@@ -259,7 +259,7 @@ public final class QT3TS {
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
         if(e.collContext) {
-          query.context(Function.COLL.get(null, Str.get(e.collURI)));
+          query.context(Function.COLLECTION.get(null, Str.get(e.collURI)));
         }
         // set base uri
         if(e.baseURI != null) query.baseURI(e.baseURI);

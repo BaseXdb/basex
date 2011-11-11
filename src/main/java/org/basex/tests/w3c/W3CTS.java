@@ -592,7 +592,7 @@ public abstract class W3CTS {
           if(first) {
             new DropDB(dbname).execute(context);
           } else {
-            def = Function.DBOPEN;
+            def = Function._DB_OPEN;
             src = dbname;
           }
         }
