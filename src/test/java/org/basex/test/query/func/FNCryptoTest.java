@@ -23,11 +23,11 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void checkFunctionArguments() {
-    check(CRYPENCRYPT);
-    check(CRYPDECRYPT);
-    check(CRYPHMAC);
-    check(CRYPGENSIG);
-    check(CRYPVALSIG);
+    check(_CRYPTO_ENCRYPT);
+    check(_CRYPTO_DECRYPT);
+    check(_CRYPTO_HMAC);
+    check(_CRYPTO_GENERATE_SIGNATURE);
+    check(_CRYPTO_VALIDATE_SIGNATURE);
   }
 
   /**

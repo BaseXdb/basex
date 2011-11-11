@@ -44,11 +44,11 @@ public final class FNNode extends FuncCall {
       checkCtx(ctx)).item(ctx, input);
 
     switch(def) {
-      case NODENAME:
+      case NODE_NAME:
         if(it == null) return null;
         QNm qname = checkNode(it).qname();
         return qname != null && qname.atom().length != 0 ? qname : null;
-      case DOCURI:
+      case DOCUMENT_URI:
         if(it == null) return null;
         ANode node = checkNode(it);
         if(node.type != NodeType.DOC) return null;
@@ -58,7 +58,7 @@ public final class FNNode extends FuncCall {
         // always false, as no schema information is given
         return it == null || checkNode(it).type != NodeType.ELM ? null :
           Bln.FALSE;
-      case BASEURI:
+      case BASE_URI:
         if(it == null) return null;
         ANode n = checkNode(it);
         if(n.type != NodeType.ELM && n.type != NodeType.DOC &&
@@ -77,11 +77,11 @@ public final class FNNode extends FuncCall {
         if(it == null) return Str.ZERO;
         qname = checkNode(it).qname();
         return qname != null ? Str.get(qname.atom()) : Str.ZERO;
-      case LOCNAME:
+      case LOCAL_NAME:
         if(it == null) return Str.ZERO;
         qname = checkNode(it).qname();
         return qname != null ? Str.get(qname.ln()) : Str.ZERO;
-      case NSURI:
+      case NAMESPACE_URI:
         if(it == null || it.type == NodeType.PI) return Uri.EMPTY;
         node = checkNode(it);
         while(node != null) {
@@ -101,10 +101,10 @@ public final class FNNode extends FuncCall {
         n = checkNode(it);
         while(n.parent() != null) n = n.parent();
         return n;
-      case GENID:
+      case GENERATE_ID:
         return it == null ? Str.ZERO : Str.get(new TokenBuilder(
             QueryText.ID).addLong(checkNode(it).id).finish());
-      case CHILDREN:
+      case HAS_CHILDREN:
         return Bln.get(it != null && checkNode(it).hasChildren());
       case PATH:
         if(it == null) return null;
@@ -160,9 +160,10 @@ public final class FNNode extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == Function.GENID || def == Function.PATH ||
-        def == Function.CHILDREN || expr.length == 0 &&
-        (def == Function.DOCURI || def == Function.NODENAME)) ||
+    return u == Use.X30 && (def == Function.GENERATE_ID ||
+        def == Function.PATH || def == Function.HAS_CHILDREN ||
+        expr.length == 0 &&
+        (def == Function.DOCUMENT_URI || def == Function.NODE_NAME)) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
   }
 }

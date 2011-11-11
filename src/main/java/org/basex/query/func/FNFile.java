@@ -54,9 +54,9 @@ public final class FNFile extends FuncCall {
     checkAdmin(ctx);
 
     switch(def) {
-      case FLLIST:
+      case _FILE_LIST:
         return list(ctx);
-      case FLREADLINES:
+      case _FILE_READ_TEXT_LINES:
         return readTextLines(new File(string(checkStr(expr[0], ctx))), ctx);
       default:
         return super.iter(ctx);
@@ -72,27 +72,27 @@ public final class FNFile extends FuncCall {
         string(checkStr(expr[0], ctx)));
 
     switch(def) {
-      case FLAPPEND:      return write(path, ctx, true);
-      case FLAPPENDBIN:   return writeBinary(path, ctx, true);
-      case FLCOPY:        return copy(path, ctx, true);
-      case FLCREATEDIR:   return createDirectory(path);
-      case FLDELETE:      return del(path);
-      case FLMOVE:        return copy(path, ctx, false);
-      case FLREADBIN:     return readBinary(path);
-      case FLREADTEXT:    return readText(path, ctx);
-      case FLWRITE:       return write(path, ctx, false);
-      case FLWRITEBIN:    return writeBinary(path, ctx, false);
-      case FLEXISTS:      return Bln.get(path.exists());
-      case FLISDIR:       return Bln.get(path.isDirectory());
-      case FLISFILE:      return Bln.get(path.isFile());
-      case FLLASTMOD:     return lastModified(path);
-      case FLSIZE:        return size(path);
-      case FLBASENAME:    return baseName(path, ctx);
-      case FLDIRNAME:     return dirName(path);
-      case FLPATHNATIVE:  return pathToNative(path);
-      case FLRESOLVEPATH: return Str.get(path.getAbsolutePath());
-      case FLPATHTOURI:   return pathToUri(path);
-      default:            return super.item(ctx, ii);
+      case _FILE_APPEND:           return write(path, ctx, true);
+      case _FILE_APPEND_BINARY:    return writeBinary(path, ctx, true);
+      case _FILE_COPY:             return copy(path, ctx, true);
+      case _FILE_CREATE_DIRECTORY: return createDirectory(path);
+      case _FILE_DELETE:           return del(path);
+      case _FILE_MOVE:             return copy(path, ctx, false);
+      case _FILE_READ_BINARY:      return readBinary(path);
+      case _FILE_READ_TEXT:        return readText(path, ctx);
+      case _FILE_WRITE:            return write(path, ctx, false);
+      case _FILE_WRITE_BINARY:     return writeBinary(path, ctx, false);
+      case _FILE_EXISTS:           return Bln.get(path.exists());
+      case _FILE_IS_DIRECTORY:     return Bln.get(path.isDirectory());
+      case _FILE_IS_FILE:          return Bln.get(path.isFile());
+      case _FILE_LAST_MODIFIED:    return lastModified(path);
+      case _FILE_SIZE:             return size(path);
+      case _FILE_BASE_NAME:        return baseName(path, ctx);
+      case _FILE_DIR_NAME:         return dirName(path);
+      case _FILE_PATH_TO_NATIVE:   return pathToNative(path);
+      case _FILE_RESOLVE_PATH:     return Str.get(path.getAbsolutePath());
+      case _FILE_PATH_TO_URI:      return pathToUri(path);
+      default:                     return super.item(ctx, ii);
     }
   }
 

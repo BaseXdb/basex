@@ -14,7 +14,7 @@ import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 
 /**
- * Update primitive for the {@link Function#DBSTORE} function.
+ * Update primitive for the {@link Function#_DB_STORE} function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

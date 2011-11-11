@@ -28,21 +28,21 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void fnUnparsedText() throws Exception {
-    check(PARSETXT);
-    contains(PARSETXT.args(TEXT), "?&gt;&lt;html");
-    contains(PARSETXT.args(TEXT, "US-ASCII"), "?&gt;&lt;html");
+    check(UNPARSED_TEXT);
+    contains(UNPARSED_TEXT.args(TEXT), "?&gt;&lt;html");
+    contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "?&gt;&lt;html");
     final IOFile io = new IOFile(Prop.TMP, NAME);
     io.write(token("A\r\nB"));
-    query(STRLEN.args(PARSETXT.args(io.path())), 3);
+    query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
     io.write(token("A\nB"));
-    query(STRLEN.args(PARSETXT.args(io.path())), 3);
+    query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
     io.write(token("A\rB"));
-    query(STRLEN.args(PARSETXT.args(io.path())), 3);
+    query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
     io.write(token("A\r\nB\rC\nD"));
-    query(TO_BYTES.args(PARSETXT.args(io.path())),
+    query(_UTIL_TO_BYTES.args(UNPARSED_TEXT.args(io.path())),
         "65 10 66 10 67 10 68");
     assertTrue(io.delete());
-    error(PARSETXT.args(TEXT, "xyz"), Err.WHICHENC);
+    error(UNPARSED_TEXT.args(TEXT, "xyz"), Err.WHICHENC);
   }
 
   /**
@@ -50,8 +50,8 @@ public final class FNGenTest extends AdvancedQueryTest {
    */
   @Test
   public void fnParseXML() {
-    check(PARSEXML);
-    contains(PARSEXML.args("\"<x>a</x>\"") + "//text()", "a");
+    check(PARSE_XML);
+    contains(PARSE_XML.args("\"<x>a</x>\"") + "//text()", "a");
   }
 
   /**

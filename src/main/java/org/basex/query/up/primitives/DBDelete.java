@@ -10,7 +10,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.list.TokenList;
 
 /**
- * Update primitive for the {@link Function#DBDELETE} function.
+ * Update primitive for the {@link Function#_DB_DELETE} function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

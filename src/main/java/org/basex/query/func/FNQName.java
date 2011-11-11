@@ -41,9 +41,11 @@ public final class FNQName extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case INSCOPE: return inscope(ctx,
-          (ANode) checkType(expr[0].item(ctx, input), NodeType.ELM));
-      default:      return super.iter(ctx);
+      case IN_SCOPE_PREFIXES:
+        return inscope(ctx, (ANode) checkType(expr[0].item(ctx, input),
+            NodeType.ELM));
+      default:
+        return super.iter(ctx);
     }
   }
 
@@ -55,7 +57,7 @@ public final class FNQName extends FuncCall {
     final Item it2 = expr.length == 2 ? expr[1].item(ctx, input) : null;
 
     switch(def) {
-      case RESQNAME:
+      case RESOLVE_QNAME:
         return it == null ? null : resolve(ctx, it, checkEmpty(it2));
       case QNAME:
         final byte[] uri = checkEStr(it);
@@ -67,15 +69,15 @@ public final class FNQName extends FuncCall {
         if(nm.ns() && uri.length == 0)
           Err.value(input, AtomType.URI, nm.uri());
         return nm;
-      case LOCNAMEQNAME:
+      case LOCAL_NAME_FROM_QNAME:
         if(it == null) return null;
         nm = (QNm) checkType(it, AtomType.QNM);
         return AtomType.NCN.e(Str.get(nm.ln()), ctx, input);
-      case PREQNAME:
+      case PREFIX_FROM_QNAME:
         if(it == null) return null;
         nm = (QNm) checkType(it, AtomType.QNM);
         return !nm.ns() ? null : AtomType.NCN.e(Str.get(nm.pref()), ctx, input);
-      case NSURIPRE:
+      case NAMESPACE_URI_FOR_PREFIX:
         // [LK] Namespaces: find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
         final ANode an = (ANode) checkType(it2, NodeType.ELM);
@@ -83,7 +85,7 @@ public final class FNQName extends FuncCall {
         final Atts at = an.nsScope(!copied || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
-      case RESURI:
+      case RESOLVE_URI:
         if(it == null) return null;
         final Uri rel = Uri.uri(checkEStr(it));
         if(!rel.valid()) URIINV.thrw(input, it);
@@ -158,6 +160,6 @@ public final class FNQName extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && def == Function.INSCOPE || super.uses(u);
+    return u == Use.CTX && def == Function.IN_SCOPE_PREFIXES || super.uses(u);
   }
 }

@@ -35,23 +35,19 @@ public class FNCrypto extends FuncCall {
       throws QueryException {
 
     switch(def) {
-      case CRYPHMAC:
+      case _CRYPTO_HMAC:
         return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],
             ctx), checkStr(expr[2], ctx),
             expr.length == 4 ? checkStr(expr[3], ctx) : Token.EMPTY);
-
-      case CRYPENCRYPT:
+      case _CRYPTO_ENCRYPT:
         return new Encryption(ii).encryption(checkStr(expr[0], ctx),
             checkStr(expr[1], ctx), checkStr(expr[2], ctx),
             checkStr(expr[3], ctx), true);
-
-      case CRYPDECRYPT:
+      case _CRYPTO_DECRYPT:
         return new Encryption(ii).encryption(checkStr(expr[0], ctx),
             checkStr(expr[1], ctx), checkStr(expr[2], ctx),
             checkStr(expr[3], ctx), false);
-
-      case CRYPGENSIG:
-
+      case _CRYPTO_GENERATE_SIGNATURE:
         // determine type of 7th argument
         Item arg6 = null;
         boolean arg6Str = false;
@@ -62,7 +58,6 @@ public class FNCrypto extends FuncCall {
           else if(arg6 instanceof ANode);
           else Err.type(this, AtomType.STR, arg6);
         }
-
         return new DigitalSignature(ii).generateSignature(
             checkNode(expr[0].item(ctx, ii)), checkStr(expr[1], ctx),
             checkStr(expr[2], ctx), checkStr(expr[3], ctx),
@@ -71,11 +66,9 @@ public class FNCrypto extends FuncCall {
             expr.length > 7 ? checkNode(expr[7].item(ctx, ii)) :
               expr.length == 7 && !arg6Str ? checkNode(expr[6].item(ctx, ii)) :
                 null);
-
-      case CRYPVALSIG:
+      case _CRYPTO_VALIDATE_SIGNATURE:
         return new DigitalSignature(ii).
             validateSignature(checkNode(expr[0].item(ctx, ii)));
-
       default:
         return super.item(ctx, ii);
     }

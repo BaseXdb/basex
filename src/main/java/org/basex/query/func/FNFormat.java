@@ -40,12 +40,12 @@ public final class FNFormat extends FuncCall {
       throws QueryException {
 
     switch(def) {
-      case FORMINT: return formatInteger(ctx);
-      case FORMNUM: return formatNumber(ctx);
-      case FORMDTM: return formatDate(AtomType.DTM, ctx);
-      case FORMDAT: return formatDate(AtomType.DAT, ctx);
-      case FORMTIM: return formatDate(AtomType.TIM, ctx);
-      default:      return super.item(ctx, ii);
+      case FORMAT_INTEGER:  return formatInteger(ctx);
+      case FORMAT_NUMBER:   return formatNumber(ctx);
+      case FORMAT_DATETIME: return formatDate(AtomType.DTM, ctx);
+      case FORMAT_DATE:     return formatDate(AtomType.DAT, ctx);
+      case FORMAT_TIME:     return formatDate(AtomType.TIM, ctx);
+      default:              return super.item(ctx, ii);
     }
   }
 

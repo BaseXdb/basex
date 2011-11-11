@@ -20,11 +20,11 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapNew() {
-    check(MAPNEW);
-    query(EXISTS.args(MAPNEW.args("()")), true);
-    query(MAPSIZE.args(MAPNEW.args("()")), 0);
-    query(COUNT.args(MAPNEW.args("()")), 1);
-    query(MAPSIZE.args(MAPNEW.args(MAPNEW.args("()"))), 0);
+    check(_MAP_NEW);
+    query(EXISTS.args(_MAP_NEW.args("()")), true);
+    query(_MAP_SIZE.args(_MAP_NEW.args("()")), 0);
+    query(COUNT.args(_MAP_NEW.args("()")), 1);
+    query(_MAP_SIZE.args(_MAP_NEW.args(_MAP_NEW.args("()"))), 0);
   }
 
   /**
@@ -32,12 +32,12 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapEntry() {
-    check(MAPENTRY);
-    query(EXISTS.args(MAPENTRY.args("A", "B")), true);
-    query(EXISTS.args(MAPENTRY.args(1, 2)), true);
-    query(EXISTS.args(MAPNEW.args(MAPENTRY.args(1, 2))), "true");
-    error(EXISTS.args(MAPENTRY.args("()", 2)), Err.XPTYPE);
-    error(EXISTS.args(MAPENTRY.args("(1,2)", 2)), Err.XPTYPE);
+    check(_MAP_ENTRY);
+    query(EXISTS.args(_MAP_ENTRY.args("A", "B")), true);
+    query(EXISTS.args(_MAP_ENTRY.args(1, 2)), true);
+    query(EXISTS.args(_MAP_NEW.args(_MAP_ENTRY.args(1, 2))), "true");
+    error(EXISTS.args(_MAP_ENTRY.args("()", 2)), Err.XPTYPE);
+    error(EXISTS.args(_MAP_ENTRY.args("(1,2)", 2)), Err.XPTYPE);
   }
 
   /**
@@ -45,9 +45,9 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapGet() {
-    check(MAPGET);
-    query(MAPGET.args(MAPNEW.args("()"), 1), "");
-    query(MAPGET.args(MAPENTRY.args(1, 2), 1), 2);
+    check(_MAP_GET);
+    query(_MAP_GET.args(_MAP_NEW.args("()"), 1), "");
+    query(_MAP_GET.args(_MAP_ENTRY.args(1, 2), 1), 2);
   }
 
   /**
@@ -55,9 +55,9 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapContains() {
-    check(MAPCONT);
-    query(MAPCONT.args(MAPNEW.args(), 1), false);
-    query(MAPCONT.args(MAPENTRY.args(1, 2), 1), true);
+    check(_MAP_CONTAINS);
+    query(_MAP_CONTAINS.args(_MAP_NEW.args(), 1), false);
+    query(_MAP_CONTAINS.args(_MAP_ENTRY.args(1, 2), 1), true);
   }
 
   /**
@@ -65,8 +65,8 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapRemove() {
-    check(MAPREM);
-    query(MAPSIZE.args(MAPREM.args(MAPENTRY.args(1, 2), 1)), 0);
+    check(_MAP_REMOVE);
+    query(_MAP_SIZE.args(_MAP_REMOVE.args(_MAP_ENTRY.args(1, 2), 1)), 0);
   }
 
   /**
@@ -74,8 +74,8 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapSize() {
-    check(MAPSIZE);
-    query(MAPSIZE.args(MAPENTRY.args(1, 2)), 1);
+    check(_MAP_SIZE);
+    query(_MAP_SIZE.args(_MAP_ENTRY.args(1, 2)), 1);
   }
 
   /**
@@ -83,14 +83,14 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapKeys() {
-    check(MAPKEYS);
-    query("for $i in " + MAPKEYS.args(
-        MAPNEW.args(" for $i in 1 to 3 return " +
-        MAPENTRY.args("$i", "$i+1"))) + " order by $i return $i", "1 2 3");
-    query("let $map := " + MAPNEW.args(" for $i in 1 to 3 return " +
-        MAPENTRY.args("$i", "$i + 1")) +
-        "for $k in " + MAPKEYS.args("$map") + " order by $k return " +
-        MAPGET.args("$map", "$k"), "2 3 4");
+    check(_MAP_KEYS);
+    query("for $i in " + _MAP_KEYS.args(
+        _MAP_NEW.args(" for $i in 1 to 3 return " +
+        _MAP_ENTRY.args("$i", "$i+1"))) + " order by $i return $i", "1 2 3");
+    query("let $map := " + _MAP_NEW.args(" for $i in 1 to 3 return " +
+        _MAP_ENTRY.args("$i", "$i + 1")) +
+        "for $k in " + _MAP_KEYS.args("$map") + " order by $k return " +
+        _MAP_GET.args("$map", "$k"), "2 3 4");
   }
 
   /**
@@ -98,7 +98,8 @@ public final class FNMapTest extends AdvancedQueryTest {
    */
   @Test
   public void mapCollation() {
-    check(MAPCOLL);
-    query(MAPCOLL.args(MAPNEW.args()), Token.string(QueryText.URLCOLL));
+    check(_MAP_COLLATION);
+    query(_MAP_COLLATION.args(_MAP_NEW.args()),
+        Token.string(QueryText.URLCOLL));
   }
 }

@@ -78,9 +78,9 @@ public final class FNJsonTest extends AdvancedQueryTest {
    */
   @Test
   public void jsonParse() {
-    check(JSONPARSE);
+    check(_JSON_PARSE);
     for(final String[] f : TOXML) {
-      final String qu = JSONPARSE.args(f[0]);
+      final String qu = _JSON_PARSE.args(f[0]);
       if(f.length == 1) {
         error(qu, Err.JSONPARSE);
       } else if(f[1].startsWith("...")) {
@@ -96,9 +96,9 @@ public final class FNJsonTest extends AdvancedQueryTest {
    */
   @Test
   public void jsonSerialize() {
-    check(JSONSER);
+    check(_JSON_SERIALIZE);
     for(final String[] f : TOJSON) {
-      final String qu = JSONSER.args(f[0]);
+      final String qu = _JSON_SERIALIZE.args(f[0]);
       if(f.length == 1) {
         error(qu, Err.JSONSER);
       } else if(f[1].startsWith("...")) {

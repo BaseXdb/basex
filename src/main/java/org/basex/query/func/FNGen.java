@@ -52,11 +52,11 @@ public final class FNGen extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case DATA:        return data(ctx);
-      case COLL:        return collection(ctx).iter();
-      case URICOLL:     return uriCollection(ctx);
-      case PARSETXTLIN: return unparsedTextLines(ctx);
-      default:          return super.iter(ctx);
+      case DATA:                return data(ctx);
+      case COLLECTION:          return collection(ctx).iter();
+      case URI_COLLECTION:      return uriCollection(ctx);
+      case UNPARSED_TEXT_LINES: return unparsedTextLines(ctx);
+      default:                  return super.iter(ctx);
     }
   }
 
@@ -64,20 +64,20 @@ public final class FNGen extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case DOC:         return doc(ctx);
-      case DOCAVL:      return docAvailable(ctx);
-      case PARSETXT:    return unparsedText(ctx);
-      case PARSETXTAVL: return unparsedTextAvailable(ctx);
-      case PUT:         return put(ctx);
-      case PARSEXML:    return parseXml(ctx);
-      case SERIALIZE:   return serialize(ctx);
-      default:          return super.item(ctx, ii);
+      case DOC:                     return doc(ctx);
+      case DOC_AVAILABLE:           return docAvailable(ctx);
+      case UNPARSED_TEXT:           return unparsedText(ctx);
+      case UNPARSED_TEXT_AVAILABLE: return unparsedTextAvailable(ctx);
+      case PUT:                     return put(ctx);
+      case PARSE_XML:               return parseXml(ctx);
+      case SERIALIZE:               return serialize(ctx);
+      default:                      return super.item(ctx, ii);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    return def == Function.COLL ? collection(ctx) : super.value(ctx);
+    return def == Function.COLLECTION ? collection(ctx) : super.value(ctx);
   }
 
   @Override
@@ -305,12 +305,12 @@ public final class FNGen extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     return
-      u == Use.CNS && def == Function.PARSEXML ||
+      u == Use.CNS && def == Function.PARSE_XML ||
       u == Use.UPD && def == Function.PUT ||
       u == Use.X30 && (def == Function.DATA && expr.length == 0 ||
-        def == Function.PARSETXT || def == Function.PARSETXTLIN ||
-        def == Function.PARSETXTAVL || def == Function.PARSEXML ||
-        def == Function.URICOLL || def == Function.SERIALIZE) ||
+        def == Function.UNPARSED_TEXT || def == Function.UNPARSED_TEXT_LINES ||
+        def == Function.UNPARSED_TEXT_AVAILABLE || def == Function.PARSE_XML ||
+        def == Function.URI_COLLECTION || def == Function.SERIALIZE) ||
       u == Use.CTX && (def == Function.DATA && expr.length == 0 ||
         def == Function.PUT) && expr.length == 0 || super.uses(u);
   }
@@ -318,6 +318,6 @@ public final class FNGen extends FuncCall {
   @Override
   public boolean iterable() {
     // collections will never yield duplicates
-    return def == Function.COLL || super.iterable();
+    return def == Function.COLLECTION || super.iterable();
   }
 }

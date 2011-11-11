@@ -38,7 +38,7 @@ public final class FNAcc extends FuncCall {
 
     final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
     switch(def) {
-      case POS:
+      case POSITION:
         return Itr.get(ctx.pos);
       case LAST:
         return Itr.get(ctx.size);
@@ -49,11 +49,11 @@ public final class FNAcc extends FuncCall {
         return it.str() && !it.unt() ? it : Str.get(it.atom(ii));
       case NUMBER:
         return number(ctx.iter(e), ctx);
-      case STRLEN:
+      case STRING_LENGTH:
         return Itr.get(len(checkEStr(e, ctx)));
-      case NORMSPC:
+      case NORMALIZE_SPACE:
         return Str.get(norm(checkEStr(e, ctx)));
-      case URIQNM:
+      case NAMESPACE_URI_FROM_QNAME:
         it = e.item(ctx, input);
         if(it == null) return null;
         final QNm qn = (QNm) checkType(it, AtomType.QNM);
@@ -88,7 +88,7 @@ public final class FNAcc extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    final boolean pos = def == Function.POS || def == Function.LAST;
+    final boolean pos = def == Function.POSITION || def == Function.LAST;
     return u == Use.CTX && (expr.length == 0 || pos) ||
       u == Use.POS && pos || super.uses(u);
   }

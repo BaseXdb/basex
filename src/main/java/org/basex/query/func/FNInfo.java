@@ -76,7 +76,7 @@ public final class FNInfo extends FuncCall {
             return i;
           }
         };
-      case ENVARS:
+      case AVAILABLE_ENVIRONMENT_VARIABLES:
         final ItemCache ic = new ItemCache();
         for(final Object k : System.getenv().keySet().toArray()) {
           ic.add(Str.get(k));
@@ -91,7 +91,7 @@ public final class FNInfo extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case ENVAR:
+      case ENVIRONMENT_VARIABLE:
         final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
         return e != null ? Str.get(e) : null;
       default:
@@ -112,7 +112,8 @@ public final class FNInfo extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == Function.ENVAR || def == Function.ENVARS) ||
+    return u == Use.X30 && (def == Function.ENVIRONMENT_VARIABLE ||
+        def == Function.AVAILABLE_ENVIRONMENT_VARIABLES) ||
       u == Use.NDT && (def == Function.ERROR || def == Function.TRACE) ||
       super.uses(u);
   }

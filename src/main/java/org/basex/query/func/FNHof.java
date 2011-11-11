@@ -36,23 +36,23 @@ public final class FNHof extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case HOFSORTWITH: return sortWith(ctx);
-      case HOFID:
-      case HOFCONST:    return expr[0].iter(ctx);
-      case HOFUNTIL:    return until(ctx).iter();
-      case HOFITERATE:  return iterate(ctx);
-      default:          return super.iter(ctx);
+      case _HOF_SORT_WITH: return sortWith(ctx);
+      case _HOF_ID:
+      case _HOF_CONST:     return expr[0].iter(ctx);
+      case _HOF_UNTIL:     return until(ctx).iter();
+      case _HOF_ITERATE:   return iterate(ctx);
+      default:             return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case HOFFOLDLEFT: return foldLeft1(ctx);
-      case HOFUNTIL:    return until(ctx);
-      case HOFID:
-      case HOFCONST:    return expr[0].value(ctx);
-      default:          return super.value(ctx);
+      case _HOF_FOLD_LEFT1: return foldLeft1(ctx);
+      case _HOF_UNTIL:      return until(ctx);
+      case _HOF_ID:
+      case _HOF_CONST:      return expr[0].value(ctx);
+      default:              return super.value(ctx);
     }
   }
 
@@ -60,9 +60,9 @@ public final class FNHof extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case HOFID:
-      case HOFCONST: return expr[0].item(ctx, ii);
-      default:       return super.item(ctx, ii);
+      case _HOF_ID:
+      case _HOF_CONST: return expr[0].item(ctx, ii);
+      default:         return super.item(ctx, ii);
     }
   }
 
@@ -169,7 +169,7 @@ public final class FNHof extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return def == Function.PARTAPP && u == Use.CTX || u == Use.X30 ||
+    return def == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 ||
         super.uses(u);
   }
 }

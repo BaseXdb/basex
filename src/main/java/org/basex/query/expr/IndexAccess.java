@@ -142,7 +142,8 @@ public final class IndexAccess extends Single {
 
   @Override
   public String toString() {
-    return (itype == IndexType.TEXT ? Function.DBTEXT : Function.DBATTR).get(
-        input, Str.get(ictx.data.meta.name), expr).toString();
+    return (itype == IndexType.TEXT ?
+        Function._DB_TEXT : Function._DB_ATTRIBUTE).get(input,
+            Str.get(ictx.data.meta.name), expr).toString();
   }
 }

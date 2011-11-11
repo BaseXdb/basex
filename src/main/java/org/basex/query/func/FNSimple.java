@@ -43,7 +43,7 @@ public final class FNSimple extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case ONEORMORE:
+      case ONE_OR_MORE:
         final Iter ir = expr[0].iter(ctx);
         final long len = ir.size();
         if(len == 0) throw EXPECTOM.thrw(input);
@@ -60,7 +60,7 @@ public final class FNSimple extends FuncCall {
             return it;
           }
         };
-      case UNORDER:
+      case UNORDERED:
         return ctx.iter(expr[0]);
       default:
         return super.iter(ctx);
@@ -70,11 +70,11 @@ public final class FNSimple extends FuncCall {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case ONEORMORE:
+      case ONE_OR_MORE:
         final Value val = ctx.value(expr[0]);
         if(val.empty()) throw EXPECTOM.thrw(input);
         return val;
-      case UNORDER:
+      case UNORDERED:
         return ctx.value(expr[0]);
       default:
         return super.value(ctx);
@@ -99,14 +99,14 @@ public final class FNSimple extends FuncCall {
         return Bln.get(e.ebv(ctx, input).bool(input));
       case NOT:
         return Bln.get(!e.ebv(ctx, input).bool(input));
-      case DEEPEQUAL:
+      case DEEP_EQUAL:
         return Bln.get(deep(ctx));
-      case ZEROORONE:
+      case ZERO_OR_ONE:
         Iter ir = e.iter(ctx);
         Item it = ir.next();
         if(it != null && ir.next() != null) EXPECTZ0.thrw(input);
         return it;
-      case EXACTLYONE:
+      case EXACTLY_ONE:
         ir = e.iter(ctx);
         it = ir.next();
         if(it == null || ir.next() != null) EXPECTO.thrw(input);
@@ -153,16 +153,16 @@ public final class FNSimple extends FuncCall {
           expr[0] = e.compEbv(ctx);
         }
         return this;
-      case ZEROORONE:
+      case ZERO_OR_ONE:
         type = SeqType.get(e.type().type, SeqType.Occ.ZO);
         return e.type().zeroOrOne() ? e : this;
-      case EXACTLYONE:
+      case EXACTLY_ONE:
         type = SeqType.get(e.type().type, SeqType.Occ.O);
         return e.type().one() ? e : this;
-      case ONEORMORE:
+      case ONE_OR_MORE:
         type = SeqType.get(e.type().type, SeqType.Occ.OM);
         return !e.type().mayBeZero() ? e : this;
-      case UNORDER:
+      case UNORDERED:
         return e;
       default:
         return this;

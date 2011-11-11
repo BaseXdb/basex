@@ -57,8 +57,8 @@ public final class FNPat extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case TOKEN:   return tokenize(checkEStr(expr[0], ctx), ctx);
-      default:      return super.iter(ctx);
+      case TOKENIZE:   return tokenize(checkEStr(expr[0], ctx), ctx);
+      default:         return super.iter(ctx);
     }
   }
 
@@ -66,10 +66,10 @@ public final class FNPat extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case MATCH:   return matches(checkEStr(expr[0], ctx), ctx);
-      case REPLACE: return replace(checkEStr(expr[0], ctx), ctx);
-      case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx);
-      default:      return super.item(ctx, ii);
+      case MATCHES:        return matches(checkEStr(expr[0], ctx), ctx);
+      case REPLACE:        return replace(checkEStr(expr[0], ctx), ctx);
+      case ANALYZE_STRING: return analyzeString(checkEStr(expr[0], ctx), ctx);
+      default:             return super.item(ctx, ii);
     }
   }
 
@@ -233,7 +233,7 @@ public final class FNPat extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return def == Function.ANALZYE && (u == Use.X30 || u == Use.CNS) ||
+    return def == Function.ANALYZE_STRING && (u == Use.X30 || u == Use.CNS) ||
         super.uses(u);
   }
 }

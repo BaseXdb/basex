@@ -111,10 +111,10 @@ public final class UserFuncs extends ExprInfo {
     // check predefined functions
     final FuncCall fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
-      ctx.updating |= fun.def == Function.PUT || fun.def == Function.DBADD ||
-        fun.def == Function.DBDELETE || fun.def == Function.DBRENAME ||
-        fun.def == Function.DBREPLACE || fun.def == Function.DBOPTIMIZE ||
-        fun.def == Function.DBSTORE;
+      ctx.updating |= fun.def == Function.PUT || fun.def == Function._DB_ADD ||
+        fun.def == Function._DB_DELETE || fun.def == Function._DB_RENAME ||
+        fun.def == Function._DB_REPLACE || fun.def == Function._DB_OPTIMIZE ||
+        fun.def == Function._DB_STORE;
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 

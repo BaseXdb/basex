@@ -62,7 +62,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void binaryEntry() {
-    check(ZIPBIN);
+    check(_ZIP_BINARY_ENTRY);
 //    query(ZIPBIN.args(ZIP, ENTRY1));
 //    contains("xs:hexBinary(" + ZIPBIN.args(ZIP, ENTRY1) + ")", "610A61626F");
 //
@@ -75,12 +75,12 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void textEntry() {
-    check(ZIPTEXT);
-    query(ZIPTEXT.args(ZIP, ENTRY1));
-    query(ZIPTEXT.args(ZIP, ENTRY1, "US-ASCII"));
-    error(ZIPTEXT.args(ZIP, ENTRY1, "xyz"), Err.ZIPFAIL);
+    check(_ZIP_TEXT_ENTRY);
+    query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1));
+    query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "US-ASCII"));
+    error(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "xyz"), Err.ZIPFAIL);
     // newlines are removed from the result..
-    contains(ZIPTEXT.args(ZIP, ENTRY1), "aaboutab");
+    contains(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1), "aaboutab");
   }
 
   /**
@@ -88,9 +88,9 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void xmlEntry() {
-    check(ZIPXML);
-    query(ZIPXML.args(ZIP, ENTRY2));
-    query(ZIPXML.args(ZIP, ENTRY2) + "//title/text()", "XML");
+    check(_ZIP_XML_ENTRY);
+    query(_ZIP_XML_ENTRY.args(ZIP, ENTRY2));
+    query(_ZIP_XML_ENTRY.args(ZIP, ENTRY2) + "//title/text()", "XML");
   }
 
   /**
@@ -98,8 +98,8 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void entries() {
-    check(ZIPENTRIES);
-    query(ZIPENTRIES.args(ZIP));
+    check(_ZIP_ENTRIES);
+    query(_ZIP_ENTRIES.args(ZIP));
   }
 
   /**
@@ -108,33 +108,33 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void zipFile() throws IOException {
-    check(ZIPFILE);
+    check(_ZIP_ZIP_FILE);
     // check first file
-    query(ZIPFILE.args(zipParams("<entry name='one'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='one'/>")));
     checkZipEntry("one", new byte[0]);
     // check second file
-    query(ZIPFILE.args(zipParams("<entry name='two'>!</entry>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='two'>!</entry>")));
     checkZipEntry("two", new byte[] { '!' });
     // check third file
-    query(ZIPFILE.args(
+    query(_ZIP_ZIP_FILE.args(
         zipParams("<entry name='three' encoding='UTF-16'>!</entry>")));
     checkZipEntry("three", new byte[] { '\0', '!' });
     // check fourth file
-    query(ZIPFILE.args(zipParams("<entry name='four' src='" +
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='four' src='" +
         TMPFILE + "'/>")));
     checkZipEntry("four", new byte[] { '!' });
     // check fifth file
-    query(ZIPFILE.args(zipParams("<entry src='" + TMPFILE + "'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry src='" + TMPFILE + "'/>")));
     checkZipEntry(NAME, new byte[] { '!' });
     // check sixth file
-    query(ZIPFILE.args(zipParams("<dir name='a'><entry name='b' src='" +
+    query(_ZIP_ZIP_FILE.args(zipParams("<dir name='a'><entry name='b' src='" +
         TMPFILE + "'/></dir>")));
     checkZipEntry("a/b", new byte[] { '!' });
 
     // error: no entry specified
-    error(ZIPFILE.args(zipParams("")), Err.ZIPFAIL);
+    error(_ZIP_ZIP_FILE.args(zipParams("")), Err.ZIPFAIL);
     // error: duplicate entry specified
-    error(ZIPFILE.args(zipParams("<entry src='" + TMPFILE + "'/>" +
+    error(_ZIP_ZIP_FILE.args(zipParams("<entry src='" + TMPFILE + "'/>" +
         "<entry src='" + TMPFILE + "'/>")), Err.ZIPFAIL);
   }
 
@@ -145,28 +145,29 @@ public final class FNZipTest extends AdvancedQueryTest {
   @Test
   public void zipFileNS() throws IOException {
     // ZIP namespace must be removed from zipped node
-    query(ZIPFILE.args(zipParams("<entry name='1'><a/></entry>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='1'><a/></entry>")));
     checkZipEntry("1", token("<a/>"));
     // ZIP namespace must be removed from zipped node
-    query(ZIPFILE.args(zipParams("<entry name='2'><a b='c'/></entry>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='2'><a b='c'/></entry>")));
     checkZipEntry("2", token("<a b=\"c\"/>"));
     // ZIP namespace must be removed from zipped node and its descendants
-    query(ZIPFILE.args(zipParams("<entry name='3'><a><b/></a></entry>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='3'><a><b/></a></entry>")));
     checkZipEntry("3", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
     // ZIP namespace must be removed from zipped entry
-    query(ZIPFILE.args(zipParams("<entry name='4'><a xmlns=''/></entry>")));
+    query(_ZIP_ZIP_FILE.args(
+        zipParams("<entry name='4'><a xmlns=''/></entry>")));
     checkZipEntry("4", token("<a/>"));
 
     // ZIP namespace must be removed from zipped entry
-    query(ZIPFILE.args(zipParamsPref("5", "<a/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPref("5", "<a/>")));
     checkZipEntry("5", token("<a/>"));
-    query(ZIPFILE.args(zipParamsPref("6", "<a><b/></a>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPref("6", "<a><b/></a>")));
     checkZipEntry("6", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
-    query(ZIPFILE.args(zipParamsPref("7", "<z:a xmlns:z='z'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPref("7", "<z:a xmlns:z='z'/>")));
     checkZipEntry("7", token("<z:a xmlns:z=\"z\"/>"));
-    query(ZIPFILE.args(zipParamsPref("8", "<zip:a xmlns:zip='z'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPref("8", "<zip:a xmlns:zip='z'/>")));
     checkZipEntry("8", token("<zip:a xmlns:zip=\"z\"/>"));
-    query(ZIPFILE.args(zipParamsPref("9", "<a xmlns='z'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPref("9", "<a xmlns='z'/>")));
     checkZipEntry("9", token("<a xmlns=\"z\"/>"));
   }
 
@@ -190,9 +191,9 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void zipZip() throws IOException {
-    check(ZIPFILE);
+    check(_ZIP_ZIP_FILE);
     // check fourth file
-    query(ZIPFILE.args(
+    query(_ZIP_ZIP_FILE.args(
         zipParams("<entry name='four' src='" + TMPFILE + "'/>")));
   }
 
@@ -202,22 +203,22 @@ public final class FNZipTest extends AdvancedQueryTest {
    */
   @Test
   public void updateEntries() throws IOException {
-    check(ZIPUPDATE);
-    String list = query(ZIPENTRIES.args(ZIP));
+    check(_ZIP_UPDATE_ENTRIES);
+    String list = query(_ZIP_ENTRIES.args(ZIP));
 
     // create and compare identical zip file
-    query(ZIPUPDATE.args(list, TMPZIP));
-    final String list2 = query(ZIPENTRIES.args(TMPZIP));
+    query(_ZIP_UPDATE_ENTRIES.args(list, TMPZIP));
+    final String list2 = query(_ZIP_ENTRIES.args(TMPZIP));
     assertEquals(list.replaceAll(" href=\\\".*?\\\"", ""),
         list2.replaceAll(" href=\\\".*?\\\"", ""));
 
     // remove one directory
     list = list.replaceAll("<zip:dir name=.test.>.*</zip:dir>", "");
-    query(ZIPUPDATE.args(list, TMPZIP));
+    query(_ZIP_UPDATE_ENTRIES.args(list, TMPZIP));
 
     // new file has no entries
     list = list.replaceAll("<zip:dir.*</zip:dir>", "");
-    error(ZIPUPDATE.args(list,
+    error(_ZIP_UPDATE_ENTRIES.args(list,
         new File(TMPZIP).getCanonicalPath()), Err.ZIPFAIL);
   }
 

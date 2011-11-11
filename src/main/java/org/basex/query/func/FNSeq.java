@@ -51,16 +51,16 @@ public final class FNSeq extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case INDEXOF:   return indexOf(ctx);
-      case DISTINCT:  return distinctValues(ctx);
-      case INSBEF:    return insertBefore(ctx);
-      case REVERSE:   return reverse(ctx);
-      case REMOVE:    return remove(ctx);
-      case SUBSEQ:    return subsequence(ctx);
-      case TAIL:      return tail(ctx);
-      case OUTERMOST: return most(ctx, true);
-      case INNERMOST: return most(ctx, false);
-      default:        return super.iter(ctx);
+      case INDEX_OF:        return indexOf(ctx);
+      case DISTINCT_VALUES: return distinctValues(ctx);
+      case INSERT_BEFORE:   return insertBefore(ctx);
+      case REVERSE:         return reverse(ctx);
+      case REMOVE:          return remove(ctx);
+      case SUBSEQUENCE:     return subsequence(ctx);
+      case TAIL:            return tail(ctx);
+      case OUTERMOST:       return most(ctx, true);
+      case INNERMOST:       return most(ctx, false);
+      default:              return super.iter(ctx);
     }
   }
 
@@ -138,7 +138,7 @@ public final class FNSeq extends FuncCall {
   public Expr cmp(final QueryContext ctx) {
     // static typing:
     // index-of will create integers, insert-before might add new types
-    if(def == Function.INDEXOF || def == Function.INSBEF) return this;
+    if(def == Function.INDEX_OF || def == Function.INSERT_BEFORE) return this;
 
     // all other types will return existing types
     final Type t = expr[0].type().type;
@@ -148,7 +148,7 @@ public final class FNSeq extends FuncCall {
     if(def == Function.HEAD) o = SeqType.Occ.ZO;
 
     // at most one returned item
-    if(def == Function.SUBSEQ && expr[0].type().one()) o = SeqType.Occ.ZO;
+    if(def == Function.SUBSEQUENCE && expr[0].type().one()) o = SeqType.Occ.ZO;
 
     type = SeqType.get(t, o);
     return this;

@@ -30,18 +30,18 @@ public final class FNMap extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case MAPGET:  return get(ctx).iter();
-      case MAPKEYS: return map(ctx).keys().iter();
-      default:      return super.iter(ctx);
+      case _MAP_GET:  return get(ctx).iter();
+      case _MAP_KEYS: return map(ctx).keys().iter();
+      default:        return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case MAPGET:  return get(ctx);
-      case MAPKEYS: return map(ctx).keys();
-      default:      return super.value(ctx);
+      case _MAP_GET:  return get(ctx);
+      case _MAP_KEYS: return map(ctx).keys();
+      default:        return super.value(ctx);
     }
   }
 
@@ -49,13 +49,13 @@ public final class FNMap extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case MAPNEW:   return newMap(ctx, ii);
-      case MAPENTRY: return entry(ctx, ii);
-      case MAPCONT:  return contains(ctx, ii);
-      case MAPSIZE:  return map(ctx).mapSize();
-      case MAPREM:   return remove(ctx, ii);
-      case MAPCOLL:  return map(ctx).collation();
-      default:       return super.item(ctx, ii);
+      case _MAP_NEW:       return newMap(ctx, ii);
+      case _MAP_ENTRY:     return entry(ctx, ii);
+      case _MAP_CONTAINS:  return contains(ctx, ii);
+      case _MAP_SIZE:      return map(ctx).mapSize();
+      case _MAP_REMOVE:    return remove(ctx, ii);
+      case _MAP_COLLATION: return map(ctx).collation();
+      default:             return super.item(ctx, ii);
     }
   }
 

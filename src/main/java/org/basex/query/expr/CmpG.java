@@ -151,7 +151,7 @@ public final class CmpG extends Cmp {
     } else if(e1.isFun(Function.COUNT)) {
       e = compCount(op.op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFun(Function.POS)) {
+    } else if(e1.isFun(Function.POSITION)) {
       if(e2 instanceof Range && op.op == CmpV.Op.EQ) {
         // position() CMP range
         final long[] rng = ((Range) e2).range(ctx);

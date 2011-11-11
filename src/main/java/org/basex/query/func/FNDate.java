@@ -47,32 +47,58 @@ public final class FNDate extends FuncCall {
     final Item zon = d ? expr[1].item(ctx, input) : null;
 
     switch(def) {
-      case YEADUR:   return yea(checkDur(it));
-      case YEADTM:   return yea(checkDate(it, AtomType.DTM, ctx));
-      case YEADAT:   return yea(checkDate(it, AtomType.DAT, ctx));
-      case MONDUR:   return mon(checkDur(it));
-      case MONDTM:   return mon(checkDate(it, AtomType.DTM, ctx));
-      case MONDAT:   return mon(checkDate(it, AtomType.DAT, ctx));
-      case DAYDUR:   return day(checkDur(it));
-      case DAYDTM:   return day(checkDate(it, AtomType.DTM, ctx));
-      case DAYDAT:   return day(checkDate(it, AtomType.DAT, ctx));
-      case HOUDUR:   return hou(checkDur(it));
-      case HOUDTM:   return hou(checkDate(it, AtomType.DTM, ctx));
-      case HOUTIM:   return hou(checkDate(it, AtomType.TIM, ctx));
-      case MINDUR:   return min(checkDur(it));
-      case MINDTM:   return min(checkDate(it, AtomType.DTM, ctx));
-      case MINTIM:   return min(checkDate(it, AtomType.TIM, ctx));
-      case SECDUR:   return sec(checkDur(it));
-      case SECDTM:   return sec(checkDate(it, AtomType.DTM, ctx));
-      case SECTIM:   return sec(checkDate(it, AtomType.TIM, ctx));
-      case ZONDTM:   return zon(checkDate(it, AtomType.DTM, ctx));
-      case ZONDAT:   return zon(checkDate(it, AtomType.DAT, ctx));
-      case ZONTIM:   return zon(checkDate(it, AtomType.TIM, ctx));
-      case DATZON:   return datzon(it, zon, d);
-      case DTMZON:   return dtmzon(it, zon, d);
-      case TIMZON:   return timzon(it, zon, d);
-      case DATETIME: return dattim(it, zon);
-      default:       return super.item(ctx, ii);
+      case YEARS_FROM_DURATION:
+        return yea(checkDur(it));
+      case YEAR_FROM_DATETIME:
+        return yea(checkDate(it, AtomType.DTM, ctx));
+      case YEAR_FROM_DATE:
+        return yea(checkDate(it, AtomType.DAT, ctx));
+      case MONTHS_FROM_DURATION:
+        return mon(checkDur(it));
+      case MONTH_FROM_DATETIME:
+        return mon(checkDate(it, AtomType.DTM, ctx));
+      case MONTH_FROM_DATE:
+        return mon(checkDate(it, AtomType.DAT, ctx));
+      case DAYS_FROM_DURATION:
+        return day(checkDur(it));
+      case DAY_FROM_DATETIME:
+        return day(checkDate(it, AtomType.DTM, ctx));
+      case DAY_FROM_DATE:
+        return day(checkDate(it, AtomType.DAT, ctx));
+      case HOURS_FROM_DURATION:
+        return hou(checkDur(it));
+      case HOURS_FROM_DATETIME:
+        return hou(checkDate(it, AtomType.DTM, ctx));
+      case HOURS_FROM_TIME:
+        return hou(checkDate(it, AtomType.TIM, ctx));
+      case MINUTES_FROM_DURATION:
+        return min(checkDur(it));
+      case MINUTES_FROM_DATETIME:
+        return min(checkDate(it, AtomType.DTM, ctx));
+      case MINUTES_FROM_TIME:
+        return min(checkDate(it, AtomType.TIM, ctx));
+      case SECONDS_FROM_DURATION:
+        return sec(checkDur(it));
+      case SECONDS_FROM_DATETIME:
+        return sec(checkDate(it, AtomType.DTM, ctx));
+      case SECONDS_FROM_TIME:
+        return sec(checkDate(it, AtomType.TIM, ctx));
+      case TIMEZONE_FROM_DATETIME:
+        return zon(checkDate(it, AtomType.DTM, ctx));
+      case TIMEZONE_FROM_DATE:
+        return zon(checkDate(it, AtomType.DAT, ctx));
+      case TIMEZONE_FROM_TIME:
+        return zon(checkDate(it, AtomType.TIM, ctx));
+      case ADJUST_DATE_TO_TIMEZONE:
+        return datzon(it, zon, d);
+      case ADJUST_DATETIME_TO_TIMEZONE:
+        return dtmzon(it, zon, d);
+      case ADJUST_TIME_TO_TIMEZONE:
+        return timzon(it, zon, d);
+      case DATETIME:
+        return dattim(it, zon);
+      default:
+        return super.item(ctx, ii);
     }
   }
 

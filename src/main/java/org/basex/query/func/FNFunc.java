@@ -39,12 +39,12 @@ public final class FNFunc extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case MAP:       return map(ctx);
-      case FILTER:    return filter(ctx);
-      case MAPPAIRS:  return zip(ctx);
-      case FOLDLEFT:  return foldLeft(ctx);
-      case FOLDRIGHT: return foldRight(ctx);
-      default:        return super.iter(ctx);
+      case MAP:        return map(ctx);
+      case FILTER:     return filter(ctx);
+      case MAP_PAIRS:  return zip(ctx);
+      case FOLD_LEFT:  return foldLeft(ctx);
+      case FOLD_RIGHT: return foldRight(ctx);
+      default:         return super.iter(ctx);
     }
   }
 
@@ -52,10 +52,14 @@ public final class FNFunc extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case FUNCARITY: return Itr.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
-      case FUNCNAME:  return getFun(0, FuncType.ANY_FUN, ctx).fName();
-      case PARTAPP:   return partApp(ctx, ii);
-      default:        return super.item(ctx, ii);
+      case FUNCTION_ARITY:
+        return Itr.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
+      case FUNCTION_NAME:
+        return getFun(0, FuncType.ANY_FUN, ctx).fName();
+      case PARTIAL_APPLY:
+        return partApp(ctx, ii);
+      default:
+        return super.item(ctx, ii);
     }
   }
 
@@ -235,7 +239,7 @@ public final class FNFunc extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return def == Function.PARTAPP && u == Use.CTX || u == Use.X30 ||
+    return def == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 ||
         super.uses(u);
   }
 }

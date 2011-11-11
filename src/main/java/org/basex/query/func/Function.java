@@ -24,7 +24,7 @@ public enum Function {
   /* FNAcc functions. */
 
   /** XQuery function. */
-  POS(FNAcc.class, "position()", ITR),
+  POSITION(FNAcc.class, "position()", ITR),
   /** XQuery function. */
   LAST(FNAcc.class, "last()", ITR),
   /** XQuery function. */
@@ -32,11 +32,12 @@ public enum Function {
   /** XQuery function. */
   NUMBER(FNAcc.class, "number([item])", DBL, 0, AAT_ZO),
   /** XQuery function. */
-  STRLEN(FNAcc.class, "string-length([item])", ITR, 0, STR_ZO),
+  STRING_LENGTH(FNAcc.class, "string-length([item])", ITR, 0, STR_ZO),
   /** XQuery function. */
-  NORMSPC(FNAcc.class, "normalize-space([string])", STR, 0, STR_ZO),
+  NORMALIZE_SPACE(FNAcc.class, "normalize-space([string])", STR, 0, STR_ZO),
   /** XQuery function. */
-  URIQNM(FNAcc.class, "namespace-uri-from-QName(qname)", URI_ZO, QNM_ZO),
+  NAMESPACE_URI_FROM_QNAME(FNAcc.class, "namespace-uri-from-QName(qname)",
+      URI_ZO, QNM_ZO),
 
   /* FNAggr functions. */
 
@@ -54,91 +55,101 @@ public enum Function {
   /* FNContext functions. */
 
   /** XQuery function. */
-  CURRDATE(FNContext.class, "current-date()", DAT),
+  CURRENT_DATE(FNContext.class, "current-date()", DAT),
   /** XQuery function. */
-  CURRDTM(FNContext.class, "current-dateTime()", DTM),
+  CURRENT_DATETIME(FNContext.class, "current-dateTime()", DTM),
   /** XQuery function. */
-  CURRTIME(FNContext.class, "current-time()", TIM),
+  CURRENT_TIME(FNContext.class, "current-time()", TIM),
   /** XQuery function. */
-  IMPLZONE(FNContext.class, "implicit-timezone()", DTD),
+  IMPLICIT_TIMEZONE(FNContext.class, "implicit-timezone()", DTD),
   /** XQuery function. */
-  COLLAT(FNContext.class, "default-collation()", STR),
+  DEFAULT_COLLATION(FNContext.class, "default-collation()", STR),
   /** XQuery function. */
-  STBASEURI(FNContext.class, "static-base-uri()", URI_ZO),
+  STATIC_BASE_URI(FNContext.class, "static-base-uri()", URI_ZO),
 
   /* FNDate functions. */
 
   /** XQuery function. */
-  DAYDAT(FNDate.class, "day-from-date(item)", ITR_ZO, DAT_ZO),
+  DAY_FROM_DATE(FNDate.class, "day-from-date(item)", ITR_ZO, DAT_ZO),
   /** XQuery function. */
-  DAYDTM(FNDate.class, "day-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
+  DAY_FROM_DATETIME(FNDate.class, "day-from-dateTime(datetime)",
+      ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  DAYDUR(FNDate.class, "days-from-duration(dur)", ITR_ZO, DUR_ZO),
+  DAYS_FROM_DURATION(FNDate.class, "days-from-duration(dur)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
-  HOUDTM(FNDate.class, "hours-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
+  HOURS_FROM_DATETIME(FNDate.class, "hours-from-dateTime(datetime)",
+      ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  HOUDUR(FNDate.class, "hours-from-duration(dur)", ITR_ZO, DUR_ZO),
+  HOURS_FROM_DURATION(FNDate.class, "hours-from-duration(dur)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
-  HOUTIM(FNDate.class, "hours-from-time(item)", ITR_ZO, TIM_ZO),
+  HOURS_FROM_TIME(FNDate.class, "hours-from-time(item)", ITR_ZO, TIM_ZO),
   /** XQuery function. */
-  MINDTM(FNDate.class, "minutes-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
+  MINUTES_FROM_DATETIME(FNDate.class, "minutes-from-dateTime(datetime)",
+      ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  MINDUR(FNDate.class, "minutes-from-duration(dur)", ITR_ZO, DUR_ZO),
+  MINUTES_FROM_DURATION(FNDate.class, "minutes-from-duration(dur)",
+      ITR_ZO, DUR_ZO),
   /** XQuery function. */
-  MINTIM(FNDate.class, "minutes-from-time(item)", ITR_ZO, TIM_ZO),
+  MINUTES_FROM_TIME(FNDate.class, "minutes-from-time(item)", ITR_ZO, TIM_ZO),
   /** XQuery function. */
-  MONDAT(FNDate.class, "month-from-date(item)", ITR_ZO, DAT_ZO),
+  MONTH_FROM_DATE(FNDate.class, "month-from-date(item)", ITR_ZO, DAT_ZO),
   /** XQuery function. */
-  MONDTM(FNDate.class, "month-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
+  MONTH_FROM_DATETIME(FNDate.class, "month-from-dateTime(datetime)",
+      ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  MONDUR(FNDate.class, "months-from-duration(dur)", ITR_ZO, DUR_ZO),
+  MONTHS_FROM_DURATION(FNDate.class, "months-from-duration(dur)",
+      ITR_ZO, DUR_ZO),
   /** XQuery function. */
-  SECDTM(FNDate.class, "seconds-from-dateTime(datetime)", DEC_ZO, DTM_ZO),
+  SECONDS_FROM_DATETIME(FNDate.class, "seconds-from-dateTime(datetime)",
+      DEC_ZO, DTM_ZO),
   /** XQuery function. */
-  SECDUR(FNDate.class, "seconds-from-duration(dur)", DEC_ZO, DUR_ZO),
+  SECONDS_FROM_DURATION(FNDate.class, "seconds-from-duration(dur)",
+      DEC_ZO, DUR_ZO),
   /** XQuery function. */
-  SECTIM(FNDate.class, "seconds-from-time(item)", DEC_ZO, TIM_ZO),
+  SECONDS_FROM_TIME(FNDate.class, "seconds-from-time(item)", DEC_ZO, TIM_ZO),
   /** XQuery function. */
-  ZONDAT(FNDate.class, "timezone-from-date(item)", DTD_ZO, DAT_ZO),
+  TIMEZONE_FROM_DATE(FNDate.class, "timezone-from-date(item)", DTD_ZO, DAT_ZO),
   /** XQuery function. */
-  ZONDTM(FNDate.class, "timezone-from-dateTime(item)", DTD_ZO, DTM_ZO),
+  TIMEZONE_FROM_DATETIME(FNDate.class, "timezone-from-dateTime(item)",
+      DTD_ZO, DTM_ZO),
   /** XQuery function. */
-  ZONTIM(FNDate.class, "timezone-from-time(item)", DTD_ZO, TIM_ZO),
+  TIMEZONE_FROM_TIME(FNDate.class, "timezone-from-time(item)", DTD_ZO, TIM_ZO),
   /** XQuery function. */
-  YEADAT(FNDate.class, "year-from-date(item)", ITR_ZO, DAT_ZO),
+  YEAR_FROM_DATE(FNDate.class, "year-from-date(item)", ITR_ZO, DAT_ZO),
   /** XQuery function. */
-  YEADTM(FNDate.class, "year-from-dateTime(datetime)", ITR_ZO, DTM_ZO),
+  YEAR_FROM_DATETIME(FNDate.class, "year-from-dateTime(datetime)",
+      ITR_ZO, DTM_ZO),
   /** XQuery function. */
-  YEADUR(FNDate.class, "years-from-duration(dur)", ITR_ZO, DUR_ZO),
+  YEARS_FROM_DURATION(FNDate.class, "years-from-duration(dur)", ITR_ZO, DUR_ZO),
   /** XQuery function. */
-  DATZON(FNDate.class, "adjust-date-to-timezone(date[,zone])", DAT_ZO, 1,
-      DAT_ZO, DTD_ZO),
+  ADJUST_DATE_TO_TIMEZONE(FNDate.class, "adjust-date-to-timezone(date[,zone])",
+      DAT_ZO, 1, DAT_ZO, DTD_ZO),
   /** XQuery function. */
-  DTMZON(FNDate.class, "adjust-dateTime-to-timezone(date[,zone])", DTM, 1,
-      DTM_ZO, DTD_ZO),
+  ADJUST_DATETIME_TO_TIMEZONE(FNDate.class,
+      "adjust-dateTime-to-timezone(date[,zone])", DTM, 1, DTM_ZO, DTD_ZO),
   /** XQuery function. */
-  TIMZON(FNDate.class, "adjust-time-to-timezone(date[,zone])", TIM_ZO, 1,
-      TIM_ZO, DTD_ZO),
+  ADJUST_TIME_TO_TIMEZONE(FNDate.class, "adjust-time-to-timezone(date[,zone])",
+      TIM_ZO, 1, TIM_ZO, DTD_ZO),
   /** XQuery function. */
   DATETIME(FNDate.class, "dateTime(date,time)", DTM_ZO, DAT_ZO, TIM_ZO),
 
   /* FNFormat functions. */
 
   /** XQuery function. */
-  FORMINT(FNFormat.class, "format-integer(number,picture[,lang])", STR, 2,
-      ITR_ZO, STR, STR),
+  FORMAT_INTEGER(FNFormat.class, "format-integer(number,picture[,lang])",
+      STR, 2, ITR_ZO, STR, STR),
   /** XQuery function. */
-  FORMNUM(FNFormat.class, "format-number(number,picture[,format])", STR, 2,
-      ITR_ZO, STR, STR),
+  FORMAT_NUMBER(FNFormat.class, "format-number(number,picture[,format])",
+      STR, 2, ITR_ZO, STR, STR),
   /** XQuery function. */
-  FORMDTM(FNFormat.class,
+  FORMAT_DATETIME(FNFormat.class,
       "format-dateTime(number,picture,[lang,cal,place])",
       STR_ZO, 2, DTM_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
   /** XQuery function. */
-  FORMDAT(FNFormat.class, "format-date(date,picture,[lang,cal,place])",
+  FORMAT_DATE(FNFormat.class, "format-date(date,picture,[lang,cal,place])",
       STR_ZO, 2, DAT_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
   /** XQuery function. */
-  FORMTIM(FNFormat.class, "format-time(number,picture,[lang,cal,place])",
+  FORMAT_TIME(FNFormat.class, "format-time(number,picture,[lang,cal,place])",
       STR_ZO, 2, TIM_ZO, STR, STR_ZO, STR_ZO, STR_ZO),
 
   /* FNFunc functions. */
@@ -147,55 +158,55 @@ public enum Function {
   FILTER(FNFunc.class, "filter(function,seq)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM }, BLN).seq(), ITEM_ZM),
   /** XQuery function. */
-  FUNCNAME(FNFunc.class, "function-name(function)", QNM_ZO,
+  FUNCTION_NAME(FNFunc.class, "function-name(function)", QNM_ZO,
       FuncType.ANY_FUN.seq()),
   /** XQuery function. */
-  FUNCARITY(FNFunc.class, "function-arity(function)", ITR,
+  FUNCTION_ARITY(FNFunc.class, "function-arity(function)", ITR,
       FuncType.ANY_FUN.seq()),
   /** XQuery function. */
   MAP(FNFunc.class, "map(function,seq)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM }, ITEM_ZM).seq(), ITEM_ZM),
   /** XQuery function. */
-  MAPPAIRS(FNFunc.class, "map-pairs(function,seq1,seq2)", ITEM_ZM,
+  MAP_PAIRS(FNFunc.class, "map-pairs(function,seq1,seq2)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM, ITEM }, ITEM_ZM).seq(),
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  FOLDLEFT(FNFunc.class, "fold-left(function,zero,seq)", ITEM_ZM,
+  FOLD_LEFT(FNFunc.class, "fold-left(function,zero,seq)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(),
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  FOLDRIGHT(FNFunc.class, "fold-right(function,zero,seq)", ITEM_ZM,
+  FOLD_RIGHT(FNFunc.class, "fold-right(function,zero,seq)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM, ITEM_ZM }, ITEM_ZM).seq(),
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  PARTAPP(FNFunc.class, "partial-apply(function,arg[,pos])", FUN_O, 2,
-      FUN_O, ITEM_ZM, ITR),
+  PARTIAL_APPLY(FNFunc.class, "partial-apply(function,arg[,pos])",
+      FUN_O, 2, FUN_O, ITEM_ZM, ITR),
 
   /* FNGen functions. */
 
   /** XQuery function. */
   DATA(FNGen.class, "data([item])", AAT_ZM, 0, ITEM_ZM),
   /** XQuery function. */
-  COLL(FNGen.class, "collection([uri])", NOD_ZM, 0, STR_ZO),
+  COLLECTION(FNGen.class, "collection([uri])", NOD_ZM, 0, STR_ZO),
   /** XQuery function. */
   DOC(FNGen.class, "doc(uri)", DOC_ZO, STR_ZO),
   /** XQuery function. */
-  DOCAVL(FNGen.class, "doc-available(uri)", BLN, STR_ZO),
+  DOC_AVAILABLE(FNGen.class, "doc-available(uri)", BLN, STR_ZO),
   /** XQuery function. */
   PUT(FNGen.class, "put(node,path)", EMP, NOD, STR_ZO),
   /** XQuery function. */
-  PARSETXT(FNGen.class, "unparsed-text(uri[,encoding])", STR_ZO, 1, STR_ZO,
-      STR),
+  UNPARSED_TEXT(FNGen.class, "unparsed-text(uri[,encoding])",
+      STR_ZO, 1, STR_ZO, STR),
   /** XQuery function. */
-  PARSETXTLIN(FNGen.class, "unparsed-text-lines(uri[,encoding])", STR_ZM, 1,
-      STR_ZO, STR),
+  UNPARSED_TEXT_LINES(FNGen.class, "unparsed-text-lines(uri[,encoding])",
+      STR_ZM, 1, STR_ZO, STR),
   /** XQuery function. */
-  PARSETXTAVL(FNGen.class, "unparsed-text-available(uri[,encoding])", BLN, 1,
-      STR_ZO, STR),
+  UNPARSED_TEXT_AVAILABLE(FNGen.class,
+      "unparsed-text-available(uri[,encoding])", BLN, 1, STR_ZO, STR),
   /** XQuery function. */
-  PARSEXML(FNGen.class, "parse-xml(string[,base])", DOC_O, 1, STR_ZO, STR),
+  PARSE_XML(FNGen.class, "parse-xml(string[,base])", DOC_O, 1, STR_ZO, STR),
   /** XQuery function. */
-  URICOLL(FNGen.class, "uri-collection([uri])", URI_ZM, 0, STR_ZO),
+  URI_COLLECTION(FNGen.class, "uri-collection([uri])", URI_ZM, 0, STR_ZO),
   /** XQuery function. */
   SERIALIZE(FNGen.class, "serialize(items[,params])", STR, 1, ITEM_ZM, ITEM),
 
@@ -208,7 +219,8 @@ public enum Function {
   /** XQuery function. */
   LANG(FNId.class, "lang(string[,item])", BLN, 1, STR_ZO, NOD),
   /** XQuery function. */
-  ELID(FNId.class, "element-with-id(string[,item])", ELM_ZM, 1, STR_ZM, NOD),
+  ELEMENT_WITH_ID(FNId.class, "element-with-id(string[,item])",
+      ELM_ZM, 1, STR_ZM, NOD),
 
   /* FNInfo functions. */
 
@@ -218,32 +230,34 @@ public enum Function {
   /** XQuery function. */
   TRACE(FNInfo.class, "trace(item,msg)", ITEM_ZM, ITEM_ZM, STR),
   /** XQuery function. */
-  ENVAR(FNInfo.class, "environment-variable(string)", STR_ZO, STR),
+  ENVIRONMENT_VARIABLE(FNInfo.class, "environment-variable(string)",
+      STR_ZO, STR),
   /** XQuery function. */
-  ENVARS(FNInfo.class, "available-environment-variables()", STR_ZM),
+  AVAILABLE_ENVIRONMENT_VARIABLES(FNInfo.class,
+      "available-environment-variables()", STR_ZM),
 
   /* FNNode functions. */
 
   /** XQuery function. */
-  DOCURI(FNNode.class, "document-uri([node])", URI_ZO, 0, NOD_ZO),
+  DOCUMENT_URI(FNNode.class, "document-uri([node])", URI_ZO, 0, NOD_ZO),
   /** XQuery function. */
   NILLED(FNNode.class, "nilled(node)", BLN_ZO, NOD_ZO),
   /** XQuery function. */
-  NODENAME(FNNode.class, "node-name([node])", QNM_ZO, 0, NOD_ZO),
+  NODE_NAME(FNNode.class, "node-name([node])", QNM_ZO, 0, NOD_ZO),
   /** XQuery function. */
-  LOCNAME(FNNode.class, "local-name([node])", STR, 0, NOD_ZO),
+  LOCAL_NAME(FNNode.class, "local-name([node])", STR, 0, NOD_ZO),
   /** XQuery function. */
   NAME(FNNode.class, "name([node])", STR, 0, NOD_ZO),
   /** XQuery function. */
-  NSURI(FNNode.class, "namespace-uri([node])", URI, 0, NOD_ZO),
+  NAMESPACE_URI(FNNode.class, "namespace-uri([node])", URI, 0, NOD_ZO),
   /** XQuery function. */
   ROOT(FNNode.class, "root([node])", NOD_ZO, 0, NOD_ZO),
   /** XQuery function. */
-  BASEURI(FNNode.class, "base-uri([node])", URI_ZO, 0, NOD_ZO),
+  BASE_URI(FNNode.class, "base-uri([node])", URI_ZO, 0, NOD_ZO),
   /** XQuery function. */
-  GENID(FNNode.class, "generate-id([node])", STR, 0, NOD_ZO),
+  GENERATE_ID(FNNode.class, "generate-id([node])", STR, 0, NOD_ZO),
   /** XQuery function. */
-  CHILDREN(FNNode.class, "has-children(node)", BLN, NOD_ZM),
+  HAS_CHILDREN(FNNode.class, "has-children(node)", BLN, NOD_ZM),
   /** XQuery function. */
   PATH(FNNode.class, "path([node])", STR_ZO, 0, NOD_ZO),
 
@@ -252,64 +266,67 @@ public enum Function {
   /** XQuery function. */
   ABS(FNNum.class, "abs(num)", AAT_ZO, AAT_ZO),
   /** XQuery function. */
-  CEIL(FNNum.class, "ceiling(num)", AAT_ZO, AAT_ZO),
+  CEILING(FNNum.class, "ceiling(num)", AAT_ZO, AAT_ZO),
   /** XQuery function. */
   FLOOR(FNNum.class, "floor(num)", AAT_ZO, AAT_ZO),
   /** XQuery function. */
   ROUND(FNNum.class, "round(num[,prec])", AAT_ZO, 1, AAT_ZO, ITR),
   /** XQuery function. */
-  RNDHLF(FNNum.class, "round-half-to-even(num[,prec])", AAT_ZO, 1, AAT_ZO, ITR),
+  ROUND_HALF_TO_EVEN(FNNum.class, "round-half-to-even(num[,prec])",
+      AAT_ZO, 1, AAT_ZO, ITR),
 
   /* FNPat functions. */
 
   /** XQuery function. */
-  MATCH(FNPat.class, "matches(item,pattern[,mod])", BLN, 2, STR_ZO, STR, STR),
+  MATCHES(FNPat.class, "matches(item,pattern[,mod])", BLN, 2, STR_ZO, STR, STR),
   /** XQuery function. */
   REPLACE(FNPat.class, "replace(item,pattern,replace[,mod])", STR, 3, STR_ZO,
       STR, STR, STR),
   /** XQuery function. */
-  TOKEN(FNPat.class, "tokenize(item,pattern[,mod])", STR_ZM, 2, STR_ZO,
+  TOKENIZE(FNPat.class, "tokenize(item,pattern[,mod])", STR_ZM, 2, STR_ZO,
       STR, STR),
   /** XQuery function. */
-  ANALZYE(FNPat.class, "analyze-string(input,pattern[,mod])", ELM, 2, STR_ZO,
-      STR, STR),
+  ANALYZE_STRING(FNPat.class, "analyze-string(input,pattern[,mod])",
+      ELM, 2, STR_ZO, STR, STR),
 
   /* FNQName functions. */
 
   /** XQuery function. */
-  INSCOPE(FNQName.class, "in-scope-prefixes(elem)", STR_ZM, ELM),
+  IN_SCOPE_PREFIXES(FNQName.class, "in-scope-prefixes(elem)", STR_ZM, ELM),
   /** XQuery function. */
-  LOCNAMEQNAME(FNQName.class, "local-name-from-QName(qname)", NCN_ZO, QNM_ZO),
+  LOCAL_NAME_FROM_QNAME(FNQName.class, "local-name-from-QName(qname)",
+      NCN_ZO, QNM_ZO),
   /** XQuery function. */
-  NSURIPRE(FNQName.class, "namespace-uri-for-prefix(pref,elem)", URI_ZO, STR_ZO,
-      ELM),
+  NAMESPACE_URI_FOR_PREFIX(FNQName.class, "namespace-uri-for-prefix(pref,elem)",
+      URI_ZO, STR_ZO, ELM),
   /** XQuery function. */
   QNAME(FNQName.class, "QName(uri,name)", QNM, STR_ZO, STR),
   /** XQuery function. */
-  PREQNAME(FNQName.class, "prefix-from-QName(qname)", NCN_ZO, QNM_ZO),
+  PREFIX_FROM_QNAME(FNQName.class, "prefix-from-QName(qname)", NCN_ZO, QNM_ZO),
   /** XQuery function. */
-  RESQNAME(FNQName.class, "resolve-QName(item,base)", QNM_ZO, STR_ZO, ELM),
+  RESOLVE_QNAME(FNQName.class, "resolve-QName(item,base)", QNM_ZO, STR_ZO, ELM),
   /** XQuery function. */
-  RESURI(FNQName.class, "resolve-uri(name[,elem])", URI_ZO, 1, STR_ZO, STR),
+  RESOLVE_URI(FNQName.class, "resolve-uri(name[,elem])",
+      URI_ZO, 1, STR_ZO, STR),
 
   /* FNSeq functions. */
 
   /** XQuery function. */
-  DISTINCT(FNSeq.class, "distinct-values(items[,coll])", AAT_ZM, 1, AAT_ZM,
-      STR),
+  DISTINCT_VALUES(FNSeq.class, "distinct-values(items[,coll])",
+      AAT_ZM, 1, AAT_ZM, STR),
   /** XQuery function. */
-  INDEXOF(FNSeq.class, "index-of(items,item[,coll])", ITR_ZM, 2, AAT_ZM, AAT,
-      STR),
+  INDEX_OF(FNSeq.class, "index-of(items,item[,coll])",
+      ITR_ZM, 2, AAT_ZM, AAT, STR),
   /** XQuery function. */
-  INSBEF(FNSeq.class, "insert-before(items,pos,insert)", ITEM_ZM, ITEM_ZM, ITR,
-      ITEM_ZM),
+  INSERT_BEFORE(FNSeq.class, "insert-before(items,pos,insert)",
+      ITEM_ZM, ITEM_ZM, ITR, ITEM_ZM),
   /** XQuery function. */
   REMOVE(FNSeq.class, "remove(items,pos)", ITEM_ZM, ITEM_ZM, ITR),
   /** XQuery function. */
   REVERSE(FNSeq.class, "reverse(items)", ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  SUBSEQ(FNSeq.class, "subsequence(items,start[,len])", ITEM_ZM, 2, ITEM_ZM,
-      DBL, DBL),
+  SUBSEQUENCE(FNSeq.class, "subsequence(items,start[,len])",
+      ITEM_ZM, 2, ITEM_ZM, DBL, DBL),
   /** XQuery function. */
   HEAD(FNSeq.class, "head(items)", ITEM_ZO, ITEM_ZM),
   /** XQuery function. */
@@ -334,377 +351,378 @@ public enum Function {
   /** XQuery function. */
   EXISTS(FNSimple.class, "exists(item)", BLN, ITEM_ZM),
   /** XQuery function. */
-  UNORDER(FNSimple.class, "unordered(item)", ITEM_ZM, ITEM_ZM),
+  UNORDERED(FNSimple.class, "unordered(item)", ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  ZEROORONE(FNSimple.class, "zero-or-one(item)", ITEM_ZO, ITEM_ZM),
+  ZERO_OR_ONE(FNSimple.class, "zero-or-one(item)", ITEM_ZO, ITEM_ZM),
   /** XQuery function. */
-  EXACTLYONE(FNSimple.class, "exactly-one(item)", ITEM, ITEM_ZM),
+  EXACTLY_ONE(FNSimple.class, "exactly-one(item)", ITEM, ITEM_ZM),
   /** XQuery function. */
-  ONEORMORE(FNSimple.class, "one-or-more(item)", ITEM_OM, ITEM_ZM),
+  ONE_OR_MORE(FNSimple.class, "one-or-more(item)", ITEM_OM, ITEM_ZM),
   /** XQuery function. */
-  DEEPEQUAL(FNSimple.class, "deep-equal(item,item[,coll])", BLN, 2, ITEM_ZM,
+  DEEP_EQUAL(FNSimple.class, "deep-equal(item,item[,coll])", BLN, 2, ITEM_ZM,
       ITEM_ZM, STR),
 
   /* FNStr functions. */
 
   /** XQuery function. */
-  CODEPNT(FNStr.class, "codepoint-equal(string,string)", BLN_ZO, STR_ZO,
+  CODEPOINT_EQUAL(FNStr.class, "codepoint-equal(string,string)", BLN_ZO, STR_ZO,
       STR_ZO),
   /** XQuery function. */
-  CODESTR(FNStr.class, "codepoints-to-string(nums)", STR, ITR_ZM),
+  CODEPOINTS_TO_STRING(FNStr.class, "codepoints-to-string(nums)", STR, ITR_ZM),
   /** XQuery function. */
   COMPARE(FNStr.class, "compare(first,second[,coll])", ITR_ZO, 2, STR_ZO,
       STR_ZO, STR),
   /** XQuery function. */
   CONCAT(FNStr.class, "concat(atom,atom[,...])", STR, -2, AAT_ZO, AAT_ZO),
   /** XQuery function. */
-  CONTAINS(FNStr.class, "contains(string,sub[,coll])", BLN, 2, STR_ZO, STR_ZO,
-      STR),
+  CONTAINS(FNStr.class, "contains(string,sub[,coll])",
+      BLN, 2, STR_ZO, STR_ZO, STR),
   /** XQuery function. */
-  ENCURI(FNStr.class, "encode-for-uri(string)", STR, STR_ZO),
+  ENCODE_FOR_URI(FNStr.class, "encode-for-uri(string)", STR, STR_ZO),
   /** XQuery function. */
-  ENDS(FNStr.class, "ends-with(string,sub[,coll])", BLN, 2, STR_ZO, STR_ZO,
-      STR),
+  ENDS_WITH(FNStr.class, "ends-with(string,sub[,coll])",
+      BLN, 2, STR_ZO, STR_ZO, STR),
   /** XQuery function. */
-  ESCURI(FNStr.class, "escape-html-uri(string)", STR, STR_ZO),
+  ESCAPE_HTML_URI(FNStr.class, "escape-html-uri(string)", STR, STR_ZO),
   /** XQuery function. */
-  IRIURI(FNStr.class, "iri-to-uri(string)", STR, STR_ZO),
+  IRI_TO_URI(FNStr.class, "iri-to-uri(string)", STR, STR_ZO),
   /** XQuery function. */
-  LOWER(FNStr.class, "lower-case(string)", STR, STR_ZO),
+  LOWER_CASE(FNStr.class, "lower-case(string)", STR, STR_ZO),
   /** XQuery function. */
-  NORMUNI(FNStr.class, "normalize-unicode(string[,form])", STR, 1, STR_ZO, STR),
+  NORMALIZE_UNICODE(FNStr.class, "normalize-unicode(string[,form])",
+      STR, 1, STR_ZO, STR),
   /** XQuery function. */
-  STARTS(FNStr.class, "starts-with(string,sub[,coll])", BLN, 2, STR_ZO, STR_ZO,
-      STR),
+  STARTS_WITH(FNStr.class, "starts-with(string,sub[,coll])",
+      BLN, 2, STR_ZO, STR_ZO, STR),
   /** XQuery function. */
-  STRJOIN(FNStr.class, "string-join(strings[,sep])", STR, 1, STR_ZM, STR),
+  STRING_JOIN(FNStr.class, "string-join(strings[,sep])", STR, 1, STR_ZM, STR),
   /** XQuery function. */
-  STCODE(FNStr.class, "string-to-codepoints(string)", ITR_ZM, STR_ZO),
+  STRING_TO_CODEPOINTS(FNStr.class, "string-to-codepoints(string)",
+      ITR_ZM, STR_ZO),
   /** XQuery function. */
-  SUBSTR(FNStr.class, "substring(string,start[,len])", STR, 2, STR_ZO, DBL,
+  SUBSTRING(FNStr.class, "substring(string,start[,len])", STR, 2, STR_ZO, DBL,
       DBL),
   /** XQuery function. */
-  SUBAFTER(FNStr.class, "substring-after(string,sub[,coll])", STR, 2, STR_ZO,
-      STR_ZO, STR),
+  SUBSTRING_AFTER(FNStr.class, "substring-after(string,sub[,coll])",
+      STR, 2, STR_ZO, STR_ZO, STR),
   /** XQuery function. */
-  SUBBEFORE(FNStr.class, "substring-before(string,sub[,coll])", STR, 2, STR_ZO,
-      STR_ZO, STR),
+  SUBSTRING_BEFORE(FNStr.class, "substring-before(string,sub[,coll])",
+      STR, 2, STR_ZO, STR_ZO, STR),
   /** XQuery function. */
-  TRANS(FNStr.class, "translate(string,map,trans)", STR, STR_ZO, STR, STR),
+  TRANSLATE(FNStr.class, "translate(string,map,trans)", STR, STR_ZO, STR, STR),
   /** XQuery function. */
-  UPPER(FNStr.class, "upper-case(string)", STR, STR_ZO),
+  UPPER_CASE(FNStr.class, "upper-case(string)", STR, STR_ZO),
 
   /* FNMap functions. */
 
   /** XQuery Function. */
-  MAPNEW(FNMap.class, "new([maps[,coll]])", MAP_O, 0, MAP_ZM, STR),
+  _MAP_NEW(FNMap.class, "new([maps[,coll]])", MAP_O, 0, MAP_ZM, STR),
   /** XQuery Function. */
-  MAPENTRY(FNMap.class, "entry(key,value)", MAP_O, AAT, ITEM_ZM),
+  _MAP_ENTRY(FNMap.class, "entry(key,value)", MAP_O, AAT, ITEM_ZM),
   /** XQuery Function. */
-  MAPGET(FNMap.class, "get(map,key)", ITEM_ZM, MAP_O, AAT),
+  _MAP_GET(FNMap.class, "get(map,key)", ITEM_ZM, MAP_O, AAT),
   /** XQuery Function. */
-  MAPCONT(FNMap.class, "contains(map,key)", BLN, MAP_O, AAT),
+  _MAP_CONTAINS(FNMap.class, "contains(map,key)", BLN, MAP_O, AAT),
   /** XQuery Function. */
-  MAPREM(FNMap.class, "remove(map,key)", MAP_O, MAP_O, AAT),
+  _MAP_REMOVE(FNMap.class, "remove(map,key)", MAP_O, MAP_O, AAT),
   /** XQuery Function. */
-  MAPSIZE(FNMap.class, "size(map)", ITR, MAP_O),
+  _MAP_SIZE(FNMap.class, "size(map)", ITR, MAP_O),
   /** XQuery Function. */
-  MAPKEYS(FNMap.class, "keys(map)", AAT_ZM, MAP_O),
+  _MAP_KEYS(FNMap.class, "keys(map)", AAT_ZM, MAP_O),
   /** XQuery Function. */
-  MAPCOLL(FNMap.class, "collation(map)", STR, MAP_O),
+  _MAP_COLLATION(FNMap.class, "collation(map)", STR, MAP_O),
 
   /* FNMath functions. */
 
   /** XQuery math function. */
-  PI(FNMath.class, "pi()", DBL),
+  _MATH_PI(FNMath.class, "pi()", DBL),
   /** XQuery math function. */
-  SQRT(FNMath.class, "sqrt(number)", DBL_ZO, DBL_ZO),
+  _MATH_SQRT(FNMath.class, "sqrt(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  SIN(FNMath.class, "sin(number)", DBL_ZO, DBL_ZO),
+  _MATH_SIN(FNMath.class, "sin(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  COS(FNMath.class, "cos(number)", DBL_ZO, DBL_ZO),
+  _MATH_COS(FNMath.class, "cos(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  TAN(FNMath.class, "tan(number)", DBL_ZO, DBL_ZO),
+  _MATH_TAN(FNMath.class, "tan(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  ASIN(FNMath.class, "asin(number)", DBL_ZO, DBL_ZO),
+  _MATH_ASIN(FNMath.class, "asin(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  ACOS(FNMath.class, "acos(number)", DBL_ZO, DBL_ZO),
+  _MATH_ACOS(FNMath.class, "acos(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  ATAN(FNMath.class, "atan(number)", DBL_ZO, DBL_ZO),
+  _MATH_ATAN(FNMath.class, "atan(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  ATAN2(FNMath.class, "atan2(number,number)", DBL, DBL, DBL),
+  _MATH_ATAN2(FNMath.class, "atan2(number,number)", DBL, DBL, DBL),
   /** XQuery math function. */
-  POW(FNMath.class, "pow(number,number)", DBL_ZO, DBL_ZO, ITR),
+  _MATH_POW(FNMath.class, "pow(number,number)", DBL_ZO, DBL_ZO, ITR),
   /** XQuery math function. */
-  EXP(FNMath.class, "exp(number)", DBL_ZO, DBL_ZO),
+  _MATH_EXP(FNMath.class, "exp(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  EXP10(FNMath.class, "exp10(number)", DBL_ZO, DBL_ZO),
+  _MATH_EXP10(FNMath.class, "exp10(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  LOG(FNMath.class, "log(number)", DBL_ZO, DBL_ZO),
+  _MATH_LOG(FNMath.class, "log(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function. */
-  LOG10(FNMath.class, "log10(number)", DBL_ZO, DBL_ZO),
+  _MATH_LOG10(FNMath.class, "log10(number)", DBL_ZO, DBL_ZO),
 
   /** XQuery math function (project specific). */
-  RANDOM(FNMath.class, "random()", DBL),
+  _MATH_RANDOM(FNMath.class, "random()", DBL),
   /** XQuery math function (project specific). */
-  E(FNMath.class, "e()", DBL),
+  _MATH_E(FNMath.class, "e()", DBL),
   /** XQuery math function (project specific). */
-  SINH(FNMath.class, "sinh(number)", DBL_ZO, DBL_ZO),
+  _MATH_SINH(FNMath.class, "sinh(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function (project specific). */
-  COSH(FNMath.class, "cosh(number)", DBL_ZO, DBL_ZO),
+  _MATH_COSH(FNMath.class, "cosh(number)", DBL_ZO, DBL_ZO),
   /** XQuery math function (project specific). */
-  TANH(FNMath.class, "tanh(number)", DBL_ZO, DBL_ZO),
+  _MATH_TANH(FNMath.class, "tanh(number)", DBL_ZO, DBL_ZO),
 
   /* FNDb functions. */
 
   /** Database function: opens a database. */
-  DBOPEN(FNDb.class, "open(database[,path])", NOD_ZM, 1, STR, STR),
+  _DB_OPEN(FNDb.class, "open(database[,path])", NOD_ZM, 1, STR, STR),
   /** Database function: opens a specific database node. */
-  DBOPENPRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, ITEM, ITR),
+  _DB_OPEN_PRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, ITEM, ITR),
   /** Database function: opens a specific database node. */
-  DBOPENID(FNDb.class, "open-id(database,id)", NOD_ZM, ITEM, ITR),
+  _DB_OPEN_ID(FNDb.class, "open-id(database,id)", NOD_ZM, ITEM, ITR),
   /** Database function: searches the text index. */
-  DBTEXT(FNDb.class, "text(database,string)", NOD_ZM, ITEM, ITEM),
+  _DB_TEXT(FNDb.class, "text(database,string)", NOD_ZM, ITEM, ITEM),
   /** Database function: searches the attribute index. */
-  DBATTR(FNDb.class, "attribute(database,string[,name])", NOD_ZM, 2,
-      ITEM, ITEM, STR),
+  _DB_ATTRIBUTE(FNDb.class, "attribute(database,string[,name])",
+      NOD_ZM, 2, ITEM, ITEM, STR),
   /** Database function: searches the full-text index. */
-  DBFULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
+  _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
   /** Database function: lists all databases or documents in a database. */
-  DBLIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
+  _DB_LIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
-  DBSYSTEM(FNDb.class, "system()", STR),
+  _DB_SYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
-  DBINFO(FNDb.class, "info(database[,type])", STR, 1, ITEM, STR),
+  _DB_INFO(FNDb.class, "info(database[,type])", STR, 1, ITEM, STR),
   /** Database function: returns the node ids of database nodes. */
-  DBNODEID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
+  _DB_NODE_ID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: returns the pre values of database nodes. */
-  DBNODEPRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
+  _DB_NODE_PRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: sends result to connected clients. */
-  DBEVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
+  _DB_EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
   /** Database function: add document(s) to a database. */
-  DBADD(FNDb.class, "add(database,nodes[,name[,path]])", EMP, 2,
-      STR, DOC_ZM, STR, STR),
+  _DB_ADD(FNDb.class, "add(database,nodes[,name[,path]])",
+      EMP, 2, STR, DOC_ZM, STR, STR),
   /** Database function: delete document(s) from a database. */
-  DBDELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
+  _DB_DELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
   /** Database function: rename document(s). */
-  DBRENAME(FNDb.class, "rename(database,path,newpath)", EMP, STR, STR, STR),
+  _DB_RENAME(FNDb.class, "rename(database,path,newpath)", EMP, STR, STR, STR),
   /** Database function: replace document(s). */
-  DBREPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
+  _DB_REPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
   /** Database function: optimize database structures. */
-  DBOPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
+  _DB_OPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
   /** Database function: retrieves binary data. */
-  DBRETRIEVE(FNDb.class, "retrieve(database,path)", RAW, STR, STR),
+  _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", RAW, STR, STR),
   /** Database function: stores binary data. */
-  DBSTORE(FNDb.class, "store(database,path,value)", EMP, STR, STR, ITEM),
+  _DB_STORE(FNDb.class, "store(database,path,value)", EMP, STR, STR, ITEM),
   /** Database function: checks if the specified resource is an xml document. */
-  DBISXML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
+  _DB_IS_XML(FNDb.class, "is-xml(database,path)", BLN, STR, STR),
   /** Database function: checks if the specified resource is a raw file. */
-  DBISRAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
+  _DB_IS_RAW(FNDb.class, "is-raw(database,path)", BLN, STR, STR),
   /** Database function: checks if the specified database or resource exists. */
-  DBEXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
+  _DB_EXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
   /** Database function: returns the content type of a database file. */
-  DBCTYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
+  _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
   /** Database function: returns details for a resource. */
-  DBDETAILS(FNDb.class, "details(database,path)", ITEM, STR, STR),
+  _DB_DETAILS(FNDb.class, "details(database,path)", ITEM, STR, STR),
 
   /* FNFile functions (EXPath). */
 
   /** XQuery function */
-  FLEXISTS(FNFile.class, "exists(path)", BLN, STR),
+  _FILE_EXISTS(FNFile.class, "exists(path)", BLN, STR),
   /** XQuery function */
-  FLISDIR(FNFile.class, "is-directory(path)", BLN, STR),
+  _FILE_IS_DIRECTORY(FNFile.class, "is-directory(path)", BLN, STR),
   /** XQuery function */
-  FLISFILE(FNFile.class, "is-file(path)", BLN, STR),
+  _FILE_IS_FILE(FNFile.class, "is-file(path)", BLN, STR),
   /** XQuery function */
-  FLLASTMOD(FNFile.class, "last-modified(path)", DTM, STR),
+  _FILE_LAST_MODIFIED(FNFile.class, "last-modified(path)", DTM, STR),
   /** XQuery function */
-  FLSIZE(FNFile.class, "size(path)", ITR, STR),
+  _FILE_SIZE(FNFile.class, "size(path)", ITR, STR),
   /** XQuery function */
-  FLBASENAME(FNFile.class, "base-name(path[,suffix])", STR, 1, STR, STR),
+  _FILE_BASE_NAME(FNFile.class, "base-name(path[,suffix])", STR, 1, STR, STR),
   /** XQuery function */
-  FLDIRNAME(FNFile.class, "dir-name(path)", STR, STR),
+  _FILE_DIR_NAME(FNFile.class, "dir-name(path)", STR, STR),
   /** XQuery function */
-  FLPATHNATIVE(FNFile.class, "path-to-native(path)", STR, STR),
+  _FILE_PATH_TO_NATIVE(FNFile.class, "path-to-native(path)", STR, STR),
   /** XQuery function */
-  FLPATHTOURI(FNFile.class, "path-to-uri(path)", URI, STR),
+  _FILE_PATH_TO_URI(FNFile.class, "path-to-uri(path)", URI, STR),
   /** XQuery function */
-  FLRESOLVEPATH(FNFile.class, "resolve-path(path)", STR, STR),
+  _FILE_RESOLVE_PATH(FNFile.class, "resolve-path(path)", STR, STR),
   /** XQuery function */
-  FLLIST(FNFile.class, "list(path[,recursive[,pattern]])", STR_ZM, 1, STR, BLN,
-      STR),
+  _FILE_LIST(FNFile.class, "list(path[,recursive[,pattern]])",
+      STR_ZM, 1, STR, BLN, STR),
   /** XQuery function */
-  FLCREATEDIR(FNFile.class, "create-directory(path)", EMP, STR),
+  _FILE_CREATE_DIRECTORY(FNFile.class, "create-directory(path)", EMP, STR),
   /** XQuery function */
-  FLDELETE(FNFile.class, "delete(path)", EMP, STR),
+  _FILE_DELETE(FNFile.class, "delete(path)", EMP, STR),
   /** XQuery function */
-  FLREADTEXT(FNFile.class, "read-text(path[,encoding])", STR, 1, STR, STR),
+  _FILE_READ_TEXT(FNFile.class, "read-text(path[,encoding])", STR, 1, STR, STR),
   /** XQuery function */
-  FLREADLINES(FNFile.class, "read-text-lines(path[,encoding])",
+  _FILE_READ_TEXT_LINES(FNFile.class, "read-text-lines(path[,encoding])",
       STR_ZM, 1, STR, STR),
   /** XQuery function */
-  FLREADBIN(FNFile.class, "read-binary(path)", RAW, STR),
+  _FILE_READ_BINARY(FNFile.class, "read-binary(path)", RAW, STR),
   /** XQuery function */
-  FLWRITE(FNFile.class, "write(path,data[,params])", EMP, 2, STR, ITEM_ZM, NOD),
+  _FILE_WRITE(FNFile.class, "write(path,data[,params])",
+      EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */
-  FLWRITEBIN(FNFile.class, "write-binary(path,item)", EMP, STR, ITEM_ZM),
+  _FILE_WRITE_BINARY(FNFile.class, "write-binary(path,item)",
+      EMP, STR, ITEM_ZM),
   /** XQuery function */
-  FLAPPEND(FNFile.class, "append(path,data[,params])", EMP, 2,
-      STR, ITEM_ZM, NOD),
+  _FILE_APPEND(FNFile.class, "append(path,data[,params])",
+      EMP, 2, STR, ITEM_ZM, NOD),
   /** XQuery function */
-  FLAPPENDBIN(FNFile.class, "append-binary(path,item)", EMP, STR, ITEM_ZM),
+  _FILE_APPEND_BINARY(FNFile.class, "append-binary(path,item)",
+      EMP, STR, ITEM_ZM),
   /** XQuery function */
-  FLCOPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
+  _FILE_COPY(FNFile.class, "copy(source,target)", EMP, STR, STR),
   /** XQuery function */
-  FLMOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
+  _FILE_MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
 
   /* FNSql functions. */
 
   /** XQuery function */
-  SQLINIT(FNSql.class, "init(class)", EMP, 1, STR),
+  _SQL_INIT(FNSql.class, "init(class)", EMP, 1, STR),
   /** XQuery function */
-  SQLCONNECT(FNSql.class, "connect(url[,user[,pass[,options]]]]])",
+  _SQL_CONNECT(FNSql.class, "connect(url[,user[,pass[,options]]]]])",
       ITR, 1, STR, STR, STR, NOD_ZO),
   /** XQuery function */
-  SQLPREPARE(FNSql.class, "prepare(id,statement)", ITR, ITR, STR),
+  _SQL_PREPARE(FNSql.class, "prepare(id,statement)", ITR, ITR, STR),
   /** XQuery function */
-  SQLEXECUTE(FNSql.class, "execute(id[,item])", ELM_ZM, 1, ITR, ITEM_ZO),
+  _SQL_EXECUTE(FNSql.class, "execute(id[,item])", ELM_ZM, 1, ITR, ITEM_ZO),
   /** XQuery function */
-  SQLCLOSE(FNSql.class, "close(id)", EMP, ITR),
+  _SQL_CLOSE(FNSql.class, "close(id)", EMP, ITR),
   /** XQuery function */
-  SQLCOMMIT(FNSql.class, "commit(id)", EMP, ITR),
+  _SQL_COMMIT(FNSql.class, "commit(id)", EMP, ITR),
   /** XQuery function */
-  SQLROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
+  _SQL_ROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
 
   /* FNFt functions. */
 
   /** Database function: searches the full-text index. */
-  FTSEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
+  _FT_SEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
   /** Database function: counts the hits of a full-text request. */
-  FTCOUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
+  _FT_COUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
   /** Database function: marks the hits of a full-text request. */
-  FTMARK(FNFt.class, "mark(nodes[,tag])", NOD_ZM, 1, NOD_ZM, STR),
+  _FT_MARK(FNFt.class, "mark(nodes[,tag])", NOD_ZM, 1, NOD_ZM, STR),
   /** Database function: extracts full-text results. */
-  FTEXTRACT(FNFt.class, "extract(nodes[,tag[,length]])", NOD_ZM, 1,
-      ITEM_ZM, STR, ITR),
+  _FT_EXTRACT(FNFt.class, "extract(nodes[,tag[,length]])",
+      NOD_ZM, 1, ITEM_ZM, STR, ITR),
   /** Database function: returns the full-text score. */
-  FTSCORE(FNFt.class, "score(items)", DBL_ZM, ITEM_ZM),
+  _FT_SCORE(FNFt.class, "score(items)", DBL_ZM, ITEM_ZM),
 
   /* FNHof functions. */
 
   /** XQuery function. */
-  HOFSORTWITH(FNHof.class, "sort-with(lt-fun,seq)", ITEM_ZM,
+  _HOF_SORT_WITH(FNHof.class, "sort-with(lt-fun,seq)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM, ITEM }, BLN).seq(), ITEM_ZM),
   /** XQuery function. */
-  HOFID(FNHof.class, "id(expr)", ITEM_ZM, ITEM_ZM),
+  _HOF_ID(FNHof.class, "id(expr)", ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  HOFCONST(FNHof.class, "const(return,ignore)", ITEM_ZM, ITEM_ZM, ITEM_ZM),
+  _HOF_CONST(FNHof.class, "const(return,ignore)", ITEM_ZM, ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  HOFUNTIL(FNHof.class, "until(pred,func,start)", ITEM_ZM,
+  _HOF_UNTIL(FNHof.class, "until(pred,func,start)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM_ZM }, BLN).seq(),
       FuncType.get(new SeqType[] { ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM),
   /** XQuery function. */
-  HOFFOLDLEFT(FNHof.class, "fold-left1(function,non-empty-seq)", ITEM_ZM,
+  _HOF_FOLD_LEFT1(FNHof.class, "fold-left1(function,non-empty-seq)", ITEM_ZM,
       FuncType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM),
   /** XQuery Function. */
-  HOFITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM,
+  _HOF_ITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM,
       FuncType.arity(1).seq(), ITEM_ZM),
 
   /* FNCrypto functions (EXPath Cryptographic module). */
 
   /** Create message authentication code (HMAC). */
-  CRYPHMAC(FNCrypto.class, "hmac(string,string,string[,string])", STR, 3, STR,
-      STR, STR, STR_ZO),
+  _CRYPTO_HMAC(FNCrypto.class, "hmac(string,string,string[,string])",
+      STR, 3, STR, STR, STR, STR_ZO),
   /** Encrypt message. */
-  CRYPENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)", STR,
-      STR, STR, STR, STR),
+  _CRYPTO_ENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)",
+      STR, STR, STR, STR, STR),
   /** Decrypt message. */
-  CRYPDECRYPT(FNCrypto.class, "decrypt(string, string, string, string)", STR,
-      STR, STR, STR, STR),
+  _CRYPTO_DECRYPT(FNCrypto.class, "decrypt(string, string, string, string)",
+      STR, STR, STR, STR, STR),
   /** Generate signature. */
-  CRYPGENSIG(FNCrypto.class,
-      "generate-signature" +
+  _CRYPTO_GENERATE_SIGNATURE(FNCrypto.class, "generate-signature" +
       "(node,string,string,string,string,string[,item][,item])",
       NOD, 6, NOD, STR, STR, STR, STR, STR, ITEM_ZO, ITEM_ZO),
   /** Validate signature. */
-  CRYPVALSIG(FNCrypto.class, "validate-signature(node)", BLN, NOD),
+  _CRYPTO_VALIDATE_SIGNATURE(FNCrypto.class, "validate-signature(node)",
+      BLN, NOD),
 
   /* FNHttp functions (EXPath). */
 
   /** XQuery function */
-  HTTPSENDREQUEST(FNHttp.class, "send-request(request[,href,[bodies]])",
+  _HTTP_SEND_REQUEST(FNHttp.class, "send-request(request[,href,[bodies]])",
       ITEM_ZM, 1, NOD, STR_ZO, ITEM_ZM),
 
   /* FNJson functions. */
 
   /** JSON function: convert JSON to XML. */
-  JSONPARSE(FNJson.class, "parse(string)", NOD, STR),
+  _JSON_PARSE(FNJson.class, "parse(string)", NOD, STR),
   /** JSON function: convert JSON to XML. */
-  JSONPARSEML(FNJson.class, "parse-ml(string)", NOD, STR),
+  _JSON_PARSE_ML(FNJson.class, "parse-ml(string)", NOD, STR),
   /** JSON function: convert XML to JSON. */
-  JSONSER(FNJson.class, "serialize(node)", STR, NOD),
+  _JSON_SERIALIZE(FNJson.class, "serialize(node)", STR, NOD),
   /** JSON function: convert XML to JsonML. */
-  JSONSERML(FNJson.class, "serialize-ml(node)", STR, NOD),
-
-  /* FNSent functions. */
-
-  /** Sentiment function: returns a text sentiment. */
-  SENTPOL(FNSent.class, "polarity(string,uri)", DBL, STR, STR),
-  /** Sentiment function: returns a normed polarity value. */
-  SENTNORM(FNSent.class, "normed-polarity(string,uri)", DBL, STR, STR),
+  _JSON_SERIALIZE_ML(FNJson.class, "serialize-ml(node)", STR, NOD),
 
   /* FNUtil functions. */
 
   /** Utility function: evaluates the specified query. */
-  EVAL(FNUtil.class, "eval(string)", ITEM_ZM, STR_ZO),
+  _UTIL_EVAL(FNUtil.class, "eval(string)", ITEM_ZM, STR_ZO),
   /** Utility function: evaluates the specified query file. */
-  RUN(FNUtil.class, "run(string)", ITEM_ZM, STR),
+  _UTIL_RUN(FNUtil.class, "run(string)", ITEM_ZM, STR),
   /** Utility function: formats a string using the printf syntax. */
-  FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
+  _UTIL_FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
   /** Utility function: returns the memory consumption in mb. */
-  MB(FNUtil.class, "mb(expr[,cache])", DBL, 1, ITEM_ZM, BLN),
+  _UTIL_MB(FNUtil.class, "mb(expr[,cache])", DBL, 1, ITEM_ZM, BLN),
   /** Utility function: measures the execution time of an expression. */
-  MS(FNUtil.class, "ms(expr[,cache])", DBL, 1, ITEM_ZM, BLN),
+  _UTIL_MS(FNUtil.class, "ms(expr[,cache])", DBL, 1, ITEM_ZM, BLN),
   /** Utility function: converts a number to a given base. */
-  TO_BASE(FNUtil.class, "integer-to-base(num,base)", STR, ITR, ITR),
+  _UTIL_INTEGER_TO_BASE(FNUtil.class, "integer-to-base(num,base)",
+      STR, ITR, ITR),
   /** Utility function: decodes a number from a given base. */
-  FRM_BASE(FNUtil.class, "integer-from-base(str,base)", ITR, STR, ITR),
+  _UTIL_INTEGER_FROM_BASE(FNUtil.class, "integer-from-base(str,base)",
+      ITR, STR, ITR),
   /** Utility function: calculates the MD5 hash of the given string. */
-  MD5(FNUtil.class, "md5(str)", HEX, STR),
+  _UTIL_MD5(FNUtil.class, "md5(str)", HEX, STR),
   /** Utility function: calculates the SHA1 hash of the given string. */
-  SHA1(FNUtil.class, "sha1(str)", HEX, STR),
+  _UTIL_SHA1(FNUtil.class, "sha1(str)", HEX, STR),
   /** Utility function: calculates the CRC32 hash of the given string. */
-  CRC32(FNUtil.class, "crc32(str)", HEX, STR),
+  _UTIL_CRC32(FNUtil.class, "crc32(str)", HEX, STR),
   /** Utility function: gets the bytes from the given data data. */
-  TO_BYTES(FNUtil.class, "to-bytes(item)", BYT_ZM, ITEM),
+  _UTIL_TO_BYTES(FNUtil.class, "to-bytes(item)", BYT_ZM, ITEM),
   /** Utility function: converts the specified bytes to a string. */
-  TO_STRING(FNUtil.class, "to-string(item[,encoding])", STR, 1, ITEM, STR),
+  _UTIL_TO_STRING(FNUtil.class, "to-string(item[,encoding])", STR, 1,
+      ITEM, STR),
   /** Utility function: returns a random unique id. */
-  UUID(FNUtil.class, "uuid()", STR),
+  _UTIL_UUID(FNUtil.class, "uuid()", STR),
 
   /* FNXslt functions. */
 
   /** XSLT function: performs an XSLT transformation. */
-  TRANSFORM(FNXslt.class, "transform(input,stylesheet[,params])",
+  _UTIL_TRANSFORM(FNXslt.class, "transform(input,stylesheet[,params])",
       NOD, 2, ITEM, ITEM, NOD_ZO),
 
   /* FNZip functions (EXPath). */
 
   /** XQuery function */
-  ZIPBIN(FNZip.class, "binary-entry(path,entry)", B64, STR, STR),
+  _ZIP_BINARY_ENTRY(FNZip.class, "binary-entry(path,entry)", B64, STR, STR),
   /** XQuery function */
-  ZIPTEXT(FNZip.class, "text-entry(path,entry[,encoding])", STR, 2, STR, STR,
-      STR),
+  _ZIP_TEXT_ENTRY(FNZip.class, "text-entry(path,entry[,encoding])",
+      STR, 2, STR, STR, STR),
   /** XQuery function */
-  ZIPHTML(FNZip.class, "html-entry(path,entry)", NOD, STR, STR),
+  _ZIP_HTML_ENTRY(FNZip.class, "html-entry(path,entry)", NOD, STR, STR),
   /** XQuery function */
-  ZIPXML(FNZip.class, "xml-entry(path,entry)", NOD, STR, STR),
+  _ZIP_XML_ENTRY(FNZip.class, "xml-entry(path,entry)", NOD, STR, STR),
   /** XQuery function */
-  ZIPENTRIES(FNZip.class, "entries(path)", ELM, STR),
+  _ZIP_ENTRIES(FNZip.class, "entries(path)", ELM, STR),
   /** XQuery function */
-  ZIPFILE(FNZip.class, "zip-file(zip)", EMP, ELM),
+  _ZIP_ZIP_FILE(FNZip.class, "zip-file(zip)", EMP, ELM),
   /** XQuery function */
-  ZIPUPDATE(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
+  _ZIP_UPDATE_ENTRIES(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
 
   /**
    * Mapping between function classes and namespace URIs.
@@ -728,7 +746,6 @@ public enum Function {
     URIS.put(FNFt.class,   FTURI);
     URIS.put(FNHof.class,  HOFURI);
     URIS.put(FNJson.class, JSONURI);
-    URIS.put(FNSent.class, SENTURI);
     URIS.put(FNSql.class, SQLURI);
     URIS.put(FNUtil.class, UTILURI);
     URIS.put(FNXslt.class, XSLTURI);

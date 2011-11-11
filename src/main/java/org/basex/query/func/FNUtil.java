@@ -53,19 +53,19 @@ public final class FNUtil extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case EVAL:     return eval(ctx).iter();
-      case RUN:      return run(ctx).iter();
-      case TO_BYTES: return toBytes(ctx);
-      default:       return super.iter(ctx);
+      case _UTIL_EVAL:     return eval(ctx).iter();
+      case _UTIL_RUN:      return run(ctx).iter();
+      case _UTIL_TO_BYTES: return toBytes(ctx);
+      default:             return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case EVAL: return eval(ctx);
-      case RUN:  return run(ctx);
-      default:   return super.value(ctx);
+      case _UTIL_EVAL: return eval(ctx);
+      case _UTIL_RUN:  return run(ctx);
+      default:         return super.value(ctx);
     }
   }
 
@@ -73,17 +73,17 @@ public final class FNUtil extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case FORMAT:    return format(ctx);
-      case MB:        return mb(ctx);
-      case MS:        return ms(ctx);
-      case FRM_BASE:  return fromBase(ctx, ii);
-      case TO_BASE:   return toBase(ctx, ii);
-      case MD5:       return hash(ctx, "MD5");
-      case SHA1:      return hash(ctx, "SHA");
-      case CRC32:     return crc32(ctx);
-      case UUID:      return uuid();
-      case TO_STRING: return toString(ctx);
-      default:        return super.item(ctx, ii);
+      case _UTIL_FORMAT:            return format(ctx);
+      case _UTIL_MB:                return mb(ctx);
+      case _UTIL_MS:                return ms(ctx);
+      case _UTIL_INTEGER_FROM_BASE: return fromBase(ctx, ii);
+      case _UTIL_INTEGER_TO_BASE:   return toBase(ctx, ii);
+      case _UTIL_MD5:               return hash(ctx, "MD5");
+      case _UTIL_SHA1:              return hash(ctx, "SHA");
+      case _UTIL_CRC32:             return crc32(ctx);
+      case _UTIL_UUID:              return uuid();
+      case _UTIL_TO_STRING:         return toString(ctx);
+      default:                      return super.item(ctx, ii);
     }
   }
 
@@ -390,9 +390,9 @@ public final class FNUtil extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && (
-      def == Function.EVAL || def == Function.RUN || def == Function.MB ||
-      def == Function.MS || def == Function.UUID) ||
+    return u == Use.NDT && (def == Function._UTIL_EVAL ||
+        def == Function._UTIL_RUN || def == Function._UTIL_MB ||
+        def == Function._UTIL_MS || def == Function._UTIL_UUID) ||
       super.uses(u);
   }
 }

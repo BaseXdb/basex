@@ -12,7 +12,7 @@ import org.basex.query.func.Function;
 import org.basex.util.InputInfo;
 
 /**
- * Update primitive for the {@link Function#DBRENAME} function.
+ * Update primitive for the {@link Function#_DB_RENAME} function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

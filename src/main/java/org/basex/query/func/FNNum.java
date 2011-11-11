@@ -39,12 +39,12 @@ public final class FNNum extends FuncCall {
     if(!it.unt() && !it.num()) Err.number(this, it);
     final double d = it.dbl(input);
     switch(def) {
-      case ABS:    return abs(it, input);
-      case CEIL:   return num(it, d, StrictMath.ceil(d));
-      case FLOOR:  return num(it, d, StrictMath.floor(d));
-      case ROUND:  return rnd(it, d, false, ctx);
-      case RNDHLF: return rnd(it, d, true, ctx);
-      default:     return super.item(ctx, ii);
+      case ABS:                return abs(it, input);
+      case CEILING:            return num(it, d, StrictMath.ceil(d));
+      case FLOOR:              return num(it, d, StrictMath.floor(d));
+      case ROUND:              return rnd(it, d, false, ctx);
+      case ROUND_HALF_TO_EVEN: return rnd(it, d, true, ctx);
+      default:                 return super.item(ctx, ii);
     }
   }
 

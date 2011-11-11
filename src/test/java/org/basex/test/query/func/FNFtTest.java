@@ -41,16 +41,16 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftSearch() throws BaseXException {
-    check(FTSEARCH);
+    check(_FT_SEARCH);
 
     // check index results
-    query(FTSEARCH.args(" . ", "assignments"), "Assignments");
-    query(FTSEARCH.args(" . ", "XXX"), "");
+    query(_FT_SEARCH.args(" . ", "assignments"), "Assignments");
+    query(_FT_SEARCH.args(" . ", "XXX"), "");
 
     // apply index options to query term
     new Set(Prop.STEMMING, true).execute(CONTEXT);
     new CreateIndex("fulltext").execute(CONTEXT);
-    contains(FTSEARCH.args(" . ", "Exercises") + "/..",
+    contains(_FT_SEARCH.args(" . ", "Exercises") + "/..",
         "<li>Exercise 1</li>");
     new Set(Prop.STEMMING, false).execute(CONTEXT);
     new CreateIndex("fulltext").execute(CONTEXT);
@@ -61,12 +61,12 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftCount() {
-    check(FTCOUNT);
-    query(FTCOUNT.args("()"), "0");
-    query(FTCOUNT.args(" //*[text() contains text '1']"), "1");
-    query(FTCOUNT.args(" //li[text() contains text 'exercise']"), "2");
+    check(_FT_COUNT);
+    query(_FT_COUNT.args("()"), "0");
+    query(_FT_COUNT.args(" //*[text() contains text '1']"), "1");
+    query(_FT_COUNT.args(" //li[text() contains text 'exercise']"), "2");
     query("for $i in //li[text() contains text 'exercise'] return " +
-        FTCOUNT.args("$i[text() contains text 'exercise']"), "1 1");
+        _FT_COUNT.args("$i[text() contains text 'exercise']"), "1 1");
   }
 
   /**
@@ -74,19 +74,19 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftMark() {
-    check(FTMARK);
-    query(FTMARK.args(" //*[text() contains text '1']"),
+    check(_FT_MARK);
+    query(_FT_MARK.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
-    query(FTMARK.args(" //*[text() contains text '2'], 'b'"),
+    query(_FT_MARK.args(" //*[text() contains text '2'], 'b'"),
       "<li>Exercise <b>2</b></li>");
-    contains(FTMARK.args(" //*[text() contains text 'Exercise']"),
+    contains(_FT_MARK.args(" //*[text() contains text 'Exercise']"),
       "<li><mark>Exercise</mark> 1</li>");
     query("copy $a := text { 'a b' } modify () return " +
-        FTMARK.args("$a[. contains text 'a']", "b"), "<b>a</b> b");
+        _FT_MARK.args("$a[. contains text 'a']", "b"), "<b>a</b> b");
     query("copy $a := text { 'ab' } modify () return " +
-        FTMARK.args("$a[. contains text 'ab'], 'b'"), "<b>ab</b>");
+        _FT_MARK.args("$a[. contains text 'ab'], 'b'"), "<b>ab</b>");
     query("copy $a := text { 'a b' } modify () return " +
-        FTMARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b> <b>b</b>");
+        _FT_MARK.args("$a[. contains text 'a b'], 'b'"), "<b>a</b> <b>b</b>");
   }
 
   /**
@@ -94,14 +94,14 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftExtract() {
-    check(FTEXTRACT);
-    query(FTEXTRACT.args(" //*[text() contains text '1']"),
+    check(_FT_EXTRACT);
+    query(_FT_EXTRACT.args(" //*[text() contains text '1']"),
       "<li>Exercise <mark>1</mark></li>");
-    query(FTEXTRACT.args(" //*[text() contains text '2'], 'b', 20"),
+    query(_FT_EXTRACT.args(" //*[text() contains text '2'], 'b', 20"),
       "<li>Exercise <b>2</b></li>");
-    query(FTEXTRACT.args(" //*[text() contains text '2'], '_o_', 1"),
+    query(_FT_EXTRACT.args(" //*[text() contains text '2'], '_o_', 1"),
       "<li>...<_o_>2</_o_></li>");
-    contains(FTEXTRACT.args(" //*[text() contains text 'Exercise'], 'b', 1"),
+    contains(_FT_EXTRACT.args(" //*[text() contains text 'Exercise'], 'b', 1"),
       "<li><b>Exercise</b>...</li>");
   }
 
@@ -110,9 +110,9 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Test
   public void ftScore() {
-    check(FTSCORE);
-    query(FTSCORE.args(FTSEARCH.args(" . ", "2")), "1");
-    query(FTSCORE.args(FTSEARCH.args(" . ", "XML")), "1 0.5");
+    check(_FT_SCORE);
+    query(_FT_SCORE.args(_FT_SEARCH.args(" . ", "2")), "1");
+    query(_FT_SCORE.args(_FT_SEARCH.args(" . ", "XML")), "1 0.5");
   }
 
   /**

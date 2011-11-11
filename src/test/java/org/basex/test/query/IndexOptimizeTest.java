@@ -101,7 +101,7 @@ public final class IndexOptimizeTest {
   @Test
   public void collTest() throws Exception {
     createColl();
-    final String doc = COLL.args(NAME);
+    final String doc = COLLECTION.args(NAME);
     check(doc + "//*[text() = '1']");
     check(doc + "//*[text() contains text '2']");
   }
@@ -113,7 +113,7 @@ public final class IndexOptimizeTest {
   @Test
   public void dbOpenTest() throws Exception {
     createColl();
-    final String doc = DBOPEN.args(NAME);
+    final String doc = _DB_OPEN.args(NAME);
     check(doc + "//*[text() = '1']");
     check(doc + "//*[text() <- '2']");
   }
@@ -125,7 +125,7 @@ public final class IndexOptimizeTest {
   @Test
   public void dbOpenExtTest() throws Exception {
     createColl();
-    final String doc = DBOPEN.args(NAME, "two");
+    final String doc = _DB_OPEN.args(NAME, "two");
     check(doc + "//*[text() = '1']", "");
     check(doc + "//*[text() = '4']", "<a>4</a>");
   }
@@ -152,7 +152,7 @@ public final class IndexOptimizeTest {
   @Test
   public void functionTest() throws Exception {
     createColl();
-    final String doc = DBOPEN.args(NAME);
+    final String doc = _DB_OPEN.args(NAME);
     // text: search term must be string
     check("declare function local:x() {" + doc +
         "//text()[. = '1'] }; local:x()", "1");

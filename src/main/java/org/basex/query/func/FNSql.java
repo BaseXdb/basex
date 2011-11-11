@@ -112,7 +112,7 @@ public final class FNSql extends FuncCall {
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     switch(def) {
-      case SQLEXECUTE: return execute(ctx);
+      case _SQL_EXECUTE: return execute(ctx);
       default:         return super.iter(ctx);
     }
   }
@@ -123,13 +123,13 @@ public final class FNSql extends FuncCall {
 
     checkAdmin(ctx);
     switch(def) {
-      case SQLINIT:     return init(ctx);
-      case SQLCONNECT:  return connect(ctx);
-      case SQLPREPARE:  return prepare(ctx);
-      case SQLCLOSE:    return close(ctx);
-      case SQLCOMMIT:   return commit(ctx);
-      case SQLROLLBACK: return rollback(ctx);
-      default:          return super.item(ctx, ii);
+      case _SQL_INIT:     return init(ctx);
+      case _SQL_CONNECT:  return connect(ctx);
+      case _SQL_PREPARE:  return prepare(ctx);
+      case _SQL_CLOSE:    return close(ctx);
+      case _SQL_COMMIT:   return commit(ctx);
+      case _SQL_ROLLBACK: return rollback(ctx);
+      default:            return super.item(ctx, ii);
     }
   }
 

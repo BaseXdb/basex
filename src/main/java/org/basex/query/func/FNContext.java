@@ -40,13 +40,20 @@ public final class FNContext extends FuncCall {
     for(int a = 0; a < expr.length; ++a) arg[a] = ctx.iter(expr[a]);
 
     switch(def) {
-      case CURRDATE:  return currDate(ctx);
-      case CURRDTM:   return currDTM(ctx);
-      case CURRTIME:  return currTIM(ctx);
-      case IMPLZONE:  return implZone();
-      case COLLAT:    return ctx.baseURI.resolve(ctx.collation);
-      case STBASEURI: return ctx.baseURI != Uri.EMPTY ? ctx.baseURI : null;
-      default: return super.item(ctx, ii);
+      case CURRENT_DATE:
+        return currDate(ctx);
+      case CURRENT_DATETIME:
+        return currDTM(ctx);
+      case CURRENT_TIME:
+        return currTIM(ctx);
+      case IMPLICIT_TIMEZONE:
+        return implZone();
+      case DEFAULT_COLLATION:
+        return ctx.baseURI.resolve(ctx.collation);
+      case STATIC_BASE_URI:
+        return ctx.baseURI != Uri.EMPTY ? ctx.baseURI : null;
+      default:
+        return super.item(ctx, ii);
     }
   }
 

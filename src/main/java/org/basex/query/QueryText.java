@@ -438,8 +438,6 @@ public interface QueryText {
   byte[] FILE = token("file");
   /** HTTP Client token. */
   byte[] HTTP = token("http");
-  /** Sentiment token. */
-  byte[] SENT = token("sent");
   /** Util token. */
   byte[] UTIL = token("util");
   /** XSLT token. */
@@ -508,8 +506,6 @@ public interface QueryText {
   byte[] HOFURI = token(Text.URL + "/hof");
   /** JSON URI. */
   byte[] JSONURI = token(Text.URL + "/json");
-  /** Sentiment URI. */
-  byte[] SENTURI = token(Text.URL + "/sent");
   /** Utility module URI. */
   byte[] UTILURI = token(Text.URL + "/util");
   /** XSLT module URI. */

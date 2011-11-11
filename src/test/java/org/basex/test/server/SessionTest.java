@@ -128,9 +128,9 @@ public abstract class SessionTest {
   public final void add() throws IOException {
     session.execute("create db " + DB);
     session.add(DB, new ArrayInput("<X/>"));
-    check("1", session.query("count(" + DBOPEN.args(DB) + ")").execute());
+    check("1", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
     for(int i = 0; i < 9; i++) session.add(DB, new ArrayInput("<X/>"));
-    check("10", session.query("count(" + DBOPEN.args(DB) + ")").execute());
+    check("10", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
   }
 
   /**
@@ -160,13 +160,13 @@ public abstract class SessionTest {
   @Test
   public final void replace() throws IOException {
     session.execute("create db " + DB);
-    check("0", session.query("count(" + DBOPEN.args(DB) + ")").execute());
+    check("0", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
     session.replace(DB, new ArrayInput("<X/>"));
-    check("1", session.query("count(" + DBOPEN.args(DB) + ")").execute());
+    check("1", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
     session.replace(DB + "2", new ArrayInput("<X/>"));
-    check("2", session.query("count(" + DBOPEN.args(DB) + ")").execute());
+    check("2", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
     session.replace(DB + "2", new ArrayInput("<X/>"));
-    check("2", session.query("count(" + DBOPEN.args(DB) + ")").execute());
+    check("2", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
   }
 
   /**
@@ -197,11 +197,11 @@ public abstract class SessionTest {
   public final void store() throws IOException {
     session.execute("create db " + DB);
     session.store("X", new ArrayInput("!"));
-    check("true", session.query(DBISRAW.args(DB, "X")).execute());
+    check("true", session.query(_DB_IS_RAW.args(DB, "X")).execute());
     session.store("X", new ArrayInput(""));
-    check("", session.query(DBRETRIEVE.args(DB, "X")).execute());
+    check("", session.query(_DB_RETRIEVE.args(DB, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
-    check("0001FF", session.query(DBRETRIEVE.args(DB, "X")).execute());
+    check("0001FF", session.query(_DB_RETRIEVE.args(DB, "X")).execute());
     session.execute("drop db " + DB);
   }
 
@@ -211,8 +211,8 @@ public abstract class SessionTest {
   public void storeBinary() throws IOException {
     session.execute("create db " + DB);
     session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
-    check("-128 -2 -1 0 1 127",
-        session.query(TO_BYTES.args(DBRETRIEVE.args(DB, "X"))).execute());
+    check("-128 -2 -1 0 1 127", session.query(
+        _UTIL_TO_BYTES.args(_DB_RETRIEVE.args(DB, "X"))).execute());
   }
 
   /**
@@ -311,9 +311,9 @@ public abstract class SessionTest {
   public void queryNullBinary() throws IOException {
     session.execute("create db " + DB);
     session.store("X", new ArrayInput("\0"));
-    check("\0", session.execute("xquery " + RAW + DBRETRIEVE.args(DB, "X")));
-    check("\0", session.query(RAW + DBRETRIEVE.args(DB, "X")).execute());
-    final Query q = session.query(RAW + DBRETRIEVE.args(DB, "X"));
+    check("\0", session.execute("xquery " + RAW + _DB_RETRIEVE.args(DB, "X")));
+    check("\0", session.query(RAW + _DB_RETRIEVE.args(DB, "X")).execute());
+    final Query q = session.query(RAW + _DB_RETRIEVE.args(DB, "X"));
     assertTrue(q.more());
     check("\0", q.next());
     assertFalse(q.more());
@@ -326,9 +326,9 @@ public abstract class SessionTest {
   public void queryEmptyBinary() throws IOException {
     session.execute("create db " + DB);
     session.store("X", new ArrayInput(""));
-    check("", session.execute("xquery " + RAW + DBRETRIEVE.args(DB, "X")));
-    check("", session.query(RAW + DBRETRIEVE.args(DB, "X")).execute());
-    final Query q = session.query(RAW + DBRETRIEVE.args(DB, "X"));
+    check("", session.execute("xquery " + RAW + _DB_RETRIEVE.args(DB, "X")));
+    check("", session.query(RAW + _DB_RETRIEVE.args(DB, "X")).execute());
+    final Query q = session.query(RAW + _DB_RETRIEVE.args(DB, "X"));
     assertTrue(q.more());
     check("", q.next());
     assertNull(q.next());
@@ -354,7 +354,7 @@ public abstract class SessionTest {
     session.execute("create db " + DB);
     final byte[] tmp = { 0, 1, 2, 127, 0, -1, -2, -128 };
     session.store("X", new ArrayInput(tmp));
-    final String retr = DBRETRIEVE.args(DB, "X");
+    final String retr = _DB_RETRIEVE.args(DB, "X");
     // check command
     session.execute("xquery " + RAW + retr + ',' + retr);
     assertTrue(eq(out.toArray(), concat(tmp, tmp)));

@@ -42,10 +42,10 @@ public final class FNId extends FuncCall {
 
     final ANode node = checkNode(it);
     switch(def) {
-      case ID:    return id(ctx.iter(expr[0]), node);
-      case IDREF: return idref(ctx.iter(expr[0]), node);
-      case ELID:  return elid(ctx.iter(expr[0]), node);
-      default:    return super.iter(ctx);
+      case ID:              return id(ctx.iter(expr[0]), node);
+      case IDREF:           return idref(ctx.iter(expr[0]), node);
+      case ELEMENT_WITH_ID: return elid(ctx.iter(expr[0]), node);
+      default:              return super.iter(ctx);
     }
   }
 
@@ -202,7 +202,7 @@ public final class FNId extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == Function.ELID ||
+    return u == Use.X30 && def == Function.ELEMENT_WITH_ID ||
       u == Use.CTX && expr.length == 1 || super.uses(u);
   }
 }

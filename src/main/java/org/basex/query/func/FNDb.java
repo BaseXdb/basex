@@ -93,21 +93,21 @@ public final class FNDb extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case DBOPEN:     return open(ctx).iter();
-      case DBTEXT:     return text(ctx);
-      case DBATTR:     return attribute(ctx);
-      case DBFULLTEXT: return fulltext(ctx);
-      case DBLIST:     return list(ctx);
-      case DBNODEID:   return node(ctx, true);
-      case DBNODEPRE:  return node(ctx, false);
-      default:         return super.iter(ctx);
+      case _DB_OPEN:      return open(ctx).iter();
+      case _DB_TEXT:      return text(ctx);
+      case _DB_ATTRIBUTE: return attribute(ctx);
+      case _DB_FULLTEXT:  return fulltext(ctx);
+      case _DB_LIST:      return list(ctx);
+      case _DB_NODE_ID:   return node(ctx, true);
+      case _DB_NODE_PRE:  return node(ctx, false);
+      default:            return super.iter(ctx);
     }
   }
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case DBOPEN: return open(ctx);
+      case _DB_OPEN: return open(ctx);
       default:     return super.value(ctx);
     }
   }
@@ -117,24 +117,24 @@ public final class FNDb extends FuncCall {
       throws QueryException {
 
     switch(def) {
-      case DBEVENT:    return event(ctx);
-      case DBOPENID:   return open(ctx, true);
-      case DBOPENPRE:  return open(ctx, false);
-      case DBSYSTEM:   return system(ctx);
-      case DBINFO:     return info(ctx);
-      case DBADD:      return add(ctx);
-      case DBDELETE:   return delete(ctx);
-      case DBRENAME:   return rename(ctx);
-      case DBREPLACE:  return replace(ctx);
-      case DBOPTIMIZE: return optimize(ctx);
-      case DBSTORE:    return store(ctx);
-      case DBRETRIEVE: return retrieve(ctx);
-      case DBISRAW:    return isRaw(ctx);
-      case DBEXISTS:   return exists(ctx);
-      case DBISXML:    return isXML(ctx);
-      case DBCTYPE:    return contentType(ctx);
-      case DBDETAILS:  return details(ctx);
-      default:         return super.item(ctx, ii);
+      case _DB_EVENT:        return event(ctx);
+      case _DB_OPEN_ID:      return open(ctx, true);
+      case _DB_OPEN_PRE:     return open(ctx, false);
+      case _DB_SYSTEM:       return system(ctx);
+      case _DB_INFO:         return info(ctx);
+      case _DB_ADD:          return add(ctx);
+      case _DB_DELETE:       return delete(ctx);
+      case _DB_RENAME:       return rename(ctx);
+      case _DB_REPLACE:      return replace(ctx);
+      case _DB_OPTIMIZE:     return optimize(ctx);
+      case _DB_STORE:        return store(ctx);
+      case _DB_RETRIEVE:     return retrieve(ctx);
+      case _DB_IS_RAW:       return isRaw(ctx);
+      case _DB_EXISTS:       return exists(ctx);
+      case _DB_IS_XML:       return isXML(ctx);
+      case _DB_CONTENT_TYPE: return contentType(ctx);
+      case _DB_DETAILS:      return details(ctx);
+      default:               return super.item(ctx, ii);
     }
   }
 
@@ -590,20 +590,20 @@ public final class FNDb extends FuncCall {
 
   @Override
   public boolean vacuous() {
-    return def == Function.DBEVENT;
+    return def == Function._DB_EVENT;
   }
 
   @Override
   public boolean uses(final Use u) {
     final boolean up =
-      def == Function.DBADD || def == Function.DBDELETE ||
-      def == Function.DBRENAME || def == Function.DBREPLACE ||
-      def == Function.DBOPTIMIZE || def == Function.DBSTORE;
+      def == Function._DB_ADD || def == Function._DB_DELETE ||
+      def == Function._DB_RENAME || def == Function._DB_REPLACE ||
+      def == Function._DB_OPTIMIZE || def == Function._DB_STORE;
     return
       // skip evaluation at compile time
       u == Use.CTX && (
-        def == Function.DBTEXT || def == Function.DBATTR ||
-        def == Function.DBFULLTEXT || def == Function.DBEVENT || up) ||
+        def == Function._DB_TEXT || def == Function._DB_ATTRIBUTE ||
+        def == Function._DB_FULLTEXT || def == Function._DB_EVENT || up) ||
       u == Use.UPD && up ||
       super.uses(u);
   }
@@ -611,8 +611,9 @@ public final class FNDb extends FuncCall {
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return def == Function.DBOPEN || def == Function.DBTEXT ||
-      def == Function.DBATTR || def == Function.DBFULLTEXT || super.iterable();
+    return def == Function._DB_OPEN || def == Function._DB_TEXT ||
+      def == Function._DB_ATTRIBUTE || def == Function._DB_FULLTEXT ||
+      super.iterable();
   }
 
   /**

@@ -42,7 +42,7 @@ public final class FNStr extends FuncCall {
     final Expr e = expr[0];
 
     switch(def) {
-      case STCODE:
+      case STRING_TO_CODEPOINTS:
         return str2cp(e.item(ctx, input));
       default:
         return super.iter(ctx);
@@ -52,7 +52,7 @@ public final class FNStr extends FuncCall {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case STCODE:
+      case STRING_TO_CODEPOINTS:
         final int[] tmp = cps(checkEStr(expr[0], ctx));
         final long[] vals = new long[tmp.length];
         for(int i = 0; i < tmp.length; i++) vals[i] = tmp[i];
@@ -68,7 +68,7 @@ public final class FNStr extends FuncCall {
     final Expr e = expr[0];
 
     switch(def) {
-      case CODESTR:
+      case CODEPOINTS_TO_STRING:
         return cp2str(ctx.iter(e));
       case COMPARE:
         if(expr.length == 3) checkColl(expr[2], ctx);
@@ -77,28 +77,28 @@ public final class FNStr extends FuncCall {
         if(it1 == null || it2 == null) return null;
         final int d = diff(checkEStr(it1), checkEStr(it2));
         return Itr.get(Math.max(-1, Math.min(1, d)));
-      case CODEPNT:
+      case CODEPOINT_EQUAL:
         it1 = e.item(ctx, input);
         it2 = expr[1].item(ctx, input);
         if(it1 == null || it2 == null) return null;
         return Bln.get(eq(checkEStr(it1), checkEStr(it2)));
-      case STRJOIN:
+      case STRING_JOIN:
         return strjoin(ctx);
-      case SUBSTR:
+      case SUBSTRING:
         return substr(ctx);
-      case NORMUNI:
+      case NORMALIZE_UNICODE:
         return normuni(ctx);
-      case UPPER:
+      case UPPER_CASE:
         return Str.get(uc(checkEStr(e, ctx)));
-      case LOWER:
+      case LOWER_CASE:
         return Str.get(lc(checkEStr(e, ctx)));
-      case TRANS:
+      case TRANSLATE:
         return trans(ctx);
-      case ENCURI:
+      case ENCODE_FOR_URI:
         return Str.get(uri(checkEStr(e, ctx), false));
-      case IRIURI:
+      case IRI_TO_URI:
         return Str.get(uri(checkEStr(e, ctx), true));
-      case ESCURI:
+      case ESCAPE_HTML_URI:
         return Str.get(escape(checkEStr(e, ctx)));
       case CONCAT:
         return concat(ctx);
@@ -107,24 +107,24 @@ public final class FNStr extends FuncCall {
         Item it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(contains(checkEStr(e, ctx), checkEStr(it)));
-      case STARTS:
+      case STARTS_WITH:
         if(expr.length == 3) checkColl(expr[2], ctx);
         it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(startsWith(checkEStr(e, ctx), checkEStr(it)));
-      case ENDS:
+      case ENDS_WITH:
         if(expr.length == 3) checkColl(expr[2], ctx);
         it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(endsWith(checkEStr(e, ctx), checkEStr(it)));
-      case SUBAFTER:
+      case SUBSTRING_AFTER:
         if(expr.length == 3) checkColl(expr[2], ctx);
         final byte[] str = checkEStr(e, ctx);
         final byte[] sa = checkEStr(expr[1], ctx);
         final int pa = indexOf(str, sa);
         return pa != -1 ? Str.get(substring(str, pa + sa.length)) :
           Str.ZERO;
-      case SUBBEFORE:
+      case SUBSTRING_BEFORE:
         if(expr.length == 3) checkColl(expr[2], ctx);
         final byte[] sb = checkEStr(e, ctx);
         final int pb = indexOf(sb, checkEStr(expr[1], ctx));
@@ -305,7 +305,7 @@ public final class FNStr extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == Function.STRJOIN && expr.length == 1 ||
+    return u == Use.X30 && def == Function.STRING_JOIN && expr.length == 1 ||
       super.uses(u);
   }
 }
