@@ -134,7 +134,7 @@ public final class FNGen extends FuncCall {
       public Item next() throws QueryException {
         final Item it = coll.next();
         // all items will be nodes
-        return it == null ? null : Uri.uri(((ANode) it).base());
+        return it == null ? null : Uri.uri(((ANode) it).baseURI());
       }
     };
   }

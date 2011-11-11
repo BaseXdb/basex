@@ -137,7 +137,7 @@ public final class DataBuilder {
    */
   private int addDoc(final ANode nd, final int pre) {
     final int ms = data.meta.size;
-    data.doc(ms, size(nd, false), nd.base());
+    data.doc(ms, size(nd, false), nd.baseURI());
     data.insert(ms);
     int p = pre + 1;
     final AxisIter ai = nd.children();

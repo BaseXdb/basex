@@ -1,13 +1,14 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 
 import org.basex.io.serial.Serializer;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
-import static org.basex.util.Token.*;
 import org.basex.util.Token;
 import org.basex.util.hash.TokenMap;
 import org.w3c.dom.Attr;
@@ -30,25 +31,22 @@ public final class FElem extends FNode {
   private final Atts ns;
   /** Tag name. */
   private final QNm name;
-  /** Base URI. */
-  private byte[] base;
 
   /**
    * Constructor.
    * @param n tag name
    */
   public FElem(final QNm n) {
-    this(n, (Atts) null, null);
+    this(n, (Atts) null);
   }
 
   /**
    * Constructor.
    * @param n tag name
    * @param nsp namespaces
-   * @param b base uri
    */
-  public FElem(final QNm n, final Atts nsp, final byte[] b) {
-    this(n, null, null, nsp, b);
+  public FElem(final QNm n, final Atts nsp) {
+    this(n, null, null, nsp);
   }
 
   /**
@@ -57,16 +55,14 @@ public final class FElem extends FNode {
    * @param ch children; can be {@code null}
    * @param at attributes; can be {@code null}
    * @param nsp namespaces; can be {@code null}
-   * @param b base uri; can be {@code null}
    */
   public FElem(final QNm n, final NodeCache ch, final NodeCache at,
-      final Atts nsp, final byte[] b) {
+      final Atts nsp) {
 
     super(NodeType.ELM);
     name = n;
     children = ch == null ? new NodeCache() : ch;
     atts = at == null ? new NodeCache() : at;
-    base = b == null ? EMPTY : b;
     ns = nsp == null ? new Atts() : nsp;
   }
 
@@ -84,8 +80,6 @@ public final class FElem extends FNode {
     final String nu = elem.getNamespaceURI();
     name = new QNm(token(elem.getNodeName()), nu == null ? EMPTY : token(nu));
     par = p;
-    final String b = elem.getBaseURI();
-    base = b == null ? EMPTY : token(b);
     children = new NodeCache();
     atts = new NodeCache();
 
@@ -178,16 +172,9 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public byte[] base() {
-    return base;
-  }
-
-  /**
-   * Sets the element base.
-   * @param b base
-   */
-  public void base(final byte[] b) {
-    base = b;
+  public byte[] baseURI() {
+    final byte[] b = attribute(new QNm(BASE, XMLURI));
+    return b != null ? b : EMPTY;
   }
 
   @Override
@@ -237,7 +224,7 @@ public final class FElem extends FNode {
 
   @Override
   public FNode copy() {
-    final FNode node = new FElem(name, ns, base).parent(par);
+    final FNode node = new FElem(name, ns).parent(par);
     for(int c = 0; c < children.size(); ++c) node.add(children.get(c).copy());
     for(int c = 0; c < atts.size(); ++c) node.add(atts.get(c).copy());
     return node;

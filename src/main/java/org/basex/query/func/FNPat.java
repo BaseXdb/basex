@@ -102,7 +102,7 @@ public final class FNPat extends FuncCall {
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
-    final FElem root = new FElem(ANALYZE, new Atts().add(FN, FNURI), EMPTY);
+    final FElem root = new FElem(ANALYZE, new Atts().add(FN, FNURI));
     int s = 0;
     while(m.find()) {
       if(s != m.start()) nonmatch(str.substring(s, m.start()), root);

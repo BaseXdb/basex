@@ -171,7 +171,7 @@ public final class FNZip extends FuncCall {
     try {
       zf = new ZipFile(file);
       // create result node
-      final FElem root = new FElem(E_FILE, new Atts().add(ZIP, ZIPURI), null);
+      final FElem root = new FElem(E_FILE, new Atts().add(ZIP, ZIPURI));
       root.add(new FAttr(A_HREF, token(path.path())));
       createEntries(paths(zf).iterator(), root, "");
       return root;

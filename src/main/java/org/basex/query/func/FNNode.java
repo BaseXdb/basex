@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
@@ -51,12 +50,14 @@ public final class FNNode extends FuncCall {
         return qname != null && qname.atom().length != 0 ? qname : null;
       case DOCURI:
         if(it == null) return null;
-        final byte[] uri = checkNode(it).base();
+        ANode node = checkNode(it);
+        if(node.type != NodeType.DOC) return null;
+        final byte[] uri = node.baseURI();
         return uri.length == 0 ? null : Uri.uri(uri);
       case NILLED:
         // always false, as no schema information is given
-        if(it == null) return null;
-        return checkNode(it).type != NodeType.ELM ? null : Bln.FALSE;
+        return it == null || checkNode(it).type != NodeType.ELM ? null :
+          Bln.FALSE;
       case BASEURI:
         if(it == null) return null;
         ANode n = checkNode(it);
@@ -68,7 +69,7 @@ public final class FNNode extends FuncCall {
             base = ctx.baseURI.resolve(base);
             break;
           }
-          base = Uri.uri(n.base()).resolve(base);
+          base = Uri.uri(n.baseURI()).resolve(base);
           n = n.parent();
         }
         return base;
@@ -82,7 +83,7 @@ public final class FNNode extends FuncCall {
         return qname != null ? Str.get(qname.ln()) : Str.ZERO;
       case NSURI:
         if(it == null || it.type == NodeType.PI) return Uri.EMPTY;
-        ANode node = checkNode(it);
+        node = checkNode(it);
         while(node != null) {
           qname = node.qname();
           if(qname == null) break;

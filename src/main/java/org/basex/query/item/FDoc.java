@@ -60,7 +60,7 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public byte[] base() {
+  public byte[] baseURI() {
     return base;
   }
 

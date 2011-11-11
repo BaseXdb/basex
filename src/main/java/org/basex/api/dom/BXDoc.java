@@ -67,23 +67,17 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXDocFrag createDocumentFragment() {
-    return new BXDocFrag(new FDoc(node.base()));
+    return new BXDocFrag(new FDoc(node.baseURI()));
   }
 
   @Override
   public BXElem createElement(final String nm) {
-    final QNm name = new QNm(token(nm));
-    final FElem elm = new FElem(name);
-    elm.base(node.base());
-    return new BXElem(elm);
+    return new BXElem(new FElem(new QNm(token(nm))));
   }
 
   @Override
   public BXElem createElementNS(final String uri, final String qn) {
-    final QNm name = new QNm(token(qn), token(uri));
-    final FElem elm = new FElem(name);
-    elm.base(node.base());
-    return new BXElem(elm);
+    return new BXElem(new FElem(new QNm(token(qn), token(uri))));
   }
 
   @Override

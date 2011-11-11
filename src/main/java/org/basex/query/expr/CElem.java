@@ -118,7 +118,7 @@ public final class CElem extends CFrag {
     if(c.errAtt) NOATTALL.thrw(input);
     if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
 
-    final FElem node = new FElem(tname, c.children, c.atts, nsc, c.base);
+    final FElem node = new FElem(tname, c.children, c.atts, nsc);
     for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(node);
     for(int n = 0; n < c.atts.size(); ++n) {
       final ANode att = c.atts.get(n);

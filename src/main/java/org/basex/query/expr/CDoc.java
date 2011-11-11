@@ -32,7 +32,7 @@ public final class CDoc extends CFrag {
     final Constr c = new Constr(ii, ctx, expr);
     if(c.errAtt || c.atts.size() != 0) XPATT.thrw(ii);
 
-    final FDoc doc = new FDoc(c.children, c.base);
+    final FDoc doc = new FDoc(c.children, Token.EMPTY);
     for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(doc);
     return doc;
   }

@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
@@ -36,8 +34,6 @@ public final class Constr {
   private final TokenBuilder text = new TokenBuilder();
   /** Space separator flag. */
   private boolean more;
-  /** Base uri. */
-  byte[] base = EMPTY;
 
   /**
    * Creates the children of the constructor.
@@ -80,12 +76,6 @@ public final class Constr {
           errAtt = true;
           return false;
         }
-
-        // split attribute name
-        final QNm name = node.qname();
-        final byte[] ln = name.ln();
-        final byte[] pre = name.pref();
-        if(eq(pre, XML) && eq(ln, BASE)) base = it.atom(ii);
 
         // check for duplicate attribute names
         final QNm qname = node.qname();

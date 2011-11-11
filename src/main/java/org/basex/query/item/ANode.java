@@ -179,10 +179,10 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the database name.
-   * @return database name
+   * Returns the base URI of the node.
+   * @return base URI
    */
-  public byte[] base() {
+  public byte[] baseURI() {
     return Token.EMPTY;
   }
 

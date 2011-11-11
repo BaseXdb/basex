@@ -407,10 +407,10 @@ public final class FNSql extends FuncCall {
             final NodeCache ch = new NodeCache();
             ch.add(columnValue);
             // Element <sql:column name='...'>...</sql:column>
-            columns.add(new FElem(Q_COLUMN, ch, attr, NS_SQL, null));
+            columns.add(new FElem(Q_COLUMN, ch, attr, NS_SQL));
           }
         }
-        rows.add(new FElem(Q_ROW, columns, null, NS_SQL, null));
+        rows.add(new FElem(Q_ROW, columns, null, NS_SQL));
       }
       return rows;
     } catch(final SQLException ex) {

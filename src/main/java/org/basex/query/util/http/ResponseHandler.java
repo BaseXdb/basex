@@ -131,7 +131,7 @@ public final class ResponseHandler {
       a.add(new FAttr(new QNm(BOUNDARY, EMPTY), boundary));
       body = new FElem(new QNm(MULTIPART, HTTPURI), extractParts(
           conn.getInputStream(), s, payloads, concat(token("--"), boundary),
-          prop, ii), a, new Atts().add(HTTP, HTTPURI), EMPTY);
+          prop, ii), a, new Atts().add(HTTP, HTTPURI));
       // single part response
     } else {
       body = createBody(contentType);
@@ -145,7 +145,7 @@ public final class ResponseHandler {
 
     // construct <http:response/>
     final FElem responseEl = new FElem(new QNm(RESPONSE, HTTPURI), hdrs, attrs,
-        new Atts().add(HTTP, HTTPURI), EMPTY);
+        new Atts().add(HTTP, HTTPURI));
     responseEl.add(body);
     // result
     final ItemCache result = new ItemCache();
@@ -182,7 +182,7 @@ public final class ResponseHandler {
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
         final FElem hdr = new FElem(new QNm(HEADER, HTTPURI),
-            new Atts().add(HTTP, HTTPURI), null);
+            new Atts().add(HTTP, HTTPURI));
         hdr.add(new FAttr(new QNm(HDR_NAME, EMPTY), token(headerName)));
         hdr.add(new FAttr(new QNm(HDR_VALUE, EMPTY),
             token(conn.getHeaderField(headerName))));
@@ -199,7 +199,7 @@ public final class ResponseHandler {
    */
   private static FElem createBody(final byte[] mediaType) {
     final FElem b = new FElem(new QNm(BODY, HTTPURI),
-        new Atts().add(HTTP, HTTPURI), null);
+        new Atts().add(HTTP, HTTPURI));
     b.add(new FAttr(new QNm(MEDIATYPE, EMPTY), mediaType));
     return b;
   }
@@ -316,7 +316,7 @@ public final class ResponseHandler {
     if(firstLine == null || eq(firstLine, end)) return null;
 
     final FElem root = new FElem(new QNm(PART, EMPTY),
-        new Atts().add(HTTP, HTTPURI), EMPTY);
+        new Atts().add(HTTP, HTTPURI));
 
     //final NodeCache partCh = new NodeCache();
     if(firstLine.length == 0) {

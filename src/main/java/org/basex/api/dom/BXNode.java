@@ -88,7 +88,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final String getBaseURI() {
-    return IO.get(string(node.base())).url();
+    return IO.get(string(node.baseURI())).url();
   }
 
   @Override

@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 
 import org.basex.build.MemBuilder;
@@ -179,11 +180,14 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final byte[] base() {
-    if(type != NodeType.DOC) return EMPTY;
-    final String dir = data.meta.original;
-    final String name = string(data.text(pre, true));
-    return token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
+  public final byte[] baseURI() {
+    if(type == NodeType.DOC) {
+      final String dir = data.meta.original;
+      final String name = string(data.text(pre, true));
+      return token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
+    }
+    final byte[] b = attribute(new QNm(BASE, XMLURI));
+    return b != null ? b : EMPTY;
   }
 
   @Override
@@ -285,7 +289,7 @@ public class DBNode extends ANode {
       int p = pre + 1;
 
       @Override
-      public ANode next() {
+      public DBNode next() {
         if(p == s) return null;
         node.set(p++, Data.ATTR);
         return node;
