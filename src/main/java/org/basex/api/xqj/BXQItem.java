@@ -147,7 +147,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     if(!it.node()) throw new BXQException(NODE);
     final ANode node = (ANode) it;
     try {
-      return new URI(Token.string(node.base()));
+      return new URI(Token.string(node.baseURI()));
     } catch(final URISyntaxException ex) {
       throw new BXQException(ex);
     }
