@@ -26,7 +26,7 @@ final class XQNode extends XQItem {
 
   @Override
   public String getBaseURI() {
-    return Token.string(node.base());
+    return Token.string(node.baseURI());
   }
 
   @Override

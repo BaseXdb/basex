@@ -2,6 +2,7 @@ package org.basex.tests.w3c;
 
 import static org.basex.core.Text.*;
 import static org.basex.tests.w3c.QT3Constants.*;
+import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,7 +26,6 @@ import org.basex.tests.w3c.qt3api.XQValue;
 import org.basex.tests.w3c.qt3api.XQuery;
 import org.basex.util.Args;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ObjList;
@@ -45,6 +45,8 @@ public final class QT3TS {
   private final TokenBuilder right = new TokenBuilder();
   /** Wrong results. */
   private final TokenBuilder wrong = new TokenBuilder();
+  /** Query counter. */
+  private int count;
   /** Number of tested queries. */
   private int total;
   /** Number of correct queries. */
@@ -93,7 +95,7 @@ public final class QT3TS {
 
     final XQuery qdoc = new XQuery("doc(' " + path + "/" + CATALOG + "')", ctx);
     final XQValue doc = qdoc.value();
-    final String version = string("*:catalog/@version", doc);
+    final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
     Util.out("Parsing queries");
 
@@ -168,11 +170,12 @@ public final class QT3TS {
       throws Exception {
 
     if(!supported(test)) return;
-    if(++total % 500 == 0) Util.out(".");
+    if(++count % 500 == 0) Util.out(".");
 
-    final String name = string("@name", test);
+    final String name = asString("@name", test);
     // skip queries that do not match filter
     if(!name.startsWith(single)) return;
+    ++total;
 
     // expected result
     final XQuery qexp = new XQuery("*:result/*[1]", ctx).context(test);
@@ -194,7 +197,7 @@ public final class QT3TS {
     // set base uri
     String b = base;
     if(e == null) {
-      final String env = string("*:environment/@ref", test);
+      final String env = asString("*:environment/@ref", test);
       if(!env.isEmpty()) {
         // check if environment is defined in test-set
         e = envs(envs, env);
@@ -207,9 +210,18 @@ public final class QT3TS {
       }
     }
 
-    // query to be run
+    // retrieve query to be run
     final Performance perf = new Performance();
-    final String string = string("data(*:test)", test);
+    final String qfile = asString("*:test/@file", test);
+    String string;
+    if(qfile.isEmpty()) {
+      // get query string
+      string = asString("*:test", test);
+    } else {
+      // get query from file
+      string = string(new IOFile(base, qfile).read());
+    }
+
     final XQuery query = new XQuery(string, ctx);
     if(b != null) query.baseURI(b);
 
@@ -273,7 +285,7 @@ public final class QT3TS {
     final String msg = test(result, expected);
     final TokenBuilder tmp = new TokenBuilder();
     tmp.add(name).add(NL);
-    tmp.add(norm(string)).add(NL);
+    tmp.add(noComments(string)).add(NL);
 
     boolean err = result.value == null;
     String res;
@@ -281,24 +293,33 @@ public final class QT3TS {
       res = result.error != null ? result.error.toString() :
             result.exc != null ?
           result.exc.getCode() + ": " + result.exc.getLocalizedMessage() :
-          string("serialize(., map { 'indent' := 'no' })", result.value);
+          asString("serialize(., map { 'indent' := 'no' })", result.value);
     } catch(final XQException ex) {
       res = ex.getCode() + ": " + ex.getLocalizedMessage();
       err = true;
     }
 
-    tmp.add(err ? "Error : " : "Result: ").add(norm(res)).add(NL);
+    tmp.add(err ? "Error : " : "Result: ").add(noComments(res)).add(NL);
     if(msg == null) {
       tmp.add(NL);
       right.add(tmp.finish());
       correct++;
     } else {
-      tmp.add("Expect: " + norm(msg)).add(NL).add(NL);;
+      tmp.add("Expect: " + noComments(msg)).add(NL).add(NL);;
       wrong.add(tmp.finish());
     }
 
     query.close();
     qexp.close();
+  }
+
+  /**
+   * Removes comments from the specified string.
+   * @param in input string
+   * @return result
+   */
+  private String noComments(final String in) {
+    return QueryProcessor.removeComments(in, maxout);
   }
 
   /**
@@ -401,7 +422,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertError(final QT3Result result, final XQValue expect) {
-    final String exp = string("@" + CODE, expect);
+    final String exp = asString("@" + CODE, expect);
     if(result.exc == null) return exp;
     final String res = result.exc.getCode();
     return !errors || exp.equals("*") || exp.equals(res) ? null : exp;
@@ -561,15 +582,11 @@ public final class QT3TS {
   private String assertSerialization(final XQValue value,
       final XQValue expect) {
 
-    final String file = string("@" + FILE, expect);
-    final String exp;
+    final String file = asString("@file", expect);
     try {
-      if(file.isEmpty()) {
-        exp = normNL(expect.getString());
-      } else {
-        exp = normNL(Token.string(new IOFile(base, file).read()));
-      }
-      final String res = string("serialize(., map {'indent':='no'})", value);
+      final String exp = normNL(file.isEmpty() ?
+          expect.getString() : string(new IOFile(base, file).read()));
+      final String res = asString("serialize(., map {'indent':='no'})", value);
       return exp.equals(normNL(res)) ? null : exp;
     } catch(final IOException ex) {
       return Util.message(ex);
@@ -583,7 +600,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertSerialError(final XQValue value, final XQValue expect) {
-    final String exp = string("@" + CODE, expect);
+    final String exp = asString("@" + CODE, expect);
     try {
       value.toString();
       return exp;
@@ -603,9 +620,9 @@ public final class QT3TS {
   private String assertStringValue(final XQValue value, final XQValue expect) {
     String exp = expect.getString();
     // normalize space
-    final XQuery qspace = new XQuery("@normalize-space = 'true'", ctx);
-    if(qspace.context(expect).next().getBoolean())
-      exp = Token.string(Token.norm(Token.token(exp)));
+    final XQuery qspace = new XQuery("@normalize-space='true'", ctx);
+    final boolean norm = qspace.context(expect).value().getBoolean();
+    if(norm) exp = string(norm(token(exp)));
     qspace.close();
 
     /*final XQuery qu =
@@ -614,14 +631,16 @@ public final class QT3TS {
     final String exp = expect.getString();
     return exp.equals(res) ? null : exp;*/
 
-    final TokenBuilder res = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     int c = 0;
     for(final XQItem it : value) {
-      if(c != 0) res.add(' ');
-      res.add(it.getString());
+      if(c != 0) tb.add(' ');
+      tb.add(it.getString());
       c++;
     }
-    return exp.equals(res.toString()) ? null : exp;
+
+    final String res = norm ? string(norm(tb.finish())) : tb.toString();
+    return exp.equals(res) ? null : exp;
   }
 
   /**
@@ -669,7 +688,7 @@ public final class QT3TS {
    * @param value optional context value
    * @return optional expected test suite result
    */
-  String string(final String query, final XQValue value) {
+  String asString(final String query, final XQValue value) {
     return XQuery.string(query, value, ctx);
   }
 
@@ -681,15 +700,6 @@ public final class QT3TS {
    */
   private static String pc(final int v, final long t) {
     return (t == 0 ? 100 : v * 10000 / t / 100d) + "%";
-  }
-
-  /**
-   * Removes comments from the specified string.
-   * @param in input string
-   * @return result
-   */
-  private String norm(final String in) {
-    return QueryProcessor.removeComments(in, maxout);
   }
 
   /**
