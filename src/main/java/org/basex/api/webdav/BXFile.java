@@ -85,7 +85,7 @@ public final class BXFile extends BXAbstractResource implements FileResource {
       public void run() throws IOException {
         s.setOutputStream(out);
         final Query q = s.query(raw ? "declare option output:method 'raw'; " +
-            DBRETRIEVE.args("$db", "$path") : DBOPEN.args("$db", "$path"));
+            _DB_RETRIEVE.args("$db", "$path") : _DB_OPEN.args("$db", "$path"));
         q.bind("db", db);
         q.bind("path", path);
         q.execute();
@@ -123,9 +123,10 @@ public final class BXFile extends BXAbstractResource implements FileResource {
       throws IOException {
 
     final Query q = s.query(
-        "if(" + DBISRAW.args("$db", "$path") + ") then " +
-        DBSTORE.args("$tdb", "$tpath", DBRETRIEVE.args("$db", "$path")) +
-        " else " + DBADD.args("$tdb", DBOPEN.args("$db", "$path"), "$tpath"));
+        "if(" + _DB_IS_RAW.args("$db", "$path") + ") then " +
+        _DB_STORE.args("$tdb", "$tpath", _DB_RETRIEVE.args("$db", "$path")) +
+        " else " + _DB_ADD.args("$tdb",
+        _DB_OPEN.args("$db", "$path"), "$tpath"));
     q.bind("db", db);
     q.bind("path", path);
     q.bind("tdb", tdb);

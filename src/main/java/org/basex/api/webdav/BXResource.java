@@ -120,7 +120,7 @@ public abstract class BXResource implements Resource {
    */
   static StringList listDBs(final Session s) throws IOException {
     final StringList result = new StringList();
-    final Query q = s.query(DBLIST.args());
+    final Query q = s.query(_DB_LIST.args());
     try {
       while(q.more()) result.add(q.next());
     } finally {
@@ -213,7 +213,7 @@ public abstract class BXResource implements Resource {
   static BXFile file(final Session s, final String d, final String p,
       final HTTPSession hs) throws IOException {
     final Query q = s.query(
-        "let $a := " + DBDETAILS.args("$d", "$p") +
+        "let $a := " + _DB_DETAILS.args("$d", "$p") +
         "return (" +
             "$a/@path/data()," +
             "$a/@raw/data()," +
@@ -270,7 +270,7 @@ public abstract class BXResource implements Resource {
    */
   private static Long databaseTimestamp(final Session s, final String d)
       throws IOException {
-    final Query q = s.query(DBINFO.args("$p"));
+    final Query q = s.query(_DB_INFO.args("$p"));
     q.bind("p", d);
     final String inf = q.execute();
     // parse the timestamp
@@ -299,7 +299,7 @@ public abstract class BXResource implements Resource {
    */
   static boolean pathExists(final Session s, final String d, final String p)
       throws IOException {
-    final Query q = s.query(COUNT.args(DBLIST.args("$d", "$p")));
+    final Query q = s.query(COUNT.args(_DB_LIST.args("$d", "$p")));
     q.bind("d", d);
     q.bind("p", p);
     return !q.execute().equals("0");
@@ -315,7 +315,7 @@ public abstract class BXResource implements Resource {
    */
   private static boolean exists(final Session s, final String d, final String p)
       throws IOException {
-    final Query q = s.query(DBEXISTS.args("$d", "$p"));
+    final Query q = s.query(_DB_EXISTS.args("$d", "$p"));
     q.bind("d", d);
     q.bind("p", p);
     return q.execute().equals(Text.TRUE);

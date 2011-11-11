@@ -113,10 +113,10 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final List<BXResource> ch = new ArrayList<BXResource>();
         final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
-            "for $r in " + DBLIST.args("$d", "$p") +
-            "let $a := " + DBDETAILS.args("$d", "$r") +
+            "for $r in " + _DB_LIST.args("$d", "$p") +
+            "let $a := " + _DB_DETAILS.args("$d", "$r") +
             "return (" +
-                SUBAFTER.args("$a/@path/data()", "$p") + ',' +
+                SUBSTRING_AFTER.args("$a/@path/data()", "$p") + ',' +
                 "$a/@raw/data()," +
                 "$a/@content-type/data()," +
                 "$a/@modified-date/data()," +
@@ -261,11 +261,11 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       throws IOException {
 
     final Query q = s.query(
-        "for $d in " + DBLIST.args("$db", "$path") +
+        "for $d in " + _DB_LIST.args("$db", "$path") +
         "let $t := $tpath ||'/'|| substring($d, string-length($path) + 1) " +
-        "return if (" + DBISRAW.args("$db", "$d") + ") then " +
-        DBSTORE.args("$tdb", "$t", DBRETRIEVE.args("$db", "$d")) + " else " +
-        DBADD.args("$tdb", DBOPEN.args("$db", "$d"), "$t"));
+        "return if (" + _DB_IS_RAW.args("$db", "$d") + ") then " +
+        _DB_STORE.args("$tdb", "$t", _DB_RETRIEVE.args("$db", "$d")) +
+        " else " + _DB_ADD.args("$tdb", _DB_OPEN.args("$db", "$d"), "$t"));
     q.bind("db", db);
     q.bind("path", path);
     q.bind("tdb", tdb);
