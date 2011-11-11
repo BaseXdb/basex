@@ -3,6 +3,33 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.0.2 (November 11, 2011) --------------------------------------
+
+  FULL TEXT
+  - Stemming support for Japanese text corpora
+    (thanks to Toshio HIRAI!)
+
+  STARTUP
+  - Updated start scripts (thanks to Ralf Jung!)
+  - System property "org.basex.path" added to specify
+    project's home directory (thanks to malamut2!)
+
+  XQUERY
+  - Numerous minor XQuery 3.0 enhancements and fixes
+  - Fix for db:optimize() calls (thanks to Martin Hillert!)
+
+  STORAGE
+  - Fix to retain newly introduced namespaces
+    (thanks to Laurent Chevalier!)
+
+  USERS
+  - Default privileges for new users set to "none"
+    (thanks to Pascal Heus!)
+
+  REST
+  - query base URI for evaluated queries is now $HTTPPATH
+    (thanks to Florent Georges!)
+
 VERSION 7.0.1 (October 23, 2011) ---------------------------------------
 
   DISTRIBUTIONS
