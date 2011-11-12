@@ -275,6 +275,17 @@ public final class UpdateTest extends AdvancedQueryTest {
   }
 
   /**
+   * The new-namespace flag has to be set for the parent of an inserted
+   * attribute.
+   */
+  @Test
+  public void setNSFlag() {
+    query("declare namespace x='x';" +
+        "copy $x := <x/> modify insert node attribute x:x {} into $x return $x",
+        "<x xmlns:x=\"x\" x:x=\"\"/>");
+  }
+
+  /**
    * Deletes the test db.
    * @throws Exception exception
    */

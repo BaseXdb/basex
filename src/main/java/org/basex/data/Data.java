@@ -824,7 +824,7 @@ public abstract class Data {
           // check if prefix of attribute has already been declared, otherwise
           // add declaration to parent node
           if(data.nsFlag(dpre) && (nsScope.get(attPref) == null)) {
-            ns.add(par, preStack.size() == 0 ? ipar : preStack.peek(), attPref,
+            ns.add(par, preStack.size() == 0 ? -1 : preStack.peek(), attPref,
                 data.ns.uri(data.uri(dpre, dkind)));
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
@@ -844,9 +844,8 @@ public abstract class Data {
     buffer(1);
 
     // set ns flags
-    for(final int toFlag : flagPres.toArray()) {
-      table.write2(toFlag, 1, name(toFlag));
-    }
+    for(final int toFlag : flagPres.toArray())
+      table.write2(toFlag, 1, name(toFlag) | 1 << 15);
 
     // increase size of ancestors
     int p = ipar;
