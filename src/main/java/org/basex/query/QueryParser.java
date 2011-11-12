@@ -3179,6 +3179,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
     final boolean u = ctx.updating;
     ctx.updating = false;
+    final int s = ctx.vars.size();
 
     Let[] fl = { };
     do {
@@ -3194,6 +3195,7 @@ public class QueryParser extends InputParser {
     wsCheck(RETURN);
     final Expr r = check(single(), INCOMPLETE);
 
+    ctx.vars.reset(s);
     ctx.updating = u;
     return new Transform(input(), fl, m, r);
   }
