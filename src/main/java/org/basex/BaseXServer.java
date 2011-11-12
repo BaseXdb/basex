@@ -247,7 +247,6 @@ public final class BaseXServer extends Main implements Runnable {
           case 'p': // parse server port
             context.mprop.set(MainProp.SERVERPORT, arg.num());
             break;
-          case 's': // set service flag (deprecated)
           case 'S': // set service flag
             service = !daemon;
             break;
