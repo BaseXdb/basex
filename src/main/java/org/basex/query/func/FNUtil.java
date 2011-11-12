@@ -353,7 +353,7 @@ public final class FNUtil extends FuncCall {
       }
       @Override
       public Item get(final long i) {
-        return Itr.get(bytes[pos], AtomType.BYT);
+        return Itr.get(bytes[(int) i], AtomType.BYT);
       }
       @Override
       public Item next() { return pos < size() ? get(pos++) : null; }
