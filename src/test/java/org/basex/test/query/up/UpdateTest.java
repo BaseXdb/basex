@@ -3,6 +3,7 @@ package org.basex.test.query.up;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
+import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -152,7 +153,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void textMerging09() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
         "modify (delete node $c//d, insert node 'bb' after ($c//d)[1]) " +
-        "return count($c//text()), $c//text()", "1aabbcc");
+        "return (count($c//text()), $c//text())", "1aabbcc");
   }
 
   /**
@@ -162,7 +163,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void textMerging10() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
         "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
-        "return count($c//text()), $c//text()", "1aabbcc");
+        "return (count($c//text()), $c//text())", "1aabbcc");
   }
 
   /**
@@ -173,7 +174,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     query(
       "copy $c := <n>aa<d/><d/>cc</n> " +
       "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
-      "return count($c//text()), $c//text()", "1aabbcc");
+      "return (count($c//text()), $c//text())", "1aabbcc");
   }
 
   /**
@@ -264,6 +265,13 @@ public final class UpdateTest extends AdvancedQueryTest {
         "return (if($w/@id) " +
         "then (delete node $w/@id, db:optimize('" + DB + "')) else ())"
         );
+  }
+
+  /** Variable from the inner scope shouldn't be visible. */
+  @Test
+  public void outOfScope() {
+    error("let $d := copy $e := <a/> modify () return $e return $e",
+        Err.VARUNDEF);
   }
 
   /**
