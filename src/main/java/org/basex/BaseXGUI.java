@@ -21,6 +21,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.Args;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This is the starter class for the graphical frontend.
@@ -34,7 +35,7 @@ public final class BaseXGUI {
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
   /** File, specified as argument. */
-  String file;
+  StringList files = new StringList();
 
   /**
    * Main method.
@@ -83,17 +84,20 @@ public final class BaseXGUI {
         if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
-        if(file != null) {
+        boolean xml = false;
+        for(final String file : files) {
           final String input = file.replace('\\', '/');
           final IOFile io = new IOFile(input);
           boolean xq = false;
           for(final String suf : IO.XQSUFFIXES) xq |= input.endsWith(suf);
           if(xq) {
             gui.editor.open(io);
-          } else {
+          } else if(!xml) {
+            // only parse first xml file
             gui.execute(new Check(input));
             gprop.set(GUIProp.CREATEPATH, io.path());
             gprop.set(GUIProp.CREATENAME, io.dbname());
+            xml = true;
           }
         }
       }
@@ -131,16 +135,9 @@ public final class BaseXGUI {
   /**
    * Parses the command-line arguments, specified by the user.
    * @param args command-line arguments
-   * @throws BaseXException database exception
    */
-  private void parseArguments(final String[] args) throws BaseXException {
+  private void parseArguments(final String[] args) {
     final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
-    while(arg.more()) {
-      if(arg.dash()) {
-        arg.usage();
-      } else {
-        file = file == null ? arg.string() : file + " " + arg.string();
-      }
-    }
+    while(arg.more()) files.add(arg.string());
   }
 }

@@ -65,8 +65,6 @@ public class BaseX extends Main {
     // create session to show optional login request
     session();
 
-    // [CG] allow sequential evaluation of multiple arguments
-
     try {
       // open initial document or database
       for(int i = 0; i < ops.size(); i += 2) {

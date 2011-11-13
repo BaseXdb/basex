@@ -25,6 +25,7 @@ import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenIntMap;
+import org.basex.util.list.StringList;
 
 /**
  * This is the starter class for running the database server. It handles
@@ -58,8 +59,8 @@ public final class BaseXServer extends Main implements Runnable {
 
   /** Server socket. */
   private ServerSocket socket;
-  /** User query. */
-  private String commands;
+  /** Initial commands. */
+  private StringList commands;
 
   /**
    * Main method, launching the server process.
@@ -120,7 +121,7 @@ public final class BaseXServer extends Main implements Runnable {
 
     try {
       // execute command-line arguments
-      if(commands != null) execute(commands);
+      for(final String c : commands) execute(c);
 
       log = new Log(context, quiet);
       log.write(SERVERSTART);
@@ -225,12 +226,14 @@ public final class BaseXServer extends Main implements Runnable {
   protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, SERVERINFO,
         Util.info(CONSOLE, SERVERMODE));
+
+    commands = new StringList();
     boolean daemon = false;
     while(arg.more()) {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'c': // send database commands
-            commands = arg.string();
+            commands.add(arg.string());
             break;
           case 'd': // activate debug mode
             context.mprop.set(MainProp.DEBUG, true);
