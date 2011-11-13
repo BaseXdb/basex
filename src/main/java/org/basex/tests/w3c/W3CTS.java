@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.basex.core.Context;
@@ -146,7 +147,7 @@ public abstract class W3CTS {
   public W3CTS(final String nm) {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
-    pathlog = testid.toLowerCase() + ".log";
+    pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
   }
 
   /**
@@ -828,7 +829,7 @@ public abstract class W3CTS {
         } else if(c == 'p') {
           path = arg.string() + "/";
         } else if(c == 't') {
-          timer = arg.num();
+          timer = arg.number();
         } else if(c == 'v') {
           verbose = true;
         } else {

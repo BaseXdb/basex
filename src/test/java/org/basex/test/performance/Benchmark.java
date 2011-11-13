@@ -45,7 +45,7 @@ public abstract class Benchmark {
     // Check if server is (not) running
     server = !local && !BaseXServer.ping(LOCALHOST,
         CONTEXT.mprop.num(MainProp.SERVERPORT)) ?
-        new BaseXServer("-z -p9999 -e9998") : null;
+        new BaseXServer("-z", "-p9999", "-e9998") : null;
 
     session = local ? new LocalSession(CONTEXT) :
       new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);

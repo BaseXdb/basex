@@ -75,7 +75,7 @@ public final class ServerStressTest {
    */
   private void run(final int clients, final int runs) throws Exception {
     // Run server instance
-    server = new BaseXServer("-p9999 -e9998 -z");
+    server = new BaseXServer("-p9999", "-e9998", "-z");
 
     // Create test database
     final ClientSession cs = newSession();

@@ -66,7 +66,7 @@ public final class XQUFServerStressTest {
    */
   private void run(final int clients, final int runs) throws Exception {
     // Run server instance
-    server = new BaseXServer("-p9999 -e9998 -z");
+    server = new BaseXServer("-p9999", "-e9998", "-z");
     insert(clients, runs);
     delete(clients, runs);
     final ClientSession s = newSession();
