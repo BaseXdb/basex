@@ -97,7 +97,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB(null);
 
     query("let $i := //item[@id='item0']/location return " +
-        "(insert node 'foo' into $i, delete node $i/text())");
+      "(insert node 'foo' into $i, delete node $i/text())");
     query("//item[@id='item0']/location/text()", "foo");
   }
 
@@ -110,9 +110,9 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB(null);
 
     query("let $i := //item[@id='item0']/location return " +
-        "(insert node <n/> into $i, insert node 'foo' as last into $i)");
+      "(insert node <n/> into $i, insert node 'foo' as last into $i)");
     query("let $i := //item[@id='item0']/location return " +
-    "delete node $i/n");
+      "delete node $i/n");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
   }
 
@@ -125,7 +125,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB(null);
 
     query("let $i := //item[@id='item0']/location return " +
-        "insert node 'foo' after $i/text()");
+      "insert node 'foo' after $i/text()");
     query("(//item[@id='item0']/location/text())[1]", "United Statesfoo");
   }
 
@@ -138,12 +138,12 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB(null);
 
     query("let $i := //item[@id='item0'] return " +
-        "(insert node 'foo' after $i/location)");
+      "(insert node 'foo' after $i/location)");
     query("let $i := //item[@id='item0']/location return " +
-        "(insert node 'foo' after $i, insert node 'faa' before $i, insert " +
-        "node 'faa' into $i, delete node $i/text())");
+      "(insert node 'foo' after $i, insert node 'faa' before $i, insert " +
+      "node 'faa' into $i, delete node $i/text())");
     query("let $i := //item[@id='item0']/location " +
-        "return ($i/text(), ($i/../text())[2])", "faafoofoo");
+      "return ($i/text(), ($i/../text())[2])", "faafoofoo");
   }
 
   /**
@@ -152,8 +152,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging09() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
-        "modify (delete node $c//d, insert node 'bb' after ($c//d)[1]) " +
-        "return (count($c//text()), $c//text())", "1aabbcc");
+      "modify (delete node $c//d, insert node 'bb' after ($c//d)[1]) " +
+      "return (count($c//text()), $c//text())", "1aabbcc");
   }
 
   /**
@@ -162,8 +162,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void textMerging10() {
     query("copy $c := <n>aa<d/><d/>cc</n> " +
-        "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
-        "return (count($c//text()), $c//text())", "1aabbcc");
+      "modify (delete node $c//d, insert node 'bb' before ($c//d)[2]) " +
+      "return (count($c//text()), $c//text())", "1aabbcc");
   }
 
   /**
@@ -262,9 +262,8 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void optimize() throws BaseXException {
     createDB(null);
     query("let $w := //item[@id = 'item0'] " +
-        "return (if($w/@id) " +
-        "then (delete node $w/@id, db:optimize('" + DB + "')) else ())"
-        );
+      "return (if($w/@id) " +
+      "then (delete node $w/@id, db:optimize('" + DB + "')) else ())");
   }
 
   /** Variable from the inner scope shouldn't be visible. */
@@ -281,8 +280,32 @@ public final class UpdateTest extends AdvancedQueryTest {
   @Test
   public void setNSFlag() {
     query("declare namespace x='x';" +
-        "copy $x := <x/> modify insert node attribute x:x {} into $x return $x",
-        "<x xmlns:x=\"x\" x:x=\"\"/>");
+      "copy $x := <x/> modify insert node attribute x:x {} into $x return $x",
+      "<x xmlns:x=\"x\" x:x=\"\"/>");
+  }
+
+  /**
+   * The new-namespace flag has to be set for the parent of an inserted
+   * attribute.
+   */
+  @Test
+  public void setNSFlag2() {
+    query("declare namespace x='x';" +
+      "copy $x := <x><a/></x> " +
+      "modify insert node attribute x:x {} into $x return $x/a",
+      "<a xmlns:x=\"x\"/>");
+  }
+
+  /**
+   * The new-namespace flag has to be set for the parent of an inserted
+   * attribute.
+   */
+  @Test
+  public void setNSFlag3() {
+    query("declare namespace x='x';" +
+      "copy $x := <x><a/></x> " +
+      "modify insert node attribute x:x {} into $x/a return $x/a",
+      "<a xmlns:x=\"x\" x:x=\"\"/>");
   }
 
   /**

@@ -19,9 +19,8 @@ import org.basex.util.hash.IntMap;
 import org.basex.util.list.IntList;
 
 /**
- * This class provides access to attribute values and text contents
- * stored on disk. The data structure is described in the {@link ValueBuilder}
- * class.
+ * This class provides access to attribute values and text contents stored on
+ * disk. The data structure is described in the {@link ValueBuilder} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -69,7 +68,7 @@ public final class DiskValues implements Index {
   }
 
   @Override
-  public byte[] info() {
+  public synchronized byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INDEXSTRUC + TREESTRUC + NL);
     final long l = idxl.length() + idxr.length();
@@ -84,19 +83,19 @@ public final class DiskValues implements Index {
   }
 
   @Override
-  public IndexIterator iter(final IndexToken tok) {
+  public synchronized IndexIterator iter(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
     final int id = cache.id(tok.get());
     if(id > 0) return iter(cache.size(id), cache.pointer(id));
 
     final long pos = get(tok.get());
-    return pos == 0 ? IndexIterator.EMPTY :
-      iter(idxl.readNum(pos), idxl.cursor());
+    return pos == 0 ? IndexIterator.EMPTY : iter(idxl.readNum(pos),
+        idxl.cursor());
   }
 
   @Override
-  public int count(final IndexToken it) {
+  public synchronized int count(final IndexToken it) {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
     if(it.get().length > MAXLEN) return Integer.MAX_VALUE;
 
@@ -106,7 +105,7 @@ public final class DiskValues implements Index {
 
     final long pos = get(tok);
     if(pos == 0) return 0;
-    final int nr =  idxl.readNum(pos);
+    final int nr = idxl.readNum(pos);
     cache.add(it.get(), nr, pos + Num.length(nr));
     return nr;
   }
@@ -116,8 +115,8 @@ public final class DiskValues implements Index {
    * @return compressed values
    */
   byte[] nextValues() {
-    return idxr.cursor() >= idxr.length() ? EMPTY :
-      idxl.readBytes(idxr.read5(), idxl.read4());
+    return idxr.cursor() >= idxr.length() ? EMPTY : idxl.readBytes(
+        idxr.read5(), idxl.read4());
   }
 
   /**
@@ -148,8 +147,8 @@ public final class DiskValues implements Index {
 
     // check if min and max are positive integers with the same number of digits
     final int len = max > 0 && (long) max == max ? token(max).length : 0;
-    final boolean simple = len != 0 && min > 0 && (long) min == min &&
-      token(min).length == len;
+    final boolean simple = len != 0 && min > 0 && (long) min == min
+        && token(min).length == len;
 
     final IntList pres = new IntList();
     for(int l = 0; l < size; ++l) {
@@ -184,23 +183,34 @@ public final class DiskValues implements Index {
       int s = ids.size();
 
       @Override
-      public boolean more() { return ++p < s; }
+      public boolean more() {
+        return ++p < s;
+      }
+
       @Override
-      public int next() { return ids.get(p); }
+      public int next() {
+        return ids.get(p);
+      }
+
       @Override
-      public double score() { return -1; }
+      public double score() {
+        return -1;
+      }
+
       @Override
-      public int size() { return s; }
+      public int size() {
+        return s;
+      }
     };
   }
 
   /**
-   * Returns the id offset for the specified token,
-   * or {@code 0} if the token is not found.
+   * Returns the id offset for the specified token, or {@code 0} if the token is
+   * not found.
    * @param key token to be found
    * @return id offset
    */
-  private long get(final byte[] key) {
+  private synchronized long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
       final int m = l + h >>> 1;

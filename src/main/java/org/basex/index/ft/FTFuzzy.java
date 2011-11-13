@@ -129,7 +129,7 @@ final class FTFuzzy extends FTIndex {
   }
 
   @Override
-  public byte[] info() {
+  public synchronized byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INDEXSTRUC + FUZZYSTRUC + NL);
     tb.addExt("- %: %" + NL, CREATEST, Util.flag(data.meta.stemming));
