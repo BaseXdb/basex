@@ -20,6 +20,7 @@ import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * This is the starter class for the stand-alone console mode.
@@ -29,20 +30,15 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public class BaseX extends Main {
-  /** Flag for writing properties to disk. */
-  private boolean writeProps;
-  /** User query. */
-  private String commands;
-  /** Query file. */
-  private String file;
-  /** Input file for queries. */
-  protected String input;
-  /** Query. */
-  private String query;
   /** User name. */
   protected String user;
   /** Password. */
   protected String pass;
+
+  /** Flag for writing properties to disk. */
+  private boolean writeProps;
+  /** Operations to be executed. */
+  private StringList ops;
 
   /**
    * Main method, launching the standalone mode.
@@ -69,28 +65,33 @@ public class BaseX extends Main {
     // create session to show optional login request
     session();
 
+    // [CG] allow sequential evaluation of multiple arguments
+
     try {
       // open initial document or database
-      if(input != null) {
-        execute(new Check(input), verbose);
+      for(int i = 0; i < ops.size(); i += 2) {
+        final String key = ops.get(i);
+        final String val = ops.get(i + 1);
+        if(key.equals("c")) {
+          // run database command
+          execute(val);
+        } else if(key.equals("f")) {
+          // query file
+          final IO io = IO.get(val);
+          if(!io.exists()) throw new BaseXException(INFOERROR + FILEWHICH, val);
+          final String query = TextInput.content(io).toString().trim();
+          execute(new Set(Prop.QUERYPATH, io.path()), false);
+          execute(new XQuery(query), verbose);
+        } else if(key.equals("i")) {
+          // set context
+          execute(new Check(val), verbose);
+        } else if(key.equals("q")) {
+          // run query
+          execute(new XQuery(val), verbose);
+        }
       }
 
-      // open specified file
-      if(file != null) {
-        // query file contents
-        final IO io = IO.get(file);
-        if(!io.exists()) throw new BaseXException(INFOERROR + FILEWHICH, file);
-        query = TextInput.content(io).toString().trim();
-        execute(new Set(Prop.QUERYPATH, io.path()), false);
-      }
-
-      if(query != null) {
-        // run query
-        execute(new XQuery(query), verbose);
-      } else if(commands != null) {
-        // run command-line arguments
-        execute(commands);
-      } else {
+      if(console) {
         // enter interactive mode
         Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
         console();
@@ -121,6 +122,7 @@ public class BaseX extends Main {
   protected final void parseArguments(final String[] args) throws IOException {
     final StringBuilder serial = new StringBuilder();
     final StringBuilder bind = new StringBuilder();
+    ops = new StringList();
 
     final HashMap<Object[], Object> options = new HashMap<Object[], Object>();
     final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO,
@@ -131,10 +133,11 @@ public class BaseX extends Main {
         if(c == 'b') {
           // set/add variable binding
           if(bind.length() != 0) bind.append(',');
-          bind.append(arg.string());
+          // commas are escaped by a second comma
+          bind.append(arg.string().replaceAll(",", ",,"));
         } else if(c == 'c') {
           // specify command to be evaluated
-          commands = arg.remaining();
+          ops.add("c").add(arg.string());
         } else if(c == 'd') {
           // activate debug mode
           context.mprop.set(MainProp.DEBUG, true);
@@ -143,7 +146,7 @@ public class BaseX extends Main {
           options.put(Prop.DOTPLAN, true);
         } else if(c == 'i') {
           // open initial file or database
-          input = arg.string();
+          ops.add("i").add(arg.string());
         } else if(c == 'n' && !sa()) {
           // set server name
           context.mprop.set(MainProp.HOST, arg.string());
@@ -153,13 +156,13 @@ public class BaseX extends Main {
           if(session != null) session.setOutputStream(out);
         } else if(c == 'p' && !sa()) {
           // set server port
-          context.mprop.set(MainProp.PORT, arg.num());
+          context.mprop.set(MainProp.PORT, arg.number());
         } else if(c == 'P' && !sa()) {
           // specify password
           pass = arg.string();
         } else if(c == 'q') {
           // specify query to be evaluated
-          query = arg.remaining();
+          ops.add("q").add(arg.string());
         } else if(c == 'r') {
           // hidden option: parse number of runs
           options.put(Prop.RUNS, arg.string());
@@ -200,10 +203,10 @@ public class BaseX extends Main {
           arg.usage();
         }
       } else {
-        file = file == null ? arg.string() : file + " " + arg.string();
+        ops.add("f").add(arg.string());
       }
     }
-    console = file == null && commands == null && query == null;
+    console = ops.size() == 0;
 
     // set cached options
     if(serial.length() != 0) options.put(Prop.SERIALIZER, serial);

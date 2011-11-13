@@ -230,7 +230,7 @@ public final class BaseXServer extends Main implements Runnable {
       if(arg.dash()) {
         switch(arg.next()) {
           case 'c': // send database commands
-            commands = arg.remaining();
+            commands = arg.string();
             break;
           case 'd': // activate debug mode
             context.mprop.set(MainProp.DEBUG, true);
@@ -239,13 +239,13 @@ public final class BaseXServer extends Main implements Runnable {
             daemon = true;
             break;
           case 'e': // parse event port
-            context.mprop.set(MainProp.EVENTPORT, arg.num());
+            context.mprop.set(MainProp.EVENTPORT, arg.number());
             break;
           case 'i': // activate interactive mode
             console = true;
             break;
           case 'p': // parse server port
-            context.mprop.set(MainProp.SERVERPORT, arg.num());
+            context.mprop.set(MainProp.SERVERPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;

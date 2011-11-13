@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
+
 import org.basex.core.AProp;
 import org.basex.core.BaseXException;
 import org.basex.util.Token;
@@ -48,10 +50,10 @@ public final class ParserProp extends AProp {
     for(final String ser : s.trim().split(",")) {
       if(ser.isEmpty()) continue;
       final String[] sprop = ser.split("=", 2);
-      final String key = sprop[0].trim().toLowerCase();
+      final String key = sprop[0].trim().toLowerCase(Locale.ENGLISH);
       final Object obj = get(key);
       if(obj == null) {
-        final String in = key.toUpperCase();
+        final String in = key.toUpperCase(Locale.ENGLISH);
         final String sim = similar(in);
         throw new IOException(
             Util.info(sim != null ? SETSIMILAR : SETWHICH, in, sim));

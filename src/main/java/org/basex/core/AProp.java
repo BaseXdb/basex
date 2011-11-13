@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
+
 import org.basex.io.IO;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenBuilder;
@@ -71,7 +73,7 @@ public abstract class AProp {
           }
 
           final String val = line.substring(d + 1).trim();
-          String key = line.substring(0, d).trim().toUpperCase();
+          String key = line.substring(0, d).trim().toUpperCase(Locale.ENGLISH);
 
           // extract numeric value in key
           int num = 0;

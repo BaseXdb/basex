@@ -3,6 +3,7 @@ package org.basex.util;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.
@@ -217,7 +218,7 @@ public final class Token {
    * @return encoding
    */
   public static String normEncoding(final String encoding, final String old) {
-    final String e = encoding.toUpperCase();
+    final String e = encoding.toUpperCase(Locale.ENGLISH);
     if(eq(e, UTF8, UTF82)) return UTF8;
     if(e.equals(UTF16BE)) return UTF16BE;
     if(e.equals(UTF16LE)) return UTF16LE;
@@ -1120,7 +1121,7 @@ public final class Token {
       for(int i = 0; i < token.length; ++i) tok[i] = (byte) uc(token[i]);
       return tok;
     }
-    return token(string(token).toUpperCase());
+    return token(string(token).toUpperCase(Locale.ENGLISH));
   }
 
   /**
@@ -1144,7 +1145,7 @@ public final class Token {
       for(int i = 0; i < token.length; ++i) tok[i] = (byte) lc(token[i]);
       return tok;
     }
-    return token(string(token).toLowerCase());
+    return token(string(token).toLowerCase(Locale.ENGLISH));
   }
 
   /**

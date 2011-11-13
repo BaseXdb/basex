@@ -36,10 +36,22 @@ public class StringList extends ElementList implements Iterable<String> {
   /**
    * Adds an element to the array.
    * @param e element to be added
+   * @return self reference
    */
-  public final void add(final String e) {
+  public final StringList add(final String e) {
     if(size == list.length) list = Array.copyOf(list, newSize());
     list[size++] = e;
+    return this;
+  }
+
+  /**
+   * Adds elements to the array.
+   * @param e element to be added
+   * @return self reference
+   */
+  public final StringList add(final String[] e) {
+    for(final String s : e) add(s);
+    return this;
   }
 
   /**

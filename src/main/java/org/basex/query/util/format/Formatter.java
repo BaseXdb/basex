@@ -4,6 +4,8 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
+
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.QueryException;
 import org.basex.query.item.AtomType;
@@ -40,7 +42,8 @@ public abstract class Formatter extends FormatUtil {
     // check if formatter has already been created
     Formatter form = MAP.get(ln);
     if(form == null) {
-      final String clz = Util.name(Formatter.class) + ln.toUpperCase();
+      final String clz = Util.name(Formatter.class) +
+          ln.toUpperCase(Locale.ENGLISH);
       form = (Formatter) Reflect.get(Reflect.find(clz));
       // instantiation not successful: return default formatter
       if(form == null) form = MAP.get(EN);

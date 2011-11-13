@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Close;
@@ -259,7 +260,7 @@ public abstract class Command extends Progress {
   protected static final <E extends Enum<E>> E getOption(final String s,
       final Class<E> typ) {
     try {
-      return Enum.valueOf(typ, s.toUpperCase());
+      return Enum.valueOf(typ, s.toUpperCase(Locale.ENGLISH));
     } catch(final Exception ex) {
       return null;
     }

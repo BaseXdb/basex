@@ -3,6 +3,8 @@ package org.basex.build.file;
 import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.Locale;
+
 import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -91,14 +93,14 @@ public final class CSVParser extends SingleParser {
     row = props.is(ParserProp.HEADER) ? 0 : 1;
 
     // set separator
-    String s = props.get(ParserProp.SEPARATOR).toLowerCase();
+    String s = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
     separator = s.equals(SEPARATORS[0]) ? ',' : s.equals(SEPARATORS[1]) ? ';' :
       s.equals(SEPARATORS[2]) ? '\t' : -1;
     if(separator == -1) throw new IOException(
         Util.info(SETVAL, ParserProp.SEPARATOR[0], s));
 
     // set XML format
-    s = props.get(ParserProp.FORMAT).toLowerCase();
+    s = props.get(ParserProp.FORMAT).toLowerCase(Locale.ENGLISH);
     simple = s.equals(FORMATS[0]);
     if(!simple && !s.equals(FORMATS[1])) throw new IOException(
         Util.info(SETVAL, ParserProp.FORMAT[0], s));

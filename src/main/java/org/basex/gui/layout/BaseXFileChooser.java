@@ -3,6 +3,8 @@ package org.basex.gui.layout;
 import static org.basex.core.Text.*;
 import java.awt.FileDialog;
 import java.io.File;
+import java.util.Locale;
+
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import org.basex.gui.GUI;
@@ -148,7 +150,7 @@ public final class BaseXFileChooser {
     @Override
     public boolean accept(final File file) {
       if(file.isDirectory()) return true;
-      final String name = file.getName().toLowerCase();
+      final String name = file.getName().toLowerCase(Locale.ENGLISH);
       for(final String s : sufs) if(name.endsWith(s)) return true;
       return false;
     }

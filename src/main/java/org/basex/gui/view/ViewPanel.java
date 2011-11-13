@@ -1,6 +1,8 @@
 package org.basex.gui.view;
 
 import java.awt.BorderLayout;
+import java.util.Locale;
+
 import org.basex.gui.layout.BaseXBack;
 
 /**
@@ -44,7 +46,8 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
    * Makes the view invisible.
    */
   public void delete() {
-    view.gui.gprop.set("SHOW" + view.getName().toUpperCase(), false);
+    view.gui.gprop.set("SHOW" +
+        view.getName().toUpperCase(Locale.ENGLISH), false);
     view.gui.layoutViews();
   }
 

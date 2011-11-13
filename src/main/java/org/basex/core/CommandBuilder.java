@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import java.util.Locale;
+
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -29,7 +31,7 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder init() {
-    init(Util.name(cmd).toUpperCase());
+    init(Util.name(cmd).toUpperCase(Locale.ENGLISH));
     return this;
   }
 
@@ -84,10 +86,13 @@ public final class CommandBuilder {
     if(a != null && !a.isEmpty()) {
       if(key != null) tb.add(' ').add(key);
       tb.add(' ');
-      final boolean s = a.indexOf(' ') != -1;
-      if(s) tb.add('"');
-      tb.add(a);
-      if(s) tb.add('"');
+      if(a.indexOf(' ') != -1 || a.indexOf(';') != -1) {
+        tb.add('"');
+        tb.add(a.replaceAll("\"", "\\\""));
+        tb.add('"');
+      } else {
+        tb.add(a);
+      }
     }
     return this;
   }

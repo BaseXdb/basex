@@ -3,6 +3,8 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
+import java.util.Locale;
+
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
 import org.basex.core.Commands.CmdCreate;
@@ -415,7 +417,7 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final int p = qp;
     final boolean ok = (consume(key) ||
-        consume(key.toLowerCase())) && (curr(0) || ws(curr()));
+        consume(key.toLowerCase(Locale.ENGLISH))) && (curr(0) || ws(curr()));
     if(!ok) {
       qp = p;
       if(cmd != null) throw help(null, cmd);
@@ -476,7 +478,8 @@ public final class CommandParser extends InputParser {
     if(!(gui && token != null && token.length() <= 1)) {
     try {
       // return command reference; allow empty strings as input ("NULL")
-      final String t = token == null ? "NULL" : token.toUpperCase();
+      final String t = token == null ? "NULL" :
+        token.toUpperCase(Locale.ENGLISH);
       return Enum.valueOf(cmp, t);
     } catch(final IllegalArgumentException ex) { /* will not happen. */ }
     }
@@ -491,7 +494,7 @@ public final class CommandParser extends InputParser {
     final byte[] name = lc(token(token));
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
-      final byte[] sm = lc(token(s.name().toLowerCase()));
+      final byte[] sm = lc(token(s.name().toLowerCase(Locale.ENGLISH)));
       if(ls.similar(name, sm, 0) && Cmd.class.isInstance(s))
         throw error(list(alt), CMDSIMILAR, name, sm);
     }
@@ -523,7 +526,7 @@ public final class CommandParser extends InputParser {
       final String i) {
 
     Enum<?>[] list = new Enum<?>[0];
-    final String t = i == null ? "" : i.toUpperCase();
+    final String t = i == null ? "" : i.toUpperCase(Locale.ENGLISH);
     for(final Enum<?> e : en.getEnumConstants()) {
       if(e.name().startsWith(t)) {
         final int s = list.length;
@@ -558,7 +561,7 @@ public final class CommandParser extends InputParser {
    */
   private StringList list(final Enum<?>[] comp) {
     final StringList list = new StringList();
-    for(final Enum<?> c : comp) list.add(c.name().toLowerCase());
+    for(final Enum<?> c : comp) list.add(c.name().toLowerCase(Locale.ENGLISH));
     return list;
   }
 }

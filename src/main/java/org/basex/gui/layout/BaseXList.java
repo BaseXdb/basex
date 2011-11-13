@@ -8,6 +8,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Locale;
+
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
@@ -134,13 +136,14 @@ public final class BaseXList extends BaseXBack {
         if(typed) {
           typed = false;
 
-          final String txt = text.getText().trim().toLowerCase();
+          final String txt = text.getText().trim().toLowerCase(Locale.ENGLISH);
           final boolean glob = txt.matches("^.*[*?,].*$");
           final String regex = glob ? IOFile.regex(txt, false) : null;
 
           final IntList il = new IntList();
           for(int i = 0; i < values.length; ++i) {
-            final String db = Prop.WIN ? values[i].toLowerCase() : values[i];
+            final String db = Prop.WIN ? values[i].toLowerCase(Locale.ENGLISH) :
+              values[i];
             if(glob) {
               if(db.matches(regex)) il.add(i);
             } else if(db.startsWith(txt)) {

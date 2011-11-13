@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.basex.core.Prop;
 import org.basex.io.serial.Serializer;
@@ -189,7 +190,8 @@ public final class HTTPClient {
       final Request r, final InputInfo ii) throws ProtocolException,
       QueryException {
     if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
-    conn.setRequestMethod(string(r.attrs.get(METHOD)).toUpperCase());
+    conn.setRequestMethod(
+        string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH));
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
     final byte[] redirect = r.attrs.get(REDIR);

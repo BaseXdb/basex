@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.SortedMap;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
@@ -96,7 +97,7 @@ public final class DialogExport extends Dialog {
     boolean f = false;
     for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
-      enc = enc.toUpperCase();
+      enc = enc.toUpperCase(Locale.ENGLISH);
       for(final String s : ENCODINGS) f |= s.equals(enc);
     }
     encoding.setSelectedItem(f ? enc : sp.get(SerializerProp.S_ENCODING));
@@ -134,7 +135,7 @@ public final class DialogExport extends Dialog {
     String enc = encoding;
     for(final String s : DialogExport.ENCODINGS) f |= s.equals(enc);
     if(!f) {
-      enc = enc.toUpperCase();
+      enc = enc.toUpperCase(Locale.ENGLISH);
       for(final String s : DialogExport.ENCODINGS) f |= s.equals(enc);
     }
     cb.setSelectedItem(enc);

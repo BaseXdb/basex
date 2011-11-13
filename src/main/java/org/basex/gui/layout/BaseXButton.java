@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Locale;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -94,7 +95,7 @@ public class BaseXButton extends JButton {
   public static BaseXButton command(final GUICommand cmd, final GUI gui) {
     // images are defined via the 'cmd-' prefix and the command in lower case
     final BaseXButton button = new BaseXButton(gui,
-        cmd.toString().toLowerCase(), Token.token(cmd.help()));
+        cmd.toString().toLowerCase(Locale.ENGLISH), Token.token(cmd.help()));
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

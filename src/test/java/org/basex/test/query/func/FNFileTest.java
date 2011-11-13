@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import org.basex.core.Prop;
 import org.basex.query.util.Err;
@@ -305,7 +306,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_RESOLVE_PATH);
     final String path = query(_FILE_RESOLVE_PATH.args(PATH1));
     final String can = new File(PATH1).getAbsolutePath();
-    assertEquals(path.toLowerCase(), can.toLowerCase());
+    assertEquals(path.toLowerCase(Locale.ENGLISH), can.toLowerCase());
   }
 
   /**
@@ -316,7 +317,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_PATH_TO_URI);
     final String path = query(_FILE_PATH_TO_URI.args(PATH1));
     final String uri = new File(PATH1).toURI().toString();
-    assertEquals(path.toLowerCase(), uri.toLowerCase());
+    assertEquals(path.toLowerCase(Locale.ENGLISH), uri.toLowerCase());
   }
 
   /**
@@ -347,7 +348,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_DIR_NAME);
     // check with a simple path
     assertEquals(norm(Prop.TMP),
-        norm(query(_FILE_DIR_NAME.args(PATH1))).toLowerCase());
+        norm(query(_FILE_DIR_NAME.args(PATH1))).toLowerCase(Locale.ENGLISH));
     // check with an empty path
     query(_FILE_DIR_NAME.args(""), ".");
     // check with a path without directory separators
@@ -373,6 +374,6 @@ public final class FNFileTest extends AdvancedQueryTest {
    * @return normalized path
    */
   private static String norm(final String path) {
-    return (path + '/').replaceAll("[\\\\/]+", "/").toLowerCase();
+    return (path + '/').replaceAll("[\\\\/]+", "/").toLowerCase(Locale.ENGLISH);
   }
 }

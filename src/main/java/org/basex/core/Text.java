@@ -3,6 +3,8 @@ package org.basex.core;
 import static org.basex.core.Lang.*;
 import static org.basex.util.Token.*;
 
+import java.util.Locale;
+
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
@@ -43,7 +45,7 @@ public interface Text {
   String LI = "- ";
 
   /** Project namespace. */
-  String NAMELC = NAME.toLowerCase();
+  String NAMELC = NAME.toLowerCase(Locale.ENGLISH);
   /** URL. */
   String URL = "http://www." + NAMELC + ".org";
   /** URL of the community page. */
@@ -81,7 +83,7 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-bdiosuvVwxz] [-cq] [file]" + NL +
+    " [-bcdioqsuvVwxz] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
     "  -c<cmd>     Execute database command(s)" + NL +
@@ -100,7 +102,7 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-bdinopPsUvVwxz] [-cq] [file]" + NL +
+    " [-bcdinopPqsUvVwxz] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
     "  -c<cmd>     Execute database command(s)" + NL +
@@ -122,7 +124,7 @@ public interface Text {
   String SERVERMODE = "Server";
   /** Server start information. */
   String SERVERINFO =
-    " [-deipSz] [-c] [stop]" + NL +
+    " [-cdeipSz] [stop]" + NL +
     "  stop      Stop running server" + NL +
     "  -c<cmd>   Execute initial database command(s)" + NL +
     "  -d        Activate debugging mode" + NL +

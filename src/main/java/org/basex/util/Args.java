@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import java.util.Locale;
+import java.util.Scanner;
 import org.basex.core.BaseXException;
 
 /**
@@ -16,12 +18,14 @@ public final class Args {
   /** Usage info. */
   private final String usage;
   /** Command-line arguments. */
-  private final String args;
+  private final String[] args;
 
   /** Dash flag. */
   private boolean dash;
+  /** Position in current argument. */
+  private int pos;
   /** Current argument. */
-  private int c;
+  private int arg;
 
   /**
    * Default constructor.
@@ -32,9 +36,8 @@ public final class Args {
    */
   public Args(final String[] a, final Object o, final String u,
       final String h) {
-    final StringBuilder sb = new StringBuilder();
-    for(final String s : a) sb.append(s).append(' ');
-    args = sb.toString();
+
+    args = a;
     usage = u;
     obj = o;
     header = h;
@@ -45,22 +48,43 @@ public final class Args {
    * @return result of check
    */
   public boolean more() {
-    while(c < args.length()) {
-      final char ch = args.charAt(c);
-      if(ch == ' ') {
-        if(dash) dash = false;
-      } else if(!dash && ch == '-') {
-        dash = true;
-      } else {
+    // parse all arguments
+    while(arg < args.length) {
+      // analyze current argument
+      final String a = args[arg];
+      if(pos == 0) {
+        // start from first character
+        dash = false;
+        // find first relevant character
+        while(pos < a.length()) {
+          final char ch = a.charAt(pos);
+          if(ch == '-') {
+            // treat input as flag
+            dash = true;
+          } else if(ch != ' ') {
+            // ignore spaces
+            return true;
+          }
+          pos++;
+        }
+        // treat input as string
+        pos = 0;
+        dash = false;
+        return true;
+      } else if(pos < a.length()) {
+        // check next character
         return true;
       }
-      ++c;
+      arg++;
+      pos = 0;
     }
+    // all arguments have been parsed
     return false;
   }
 
   /**
-   * Checks if the current argument starts with a dash.
+   * Checks if the current argument starts with a dash
+   * (i.e., introduces any flags).
    * @return result of check
    */
   public boolean dash() {
@@ -68,45 +92,42 @@ public final class Args {
   }
 
   /**
-   * Returns the next character.
-   * @return next character
+   * Returns the next flag.
+   * @return next flag
    */
   public char next() {
-    return args.charAt(c++);
+    return arg < args.length && pos < args[arg].length() ?
+        args[arg].charAt(pos++) : 0;
   }
 
   /**
-   * Returns the next string.
+   * Returns the next string argument.
    * @return string
    */
   public String string() {
-    while(args.charAt(c) == ' ') if(++c == args.length()) return "";
-    final int i = args.indexOf(' ', c);
-    final String s = args.substring(c, i);
-    c = i;
-    return s.trim();
+    while(arg < args.length) {
+      final String a = args[arg++];
+      int p = pos;
+      pos = 0;
+      if(p == a.length()) continue;
+      final StringBuilder sb = new StringBuilder();
+      while(p < a.length()) sb.append(a.charAt(p++));
+      final String str = sb.toString();
+      return str.equals("-") ?
+          new Scanner(System.in).useDelimiter("\0").next() : str;
+    }
+    return "";
   }
 
   /**
-   * Returns the next positive number.
-   * @return number as int value
+   * Returns the next positive numeric argument.
+   * @return positive integer
    * @throws BaseXException database exception
    */
-  public int num() throws BaseXException {
+  public int number() throws BaseXException {
     final int i = Token.toInt(string());
     if(i < 0) usage();
     return i;
-  }
-
-  /**
-   * Returns the remaining string.
-   * @return remaining string
-   */
-  public String remaining() {
-    while(args.charAt(c) == ' ') if(++c == args.length()) return "";
-    final String s = args.substring(c);
-    c = args.length();
-    return s.trim();
   }
 
   /**
@@ -115,10 +136,13 @@ public final class Args {
    */
   public void usage() throws BaseXException {
     throw new BaseXException(header +
-        "Usage: " + Util.name(obj).toLowerCase() + usage);  }
+        "Usage: " + Util.name(obj).toLowerCase(Locale.ENGLISH) + usage);
+  }
 
   @Override
   public String toString() {
-    return args;
+    final StringBuilder sb = new StringBuilder();
+    for(final String s : args) sb.append(s).append(' ');
+    return sb.toString();
   }
 }

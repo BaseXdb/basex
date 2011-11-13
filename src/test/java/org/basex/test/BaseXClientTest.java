@@ -11,6 +11,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Text;
 import org.basex.io.out.ArrayOutput;
 import org.basex.util.Token;
+import org.basex.util.list.StringList;
 import org.junit.Test;
 
 /**
@@ -21,8 +22,8 @@ import org.junit.Test;
  */
 public final class BaseXClientTest extends BaseXTest {
   @Override
-  protected String run(final String args) throws IOException {
-    return run(args, "");
+  protected String run(final String... args) throws IOException {
+    return run(args, new String[0]);
   }
 
   /**
@@ -31,8 +32,7 @@ public final class BaseXClientTest extends BaseXTest {
    */
   @Test
   public void port() throws IOException {
-    equals("1", "-p9898 -q1", "-p9898");
-    equals("1", "-p55555 -q1", "-p55555");
+    equals("1", new String[] { "-p9898", "-q1" }, new String[] { "-p9898" });
   }
 
   /**
@@ -60,8 +60,8 @@ public final class BaseXClientTest extends BaseXTest {
   @Test
   public void user() throws IOException {
     run("-cexit", "-cdrop user " + NAME);
-    equals("5", "-U" + NAME + " -P" + NAME + " -q5",
-        "-ccreate user " + NAME + " " + Token.md5(NAME));
+    equals("5", new String[] { "-U" + NAME, "-P" + NAME, "-q5" },
+        new String[] {  "-ccreate user " + NAME + " " + Token.md5(NAME) });
     run("-cexit", "-cdrop user " + NAME);
   }
 
@@ -72,8 +72,8 @@ public final class BaseXClientTest extends BaseXTest {
    * @param sargs server arguments
    * @throws IOException I/O exception
    */
-  private void equals(final String exp, final String args,
-      final String sargs) throws IOException {
+  private void equals(final String exp, final String[] args,
+      final String[] sargs) throws IOException {
     assertEquals(exp, run(args, sargs));
   }
 
@@ -84,15 +84,19 @@ public final class BaseXClientTest extends BaseXTest {
    * @return result
    * @throws IOException I/O exception
    */
-  private String run(final String args, final String sargs) throws IOException {
+  private String run(final String[] args, final String[] sargs)
+      throws IOException {
+
     System.setOut(NULL);
     System.setErr(NULL);
-    final BaseXServer bxs = new BaseXServer("-p9999 -e9998 " + sargs);
+    StringList sl = new StringList().add("-p9999").add("-e9998").add(sargs);
+    final BaseXServer bxs = new BaseXServer(sl.toArray());
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));
     try {
-      new BaseXClient("-p9999 -U" + Text.ADMIN + " -P" + Text.ADMIN +
-          " " + args);
+      sl.reset();
+      sl.add("-p9999").add("-U" + Text.ADMIN).add("-P" + Text.ADMIN).add(args);
+      new BaseXClient(sl.toArray());
       return ao.toString();
     } finally {
       bxs.stop();

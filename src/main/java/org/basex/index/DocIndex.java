@@ -3,6 +3,7 @@ package org.basex.index;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -183,10 +184,10 @@ public final class DocIndex implements Index {
     final String np = MetaData.normPath(path);
     if(np == null) return tl;
 
-    final String exct = Prop.WIN ? np.toLowerCase() : np;
+    final String exct = Prop.WIN ? np.toLowerCase(Locale.ENGLISH) : np;
     final String pref = exct + '/';
     for(final String f : data.meta.binaries().descendants()) {
-      final String lc = Prop.WIN ? f.toLowerCase() : f;
+      final String lc = Prop.WIN ? f.toLowerCase(Locale.ENGLISH) : f;
       if(exct.isEmpty() || lc.equals(exct) || lc.startsWith(pref)) tl.add(f);
     }
     return tl.sort(!Prop.WIN);

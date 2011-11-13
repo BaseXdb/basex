@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.util.Locale;
+
 import org.basex.core.AProp;
 import org.basex.core.MainProp;
 import org.basex.core.Context;
@@ -35,7 +37,7 @@ public final class Set extends AGet {
 
   @Override
   protected boolean run() {
-    String key = args[0].toUpperCase();
+    String key = args[0].toUpperCase(Locale.ENGLISH);
     final String val = args[1];
 
     CmdSet s = null;

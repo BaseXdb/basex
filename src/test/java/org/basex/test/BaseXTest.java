@@ -42,11 +42,37 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void bind() throws IOException {
-    equals("1", "-ba=1 -q$a");
-    equals("2", "-ba=1 -bb=1 -q$a+$b");
-    equals("3", "-ba=1,b=2 -q$a+$b");
+    equals("1", "-ba=1", "-q$a");
+    equals("2", "-ba=1", "-bb=1", "-q$a+$b");
+    equals("3", "-ba=1", "-bb=2", "-q$a+$b");
     IN.write(token("$a"));
-    equals("4", "-ba=4 " + IN);
+    equals("4", "-ba=4", IN.toString());
+    equals("5,6;7'", "-ba=5,6;7'", "-q$a");
+    // bind quote (to be checked in client/server mode)
+    //equals("\"", "-ba=\"", "-q$a");
+    // bind variables with namespaces
+    equals("8", "-b{}a=8", "-q$a");
+    equals("9", "-b'':a=9", "-q$a");
+    equals("A", "-b{URI}a=A", "-qdeclare namespace a='URI'; $a:a");
+    equals("B", "-b'URI':a=B", "-qdeclare namespace a='URI'; $a:a");
+  }
+
+  /**
+   * Test variable bindings.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = BaseXException.class)
+  public void bindErr() throws IOException {
+    run("-ba=A", "-qdeclare variable $a as xs:integer external; $a");
+  }
+
+  /**
+   * Test variable bindings with namespaces.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = BaseXException.class)
+  public void bindNSErr() throws IOException {
+    run("X'\"", "-b{URI}ln=X'\"", IN.toString());
   }
 
   /**
@@ -58,17 +84,8 @@ public abstract class BaseXTest extends MainTest {
     final String in = "<a/>";
     final Context ctx = new Context();
     new CreateDB(NAME, in).execute(ctx);
-    equals(in, "-i" + NAME + " -q.");
+    equals(in, "-i" + NAME, "-q.");
     ctx.close();
-  }
-
-  /**
-   * Test variable bindings.
-   * @throws IOException I/O exception
-   */
-  @Test(expected = BaseXException.class)
-  public void bindErr() throws IOException {
-    run("-ba=A -qdeclare variable $a as xs:integer external; $a");
   }
 
   /**
@@ -113,7 +130,7 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void runs() throws IOException {
-    equals("2", "-r10 -q2");
+    equals("2", "-r10", "-q2");
   }
 
   /**
@@ -122,7 +139,7 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test(expected = BaseXException.class)
   public void runErr() throws IOException {
-    run("-rx -q2");
+    run("-rx", "-q2");
   }
 
   /**
@@ -131,7 +148,7 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void serial() throws IOException {
-    equals("1", "-smethod=text -q<a>1</a>");
+    equals("1", "-smethod=text", "-q<a>1</a>");
   }
 
   /**
@@ -140,8 +157,8 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void verbose() throws IOException {
-    contains(Text.QUERYEXEC.replaceAll(" %.*", ""), "-v -q1");
-    contains(Text.QUERYTOTAL, "-V -q1");
+    contains(Text.QUERYEXEC.replaceAll(" %.*", ""), "-v", "-q1");
+    contains(Text.QUERYTOTAL, "-V", "-q1");
   }
 
   /**
@@ -150,7 +167,7 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test(expected = BaseXException.class)
   public void serialErr() throws IOException {
-    run("-sm=x -q2");
+    run("-sm=x", "-q2");
   }
 
   /**
@@ -161,7 +178,7 @@ public abstract class BaseXTest extends MainTest {
   public void chop() throws IOException {
     final String in = "<a> X </a>";
     IN.write(token(in));
-    equals(in, "-w -i" + IN + " -q.");
+    equals(in, "-w", "-i" + IN, "-q.");
   }
 
   /**
@@ -170,6 +187,6 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void noSerialization() throws IOException {
-    equals("", "-z -q1");
+    equals("", "-z", "-q1");
   }
 }

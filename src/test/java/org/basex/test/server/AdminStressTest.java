@@ -31,7 +31,7 @@ public final class AdminStressTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z -p9999 -e9998");
+    server = new BaseXServer("-z", "-p9999", "-e9998");
   }
 
   /**

@@ -24,12 +24,12 @@ public final class BaseXStandaloneTest extends BaseXTest {
   @Test
   public void writeBack() throws IOException {
     IN.write(token("<a>X</a>"));
-    run("-i " + IN + " -u -qdelete node //text() ");
+    run("-i", IN.toString(), "-u", "-q", "delete node //text()");
     assertEquals("<a/>", string(IN.read()));
   }
 
   @Override
-  protected String run(final String args) throws IOException {
+  protected String run(final String... args) throws IOException {
     System.setErr(NULL);
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));

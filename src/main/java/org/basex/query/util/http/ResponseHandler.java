@@ -8,6 +8,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Locale;
 
 import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
@@ -435,7 +436,7 @@ public final class ResponseHandler {
    */
   private static byte[] extractBoundary(final String c, final InputInfo info)
       throws QueryException {
-    int index = c.toLowerCase().lastIndexOf("boundary=");
+    int index = c.toLowerCase(Locale.ENGLISH).lastIndexOf("boundary=");
     if(index == -1) REQINV.thrw(info, "No separation boundary specified");
     String b = c.substring(index + 9); // 9 for "boundary="
     if(b.charAt(0) == '"') {
@@ -455,7 +456,7 @@ public final class ResponseHandler {
     // content type is unknown
     if(c == null) return null;
     final String cs = "charset=";
-    final int i = c.toLowerCase().lastIndexOf(cs);
+    final int i = c.toLowerCase(Locale.ENGLISH).lastIndexOf(cs);
     return i == -1 ? null : c.substring(i + cs.length());
   }
 }

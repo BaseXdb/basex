@@ -4,10 +4,14 @@ import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -49,6 +53,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.XMLToken;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.hash.TokenMap;
@@ -199,21 +204,21 @@ public final class QueryContext extends Progress {
 
   /**
    * Parses the specified query.
-   * @param q input query
+   * @param qu input query
    * @throws QueryException query exception
    */
-  public void parse(final String q) throws QueryException {
-    root = new QueryParser(q, this).parse(base(), null);
-    query = q;
+  public void parse(final String qu) throws QueryException {
+    root = new QueryParser(qu, this).parse(base(), null);
+    query = qu;
   }
 
   /**
    * Parses the specified module.
-   * @param q input query
+   * @param qu input query
    * @throws QueryException query exception
    */
-  public void module(final String q) throws QueryException {
-    new QueryParser(q, this).parse(base(), Uri.EMPTY);
+  public void module(final String qu) throws QueryException {
+    new QueryParser(qu, this).parse(base(), Uri.EMPTY);
   }
 
   /**
@@ -345,15 +350,61 @@ public final class QueryContext extends Progress {
   /**
    * Binds an object to a global variable. If the object is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type.
-   * @param n name of variable
-   * @param o object to be bound
+   * appropriate XQuery type. If {@code "json"} is specified as data type,
+   * the value is interpreted according to the rules specified in
+   * {@link JsonMapConverter}.
+   * @param name name of variable
+   * @param val object to be bound
+   * @param type data type
    * @throws QueryException query exception
    */
-  public void bind(final String n, final Object o) throws QueryException {
-    final Expr ex = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
+  public void bind(final String name, final Object val, final String type)
+      throws QueryException {
+
+    Object obj = val;
+    if(type != null && !type.isEmpty()) {
+      if(type.equals(QueryText.JSONSTR)) {
+        obj = JsonMapConverter.parse(token(val.toString()), null);
+      } else {
+        final QNm nm = new QNm(token(type));
+        if(nm.ns()) nm.uri(ns.uri(nm.pref(), false, null));
+        final Type typ = Types.find(nm, true);
+        if(typ != null) obj = typ.e(obj, null);
+        else NOTYPE.thrw(null, nm);
+      }
+    }
+    bind(name, obj);
+  }
+
+  /**
+   * Binds an value to a global variable. If the value is an {@link Expr}
+   * instance, it is directly assigned. Otherwise, it is first cast to the
+   * appropriate XQuery type.
+   * @param name name of variable
+   * @param val value to be bound
+   * @throws QueryException query exception
+   */
+  public void bind(final String name, final Object val) throws QueryException {
+    final Expr ex = val instanceof Expr ? (Expr) val :
+      JavaFunc.type(val).e(val, null);
+
     // remove optional $ prefix
-    final QNm nm = new QNm(token(n.indexOf('$') == 0 ? n.substring(1) : n));
+    String loc = name.indexOf('$') == 0 ? name.substring(1) : name;
+    String uri = "";
+
+    // check for namespace declaration (clark notation or EQName)
+    final Pattern p = Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
+    final Matcher m = p.matcher(loc);
+    if(m.find()) {
+      uri = m.group(3);
+      if(uri == null) uri = m.group(5);
+      loc = m.group(6);
+    }
+    final byte[] ln = token(loc);
+    if(loc.isEmpty() || !XMLToken.isNCName(ln)) return;
+
+    // bind variable
+    final QNm nm = new QNm(ln, token(uri));
     ns.uri(nm);
     final Var gl = vars.global().get(nm);
     if(gl == null) {
@@ -368,32 +419,26 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Binds an object to a global variable. If the object is an {@link Expr}
-   * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type. If {@code "json"} is specified as data type,
-   * the value is interpreted according to the rules specified in
-   * {@link JsonMapConverter}.
-   * @param n name of variable
-   * @param o object to be bound
-   * @param t data type
+   * Declares a namespace.
+   * A namespace is undeclared if the {@code uri} is an empty string.
+   * The default element namespaces is set if the {@code prefix} is empty.
+   * @param prefix namespace prefix
+   * @param uri namespace uri
    * @throws QueryException query exception
    */
-  public void bind(final String n, final Object o, final String t)
+  public void namespace(final String prefix, final String uri)
       throws QueryException {
 
-    Object obj = o;
-    if(t != null && !t.isEmpty()) {
-      if(t.equals(QueryText.JSONSTR)) {
-        obj = JsonMapConverter.parse(token(o.toString()), null);
+    if(prefix.isEmpty()) {
+      nsElem = token(uri);
+    } else {
+      final QNm name = new QNm(token(prefix), token(uri));
+      if(!uri.isEmpty()) {
+        ns.add(name, null);
       } else {
-        final QNm type = new QNm(token(t));
-        if(type.ns()) type.uri(ns.uri(type.pref(), false, null));
-        final Type typ = Types.find(type, true);
-        if(typ != null) obj = typ.e(obj, null);
-        else NOTYPE.thrw(null, type);
+        ns.delete(name);
       }
     }
-    bind(n, obj);
   }
 
   /**
@@ -424,13 +469,13 @@ public final class QueryContext extends Progress {
 
   /**
    * Evaluates the specified expression and returns an iterator.
-   * @param e expression to be evaluated
+   * @param expr expression to be evaluated
    * @return iterator
    * @throws QueryException query exception
    */
-  public Value value(final Expr e) throws QueryException {
+  public Value value(final Expr expr) throws QueryException {
     checkStop();
-    return e.value(this);
+    return expr.value(this);
   }
 
   /**
@@ -444,11 +489,11 @@ public final class QueryContext extends Progress {
   /**
    * Creates a variable with a unique, non-clashing variable name.
    * @param ii input info
-   * @param t type
+   * @param type type
    * @return variable
    */
-  public Var uniqueVar(final InputInfo ii, final SeqType t) {
-    return Var.create(this, ii, new QNm(Token.token(varIDs)), t);
+  public Var uniqueVar(final InputInfo ii, final SeqType type) {
+    return Var.create(this, ii, new QNm(Token.token(varIDs)), type);
   }
 
   /**

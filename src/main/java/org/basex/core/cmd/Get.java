@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.Locale;
 
 import org.basex.core.User;
 
@@ -23,7 +24,7 @@ public final class Get extends AGet {
 
   @Override
   protected boolean run() throws IOException {
-    final String key = args[0].toUpperCase();
+    final String key = args[0].toUpperCase(Locale.ENGLISH);
     Object type = prop.get(key);
     if(type == null && !context.client()) type = mprop.get(key);
     if(type == null) return whichKey();

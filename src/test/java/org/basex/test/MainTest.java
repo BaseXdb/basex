@@ -30,7 +30,7 @@ public abstract class MainTest {
    * @return result
    * @throws IOException I/O exception
    */
-  protected abstract String run(final String args) throws IOException;
+  protected abstract String run(final String... args) throws IOException;
 
   /**
    * Runs a request and compares the result with the expected result.
@@ -38,7 +38,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected final void equals(final String exp, final String args)
+  protected final void equals(final String exp, final String... args)
       throws IOException {
     assertEquals(exp, run(args));
   }
@@ -50,7 +50,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected final void contains(final String exp, final String args)
+  protected final void contains(final String exp, final String... args)
       throws IOException {
 
     final String result = run(args);

@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.Locale;
+
 import org.basex.gui.GUIConstants;
 import org.basex.util.TokenBuilder;
 
@@ -98,7 +100,7 @@ final class BaseXTextRenderer extends BaseXBack {
   int find(final String s, final boolean b) {
     final int os = search == null ? 0 : search.length();
     final int ns = s.length();
-    search = ns != 0 ? s.toLowerCase() : null;
+    search = ns != 0 ? s.toLowerCase(Locale.ENGLISH) : null;
     return ns < os ? 0 : find(b, ns == os);
   }
 

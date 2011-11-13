@@ -159,8 +159,7 @@ public final class DialogInsert extends Dialog {
     final String in2 = string(input2.getText());
     switch(kind) {
       case Data.ATTR: case Data.PI:
-        result.add(in1);
-        result.add(in2);
+        result.add(in1).add(in2);
         break;
       case Data.ELEM:
         result.add(in1);

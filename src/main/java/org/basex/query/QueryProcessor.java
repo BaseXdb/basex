@@ -15,7 +15,6 @@ import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.JavaFunc;
-import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
@@ -137,48 +136,49 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Binds an object to a global variable. If the object is an {@link Expr}
+   * Binds a value to a global variable. If the value is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
    * appropriate XQuery type. If {@code "json"} is specified as data type,
    * the value is interpreted according to the rules specified in
    * {@link JsonMapConverter}.
-   * @param n name of variable
-   * @param o object to be bound
-   * @param t data type
+   * @param name name of variable
+   * @param value value to be bound
+   * @param type data type
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor bind(final String n, final Object o, final String t)
-      throws QueryException {
-    ctx.bind(n, o, t);
+  public QueryProcessor bind(final String name, final Object value,
+      final String type) throws QueryException {
+    ctx.bind(name, value, type);
     return this;
   }
 
   /**
-   * Binds an object to a global variable. If the object is an {@link Expr}
+   * Binds a value to a global variable. If the value is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
    * appropriate XQuery type.
-   * @param n name of variable
-   * @param o object to be bound
+   * @param name name of variable
+   * @param value value to be bound
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor bind(final String n, final Object o)
+  public QueryProcessor bind(final String name, final Object value)
       throws QueryException {
-    ctx.bind(n, o);
+    ctx.bind(name, value);
     return this;
   }
 
   /**
-   * Sets an object as context item. If the object is an {@link Expr}
+   * Sets a value as context item. If the value is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
    * appropriate XQuery type.
-   * @param o object to be bound
+   * @param value value to be bound
    * @return self reference
    * @throws QueryException query exception
    */
-  public QueryProcessor context(final Object o) throws QueryException {
-    ctx.initExpr = o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null);
+  public QueryProcessor context(final Object value) throws QueryException {
+    ctx.initExpr = value instanceof Expr ? (Expr) value :
+      JavaFunc.type(value).e(value, null);
     return this;
   }
 
@@ -193,17 +193,7 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor namespace(final String prefix, final String uri)
       throws QueryException {
-
-    if(prefix.isEmpty()) {
-      ctx.nsElem = token(uri);
-    } else {
-      final QNm name = new QNm(token(prefix), token(uri));
-      if(!uri.isEmpty()) {
-        ctx.ns.add(name, null);
-      } else {
-        ctx.ns.delete(name);
-      }
-    }
+    ctx.namespace(prefix, uri);
     return this;
   }
 

@@ -1,6 +1,9 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
+import java.util.Locale;
+
 import org.basex.core.Command;
 
 /**
@@ -24,7 +27,7 @@ abstract class AGet extends Command {
    * @return false
    */
   protected final boolean whichKey() {
-    final String key = args[0].toUpperCase();
+    final String key = args[0].toUpperCase(Locale.ENGLISH);
     final String sim = prop.similar(key);
     return sim != null ? error(SETSIMILAR, key, sim) : error(SETWHICH, key);
   }

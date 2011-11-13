@@ -1,6 +1,9 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
+import java.util.Locale;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -105,6 +108,7 @@ abstract class Set extends Arr {
 
   @Override
   public final String toString() {
-    return PAR1 + toString(" " + Util.name(this).toUpperCase() + " ") + PAR2;
+    return PAR1 + toString(" " +
+        Util.name(this).toUpperCase(Locale.ENGLISH) + " ") + PAR2;
   }
 }

@@ -92,8 +92,7 @@ public final class DialogParsing extends BaseXBack {
     final StringList parsers = new StringList();
     parsers.add(DataText.M_XML);
     if(HTMLParser.available()) parsers.add(DataText.M_HTML);
-    parsers.add(DataText.M_CSV);
-    parsers.add(DataText.M_TEXT);
+    parsers.add(DataText.M_CSV).add(DataText.M_TEXT);
 
     parser = new BaseXCombo(d, parsers.toArray());
     parser.setSelectedItem(prop.get(Prop.PARSER));

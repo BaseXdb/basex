@@ -68,8 +68,7 @@ public final class GUIInput extends BaseXTextField {
           } else {
             // store current input in history
             final String txt = getText();
-            final StringList sl = new StringList();
-            sl.add(txt);
+            final StringList sl = new StringList().add(txt);
 
             final GUIProp gprop = gui.gprop;
             final int i = main.context.data() == null ? 2 :

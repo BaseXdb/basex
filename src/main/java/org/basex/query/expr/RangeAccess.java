@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.Locale;
+
 import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.IndexIterator;
@@ -72,7 +74,7 @@ public final class RangeAccess extends Simple {
   @Override
   public String toString() {
     return new TokenBuilder(DB).add(':').
-      addExt(ind.type().toString().toLowerCase()).add("-range(").
+      addExt(ind.type().toString().toLowerCase(Locale.ENGLISH)).add("-range(").
       addExt(ind.min).add(SEP).addExt(ind.max).add(')').toString();
   }
 }

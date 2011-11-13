@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -123,7 +124,7 @@ public final class IOFile extends IO {
   @Override
   public boolean more() throws IOException {
     // process gzip files
-    if(path.toLowerCase().endsWith(GZSUFFIX)) {
+    if(path.toLowerCase(Locale.ENGLISH).endsWith(GZSUFFIX)) {
       if(is == null) {
         is = new GZIPInputStream(new FileInputStream(file));
       } else {
@@ -149,8 +150,8 @@ public final class IOFile extends IO {
         if(zip == null) break;
         len = zip.getSize();
         init(zip.getName());
-        if(path.toLowerCase().endsWith(XMLSUFFIX) && !zip.isDirectory())
-          return true;
+        if(path.toLowerCase(Locale.ENGLISH).endsWith(XMLSUFFIX) &&
+            !zip.isDirectory()) return true;
       }
       is.close();
       is = null;
@@ -179,7 +180,7 @@ public final class IOFile extends IO {
   private boolean isSuffix(final String[] suffixes) {
     final int i = path.lastIndexOf('.');
     if(i == -1) return false;
-    final String suf = path.substring(i).toLowerCase();
+    final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
     for(final String z : suffixes) if(suf.equals(z)) return true;
     return false;
   }
@@ -366,7 +367,7 @@ public final class IOFile extends IO {
       }
       if(!suf && sub) sb.append(".*");
     }
-    return Prop.WIN ? sb.toString().toLowerCase() : sb.toString();
+    return Prop.WIN ? sb.toString().toLowerCase(Locale.ENGLISH) : sb.toString();
   }
 
   /**

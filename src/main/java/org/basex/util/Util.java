@@ -348,11 +348,9 @@ public final class Util {
    * @param args command-line arguments
    */
   public static void start(final Class<?> clz, final String... args) {
-    final StringList sl = new StringList();
     final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
         "-cp", System.getProperty("java.class.path"), clz.getName(), "-D", };
-    for(final String a : largs) sl.add(a);
-    for(final String a : args) sl.add(a);
+    final StringList sl = new StringList().add(largs).add(args);
 
     try {
       new ProcessBuilder(sl.toArray()).start();

@@ -56,7 +56,7 @@ public final class Language implements Comparable<Language> {
   public static Language get(final String lang) {
     final int i = lang.indexOf('-');
     final String l = i == -1 ? lang : lang.substring(0, i);
-    Language ln = ALL.get(l.toLowerCase());
+    Language ln = ALL.get(l.toLowerCase(Locale.ENGLISH));
     if(ln == null) ln = DISP.get(lang);
     return ln;
   }

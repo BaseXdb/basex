@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.io.File;
+import java.util.Locale;
 
 import org.basex.util.Util;
 
@@ -28,7 +29,8 @@ public final class Prop extends AProp {
   public static final String TMP = System.getProperty("java.io.tmpdir") + '/';
 
   /** OS flag (should be ignored whenever possible). */
-  public static final String OS = System.getProperty("os.name").toUpperCase();
+  public static final String OS =
+      System.getProperty("os.name").toUpperCase(Locale.ENGLISH);
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.startsWith("MAC");
   /** Flag denoting if OS belongs to Windows family. */

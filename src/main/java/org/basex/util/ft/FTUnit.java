@@ -1,5 +1,7 @@
 package org.basex.util.ft;
 
+import java.util.Locale;
+
 /**
  * Full-text units.
  *
@@ -20,6 +22,6 @@ public enum FTUnit {
    */
   @Override
   public String toString() {
-    return name().toLowerCase();
+    return name().toLowerCase(Locale.ENGLISH);
   }
 }

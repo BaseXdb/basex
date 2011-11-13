@@ -10,7 +10,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Scanner;
 
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -213,13 +212,50 @@ public class QueryParser extends InputParser {
     ctx = c;
 
     // parse pre-defined external variables
-    final String bind = ctx.context.prop.get(Prop.BINDINGS);
-    if(bind.isEmpty()) return;
-    final Scanner sc = new Scanner(bind).useDelimiter(",");
-    while(sc.hasNext()) {
-      final String[] sp = sc.next().split("=", 2);
-      c.bind(sp[0], new Atm(token(sp.length > 1 ? sp[1] : "")));
+    final String bind = ctx.context.prop.get(Prop.BINDINGS).trim();
+    final StringBuilder key = new StringBuilder();
+    final StringBuilder val = new StringBuilder();
+    boolean first = true;
+    final int sl = bind.length();
+    for(int s = 0; s < sl; s++) {
+      final char ch = bind.charAt(s);
+      if(first) {
+        if(ch == '=') {
+          first = false;
+        } else {
+          key.append(ch);
+        }
+      } else {
+        if(ch == ',') {
+          if(s + 1 == sl || bind.charAt(s + 1) != ',') {
+            bind(key, val);
+            key.setLength(0);
+            val.setLength(0);
+            first = true;
+            continue;
+          }
+          // commas are escaped by a second comma
+          s++;
+        }
+        val.append(ch);
+      }
     }
+    bind(key, val);
+  }
+
+
+  /**
+   * Binds the specified variable.
+   * If a URI is specified, the query is treated as a module.
+   * @param key key
+   * @param val value
+   * @throws QueryException query exception
+   */
+  public final void bind(final StringBuilder key, final StringBuilder val)
+      throws QueryException {
+
+    final String k = key.toString().trim();
+    if(!k.isEmpty()) ctx.bind(k, new Atm(token(val.toString())));
   }
 
   /**

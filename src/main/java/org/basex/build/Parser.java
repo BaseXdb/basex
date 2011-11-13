@@ -1,6 +1,8 @@
 package org.basex.build;
 
 import java.io.IOException;
+import java.util.Locale;
+
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
 import org.basex.build.file.MAB2Parser;
@@ -120,7 +122,7 @@ public abstract class Parser extends Progress {
       final String target) throws IOException {
 
     // use file specific parser
-    final String parser = prop.get(Prop.PARSER).toLowerCase();
+    final String parser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH);
     if(parser.equals(DataText.M_HTML))
       return new HTMLParser(source, target, prop);
     if(parser.equals(DataText.M_TEXT))

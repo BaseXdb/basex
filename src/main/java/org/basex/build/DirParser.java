@@ -3,6 +3,7 @@ package org.basex.build;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.basex.core.Prop;
@@ -91,7 +92,8 @@ public final class DirParser extends TargetParser {
 
       // multiple archive files may be parsed in this loop
       while(io.more()) {
-        final String nm = Prop.WIN ? io.name().toLowerCase() : io.name();
+        final String nm = Prop.WIN ? io.name().toLowerCase(Locale.ENGLISH) :
+          io.name();
         if(filter != null && !filter.matcher(nm).matches()) continue;
         b.meta.filesize += src.length();
 
