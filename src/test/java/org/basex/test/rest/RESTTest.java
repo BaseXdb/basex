@@ -26,6 +26,7 @@ import org.basex.io.in.BufferInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.util.Base64;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,10 +71,12 @@ public class RESTTest {
    * @param local local flag
    * @throws Exception exception
    */
-  public static void init(final boolean local) throws Exception {
-    final String l = local ? "-l " : "";
-    http = new BaseXHTTP(l + " -p9996 -e9997 -h9998 -s9999 -zU" +
-        ADMIN + " -P" + ADMIN);
+  protected static void init(final boolean local) throws Exception {
+    final StringList sl = new StringList();
+    if(local) sl.add("-l");
+    sl.add(new String[] {"-p9996", "-e9997", "-h9998", "-s9999", "-z",
+        "-U" + ADMIN, "-P" + ADMIN });
+    http = new BaseXHTTP(sl.toArray());
   }
 
   /**

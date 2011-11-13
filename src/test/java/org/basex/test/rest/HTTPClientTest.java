@@ -56,6 +56,7 @@ import org.basex.query.util.http.Request.Part;
 import org.basex.query.util.http.RequestParser;
 import org.basex.query.util.http.ResponseHandler;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -109,9 +110,11 @@ public class HTTPClientTest {
    * @throws Exception exception
    */
   protected static void init(final boolean local) throws Exception {
-    final String l = local ? "-l " : "";
-    http = new BaseXHTTP(l + " -p9996 -e9997 -h9998 -s9999 -zU" +
-        ADMIN + " -P" + ADMIN);
+    final StringList sl = new StringList();
+    if(local) sl.add("-l");
+    sl.add(new String[] {"-p9996", "-e9997", "-h9998", "-s9999", "-z",
+        "-U" + ADMIN, "-P" + ADMIN });
+    http = new BaseXHTTP(sl.toArray());
   }
 
   /**

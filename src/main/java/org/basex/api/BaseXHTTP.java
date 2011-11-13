@@ -56,7 +56,7 @@ public final class BaseXHTTP {
    * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
-  public static void main(final String[] args) {
+  public static void main(final String... args) {
     try {
       new BaseXHTTP(args);
     } catch(final Exception ex) {
@@ -185,10 +185,10 @@ public final class BaseXHTTP {
             daemon = true;
             break;
           case 'e': // parse event port
-            ctx.mprop.set(MainProp.EVENTPORT, arg.num());
+            ctx.mprop.set(MainProp.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
-            ctx.mprop.set(MainProp.HTTPPORT, arg.num());
+            ctx.mprop.set(MainProp.HTTPPORT, arg.number());
             break;
           case 'l': // use local mode
             System.setProperty(DBMODE, LOCAL);
@@ -198,7 +198,7 @@ public final class BaseXHTTP {
             ctx.mprop.set(MainProp.HOST, arg.string());
             break;
           case 'p': // parse server port
-            ctx.mprop.set(MainProp.PORT, arg.num());
+            ctx.mprop.set(MainProp.PORT, arg.number());
             ctx.mprop.set(MainProp.SERVERPORT, ctx.mprop.num(MainProp.PORT));
             break;
           case 'R': // deactivate REST service
@@ -208,7 +208,7 @@ public final class BaseXHTTP {
             System.setProperty(DBPASS, arg.string());
             break;
           case 's': // parse stop port
-            ctx.mprop.set(MainProp.STOPPORT, arg.num());
+            ctx.mprop.set(MainProp.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;
@@ -226,11 +226,8 @@ public final class BaseXHTTP {
             arg.usage();
         }
       } else {
-        if(arg.string().equalsIgnoreCase("stop")) {
-          stopped = true;
-        } else {
-          arg.usage();
-        }
+        if(!arg.string().equalsIgnoreCase("stop")) arg.usage();
+        stopped = true;
       }
     }
 

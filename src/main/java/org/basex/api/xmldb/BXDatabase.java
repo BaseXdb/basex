@@ -2,6 +2,8 @@ package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
 
+import java.util.Locale;
+
 import org.basex.core.MainProp;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -52,7 +54,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
   @Override
   public String getProperty(final String key) {
     try {
-      final String prop = key.toUpperCase();
+      final String prop = key.toUpperCase(Locale.ENGLISH);
       return ((Object[]) Prop.class.getField(prop).get(null))[1].toString();
     } catch(final Exception ex) {
       return null;

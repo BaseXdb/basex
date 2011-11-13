@@ -9,7 +9,6 @@ import javax.xml.xquery.XQStaticContext;
 import org.basex.core.Context;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
 
 /**
@@ -61,9 +60,7 @@ final class BXQStaticContext implements XQStaticContext {
     try {
       BXQAbstract.valid(prefix, String.class);
       BXQAbstract.valid(uri, String.class);
-      final QNm name = new QNm(token(prefix), token(uri));
-      if(!uri.isEmpty()) ctx.ns.add(name, null);
-      else ctx.ns.delete(name);
+      ctx.namespace(prefix, uri);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
