@@ -7,7 +7,6 @@ import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV.Op;
-import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -64,9 +63,6 @@ public final class Pos extends Simple {
    */
   public static Expr get(final Op cmp, final Expr a, final Expr o,
       final InputInfo ii) throws QueryException {
-
-    // position() = last() -> last()
-    if(a.isFun(Function.LAST) && cmp == Op.EQ) return a;
 
     if(a.item()) {
       final Item it = (Item) a;

@@ -45,39 +45,48 @@ public abstract class Preds extends ParseExpr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(final Expr p : preds) checkUp(p, ctx);
 
-    Expr e = this;
     for(int p = 0; p < preds.length; ++p) {
       Expr pr = preds[p].comp(ctx).compEbv(ctx);
       pr = Pos.get(CmpV.Op.EQ, pr, pr, input);
 
+      // position() = last() -> last()
+      if(pr instanceof CmpG || pr instanceof CmpV) {
+        final Cmp cmp = (Cmp) pr;
+        if(cmp.expr[0].isFun(Function.POSITION) &&
+           cmp.expr[1].isFun(Function.LAST)) {
+          if(cmp instanceof CmpG && ((CmpG) cmp).op == CmpG.Op.EQ ||
+             cmp instanceof CmpV && ((CmpV) cmp).op == CmpV.Op.EQ) {
+            ctx.compInfo(OPTWRITE, pr);
+            pr = cmp.expr[1];
+          }
+        }
+      }
+
       if(pr.value()) {
         if(!pr.ebv(ctx, input).bool(input)) {
           ctx.compInfo(OPTREMOVE, desc(), pr);
-          e = Empty.SEQ;
-          break;
+          return Empty.SEQ;
         }
         ctx.compInfo(OPTREMOVE, desc(), pr);
         preds = Array.delete(preds, p--);
+      } else if(pr instanceof And && !pr.uses(Use.POS)) {
+        // replace AND expression with predicates (don't swap position tests)
+        ctx.compInfo(OPTPRED, pr.desc());
+        final Expr[] and = ((And) pr).expr;
+        final int m = and.length - 1;
+        final ObjList<Expr> tmp = new ObjList<Expr>(preds.length + m);
+        for(int i = 0; i < p; i++) tmp.add(preds[i]);
+        for(final Expr a : and) {
+          // wrap test with boolean() if the result is numeric
+          tmp.add(Function.BOOLEAN.get(input, a).compEbv(ctx));
+        }
+        for(int i = p + 1; i < preds.length; i++) tmp.add(preds[i]);
+        preds = tmp.toArray(new Expr[tmp.size()]);
       } else {
         preds[p] = pr;
-
-        // replace AND expression with predicates (don't swap position tests)
-        if(preds[p] instanceof And && !preds[p].uses(Use.POS)) {
-          ctx.compInfo(OPTPRED, preds[p].desc());
-          final Expr[] and = ((And) preds[p]).expr;
-          final int m = and.length - 1;
-          final ObjList<Expr> tmp = new ObjList<Expr>(preds.length + m);
-          for(int i = 0; i < p; i++) tmp.add(preds[i]);
-          for(final Expr a : and) {
-            // wrap test with boolean() if the result is numeric
-            tmp.add(Function.BOOLEAN.get(input, a).compEbv(ctx));
-          }
-          for(int i = p + 1; i < preds.length; i++) tmp.add(preds[i]);
-          preds = tmp.toArray(new Expr[tmp.size()]);
-        }
       }
     }
-    return e;
+    return this;
   }
 
   /**

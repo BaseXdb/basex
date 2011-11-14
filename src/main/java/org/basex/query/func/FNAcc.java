@@ -76,9 +76,7 @@ public final class FNAcc extends FuncCall {
 
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
-
     if(it.func()) FNATM.thrw(input, this);
-
     try {
       return it.type == AtomType.DBL ? it : AtomType.DBL.e(it, ctx, input);
     } catch(final QueryException ex) {
@@ -88,8 +86,8 @@ public final class FNAcc extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    final boolean pos = def == Function.POSITION || def == Function.LAST;
-    return u == Use.CTX && (expr.length == 0 || pos) ||
-      u == Use.POS && pos || super.uses(u);
+    return u == Use.CTX && expr.length == 0 ||
+        u == Use.POS && (def == Function.POSITION || def == Function.LAST) ||
+        super.uses(u);
   }
 }
