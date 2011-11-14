@@ -110,6 +110,12 @@ public final class FuncTest extends QueryTest {
         "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
       { "uri 2", str("U"), "string(<x a='{ " +
         "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
+
+      { "Last 1", itr(1), "1[last()]" },
+      { "Last 2", itr(2), "(1 to 2)[last()]" },
+      { "Last 3", itr(2), "(1 to 2)[position()=last()]" },
+      { "Last 4", itr(1, 2), "(1 to 2)[position()=1 or position()=last()]" },
+      { "Last 5", empty(), "(1 to 2)[position()=1 and position()=last()]" },
     };
   }
 
