@@ -5,10 +5,8 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -59,40 +57,40 @@ public final class Try extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
-    return new Iter() {
-      final int s = ctx.vars.size();
-      Iter it;
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    return value(ctx).iter();
+  }
 
-      @Override
-      public Item next() throws QueryException {
-        if(it == null && qe != null) it = err(ctx, qe);
-        try {
-          if(it == null) it = ctx.iter(expr);
-          return it.next();
-        } catch(final QueryException ex) {
-          ctx.vars.reset(s);
-          it = err(ctx, ex);
-        }
-        return it.next();
+  @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final int s = ctx.vars.size();
+    try {
+      // don't catch errors from error handlers
+      if(qe != null) return err(ctx, qe);
+      try {
+        return expr.value(ctx);
+      } catch(final QueryException ex) {
+        return err(ctx, ex);
       }
-    };
+    } finally {
+      // always reset the scope
+      ctx.vars.reset(s);
+    }
   }
 
   /**
-   * Handles an exception iterator.
+   * Handles an exception.
    * @param ctx query context
    * @param ex query exception
-   * @return result iterator
+   * @return result
    * @throws QueryException query exception
    */
-  ValueIter err(final QueryContext ctx, final QueryException ex)
+  private Value err(final QueryContext ctx, final QueryException ex)
       throws QueryException {
 
     for(final Catch c : ctch) {
       final Value val = c.value(ctx, ex);
-      // [LW] check strictness
-      if(val != null) return val.iter();
+      if(val != null) return val;
     }
     throw ex;
   }
