@@ -75,6 +75,8 @@ public final class SimpleTest extends QueryTest {
 
       { "SeqError 1", "()()" },
       { "SeqError 2", "() ()" },
+
+      { "ContextItem 1", node(0), "42[not(.)], ." },
     };
   }
 }
