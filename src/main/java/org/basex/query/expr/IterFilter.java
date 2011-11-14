@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 
 /**
@@ -32,12 +33,21 @@ final class IterFilter extends Filter {
         // first call - initialize iterator
         if(iter == null) iter = ctx.iter(root);
 
-        // loop through all items
-        while(true) {
-          ctx.checkStop();
-          final Item it = iter.next();
-          if(it == null) return null;
-          if(preds(it, ctx)) return it;
+        // cache context
+        final Value cv = ctx.value;
+        final long cp = ctx.pos;
+        final long cs = ctx.size;
+        try {
+          while(true) {
+            ctx.checkStop();
+            final Item it = iter.next();
+            if(it == null) return null;
+            if(preds(it, ctx)) return it;
+          }
+        } finally {
+          ctx.value = cv;
+          ctx.pos = cp;
+          ctx.size = cs;
         }
       }
     };
