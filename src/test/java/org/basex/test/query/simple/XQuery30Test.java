@@ -64,6 +64,8 @@ public final class XQuery30Test extends QueryTest {
       { "Concat 4", str("1true3"), "1 || true() || '3'" },
 
       { "Try/catch 1", str("X"), "try { 1+'a' } catch * { 'X' }" },
+      { "Try/catch 2", str("X"), "try { for $i in (42,0)" +
+          "return 1 idiv $i } catch * {'X'}" },
     };
   }
 }
