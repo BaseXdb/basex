@@ -2703,8 +2703,9 @@ public class QueryParser extends InputParser {
 
       final byte[] ln = test.ln();
       tp = Types.find(test, true);
-      if(tp == null && !eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE)
-          && !eq(ln, UNTYPED)) error(VARUNDEF, test);
+      if(tp == null && !eq(ln, AtomType.ATY.nam()) &&
+          !eq(ln, AtomType.AST.nam()) && !eq(ln, AtomType.UTY.nam()))
+        error(VARUNDEF, test);
       if(tp == AtomType.ATM || tp == AtomType.AAT) tp = null;
       nm = trim(substring(nm, 0, i));
     }

@@ -112,7 +112,7 @@ final class QueryListener extends Progress {
       int c = 0;
       for(Item it; (it = ir.next()) != null;) {
         if(iter && !wrap) {
-          po.write(1);
+          po.write(it.type.id());
           ser.reset();
         }
         ser.openResult();

@@ -15,11 +15,11 @@ import org.basex.io.out.ArrayOutput;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ClientQuery extends Query {
+public class ClientQuery extends Query {
   /** Client session. */
-  private final ClientSession cs;
+  protected final ClientSession cs;
   /** Query id. */
-  private final String id;
+  protected final String id;
 
   /**
    * Standard constructor.

@@ -25,6 +25,15 @@ public enum AtomType implements Type {
   /** Item type. */
   ITEM("item", null, EMPTY, false, false, false, false, false),
 
+  /** Any simple type. */
+  UTY("untyped", null, EMPTY, false, false, false, false, false),
+
+  /** Any simple type. */
+  ATY("anyType", null, EMPTY, false, false, false, false, false),
+
+  /** Any simple type. */
+  AST("anySimpleType", null, EMPTY, false, false, false, false, false),
+
   /** Any atomic type. */
   AAT("anyAtomicType", ITEM, XSURI, false, false, false, false, false) {
     @Override
@@ -227,6 +236,9 @@ public enum AtomType implements Type {
       return Dec.get(new BigDecimal(o.toString()));
     }
   },
+
+  /** Precision decimal type. */
+  PDC("precisionDecimal", null, EMPTY, false, false, false, false, false),
 
   /** Integer type. */
   ITR("integer", DEC, XSURI, true, false, false, false, false) {
@@ -461,6 +473,9 @@ public enum AtomType implements Type {
     }
   },
 
+  /** DateTimeStamp type. */
+  DTS("dateTimeStamp", null, EMPTY, false, false, false, false, false),
+
   /** Date type. */
   DAT("date", AAT, XSURI, false, false, false, false, true) {
     @Override
@@ -579,7 +594,7 @@ public enum AtomType implements Type {
   },
 
   /** Implementation specific: binary type. */
-  BIN("binary", AAT, XSURI, false, false, false, false, false),
+  BIN("binary", AAT, BASEXURI, false, false, false, false, false),
 
   /** Base64 binary type. */
   B64("base64Binary", BIN, XSURI, false, false, false, false, false) {
@@ -671,7 +686,7 @@ public enum AtomType implements Type {
   };
 
   /** String representation. */
-  public final byte[] nam;
+  private final byte[] nam;
   /** URI representation. */
   private final byte[] uri;
   /** Number flag. */
@@ -883,6 +898,11 @@ public enum AtomType implements Type {
       }
     }
     return null;
+  }
+
+  @Override
+  public int id() {
+    return ordinal() + 32;
   }
 
   @Override

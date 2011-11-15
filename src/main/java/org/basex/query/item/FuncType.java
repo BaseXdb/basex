@@ -172,6 +172,11 @@ public class FuncType implements Type {
   }
 
   @Override
+  public int id() {
+    return 7;
+  }
+
+  @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(FUNCTION).add('(');
     if(this == ANY_FUN) {

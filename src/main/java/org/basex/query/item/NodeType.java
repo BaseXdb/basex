@@ -83,8 +83,8 @@ public enum NodeType implements Type {
     }
   },
 
-  /** Document element type (required by XQJ API). */
-  DEL("document-node(...)", NOD),
+  /** Document element type. */
+  DEL("document-node(element())", NOD),
 
   /** Attribute type. */
   ATT("attribute", NOD) {
@@ -211,6 +211,11 @@ public enum NodeType implements Type {
       if(eq(ln, t.nam) && eq(uri, EMPTY)) return t;
     }
     return null;
+  }
+
+  @Override
+  public int id() {
+    return ordinal() + 8;
   }
 
   @Override

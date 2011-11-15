@@ -386,15 +386,6 @@ public interface QueryText {
   /** Parser Token. */
   String ASTERISK = "*";
 
-  // TYPES ====================================================================
-
-  /** AnyType. */
-  byte[] ANYTYPE = token("anyType");
-  /** AnySimpleType. */
-  byte[] ANYSIMPLE = token("anySimpleType");
-  /** Untyped. */
-  byte[] UNTYPED = token("untyped");
-
   // PREFIXES =================================================================
 
   /** Base token. */
@@ -424,6 +415,8 @@ public interface QueryText {
   byte[] MATH = token("math");
   /** Output token. */
   byte[] OUTPUT = token("output");
+  /** BaseX token. */
+  byte[] BASEX = token("basex");
   /** DB token. */
   byte[] DB = token("db");
   /** FT token. */
@@ -498,6 +491,8 @@ public interface QueryText {
   /** ZIP URI.*/
   byte[] ZIPURI = token(EXPATH + "/zip");
 
+  /** Database URI. */
+  byte[] BASEXURI = token(Text.URL);
   /** Database module URI. */
   byte[] DBURI = token(Text.URL + "/db");
   /** Full-text module URI. */

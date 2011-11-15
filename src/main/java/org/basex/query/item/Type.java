@@ -101,6 +101,12 @@ public interface Type {
    */
   byte[] nam();
 
+  /**
+   * Returns a type id to differentiate all types.
+   * @return id
+   */
+  int id();
+
   @Override
   String toString();
 }

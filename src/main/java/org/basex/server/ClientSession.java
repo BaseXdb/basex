@@ -40,7 +40,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ClientSession extends Session {
+public class ClientSession extends Session {
   /** Event notifications. */
   final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());

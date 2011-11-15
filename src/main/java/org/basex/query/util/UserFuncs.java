@@ -73,8 +73,8 @@ public final class UserFuncs extends ExprInfo {
       if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
         final Levenshtein ls = new Levenshtein();
         for(final AtomType t : AtomType.values()) {
-          if(t.par != null && ls.similar(lc(ln), lc(t.nam), 0))
-            qp.error(FUNSIMILAR, name.atom(), t.nam);
+          if(t.par != null && ls.similar(lc(ln), lc(t.nam()), 0))
+            qp.error(FUNSIMILAR, name.atom(), t.nam());
         }
         qp.error(FUNCUNKNOWN, name.atom());
       }

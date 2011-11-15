@@ -23,9 +23,9 @@ public abstract class Query {
   /** Client output stream. */
   protected OutputStream out;
   /** Cached results. */
-  private TokenList cache;
+  protected TokenList cache;
   /** Cache pointer. */
-  private int pos;
+  protected int pos;
 
   /**
    * Binds a value to an external variable.
@@ -52,7 +52,7 @@ public abstract class Query {
    * @return result of check
    * @throws IOException I/O exception
    */
-  public final boolean more() throws IOException {
+  public boolean more() throws IOException {
     if(cache == null) cache();
     return pos < cache.size();
   }
@@ -85,7 +85,7 @@ public abstract class Query {
   protected void cache(final InputStream is) throws IOException {
     cache = new TokenList();
     final ByteList bl = new ByteList();
-    while(is.read() == 1) {
+    while(is.read() > 0) {
       final DecodingInput di = new DecodingInput(is);
       for(int b; (b = di.read()) != -1;) bl.add(b);
       cache.add(bl.toArray());
