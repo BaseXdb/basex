@@ -138,7 +138,7 @@ class Query
     if @cache.length == 0
       @session.write(4.chr)
       @session.send(@id)
-      while @session.read == 1.chr
+      while @session.read > 0.chr
         @cache << @session.receive
       end
       if !@session.ok

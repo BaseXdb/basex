@@ -292,7 +292,7 @@ namespace BaseXClient
     {
       Exec(3, id + '\0' + name + '\0' + value + '\0');
     }
-	
+
     /** see readme.txt */
     public bool More()
     {
@@ -301,18 +301,18 @@ namespace BaseXClient
         session.stream.WriteByte(4);
         session.Send(id);
         cache = new ArrayList();
-        while (session.Read() == 1)
+        while (session.Read() > 0)
         {
           cache.Add(session.Receive());
         }
         if(!session.Ok())
         {
           throw new IOException(session.Receive());
-        }		
+        }
       }
       return pos < cache.Count;
     }
-	
+
     /** see readme.txt */
     public string Next()
     {
@@ -322,7 +322,7 @@ namespace BaseXClient
       }
       else
       {
-      	return null;		
+        return null;
       }
     }
 
@@ -356,7 +356,7 @@ namespace BaseXClient
       session.stream.WriteByte(cmd);
       session.Send(arg);
       string s = session.Receive();
-	  bool ok = session.Ok();
+    bool ok = session.Ok();
       if(!ok)
       {
         throw new IOException(session.Receive());
