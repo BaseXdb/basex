@@ -253,11 +253,13 @@ public abstract class Serializer {
           final byte[] key = pref(name);
           byte[] val = data.ns.uri(data.uri(p, k));
           if(val == null) val = EMPTY;
-          if(key.length != 0) {
-            if(ns.get(key) == -1) namespace(key, val);
-          } else if(!eq(val, empty)) {
-            namespace(key, val);
-            empty = val;
+          if(ns.get(key) == -1) {
+            if(key.length != 0) {
+              namespace(key, val);
+            } else if(!eq(val, empty)) {
+              namespace(key, val);
+              empty = val;
+            }
           }
         } else if(l == 0 && ns(EMPTY) != EMPTY) {
           namespace(EMPTY, EMPTY);

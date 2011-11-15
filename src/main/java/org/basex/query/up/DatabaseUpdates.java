@@ -114,19 +114,22 @@ final class DatabaseUpdates {
   }
 
   /**
-   * Checks nodes for duplicate attributes and namespace conflicts.
+   * Checks nodes for namespace conflicts and duplicate attributes.
    * @param pres pre values of nodes to check (in descending order)
    * @throws QueryException query exception
    */
   private void checkNames(final int... pres) throws QueryException {
+    // check for namespace conflicts
     final NamePool pool = new NamePool();
-    final IntList il = new IntList();
-
     for(final int pre : pres) {
       final NodeUpdates ups = updatePrimitives.get(pre);
-      if(ups != null)
-        for(final UpdatePrimitive up : ups.prim) up.update(pool);
+      if(ups != null) for(final UpdatePrimitive up : ups.prim) up.update(pool);
+    }
+    if(!pool.nsOK()) UPNSCONFL2.thrw(null);
 
+    // check for duplicate attributes
+    final IntList il = new IntList();
+    for(final int pre : pres) {
       // pre values consist exclusively of element and attribute nodes
       if(data.kind(pre) == Data.ATTR) {
         il.add(pre);
@@ -143,13 +146,8 @@ final class DatabaseUpdates {
         }
       }
     }
-
-    // find duplicate attributes
     final QNm dup = pool.duplicate();
     if(dup != null) UPATTDUPL.thrw(null, dup);
-
-    // find namespace conflicts
-    if(!pool.nsOK()) UPNSCONFL2.thrw(null);
   }
 
   /**

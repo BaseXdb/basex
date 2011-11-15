@@ -4,13 +4,14 @@ import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import org.basex.core.BaseXException;
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
+import org.basex.query.up.primitives.RenameNode;
+import org.basex.query.util.Err;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -22,11 +23,9 @@ import org.junit.Test;
  * @author BaseX Team 2005-11, BSD License
  * @author Lukas Kircher
  */
-public final class NamespaceTest {
+public final class NamespaceTest extends AdvancedQueryTest {
   /** Default database name. */
   private static final String DB = Util.name(NamespaceTest.class);
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
 
   /** Test documents. */
   private static String[][] docs = {
@@ -473,6 +472,80 @@ public final class NamespaceTest {
         "insert node <b ns:id='0'/> into /n/a",
         "");
     assertEquals(1, CONTEXT.data().ns.numberNSNodes());
+  }
+
+  /**
+   * Checks namespace declarations.
+   */
+  @Test
+  public void renameNSCheck1() {
+    query(
+        "copy $copy := <a/> " +
+        "modify rename node $copy as QName('uri', 'e') " +
+        "return $copy",
+        "<e xmlns=\"uri\"/>");
+  }
+
+  /**
+   * Checks namespace declarations.
+   */
+  @Test
+  public void renameNSCheck2() {
+    query(
+      "copy $n := <a><b/></a> " +
+      "modify rename node $n/b as QName('uri', 'e') " +
+      "return $n/*:e",
+      "<e xmlns=\"uri\"/>");
+  }
+
+  /**
+   * Checks namespace declarations.
+   */
+  @Test
+  public void renameNSCheck3() {
+    query(
+      "copy $n := <a c='d'/> " +
+      "modify rename node $n as QName('uri', 'e') " +
+      "return $n",
+      "<e xmlns=\"uri\" c=\"d\"/>");
+  }
+
+  /**
+   * Checks namespace declarations.
+   */
+  @Test
+  public void renameNSCheck4() {
+    query(
+      "copy $a := <a a='v'/> " +
+      "modify rename node $a/@a as QName('uri', 'p:a') " +
+      "return $a",
+      "<a xmlns:p='uri' p:a='v'/>");
+  }
+
+  /**
+   * Checks namespace declarations.
+   */
+  @Test
+  public void renameNSCheck5() {
+    error(
+      "copy $a := <a xmlns:p='A' a='v'/> " +
+      "modify rename node $a/@a as QName('uri', 'p:a') " +
+      "return $a",
+      Err.UPNSCONFL);
+  }
+
+  /**
+   * Checks namespace declarations.
+   * Note: xmlns='' is being erroneously added. Might have to to with
+   * Data.update(); see {@link RenameNode#apply()}.
+   */
+  @Test
+  public void renameDuplNSCheck() {
+    query(
+      "copy $a := <a a='v'/> " +
+      "modify rename node $a/@a as fn:QName('uri', 'a') " +
+      "return $a",
+      "<a xmlns=\"uri\" a=\"v\"/>");
   }
 
   /**

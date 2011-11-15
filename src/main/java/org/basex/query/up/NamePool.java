@@ -25,7 +25,7 @@ public final class NamePool {
   private int size;
 
   /**
-   * Adds an entry to the pool.
+   * Adds an entry to the pool and increases its number of occurrence.
    * @param name name
    * @param type node type
    */
@@ -36,7 +36,7 @@ public final class NamePool {
   }
 
   /**
-   * Removes an entry from the pool.
+   * Adds an entry to the pool and decreases its number of occurrence.
    * @param node node
    */
   public void remove(final ANode node) {
@@ -69,6 +69,8 @@ public final class NamePool {
       if(ai == -1) at.add(pref, uri);
       // check if only one uri is assigned to a prefix
       else if(!eq(uri, at.val[ai])) return false;
+      // [CG] check
+      //else if(uri.length != 0 && !eq(uri, at.val[ai])) return false;
     }
     return true;
   }

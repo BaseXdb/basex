@@ -61,16 +61,33 @@ public final class Rename extends Update {
       throw UPWRTRGTYP.thrw(input);
     }
 
-    // check namespace conflicts...
     final QNm rename = ex.item(ctx, input).qname();
     final ANode targ = (ANode) i;
-    final ANode test = i.type == NodeType.ELM ? targ :
-      i.type == NodeType.ATT ? targ.parent() : null;
 
-    if(test != null) {
-      final byte[] uri = test.uri(rename.pref(), ctx);
-      if(uri != null && !eq(rename.uri().atom(), uri)) UPNSCONFL.thrw(input);
+    // check namespace conflicts...
+    // Util.outln("%: % / %", n, at.key[n], renPref);
+    // Attribute: targ.qname().pref().length != 0  ??
+    if(targ.type == NodeType.ELM || targ.type == NodeType.ATT) {
+      final byte[] renPref = rename.pref();
+      final byte[] renURI = rename.uri().atom();
+      final Atts at = targ.nsScope();
+      for(int n = 0; n < at.size; ++n) {
+        if(eq(at.key[n], renPref)) {
+          if(!eq(at.val[n], renURI)) UPNSCONFL.thrw(input);
+        }
+      }
     }
+
+  /*
+  if(test != null) {
+      final byte[] uri = test.uri(rename.pref(), ctx);
+      Util.outln("RENAME: %/%", rename.pref(), rename.uri());
+      Util.outln("TARGET: %/%", test.qname().pref(), uri);
+      if(uri != null &&
+          eq(rename.pref(), test.qname().pref()) &&
+          !eq(rename.uri().atom(), uri)) UPNSCONFL.thrw(input);
+    }*/
+
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
     ctx.updates.add(new RenameNode(dbn.pre, dbn.data, input, rename), ctx);
     return null;

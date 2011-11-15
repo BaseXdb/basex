@@ -162,7 +162,7 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the uri for the specified prefix.
+   * Recursively finds the uri for the specified prefix.
    * @param pref prefix
    * @param ctx query context
    * @return uri
