@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * (C) BaseX Team 2005-11, BSD License
  */
-public final class BaseXClient {
+public class BaseXClient {
   /** UTF-8 charset. */
   static final Charset UTF8 = Charset.forName("UTF-8");
   /** Event notifications. */
@@ -337,7 +337,7 @@ public final class BaseXClient {
   /**
    * Inner class for iterative query execution.
    */
-  public final class Query {
+  public class Query {
     /** Query id. */
     private final String id;
     /** Cached results. */
@@ -376,7 +376,7 @@ public final class BaseXClient {
         send(id);
         cache = new ArrayList<byte[]>();
         final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        while(in.read() == 1) {
+        while(in.read() > 0) {
           receive(in, os);
           cache.add(os.toByteArray());
           os.reset();
