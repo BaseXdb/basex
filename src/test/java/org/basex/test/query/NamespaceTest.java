@@ -549,6 +549,32 @@ public final class NamespaceTest extends AdvancedQueryTest {
   }
 
   /**
+   * Checks namespace declarations.
+   */
+  @Test
+  public void renameRemoveNS1() {
+    error(
+      "copy $a := <a xmlns='A'><b xmlns='B'/></a> " +
+      "modify for $el in $a/descendant-or-self::element() return " +
+      "rename node $el as QName('',local-name($el)) " +
+      "return $a",
+      Err.UPNSCONFL);
+  }
+
+  /**
+   * Checks namespace declarations.
+   */
+  @Test
+  public void renameRemoveNS2() {
+    query(
+      "copy $a := <a:a xmlns:a='A'><b:a xmlns:b='B'/></a:a> " +
+      "modify for $el in $a/descendant-or-self::element() return " +
+      "rename node $el as QName('',local-name($el)) " +
+      "return $a",
+      "<a xmlns:a='A'><a xmlns:b='B'/></a>");
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */
