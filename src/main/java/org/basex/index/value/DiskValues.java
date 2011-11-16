@@ -210,7 +210,7 @@ public final class DiskValues implements Index {
    * @param key token to be found
    * @return id offset
    */
-  private synchronized long get(final byte[] key) {
+  private long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
       final int m = l + h >>> 1;
