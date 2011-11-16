@@ -59,4 +59,9 @@ public final class DBStore extends UpdatePrimitive {
       }
     }
   }
+
+  @Override
+  public int size() {
+    return map.size();
+  }
 }

@@ -97,4 +97,9 @@ public abstract class NodeCopy extends StructuralUpdate {
     }
     return s;
   }
+
+  @Override
+  public int size() {
+    return insert.size();
+  }
 }

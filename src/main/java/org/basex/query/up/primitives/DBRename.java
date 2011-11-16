@@ -52,4 +52,9 @@ public final class DBRename extends UpdatePrimitive {
         UPDBRENAMEERR.thrw(input, src);
     }
   }
+
+  @Override
+  public int size() {
+    return map.size();
+  }
 }

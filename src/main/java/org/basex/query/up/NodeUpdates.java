@@ -41,7 +41,7 @@ import org.basex.util.list.ObjList;
  * @author Lukas Kircher
  */
 final class NodeUpdates {
-  /** Container for update primitives. In most cases there will only be a sinlge
+  /** Container for update primitives. In most cases there will only be a single
    * update operation per target node, hence it's convenient to initialize this
    * container with a size of one. */
   UpdatePrimitive[] prim = new UpdatePrimitive[1];

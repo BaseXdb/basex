@@ -70,4 +70,10 @@ public abstract class UpdatePrimitive implements Comparable<UpdatePrimitive> {
    */
   @SuppressWarnings("unused")
   public void update(final NamePool pool) { }
+
+  /**
+   * Returns the total number of node operations.
+   * @return number of updates
+   */
+  public abstract int size();
 }

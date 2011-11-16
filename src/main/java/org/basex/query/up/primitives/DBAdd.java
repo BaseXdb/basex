@@ -87,7 +87,7 @@ public final class DBAdd extends InsertBase {
   }
 
   /**
-   * Create a {@link Data} instance for the specified document.
+   * Creates a {@link Data} instance for the specified document.
    * @param doc item representing document(s)
    * @param pth target path
    * @return {@link Data} instance from the parsed document(s)
@@ -144,6 +144,11 @@ public final class DBAdd extends InsertBase {
       throw STRNODTYPE.thrw(input, this, doc.type);
     }
     return mdata;
+  }
+
+  @Override
+  public int size() {
+    return docs.size();
   }
 
   @Override

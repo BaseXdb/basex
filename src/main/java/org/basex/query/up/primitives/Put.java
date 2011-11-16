@@ -81,6 +81,11 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
+  public int size() {
+    return uri.length;
+  }
+
+  @Override
   public String toString() {
     return Util.name(this) + "[" + targetNode() + ", " + uri[0] + "]";
   }

@@ -49,4 +49,9 @@ public final class DBOptimize extends UpdatePrimitive {
       DBERR.thrw(input, ex);
     }
   }
+
+  @Override
+  public int size() {
+    return 1;
+  }
 }

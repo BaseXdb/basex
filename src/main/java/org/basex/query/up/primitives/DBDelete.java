@@ -40,4 +40,9 @@ public final class DBDelete extends UpdatePrimitive {
     final byte[] key = Delete.delete(data,  keys);
     if(key != null) UPDBDELERR.thrw(input, key);
   }
+
+  @Override
+  public int size() {
+    return keys.size();
+  }
 }

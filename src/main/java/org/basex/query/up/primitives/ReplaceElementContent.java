@@ -50,8 +50,7 @@ public final class ReplaceElementContent extends StructuralUpdate {
     shifts = data.size(pre, kind) - data.attSize(pre, kind) - 1 +
       value.length == 0 ? 0 : 1;
 
-    if(pre + data.size(pre, kind) == loc + 1 &&
-        data.kind(loc) == Data.TEXT) {
+    if(pre + data.size(pre, kind) == loc + 1 && data.kind(loc) == Data.TEXT) {
       // overwrite existing text node
       data.update(loc, Data.TEXT, value);
     } else {
@@ -73,6 +72,11 @@ public final class ReplaceElementContent extends StructuralUpdate {
   @Override
   public boolean adjacentTexts(final int c) {
     return false;
+  }
+
+  @Override
+  public int size() {
+    return 1;
   }
 
   @Override

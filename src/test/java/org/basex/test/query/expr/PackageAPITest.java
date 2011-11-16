@@ -43,6 +43,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void setUpBeforeClass() {
     ctx = new Context();
     ctx.repo.init(REPO);
+    new IOFile(REPO, "jarPkg-1.0.0").delete();
   }
 
   /** Tests repository initialization. */
@@ -241,26 +242,27 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void installJar() throws BaseXException, QueryException {
     // install package
     new RepoInstall(REPO + "testJar.xar", null).execute(ctx);
-    final String dirName = normalize("jarPkg-1.0.0");
+
     // ensure package was properly installed
-    assertTrue(dir(dirName));
-    assertTrue(file(dirName + "/expath-pkg.xml"));
-    assertTrue(file(dirName + "/basex.xml"));
-    assertTrue(dir(dirName + "/jar"));
-    assertTrue(file(dirName + "/jar/test.jar"));
-    assertTrue(file(dirName + "/jar/wrapper.xq"));
+    final String dir = normalize("jarPkg-1.0.0");
+    assertTrue(dir(dir));
+    assertTrue(file(dir + "/expath-pkg.xml"));
+    assertTrue(file(dir + "/basex.xml"));
+    assertTrue(dir(dir + "/jar"));
+    assertTrue(file(dir + "/jar/test.jar"));
+    assertTrue(file(dir + "/jar/wrapper.xq"));
 
     // use package
-    final QueryProcessor qp1 = new QueryProcessor(
-        "import module namespace j='jar';\nj:print('test')", ctx);
-    assertEquals(qp1.execute().toString(), "test");
-    qp1.execute();
+    final QueryProcessor qp = new QueryProcessor(
+        "import module namespace j='jar'; j:print('test')", ctx);
+    assertEquals(qp.execute().toString(), "test");
+    qp.execute();
 
     // Close jar loader
     Reflect.jarLoader.close();
 
     // Delete package
-    new IOFile(REPO, dirName).delete();
+    new IOFile(REPO, dir).delete();
   }
 
   /**
@@ -271,13 +273,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void importPkg() throws QueryException {
     // try with a package without dependencies
     final QueryProcessor qp1 = new QueryProcessor(
-        "import module namespace ns3='ns3';\nns3:test()", ctx);
+        "import module namespace ns3='ns3'; ns3:test()", ctx);
     assertEquals(qp1.execute().toString(), "pkg2mod2");
     qp1.execute();
 
     // try with a package with dependencies
     final QueryProcessor qp2 = new QueryProcessor(
-        "import module namespace ns2='ns2';\nns2:test()", ctx);
+        "import module namespace ns2='ns2'; ns2:test()", ctx);
     assertEquals(qp2.execute().toString(), "pkg2mod2");
     qp2.execute();
   }

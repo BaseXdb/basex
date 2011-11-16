@@ -479,36 +479,38 @@ public interface QueryText {
   byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
 
   /** EXPath URI. */
-  String EXPATH = "http://expath.org/ns";
+  String EXPATH = "http://expath.org/ns/";
   /** Cryptographic module URI. */
-  byte[] CRYPTOURI = token(EXPATH + "/crypto");
+  byte[] CRYPTOURI = token(EXPATH + "crypto");
   /** File module URI. */
-  byte[] FILEURI = token(EXPATH + "/file");
+  byte[] FILEURI = token(EXPATH + "file");
   /** HTTP Client URI. */
-  byte[] HTTPURI = token(EXPATH + "/http-client");
+  byte[] HTTPURI = token(EXPATH + "http-client");
   /** Package API URI. */
-  byte[] PKGURI = token(EXPATH + "/pkg");
+  byte[] PKGURI = token(EXPATH + "pkg");
   /** ZIP URI.*/
-  byte[] ZIPURI = token(EXPATH + "/zip");
+  byte[] ZIPURI = token(EXPATH + "zip");
 
   /** Database URI. */
   byte[] BASEXURI = token(Text.URL);
+  /** EXPath URI. */
+  String BXMODULES = Text.URL + "/modules/";
   /** Database module URI. */
-  byte[] DBURI = token(Text.URL + "/db");
+  byte[] DBURI = token(BXMODULES + "db");
   /** Full-text module URI. */
-  byte[] FTURI = token(Text.URL + "/ft");
+  byte[] FTURI = token(BXMODULES + "ft");
   /** Higher-order URI. */
-  byte[] HOFURI = token(Text.URL + "/hof");
+  byte[] HOFURI = token(BXMODULES + "hof");
   /** JSON URI. */
-  byte[] JSONURI = token(Text.URL + "/json");
+  byte[] JSONURI = token(BXMODULES + "json");
   /** Utility module URI. */
-  byte[] UTILURI = token(Text.URL + "/util");
+  byte[] UTILURI = token(BXMODULES + "util");
   /** XSLT module URI. */
-  byte[] XSLTURI = token(Text.URL + "/xslt");
-  /** Package URI. */
-  byte[] PACKURI = token(Text.URL + "/pkg");
+  byte[] XSLTURI = token(BXMODULES + "xslt");
   /** SQL Module URI. */
-  byte[] SQLURI = token(Text.URL + "/sql");
+  byte[] SQLURI = token(BXMODULES + "sql");
+  /** Package URI. */
+  byte[] PACKURI = token(BXMODULES + "pkg");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");

@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.util;
 
 import org.basex.util.Version;
 

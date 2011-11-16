@@ -247,4 +247,18 @@ final class DatabaseUpdates {
     final int p = data.parent(n, data.kind(n));
     return p != -1 && ancestorDeleted(p);
   }
+
+  /**
+   * Returns the number of performed updates.
+   * @return number of updates
+   */
+  int size() {
+    int s = 0;
+    for(int i = nodes.size() - 1; i >= 0; i--) {
+      for(final UpdatePrimitive up : updatePrimitives.get(nodes.get(i)).prim) {
+        s += up.size();
+      }
+    }
+    return s;
+  }
 }

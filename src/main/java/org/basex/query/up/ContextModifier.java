@@ -59,12 +59,12 @@ public abstract class ContextModifier {
   }
 
   /**
-   * Returns the total number of node updates.
+   * Returns the total number of update operations.
    * @return number of updates
    */
   final int size() {
     int s = 0;
-    for(final DatabaseUpdates c : pendingUpdates.values()) s += c.nodes.size();
+    for(final DatabaseUpdates c : pendingUpdates.values()) s += c.size();
     return s;
   }
 }
