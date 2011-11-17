@@ -2157,7 +2157,7 @@ public class QueryParser extends InputParser {
         Expr arg = null;
         if(!wsConsume(PLHOLDER) && (arg = single()) == null) error(FUNCMISS,
             name);
-        args = add(args, arg);
+        args = Array.add(args, arg);
       } while(wsConsume(COMMA));
       if(!wsConsume(PAR2)) error(FUNCMISS, name);
     }
