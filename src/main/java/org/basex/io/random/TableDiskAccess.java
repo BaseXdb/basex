@@ -89,8 +89,16 @@ public final class TableDiskAccess extends TableAccess {
     final DataOutput out = new DataOutput(meta.dbfile(pref + 'i'));
     out.writeNum(allBlocks);
     out.writeNum(blocks);
-    out.writeNums(fpres);
-    out.writeNums(pages);
+
+    // due to legacy issues, allBlocks is written several times
+    out.writeNum(allBlocks);
+    for(int a = 0; a < allBlocks; a++) out.writeNum(fpres[a]);
+    out.writeNum(allBlocks);
+    for(int a = 0; a < allBlocks; a++) out.writeNum(pages[a]);
+
+    //out.writeNums(fpres);
+    //out.writeNums(pages);
+
     out.writeLongs(pagemap.toArray());
     out.close();
     dirty = false;
@@ -334,13 +342,14 @@ public final class TableDiskAccess extends TableAccess {
       }
     }
 
-    // number of new blocks (number of needed block - number of empty blocks)
-    final int newBlocks = neededBlocks - (allBlocks - blocks);
-
-    // extend fpres and pages, if new blocks will be allocated
-    if(newBlocks > 0) {
-      fpres = Arrays.copyOf(fpres, fpres.length + newBlocks);
-      pages = Arrays.copyOf(pages, pages.length + newBlocks);
+    // number of expected blocks:
+    //   existing blocks + needed block - empty blocks
+    final int expBlocks = allBlocks + neededBlocks - (allBlocks - blocks);
+    if(expBlocks > fpres.length) {
+      // resize directory arrays if existing ones are too small
+      final int ns = Math.max(fpres.length << 1, expBlocks);
+      fpres = Arrays.copyOf(fpres, ns);
+      pages = Arrays.copyOf(pages, ns);
     }
 
     // make place for the blocks where the new entries will be written
