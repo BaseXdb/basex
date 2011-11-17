@@ -1198,7 +1198,7 @@ public class QueryParser extends InputParser {
     }
     if(e.empty()) return order;
     final OrderBy ord = new OrderByExpr(input(), e, desc, least);
-    return order == null ? new OrderBy[] { ord} : Array.add(order, ord);
+    return order == null ? new OrderBy[] { ord } : Array.add(order, ord);
   }
 
   /**
@@ -1959,9 +1959,9 @@ public class QueryParser extends InputParser {
 
     if(!wsConsume(BRACE2)) {
       do {
-        args = Array.add(args, check(single(), INVMAPKEY));
+        args = add(args, check(single(), INVMAPKEY));
         wsCheck(ASSIGN);
-        args = Array.add(args, check(single(), INVMAPVAL));
+        args = add(args, check(single(), INVMAPVAL));
       } while(wsConsume(COMMA));
       wsCheck(BRACE2);
     }
@@ -2157,7 +2157,7 @@ public class QueryParser extends InputParser {
         Expr arg = null;
         if(!wsConsume(PLHOLDER) && (arg = single()) == null) error(FUNCMISS,
             name);
-        args = Array.add(args, arg);
+        args = add(args, arg);
       } while(wsConsume(COMMA));
       if(!wsConsume(PAR2)) error(FUNCMISS, name);
     }
