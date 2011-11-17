@@ -90,13 +90,6 @@ final class NSNode {
    */
   void add(final int p, final int u) {
     final int s = vals.length;
-    // check if same values have been added before to avoid duplicate entries
-    int i = 0;
-    while(i < s) {
-      if(vals[i++] == p && vals[i] == u) return;
-      i++;
-    }
-
     vals = Arrays.copyOf(vals, s + 2);
     vals[s] = p;
     vals[s + 1] = u;
