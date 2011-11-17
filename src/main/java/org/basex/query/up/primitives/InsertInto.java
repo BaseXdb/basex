@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import org.basex.data.Data;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Insert into and insert into as last primitive.
@@ -54,10 +53,5 @@ public final class InsertInto extends InsertBase {
     }
 
     return merged;
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }
