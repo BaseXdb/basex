@@ -36,9 +36,9 @@ public abstract class Serializer {
   /** Declare namespaces flag. */
   protected boolean undecl;
 
-  /** Namespaces. */
+  /** Currently available namespaces. */
   private final Atts ns = new Atts().add(XML, XMLURI).add(EMPTY, EMPTY);
-  /** Stack of namespace levels. */
+  /** Namespace stack. */
   private final IntList nsl = new IntList();
   /** Indicates if an element has not been completely opened yet. */
   private boolean elem;
@@ -191,9 +191,6 @@ public abstract class Serializer {
     boolean doc = false;
     final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
     final IntList pars = new IntList();
-    final TokenList names = new TokenList();
-    names.set(0, ns(EMPTY));
-
     int l = 0;
     int p = pre;
 
@@ -229,40 +226,34 @@ public abstract class Serializer {
         openElement(name);
 
         // add namespace definitions
-        byte[] empty = names.get(l);
         if(nsp != null) {
           // add namespaces from database
           nsp.reset();
           int pp = p;
+
+          // check namespace of current element
+          byte[] key = pref(name);
+          byte[] val = data.ns.uri(data.uri(p, k));
+          if(val == null) val = EMPTY;
+          // add new or updated namespace
+          final byte[] old = ns(key);
+          if(old == null || !eq(old, val)) namespace(key, val);
+
           do {
             final Atts atn = data.ns(pp);
             for(int n = 0; n < atn.size; ++n) {
-              final byte[] key = atn.key[n];
-              final byte[] val = atn.val[n];
+              key = atn.key[n];
+              val = atn.val[n];
               if(!nsp.contains(key)) {
                 nsp.add(key);
                 namespace(key, val);
-                if(key.length == 0) empty = val;
               }
             }
-            pp = data.parent(pp, data.kind(pp));
-          } while(pp >= 0 && data.kind(pp) == Data.ELEM &&
-              l == 0 && level == 0);
+            // check ancestors only on top level
+            if(level != 0 || l != 0) break;
 
-          // check namespace of current element
-          final byte[] key = pref(name);
-          byte[] val = data.ns.uri(data.uri(p, k));
-          if(val == null) val = EMPTY;
-          if(ns.get(key) == -1) {
-            if(key.length != 0) {
-              namespace(key, val);
-            } else if(!eq(val, empty)) {
-              namespace(key, val);
-              empty = val;
-            }
-          }
-        } else if(l == 0 && ns(EMPTY) != EMPTY) {
-          namespace(EMPTY, EMPTY);
+            pp = data.parent(pp, data.kind(pp));
+          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
         }
 
         // serialize attributes
@@ -271,7 +262,6 @@ public abstract class Serializer {
           attribute(data.name(p, Data.ATTR), data.text(p, false));
         }
         pars.set(l++, r);
-        names.set(l, empty);
       }
     }
 
