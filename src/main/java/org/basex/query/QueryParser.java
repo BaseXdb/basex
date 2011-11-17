@@ -272,13 +272,18 @@ public class QueryParser extends InputParser {
     if(!more()) error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
-    int cp;
-    for(int p = 0; p < ql; p += Character.charCount(cp)) {
-      cp = query.codePointAt(p);
-      if(XMLToken.valid(cp)) continue;
-      qp = p;
-      error(QUERYINV, cp);
+    for(int p = 0; p < ql;) {
+      // only retrieve code points for large character codes (faster)
+      int cp = query.charAt(p);
+      final boolean hs = cp >= Character.MIN_HIGH_SURROGATE;
+      if(hs) cp = query.codePointAt(p);
+      if(!XMLToken.valid(cp)) {
+        qp = p;
+        error(QUERYINV, cp);
+      }
+      p += hs ? Character.charCount(cp) : 1;
     }
+
     final Expr expr = parse(uri);
     if(more()) {
       if(alter != null) error();

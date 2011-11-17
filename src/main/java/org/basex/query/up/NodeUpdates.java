@@ -153,7 +153,7 @@ final class NodeUpdates {
 
     /* Update primitives are executed in a strict order,
      * see {@link PrimitiveType}. */
-    Arrays.sort(prim);
+    if(prim.length > 1) Arrays.sort(prim);
   }
 
   /**
