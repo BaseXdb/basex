@@ -49,6 +49,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     { "d16", "<a><b/></a>" },
     { "d17", "<ns:a xmlns:ns='NS'><b/></ns:a>" },
     { "d18", "<n xmlns:ns='ns'><a/></n>"},
+    { "d19", "<x:n xmlns:x='X'/>"},
   };
 
   /**
@@ -572,6 +573,20 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "rename node $el as QName('',local-name($el)) " +
       "return $a",
       "<a xmlns:a='A'><a xmlns:b='B'/></a>");
+  }
+
+  /**
+   * Checks duplicate namespace declarations.
+   * @throws BaseXException exception
+   */
+  @Test
+  public void avoidDuplicateNSDeclaration() throws BaseXException {
+    create(19);
+    query("" +
+        "let $b := <a xmlns:x='X' x:id='0'/> " +
+        "return insert node $b//@*:id into /*:n"
+        , "");
+    assertEquals(1, CONTEXT.data().ns(1).size);
   }
 
   /**
