@@ -121,7 +121,7 @@ public final class BaseXHTTP {
 
     if(start) {
       // default mode: start database server
-      server = new BaseXServer(ctx, quiet ? "-z" : "");
+      server = quiet ? new BaseXServer(ctx, "-z") : new BaseXServer(ctx);
       Util.outln(HTTP + ' ' + SERVERSTART);
     } else {
       // local or client mode
