@@ -67,6 +67,10 @@ import org.basex.util.list.IntList;
  * @author Christian Gruen
  */
 public final class QueryContext extends Progress {
+  /** URL pattern (matching Clark and EQName notation). */
+  private static final Pattern BIND =
+      Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
+
   /** Functions. */
   public final UserFuncs funcs = new UserFuncs();
   /** Variables. */
@@ -392,9 +396,8 @@ public final class QueryContext extends Progress {
     String loc = name.indexOf('$') == 0 ? name.substring(1) : name;
     String uri = "";
 
-    // check for namespace declaration (clark notation or EQName)
-    final Pattern p = Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
-    final Matcher m = p.matcher(loc);
+    // check for namespace declaration
+    final Matcher m = BIND.matcher(loc);
     if(m.find()) {
       uri = m.group(3);
       if(uri == null) uri = m.group(5);
