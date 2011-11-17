@@ -96,9 +96,9 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public int count(final Var v) {
-    int c = 0;
+    int c = ts.count(v);
     for(final TypeCase t : cases) c += t.count(v);
-    return c + ts.count(v);
+    return c;
   }
 
   @Override
@@ -130,7 +130,7 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   Expr markTailCalls() {
-    for(int i = 0; i < cases.length; i++) cases[i] = cases[i].markTailCalls();
+    for(final TypeCase t : cases) t.markTailCalls();
     return this;
   }
 }

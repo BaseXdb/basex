@@ -58,6 +58,7 @@ import org.basex.query.expr.Quantifier;
 import org.basex.query.expr.Range;
 import org.basex.query.expr.Root;
 import org.basex.query.expr.Switch;
+import org.basex.query.expr.SwitchCase;
 import org.basex.query.expr.Treat;
 import org.basex.query.expr.Try;
 import org.basex.query.expr.TypeCase;
@@ -276,7 +277,7 @@ public class QueryParser extends InputParser {
       cp = query.codePointAt(p);
       if(XMLToken.valid(cp)) continue;
       qp = p;
-      error(QUERYINV, query.codePointAt(p));
+      error(QUERYINV, cp);
     }
     final Expr expr = parse(uri);
     if(more()) {
@@ -1256,28 +1257,26 @@ public class QueryParser extends InputParser {
   private Expr switchh() throws QueryException {
     if(!wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
     wsCheck(PAR1);
-    Expr[] exprs = { check(expr(), NOSWITCH)};
+    final Expr expr = check(expr(), NOSWITCH);
+    SwitchCase[] exprs = { };
     wsCheck(PAR2);
 
     // collect all cases
-    Expr[] cases;
-    while(true) {
-      cases = new Expr[0];
+    Expr[] cases = {};
+    do {
+      cases = new Expr[1];
       while(wsConsumeWs(CASE)) cases = add(cases, single());
-      if(cases.length == 0) break;
-
+      if(cases.length == 1) {
+        // add default case
+        if(exprs.length == 0) error(WRONGCHAR, CASE, found());
+        wsCheck(DEFAULT);
+      }
       wsCheck(RETURN);
-      final Expr ret = single();
-      for(final Expr c : cases) exprs = add(add(exprs, c), ret);
-    }
+      cases[0] = single();
+      exprs = Array.add(exprs, new SwitchCase(input(), cases));
+    } while(cases.length != 1);
 
-    // add default case
-    if(exprs.length == 1) error(WRONGCHAR, CASE, found());
-    wsCheck(DEFAULT);
-    wsCheck(RETURN);
-    exprs = add(exprs, single());
-
-    return new Switch(input(), exprs);
+    return new Switch(input(), expr, exprs);
   }
 
   /**
