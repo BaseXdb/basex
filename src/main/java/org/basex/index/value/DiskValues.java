@@ -207,10 +207,14 @@ public final class DiskValues implements Index {
   /**
    * Returns the id offset for the specified token, or {@code 0} if the token is
    * not found.
+   * <p>
+   * <em>Important:</em> This method has to be called while being in the monitor
+   * of this {@link DiskValues} instance, e.g. from a {@code synchronized}
+   * method.
    * @param key token to be found
    * @return id offset
    */
-  private synchronized long get(final byte[] key) {
+  private long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
       final int m = l + h >>> 1;
