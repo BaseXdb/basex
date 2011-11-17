@@ -193,7 +193,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     create(4);
     query(
         "declare namespace a='aa'; copy $c:=doc('d4') modify () return $c//a:y",
-        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+        "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
   /**
@@ -206,7 +206,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     query(
         "declare namespace a='aa'; copy $c:=doc('d4')//a:y " +
         "modify () return $c",
-        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+        "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
   /**
@@ -360,7 +360,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "declare namespace a='aa';insert node doc('d4')//a:y " +
         "into doc('d5')/a:x",
         "declare namespace a='aa';doc('d5')//a:y",
-        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+        "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
   /**
@@ -386,7 +386,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     query(
         "declare namespace a='aa';insert node doc('d6') into doc('d4')/a:x",
         "declare namespace a='aa';doc('d4')/a:x/a:y",
-        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+        "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
   /**
