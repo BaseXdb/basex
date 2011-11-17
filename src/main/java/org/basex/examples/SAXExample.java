@@ -2,7 +2,7 @@ package org.basex.examples;
 
 import org.basex.core.Context;
 import org.basex.data.Result;
-import org.basex.data.SAXSerializer;
+import org.basex.io.serial.SAXSerializer;
 import org.basex.query.QueryProcessor;
 import org.xml.sax.Attributes;
 import org.xml.sax.XMLReader;

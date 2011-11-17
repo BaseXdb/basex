@@ -1,11 +1,13 @@
 package org.basex.examples.query;
 
 import java.io.IOException;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Result;
-import org.basex.data.XMLSerializer;
+import org.basex.io.serial.Serializer;
+import org.basex.io.serial.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -29,7 +31,7 @@ public final class RunQueries {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args)
-      throws IOException, QueryException, BaseXException {
+      throws IOException, QueryException {
 
     System.out.println("=== RunQueries ===");
 
@@ -84,9 +86,8 @@ public final class RunQueries {
    * The resulting items are passed on to an {@link XMLSerializer} instance.
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
-   * @throws IOException if an error occurs while serializing the results
    */
-  static void process(final String query) throws QueryException, IOException {
+  static void process(final String query) throws QueryException {
     // ------------------------------------------------------------------------
     // Create a query processor
     QueryProcessor proc = new QueryProcessor(query, context);
@@ -111,9 +112,8 @@ public final class RunQueries {
    * efficient if large result sets are expected.
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
-   * @throws IOException if an error occurs while serializing the results
    */
-  static void iterate(final String query) throws QueryException, IOException {
+  static void iterate(final String query) throws QueryException {
     // ------------------------------------------------------------------------
     // Create a query processor
     QueryProcessor proc = new QueryProcessor(query, context);
@@ -152,18 +152,18 @@ public final class RunQueries {
     Iter iter = proc.iter();
 
     // ------------------------------------------------------------------------
-    // Create an XML serializer
-    XMLSerializer xml = proc.getSerializer(System.out);
+    // Create a serializer instance
+    Serializer ser = proc.getSerializer(System.out);
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
     for(Item item; (item = iter.next()) != null;) {
-      item.serialize(xml);
+      item.serialize(ser);
     }
 
     // ------------------------------------------------------------------------
     // Close the serializer
-    xml.close();
+    ser.close();
     System.out.println();
 
     // ------------------------------------------------------------------------

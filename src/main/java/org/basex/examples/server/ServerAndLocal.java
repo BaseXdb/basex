@@ -1,7 +1,8 @@
 package org.basex.examples.server;
 
+import java.io.IOException;
+
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
@@ -30,7 +31,7 @@ public final class ServerAndLocal {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerLocalExample ===");
+    System.out.println("=== ServerAndLocal ===");
 
     // ------------------------------------------------------------------------
     // Start server
@@ -85,9 +86,9 @@ public final class ServerAndLocal {
    * Command info is printed to System.out by default.
    * @param command command to be executed
    * @return string result of command
-   * @throws BaseXException database exception
+   * @throws IOException I/O exception
    */
-  private static String send(final String command) throws BaseXException {
+  private static String send(final String command) throws IOException {
 
     // ------------------------------------------------------------------------
     // Execute the command

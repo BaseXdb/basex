@@ -1,7 +1,8 @@
 package org.basex.examples.server;
 
+import java.io.IOException;
+
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.XQuery;
 import org.basex.examples.query.QueryCollection;
@@ -9,8 +10,7 @@ import org.basex.server.ClientSession;
 
 /**
  * This class demonstrates database access via the client/server architecture.
- * It shows how to {@link #add(String, String, String)},
- * {@link #modify()} files.
+ * It shows how to {@link #add(String, String)} and {@link #modify()} files.
  * For further options see {@link QueryCollection}.
  *
  * @author BaseX Team 2005-11, BSD License
@@ -31,7 +31,7 @@ public final class ServerCollection {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== CollectionServerExample ===");
+    System.out.println("=== ServerCollection ===");
 
     // ------------------------------------------------------------------------
     // Start server
@@ -50,10 +50,12 @@ public final class ServerCollection {
     System.out.println("\n* Adding 50 documents");
 
     for(int i = 0; i < 50; i++) {
-      add(XML_1 + i + XML_2, "Chapter-" + i + ".xml", "/book/chapters/" + i);
+      String path = "/book/chapters/" + i + "/Chapter-" + i + ".xml";
+      add(path, XML_1 + i + XML_2);
     }
     // Add another Test Document in folder /book/chapters/0
-    add(XML_1 + "test" + XML_2, "Chapter-test.xml", "/book/chapters/0");
+    String path = "/book/chapters/0/Chapter-test.xml";
+    add(path, XML_1 + "test" + XML_2);
 
     // ------------------------------------------------------------------------
     // Find some documents using the collection command
@@ -78,10 +80,11 @@ public final class ServerCollection {
     server.stop();
   }
 
-  /** This Methods performs a simple path based search in a collection.
-   * @throws BaseXException on error.
+  /**
+   * This Methods performs a simple path based search in a collection.
+   * @throws IOException I/O exception
    */
-  private static void find() throws BaseXException {
+  private static void find() throws IOException {
     // ------------------------------------------------------------------------
     System.out.println("\n* Finding documents in folder /book/chapters/0:");
     System.out.println(session.execute(
@@ -93,9 +96,9 @@ public final class ServerCollection {
   /**
    * This method shows how to modify multiple documents at once.
    * It replaces the title of the matching documents with 1 2 3.
-   * @throws BaseXException on error.
+   * @throws IOException I/O exception
    */
-  private static void modify() throws BaseXException {
+  private static void modify() throws IOException {
     session.execute(new XQuery(
         "for $doc in collection('input/book/chapters/0/')" + " return "
             + "replace value of node $doc/text/title  "
@@ -108,14 +111,13 @@ public final class ServerCollection {
 
   /**
    * Adds a document to the collection.
-   * @param xmlFragment XML Fragment
-   * @param docname document name
    * @param target optional target path
-   * @throws BaseXException on error.
+   * @param xmlFragment XML Fragment
+   * @throws IOException I/O exception
    */
-  private static void add(final String xmlFragment, final String docname,
-      final String target) throws BaseXException {
+  private static void add(final String target, final String xmlFragment)
+      throws IOException {
 
-    session.execute(new Add(xmlFragment, docname, target));
+    session.execute(new Add(target, xmlFragment));
   }
 }

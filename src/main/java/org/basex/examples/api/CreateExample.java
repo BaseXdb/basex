@@ -6,31 +6,28 @@ import java.io.InputStream;
 
 /**
  * This example shows how new databases can be created.
- * Documentation: http://basex.org/api
+ *
+ * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-11, BSD License
  */
 public final class CreateExample {
+  /** Hidden default constructor. */
+  private CreateExample() { }
+
   /**
    * Main method.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new CreateExample();
-  }
-
-  /**
-   * Constructor.
-   */
-  private CreateExample() {
     try {
       // create session
-      BaseXClient session =
+      final BaseXClient session =
         new BaseXClient("localhost", 1984, "admin", "admin");
 
       try {
         // define input stream
-        InputStream bais =
+        final InputStream bais =
           new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
 
         // create new database
@@ -43,7 +40,7 @@ public final class CreateExample {
         // drop database
         session.execute("drop db database");
 
-      } catch(IOException ex) {
+      } catch(final IOException ex) {
         // print exception
         ex.printStackTrace();
       }
@@ -51,7 +48,7 @@ public final class CreateExample {
       // close session
       session.close();
 
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       // print exception
       ex.printStackTrace();
     }

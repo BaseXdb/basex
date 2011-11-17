@@ -104,10 +104,10 @@ public final class Part4 extends Main {
     items = new XQItem[3];
 
     // Create an XQItem with a type of xs:int
-    items[0] = conn.createItemFromObject(new Integer(5), null);
+    items[0] = conn.createItemFromObject(Integer.valueOf(5), null);
 
     // Create an XQItem with a type of xs:float
-    items[1] = conn.createItemFromObject(new Float(123.4f), null);
+    items[1] = conn.createItemFromObject(Float.valueOf(123.4f), null);
 
     // Create an XQItem with a type of xs:hexBinary
     items[2] = conn.createItemFromObject(new byte[] { 1, 2, 3, 4 }, null);

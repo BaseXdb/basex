@@ -2,7 +2,7 @@ package org.basex.examples.create;
 
 import org.basex.build.Parser;
 import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.Create;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.XQuery;
@@ -36,7 +36,7 @@ public final class SimpleFSExample {
     final String name = "fsexample";
 
     final Parser parser = new SimpleFSParser(path);
-    new CreateDB(name, path, parser).execute(ctx);
+    new Create(parser, name).execute(ctx);
 
     System.out.println("\n* Number of created elements:");
 

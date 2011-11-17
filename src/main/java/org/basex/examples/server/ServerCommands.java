@@ -2,6 +2,7 @@ package org.basex.examples.server;
 
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.*;
 import org.basex.server.ClientSession;
 
 /**
@@ -20,7 +21,7 @@ public final class ServerCommands {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerExample ===");
+    System.out.println("=== ServerCommands ===");
 
     // ------------------------------------------------------------------------
     // Start server on default port 1984
@@ -36,30 +37,31 @@ public final class ServerCommands {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    session.execute("CREATE DB input etc/xml/input.xml");
+    session.execute(new CreateDB("input", "etc/xml/input.xml"));
 
     // ------------------------------------------------------------------------
     // Run a query
     System.out.println("\n* Run a query:");
 
-    System.out.println(session.execute("XQUERY //li"));
+    System.out.println(session.query("//li").execute());
 
     // ------------------------------------------------------------------------
     // Faster version: specify an output stream and run a query
     System.out.println("\n* Run a query (faster):");
 
     session.setOutputStream(System.out);
-    session.execute("XQUERY //li");
+    session.query("//li").execute();
+    System.out.println();
 
     // Reset output stream
     session.setOutputStream(null);
 
     // ------------------------------------------------------------------------
     // Run a query
-    System.out.println("\n* Run a buggy query: ");
+    System.out.println("\n\n* Run a buggy query: ");
 
     try {
-      session.execute("XQUERY ///");
+      session.execute(new XQuery("///"));
     } catch(final BaseXException ex) {
       System.out.println(ex.getMessage());
     }
@@ -68,7 +70,7 @@ public final class ServerCommands {
     // Drop the database
     System.out.println("\n* Close and drop the database.");
 
-    session.execute("DROP DB input");
+    session.execute(new DropDB("input"));
 
     // ------------------------------------------------------------------------
     // Close the client session
