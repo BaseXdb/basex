@@ -64,7 +64,7 @@ final class IterPosFilter extends Filter {
             if(s != -1) {
               cpos = last ? s : pos.min;
               if(cpos > s) return null;
-              direct = true;
+              direct = preds.length == 1;
             }
           }
         }
@@ -74,38 +74,40 @@ final class IterPosFilter extends Filter {
         final long cp = ctx.pos;
         final long cs = ctx.size;
 
-        Item item = null;
-        if(direct) {
-          // directly access relevant items
-          item = iter.size() < cpos ? null : iter.get(cpos - 1);
-          ctx.pos = cpos++;
-        } else {
-          // loop through all items
-          Item lnode = null;
-          while((item = iter.next()) != null) {
-            // evaluate predicates
-            ctx.checkStop();
-            ctx.size = 0;
+        try {
+          Item item = null;
+          if(direct) {
+            // directly access relevant items
+            item = iter.size() < cpos ? null : iter.get(cpos - 1);
             ctx.pos = cpos++;
-            if(preds(item, ctx)) break;
-            // remember last node
-            lnode = item;
-            ctx.pos = cp;
-            ctx.size = cs;
+          } else {
+            // loop through all items
+            Item lnode = null;
+            while((item = iter.next()) != null) {
+              // evaluate predicates
+              ctx.checkStop();
+              ctx.size = 0;
+              ctx.pos = cpos++;
+              if(preds(item, ctx)) break;
+              // remember last node
+              lnode = item;
+              ctx.pos = cp;
+              ctx.size = cs;
+            }
+            // returns the last item
+            if(last) item = lnode;
           }
-          // returns the last item
-          if(last) item = lnode;
+
+          // check if more items can be expected
+          skip = last || pos != null && pos.skip(ctx);
+          if(skip && direct) iter.reset();
+          return item;
+        } finally {
+          // reset context and return result
+          ctx.value = cv;
+          ctx.pos = cp;
+          ctx.size = cs;
         }
-
-        // check if more items can be expected
-        skip = last || pos != null && pos.skip(ctx);
-        if(skip && direct) iter.reset();
-
-        // reset context and return result
-        ctx.value = cv;
-        ctx.pos = cp;
-        ctx.size = cs;
-        return item;
       }
     };
   }

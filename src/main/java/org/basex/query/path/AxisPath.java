@@ -280,31 +280,34 @@ public class AxisPath extends Path {
     final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    Value r = root != null ? root.value(ctx) : cv;
 
-    if(!cache || citer == null || lvalue.type != NodeType.DOC ||
-        r.type != NodeType.DOC || !((ANode) lvalue).is((ANode) r)) {
-      lvalue = r;
-      citer = new NodeCache().random();
-      if(r != null) {
-        final Iter ir = ctx.iter(r);
-        while((r = ir.next()) != null) {
-          ctx.value = r;
+    try {
+      Value r = root != null ? root.value(ctx) : cv;
+
+      if(!cache || citer == null || lvalue.type != NodeType.DOC ||
+          r.type != NodeType.DOC || !((ANode) lvalue).is((ANode) r)) {
+        lvalue = r;
+        citer = new NodeCache().random();
+        if(r != null) {
+          final Iter ir = ctx.iter(r);
+          while((r = ir.next()) != null) {
+            ctx.value = r;
+            iter(0, citer, ctx);
+          }
+        } else {
+          ctx.value = null;
           iter(0, citer, ctx);
         }
+        citer.sort();
       } else {
-        ctx.value = null;
-        iter(0, citer, ctx);
+        citer.reset();
       }
-      citer.sort();
-    } else {
-      citer.reset();
+      return citer;
+    } finally {
+      ctx.value = cv;
+      ctx.size = cs;
+      ctx.pos = cp;
     }
-
-    ctx.value = cv;
-    ctx.size = cs;
-    ctx.pos = cp;
-    return citer;
   }
 
   /**
