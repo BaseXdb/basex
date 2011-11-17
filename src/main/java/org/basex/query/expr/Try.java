@@ -35,10 +35,11 @@ public final class Try extends Single {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int c = 0; c < ctch.length; ++c) {
-      ctch[c] = ((Catch) checkUp(ctch[c], ctx)).comp(ctx);
-    }
-    checkUp(expr, ctx);
+    // check if none or all try/catch expressions are updating
+    final Expr[] tmp = new Expr[ctch.length + 1];
+    tmp[0] = expr;
+    for(int c = 0; c < ctch.length; ++c) tmp[c + 1] = ctch[c].expr;
+    checkUp(ctx, tmp);
 
     // compile expression
     try {
@@ -49,6 +50,9 @@ public final class Try extends Single {
       // catch exception for evaluation if expression fails at compile time
       qe = ex;
     }
+
+    // compile catch expressions
+    for(final Catch c : ctch) c.comp(ctx);
 
     // evaluate result type
     type = expr.type();
