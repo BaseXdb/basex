@@ -101,13 +101,11 @@ public enum AtomType implements Type {
 
   /** Language type. */
   LAN("language", TOK, XSURI, false, false, true, false, false) {
-    final Pattern pat = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
-
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       final byte[] v = norm(it.atom(ii));
-      if(!pat.matcher(string(v)).matches()) error(it, ii);
+      if(!LANGPATTERN.matcher(string(v)).matches()) error(it, ii);
       return new Str(v, this);
     }
     @Override
@@ -684,6 +682,10 @@ public enum AtomType implements Type {
       return new Jav(o);
     }
   };
+
+  /** Language pattern. */
+  static final Pattern LANGPATTERN =
+      Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
   /** String representation. */
   private final byte[] nam;
