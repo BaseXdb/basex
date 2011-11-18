@@ -266,15 +266,15 @@ public abstract class Builder extends Progress {
    * Adds an element node to the database. This method stores a preliminary
    * size value; if this node has further descendants, {@link #setSize} must
    * be called to set the final size value.
-   * @param nm the tag name reference
-   * @param uri namespace uri reference
    * @param dist distance to parent
+   * @param nm the tag name reference
    * @param asize number of attributes
+   * @param uri namespace uri reference
    * @param ne namespace flag
    * @throws IOException I/O exception
    */
-  protected abstract void addElem(int nm, int uri, int dist, int asize,
-      boolean ne) throws IOException;
+  protected abstract void addElem(int dist, int nm, int asize,
+      int uri, boolean ne) throws IOException;
 
   /**
    * Adds an attribute to the database.
@@ -304,6 +304,24 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   protected abstract void setSize(int pre, int size) throws IOException;
+  
+  // ACCESSORS ================================================================
+  
+  /**
+   * @return the current depth of the builder
+   */
+  protected int getLvl()
+  {
+    return lvl;
+  }
+  
+  /**
+   * @return the current parent pre
+   */
+  protected int getPar()
+  {
+    return lvl < 1 ? -1 : pstack.get(lvl-1);
+  }
 
   // PRIVATE METHODS ==========================================================
 
