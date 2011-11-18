@@ -1,8 +1,9 @@
 package org.basex.query.func;
 
+import static javax.xml.datatype.DatatypeConstants.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
-import static javax.xml.datatype.DatatypeConstants.*;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -11,6 +12,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
+
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
@@ -20,14 +23,15 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
+import org.basex.query.item.FuncType;
 import org.basex.query.item.Jav;
 import org.basex.query.item.NodeType;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
@@ -54,7 +58,7 @@ public final class JavaFunc extends Arr {
     Integer.class,    long.class,    Long.class,         float.class,
     Float.class,      double.class,  Double.class,       BigDecimal.class,
     BigInteger.class, QName.class,   CharSequence.class, byte[].class,
-    Object[].class,
+    Object[].class,   Map.class
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
@@ -63,7 +67,7 @@ public final class JavaFunc extends Arr {
     AtomType.INT, AtomType.LNG, AtomType.LNG, AtomType.FLT,
     AtomType.FLT, AtomType.DBL, AtomType.DBL, AtomType.DEC,
     AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.HEX,
-    AtomType.SEQ
+    AtomType.SEQ, FuncType.ANY_FUN
   };
   /** Java class. */
   private final Class<?> cls;
@@ -139,6 +143,7 @@ public final class JavaFunc extends Arr {
       final Object[] arg = args(meth.getParameterTypes(), ar, st);
       if(arg != null) return meth.invoke(st ? null : instObj(ar[0]), arg);
     }
+
     throw new Exception();
   }
 
@@ -192,11 +197,13 @@ public final class JavaFunc extends Arr {
 
   /**
    * Returns an appropriate XQuery data type for the specified Java class.
-   * @param par Java type
+   * @param type Java type
    * @return xquery type
    */
-  private static Type type(final Class<?> par) {
-    for(int j = 0; j < JAVA.length; ++j) if(par == JAVA[j]) return XQUERY[j];
+  private static Type type(final Class<?> type) {
+    for(int j = 0; j < JAVA.length; ++j) {
+      if(JAVA[j].isAssignableFrom(type)) return XQUERY[j];
+    }
     return AtomType.JAVA;
   }
 

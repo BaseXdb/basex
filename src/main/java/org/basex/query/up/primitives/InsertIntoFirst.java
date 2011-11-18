@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import org.basex.data.Data;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Insert into as first primitive.
@@ -42,10 +41,5 @@ public final class InsertIntoFirst extends InsertBase {
     final int p = pre + c;
     final int loc = p + data.attSize(p, data.kind(p)) + md.meta.size - 1;
     return mergeTexts(data, loc , loc + 1);
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }
