@@ -1,11 +1,11 @@
 package org.basex.util.hash;
 
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -88,9 +88,9 @@ public class TokenSet implements Iterable<byte[]> {
    */
   public final int add(final byte[] key) {
     if(size == next.length) rehash();
-    final int p = Token.hash(key) & bucket.length - 1;
+    final int p = hash(key) & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(Token.eq(key, keys[id])) return -id;
+      if(eq(key, keys[id])) return -id;
     }
     next[size] = bucket[p];
     keys[size] = key;
@@ -99,19 +99,22 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Deletes the specified key.
+   * Deletes the specified key. The total number of entries does not change
+   * by calling this method.
    * @param key key
    * @return deleted key or 0
    */
   public final int delete(final byte[] key) {
-    final int p = Token.hash(key) & bucket.length - 1;
-    for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(Token.eq(key, keys[id])) {
-        if(bucket[p] == id) bucket[p] = next[id];
-        else next[id] = next[next[id]];
-        keys[id] = null;
+    final int p = hash(key) & bucket.length - 1;
+    int o = 0, n;
+    for(int id = bucket[p]; id != 0; id = n) {
+      n = next[id];
+      if(eq(key, keys[id])) {
+        if(bucket[p] == id) bucket[p] = n;
+        else next[o] = next[n];
         return id;
       }
+      o = id;
     }
     return 0;
   }
@@ -122,9 +125,9 @@ public class TokenSet implements Iterable<byte[]> {
    * @return id or 0 if nothing was found
    */
   public final int id(final byte[] key) {
-    final int p = Token.hash(key) & bucket.length - 1;
+    final int p = hash(key) & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(Token.eq(key, keys[id])) return id;
+      if(eq(key, keys[id])) return id;
     }
     return 0;
   }
@@ -167,7 +170,7 @@ public class TokenSet implements Iterable<byte[]> {
     for(int i = 0; i != l; ++i) {
       int id = bucket[i];
       while(id != 0) {
-        final int p = Token.hash(keys[id]) & s - 1;
+        final int p = hash(keys[id]) & s - 1;
         final int nx = next[id];
         next[id] = tmp[p];
         tmp[p] = id;

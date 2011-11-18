@@ -44,6 +44,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     ctx = new Context();
     ctx.repo.init(REPO);
     new IOFile(REPO, "jarPkg-1.0.0").delete();
+    new IOFile(REPO, "http-www.pkg3.com-10.0").delete();
   }
 
   /** Tests repository initialization. */
