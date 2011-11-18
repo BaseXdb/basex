@@ -11,7 +11,7 @@ import org.basex.test.query.QueryTest;
 public final class SimpleTest extends QueryTest {
   /** Constructor. */
   static {
-    doc = "<dummy/>";
+    doc = "<X/>";
 
     queries = new Object[][] {
       { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
@@ -72,11 +72,23 @@ public final class SimpleTest extends QueryTest {
       { "Seq 3", itr(1, 2), "((( 1,2 )  )    )" },
       { "Seq 4", itr(1, 2, 3), "(1, (( 2,3 )  )    )" },
       { "Seq 5", itr(1, 2, 3, 4), "(1, (( 2,3 )  ),4   )" },
+      { "Seq 6", "()()" },
+      { "Seq 7", "() ()" },
 
-      { "SeqError 1", "()()" },
-      { "SeqError 2", "() ()" },
+      { "Filter 1", "1[1][error()]" },
+      { "Filter 2", empty(), "1[1][<x/>/a]" },
 
+      // [CG] Tests: check why context is not always root node
+
+      { "ContextItem 0", node(0), "." },
       { "ContextItem 1", node(0), "42[not(.)], ." },
+
+      { "ContextItem 2", "try { 1[error()] } catch {.}" },
+      { "ContextItem 3", "try { 1[error()][1] } catch {.}" },
+      { "ContextItem 4", "try { 1[1][error()] } catch {.}" },
+      { "ContextItem 5", node(0),
+        "try { let $a := <a><b/></a> return $a/b[error()] } catch * { . }" },
+
     };
   }
 }

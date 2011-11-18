@@ -3,7 +3,6 @@ package org.basex.query.up.primitives;
 import org.basex.data.Data;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Insert after primitive.
@@ -46,10 +45,5 @@ public final class InsertAfter extends InsertBase {
       merged |= mergeTexts(data, affectedPre + mds - 1, affectedPre + mds);
 
     return merged;
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }
