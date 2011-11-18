@@ -273,8 +273,8 @@ public abstract class Builder extends Progress {
    * @param ne namespace flag
    * @throws IOException I/O exception
    */
-  protected abstract void addElem(int dist, int nm, int asize, 
-      int uri, boolean ne) throws IOException; 
+  protected abstract void addElem(int dist, int nm, int asize,
+      int uri, boolean ne) throws IOException;
 
   /**
    * Adds an attribute to the database.
