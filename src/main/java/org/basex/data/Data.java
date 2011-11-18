@@ -727,9 +727,8 @@ public abstract class Data {
       final int pre = ipre + dpre;
       final int dkind = data.kind(dpre);
       final int dpar = data.parent(dpre, dkind);
-      // [LK] if ipar == -1 wrong dis is calculated?
-      final int dis = dpar >= 0 ? dpre - dpar : pre - ipar;
-      final int par = pre - dis;
+      final int dis = dpar >= 0 ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
+      final int par = dis == 0 ? -1 : pre - dis;
 
       // find nearest namespace node on the ancestor axis of the insert
       // location. possible candidates for this node are collected and
