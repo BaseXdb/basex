@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
@@ -25,6 +26,9 @@ import org.basex.util.list.TokenList;
  * @author Christian Gruen
  */
 public final class ShowBackups extends Command {
+  /** Pattern to extract the database name from a backup file name. */
+  private static final Pattern PA =
+      Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
   /**
    * Default constructor.
    */
@@ -82,9 +86,7 @@ public final class ShowBackups extends Command {
    * @return name of database
    */
   private static String dbname(final String s) {
-    // [LK] clean up / use pattern
-    // -yyyy-MM-dd-HH-mm-ss.zip , 24chars
-    return s.length() < 25 ? null : s.substring(0, s.length() - 24);
+    return PA.split(s)[0];
   }
 
   /**
@@ -99,9 +101,10 @@ public final class ShowBackups extends Command {
     for(final IOFile f : ctx.mprop.dbpath().children()) {
       final String name = f.name();
       if(name.endsWith(IO.ZIPSUFFIX) && db.equals(dbname(name)))
-        sl.add(name.substring(0, name.length() - IO.ZIPSUFFIX.length()));
+        // remove .zip from the end
+        sl.add(Pattern.compile(IO.ZIPSUFFIX + '$').split(name)[0]);
     }
-    sl.sort(false, true);
+    sl.sort(false, false);
     return sl;
   }
 }
