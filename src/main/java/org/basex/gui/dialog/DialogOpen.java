@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.IOException;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
@@ -20,10 +21,12 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Restore;
+import org.basex.core.cmd.ShowBackups;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
@@ -65,6 +68,8 @@ public final class DialogOpen extends Dialog {
   private final boolean manage;
   /** Refresh. */
   private boolean refresh;
+  /** Combobox that lists available backups for a database. */
+  private BaseXCombo backupchoice;
 
   /**
    * Default constructor.
@@ -75,9 +80,9 @@ public final class DialogOpen extends Dialog {
     super(main, m ? MANAGETITLE : OPENTITLE);
     manage = m;
     // create database chooser
-    final StringList db = List.list(main.context);
-
-    choice = new BaseXList(db.toArray(), this, !m);
+    final StringList dbs = manage ? ShowBackups.listdbs(main.context) :
+      List.list(main.context);
+    choice = new BaseXList(dbs.toArray(), this, !m);
     set(choice, BorderLayout.CENTER);
     choice.setSize(160, 440);
 
@@ -92,8 +97,10 @@ public final class DialogOpen extends Dialog {
 
     detail = new BaseXEditor(false, this);
     detail.border(5, 5, 5, 5).setFont(f);
-
     BaseXLayout.setWidth(detail, 400);
+
+    backupchoice = new BaseXCombo(this, "");
+    if(manage) info.add(backupchoice, BorderLayout.NORTH);
     info.add(detail, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack(new BorderLayout()).border(0, 12, 0, 0);
@@ -116,7 +123,7 @@ public final class DialogOpen extends Dialog {
 
     set(pp, BorderLayout.EAST);
     action(null);
-    if(db.size() == 0) return;
+    if(dbs.size() == 0) return;
 
     finish(null);
   }
@@ -142,7 +149,8 @@ public final class DialogOpen extends Dialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      choice.setData(List.list(ctx).toArray());
+      choice.setData(manage ? ShowBackups.listdbs(ctx).toArray() :
+        List.list(ctx).toArray());
       choice.requestFocusInWindow();
       refresh = false;
     }
@@ -152,6 +160,12 @@ public final class DialogOpen extends Dialog {
     final ObjList<Command> cmds = new ObjList<Command>();
     boolean o = dbs.size() > 0;
     ok = manage || o;
+
+    /*
+     * backup --
+     * ok --
+     * drop ??
+     */
 
     if(cmp == open) {
       close();
@@ -172,12 +186,15 @@ public final class DialogOpen extends Dialog {
     } else if(cmp == backup) {
       for(final String s : dbs) cmds.add(new CreateBackup(s));
     } else if(cmp == restore) {
-      for(final String s : dbs) cmds.add(new Restore(s));
+      System.out.println(backupchoice.getSelectedItem());
+      if(dbs.size() == 1) cmds.add(
+          new Restore((String) backupchoice.getSelectedItem()));
+      else
+        for(final String s : dbs) cmds.add(new Restore(s));
+    } else if(cmp == backupchoice) {
+      // don't reset the combo box after selecting an item
     } else {
       // update components
-      enableOK(buttons, BUTTONOPEN, o);
-      enableOK(buttons, BUTTONBACKUP, o);
-      enableOK(buttons, BUTTONDROP, o);
       o = ctx.mprop.dbexists(db);
       if(o) {
         // refresh info view
@@ -194,6 +211,20 @@ public final class DialogOpen extends Dialog {
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
       }
+
+      // list available backups for the current database
+      if(manage) {
+        final String[] backups = ShowBackups.findBackups(db, ctx).toArray();
+        if(!o && backups.length > 0) {
+          detail.setText(Token.token("Database only available as backup.\n" +
+              "Please choose a backup to restore."));
+        }
+        backupchoice.setModel(new DefaultComboBoxModel(backups));
+      }
+
+      enableOK(buttons, BUTTONOPEN, o);
+      enableOK(buttons, BUTTONBACKUP, o);
+      enableOK(buttons, BUTTONDROP, o);
       enableOK(buttons, BUTTONRENAME, o);
       enableOK(buttons, BUTTONCOPY, o);
       o = true;

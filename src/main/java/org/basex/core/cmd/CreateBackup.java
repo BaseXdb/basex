@@ -4,13 +4,13 @@ import static org.basex.core.Text.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
+import org.basex.core.User;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -24,9 +24,6 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class CreateBackup extends Command {
-  /** Date format. */
-  private static final SimpleDateFormat DATE =
-    new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
   /**
    * Default constructor.
@@ -68,7 +65,7 @@ public final class CreateBackup extends Command {
     try {
       final File path = mprop.dbpath(db);
       final IOFile file = new IOFile(mprop.dbpath(db + "-" +
-          DATE.format(new Date()) + IO.ZIPSUFFIX));
+          IO.DATE.format(new Date()) + IO.ZIPSUFFIX));
 
       final Zip zip = progress(new Zip(file));
       zip.zip(path);
