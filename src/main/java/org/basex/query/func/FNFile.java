@@ -207,22 +207,41 @@ public final class FNFile extends FuncCall {
    * @param list file list
    * @param rec recursive flag
    * @param pat file name pattern; ignored if {@code null}
+   * @throws QueryException query exception
    */
   private void list(final File dir, final StringList list,
-      final boolean rec, final Pattern pat) {
+      final boolean rec, final Pattern pat) throws QueryException {
 
     // skip invalid directories
     final File[] ch = dir.listFiles();
     if(ch == null) return;
 
     // parse directories
-    if(rec) for(final File f : ch) {
-      if(f.isDirectory()) list(f, list, rec, pat);
+    if(rec) {
+      for(final File f : ch) {
+        if(!mayBeLink(f) && f.isDirectory()) list(f, list, rec, pat);
+      }
     }
     // parse files. ignore directories if a pattern is specified
     for(final File f : ch) {
-      if(pat == null || pat.matcher(f.getName()).matches() &&
-          !f.isDirectory()) list.add(f.getPath());
+      if(!mayBeLink(f) && (pat == null || pat.matcher(f.getName()).matches() &&
+          !f.isDirectory())) list.add(f.getPath());
+    }
+  }
+
+  /**
+   * Checks if the specified file may be a symbolic link.
+   * @param f file to check
+   * @return result
+   * @throws QueryException query exception
+   */
+  private boolean mayBeLink(final File f) throws QueryException {
+    try {
+      final String p1 = f.getAbsolutePath();
+      final String f2 = f.getCanonicalPath();
+      return !(Prop.WIN ? p1.equalsIgnoreCase(f2) : p1.equals(f2));
+    } catch(final IOException ex) {
+      throw PATHINVALID.thrw(input, f);
     }
   }
 
