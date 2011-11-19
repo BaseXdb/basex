@@ -41,9 +41,11 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /** Prepare test. */
   @Before
   public void setUpBeforeClass() {
+    for(final IOFile f : new IOFile(REPO).children()) {
+      if(f.isDir() && f.name().contains(".")) f.delete();
+    }
     ctx = new Context();
     ctx.repo.init(REPO);
-    new IOFile(REPO, "jarPkg-1.0.0").delete();
   }
 
   /** Tests repository initialization. */

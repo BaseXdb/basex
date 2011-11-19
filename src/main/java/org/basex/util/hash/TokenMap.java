@@ -35,6 +35,13 @@ public class TokenMap extends TokenSet {
     return key != null ? values[id(key)] : null;
   }
 
+  @Override
+  public int delete(final byte[] key) {
+    final int i = super.delete(key);
+    values[i] = null;
+    return i;
+  }
+
   /**
    * Returns the specified value.
    * @param p value index

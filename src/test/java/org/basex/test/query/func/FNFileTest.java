@@ -30,7 +30,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test path. */
   private static final String PATH3 = Prop.TMP + NAME + "/x";
   /** Test path. */
-  private static final String PATH4 = Prop.TMP + NAME + "/x/x";
+  private static final String PATH4 = Prop.TMP + NAME + "/x/y";
 
   /** Initializes the test. */
   @BeforeClass
@@ -118,6 +118,12 @@ public final class FNFileTest extends AdvancedQueryTest {
     contains(_FILE_LIST.args(Prop.TMP, "false()", NAME), NAME);
     query(_FILE_LIST.args(Prop.TMP, "false()", "XXX"), "");
     query(_FILE_DELETE.args(PATH1));
+    // check recursive paths
+    query(_FILE_CREATE_DIRECTORY.args(PATH1));
+    query(_FILE_CREATE_DIRECTORY.args(PATH3));
+    query(_FILE_WRITE.args(PATH4, "()"));
+    contains(_FILE_LIST.args(PATH1, "true()"), "y");
+    //query(_FILE_DELETE.args(PATH1));
   }
 
   /**
