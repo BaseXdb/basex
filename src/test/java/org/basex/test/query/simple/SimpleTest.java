@@ -11,7 +11,7 @@ import org.basex.test.query.QueryTest;
 public final class SimpleTest extends QueryTest {
   /** Constructor. */
   static {
-    doc = "<X/>";
+    doc = "<x>X</x>";
 
     queries = new Object[][] {
       { "Compare 1", "xs:QName('a') = attribute a { 'b' }" },
@@ -78,19 +78,19 @@ public final class SimpleTest extends QueryTest {
       { "Filter 1", "1[1][error()]" },
       { "Filter 2", empty(), "1[1][<x/>/a]" },
 
-      // [CG] Tests: check why context is not always root node
-
       { "ContextItem 0", node(0), "." },
       { "ContextItem 1", node(0), "42[not(.)], ." },
-      { "ContextItem 2", "try { 1[error()] } catch {.}" },
-      { "ContextItem 3", "try { 1[error()][1] } catch {.}" },
-      { "ContextItem 4", "try { 1[1][error()] } catch {.}" },
+      { "ContextItem 2", node(0), "try { 1[error()] } catch * {.}" },
+      { "ContextItem 3", node(0), "try { 1[error()][1] } catch * {.}" },
+      { "ContextItem 4", node(0), "try { 1[1][error()] } catch * {.}" },
       { "ContextItem 5", node(0),
-        "try { let $a := <a><b/></a> return $a/b[error()] } catch * { . }" },
+        "try { let $a := <a><b/></a> return $a/b[error()] } catch * {.}" },
       { "ContextItem 6", itr(1),
         "declare function local:x() { 1+<x/> };" +
-        "1[try { local:x() } catch * { . }]" },
-
+        "1[try { local:x() } catch * {.}]" },
+      { "ContextItem 7", node(0),
+        "try { <a/>/(1+'') } catch * {.}"
+      }
     };
   }
 }

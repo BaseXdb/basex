@@ -79,10 +79,12 @@ public abstract class Path extends ParseExpr {
     }
 
     final Value v = ctx.value;
-    ctx.value = root(ctx);
-    final Expr e = compPath(ctx);
-    ctx.value = v;
-    return e;
+    try {
+      ctx.value = root(ctx);
+      return compPath(ctx);
+    } finally {
+      ctx.value = v;
+    }
   }
 
   /**
@@ -150,7 +152,7 @@ public abstract class Path extends ParseExpr {
     if(opt) ctx.compInfo(OPTDESC);
 
     // set atomic type for single attribute steps to speedup predicate tests
-    if(root == null && st.length == 1 && st[0] instanceof AxisPath) {
+    if(root == null && st.length == 1 && st[0] instanceof AxisStep) {
       final AxisStep curr = (AxisStep) st[0];
       if(curr.axis == ATTR && curr.test.test == Name.STD)
         curr.type = SeqType.NOD_ZO;

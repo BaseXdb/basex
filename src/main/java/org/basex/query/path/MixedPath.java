@@ -61,13 +61,13 @@ public final class MixedPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
+    // creates an iterator from the root value
     final Value v = root != null ? root.value(ctx) : checkCtx(ctx);
+    Iter res = v.iter();
+
     final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    // creates an initial item cache
-    Iter res = v.iter();
-
     try {
       // loop through all expressions
       final int el = steps.length;
@@ -107,12 +107,12 @@ public final class MixedPath extends Path {
           res = ic;
         }
       }
+      return res;
     } finally {
       ctx.value = cv;
       ctx.size = cs;
       ctx.pos = cp;
     }
-    return res;
   }
 
   @Override

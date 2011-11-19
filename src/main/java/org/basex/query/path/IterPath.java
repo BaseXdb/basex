@@ -63,33 +63,36 @@ final class IterPath extends AxisPath {
         final Value cv = ctx.value;
         final long cp = ctx.pos;
         final long cs = ctx.size;
-
-        while(true) {
-          final Item item = iter[p].next();
-          if(item == null) {
-            if(--p == -1) {
-              node = null;
-              break;
-            }
-          } else if(p < iter.length - 1) {
-            ++p;
-            ctx.value = item;
-            if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);
-          } else {
-            if(!item.node()) NODESPATH.thrw(input, this, item.type);
-            final ANode n = (ANode) item;
-            if(node == null || !node.is(n)) {
-              node = n;
-              break;
+        try {
+          while(true) {
+            final Item item = iter[p].next();
+            if(item == null) {
+              if(--p == -1) {
+                node = null;
+                break;
+              }
+            } else if(p < iter.length - 1) {
+              ++p;
+              ctx.value = item;
+              if(iter[p] == null || !iter[p].reset())
+                iter[p] = ctx.iter(expr[p]);
+            } else {
+              // not expected to happen, as steps will always yield nodes
+              if(!item.node()) NODESPATH.thrw(input, this, item.type);
+              final ANode n = (ANode) item;
+              if(node == null || !node.is(n)) {
+                node = n;
+                break;
+              }
             }
           }
+          return node;
+        } finally {
+          // reset context and return result
+          ctx.value = cv;
+          ctx.pos = cp;
+          ctx.size = cs;
         }
-
-        // reset context and return result
-        ctx.value = cv;
-        ctx.pos = cp;
-        ctx.size = cs;
-        return node;
       }
 
       @Override
