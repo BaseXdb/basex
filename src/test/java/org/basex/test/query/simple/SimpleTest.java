@@ -82,12 +82,14 @@ public final class SimpleTest extends QueryTest {
 
       { "ContextItem 0", node(0), "." },
       { "ContextItem 1", node(0), "42[not(.)], ." },
-
       { "ContextItem 2", "try { 1[error()] } catch {.}" },
       { "ContextItem 3", "try { 1[error()][1] } catch {.}" },
       { "ContextItem 4", "try { 1[1][error()] } catch {.}" },
       { "ContextItem 5", node(0),
         "try { let $a := <a><b/></a> return $a/b[error()] } catch * { . }" },
+      { "ContextItem 6", itr(1),
+        "declare function local:x() { 1+<x/> };" +
+        "1[try { local:x() } catch * { . }]" },
 
     };
   }
