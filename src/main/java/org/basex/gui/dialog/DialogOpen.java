@@ -84,9 +84,9 @@ public final class DialogOpen extends Dialog {
       List.list(main.context);
     choice = new BaseXList(dbs.toArray(), this, !m);
     set(choice, BorderLayout.CENTER);
-    choice.setSize(160, 440);
+    choice.setSize(160, 450);
 
-    final BaseXBack info = new BaseXBack(new BorderLayout());
+    final BaseXBack info = new BaseXBack(new BorderLayout(5, 10));
     info.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(10, 10, 10, 10)));
 
@@ -100,7 +100,12 @@ public final class DialogOpen extends Dialog {
     BaseXLayout.setWidth(detail, 400);
 
     backupchoice = new BaseXCombo(this, "");
-    if(manage) info.add(backupchoice, BorderLayout.NORTH);
+    if(manage) {
+      final BaseXBack b = new BaseXBack(new BorderLayout(5, 5));
+      b.add(new BaseXLabel("Available backups:"), BorderLayout.NORTH);
+      b.add(backupchoice, BorderLayout.CENTER);
+      info.add(b, BorderLayout.NORTH);
+    }
     info.add(detail, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack(new BorderLayout()).border(0, 12, 0, 0);
