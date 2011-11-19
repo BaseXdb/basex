@@ -26,6 +26,8 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.HandlerList;
+import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 
 /**
@@ -134,12 +136,23 @@ public final class BaseXHTTP {
     conn.setPort(hport);
     jetty.addConnector(conn);
 
-    final org.mortbay.jetty.servlet.Context jcontext =
+    final org.mortbay.jetty.servlet.Context jctx =
         new org.mortbay.jetty.servlet.Context(jetty, "/",
             org.mortbay.jetty.servlet.Context.SESSIONS);
 
-    if(rest) jcontext.addServlet(RESTServlet.class, "/rest/*");
-    if(webdav) jcontext.addServlet(WebDAVServlet.class, "/webdav/*");
+    if(rest)   jctx.addServlet(RESTServlet.class, "/rest/*");
+    if(webdav) jctx.addServlet(WebDAVServlet.class, "/webdav/*");
+
+    final ResourceHandler rh = new ResourceHandler();
+    rh.setWelcomeFiles(new String[] {
+        "index.xml", "index.xhtml", "index.html" });
+    rh.setResourceBase(ctx.mprop.get(MainProp.HTTPPATH));
+
+    final HandlerList hl = new HandlerList();
+    hl.addHandler(rh);
+    hl.addHandler(jctx);
+    //hl.addHandler(new DefaultHandler());
+    jetty.setHandler(hl);
 
     jetty.start();
     new StopServer(sport, shost).start();
