@@ -195,14 +195,13 @@ public final class FNFile extends FuncCall {
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
 
     final StringList list = new StringList();
-    list(dir.getPath().length() + 1, dir, list, rec, pat);
+    list(dir.getPath().length(), dir, list, rec, pat);
 
     return new Iter() {
-      int c = -1;
-
+      int c;
       @Override
       public Item next() {
-        return ++c < list.size() ? Str.get(list.get(c)) : null;
+        return c < list.size() ? Str.get(path + list.get(c++)) : null;
       }
     };
   }
