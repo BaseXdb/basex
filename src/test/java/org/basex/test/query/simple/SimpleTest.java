@@ -86,11 +86,11 @@ public final class SimpleTest extends QueryTest {
       { "ContextItem 5", node(0),
         "try { let $a := <a><b/></a> return $a/b[error()] } catch * {.}" },
       { "ContextItem 6", itr(1),
-        "declare function local:x() { 1+<x/> };" +
-        "1[try { local:x() } catch * {.}]" },
-      { "ContextItem 7", node(0),
-        "try { <a/>/(1+'') } catch * {.}"
-      }
+        "declare function local:x() {1+<x/>};1[try { local:x() } catch *{.}]" },
+      { "ContextItem 7", node(0), "try { <a/>/(1+'') } catch * {.}" },
+
+      { "Path 1", empty(), "<a/>[./(@*)]" },
+
     };
   }
 }
