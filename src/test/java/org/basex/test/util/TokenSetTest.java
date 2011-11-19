@@ -19,7 +19,6 @@ public class TokenSetTest {
   private static final int SIZE = 65536;
   /** Token list. */
   private static final TokenList LIST = new TokenList();
-
   /** Token set. */
   private final TokenSet set = new TokenSet();
 

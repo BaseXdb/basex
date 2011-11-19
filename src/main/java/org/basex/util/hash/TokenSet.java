@@ -99,12 +99,14 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Deletes the specified key. The total number of entries does not change
-   * by calling this method.
+   * Deletes the specified key.
+   * <b>Warning</b>: After a deletion, the key array will have {@code null}
+   * entries, and the total number of entries will not reflect the number
+   * of valid entries anymore.
    * @param key key
    * @return deleted key or 0
    */
-  public final int delete(final byte[] key) {
+  public int delete(final byte[] key) {
     final int p = hash(key) & bucket.length - 1;
     int o = 0, n;
     for(int id = bucket[p]; id != 0; id = n) {
@@ -112,6 +114,7 @@ public class TokenSet implements Iterable<byte[]> {
       if(eq(key, keys[id])) {
         if(bucket[p] == id) bucket[p] = n;
         else next[o] = next[n];
+        keys[id] = null;
         return id;
       }
       o = id;

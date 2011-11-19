@@ -47,6 +47,13 @@ public final class TokenObjMap<E> extends TokenSet {
   }
 
   @Override
+  public int delete(final byte[] key) {
+    final int i = super.delete(key);
+    values[i] = null;
+    return i;
+  }
+
+  @Override
   protected void rehash() {
     super.rehash();
     values = Arrays.copyOf(values, size << 1);
