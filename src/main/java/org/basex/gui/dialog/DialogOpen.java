@@ -162,6 +162,13 @@ public final class DialogOpen extends Dialog {
     ok = manage || o;
 
     /*
+     * [LK] TODO
+     *
+     * DONE- check if database correctly closed before restore
+     * DONE- check order of backups, newest first
+     * DONE- use pattern in Restore.java
+     *
+     * DONE
      * backup --
      * ok --
      * drop ??
@@ -186,7 +193,6 @@ public final class DialogOpen extends Dialog {
     } else if(cmp == backup) {
       for(final String s : dbs) cmds.add(new CreateBackup(s));
     } else if(cmp == restore) {
-      System.out.println(backupchoice.getSelectedItem());
       if(dbs.size() == 1) cmds.add(
           new Restore((String) backupchoice.getSelectedItem()));
       else
