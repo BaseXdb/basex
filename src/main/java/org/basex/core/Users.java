@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -25,8 +24,7 @@ import org.basex.util.list.TokenList;
  */
 public final class Users {
   /** User array. */
-  private final List<User> list =
-    Collections.synchronizedList(new ArrayList<User>(0));
+  private final List<User> list = new ArrayList<User>(0);
   /** Filename; set to {@code null} if the instance handles local users. */
   private File file;
 

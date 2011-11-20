@@ -79,6 +79,8 @@ public final class MetaData {
   public boolean uptodate = true;
   /** Flag for out-of-date indexes. */
   public boolean oldindex;
+  /** Flag to indicate possible corruption. */
+  public boolean corrupt;
   /** Dirty flag. */
   public boolean dirty;
   /** Table size. */
@@ -337,6 +339,7 @@ public final class MetaData {
       oldindex = true;
       update();
     }
+    corrupt = dbfile(DATAUPD).exists();
   }
 
   /**

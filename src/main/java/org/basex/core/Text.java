@@ -479,6 +479,8 @@ public interface Text {
   String DBUPDATE = lang("pc_update");
   /** Index update. */
   String INDUPDATE = lang("pc_indupdate");
+  /** Possible corruption. */
+  String DBCORRUPT = lang("pc_corrupt");
   /** Builder error. */
   String CANCELCREATE = lang("pc_cancel");
   /** Create database information. */

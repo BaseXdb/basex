@@ -113,9 +113,12 @@ public final class Add extends ACreate {
     Data tmp = null;
     try {
       tmp = build.build();
-      data.insert(data.meta.size, -1, tmp);
-      context.update();
-      data.flush();
+      // ignore empty fragments
+      if(tmp.meta.size > 1) {
+        data.insert(data.meta.size, -1, tmp);
+        context.update();
+        data.flush();
+      }
       return info(parser.info() + PATHADDED, name, perf);
     } catch(final IOException ex) {
       Util.debug(ex);

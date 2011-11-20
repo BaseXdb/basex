@@ -64,6 +64,7 @@ public final class InfoDB extends AInfo {
     final int raw = meta.binaries().descendants().size();
     format(tb, INFONRES, Integer.toString(meta.ndocs + raw));
     format(tb, INFOTIME, DATE.format(new Date(meta.dbtime())));
+    if(meta.corrupt) tb.add(' ' + DBCORRUPT + NL);
 
     tb.add(NL).addExt(header, INFORESOURCE);
     if(create && !meta.original.isEmpty()) format(tb, INFOPATH, meta.original);

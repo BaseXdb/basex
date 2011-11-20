@@ -751,18 +751,20 @@ public enum Function {
     URIS.put(FNXslt.class, XSLTURI);
   }
 
-  /** Function classes. */
-  final Class<? extends FuncCall> func;
-  /** Descriptions. */
-  final String desc;
   /** Minimum number of arguments. */
   public final int min;
   /** Maximum number of arguments. */
   public final int max;
   /** Argument types. */
   public final SeqType[] args;
+
+  /** Descriptions. */
+  final String desc;
   /** Return type. */
   final SeqType ret;
+
+  /** Function classes. */
+  private final Class<? extends FuncCall> func;
 
   /**
    * Default constructor.
@@ -811,7 +813,7 @@ public enum Function {
    * Returns the namespace URI of this function.
    * @return function
    */
-  public byte[] uri() {
+  public final byte[] uri() {
     final byte[] u = URIS.get(func);
     return u == null ? FNURI : u;
   }
@@ -821,7 +823,7 @@ public enum Function {
    * @param arity number of arguments
    * @return function type
    */
-  public FuncType type(final int arity) {
+  public final FuncType type(final int arity) {
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);
@@ -846,7 +848,7 @@ public enum Function {
    * @param arg arguments
    * @return string representation
    */
-  public String args(final Object... arg) {
+  public final String args(final Object... arg) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Object a : arg) {
       if(tb.size() != 0) tb.add(',');

@@ -346,6 +346,7 @@ pc_create=Cơ sở dữ liệu đã được tạo
 pc_index=Đang tạo Indexes
 pc_update=Định dạng cơ sở dữ liệu đã bị đổi; xin tạo cơ sở dữ liệu mới.
 pc_indupdate=Định dạng index đã bị đổi; xin tạo index mới.
+pc_corrupt=Warning: the database may be corrupt!
 pc_cancel=Việc tạo cơ sở dữ liệu đã bị hủy.
 pc_finish=Finishing
 pc_indextxt=Đang index văn bản
