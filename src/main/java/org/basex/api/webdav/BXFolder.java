@@ -85,8 +85,6 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     return new BXCode<BXFolder>(this) {
       @Override
       public BXFolder get() throws IOException {
-        // [DP] WebDAV: possible optimization would be to rename the dummy, if
-        // the current folder is empty (which not always the case)
         deleteDummy(s, db, path);
         final String newFolder = path + SEP + folder;
         createDummy(s, db, newFolder);
