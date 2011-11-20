@@ -129,8 +129,7 @@ public final class NamespaceTest {
   }
 
   /**
-   * [LK]
-   * Test query.
+   * [LK] Namespaces: Test query.
    * Tests preserve, no-inherit for copy expression. Related to XQUTS
    * id-insert-expr-081-no-inherit.xq. Tests if no-inherit has a persistent
    * effect. Is it actually supposed to?
