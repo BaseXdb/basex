@@ -188,7 +188,6 @@ public final class PermissionTest {
     no(new Grant("none", NAME), testSession);
     no(new AlterUser(NAME, Token.md5(NAME)), testSession);
     no(new Flush(), testSession);
-    // [CG] to be tested...
     ok(new Close(), testSession);
   }
 
@@ -314,7 +313,6 @@ public final class PermissionTest {
 
   /**
    * Assumes that this command fails.
-   * [MS] does not check whether it fails *really* due to permissions
    * @param cmd command reference
    * @param s session
    */

@@ -2155,9 +2155,14 @@ public class QueryParser extends InputParser {
     if(!wsConsume(PAR2)) {
       do {
         Expr arg = null;
-        if(!wsConsume(PLHOLDER) && (arg = single()) == null) error(FUNCMISS,
-            name);
-        args = Array.add(args, arg);
+        if(!wsConsume(PLHOLDER) && (arg = single()) == null)
+          error(FUNCMISS, name);
+        // speeding up array creation
+        final int a = args.length;
+        final Expr[] tmp = new Expr[a + 1];
+        System.arraycopy(args, 0, tmp, 0, a);
+        tmp[a] = arg;
+        args = tmp;
       } while(wsConsume(COMMA));
       if(!wsConsume(PAR2)) error(FUNCMISS, name);
     }

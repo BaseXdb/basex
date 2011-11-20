@@ -4,7 +4,9 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.IOException;
+import java.util.HashSet;
 
+import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
@@ -87,6 +89,7 @@ public final class Transform extends Arr {
       // add resulting node to variable
       ctx.vars.add(fo.var.bind(new DBNode(md, 0), ctx).copy());
       pu.addData(md);
+      if(ctx.copiedNods == null) ctx.copiedNods = new HashSet<Data>();
       ctx.copiedNods.add(md);
     }
 
