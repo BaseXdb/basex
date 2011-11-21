@@ -102,7 +102,7 @@ public final class DialogOpen extends Dialog {
     backupchoice = new BaseXCombo(this, "");
     if(manage) {
       final BaseXBack b = new BaseXBack(new BorderLayout(5, 5));
-      b.add(new BaseXLabel("Available backups:"), BorderLayout.NORTH);
+      b.add(new BaseXLabel(AVAILABLE), BorderLayout.NORTH);
       b.add(backupchoice, BorderLayout.CENTER);
       info.add(b, BorderLayout.NORTH);
     }
@@ -227,8 +227,7 @@ public final class DialogOpen extends Dialog {
       if(manage) {
         final String[] backups = ShowBackups.findBackups(db, ctx).toArray();
         if(!o && backups.length > 0) {
-          detail.setText(Token.token("Database only available as backup.\n" +
-              "Please choose a backup to restore."));
+          detail.setText(Token.token(ONLYBACKUP));
         }
         backupchoice.setModel(new DefaultComboBoxModel(backups));
       }
