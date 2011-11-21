@@ -63,7 +63,7 @@ public abstract class Cmp extends Arr {
     final Expr a = expr[1];
     if(!a.item()) return this;
     final Item it = (Item) a;
-    if(!it.num() && !it.unt()) return this;
+    if(!it.isNumber() && !it.isUntyped()) return this;
 
     final double v = it.dbl(input);
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)

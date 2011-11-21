@@ -1,7 +1,5 @@
 package org.basex.query.item;
 
-import static org.basex.util.Token.*;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
@@ -15,23 +13,23 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class Itr extends Num {
+public class Int extends Num {
   /** Constant values. */
-  private static final Itr[] NUMS;
+  private static final Int[] NUMS;
   /** Integer value. */
   private final long val;
 
   // caches the first 128 integers
   static {
-    NUMS = new Itr[128];
-    for(int i = 0; i < NUMS.length; ++i) NUMS[i] = new Itr(i);
+    NUMS = new Int[128];
+    for(int i = 0; i < NUMS.length; ++i) NUMS[i] = new Int(i);
   }
 
   /**
    * Constructor.
    * @param v value
    */
-  private Itr(final long v) {
+  private Int(final long v) {
     this(v, AtomType.ITR);
   }
 
@@ -40,7 +38,7 @@ public class Itr extends Num {
    * @param v value
    * @param t data type
    */
-  public Itr(final long v, final Type t) {
+  public Int(final long v, final Type t) {
     super(t);
     val = v;
   }
@@ -49,7 +47,7 @@ public class Itr extends Num {
    * Constructor.
    * @param d date time
    */
-  Itr(final Date d) {
+  Int(final Date d) {
     this(d.xc.toGregorianCalendar().getTimeInMillis(), AtomType.LNG);
   }
 
@@ -58,8 +56,8 @@ public class Itr extends Num {
    * @param v value
    * @return instance
    */
-  public static Itr get(final long v) {
-    return v >= 0 && v < NUMS.length ? NUMS[(int) v] : new Itr(v);
+  public static Int get(final long v) {
+    return v >= 0 && v < NUMS.length ? NUMS[(int) v] : new Int(v);
   }
 
   /**
@@ -68,12 +66,12 @@ public class Itr extends Num {
    * @param t data type
    * @return instance
    */
-  public static Itr get(final long v, final Type t) {
-    return t == AtomType.ITR ? get(v) : new Itr(v, t);
+  public static Int get(final long v, final Type t) {
+    return t == AtomType.ITR ? get(v) : new Int(v, t);
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
+  public final byte[] string(final InputInfo ii) {
     return val == 0 ? Token.ZERO : Token.token(val);
   }
 
@@ -105,15 +103,15 @@ public class Itr extends Num {
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    return it instanceof Itr ? val == ((Itr) it).val : val == it.dbl(ii);
+    return it instanceof Int ? val == ((Int) it).val : val == it.dbl(ii);
   }
 
   @Override
   public final int diff(final InputInfo ii, final Item it)
       throws QueryException {
 
-    if(it instanceof Itr) {
-      final long i = ((Itr) it).val;
+    if(it instanceof Int) {
+      final long i = ((Int) it).val;
       return val < i ? -1 : val > i ? 1 : 0;
     }
     final double n = it.dbl(ii);
@@ -136,8 +134,8 @@ public class Itr extends Num {
 
   @Override
   public final boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Itr)) return false;
-    final Itr i = (Itr) cmp;
+    if(!(cmp instanceof Int)) return false;
+    final Int i = (Int) cmp;
     return type == i.type && val == i.val;
   }
 
@@ -152,11 +150,11 @@ public class Itr extends Num {
       throws QueryException {
 
     // try fast conversion
-    final long l = toLong(val);
+    final long l = Token.toLong(val);
     if(l != Long.MIN_VALUE) return l;
 
     try {
-      final String v = string(Token.trim(val));
+      final String v = Token.string(Token.trim(val));
       return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);
     } catch(final NumberFormatException ex) {
       throw NUMS[0].castErr(val, ii);

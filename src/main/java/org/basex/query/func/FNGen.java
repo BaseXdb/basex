@@ -84,7 +84,7 @@ public final class FNGen extends FuncCall {
   public Expr cmp(final QueryContext ctx) {
     if(def == Function.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();
-      type = t.type.node() ? SeqType.get(AtomType.ATM, t.occ) : t;
+      type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
     return this;
   }
@@ -103,7 +103,7 @@ public final class FNGen extends FuncCall {
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
-        if(it.func()) FNATM.thrw(input, FNGen.this);
+        if(it.isFunction()) FNATM.thrw(input, FNGen.this);
         return atom(it);
       }
     };
@@ -218,7 +218,7 @@ public final class FNGen extends FuncCall {
    * @throws QueryException query exception
    */
   Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
-    return textIter(unparsedText(ctx).atom());
+    return textIter(unparsedText(ctx).string());
   }
 
   /**
@@ -272,7 +272,7 @@ public final class FNGen extends FuncCall {
       if(!base.valid()) BASEINV.thrw(input, base);
     }
 
-    final IO io = new IOContent(cont, string(base.atom()));
+    final IO io = new IOContent(cont, string(base.string()));
     try {
       return new DBNode(io, ctx.context.prop);
     } catch(final IOException ex) {

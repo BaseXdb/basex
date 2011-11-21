@@ -340,7 +340,7 @@ public enum Err {
   /** XPDY0050: Evaluation exception. */
   CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
   /** XPDY0050: Evaluation exception. */
-  NOTREAT(XPDY, 50, "%: % expected, % found."),
+  NOTREAT(XPDY, 50, "%: % cannot be treated as %."),
   /** XPDY0050: Evaluation exception. */
   NOTREATS(XPDY, 50, "%: % expected, sequence found."),
 

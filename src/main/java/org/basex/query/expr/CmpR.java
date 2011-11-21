@@ -73,7 +73,7 @@ public final class CmpR extends Single {
   static Expr get(final CmpG ex) throws QueryException {
     if(!ex.expr[1].item()) return ex;
     final Item it = (Item) ex.expr[1];
-    if(!it.num()) return ex;
+    if(!it.isNumber()) return ex;
 
     final Expr e = ex.expr[0];
     final double d = it.dbl(ex.input);

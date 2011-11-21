@@ -93,12 +93,12 @@ public final class FNIndex extends TokenSet {
       final byte[] u = substring(keys[k], 1, i);
       final byte[] l = substring(keys[k], i + 1);
       if(eq(ln, l)) {
-        final byte[] ur = name.uri().atom();
+        final byte[] ur = name.uri().string();
         qp.error(FUNSIMILAR,
             new TokenBuilder(NSGlobal.prefix(ur)).add(':').add(l),
             new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
       } else if(ls.similar(ln, l, 0)) {
-        qp.error(FUNSIMILAR, name.atom(), l);
+        qp.error(FUNSIMILAR, name.string(), l);
       }
     }
   }

@@ -9,7 +9,7 @@ import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -40,7 +40,7 @@ public final class FNAggr extends FuncCall {
       case COUNT:
         long c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
-        return Itr.get(c);
+        return Int.get(c);
       case MIN:
         return minmax(iter, CmpV.Op.GT, ctx);
       case MAX:
@@ -48,7 +48,7 @@ public final class FNAggr extends FuncCall {
       case SUM:
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
-          expr.length == 2 ? expr[1].item(ctx, input) : Itr.get(0);
+          expr.length == 2 ? expr[1].item(ctx, input) : Int.get(0);
       case AVG:
         it = iter.next();
         return it == null ? null : sum(iter, it, true);
@@ -65,9 +65,9 @@ public final class FNAggr extends FuncCall {
 
     switch(def) {
       case COUNT:
-        return Itr.get(c);
+        return Int.get(c);
       case SUM:
-        return c == 0 ? expr.length == 2 ? expr[1] : Itr.get(0) : this;
+        return c == 0 ? expr.length == 2 ? expr[1] : Int.get(0) : this;
       default:
         return this;
     }
@@ -84,20 +84,20 @@ public final class FNAggr extends FuncCall {
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
 
-    Item res = it.unt() ? Dbl.get(it.atom(input), input) : it;
-    if(!res.num() && (!res.dur() || res.type == DUR))
+    Item res = it.isUntyped() ? Dbl.get(it.string(input), input) : it;
+    if(!res.isNumber() && (!res.isDuration() || res.type == DUR))
       SUMTYPE.thrw(input, this, res.type);
-    final boolean n = res.num();
+    final boolean n = res.isNumber();
 
     int c = 1;
     for(Item i; (i = iter.next()) != null;) {
-      final boolean un = i.unt() || i.num();
+      final boolean un = i.isUntyped() || i.isNumber();
       if(n && !un) FUNNUM.thrw(input, this, i.type);
       if(!n && un) FUNDUR.thrw(input, this, i.type);
       res = Calc.PLUS.ev(input, res, i);
       ++c;
     }
-    return avg ? Calc.DIV.ev(input, res, Itr.get(c)) : res;
+    return avg ? Calc.DIV.ev(input, res, Int.get(c)) : res;
   }
 
   /**
@@ -120,7 +120,7 @@ public final class FNAggr extends FuncCall {
     cmp.e(input, res, res);
 
     // strings or dates
-    if(!res.unt() && res.str() || res.date()) {
+    if(!res.isUntyped() && res.isString() || res.isDate()) {
       for(Item it; (it = iter.next()) != null;) {
         if(it.type != res.type) {
           FUNCMP.thrw(input, desc(), res.type, it.type);
@@ -131,12 +131,13 @@ public final class FNAggr extends FuncCall {
     }
 
     // durations or numbers
-    Type t = res.unt() ? DBL : res.type;
+    Type t = res.isUntyped() ? DBL : res.type;
     if(res.type != t) res = t.e(res, ctx, input);
 
     for(Item it; (it = iter.next()) != null;) {
       t = type(res, it);
-      if(!it.dur() && Double.isNaN(it.dbl(input)) || cmp.e(input, res, it))
+      if(!it.isDuration() && Double.isNaN(it.dbl(input)) ||
+          cmp.e(input, res, it))
         res = it;
       if(res.type != t) res = t.e(res, ctx, input);
     }
@@ -152,18 +153,19 @@ public final class FNAggr extends FuncCall {
    */
   private Type type(final Item a, final Item b) throws QueryException {
     final Type ta = a.type, tb = b.type;
-    if(b.unt()) {
-      if(!a.num()) FUNCMP.thrw(input, this, ta, tb);
+    if(b.isUntyped()) {
+      if(!a.isNumber()) FUNCMP.thrw(input, this, ta, tb);
       return DBL;
     }
-    if(a.num() && !b.unt() && b.str()) FUNCMP.thrw(input, this, ta, tb);
+    if(a.isNumber() && !b.isUntyped() && b.isString())
+      FUNCMP.thrw(input, this, ta, tb);
 
     if(ta == tb) return ta;
     if(ta == DBL || tb == DBL) return DBL;
     if(ta == FLT || tb == FLT) return FLT;
     if(ta == DEC || tb == DEC) return DEC;
-    if(ta == BLN || a.num() && !b.num() || b.num() && !a.num())
-      FUNCMP.thrw(input, this, ta, tb);
-    return a.num() || b.num() ? ITR : ta;
+    if(ta == BLN || a.isNumber() && !b.isNumber() ||
+        b.isNumber() && !a.isNumber()) FUNCMP.thrw(input, this, ta, tb);
+    return a.isNumber() || b.isNumber() ? ITR : ta;
   }
 }

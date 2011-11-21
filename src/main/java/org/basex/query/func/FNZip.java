@@ -352,7 +352,7 @@ public final class FNZip extends FuncCall {
             if(hex || M_BASE64.equals(m)) {
               // treat children as base64/hex
               final ByteList bl = new ByteList();
-              do bl.add(n.atom()); while((n = ch.next()) != null);
+              do bl.add(n.string()); while((n = ch.next()) != null);
               final byte[] bytes = bl.toArray();
               zos.write((hex ? new Hex(bytes) : new B64(bytes)).toJava());
             } else {
@@ -391,7 +391,7 @@ public final class FNZip extends FuncCall {
       final QNm name = at.qname();
       if(name.eq(A_NAME) || name.eq(A_SRC)) continue;
       if(tb.size() != 0) tb.add(',');
-      tb.add(name.ln()).add('=').add(at.atom());
+      tb.add(name.ln()).add('=').add(at.string());
     }
     return tb.size() == 0 ? ctx.serProp(true) :
       new SerializerProp(tb.toString());

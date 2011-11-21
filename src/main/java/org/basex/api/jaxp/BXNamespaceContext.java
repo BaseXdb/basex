@@ -26,7 +26,7 @@ public final class BXNamespaceContext implements NamespaceContext {
 
   @Override
   public String getNamespaceURI(final String pre) {
-    final byte[] uri = ns.find(token(pre));
+    final byte[] uri = ns.localURI(token(pre));
     return uri == null ? null : string(uri);
   }
 

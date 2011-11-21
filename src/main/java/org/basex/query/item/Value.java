@@ -65,67 +65,67 @@ public abstract class Value extends Expr {
   public abstract long size();
 
   /**
-   * Checks if this is a single numeric item.
+   * Checks if this is a numeric item.
    * @return result of check
    */
-  public final boolean num() {
-    return type.num();
+  public boolean isNumber() {
+    return false;
   }
 
   /**
-   * Checks if this is a single function item.
+   * Checks if this is a function item.
    * @return result of check
    */
-  public final boolean func() {
-    return type.func();
+  public boolean isFunction() {
+    return false;
   }
 
   /**
-   * Checks if this is a single function item.
+   * Checks if this is a map.
    * @return result of check
    */
-  public final boolean map() {
-    return type.map();
+  public boolean isMap() {
+    return false;
   }
 
   /**
-   * Checks if this is a single untyped item.
+   * Checks if this is a untyped item.
    * @return result of check
    */
-  public final boolean unt() {
-    return type.unt();
+  public boolean isUntyped() {
+    return false;
   }
 
   /**
-   * Checks if this is a single string item.
+   * Checks if this is a string item.
    * @return result of check
    */
-  public final boolean str() {
-    return type.str();
+  public boolean isString() {
+    return false;
   }
 
   /**
-   * Checks if this is a single duration item.
+   * Checks if this is a duration item.
    * @return result of check
    */
-  public final boolean dur() {
-    return type.dur();
+  public boolean isDuration() {
+    return false;
   }
 
   /**
-   * Checks if this is a single date item.
+   * Checks if this is a date item.
    * @return result of check
    */
-  public final boolean date() {
-    return type.dat();
+  public boolean isDate() {
+    return false;
   }
 
   /**
-   * Checks if this is a single node.
+   * Checks if this is a node.
    * @return result of check
    */
-  public final boolean node() {
-    return type.node();
+  public boolean isNode() {
+    return false;
   }
 
   /**

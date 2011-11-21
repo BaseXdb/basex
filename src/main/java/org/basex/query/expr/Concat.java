@@ -40,7 +40,7 @@ public final class Concat extends Arr {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
       final Item it = a.item(ctx, input);
-      if(it != null) tb.add(it.atom(input));
+      if(it != null) tb.add(it.string(input));
     }
     return Str.get(tb.finish());
   }

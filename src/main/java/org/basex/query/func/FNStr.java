@@ -11,7 +11,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.ItrSeq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
@@ -76,7 +76,7 @@ public final class FNStr extends FuncCall {
         Item it2 = expr[1].item(ctx, input);
         if(it1 == null || it2 == null) return null;
         final int d = diff(checkEStr(it1), checkEStr(it2));
-        return Itr.get(Math.max(-1, Math.min(1, d)));
+        return Int.get(Math.max(-1, Math.min(1, d)));
       case CODEPOINT_EQUAL:
         it1 = e.item(ctx, input);
         it2 = expr[1].item(ctx, input);
@@ -169,7 +169,7 @@ public final class FNStr extends FuncCall {
         if(l == s.length) return null;
         final int i = cp(s, l);
         l += cl(s, l);
-        return Itr.get(i);
+        return Int.get(i);
       }
     };
   }
@@ -298,7 +298,7 @@ public final class FNStr extends FuncCall {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
       final Item it = a.item(ctx, input);
-      if(it != null) tb.add(it.atom(input));
+      if(it != null) tb.add(it.string(input));
     }
     return Str.get(tb.finish());
   }

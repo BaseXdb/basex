@@ -66,7 +66,7 @@ public final class Pos extends Simple {
 
     if(a.item()) {
       final Item it = (Item) a;
-      if(it.num()) {
+      if(it.isNumber()) {
         final long p = it.itr(ii);
         final boolean ex = p == it.dbl(ii);
         switch(cmp) {

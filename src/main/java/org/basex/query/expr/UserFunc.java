@@ -64,7 +64,7 @@ public class UserFunc extends Single {
    * @throws QueryException query exception
    */
   public final void check() throws QueryException {
-    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, name.atom());
+    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, name.string());
 
     final boolean u = expr.uses(Use.UPD);
     if(updating) {
@@ -139,9 +139,9 @@ public class UserFunc extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.attribute(NAM, name.atom());
+    ser.attribute(NAM, name.string());
     for(int i = 0; i < args.length; ++i) {
-      ser.attribute(Token.token(ARG + i), args[i].name.atom());
+      ser.attribute(Token.token(ARG + i), args[i].name.string());
     }
     expr.plan(ser);
     ser.closeElement();
@@ -149,7 +149,7 @@ public class UserFunc extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(name.atom());
+    final TokenBuilder tb = new TokenBuilder(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(ret != null) tb.add(' ' + AS + ' ' + ret);
     if(expr != null) tb.add(" { " + expr + " }; ");

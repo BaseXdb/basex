@@ -20,7 +20,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.ItrSeq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
@@ -280,7 +280,7 @@ public final class FNUtil extends FuncCall {
    * @return read integer
    * @throws QueryException exception
    */
-  private Itr fromBase(final QueryContext ctx, final InputInfo ii)
+  private Int fromBase(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final byte[] str = checkStr(expr[0], ctx);
@@ -297,7 +297,7 @@ public final class FNUtil extends FuncCall {
       res = res * base + num;
     }
 
-    return Itr.get(res);
+    return Int.get(res);
   }
 
   /**
@@ -353,7 +353,7 @@ public final class FNUtil extends FuncCall {
       }
       @Override
       public Item get(final long i) {
-        return Itr.get(bytes[(int) i], AtomType.BYT);
+        return Int.get(bytes[(int) i], AtomType.BYT);
       }
       @Override
       public Item next() { return pos < size() ? get(pos++) : null; }

@@ -46,7 +46,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.query.func.Function;
 import org.basex.query.item.ANode;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.util.Array;
@@ -367,7 +367,8 @@ public enum GUICommands implements GUICommand {
 
       final StringList sl = insert.result;
       final NodeType type = ANode.type(insert.kind);
-      String item = Token.string(type.nam()) + " { " + quote(sl.get(0)) + " }";
+      String item = Token.string(type.string()) +
+          " { " + quote(sl.get(0)) + " }";
 
       if(type == NodeType.ATT || type == NodeType.PI) {
         item += " { " + quote(sl.get(1)) + " }";
@@ -961,6 +962,6 @@ public enum GUICommands implements GUICommand {
    */
   static String openPre(final Nodes n, final int i) {
     return Function._DB_OPEN_PRE.get(null, Str.get(n.data.meta.name),
-        Itr.get(n.list[i])).toString();
+        Int.get(n.list[i])).toString();
   }
 }

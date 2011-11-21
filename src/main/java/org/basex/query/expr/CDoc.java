@@ -33,7 +33,9 @@ public final class CDoc extends CFrag {
     if(c.errAtt || c.atts.size() != 0) XPATT.thrw(ii);
 
     final FDoc doc = new FDoc(c.children, Token.EMPTY);
-    for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(doc);
+    for(int n = 0; n < c.children.size(); ++n) {
+      c.children.get(n).parent(doc);
+    }
     return doc;
   }
 
@@ -44,6 +46,6 @@ public final class CDoc extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.DOC.nam()));
+    return toString(Token.string(NodeType.DOC.string()));
   }
 }

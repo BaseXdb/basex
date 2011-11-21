@@ -112,7 +112,7 @@ public final class FElem extends FNode {
     }
 
     final byte[] pref = name.pref();
-    final byte[] uri = name.uri().atom();
+    final byte[] uri = name.uri().string();
     final byte[] old = nss.get(pref);
     if(old == null || !Token.eq(uri, old)) {
       ns.add(pref, uri);
@@ -184,7 +184,7 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] nname() {
-    return name.atom();
+    return name.string();
   }
 
   @Override
@@ -194,10 +194,10 @@ public final class FElem extends FNode {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    final byte[] tag = name.atom();
+    final byte[] tag = name.string();
     ser.openElement(tag);
 
-    if(name.hasUri()) ser.namespace(name.pref(), name.uri().atom());
+    if(name.hasUri()) ser.namespace(name.pref(), name.uri().string());
 
     // serialize all namespaces at top level...
     if(ser.level() == 0) {
@@ -211,10 +211,10 @@ public final class FElem extends FNode {
     for(int n = 0; n < atts.size(); ++n) {
       final ANode node = atts.get(n);
       final QNm atn = node.qname();
-      if(atn.ns() && !NSGlobal.standard(atn.uri().atom())) {
-        ser.namespace(atn.pref(), atn.uri().atom());
+      if(atn.ns() && !NSGlobal.standard(atn.uri().string())) {
+        ser.namespace(atn.pref(), atn.uri().string());
       }
-      ser.attribute(atn.atom(), node.atom());
+      ser.attribute(atn.string(), node.string());
     }
 
     // serialize children
@@ -224,21 +224,22 @@ public final class FElem extends FNode {
 
   @Override
   public FNode copy() {
-    final FNode node = new FElem(name, ns).parent(par);
+    final FElem node = new FElem(name);
     for(int c = 0; c < children.size(); ++c) node.add(children.get(c).copy());
     for(int c = 0; c < atts.size(); ++c) node.add(atts.get(c).copy());
-    return node;
+    for(int c = 0; c < ns.size; ++c) node.ns.add(ns.key[c], ns.val[c]);
+    return node.parent(par);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.atom());
+    ser.emptyElement(this, NAM, name.string());
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
-    sb.append(Token.string(name.atom()));
+    sb.append(Token.string(name.string()));
     if(atts.size() != 0 || ns != null && ns.size != 0 || children.size() != 0)
       sb.append(" ...");
     return sb.append("/>").toString();

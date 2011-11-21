@@ -62,7 +62,7 @@ public final class List extends Arr {
     }
 
     // return cached integer sequence, cached values or self reference
-    return v ? type.type.instance(AtomType.ITR) ?
+    return v ? type.type.instanceOf(AtomType.ITR) ?
         optPre(ItrSeq.get(expr, size, type.type), ctx) :
         optPre(value(ctx), ctx) : this;
   }

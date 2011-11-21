@@ -37,10 +37,10 @@ public final class CPI extends CFrag {
   public FPI item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Item it = checkItem(expr[0], ctx);
-    if(!it.unt() && !it.str() && it.type != AtomType.QNM)
+    if(!it.isUntyped() && !it.isString() && it.type != AtomType.QNM)
       CPIWRONG.thrw(input, it.type, it);
 
-    final byte[] nm = trim(it.atom(ii));
+    final byte[] nm = trim(it.string(ii));
     if(eq(lc(nm), XML)) CPIXML.thrw(input, nm);
     if(!XMLToken.isNCName(nm)) CPIINVAL.thrw(input, nm);
 
@@ -62,6 +62,6 @@ public final class CPI extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.PI.nam()));
+    return toString(Token.string(NodeType.PI.string()));
   }
 }

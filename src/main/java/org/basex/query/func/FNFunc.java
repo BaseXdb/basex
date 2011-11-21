@@ -12,7 +12,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.FItem;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -53,7 +53,7 @@ public final class FNFunc extends FuncCall {
       throws QueryException {
     switch(def) {
       case FUNCTION_ARITY:
-        return Itr.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
+        return Int.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
       case FUNCTION_NAME:
         return getFun(0, FuncType.ANY_FUN, ctx).fName();
       case PARTIAL_APPLY:
@@ -231,7 +231,7 @@ public final class FNFunc extends FuncCall {
   private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!f.func() || ((FItem) f).arity() != a)
+    if(!f.isFunction() || ((FItem) f).arity() != a)
       Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;

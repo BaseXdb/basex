@@ -98,20 +98,20 @@ public final class NameTest extends Test {
         return eq(ln, ln(node.nname()));
       // name wildcard - check only namespace
       case NS:
-        return name.uri().eq(node.qname(tmpq).uri());
+        return name.uri().eq(node.update(tmpq).uri());
       default:
         // check attributes, or check everything
         return type == NodeType.ATT && !name.ns() ? eq(ln, node.nname()) :
-          name.eq(node.qname(tmpq));
+          name.eq(node.update(tmpq));
     }
   }
 
   @Override
   public String toString() {
     if(test == Name.ALL) return "*";
-    if(test == Name.NAME) return "*:" + string(name.atom());
+    if(test == Name.NAME) return "*:" + string(name.string());
     final String uri = name.uri() == Uri.EMPTY || name.ns() ? "" :
-      "{" + string(name.uri().atom()) + "}";
-    return uri + (test == Name.NS ? "*" : string(name.atom()));
+      "{" + string(name.uri().string()) + "}";
+    return uri + (test == Name.NS ? "*" : string(name.string()));
   }
 }

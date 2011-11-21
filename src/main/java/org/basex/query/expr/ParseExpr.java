@@ -88,7 +88,7 @@ public abstract class ParseExpr extends Expr {
     } else {
       final Iter ir = iter(ctx);
       it = ir.next();
-      if(it != null && !it.node() && ir.next() != null)
+      if(it != null && !it.isNode() && ir.next() != null)
         CONDTYPE.thrw(input, this);
     }
     return it == null ? Bln.FALSE : it;
@@ -99,7 +99,8 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = ebv(ctx, input);
-    return (it.num() ? it.dbl(input) == ctx.pos : it.bool(input)) ? it : null;
+    return (it.isNumber() ? it.dbl(input) == ctx.pos :
+      it.bool(input)) ? it : null;
   }
 
   @Override
@@ -192,7 +193,8 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = checkNoEmpty(e.item(ctx, input), AtomType.BLN);
-    if(!it.unt() && it.type != AtomType.BLN) Err.type(this, AtomType.BLN, it);
+    if(!it.isUntyped() && it.type != AtomType.BLN)
+      Err.type(this, AtomType.BLN, it);
     return it.bool(input);
   }
 
@@ -208,7 +210,7 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = checkNoEmpty(e.item(ctx, input), AtomType.DBL);
-    if(!it.unt() && !it.num()) Err.number(this, it);
+    if(!it.isUntyped() && !it.isNumber()) Err.number(this, it);
     return it.dbl(input);
   }
 
@@ -246,7 +248,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final long checkItr(final Item it) throws QueryException {
-    if(!it.unt() && !it.type.instance(AtomType.ITR))
+    if(!it.isUntyped() && !it.type.instanceOf(AtomType.ITR))
       Err.type(this, AtomType.ITR, it);
     return it.itr(input);
   }
@@ -259,7 +261,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final ANode checkNode(final Item it) throws QueryException {
-    if(!it.node()) Err.type(this, NodeType.NOD, it);
+    if(!it.isNode()) Err.type(this, NodeType.NOD, it);
     return (ANode) it;
   }
 
@@ -301,8 +303,8 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkStr(final Expr e, final QueryContext ctx)
       throws QueryException {
     final Item it = checkItem(e, ctx);
-    if(!it.str() && !it.unt()) Err.type(this, AtomType.STR, it);
-    return it.atom(input);
+    if(!it.isString() && !it.isUntyped()) Err.type(this, AtomType.STR, it);
+    return it.string(input);
   }
 
   /**
@@ -314,8 +316,8 @@ public abstract class ParseExpr extends Expr {
    */
   public final byte[] checkEStr(final Item it) throws QueryException {
     if(it == null) return EMPTY;
-    if(!it.str() && !it.unt()) Err.type(this, AtomType.STR, it);
-    return it.atom(input);
+    if(!it.isString() && !it.isUntyped()) Err.type(this, AtomType.STR, it);
+    return it.string(input);
   }
 
   /**
@@ -352,7 +354,7 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkBin(final Expr e, final QueryContext ctx)
       throws QueryException {
     final Item it = checkEmpty(e.item(ctx, input));
-    return it instanceof Bin ? ((Bin) it).toJava() : it.atom(input);
+    return it instanceof Bin ? ((Bin) it).toJava() : it.string(input);
   }
 
   /**
@@ -365,7 +367,7 @@ public abstract class ParseExpr extends Expr {
   public final Item checkType(final Item it, final Type t)
       throws QueryException {
 
-    if(!checkEmpty(it).type.instance(t)) Err.type(this, t, it);
+    if(!checkEmpty(it).type.instanceOf(t)) Err.type(this, t, it);
     return it;
   }
 
@@ -408,7 +410,7 @@ public abstract class ParseExpr extends Expr {
     checkAdmin(ctx);
     final String name = string(checkStr(e, ctx));
     IO io = IO.get(name);
-    if(!io.exists()) io = new IOFile(string(ctx.baseURI.atom()), name);
+    if(!io.exists()) io = new IOFile(string(ctx.baseURI.string()), name);
     if(!io.exists()) RESFNF.thrw(input, name);
     return io;
   }

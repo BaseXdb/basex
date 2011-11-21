@@ -9,7 +9,7 @@ import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
@@ -206,7 +206,7 @@ public final class FNSeq extends FuncCall {
           final Item i = ir.next();
           if(i == null) return null;
           ++c;
-          if(i.comparable(it) && CmpV.Op.EQ.e(input, i, it)) return Itr.get(c);
+          if(i.comparable(it) && CmpV.Op.EQ.e(input, i, it)) return Int.get(c);
         }
       }
     };

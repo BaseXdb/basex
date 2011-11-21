@@ -41,7 +41,7 @@ public final class CTxt extends CFrag {
     boolean more = false;
     do {
       if(more) tb.add(' ');
-      tb.add(it.atom(ii));
+      tb.add(it.string(ii));
       more = true;
     } while((it = iter.next()) != null);
 
@@ -55,6 +55,6 @@ public final class CTxt extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.TXT.nam()));
+    return toString(Token.string(NodeType.TXT.string()));
   }
 }

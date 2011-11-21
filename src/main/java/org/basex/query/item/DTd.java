@@ -116,7 +116,7 @@ public final class DTd extends Dur {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(sc.signum() < 0) tb.add('-');
     tb.add('P');

@@ -463,7 +463,7 @@ public abstract class Serializer {
    */
   protected final byte[] atom(final Item it) throws IOException {
     try {
-      return it.atom(null);
+      return it.string(null);
     } catch(final QueryException ex) {
       throw new IOException(ex.getMessage(), ex);
     }

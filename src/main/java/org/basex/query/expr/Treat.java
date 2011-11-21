@@ -49,8 +49,8 @@ public final class Treat extends Single {
     }
     if(type.zeroOrOne()) {
       if(iter.next() != null) NOTREATS.thrw(input, desc(), type);
-      if(!it.type.instance(type.type))
-        NOTREAT.thrw(input, desc(), type, it.type);
+      if(!it.type.instanceOf(type.type))
+        NOTREAT.thrw(input, desc(), it.type, type);
       return it.iter();
     }
 
@@ -60,8 +60,8 @@ public final class Treat extends Single {
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;
-        if(!i.type.instance(type.type))
-          NOTREAT.thrw(input, desc(), type, i.type);
+        if(!i.type.instanceOf(type.type))
+          NOTREAT.thrw(input, desc(), i.type, type);
         final Item ii = i;
         i = iter.next();
         return ii;
@@ -81,15 +81,15 @@ public final class Treat extends Single {
     if(type.zeroOrOne()) {
       if(len > 1) throw NOTREATS.thrw(input, desc(), type);
       final Item it = val.itemAt(0);
-      if(!it.type.instance(type.type))
-        NOTREAT.thrw(input, desc(), type, it.type);
+      if(!it.type.instanceOf(type.type))
+        NOTREAT.thrw(input, desc(), it.type, type);
       return it;
     }
 
     for(long i = 0; i < len; i++) {
       final Item it = val.itemAt(i);
-      if(!it.type.instance(type.type))
-        NOTREAT.thrw(input, desc(), type, it.type);
+      if(!it.type.instanceOf(type.type))
+        NOTREAT.thrw(input, desc(), it.type, type);
     }
 
     return val;

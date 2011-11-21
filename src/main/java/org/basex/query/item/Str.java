@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.data.DataText.*;
-
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
@@ -57,31 +56,31 @@ public class Str extends Item {
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
+  public final byte[] string(final InputInfo ii) {
     return val;
   }
 
   /**
-   * Returns an atomized string.
-   * @return Returns an atomized string.
+   * Returns the string value.
+   * @return string value
    */
-  public final byte[] atom() {
+  public final byte[] string() {
     return val;
   }
 
   @Override
   public final boolean bool(final InputInfo ii) {
-    return atom(ii).length != 0;
+    return string(ii).length != 0;
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return Token.eq(val, it.atom(ii));
+    return Token.eq(val, it.string(ii));
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return Token.diff(val, it.atom(ii));
+    return Token.diff(val, it.string(ii));
   }
 
   @Override
@@ -94,6 +93,11 @@ public class Str extends Item {
   @Override
   public final String toJava() {
     return Token.string(val);
+  }
+
+  @Override
+  public boolean isString() {
+    return true;
   }
 
   @Override

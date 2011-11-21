@@ -45,7 +45,7 @@ public final class FAttr extends FNode {
 
   @Override
   public byte[] nname() {
-    return name.atom();
+    return name.string();
   }
 
   @Override
@@ -55,16 +55,16 @@ public final class FAttr extends FNode {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    ser.attribute(name.atom(), val);
+    ser.attribute(name.string(), val);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.atom(), VAL, val);
+    ser.emptyElement(this, NAM, name.string(), VAL, val);
   }
 
   @Override
   public String toString() {
-    return Util.info("%(%=\"%\")", name(), name.atom(), val);
+    return Util.info("%(%=\"%\")", name(), name.string(), val);
   }
 }

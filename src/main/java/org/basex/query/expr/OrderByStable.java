@@ -7,7 +7,7 @@ import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -35,7 +35,7 @@ public final class OrderByStable extends OrderBy {
 
   @Override
   Item key(final QueryContext ctx, final int i) {
-    return Itr.get(i);
+    return Int.get(i);
   }
 
   @Override

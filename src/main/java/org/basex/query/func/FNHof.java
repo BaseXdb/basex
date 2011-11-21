@@ -161,7 +161,7 @@ public final class FNHof extends FuncCall {
   private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!f.func() || ((FItem) f).arity() != a)
+    if(!f.isFunction() || ((FItem) f).arity() != a)
       Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;

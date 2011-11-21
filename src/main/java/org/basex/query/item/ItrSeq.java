@@ -14,7 +14,7 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * Sequence of {@link Itr Integers}, containing at least two of them.
+ * Sequence of {@link Int Integers}, containing at least two of them.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
@@ -40,7 +40,7 @@ public final class ItrSeq extends Seq {
 
   @Override
   public Item itemAt(final long pos) {
-    return Itr.get(vals[(int) pos], type);
+    return Int.get(vals[(int) pos], type);
   }
 
   @Override
@@ -70,7 +70,7 @@ public final class ItrSeq extends Seq {
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v)
-      ser.emptyElement(ITM, VAL, Token.token(vals[v]), TYP, type.nam());
+      ser.emptyElement(ITM, VAL, Token.token(vals[v]), TYP, type.string());
     ser.closeElement();
   }
 
@@ -82,7 +82,7 @@ public final class ItrSeq extends Seq {
    */
   public static Value get(final long[] val, final Type type) {
     return val.length == 0 ? Empty.SEQ : val.length == 1 ?
-        Itr.get(val[0], type) : new ItrSeq(val, type);
+        Int.get(val[0], type) : new ItrSeq(val, type);
   }
 
   /**

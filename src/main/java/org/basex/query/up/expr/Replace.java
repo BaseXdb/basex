@@ -69,7 +69,7 @@ public final class Replace extends Update {
     NodeCache list = c.children;
     if(value) {
       // replace value of node
-      final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).atom();
+      final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).string();
       if(tp == NodeType.COM) FComm.parse(txt, input);
       if(tp == NodeType.PI) FPI.parse(txt, input);
 

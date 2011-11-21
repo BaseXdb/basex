@@ -51,7 +51,7 @@ public class Hex extends Bin {
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) throws QueryException {
+  public final byte[] string(final InputInfo ii) throws QueryException {
     return Token.hex(val(ii), true);
   }
 
@@ -59,7 +59,7 @@ public class Hex extends Bin {
   public boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
     return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
-      decode(it.atom(ii), ii));
+      decode(it.string(ii), ii));
   }
 
   /**

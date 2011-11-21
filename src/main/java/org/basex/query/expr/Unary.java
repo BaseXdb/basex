@@ -11,7 +11,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -42,7 +42,7 @@ public final class Unary extends Single {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     type = expr.type();
-    if(!type.num()) type = SeqType.ITR;
+    if(!type.isNum()) type = SeqType.ITR;
     return expr.value() ? preEval(ctx) : this;
   }
 
@@ -53,16 +53,16 @@ public final class Unary extends Single {
     final Item it = expr.item(ctx, input);
     if(it == null) return null;
 
-    if(!it.unt() && !it.num()) Err.number(this, it);
+    if(!it.isUntyped() && !it.isNumber()) Err.number(this, it);
     final double d = it.dbl(input);
-    if(it.unt()) return Dbl.get(minus ? -d : d);
+    if(it.isUntyped()) return Dbl.get(minus ? -d : d);
 
     if(!minus) return it;
     switch((AtomType) it.type) {
       case DBL: return Dbl.get(-d);
       case FLT: return Flt.get(-it.flt(input));
       case DEC: return Dec.get(it.dec(input).negate());
-      default:  return Itr.get(-it.itr(input));
+      default:  return Int.get(-it.itr(input));
     }
   }
 

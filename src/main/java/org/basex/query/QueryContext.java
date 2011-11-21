@@ -408,7 +408,8 @@ public final class QueryContext extends Progress {
 
     // bind variable
     final QNm nm = new QNm(ln, token(uri));
-    ns.uri(nm);
+    if(nm.ns()) nm.uri(ns.uri(nm.pref()));
+
     final Var gl = vars.global().get(nm);
     if(gl == null) {
       // assign new variable
@@ -544,7 +545,7 @@ public final class QueryContext extends Progress {
    * @return IO reference
    */
   public IO base() {
-    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
+    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.string())) : null;
   }
 
   /**

@@ -38,17 +38,22 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] string() {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < children.size(); ++c) {
         final ANode nc = children.get(c);
         if(nc.type == NodeType.ELM || nc.type == NodeType.TXT)
-          tb.add(nc.atom());
+          tb.add(nc.string());
       }
       val = tb.finish();
     }
     return val;
+  }
+
+  @Override
+  public QNm update(final QNm nm) {
+    return qname();
   }
 
   @Override
@@ -121,7 +126,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public FNode parent(final ANode p) {
+  public final FNode parent(final ANode p) {
     par = p;
     return this;
   }

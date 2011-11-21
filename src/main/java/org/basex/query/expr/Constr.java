@@ -67,11 +67,23 @@ public final class Constr {
 
     if(it == null) return false;
 
-    if(it.node() && it.type != NodeType.TXT) {
+    if(!it.isNode()) {
+      // type: atomic value
+      if(more) text.add(' ');
+      text.add(it.string(ii));
+      more = true;
+
+    } else {
+      // type: nodes
       ANode node = (ANode) it;
 
-      if(it.type == NodeType.ATT) {
-        // text has already been added - no attribute allowed anymore
+      if(it.type == NodeType.TXT) {
+        // type: text node
+        text.add(node.string());
+      } else if(it.type == NodeType.ATT) {
+        // type: attribute node
+
+        // no attribute allowed after texts or child nodes
         if(text.size() != 0 || children.size() != 0) {
           errAtt = true;
           return false;
@@ -81,28 +93,32 @@ public final class Constr {
         final QNm qname = node.qname();
         for(int a = 0; a < atts.size(); ++a) {
           if(qname.eq(atts.get(a).qname())) {
-            duplAtt = qname.atom();
+            duplAtt = qname.string();
             return false;
           }
         }
         // add attribute
         atts.add(node.copy());
       } else if(it.type == NodeType.DOC) {
+        // type: document node
+
         final AxisIter ai = node.children();
         for(ANode ch; (ch = ai.next()) != null;) add(ctx, ch, ii);
       } else {
+        // type: element/comment/processing instruction node
+
         // add text node
         if(text.size() != 0) {
           children.add(new FTxt(text.finish()));
           text.reset();
         }
+
         node = node.copy();
         children.add(node);
 
-        // add namespaces from ancestors
-        final Atts ats = node.ns();
-        if(ats != null && ats.size != 0) {
-          // [LK][LW] Namespaces: why only if there are already namespaces?
+        // add namespaces from ancestor elements
+        if(it.type == NodeType.ELM) {
+          final Atts ats = node.ns();
           node = node.parent();
           while(node != null && node.type == NodeType.ELM) {
             final Atts ns = node.ns();
@@ -114,10 +130,6 @@ public final class Constr {
         }
       }
       more = false;
-    } else {
-      if(more && it.type != NodeType.TXT) text.add(' ');
-      text.add(it.atom(ii));
-      more = it.type != NodeType.TXT;
     }
     return true;
   }

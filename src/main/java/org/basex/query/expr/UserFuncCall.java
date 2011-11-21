@@ -95,7 +95,7 @@ public abstract class UserFuncCall extends Arr {
     if(func.expr.value() && values() && !func.uses(Use.NDT)) {
       // evaluate arguments to catch cast exceptions
       for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
-      ctx.compInfo(OPTINLINE, func.name.atom());
+      ctx.compInfo(OPTINLINE, func.name.string());
       return func.value(ctx);
     }
     // user-defined functions are not pre-evaluated to avoid various issues
@@ -151,7 +151,7 @@ public abstract class UserFuncCall extends Arr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.atom()).add(PAR1).add(
+    return new TokenBuilder(name.string()).add(PAR1).add(
         toString(SEP)).add(PAR2).toString();
   }
 }

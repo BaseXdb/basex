@@ -68,12 +68,12 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns the string value of an item.
+   * Returns a string representation of the value.
    * @param ii input info, use {@code null} if none is available
-   * @return string representation
+   * @return string value
    * @throws QueryException if the item can't be atomized
    */
-  public abstract byte[] atom(final InputInfo ii) throws QueryException;
+  public abstract byte[] string(final InputInfo ii) throws QueryException;
 
   /**
    * Returns a boolean representation of the value.
@@ -92,7 +92,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public BigDecimal dec(final InputInfo ii) throws QueryException {
-    return Dec.parse(atom(ii), ii);
+    return Dec.parse(string(ii), ii);
   }
 
   /**
@@ -102,7 +102,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public long itr(final InputInfo ii) throws QueryException {
-    return Itr.parse(atom(ii), ii);
+    return Int.parse(string(ii), ii);
   }
 
   /**
@@ -112,7 +112,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public float flt(final InputInfo ii) throws QueryException {
-    return Flt.parse(atom(ii), ii);
+    return Flt.parse(string(ii), ii);
   }
 
   /**
@@ -122,7 +122,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public double dbl(final InputInfo ii) throws QueryException {
-    return Dbl.parse(atom(ii), ii);
+    return Dbl.parse(string(ii), ii);
   }
 
   /**
@@ -132,8 +132,9 @@ public abstract class Item extends Value {
    * @return result of check
    */
   public final boolean comparable(final Item b) {
-    return type == b.type || num() && b.num() || (unt() || str()) &&
-      (b.str() || b.unt()) || dur() && b.dur() || func();
+    return type == b.type || isNumber() && b.isNumber() ||
+        (isUntyped() || isString()) && (b.isString() || b.isUntyped()) ||
+        isDuration() && b.isDuration() || isFunction();
   }
 
   /**
@@ -157,7 +158,7 @@ public abstract class Item extends Value {
       throws QueryException {
 
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it.num() &&
+    return (this == Dbl.NAN || this == Flt.NAN) && it.isNumber() &&
         Double.isNaN(it.dbl(ii)) || comparable(it) && eq(ii, it);
   }
 
@@ -179,7 +180,7 @@ public abstract class Item extends Value {
    */
   public InputStream input() throws IOException {
     try {
-      return new ArrayInput(atom(null));
+      return new ArrayInput(string(null));
     } catch(final QueryException ex) {
       throw new IOException(ex.getMessage(), ex);
     }
@@ -254,7 +255,7 @@ public abstract class Item extends Value {
   @Override
   public void plan(final Serializer ser) throws IOException {
     try {
-      ser.emptyElement(ITM, VAL, atom(null), TYP, Token.token(name()));
+      ser.emptyElement(ITM, VAL, string(null), TYP, Token.token(name()));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly
@@ -264,7 +265,7 @@ public abstract class Item extends Value {
 
   @Override
   public int hash(final InputInfo ii) throws QueryException {
-    return Token.hash(atom(ii));
+    return Token.hash(string(ii));
   }
 
   @Override

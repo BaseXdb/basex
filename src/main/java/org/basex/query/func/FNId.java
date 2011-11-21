@@ -113,7 +113,7 @@ public final class FNId extends FuncCall {
     for(ANode n = node; n != null; n = n.parent()) {
       final AxisIter atts = n.attributes();
       for(ANode at; (at = atts.next()) != null;) {
-        if(eq(at.qname().atom(), LANG)) {
+        if(eq(at.qname().string(), LANG)) {
           final byte[] ln = lc(norm(checkEStr(at)));
           return Bln.get(startsWith(ln, lang)
               && (lang.length == ln.length || ln[lang.length] == '-'));
@@ -152,7 +152,7 @@ public final class FNId extends FuncCall {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
         if(!eq(checkEStr(att), id)) continue;
-        final byte[] nm = lc(att.qname().atom());
+        final byte[] nm = lc(att.qname().string());
         if(contains(nm, ID) && !contains(nm, IDREF)) nc.add(node);
       }
     }
@@ -175,7 +175,7 @@ public final class FNId extends FuncCall {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
         if(!eq(checkEStr(att), id)) continue;
-        final byte[] nm = lc(att.qname().atom());
+        final byte[] nm = lc(att.qname().string());
         if(contains(nm, IDREF)) nc.add(att.finish());
       }
     }

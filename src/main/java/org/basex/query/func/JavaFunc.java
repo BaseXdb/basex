@@ -186,8 +186,8 @@ public final class JavaFunc extends Arr {
         next = arg;
       } else {
         final Type jtype = type(par);
-        if(jtype == null || !arg.type.instance(jtype)
-            && !jtype.instance(arg.type)) return null;
+        if(jtype == null || !arg.type.instanceOf(jtype)
+            && !jtype.instanceOf(arg.type)) return null;
         next = arg.toJava();
       }
       val[a++] = next;

@@ -14,7 +14,7 @@ import org.basex.data.Result;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.test.query.simple.XQUPTest;
@@ -169,7 +169,7 @@ public abstract class QueryTest {
    */
   public static ItemCache itr(final long... d) {
     final ItemCache ii = new ItemCache();
-    for(final long dd : d) ii.add(Itr.get(dd));
+    for(final long dd : d) ii.add(Int.get(dd));
     return ii;
   }
 

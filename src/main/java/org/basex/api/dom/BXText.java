@@ -26,7 +26,7 @@ public class BXText extends BXChar implements Text {
 
   @Override
   public boolean isElementContentWhitespace() {
-    return Token.ws(node.atom());
+    return Token.ws(node.string());
   }
 
   @Override

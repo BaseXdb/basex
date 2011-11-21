@@ -64,7 +64,7 @@ public final class UserFuncs extends ExprInfo {
       final QueryContext ctx, final QueryParser qp) throws QueryException {
 
     // find function
-    final byte[] uri = name.uri().atom();
+    final byte[] uri = name.uri().string();
     final byte[] ln = name.ln();
 
     // parse data type constructors
@@ -73,12 +73,12 @@ public final class UserFuncs extends ExprInfo {
       if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
         final Levenshtein ls = new Levenshtein();
         for(final AtomType t : AtomType.values()) {
-          if(t.par != null && ls.similar(lc(ln), lc(t.nam()), 0))
-            qp.error(FUNSIMILAR, name.atom(), t.nam());
+          if(t.par != null && ls.similar(lc(ln), lc(t.string()), 0))
+            qp.error(FUNSIMILAR, name.string(), t.string());
         }
-        qp.error(FUNCUNKNOWN, name.atom());
+        qp.error(FUNCUNKNOWN, name.string());
       }
-      if(args.length != 1) qp.error(FUNCTYPE, name.atom());
+      if(args.length != 1) qp.error(FUNCTYPE, name.string());
       final SeqType to = SeqType.get(type, SeqType.Occ.ZO);
       return TypedFunc.constr(new Cast(qp.input(), args[0], to), to);
     }
@@ -121,7 +121,7 @@ public final class UserFuncs extends ExprInfo {
     // find local function
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
-      if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
+      if(eq(ln, qn.ln()) && eq(uri, qn.uri().string()) && args.length ==
         func[l].args.length) return new TypedFunc(
             add(qp.input(), qn, l, args), FuncType.get(func[l]));
     }
@@ -162,18 +162,18 @@ public final class UserFuncs extends ExprInfo {
 
     final QNm name = fun.name;
 
-    final byte[] uri = name.uri().atom();
-    if(uri.length == 0) qp.error(FUNNONS, name.atom());
+    final byte[] uri = name.uri().string();
+    if(uri.length == 0) qp.error(FUNNONS, name.string());
 
     if(NSGlobal.standard(uri)) {
-      if(fun.declared) qp.error(NAMERES, name.atom());
+      if(fun.declared) qp.error(NAMERES, name.string());
       funError(name, qp);
     }
 
     final byte[] ln = name.ln();
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
-      final byte[] u = qn.uri().atom();
+      final byte[] u = qn.uri().string();
       final byte[] nm = qn.ln();
 
       if(eq(ln, nm) && eq(uri, u) && fun.args.length == func[l].args.length) {
@@ -234,7 +234,7 @@ public final class UserFuncs extends ExprInfo {
     final byte[] nm = lc(name.ln());
     for(int n = 0; n < func.length; ++n) {
       if(ls.similar(nm, lc(func[n].name.ln()), 0)) {
-        qp.error(FUNSIMILAR, name.atom(), func[n].name.atom());
+        qp.error(FUNSIMILAR, name.string(), func[n].name.string());
       }
     }
   }

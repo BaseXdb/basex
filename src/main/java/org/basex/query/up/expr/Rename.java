@@ -69,7 +69,7 @@ public final class Rename extends Update {
     // Attribute: targ.qname().pref().length != 0  ??
     if(targ.type == NodeType.ELM || targ.type == NodeType.ATT) {
       final byte[] renPref = rename.pref();
-      final byte[] renURI = rename.uri().atom();
+      final byte[] renURI = rename.uri().string();
       final Atts at = targ.nsScope();
       for(int n = 0; n < at.size; ++n) {
         if(eq(at.key[n], renPref)) {

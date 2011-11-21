@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
@@ -79,7 +79,7 @@ public final class Catch extends Single {
     final Value val = ex.value();
     for(final Value v : new Value[] { new QNm(cd, ERRORURI),
         Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Itr.get(ex.col()), Itr.get(ex.line()) }) {
+        Str.get(io), Int.get(ex.col()), Int.get(ex.line()) }) {
       vars[i++].bind(v, ctx);
     }
     final Value ir = ctx.value(expr);

@@ -43,7 +43,7 @@ public final class KindTest extends Test {
 
   @Override
   public boolean eval(final ANode node) {
-    return node.type == type && (name == null || node.qname(tmpq).eq(name));
+    return node.type == type && (name == null || node.update(tmpq).eq(name));
   }
 
   @Override

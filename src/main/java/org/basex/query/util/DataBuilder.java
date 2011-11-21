@@ -118,7 +118,7 @@ public final class DataBuilder {
   private int addNode(final ANode nd, final int pre, final int par,
       final ANode ndPar) {
 
-    switch(nd.ndType()) {
+    switch(nd.nodeType()) {
       case DOC: return addDoc(nd, pre);
       case ELM: return addElem(nd, pre, par, ndPar);
       case TXT: return pre + addText(nd, pre, par, ndPar);
@@ -155,16 +155,16 @@ public final class DataBuilder {
   private int addAttr(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
     final QNm q = nd.qname();
-    final byte[] uri = q.uri().atom();
+    final byte[] uri = q.uri().string();
     int u = 0;
     final boolean ne = uri.length != 0;
     if(ne) {
       if(par == 0) data.ns.add(ms, pre - par, q.pref(), uri);
       u = data.ns.addURI(uri);
     }
-    final int n = data.atnindex.index(q.atom(), null, false);
+    final int n = data.atnindex.index(q.string(), null, false);
     // attribute namespace flag is only set in main memory instance
-    data.attr(ms, pre - par, n, nd.atom(), u, ne);
+    data.attr(ms, pre - par, n, nd.string(), u, ne);
     data.insert(ms);
     return 1;
   }
@@ -183,7 +183,7 @@ public final class DataBuilder {
     // check full-text mode
     final int dist = pre - par;
     final TokenList tl = ftbuilder != null ? ftbuilder.build(nd) : null;
-    if(tl == null) return addText(nd.atom(), dist);
+    if(tl == null) return addText(nd.string(), dist);
 
     // adopt namespace from parent
     final int u = ndPar != null ? data.ns.uri(ndPar.nname(), true) : 0;
@@ -224,7 +224,7 @@ public final class DataBuilder {
    */
   private int addPI(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
-    final byte[] v = trim(concat(nd.nname(), SPACE, nd.atom()));
+    final byte[] v = trim(concat(nd.nname(), SPACE, nd.string()));
     data.text(ms, pre - par, v, Data.PI);
     data.insert(ms);
     return 1;
@@ -239,7 +239,7 @@ public final class DataBuilder {
    */
   private int addComm(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
-    data.text(ms, pre - par, nd.atom(), Data.COMM);
+    data.text(ms, pre - par, nd.string(), Data.COMM);
     data.insert(ms);
     return 1;
   }
@@ -294,9 +294,9 @@ public final class DataBuilder {
         data.ns.add(ns.key[a], ns.val[a], ms);
     }
 
-    final byte[] uri = q.uri().atom();
+    final byte[] uri = q.uri().string();
     final int u = uri.length != 0 ? data.ns.addURI(uri) : 0;
-    final int tn = data.tagindex.index(q.atom(), null, false);
+    final int tn = data.tagindex.index(q.string(), null, false);
     final int s = size(nd, false);
 
     // add element node
@@ -329,7 +329,7 @@ public final class DataBuilder {
   private static int size(final ANode n, final boolean a) {
     if(n instanceof DBNode) {
       final DBNode dbn = (DBNode) n;
-      final int k = ANode.kind(n.ndType());
+      final int k = n.kind();
       return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
     }
 

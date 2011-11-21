@@ -180,7 +180,7 @@ public final class FNSimple extends FuncCall {
       if(!e.type().mayBeNum()) ex = e;
     } else if(def == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.node() || e.size() > 0) ex = e;
+      if(e.type().type.isNode() || e.size() > 0) ex = e;
     }
     if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;
@@ -214,26 +214,26 @@ public final class FNSimple extends FuncCall {
       // at least one iterator is exhausted: check if both items are null
       if(it1 == null) {
         if(it2 == null) return true;
-        if(it2.func()) FNCMP.thrw(ii, it2);
+        if(it2.isFunction()) FNCMP.thrw(ii, it2);
         return false;
       } else if(it2 == null) {
-        if(it1.func()) FNCMP.thrw(ii, it1);
+        if(it1.isFunction()) FNCMP.thrw(ii, it1);
         return false;
       }
 
       // check for functions
-      if(it1.func() || it2.func()) {
+      if(it1.isFunction() || it2.isFunction()) {
         // maps are functions but have a defined deep-equality
-        if(it1.map() && it2.map()) {
+        if(it1.isMap() && it2.isMap()) {
           final Map map1 = (Map) it1, map2 = (Map) it2;
           if(!map1.deep(ii, map2)) return false;
           continue;
         }
-        FNCMP.thrw(ii, it1.func() ? it1 : it2);
+        FNCMP.thrw(ii, it1.isFunction() ? it1 : it2);
       }
 
       // check atomic values
-      if(!it1.node() && !it2.node()) {
+      if(!it1.isNode() && !it2.isNode()) {
         if(!it1.equiv(ii, it2)) return false;
         continue;
       }
@@ -274,7 +274,7 @@ public final class FNSimple extends FuncCall {
           // compare string values
           if((t1 == NodeType.TXT || t1 == NodeType.ATT ||
               t1 == NodeType.COM || t1 == NodeType.PI) &&
-              !Token.eq(s1.atom(), s2.atom())) return false;
+              !Token.eq(s1.string(), s2.string())) return false;
 
           // compare elements
           if(t1 == NodeType.ELM) {
@@ -289,7 +289,7 @@ public final class FNSimple extends FuncCall {
               boolean f = false;
               for(ANode a2; (a2 = att2.next()) != null;) {
                 if(a1.qname().eq(a2.qname())) {
-                  f = Token.eq(a1.atom(), a2.atom());
+                  f = Token.eq(a1.string(), a2.string());
                   break;
                 }
               }

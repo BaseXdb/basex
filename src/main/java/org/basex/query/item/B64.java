@@ -43,7 +43,7 @@ public final class B64 extends Bin {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     return Base64.encode(val);
   }
 
@@ -51,7 +51,7 @@ public final class B64 extends Bin {
   public boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
     return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
-      decode(it.atom(ii), ii));
+      decode(it.string(ii), ii));
   }
 
   /**
@@ -73,6 +73,6 @@ public final class B64 extends Bin {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", atom(null));
+    return Util.info("\"%\"", string(null));
   }
 }

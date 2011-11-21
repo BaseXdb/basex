@@ -113,7 +113,7 @@ public final class RequestParser {
   private static void parseAttrs(final ANode element, final TokenMap attrs) {
     final AxisIter elAttrs = element.attributes();
     for(ANode attr; (attr = elAttrs.next()) != null;) {
-      attrs.add(attr.nname(), attr.atom());
+      attrs.add(attr.nname(), attr.string());
     }
   }
 
@@ -131,8 +131,8 @@ public final class RequestParser {
       byte[] value = null;
 
       for(ANode attr; (attr = hdrAttrs.next()) != null;) {
-        if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
-        if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
+        if(eq(attr.nname(), HDR_NAME)) name = attr.string();
+        if(eq(attr.nname(), HDR_VALUE)) value = attr.string();
 
         if(name != null && name.length != 0 && value != null
             && value.length != 0) {

@@ -146,7 +146,7 @@ public final class FNQName extends FuncCall {
       }
       if(emp == null) {
         final QNm nm = n.qname();
-        if(!nm.ns()) emp = nm.uri().atom();
+        if(!nm.ns()) emp = nm.uri().string();
       }
       n = n.parent();
     } while(n != null && ctx.nsInherit);

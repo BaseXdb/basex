@@ -47,7 +47,7 @@ public final class FNNode extends FuncCall {
       case NODE_NAME:
         if(it == null) return null;
         QNm qname = checkNode(it).qname();
-        return qname != null && qname.atom().length != 0 ? qname : null;
+        return qname != null && qname.string().length != 0 ? qname : null;
       case DOCUMENT_URI:
         if(it == null) return null;
         ANode node = checkNode(it);
@@ -76,7 +76,7 @@ public final class FNNode extends FuncCall {
       case NAME:
         if(it == null) return Str.ZERO;
         qname = checkNode(it).qname();
-        return qname != null ? Str.get(qname.atom()) : Str.ZERO;
+        return qname != null ? Str.get(qname.string()) : Str.ZERO;
       case LOCAL_NAME:
         if(it == null) return Str.ZERO;
         qname = checkNode(it).qname();
@@ -127,15 +127,16 @@ public final class FNNode extends FuncCall {
       int i = 1;
       final TokenBuilder tb = new TokenBuilder();
       if(n.type == NodeType.ATT) {
-        tb.add("@\"");
+        tb.add('@');
         final QNm qnm = n.qname();
-        if(qnm.uri().atom().length != 0) tb.add(qnm.uri().atom());
-        tb.add("\":").add(qnm.ln());
+        final byte[] uri = qnm.uri().string();
+        if(uri.length != 0) tb.add('"').add(uri).add("\":");
+        tb.add(qnm.ln());
       } else if(n.type == NodeType.ELM) {
         final QNm qnm = n.qname();
         final AxisIter ai = n.precSibl();
         for(ANode fs; (fs = ai.next()) != null;) if(fs.qname().eq(qnm)) i++;
-        tb.addExt("\"%\":%[%]", qnm.uri().atom(), qnm.ln(), i);
+        tb.addExt("\"%\":%[%]", qnm.uri().string(), qnm.ln(), i);
       } else if(n.type == NodeType.COM || n.type == NodeType.TXT) {
         final AxisIter ai = n.precSibl();
         for(ANode fs; (fs = ai.next()) != null;) if(fs.type == n.type) i++;
@@ -146,7 +147,7 @@ public final class FNNode extends FuncCall {
         for(ANode fs; (fs = ai.next()) != null;) {
           if(fs.type == n.type && fs.qname().eq(qnm)) i++;
         }
-        tb.addExt("%(\"%\")[%]", n.type.nam(), qnm.ln(), i);
+        tb.addExt("%(\"%\")[%]", n.type.string(), qnm.ln(), i);
       }
       tl.add(tb.finish());
       n = n.parent();

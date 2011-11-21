@@ -29,7 +29,7 @@ public final class NSLocal {
   public void add(final QNm name, final InputInfo ii) throws QueryException {
     final byte[] ln = name.ln();
     if(eq(ln, XML) || eq(ln, XMLNS)) NSDEF.thrw(ii, name);
-    final byte[] uri = name.uri().atom();
+    final byte[] uri = name.uri().string();
     if(eq(XMLURI, uri)) NOXMLNS.thrw(ii, XML, name);
     if(eq(XMLNSURI, uri)) NOXMLNS.thrw(ii, XMLNS, name);
     ns.add(ln, uri);
@@ -47,50 +47,50 @@ public final class NSLocal {
   }
 
   /**
-   * Assigns a URI to the specified QName.
-   * @param qname qname
-   */
-  public void uri(final QNm qname) {
-    final byte[] pre = qname.pref();
-    if(pre.length == 0) return;
-    final byte[] uri = find(pre);
-    qname.uri(uri != null ? uri : NSGlobal.uri(pre));
-  }
-
-  /**
    * Finds the URI for the specified prefix in the local and global namespaces.
-   * @param pre prefix of the namespace
+   * Throws an exception if no namespace is defined.
+   * @param pref prefix of the namespace
    * @param dn dynamic error
    * @param ii input info
    * @return uri
    * @throws QueryException query exception
    */
-  public byte[] uri(final byte[] pre, final boolean dn, final InputInfo ii)
+  public byte[] uri(final byte[] pref, final boolean dn, final InputInfo ii)
       throws QueryException {
 
-    byte[] uri = find(pre);
-    if(uri == null) uri = NSGlobal.uri(pre);
-    if(uri.length == 0 && pre.length != 0) {
-      (dn ? INVPREF : PREFUNKNOWN).thrw(ii, pre);
+    final byte[] uri = uri(pref);
+    if(uri.length == 0 && pref.length != 0) {
+      (dn ? INVPREF : PREFUNKNOWN).thrw(ii, pref);
     }
     return uri;
   }
 
   /**
-   * Finds the URI for the specified prefix.
-   * @param pre prefix of the namespace
+   * Finds the local URI for the specified prefix.
+   * @param pref prefix of the namespace
    * @return uri or {@code null}
    */
-  public byte[] find(final byte[] pre) {
+  public byte[] localURI(final byte[] pref) {
     for(int s = ns.size - 1; s >= 0; s--) {
-      if(eq(ns.key[s], pre)) return ns.val[s];
+      if(eq(ns.key[s], pref)) return ns.val[s];
     }
     return null;
   }
 
   /**
-   * Finds the specified URI and returns the prefix.
-   * @param uri URI
+   * Finds the URI for the specified prefix.
+   * @param pref prefix of the namespace
+   * @return uri or {@code null}
+   */
+  public byte[] uri(final byte[] pref) {
+    final byte[] uri = localURI(pref);
+    return uri == null ? NSGlobal.uri(pref) : uri;
+  }
+
+
+  /**
+   * Returns the prefix for the specified URI.
+   * @param uri namespace URI
    * @return prefix
    */
   public byte[] prefix(final byte[] uri) {
@@ -105,9 +105,9 @@ public final class NSLocal {
    * @return prefixes
    */
   public byte[][] prefixes() {
-    final byte[][] pre = new byte[ns.size][];
-    for(int p = 0; p < pre.length; ++p) pre[p] = ns.key[p];
-    return pre;
+    final byte[][] prefs = new byte[ns.size][];
+    for(int p = 0; p < prefs.length; ++p) prefs[p] = ns.key[p];
+    return prefs;
   }
 
   /**

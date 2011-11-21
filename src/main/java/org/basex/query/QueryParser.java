@@ -92,7 +92,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
 import org.basex.query.item.FuncType;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -484,7 +484,7 @@ public class QueryParser extends InputParser {
     final QNm name = new QNm(ncName(XPNAME));
     wsCheck(IS);
     name.uri(stringLiteral());
-    if(ctx.ns.find(name.ln()) != null) error(DUPLNSDECL, name);
+    if(ctx.ns.localURI(name.ln()) != null) error(DUPLNSDECL, name);
     ctx.ns.add(name, input());
   }
 
@@ -656,7 +656,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(COLLATION)) return false;
     if(declColl) error(DUPLCOLL);
     declColl = true;
-    final byte[] coll = ctx.baseURI.resolve(Uri.uri(stringLiteral())).atom();
+    final byte[] coll = ctx.baseURI.resolve(Uri.uri(stringLiteral())).string();
     if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
     return true;
   }
@@ -746,10 +746,10 @@ public class QueryParser extends InputParser {
   private void module(final byte[] path, final Uri uri) throws QueryException {
     final byte[] u = ctx.modParsed.get(path);
     if(u != null) {
-      if(!eq(uri.atom(), u)) error(WRONGMODULE, uri, path);
+      if(!eq(uri.string(), u)) error(WRONGMODULE, uri, path);
       return;
     }
-    ctx.modParsed.add(path, uri.atom());
+    ctx.modParsed.add(path, uri.string());
 
     // check specified path and path relative to query file
     final IO io = io(string(path));
@@ -764,7 +764,7 @@ public class QueryParser extends InputParser {
     ctx.ns = new NSLocal();
     new QueryParser(qu, ctx).parse(io, uri);
     ctx.ns = ns;
-    modules.add(uri.atom());
+    modules.add(uri.string());
   }
 
   /**
@@ -1080,7 +1080,7 @@ public class QueryParser extends InputParser {
           if(pos >= 0) ng.set(pos, v);
           else {
             ng.add(v);
-            ngp = ngp.insert(v.name, Itr.get(ng.size() - 1), null);
+            ngp = ngp.insert(v.name, Int.get(ng.size() - 1), null);
           }
         }
       }
@@ -1993,12 +1993,12 @@ public class QueryParser extends InputParser {
     final byte[] fn = qName(null);
     if(fn.length > 0 && consume(HASH)) {
       final QNm name = new QNm(fn);
-      if(name.ns()) ctx.ns.uri(name);
+      if(name.ns()) name.uri(ctx.ns.uri(name.pref(), false, input()));
       else name.uri(ctx.nsFunc);
-      final long cardinal = ((Itr) numericLiteral(true)).itr(null);
-      if(cardinal < 0 || cardinal > Integer.MAX_VALUE) error(FUNCUNKNOWN, fn);
+      final long card = ((Int) numericLiteral(true)).itr(null);
+      if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, fn);
 
-      final Expr[] args = new Expr[(int) cardinal];
+      final Expr[] args = new Expr[(int) card];
       final Var[] vars = new Var[args.length];
       partial(args, vars);
       final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
@@ -2027,7 +2027,7 @@ public class QueryParser extends InputParser {
     if(XMLToken.isNCStartChar(curr())) return checkDbl();
     final long l = toLong(tok.finish());
     if(l == Long.MIN_VALUE) error(RANGE, tok);
-    return Itr.get(l);
+    return Int.get(l);
   }
 
   /**
@@ -2093,7 +2093,6 @@ public class QueryParser extends InputParser {
     skipWS();
     final QNm name = new QNm(qName(NOVARNAME));
     if(name.ns()) name.uri(ctx.ns.uri(name.pref(), false, input()));
-    ctx.ns.uri(name);
     return name;
   }
 
@@ -2120,7 +2119,7 @@ public class QueryParser extends InputParser {
 
     Expr[] args;
     if(NodeType.find(name) != null
-        || (args = argumentList(name.atom())) == null) {
+        || (args = argumentList(name.string())) == null) {
       qp = p;
       return null;
     }
@@ -2128,7 +2127,6 @@ public class QueryParser extends InputParser {
     alter = FUNCUNKNOWN;
     alterFunc = name;
     ap = qp;
-    ctx.ns.uri(name);
     name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
 
     final Var[] vars = new Var[args.length];
@@ -2248,12 +2246,12 @@ public class QueryParser extends InputParser {
 
       if(eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
+        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).string();
         if(!tag.ns()) tag.uri(v);
         addNS(ns, EMPTY, v);
       } else if(startsWith(atn, XMLNSC)) {
         if(!simple) error(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
+        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).string();
         if(v.length == 0) error(NSEMPTYURI);
         final QNm nsd = new QNm(atn, v);
         final byte[] pref = nsd.ln();
@@ -2288,7 +2286,7 @@ public class QueryParser extends InputParser {
       final byte[] close = qName(NOTAGNAME);
       consumeWSS();
       check('>');
-      if(!eq(tag.atom(), close)) error(TAGWRONG, tag.atom(), close);
+      if(!eq(tag.string(), close)) error(TAGWRONG, tag.string(), close);
     }
 
     ctx.ns.size(s);
@@ -2343,7 +2341,7 @@ public class QueryParser extends InputParser {
       } else if(c != 0) {
         strip &= !entity(tb);
       } else {
-        error(NOCLOSING, tag.atom());
+        error(NOCLOSING, tag.string());
       }
     } while(true);
   }
@@ -2601,7 +2599,7 @@ public class QueryParser extends InputParser {
 
     // use empty name test if types are different
     return SeqType.get(t, occ, kt == null ? null : kt.extype == null
-        || t == kt.extype || !kt.extype.node() ? kt.name : new QNm(EMPTY));
+        || t == kt.extype || !kt.extype.isNode() ? kt.name : new QNm(EMPTY));
   }
 
   /**
@@ -2628,16 +2626,16 @@ public class QueryParser extends InputParser {
 
     tok.reset();
     if(!atom) {
-      if(t != null && t.func()) {
+      if(t != null && t.isFunction()) {
         // function type
         if(!wsConsume(ASTERISK)) {
-          if(t.map()) {
+          if(t.isMap()) {
             final Type keyType = itemType();
-            if(keyType == null) throw error(MAPTKV, type.atom());
-            if(!keyType.instance(AtomType.AAT)) throw error(MAPTAAT, keyType);
+            if(keyType == null) throw error(MAPTKV, type.string());
+            if(!keyType.instanceOf(AtomType.AAT)) throw error(MAPTAAT, keyType);
             wsCheck(COMMA);
             t = MapType.get((AtomType) keyType, sequenceType());
-            if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+            if(!wsConsume(PAR2)) error(FUNCMISS, type.string());
           } else {
             // function type
             SeqType[] args = { };
@@ -2647,13 +2645,13 @@ public class QueryParser extends InputParser {
                 args = Array.add(args, sequenceType());
               } while(wsConsume(COMMA));
 
-              if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+              if(!wsConsume(PAR2)) error(FUNCMISS, type.string());
             }
             wsCheck(AS);
             t = FuncType.get(args, sequenceType());
           }
         } else if(!wsConsume(PAR2)) {
-          error(FUNCMISS, type.atom());
+          error(FUNCMISS, type.string());
         }
       } else {
         int par = 0;
@@ -2666,7 +2664,7 @@ public class QueryParser extends InputParser {
               par--;
               break;
             case '\0':
-              error(FUNCMISS, type.atom());
+              error(FUNCMISS, type.string());
           }
           tok.add(consume());
         }
@@ -2676,7 +2674,7 @@ public class QueryParser extends InputParser {
     if(t == null) {
       if(atom) error(TYPEUNKNOWN, type);
       error(NOTYPE,
-          new TokenBuilder(type.atom()).add('(').add(tok.finish()).add(')'));
+          new TokenBuilder(type.string()).add('(').add(tok.finish()).add(')'));
     }
 
     return t;
@@ -2708,12 +2706,12 @@ public class QueryParser extends InputParser {
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
-      if(!eq(test.uri().atom(), XSURI)) error(TYPEUNDEF, test);
+      if(!eq(test.uri().string(), XSURI)) error(TYPEUNDEF, test);
 
       final byte[] ln = test.ln();
       tp = Types.find(test, true);
-      if(tp == null && !eq(ln, AtomType.ATY.nam()) &&
-          !eq(ln, AtomType.AST.nam()) && !eq(ln, AtomType.UTY.nam()))
+      if(tp == null && !eq(ln, AtomType.ATY.string()) &&
+          !eq(ln, AtomType.AST.string()) && !eq(ln, AtomType.UTY.string()))
         error(VARUNDEF, test);
       if(tp == AtomType.ATM || tp == AtomType.AAT) tp = null;
       nm = trim(substring(nm, 0, i));
@@ -2952,7 +2950,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE)};
+    final Expr[] occ = { Int.get(1), Int.get(Long.MAX_VALUE)};
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];
@@ -2961,7 +2959,7 @@ public class QueryParser extends InputParser {
         occ[0] = ftAdditive(i);
       } else {
         wsCheck(MOST);
-        occ[0] = Itr.get(0);
+        occ[0] = Int.get(0);
         occ[1] = ftAdditive(i);
       }
     } else if(wsConsumeWs(FROM)) {
@@ -2987,7 +2985,7 @@ public class QueryParser extends InputParser {
     while(digit(curr()))
       tok.add(consume());
     if(tok.size() == 0) error(INTEXP);
-    return Itr.get(toLong(tok.finish()));
+    return Int.get(toLong(tok.finish()));
   }
 
   /**
@@ -3117,8 +3115,8 @@ public class QueryParser extends InputParser {
     if(range != null) {
       wsCheck(LEVELS);
       // values will always be integer instances
-      min = ((Itr) range[0]).itr(input());
-      max = ((Itr) range[1]).itr(input());
+      min = ((Int) range[0]).itr(input());
+      max = ((Int) range[1]).itr(input());
     }
     thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
   }
@@ -3442,7 +3440,7 @@ public class QueryParser extends InputParser {
       Variable.init(ctx);
       v = ctx.vars.get(name);
     }
-    if(v == null) error(err, '$' + string(name.atom()));
+    if(v == null) error(err, '$' + string(name.string()));
     return v;
   }
 
@@ -3565,7 +3563,7 @@ public class QueryParser extends InputParser {
     qp = ap;
     if(alter != FUNCUNKNOWN) throw error(alter);
     ctx.funcs.funError(alterFunc, this);
-    throw error(alter, alterFunc.atom());
+    throw error(alter, alterFunc.string());
   }
 
   /**

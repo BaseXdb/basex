@@ -64,7 +64,7 @@ public final class NamePool {
       if(occ[i] <= 0) continue;
       final QNm nm = names[i];
       final byte[] pref = nm.pref();
-      final byte[] uri = nm.uri().atom();
+      final byte[] uri = nm.uri().string();
       final int ai = at.get(pref);
       if(ai == -1) at.add(pref, uri);
       // check if only one uri is assigned to a prefix

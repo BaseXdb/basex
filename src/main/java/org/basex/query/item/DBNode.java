@@ -1,10 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
@@ -18,6 +15,7 @@ import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.Scoring;
@@ -111,7 +109,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] string() {
     if(val == null) val = data.atom(pre);
     return val;
   }
@@ -123,7 +121,7 @@ public class DBNode extends ANode {
       final long l = data.textItr(pre, txt);
       if(l != Long.MIN_VALUE) return l;
     }
-    return Itr.parse(data.atom(pre), ii);
+    return Int.parse(data.atom(pre), ii);
   }
 
   @Override
@@ -143,33 +141,35 @@ public class DBNode extends ANode {
 
   @Override
   public final byte[] nname() {
-    if(!(type instanceof NodeType)) return EMPTY;
-    final NodeType t = ndType();
+    final NodeType t = nodeType();
     switch(t) {
       case ELM: case ATT: case PI:
         return data.name(pre, kind(t));
       default:
-        return EMPTY;
+        return Token.EMPTY;
     }
   }
 
   @Override
   public final QNm qname() {
-    return qname(new QNm());
+    return update(new QNm());
   }
 
   @Override
-  public final QNm qname(final QNm name) {
+  public final QNm update(final QNm name) {
     final byte[] nm = nname();
+    Uri uri = Uri.EMPTY;
+    // set prefix and local name
     name.name(nm);
-    name.uri(Uri.EMPTY);
+    // set namespace
     final boolean ns = name.ns();
     if(ns || data.ns.size() != 0) {
       final int n = ns ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
-      final byte[] uri = n > 0 ? data.ns.uri(n) : ns ?
-          NSGlobal.uri(pref(nm)) : EMPTY;
-      name.uri(uri.length == 0 ? Uri.EMPTY : new Uri(uri));
+      final byte[] u = n > 0 ? data.ns.uri(n) : ns ?
+          NSGlobal.uri(Token.pref(nm)) : Token.EMPTY;
+      if(u.length != 0) uri = new Uri(u);
     }
+    name.uri(uri);
     return name;
   }
 
@@ -183,11 +183,11 @@ public class DBNode extends ANode {
   public final byte[] baseURI() {
     if(type == NodeType.DOC) {
       final String dir = data.meta.original;
-      final String name = string(data.text(pre, true));
-      return token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
+      final String name = Token.string(data.text(pre, true));
+      return Token.token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
     }
     final byte[] b = attribute(new QNm(BASE, XMLURI));
-    return b != null ? b : EMPTY;
+    return b != null ? b : Token.EMPTY;
   }
 
   @Override
@@ -205,7 +205,7 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, par, ndType());
+    final DBNode n = new DBNode(data, pre, par, nodeType());
     n.root = root;
     n.score = score;
     return n;
@@ -424,19 +424,20 @@ public class DBNode extends ANode {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(token(Util.name(this)), NAM, token(data.meta.name));
-    if(pre != 0) ser.attribute(PRE, token(pre));
+    ser.openElement(Token.token(Util.name(this)), NAM,
+        Token.token(data.meta.name));
+    if(pre != 0) ser.attribute(PRE, Token.token(pre));
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final NodeType nt = (NodeType) type;
-    final TokenBuilder tb = new TokenBuilder(nt.nam()).add(' ');
+    final TokenBuilder tb = new TokenBuilder(nt.string()).add(' ');
     switch(nt) {
       case ATT:
       case PI:
-        tb.add(nname()).add(" { \"").add(chop(atom(), 64)).add("\" }");
+        tb.add(nname()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
         break;
       case ELM:
         tb.add(nname()).add(" { ... }");
@@ -445,7 +446,7 @@ public class DBNode extends ANode {
         tb.add("{ \"").add(data.text(pre, true)).add("\" }");
         break;
       default:
-        tb.add("{ \"").add(chop(atom(), 64)).add("\" }");
+        tb.add("{ \"").add(Token.chop(string(), 64)).add("\" }");
         break;
     }
     return tb.toString();

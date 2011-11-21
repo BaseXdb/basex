@@ -59,7 +59,7 @@ public enum Variable {
 
   @Override
   public final String toString() {
-    final byte[] pre = NSGlobal.prefix(qname.uri().atom());
+    final byte[] pre = NSGlobal.prefix(qname.uri().string());
     return new TokenBuilder("$").add(pre).add(':').add(qname.ln()).toString();
   }
 }

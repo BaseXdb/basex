@@ -71,7 +71,7 @@ public class FTContains extends ParseExpr {
 
     ctx.fttoken = lex;
     for(Item it; (it = iter.next()) != null;) {
-      lex.init(it.atom(input));
+      lex.init(it.string(input));
       final FTNode item = ftexpr.item(ctx, input);
       double d = 0;
       if(item.all.matches()) {

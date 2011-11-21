@@ -50,9 +50,9 @@ public abstract class CFrag extends Arr {
     if(it.type == AtomType.QNM) {
       n = (QNm) it;
     } else {
-      final byte[] nm = it.atom(ii);
+      final byte[] nm = it.string(ii);
       if(!XMLToken.isQName(nm)) {
-        (it.str() || it.unt() ? INVNAME : INVQNAME).thrw(input, nm);
+        (it.isString() || it.isUntyped() ? INVNAME : INVQNAME).thrw(input, nm);
       }
       n = new QNm(nm);
     }

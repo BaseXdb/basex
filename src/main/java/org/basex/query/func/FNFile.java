@@ -24,7 +24,7 @@ import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
@@ -114,7 +114,7 @@ public final class FNFile extends FuncCall {
   private Item size(final File path) throws QueryException {
     if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
-    return Itr.get(path.length());
+    return Int.get(path.length());
   }
 
   /**
@@ -348,7 +348,7 @@ public final class FNFile extends FuncCall {
    */
   private Iter readTextLines(final File path, final QueryContext ctx)
       throws QueryException {
-    return FNGen.textIter(readText(path, ctx).atom());
+    return FNGen.textIter(readText(path, ctx).string());
   }
 
   /**

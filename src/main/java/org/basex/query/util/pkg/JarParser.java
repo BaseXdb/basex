@@ -50,8 +50,8 @@ public final class JarParser {
       final AxisIter ch = node.children();
       for(ANode next; (next = ch.next()) != null;) {
         final QNm name = next.qname();
-        if(eqNS(JAR, name)) desc.jars.add(next.atom());
-        else if(eqNS(CLASS, name)) desc.classes.add(next.atom());
+        if(eqNS(JAR, name)) desc.jars.add(next.string());
+        else if(eqNS(CLASS, name)) desc.classes.add(next.string());
       }
       if(desc.jars.size() == 0) JARDESCINV.thrw(input, NOJARS);
       else if(desc.classes.size() == 0) JARDESCINV.thrw(input, NOCLASS);
@@ -69,6 +69,6 @@ public final class JarParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryText.PACKURI);
+    return eq(name.ln(), cmp) && eq(name.uri().string(), QueryText.PACKURI);
   }
 }

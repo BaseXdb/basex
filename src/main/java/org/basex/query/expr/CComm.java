@@ -36,7 +36,7 @@ public final class CComm extends CFrag {
     boolean more = false;
     for(Item it; (it = iter.next()) != null;) {
       if(more) tb.add(' ');
-      tb.add(it.atom(ii));
+      tb.add(it.string(ii));
       more = true;
     }
     return new FComm(FComm.parse(tb.finish(), input));
@@ -49,6 +49,6 @@ public final class CComm extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.COM.nam()));
+    return toString(Token.string(NodeType.COM.string()));
   }
 }

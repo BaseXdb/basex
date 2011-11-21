@@ -40,7 +40,8 @@ public final class QNm extends Item {
    */
   public QNm(final byte[] n) {
     this();
-    name(n);
+    val = n;
+    ns = indexOf(n, ':');
   }
 
   /**
@@ -64,7 +65,7 @@ public final class QNm extends Item {
    */
   public QNm(final byte[] n, final Uri u) {
     this(n);
-    uri(u);
+    uri = u;
   }
 
   /**
@@ -82,15 +83,8 @@ public final class QNm extends Item {
    * @param qn qname
    */
   public QNm(final QName qn) {
-    this(token(qname(qn)), token(qn.getNamespaceURI()));
-  }
-
-  /**
-   * Sets the URI of this QName.
-   * @param u the uri to set
-   */
-  public void uri(final Uri u) {
-    uri = u;
+    this(token(qn.getPrefix().isEmpty() ? qn.getLocalPart() :
+      qn.getPrefix() + ':' + qn.getLocalPart()), token(qn.getNamespaceURI()));
   }
 
   /**
@@ -98,7 +92,7 @@ public final class QNm extends Item {
    * @param u the uri to set
    */
   public void uri(final byte[] u) {
-    uri(Uri.uri(u));
+    uri = Uri.uri(u);
   }
 
   /**
@@ -117,36 +111,16 @@ public final class QNm extends Item {
     return uri != null;
   }
 
-  /**
-   * Converts the specified QName to a string.
-   * @param qn qname
-   * @return string
-   */
-  private static String qname(final QName qn) {
-    final String name = qn.getLocalPart();
-    final String pre = qn.getPrefix();
-    return !pre.isEmpty() ? pre + ":" + name : name;
-  }
-
-  /**
-   * Sets the name.
-   * @param nm name
-   */
-  public void name(final byte[] nm) {
-    val = nm;
-    ns = indexOf(val, ':');
-  }
-
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     return val;
   }
 
   /**
-   * Returns an atomized string.
-   * @return Returns an atomized string.
+   * Returns the string value.
+   * @return string value
    */
-  public byte[] atom() {
+  public byte[] string() {
     return val;
   }
 
@@ -199,9 +173,26 @@ public final class QNm extends Item {
     return ns == -1 ? val : substring(val, ns + 1);
   }
 
+  /**
+   * Sets the URI; only called to speed up internal operations.
+   * @param u the uri to set
+   */
+  void uri(final Uri u) {
+    uri = u;
+  }
+
+  /**
+   * Sets the name; only called to speed up internal operations.
+   * @param nm name
+   */
+  void name(final byte[] nm) {
+    val = nm;
+    ns = indexOf(val, ':');
+  }
+
   @Override
   public QName toJava() {
-    return new QName(Token.string(uri().atom()), Token.string(ln()),
+    return new QName(Token.string(uri().string()), Token.string(ln()),
         Token.string(pref()));
   }
 
@@ -211,7 +202,7 @@ public final class QNm extends Item {
    * @return full name
    */
   public byte[] full() {
-    return new TokenBuilder().add('{').add(uri().atom()).add('}').
+    return new TokenBuilder().add('{').add(uri().string()).add('}').
       add(ln()).finish();
   }
 

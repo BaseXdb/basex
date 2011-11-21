@@ -7,7 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
@@ -39,18 +39,18 @@ public final class FNAcc extends FuncCall {
     final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
     switch(def) {
       case POSITION:
-        return Itr.get(ctx.pos);
+        return Int.get(ctx.pos);
       case LAST:
-        return Itr.get(ctx.size);
+        return Int.get(ctx.size);
       case STRING:
         Item it = e.item(ctx, input);
         if(it == null) return Str.ZERO;
-        if(it.func()) FNSTR.thrw(ii, this);
-        return it.str() && !it.unt() ? it : Str.get(it.atom(ii));
+        if(it.isFunction()) FNSTR.thrw(ii, this);
+        return it.isString() && !it.isUntyped() ? it : Str.get(it.string(ii));
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRING_LENGTH:
-        return Itr.get(len(checkEStr(e, ctx)));
+        return Int.get(len(checkEStr(e, ctx)));
       case NORMALIZE_SPACE:
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
@@ -76,7 +76,7 @@ public final class FNAcc extends FuncCall {
 
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
-    if(it.func()) FNATM.thrw(input, this);
+    if(it.isFunction()) FNATM.thrw(input, this);
     try {
       return it.type == AtomType.DBL ? it : AtomType.DBL.e(it, ctx, input);
     } catch(final QueryException ex) {

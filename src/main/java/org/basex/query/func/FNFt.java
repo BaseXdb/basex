@@ -14,7 +14,7 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ValueIter;
@@ -78,7 +78,7 @@ public final class FNFt extends FuncCall {
     for(Item it; (it = ir.next()) != null;) checkDBNode(it);
     final int s = ctx.ftpos.size();
     ctx.ftpos = tmp;
-    return Itr.get(s);
+    return Int.get(s);
   }
 
   /**

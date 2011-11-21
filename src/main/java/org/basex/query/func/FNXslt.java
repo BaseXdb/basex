@@ -161,14 +161,14 @@ public final class FNXslt extends FuncCall {
    */
   private IO read(final Expr e, final QueryContext ctx) throws Exception {
     final Item in = checkEmpty(e.item(ctx, input));
-    if(in.node()) {
+    if(in.isNode()) {
       final ArrayOutput ao = new ArrayOutput();
       final Serializer ser = Serializer.get(ao);
       in.serialize(ser);
       ser.close();
       return new IOContent(ao.toArray());
     }
-    if(in.str()) return IO.get(string(in.atom(input)));
+    if(in.isString()) return IO.get(string(in.string(input)));
     throw STRNODTYPE.thrw(input, this, in.type);
   }
 

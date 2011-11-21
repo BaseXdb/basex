@@ -91,7 +91,7 @@ public class Filter extends Preds {
 
     // check if offset will not be deterministic; e.g.:
     // (1 to 10)[xs:int(math:random() * 10)]
-    final boolean off = preds.length == 1 && preds[0].type().num() &&
+    final boolean off = preds.length == 1 && preds[0].type().isNum() &&
       !preds[0].uses(Use.CTX) && !preds[0].uses(Use.NDT);
 
     // iterator for simple numeric predicate

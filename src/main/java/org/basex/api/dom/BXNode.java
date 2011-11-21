@@ -57,7 +57,7 @@ public abstract class BXNode implements Node {
    * @return node kind
    */
   protected int kind() {
-    return ANode.kind(node.ndType());
+    return node.kind();
   }
 
   @Override
@@ -172,7 +172,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final String getTextContent() {
-    return string(node.atom());
+    return string(node.string());
   }
 
   @Override

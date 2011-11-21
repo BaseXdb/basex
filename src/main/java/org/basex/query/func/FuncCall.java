@@ -87,8 +87,8 @@ public abstract class FuncCall extends Arr {
    * @throws QueryException query exception
    */
   protected final Item atom(final Item it) throws QueryException {
-    return it.node() ? it.type == NodeType.PI || it.type == NodeType.COM ?
-        Str.get(it.atom(input)) : new Atm(it.atom(input)) : it;
+    return it.isNode() ? it.type == NodeType.PI || it.type == NodeType.COM ?
+        Str.get(it.string(input)) : new Atm(it.string(input)) : it;
   }
 
   @Override

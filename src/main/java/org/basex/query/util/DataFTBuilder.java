@@ -52,7 +52,7 @@ final class DataFTBuilder {
     boolean marked = false;
     final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
-    final FTLexer lex = new FTLexer().sc().init(nd.atom());
+    final FTLexer lex = new FTLexer().sc().init(nd.string());
     int len = -ftlen;
     while(lex.hasNext()) {
       final FTSpan span = lex.next();

@@ -49,7 +49,7 @@ public abstract class Test {
   /** Name test. Set to {@code null} for other kind tests. */
   public QNm name;
 
-  /** Cached QName instance. */
+  /** Mutable QName instance. */
   protected final QNm tmpq = new QNm();
 
   /**

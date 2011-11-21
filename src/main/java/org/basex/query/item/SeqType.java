@@ -258,7 +258,7 @@ public final class SeqType {
     // the empty sequence has every type
     if(size == 0) return true;
 
-    final MapType mt = type.map() ? (MapType) type : null;
+    final MapType mt = type.isMap() ? (MapType) type : null;
     for(long i = 0; i < size; i++) {
       if(!check(val.itemAt(i), mt)) return false;
       if(i == 0 && val.homogenous()) break;
@@ -274,8 +274,8 @@ public final class SeqType {
    */
   private boolean check(final Item it, final MapType mt) {
     // maps don't have type information attached to them, you have to look...
-    return mt != null ? it.map() && ((Map) it).hasType(mt) :
-        it.type.instance(type) && checkExt(it);
+    return mt != null ? it.isMap() && ((Map) it).hasType(mt) :
+        it.type.instanceOf(type) && checkExt(it);
   }
 
   /**
@@ -344,8 +344,8 @@ public final class SeqType {
   private boolean instance(final Item it, final InputInfo ii)
       throws QueryException {
     final Type t = it.type;
-    final boolean ins = it.type.instance(type);
-    if(!ins && !t.unt() && !t.func() &&
+    final boolean ins = it.type.instanceOf(type);
+    if(!ins && !it.isUntyped() && !it.isFunction() &&
         // implicit type promotions:
         // xs:float -> xs:double
         (t != AtomType.FLT || type != AtomType.DBL) &&
@@ -353,7 +353,7 @@ public final class SeqType {
         (t != AtomType.URI || type != AtomType.STR) &&
         // xs:decimal -> xs:float/xs:double
         (type != AtomType.FLT && type != AtomType.DBL ||
-            !t.instance(AtomType.DEC)))
+            !t.instanceOf(AtomType.DEC)))
       Err.promote(ii, type, it);
     return ins;
   }
@@ -406,8 +406,8 @@ public final class SeqType {
    * Tests if the type is a single number.
    * @return result of check
    */
-  public boolean num() {
-    return one() && type.num();
+  public boolean isNum() {
+    return one() && type.isNumber();
   }
 
   /**
@@ -415,7 +415,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNum() {
-    return type.num() || type == AtomType.ITEM;
+    return type.isNumber() || type == AtomType.ITEM;
   }
 
   /**
@@ -454,7 +454,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final SeqType t) {
-    return type.instance(t.type) && occ.instance(t.occ);
+    return type.instanceOf(t.type) && occ.instance(t.occ);
   }
 
   @Override

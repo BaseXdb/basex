@@ -1,8 +1,8 @@
 package org.basex.query.item;
 
-import static org.basex.util.Token.*;
 import static java.lang.Float.*;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 
 /**
  * Superclass for all numeric items.
@@ -24,7 +24,7 @@ abstract class Num extends Item {
   /* Removing "throws QueryException" */
 
   @Override
-  public abstract byte[] atom(final InputInfo ii);
+  public abstract byte[] string(final InputInfo ii);
 
   @Override
   public abstract double dbl(InputInfo ii);
@@ -53,7 +53,12 @@ abstract class Num extends Item {
   }
 
   @Override
+  public boolean isNumber() {
+    return true;
+  }
+
+  @Override
   public final String toString() {
-    return string(atom(null));
+    return Token.string(string(null));
   }
 }

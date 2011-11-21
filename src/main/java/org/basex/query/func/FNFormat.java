@@ -82,7 +82,7 @@ public final class FNFormat extends FuncCall {
     // evaluate arguments
     Item it = expr[0].item(ctx, input);
     if(it == null) it = Dbl.NAN;
-    else if(!it.unt() && !it.num()) Err.number(this, it);
+    else if(!it.isUntyped() && !it.isNumber()) Err.number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
     final byte[] frm = new QNm(expr.length == 3 ?

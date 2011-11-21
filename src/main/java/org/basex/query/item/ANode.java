@@ -58,27 +58,28 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
-    return atom();
+  public final byte[] string(final InputInfo ii) {
+    return string();
   }
 
   /**
-   * Returns an atomized string.
-   * @return Returns an atomized string.
+   * Returns the string value.
+   * @return string value
    */
-  public abstract byte[] atom();
+  public abstract byte[] string();
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? it.eq(ii, this) : Token.eq(atom(), it.atom(ii));
+    return !it.isUntyped() ? it.eq(ii, this) :
+      Token.eq(string(), it.string(ii));
   }
 
   @Override
   public final int diff(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? -it.diff(ii, this) :
-      Token.diff(atom(), it.atom(ii));
+    return !it.isUntyped() ? -it.diff(ii, this) :
+      Token.diff(string(), it.string(ii));
   }
 
   /**
@@ -109,17 +110,14 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a temporary node name.
-   * This function must only be called for elements, attributes and pi's.
-   * It is more efficient than calling {@link #qname}, as an existing
+   * Updates the specified with the information of the current node.
+   * This is more efficient than calling {@link #qname}, as an existing
    * {@link QNm} instance is reused.
+   * This function must only be called for elements, attributes and pi's.
    * @param nm temporary qname
    * @return name
    */
-  @SuppressWarnings("unused")
-  public QNm qname(final QNm nm) {
-    return qname();
-  }
+  public abstract QNm update(final QNm nm);
 
   /**
    * Returns a namespace array.
@@ -187,6 +185,16 @@ public abstract class ANode extends Item {
   }
 
   @Override
+  public boolean isNode() {
+    return true;
+  }
+
+  @Override
+  public boolean isUntyped() {
+    return true;
+  }
+
+  @Override
   public abstract void serialize(final Serializer ser) throws IOException;
 
   /**
@@ -242,7 +250,7 @@ public abstract class ANode extends Item {
     while(true) {
       final ANode node = ai.next();
       if(node == null) return null;
-      if(node.qname().eq(name)) return node.atom();
+      if(node.qname().eq(name)) return node.string();
     }
   }
 
@@ -397,6 +405,14 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a database kind for the specified node type.
+   * @return node kind
+   */
+  public int kind() {
+    return kind(nodeType());
+  }
+
+  /**
+   * Returns a database kind for the specified node type.
    * @param t node type
    * @return node kind
    */
@@ -423,7 +439,7 @@ public abstract class ANode extends Item {
 
   @Override
   public final BXNode toJava() {
-    switch(ndType()) {
+    switch(nodeType()) {
       case DOC: return new BXDoc(this);
       case ELM: return new BXElem(this);
       case TXT: return new BXText(this);
@@ -438,7 +454,7 @@ public abstract class ANode extends Item {
    * Returns this Node's node type.
    * @return node type
    */
-  public final NodeType ndType() {
+  public final NodeType nodeType() {
     return (NodeType) type;
   }
 }

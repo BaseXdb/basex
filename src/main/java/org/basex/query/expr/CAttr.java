@@ -58,12 +58,12 @@ public final class CAttr extends CFrag {
   public FAttr item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final QNm name = qname(ctx, checkItem(atn, ctx), true, ii);
+    QNm name = qname(ctx, checkItem(atn, ctx), true, ii);
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
 
     if(comp) {
-      final byte[] uri = name.uri().atom();
+      final byte[] uri = name.uri().string();
       if(eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
           || eq(pre, XML) ^ eq(uri, XMLURI)) {
         CAINS.thrw(input, ln, uri);
@@ -71,7 +71,7 @@ public final class CAttr extends CFrag {
 
       if(eq(pre, EMPTY) && !eq(uri, EMPTY)) {
         // create new standard namespace to cover most frequent cases
-        name.name(concat(NS0, name.atom()));
+        name = new QNm(concat(NS0, name.string()), uri);
       }
     }
 
@@ -95,7 +95,7 @@ public final class CAttr extends CFrag {
     boolean m = false;
     for(Item it; (it = ir.next()) != null;) {
       if(m) tb.add(' ');
-      tb.add(it.atom(ii));
+      tb.add(it.string(ii));
       m = true;
     }
   }
@@ -131,6 +131,6 @@ public final class CAttr extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.ATT.nam()) + " { " + atn + " }");
+    return toString(Token.string(NodeType.ATT.string()) + " { " + atn + " }");
   }
 }

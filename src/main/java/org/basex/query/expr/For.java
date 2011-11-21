@@ -9,7 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -137,7 +137,7 @@ public final class For extends ForLet {
        */
       private Item bind(final Item it, final long i) throws QueryException {
         v.bind(it, ctx);
-        if(p != null) p.bind(Itr.get(i), ctx);
+        if(p != null) p.bind(Int.get(i), ctx);
         if(s != null) s.bind(Dbl.get(it.score()), ctx);
         return it;
       }

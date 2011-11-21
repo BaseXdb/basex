@@ -105,8 +105,8 @@ public final class DBAdd extends InsertBase {
 
     // add slash to the target if the addressed file is an archive or directory
     IO io = null;
-    if(doc.str()) {
-      io = IO.get(string(doc.atom(input)));
+    if(doc.isString()) {
+      io = IO.get(string(doc.string(input)));
       if(!io.exists()) RESFNF.thrw(input, pth);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
     }
@@ -118,7 +118,7 @@ public final class DBAdd extends InsertBase {
       name = name.substring(s + 1);
     }
 
-    if(doc.str()) {
+    if(doc.isString()) {
       // set name of document
       if(!name.isEmpty()) io.name(name);
       // get name from io reference
@@ -128,14 +128,14 @@ public final class DBAdd extends InsertBase {
     // ensure that the final name is not empty
     if(name.isEmpty()) RESINV.thrw(input, pth);
 
-    if(doc.node()) {
+    if(doc.isNode()) {
       // adding a document node
       final ANode nd = (ANode) doc;
-      if(nd.ndType() != NodeType.DOC) UPDOCTYPE.thrw(input, nd);
+      if(nd.type != NodeType.DOC) UPDOCTYPE.thrw(input, nd);
       mdata = new MemData(data);
       new DataBuilder(mdata).build(nd);
       mdata.update(0, Data.DOC, pth);
-    } else if(doc.str()) {
+    } else if(doc.isString()) {
       final DirParser p = new DirParser(io, target, ctx.prop);
       final MemBuilder b = new MemBuilder(data.meta.name, p, ctx.prop);
       try {

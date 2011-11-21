@@ -83,16 +83,16 @@ public final class MixedPath extends Path {
 
         // loop through all input items
         for(Item it; (it = res.next()) != null;) {
-          if(!it.node()) NODESPATH.thrw(input, this, it.type);
+          if(!it.isNode()) NODESPATH.thrw(input, this, it.type);
           ctx.value = it;
 
           // loop through all resulting items
           final Iter ir = ctx.iter(e);
           for(Item i; (i = ir.next()) != null;) {
             // set node flag
-            if(ic.size() == 0) nodes = i.node();
+            if(ic.size() == 0) nodes = i.isNode();
             // check if both nodes and atomic values occur in last result
-            else if(last && nodes != i.node()) EVALNODESVALS.thrw(input);
+            else if(last && nodes != i.isNode()) EVALNODESVALS.thrw(input);
             ic.add(i);
           }
           ctx.pos++;

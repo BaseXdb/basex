@@ -39,7 +39,7 @@ public final class Arith extends Arr {
 
     final SeqType s0 = expr[0].type();
     final SeqType s1 = expr[1].type();
-    type = s0.num() && s1.num() ? SeqType.ITR :
+    type = s0.isNum() && s1.isNum() ? SeqType.ITR :
       s0.one() && s1.one() ? SeqType.ITEM : SeqType.ITEM_ZO;
 
     return optPre(oneEmpty() ? null : values() ? item(ctx, input) : this, ctx);

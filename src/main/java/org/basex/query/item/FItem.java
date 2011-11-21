@@ -87,7 +87,7 @@ public abstract class FItem extends Item {
       final InputInfo ii) throws QueryException;
 
   @Override
-  public final byte[] atom(final InputInfo ii) throws QueryException {
+  public final byte[] string(final InputInfo ii) throws QueryException {
     throw NOTYP.thrw(ii, desc());
   }
 
@@ -100,6 +100,11 @@ public abstract class FItem extends Item {
   @Override
   public Object toJava() throws QueryException {
     throw Util.notexpected();
+  }
+
+  @Override
+  public boolean isFunction() {
+    return true;
   }
 
   @Override

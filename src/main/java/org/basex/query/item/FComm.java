@@ -46,7 +46,7 @@ public final class FComm extends FNode {
 
   @Override
   public FNode copy() {
-    return new FComm(val.clone()).parent(par);
+    return new FComm(val).parent(par);
   }
 
   @Override

@@ -41,65 +41,53 @@ public interface Type {
   // PUBLIC AND STATIC METHODS ================================================
 
   /**
-   * Checks if the specified type is an instance of the current type.
+   * Checks if the current type is an instance of the specified type.
    * @param t type to be checked
    * @return result of check
    */
-  boolean instance(final Type t);
+  boolean instanceOf(final Type t);
 
   /**
    * Checks if the type refers to a node.
    * @return result of check
    */
-  boolean node();
+  boolean isNode();
 
   /**
    * Checks if the type refers to a number.
    * @return result of check
    */
-  boolean num();
+  boolean isNumber();
 
   /**
    * Checks if the type refers to an untyped value.
    * @return result of check
    */
-  boolean unt();
+  boolean isUntyped();
 
   /**
    * Checks if the type refers to a string.
    * @return result of check
    */
-  boolean str();
-
-  /**
-   * Checks if the type refers to a duration.
-   * @return result of check
-   */
-  boolean dur();
-
-  /**
-   * Checks if the type refers to a date.
-   * @return result of check
-   */
-  boolean dat();
+  boolean isString();
 
   /**
    * Checks if the type refers to a function item.
    * @return result of check
    */
-  boolean func();
+  boolean isFunction();
 
   /**
-   * Checks if the type refers to a function item.
+   * Checks if the type refers to a map.
    * @return result of check
    */
-  boolean map();
+  boolean isMap();
 
   /**
-   * Returns the name of this type.
+   * Returns the string representation of this type.
    * @return name
    */
-  byte[] nam();
+  byte[] string();
 
   /**
    * Returns a type id to differentiate all types.
