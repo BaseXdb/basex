@@ -346,6 +346,7 @@ pc_create=Bezig de database te maken
 pc_index=Bezig de indexen te maken
 pc_update=Het database formaat is gewijzigd; maak een nieuwe database.
 pc_indupdate=Het index formaat is gewijzigd; maak nieuwe indexen.
+pc_corrupt=Warning: the database may be corrupt!
 pc_cancel=Het maken van de database is afgebroken.
 pc_finish=Afronden
 pc_indextxt=Text indexeren

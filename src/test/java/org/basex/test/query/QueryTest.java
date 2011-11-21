@@ -86,6 +86,7 @@ public abstract class QueryTest {
         if(cmp instanceof Nodes) {
           ((Nodes) cmp).data = context.data();
         }
+
         if(!correct || !val.sameAs(cmp)) {
           sb.append("-- " + qu[0] + ": " + query);
           String s = correct && cmp.size() != 1 ? "#" + cmp.size() : "";

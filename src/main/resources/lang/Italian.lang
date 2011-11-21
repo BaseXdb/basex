@@ -346,6 +346,7 @@ pc_create=Sto creando la base di dati
 pc_index=Sto creando gli indici
 pc_update=Il formato della base di dati è cambiato; creare una nuova base di dati.
 pc_indupdate=Il formato degli indici è cambiato; creare nuovi indici.
+pc_corrupt=Warning: the database may be corrupt!
 pc_cancel=Creazione della base di dati annullata.
 pc_finish=Sto terminando
 pc_indextxt=Sto indicizzando il testo

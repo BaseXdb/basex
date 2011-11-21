@@ -151,10 +151,10 @@ public final class QueryContext extends Progress {
   /** Full-text token counter (needed for highlighting of full-text results). */
   public byte ftoknum;
 
-  /** Copied nodes, resulting from transform expression. */
-  public final HashSet<Data> copiedNods = new HashSet<Data>();
   /** Pending updates. */
   public final Updates updates = new Updates();
+  /** Copied nodes, resulting from transform expression. */
+  public HashSet<Data> copiedNods;
   /** Indicates if this query might perform updates. */
   public boolean updating;
 

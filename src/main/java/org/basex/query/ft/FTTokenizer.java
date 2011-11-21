@@ -114,8 +114,6 @@ public final class FTTokenizer {
         for(final byte[] ext : opt.th.find(words.input, query)) {
           // parse each extension term to a set of tokens:
           final TokenList tl = new TokenList(1);
-          // [DP] should we apply the same FT options (e.g. stemming, etc.)
-          // to the thesaurus tokens?
           quLex.init(ext);
           while(quLex.hasNext()) tl.add(quLex.nextToken());
           // add each thesaurus term as an additional query term:

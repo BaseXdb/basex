@@ -114,7 +114,6 @@ public final class Add extends ACreate {
     try {
       tmp = build.build();
       // ignore empty fragments
-      // [CG] check if fragments can be empty at all
       if(tmp.meta.size > 1) {
         data.insert(data.meta.size, -1, tmp);
         context.update();

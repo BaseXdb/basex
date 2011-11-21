@@ -8,11 +8,14 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Export;
 import org.basex.data.Data;
+import org.basex.data.DataText;
+import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.util.Token;
 import org.basex.util.hash.IntMap;
 import org.basex.util.list.IntList;
 
@@ -167,7 +170,7 @@ final class DatabaseUpdates {
       // If a node is deleted or replaced or affected by a replace element
       // content expression ...
       final int[] destroyed = updatePrimitives.get(pre).
-      destroyedNodeIdentities().toArray();
+          destroyedNodeIdentities().toArray();
       for(final int pd : destroyed) {
         final int followingAxisPre = pd + data.size(pd, data.kind(pd));
         // mark obsolete target nodes on the descendant axis.
@@ -177,8 +180,7 @@ final class DatabaseUpdates {
         }
       }
     }
-
-    // in case nothing changed on the pending update list, return
+    // return if nothing changed on the pending update list
     if(c == 0) return;
 
     // Create a new list that contains necessary targets only
@@ -196,6 +198,14 @@ final class DatabaseUpdates {
    */
   protected void apply() throws QueryException {
     treeAwareUpdates();
+
+    // mark database as updating
+    final IOFile upd = new IOFile(data.meta.dbfile(DataText.DATAUPD));
+    try {
+      upd.write(Token.EMPTY);
+    } catch(final IOException ex) {
+      UPPUTERR.thrw(null, upd);
+    }
 
     /*
      * For each target node, the update primitives in the corresponding
@@ -226,6 +236,8 @@ final class DatabaseUpdates {
     recent.resolveExternalTextNodeAdjacency(0);
 
     data.flush();
+    upd.delete();
+
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {
         Export.export(data, data.meta.original);

@@ -93,6 +93,8 @@ public interface DataText {
   String DATAFTX = "ftx";
   /** Database - Stopword list. */
   String DATASWL = "swl";
+  /** Database - Updating flag. */
+  String DATAUPD = "upd";
 
   // XML SERIALIZATION ========================================================
 

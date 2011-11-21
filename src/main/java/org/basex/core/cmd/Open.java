@@ -48,6 +48,7 @@ public final class Open extends Command {
       final Data data = open(db, context);
       context.openDB(data, path);
       if(data.meta.oldindex) info(INDUPDATE);
+      if(data.meta.corrupt)  info(DBCORRUPT);
       return info(DBOPENED, db, perf);
     } catch(final IOException ex) {
       Util.debug(ex);

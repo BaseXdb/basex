@@ -160,14 +160,12 @@ public enum Err {
   /** FOHC006: Evaluation exception. */
   NOPARAMS(FOHC, 6, "Specify request element or HTTP URI."),
 
-  // [RS] please add to http://docs.basex.org/wiki/XQuery_Errors
-
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
   PKGINST(PACK, 2, "Package '%' is already installed."),
   /** PACK0003: Evaluation exception. */
-  NECPKGNOTINST(PACK, 3, "Necessary package '%' is not installed."),
+  NECPKGNOTINST(PACK, 3, "Required package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
   /** PACK0004: Evaluation exception. */
@@ -181,11 +179,11 @@ public enum Err {
   /** PACK0008: Evaluation exception. */
   PKGDEP(PACK, 8, "Package '%' depends on package '%'."),
   /** PACK0009: Evaluation exception. */
-  PKGNOTSUPP(PACK, 9, "Package is not supported by database version."),
+  PKGNOTSUPP(PACK, 9, "Package version is not supported."),
   /** PACK0010: Evaluation exception. */
-  JARDESCINV(PACK, 10, "Jar descriptor: %."),
+  JARDESCINV(PACK, 10, "JAR descriptor: %."),
   /** PACK0011: Evaluation exception. */
-  JARREADFAIL(PACK, 11, "Reading jar descriptor failed: %."),
+  JARREADFAIL(PACK, 11, "Reading JAR descriptor failed: %."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
@@ -265,8 +263,6 @@ public enum Err {
   ILLFORMAT(FOSQ, 6, "Illegal % format"),
   /** FOSQ0007: Evaluation exception. */
   SQLINIT(FOSQ, 7, "Could not initialize specified driver: '%'"),
-
-  // [LW] please add to http://docs.basex.org/wiki/XQuery_Errors
 
   /** FOTY0012: Type exception. */
   NOTYP(FOTY, 12, "Item has no typed value: %."),
