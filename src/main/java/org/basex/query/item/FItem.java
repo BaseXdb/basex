@@ -103,10 +103,5 @@ public abstract class FItem extends Item {
   }
 
   @Override
-  public boolean isFunction() {
-    return true;
-  }
-
-  @Override
   public abstract void plan(Serializer ser) throws IOException;
 }

@@ -149,9 +149,9 @@ public abstract class ANode extends Item {
       final Atts nns = n.ns();
       if(!nsInherit) return nns;
       if(nns != null) {
-        for(int a = nns.size - 1; a >= 0; a--) {
-          final byte[] key = nns.key[a];
-          if(!ns.contains(key)) ns.add(key, nns.val[a]);
+        for(int a = nns.size() - 1; a >= 0; a--) {
+          final byte[] key = nns.key(a);
+          if(!ns.contains(key)) ns.add(key, nns.val(a));
         }
       }
       n = n.parent();
@@ -169,7 +169,7 @@ public abstract class ANode extends Item {
     final Atts at = ns();
     if(at != null) {
       final int i = at.get(pref);
-      if(i != -1) return at.val[i];
+      if(i != -1) return at.val(i);
       final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);
     }

@@ -72,7 +72,7 @@ public final class CElem extends CFrag {
 
       // clone namespaces
       final Atts nns = new Atts();
-      for(int i = 0; i < nsp.size; ++i) nns.add(nsp.key[i], nsp.val[i]);
+      for(int i = 0; i < nsp.size(); ++i) nns.add(nsp.key(i), nsp.val(i));
 
       // create QName and set namespaces
       final QNm nnm = checkNS(qname(ctx, it, false, ii));
@@ -113,14 +113,14 @@ public final class CElem extends CFrag {
           final int pos = nns.get(apref);
           if(pos == -1) {
             nns.add(apref, auri);
-          } else if(!eq(nns.val[pos], auri)) {
+          } else if(!eq(nns.val(pos), auri)) {
             // same prefixes with different URIs exist
             apref = null;
             // check if existing prefix can be assigned
-            for(int a = 0; a < nns.size; a++) {
-              if(eq(nns.val[a], auri)) apref = nns.key[a];
+            for(int a = 0; a < nns.size(); a++) {
+              if(eq(nns.val(a), auri)) apref = nns.key(a);
             }
-            // if not, generate new one
+            // if negative, generate new one
             if(apref == null) {
               int i = 1;
               do {
@@ -147,8 +147,8 @@ public final class CElem extends CFrag {
    * @throws QueryException query exception
    */
   private void addNS(final QueryContext ctx) throws QueryException {
-    for(int n = nsp.size - 1; n >= 0; n--) {
-      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), nsp.val[n]), input);
+    for(int n = nsp.size() - 1; n >= 0; n--) {
+      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key(n)), nsp.val(n)), input);
     }
   }
 

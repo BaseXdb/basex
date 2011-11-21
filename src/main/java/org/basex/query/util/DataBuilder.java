@@ -269,29 +269,29 @@ public final class DataBuilder {
       // remove them to avoid duplicates
       final Atts ns2 = nd.nsScope(inherit);
       int uid;
-      if((uid = ns2.get(EMPTY)) != -1) ns.add(ns2.key[uid], ns2.val[uid]);
+      if((uid = ns2.get(EMPTY)) != -1) ns.add(ns2.key(uid), ns2.val(uid));
     } else {
       ns = par == 0 ? nd.nsScope(inherit) : nd.ns();
     }
 
     if(ns != null) {
-      if(ns.size > 0 && ndPar != null && preserve) {
+      if(ns.size() > 0 && ndPar != null && preserve) {
         // remove duplicate namespace bindings
         final Atts nsPar = ndPar.nsScope(inherit);
-        for(int j = 0; j < nsPar.size; ++j) {
-          final byte[] key = nsPar.key[j];
+        for(int j = 0; j < nsPar.size(); ++j) {
+          final byte[] key = nsPar.key(j);
           final int ki = ns.get(key);
           // check if prefix (or empty prefix) is already indexed and if so
           // check for different URIs. If the URIs are different the
           // prefix must be added to the index
-          if(ki > -1 && eq(nsPar.val[j], ns.val[ki])) ns.delete(ki);
+          if(ki > -1 && eq(nsPar.val(j), ns.val(ki))) ns.delete(ki);
         }
       }
-      ne = ns.size > 0;
+      ne = ns.size() > 0;
 
       // add new namespaces
-      for(int a = 0; ne && a < ns.size; ++a)
-        data.ns.add(ns.key[a], ns.val[a], ms);
+      for(int a = 0; ne && a < ns.size(); ++a)
+        data.ns.add(ns.key(a), ns.val(a), ms);
     }
 
     final byte[] uri = q.uri().string();

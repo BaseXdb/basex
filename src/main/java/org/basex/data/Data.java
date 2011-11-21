@@ -788,17 +788,17 @@ public abstract class Data {
           boolean ne = false;
           if(data.nsFlag(dpre)) {
             final Atts at = data.ns(dpre);
-            for(int a = 0; a < at.size; ++a) {
+            for(int a = 0; a < at.size(); ++a) {
               // see if prefix has been declared/ is part of current ns scope
-              final byte[] old = nsScope.get(at.key[a]);
-              if(old == null || !eq(old, at.val[a])) {
+              final byte[] old = nsScope.get(at.key(a));
+              if(old == null || !eq(old, at.val(a))) {
                 // we have to keep track of all new NSNodes that are added
                 // to the Namespace structure, as their pre values must not
                 // be updated. I.e. if an NSNode N with pre value 3 existed
                 // prior to inserting and two new nodes are inserted at
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
-                newNodes.add(ns.add(at.key[a], at.val[a], pre));
+                newNodes.add(ns.add(at.key(a), at.val(a), pre));
                 ne = true;
               }
             }

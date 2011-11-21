@@ -41,8 +41,8 @@ public final class NSLocal {
    */
   public void delete(final QNm name) {
     final byte[] ln = name.ln();
-    for(int s = ns.size - 1; s >= 0; s--) {
-      if(eq(ln, ns.key[s])) ns.delete(s);
+    for(int s = ns.size() - 1; s >= 0; s--) {
+      if(eq(ln, ns.key(s))) ns.delete(s);
     }
   }
 
@@ -71,8 +71,8 @@ public final class NSLocal {
    * @return uri or {@code null}
    */
   public byte[] localURI(final byte[] pref) {
-    for(int s = ns.size - 1; s >= 0; s--) {
-      if(eq(ns.key[s], pref)) return ns.val[s];
+    for(int s = ns.size() - 1; s >= 0; s--) {
+      if(eq(ns.key(s), pref)) return ns.val(s);
     }
     return null;
   }
@@ -94,8 +94,8 @@ public final class NSLocal {
    * @return prefix
    */
   public byte[] prefix(final byte[] uri) {
-    for(int s = ns.size - 1; s >= 0; s--) {
-      if(eq(ns.val[s], uri)) return ns.key[s];
+    for(int s = ns.size() - 1; s >= 0; s--) {
+      if(eq(ns.val(s), uri)) return ns.key(s);
     }
     return NSGlobal.prefix(uri);
   }
@@ -105,8 +105,8 @@ public final class NSLocal {
    * @return prefixes
    */
   public byte[][] prefixes() {
-    final byte[][] prefs = new byte[ns.size][];
-    for(int p = 0; p < prefs.length; ++p) prefs[p] = ns.key[p];
+    final byte[][] prefs = new byte[ns.size()][];
+    for(int p = 0; p < prefs.length; ++p) prefs[p] = ns.key(p);
     return prefs;
   }
 
@@ -116,7 +116,7 @@ public final class NSLocal {
    */
   public void finish(final byte[] elem) {
     if(elem.length != 0) ns.add(EMPTY, elem);
-    def = ns.size;
+    def = ns.size();
   }
 
   /**
@@ -125,7 +125,7 @@ public final class NSLocal {
    */
   public NSLocal copy() {
     final NSLocal local = new NSLocal();
-    for(int i = 0; i < def; ++i) local.ns.add(ns.key[i], ns.val[i]);
+    for(int i = 0; i < def; ++i) local.ns.add(ns.key(i), ns.val(i));
     return local;
   }
 
@@ -134,7 +134,7 @@ public final class NSLocal {
    * @return namespaces
    */
   public int size() {
-    return ns.size;
+    return ns.size();
   }
 
   /**
@@ -142,6 +142,6 @@ public final class NSLocal {
    * @param s namespaces
    */
   public void size(final int s) {
-    ns.size = s;
+    ns.size(s);
   }
 }

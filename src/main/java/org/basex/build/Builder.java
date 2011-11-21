@@ -165,7 +165,7 @@ public abstract class Builder extends Progress {
     addElem(nm, att);
     final int pre = pstack.get(lvl);
     ns.close(pre);
-    if(att.size > IO.MAXATTS) setSize(pre, meta.size - pre);
+    if(att.size() > IO.MAXATTS) setSize(pre, meta.size - pre);
   }
 
   /**
@@ -328,17 +328,17 @@ public abstract class Builder extends Progress {
 
     // get and store element references
     final int dis = lvl != 0 ? pre - pstack.get(lvl - 1) : 1;
-    final int as = att.size;
+    final int as = att.size();
     final boolean ne = ns.open();
     int u = ns.uri(nm, true);
     addElem(dis, n, Math.min(IO.MAXATTS, as + 1), u, ne);
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
-      n = atts.index(att.key[a], att.val[a], true);
-      u = ns.uri(att.key[a], false);
+      n = atts.index(att.key(a), att.val(a), true);
+      u = ns.uri(att.key(a), false);
       if(meta.pathindex) path.index(n, Data.ATTR, lvl + 1);
-      addAttr(n, att.val[a], Math.min(IO.MAXATTS, a + 1), u);
+      addAttr(n, att.val(a), Math.min(IO.MAXATTS, a + 1), u);
     }
 
     if(lvl != 0) {

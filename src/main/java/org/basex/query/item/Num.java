@@ -53,11 +53,6 @@ abstract class Num extends Item {
   }
 
   @Override
-  public boolean isNumber() {
-    return true;
-  }
-
-  @Override
   public final String toString() {
     return Token.string(string(null));
   }

@@ -85,7 +85,7 @@ public final class FNQName extends FuncCall {
             ctx.copiedNods.contains(an.data());
         final Atts at = an.nsScope(!copied || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
-        return i != -1 ? Uri.uri(at.val[i]) : null;
+        return i != -1 ? Uri.uri(at.val(i)) : null;
       case RESOLVE_URI:
         if(it == null) return null;
         final Uri rel = Uri.uri(checkEStr(it));
@@ -137,10 +137,10 @@ public final class FNQName extends FuncCall {
       final Atts at = n.ns();
       if(at == null) break;
       if(n != node || ctx.nsPreserve) {
-        for(int a = 0; a < at.size; ++a) {
-          final byte[] pre = at.key[a];
+        for(int a = 0; a < at.size(); ++a) {
+          final byte[] pre = at.key(a);
           if(pre.length == 0) {
-            if(emp == null) emp = at.val[a];
+            if(emp == null) emp = at.val(a);
           } else pref.add(pre);
         }
       }

@@ -107,6 +107,7 @@ public class Str extends Item {
     for(final byte v : val) {
       if(v == '&') tb.add(E_AMP);
       else tb.add(v);
+      if(v == '"') tb.add(v);
     }
     return tb.add('"').toString();
   }

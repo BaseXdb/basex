@@ -586,7 +586,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "let $b := <a xmlns:x='X' x:id='0'/> " +
         "return insert node $b//@*:id into /*:n"
         , "");
-    assertEquals(1, CONTEXT.data().ns(1).size);
+    assertEquals(1, CONTEXT.data().ns(1).size());
   }
 
   /** Handles duplicate prefixes. */

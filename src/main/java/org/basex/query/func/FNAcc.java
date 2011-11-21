@@ -46,7 +46,7 @@ public final class FNAcc extends FuncCall {
         Item it = e.item(ctx, input);
         if(it == null) return Str.ZERO;
         if(it.isFunction()) FNSTR.thrw(ii, this);
-        return it.isString() && !it.isUntyped() ? it : Str.get(it.string(ii));
+        return it.type == AtomType.STR ? it : Str.get(it.string(ii));
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRING_LENGTH:

@@ -101,7 +101,7 @@ public final class FElem extends FNode {
     }
 
     // add all new namespaces
-    for(int i = 0; i < ns.size; ++i) nss.add(ns.key[i], ns.val[i]);
+    for(int i = 0; i < ns.size(); ++i) nss.add(ns.key(i), ns.val(i));
 
     // no parent, so we have to add all namespaces in scope
     if(p == null) {
@@ -202,9 +202,13 @@ public final class FElem extends FNode {
     // serialize all namespaces at top level...
     if(ser.level() == 0) {
       final Atts nns = nsScope();
-      for(int a = 0; a < nns.size; ++a) ser.namespace(nns.key[a], nns.val[a]);
+      for(int a = 0; a < nns.size(); ++a) {
+        ser.namespace(nns.key(a), nns.val(a));
+      }
     } else if(ns != null) {
-      for(int p = ns.size - 1; p >= 0; p--) ser.namespace(ns.key[p], ns.val[p]);
+      for(int p = ns.size() - 1; p >= 0; p--) {
+        ser.namespace(ns.key(p), ns.val(p));
+      }
     }
 
     // serialize attributes
@@ -227,7 +231,7 @@ public final class FElem extends FNode {
     final FElem node = new FElem(name);
     for(int c = 0; c < children.size(); ++c) node.add(children.get(c).copy());
     for(int c = 0; c < atts.size(); ++c) node.add(atts.get(c).copy());
-    for(int c = 0; c < ns.size; ++c) node.ns.add(ns.key[c], ns.val[c]);
+    for(int c = 0; c < ns.size(); ++c) node.ns.add(ns.key(c), ns.val(c));
     return node.parent(par);
   }
 
@@ -240,7 +244,7 @@ public final class FElem extends FNode {
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
     sb.append(Token.string(name.string()));
-    if(atts.size() != 0 || ns != null && ns.size != 0 || children.size() != 0)
+    if(atts.size() != 0 || ns != null && ns.size() != 0 || children.size() != 0)
       sb.append(" ...");
     return sb.append("/>").toString();
   }

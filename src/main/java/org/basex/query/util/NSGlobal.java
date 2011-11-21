@@ -47,8 +47,8 @@ public final class NSGlobal {
    * @return uri
    */
   public static byte[] uri(final byte[] pre) {
-    for(int s = NS.size - 1; s >= 0; s--) {
-      if(eq(NS.key[s], pre)) return NS.val[s];
+    for(int s = NS.size() - 1; s >= 0; s--) {
+      if(eq(NS.key(s), pre)) return NS.val(s);
     }
     return EMPTY;
   }
@@ -59,8 +59,8 @@ public final class NSGlobal {
    * @return prefix
    */
   public static byte[] prefix(final byte[] uri) {
-    for(int s = NS.size - 1; s >= 0; s--) {
-      if(eq(NS.val[s], uri)) return NS.key[s];
+    for(int s = NS.size() - 1; s >= 0; s--) {
+      if(eq(NS.val(s), uri)) return NS.key(s);
     }
     return EMPTY;
   }
@@ -72,8 +72,8 @@ public final class NSGlobal {
    */
   public static boolean standard(final byte[] uri) {
     // 'local' namespace is skipped
-    for(int s = NS.size - 1; s > 0; s--) {
-      if(eq(NS.val[s], uri)) return true;
+    for(int s = NS.size() - 1; s > 0; s--) {
+      if(eq(NS.val(s), uri)) return true;
     }
     return false;
   }

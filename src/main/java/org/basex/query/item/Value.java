@@ -68,16 +68,16 @@ public abstract class Value extends Expr {
    * Checks if this is a numeric item.
    * @return result of check
    */
-  public boolean isNumber() {
-    return false;
+  public final boolean isNumber() {
+    return type.isNumber();
   }
 
   /**
    * Checks if this is a function item.
    * @return result of check
    */
-  public boolean isFunction() {
-    return false;
+  public final boolean isFunction() {
+    return type.isFunction();
   }
 
   /**

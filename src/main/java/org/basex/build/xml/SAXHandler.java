@@ -133,7 +133,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
       builder.text(tb.finish());
       tb.reset();
     }
-    for(int i = 0; i < ns.size; ++i) builder.startNS(ns.key[i], ns.val[i]);
+    for(int i = 0; i < ns.size(); ++i) builder.startNS(ns.key(i), ns.val(i));
     ns.reset();
   }
 

@@ -122,8 +122,8 @@ public final class Constr {
           node = node.parent();
           while(node != null && node.type == NodeType.ELM) {
             final Atts ns = node.ns();
-            for(int a = 0; a < ns.size; ++a) {
-              if(!ats.contains(ns.key[a])) ats.add(ns.key[a], ns.val[a]);
+            for(int a = 0; a < ns.size(); ++a) {
+              if(!ats.contains(ns.key(a))) ats.add(ns.key(a), ns.val(a));
             }
             node = node.parent();
           }

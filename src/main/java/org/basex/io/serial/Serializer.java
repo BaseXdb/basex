@@ -87,7 +87,7 @@ public abstract class Serializer {
       throws IOException {
 
     finishElement();
-    nsl.push(ns.size);
+    nsl.push(ns.size());
     elem = true;
     tag = t;
     startOpen(t);
@@ -99,7 +99,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   public final void closeElement() throws IOException {
-    ns.size = nsl.pop();
+    ns.size(nsl.pop());
     if(elem) {
       finishEmpty();
       elem = false;
@@ -241,9 +241,9 @@ public abstract class Serializer {
 
           do {
             final Atts atn = data.ns(pp);
-            for(int n = 0; n < atn.size; ++n) {
-              key = atn.key[n];
-              val = atn.val[n];
+            for(int n = 0; n < atn.size(); ++n) {
+              key = atn.key(n);
+              val = atn.val(n);
               if(!nsp.contains(key)) {
                 nsp.add(key);
                 namespace(key, val);
@@ -477,8 +477,8 @@ public abstract class Serializer {
    * @return URI if found, {@code null} otherwise
    */
   private byte[] ns(final byte[] pre) {
-    for(int i = ns.size - 1; i >= 0; i--)
-      if(eq(ns.key[i], pre)) return ns.val[i];
+    for(int i = ns.size() - 1; i >= 0; i--)
+      if(eq(ns.key(i), pre)) return ns.val(i);
     return null;
   }
 

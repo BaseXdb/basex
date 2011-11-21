@@ -91,7 +91,7 @@ public final class FNNode extends FuncCall {
           final Atts ns = node.nsScope();
           if(ns != null) {
             final int pos = ns.get(qname.pref());
-            if(pos != -1) return Uri.uri(ns.val[pos]);
+            if(pos != -1) return Uri.uri(ns.val(pos));
           }
           node = node.parent();
         }
