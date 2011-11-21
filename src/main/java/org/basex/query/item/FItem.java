@@ -98,7 +98,7 @@ public abstract class FItem extends Item {
   }
 
   @Override
-  public final Object toJava() {
+  public Object toJava() throws QueryException {
     throw Util.notexpected();
   }
 

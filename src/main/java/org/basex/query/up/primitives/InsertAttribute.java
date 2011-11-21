@@ -4,7 +4,6 @@ import org.basex.data.Data;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Insert attribute primitive.
@@ -40,10 +39,5 @@ public final class InsertAttribute extends InsertBase {
   @Override
   public boolean adjacentTexts(final int c) {
     return false;
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

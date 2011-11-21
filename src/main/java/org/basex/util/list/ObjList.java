@@ -82,15 +82,6 @@ public final class ObjList<E> extends ElementList
   }
 
   /**
-   * Returns an array with all elements.
-   * @return array
-  @SuppressWarnings("unchecked")
-  public E[] toArray() {
-    return (E[]) Arrays.copyOf(list, size);
-  }
-   */
-
-  /**
    * Fills and returns the array with all elements.
    * @param a container to be filled
    * @return array with all elements

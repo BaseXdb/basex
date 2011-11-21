@@ -12,6 +12,7 @@ import org.basex.query.up.NamePool;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.list.ObjList;
 
 /**
@@ -22,9 +23,11 @@ import org.basex.util.list.ObjList;
  */
 public abstract class NodeCopy extends StructuralUpdate {
   /** Nodes to be inserted. */
-  protected final ObjList<NodeCache> insert = new ObjList<NodeCache>(1);
+  protected ObjList<NodeCache> insert = new ObjList<NodeCache>(1);
   /** Final copy of insertion nodes. */
   protected MemData md;
+  /** Number of insert operations (initialized by {@link #prepare}). */
+  protected int size;
 
   /**
    * Constructor.
@@ -50,9 +53,17 @@ public abstract class NodeCopy extends StructuralUpdate {
     // build main memory representation of nodes to be copied
     md = new MemData(data);
     final NodeCache seq = new NodeCache();
-    for(final NodeCache nc : insert) {
-      for(ANode i; (i = nc.next()) != null;) seq.add(i);
+    for(int i = 0; i < insert.size(); i++) {
+      final NodeCache nc = insert.get(i);
+      for(ANode n; (n = nc.next()) != null;) {
+        seq.add(n);
+        size++;
+      }
+      // save memory
+      insert.set(i, null);
     }
+    insert = null;
+
     // text nodes still need to be merged. two adjacent iterators may
     // lead to two adjacent text nodes
     new DataBuilder(md).build(mergeNodeCacheText(seq));
@@ -99,7 +110,12 @@ public abstract class NodeCopy extends StructuralUpdate {
   }
 
   @Override
-  public int size() {
-    return insert.size();
+  public final int size() {
+    return size;
+  }
+
+  @Override
+  public String toString() {
+    return Util.name(this) + "[" + targetNode() + ", " + size() + " ops]";
   }
 }

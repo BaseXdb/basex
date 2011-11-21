@@ -1,17 +1,20 @@
 package org.basex.query.item.map;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+
 import java.io.IOException;
+import java.util.HashMap;
+
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import static org.basex.query.QueryText.*;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Flt;
 import org.basex.query.item.FItem;
+import org.basex.query.item.Flt;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -243,6 +246,16 @@ public final class Map extends FItem {
       tm.add(k.atom(null), get(k, ii).toJava());
     }
     return tm;
+  }
+
+  @Override
+  public HashMap<Object, Object> toJava() throws QueryException {
+    final HashMap<Object, Object> map = new HashMap<Object, Object>();
+    final ValueIter vi = keys().iter();
+    for(Item k; (k = vi.next()) != null;) {
+      map.put(k.toJava(), get(k, null).toJava());
+    }
+    return map;
   }
 
   @Override

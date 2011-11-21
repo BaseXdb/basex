@@ -52,14 +52,12 @@ public final class FNFile extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
+    final File path = new File(string(checkStr(expr[0], ctx)));
 
     switch(def) {
-      case _FILE_LIST:
-        return list(ctx);
-      case _FILE_READ_TEXT_LINES:
-        return readTextLines(new File(string(checkStr(expr[0], ctx))), ctx);
-      default:
-        return super.iter(ctx);
+      case _FILE_LIST:            return list(path, ctx);
+      case _FILE_READ_TEXT_LINES: return readTextLines(path, ctx);
+      default:                    return super.iter(ctx);
     }
   }
 
@@ -172,16 +170,24 @@ public final class FNFile extends FuncCall {
 
   /**
    * Lists all files in a directory.
+   * @param path root directory
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter list(final QueryContext ctx) throws QueryException {
-    final String path = string(checkStr(expr[0], ctx));
-    final File dir = new File(path);
+  private Iter list(final File path, final QueryContext ctx)
+      throws QueryException {
 
-    // check if not a directory
-    if(!dir.isDirectory()) NOTDIR.thrw(input, path);
+    // get canonical representation to resolve symbolic links
+    File dir = null;
+    try {
+      dir = path.getCanonicalFile();
+    } catch(final IOException ex) {
+      throw PATHINVALID.thrw(input, path);
+    }
+
+    // check if the addresses path is a directory
+    if(!dir.isDirectory()) NOTDIR.thrw(input, dir);
 
     final boolean rec = optionalBool(1, ctx);
     final Pattern pat = expr.length != 3 ? null :
@@ -189,40 +195,59 @@ public final class FNFile extends FuncCall {
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
 
     final StringList list = new StringList();
-    list(dir, list, rec, pat);
+    list(dir.getPath().length(), dir, list, rec, pat);
 
     return new Iter() {
-      int c = -1;
-
+      int c;
       @Override
       public Item next() {
-        return ++c < list.size() ? Str.get(list.get(c)) : null;
+        return c < list.size() ? Str.get(path + list.get(c++)) : null;
       }
     };
   }
 
   /**
    * Collects the sub-directories and files of the specified directory.
+   * @param root length of root path
    * @param dir root directory
    * @param list file list
    * @param rec recursive flag
    * @param pat file name pattern; ignored if {@code null}
+   * @throws QueryException query exception
    */
-  private void list(final File dir, final StringList list,
-      final boolean rec, final Pattern pat) {
+  private void list(final int root, final File dir, final StringList list,
+      final boolean rec, final Pattern pat) throws QueryException {
 
     // skip invalid directories
     final File[] ch = dir.listFiles();
     if(ch == null) return;
 
     // parse directories
-    if(rec) for(final File f : ch) {
-      if(f.isDirectory()) list(f, list, rec, pat);
+    if(rec) {
+      for(final File f : ch) {
+        if(!mayBeLink(f) && f.isDirectory()) list(root, f, list, rec, pat);
+      }
     }
     // parse files. ignore directories if a pattern is specified
     for(final File f : ch) {
-      if(pat == null || pat.matcher(f.getName()).matches() &&
-          !f.isDirectory()) list.add(f.getPath());
+      if(pat == null || pat.matcher(f.getName()).matches() && !f.isDirectory())
+        list.add(f.getPath().substring(root));
+    }
+  }
+
+  /**
+   * Checks if the specified file may be a symbolic link.
+   * @param f file to check
+   * @return result
+   * @throws QueryException query exception
+   */
+  private boolean mayBeLink(final File f) throws QueryException {
+    try {
+      final String p1 = f.getAbsolutePath();
+      final String p2 = f.getCanonicalPath();
+      return !(Prop.WIN ? p1.equalsIgnoreCase(p2) : p1.equals(p2));
+    } catch(final IOException ex) {
+      throw PATHINVALID.thrw(input, f);
     }
   }
 

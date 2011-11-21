@@ -30,9 +30,9 @@ import org.basex.util.list.TokenList;
  */
 public final class DBAdd extends InsertBase {
   /** Documents to add. */
-  private final ObjList<Item> docs = new ObjList<Item>();
+  private ObjList<Item> docs = new ObjList<Item>();
   /** Paths to which the new document(s) will be added. */
-  private final TokenList paths = new TokenList();
+  private TokenList paths = new TokenList();
   /** Database context. */
   private final Context ctx;
 
@@ -79,11 +79,14 @@ public final class DBAdd extends InsertBase {
   public void prepare() throws QueryException {
     // build data with all documents, to prevent dirty reads
     md = new MemData(data);
-    final Iterator<Item> d = docs.iterator();
-    final Iterator<byte[]> p = paths.iterator();
-    while(d.hasNext()) {
-      md.insert(md.meta.size, -1, docData(d.next(),  p.next()));
+    for(int i = 0; i < docs.size(); i++) {
+      md.insert(md.meta.size, -1, docData(docs.get(i),  paths.get(i)));
+      docs.set(i, null);
+      paths.set(i, null);
+      size++;
     }
+    docs = null;
+    paths = null;
   }
 
   /**
@@ -144,11 +147,6 @@ public final class DBAdd extends InsertBase {
       throw STRNODTYPE.thrw(input, this, doc.type);
     }
     return mdata;
-  }
-
-  @Override
-  public int size() {
-    return docs.size();
   }
 
   @Override

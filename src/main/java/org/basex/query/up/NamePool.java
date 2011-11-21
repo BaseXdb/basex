@@ -69,8 +69,6 @@ public final class NamePool {
       if(ai == -1) at.add(pref, uri);
       // check if only one uri is assigned to a prefix
       else if(!eq(uri, at.val[ai])) return false;
-      // [CG] check
-      //else if(uri.length != 0 && !eq(uri, at.val[ai])) return false;
     }
     return true;
   }

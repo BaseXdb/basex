@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
-import org.basex.util.Util;
 
 /**
  * Replace node primitive.
@@ -70,10 +69,5 @@ public final class ReplaceNode extends NodeCopy {
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     UPMULTREPL.thrw(input, targetNode());
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + "[" + targetNode() + ", " + insert + "]";
   }
 }

@@ -65,52 +65,53 @@ public final class MixedPath extends Path {
     final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-
     // creates an initial item cache
     Iter res = v.iter();
 
-    // loop through all expressions
-    final int el = steps.length;
-    for(int ex = 0; ex < el; ex++) {
-      final Expr e = steps[ex];
-      final boolean last = ex + 1 == el;
-      final ItemCache ic = new ItemCache();
+    try {
+      // loop through all expressions
+      final int el = steps.length;
+      for(int ex = 0; ex < el; ex++) {
+        final Expr e = steps[ex];
+        final boolean last = ex + 1 == el;
+        final ItemCache ic = new ItemCache();
 
-      // this flag indicates if the resulting items contain nodes
-      boolean nodes = false;
-      ctx.size = res.size();
-      ctx.pos = 1;
+        // this flag indicates if the resulting items contain nodes
+        boolean nodes = false;
+        ctx.size = res.size();
+        ctx.pos = 1;
 
-      // loop through all input items
-      for(Item it; (it = res.next()) != null;) {
-        if(!it.node()) NODESPATH.thrw(input, this, it.type);
-        ctx.value = it;
+        // loop through all input items
+        for(Item it; (it = res.next()) != null;) {
+          if(!it.node()) NODESPATH.thrw(input, this, it.type);
+          ctx.value = it;
 
-        // loop through all resulting items
-        final Iter ir = ctx.iter(e);
-        for(Item i; (i = ir.next()) != null;) {
-          // set node flag
-          if(ic.size() == 0) nodes = i.node();
-          // check if both nodes and atomic values occur in last result
-          else if(last && nodes != i.node()) EVALNODESVALS.thrw(input);
-          ic.add(i);
+          // loop through all resulting items
+          final Iter ir = ctx.iter(e);
+          for(Item i; (i = ir.next()) != null;) {
+            // set node flag
+            if(ic.size() == 0) nodes = i.node();
+            // check if both nodes and atomic values occur in last result
+            else if(last && nodes != i.node()) EVALNODESVALS.thrw(input);
+            ic.add(i);
+          }
+          ctx.pos++;
         }
-        ctx.pos++;
-      }
 
-      if(nodes) {
-        // remove potential duplicates from node sets
-        final NodeCache nc = new NodeCache().random();
-        for(Item it; (it = ic.next()) != null;) nc.add((ANode) it);
-        res = nc.value().cache();
-      } else {
-        res = ic;
+        if(nodes) {
+          // remove potential duplicates from node sets
+          final NodeCache nc = new NodeCache().random();
+          for(Item it; (it = ic.next()) != null;) nc.add((ANode) it);
+          res = nc.value().cache();
+        } else {
+          res = ic;
+        }
       }
+    } finally {
+      ctx.value = cv;
+      ctx.size = cs;
+      ctx.pos = cp;
     }
-
-    ctx.value = cv;
-    ctx.size = cs;
-    ctx.pos = cp;
     return res;
   }
 
