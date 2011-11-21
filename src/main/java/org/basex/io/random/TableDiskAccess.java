@@ -300,7 +300,7 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // append old entries at the end of the new entries
-    // [DP] the following can be optimized to avoid copying arrays
+    // [DP] Storage: the following can be optimized to avoid copying arrays
     final byte[] all = new byte[entries.length + moved];
     System.arraycopy(entries, 0, all, 0, entries.length);
     System.arraycopy(bf.data, split, all, entries.length, moved);

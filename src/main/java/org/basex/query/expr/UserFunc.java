@@ -104,13 +104,17 @@ public class UserFunc extends Single {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
-    final Item it = expr.item(ctx, ii);
-    ctx.value = cv;
-    // optionally promote return value to target type
-    return cast ? ret.cast(it, this, false, ctx, input) : it;
+    try {
+      final Item it = expr.item(ctx, ii);
+      // optionally promote return value to target type
+      return cast ? ret.cast(it, this, false, ctx, input) : it;
+    } finally {
+      ctx.value = cv;
+    }
   }
 
   @Override
@@ -118,10 +122,13 @@ public class UserFunc extends Single {
     // reset context and evaluate function
     final Value cv = ctx.value;
     ctx.value = null;
-    final Value v = expr.value(ctx);
-    ctx.value = cv;
-    // optionally promote return value to target type
-    return cast ? ret.promote(v, ctx, input) : v;
+    try {
+      final Value v = expr.value(ctx);
+      // optionally promote return value to target type
+      return cast ? ret.promote(v, ctx, input) : v;
+    } finally {
+      ctx.value = cv;
+    }
   }
 
   @Override

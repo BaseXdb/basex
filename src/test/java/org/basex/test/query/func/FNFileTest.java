@@ -11,7 +11,7 @@ import org.basex.core.Prop;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.junit.Test;
 
 /**
@@ -33,8 +33,8 @@ public final class FNFileTest extends AdvancedQueryTest {
   private static final String PATH4 = Prop.TMP + NAME + "/x/y";
 
   /** Initializes the test. */
-  @BeforeClass
-  public static void init() {
+  @After
+  public void init() {
     new File(PATH4).delete();
     new File(PATH3).delete();
     new File(PATH2).delete();

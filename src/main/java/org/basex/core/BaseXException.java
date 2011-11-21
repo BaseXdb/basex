@@ -45,9 +45,6 @@ public final class BaseXException extends IOException {
       } else if(!(ext[i] instanceof String)) {
         ext[i] = ext[i].toString();
       }
-      // [CG] XQuery/Exception: verify if/which strings are to be chopped
-      //final String s = t[i].toString();
-      //t[i] = s.length() > 1000 ? s.substring(0, 1000) + DOTS : s;
     }
     return Util.info(info, ext);
   }

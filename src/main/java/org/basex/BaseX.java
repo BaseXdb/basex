@@ -14,6 +14,7 @@ import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.io.in.TextInput;
 import org.basex.io.out.PrintOutput;
 import org.basex.server.LocalSession;
@@ -81,8 +82,11 @@ public class BaseX extends Main {
           execute(new Set(Prop.QUERYPATH, io.path()), false);
           execute(new XQuery(query), verbose);
         } else if(key.equals("i")) {
-          // set context
+          // create main memory database if input is XML snippet
+          final boolean mem = IO.get(val) instanceof IOContent;
+          execute(new Set(Prop.MAINMEM, mem), false);
           execute(new Check(val), verbose);
+          execute(new Set(Prop.MAINMEM, false), false);
         } else if(key.equals("q")) {
           // run query
           execute(new XQuery(val), verbose);

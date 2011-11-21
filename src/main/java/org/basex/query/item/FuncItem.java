@@ -87,37 +87,33 @@ public final class FuncItem extends FItem {
    * Binds all variables to the context.
    * @param ctx query context
    * @param args argument values
-   * @return old size of the variable stack
    * @throws QueryException query exception
    */
-  private int bindVars(final QueryContext ctx, final Value[] args)
+  private void bindVars(final QueryContext ctx, final Value[] args)
       throws QueryException {
-    final int s = ctx.vars.size();
     for(int i = closure.size; --i >= 0;)
       ctx.vars.add(closure.vars[i].copy());
     for(int a = vars.length; --a >= 0;)
       ctx.vars.add(vars[a].bind(args[a], ctx).copy());
-    return s;
   }
 
   @Override
   public Value invValue(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
-    // move variables to stack
-    final int s = bindVars(ctx, args);
-
-    // reset context and evaluate function
+    // bind variables and cache context
+    final int s = ctx.vars.size();
     final Value cv = ctx.value;
-    ctx.value = null;
-    final Value v = ctx.value(expr);
-    ctx.value = cv;
-
-    // reset variable scope
-    ctx.vars.reset(s);
-
-    // optionally cast return value to target type
-    return cast != null ? cast.promote(v, ctx, ii) : v;
+    try {
+      bindVars(ctx, args);
+      ctx.value = null;
+      final Value v = ctx.value(expr);
+      // optionally cast return value to target type
+      return cast != null ? cast.promote(v, ctx, ii) : v;
+    } finally {
+      ctx.value = cv;
+      ctx.vars.reset(s);
+    }
   }
 
   @Override
@@ -132,20 +128,19 @@ public final class FuncItem extends FItem {
   public Item invItem(final QueryContext ctx, final InputInfo ii,
       final Value... args) throws QueryException {
 
-    // move variables to stack
-    final int s = bindVars(ctx, args);
-
-    // reset context and evaluate function
+    // bind variables and cache context
+    final int s = ctx.vars.size();
     final Value cv = ctx.value;
-    ctx.value = null;
-    final Item it = expr.item(ctx, ii);
-    ctx.value = cv;
-
-    // reset variable scope
-    ctx.vars.reset(s);
-
-    // optionally promote return value to target type
-    return cast != null ? cast.cast(it, expr, false, ctx, ii) : it;
+    try {
+      bindVars(ctx, args);
+      ctx.value = null;
+      final Item it = expr.item(ctx, ii);
+      // optionally cast return value to target type
+      return cast != null ? cast.cast(it, expr, false, ctx, ii) : it;
+    } finally {
+      ctx.value = cv;
+      ctx.vars.reset(s);
+    }
   }
 
   @Override

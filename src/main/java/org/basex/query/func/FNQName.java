@@ -81,7 +81,8 @@ public final class FNQName extends FuncCall {
         // [LK] Namespaces: find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
         final ANode an = (ANode) checkType(it2, NodeType.ELM);
-        final boolean copied = ctx.copiedNods.contains(an.data());
+        final boolean copied = ctx.copiedNods != null &&
+            ctx.copiedNods.contains(an.data());
         final Atts at = an.nsScope(!copied || ctx.nsInherit);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;

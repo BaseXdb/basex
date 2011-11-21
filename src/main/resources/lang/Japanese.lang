@@ -346,6 +346,7 @@ pc_create=データベースが作成されました。
 pc_index=インデックスを作成中です。
 pc_update=データベース形式を変更しました。新しいデータベースを作成して下さい。
 pc_indupdate=インデックス形式を変更しました。新しくインデックスを作成して下さい。
+pc_corrupt=Warning: the database may be corrupt!
 pc_cancel=データベース作成処理はキャンセルされました。
 pc_finish=終了しました。
 pc_indextxt=テキストインデックスを作成中です。

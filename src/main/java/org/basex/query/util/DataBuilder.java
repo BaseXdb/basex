@@ -260,7 +260,7 @@ public final class DataBuilder {
     data.ns.open();
     boolean ne = false;
 
-    // [LK] copy-namespaces no-preserve
+    // [LK] Namespaces: copy-namespaces no-preserve
     // best way to determine necessary descendant ns bindings?
     Atts ns = null;
     if(!preserve) {
