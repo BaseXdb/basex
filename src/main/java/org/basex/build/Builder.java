@@ -304,6 +304,24 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   protected abstract void setSize(int pre, int size) throws IOException;
+  
+  // ACCESSORS ================================================================
+  
+  /**
+   * @return the current depth of the builder
+   */
+  protected int getLvl()
+  {
+    return lvl;
+  }
+  
+  /**
+   * @return the current parent pre
+   */
+  protected int getPar()
+  {
+    return lvl < 1 ? -1 : pstack.get(lvl-1);
+  }
 
   // PRIVATE METHODS ==========================================================
 

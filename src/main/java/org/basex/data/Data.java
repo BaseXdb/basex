@@ -868,7 +868,7 @@ public abstract class Data {
    * @param pre root node
    * @param size size to be added/removed
    */
-  private void updateDist(final int pre, final int size) {
+  void updateDist(final int pre, final int size) {
     int p = pre;
     while(p < meta.size) {
       final int k = kind(p);
@@ -957,7 +957,7 @@ public abstract class Data {
   /** Buffer for caching new table entries. */
   private byte[] b = new byte[IO.NODESIZE];
   /** Buffer position. */
-  private int bp;
+  int bp;
 
   /**
    * Sets the update buffer to a new size.
