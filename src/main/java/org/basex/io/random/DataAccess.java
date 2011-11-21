@@ -386,7 +386,6 @@ public final class DataAccess {
    */
   private Buffer buffer(final boolean next) {
     if(next) {
-      off = 0;
       cursor(bm.current().pos + IO.BLOCKSIZE);
     }
     return bm.current();
