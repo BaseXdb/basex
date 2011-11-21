@@ -589,6 +589,38 @@ public final class NamespaceTest extends AdvancedQueryTest {
     assertEquals(1, CONTEXT.data().ns(1).size);
   }
 
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes1() {
+    query(
+      "<e xmlns:p='u'>{ <a xmlns:p='u' p:a='v'/>/@* }</e>",
+      "<e xmlns:p='u' p:a='v'/>");
+  }
+
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes2() {
+    query(
+      "<e xmlns:p='u1'>{ <a xmlns:p='u2' p:a='v'/>/@* }</e>",
+      "<e xmlns:p1='u2' xmlns:p='u1' p1:a='v'/>");
+  }
+
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes3() {
+    query(
+      "<e xmlns:p='u' xmlns:p1='u1'>{ <a xmlns:p='u1' p:a='v'/>/@* }</e>",
+      "<e xmlns:p1='u1' xmlns:p='u' p1:a='v'/>");
+  }
+
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes4() {
+    query(
+      "<e xmlns:p='u' xmlns:p1='u1'>{ <a xmlns:p='u2' p:a='v'/>/@* }</e>",
+      "<e xmlns:p2='u2' xmlns:p1='u1' xmlns:p='u' p2:a='v'/>");
+  }
+
   /**
    * Creates the database context.
    * @throws BaseXException database exception
