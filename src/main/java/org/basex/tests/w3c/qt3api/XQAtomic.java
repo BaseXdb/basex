@@ -32,7 +32,7 @@ class XQAtomic extends XQItem {
   @Override
   public String getString() {
     try {
-      return Token.string(item.atom(null));
+      return Token.string(item.string(null));
     } catch(final QueryException ex) {
       throw new XQException(ex);
     }
