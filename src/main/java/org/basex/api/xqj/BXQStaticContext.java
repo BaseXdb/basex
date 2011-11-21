@@ -68,7 +68,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getBaseURI() {
-    return string(ctx.baseURI.atom());
+    return string(ctx.baseURI.string());
   }
 
   @Override
@@ -105,7 +105,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getDefaultCollation() {
-    return string(ctx.collation.atom());
+    return string(ctx.collation.string());
   }
 
   @Override
@@ -141,7 +141,7 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public String getNamespaceURI(final String prefix) throws XQException {
     BXQAbstract.valid(prefix, String.class);
-    final byte[] uri = ctx.ns.find(token(prefix));
+    final byte[] uri = ctx.ns.localURI(token(prefix));
     if(uri != null) return string(uri);
     throw new BXQException(PRE, prefix);
   }

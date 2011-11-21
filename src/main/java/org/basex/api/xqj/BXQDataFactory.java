@@ -21,7 +21,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Flt;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
@@ -338,7 +338,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throw new BXQException(OCC);
 
     final Type type = ((BXQItemType) it).getType();
-    final QName name = type.node() ? it.getNodeName() : null;
+    final QName name = type.isNode() ? it.getNodeName() : null;
     return new BXQItemType(type, name, it.getBaseType(), occ);
   }
 
@@ -370,7 +370,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   private BXQItem itr(final long v, final Type e, final XQItemType t)
       throws XQException {
     try {
-      return new BXQItem(check(e, t).e(Itr.get(v), ctx.ctx, null));
+      return new BXQItem(check(e, t).e(Int.get(v), ctx.ctx, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

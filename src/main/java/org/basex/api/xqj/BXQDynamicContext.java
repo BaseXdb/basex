@@ -29,7 +29,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
@@ -86,7 +86,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   @Override
   public void bindByte(final QName qn, final byte v, final XQItemType t)
       throws XQException {
-    bind(qn, Itr.get(v, AtomType.BYT), t);
+    bind(qn, Int.get(v, AtomType.BYT), t);
   }
 
   @Override
@@ -135,7 +135,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   @Override
   public void bindInt(final QName qn, final int v, final XQItemType t)
       throws XQException {
-    bind(qn, Itr.get(v), t);
+    bind(qn, Int.get(v), t);
   }
 
   @Override
@@ -177,7 +177,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   @Override
   public void bindShort(final QName qn, final short v, final XQItemType t)
       throws XQException {
-    bind(qn, Itr.get(v, AtomType.SHR), t);
+    bind(qn, Int.get(v, AtomType.SHR), t);
   }
 
   @Override

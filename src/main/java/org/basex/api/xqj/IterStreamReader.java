@@ -85,7 +85,7 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public String getAttributeNamespace(final int i) {
-    return string(attributes().get(i).qname().uri().atom());
+    return string(attributes().get(i).qname().uri().string());
   }
 
   @Override
@@ -107,7 +107,7 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public String getAttributeValue(final int i) {
-    return string(attributes().get(i).atom());
+    return string(attributes().get(i).string());
   }
 
   @Override
@@ -147,7 +147,7 @@ final class IterStreamReader implements XMLStreamReader {
     final TokenBuilder tb = new TokenBuilder();
     while(kind != END_ELEMENT) {
       if(isType(CHARACTERS, CDATA, SPACE, ENTITY_REFERENCE)) {
-        tb.add(node.atom());
+        tb.add(node.string());
       } else if(isType(END_DOCUMENT)) {
         throw new XMLStreamException("Unexpected end of document.");
       } else if(isType(START_ELEMENT)) {
@@ -213,7 +213,7 @@ final class IterStreamReader implements XMLStreamReader {
   public String getNamespaceURI(final String s) {
     if(s == null) throw new IllegalArgumentException();
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
-    final byte[] uri = ns.find(token(s));
+    final byte[] uri = ns.localURI(token(s));
     return uri == null ? null : string(uri);
   }
 
@@ -226,7 +226,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPIData() {
     checkType(PROCESSING_INSTRUCTION);
-    final byte[] val = node.atom();
+    final byte[] val = node.string();
     final int i = indexOf(val, ' ');
     return string(i == -1 ? EMPTY : substring(val, i + 1));
   }
@@ -234,7 +234,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getPITarget() {
     checkType(PROCESSING_INSTRUCTION);
-    final byte[] val = node.atom();
+    final byte[] val = node.string();
     final int i = indexOf(val, ' ');
     return string(i == -1 ? val : substring(val, 0, i));
   }
@@ -255,7 +255,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getText() {
     checkType(CHARACTERS, COMMENT);
-    return string(node.atom());
+    return string(node.string());
   }
 
   @Override
@@ -280,7 +280,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public int getTextLength() {
     checkType(CHARACTERS, COMMENT);
-    return node.atom().length;
+    return node.string().length;
   }
 
   @Override
@@ -360,7 +360,7 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public boolean isWhiteSpace() {
-    return isCharacters() && ws(node.atom());
+    return isCharacters() && ws(node.string());
   }
 
   @Override
@@ -408,7 +408,7 @@ final class IterStreamReader implements XMLStreamReader {
    * Sets the current event type.
    */
   void type() {
-    switch(node.ndType()) {
+    switch(node.nodeType()) {
       case DOC: kind = START_DOCUMENT; return;
       case ATT: kind = ATTRIBUTE; return;
       case ELM: kind = START_ELEMENT; return;

@@ -132,7 +132,7 @@ public class RESTPost extends RESTCode {
       final Context context) throws QueryException {
     final QueryProcessor qp = new QueryProcessor(query, item, context);
     final Item it = qp.iter().next();
-    return it == null ? null : Token.string(it.atom(null));
+    return it == null ? null : Token.string(it.string(null));
   }
 
   /** XQuery for checking the syntax of the POST request. */

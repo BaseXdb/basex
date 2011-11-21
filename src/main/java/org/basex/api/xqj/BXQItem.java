@@ -74,9 +74,9 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   @Override
   public String getAtomicValue() throws XQException {
     opened();
-    if(it.node()) throw new BXQException(ATOM);
+    if(it.isNode()) throw new BXQException(ATOM);
     try {
-      return Token.string(it.atom(null));
+      return Token.string(it.string(null));
     } catch(final QueryException e) {
       // function item
       throw new BXQException(ATOM);
@@ -116,8 +116,8 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   @Override
   public String getItemAsString(final Properties props) throws XQException {
     try {
-      return it.node() && it.type != NodeType.TXT ? serialize() :
-        Token.string(it.atom(null));
+      return it.isNode() && it.type != NodeType.TXT ? serialize() :
+        Token.string(it.string(null));
     } catch(final QueryException e) {
       throw new XQException(e.getMessage(), e.code());
     }
@@ -137,14 +137,14 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   @Override
   public Node getNode() throws XQException {
     opened();
-    if(!it.node()) throw new BXQException(WRONG, NodeType.NOD, it.type);
+    if(!it.isNode()) throw new BXQException(WRONG, NodeType.NOD, it.type);
     return ((ANode) it).toJava();
   }
 
   @Override
   public URI getNodeUri() throws XQException {
     opened();
-    if(!it.node()) throw new BXQException(NODE);
+    if(!it.isNode()) throw new BXQException(NODE);
     final ANode node = (ANode) it;
     try {
       return new URI(Token.string(node.baseURI()));
@@ -171,7 +171,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   @Override
   public boolean instanceOf(final XQItemType type) throws XQException {
     opened();
-    return it.type.instance(((BXQItemType) type).getType());
+    return it.type.instanceOf(((BXQItemType) type).getType());
   }
 
   @Override
@@ -276,7 +276,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     opened();
     try {
       final double d = it.dbl(null);
-      if(!it.num() || d != (long) d) throw new BXQException(NUM, d);
+      if(!it.isNumber() || d != (long) d) throw new BXQException(NUM, d);
       return type.e(it, ctx.ctx, null).itr(null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);

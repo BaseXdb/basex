@@ -91,7 +91,7 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public int getBaseType() throws BXQException {
-    if(type.unt()) check(NodeType.DEL, NodeType.ELM, NodeType.ATT,
+    if(type.isUntyped()) check(NodeType.DEL, NodeType.ELM, NodeType.ATT,
         AtomType.ATM);
 
     if(base != -1) return base;
@@ -141,13 +141,13 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public QName getTypeName() throws BXQException {
-    if(type.unt()) check(NodeType.DEL, NodeType.ELM, NodeType.ATT,
+    if(type.isUntyped()) check(NodeType.DEL, NodeType.ELM, NodeType.ATT,
         AtomType.ATM);
     if(type == AtomType.ITEM) throw new BXQException(TYPE);
 
     final Type t = base != -1 ? BASE[base] : type;
     return new QName(Token.string(QueryText.XSURI),
-        Token.string(t.nam()));
+        Token.string(t.string()));
   }
 
   @Override
@@ -185,6 +185,6 @@ final class BXQItemType implements XQItemType {
 
   @Override
   public String toString() {
-    return Token.string(type.nam());
+    return Token.string(type.string());
   }
 }

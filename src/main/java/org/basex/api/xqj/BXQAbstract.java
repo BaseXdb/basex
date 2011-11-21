@@ -107,7 +107,7 @@ abstract class BXQAbstract {
     if(tar == null) return e;
 
     final Type t = ((BXQItemType) tar).getType();
-    if(e != t && e != AtomType.ATM && (e.node() || t.node()))
+    if(e != t && e != AtomType.ATM && (e.isNode() || t.isNode()))
       throw new BXQException(WRONG, tar, e);
     return t;
   }

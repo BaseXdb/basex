@@ -701,10 +701,10 @@ public class HTTPClientTest {
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
     conn.content = Charset.forName("CP1251").encode(test).array();
-    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
-        CONTEXT.prop, null);
+    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.string(),
+        null, CONTEXT.prop, null);
     // compare results
-    assertEquals(test, string(i.get(1).atom(null)));
+    assertEquals(test, string(i.get(1).string(null)));
   }
 
   /**
@@ -746,8 +746,8 @@ public class HTTPClientTest {
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
         + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
-    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
-        CONTEXT.prop, null);
+    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.string(),
+        null, CONTEXT.prop, null);
 
     // Construct expected result
     final ItemCache resultIter = new ItemCache();
@@ -838,8 +838,8 @@ public class HTTPClientTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.atom(null), null,
-        CONTEXT.prop, null);
+    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.string(),
+        null, CONTEXT.prop, null);
 
     // Construct expected result
     final ItemCache resultIter = new ItemCache();
@@ -893,8 +893,8 @@ public class HTTPClientTest {
     assertNotNull(response.attributes());
     final NodeIter resAttr = response.attributes();
     for(ANode attr; (attr = resAttr.next()) != null;) {
-      if(eq(attr.nname(), STATUS) && !eq(attr.atom(), token(expStatus))) {
-        fail("Expected: " + expStatus + "\nFound: " + string(attr.atom()));
+      if(eq(attr.nname(), STATUS) && !eq(attr.string(), token(expStatus))) {
+        fail("Expected: " + expStatus + "\nFound: " + string(attr.string()));
       }
     }
   }
