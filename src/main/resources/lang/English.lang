@@ -119,6 +119,8 @@ dr_delete=% documents will be deleted
 dd_title=Manage Databases
 dd_question=% database(s) will be dropped.
 dd_sure=Are you sure?
+dd_available=Available backups
+dd_onlybac=Only available as a backup.\nPlease choose a backup to restore. 
 
 dx_question=Do you really want to delete?
 dq_question=Save changes to %?
