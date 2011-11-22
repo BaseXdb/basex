@@ -550,6 +550,8 @@ public enum Err {
   CPIWRONG(XPTY, 4, "% not allowed as PI name: \"%\"."),
   /** XPTY0004: Typing exception. */
   INVQNAME(XPTY, 4, "Invalid QName: \"%\"."),
+  /** XPTY0004: Typing exception. */
+  INVARITY(XPTY, 4, "Wrong number of arguments in %, expected %."),
 
   /** XPTY0018: Typing exception. */
   EVALNODESVALS(XPTY, 18, "Result yields both nodes and atomic values."),
