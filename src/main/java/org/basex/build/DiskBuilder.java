@@ -26,7 +26,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DiskBuilder extends Builder {
+public final class DiskBuilder extends DataBuilder {
   /** Database table. */
   private DataOutput tout;
   /** Database texts. */

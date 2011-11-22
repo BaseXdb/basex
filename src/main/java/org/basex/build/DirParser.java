@@ -71,8 +71,12 @@ public final class DirParser extends TargetParser {
 
   @Override
   public void parse(final Builder build) throws IOException {
-    build.meta.filesize = 0;
-    build.meta.original = src.path();
+    if(DataBuilder.class.isInstance(build))
+    {
+      DataBuilder dataBuilder = (DataBuilder)build;
+      dataBuilder.meta.filesize = 0;
+      dataBuilder.meta.original = src.path();
+    }
     parse(build, src);
   }
 
@@ -95,7 +99,10 @@ public final class DirParser extends TargetParser {
         final String nm = Prop.WIN ? io.name().toLowerCase(Locale.ENGLISH) :
           io.name();
         if(filter != null && !filter.matcher(nm).matches()) continue;
-        b.meta.filesize += src.length();
+        if(DataBuilder.class.isInstance(b))
+        {
+          ((DataBuilder)b).meta.filesize += src.length();
+        }
 
         // use global target as prefix
         String targ = trg;

@@ -13,7 +13,7 @@ import org.basex.io.IO;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class MemBuilder extends Builder {
+public final class MemBuilder extends DataBuilder {
   /** Data reference. */
   private MemData data;
 

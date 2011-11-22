@@ -94,61 +94,67 @@ public final class Add extends ACreate {
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAMEINVALID, name);
 
-    //This is the old Add code that does a Parser -> [Mem/Disk]Builder -> temp Data -> target Data
-    /*    
-    // create disk instances for large documents
-    // (does not work for input streams and directories)
-    final long fl = parser.src.length();
-    boolean large = false;
-    final Runtime rt = Runtime.getRuntime();
-    if(fl > rt.freeMemory() / 3) {
-      Performance.gc(2);
-      large = fl > rt.freeMemory() / 3;
-    }
+    boolean old = false;
     
-    // create random database name for disk-based creation    
-    final Data data = context.data();
-    final String dbname = large ? context.mprop.random(data.meta.name) : name;
-
-    build = large ? new DiskBuilder(dbname, parser, context) :
-      new MemBuilder(dbname, parser, context.prop);
-
-    Data tmp = null;
-    try {
-      tmp = build.build();
-      // ignore empty fragments
-      // [CG] check if fragments can be empty at all
-      if(tmp.meta.size > 1) {
-        data.insert(data.meta.size, -1, tmp);
+    //This is the old Add code that does a Parser -> [Mem/Disk]Builder -> temp Data -> target Data
+    if(old)
+    {
+      // create disk instances for large documents
+      // (does not work for input streams and directories)
+      final long fl = parser.src.length();
+      boolean large = false;
+      final Runtime rt = Runtime.getRuntime();
+      if(fl > rt.freeMemory() / 3) {
+        Performance.gc(2);
+        large = fl > rt.freeMemory() / 3;
+      }
+      
+      // create random database name for disk-based creation    
+      final Data data = context.data();
+      final String dbname = large ? context.mprop.random(data.meta.name) : name;
+  
+      build = large ? new DiskBuilder(dbname, parser, context) :
+        new MemBuilder(dbname, parser, context.prop);
+  
+      Data tmp = null;
+      try {
+        tmp = build.build();
+        // ignore empty fragments
+        // [CG] check if fragments can be empty at all
+        if(tmp.meta.size > 1) {
+          data.insert(data.meta.size, -1, tmp);
+          context.update();
+          data.flush();
+        }
+        return info(parser.info() + PATHADDED, name, perf);
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        return error(Util.message(ex));
+      } finally {
+        // close and drop intermediary database instance
+        try { build.close(); } catch(final IOException e) { }
+        if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
+        if(large) DropDB.drop(dbname, context.mprop);
+      }   
+    }
+    // This is the new Add code that does a Parser -> InsertBuilder -> target Data
+    else
+    {    
+      // This is the new Add code that does a Parser -> InsertBuilder -> target Data
+      // create random database name for disk-based creation
+      final Data data = context.data();
+      build = new InsertBuilder(data.meta.size, -1, data, parser);
+      try {
+        build.build();
         context.update();
         data.flush();
+        return info(parser.info() + PATHADDED, name, perf);
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        return error(Util.message(ex));
+      } finally {
+        try { build.close(); } catch(final IOException e) { }
       }
-      return info(parser.info() + PATHADDED, name, perf);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return error(Util.message(ex));
-    } finally {
-      // close and drop intermediary database instance
-      try { build.close(); } catch(final IOException e) { }
-      if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
-      if(large) DropDB.drop(dbname, context.mprop);
-    }   
-    */    
-    
-    // This is the new Add code that does a Parser -> InsertBuilder -> target Data
-    // create random database name for disk-based creation
-    final Data data = context.data();
-    build = new InsertBuilder(data.meta.size, -1, data, parser);
-    try {
-      build.build();
-      context.update();
-      data.flush();
-      return info(parser.info() + PATHADDED, name, perf);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return error(Util.message(ex));
-    } finally {
-      try { build.close(); } catch(final IOException e) { }
     }
      
   }

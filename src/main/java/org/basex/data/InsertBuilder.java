@@ -1,5 +1,7 @@
 package org.basex.data;
 
+import static org.basex.build.BuildText.*;
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
@@ -13,6 +15,8 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.io.IO;
 import org.basex.util.Atts;
+import org.basex.util.Performance;
+import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 import org.basex.util.list.IntList;
 
@@ -32,14 +36,16 @@ public final class InsertBuilder extends Builder {
   /** The optimal buffer size */
   private final int buf = IO.BLOCKSIZE >> IO.NODEPOWER;
   
+  /** Flag for inside document */
+  private boolean inDoc;
   /** Cache of document pres */
   private IntList docPres;
   /** Flag for a dummy document */
   private boolean dummy;
   /** Cache of namespace scopes */
   private TokenMap nsScope;
-  /** All current pres */
-  private IntList preStack;
+  /** All current pres, stores the pre value of the insert operation, not the absolute pre value */
+  private Stack<PreStackItem> preStack;
   /** Cache of new namespace nodes */
   private Set<NSNode> newNodes;
   /** Cache of pres with ns flag */
@@ -49,10 +55,31 @@ public final class InsertBuilder extends Builder {
 
   /** The current insert pre */
   private int pre;
+  /** The current insert count - named dpre to match Data.insert() */
+  private int dpre;
   /** The current insert distance */
   private int dis;
-  /** The current insert parent */
-  private int par;
+  
+  /**
+   * Used for internally caching nested pre and tag names
+   */
+  private class PreStackItem
+  {
+    /** The source pre */
+    public final int dp;
+    /** The tag name */
+    public final byte[] tag;
+    
+    /**
+     * @param p pre
+     * @param t tag name
+     */
+    public PreStackItem(int p, byte[] t)
+    {
+      dp = p;
+      tag = t;
+    }
+  }
  
   /**
    * @param tpre the target pre
@@ -61,30 +88,26 @@ public final class InsertBuilder extends Builder {
    * @param parse the source parser
    */
   public InsertBuilder(final int tpre, final int tpar, Data d, Parser parse) {
-    super(d.meta.name, parse, d.meta.prop);   // We don't really need the name or prop for this Builder, but have to provide ones anyway
+    super(parse);   // We don't really need the name or prop for this Builder, but have to provide ones anyway
     ipre = tpre;
     ipar = tpar;
     data = d;
   }
 
   @Override
-  public Data build() throws IOException {
-    //Create a dummy meta for the Builder base - it assumes that the Builder is flushing the buffer
-    //after every update and relies on an accurate meta.size internally
-    meta = new MetaData(prop);
-    meta.name = name;
-    meta.textindex = false;
-    meta.attrindex = false;
-    meta.ftindex = false;
-    meta.chop = data.meta.chop;
+  public Data build() throws IOException {   
+    final Performance perf = Util.debug ? new Performance() : null;
+    Util.debug(tit() + DOTS);
     
     //Put the target database in update mode
     data.meta.update();
     
+    dpre = 0;
+    inDoc = false;
     docPres = new IntList();
     dummy = false;
     nsScope = new TokenMap();
-    preStack = new IntList();
+    preStack = new Stack<PreStackItem>();
     newNodes = new HashSet<NSNode>();
     flagPres = new IntList();  
     sizeStack = new Stack<int[]>();    
@@ -144,17 +167,17 @@ public final class InsertBuilder extends Builder {
     }
     data.ns.setNearestRoot(cn, ipar);   
     
-    // Parse the input
-    parse();
+    // add document node and parse document
+    parser.parse(this);
     
-    //Close any remaining items
-    while(preStack.size() != 0) data.ns.close(preStack.pop());
-    
+    //We should have closed all the tags we opened
+    if(preStack.size() != 0) error(DOCOPEN, parser.detail(), preStack.peek().tag); 
+      
     // Reset the root namespace
     data.ns.setRoot(t);
 
     // Insert any remaining buffer
-    if(data.bp != 0) data.insert(ipre + meta.size - 1 - (meta.size - 1) % buf);
+    if(data.bp != 0) data.insert(ipre + dpre - 1 - (dpre - 1) % buf);
     
     // reset buffer to old size
     data.buffer(1);
@@ -174,47 +197,42 @@ public final class InsertBuilder extends Builder {
     int p = ipar;
     while(p >= 0) {
       final int k = data.kind(p);
-      data.size(p, k, data.size(p, k) + meta.size);
+      data.size(p, k, data.size(p, k) + dpre);
       p = data.parent(p, k);
     }
-    data.updateDist(ipre +  meta.size,  meta.size);
+    data.updateDist(ipre +  dpre,  dpre);
 
     // NSNodes have to be checked for pre value shifts after insert
-    data.ns.update(ipre, meta.size, true, newNodes);
+    data.ns.update(ipre, dpre, true, newNodes);
     
     // Update document index
     final IntList il = data.docindex.docs();
     int i = il.sortedIndexOf(ipre);
     if(i < 0) i = -i - 1;
     il.insert(i, docPres.toArray());
-    il.move(meta.size, i + docPres.size());
+    il.move(dpre, i + docPres.size());
     data.docindex.update();
 
     // delete old empty root node
     if(dummy) data.delete(0);
       
+    Util.gc(perf);
     return data;
   }
   
   /**
    * Updates the current state for each build event
-   * @param doc flag to indicate if this is a doc event
    */
-  private void update(boolean doc)
-  {    
+  private void update()
+  {        
     // Flush the buffer if we're at capacity
-    if(meta.size != 0 && meta.size % buf == 0)
-      data.insert(ipre + meta.size - buf);
+    if(dpre != 0 && dpre % buf == 0)
+      data.insert(ipre + dpre - buf);
     
     // Update positions
-    pre = ipre + meta.size;
-    int dpar = doc ?  -1 : getPar();  //The Builder increases the level count for docs before calling overrides, while increase after for everything else
-    dis = dpar >= 0 ? meta.size - dpar : ipar >= 0 ? pre - ipar : 0;
-    par = dis == 0 ? -1 : pre - dis;
-    
-    // Close items
-    while(preStack.size() != 0 && preStack.peek() > par)
-      data.ns.close(preStack.pop());
+    pre = ipre + dpre;
+    int dpar = preStack.size() > 0 ? preStack.peek().dp : -1;
+    dis = dpar >= 0 ? dpre - dpar : ipar >= 0 ? pre - ipar : 0;
   }
   
   @Override
@@ -223,11 +241,12 @@ public final class InsertBuilder extends Builder {
   }
 
   @Override
-  protected void addDoc(byte[] value) throws IOException {
-    update(true);
+  public void startDoc(byte[] value) throws IOException
+  {    
+    update();
 
     // If addDoc is first event, check if data is empty, and if so set dummy = true
-    if(data.empty() && meta.size == 0)
+    if(data.empty() && dpre == 0)
     {
       dummy = true;
     }
@@ -239,93 +258,129 @@ public final class InsertBuilder extends Builder {
     data.doc(pre, 0, value);
     data.meta.ndocs++;
     data.ns.open();
-    preStack.push(pre);
-    meta.size++;
+    preStack.push(new PreStackItem(dpre, value));
+    dpre++;
+    inDoc = true;
+  }
+
+  @Override
+  public void endDoc() throws IOException
+  {
+    inDoc = false;
+    int spre = preStack.pop().dp + ipre;
+    data.ns.close(spre);    
+    sizeStack.push(new int[]{spre, pre - spre + 1});
+  }
+
+  @Override
+  public void startElem(byte[] nm, Atts att) throws IOException
+  {
+    update();
+    
+    // Add element
+    final int as = att.size;
+    boolean ne = data.ns.open();
+    data.elem(dis, data.tagindex.index(nm, null, false),
+        Math.min(IO.MAXATTS, as + 1), 0, data.ns.uri(nm, true), ne);
+    preStack.push(new PreStackItem(dpre, nm)); 
+    dpre++;    
+    
+    // Get and store attribute references
+    for(int a = 0; a < as; ++a) {
+      addAttr(att.key[a], att.val[a], Math.min(IO.MAXATTS, a + 1));
+    }
+    
+    // Make sure this is the only root node for a document
+    if(preStack.size() == 1 && inDoc && dis > 0)
+    {
+      error(MOREROOTS, parser.detail(), nm);
+    }
   }
   
   /**
-   * @return a attribute collection of namespaces
+   * @param nm attribute name
+   * @param value attribute value
+   * @param dist distance to the parent element
    */
-  private Atts getNs()
+  private void addAttr(byte[] nm, byte[] value, int dist)
   {
-    //This replicates the behavior of Data.ns() using the Builder ns cache
-    final Atts as = new Atts();
-    final int[] nsp = ns.current.vals;
-    for(int n = 0; n < nsp.length; n += 2)
-      as.add(ns.pref(nsp[n]), ns.uri(nsp[n + 1]));
-    return as;
-  }
-
-  @Override
-  protected void addElem(final int dist, final int nm, final int asize,
-      final int uri, final boolean nf)
-      throws IOException {
-    update(false);
-
-    // Resolve namespaces
-    boolean ne = false;    
-    if(nf) {
-      final Atts at = getNs();
-      for(int a = 0; a < at.size; ++a) {
-        // see if prefix has been declared/ is part of current ns scope
-        final byte[] old = nsScope.get(at.key[a]);
-        if(old == null || !eq(old, at.val[a])) {
-          // we have to keep track of all new NSNodes that are added
-          // to the Namespace structure, as their pre values must not
-          // be updated. I.e. if an NSNode N with pre value 3 existed
-          // prior to inserting and two new nodes are inserted at
-          // location pre == 3 we have to make sure N and only N gets
-          // updated.
-          newNodes.add(ns.add(at.key[a], at.val[a], pre));
-          ne = true;
-        }
-      }
-    }    
-    
-    // Add element
-    data.ns.open();
-    data.elem(dis, data.tagindex.index(tags.key(nm), null, false), asize,
-        0, data.ns.uri(tags.key(nm), true), ne);
-    preStack.push(pre); 
-    meta.size++;
-  }
-
-  @Override
-  protected void addAttr(int nmi, byte[] value, int dist, int uri)
-      throws IOException {
-    update(false);
+    update();
     
     // add attribute
-    byte[] nm = atts.key(nmi);
-    // check if prefix already in nsScope or not
-    final byte[] attPref = pref(nm);
-    // check if prefix of attribute has already been declared, otherwise
-    // add declaration to parent node
-    if(uri != 0 && (nsScope.get(attPref) == null)) {
-      data.ns.add(par, preStack.size() == 0 ? -1 : preStack.peek(), attPref, ns.uri(uri));
-      // save pre value to set ns flag later for this node. can't be done
-      // here as direct table access would interfere with the buffer
-      flagPres.add(par);
-    }
     data.attr(pre, dist, data.atnindex.index(nm, null, false),
         value, data.ns.uri(nm, false), false);
-    meta.size++;
+    dpre++;    
   }
 
   @Override
-  protected void addText(byte[] value, int dist, byte kind)
-      throws IOException {
-    update(false);
-    
-    data.text(pre, dist, value, kind);
-    meta.size++;
-  }
-
-  @Override
-  protected void setSize(int spre, int size) throws IOException
+  public void emptyElem(byte[] nm, Atts att) throws IOException
   {
-    // Store the size in the cache so it can be set once the buffer is flushed 
-    sizeStack.push(new int[]{ipre + spre, size});
+    startElem(nm, att);
+    endElem();
   }
+
+  @Override
+  public void endElem() throws IOException
+  {
+    int spre = preStack.pop().dp + ipre;
+    data.ns.close(spre);    
+    sizeStack.push(new int[]{spre, pre - spre + 1});
+  }
+
+  @Override
+  public void startNS(byte[] pref, byte[] uri)
+  {
+    // see if prefix has been declared/ is part of current ns scope
+    final byte[] old = nsScope.get(pref);
+    if(old == null || !eq(old, uri)) {
+      // we have to keep track of all new NSNodes that are added
+      // to the Namespace structure, as their pre values must not
+      // be updated. I.e. if an NSNode N with pre value 3 existed
+      // prior to inserting and two new nodes are inserted at
+      // location pre == 3 we have to make sure N and only N gets
+      // updated.
+      newNodes.add(data.ns.add(pref, uri, pre));
+    }
+  }
+
+  @Override
+  public void text(byte[] value) throws IOException
+  {
+    // chop whitespaces in text nodes
+    final byte[] t = data.meta.chop ? trim(value) : value;
+
+    // check if text appears before or after root node
+    final boolean ignore = !inDoc || preStack.size() == 1;
+    if((data.meta.chop && t.length != 0 || !ws(t)) && ignore)
+      error(inDoc ? AFTERROOT : BEFOREROOT, parser.detail());
+
+    if(t.length != 0 && !ignore) addText(t, Data.TEXT);    
+  }
+
+  @Override
+  public void comment(byte[] value) throws IOException
+  {
+    addText(value, Data.COMM);    
+  }
+
+  @Override
+  public void pi(byte[] pi) throws IOException
+  {
+    addText(pi, Data.PI);    
+  }
+
+  /**
+   * @param value text content
+   * @param kind text kind (text, comment, etc.)
+   */
+  private void addText(byte[] value, byte kind)
+  {    
+    update();    
+    data.text(pre, dis, value, kind);
+    dpre++;
+  }
+
+  @Override
+  public void encoding(String enc) { }
 
 }
