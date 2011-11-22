@@ -17,6 +17,7 @@ import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.Copy;
 import org.basex.core.cmd.CreateBackup;
+import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.List;
@@ -31,6 +32,7 @@ import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXList;
+import org.basex.io.IO;
 import org.basex.io.in.DataInput;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -70,6 +72,8 @@ public final class DialogOpen extends Dialog {
   private boolean refresh;
   /** Combobox that lists available backups for a database. */
   private BaseXCombo backupchoice;
+  /** Delete button for backups. */
+  private BaseXButton delete;
 
   /**
    * Default constructor.
@@ -103,7 +107,11 @@ public final class DialogOpen extends Dialog {
     if(manage) {
       final BaseXBack b = new BaseXBack(new BorderLayout(5, 5));
       b.add(new BaseXLabel(AVAILABLE), BorderLayout.NORTH);
-      b.add(backupchoice, BorderLayout.CENTER);
+      final BaseXBack bb = new BaseXBack(new BorderLayout(5, 5));
+      delete = new BaseXButton("delete", this);
+      bb.add(backupchoice, BorderLayout.WEST);
+      bb.add(delete, BorderLayout.EAST);
+      b.add(bb, BorderLayout.CENTER);
       info.add(b, BorderLayout.NORTH);
     }
     info.add(detail, BorderLayout.CENTER);
@@ -169,14 +177,8 @@ public final class DialogOpen extends Dialog {
     /*
      * [LK] TODO
      *
-     * DONE- check if database correctly closed before restore
-     * DONE- check order of backups, newest first
-     * DONE- use pattern in Restore.java
-     *
-     * DONE
-     * backup --
-     * ok --
-     * drop ??
+     * - selected backup can't be dropped: cmd doesn't support it
+     * yet, only dbname as argument and then all backupds dropped
      */
 
     if(cmp == open) {
@@ -203,6 +205,13 @@ public final class DialogOpen extends Dialog {
       else
         for(final String s : dbs) cmds.add(new Restore(s));
     } else if(cmp == backupchoice) {
+    } else if(cmp == delete) {
+      if(dbs.size() == 1) {
+        if(!Dialog.confirm(gui, DROPBACKUP)) return;
+        refresh = true;
+        cmds.add(new DropBackup(
+            ((String) backupchoice.getSelectedItem()).concat(IO.ZIPSUFFIX)));
+      }
       // don't reset the combo box after selecting an item
     } else {
       // update components

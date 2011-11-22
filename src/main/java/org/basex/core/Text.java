@@ -1346,6 +1346,8 @@ public interface Text {
   String AVAILABLE = lang("dd_available") + COL;
   /** Database only available as backup. */
   String ONLYBACKUP = lang("dd_onlybac");
+  /** Dialog title for dropping a backup. */
+  String DROPBACKUP = lang("dd_dropbac") + NL + lang("dd_sure");
 
   /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");
