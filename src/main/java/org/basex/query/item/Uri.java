@@ -65,7 +65,7 @@ public final class Uri extends Str {
    * Tests if this is an absolute URI.
    * @return result of check
    */
-  public boolean absolute() {
+  public boolean isAbsolute() {
     return Token.contains(val, ':');
   }
 
@@ -73,7 +73,7 @@ public final class Uri extends Str {
    * Checks the validity of this URI.
    * @return result of check
    */
-  public boolean valid() {
+  public boolean isValid() {
     try {
       new URI(Token.string(Token.uri(val, true)));
       return true;

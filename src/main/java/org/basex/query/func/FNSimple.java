@@ -72,7 +72,7 @@ public final class FNSimple extends FuncCall {
     switch(def) {
       case ONE_OR_MORE:
         final Value val = ctx.value(expr[0]);
-        if(val.empty()) throw EXPECTOM.thrw(input);
+        if(val.isEmpty()) throw EXPECTOM.thrw(input);
         return val;
       case UNORDERED:
         return ctx.value(expr[0]);
@@ -131,12 +131,12 @@ public final class FNSimple extends FuncCall {
         // simplify, e.g.: if(boolean(A)) -> if(A)
         return e.type().eq(SeqType.BLN) ? e : this;
       case NOT:
-        if(e.isFun(Function.EMPTY)) {
+        if(e.isFunction(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
           expr = ((FuncCall) e).expr;
           def = Function.EXISTS;
-        } else if(e.isFun(Function.EXISTS)) {
+        } else if(e.isFunction(Function.EXISTS)) {
           // simplify: not(exists(A)) -> empty(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
           expr = ((FuncCall) e).expr;
@@ -145,7 +145,7 @@ public final class FNSimple extends FuncCall {
           // simplify: not('a' = 'b') -> 'a' != 'b'
           final Cmp c = ((Cmp) e).invert();
           return c == e ? this : c;
-        } else if(e.isFun(Function.NOT)) {
+        } else if(e.isFunction(Function.NOT)) {
           // simplify: not(not(A)) -> boolean(A)
           return compBln(((FuncCall) e).expr[0]);
         } else {
@@ -209,37 +209,40 @@ public final class FNSimple extends FuncCall {
       final Iter iter2) throws QueryException {
 
     while(true) {
-      final Item it1 = iter1.next();
-      final Item it2 = iter2.next();
-      // at least one iterator is exhausted: check if both items are null
+      // check if both items are null
+      final Item it1 = iter1.next(), it2 = iter2.next();
+      if(it1 == null && it2 == null) return true;
+
+      // check if one iterator is exhausted
       if(it1 == null) {
-        if(it2 == null) return true;
-        if(it2.isFunction()) FNCMP.thrw(ii, it2);
+        if(it2.type.isFunction()) FNCMP.thrw(ii, it2);
         return false;
-      } else if(it2 == null) {
-        if(it1.isFunction()) FNCMP.thrw(ii, it1);
+      }
+      if(it2 == null) {
+        if(it1.type.isFunction()) FNCMP.thrw(ii, it1);
         return false;
       }
 
       // check for functions
-      if(it1.isFunction() || it2.isFunction()) {
+      Type t1 = it1.type, t2 = it2.type;
+      if(t1.isFunction() || t2.isFunction()) {
         // maps are functions but have a defined deep-equality
-        if(it1.isMap() && it2.isMap()) {
+        if(t1.isMap() && t2.isMap()) {
           final Map map1 = (Map) it1, map2 = (Map) it2;
           if(!map1.deep(ii, map2)) return false;
           continue;
         }
-        FNCMP.thrw(ii, it1.isFunction() ? it1 : it2);
+        FNCMP.thrw(ii, t1.isFunction() ? it1 : it2);
       }
 
       // check atomic values
-      if(!it1.isNode() && !it2.isNode()) {
+      if(!t1.isNode() && !t2.isNode()) {
         if(!it1.equiv(ii, it2)) return false;
         continue;
       }
 
       // node types must be equal
-      if(it1.type != it2.type) return false;
+      if(t1 != t2) return false;
 
       ANode s1 = (ANode) it1, s2 = (ANode) it2;
       final Stack<AxisIter[]> chld = new Stack<AxisIter[]>();
@@ -247,8 +250,8 @@ public final class FNSimple extends FuncCall {
       chld.push(ch);
       boolean desc = false;
       do {
-        final Type t1 = s1 != null ? s1.type : null;
-        final Type t2 = s2 != null ? s2.type : null;
+        t1 = s1 != null ? s1.type : null;
+        t2 = s2 != null ? s2.type : null;
 
         if(desc) {
           // skip descendant comments and processing instructions

@@ -54,7 +54,7 @@ public final class TypeCase extends Single {
       final int s = ctx.vars.size();
       ctx.vars.add(v == null ? var : var.bind(v, ctx).copy());
       super.comp(ctx);
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     }
     type = expr.type();
     return this;
@@ -80,7 +80,7 @@ public final class TypeCase extends Single {
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq, ctx).copy());
     final ValueIter ic = ctx.value(expr).iter();
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return ic;
   }
 

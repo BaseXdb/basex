@@ -131,6 +131,16 @@ public enum NodeType implements Type {
   }
 
   @Override
+  public boolean isDuration() {
+    return false;
+  }
+
+  @Override
+  public boolean isDate() {
+    return false;
+  }
+
+  @Override
   public final boolean isFunction() {
     return false;
   }

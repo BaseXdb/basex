@@ -72,8 +72,8 @@ public abstract class Arr extends ParseExpr {
    * Returns true if all arguments are values.
    * @return result of check
    */
-  protected final boolean values() {
-    for(final Expr e : expr) if(!e.value()) return false;
+  protected final boolean allAreValues() {
+    for(final Expr e : expr) if(!e.isValue()) return false;
     return true;
   }
 
@@ -81,8 +81,8 @@ public abstract class Arr extends ParseExpr {
    * Returns true if at least one argument is empty, or will yield 0 results.
    * @return result of check
    */
-  protected final boolean oneEmpty() {
-    for(final Expr e : expr) if(e.empty()) return true;
+  protected final boolean oneIsEmpty() {
+    for(final Expr e : expr) if(e.isEmpty()) return true;
     return false;
   }
 

@@ -45,7 +45,7 @@ public final class Try extends Single {
     try {
       super.comp(ctx);
       // return value, which will never throw an error
-      if(expr.value()) return expr;
+      if(expr.isValue()) return expr;
     } catch(final QueryException ex) {
       // catch exception for evaluation if expression fails at compile time
       qe = ex;
@@ -78,7 +78,7 @@ public final class Try extends Single {
       }
     } finally {
       // always reset the scope
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     }
   }
 

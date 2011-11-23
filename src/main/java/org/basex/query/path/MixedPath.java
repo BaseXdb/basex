@@ -42,7 +42,7 @@ public final class MixedPath extends Path {
 
     for(int s = 0; s != steps.length; ++s) {
       steps[s] = steps[s].comp(ctx);
-      if(steps[s].empty()) return Empty.SEQ;
+      if(steps[s].isEmpty()) return Empty.SEQ;
     }
     optSteps(ctx);
 
@@ -83,16 +83,16 @@ public final class MixedPath extends Path {
 
         // loop through all input items
         for(Item it; (it = res.next()) != null;) {
-          if(!it.isNode()) NODESPATH.thrw(input, this, it.type);
+          if(!it.type.isNode()) NODESPATH.thrw(input, this, it.type);
           ctx.value = it;
 
           // loop through all resulting items
           final Iter ir = ctx.iter(e);
           for(Item i; (i = ir.next()) != null;) {
             // set node flag
-            if(ic.size() == 0) nodes = i.isNode();
+            if(ic.size() == 0) nodes = i.type.isNode();
             // check if both nodes and atomic values occur in last result
-            else if(last && nodes != i.isNode()) EVALNODESVALS.thrw(input);
+            else if(last && nodes != i.type.isNode()) EVALNODESVALS.thrw(input);
             ic.add(i);
           }
           ctx.pos++;

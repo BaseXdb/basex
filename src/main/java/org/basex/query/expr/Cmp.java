@@ -6,6 +6,7 @@ import org.basex.query.func.FuncCall;
 import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.query.path.AxisPath;
 import org.basex.util.InputInfo;
 
@@ -33,7 +34,7 @@ public abstract class Cmp extends Arr {
    */
   protected final boolean swap() {
     // move value or path without root to second position
-    final boolean swap = expr[0].value() && !expr[1].value() ||
+    final boolean swap = expr[0].isValue() && !expr[1].isValue() ||
       expr[0] instanceof AxisPath && ((AxisPath) expr[0]).root != null &&
       expr[1] instanceof AxisPath && ((AxisPath) expr[1]).root == null;
 
@@ -61,9 +62,10 @@ public abstract class Cmp extends Arr {
   protected final Expr compCount(final Op o) throws QueryException {
     // evaluate argument
     final Expr a = expr[1];
-    if(!a.item()) return this;
+    if(!a.isItem()) return this;
     final Item it = (Item) a;
-    if(!it.isNumber() && !it.isUntyped()) return this;
+    final Type ip = it.type;
+    if(!ip.isNumber() && !ip.isUntyped()) return this;
 
     final double v = it.dbl(input);
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)

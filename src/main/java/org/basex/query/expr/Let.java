@@ -111,7 +111,7 @@ public final class Let extends ForLet {
       @Override
       public boolean reset() {
         if(more) {
-          ctx.vars.reset(vs);
+          ctx.vars.size(vs);
           more = false;
         }
         return true;

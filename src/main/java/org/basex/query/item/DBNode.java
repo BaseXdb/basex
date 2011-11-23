@@ -6,12 +6,15 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
+import org.basex.query.util.DataBuilder;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -209,6 +212,13 @@ public class DBNode extends ANode {
     n.root = root;
     n.score = score;
     return n;
+  }
+
+  @Override
+  public final DBNode copy(final QueryContext ctx) {
+    final MemData md = new MemData(data.meta.prop);
+    new DataBuilder(md).context(ctx).build(this);
+    return new DBNode(md, 0);
   }
 
   @Override

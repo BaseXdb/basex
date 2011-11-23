@@ -70,7 +70,7 @@ public class UserFunc extends Single {
     if(updating) {
       // updating function
       if(ret != null) UPFUNCTYPE.thrw(input);
-      if(!u && !expr.vacuous()) UPEXPECTF.thrw(input);
+      if(!u && !expr.isVacuous()) UPEXPECTF.thrw(input);
     } else if(u) {
       // uses updates, but is not declared as such
       UPNOT.thrw(input, desc());
@@ -85,7 +85,7 @@ public class UserFunc extends Single {
     final int s = ctx.vars.size();
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
 
     // convert all function calls in tail position to proper tail calls
     if(tco()) expr = expr.markTailCalls();

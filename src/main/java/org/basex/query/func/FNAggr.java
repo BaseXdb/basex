@@ -84,16 +84,18 @@ public final class FNAggr extends FuncCall {
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
 
-    Item res = it.isUntyped() ? Dbl.get(it.string(input), input) : it;
-    if(!res.isNumber() && (!res.isDuration() || res.type == DUR))
-      SUMTYPE.thrw(input, this, res.type);
-    final boolean n = res.isNumber();
+    Item res = it.type.isUntyped() ? Dbl.get(it.string(input), input) : it;
+    Type t = res.type;
+    if(!t.isNumber() && (!t.isDuration() || t == DUR))
+      SUMTYPE.thrw(input, this, t);
+    final boolean n = t.isNumber();
 
     int c = 1;
     for(Item i; (i = iter.next()) != null;) {
-      final boolean un = i.isUntyped() || i.isNumber();
-      if(n && !un) FUNNUM.thrw(input, this, i.type);
-      if(!n && un) FUNDUR.thrw(input, this, i.type);
+      t = i.type;
+      final boolean un = t.isUntyped() || t.isNumber();
+      if(n && !un) FUNNUM.thrw(input, this, t);
+      if(!n && un) FUNDUR.thrw(input, this, t);
       res = Calc.PLUS.ev(input, res, i);
       ++c;
     }
@@ -120,7 +122,7 @@ public final class FNAggr extends FuncCall {
     cmp.e(input, res, res);
 
     // strings or dates
-    if(!res.isUntyped() && res.isString() || res.isDate()) {
+    if(!res.type.isUntyped() && res.type.isString() || res.type.isDate()) {
       for(Item it; (it = iter.next()) != null;) {
         if(it.type != res.type) {
           FUNCMP.thrw(input, desc(), res.type, it.type);
@@ -131,12 +133,12 @@ public final class FNAggr extends FuncCall {
     }
 
     // durations or numbers
-    Type t = res.isUntyped() ? DBL : res.type;
+    Type t = res.type.isUntyped() ? DBL : res.type;
     if(res.type != t) res = t.e(res, ctx, input);
 
     for(Item it; (it = iter.next()) != null;) {
       t = type(res, it);
-      if(!it.isDuration() && Double.isNaN(it.dbl(input)) ||
+      if(!it.type.isDuration() && Double.isNaN(it.dbl(input)) ||
           cmp.e(input, res, it))
         res = it;
       if(res.type != t) res = t.e(res, ctx, input);
@@ -153,19 +155,19 @@ public final class FNAggr extends FuncCall {
    */
   private Type type(final Item a, final Item b) throws QueryException {
     final Type ta = a.type, tb = b.type;
-    if(b.isUntyped()) {
-      if(!a.isNumber()) FUNCMP.thrw(input, this, ta, tb);
+    if(tb.isUntyped()) {
+      if(!ta.isNumber()) FUNCMP.thrw(input, this, ta, tb);
       return DBL;
     }
-    if(a.isNumber() && !b.isUntyped() && b.isString())
+    if(ta.isNumber() && !tb.isUntyped() && tb.isString())
       FUNCMP.thrw(input, this, ta, tb);
 
     if(ta == tb) return ta;
     if(ta == DBL || tb == DBL) return DBL;
     if(ta == FLT || tb == FLT) return FLT;
     if(ta == DEC || tb == DEC) return DEC;
-    if(ta == BLN || a.isNumber() && !b.isNumber() ||
-        b.isNumber() && !a.isNumber()) FUNCMP.thrw(input, this, ta, tb);
-    return a.isNumber() || b.isNumber() ? ITR : ta;
+    if(ta == BLN || ta.isNumber() && !tb.isNumber() ||
+        tb.isNumber() && !ta.isNumber()) FUNCMP.thrw(input, this, ta, tb);
+    return ta.isNumber() || tb.isNumber() ? ITR : ta;
   }
 }

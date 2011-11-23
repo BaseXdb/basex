@@ -54,9 +54,12 @@ public final class Catch extends Single {
 
   @Override
   public Catch comp(final QueryContext ctx) throws QueryException {
-    final int s = prepare(ctx);
+    final int s = ctx.vars.size();
+    final int ns = ctx.ns.size();
+    prepare(ctx);
     super.comp(ctx);
-    finish(s, ctx);
+    ctx.vars.size(s);
+    ctx.ns.size(ns);
     return this;
   }
 
@@ -73,41 +76,32 @@ public final class Catch extends Single {
     final byte[] cd = token(ex.code());
     if(!find(cd)) return null;
 
-    final int s = prepare(ctx);
-    int i = 0;
-    final byte[] io = ex.file() == null ? EMPTY : token(ex.file().path());
-    final Value val = ex.value();
-    for(final Value v : new Value[] { new QNm(cd, ERRORURI),
-        Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-        Str.get(io), Int.get(ex.col()), Int.get(ex.line()) }) {
-      vars[i++].bind(v, ctx);
+    final int s = ctx.vars.size();
+    final int ns = ctx.ns.size();
+    prepare(ctx);
+    try {
+      int i = 0;
+      final byte[] io = ex.file() == null ? EMPTY : token(ex.file().path());
+      final Value val = ex.value();
+      for(final Value v : new Value[] { new QNm(cd, ERRORURI),
+          Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
+          Str.get(io), Int.get(ex.col()), Int.get(ex.line()) }) {
+        vars[i++].bind(v, ctx);
+      }
+      return ctx.value(expr);
+    } finally {
+      ctx.vars.size(s);
+      ctx.ns.size(ns);
     }
-    final Value ir = ctx.value(expr);
-    finish(s, ctx);
-    return ir;
   }
 
   /**
    * Prepares the catch construction.
    * @param ctx query context
-   * @return original size of variable stack
-   * @throws QueryException query exception
    */
-  public int prepare(final QueryContext ctx) throws QueryException {
-    ctx.ns.add(NS, null);
-    final int s = ctx.vars.size();
+  public void prepare(final QueryContext ctx) {
+    ctx.ns.add(NS);
     for(final Var v : vars) ctx.vars.add(v);
-    return s;
-  }
-
-  /**
-   * Finishes the catch construction.
-   * @param s original size of variable stack
-   * @param ctx query context
-   */
-  public void finish(final int s, final QueryContext ctx) {
-    ctx.vars.reset(s);
-    ctx.ns.delete(NS);
   }
 
   /**

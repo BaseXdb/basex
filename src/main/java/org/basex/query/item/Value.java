@@ -57,76 +57,12 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public final boolean value() {
+  public final boolean isValue() {
     return true;
   }
 
   @Override
   public abstract long size();
-
-  /**
-   * Checks if this is a numeric item.
-   * @return result of check
-   */
-  public final boolean isNumber() {
-    return type.isNumber();
-  }
-
-  /**
-   * Checks if this is a function item.
-   * @return result of check
-   */
-  public final boolean isFunction() {
-    return type.isFunction();
-  }
-
-  /**
-   * Checks if this is a map.
-   * @return result of check
-   */
-  public boolean isMap() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a untyped item.
-   * @return result of check
-   */
-  public boolean isUntyped() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a string item.
-   * @return result of check
-   */
-  public boolean isString() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a duration item.
-   * @return result of check
-   */
-  public boolean isDuration() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a date item.
-   * @return result of check
-   */
-  public boolean isDate() {
-    return false;
-  }
-
-  /**
-   * Checks if this is a node.
-   * @return result of check
-   */
-  public boolean isNode() {
-    return false;
-  }
 
   /**
    * Returns a Java representation of the value.

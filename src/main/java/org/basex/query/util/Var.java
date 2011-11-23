@@ -136,7 +136,7 @@ public final class Var extends ParseExpr {
    */
   public Var bind(final Expr e, final QueryContext ctx) throws QueryException {
     expr = e;
-    return e.value() ? bind((Value) e, ctx) : this;
+    return e.isValue() ? bind((Value) e, ctx) : this;
   }
 
   /**

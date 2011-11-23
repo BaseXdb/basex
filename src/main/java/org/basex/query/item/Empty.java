@@ -36,12 +36,12 @@ public final class Empty extends Value {
   }
 
   @Override
-  public boolean empty() {
+  public boolean isEmpty() {
     return true;
   }
 
   @Override
-  public boolean vacuous() {
+  public boolean isVacuous() {
     return true;
   }
 

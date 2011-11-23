@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Leo Woerteler
  */
-public final class ItrSeq extends Seq {
+public final class IntSeq extends Seq {
   /** Values. */
   final long[] vals;
 
@@ -28,7 +28,7 @@ public final class ItrSeq extends Seq {
    * @param ints integers
    * @param t int type
    */
-  private ItrSeq(final long[] ints, final Type t) {
+  private IntSeq(final long[] ints, final Type t) {
     super(ints.length, t);
     vals = ints;
   }
@@ -82,7 +82,7 @@ public final class ItrSeq extends Seq {
    */
   public static Value get(final long[] val, final Type type) {
     return val.length == 0 ? Empty.SEQ : val.length == 1 ?
-        Int.get(val[0], type) : new ItrSeq(val, type);
+        Int.get(val[0], type) : new IntSeq(val, type);
   }
 
   /**
@@ -102,8 +102,8 @@ public final class ItrSeq extends Seq {
       // speed up construction for items and integer sequences
       if(e instanceof Item) {
         tmp[t++] = ((Item) e).itr(null);
-      } else if(e instanceof ItrSeq) {
-        final ItrSeq val = (ItrSeq) e;
+      } else if(e instanceof IntSeq) {
+        final IntSeq val = (IntSeq) e;
         final long vs = val.size();
         for(int v = 0; v < vs; v++) tmp[t++] = val.vals[v];
       } else {

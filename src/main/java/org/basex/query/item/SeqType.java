@@ -274,8 +274,9 @@ public final class SeqType {
    */
   private boolean check(final Item it, final MapType mt) {
     // maps don't have type information attached to them, you have to look...
-    return mt != null ? it.isMap() && ((Map) it).hasType(mt) :
-        it.type.instanceOf(type) && checkExt(it);
+    final Type ip = it.type;
+    return mt != null ? ip.isMap() && ((Map) it).hasType(mt) :
+        ip.instanceOf(type) && checkExt(it);
   }
 
   /**
@@ -343,17 +344,18 @@ public final class SeqType {
    */
   private boolean instance(final Item it, final InputInfo ii)
       throws QueryException {
-    final Type t = it.type;
-    final boolean ins = it.type.instanceOf(type);
-    if(!ins && !it.isUntyped() && !it.isFunction() &&
+
+    final Type ip = it.type;
+    final boolean ins = ip.instanceOf(type);
+    if(!ins && !ip.isUntyped() && !ip.isFunction() &&
         // implicit type promotions:
         // xs:float -> xs:double
-        (t != AtomType.FLT || type != AtomType.DBL) &&
+        (ip != AtomType.FLT || type != AtomType.DBL) &&
         // xs:anyUri -> xs:string
-        (t != AtomType.URI || type != AtomType.STR) &&
+        (ip != AtomType.URI || type != AtomType.STR) &&
         // xs:decimal -> xs:float/xs:double
         (type != AtomType.FLT && type != AtomType.DBL ||
-            !t.instanceOf(AtomType.DEC)))
+            !ip.instanceOf(AtomType.DEC)))
       Err.promote(ii, type, it);
     return ins;
   }

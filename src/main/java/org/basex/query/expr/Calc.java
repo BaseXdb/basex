@@ -33,11 +33,12 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      final boolean t1 = a.isNumber() || a.isUntyped();
-      final boolean t2 = b.isNumber() || b.isUntyped();
+      final Type ta = a.type, tb = b.type;
+      final boolean t1 = ta.isNumber() || ta.isUntyped();
+      final boolean t2 = tb.isNumber() || tb.isUntyped();
       if(t1 ^ t2) errNum(ii, !t1 ? a : b);
       if(t1 && t2) {
-        final Type t = type(a, b);
+        final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
@@ -49,9 +50,8 @@ public enum Calc {
         return Dec.get(a.dec(ii).add(b.dec(ii)));
       }
 
-      final Type ta = a.type, tb = b.type;
       if(ta == tb) {
-        if(!a.isDuration()) errNum(ii, !t1 ? a : b);
+        if(!ta.isDuration()) errNum(ii, !t1 ? a : b);
         if(ta == YMD) return new YMd((YMd) a, (YMd) b, true);
         if(ta == DTD) return new DTd((DTd) a, (DTd) b, true);
       }
@@ -78,11 +78,12 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      final boolean t1 = a.isNumber() || a.isUntyped();
-      final boolean t2 = b.isNumber() || b.isUntyped();
+      final Type ta = a.type, tb = b.type;
+      final boolean t1 = ta.isNumber() || ta.isUntyped();
+      final boolean t2 = tb.isNumber() || tb.isUntyped();
       if(t1 ^ t2) errNum(ii, !t1 ? a : b);
       if(t1 && t2) {
-        final Type t = type(a, b);
+        final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
@@ -94,7 +95,6 @@ public enum Calc {
         return Dec.get(a.dec(ii).subtract(b.dec(ii)));
       }
 
-      final Type ta = a.type, tb = b.type;
       if(ta == tb) {
         if(ta == DTM || ta == DAT || ta == TIM)
           return new DTd((Date) a, (Date) b);
@@ -121,27 +121,27 @@ public enum Calc {
 
       final Type ta = a.type, tb = b.type;
       if(ta == YMD) {
-        if(!b.isNumber()) errNum(ii, b);
+        if(!tb.isNumber()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(ii), true, ii);
       }
       if(tb == YMD) {
-        if(!a.isNumber()) errNum(ii, a);
+        if(!ta.isNumber()) errNum(ii, a);
         return new YMd((Dur) b, a.dbl(ii), true, ii);
       }
       if(ta == DTD) {
-        if(!b.isNumber()) errNum(ii, b);
+        if(!tb.isNumber()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(ii), true, ii);
       }
       if(tb == DTD) {
-        if(!a.isNumber()) errNum(ii, a);
+        if(!ta.isNumber()) errNum(ii, a);
         return new DTd((Dur) b, a.dbl(ii), true, ii);
       }
 
-      final boolean t1 = a.isNumber() || a.isUntyped();
-      final boolean t2 = b.isNumber() || b.isUntyped();
+      final boolean t1 = ta.isNumber() || ta.isUntyped();
+      final boolean t2 = tb.isNumber() || tb.isUntyped();
       if(t1 ^ t2) errType(ii, ta, b);
       if(t1 && t2) {
-        final Type t = type(a, b);
+        final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
           final long l2 = b.itr(ii);
@@ -179,16 +179,16 @@ public enum Calc {
         }
       }
       if(ta == YMD) {
-        if(!b.isNumber()) errNum(ii, b);
+        if(!tb.isNumber()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(ii), false, ii);
       }
       if(ta == DTD) {
-        if(!b.isNumber()) errNum(ii, b);
+        if(!tb.isNumber()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(ii), false, ii);
       }
 
       checkNum(ii, a, b);
-      final Type t = type(a, b);
+      final Type t = type(ta, tb);
       if(t == DBL) return Dbl.get(a.dbl(ii) / b.dbl(ii));
       if(t == FLT) return Flt.get(a.flt(ii) / b.flt(ii));
 
@@ -212,7 +212,8 @@ public enum Calc {
       if(d2 == 0) DIVZERO.thrw(ii, a);
       final double d = d1 / d2;
       if(Double.isNaN(d) || Double.isInfinite(d)) DIVFLOW.thrw(ii, d1, d2);
-      return Int.get(type(a, b) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
+      return Int.get(type(a.type, b.type) == ITR ?
+          a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
 
@@ -223,7 +224,7 @@ public enum Calc {
         throws QueryException {
 
       checkNum(ii, a, b);
-      final Type t = type(a, b);
+      final Type t = type(a.type, b.type);
       if(t == DBL) return Dbl.get(a.dbl(ii) % b.dbl(ii));
       if(t == FLT) return Flt.get(a.flt(ii) % b.flt(ii));
       if(t == ITR) {
@@ -269,11 +270,10 @@ public enum Calc {
    * @param b second item type
    * @return type
    */
-  static final Type type(final Item a, final Item b) {
-    if(a.type == DBL || b.type == DBL || a.isUntyped() || b.isUntyped())
-      return DBL;
-    if(a.type == FLT || b.type == FLT) return FLT;
-    if(a.type == DEC || b.type == DEC) return DEC;
+  static final Type type(final Type a, final Type b) {
+    if(a == DBL || b == DBL || a.isUntyped() || b.isUntyped()) return DBL;
+    if(a == FLT || b == FLT) return FLT;
+    if(a == DEC || b == DEC) return DEC;
     return ITR;
   }
 
@@ -307,8 +307,9 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
-    if(!it.isDuration()) XPDUR.thrw(ii, info(), it.type);
-    if(it.type == DUR) throw SIMPLDUR.thrw(ii, info(), it);
+    final Type ip = it.type;
+    if(!ip.isDuration()) XPDUR.thrw(ii, info(), ip);
+    if(ip == DUR) throw SIMPLDUR.thrw(ii, info(), it);
     return (Dur) it;
   }
 
@@ -319,10 +320,12 @@ public enum Calc {
    * @param b second item
    * @throws QueryException query exception
    */
-  final void checkNum(final InputInfo ii, final Item a,
-      final Item b) throws QueryException {
-    if(!a.isUntyped() && !a.isNumber()) errNum(ii, a);
-    if(!b.isUntyped() && !b.isNumber()) errNum(ii, b);
+  final void checkNum(final InputInfo ii, final Item a, final Item b)
+      throws QueryException {
+    final Type ta = a.type;
+    final Type tb = b.type;
+    if(!ta.isUntyped() && !ta.isNumber()) errNum(ii, a);
+    if(!tb.isUntyped() && !tb.isNumber()) errNum(ii, b);
   }
 
   /**

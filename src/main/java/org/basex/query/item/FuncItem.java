@@ -112,7 +112,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.promote(v, ctx, ii) : v;
     } finally {
       ctx.value = cv;
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     }
   }
 
@@ -139,7 +139,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.cast(it, expr, false, ctx, ii) : it;
     } finally {
       ctx.value = cv;
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     }
   }
 

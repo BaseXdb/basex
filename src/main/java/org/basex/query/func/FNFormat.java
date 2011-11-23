@@ -64,7 +64,7 @@ public final class FNFormat extends FuncCall {
     final byte[] pic = checkStr(expr[1], ctx);
     final byte[] lng = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
 
-    if(expr[0].empty()) return Str.ZERO;
+    if(expr[0].isEmpty()) return Str.ZERO;
     final long num = checkItr(expr[0], ctx);
 
     if(pic.length == 0) WRONGINT.thrw(input, pic);
@@ -82,7 +82,7 @@ public final class FNFormat extends FuncCall {
     // evaluate arguments
     Item it = expr[0].item(ctx, input);
     if(it == null) it = Dbl.NAN;
-    else if(!it.isUntyped() && !it.isNumber()) Err.number(this, it);
+    else if(!it.type.isUntyped() && !it.type.isNumber()) Err.number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
     final byte[] frm = new QNm(expr.length == 3 ?

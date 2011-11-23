@@ -80,7 +80,8 @@ public class FuncType implements Type {
   @Override
   public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!it.isFunction()) throw Err.cast(ii, this, it);
+
+    if(!it.type.isFunction()) throw Err.cast(ii, this, it);
     final FItem f = (FItem) it;
     return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii);
   }
@@ -154,6 +155,16 @@ public class FuncType implements Type {
           vars[v].type = args[v];
     }
     return vars;
+  }
+
+  @Override
+  public boolean isDuration() {
+    return false;
+  }
+
+  @Override
+  public boolean isDate() {
+    return false;
   }
 
   @Override

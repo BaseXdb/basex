@@ -61,9 +61,9 @@ public final class Transform extends Arr {
     }
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
 
-    if(!expr[0].uses(Use.UPD) && !expr[0].vacuous()) UPEXPECTT.thrw(input);
+    if(!expr[0].uses(Use.UPD) && !expr[0].isVacuous()) UPEXPECTT.thrw(input);
     checkUp(expr[1], ctx);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     ctx.updating = u;
     return this;
   }
@@ -80,7 +80,8 @@ public final class Transform extends Arr {
     for(final Let fo : copies) {
       final Iter ir = ctx.iter(fo.expr);
       final Item i = ir.next();
-      if(i == null || !i.isNode() || ir.next() != null) UPCOPYMULT.thrw(input);
+      if(i == null || !i.type.isNode() || ir.next() != null)
+        UPCOPYMULT.thrw(input);
 
       // copy node to main memory data instance
       final MemData md = new MemData(ctx.context.prop);
@@ -100,7 +101,7 @@ public final class Transform extends Arr {
     ctx.updates.mod = tmp;
 
     final Value v = ctx.value(expr[1]);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return v;
   }
 

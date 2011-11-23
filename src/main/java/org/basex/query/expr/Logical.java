@@ -34,7 +34,7 @@ public abstract class Logical extends Arr {
     final boolean and = this instanceof And;
     for(int e = 0; e < expr.length; ++e) {
       expr[e] = expr[e].comp(ctx).compEbv(ctx);
-      if(!expr[e].value()) continue;
+      if(!expr[e].isValue()) continue;
 
       // atomic items can be pre-evaluated
       ctx.compInfo(OPTREMOVE, desc(), expr[e]);

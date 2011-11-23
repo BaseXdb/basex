@@ -92,7 +92,7 @@ public abstract class UserFuncCall extends Arr {
     // return expressions are supported; otherwise, recursive functions
     // might not be correctly evaluated
     func.comp(ctx);
-    if(func.expr.value() && values() && !func.uses(Use.NDT)) {
+    if(func.expr.isValue() && allAreValues() && !func.uses(Use.NDT)) {
       // evaluate arguments to catch cast exceptions
       for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
       ctx.compInfo(OPTINLINE, func.name.string());

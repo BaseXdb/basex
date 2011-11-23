@@ -70,23 +70,32 @@ public final class CElem extends CFrag {
     try {
       addNS(ctx);
 
-      // clone namespaces
+      // clone namespaces specified by the constructor
       final Atts nns = new Atts();
       for(int i = 0; i < nsp.size(); ++i) nns.add(nsp.key(i), nsp.val(i));
 
-      // create QName and set namespaces
-      final QNm nnm = checkNS(qname(ctx, it, false, ii));
-      final byte[] p = nnm.pref();
-      if(!eq(p, XML)) {
-        final byte[] uri = ctx.ns.uri(p);
+      /* assign locally available namespaces
+      for(int n = 0; n < ctx.ns.size(); ++n) {
+        nns.add(ctx.ns.ns.key(n), ctx.ns.ns.val(n));
+      }*/
+
+      // create and check QName
+      final QNm nnm = qname(ctx, it, false, ii);
+      final Uri nuri = nnm.uri();
+      final byte[] np = nnm.pref(), nu = nuri.string();
+      if(eq(np, XMLNS) || eq(nu, XMLNSURI) || eq(np, XML) ^ eq(nu, XMLURI))
+        CEINS.thrw(input, nu, np);
+
+      // set namespaces
+      if(!eq(np, XML)) {
+        final byte[] uri = ctx.ns.uri(np);
         if(nnm.hasUri()) {
           // uri assigned: add to namespace declarations
-          final Uri u = nnm.uri();
-          if(uri == null || !eq(uri, u.string())) {
-            ctx.ns.add(new QNm(p, u), ii);
-            nns.add(p, u.string());
-          } else if(!nns.contains(p) && !(eq(p, EMPTY) && eq(uri, EMPTY))) {
-            nns.add(p, uri);
+          if(uri == null || !eq(uri, nu)) {
+            ctx.ns.add(new QNm(np, nuri), ii);
+            nns.add(np, nu);
+          } else if(!nns.contains(np) && !(eq(np, EMPTY) && eq(uri, EMPTY))) {
+            nns.add(np, uri);
           }
         } else if(uri != null) {
           // no uri: assign default uri
@@ -99,11 +108,13 @@ public final class CElem extends CFrag {
       if(c.errAtt) NOATTALL.thrw(input);
       if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
 
-      // update parent and namespace references
+      // update child nodes: set parent
       final FElem node = new FElem(nnm, c.children, c.atts, nns);
       for(int n = 0; n < c.children.size(); ++n) {
         c.children.get(n).parent(node);
       }
+
+      // update attributes: set parent, check namespaces
       for(int n = 0; n < c.atts.size(); ++n) {
         final ANode att = c.atts.get(n).parent(node);
         final QNm name = att.qname();
@@ -116,7 +127,7 @@ public final class CElem extends CFrag {
           } else if(!eq(nns.val(pos), auri)) {
             // same prefixes with different URIs exist
             apref = null;
-            // check if existing prefix can be assigned
+            // check if existing prefix can be adopted
             for(int a = 0; a < nns.size(); a++) {
               if(eq(nns.val(a), auri)) apref = nns.key(a);
             }
@@ -150,19 +161,6 @@ public final class CElem extends CFrag {
     for(int n = nsp.size() - 1; n >= 0; n--) {
       ctx.ns.add(new QNm(concat(XMLNSC, nsp.key(n)), nsp.val(n)), input);
     }
-  }
-
-  /**
-   * Checks the element name for illegal prefixes or URIs.
-   * @param name element name
-   * @return checked name
-   * @throws QueryException XQDY0096, if invalid namespace was found
-   */
-  private QNm checkNS(final QNm name) throws QueryException {
-    final byte[] pre = name.pref(), uri = name.uri().string();
-    if(eq(pre, XMLNS) || eq(uri, XMLNSURI) || eq(pre, XML) ^ eq(uri, XMLURI))
-      CEINS.thrw(input, pre, uri);
-    return name;
   }
 
   @Override

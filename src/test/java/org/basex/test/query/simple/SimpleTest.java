@@ -91,6 +91,10 @@ public final class SimpleTest extends QueryTest {
 
       { "Path 1", empty(), "<a/>[./(@*)]" },
 
+      { "Constructor 0",
+        "declare copy-namespaces no-preserve no-inherit; 1" },
+      { "Constructor 1", dbl(2),
+        "number(<e xmlns:n='O'> { count( in-scope-prefixes(<e/>) ) } </e>)" },
     };
   }
 }

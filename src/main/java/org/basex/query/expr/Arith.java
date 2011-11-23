@@ -42,7 +42,8 @@ public final class Arith extends Arr {
     type = s0.isNum() && s1.isNum() ? SeqType.ITR :
       s0.one() && s1.one() ? SeqType.ITEM : SeqType.ITEM_ZO;
 
-    return optPre(oneEmpty() ? null : values() ? item(ctx, input) : this, ctx);
+    return optPre(oneIsEmpty() ? null : allAreValues() ?
+        item(ctx, input) : this, ctx);
   }
 
   @Override

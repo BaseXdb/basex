@@ -21,7 +21,7 @@ public final class NSLocal {
   private int def;
 
   /**
-   * Adds the specified namespace.
+   * Validates and adds the specified namespace.
    * @param name namespace
    * @param ii input info
    * @throws QueryException query exception
@@ -33,6 +33,14 @@ public final class NSLocal {
     if(eq(XMLURI, uri)) NOXMLNS.thrw(ii, XML, name);
     if(eq(XMLNSURI, uri)) NOXMLNS.thrw(ii, XMLNS, name);
     ns.add(ln, uri);
+  }
+
+  /**
+   * Adds the specified namespace.
+   * @param name namespace
+   */
+  public void add(final QNm name) {
+    ns.add(name.ln(), name.uri().string());
   }
 
   /**

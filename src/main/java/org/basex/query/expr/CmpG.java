@@ -147,14 +147,14 @@ public final class CmpG extends Cmp {
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
     Expr e = this;
-    if(oneEmpty()) {
+    if(oneIsEmpty()) {
       e = optPre(Bln.FALSE, ctx);
-    } else if(values()) {
+    } else if(allAreValues()) {
       e = preEval(ctx);
-    } else if(e1.isFun(Function.COUNT)) {
+    } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op.op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFun(Function.POSITION)) {
+    } else if(e1.isFunction(Function.POSITION)) {
       if(e2 instanceof Range && op.op == CmpV.Op.EQ) {
         // position() CMP range
         final long[] rng = ((Range) e2).range(ctx);
@@ -261,9 +261,10 @@ public final class CmpG extends Cmp {
   private boolean eval(final Item a, final Item b) throws QueryException {
     final Type ta = a.type;
     final Type tb = b.type;
-    if(ta != tb && (!a.isUntyped() && !b.isUntyped() && !(a.isString() &&
-        b.isString()) && !(a.isNumber() && b.isNumber()) && !a.isFunction() &&
-        !b.isFunction() || ta == AtomType.QNM || tb == AtomType.QNM))
+    if(ta != tb && (!ta.isUntyped() && !tb.isUntyped() && !(ta.isString() &&
+        tb.isString()) && !(ta.isNumber() && tb.isNumber()) &&
+        !ta.isFunction() && !tb.isFunction() ||
+        ta == AtomType.QNM || tb == AtomType.QNM))
       XPTYPECMP.thrw(input, ta, tb);
     return op.op.e(input, a, b);
   }
@@ -304,7 +305,7 @@ public final class CmpG extends Cmp {
     // support expressions
     final IndexType ind = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final Expr arg = expr[1];
-    if(!arg.value()) {
+    if(!arg.isValue()) {
       final SeqType t = arg.type();
       /* index access is not possible if returned type is no string or node, if
          expression depends on context, or if it is non-deterministic. examples:

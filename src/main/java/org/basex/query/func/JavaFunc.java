@@ -93,7 +93,7 @@ public final class JavaFunc extends Arr {
     final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
       arg[a] = expr[a].value(ctx);
-      if(arg[a].empty()) XPEMPTY.thrw(input, desc());
+      if(arg[a].isEmpty()) XPEMPTY.thrw(input, desc());
     }
 
     Object result = null;

@@ -27,7 +27,7 @@ public final class Concat extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(values()) return optPre(item(ctx, input), ctx);
+    if(allAreValues()) return optPre(item(ctx, input), ctx);
     type = AtomType.STR.seq();
     size = 1;
     return this;

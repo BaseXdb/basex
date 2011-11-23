@@ -71,14 +71,14 @@ public abstract class ANode extends Item {
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.isUntyped() ? it.eq(ii, this) :
+    return !it.type.isUntyped() ? it.eq(ii, this) :
       Token.eq(string(), it.string(ii));
   }
 
   @Override
   public final int diff(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.isUntyped() ? -it.diff(ii, this) :
+    return !it.type.isUntyped() ? -it.diff(ii, this) :
       Token.diff(string(), it.string(ii));
   }
 
@@ -87,6 +87,13 @@ public abstract class ANode extends Item {
    * @return copy
    */
   public abstract ANode copy();
+
+  /**
+   * Returns a deep copy of the node.
+   * @param ctx query context
+   * @return node copy
+   */
+  public abstract ANode copy(final QueryContext ctx);
 
   /**
    * Returns the name of the node, composed of an optional prefix
@@ -120,7 +127,7 @@ public abstract class ANode extends Item {
   public abstract QNm update(final QNm nm);
 
   /**
-   * Returns a namespace array.
+   * Returns all namespaces defined for the nodes.
    * @return namespace array
    */
   public Atts ns() {
@@ -182,16 +189,6 @@ public abstract class ANode extends Item {
    */
   public byte[] baseURI() {
     return Token.EMPTY;
-  }
-
-  @Override
-  public boolean isNode() {
-    return true;
-  }
-
-  @Override
-  public boolean isUntyped() {
-    return true;
   }
 
   @Override

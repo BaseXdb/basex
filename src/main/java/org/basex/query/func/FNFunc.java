@@ -198,7 +198,7 @@ public final class FNFunc extends FuncCall {
     final FItem f = withArity(0, 2, ctx);
     final Value xs = expr[2].value(ctx);
     // evaluate start value lazily if it's passed straight through
-    if(xs.empty()) return expr[1].iter(ctx);
+    if(xs.isEmpty()) return expr[1].iter(ctx);
 
     Value res = expr[1].value(ctx);
     for(long i = xs.size(); --i >= 0;)
@@ -231,7 +231,7 @@ public final class FNFunc extends FuncCall {
   private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!f.isFunction() || ((FItem) f).arity() != a)
+    if(!f.type.isFunction() || ((FItem) f).arity() != a)
       Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;

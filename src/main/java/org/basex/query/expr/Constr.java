@@ -1,15 +1,19 @@
 package org.basex.query.expr;
 
+import static org.basex.query.util.Err.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.ANode;
+import org.basex.query.item.FAttr;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Type;
+import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.AxisIter;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -67,7 +71,10 @@ public final class Constr {
 
     if(it == null) return false;
 
-    if(!it.isNode()) {
+    final Type ip = it.type;
+    if(ip.isFunction()) CONSFUNC.thrw(ii, it);
+
+    if(!ip.isNode()) {
       // type: atomic value
       if(more) text.add(' ');
       text.add(it.string(ii));
@@ -77,10 +84,10 @@ public final class Constr {
       // type: nodes
       ANode node = (ANode) it;
 
-      if(it.type == NodeType.TXT) {
+      if(ip == NodeType.TXT) {
         // type: text node
         text.add(node.string());
-      } else if(it.type == NodeType.ATT) {
+      } else if(ip == NodeType.ATT) {
         // type: attribute node
 
         // no attribute allowed after texts or child nodes
@@ -98,8 +105,10 @@ public final class Constr {
           }
         }
         // add attribute
-        atts.add(node.copy());
-      } else if(it.type == NodeType.DOC) {
+        atts.add(new FAttr(node.qname(), node.string()));
+        //atts.add(node.copy());
+
+      } else if(ip == NodeType.DOC) {
         // type: document node
 
         final AxisIter ai = node.children();
@@ -114,10 +123,11 @@ public final class Constr {
         }
 
         node = node.copy();
+        //node = node.copy(ctx);
         children.add(node);
 
         // add namespaces from ancestor elements
-        if(it.type == NodeType.ELM) {
+        if(ip == NodeType.ELM) {
           final Atts ats = node.ns();
           node = node.parent();
           while(node != null && node.type == NodeType.ELM) {

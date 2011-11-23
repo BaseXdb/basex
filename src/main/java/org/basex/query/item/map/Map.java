@@ -22,6 +22,7 @@ import org.basex.query.item.MapType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
@@ -93,7 +94,7 @@ public final class Map extends FItem {
     if(it == Flt.NAN || it == Dbl.NAN) return null;
 
     // untyped items are converted to strings
-   return it.isUntyped() ? Str.get(it.string(ii)) : it;
+   return it.type.isUntyped() ? Str.get(it.string(ii)) : it;
   }
 
   /**
@@ -242,7 +243,8 @@ public final class Map extends FItem {
     final TokenObjMap<Object> tm = new TokenObjMap<Object>();
     final ValueIter vi = keys().iter();
     for(Item k; (k = vi.next()) != null;) {
-      if(!k.isString()) FUNCMP.thrw(ii, desc(), AtomType.STR, k.type);
+      final Type kt = k.type;
+      if(!kt.isString()) FUNCMP.thrw(ii, desc(), AtomType.STR, kt);
       tm.add(k.string(null), get(k, ii).toJava());
     }
     return tm;
@@ -261,11 +263,6 @@ public final class Map extends FItem {
   @Override
   public int hash(final InputInfo ii) throws QueryException {
     return root.hash(ii);
-  }
-
-  @Override
-  public boolean isMap() {
-    return true;
   }
 
   @Override

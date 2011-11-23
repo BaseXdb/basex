@@ -12,7 +12,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Int;
-import org.basex.query.item.ItrSeq;
+import org.basex.query.item.IntSeq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -56,7 +56,7 @@ public final class FNStr extends FuncCall {
         final int[] tmp = cps(checkEStr(expr[0], ctx));
         final long[] vals = new long[tmp.length];
         for(int i = 0; i < tmp.length; i++) vals[i] = tmp[i];
-        return ItrSeq.get(vals, AtomType.ITR);
+        return IntSeq.get(vals, AtomType.ITR);
       default:
         return super.value(ctx);
     }

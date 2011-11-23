@@ -52,8 +52,8 @@ public abstract class Preds extends ParseExpr {
       // position() = last() -> last()
       if(pr instanceof CmpG || pr instanceof CmpV) {
         final Cmp cmp = (Cmp) pr;
-        if(cmp.expr[0].isFun(Function.POSITION) &&
-           cmp.expr[1].isFun(Function.LAST)) {
+        if(cmp.expr[0].isFunction(Function.POSITION) &&
+           cmp.expr[1].isFunction(Function.LAST)) {
           if(cmp instanceof CmpG && ((CmpG) cmp).op == CmpG.Op.EQ ||
              cmp instanceof CmpV && ((CmpV) cmp).op == CmpV.Op.EQ) {
             ctx.compInfo(OPTWRITE, pr);
@@ -62,7 +62,7 @@ public abstract class Preds extends ParseExpr {
         }
       }
 
-      if(pr.value()) {
+      if(pr.isValue()) {
         if(!pr.ebv(ctx, input).bool(input)) {
           ctx.compInfo(OPTREMOVE, desc(), pr);
           return Empty.SEQ;
@@ -98,7 +98,7 @@ public abstract class Preds extends ParseExpr {
   protected boolean useIterator() {
     // numeric predicate
     pos = preds[0] instanceof Pos ? (Pos) preds[0] : null;
-    last = preds[0].isFun(Function.LAST);
+    last = preds[0].isFunction(Function.LAST);
 
     boolean np1 = true;
     boolean np2 = true;

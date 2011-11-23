@@ -40,7 +40,7 @@ public final class If extends Arr {
     checkUp(ctx, expr[1], expr[2]);
 
     // static condition: return branch in question
-    if(expr[0].value()) return optPre(eval(ctx).comp(ctx), ctx);
+    if(expr[0].isValue()) return optPre(eval(ctx).comp(ctx), ctx);
 
     // compile both branches
     for(int e = 1; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
@@ -49,7 +49,7 @@ public final class If extends Arr {
     if(expr[1].sameAs(expr[2])) return optPre(expr[1], ctx);
 
     // if not(A) then B else C -> if A then C else B
-    if(expr[0].isFun(Function.NOT)) {
+    if(expr[0].isFunction(Function.NOT)) {
       ctx.compInfo(OPTWRITE, this);
       expr[0] = ((FuncCall) expr[0]).expr[0];
       final Expr tmp = expr[1];
@@ -102,8 +102,8 @@ public final class If extends Arr {
   }
 
   @Override
-  public boolean vacuous() {
-    return expr[1].vacuous() || expr[2].vacuous();
+  public boolean isVacuous() {
+    return expr[1].isVacuous() || expr[2].isVacuous();
   }
 
   @Override

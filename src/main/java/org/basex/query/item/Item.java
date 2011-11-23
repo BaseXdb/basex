@@ -63,7 +63,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public final boolean item() {
+  public final boolean isItem() {
     return true;
   }
 
@@ -127,14 +127,16 @@ public abstract class Item extends Value {
 
   /**
    * Checks if the items can be compared.
-   * Items are comparable
-   * @param b second item
+   * @param it item to be compared
    * @return result of check
    */
-  public final boolean comparable(final Item b) {
-    return type == b.type || isNumber() && b.isNumber() ||
-        (isUntyped() || isString()) && (b.isString() || b.isUntyped()) ||
-        isDuration() && b.isDuration() || isFunction();
+  public final boolean comparable(final Item it) {
+    final Type t1 = type;
+    final Type t2 = it.type;
+    return t1 == t2 ||
+      t1.isNumber() && t2.isNumber() ||
+      (t1.isUntyped() || t1.isString()) && (t2.isUntyped() || t2.isString()) ||
+      t1.isDuration() && t2.isDuration();
   }
 
   /**
@@ -158,7 +160,7 @@ public abstract class Item extends Value {
       throws QueryException {
 
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it.isNumber() &&
+    return (this == Dbl.NAN || this == Flt.NAN) && it.type.isNumber() &&
         Double.isNaN(it.dbl(ii)) || comparable(it) && eq(ii, it);
   }
 

@@ -389,6 +389,8 @@ public final class ClientListener extends Thread {
    * @throws IOException I/O exception
    */
   private void watch() throws IOException {
+    server.initEvents();
+
     // initialize server-based event handling
     if(!events) {
       out.writeString(Integer.toString(context.mprop.num(MainProp.EVENTPORT)));

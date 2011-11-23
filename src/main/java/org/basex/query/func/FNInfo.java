@@ -106,7 +106,7 @@ public final class FNInfo extends FuncCall {
   }
 
   @Override
-  public boolean vacuous() {
+  public boolean isVacuous() {
     return def == Function.ERROR;
   }
 

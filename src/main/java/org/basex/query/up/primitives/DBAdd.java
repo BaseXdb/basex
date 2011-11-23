@@ -16,6 +16,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
+import org.basex.query.item.Type;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -105,7 +106,8 @@ public final class DBAdd extends InsertBase {
 
     // add slash to the target if the addressed file is an archive or directory
     IO io = null;
-    if(doc.isString()) {
+    final Type dt = doc.type;
+    if(dt.isString()) {
       io = IO.get(string(doc.string(input)));
       if(!io.exists()) RESFNF.thrw(input, pth);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
@@ -118,7 +120,7 @@ public final class DBAdd extends InsertBase {
       name = name.substring(s + 1);
     }
 
-    if(doc.isString()) {
+    if(dt.isString()) {
       // set name of document
       if(!name.isEmpty()) io.name(name);
       // get name from io reference
@@ -128,14 +130,14 @@ public final class DBAdd extends InsertBase {
     // ensure that the final name is not empty
     if(name.isEmpty()) RESINV.thrw(input, pth);
 
-    if(doc.isNode()) {
+    if(dt.isNode()) {
       // adding a document node
       final ANode nd = (ANode) doc;
       if(nd.type != NodeType.DOC) UPDOCTYPE.thrw(input, nd);
       mdata = new MemData(data);
       new DataBuilder(mdata).build(nd);
       mdata.update(0, Data.DOC, pth);
-    } else if(doc.isString()) {
+    } else if(dt.isString()) {
       final DirParser p = new DirParser(io, target, ctx.prop);
       final MemBuilder b = new MemBuilder(data.meta.name, p, ctx.prop);
       try {

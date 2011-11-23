@@ -96,11 +96,6 @@ public class Str extends Item {
   }
 
   @Override
-  public boolean isString() {
-    return true;
-  }
-
-  @Override
   public final String toString() {
     final ByteList tb = new ByteList();
     tb.add('"');

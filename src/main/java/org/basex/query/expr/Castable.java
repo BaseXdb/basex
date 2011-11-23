@@ -36,7 +36,7 @@ public final class Castable extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return checkUp(expr, ctx).value() ? preEval(ctx) : this;
+    return checkUp(expr, ctx).isValue() ? preEval(ctx) : this;
   }
 
   @Override

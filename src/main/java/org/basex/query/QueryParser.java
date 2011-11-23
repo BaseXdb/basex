@@ -605,7 +605,7 @@ public class QueryParser extends InputParser {
     declPres = true;
     ctx.nsPreserve = wsConsumeWs(PRESERVE);
     if(!ctx.nsPreserve) wsCheck(NOPRESERVE);
-    consume(',');
+    wsCheck(COMMA);
     ctx.nsInherit = wsConsumeWs(INHERIT);
     if(!ctx.nsInherit) wsCheck(NOINHERIT);
   }
@@ -949,7 +949,7 @@ public class QueryParser extends InputParser {
 
     ctx.funcs.add(func, this);
     if(!wsConsumeWs(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
   }
 
   /**
@@ -1064,7 +1064,7 @@ public class QueryParser extends InputParser {
       for(final ForLet f : fl) {
         vars: for(final Var v : f.vars()) {
           final Value old = ngp.get(v.name, null);
-          final int pos = old.item() ? (int) old.itemAt(0).itr(null) : -1;
+          final int pos = old.isItem() ? (int) old.itemAt(0).itr(null) : -1;
 
           // number of entries is expected to be tiny, so linear search is fast
           for(final Var g : grp) {
@@ -1118,7 +1118,7 @@ public class QueryParser extends InputParser {
       error(where == null ? FLWORWHERE : order == null ? FLWORORD : FLWORRET);
     }
     final Expr ret = check(single(), NORETURN);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return GFLWOR.get(fl, where, order, group, ret, input());
   }
 
@@ -1196,7 +1196,7 @@ public class QueryParser extends InputParser {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
-    if(e.empty()) return order;
+    if(e.isEmpty()) return order;
     final OrderBy ord = new OrderByExpr(input(), e, desc, least);
     return order == null ? new OrderBy[] { ord } : Array.add(order, ord);
   }
@@ -1250,7 +1250,7 @@ public class QueryParser extends InputParser {
 
     wsCheck(SATISFIES);
     final Expr e = check(single(), NOSOME);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return new Quantifier(input(), fl, e, !some);
   }
 
@@ -1312,7 +1312,7 @@ public class QueryParser extends InputParser {
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
       cases = Array.add(cases, new TypeCase(input(), v, ret));
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     } while(cs);
     if(cases.length == 1) error(NOTYPESWITCH);
     return new TypeSwitch(input(), ts, cases);
@@ -1984,7 +1984,7 @@ public class QueryParser extends InputParser {
 
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
       return new InlineFunc(input(), type, args, body);
     }
     qp = pos;
@@ -2747,9 +2747,12 @@ public class QueryParser extends InputParser {
       } while(wsConsumeWs(PIPE));
 
       final Catch c = new Catch(input(), codes, ctx);
-      final int s = c.prepare(ctx);
+      final int s = ctx.vars.size();
+      final int ns = ctx.ns.size();
+      c.prepare(ctx);
       c.expr = enclosed(NOENCLEXPR);
-      c.finish(s, ctx);
+      ctx.vars.size(s);
+      ctx.ns.size(ns);
 
       ct = Array.add(ct, c);
     } while(wsConsumeWs(CATCH));
@@ -3239,7 +3242,7 @@ public class QueryParser extends InputParser {
     wsCheck(RETURN);
     final Expr r = check(single(), INCOMPLETE);
 
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     ctx.updating = u;
     return new Transform(input(), fl, m, r);
   }

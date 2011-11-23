@@ -40,7 +40,7 @@ public class Filter extends Preds {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
     // return empty root
-    if(root.empty()) return optPre(null, ctx);
+    if(root.isEmpty()) return optPre(null, ctx);
     // convert filters without numeric predicates to axis paths
     if(root instanceof AxisPath && !super.uses(Use.POS))
       return ((AxisPath) root).copy().addPreds(preds).comp(ctx);
@@ -84,7 +84,7 @@ public class Filter extends Preds {
     // one single position() or last() function specified:
     if(preds.length == 1 && (last || pos != null)) {
       // return single value
-      if(root.value() && t.one() && (last || pos.min == 1 && pos.max == 1)) {
+      if(root.isValue() && t.one() && (last || pos.min == 1 && pos.max == 1)) {
         return optPre(root, ctx);
       }
     }

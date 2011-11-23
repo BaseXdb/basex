@@ -78,22 +78,21 @@ public final class FNQName extends FuncCall {
         nm = (QNm) checkType(it, AtomType.QNM);
         return !nm.ns() ? null : AtomType.NCN.e(Str.get(nm.pref()), ctx, input);
       case NAMESPACE_URI_FOR_PREFIX:
-        // [LK] Namespaces: find out if inherit flag has a persistent effect
         final byte[] pre = checkEStr(it);
         final ANode an = (ANode) checkType(it2, NodeType.ELM);
         final boolean copied = ctx.copiedNods != null &&
             ctx.copiedNods.contains(an.data());
-        final Atts at = an.nsScope(!copied || ctx.nsInherit);
+        final Atts at = an.nsScope(!copied);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val(i)) : null;
       case RESOLVE_URI:
         if(it == null) return null;
         final Uri rel = Uri.uri(checkEStr(it));
-        if(!rel.valid()) URIINV.thrw(input, it);
-        if(rel.absolute()) return rel;
+        if(!rel.isValid()) URIINV.thrw(input, it);
+        if(rel.isAbsolute()) return rel;
         final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkEStr(it2));
-        if(!base.valid()) URIINV.thrw(input, base);
-        if(!base.absolute()) URIABS.thrw(input, base);
+        if(!base.isValid()) URIINV.thrw(input, base);
+        if(!base.isAbsolute()) URIABS.thrw(input, base);
         return base.resolve(rel);
       default:
         return super.item(ctx, ii);
@@ -123,7 +122,7 @@ public final class FNQName extends FuncCall {
   }
 
   /**
-   * Returns the in-scope prefixes for the specified node.
+   * Returns the in-scope prefixes of the specified node.
    * @param ctx query context
    * @param node node
    * @return prefix sequence
@@ -135,32 +134,31 @@ public final class FNQName extends FuncCall {
     ANode n = node;
     do {
       final Atts at = n.ns();
-      if(at == null) break;
-      if(n != node || ctx.nsPreserve) {
-        for(int a = 0; a < at.size(); ++a) {
+      if(at != null) {
+        final int as = at.size();
+        for(int a = 0; a < as; ++a) {
           final byte[] pre = at.key(a);
           if(pre.length == 0) {
             if(emp == null) emp = at.val(a);
-          } else pref.add(pre);
+          } else {
+            pref.add(pre);
+          }
         }
       }
+
       if(emp == null) {
         final QNm nm = n.qname();
         if(!nm.ns()) emp = nm.uri().string();
       }
       n = n.parent();
-    } while(n != null && ctx.nsInherit);
+    } while(n != null);
 
+    // add prefix for default namespace
     if(emp == null) emp = ctx.nsElem;
     if(emp.length != 0) pref.add(EMPTY);
 
     final ItemCache ic = new ItemCache(pref.size());
     for(final byte[] t : pref.keys()) ic.add(Str.get(t));
     return ic;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.CTX && def == Function.IN_SCOPE_PREFIXES || super.uses(u);
   }
 }

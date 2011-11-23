@@ -36,7 +36,7 @@ public final class TailFuncCall extends UserFuncCall {
     // cache arguments, evaluate function and reset variable scope
     final int s = addArgs(ctx, args(ctx));
     final Item it = func.item(ctx, ii);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return it;
   }
 
@@ -47,7 +47,7 @@ public final class TailFuncCall extends UserFuncCall {
     // cache arguments, evaluate function and reset variable scope
     final int s = addArgs(ctx, args(ctx));
     final Value v = func.value(ctx);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return v;
   }
 

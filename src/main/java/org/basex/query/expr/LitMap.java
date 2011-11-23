@@ -38,7 +38,7 @@ public final class LitMap extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return values() ? preEval(ctx) : this;
+    return allAreValues() ? preEval(ctx) : this;
   }
 
   @Override

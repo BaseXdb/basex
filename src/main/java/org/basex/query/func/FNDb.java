@@ -39,6 +39,7 @@ import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Raw;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
@@ -589,7 +590,7 @@ public final class FNDb extends FuncCall {
   }
 
   @Override
-  public boolean vacuous() {
+  public boolean isVacuous() {
     return def == Function._DB_EVENT;
   }
 
@@ -627,13 +628,14 @@ public final class FNDb extends FuncCall {
       throws QueryException {
 
     final Item it = checkEmpty(expr[i].item(ctx, input));
-    if(it.isNode()) return checkDBNode(it).data;
-    if(it.isString())  {
+    final Type ip = it.type;
+    if(ip.isNode()) return checkDBNode(it).data;
+    if(ip.isString())  {
       final String name = string(it.string(input));
       if(!MetaData.validName(name, false)) INVDB.thrw(input, name);
       return ctx.resource.data(name, input);
     }
-    throw STRNODTYPE.thrw(input, this, it.type);
+    throw STRNODTYPE.thrw(input, this, ip);
   }
 
   /**

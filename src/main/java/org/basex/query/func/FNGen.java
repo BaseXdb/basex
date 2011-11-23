@@ -103,7 +103,7 @@ public final class FNGen extends FuncCall {
       public Item next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
-        if(it.isFunction()) FNATM.thrw(input, FNGen.this);
+        if(it.type.isFunction()) FNATM.thrw(input, FNGen.this);
         return atom(it);
       }
     };
@@ -154,7 +154,7 @@ public final class FNGen extends FuncCall {
       UPFOTYPE.thrw(input, expr[0]);
 
     final Uri u = Uri.uri(file);
-    if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
+    if(u == Uri.EMPTY || !u.isValid()) UPFOURI.thrw(input, file);
     final DBNode target = ctx.updates.determineDataRef(nd, ctx);
     ctx.updates.add(new Put(input, target.pre, target.data, u, ctx), ctx);
 
@@ -269,7 +269,7 @@ public final class FNGen extends FuncCall {
     Uri base = ctx.baseURI;
     if(expr.length == 2) {
       base = Uri.uri(checkEStr(expr[1], ctx));
-      if(!base.valid()) BASEINV.thrw(input, base);
+      if(!base.isValid()) BASEINV.thrw(input, base);
     }
 
     final IO io = new IOContent(cont, string(base.string()));

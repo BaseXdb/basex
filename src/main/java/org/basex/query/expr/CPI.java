@@ -10,6 +10,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -36,9 +37,11 @@ public final class CPI extends CFrag {
   @Override
   public FPI item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Item it = checkItem(expr[0], ctx);
-    if(!it.isUntyped() && !it.isString() && it.type != AtomType.QNM)
-      CPIWRONG.thrw(input, it.type, it);
+    final Type ip = it.type;
+    if(!ip.isUntyped() && !ip.isString() && ip != AtomType.QNM)
+      CPIWRONG.thrw(input, ip, it);
 
     final byte[] nm = trim(it.string(ii));
     if(eq(lc(nm), XML)) CPIXML.thrw(input, nm);

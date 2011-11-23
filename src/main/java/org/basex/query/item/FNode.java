@@ -1,6 +1,8 @@
 package org.basex.query.item;
 
 import java.util.Arrays;
+
+import org.basex.query.QueryContext;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
@@ -54,6 +56,11 @@ public abstract class FNode extends ANode {
   @Override
   public QNm update(final QNm nm) {
     return qname();
+  }
+
+  @Override
+  public ANode copy(final QueryContext ctx) {
+    return copy();
   }
 
   @Override

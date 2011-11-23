@@ -50,16 +50,6 @@ public final class Jav extends Item {
   }
 
   @Override
-  public boolean isString() {
-    return true;
-  }
-
-  @Override
-  public boolean isUntyped() {
-    return true;
-  }
-
-  @Override
   public String toString() {
     return Util.info("\"%\"", val);
   }

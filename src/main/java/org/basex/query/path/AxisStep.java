@@ -115,7 +115,7 @@ public class AxisStep extends Preds {
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Value v = checkCtx(ctx);
-    if(!v.isNode()) NODESPATH.thrw(input, AxisStep.this, v.type);
+    if(!v.type.isNode()) NODESPATH.thrw(input, AxisStep.this, v.type);
     final AxisIter ai = axis.iter((ANode) v);
 
     final NodeCache nc = new NodeCache();

@@ -25,6 +25,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
@@ -160,16 +161,17 @@ public final class FNXslt extends FuncCall {
    * @throws Exception exception
    */
   private IO read(final Expr e, final QueryContext ctx) throws Exception {
-    final Item in = checkEmpty(e.item(ctx, input));
-    if(in.isNode()) {
+    final Item it = checkEmpty(e.item(ctx, input));
+    final Type ip = it.type;
+    if(ip.isNode()) {
       final ArrayOutput ao = new ArrayOutput();
       final Serializer ser = Serializer.get(ao);
-      in.serialize(ser);
+      it.serialize(ser);
       ser.close();
       return new IOContent(ao.toArray());
     }
-    if(in.isString()) return IO.get(string(in.string(input)));
-    throw STRNODTYPE.thrw(input, this, in.type);
+    if(ip.isString()) return IO.get(string(it.string(input)));
+    throw STRNODTYPE.thrw(input, this, ip);
   }
 
   @Override

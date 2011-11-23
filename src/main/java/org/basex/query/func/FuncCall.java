@@ -19,6 +19,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
@@ -63,7 +64,7 @@ public abstract class FuncCall extends Arr {
     // compile all arguments
     super.comp(ctx);
     // skip context-based or non-deterministic functions, and non-values
-    if(uses(Use.CTX) || uses(Use.NDT) || !values())
+    if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues())
       return optPre(cmp(ctx), ctx);
     // pre-evaluate function
     return optPre(def.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
@@ -87,12 +88,13 @@ public abstract class FuncCall extends Arr {
    * @throws QueryException query exception
    */
   protected final Item atom(final Item it) throws QueryException {
-    return it.isNode() ? it.type == NodeType.PI || it.type == NodeType.COM ?
+    final Type ip = it.type;
+    return ip.isNode() ? ip == NodeType.PI || ip == NodeType.COM ?
         Str.get(it.string(input)) : new Atm(it.string(input)) : it;
   }
 
   @Override
-  public final boolean isFun(final Function f) {
+  public final boolean isFunction(final Function f) {
     return def == f;
   }
 

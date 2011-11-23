@@ -107,7 +107,7 @@ public abstract class Path extends ParseExpr {
     // as e.g. happens in //a(b|c)
     if(root == null) return v == null || v.type != NodeType.DOC ? v : null;
     // root is value: return root
-    if(root.value()) return (Value) root;
+    if(root.isValue()) return (Value) root;
     // no root reference, no context: return null
     if(!(root instanceof Root) || v == null) return null;
     // return context sequence or root of current context

@@ -563,7 +563,7 @@ public enum Err {
   /** XQDY0041: Evaluation exception. */
   CPIINVAL(XQDY, 41, "Invalid PI name: \"%\"."),
   /** XQDY0044: Evaluation exception. */
-  CAINS(XQDY, 44, "Invalid attribute namespace %{\"%\"}."),
+  CAINS(XQDY, 44, "Invalid attribute namespace \"%\":%."),
   /** XQDY0064: Evaluation exception. */
   CPIXML(XQDY, 64, "Illegal PI name: \"%\"."),
   /** XQDY0072: Evaluation exception. */
@@ -575,7 +575,7 @@ public enum Err {
   /** XQDY0095: resulting value for any grouping variable >> 1 item. */
   XGRP(XQDY, 95, "No sequence allowed as grouping variable."),
   /** XQDY0096: Invalid namespace in constructed element. */
-  CEINS(XQDY, 96, "Invalid element namespace: %{\"%\"}."),
+  CEINS(XQDY, 96, "Invalid element namespace: \"%\":%."),
 
   /** XQST0009: Parsing exception. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
@@ -678,6 +678,8 @@ public enum Err {
 
   /** XQTY0024: Parsing exception. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
+  /** XQTY0105: Parsing exception. */
+  CONSFUNC(XQTY, 105, "Invalid content: %."),
 
   /** FOFD1340: Parsing exception. */
   WRONGINT(FOFD, 1340, "Wrong integer format: \"%\"."),

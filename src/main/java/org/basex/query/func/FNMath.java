@@ -31,7 +31,7 @@ public final class FNMath extends FuncCall {
 
     double d = 0;
     if(expr.length > 0) {
-      if(expr[0].empty()) return null;
+      if(expr[0].isEmpty()) return null;
       d = checkDbl(expr[0], ctx);
     }
     final double e = expr.length > 1 ? checkDbl(expr[1], ctx) : 0;

@@ -64,7 +64,7 @@ public final class FNNode extends FuncCall {
         if(n.type != NodeType.ELM && n.type != NodeType.DOC &&
             n.parent() == null) return null;
         Uri base = Uri.EMPTY;
-        while(!base.absolute()) {
+        while(!base.isAbsolute()) {
           if(n == null) {
             base = ctx.baseURI.resolve(base);
             break;

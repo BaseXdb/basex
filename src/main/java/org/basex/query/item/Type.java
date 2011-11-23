@@ -72,6 +72,18 @@ public interface Type {
   boolean isString();
 
   /**
+   * Checks if the type refers to a duration.
+   * @return result of check
+   */
+  boolean isDuration();
+
+  /**
+   * Checks if the type refers to a date.
+   * @return result of check
+   */
+  boolean isDate();
+
+  /**
    * Checks if the type refers to a function item.
    * @return result of check
    */

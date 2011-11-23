@@ -36,7 +36,7 @@ public final class Range extends Arr {
     super.comp(ctx);
 
     Expr e = this;
-    if(oneEmpty()) {
+    if(oneIsEmpty()) {
       e = Empty.SEQ;
     } else {
       final long[] v = range(ctx);
@@ -71,7 +71,7 @@ public final class Range extends Arr {
    * @throws QueryException query exception
    */
   long[] range(final QueryContext ctx) throws QueryException {
-    return values() ? rng(ctx) : null;
+    return allAreValues() ? rng(ctx) : null;
   }
 
   /**

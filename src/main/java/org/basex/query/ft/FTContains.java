@@ -58,7 +58,7 @@ public class FTContains extends ParseExpr {
     expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
     lex = new FTLexer(new FTOpt());
     ftexpr = ftexpr.comp(ctx);
-    return expr.empty() ? optPre(Bln.FALSE, ctx) : this;
+    return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
   }
 
   @Override

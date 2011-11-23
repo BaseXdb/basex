@@ -185,7 +185,7 @@ public final class FNDate extends FuncCall {
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.isUntyped() ? t.e(it, ctx, input) : checkType(it, t);
+    return it.type.isUntyped() ? t.e(it, ctx, input) : checkType(it, t);
   }
 
   /**
@@ -196,8 +196,9 @@ public final class FNDate extends FuncCall {
    * @throws QueryException query exception
    */
   private Item checkDur(final Item it) throws QueryException {
-    if(it.isUntyped()) return new Dur(it.string(input), input);
-    if(!it.isDuration()) Err.type(this, AtomType.DUR, it);
+    final Type ip = it.type;
+    if(ip.isUntyped()) return new Dur(it.string(input), input);
+    if(!ip.isDuration()) Err.type(this, AtomType.DUR, it);
     return it;
   }
 
@@ -212,7 +213,7 @@ public final class FNDate extends FuncCall {
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.isUntyped() ? new Dat(it.string(input), input) :
+    final Item i = it.type.isUntyped() ? new Dat(it.string(input), input) :
       checkType(it, AtomType.DAT);
     return adjust((Date) i, zon, d);
   }
@@ -228,7 +229,7 @@ public final class FNDate extends FuncCall {
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.isUntyped() ? new Dtm(it.string(input), input) :
+    final Item i = it.type.isUntyped() ? new Dtm(it.string(input), input) :
       checkType(it, AtomType.DTM);
     return adjust((Date) i, zon, d);
   }
@@ -244,7 +245,7 @@ public final class FNDate extends FuncCall {
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.isUntyped() ? new Tim(it.string(input), input) :
+    final Item i = it.type.isUntyped() ? new Tim(it.string(input), input) :
       checkType(it, AtomType.TIM);
     return adjust((Date) i, zon, d);
   }
@@ -259,8 +260,10 @@ public final class FNDate extends FuncCall {
   private Item dattim(final Item date, final Item tm) throws QueryException {
     if(tm == null) return null;
 
-    final Item d = date.isUntyped() ? new Dat(date.string(input), input) : date;
-    final Item t = tm.isUntyped() ? new Tim(tm.string(input), input) : tm;
+    final Item d = date.type.isUntyped() ?
+        new Dat(date.string(input), input) : date;
+    final Item t = tm.type.isUntyped() ?
+        new Tim(tm.string(input), input) : tm;
 
     final Dtm dtm = new Dtm((Dat) checkType(d, AtomType.DAT));
     final Tim tim = (Tim) checkType(t, AtomType.TIM);

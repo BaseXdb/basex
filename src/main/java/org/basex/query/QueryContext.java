@@ -124,22 +124,22 @@ public final class QueryContext extends Progress {
   /** Decimal-format declarations. */
   public final TokenObjMap<DecFormatter> decFormats =
     new TokenObjMap<DecFormatter>();
-  /** URI of the Default function namespace. */
+  /** URI of the default function namespace. */
   public byte[] nsFunc = FNURI;
   /** URI of the default element namespace. */
   public byte[] nsElem = EMPTY;
-  /** Static Base URI. */
+  /** Static base URI. */
   public Uri baseURI = Uri.EMPTY;
   /** Default collation. */
   public Uri collation = Uri.uri(URLCOLL);
 
-  /** Default boundary-space. */
+  /** Default boundary space. */
   public boolean spaces;
-  /** Empty Order mode. */
+  /** Empty order mode. */
   public boolean orderGreatest;
-  /** Preserve Namespaces. */
+  /** Preserve namespaces. */
   public boolean nsPreserve = true;
-  /** Inherit Namespaces. */
+  /** Inherit namespaces. */
   public boolean nsInherit = true;
   /** Ordering mode. */
   public boolean ordered;

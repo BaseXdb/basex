@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import java.math.BigDecimal;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -8,8 +9,9 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
-import org.basex.query.item.Item;
 import org.basex.query.item.Int;
+import org.basex.query.item.Item;
+import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -36,7 +38,8 @@ public final class FNNum extends FuncCall {
     final Item it = expr[0].item(ctx, input);
     if(it == null) return null;
 
-    if(!it.isUntyped() && !it.isNumber()) Err.number(this, it);
+    final Type ip = it.type;
+    if(!ip.isUntyped() && !ip.isNumber()) Err.number(this, it);
     final double d = it.dbl(input);
     switch(def) {
       case ABS:                return abs(it, input);
@@ -77,8 +80,9 @@ public final class FNNum extends FuncCall {
     final double d = it.dbl(ii);
     final boolean s = d > 0d || 1 / d > 0;
 
-    if(it.type instanceof AtomType) {
-      switch((AtomType) it.type) {
+    final Type ip = it.type;
+    if(ip instanceof AtomType) {
+      switch((AtomType) ip) {
         case DBL: return s ? it : Dbl.get(Math.abs(it.dbl(ii)));
         case FLT: return s ? it : Flt.get(Math.abs((float) it.dbl(ii)));
         case DEC: return s ? it : Dec.get(it.dec(ii).abs());
@@ -86,7 +90,7 @@ public final class FNNum extends FuncCall {
         default:  break;
       }
     }
-    return it.type.instanceOf(AtomType.ITR) ?
+    return ip.instanceOf(AtomType.ITR) ?
         Int.get(Math.abs(it.itr(ii))) : Dec.get(it.dec(ii).abs());
   }
 
@@ -104,7 +108,7 @@ public final class FNNum extends FuncCall {
       final boolean h2e, final InputInfo ii) throws QueryException {
 
     // take care of untyped items
-    final Item num = it.isUntyped() ? Dbl.get(it.dbl(ii)) : it;
+    final Item num = it.type.isUntyped() ? Dbl.get(it.dbl(ii)) : it;
 
     if(num.type == AtomType.DEC && prec >= 0) {
       final BigDecimal bd = num.dec(ii);
@@ -144,11 +148,12 @@ public final class FNNum extends FuncCall {
    * @return numeric item
    */
   private static Item num(final Item it, final double n, final double d) {
-    final Item i = it.isUntyped() ? Dbl.get(n) : it;
+    final Type ip = it.type;
+    final Item i = ip.isUntyped() ? Dbl.get(n) : it;
     if(n == d) return i;
 
-    if(it.type instanceof AtomType) {
-      switch((AtomType) it.type) {
+    if(ip instanceof AtomType) {
+      switch((AtomType) ip) {
         case DEC: return Dec.get(d);
         case DBL: return Dbl.get(d);
         case FLT: return Flt.get((float) d);

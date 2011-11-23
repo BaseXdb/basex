@@ -44,7 +44,7 @@ public final class DynFuncCall extends Arr {
     }
 
     // maps can only contain fully evaluated Values, so this is safe
-    if(values() && expr[expr.length - 1] instanceof Map)
+    if(allAreValues() && expr[expr.length - 1] instanceof Map)
       return optPre(value(ctx), ctx);
 
     return this;
@@ -86,7 +86,7 @@ public final class DynFuncCall extends Arr {
    */
   private FItem getFun(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[expr.length - 1], ctx);
-    if(!it.isFunction() || ((FItem) it).arity() != expr.length - 1)
+    if(!it.type.isFunction() || ((FItem) it).arity() != expr.length - 1)
       Err.type(this, FuncType.arity(expr.length - 1), it);
     return (FItem) it;
   }
