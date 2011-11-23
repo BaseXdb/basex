@@ -13,6 +13,7 @@ import org.basex.query.item.Value;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import static org.basex.query.util.Err.*;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -37,14 +38,18 @@ public final class DynFuncCall extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    final Type t = expr[expr.length - 1].type().type;
+    final int ar = expr.length - 1;
+    final Expr f = expr[ar];
+    final Type t = f.type().type;
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
+      if(ft.args != null && ft.args.length != ar)
+        throw INVARITY.thrw(input, f, ar);
       if(ft.ret != null) type = ft.ret;
     }
 
     // maps can only contain fully evaluated Values, so this is safe
-    if(values() && expr[expr.length - 1] instanceof Map)
+    if(values() && f instanceof Map)
       return optPre(value(ctx), ctx);
 
     return this;
@@ -85,10 +90,12 @@ public final class DynFuncCall extends Arr {
    * @throws QueryException query exception
    */
   private FItem getFun(final QueryContext ctx) throws QueryException {
-    final Item it = checkItem(expr[expr.length - 1], ctx);
-    if(!it.func() || ((FItem) it).arity() != expr.length - 1)
-      Err.type(this, FuncType.arity(expr.length - 1), it);
-    return (FItem) it;
+    final int ar = expr.length - 1;
+    final Item it = checkItem(expr[ar], ctx);
+    if(!it.func()) throw Err.type(this, FuncType.arity(ar), it);
+    final FItem fit = (FItem) it;
+    if(fit.arity() != ar) throw INVARITY.thrw(input, fit, ar);
+    return fit;
   }
 
   @Override
