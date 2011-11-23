@@ -3,9 +3,11 @@ package org.basex.api.xqj;
 import static javax.xml.xquery.XQConstants.*;
 import static org.basex.api.xqj.BXQText.*;
 import static org.basex.util.Token.*;
+
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
+
 import org.basex.core.Context;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -57,6 +59,7 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public void declareNamespace(final String prefix, final String uri)
       throws XQException {
+
     try {
       BXQAbstract.valid(prefix, String.class);
       BXQAbstract.valid(uri, String.class);
