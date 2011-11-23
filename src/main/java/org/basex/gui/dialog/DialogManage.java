@@ -165,17 +165,14 @@ public final class DialogManage extends Dialog {
     boolean o = dbs.size() > 0;
     ok = o;
 
-    /*
-     * [LK] TODO
-     *
-     * - selected backup can't be dropped: cmd doesn't support it
-     * yet, only dbname as argument and then all backupds dropped
-     *  -> change CMD to allow dropping a specific backup
-     */
-
     if(cmp == open) {
-      if(dbs.size() == 1) cmds.add(new Open(dbs.get(0)));
+      if(dbs.size() == 1) {
+        cmds.add(new Open(dbs.get(0)));
+      }
       close();
+    } else if(cmp == choice) {
+      // [LK] open db on double click?
+      System.out.println("chice");
     } else if(cmp == drop) {
       if(!Dialog.confirm(gui, Util.info(DROPCONF, dbs.size()))) return;
       refresh = true;
@@ -199,22 +196,12 @@ public final class DialogManage extends Dialog {
         for(final String s : dbs) cmds.add(new Restore(s));
     } else if(cmp == backupchoice) {
       // no direct consequences if backup selection changes
-
-      /*
-       *
-       *
-       */
     } else if(cmp == delete) {
       if(dbs.size() == 1) {
         if(!Dialog.confirm(gui, DROPBACKUP)) return;
         refresh = true;
         cmds.add(new DropBackup((String) backupchoice.getSelectedItem()));
       }
-      /*
-      *
-      *
-      */
-
       // don't reset the combo box after selecting an item
     } else {
       // update components
@@ -261,6 +248,8 @@ public final class DialogManage extends Dialog {
 
   @Override
   public void close() {
-    if(ok || choice.getValue().isEmpty()) dispose();
+    if(ok || choice.getValue().isEmpty()) {
+      dispose();
+    }
   }
 }
