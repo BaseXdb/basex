@@ -92,6 +92,7 @@ public final class QT3TS {
 
     final Performance perf = new Performance();
     new Set(Prop.CHOP, false).execute(ctx);
+    new Set(Prop.INTPARSE, false).execute(ctx);
 
     final XQuery qdoc = new XQuery("doc(' " + path + "/" + CATALOG + "')", ctx);
     final XQValue doc = qdoc.value();
