@@ -46,6 +46,7 @@ import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
+import org.basex.core.cmd.ShowBackups;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
@@ -96,6 +97,8 @@ public class CommandTest {
    * @throws IOException I/O exception
    */
   protected static void cleanUp() throws IOException {
+    session.execute(new DropBackup(NAME));
+    session.execute(new DropBackup(NAME2));
     session.execute(new DropDB(NAME));
     session.execute(new DropDB(NAME2));
     session.execute(new DropUser(NAME));
@@ -488,7 +491,42 @@ public class CommandTest {
     no(new Restore("test"));
     ok(new DropBackup("test-1"));
     ok(new DropDB("test-1"));
-    ok(new Close());
+    // deleting a backup passing the exact backup name as argument
+    ok(new CreateDB(NAME));
+    ok(new CreateBackup(NAME));
+    ok(new DropBackup(ShowBackups.findBackups(NAME, CONTEXT).get(0)));
+    assertEquals(0, ShowBackups.findBackups(NAME, CONTEXT).size());
+  }
+
+  /**
+   * Dropping backups.
+   */
+  @Test
+  public final void dropBackup() {
+    // dropping a backup with db name as argument
+    ok(new CreateDB(NAME));
+    ok(new CreateBackup(NAME));
+    ok(new DropBackup(NAME));
+
+    // dropping a specific backup (database name + time stamp)
+    // how to get my hands on the created backup name?
+    ok(new CreateDB(NAME));
+    ok(new CreateBackup(NAME));
+    final String[] b = ShowBackups.findBackups(NAME, CONTEXT).toArray();
+    ok(new DropBackup(b[0]));
+    assertEquals(0, ShowBackups.findBackups(NAME, CONTEXT).size());
+
+    /* Creates 2 dbs: one with a short name (1), the other with a
+     * longer name (2). (1) is a prefix of (2). Tests then, whether
+     * backups of both dbs are deleted, when we drop backups of (1).
+     */
+    System.out.println("now");
+    ok(new CreateDB(NAME));
+    ok(new CreateDB(NAME2));
+    ok(new CreateBackup(NAME));
+    ok(new CreateBackup(NAME2));
+    ok(new DropBackup(NAME));
+    assertEquals(1, ShowBackups.findBackups(NAME2, CONTEXT).size());
   }
 
   /** Retrieves raw data. */
