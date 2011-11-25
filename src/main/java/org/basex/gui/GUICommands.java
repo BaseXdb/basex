@@ -82,7 +82,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to manage databases. */
-  MANAGE(GUIMANAGE + DOTS, "% M", GUIMANAGETT, false, false) {
+  MANAGE(GUIMANAGE + DOTS, "% O", GUIMANAGETT, false, false) {
     @Override
     public void execute(final GUI gui) {
       if(new DialogManage(gui, true).nodb()) Dialog.warn(gui, INFONODB);
