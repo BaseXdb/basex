@@ -195,6 +195,7 @@ public final class DialogManage extends Dialog {
       else
         for(final String s : dbs) cmds.add(new Restore(s));
     } else if(cmp == backupchoice) {
+      // don't reset the combo box after selecting an item
       // no direct consequences if backup selection changes
     } else if(cmp == delete) {
       if(dbs.size() == 1) {
@@ -202,7 +203,6 @@ public final class DialogManage extends Dialog {
         refresh = true;
         cmds.add(new DropBackup((String) backupchoice.getSelectedItem()));
       }
-      // don't reset the combo box after selecting an item
     } else {
       // update components
       o = ctx.mprop.dbexists(db);
@@ -217,6 +217,7 @@ public final class DialogManage extends Dialog {
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
         } finally {
+          // [LK] exception?
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
       }
@@ -248,8 +249,16 @@ public final class DialogManage extends Dialog {
 
   @Override
   public void close() {
-    if(ok || choice.getValue().isEmpty()) {
+//    if(ok || choice.getValue().isEmpty()) {
+//      dispose();
+//    }
+
+    final String db = choice.getValue();
+    if(gui.context.mprop.dbexists(db)) {
+      DialogProgress.execute(this, "", new Open(db));
       dispose();
+    } else {
+     Dialog.info(gui, "Please restore the datbase first.");
     }
   }
 }
