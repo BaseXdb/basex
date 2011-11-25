@@ -200,7 +200,6 @@ public final class DialogManage extends Dialog {
     } else if(cmp == delete) {
       if(dbs.size() == 1) {
         if(!Dialog.confirm(gui, DROPBACKUP)) return;
-        refresh = true;
         cmds.add(new DropBackup((String) backupchoice.getSelectedItem()));
       }
     } else {
@@ -217,7 +216,6 @@ public final class DialogManage extends Dialog {
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
         } finally {
-          // [LK] exception?
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
       }
