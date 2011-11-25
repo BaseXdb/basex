@@ -249,16 +249,12 @@ public final class DialogManage extends Dialog {
 
   @Override
   public void close() {
-//    if(ok || choice.getValue().isEmpty()) {
-//      dispose();
-//    }
-
     final String db = choice.getValue();
     if(gui.context.mprop.dbexists(db)) {
       DialogProgress.execute(this, "", new Open(db));
       dispose();
     } else {
-     Dialog.info(gui, "Please restore the datbase first.");
+     Dialog.info(gui, RESTOREFIRST);
     }
   }
 }
