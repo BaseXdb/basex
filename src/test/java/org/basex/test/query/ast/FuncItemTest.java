@@ -61,4 +61,12 @@ public final class FuncItemTest extends QueryPlanTest {
         "  $f instance of element(FuncItem)"
     );
   }
+
+  /** Checks if {@code fold-left1(...)} can be used. */
+  @Test
+  public void foldLeft1Test() {
+    check("hof:fold-left1(function($a, $b) { max(($a, $b)) }, 1 to 42)",
+        "42"
+    );
+  }
 }
