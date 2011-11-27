@@ -2780,7 +2780,7 @@ public class QueryParser extends InputParser {
               if(!wsConsume(PAR2)) error(FUNCMISS, name.string());
             }
             wsCheck(AS);
-            t = FuncType.get(args, sequenceType());
+            t = FuncType.get(sequenceType(), args);
           }
         } else if(!wsConsume(PAR2)) {
           error(FUNCMISS, name.string());

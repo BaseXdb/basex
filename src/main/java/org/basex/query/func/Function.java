@@ -158,7 +158,7 @@ public enum Function {
 
   /** XQuery function. */
   FILTER(FNFunc.class, "filter(function,seq)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM }, BLN).seq(), ITEM_ZM),
+      FuncType.get(BLN, ITEM).seq(), ITEM_ZM),
   /** XQuery function. */
   FUNCTION_NAME(FNFunc.class, "function-name(function)", QNM_ZO,
       FuncType.ANY_FUN.seq()),
@@ -167,22 +167,20 @@ public enum Function {
       FuncType.ANY_FUN.seq()),
   /** XQuery function. */
   MAP(FNFunc.class, "map(function,seq)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM }, ITEM_ZM).seq(), ITEM_ZM),
+      FuncType.get(ITEM_ZM, ITEM).seq(), ITEM_ZM),
   /** XQuery function. */
   MAP_PAIRS(FNFunc.class, "map-pairs(function,seq1,seq2)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM, ITEM }, ITEM_ZM).seq(),
+      FuncType.get(ITEM_ZM, ITEM, ITEM).seq(),
       ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FOLD_LEFT(FNFunc.class, "fold-left(function,zero,seq)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(),
-      ITEM_ZM, ITEM_ZM),
+      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   FOLD_RIGHT(FNFunc.class, "fold-right(function,zero,seq)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM, ITEM_ZM }, ITEM_ZM).seq(),
-      ITEM_ZM, ITEM_ZM),
+      FuncType.get(ITEM_ZM, ITEM, ITEM_ZM).seq(), ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
-  PARTIAL_APPLY(FNFunc.class, "partial-apply(function,arg[,pos])",
-      FUN_O, 2, FUN_O, ITEM_ZM, ITR),
+  PARTIAL_APPLY(FNFunc.class, "partial-apply(function,arg[,pos])", FUN_O, 2,
+      FUN_O, ITEM_ZM, ITR),
 
   /* FNGen functions. */
 
@@ -618,18 +616,18 @@ public enum Function {
 
   /** XQuery function. */
   _HOF_SORT_WITH(FNHof.class, "sort-with(lt-fun,seq)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM, ITEM }, BLN).seq(), ITEM_ZM),
+      FuncType.get(BLN, ITEM, ITEM).seq(), ITEM_ZM),
   /** XQuery function. */
   _HOF_ID(FNHof.class, "id(expr)", ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   _HOF_CONST(FNHof.class, "const(return,ignore)", ITEM_ZM, ITEM_ZM, ITEM_ZM),
   /** XQuery function. */
   _HOF_UNTIL(FNHof.class, "until(pred,func,start)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM_ZM }, BLN).seq(),
-      FuncType.get(new SeqType[] { ITEM_ZM }, ITEM_ZM).seq(), ITEM_ZM),
+      FuncType.get(BLN, ITEM_ZM).seq(),
+      FuncType.get(ITEM_ZM, ITEM_ZM).seq(), ITEM_ZM),
   /** XQuery function. */
   _HOF_FOLD_LEFT1(FNHof.class, "fold-left1(function,non-empty-seq)", ITEM_ZM,
-      FuncType.get(new SeqType[] { ITEM_ZM, ITEM }, ITEM_ZM).seq(), ITEM_OM),
+      FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seq(), ITEM_OM),
   /** XQuery Function. */
   _HOF_ITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM,
       FuncType.arity(1).seq(), ITEM_ZM),
@@ -842,7 +840,7 @@ public enum Function {
     } else {
       System.arraycopy(args, 0, arg, 0, arity);
     }
-    return FuncType.get(arg, ret);
+    return FuncType.get(ret, arg);
   }
 
   /**
