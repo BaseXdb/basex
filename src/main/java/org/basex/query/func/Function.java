@@ -160,11 +160,11 @@ public enum Function {
   FILTER(FNFunc.class, "filter(function,seq)", ITEM_ZM,
       FuncType.get(BLN, ITEM).seq(), ITEM_ZM),
   /** XQuery function. */
-  FUNCTION_NAME(FNFunc.class, "function-name(function)", QNM_ZO,
-      FuncType.ANY_FUN.seq()),
+  FUNCTION_NAME(FNFunc.class, "function-name(function)", QNM_ZO, FUN_O),
   /** XQuery function. */
-  FUNCTION_ARITY(FNFunc.class, "function-arity(function)", ITR,
-      FuncType.ANY_FUN.seq()),
+  FUNCTION_ARITY(FNFunc.class, "function-arity(function)", ITR, FUN_O),
+  /** XQuery function. */
+  FUNCTION_LOOKUP(FNFunc.class, "function-lookup(name,arity)", FUN_O, QNM, ITR),
   /** XQuery function. */
   MAP(FNFunc.class, "map(function,seq)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM).seq(), ITEM_ZM),

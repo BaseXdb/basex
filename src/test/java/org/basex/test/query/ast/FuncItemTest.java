@@ -69,4 +69,14 @@ public final class FuncItemTest extends QueryPlanTest {
         "42"
     );
   }
+
+  /** Checks if statically unused functions are compiled at runtime. */
+  @Test
+  public void compStatUnusedTest() {
+    check("declare function local:foo() { abs(?) };" +
+        "function-lookup(xs:QName('local:foo'), 0)()(-42)",
+        "42",
+        "exists(//PartFunApp)"
+    );
+  }
 }
