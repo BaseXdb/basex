@@ -173,7 +173,7 @@ public final class GUIMacOSX {
      * Finder or another application.
      */
     public void handleReOpenApplication() {
-      main.setVisible(true);
+      if(main != null) main.setVisible(true);
     }
   }
 
