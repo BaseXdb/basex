@@ -167,21 +167,45 @@ public final class InsertBuilder extends Builder {
     }
     data.ns.setNearestRoot(cn, ipar);   
     
-    // add document node and parse document
-    parser.parse(this);
-    
-    //We should have closed all the tags we opened
-    if(preStack.size() != 0) error(DOCOPEN, parser.detail(), preStack.peek().tag); 
+    try
+    {
+      // add document node and parse document
+      parser.parse(this);
       
-    // Reset the root namespace
-    data.ns.setRoot(t);
-
-    // Insert any remaining buffer
-    if(data.bp != 0) data.insert(ipre + dpre - 1 - (dpre - 1) % buf);
+      //We should have closed all the tags we opened
+      if(preStack.size() != 0) error(DOCOPEN, parser.detail(), preStack.peek().tag); 
+      
+      // Insert any remaining buffer
+      if(data.bp != 0) data.insert(ipre + dpre - 1 - (dpre - 1) % buf);
+    }
+    catch(Exception e)
+    {
+      //If something went wrong, rollback any inserted buffers and rethrow
+      data.delete(ipre, dpre - (dpre % buf));    
+      data.bp = 0;
+      
+      //TODO: This appears to work except...
+      //Text indexed during the invalid operation will remain in the index
+      //Other indexes such as the tag, namespace, and attribute indexes will not be reset and will contain indexed values from the invalid operation
+      //Unique identifiers generated during the invalid operation will not be reused by the next valid operation
+      
+      if(e instanceof IOException)
+        throw (IOException)e;
+      if(e instanceof RuntimeException)
+        throw (RuntimeException)e;
+    }
+    finally
+    {
+      // reset buffer to old size
+      data.buffer(1);
+      
+      // Reset the root namespace
+      data.ns.setRoot(t);      
+    }      
     
-    // reset buffer to old size
-    data.buffer(1);
-    
+    //Increase document count
+    data.meta.ndocs += docPres.size();
+        
     // Now that all the buffers have been flushed, set sizes for inserted nodes
     while(sizeStack.size() != 0)
     {
@@ -256,7 +280,6 @@ public final class InsertBuilder extends Builder {
 
     // Add document
     data.doc(pre, 0, value);
-    data.meta.ndocs++;
     data.ns.open();
     preStack.push(new PreStackItem(dpre, value));
     dpre++;

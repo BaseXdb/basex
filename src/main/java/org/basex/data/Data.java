@@ -946,6 +946,15 @@ public abstract class Data {
   }
 
   /**
+   * Deletes the specified number of entries from the database.
+   * @param pre pre value of the first node to delete
+   * @param nr number of entries to be deleted
+   */
+  public final void delete(final int pre, final int nr) {
+    table.delete(pre, nr);
+  }
+
+  /**
    * Deletes the specified text entry.
    * @param pre pre value
    * @param text text (text, comment or pi) or attribute flag

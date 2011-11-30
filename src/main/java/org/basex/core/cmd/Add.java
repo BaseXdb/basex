@@ -146,13 +146,13 @@ public final class Add extends ACreate {
       build = new InsertBuilder(data.meta.size, -1, data, parser);
       try {
         build.build();
-        context.update();
-        data.flush();
         return info(parser.info() + PATHADDED, name, perf);
       } catch(final IOException ex) {
         Util.debug(ex);
         return error(Util.message(ex));
       } finally {
+        context.update();
+        data.flush();
         try { build.close(); } catch(final IOException e) { }
       }
     }
