@@ -149,9 +149,7 @@ public final class BaseXHTTP {
     final HandlerList hl = new HandlerList();
     hl.addHandler(rh);
     hl.addHandler(jctx);
-    //hl.addHandler(new DefaultHandler());
     jetty.setHandler(hl);
-
     jetty.start();
     new StopServer(sport, shost).start();
 
@@ -352,7 +350,7 @@ public final class BaseXHTTP {
           ss.accept().close();
           if(stop.exists()) {
             stop.delete();
-            if(jetty != null) jetty.stop();
+            jetty.stop();
             ss.close();
             break;
           }
