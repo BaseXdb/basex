@@ -218,13 +218,13 @@ final class BXQStaticContext implements XQStaticContext {
   public void setDefaultElementTypeNamespace(final String uri)
       throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsElem = uri.length() == 0 ? token(uri) : null;
+    ctx.nsElem = uri.length() != 0 ? token(uri) : null;
   }
 
   @Override
   public void setDefaultFunctionNamespace(final String uri) throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsFunc = uri.length() == 0 ? token(uri) : null;
+    ctx.nsFunc = uri.length() != 0 ? token(uri) : null;
   }
 
   @Override
