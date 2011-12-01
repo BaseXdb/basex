@@ -281,7 +281,7 @@ public final class BaseXServer extends Main implements Runnable {
   // STATIC METHODS ===========================================================
 
   /**
-   * Starts the specified class in a separate process.
+   * Starts the database server in a separate process.
    * @param port server port
    * @param args command-line arguments
    * @throws BaseXException database exception
