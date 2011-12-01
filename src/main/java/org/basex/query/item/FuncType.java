@@ -109,11 +109,11 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types.
-   * @param args argument types
    * @param ret return type
+   * @param args argument types
    * @return function type
    */
-  public static FuncType get(final SeqType[] args, final SeqType ret) {
+  public static FuncType get(final SeqType ret, final SeqType... args) {
     if(args == null || ret == null) return ANY_FUN;
     return new FuncType(args, ret);
   }
@@ -126,7 +126,7 @@ public class FuncType implements Type {
   public static FuncType arity(final int a) {
     final SeqType[] args = new SeqType[a];
     Arrays.fill(args, SeqType.ITEM_ZM);
-    return get(args, SeqType.ITEM_ZM);
+    return get(SeqType.ITEM_ZM, args);
   }
 
   /**

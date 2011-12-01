@@ -82,6 +82,14 @@ public abstract class UserFuncCall extends Arr {
     func = f;
   }
 
+  /**
+   * Getter for the called function.
+   * @return user-defined function
+   */
+  public final UserFunc func() {
+    return func;
+  }
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     // compile all arguments
