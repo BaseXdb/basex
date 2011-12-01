@@ -146,8 +146,7 @@ final class BXQItemType implements XQItemType {
     if(type == AtomType.ITEM) throw new BXQException(TYPE);
 
     final Type t = base != -1 ? BASE[base] : type;
-    return new QName(Token.string(QueryText.XSURI),
-        Token.string(t.string()));
+    return new QName(Token.string(QueryText.XSURI), Token.string(t.string()));
   }
 
   @Override

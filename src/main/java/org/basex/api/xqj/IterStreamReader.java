@@ -24,7 +24,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
-import org.basex.query.util.NSLocal;
+import org.basex.query.util.NSContext;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.IntList;
 import org.basex.util.list.ObjList;
@@ -39,7 +39,7 @@ final class IterStreamReader implements XMLStreamReader {
   /** Properties. */
   private static final Properties PROPS = new Properties();
   /** Namespaces references. */
-  private final NSLocal ns = new NSLocal();
+  private final NSContext ns = new NSContext();
   /** Result iterator. */
   private final Iter result;
   /** Next flag. */
@@ -75,7 +75,7 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public String getAttributeLocalName(final int i) {
-    return string(attributes().get(i).nname());
+    return string(attributes().get(i).name());
   }
 
   @Override
@@ -85,12 +85,12 @@ final class IterStreamReader implements XMLStreamReader {
 
   @Override
   public String getAttributeNamespace(final int i) {
-    return string(attributes().get(i).qname().uri().string());
+    return string(attributes().get(i).qname().uri());
   }
 
   @Override
   public String getAttributePrefix(final int i) {
-    return string(attributes().get(i).qname().pref());
+    return string(attributes().get(i).qname().prefix());
   }
 
   @Override
@@ -129,7 +129,7 @@ final class IterStreamReader implements XMLStreamReader {
       checkType(START_ELEMENT, ATTRIBUTE);
       atts = new NodeCache();
       final AxisIter ai = node.attributes();
-      for(ANode n; (n = ai.next()) != null;) atts.add(n);
+      for(ANode n; (n = ai.next()) != null;) atts.add(n.finish());
     }
     return atts;
   }
@@ -173,7 +173,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getLocalName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return string(node.nname());
+    return string(node.name());
   }
 
   @Override
@@ -213,7 +213,7 @@ final class IterStreamReader implements XMLStreamReader {
   public String getNamespaceURI(final String s) {
     if(s == null) throw new IllegalArgumentException();
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
-    final byte[] uri = ns.localURI(token(s));
+    final byte[] uri = ns.staticURI(token(s));
     return uri == null ? null : string(uri);
   }
 
@@ -243,7 +243,7 @@ final class IterStreamReader implements XMLStreamReader {
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
     final QNm qn = node.qname();
-    return !qn.ns() ? null : string(qn.pref());
+    return !qn.hasPrefix() ? null : string(qn.prefix());
   }
 
   @Override

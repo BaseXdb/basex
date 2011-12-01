@@ -265,8 +265,10 @@ abstract class BXQDynamicContext extends BXQAbstract
       if(sc.scrollable) iter = iter.value().cache();
       return new BXQSequence(iter, this, (BXQConnection) par);
     } catch(final QueryException ex) {
-      throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
-          ex.line(), ex.col(), -1);
+      final QNm qnm = ex.qname();
+      throw new XQQueryException(ex.getMessage(),
+        new QName(Token.string(qnm.uri()), Token.string(qnm.local())),
+        ex.line(), ex.col(), -1);
     } catch(final ProgressException ex) {
       throw new XQCancelledException(TIMEOUT, null, null, -1, -1, -1,
           null, null, null);

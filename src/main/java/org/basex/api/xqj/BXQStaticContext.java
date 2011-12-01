@@ -9,6 +9,7 @@ import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
 
 import org.basex.core.Context;
+import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Uri;
@@ -71,7 +72,8 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getBaseURI() {
-    return string(ctx.baseURI.string());
+    final IO io = ctx.baseIO();
+    return io != null ? io.url() : "";
   }
 
   @Override
@@ -113,12 +115,12 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getDefaultElementTypeNamespace() {
-    return string(ctx.nsElem);
+    return ctx.nsElem == null ? "" : string(ctx.nsElem);
   }
 
   @Override
   public String getDefaultFunctionNamespace() {
-    return string(ctx.nsFunc);
+    return ctx.nsFunc == null ? "" : string(ctx.nsFunc);
   }
 
   @Override
@@ -144,7 +146,7 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public String getNamespaceURI(final String prefix) throws XQException {
     BXQAbstract.valid(prefix, String.class);
-    final byte[] uri = ctx.ns.localURI(token(prefix));
+    final byte[] uri = ctx.ns.staticURI(token(prefix));
     if(uri != null) return string(uri);
     throw new BXQException(PRE, prefix);
   }
@@ -172,7 +174,7 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public void setBaseURI(final String baseUri) throws XQException {
     BXQAbstract.valid(baseUri, String.class);
-    ctx.base(baseUri);
+    ctx.baseURI(baseUri);
   }
 
   @Override
@@ -216,13 +218,13 @@ final class BXQStaticContext implements XQStaticContext {
   public void setDefaultElementTypeNamespace(final String uri)
       throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsElem = token(uri);
+    ctx.nsElem = uri.length() == 0 ? token(uri) : null;
   }
 
   @Override
   public void setDefaultFunctionNamespace(final String uri) throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsFunc = token(uri);
+    ctx.nsFunc = uri.length() == 0 ? token(uri) : null;
   }
 
   @Override

@@ -34,7 +34,6 @@ import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.func.FNSimple;
 import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.B64;
@@ -49,6 +48,7 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.util.Compare;
 import org.basex.query.util.Err;
 import org.basex.query.util.http.HTTPClient;
 import org.basex.query.util.http.Request;
@@ -784,7 +784,7 @@ public class HTTPClientTest {
         + "message  goes  here\n...\n"));
 
     // Compare response with expected result
-    assertTrue(FNSimple.deep(null, resultIter, i));
+    assertTrue(Compare.deep(resultIter, i, null));
   }
 
   /**
@@ -872,7 +872,7 @@ public class HTTPClientTest {
         + "It DOES end with a linebreak.\n\n"));
 
     // Compare response with expected result
-    assertTrue(FNSimple.deep(null, resultIter, i));
+    assertTrue(Compare.deep(resultIter, i, null));
   }
 
   /**
@@ -893,7 +893,7 @@ public class HTTPClientTest {
     assertNotNull(response.attributes());
     final NodeIter resAttr = response.attributes();
     for(ANode attr; (attr = resAttr.next()) != null;) {
-      if(eq(attr.nname(), STATUS) && !eq(attr.string(), token(expStatus))) {
+      if(eq(attr.name(), STATUS) && !eq(attr.string(), token(expStatus))) {
         fail("Expected: " + expStatus + "\nFound: " + string(attr.string()));
       }
     }

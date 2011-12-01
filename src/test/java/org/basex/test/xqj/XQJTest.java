@@ -567,4 +567,19 @@ public final class XQJTest extends TestCase {
       fail(Util.message(ex));
     }
   }
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void testStatic() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQStaticContext xqs = conn.getStaticContext();
+    xqs.declareNamespace("p", "u");
+    conn.setStaticContext(xqs);
+    final XQPreparedExpression xqps = conn.prepareExpression("<p:e/>");
+    xqps.executeQuery();
+    xqps.close();
+  }
 }

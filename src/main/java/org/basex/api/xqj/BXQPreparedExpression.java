@@ -14,6 +14,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarList;
 import org.basex.util.Array;
+import org.basex.util.Token;
 
 /**
  * Java XQuery API - Prepared Expression.
@@ -38,8 +39,10 @@ final class BXQPreparedExpression extends BXQDynamicContext
     try {
       qp.parse();
     } catch(final QueryException ex) {
-      throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
-          ex.line(), ex.col(), -1);
+      final QNm qnm = ex.qname();
+      throw new XQQueryException(ex.getMessage(),
+        new QName(Token.string(qnm.uri()), Token.string(qnm.local())),
+        ex.line(), ex.col(), -1);
     }
   }
 

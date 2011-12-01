@@ -120,7 +120,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
       return ip.isNode() && ip != NodeType.TXT ? serialize() :
         Token.string(it.string(null));
     } catch(final QueryException e) {
-      throw new XQException(e.getMessage(), e.code());
+      throw new XQException(e.getMessage(), Token.string(e.qname().string()));
     }
   }
 
