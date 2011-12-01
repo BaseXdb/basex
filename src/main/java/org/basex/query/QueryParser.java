@@ -3604,13 +3604,13 @@ public class QueryParser extends InputParser {
    * @throws QueryException if the variable isn't defined
    */
   private Var checkVar(final QNm name, final Err err) throws QueryException {
-    // initialize statically known variables
-    if(!declVars) {
+    Var v = ctx.vars.get(name);
+    // dynamically assign variables from function modules
+    if(v == null && !declVars) {
       declVars = true;
       Variable.init(ctx);
+      v = ctx.vars.get(name);
     }
-
-    final Var v = ctx.vars.get(name);
     if(v == null) error(err, '$' + string(name.string()));
     return v;
   }
