@@ -42,8 +42,6 @@ public final class BaseXHTTP {
   /** Activate REST. */
   private boolean rest = true;
 
-  /** Database server. */
-  private BaseXServer server;
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
@@ -106,6 +104,7 @@ public final class BaseXHTTP {
       stop(sport);
       Util.outln(HTTP + ' ' + SERVERSTOPPED);
       if(start) {
+        // server has been started as separate process and need to be stopped
         BaseXServer.stop(port, eport);
         Util.outln(SERVERSTOPPED);
       }
@@ -123,7 +122,8 @@ public final class BaseXHTTP {
 
     if(start) {
       // default mode: start database server
-      server = quiet ? new BaseXServer(ctx, "-z") : new BaseXServer(ctx);
+      if(quiet) new BaseXServer(ctx, "-z");
+      else new BaseXServer(ctx);
       Util.outln(HTTP + ' ' + SERVERSTART);
     } else {
       // local or client mode
@@ -170,9 +170,8 @@ public final class BaseXHTTP {
    * Stops the server.
    * @throws Exception exception
    */
-  public void stop() throws Exception {
+  private void stop() throws Exception {
     if(jetty != null) jetty.stop();
-    if(server != null) server.quit();
   }
 
   /**
@@ -343,16 +342,18 @@ public final class BaseXHTTP {
       setDaemon(true);
     }
 
+    @SuppressWarnings("synthetic-access")
     @Override
     public void run() {
       try {
         while(true) {
           ss.accept().close();
-          if(!stop.exists()) continue;
-          stop.delete();
-          BaseXHTTP.this.stop();
-          ss.close();
-          break;
+          if(stop.exists()) {
+            stop.delete();
+            BaseXHTTP.this.stop();
+            ss.close();
+            break;
+          }
         }
       } catch(final Exception ex) {
         Util.errln(ex);
