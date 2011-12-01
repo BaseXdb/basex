@@ -37,17 +37,21 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
  * @author Christian Gruen
  */
 public final class BaseXHTTP {
+  /** Database context. */
+  final Context ctx = HTTPSession.context();
   /** Activate WebDAV. */
   private boolean webdav = true;
   /** Activate REST. */
   private boolean rest = true;
+  /** Start database server. */
+  private boolean server;
 
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
   private boolean stopped;
   /** HTTP server. */
-  protected Server jetty;
+  private Server jetty;
   /** Quiet flag. */
   private boolean quiet;
 
@@ -74,10 +78,8 @@ public final class BaseXHTTP {
     parseArguments(args);
 
     // flag for starting/stopping the database server
-    final boolean start =
-        !Token.eqic(System.getProperty(DBMODE), LOCAL, CLIENT);
+    server = !Token.eqic(System.getProperty(DBMODE), LOCAL, CLIENT);
 
-    final Context ctx = HTTPSession.context();
     final MainProp mprop = ctx.mprop;
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
@@ -95,19 +97,15 @@ public final class BaseXHTTP {
     if(service) {
       start(hport, args);
       Util.outln(HTTP + ' ' + SERVERSTART);
-      if(start) Util.outln(SERVERSTART);
+      if(server) Util.outln(SERVERSTART);
       Performance.sleep(1000);
       return;
     }
 
     if(stopped) {
-      stop(sport);
+      stop();
       Util.outln(HTTP + ' ' + SERVERSTOPPED);
-      if(start) {
-        // server has been started as separate process and need to be stopped
-        BaseXServer.stop(port, eport);
-        Util.outln(SERVERSTOPPED);
-      }
+      if(server) Util.outln(SERVERSTOPPED);
       Performance.sleep(1000);
       return;
     }
@@ -120,7 +118,7 @@ public final class BaseXHTTP {
       }
     }
 
-    if(start) {
+    if(server) {
       // default mode: start database server
       if(quiet) new BaseXServer(ctx, "-z");
       else new BaseXServer(ctx);
@@ -170,8 +168,14 @@ public final class BaseXHTTP {
    * Stops the server.
    * @throws Exception exception
    */
-  private void stop() throws Exception {
-    if(jetty != null) jetty.stop();
+  public void stop() throws Exception {
+    stop(ctx.mprop.num(MainProp.STOPPORT));
+    // server has been started as separate process and need to be stopped
+    if(server) {
+      final int port = ctx.mprop.num(MainProp.SERVERPORT);
+      final int eport = ctx.mprop.num(MainProp.EVENTPORT);
+      BaseXServer.stop(port, eport);
+    }
   }
 
   /**
@@ -181,7 +185,6 @@ public final class BaseXHTTP {
    */
   protected void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
-    final Context ctx = HTTPSession.context();
     boolean daemon = false, local = false, client = false;
     while(arg.more()) {
       if(arg.dash()) {
@@ -253,7 +256,7 @@ public final class BaseXHTTP {
   // STATIC METHODS ===========================================================
 
   /**
-   * Starts the specified class in a separate process.
+   * Starts the HTTP server in a separate process.
    * @param port server port
    * @param args command-line arguments
    * @throws BaseXException database exception
@@ -310,8 +313,7 @@ public final class BaseXHTTP {
     try {
       // create connection
       final URL url = new URL("http://" + host + ":" + port);
-      final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      conn.getInputStream();
+      ((HttpURLConnection) url.openConnection()).getInputStream();
       return true;
     } catch(final IOException ex) {
       // if page is not found, server is running
@@ -350,7 +352,7 @@ public final class BaseXHTTP {
           ss.accept().close();
           if(stop.exists()) {
             stop.delete();
-            BaseXHTTP.this.stop();
+            if(jetty != null) jetty.stop();
             ss.close();
             break;
           }

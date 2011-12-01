@@ -92,6 +92,8 @@ public class HTTPClientTest {
 
   /** Database context. */
   private static final Context CONTEXT = new Context();
+  /** HTTP servers. */
+  private static BaseXHTTP http;
 
   /**
    * Start server.
@@ -112,7 +114,7 @@ public class HTTPClientTest {
     if(local) sl.add("-l");
     sl.add(new String[] {"-p9996", "-e9997", "-h9998", "-s9999", "-z",
         "-U" + ADMIN, "-P" + ADMIN });
-    new BaseXHTTP(sl.toArray());
+    http = new BaseXHTTP(sl.toArray());
   }
 
   /**
@@ -121,7 +123,7 @@ public class HTTPClientTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    new BaseXHTTP("stop");
+    http.stop();
     CONTEXT.close();
   }
 
