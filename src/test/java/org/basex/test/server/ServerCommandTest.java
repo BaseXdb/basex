@@ -5,6 +5,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
+import org.basex.core.MainProp;
 import org.basex.core.Text;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Kill;
@@ -35,7 +36,8 @@ public final class ServerCommandTest extends CommandTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
+    CONTEXT.mprop.set(MainProp.DBPATH, dbpath().path());
+    server = new BaseXServer(CONTEXT, "-z", "-p9999", "-e9998");
     session = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
     cleanUp();
   }
@@ -45,7 +47,7 @@ public final class ServerCommandTest extends CommandTest {
    * @throws IOException I/O exception
    */
   @AfterClass
-  public static void stop() throws IOException {
+  public static void finish() throws IOException {
     try {
       if(session != null) session.close();
     } catch(final Exception ex) {
@@ -53,6 +55,9 @@ public final class ServerCommandTest extends CommandTest {
     }
     // stop server instance
     if(server != null) server.stop();
+
+    assertTrue(dbpath().delete());
+    CONTEXT.close();
   }
 
   /**
@@ -63,7 +68,7 @@ public final class ServerCommandTest extends CommandTest {
   public void kill() throws IOException {
     no(new Kill(Text.ADMIN));
     no(new Kill(Text.ADMIN + "2"));
-    no(new Kill("ha*"));
+    no(new Kill(NAME + "*"));
     ok(new CreateUser(NAME2, Token.md5("test")));
     final ClientSession cs = new ClientSession(LOCALHOST, 9999, NAME2, "test");
     ok(new Kill(NAME2));

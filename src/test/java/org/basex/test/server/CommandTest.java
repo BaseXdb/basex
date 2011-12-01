@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Context;
+import org.basex.core.MainProp;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Add;
@@ -86,6 +87,7 @@ public class CommandTest {
   */
   @BeforeClass
   public static void start() throws IOException {
+    CONTEXT.mprop.set(MainProp.DBPATH, dbpath().path());
     session = new LocalSession(CONTEXT);
     cleanUp();
   }
@@ -102,9 +104,14 @@ public class CommandTest {
     session.execute(new DropUser(NAME2));
   }
 
-  /** Removes test databases and closes the database context. */
+  /**
+   * Removes test databases and closes the database context.
+   * @throws IOException I/O exception
+   */
   @AfterClass
-  public static void finish() {
+  @SuppressWarnings("unused")
+  public static void finish() throws IOException {
+    assertTrue(dbpath().delete());
     CONTEXT.close();
   }
 
@@ -115,6 +122,14 @@ public class CommandTest {
   @After
   public final void after() throws IOException {
     cleanUp();
+  }
+
+  /**
+   * Returns the temporary database path.
+   * @return database path
+   */
+  public static IOFile dbpath() {
+    return new IOFile(Prop.TMP, NAME);
   }
 
   /** Command test. */
