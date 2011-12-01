@@ -57,7 +57,7 @@ public final class RESTDelete {
    */
   public static void main(final String... args) throws Exception {
     // Start server
-    final BaseXHTTP http = new BaseXHTTP("-Uadmin -Padmin");
+    final BaseXHTTP http = new BaseXHTTP("-Uadmin", "-Padmin");
     // Run example
     run();
     // Stop server

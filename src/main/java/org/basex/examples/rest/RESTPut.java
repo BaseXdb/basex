@@ -63,7 +63,7 @@ public final class RESTPut {
    */
   public static void main(final String... args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP("-Uadmin -Padmin");
+    final BaseXHTTP http = new BaseXHTTP("-Uadmin", "-Padmin");
     // Run example
     run();
     // Stop servers

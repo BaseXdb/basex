@@ -30,9 +30,8 @@ public final class RESTPost {
     // Query to be sent to the server
     String request =
       "<query xmlns='http://www.basex.org/rest'>\n" +
-      "  <text>//city/name</text>\n" +
+      "  <text>(//city/name)[position() le 3]</text>\n" +
       "  <parameter name='wrap' value='yes'/>\n" +
-      "  <parameter name='count' value='2'/>\n" +
       "</query>";
     System.out.println("\n* Query:\n" + request);
 
@@ -84,7 +83,7 @@ public final class RESTPost {
    */
   public static void main(final String... args) throws Exception {
     // Start servers
-    final BaseXHTTP http = new BaseXHTTP("-W -Uadmin -Padmin");
+    final BaseXHTTP http = new BaseXHTTP("-W", "-Uadmin", "-Padmin");
     // Run example
     run();
     // Stop servers
