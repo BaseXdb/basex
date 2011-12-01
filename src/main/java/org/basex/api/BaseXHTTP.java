@@ -38,7 +38,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
  */
 public final class BaseXHTTP {
   /** Database context. */
-  final Context ctx = HTTPSession.context();
+  private final Context ctx = HTTPSession.context();
   /** Activate WebDAV. */
   private boolean webdav = true;
   /** Activate REST. */
@@ -98,6 +98,7 @@ public final class BaseXHTTP {
       start(hport, args);
       Util.outln(HTTP + ' ' + SERVERSTART);
       if(server) Util.outln(SERVERSTART);
+      // keep the console window a little bit, so the user can read the message
       Performance.sleep(1000);
       return;
     }
@@ -106,6 +107,7 @@ public final class BaseXHTTP {
       stop();
       Util.outln(HTTP + ' ' + SERVERSTOPPED);
       if(server) Util.outln(SERVERSTOPPED);
+      // keep the console window a little bit, so the user can read the message
       Performance.sleep(1000);
       return;
     }
@@ -167,6 +169,7 @@ public final class BaseXHTTP {
    * @throws Exception exception
    */
   public void stop() throws Exception {
+    // notify the jetty monitor, that it should stop
     stop(ctx.mprop.num(MainProp.STOPPORT));
     // server has been started as separate process and need to be stopped
     if(server) {
@@ -181,7 +184,7 @@ public final class BaseXHTTP {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected void parseArguments(final String[] args) throws IOException {
+  private void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, HTTPINFO, Util.info(CONSOLE, HTTP));
     boolean daemon = false, local = false, client = false;
     while(arg.more()) {
@@ -259,7 +262,7 @@ public final class BaseXHTTP {
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  public static void start(final int port, final String... args)
+  private static void start(final int port, final String... args)
       throws BaseXException {
 
     // check if server is already running (needs some time)
@@ -280,7 +283,7 @@ public final class BaseXHTTP {
    * @param port server port
    * @return stop file
    */
-  static IOFile stopFile(final int port) {
+  private static IOFile stopFile(final int port) {
     return new IOFile(Prop.TMP, Util.name(BaseXHTTP.class) + port);
   }
 
@@ -289,12 +292,13 @@ public final class BaseXHTTP {
    * @param port server port
    * @throws IOException I/O exception
    */
-  public static void stop(final int port) throws IOException {
+  private static void stop(final int port) throws IOException {
     final IOFile stop = stopFile(port);
     try {
       stop.write(Token.EMPTY);
       new Socket(LOCALHOST, port).close();
-      Performance.sleep(50);
+      // give the notified process some time to quit
+      Performance.sleep(100);
     } catch(final IOException ex) {
       stop.delete();
       throw ex;
@@ -320,6 +324,7 @@ public final class BaseXHTTP {
   }
 
   /** Monitor for stopping the Jetty server. */
+  @SuppressWarnings("synthetic-access")
   private final class StopServer extends Thread {
     /** Server socket. */
     private final ServerSocket ss;
@@ -342,7 +347,6 @@ public final class BaseXHTTP {
       setDaemon(true);
     }
 
-    @SuppressWarnings("synthetic-access")
     @Override
     public void run() {
       try {
