@@ -39,6 +39,7 @@ public final class FNHof extends FuncCall {
       case _HOF_SORT_WITH: return sortWith(ctx);
       case _HOF_ID:
       case _HOF_CONST:     return expr[0].iter(ctx);
+      case _HOF_FOLD_LEFT1: return foldLeft1(ctx).iter();
       case _HOF_UNTIL:     return until(ctx).iter();
       case _HOF_ITERATE:   return iterate(ctx);
       default:             return super.iter(ctx);

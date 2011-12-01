@@ -4,13 +4,11 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
-
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -47,7 +45,6 @@ import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
 import org.basex.query.expr.Let;
 import org.basex.query.expr.List;
-import org.basex.query.expr.LitFunc;
 import org.basex.query.expr.LitMap;
 import org.basex.query.expr.Or;
 import org.basex.query.expr.OrderBy;
@@ -1012,7 +1009,7 @@ public class QueryParser extends InputParser {
     final UserFunc func = new UserFunc(input(), name, args, optAsType(), true);
     func.updating = up;
 
-    ctx.funcs.add(func, this);
+    ctx.funcs.add(func, input());
     if(!wsConsumeWs(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
     ctx.vars.size(s);
   }
@@ -2089,12 +2086,7 @@ public class QueryParser extends InputParser {
       final long card = ((Int) numericLiteral(true)).itr(null);
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
 
-      final Expr[] args = new Expr[(int) card];
-      final Var[] vars = new Var[args.length];
-      partial(args, vars);
-      final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
-      if(f == null) error(FUNCUNKNOWN, name);
-      return new LitFunc(input(), name, f, vars);
+      return ctx.funcs.get(name, card, false, ctx, input());
     }
 
     qp = pos;
@@ -2224,7 +2216,7 @@ public class QueryParser extends InputParser {
 
         final Var[] vars = new Var[args.length];
         final boolean part = partial(args, vars);
-        final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
+        final TypedFunc f = ctx.funcs.get(name, args, false, ctx, input());
         if(f != null) {
           alter = null;
           return part ? new PartFunApp(input(), f, vars) : f.fun;
@@ -2780,7 +2772,7 @@ public class QueryParser extends InputParser {
               if(!wsConsume(PAR2)) error(FUNCMISS, name.string());
             }
             wsCheck(AS);
-            t = FuncType.get(args, sequenceType());
+            t = FuncType.get(sequenceType(), args);
           }
         } else if(!wsConsume(PAR2)) {
           error(FUNCMISS, name.string());
@@ -3733,7 +3725,7 @@ public class QueryParser extends InputParser {
   private QueryException error() throws QueryException {
     qp = ap;
     if(alter != FUNCUNKNOWN) throw error(alter);
-    ctx.funcs.funError(alterFunc, this);
+    ctx.funcs.funError(alterFunc, input());
     throw error(alter, alterFunc.string());
   }
 
