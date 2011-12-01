@@ -1,5 +1,8 @@
 package org.basex.test.xmldb;
 
+import static org.junit.Assert.*;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.xmldb.api.DatabaseManager;
@@ -16,19 +19,24 @@ import junit.framework.TestCase;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class DatabaseTest extends TestCase {
+public class DatabaseTest extends XMLDBBaseTest {
   /** Database. */
   private Database database;
 
   @Before
-  @Override
-  protected void setUp() throws Exception {
-    database = (Database) Class.forName(AllTests.DRIVER).newInstance();
+  public void setUp() throws Exception {
+    createDB();
+    database = (Database) Class.forName(DRIVER).newInstance();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    dropDB();
   }
 
   @Test
   public void testAcceptsURI() throws Exception {
-    database.acceptsURI(AllTests.PATH);
+    database.acceptsURI(PATH);
 
     try {
       database.acceptsURI("bla");
@@ -41,19 +49,17 @@ public class DatabaseTest extends TestCase {
   @Test
   public void testGetCollection() throws Exception {
     // directly call and close database instance
-    database.getCollection(AllTests.PATH,
-        AllTests.LOGIN, AllTests.PW).close();
+    database.getCollection(PATH, LOGIN, PW).close();
 
     try {
-      database.getCollection("bla", AllTests.LOGIN, AllTests.PW);
+      database.getCollection("bla", LOGIN, PW);
       fail("URI was invalid.");
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.INVALID_URI, ex);
     }
     // get database from database manager
     DatabaseManager.registerDatabase(database);
-    final Collection coll = DatabaseManager.getCollection(
-        AllTests.PATH, AllTests.LOGIN, AllTests.PW);
+    final Collection coll = DatabaseManager.getCollection(PATH, LOGIN, PW);
     coll.close();
   }
 

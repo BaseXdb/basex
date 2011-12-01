@@ -1,5 +1,7 @@
 package org.basex.test.xmldb;
 
+import static org.junit.Assert.*;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +19,7 @@ import junit.framework.TestCase;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class CollectionManagementServiceTest extends TestCase {
+public class CollectionManagementServiceTest extends XMLDBBaseTest {
   /** Temporary collection. */
   static final String TEMP = "XMLDBTemp";
   /** Test document. */
@@ -30,19 +32,19 @@ public class CollectionManagementServiceTest extends TestCase {
   private CollectionManagementService serv;
 
   @Before
-  @Override
-  protected void setUp() throws Exception {
-    final Class<?> c = Class.forName(AllTests.DRIVER);
+  public void setUp() throws Exception {
+    createDB();
+    final Class<?> c = Class.forName(DRIVER);
     db = (Database) c.newInstance();
-    coll = db.getCollection(AllTests.PATH, AllTests.LOGIN, AllTests.PW);
+    coll = db.getCollection(PATH, LOGIN, PW);
     serv = (CollectionManagementService) coll.getService(
         "CollectionManagementService", "1.0");
   }
 
   @After
-  @Override
-  protected void tearDown() throws Exception {
+  public void tearDown() throws Exception {
     coll.close();
+    dropDB();
   }
 
   @Test
@@ -62,7 +64,7 @@ public class CollectionManagementServiceTest extends TestCase {
   public void testRemoveCollection() throws Exception {
     serv.removeCollection(TEMP);
     assertNull("Collection was not removed.",
-        db.getCollection(AllTests.URL + TEMP, null, null));
+        db.getCollection(URL + TEMP, null, null));
   }
 
   @Test

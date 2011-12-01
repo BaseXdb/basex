@@ -52,8 +52,6 @@ public class RESTTest {
       "http://" + LOCALHOST + ":9998/" + NAME + "/";
   /** Input file. */
   private static final String FILE = "etc/test/input.xml";
-  /** Start servers. */
-  private static BaseXHTTP http;
 
   // INITIALIZERS =============================================================
 
@@ -76,7 +74,7 @@ public class RESTTest {
     if(local) sl.add("-l");
     sl.add(new String[] {"-p9996", "-e9997", "-h9998", "-s9999", "-z",
         "-U" + ADMIN, "-P" + ADMIN });
-    http = new BaseXHTTP(sl.toArray());
+    new BaseXHTTP(sl.toArray());
   }
 
   /**
@@ -85,7 +83,7 @@ public class RESTTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    http.stop();
+    new BaseXHTTP("stop");
   }
 
   // TEST METHODS =============================================================

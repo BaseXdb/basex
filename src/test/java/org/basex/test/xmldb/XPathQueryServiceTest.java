@@ -1,5 +1,7 @@
 package org.basex.test.xmldb;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,25 +23,25 @@ import junit.framework.TestCase;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class XPathQueryServiceTest extends TestCase {
+public class XPathQueryServiceTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */
   private XPathQueryService serv;
 
   @Before
-  @Override
-  protected void setUp() throws Exception {
-    final Class<?> c = Class.forName(AllTests.DRIVER);
+  public void setUp() throws Exception {
+    createDB();
+    final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.newInstance();
-    coll = database.getCollection(AllTests.PATH, AllTests.LOGIN, AllTests.PW);
+    coll = database.getCollection(PATH, LOGIN, PW);
     serv = (XPathQueryService) coll.getService("XPathQueryService", "1.0");
   }
 
   @After
-  @Override
-  protected void tearDown() throws Exception {
+  public void tearDown() throws Exception {
     coll.close();
+    dropDB();
   }
 
   @Test
@@ -104,9 +106,9 @@ public class XPathQueryServiceTest extends TestCase {
     assertEquals("Wrong result size.", 1, serv.query("/").getSize());
 
     // add second document
-    final Resource res = coll.createResource(AllTests.DOC2,
+    final Resource res = coll.createResource(DOC2,
         XMLResource.RESOURCE_TYPE);
-    res.setContent(AllTests.read(AllTests.DOCPATH + AllTests.DOC2));
+    res.setContent(read(DOCPATH + DOC2));
     coll.storeResource(res);
     assertEquals("Wrong result size", 6, serv.query("//node()").getSize());
 
@@ -116,7 +118,7 @@ public class XPathQueryServiceTest extends TestCase {
 
   @Test
   public void testQueryResource() throws Exception {
-     assertEquals("Wrong result size", 3, serv.queryResource(AllTests.DOC1,
+     assertEquals("Wrong result size", 3, serv.queryResource(DOC1,
       "//node()").getSize());
 
     // catch query errors
