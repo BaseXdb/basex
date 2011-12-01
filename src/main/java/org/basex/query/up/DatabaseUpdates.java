@@ -8,14 +8,11 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Export;
 import org.basex.data.Data;
-import org.basex.data.DataText;
-import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.util.Token;
 import org.basex.util.hash.IntMap;
 import org.basex.util.list.IntList;
 
@@ -199,13 +196,8 @@ final class DatabaseUpdates {
   protected void apply() throws QueryException {
     treeAwareUpdates();
 
-    // mark database as updating
-    final IOFile upd = new IOFile(data.meta.dbfile(DataText.DATAUPD));
-    try {
-      upd.write(Token.EMPTY);
-    } catch(final IOException ex) {
-      UPPUTERR.thrw(null, upd);
-    }
+    // mark disk database instances as updating
+    if(!data.lock()) LOCKED.thrw(null, data.meta.name);
 
     /*
      * For each target node, the update primitives in the corresponding
@@ -236,7 +228,9 @@ final class DatabaseUpdates {
     recent.resolveExternalTextNodeAdjacency(0);
 
     data.flush();
-    upd.delete();
+
+    // mark disk database instances as updating
+    if(!data.unlock()) LOCKED.thrw(null, data.meta.name);
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {

@@ -337,6 +337,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbOptimize() {
     check(_DB_OPTIMIZE);
     query(_DB_OPTIMIZE.args(DB));
+    query(_DB_OPTIMIZE.args(DB));
     query(_DB_OPTIMIZE.args(DB, "true()"));
   }
 

@@ -164,6 +164,18 @@ public abstract class Data {
   public abstract void setIndex(IndexType type, Index index);
 
   /**
+   * Marks a database as updating.
+   * @return result flag
+   */
+  public abstract boolean lock();
+
+  /**
+   * Removes the updating flag.
+   * @return result flag
+   */
+  public abstract boolean unlock();
+
+  /**
    * Returns the indexed pre references for the specified token.
    * @param token index token reference
    * @return array of sorted pre values

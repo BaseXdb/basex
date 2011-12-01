@@ -56,6 +56,8 @@ public enum Err {
   INVPOS(BASX, 17, "Illegal argument position for %: %."),
   /** BASX0018: Evaluation exception. */
   CONVERT(BASX, 18, "String conversion: %."),
+  /** BASX0019: Evaluation exception. */
+  LOCKED(BASX, 19, "Database \"%\" is currently locked ('upd.basex' found)."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
