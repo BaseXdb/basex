@@ -63,6 +63,8 @@ public enum Err {
   CONVERT(BASX, 18, "String conversion: %."),
   /** BASX0019: Evaluation exception. */
   INVFLAG(BASX, 19, "Unknown flag: %."),
+  /** BASX0020: Evaluation exception. */
+  LOCKED(BASX, 20, "Database \"%\" is currently locked ('upd.basex' found)."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

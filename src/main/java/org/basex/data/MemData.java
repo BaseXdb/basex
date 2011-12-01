@@ -69,6 +69,16 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
+  public boolean lock() {
+    return true;
+  }
+
+  @Override
+  public boolean unlock() {
+    return true;
+  }
+
+  @Override
   public byte[] text(final int pre, final boolean text) {
     return ((MemValues) (text ? txtindex : atvindex)).key((int) textOff(pre));
   }
