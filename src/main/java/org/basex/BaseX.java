@@ -77,7 +77,7 @@ public class BaseX extends Main {
         } else if(key.equals("f")) {
           // query file
           final IO io = IO.get(val);
-          if(!io.exists()) throw new BaseXException(INFOERROR + FILEWHICH, val);
+          if(!io.exists()) throw new BaseXException(FILEWHICH, val);
           final String query = TextInput.content(io).toString().trim();
           execute(new Set(Prop.QUERYPATH, io.path()), false);
           execute(new XQuery(query), verbose);

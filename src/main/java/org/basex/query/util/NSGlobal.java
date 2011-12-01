@@ -11,31 +11,37 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 public final class NSGlobal {
-  /** Namespaces. */
+  /** Namespaces, containing prefixes and uris. */
   private static final Atts NS = new Atts();
 
   static {
+    // pre-declared namespaces (the order is important here)
     NS.add(LOCAL, LOCALURI);
+    NS.add(XML, XMLURI);
     NS.add(XS, XSURI);
     NS.add(XSI, XSIURI);
-    NS.add(OUTPUT, OUTPUTURI);
     NS.add(FN, FNURI);
+    NS.add(OPT, OPTIONURI);
+    // implementation-defined pre-declarations
+    NS.add(MAP, MAPURI);
     NS.add(MATH, MATHURI);
-    NS.add(XML, XMLURI);
+    NS.add(OUTPUT, OUTPUTURI);
+    NS.add(ERR, ERRORURI);
+    // BaseX namespaces
     NS.add(BASEX, BASEXURI);
-    NS.add(UTIL, UTILURI);
-    NS.add(XSLT, XSLTURI);
     NS.add(DB, DBURI);
     NS.add(FT, FTURI);
-    NS.add(FILE, FILEURI);
-    NS.add(HTTP, HTTPURI);
-    NS.add(ZIP, ZIPURI);
     NS.add(HOF, HOFURI);
     NS.add(JSON, JSONURI);
-    NS.add(MAP, MAPURI);
-    NS.add(PKG, PKGURI);
     NS.add(SQL, SQLURI);
+    NS.add(UTIL, UTILURI);
+    NS.add(XSLT, XSLTURI);
+    // EXPath namespaces
     NS.add(CRYPTO, CRYPTOURI);
+    NS.add(FILE, FILEURI);
+    NS.add(HTTP, HTTPURI);
+    NS.add(PKG, PKGURI);
+    NS.add(ZIP, ZIPURI);
   }
 
   /** Private constructor. */
@@ -43,24 +49,24 @@ public final class NSGlobal {
 
   /**
    * Finds the specified namespace uri.
-   * @param pre prefix of the namespace
-   * @return uri
+   * @param pref prefix of the namespace
+   * @return uri, or {@code null}
    */
-  public static byte[] uri(final byte[] pre) {
+  public static byte[] uri(final byte[] pref) {
     for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.key(s), pre)) return NS.val(s);
+      if(eq(NS.key(s), pref)) return NS.value(s);
     }
-    return EMPTY;
+    return null;
   }
 
   /**
-   * Finds the specified URI prefix.
-   * @param uri URI
-   * @return prefix
+   * Finds the prefix for the specified uri.
+   * @param uri namespace uri
+   * @return prefix, or empty string
    */
   public static byte[] prefix(final byte[] uri) {
     for(int s = NS.size() - 1; s >= 0; s--) {
-      if(eq(NS.val(s), uri)) return NS.key(s);
+      if(eq(NS.value(s), uri)) return NS.key(s);
     }
     return EMPTY;
   }
@@ -71,9 +77,9 @@ public final class NSGlobal {
    * @return result of check
    */
   public static boolean standard(final byte[] uri) {
-    // 'local' namespace is skipped
+    // first ('local') namespace is skipped
     for(int s = NS.size() - 1; s > 0; s--) {
-      if(eq(NS.val(s), uri)) return true;
+      if(eq(NS.value(s), uri)) return true;
     }
     return false;
   }

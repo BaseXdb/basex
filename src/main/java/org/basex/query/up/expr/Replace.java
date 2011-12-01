@@ -1,18 +1,18 @@
 package org.basex.query.up.expr;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FComm;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;

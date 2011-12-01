@@ -58,7 +58,7 @@ public final class LitMap extends Arr {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return QueryText.MAPSTR;
   }
 }

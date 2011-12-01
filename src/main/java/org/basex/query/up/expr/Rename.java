@@ -52,9 +52,9 @@ public final class Rename extends Update {
 
     CFrag ex = null;
     if(i.type == NodeType.ELM) {
-      ex = new CElem(input, expr[1], new Atts(), true);
+      ex = new CElem(input, expr[1], null);
     } else if(i.type == NodeType.ATT) {
-      ex = new CAttr(input, false, expr[1]);
+      ex = new CAttr(input, false, expr[1], Empty.SEQ);
     } else if(i.type == NodeType.PI) {
       ex = new CPI(input, expr[1], Empty.SEQ);
     } else {
@@ -65,28 +65,14 @@ public final class Rename extends Update {
     final ANode targ = (ANode) i;
 
     // check namespace conflicts...
-    // Util.outln("%: % / %", n, at.key[n], renPref);
-    // Attribute: targ.qname().pref().length != 0  ??
     if(targ.type == NodeType.ELM || targ.type == NodeType.ATT) {
-      final byte[] renPref = rename.pref();
-      final byte[] renURI = rename.uri().string();
+      final byte[] rp = rename.prefix();
+      final byte[] ru = rename.uri();
       final Atts at = targ.nsScope();
       for(int n = 0; n < at.size(); ++n) {
-        if(eq(at.key(n), renPref)) {
-          if(!eq(at.val(n), renURI)) UPNSCONFL.thrw(input);
-        }
+        if(eq(at.key(n), rp) && !eq(at.value(n), ru)) UPNSCONFL.thrw(input);
       }
     }
-
-  /*
-  if(test != null) {
-      final byte[] uri = test.uri(rename.pref(), ctx);
-      Util.outln("RENAME: %/%", rename.pref(), rename.uri());
-      Util.outln("TARGET: %/%", test.qname().pref(), uri);
-      if(uri != null &&
-          eq(rename.pref(), test.qname().pref()) &&
-          !eq(rename.uri().atom(), uri)) UPNSCONFL.thrw(input);
-    }*/
 
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
     ctx.updates.add(new RenameNode(dbn.pre, dbn.data, input, rename), ctx);

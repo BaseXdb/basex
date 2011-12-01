@@ -102,7 +102,7 @@ public final class Var extends ParseExpr {
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
-    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(input, desc());
+    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(input, description());
   }
 
   @Override

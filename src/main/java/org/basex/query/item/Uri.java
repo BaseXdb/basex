@@ -3,7 +3,6 @@ package org.basex.query.item;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.basex.query.QueryText;
 import org.basex.util.Token;
 
 /**
@@ -15,8 +14,6 @@ import org.basex.util.Token;
 public final class Uri extends Str {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
-  /** Default collation. */
-  public static final Uri COLL = Uri.uri(QueryText.URLCOLL);
 
   /**
    * Constructor.

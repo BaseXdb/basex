@@ -17,15 +17,18 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
-import org.basex.query.item.Item;
 import org.basex.query.item.Int;
 import org.basex.query.item.IntSeq;
+import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ValueIter;
+import org.basex.query.util.Compare;
+import org.basex.query.util.Compare.Flag;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Performance;
@@ -83,6 +86,7 @@ public final class FNUtil extends FuncCall {
       case _UTIL_CRC32:             return crc32(ctx);
       case _UTIL_UUID:              return uuid();
       case _UTIL_TO_STRING:         return toString(ctx);
+      case _UTIL_DEEP_EQUAL:        return deep(ctx);
       default:                      return super.item(ctx, ii);
     }
   }
@@ -386,6 +390,33 @@ public final class FNUtil extends FuncCall {
    */
   private Str uuid() {
     return Str.get(UUID.randomUUID());
+  }
+
+  /**
+   * Checks items for deep equality.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private Item deep(final QueryContext ctx) throws QueryException {
+    final Compare cmp = new Compare(input);
+    final Flag[] flags = Flag.values();
+    if(expr.length == 3) {
+      final Iter ir = expr[2].iter(ctx);
+      for(Item it; (it = ir.next()) != null;) {
+        final byte[] key = uc(checkEStr(it));
+        boolean found = false;
+        for(final Flag f : flags) {
+          found = eq(key, token(f.name()));
+          if(found) {
+            cmp.set(f);
+            break;
+          }
+        }
+        if(!found) INVFLAG.thrw(input, key);
+      }
+    }
+    return Bln.get(cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1])));
   }
 
   @Override

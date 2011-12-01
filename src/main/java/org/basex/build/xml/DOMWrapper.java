@@ -64,7 +64,7 @@ public final class DOMWrapper extends Parser {
             if(eq(k, XMLNS)) {
               builder.startNS(EMPTY, v);
             } else if(startsWith(k, XMLNSC)) {
-              builder.startNS(ln(k), v);
+              builder.startNS(local(k), v);
             } else {
               atts.add(k, v);
             }

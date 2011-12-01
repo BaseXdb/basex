@@ -1,11 +1,10 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.XPATT;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.item.FDoc;
-import org.basex.query.item.NodeType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -40,12 +39,12 @@ public final class CDoc extends CFrag {
   }
 
   @Override
-  public String desc() {
-    return info(QueryText.DOCUMENT);
+  public String description() {
+    return info(DOCUMENT);
   }
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.DOC.string()));
+    return toString(DOCUMENT);
   }
 }

@@ -1,15 +1,14 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -49,12 +48,12 @@ public final class CTxt extends CFrag {
   }
 
   @Override
-  public String desc() {
-    return info(QueryText.TEXT);
+  public String description() {
+    return info(TEXT);
   }
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.TXT.string()));
+    return toString(TEXT);
   }
 }

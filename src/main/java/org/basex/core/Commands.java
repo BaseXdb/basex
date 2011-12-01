@@ -24,9 +24,6 @@ public interface Commands {
   enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS, EVENTS }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
-  /** Set commands. Should be synchronized with {@link Set#STRINGS}. */
-  enum CmdSet { QUERYINFO, DEBUG, SERIALIZE, CHOP, TEXTINDEX, ATTRINDEX,
-    FTINDEX, PATHINDEX }
   /** Index types. */
   enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, PATH }
   /** Index types. */

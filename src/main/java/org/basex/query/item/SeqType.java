@@ -183,7 +183,7 @@ public final class SeqType {
   /** Number of occurrences. */
   public final Occ occ;
   /** Extended type info. */
-  public final QNm ext;
+  private final QNm ext;
 
   /**
    * Private constructor.
@@ -260,23 +260,18 @@ public final class SeqType {
 
     final MapType mt = type.isMap() ? (MapType) type : null;
     for(long i = 0; i < size; i++) {
-      if(!check(val.itemAt(i), mt)) return false;
+      final Item it = val.itemAt(i);
+
+      // maps don't have type information attached to them, you have to look...
+      final Type ip = it.type;
+      if(mt == null) {
+        if(!(ip.instanceOf(type) && checkExt(it))) return false;
+      } else {
+        if(!(ip.isMap() && ((Map) it).hasType(mt))) return false;
+      }
       if(i == 0 && val.homogenous()) break;
     }
     return true;
-  }
-
-  /**
-   * Checks if the given item is of this SeqType's type.
-   * @param it item to check
-   * @param mt map type of this type, {@code null} if it's something else
-   * @return result of check
-   */
-  private boolean check(final Item it, final MapType mt) {
-    // maps don't have type information attached to them, you have to look...
-    final Type ip = it.type;
-    return mt != null ? ip.isMap() && ((Map) it).hasType(mt) :
-        ip.instanceOf(type) && checkExt(it);
   }
 
   /**
@@ -293,7 +288,7 @@ public final class SeqType {
       final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     if(it == null) {
-      if(occ == Occ.O) XPEMPTY.thrw(ii, e.desc());
+      if(occ == Occ.O) XPEMPTY.thrw(ii, e.description());
       return null;
     }
     final boolean correct = cast ? it.type == type : instance(it, ii);
@@ -428,7 +423,8 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   private Item check(final Item it, final InputInfo ii) throws QueryException {
-    if(!checkExt(it)) XPCAST.thrw(ii, it.type, ext);
+    if(!checkExt(it)) XPCAST.thrw(ii,
+        it.type.toString().replaceAll("\\(|\\)", ""), ext);
     return it;
   }
 

@@ -8,7 +8,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Uri;
 import org.basex.util.InputInfo;
 
 /**
@@ -42,7 +41,7 @@ public final class NameTest extends Test {
   public NameTest(final QNm nm, final Name t, final boolean att,
       final InputInfo ii) {
     type = att ? NodeType.ATT : NodeType.ELM;
-    ln = nm != null ? nm.ln() : null;
+    ln = nm != null ? nm.local() : null;
     name = nm;
     test = t;
     input = ii;
@@ -50,11 +49,6 @@ public final class NameTest extends Test {
 
   @Override
   public boolean comp(final QueryContext ctx) throws QueryException {
-    // check namespace context
-    if(ctx.ns.size() != 0 && name != null && !name.hasUri()) {
-      name.uri(ctx.ns.uri(name.pref(), false, input));
-    }
-
     // retrieve current data reference
     final Data data = ctx.data();
     if(data == null) return true;
@@ -66,11 +60,11 @@ public final class NameTest extends Test {
     // true if results can be expected
     boolean ok = true;
 
-    if(test == Name.STD && !name.ns()) {
+    if(test == Name.STD && !name.hasPrefix()) {
       // no results if default and database namespaces of elements are different
-      ok = type == NodeType.ATT || eq(ns, ctx.nsElem);
+      ok = type == NodeType.ATT || ctx.nsElem == null || eq(ns, ctx.nsElem);
       if(ok) {
-        // identical namespace: ignore prefix to speed up test
+        // namespace is irrelevant or identical: ignore prefix to speed up test
         if(ns.length != 0) ctx.compInfo(OPTPREF, ln);
         test = Name.NAME;
       }
@@ -95,14 +89,14 @@ public final class NameTest extends Test {
         return true;
       // namespaces wildcard - check only name
       case NAME:
-        return eq(ln, ln(node.nname()));
+        return eq(ln, local(node.name()));
       // name wildcard - check only namespace
       case NS:
-        return name.uri().eq(node.update(tmpq).uri());
+        return eq(name.uri(), node.update(tmpq).uri());
       default:
         // check attributes, or check everything
-        return type == NodeType.ATT && !name.ns() ? eq(ln, node.nname()) :
-          name.eq(node.update(tmpq));
+        return type == NodeType.ATT && !name.hasPrefix() ?
+            eq(ln, node.name()) : name.eq(node.update(tmpq));
     }
   }
 
@@ -110,8 +104,8 @@ public final class NameTest extends Test {
   public String toString() {
     if(test == Name.ALL) return "*";
     if(test == Name.NAME) return "*:" + string(name.string());
-    final String uri = name.uri() == Uri.EMPTY || name.ns() ? "" :
-      "{" + string(name.uri().string()) + "}";
+    final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
+      "{" + string(name.uri()) + "}";
     return uri + (test == Name.NS ? "*" : string(name.string()));
   }
 }

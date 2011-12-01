@@ -111,7 +111,7 @@ public class XMLParser extends SingleParser {
 
       if(startsWith(attName, XMLNSC)) {
         // open namespace...
-        builder.startNS(ln(attName), attValue);
+        builder.startNS(local(attName), attValue);
       } else if(eq(attName, XMLNS)) {
         // open namespace...
         builder.startNS(EMPTY, attValue);

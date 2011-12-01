@@ -17,7 +17,7 @@ public enum Axis {
   ANCORSELF("ancestor-or-self", false) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.ancOrSelf();
+      return n.ancestorOrSelf();
     }
   },
 
@@ -25,7 +25,7 @@ public enum Axis {
   ANC("ancestor", false) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.anc();
+      return n.ancestor();
     }
   },
 
@@ -49,7 +49,7 @@ public enum Axis {
   DESCORSELF("descendant-or-self", true) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.descOrSelf();
+      return n.descendantOrSelf();
     }
   },
 
@@ -65,7 +65,7 @@ public enum Axis {
   FOLLSIBL("following-sibling", false) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.follSibl();
+      return n.followingSibling();
     }
   },
 
@@ -73,7 +73,7 @@ public enum Axis {
   FOLL("following", false) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.foll();
+      return n.following();
     }
   },
 
@@ -81,7 +81,7 @@ public enum Axis {
   PARENT("parent", true) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.par();
+      return n.parentIter();
     }
   },
 
@@ -89,7 +89,7 @@ public enum Axis {
   PRECSIBL("preceding-sibling", false) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.precSibl();
+      return n.precedingSibling();
     }
   },
 
@@ -97,7 +97,7 @@ public enum Axis {
   PREC("preceding", false) {
     @Override
     AxisIter iter(final ANode n) {
-      return n.prec();
+      return n.preceding();
     }
   },
 

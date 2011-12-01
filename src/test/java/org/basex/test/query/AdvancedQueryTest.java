@@ -9,6 +9,7 @@ import org.basex.query.func.Function;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -88,11 +89,12 @@ public abstract class AdvancedQueryTest {
    */
   protected static void check(final QueryException ex, final Err... error) {
     if(error.length == 0) Util.notexpected("No error code specified");
-    final String msg = ex.getMessage();
+    final byte[] msg = Token.token(ex.getMessage());
     boolean found = false;
-    for(final Err e : error) found |= msg.contains(e.code());
+    for(final Err e : error) found |= Token.contains(msg, e.qname().string());
     if(!found) {
-      fail("'" + error[0].code() + "' not contained in '" + msg + "'.");
+      fail("'" + Token.string(error[0].qname().string()) +
+          "' not contained in '" + msg + "'.");
     }
   }
 

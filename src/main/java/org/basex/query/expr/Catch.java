@@ -11,6 +11,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -21,23 +22,21 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class Catch extends Single {
-  /** Error QName. */
-  private static final QNm NS = new QNm(ERR, ERRORURI);
   /** Error QNames. */
   private static final QNm[] QNM = {
-    create(ECODE), create(EDESC), create(EVALUE),
-    create(EMODULE), create(ELINENUM), create(ECOLNUM)
+    create(ECODE), create(EDESC), create(EVALUE), create(EMODULE),
+    create(ELINENUM), create(ECOLNUM), create(EADD)
   };
   /** Error types. */
   private static final SeqType[] TYPES = {
-    SeqType.QNM, SeqType.STR_ZO, SeqType.ITEM_ZM,
-    SeqType.STR_ZO, SeqType.ITR_ZO, SeqType.ITR_ZO
+    SeqType.QNM, SeqType.STR_ZO, SeqType.ITEM_ZM, SeqType.STR_ZO,
+    SeqType.ITR_ZO, SeqType.ITR_ZO, SeqType.ITEM_ZM
   };
 
+  /** Error variables. */
+  private final Var[] vars = new Var[QNM.length];
   /** Supported codes. */
   private final QNm[] codes;
-  /** Error variables. */
-  private final Var[] vars = new Var[6];
 
   /**
    * Constructor.
@@ -54,12 +53,9 @@ public final class Catch extends Single {
 
   @Override
   public Catch comp(final QueryContext ctx) throws QueryException {
-    final int s = ctx.vars.size();
-    final int ns = ctx.ns.size();
-    prepare(ctx);
+    final int s = prepare(ctx);
     super.comp(ctx);
     ctx.vars.size(s);
-    ctx.ns.size(ns);
     return this;
   }
 
@@ -73,44 +69,52 @@ public final class Catch extends Single {
   Value value(final QueryContext ctx, final QueryException ex)
       throws QueryException {
 
-    final byte[] cd = token(ex.code());
-    if(!find(cd)) return null;
+    if(!find(ex.err(), ex.qname())) return null;
 
-    final int s = ctx.vars.size();
-    final int ns = ctx.ns.size();
-    prepare(ctx);
+    final int s = prepare(ctx);
     try {
       int i = 0;
       final byte[] io = ex.file() == null ? EMPTY : token(ex.file().path());
       final Value val = ex.value();
-      for(final Value v : new Value[] { new QNm(cd, ERRORURI),
+      for(final Value v : new Value[] { ex.qname(),
           Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-          Str.get(io), Int.get(ex.col()), Int.get(ex.line()) }) {
+          Str.get(io), Int.get(ex.col()), Int.get(ex.line()), Empty.SEQ }) {
         vars[i++].bind(v, ctx);
       }
       return ctx.value(expr);
     } finally {
       ctx.vars.size(s);
-      ctx.ns.size(ns);
     }
   }
 
   /**
    * Prepares the catch construction.
    * @param ctx query context
+   * @return number of variables
    */
-  public void prepare(final QueryContext ctx) {
-    ctx.ns.add(NS);
+  public int prepare(final QueryContext ctx) {
+    final int s = ctx.vars.size();
     for(final Var v : vars) ctx.vars.add(v);
+    return s;
   }
 
   /**
-   * Finds iterator.
-   * @param err error code
+   * Checks if one defined error matches the thrown error.
+   * @param err error reference
+   * @param code error code
    * @return result of check
    */
-  private boolean find(final byte[] err) {
-    for(final QNm c : codes) if(c == null || eq(c.ln(), err)) return true;
+  private boolean find(final Err err, final QNm code) {
+    for(final QNm c : codes) {
+      if(c != null) {
+        final byte[] cu = c.uri();
+        if(err == null || cu.length != 0 &&
+            !eq(err.qname().uri(), cu)) continue;
+        final byte[] nm = c.local();
+        if(nm.length != 0 && !eq(code.local(), nm)) continue;
+      }
+      return true;
+    }
     return false;
   }
 

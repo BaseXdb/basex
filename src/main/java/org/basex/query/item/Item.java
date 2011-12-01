@@ -257,7 +257,7 @@ public abstract class Item extends Value {
   @Override
   public void plan(final Serializer ser) throws IOException {
     try {
-      ser.emptyElement(ITM, VAL, string(null), TYP, Token.token(name()));
+      ser.emptyElement(ITM, VAL, string(null), TYP, Token.token(info()));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly

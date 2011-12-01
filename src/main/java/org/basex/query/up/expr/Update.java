@@ -45,12 +45,12 @@ abstract class Update extends Arr {
 
     for(int a = 0; a < list.size(); ++a) {
       final QNm name = list.get(a).qname();
-      final byte[] pref = name.pref();
+      final byte[] pref = name.prefix();
       // attributes without prefix have no namespace
       if(pref.length == 0) continue;
       // check if attribute and target have the same namespace
       final byte[] uri = targ.uri(pref, ctx);
-      if(uri != null && !eq(name.uri().string(), uri)) UPNSCONFL.thrw(input);
+      if(uri != null && !eq(name.uri(), uri)) UPNSCONFL.thrw(input);
     }
     return list;
   }

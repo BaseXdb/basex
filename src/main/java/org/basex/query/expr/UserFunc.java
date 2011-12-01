@@ -14,6 +14,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -73,7 +74,7 @@ public class UserFunc extends Single {
       if(!u && !expr.isVacuous()) UPEXPECTF.thrw(input);
     } else if(u) {
       // uses updates, but is not declared as such
-      UPNOT.thrw(input, desc());
+      UPNOT.thrw(input, description());
     }
   }
 
@@ -107,6 +108,7 @@ public class UserFunc extends Single {
 
     // reset context and evaluate function
     final Value cv = ctx.value;
+    final Atts ns = ctx.ns.reset();
     ctx.value = null;
     try {
       final Item it = expr.item(ctx, ii);
@@ -114,6 +116,7 @@ public class UserFunc extends Single {
       return cast ? ret.cast(it, this, false, ctx, input) : it;
     } finally {
       ctx.value = cv;
+      ctx.ns.stack(ns);
     }
   }
 
@@ -121,6 +124,7 @@ public class UserFunc extends Single {
   public Value value(final QueryContext ctx) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
+    final Atts ns = ctx.ns.reset();
     ctx.value = null;
     try {
       final Value v = expr.value(ctx);
@@ -128,6 +132,7 @@ public class UserFunc extends Single {
       return cast ? ret.promote(v, ctx, input) : v;
     } finally {
       ctx.value = cv;
+      ctx.ns.stack(ns);
     }
   }
 

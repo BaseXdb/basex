@@ -8,10 +8,8 @@ import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.NSLocal;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -46,22 +44,23 @@ public final class VarRef extends ParseExpr {
     Expr e = var.expr();
     if(e == null) return this;
 
-    // pre-assign static variables
-    final NSLocal ns = ctx.ns;
-    ctx.ns = ns.copy();
-    if(ctx.nsElem.length != 0) ctx.ns.add(new QNm(EMPTY, ctx.nsElem), input);
-
-    /* Choose variables to be pre-evaluated.
+    /* Choose expressions to be pre-evaluated.
      * If a variable is pre-evaluated, it may not be available for further
      * optimizations (index access, count, ...). On the other hand, repeated
-     * evaluation of the same expression is avoided. */
-    // [CG][LW] document / clean up the logic here
-    if(var.global || ctx.nsElem.length != 0 || ns.size() != 0 ||
-        var.type != null || e.uses(Use.CNS) || e instanceof UserFuncCall) {
+     * evaluation of the same expression is avoided.
+     *
+     * [CG][LW] Variables are currently pre-evaluated if...
+     * - they are global (mandatory)
+     * - namespaces are used
+     * - they are given a type
+     * - they contain an element constructor (mandatory)
+     * - they contain a function call
+     */
+    if(var.global || var.type != null || e.uses(Use.CNS) ||
+        e instanceof UserFuncCall) {
       e = var.value(ctx);
     }
 
-    ctx.ns = ns;
     return e;
   }
 
@@ -116,7 +115,7 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return VARBL;
   }
 

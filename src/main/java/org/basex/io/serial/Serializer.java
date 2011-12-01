@@ -232,7 +232,7 @@ public abstract class Serializer {
           int pp = p;
 
           // check namespace of current element
-          byte[] key = pref(name);
+          byte[] key = prefix(name);
           byte[] val = data.ns.uri(data.uri(p, k));
           if(val == null) val = EMPTY;
           // add new or updated namespace
@@ -243,7 +243,7 @@ public abstract class Serializer {
             final Atts atn = data.ns(pp);
             for(int n = 0; n < atn.size(); ++n) {
               key = atn.key(n);
-              val = atn.val(n);
+              val = atn.value(n);
               if(!nsp.contains(key)) {
                 nsp.add(key);
                 namespace(key, val);
@@ -279,7 +279,7 @@ public abstract class Serializer {
    */
   public final void openElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
-    openElement(name(expr), a);
+    openElement(info(expr), a);
   }
 
   /**
@@ -291,7 +291,7 @@ public abstract class Serializer {
    */
   public final void emptyElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
-    emptyElement(name(expr), a);
+    emptyElement(info(expr), a);
   }
 
   /**
@@ -451,8 +451,8 @@ public abstract class Serializer {
    * @param expr expression
    * @return name
    */
-  protected byte[] name(final ExprInfo expr) {
-    return token(expr.name());
+  protected byte[] info(final ExprInfo expr) {
+    return token(expr.info());
   }
 
   /**
@@ -478,7 +478,7 @@ public abstract class Serializer {
    */
   private byte[] ns(final byte[] pre) {
     for(int i = ns.size() - 1; i >= 0; i--)
-      if(eq(ns.key(i), pre)) return ns.val(i);
+      if(eq(ns.key(i), pre)) return ns.value(i);
     return null;
   }
 

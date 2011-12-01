@@ -14,7 +14,9 @@ import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 
 /**
- * Signatures of all statically available XQuery functions.
+ * Signatures of all statically available XQuery functions:
+ * Namespace mappings for function prefixes and URIs are specified in the
+ * static code in the {@code NSGlobal} class.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -359,19 +361,19 @@ public enum Function {
   /** XQuery function. */
   ONE_OR_MORE(FNSimple.class, "one-or-more(item)", ITEM_OM, ITEM_ZM),
   /** XQuery function. */
-  DEEP_EQUAL(FNSimple.class, "deep-equal(item,item[,coll])", BLN, 2, ITEM_ZM,
-      ITEM_ZM, STR),
+  DEEP_EQUAL(FNSimple.class, "deep-equal(item,item[,coll])",
+      BLN, 2, ITEM_ZM, ITEM_ZM, STR),
 
   /* FNStr functions. */
 
   /** XQuery function. */
-  CODEPOINT_EQUAL(FNStr.class, "codepoint-equal(string,string)", BLN_ZO, STR_ZO,
-      STR_ZO),
+  CODEPOINT_EQUAL(FNStr.class, "codepoint-equal(string,string)",
+      BLN_ZO, STR_ZO, STR_ZO),
   /** XQuery function. */
   CODEPOINTS_TO_STRING(FNStr.class, "codepoints-to-string(nums)", STR, ITR_ZM),
   /** XQuery function. */
-  COMPARE(FNStr.class, "compare(first,second[,coll])", ITR_ZO, 2, STR_ZO,
-      STR_ZO, STR),
+  COMPARE(FNStr.class, "compare(first,second[,coll])",
+      ITR_ZO, 2, STR_ZO, STR_ZO, STR),
   /** XQuery function. */
   CONCAT(FNStr.class, "concat(atom,atom[,...])", STR, -2, AAT_ZO, AAT_ZO),
   /** XQuery function. */
@@ -400,8 +402,8 @@ public enum Function {
   STRING_TO_CODEPOINTS(FNStr.class, "string-to-codepoints(string)",
       ITR_ZM, STR_ZO),
   /** XQuery function. */
-  SUBSTRING(FNStr.class, "substring(string,start[,len])", STR, 2, STR_ZO, DBL,
-      DBL),
+  SUBSTRING(FNStr.class, "substring(string,start[,len])",
+      STR, 2, STR_ZO, DBL, DBL),
   /** XQuery function. */
   SUBSTRING_AFTER(FNStr.class, "substring-after(string,sub[,coll])",
       STR, 2, STR_ZO, STR_ZO, STR),
@@ -699,6 +701,9 @@ public enum Function {
       ITEM, STR),
   /** Utility function: returns a random unique id. */
   _UTIL_UUID(FNUtil.class, "uuid()", STR),
+  /** Utility function: compares items in depth and offers some more options. */
+  _UTIL_DEEP_EQUAL(FNUtil.class, "deep-equal(item,item[,options])",
+      BLN, 2, ITEM_ZM, ITEM_ZM, ITEM),
 
   /* FNXslt functions. */
 
@@ -723,6 +728,11 @@ public enum Function {
   _ZIP_ZIP_FILE(FNZip.class, "zip-file(zip)", EMP, ELM),
   /** XQuery function */
   _ZIP_UPDATE_ENTRIES(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
+
+  /** Updating functions. */
+  public static final Function[] UPDATING = {
+    PUT, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE, _DB_OPTIMIZE, _DB_STORE
+  };
 
   /**
    * Mapping between function classes and namespace URIs.

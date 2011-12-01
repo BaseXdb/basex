@@ -25,12 +25,12 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public String getNodeName() {
-    return Token.string(node.nname());
+    return Token.string(node.name());
   }
 
   @Override
   public String getLocalName() {
-    return Token.string(Token.ln(node.nname()));
+    return Token.string(Token.local(node.name()));
   }
 
   @Override
@@ -46,7 +46,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public String getNamespaceURI() {
-    final byte[] uri = node.qname().uri().string();
+    final byte[] uri = node.qname().uri();
     return uri.length == 0 ? null : Token.string(uri);
   }
 
@@ -165,7 +165,7 @@ public final class BXElem extends BXNode implements Element {
     final AxisIter ai = node.attributes();
     final byte[] nm = Token.token(name);
     for(ANode n; (n = ai.next()) != null;) {
-      if(Token.eq(nm, n.nname())) return n;
+      if(Token.eq(nm, n.name())) return n;
     }
     return null;
   }

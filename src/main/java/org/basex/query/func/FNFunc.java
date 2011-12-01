@@ -76,7 +76,7 @@ public final class FNFunc extends FuncCall {
     final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
 
     final int arity = f.arity();
-    if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.name(), pos + 1);
+    if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.info(), pos + 1);
 
     final FuncType ft = (FuncType) f.type;
     final Var[] vars = new Var[arity - 1];

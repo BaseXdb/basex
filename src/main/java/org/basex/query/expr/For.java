@@ -14,7 +14,6 @@ import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * For clause.
@@ -153,8 +152,7 @@ public final class For extends ForLet {
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, VAR, token(var.toString()));
     if(pos != null) ser.attribute(POS, token(pos.toString()));
-    if(score != null) ser.attribute(Token.token(SCORE),
-        token(score.toString()));
+    if(score != null) ser.attribute(token(SCORE), token(score.toString()));
     expr.plan(ser);
     ser.closeElement();
   }

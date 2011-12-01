@@ -107,8 +107,8 @@ public final class DynFuncCall extends Arr {
   }
 
   @Override
-  public String desc() {
-    return expr[expr.length - 1].desc() + "(...)";
+  public String description() {
+    return expr[expr.length - 1].description() + "(...)";
   }
 
   @Override

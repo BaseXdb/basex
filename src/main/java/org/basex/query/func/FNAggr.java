@@ -61,7 +61,7 @@ public final class FNAggr extends FuncCall {
   public Expr cmp(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
     final long c = e.size();
-    if(c < 0 || e.uses(Use.NDT)) return this;
+    if(c < 0 || e.uses(Use.NDT) || e.uses(Use.CNS)) return this;
 
     switch(def) {
       case COUNT:
@@ -125,7 +125,7 @@ public final class FNAggr extends FuncCall {
     if(!res.type.isUntyped() && res.type.isString() || res.type.isDate()) {
       for(Item it; (it = iter.next()) != null;) {
         if(it.type != res.type) {
-          FUNCMP.thrw(input, desc(), res.type, it.type);
+          FUNCMP.thrw(input, description(), res.type, it.type);
         }
         if(cmp.e(input, res, it)) res = it;
       }

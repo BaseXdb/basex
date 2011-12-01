@@ -159,15 +159,15 @@ public final class FNZipTest extends AdvancedQueryTest {
     checkZipEntry("4", token("<a/>"));
 
     // ZIP namespace must be removed from zipped entry
-    query(_ZIP_ZIP_FILE.args(zipParamsPref("5", "<a/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPrefix("5", "<a/>")));
     checkZipEntry("5", token("<a/>"));
-    query(_ZIP_ZIP_FILE.args(zipParamsPref("6", "<a><b/></a>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPrefix("6", "<a><b/></a>")));
     checkZipEntry("6", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
-    query(_ZIP_ZIP_FILE.args(zipParamsPref("7", "<z:a xmlns:z='z'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPrefix("7", "<z:a xmlns:z='z'/>")));
     checkZipEntry("7", token("<z:a xmlns:z=\"z\"/>"));
-    query(_ZIP_ZIP_FILE.args(zipParamsPref("8", "<zip:a xmlns:zip='z'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPrefix("8", "<zip:a xmlns:zip='z'/>")));
     checkZipEntry("8", token("<zip:a xmlns:zip=\"z\"/>"));
-    query(_ZIP_ZIP_FILE.args(zipParamsPref("9", "<a xmlns='z'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParamsPrefix("9", "<a xmlns='z'/>")));
     checkZipEntry("9", token("<a xmlns=\"z\"/>"));
   }
 
@@ -178,7 +178,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @return parameter string
    * @throws IOException I/O Exception
    */
-  private static String zipParamsPref(final String name,
+  private static String zipParamsPrefix(final String name,
       final String entry) throws IOException {
     return "<zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
         new File(TMPZIP).getCanonicalPath() + "'>" +

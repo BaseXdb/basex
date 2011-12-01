@@ -50,8 +50,8 @@ public final class JarParser {
       for(ANode next; (next = ch.next()) != null;) {
         final QNm name = next.qname();
         // ignore namespace to improve compatibility
-        if(eq(JAR, name.ln())) desc.jars.add(next.string());
-        else if(eq(CLASS, name.ln())) desc.classes.add(next.string());
+        if(eq(JAR, name.local())) desc.jars.add(next.string());
+        else if(eq(CLASS, name.local())) desc.classes.add(next.string());
         // [CG] add message for unknown elements
       }
       if(desc.jars.size() == 0) JARDESCINV.thrw(input, NOJARS);

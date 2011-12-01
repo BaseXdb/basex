@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Commands.CmdSet;
+import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterUser;
@@ -120,7 +120,7 @@ public final class PermissionTest {
     no(new InfoIndex(), testSession);
     no(new InfoStorage(), testSession);
     no(new Get("DBPATH"), testSession);
-    no(new Set(CmdSet.QUERYINFO, false), testSession);
+    no(new Set(Prop.QUERYINFO, false), testSession);
 
     // repo Stuff
     no(new RepoInstall(REPO, null), testSession);
@@ -158,8 +158,8 @@ public final class PermissionTest {
     ok(new ListDB(NAME), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
-    ok(new Get(CmdSet.QUERYINFO), testSession);
-    ok(new Set(CmdSet.QUERYINFO, false), testSession);
+    ok(new Get(Prop.QUERYINFO), testSession);
+    ok(new Set(Prop.QUERYINFO, false), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
     ok(new Find(NAME), testSession);

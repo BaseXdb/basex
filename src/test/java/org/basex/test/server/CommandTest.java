@@ -7,8 +7,8 @@ import java.io.IOException;
 
 import org.basex.core.Command;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Commands.CmdSet;
 import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterDB;
@@ -323,7 +323,7 @@ public class CommandTest {
   /** Command test. */
   @Test
   public final void get() {
-    ok(new Get(CmdSet.CHOP));
+    ok(new Get(Prop.CHOP));
     no(new Get(NAME2));
   }
 
@@ -535,8 +535,8 @@ public class CommandTest {
   /** Command test. */
   @Test
   public final void set() {
-    ok(new Set(CmdSet.CHOP, false));
-    ok(new Set(CmdSet.CHOP, true));
+    ok(new Set(Prop.CHOP, false));
+    ok(new Set(Prop.CHOP, true));
     ok(new Set("chop", true));
     ok(new Set("runs", 1));
     no(new Set("runs", true));

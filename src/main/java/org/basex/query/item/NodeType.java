@@ -16,6 +16,7 @@ import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 import org.w3c.dom.Attr;
@@ -101,10 +102,13 @@ public enum NodeType implements Type {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
         new FComm((Comment) o);
     }
-  };
+  },
+
+  /** Namespace type. */
+  NSP("namespace-node", NOD);
 
   /** String representation. */
-  private final byte[] nam;
+  private final byte[] string;
   /** Parent type. */
   private final Type par;
   /** Sequence type. */
@@ -168,7 +172,7 @@ public enum NodeType implements Type {
    * @param pr parent type
    */
   private NodeType(final String nm, final Type pr) {
-    nam = Token.token(nm);
+    string = Token.token(nm);
     par = pr;
   }
 
@@ -205,10 +209,11 @@ public enum NodeType implements Type {
    * @return type or {@code null}
    */
   public static NodeType find(final QNm type) {
-    final byte[] ln = type.ln();
-    final byte[] uri = type.uri().string();
-    for(final NodeType t : values()) {
-      if(Token.eq(ln, t.nam) && Token.eq(uri, Token.EMPTY)) return t;
+    if(type.uri().length == 0) {
+      final byte[] ln = type.local();
+      for(final NodeType t : values()) {
+        if(Token.eq(ln, t.string)) return t;
+      }
     }
     return null;
   }
@@ -220,11 +225,11 @@ public enum NodeType implements Type {
 
   @Override
   public String toString() {
-    return Token.string(nam) + "()";
+    return new TokenBuilder(string).add("()").toString();
   }
 
   @Override
   public byte[] string() {
-    return nam;
+    return string;
   }
 }

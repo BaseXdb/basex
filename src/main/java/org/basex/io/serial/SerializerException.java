@@ -3,6 +3,7 @@ package org.basex.io.serial;
 import java.io.IOException;
 import org.basex.core.BaseXException;
 import org.basex.query.util.Err;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class signals that an exception occurred during query serialization.
@@ -39,6 +40,7 @@ public final class SerializerException extends IOException {
 
   @Override
   public String getMessage() {
-    return "[" + err.code() + "] " + getLocalizedMessage();
+    return new TokenBuilder().add('[').add(err.qname().string()).
+        add(']').add(getLocalizedMessage()).toString();
   }
 }

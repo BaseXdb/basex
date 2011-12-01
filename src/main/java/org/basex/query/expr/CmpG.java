@@ -371,7 +371,7 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return "'" + op + "' expression";
   }
 

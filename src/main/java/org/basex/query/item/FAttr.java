@@ -44,7 +44,7 @@ public final class FAttr extends FNode {
   }
 
   @Override
-  public byte[] nname() {
+  public byte[] name() {
     return name.string();
   }
 
@@ -65,6 +65,6 @@ public final class FAttr extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("%(%=\"%\")", name(), name.string(), val);
+    return Util.info(" %=\"%\"", name.string(), val);
   }
 }

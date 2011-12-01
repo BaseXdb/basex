@@ -45,8 +45,8 @@ public enum Calc {
           checkRange(ii, l1 + (double) l2);
           return Int.get(l1 + l2);
         }
-        if(t == FLT) return Flt.get(a.flt(ii) + b.flt(ii));
         if(t == DBL) return Dbl.get(a.dbl(ii) + b.dbl(ii));
+        if(t == FLT) return Flt.get(a.flt(ii) + b.flt(ii));
         return Dec.get(a.dec(ii).add(b.dec(ii)));
       }
 

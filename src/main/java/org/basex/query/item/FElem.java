@@ -10,6 +10,7 @@ import org.basex.query.iter.NodeCache;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenMap;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -94,14 +95,14 @@ public final class FElem extends FNode {
       if(Token.eq(nm, XMLNS)) {
         ns.add(EMPTY, uri);
       } else if(startsWith(nm, XMLNSC)) {
-        ns.add(ln(nm), uri);
+        ns.add(local(nm), uri);
       } else {
         add(new FAttr(att));
       }
     }
 
     // add all new namespaces
-    for(int i = 0; i < ns.size(); ++i) nss.add(ns.key(i), ns.val(i));
+    for(int i = 0; i < ns.size(); ++i) nss.add(ns.key(i), ns.value(i));
 
     // no parent, so we have to add all namespaces in scope
     if(p == null) {
@@ -111,8 +112,8 @@ public final class FElem extends FNode {
       }
     }
 
-    final byte[] pref = name.pref();
-    final byte[] uri = name.uri().string();
+    final byte[] pref = name.prefix();
+    final byte[] uri = name.uri();
     final byte[] old = nss.get(pref);
     if(old == null || !Token.eq(uri, old)) {
       ns.add(pref, uri);
@@ -163,7 +164,7 @@ public final class FElem extends FNode {
           if(nss.get(EMPTY) == null) nss.add(EMPTY, val);
         } else if(startsWith(name, XMLNS)) {
           // prefixed namespace
-          final byte[] ln = ln(name);
+          final byte[] ln = local(name);
           if(nss.get(ln) == null) nss.add(ln, val);
         }
       }
@@ -183,12 +184,12 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public byte[] nname() {
+  public byte[] name() {
     return name.string();
   }
 
   @Override
-  public Atts ns() {
+  public Atts namespaces() {
     return ns;
   }
 
@@ -197,17 +198,17 @@ public final class FElem extends FNode {
     final byte[] tag = name.string();
     ser.openElement(tag);
 
-    if(name.hasUri()) ser.namespace(name.pref(), name.uri().string());
+    if(name.hasURI()) ser.namespace(name.prefix(), name.uri());
 
     // serialize all namespaces at top level...
     if(ser.level() == 0) {
       final Atts nns = nsScope();
       for(int a = 0; a < nns.size(); ++a) {
-        ser.namespace(nns.key(a), nns.val(a));
+        ser.namespace(nns.key(a), nns.value(a));
       }
     } else if(ns != null) {
       for(int p = ns.size() - 1; p >= 0; p--) {
-        ser.namespace(ns.key(p), ns.val(p));
+        ser.namespace(ns.key(p), ns.value(p));
       }
     }
 
@@ -215,8 +216,8 @@ public final class FElem extends FNode {
     for(int n = 0; n < atts.size(); ++n) {
       final ANode node = atts.get(n);
       final QNm atn = node.qname();
-      if(atn.ns() && !NSGlobal.standard(atn.uri().string())) {
-        ser.namespace(atn.pref(), atn.uri().string());
+      if(atn.hasPrefix() && !NSGlobal.standard(atn.uri())) {
+        ser.namespace(atn.prefix(), atn.uri());
       }
       ser.attribute(atn.string(), node.string());
     }
@@ -231,7 +232,7 @@ public final class FElem extends FNode {
     final FElem node = new FElem(name);
     for(int c = 0; c < children.size(); ++c) node.add(children.get(c).copy());
     for(int c = 0; c < atts.size(); ++c) node.add(atts.get(c).copy());
-    for(int c = 0; c < ns.size(); ++c) node.ns.add(ns.key(c), ns.val(c));
+    for(int c = 0; c < ns.size(); ++c) node.ns.add(ns.key(c), ns.value(c));
     return node.parent(par);
   }
 
@@ -242,10 +243,13 @@ public final class FElem extends FNode {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("<");
-    sb.append(Token.string(name.string()));
-    if(atts.size() != 0 || ns != null && ns.size() != 0 || children.size() != 0)
-      sb.append(" ...");
-    return sb.append("/>").toString();
+    final TokenBuilder tb = new TokenBuilder().add('<').add(name.string());
+    for(int a = 0; a < atts.size(); a++) tb.add(atts.get(a).toString());
+    for(int a = 0; a < ns.size(); a++) {
+      tb.add(new FNames(ns.key(a), ns.value(a)).toString());
+    }
+    if(children.size() != 0) tb.add(">...</").add(name.string());
+    else tb.add("/");
+    return tb.add(">").toString();
   }
 }

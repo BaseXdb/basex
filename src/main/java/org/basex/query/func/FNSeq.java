@@ -123,11 +123,11 @@ public final class FNSeq extends FuncCall {
 
     // multiple documents and/or constructed fragments
     final NodeCache out = new NodeCache(new ANode[len], 0);
-    outer: for(int i = 0; i < len; i++) {
+    OUTER: for(int i = 0; i < len; i++) {
       final ANode nd = nc.item[i];
-      final AxisIter ax = outer ? nd.anc() : nd.descendant();
+      final AxisIter ax = outer ? nd.ancestor() : nd.descendant();
       for(ANode a; (a = ax.next()) != null;)
-        if(nc.indexOf(a, false) != -1) continue outer;
+        if(nc.indexOf(a, false) != -1) continue OUTER;
       out.add(nc.item[i]);
     }
 

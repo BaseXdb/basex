@@ -60,25 +60,25 @@ public interface Type {
   boolean isNumber();
 
   /**
-   * Checks if the type refers to an untyped value.
+   * Checks if the type refers to an untyped item.
    * @return result of check
    */
   boolean isUntyped();
 
   /**
-   * Checks if the type refers to a string.
+   * Checks if the type refers to an {@code xs:string} or one of its sub-types.
    * @return result of check
    */
   boolean isString();
 
   /**
-   * Checks if the type refers to a duration.
+   * Checks if the type refers to a {@code xs:duration} or one of its sub-types.
    * @return result of check
    */
   boolean isDuration();
 
   /**
-   * Checks if the type refers to a date.
+   * Checks if the type refers to a {@code date} or one of its sub-types.
    * @return result of check
    */
   boolean isDate();

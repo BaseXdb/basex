@@ -335,10 +335,10 @@ public abstract class Builder extends Progress {
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
-      n = atts.index(att.key(a), att.val(a), true);
+      n = atts.index(att.key(a), att.value(a), true);
       u = ns.uri(att.key(a), false);
       if(meta.pathindex) path.index(n, Data.ATTR, lvl + 1);
-      addAttr(n, att.val(a), Math.min(IO.MAXATTS, a + 1), u);
+      addAttr(n, att.value(a), Math.min(IO.MAXATTS, a + 1), u);
     }
 
     if(lvl != 0) {

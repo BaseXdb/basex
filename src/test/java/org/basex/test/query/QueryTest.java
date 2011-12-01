@@ -88,7 +88,7 @@ public abstract class QueryTest {
         }
 
         if(!correct || !val.sameAs(cmp)) {
-          sb.append("-- " + qu[0] + ": " + query);
+          sb.append("[" + qu[0] + "] " + query);
           String s = correct && cmp.size() != 1 ? "#" + cmp.size() : "";
           sb.append("\n[E" + s + "] ");
           if(correct) {
@@ -104,16 +104,18 @@ public abstract class QueryTest {
           ++fail;
         }
       } catch(final BaseXException ex) {
-        if(correct || ex.getMessage().contains("mailman")) {
+        final String msg = ex.getMessage();
+        if(correct || msg.contains("mailman")) {
           final String cp = correct && (!(cmp instanceof Nodes) ||
               ((Nodes) cmp).data != null) ? cmp.toString() : "()";
-          sb.append("-- " + qu[0] + ": " + query + "\n[E] " +
-              cp + "\n[F] " + ex.getMessage() + " " + details() + "\n");
+          sb.append("[" + qu[0] + "] " + query + "\n[E] " +
+              cp + "\n[F] " + msg.replaceAll("\r\n?|\n", " ") + " " +
+              details() + "\n");
           ++fail;
         }
       }
     }
-    if(fail != 0) fail(fail + " wrong queries; [E] expected, [F] found:\n" +
+    if(fail != 0) fail(fail + " Errors. [E] = expected, [F] = found:\n" +
         sb.toString().trim());
   }
 

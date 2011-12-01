@@ -145,7 +145,7 @@ public abstract class UserFuncCall extends Arr {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return FUNC;
   }
 

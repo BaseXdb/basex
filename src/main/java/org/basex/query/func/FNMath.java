@@ -34,7 +34,7 @@ public final class FNMath extends FuncCall {
       if(expr[0].isEmpty()) return null;
       d = checkDbl(expr[0], ctx);
     }
-    final double e = expr.length > 1 ? checkDbl(expr[1], ctx) : 0;
+    final double e = expr.length == 2 ? checkDbl(expr[1], ctx) : 0;
 
     switch(def) {
       case _MATH_PI:     return Dbl.get(PI);
@@ -51,7 +51,7 @@ public final class FNMath extends FuncCall {
       case _MATH_LOG:    return Dbl.get(log(d));
       case _MATH_LOG10:  return Dbl.get(log10(d));
       case _MATH_ATAN2:  return Dbl.get(atan2(d, e));
-      case _MATH_POW:    return Dbl.get(d == 1 ? 1 : pow(d, e));
+      case _MATH_POW:    return Dbl.get(power(d, e));
       // project-specific
       case _MATH_RANDOM: return Dbl.get(random());
       case _MATH_SINH:   return Dbl.get(sinh(d));
@@ -59,6 +59,21 @@ public final class FNMath extends FuncCall {
       case _MATH_TANH:   return Dbl.get(tanh(d));
       default:           return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Calculates the power.
+   * @param b base
+   * @param e exponent
+   * @return power
+   */
+  private static double power(final double b, final double e) {
+    if(b == 1) return 1;
+    if(b == -1) {
+      if(Double.isNaN(e)) return b;
+      if(Double.isInfinite(e)) return 1;
+    }
+    return pow(b, e);
   }
 
   @Override

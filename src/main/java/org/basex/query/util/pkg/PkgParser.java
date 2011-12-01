@@ -77,7 +77,7 @@ public final class PkgParser {
 
     final AxisIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
-      final byte[] name = next.nname();
+      final byte[] name = next.name();
       if(eq(NAME, name))         p.name = next.string();
       else if(eq(ABBREV, name))  p.abbrev = next.string();
       else if(eq(VERSION, name)) p.version = next.string();
@@ -123,7 +123,7 @@ public final class PkgParser {
     final AxisIter atts = node.attributes();
     final Dependency d = new Dependency();
     for(ANode next; (next = atts.next()) != null;) {
-      final byte[] name = next.nname();
+      final byte[] name = next.name();
       if(eq(PKG, name))            d.pkg = next.string();
       else if(eq(PROC, name))      d.processor = next.string();
       else if(eq(VERS, name))      d.versions = next.string();

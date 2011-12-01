@@ -90,11 +90,6 @@ public final class SimpleTest extends QueryTest {
       { "ContextItem 7", node(0), "try { <a/>/(1+'') } catch * {.}" },
 
       { "Path 1", empty(), "<a/>[./(@*)]" },
-
-      { "Constructor 0",
-        "declare copy-namespaces no-preserve no-inherit; 1" },
-      { "Constructor 1", dbl(2),
-        "number(<e xmlns:n='O'> { count( in-scope-prefixes(<e/>) ) } </e>)" },
     };
   }
 }

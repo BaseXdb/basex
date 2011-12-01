@@ -64,8 +64,8 @@ public final class UserFuncs extends ExprInfo {
       final QueryContext ctx, final QueryParser qp) throws QueryException {
 
     // find function
-    final byte[] uri = name.uri().string();
-    final byte[] ln = name.ln();
+    final byte[] uri = name.uri();
+    final byte[] ln = name.local();
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
@@ -111,17 +111,19 @@ public final class UserFuncs extends ExprInfo {
     // check predefined functions
     final FuncCall fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
-      ctx.updating |= fun.def == Function.PUT || fun.def == Function._DB_ADD ||
-        fun.def == Function._DB_DELETE || fun.def == Function._DB_RENAME ||
-        fun.def == Function._DB_REPLACE || fun.def == Function._DB_OPTIMIZE ||
-        fun.def == Function._DB_STORE;
+      for(final Function f : Function.UPDATING) {
+        if(fun.def == f) {
+          ctx.updating = true;
+          break;
+        }
+      }
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 
     // find local function
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
-      if(eq(ln, qn.ln()) && eq(uri, qn.uri().string()) && args.length ==
+      if(eq(ln, qn.local()) && eq(uri, qn.uri()) && args.length ==
         func[l].args.length) return new TypedFunc(
             add(qp.input(), qn, l, args), FuncType.get(func[l]));
     }
@@ -162,7 +164,7 @@ public final class UserFuncs extends ExprInfo {
 
     final QNm name = fun.name;
 
-    final byte[] uri = name.uri().string();
+    final byte[] uri = name.uri();
     if(uri.length == 0) qp.error(FUNNONS, name.string());
 
     if(NSGlobal.standard(uri)) {
@@ -170,11 +172,11 @@ public final class UserFuncs extends ExprInfo {
       funError(name, qp);
     }
 
-    final byte[] ln = name.ln();
+    final byte[] ln = name.local();
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
-      final byte[] u = qn.uri().string();
-      final byte[] nm = qn.ln();
+      final byte[] u = qn.uri();
+      final byte[] nm = qn.local();
 
       if(eq(ln, nm) && eq(uri, u) && fun.args.length == func[l].args.length) {
         // declare function that has been called before
@@ -231,9 +233,9 @@ public final class UserFuncs extends ExprInfo {
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
-    final byte[] nm = lc(name.ln());
+    final byte[] nm = lc(name.local());
     for(int n = 0; n < func.length; ++n) {
-      if(ls.similar(nm, lc(func[n].name.ln()), 0)) {
+      if(ls.similar(nm, lc(func[n].name.local()), 0)) {
         qp.error(FUNSIMILAR, name.string(), func[n].name.string());
       }
     }

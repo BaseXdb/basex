@@ -35,7 +35,7 @@ public final class RenameNode extends ValueUpdate {
 
   @Override
   public void apply() {
-    data.update(pre, data.kind(pre), name.string(), name.uri().string());
+    data.update(pre, data.kind(pre), name.string(), name.uri());
   }
 
   @Override

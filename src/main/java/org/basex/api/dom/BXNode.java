@@ -116,12 +116,12 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return toJava(node.follSibl().next());
+    return toJava(node.followingSibling().next());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return toJava(node.precSibl().next());
+    return toJava(node.precedingSibling().next());
   }
 
   @Override
@@ -275,7 +275,7 @@ public abstract class BXNode implements Node {
     final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
     for(ANode n; (n = ai.next()) != null;) {
-      if(n.type == NodeType.ELM && (nm == null || eq(nm, n.nname())))
+      if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name())))
         nb.add(n.copy());
     }
     return new BXNList(nb);
@@ -288,7 +288,7 @@ public abstract class BXNode implements Node {
    */
   protected static final NodeCache finish(final AxisIter ai) {
     final NodeCache nc = new NodeCache();
-    for(ANode n; (n = ai.next()) != null;) nc.add(n.copy());
+    for(ANode n; (n = ai.next()) != null;) nc.add(n.finish());
     return nc;
   }
 

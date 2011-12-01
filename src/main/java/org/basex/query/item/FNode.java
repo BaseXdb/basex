@@ -93,7 +93,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter anc() {
+  public final AxisIter ancestor() {
     return new AxisIter() {
       /** Temporary node. */
       private ANode node = FNode.this;
@@ -107,7 +107,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter ancOrSelf() {
+  public final AxisIter ancestorOrSelf() {
     return new AxisIter() {
       /** Temporary node. */
       private ANode node = FNode.this;
@@ -171,7 +171,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter descOrSelf() {
+  public final AxisIter descendantOrSelf() {
     return desc(true);
   }
 
@@ -208,7 +208,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter par() {
+  public final AxisIter parentIter() {
     return new AxisIter() {
       /** First call. */
       private boolean more;
@@ -221,7 +221,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter follSibl() {
+  public final AxisIter followingSibling() {
     return new AxisIter() {
       /** Iterator. */
       private AxisIter ai;
@@ -240,7 +240,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter foll() {
+  public final AxisIter following() {
     return new AxisIter() {
       /** Iterator. */
       private NodeCache nc;

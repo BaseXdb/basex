@@ -4,9 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
 import java.io.IOException;
-import java.util.HashSet;
-
-import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
@@ -76,33 +73,33 @@ public final class Transform extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
-    final TransformModifier pu = new TransformModifier();
-    for(final Let fo : copies) {
-      final Iter ir = ctx.iter(fo.expr);
-      final Item i = ir.next();
-      if(i == null || !i.type.isNode() || ir.next() != null)
-        UPCOPYMULT.thrw(input);
+    try {
+      final TransformModifier pu = new TransformModifier();
+      for(final Let fo : copies) {
+        final Iter ir = ctx.iter(fo.expr);
+        final Item i = ir.next();
+        if(i == null || !i.type.isNode() || ir.next() != null)
+          UPCOPYMULT.thrw(input);
 
-      // copy node to main memory data instance
-      final MemData md = new MemData(ctx.context.prop);
-      new DataBuilder(md).context(ctx).build((ANode) i);
+        // copy node to main memory data instance
+        final MemData md = new MemData(ctx.context.prop);
+        new DataBuilder(md).context(ctx).build((ANode) i);
 
-      // add resulting node to variable
-      ctx.vars.add(fo.var.bind(new DBNode(md, 0), ctx).copy());
-      pu.addData(md);
-      if(ctx.copiedNods == null) ctx.copiedNods = new HashSet<Data>();
-      ctx.copiedNods.add(md);
+        // add resulting node to variable
+        ctx.vars.add(fo.var.bind(new DBNode(md, 0), ctx).copy());
+        pu.addData(md);
+      }
+
+      final ContextModifier tmp = ctx.updates.mod;
+      ctx.updates.mod = pu;
+      expr[0].value(ctx);
+      ctx.updates.applyUpdates();
+      ctx.updates.mod = tmp;
+
+      return ctx.value(expr[1]);
+    } finally {
+      ctx.vars.size(s);
     }
-
-    final ContextModifier tmp = ctx.updates.mod;
-    ctx.updates.mod = pu;
-    expr[0].value(ctx);
-    ctx.updates.applyUpdates();
-    ctx.updates.mod = tmp;
-
-    final Value v = ctx.value(expr[1]);
-    ctx.vars.size(s);
-    return v;
   }
 
   @Override

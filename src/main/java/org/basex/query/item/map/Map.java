@@ -85,10 +85,10 @@ public final class Map extends FItem {
    */
   private Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw XPEMPTY.thrw(ii, desc());
+    if(it == null) throw XPEMPTY.thrw(ii, description());
 
     // function items can't be keys
-    if(it instanceof FItem) throw FNATM.thrw(ii, it.desc());
+    if(it instanceof FItem) throw FNATM.thrw(ii, it.description());
 
     // NaN can't be stored as key, as it isn't equal to anything
     if(it == Flt.NAN || it == Dbl.NAN) return null;
@@ -244,7 +244,7 @@ public final class Map extends FItem {
     final ValueIter vi = keys().iter();
     for(Item k; (k = vi.next()) != null;) {
       final Type kt = k.type;
-      if(!kt.isString()) FUNCMP.thrw(ii, desc(), AtomType.STR, kt);
+      if(!kt.isString()) FUNCMP.thrw(ii, description(), AtomType.STR, kt);
       tm.add(k.string(null), get(k, ii).toJava());
     }
     return tm;
@@ -266,7 +266,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return MAPSTR + BRACE1 + DOTS + BRACE2;
   }
 

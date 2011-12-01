@@ -148,7 +148,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void errln(final Object obj, final Object... ext) {
-    err((obj instanceof Exception ? message((Exception) obj) : obj) + NL, ext);
+    err((obj instanceof Throwable ? message((Throwable) obj) : obj) + NL, ext);
   }
 
   /**
@@ -165,7 +165,7 @@ public final class Util {
    * @param ex throwable reference
    * @return error message
    */
-  public static String message(final Exception ex) {
+  public static String message(final Throwable ex) {
     debug(ex);
     final String msg = ex.getMessage();
     if(ex instanceof BindException) return SERVERBIND;

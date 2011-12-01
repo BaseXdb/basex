@@ -143,7 +143,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final byte[] nname() {
+  public final byte[] name() {
     final NodeType t = nodeType();
     switch(t) {
       case ELM: case ATT: case PI:
@@ -160,24 +160,22 @@ public class DBNode extends ANode {
 
   @Override
   public final QNm update(final QNm name) {
-    final byte[] nm = nname();
-    Uri uri = Uri.EMPTY;
-    // set prefix and local name
-    name.name(nm);
-    // set namespace
-    final boolean ns = name.ns();
-    if(ns || data.ns.size() != 0) {
-      final int n = ns ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
-      final byte[] u = n > 0 ? data.ns.uri(n) : ns ?
-          NSGlobal.uri(Token.pref(nm)) : Token.EMPTY;
-      if(u.length != 0) uri = new Uri(u);
+    // update the name and uri strings in the specified QName
+    final byte[] nm = name();
+    byte[] uri = Token.EMPTY;
+    final boolean pref = Token.indexOf(nm, ':') != -1;
+    if(pref || data.ns.size() != 0) {
+      final int n = pref ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
+      final byte[] u = n > 0 ? data.ns.uri(n) : pref ?
+          NSGlobal.uri(Token.prefix(nm)) : null;
+      if(u != null) uri = u;
     }
-    name.uri(uri);
+    name.update(nm, uri);
     return name;
   }
 
   @Override
-  public final Atts ns() {
+  public final Atts namespaces() {
     if(type == NodeType.ELM && nsp == null) nsp = data.ns(pre);
     return nsp;
   }
@@ -252,7 +250,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter anc() {
+  public final AxisIter ancestor() {
     return new AxisIter() {
       private final DBNode node = copy();
       int p = pre;
@@ -272,7 +270,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter ancOrSelf() {
+  public final AxisIter ancestorOrSelf() {
     return new AxisIter() {
       private final DBNode node = copy();
       int p = pre;
@@ -355,7 +353,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter descOrSelf() {
+  public final AxisIter descendantOrSelf() {
     return new AxisIter() {
       final DBNode node = copy();
       final int s = pre + data.size(pre, data.kind(pre));
@@ -373,7 +371,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter foll() {
+  public final AxisIter following() {
     return new AxisIter() {
       private final DBNode node = copy();
       final int s = data.meta.size;
@@ -392,7 +390,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter follSibl() {
+  public final AxisIter followingSibling() {
     return new AxisIter() {
       private final DBNode node = copy();
       int k = data.kind(pre);
@@ -412,7 +410,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter par() {
+  public final AxisIter parentIter() {
     return new AxisIter() {
       /** First call. */
       private boolean more;
@@ -442,15 +440,14 @@ public class DBNode extends ANode {
 
   @Override
   public String toString() {
-    final NodeType nt = (NodeType) type;
-    final TokenBuilder tb = new TokenBuilder(nt.string()).add(' ');
-    switch(nt) {
+    final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
+    switch((NodeType) type) {
       case ATT:
       case PI:
-        tb.add(nname()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
+        tb.add(name()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
         break;
       case ELM:
-        tb.add(nname()).add(" { ... }");
+        tb.add(name()).add(" { ... }");
         break;
       case DOC:
         tb.add("{ \"").add(data.text(pre, true)).add("\" }");

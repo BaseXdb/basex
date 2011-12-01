@@ -7,7 +7,6 @@ import java.util.Locale;
 import org.basex.core.AProp;
 import org.basex.core.MainProp;
 import org.basex.core.Context;
-import org.basex.core.Commands.CmdSet;
 import org.basex.core.User;
 import org.basex.util.Util;
 
@@ -18,12 +17,6 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class Set extends AGet {
-  /** Info strings (same order as options defined in {@link CmdSet}). */
-  private static final String[] STRINGS = {
-    INFOQUERY, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOTEXTINDEX,
-    INFOATTRINDEX, INFOFTINDEX, INFOPATHINDEX, INFODBPATH
-  };
-
   /**
    * Default constructor.
    * @param key property
@@ -37,11 +30,8 @@ public final class Set extends AGet {
 
   @Override
   protected boolean run() {
-    String key = args[0].toUpperCase(Locale.ENGLISH);
+    final String key = args[0].toUpperCase(Locale.ENGLISH);
     final String val = args[1];
-
-    CmdSet s = null;
-    try { s = Enum.valueOf(CmdSet.class, key); } catch(final Exception ex) { }
 
     try {
       String v = set(key, val, prop);
@@ -54,8 +44,6 @@ public final class Set extends AGet {
       }
       if(v == null) return whichKey();
 
-      final CmdSet[] cs = CmdSet.values();
-      for(int c = 0; c < cs.length; ++c) if(cs[c] == s) key = STRINGS[c];
       return info(key + COLS + v);
     } catch(final Exception ex) {
       Util.debug(ex);

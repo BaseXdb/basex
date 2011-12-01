@@ -115,8 +115,8 @@ public final class FNId extends FuncCall {
       for(ANode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
           final byte[] ln = lc(norm(checkEStr(at)));
-          return Bln.get(startsWith(ln, lang)
-              && (lang.length == ln.length || ln[lang.length] == '-'));
+          return Bln.get(startsWith(ln, lang) &&
+              (lang.length == ln.length || ln[lang.length] == '-'));
         }
       }
     }

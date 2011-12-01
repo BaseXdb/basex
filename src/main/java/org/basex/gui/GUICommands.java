@@ -266,7 +266,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Exits the application. */
-  EXIT(GUIEXIT, null, GUIEXITTT, false, false) {
+  EXIT(GUIEXIT, "% Q", GUIEXITTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       gui.dispose();

@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
@@ -9,6 +10,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import static org.basex.query.util.Err.*;
+
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -630,6 +632,7 @@ public enum AtomType implements Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
+
       if(!it.type.isString()) error(it, ii);
       final Uri u = Uri.uri(it.string(ii));
       if(!u.isValid()) FUNCAST.thrw(ii, this, it);
@@ -646,15 +649,14 @@ public enum AtomType implements Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
+
+      // argument must be of type string and a valid QName
       if(it.type != STR) error(it, ii);
-      final byte[] s = trim(it.string(ii));
-      if(s.length == 0) QNMINV.thrw(ii, s);
-      try {
-        return new QNm(s, ctx, ii);
-      } catch(final QueryException ex) {
-        NSDECL.thrw(ii, s);
-        return null;
-      }
+      final byte[] nm = it.string(ii);
+      if(nm.length == 0) FUNCAST.thrw(ii, this, it);
+      final QNm name = new QNm(nm, ctx);
+      if(!name.hasURI() && name.hasPrefix()) NSDECL.thrw(ii, name.prefix());
+      return name;
     }
     @Override
     public Item e(final Object o, final InputInfo ii) {
@@ -716,8 +718,8 @@ public enum AtomType implements Type {
    * @param n number flag
    * @param u untyped flag
    * @param s string flag
-   * @param d TODO
-   * @param t TODO
+   * @param d duration flag
+   * @param t date flag
    */
   private AtomType(final String nm, final Type pr, final byte[] ur,
       final boolean n, final boolean u, final boolean s, final boolean d,
@@ -896,9 +898,9 @@ public enum AtomType implements Type {
    */
   public static AtomType find(final QNm type, final boolean atom) {
     // type must be atomic, or must not have a namespace
-    if(atom ^ type.uri() == Uri.EMPTY) {
-      final byte[] ln = type.ln();
-      final byte[] uri = type.uri().string();
+    if(atom ^ type.uri().length == 0) {
+      final byte[] ln = type.local();
+      final byte[] uri = type.uri();
       for(final AtomType t : values()) {
         // skip non-standard types
         if(t == AtomType.SEQ || t == AtomType.JAVA) continue;

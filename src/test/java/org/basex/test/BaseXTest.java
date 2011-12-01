@@ -54,7 +54,7 @@ public abstract class BaseXTest extends MainTest {
     equals("8", "-b{}a=8", "-q$a");
     equals("9", "-b'':a=9", "-q$a");
     equals("A", "-b{URI}a=A", "-qdeclare namespace a='URI'; $a:a");
-    equals("B", "-b'URI':a=B", "-qdeclare namespace a='URI'; $a:a");
+    equals("B", "-b'URI':b=B", "-qdeclare namespace b='URI'; $b:b");
   }
 
   /**

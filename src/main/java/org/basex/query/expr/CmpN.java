@@ -114,7 +114,7 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return "'" + op + "' operator";
   }
 

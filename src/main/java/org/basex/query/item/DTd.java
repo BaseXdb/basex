@@ -63,8 +63,9 @@ public final class DTd extends Dur {
       throws QueryException {
 
     this(it);
-    if(Double.isNaN(f)) DATECALC.thrw(ii, desc(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, desc());
+    if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0)
+      DATEZERO.thrw(ii, description());
     sc = sc.multiply(BigDecimal.valueOf(m ? f : 1 / f));
     if(Math.abs(sc.doubleValue()) < 1E-13) sc = BigDecimal.valueOf(0);
   }

@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import javax.xml.namespace.QName;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -10,7 +11,6 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
-import org.basex.util.XMLToken;
 
 /**
  * QName item.
@@ -19,19 +19,19 @@ import org.basex.util.XMLToken;
  * @author Christian Gruen
  */
 public final class QNm extends Item {
-  /** URI. */
-  private Uri uri;
-  /** Local part and optional prefix. */
-  private byte[] val;
-  /** Namespace index. */
-  private int ns;
+  /** Namespace URI. */
+  private byte[] uri;
+  /** Name with optional prefix. */
+  private byte[] name;
+  /** Prefix index. */
+  private int pref;
 
   /**
    * Empty constructor.
    */
   public QNm() {
     super(AtomType.QNM);
-    val = EMPTY;
+    name = EMPTY;
   }
 
   /**
@@ -39,39 +39,15 @@ public final class QNm extends Item {
    * @param n name
    */
   public QNm(final byte[] n) {
-    this();
-    val = n;
-    ns = indexOf(n, ':');
+    super(AtomType.QNM);
+    name = n;
+    pref = indexOf(n, ':');
   }
 
   /**
    * Constructor.
    * @param n name
-   * @param ctx query context
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public QNm(final byte[] n, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    this(n);
-    if(!XMLToken.isQName(val)) Err.value(ii, type, val);
-    if(ns()) uri(ctx.ns.uri(pref(), false, ii));
-  }
-
-  /**
-   * Constructor.
-   * @param n name
-   * @param u uri
-   */
-  public QNm(final byte[] n, final Uri u) {
-    this(n);
-    uri = u;
-  }
-
-  /**
-   * Constructor.
-   * @param n name
-   * @param u uri
+   * @param u namespace URI
    */
   public QNm(final byte[] n, final byte[] u) {
     this(n);
@@ -79,7 +55,18 @@ public final class QNm extends Item {
   }
 
   /**
-   * Convenience method for converting a Java QName.
+   * Constructor, binding a statically known namespace.
+   * If no namespace is found, the namespace uri is set to {@code null}.
+   * @param n name
+   * @param ctx query context
+   */
+  public QNm(final byte[] n, final QueryContext ctx) {
+    this(n);
+    uri(ctx.ns.uri(prefix()));
+  }
+
+  /**
+   * Constructor for converting a Java QName.
    * @param qn qname
    */
   public QNm(final QName qn) {
@@ -89,31 +76,31 @@ public final class QNm extends Item {
 
   /**
    * Sets the URI of this QName.
-   * @param u the uri to set
+   * @param u the uri to be set
    */
   public void uri(final byte[] u) {
-    uri = Uri.uri(u);
+    uri = u == null ? null : norm(u);
   }
 
   /**
    * Returns the URI of this QName.
-   * @return the uri
+   * @return uri
    */
-  public Uri uri() {
-    return uri == null ? Uri.EMPTY : uri;
+  public byte[] uri() {
+    return uri == null ? EMPTY : uri;
   }
 
   /**
    * Checks if the URI of this QName has been explicitly set.
-   * @return {@code true} if it has been set, {@code false} otherwise
+   * @return result of check
    */
-  public boolean hasUri() {
+  public boolean hasURI() {
     return uri != null;
   }
 
   @Override
   public byte[] string(final InputInfo ii) {
-    return val;
+    return name;
   }
 
   /**
@@ -121,7 +108,7 @@ public final class QNm extends Item {
    * @return string value
    */
   public byte[] string() {
-    return val;
+    return name;
   }
 
   @Override
@@ -141,7 +128,8 @@ public final class QNm extends Item {
    * @return result of check
    */
   public boolean eq(final QNm n) {
-    return n == this || Token.eq(ln(), n.ln()) && uri().eq(n.uri());
+    return n == this || Token.eq(local(), n.local()) &&
+        Token.eq(uri(), n.uri());
   }
 
   @Override
@@ -153,47 +141,42 @@ public final class QNm extends Item {
    * Checks if the name contains a prefix.
    * @return result of check
    */
-  public boolean ns() {
-    return ns != -1;
+  public boolean hasPrefix() {
+    return pref != -1;
   }
 
   /**
    * Returns the prefix.
    * @return prefix
    */
-  public byte[] pref() {
-    return ns == -1 ? EMPTY : substring(val, 0, ns);
+  public byte[] prefix() {
+    return pref == -1 ? EMPTY : substring(name, 0, pref);
   }
 
   /**
    * Returns the local name.
    * @return local name
    */
-  public byte[] ln() {
-    return ns == -1 ? val : substring(val, ns + 1);
+  public byte[] local() {
+    return pref == -1 ? name : substring(name, pref + 1);
   }
 
   /**
-   * Sets the URI; only called to speed up internal operations.
-   * @param u the uri to set
+   * Updates the values of this QName. This method is only called
+   * to speed up internal operations.
+   * @param n name
+   * @param u URI
    */
-  void uri(final Uri u) {
+  void update(final byte[] n, final byte[] u) {
+    name = n;
+    pref = indexOf(name, ':');
     uri = u;
-  }
-
-  /**
-   * Sets the name; only called to speed up internal operations.
-   * @param nm name
-   */
-  void name(final byte[] nm) {
-    val = nm;
-    ns = indexOf(val, ':');
   }
 
   @Override
   public QName toJava() {
-    return new QName(Token.string(uri().string()), Token.string(ln()),
-        Token.string(pref()));
+    return new QName(Token.string(uri()), Token.string(local()),
+        Token.string(prefix()));
   }
 
   /**
@@ -202,17 +185,17 @@ public final class QNm extends Item {
    * @return full name
    */
   public byte[] full() {
-    return new TokenBuilder().add('{').add(uri().string()).add('}').
-      add(ln()).finish();
+    return new TokenBuilder().add('{').add(uri()).add('}').
+        add(local()).finish();
   }
 
   @Override
   public int hash(final InputInfo ii) throws QueryException {
-    return Token.hash(ln());
+    return Token.hash(local());
   }
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", val);
+    return Util.info("\"%\"", name);
   }
 }

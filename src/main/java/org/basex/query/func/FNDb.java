@@ -195,7 +195,8 @@ public final class FNDb extends FuncCall {
 
     // parse and compile the name test
     final Item name = checkEmpty(expr[2].item(ctx, input));
-    final QNm nm = new QNm(checkStr(name, ctx), ctx, input);
+    final QNm nm = new QNm(checkStr(name, ctx), ctx);
+    if(!nm.hasPrefix()) nm.uri(ctx.ns.uri(EMPTY));
 
     final NameTest nt = new NameTest(nm, NameTest.Name.STD, true, input);
     // no results expected: return empty sequence

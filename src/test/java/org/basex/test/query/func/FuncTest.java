@@ -106,16 +106,19 @@ public final class FuncTest extends QueryTest {
       { "lang 5", empty(),  "/.[lang('en-US')]" },
       { "lang 6", node(7), "//desc[lang('FR')]" },
 
-      { "uri 1", str("U"), "string(<x a='{ " +
-        "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
-      { "uri 2", str("U"), "string(<x a='{ " +
-        "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
+      { "last 1", itr(1), "1[last()]" },
+      { "last 2", itr(2), "(1 to 2)[last()]" },
+      { "last 3", itr(2), "(1 to 2)[position()=last()]" },
+      { "last 4", itr(1, 2), "(1 to 2)[position()=1 or position()=last()]" },
+      { "last 5", empty(), "(1 to 2)[position()=1 and position()=last()]" },
 
-      { "Last 1", itr(1), "1[last()]" },
-      { "Last 2", itr(2), "(1 to 2)[last()]" },
-      { "Last 3", itr(2), "(1 to 2)[position()=last()]" },
-      { "Last 4", itr(1, 2), "(1 to 2)[position()=1 or position()=last()]" },
-      { "Last 5", empty(), "(1 to 2)[position()=1 and position()=last()]" },
+      { "pow 1", dbl(1.0e0), "math:pow(1, xs:double('INF'))" },
+      { "pow 2", dbl(1.0e0), "math:pow(1, xs:double('-INF'))" },
+      { "pow 3", dbl(1.0e0), "math:pow(-1, xs:double('INF'))" },
+      { "pow 4", dbl(1.0e0), "math:pow(-1, xs:double('-INF'))" },
+      { "pow 5", dbl(1.0e0), "math:pow(1, xs:double('NaN'))" },
+      { "pow 6", dbl(Double.NaN), "math:pow(-2.5e0, 2.00000001e0)" },
+
     };
   }
 

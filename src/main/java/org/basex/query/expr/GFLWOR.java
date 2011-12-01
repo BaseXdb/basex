@@ -110,7 +110,7 @@ public class GFLWOR extends ParseExpr {
         empty = !where.ebv(ctx, input).bool(input);
         if(!empty) {
           // always true: test can be skipped
-          ctx.compInfo(OPTREMOVE, desc(), where);
+          ctx.compInfo(OPTREMOVE, description(), where);
           where = null;
         }
       }
@@ -124,7 +124,7 @@ public class GFLWOR extends ParseExpr {
 
     // remove FLWOR expression if WHERE clause always returns false
     if(empty) {
-      ctx.compInfo(OPTREMOVE, desc(), where);
+      ctx.compInfo(OPTREMOVE, description(), where);
       return Empty.SEQ;
     }
     // check if return always yields an empty sequence

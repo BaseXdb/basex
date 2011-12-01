@@ -434,7 +434,7 @@ public abstract class Data {
   }
 
   /**
-   * Returns namespace key and value ids.
+   * Returns all namespace keys and values.
    * Should be only called for element nodes.
    * @param pre pre value
    * @return key and value ids
@@ -444,7 +444,7 @@ public abstract class Data {
     if(nsFlag(pre)) {
       final int[] nsp = ns.get(pre);
       for(int n = 0; n < nsp.length; n += 2)
-        as.add(ns.pref(nsp[n]), ns.uri(nsp[n + 1]));
+        as.add(ns.prefix(nsp[n]), ns.uri(nsp[n + 1]));
     }
     return as;
   }
@@ -511,7 +511,7 @@ public abstract class Data {
       final int ouri = ns.uri(name, pre);
       final boolean ne = ouri == 0 && uri.length != 0;
       final int npre = kind == ATTR ? parent(pre, kind) : pre;
-      final int nuri = ne ? ns.add(npre, npre, pref(name), uri) :
+      final int nuri = ne ? ns.add(npre, npre, prefix(name), uri) :
         ouri != 0 && eq(ns.uri(ouri), uri) ? ouri : 0;
 
       // write namespace uri reference
@@ -708,7 +708,7 @@ public abstract class Data {
     NSNode n = ns.current;
     do {
       for(int i = 0; i < n.vals.length; i += 2)
-        nsScope.add(ns.pref(n.vals[i]), ns.uri(n.vals[i + 1]));
+        nsScope.add(ns.prefix(n.vals[i]), ns.uri(n.vals[i + 1]));
       final int pos = n.fnd(ipar);
       if(pos < 0) break;
       n = n.ch[pos];
@@ -791,14 +791,14 @@ public abstract class Data {
             for(int a = 0; a < at.size(); ++a) {
               // see if prefix has been declared/ is part of current ns scope
               final byte[] old = nsScope.get(at.key(a));
-              if(old == null || !eq(old, at.val(a))) {
+              if(old == null || !eq(old, at.value(a))) {
                 // we have to keep track of all new NSNodes that are added
                 // to the Namespace structure, as their pre values must not
                 // be updated. I.e. if an NSNode N with pre value 3 existed
                 // prior to inserting and two new nodes are inserted at
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
-                newNodes.add(ns.add(at.key(a), at.val(a), pre));
+                newNodes.add(ns.add(at.key(a), at.value(a), pre));
                 ne = true;
               }
             }
@@ -819,10 +819,10 @@ public abstract class Data {
           // add attribute
           nm = data.name(dpre, dkind);
           // check if prefix already in nsScope or not
-          final byte[] attPref = pref(nm);
+          final byte[] attPref = prefix(nm);
           // check if prefix of attribute has already been declared, otherwise
           // add declaration to parent node
-          if(data.nsFlag(dpre) && (nsScope.get(attPref) == null)) {
+          if(data.nsFlag(dpre) && nsScope.get(attPref) == null) {
             ns.add(par, preStack.size() == 0 ? -1 : preStack.peek(), attPref,
                 data.ns.uri(data.uri(dpre, dkind)));
             // save pre value to set ns flag later for this node. can't be done

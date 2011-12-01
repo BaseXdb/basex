@@ -93,7 +93,7 @@ public final class JavaFunc extends Arr {
     final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
       arg[a] = expr[a].value(ctx);
-      if(arg[a].isEmpty()) XPEMPTY.thrw(input, desc());
+      if(arg[a].isEmpty()) XPEMPTY.thrw(input, description());
     }
 
     Object result = null;
@@ -102,7 +102,7 @@ public final class JavaFunc extends Arr {
     } catch(final InvocationTargetException ex) {
       JAVAERR.thrw(input, ex.getCause());
     } catch(final Exception ex) {
-      FUNJAVA.thrw(input, desc(), arg);
+      FUNJAVA.thrw(input, description(), arg);
     }
     return result == null ? Empty.ITER : iter(result);
   }
@@ -283,7 +283,7 @@ public final class JavaFunc extends Arr {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return cls.getName() + "." + mth + "(...)" +
       (mth.equals(NEW) ? " constructor" : " method");
   }

@@ -1,15 +1,20 @@
 package org.basex.query.util;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.ErrType.*;
+
+import java.util.HashMap;
 
 import org.basex.core.Text;
 import org.basex.io.serial.SerializerException;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 
 /**
  * This class contains all query error messages.
@@ -56,6 +61,8 @@ public enum Err {
   INVPOS(BASX, 17, "Illegal argument position for %: %."),
   /** BASX0018: Evaluation exception. */
   CONVERT(BASX, 18, "String conversion: %."),
+  /** BASX0019: Evaluation exception. */
+  INVFLAG(BASX, 19, "Unknown flag: %."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -186,7 +193,7 @@ public enum Err {
   JARREADFAIL(PACK, 11, "Reading JAR descriptor failed: %."),
 
   /** FONS0004: Evaluation exception. */
-  NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
+  NSDECL(FONS, 4, "No namespace declared for prefix \"%\"."),
 
   /** FORG0001: Evaluation exception. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
@@ -196,8 +203,6 @@ public enum Err {
   DATERANGE(FORG, 1, "%(\"%\") out of range."),
   /** FORG0001: Evaluation exception. */
   DATEFORMAT(FORG, 1, "Wrong % format: \"%\" (try: \"%\")."),
-  /** FORG0001: Evaluation exception. */
-  QNMINV(FORG, 1, "Invalid QName: \"%\"."),
   /** FORG0002: Evaluation exception. */
   URIINV(FORG, 2, "Invalid URI: %."),
   /** FORG0002: Evaluation exception. */
@@ -353,9 +358,11 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   NOVALIDATE(XPST, 3, "Invalid validation expression."),
   /** XPST0003: Parsing exception. */
+  NOSCHEMA(XPST, 3, "Unknown schema type: %."),
+  /** XPST0003: Parsing exception. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003: Parsing exception. */
-  NUMBERINC(XPST, 3, "Incomplete double value."),
+  NUMBERINC(XPST, 3, "Incomplete double value: \"%\"."),
   /** XPST0003: Parsing exception. */
   NUMBERITR(XPST, 3, "Unexpected decimal point."),
   /** XPST0003: Parsing exception. */
@@ -363,7 +370,9 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   CMPEXPR(XPST, 3, "Comparison is incomplete."),
   /** XPST0003: Parsing exception. */
-  NOTAGNAME(XPST, 3, "Expecting tag name."),
+  NOTAG(XPST, 3, "Expecting tag name."),
+  /** XPST0003: Parsing exception. */
+  TAGNAME(XPST, 3, "Expecting tag name, \"<%\" found."),
   /** XPST0003: Parsing exception. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
   /** XPST0003: Parsing exception. */
@@ -386,23 +395,27 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   FUNCNAME(XPST, 3, "Expecting function name."),
   /** XPST0003: Parsing exception. */
+  RESERVED(XPST, 3, "% is a reserved function name."),
+  /** XPST0003: Parsing exception. */
   PREDMISSING(XPST, 3, "Expecting expression before predicate."),
   /** XPST0003: Parsing exception. */
   NOVARNAME(XPST, 3, "Expecting variable name."),
   /** XPST0003: Parsing exception. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
   /** XPST0003: Parsing exception. */
-  TAGWRONG(XPST, 3, "Start and end tag are different (%/%)."),
+  TAGWRONG(XPST, 3, "Start and end tag are different: <%>...</%>."),
   /** XPST0003: Parsing exception. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
   /** XPST0003: Parsing exception. */
+  NSWRONG(XPST, 3, "Expecting namespace prefix."),
+  /** XPST0003: Parsing exception. */
   NOENCLEXPR(XPST, 3, "Expecting valid expression after \"{\"."),
   /** XPST0003: Parsing exception. */
-  NODOCCONS(XPST, 3, "Expecting document construction."),
+  NODOCCONS(XPST, 3, "Expecting expression in document constructor."),
   /** XPST0003: Parsing exception. */
-  NOTXTCONS(XPST, 3, "Expecting text construction."),
+  NOTXTCONS(XPST, 3, "Expecting expression in text constructor."),
   /** XPST0003: Parsing exception. */
-  NOCOMCONS(XPST, 3, "Expecting comment construction."),
+  NOCOMCONS(XPST, 3, "Expecting expression in comment constructor."),
   /** XPST0003: Parsing exception. */
   NOFUNBODY(XPST, 3, "Expecting function body."),
   /** XPST0003: Parsing exception. */
@@ -414,7 +427,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
   /** XPST0003: Parsing exception. */
-  NODECLFORM(XPST, 3, "Expecting decimal-format property declaration."),
+  NODECLFORM(XPST, 3, "Unknown decimal-format property: \"%\"."),
   /** XPST0003: Parsing exception. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
   /** XPST0003: Parsing exception. */
@@ -464,13 +477,13 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   NOTYPE(XPST, 3, "Unknown type \"%\"."),
   /** XPST0003: Parsing exception. */
-  PIXML(XPST, 3, "Illegal PI name: \"%\"."),
+  PIXML(XPST, 3, "Processing instruction has illegal name: \"%\"."),
   /** XPST0003: Parsing exception. */
   EMPTYSEQOCC(XPST, 3, "No occurrence indicator defined for %."),
   /** XPST0003: Parsing exception. */
   TESTINVALID(XPST, 3, "Invalid % test: %."),
   /** XPST0003: Parsing exception. */
-  QNAMEINV(XPST, 3, "Expecting QName."),
+  QNAMEINV(XPST, 3, "Expecting QName, \"%\" found."),
   /** XPST0003: Parsing exception. */
   PROLOGORDER(XPST, 3, "Default declaration must be declared first."),
   /** XPST0003: Parsing exception. */
@@ -480,9 +493,15 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   FTMATCH(XPST, 3, "Unknown match option '%...'."),
   /** XPST0003: Evaluation exception. */
-  INVALPI(XPST, 3, "Invalid PI name: \"%\"."),
+  INVALPI(XPST, 3, "Processing instruction has invalid name."),
   /** XPST0003: Parsing exception. */
   INTEXP(XPST, 3, "Integer expected."),
+  /** XPST0003: Parsing exception. */
+  VARFUNC(XPST, 3, "Variable or function declaration expected."),
+  /** XPST0003: Parsing exception. */
+  NOANN(XPST, 3, "No annotation allowed here."),
+  /** XPST0003: Parsing exception. */
+  NOCATCH(XPST, 3, "Expecting catch clause."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
@@ -490,10 +509,10 @@ public enum Err {
   /** XPST0008: Parsing exception. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008: Parsing exception. */
-  TYPEUNDEF(XPST, 8, "Undefined type %."),
+  TYPEUNDEF(XPST, 8, "Undefined type \"%\"."),
 
   /** XPST0017: Parsing Exception. */
-  XPARGS(XPST, 17, "Wrong arguments: % expected."),
+  XPARGS(XPST, 17, "%: wrong number of arguments."),
   /** XPST0017: Parsing exception. */
   FUNSIMILAR(XPST, 17, "Unknown function \"%\"; similar: \"%\"."),
   /** XPST0017: Parsing Exception. */
@@ -510,9 +529,9 @@ public enum Err {
   /** XPST0080: Parsing exception. */
   CASTUNKNOWN(XPST, 80, "Invalid cast type %."),
   /** XPST0081: Parsing exception. */
-  PREFUNKNOWN(XPST, 81, "Unknown prefix: \"%\"."),
+  NOURI(XPST, 81, "No namespace declared for %."),
   /** XPST0081: Parsing exception. */
-  NSMISS(XPST, 81, "% must be prefixed."),
+  NSMISS(XPST, 81, "QName % has no namespace."),
 
   /** XPTY0004: Typing exception. */
   XPSEQ(XPTY, 4, "No sequence % allowed."),
@@ -547,7 +566,7 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPATT(XPTY, 4, "Cannot add attributes to a document node."),
   /** XPTY0004: Typing exception. */
-  CPIWRONG(XPTY, 4, "% not allowed as PI name: \"%\"."),
+  CPIWRONG(XPTY, 4, "Name has invalid type: \"%\"."),
   /** XPTY0004: Typing exception. */
   INVQNAME(XPTY, 4, "Invalid QName: \"%\"."),
   /** XPTY0004: Typing exception. */
@@ -561,23 +580,33 @@ public enum Err {
   /** XQDY0025: Evaluation exception. */
   CATTDUPL(XQDY, 25, "Duplicate attribute \"%\"."),
   /** XQDY0026: Evaluation exception. */
-  CPICONT(XQDY, 26, "Invalid PI content: \"%\"."),
+  CPICONT(XQDY, 26, "Processing instruction has invalid content: \"%\"."),
   /** XQDY0041: Evaluation exception. */
-  CPIINVAL(XQDY, 41, "Invalid PI name: \"%\"."),
+  CPIINVAL(XQDY, 41, "Processing instruction has invalid name: \"%\"."),
   /** XQDY0044: Evaluation exception. */
-  CAINS(XQDY, 44, "Invalid attribute namespace \"%\":%."),
+  CAXML(XQDY, 44, "XML prefix and namespace cannot be rebound."),
+  /** XQDY0044: Evaluation exception. */
+  CAINV(XQDY, 44, "Invalid attribute prefix/namespace \"%\"."),
   /** XQDY0064: Evaluation exception. */
-  CPIXML(XQDY, 64, "Illegal PI name: \"%\"."),
+  CPIXML(XQDY, 64, "Processing instruction has illegal name: \"%\"."),
   /** XQDY0072: Evaluation exception. */
   COMINVALID(XQDY, 72, "Invalid comment."),
   /** XQDY0074: Evaluation exception. */
   INVNAME(XQDY, 74, "Invalid name: \"%\"."),
-  /** XQDY0074: Parsing exception. */
-  INVPREF(XQDY, 74, "Unknown prefix: \"%\"."),
+  /** XQDY0074: Dynamic exception. */
+  INVPREF(XQDY, 74, "No namespace declared for %."),
   /** XQDY0095: resulting value for any grouping variable >> 1 item. */
   XGRP(XQDY, 95, "No sequence allowed as grouping variable."),
-  /** XQDY0096: Invalid namespace in constructed element. */
-  CEINS(XQDY, 96, "Invalid element namespace: \"%\":%."),
+  /** XQDY0096: Evaluation exception. */
+  CEXML(XQDY, 96, "XML prefix and namespace cannot be rebound."),
+  /** XQDY0096: Evaluation exception. */
+  CEINV(XQDY, 96, "Invalid element prefix/namespace \"%\"."),
+  /** XQDY0101: Evaluation exception. */
+  CNXML(XQDY, 101, "XML prefix and namespace cannot be rebound."),
+  /** XQDY0101: Evaluation exception. */
+  CNINV(XQDY, 101, "Invalid prefix/namespace \"%\"."),
+  /** XQDY0102: Dynamic exception. */
+  DUPLNSCONS(XQDY, 102, "Duplicate namespace declaration: \"%\"."),
 
   /** XQST0009: Parsing exception. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
@@ -588,7 +617,7 @@ public enum Err {
   /** XQST0032: Parsing exception. */
   DUPLBASE(XQST, 32, "Duplicate 'base-uri' declaration."),
   /** XQST0033: Parsing exception. */
-  DUPLNSDECL(XQST, 33, "Duplicate declaration of namespace %."),
+  DUPLNSDECL(XQST, 33, "Duplicate declaration of prefix \"%\"."),
   /** XQST0034: Parsing exception. */
   FUNCDEFINED(XQST, 34, "Duplicate declaration of function \"%\"."),
   /** XQST0038: Parsing exception. */
@@ -618,7 +647,7 @@ public enum Err {
   /** XQST0059: Parsing exception. */
   NOMODULEFILE(XQST, 59, "Module not found: \"%\"."),
   /** XQST0059: Parsing exception. */
-  WRONGMODULE(XQST, 59, "Wrong uri % in imported module \"%\"."),
+  WRONGMODULE(XQST, 59, "Wrong URI \"%\" in imported module \"%\"."),
   /** XQST0060: Parsing exception. */
   FUNNONS(XQST, 60, "Namespace needed for function %(...)."),
   /** XQST0065: Parsing exception. */
@@ -632,11 +661,11 @@ public enum Err {
   /** XQST0069: Parsing exception. */
   DUPLORDEMP(XQST, 69, "Duplicate 'order empty' declaration."),
   /** XQST0070: Parsing exception. */
-  NSDEF(XQST, 70, "Cannot overwrite namespace %."),
+  BINDXML(XQST, 70, "Prefix \"%\" cannot be rebound."),
   /** XQST0070: Parsing exception. */
-  NOXMLNS(XQST, 70, "Cannot declare % namespace."),
+  BINDXMLURI(XQST, 70, "\"%\" can only be bound to \"%\"."),
   /** XQST0071: Parsing exception. */
-  DUPLNSDEF(XQST, 71, "Duplicate declaration of namespace \"%\"."),
+  DUPLNSDEF(XQST, 71, "Duplicate declaration of prefix \"%\"."),
   /** XQST0075: Parsing exception. */
   IMPLVAL(XQST, 75, "Validation not supported yet."),
   /** XQST0076: Parsing exception. */
@@ -680,6 +709,8 @@ public enum Err {
 
   /** XQTY0024: Parsing exception. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
+  /** XQTY0024: Parsing exception. */
+  NONSALL(XQTY, 24, "Namespaces must follow the root element."),
   /** XQTY0105: Parsing exception. */
   CONSFUNC(XQTY, 105, "Invalid content: %."),
 
@@ -717,9 +748,9 @@ public enum Err {
   /** XUDY0015: XQuery Update dynamic exception. */
   UPPATHREN(XUDY, 15, "Multiple renames on path \"%\"."),
   /** XUDY0016: XQuery Update dynamic exception. */
-  UPMULTREPL(XUDY, 16, "Multiple replaces on %."),
+  UPMULTREPL(XUDY, 16, "Multiple replaces on the same node: %."),
   /** XUDY0017: XQuery Update dynamic exception. */
-  UPMULTREPV(XUDY, 17, "Multiple replaces on %."),
+  UPMULTREPV(XUDY, 17, "Multiple replaces on the same node: %"),
   /** XUDY0021: XQuery Update dynamic exception. */
   UPATTDUPL(XUDY, 21, "Duplicate attribute %."),
   /** XUDY0023: XQuery Update dynamic exception. */
@@ -879,12 +910,11 @@ public enum Err {
   }
 
   /**
-   * Returns the error code.
-   * @return position
+   * Mapping between function classes and namespace URIs.
+   * If no mapping exists, {@link #FNURI} will be assumed as default mapping.
    */
-  public String code() {
-    return String.format("%s%04d", type, num);
-  }
+  private static final HashMap<ErrType, byte[]> URIS =
+      new HashMap<ErrType, byte[]>();
 
   /**
    * Error types.
@@ -894,7 +924,7 @@ public enum Err {
    */
   public static enum ErrType {
     /** BASX Error type. */ BASX,
-    /** FOCX Error type. (EXPath Cryptographic) */ FOCX,
+    /** FOCX Error type. */ FOCX,
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,
@@ -928,6 +958,23 @@ public enum Err {
     /** XUDY Error type. */ XUDY,
     /** XUST Error type. */ XUST,
     /** XUTY Error type. */ XUTY;
+  }
+
+  // initialization of error/uri mappings
+  static {
+    URIS.put(BASX,  BASEXURI);
+    URIS.put(FOCX,  CRYPTOURI);
+    URIS.put(PACK,  PKGURI);
+    URIS.put(FOZP,  ZIPURI);
+  }
+
+  /**
+   * Returns the namespace URI of this error.
+   * @return function
+   */
+  public final QNm qname() {
+    final byte[] u = URIS.get(type);
+    return new QNm(Token.token(toString()), u == null ? ERRORURI : u);
   }
 
   /**
@@ -993,7 +1040,7 @@ public enum Err {
    */
   public static QueryException type(final ParseExpr e, final Type t,
       final Item it) throws QueryException {
-    throw type(e.input, e.desc(), t, it);
+    throw type(e.input, e.description(), t, it);
   }
 
   /**
@@ -1005,7 +1052,7 @@ public enum Err {
    */
   public static QueryException number(final ParseExpr e, final Item it)
       throws QueryException {
-    throw XPTYPENUM.thrw(e.input, e.desc(), it.type);
+    throw XPTYPENUM.thrw(e.input, e.description(), it.type);
   }
 
   /**

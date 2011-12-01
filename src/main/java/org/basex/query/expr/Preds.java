@@ -64,14 +64,14 @@ public abstract class Preds extends ParseExpr {
 
       if(pr.isValue()) {
         if(!pr.ebv(ctx, input).bool(input)) {
-          ctx.compInfo(OPTREMOVE, desc(), pr);
+          ctx.compInfo(OPTREMOVE, description(), pr);
           return Empty.SEQ;
         }
-        ctx.compInfo(OPTREMOVE, desc(), pr);
+        ctx.compInfo(OPTREMOVE, description(), pr);
         preds = Array.delete(preds, p--);
       } else if(pr instanceof And && !pr.uses(Use.POS)) {
         // replace AND expression with predicates (don't swap position tests)
-        ctx.compInfo(OPTPRED, pr.desc());
+        ctx.compInfo(OPTPRED, pr.description());
         final Expr[] and = ((And) pr).expr;
         final int m = and.length - 1;
         final ObjList<Expr> tmp = new ObjList<Expr>(preds.length + m);

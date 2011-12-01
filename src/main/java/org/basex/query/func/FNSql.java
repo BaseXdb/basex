@@ -31,7 +31,6 @@ import org.basex.query.item.Int;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Uri;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
@@ -177,11 +176,11 @@ public final class FNSql extends FuncCall {
           final Connection conn = getConnection(url, props);
           // Set auto/commit mode
           conn.setAutoCommit(autoCommit);
-          return Int.get(ctx.jdbc.add(conn));
+          return Int.get(ctx.jdbc().add(conn));
         }
-        return Int.get(ctx.jdbc.add(getConnection(url, user, pass)));
+        return Int.get(ctx.jdbc().add(getConnection(url, user, pass)));
       }
-      return Int.get(ctx.jdbc.add(getConnection(url)));
+      return Int.get(ctx.jdbc().add(getConnection(url)));
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
@@ -214,7 +213,7 @@ public final class FNSql extends FuncCall {
     try {
       // Keep prepared statement
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
-      return Int.get(ctx.jdbc.add(prep));
+      return Int.get(ctx.jdbc().add(prep));
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(input, ex.getMessage());
     }
@@ -228,7 +227,7 @@ public final class FNSql extends FuncCall {
    */
   private Iter execute(final QueryContext ctx) throws QueryException {
     final int id = (int) checkItr(expr[0].item(ctx, input));
-    final Object obj = ctx.jdbc.get(id);
+    final Object obj = ctx.jdbc().get(id);
     if(obj == null) throw NOCONN.thrw(input, id);
     // Execute query or prepared statement
     return obj instanceof Connection ? executeQuery((Connection) obj, ctx)
@@ -314,12 +313,12 @@ public final class FNSql extends FuncCall {
       boolean isNull = false;
       for(ANode attr; (attr = attrs.next()) != null;) {
         // Attribute "type"
-        if(eq(attr.nname(), TYPE)) paramType = attr.string();
+        if(eq(attr.name(), TYPE)) paramType = attr.string();
         // Attribute "null"
-        else if(eq(attr.nname(), NULL)) isNull = attr.string() != null
-            && Bln.parse(attr.string(), input);
+        else if(eq(attr.name(), NULL))
+          isNull = attr.string() != null && Bln.parse(attr.string(), input);
         // Not expected attribute
-        else throw NOTEXPATTR.thrw(input, string(attr.nname()));
+        else throw NOTEXPATTR.thrw(input, string(attr.name()));
       }
       if(paramType == null) NOPARAMTYPE.thrw(input);
       final byte[] v = next.string();
@@ -474,9 +473,9 @@ public final class FNSql extends FuncCall {
   private Connection connection(final QueryContext ctx, final boolean del)
       throws QueryException {
     final int id = (int) checkItr(expr[0].item(ctx, input));
-    final Object obj = ctx.jdbc.get(id);
+    final Object obj = ctx.jdbc().get(id);
     if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(input, id);
-    if(del) ctx.jdbc.remove(id);
+    if(del) ctx.jdbc().remove(id);
     return (Connection) obj;
   }
 
@@ -512,8 +511,8 @@ public final class FNSql extends FuncCall {
     final AxisIter ai = node.children();
     while((node = ai.next()) != null) {
       final QNm qn = node.qname();
-      if(!qn.uri().eq(Uri.uri(SQLURI))) PARWHICH.thrw(input, qn);
-      tm.add(qn.ln(), node.children().next());
+      if(!eq(qn.uri(), SQLURI)) PARWHICH.thrw(input, qn);
+      tm.add(qn.local(), node.children().next());
     }
     return tm;
   }

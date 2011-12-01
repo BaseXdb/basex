@@ -92,12 +92,12 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public String desc() {
-    return name();
+  public String description() {
+    return info();
   }
 
   @Override
-  public final String name() {
+  public final String info() {
     return type.toString();
   }
 

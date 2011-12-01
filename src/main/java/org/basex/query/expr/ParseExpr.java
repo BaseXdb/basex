@@ -158,7 +158,8 @@ public abstract class ParseExpr extends Expr {
    */
   public final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
-    if(e != null && ctx.updating && e.uses(Use.UPD)) UPNOT.thrw(input, desc());
+    if(e != null && ctx.updating && e.uses(Use.UPD))
+      UPNOT.thrw(input, description());
     return e;
   }
 
@@ -176,7 +177,7 @@ public abstract class ParseExpr extends Expr {
     for(final Expr e : expr) {
       if(e.isVacuous()) continue;
       final boolean u = e.uses(Use.UPD);
-      if(u && s == 2 || !u && s == 1) UPNOT.thrw(input, desc());
+      if(u && s == 2 || !u && s == 1) UPNOT.thrw(input, description());
       s = u ? 1 : 2;
     }
   }
@@ -237,7 +238,7 @@ public abstract class ParseExpr extends Expr {
    */
   private Item checkNoEmpty(final Item it, final Type t)
       throws QueryException {
-    if(it == null) XPEMPTYPE.thrw(input, desc(), t);
+    if(it == null) XPEMPTYPE.thrw(input, description(), t);
     return it;
   }
 
@@ -290,8 +291,8 @@ public abstract class ParseExpr extends Expr {
     final byte[] u = checkStr(e, ctx);
     if(eq(URLCOLL, u)) return;
     final Uri uri = Uri.uri(u);
-    if(uri.isAbsolute() || !ctx.baseURI.resolve(uri).eq(Uri.COLL))
-      IMPLCOL.thrw(input, e);
+    if(uri.isAbsolute() || !eq(ctx.baseURI().resolve(uri).string(),
+        QueryText.URLCOLL)) IMPLCOL.thrw(input, e);
     }
 
   /**
@@ -383,7 +384,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Item checkEmpty(final Item it) throws QueryException {
-    if(it == null) XPEMPTY.thrw(input, desc());
+    if(it == null) XPEMPTY.thrw(input, description());
     return it;
   }
 
@@ -414,8 +415,13 @@ public abstract class ParseExpr extends Expr {
     checkAdmin(ctx);
     final String name = string(checkStr(e, ctx));
     IO io = IO.get(name);
-    if(!io.exists()) io = new IOFile(string(ctx.baseURI.string()), name);
-    if(!io.exists()) RESFNF.thrw(input, name);
+    if(!io.exists()) {
+      final IO iob = ctx.baseIO();
+      if(iob != null) {
+        io = new IOFile(iob.path(), name);
+        if(!io.exists()) RESFNF.thrw(input, name);
+      }
+    }
     return io;
   }
 

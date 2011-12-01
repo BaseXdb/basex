@@ -151,7 +151,7 @@ final class DOTData {
    * @return name
    */
   static String name(final ExprInfo e) {
-    final String name = e.name();
+    final String name = e.info();
     for(final Object[] o : NAMES) {
       if(!(o[1] instanceof Class<?>)) continue;
       final Class<?> c = (Class<?>) o[1];

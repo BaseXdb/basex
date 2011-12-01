@@ -73,8 +73,18 @@ public final class Atts {
    * @param i index
    * @return key
    */
-  public byte[] val(final int i) {
+  public byte[] value(final int i) {
     return val[i];
+  }
+
+  /**
+   * Returns the value for the specified key, or {@code null}.
+   * @param k key to be found
+   * @return offset or -1
+   */
+  public byte[] value(final byte[] k) {
+    final int i = get(k);
+    return i == -1 ? null : val[i];
   }
 
   /**

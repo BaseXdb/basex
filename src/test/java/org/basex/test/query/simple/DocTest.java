@@ -35,9 +35,8 @@ public final class DocTest extends QueryTest {
     queries = new Object[][] {
       { "Root 1", node(0), "/" },
       { "Root 2", node(0), "/." },
-      { "Root 3", empty(), "/.." },
-      { "Root 4", node(1), "/*" },
-      { "Root 5", node(1), "/node()" },
+      { "Root 3", node(1), "/*" },
+      { "Root 4", node(1), "/node()" },
 
       { "Child 1", node(1), "*" },
       { "Child 2", node(1), "node()" },

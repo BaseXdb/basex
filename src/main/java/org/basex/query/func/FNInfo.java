@@ -43,18 +43,18 @@ public final class FNInfo extends FuncCall {
         final int al = expr.length;
         if(al == 0) FUNERR1.thrw(input);
 
-        String code = FUNERR1.code();
+        QNm name = FUNERR1.qname();
         String msg = FUNERR1.desc;
 
         final Item it = expr[0].item(ctx, input);
         if(it == null) {
-          if(al == 1) XPEMPTY.thrw(input, desc());
+          if(al == 1) XPEMPTY.thrw(input, description());
         } else {
-          code = Token.string(((QNm) checkType(it, AtomType.QNM)).ln());
+          name = (QNm) checkType(it, AtomType.QNM);
         }
         if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
         final Value val = al > 2 ? expr[2].value(ctx) : null;
-        throw new QueryException(input, code, val, msg);
+        throw new QueryException(input, name, val, msg);
       case TRACE:
         return new Iter() {
           final Iter ir = expr[0].iter(ctx);

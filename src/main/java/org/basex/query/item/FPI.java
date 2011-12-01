@@ -50,7 +50,7 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public byte[] nname() {
+  public byte[] name() {
     return name.string();
   }
 

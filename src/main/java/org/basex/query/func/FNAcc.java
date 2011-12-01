@@ -44,26 +44,39 @@ public final class FNAcc extends FuncCall {
       case LAST:
         return Int.get(ctx.size);
       case STRING:
-        Item it = e.item(ctx, input);
-        if(it == null) return Str.ZERO;
-        Type t = it.type;
-        if(t.isFunction()) FNSTR.thrw(ii, this);
-        return t == AtomType.STR ? it : Str.get(it.string(ii));
+        return string(e, ii, ctx);
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRING_LENGTH:
-        return Int.get(len(checkEStr(e, ctx)));
+        return Int.get(len(checkEStr(expr.length == 0 ?
+            string(e, ii, ctx) : e, ctx)));
       case NORMALIZE_SPACE:
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
-        it = e.item(ctx, input);
-        if(it == null) return null;
-        final QNm qn = (QNm) checkType(it, AtomType.QNM);
-        return qn.hasUri() ? qn.uri() :
-          Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
+        final Item it = e.item(ctx, input);
+        return it == null ? null :
+          Uri.uri(((QNm) checkType(it, AtomType.QNM)).uri());
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Converts the specified item to a string.
+   * @param e expression
+   * @param ii input info
+   * @param ctx query context
+   * @return double iterator
+   * @throws QueryException query exception
+   */
+  private Item string(final Expr e, final InputInfo ii,
+      final QueryContext ctx) throws QueryException {
+
+    final Item it = e.item(ctx, input);
+    if(it == null) return Str.ZERO;
+    final Type t = it.type;
+    if(t.isFunction()) FNSTR.thrw(ii, this);
+    return t == AtomType.STR ? it : Str.get(it.string(ii));
   }
 
   /**
@@ -78,7 +91,7 @@ public final class FNAcc extends FuncCall {
 
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
-    Type t = it.type;
+    final Type t = it.type;
     if(t.isFunction()) FNATM.thrw(input, this);
     try {
       return t == AtomType.DBL ? it : AtomType.DBL.e(it, ctx, input);

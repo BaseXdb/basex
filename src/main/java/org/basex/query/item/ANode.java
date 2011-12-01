@@ -34,7 +34,9 @@ public abstract class ANode extends Item {
     NodeType.COM, NodeType.PI
   };
   /** Static node counter. */
-  // [CG] XQuery/ID: move to query context to reduce chance of overflow
+  // [CG] XQuery/ID:
+  // - move to query context to reduce chance of overflow
+  // - move to FNode to reduce memory usage of DBNode instances
   private static int sid;
   /** Unique node id. */
   public final int id = ++sid;
@@ -103,7 +105,7 @@ public abstract class ANode extends Item {
    * instance is created.
    * @return name
    */
-  public byte[] nname() {
+  public byte[] name() {
     return null;
   }
 
@@ -128,41 +130,30 @@ public abstract class ANode extends Item {
 
   /**
    * Returns all namespaces defined for the nodes.
+   * Overwritten by {@link FElem} and {@link DBNode}.
    * @return namespace array
    */
-  public Atts ns() {
+  public Atts namespaces() {
     return null;
   }
 
   /**
    * Returns the namespace hierarchy.
    * @return namespaces
-   * [LW][LK] Namespaces: this isn't enough
    */
   public final Atts nsScope() {
-    return nsScope(true);
-  }
-
-  /**
-   * Returns the namespace hierarchy.
-   * @param nsInherit copy-namespaces inherit
-   * @return namespaces
-   * [LW][LK] Namespaces: this isn't enough
-   */
-  public final Atts nsScope(final boolean nsInherit) {
     final Atts ns = new Atts();
-    ANode n = this;
+    ANode node = this;
     do {
-      final Atts nns = n.ns();
-      if(!nsInherit) return nns;
-      if(nns != null) {
-        for(int a = nns.size() - 1; a >= 0; a--) {
-          final byte[] key = nns.key(a);
-          if(!ns.contains(key)) ns.add(key, nns.val(a));
+      final Atts n = node.namespaces();
+      if(n != null) {
+        for(int a = n.size() - 1; a >= 0; a--) {
+          final byte[] key = n.key(a);
+          if(!ns.contains(key)) ns.add(key, n.value(a));
         }
       }
-      n = n.parent();
-    } while(n != null && n.type == NodeType.ELM);
+      node = node.parent();
+    } while(node != null && node.type == NodeType.ELM);
     return ns;
   }
 
@@ -173,10 +164,10 @@ public abstract class ANode extends Item {
    * @return uri
    */
   public final byte[] uri(final byte[] pref, final QueryContext ctx) {
-    final Atts at = ns();
+    final Atts at = namespaces();
     if(at != null) {
       final int i = at.get(pref);
-      if(i != -1) return at.val(i);
+      if(i != -1) return at.value(i);
       final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);
     }
@@ -255,13 +246,13 @@ public abstract class ANode extends Item {
    * Returns an ancestor axis iterator.
    * @return iterator
    */
-  public abstract AxisIter anc();
+  public abstract AxisIter ancestor();
 
   /**
    * Returns an ancestor-or-self axis iterator.
    * @return iterator
    */
-  public abstract AxisIter ancOrSelf();
+  public abstract AxisIter ancestorOrSelf();
 
   /**
    * Returns an attribute axis iterator.
@@ -285,31 +276,31 @@ public abstract class ANode extends Item {
    * Returns a descendant-or-self axis iterator.
    * @return iterator
    */
-  public abstract AxisIter descOrSelf();
+  public abstract AxisIter descendantOrSelf();
 
   /**
    * Returns a following axis iterator.
    * @return iterator
    */
-  public abstract AxisIter foll();
+  public abstract AxisIter following();
 
   /**
    * Returns a following-sibling axis iterator.
    * @return iterator
    */
-  public abstract AxisIter follSibl();
+  public abstract AxisIter followingSibling();
 
   /**
    * Returns a parent axis iterator.
    * @return iterator
    */
-  public abstract AxisIter par();
+  public abstract AxisIter parentIter();
 
   /**
    * Returns a preceding axis iterator.
    * @return iterator
    */
-  public final AxisIter prec() {
+  public final AxisIter preceding() {
     return new AxisIter() {
       /** Iterator. */
       private NodeCache nc;
@@ -343,7 +334,7 @@ public abstract class ANode extends Item {
    * Returns a preceding-sibling axis iterator.
    * @return iterator
    */
-  public final AxisIter precSibl() {
+  public final AxisIter precedingSibling() {
     return new AxisIter() {
       /** Child nodes. */
       private NodeCache nc;
