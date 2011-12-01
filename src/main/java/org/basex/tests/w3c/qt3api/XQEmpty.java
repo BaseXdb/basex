@@ -25,7 +25,7 @@ public final class XQEmpty extends XQValue {
   }
 
   @Override
-  public int getSize() {
+  public int size() {
     return 0;
   }
 

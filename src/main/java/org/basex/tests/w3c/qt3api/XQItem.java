@@ -22,7 +22,7 @@ public abstract class XQItem extends XQValue {
   }
 
   @Override
-  public int getSize() {
+  public int size() {
     return 1;
   }
 

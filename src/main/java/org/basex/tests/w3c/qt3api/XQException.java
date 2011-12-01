@@ -1,6 +1,7 @@
 package org.basex.tests.w3c.qt3api;
 
 import org.basex.query.QueryException;
+import org.basex.util.Token;
 
 /**
  * XQuery error. Inherited from {@link RuntimeException} to provide
@@ -28,7 +29,7 @@ public final class XQException extends RuntimeException {
    * @return error code
    */
   public String getCode() {
-    return getException().code();
+    return Token.string(getException().qname().local());
   }
 
   @Override

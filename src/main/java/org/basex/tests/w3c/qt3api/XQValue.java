@@ -1,12 +1,12 @@
 package org.basex.tests.w3c.qt3api;
 
 import org.basex.query.QueryException;
-import org.basex.query.func.FNSimple;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
+import org.basex.query.util.Compare;
 import org.basex.util.Util;
 
 /**
@@ -72,7 +72,7 @@ public abstract class XQValue implements Iterable<XQItem> {
    * Returns the number of items stored in the value.
    * @return number of items
    */
-  public abstract int getSize();
+  public abstract int size();
 
   /**
    * Checks if the two values are deep-equal, according to XQuery.
@@ -82,7 +82,7 @@ public abstract class XQValue implements Iterable<XQItem> {
    */
   public boolean deepEqual(final XQValue value) {
     try {
-      return FNSimple.deep(null, internal().iter(), value.internal().iter());
+      return Compare.deep(internal(), value.internal(), null);
     } catch(final QueryException ex) {
       throw new XQException(ex);
     }

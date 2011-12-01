@@ -14,11 +14,11 @@ import org.basex.data.Data;
 import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.func.FNSimple;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
+import org.basex.query.util.Compare;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -113,7 +113,7 @@ public final class NamespaceTest {
           "  $target := $input-context/works[1]/employee[1]" +
           "return insert nodes $source into $target", context).execute();
     } catch(final QueryException ex) {
-      assertEquals("XUTY0004", ex.code());
+      assertEquals("XUTY0004", string(ex.qname().local()));
     }
     fail("should throw XUTY0004");
   }
@@ -159,7 +159,7 @@ public final class NamespaceTest {
    */
   public static void assertDeepEquals(final String exp, final String actual) {
     try {
-      if(!FNSimple.deep(null, getIter(exp), getIter(actual)))
+      if(!Compare.deep(getIter(exp), getIter(actual), null))
         assertEquals(exp, actual);
     } catch(final QueryException ex) { fail(Util.message(ex)); }
   }
@@ -172,7 +172,7 @@ public final class NamespaceTest {
   private static Iter getIter(final String xml) {
     try {
       final Data ex = CreateDB.mainMem(new IOContent(token(xml)), context);
-      return new NodeCache(new ANode[]{new DBNode(ex, 0)}, 1);
+      return new NodeCache(new ANode[] { new DBNode(ex, 0) }, 1);
     } catch(final IOException ex) { fail(Util.message(ex)); }
     return null;
   }

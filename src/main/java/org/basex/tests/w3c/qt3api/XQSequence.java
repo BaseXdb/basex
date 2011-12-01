@@ -27,7 +27,7 @@ final class XQSequence extends XQValue {
   }
 
   @Override
-  public int getSize() {
+  public int size() {
     return (int) sequence.size();
   }
 

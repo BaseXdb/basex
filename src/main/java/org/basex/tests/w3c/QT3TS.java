@@ -19,6 +19,7 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.func.Function;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
+import org.basex.query.util.Compare.Flag;
 import org.basex.tests.w3c.qt3api.XQEmpty;
 import org.basex.tests.w3c.qt3api.XQException;
 import org.basex.tests.w3c.qt3api.XQItem;
@@ -45,12 +46,18 @@ public final class QT3TS {
   private final TokenBuilder right = new TokenBuilder();
   /** Wrong results. */
   private final TokenBuilder wrong = new TokenBuilder();
-  /** Query counter. */
-  private int count;
-  /** Number of tested queries. */
+  /** Ignored tests. */
+  private final TokenBuilder ignore = new TokenBuilder();
+
+  /** Number of total queries. */
   private int total;
+  /** Number of tested queries. */
+  private int tested;
   /** Number of correct queries. */
   private int correct;
+  /** Number of ignored queries. */
+  private int ignored;
+
   /** Current base uri. */
   private String base;
 
@@ -60,6 +67,10 @@ public final class QT3TS {
   private boolean verbose;
   /** Error code flag. */
   private boolean errors;
+  /** Also print ignored files. */
+  private boolean ignoring;
+  /** All flag. */
+  private boolean all;
 
   /** Database context. */
   protected final Context ctx = new Context();
@@ -110,27 +121,31 @@ public final class QT3TS {
     qset.close();
     qdoc.close();
 
-    Util.outln(NL + "Writing log file...");
+    final StringBuilder result = new StringBuilder();
+    result.append(" Rate    : ").append(pc(correct, tested)).append(NL);
+    result.append(" Correct : ").append(correct).append(NL);
+    result.append(" Tested  : ").append(tested).append(NL);
+    result.append(" Total   : ").append(total).append(NL);
+    result.append(" Ignored : ").append(ignored).append(NL);
+
+    Util.outln(NL + "Writing log file..." + NL);
     final PrintOutput po = new PrintOutput(path + "qt3ts.log");
-    po.println("TEST RESULTS ___________________________");
-    po.println(NL + "Total #Queries: " + total);
-    po.println("Correct Results: " + correct);
-    po.println("Conformance: " + pc(correct, total));
-    po.print(NL);
-    po.println("WRONG __________________________________");
-    po.print(NL);
+    po.println("QT3TS RESULTS __________________________" + NL);
+    po.println(result.toString());
+    po.println("WRONG __________________________________" + NL);
     po.print(wrong.finish());
-    if(verbose || !single.isEmpty()) {
-      po.println("CORRECT ________________________________");
-      po.print(NL);
+    if(all || !single.isEmpty()) {
+      po.println("CORRECT ________________________________" + NL);
       po.print(right.finish());
+    }
+    if(ignoring) {
+      po.println("IGNORED ________________________________" + NL);
+      po.print(ignore.finish());
     }
     po.close();
 
-    Util.outln(NL + "Total #Queries: " + total);
-    Util.outln("Correct Results: " + correct);
-    Util.outln("Conformance: " + pc(correct, total));
-    Util.outln("Total time: " + perf);
+    Util.out(result);
+    Util.outln(" Time    : " + perf);
   }
 
   /**
@@ -170,13 +185,23 @@ public final class QT3TS {
   private void testCase(final XQItem test, final ObjList<QT3Env> envs)
       throws Exception {
 
-    if(!supported(test)) return;
-    if(++count % 500 == 0) Util.out(".");
+    if(total++ % 500 == 0) Util.out(".");
 
-    final String name = asString("@name", test);
+    if(!supported(test)) {
+      if(ignoring) ignore.add(asString("@name", test)).add(NL);
+      ignored++;
+      return;
+    }
+
     // skip queries that do not match filter
-    if(!name.startsWith(single)) return;
-    ++total;
+    final String name = asString("@name", test);
+    if(!name.startsWith(single)) {
+      if(ignoring) ignore.add(name).add(NL);
+      ignored++;
+      return;
+    }
+
+    tested++;
 
     // expected result
     final XQuery qexp = new XQuery("*:result/*[1]", ctx).context(test);
@@ -340,8 +365,9 @@ public final class QT3TS {
 
     // skip schema import, schema validation, and XML 1.1
     final XQuery q = new XQuery(
-        "*:dependency[" +
-        "@type='feature' and @value=('schemaImport','schemaValidation') or " +
+        "*:environment/*:collation | *:dependency[" +
+        "@type='feature' and " +
+        "@value=('schemaImport','schemaValidation','namespace-axis') or " +
         "@type='xml-version' and @value='1.1']", ctx).context(node);
 
     try {
@@ -367,53 +393,55 @@ public final class QT3TS {
    * @param result resulting value
    * @param expected expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String test(final QT3Result result, final XQValue expected)
-      throws Exception {
-
+  private String test(final QT3Result result, final XQValue expected) {
     final String type = expected.getName();
     final XQValue value = result.value;
 
-    String msg;
-    if(type.equals("error")) {
-      msg = assertError(result, expected);
-    } else if(type.equals("all-of")) {
-      msg = allOf(result, expected);
-    } else if(type.equals("any-of")) {
-      msg = anyOf(result, expected);
-    } else if(value != null) {
-      if(type.equals("assert")) {
-        msg = assertQuery(value, expected);
-      } else if(type.equals("assert-count")) {
-        msg = assertCount(value, expected);
-      } else if(type.equals("assert-deep-eq")) {
-        msg = assertDeepEq(value, expected);
-      } else if(type.equals("assert-empty")) {
-        msg = assertEmpty(value);
-      } else if(type.equals("assert-eq")) {
-        msg = assertEq(value, expected);
-      } else if(type.equals("assert-false")) {
-        msg = assertBoolean(value, false);
-      } else if(type.equals("assert-permutation")) {
-        msg = assertPermutation(value, expected);
-      } else if(type.equals("assert-serialization")) {
-        msg = assertSerialization(value, expected);
-      } else if(type.equals("assert-serialization-error")) {
-        msg = assertSerialError(value, expected);
-      } else if(type.equals("assert-string-value")) {
-        msg = assertStringValue(value, expected);
-      } else if(type.equals("assert-true")) {
-        msg = assertBoolean(value, true);
-      } else if(type.equals("assert-type")) {
-        msg = assertType(value, expected);
+    try {
+      String msg;
+      if(type.equals("error")) {
+        msg = assertError(result, expected);
+      } else if(type.equals("all-of")) {
+        msg = allOf(result, expected);
+      } else if(type.equals("any-of")) {
+        msg = anyOf(result, expected);
+      } else if(value != null) {
+        if(type.equals("assert")) {
+          msg = assertQuery(value, expected);
+        } else if(type.equals("assert-count")) {
+          msg = assertCount(value, expected);
+        } else if(type.equals("assert-deep-eq")) {
+          msg = assertDeepEq(value, expected);
+        } else if(type.equals("assert-empty")) {
+          msg = assertEmpty(value);
+        } else if(type.equals("assert-eq")) {
+          msg = assertEq(value, expected);
+        } else if(type.equals("assert-false")) {
+          msg = assertBoolean(value, false);
+        } else if(type.equals("assert-permutation")) {
+          msg = assertPermutation(value, expected);
+        } else if(type.equals("assert-serialization")) {
+          msg = assertSerialization(value, expected);
+        } else if(type.equals("assert-serialization-error")) {
+          msg = assertSerialError(value, expected);
+        } else if(type.equals("assert-string-value")) {
+          msg = assertStringValue(value, expected);
+        } else if(type.equals("assert-true")) {
+          msg = assertBoolean(value, true);
+        } else if(type.equals("assert-type")) {
+          msg = assertType(value, expected);
+        } else {
+          msg = "Test type not supported: " + type;
+        }
       } else {
-        msg = "Test type not supported: " + type;
+        msg = expected.toString();
       }
-    } else {
-      msg = expected.toString();
+      return msg;
+    } catch(final Exception ex) {
+      Util.stack(ex);
+      return ex.getMessage();
     }
-    return msg;
   }
 
   /**
@@ -434,11 +462,8 @@ public final class QT3TS {
    * @param res resulting value
    * @param exp expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String allOf(final QT3Result res, final XQValue exp)
-      throws Exception {
-
+  private String allOf(final QT3Result res, final XQValue exp) {
     final XQuery query = new XQuery("*", ctx).context(exp);
     try {
       final TokenBuilder tb = new TokenBuilder();
@@ -457,11 +482,8 @@ public final class QT3TS {
    * @param res resulting value
    * @param exp expected result
    * @return optional expected test suite result
-   * @throws Exception exception
    */
-  private String anyOf(final QT3Result res, final XQValue exp)
-      throws Exception {
-
+  private String anyOf(final QT3Result res, final XQValue exp) {
     final XQuery query = new XQuery("*", ctx).context(exp);
     final TokenBuilder tb = new TokenBuilder();
     try {
@@ -503,7 +525,7 @@ public final class QT3TS {
    */
   private String assertCount(final XQValue value, final XQValue expect) {
     final long exp = expect.getInteger();
-    final int res = value.getSize();
+    final int res = value.size();
     return exp == res ? null : Util.info("% items (% found)", exp, res);
   }
 
@@ -575,7 +597,7 @@ public final class QT3TS {
   }
 
   /**
-   * Tests string value.
+   * Tests the serialized result.
    * @param value resulting value
    * @param expect expected result
    * @return optional expected test suite result
@@ -584,18 +606,31 @@ public final class QT3TS {
       final XQValue expect) {
 
     final String file = asString("@file", expect);
+    final boolean norm = asBoolean("@normalize-space=('true','1')", expect);
+    final boolean pref = asBoolean("@ignore-prefixes=('true','1')", expect);
+
     try {
-      final String exp = normNL(file.isEmpty() ?
+      String exp = normNL(file.isEmpty() ?
           expect.getString() : string(new IOFile(base, file).read()));
-      final String res = asString("serialize(., map {'indent':='no'})", value);
-      return exp.equals(normNL(res)) ? null : exp;
+      if(norm) exp = string(norm(token(exp)));
+
+      final String res = normNL(asString(
+          "serialize(.,map{'indent':='no'})", value));
+      if(exp.equals(res)) return null;
+
+      // include check for comments, processing instructions and namespaces
+      String flags = "'" + Flag.ALLNODES + "'";
+      if(!pref) flags += ",'" + Flag.NAMESPACES + "'";
+      final String query = "util:deep-equal(<X>" + exp + "</X>," +
+          "<X>" + res + "</X>,(" + flags + "))";
+      return asBoolean(query, expect) ? null : exp;
     } catch(final IOException ex) {
       return Util.message(ex);
     }
   }
 
   /**
-   * Tests string value.
+   * Tests a serialization error.
    * @param value resulting value
    * @param expect expected result
    * @return optional expected test suite result
@@ -621,16 +656,8 @@ public final class QT3TS {
   private String assertStringValue(final XQValue value, final XQValue expect) {
     String exp = expect.getString();
     // normalize space
-    final XQuery qspace = new XQuery("@normalize-space='true'", ctx);
-    final boolean norm = qspace.context(expect).value().getBoolean();
+    final boolean norm = asBoolean("@normalize-space=('true','1')", expect);
     if(norm) exp = string(norm(token(exp)));
-    qspace.close();
-
-    /*final XQuery qu =
-        new XQuery("serialize(for $i in $result return string($i))", ctx);
-    final String res = qu.bind("result", value).next().getString();
-    final String exp = expect.getString();
-    return exp.equals(res) ? null : exp;*/
 
     final TokenBuilder tb = new TokenBuilder();
     int c = 0;
@@ -694,6 +721,22 @@ public final class QT3TS {
   }
 
   /**
+   * Returns the boolean representation of a query result.
+   * @param query query string
+   * @param value optional context value
+   * @return optional expected test suite result
+   */
+  boolean asBoolean(final String query, final XQValue value) {
+    final XQuery qp = new XQuery(query, ctx).context(value);
+    try {
+      final XQItem it = qp.next();
+      return it != null && it.getBoolean();
+    } finally {
+      qp.close();
+    }
+  }
+
+  /**
    * Calculates the percentage of correct queries.
    * @param v value
    * @param t total value
@@ -720,9 +763,11 @@ public final class QT3TS {
   private void parseArguments(final String[] args) throws IOException {
     final Args arg = new Args(args, this, " -v [pat]" + NL +
         " [pat] perform tests starting with a pattern" + NL +
-        " -d     debugging mode" + NL +
-        " -e     check error codes" + NL +
-        " -v     verbose output",
+        " -a  save all tests" + NL +
+        " -d  debugging mode" + NL +
+        " -e  check error codes" + NL +
+        " -i  also save ignored files" + NL +
+        " -v  verbose output",
         Util.info(CONSOLE, Util.name(this)));
 
     while(arg.more()) {
@@ -730,8 +775,12 @@ public final class QT3TS {
         final char c = arg.next();
         if(c == 'v') {
           verbose = true;
+        } else if(c == 'a') {
+          all = true;
         } else if(c == 'd') {
           ctx.mprop.set(MainProp.DEBUG, true);
+        } else if(c == 'i') {
+          ignoring = true;
         } else if(c == 'e') {
           errors = true;
         } else {

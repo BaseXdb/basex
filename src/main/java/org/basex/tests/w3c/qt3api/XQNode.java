@@ -31,7 +31,7 @@ final class XQNode extends XQItem {
 
   @Override
   public String getName() {
-    return Token.string(node.nname());
+    return Token.string(node.name());
   }
 
   @Override

@@ -32,7 +32,6 @@ import org.basex.io.serial.SerializerProp;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.FNSimple;
 import org.basex.query.func.Function;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -40,6 +39,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.util.Compare;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -438,10 +438,10 @@ public abstract class W3CTS {
             try {
               final ItemCache ic = toIter(expect.replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
-              if(FNSimple.deep(null, iter, ic)) break;
+              if(Compare.deep(iter, ic, null)) break;
               ic.reset();
               final ItemCache ia = toIter(actual, frag);
-              if(FNSimple.deep(null, ia, ic)) break;
+              if(Compare.deep(ia, ic, null)) break;
             } catch(final Throwable ex) {
               System.err.println("\n" + outname + ":");
               ex.printStackTrace();
