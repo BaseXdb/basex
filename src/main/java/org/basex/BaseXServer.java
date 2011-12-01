@@ -196,7 +196,7 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  public void quit() throws IOException {
+  protected void quit() throws IOException {
     if(!running) return;
     running = false;
     for(final ClientListener cs : context.sessions) cs.quit();
