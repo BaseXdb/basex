@@ -1,5 +1,7 @@
 package org.basex.test.xmldb;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,27 +30,27 @@ import junit.framework.TestCase;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class CollectionTest extends TestCase {
+public class CollectionTest extends XMLDBBaseTest {
   /** Collection. */
   Collection coll;
 
   @Before
-  @Override
-  protected void setUp() throws Exception {
-    final Class<?> c = Class.forName(AllTests.DRIVER);
+  public void setUp() throws Exception {
+    createDB();
+    final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.newInstance();
-    coll = database.getCollection(AllTests.PATH, AllTests.LOGIN, AllTests.PW);
+    coll = database.getCollection(PATH, LOGIN, PW);
   }
 
   @After
-  @Override
-  protected void tearDown() throws Exception {
+  public void tearDown() throws Exception {
     coll.close();
+    dropDB();
   }
 
   @Test
   public void testGetName() throws Exception {
-    assertEquals(AllTests.COLL, coll.getName());
+    assertEquals(COLL, coll.getName());
   }
 
   @Test
@@ -147,7 +149,7 @@ public class CollectionTest extends TestCase {
     };
     final String[] res = code.strings();
     assertEquals("One document expected.", 1, res.length);
-    assertEquals("Wrong document name.", AllTests.DOC1, res[0]);
+    assertEquals("Wrong document name.", DOC1, res[0]);
     checkClosed(code);
   }
 
@@ -165,7 +167,7 @@ public class CollectionTest extends TestCase {
     assertNotNull("No ID was created.", res.getId());
 
     // test adoption of specified id
-    final String id = AllTests.DOC2;
+    final String id = DOC2;
     res = coll.createResource(id, XMLResource.RESOURCE_TYPE);
     assertEquals("Resource has wrong ID.", id, res.getId());
 
@@ -214,19 +216,19 @@ public class CollectionTest extends TestCase {
 
     // store DOM instance
     final XMLResource xml1 = (XMLResource) coll.createResource(
-        AllTests.DOC2, XMLResource.RESOURCE_TYPE);
+        DOC2, XMLResource.RESOURCE_TYPE);
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
-    final Node node = builder.parse(new File(AllTests.DOCPATH + AllTests.DOC2));
+    final Node node = builder.parse(new File(DOCPATH + DOC2));
     xml1.setContentAsDOM(node);
     coll.storeResource(xml1);
 
     // store SAX stream
     final XMLResource xml2 = (XMLResource) coll.createResource(
-        AllTests.DOC3, XMLResource.RESOURCE_TYPE);
+        DOC3, XMLResource.RESOURCE_TYPE);
     final XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(xml2.setContentAsSAX());
-    reader.parse(new InputSource(AllTests.DOCPATH + AllTests.DOC3));
+    reader.parse(new InputSource(DOCPATH + DOC3));
     coll.storeResource(xml2);
     // check number of documents
     assertEquals("Wrong number of documents.", 4, coll.getResourceCount());
@@ -247,9 +249,13 @@ public class CollectionTest extends TestCase {
 
   @Test
   public void testRemoveResource() throws Exception {
+    Resource res = coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
+    res.setContent("<xml/>");
+    coll.storeResource(res);
+
     coll.removeResource(coll.getResource("Correct"));
     // check number of documents
-    assertEquals("Wrong number of documents.", 3, coll.getResourceCount());
+    assertEquals("Wrong number of documents.", 1, coll.getResourceCount());
 
     try {
       coll.removeResource(coll.getResource("test"));
@@ -257,10 +263,6 @@ public class CollectionTest extends TestCase {
     } catch(final XMLDBException ex) {
       checkCode(ErrorCodes.NO_SUCH_RESOURCE, ex);
     }
-
-    coll.removeResource(coll.getResource(AllTests.DOC2));
-    coll.removeResource(coll.getResource(AllTests.DOC3));
-    assertEquals("Wrong number of documents.", 1, coll.getResourceCount());
 
     try {
       coll.removeResource(coll.getResource(null));
@@ -310,7 +312,7 @@ public class CollectionTest extends TestCase {
     assertNull(coll.getProperty("ProbablyUnknown"));
 
     // the following tests are database specific...
-    assertEquals(AllTests.COLL, coll.getProperty("name"));
+    assertEquals(COLL, coll.getProperty("name"));
     assertEquals("true", coll.getProperty("chop"));
   }
 
@@ -325,7 +327,7 @@ public class CollectionTest extends TestCase {
 
     // the following tests are database specific...
     coll.setProperty("name", "NewName");
-    coll.setProperty("name", AllTests.COLL);
+    coll.setProperty("name", COLL);
 
     try {
       coll.setProperty("time", "ABC");

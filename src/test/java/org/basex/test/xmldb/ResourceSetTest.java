@@ -1,5 +1,7 @@
 package org.basex.test.xmldb;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,25 +26,25 @@ import junit.framework.TestCase;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class ResourceSetTest extends TestCase {
+public class ResourceSetTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */
   private XPathQueryService serv;
 
   @Before
-  @Override
-  protected void setUp() throws Exception {
-    final Class<?> c = Class.forName(AllTests.DRIVER);
+  public void setUp() throws Exception {
+    createDB();
+    final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.newInstance();
-    coll = database.getCollection(AllTests.PATH, AllTests.LOGIN, AllTests.PW);
+    coll = database.getCollection(PATH, LOGIN, PW);
     serv = (XPathQueryService) coll.getService("XPathQueryService", "1.0");
   }
 
   @After
-  @Override
-  protected void tearDown() throws Exception {
+  public void tearDown() throws Exception {
     coll.close();
+    dropDB();
   }
 
   @Test

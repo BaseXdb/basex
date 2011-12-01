@@ -1,5 +1,7 @@
 package org.basex.test.xmldb;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,25 +31,25 @@ import junit.framework.TestCase;
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
-public class XMLResourceTest extends TestCase {
+public class XMLResourceTest extends XMLDBBaseTest {
   /** Collection. */
   private Collection coll;
   /** Resource. */
   private XMLResource res;
 
   @Before
-  @Override
-  protected void setUp() throws Exception {
-    final Class<?> c = Class.forName(AllTests.DRIVER);
+  public void setUp() throws Exception {
+    createDB();
+    final Class<?> c = Class.forName(DRIVER);
     final Database database = (Database) c.newInstance();
-    coll = database.getCollection(AllTests.PATH, AllTests.LOGIN, AllTests.PW);
-    res = (XMLResource) coll.getResource(AllTests.DOC1);
+    coll = database.getCollection(PATH, LOGIN, PW);
+    res = (XMLResource) coll.getResource(DOC1);
   }
 
   @After
-  @Override
-  protected void tearDown() throws Exception {
+  public void tearDown() throws Exception {
     coll.close();
+    dropDB();
   }
 
   @Test
@@ -57,7 +59,7 @@ public class XMLResourceTest extends TestCase {
 
   @Test
   public void testGetID() throws Exception {
-    assertEquals("Wrong ID.", res.getId(), AllTests.DOC1);
+    assertEquals("Wrong ID.", res.getId(), DOC1);
   }
 
   @Test
@@ -68,7 +70,7 @@ public class XMLResourceTest extends TestCase {
 
   @Test
   public void testGetContent() throws Exception {
-    compare(AllTests.DOCPATH + AllTests.DOC1, res);
+    compare(DOCPATH + DOC1, res);
   }
 
   @Test
@@ -88,7 +90,7 @@ public class XMLResourceTest extends TestCase {
   @Test
   public void testSetContentAsDOM() throws Exception {
     // store small document
-    final XMLResource xml = (XMLResource) coll.createResource(AllTests.DOC2,
+    final XMLResource xml = (XMLResource) coll.createResource(DOC2,
         XMLResource.RESOURCE_TYPE);
     xml.setContent("<xml/>");
     coll.storeResource(xml);
@@ -98,7 +100,7 @@ public class XMLResourceTest extends TestCase {
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
     final Document doc = builder.parse(
-        new File(AllTests.DOCPATH + AllTests.DOC2));
+        new File(DOCPATH + DOC2));
     xml.setContentAsDOM(doc);
     coll.storeResource(xml);
     assertEquals("Wrong number of documents.", 2, coll.getResourceCount());
@@ -121,27 +123,34 @@ public class XMLResourceTest extends TestCase {
         assertEquals("Wrong number of elements.", 2, count);
       }
     };
-    ((XMLResource) coll.getResource(AllTests.DOC2)).getContentAsSAX(ch);
+    ((XMLResource) coll.getResource(DOC1)).getContentAsSAX(ch);
   }
 
   @Test
   public void testSetContentAsSAX() throws Exception {
     // store small document
-    final XMLResource doc3 = (XMLResource) coll.createResource(AllTests.DOC3,
+    final XMLResource doc2 = (XMLResource) coll.createResource(DOC2,
+        XMLResource.RESOURCE_TYPE);
+    final XMLResource doc3 = (XMLResource) coll.createResource(DOC3,
         XMLResource.RESOURCE_TYPE);
 
-    final XMLReader reader = XMLReaderFactory.createXMLReader();
-    reader.setContentHandler(doc3.setContentAsSAX());
-    reader.parse(new InputSource(AllTests.DOCPATH + AllTests.DOC3));
 
+    final XMLReader reader2 = XMLReaderFactory.createXMLReader();
+    reader2.setContentHandler(doc2.setContentAsSAX());
+    reader2.parse(new InputSource(DOCPATH + DOC2));
+
+    final XMLReader reader3 = XMLReaderFactory.createXMLReader();
+    reader3.setContentHandler(doc3.setContentAsSAX());
+    reader3.parse(new InputSource(DOCPATH + DOC3));
+
+    coll.storeResource(doc2);
     coll.storeResource(doc3);
     assertEquals("Wrong number of documents.", 3, coll.getResourceCount());
 
-    final Resource doc1 = coll.getResource(AllTests.DOC1);
-    final Resource doc2 = coll.getResource(AllTests.DOC2);
-    compare(AllTests.DOCPATH + AllTests.DOC1, doc1);
-    compare(AllTests.DOCPATH + AllTests.DOC2, doc2);
-    compare(AllTests.DOCPATH + AllTests.DOC3, doc3);
+    final Resource doc1 = coll.getResource(DOC1);
+    compare(DOCPATH + DOC1, doc1);
+    compare(DOCPATH + DOC2, doc2);
+    compare(DOCPATH + DOC3, doc3);
     coll.removeResource(doc3);
     coll.removeResource(doc2);
     assertEquals("Wrong number of documents.", 1, coll.getResourceCount());
@@ -159,7 +168,7 @@ public class XMLResourceTest extends TestCase {
 
     // compare serialized node with input file
     final String cont = r.getContent().toString().replaceAll("\\r?\\n *", "");
-    final String buffer = new String(AllTests.read(file)).trim();
+    final String buffer = new String(read(file)).trim();
     assertEquals("File content differs.", buffer, cont.trim());
   }
 }
