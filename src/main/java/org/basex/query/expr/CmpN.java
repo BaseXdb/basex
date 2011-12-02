@@ -91,7 +91,8 @@ public final class CmpN extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return optPre(oneEmpty() ? null : values() ? item(ctx, input) : this, ctx);
+    return optPre(oneIsEmpty() ? null : allAreValues() ?
+        item(ctx, input) : this, ctx);
   }
 
   @Override
@@ -113,7 +114,7 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return "'" + op + "' operator";
   }
 

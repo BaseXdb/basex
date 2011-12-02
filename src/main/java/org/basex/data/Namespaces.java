@@ -82,7 +82,7 @@ public final class Namespaces {
    * @param p prefix
    * @param u uri
    * @param pre pre value
-   * @return the new NSNode if a new one has been created, or null otherwise
+   * @return new NSNode if a new one has been created, or null otherwise
    */
   public NSNode add(final byte[] p, final byte[] u, final int pre) {
     NSNode newNode = null;
@@ -92,7 +92,7 @@ public final class Namespaces {
       current = current.add(newNode);
       newns = true;
     }
-    final int k = addPref(p);
+    final int k = addPrefix(p);
     final int v = addURI(u);
     current.add(k, v);
     if(p.length == 0) uriStack.set(uriL, v);
@@ -130,7 +130,7 @@ public final class Namespaces {
    */
   public int uri(final byte[] n, final boolean elem) {
     if(uri.size() == 0) return 0;
-    final byte[] pr = Token.pref(n);
+    final byte[] pr = Token.prefix(n);
     int u = elem ? uriStack.get(uriL) : 0;
     if(pr.length != 0) u = uri(pr, current);
     return u;
@@ -221,7 +221,7 @@ public final class Namespaces {
    * @return namespace URI reference or 0 if no namespace was found
    */
   public int uri(final byte[] name, final int pre) {
-    return uri(Token.pref(name), current.find(pre));
+    return uri(Token.prefix(name), current.find(pre));
   }
 
   /**
@@ -238,7 +238,7 @@ public final class Namespaces {
    * @param id prefix reference
    * @return prefix
    */
-  byte[] pref(final int id) {
+  byte[] prefix(final int id) {
     return pref.key(id);
   }
 
@@ -300,7 +300,7 @@ public final class Namespaces {
     final NSNode nd = current.find(par);
     final NSNode t = new NSNode(pre);
 
-    final int k = addPref(p);
+    final int k = addPrefix(p);
     final int v = addURI(u);
     if(nd.pre == pre) {
       nd.add(k, v);
@@ -325,7 +325,7 @@ public final class Namespaces {
    * @param p prefix to be added
    * @return reference
    */
-  private int addPref(final byte[] p) {
+  private int addPrefix(final byte[] p) {
     return Math.abs(pref.add(p));
   }
 

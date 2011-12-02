@@ -9,16 +9,18 @@ import org.basex.data.ExprInfo;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryParser;
 import org.basex.query.expr.UserFuncCall;
 import org.basex.query.expr.BaseFuncCall;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.UserFunc;
+import org.basex.query.expr.VarRef;
 import org.basex.query.func.FNIndex;
 import org.basex.query.func.FuncCall;
 import org.basex.query.func.Function;
 import org.basex.query.func.JavaFunc;
+import org.basex.query.item.FItem;
+import org.basex.query.item.FuncItem;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -55,17 +57,18 @@ public final class UserFuncs extends ExprInfo {
    * Returns the specified function.
    * @param name name of the function
    * @param args optional arguments
+   * @param dyn compile-/run-time flag
    * @param ctx query context
+   * @param ii input info
    * @return function instance
-   * @param qp query parser
    * @throws QueryException query exception
    */
-  public TypedFunc get(final QNm name, final Expr[] args,
-      final QueryContext ctx, final QueryParser qp) throws QueryException {
+  public TypedFunc get(final QNm name, final Expr[] args, final boolean dyn,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     // find function
-    final byte[] uri = name.uri().atom();
-    final byte[] ln = name.ln();
+    final byte[] uri = name.uri();
+    final byte[] ln = name.local();
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
@@ -73,14 +76,14 @@ public final class UserFuncs extends ExprInfo {
       if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
         final Levenshtein ls = new Levenshtein();
         for(final AtomType t : AtomType.values()) {
-          if(t.par != null && ls.similar(lc(ln), lc(t.nam()), 0))
-            qp.error(FUNSIMILAR, name.atom(), t.nam());
+          if(t.par != null && ls.similar(lc(ln), lc(t.string()), 0))
+            FUNSIMILAR.thrw(ii, name.string(), t.string());
         }
-        qp.error(FUNCUNKNOWN, name.atom());
+        FUNCUNKNOWN.thrw(ii, name.string());
       }
-      if(args.length != 1) qp.error(FUNCTYPE, name.atom());
+      if(args.length != 1) FUNCTYPE.thrw(ii, name.string());
       final SeqType to = SeqType.get(type, SeqType.Occ.ZO);
-      return TypedFunc.constr(new Cast(qp.input(), args[0], to), to);
+      return TypedFunc.constr(new Cast(ii, args[0], to), to);
     }
 
     // check Java functions - only allowed with administrator permissions
@@ -103,36 +106,74 @@ public final class UserFuncs extends ExprInfo {
       final String java = tb.toString();
       final int i = java.lastIndexOf(".");
       final Class<?> cls = Reflect.find(java.substring(0, i));
-      if(cls == null) qp.error(FUNCJAVA, java);
+      if(cls == null) FUNCJAVA.thrw(ii, java);
       final String mth = java.substring(i + 1);
-      return TypedFunc.java(new JavaFunc(qp.input(), cls, mth, args));
+      return TypedFunc.java(new JavaFunc(ii, cls, mth, args));
     }
 
     // check predefined functions
-    final FuncCall fun = FNIndex.get().get(ln, uri, args, qp);
+    final FuncCall fun = FNIndex.get().get(ln, uri, args, ctx, ii);
     if(fun != null) {
-      ctx.updating |= fun.def == Function.PUT || fun.def == Function._DB_ADD ||
-        fun.def == Function._DB_DELETE || fun.def == Function._DB_RENAME ||
-        fun.def == Function._DB_REPLACE || fun.def == Function._DB_OPTIMIZE ||
-        fun.def == Function._DB_STORE;
+      for(final Function f : Function.UPDATING) {
+        if(fun.def == f) {
+          ctx.updating = true;
+          break;
+        }
+      }
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 
     // find local function
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
-      if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
+      if(eq(ln, qn.local()) && eq(uri, qn.uri()) && args.length ==
         func[l].args.length) return new TypedFunc(
-            add(qp.input(), qn, l, args), FuncType.get(func[l]));
+            add(ii, qn, l, args), FuncType.get(func[l]));
     }
 
     // add function call for function that has not been defined yet
-    if(Types.find(name, false) == null) {
-      return new TypedFunc(add(qp.input(), name, add(new UserFunc(qp.input(),
-          name, new Var[args.length], null, false), qp), args),
+    if(!dyn && Types.find(name, false) == null) {
+      return new TypedFunc(add(ii, name, add(new UserFunc(ii, name,
+          new Var[args.length], null, false), ii), args),
           FuncType.arity(args.length));
     }
     return null;
+  }
+
+  /**
+   * Returns the specified function literal.
+   * @param name function name
+   * @param arity number of arguments
+   * @param dyn dynamic invocation flag
+   * @param ctx query context
+   * @param ii input info
+   * @return literal function expression
+   * @throws QueryException query exception
+   */
+  public FItem get(final QNm name, final long arity, final boolean dyn,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+
+    final Expr[] args = new Expr[(int) arity];
+    final Var[] vars = new Var[args.length];
+    for(int i = 0; i < args.length; i++) {
+      vars[i] = ctx.uniqueVar(ii, null);
+      args[i] = new VarRef(ii, vars[i]);
+    }
+
+    final TypedFunc f = ctx.funcs.get(name, args, dyn, ctx, ii);
+    if(f == null) {
+      if(!dyn) FUNCUNKNOWN.thrw(ii, name + "#" + arity);
+      return null;
+    }
+
+    // compile the function if it hasn't been done statically
+    if(f.fun instanceof UserFuncCall) {
+      final UserFunc usf = ((UserFuncCall) f.fun).func();
+      if(usf != null && usf.declared) usf.comp(ctx);
+    }
+
+    final FuncType ft = f.type;
+    return new FuncItem(name, vars, f.fun, ft, false);
   }
 
   /**
@@ -146,6 +187,8 @@ public final class UserFuncs extends ExprInfo {
   private UserFuncCall add(final InputInfo ii, final QNm nm, final int id,
       final Expr[] arg) {
     final UserFuncCall call = new BaseFuncCall(ii, nm, arg);
+    // for dynamic calls
+    if(func[id].declared) call.init(func[id]);
     calls[id] = Array.add(calls[id], call);
     return call;
   }
@@ -153,28 +196,27 @@ public final class UserFuncs extends ExprInfo {
   /**
    * Adds a local function.
    * @param fun function instance
-   * @param qp query parser
+   * @param ii input info
    * @return function id
    * @throws QueryException query exception
    */
-  public int add(final UserFunc fun, final QueryParser qp)
-      throws QueryException {
+  public int add(final UserFunc fun, final InputInfo ii) throws QueryException {
 
     final QNm name = fun.name;
 
-    final byte[] uri = name.uri().atom();
-    if(uri.length == 0) qp.error(FUNNONS, name.atom());
+    final byte[] uri = name.uri();
+    if(uri.length == 0) FUNNONS.thrw(ii, name.string());
 
     if(NSGlobal.standard(uri)) {
-      if(fun.declared) qp.error(NAMERES, name.atom());
-      funError(name, qp);
+      if(fun.declared) NAMERES.thrw(ii, name.string());
+      funError(name, ii);
     }
 
-    final byte[] ln = name.ln();
+    final byte[] ln = name.local();
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
-      final byte[] u = qn.uri().atom();
-      final byte[] nm = qn.ln();
+      final byte[] u = qn.uri();
+      final byte[] nm = qn.local();
 
       if(eq(ln, nm) && eq(uri, u) && fun.args.length == func[l].args.length) {
         // declare function that has been called before
@@ -183,7 +225,7 @@ public final class UserFuncs extends ExprInfo {
           return l;
         }
         // duplicate declaration
-        qp.error(FUNCDEFINED, fun);
+        FUNCDEFINED.thrw(ii, fun);
       }
     }
     // add function skeleton
@@ -220,21 +262,21 @@ public final class UserFuncs extends ExprInfo {
   /**
    * Finds similar function names and throws an error message.
    * @param name function name
-   * @param qp query parser
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public void funError(final QNm name, final QueryParser qp)
+  public void funError(final QNm name, final InputInfo ii)
       throws QueryException {
 
     // find global function
-    FNIndex.get().error(name, qp);
+    FNIndex.get().error(name, ii);
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
-    final byte[] nm = lc(name.ln());
+    final byte[] nm = lc(name.local());
     for(int n = 0; n < func.length; ++n) {
-      if(ls.similar(nm, lc(func[n].name.ln()), 0)) {
-        qp.error(FUNSIMILAR, name.atom(), func[n].name.atom());
+      if(ls.similar(nm, lc(func[n].name.local()), 0)) {
+        FUNSIMILAR.thrw(ii, name.string(), func[n].name.string());
       }
     }
   }

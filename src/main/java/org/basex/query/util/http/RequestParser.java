@@ -76,7 +76,7 @@ public final class RequestParser {
         "Body not expected for method " + string(httpMethod));
     if(payload != null) {
       // single part request
-      if(eq(payload.nname(), BODY)) {
+      if(eq(payload.name(), BODY)) {
         Item it = null;
         if(bodies != null) {
           // $bodies must contain exactly one item
@@ -88,7 +88,7 @@ public final class RequestParser {
         parseBody(payload, it, r.payloadAttrs, r.bodyContent, ii);
         r.isMultipart = false;
         // multipart request
-      } else if(eq(payload.nname(), MULTIPART)) {
+      } else if(eq(payload.name(), MULTIPART)) {
         int i = 0;
         final AxisMoreIter ch = payload.children();
         while(ch.next() != null)
@@ -113,7 +113,7 @@ public final class RequestParser {
   private static void parseAttrs(final ANode element, final TokenMap attrs) {
     final AxisIter elAttrs = element.attributes();
     for(ANode attr; (attr = elAttrs.next()) != null;) {
-      attrs.add(attr.nname(), attr.atom());
+      attrs.add(attr.name(), attr.string());
     }
   }
 
@@ -125,14 +125,14 @@ public final class RequestParser {
    */
   private static ANode parseHdrs(final AxisMoreIter i, final TokenMap hdrs) {
     ANode n = null;
-    while((n = i.next()) != null && eq(n.nname(), HDR)) {
+    while((n = i.next()) != null && eq(n.name(), HDR)) {
       final AxisIter hdrAttrs = n.attributes();
       byte[] name = null;
       byte[] value = null;
 
       for(ANode attr; (attr = hdrAttrs.next()) != null;) {
-        if(eq(attr.nname(), HDR_NAME)) name = attr.atom();
-        if(eq(attr.nname(), HDR_VALUE)) value = attr.atom();
+        if(eq(attr.name(), HDR_NAME)) name = attr.string();
+        if(eq(attr.name(), HDR_VALUE)) value = attr.string();
 
         if(name != null && name.length != 0 && value != null
             && value.length != 0) {

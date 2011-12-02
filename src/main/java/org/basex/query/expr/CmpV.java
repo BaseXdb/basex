@@ -175,14 +175,14 @@ public final class CmpV extends Cmp {
         Occ.O : Occ.ZO);
 
     Expr e = this;
-    if(oneEmpty()) {
+    if(oneIsEmpty()) {
       e = optPre(null, ctx);
-    } else if(values()) {
+    } else if(allAreValues()) {
       e = preEval(ctx);
-    } else if(e1.isFun(Function.COUNT)) {
+    } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFun(Function.POSITION)) {
+    } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
       e = Pos.get(op, e2, e, input);
       if(e != this) ctx.compInfo(OPTWRITE, this);
@@ -211,9 +211,11 @@ public final class CmpV extends Cmp {
     if(a == null) return null;
     final Item b = expr[1].item(ctx, input);
     if(b == null) return null;
+    if(a.comparable(b)) return Bln.get(op.e(input, a, b));
 
-    if(!a.comparable(b)) XPTYPECMP.thrw(input, a.type, b.type);
-    return Bln.get(op.e(input, a, b));
+    if(a.type.isFunction()) FNEQ.thrw(input, a);
+    if(b.type.isFunction()) FNEQ.thrw(input, b);
+    throw XPTYPECMP.thrw(input, a.type, b.type);
   }
 
   @Override
@@ -230,7 +232,7 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return "'" + op + "' expression";
   }
 

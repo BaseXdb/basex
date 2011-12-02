@@ -82,7 +82,7 @@ public final class RegEx {
         continue;
       }
       // backslash
-      char c = next(++i);
+      final char c = next(++i);
       // character class
       if(c != 'p' && c != 'P') {
         if("0123456789cCdDniIrsStwW|.-^$?*+{}()[]\\".indexOf(c) == -1)

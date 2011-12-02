@@ -12,7 +12,8 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.FItem;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -53,13 +54,34 @@ public final class FNFunc extends FuncCall {
       throws QueryException {
     switch(def) {
       case FUNCTION_ARITY:
-        return Itr.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
+        return Int.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
       case FUNCTION_NAME:
         return getFun(0, FuncType.ANY_FUN, ctx).fName();
       case PARTIAL_APPLY:
         return partApp(ctx, ii);
+      case FUNCTION_LOOKUP:
+        return lookup(ctx, ii);
       default:
         return super.item(ctx, ii);
+    }
+  }
+
+  /**
+   * Looks up the specified function item.
+   * @param ctx query context
+   * @param ii input info
+   * @return function item
+   * @throws QueryException query exception
+   */
+  private Item lookup(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final QNm name = (QNm) checkType(expr[0].item(ctx, ii), AtomType.QNM);
+    final long arity = checkItr(expr[1], ctx);
+    try {
+      return ctx.funcs.get(name, arity, true, ctx, ii);
+    } catch(final QueryException e) {
+      // function not found
+      return null;
     }
   }
 
@@ -76,7 +98,7 @@ public final class FNFunc extends FuncCall {
     final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
 
     final int arity = f.arity();
-    if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.name(), pos + 1);
+    if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.info(), pos + 1);
 
     final FuncType ft = (FuncType) f.type;
     final Var[] vars = new Var[arity - 1];
@@ -198,7 +220,7 @@ public final class FNFunc extends FuncCall {
     final FItem f = withArity(0, 2, ctx);
     final Value xs = expr[2].value(ctx);
     // evaluate start value lazily if it's passed straight through
-    if(xs.empty()) return expr[1].iter(ctx);
+    if(xs.isEmpty()) return expr[1].iter(ctx);
 
     Value res = expr[1].value(ctx);
     for(long i = xs.size(); --i >= 0;)
@@ -231,7 +253,7 @@ public final class FNFunc extends FuncCall {
   private FItem withArity(final int p, final int a, final QueryContext ctx)
       throws QueryException {
     final Item f = checkItem(expr[p], ctx);
-    if(!f.func() || ((FItem) f).arity() != a)
+    if(!f.type.isFunction() || ((FItem) f).arity() != a)
       Err.type(this, FuncType.arity(a), f);
 
     return (FItem) f;
@@ -239,7 +261,7 @@ public final class FNFunc extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return def == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 ||
-        super.uses(u);
+    return (def == Function.PARTIAL_APPLY || def == Function.FUNCTION_LOOKUP)
+        && u == Use.CTX || u == Use.X30 || super.uses(u);
   }
 }

@@ -78,7 +78,7 @@ final class IterPath extends AxisPath {
                 iter[p] = ctx.iter(expr[p]);
             } else {
               // not expected to happen, as steps will always yield nodes
-              if(!item.node()) NODESPATH.thrw(input, this, item.type);
+              if(!item.type.isNode()) NODESPATH.thrw(input, this, item.type);
               final ANode n = (ANode) item;
               if(node == null || !node.is(n)) {
                 node = n;

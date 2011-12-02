@@ -3,7 +3,6 @@ package org.basex.query.item;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.basex.query.QueryText;
 import org.basex.util.Token;
 
 /**
@@ -15,8 +14,6 @@ import org.basex.util.Token;
 public final class Uri extends Str {
   /** Empty URI. */
   public static final Uri EMPTY = new Uri(Token.EMPTY);
-  /** Default collation. */
-  public static final Uri COLL = Uri.uri(QueryText.URLCOLL);
 
   /**
    * Constructor.
@@ -65,7 +62,7 @@ public final class Uri extends Str {
    * Tests if this is an absolute URI.
    * @return result of check
    */
-  public boolean absolute() {
+  public boolean isAbsolute() {
     return Token.contains(val, ':');
   }
 
@@ -73,7 +70,7 @@ public final class Uri extends Str {
    * Checks the validity of this URI.
    * @return result of check
    */
-  public boolean valid() {
+  public boolean isValid() {
     try {
       new URI(Token.string(Token.uri(val, true)));
       return true;

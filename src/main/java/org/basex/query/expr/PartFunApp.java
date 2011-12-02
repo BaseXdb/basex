@@ -47,7 +47,7 @@ public final class PartFunApp extends UserFunc {
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(int i = 0; i < args.length; ++i) {
-      ser.attribute(Token.token(ARG + i), args[i].name.atom());
+      ser.attribute(Token.token(ARG + i), args[i].name.string());
     }
     expr.plan(ser);
     ser.closeElement();

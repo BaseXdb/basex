@@ -127,8 +127,8 @@ public final class HTTPClient {
         if(href == null || href.length == 0) NOPARAMS.thrw(ii);
         final HttpURLConnection conn = openConnection(string(href), ii);
         try {
-          return ResponseHandler.getResponse(conn, Bln.FALSE.atom(ii),
-              Bln.FALSE.atom(ii), prop, ii);
+          return ResponseHandler.getResponse(conn, Bln.FALSE.string(ii),
+              Bln.FALSE.string(ii), prop, ii);
         } finally {
           conn.disconnect();
         }
@@ -337,7 +337,7 @@ public final class HTTPClient {
       if(item instanceof B64) {
         out.write(((B64) item).toJava());
       } else {
-        out.write(new B64(item.atom(ii)).toJava());
+        out.write(new B64(item.string(ii)).toJava());
       }
     }
   }
@@ -358,7 +358,7 @@ public final class HTTPClient {
       if(item instanceof Hex) {
         out.write(((Hex) item).toJava());
       } else {
-        out.write(new Hex(item.atom(ii)).toJava());
+        out.write(new Hex(item.string(ii)).toJava());
       }
     }
   }

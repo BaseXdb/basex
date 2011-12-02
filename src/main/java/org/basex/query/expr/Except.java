@@ -30,11 +30,11 @@ public final class Except extends Set {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(expr[0].empty()) return optPre(null, ctx);
+    if(expr[0].isEmpty()) return optPre(null, ctx);
 
     for(int e = 1; e < expr.length; ++e) {
-      if(expr[e].empty()) {
-        ctx.compInfo(OPTREMOVE, desc(), expr[e]);
+      if(expr[e].isEmpty()) {
+        ctx.compInfo(OPTREMOVE, description(), expr[e]);
         expr = Array.delete(expr, e--);
       }
     }

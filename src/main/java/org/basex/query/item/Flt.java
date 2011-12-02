@@ -40,7 +40,7 @@ public final class Flt extends Num {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     return Token.token(val);
   }
 

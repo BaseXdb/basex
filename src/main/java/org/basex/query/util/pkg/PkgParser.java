@@ -77,11 +77,11 @@ public final class PkgParser {
 
     final AxisIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
-      final byte[] name = next.nname();
-      if(eq(NAME, name))         p.name = next.atom();
-      else if(eq(ABBREV, name))  p.abbrev = next.atom();
-      else if(eq(VERSION, name)) p.version = next.atom();
-      else if(eq(SPEC, name))    p.spec = next.atom();
+      final byte[] name = next.name();
+      if(eq(NAME, name))         p.name = next.string();
+      else if(eq(ABBREV, name))  p.abbrev = next.string();
+      else if(eq(VERSION, name)) p.version = next.string();
+      else if(eq(SPEC, name))    p.spec = next.string();
       else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
     }
 
@@ -123,13 +123,13 @@ public final class PkgParser {
     final AxisIter atts = node.attributes();
     final Dependency d = new Dependency();
     for(ANode next; (next = atts.next()) != null;) {
-      final byte[] name = next.nname();
-      if(eq(PKG, name))            d.pkg = next.atom();
-      else if(eq(PROC, name))      d.processor = next.atom();
-      else if(eq(VERS, name))      d.versions = next.atom();
-      else if(eq(SEMVER, name))    d.semver = next.atom();
-      else if(eq(SEMVERMIN, name)) d.semverMin = next.atom();
-      else if(eq(SEMVERMAX, name)) d.semverMax = next.atom();
+      final byte[] name = next.name();
+      if(eq(PKG, name))            d.pkg = next.string();
+      else if(eq(PROC, name))      d.processor = next.string();
+      else if(eq(VERS, name))      d.versions = next.string();
+      else if(eq(SEMVER, name))    d.semver = next.string();
+      else if(eq(SEMVERMIN, name)) d.semverMin = next.string();
+      else if(eq(SEMVERMAX, name)) d.semverMax = next.string();
       else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
     }
     return d;
@@ -146,8 +146,8 @@ public final class PkgParser {
     final Component c = new Component();
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
-      if(eqNS(NSPC, name)) c.uri = next.atom();
-      else if(eqNS(FILE, name)) c.file = next.atom();
+      if(eqNS(NSPC, name)) c.uri = next.string();
+      else if(eqNS(FILE, name)) c.file = next.string();
       else PKGDESCINV.thrw(input, Util.info(WHICHELEM, name));
     }
 
@@ -186,6 +186,6 @@ public final class PkgParser {
    * @return result of check
    */
   private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryText.PKGURI);
+    return name.eq(new QNm(cmp, QueryText.PKGURI));
   }
 }

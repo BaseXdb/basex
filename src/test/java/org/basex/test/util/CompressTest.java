@@ -91,7 +91,7 @@ public final class CompressTest {
     final QueryProcessor qp = new QueryProcessor(query, ctx);
     final Iter ir = qp.iter();
     for(Item it; (it = ir.next()) != null;) {
-      final byte[] token = it.atom(null);
+      final byte[] token = it.string(null);
       tl.add(token);
       tb.add(token).add(' ');
     }

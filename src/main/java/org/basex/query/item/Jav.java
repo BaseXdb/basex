@@ -25,23 +25,23 @@ public final class Jav extends Item {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     return Token.token(val.toString());
   }
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return atom(ii).length != 0;
+    return string(ii).length != 0;
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return Token.eq(atom(ii), it.atom(ii));
+    return Token.eq(string(ii), it.string(ii));
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return Token.diff(atom(ii), it.atom(ii));
+    return Token.diff(string(ii), it.string(ii));
   }
 
   @Override

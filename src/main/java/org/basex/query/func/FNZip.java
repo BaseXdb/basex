@@ -43,7 +43,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.item.Uri;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.Atts;
@@ -59,14 +58,12 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public final class FNZip extends FuncCall {
-  /** Function namespace. */
-  private static final Uri U_ZIP = Uri.uri(ZIPURI);
   /** Element: zip:file. */
-  private static final QNm E_FILE = new QNm(token("zip:file"), U_ZIP);
+  private static final QNm E_FILE = new QNm(token("zip:file"), ZIPURI);
   /** Element: zip:dir. */
-  private static final QNm E_DIR = new QNm(token("zip:dir"), U_ZIP);
+  private static final QNm E_DIR = new QNm(token("zip:dir"), ZIPURI);
   /** Element: zip:entry. */
-  private static final QNm E_ENTRY = new QNm(token("zip:entry"), U_ZIP);
+  private static final QNm E_ENTRY = new QNm(token("zip:entry"), ZIPURI);
   /** Attribute: href. */
   private static final QNm A_HREF = new QNm(token("href"));
   /** Attribute: name. */
@@ -352,7 +349,7 @@ public final class FNZip extends FuncCall {
             if(hex || M_BASE64.equals(m)) {
               // treat children as base64/hex
               final ByteList bl = new ByteList();
-              do bl.add(n.atom()); while((n = ch.next()) != null);
+              do bl.add(n.string()); while((n = ch.next()) != null);
               final byte[] bytes = bl.toArray();
               zos.write((hex ? new Hex(bytes) : new B64(bytes)).toJava());
             } else {
@@ -391,7 +388,7 @@ public final class FNZip extends FuncCall {
       final QNm name = at.qname();
       if(name.eq(A_NAME) || name.eq(A_SRC)) continue;
       if(tb.size() != 0) tb.add(',');
-      tb.add(name.ln()).add('=').add(at.atom());
+      tb.add(name.local()).add('=').add(at.string());
     }
     return tb.size() == 0 ? ctx.serProp(true) :
       new SerializerProp(tb.toString());

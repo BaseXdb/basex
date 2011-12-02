@@ -7,7 +7,6 @@ import java.util.EmptyStackException;
 import java.util.Iterator;
 
 import org.basex.util.Array;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -67,7 +66,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @param e element to be added
    */
   public void add(final String e) {
-    add(Token.token(e));
+    add(token(e));
   }
 
   /**

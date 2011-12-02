@@ -59,7 +59,8 @@ public abstract class InputParser {
    * @return current character
    */
   protected final char curr() {
-    return qp >= ql ? 0 : query.charAt(qp);
+    final int p = qp;
+    return p < ql ? query.charAt(p) : 0;
   }
 
   /**
@@ -68,7 +69,8 @@ public abstract class InputParser {
    * @return result of check
    */
   protected final boolean curr(final int ch) {
-    return curr() == ch;
+    final int p = qp;
+    return p < ql && ch == query.charAt(p);
   }
 
   /**
@@ -83,7 +85,8 @@ public abstract class InputParser {
    * @return result of check
    */
   protected final char next() {
-    return qp + 1 >= ql ? 0 : query.charAt(qp + 1);
+    final int p = qp + 1;
+    return p < ql ? query.charAt(p) : 0;
   }
 
   /**
@@ -91,7 +94,7 @@ public abstract class InputParser {
    * @return next character
    */
   protected final char consume() {
-    return qp >= ql ? 0 : query.charAt(qp++);
+    return qp < ql ? query.charAt(qp++) : 0;
   }
 
   /**
@@ -100,9 +103,10 @@ public abstract class InputParser {
    * @return true if character was found
    */
   protected final boolean consume(final int ch) {
-    final boolean found = curr() == ch;
-    if(found) ++qp;
-    return found;
+    final int p = qp;
+    if(p >= ql || ch != query.charAt(p)) return false;
+    ++qp;
+    return true;
   }
 
   /**

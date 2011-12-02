@@ -15,7 +15,6 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.ft.Scoring;
 
 /**
@@ -111,7 +110,7 @@ public final class Let extends ForLet {
       @Override
       public boolean reset() {
         if(more) {
-          ctx.vars.reset(vs);
+          ctx.vars.size(vs);
           more = false;
         }
         return true;
@@ -126,8 +125,7 @@ public final class Let extends ForLet {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, score ? Token.token(SCORE) : VAR,
-        token(var.toString()));
+    ser.openElement(this, score ? token(SCORE) : VAR, token(var.toString()));
     expr.plan(ser);
     ser.closeElement();
   }

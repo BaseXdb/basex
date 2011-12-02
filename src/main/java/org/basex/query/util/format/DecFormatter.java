@@ -10,7 +10,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
 import org.basex.query.func.FNNum;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -294,8 +294,8 @@ public final class DecFormatter extends FormatUtil {
 
     // convert and round number
     Item num = it;
-    if(pic.pc) num = Calc.MULT.ev(ii, num, Itr.get(100));
-    if(pic.pm) num = Calc.MULT.ev(ii, num, Itr.get(1000));
+    if(pic.pc) num = Calc.MULT.ev(ii, num, Int.get(100));
+    if(pic.pm) num = Calc.MULT.ev(ii, num, Int.get(1000));
     num = FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii);
     // remove sign: num = FNNum.abs(num);
 

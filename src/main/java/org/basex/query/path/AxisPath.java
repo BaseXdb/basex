@@ -101,6 +101,7 @@ public class AxisPath extends Path {
       ctx.compInfo(OPTMERGE);
       ctx.value = root(ctx);
     }
+
     final AxisStep s = voidStep(steps);
     if(s != null) COMPSELF.thrw(input, s);
 
@@ -221,7 +222,7 @@ public class AxisPath extends Path {
           if(s.test.test != Name.NAME) break;
 
           // support only unique paths with nodes on the correct level
-          final int name = data.tagindex.id(s.test.name.ln());
+          final int name = data.tagindex.id(s.test.name.local());
           final ObjList<PathNode> pn = data.pthindex.desc(name, Data.ELEM);
           if(pn.size() != 1 || pn.get(0).level() != j + 1) break;
         }
@@ -369,7 +370,7 @@ public class AxisPath extends Path {
     if(data == null || !data.meta.uptodate) return this;
 
     final StatsKey stats = data.tagindex.stat(
-        data.tagindex.id(s.test.name.ln()));
+        data.tagindex.id(s.test.name.local()));
     if(stats != null && stats.leaf) {
       steps = Array.add(steps, AxisStep.get(input, Axis.CHILD, Test.TXT));
       ctx.compInfo(OPTTEXT, this);

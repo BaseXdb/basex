@@ -34,7 +34,9 @@ public abstract class ANode extends Item {
     NodeType.COM, NodeType.PI
   };
   /** Static node counter. */
-  // [CG] XQuery/ID: move to query context to reduce chance of overflow
+  // [CG] XQuery/ID:
+  // - move to query context to reduce chance of overflow
+  // - move to FNode to reduce memory usage of DBNode instances
   private static int sid;
   /** Unique node id. */
   public final int id = ++sid;
@@ -58,27 +60,28 @@ public abstract class ANode extends Item {
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
-    return atom();
+  public final byte[] string(final InputInfo ii) {
+    return string();
   }
 
   /**
-   * Returns an atomized string.
-   * @return Returns an atomized string.
+   * Returns the string value.
+   * @return string value
    */
-  public abstract byte[] atom();
+  public abstract byte[] string();
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? it.eq(ii, this) : Token.eq(atom(), it.atom(ii));
+    return !it.type.isUntyped() ? it.eq(ii, this) :
+      Token.eq(string(), it.string(ii));
   }
 
   @Override
   public final int diff(final InputInfo ii, final Item it)
       throws QueryException {
-    return !it.unt() ? -it.diff(ii, this) :
-      Token.diff(atom(), it.atom(ii));
+    return !it.type.isUntyped() ? -it.diff(ii, this) :
+      Token.diff(string(), it.string(ii));
   }
 
   /**
@@ -88,6 +91,13 @@ public abstract class ANode extends Item {
   public abstract ANode copy();
 
   /**
+   * Returns a deep copy of the node.
+   * @param ctx query context
+   * @return node copy
+   */
+  public abstract ANode copy(final QueryContext ctx);
+
+  /**
    * Returns the name of the node, composed of an optional prefix
    * and the local name.
    * This function must only be called for element and attribute nodes.
@@ -95,7 +105,7 @@ public abstract class ANode extends Item {
    * instance is created.
    * @return name
    */
-  public byte[] nname() {
+  public byte[] name() {
     return null;
   }
 
@@ -109,55 +119,41 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns a temporary node name.
-   * This function must only be called for elements, attributes and pi's.
-   * It is more efficient than calling {@link #qname}, as an existing
+   * Updates the specified with the information of the current node.
+   * This is more efficient than calling {@link #qname}, as an existing
    * {@link QNm} instance is reused.
+   * This function must only be called for elements, attributes and pi's.
    * @param nm temporary qname
    * @return name
    */
-  @SuppressWarnings("unused")
-  public QNm qname(final QNm nm) {
-    return qname();
-  }
+  public abstract QNm update(final QNm nm);
 
   /**
-   * Returns a namespace array.
+   * Returns all namespaces defined for the nodes.
+   * Overwritten by {@link FElem} and {@link DBNode}.
    * @return namespace array
    */
-  public Atts ns() {
+  public Atts namespaces() {
     return null;
   }
 
   /**
    * Returns the namespace hierarchy.
    * @return namespaces
-   * [LW][LK] Namespaces: this isn't enough
    */
   public final Atts nsScope() {
-    return nsScope(true);
-  }
-
-  /**
-   * Returns the namespace hierarchy.
-   * @param nsInherit copy-namespaces inherit
-   * @return namespaces
-   * [LW][LK] Namespaces: this isn't enough
-   */
-  public final Atts nsScope(final boolean nsInherit) {
     final Atts ns = new Atts();
-    ANode n = this;
+    ANode node = this;
     do {
-      final Atts nns = n.ns();
-      if(!nsInherit) return nns;
-      if(nns != null) {
-        for(int a = nns.size - 1; a >= 0; a--) {
-          final byte[] key = nns.key[a];
-          if(!ns.contains(key)) ns.add(key, nns.val[a]);
+      final Atts n = node.namespaces();
+      if(n != null) {
+        for(int a = n.size() - 1; a >= 0; a--) {
+          final byte[] key = n.key(a);
+          if(!ns.contains(key)) ns.add(key, n.value(a));
         }
       }
-      n = n.parent();
-    } while(n != null && n.type == NodeType.ELM);
+      node = node.parent();
+    } while(node != null && node.type == NodeType.ELM);
     return ns;
   }
 
@@ -168,10 +164,10 @@ public abstract class ANode extends Item {
    * @return uri
    */
   public final byte[] uri(final byte[] pref, final QueryContext ctx) {
-    final Atts at = ns();
+    final Atts at = namespaces();
     if(at != null) {
       final int i = at.get(pref);
-      if(i != -1) return at.val[i];
+      if(i != -1) return at.value(i);
       final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);
     }
@@ -242,7 +238,7 @@ public abstract class ANode extends Item {
     while(true) {
       final ANode node = ai.next();
       if(node == null) return null;
-      if(node.qname().eq(name)) return node.atom();
+      if(node.qname().eq(name)) return node.string();
     }
   }
 
@@ -250,13 +246,13 @@ public abstract class ANode extends Item {
    * Returns an ancestor axis iterator.
    * @return iterator
    */
-  public abstract AxisIter anc();
+  public abstract AxisIter ancestor();
 
   /**
    * Returns an ancestor-or-self axis iterator.
    * @return iterator
    */
-  public abstract AxisIter ancOrSelf();
+  public abstract AxisIter ancestorOrSelf();
 
   /**
    * Returns an attribute axis iterator.
@@ -280,31 +276,31 @@ public abstract class ANode extends Item {
    * Returns a descendant-or-self axis iterator.
    * @return iterator
    */
-  public abstract AxisIter descOrSelf();
+  public abstract AxisIter descendantOrSelf();
 
   /**
    * Returns a following axis iterator.
    * @return iterator
    */
-  public abstract AxisIter foll();
+  public abstract AxisIter following();
 
   /**
    * Returns a following-sibling axis iterator.
    * @return iterator
    */
-  public abstract AxisIter follSibl();
+  public abstract AxisIter followingSibling();
 
   /**
    * Returns a parent axis iterator.
    * @return iterator
    */
-  public abstract AxisIter par();
+  public abstract AxisIter parentIter();
 
   /**
    * Returns a preceding axis iterator.
    * @return iterator
    */
-  public final AxisIter prec() {
+  public final AxisIter preceding() {
     return new AxisIter() {
       /** Iterator. */
       private NodeCache nc;
@@ -338,7 +334,7 @@ public abstract class ANode extends Item {
    * Returns a preceding-sibling axis iterator.
    * @return iterator
    */
-  public final AxisIter precSibl() {
+  public final AxisIter precedingSibling() {
     return new AxisIter() {
       /** Child nodes. */
       private NodeCache nc;
@@ -397,6 +393,14 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a database kind for the specified node type.
+   * @return node kind
+   */
+  public int kind() {
+    return kind(nodeType());
+  }
+
+  /**
+   * Returns a database kind for the specified node type.
    * @param t node type
    * @return node kind
    */
@@ -423,7 +427,7 @@ public abstract class ANode extends Item {
 
   @Override
   public final BXNode toJava() {
-    switch(ndType()) {
+    switch(nodeType()) {
       case DOC: return new BXDoc(this);
       case ELM: return new BXElem(this);
       case TXT: return new BXText(this);
@@ -438,7 +442,7 @@ public abstract class ANode extends Item {
    * Returns this Node's node type.
    * @return node type
    */
-  public final NodeType ndType() {
+  public final NodeType nodeType() {
     return (NodeType) type;
   }
 }

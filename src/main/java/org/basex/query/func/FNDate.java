@@ -13,7 +13,7 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Dur;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
@@ -108,7 +108,7 @@ public final class FNDate extends FuncCall {
    * @return years
    */
   private Item yea(final Item it) {
-    return Itr.get(it instanceof Dur ? ((Dur) it).yea() :
+    return Int.get(it instanceof Dur ? ((Dur) it).yea() :
       ((Date) it).xc.getYear());
   }
 
@@ -118,7 +118,7 @@ public final class FNDate extends FuncCall {
    * @return months
    */
   private Item mon(final Item it) {
-    return Itr.get(it instanceof Dur ? ((Dur) it).mon() :
+    return Int.get(it instanceof Dur ? ((Dur) it).mon() :
       ((Date) it).xc.getMonth());
   }
 
@@ -128,7 +128,7 @@ public final class FNDate extends FuncCall {
    * @return days
    */
   private Item day(final Item it) {
-    return Itr.get(it instanceof Dur ? (int) ((Dur) it).day() :
+    return Int.get(it instanceof Dur ? (int) ((Dur) it).day() :
       ((Date) it).xc.getDay());
   }
 
@@ -138,7 +138,7 @@ public final class FNDate extends FuncCall {
    * @return hours
    */
   private Item hou(final Item it) {
-    return Itr.get(it instanceof Dur ? (int) ((Dur) it).hou() :
+    return Int.get(it instanceof Dur ? (int) ((Dur) it).hou() :
       ((Date) it).xc.getHour());
   }
 
@@ -148,7 +148,7 @@ public final class FNDate extends FuncCall {
    * @return minutes
    */
   private Item min(final Item it) {
-    return Itr.get(it instanceof Dur ? ((Dur) it).min() :
+    return Int.get(it instanceof Dur ? ((Dur) it).min() :
       ((Date) it).xc.getMinute());
   }
 
@@ -185,7 +185,7 @@ public final class FNDate extends FuncCall {
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.unt() ? t.e(it, ctx, input) : checkType(it, t);
+    return it.type.isUntyped() ? t.e(it, ctx, input) : checkType(it, t);
   }
 
   /**
@@ -196,8 +196,9 @@ public final class FNDate extends FuncCall {
    * @throws QueryException query exception
    */
   private Item checkDur(final Item it) throws QueryException {
-    if(it.unt()) return new Dur(it.atom(input), input);
-    if(!it.dur()) Err.type(this, AtomType.DUR, it);
+    final Type ip = it.type;
+    if(ip.isUntyped()) return new Dur(it.string(input), input);
+    if(!ip.isDuration()) Err.type(this, AtomType.DUR, it);
     return it;
   }
 
@@ -212,7 +213,7 @@ public final class FNDate extends FuncCall {
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Dat(it.atom(input), input) :
+    final Item i = it.type.isUntyped() ? new Dat(it.string(input), input) :
       checkType(it, AtomType.DAT);
     return adjust((Date) i, zon, d);
   }
@@ -228,7 +229,7 @@ public final class FNDate extends FuncCall {
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Dtm(it.atom(input), input) :
+    final Item i = it.type.isUntyped() ? new Dtm(it.string(input), input) :
       checkType(it, AtomType.DTM);
     return adjust((Date) i, zon, d);
   }
@@ -244,7 +245,7 @@ public final class FNDate extends FuncCall {
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Tim(it.atom(input), input) :
+    final Item i = it.type.isUntyped() ? new Tim(it.string(input), input) :
       checkType(it, AtomType.TIM);
     return adjust((Date) i, zon, d);
   }
@@ -259,8 +260,10 @@ public final class FNDate extends FuncCall {
   private Item dattim(final Item date, final Item tm) throws QueryException {
     if(tm == null) return null;
 
-    final Item d = date.unt() ? new Dat(date.atom(input), input) : date;
-    final Item t = tm.unt() ? new Tim(tm.atom(input), input) : tm;
+    final Item d = date.type.isUntyped() ?
+        new Dat(date.string(input), input) : date;
+    final Item t = tm.type.isUntyped() ?
+        new Tim(tm.string(input), input) : tm;
 
     final Dtm dtm = new Dtm((Dat) checkType(d, AtomType.DAT));
     final Tim tim = (Tim) checkType(t, AtomType.TIM);

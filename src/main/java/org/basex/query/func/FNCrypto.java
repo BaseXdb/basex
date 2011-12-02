@@ -62,7 +62,7 @@ public class FNCrypto extends FuncCall {
             checkNode(expr[0].item(ctx, ii)), checkStr(expr[1], ctx),
             checkStr(expr[2], ctx), checkStr(expr[3], ctx),
             checkStr(expr[4], ctx), checkStr(expr[5], ctx),
-            arg6Str ? arg6.atom(ii) : Token.token(""),
+            arg6Str ? arg6.string(ii) : Token.token(""),
             expr.length > 7 ? checkNode(expr[7].item(ctx, ii)) :
               expr.length == 7 && !arg6Str ? checkNode(expr[6].item(ctx, ii)) :
                 null);

@@ -42,22 +42,12 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final boolean dat() {
+  public final boolean isNode() {
     return false;
   }
 
   @Override
-  public final boolean dur() {
-    return false;
-  }
-
-  @Override
-  public final boolean node() {
-    return false;
-  }
-
-  @Override
-  public final boolean num() {
+  public final boolean isNumber() {
     return false;
   }
 
@@ -68,29 +58,30 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final boolean str() {
+  public final boolean isString() {
     return false;
   }
 
   @Override
-  public final boolean unt() {
+  public final boolean isUntyped() {
     return false;
   }
 
   @Override
-  public final boolean func() {
+  public final boolean isFunction() {
     return true;
   }
 
   @Override
-  public byte[] nam() {
+  public byte[] string() {
     return Token.token(FUNCTION);
   }
 
   @Override
   public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!it.func()) throw Err.cast(ii, this, it);
+
+    if(!it.type.isFunction()) throw Err.cast(ii, this, it);
     final FItem f = (FItem) it;
     return this == ANY_FUN ? f : f.coerceTo(this, ctx, ii);
   }
@@ -101,7 +92,7 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final boolean instance(final Type t) {
+  public final boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
     if(!(t instanceof FuncType)) return t == AtomType.ITEM;
     final FuncType ft = (FuncType) t;
@@ -118,11 +109,11 @@ public class FuncType implements Type {
 
   /**
    * Getter for function types.
-   * @param args argument types
    * @param ret return type
+   * @param args argument types
    * @return function type
    */
-  public static FuncType get(final SeqType[] args, final SeqType ret) {
+  public static FuncType get(final SeqType ret, final SeqType... args) {
     if(args == null || ret == null) return ANY_FUN;
     return new FuncType(args, ret);
   }
@@ -135,7 +126,7 @@ public class FuncType implements Type {
   public static FuncType arity(final int a) {
     final SeqType[] args = new SeqType[a];
     Arrays.fill(args, SeqType.ITEM_ZM);
-    return get(args, SeqType.ITEM_ZM);
+    return get(SeqType.ITEM_ZM, args);
   }
 
   /**
@@ -167,7 +158,17 @@ public class FuncType implements Type {
   }
 
   @Override
-  public boolean map() {
+  public boolean isDuration() {
+    return false;
+  }
+
+  @Override
+  public boolean isDate() {
+    return false;
+  }
+
+  @Override
+  public boolean isMap() {
     return false;
   }
 

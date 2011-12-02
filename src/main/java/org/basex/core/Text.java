@@ -11,7 +11,6 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdRepo;
-import org.basex.core.Commands.CmdSet;
 import org.basex.core.Commands.CmdShow;
 
 /**
@@ -399,15 +398,7 @@ public interface Text {
   String[] HELPSET = {
     "[option] ([value])",
     lang("ch_set1", "info"),
-    lang("ch_set2", "option", "value") + NL +
-    LI + CmdSet.QUERYINFO + COLS + lang("ch_set21") + NL +
-    LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
-    LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
-    LI + CmdSet.CHOP      + COLS + lang("ch_set26") + NL +
-    LI + CmdSet.TEXTINDEX + COLS + lang("ch_set28") + NL +
-    LI + CmdSet.ATTRINDEX + COLS + lang("ch_set29") + NL +
-    LI + CmdSet.FTINDEX   + COLS + lang("ch_set31") + NL +
-    LI + CmdSet.PATHINDEX + COLS + lang("ch_set32")
+    lang("ch_set2", "option", "value")
   };
   /** Command help. */
   String[] HELPGET = {
@@ -783,12 +774,6 @@ public interface Text {
   /** Error info. */
   String INFOBROSERERR = lang("info_browsererror");
 
-  /** Info on query info. */
- String INFOQUERY = lang("info_query");
-  /** Info on debug mode. */
-  String INFODEBUG = lang("info_debug");
-  /** Info on result serialization. */
-  String INFOSERIALIZE = lang("info_serialize");
   /** Info on whitespace chopping. */
   String INFOCHOP = lang("info_chop");
   /** Info on text indexing. */

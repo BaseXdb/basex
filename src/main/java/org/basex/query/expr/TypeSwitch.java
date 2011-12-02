@@ -45,7 +45,7 @@ public final class TypeSwitch extends ParseExpr {
     checkUp(ctx, tmp);
 
     // static condition: return branch in question
-    if(ts.value()) {
+    if(ts.isValue()) {
       for(final TypeCase c : cases) {
         if(c.var.type == null || c.var.type.instance(ts.value(ctx)))
           return optPre(c.comp(ctx, (Value) ts).expr, ctx);
@@ -82,8 +82,8 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public boolean vacuous() {
-    for(final TypeCase c : cases) if(!c.expr.vacuous()) return false;
+  public boolean isVacuous() {
+    for(final TypeCase c : cases) if(!c.expr.isVacuous()) return false;
     return true;
   }
 

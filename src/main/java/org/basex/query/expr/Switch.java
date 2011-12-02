@@ -50,13 +50,13 @@ public final class Switch extends ParseExpr {
 
     // check if expression can be pre-evaluated
     Expr ex = this;
-    if(cond.value()) {
+    if(cond.isValue()) {
       final Item it = cond.item(ctx, input);
       LOOP:
       for(final SwitchCase sc : cases) {
         final int sl = sc.expr.length;
         for(int e = 1; e < sl; e++) {
-          if(!sc.expr[e].value()) break LOOP;
+          if(!sc.expr[e].isValue()) break LOOP;
 
           // includes check for empty sequence (null reference)
           final Item cs = sc.expr[e].item(ctx, input);

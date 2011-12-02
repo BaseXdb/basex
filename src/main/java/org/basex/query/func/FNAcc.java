@@ -7,10 +7,11 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -39,29 +40,43 @@ public final class FNAcc extends FuncCall {
     final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
     switch(def) {
       case POSITION:
-        return Itr.get(ctx.pos);
+        return Int.get(ctx.pos);
       case LAST:
-        return Itr.get(ctx.size);
+        return Int.get(ctx.size);
       case STRING:
-        Item it = e.item(ctx, input);
-        if(it == null) return Str.ZERO;
-        if(it.func()) FNSTR.thrw(ii, this);
-        return it.str() && !it.unt() ? it : Str.get(it.atom(ii));
+        return string(e, ii, ctx);
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRING_LENGTH:
-        return Itr.get(len(checkEStr(e, ctx)));
+        return Int.get(len(checkEStr(expr.length == 0 ?
+            string(e, ii, ctx) : e, ctx)));
       case NORMALIZE_SPACE:
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
-        it = e.item(ctx, input);
-        if(it == null) return null;
-        final QNm qn = (QNm) checkType(it, AtomType.QNM);
-        return qn.hasUri() ? qn.uri() :
-          Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
+        final Item it = e.item(ctx, input);
+        return it == null ? null :
+          Uri.uri(((QNm) checkType(it, AtomType.QNM)).uri());
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Converts the specified item to a string.
+   * @param e expression
+   * @param ii input info
+   * @param ctx query context
+   * @return double iterator
+   * @throws QueryException query exception
+   */
+  private Item string(final Expr e, final InputInfo ii,
+      final QueryContext ctx) throws QueryException {
+
+    final Item it = e.item(ctx, input);
+    if(it == null) return Str.ZERO;
+    final Type t = it.type;
+    if(t.isFunction()) FNSTR.thrw(ii, this);
+    return t == AtomType.STR ? it : Str.get(it.string(ii));
   }
 
   /**
@@ -76,9 +91,10 @@ public final class FNAcc extends FuncCall {
 
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
-    if(it.func()) FNATM.thrw(input, this);
+    final Type t = it.type;
+    if(t.isFunction()) FNATM.thrw(input, this);
     try {
-      return it.type == AtomType.DBL ? it : AtomType.DBL.e(it, ctx, input);
+      return t == AtomType.DBL ? it : AtomType.DBL.e(it, ctx, input);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }

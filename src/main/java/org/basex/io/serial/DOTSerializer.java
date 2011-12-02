@@ -142,7 +142,7 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  protected byte[] name(final ExprInfo expr) {
+  protected byte[] info(final ExprInfo expr) {
     color = DOTData.color(expr);
     return token(DOTData.name(expr));
   }

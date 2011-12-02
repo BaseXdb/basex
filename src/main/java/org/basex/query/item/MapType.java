@@ -29,20 +29,20 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public byte[] nam() {
+  public byte[] string() {
     return MAP;
   }
 
   @Override
-  public boolean map() {
+  public boolean isMap() {
     return true;
   }
 
   @Override
   public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-    if(!it.map() || !((Map) it).hasType(this)) throw Err.cast(ii, this, it);
 
+      throws QueryException {
+    if(!it.type.isMap() || !((Map) it).hasType(this)) Err.cast(ii, this, it);
     return (Map) it;
   }
 
@@ -53,8 +53,8 @@ public final class MapType extends FuncType {
    * @return map type
    */
   public static MapType get(final AtomType key, final SeqType val) {
-    if(key == AtomType.AAT && val.eq(SeqType.ITEM_ZM)) return SeqType.ANY_MAP;
-    return new MapType(key, val);
+    return key == AtomType.AAT && val.eq(SeqType.ITEM_ZM) ?
+        SeqType.ANY_MAP : new MapType(key, val);
   }
 
   @Override

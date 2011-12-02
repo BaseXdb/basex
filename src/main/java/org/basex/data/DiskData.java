@@ -3,11 +3,14 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.basex.build.DiskBuilder;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.FTIndex;
@@ -48,6 +51,9 @@ public final class DiskData extends Data {
    */
   public DiskData(final String db, final Context ctx) throws IOException {
     meta = new MetaData(db, ctx);
+
+    // don't allow to open locked databases
+    if(lockFile().exists()) throw new BaseXException(Text.DBLOCKED, meta.name);
 
     final int cats = ctx.prop.num(Prop.CATEGORIES);
     final DataInput in = new DataInput(meta.dbfile(DATAINF));
@@ -174,6 +180,29 @@ public final class DiskData extends Data {
       case PATH:      pthindex = (PathSummary) index; break;
       default:        break;
     }
+  }
+
+  @Override
+  public boolean lock() {
+    try {
+      return lockFile().createNewFile();
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return false;
+    }
+  }
+
+  @Override
+  public boolean unlock() {
+    return lockFile().delete();
+  }
+
+  /**
+   * Returns a lock file.
+   * @return lock file
+   */
+  public File lockFile() {
+    return meta.dbfile(DataText.DATAUPD);
   }
 
   @Override

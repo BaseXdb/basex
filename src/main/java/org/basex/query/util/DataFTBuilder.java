@@ -2,6 +2,7 @@ package org.basex.query.util;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Text;
+import org.basex.data.Data;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
 import org.basex.query.item.DBNode;
@@ -17,7 +18,7 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class DataFTBuilder {
+public final class DataFTBuilder {
   /** Dots. */
   private static final byte[] DOTS = token(Text.DOTS);
   /** Full-text position data. */
@@ -30,7 +31,7 @@ final class DataFTBuilder {
    * @param pos full-text position data
    * @param len length of extract
    */
-  DataFTBuilder(final FTPosData pos, final int len) {
+  public DataFTBuilder(final FTPosData pos, final int len) {
     ftpos = pos;
     ftlen = len;
   }
@@ -46,13 +47,24 @@ final class DataFTBuilder {
 
     // check if full-text data exists for the current node
     final DBNode node = (DBNode) nd;
-    final FTPos ftp = ftpos.get(node.data, node.pre);
+    return build(node.data, node.pre, nd.string());
+  }
+
+  /**
+   * Builds full-text information.
+   * @param d data reference
+   * @param p pre value
+   * @param str string value
+   * @return number of added nodes
+   */
+  TokenList build(final Data d, final int p, final byte[] str) {
+    final FTPos ftp = ftpos.get(d, p);
     if(ftp == null) return null;
 
     boolean marked = false;
     final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
-    final FTLexer lex = new FTLexer().sc().init(nd.atom());
+    final FTLexer lex = new FTLexer().sc().init(str);
     int len = -ftlen;
     while(lex.hasNext()) {
       final FTSpan span = lex.next();

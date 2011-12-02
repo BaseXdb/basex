@@ -8,7 +8,7 @@ package org.basex.io.random;
  */
 final class Buffers {
   /** Number of buffers (must be 1 << n). */
-  private static final int BUFFERS = 1 << 3;
+  private static final int BUFFERS = 1 << 4;
   /** Buffers. */
   private final Buffer[] buf = new Buffer[BUFFERS];
   /** Current buffer offset. */

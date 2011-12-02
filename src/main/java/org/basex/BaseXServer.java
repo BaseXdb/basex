@@ -46,7 +46,7 @@ public final class BaseXServer extends Main implements Runnable {
   Log log;
 
   /** EventsListener. */
-  private final EventListener events = new EventListener();
+  private EventListener events;
   /** Temporarily blocked clients. */
   private final TokenIntMap blocked = new TokenIntMap();
 
@@ -161,7 +161,6 @@ public final class BaseXServer extends Main implements Runnable {
 
   @Override
   public void run() {
-    events.start();
     running = true;
     while(running) {
       try {
@@ -197,7 +196,7 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  public void quit() throws IOException {
+  protected void quit() throws IOException {
     if(!running) return;
     running = false;
     for(final ClientListener cs : context.sessions) cs.quit();
@@ -282,7 +281,7 @@ public final class BaseXServer extends Main implements Runnable {
   // STATIC METHODS ===========================================================
 
   /**
-   * Starts the specified class in a separate process.
+   * Starts the database server in a separate process.
    * @param port server port
    * @param args command-line arguments
    * @throws BaseXException database exception
@@ -362,6 +361,16 @@ public final class BaseXServer extends Main implements Runnable {
   public void unblock(final byte[] client) {
     synchronized(blocked) {
       blocked.delete(client);
+    }
+  }
+
+  /**
+   * Initializes the event listener.
+   */
+  public void initEvents() {
+    if(events == null) {
+      events = new EventListener();
+      events.start();
     }
   }
 

@@ -183,7 +183,7 @@ public final class SeqType {
   /** Number of occurrences. */
   public final Occ occ;
   /** Extended type info. */
-  public final QNm ext;
+  private final QNm ext;
 
   /**
    * Private constructor.
@@ -258,24 +258,20 @@ public final class SeqType {
     // the empty sequence has every type
     if(size == 0) return true;
 
-    final MapType mt = type.map() ? (MapType) type : null;
+    final MapType mt = type.isMap() ? (MapType) type : null;
     for(long i = 0; i < size; i++) {
-      if(!check(val.itemAt(i), mt)) return false;
+      final Item it = val.itemAt(i);
+
+      // maps don't have type information attached to them, you have to look...
+      final Type ip = it.type;
+      if(mt == null) {
+        if(!(ip.instanceOf(type) && checkExt(it))) return false;
+      } else {
+        if(!(ip.isMap() && ((Map) it).hasType(mt))) return false;
+      }
       if(i == 0 && val.homogenous()) break;
     }
     return true;
-  }
-
-  /**
-   * Checks if the given item is of this SeqType's type.
-   * @param it item to check
-   * @param mt map type of this type, {@code null} if it's something else
-   * @return result of check
-   */
-  private boolean check(final Item it, final MapType mt) {
-    // maps don't have type information attached to them, you have to look...
-    return mt != null ? it.map() && ((Map) it).hasType(mt) :
-        it.type.instance(type) && checkExt(it);
   }
 
   /**
@@ -292,7 +288,7 @@ public final class SeqType {
       final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     if(it == null) {
-      if(occ == Occ.O) XPEMPTY.thrw(ii, e.desc());
+      if(occ == Occ.O) XPEMPTY.thrw(ii, e.description());
       return null;
     }
     final boolean correct = cast ? it.type == type : instance(it, ii);
@@ -343,17 +339,18 @@ public final class SeqType {
    */
   private boolean instance(final Item it, final InputInfo ii)
       throws QueryException {
-    final Type t = it.type;
-    final boolean ins = it.type.instance(type);
-    if(!ins && !t.unt() && !t.func() &&
+
+    final Type ip = it.type;
+    final boolean ins = ip.instanceOf(type);
+    if(!ins && !ip.isUntyped() && !ip.isFunction() &&
         // implicit type promotions:
         // xs:float -> xs:double
-        (t != AtomType.FLT || type != AtomType.DBL) &&
+        (ip != AtomType.FLT || type != AtomType.DBL) &&
         // xs:anyUri -> xs:string
-        (t != AtomType.URI || type != AtomType.STR) &&
+        (ip != AtomType.URI || type != AtomType.STR) &&
         // xs:decimal -> xs:float/xs:double
         (type != AtomType.FLT && type != AtomType.DBL ||
-            !t.instance(AtomType.DEC)))
+            !ip.instanceOf(AtomType.DEC)))
       Err.promote(ii, type, it);
     return ins;
   }
@@ -406,8 +403,8 @@ public final class SeqType {
    * Tests if the type is a single number.
    * @return result of check
    */
-  public boolean num() {
-    return one() && type.num();
+  public boolean isNum() {
+    return one() && type.isNumber();
   }
 
   /**
@@ -415,7 +412,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNum() {
-    return type.num() || type == AtomType.ITEM;
+    return type.isNumber() || type == AtomType.ITEM;
   }
 
   /**
@@ -426,7 +423,8 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   private Item check(final Item it, final InputInfo ii) throws QueryException {
-    if(!checkExt(it)) XPCAST.thrw(ii, it.type, ext);
+    if(!checkExt(it)) XPCAST.thrw(ii,
+        it.type.toString().replaceAll("\\(|\\)", ""), ext);
     return it;
   }
 
@@ -454,7 +452,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean instance(final SeqType t) {
-    return type.instance(t.type) && occ.instance(t.occ);
+    return type.instanceOf(t.type) && occ.instance(t.occ);
   }
 
   @Override

@@ -1,12 +1,12 @@
 package org.basex.query.item.map;
 
 import org.basex.query.QueryException;
-import org.basex.query.func.FNSimple;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.util.Compare;
 import org.basex.util.InputInfo;
 
 /**
@@ -224,7 +224,7 @@ abstract class TrieNode {
    */
   static final boolean deep(final Value a, final Value b, final InputInfo ii)
       throws QueryException {
-    return a.size() == b.size() && FNSimple.deep(ii, a.iter(), b.iter());
+    return a.size() == b.size() && Compare.deep(a, b, ii);
   }
 
   /**

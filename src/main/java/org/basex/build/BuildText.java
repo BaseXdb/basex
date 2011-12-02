@@ -10,9 +10,9 @@ import static org.basex.util.Token.*;
  */
 public interface BuildText {
   /** Builder error. */
-  String BEFOREROOT = "%: No text allowed before root tag.";
+  String BEFOREROOT = "%: No text allowed before root element.";
   /** Builder error. */
-  String AFTERROOT = "%: No text allowed after closed root tag.";
+  String AFTERROOT = "%: No text allowed after closed root element.";
   /** Builder error: Tag Mismatch. */
   String MOREROOTS = "%: More than one root node: '<%>'";
   /** Builder error. */

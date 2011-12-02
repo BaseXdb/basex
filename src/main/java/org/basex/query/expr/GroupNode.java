@@ -39,8 +39,8 @@ final class GroupNode {
   boolean eq(final GroupNode c) throws QueryException {
     if(vals.length != c.vals.length) return false;
     for(int i = 0; i < vals.length; ++i) {
-      final boolean it = vals[i].item();
-      if(it ^ c.vals[i].item() || it &&
+      final boolean it = vals[i].isItem();
+      if(it ^ c.vals[i].isItem() || it &&
           !((Item) vals[i]).equiv(null, (Item) c.vals[i])) return false;
     }
     return true;

@@ -1,8 +1,10 @@
 package org.basex.query.expr;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
+
 import java.io.IOException;
+
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ValuesToken;
 import org.basex.io.serial.Serializer;
@@ -14,8 +16,9 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.iter.Iter;
+import org.basex.query.item.Type;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.AxisStep;
 import org.basex.query.util.IndexContext;
@@ -144,14 +147,14 @@ public final class CmpG extends Cmp {
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
     Expr e = this;
-    if(oneEmpty()) {
+    if(oneIsEmpty()) {
       e = optPre(Bln.FALSE, ctx);
-    } else if(values()) {
+    } else if(allAreValues()) {
       e = preEval(ctx);
-    } else if(e1.isFun(Function.COUNT)) {
+    } else if(e1.isFunction(Function.COUNT)) {
       e = compCount(op.op);
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-    } else if(e1.isFun(Function.POSITION)) {
+    } else if(e1.isFunction(Function.POSITION)) {
       if(e2 instanceof Range && op.op == CmpV.Op.EQ) {
         // position() CMP range
         final long[] rng = ((Range) e2).range(ctx);
@@ -256,10 +259,13 @@ public final class CmpG extends Cmp {
    * @throws QueryException query exception
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
-    if(a.type != b.type && (!a.unt() && !b.unt() && !(a.str() && b.str()) &&
-        !(a.num() && b.num()) && !a.func() && !b.func() ||
-        a.type == AtomType.QNM || b.type == AtomType.QNM))
-      XPTYPECMP.thrw(input, a.type, b.type);
+    final Type ta = a.type;
+    final Type tb = b.type;
+    if(ta != tb && (!ta.isUntyped() && !tb.isUntyped() && !(ta.isString() &&
+        tb.isString()) && !(ta.isNumber() && tb.isNumber()) &&
+        !ta.isFunction() && !tb.isFunction() ||
+        ta == AtomType.QNM || tb == AtomType.QNM))
+      XPTYPECMP.thrw(input, ta, tb);
     return op.op.e(input, a, b);
   }
 
@@ -299,7 +305,7 @@ public final class CmpG extends Cmp {
     // support expressions
     final IndexType ind = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final Expr arg = expr[1];
-    if(!arg.value()) {
+    if(!arg.isValue()) {
       final SeqType t = arg.type();
       /* index access is not possible if returned type is no string or node, if
          expression depends on context, or if it is non-deterministic. examples:
@@ -307,7 +313,7 @@ public final class CmpG extends Cmp {
          //*[text() = .]
          //*[text() = (if(math:random() < .5) then 'X' else 'Y')]
        */
-      if(!t.type.str() && !t.type.node() ||
+      if(!t.type.isString() && !t.type.isNode() ||
           arg.uses(Use.CTX) || arg.uses(Use.NDT)) return false;
 
       ic.addCosts(ic.data.meta.size / 10);
@@ -321,9 +327,9 @@ public final class CmpG extends Cmp {
     ic.costs(0);
     while((it = ir.next()) != null) {
       final SeqType t = it.type();
-      if(!(t.type.str() || t.type.node())) return false;
+      if(!(t.type.isString() || t.type.isNode())) return false;
 
-      final int is = ic.data.count(new ValuesToken(ind, it.atom(input)));
+      final int is = ic.data.count(new ValuesToken(ind, it.string(input)));
       // add only expressions that yield results
       if(is != 0) {
         iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
@@ -365,7 +371,7 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return "'" + op + "' expression";
   }
 

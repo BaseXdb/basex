@@ -14,6 +14,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -64,16 +65,16 @@ public class UserFunc extends Single {
    * @throws QueryException query exception
    */
   public final void check() throws QueryException {
-    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, name.atom());
+    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, name.string());
 
     final boolean u = expr.uses(Use.UPD);
     if(updating) {
       // updating function
       if(ret != null) UPFUNCTYPE.thrw(input);
-      if(!u && !expr.vacuous()) UPEXPECTF.thrw(input);
+      if(!u && !expr.isVacuous()) UPEXPECTF.thrw(input);
     } else if(u) {
       // uses updates, but is not declared as such
-      UPNOT.thrw(input, desc());
+      UPNOT.thrw(input, description());
     }
   }
 
@@ -85,7 +86,7 @@ public class UserFunc extends Single {
     final int s = ctx.vars.size();
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
 
     // convert all function calls in tail position to proper tail calls
     if(tco()) expr = expr.markTailCalls();
@@ -107,6 +108,7 @@ public class UserFunc extends Single {
 
     // reset context and evaluate function
     final Value cv = ctx.value;
+    final Atts ns = ctx.ns.reset();
     ctx.value = null;
     try {
       final Item it = expr.item(ctx, ii);
@@ -114,6 +116,7 @@ public class UserFunc extends Single {
       return cast ? ret.cast(it, this, false, ctx, input) : it;
     } finally {
       ctx.value = cv;
+      ctx.ns.stack(ns);
     }
   }
 
@@ -121,6 +124,7 @@ public class UserFunc extends Single {
   public Value value(final QueryContext ctx) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
+    final Atts ns = ctx.ns.reset();
     ctx.value = null;
     try {
       final Value v = expr.value(ctx);
@@ -128,6 +132,7 @@ public class UserFunc extends Single {
       return cast ? ret.promote(v, ctx, input) : v;
     } finally {
       ctx.value = cv;
+      ctx.ns.stack(ns);
     }
   }
 
@@ -139,9 +144,9 @@ public class UserFunc extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.attribute(NAM, name.atom());
+    ser.attribute(NAM, name.string());
     for(int i = 0; i < args.length; ++i) {
-      ser.attribute(Token.token(ARG + i), args[i].name.atom());
+      ser.attribute(Token.token(ARG + i), args[i].name.string());
     }
     expr.plan(ser);
     ser.closeElement();
@@ -149,7 +154,7 @@ public class UserFunc extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(name.atom());
+    final TokenBuilder tb = new TokenBuilder(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(ret != null) tb.add(' ' + AS + ' ' + ret);
     if(expr != null) tb.add(" { " + expr + " }; ");

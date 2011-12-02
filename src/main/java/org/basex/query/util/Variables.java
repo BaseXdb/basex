@@ -91,10 +91,10 @@ public final class Variables extends ExprInfo {
   }
 
   /**
-   * Resets the number of local variables.
+   * Sets the number of local variables to the specified value.
    * @param s number of variables to be set
    */
-  public void reset(final int s) {
+  public void size(final int s) {
     local.size = s;
   }
 

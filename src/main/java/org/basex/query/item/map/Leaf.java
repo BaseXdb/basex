@@ -175,7 +175,7 @@ final class Leaf extends TrieNode {
 
   @Override
   boolean hasType(final AtomType kt, final SeqType vt) {
-    return (kt == null || key.type.instance(kt))
+    return (kt == null || key.type.instanceOf(kt))
         && (vt == null || vt.instance(value));
   }
 

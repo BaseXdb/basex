@@ -102,23 +102,7 @@ public abstract class Expr extends ExprInfo {
    * by the {@link Empty} class, which represents the empty sequence.
    * @return result of check
    */
-  public boolean empty() {
-    return false;
-  }
-
-  /**
-   * Tests if this is a value.
-   * @return result of check
-   */
-  public boolean value() {
-    return false;
-  }
-
-  /**
-   * Tests if this is an item.
-   * @return result of check
-   */
-  public boolean item() {
+  public boolean isEmpty() {
     return false;
   }
 
@@ -127,7 +111,23 @@ public abstract class Expr extends ExprInfo {
    * This check is needed for updating queries.
    * @return result of check
    */
-  public boolean vacuous() {
+  public boolean isVacuous() {
+    return false;
+  }
+
+  /**
+   * Tests if this is a value.
+   * @return result of check
+   */
+  public boolean isValue() {
+    return false;
+  }
+
+  /**
+   * Tests if this is an item.
+   * @return result of check
+   */
+  public boolean isItem() {
     return false;
   }
 
@@ -261,7 +261,7 @@ public abstract class Expr extends ExprInfo {
    * @return function, or {@code null}
    */
   @SuppressWarnings("unused")
-  public boolean isFun(final Function f) {
+  public boolean isFunction(final Function f) {
     return false;
   }
 

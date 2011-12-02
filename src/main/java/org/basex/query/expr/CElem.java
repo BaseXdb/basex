@@ -1,24 +1,17 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
-import org.basex.query.item.FElem;
-import org.basex.query.item.Item;
 import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
+import org.basex.query.item.FAttr;
+import org.basex.query.item.FElem;
 import org.basex.query.item.QNm;
-import static org.basex.query.util.Err.*;
-import org.basex.query.util.NSGlobal;
-import org.basex.query.util.Var;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Element fragment.
@@ -26,149 +19,142 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class CElem extends CFrag {
+public final class CElem extends CName {
   /** Namespaces. */
   private final Atts nsp;
-  /** Tag name. */
-  private Expr tag;
-  /** Computed constructor. */
+  /** Computed constructor flag. */
   private final boolean comp;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param t tag tag
-   * @param c computed constructor
-   * @param cont element content
-   * @param ns namespaces
+   * @param t tag
+   * @param ns namespaces, or {@code null} if this is a computed constructor.
+   * @param cont element contents
    */
   public CElem(final InputInfo ii, final Expr t, final Atts ns,
-      final boolean c, final Expr... cont) {
-    super(ii, cont);
-    tag = t;
-    nsp = ns;
-    comp = c;
+      final Expr... cont) {
+
+    super(ELEMENT, ii, t, cont);
+    nsp = ns == null ? new Atts() : ns;
+    comp = ns == null;
   }
 
   @Override
   public CElem comp(final QueryContext ctx) throws QueryException {
-    final int s = ctx.ns.size();
-    addNS(ctx);
+    final int s = prepare(ctx);
     super.comp(ctx);
-    tag = checkUp(tag, ctx).comp(ctx);
     ctx.ns.size(s);
     return this;
-  }
-
-  /**
-   * Adds namespaces to the current context.
-   * @param ctx query context
-   * @throws QueryException query exception
-   */
-  private void addNS(final QueryContext ctx) throws QueryException {
-    for(int n = nsp.size - 1; n >= 0; n--) {
-      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), nsp.val[n]), input);
-    }
-  }
-
-  /**
-   * Checks the element name for illegal prefixes or URIs.
-   * @param name element name
-   * @return checked name
-   * @throws QueryException XQDY0096, if invalid namespace was found
-   */
-  private QNm checkNS(final QNm name) throws QueryException {
-    final byte[] pre = name.pref(), uri = name.uri().atom();
-    if(eq(pre, XMLNS) || eq(uri, XMLNSURI) || eq(pre, XML) ^ eq(uri, XMLURI))
-      CEINS.thrw(input, pre, uri);
-    return name;
   }
 
   @Override
   public FElem item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item it = checkItem(tag, ctx);
-    final int s = ctx.ns.size();
-    addNS(ctx);
+    final int s = prepare(ctx);
+    try {
+      // adds namespaces for the element constructor
+      final Atts cns = new Atts();
+      for(int i = 0; i < nsp.size(); ++i) cns.add(nsp.key(i), nsp.value(i));
 
-    // clone namespaces for context sensitive operations
-    final Atts nsc = new Atts();
-    for(int i = 0; i < nsp.size; ++i) nsc.add(nsp.key[i], nsp.val[i]);
+      // create and check QName
+      final QNm nm = qname(ctx, ii);
+      final byte[] cp = nm.prefix(), cu = nm.uri();
+      if(eq(cp, XML) ^ eq(cu, XMLURI)) CEXML.thrw(input, cu, cp);
+      if(eq(cu, XMLNSURI)) CEINV.thrw(input, cu);
+      if(eq(cp, XMLNS)) CEINV.thrw(input, cp);
 
-    final QNm tname = checkNS(qname(ctx, it, false, ii));
-    final byte[] pref = tname.pref();
-    if(!eq(pref, XML)) {
-      byte[] uri = ctx.ns.find(pref);
-      if(uri == null) uri = NSGlobal.uri(pref);
-      if(tname.hasUri()) {
-        final byte[] muri = tname.uri().atom();
-        if(uri == null || !eq(uri, muri)) {
-          ctx.ns.add(new QNm(tname.pref(), tname.uri()), ii);
-          nsc.add(pref, muri);
-        } else if(!nsc.contains(pref) && !(eq(pref, EMPTY) && eq(uri, EMPTY))) {
-          nsc.add(pref, uri);
-        }
-      } else if(uri != null) {
-        tname.uri(uri);
-      }
-    }
+      // analyze element namespace unless it is "xml"
+      if(!eq(cp, XML)) {
+        // request namespace for the specified uri
+        final byte[] uri = ctx.ns.uri(cp);
 
-    final Constr c = new Constr(ii, ctx, expr);
-    if(c.errAtt) NOATTALL.thrw(input);
-    if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
-
-    final FElem node = new FElem(tname, c.children, c.atts, nsc);
-    for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(node);
-    for(int n = 0; n < c.atts.size(); ++n) {
-      final ANode att = c.atts.get(n);
-      final QNm name = att.qname();
-      if(name.ns() && name.hasUri()) {
-        final byte[] apre = name.pref(), auri = name.uri().atom();
-        final int pos = nsc.get(apre);
-        if(pos  == -1) {
-          nsc.add(apre, auri);
-        } else if(!eq(nsc.val[pos], auri)) {
-          // [LK][CG] Namespaces: create new prefix
+        // check if element has a namespace
+        if(nm.hasURI()) {
+          // overwrite namespace declaration
+          if(!comp && (uri == null || !eq(uri, cu))) {
+            ctx.ns.add(cp, cu);
+          }
+          // add declaration if it does not already exist
+          if(!cns.contains(cp)) cns.add(cp, cu);
+        } else {
+          // element has no namespace: assign default uri
+          nm.uri(uri);
         }
       }
-      att.parent(node);
+
+      // create child and attribute nodes
+      final Constr c = new Constr(ii, ctx, expr);
+      if(c.errAtt) NOATTALL.thrw(input);
+      if(c.errNS) NONSALL.thrw(input);
+      if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
+      if(c.duplNS != null) DUPLNSCONS.thrw(input, c.duplNS);
+
+      // add computed namespaces
+      for(int n = 0; n < c.ns.size(); ++n) {
+        cns.add(c.ns.key(n), c.ns.value(n));
+      }
+
+      // create node and update parent references of child nodes
+      final FElem node = new FElem(nm, c.children, c.atts, cns);
+      for(int n = 0; n < c.children.size(); ++n) {
+        c.children.get(n).parent(node);
+      }
+
+      // update attributes: set parent references, add undeclared namespaces
+      for(int n = 0; n < c.atts.size(); ++n) {
+        final ANode att = c.atts.get(n).parent(node);
+        final QNm qnm = att.qname();
+        // skip attributes without prefixes or URIs
+        if(!qnm.hasPrefix() || !qnm.hasURI()) continue;
+        // skip XML namespace
+        byte[] apref = qnm.prefix();
+        if(eq(apref, XML)) continue;
+
+        final byte[] auri = qnm.uri();
+        final int pos = cns.get(apref);
+        if(pos == -1) {
+          // add undeclared namespace
+          cns.add(apref, auri);
+        } else if(!eq(cns.value(pos), auri)) {
+          // prefixes with different URIs exist; new one must be replaced
+          apref = null;
+          // check if one of the existing prefixes can be adopted
+          for(int a = 0; a < cns.size(); a++) {
+            if(eq(cns.value(a), auri)) apref = cns.key(a);
+          }
+          // if negative, generate a new one that is not used yet
+          if(apref == null) {
+            int i = 1;
+            do {
+              apref = concat(qnm.prefix(), new byte[] { '_' }, token(i++));
+            } while(cns.contains(apref));
+            cns.add(apref, auri);
+          }
+          // overwrite existing attribute with new one
+          c.atts.item[n] = new FAttr(new QNm(concat(apref, COLON,
+              qnm.local()), qnm.uri()), c.atts.get(n).string());
+        }
+      }
+      // return generated node
+      return node;
+
+    } finally {
+      ctx.ns.size(s);
     }
-    ctx.ns.size(s);
-    return node;
   }
 
-  @Override
-  public Expr remove(final Var v) {
-    tag = tag.remove(v);
-    return super.remove(v);
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return tag.uses(u) || super.uses(u);
-  }
-
-  @Override
-  public int count(final Var v) {
-    return tag.count(v) + super.count(v);
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    tag.plan(ser);
-    for(final Expr e : expr) e.plan(ser);
-    ser.closeElement();
-  }
-
-  @Override
-  public String desc() {
-    return info(QueryText.ELEMENT);
-  }
-
-  @Override
-  public String toString() {
-    return toString(Token.string(NodeType.ELM.nam()) + " { " + tag + " }");
+  /**
+   * Adds namespaces to the namespace stack.
+   * @param ctx query context
+   * @return old stack position
+   */
+  private int prepare(final QueryContext ctx) {
+    int s = ctx.ns.size();
+    for(int n = 0; n < nsp.size(); n++) {
+      ctx.ns.add(nsp.key(n), nsp.value(n));
+    }
+    return s;
   }
 }

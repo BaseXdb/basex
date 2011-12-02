@@ -1,8 +1,12 @@
 package org.basex.query.func;
 
+import static org.basex.util.Token.*;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -14,7 +18,6 @@ import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Context functions.
@@ -49,9 +52,10 @@ public final class FNContext extends FuncCall {
       case IMPLICIT_TIMEZONE:
         return implZone();
       case DEFAULT_COLLATION:
-        return ctx.baseURI.resolve(ctx.collation);
+        return ctx.baseURI().resolve(ctx.collation);
       case STATIC_BASE_URI:
-        return ctx.baseURI != Uri.EMPTY ? ctx.baseURI : null;
+        final IO base = ctx.baseIO();
+        return base == null ? null : Uri.uri(token(ctx.baseIO().url()));
       default:
         return super.item(ctx, ii);
     }
@@ -102,9 +106,9 @@ public final class FNContext extends FuncCall {
     final String ymd = new SimpleDateFormat("yyyy-MM-dd").format(d);
     final String hms = new SimpleDateFormat("HH:mm:ss.S").format(d);
     final String zone = zon.substring(0, 3) + ":" + zon.substring(3);
-    ctx.date = new Dat(Token.token(ymd + zone), input);
-    ctx.time = new Tim(Token.token(hms + zone), input);
-    ctx.dtm = new Dtm(Token.token(ymd + "T" + hms + zone), input);
+    ctx.date = new Dat(token(ymd + zone), input);
+    ctx.time = new Tim(token(hms + zone), input);
+    ctx.dtm = new Dtm(token(ymd + "T" + hms + zone), input);
   }
 
   /**
@@ -114,9 +118,8 @@ public final class FNContext extends FuncCall {
   private Item implZone() {
     final Date d = Calendar.getInstance().getTime();
     final String zone = new SimpleDateFormat("Z").format(d);
-    final byte[] z = Token.token(zone);
-    final int cshift = Token.toInt(Token.substring(z, 0, 3)) * 60 +
-      Token.toInt(Token.substring(z, 3));
+    final byte[] z = token(zone);
+    final int cshift = toInt(substring(z, 0, 3)) * 60 + toInt(substring(z, 3));
     return new DTd(cshift);
   }
 }

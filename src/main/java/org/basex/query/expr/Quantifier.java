@@ -49,11 +49,11 @@ public final class Quantifier extends ParseExpr {
     final int vs = ctx.vars.size();
     for(final For f : fl) f.comp(ctx);
     sat = checkUp(sat, ctx).comp(ctx).compEbv(ctx);
-    ctx.vars.reset(vs);
+    ctx.vars.size(vs);
 
     // find empty sequences
-    boolean empty = sat.empty();
-    for(final For f : fl) empty |= f.empty();
+    boolean empty = sat.isEmpty();
+    for(final For f : fl) empty |= f.isEmpty();
 
     // return pre-evaluated result
     return empty ? optPre(Bln.get(every), ctx) : this;

@@ -4,13 +4,11 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
-
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -21,6 +19,7 @@ import org.basex.query.expr.CAttr;
 import org.basex.query.expr.CComm;
 import org.basex.query.expr.CDoc;
 import org.basex.query.expr.CElem;
+import org.basex.query.expr.CNSpace;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.CTxt;
 import org.basex.query.expr.Calc;
@@ -46,7 +45,6 @@ import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
 import org.basex.query.expr.Let;
 import org.basex.query.expr.List;
-import org.basex.query.expr.LitFunc;
 import org.basex.query.expr.LitMap;
 import org.basex.query.expr.Or;
 import org.basex.query.expr.OrderBy;
@@ -92,7 +90,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Empty;
 import org.basex.query.item.FuncType;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.MapType;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -116,7 +114,7 @@ import org.basex.query.up.expr.Rename;
 import org.basex.query.up.expr.Replace;
 import org.basex.query.up.expr.Transform;
 import org.basex.query.util.Err;
-import org.basex.query.util.NSLocal;
+import org.basex.query.util.NSContext;
 import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
 import org.basex.query.util.format.DecFormatter;
@@ -155,6 +153,20 @@ import org.basex.util.list.TokenList;
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {
+  /** QName check: URI is mandatory. */
+  private static final byte[] URICHECK = {};
+  /** QName check: skip namespace check. */
+  private static final byte[] SKIPCHECK = {};
+  /** Reserved function names (sorted). */
+  private static final byte[][] KEYWORDS = {
+    NodeType.ATT.string(), NodeType.COM.string(), NodeType.DOC.string(),
+    NodeType.ELM.string(), AtomType.EMP.string(), FuncType.ANY_FUN.string(),
+    token(IF), AtomType.ITEM.string(),
+    NodeType.NSP.string(), NodeType.NOD.string(), NodeType.PI.string(),
+    token(SCHEMAATTRIBUTE), token(SCHEMAELEMENT), token(SWITCH),
+    NodeType.TXT.string(), token(TYPESWITCH)
+  };
+
   /** Query context. */
   public final QueryContext ctx;
 
@@ -200,6 +212,9 @@ public class QueryParser extends InputParser {
   /** Declaration flag. */
   private boolean declVars;
 
+  /** Cached QNames. */
+  private final ObjList<QNmCheck> names = new ObjList<QNmCheck>();
+
   /**
    * Constructor.
    * @param q query
@@ -209,7 +224,7 @@ public class QueryParser extends InputParser {
   public QueryParser(final String q, final QueryContext c)
       throws QueryException {
 
-    super(q, c.base());
+    super(q, c.baseIO());
     ctx = c;
 
     // parse pre-defined external variables
@@ -267,7 +282,9 @@ public class QueryParser extends InputParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final IO input, final Uri uri) throws QueryException {
+  public final Expr parse(final IO input, final byte[] uri)
+      throws QueryException {
+
     file = input;
     if(!more()) error(QUERYEMPTY);
 
@@ -291,9 +308,10 @@ public class QueryParser extends InputParser {
     }
 
     // completes the parsing step
+    assignURI(0);
     ctx.funcs.check();
     ctx.vars.check();
-    ctx.ns.finish(ctx.nsElem);
+    if(ctx.nsElem != null) ctx.ns.add(EMPTY, ctx.nsElem, null);
 
     // set default decimal format
     final byte[] empty = new QNm(EMPTY).full();
@@ -310,7 +328,7 @@ public class QueryParser extends InputParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final Uri u) throws QueryException {
+  public final Expr parse(final byte[] u) throws QueryException {
     try {
       Expr expr = null;
       versionDecl();
@@ -357,8 +375,9 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "MainModule" rule. Parses the "Setter" rule. Parses the
-   * "QueryBody (= Expr)" rule.
+   * Parses the "MainModule" rule.
+   * Parses the "Setter" rule.
+   * Parses the "QueryBody (= Expr)" rule.
    * @return query expression
    * @throws QueryException query exception
    */
@@ -373,26 +392,28 @@ public class QueryParser extends InputParser {
    * @param u module uri
    * @throws QueryException query exception
    */
-  private void moduleDecl(final Uri u) throws QueryException {
+  private void moduleDecl(final byte[] u) throws QueryException {
     wsCheck(MODULE);
     wsCheck(NSPACE);
-    module = new QNm(ncName(XPNAME));
+    skipWS();
+    final byte[] pref = ncName(XPNAME);
     wsCheck(IS);
-    module.uri(stringLiteral());
-    if(module.uri() == Uri.EMPTY) error(NSMODURI);
+    final byte[] uri = stringLiteral();
+    if(uri.length == 0) error(NSMODURI);
+    module = new QNm(pref, uri);
 
-    ctx.ns.add(module, input());
+    ctx.ns.add(pref, uri, input());
     skipWS();
     check(';');
     prolog1();
     prolog2();
     // check if import and declaration uri match
-    if(u != Uri.EMPTY && !u.eq(module.uri())) error(WRONGMODULE, module.uri(),
-        file);
+    if(!eq(u, module.uri())) error(WRONGMODULE, module.uri(), file);
   }
 
   /**
-   * Parses the "Prolog" rule. Parses the "Setter" rule.
+   * Parses the "Prolog" rule.
+   * Parses the "Setter" rule.
    * @throws QueryException query exception
    */
   private void prolog1() throws QueryException {
@@ -401,7 +422,7 @@ public class QueryParser extends InputParser {
       if(wsConsumeWs(DECLARE)) {
         if(wsConsumeWs(DEFAULT)) {
           if(!defaultNamespaceDecl() && !defaultCollationDecl()
-              && !emptyOrderDecl() && !decFormatDecl(true))
+              && !emptyOrderDecl() && !(ctx.xquery3 && decimalFormatDecl(true)))
             error(DECLINCOMPLETE);
         } else if(wsConsumeWs(BOUNDARY)) {
           boundarySpaceDecl();
@@ -415,8 +436,8 @@ public class QueryParser extends InputParser {
           revalidationDecl();
         } else if(wsConsumeWs(COPYNS)) {
           copyNamespacesDecl();
-        } else if(wsConsumeWs(DECFORMAT)) {
-          decFormatDecl(false);
+        } else if(ctx.xquery3 && wsConsumeWs(DECFORMAT)) {
+          decimalFormatDecl(false);
         } else if(wsConsumeWs(NSPACE)) {
           namespaceDecl();
         } else if(wsConsumeWs(FTOPTION)) {
@@ -467,6 +488,8 @@ public class QueryParser extends InputParser {
         optionDecl();
       } else if(wsConsumeWs(DEFAULT)) {
         error(PROLOGORDER);
+      } else if(curr('%')) {
+        annotatedDecl();
       } else {
         qp = p;
         return;
@@ -477,15 +500,45 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Parses the "AnnotatedDecl" rule.
+   * @throws QueryException query exception
+   */
+  private void annotatedDecl() throws QueryException {
+    annotation();
+    if(wsConsumeWs(VARIABLE)) {
+      varDecl();
+    } else if(wsConsumeWs(FUNCTION)) {
+      functionDecl(false);
+    } else {
+      error(VARFUNC);
+    }
+  }
+
+  /**
+   * Parses the "Annotation" rule.
+   * @throws QueryException query exception
+   */
+  private void annotation() throws QueryException {
+    // XQuery30: annotations (currently ignored)
+    check('%');
+    eQName(QNAMEINV, ctx.nsFunc);
+    if(wsConsumeWs(PAR1)) {
+      do literal(); while(wsConsumeWs(COMMA));
+      wsCheck(PAR2);
+    }
+    skipWS();
+  }
+
+  /**
    * Parses the "NamespaceDecl" rule.
    * @throws QueryException query exception
    */
   private void namespaceDecl() throws QueryException {
-    final QNm name = new QNm(ncName(XPNAME));
+    final byte[] pref = ncName(XPNAME);
     wsCheck(IS);
-    name.uri(stringLiteral());
-    if(ctx.ns.find(name.ln()) != null) error(DUPLNSDECL, name);
-    ctx.ns.add(name, input());
+    final byte[] uri = stringLiteral();
+    if(ctx.ns.staticURI(pref) != null) error(DUPLNSDECL, pref);
+    ctx.ns.add(pref, uri, input());
   }
 
   /**
@@ -521,14 +574,17 @@ public class QueryParser extends InputParser {
     if(!elem && !wsConsumeWs(FUNCTION)) return false;
     wsCheck(NSPACE);
     final byte[] uri = stringLiteral();
+    if(eq(XMLURI, uri)) error(BINDXMLURI, uri, XML);
+    if(eq(XMLNSURI, uri)) error(BINDXMLURI, uri, XMLNS);
+
     if(elem) {
       if(declElem) error(DUPLNS);
       declElem = true;
-      ctx.nsElem = uri;
+      ctx.nsElem = uri.length == 0 ? null : uri;
     } else {
       if(declFunc) error(DUPLNS);
       declFunc = true;
-      ctx.nsFunc = uri;
+      ctx.nsFunc = uri.length == 0 ? null : uri;
     }
     return true;
   }
@@ -539,13 +595,12 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     skipWS();
-    final QNm name = new QNm(qName(QNAMEINV), ctx, input());
+    final QNm name = eQName(QNAMEINV, URICHECK);
     final byte[] val = stringLiteral();
-    if(!name.ns()) error(NSMISS, name);
 
-    if(ctx.xquery3 && eq(name.pref(), OUTPUT)) {
+    if(ctx.xquery3 && eq(name.prefix(), OUTPUT)) {
       // output declaration
-      final String key = string(name.ln());
+      final String key = string(name.local());
       if(module != null) error(MODOUT);
 
       if(ctx.serProp == null) ctx.serProp = new SerializerProp();
@@ -554,9 +609,9 @@ public class QueryParser extends InputParser {
 
       ctx.serProp.set(key, string(val));
       serial.add(key);
-    } else if(eq(name.pref(), DB)) {
+    } else if(eq(name.prefix(), DB)) {
       // project-specific declaration
-      final String key = string(uc(name.ln()));
+      final String key = string(uc(name.local()));
       final Object obj = ctx.context.prop.get(key);
       if(obj == null) error(NOOPTION, key);
       // cache old value (to be reset after query evaluation)
@@ -567,6 +622,7 @@ public class QueryParser extends InputParser {
       ctx.globalOpt.put(key, obj);
       ctx.queryOpt.put(key, string(val));
     }
+    // ignore unknown options
   }
 
   /**
@@ -596,7 +652,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "copyNamespacesDecl" rule. Parses the "PreserveMode" rule.
+   * Parses the "copyNamespacesDecl" rule.
+   * Parses the "PreserveMode" rule.
    * Parses the "InheritMode" rule.
    * @throws QueryException query exception
    */
@@ -605,7 +662,7 @@ public class QueryParser extends InputParser {
     declPres = true;
     ctx.nsPreserve = wsConsumeWs(PRESERVE);
     if(!ctx.nsPreserve) wsCheck(NOPRESERVE);
-    consume(',');
+    wsCheck(COMMA);
     ctx.nsInherit = wsConsumeWs(INHERIT);
     if(!ctx.nsInherit) wsCheck(NOINHERIT);
   }
@@ -616,34 +673,35 @@ public class QueryParser extends InputParser {
    * @return true if declaration was found
    * @throws QueryException query exception
    */
-  private boolean decFormatDecl(final boolean def) throws QueryException {
+  private boolean decimalFormatDecl(final boolean def) throws QueryException {
     if(def && !wsConsumeWs(DECFORMAT)) return false;
 
     // use empty name for default declaration
-    final byte[] name = new QNm(def ? EMPTY : qName(QNAMEINV)).full();
-    if(ctx.decFormats.get(name) != null) error(DECDUPL);
+    final QNm name = def ? new QNm() : eQName(QNAMEINV, null);
+
+    // check if format has already been declared
+    if(ctx.decFormats.get(name.full()) != null) error(DECDUPL);
 
     // create new format
-    final HashMap<String, String> sl = new HashMap<String, String>();
+    final HashMap<String, String> map = new HashMap<String, String>();
     // collect all property declarations
     int n;
     do {
-      n = sl.size();
+      n = map.size();
+      skipWS();
       final String prop = string(ncName(null));
       for(final String s : DECFORMATS) {
-        if(prop.equals(s)) {
-          final String key = s;
-          if(sl.get(key) != null) error(DECDUPLPROP, key);
-          wsCheck(IS);
-          sl.put(key, string(stringLiteral()));
-          break;
-        }
+        if(!prop.equals(s)) continue;
+        if(map.get(s) != null) error(DECDUPLPROP, s);
+        wsCheck(IS);
+        map.put(s, string(stringLiteral()));
+        break;
       }
-      if(sl.size() == 0) error(NODECLFORM, prop);
-    } while(n != sl.size());
+      if(map.size() == 0) error(NODECLFORM, prop);
+    } while(n != map.size());
 
     // completes the format declaration
-    ctx.decFormats.add(name, new DecFormatter(input(), sl));
+    ctx.decFormats.add(name.full(), new DecFormatter(input(), map));
     return true;
   }
 
@@ -656,8 +714,8 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(COLLATION)) return false;
     if(declColl) error(DUPLCOLL);
     declColl = true;
-    final byte[] coll = ctx.baseURI.resolve(Uri.uri(stringLiteral())).atom();
-    if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
+    final byte[] cl = ctx.baseURI().resolve(Uri.uri(stringLiteral())).string();
+    if(!eq(URLCOLL, cl)) error(COLLWHICH, cl);
     return true;
   }
 
@@ -668,11 +726,13 @@ public class QueryParser extends InputParser {
   private void baseURIDecl() throws QueryException {
     if(declBase) error(DUPLBASE);
     declBase = true;
-    ctx.baseURI = Uri.uri(stringLiteral());
+    final byte[] base = stringLiteral();
+    if(base.length != 0) ctx.baseURI(string(base));
   }
 
   /**
-   * Parses the "SchemaImport" rule. Parses the "SchemaPrefix" rule.
+   * Parses the "SchemaImport" rule.
+   * Parses the "SchemaPrefix" rule.
    * @throws QueryException query exception
    */
   private void schemaImport() throws QueryException {
@@ -701,17 +761,16 @@ public class QueryParser extends InputParser {
       ns = ncName(XPNAME);
       wsCheck(IS);
     }
-    final byte[] uri = stringLiteral();
+    final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) error(NSMODURI);
     if(modules.contains(uri)) error(DUPLMODULE, uri);
 
-    final QNm name = new QNm(ns, uri);
-    if(ns != EMPTY) ctx.ns.add(name, input());
+    if(ns != EMPTY) ctx.ns.add(ns, uri, input());
 
     try {
       if(wsConsumeWs(AT)) {
         do {
-          module(stringLiteral(), name.uri());
+          module(stringLiteral(), uri);
         } while(wsConsumeWs(COMMA));
       } else {
         // search for uri in namespace dictionary
@@ -727,7 +786,7 @@ public class QueryParser extends InputParser {
           for(final byte[] u : MODULES) found |= eq(uri, u);
           // check pre-declared modules
           final byte[] path = ctx.modDeclared.get(uri);
-          if(path != null) module(path, name.uri());
+          if(path != null) module(path, uri);
           // module not found: show error
           else if(!found) error(NOMODULE, uri);
         }
@@ -743,13 +802,15 @@ public class QueryParser extends InputParser {
    * @param uri module uri
    * @throws QueryException query exception
    */
-  private void module(final byte[] path, final Uri uri) throws QueryException {
+  private void module(final byte[] path, final byte[] uri)
+      throws QueryException {
+
     final byte[] u = ctx.modParsed.get(path);
     if(u != null) {
-      if(!eq(uri.atom(), u)) error(WRONGMODULE, uri, path);
+      if(!eq(uri, u)) error(WRONGMODULE, uri, path);
       return;
     }
-    ctx.modParsed.add(path, uri.atom());
+    ctx.modParsed.add(path, uri);
 
     // check specified path and path relative to query file
     final IO io = io(string(path));
@@ -760,11 +821,11 @@ public class QueryParser extends InputParser {
       error(NOMODULEFILE, io);
     }
 
-    final NSLocal ns = ctx.ns;
-    ctx.ns = new NSLocal();
+    final NSContext ns = ctx.ns;
+    ctx.ns = new NSContext();
     new QueryParser(qu, ctx).parse(io, uri);
     ctx.ns = ns;
-    modules.add(uri.atom());
+    modules.add(uri);
   }
 
   /**
@@ -814,7 +875,7 @@ public class QueryParser extends InputParser {
     for(final Component comp : pkg.comps) {
       final String path = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)),
           string(comp.file)).path();
-      module(token(path), Uri.uri(comp.uri));
+      module(token(path), comp.uri);
     }
     if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
     pkgsLoaded.add(pkgName);
@@ -846,8 +907,9 @@ public class QueryParser extends InputParser {
     // Add jars to classpath
     Reflect.setJarLoader(new JarLoader(urls));
     // Load public classes
-    for(final byte[] c : desc.classes)
-          ctx.ns.add(new QNm(concat(token("java:"), c)), input());
+    for(final byte[] c : desc.classes) {
+      ctx.ns.add(c, EMPTY, input());
+    }
   }
   /**
    * Parses the "VarDecl" rule.
@@ -873,7 +935,7 @@ public class QueryParser extends InputParser {
    */
   private void varDecl() throws QueryException {
     final Var v = typedVar();
-    if(module != null && !v.name.uri().eq(module.uri())) error(MODNS, v);
+    if(module != null && !eq(v.name.uri(), module.uri())) error(MODNS, v);
 
     // check if variable has already been declared
     final Var old = ctx.vars.get(v.name);
@@ -933,10 +995,10 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final boolean up) throws QueryException {
     skipWS();
-    final InputInfo ii = input();
-    final QNm name = new QNm(qName(FUNCNAME));
-    name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
-    if(module != null && !name.uri().eq(module.uri())) error(MODNS, name);
+
+    final QNm name = eQName(FUNCNAME, ctx.nsFunc);
+    if(keyword(name)) error(RESERVED, name);
+    if(module != null && !eq(name.uri(), module.uri())) error(MODNS, name);
 
     wsCheck(PAR1);
     final int s = ctx.vars.size();
@@ -944,12 +1006,24 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final UserFunc func = new UserFunc(ii, name, args, optAsType(), true);
+    final UserFunc func = new UserFunc(input(), name, args, optAsType(), true);
     func.updating = up;
 
-    ctx.funcs.add(func, this);
+    ctx.funcs.add(func, input());
     if(!wsConsumeWs(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
+  }
+
+  /**
+   * Checks if the specified name equals reserved function names.
+   * @param name name to be checked
+   * @return result of check
+   */
+  private boolean keyword(final QNm name) {
+    if(name.hasPrefix()) return false;
+    final byte[] str = name.string();
+    for(final byte[] key : KEYWORDS) if(eq(key, str)) return true;
+    return false;
   }
 
   /**
@@ -1016,7 +1090,7 @@ public class QueryParser extends InputParser {
    */
   private Expr single() throws QueryException {
     alter = null;
-    Expr e = gflwor();
+    Expr e = flwor();
     if(e == null) e = quantified();
     if(e == null) e = switchh();
     if(e == null) e = typeswitch();
@@ -1032,15 +1106,20 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FLWORExpr" rule. Parses the "WhereClause" rule. Parses the
-   * "OrderByClause" rule. Parses the "OrderSpecList" rule. Parses the
-   * "GroupByClause"
+   * Parses the "FLWORExpr" rule.
+   * Parses the "WhereClause" rule.
+   * Parses the "OrderByClause" rule.
+   * Parses the "OrderSpecList" rule.
+   * Parses the "GroupByClause" rule.
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr gflwor() throws QueryException {
-    final int s = ctx.vars.size();
+  private Expr flwor() throws QueryException {
 
+    // XQuery30: tumbling window, sliding window, count, allowing empty
+    //  (still to be parsed and implemented)
+
+    final int s = ctx.vars.size();
     final ForLet[] fl = forLet();
     if(fl == null) return null;
 
@@ -1064,7 +1143,7 @@ public class QueryParser extends InputParser {
       for(final ForLet f : fl) {
         vars: for(final Var v : f.vars()) {
           final Value old = ngp.get(v.name, null);
-          final int pos = old.item() ? (int) old.itemAt(0).itr(null) : -1;
+          final int pos = old.isItem() ? (int) old.itemAt(0).itr(null) : -1;
 
           // number of entries is expected to be tiny, so linear search is fast
           for(final Var g : grp) {
@@ -1080,7 +1159,7 @@ public class QueryParser extends InputParser {
           if(pos >= 0) ng.set(pos, v);
           else {
             ng.add(v);
-            ngp = ngp.insert(v.name, Itr.get(ng.size() - 1), null);
+            ngp = ngp.insert(v.name, Int.get(ng.size() - 1), null);
           }
         }
       }
@@ -1118,13 +1197,15 @@ public class QueryParser extends InputParser {
       error(where == null ? FLWORWHERE : order == null ? FLWORORD : FLWORRET);
     }
     final Expr ret = check(single(), NORETURN);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return GFLWOR.get(fl, where, order, group, ret, input());
   }
 
   /**
-   * Parses the "ForClause" rule. Parses the "PositionalVar" rule. Parses the
-   * "LetClause" rule. Parses the "FTScoreVar" rule.
+   * Parses the "ForClause" rule.
+   * Parses the "PositionalVar" rule.
+   * Parses the "LetClause" rule.
+   * Parses the "FTScoreVar" rule.
    * @return query expression
    * @throws QueryException query exception
    */
@@ -1177,7 +1258,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "OrderSpec" rule. Parses the "OrderModifier" rule.
+   * Parses the "OrderSpec" rule.
+   * Parses the "OrderModifier" rule.
    * @param order order array
    * @return new order array
    * @throws QueryException query exception
@@ -1196,7 +1278,7 @@ public class QueryParser extends InputParser {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
-    if(e.empty()) return order;
+    if(e.isEmpty()) return order;
     final OrderBy ord = new OrderByExpr(input(), e, desc, least);
     return order == null ? new OrderBy[] { ord } : Array.add(order, ord);
   }
@@ -1210,6 +1292,7 @@ public class QueryParser extends InputParser {
    */
   private Var[] groupSpec(final ForLet[] fl, final Var[] group)
       throws QueryException {
+
     final Var v = checkVar(varName(), GVARNOTDEFINED);
 
     // the grouping variable has to be declared by the same FLWOR expression
@@ -1250,7 +1333,7 @@ public class QueryParser extends InputParser {
 
     wsCheck(SATISFIES);
     final Expr e = check(single(), NOSOME);
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     return new Quantifier(input(), fl, e, !some);
   }
 
@@ -1312,7 +1395,7 @@ public class QueryParser extends InputParser {
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
       cases = Array.add(cases, new TypeCase(input(), v, ret));
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     } while(cs);
     if(cases.length == 1) error(NOTYPESWITCH);
     return new TypeSwitch(input(), ts, cases);
@@ -1603,7 +1686,9 @@ public class QueryParser extends InputParser {
   private void validate() throws QueryException {
     if(wsConsumeWs(VALIDATE)) {
       if(!wsConsumeWs(STRICT) && !wsConsumeWs(LAX) && wsConsumeWs(TYPE)) {
-        qName(Err.QNAMEINV);
+        final QNm qnm = eQName(QNAMEINV, SKIPCHECK);
+        names.add(new QNmCheck(qnm));
+        error(NOSCHEMA, qnm);
       }
       wsCheck(BRACE1);
       check(single(), NOVALIDATE);
@@ -1631,12 +1716,9 @@ public class QueryParser extends InputParser {
   private Expr[] pragma() throws QueryException {
     Expr[] pragmas = { };
     while(wsConsumeWs(PRAGMA)) {
-      skipWS();
-      final QNm name = new QNm(qName(PRAGMAINV), ctx, input());
-      if(!name.ns()) error(NSMISS, name);
+      final QNm name = eQName(QNAMEINV, URICHECK);
       char c = curr();
       if(c != '#' && !ws(c)) error(PRAGMAINV);
-
       tok.reset();
       while(c != '#' || next() != ')') {
         if(c == 0) error(PRAGMAINV);
@@ -1650,11 +1732,14 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "PathExpr" rule. Parses the "RelativePathExpr" rule.
+   * Parses the "PathExpr" rule.
+   * Parses the "RelativePathExpr" rule.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr path() throws QueryException {
+    // XQuery30: bang operator (still to be parsed and implemented)
+
     checkInit();
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     if(s > 0) checkAxis(s == 2 ? Axis.DESC : Axis.CHILD);
@@ -1744,7 +1829,7 @@ public class QueryParser extends InputParser {
    */
   private Expr step() throws QueryException {
     final Expr e = postfix();
-    return e != null ? e : axis();
+    return e != null ? e : axisStep();
   }
 
   /**
@@ -1752,7 +1837,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private AxisStep axis() throws QueryException {
+  private AxisStep axisStep() throws QueryException {
     Axis ax = null;
     Test test = null;
     if(wsConsume(DOT2)) {
@@ -1761,7 +1846,7 @@ public class QueryParser extends InputParser {
       checkTest(test, false);
     } else if(consume('@')) {
       ax = Axis.ATTR;
-      test = test(true);
+      test = nodeTest(true, true);
       checkTest(test, true);
       if(test == null) {
         --qp;
@@ -1773,7 +1858,7 @@ public class QueryParser extends InputParser {
           wsConsume(COLS);
           ap = qp;
           ax = a;
-          test = test(a == Axis.ATTR);
+          test = nodeTest(a == Axis.ATTR, true);
           checkTest(test, a == Axis.ATTR);
           break;
         }
@@ -1781,7 +1866,7 @@ public class QueryParser extends InputParser {
     }
     if(ax == null) {
       ax = Axis.CHILD;
-      test = test(false);
+      test = nodeTest(false, true);
       if(test != null && test.type == NodeType.ATT) ax = Axis.ATTR;
       checkTest(test, ax == Axis.ATTR);
     }
@@ -1798,24 +1883,35 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "NodeTest" rule. Parses the "NameTest" rule. Parses the
-   * "KindTest" rule.
+   * Parses the "NodeTest" rule.
+   * Parses the "NameTest" rule.
+   * Parses the "KindTest" rule.
    * @param att attribute flag
+   * @param all check all tests, or only names
    * @return query expression
    * @throws QueryException query exception
    */
-  private Test test(final boolean att) throws QueryException {
+  private Test nodeTest(final boolean att, final boolean all)
+      throws QueryException {
+
     final int p = qp;
-    final char ch = curr();
-    if(XMLToken.isNCStartChar(ch)) {
-      final byte[] name = qName(null);
+    if(consume('*')) {
+      // name test: "*"
+      if(!consume(':')) return new NameTest(att, input());
+      // name test: "*:tag"
+      return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Name.NAME, att,
+          input());
+    }
+
+    final QNm name = eQName(null, SKIPCHECK);
+    if(name != null) {
       final int p2 = qp;
-      if(wsConsumeWs(PAR1)) {
-        final NodeType type = NodeType.find(new QNm(name, ctx, input()));
+      if(all && wsConsumeWs(PAR1)) {
+        final NodeType type = NodeType.find(name);
         if(type != null) {
           tok.reset();
           while(!consume(PAR2)) {
-            if(curr(0)) error(TESTINCOMPLETE);
+            if(!more()) error(TESTINCOMPLETE);
             tok.add(consume());
           }
           skipWS();
@@ -1824,30 +1920,19 @@ public class QueryParser extends InputParser {
         }
       } else {
         qp = p2;
-        // name test "pre:tag"
-        if(contains(name, ':')) {
+        // name test: "pre:tag" or "tag"
+        if(name.hasPrefix() || !consume(':')) {
           skipWS();
-          return new NameTest(new QNm(name, ctx, input()), NameTest.Name.STD,
-              att, input());
+          names.add(new QNmCheck(name, !att));
+          return new NameTest(name, NameTest.Name.STD, att, input());
         }
-        // name test "tag"
-        if(!consume(':')) {
-          skipWS();
-          final QNm nm = new QNm(name, att ? Uri.EMPTY : null);
-          return new NameTest(nm, NameTest.Name.STD, att, input());
-        }
-        // name test "pre:*"
+        // name test: "pre:*"
         if(consume('*')) {
-          final QNm nm = new QNm(EMPTY, ctx.ns.uri(name, false, input()));
+          final QNm nm = new QNm(concat(name.string(), COLON));
+          names.add(new QNmCheck(nm, !att));
           return new NameTest(nm, NameTest.Name.NS, att, input());
         }
       }
-    } else if(consume('*')) {
-      // name test "*"
-      if(!consume(':')) return new NameTest(att, input());
-      // name test "*:tag"
-      return new NameTest(new QNm(qName(QNAMEINV)), NameTest.Name.NAME, att,
-          input());
     }
     qp = p;
     return null;
@@ -1904,8 +1989,10 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "PrimaryExpr" rule. Parses the "VarRef" rule. Parses the
-   * "ContextItem" rule. Parses the "Literal" rule.
+   * Parses the "PrimaryExpr" rule.
+   * Parses the "VarRef" rule.
+   * Parses the "ContextItem" rule.
+   * Parses the "Literal" rule.
    * @return query expression
    * @throws QueryException query exception
    */
@@ -1919,7 +2006,7 @@ public class QueryParser extends InputParser {
     // direct constructor
     if(c == '<') return constructor();
     // function calls and computed constructors
-    if(XMLToken.isNCStartChar(c)) {
+    if(c == '%' || XMLToken.isNCStartChar(c)) {
       Expr e;
       if(ctx.xquery3) {
         e = functionItem();
@@ -1930,8 +2017,8 @@ public class QueryParser extends InputParser {
       e = compConstructor();
       if(e != null) return e;
       // ordered expression
-      if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE)
-          || wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
+      if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
+          wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
         return enclosed(NOENCLEXPR);
 
       if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral();
@@ -1943,13 +2030,11 @@ public class QueryParser extends InputParser {
       return new Context(input());
     }
     // literals
-    if(digit(c) || c == '.') return numericLiteral(false);
-    // strings
-    return quote(c) ? Str.get(stringLiteral()) : null;
+    return literal();
   }
 
   /**
-   * Parses a literal map. [LW] adapt to actual spec when available.
+   * Parses a literal map.
    * @return map literal
    * @throws QueryException query exception
    */
@@ -1970,13 +2055,19 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "FunctionItemExpr" rule. Parses the "LiteralFunctionItem" rule.
+   * Parses the "FunctionItemExpr" rule.
+   * Parses the "NamedFunctionRef" rule.
+   * Parses the "LiteralFunctionItem" rule.
    * Parses the "InlineFunction" rule.
-   * @return query expression
+   * @return query expression, or {@code null}
    * @throws QueryException query exception
    */
   private Expr functionItem() throws QueryException {
+    skipWS();
     final int pos = qp;
+
+    // inline function
+    while(curr('%')) annotation();
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       final int s = ctx.vars.size();
       final Var[] args = paramList();
@@ -1984,26 +2075,18 @@ public class QueryParser extends InputParser {
 
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
       return new InlineFunc(input(), type, args, body);
     }
+
+    // named function reference
     qp = pos;
+    final QNm name = eQName(null, ctx.nsFunc);
+    if(name != null && consume('#')) {
+      final long card = ((Int) numericLiteral(true)).itr(null);
+      if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
 
-    skipWS();
-    final byte[] fn = qName(null);
-    if(fn.length > 0 && consume(HASH)) {
-      final QNm name = new QNm(fn);
-      if(name.ns()) ctx.ns.uri(name);
-      else name.uri(ctx.nsFunc);
-      final long cardinal = ((Itr) numericLiteral(true)).itr(null);
-      if(cardinal < 0 || cardinal > Integer.MAX_VALUE) error(FUNCUNKNOWN, fn);
-
-      final Expr[] args = new Expr[(int) cardinal];
-      final Var[] vars = new Var[args.length];
-      partial(args, vars);
-      final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
-      if(f == null) error(FUNCUNKNOWN, fn);
-      return new LitFunc(input(), name, f, vars);
+      return ctx.funcs.get(name, card, false, ctx, input());
     }
 
     qp = pos;
@@ -2011,36 +2094,45 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "NumericLiteral" rule. Parses the "IntegerLiteral" rule.
+   * Parses the "Literal" rule.
+   * @return query expression, or {@code null}
+   * @throws QueryException query exception
+   */
+  private Expr literal() throws QueryException {
+    final char c = curr();
+    // literals
+    if(digit(c) || c == '.') return numericLiteral(false);
+    // strings
+    return quote(c) ? Str.get(stringLiteral()) : null;
+  }
+
+  /**
+   * Parses the "NumericLiteral" rule.
+   * Parses the "DecimalLiteral" rule.
+   * Parses the "IntegerLiteral" rule.
    * @param itr integer flag
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr numericLiteral(final boolean itr) throws QueryException {
     tok.reset();
-    while(digit(curr()))
-      tok.add(consume());
-    if(consume('.')) {
+    while(digit(curr())) tok.add(consume());
+
+    final boolean dec = consume('.');
+    if(dec) {
+      // decimal literal
       if(itr) error(NUMBERITR);
-      return decimalLiteral();
+      tok.add('.');
+      while(digit(curr()))
+        tok.add(consume());
     }
     if(XMLToken.isNCStartChar(curr())) return checkDbl();
+
+    if(dec) return new Dec(tok.finish());
+
     final long l = toLong(tok.finish());
     if(l == Long.MIN_VALUE) error(RANGE, tok);
-    return Itr.get(l);
-  }
-
-  /**
-   * Parses the "DecimalLiteral" rule.
-   * @return query expression
-   * @throws QueryException query exception
-   */
-  private Expr decimalLiteral() throws QueryException {
-    tok.add('.');
-    if(XMLToken.isNCStartChar(curr())) return checkDbl();
-    while(digit(curr()))
-      tok.add(consume());
-    return XMLToken.isNCStartChar(curr()) ? checkDbl() : new Dec(tok.finish());
+    return Int.get(l);
   }
 
   /**
@@ -2056,7 +2148,8 @@ public class QueryParser extends InputParser {
     final int s = tok.size();
     while(digit(curr()))
       tok.add(consume());
-    if(s == tok.size()) error(NUMBERINC);
+    if(s == tok.size()) error(NUMBERINC, tok);
+
     if(XMLToken.isNCStartChar(curr())) error(NUMBERWS);
     return Dbl.get(tok.finish(), input());
   }
@@ -2074,7 +2167,7 @@ public class QueryParser extends InputParser {
     tok.reset();
     while(true) {
       while(!consume(del)) {
-        if(curr(0)) error(NOQUOTE, found());
+        if(!more()) error(NOQUOTE, found());
         entity(tok);
       }
       if(!consume(del)) break;
@@ -2091,10 +2184,7 @@ public class QueryParser extends InputParser {
   private QNm varName() throws QueryException {
     wsCheck(DOLLAR);
     skipWS();
-    final QNm name = new QNm(qName(NOVARNAME));
-    if(name.ns()) name.uri(ctx.ns.uri(name.pref(), false, input()));
-    ctx.ns.uri(name);
-    return name;
+    return eQName(NOVARNAME, null);
   }
 
   /**
@@ -2116,28 +2206,24 @@ public class QueryParser extends InputParser {
    */
   private Expr functionCall() throws QueryException {
     final int p = qp;
-    final QNm name = new QNm(qName(null), ctx, input());
+    final QNm name = eQName(null, ctx.nsFunc);
+    if(!keyword(name)) {
+      final Expr[] args = argumentList(name.string());
+      if(args != null) {
+        alter = FUNCUNKNOWN;
+        alterFunc = name;
+        ap = qp;
 
-    Expr[] args;
-    if(NodeType.find(name) != null
-        || (args = argumentList(name.atom())) == null) {
-      qp = p;
-      return null;
+        final Var[] vars = new Var[args.length];
+        final boolean part = partial(args, vars);
+        final TypedFunc f = ctx.funcs.get(name, args, false, ctx, input());
+        if(f != null) {
+          alter = null;
+          return part ? new PartFunApp(input(), f, vars) : f.fun;
+        }
+      }
     }
 
-    alter = FUNCUNKNOWN;
-    alterFunc = name;
-    ap = qp;
-    ctx.ns.uri(name);
-    name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
-
-    final Var[] vars = new Var[args.length];
-    final boolean part = partial(args, vars);
-    final TypedFunc f = ctx.funcs.get(name, args, ctx, this);
-    if(f != null) {
-      alter = null;
-      return part ? new PartFunApp(input(), f, vars) : f.fun;
-    }
     qp = p;
     return null;
   }
@@ -2170,7 +2256,8 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "Constructor" rule. Parses the "DirectConstructor" rule.
+   * Parses the "Constructor" rule.
+   * Parses the "DirectConstructor" rule.
    * @return query expression
    * @throws QueryException query exception
    */
@@ -2180,28 +2267,35 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "DirElemConstructor" rule. Parses the "DirAttributeList" rules.
+   * Parses the "DirElemConstructor" rule.
+   * Parses the "DirAttributeList" rules.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr dirElement() throws QueryException {
-    if(skipWS()) error(NOTAGNAME);
-    final QNm tag = new QNm(qName(NOTAGNAME));
-    consumeWSS();
-
-    Expr[] cont = { };
-    final Atts ns = new Atts();
+    // cache namespace information
     final int s = ctx.ns.size();
+    final byte[] nse = ctx.nsElem;
+    final int npos = names.size();
+
+    final QNm tag = new QNm(qName(TAGNAME));
+    names.add(new QNmCheck(tag));
+    consumeWS();
+
+    final Atts ns = new Atts();
+    Expr[] cont = { };
 
     // parse attributes...
-    boolean xmlDef = false; // xml prefix explicitly declared?
-    while(XMLToken.isNCStartChar(curr())) {
+    boolean xmlDecl = false; // xml prefix explicitly declared?
+    while(true) {
       final byte[] atn = qName(null);
+      if(atn.length == 0) break;
+
       Expr[] attv = { };
 
-      consumeWSS();
+      consumeWS();
       check('=');
-      consumeWSS();
+      consumeWS();
       final char delim = consume();
       if(!quote(delim)) error(NOQUOTE, found());
       final TokenBuilder tb = new TokenBuilder();
@@ -2246,31 +2340,34 @@ public class QueryParser extends InputParser {
 
       if(tb.size() != 0) attv = add(attv, Str.get(tb.finish()));
 
-      if(eq(atn, XMLNS)) {
+      // parse namespace declarations
+      final boolean pr = startsWith(atn, XMLNSC);
+      if(pr || eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
-        if(!tag.ns()) tag.uri(v);
-        addNS(ns, EMPTY, v);
-      } else if(startsWith(atn, XMLNSC)) {
-        if(!simple) error(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
-        if(v.length == 0) error(NSEMPTYURI);
-        final QNm nsd = new QNm(atn, v);
-        final byte[] pref = nsd.ln();
-        if(!eq(pref, XML) || !eq(v, XMLURI)) {
-          ctx.ns.add(nsd, input());
-          addNS(ns, pref, v);
-          if(eq(pref, tag.pref())) tag.uri(v);
+        final byte[] pref = pr ? local(atn) : EMPTY;
+        final byte[] uri = attv.length == 0 ? EMPTY : ((Str) attv[0]).string();
+        if(eq(pref, XML) && eq(uri, XMLURI)) {
+          if(xmlDecl) error(DUPLNSDEF, XML);
+          xmlDecl = true;
         } else {
-          if(xmlDef) error(DUPLNSDEF, XML);
-          xmlDef = true;
+          if(pr) {
+            if(uri.length == 0) error(NSEMPTYURI);
+            if(eq(pref, XML) || eq(pref, XMLNS)) error(BINDXML, pref);
+            if(eq(XMLURI, uri)) error(BINDXMLURI, uri, XML);
+            if(eq(XMLNSURI, uri)) error(BINDXMLURI, uri, XMLNS);
+            ctx.ns.add(pref, uri);
+          } else {
+            ctx.nsElem = uri;
+          }
+          if(ns.get(pref) != -1) error(DUPLNSDEF, pref);
+          ns.add(pref, uri);
         }
       } else {
-        cont = add(cont,
-            new CAttr(input(), false, new QNm(atn, contains(atn, ':') ? null
-                : Uri.EMPTY), attv));
+        final QNm attn = new QNm(atn);
+        names.add(new QNmCheck(attn, false));
+        cont = add(cont, new CAttr(input(), false, attn, attv));
       }
-      if(!consumeWSS()) break;
+      if(!consumeWS()) break;
     }
 
     if(consume('/')) {
@@ -2278,35 +2375,22 @@ public class QueryParser extends InputParser {
     } else {
       check('>');
       while(curr() != '<' || next() != '/') {
-        final Expr e = dirElemContent(tag);
+        final Expr e = dirElemContent(tag.string());
         if(e == null) continue;
         cont = add(cont, e);
       }
       qp += 2;
 
-      if(skipWS()) error(NOTAGNAME);
-      final byte[] close = qName(NOTAGNAME);
-      consumeWSS();
+      final byte[] close = qName(TAGNAME);
+      consumeWS();
       check('>');
-      if(!eq(tag.atom(), close)) error(TAGWRONG, tag.atom(), close);
+      if(!eq(tag.string(), close)) error(TAGWRONG, tag.string(), close);
     }
 
+    assignURI(npos);
     ctx.ns.size(s);
-    return new CElem(input(), tag, ns, false, cont);
-  }
-
-  /**
-   * Checks the uniqueness of the namespace and adds it to the attributes.
-   * @param ns namespace array
-   * @param k namespace prefix
-   * @param v uri
-   * @throws QueryException query exception
-   */
-  private void addNS(final Atts ns, final byte[] k, final byte[] v)
-      throws QueryException {
-
-    if(ns.get(k) != -1) error(DUPLNSDEF, k);
-    ns.add(k, v);
+    ctx.nsElem = nse;
+    return new CElem(input(), tag, ns, cont);
   }
 
   /**
@@ -2315,7 +2399,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr dirElemContent(final QNm tag) throws QueryException {
+  private Expr dirElemContent(final byte[] tag) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     boolean strip = true;
     do {
@@ -2343,7 +2427,7 @@ public class QueryParser extends InputParser {
       } else if(c != 0) {
         strip &= !entity(tb);
       } else {
-        error(NOCLOSING, tag.atom());
+        error(NOCLOSING, tag);
       }
     } while(true);
   }
@@ -2381,14 +2465,14 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "DirPIConstructor" rule. Parses the "DirPIContents" rule.
+   * Parses the "DirPIConstructor" rule.
+   * Parses the "DirPIContents" rule.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr dirPI() throws QueryException {
-    if(consumeWSS()) error(PIXML, EMPTY);
-    final byte[] str = trim(qName(PIWRONG));
-    if(str.length == 0 || eq(lc(str), XML)) error(PIXML, str);
+    final byte[] str = ncName(INVALPI);
+    if(eq(lc(str), XML)) error(PIXML, str);
 
     final boolean space = skipWS();
     final TokenBuilder tb = new TokenBuilder();
@@ -2399,7 +2483,6 @@ public class QueryParser extends InputParser {
       }
       consume();
       if(consume('>')) {
-        if(!XMLToken.isNCName(str)) error(INVALPI, str);
         return new CPI(input(), Str.get(str), Str.get(tb.finish()));
       }
       tb.add('?');
@@ -2438,12 +2521,13 @@ public class QueryParser extends InputParser {
    */
   private Expr compConstructor() throws QueryException {
     final int p = qp;
-    if(wsConsumeWs(DOCUMENT)) return consume(compDoc(), p);
-    else if(wsConsumeWs(ELEMENT)) return consume(compElemConstructor(), p);
-    else if(wsConsumeWs(ATTRIBUTE)) return consume(compAttribute(), p);
-    else if(wsConsumeWs(TEXT)) return consume(compText(), p);
-    else if(wsConsumeWs(COMMENT)) return consume(compComment(), p);
-    else if(wsConsumeWs(PI)) return consume(compPI(), p);
+    if(wsConsumeWs(DOCUMENT))  return consume(compDoc(), p);
+    if(wsConsumeWs(ELEMENT))   return consume(compElement(), p);
+    if(wsConsumeWs(ATTRIBUTE)) return consume(compAttribute(), p);
+    if(wsConsumeWs(NSPACE))    return consume(compNamespace(), p);
+    if(wsConsumeWs(TEXT))      return consume(compText(), p);
+    if(wsConsumeWs(COMMENT))   return consume(compComment(), p);
+    if(wsConsumeWs(PI))        return consume(compPI(), p);
     return null;
   }
 
@@ -2471,27 +2555,30 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "CompElemConstructor" rule. Parses the "ContextExpr" rule.
+   * Parses the "CompElemConstructor" rule.
+   * Parses the "ContextExpr" rule.
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr compElemConstructor() throws QueryException {
+  private Expr compElement() throws QueryException {
     skipWS();
 
     Expr name;
-    if(XMLToken.isNCStartChar(curr())) {
-      name = new QNm(qName(null));
+    final QNm qn = eQName(null, SKIPCHECK);
+    if(qn != null) {
+      name = qn;
+      names.add(new QNmCheck(qn));
     } else {
       if(!wsConsume(BRACE1)) return null;
-      name = check(expr(), NOTAGNAME);
+      name = check(expr(), NOTAG);
       wsCheck(BRACE2);
     }
 
     if(!wsConsume(BRACE1)) return null;
     final Expr e = expr();
     wsCheck(BRACE2);
-    return new CElem(input(), name, new Atts(), true, e == null ? new Expr[0]
-        : new Expr[] { e });
+    return new CElem(input(), name, null,
+        e == null ? new Expr[0] : new Expr[] { e });
   }
 
   /**
@@ -2502,19 +2589,46 @@ public class QueryParser extends InputParser {
   private Expr compAttribute() throws QueryException {
     skipWS();
 
-    Expr nm;
-    if(XMLToken.isNCStartChar(curr())) {
-      nm = new QNm(qName(null));
+    Expr name;
+    final QNm qn = eQName(null, SKIPCHECK);
+    if(qn != null) {
+      name = qn;
+      names.add(new QNmCheck(qn, false));
     } else {
       if(!wsConsume(BRACE1)) return null;
-      nm = expr();
+      name = expr();
       wsCheck(BRACE2);
     }
 
     if(!wsConsume(BRACE1)) return null;
     final Expr e = expr();
     wsCheck(BRACE2);
-    return new CAttr(input(), true, nm, e == null ? Empty.SEQ : e);
+    return new CAttr(input(), true, name, e == null ? Empty.SEQ : e);
+  }
+
+  /**
+   * Parses the "CompNamespaceConstructor" rule.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr compNamespace() throws QueryException {
+    if(!ctx.xquery3) return null;
+    skipWS();
+
+    Expr name;
+    final byte[] str = ncName(null);
+    if(str.length != 0) {
+      name = Str.get(str);
+    } else {
+      if(!wsConsume(BRACE1)) return null;
+      name = check(expr(), NSWRONG);
+      wsCheck(BRACE2);
+    }
+
+    if(!wsConsume(BRACE1)) return null;
+    final Expr e = expr();
+    wsCheck(BRACE2);
+    return new CNSpace(input(), name, e == null ? Empty.SEQ : e);
   }
 
   /**
@@ -2548,9 +2662,11 @@ public class QueryParser extends InputParser {
    */
   private Expr compPI() throws QueryException {
     skipWS();
+
     Expr name;
-    if(XMLToken.isNCStartChar(curr())) {
-      name = Str.get(ncName(null));
+    final byte[] str = ncName(null);
+    if(str.length != 0) {
+      name = Str.get(str);
     } else {
       if(!wsConsume(BRACE1)) return null;
       name = check(expr(), PIWRONG);
@@ -2570,17 +2686,17 @@ public class QueryParser extends InputParser {
    */
   private SeqType simpleType() throws QueryException {
     skipWS();
-    final QNm type = new QNm(qName(TYPEINVALID));
-    type.uri(ctx.ns.uri(type.pref(), false, input()));
+    final QNm name = eQName(TYPEINVALID, ctx.nsElem);
+    final Type t = Types.find(name, true);
+    if(t == null) error(TYPEUNKNOWN, name);
+    if(t == AtomType.AAT || t == AtomType.NOT) error(CASTUNKNOWN, name);
     skipWS();
-    final Type t = Types.find(type, true);
-    if(t == AtomType.AAT || t == AtomType.NOT) error(CASTUNKNOWN, type);
-    if(t == null) error(TYPEUNKNOWN, type);
     return SeqType.get(t, consume('?') ? Occ.ZO : Occ.O);
   }
 
   /**
-   * Parses the "SequenceType" rule. Parses the "OccurrenceIndicator" rule.
+   * Parses the "SequenceType" rule.
+   * Parses the "OccurrenceIndicator" rule.
    * Parses the "KindTest" rule.
    * @return sequence type
    * @throws QueryException query exception
@@ -2590,18 +2706,18 @@ public class QueryParser extends InputParser {
     final Type t = itemType();
 
     // parse occurrence indicator
-    final Occ occ = consume('?') ? Occ.ZO : consume('+') ? Occ.OM
-        : consume('*') ? Occ.ZM : Occ.O;
     skipWS();
-
+    final Occ occ = consume('?') ? Occ.ZO : consume('+') ? Occ.OM :
+      consume('*') ? Occ.ZM : Occ.O;
     if(t == AtomType.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
 
     final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
     tok.reset();
 
     // use empty name test if types are different
-    return SeqType.get(t, occ, kt == null ? null : kt.extype == null
-        || t == kt.extype || !kt.extype.node() ? kt.name : new QNm(EMPTY));
+    skipWS();
+    return SeqType.get(t, occ, kt == null ? null : kt.extype == null ||
+        t == kt.extype || !kt.extype.isNode() ? kt.name : new QNm());
   }
 
   /**
@@ -2619,25 +2735,31 @@ public class QueryParser extends InputParser {
       return ret;
     }
 
-    final QNm type = new QNm(qName(TYPEINVALID));
-    type.uri(ctx.ns.uri(type.pref(), false, input()));
+    boolean ann = false;
+    while(curr('%')) {
+      annotation();
+      ann = true;
+    }
+
+    final QNm name = eQName(TYPEINVALID, null);
     // parse non-atomic types
     final boolean atom = !wsConsumeWs(PAR1);
 
-    Type t = Types.find(type, atom);
+    Type t = Types.find(name, atom);
+    if(ann && (t == null || !t.isFunction())) error(NOANN);
 
     tok.reset();
     if(!atom) {
-      if(t != null && t.func()) {
+      if(t != null && t.isFunction()) {
         // function type
         if(!wsConsume(ASTERISK)) {
-          if(t.map()) {
-            final Type keyType = itemType();
-            if(keyType == null) throw error(MAPTKV, type.atom());
-            if(!keyType.instance(AtomType.AAT)) throw error(MAPTAAT, keyType);
+          if(t.isMap()) {
+            final Type key = itemType();
+            if(key == null) throw error(MAPTKV, name.string());
+            if(!key.instanceOf(AtomType.AAT)) throw error(MAPTAAT, key);
             wsCheck(COMMA);
-            t = MapType.get((AtomType) keyType, sequenceType());
-            if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+            t = MapType.get((AtomType) key, sequenceType());
+            if(!wsConsume(PAR2)) error(FUNCMISS, name.string());
           } else {
             // function type
             SeqType[] args = { };
@@ -2647,17 +2769,17 @@ public class QueryParser extends InputParser {
                 args = Array.add(args, sequenceType());
               } while(wsConsume(COMMA));
 
-              if(!wsConsume(PAR2)) error(FUNCMISS, type.atom());
+              if(!wsConsume(PAR2)) error(FUNCMISS, name.string());
             }
             wsCheck(AS);
-            t = FuncType.get(args, sequenceType());
+            t = FuncType.get(sequenceType(), args);
           }
         } else if(!wsConsume(PAR2)) {
-          error(FUNCMISS, type.atom());
+          error(FUNCMISS, name.string());
         }
       } else {
         int par = 0;
-        while(par != 0 || !wsConsumeWs(PAR2)) {
+        while(par != 0 || !consume(PAR2)) {
           switch(curr()) {
             case '(':
               par++;
@@ -2666,7 +2788,7 @@ public class QueryParser extends InputParser {
               par--;
               break;
             case '\0':
-              error(FUNCMISS, type.atom());
+              error(FUNCMISS, name.string());
           }
           tok.add(consume());
         }
@@ -2674,11 +2796,10 @@ public class QueryParser extends InputParser {
     }
 
     if(t == null) {
-      if(atom) error(TYPEUNKNOWN, type);
+      if(atom) error(TYPEUNKNOWN, name);
       error(NOTYPE,
-          new TokenBuilder(type.atom()).add('(').add(tok.finish()).add(')'));
+          new TokenBuilder(name.string()).add('(').add(tok.finish()).add(')'));
     }
-
     return t;
   }
 
@@ -2690,9 +2811,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private KindTest kindTest(final Type t, final byte[] k)
-  throws QueryException {
+      throws QueryException {
 
     byte[] nm = trim(k);
+
+    // processing-instruction test
     if(t == NodeType.PI) {
       final boolean s = startsWith(k, '\'') || startsWith(k, '"');
       nm = trim(delete(delete(k, '\''), '"'));
@@ -2700,28 +2823,42 @@ public class QueryParser extends InputParser {
         if(s) error(XPINVNAME, nm);
         error(TESTINVALID, t, k);
       }
-      return new KindTest((NodeType) t, new QNm(nm, ctx, input()), null);
+      return new KindTest((NodeType) t, new QNm(nm), null);
     }
-    if(t != NodeType.ELM && t != NodeType.ATT) error(TESTINVALID, t, k);
+
+    // element/attribute test
+    final boolean elm = t == NodeType.ELM;
+    if(!elm && t != NodeType.ATT) error(TESTINVALID, t, k);
 
     Type tp = t;
     final int i = indexOf(nm, ',');
     if(i != -1) {
-      final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
-      if(!eq(test.uri().atom(), XSURI)) error(TYPEUNDEF, test);
+      byte[] type = trim(substring(nm, i + 1));
+      if(elm && endsWith(type, '?')) type = substring(type, 0, type.length - 1);
+      final QNm qnm = new QNm(type, ctx);
+      if(qnm.hasPrefix() && !qnm.hasURI()) error(NOURI, qnm);
+      if(!eq(qnm.uri(), XSURI)) error(TYPEUNDEF, type);
 
-      final byte[] ln = test.ln();
-      tp = Types.find(test, true);
-      if(tp == null && !eq(ln, AtomType.ATY.nam()) &&
-          !eq(ln, AtomType.AST.nam()) && !eq(ln, AtomType.UTY.nam()))
-        error(VARUNDEF, test);
+      final byte[] ln = qnm.local();
+      tp = Types.find(qnm, true);
+      if(tp == null && !eq(ln, AtomType.ATY.string()) &&
+          !eq(ln, AtomType.AST.string()) && !eq(ln, AtomType.UTY.string()))
+        error(VARUNDEF, qnm);
       if(tp == AtomType.ATM || tp == AtomType.AAT) tp = null;
       nm = trim(substring(nm, 0, i));
     }
-    if(nm.length == 1 && nm[0] == '*') return new KindTest((NodeType) t, null,
-        tp);
+
+    if(nm.length == 1 && nm[0] == '*')
+      return new KindTest((NodeType) t, null, tp);
+
     if(!XMLToken.isQName(nm)) error(TESTINVALID, t, k);
-    return new KindTest((NodeType) t, new QNm(nm, ctx, input()), tp);
+
+    final QNm qnm = new QNm(nm, ctx);
+    if(!qnm.hasURI()) {
+      if(qnm.hasPrefix()) error(NOURI, qnm);
+      if(elm) qnm.uri(ctx.nsElem);
+    }
+    return new KindTest((NodeType) t, qnm, tp);
   }
 
   /**
@@ -2740,18 +2877,15 @@ public class QueryParser extends InputParser {
       QNm[] codes = { };
       do {
         skipWS();
-        if(XMLToken.isNCStartChar(curr())) {
-          codes = Array.add(codes, new QNm(qName(QNAMEINV)));
-        } else {
-          wsCheck("*");
-          codes = Array.add(codes, (QNm) null);
-        }
+        final Test test = nodeTest(false, false);
+        if(test == null) error(NOCATCH);
+        codes = Array.add(codes, test.name);
       } while(wsConsumeWs(PIPE));
 
       final Catch c = new Catch(input(), codes, ctx);
       final int s = c.prepare(ctx);
       c.expr = enclosed(NOENCLEXPR);
-      c.finish(s, ctx);
+      ctx.vars.size(s);
 
       ct = Array.add(ct, c);
     } while(wsConsumeWs(CATCH));
@@ -2887,9 +3021,9 @@ public class QueryParser extends InputParser {
 
     // check if specified language is not available
     if(fto.ln == null) fto.ln = Language.def();
-    if(!Tokenizer.supportFor(fto.ln)) error(Err.FTNOTOK, fto.ln);
+    if(!Tokenizer.supportFor(fto.ln)) error(FTNOTOK, fto.ln);
     if(fto.is(ST) && fto.sd == null && !Stemmer.supportFor(fto.ln))
-      error(Err.FTNOSTEM, fto.ln);
+      error(FTNOSTEM, fto.ln);
 
     // consume weight option
     if(wsConsumeWs(WEIGHT)) expr = new FTWeight(input(), expr,
@@ -2952,7 +3086,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr[] ftRange(final boolean i) throws QueryException {
-    final Expr[] occ = { Itr.get(1), Itr.get(Long.MAX_VALUE)};
+    final Expr[] occ = { Int.get(1), Int.get(Long.MAX_VALUE)};
     if(wsConsumeWs(EXACTLY)) {
       occ[0] = ftAdditive(i);
       occ[1] = occ[0];
@@ -2961,7 +3095,7 @@ public class QueryParser extends InputParser {
         occ[0] = ftAdditive(i);
       } else {
         wsCheck(MOST);
-        occ[0] = Itr.get(0);
+        occ[0] = Int.get(0);
         occ[1] = ftAdditive(i);
       }
     } else if(wsConsumeWs(FROM)) {
@@ -2987,7 +3121,7 @@ public class QueryParser extends InputParser {
     while(digit(curr()))
       tok.add(consume());
     if(tok.size() == 0) error(INTEXP);
-    return Itr.get(toLong(tok.finish()));
+    return Int.get(toLong(tok.finish()));
   }
 
   /**
@@ -3117,8 +3251,8 @@ public class QueryParser extends InputParser {
     if(range != null) {
       wsCheck(LEVELS);
       // values will always be integer instances
-      min = ((Itr) range[0]).itr(input());
-      max = ((Itr) range[1]).itr(input());
+      min = ((Int) range[0]).itr(input());
+      max = ((Int) range[1]).itr(input());
     }
     thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
   }
@@ -3241,7 +3375,7 @@ public class QueryParser extends InputParser {
     wsCheck(RETURN);
     final Expr r = check(single(), INCOMPLETE);
 
-    ctx.vars.reset(s);
+    ctx.vars.size(s);
     ctx.updating = u;
     return new Transform(input(), fl, m, r);
   }
@@ -3253,7 +3387,6 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private byte[] ncName(final Err err) throws QueryException {
-    skipWS();
     tok.reset();
     if(ncName()) return tok.finish();
     if(err != null) error(err);
@@ -3261,36 +3394,64 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * Parses the "EQName" rule.
+   * @param err optional error message. Will be thrown if no EQName is found,
+   *   or ignored if set to {@code null}
+   * @param def default namespace, or operation mode
+   *   ({@link #URICHECK}, {@link #SKIPCHECK})
+   * @return string
+   * @throws QueryException query exception
+   */
+  private QNm eQName(final Err err, final byte[] def) throws QueryException {
+    final int p = qp;
+    if(ctx.xquery3 && quote(curr())) {
+      final byte[] uri = stringLiteral();
+      if(consume(':')) {
+        final byte[] name = ncName(null);
+        if(name.length != 0) {
+          if(def == URICHECK && uri.length == 0) error(NOURI, name);
+          return new QNm(name, uri);
+        }
+      }
+      qp = p;
+    }
+    final byte[] nm = qName(err);
+    if(nm.length == 0) return null;
+
+    if(def == SKIPCHECK) return new QNm(nm);
+
+    // create new EQName and set namespace
+    final QNm name = new QNm(nm, ctx);
+    if(!name.hasURI()) {
+      if(def == URICHECK) error(NSMISS, name);
+      if(name.hasPrefix()) error(NOURI, name);
+      name.uri(def);
+    }
+    return name;
+  }
+
+  /**
    * Parses the "QName" rule.
    * @param err optional error message. Will be thrown if no QName is found, and
-   *          ignored if set to {@code null}
+   *   ignored if set to {@code null}
    * @return string
    * @throws QueryException query exception
    */
   private byte[] qName(final Err err) throws QueryException {
     tok.reset();
-    final boolean ok = ncName();
-    if(ok && consume(':')) ncName2();
-    if(!ok && err != null) error(err);
-    return tok.finish();
-  }
-
-  /**
-   * Helper method for parsing NCNames.
-   * @return true for success
-   */
-  private boolean ncName2() {
-    char c = curr();
-    if(!XMLToken.isNCStartChar(c)) {
-      --qp;
-      return false;
+    if(!ncName()) {
+      if(err != null) error(err, consume());
+    } else if(consume(':')) {
+      if(!XMLToken.isNCStartChar(curr())) {
+        --qp;
+      } else {
+        tok.add(':');
+        do {
+          tok.add(consume());
+        } while(XMLToken.isNCChar(curr()));
+      }
     }
-    tok.add(':');
-    do {
-      tok.add(consume());
-      c = curr();
-    } while(XMLToken.isNCChar(c));
-    return true;
+    return tok.finish();
   }
 
   /**
@@ -3385,7 +3546,7 @@ public class QueryParser extends InputParser {
     IO fl = IO.get(fn);
     // if file does not exist, try base uri
     if(!fl.exists()) {
-      final IO base = ctx.base();
+      final IO base = ctx.baseIO();
       if(base != null) fl = base.merge(fn);
     }
     // if file does not exist, try query directory
@@ -3442,7 +3603,7 @@ public class QueryParser extends InputParser {
       Variable.init(ctx);
       v = ctx.vars.get(name);
     }
-    if(v == null) error(err, '$' + string(name.atom()));
+    if(v == null) error(err, '$' + string(name.string()));
     return v;
   }
 
@@ -3546,7 +3707,7 @@ public class QueryParser extends InputParser {
    * Consumes all following whitespace characters.
    * @return true if whitespaces were found
    */
-  private boolean consumeWSS() {
+  private boolean consumeWS() {
     final int p = qp;
     while(more()) {
       final int c = curr();
@@ -3564,8 +3725,8 @@ public class QueryParser extends InputParser {
   private QueryException error() throws QueryException {
     qp = ap;
     if(alter != FUNCUNKNOWN) throw error(alter);
-    ctx.funcs.funError(alterFunc, this);
-    throw error(alter, alterFunc.atom());
+    ctx.funcs.funError(alterFunc, input());
+    throw error(alter, alterFunc.string());
   }
 
   /**
@@ -3594,5 +3755,60 @@ public class QueryParser extends InputParser {
   public QueryException error(final Err err, final Object... arg)
       throws QueryException {
     throw err.thrw(input(), arg);
+  }
+
+  /**
+   * Finalizes the QNames by assigning namespace URIs.
+   * @param npos first entry to be checked
+   * @throws QueryException query exception
+   */
+  private void assignURI(final int npos) throws QueryException {
+    for(int i = npos; i < names.size(); i++) {
+      if(names.get(i).assign(npos == 0)) names.delete(i--);
+    }
+  }
+
+  /**
+   * Cache for checking QNames after their construction.
+   */
+  private class QNmCheck {
+    /** QName to be checked. */
+    final QNm name;
+    /** Flag for assigning default element namespace. */
+    final boolean nsElem;
+
+    /**
+     * Constructor.
+     * @param nm qname
+     */
+    QNmCheck(final QNm nm) {
+      this(nm, true);
+    }
+
+    /**
+     * Constructor.
+     * @param nm qname
+     * @param nse default check
+     */
+    QNmCheck(final QNm nm, final boolean nse) {
+      name = nm;
+      nsElem = nse;
+    }
+
+    /**
+     * Assigns the namespace URI that is currently in scope.
+     * @param check check if prefix URI was assigned
+     * @return true if URI was assigned
+     * @throws QueryException query exception
+     */
+    boolean assign(final boolean check) throws QueryException {
+      if(name.hasPrefix()) {
+        name.uri(ctx.ns.uri(name.prefix()));
+        if(check && !name.hasURI()) error(NOURI, name);
+      } else if(nsElem) {
+        name.uri(ctx.nsElem);
+      }
+      return name.hasURI();
+    }
   }
 }

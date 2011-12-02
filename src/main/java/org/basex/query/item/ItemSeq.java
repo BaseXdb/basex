@@ -44,7 +44,7 @@ public final class ItemSeq extends Seq {
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!item[0].node()) CONDTYPE.thrw(ii, this);
+    if(!item[0].type.isNode()) CONDTYPE.thrw(ii, this);
     return item[0];
   }
 

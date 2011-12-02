@@ -15,7 +15,6 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Seq;
-import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
@@ -126,21 +125,22 @@ public final class QueryResources {
   public Data data(final String input, final boolean col, final InputInfo ii)
       throws QueryException {
 
-    // check if a database with the same name has already been opened
+    // check if a data instance with the same name exists
     for(int d = 0; d < datas; ++d) {
       if(data[d].meta.name.equals(input)) return data[d];
     }
 
-    // check if a database with the same file path has already been opened
+    // check if a database with the same file path exists
     final IO io = IO.get(input);
     for(int d = 0; d < datas; ++d) {
       if(IO.get(data[d].meta.original).eq(io)) return data[d];
     }
 
     // retrieve new data reference
-    Data d = doc(input, ctx.baseURI == Uri.EMPTY, col, ii);
+    final IO base = ctx.baseIO();
+    Data d = doc(input, base == null, col, ii);
     // throws an exception if reference is not found
-    if(d == null) d = doc(ctx.base().merge(input).path(), true, col, ii);
+    if(d == null) d = doc(base.merge(input).path(), true, col, ii);
     // add reference to pool of opened databases
     addData(d);
     return d;
@@ -168,7 +168,7 @@ public final class QueryResources {
       // find specified collection
       while(c < colls && !collName[c].equals(input)) ++c;
       if(c == colls) {
-        final IO base = ctx.base();
+        final IO base = ctx.baseIO();
         if(base != null) {
           c = 0;
           final String in = base.merge(input).path();

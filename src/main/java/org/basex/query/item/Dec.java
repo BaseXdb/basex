@@ -69,7 +69,7 @@ public final class Dec extends Num {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     return chopNumber(token(val.toPlainString()));
   }
 

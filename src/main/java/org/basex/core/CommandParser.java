@@ -72,6 +72,7 @@ import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
+import org.basex.query.item.QNm;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
@@ -549,9 +550,9 @@ public final class CommandParser extends InputParser {
   private QueryException error(final StringList comp, final String m,
       final Object... e) {
 
-    final QueryException qe = new QueryException(input(), "", null, m, e);
-    qe.complete(this, comp);
-    return qe;
+    final QueryException q = new QueryException(input(), new QNm(), null, m, e);
+    q.complete(this, comp);
+    return q;
   }
 
   /**

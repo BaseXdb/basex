@@ -9,7 +9,6 @@ import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.QNm;
@@ -50,8 +49,10 @@ public final class JarParser {
       final AxisIter ch = node.children();
       for(ANode next; (next = ch.next()) != null;) {
         final QNm name = next.qname();
-        if(eqNS(JAR, name)) desc.jars.add(next.atom());
-        else if(eqNS(CLASS, name)) desc.classes.add(next.atom());
+        // ignore namespace to improve compatibility
+        if(eq(JAR, name.local())) desc.jars.add(next.string());
+        else if(eq(CLASS, name.local())) desc.classes.add(next.string());
+        // [CG] add message for unknown elements
       }
       if(desc.jars.size() == 0) JARDESCINV.thrw(input, NOJARS);
       else if(desc.classes.size() == 0) JARDESCINV.thrw(input, NOCLASS);
@@ -59,16 +60,5 @@ public final class JarParser {
     } catch(final IOException ex) {
       throw JARREADFAIL.thrw(input, ex.getMessage());
     }
-  }
-
-  /**
-   * Checks if the specified name equals the qname and if it uses the packaging
-   * namespace.
-   * @param cmp input
-   * @param name name to be compared
-   * @return result of check
-   */
-  private static boolean eqNS(final byte[] cmp, final QNm name) {
-    return eq(name.ln(), cmp) && eq(name.uri().atom(), QueryText.PACKURI);
   }
 }

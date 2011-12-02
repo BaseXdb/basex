@@ -36,6 +36,8 @@ abstract class AQuery extends Command {
 
   /** Query processor. */
   private QueryProcessor qp;
+  /** Initial parsing time. */
+  private long init;
   /** Parsing time. */
   private long pars;
   /** Compilation time. */
@@ -60,6 +62,7 @@ abstract class AQuery extends Command {
    * @return query instance
    */
   protected final boolean query(final String query) {
+    final Performance per = new Performance();
     final int runs = Math.max(1, prop.num(Prop.RUNS));
     String err = null;
     String inf = "";
@@ -68,12 +71,12 @@ abstract class AQuery extends Command {
       long hits = 0;
       int updates = 0;
       for(int i = 0; i < runs; ++i) {
-        final Performance per = new Performance();
-
-        qp = progress(new QueryProcessor(query, context));
-
+        // reuse existing processor instance
+        if(i != 0) qp = null;
+        qp = queryProcessor(query, context);
         qp.parse();
-        pars += per.getTime();
+        pars += init + per.getTime();
+        init = 0;
         if(i == 0) plan(false);
         qp.compile();
         comp += per.getTime();
@@ -149,7 +152,17 @@ abstract class AQuery extends Command {
    * @return result of check
    */
   protected final boolean updating(final Context ctx, final String qu) {
-    return QueryProcessor.updating(ctx, qu);
+    // keyword found; parse query to get sure
+    try {
+      final Performance p = new Performance();
+      qp = progress(new QueryProcessor(qu, ctx));
+      qp.parse();
+      init = p.getTime();
+      return qp.ctx.updating;
+    } catch(final QueryException ex) {
+      qp = null;
+      return true;
+    }
   }
 
   /**
@@ -157,11 +170,24 @@ abstract class AQuery extends Command {
    */
   protected final void queryNodes() {
     try {
-      result = new QueryProcessor(args[0], context).queryNodes();
+      result = queryProcessor(args[0], context).queryNodes();
     } catch(final QueryException ex) {
       Util.debug(ex);
+      qp = null;
       error(ex.getMessage());
     }
+  }
+
+  /**
+   * Returns a query processor instance.
+   * @param query query string
+   * @param ctx database context
+   * @return query processor
+   */
+  protected final QueryProcessor queryProcessor(final String query,
+      final Context ctx) {
+    if(qp == null) qp = progress(new QueryProcessor(query, ctx));
+    return qp;
   }
 
   @Override
@@ -181,7 +207,7 @@ abstract class AQuery extends Command {
 
     final long total = pars + comp + eval + prnt;
     info(NL);
-    info(QUERYSTRING + query);
+    info(QUERYSTRING + QueryProcessor.removeComments(query, Integer.MAX_VALUE));
     info(qp.info());
     info(QUERYPARSE + Performance.getTimer(pars, runs));
     info(QUERYCOMPILE + Performance.getTimer(comp, runs));

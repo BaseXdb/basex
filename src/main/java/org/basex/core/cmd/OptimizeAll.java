@@ -2,6 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.basex.build.Builder;
@@ -121,6 +122,9 @@ public final class OptimizeAll extends ACreate {
       // move binary files
       final IOFile bin = data.meta.binaries();
       if(bin.exists()) bin.rename(d.meta.binaries());
+
+      final File lock = old.lockFile();
+      if(lock.exists()) Copy.copy(lock, d.lockFile());
       d.close();
     } finally {
       try {

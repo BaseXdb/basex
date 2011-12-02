@@ -48,7 +48,7 @@ public abstract class Progress {
    * Sets a new sub progress.
    * @param <P> progress type
    * @param prog progress
-   * @return the progress for convenience
+   * @return passed on progress reference
    */
   public final <P extends Progress> P progress(final P prog) {
     sub = prog;
