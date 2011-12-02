@@ -1,14 +1,13 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.item.FComm;
 import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -36,19 +35,19 @@ public final class CComm extends CFrag {
     boolean more = false;
     for(Item it; (it = iter.next()) != null;) {
       if(more) tb.add(' ');
-      tb.add(it.atom(ii));
+      tb.add(it.string(ii));
       more = true;
     }
     return new FComm(FComm.parse(tb.finish(), input));
   }
 
   @Override
-  public String desc() {
-    return info(QueryText.COMMENT);
+  public String description() {
+    return info(COMMENT);
   }
 
   @Override
   public String toString() {
-    return toString(Token.string(NodeType.COM.nam()));
+    return toString(COMMENT);
   }
 }

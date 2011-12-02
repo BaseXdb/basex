@@ -6,15 +6,17 @@ import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
+import org.basex.data.MemData;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.ft.FTWords;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ValueIter;
@@ -24,6 +26,7 @@ import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
 import org.basex.util.ft.FTOpt;
+import org.basex.util.list.IntList;
 
 /**
  * Full-text functions.
@@ -78,7 +81,7 @@ public final class FNFt extends FuncCall {
     for(Item it; (it = ir.next()) != null;) checkDBNode(it);
     final int s = ctx.ftpos.size();
     ctx.ftpos = tmp;
-    return Itr.get(s);
+    return Int.get(s);
   }
 
   /**
@@ -107,23 +110,32 @@ public final class FNFt extends FuncCall {
 
     return new Iter() {
       final FTPosData ftd = new FTPosData();
+      ValueIter vi;
       Iter ir;
-      ValueIter ii;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          if(ii != null) {
-            final Item it = ii.next();
+          if(vi != null) {
+            final Item it = vi.next();
             if(it != null) return it;
-            ii = null;
+            vi = null;
           }
           final FTPosData tmp = ctx.ftpos;
           ctx.ftpos = ftd;
           if(ir == null) ir = ctx.iter(expr[0]);
           final Item it = ir.next();
           if(it != null) {
-            ii = DataBuilder.mark(checkDBNode(it), mark, len, ctx).iter();
+            // copy node to main memory data instance
+            final MemData md = new MemData(ctx.context.prop);
+            final DataBuilder db = new DataBuilder(md);
+            db.ftpos(mark, ctx.ftpos, len).build(checkDBNode(it));
+
+            final IntList il = new IntList();
+            for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) {
+              il.add(p);
+            }
+            vi = DBNodeSeq.get(il, md, false, false).iter();
           }
           ctx.ftpos = tmp;
           if(it == null) return null;

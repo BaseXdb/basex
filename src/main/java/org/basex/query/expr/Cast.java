@@ -39,7 +39,7 @@ public final class Cast extends Single {
 
     Expr e = this;
     final SeqType t = expr.type();
-    if(expr.value()) {
+    if(expr.isValue()) {
       // pre-evaluate value
       e = preEval(ctx);
     } else if(type.type == AtomType.BLN || type.type == AtomType.FLT ||

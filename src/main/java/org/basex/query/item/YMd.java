@@ -53,8 +53,9 @@ public final class YMd extends Dur {
       throws QueryException {
 
     this(it);
-    if(Double.isNaN(f)) DATECALC.thrw(ii, desc(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, desc());
+    if(Double.isNaN(f)) DATECALC.thrw(ii, description(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0)
+      DATEZERO.thrw(ii, description());
     mon = (int) StrictMath.round(m ? mon * f : mon / f);
   }
 
@@ -86,7 +87,7 @@ public final class YMd extends Dur {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
+  public byte[] string(final InputInfo ii) {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0) tb.add('-');
     tb.add('P');

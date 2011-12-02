@@ -51,8 +51,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXAttr createAttributeNS(final String uri, final String qn) {
-    final QNm name = new QNm(token(qn), token(uri));
-    return new BXAttr(new FAttr(name, EMPTY));
+    return new BXAttr(new FAttr(new QNm(token(qn), token(uri)), EMPTY));
   }
 
   @Override

@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.util.Atts;
-import org.basex.util.TokenBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
@@ -73,16 +72,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   @Override
   public void characters(final char[] ch, final int s, final int l) {
-    final int e = s + l;
-    for(int i = s; i < e; ++i) {
-      final char c = ch[i];
-      if(sb.length() != 0 || Character.isHighSurrogate(c)) {
-        // high surrogates found: store remaining text in default string builder
-        sb.append(c);
-      } else {
-        tb.add(c);
-      }
-    }
+    sb.append(ch, s, l);
   }
 
   @Override
@@ -111,8 +101,9 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
     }
   }
 
-  /** Temporary token builder. */
+  /** Temporary token builder.
   private final TokenBuilder tb = new TokenBuilder();
+   */
   /** Temporary string builder for high surrogates. */
   private final StringBuilder sb = new StringBuilder();
   /** Temporary namespaces. */
@@ -124,16 +115,11 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    */
   private void finishText() throws IOException {
     final boolean sur = sb.length() != 0;
-    if(tb.size() != 0 || sur) {
-      if(sur) {
-        // add string with high surrogates
-        tb.add(token(sb.toString()));
-        sb.setLength(0);
-      }
-      builder.text(tb.finish());
-      tb.reset();
+    if(sb.length() != 0 || sur) {
+      builder.text(token(sb.toString()));
+      sb.setLength(0);
     }
-    for(int i = 0; i < ns.size; ++i) builder.startNS(ns.key[i], ns.val[i]);
+    for(int i = 0; i < ns.size(); ++i) builder.startNS(ns.key(i), ns.value(i));
     ns.reset();
   }
 

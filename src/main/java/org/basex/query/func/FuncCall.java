@@ -19,11 +19,10 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.item.Uri;
+import org.basex.query.item.Type;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenObjMap;
 
@@ -34,11 +33,9 @@ import org.basex.util.hash.TokenObjMap;
  * @author Christian Gruen
  */
 public abstract class FuncCall extends Arr {
-  /** Output namespace. */
-  private static final Uri U_OUTPUT = Uri.uri(OUTPUTURI);
   /** Element: output:serialization-parameter. */
   private static final QNm E_PARAM =
-    new QNm(token("serialization-parameters"), U_OUTPUT);
+    new QNm(token("serialization-parameters"), OUTPUTURI);
   /** Attribute: value. */
   private static final QNm A_VALUE = new QNm(token("value"));
 
@@ -63,7 +60,7 @@ public abstract class FuncCall extends Arr {
     // compile all arguments
     super.comp(ctx);
     // skip context-based or non-deterministic functions, and non-values
-    if(uses(Use.CTX) || uses(Use.NDT) || !values())
+    if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues())
       return optPre(cmp(ctx), ctx);
     // pre-evaluate function
     return optPre(def.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
@@ -87,23 +84,24 @@ public abstract class FuncCall extends Arr {
    * @throws QueryException query exception
    */
   protected final Item atom(final Item it) throws QueryException {
-    return it.node() ? it.type == NodeType.PI || it.type == NodeType.COM ?
-        Str.get(it.atom(input)) : new Atm(it.atom(input)) : it;
+    final Type ip = it.type;
+    return ip.isNode() ? ip == NodeType.PI || ip == NodeType.COM ?
+        Str.get(it.string(input)) : new Atm(it.string(input)) : it;
   }
 
   @Override
-  public final boolean isFun(final Function f) {
+  public final boolean isFunction(final Function f) {
     return def == f;
   }
 
   @Override
-  public final String desc() {
+  public final String description() {
     return def.toString();
   }
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(def.desc));
+    ser.openElement(this, NAM, token(def.desc));
     for(final Expr arg : expr) arg.plan(ser);
     ser.closeElement();
   }
@@ -143,10 +141,10 @@ public abstract class FuncCall extends Arr {
           final AxisIter ai = n.children();
           while((n = ai.next()) != null) {
             final QNm qn = n.qname();
-            if(!qn.uri().eq(U_OUTPUT)) SERUNKNOWN.thrw(fun.input, qn);
+            if(!eq(qn.uri(), OUTPUTURI)) SERUNKNOWN.thrw(fun.input, qn);
             final byte[] val = n.attribute(A_VALUE);
             if(val == null) SERNOVAL.thrw(fun.input);
-            tm.add(qn.ln(), val);
+            tm.add(qn.local(), val);
           }
         }
       }

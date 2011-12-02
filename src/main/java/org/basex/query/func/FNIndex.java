@@ -4,12 +4,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryParser;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Expr.Use;
 import org.basex.query.item.QNm;
 import org.basex.query.util.NSGlobal;
+import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -54,12 +55,14 @@ public final class FNIndex extends TokenSet {
    * @param name function name
    * @param uri function uri
    * @param args optional arguments
-   * @param qp query parser
+   * @param ctx query context
+   * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
   public FuncCall get(final byte[] name, final byte[] uri,
-      final Expr[] args, final QueryParser qp) throws QueryException {
+      final Expr[] args, final QueryContext ctx, final InputInfo ii)
+          throws QueryException {
 
     final int id = id(full(uri, name));
     if(id == 0) return null;
@@ -68,10 +71,10 @@ public final class FNIndex extends TokenSet {
     final Function fl = funcs[id];
     if(!eq(fl.uri(), uri)) return null;
 
-    final FuncCall f = fl.get(qp.input(), args);
-    if(!qp.ctx.xquery3 && f.uses(Use.X30)) qp.error(FEATURE11);
+    final FuncCall f = fl.get(ii, args);
+    if(!ctx.xquery3 && f.uses(Use.X30)) FEATURE30.thrw(ii);
     // check number of arguments
-    if(args.length < fl.min || args.length > fl.max) qp.error(XPARGS, fl);
+    if(args.length < fl.min || args.length > fl.max) XPARGS.thrw(ii, fl);
     return f;
   }
 
@@ -79,26 +82,25 @@ public final class FNIndex extends TokenSet {
    * Throws an error if one of the pre-defined functions is similar to the
    * specified function name.
    * @param name function name
-   * @param qp query parser
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public void error(final QNm name, final QueryParser qp)
-      throws QueryException {
+  public void error(final QNm name, final InputInfo ii) throws QueryException {
 
     // compare specified name with names of predefined functions
-    final byte[] ln = name.ln();
+    final byte[] ln = name.local();
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; ++k) {
       final int i = indexOf(keys[k], '}');
       final byte[] u = substring(keys[k], 1, i);
       final byte[] l = substring(keys[k], i + 1);
       if(eq(ln, l)) {
-        final byte[] ur = name.uri().atom();
-        qp.error(FUNSIMILAR,
+        final byte[] ur = name.uri();
+        FUNSIMILAR.thrw(ii,
             new TokenBuilder(NSGlobal.prefix(ur)).add(':').add(l),
             new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
       } else if(ls.similar(ln, l, 0)) {
-        qp.error(FUNSIMILAR, name.atom(), l);
+        FUNSIMILAR.thrw(ii, name.string(), l);
       }
     }
   }

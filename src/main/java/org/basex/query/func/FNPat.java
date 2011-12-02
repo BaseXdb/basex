@@ -15,7 +15,6 @@ import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.util.RegEx;
@@ -29,18 +28,15 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class FNPat extends FuncCall {
-  /** Function namespace. */
-  private static final Uri U_FN = Uri.uri(FNURI);
-
   /** Root element for the analyze-string-result function. */
   private static final QNm ANALYZE =
-    new QNm(token("fn:analyze-string-result"), U_FN);
+    new QNm(token("fn:analyze-string-result"), FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm MATCH = new QNm(token("fn:match"), U_FN);
+  private static final QNm MATCH = new QNm(token("fn:match"), FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm NONMATCH = new QNm(token("fn:non-match"), U_FN);
+  private static final QNm NONMATCH = new QNm(token("fn:non-match"), FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm MGROUP = new QNm(token("fn:group"), U_FN);
+  private static final QNm MGROUP = new QNm(token("fn:group"), FNURI);
   /** Attribute for the analyze-string-result function. */
   private static final QNm NR = new QNm(token("nr"));
 

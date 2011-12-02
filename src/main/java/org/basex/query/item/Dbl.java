@@ -5,8 +5,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-
-import static org.basex.util.Token.*;
 import static java.lang.Double.isNaN;
 
 /**
@@ -57,8 +55,8 @@ public final class Dbl extends Num {
   }
 
   @Override
-  public byte[] atom(final InputInfo ii) {
-    return token(val);
+  public byte[] string(final InputInfo ii) {
+    return Token.token(val);
   }
 
   @Override
@@ -120,10 +118,10 @@ public final class Dbl extends Num {
       throws QueryException {
 
     try {
-      return Double.parseDouble(string(val));
+      return Double.parseDouble(Token.string(val));
     } catch(final NumberFormatException ex) {
-      if(Token.eq(trim(val), INF)) return Double.POSITIVE_INFINITY;
-      if(Token.eq(trim(val), NINF)) return Double.NEGATIVE_INFINITY;
+      if(Token.eq(Token.trim(val), Token.INF)) return Double.POSITIVE_INFINITY;
+      if(Token.eq(Token.trim(val), Token.NINF)) return Double.NEGATIVE_INFINITY;
       throw ZERO.castErr(val, ii);
     }
   }

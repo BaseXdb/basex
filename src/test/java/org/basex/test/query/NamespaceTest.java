@@ -193,7 +193,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void copy2() throws Exception {
     create(4);
     query(
-        "declare namespace a='aa'; copy $c:=doc('d4') modify () return $c//a:y",
+        "declare namespace a='aa';" +
+        "copy $c:=doc('d4') modify () return $c//a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -205,8 +206,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void copy3() throws Exception {
     create(4);
     query(
-        "declare namespace a='aa'; copy $c:=doc('d4')//a:y " +
-        "modify () return $c",
+        "declare namespace a='aa';" +
+        "copy $c:=doc('d4')//a:y modify () return $c",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
 
@@ -216,8 +217,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void copy4() {
     query(
-        "copy $c := <a xmlns='test'><b><c/></b><d/></a> " +
-        "modify () return $c",
+        "copy $c := <a xmlns='test'><b><c/></b><d/></a> modify () return $c",
         "<a xmlns='test'><b><c/></b><d/></a>");
   }
 
@@ -469,9 +469,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void superfluousPrefixDeclaration() throws BaseXException {
     create(18);
     query(
-        "declare namespace ns='ns'; " +
-        "insert node <b ns:id='0'/> into /n/a",
-        "");
+      "declare namespace ns='ns'; " +
+      "insert node <b ns:id='0'/> into /n/a",
+      "");
     assertEquals(1, CONTEXT.data().ns.numberNSNodes());
   }
 
@@ -481,10 +481,10 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void renameNSCheck1() {
     query(
-        "copy $copy := <a/> " +
-        "modify rename node $copy as QName('uri', 'e') " +
-        "return $copy",
-        "<e xmlns=\"uri\"/>");
+      "copy $copy := <a/> " +
+      "modify rename node $copy as QName('uri', 'e') " +
+      "return $copy",
+      "<e xmlns=\"uri\"/>");
   }
 
   /**
@@ -583,10 +583,42 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void avoidDuplicateNSDeclaration() throws BaseXException {
     create(19);
     query("" +
-        "let $b := <a xmlns:x='X' x:id='0'/> " +
-        "return insert node $b//@*:id into /*:n"
-        , "");
-    assertEquals(1, CONTEXT.data().ns(1).size);
+      "let $b := <a xmlns:x='X' x:id='0'/> " +
+      "return insert node $b//@*:id into /*:n",
+      "");
+    assertEquals(1, CONTEXT.data().ns(1).size());
+  }
+
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes1() {
+    query(
+      "<e xmlns:p='u'>{ <a xmlns:p='u' p:a='v'/>/@* }</e>",
+      "<e xmlns:p='u' p:a='v'/>");
+  }
+
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes2() {
+    query(
+      "<e xmlns:p='u1'>{ <a xmlns:p='u2' p:a='v'/>/@* }</e>",
+      "<e xmlns:p_1='u2' xmlns:p='u1' p_1:a='v'/>");
+  }
+
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes3() {
+    query(
+      "<e xmlns:p='u' xmlns:p1='u1'>{ <a xmlns:p='u1' p:a='v'/>/@* }</e>",
+      "<e xmlns:p1='u1' xmlns:p='u' p1:a='v'/>");
+  }
+
+  /** Handles duplicate prefixes. */
+  @Test
+  public void duplicatePrefixes4() {
+    query(
+      "<e xmlns:p='u' xmlns:p1='u1'>{ <a xmlns:p='u2' p:a='v'/>/@* }</e>",
+      "<e xmlns:p_1='u2' xmlns:p1='u1' xmlns:p='u' p_1:a='v'/>");
   }
 
   /**

@@ -8,11 +8,11 @@ package org.basex.util;
  */
 public final class Atts {
   /** Key array. */
-  public byte[][] key = new byte[1][];
+  private byte[][] key = new byte[1][];
   /** Value array. */
-  public byte[][] val = new byte[1][];
+  private byte[][] val = new byte[1][];
   /** Current array size. */
-  public int size;
+  private int size;
 
   /**
    * Adds the next key/value pair.
@@ -50,13 +50,57 @@ public final class Atts {
   }
 
   /**
-   * Returns the reference for the specified key.
+   * Returns the offset to the specified key.
    * @param k key to be found
-   * @return reference or -1
+   * @return offset or -1
    */
   public int get(final byte[] k) {
     for(int i = 0; i < size; ++i) if(Token.eq(key[i], k)) return i;
     return -1;
+  }
+
+  /**
+   * Returns the key at the specified index position.
+   * @param i index
+   * @return key
+   */
+  public byte[] key(final int i) {
+    return key[i];
+  }
+
+  /**
+   * Returns the value at the specified index position.
+   * @param i index
+   * @return key
+   */
+  public byte[] value(final int i) {
+    return val[i];
+  }
+
+  /**
+   * Returns the value for the specified key, or {@code null}.
+   * @param k key to be found
+   * @return offset or -1
+   */
+  public byte[] value(final byte[] k) {
+    final int i = get(k);
+    return i == -1 ? null : val[i];
+  }
+
+  /**
+   * Returns the number of attributes.
+   * @return number of attributes
+   */
+  public int size() {
+    return size;
+  }
+
+  /**
+   * Sets the number of attributes.
+   * @param s number of attributes
+   */
+  public void size(final int s) {
+    size = s;
   }
 
   /**

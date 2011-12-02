@@ -135,14 +135,14 @@ public abstract class Date extends Item {
   protected final void calc(final Dur a, final boolean p, final InputInfo ii)
       throws QueryException {
 
-    if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.atom(ii));
+    if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.string(ii));
     final Duration dur = a.toJava();
     xc.add(p ? dur : dur.negate());
     if(xc.getYear() == 0) xc.setYear(p ^ dur.getSign() < 0 ? 1 : -1);
   }
 
   @Override
-  public final byte[] atom(final InputInfo ii) {
+  public final byte[] string(final InputInfo ii) {
     String str = xc.toXMLFormat();
     str = str.replaceAll("\\.0+(Z|-.*|\\+.*)?$", "$1");
     str = str.replaceAll("(\\.\\d+?)0+(Z|-.*|\\+.*)?$", "$1$2");
@@ -153,7 +153,7 @@ public abstract class Date extends Item {
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
     final long d1 = days();
-    final Date d = (Date) (it.date() ? it : type.e(it, null, ii));
+    final Date d = (Date) (it.type.isDate() ? it : type.e(it, null, ii));
     final long d2 = d.days();
     return d1 == d2 && seconds().doubleValue() == d.seconds().doubleValue();
   }
@@ -161,7 +161,7 @@ public abstract class Date extends Item {
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     final long d1 = days();
-    final Date d = (Date) (it.date() ? it : type.e(it, null, ii));
+    final Date d = (Date) (it.type.isDate() ? it : type.e(it, null, ii));
     final long d2 = d.days();
     if(d1 != d2) return (int) (d1 - d2);
     return seconds().subtract(d.seconds()).signum();
@@ -235,6 +235,6 @@ public abstract class Date extends Item {
 
   @Override
   public final String toString() {
-    return Util.info("\"%\"", atom(null));
+    return Util.info("\"%\"", string(null));
   }
 }

@@ -42,7 +42,7 @@ public final class BaseFuncCall extends UserFuncCall {
         fun = c.getFunc();
         args = c.getArgs();
       } finally {
-        ctx.vars.reset(s);
+        ctx.vars.size(s);
       }
     } while(true);
   }
@@ -62,7 +62,7 @@ public final class BaseFuncCall extends UserFuncCall {
         fun = c.getFunc();
         args = c.getArgs();
       } finally {
-        ctx.vars.reset(s);
+        ctx.vars.size(s);
       }
     } while(true);
   }

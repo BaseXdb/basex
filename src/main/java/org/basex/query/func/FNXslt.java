@@ -25,7 +25,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Uri;
+import org.basex.query.item.Type;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
@@ -39,10 +39,8 @@ import org.basex.util.hash.TokenObjMap;
  * @author Christian Gruen
  */
 public final class FNXslt extends FuncCall {
-  /** Util namespace. */
-  private static final Uri U_XSLT = Uri.uri(XSLTURI);
   /** Element: parameters. */
-  private static final QNm E_PARAM = new QNm(token("parameters"), U_XSLT);
+  private static final QNm E_PARAM = new QNm(token("parameters"), XSLTURI);
 
   /** XSLT implementations. */
   private static final String[] IMPL = {
@@ -145,8 +143,8 @@ public final class FNXslt extends FuncCall {
     final AxisIter ai = node.children();
     while((node = ai.next()) != null) {
       final QNm qn = node.qname();
-      if(!qn.uri().eq(U_XSLT)) PARWHICH.thrw(input, qn);
-      tm.add(qn.ln(), node.children().next());
+      if(!eq(qn.uri(), XSLTURI)) PARWHICH.thrw(input, qn);
+      tm.add(qn.local(), node.children().next());
     }
     return tm;
   }
@@ -160,16 +158,17 @@ public final class FNXslt extends FuncCall {
    * @throws Exception exception
    */
   private IO read(final Expr e, final QueryContext ctx) throws Exception {
-    final Item in = checkEmpty(e.item(ctx, input));
-    if(in.node()) {
+    final Item it = checkEmpty(e.item(ctx, input));
+    final Type ip = it.type;
+    if(ip.isNode()) {
       final ArrayOutput ao = new ArrayOutput();
       final Serializer ser = Serializer.get(ao);
-      in.serialize(ser);
+      it.serialize(ser);
       ser.close();
       return new IOContent(ao.toArray());
     }
-    if(in.str()) return IO.get(string(in.atom(input)));
-    throw STRNODTYPE.thrw(input, this, in.type);
+    if(ip.isString()) return IO.get(string(it.string(input)));
+    throw STRNODTYPE.thrw(input, this, ip);
   }
 
   @Override

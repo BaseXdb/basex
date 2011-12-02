@@ -76,6 +76,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("%(%)", name(), base);
+    return Util.info("%(%)", info(), base);
   }
 }

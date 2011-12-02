@@ -5,7 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
-import org.basex.query.item.ItrSeq;
+import org.basex.query.item.IntSeq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.item.SeqType.Occ;
@@ -51,7 +51,7 @@ public final class List extends Arr {
     boolean v = true;
     for(final Expr e : expr) {
       // check if all expressions are values
-      v &= e.value();
+      v &= e.isValue();
       // skip expression that will not add any results
       if(e.size() == 0) continue;
       // evaluate sequence type
@@ -62,8 +62,8 @@ public final class List extends Arr {
     }
 
     // return cached integer sequence, cached values or self reference
-    return v ? type.type.instance(AtomType.ITR) ?
-        optPre(ItrSeq.get(expr, size, type.type), ctx) :
+    return v ? type.type.instanceOf(AtomType.ITR) ?
+        optPre(IntSeq.get(expr, size, type.type), ctx) :
         optPre(value(ctx), ctx) : this;
   }
 
@@ -96,8 +96,8 @@ public final class List extends Arr {
   }
 
   @Override
-  public boolean vacuous() {
-    for(final Expr e : expr) if(!e.vacuous()) return false;
+  public boolean isVacuous() {
+    for(final Expr e : expr) if(!e.isVacuous()) return false;
     return true;
   }
 

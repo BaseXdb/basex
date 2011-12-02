@@ -17,11 +17,12 @@ import org.basex.query.item.FItem;
 import org.basex.query.item.Flt;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.MapType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
@@ -38,7 +39,7 @@ import org.basex.util.hash.TokenObjMap;
  * @author Leo Woerteler
  */
 public final class Map extends FItem {
-  /** the empty map. */
+  /** The empty map. */
   public static final Map EMPTY = new Map(TrieNode.EMPTY);
   /** Number of bits per level, maximum is 5 because {@code 1 << 5 == 32}. */
   static final int BITS = 5;
@@ -48,7 +49,7 @@ public final class Map extends FItem {
   /** Key sequence. */
   private Value keys;
   /** Size. */
-  private Itr size;
+  private Int size;
 
   /**
    * Constructor.
@@ -84,16 +85,16 @@ public final class Map extends FItem {
    */
   private Item key(final Item it, final InputInfo ii) throws QueryException {
     // no empty sequence allowed
-    if(it == null) throw XPEMPTY.thrw(ii, desc());
+    if(it == null) throw XPEMPTY.thrw(ii, description());
 
     // function items can't be keys
-    if(it instanceof FItem) throw FNATM.thrw(ii, it.desc());
+    if(it instanceof FItem) throw FNATM.thrw(ii, it.description());
 
     // NaN can't be stored as key, as it isn't equal to anything
     if(it == Flt.NAN || it == Dbl.NAN) return null;
 
     // untyped items are converted to strings
-   return it.type.unt() ? Str.get(it.atom(ii)) : it;
+   return it.type.isUntyped() ? Str.get(it.string(ii)) : it;
   }
 
   /**
@@ -193,8 +194,8 @@ public final class Map extends FItem {
    * Number of values contained in this map.
    * @return size
    */
-  public Itr mapSize() {
-    if(size == null) size = Itr.get(root.size);
+  public Int mapSize() {
+    if(size == null) size = Int.get(root.size);
     return size;
   }
 
@@ -242,8 +243,9 @@ public final class Map extends FItem {
     final TokenObjMap<Object> tm = new TokenObjMap<Object>();
     final ValueIter vi = keys().iter();
     for(Item k; (k = vi.next()) != null;) {
-      if(!k.str()) FUNCMP.thrw(ii, desc(), AtomType.STR, k.type);
-      tm.add(k.atom(null), get(k, ii).toJava());
+      final Type kt = k.type;
+      if(!kt.isString()) FUNCMP.thrw(ii, description(), AtomType.STR, kt);
+      tm.add(k.string(null), get(k, ii).toJava());
     }
     return tm;
   }
@@ -264,7 +266,7 @@ public final class Map extends FItem {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return MAPSTR + BRACE1 + DOTS + BRACE2;
   }
 
@@ -277,7 +279,7 @@ public final class Map extends FItem {
       for(long i = 0, max = Math.min(s, 5); i < max; i++) {
         final Item key = ks.itemAt(i);
         final Value val = get(key, null);
-        ser.openElement(ENTRY, KEY, key.atom(null));
+        ser.openElement(ENTRY, KEY, key.string(null));
         val.plan(ser);
         ser.closeElement();
       }

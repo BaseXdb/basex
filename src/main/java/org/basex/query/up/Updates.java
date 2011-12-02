@@ -157,7 +157,7 @@ public final class Updates {
 
     // determine highest ancestor node
     ANode anc = target;
-    final AxisIter it = target.anc();
+    final AxisIter it = target.ancestor();
     for(ANode p; (p = it.next()) != null;) anc = p;
 
     /* See if this ancestor has already been added to the pending update list.

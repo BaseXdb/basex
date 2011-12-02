@@ -49,7 +49,7 @@ public final class DynFuncCall extends Arr {
     }
 
     // maps can only contain fully evaluated Values, so this is safe
-    if(values() && f instanceof Map)
+    if(allAreValues() && f instanceof Map)
       return optPre(value(ctx), ctx);
 
     return this;
@@ -92,7 +92,7 @@ public final class DynFuncCall extends Arr {
   private FItem getFun(final QueryContext ctx) throws QueryException {
     final int ar = expr.length - 1;
     final Item it = checkItem(expr[ar], ctx);
-    if(!it.func()) throw Err.type(this, FuncType.arity(ar), it);
+    if(!it.type.isFunction()) throw Err.type(this, FuncType.arity(ar), it);
     final FItem fit = (FItem) it;
     if(fit.arity() != ar) throw INVARITY.thrw(input, fit, ar);
     return fit;
@@ -107,8 +107,8 @@ public final class DynFuncCall extends Arr {
   }
 
   @Override
-  public String desc() {
-    return expr[expr.length - 1].desc() + "(...)";
+  public String description() {
+    return expr[expr.length - 1].description() + "(...)";
   }
 
   @Override

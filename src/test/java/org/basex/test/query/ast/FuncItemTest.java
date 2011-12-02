@@ -61,4 +61,22 @@ public final class FuncItemTest extends QueryPlanTest {
         "  $f instance of element(FuncItem)"
     );
   }
+
+  /** Checks if {@code fold-left1(...)} can be used. */
+  @Test
+  public void foldLeft1Test() {
+    check("hof:fold-left1(function($a, $b) { max(($a, $b)) }, 1 to 42)",
+        "42"
+    );
+  }
+
+  /** Checks if statically unused functions are compiled at runtime. */
+  @Test
+  public void compStatUnusedTest() {
+    check("declare function local:foo() { abs(?) };" +
+        "function-lookup(xs:QName('local:foo'), 0)()(-42)",
+        "42",
+        "exists(//PartFunApp)"
+    );
+  }
 }

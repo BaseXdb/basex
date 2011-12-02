@@ -102,7 +102,7 @@ public final class Var extends ParseExpr {
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
-    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(input, desc());
+    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(input, description());
   }
 
   @Override
@@ -121,7 +121,8 @@ public final class Var extends ParseExpr {
       throws QueryException {
 
     type = t;
-    if(value != null && !value.type.instance(t.type) && value instanceof Item) {
+    if(value != null && !value.type.instanceOf(t.type) &&
+        value instanceof Item) {
       value = type.type.e((Item) value, ctx, input);
     }
   }
@@ -135,7 +136,7 @@ public final class Var extends ParseExpr {
    */
   public Var bind(final Expr e, final QueryContext ctx) throws QueryException {
     expr = e;
-    return e.value() ? bind((Value) e, ctx) : this;
+    return e.isValue() ? bind((Value) e, ctx) : this;
   }
 
   /**
@@ -266,7 +267,7 @@ public final class Var extends ParseExpr {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
-      tb.add(DOLLAR).add(name.atom());
+      tb.add(DOLLAR).add(name.string());
       if(type != null) tb.add(" " + AS);
     }
     if(type != null) tb.add(" " + type);

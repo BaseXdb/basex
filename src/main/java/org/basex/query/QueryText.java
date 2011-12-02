@@ -226,6 +226,10 @@ public interface QueryText {
   /** Parser token. */
   String SCHEMA = "schema";
   /** Parser token. */
+  String SCHEMAATTRIBUTE = "schema-attribute";
+  /** Parser token. */
+  String SCHEMAELEMENT = "schema-element";
+  /** Parser token. */
   String SCORE = "score";
   /** Parser token. */
   String SENSITIVE = "sensitive";
@@ -360,8 +364,6 @@ public interface QueryText {
   /** Parser token. */
   String DOLLAR = "$";
   /** Parser token. */
-  String HASH = "#";
-  /** Parser token. */
   String DOT2 = "..";
   /** Parser token. */
   String IS = "=";
@@ -406,6 +408,8 @@ public interface QueryText {
   byte[] ELINENUM = token("line-number");
   /** Error token. */
   byte[] ECOLNUM = token("column-number");
+  /** Error token. */
+  byte[] EADD = token("additional");
 
   /** Error prefix. */
   byte[] ERR = token("err");
@@ -413,6 +417,8 @@ public interface QueryText {
   byte[] FN = token("fn");
   /** Math token. */
   byte[] MATH = token("math");
+  /** Option token. */
+  byte[] OPT = token("opt");
   /** Output token. */
   byte[] OUTPUT = token("output");
   /** BaseX token. */
@@ -477,6 +483,8 @@ public interface QueryText {
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
   /** Map URI. */
   byte[] MAPURI = token(W3URI + "/2005/xpath-functions/map");
+  /** Option URI. */
+  byte[] OPTIONURI = token(W3URI + "/2011/xquery-options");
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
@@ -526,7 +534,7 @@ public interface QueryText {
   /** Separator. */
   String SEP = ", ";
   /** Dots. */
-  String DOTS = Text.DOTS;
+  String DOTS = "...";
   /** Query Plan. */
   String ARG = "arg";
   /** Query Plan. */

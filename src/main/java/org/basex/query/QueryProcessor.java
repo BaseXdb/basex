@@ -90,8 +90,8 @@ public final class QueryProcessor extends Progress {
    */
   public void parse() throws QueryException {
     if(parsed) return;
-    parsed = true;
     ctx.parse(query);
+    parsed = true;
   }
 
   /**
@@ -101,8 +101,8 @@ public final class QueryProcessor extends Progress {
   public void compile() throws QueryException {
     parse();
     if(compiled) return;
-    compiled = true;
     ctx.compile();
+    compiled = true;
   }
 
   /**
@@ -274,7 +274,7 @@ public final class QueryProcessor extends Progress {
     }
     // close all database connections
     ctx.resource.close();
-    ctx.jdbc.close();
+    if(ctx.jdbc != null) ctx.jdbc.close();
   }
 
   /**
@@ -291,23 +291,6 @@ public final class QueryProcessor extends Progress {
    */
   public String info() {
     return ctx.info();
-  }
-
-  /**
-   * Checks if the specified query performs updates.
-   * @param ctx database context
-   * @param qu query string
-   * @return result of check
-   */
-  public static boolean updating(final Context ctx, final String qu) {
-    // keyword found; parse query to get sure
-    try {
-      final QueryProcessor qp = new QueryProcessor(qu, ctx);
-      qp.parse();
-      return qp.ctx.updating;
-    } catch(final QueryException ex) {
-      return true;
-    }
   }
 
   /**

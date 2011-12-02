@@ -27,7 +27,7 @@ public final class Concat extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(values()) return optPre(item(ctx, input), ctx);
+    if(allAreValues()) return optPre(item(ctx, input), ctx);
     type = AtomType.STR.seq();
     size = 1;
     return this;
@@ -40,7 +40,7 @@ public final class Concat extends Arr {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
       final Item it = a.item(ctx, input);
-      if(it != null) tb.add(it.atom(input));
+      if(it != null) tb.add(it.string(input));
     }
     return Str.get(tb.finish());
   }

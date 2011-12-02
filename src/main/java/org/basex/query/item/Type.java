@@ -41,65 +41,65 @@ public interface Type {
   // PUBLIC AND STATIC METHODS ================================================
 
   /**
-   * Checks if the specified type is an instance of the current type.
+   * Checks if the current type is an instance of the specified type.
    * @param t type to be checked
    * @return result of check
    */
-  boolean instance(final Type t);
+  boolean instanceOf(final Type t);
 
   /**
    * Checks if the type refers to a node.
    * @return result of check
    */
-  boolean node();
+  boolean isNode();
 
   /**
    * Checks if the type refers to a number.
    * @return result of check
    */
-  boolean num();
+  boolean isNumber();
 
   /**
-   * Checks if the type refers to an untyped value.
+   * Checks if the type refers to an untyped item.
    * @return result of check
    */
-  boolean unt();
+  boolean isUntyped();
 
   /**
-   * Checks if the type refers to a string.
+   * Checks if the type refers to an {@code xs:string} or one of its sub-types.
    * @return result of check
    */
-  boolean str();
+  boolean isString();
 
   /**
-   * Checks if the type refers to a duration.
+   * Checks if the type refers to a {@code xs:duration} or one of its sub-types.
    * @return result of check
    */
-  boolean dur();
+  boolean isDuration();
 
   /**
-   * Checks if the type refers to a date.
+   * Checks if the type refers to a {@code date} or one of its sub-types.
    * @return result of check
    */
-  boolean dat();
+  boolean isDate();
 
   /**
    * Checks if the type refers to a function item.
    * @return result of check
    */
-  boolean func();
+  boolean isFunction();
 
   /**
-   * Checks if the type refers to a function item.
+   * Checks if the type refers to a map.
    * @return result of check
    */
-  boolean map();
+  boolean isMap();
 
   /**
-   * Returns the name of this type.
+   * Returns the string representation of this type.
    * @return name
    */
-  byte[] nam();
+  byte[] string();
 
   /**
    * Returns a type id to differentiate all types.

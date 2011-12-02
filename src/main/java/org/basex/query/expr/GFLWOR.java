@@ -90,7 +90,7 @@ public class GFLWOR extends ParseExpr {
       final ForLet flt = fl[f];
       flt.comp(ctx);
       // bind variable if it contains a value or occurs only once
-      if(flt.expr.value() || count(flt.var, f) == 1) flt.bind(ctx);
+      if(flt.expr.isValue() || count(flt.var, f) == 1) flt.bind(ctx);
 
       /* ...or if all inner clauses return only one item. This rewriting would
        * disallow repeated evaluations of the same expression, but it prevents
@@ -105,12 +105,12 @@ public class GFLWOR extends ParseExpr {
     boolean empty = false;
     if(where != null) {
       where = checkUp(where, ctx).comp(ctx).compEbv(ctx);
-      if(where.value()) {
+      if(where.isValue()) {
         // test is always false: no results
         empty = !where.ebv(ctx, input).bool(input);
         if(!empty) {
           // always true: test can be skipped
-          ctx.compInfo(OPTREMOVE, desc(), where);
+          ctx.compInfo(OPTREMOVE, description(), where);
           where = null;
         }
       }
@@ -119,12 +119,12 @@ public class GFLWOR extends ParseExpr {
     if(group != null) group.comp(ctx);
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
-    ctx.vars.reset(vs);
+    ctx.vars.size(vs);
     ctx.grouping = grp;
 
     // remove FLWOR expression if WHERE clause always returns false
     if(empty) {
-      ctx.compInfo(OPTREMOVE, desc(), where);
+      ctx.compInfo(OPTREMOVE, description(), where);
       return Empty.SEQ;
     }
     // check if return always yields an empty sequence
@@ -289,14 +289,14 @@ public class GFLWOR extends ParseExpr {
     }
     if(group != null) group.init(order);
     iter(ctx, iter, 0, keys, vals);
-    ctx.vars.reset(vs);
+    ctx.vars.size(vs);
 
     for(final ForLet f : fl) ctx.vars.add(f.var);
 
     // order != null, otherwise it would have been handled in group
     final Iter ir = group != null ?
         group.gp.ret(ctx, ret, keys, vals) : ctx.iter(order.set(keys, vals));
-    ctx.vars.reset(vs);
+    ctx.vars.size(vs);
     return ir;
   }
 

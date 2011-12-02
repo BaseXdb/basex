@@ -112,7 +112,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.promote(v, ctx, ii) : v;
     } finally {
       ctx.value = cv;
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     }
   }
 
@@ -139,7 +139,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.cast(it, expr, false, ctx, ii) : it;
     } finally {
       ctx.value = cv;
-      ctx.vars.reset(s);
+      ctx.vars.size(s);
     }
   }
 
@@ -188,7 +188,7 @@ public final class FuncItem extends FItem {
       final InputInfo ii) throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
-    return type.instance(ft) ? this : FuncItem.coerce(ctx, ii, this, ft);
+    return type.instanceOf(ft) ? this : FuncItem.coerce(ctx, ii, this, ft);
   }
 
   @Override

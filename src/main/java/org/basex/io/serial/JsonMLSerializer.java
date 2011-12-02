@@ -44,7 +44,7 @@ public final class JsonMLSerializer extends OutputSerializer {
     }
     print('[');
     print('"');
-    for(final byte ch : ln(name)) code(ch);
+    for(final byte ch : local(name)) code(ch);
     print('"');
     att = false;
   }

@@ -58,7 +58,7 @@ public class FTContains extends ParseExpr {
     expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
     lex = new FTLexer(new FTOpt());
     ftexpr = ftexpr.comp(ctx);
-    return expr.empty() ? optPre(Bln.FALSE, ctx) : this;
+    return expr.isEmpty() ? optPre(Bln.FALSE, ctx) : this;
   }
 
   @Override
@@ -71,7 +71,7 @@ public class FTContains extends ParseExpr {
 
     ctx.fttoken = lex;
     for(Item it; (it = iter.next()) != null;) {
-      lex.init(it.atom(input));
+      lex.init(it.string(input));
       final FTNode item = ftexpr.item(ctx, input);
       double d = 0;
       if(item.all.matches()) {

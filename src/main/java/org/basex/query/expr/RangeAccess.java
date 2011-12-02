@@ -17,7 +17,6 @@ import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -67,8 +66,8 @@ public final class RangeAccess extends Simple {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, DATA, token(ictx.data.meta.name),
-        MIN, Token.token(ind.min), MAX, Token.token(ind.max),
-        TYP, Token.token(ind.ind.toString()));
+        MIN, token(ind.min), MAX, token(ind.max),
+        TYP, token(ind.ind.toString()));
   }
 
   @Override

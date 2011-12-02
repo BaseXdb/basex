@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
@@ -48,7 +47,7 @@ public final class WesternTokenizer extends Tokenizer {
   private boolean pa;
 
   /** Text. */
-  private byte[] text = Token.EMPTY;
+  private byte[] text = EMPTY;
   /** Current sentence. */
   private int sent;
   /** Current paragraph. */

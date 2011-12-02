@@ -1,13 +1,18 @@
 package org.basex.io;
 
+import static org.basex.core.Text.*;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.regex.Pattern;
 
+import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
+import org.basex.util.Util;
 import org.basex.util.list.ByteList;
 import org.xml.sax.InputSource;
 
@@ -29,8 +34,7 @@ public final class IOUrl extends IO {
   @Override
   public byte[] read() throws IOException {
     final ByteList bl = new ByteList();
-    final BufferedInputStream bis = new BufferedInputStream(
-        new URL(path).openStream());
+    final BufferedInputStream bis = new BufferedInputStream(inputStream());
     try {
       for(int b; (b = bis.read()) != -1;) bl.add(b);
     } finally {
@@ -46,7 +50,23 @@ public final class IOUrl extends IO {
 
   @Override
   public BufferInput buffer() throws IOException {
-    return new BufferInput(new URL(path).openStream());
+    return new BufferInput(inputStream());
+  }
+
+  /**
+   * Returns the input stream.
+   * @return input stream
+   * @throws IOException I/O exception
+   */
+  private InputStream inputStream() throws IOException {
+    final URL url = new URL(path);
+    try {
+      return url.openStream();
+    } catch(final RuntimeException ex) {
+      // catch unexpected runtime exceptions
+      Util.debug(ex);
+      throw new BaseXException(PARSEERR, path);
+    }
   }
 
   @Override

@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.api.dom.BXAttr;
 import org.basex.api.dom.BXComm;
@@ -16,6 +15,8 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 import org.w3c.dom.Attr;
@@ -79,7 +80,7 @@ public enum NodeType implements Type {
       // document fragment
       final DocumentFragment df = (DocumentFragment) o;
       final String bu = df.getBaseURI();
-      return new FDoc(df, bu != null ? token(bu) : EMPTY);
+      return new FDoc(df, bu != null ? Token.token(bu) : Token.EMPTY);
     }
   },
 
@@ -101,52 +102,55 @@ public enum NodeType implements Type {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
         new FComm((Comment) o);
     }
-  };
+  },
+
+  /** Namespace type. */
+  NSP("namespace-node", NOD);
 
   /** String representation. */
-  private final byte[] nam;
+  private final byte[] string;
   /** Parent type. */
   private final Type par;
   /** Sequence type. */
   private SeqType seq;
 
   @Override
-  public final boolean node() {
+  public final boolean isNode() {
     return true;
   }
 
   @Override
-  public boolean dat() {
+  public boolean isNumber() {
     return false;
   }
 
   @Override
-  public boolean dur() {
+  public boolean isString() {
     return false;
   }
 
   @Override
-  public boolean num() {
-    return false;
-  }
-
-  @Override
-  public boolean str() {
-    return false;
-  }
-
-  @Override
-  public boolean unt() {
+  public boolean isUntyped() {
     return true;
   }
 
   @Override
-  public final boolean func() {
+  public boolean isDuration() {
     return false;
   }
 
   @Override
-  public final boolean map() {
+  public boolean isDate() {
+    return false;
+  }
+
+  @Override
+  public final boolean isFunction() {
+    return false;
+  }
+
+  @Override
+  public final boolean isMap() {
     return false;
   }
 
@@ -168,7 +172,7 @@ public enum NodeType implements Type {
    * @param pr parent type
    */
   private NodeType(final String nm, final Type pr) {
-    nam = token(nm);
+    string = Token.token(nm);
     par = pr;
   }
 
@@ -195,8 +199,8 @@ public enum NodeType implements Type {
   // PUBLIC AND STATIC METHODS ================================================
 
   @Override
-  public final boolean instance(final Type t) {
-    return this == t || par != null && par.instance(t);
+  public final boolean instanceOf(final Type t) {
+    return this == t || par != null && par.instanceOf(t);
   }
 
   /**
@@ -205,10 +209,11 @@ public enum NodeType implements Type {
    * @return type or {@code null}
    */
   public static NodeType find(final QNm type) {
-    final byte[] ln = type.ln();
-    final byte[] uri = type.uri().atom();
-    for(final NodeType t : values()) {
-      if(eq(ln, t.nam) && eq(uri, EMPTY)) return t;
+    if(type.uri().length == 0) {
+      final byte[] ln = type.local();
+      for(final NodeType t : values()) {
+        if(Token.eq(ln, t.string)) return t;
+      }
     }
     return null;
   }
@@ -220,11 +225,11 @@ public enum NodeType implements Type {
 
   @Override
   public String toString() {
-    return string(nam) + "()";
+    return new TokenBuilder(string).add("()").toString();
   }
 
   @Override
-  public byte[] nam() {
-    return nam;
+  public byte[] string() {
+    return string;
   }
 }

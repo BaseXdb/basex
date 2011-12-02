@@ -28,7 +28,7 @@ public final class InterSect extends Set {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return oneEmpty() ? optPre(null, ctx) : this;
+    return oneIsEmpty() ? optPre(null, ctx) : this;
   }
 
   @Override

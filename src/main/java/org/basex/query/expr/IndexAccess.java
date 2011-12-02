@@ -60,7 +60,7 @@ public final class IndexAccess extends Single {
       final NodeIter[] tmp = new NodeIter[s + 1];
       System.arraycopy(iter, 0, tmp, 0, s);
       iter = tmp;
-      iter[s] = index(it.atom(input));
+      iter[s] = index(it.string(input));
     }
     return iter.length == 0 ? new NodeCache() : iter.length == 1 ? iter[0] :
       new Union(input, expr).eval(iter);

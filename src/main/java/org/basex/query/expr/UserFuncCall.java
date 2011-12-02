@@ -82,6 +82,14 @@ public abstract class UserFuncCall extends Arr {
     func = f;
   }
 
+  /**
+   * Getter for the called function.
+   * @return user-defined function
+   */
+  public final UserFunc func() {
+    return func;
+  }
+
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     // compile all arguments
@@ -92,10 +100,10 @@ public abstract class UserFuncCall extends Arr {
     // return expressions are supported; otherwise, recursive functions
     // might not be correctly evaluated
     func.comp(ctx);
-    if(func.expr.value() && values() && !func.uses(Use.NDT)) {
+    if(func.expr.isValue() && allAreValues() && !func.uses(Use.NDT)) {
       // evaluate arguments to catch cast exceptions
       for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
-      ctx.compInfo(OPTINLINE, func.name.atom());
+      ctx.compInfo(OPTINLINE, func.name.string());
       return func.value(ctx);
     }
     // user-defined functions are not pre-evaluated to avoid various issues
@@ -145,13 +153,13 @@ public abstract class UserFuncCall extends Arr {
   }
 
   @Override
-  public String desc() {
+  public String description() {
     return FUNC;
   }
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.atom()).add(PAR1).add(
+    return new TokenBuilder(name.string()).add(PAR1).add(
         toString(SEP)).add(PAR2).toString();
   }
 }

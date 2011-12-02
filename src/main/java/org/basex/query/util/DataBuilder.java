@@ -8,14 +8,11 @@ import org.basex.data.MemData;
 import org.basex.query.QueryContext;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Value;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.Atts;
-import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -34,7 +31,7 @@ public final class DataBuilder {
   /** Preserve flag. */
   private boolean preserve = true;
   /** Inherit flag. */
-  private final boolean inherit = true;
+  private boolean inherit = true;
 
   /**
    * Constructor.
@@ -51,7 +48,7 @@ public final class DataBuilder {
    */
   public DataBuilder context(final QueryContext ctx) {
     preserve = ctx.nsPreserve;
-    //inherit = ctx.nsInherit;
+    inherit = ctx.nsInherit;
     return this;
   }
 
@@ -62,31 +59,11 @@ public final class DataBuilder {
    * @param len length of extract
    * @return self reference
    */
-  private DataBuilder ftpos(final byte[] tag, final FTPosData pos,
+  public DataBuilder ftpos(final byte[] tag, final FTPosData pos,
       final int len) {
     ftbuilder = new DataFTBuilder(pos, len);
     marker = data.tagindex.index(tag, null, false);
     return this;
-  }
-
-  /**
-   * Marks the full-text terms in the specified node and returns the new nodes.
-   * @param node input node
-   * @param tag tag name
-   * @param len length of extract
-   * @param ctx query context
-   * @return resulting value
-   */
-  public static Value mark(final ANode node, final byte[] tag,
-      final int len, final QueryContext ctx) {
-
-    // copy node to main memory data instance
-    final MemData md = new MemData(ctx.context.prop);
-    new DataBuilder(md).ftpos(tag, ctx.ftpos, len).build(node);
-
-    final IntList il = new IntList();
-    for(int p = 0; p < md.meta.size; p += md.size(p, md.kind(p))) il.add(p);
-    return DBNodeSeq.get(il, md, false, false);
   }
 
   /**
@@ -118,7 +95,7 @@ public final class DataBuilder {
   private int addNode(final ANode nd, final int pre, final int par,
       final ANode ndPar) {
 
-    switch(nd.ndType()) {
+    switch(nd.nodeType()) {
       case DOC: return addDoc(nd, pre);
       case ELM: return addElem(nd, pre, par, ndPar);
       case TXT: return pre + addText(nd, pre, par, ndPar);
@@ -155,16 +132,16 @@ public final class DataBuilder {
   private int addAttr(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
     final QNm q = nd.qname();
-    final byte[] uri = q.uri().atom();
+    final byte[] uri = q.uri();
     int u = 0;
     final boolean ne = uri.length != 0;
     if(ne) {
-      if(par == 0) data.ns.add(ms, pre - par, q.pref(), uri);
+      if(par == 0) data.ns.add(ms, pre - par, q.prefix(), uri);
       u = data.ns.addURI(uri);
     }
-    final int n = data.atnindex.index(q.atom(), null, false);
+    final int n = data.atnindex.index(q.string(), null, false);
     // attribute namespace flag is only set in main memory instance
-    data.attr(ms, pre - par, n, nd.atom(), u, ne);
+    data.attr(ms, pre - par, n, nd.string(), u, ne);
     data.insert(ms);
     return 1;
   }
@@ -183,10 +160,10 @@ public final class DataBuilder {
     // check full-text mode
     final int dist = pre - par;
     final TokenList tl = ftbuilder != null ? ftbuilder.build(nd) : null;
-    if(tl == null) return addText(nd.atom(), dist);
+    if(tl == null) return addText(nd.string(), dist);
 
     // adopt namespace from parent
-    final int u = ndPar != null ? data.ns.uri(ndPar.nname(), true) : 0;
+    final int u = ndPar != null ? data.ns.uri(ndPar.name(), true) : 0;
 
     for(int i = 0; i < tl.size(); i++) {
       byte[] text = tl.get(i);
@@ -224,7 +201,7 @@ public final class DataBuilder {
    */
   private int addPI(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
-    final byte[] v = trim(concat(nd.nname(), SPACE, nd.atom()));
+    final byte[] v = trim(concat(nd.name(), SPACE, nd.string()));
     data.text(ms, pre - par, v, Data.PI);
     data.insert(ms);
     return 1;
@@ -239,7 +216,7 @@ public final class DataBuilder {
    */
   private int addComm(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
-    data.text(ms, pre - par, nd.atom(), Data.COMM);
+    data.text(ms, pre - par, nd.string(), Data.COMM);
     data.insert(ms);
     return 1;
   }
@@ -260,43 +237,42 @@ public final class DataBuilder {
     data.ns.open();
     boolean ne = false;
 
-    // [LK] Namespaces: copy-namespaces no-preserve
-    // best way to determine necessary descendant ns bindings?
+    // best way to determine necessary descendant namespace bindings?
     Atts ns = null;
     if(!preserve) {
-      ns = nd.ns();
+      ns = nd.namespaces();
       // detect default namespace bindings on ancestor axis of nd and
       // remove them to avoid duplicates
-      final Atts ns2 = nd.nsScope(inherit);
+      final Atts ns2 = inherit ? nd.nsScope() : nd.namespaces();
       int uid;
-      if((uid = ns2.get(EMPTY)) != -1) ns.add(ns2.key[uid], ns2.val[uid]);
+      if((uid = ns2.get(EMPTY)) != -1) ns.add(ns2.key(uid), ns2.value(uid));
     } else {
-      ns = par == 0 ? nd.nsScope(inherit) : nd.ns();
+      ns = par == 0 && inherit ? nd.nsScope() : nd.namespaces();
     }
 
     if(ns != null) {
-      if(ns.size > 0 && ndPar != null && preserve) {
+      if(ns.size() > 0 && ndPar != null && preserve) {
         // remove duplicate namespace bindings
-        final Atts nsPar = ndPar.nsScope(inherit);
-        for(int j = 0; j < nsPar.size; ++j) {
-          final byte[] key = nsPar.key[j];
-          final int ki = ns.get(key);
+        final Atts nsPar = inherit ? nd.nsScope() : nd.namespaces();
+        for(int j = 0; j < nsPar.size(); ++j) {
+          //final byte[] key = nsPar.key(j);
+          //final int ki = ns.get(key);
           // check if prefix (or empty prefix) is already indexed and if so
           // check for different URIs. If the URIs are different the
           // prefix must be added to the index
-          if(ki > -1 && eq(nsPar.val[j], ns.val[ki])) ns.delete(ki);
+          //if(ki > -1 && eq(nsPar.val(j), ns.val(ki))) ns.delete(ki);
         }
       }
-      ne = ns.size > 0;
+      ne = ns.size() > 0;
 
       // add new namespaces
-      for(int a = 0; ne && a < ns.size; ++a)
-        data.ns.add(ns.key[a], ns.val[a], ms);
+      for(int a = 0; ne && a < ns.size(); ++a)
+        data.ns.add(ns.key(a), ns.value(a), ms);
     }
 
-    final byte[] uri = q.uri().atom();
+    final byte[] uri = q.uri();
     final int u = uri.length != 0 ? data.ns.addURI(uri) : 0;
-    final int tn = data.tagindex.index(q.atom(), null, false);
+    final int tn = data.tagindex.index(q.string(), null, false);
     final int s = size(nd, false);
 
     // add element node
@@ -329,7 +305,7 @@ public final class DataBuilder {
   private static int size(final ANode n, final boolean a) {
     if(n instanceof DBNode) {
       final DBNode dbn = (DBNode) n;
-      final int k = ANode.kind(n.ndType());
+      final int k = n.kind();
       return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
     }
 
@@ -370,7 +346,7 @@ public final class DataBuilder {
       if(uri == null || !eq(uri, ns)) continue;
 
       final byte[] name = md.name(pre, kind);
-      if(pref(name).length == 0) {
+      if(prefix(name).length == 0) {
         // no prefix: remove ZIP namespace from element
         if(kind == Data.ELEM) {
           md.update(pre, kind, name, EMPTY);

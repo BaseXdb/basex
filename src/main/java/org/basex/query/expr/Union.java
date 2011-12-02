@@ -34,8 +34,8 @@ public final class Union extends Set {
 
     for(int e = 0; e != expr.length; ++e) {
       // remove empty operands
-      if(expr[e].empty()) {
-        ctx.compInfo(OPTREMOVE, desc(), expr[e]);
+      if(expr[e].isEmpty()) {
+        ctx.compInfo(OPTREMOVE, description(), expr[e]);
         expr = Array.delete(expr, e--);
       }
     }

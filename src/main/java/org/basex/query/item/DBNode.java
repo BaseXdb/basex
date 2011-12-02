@@ -1,23 +1,24 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
+import org.basex.query.util.DataBuilder;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.Scoring;
@@ -111,7 +112,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] string() {
     if(val == null) val = data.atom(pre);
     return val;
   }
@@ -123,7 +124,7 @@ public class DBNode extends ANode {
       final long l = data.textItr(pre, txt);
       if(l != Long.MIN_VALUE) return l;
     }
-    return Itr.parse(data.atom(pre), ii);
+    return Int.parse(data.atom(pre), ii);
   }
 
   @Override
@@ -142,39 +143,39 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final byte[] nname() {
-    if(!(type instanceof NodeType)) return EMPTY;
-    final NodeType t = ndType();
+  public final byte[] name() {
+    final NodeType t = nodeType();
     switch(t) {
       case ELM: case ATT: case PI:
         return data.name(pre, kind(t));
       default:
-        return EMPTY;
+        return Token.EMPTY;
     }
   }
 
   @Override
   public final QNm qname() {
-    return qname(new QNm());
+    return update(new QNm());
   }
 
   @Override
-  public final QNm qname(final QNm name) {
-    final byte[] nm = nname();
-    name.name(nm);
-    name.uri(Uri.EMPTY);
-    final boolean ns = name.ns();
-    if(ns || data.ns.size() != 0) {
-      final int n = ns ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
-      final byte[] uri = n > 0 ? data.ns.uri(n) : ns ?
-          NSGlobal.uri(pref(nm)) : EMPTY;
-      name.uri(uri.length == 0 ? Uri.EMPTY : new Uri(uri));
+  public final QNm update(final QNm name) {
+    // update the name and uri strings in the specified QName
+    final byte[] nm = name();
+    byte[] uri = Token.EMPTY;
+    final boolean pref = Token.indexOf(nm, ':') != -1;
+    if(pref || data.ns.size() != 0) {
+      final int n = pref ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
+      final byte[] u = n > 0 ? data.ns.uri(n) : pref ?
+          NSGlobal.uri(Token.prefix(nm)) : null;
+      if(u != null) uri = u;
     }
+    name.update(nm, uri);
     return name;
   }
 
   @Override
-  public final Atts ns() {
+  public final Atts namespaces() {
     if(type == NodeType.ELM && nsp == null) nsp = data.ns(pre);
     return nsp;
   }
@@ -183,11 +184,11 @@ public class DBNode extends ANode {
   public final byte[] baseURI() {
     if(type == NodeType.DOC) {
       final String dir = data.meta.original;
-      final String name = string(data.text(pre, true));
-      return token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
+      final String name = Token.string(data.text(pre, true));
+      return Token.token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
     }
     final byte[] b = attribute(new QNm(BASE, XMLURI));
-    return b != null ? b : EMPTY;
+    return b != null ? b : Token.EMPTY;
   }
 
   @Override
@@ -205,10 +206,17 @@ public class DBNode extends ANode {
 
   @Override
   public final DBNode copy() {
-    final DBNode n = new DBNode(data, pre, par, ndType());
+    final DBNode n = new DBNode(data, pre, par, nodeType());
     n.root = root;
     n.score = score;
     return n;
+  }
+
+  @Override
+  public final DBNode copy(final QueryContext ctx) {
+    final MemData md = new MemData(data.meta.prop);
+    new DataBuilder(md).context(ctx).build(this);
+    return new DBNode(md, 0);
   }
 
   @Override
@@ -242,7 +250,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter anc() {
+  public final AxisIter ancestor() {
     return new AxisIter() {
       private final DBNode node = copy();
       int p = pre;
@@ -262,7 +270,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter ancOrSelf() {
+  public final AxisIter ancestorOrSelf() {
     return new AxisIter() {
       private final DBNode node = copy();
       int p = pre;
@@ -345,7 +353,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter descOrSelf() {
+  public final AxisIter descendantOrSelf() {
     return new AxisIter() {
       final DBNode node = copy();
       final int s = pre + data.size(pre, data.kind(pre));
@@ -363,7 +371,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter foll() {
+  public final AxisIter following() {
     return new AxisIter() {
       private final DBNode node = copy();
       final int s = data.meta.size;
@@ -382,7 +390,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter follSibl() {
+  public final AxisIter followingSibling() {
     return new AxisIter() {
       private final DBNode node = copy();
       int k = data.kind(pre);
@@ -402,7 +410,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter par() {
+  public final AxisIter parentIter() {
     return new AxisIter() {
       /** First call. */
       private boolean more;
@@ -424,28 +432,28 @@ public class DBNode extends ANode {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(token(Util.name(this)), NAM, token(data.meta.name));
-    if(pre != 0) ser.attribute(PRE, token(pre));
+    ser.openElement(Token.token(Util.name(this)), NAM,
+        Token.token(data.meta.name));
+    if(pre != 0) ser.attribute(PRE, Token.token(pre));
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    final NodeType nt = (NodeType) type;
-    final TokenBuilder tb = new TokenBuilder(nt.nam()).add(' ');
-    switch(nt) {
+    final TokenBuilder tb = new TokenBuilder(type.string()).add(' ');
+    switch((NodeType) type) {
       case ATT:
       case PI:
-        tb.add(nname()).add(" { \"").add(chop(atom(), 64)).add("\" }");
+        tb.add(name()).add(" { \"").add(Token.chop(string(), 64)).add("\" }");
         break;
       case ELM:
-        tb.add(nname()).add(" { ... }");
+        tb.add(name()).add(" { ... }");
         break;
       case DOC:
         tb.add("{ \"").add(data.text(pre, true)).add("\" }");
         break;
       default:
-        tb.add("{ \"").add(chop(atom(), 64)).add("\" }");
+        tb.add("{ \"").add(Token.chop(string(), 64)).add("\" }");
         break;
     }
     return tb.toString();

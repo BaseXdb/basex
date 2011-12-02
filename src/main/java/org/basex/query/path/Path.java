@@ -17,7 +17,6 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -107,7 +106,7 @@ public abstract class Path extends ParseExpr {
     // as e.g. happens in //a(b|c)
     if(root == null) return v == null || v.type != NodeType.DOC ? v : null;
     // root is value: return root
-    if(root.value()) return (Value) root;
+    if(root.isValue()) return (Value) root;
     // no root reference, no context: return null
     if(!(root instanceof Root) || v == null) return null;
     // return context sequence or root of current context
@@ -204,7 +203,7 @@ public abstract class Path extends ParseExpr {
       if(l == 0) {
         if(root instanceof CAttr) {
           if(sa == CHILD || sa == DESC) return s;
-        } else if(root instanceof DBNode &&
+        } else if(root instanceof Root || root instanceof Value &&
             ((Value) root).type == NodeType.DOC || root instanceof CDoc) {
           if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
             (sa != SELF && sa != ANCORSELF ||
@@ -273,7 +272,7 @@ public abstract class Path extends ParseExpr {
       while(pn.get(0).par != null) {
         QNm nm = new QNm(data.tagindex.key(pn.get(0).name));
         // skip children with prefixes
-        if(nm.ns()) return this;
+        if(nm.hasPrefix()) return this;
         for(int j = 0; j < pn.size(); ++j) {
           if(pn.get(0).name != pn.get(j).name) nm = null;
         }
@@ -309,7 +308,7 @@ public abstract class Path extends ParseExpr {
         if(st.test.test != Name.NAME) break;
 
         // check if one of the addressed nodes is on the correct level
-        final int name = data.tagindex.id(st.test.name.ln());
+        final int name = data.tagindex.id(st.test.name.local());
         for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
           if(pn.level() == s + 1) continue LOOP;
         }
@@ -349,7 +348,7 @@ public abstract class Path extends ParseExpr {
       if(!desc && curr.axis != Axis.CHILD || curr.test.test != Name.NAME)
         return null;
 
-      final int name = data.tagindex.id(curr.test.name.ln());
+      final int name = data.tagindex.id(curr.test.name.local());
 
       final ObjList<PathNode> al = new ObjList<PathNode>();
       for(final PathNode pn : data.pthindex.desc(in, desc)) {

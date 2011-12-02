@@ -13,7 +13,6 @@ import java.util.Iterator;
 
 import org.basex.core.Prop;
 import org.basex.util.Reflect;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -364,7 +363,7 @@ public class JapaneseTokenizer extends Tokenizer {
         n = currToken.getBaseForm();
     }
     byte[] token = token(n);
-    final boolean a = Token.ascii(token);
+    final boolean a = ascii(token);
     if(!a && !dc) token = WesternTokenizer.dia(token);
     if(uc) token = WesternTokenizer.upper(token, a);
     if(lc || !cs) token = WesternTokenizer.lower(token, a);

@@ -13,7 +13,6 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.server.ClientListener;
 import org.basex.server.Sessions;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -107,7 +106,7 @@ public final class Events extends HashMap<String, Sessions> {
   public synchronized boolean notify(final Context ctx, final byte[] name,
       final byte[] msg) {
 
-    final Sessions sess = get(Token.string(name));
+    final Sessions sess = get(string(name));
     // event was not found
     if(sess == null) return false;
 

@@ -6,6 +6,7 @@ import org.basex.core.BaseXException;
 import org.basex.io.IO;
 import org.basex.io.serial.SerializerException;
 import org.basex.query.item.Empty;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -22,8 +23,8 @@ import org.basex.util.list.StringList;
 public final class QueryException extends Exception {
   /** Error reference. */
   private Err err;
-  /** Alternative error code. */
-  private String code;
+  /** Error QName. */
+  private QNm name;
   /** Error value. */
   private Value value = Empty.SEQ;
   /** File reference. */
@@ -42,7 +43,7 @@ public final class QueryException extends Exception {
    * @param ext error extension
    */
   public QueryException(final InputInfo ii, final Err er, final Object... ext) {
-    this(ii, null, null, er.desc, ext);
+    this(ii, er.qname(), null, er.desc, ext);
     err = er;
   }
 
@@ -52,7 +53,7 @@ public final class QueryException extends Exception {
    * @param ex serializer exception
    */
   public QueryException(final InputInfo ii, final SerializerException ex) {
-    this(ii, (String) null, null, ex.getLocalizedMessage());
+    this(ii, ex.err().qname(), null, ex.getLocalizedMessage());
     err = ex.err();
   }
 
@@ -64,11 +65,11 @@ public final class QueryException extends Exception {
    * @param msg error message
    * @param ext error extension
    */
-  public QueryException(final InputInfo ii, final String errc, final Value val,
+  public QueryException(final InputInfo ii, final QNm errc, final Value val,
       final String msg, final Object... ext) {
 
     super(BaseXException.message(msg, ext));
-    code = errc;
+    name = errc;
     value = val;
     if(ii == null) return;
 
@@ -143,8 +144,8 @@ public final class QueryException extends Exception {
    * Returns the error code.
    * @return error code
    */
-  public String code() {
-    return code == null ? err.toString() : code;
+  public QNm qname() {
+    return name;
   }
 
   /**
@@ -177,8 +178,8 @@ public final class QueryException extends Exception {
       if(file != null) tb.add(' ').addExt(FILEINFO, file);
       tb.add(COL).add(NL);
     }
-    final String c = code();
-    if(!c.isEmpty()) tb.add('[').add(c).add("] ");
+    final byte[] code = name.local();
+    if(code.length != 0) tb.add('[').add(code).add("] ");
     return tb.add(getLocalizedMessage()).toString();
   }
 }

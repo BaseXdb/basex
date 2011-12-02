@@ -67,6 +67,6 @@ final class DocTest extends Test {
 
   @Override
   public String toString() {
-    return new TokenBuilder(NodeType.DOC.nam()).add("(...)").toString();
+    return new TokenBuilder(NodeType.DOC.string()).add("(...)").toString();
   }
 }

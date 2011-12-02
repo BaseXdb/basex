@@ -4,7 +4,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.item.map.Map;
@@ -68,7 +68,7 @@ public final class JsonMapConverter {
     final JStruct st = (JStruct) nd;
     final TokenList names = st instanceof JObject ? ((JObject) st).names : null;
     for(int i = st.size(); --i >= 0;) {
-      map = map.insert(names == null ? Itr.get(i + 1) : Str.get(names.get(i)),
+      map = map.insert(names == null ? Int.get(i + 1) : Str.get(names.get(i)),
           convert(st.value(i)), null);
     }
     return map;

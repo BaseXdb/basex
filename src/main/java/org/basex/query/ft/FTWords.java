@@ -106,7 +106,7 @@ public final class FTWords extends FTExpr {
         for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].comp(ctx);
       }
       query = query.comp(ctx);
-      if(query.value()) txt = tokens(ctx);
+      if(query.isValue()) txt = tokens(ctx);
 
       // choose fast evaluation for default settings
       fast = mode == FTMode.M_ANY && txt != null && occ == null;

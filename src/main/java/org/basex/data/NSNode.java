@@ -213,7 +213,7 @@ final class NSNode {
       tb.add("Pre[" + pre + "] ");
       for(int i = 0; i < vals.length; i += 2) {
         tb.add("xmlns");
-        final byte[] p = ns.pref(vals[i]);
+        final byte[] p = ns.prefix(vals[i]);
         if(p.length != 0) tb.add(':');
         tb.add(p);
         tb.add("=\"");

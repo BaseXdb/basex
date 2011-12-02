@@ -1,6 +1,8 @@
 package org.basex.query.item;
 
 import java.util.Arrays;
+
+import org.basex.query.QueryContext;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
@@ -38,17 +40,27 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final byte[] atom() {
+  public final byte[] string() {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < children.size(); ++c) {
         final ANode nc = children.get(c);
         if(nc.type == NodeType.ELM || nc.type == NodeType.TXT)
-          tb.add(nc.atom());
+          tb.add(nc.string());
       }
       val = tb.finish();
     }
     return val;
+  }
+
+  @Override
+  public QNm update(final QNm nm) {
+    return qname();
+  }
+
+  @Override
+  public ANode copy(final QueryContext ctx) {
+    return copy();
   }
 
   @Override
@@ -81,7 +93,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter anc() {
+  public final AxisIter ancestor() {
     return new AxisIter() {
       /** Temporary node. */
       private ANode node = FNode.this;
@@ -95,7 +107,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter ancOrSelf() {
+  public final AxisIter ancestorOrSelf() {
     return new AxisIter() {
       /** Temporary node. */
       private ANode node = FNode.this;
@@ -121,7 +133,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public FNode parent(final ANode p) {
+  public final FNode parent(final ANode p) {
     par = p;
     return this;
   }
@@ -159,7 +171,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter descOrSelf() {
+  public final AxisIter descendantOrSelf() {
     return desc(true);
   }
 
@@ -196,7 +208,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter par() {
+  public final AxisIter parentIter() {
     return new AxisIter() {
       /** First call. */
       private boolean more;
@@ -209,7 +221,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter follSibl() {
+  public final AxisIter followingSibling() {
     return new AxisIter() {
       /** Iterator. */
       private AxisIter ai;
@@ -228,7 +240,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter foll() {
+  public final AxisIter following() {
     return new AxisIter() {
       /** Iterator. */
       private NodeCache nc;

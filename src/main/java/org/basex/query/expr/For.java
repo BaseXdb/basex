@@ -9,12 +9,11 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Itr;
+import org.basex.query.item.Int;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * For clause.
@@ -108,7 +107,7 @@ public final class For extends ForLet {
       @Override
       public boolean reset() {
         if(ir != null) {
-          ctx.vars.reset(vs);
+          ctx.vars.size(vs);
           ir.reset();
           ir = null;
           c = 0;
@@ -137,7 +136,7 @@ public final class For extends ForLet {
        */
       private Item bind(final Item it, final long i) throws QueryException {
         v.bind(it, ctx);
-        if(p != null) p.bind(Itr.get(i), ctx);
+        if(p != null) p.bind(Int.get(i), ctx);
         if(s != null) s.bind(Dbl.get(it.score()), ctx);
         return it;
       }
@@ -153,8 +152,7 @@ public final class For extends ForLet {
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, VAR, token(var.toString()));
     if(pos != null) ser.attribute(POS, token(pos.toString()));
-    if(score != null) ser.attribute(Token.token(SCORE),
-        token(score.toString()));
+    if(score != null) ser.attribute(token(SCORE), token(score.toString()));
     expr.plan(ser);
     ser.closeElement();
   }

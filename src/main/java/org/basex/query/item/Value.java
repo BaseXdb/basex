@@ -57,76 +57,12 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public final boolean value() {
+  public final boolean isValue() {
     return true;
   }
 
   @Override
   public abstract long size();
-
-  /**
-   * Checks if this is a single numeric item.
-   * @return result of check
-   */
-  public final boolean num() {
-    return type.num();
-  }
-
-  /**
-   * Checks if this is a single function item.
-   * @return result of check
-   */
-  public final boolean func() {
-    return type.func();
-  }
-
-  /**
-   * Checks if this is a single function item.
-   * @return result of check
-   */
-  public final boolean map() {
-    return type.map();
-  }
-
-  /**
-   * Checks if this is a single untyped item.
-   * @return result of check
-   */
-  public final boolean unt() {
-    return type.unt();
-  }
-
-  /**
-   * Checks if this is a single string item.
-   * @return result of check
-   */
-  public final boolean str() {
-    return type.str();
-  }
-
-  /**
-   * Checks if this is a single duration item.
-   * @return result of check
-   */
-  public final boolean dur() {
-    return type.dur();
-  }
-
-  /**
-   * Checks if this is a single date item.
-   * @return result of check
-   */
-  public final boolean date() {
-    return type.dat();
-  }
-
-  /**
-   * Checks if this is a single node.
-   * @return result of check
-   */
-  public final boolean node() {
-    return type.node();
-  }
 
   /**
    * Returns a Java representation of the value.
@@ -156,12 +92,12 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public String desc() {
-    return name();
+  public String description() {
+    return info();
   }
 
   @Override
-  public final String name() {
+  public final String info() {
     return type.toString();
   }
 

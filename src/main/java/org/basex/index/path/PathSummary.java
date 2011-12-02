@@ -252,4 +252,9 @@ public final class PathSummary implements Index {
   public int count(final IndexToken token) {
     throw Util.notexpected();
   }
+
+  @Override
+  public String toString() {
+    return string(info());
+  }
 }

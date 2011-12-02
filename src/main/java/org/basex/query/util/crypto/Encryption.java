@@ -22,7 +22,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.util.Base64;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.hash.TokenMap;
 
 /**
@@ -232,7 +231,6 @@ public final class Encryption {
     }
 
     // convert to specified encoding, base64 as a standard, else use hex
-    if(b64) return Str.get(Base64.encode(hash));
-    return  Str.get(Token.hex(hash, true));
+    return Str.get(b64 ? Base64.encode(hash) : hex(hash, true));
   }
 }

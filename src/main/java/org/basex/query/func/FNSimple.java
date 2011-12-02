@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
-import java.util.Stack;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
@@ -11,17 +11,11 @@ import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.item.Value;
-import org.basex.query.item.map.Map;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.AxisIter;
+import org.basex.query.util.Compare;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Simple functions.
@@ -72,7 +66,7 @@ public final class FNSimple extends FuncCall {
     switch(def) {
       case ONE_OR_MORE:
         final Value val = ctx.value(expr[0]);
-        if(val.empty()) throw EXPECTOM.thrw(input);
+        if(val.isEmpty()) throw EXPECTOM.thrw(input);
         return val;
       case UNORDERED:
         return ctx.value(expr[0]);
@@ -125,18 +119,18 @@ public final class FNSimple extends FuncCall {
       case EMPTY:
       case EXISTS:
         // ignore non-deterministic expressions (e.g.: error())
-        return e.size() == -1 || e.uses(Use.NDT) ? this :
+        return e.size() == -1 || e.uses(Use.NDT) || e.uses(Use.CNS) ? this :
           Bln.get(def == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
         return e.type().eq(SeqType.BLN) ? e : this;
       case NOT:
-        if(e.isFun(Function.EMPTY)) {
+        if(e.isFunction(Function.EMPTY)) {
           // simplify: not(empty(A)) -> exists(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
           expr = ((FuncCall) e).expr;
           def = Function.EXISTS;
-        } else if(e.isFun(Function.EXISTS)) {
+        } else if(e.isFunction(Function.EXISTS)) {
           // simplify: not(exists(A)) -> empty(A)
           ctx.compInfo(QueryText.OPTWRITE, this);
           expr = ((FuncCall) e).expr;
@@ -145,7 +139,7 @@ public final class FNSimple extends FuncCall {
           // simplify: not('a' = 'b') -> 'a' != 'b'
           final Cmp c = ((Cmp) e).invert();
           return c == e ? this : c;
-        } else if(e.isFun(Function.NOT)) {
+        } else if(e.isFunction(Function.NOT)) {
           // simplify: not(not(A)) -> boolean(A)
           return compBln(((FuncCall) e).expr[0]);
         } else {
@@ -180,7 +174,7 @@ public final class FNSimple extends FuncCall {
       if(!e.type().mayBeNum()) ex = e;
     } else if(def == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.node() || e.size() > 0) ex = e;
+      if(e.type().type.isNode() || e.size() > 0) ex = e;
     }
     if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;
@@ -194,119 +188,6 @@ public final class FNSimple extends FuncCall {
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
     if(expr.length == 3) checkColl(expr[2], ctx);
-    return deep(input, ctx.iter(expr[0]), ctx.iter(expr[1]));
-  }
-
-  /**
-   * Checks items for deep equality.
-   * @param ii input info
-   * @param iter1 first iterator
-   * @param iter2 second iterator
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public static boolean deep(final InputInfo ii, final Iter iter1,
-      final Iter iter2) throws QueryException {
-
-    while(true) {
-      final Item it1 = iter1.next();
-      final Item it2 = iter2.next();
-      // at least one iterator is exhausted: check if both items are null
-      if(it1 == null) {
-        if(it2 == null) return true;
-        if(it2.func()) FNCMP.thrw(ii, it2);
-        return false;
-      } else if(it2 == null) {
-        if(it1.func()) FNCMP.thrw(ii, it1);
-        return false;
-      }
-
-      // check for functions
-      if(it1.func() || it2.func()) {
-        // maps are functions but have a defined deep-equality
-        if(it1.map() && it2.map()) {
-          final Map map1 = (Map) it1, map2 = (Map) it2;
-          if(!map1.deep(ii, map2)) return false;
-          continue;
-        }
-        FNCMP.thrw(ii, it1.func() ? it1 : it2);
-      }
-
-      // check atomic values
-      if(!it1.node() && !it2.node()) {
-        if(!it1.equiv(ii, it2)) return false;
-        continue;
-      }
-
-      // node types must be equal
-      if(it1.type != it2.type) return false;
-
-      ANode s1 = (ANode) it1, s2 = (ANode) it2;
-      final Stack<AxisIter[]> chld = new Stack<AxisIter[]>();
-      AxisIter[] ch = { s1.children(), s2.children() };
-      chld.push(ch);
-      boolean desc = false;
-      do {
-        final Type t1 = s1 != null ? s1.type : null;
-        final Type t2 = s2 != null ? s2.type : null;
-
-        if(desc) {
-          // skip descendant comments and processing instructions
-          if(t1 == NodeType.PI || t1 == NodeType.COM) {
-            s1 = ch[0].next();
-            continue;
-          }
-          if(t2 == NodeType.PI || t2 == NodeType.COM) {
-            s2 = ch[1].next();
-            continue;
-          }
-        }
-
-        if(s1 == null || s2 == null) {
-          if(s1 != s2) return false;
-          ch = chld.pop();
-        } else {
-          // compare names
-          final QNm n1 = s1.qname(), n2 = s2.qname();
-          if(n1 != null && n2 != null && !n1.eq(n2))
-            return false;
-
-          // compare string values
-          if((t1 == NodeType.TXT || t1 == NodeType.ATT ||
-              t1 == NodeType.COM || t1 == NodeType.PI) &&
-              !Token.eq(s1.atom(), s2.atom())) return false;
-
-          // compare elements
-          if(t1 == NodeType.ELM) {
-            // compare number of attributes
-            if(s1.attributes().value().size() !=
-              s2.attributes().value().size()) return false;
-
-            // compare attributes names and values
-            final AxisIter att1 = s1.attributes();
-            for(ANode a1; (a1 = att1.next()) != null;) {
-              final AxisIter att2 = s2.attributes();
-              boolean f = false;
-              for(ANode a2; (a2 = att2.next()) != null;) {
-                if(a1.qname().eq(a2.qname())) {
-                  f = Token.eq(a1.atom(), a2.atom());
-                  break;
-                }
-              }
-              if(!f) return false;
-            }
-
-            // check children
-            chld.push(ch);
-            ch = new AxisIter[] { s1.children(), s2.children() };
-          }
-        }
-
-        // check next child
-        s1 = ch[0].next();
-        s2 = ch[1].next();
-        desc = true;
-      } while(!chld.isEmpty());
-    }
+    return Compare.deep(ctx.iter(expr[0]), ctx.iter(expr[1]), input);
   }
 }

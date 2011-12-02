@@ -308,7 +308,7 @@ public final class IOFile extends IO {
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);
     // add leading slash for Windows paths
-    if(!path.startsWith("/")) tb.add('/');
+    if(!path.startsWith("/")) tb.add("///");
     for(int p = 0; p < path.length(); p++) {
       // replace spaces with %20
       final char ch = path.charAt(p);
@@ -325,6 +325,17 @@ public final class IOFile extends IO {
    */
   public static String regex(final String glob) {
     return regex(glob, true);
+  }
+
+  /**
+   * Checks if the specified string is a valid file reference.
+   * @param s source
+   * @return result of check
+   */
+  static boolean valid(final String s) {
+    if(s.length() < 3 || s.indexOf(':') == -1) return true;
+    final char c = Character.toLowerCase(s.charAt(0));
+    return c >= 'a' && c <= 'z' && s.charAt(1) == ':';
   }
 
   /**

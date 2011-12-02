@@ -30,8 +30,8 @@ public final class Types {
       if(nt != null) return nt;
     }
 
-    if(!atom && type.uri() == Uri.EMPTY) {
-      final byte[] ln = type.ln();
+    if(!atom && type.uri().length == 0) {
+      final byte[] ln = type.local();
       if(eq(ln, token(FUNCTION))) return FuncType.ANY_FUN;
       if(eq(ln, MAP)) return SeqType.ANY_MAP;
     }

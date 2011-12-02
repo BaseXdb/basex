@@ -97,7 +97,7 @@ public abstract class NodeCopy extends StructuralUpdate {
       if(i.type == NodeType.TXT) {
         final TokenBuilder tb = new TokenBuilder();
         while(i != null && i.type == NodeType.TXT) {
-          tb.add(i.atom());
+          tb.add(i.string());
           i = n.next();
         }
         s.add(new FTxt(tb.finish()));

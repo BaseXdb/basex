@@ -34,7 +34,7 @@ public final class RangeSeq extends Seq {
   @Override
   public Object toJava() {
     final Object[] obj = new Object[(int) size];
-    for(int s = 0; s < size; ++s) obj[s] = Itr.get(start + s);
+    for(int s = 0; s < size; ++s) obj[s] = Int.get(start + s);
     return obj;
   }
 
@@ -62,7 +62,7 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Item itemAt(final long pos) {
-    return Itr.get(start + pos);
+    return Int.get(start + pos);
   }
 
   @Override
