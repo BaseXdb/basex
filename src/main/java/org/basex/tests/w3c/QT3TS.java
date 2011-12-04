@@ -368,7 +368,8 @@ public final class QT3TS {
         "*:environment/*:collation | *:dependency[" +
         "@type='feature' and " +
         "@value=('schemaImport','schemaValidation','namespace-axis') or " +
-        "@type='xml-version' and @value='1.1']", ctx).context(node);
+        "@type='xml-version' and @value='1.1' or" +
+        "@type='xsd-version' and @value='1.1']", ctx).context(node);
 
     try {
       return q.next() == null;
@@ -439,8 +440,8 @@ public final class QT3TS {
       }
       return msg;
     } catch(final Exception ex) {
-      Util.stack(ex);
-      return ex.getMessage();
+      ex.printStackTrace();
+      return "Exception: " + ex.getMessage();
     }
   }
 
