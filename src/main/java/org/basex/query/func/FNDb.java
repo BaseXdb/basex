@@ -354,7 +354,7 @@ public final class FNDb extends FuncCall {
    */
   private static FNode resource(final byte[] path, final boolean raw,
       final long size, final byte[] ctype, final long mdate) {
-    final FNode res = new FElem(RESOURCE).
+    final FElem res = new FElem(RESOURCE).
         add(new FAttr(PATH, path)).
         add(new FAttr(RAW, token(raw))).
         add(new FAttr(CTYPE, ctype)).

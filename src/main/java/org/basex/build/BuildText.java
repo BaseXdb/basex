@@ -21,7 +21,7 @@ public interface BuildText {
   /** Builder error. */
   String LIMITNS = "%: Too many different namespaces (limit: %).";
   /** Builder error. */
-  String LIMITRANGE = "%: Document is too large for being processed.";
+  String LIMITRANGE = "%: Input is too large for a single database.";
   /** Builder error. */
   String LIMITTAGS = "%: Too many different tag names (limit: %).";
   /** Builder error. */

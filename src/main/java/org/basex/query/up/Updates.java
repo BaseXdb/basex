@@ -168,7 +168,7 @@ public final class Updates {
     // if data doesn't exist, create a new one
     if(data == null) {
       data =  new MemData(ctx.context.prop);
-      new DataBuilder(data).context(ctx).build(anc);
+      new DataBuilder(data).build(anc);
       // create a mapping between the fragment id and the data reference
       fragmentIDs.add(ancID, data);
     }

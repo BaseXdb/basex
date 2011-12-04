@@ -1,33 +1,33 @@
 package org.basex.util;
 
 /**
- * This is a simple container for attributes (key/value tokens).
+ * This is a simple container for attributes (name/string pairs).
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class Atts {
-  /** Key array. */
-  private byte[][] key = new byte[1][];
-  /** Value array. */
-  private byte[][] val = new byte[1][];
+  /** Name array. */
+  private byte[][] nm = new byte[1][];
+  /** String array. */
+  private byte[][] st = new byte[1][];
   /** Current array size. */
   private int size;
 
   /**
-   * Adds the next key/value pair.
-   * @param k key to be added
-   * @param v value to be added
+   * Adds the next name/string pair.
+   * @param name name to be added
+   * @param string string to be added
    * @return self reference
    */
-  public Atts add(final byte[] k, final byte[] v) {
-    if(size == key.length) {
+  public Atts add(final byte[] name, final byte[] string) {
+    if(size == nm.length) {
       final int s = size << 1;
-      key = Array.copyOf(key, s);
-      val = Array.copyOf(val, s);
+      nm = Array.copyOf(nm, s);
+      st = Array.copyOf(st, s);
     }
-    key[size] = k;
-    val[size++] = v;
+    nm[size] = name;
+    st[size++] = string;
     return this;
   }
 
@@ -36,55 +36,55 @@ public final class Atts {
    * @param i entry offset
    */
   public void delete(final int i) {
-    Array.move(key, i + 1, -1, --size - i);
-    Array.move(val, i + 1, -1, size - i);
+    Array.move(nm, i + 1, -1, --size - i);
+    Array.move(st, i + 1, -1, size - i);
   }
 
   /**
-   * Checks if the specified key is found.
-   * @param k key to be checked
+   * Checks if the specified name is found.
+   * @param name name to be found
    * @return result of check
    */
-  public boolean contains(final byte[] k) {
-    return get(k) != -1;
+  public boolean contains(final byte[] name) {
+    return get(name) != -1;
   }
 
   /**
-   * Returns the offset to the specified key.
-   * @param k key to be found
+   * Returns the offset to the specified name.
+   * @param name name to be found
    * @return offset or -1
    */
-  public int get(final byte[] k) {
-    for(int i = 0; i < size; ++i) if(Token.eq(key[i], k)) return i;
+  public int get(final byte[] name) {
+    for(int i = 0; i < size; ++i) if(Token.eq(nm[i], name)) return i;
     return -1;
   }
 
   /**
-   * Returns the key at the specified index position.
+   * Returns the name at the specified index position.
    * @param i index
-   * @return key
+   * @return name
    */
-  public byte[] key(final int i) {
-    return key[i];
+  public byte[] name(final int i) {
+    return nm[i];
   }
 
   /**
-   * Returns the value at the specified index position.
+   * Returns the string at the specified index position.
    * @param i index
-   * @return key
+   * @return string
    */
-  public byte[] value(final int i) {
-    return val[i];
+  public byte[] string(final int i) {
+    return st[i];
   }
 
   /**
-   * Returns the value for the specified key, or {@code null}.
-   * @param k key to be found
+   * Returns the string for the specified name, or {@code null}.
+   * @param name name to be found
    * @return offset or -1
    */
-  public byte[] value(final byte[] k) {
-    final int i = get(k);
-    return i == -1 ? null : val[i];
+  public byte[] string(final byte[] name) {
+    final int i = get(name);
+    return i == -1 ? null : st[i];
   }
 
   /**
@@ -117,7 +117,7 @@ public final class Atts {
     final TokenBuilder tb = new TokenBuilder(Util.name(this) + "[");
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(", ");
-      tb.add(key[i]).add("=\"").add(val[i]).add("\"");
+      tb.add(nm[i]).add("=\"").add(st[i]).add("\"");
     }
     return tb.add("]").toString();
   }

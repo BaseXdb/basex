@@ -41,7 +41,7 @@ public final class NSContext {
    */
   public void delete(final byte[] pref) {
     for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(pref, ns.key(s))) ns.delete(s);
+      if(eq(pref, ns.name(s))) ns.delete(s);
     }
   }
 
@@ -52,7 +52,7 @@ public final class NSContext {
    */
   public byte[] staticURI(final byte[] pref) {
     for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(ns.key(s), pref)) return ns.value(s);
+      if(eq(ns.name(s), pref)) return ns.string(s);
     }
     return null;
   }
@@ -66,7 +66,7 @@ public final class NSContext {
   public byte[] uri(final byte[] pref) {
     if(stack != null) {
       for(int s = stack.size() - 1; s >= 0; s--) {
-        if(eq(stack.key(s), pref)) return stack.value(s);
+        if(eq(stack.name(s), pref)) return stack.string(s);
       }
     }
     final byte[] uri = staticURI(pref);
@@ -81,7 +81,7 @@ public final class NSContext {
    */
   public byte[] prefix(final byte[] uri) {
     for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(ns.value(s), uri)) return ns.key(s);
+      if(eq(ns.string(s), uri)) return ns.name(s);
     }
     return NSGlobal.prefix(uri);
   }
@@ -92,7 +92,7 @@ public final class NSContext {
    */
   public byte[][] prefixes() {
     final byte[][] prefs = new byte[ns.size()][];
-    for(int p = 0; p < prefs.length; ++p) prefs[p] = ns.key(p);
+    for(int p = 0; p < prefs.length; ++p) prefs[p] = ns.name(p);
     return prefs;
   }
 

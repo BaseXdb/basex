@@ -31,7 +31,7 @@ public final class Constr {
   /** Attribute array. */
   public final NodeCache atts = new NodeCache();
   /** Namespace array. */
-  public final Atts ns = new Atts();
+  public Atts nspaces = new Atts();
   /** Error: attribute position. */
   public boolean errAtt;
   /** Error: namespace position. */
@@ -41,6 +41,10 @@ public final class Constr {
   /** Error: duplicate namespace. */
   public byte[] duplNS;
 
+  /** Query context. */
+  private final QueryContext ctx;
+  /** Input information. */
+  private final InputInfo input;
   /** Text cache. */
   private final TokenBuilder text = new TokenBuilder();
   /** Space separator flag. */
@@ -49,42 +53,59 @@ public final class Constr {
   /**
    * Creates the children of the constructor.
    * @param ii input info
-   * @param ctx query context
+   * @param qc query context
+   */
+  public Constr(final InputInfo ii, final QueryContext qc) {
+    input = ii;
+    ctx = qc;
+  }
+
+  /**
+   * Adds a namespace array.
+   * @param nsp namespace array
+   * @return self reference
+   */
+  public Constr add(final Atts nsp) {
+    nspaces = nsp;
+    return this;
+  }
+
+  /**
+   * Constructs child and attribute nodes.
    * @param expr input expressions
+   * @return self reference
    * @throws QueryException query exception
    */
-  public Constr(final InputInfo ii, final QueryContext ctx, final Expr... expr)
-      throws QueryException {
-
-    for(final Expr e : expr) {
-      more = false;
-      final Iter iter = ctx.iter(e);
-      for(Item ch; (ch = iter.next()) != null;) {
-        if(!add(ctx, ch, ii)) break;
+  public Constr add(final Expr... expr) throws QueryException {
+    final int s = ctx.ns.size();
+    try {
+      for(final Expr e : expr) {
+        more = false;
+        final Iter iter = ctx.iter(e);
+        for(Item ch; (ch = iter.next()) != null && add(ch););
       }
+      if(text.size() != 0) children.add(new FTxt(text.finish()));
+      return this;
+    } finally {
+      ctx.ns.size(s);
     }
-    if(text.size() != 0) children.add(new FTxt(text.finish()));
   }
 
   /**
    * Recursively adds nodes to the element arrays. Recursion is necessary
    * as documents are resolved to their child nodes.
-   * @param ctx query context
    * @param it current item
-   * @param ii input info
    * @return true if item was added
    * @throws QueryException query exception
    */
-  private boolean add(final QueryContext ctx, final Item it, final InputInfo ii)
-      throws QueryException {
-
+  private boolean add(final Item it) throws QueryException {
     final Type ip = it.type;
-    if(ip.isFunction()) CONSFUNC.thrw(ii, it);
+    if(ip.isFunction()) CONSFUNC.thrw(input, it);
 
     if(!ip.isNode()) {
       // type: atomic value
       if(more) text.add(' ');
-      text.add(it.string(ii));
+      text.add(it.string(input));
       more = true;
 
     } else {
@@ -94,6 +115,7 @@ public final class Constr {
       if(ip == NodeType.TXT) {
         // type: text node
         text.add(node.string());
+
       } else if(ip == NodeType.ATT) {
         // type: attribute node
 
@@ -102,18 +124,21 @@ public final class Constr {
           errAtt = true;
           return false;
         }
-
         // check for duplicate attribute names
-        final QNm qname = node.qname();
+        final QNm name = node.qname();
         for(int a = 0; a < atts.size(); ++a) {
-          if(qname.eq(atts.get(a).qname())) {
-            duplAtt = qname.string();
+          if(name.eq(atts.get(a).qname())) {
+            duplAtt = name.string();
             return false;
           }
         }
+
         // add attribute
-        atts.add(new FAttr(node.qname(), node.string()));
-        //atts.add(node.copy());
+        atts.add(new FAttr(name, node.string()));
+
+        if(name.hasURI()) {
+          ctx.ns.add(name.prefix(), name.uri());
+        }
 
       } else if(ip == NodeType.NSP) {
         // type: namespace node
@@ -124,27 +149,24 @@ public final class Constr {
           return false;
         }
 
-        // check for duplicate attribute names
-        final byte[] name = node.name();
-        final byte[] val = node.string();
-        int a = -1;
-        while(++a < ns.size()) {
-          if(Token.eq(name, ns.key(a))) {
-            if(Token.eq(val, ns.value(a))) break;
-            duplNS = name;
-            return false;
-          }
-        }
         // add namespace
-        if(a == ns.size()) ns.add(name, val);
+        final byte[] name = node.name();
+        final byte[] uri = node.string();
+        final byte[] u = nspaces.string(name);
+        if(u == null) {
+          nspaces.add(name, uri);
+        } else if(!Token.eq(uri, u)) {
+          // duplicate namespace (ignore duplicates with same uri)
+          duplNS = name;
+          return false;
+        }
 
       } else if(ip == NodeType.DOC) {
         // type: document node
 
         final AxisIter ai = node.children();
-        for(ANode ch; (ch = ai.next()) != null;) {
-          if(!add(ctx, ch, ii)) return false;
-        }
+        for(ANode ch; (ch = ai.next()) != null && add(ch););
+
       } else {
         // type: element/comment/processing instruction node
 
@@ -157,30 +179,6 @@ public final class Constr {
         // [CG] Element construction: avoid full copy of sub tree if not needed
         node = node.copy(ctx);
         children.add(node);
-
-        // add namespaces to new node
-        if(ip == NodeType.ELM) {
-          final Atts ats = node.namespaces();
-
-          // add inherited namespaces
-          if(ctx.nsInherit) {
-            final Atts nsp = ctx.ns.stack();
-            for(int a = 0; a < nsp.size(); ++a) {
-              final byte[] key = nsp.key(a);
-              if(!ats.contains(key)) ats.add(key, nsp.value(a));
-            }
-          }
-          // add namespaces from ancestors
-          while(true) {
-            node = node.parent();
-            if(node == null || node.type != NodeType.ELM) break;
-            final Atts nsp = node.namespaces();
-            for(int a = 0; a < nsp.size(); ++a) {
-              final byte[] key = nsp.key(a);
-              if(!ats.contains(key)) ats.add(key, nsp.value(a));
-            }
-          }
-        }
       }
       more = false;
     }

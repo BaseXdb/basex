@@ -34,11 +34,8 @@ public class DBNode extends ANode {
   public final Data data;
   /** Pre value. */
   public int pre;
-
-  /** Root node (constructor). */
-  private ANode root;
   /** Namespaces. */
-  Atts nsp;
+  private Atts nsp;
 
   /**
    * Constructor.
@@ -207,16 +204,43 @@ public class DBNode extends ANode {
   @Override
   public final DBNode copy() {
     final DBNode n = new DBNode(data, pre, par, nodeType());
-    n.root = root;
     n.score = score;
     return n;
   }
 
   @Override
-  public final DBNode copy(final QueryContext ctx) {
-    final MemData md = new MemData(data.meta.prop);
-    new DataBuilder(md).context(ctx).build(this);
+  public final ANode copy(final QueryContext ctx) {
+    // adopt index structures if database is a main-memory instance
+    final MemData md = data instanceof MemData ?
+        new MemData(data) : new MemData(data.meta.prop);
+    new DataBuilder(md).build(this);
     return new DBNode(md, 0);
+
+    /*if(hasChildren()) {
+      // adopt index structures if database is a main-memory instance
+      final MemData md = data instanceof MemData ?
+          new MemData(data) : new MemData(data.meta.prop);
+      new DataBuilder(md).build(this);
+      return new DBNode(md, 0);
+    }
+    // create object-based fragments for nodes without children (faster)
+    switch((NodeType) type) {
+      case ATT:
+        return new FAttr(qname(), string());
+      case PI:
+        return new FPI(qname(), string());
+      case TXT:
+        return new FTxt(string());
+      case COM:
+        return new FComm(string());
+      case DOC:
+        return new FDoc(new NodeCache(), baseURI());
+      default:
+        final NodeCache atts = new NodeCache();
+        final AxisIter ai = attributes();
+        for(ANode it; (it = ai.next()) != null;) atts.add(it.finish());
+        return new FElem(qname(), null, atts, namespaces());
+    }*/
   }
 
   @Override
@@ -238,7 +262,6 @@ public class DBNode extends ANode {
 
   @Override
   public DBNode parent(final ANode p) {
-    root = p;
     par = p;
     return this;
   }
@@ -290,15 +313,20 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final AxisIter attributes() {
-    return new AxisIter() {
+  public final AxisMoreIter attributes() {
+    return new AxisMoreIter() {
       final DBNode node = copy();
       final int s = pre + data.attSize(pre, data.kind(pre));
       int p = pre + 1;
 
       @Override
+      public boolean more() {
+        return p != s;
+      }
+
+      @Override
       public DBNode next() {
-        if(p == s) return null;
+        if(!more()) return null;
         node.set(p++, Data.ATTR);
         return node;
       }
