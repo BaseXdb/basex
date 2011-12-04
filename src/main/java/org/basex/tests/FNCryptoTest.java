@@ -2,6 +2,7 @@ package org.basex.tests;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -30,36 +31,32 @@ public class FNCryptoTest {
   /** Database context. */
   private static Context context;
 
+  /** User home directory. */
+  private static final String KEYSTORE_DIR = System.getProperty("user.home");
+  /** Java home directory. */
+  private static final String JAVA_HOME = System.getProperty("java.home");
+  /** Keytool executable. */
+  private static final String KEYTOOL = JAVA_HOME + "/bin/keytool";
+  /** Key store file. */
+  private static final String KEYSTORE = KEYSTORE_DIR + "/keystore.jks";
+  /** Key alias. */
+  private static final String ALIAS = "basex";
+  /** Key store and key password. */
+  private static final String PASS = "password";
 
-/*
-shell command to create java keystore (REMOVE LINEBREAK BEFORE C&P!), expected
-to be stored in HOME
-
-keytool -genkey -keyalg RSA -alias basex -keystore keystore.jks
- -storepass password -validity 360
-
-What is your first and last name?
-[Unknown]:  hans wurst
-What is the name of your organizational unit?
-  [Unknown]:  dev
-What is the name of your organization?
-  [Unknown]:  basex
-What is the name of your City or Locality?
-  [Unknown]:  konstanz
-What is the name of your State or Province?
-  [Unknown]:  bw
-What is the two-letter country code for this unit?
-  [Unknown]:  de
- */
-
+  /** Shell command to create java keystore. */
+  private static final String[] GENKEY_CMD = { KEYTOOL,
+      "-genkey", "-keyalg", "RSA", "-validity", "360", "-alias", ALIAS,
+      "-keystore", KEYSTORE, "-storepass", PASS, "-keypass", PASS,
+      "-dname", "CN=hans wurst, OU=dev, O=basex, L=konstanz, ST=bw, C=de" };
 
   /** Digital certificate element. */
   private static final String CT = "<digital-certificate>" +
       "<keystore-type>JKS</keystore-type>" +
-      "<keystore-password>password</keystore-password>" +
-      "<key-alias>basex</key-alias>" +
-      "<private-key-password>password</private-key-password>" +
-      "<keystore-uri>~/keystore.jks</keystore-uri>" +
+      "<keystore-password>" + PASS + "</keystore-password>" +
+      "<key-alias>" + ALIAS + "</key-alias>" +
+      "<private-key-password>" + PASS + "</private-key-password>" +
+      "<keystore-uri>" + KEYSTORE + "</keystore-uri>" +
       "</digital-certificate>";
 
   /**
@@ -123,10 +120,17 @@ What is the two-letter country code for this unit?
 
   /**
    * Creates the database context.
-   * @throws BaseXException database exception
+   * @throws Exception error during keystore generation or database exception
    */
   @BeforeClass
-  public static void start() throws BaseXException {
+  public static void start() throws Exception {
+    new File(KEYSTORE).delete();
+
+    final Process proc = Runtime.getRuntime().exec(GENKEY_CMD);
+    Thread.sleep(2000); // give the keytool some time to finish
+    if(proc.exitValue() != 0)
+      throw new RuntimeException("Cannot initialize keystore.");
+
     context = new Context();
     // turn off pretty printing
     new Set(Prop.SERIALIZER, "indent=no").execute(context);
@@ -138,6 +142,7 @@ What is the two-letter country code for this unit?
   @AfterClass
   public static void finish() {
     context.close();
+    new File(KEYSTORE).delete();
   }
 
   /**
