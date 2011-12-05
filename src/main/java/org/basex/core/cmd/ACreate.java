@@ -101,9 +101,9 @@ public abstract class ACreate extends Command {
         if(data.meta.createtext) create(IndexType.TEXT,      data, this);
         if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
         if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
+        data.meta.pathindex = data.meta.createpath;
         data.flush();
       }
-      data.meta.pathindex = data.meta.createpath;
       return info(parser.info() + DBCREATED, db, perf);
     } catch(final ProgressException ex) {
       throw ex;

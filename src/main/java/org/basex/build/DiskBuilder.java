@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.basex.core.Context;
 import org.basex.core.MainProp;
-import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -61,16 +60,10 @@ public final class DiskBuilder extends Builder {
 
     final IO file = parser.src;
     meta = new MetaData(name, prop, mprop);
-    meta.createtext = prop.is(Prop.TEXTINDEX);
-    meta.createattr = prop.is(Prop.ATTRINDEX);
-    meta.createpath = prop.is(Prop.PATHINDEX);
-    meta.createftxt = prop.is(Prop.FTINDEX);
-    meta.createattr = true;
     meta.original = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;
     meta.time = file != null ? file.date() : System.currentTimeMillis();
     meta.dirty = true;
-    meta.updindex = prop.is(Prop.UPDINDEX);
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();

@@ -58,11 +58,11 @@ public final class MemBuilder extends Builder {
     meta = data.meta;
     meta.name = name;
     // all contents will be indexed in main memory mode
-    meta.textindex = true;
-    meta.attrindex = true;
     meta.createtext = true;
     meta.createattr = true;
-    meta.createpath = prop.is(Prop.PATHINDEX);
+    meta.textindex = true;
+    meta.attrindex = true;
+    meta.pathindex = meta.createpath;
     final IO file = parser.src;
     meta.original = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;
