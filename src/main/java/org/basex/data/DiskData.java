@@ -74,7 +74,7 @@ public final class DiskData extends Data {
       init();
       if(meta.textindex) txtindex = new DiskValues(this, true);
       if(meta.attrindex) atvindex = new DiskValues(this, false);
-      if(meta.ftindex)   ftxindex = FTIndex.get(this, meta.wildcards);
+      if(meta.ftxtindex)   ftxindex = FTIndex.get(this, meta.wildcards);
     } finally {
       try { in.close(); } catch(final IOException ex) { }
     }

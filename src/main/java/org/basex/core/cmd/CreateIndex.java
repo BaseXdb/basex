@@ -40,12 +40,15 @@ public final class CreateIndex extends ACreate {
       if(ci == null) return error(CMDUNKNOWN, this);
       switch(ci) {
         case TEXT:
+          data.meta.createtext = true;
           index = IndexType.TEXT;
           break;
         case ATTRIBUTE:
+          data.meta.createattr = true;
           index = IndexType.ATTRIBUTE;
           break;
         case FULLTEXT:
+          data.meta.createftxt = true;
           data.meta.wildcards = prop.is(Prop.WILDCARDS);
           data.meta.stemming = prop.is(Prop.STEMMING);
           data.meta.casesens = prop.is(Prop.CASESENS);
@@ -55,12 +58,13 @@ public final class CreateIndex extends ACreate {
           index = IndexType.FULLTEXT;
           break;
         case PATH:
+          data.meta.createpath = true;
           index = IndexType.PATH;
           break;
         default:
           throw Util.notexpected();
       }
-      index(index, data);
+      create(index, data, this);
       data.flush();
 
       return info(INDCREATED, index, perf);

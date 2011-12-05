@@ -48,14 +48,22 @@ public final class MetaData {
   /** Flag for whitespace chopping. */
   public boolean chop;
 
-  /** Flag for activated text index. */
+  /** Indicates if a text index exists. */
   public boolean textindex;
-  /** Flag for activated attribute value index. */
+  /** Indicates if a attribute index exists. */
   public boolean attrindex;
-  /** Flag for activated full-text index. */
-  public boolean ftindex;
-  /** Flag for activated path summary. */
-  public boolean pathindex = true;
+  /** Indicates if a full-text index exists. */
+  public boolean ftxtindex;
+  /** Indicates if a path index exists. */
+  public boolean pathindex;
+  /** Indicates if text index is to be recreated. */
+  public boolean createtext;
+  /** Indicates if attribute index is to be recreated. */
+  public boolean createattr;
+  /** Indicates if full-text index is to be recreated. */
+  public boolean createftxt;
+  /** Indicates if path index is to be recreated. */
+  public boolean createpath;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;
@@ -119,7 +127,10 @@ public final class MetaData {
     prop = pr;
     name = db;
     chop = prop.is(Prop.CHOP);
-    pathindex = prop.is(Prop.PATHINDEX);
+    createtext = prop.is(Prop.TEXTINDEX);
+    createattr = prop.is(Prop.ATTRINDEX);
+    createftxt = prop.is(Prop.FTINDEX);
+    createpath = prop.is(Prop.PATHINDEX);
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
     diacritics = prop.is(Prop.DIACRITICS);
@@ -321,7 +332,7 @@ public final class MetaData {
         else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
         else if(k.equals(DBTXTIDX)) textindex  = toBool(v);
         else if(k.equals(DBATVIDX)) attrindex  = toBool(v);
-        else if(k.equals(DBFTXIDX)) ftindex    = toBool(v);
+        else if(k.equals(DBFTXIDX)) ftxtindex    = toBool(v);
         else if(k.equals(DBWCIDX))  wildcards  = toBool(v);
         else if(k.equals(DBFTST))   stemming   = toBool(v);
         else if(k.equals(DBFTCS))   casesens   = toBool(v);
@@ -360,7 +371,11 @@ public final class MetaData {
     writeInfo(out, DBPTHIDX, pathindex);
     writeInfo(out, DBTXTIDX, textindex);
     writeInfo(out, DBATVIDX, attrindex);
-    writeInfo(out, DBFTXIDX, ftindex);
+    writeInfo(out, DBFTXIDX, ftxtindex);
+    writeInfo(out, CRTPTH,   createpath);
+    writeInfo(out, CRTTXT,   createtext);
+    writeInfo(out, CRTATV,   createattr);
+    writeInfo(out, CRTFTX,   createftxt);
     writeInfo(out, DBWCIDX,  wildcards);
     writeInfo(out, DBFTST,   stemming);
     writeInfo(out, DBFTCS,   casesens);
@@ -387,7 +402,7 @@ public final class MetaData {
     // reset of flags might be skipped if id/pre mapping is supported
     textindex = false;
     attrindex = false;
-    ftindex = false;
+    ftxtindex = false;
   }
 
   // PRIVATE METHODS ==========================================================

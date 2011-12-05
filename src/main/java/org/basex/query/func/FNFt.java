@@ -186,7 +186,7 @@ public final class FNFt extends FuncCall {
       final FuncCall fun, final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    if(!data.meta.ftindex) NOIDX.thrw(fun.input, fun);
+    if(!data.meta.ftxtindex) NOIDX.thrw(fun.input, fun);
 
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = new FTOpt();

@@ -60,7 +60,8 @@ public final class MemBuilder extends Builder {
     // all contents will be indexed in main memory mode
     meta.textindex = true;
     meta.attrindex = true;
-    meta.ftindex = false;
+    meta.createtext = true;
+    meta.createattr = true;
     final IO file = parser.src;
     meta.original = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;

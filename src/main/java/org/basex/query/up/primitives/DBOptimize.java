@@ -45,7 +45,7 @@ public final class DBOptimize extends UpdatePrimitive {
   public void apply() throws QueryException {
     try {
       if(all) OptimizeAll.optimizeAll(data, ctx, null);
-      else Optimize.optimize(data, data.meta.prop);
+      else Optimize.optimize(data);
     } catch(final Exception ex) {
       DBERR.thrw(input, ex);
     }

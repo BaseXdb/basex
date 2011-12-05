@@ -98,7 +98,7 @@ public class FTContains extends ParseExpr {
 
     // return if step is no text node, or if no index is available
     final AxisStep s = expr instanceof Context ? ic.step : CmpG.indexStep(expr);
-    final boolean ok = s != null && ic.data.meta.ftindex &&
+    final boolean ok = s != null && ic.data.meta.ftxtindex &&
       s.test.type == NodeType.TXT && ftexpr.indexAccessible(ic);
     ic.seq |= ic.not;
     return ok;

@@ -114,12 +114,13 @@ public final class CreateDB extends ACreate {
     final Builder builder = new DiskBuilder(name, parser, ctx);
     try {
       final Data data = builder.build();
-      if(prop.is(Prop.TEXTINDEX)) data.setIndex(IndexType.TEXT,
+      if(data.meta.createtext) data.setIndex(IndexType.TEXT,
         new ValueBuilder(data, true).build());
-      if(prop.is(Prop.ATTRINDEX)) data.setIndex(IndexType.ATTRIBUTE,
+      if(data.meta.createattr) data.setIndex(IndexType.ATTRIBUTE,
         new ValueBuilder(data, false).build());
-      if(prop.is(Prop.FTINDEX))   data.setIndex(IndexType.FULLTEXT,
+      if(data.meta.createftxt) data.setIndex(IndexType.FULLTEXT,
         FTBuilder.get(data).build());
+      data.meta.pathindex = data.meta.createpath;
       data.close();
     } finally {
       try { builder.close(); } catch(final IOException exx) { Util.debug(exx); }

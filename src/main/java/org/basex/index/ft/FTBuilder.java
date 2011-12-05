@@ -151,7 +151,7 @@ public abstract class FTBuilder extends IndexBuilder {
       data.meta.maxscore = max;
       data.meta.minscore = min;
     }
-    data.meta.ftindex = true;
+    data.meta.ftxtindex = true;
     Util.gc(perf);
   }
 
@@ -308,7 +308,7 @@ public abstract class FTBuilder extends IndexBuilder {
   @Override
   public final void abort() {
     data.meta.drop(DATAFTX + ".*");
-    data.meta.ftindex = false;
+    data.meta.ftxtindex = false;
   }
 
   @Override

@@ -92,7 +92,7 @@ public final class DialogInfo extends Dialog {
     final String[] cb = {
         INFOPATHINDEX, INFOTEXTINDEX, INFOATTRINDEX, INFOFTINDEX };
     final boolean[] val = { data.meta.pathindex, data.meta.textindex,
-        data.meta.attrindex, data.meta.ftindex };
+        data.meta.attrindex, data.meta.ftxtindex };
 
     final BaseXBack[] panels = new BaseXBack[indexes.length];
     for(int i = 0; i < indexes.length; ++i) {
