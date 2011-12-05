@@ -1,14 +1,16 @@
 package org.basex.index.value;
 
+import static org.basex.core.Text.*;
+
 import java.util.Arrays;
 
 import org.basex.data.Data;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
+import org.basex.index.IndexStats;
 import org.basex.index.IndexToken;
 import org.basex.util.Array;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenSet;
 
 /**
@@ -79,11 +81,11 @@ public final class MemValues extends TokenSet implements Index {
       final int[] pres = data.pre(ids[i], 0, len[i]);
       if(pres.length > 0) {
         return new IndexIterator() {
-          int p = -1;
+          int p;
           @Override
-          public boolean more() { return ++p < pres.length; }
+          public boolean more() { return p < pres.length; }
           @Override
-          public int next() { return pres[p]; }
+          public int next() { return pres[p++]; }
           @Override
           public double score() { return -1; }
           @Override
@@ -102,7 +104,15 @@ public final class MemValues extends TokenSet implements Index {
 
   @Override
   public byte[] info() {
-    return Token.token(Util.name(this));
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(INDEXSTRUC + TREESTRUC + NL);
+    final IndexStats stats = new IndexStats(data);
+    for(int m = 1; m < size; ++m) {
+      final int oc = len[m];
+      if(stats.adding(oc)) stats.add(key(m));
+    }
+    stats.print(tb);
+    return tb.finish();
   }
 
   @Override

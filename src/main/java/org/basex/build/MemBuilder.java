@@ -62,6 +62,7 @@ public final class MemBuilder extends Builder {
     meta.attrindex = true;
     meta.createtext = true;
     meta.createattr = true;
+    meta.createpath = prop.is(Prop.PATHINDEX);
     final IO file = parser.src;
     meta.original = file != null ? file.path() : "";
     meta.filesize = file != null ? file.length() : 0;

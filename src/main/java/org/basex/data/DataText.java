@@ -70,13 +70,13 @@ public interface DataText {
   /** Documents. */
   String DBDOCS = "DOCS";
   /** Path indexing. */
-  String CRTPTH = "CRTPTH";
+  String DBCRTPTH = "CRTPTH";
   /** Text indexing. */
-  String CRTTXT = "CRTTXT";
+  String DBCRTTXT = "CRTTXT";
   /** Attribute indexing. */
-  String CRTATV = "CRTATV";
+  String DBCRTATV = "CRTATV";
   /** Full-text indexing. */
-  String CRTFTX = "CRTFTX";
+  String DBCRTFTX = "CRTFTX";
 
   /** Tags. */
   String DBTAGS = "TAGS";
