@@ -415,7 +415,8 @@ public final class DiskData extends Data {
       final int k = kind(p);
       final boolean isAttr = k == ATTR;
       // consider nodes which are attribute, text, comment, or proc. instruction
-      if(isAttr || k == TEXT || k == COMM || k == PI) {
+      if(meta.attrindex && isAttr ||
+         meta.textindex && (k == TEXT || k == COMM || k == PI)) {
         final byte[] key = text(p, !isAttr);
         if(len(key) <= MAXLEN) {
           final IntList ids;
@@ -434,10 +435,10 @@ public final class DiskData extends Data {
 
     // update all indexes in parallel
     // [DP] Full-text index updates: update the existing indexes
-    final Thread txtupdater = txts.size() > 0 ? runIndexDelete(txtindex, txts)
-        : null;
-    final Thread atvupdater = atvs.size() > 0 ? runIndexDelete(atvindex, atvs)
-        : null;
+    final Thread txtupdater = meta.textindex && txts.size() > 0 ?
+        runIndexDelete(txtindex, txts) : null;
+    final Thread atvupdater = meta.attrindex && atvs.size() > 0 ?
+        runIndexDelete(atvindex, atvs) : null;
 
     // wait for all tasks to finish
     try {
