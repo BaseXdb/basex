@@ -33,7 +33,6 @@ public final class DropIndex extends ACreate {
     if(data instanceof MemData) return error(PROCMM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
-    if(ci == null) return error(CMDUNKNOWN, this);
     switch(ci) {
       case TEXT:
         data.meta.createtext = false;
@@ -48,7 +47,7 @@ public final class DropIndex extends ACreate {
         data.meta.createpath = false;
         return drop(IndexType.PATH);
       default:
-        return false;
+        return error(CMDUNKNOWN, this);
     }
   }
 

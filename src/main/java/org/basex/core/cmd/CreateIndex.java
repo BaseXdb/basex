@@ -37,7 +37,6 @@ public final class CreateIndex extends ACreate {
     try {
       IndexType index = null;
       final CmdIndex ci = getOption(CmdIndex.class);
-      if(ci == null) return error(CMDUNKNOWN, this);
       switch(ci) {
         case TEXT:
           data.meta.createtext = true;
@@ -62,7 +61,7 @@ public final class CreateIndex extends ACreate {
           index = IndexType.PATH;
           break;
         default:
-          throw Util.notexpected();
+          return error(CMDUNKNOWN, this);
       }
       create(index, data, this);
       data.flush();

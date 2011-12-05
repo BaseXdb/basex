@@ -124,25 +124,25 @@ public abstract class ACreate extends Command {
 
   /**
    * Builds the specified index.
-   * @param type index to be built
+   * @param index index to be built
    * @param data data reference
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  protected static void create(final IndexType type, final Data data,
+  protected static void create(final IndexType index, final Data data,
       final ACreate cmd) throws IOException {
 
     if(data instanceof MemData) return;
     IndexBuilder ib = null;
-    switch(type) {
+    switch(index) {
       case TEXT:      ib = new ValueBuilder(data, true); break;
       case ATTRIBUTE: ib = new ValueBuilder(data, false); break;
       case FULLTEXT:  ib = FTBuilder.get(data); break;
       case PATH:      ib = new PathBuilder(data); break;
       default:        throw Util.notexpected();
     }
-    data.closeIndex(type);
-    data.setIndex(type, (cmd == null ? ib : cmd.progress(ib)).build());
+    data.closeIndex(index);
+    data.setIndex(index, (cmd == null ? ib : cmd.progress(ib)).build());
   }
 
   /**
