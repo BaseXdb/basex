@@ -77,8 +77,8 @@ public final class FNQName extends FuncCall {
     final int as = ns.size();
     final ItemCache ic = new ItemCache(as);
     for(int a = 0; a < as; ++a) {
-      final byte[] key = ns.key(a);
-      if(key.length + ns.value(a).length != 0) ic.add(Str.get(key));
+      final byte[] key = ns.name(a);
+      if(key.length + ns.string(a).length != 0) ic.add(Str.get(key));
     }
     return ic;
   }
@@ -168,12 +168,12 @@ public final class FNQName extends FuncCall {
   private Item nsUriForPrefix(final Item it, final Item it2)
       throws QueryException {
 
-    final byte[] pre = checkEStr(it);
+    final byte[] pref = checkEStr(it);
     final ANode an = (ANode) checkType(it2, NodeType.ELM);
-    if(eq(pre, XML)) return Uri.uri(XMLURI);
+    if(eq(pref, XML)) return Uri.uri(XMLURI);
     final Atts at = an.nsScope();
-    final int i = at != null ? at.get(pre) : -1;
-    return i == -1 || at.value(i).length == 0 ? null : Uri.uri(at.value(i));
+    final int i = at != null ? at.get(pref) : -1;
+    return i == -1 || at.string(i).length == 0 ? null : Uri.uri(at.string(i));
   }
 
   /**

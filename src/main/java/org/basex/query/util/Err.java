@@ -64,7 +64,9 @@ public enum Err {
   /** BASX0019: Evaluation exception. */
   INVFLAG(BASX, 19, "Unknown flag: %."),
   /** BASX0020: Evaluation exception. */
-  LOCKED(BASX, 20, "Database \"%\" is currently locked ('upd.basex' found)."),
+  LOCK(BASX, 20, "Database \"%\" is currently locked."),
+  /** BASX0020: Evaluation exception. */
+  UNLOCK(BASX, 20, "Database \"%\" could not be unlocked ."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -568,6 +570,8 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPATT(XPTY, 4, "Cannot add attributes to a document node."),
   /** XPTY0004: Typing exception. */
+  XPNS(XPTY, 4, "Cannot add namespaces to a document node."),
+  /** XPTY0004: Typing exception. */
   CPIWRONG(XPTY, 4, "Name has invalid type: \"%\"."),
   /** XPTY0004: Typing exception. */
   INVQNAME(XPTY, 4, "Invalid QName: \"%\"."),
@@ -746,13 +750,13 @@ public enum Err {
   /** XUDY0014: XQuery Update dynamic exception. */
   UPNOTCOPIED(XUDY, 14, "% was not copied by copy clause."),
   /** XUDY0015: XQuery Update dynamic exception. */
-  UPMULTREN(XUDY, 15, "Multiple renames on %."),
+  UPMULTREN(XUDY, 15, "Node can only be renamed once: %."),
   /** XUDY0015: XQuery Update dynamic exception. */
-  UPPATHREN(XUDY, 15, "Multiple renames on path \"%\"."),
+  UPPATHREN(XUDY, 15, "Path can only be renamed once: \"%\"."),
   /** XUDY0016: XQuery Update dynamic exception. */
-  UPMULTREPL(XUDY, 16, "Multiple replaces on the same node: %."),
+  UPMULTREPL(XUDY, 16, "Node can only be replaced once: %."),
   /** XUDY0017: XQuery Update dynamic exception. */
-  UPMULTREPV(XUDY, 17, "Multiple replaces on the same node: %"),
+  UPMULTREPV(XUDY, 17, "Node can only be replaced once: %"),
   /** XUDY0021: XQuery Update dynamic exception. */
   UPATTDUPL(XUDY, 21, "Duplicate attribute %."),
   /** XUDY0023: XQuery Update dynamic exception. */

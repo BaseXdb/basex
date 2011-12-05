@@ -24,6 +24,7 @@ import org.basex.io.random.DataAccess;
 import org.basex.io.random.TableDiskAccess;
 import org.basex.util.Compress;
 import org.basex.util.Num;
+import org.basex.util.Performance;
 import org.basex.util.Util;
 
 /**
@@ -184,12 +185,17 @@ public final class DiskData extends Data {
 
   @Override
   public boolean lock() {
-    try {
-      return lockFile().createNewFile();
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return false;
+    // try several times (may fail at first run)
+    final File lock = lockFile();
+    for(int i = 0; i < 10; i++) {
+      try {
+        if(lock.createNewFile()) return true;
+      } catch(final IOException ex) {
+        Performance.sleep(10);
+        Util.debug(ex);
+      }
     }
+    return false;
   }
 
   @Override

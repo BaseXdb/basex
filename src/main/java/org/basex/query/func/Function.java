@@ -875,7 +875,7 @@ public enum Function {
 
   @Override
   public final String toString() {
-    final byte[] pre = NSGlobal.prefix(uri());
-    return new TokenBuilder(pre).add(':').add(desc).toString();
+    final byte[] pref = NSGlobal.prefix(uri());
+    return new TokenBuilder(pref).add(':').add(desc).toString();
   }
 }

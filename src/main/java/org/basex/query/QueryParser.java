@@ -3798,10 +3798,12 @@ public class QueryParser extends InputParser {
     /**
      * Assigns the namespace URI that is currently in scope.
      * @param check check if prefix URI was assigned
-     * @return true if URI was assigned
+     * @return true if URI has a URI
      * @throws QueryException query exception
      */
     boolean assign(final boolean check) throws QueryException {
+      if(name.hasURI()) return true;
+
       if(name.hasPrefix()) {
         name.uri(ctx.ns.uri(name.prefix()));
         if(check && !name.hasURI()) error(NOURI, name);

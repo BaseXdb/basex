@@ -236,7 +236,6 @@ public final class Order extends ParseExpr {
      * @throws QueryException query exception
      */
     private int d(final Item[] sa, final Item[] sb) throws QueryException {
-
       for(int k = 0; k < ob.length; ++k) {
         final OrderBy or = ob[k];
         final Item m = sa[k], n = sb[k];

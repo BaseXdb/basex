@@ -33,6 +33,8 @@ public final class NSTest extends QueryTest {
         "namespace-uri-for-prefix('n', <n:x/>) }'/>/@a)" },
       { "NUFP 8", str("U"), "string(<x a='{ " +
         "namespace-uri-for-prefix('n', <n:x/>) }' xmlns:n='U'/>/@a)" },
+      { "NUFP 9", str("O"),
+        "string(<a xmlns:o='O'>{ namespace-uri-for-prefix('o', <e/>) }</a>)" },
 
       { "NU 1", str("u"),
         "string(<e xmlns:p='u'>{ namespace-uri(<p:e/>) }</e>)" },
@@ -56,6 +58,8 @@ public final class NSTest extends QueryTest {
         "count(in-scope-prefixes(<a/>)), " +
         "count(in-scope-prefixes(<a xmlns=''/>)), " +
         "count(in-scope-prefixes(<a xmlns=''/>))" },
+      { "ISP 4", dbl(2),
+        "number(<e xmlns:n='O'> { count( in-scope-prefixes(<e/>) ) } </e>)" },
 
       { "EC1", bool(true), "exists(<e xmlns:p='u'>{ <a/>/p:x }</e>)" },
 
@@ -72,23 +76,16 @@ public final class NSTest extends QueryTest {
       { "STEP 1", str("X"),
         "string(<e a='{ <e>X</e>/self::e }' xmlns='A'/>/@*)" },
 
-      /* Buggy queries:
+      // Buggy queries:
 
-        // inner element needs to declare outer namespace
-      { "NUFP X2", str("O"),
-        "string(<a xmlns:o='O'>{ namespace-uri-for-prefix('o', <e/>) }</a>)" },
-        // inner element needs to declare outer namespace
-      { "ISP X1", dbl(2),
-        "number(<e xmlns:n='O'> { count( in-scope-prefixes(<e/>) ) } </e>)" },
-        // function prefix is declared by element constructor
+      // function prefix is declared by element constructor
       { "FuncX 1", dbl(1),
         "number(<b a='{ p:count(5) }' " +
         "xmlns:p='http://www.w3.org/2005/xpath-functions'/>/@*)" },
-        // error expected: variable namespace must be invalidated by
-        // element namespace declaration
+      // error expected: variable namespace must be invalidated by
+      // element namespace declaration
       { "VarDecl X1", "declare namespace x='a'; " +
         "let $x:x := 1 return <x a='{ $x:x }' xmlns:x='b'/>" },
-        */
     };
   }
 }

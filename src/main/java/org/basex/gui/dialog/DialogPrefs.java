@@ -137,7 +137,7 @@ public final class DialogPrefs extends Dialog {
     final MainProp mprop = gui.context.mprop;
     mprop.set(MainProp.LANG, lang.getSelectedItem().toString());
     // new database path: close existing database
-    final String dbpath = path.getText().trim();
+    final String dbpath = path.getText();
     if(!mprop.get(MainProp.DBPATH).equals(dbpath)) gui.execute(new Close());
     mprop.set(MainProp.DBPATH, dbpath);
     mprop.write();

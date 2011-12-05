@@ -40,7 +40,7 @@ public final class MemData extends Data {
   }
 
   /**
-   * Constructor, adopting meta data from the specified database.
+   * Constructor, adopting data structures from the specified database.
    * @param data data reference
    */
   public MemData(final Data data) {
