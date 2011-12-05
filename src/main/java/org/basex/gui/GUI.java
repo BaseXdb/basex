@@ -311,17 +311,17 @@ public final class GUI extends AGUI {
 
       try {
         // parse and run all commands
-        execute(true, new CommandParser(in.substring(i), context).parse());
+        execute(false, new CommandParser(in.substring(i), context).parse());
       } catch(final QueryException ex) {
         if(!info.visible()) GUICommands.SHOWINFO.execute(this);
         info.setInfo(ex.getMessage(), null, null, false);
         info.reset();
       }
     } else if(gprop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
-      xquery(in, true);
+      xquery(in, false);
     } else {
       final String qu = Find.find(in, context, gprop.is(GUIProp.FILTERRT));
-      execute(true, new XQuery(qu));
+      execute(false, new XQuery(qu));
     }
   }
 
@@ -329,16 +329,16 @@ public final class GUI extends AGUI {
    * Launches a query. Adds the default namespace, if available.
    * The command is ignored if an update operation takes place.
    * @param qu query to be run
-   * @param main main window
+   * @param edit editor panel
    */
-  public void xquery(final String qu, final boolean main) {
+  public void xquery(final String qu, final boolean edit) {
     // check and add default namespace
     final Namespaces ns = context.data().ns;
     String in = qu.trim().isEmpty() ? "()" : qu;
     final int u = ns.uri(Token.EMPTY, 0);
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
         ns.uri(u), in);
-    execute(main, new XQuery(in));
+    execute(edit, new XQuery(in));
   }
 
   /**
@@ -347,23 +347,23 @@ public final class GUI extends AGUI {
    * @param cmd command to be launched
    */
   public void execute(final Command cmd) {
-    execute(true, cmd);
+    execute(false, cmd);
   }
 
   /**
    * Launches the specified commands in a separate thread.
    * The command is ignored if an update operation takes place.
-   * @param main call from main window
+   * @param edit call from editor view
    * @param cmd command to be launched
    */
-  public void execute(final boolean main, final Command... cmd) {
+  public void execute(final boolean edit, final Command... cmd) {
     // ignore command if updates take place
     if(updating) return;
 
     new Thread() {
       @Override
       public void run() {
-        for(final Command c : cmd) if(!exec(c, main)) break;
+        for(final Command c : cmd) if(!exec(c, edit)) break;
       }
     }.start();
   }
@@ -371,10 +371,10 @@ public final class GUI extends AGUI {
   /**
    * Executes the specified command.
    * @param c command to be executed
-   * @param main call from the main input field
+   * @param edit call from editor panel
    * @return success flag
    */
-  boolean exec(final Command c, final boolean main) {
+  boolean exec(final Command c, final boolean edit) {
     final int thread = ++threadID;
 
     // wait when command is still running
@@ -404,10 +404,11 @@ public final class GUI extends AGUI {
       final boolean up = c.updating(context);
       updating = up;
 
-      // resets the query editor
-      if(editor.visible()) {
-        if(main) editor.reset();
-        else if(c instanceof XQuery) editor.start();
+      // updates the query editor
+      if(edit) {
+        editor.start();
+      } else if(editor.visible()) {
+        editor.reset();
       }
 
       // evaluate command
@@ -427,17 +428,15 @@ public final class GUI extends AGUI {
       info.setInfo(inf, c, time, ok);
       info.reset();
 
-      // show feedback in query editor
-      boolean feedback = main;
-      if(!main && editor.visible() && c instanceof XQuery) {
+      // sends feedback to the query editor
+      if(edit) {
         editor.info(inf.startsWith(PROGERR) ? PROGERR : inf, ok);
-        feedback = true;
       }
 
       // check if query feedback was evaluated in the query view
       if(!ok) {
         // display error in info view
-        if((!feedback || inf.startsWith(BUGINFO)) && !info.visible()) {
+        if((!edit || inf.startsWith(BUGINFO)) && !info.visible()) {
           GUICommands.SHOWINFO.execute(this);
         }
       } else {
