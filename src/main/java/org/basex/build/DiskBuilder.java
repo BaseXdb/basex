@@ -70,6 +70,7 @@ public final class DiskBuilder extends Builder {
     meta.filesize = file != null ? file.length() : 0;
     meta.time = file != null ? file.date() : System.currentTimeMillis();
     meta.dirty = true;
+    meta.updindex = prop.is(Prop.UPDINDEX);
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();

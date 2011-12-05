@@ -244,7 +244,7 @@ public final class UpdateTestText extends UpdateTest {
       throw new IOException("May not insert TEXT before/after TEXT!");
 
     final MemData md = new MemData(CONTEXT.data());
-    md.text(0, pre - par, val, kind);
+    md.text(pre - par, val, kind);
     md.insert(0);
     data.insert(pre, par, md);
   }

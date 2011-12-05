@@ -37,6 +37,8 @@ public interface DataText {
   String DBCHOP = "CHOPPED";
   /** Path indexing. */
   String DBPTHIDX = "PTHINDEX";
+  /** Automatic index update. */
+  String DBUPDIDX = "UPDINDEX";
   /** Text indexing. */
   String DBTXTIDX = "TXTINDEX";
   /** Attribute indexing. */
@@ -291,4 +293,6 @@ public interface DataText {
   byte[] TABLEURI = token("URI");
   /** Table kinds. */
   byte[][] TABLEKINDS = tokens("DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  ");
+  /** Database - ID->PRE mapping. */
+  String DATAIDP = "idp";
 }
