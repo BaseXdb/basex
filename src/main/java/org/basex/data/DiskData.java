@@ -361,7 +361,9 @@ public final class DiskData extends Data {
     try {
       if(txtupdater != null) txtupdater.join();
       if(atvupdater != null) atvupdater.join();
-    } catch(InterruptedException e) { Util.stack(e); }
+    } catch(final InterruptedException ex) {
+      Util.stack(ex);
+    }
   }
 
   @Override
@@ -444,7 +446,9 @@ public final class DiskData extends Data {
     try {
       if(txtupdater != null) txtupdater.join();
       if(atvupdater != null) atvupdater.join();
-    } catch(InterruptedException e) { Util.errln(e); }
+    } catch(final InterruptedException ex) {
+      Util.errln(ex);
+    }
   }
 
   /**
