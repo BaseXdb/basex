@@ -122,7 +122,8 @@ dd_sure=Are you sure?
 dd_available=Available backups
 dd_onlybac=Only available as a backup.\nPlease choose a backup to restore.
 dd_dropbac=One backup will be dropped.
-dd_restore=Please restore the database first. 
+dd_restore=Please restore the database first.
+dd_exists=% database(s) already exist and will be overwritten. 
 
 dx_question=Do you really want to delete?
 dq_question=Save changes to %?
