@@ -173,30 +173,43 @@ public final class DialogManage extends Dialog {
     } else if(cmp == choice) {
       // [LK] open db on double click?
       System.out.println("chice");
+
     } else if(cmp == drop) {
       if(!Dialog.confirm(gui, Util.info(DROPCONF, dbs.size()))) return;
       refresh = true;
       for(final String s : dbs) cmds.add(new DropDB(s));
+
     } else if(cmp == rename) {
       final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
       refresh = true;
       cmds.add(new AlterDB(db, dr.input()));
+
     } else if(cmp == copy) {
       final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
       refresh = true;
       cmds.add(new Copy(db, dc.input()));
+
     } else if(cmp == backup) {
       for(final String s : dbs) cmds.add(new CreateBackup(s));
+
     } else if(cmp == restore) {
-      if(dbs.size() == 1) cmds.add(
-          new Restore((String) backupchoice.getSelectedItem()));
-      else
+      int exist = 0;
+      for(final String d : dbs)
+        if(gui.context.mprop.dbexists(d)) exist++;
+      if(exist > 0 && !Dialog.confirm(gui, Util.info(RESTOREEXIST, exist)))
+        return;
+
+      if(dbs.size() == 1) {
+        cmds.add(new Restore((String) backupchoice.getSelectedItem()));
+      } else
         for(final String s : dbs) cmds.add(new Restore(s));
+
     } else if(cmp == backupchoice) {
       // don't reset the combo box after selecting an item
       // no direct consequences if backup selection changes
+
     } else if(cmp == delete) {
       if(dbs.size() == 1) {
         if(!Dialog.confirm(gui, DROPBACKUP)) return;
@@ -228,7 +241,7 @@ public final class DialogManage extends Dialog {
       backupchoice.setModel(new DefaultComboBoxModel(backups));
 
       // enable or disable buttons (depends on the currently chosen db being
-      // only a backup or an actual database
+      // only a backup or an actual database)
       enableOK(buttons, BUTTONOPEN, o);
       enableOK(buttons, BUTTONBACKUP, o);
       enableOK(buttons, BUTTONDROP, o);
