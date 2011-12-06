@@ -103,7 +103,7 @@ public final class DialogManage extends Dialog {
     final BaseXBack b = new BaseXBack(new BorderLayout(5, 5));
     b.add(new BaseXLabel(AVAILABLE), BorderLayout.NORTH);
     final BaseXBack bb = new BaseXBack(new BorderLayout(5, 5));
-    delete = new BaseXButton(BUTTONDELETE, this);
+    delete = new BaseXButton(BUTTONDELETE + DOTS, this);
     bb.add(backupchoice, BorderLayout.WEST);
     bb.add(delete, BorderLayout.EAST);
     b.add(bb, BorderLayout.CENTER);
