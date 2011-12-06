@@ -83,7 +83,7 @@ public final class DialogManage extends Dialog {
     final StringList dbs = ShowBackups.listdbs(main.context);
     choice = new BaseXList(dbs.toArray(), this, !m);
     set(choice, BorderLayout.CENTER);
-    choice.setSize(160, 450);
+    choice.setSize(160, 580);
 
     final BaseXBack info = new BaseXBack(new BorderLayout(5, 10));
     info.setBorder(new CompoundBorder(new EtchedBorder(),
@@ -99,34 +99,40 @@ public final class DialogManage extends Dialog {
     BaseXLayout.setWidth(detail, 400);
 
     backupchoice = new BaseXCombo(this, "");
-    BaseXLayout.setWidth(backupchoice, 440);
-    final BaseXBack b = new BaseXBack(new BorderLayout(5, 5));
-    b.add(new BaseXLabel(AVAILABLE), BorderLayout.NORTH);
-    final BaseXBack bb = new BaseXBack(new BorderLayout(5, 5));
+    BaseXLayout.setWidth(backupchoice, 400);
     delete = new BaseXButton(BUTTONDELETE + DOTS, this);
-    bb.add(backupchoice, BorderLayout.WEST);
-    bb.add(delete, BorderLayout.EAST);
-    b.add(bb, BorderLayout.CENTER);
-    info.add(b, BorderLayout.NORTH);
+    backup = new BaseXButton(BUTTONBACKUP, this);
+    restore = new BaseXButton(BUTTONRESTORE, this);
+    final BaseXBack backups = new BaseXBack(new BorderLayout(5, 5));
+    backups.setBorder(new CompoundBorder(new EtchedBorder(),
+        new EmptyBorder(10, 10, 10, 10)));
+    final BaseXBack backbtns = newButtons(this, backup, restore, delete);
+    final BaseXLabel avlbbackups = new BaseXLabel("Backups").border(0, 0, 5, 0);
+    avlbbackups.setFont(f.deriveFont(f.getSize2D() + 7f));
+    backups.add(avlbbackups, BorderLayout.NORTH);
+    backups.add(backupchoice, BorderLayout.CENTER);
+    backups.add(backbtns, BorderLayout.SOUTH);
+
     info.add(detail, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack(new BorderLayout()).border(0, 12, 0, 0);
     pp.add(info, BorderLayout.CENTER);
+    pp.add(backups, BorderLayout.SOUTH);
 
     // create buttons
     final BaseXBack p = new BaseXBack(new BorderLayout());
-
-    backup = new BaseXButton(BUTTONBACKUP, this);
-    restore = new BaseXButton(BUTTONRESTORE, this);
     copy = new BaseXButton(BUTTONCOPY, this);
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP, this);
-    buttons = newButtons(this, drop, rename, copy, backup, restore, open);
-    p.add(buttons, BorderLayout.EAST);
-    pp.add(p, BorderLayout.SOUTH);
+    buttons = newButtons(this, drop, rename, copy, open);
+    p.add(buttons, BorderLayout.SOUTH);
 
-    set(pp, BorderLayout.EAST);
+    final BaseXBack right = new BaseXBack(new BorderLayout());
+    right.add(pp, BorderLayout.CENTER);
+    right.add(buttons, BorderLayout.SOUTH);
+
+    set(right, BorderLayout.EAST);
     action(null);
     if(dbs.size() == 0) return;
 
@@ -170,9 +176,6 @@ public final class DialogManage extends Dialog {
         cmds.add(new Open(dbs.get(0)));
       }
       close();
-    } else if(cmp == choice) {
-      // [LK] open db on double click?
-      System.out.println("chice");
 
     } else if(cmp == drop) {
       if(!Dialog.confirm(gui, Util.info(DROPCONF, dbs.size()))) return;
@@ -247,6 +250,12 @@ public final class DialogManage extends Dialog {
       enableOK(buttons, BUTTONDROP, o);
       enableOK(buttons, BUTTONRENAME, o);
       enableOK(buttons, BUTTONCOPY, o);
+
+      // enable/disable backup buttons
+      boolean backupsavl = backupchoice.getModel().getSize() > 0;
+      restore.setEnabled(backupsavl);
+      delete.setEnabled(backupsavl);
+
       o = true;
       for(final String s : dbs) o &= Restore.list(s, ctx).size() != 0;
       enableOK(buttons, BUTTONRESTORE, o);
