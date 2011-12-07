@@ -9,6 +9,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.Text;
+import org.basex.core.cmd.Open;
 import org.basex.index.IdPreMap;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
@@ -50,7 +51,7 @@ public final class DiskData extends Data {
   TokenObjMap<IntList> atvs;
 
   /**
-   * Default constructor.
+   * Default constructor, called from {@link Open#open}.
    * @param db name of database
    * @param ctx database context
    * @throws IOException I/O Exception
@@ -80,6 +81,7 @@ public final class DiskData extends Data {
       if(meta.textindex) txtindex = new DiskValues(this, true);
       if(meta.attrindex) atvindex = new DiskValues(this, false);
       if(meta.ftxtindex) ftxindex = FTIndex.get(this, meta.wildcards);
+      if(meta.updindex) idmap = new IdPreMap(meta.dbfile(DATAIDP));
     } finally {
       try { in.close(); } catch(final IOException ex) { }
     }
@@ -103,6 +105,7 @@ public final class DiskData extends Data {
     pthindex = ps;
     pthindex.finish(this);
     ns = n;
+    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     init();
     flush();
   }
@@ -113,14 +116,6 @@ public final class DiskData extends Data {
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));
     super.init();
-
-    if(meta.updindex) {
-      // if the ID -> PRE mapping is available restore it from disk
-      final File idpfile = meta.dbfile(DATAIDP);
-      idmap = idpfile.exists() && idpfile.length() > 0L ?
-          new IdPreMap(idpfile) :
-          new IdPreMap(meta.lastid);
-    }
   }
 
   /**
