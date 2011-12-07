@@ -227,7 +227,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void finishText(final byte[] b) throws IOException {
-    if(cdata.size() == 0 || !cdata.contains(tags.peek())) {
+    if(cdata.size() == 0 || tags.empty() || !cdata.contains(tags.peek())) {
       for(int k = 0; k < b.length; k += cl(b, k)) code(cp(b, k));
     } else {
       print(CDATA_O);
