@@ -144,6 +144,7 @@ public final class DiskData extends Data {
     docindex.write(out);
     out.write(0);
     out.close();
+    if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
   }
 
   @Override
@@ -156,7 +157,6 @@ public final class DiskData extends Data {
       values.flush();
       if(txtindex != null) ((DiskValues) txtindex).flush();
       if(atvindex != null) ((DiskValues) atvindex).flush();
-      if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
       meta.dirty = false;
     } catch(final IOException ex) {
       Util.stack(ex);
