@@ -38,7 +38,7 @@ public final class MemData extends Data {
     tagindex = tag;
     atnindex = att;
     ns = n;
-    pthindex = s == null ? new PathSummary(this) : s;
+    pthindex = s == null ? new PathSummary(this, 0) : s;
   }
 
   /**

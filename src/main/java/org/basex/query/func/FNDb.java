@@ -17,6 +17,9 @@ import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.Names;
+import org.basex.index.StatsKey;
+import org.basex.index.path.PathNode;
 import org.basex.io.IOFile;
 import org.basex.io.MimeTypes;
 import org.basex.io.out.ArrayOutput;
@@ -32,8 +35,10 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
 import org.basex.query.item.Empty;
 import org.basex.query.item.FAttr;
+import org.basex.query.item.FDoc;
 import org.basex.query.item.FElem;
 import org.basex.query.item.FNode;
+import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
@@ -42,6 +47,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.path.NameTest;
@@ -54,6 +60,7 @@ import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.Kind;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
@@ -119,6 +126,7 @@ public final class FNDb extends FuncCall {
 
     switch(def) {
       case _DB_EVENT:        return event(ctx);
+      case _DB_FACETS:       return facets(ctx);
       case _DB_OPEN_ID:      return open(ctx, true);
       case _DB_OPEN_PRE:     return open(ctx, false);
       case _DB_SYSTEM:       return system(ctx);
@@ -588,6 +596,126 @@ public final class FNDb extends FuncCall {
       NOEVENT.thrw(input, name);
     }
     return null;
+  }
+
+  /**
+   * Returns facet information about db.
+   * @param ctx query context
+   * @return facet information
+   * @throws QueryException query exception
+   */
+  private Item facets(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    double d = checkDbl(expr[1], ctx);
+    final NodeCache nc = new NodeCache();
+    if(d == 1) {
+      PathNode root = data.pthindex.root;
+      if(root != null) {
+        PathNode start = root.ch[0];
+        if(start != null) {
+          FElem felem = new FElem(new QNm(data.tagindex.key(start.name)));
+          getTree(data, start, felem, 0);
+          nc.add(felem);
+        }
+      } else {
+        throw NOVAIDX.thrw(null);
+      }
+    } else if(d == 2) {
+      getFlat(data, nc);
+    }
+    return new FDoc(nc, Token.EMPTY);
+  }
+
+  /** Value token. */
+  byte[] value = token("value");
+  /** Count token. */
+  byte[] count = token("count");
+  /** Type token. */
+  byte[] type2 = token("type");
+  /** Min token. */
+  byte[] min = token("min");
+  /** Max token. */
+  byte[] max = token("max");
+  /** Cate token. */
+  byte[] cate = token("categorical");
+  /** Text token. */
+  byte[] text = token("textual");
+  /** Metric token. */
+  byte[] metric = token("metric");
+
+  /**
+   * Returns flat facet representation.
+   * @param data data reference
+   * @param nc NodeCache
+   * @throws QueryException Exception
+   */
+  private void getFlat(final Data data, final NodeCache nc)
+      throws QueryException {
+    Names tags = data.tagindex;
+    for(int i = 1; i <= tags.size(); i++) {
+      StatsKey s = tags.stat(i);
+      if(!s.advIndex) {
+        throw NOVAIDX.thrw(null);
+      }
+      if(s.kind == Kind.NONE) continue;
+      FElem nd = new FElem(new QNm(tags.key(i)));
+      if(s.kind == Kind.CAT) {
+        nd.add(new FAttr(new QNm(type2), cate));
+        for(int j = 0; j < s.cats.size(); j++) {
+          FElem node = new FElem(new QNm(value));
+          node.add(new FTxt(s.cats.get(j)));
+          node.add(new FAttr(new QNm(count), token(s.vasize.get(j))));
+          nd.add(node);
+        }
+      } else if(s.kind == Kind.DBL || s.kind == Kind.INT) {
+        nd.add(new FAttr(new QNm(type2), metric));
+        nd.add(new FAttr(new QNm(min), token(s.min)));
+        nd.add(new FAttr(new QNm(max), token(s.max)));
+      } else if(s.kind == Kind.TEXT) {
+        nd.add(new FAttr(new QNm(type2), text));
+      }
+      nd.add(new FAttr(new QNm(count), token(s.counter)));
+      nc.add(nd);
+    }
+  }
+
+  /**
+   * Returns tree facet representation.
+   * @param data data reference
+   * @param pn path node
+   * @param par parent node
+   * @param stage root level
+   */
+  private void getTree(final Data data, final PathNode pn, final FElem par,
+      final int stage) {
+    final int k = pn.kind;
+    if(k == Data.ELEM) {
+      final byte[] name = data.tagindex.key(pn.name);
+      final FElem nd = stage == 0 ? par : new FElem(new QNm(name));
+      for(final PathNode ch : pn.ch) getTree(data, ch, nd, 1);
+      if(nd != par) {
+        nd.add(new FAttr(new QNm(count), token(pn.size)));
+        par.add(nd);
+      }
+    } else if(k == Data.TEXT) {
+      if(pn.tkind == Kind.TEXT) {
+        par.add(new FAttr(new QNm(type2), text));
+      } else if(pn.tkind == Kind.CAT) {
+        par.add(new FAttr(new QNm(type2), cate));
+        for(int i = 0; i < pn.values.size(); i++) {
+          FElem node = new FElem(new QNm(value));
+          node.add(new FTxt(pn.values.get(i)));
+          node.add(new FAttr(new QNm(count), token(pn.vasize.get(i))));
+          par.add(node);
+        }
+      } else if(pn.tkind == Kind.INT || pn.tkind == Kind.DBL) {
+        par.add(new FAttr(new QNm(type2), metric));
+        par.add(new FAttr(new QNm(min), token(pn.min)));
+        par.add(new FAttr(new QNm(max), token(pn.max)));
+      }
+    } else if(k == Data.ATTR) {
+      // to be implemented
+    }
   }
 
   @Override

@@ -31,7 +31,7 @@ import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
-import org.basex.index.StatsKey.Kind;
+import org.basex.util.Kind;
 import org.basex.util.list.IntList;
 
 /**

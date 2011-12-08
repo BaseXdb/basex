@@ -3,7 +3,7 @@ package org.basex.gui.view.plot;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.index.StatsKey;
-import org.basex.index.StatsKey.Kind;
+import org.basex.util.Kind;
 import org.basex.util.Array;
 import org.basex.util.hash.TokenSet;
 

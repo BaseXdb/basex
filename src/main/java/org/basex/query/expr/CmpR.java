@@ -22,6 +22,7 @@ import org.basex.query.path.AxisStep;
 import org.basex.query.path.Test.Name;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
+import org.basex.util.Kind;
 import org.basex.util.Token;
 
 /**
@@ -184,8 +185,8 @@ public final class CmpR extends Single {
 
     final Names names = text ? ic.data.tagindex : ic.data.atnindex;
     final StatsKey key = names.stat(names.id(((NameTest) step.test).ln));
-    return key == null || key.kind == StatsKey.Kind.INT ||
-      key.kind == StatsKey.Kind.DBL ? key : null;
+    return key == null || key.kind == Kind.INT ||
+      key.kind == Kind.DBL ? key : null;
   }
 
   @Override

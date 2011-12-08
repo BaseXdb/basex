@@ -155,6 +155,16 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Checks if the specified element is found in the list.
+   * @param e element to be checked
+   * @return result of check
+   */
+  public int containsi(final byte[] e) {
+    for(int i = 0; i < size; ++i) if(eq(list[i], e)) return i;
+    return -1;
+  }
+
+  /**
    * Returns an array with all elements.
    * @return array
    */

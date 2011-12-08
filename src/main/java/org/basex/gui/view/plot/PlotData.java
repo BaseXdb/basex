@@ -6,7 +6,7 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.index.Names;
-import org.basex.index.StatsKey.Kind;
+import org.basex.util.Kind;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 

@@ -493,6 +493,8 @@ public enum Function {
   _DB_LIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   _DB_SYSTEM(FNDb.class, "system()", STR),
+  /** Database function: returns database facet information. */
+  _DB_FACETS(FNDb.class, "facets(database, number)", ITEM, ITEM, DBL_ZM),
   /** Database function: returns database or index information. */
   _DB_INFO(FNDb.class, "info(database[,type])", STR, 1, ITEM, STR),
   /** Database function: returns the node ids of database nodes. */
