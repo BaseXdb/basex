@@ -60,7 +60,8 @@ public final class DiskData extends Data {
     meta = new MetaData(db, ctx);
 
     // don't allow to open locked databases
-    if(lockFile().exists()) throw new BaseXException(Text.DBLOCKED, meta.name);
+    if(updateFile().exists())
+      throw new BaseXException(Text.DBUPDATED, meta.name);
 
     final int cats = ctx.prop.num(Prop.CATEGORIES);
     final DataInput in = new DataInput(meta.dbfile(DATAINF));
@@ -195,9 +196,11 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public boolean lock() {
+  public boolean updating(final boolean updating) {
+    final File lock = updateFile();
+    if(!updating) return lock.delete();
+
     // try several times (may fail at first run)
-    final File lock = lockFile();
     for(int i = 0; i < 10; i++) {
       try {
         if(lock.createNewFile()) return true;
@@ -209,16 +212,11 @@ public final class DiskData extends Data {
     return false;
   }
 
-  @Override
-  public boolean unlock() {
-    return lockFile().delete();
-  }
-
   /**
    * Returns a lock file.
    * @return lock file
    */
-  public File lockFile() {
+  public File updateFile() {
     return meta.dbfile(DataText.DATAUPD);
   }
 

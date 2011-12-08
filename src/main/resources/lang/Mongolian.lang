@@ -372,7 +372,8 @@ pc_direrr="%" эх байршлыг заах.
 # Database commands
 db_no=Өгөгдлийн сан '%' олдсонгүй.
 db_invalid=Нэр '%' буруу байна.
-db_locked=Өгөгдлийн сан '%' цоожлогдсон байна.
+db_pinned=Database '%' is currently opened by another client.
+db_updated=Database '%' is being updated, or update was not completed.
 db_closed=Өгөгдлийн сан '%' хаагдсан байна.
 db_closeerr=Өгөгдлийн сан '%' хаагдаагүй байна.
 db_optimized=Өгөгдлийн сан '%' нь %-нд шинэчлэгдсэн.

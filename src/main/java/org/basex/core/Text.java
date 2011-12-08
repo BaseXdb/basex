@@ -524,8 +524,10 @@ public interface Text {
   String DBNOTFOUND = lang("db_no");
   /** Name invalid. */
   String NAMEINVALID = lang("db_invalid");
-  /** Database locked. */
-  String DBLOCKED = lang("db_locked");
+  /** Database pinned. */
+  String DBPINNED = lang("db_pinned");
+  /** Database updated. */
+  String DBUPDATED = lang("db_updated");
   /** Database closed. */
   String DBCLOSED = lang("db_closed");
   /** Database not closed. */

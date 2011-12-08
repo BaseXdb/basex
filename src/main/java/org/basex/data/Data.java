@@ -168,15 +168,10 @@ public abstract class Data {
 
   /**
    * Marks a database as updating.
+   * @param updating updating flag
    * @return result flag
    */
-  public abstract boolean lock();
-
-  /**
-   * Removes the updating flag.
-   * @return result flag
-   */
-  public abstract boolean unlock();
+  public abstract boolean updating(final boolean updating);
 
   /**
    * Returns the indexed pre references for the specified token.

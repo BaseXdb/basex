@@ -197,7 +197,7 @@ final class DatabaseUpdates {
     treeAwareUpdates();
 
     // mark disk database instances as updating
-    if(!data.lock()) LOCK.thrw(null, data.meta.name);
+    if(!data.updating(true)) LOCK.thrw(null, data.meta.name);
 
     /*
      * For each target node, the update primitives in the corresponding
@@ -230,7 +230,7 @@ final class DatabaseUpdates {
     data.flush();
 
     // mark disk database instances as updating
-    if(!data.unlock()) UNLOCK.thrw(null, data.meta.name);
+    if(!data.updating(false)) UNLOCK.thrw(null, data.meta.name);
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {

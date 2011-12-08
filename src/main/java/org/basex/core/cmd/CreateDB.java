@@ -108,7 +108,7 @@ public final class CreateDB extends ACreate {
     if(prop.is(Prop.MAINMEM)) return MemBuilder.build(name, parser, ctx.prop);
 
     // database is currently locked by another process
-    if(ctx.pinned(name)) throw new BaseXException(DBLOCKED, name);
+    if(ctx.pinned(name)) throw new BaseXException(DBPINNED, name);
 
     // build database and index structures
     final Builder builder = new DiskBuilder(name, parser, ctx);

@@ -372,7 +372,8 @@ pc_direrr="%" ディレクトリを示します。
 # Database commands
 db_no=データベース '%' が見付かりませんでした。
 db_invalid='%' は不正な名前です。
-db_locked=データベース '%' はロックされています。
+db_pinned=Database '%' is currently opened by another client.
+db_updated=Database '%' is being updated, or update was not completed.
 db_closed=データベース '%' を閉じました。
 db_closeerr=データベース '%' を閉じる事が出来ませんでした。
 db_optimized=データベース '%' を  % で最適化しました。

@@ -372,7 +372,8 @@ pc_direrr="%" points to a directory.
 # Database commands
 db_no=Cơ sở dữ liệu '%' không tìm thấy.
 db_invalid=Name '%' is invalid.
-db_locked=Database '%' is currently locked.
+db_pinned=Database '%' is currently opened by another client.
+db_updated=Database '%' is being updated, or update was not completed.
 db_closed=Cơ sở dữ liệu '%' đã được đóng.
 db_closeerr=Cơ sở dữ liệu '%' không đóng được.
 db_optimized=Cơ sở dữ liệu '%' tối ưu trong %.

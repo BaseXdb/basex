@@ -52,7 +52,7 @@ public final class Restore extends Command {
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);
     // check if database is still pinned
-    if(context.pinned(db)) return error(DBLOCKED, db);
+    if(context.pinned(db)) return error(DBPINNED, db);
 
     // try to restore database
     return restore(file) && (!closed || new Open(db).run(context)) ?

@@ -82,7 +82,7 @@ public abstract class ACreate extends Command {
     new Close().run(context);
 
     try {
-      if(context.pinned(db)) return error(DBLOCKED, db);
+      if(context.pinned(db)) return error(DBPINNED, db);
 
       final boolean mem = prop.is(Prop.MAINMEM);
       builder = mem ? new MemBuilder(db, parser, prop) :

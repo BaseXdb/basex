@@ -43,7 +43,7 @@ public final class DropDB extends Command {
       close(context, db);
       // check if database is still pinned
       if(context.pinned(db)) {
-        info(DBLOCKED, db);
+        info(DBPINNED, db);
         ok = false;
       } else if(!drop(db, mprop)) {
         // dropping was not successful
