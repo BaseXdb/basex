@@ -20,20 +20,20 @@ import org.basex.util.hash.TokenSet;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class MemValues extends TokenSet implements Index {
+public class MemValues extends TokenSet implements Index {
   /** IDs. */
-  private int[][] ids = new int[CAP][];
+  protected int[][] ids = new int[CAP][];
   /** ID array lengths. */
-  private int[] len = new int[CAP];
-  /** ID->PRE mapping. */
-  private final Data data;
+  protected int[] len = new int[CAP];
+  /** Data instance. */
+  protected final Data data;
 
   /**
    * Constructor.
-   * @param m id->pre mapping
+   * @param d data instance
    */
-  public MemValues(final Data m) {
-    data = m;
+  public MemValues(final Data d) {
+    data = d;
   }
 
   /**
@@ -61,35 +61,26 @@ public final class MemValues extends TokenSet implements Index {
    * @param key record key
    * @param id record id
    */
-  public void delete(final byte[] key, final int id) {
-    final int i = id(key);
-    if(i == 0 || len[i] == 0) return;
-
-    // find the position where the id is stored
-    int p = -1;
-    while(++p < len[i]) if(ids[i][p] == id) break;
-
-    // if not the last element, we need to shift forwards
-    if(p < len[i] - 1) Array.move(ids[i], p + 1, -1, len[i] - (p + 1));
-    len[i]--;
-  }
+  @SuppressWarnings("unused")
+  public void delete(final byte[] key, final int id) { }
 
   @Override
   public IndexIterator iter(final IndexToken tok) {
     final int i = id(tok.get());
     if(i > 0) {
-      final int[] pres = data.pre(ids[i], 0, len[i]);
-      if(pres.length > 0) {
+      final int cnt = len[i];
+      if(cnt > 0) {
+        final int[] pres = ids[i];
         return new IndexIterator() {
-          int p;
+          private int p;
           @Override
-          public boolean more() { return p < pres.length; }
+          public boolean more() { return p < cnt; }
           @Override
           public int next() { return pres[p++]; }
           @Override
           public double score() { return -1; }
           @Override
-          public int size() { return pres.length; }
+          public int size() { return cnt; }
         };
       }
     }

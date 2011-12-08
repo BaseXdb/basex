@@ -81,7 +81,7 @@ public final class MemBuilder extends Builder {
 
   @Override
   protected void addDoc(final byte[] value) {
-    data.doc(0, value);
+    data.doc(meta.size, 0, value);
     data.insert(meta.size);
   }
 
@@ -95,13 +95,13 @@ public final class MemBuilder extends Builder {
   @Override
   protected void addAttr(final int nm, final byte[] value, final int dist,
       final int uri) {
-    data.attr(dist, nm, value, uri, false);
+    data.attr(meta.size, dist, nm, value, uri, false);
     data.insert(meta.size);
   }
 
   @Override
   protected void addText(final byte[] value, final int dist, final byte kind) {
-    data.text(dist, value, kind);
+    data.text(meta.size, dist, value, kind);
     data.insert(meta.size);
   }
 

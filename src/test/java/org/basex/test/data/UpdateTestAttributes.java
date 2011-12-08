@@ -54,7 +54,7 @@ public final class UpdateTestAttributes extends UpdateTest {
     final long nextid = data.meta.lastid;
 
     final MemData md = new MemData(CONTEXT.data());
-    md.attr(1, data.atnindex.index(FOO, null, false), JUNIT, 0, false);
+    md.attr(0, 1, data.atnindex.index(FOO, null, false), JUNIT, 0, false);
     md.insert(0);
     data.insertAttr(9, 6, md);
     assertEquals(size + 1, data.meta.size);

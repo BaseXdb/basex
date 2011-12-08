@@ -6,6 +6,7 @@ import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.path.PathSummary;
 import org.basex.index.value.MemValues;
+import org.basex.index.value.UpdatableMemValues;
 import org.basex.index.Names;
 import org.basex.io.random.TableMemAccess;
 import org.basex.util.Token;
@@ -31,10 +32,15 @@ public final class MemData extends Data {
       final PathSummary s, final Prop pr) {
 
     meta = new MetaData(pr);
-    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     table = new TableMemAccess(meta);
-    txtindex = new MemValues(this);
-    atvindex = new MemValues(this);
+    if(meta.updindex) {
+      idmap = new IdPreMap(meta.lastid);
+      txtindex = new UpdatableMemValues(this);
+      atvindex = new UpdatableMemValues(this);
+    } else {
+      txtindex = new MemValues(this);
+      atvindex = new MemValues(this);
+    }
     tagindex = tag;
     atnindex = att;
     ns = n;
@@ -103,17 +109,19 @@ public final class MemData extends Data {
 
   @Override
   public void updateText(final int pre, final byte[] val, final int kind) {
-    final boolean txt = kind != ATTR;
     final int id = id(pre);
     if(meta.updindex) {
+      final boolean txt = kind != ATTR;
       ((MemValues) (txt ? txtindex : atvindex)).delete(text(pre, txt), id);
     }
-    textOff(pre, index(id, val, kind));
+    textOff(pre, index(pre, id, val, kind));
   }
 
   @Override
-  protected long index(final int id, final byte[] txt, final int kind) {
-    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).index(txt, id);
+  protected long index(final int pre, final int id, final byte[] txt,
+      final int kind) {
+    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).
+        index(txt, meta.updindex ? id : pre);
   }
 
   @Override
