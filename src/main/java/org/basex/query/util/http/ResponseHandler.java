@@ -139,7 +139,7 @@ public final class ResponseHandler {
       if(!s) payloads.add(
           interpretPayload(
               extractPayload(
-                  conn.getInputStream(),
+                  conn.getInputStream(), contentType,
                   extractCharset(conn.getContentType())),
               contentType, prop, ii));
     }
@@ -209,17 +209,22 @@ public final class ResponseHandler {
    * Extracts payload from HTTP message and returns it as a byte array encoded
    * in UTF-8.
    * @param io connection input stream
+   * @param c content type
    * @param cs response content charset
    * @return payload as byte array
    * @throws IOException I/O Exception
    */
-  private static byte[] extractPayload(final InputStream io, final String cs)
+  private static byte[] extractPayload(final InputStream io, final byte[] c, final String cs)
     throws IOException {
     final BufferedInputStream bis = new BufferedInputStream(io);
     try {
       final ByteList bl = new ByteList();
       for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
+      // In case of XML, HTML or text content type, use supplied character set
+      if(isXML(c) || eq(c, TXT_HTML) || startsWith(c, MIME_TEXT_PREFIX))
       return TextInput.content(new IOContent(bl.toArray()), cs).finish();
+      // In case of binary data, do not encode anything
+      return bl.toArray();
     } finally {
       bis.close();
     }
@@ -240,8 +245,7 @@ public final class ResponseHandler {
   private static Item interpretPayload(final byte[] p, final byte[] c,
       final Prop prop, final InputInfo ii) throws IOException, QueryException {
 
-    if(eq(c, TXT_XML) || eq(c, TXT_EXT_XML) || eq(c, APPL_XML) ||
-        eq(c, APPL_EXT_XML) || endsWith(c, MIME_XML_SUFFIX)) {
+    if(isXML(c)) {
       return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
     }
     if(eq(c, TXT_HTML)) {
@@ -249,6 +253,18 @@ public final class ResponseHandler {
       return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
     }
     return startsWith(c, MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
+  }
+  
+  /**
+   * Checks if the content type is an XML content type.
+   * @param c content type
+   * @return result
+   */
+  private static boolean isXML(final byte[] c) {
+    if(eq(c, TXT_XML) || eq(c, TXT_EXT_XML) || eq(c, APPL_XML) ||
+        eq(c, APPL_EXT_XML) || endsWith(c, MIME_XML_SUFFIX))
+      return true;
+    return false;
   }
 
   /**
