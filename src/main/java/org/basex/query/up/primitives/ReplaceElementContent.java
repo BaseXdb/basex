@@ -57,7 +57,7 @@ public final class ReplaceElementContent extends StructuralUpdate {
       while(pre + data.size(pre, kind) > loc) data.delete(loc);
       if(value.length > 0) {
         final MemData md = new MemData(data);
-        md.text(loc - pre, value, Data.TEXT);
+        md.text(pre, loc - pre, value, Data.TEXT);
         md.insert(0);
         data.insert(loc, pre, md);
       }

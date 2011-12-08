@@ -16,6 +16,7 @@ import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.FTIndex;
 import org.basex.index.path.PathSummary;
 import org.basex.index.value.DiskValues;
+import org.basex.index.value.UpdatableDiskValues;
 import org.basex.index.Names;
 import org.basex.io.IO;
 import org.basex.io.in.DataInput;
@@ -79,10 +80,15 @@ public final class DiskData extends Data {
       }
       // open data and indexes
       init();
-      if(meta.textindex) txtindex = new DiskValues(this, true);
-      if(meta.attrindex) atvindex = new DiskValues(this, false);
+      if(meta.updindex) {
+        idmap = new IdPreMap(meta.dbfile(DATAIDP));
+        if(meta.textindex) txtindex = new UpdatableDiskValues(this, true);
+        if(meta.attrindex) atvindex = new UpdatableDiskValues(this, false);
+      } else {
+        if(meta.textindex) txtindex = new DiskValues(this, true);
+        if(meta.attrindex) atvindex = new DiskValues(this, false);
+      }
       if(meta.ftxtindex) ftxindex = FTIndex.get(this, meta.wildcards);
-      if(meta.updindex) idmap = new IdPreMap(meta.dbfile(DATAIDP));
     } finally {
       try { in.close(); } catch(final IOException ex) { }
     }
@@ -138,6 +144,7 @@ public final class DiskData extends Data {
     docindex.write(out);
     out.write(0);
     out.close();
+    if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
   }
 
   @Override
@@ -150,7 +157,6 @@ public final class DiskData extends Data {
       values.flush();
       if(txtindex != null) ((DiskValues) txtindex).flush();
       if(atvindex != null) ((DiskValues) atvindex).flush();
-      if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
       meta.dirty = false;
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -360,7 +366,8 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected long index(final int id, final byte[] value, final int kind) {
+  protected long index(final int pre, final int id, final byte[] value,
+      final int kind) {
     final DataAccess store;
     final TokenObjMap<IntList> m;
 
