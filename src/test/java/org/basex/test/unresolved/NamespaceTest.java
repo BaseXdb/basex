@@ -47,26 +47,6 @@ public final class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public void nsInAtt() {
-    query("data(<a a='{namespace-uri-for-prefix('x', <b/>)}' xmlns:x='X'/>/@a)",
-        "X");
-  }
-
-  /**
-   * Test query.
-   * Detects malformed namespace hierarchy.
-   */
-  @Test
-  public void nsInBraces() {
-    query("<a xmlns:x='X'>{namespace-uri-for-prefix('x', <b/>)}</a>/text()",
-        "X");
-  }
-
-  /**
-   * Test query.
-   * Detects malformed namespace hierarchy.
-   */
-  @Test
   public void newPrefix() {
     query("<a>{ attribute {QName('http://bla', 'att')} {} }</a>",
         "<a xmlns:ns1='http://bla' ns1:att=''/>");
@@ -116,16 +96,6 @@ public final class NamespaceTest {
       assertEquals("XUTY0004", string(ex.qname().local()));
     }
     fail("should throw XUTY0004");
-  }
-
-  /**
-   * Test query.
-   */
-  @Test
-  public void defaultElementNamespaceTest() {
-    query("declare default element namespace 'a';" +
-        "let $x as element(a) := <a/> return $x",
-        "<a xmlns=\"a\"/>");
   }
 
   /**
