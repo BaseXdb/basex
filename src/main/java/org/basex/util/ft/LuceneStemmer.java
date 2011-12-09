@@ -1,6 +1,7 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
+
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
@@ -130,7 +131,7 @@ final class LuceneStemmer extends Stemmer {
     } else {
       s = (String) Reflect.invoke(clazz.stem, stemmer, s);
     }
-    return token(s);
+    return s == null ? word : token(s);
   }
 
   /** Structure, containing stemming methods. */
