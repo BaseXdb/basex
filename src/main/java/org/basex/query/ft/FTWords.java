@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -364,10 +365,11 @@ public final class FTWords extends FTExpr {
     /* Index will be applied if no explicit match options have been set
      * that conflict with the index options. As a consequence, though, index-
      * based querying might yield other results than sequential scanning. */
-    if(fto.isSet(CS) && md.casesens != fto.is(CS) ||
+    if(occ != null ||
+       fto.isSet(CS) && md.casesens != fto.is(CS) ||
        fto.isSet(DC) && md.diacritics != fto.is(DC) ||
        fto.isSet(ST) && md.stemming != fto.is(ST) ||
-       fto.ln != null && md.language != fto.ln || occ != null) return false;
+       fto.ln != null && !fto.ln.equals(md.language)) return false;
 
     // estimate costs if text is not statically known
     if(txt == null) {
