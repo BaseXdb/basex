@@ -317,6 +317,8 @@ public final class FTTest extends QueryTest {
         "'base' <- ('bases' using stemming) using no stemming" },
       { "FTStemming 10", bool(true),
         "'книга' <- 'книги' using stemming using language 'Russian'" },
+      { "FTStemming 11", bool(true),
+        "'de' <- 'de' using stemming using language 'pt'" },
 
       { "FTLanguage 1", node(14),
         "//* [text() <- 'hello' using language 'en']" },
