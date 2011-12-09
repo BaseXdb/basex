@@ -15,6 +15,25 @@ public final class Atts {
   private int size;
 
   /**
+   * Default constructor.
+   */
+  public Atts() {
+    nm = new byte[1][];
+    st = new byte[1][];
+  }
+
+  /**
+   * Constructor, specifying an initial entry.
+   * @param name name to be added
+   * @param string string to be added
+   */
+  public Atts(final byte[] name, final byte[] string) {
+    nm = new byte[][] { name };
+    st = new byte[][] { string };
+    size = 1;
+  }
+
+  /**
    * Adds the next name/string pair.
    * @param name name to be added
    * @param string string to be added
