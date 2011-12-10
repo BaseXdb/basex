@@ -373,7 +373,7 @@ public final class FTWords extends FTExpr {
 
     // estimate costs if text is not statically known
     if(txt == null) {
-      ic.costs(Math.max(1, ic.data.meta.size / 20));
+      ic.costs(Math.max(1, ic.data.meta.size >> 10));
       return true;
     }
 
@@ -403,7 +403,7 @@ public final class FTWords extends FTExpr {
           }
         }
         // reduce number of expected results to favor full-text index requests
-        ic.addCosts(Math.max(1, ic.data.count(ft) >> 2));
+        ic.addCosts(Math.max(1, ic.data.count(ft) >> 10));
       }
     }
     return true;
