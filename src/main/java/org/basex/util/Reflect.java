@@ -3,6 +3,7 @@ package org.basex.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
 /**
@@ -53,11 +54,13 @@ public final class Reflect {
       if(c == null) {
         try {
           c = Class.forName(name);
+          if(!accessible(c)) return null;
           classes.put(name, c);
           return c;
         } catch(final ClassNotFoundException ex) {
           if(jarLoader != null) {
             c = Class.forName(name, true, jarLoader);
+            if(!accessible(c)) return null;
             classes.put(name, c);
           }
           return c;
@@ -265,5 +268,15 @@ public final class Reflect {
    */
   public static void setJarLoader(final JarLoader l) {
     jarLoader = l;
+  }
+
+  /**
+   * Check if a class is accessible.
+   * @param cls class
+   * @return {@code true} if a class is accessible
+   */
+  public static boolean accessible(final Class<?> cls) {
+    // non public classes cannot be instantiated
+    return Modifier.isPublic(cls.getModifiers());
   }
 }
