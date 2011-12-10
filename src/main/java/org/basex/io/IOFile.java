@@ -400,6 +400,7 @@ public final class IOFile extends IO {
         else tb.add(ch);
       }
       add(tb);
+      if(path.startsWith("\\\\") || path.startsWith("//")) tb.add("//");
       for(int s = 0; s < size; ++s) {
         if(s != 0 || path.startsWith("/")) tb.add('/');
         tb.add(list[s]);
