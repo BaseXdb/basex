@@ -520,7 +520,7 @@ public enum Err {
   /** XPST0017: Parsing exception. */
   FUNSIMILAR(XPST, 17, "Unknown function \"%\"; similar: \"%\"."),
   /** XPST0017: Parsing Exception. */
-  FUNCTYPE(XPST, 17, "Wrong arguments: %(value) expected."),
+  FUNCTYPE(XPST, 17, "%(...): wrong number of arguments."),
   /** XPST0003: Parsing exception. */
   FEATURE30(XPST, 17, "Feature not available in XQuery 1.0."),
   /** XPST0017: Parsing exception. */

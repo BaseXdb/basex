@@ -3389,7 +3389,7 @@ public class QueryParser extends InputParser {
   private byte[] ncName(final Err err) throws QueryException {
     tok.reset();
     if(ncName()) return tok.finish();
-    if(err != null) error(err);
+    if(err != null) error(err, tok);
     return EMPTY;
   }
 

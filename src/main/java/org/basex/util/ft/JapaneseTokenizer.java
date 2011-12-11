@@ -117,17 +117,17 @@ public class JapaneseTokenizer extends Tokenizer {
     if(available) {
       Class<?> clz = Reflect.find(PATTERN);
       if(clz == null) {
-        Util.errln("Could not initialize Igo Japanese lexer.");
+        Util.debug("Could not initialize Igo Japanese lexer.");
       } else {
         tgr = Reflect.find(clz, String.class);
         tagger = Reflect.get(tgr, dic.toString());
         if(tagger == null) {
           available = false;
-          Util.errln("Could not initialize Igo Japanese lexer.");
+          Util.debug("Could not initialize Igo Japanese lexer.");
         } else {
           parse = Reflect.method(clz, "parse", CharSequence.class);
           if(parse == null) {
-            Util.errln("Could not initialize Igo lexer method.");
+            Util.debug("Could not initialize Igo lexer method.");
           }
           clz = Reflect.find("net.reduls.igo.Morpheme");
           surface = Reflect.field(clz, "surface");
