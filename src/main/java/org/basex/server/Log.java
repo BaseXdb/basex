@@ -73,8 +73,8 @@ public final class Log {
     try {
       fos.write(tb.finish());
       fos.flush();
-    } catch(final IOException ex) {
-      Util.stack(ex);
+    } catch(final Exception ex) {
+      Util.debug(ex);
     }
   }
 

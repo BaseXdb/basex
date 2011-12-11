@@ -392,7 +392,7 @@ public enum Err {
   /** XPST0003: Evaluation exception. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
   /** XPST0003: Parsing exception. */
-  PATHMISS(XPST, 3, "Expecting location path."),
+  PATHMISS(XPST, 3, "Expecting location path%."),
   /** XPST0003: Parsing exception. */
   DECLINCOMPLETE(XPST, 3, "Incomplete declaration; expecting "
       + "'function', 'variable', ..."),

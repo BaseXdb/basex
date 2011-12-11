@@ -335,8 +335,10 @@ public class QueryParser extends InputParser {
       versionDecl();
       if(u == null) {
         expr = mainModule();
-        if(expr == null) if(alter != null) error();
-        else error(EXPREMPTY);
+        if(expr == null) {
+          if(alter != null) error();
+          else error(EXPREMPTY);
+        }
       } else {
         moduleDecl(u);
       }
@@ -1751,7 +1753,7 @@ public class QueryParser extends InputParser {
     if(ex == null) {
       if(s == 2) {
         if(more()) checkInit();
-        error(PATHMISS);
+        error(PATHMISS, found());
       }
       return s == 1 ? new Root(input()) : null;
     }
@@ -1774,7 +1776,7 @@ public class QueryParser extends InputParser {
         checkAxis(desc ? Axis.DESC : Axis.CHILD);
 
         final Expr st = step();
-        if(st == null) error(PATHMISS);
+        if(st == null) error(PATHMISS, found());
         // skip context nodes
         if(!(st instanceof Context)) list = add(list, st);
       } while(consume('/'));
@@ -1898,9 +1900,9 @@ public class QueryParser extends InputParser {
 
     final int p = qp;
     if(consume('*')) {
-      // name test: "*"
+      // name test: *
       if(!consume(':')) return new NameTest(att, input());
-      // name test: "*:tag"
+      // name test: *:name
       return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Name.NAME, att,
           input());
     }
@@ -1922,18 +1924,25 @@ public class QueryParser extends InputParser {
         }
       } else {
         qp = p2;
-        // name test: "pre:tag" or "tag"
+        // name test: prefix:name, name
         if(name.hasPrefix() || !consume(':')) {
           skipWS();
           names.add(new QNmCheck(name, !att));
           return new NameTest(name, NameTest.Name.STD, att, input());
         }
-        // name test: "pre:*"
+        // name test: prefix:*
         if(consume('*')) {
           final QNm nm = new QNm(concat(name.string(), COLON));
           names.add(new QNmCheck(nm, !att));
           return new NameTest(nm, NameTest.Name.NS, att, input());
         }
+      }
+    } else if(quote(curr())) {
+      // name test: '':*
+      final byte[] u = stringLiteral();
+      if(consume(':') && consume('*')) {
+        final QNm nm = new QNm(COLON, u);
+        return new NameTest(nm, NameTest.Name.NS, att, input());
       }
     }
     qp = p;
@@ -2007,24 +2016,22 @@ public class QueryParser extends InputParser {
     if(c == '(' && next() != '#') return parenthesized();
     // direct constructor
     if(c == '<') return constructor();
-    // function calls and computed constructors
-    if(c == '%' || XMLToken.isNCStartChar(c)) {
-      Expr e;
-      if(ctx.xquery3) {
-        e = functionItem();
-        if(e != null) return e;
-      }
-      e = functionCall();
+    // function item
+    if(ctx.xquery3) {
+      final Expr e = functionItem();
       if(e != null) return e;
-      e = compConstructor();
-      if(e != null) return e;
-      // ordered expression
-      if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
-          wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE))
-        return enclosed(NOENCLEXPR);
-
-      if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral();
     }
+    // function call
+    Expr e = functionCall();
+    if(e != null) return e;
+    // computed constructors
+    e = compConstructor();
+    if(e != null) return e;
+    // ordered expression
+    if(wsConsumeWs(ORDERED, BRACE1, INCOMPLETE) ||
+        wsConsumeWs(UNORDERED, BRACE1, INCOMPLETE)) return enclosed(NOENCLEXPR);
+    // map literal
+    if(wsConsumeWs(MAPSTR, BRACE1, INCOMPLETE)) return mapLiteral();
     // context item
     if(c == '.' && !digit(next())) {
       if(next() == '.') return null;
@@ -2105,7 +2112,20 @@ public class QueryParser extends InputParser {
     // literals
     if(digit(c) || c == '.') return numericLiteral(false);
     // strings
-    return quote(c) ? Str.get(stringLiteral()) : null;
+    if(!quote(c)) return null;
+
+    final int p = qp;
+    final byte[] s = stringLiteral();
+    final int q = qp;
+    if(consume(':')) {
+      // check for EQName
+      if(!consume('=')) {
+        qp = p;
+        return null;
+      }
+      qp = q;
+    }
+    return Str.get(s);
   }
 
   /**
@@ -2209,7 +2229,7 @@ public class QueryParser extends InputParser {
   private Expr functionCall() throws QueryException {
     final int p = qp;
     final QNm name = eQName(null, ctx.nsFunc);
-    if(!keyword(name)) {
+    if(name != null && !keyword(name)) {
       final Expr[] args = argumentList(name.string());
       if(args != null) {
         alter = FUNCUNKNOWN;

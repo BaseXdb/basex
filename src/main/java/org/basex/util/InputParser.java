@@ -13,7 +13,7 @@ import org.basex.io.IO;
  */
 public abstract class InputParser {
   /** Parsing exception. */
-  private static final String FOUND = ", found \"%\"";
+  private static final String FOUND = ", '%' found";
 
   /** Input query. */
   public final String query;
