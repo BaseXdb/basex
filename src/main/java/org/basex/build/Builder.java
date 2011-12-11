@@ -29,9 +29,6 @@ import org.basex.util.list.IntList;
  * @author Christian Gruen
  */
 public abstract class Builder extends Progress {
-  /** Meta data on built database. */
-  public MetaData meta;
-
   /** Tree structure. */
   protected final PathSummary path = new PathSummary(null);
   /** Namespace index. */
@@ -43,10 +40,12 @@ public abstract class Builder extends Progress {
   /** Database name. */
   protected final String name;
 
+  /** Meta data on built database. */
+  protected MetaData meta;
   /** Tag name index. */
-  protected final Names tags;
+  private Names tags;
   /** Attribute name index. */
-  protected final Names atts;
+  private Names atts;
 
   /** Number of cached size values. */
   protected int ssize;
@@ -74,20 +73,26 @@ public abstract class Builder extends Progress {
     parser = parse;
     prop = pr;
     name = nm;
-    final int cats = pr.num(Prop.CATEGORIES);
-    tags = new Names(cats);
-    atts = new Names(cats);
   }
 
   // PUBLIC METHODS ===========================================================
 
   /**
    * Builds the database.
+   * @param md meta data
+   * @param ta tag index
+   * @param at attribute name index
    * @throws IOException I/O exception
    */
-  protected final void parse() throws IOException {
+  protected final void parse(final MetaData md, final Names ta, final Names at)
+      throws IOException {
+
     final Performance perf = Util.debug ? new Performance() : null;
     Util.debug(tit() + DOTS);
+
+    meta = md;
+    tags = ta;
+    atts = at;
 
     // add document node and parse document
     parser.parse(this);

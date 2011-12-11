@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.IOException;
@@ -161,7 +160,7 @@ public final class FTWords extends FTExpr {
               if(ftt.opt.sw != null && ftt.opt.sw.id(tok) != 0) {
                 ++d;
               } else {
-                final FTIndexIterator ir = lex.get().length > MAXLEN ?
+                final FTIndexIterator ir = lex.get().length > data.meta.maxlen ?
                     scan(lex) : (FTIndexIterator) data.iter(lex);
                 if(ia == null) {
                   ia = ir;

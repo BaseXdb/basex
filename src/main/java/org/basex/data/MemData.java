@@ -24,12 +24,12 @@ public final class MemData extends Data {
    * Constructor.
    * @param tag tag index
    * @param att attribute name index
-   * @param n namespaces
-   * @param s path summary
+   * @param ps path summary
+   * @param ns namespaces
    * @param pr database properties
    */
-  public MemData(final Names tag, final Names att, final Namespaces n,
-      final PathSummary s, final Prop pr) {
+  public MemData(final Names tag, final Names att, final PathSummary ps,
+      final Namespaces ns, final Prop pr) {
 
     meta = new MetaData(pr);
     table = new TableMemAccess(meta);
@@ -41,19 +41,19 @@ public final class MemData extends Data {
       txtindex = new MemValues(this);
       atvindex = new MemValues(this);
     }
-    tagindex = tag;
-    atnindex = att;
-    ns = n;
-    pthindex = s == null ? new PathSummary(this) : s;
+    tagindex = tag == null ? new Names(meta) : tag;
+    atnindex = att == null ? new Names(meta) : att;
+    pthindex = ps == null ? new PathSummary(this) : ps;
+    nspaces = ns == null ? new Namespaces() : ns;
   }
 
   /**
-   * Constructor, adopting data structures from the specified database.
+   * Light-weight constructor, adopting data structures from the
+   * specified database.
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, new Namespaces(),
-         data.pthindex, data.meta.prop);
+    this(data.tagindex, data.atnindex, data.pthindex, null, data.meta.prop);
   }
 
   /**
@@ -61,7 +61,7 @@ public final class MemData extends Data {
    * @param pr property reference
    */
   public MemData(final Prop pr) {
-    this(new Names(0), new Names(0), new Namespaces(), null, pr);
+    this(null, null, null, null, pr);
   }
 
   @Override

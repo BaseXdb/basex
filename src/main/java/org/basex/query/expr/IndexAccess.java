@@ -76,7 +76,7 @@ public final class IndexAccess extends Single {
 
     // access index if term is not too long, and if index exists.
     // otherwise, scan data sequentially
-    final IndexIterator ii = term.length <= MAXLEN &&
+    final IndexIterator ii = term.length <= data.meta.maxlen &&
       (itype == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
       data.iter(new ValuesToken(itype, term)) : scan(term);
 

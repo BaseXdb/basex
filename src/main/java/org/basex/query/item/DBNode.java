@@ -161,9 +161,10 @@ public class DBNode extends ANode {
     final byte[] nm = name();
     byte[] uri = Token.EMPTY;
     final boolean pref = Token.indexOf(nm, ':') != -1;
-    if(pref || data.ns.size() != 0) {
-      final int n = pref ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
-      final byte[] u = n > 0 ? data.ns.uri(n) : pref ?
+    if(pref || data.nspaces.size() != 0) {
+      final int n = pref ? data.nspaces.uri(nm, pre) :
+        data.uri(pre, data.kind(pre));
+      final byte[] u = n > 0 ? data.nspaces.uri(n) : pref ?
           NSGlobal.uri(Token.prefix(nm)) : null;
       if(u != null) uri = u;
     }

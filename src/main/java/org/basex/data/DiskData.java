@@ -64,7 +64,6 @@ public final class DiskData extends Data {
     if(updateFile().exists())
       throw new BaseXException(Text.DBUPDATED, meta.name);
 
-    final int cats = ctx.prop.num(Prop.CATEGORIES);
     final DataInput in = new DataInput(meta.dbfile(DATAINF));
     try {
       // read meta data and indexes
@@ -72,10 +71,10 @@ public final class DiskData extends Data {
       while(true) {
         final String k = string(in.readToken());
         if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      tagindex = new Names(in, cats);
-        else if(k.equals(DBATTS)) atnindex = new Names(in, cats);
+        if(k.equals(DBTAGS))      tagindex = new Names(in, meta);
+        else if(k.equals(DBATTS)) atnindex = new Names(in, meta);
         else if(k.equals(DBPATH)) pthindex = new PathSummary(this, in);
-        else if(k.equals(DBNS))   ns = new Namespaces(in);
+        else if(k.equals(DBNS))   nspaces = new Namespaces(in);
         else if(k.equals(DBDOCS)) docindex.read(in);
       }
       // open data and indexes
@@ -90,7 +89,7 @@ public final class DiskData extends Data {
       }
       if(meta.ftxtindex) ftxindex = FTIndex.get(this, meta.wildcards);
     } finally {
-      try { in.close(); } catch(final IOException ex) { }
+      in.close();
     }
   }
 
@@ -111,7 +110,7 @@ public final class DiskData extends Data {
     atnindex = at;
     pthindex = ps;
     pthindex.finish(this);
-    ns = n;
+    nspaces = n;
     if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     init();
     flush();
@@ -139,7 +138,7 @@ public final class DiskData extends Data {
     out.writeToken(token(DBPATH));
     pthindex.write(out);
     out.writeToken(token(DBNS));
-    ns.write(out);
+    nspaces.write(out);
     out.writeToken(token(DBDOCS));
     docindex.write(out);
     out.write(0);
@@ -351,10 +350,10 @@ public final class DiskData extends Data {
   protected void indexEnd() {
     // update all indexes in parallel
     // [DP] Full-text index updates: update the existing indexes
-    final Thread txtupdater = txts.size() > 0 ? runIndexInsert(txtindex, txts)
-        : null;
-    final Thread atvupdater = atvs.size() > 0 ? runIndexInsert(atvindex, atvs)
-        : null;
+    final Thread txtupdater = txts.size() > 0 ?
+        runIndexInsert((DiskValues) txtindex, txts) : null;
+    final Thread atvupdater = atvs.size() > 0 ?
+        runIndexInsert((DiskValues) atvindex, atvs) : null;
 
     // wait for all tasks to finish
     try {
@@ -368,6 +367,7 @@ public final class DiskData extends Data {
   @Override
   protected long index(final int pre, final int id, final byte[] value,
       final int kind) {
+
     final DataAccess store;
     final TokenObjMap<IntList> m;
 
@@ -381,7 +381,7 @@ public final class DiskData extends Data {
     }
 
     // add text to map to index later
-    if(meta.updindex && m != null && len(value) <= MAXLEN) {
+    if(meta.updindex && m != null && value.length <= meta.maxlen) {
       final IntList ids;
       final int hash = m.id(value);
       if(hash == 0) {
@@ -420,7 +420,7 @@ public final class DiskData extends Data {
       if(meta.attrindex && isAttr ||
          meta.textindex && (k == TEXT || k == COMM || k == PI)) {
         final byte[] key = text(p, !isAttr);
-        if(len(key) <= MAXLEN) {
+        if(key.length <= meta.maxlen) {
           final IntList ids;
           final TokenObjMap<IntList> m = isAttr ? atvs : txts;
           final int hash = m.id(key);
@@ -437,10 +437,10 @@ public final class DiskData extends Data {
 
     // update all indexes in parallel
     // [DP] Full-text index updates: update the existing indexes
-    final Thread txtupdater = meta.textindex && txts.size() > 0 ?
-        runIndexDelete(txtindex, txts) : null;
-    final Thread atvupdater = meta.attrindex && atvs.size() > 0 ?
-        runIndexDelete(atvindex, atvs) : null;
+    final Thread txtupdater = txts.size() > 0 ?
+        runIndexDelete((DiskValues) txtindex, txts) : null;
+    final Thread atvupdater = atvs.size() > 0 ?
+        runIndexDelete((DiskValues) atvindex, atvs) : null;
 
     // wait for all tasks to finish
     try {
@@ -452,29 +452,31 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Start a new thread which inserts records into an index.
-   * @param ix index
+   * Starts a new thread which inserts records into an index.
+   * @param dv index
    * @param m records to be inserted
    * @return the new thread
    */
-  private Thread runIndexInsert(final Index ix, final TokenObjMap<IntList> m) {
-    final Thread t = new Thread(new Runnable() { @Override public void run() {
-      ((DiskValues) ix).index(m);
-    }});
+  private Thread runIndexInsert(final DiskValues dv,
+      final TokenObjMap<IntList> m) {
+    final Thread t = new Thread() { @Override public void run() {
+      dv.index(m);
+    }};
     t.start();
     return t;
   }
 
   /**
-   * Start a new thread which deletes records from an index.
-   * @param ix index
+   * Starts a new thread which deletes records from an index.
+   * @param dv index
    * @param m records to be deleted
    * @return the new thread
    */
-  private Thread runIndexDelete(final Index ix, final TokenObjMap<IntList> m) {
-    final Thread t = new Thread(new Runnable() { @Override public void run() {
-      ((DiskValues) ix).delete(m);
-    }});
+  private Thread runIndexDelete(final DiskValues dv,
+      final TokenObjMap<IntList> m) {
+    final Thread t = new Thread() { @Override public void run() {
+      dv.delete(m);
+    }};
     t.start();
     return t;
   }

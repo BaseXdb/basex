@@ -298,7 +298,7 @@ public abstract class Path extends ParseExpr {
     }
 
     // check if the all children in the path exist; don't test with namespaces
-    if(data.ns.size() == 0) {
+    if(data.nspaces.size() == 0) {
       LOOP:
       for(int s = 0; s < path.steps.length; ++s) {
         // only verify child steps; ignore namespaces

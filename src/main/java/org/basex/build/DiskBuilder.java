@@ -9,6 +9,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
+import org.basex.index.Names;
 import org.basex.io.IO;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
@@ -59,36 +60,38 @@ public final class DiskBuilder extends Builder {
     mprop.dbpath(name).mkdirs();
 
     final IO file = parser.src;
-    meta = new MetaData(name, prop, mprop);
-    meta.original = file != null ? file.path() : "";
-    meta.filesize = file != null ? file.length() : 0;
-    meta.time = file != null ? file.date() : System.currentTimeMillis();
-    meta.dirty = true;
+    final MetaData md = new MetaData(name, prop, mprop);
+    md.original = file != null ? file.path() : "";
+    md.filesize = file != null ? file.length() : 0;
+    md.time = file != null ? file.date() : System.currentTimeMillis();
+    md.dirty = true;
 
     // calculate optimized output buffer sizes to reduce disk fragmentation
     final Runtime rt = Runtime.getRuntime();
-    int bs = (int) Math.min(meta.filesize, Math.min(1 << 22,
+    int bs = (int) Math.min(md.filesize, Math.min(1 << 22,
         rt.maxMemory() - rt.freeMemory() >> 2));
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
-    tout = new DataOutput(new TableOutput(meta, DATATBL));
-    xout = new DataOutput(meta.dbfile(DATATXT), bs);
-    vout = new DataOutput(meta.dbfile(DATAATV), bs);
-    sout = new DataOutput(meta.dbfile(DATATMP), bs);
+    tout = new DataOutput(new TableOutput(md, DATATBL));
+    xout = new DataOutput(md.dbfile(DATATXT), bs);
+    vout = new DataOutput(md.dbfile(DATAATV), bs);
+    sout = new DataOutput(md.dbfile(DATATMP), bs);
 
-    parse();
+    final Names tags = new Names(md);
+    final Names atts = new Names(md);
+    parse(md, tags, atts);
     close();
 
     // copy temporary values into database table
-    final TableAccess ta = new TableDiskAccess(meta, DATATBL);
-    final DataInput in = new DataInput(meta.dbfile(DATATMP));
+    final TableAccess ta = new TableDiskAccess(md, DATATBL);
+    final DataInput in = new DataInput(md.dbfile(DATATMP));
     for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
     ta.close();
     in.close();
-    meta.dbfile(DATATMP).delete();
+    md.dbfile(DATATMP).delete();
 
     // return database instance
-    return new DiskData(meta, tags, atts, path, ns);
+    return new DiskData(md, tags, atts, path, ns);
   }
 
   @Override

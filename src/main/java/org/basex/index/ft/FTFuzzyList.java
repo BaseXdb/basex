@@ -17,7 +17,7 @@ final class FTFuzzyList extends FTList {
   /** Size file. */
   private final File sizes;
   /** Token positions. */
-  private final int[] tp = new int[MAXLEN + 3];
+  private final int[] tp;
   /** Pointer on current token length. */
   private int ctl;
   /** Pointer on next token length. */
@@ -33,12 +33,13 @@ final class FTFuzzyList extends FTList {
    */
   protected FTFuzzyList(final Data d, final int cf) throws IOException {
     super(d, cf, 'y', 'z');
+    tp = new int[d.meta.maxlen + 3];
     for(int i = 0; i < tp.length; ++i) tp[i] = -1;
     sizes = d.meta.dbfile(DATAFTX + cf + 'x');
     final DataAccess li = new DataAccess(sizes);
-    int is = li.read1();
+    int is = li.readNum();
     while(--is >= 0) {
-      final int p = li.read1();
+      final int p = li.readNum();
       tp[p] = li.read4();
     }
     tp[tp.length - 1] = (int) str.length();

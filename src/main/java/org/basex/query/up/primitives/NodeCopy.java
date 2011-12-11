@@ -80,7 +80,7 @@ public abstract class NodeCopy extends StructuralUpdate {
       if(k != Data.ATTR && k != Data.ELEM || md.parent(p, k) > -1) continue;
       final int u = md.uri(p, k);
       final QNm qnm = new QNm(md.name(p, k));
-      if(u != 0) qnm.uri(md.ns.uri(u));
+      if(u != 0) qnm.uri(md.nspaces.uri(u));
       pool.add(qnm, ANode.type(k));
     }
   }

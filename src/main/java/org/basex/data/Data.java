@@ -92,7 +92,7 @@ public abstract class Data {
   /** Attribute name index. */
   public Names atnindex;
   /** Namespace index. */
-  public Namespaces ns;
+  public Namespaces nspaces;
   /** Path summary index. */
   public PathSummary pthindex;
 
@@ -477,9 +477,9 @@ public abstract class Data {
   public final Atts ns(final int pre) {
     final Atts as = new Atts();
     if(nsFlag(pre)) {
-      final int[] nsp = ns.get(pre);
+      final int[] nsp = nspaces.get(pre);
       for(int n = 0; n < nsp.length; n += 2)
-        as.add(ns.prefix(nsp[n]), ns.uri(nsp[n + 1]));
+        as.add(nspaces.prefix(nsp[n]), nspaces.uri(nsp[n + 1]));
     }
     return as;
   }
@@ -518,7 +518,7 @@ public abstract class Data {
   public abstract double textDbl(int pre, boolean text);
 
   /**
-   * Returns a text (text, comment, pi) length.
+   * Returns the byte length of a text (text, comment, pi).
    * @param pre pre value
    * @param text text/attribute flag
    * @return length
@@ -543,11 +543,11 @@ public abstract class Data {
       updateText(pre, trim(concat(name, SPACE, atom(pre))), kind);
     } else {
       // update/set namespace reference
-      final int ouri = ns.uri(name, pre);
+      final int ouri = nspaces.uri(name, pre);
       final boolean ne = ouri == 0 && uri.length != 0;
       final int npre = kind == ATTR ? parent(pre, kind) : pre;
-      final int nuri = ne ? ns.add(npre, npre, prefix(name), uri) :
-        ouri != 0 && eq(ns.uri(ouri), uri) ? ouri : 0;
+      final int nuri = ne ? nspaces.add(npre, npre, prefix(name), uri) :
+        ouri != 0 && eq(nspaces.uri(ouri), uri) ? ouri : 0;
 
       // write namespace uri reference
       table.write1(pre, kind == ELEM ? 3 : 11, nuri);
@@ -612,7 +612,7 @@ public abstract class Data {
           // add element
           byte[] nm = data.name(dpre, dkind);
           elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
-              data.size(dpre, dkind), ns.uri(nm, true), false);
+              data.size(dpre, dkind), nspaces.uri(nm, true), false);
           break;
         case TEXT:
         case COMM:
@@ -624,7 +624,7 @@ public abstract class Data {
           // add attribute
           nm = data.name(dpre, dkind);
           attr(pre, dis, atnindex.index(nm, null, false),
-              data.text(dpre, false), ns.uri(nm, false), false);
+              data.text(dpre, false), nspaces.uri(nm, false), false);
           break;
       }
     }
@@ -686,7 +686,7 @@ public abstract class Data {
     if(k != DOC && k != ELEM) delete(pre, k != ATTR);
 
     // update namespaces
-    ns.delete(pre, s);
+    nspaces.delete(pre, s);
 
     // reduce size of ancestors
     int par = pre;
@@ -724,7 +724,7 @@ public abstract class Data {
     updateDist(p, -s);
 
     // NSNodes have to be checked for pre value shifts after delete
-    ns.update(pre, s, false, null);
+    nspaces.update(pre, s, false, null);
 
     // restore empty document node
     if(empty) {
@@ -754,8 +754,9 @@ public abstract class Data {
    */
   public final void insert(final int ipre, final int ipar, final Data data) {
     meta.update();
+
+    // update value and document indexes
     if(meta.updindex) indexBegin();
-    // update document index: insert new document nodes
     docindex.insert(ipre, data);
 
     // indicates if database only contains a dummy node
@@ -768,10 +769,10 @@ public abstract class Data {
 
     // find all namespaces in scope to avoid duplicate declarations
     final TokenMap nsScope = new TokenMap();
-    NSNode n = ns.current;
+    NSNode n = nspaces.current;
     do {
       for(int i = 0; i < n.vals.length; i += 2)
-        nsScope.add(ns.prefix(n.vals[i]), ns.uri(n.vals[i + 1]));
+        nsScope.add(nspaces.prefix(n.vals[i]), nspaces.uri(n.vals[i + 1]));
       final int pos = n.fnd(ipar);
       if(pos < 0) break;
       n = n.ch[pos];
@@ -780,7 +781,7 @@ public abstract class Data {
     // loop through all entries
     final IntList preStack = new IntList();
     int dpre = -1;
-    final NSNode t = ns.current;
+    final NSNode t = nspaces.current;
     final Set<NSNode> newNodes = new HashSet<NSNode>();
     final IntList flagPres = new IntList();
 
@@ -800,7 +801,7 @@ public abstract class Data {
       if(dpre == 0) {
         // collect possible candidates for namespace root
         final List<NSNode> cand = new LinkedList<NSNode>();
-        NSNode cn = ns.root;
+        NSNode cn = nspaces.root;
         cand.add(cn);
         for(int cI; (cI = cn.fnd(par)) > -1;) {
           // add candidate to stack
@@ -808,13 +809,13 @@ public abstract class Data {
           cand.add(0, cn);
         }
 
-        cn = ns.root;
+        cn = nspaces.root;
         if(cand.size() > 1) {
           // compare candidates to ancestors of par
           int ancPre = par;
           // take first candidate from stack
           NSNode curr = cand.remove(0);
-          while(ancPre > -1 && cn == ns.root) {
+          while(ancPre > -1 && cn == nspaces.root) {
             // this is the new root
             if(curr.pre == ancPre) cn = curr;
             // if the current candidate's pre value is lower than the current
@@ -831,11 +832,11 @@ public abstract class Data {
             if(cand.size() > 0) curr = cand.remove(0);
           }
         }
-        ns.setNearestRoot(cn, par);
+        nspaces.setNearestRoot(cn, par);
       }
 
       while(preStack.size() != 0 && preStack.peek() > par)
-        ns.close(preStack.pop());
+        nspaces.close(preStack.pop());
 
       switch(dkind) {
         case DOC:
@@ -843,7 +844,7 @@ public abstract class Data {
           final int s = data.size(dpre, dkind);
           doc(pre, s, data.text(dpre, true));
           meta.ndocs++;
-          ns.open();
+          nspaces.open();
           preStack.push(pre);
           break;
         case ELEM:
@@ -861,15 +862,15 @@ public abstract class Data {
                 // prior to inserting and two new nodes are inserted at
                 // location pre == 3 we have to make sure N and only N gets
                 // updated.
-                newNodes.add(ns.add(at.name(a), at.string(a), pre));
+                newNodes.add(nspaces.add(at.name(a), at.string(a), pre));
                 ne = true;
               }
             }
           }
-          ns.open();
+          nspaces.open();
           byte[] nm = data.name(dpre, dkind);
           elem(dis, tagindex.index(nm, null, false), data.attSize(dpre, dkind),
-              data.size(dpre, dkind), ns.uri(nm, true), ne);
+              data.size(dpre, dkind), nspaces.uri(nm, true), ne);
           preStack.push(pre);
           break;
         case TEXT:
@@ -886,20 +887,20 @@ public abstract class Data {
           // check if prefix of attribute has already been declared, otherwise
           // add declaration to parent node
           if(data.nsFlag(dpre) && nsScope.get(attPref) == null) {
-            ns.add(par, preStack.size() == 0 ? -1 : preStack.peek(), attPref,
-                data.ns.uri(data.uri(dpre, dkind)));
+            nspaces.add(par, preStack.size() == 0 ? -1 : preStack.peek(),
+                attPref, data.nspaces.uri(data.uri(dpre, dkind)));
             // save pre value to set ns flag later for this node. can't be done
             // here as direct table access would interfere with the buffer
             flagPres.add(par);
           }
           attr(pre, dis, atnindex.index(nm, null, false),
-              data.text(dpre, false), ns.uri(nm, false), false);
+              data.text(dpre, false), nspaces.uri(nm, false), false);
           break;
       }
     }
 
-    while(preStack.size() != 0) ns.close(preStack.pop());
-    ns.setRoot(t);
+    while(preStack.size() != 0) nspaces.close(preStack.pop());
+    nspaces.setRoot(t);
 
     if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);
     // reset buffer to old size
@@ -919,7 +920,7 @@ public abstract class Data {
     updateDist(ipre + dsize, dsize);
 
     // NSNodes have to be checked for pre value shifts after insert
-    ns.update(ipre, dsize, true, newNodes);
+    nspaces.update(ipre, dsize, true, newNodes);
 
     if(meta.updindex) {
       // add the entries to the ID -> PRE mapping:

@@ -59,12 +59,16 @@ public interface DataText {
   String DBSCMAX = "FTSCMAX";
   /** Minimum scoring value. */
   String DBSCMIN = "FTSCMIN";
-  /** Maximal indexed full-text score. */
+  /** Maximum indexed full-text score. */
   String DBSCTYPE = "FTSCTYPE";
+  /** Maximum token length. */
+  String DBMAXLEN = "MAXLEN";
+  /** Maximum number of categories. */
+  String DBMAXCATS = "MAXCATS";
   /** Up-to-date flag. */
-  String DBUTD = "UPTODATE";
+  String DBUPTODATE = "UPTODATE";
   /** Last (highest) id. */
-  String DBLID = "LASTID";
+  String DBLASTID = "LASTID";
   /** Permissions. */
   String DBPERM = "PERM";
   /** Documents. */

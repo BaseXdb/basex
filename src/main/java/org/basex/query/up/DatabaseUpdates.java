@@ -139,7 +139,7 @@ final class DatabaseUpdates {
           final byte[] nm = data.name(p, Data.ATTR);
           if(!il.contains(p)) {
             final QNm name = new QNm(nm);
-            final byte[] uri = data.ns.uri(data.ns.uri(nm, p));
+            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p));
             if(uri != null) name.uri(uri);
             pool.add(name, NodeType.ATT);
           }
