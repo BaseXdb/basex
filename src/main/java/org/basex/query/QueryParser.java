@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.serial.SerializerProp;
@@ -818,7 +819,8 @@ public class QueryParser extends InputParser {
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      error(NOMODULEFILE, io);
+      final boolean admin = ctx.context.user.perm(User.ADMIN);
+      error(NOMODULEFILE, admin ? io.path() : io.name());
     }
 
     final NSContext ns = ctx.ns;

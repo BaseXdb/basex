@@ -652,6 +652,30 @@ public final class NamespaceTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public void newPrefix() {
+    query("<a>{ attribute {QName('U', 'a')} {} }</a>",
+        "<a xmlns:ns0='U' ns0:a=''/>");
+  }
+
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public void newPrefix2() {
+    query("<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
+        "<c>{attribute {QName('ns1', 'att1')} {}," +
+        "attribute {QName('ns2', 'att2')} {}}</c></b></a>",
+        "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
+        "<c xmlns:ns0_1='ns2' xmlns:ns0='ns1' ns0:att1='' ns0_1:att2=''/>" +
+        "</b></a>");
+  }
+
+  /**
    * Creates the database context.
    * @throws BaseXException database exception
    */
