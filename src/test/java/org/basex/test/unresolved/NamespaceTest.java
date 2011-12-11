@@ -47,42 +47,6 @@ public final class NamespaceTest {
    * Detects malformed namespace hierarchy.
    */
   @Test
-  public void newPrefix() {
-    query("<a>{ attribute {QName('http://bla', 'att')} {} }</a>",
-        "<a xmlns:ns1='http://bla' ns1:att=''/>");
-  }
-
-  /**
-   * Test query.
-   * Detects malformed namespace hierarchy.
-   */
-  @Test
-  public void newPrefix2() {
-    query("<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
-        "  <c>{attribute {QName('ns1', 'att1')} {}," +
-        "    attribute {QName('ns2', 'att2')} {}}</c>" +
-        "</b></a>",
-        "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
-        "  <c xmlns:ns2='ns2' ns1:att1='' ns2:att2=''/>" +
-        "</b></a>");
-  }
-
-  /**
-   * Test query.
-   * Detects malformed namespace hierarchy.
-   */
-  @Test
-  public void newPrefix3() {
-    query("insert node attribute {QName('test', 'att')}{} into doc('d1')//g",
-        "doc('d1')//g",
-        "<g xmlns:ns2='G' xmlns:ns3='test' ns3:att=''/>");
-  }
-
-  /**
-   * Test query.
-   * Detects malformed namespace hierarchy.
-   */
-  @Test
   public void xuty0004() {
     try {
       new QueryProcessor("declare variable $input-context external;" +
@@ -180,15 +144,6 @@ public final class NamespaceTest {
       new DropDB(doc[0]).execute(context);
     }
     context.close();
-  }
-
-  /**
-   * Runs a query and matches the result against the expected output.
-   * @param query query
-   * @param expected expected output
-   */
-  private void query(final String query, final String expected) {
-    query(null, query, expected);
   }
 
   /**
