@@ -315,7 +315,7 @@ public class QueryParser extends InputParser {
     if(ctx.nsElem != null) ctx.ns.add(EMPTY, ctx.nsElem, null);
 
     // set default decimal format
-    final byte[] empty = new QNm(EMPTY).full();
+    final byte[] empty = new QNm(EMPTY).eqname();
     if(ctx.decFormats.get(empty) == null) {
       ctx.decFormats.add(empty, new DecFormatter());
     }
@@ -683,7 +683,7 @@ public class QueryParser extends InputParser {
     final QNm name = def ? new QNm() : eQName(QNAMEINV, null);
 
     // check if format has already been declared
-    if(ctx.decFormats.get(name.full()) != null) error(DECDUPL);
+    if(ctx.decFormats.get(name.eqname()) != null) error(DECDUPL);
 
     // create new format
     final HashMap<String, String> map = new HashMap<String, String>();
@@ -704,7 +704,7 @@ public class QueryParser extends InputParser {
     } while(n != map.size());
 
     // completes the format declaration
-    ctx.decFormats.add(name.full(), new DecFormatter(input(), map));
+    ctx.decFormats.add(name.eqname(), new DecFormatter(input(), map));
     return true;
   }
 
@@ -1937,7 +1937,7 @@ public class QueryParser extends InputParser {
           return new NameTest(nm, NameTest.Name.NS, att, input());
         }
       }
-    } else if(quote(curr())) {
+    } else if(ctx.xquery3 && quote(curr())) {
       // name test: '':*
       final byte[] u = stringLiteral();
       if(consume(':') && consume('*')) {
@@ -2873,9 +2873,16 @@ public class QueryParser extends InputParser {
     if(nm.length == 1 && nm[0] == '*')
       return new KindTest((NodeType) t, null, tp);
 
-    if(!XMLToken.isQName(nm)) error(TESTINVALID, t, k);
+    if(!XMLToken.isEQName(nm)) error(TESTINVALID, t, k);
+    // extract uri and local name
+    final QNm qnm;
+    if(quote(nm[0])) {
+      final int c = lastIndexOf(nm, ':');
+      qnm = new QNm(substring(nm, c + 1), substring(nm, 1, c - 1));
+    } else {
+      qnm = new QNm(nm, ctx);
+    }
 
-    final QNm qnm = new QNm(nm, ctx);
     if(!qnm.hasURI()) {
       if(qnm.hasPrefix()) error(NOURI, qnm);
       if(elm) qnm.uri(ctx.nsElem);
