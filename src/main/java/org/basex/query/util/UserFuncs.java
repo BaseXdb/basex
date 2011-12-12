@@ -15,7 +15,7 @@ import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.UserFunc;
 import org.basex.query.expr.VarRef;
-import org.basex.query.func.FNIndex;
+import org.basex.query.func.Functions;
 import org.basex.query.func.FuncCall;
 import org.basex.query.func.Function;
 import org.basex.query.func.JavaFunc;
@@ -112,7 +112,7 @@ public final class UserFuncs extends ExprInfo {
     }
 
     // check predefined functions
-    final FuncCall fun = FNIndex.get().get(ln, uri, args, ctx, ii);
+    final FuncCall fun = Functions.get().get(ln, uri, args, ctx, ii);
     if(fun != null) {
       for(final Function f : Function.UPDATING) {
         if(fun.def == f) {
@@ -282,7 +282,7 @@ public final class UserFuncs extends ExprInfo {
       throws QueryException {
 
     // find global function
-    FNIndex.get().error(name, ii);
+    Functions.get().error(name, ii);
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();

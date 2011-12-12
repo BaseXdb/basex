@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -30,7 +31,9 @@ public final class PathSummary implements Index {
   /** Data reference. */
   private Data data;
   /** Root node. */
-  private PathNode root;
+  public PathNode root;
+  /** MetaData reference. */
+  private MetaData mdata;
 
   /**
    * Constructor, specifying a data reference.
@@ -38,6 +41,15 @@ public final class PathSummary implements Index {
    */
   public PathSummary(final Data d) {
     data = d;
+    mdata = d.meta;
+  }
+  
+  /**
+   * Constructor, specifying a metadata reference.
+   * @param md metadata reference
+   */
+  public PathSummary(final MetaData md) {
+      mdata = md;
   }
 
   /**
@@ -83,12 +95,23 @@ public final class PathSummary implements Index {
    * @param l current level
    */
   public void index(final int n, final byte k, final int l) {
+    index(n, k, l, null);
+  }
+
+  /**
+   * Adds an entry.
+   * @param n name reference
+   * @param k node kind
+   * @param l current level
+   * @param val value
+   */
+  public void index(final int n, final byte k, final int l, final byte[] val) {
     if(root == null) {
-      root = new PathNode(n, k, null);
+      root = new PathNode(n, k, null, mdata.maxcats, mdata.maxlen);
       stack.size(0);
       stack.add(root);
     } else {
-      stack.set(l, stack.get(l - 1).index(n, k));
+      stack.set(l, stack.get(l - 1).index(n, k, val));
     }
   }
 

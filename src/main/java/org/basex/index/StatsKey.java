@@ -6,7 +6,8 @@ import java.io.IOException;
 import org.basex.data.MetaData;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class provides statistics for a tag or attribute name and its contents.
@@ -15,19 +16,13 @@ import org.basex.util.hash.TokenSet;
  * @author Christian Gruen
  */
 public final class StatsKey {
-  /** Kind of Contents. */
-  public enum Kind {
-    /** Text.     */ TEXT,
-    /** Category. */ CAT,
-    /** Numeric.  */ INT,
-    /** Numeric.  */ DBL,
-    /** No texts. */ NONE
-  }
 
   /** Node kind. */
   public Kind kind;
   /** Categories. */
-  public TokenSet cats;
+  public TokenList cats;
+  /** Counts of nodes. */
+  public IntList vasize;
   /** Minimum value. */
   public double min;
   /** Maximum value. */
@@ -41,13 +36,18 @@ public final class StatsKey {
   private final MetaData meta;
   /** Maximum text length. */
   private double len;
+  /** Advanced index features. */
+  public boolean advIndex;
+  /** Number of kinds. */
+  private int kinds = 5;
 
   /**
    * Default constructor.
    * @param md meta data
    */
   public StatsKey(final MetaData md) {
-    cats = new TokenSet();
+    cats = new TokenList();
+    vasize = new IntList();
     kind = Kind.INT;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
@@ -62,15 +62,18 @@ public final class StatsKey {
    * @throws IOException I/O exception
    */
   public StatsKey(final DataInput in, final MetaData md) throws IOException {
-    kind = Kind.values()[in.readNum()];
-
+    int i = in.readNum();
+    if(i - kinds >= 0) {
+      advIndex = true;
+      i = i - kinds;
+    }
+    kind = Kind.values()[i];
     if(kind == Kind.INT || kind == Kind.DBL) {
       min = in.readDouble();
       max = in.readDouble();
     } else if(kind == Kind.CAT) {
-      cats = new TokenSet();
-      final int cl = in.readNum();
-      for(int i = 0; i < cl; ++i) cats.add(in.readToken());
+      cats = new TokenList(in.readTokens());
+      if(advIndex) vasize = new IntList(in.readNums());
     }
     counter = in.readNum();
     leaf = in.readBool();
@@ -90,14 +93,13 @@ public final class StatsKey {
       leaf = false;
     }
 
-    out.writeNum(kind.ordinal());
+    out.writeNum(kind.ordinal() + kinds);
     if(kind == Kind.INT || kind == Kind.DBL) {
       out.writeDouble(min);
       out.writeDouble(max);
     } else if(kind == Kind.CAT) {
-      final int cl = cats.size();
-      out.writeNum(cl);
-      for(final byte[] k : cats) out.writeToken(k);
+      out.writeTokens(cats.toArray());
+      out.writeNums(vasize.toArray());
     }
     out.writeNum(counter);
     out.writeBool(leaf);
@@ -123,7 +125,14 @@ public final class StatsKey {
         kind = Kind.TEXT;
         cats = null;
       } else {
-        cats.add(val);
+        int pos = cats.pos(val);
+        if (pos > -1) {
+          int t = vasize.get(pos) + 1;
+          vasize.set(pos, t);
+        } else {
+          cats.add(val);
+          vasize.add(1);
+        }
       }
     }
     if(kind == Kind.INT) {

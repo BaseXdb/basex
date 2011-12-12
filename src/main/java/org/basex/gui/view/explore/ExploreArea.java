@@ -214,7 +214,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
               addSlider(stat.min, stat.max, cp + 1, false);
               break;
             case CAT:
-              addCombo(entries(stat.cats.keys()), cp + 1);
+              addCombo(entries(stat.cats.toArray()), cp + 1);
               break;
             case TEXT:
               addInput(cp + 1);
