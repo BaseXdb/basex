@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.MemData;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.Kind;
 import org.basex.index.Names;
 import org.basex.index.RangeToken;
 import org.basex.index.StatsKey;
@@ -22,7 +23,6 @@ import org.basex.query.path.AxisStep;
 import org.basex.query.path.Test.Name;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
-import org.basex.util.Kind;
 import org.basex.util.Token;
 
 /**

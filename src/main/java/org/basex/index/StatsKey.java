@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Kind;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 

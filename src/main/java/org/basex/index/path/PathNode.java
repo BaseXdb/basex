@@ -7,10 +7,10 @@ import java.io.IOException;
 
 import org.basex.core.Text;
 import org.basex.data.Data;
+import org.basex.index.Kind;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.serial.Serializer;
-import org.basex.util.Kind;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.IntList;
