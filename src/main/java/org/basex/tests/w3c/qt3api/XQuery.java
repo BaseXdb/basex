@@ -125,7 +125,7 @@ public final class XQuery implements Iterable<XQItem> {
    * @throws XQException exception
    */
   public XQuery baseURI(final String base) {
-    qp.ctx.baseURI(base);
+    qp.ctx.sc.baseURI(base);
     return this;
   }
 
