@@ -10,8 +10,9 @@ import javax.xml.xquery.XQStaticContext;
 
 import org.basex.core.Context;
 import org.basex.io.IO;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.StaticContext;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Uri;
 
 /**
@@ -21,17 +22,13 @@ import org.basex.query.item.Uri;
  * @author Christian Gruen
  */
 final class BXQStaticContext implements XQStaticContext {
-  /** Database context. */
-  final Context context;
-  /** Query context. */
-  final QueryContext ctx;
+  /** Static context. */
+  final StaticContext sc;
   /** Forward flag. */
   boolean scrollable;
   /** Timeout. */
   int timeout;
 
-  /** Context item type. */
-  private XQItemType type;
   /** Binding mode (immediate). */
   private boolean binding = true;
   /** Holdability. */
@@ -48,13 +45,13 @@ final class BXQStaticContext implements XQStaticContext {
   protected BXQStaticContext(final String name, final String pw)
       throws XQException {
 
-    context = new Context();
     if(name != null) {
-      context.user = context.users.get(name);
-      if(context.user == null || !string(context.user.password).equals(md5(pw)))
+      final Context ctx = BXQDataSource.context();
+      ctx.user = ctx.users.get(name);
+      if(ctx.user == null || !string(ctx.user.password).equals(md5(pw)))
         throw new BXQException(DENIED, name);
     }
-    ctx = new QueryContext(context);
+    sc = new StaticContext();
  }
 
   @Override
@@ -64,7 +61,7 @@ final class BXQStaticContext implements XQStaticContext {
     try {
       BXQAbstract.valid(prefix, String.class);
       BXQAbstract.valid(uri, String.class);
-      ctx.namespace(prefix, uri);
+      sc.namespace(prefix, uri);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -72,7 +69,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getBaseURI() {
-    final IO io = ctx.baseIO();
+    final IO io = sc.baseIO();
     return io != null ? io.url() : "";
   }
 
@@ -83,49 +80,49 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public int getBoundarySpacePolicy() {
-    return ctx.spaces ? BOUNDARY_SPACE_PRESERVE : BOUNDARY_SPACE_STRIP;
+    return sc.spaces ? BOUNDARY_SPACE_PRESERVE : BOUNDARY_SPACE_STRIP;
   }
 
   @Override
   public int getConstructionMode() {
-    return ctx.construct ? CONSTRUCTION_MODE_PRESERVE : CONSTRUCTION_MODE_STRIP;
+    return sc.construct ? CONSTRUCTION_MODE_PRESERVE : CONSTRUCTION_MODE_STRIP;
   }
 
   @Override
   public XQItemType getContextItemStaticType() {
-    return type;
+    return sc.initType == null ? null : new BXQItemType(sc.initType.type);
   }
 
   @Override
   public int getCopyNamespacesModeInherit() {
-    return ctx.nsInherit ? COPY_NAMESPACES_MODE_INHERIT :
+    return sc.nsInherit ? COPY_NAMESPACES_MODE_INHERIT :
       COPY_NAMESPACES_MODE_NO_INHERIT;
   }
 
   @Override
   public int getCopyNamespacesModePreserve() {
-    return ctx.nsPreserve ? COPY_NAMESPACES_MODE_PRESERVE :
+    return sc.nsPreserve ? COPY_NAMESPACES_MODE_PRESERVE :
       COPY_NAMESPACES_MODE_NO_PRESERVE;
   }
 
   @Override
   public String getDefaultCollation() {
-    return string(ctx.collation.string());
+    return string(sc.collation.string());
   }
 
   @Override
   public String getDefaultElementTypeNamespace() {
-    return ctx.nsElem == null ? "" : string(ctx.nsElem);
+    return sc.nsElem == null ? "" : string(sc.nsElem);
   }
 
   @Override
   public String getDefaultFunctionNamespace() {
-    return ctx.nsFunc == null ? "" : string(ctx.nsFunc);
+    return sc.nsFunc == null ? "" : string(sc.nsFunc);
   }
 
   @Override
   public int getDefaultOrderForEmptySequences() {
-    return ctx.orderGreatest ? DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST :
+    return sc.orderGreatest ? DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST :
       DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_LEAST;
   }
 
@@ -137,7 +134,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String[] getNamespacePrefixes() {
-    final byte[][] atts = ctx.ns.prefixes();
+    final byte[][] atts = sc.ns.prefixes();
     final String[] pre = new String[atts.length];
     for(int p = 0; p < pre.length; ++p) pre[p] = string(atts[p]);
     return pre;
@@ -146,14 +143,14 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public String getNamespaceURI(final String prefix) throws XQException {
     BXQAbstract.valid(prefix, String.class);
-    final byte[] uri = ctx.ns.staticURI(token(prefix));
+    final byte[] uri = sc.ns.staticURI(token(prefix));
     if(uri != null) return string(uri);
     throw new BXQException(PRE, prefix);
   }
 
   @Override
   public int getOrderingMode() {
-    return ctx.ordered ? ORDERING_MODE_ORDERED : ORDERING_MODE_UNORDERED;
+    return sc.ordered ? ORDERING_MODE_ORDERED : ORDERING_MODE_UNORDERED;
   }
 
   @Override
@@ -174,7 +171,7 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public void setBaseURI(final String baseUri) throws XQException {
     BXQAbstract.valid(baseUri, String.class);
-    ctx.baseURI(baseUri);
+    sc.baseURI(baseUri);
   }
 
   @Override
@@ -185,52 +182,55 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public void setBoundarySpacePolicy(final int mode) throws BXQException {
-    ctx.spaces = check(mode, ARGS) == BOUNDARY_SPACE_PRESERVE;
+    sc.spaces = check(mode, ARGS) == BOUNDARY_SPACE_PRESERVE;
   }
 
   @Override
   public void setConstructionMode(final int mode) throws XQException {
-    ctx.construct = check(mode, ARGC) == CONSTRUCTION_MODE_PRESERVE;
+    sc.construct = check(mode, ARGC) == CONSTRUCTION_MODE_PRESERVE;
   }
 
   @Override
-  public void setContextItemStaticType(final XQItemType contextItemType) {
-    type = contextItemType;
+  public void setContextItemStaticType(final XQItemType contextItemType)
+      throws XQException {
+
+    sc.initType = contextItemType == null ? null :
+      SeqType.get(((BXQItemType) contextItemType).getType(), 1);
   }
 
   @Override
   public void setCopyNamespacesModeInherit(final int mode) throws BXQException {
-    ctx.nsInherit = check(mode, ARGN) == COPY_NAMESPACES_MODE_INHERIT;
+    sc.nsInherit = check(mode, ARGN) == COPY_NAMESPACES_MODE_INHERIT;
   }
 
   @Override
   public void setCopyNamespacesModePreserve(final int m) throws BXQException {
-    ctx.nsPreserve = check(m, ARGN) == COPY_NAMESPACES_MODE_PRESERVE;
+    sc.nsPreserve = check(m, ARGN) == COPY_NAMESPACES_MODE_PRESERVE;
   }
 
   @Override
   public void setDefaultCollation(final String uri) throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.collation = Uri.uri(token(uri));
+    sc.collation = Uri.uri(token(uri));
   }
 
   @Override
   public void setDefaultElementTypeNamespace(final String uri)
       throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsElem = uri.length() != 0 ? token(uri) : null;
+    sc.nsElem = uri.length() != 0 ? token(uri) : null;
   }
 
   @Override
   public void setDefaultFunctionNamespace(final String uri) throws XQException {
     BXQAbstract.valid(uri, String.class);
-    ctx.nsFunc = uri.length() != 0 ? token(uri) : null;
+    sc.nsFunc = uri.length() != 0 ? token(uri) : null;
   }
 
   @Override
   public void setDefaultOrderForEmptySequences(final int mode)
       throws BXQException {
-    ctx.orderGreatest = check(mode, ARGO) ==
+    sc.orderGreatest = check(mode, ARGO) ==
       DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST;
   }
 
@@ -241,7 +241,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public void setOrderingMode(final int mode) throws BXQException {
-    ctx.ordered = check(mode, ARGO) == ORDERING_MODE_ORDERED;
+    sc.ordered = check(mode, ARGO) == ORDERING_MODE_ORDERED;
   }
 
   @Override

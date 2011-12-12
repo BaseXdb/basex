@@ -12,7 +12,7 @@ import javax.xml.xquery.XQStaticContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
 import org.basex.query.util.Var;
-import org.basex.query.util.VarList;
+import org.basex.query.util.VarStack;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -77,7 +77,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
   private QName[] getVariables(final boolean all) throws XQException {
     opened();
     QName[] names = { };
-    final VarList vars = qp.ctx.vars.global();
+    final VarStack vars = qp.ctx.vars.globals();
     for(final Var v : Arrays.copyOf(vars.vars, vars.size)) {
       if(all || v.expr() == null) names = Array.add(names, v.name.toJava());
     }

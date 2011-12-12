@@ -15,6 +15,7 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 
 import org.basex.build.xml.SAXWrapper;
+import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.data.Data;
 import org.basex.io.IO;
@@ -41,7 +42,7 @@ abstract class BXQAbstract {
   /** Parent closer. */
   protected final BXQAbstract par;
   /** Database connection. */
-  protected BXQStaticContext ctx;
+  protected BXQStaticContext context;
   /** Closed flag. */
   protected boolean closed;
 
@@ -51,7 +52,7 @@ abstract class BXQAbstract {
    */
   protected BXQAbstract(final BXQAbstract p) {
     par = p;
-    if(par != null) ctx = p.ctx;
+    if(par != null) context = p.context;
   }
 
   /**
@@ -60,7 +61,7 @@ abstract class BXQAbstract {
    */
   @SuppressWarnings("unused")
   public void close() throws XQException {
-    if(!closed) ctx.context.close();
+    if(!closed) BXQDataSource.context().close();
     closed = true;
   }
 
@@ -235,8 +236,8 @@ abstract class BXQAbstract {
   private DBNode createNode(final SAXSource s) throws XQException {
     opened();
     try {
-      return checkNode(CreateDB.mainMem(
-          new SAXWrapper(s, ctx.context.prop) , ctx.context));
+      final Context ctx = BXQDataSource.context();
+      return checkNode(CreateDB.mainMem(new SAXWrapper(s, ctx.prop) , ctx));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -253,7 +254,8 @@ abstract class BXQAbstract {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
-      return checkNode(CreateDB.mainMem(new XMLStreamWrapper(sr), ctx.context));
+      final Context ctx = BXQDataSource.context();
+      return checkNode(CreateDB.mainMem(new XMLStreamWrapper(sr), ctx));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -267,7 +269,8 @@ abstract class BXQAbstract {
    */
   protected final DBNode createNode(final IO io) throws BXQException {
     try {
-      return checkNode(CreateDB.mainMem(io, ctx.context));
+      final Context ctx = BXQDataSource.context();
+      return checkNode(CreateDB.mainMem(io, ctx));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

@@ -9,6 +9,7 @@ import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQMetaData;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQStaticContext;
+
 import org.basex.util.Token;
 
 /**
@@ -39,7 +40,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
 
   @Override
   public XQExpression createExpression() throws XQException {
-    return createExpression(ctx);
+    return createExpression(context);
   }
 
   @Override
@@ -64,7 +65,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   @Override
   public XQStaticContext getStaticContext() throws XQException {
     opened();
-    return ctx;
+    return context;
   }
 
   @Override
@@ -76,7 +77,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   @Override
   public XQPreparedExpression prepareExpression(final InputStream is)
       throws XQException {
-    return prepareExpression(is, ctx);
+    return prepareExpression(is, context);
   }
 
   @Override
@@ -88,7 +89,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   @Override
   public XQPreparedExpression prepareExpression(final Reader r)
       throws XQException {
-    return prepareExpression(r, ctx);
+    return prepareExpression(r, context);
   }
 
   @Override
@@ -103,7 +104,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   @Override
   public XQPreparedExpression prepareExpression(final String query)
       throws XQException {
-    return prepareExpression(query, ctx);
+    return prepareExpression(query, context);
   }
 
   @Override
@@ -122,6 +123,6 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   public void setStaticContext(final XQStaticContext sc) throws XQException {
     opened();
     valid(sc, XQStaticContext.class);
-    ctx = (BXQStaticContext) sc;
+    context = (BXQStaticContext) sc;
   }
 }

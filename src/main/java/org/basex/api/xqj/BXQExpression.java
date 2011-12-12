@@ -2,13 +2,16 @@ package org.basex.api.xqj;
 
 import java.io.InputStream;
 import java.io.Reader;
+
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQStaticContext;
+
 import org.basex.core.BaseXException;
-import org.basex.core.CommandParser;
 import org.basex.core.Command;
+import org.basex.core.CommandParser;
+import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 
@@ -38,10 +41,11 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
   public void executeCommand(final String cmd) throws XQException {
     opened();
     try {
-      for(final Command c : new CommandParser(cmd, sc.context).parse()) {
+      final Context ctx = BXQDataSource.context();
+      for(final Command c : new CommandParser(cmd, ctx).parse()) {
         // process output is suppressed, errors are returned as exception
         try {
-          c.execute(sc.context);
+          c.execute(ctx);
         } catch(final BaseXException ex) {
           throw new BXQException(ex.getMessage());
         }

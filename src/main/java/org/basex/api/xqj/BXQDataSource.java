@@ -8,6 +8,7 @@ import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
 
+import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.Text;
 import org.basex.util.Util;
@@ -19,6 +20,9 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class BXQDataSource implements XQDataSource {
+  /** Static database context. */
+  private static Context context;
+
   /** Log output (currently ignored). */
   private PrintWriter log;
   /** User. */
@@ -34,6 +38,24 @@ public final class BXQDataSource implements XQDataSource {
     props.setProperty(PASSWORD, Text.ADMIN);
     props.setProperty(SERVERNAME, MainProp.HOST[1].toString());
     props.setProperty(PORT, MainProp.PORT[1].toString());
+  }
+
+  /**
+   * Default constructor, specifying a new database context.
+   * @param ctx database context
+   */
+  public BXQDataSource(final Context ctx) {
+    this();
+    context = ctx;
+  }
+
+  /**
+   * Returns the static database context reference.
+   * @return database context
+   */
+  static Context context() {
+    if(context == null) context = new Context();
+    return context;
   }
 
   @Override

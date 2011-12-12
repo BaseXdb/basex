@@ -66,8 +66,8 @@ abstract class BXQDynamicContext extends BXQAbstract
       final BXQConnection c) {
     super(c);
     sc = s;
-    qp = new QueryProcessor(qu, s.context);
-    qp.ctx.copy(sc.ctx);
+    qp = new QueryProcessor(qu, BXQDataSource.context());
+    qp.ctx.sc.copy(sc.sc);
   }
 
   @Override
@@ -216,7 +216,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     // don't cast sequences
     if(tt != v.type && v instanceof Item) {
       try {
-        vl = tt.e((Item) v, ctx.ctx, null);
+        vl = tt.e((Item) v, qp.ctx, null);
       } catch(final QueryException ex) {
         throw new BXQException(ex);
       }
@@ -247,7 +247,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   protected final BXQSequence execute() throws XQException {
     opened();
     final QueryContext qctx = qp.ctx;
-    qctx.ns = sc.ctx.ns;
+    qctx.sc.ns = sc.sc.ns;
 
     try {
       if(sc.timeout != 0) {

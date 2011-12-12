@@ -15,6 +15,7 @@ import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQSequenceType;
+
 import org.basex.io.IOContent;
 import org.basex.query.QueryException;
 import org.basex.query.item.AtomType;
@@ -40,6 +41,7 @@ import org.w3c.dom.ls.LSOutput;
  * @author Christian Gruen
  */
 class BXQDataFactory extends BXQAbstract implements XQDataFactory {
+
   /**
    * Constructor, specifying a user name and password.
    * @param name user name
@@ -49,7 +51,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   protected BXQDataFactory(final String name, final String pw)
       throws XQException {
     super(null);
-    ctx = new BXQStaticContext(name, pw);
+    context = new BXQStaticContext(name, pw);
   }
 
   @Override
@@ -131,7 +133,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(v, XQItem.class);
     try {
       final Type type = ((BXQItemType) v.getItemType()).getType();
-      return new BXQItem(type.e(((BXQItem) v).it, ctx.ctx, null));
+      return new BXQItem(type.e(((BXQItem) v).it, null, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -143,7 +145,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(it, XQItemType.class);
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(AtomType.STR, it).e(val, ctx.ctx, null));
+      return new BXQItem(check(AtomType.STR, it).e(val, null, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -262,7 +264,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(AtomType.STR, it).e(val, ctx.ctx, null));
+      return new BXQItem(check(AtomType.STR, it).e(val, null, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -370,7 +372,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   private BXQItem itr(final long v, final Type e, final XQItemType t)
       throws XQException {
     try {
-      return new BXQItem(check(e, t).e(Int.get(v), ctx.ctx, null));
+      return new BXQItem(check(e, t).e(Int.get(v), null, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
