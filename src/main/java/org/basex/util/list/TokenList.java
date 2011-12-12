@@ -159,7 +159,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @param e element to be checked
    * @return result of check
    */
-  public int containsi(final byte[] e) {
+  public int pos(final byte[] e) {
     for(int i = 0; i < size; ++i) if(eq(list[i], e)) return i;
     return -1;
   }

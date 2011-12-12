@@ -124,7 +124,7 @@ public final class StatsKey {
         kind = Kind.TEXT;
         cats = null;
       } else {
-        int pos = cats.containsi(val);
+        int pos = cats.pos(val);
         if (pos > -1) {
           int t = vasize.get(pos) + 1;
           vasize.set(pos, t);

@@ -112,7 +112,7 @@ public final class PathNode {
     for(final PathNode c : ch) {
       if(c.kind == k && c.name == n) {
         if(val != null && c.values.size() <= maxcats + 1) {
-          int pos = c.values.containsi(val);
+          int pos = c.values.pos(val);
           if (pos > -1) {
             int t = c.vasize.get(pos) + 1;
             c.vasize.set(pos, t);
