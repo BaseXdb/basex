@@ -30,7 +30,7 @@ import org.basex.util.list.IntList;
  */
 public abstract class Builder extends Progress {
   /** Tree structure. */
-  protected final PathSummary path;
+  protected PathSummary path;
   /** Namespace index. */
   protected final Namespaces ns = new Namespaces();
   /** Parser instance. */
@@ -73,7 +73,6 @@ public abstract class Builder extends Progress {
     parser = parse;
     prop = pr;
     name = nm;
-    path = new PathSummary(null, pr.num(Prop.MAXCATS), pr.num(Prop.MAXLEN));
   }
 
   // PUBLIC METHODS ===========================================================
@@ -94,6 +93,7 @@ public abstract class Builder extends Progress {
     meta = md;
     tags = ta;
     atts = at;
+    path = new PathSummary(md);
 
     // add document node and parse document
     parser.parse(this);

@@ -425,6 +425,8 @@ public interface QueryText {
   byte[] BASEX = token("basex");
   /** DB token. */
   byte[] DB = token("db");
+  /** Index token. */
+  byte[] INDEX = token("index");
   /** FT token. */
   byte[] FT = token("ft");
   /** XS token. */
@@ -509,6 +511,8 @@ public interface QueryText {
   byte[] FTURI = token(BXMODULES + "ft");
   /** Higher-order URI. */
   byte[] HOFURI = token(BXMODULES + "hof");
+  /** Index module URI. */
+  byte[] INDEXURI = token(BXMODULES + "index");
   /** JSON URI. */
   byte[] JSONURI = token(BXMODULES + "json");
   /** Utility module URI. */

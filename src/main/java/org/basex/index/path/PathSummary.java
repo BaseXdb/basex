@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -31,21 +32,24 @@ public final class PathSummary implements Index {
   private Data data;
   /** Root node. */
   public PathNode root;
-  /** Maximum categories. */
-  private int maxcats;
-  /** Maximum length. */
-  private int maxlength;
+  /** MetaData reference. */
+  private MetaData mdata;
 
   /**
    * Constructor, specifying a data reference.
    * @param d data reference
-   * @param mc maxcats
-   * @param ml maxlength
    */
-  public PathSummary(final Data d, final int mc, final int ml) {
+  public PathSummary(final Data d) {
     data = d;
-    maxcats = mc;
-    maxlength = ml;
+    mdata = d.meta;
+  }
+  
+  /**
+   * Constructor, specifying a metadata reference.
+   * @param md metadata reference
+   */
+  public PathSummary(final MetaData md) {
+      mdata = md;
   }
 
   /**
@@ -103,7 +107,7 @@ public final class PathSummary implements Index {
    */
   public void index(final int n, final byte k, final int l, final byte[] val) {
     if(root == null) {
-      root = new PathNode(n, k, null, maxcats, maxlength);
+      root = new PathNode(n, k, null, mdata.maxcats, mdata.maxlen);
       stack.size(0);
       stack.add(root);
     } else {

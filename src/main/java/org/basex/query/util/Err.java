@@ -64,9 +64,9 @@ public enum Err {
   /** BASX0019: Evaluation exception. */
   INVFLAG(BASX, 19, "Unknown flag: %."),
   /** BASX0020: Evaluation exception. */
-  LOCK(BASX, 20, "Database \"%\" is currently locked."),
+  LOCK(BASX, 20, "Database '%' cannot be flagged as 'updating'."),
   /** BASX0020: Evaluation exception. */
-  UNLOCK(BASX, 20, "Database \"%\" could not be unlocked ."),
+  UNLOCK(BASX, 20, "The 'updating' flag of '%' could not be reset."),
   /** BASX0021: Evaluation exception. */
   NOVAIDX(BASX, 21, "Index not valid for this function."),
 

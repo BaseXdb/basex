@@ -17,7 +17,7 @@ import java.util.Locale;
  */
 public final class Token {
   /** Maximum length for hash calculation. */
-  public static final byte MAXLENGTH = 96;
+  private static final byte MAXLENGTH = 96;
 
   /** Empty token. */
   public static final byte[] EMPTY = {};

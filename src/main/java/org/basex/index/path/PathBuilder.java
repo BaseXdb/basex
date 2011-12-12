@@ -26,7 +26,7 @@ public final class PathBuilder extends IndexBuilder {
     abort();
 
     final IntList pars = new IntList();
-    final PathSummary path = new PathSummary(data, 0, 0);
+    final PathSummary path = new PathSummary(data);
 
     for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);

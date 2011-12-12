@@ -60,11 +60,11 @@ public final class PathNode {
    * @param t tag
    * @param k node kind
    * @param p parent node
-   * @param m maxcats
+   * @param mc maxcats
    * @param ml maxlength
    */
   PathNode(final int t, final byte k, final PathNode p,
-      final int m, final int ml) {
+      final int mc, final int ml) {
     ch = new PathNode[0];
     size = 1;
     values = new TokenList();
@@ -75,7 +75,7 @@ public final class PathNode {
     max = Double.MIN_VALUE;
     min = Double.MAX_VALUE;
     tkind = Kind.INT;
-    maxcats = m;
+    maxcats = mc;
     maxlength = ml;
   }
 

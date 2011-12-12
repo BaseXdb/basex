@@ -43,8 +43,7 @@ public final class MemData extends Data {
     }
     tagindex = tag == null ? new Names(meta) : tag;
     atnindex = att == null ? new Names(meta) : att;
-    pthindex = ps == null ? new PathSummary(this, meta.maxcats,
-        meta.maxlen) : ps;
+    pthindex = ps == null ? new PathSummary(this) : ps;
     nspaces = ns == null ? new Namespaces() : ns;
   }
 
