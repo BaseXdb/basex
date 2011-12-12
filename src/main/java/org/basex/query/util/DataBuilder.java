@@ -99,7 +99,7 @@ public final class DataBuilder {
    */
   private int addDoc(final ANode nd, final int pre) {
     final int ms = data.meta.size;
-    data.doc(size(nd, false), nd.baseURI());
+    data.doc(ms, size(nd, false), nd.baseURI());
     data.insert(ms);
     int p = pre + 1;
     final AxisIter ai = nd.children();
@@ -121,12 +121,12 @@ public final class DataBuilder {
     int u = 0;
     final boolean ne = uri.length != 0;
     if(ne) {
-      if(par == 0) data.ns.add(ms, pre - par, q.prefix(), uri);
-      u = data.ns.addURI(uri);
+      if(par == 0) data.nspaces.add(ms, pre - par, q.prefix(), uri);
+      u = data.nspaces.addURI(uri);
     }
     final int n = data.atnindex.index(q.string(), null, false);
     // attribute namespace flag is only set in main memory instance
-    data.attr(pre - par, n, nd.string(), u, ne);
+    data.attr(ms, pre - par, n, nd.string(), u, ne);
     data.insert(ms);
     return 1;
   }
@@ -148,7 +148,7 @@ public final class DataBuilder {
     if(tl == null) return addText(nd.string(), dist);
 
     // adopt namespace from parent
-    final int u = ndPar != null ? data.ns.uri(ndPar.name(), true) : 0;
+    final int u = ndPar != null ? data.nspaces.uri(ndPar.name(), true) : 0;
 
     for(int i = 0; i < tl.size(); i++) {
       byte[] text = tl.get(i);
@@ -172,7 +172,7 @@ public final class DataBuilder {
    */
   private int addText(final byte[] txt, final int dist) {
     final int ms = data.meta.size;
-    data.text(dist, txt, Data.TEXT);
+    data.text(ms, dist, txt, Data.TEXT);
     data.insert(ms);
     return 1;
   }
@@ -187,7 +187,7 @@ public final class DataBuilder {
   private int addPI(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
     final byte[] v = trim(concat(nd.name(), SPACE, nd.string()));
-    data.text(pre - par, v, Data.PI);
+    data.text(ms, pre - par, v, Data.PI);
     data.insert(ms);
     return 1;
   }
@@ -201,7 +201,7 @@ public final class DataBuilder {
    */
   private int addComm(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
-    data.text(pre - par, nd.string(), Data.COMM);
+    data.text(ms, pre - par, nd.string(), Data.COMM);
     data.insert(ms);
     return 1;
   }
@@ -215,17 +215,17 @@ public final class DataBuilder {
    */
   private int addElem(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
-    data.ns.open();
+    data.nspaces.open();
 
     // add new namespaces
     final Atts ns = nd.nsScope();
     final boolean ne = ns.size() > 0;
     for(int a = 0, as = ns.size(); a < as; a++)
-      data.ns.add(ns.name(a), ns.string(a), ms);
+      data.nspaces.add(ns.name(a), ns.string(a), ms);
 
     final QNm q = nd.qname();
     final byte[] uri = q.uri();
-    final int u = uri.length != 0 ? data.ns.addURI(uri) : 0;
+    final int u = uri.length != 0 ? data.nspaces.addURI(uri) : 0;
     final int tn = data.tagindex.index(q.string(), null, false);
     final int s = size(nd, false);
 
@@ -243,7 +243,7 @@ public final class DataBuilder {
     // add children
     ai = nd.children();
     for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
-    data.ns.close(ms);
+    data.nspaces.close(ms);
 
     // update size if additional nodes have been added by the descendants
     if(s != p - pp) data.size(ms, Data.ELEM, p - pp);
@@ -296,7 +296,7 @@ public final class DataBuilder {
       final int kind = md.kind(pre);
       if(kind != Data.ELEM && kind != Data.ATTR) continue;
       // check if namespace is referenced
-      final byte[] uri = md.ns.uri(md.uri(pre, kind));
+      final byte[] uri = md.nspaces.uri(md.uri(pre, kind));
       if(uri == null || !eq(uri, ns)) continue;
 
       final byte[] name = md.name(pre, kind);
@@ -311,7 +311,7 @@ public final class DataBuilder {
         del = false;
       }
     }
-    if(del) md.ns.delete(ns);
+    if(del) md.nspaces.delete(ns);
     return new DBNode(md, 0);
   }
 }

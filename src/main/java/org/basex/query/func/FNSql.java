@@ -93,7 +93,7 @@ public final class FNSql extends FuncCall {
 
   /** Other. */
   /** SQL Namespace attribute. */
-  private static final Atts NS_SQL = new Atts().add(SQL, SQLURI);
+  private static final Atts NS_SQL = new Atts(SQL, SQLURI);
   /** Attribute "type" of <sql:parameter/>. */
   private static final byte[] TYPE = token("type");
 

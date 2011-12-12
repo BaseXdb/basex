@@ -25,7 +25,7 @@ import org.basex.util.list.IntList;
  */
 final class FTFuzzyBuilder extends FTBuilder {
   /** Value trees. */
-  private final FTIndexTrees tree = new FTIndexTrees();
+  private final FTIndexTrees tree;
 
   /**
    * Constructor.
@@ -34,6 +34,7 @@ final class FTFuzzyBuilder extends FTBuilder {
    */
   protected FTFuzzyBuilder(final Data d) throws IOException {
     super(d);
+    tree = new FTIndexTrees(d.meta.maxlen);
   }
 
   @Override
@@ -129,12 +130,12 @@ final class FTFuzzyBuilder extends FTBuilder {
       final int ls, final int lp) throws IOException {
 
     final int is = il.size();
-    outX.write1(is >> 1);
+    outX.writeNum(is >> 1);
     for(int i = 0; i < is; i += 2) {
-      outX.write1(il.get(i));
+      outX.writeNum(il.get(i));
       outX.write4(il.get(i + 1));
     }
-    outX.write1(ls);
+    outX.writeNum(ls);
     outX.write4(lp);
   }
 

@@ -99,7 +99,7 @@ public final class OptimizeAll extends ACreate {
     if(cmd != null) cmd.size = m.size;
 
     // check if database is also pinned by other users
-    if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DBLOCKED, m.name);
+    if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DBPINNED, m.name);
 
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
@@ -119,8 +119,8 @@ public final class OptimizeAll extends ACreate {
       final IOFile bin = data.meta.binaries();
       if(bin.exists()) bin.rename(d.meta.binaries());
 
-      final File lock = old.lockFile();
-      if(lock.exists()) Copy.copy(lock, d.lockFile());
+      final File lock = old.updateFile();
+      if(lock.exists()) Copy.copy(lock, d.updateFile());
       d.close();
     } finally {
       try {

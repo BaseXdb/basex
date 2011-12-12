@@ -3,6 +3,8 @@ package org.basex.index;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.Arrays;
+
+import org.basex.data.MetaData;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
@@ -21,36 +23,36 @@ import org.basex.util.hash.TokenSet;
 public final class Names extends TokenSet implements Index {
   /** Statistic information. */
   private StatsKey[] stat;
-  /** Maximum number of string categories. */
-  private final int cats;
+  /** Reference to meta data. */
+  private final MetaData meta;
 
   /**
    * Default constructor.
-   * @param c number of string categories
+   * @param md meta data
    */
-  public Names(final int c) {
+  public Names(final MetaData md) {
     stat = new StatsKey[CAP];
-    cats = c;
+    meta = md;
   }
 
   /**
    * Constructor, specifying an input file.
    * @param in input stream
-   * @param c number of string categories
+   * @param md meta data
    * @throws IOException I/O exception
    */
-  public Names(final DataInput in, final int c) throws IOException {
+  public Names(final DataInput in, final MetaData md) throws IOException {
     super(in);
     stat = new StatsKey[keys.length];
-    cats = c;
-    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(in, c);
+    meta = md;
+    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(in, md);
   }
 
   /**
    * Initializes the statistics.
    */
   public void init() {
-    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(cats);
+    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(meta);
   }
 
   /**
@@ -63,7 +65,7 @@ public final class Names extends TokenSet implements Index {
   public int index(final byte[] k, final byte[] v, final boolean st) {
     final int s = Math.abs(add(k));
     if(st) {
-      if(stat[s] == null) stat[s] = new StatsKey(cats);
+      if(stat[s] == null) stat[s] = new StatsKey(meta);
       if(v != null) stat[s].add(v);
       stat[s].counter++;
     }
@@ -83,7 +85,7 @@ public final class Names extends TokenSet implements Index {
   public void write(final DataOutput out) throws IOException {
     super.write(out);
     for(int s = 1; s < size; ++s) {
-      if(stat[s] == null) stat[s] = new StatsKey(cats);
+      if(stat[s] == null) stat[s] = new StatsKey(meta);
       stat[s].finish(out);
     }
   }

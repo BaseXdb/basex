@@ -76,8 +76,8 @@ public final class DialogInfo extends Dialog {
 
     final byte[] db = InfoDB.db(meta, true, false, true);
     final TokenBuilder info = new TokenBuilder(db);
-    if(data.ns.size() != 0) {
-      info.bold().add(NL + INFONS + NL).norm().add(data.ns.info());
+    if(data.nspaces.size() != 0) {
+      info.bold().add(NL + INFONS + NL).norm().add(data.nspaces.info());
     }
 
     final BaseXEditor text = text(info.finish());

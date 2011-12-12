@@ -50,6 +50,8 @@ public final class PathNode {
   public double max;
   /** Maximum cats. */
   private int maxcats;
+  /** Maximum cats. */
+  private int maxlength;
   /** Checker boolean. */
   private boolean check;
 
@@ -59,8 +61,10 @@ public final class PathNode {
    * @param k node kind
    * @param p parent node
    * @param m maxcats
+   * @param ml maxlength
    */
-  PathNode(final int t, final byte k, final PathNode p, final int m) {
+  PathNode(final int t, final byte k, final PathNode p,
+      final int m, final int ml) {
     ch = new PathNode[0];
     size = 1;
     values = new TokenList();
@@ -72,6 +76,7 @@ public final class PathNode {
     min = Double.MAX_VALUE;
     tkind = Kind.INT;
     maxcats = m;
+    maxlength = ml;
   }
 
   /**
@@ -128,7 +133,7 @@ public final class PathNode {
         return c;
       }
     }
-    final PathNode pn = new PathNode(n, k, this, maxcats);
+    final PathNode pn = new PathNode(n, k, this, maxcats, maxlength);
     if(val != null) {
       pn.values.add(val);
       pn.vasize.add(1);
@@ -157,7 +162,7 @@ public final class PathNode {
     if(vl == 0 || tkind == Kind.TEXT || ws(val)) return;
 
     if(check && values.size() <= maxcats) {
-      if(val.length > MAXLEN) {
+      if(val.length > maxlength) {
         tkind = Kind.TEXT;
         check = false;
       }

@@ -51,7 +51,7 @@ final class FTFuzzy extends FTIndex {
   /** Entry size. */
   private static final int ENTRY = 9;
   /** Token positions. */
-  private final int[] tp = new int[MAXLEN + 3];
+  private final int[] tp;
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
 
@@ -75,10 +75,11 @@ final class FTFuzzy extends FTIndex {
     inY = new DataAccess(d.meta.dbfile(DATAFTX + 'y'));
     inZ = new DataAccess(d.meta.dbfile(DATAFTX + 'z'));
     inX = new DataAccess(d.meta.dbfile(DATAFTX + 'x'));
+    tp = new int[d.meta.maxlen + 3];
     for(int i = 0; i < tp.length; ++i) tp[i] = -1;
-    int is = inX.read1();
+    int is = inX.readNum();
     while(--is >= 0) {
-      final int p = inX.read1();
+      final int p = inX.readNum();
       tp[p] = inX.read4();
     }
     tp[tp.length - 1] = (int) inY.length();
@@ -86,7 +87,7 @@ final class FTFuzzy extends FTIndex {
 
   @Override
   public synchronized int count(final IndexToken ind) {
-    if(ind.get().length > MAXLEN) return Integer.MAX_VALUE;
+    if(ind.get().length > data.meta.maxlen) return Integer.MAX_VALUE;
 
     // estimate costs for queries which stretch over multiple index entries
     final FTLexer lex = (FTLexer) ind;

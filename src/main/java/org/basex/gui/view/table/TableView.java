@@ -22,7 +22,6 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.list.IntList;
 
 /**
@@ -203,11 +202,11 @@ public final class TableView extends View implements Runnable {
     final int l = y / tdata.rowH;
     final boolean valid = y >= 0 && l < tdata.rows.size();
 
+    final Data data = gui.context.data();
     int focused = -1;
     if(valid) {
       final int pre = tdata.rows.get(l);
-      final Context context = gui.context;
-      final TableIterator it = new TableIterator(context.data(), tdata);
+      final TableIterator it = new TableIterator(data, tdata);
       final int c = tdata.column(getWidth() - BaseXBar.SIZE, tdata.mouseX);
       it.init(pre);
       while(it.more()) {
@@ -221,7 +220,7 @@ public final class TableView extends View implements Runnable {
     content.repaint();
 
     final String str = content.focusedString;
-    gui.cursor(valid && str != null && str.length() <= Token.MAXLEN ?
+    gui.cursor(valid && str != null && str.length() <= data.meta.maxlen ?
       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
@@ -235,8 +234,10 @@ public final class TableView extends View implements Runnable {
   public void mousePressed(final MouseEvent e) {
     final int pre = gui.context.focused;
     if(pre == -1) return;
+
     super.mousePressed(e);
     final Context context = gui.context;
+    final Data data = gui.context.data();
 
     if(tdata.rows == null) return;
 
@@ -246,7 +247,7 @@ public final class TableView extends View implements Runnable {
       if(e.getClickCount() == 1) {
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         final String str = content.focusedString;
-        if(str == null || str.length() > Token.MAXLEN) return;
+        if(str == null || str.length() > data.meta.maxlen) return;
         if(!e.isShiftDown()) tdata.resetFilter();
         tdata.cols[c].filter = str;
         query();
@@ -260,12 +261,12 @@ public final class TableView extends View implements Runnable {
       }
     } else {
       if(pre != -1) {
-        final TableIterator it = new TableIterator(context.data(), tdata);
+        final TableIterator it = new TableIterator(data, tdata);
         final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         it.init(pre);
         while(it.more()) {
           if(it.col == c) {
-            gui.notify.mark(new Nodes(it.pre, context.data()), null);
+            gui.notify.mark(new Nodes(it.pre, data), null);
             return;
           }
         }

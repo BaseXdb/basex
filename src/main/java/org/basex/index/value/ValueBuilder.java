@@ -72,8 +72,9 @@ public final class ValueBuilder extends IndexBuilder {
         }
       }
       // skip too long values
-      if(data.kind(pre) != k || data.textLen(pre, text) > MAXLEN) continue;
-      index.index(data.text(pre, text), data.id(pre));
+      if(data.kind(pre) == k && data.textLen(pre, text) <= data.meta.maxlen)
+        index.index(data.text(pre, text),
+            data.meta.updindex ? data.id(pre) : pre);
     }
 
     if(merge) {
@@ -89,7 +90,8 @@ public final class ValueBuilder extends IndexBuilder {
     else data.meta.attrindex = true;
 
     Util.gc(perf);
-    return new DiskValues(data, text);
+    return data.meta.updindex ?
+        new UpdatableDiskValues(data, text) : new DiskValues(data, text);
   }
 
   /**

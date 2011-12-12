@@ -36,6 +36,8 @@ abstract class AQuery extends Command {
 
   /** Query processor. */
   private QueryProcessor qp;
+  /** Query exception. */
+  private QueryException qe;
   /** Initial parsing time. */
   private long init;
   /** Parsing time. */
@@ -57,83 +59,88 @@ abstract class AQuery extends Command {
   }
 
   /**
-   * Returns a new query instance.
+   * Evaluates the specified query.
    * @param query query
-   * @return query instance
+   * @return success flag
    */
   protected final boolean query(final String query) {
-    final Performance per = new Performance();
-    final int runs = Math.max(1, prop.num(Prop.RUNS));
+    final Performance p = new Performance();
+
     String err = null;
     String inf = "";
-    try {
-      final boolean serial = prop.is(Prop.SERIALIZE);
-      long hits = 0;
-      int updates = 0;
-      for(int i = 0; i < runs; ++i) {
-        // reuse existing processor instance
-        if(i != 0) qp = null;
-        qp = queryProcessor(query, context);
-        qp.parse();
-        pars += init + per.getTime();
-        init = 0;
-        if(i == 0) plan(false);
-        qp.compile();
-        comp += per.getTime();
-        if(i == 0) plan(true);
+    if(qe != null) {
+      err = qe.getMessage();
+    } else {
+      try {
+        final boolean serial = prop.is(Prop.SERIALIZE);
+        long hits = 0;
+        int updates = 0;
+        final int runs = Math.max(1, prop.num(Prop.RUNS));
+        for(int r = 0; r < runs; ++r) {
+          // reuse existing processor instance
+          if(r != 0) qp = null;
+          qp = queryProcessor(query, context);
+          qp.parse();
+          pars += init + p.getTime();
+          init = 0;
+          if(r == 0) plan(false);
+          qp.compile();
+          comp += p.getTime();
+          if(r == 0) plan(true);
 
-        final PrintOutput po = i == 0 && serial ? out : new NullOutput();
-        Serializer ser;
+          final PrintOutput po = r == 0 && serial ? out : new NullOutput();
+          Serializer ser;
 
-        if(prop.is(Prop.CACHEQUERY)) {
-          result = qp.execute();
-          eval += per.getTime();
-          ser = qp.getSerializer(po);
-          result.serialize(ser);
-          hits = result.size();
-        } else {
-          final Iter ir = qp.iter();
-          eval += per.getTime();
-          hits = 0;
-          Item it = ir.next();
-          ser = qp.getSerializer(po);
-          while(it != null) {
-            checkStop();
-            ser.openResult();
-            it.serialize(ser);
-            ser.closeResult();
-            it = ir.next();
-            ++hits;
+          if(prop.is(Prop.CACHEQUERY)) {
+            result = qp.execute();
+            eval += p.getTime();
+            ser = qp.getSerializer(po);
+            result.serialize(ser);
+            hits = result.size();
+          } else {
+            final Iter ir = qp.iter();
+            eval += p.getTime();
+            hits = 0;
+            Item it = ir.next();
+            ser = qp.getSerializer(po);
+            while(it != null) {
+              checkStop();
+              ser.openResult();
+              it.serialize(ser);
+              ser.closeResult();
+              it = ir.next();
+              ++hits;
+            }
           }
+          updates = qp.updates();
+          ser.close();
+          qp.close();
+          prnt += p.getTime();
         }
-        updates = qp.updates();
-        ser.close();
-        qp.close();
-        prnt += per.getTime();
+        // dump some query info
+        if(prop.is(Prop.QUERYINFO)) evalInfo(query, hits, updates, runs);
+        out.flush();
+        return info(NL + QUERYEXEC, perf.getTimer(runs));
+      } catch(final QueryException ex) {
+        Util.debug(ex);
+        err = ex.getMessage();
+      } catch(final IOException ex) {
+        Util.debug(ex);
+        err = ex.getMessage();
+      } catch(final ProgressException ex) {
+        err = PROGERR;
+        // store any useful info (e.g. query plan):
+        inf = info();
+      } catch(final RuntimeException ex) {
+        Util.debug(qp.info());
+        throw ex;
+      } catch(final StackOverflowError ex) {
+        Util.debug(ex);
+        err = XPSTACK.desc;
       }
-      // dump some query info
-      if(prop.is(Prop.QUERYINFO)) evalInfo(query, hits, updates, runs);
-      out.flush();
-      return info(NL + QUERYEXEC, perf.getTimer(runs));
-    } catch(final QueryException ex) {
-      Util.debug(ex);
-      err = ex.getMessage();
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      err = ex.getMessage();
-    } catch(final ProgressException ex) {
-      err = PROGERR;
-      // store any useful info (e.g. query plan):
-      inf = info();
-    } catch(final RuntimeException ex) {
-      Util.debug(qp.info());
-      throw ex;
-    } catch(final StackOverflowError ex) {
-      Util.debug(ex);
-      err = XPSTACK.desc;
+      // close processor after exceptions
+      if(qp != null) try { qp.close(); } catch(final QueryException ex) { }
     }
-    // close processor after exceptions
-    if(qp != null) try { qp.close(); } catch(final QueryException ex) { }
 
     error(err);
     if(Util.debug || err.startsWith(PROGERR)) {
@@ -160,8 +167,10 @@ abstract class AQuery extends Command {
       init = p.getTime();
       return qp.ctx.updating;
     } catch(final QueryException ex) {
-      qp = null;
-      return true;
+      Util.debug(ex);
+      qe = ex;
+      if(qp != null) try { qp.close(); } catch(final QueryException e) { }
+      return false;
     }
   }
 

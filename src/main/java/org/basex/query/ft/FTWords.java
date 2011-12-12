@@ -1,10 +1,10 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.data.MetaData;
@@ -160,7 +160,7 @@ public final class FTWords extends FTExpr {
               if(ftt.opt.sw != null && ftt.opt.sw.id(tok) != 0) {
                 ++d;
               } else {
-                final FTIndexIterator ir = lex.get().length > MAXLEN ?
+                final FTIndexIterator ir = lex.get().length > data.meta.maxlen ?
                     scan(lex) : (FTIndexIterator) data.iter(lex);
                 if(ia == null) {
                   ia = ir;
@@ -364,14 +364,15 @@ public final class FTWords extends FTExpr {
     /* Index will be applied if no explicit match options have been set
      * that conflict with the index options. As a consequence, though, index-
      * based querying might yield other results than sequential scanning. */
-    if(fto.isSet(CS) && md.casesens != fto.is(CS) ||
+    if(occ != null ||
+       fto.isSet(CS) && md.casesens != fto.is(CS) ||
        fto.isSet(DC) && md.diacritics != fto.is(DC) ||
        fto.isSet(ST) && md.stemming != fto.is(ST) ||
-       fto.ln != null && md.language != fto.ln || occ != null) return false;
+       fto.ln != null && !fto.ln.equals(md.language)) return false;
 
     // estimate costs if text is not statically known
     if(txt == null) {
-      ic.costs(Math.max(1, ic.data.meta.size / 20));
+      ic.costs(Math.max(1, ic.data.meta.size >> 10));
       return true;
     }
 
@@ -401,7 +402,7 @@ public final class FTWords extends FTExpr {
           }
         }
         // reduce number of expected results to favor full-text index requests
-        ic.addCosts(Math.max(1, ic.data.count(ft) >> 2));
+        ic.addCosts(Math.max(1, ic.data.count(ft) >> 10));
       }
     }
     return true;

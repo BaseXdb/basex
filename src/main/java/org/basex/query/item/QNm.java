@@ -180,13 +180,12 @@ public final class QNm extends Item {
   }
 
   /**
-   * Returns the Clark notation, represented by the URI in curly braces
-   * and the local name.
+   * Returns the EQName notation.
    * @return full name
    */
-  public byte[] full() {
-    return new TokenBuilder().add('{').add(uri()).add('}').
-        add(local()).finish();
+  public byte[] eqname() {
+    return new TokenBuilder().add('"').add(Str.get(uri()).toString()).
+        add("\":").add(local()).finish();
   }
 
   @Override

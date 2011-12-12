@@ -372,7 +372,8 @@ pc_direrr="%" verweist auf ein Verzeichnis.
 # Database commands
 db_no=Die Datenbank '%' wurde nicht gefunden.
 db_invalid=Der Name '%' ist ungültig.
-db_locked=Die Datenbank '%' ist gerade gesperrt.
+db_pinned=Ein Client hat die Datenbank '%' noch geöffnet.
+db_updated=Die Datenbank '%' wird gerade aktualisert, oder das Update wurde nicht abgeschlossen.
 db_closed=Die Datenbank '%' wurde geschlossen.
 db_closeerr=Die Datenbank '%' konnte nicht geschlossen werden.
 db_optimized=Die Datenbank '%' wurde optimiert (%).

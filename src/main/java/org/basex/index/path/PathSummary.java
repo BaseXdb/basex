@@ -33,15 +33,19 @@ public final class PathSummary implements Index {
   public PathNode root;
   /** Maximum categories. */
   private int maxcats;
+  /** Maximum length. */
+  private int maxlength;
 
   /**
    * Constructor, specifying a data reference.
    * @param d data reference
-   * @param c categories
+   * @param mc maxcats
+   * @param ml maxlength
    */
-  public PathSummary(final Data d, final int c) {
+  public PathSummary(final Data d, final int mc, final int ml) {
     data = d;
-    maxcats = c;
+    maxcats = mc;
+    maxlength = ml;
   }
 
   /**
@@ -99,7 +103,7 @@ public final class PathSummary implements Index {
    */
   public void index(final int n, final byte k, final int l, final byte[] val) {
     if(root == null) {
-      root = new PathNode(n, k, null, maxcats);
+      root = new PathNode(n, k, null, maxcats, maxlength);
       stack.size(0);
       stack.add(root);
     } else {

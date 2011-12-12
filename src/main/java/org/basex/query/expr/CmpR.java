@@ -169,7 +169,7 @@ public final class CmpR extends Single {
    */
   private StatsKey key(final IndexContext ic, final boolean text) {
     // statistics are not up-to-date
-    if(!ic.data.meta.uptodate || ic.data.ns.size() != 0) return null;
+    if(!ic.data.meta.uptodate || ic.data.nspaces.size() != 0) return null;
 
     final AxisPath path = (AxisPath) expr;
     final int st = path.steps.length;

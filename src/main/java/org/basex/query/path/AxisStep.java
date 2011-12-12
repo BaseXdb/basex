@@ -89,7 +89,7 @@ public class AxisStep extends Preds {
     final Data data = ctx.data();
     ctx.leaf = data != null &&
       test.test == Name.NAME && test.type != NodeType.ATT && axis.down &&
-      data.meta.uptodate && data.ns.size() == 0;
+      data.meta.uptodate && data.nspaces.size() == 0;
     if(ctx.leaf) {
       final StatsKey s =
         data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
@@ -167,7 +167,7 @@ public class AxisStep extends Preds {
       final Data data) {
 
     // skip steps with predicates or different namespaces
-    if(preds.length != 0 || data.ns.globalNS() == null) return null;
+    if(preds.length != 0 || data.nspaces.globalNS() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;

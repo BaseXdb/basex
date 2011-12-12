@@ -50,48 +50,20 @@ public final class Prop extends AProp {
 
   // OPTIONS ==================================================================
 
-  /** Detailed query information. */
-  public static final Object[] QUERYINFO = { "QUERYINFO", false };
-  /** Flag for serializing query results. */
-  public static final Object[] SERIALIZE = { "SERIALIZE", true };
-  /** External variables, separated by commas. */
-  public static final Object[] BINDINGS = { "BINDINGS", "" };
-  /** Serialization parameters, separated by commas. */
-  public static final Object[] SERIALIZER = { "SERIALIZER", "" };
-  /** Exporter serialization parameters. */
-  public static final Object[] EXPORTER = { "EXPORTER", "" };
-  /** Dots the query plan. */
-  public static final Object[] DOTPLAN = { "DOTPLAN", false };
-  /** Compact dot representation. */
-  public static final Object[] DOTCOMPACT = { "DOTCOMPACT", false };
-  /** Display dot graph. */
-  public static final Object[] DOTDISPLAY = { "DOTDISPLAY", true };
-  /** Path to dotty. */
-  public static final Object[] DOTTY = { "DOTTY", "dotty" };
-  /** Prints an XML plan. */
-  public static final Object[] XMLPLAN = { "XMLPLAN", false };
-  /** Creates the query plan before or after compilation. */
-  public static final Object[] COMPPLAN = { "COMPPLAN", true };
-
-  /** Caches the query results. */
-  public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
-  /** Path to current query. */
-  public static final Object[] QUERYPATH = { "QUERYPATH", "" };
-  /** Writes original files back after updates. */
-  public static final Object[] WRITEBACK = { "WRITEBACK", false };
-  /** Forces database creation for unknown documents. */
-  public static final Object[] FORCECREATE = { "FORCECREATE", false };
-  /** Flushes the database after each update. */
-  public static final Object[] AUTOFLUSH = { "AUTOFLUSH", true };
-  /** Default XQuery version. */
-  public static final Object[] XQUERY3 = { "XQUERY3", true };
-
+  /** Flag for whitespace chopping. */
+  public static final Object[] CHOP = { "CHOP", true };
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", true };
   /** Flag for parsing DTDs in internal parser. */
   public static final Object[] DTD = { "DTD", false };
   /** Path to XML Catalog file. */
   public static final Object[] CATFILE = { "CATFILE", "" };
+  /** Path for filtering XML Documents. */
+  public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
+  /** Flag for adding archives to a database. */
+  public static final Object[] ADDARCHIVES = { "ADDARCHIVES", true };
+  /** Flag for skipping corrupt files. */
+  public static final Object[] SKIPCORRUPT = { "SKIPCORRUPT", false };
   /** Define import parser. */
   public static final Object[] PARSER = { "PARSER", "xml" };
   /** Define parser options. */
@@ -99,31 +71,35 @@ public final class Prop extends AProp {
     "flat=false,encoding=UTF-8,lines=true,format=verbose,header=false," +
     "separator=comma" };
 
-  /** Number of query executions. */
-  public static final Object[] RUNS = { "RUNS", 1 };
-  /** Flag for whitespace chopping. */
-  public static final Object[] CHOP = { "CHOP", true };
-  /** Flag for automatic index update. */
-  public static final Object[] UPDINDEX = { "UPDINDEX", false };
+  /** Flag for creating a path summary. */
+  public static final Object[] PATHINDEX = { "PATHINDEX", true };
   /** Flag for creating a text index. */
   public static final Object[] TEXTINDEX = { "TEXTINDEX", true };
   /** Flag for creating an attribute value index. */
   public static final Object[] ATTRINDEX = { "ATTRINDEX", true };
   /** Flag for creating a full-text index. */
   public static final Object[] FTINDEX = { "FTINDEX", false };
-  /** Flag for creating a path summary. */
-  public static final Object[] PATHINDEX = { "PATHINDEX", true };
-  /** Maximum number of name categories. */
-  public static final Object[] CATEGORIES = { "CATEGORIES", 50 };
 
+  /** Maximum length of index entries. */
+  public static final Object[] MAXLEN = { "MAXLEN", 96 };
+  /** Maximum number of name categories. */
+  public static final Object[] MAXCATS = { "MAXCATS", 64 };
+  /** Flag for automatic index update. */
+  public static final Object[] UPDINDEX = { "UPDINDEX", false };
+
+  /** Writes original files back after updates. */
+  public static final Object[] WRITEBACK = { "WRITEBACK", false };
   /** Flag for creating a main memory database. */
   public static final Object[] MAINMEM = { "MAINMEM", false };
-  /** Path for filtering XML Documents. */
-  public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
-  /** Flag for adding archives to a database. */
-  public static final Object[] ADDARCHIVES = { "ADDARCHIVES", true };
-  /** Flag for skipping corrupt files. */
-  public static final Object[] SKIPCORRUPT = { "SKIPCORRUPT", false };
+  /** Forces database creation for unknown documents. */
+  public static final Object[] FORCECREATE = { "FORCECREATE", false };
+  /** Flushes the database after each update. */
+  public static final Object[] AUTOFLUSH = { "AUTOFLUSH", true };
+
+  /** Maximum number of index occurrences to print. */
+  public static final Object[] MAXSTAT = { "MAXSTAT", 30 };
+  /** Flag for tail-call optimization. */
+  public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
 
   /** Flag for creating a wildcard index. */
   public static final Object[] WILDCARDS = { "WILDCARDS", false };
@@ -143,10 +119,37 @@ public final class Prop extends AProp {
   /** Levenshtein default error. */
   public static final Object[] LSERROR = { "LSERROR", 0 };
 
-  /** Maximum number of index occurrences to print. */
-  public static final Object[] MAXSTAT = { "MAXSTAT", 30 };
-  /** Flag for tail-call optimization. */
-  public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
+  /** Detailed query information. */
+  public static final Object[] QUERYINFO = { "QUERYINFO", false };
+  /** Default XQuery version. */
+  public static final Object[] XQUERY3 = { "XQUERY3", true };
+  /** Flag for serializing query results. */
+  public static final Object[] SERIALIZE = { "SERIALIZE", true };
+  /** External variables, separated by commas. */
+  public static final Object[] BINDINGS = { "BINDINGS", "" };
+  /** Serialization parameters, separated by commas. */
+  public static final Object[] SERIALIZER = { "SERIALIZER", "" };
+  /** Exporter serialization parameters. */
+  public static final Object[] EXPORTER = { "EXPORTER", "" };
+  /** Path to current query. */
+  public static final Object[] QUERYPATH = { "QUERYPATH", "" };
+  /** Caches the query results. */
+  public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
+  /** Number of query executions. */
+  public static final Object[] RUNS = { "RUNS", 1 };
+
+  /** Prints an XML plan. */
+  public static final Object[] XMLPLAN = { "XMLPLAN", false };
+  /** Creates the query plan before or after compilation. */
+  public static final Object[] COMPPLAN = { "COMPPLAN", true };
+  /** Dots the query plan. */
+  public static final Object[] DOTPLAN = { "DOTPLAN", false };
+  /** Compact dot representation. */
+  public static final Object[] DOTCOMPACT = { "DOTCOMPACT", false };
+  /** Display dot graph. */
+  public static final Object[] DOTDISPLAY = { "DOTDISPLAY", true };
+  /** Path to dotty. */
+  public static final Object[] DOTTY = { "DOTTY", "dotty" };
 
   // STATIC PROPERTIES ========================================================
 

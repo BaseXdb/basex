@@ -109,13 +109,42 @@ public final class XMLToken {
    * @param val value to be checked
    * @return result of check
    */
-  public static boolean isQName(final byte[] val) {
+  public static boolean isEQName(final byte[] val) {
     final int l = val.length;
-    if(l == 0) return false;
-    final int i = ncName(val, 0);
+    int i = 0;
+    if(i < l && (val[0] == '"' || val[0] == '\'')) {
+      boolean d = false;
+      while(++i < l) {
+        if(val[i] == val[0]) d ^= true;
+        else if(d) break;
+      }
+      if(i == l || val[i++] != ':') return false;
+    }
+    return isQName(val, i);
+  }
+
+  /**
+   * Checks if the specified token is a valid QName.
+   * @param val value to be checked
+   * @return result of check
+   */
+  public static boolean isQName(final byte[] val) {
+    return isQName(val, 0);
+  }
+
+  /**
+   * Checks the specified token as QName.
+   * @param v value to be checked
+   * @param p start position
+   * @return result of check
+   */
+  private static boolean isQName(final byte[] v, final int p) {
+    final int l = v.length;
+    if(l == p) return false;
+    final int i = ncName(v, p);
     if(i == l) return true;
-    if(i == 0 || val[i] != ':') return false;
-    final int j = ncName(val, i + 1);
+    if(i == p || v[i] != ':') return false;
+    final int j = ncName(v, i + 1);
     if(j == i + 1 || j != l) return false;
     return true;
   }

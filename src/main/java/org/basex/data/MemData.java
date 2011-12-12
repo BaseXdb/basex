@@ -6,6 +6,7 @@ import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.path.PathSummary;
 import org.basex.index.value.MemValues;
+import org.basex.index.value.UpdatableMemValues;
 import org.basex.index.Names;
 import org.basex.io.random.TableMemAccess;
 import org.basex.util.Token;
@@ -23,31 +24,37 @@ public final class MemData extends Data {
    * Constructor.
    * @param tag tag index
    * @param att attribute name index
-   * @param n namespaces
-   * @param s path summary
+   * @param ps path summary
+   * @param ns namespaces
    * @param pr database properties
    */
-  public MemData(final Names tag, final Names att, final Namespaces n,
-      final PathSummary s, final Prop pr) {
+  public MemData(final Names tag, final Names att, final PathSummary ps,
+      final Namespaces ns, final Prop pr) {
 
     meta = new MetaData(pr);
-    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     table = new TableMemAccess(meta);
-    txtindex = new MemValues(this);
-    atvindex = new MemValues(this);
-    tagindex = tag;
-    atnindex = att;
-    ns = n;
-    pthindex = s == null ? new PathSummary(this, 0) : s;
+    if(meta.updindex) {
+      idmap = new IdPreMap(meta.lastid);
+      txtindex = new UpdatableMemValues(this);
+      atvindex = new UpdatableMemValues(this);
+    } else {
+      txtindex = new MemValues(this);
+      atvindex = new MemValues(this);
+    }
+    tagindex = tag == null ? new Names(meta) : tag;
+    atnindex = att == null ? new Names(meta) : att;
+    pthindex = ps == null ? new PathSummary(this, meta.maxcats,
+        meta.maxlen) : ps;
+    nspaces = ns == null ? new Namespaces() : ns;
   }
 
   /**
-   * Constructor, adopting data structures from the specified database.
+   * Light-weight constructor, adopting data structures from the
+   * specified database.
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, new Namespaces(),
-         data.pthindex, data.meta.prop);
+    this(data.tagindex, data.atnindex, data.pthindex, null, data.meta.prop);
   }
 
   /**
@@ -55,7 +62,7 @@ public final class MemData extends Data {
    * @param pr property reference
    */
   public MemData(final Prop pr) {
-    this(new Names(0), new Names(0), new Namespaces(), null, pr);
+    this(null, null, null, null, pr);
   }
 
   @Override
@@ -71,12 +78,7 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
-  public boolean lock() {
-    return true;
-  }
-
-  @Override
-  public boolean unlock() {
+  public boolean updating(final boolean updating) {
     return true;
   }
 
@@ -108,17 +110,19 @@ public final class MemData extends Data {
 
   @Override
   public void updateText(final int pre, final byte[] val, final int kind) {
-    final boolean txt = kind != ATTR;
     final int id = id(pre);
     if(meta.updindex) {
+      final boolean txt = kind != ATTR;
       ((MemValues) (txt ? txtindex : atvindex)).delete(text(pre, txt), id);
     }
-    textOff(pre, index(id, val, kind));
+    textOff(pre, index(pre, id, val, kind));
   }
 
   @Override
-  protected long index(final int id, final byte[] txt, final int kind) {
-    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).index(txt, id);
+  protected long index(final int pre, final int id, final byte[] txt,
+      final int kind) {
+    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).
+        index(txt, meta.updindex ? id : pre);
   }
 
   @Override
