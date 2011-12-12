@@ -67,6 +67,8 @@ public enum Err {
   LOCK(BASX, 20, "Database '%' cannot be flagged as 'updating'."),
   /** BASX0020: Evaluation exception. */
   UNLOCK(BASX, 20, "The 'updating' flag of '%' could not be reset."),
+  /** BASX0021: Evaluation exception. */
+  NOVAIDX(BASX, 21, "Index not valid for this function."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

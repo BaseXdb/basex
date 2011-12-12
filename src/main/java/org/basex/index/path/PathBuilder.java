@@ -27,6 +27,7 @@ public final class PathBuilder extends IndexBuilder {
 
     final IntList pars = new IntList();
     final PathSummary path = new PathSummary(data);
+
     for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
@@ -39,7 +40,9 @@ public final class PathBuilder extends IndexBuilder {
         path.index(data.name(pre), kind, pars.size());
         pars.push(pre);
       } else if(kind == Data.ATTR) {
-        path.index(data.name(pre), kind, pars.size());
+        path.index(data.name(pre), kind, pars.size(), data.text(pre, false));
+      } else if(kind == Data.TEXT) {
+        path.index(data.name(pre), kind, pars.size(), data.text(pre, true));
       } else {
         path.index(0, kind, pars.size());
       }

@@ -30,7 +30,7 @@ import org.basex.util.list.IntList;
  */
 public abstract class Builder extends Progress {
   /** Tree structure. */
-  protected final PathSummary path = new PathSummary(null);
+  protected PathSummary path;
   /** Namespace index. */
   protected final Namespaces ns = new Namespaces();
   /** Parser instance. */
@@ -93,6 +93,7 @@ public abstract class Builder extends Progress {
     meta = md;
     tags = ta;
     atts = at;
+    path = new PathSummary(md);
 
     // add document node and parse document
     parser.parse(this);
@@ -342,7 +343,7 @@ public abstract class Builder extends Progress {
     for(int a = 0; a < as; ++a) {
       n = atts.index(att.name(a), att.string(a), true);
       u = ns.uri(att.name(a), false);
-      if(meta.createpath) path.index(n, Data.ATTR, lvl + 1);
+      if(meta.createpath) path.index(n, Data.ATTR, lvl + 1, att.string(a));
       addAttr(n, att.string(a), Math.min(IO.MAXATTS, a + 1), u);
     }
 
@@ -394,7 +395,7 @@ public abstract class Builder extends Progress {
     // set leaf node information in index
     else if(lvl > 1) tags.stat(tstack.get(lvl - 1)).leaf = false;
 
-    if(meta.createpath) path.index(0, kind, lvl);
+    if(meta.createpath) path.index(0, kind, lvl, value);
     addText(value, lvl == 0 ? 1 : meta.size - pstack.get(lvl - 1), kind);
   }
 

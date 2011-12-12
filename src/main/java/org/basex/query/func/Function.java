@@ -526,6 +526,11 @@ public enum Function {
   _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
   /** Database function: returns details for a resource. */
   _DB_DETAILS(FNDb.class, "details(database,path)", ITEM, STR, STR),
+  
+  /* FNIx functions. */
+  
+  /** Index function: returns index facet information. */
+  _INDEX_FACETS(FNIndex.class, "facets(database, number)", ITEM, ITEM, DBL_ZM),
 
   /* FNFile functions (EXPath). */
 
@@ -753,6 +758,7 @@ public enum Function {
     URIS.put(FNDb.class,   DBURI);
     URIS.put(FNFt.class,   FTURI);
     URIS.put(FNHof.class,  HOFURI);
+    URIS.put(FNIndex.class,   INDEXURI);
     URIS.put(FNJson.class, JSONURI);
     URIS.put(FNSql.class, SQLURI);
     URIS.put(FNUtil.class, UTILURI);

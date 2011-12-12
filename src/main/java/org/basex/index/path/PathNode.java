@@ -1,23 +1,31 @@
 package org.basex.index.path;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.core.Text;
 import org.basex.data.Data;
+import org.basex.index.Kind;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.IntList;
 import org.basex.util.list.ObjList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class represents a node of the path summary.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
+ * @author Andreas Weiler
  */
 public final class PathNode {
+
   /** Tag/attribute name reference. */
   public final short name;
   /** Node kind, defined in the {@link Data} class. */
@@ -26,21 +34,49 @@ public final class PathNode {
   public final PathNode par;
   /** Number of occurrences. */
   public int size;
+  /** Values of node. */
+  public TokenList values;
+  /** Counts of nodes. */
+  public IntList vasize;
   /** Children. */
-  PathNode[] ch;
+  public PathNode[] ch;
+  /** TypeKind of node. */
+  public Kind tkind;
+  /** Maximum text length. */
+  private double len;
+  /** Minimum value. */
+  public double min;
+  /** Maximum value. */
+  public double max;
+  /** Maximum cats. */
+  private int maxcats;
+  /** Maximum cats. */
+  private int maxlength;
+  /** Checker boolean. */
+  private boolean check;
 
   /**
    * Default constructor.
    * @param t tag
    * @param k node kind
    * @param p parent node
+   * @param mc maxcats
+   * @param ml maxlength
    */
-  PathNode(final int t, final byte k, final PathNode p) {
+  PathNode(final int t, final byte k, final PathNode p,
+      final int mc, final int ml) {
     ch = new PathNode[0];
     size = 1;
+    values = new TokenList();
+    vasize = new IntList();
     name = (short) t;
     kind = k;
     par = p;
+    max = Double.MIN_VALUE;
+    min = Double.MAX_VALUE;
+    tkind = Kind.INT;
+    maxcats = mc;
+    maxlength = ml;
   }
 
   /**
@@ -54,7 +90,18 @@ public final class PathNode {
     kind = (byte) in.read();
     size = in.readNum();
     ch = new PathNode[in.readNum()];
-    in.readDouble();
+    if(in.readDouble() == 1) {
+      tkind = Kind.values()[in.readNum()];
+      if(tkind == Kind.INT || tkind == Kind.DBL) {
+        min = in.readDouble();
+        max = in.readDouble();
+      }
+      len = in.readDouble();
+      if(tkind == Kind.CAT) {
+        values = new TokenList(in.readTokens());
+        vasize = new IntList(in.readNums());
+      }
+    }
     par = p;
     for(int i = 0; i < ch.length; ++i) ch[i] = new PathNode(in, this);
   }
@@ -63,22 +110,86 @@ public final class PathNode {
    * Indexes the specified name along with its kind.
    * @param n name reference
    * @param k node kind
+   * @param val value
    * @return node reference
    */
-  PathNode index(final int n, final byte k) {
+  PathNode index(final int n, final byte k, final byte[] val) {
     for(final PathNode c : ch) {
       if(c.kind == k && c.name == n) {
+        if(val != null && c.values.size() <= maxcats + 1) {
+          int pos = c.values.pos(val);
+          if (pos > -1) {
+            int t = c.vasize.get(pos) + 1;
+            c.vasize.set(pos, t);
+          } else {
+            c.values.add(val);
+            c.vasize.add(1);
+          }
+        }
+        if(val != null) {
+          c.check(val);
+        }
         c.size++;
         return c;
       }
     }
-    final PathNode pn = new PathNode(n, k, this);
+    final PathNode pn = new PathNode(n, k, this, maxcats, maxlength);
+    if(val != null) {
+      pn.values.add(val);
+      pn.vasize.add(1);
+      pn.check(val);
+    }
     final int cs = ch.length;
     final PathNode[] tmp = new PathNode[cs + 1];
     System.arraycopy(ch, 0, tmp, 0, cs);
     tmp[cs] = pn;
     ch = tmp;
     return pn;
+  }
+
+  /**
+   * Adds a value. All values are first treated as integer values. If a value
+   * can't be converted to an integer, it is treated as double value. If
+   * conversion fails again, it is handled as string category. Next, all values
+   * are cached. As soon as their number exceeds {@link #maxcats}, the cached
+   * values are skipped, and contents are treated as arbitrary strings.
+   * @param val value to be added
+   */
+  public void check(final byte[] val) {
+    final int vl = val.length;
+    if(vl > len) len = vl;
+
+    if(vl == 0 || tkind == Kind.TEXT || ws(val)) return;
+
+    if(check && values.size() <= maxcats) {
+      if(val.length > maxlength) {
+        tkind = Kind.TEXT;
+        check = false;
+      }
+    }
+    if(tkind == Kind.INT) {
+      final long d = toLong(val);
+      if(d == Long.MIN_VALUE) {
+        tkind = Kind.DBL;
+      } else {
+        if(min > d) min = d;
+        if(max < d) max = d;
+      }
+    }
+    if(tkind == Kind.DBL) {
+      final double d = toDouble(val);
+      if(Double.isNaN(d)) {
+        tkind = values.size() <= maxcats ? Kind.CAT : Kind.TEXT;
+      } else {
+        if(min > d) min = d;
+        if(max < d) max = d;
+      }
+    } else if(tkind == Kind.CAT) {
+      if(values.size() > maxcats) {
+        tkind = Kind.TEXT;
+        check = false;
+      }
+    }
   }
 
   /**
@@ -91,7 +202,17 @@ public final class PathNode {
     out.write1(kind);
     out.writeNum(size);
     out.writeNum(ch.length);
-    out.writeDouble(0);
+    out.writeDouble(1);
+    out.writeNum(tkind.ordinal());
+    if(tkind == Kind.INT || tkind == Kind.DBL) {
+      out.writeDouble(min);
+      out.writeDouble(max);
+    }
+    out.writeDouble(len);
+    if(tkind == Kind.CAT) {
+      out.writeTokens(values.toArray());
+      out.writeNums(vasize.toArray());
+    }
     for(final PathNode c : ch) c.write(out);
   }
 
@@ -164,7 +285,7 @@ public final class PathNode {
       case Data.COMM: tb.add(COMM); break;
       case Data.PI:   tb.add(PI); break;
     }
-    tb.add(" " + size + "x");
+    tb.add(" " + size + "x; ");
     for(final PathNode p : ch) tb.add(p.info(data, l + 1));
     return tb.finish();
   }
