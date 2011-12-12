@@ -1327,8 +1327,6 @@ public interface Text {
   String MANAGETITLE = lang("dd_title");
   /** Dialog title for dropping a database. */
   String DROPCONF = lang("dd_question") + NL + lang("dd_sure");
-  /** Availble databases. */
-  String AVAILABLE = lang("dd_available") + COL;
   /** Database only available as backup. */
   String ONLYBACKUP = lang("dd_onlybac");
   /** Dialog title for dropping a backup. */
@@ -1337,6 +1335,8 @@ public interface Text {
   String RESTOREFIRST = lang("dd_restore");
   /** Restoring an existing database. */
   String RESTOREEXIST = lang("dd_exists") + NL + lang("dd_sure");
+  /** Restoring an existing database. */
+  String NOBACKUPS = lang("dd_nobackups");
 
   /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");

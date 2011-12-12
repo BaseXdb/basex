@@ -71,6 +71,8 @@ public final class DialogManage extends Dialog {
   private BaseXCombo backupchoice;
   /** Delete button for backups. */
   private BaseXButton delete;
+  /** Backups available for the current database. */
+  private boolean backupsavl;
 
   /**
    * Default constructor.
@@ -98,7 +100,7 @@ public final class DialogManage extends Dialog {
     detail.border(5, 5, 5, 5).setFont(f);
     BaseXLayout.setWidth(detail, 400);
 
-    backupchoice = new BaseXCombo(this, "");
+    backupchoice = new BaseXCombo(this, NOBACKUPS);
     BaseXLayout.setWidth(backupchoice, 400);
     delete = new BaseXButton(BUTTONDELETE + DOTS, this);
     backup = new BaseXButton(BUTTONBACKUP, this);
@@ -107,7 +109,7 @@ public final class DialogManage extends Dialog {
     backups.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(10, 10, 10, 10)));
     final BaseXBack backbtns = newButtons(this, backup, restore, delete);
-    final BaseXLabel avlbbackups = new BaseXLabel("Backups").border(0, 0, 5, 0);
+    final BaseXLabel avlbbackups = new BaseXLabel(BACKUPS).border(0, 0, 5, 0);
     avlbbackups.setFont(f.deriveFont(f.getSize2D() + 7f));
     backups.add(avlbbackups, BorderLayout.NORTH);
     backups.add(backupchoice, BorderLayout.CENTER);
@@ -241,7 +243,10 @@ public final class DialogManage extends Dialog {
       if(!o && backups.length > 0) {
         detail.setText(Token.token(ONLYBACKUP));
       }
-      backupchoice.setModel(new DefaultComboBoxModel(backups));
+
+      backupsavl = backups.length > 0;
+      backupchoice.setModel(backupsavl ? new DefaultComboBoxModel(backups) :
+          new DefaultComboBoxModel(new String[] { NOBACKUPS }));
 
       // enable or disable buttons (depends on the currently chosen db being
       // only a backup or an actual database)
@@ -252,7 +257,6 @@ public final class DialogManage extends Dialog {
       enableOK(buttons, BUTTONCOPY, o);
 
       // enable/disable backup buttons
-      boolean backupsavl = backupchoice.getModel().getSize() > 0;
       restore.setEnabled(backupsavl);
       delete.setEnabled(backupsavl);
 
