@@ -85,10 +85,10 @@ public final class FNFormat extends FuncCall {
     else if(!it.type.isUntyped() && !it.type.isNumber()) Err.number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
-    final byte[] frm = new QNm(expr.length == 3 ?
-        checkStr(expr[2], ctx) : EMPTY).full();
+    final QNm frm = new QNm(expr.length == 3 ?
+        checkStr(expr[2], ctx) : EMPTY, ctx);
 
-    final DecFormatter df = ctx.decFormats.get(frm);
+    final DecFormatter df = ctx.decFormats.get(frm.eqname());
     if(df == null) throw FORMNUM.thrw(input, frm);
     return Str.get(df.format(input, it, pic));
   }

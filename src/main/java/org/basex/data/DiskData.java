@@ -2,20 +2,21 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.build.DiskBuilder;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.Text;
+import org.basex.core.cmd.Open;
+import org.basex.index.IdPreMap;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.FTIndex;
 import org.basex.index.path.PathSummary;
 import org.basex.index.value.DiskValues;
+import org.basex.index.value.UpdatableDiskValues;
 import org.basex.index.Names;
 import org.basex.io.IO;
 import org.basex.io.in.DataInput;
@@ -25,6 +26,8 @@ import org.basex.io.random.TableDiskAccess;
 import org.basex.util.Compress;
 import org.basex.util.Num;
 import org.basex.util.Performance;
+import org.basex.util.hash.TokenObjMap;
+import org.basex.util.list.IntList;
 import org.basex.util.Util;
 
 /**
@@ -43,9 +46,13 @@ public final class DiskData extends Data {
   private DataAccess texts;
   /** Values access file. */
   private DataAccess values;
+  /** Texts buffered for subsequent index updates. */
+  TokenObjMap<IntList> txts;
+  /** Attribute values buffered for subsequent index updates. */
+  TokenObjMap<IntList> atvs;
 
   /**
-   * Default constructor.
+   * Default constructor, called from {@link Open#open}.
    * @param db name of database
    * @param ctx database context
    * @throws IOException I/O Exception
@@ -54,9 +61,9 @@ public final class DiskData extends Data {
     meta = new MetaData(db, ctx);
 
     // don't allow to open locked databases
-    if(lockFile().exists()) throw new BaseXException(Text.DBLOCKED, meta.name);
+    if(updateFile().exists())
+      throw new BaseXException(Text.DBUPDATED, meta.name);
 
-    final int cats = ctx.prop.num(Prop.CATEGORIES);
     final DataInput in = new DataInput(meta.dbfile(DATAINF));
     try {
       // read meta data and indexes
@@ -64,19 +71,25 @@ public final class DiskData extends Data {
       while(true) {
         final String k = string(in.readToken());
         if(k.isEmpty()) break;
-        if(k.equals(DBTAGS))      tagindex = new Names(in, cats);
-        else if(k.equals(DBATTS)) atnindex = new Names(in, cats);
+        if(k.equals(DBTAGS))      tagindex = new Names(in, meta);
+        else if(k.equals(DBATTS)) atnindex = new Names(in, meta);
         else if(k.equals(DBPATH)) pthindex = new PathSummary(this, in);
-        else if(k.equals(DBNS))   ns = new Namespaces(in);
+        else if(k.equals(DBNS))   nspaces = new Namespaces(in);
         else if(k.equals(DBDOCS)) docindex.read(in);
       }
       // open data and indexes
       init();
-      if(meta.textindex) txtindex = new DiskValues(this, true);
-      if(meta.attrindex) atvindex = new DiskValues(this, false);
-      if(meta.ftindex)   ftxindex = FTIndex.get(this, meta.wildcards);
+      if(meta.updindex) {
+        idmap = new IdPreMap(meta.dbfile(DATAIDP));
+        if(meta.textindex) txtindex = new UpdatableDiskValues(this, true);
+        if(meta.attrindex) atvindex = new UpdatableDiskValues(this, false);
+      } else {
+        if(meta.textindex) txtindex = new DiskValues(this, true);
+        if(meta.attrindex) atvindex = new DiskValues(this, false);
+      }
+      if(meta.ftxtindex) ftxindex = FTIndex.get(this, meta.wildcards);
     } finally {
-      try { in.close(); } catch(final IOException ex) { }
+      in.close();
     }
   }
 
@@ -97,7 +110,8 @@ public final class DiskData extends Data {
     atnindex = at;
     pthindex = ps;
     pthindex.finish(this);
-    ns = n;
+    nspaces = n;
+    if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     init();
     flush();
   }
@@ -124,11 +138,12 @@ public final class DiskData extends Data {
     out.writeToken(token(DBPATH));
     pthindex.write(out);
     out.writeToken(token(DBNS));
-    ns.write(out);
+    nspaces.write(out);
     out.writeToken(token(DBDOCS));
     docindex.write(out);
     out.write(0);
     out.close();
+    if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
   }
 
   @Override
@@ -139,6 +154,8 @@ public final class DiskData extends Data {
       table.flush();
       texts.flush();
       values.flush();
+      if(txtindex != null) ((DiskValues) txtindex).flush();
+      if(atvindex != null) ((DiskValues) atvindex).flush();
       meta.dirty = false;
     } catch(final IOException ex) {
       Util.stack(ex);
@@ -184,9 +201,11 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public boolean lock() {
+  public boolean updating(final boolean updating) {
+    final File lock = updateFile();
+    if(!updating) return lock.delete();
+
     // try several times (may fail at first run)
-    final File lock = lockFile();
     for(int i = 0; i < 10; i++) {
       try {
         if(lock.createNewFile()) return true;
@@ -198,16 +217,11 @@ public final class DiskData extends Data {
     return false;
   }
 
-  @Override
-  public boolean unlock() {
-    return lockFile().delete();
-  }
-
   /**
    * Returns a lock file.
    * @return lock file
    */
-  public File lockFile() {
+  public File updateFile() {
     return meta.dbfile(DataText.DATAUPD);
   }
 
@@ -279,7 +293,18 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected void text(final int pre, final byte[] value, final boolean text) {
+  protected void updateText(final int pre, final byte[] value, final int kind) {
+    final boolean text = kind != ATTR;
+
+    if(meta.updindex) {
+      // update indexes
+      final int id = id(pre);
+      final byte[] oldval = text(pre, text);
+      final DiskValues index = (DiskValues) (text ? txtindex : atvindex);
+      // don't index document names
+      if(index != null && kind != DOC) index.replace(oldval, value, id);
+    }
+
     // reference to text store
     final DataAccess store = text ? texts : values;
     // file length
@@ -316,16 +341,143 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected long index(final int pre, final byte[] value, final boolean text) {
+  protected void indexBegin() {
+    txts = new TokenObjMap<IntList>();
+    atvs = new TokenObjMap<IntList>();
+  }
+
+  @Override
+  protected void indexEnd() {
+    // update all indexes in parallel
+    // [DP] Full-text index updates: update the existing indexes
+    final Thread txtupdater = txts.size() > 0 ?
+        runIndexInsert((DiskValues) txtindex, txts) : null;
+    final Thread atvupdater = atvs.size() > 0 ?
+        runIndexInsert((DiskValues) atvindex, atvs) : null;
+
+    // wait for all tasks to finish
+    try {
+      if(txtupdater != null) txtupdater.join();
+      if(atvupdater != null) atvupdater.join();
+    } catch(final InterruptedException ex) {
+      Util.stack(ex);
+    }
+  }
+
+  @Override
+  protected long index(final int pre, final int id, final byte[] value,
+      final int kind) {
+
+    final DataAccess store;
+    final TokenObjMap<IntList> m;
+
+    if(kind == ATTR) {
+      store = values;
+      m = meta.attrindex ? atvs : null;
+    } else {
+      store = texts;
+      // don't index document names
+      m = meta.textindex && kind != DOC ? txts : null;
+    }
+
+    // add text to map to index later
+    if(meta.updindex && m != null && value.length <= meta.maxlen) {
+      final IntList ids;
+      final int hash = m.id(value);
+      if(hash == 0) {
+        ids = new IntList();
+        m.add(value, ids);
+      } else {
+        ids = m.value(hash);
+      }
+      ids.add(id);
+    }
+
+    // add text to text file
     // inline integer value...
     final long v = toSimpleInt(value);
     if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;
 
     // store text
-    final DataAccess store = text ? texts : values;
     final long off = store.length();
     final byte[] val = comp.pack(value);
     store.writeToken(off, val);
     return val == value ? off : off | IO.OFFCOMP;
+  }
+
+  @Override
+  protected void indexDelete(final int pre, final int size) {
+    if(!(meta.textindex || meta.attrindex)) return;
+
+    // collect all keys and ids
+    txts = new TokenObjMap<IntList>();
+    atvs = new TokenObjMap<IntList>();
+    final int l = pre + size;
+    for(int p = pre; p < l; ++p) {
+      final int k = kind(p);
+      final boolean isAttr = k == ATTR;
+      // consider nodes which are attribute, text, comment, or proc. instruction
+      if(meta.attrindex && isAttr ||
+         meta.textindex && (k == TEXT || k == COMM || k == PI)) {
+        final byte[] key = text(p, !isAttr);
+        if(key.length <= meta.maxlen) {
+          final IntList ids;
+          final TokenObjMap<IntList> m = isAttr ? atvs : txts;
+          final int hash = m.id(key);
+          if(hash == 0) {
+            ids = new IntList();
+            m.add(key, ids);
+          } else {
+            ids = m.value(hash);
+          }
+          ids.add(id(p));
+        }
+      }
+    }
+
+    // update all indexes in parallel
+    // [DP] Full-text index updates: update the existing indexes
+    final Thread txtupdater = txts.size() > 0 ?
+        runIndexDelete((DiskValues) txtindex, txts) : null;
+    final Thread atvupdater = atvs.size() > 0 ?
+        runIndexDelete((DiskValues) atvindex, atvs) : null;
+
+    // wait for all tasks to finish
+    try {
+      if(txtupdater != null) txtupdater.join();
+      if(atvupdater != null) atvupdater.join();
+    } catch(final InterruptedException ex) {
+      Util.errln(ex);
+    }
+  }
+
+  /**
+   * Starts a new thread which inserts records into an index.
+   * @param dv index
+   * @param m records to be inserted
+   * @return the new thread
+   */
+  private Thread runIndexInsert(final DiskValues dv,
+      final TokenObjMap<IntList> m) {
+    final Thread t = new Thread() { @Override public void run() {
+      dv.index(m);
+    }};
+    t.start();
+    return t;
+  }
+
+  /**
+   * Starts a new thread which deletes records from an index.
+   * @param dv index
+   * @param m records to be deleted
+   * @return the new thread
+   */
+  private Thread runIndexDelete(final DiskValues dv,
+      final TokenObjMap<IntList> m) {
+    final Thread t = new Thread() { @Override public void run() {
+      dv.delete(m);
+    }};
+    t.start();
+    return t;
   }
 }

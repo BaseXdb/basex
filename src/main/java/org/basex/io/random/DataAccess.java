@@ -225,7 +225,8 @@ public final class DataAccess {
       if(bf.dirty) writeBlock(bf);
       bf.pos = b;
       file.seek(bf.pos);
-      file.readFully(bf.data, 0, (int) Math.min(len - b, IO.BLOCKSIZE));
+      if(bf.pos < file.length())
+        file.readFully(bf.data, 0, (int) Math.min(len - bf.pos, IO.BLOCKSIZE));
     } catch(final IOException ex) {
       Util.stack(ex);
     }
@@ -258,6 +259,20 @@ public final class DataAccess {
   }
 
   /**
+   * Writes a 5-byte value to the specified position.
+   * @param p position in the file
+   * @param v value to be written
+   */
+  public void write5(final long p, final long v) {
+    cursor(p);
+    write((byte) (v >>> 32));
+    write((byte) (v >>> 24));
+    write((byte) (v >>> 16));
+    write((byte) (v >>> 8));
+    write((byte) v);
+  }
+
+  /**
    * Writes an integer value to the specified position.
    * @param p write position
    * @param v byte array to be appended
@@ -276,6 +291,38 @@ public final class DataAccess {
     write(v >>> 16);
     write(v >>>  8);
     write(v);
+  }
+
+  /**
+   * Write a value to the file.
+   * @param p write position
+   * @param v value to be written
+   */
+  public void writeNum(final long p, final int v) {
+    cursor(p);
+    writeNum(v);
+  }
+
+  /**
+   * Writes integers to the file in compressed form.
+   * @param p write position
+   * @param v integer values
+   */
+  public void writeNums(final long p, final int[] v) {
+    cursor(p);
+    writeNum(v.length);
+    for(final int n : v) writeNum(n);
+  }
+
+  /**
+   * Appends integers to the file in compressed form.
+   * @param v integer values
+   * @return the position in the file where the values have been written
+   */
+  public long appendNums(final int[] v) {
+    final long end = len;
+    writeNums(end, v);
+    return end;
   }
 
   /**

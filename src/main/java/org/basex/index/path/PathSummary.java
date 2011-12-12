@@ -85,6 +85,7 @@ public final class PathSummary implements Index {
   public void index(final int n, final byte k, final int l) {
     if(root == null) {
       root = new PathNode(n, k, null);
+      stack.size(0);
       stack.add(root);
     } else {
       stack.set(l, stack.get(l - 1).index(n, k));

@@ -20,7 +20,7 @@ import org.w3c.dom.Node;
  */
 public final class FDoc extends FNode {
   /** Child nodes. */
-  private NodeCache children;
+  private final NodeCache children;
   /** Base URI. */
   private final byte[] base;
 

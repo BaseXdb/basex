@@ -2,7 +2,6 @@ package org.basex.index.ft;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
@@ -122,7 +121,8 @@ public abstract class FTBuilder extends IndexBuilder {
         final byte[] tok = lex.nextToken();
         ++pos;
         // skip too long and stopword tokens
-        if(tok.length <= MAXLEN && (sw.size() == 0 || sw.id(tok) == 0)) {
+        if(tok.length <= data.meta.maxlen &&
+            (sw.size() == 0 || sw.id(tok) == 0)) {
           // check if main memory is exhausted
           if((ntok++ & 0xFFF) == 0 && scm == 0 && memFull()) {
             // currently no frequency support for tf/idf based scoring
@@ -151,7 +151,7 @@ public abstract class FTBuilder extends IndexBuilder {
       data.meta.maxscore = max;
       data.meta.minscore = min;
     }
-    data.meta.ftindex = true;
+    data.meta.ftxtindex = true;
     Util.gc(perf);
   }
 
@@ -308,7 +308,7 @@ public abstract class FTBuilder extends IndexBuilder {
   @Override
   public final void abort() {
     data.meta.drop(DATAFTX + ".*");
-    data.meta.ftindex = false;
+    data.meta.ftxtindex = false;
   }
 
   @Override

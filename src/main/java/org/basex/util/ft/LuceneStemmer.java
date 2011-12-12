@@ -1,6 +1,7 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
+
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
@@ -60,7 +61,7 @@ final class LuceneStemmer extends Stemmer {
   private static void add(final Language lang, final String name) {
     final Class<?> clz = Reflect.find(PATTERN, name);
     if(clz == null) {
-      Util.errln("Could not initialize \"%\" Lucene stemmer class.", lang);
+      Util.debug("Could not initialize \"%\" Lucene stemmer class.", lang);
       return;
     }
     boolean ch = false;
@@ -68,7 +69,7 @@ final class LuceneStemmer extends Stemmer {
     ch = m == null;
     if(ch) m = Reflect.method(clz, "stem", char[].class, int.class);
     if(m == null) {
-      Util.errln("Could not initialize \"%\" Lucene stemmer method.", lang);
+      Util.debug("Could not initialize \"%\" Lucene stemmer method.", lang);
     } else {
       CLASSES.put(lang, new StemmerClass(clz, m, ch));
     }
@@ -130,7 +131,7 @@ final class LuceneStemmer extends Stemmer {
     } else {
       s = (String) Reflect.invoke(clazz.stem, stemmer, s);
     }
-    return token(s);
+    return s == null ? word : token(s);
   }
 
   /** Structure, containing stemming methods. */

@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -40,11 +39,10 @@ public final class Optimize extends ACreate {
     size = m.size;
 
     try {
-      optimize(d, prop, this);
+      optimize(d, this);
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-
     return info(DBOPTIMIZED, m.name, perf);
   }
 
@@ -66,21 +64,19 @@ public final class Optimize extends ACreate {
   /**
    * Optimize data structures.
    * @param d data
-   * @param p database properties
    * @throws IOException I/O Exception during index rebuild
    */
-  public static void optimize(final Data d, final Prop p) throws IOException {
-    optimize(d, p, null);
+  public static void optimize(final Data d) throws IOException {
+    optimize(d, null);
   }
 
   /**
    * Optimize data structures.
    * @param d data
-   * @param p database properties
    * @param c calling command (can be null)
    * @throws IOException I/O Exception during index rebuild
    */
-  private static void optimize(final Data d, final Prop p, final Optimize c)
+  private static void optimize(final Data d, final Optimize c)
       throws IOException {
 
     // refresh indexes
@@ -92,7 +88,6 @@ public final class Optimize extends ACreate {
 
     final IntList pars = new IntList();
     final IntList tags = new IntList();
-    final boolean path = p.is(Prop.PATHINDEX);
     int n = 0;
 
     for(int pre = 0; pre < m.size; ++pre) {
@@ -105,36 +100,50 @@ public final class Optimize extends ACreate {
       if(kind == Data.DOC) {
         pars.push(pre);
         tags.push(0);
-        if(path) d.pthindex.index(0, kind, pars.size());
+        if(m.createpath) d.pthindex.index(0, kind, pars.size());
         ++n;
       } else if(kind == Data.ELEM) {
         final int id = d.name(pre);
         d.tagindex.index(d.tagindex.key(id), null, true);
-        if(path) d.pthindex.index(id, kind, pars.size());
+        if(m.createpath) d.pthindex.index(id, kind, pars.size());
         pars.push(pre);
         tags.push(id);
       } else if(kind == Data.ATTR) {
         final int id = d.name(pre);
         d.atnindex.index(d.atnindex.key(id), d.text(pre, false), true);
-        if(path) d.pthindex.index(id, kind, pars.size());
+        if(m.createpath) d.pthindex.index(id, kind, pars.size());
       } else {
         final byte[] txt = d.text(pre, true);
         if(kind == Data.TEXT) d.tagindex.index(tags.peek(), txt);
-        if(path) d.pthindex.index(0, kind, pars.size());
+        if(m.createpath) d.pthindex.index(0, kind, pars.size());
       }
       if(c != null) c.pre = pre;
     }
     m.ndocs = n;
-    m.pathindex = path;
+    m.pathindex = m.createpath;
     m.uptodate = true;
 
     try {
-      // global property check can be skipped as soon as id/pre mapping exists
-      if(m.textindex || p.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      d, c);
-      if(m.attrindex || p.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, d, c);
-      if(m.ftindex   || p.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  d, c);
+      optimize(IndexType.ATTRIBUTE, d, m.createattr, c);
+      optimize(IndexType.TEXT,      d, m.createtext, c);
+      optimize(IndexType.FULLTEXT,  d, m.createftxt, c);
     } finally {
       d.flush();
     }
+  }
+
+  /**
+   * Optimizes the specified index.
+   * @param type index type
+   * @param d data reference
+   * @param create create flag
+   * @param c calling command
+   * @throws IOException I/O exception
+   *
+   */
+  private static void optimize(final IndexType type, final Data d,
+      final boolean create, final Optimize c) throws IOException {
+    if(create) create(type, d, c);
+    else drop(type, d);
   }
 }

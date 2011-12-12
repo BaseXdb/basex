@@ -65,7 +65,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     assertEquals(NL +
         "  Pre[3] xmlns:ns=\"A\" " + NL +
         "  Pre[4] xmlns=\"B\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -80,7 +80,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     new Open("d13").execute(CONTEXT);
     assertEquals(NL +
         "  Pre[3] xmlns=\"A\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -98,7 +98,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "    Pre[2] xmlns=\"B\" " + NL +
         "      Pre[3] xmlns=\"D\" " + NL +
         "    Pre[4] xmlns=\"C\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -113,7 +113,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     new Open("d12").execute(CONTEXT);
     assertEquals(NL +
         "  Pre[2] xmlns=\"B\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -129,7 +129,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[2] xmlns=\"C\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -146,7 +146,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[2] xmlns=\"B\" " + NL +
         "    Pre[3] xmlns=\"E\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -160,7 +160,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     query("delete node doc('d16')/a/b", "");
     new Open("d16").execute(CONTEXT);
     assertEquals("",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -265,7 +265,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[4] xmlns=\"D\" " + NL +
         "    Pre[6] xmlns=\"F\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /**
@@ -282,7 +282,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "    Pre[4] xmlns=\"D\" " + NL +
         "      Pre[5] xmlns=\"G\" " + NL +
         "    Pre[7] xmlns=\"F\" ",
-        CONTEXT.data().ns.toString());
+        CONTEXT.data().nspaces.toString());
   }
 
   /** Test query. */
@@ -437,7 +437,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   public void deleteDocumentNode() throws Exception {
     new Open("d2").execute(CONTEXT);
     CONTEXT.data().delete(0);
-    assertEquals(true, CONTEXT.data().ns.rootEmpty());
+    assertEquals(true, CONTEXT.data().nspaces.rootEmpty());
   }
 
   /**
@@ -472,7 +472,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
       "declare namespace ns='ns'; " +
       "insert node <b ns:id='0'/> into /n/a",
       "");
-    assertEquals(1, CONTEXT.data().ns.numberNSNodes());
+    assertEquals(1, CONTEXT.data().nspaces.numberNSNodes());
   }
 
   /**
@@ -619,6 +619,60 @@ public final class NamespaceTest extends AdvancedQueryTest {
     query(
       "<e xmlns:p='u' xmlns:p1='u1'>{ <a xmlns:p='u2' p:a='v'/>/@* }</e>",
       "<e xmlns:p_1='u2' xmlns:p1='u1' xmlns:p='u' p_1:a='v'/>");
+  }
+
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public void nsInAtt() {
+    query("data(<a a='{namespace-uri-for-prefix('x', <b/>)}' xmlns:x='X'/>/@a)",
+        "X");
+  }
+
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public void nsInBraces() {
+    query("<a xmlns:x='X'>{namespace-uri-for-prefix('x', <b/>)}</a>/text()",
+        "X");
+  }
+
+  /**
+   * Test query.
+   */
+  @Test
+  public void defaultElementNamespaceTest() {
+    query("declare default element namespace 'a';" +
+        "let $x as element(a) := <a/> return $x",
+        "<a xmlns=\"a\"/>");
+  }
+
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public void newPrefix() {
+    query("<a>{ attribute {QName('U', 'a')} {} }</a>",
+        "<a xmlns:ns0='U' ns0:a=''/>");
+  }
+
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public void newPrefix2() {
+    query("<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
+        "<c>{attribute {QName('ns1', 'att1')} {}," +
+        "attribute {QName('ns2', 'att2')} {}}</c></b></a>",
+        "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
+        "<c xmlns:ns0_1='ns2' xmlns:ns0='ns1' ns0:att1='' ns0_1:att2=''/>" +
+        "</b></a>");
   }
 
   /**

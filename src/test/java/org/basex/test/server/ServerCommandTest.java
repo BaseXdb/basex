@@ -66,13 +66,13 @@ public final class ServerCommandTest extends CommandTest {
    */
   @Test
   public void kill() throws IOException {
-    no(new Kill(Text.ADMIN));
-    no(new Kill(Text.ADMIN + "2"));
-    no(new Kill(NAME + "*"));
+    ok(new Kill(Text.ADMIN));
+    ok(new Kill(Text.ADMIN + "2"));
+    ok(new Kill(NAME + "*"));
     ok(new CreateUser(NAME2, Token.md5("test")));
     final ClientSession cs = new ClientSession(LOCALHOST, 9999, NAME2, "test");
     ok(new Kill(NAME2));
-    no(new Kill(NAME2 + "?"));
+    ok(new Kill(NAME2 + "?"));
     cs.close();
     // may be superfluous
     Performance.sleep(100);

@@ -1,10 +1,12 @@
 package org.basex.data;
 
 import org.basex.core.Prop;
+import org.basex.index.IdPreMap;
 import org.basex.index.Index;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.path.PathSummary;
 import org.basex.index.value.MemValues;
+import org.basex.index.value.UpdatableMemValues;
 import org.basex.index.Names;
 import org.basex.io.random.TableMemAccess;
 import org.basex.util.Token;
@@ -22,30 +24,36 @@ public final class MemData extends Data {
    * Constructor.
    * @param tag tag index
    * @param att attribute name index
-   * @param n namespaces
-   * @param s path summary
+   * @param ps path summary
+   * @param ns namespaces
    * @param pr database properties
    */
-  public MemData(final Names tag, final Names att, final Namespaces n,
-      final PathSummary s, final Prop pr) {
+  public MemData(final Names tag, final Names att, final PathSummary ps,
+      final Namespaces ns, final Prop pr) {
 
     meta = new MetaData(pr);
     table = new TableMemAccess(meta);
-    txtindex = new MemValues();
-    atvindex = new MemValues();
-    tagindex = tag;
-    atnindex = att;
-    ns = n;
-    pthindex = s == null ? new PathSummary(this) : s;
+    if(meta.updindex) {
+      idmap = new IdPreMap(meta.lastid);
+      txtindex = new UpdatableMemValues(this);
+      atvindex = new UpdatableMemValues(this);
+    } else {
+      txtindex = new MemValues(this);
+      atvindex = new MemValues(this);
+    }
+    tagindex = tag == null ? new Names(meta) : tag;
+    atnindex = att == null ? new Names(meta) : att;
+    pthindex = ps == null ? new PathSummary(this) : ps;
+    nspaces = ns == null ? new Namespaces() : ns;
   }
 
   /**
-   * Constructor, adopting data structures from the specified database.
+   * Light-weight constructor, adopting data structures from the
+   * specified database.
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, new Namespaces(),
-         data.pthindex, data.meta.prop);
+    this(data.tagindex, data.atnindex, data.pthindex, null, data.meta.prop);
   }
 
   /**
@@ -53,7 +61,7 @@ public final class MemData extends Data {
    * @param pr property reference
    */
   public MemData(final Prop pr) {
-    this(new Names(0), new Names(0), new Namespaces(), null, pr);
+    this(null, null, null, null, pr);
   }
 
   @Override
@@ -69,12 +77,7 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
-  public boolean lock() {
-    return true;
-  }
-
-  @Override
-  public boolean unlock() {
+  public boolean updating(final boolean updating) {
     return true;
   }
 
@@ -105,12 +108,33 @@ public final class MemData extends Data {
   }
 
   @Override
-  public void text(final int pre, final byte[] val, final boolean txt) {
-    textOff(pre, index(meta.size, val, txt));
+  public void updateText(final int pre, final byte[] val, final int kind) {
+    final int id = id(pre);
+    if(meta.updindex) {
+      final boolean txt = kind != ATTR;
+      ((MemValues) (txt ? txtindex : atvindex)).delete(text(pre, txt), id);
+    }
+    textOff(pre, index(pre, id, val, kind));
   }
 
   @Override
-  protected long index(final int pre, final byte[] txt, final boolean text) {
-    return ((MemValues) (text ? txtindex : atvindex)).index(txt, pre);
+  protected long index(final int pre, final int id, final byte[] txt,
+      final int kind) {
+    return ((MemValues) (kind == ATTR ? atvindex : txtindex)).
+        index(txt, meta.updindex ? id : pre);
+  }
+
+  @Override
+  protected void indexDelete(final int pre, final int size) {
+    final int l = pre + size;
+    for(int p = pre; p < l; ++p) {
+      final int k = kind(p);
+      final boolean isAttr = k == ATTR;
+      // skip nodes which are not attribute, text, comment, or proc. instruction
+      if(isAttr || k == TEXT || k == COMM || k == PI) {
+        final byte[] key = text(p, !isAttr);
+        ((MemValues) (isAttr ? atvindex : txtindex)).delete(key, id(p));
+      }
+    }
   }
 }

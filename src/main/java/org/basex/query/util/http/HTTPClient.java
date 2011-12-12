@@ -127,8 +127,8 @@ public final class HTTPClient {
         if(href == null || href.length == 0) NOPARAMS.thrw(ii);
         final HttpURLConnection conn = openConnection(string(href), ii);
         try {
-          return ResponseHandler.getResponse(conn, Bln.FALSE.string(ii),
-              Bln.FALSE.string(ii), prop, ii);
+          return ResponseHandler.getResponse(conn, Bln.FALSE.string(),
+              Bln.FALSE.string(), prop, ii);
         } finally {
           conn.disconnect();
         }

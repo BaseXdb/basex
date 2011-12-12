@@ -14,7 +14,6 @@ import org.basex.core.Command;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
-import org.basex.core.User;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -232,12 +231,13 @@ public final class ClientListener extends Thread {
    */
   public synchronized void quit() {
     running = false;
+    if(log != null) log.write(this, "LOGOUT " + context.user.name, OK);
+
     // wait until running command was stopped
     if(command != null) {
       command.stop();
       while(command != null) Performance.sleep(50);
     }
-    log.write(this, "LOGOUT " + context.user.name, OK);
     context.delete(this);
 
     try {
@@ -249,17 +249,17 @@ public final class ClientListener extends Thread {
         for(final Sessions s : context.events.values()) s.remove(this);
       }
     } catch(final Exception ex) {
-      log.write(ex.getMessage());
+      if(log != null) log.write(ex.getMessage());
       Util.stack(ex);
     }
   }
 
   /**
-   * Returns the user of this session.
+   * Returns the context of this session.
    * @return user reference
    */
-  public User user() {
-    return context.user;
+  public Context context() {
+    return context;
   }
 
   /**

@@ -45,17 +45,27 @@ public final class MetaData {
   public int ndocs;
   /** Timestamp of original document. */
   public long time;
+
   /** Flag for whitespace chopping. */
   public boolean chop;
-
-  /** Flag for activated text index. */
+  /** Flag for activated automatic index update. */
+  public boolean updindex;
+  /** Indicates if a text index exists. */
   public boolean textindex;
-  /** Flag for activated attribute value index. */
+  /** Indicates if a attribute index exists. */
   public boolean attrindex;
-  /** Flag for activated full-text index. */
-  public boolean ftindex;
-  /** Flag for activated path summary. */
-  public boolean pathindex = true;
+  /** Indicates if a full-text index exists. */
+  public boolean ftxtindex;
+  /** Indicates if a path index exists. */
+  public boolean pathindex;
+  /** Indicates if text index is to be recreated. */
+  public boolean createtext;
+  /** Indicates if attribute index is to be recreated. */
+  public boolean createattr;
+  /** Indicates if full-text index is to be recreated. */
+  public boolean createftxt;
+  /** Indicates if path index is to be recreated. */
+  public boolean createpath;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;
@@ -65,14 +75,20 @@ public final class MetaData {
   public boolean casesens;
   /** Flag for full-text diacritics removal. */
   public boolean diacritics;
-  /** Language of full-text search index. */
-  public Language language;
+
   /** Maximal indexed full-text score. */
   public int maxscore;
   /** Minimal indexed full-text score. */
   public int minscore;
   /** Scoring mode: see {@link Prop#SCORING}. */
   public int scoring;
+  /** Maximum number of categories. */
+  public int maxcats;
+  /** Maximum token length. */
+  public int maxlen;
+
+  /** Language of full-text search index. */
+  public Language language;
 
   /** Flag for out-of-date index structures.
    *  Will be removed as soon as all indexes support updates. */
@@ -83,6 +99,7 @@ public final class MetaData {
   public boolean corrupt;
   /** Dirty flag. */
   public boolean dirty;
+
   /** Table size. */
   public int size;
   /** Last (highest) id assigned to a node. */
@@ -119,12 +136,18 @@ public final class MetaData {
     prop = pr;
     name = db;
     chop = prop.is(Prop.CHOP);
-    pathindex = prop.is(Prop.PATHINDEX);
+    createtext = prop.is(Prop.TEXTINDEX);
+    createattr = prop.is(Prop.ATTRINDEX);
+    createftxt = prop.is(Prop.FTINDEX);
+    createpath = prop.is(Prop.PATHINDEX);
+    diacritics = prop.is(Prop.DIACRITICS);
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
-    diacritics = prop.is(Prop.DIACRITICS);
     casesens = prop.is(Prop.CASESENS);
+    updindex = prop.is(Prop.UPDINDEX);
     scoring = prop.num(Prop.SCORING);
+    maxlen = prop.num(Prop.MAXLEN);
+    maxcats = prop.num(Prop.MAXCATS);
     language = Language.get(prop);
     users = new Users(false);
   }
@@ -308,30 +331,37 @@ public final class MetaData {
         users.read(in);
       } else {
         final String v = string(in.readToken());
-        if(k.equals(DBSTR))         storage    = v;
-        else if(k.equals(IDBSTR))   istorage   = v;
-        else if(k.equals(DBFNAME))  original   = v;
-        else if(k.equals(DBTIME))   time       = toLong(v);
-        else if(k.equals(DBSIZE))   size       = toInt(v);
-        else if(k.equals(DBFSIZE))  filesize   = toLong(v);
-        else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
-        else if(k.equals(DBFTDC))   diacritics = toBool(v);
-        else if(k.equals(DBENC))    encoding   = v;
-        else if(k.equals(DBCHOP))   chop       = toBool(v);
-        else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
-        else if(k.equals(DBTXTIDX)) textindex  = toBool(v);
-        else if(k.equals(DBATVIDX)) attrindex  = toBool(v);
-        else if(k.equals(DBFTXIDX)) ftindex    = toBool(v);
-        else if(k.equals(DBWCIDX))  wildcards  = toBool(v);
-        else if(k.equals(DBFTST))   stemming   = toBool(v);
-        else if(k.equals(DBFTCS))   casesens   = toBool(v);
-        else if(k.equals(DBFTDC))   diacritics = toBool(v);
-        else if(k.equals(DBFTLN))   language   = Language.get(v);
-        else if(k.equals(DBSCMAX))  maxscore   = toInt(v);
-        else if(k.equals(DBSCMIN))  minscore   = toInt(v);
-        else if(k.equals(DBSCTYPE)) scoring    = toInt(v);
-        else if(k.equals(DBUTD))    uptodate   = toBool(v);
-        else if(k.equals(DBLID))    lastid     = toInt(v);
+        if(k.equals(DBSTR))           storage    = v;
+        else if(k.equals(IDBSTR))     istorage   = v;
+        else if(k.equals(DBFNAME))    original   = v;
+        else if(k.equals(DBENC))      encoding   = v;
+        else if(k.equals(DBSIZE))     size       = toInt(v);
+        else if(k.equals(DBNDOCS))    ndocs      = toInt(v);
+        else if(k.equals(DBSCMAX))    maxscore   = toInt(v);
+        else if(k.equals(DBSCMIN))    minscore   = toInt(v);
+        else if(k.equals(DBSCTYPE))   scoring    = toInt(v);
+        else if(k.equals(DBMAXLEN))   maxlen     = toInt(v);
+        else if(k.equals(DBMAXCATS))  maxcats    = toInt(v);
+        else if(k.equals(DBLASTID))   lastid     = toInt(v);
+        else if(k.equals(DBTIME))     time       = toLong(v);
+        else if(k.equals(DBFSIZE))    filesize   = toLong(v);
+        else if(k.equals(DBFTDC))     diacritics = toBool(v);
+        else if(k.equals(DBCHOP))     chop       = toBool(v);
+        else if(k.equals(DBUPDIDX))   updindex   = toBool(v);
+        else if(k.equals(DBPTHIDX))   pathindex  = toBool(v);
+        else if(k.equals(DBTXTIDX))   textindex  = toBool(v);
+        else if(k.equals(DBATVIDX))   attrindex  = toBool(v);
+        else if(k.equals(DBFTXIDX))   ftxtindex  = toBool(v);
+        else if(k.equals(DBCRTPTH))   createpath = toBool(v);
+        else if(k.equals(DBCRTTXT))   createtext = toBool(v);
+        else if(k.equals(DBCRTATV))   createattr = toBool(v);
+        else if(k.equals(DBCRTFTX))   createftxt = toBool(v);
+        else if(k.equals(DBWCIDX))    wildcards  = toBool(v);
+        else if(k.equals(DBFTST))     stemming   = toBool(v);
+        else if(k.equals(DBFTCS))     casesens   = toBool(v);
+        else if(k.equals(DBFTDC))     diacritics = toBool(v);
+        else if(k.equals(DBUPTODATE)) uptodate   = toBool(v);
+        else if(k.equals(DBFTLN))     language   = Language.get(v);
       }
     }
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
@@ -348,28 +378,35 @@ public final class MetaData {
    * @throws IOException I/O Exception
    */
   void write(final DataOutput out) throws IOException {
-    writeInfo(out, DBSTR,    STORAGE);
-    writeInfo(out, DBFNAME,  original);
-    writeInfo(out, DBTIME,   time);
-    writeInfo(out, IDBSTR,   ISTORAGE);
-    writeInfo(out, DBFSIZE,  filesize);
-    writeInfo(out, DBNDOCS,  ndocs);
-    writeInfo(out, DBENC,    encoding);
-    writeInfo(out, DBSIZE,   size);
-    writeInfo(out, DBCHOP,   chop);
-    writeInfo(out, DBPTHIDX, pathindex);
-    writeInfo(out, DBTXTIDX, textindex);
-    writeInfo(out, DBATVIDX, attrindex);
-    writeInfo(out, DBFTXIDX, ftindex);
-    writeInfo(out, DBWCIDX,  wildcards);
-    writeInfo(out, DBFTST,   stemming);
-    writeInfo(out, DBFTCS,   casesens);
-    writeInfo(out, DBFTDC,   diacritics);
-    writeInfo(out, DBSCMAX,  maxscore);
-    writeInfo(out, DBSCMIN,  minscore);
-    writeInfo(out, DBSCTYPE, scoring);
-    writeInfo(out, DBUTD,    uptodate);
-    writeInfo(out, DBLID,    lastid);
+    writeInfo(out, DBSTR,      STORAGE);
+    writeInfo(out, DBFNAME,    original);
+    writeInfo(out, DBTIME,     time);
+    writeInfo(out, IDBSTR,     ISTORAGE);
+    writeInfo(out, DBFSIZE,    filesize);
+    writeInfo(out, DBNDOCS,    ndocs);
+    writeInfo(out, DBENC,      encoding);
+    writeInfo(out, DBSIZE,     size);
+    writeInfo(out, DBCHOP,     chop);
+    writeInfo(out, DBUPDIDX,   updindex);
+    writeInfo(out, DBPTHIDX,   pathindex);
+    writeInfo(out, DBTXTIDX,   textindex);
+    writeInfo(out, DBATVIDX,   attrindex);
+    writeInfo(out, DBFTXIDX,   ftxtindex);
+    writeInfo(out, DBCRTPTH,   createpath);
+    writeInfo(out, DBCRTTXT,   createtext);
+    writeInfo(out, DBCRTATV,   createattr);
+    writeInfo(out, DBCRTFTX,   createftxt);
+    writeInfo(out, DBWCIDX,    wildcards);
+    writeInfo(out, DBFTST,     stemming);
+    writeInfo(out, DBFTCS,     casesens);
+    writeInfo(out, DBFTDC,     diacritics);
+    writeInfo(out, DBSCMAX,    maxscore);
+    writeInfo(out, DBSCMIN,    minscore);
+    writeInfo(out, DBSCTYPE,   scoring);
+    writeInfo(out, DBMAXLEN,   maxlen);
+    writeInfo(out, DBMAXCATS,  maxcats);
+    writeInfo(out, DBUPTODATE, uptodate);
+    writeInfo(out, DBLASTID,   lastid);
     if(language != null) writeInfo(out, DBFTLN, language.toString());
     out.writeToken(token(DBPERM));
     users.write(out);
@@ -384,10 +421,11 @@ public final class MetaData {
     time = System.currentTimeMillis();
     uptodate = false;
     dirty = true;
-    // reset of flags might be skipped if id/pre mapping is supported
-    textindex = false;
-    attrindex = false;
-    ftindex = false;
+    if(!updindex) {
+      textindex = false;
+      attrindex = false;
+    }
+    ftxtindex = false;
   }
 
   // PRIVATE METHODS ==========================================================

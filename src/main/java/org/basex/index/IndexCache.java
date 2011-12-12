@@ -31,6 +31,17 @@ public final class IndexCache extends TokenSet {
   }
 
   /**
+   * Indexes the specified keys and values.
+   * @param id cache id of the key
+   * @param s size
+   * @param p pointer
+   */
+  public void update(final int id, final int s, final long p) {
+    sizes[id] = s;
+    pointers[id] = p;
+  }
+
+  /**
    * Returns the size for the specified key.
    * @param id id of the key to be found
    * @return size

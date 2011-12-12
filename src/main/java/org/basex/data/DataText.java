@@ -37,6 +37,8 @@ public interface DataText {
   String DBCHOP = "CHOPPED";
   /** Path indexing. */
   String DBPTHIDX = "PTHINDEX";
+  /** Automatic index update. */
+  String DBUPDIDX = "UPDINDEX";
   /** Text indexing. */
   String DBTXTIDX = "TXTINDEX";
   /** Attribute indexing. */
@@ -57,16 +59,28 @@ public interface DataText {
   String DBSCMAX = "FTSCMAX";
   /** Minimum scoring value. */
   String DBSCMIN = "FTSCMIN";
-  /** Maximal indexed full-text score. */
+  /** Maximum indexed full-text score. */
   String DBSCTYPE = "FTSCTYPE";
+  /** Maximum token length. */
+  String DBMAXLEN = "MAXLEN";
+  /** Maximum number of categories. */
+  String DBMAXCATS = "MAXCATS";
   /** Up-to-date flag. */
-  String DBUTD = "UPTODATE";
+  String DBUPTODATE = "UPTODATE";
   /** Last (highest) id. */
-  String DBLID = "LASTID";
+  String DBLASTID = "LASTID";
   /** Permissions. */
   String DBPERM = "PERM";
   /** Documents. */
   String DBDOCS = "DOCS";
+  /** Path indexing. */
+  String DBCRTPTH = "CRTPTH";
+  /** Text indexing. */
+  String DBCRTTXT = "CRTTXT";
+  /** Attribute indexing. */
+  String DBCRTATV = "CRTATV";
+  /** Full-text indexing. */
+  String DBCRTFTX = "CRTFTX";
 
   /** Tags. */
   String DBTAGS = "TAGS";
@@ -283,4 +297,6 @@ public interface DataText {
   byte[] TABLEURI = token("URI");
   /** Table kinds. */
   byte[][] TABLEKINDS = tokens("DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  ");
+  /** Database - ID->PRE mapping. */
+  String DATAIDP = "idp";
 }

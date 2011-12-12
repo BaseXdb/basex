@@ -16,6 +16,7 @@ import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.hash.IntMap;
+import org.basex.util.hash.TokenObjMap;
 import org.basex.util.list.IntList;
 
 /**
@@ -25,21 +26,21 @@ import org.basex.util.list.IntList;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class DiskValues implements Index {
+public class DiskValues implements Index {
   /** Number of index entries. */
-  private final int size;
+  protected int size;
   /** ID references. */
-  private final DataAccess idxr;
+  protected final DataAccess idxr;
   /** ID lists. */
-  private final DataAccess idxl;
+  protected final DataAccess idxl;
   /** Value type (texts/attributes). */
-  private final boolean text;
+  protected final boolean text;
   /** Data reference. */
-  private final Data data;
+  protected final Data data;
   /** Cache tokens. */
-  private final IndexCache cache = new IndexCache();
+  protected final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  private final IntMap<byte[]> ctext = new IntMap<byte[]>();
+  protected final IntMap<byte[]> ctext = new IntMap<byte[]>();
 
   /**
    * Constructor, initializing the index structure.
@@ -75,8 +76,9 @@ public final class DiskValues implements Index {
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
     final IndexStats stats = new IndexStats(data);
     for(int m = 0; m < size; ++m) {
-      final int oc = idxl.readNum(idxr.read5(m * 5L));
-      if(stats.adding(oc)) stats.add(data.text(idxl.readNum(), text));
+      final long pos = idxr.read5(m * 5L);
+      final int oc = idxl.readNum(pos);
+      if(stats.adding(oc)) stats.add(data.text(firstpre(pos), text));
     }
     stats.print(tb);
     return tb.finish();
@@ -89,22 +91,25 @@ public final class DiskValues implements Index {
     final int id = cache.id(tok.get());
     if(id > 0) return iter(cache.size(id), cache.pointer(id));
 
-    final long pos = get(tok.get());
-    return pos == 0 ? IndexIterator.EMPTY : iter(idxl.readNum(pos),
-        idxl.cursor());
+    final int ix = get(tok.get());
+    if(ix < 0) return IndexIterator.EMPTY;
+    final long pos = idxr.read5(ix * 5L);
+    return iter(idxl.readNum(pos), idxl.cursor());
   }
 
   @Override
   public synchronized int count(final IndexToken it) {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
-    if(it.get().length > MAXLEN) return Integer.MAX_VALUE;
+    if(it.get().length > data.meta.maxlen) return Integer.MAX_VALUE;
 
     final byte[] tok = it.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.size(id);
 
-    final long pos = get(tok);
-    if(pos == 0) return 0;
+    final int ix = get(tok);
+    if(ix < 0) return 0;
+    final long pos = idxr.read5(ix * 5L);
+    // the first number is the number of hits:
     final int nr = idxl.readNum(pos);
     cache.add(it.get(), nr, pos + Num.length(nr));
     return nr;
@@ -125,7 +130,7 @@ public final class DiskValues implements Index {
    * @param ps offset
    * @return iterator
    */
-  private IndexIterator iter(final int s, final long ps) {
+  protected IndexIterator iter(final int s, final long ps) {
     final IntList pres = new IntList(s);
     long p = ps;
     for(int l = 0, v = 0; l < s; ++l) {
@@ -141,7 +146,7 @@ public final class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  private IndexIterator idRange(final RangeToken tok) {
+  protected IndexIterator idRange(final RangeToken tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -154,6 +159,7 @@ public final class DiskValues implements Index {
     for(int l = 0; l < size; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
+
       final double v = data.textDbl(pre, text);
 
       if(v >= min && v <= max) {
@@ -177,7 +183,7 @@ public final class DiskValues implements Index {
    * @param ids id list
    * @return iterator
    */
-  private IndexIterator iter(final IntList ids) {
+  protected IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
       int p = -1;
       int s = ids.size();
@@ -205,33 +211,60 @@ public final class DiskValues implements Index {
   }
 
   /**
-   * Returns the id offset for the specified token, or {@code 0} if the token is
-   * not found.
+   * Get the first pre value from the id-list at the specified position.
+   * @param pos position of the id-list in {@link #idxl}
+   * @return pre value
+   */
+  protected int firstpre(final long pos) {
+    // read the number of ids in the list
+    idxl.readNum(pos);
+    return idxl.readNum();
+  }
+
+  /**
+   * Binary search for key in the {@link #idxr}.
+   * @param key token to be found
+   * @return if the key is found: index of the key else: -(insertion point - 1)
+   */
+  protected int get(final byte[] key) {
+    return get(key, 0, size - 1);
+  }
+
+  /**
+   * Binary search for key in the {@link #idxr}.
    * <p>
    * <em>Important:</em> This method has to be called while being in the monitor
    * of this {@link DiskValues} instance, e.g. from a {@code synchronized}
    * method.
    * @param key token to be found
-   * @return id offset
+   * @param first begin of the search interval
+   * @param last end of the search interval
+   * @return if the key is found: index of the key else: -(insertion point - 1)
    */
-  private long get(final byte[] key) {
-    int l = 0, h = size - 1;
+  protected int get(final byte[] key, final int first, final int last) {
+    int l = first, h = last;
     while(l <= h) {
       final int m = l + h >>> 1;
-      final long pos = idxr.read5(m * 5L);
-      // get text from cache, of add entry to cache
       byte[] txt = ctext.get(m);
       if(txt == null) {
-        idxl.readNum(pos);
-        txt = data.text(idxl.readNum(), text);
+        txt = data.text(firstpre(idxr.read5(m * 5L)), text);
         ctext.add(m, txt);
       }
       final int d = diff(txt, key);
-      if(d == 0) return pos;
+      if(d == 0) return m;
       if(d < 0) l = m + 1;
       else h = m - 1;
     }
-    return 0;
+    return -(l + 1);
+  }
+
+  /**
+   * Flushes the buffered data.
+   * @throws IOException I/O exception
+   */
+  public void flush() throws IOException {
+    idxl.flush();
+    idxr.flush();
   }
 
   @Override
@@ -239,4 +272,27 @@ public final class DiskValues implements Index {
     idxl.close();
     idxr.close();
   }
+
+  /**
+   * Add entries to the index.
+   * @param m a set of <key, id-list> pairs
+   */
+  @SuppressWarnings("unused")
+  public void index(final TokenObjMap<IntList> m) { }
+
+  /**
+   * Delete records from the index.
+   * @param m a set of <key, id-list> pairs
+   */
+  @SuppressWarnings("unused")
+  public void delete(final TokenObjMap<IntList> m) { }
+
+  /**
+   * Remove record from the index.
+   * @param o old record key
+   * @param n new record key
+   * @param id record id
+   */
+  @SuppressWarnings("unused")
+  public void replace(final byte[] o, final byte[] n, final int id) { }
 }

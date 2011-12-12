@@ -92,10 +92,10 @@ public final class FNQName extends FuncCall {
    */
   private Item qName(final Item it, final Item it2) throws QueryException {
     final byte[] uri = checkEStr(it);
-    final byte[] atm = checkEStr(it2);
-    final byte[] str = !contains(atm, ':') && eq(uri, XMLURI) ?
-        concat(XMLC, atm) : atm;
-    if(!XMLToken.isQName(str)) Err.value(input, AtomType.QNM, Str.get(atm));
+    final byte[] name = checkEStr(it2);
+    final byte[] str = !contains(name, ':') && eq(uri, XMLURI) ?
+        concat(XMLC, name) : name;
+    if(!XMLToken.isQName(str)) Err.value(input, AtomType.QNM, Str.get(name));
     final QNm nm = new QNm(str, uri);
     if(nm.hasPrefix() && uri.length == 0)
       Err.value(input, AtomType.URI, Str.get(nm.uri()));
@@ -147,7 +147,7 @@ public final class FNQName extends FuncCall {
     final ANode base = (ANode) checkType(it2, NodeType.ELM);
     if(it == null) return null;
 
-    final byte[] name = trim(checkEStr(it));
+    final byte[] name = checkEStr(it);
     if(!XMLToken.isQName(name)) Err.value(input, AtomType.QNM, it);
 
     final QNm nm = new QNm(name);

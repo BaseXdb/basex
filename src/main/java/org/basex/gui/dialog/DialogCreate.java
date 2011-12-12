@@ -149,7 +149,7 @@ public final class DialogCreate extends DialogImport {
     gui.set(Prop.PATHINDEX, pathindex.isSelected());
     gui.set(Prop.TEXTINDEX, txtindex.isSelected());
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
-    gui.set(Prop.FTINDEX, ftxindex.isSelected());
+    gui.set(Prop.FTINDEX,   ftxindex.isSelected());
     ft.close();
   }
 }

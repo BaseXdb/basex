@@ -64,9 +64,7 @@ public class UserFunc extends Single {
    * Checks the function for updating behavior.
    * @throws QueryException query exception
    */
-  public final void check() throws QueryException {
-    if(!declared || expr == null) FUNCUNKNOWN.thrw(input, name.string());
-
+  public final void checkUp() throws QueryException {
     final boolean u = expr.uses(Use.UPD);
     if(updating) {
       // updating function

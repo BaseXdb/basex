@@ -45,6 +45,35 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Constructor, specifying an initial array.
+   * @param a initial array
+   */
+  public TokenList(final byte[][] a) {
+    list = a;
+    size = list.length;
+  }
+
+  /**
+   * Adds an element at the specified position; subsequent elements are shifted.
+   * @param e element to be added
+   * @param i index
+   */
+  public void add(final byte[] e, final int i) {
+    if(size == list.length) {
+      final int s = newSize();
+      final byte[][] tmp = new byte[s][];
+      System.arraycopy(list, 0, tmp, 0, i);
+      System.arraycopy(list, i, tmp, i + 1, size - i);
+      tmp[i] = e;
+      list = tmp;
+    } else {
+      System.arraycopy(list, i, list, i + 1, size - i);
+      list[i] = e;
+    }
+    ++size;
+  }
+
+  /**
    * Adds an element.
    * @param e element to be added
    */
@@ -75,7 +104,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @return element
    */
   public byte[] get(final int i) {
-    return list[i];
+    return i < list.length ? list[i] : null;
   }
 
   /**

@@ -1,13 +1,16 @@
 package org.basex.index.value;
 
+import static org.basex.core.Text.*;
+
 import java.util.Arrays;
 
+import org.basex.data.Data;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
+import org.basex.index.IndexStats;
 import org.basex.index.IndexToken;
 import org.basex.util.Array;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenSet;
 
 /**
@@ -17,11 +20,21 @@ import org.basex.util.hash.TokenSet;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class MemValues extends TokenSet implements Index {
+public class MemValues extends TokenSet implements Index {
   /** IDs. */
-  int[][] ids = new int[CAP][];
+  protected int[][] ids = new int[CAP][];
   /** ID array lengths. */
-  int[] len = new int[CAP];
+  protected int[] len = new int[CAP];
+  /** Data instance. */
+  protected final Data data;
+
+  /**
+   * Constructor.
+   * @param d data instance
+   */
+  public MemValues(final Data d) {
+    data = d;
+  }
 
   /**
    * Indexes the specified keys and values.
@@ -43,22 +56,35 @@ public final class MemValues extends TokenSet implements Index {
     return i;
   }
 
+  /**
+   * Remove record from the index.
+   * @param key record key
+   * @param id record id
+   */
+  @SuppressWarnings("unused")
+  public void delete(final byte[] key, final int id) { }
+
   @Override
   public IndexIterator iter(final IndexToken tok) {
     final int i = id(tok.get());
-    if(i == 0) return IndexIterator.EMPTY;
-
-    return new IndexIterator() {
-      int p = -1;
-      @Override
-      public boolean more() { return ++p < len[i]; }
-      @Override
-      public int next() { return ids[i][p]; }
-      @Override
-      public double score() { return -1; }
-      @Override
-      public int size() { return len[i]; }
-    };
+    if(i > 0) {
+      final int cnt = len[i];
+      if(cnt > 0) {
+        final int[] pres = ids[i];
+        return new IndexIterator() {
+          private int p;
+          @Override
+          public boolean more() { return p < cnt; }
+          @Override
+          public int next() { return pres[p++]; }
+          @Override
+          public double score() { return -1; }
+          @Override
+          public int size() { return cnt; }
+        };
+      }
+    }
+    return IndexIterator.EMPTY;
   }
 
   @Override
@@ -69,7 +95,15 @@ public final class MemValues extends TokenSet implements Index {
 
   @Override
   public byte[] info() {
-    return Token.token(Util.name(this));
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(INDEXSTRUC + TREESTRUC + NL);
+    final IndexStats stats = new IndexStats(data);
+    for(int m = 1; m < size; ++m) {
+      final int oc = len[m];
+      if(stats.adding(oc)) stats.add(key(m));
+    }
+    stats.print(tb);
+    return tb.finish();
   }
 
   @Override

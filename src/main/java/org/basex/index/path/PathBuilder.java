@@ -25,23 +25,23 @@ public final class PathBuilder extends IndexBuilder {
   public Index build() {
     abort();
 
-    final IntList st = new IntList();
+    final IntList pars = new IntList();
     final PathSummary path = new PathSummary(data);
     for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
-      while(st.size() > 0 && st.peek() > par) st.pop();
+      while(!pars.empty() && pars.peek() > par) pars.pop();
 
       if(kind == Data.DOC) {
-        st.push(pre);
-        path.index(0, kind, st.size());
+        pars.push(pre);
+        path.index(0, kind, pars.size());
       } else if(kind == Data.ELEM) {
-        path.index(data.name(pre), kind, st.size());
-        st.push(pre);
+        path.index(data.name(pre), kind, pars.size());
+        pars.push(pre);
       } else if(kind == Data.ATTR) {
-        path.index(data.name(pre), kind, st.size());
+        path.index(data.name(pre), kind, pars.size());
       } else {
-        path.index(0, kind, st.size());
+        path.index(0, kind, pars.size());
       }
     }
     data.meta.pathindex = true;

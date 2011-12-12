@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.User;
@@ -34,38 +33,32 @@ public final class DropIndex extends ACreate {
     if(data instanceof MemData) return error(PROCMM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
-    if(ci == null) return error(CMDUNKNOWN, this);
     switch(ci) {
       case TEXT:
-        data.meta.textindex = false;
-        return drop(IndexType.TEXT, DATATXT);
+        data.meta.createtext = false;
+        return drop(IndexType.TEXT);
       case ATTRIBUTE:
-        data.meta.attrindex = false;
-        return drop(IndexType.ATTRIBUTE, DATAATV);
+        data.meta.createattr = false;
+        return drop(IndexType.ATTRIBUTE);
       case FULLTEXT:
-        data.meta.ftindex = false;
-        return drop(IndexType.FULLTEXT, DATAFTX);
+        data.meta.createftxt = false;
+        return drop(IndexType.FULLTEXT);
       case PATH:
-        data.meta.pathindex = false;
-        return drop(IndexType.PATH, null);
+        data.meta.createpath = false;
+        return drop(IndexType.PATH);
       default:
-        return false;
+        return error(CMDUNKNOWN, this);
     }
   }
 
   /**
    * Drops the specified index.
    * @param index index type
-   * @param pat pattern
    * @return success of operation
    */
-  private boolean drop(final IndexType index, final String pat) {
+  private boolean drop(final IndexType index) {
     try {
-      final Data data = context.data();
-      data.closeIndex(index);
-      data.meta.dirty = true;
-      data.flush();
-      return pat == null || data.meta.drop(pat + '.') ?
+      return drop(index, context.data()) ?
           info(INDDROP, index, perf) : error(INDDROPERROR, index);
     } catch(final IOException ex) {
       Util.debug(ex);

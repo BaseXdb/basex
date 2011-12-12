@@ -53,7 +53,7 @@ public final class Info extends AInfo {
     format(tb, INFOPATHINDEX, Util.flag(prop.is(Prop.PATHINDEX)));
     format(tb, INFOTEXTINDEX, Util.flag(prop.is(Prop.TEXTINDEX)));
     format(tb, INFOATTRINDEX, Util.flag(prop.is(Prop.ATTRINDEX)));
-    format(tb, INFOFTINDEX, Util.flag(prop.is(Prop.FTINDEX)) +
+    format(tb, INFOFTINDEX,   Util.flag(prop.is(Prop.FTINDEX)) +
         (prop.is(Prop.FTINDEX) && prop.is(Prop.WILDCARDS) ?
         " (" + INFOWCINDEX + ")" : ""));
     return tb.finish();

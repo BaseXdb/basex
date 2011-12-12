@@ -54,7 +54,7 @@ public final class NameTest extends Test {
     if(data == null) return true;
 
     // skip optimizations if several namespaces are defined in the database
-    final byte[] ns = data.ns.globalNS();
+    final byte[] ns = data.nspaces.globalNS();
     if(ns == null) return true;
 
     // true if results can be expected

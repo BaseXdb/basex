@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
+
 import org.basex.util.Reflect;
 import org.basex.util.Util;
 
@@ -37,7 +38,7 @@ final class SnowballStemmer extends Stemmer {
         final Method m2 = Reflect.method(clz, "stem");
         final Method m3 = Reflect.method(clz, "getCurrent");
         if(m1 == null || m2 == null || m3 == null) {
-          Util.errln("Could not initialize \"%\" Snowball stemmer.", l);
+          Util.debug("Could not initialize \"%\" Snowball stemmer.", l);
         } else {
           CLASSES.put(l, new StemmerClass(clz, m1, m2, m3));
         }
@@ -94,7 +95,8 @@ final class SnowballStemmer extends Stemmer {
   protected byte[] stem(final byte[] word) {
     Reflect.invoke(clazz.setCurrent, stemmer, string(word));
     Reflect.invoke(clazz.stem, stemmer);
-    return token((String) Reflect.invoke(clazz.getCurrent, stemmer));
+    final String s = (String) Reflect.invoke(clazz.getCurrent, stemmer);
+    return s == null ? word : token(s);
   }
 
   /** Structure, containing stemming methods. */

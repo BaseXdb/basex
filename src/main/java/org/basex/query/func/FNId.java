@@ -70,10 +70,13 @@ public final class FNId extends FuncCall {
    * @throws QueryException query exception
    */
   private Iter elid(final Iter it, final ANode node) throws QueryException {
+    return id(it, node);
+    /*
     final NodeCache nc = id(it, node);
     final NodeCache res = new NodeCache().random();
     for(ANode n; (n = nc.next()) != null;) res.add(n.parent());
     return res;
+    */
   }
 
   /**
@@ -107,14 +110,13 @@ public final class FNId extends FuncCall {
    * @param lang language to be found
    * @param node attribute
    * @return resulting node list
-   * @throws QueryException query exception
    */
-  private Bln lang(final byte[] lang, final ANode node) throws QueryException {
+  private Bln lang(final byte[] lang, final ANode node) {
     for(ANode n = node; n != null; n = n.parent()) {
       final AxisIter atts = n.attributes();
       for(ANode at; (at = atts.next()) != null;) {
         if(eq(at.qname().string(), LANG)) {
-          final byte[] ln = lc(norm(checkEStr(at)));
+          final byte[] ln = lc(norm(at.string()));
           return Bln.get(startsWith(ln, lang) &&
               (lang.length == ln.length || ln[lang.length] == '-'));
         }
@@ -124,7 +126,7 @@ public final class FNId extends FuncCall {
   }
 
   /**
-   * Extracts the ids from the specified item.
+   * Extracts the ids from the specified iterator.
    * @param iter iterator
    * @return ids
    * @throws QueryException query exception
@@ -148,11 +150,12 @@ public final class FNId extends FuncCall {
       final ANode node) throws QueryException {
 
     AxisIter ai = node.attributes();
-    for(ANode att; (att = ai.next()) != null;) {
+    for(ANode at; (at = ai.next()) != null;) {
+      final byte[] val = at.string();
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
-        if(!eq(checkEStr(att), id)) continue;
-        final byte[] nm = lc(att.qname().string());
+        if(!eq(val, id)) continue;
+        final byte[] nm = lc(at.qname().string());
         if(contains(nm, ID) && !contains(nm, IDREF)) nc.add(node);
       }
     }
@@ -171,12 +174,13 @@ public final class FNId extends FuncCall {
       final ANode node) throws QueryException {
 
     AxisIter ai = node.attributes();
-    for(ANode att; (att = ai.next()) != null;) {
+    for(ANode at; (at = ai.next()) != null;) {
+      final byte[] val = at.string();
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
-        if(!eq(checkEStr(att), id)) continue;
-        final byte[] nm = lc(att.qname().string());
-        if(contains(nm, IDREF)) nc.add(att.finish());
+        if(!eq(val, id)) continue;
+        final byte[] nm = lc(at.qname().string());
+        if(contains(nm, IDREF)) nc.add(at.finish());
       }
     }
     ai = node.children();

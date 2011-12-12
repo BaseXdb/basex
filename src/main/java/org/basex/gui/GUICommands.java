@@ -174,7 +174,7 @@ public enum GUICommands implements GUICommand {
         if(info.opt) {
           d.meta.textindex = ind[0];
           d.meta.attrindex = ind[1];
-          d.meta.ftindex   = ind[2];
+          d.meta.ftxtindex   = ind[2];
           DialogProgress.execute(info, INFOOPT, new Optimize());
         } else {
           Command[] cmd = {};
@@ -184,7 +184,7 @@ public enum GUICommands implements GUICommand {
             cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
           if(ind[2] != d.meta.attrindex)
             cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
-          if(ind[3] != d.meta.ftindex)
+          if(ind[3] != d.meta.ftxtindex)
             cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
 
           DialogProgress.execute(info, PROGINDEX, cmd);

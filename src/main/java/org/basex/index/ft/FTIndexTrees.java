@@ -1,7 +1,5 @@
 package org.basex.index.ft;
 
-import org.basex.util.Token;
-
 /**
  * This class provides an array with several {@link FTIndexTree} instances,
  * one for each token length.
@@ -12,9 +10,17 @@ import org.basex.util.Token;
  */
 class FTIndexTrees {
   /** For each key length, an extra tree is created. */
-  final FTIndexTree[] trees = new FTIndexTree[Token.MAXLEN + 1];
+  final FTIndexTree[] trees;
   /** Pointer on current tree. */
   private int ctree;
+
+  /**
+   * Constructor.
+   * @param size number of tree instances
+   */
+  protected FTIndexTrees(final int size) {
+    trees = new FTIndexTree[size + 1];
+  }
 
   /**
    * Indexes a token with full-text data.

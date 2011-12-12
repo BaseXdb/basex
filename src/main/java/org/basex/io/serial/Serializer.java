@@ -37,7 +37,7 @@ public abstract class Serializer {
   protected boolean undecl;
 
   /** Currently available namespaces. */
-  private final Atts ns = new Atts().add(XML, XMLURI).add(EMPTY, EMPTY);
+  private final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
   /** Namespace stack. */
   private final IntList nsl = new IntList();
   /** Indicates if an element has not been completely opened yet. */
@@ -190,7 +190,7 @@ public abstract class Serializer {
       throws IOException {
 
     boolean doc = false;
-    final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
+    final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
     final IntList pars = new IntList();
     int l = 0;
     int p = pre;
@@ -234,7 +234,7 @@ public abstract class Serializer {
 
           // check namespace of current element
           byte[] key = prefix(name);
-          byte[] val = data.ns.uri(data.uri(p, k));
+          byte[] val = data.nspaces.uri(data.uri(p, k));
           if(val == null) val = EMPTY;
           // add new or updated namespace
           final byte[] old = ns(key);
