@@ -1068,9 +1068,9 @@ public interface Text {
   /** Button text for creating backup of databases. */
   String BUTTONBACKUP = lang("b_backup");
   /** Button text for restoring databases. */
-  String BUTTONRESTORE = lang("b_restore");
+  String BUTTONRESTORE = lang("b_restore") + DOTS;
   /** Button text for copying databases. */
-  String BUTTONCOPY = lang("b_copy");
+  String BUTTONCOPY = lang("b_copy") + DOTS;
   /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
   /** Button text for canceling actions. */
@@ -1329,6 +1329,16 @@ public interface Text {
   String MANAGETITLE = lang("dd_title");
   /** Dialog title for dropping a database. */
   String DROPCONF = lang("dd_question") + NL + lang("dd_sure");
+  /** Database only available as backup. */
+  String ONLYBACKUP = lang("dd_onlybac");
+  /** Dialog title for dropping a backup. */
+  String DROPBACKUP = lang("dd_dropbac") + NL + lang("dd_sure");
+  /** Dialog info when trying to open a backup. */
+  String RESTOREFIRST = lang("dd_restore");
+  /** Restoring an existing database. */
+  String RESTOREEXIST = lang("dd_exists") + NL + lang("dd_sure");
+  /** Restoring an existing database. */
+  String NOBACKUPS = lang("dd_nobackups");
 
   /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");

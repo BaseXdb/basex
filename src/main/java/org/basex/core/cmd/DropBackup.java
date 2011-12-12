@@ -31,10 +31,15 @@ public final class DropBackup extends Command {
   protected boolean run() {
     if(!MetaData.validName(args[0], true)) return error(NAMEINVALID, args[0]);
 
+    final String[] dbs = databases(args[0]);
     // loop through all databases and drop backups
-    for(final String db : databases(args[0])) {
+    for(final String db : dbs) {
       drop(db.contains("-") ? db : db + '-', context);
     }
+    // if the given argument is not a database name, it could be the name
+    // of a backup file
+    if(dbs.length == 0) drop(args[0], context);
+
     return info(DBBACKDROP, args[0] + "*" + IO.ZIPSUFFIX);
   }
 
