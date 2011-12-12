@@ -3,6 +3,8 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.regex.Pattern;
+
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.User;
@@ -20,9 +22,6 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public final class Restore extends Command {
-  /** Date pattern. */
-  private static final String PATTERN =
-    "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
   /** States if current database was closed. */
   private boolean closed;
 
@@ -45,7 +44,9 @@ public final class Restore extends Command {
       final StringList list = list(db, context);
       if(list.size() != 0) file = new File(list.get(0));
     } else {
-      db = db.replace(PATTERN + '$', "");
+      // db is already the name of a backup -> extract db name
+      final Pattern pa = Pattern.compile(IO.DATEPATTERN + '$');
+      db = pa.split(db)[0];
     }
     if(!file.exists()) return error(DBBACKNF, db);
 
@@ -87,7 +88,8 @@ public final class Restore extends Command {
     if(!dir.exists()) return list;
 
     for(final IOFile f : dir.children()) {
-      if(f.name().matches(db + PATTERN + IO.ZIPSUFFIX)) list.add(f.path());
+      if(f.name().matches(db + IO.DATEPATTERN + IO.ZIPSUFFIX))
+        list.add(f.path());
     }
     list.sort(false, false);
     return list;

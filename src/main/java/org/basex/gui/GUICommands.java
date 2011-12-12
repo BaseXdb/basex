@@ -6,11 +6,13 @@ import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+
 import javax.swing.AbstractButton;
-import org.basex.core.Context;
+
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Context;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
@@ -18,7 +20,6 @@ import org.basex.core.cmd.Cs;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.Export;
-import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
@@ -33,12 +34,12 @@ import org.basex.gui.dialog.DialogExport;
 import org.basex.gui.dialog.DialogFonts;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
+import org.basex.gui.dialog.DialogInput;
 import org.basex.gui.dialog.DialogInsert;
+import org.basex.gui.dialog.DialogManage;
 import org.basex.gui.dialog.DialogMapLayout;
-import org.basex.gui.dialog.DialogOpen;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
-import org.basex.gui.dialog.DialogInput;
 import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.view.ViewData;
@@ -80,26 +81,11 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a dialog to open a database. */
-  OPEN(GUIOPEN + DOTS, "% O", GUIOPENTT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogOpen dialog = new DialogOpen(gui, false);
-      if(dialog.ok()) {
-        new Close().run(gui.context);
-        gui.notify.init();
-        gui.execute(new Open(dialog.db()));
-      } else if(dialog.nodb()) {
-        if(Dialog.confirm(gui, NODBQUESTION)) CREATE.execute(gui);
-      }
-    }
-  },
-
   /** Opens a dialog to manage databases. */
-  MANAGE(GUIMANAGE + DOTS, "% M", GUIMANAGETT, false, false) {
+  MANAGE(GUIMANAGE + DOTS, "% O", GUIMANAGETT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true).nodb()) Dialog.warn(gui, INFONODB);
+      if(new DialogManage(gui, true).nodb()) Dialog.warn(gui, INFONODB);
     }
   },
 
