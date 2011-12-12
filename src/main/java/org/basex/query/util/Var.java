@@ -98,10 +98,10 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Checks if the variable has been correctly declared.
+   * Checks if the variable contains no updating expression.
    * @throws QueryException query exception
    */
-  public void check() throws QueryException {
+  public void checkUp() throws QueryException {
     if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(input, description());
   }
 

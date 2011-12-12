@@ -113,7 +113,7 @@ public final class PlotView extends View {
    */
   public PlotView(final ViewNotifier man) {
     super(PLOTVIEW, HELPPLOT, man);
-    border(5, 5, 5, 5).layout(new BorderLayout());
+    border(5).layout(new BorderLayout());
 
     final BaseXBack panel = new BaseXBack(Fill.NONE).layout(new BorderLayout());
 

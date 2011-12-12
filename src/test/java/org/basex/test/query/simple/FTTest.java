@@ -302,7 +302,8 @@ public final class FTTest extends QueryTest {
       { "FTStemming 2", empty(),
         "//w [text() <- 'xml database' using no stemming]" },
       { "FTStemming 3", node(7, 9, 11),
-        "//w [text() <- 'xml' ftand 'databasing' using stemming]" },
+        "//w [text() <- 'xml' ftand 'databasing' using stemming " +
+        "using language 'en']" },
       { "FTStemming 4", node(7, 9, 11, 14),
         "//w [text() <- 'hello' ftor 'database' using stemming]" },
       { "FTStemming 5", node(3, 5, 14, 37),

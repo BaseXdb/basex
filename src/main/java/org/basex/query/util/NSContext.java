@@ -46,7 +46,8 @@ public final class NSContext {
   }
 
   /**
-   * Finds the namespace URI for the specified prefix.
+   * Finds the namespace URI for the specified prefix, if it is found
+   * in statically declared namespaces.
    * @param pref prefix of the namespace
    * @return uri or {@code null}
    */

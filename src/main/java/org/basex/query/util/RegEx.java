@@ -158,14 +158,14 @@ public final class RegEx {
   private static String replace(final String cls, final char incl) {
     final int[] v = cls.startsWith("Is") ? MAP.get(cls.substring(2)) : null;
     if(v == null) return "\\" + incl + "{" + cls + "}";
-    final TokenBuilder sb = new TokenBuilder().add('[');
-    if(incl == 'P') sb.add("!");
+    final TokenBuilder tb = new TokenBuilder().add('[');
+    if(incl == 'P') tb.add("!");
     for(int i = 0; i < v.length;) {
-      sb.add(v[i++]);
-      sb.add('-');
-      sb.add(v[i++]);
+      tb.add(v[i++]);
+      tb.add('-');
+      tb.add(v[i++]);
     }
-    return sb.add(']').toString();
+    return tb.add(']').toString();
   }
 
   /** Character class map. */

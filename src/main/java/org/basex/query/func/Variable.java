@@ -53,7 +53,7 @@ public enum Variable {
    */
   public static void init(final QueryContext ctx) {
     for(final Variable v : values()) {
-      ctx.vars.setGlobal(Var.create(ctx, null, v.qname, v.value));
+      ctx.vars.updateGlobal(Var.create(ctx, null, v.qname, v.value));
     }
   }
 

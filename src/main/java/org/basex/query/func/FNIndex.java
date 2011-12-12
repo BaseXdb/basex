@@ -86,7 +86,6 @@ public final class FNIndex extends TokenSet {
    * @throws QueryException query exception
    */
   public void error(final QNm name, final InputInfo ii) throws QueryException {
-
     // compare specified name with names of predefined functions
     final byte[] ln = name.local();
     final Levenshtein ls = new Levenshtein();

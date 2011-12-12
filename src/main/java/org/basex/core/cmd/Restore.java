@@ -41,7 +41,7 @@ public final class Restore extends Command {
     // find backup file with or without date suffix
     File file = mprop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
-      final StringList list = list(db, context);
+      final StringList list = ShowBackups.list(db, true, context);
       if(list.size() != 0) file = new File(list.get(0));
     } else {
       // db is already the name of a backup -> extract db name
@@ -73,26 +73,6 @@ public final class Restore extends Command {
       Util.debug(ex);
       return false;
     }
-  }
-
-  /**
-   * Returns all backups of the specified database.
-   * @param db database
-   * @param ctx database context
-   * @return available backups
-   */
-  public static StringList list(final String db, final Context ctx) {
-    final StringList list = new StringList();
-
-    final IOFile dir = ctx.mprop.dbpath();
-    if(!dir.exists()) return list;
-
-    for(final IOFile f : dir.children()) {
-      if(f.name().matches(db + IO.DATEPATTERN + IO.ZIPSUFFIX))
-        list.add(f.path());
-    }
-    list.sort(false, false);
-    return list;
   }
 
   @Override

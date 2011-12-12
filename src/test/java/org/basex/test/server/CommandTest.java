@@ -510,8 +510,8 @@ public class CommandTest {
     // deleting a backup passing the exact backup name as argument
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    ok(new DropBackup(ShowBackups.findBackups(NAME, CONTEXT).get(0)));
-    assertEquals(0, ShowBackups.findBackups(NAME, CONTEXT).size());
+    ok(new DropBackup(ShowBackups.list(NAME, false, CONTEXT).get(0)));
+    assertEquals(0, ShowBackups.list(NAME, false, CONTEXT).size());
   }
 
   /**
@@ -528,21 +528,20 @@ public class CommandTest {
     // how to get my hands on the created backup name?
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    final String[] b = ShowBackups.findBackups(NAME, CONTEXT).toArray();
+    final String[] b = ShowBackups.list(NAME, false, CONTEXT).toArray();
     ok(new DropBackup(b[0]));
-    assertEquals(0, ShowBackups.findBackups(NAME, CONTEXT).size());
+    assertEquals(0, ShowBackups.list(NAME, false, CONTEXT).size());
 
     /* Creates 2 dbs: one with a short name (1), the other with a
      * longer name (2). (1) is a prefix of (2). Tests then, whether
      * backups of both dbs are deleted, when we drop backups of (1).
      */
-    System.out.println("now");
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
     ok(new CreateBackup(NAME));
     ok(new CreateBackup(NAME2));
     ok(new DropBackup(NAME));
-    assertEquals(1, ShowBackups.findBackups(NAME2, CONTEXT).size());
+    assertEquals(1, ShowBackups.list(NAME2, false, CONTEXT).size());
   }
 
   /** Retrieves raw data. */

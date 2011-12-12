@@ -234,7 +234,7 @@ public final class DialogServer extends Dialog {
     logt.setFont(start.getFont());
     BaseXLayout.setHeight(logt, 100);
 
-    logt.border(5, 5, 5, 5);
+    logt.border(5);
     infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
     refreshLog.setMnemonic();

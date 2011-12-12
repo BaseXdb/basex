@@ -202,7 +202,7 @@ final class BaseXTextRenderer extends BaseXBack {
       if(text.curr() == 0x0A) max = Math.max(x, max);
       next();
     }
-    return new Dimension(Math.max(x, max) + fwidth[' '], y + fwidth[' ']);
+    return new Dimension(Math.max(x, max) + fwidth[' '], y + fontH);
   }
 
   /**

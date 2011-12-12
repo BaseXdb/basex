@@ -62,7 +62,8 @@ public final class NameTest extends Test {
 
     if(test == Name.STD && !name.hasPrefix()) {
       // no results if default and database namespaces of elements are different
-      ok = type == NodeType.ATT || ctx.nsElem == null || eq(ns, ctx.nsElem);
+      ok = type == NodeType.ATT || ctx.sc.nsElem == null ||
+          eq(ns, ctx.sc.nsElem);
       if(ok) {
         // namespace is irrelevant or identical: ignore prefix to speed up test
         if(ns.length != 0) ctx.compInfo(OPTPREF, ln);

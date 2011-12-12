@@ -8,23 +8,22 @@ import org.basex.query.QueryParser;
 import org.basex.query.item.QNm;
 
 /**
- * Container for all global and local variables that are specified in the
- * current context.
+ * This class references all in-scope variables.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class Variables extends ExprInfo {
+public final class VarContext extends ExprInfo {
   /** Global variables. */
-  private final VarList global = new VarList();
+  private final VarStack global = new VarStack();
   /** Local variables. */
-  private final VarList local = new VarList();
+  private VarStack local = new VarStack();
 
   /**
    * Returns the global variables.
    * @return global variables
    */
-  public VarList global() {
+  public VarStack globals() {
     return global;
   }
 
@@ -32,16 +31,35 @@ public final class Variables extends ExprInfo {
    * Returns the local variables.
    * @return local variables
    */
-  public VarList local() {
+  public VarStack locals() {
     return local;
   }
 
   /**
-   * Sets a global variable.
+   * Creates a new variable stack and returns the old one.
+   * @param c stack capacity
+   * @return local variables
+   */
+  public VarStack cache(final int c) {
+    final VarStack vl = local;
+    local = new VarStack(c);
+    return vl;
+  }
+
+  /**
+   * Resets the local variables to the specified instance.
+   * @param l local variables
+   */
+  public void reset(final VarStack l) {
+    local = l;
+  }
+
+  /**
+   * Adds or replaces a global variable.
    * @param v variable to be added
    */
-  public void setGlobal(final Var v) {
-    global.set(v);
+  public void updateGlobal(final Var v) {
+    global.update(v);
     v.global = true;
   }
 
@@ -54,7 +72,7 @@ public final class Variables extends ExprInfo {
   }
 
   /**
-   * Finds the specified variable.
+   * Returns a variable with the specified name.
    * @param var variable
    * @return variable
    */
@@ -64,7 +82,7 @@ public final class Variables extends ExprInfo {
   }
 
   /**
-   * Finds the variable with the specified name.
+   * Returns a variable instance with the same id.
    * @param name variable name
    * @return variable
    */
@@ -74,12 +92,17 @@ public final class Variables extends ExprInfo {
   }
 
   /**
-   * Checks if all global variables have been correctly declared.
+   * Checks if none of the global variables contains an updating expression.
    * Called by the {@link QueryParser}.
    * @throws QueryException query exception
    */
-  public void check() throws QueryException {
-    global.check();
+  public void checkUp() throws QueryException {
+    global.checkUp();
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    global.plan(ser);
   }
 
   /**
@@ -101,10 +124,5 @@ public final class Variables extends ExprInfo {
   @Override
   public String toString() {
     return local.toString();
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    global.plan(ser);
   }
 }

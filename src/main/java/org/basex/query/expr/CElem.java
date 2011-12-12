@@ -46,7 +46,7 @@ public final class CElem extends CName {
   public CElem comp(final QueryContext ctx) throws QueryException {
     final int s = prepare(ctx);
     super.comp(ctx);
-    ctx.ns.size(s);
+    ctx.sc.ns.size(s);
     return this;
   }
 
@@ -72,12 +72,12 @@ public final class CElem extends CName {
       // analyze element namespace unless it is "xml"
       if(!eq(cp, XML)) {
         // request namespace for the specified uri
-        final byte[] uri = ctx.ns.uri(cp);
+        final byte[] uri = ctx.sc.ns.uri(cp);
 
         // check if element has a namespace
         if(nm.hasURI()) {
           // add to statically known namespaces
-          if(!comp && (uri == null || !eq(uri, cu))) ctx.ns.add(cp, cu);
+          if(!comp && (uri == null || !eq(uri, cu))) ctx.sc.ns.add(cp, cu);
           // add to in-scope namespaces
           if(!ns.contains(cp)) ns.add(cp, cu);
         } else {
@@ -125,7 +125,7 @@ public final class CElem extends CName {
       }
 
       // add inherited namespaces
-      final Atts stack = ctx.ns.stack();
+      final Atts stack = ctx.sc.ns.stack();
       for(int a = stack.size() - 1; a >= 0; a--) {
         final byte[] pref = stack.name(a);
         if(!ns.contains(pref)) ns.add(pref, stack.string(a));
@@ -136,8 +136,8 @@ public final class CElem extends CName {
         final ANode child = constr.children.get(c).parent(node);
         // add inherited and remove unused namespaces
         if(child.type == NodeType.ELM) {
-          if(ctx.nsInherit) inherit(child, ns);
-          if(!ctx.nsPreserve) noPreserve(child);
+          if(ctx.sc.nsInherit) inherit(child, ns);
+          if(!ctx.sc.nsPreserve) noPreserve(child);
           child.optimize();
         }
       }
@@ -146,7 +146,7 @@ public final class CElem extends CName {
       return node.optimize();
 
     } finally {
-      ctx.ns.size(s);
+      ctx.sc.ns.size(s);
     }
   }
 
@@ -220,9 +220,9 @@ public final class CElem extends CName {
    * @return old stack position
    */
   private int prepare(final QueryContext ctx) {
-    final int s = ctx.ns.size();
+    final int s = ctx.sc.ns.size();
     for(int n = 0; n < nspaces.size(); n++) {
-      ctx.ns.add(nspaces.name(n), nspaces.string(n));
+      ctx.sc.ns.add(nspaces.name(n), nspaces.string(n));
     }
     return s;
   }

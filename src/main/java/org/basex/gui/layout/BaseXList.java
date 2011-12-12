@@ -8,7 +8,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.Locale;
 
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -16,7 +15,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.MouseInputAdapter;
 
-import org.basex.core.Prop;
 import org.basex.gui.dialog.Dialog;
 import org.basex.io.IOFile;
 import org.basex.util.Token;
@@ -78,7 +76,8 @@ public final class BaseXList extends BaseXBack {
       }
     });
     text.addKeyListener(new KeyAdapter() {
-      boolean typed;
+      boolean multi, typed;
+      String old = "";
 
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -118,6 +117,7 @@ public final class BaseXList extends BaseXBack {
           text.setText(val);
           text.selectAll();
         }
+        multi = il.size() > 1;
       }
 
       @Override
@@ -129,37 +129,41 @@ public final class BaseXList extends BaseXBack {
         } else {
           typed = ch >= ' ' && ch != 127;
         }
+        multi = false;
       }
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(typed) {
-          typed = false;
+        String txt = text.getText().trim().toLowerCase();
 
-          final String txt = text.getText().trim().toLowerCase(Locale.ENGLISH);
+        if(!txt.equals(old) && !multi) {
           final boolean glob = txt.matches("^.*[*?,].*$");
           final String regex = glob ? IOFile.regex(txt, false) : null;
 
           final IntList il = new IntList();
-          for(int i = 0; i < values.length; ++i) {
-            final String db = Prop.WIN ? values[i].toLowerCase(Locale.ENGLISH) :
-              values[i];
+          for(int v = 0; v < values.length; ++v) {
+            final String value = values[v].trim().toLowerCase();
             if(glob) {
-              if(db.matches(regex)) il.add(i);
-            } else if(db.startsWith(txt)) {
-              final int c = text.getCaretPosition();
-              list.setSelectedValue(values[i], true);
-              text.setText(values[i]);
-              text.select(c, values[i].length());
+              if(value.matches(regex)) il.add(v);
+            } else if(value.startsWith(txt)) {
+              if(typed) {
+                final int c = text.getCaretPosition();
+                text.setText(values[v]);
+                text.select(c, values[v].length());
+                txt = value;
+              }
+              il.add(v);
               break;
             }
           }
-          if(glob) {
-            list.setSelectedValue(values[il.get(0)], true);
-            list.setSelectedIndices(il.toArray());
+          if(il.size() > 0) {
+            list.setSelectedValue(values[il.get(il.size() - 1)], true);
           }
+          list.setSelectedIndices(il.toArray());
         }
-        d.action(null);
+        d.action(BaseXList.this);
+        typed = false;
+        old = txt;
       }
     });
     add(text);
@@ -172,12 +176,10 @@ public final class BaseXList extends BaseXBack {
       @Override
       public void mousePressed(final MouseEvent e) {
         final Object[] i = list.getSelectedValues();
-        if(i.length == 0) return;
-
         text.setText(i.length == 1 ? i[0].toString() : "");
         text.requestFocusInWindow();
         text.selectAll();
-        d.action(null);
+        d.action(BaseXList.this);
       }
       @Override
       public void mouseDragged(final MouseEvent e) {
@@ -216,6 +218,12 @@ public final class BaseXList extends BaseXBack {
     text.setText(value);
   }
 
+  @Override
+  public void setEnabled(final boolean en) {
+    list.setEnabled(en);
+    text.setEnabled(en);
+  }
+
   /**
    * Sets the specified font.
    * @param font font name
@@ -235,11 +243,13 @@ public final class BaseXList extends BaseXBack {
   }
 
   /**
-   * Returns the first (or only) chosen value of the text field.
+   * Returns the selected value of the text field.
+   * An empty string is returned if no or multiple values are selected.
    * @return text field value
    */
   public String getValue() {
-    return text.getText();
+    final Object[] vals = list.getSelectedValues();
+    return vals.length == 1 ? vals[0].toString() : "";
   }
 
   /**

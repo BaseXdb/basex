@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
 import org.basex.query.util.Var;
+import org.basex.query.util.VarStack;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -118,11 +119,11 @@ public abstract class UserFuncCall extends Arr {
    * @param vs variables to add
    * @return old stack size
    */
-  int addArgs(final QueryContext ctx, final Var[] vs) {
+  VarStack addArgs(final QueryContext ctx, final Var[] vs) {
     // move variables to stack
-    final int s = ctx.vars.size();
+    final VarStack vl = ctx.vars.cache(vs.length);
     for(final Var v : vs) ctx.vars.add(v);
-    return s;
+    return vl;
   }
 
   /**

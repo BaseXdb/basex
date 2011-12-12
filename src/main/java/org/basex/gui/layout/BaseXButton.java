@@ -133,7 +133,8 @@ public class BaseXButton extends JButton {
       final String label = b.getText();
       for(int l = 0; l < label.length(); l++) {
         final char ch = Character.toLowerCase(label.charAt(l));
-        if(ch == ' ' || mnem.indexOf(Character.toString(ch)) != -1) continue;
+        if(!Token.letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
+          continue;
         b.setMnemonic(ch);
         mnem.append(ch);
         break;

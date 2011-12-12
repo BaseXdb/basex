@@ -7,11 +7,6 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.IOException;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-
 import org.basex.core.Command;
 import org.basex.core.Context;
 import org.basex.core.cmd.AlterDB;
@@ -20,6 +15,7 @@ import org.basex.core.cmd.CreateBackup;
 import org.basex.core.cmd.DropBackup;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.ShowBackups;
@@ -27,11 +23,11 @@ import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXList;
+import org.basex.gui.layout.BaseXTabs;
 import org.basex.io.in.DataInput;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -47,12 +43,12 @@ import org.basex.util.list.StringList;
 public final class DialogManage extends Dialog {
   /** List of currently available databases. */
   private final BaseXList choice;
-  /** Information panel. */
-  private final BaseXLabel doc;
+  /** Name of current database. */
+  private final BaseXLabel doc1;
+  /** Name of current database. */
+  private final BaseXLabel doc2;
   /** Information panel. */
   private final BaseXEditor detail;
-  /** Buttons. */
-  private final BaseXBack buttons;
   /** Rename button. */
   private final BaseXButton rename;
   /** Drop button. */
@@ -65,14 +61,14 @@ public final class DialogManage extends Dialog {
   private final BaseXButton restore;
   /** Copy button. */
   private final BaseXButton copy;
-  /** Refresh. */
+  /** Refresh list of databases. */
   private boolean refresh;
   /** Combobox that lists available backups for a database. */
-  private BaseXCombo backupchoice;
+  private BaseXList backups;
   /** Delete button for backups. */
   private BaseXButton delete;
-  /** Backups available for the current database. */
-  private boolean backupsavl;
+  /** Deletes all backups. */
+  private final BaseXButton deleteAll;
 
   /**
    * Default constructor.
@@ -81,60 +77,58 @@ public final class DialogManage extends Dialog {
    */
   public DialogManage(final GUI main, final boolean m) {
     super(main, m ? MANAGETITLE : OPENTITLE);
+
     // create database chooser
-    final StringList dbs = ShowBackups.listdbs(main.context);
+    final StringList dbs = List.list(main.context, true);
     choice = new BaseXList(dbs.toArray(), this, !m);
-    set(choice, BorderLayout.CENTER);
-    choice.setSize(160, 580);
+    choice.setSize(160, 450);
 
-    final BaseXBack info = new BaseXBack(new BorderLayout(5, 10));
-    info.setBorder(new CompoundBorder(new EtchedBorder(),
-        new EmptyBorder(10, 10, 10, 10)));
-
-    final Font f = choice.getFont();
-    doc = new BaseXLabel(DIALOGINFO).border(0, 0, 5, 0);
-    doc.setFont(f.deriveFont(f.getSize2D() + 7f));
-    info.add(doc, BorderLayout.NORTH);
+    final Font f = panel.getFont();
+    doc1 = new BaseXLabel(" ").border(0, 0, 5, 0);
+    doc1.setFont(f.deriveFont(f.getSize2D() + 7));
 
     detail = new BaseXEditor(false, this);
-    detail.border(5, 5, 5, 5).setFont(f);
+    detail.border(5).setFont(f);
     BaseXLayout.setWidth(detail, 400);
 
-    backupchoice = new BaseXCombo(this, NOBACKUPS);
-    BaseXLayout.setWidth(backupchoice, 400);
-    delete = new BaseXButton(BUTTONDELETE + DOTS, this);
-    backup = new BaseXButton(BUTTONBACKUP, this);
-    restore = new BaseXButton(BUTTONRESTORE, this);
-    final BaseXBack backups = new BaseXBack(new BorderLayout(5, 5));
-    backups.setBorder(new CompoundBorder(new EtchedBorder(),
-        new EmptyBorder(10, 10, 10, 10)));
-    final BaseXBack backbtns = newButtons(this, backup, restore, delete);
-    final BaseXLabel avlbbackups = new BaseXLabel(BACKUPS).border(0, 0, 5, 0);
-    avlbbackups.setFont(f.deriveFont(f.getSize2D() + 7f));
-    backups.add(avlbbackups, BorderLayout.NORTH);
-    backups.add(backupchoice, BorderLayout.CENTER);
-    backups.add(backbtns, BorderLayout.SOUTH);
-
-    info.add(detail, BorderLayout.CENTER);
-
-    final BaseXBack pp = new BaseXBack(new BorderLayout()).border(0, 12, 0, 0);
-    pp.add(info, BorderLayout.CENTER);
-    pp.add(backups, BorderLayout.SOUTH);
-
-    // create buttons
-    final BaseXBack p = new BaseXBack(new BorderLayout());
+    // database buttons
     copy = new BaseXButton(BUTTONCOPY, this);
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP, this);
-    buttons = newButtons(this, drop, rename, copy, open);
-    p.add(buttons, BorderLayout.SOUTH);
 
-    final BaseXBack right = new BaseXBack(new BorderLayout());
-    right.add(pp, BorderLayout.CENTER);
-    right.add(buttons, BorderLayout.SOUTH);
+    // first tab
+    final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
+    tab1.add(doc1, BorderLayout.NORTH);
+    tab1.add(detail, BorderLayout.CENTER);
+    tab1.add(newButtons(this, drop, rename, copy, open), BorderLayout.SOUTH);
 
-    set(right, BorderLayout.EAST);
+    doc2 = new BaseXLabel(" ").border(0, 0, 5, 0);
+    doc2.setFont(f.deriveFont(f.getSize2D() + 7));
+
+    backups = new BaseXList(new String[] { }, this);
+    backups.setSize(400, 330);
+    // backup buttons
+    backup = new BaseXButton(BUTTONBACKUP, this);
+    restore = new BaseXButton(BUTTONRESTORE, this);
+    delete = new BaseXButton(BUTTONDELETE, this);
+    deleteAll = new BaseXButton(BUTTONDELALL + DOTS, this);
+
+    // second tab
+    final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);
+    tab2.add(doc2, BorderLayout.NORTH);
+    tab2.add(backups, BorderLayout.CENTER);
+    tab2.add(newButtons(this, backup, restore, delete, deleteAll),
+        BorderLayout.SOUTH);
+
+    final BaseXTabs tabs = new BaseXTabs(this);
+    tabs.addTab(DIALOGINFO, tab1);
+    tabs.addTab(BACKUPS, tab2);
+
+    panel.setLayout(new BorderLayout(8, 0));
+
+    set(choice, BorderLayout.CENTER);
+    set(tabs, BorderLayout.EAST);
     action(null);
     if(dbs.size() == 0) return;
 
@@ -162,68 +156,68 @@ public final class DialogManage extends Dialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      choice.setData(ShowBackups.listdbs(ctx).toArray());
+      choice.setData(List.list(ctx, true).toArray());
       choice.requestFocusInWindow();
       refresh = false;
     }
 
     final StringList dbs = choice.getValues();
-    final String db = choice.getValue().trim();
+    final String db = choice.getValue();
     final ObjList<Command> cmds = new ObjList<Command>();
-    boolean o = dbs.size() > 0;
-    ok = o;
+    boolean active = dbs.size() > 0;
 
     if(cmp == open) {
-      if(dbs.size() == 1) {
-        cmds.add(new Open(dbs.get(0)));
-      }
       close();
 
     } else if(cmp == drop) {
-      if(!Dialog.confirm(gui, Util.info(DROPCONF, dbs.size()))) return;
+      for(final String s : dbs) {
+        if(ctx.mprop.dbexists(s)) cmds.add(new DropDB(s));
+      }
+      if(!Dialog.confirm(gui, Util.info(DROPCONF, cmds.size()))) return;
       refresh = true;
-      for(final String s : dbs) cmds.add(new DropDB(s));
 
     } else if(cmp == rename) {
       final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
-      refresh = true;
       cmds.add(new AlterDB(db, dr.input()));
+      refresh = true;
 
     } else if(cmp == copy) {
       final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
-      refresh = true;
       cmds.add(new Copy(db, dc.input()));
+      refresh = true;
 
     } else if(cmp == backup) {
       for(final String s : dbs) cmds.add(new CreateBackup(s));
 
     } else if(cmp == restore) {
-      int exist = 0;
-      for(final String d : dbs)
-        if(gui.context.mprop.dbexists(d)) exist++;
-      if(exist > 0 && !Dialog.confirm(gui, Util.info(RESTOREEXIST, exist)))
-        return;
+      // show warning if existing database would be overwritten
+      if(!gui.context.mprop.dbexists(db) || Dialog.confirm(gui, OVERWRITE))
+        cmds.add(new Restore(db));
 
-      if(dbs.size() == 1) {
-        cmds.add(new Restore((String) backupchoice.getSelectedItem()));
-      } else
-        for(final String s : dbs) cmds.add(new Restore(s));
-
-    } else if(cmp == backupchoice) {
+    } else if(cmp == backups) {
       // don't reset the combo box after selecting an item
       // no direct consequences if backup selection changes
 
     } else if(cmp == delete) {
-      if(dbs.size() == 1) {
-        if(!Dialog.confirm(gui, DROPBACKUP)) return;
-        cmds.add(new DropBackup((String) backupchoice.getSelectedItem()));
-      }
-    } else {
-      // update components
-      o = ctx.mprop.dbexists(db);
-      if(o) {
+      cmds.add(new DropBackup(backups.getValue()));
+      refresh = backups.getList().length == 1;
+      backups.requestFocusInWindow();
+
+    } else if(cmp == deleteAll) {
+      final String[] back = backups.getList();
+      if(!Dialog.confirm(gui, Util.info(DROPBACKUP, back.length))) return;
+      for(final String b : back) cmds.add(new DropBackup(b));
+      refresh = true;
+
+    } else if(cmp != backups) {
+      final String title = dbs.size() == 1 ? db : dbs.size() + " " + DATABASES;
+      doc1.setText(title);
+      doc2.setText(title);
+
+      active = ctx.mprop.dbexists(db);
+      if(active) {
         // refresh info view
         DataInput in = null;
         final MetaData meta = new MetaData(db, ctx);
@@ -236,33 +230,30 @@ public final class DialogManage extends Dialog {
         } finally {
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
+      } else {
+        detail.setText(dbs.size() == 1 ? Token.token(ONLYBACKUP) : Token.EMPTY);
       }
 
-      // list available backups for the current database
-      final String[] backups = ShowBackups.findBackups(db, ctx).toArray();
-      if(!o && backups.length > 0) {
-        detail.setText(Token.token(ONLYBACKUP));
-      }
+      // enable or disable buttons
+      rename.setEnabled(active);
+      copy.setEnabled(active);
+      open.setEnabled(active);
+      restore.setEnabled(active);
 
-      backupsavl = backups.length > 0;
-      backupchoice.setModel(backupsavl ? new DefaultComboBoxModel(backups) :
-          new DefaultComboBoxModel(new String[] { NOBACKUPS }));
-
-      // enable or disable buttons (depends on the currently chosen db being
-      // only a backup or an actual database)
-      enableOK(buttons, BUTTONOPEN, o);
-      enableOK(buttons, BUTTONBACKUP, o);
-      enableOK(buttons, BUTTONDROP, o);
-      enableOK(buttons, BUTTONRENAME, o);
-      enableOK(buttons, BUTTONCOPY, o);
+      active = false;
+      for(final String d : dbs) active |= ctx.mprop.dbexists(d);
+      drop.setEnabled(active);
+      backup.setEnabled(active);
 
       // enable/disable backup buttons
-      restore.setEnabled(backupsavl);
-      delete.setEnabled(backupsavl);
+      final String[] back = ShowBackups.list(db, false, ctx).toArray();
+      active = back.length > 0;
+      backups.setData(back);
+      backups.setEnabled(active);
 
-      o = true;
-      for(final String s : dbs) o &= Restore.list(s, ctx).size() != 0;
-      enableOK(buttons, BUTTONRESTORE, o);
+      restore.setEnabled(active);
+      delete.setEnabled(active);
+      deleteAll.setEnabled(active);
     }
 
     // run all commands
@@ -277,8 +268,6 @@ public final class DialogManage extends Dialog {
     if(gui.context.mprop.dbexists(db)) {
       DialogProgress.execute(this, "", new Open(db));
       dispose();
-    } else {
-     Dialog.info(gui, RESTOREFIRST);
     }
   }
 }

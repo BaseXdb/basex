@@ -7,6 +7,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.query.util.VarStack;
 import org.basex.util.InputInfo;
 
 /**
@@ -34,7 +35,7 @@ public final class BaseFuncCall extends UserFuncCall {
     Var[] args = args(ctx);
     do {
       // cache arguments, evaluate function and reset variable scope
-      final int s = addArgs(ctx, args);
+      final VarStack cs = addArgs(ctx, args);
       ctx.tailCalls = 0;
       try {
         return fun.item(ctx, ii);
@@ -42,7 +43,7 @@ public final class BaseFuncCall extends UserFuncCall {
         fun = c.getFunc();
         args = c.getArgs();
       } finally {
-        ctx.vars.size(s);
+        ctx.vars.reset(cs);
       }
     } while(true);
   }
@@ -54,7 +55,7 @@ public final class BaseFuncCall extends UserFuncCall {
     Var[] args = args(ctx);
     do {
       // cache arguments, evaluate function and reset variable scope
-      final int s = addArgs(ctx, args);
+      final VarStack cs = addArgs(ctx, args);
       ctx.tailCalls = 0;
       try {
         return fun.value(ctx);
@@ -62,7 +63,7 @@ public final class BaseFuncCall extends UserFuncCall {
         fun = c.getFunc();
         args = c.getArgs();
       } finally {
-        ctx.vars.size(s);
+        ctx.vars.reset(cs);
       }
     } while(true);
   }

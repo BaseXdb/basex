@@ -14,6 +14,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.query.util.VarStack;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -28,12 +29,13 @@ import org.basex.util.TokenBuilder;
 public class UserFunc extends Single {
   /** Function name. */
   public final QNm name;
-  /** Return type. */
-  public SeqType ret;
   /** Arguments. */
   public final Var[] args;
   /** Declaration flag. */
   public final boolean declared;
+
+  /** Return type. */
+  public SeqType ret;
   /** Updating flag. */
   public boolean updating;
   /** Cast flag. */
@@ -78,13 +80,28 @@ public class UserFunc extends Single {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    if(compiled) return this;
+    comp(ctx, true);
+    return this;
+  }
+
+  /**
+   * Compiles the expression.
+   * @param ctx query context
+   * @param cache cache variables
+   * @throws QueryException query exception
+   */
+  public void comp(final QueryContext ctx, final boolean cache)
+      throws QueryException {
+
+    if(compiled) return;
     compiled = true;
 
-    final int s = ctx.vars.size();
+    final int vs = ctx.vars.size();
+    final VarStack vl = cache ? ctx.vars.cache(args.length) : null;
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
-    ctx.vars.size(s);
+    if(cache) ctx.vars.reset(vl);
+    else ctx.vars.size(vs);
 
     // convert all function calls in tail position to proper tail calls
     if(tco()) expr = expr.markTailCalls();
@@ -96,8 +113,6 @@ public class UserFunc extends Single {
       ctx.compInfo(OPTCAST, ret);
       cast = false;
     }
-    // returned expression will be ignored
-    return this;
   }
 
   @Override
@@ -106,7 +121,7 @@ public class UserFunc extends Single {
 
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final Atts ns = ctx.ns.reset();
+    final Atts ns = ctx.sc.ns.reset();
     ctx.value = null;
     try {
       final Item it = expr.item(ctx, ii);
@@ -114,7 +129,7 @@ public class UserFunc extends Single {
       return cast ? ret.cast(it, this, false, ctx, input) : it;
     } finally {
       ctx.value = cv;
-      ctx.ns.stack(ns);
+      ctx.sc.ns.stack(ns);
     }
   }
 
@@ -122,7 +137,7 @@ public class UserFunc extends Single {
   public Value value(final QueryContext ctx) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
-    final Atts ns = ctx.ns.reset();
+    final Atts ns = ctx.sc.ns.reset();
     ctx.value = null;
     try {
       final Value v = expr.value(ctx);
@@ -130,7 +145,7 @@ public class UserFunc extends Single {
       return cast ? ret.promote(v, ctx, input) : v;
     } finally {
       ctx.value = cv;
-      ctx.ns.stack(ns);
+      ctx.sc.ns.stack(ns);
     }
   }
 

@@ -34,7 +34,7 @@ import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 
 /**
- * Container for a global, user-defined function.
+ * Container for a user-defined function.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen

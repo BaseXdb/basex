@@ -6,6 +6,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.VarStack;
 import org.basex.util.InputInfo;
 
 /**
@@ -34,9 +35,9 @@ public final class TailFuncCall extends UserFuncCall {
     checkHeight(ctx);
 
     // cache arguments, evaluate function and reset variable scope
-    final int s = addArgs(ctx, args(ctx));
+    final VarStack cs = addArgs(ctx, args(ctx));
     final Item it = func.item(ctx, ii);
-    ctx.vars.size(s);
+    ctx.vars.reset(cs);
     return it;
   }
 
@@ -45,9 +46,9 @@ public final class TailFuncCall extends UserFuncCall {
     checkHeight(ctx);
 
     // cache arguments, evaluate function and reset variable scope
-    final int s = addArgs(ctx, args(ctx));
+    final VarStack cs = addArgs(ctx, args(ctx));
     final Value v = func.value(ctx);
-    ctx.vars.size(s);
+    ctx.vars.reset(cs);
     return v;
   }
 
@@ -66,8 +67,7 @@ public final class TailFuncCall extends UserFuncCall {
    * @throws QueryException query exception
    */
   private void checkHeight(final QueryContext ctx) throws QueryException {
-    if(ctx.maxCalls >= 0 && ctx.tailCalls++ > ctx.maxCalls)
-      throw new Continuation(args(ctx));
+    final int max = ctx.maxCalls;
+    if(max >= 0 && ctx.tailCalls++ > max) throw new Continuation(args(ctx));
   }
-
 }

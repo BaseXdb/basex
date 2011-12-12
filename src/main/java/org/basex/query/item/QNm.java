@@ -62,7 +62,7 @@ public final class QNm extends Item {
    */
   public QNm(final byte[] n, final QueryContext ctx) {
     this(n);
-    uri(ctx.ns.uri(prefix()));
+    uri(ctx.sc.ns.uri(prefix()));
   }
 
   /**

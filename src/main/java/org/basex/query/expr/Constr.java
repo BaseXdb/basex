@@ -77,7 +77,7 @@ public final class Constr {
    * @throws QueryException query exception
    */
   public Constr add(final Expr... expr) throws QueryException {
-    final int s = ctx.ns.size();
+    final int s = ctx.sc.ns.size();
     try {
       for(final Expr e : expr) {
         more = false;
@@ -87,7 +87,7 @@ public final class Constr {
       if(text.size() != 0) children.add(new FTxt(text.finish()));
       return this;
     } finally {
-      ctx.ns.size(s);
+      ctx.sc.ns.size(s);
     }
   }
 
@@ -137,7 +137,7 @@ public final class Constr {
         atts.add(new FAttr(name, node.string()));
 
         if(name.hasURI()) {
-          ctx.ns.add(name.prefix(), name.uri());
+          ctx.sc.ns.add(name.prefix(), name.uri());
         }
 
       } else if(ip == NodeType.NSP) {
