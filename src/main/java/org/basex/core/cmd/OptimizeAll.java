@@ -12,7 +12,6 @@ import org.basex.core.BaseXException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -100,7 +99,7 @@ public final class OptimizeAll extends ACreate {
     if(cmd != null) cmd.size = m.size;
 
     // check if database is also pinned by other users
-    if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DBLOCKED, m.name);
+    if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DBPINNED, m.name);
 
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
@@ -110,12 +109,9 @@ public final class OptimizeAll extends ACreate {
         new DBParser(old, cmd), ctx);
     try {
       final DiskData d = builder.build();
-      if(m.textindex || ctx.prop.is(Prop.TEXTINDEX))
-        index(IndexType.TEXT, d, cmd);
-      if(m.attrindex || ctx.prop.is(Prop.ATTRINDEX))
-        index(IndexType.ATTRIBUTE, d, cmd);
-      if(m.ftindex || ctx.prop.is(Prop.FTINDEX))
-        index(IndexType.FULLTEXT, d, cmd);
+      if(m.createtext) create(IndexType.TEXT, d, cmd);
+      if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
+      if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
       d.meta.filesize = m.filesize;
       d.meta.users    = m.users;
       d.meta.dirty    = true;
@@ -123,8 +119,8 @@ public final class OptimizeAll extends ACreate {
       final IOFile bin = data.meta.binaries();
       if(bin.exists()) bin.rename(d.meta.binaries());
 
-      final File lock = old.lockFile();
-      if(lock.exists()) Copy.copy(lock, d.lockFile());
+      final File lock = old.updateFile();
+      if(lock.exists()) Copy.copy(lock, d.updateFile());
       d.close();
     } finally {
       try {

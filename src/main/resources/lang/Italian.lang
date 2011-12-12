@@ -372,7 +372,8 @@ pc_direrr="%" points to a directory.
 # Database commands
 db_no=Base di dati '%' non trovata.
 db_invalid=Name '%' is invalid.
-db_locked=Base di dati '%' correntemente bloccata.
+db_pinned=Database '%' is currently opened by another client.
+db_updated=Database '%' is being updated, or update was not completed.
 db_closed=Base di dati '%' chiusa.
 db_closeerr=Impossibile chiudere la base di dati.
 db_optimized=Base di dati '%' ottimizzata in %.

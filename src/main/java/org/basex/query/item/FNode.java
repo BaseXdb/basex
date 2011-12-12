@@ -6,6 +6,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -15,11 +16,6 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {
-  /** Child nodes. */
-  protected NodeCache children;
-  /** Attributes. */
-  protected NodeCache atts;
-
   /**
    * Constructor.
    * @param t data type
@@ -28,28 +24,9 @@ public abstract class FNode extends ANode {
     super(t);
   }
 
-  /**
-   * Adds a node to this node.
-   * @param node node to be added
-   * @return self reference
-   */
-  public FNode add(final ANode node) {
-    (node.type == NodeType.ATT ? atts : children).add(node);
-    node.parent(this);
-    return this;
-  }
-
   @Override
-  public final byte[] string() {
-    if(val == null) {
-      final TokenBuilder tb = new TokenBuilder();
-      for(int c = 0; c < children.size(); ++c) {
-        final ANode nc = children.get(c);
-        if(nc.type == NodeType.ELM || nc.type == NodeType.TXT)
-          tb.add(nc.string());
-      }
-      val = tb.finish();
-    }
+  public byte[] string() {
+    if(val == null) val = Token.EMPTY;
     return val;
   }
 
@@ -123,13 +100,13 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final AxisIter attributes() {
-    return iter(atts);
+  public AxisMoreIter attributes() {
+    return AxisMoreIter.EMPTY;
   }
 
   @Override
-  public final AxisMoreIter children() {
-    return iter(children);
+  public AxisMoreIter children() {
+    return AxisMoreIter.EMPTY;
   }
 
   @Override
@@ -139,30 +116,8 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public final boolean hasChildren() {
-    return children.size() != 0;
-  }
-
-  /**
-   * Iterates all nodes of the specified iterator.
-   * @param iter iterator
-   * @return node iterator
-   */
-  private AxisMoreIter iter(final NodeCache iter) {
-    return new AxisMoreIter() {
-      /** Child counter. */
-      int c;
-
-      @Override
-      public boolean more() {
-        return iter != null && c != iter.size();
-      }
-
-      @Override
-      public ANode next() {
-        return more() ? iter.get(c++) : null;
-      }
-    };
+  public boolean hasChildren() {
+    return false;
   }
 
   @Override
@@ -173,6 +128,47 @@ public abstract class FNode extends ANode {
   @Override
   public final AxisIter descendantOrSelf() {
     return desc(true);
+  }
+
+  /**
+   * Iterates all nodes of the specified iterator.
+   * @param iter iterator
+   * @return node iterator
+   */
+  protected final AxisMoreIter iter(final NodeCache iter) {
+    return new AxisMoreIter() {
+      /** Child counter. */ int c;
+      @Override
+      public boolean more() { return iter != null && c != iter.size(); }
+      @Override
+      public ANode next() { return more() ? iter.get(c++) : null; }
+      @Override
+      public ANode get(final long i) { return iter.get(i); }
+      @Override
+      public long size() { return iter.size(); }
+      @Override
+      public boolean reset() { c = 0; return true; }
+      @Override
+      public Value value() { return iter.value(); }
+    };
+  }
+
+  /**
+   * Returns the string value for the specified nodes.
+   * @param iter iterator
+   * @return node iterator
+   */
+  protected final byte[] string(final NodeCache iter) {
+    if(val == null) {
+      final TokenBuilder tb = new TokenBuilder();
+      for(int c = 0; c < iter.size(); ++c) {
+        final ANode nc = iter.get(c);
+        if(nc.type == NodeType.ELM || nc.type == NodeType.TXT)
+          tb.add(nc.string());
+      }
+      val = tb.finish();
+    }
+    return val;
   }
 
   /**

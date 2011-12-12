@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.index.path.PathNode;
 import org.basex.io.serial.Serializer;
+import org.basex.index.StatsKey;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -88,8 +89,12 @@ public class AxisStep extends Preds {
     final Data data = ctx.data();
     ctx.leaf = data != null &&
       test.test == Name.NAME && test.type != NodeType.ATT && axis.down &&
-      data.meta.uptodate && data.ns.size() == 0 &&
-      data.tagindex.stat(data.tagindex.id(((NameTest) test).ln)).leaf;
+      data.meta.uptodate && data.nspaces.size() == 0;
+    if(ctx.leaf) {
+      final StatsKey s =
+        data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
+      ctx.leaf = s != null && s.leaf;
+    }
 
     // as predicates will not necessarily start from the document node,
     // the context item type is temporarily generalized
@@ -162,7 +167,7 @@ public class AxisStep extends Preds {
       final Data data) {
 
     // skip steps with predicates or different namespaces
-    if(preds.length != 0 || data.ns.globalNS() == null) return null;
+    if(preds.length != 0 || data.nspaces.globalNS() == null) return null;
 
     // check restrictions on node type
     int kind = -1, name = 0;

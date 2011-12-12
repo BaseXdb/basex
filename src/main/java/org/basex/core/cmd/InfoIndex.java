@@ -82,7 +82,7 @@ public final class InfoIndex extends AInfo {
       case ATTRIBUTE: return info(INFOATTRINDEX, IndexType.ATTRIBUTE, data,
           data.meta.attrindex);
       case FULLTEXT:  return info(INFOFTINDEX, IndexType.FULLTEXT, data,
-          data.meta.ftindex);
+          data.meta.ftxtindex);
       case PATH:      return info(INFOPATHINDEX, IndexType.PATH, data,
           data.meta.pathindex);
       default:        return Token.token(LI + INDNOTAVL);

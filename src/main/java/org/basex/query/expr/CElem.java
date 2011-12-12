@@ -9,19 +9,21 @@ import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
+import org.basex.query.iter.AxisIter;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 
 /**
- * Element fragment.
+ * Element constructor.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class CElem extends CName {
   /** Namespaces. */
-  private final Atts nsp;
+  private final Atts nspaces;
   /** Computed constructor flag. */
   private final boolean comp;
 
@@ -36,7 +38,7 @@ public final class CElem extends CName {
       final Expr... cont) {
 
     super(ELEMENT, ii, t, cont);
-    nsp = ns == null ? new Atts() : ns;
+    nspaces = ns == null ? new Atts() : ns;
     comp = ns == null;
   }
 
@@ -54,9 +56,11 @@ public final class CElem extends CName {
 
     final int s = prepare(ctx);
     try {
-      // adds namespaces for the element constructor
-      final Atts cns = new Atts();
-      for(int i = 0; i < nsp.size(); ++i) cns.add(nsp.key(i), nsp.value(i));
+      // adds in-scope namespaces
+      final Atts ns = new Atts();
+      for(int i = 0; i < nspaces.size(); ++i) {
+        ns.add(nspaces.name(i), nspaces.string(i));
+      }
 
       // create and check QName
       final QNm nm = qname(ctx, ii);
@@ -72,12 +76,10 @@ public final class CElem extends CName {
 
         // check if element has a namespace
         if(nm.hasURI()) {
-          // overwrite namespace declaration
-          if(!comp && (uri == null || !eq(uri, cu))) {
-            ctx.ns.add(cp, cu);
-          }
-          // add declaration if it does not already exist
-          if(!cns.contains(cp)) cns.add(cp, cu);
+          // add to statically known namespaces
+          if(!comp && (uri == null || !eq(uri, cu))) ctx.ns.add(cp, cu);
+          // add to in-scope namespaces
+          if(!ns.contains(cp)) ns.add(cp, cu);
         } else {
           // element has no namespace: assign default uri
           nm.uri(uri);
@@ -85,64 +87,131 @@ public final class CElem extends CName {
       }
 
       // create child and attribute nodes
-      final Constr c = new Constr(ii, ctx, expr);
-      if(c.errAtt) NOATTALL.thrw(input);
-      if(c.errNS) NONSALL.thrw(input);
-      if(c.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, c.duplAtt);
-      if(c.duplNS != null) DUPLNSCONS.thrw(input, c.duplNS);
+      final Constr constr = new Constr(ii, ctx).add(expr);
+      if(constr.errAtt) NOATTALL.thrw(input);
+      if(constr.errNS) NONSALL.thrw(input);
+      if(constr.duplAtt != null)
+        (comp ? CATTDUPL : ATTDUPL).thrw(input, constr.duplAtt);
+      if(constr.duplNS != null) DUPLNSCONS.thrw(input, constr.duplNS);
 
-      // add computed namespaces
-      for(int n = 0; n < c.ns.size(); ++n) {
-        cns.add(c.ns.key(n), c.ns.value(n));
+      // create node
+      final FElem node = new FElem(nm, constr.children, constr.atts, ns);
+
+      // add namespaces from constructor
+      final Atts cns = constr.nspaces;
+      for(int a = 0; a < cns.size(); ++a) {
+        addNS(cns.name(a), cns.string(a), ns);
       }
 
-      // create node and update parent references of child nodes
-      final FElem node = new FElem(nm, c.children, c.atts, cns);
-      for(int n = 0; n < c.children.size(); ++n) {
-        c.children.get(n).parent(node);
-      }
+      // update parent references of attributes and add namespaces
+      for(int a = 0; a < constr.atts.size(); ++a) {
+        constr.atts.get(a).parent(node);
 
-      // update attributes: set parent references, add undeclared namespaces
-      for(int n = 0; n < c.atts.size(); ++n) {
-        final ANode att = c.atts.get(n).parent(node);
+        final ANode att = constr.atts.get(a);
         final QNm qnm = att.qname();
         // skip attributes without prefixes or URIs
         if(!qnm.hasPrefix() || !qnm.hasURI()) continue;
+
         // skip XML namespace
-        byte[] apref = qnm.prefix();
+        final byte[] apref = qnm.prefix();
         if(eq(apref, XML)) continue;
 
         final byte[] auri = qnm.uri();
-        final int pos = cns.get(apref);
-        if(pos == -1) {
-          // add undeclared namespace
-          cns.add(apref, auri);
-        } else if(!eq(cns.value(pos), auri)) {
-          // prefixes with different URIs exist; new one must be replaced
-          apref = null;
-          // check if one of the existing prefixes can be adopted
-          for(int a = 0; a < cns.size(); a++) {
-            if(eq(cns.value(a), auri)) apref = cns.key(a);
-          }
-          // if negative, generate a new one that is not used yet
-          if(apref == null) {
-            int i = 1;
-            do {
-              apref = concat(qnm.prefix(), new byte[] { '_' }, token(i++));
-            } while(cns.contains(apref));
-            cns.add(apref, auri);
-          }
-          // overwrite existing attribute with new one
-          c.atts.item[n] = new FAttr(new QNm(concat(apref, COLON,
-              qnm.local()), qnm.uri()), c.atts.get(n).string());
+        final byte[] npref = addNS(apref, auri, ns);
+        if(npref != null) {
+          constr.atts.item[a] = new FAttr(
+              new QNm(concat(npref, COLON, qnm.local()), auri), att.string());
         }
       }
-      // return generated node
-      return node;
+
+      // add inherited namespaces
+      final Atts stack = ctx.ns.stack();
+      for(int a = stack.size() - 1; a >= 0; a--) {
+        final byte[] pref = stack.name(a);
+        if(!ns.contains(pref)) ns.add(pref, stack.string(a));
+      }
+
+      // update parent references of children
+      for(int c = 0; c < constr.children.size(); ++c) {
+        final ANode child = constr.children.get(c).parent(node);
+        // add inherited and remove unused namespaces
+        if(child.type == NodeType.ELM) {
+          if(ctx.nsInherit) inherit(child, ns);
+          if(!ctx.nsPreserve) noPreserve(child);
+          child.optimize();
+        }
+      }
+
+      // return generated and optimized node
+      return node.optimize();
 
     } finally {
       ctx.ns.size(s);
     }
+  }
+
+  /**
+   * Removes unused namespaces.
+   * @param node to be modified
+   */
+  private void noPreserve(final ANode node) {
+    final Atts ns = node.namespaces();
+    final byte[] pref = node.qname().prefix();
+    for(int i = ns.size() - 1; i >= 0; i--) {
+      boolean f = eq(ns.name(i), pref);
+      final AxisIter atts = node.attributes();
+      for(ANode it; f && (it = atts.next()) != null;) {
+        f |= eq(it.qname().prefix(), pref);
+      }
+      if(!f) ns.delete(i);
+    }
+  }
+
+  /**
+   * Inherits namespaces.
+   * @param node to be modified
+   * @param nsp in-scope namespaces
+   */
+  private void inherit(final ANode node, final Atts nsp) {
+    final Atts ns = node.namespaces();
+    for(int a = nsp.size() - 1; a >= 0; a--) {
+      final byte[] pref = nsp.name(a);
+      if(!ns.contains(pref)) ns.add(pref, nsp.string(a));
+    }
+  }
+
+  /**
+   * Adds the specified namespace to the namespace array.
+   * If the prefix is already used for another URI, a new
+   * name is generated.
+   * @param pref prefix
+   * @param uri uri
+   * @param ns namespaces
+   * @return resulting prefix
+   */
+  private byte[] addNS(final byte[] pref, final byte[] uri, final Atts ns) {
+    final byte[] u = ns.string(pref);
+    if(u == null) {
+      // add undeclared namespace
+      ns.add(pref, uri);
+    } else if(!eq(u, uri)) {
+      // prefixes with different URIs exist; new one must be replaced
+      byte[] apref = null;
+      // check if one of the existing prefixes can be adopted
+      for(int c = 0; c < ns.size(); c++) {
+        if(eq(ns.string(c), uri)) apref = ns.name(c);
+      }
+      // if negative, generate a new one that is not used yet
+      if(apref == null) {
+        int i = 1;
+        do {
+          apref = concat(pref, new byte[] { '_' }, token(i++));
+        } while(ns.contains(apref));
+        ns.add(apref, uri);
+      }
+      return apref;
+    }
+    return null;
   }
 
   /**
@@ -151,9 +220,9 @@ public final class CElem extends CName {
    * @return old stack position
    */
   private int prepare(final QueryContext ctx) {
-    int s = ctx.ns.size();
-    for(int n = 0; n < nsp.size(); n++) {
-      ctx.ns.add(nsp.key(n), nsp.value(n));
+    final int s = ctx.ns.size();
+    for(int n = 0; n < nspaces.size(); n++) {
+      ctx.ns.add(nspaces.name(n), nspaces.string(n));
     }
     return s;
   }

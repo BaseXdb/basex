@@ -129,6 +129,14 @@ public abstract class ANode extends Item {
   public abstract QNm update(final QNm nm);
 
   /**
+   * Minimizes the memory consumption of the node.
+   * @return self reference
+   */
+  public ANode optimize() {
+    return this;
+  }
+
+  /**
    * Returns all namespaces defined for the nodes.
    * Overwritten by {@link FElem} and {@link DBNode}.
    * @return namespace array
@@ -138,7 +146,7 @@ public abstract class ANode extends Item {
   }
 
   /**
-   * Returns the namespace hierarchy.
+   * Returns a copy of the namespace hierarchy.
    * @return namespaces
    */
   public final Atts nsScope() {
@@ -148,8 +156,8 @@ public abstract class ANode extends Item {
       final Atts n = node.namespaces();
       if(n != null) {
         for(int a = n.size() - 1; a >= 0; a--) {
-          final byte[] key = n.key(a);
-          if(!ns.contains(key)) ns.add(key, n.value(a));
+          final byte[] key = n.name(a);
+          if(!ns.contains(key)) ns.add(key, n.string(a));
         }
       }
       node = node.parent();
@@ -167,7 +175,7 @@ public abstract class ANode extends Item {
     final Atts at = namespaces();
     if(at != null) {
       final int i = at.get(pref);
-      if(i != -1) return at.value(i);
+      if(i != -1) return at.string(i);
       final ANode n = parent();
       if(n != null) return n.uri(pref, ctx);
     }
@@ -258,7 +266,7 @@ public abstract class ANode extends Item {
    * Returns an attribute axis iterator.
    * @return iterator
    */
-  public abstract AxisIter attributes();
+  public abstract AxisMoreIter attributes();
 
   /**
    * Returns a child axis iterator.

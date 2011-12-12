@@ -27,7 +27,7 @@ public final class StoreTest {
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Number of runs per client. */
-  private static final int NQUERIES = 1000;
+  private static final int NQUERIES = 100;
 
   /**
    * Initializes the test.

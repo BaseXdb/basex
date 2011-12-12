@@ -372,7 +372,8 @@ pc_direrr="%" points to a directory.
 # Database commands
 db_no=Database '%' is niet gevonden.
 db_invalid=Naam '%' is ongeldig.
-db_locked=Database '%' is momenteel gelockt.
+db_pinned=Database '%' is currently opened by another client.
+db_updated=Database '%' is being updated, or update was not completed.
 db_closed=Database '%' is gesloten.
 db_closeerr=Database '%' kon niet gesloten worden.
 db_optimized=Database '%' geoptimaliseerd in %.

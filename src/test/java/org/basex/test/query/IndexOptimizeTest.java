@@ -146,6 +146,19 @@ public final class IndexOptimizeTest {
   }
 
   /**
+   * Checks if a full-text index with language option is used.
+   * @throws Exception unexpected exception
+   */
+  @Test
+  public void ftTestLang() throws Exception {
+    new Set(Prop.LANGUAGE, "de").execute(CONTEXT);
+    createDoc();
+    new Open(NAME).execute(CONTEXT);
+    check("//text()[. contains text 'test' using language 'de']");
+    check("//text()[. contains text 'test' using language 'German']");
+  }
+
+  /**
    * Checks index optimizations inside functions.
    * @throws Exception unexpected exception
    */

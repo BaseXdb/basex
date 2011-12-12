@@ -29,9 +29,6 @@ import org.basex.util.list.IntList;
  * @author Christian Gruen
  */
 public abstract class Builder extends Progress {
-  /** Meta data on built database. */
-  public MetaData meta;
-
   /** Tree structure. */
   protected final PathSummary path = new PathSummary(null);
   /** Namespace index. */
@@ -43,10 +40,12 @@ public abstract class Builder extends Progress {
   /** Database name. */
   protected final String name;
 
+  /** Meta data on built database. */
+  protected MetaData meta;
   /** Tag name index. */
-  protected final Names tags;
+  private Names tags;
   /** Attribute name index. */
-  protected final Names atts;
+  private Names atts;
 
   /** Number of cached size values. */
   protected int ssize;
@@ -74,20 +73,26 @@ public abstract class Builder extends Progress {
     parser = parse;
     prop = pr;
     name = nm;
-    final int cats = pr.num(Prop.CATEGORIES);
-    tags = new Names(cats);
-    atts = new Names(cats);
   }
 
   // PUBLIC METHODS ===========================================================
 
   /**
    * Builds the database.
+   * @param md meta data
+   * @param ta tag index
+   * @param at attribute name index
    * @throws IOException I/O exception
    */
-  protected final void parse() throws IOException {
+  protected final void parse(final MetaData md, final Names ta, final Names at)
+      throws IOException {
+
     final Performance perf = Util.debug ? new Performance() : null;
     Util.debug(tit() + DOTS);
+
+    meta = md;
+    tags = ta;
+    atts = at;
 
     // add document node and parse document
     parser.parse(this);
@@ -112,7 +117,7 @@ public abstract class Builder extends Progress {
    */
   public final void startDoc(final byte[] value) throws IOException {
     pstack.set(lvl++, meta.size);
-    if(meta.pathindex) path.index(0, Data.DOC, lvl);
+    if(meta.createpath) path.index(0, Data.DOC, lvl);
     addDoc(value);
     ns.open();
   }
@@ -318,7 +323,7 @@ public abstract class Builder extends Progress {
     // get tag reference
     int n = tags.index(nm, null, true);
 
-    if(meta.pathindex) path.index(n, Data.ELEM, lvl);
+    if(meta.createpath) path.index(n, Data.ELEM, lvl);
 
     // cache pre value
     final int pre = meta.size;
@@ -335,10 +340,10 @@ public abstract class Builder extends Progress {
 
     // get and store attribute references
     for(int a = 0; a < as; ++a) {
-      n = atts.index(att.key(a), att.value(a), true);
-      u = ns.uri(att.key(a), false);
-      if(meta.pathindex) path.index(n, Data.ATTR, lvl + 1);
-      addAttr(n, att.value(a), Math.min(IO.MAXATTS, a + 1), u);
+      n = atts.index(att.name(a), att.string(a), true);
+      u = ns.uri(att.name(a), false);
+      if(meta.createpath) path.index(n, Data.ATTR, lvl + 1);
+      addAttr(n, att.string(a), Math.min(IO.MAXATTS, a + 1), u);
     }
 
     if(lvl != 0) {
@@ -389,7 +394,7 @@ public abstract class Builder extends Progress {
     // set leaf node information in index
     else if(lvl > 1) tags.stat(tstack.get(lvl - 1)).leaf = false;
 
-    if(meta.pathindex) path.index(0, kind, lvl);
+    if(meta.createpath) path.index(0, kind, lvl);
     addText(value, lvl == 0 ? 1 : meta.size - pstack.get(lvl - 1), kind);
   }
 

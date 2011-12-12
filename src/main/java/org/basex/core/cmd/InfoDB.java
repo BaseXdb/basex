@@ -83,7 +83,7 @@ public final class InfoDB extends AInfo {
         format(tb, INFOPATHINDEX, Util.flag(meta.pathindex));
         format(tb, INFOTEXTINDEX, Util.flag(meta.textindex));
         format(tb, INFOATTRINDEX, Util.flag(meta.attrindex));
-        format(tb, INFOFTINDEX, Util.flag(meta.ftindex) + (meta.ftindex &&
+        format(tb, INFOFTINDEX, Util.flag(meta.ftxtindex) + (meta.ftxtindex &&
             meta.wildcards ? " (" + INFOWCINDEX + ")" : ""));
       }
     }

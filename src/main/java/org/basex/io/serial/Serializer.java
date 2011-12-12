@@ -37,7 +37,7 @@ public abstract class Serializer {
   protected boolean undecl;
 
   /** Currently available namespaces. */
-  private final Atts ns = new Atts().add(XML, XMLURI).add(EMPTY, EMPTY);
+  private final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
   /** Namespace stack. */
   private final IntList nsl = new IntList();
   /** Indicates if an element has not been completely opened yet. */
@@ -79,19 +79,19 @@ public abstract class Serializer {
 
   /**
    * Opens an element.
-   * @param t tag
-   * @param a attributes
+   * @param name tag name
+   * @param atts attributes
    * @throws IOException I/O exception
    */
-  public final void openElement(final byte[] t, final byte[]... a)
+  public final void openElement(final byte[] name, final byte[]... atts)
       throws IOException {
 
     finishElement();
     nsl.push(ns.size());
     elem = true;
-    tag = t;
-    startOpen(t);
-    for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
+    tag = name;
+    startOpen(name);
+    for(int i = 0; i < atts.length; i += 2) attribute(atts[i], atts[i + 1]);
   }
 
   /**
@@ -112,58 +112,59 @@ public abstract class Serializer {
 
   /**
    * Opens and closes an empty element.
-   * @param t tag
-   * @param a attributes
+   * @param name tag name
+   * @param atts attributes
    * @throws IOException I/O exception
    */
-  public final void emptyElement(final byte[] t, final byte[]... a)
+  public final void emptyElement(final byte[] name, final byte[]... atts)
       throws IOException {
 
-    openElement(t, a);
+    openElement(name, atts);
     closeElement();
   }
 
 
   /**
    * Serializes a text.
-   * @param b text bytes
+   * @param value text bytes
    * @throws IOException I/O exception
    */
-  public final void text(final byte[] b) throws IOException {
+  public final void text(final byte[] value) throws IOException {
     finishElement();
-    finishText(b);
+    finishText(value);
   }
 
   /**
    * Serializes a comment.
-   * @param b comment
+   * @param value value
    * @throws IOException I/O exception
    */
-  public final void comment(final byte[] b) throws IOException {
+  public final void comment(final byte[] value) throws IOException {
     finishElement();
-    finishComment(b);
+    finishComment(value);
   }
 
   /**
    * Serializes a processing instruction.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    * @throws IOException I/O exception
    */
-  public final void pi(final byte[] n, final byte[] v) throws IOException {
+  public final void pi(final byte[] name, final byte[] value)
+      throws IOException {
     finishElement();
-    finishPi(n, v);
+    finishPi(name, value);
   }
 
   /**
    * Serializes an item. This method is internally called;
    * call {@link Item#serialize} instead.
-   * @param b text bytes
+   * @param item text bytes
    * @throws IOException I/O exception
    */
-  public final void item(final Item b) throws IOException {
+  public final void item(final Item item) throws IOException {
     finishElement();
-    finishItem(b);
+    finishItem(item);
   }
 
   /**
@@ -189,7 +190,7 @@ public abstract class Serializer {
       throws IOException {
 
     boolean doc = false;
-    final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
+    final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
     final IntList pars = new IntList();
     int l = 0;
     int p = pre;
@@ -233,7 +234,7 @@ public abstract class Serializer {
 
           // check namespace of current element
           byte[] key = prefix(name);
-          byte[] val = data.ns.uri(data.uri(p, k));
+          byte[] val = data.nspaces.uri(data.uri(p, k));
           if(val == null) val = EMPTY;
           // add new or updated namespace
           final byte[] old = ns(key);
@@ -242,8 +243,8 @@ public abstract class Serializer {
           do {
             final Atts atn = data.ns(pp);
             for(int n = 0; n < atn.size(); ++n) {
-              key = atn.key(n);
-              val = atn.value(n);
+              key = atn.name(n);
+              val = atn.string(n);
               if(!nsp.contains(key)) {
                 nsp.add(key);
                 namespace(key, val);
@@ -274,24 +275,24 @@ public abstract class Serializer {
   /**
    * Opens an element, adopting the expression name as element name.
    * @param expr expression info
-   * @param a attributes
+   * @param atts attributes
    * @throws IOException I/O exception
    */
-  public final void openElement(final ExprInfo expr, final byte[]... a)
+  public final void openElement(final ExprInfo expr, final byte[]... atts)
       throws IOException {
-    openElement(info(expr), a);
+    openElement(info(expr), atts);
   }
 
   /**
    * Opens and closes an empty element, adopting the expression name as
    * element name.
    * @param expr expression info
-   * @param a attributes
+   * @param atts attributes
    * @throws IOException I/O exception
    */
-  public final void emptyElement(final ExprInfo expr, final byte[]... a)
+  public final void emptyElement(final ExprInfo expr, final byte[]... atts)
       throws IOException {
-    emptyElement(info(expr), a);
+    emptyElement(info(expr), atts);
   }
 
   /**
@@ -326,17 +327,19 @@ public abstract class Serializer {
   public void close() throws IOException { }
 
   /**
-   * Serializes a namespace.
-   * @param n name
-   * @param v value
+   * Serializes a namespace if it has not been serialized by an ancestor yet.
+   * @param pref prefix
+   * @param uri URI
    * @throws IOException I/O exception
    */
-  public void namespace(final byte[] n, final byte[] v) throws IOException {
-    if(!undecl && n.length != 0 && v.length == 0) return;
-    final byte[] uri = ns(n);
-    if(uri == null || !eq(uri, v)) {
-      attribute(n.length == 0 ? XMLNS : concat(XMLNSC, n), v);
-      ns.add(n, v);
+  public void namespace(final byte[] pref, final byte[] uri)
+      throws IOException {
+
+    if(!undecl && pref.length != 0 && uri.length == 0) return;
+    final byte[] u = ns(pref);
+    if(u == null || !eq(u, uri)) {
+      attribute(pref.length == 0 ? XMLNS : concat(XMLNSC, pref), uri);
+      ns.add(pref, uri);
     }
   }
 
@@ -355,21 +358,21 @@ public abstract class Serializer {
 
   /**
    * Serializes an attribute.
-   * @param n name
-   * @param v value
+   * @param name name
+   * @param value value
    * @throws IOException I/O exception
    */
-  public abstract void attribute(final byte[] n, final byte[] v)
+  public abstract void attribute(final byte[] name, final byte[] value)
       throws IOException;
 
   // PROTECTED METHODS ========================================================
 
   /**
    * Starts an element.
-   * @param t tag
+   * @param n tag name
    * @throws IOException I/O exception
    */
-  protected abstract void startOpen(final byte[] t) throws IOException;
+  protected abstract void startOpen(final byte[] n) throws IOException;
 
   /**
    * Finishes an opening element node.
@@ -391,17 +394,17 @@ public abstract class Serializer {
 
   /**
    * Serializes a text.
-   * @param b text bytes
+   * @param v value
    * @throws IOException I/O exception
    */
-  protected abstract void finishText(final byte[] b) throws IOException;
+  protected abstract void finishText(final byte[] v) throws IOException;
 
   /**
    * Serializes a comment.
-   * @param b comment
+   * @param v value
    * @throws IOException I/O exception
    */
-  protected abstract void finishComment(final byte[] b) throws IOException;
+  protected abstract void finishComment(final byte[] v) throws IOException;
 
   /**
    * Serializes a processing instruction.
@@ -414,30 +417,30 @@ public abstract class Serializer {
 
   /**
    * Serializes an item.
-   * @param b text bytes
+   * @param i item
    * @throws IOException I/O exception
    */
-  protected abstract void finishItem(final Item b) throws IOException;
+  protected abstract void finishItem(final Item i) throws IOException;
 
   /**
    * Serializes a text.
-   * @param b text bytes
+   * @param v value
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void finishText(final byte[] b, final FTPos ftp)
+  protected void finishText(final byte[] v, final FTPos ftp)
       throws IOException {
-    text(b);
+    text(v);
   }
 
   /**
    * Opens a document.
-   * @param name name
+   * @param n name
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void openDoc(final byte[] name) throws IOException { };
+  protected void openDoc(final byte[] n) throws IOException { };
 
   /**
    * Closes a document.
@@ -473,24 +476,24 @@ public abstract class Serializer {
 
   /**
    * Gets the URI currently bound by the given prefix.
-   * @param pre namespace prefix
+   * @param pref namespace prefix
    * @return URI if found, {@code null} otherwise
    */
-  private byte[] ns(final byte[] pre) {
+  private byte[] ns(final byte[] pref) {
     for(int i = ns.size() - 1; i >= 0; i--)
-      if(eq(ns.key(i), pre)) return ns.value(i);
+      if(eq(ns.name(i), pref)) return ns.string(i);
     return null;
   }
 
   /**
    * Serializes a text.
-   * @param b text bytes
+   * @param v text bytes
    * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
-  private void text(final byte[] b, final FTPos ftp) throws IOException {
+  private void text(final byte[] v, final FTPos ftp) throws IOException {
     finishElement();
-    finishText(b, ftp);
+    finishText(v, ftp);
   }
 
   /**

@@ -50,7 +50,7 @@ public final class Replace extends Update {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Constr c = new Constr(ii, ctx, expr[1]);
+    final Constr c = new Constr(ii, ctx).add(expr[1]);
     if(c.errAtt) UPNOATTRPER.thrw(input);
     if(c.duplAtt != null) UPATTDUPL.thrw(input, c.duplAtt);
 

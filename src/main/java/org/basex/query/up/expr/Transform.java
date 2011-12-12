@@ -83,7 +83,7 @@ public final class Transform extends Arr {
 
         // copy node to main memory data instance
         final MemData md = new MemData(ctx.context.prop);
-        new DataBuilder(md).context(ctx).build((ANode) i);
+        new DataBuilder(md).build((ANode) i);
 
         // add resulting node to variable
         ctx.vars.add(fo.var.bind(new DBNode(md, 0), ctx).copy());

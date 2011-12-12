@@ -139,7 +139,7 @@ final class DatabaseUpdates {
           final byte[] nm = data.name(p, Data.ATTR);
           if(!il.contains(p)) {
             final QNm name = new QNm(nm);
-            final byte[] uri = data.ns.uri(data.ns.uri(nm, p));
+            final byte[] uri = data.nspaces.uri(data.nspaces.uri(nm, p));
             if(uri != null) name.uri(uri);
             pool.add(name, NodeType.ATT);
           }
@@ -197,7 +197,7 @@ final class DatabaseUpdates {
     treeAwareUpdates();
 
     // mark disk database instances as updating
-    if(!data.lock()) LOCKED.thrw(null, data.meta.name);
+    if(!data.updating(true)) LOCK.thrw(null, data.meta.name);
 
     /*
      * For each target node, the update primitives in the corresponding
@@ -230,7 +230,7 @@ final class DatabaseUpdates {
     data.flush();
 
     // mark disk database instances as updating
-    if(!data.unlock()) LOCKED.thrw(null, data.meta.name);
+    if(!data.updating(false)) UNLOCK.thrw(null, data.meta.name);
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {

@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
 /**
- * Fragment constructor with name.
+ * Abstract fragment constructor with a QName argument.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -26,7 +26,7 @@ import org.basex.util.XMLToken;
 public abstract class CName extends CFrag {
   /** Description. */
   private final String desc;
-  /** Name. */
+  /** QName. */
   protected Expr name;
 
   /**

@@ -244,7 +244,20 @@ public final class UserFuncs extends ExprInfo {
     for(int i = 0; i < func.length; ++i) {
       for(final UserFuncCall c : calls[i]) c.init(func[i]);
     }
-    for(final UserFunc f : func) f.check();
+    for(final UserFunc f : func) {
+      if(!f.declared || f.expr == null) {
+        // function has not been declare yet
+        for(final UserFunc uf : func) {
+          // check if another function with same name exists
+          if(f != uf && f.name.eq(uf.name)) {
+            FUNCTYPE.thrw(f.input, uf.name.string());
+          }
+        }
+        // if not, indicate that function is unknown
+        FUNCUNKNOWN.thrw(f.input, f.name.string());
+      }
+      f.checkUp();
+    }
   }
 
   /**

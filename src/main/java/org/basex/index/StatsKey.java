@@ -2,6 +2,8 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.data.MetaData;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.hash.TokenSet;
@@ -35,31 +37,31 @@ public final class StatsKey {
   /** Leaf node flag. */
   public boolean leaf;
 
-  /** Maximum number of string categories. */
-  private final int maxcats;
+  /** Reference to meta data. */
+  private final MetaData meta;
   /** Maximum text length. */
   private double len;
 
   /**
    * Default constructor.
-   * @param c number of string categories
+   * @param md meta data
    */
-  public StatsKey(final int c) {
+  public StatsKey(final MetaData md) {
     cats = new TokenSet();
     kind = Kind.INT;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
     leaf = true;
-    maxcats = c;
+    meta = md;
   }
 
   /**
    * Constructor, specifying an input stream.
    * @param in input stream
-   * @param c number of string categories
+   * @param md meta data
    * @throws IOException I/O exception
    */
-  public StatsKey(final DataInput in, final int c) throws IOException {
+  public StatsKey(final DataInput in, final MetaData md) throws IOException {
     kind = Kind.values()[in.readNum()];
 
     if(kind == Kind.INT || kind == Kind.DBL) {
@@ -73,7 +75,7 @@ public final class StatsKey {
     counter = in.readNum();
     leaf = in.readBool();
     len = in.readDouble();
-    maxcats = c;
+    meta = md;
   }
 
   /**
@@ -106,7 +108,7 @@ public final class StatsKey {
    * Adds a value. All values are first treated as integer values. If a value
    * can't be converted to an integer, it is treated as double value. If
    * conversion fails again, it is handled as string category. Next, all values
-   * are cached. As soon as their number exceeds {@link #maxcats}, the cached
+   * are cached. As soon as their number exceeds a maximum, the cached
    * values are skipped, and contents are treated as arbitrary strings.
    * @param val value to be added
    */
@@ -116,8 +118,8 @@ public final class StatsKey {
 
     if(vl == 0 || kind == Kind.TEXT || ws(val)) return;
 
-    if(cats != null && cats.size() <= maxcats) {
-      if(val.length > MAXLEN) {
+    if(cats != null && cats.size() <= meta.maxcats) {
+      if(val.length > meta.maxlen) {
         kind = Kind.TEXT;
         cats = null;
       } else {
@@ -136,13 +138,13 @@ public final class StatsKey {
     if(kind == Kind.DBL) {
       final double d = toDouble(val);
       if(Double.isNaN(d)) {
-        kind = cats.size() <= maxcats ? Kind.CAT : Kind.TEXT;
+        kind = cats.size() <= meta.maxcats ? Kind.CAT : Kind.TEXT;
       } else {
         if(min > d) min = d;
         if(max < d) max = d;
       }
     } else if(kind == Kind.CAT) {
-      if(cats.size() > maxcats) {
+      if(cats.size() > meta.maxcats) {
         kind = Kind.TEXT;
         cats = null;
       }

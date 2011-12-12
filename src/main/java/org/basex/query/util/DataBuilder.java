@@ -28,10 +28,6 @@ public final class DataBuilder {
   private DataFTBuilder ftbuilder;
   /** Index reference of marker tag. */
   private int marker;
-  /** Preserve flag. */
-  private boolean preserve = true;
-  /** Inherit flag. */
-  private boolean inherit = true;
 
   /**
    * Constructor.
@@ -39,17 +35,6 @@ public final class DataBuilder {
    */
   public DataBuilder(final MemData md) {
     data = md;
-  }
-
-  /**
-   * Attaches flags of the query context.
-   * @param ctx query context
-   * @return self reference
-   */
-  public DataBuilder context(final QueryContext ctx) {
-    preserve = ctx.nsPreserve;
-    inherit = ctx.nsInherit;
-    return this;
   }
 
   /**
@@ -97,7 +82,7 @@ public final class DataBuilder {
 
     switch(nd.nodeType()) {
       case DOC: return addDoc(nd, pre);
-      case ELM: return addElem(nd, pre, par, ndPar);
+      case ELM: return addElem(nd, pre, par);
       case TXT: return pre + addText(nd, pre, par, ndPar);
       case ATT: return pre + addAttr(nd, pre, par);
       case COM: return pre + addComm(nd, pre, par);
@@ -136,8 +121,8 @@ public final class DataBuilder {
     int u = 0;
     final boolean ne = uri.length != 0;
     if(ne) {
-      if(par == 0) data.ns.add(ms, pre - par, q.prefix(), uri);
-      u = data.ns.addURI(uri);
+      if(par == 0) data.nspaces.add(ms, pre - par, q.prefix(), uri);
+      u = data.nspaces.addURI(uri);
     }
     final int n = data.atnindex.index(q.string(), null, false);
     // attribute namespace flag is only set in main memory instance
@@ -163,7 +148,7 @@ public final class DataBuilder {
     if(tl == null) return addText(nd.string(), dist);
 
     // adopt namespace from parent
-    final int u = ndPar != null ? data.ns.uri(ndPar.name(), true) : 0;
+    final int u = ndPar != null ? data.nspaces.uri(ndPar.name(), true) : 0;
 
     for(int i = 0; i < tl.size(); i++) {
       byte[] text = tl.get(i);
@@ -226,52 +211,21 @@ public final class DataBuilder {
    * @param nd node to be added
    * @param pre pre reference
    * @param par parent reference
-   * @param ndPar parent node
    * @return number of added nodes
    */
-  private int addElem(final ANode nd, final int pre, final int par,
-      final ANode ndPar) {
-
+  private int addElem(final ANode nd, final int pre, final int par) {
     final int ms = data.meta.size;
+    data.nspaces.open();
+
+    // add new namespaces
+    final Atts ns = nd.nsScope();
+    final boolean ne = ns.size() > 0;
+    for(int a = 0, as = ns.size(); a < as; a++)
+      data.nspaces.add(ns.name(a), ns.string(a), ms);
+
     final QNm q = nd.qname();
-    data.ns.open();
-    boolean ne = false;
-
-    // best way to determine necessary descendant namespace bindings?
-    Atts ns = null;
-    if(!preserve) {
-      ns = nd.namespaces();
-      // detect default namespace bindings on ancestor axis of nd and
-      // remove them to avoid duplicates
-      final Atts ns2 = inherit ? nd.nsScope() : nd.namespaces();
-      int uid;
-      if((uid = ns2.get(EMPTY)) != -1) ns.add(ns2.key(uid), ns2.value(uid));
-    } else {
-      ns = par == 0 && inherit ? nd.nsScope() : nd.namespaces();
-    }
-
-    if(ns != null) {
-      if(ns.size() > 0 && ndPar != null && preserve) {
-        // remove duplicate namespace bindings
-        final Atts nsPar = inherit ? nd.nsScope() : nd.namespaces();
-        for(int j = 0; j < nsPar.size(); ++j) {
-          //final byte[] key = nsPar.key(j);
-          //final int ki = ns.get(key);
-          // check if prefix (or empty prefix) is already indexed and if so
-          // check for different URIs. If the URIs are different the
-          // prefix must be added to the index
-          //if(ki > -1 && eq(nsPar.val(j), ns.val(ki))) ns.delete(ki);
-        }
-      }
-      ne = ns.size() > 0;
-
-      // add new namespaces
-      for(int a = 0; ne && a < ns.size(); ++a)
-        data.ns.add(ns.key(a), ns.value(a), ms);
-    }
-
     final byte[] uri = q.uri();
-    final int u = uri.length != 0 ? data.ns.addURI(uri) : 0;
+    final int u = uri.length != 0 ? data.nspaces.addURI(uri) : 0;
     final int tn = data.tagindex.index(q.string(), null, false);
     final int s = size(nd, false);
 
@@ -289,7 +243,7 @@ public final class DataBuilder {
     // add children
     ai = nd.children();
     for(ANode ch; (ch = ai.next()) != null;) p = addNode(ch, p, pre, nd);
-    data.ns.close(ms);
+    data.nspaces.close(ms);
 
     // update size if additional nodes have been added by the descendants
     if(s != p - pp) data.size(ms, Data.ELEM, p - pp);
@@ -334,30 +288,30 @@ public final class DataBuilder {
     final DataBuilder db = new DataBuilder(md);
     db.build(node);
 
-    // flag indicating if ZIP namespace should be completely removed
+    // flag indicating if namespace should be completely removed
     boolean del = true;
     // loop through all nodes
     for(int pre = 0; pre < md.meta.size; pre++) {
       // only check elements and attributes
       final int kind = md.kind(pre);
       if(kind != Data.ELEM && kind != Data.ATTR) continue;
-      // check if ZIP namespace is referenced
-      final byte[] uri = md.ns.uri(md.uri(pre, kind));
+      // check if namespace is referenced
+      final byte[] uri = md.nspaces.uri(md.uri(pre, kind));
       if(uri == null || !eq(uri, ns)) continue;
 
       final byte[] name = md.name(pre, kind);
       if(prefix(name).length == 0) {
-        // no prefix: remove ZIP namespace from element
+        // no prefix: remove namespace from element
         if(kind == Data.ELEM) {
           md.update(pre, kind, name, EMPTY);
           md.nsFlag(pre, false);
         }
       } else {
-        // zip prefix: retain ZIP namespace
+        // prefix: retain namespace
         del = false;
       }
     }
-    if(del) md.ns.delete(ns);
+    if(del) md.nspaces.delete(ns);
     return new DBNode(md, 0);
   }
 }

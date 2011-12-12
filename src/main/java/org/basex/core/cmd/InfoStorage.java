@@ -81,8 +81,9 @@ public final class InfoStorage extends AQuery {
     for(int p = ps; p < pe; ++p) table(table, data, p);
     tb.add(table.finish());
 
-    final byte[] ns = data.ns.table(ps, pe);
-    if(ns.length != 0) tb.add(NL).add(ns).add(data.ns.toString(ps, pe)).add(NL);
+    final byte[] ns = data.nspaces.table(ps, pe);
+    if(ns.length != 0)
+      tb.add(NL).add(ns).add(data.nspaces.toString(ps, pe)).add(NL);
     return tb.finish();
   }
 

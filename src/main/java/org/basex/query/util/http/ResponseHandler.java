@@ -14,6 +14,7 @@ import org.basex.build.Parser;
 import org.basex.build.file.HTMLParser;
 import org.basex.core.Prop;
 import org.basex.io.IOContent;
+import org.basex.io.MimeTypes;
 import org.basex.io.in.TextInput;
 import org.basex.query.QueryException;
 import org.basex.query.item.B64;
@@ -42,9 +43,9 @@ import org.basex.util.list.ByteList;
 public final class ResponseHandler {
   /** Response element. */
   /** http:response element. */
-  private static final byte[] RESPONSE = token("http:response");
+  private static final byte[] HTTP_RESPONSE = token("http:response");
   /** http:multipart element. */
-  private static final byte[] MULTIPART = token("http:multipart");
+  private static final byte[] HTTP_MULTIPART = token("http:multipart");
   /** part element. */
   private static final byte[] PART = token("part");
   /** boundary marker. */
@@ -52,7 +53,7 @@ public final class ResponseHandler {
 
   /** Header element. */
   /** http:header element. */
-  private static final byte[] HEADER = token("http:header");
+  private static final byte[] HTTP_HEADER = token("http:header");
   /** Header attribute: name. */
   private static final byte[] HDR_NAME = token("name");
   /** Header attribute: value. */
@@ -60,7 +61,7 @@ public final class ResponseHandler {
 
   /** Body element. */
   /** http:body element. */
-  private static final byte[] BODY = token("http:body");
+  private static final byte[] HTTP_BODY = token("http:body");
   /** Body attribute: media-type. */
   private static final byte[] MEDIATYPE = token("media-type");
 
@@ -69,30 +70,10 @@ public final class ResponseHandler {
   /** Response attribute: message. */
   private static final byte[] MSG = token("message");
 
-  /** Media Types. */
-  /** XML media type. */
-  private static final byte[] APPL_XML = token("application/xml");
-  /** XML media type. */
-  private static final byte[] APPL_EXT_XML =
-    token("application/xml-external-parsed-entity");
-  /** XML media type. */
-  private static final byte[] TXT_XML = token("text/xml");
-  /** XML media type. */
-  private static final byte[] TXT_EXT_XML =
-    token("text/xml-external-parsed-entity");
-  /** XML media types' suffix. */
-  private static final byte[] MIME_XML_SUFFIX = token("+xml");
-  /** HTML media type. */
-  private static final byte[] TXT_HTML = token("text/html");
-  /** Media type application/octet-stream. */
-  private static final byte[] OCT_STREAM = token("application/octet-stream");
-  /** Text media types' prefix. */
-  private static final byte[] MIME_TEXT_PREFIX = token("text/");
-
-  /** Content type text/plain. */
-  private static final byte[] TXT_PLAIN = token("text/plain");
   /** HTTP header Content-Type lower case. */
   private static final byte[] CONT_TYPE_LC = token("content-type");
+  /** Multipart string. */
+  private static final String MULTIPART = "multipart";
 
   /**
    * Constructor.
@@ -119,34 +100,34 @@ public final class ResponseHandler {
 
     final NodeCache attrs = extractAttrs(conn);
     final NodeCache hdrs = extractHdrs(conn);
-    final byte[] contentType = mediaTypeOvr == null ?
-        extractContentType(conn.getContentType()) : mediaTypeOvr;
+    final String cType = mediaTypeOvr == null ?
+        extractContentType(conn.getContentType()) : string(mediaTypeOvr);
     final ItemCache payloads = new ItemCache();
     final FNode body;
     final boolean s = statusOnly != null && Bln.parse(statusOnly, ii);
     // multipart response
-    if(startsWith(contentType, token("multipart"))) {
+    if(cType.startsWith(MULTIPART)) {
       final byte[] boundary = extractBoundary(conn.getContentType(), ii);
       final NodeCache a = new NodeCache();
-      a.add(new FAttr(new QNm(MEDIATYPE, EMPTY), contentType));
+      a.add(new FAttr(new QNm(MEDIATYPE, EMPTY), token(cType)));
       a.add(new FAttr(new QNm(BOUNDARY, EMPTY), boundary));
-      body = new FElem(new QNm(MULTIPART, HTTPURI), extractParts(
+      body = new FElem(new QNm(HTTP_MULTIPART, HTTPURI), extractParts(
           conn.getInputStream(), s, payloads, concat(token("--"), boundary),
-          prop, ii), a, new Atts().add(HTTP, HTTPURI));
+          prop, ii), a, new Atts(HTTP, HTTPURI));
       // single part response
     } else {
-      body = createBody(contentType);
+      body = createBody(cType);
       if(!s) payloads.add(
           interpretPayload(
               extractPayload(
-                  conn.getInputStream(),
+                  conn.getInputStream(), cType,
                   extractCharset(conn.getContentType())),
-              contentType, prop, ii));
+              cType, prop, ii));
     }
 
     // construct <http:response/>
-    final FElem responseEl = new FElem(new QNm(RESPONSE, HTTPURI), hdrs, attrs,
-        new Atts().add(HTTP, HTTPURI));
+    final FElem responseEl = new FElem(new QNm(HTTP_RESPONSE, HTTPURI),
+        hdrs, attrs, new Atts(HTTP, HTTPURI));
     responseEl.add(body);
     // result
     final ItemCache result = new ItemCache();
@@ -182,8 +163,8 @@ public final class ResponseHandler {
     final NodeCache h = new NodeCache();
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
-        final FElem hdr = new FElem(new QNm(HEADER, HTTPURI),
-            new Atts().add(HTTP, HTTPURI));
+        final FElem hdr = new FElem(new QNm(HTTP_HEADER, HTTPURI),
+            new Atts(HTTP, HTTPURI));
         hdr.add(new FAttr(new QNm(HDR_NAME, EMPTY), token(headerName)));
         hdr.add(new FAttr(new QNm(HDR_VALUE, EMPTY),
             token(conn.getHeaderField(headerName))));
@@ -198,10 +179,10 @@ public final class ResponseHandler {
    * @param mediaType content type
    * @return body
    */
-  private static FElem createBody(final byte[] mediaType) {
-    final FElem b = new FElem(new QNm(BODY, HTTPURI),
-        new Atts().add(HTTP, HTTPURI));
-    b.add(new FAttr(new QNm(MEDIATYPE, EMPTY), mediaType));
+  private static FElem createBody(final String mediaType) {
+    final FElem b = new FElem(new QNm(HTTP_BODY, HTTPURI),
+        new Atts(HTTP, HTTPURI));
+    b.add(new FAttr(new QNm(MEDIATYPE, EMPTY), token(mediaType)));
     return b;
   }
 
@@ -209,17 +190,24 @@ public final class ResponseHandler {
    * Extracts payload from HTTP message and returns it as a byte array encoded
    * in UTF-8.
    * @param io connection input stream
+   * @param c content type
    * @param cs response content charset
    * @return payload as byte array
    * @throws IOException I/O Exception
    */
-  private static byte[] extractPayload(final InputStream io, final String cs)
-    throws IOException {
+  private static byte[] extractPayload(final InputStream io, final String c,
+      final String cs) throws IOException {
+
     final BufferedInputStream bis = new BufferedInputStream(io);
     try {
       final ByteList bl = new ByteList();
       for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
-      return TextInput.content(new IOContent(bl.toArray()), cs).finish();
+      // In case of XML, HTML or text content type, use supplied character set
+      if(MimeTypes.isXML(c) || c.equals(MimeTypes.TEXT_HTML) ||
+          c.startsWith(MimeTypes.MIME_TEXT_PREFIX))
+        return TextInput.content(new IOContent(bl.toArray()), cs).finish();
+      // In case of binary data, do not encode anything
+      return bl.toArray();
     } finally {
       bis.close();
     }
@@ -237,18 +225,17 @@ public final class ResponseHandler {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private static Item interpretPayload(final byte[] p, final byte[] c,
+  private static Item interpretPayload(final byte[] p, final String c,
       final Prop prop, final InputInfo ii) throws IOException, QueryException {
 
-    if(eq(c, TXT_XML) || eq(c, TXT_EXT_XML) || eq(c, APPL_XML) ||
-        eq(c, APPL_EXT_XML) || endsWith(c, MIME_XML_SUFFIX)) {
+    if(MimeTypes.isXML(c)) {
       return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
     }
-    if(eq(c, TXT_HTML)) {
+    if(c.equals(MimeTypes.TEXT_HTML)) {
       if(!HTMLParser.available()) throw HTMLERR.thrw(ii);
       return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
     }
-    return startsWith(c, MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
+    return c.startsWith(MimeTypes.MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
   }
 
   /**
@@ -310,20 +297,19 @@ public final class ResponseHandler {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
-    byte[] partContType = TXT_PLAIN;
+    String partCType = MimeTypes.TEXT_PLAIN;
     String charset = null;
     final byte[] firstLine = readLine(io);
     // last line is reached:
     if(firstLine == null || eq(firstLine, end)) return null;
 
-    final FElem root = new FElem(new QNm(PART, EMPTY),
-        new Atts().add(HTTP, HTTPURI));
+    final FElem root = new FElem(new QNm(PART, EMPTY), new Atts(HTTP, HTTPURI));
 
     //final NodeCache partCh = new NodeCache();
     if(firstLine.length == 0) {
       // part has no headers
       final byte[] p = extractPartPayload(io, sep, end, null);
-      if(!statusOnly) payloads.add(interpretPayload(p, partContType, prop, ii));
+      if(!statusOnly) payloads.add(interpretPayload(p, partCType, prop, ii));
     } else {
       // extract headers:
       byte[] nextHdr = firstLine;
@@ -341,21 +327,21 @@ public final class ResponseHandler {
             final byte[] value = trim(substring(nextHdr, pos + 1,
                 nextHdr.length));
             // construct attributes
-            final FElem hdr = new FElem(new QNm(HEADER, HTTPURI));
+            final FElem hdr = new FElem(new QNm(HTTP_HEADER, HTTPURI));
             hdr.add(new FAttr(new QNm(HDR_NAME, EMPTY), name));
             hdr.add(new FAttr(new QNm(HDR_VALUE, EMPTY), value));
             root.add(hdr);
-            if(eq(lc(name), CONT_TYPE_LC)) partContType = value;
+            if(eq(lc(name), CONT_TYPE_LC)) partCType = string(value);
           }
         }
         nextHdr = readLine(io);
       }
       final byte[] p = extractPartPayload(io, sep, end, charset);
       if(!statusOnly) {
-        payloads.add(interpretPayload(p, partContType, prop, ii));
+        payloads.add(interpretPayload(p, partCType, prop, ii));
       }
     }
-    root.add(createBody(partContType));
+    root.add(createBody(partCType));
     return root;
   }
 
@@ -421,10 +407,10 @@ public final class ResponseHandler {
    * @param c value for "Content-type" header
    * @return result
    */
-  private static byte[] extractContentType(final String c) {
-    if(c == null) return OCT_STREAM;
+  private static String extractContentType(final String c) {
+    if(c == null) return MimeTypes.APP_OCTET;
     final int end = c.indexOf(';');
-    return end == -1 ? token(c) : subtoken(token(c), 0, end);
+    return end == -1 ? c : c.substring(0, end);
   }
 
   /**

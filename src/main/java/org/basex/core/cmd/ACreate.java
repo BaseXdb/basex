@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 
 import java.io.IOException;
 import org.basex.build.Builder;
@@ -81,7 +82,7 @@ public abstract class ACreate extends Command {
     new Close().run(context);
 
     try {
-      if(context.pinned(db)) return error(DBLOCKED, db);
+      if(context.pinned(db)) return error(DBPINNED, db);
 
       final boolean mem = prop.is(Prop.MAINMEM);
       builder = mem ? new MemBuilder(db, parser, prop) :
@@ -97,9 +98,10 @@ public abstract class ACreate extends Command {
         if(!open.run(context)) return error(open.info());
 
         data = context.data();
-        if(prop.is(Prop.TEXTINDEX)) index(IndexType.TEXT,      data);
-        if(prop.is(Prop.ATTRINDEX)) index(IndexType.ATTRIBUTE, data);
-        if(prop.is(Prop.FTINDEX))   index(IndexType.FULLTEXT,  data);
+        if(data.meta.createtext) create(IndexType.TEXT,      data, this);
+        if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
+        if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
+        data.meta.pathindex = data.meta.createpath;
         data.flush();
       }
       return info(parser.info() + DBCREATED, db, perf);
@@ -122,35 +124,59 @@ public abstract class ACreate extends Command {
 
   /**
    * Builds the specified index.
-   * @param type index to be built
-   * @param data data reference
-   * @throws IOException I/O exception
-   */
-  protected final void index(final IndexType type, final Data data)
-      throws IOException {
-    index(type, data, this);
-  }
-
-  /**
-   * Builds the specified index.
-   * @param type index to be built
+   * @param index index to be built
    * @param data data reference
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  protected static void index(final IndexType type, final Data data,
+  protected static void create(final IndexType index, final Data data,
       final ACreate cmd) throws IOException {
 
     if(data instanceof MemData) return;
     IndexBuilder ib = null;
-    switch(type) {
+    switch(index) {
       case TEXT:      ib = new ValueBuilder(data, true); break;
       case ATTRIBUTE: ib = new ValueBuilder(data, false); break;
       case FULLTEXT:  ib = FTBuilder.get(data); break;
       case PATH:      ib = new PathBuilder(data); break;
       default:        throw Util.notexpected();
     }
-    data.closeIndex(type);
-    data.setIndex(type, (cmd == null ? ib : cmd.progress(ib)).build());
+    data.closeIndex(index);
+    data.setIndex(index, (cmd == null ? ib : cmd.progress(ib)).build());
+  }
+
+  /**
+   * Drops the specified index.
+   * @param index index type
+   * @param data data reference
+   * @return success of operation
+   * @throws IOException I/O exception
+   */
+  static boolean drop(final IndexType index, final Data data)
+      throws IOException {
+
+    String pat = null;
+    switch(index) {
+      case TEXT:
+        data.meta.textindex = false;
+        pat = DATATXT;
+        break;
+      case ATTRIBUTE:
+        data.meta.attrindex = false;
+        pat = DATAATV;
+        break;
+      case FULLTEXT:
+        data.meta.ftxtindex = false;
+        pat = DATAFTX;
+        break;
+      case PATH:
+        data.meta.pathindex = false;
+        break;
+      default:
+    }
+    data.closeIndex(index);
+    data.meta.dirty = true;
+    data.flush();
+    return pat == null || data.meta.drop(pat + '.');
   }
 }

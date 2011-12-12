@@ -433,6 +433,7 @@ public class CommandTest {
     no(new OptimizeAll());
     ok(new CreateDB(NAME, FILE));
     ok(new Optimize());
+    ok(new Optimize());
     ok(new OptimizeAll());
   }
 

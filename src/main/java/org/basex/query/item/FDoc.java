@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import java.io.IOException;
 
 import org.basex.io.serial.Serializer;
+import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
@@ -18,6 +19,8 @@ import org.w3c.dom.Node;
  * @author Christian Gruen
  */
 public final class FDoc extends FNode {
+  /** Child nodes. */
+  private final NodeCache children;
   /** Base URI. */
   private final byte[] base;
 
@@ -57,6 +60,21 @@ public final class FDoc extends FNode {
   @Override
   public void serialize(final Serializer ser) throws IOException {
     for(int c = 0; c < children.size(); ++c) children.get(c).serialize(ser);
+  }
+
+  @Override
+  public byte[] string() {
+    return string(children);
+  }
+
+  @Override
+  public AxisMoreIter children() {
+    return iter(children);
+  }
+
+  @Override
+  public boolean hasChildren() {
+    return children.size() != 0;
   }
 
   @Override

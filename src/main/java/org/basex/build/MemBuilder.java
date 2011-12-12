@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.data.MetaData;
 import org.basex.io.IO;
 
 /**
@@ -54,19 +55,22 @@ public final class MemBuilder extends Builder {
 
   @Override
   public MemData build() throws IOException {
-    data = new MemData(tags, atts, ns, path, prop);
-    meta = data.meta;
-    meta.name = name;
-    // all contents will be indexed in main memory mode
-    meta.textindex = true;
-    meta.attrindex = true;
-    meta.ftindex = false;
-    final IO file = parser.src;
-    meta.original = file != null ? file.path() : "";
-    meta.filesize = file != null ? file.length() : 0;
-    meta.time = file != null ? file.date() : System.currentTimeMillis();
+    data = new MemData(null, null, path, ns, prop);
 
-    parse();
+    final MetaData md = data.meta;
+    md.name = name;
+    // all contents will be indexed in main memory mode
+    md.createtext = true;
+    md.createattr = true;
+    md.textindex = true;
+    md.attrindex = true;
+    md.pathindex = md.createpath;
+    final IO file = parser.src;
+    md.original = file != null ? file.path() : "";
+    md.filesize = file != null ? file.length() : 0;
+    md.time = file != null ? file.date() : System.currentTimeMillis();
+
+    parse(md, data.tagindex, data.atnindex);
     data.init();
     path.finish(data);
     return data;

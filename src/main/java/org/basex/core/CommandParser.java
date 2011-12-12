@@ -273,7 +273,7 @@ public final class CommandParser extends InputParser {
       case FLUSH:
         return new Flush();
       case KILL:
-        return new Kill(glob(cmd));
+        return new Kill(string(cmd));
       case RESTORE:
         return new Restore(name(cmd));
       case SHOW:
