@@ -7,14 +7,16 @@ package org.basex.index;
  * @author Christian Gruen
  */
 public enum StatsType {
+  // Don't change order (new items can be attached, however)
+
+  /** Text.     */
+  TEXT,
   /** Category. */
   CATEGORY,
   /** Numeric.  */
   INTEGER,
   /** Numeric.  */
   DOUBLE,
-  /** Text.     */
-  TEXT,
   /** No values. */
   NONE
 }
