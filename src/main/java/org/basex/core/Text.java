@@ -756,8 +756,12 @@ public interface Text {
   String INFOPATH = lang("info_path");
   /** Info on database time stamp. */
   String INFOTIME = lang("info_time");
+  /** Info on number of resources. */
+  String INFORES = lang("info_res");
   /** Info on number of documents. */
-  String INFONRES = lang("info_nres");
+  String INFODOCS = lang("info_docs");
+  /** Info on number of resources. */
+  String INFOBIN = lang("info_bin");
   /** Info on document size. */
   String INFODOCSIZE = lang("info_docsize");
   /** Document encoding. */
@@ -1068,9 +1072,9 @@ public interface Text {
   /** Button text for creating backup of databases. */
   String BUTTONBACKUP = lang("b_backup");
   /** Button text for restoring databases. */
-  String BUTTONRESTORE = lang("b_restore");
+  String BUTTONRESTORE = lang("b_restore") + DOTS;
   /** Button text for copying databases. */
-  String BUTTONCOPY = lang("b_copy");
+  String BUTTONCOPY = lang("b_copy") + DOTS;
   /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
   /** Button text for canceling actions. */
@@ -1285,10 +1289,12 @@ public interface Text {
   String GLOBPERM = lang("ds_globperm") + COLS;
   /** Local permissions. */
   String LOCPERM = lang("ds_locperm") + COLS;
+  /** Confirmation . */
+  String SURE = lang("dd_sure");
   /** Question for dropping user. */
-  String DRQUESTION = lang("ds_drquestion") + NL + lang("dd_sure");
+  String DRQUESTION = lang("ds_drquestion") + NL + SURE;
   /** Question for revoking right from logged in user. */
-  String DBREVOKE = lang("ds_dbrevoke") + NL + lang("dd_sure");
+  String DBREVOKE = lang("ds_dbrevoke") + NL + SURE;
   /** Alter password. */
   String ALTERPW = lang("ds_alterpw");
   /** Invalid. */
@@ -1319,16 +1325,22 @@ public interface Text {
   /** Dialog title for copying a database. */
   String COPYTITLE = lang("dr_title3");
   /** Info for overwriting a database. */
-  String RENAMEOVER = lang("dr_over") + DOT;
+  String RENAMEOVER = lang("dr_over");
   /** Info for creating an empty database. */
-  String EMPTYDATABASE = lang("dr_empty") + DOT;
+  String EMPTYDATABASE = lang("dr_empty");
   /** % documents will be deleted. */
-  String DELETEPATH = lang("dr_delete") + DOT;
+  String DELETEPATH = lang("dr_delete");
 
   /** Dialog title for managing databases. */
   String MANAGETITLE = lang("dd_title");
-  /** Dialog title for dropping a database. */
-  String DROPCONF = lang("dd_question") + NL + lang("dd_sure");
+  /** Dialog text for dropping a database. */
+  String DROPCONF = lang("dd_question") + NL + SURE;
+  /** Database only available as backup. */
+  String ONLYBACKUP = lang("dd_onlyback");
+  /** Dialog text for dropping a backup. */
+  String DROPBACKUP = lang("dd_dropback") + NL + SURE;
+  /** Dialog text for overwriting a backup. */
+  String OVERWRITE = lang("dr_over") + NL + SURE;
 
   /** Dialog title for import options. */
   String PREFSTITLE = lang("dp_title");

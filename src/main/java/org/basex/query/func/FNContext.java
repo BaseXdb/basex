@@ -52,10 +52,10 @@ public final class FNContext extends FuncCall {
       case IMPLICIT_TIMEZONE:
         return implZone();
       case DEFAULT_COLLATION:
-        return ctx.baseURI().resolve(ctx.collation);
+        return ctx.sc.baseURI().resolve(ctx.sc.collation);
       case STATIC_BASE_URI:
-        final IO base = ctx.baseIO();
-        return base == null ? null : Uri.uri(token(ctx.baseIO().url()));
+        final IO base = ctx.sc.baseIO();
+        return base == null ? null : Uri.uri(token(ctx.sc.baseIO().url()));
       default:
         return super.item(ctx, ii);
     }

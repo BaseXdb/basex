@@ -119,8 +119,8 @@ public final class OptimizeAll extends ACreate {
       final IOFile bin = data.meta.binaries();
       if(bin.exists()) bin.rename(d.meta.binaries());
 
-      final File lock = old.updateFile();
-      if(lock.exists()) Copy.copy(lock, d.updateFile());
+      final File upd = old.updateFile();
+      if(upd.exists()) Copy.copy(upd, d.updateFile());
       d.close();
     } finally {
       try {

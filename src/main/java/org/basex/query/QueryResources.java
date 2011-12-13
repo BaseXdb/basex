@@ -137,7 +137,7 @@ public final class QueryResources {
     }
 
     // retrieve new data reference
-    final IO base = ctx.baseIO();
+    final IO base = ctx.sc.baseIO();
     Data d = doc(input, base == null, col, ii);
     // throws an exception if reference is not found
     if(d == null) d = doc(base.merge(input).path(), true, col, ii);
@@ -168,7 +168,7 @@ public final class QueryResources {
       // find specified collection
       while(c < colls && !collName[c].equals(input)) ++c;
       if(c == colls) {
-        final IO base = ctx.baseIO();
+        final IO base = ctx.sc.baseIO();
         if(base != null) {
           c = 0;
           final String in = base.merge(input).path();

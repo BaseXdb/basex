@@ -23,7 +23,7 @@ import org.basex.gui.layout.BaseXPanel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.index.Names;
-import org.basex.index.StatsKey;
+import org.basex.index.Stats;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -205,15 +205,15 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           final boolean att = item.startsWith("@");
           final Names names = att ? data.atnindex : data.tagindex;
           final byte[] key = Token.token(att ? item.substring(1) : item);
-          final StatsKey stat = names.stat(names.id(key));
-          switch(stat.kind) {
-            case INT:
+          final Stats stat = names.stat(names.id(key));
+          switch(stat.type) {
+            case INTEGER:
               addSlider(stat.min, stat.max, cp + 1, true);
               break;
-            case DBL:
+            case DOUBLE:
               addSlider(stat.min, stat.max, cp + 1, false);
               break;
-            case CAT:
+            case CATEGORY:
               addCombo(entries(stat.cats.keys()), cp + 1);
               break;
             case TEXT:

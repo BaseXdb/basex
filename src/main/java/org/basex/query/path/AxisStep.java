@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.index.path.PathNode;
 import org.basex.io.serial.Serializer;
-import org.basex.index.StatsKey;
+import org.basex.index.Stats;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -91,7 +91,7 @@ public class AxisStep extends Preds {
       test.test == Name.NAME && test.type != NodeType.ATT && axis.down &&
       data.meta.uptodate && data.nspaces.size() == 0;
     if(ctx.leaf) {
-      final StatsKey s =
+      final Stats s =
         data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
       ctx.leaf = s != null && s.leaf;
     }

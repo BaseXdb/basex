@@ -83,7 +83,7 @@ final class DOTData {
     { "FF9900", org.basex.query.expr.Preds.class },
     // green
     { "009900", org.basex.query.expr.GFLWOR.class },
-    { "339933", org.basex.query.util.VarList.class },
+    { "339933", org.basex.query.util.VarStack.class },
     { "33CC33", org.basex.query.expr.ForLet.class },
     { "33CC33", org.basex.query.expr.List.class },
     { "33CC33", org.basex.query.expr.Range.class },
@@ -113,7 +113,7 @@ final class DOTData {
     { "Function", org.basex.query.func.FuncCall.class },
     { null, org.basex.query.path.Path.class },
     { "Step", org.basex.query.path.AxisStep.class },
-    { "Variables", org.basex.query.util.VarList.class },
+    { "Variables", org.basex.query.util.VarStack.class },
     { "OrderBy", org.basex.query.expr.OrderByExpr.class },
     { "operator", "op" },
   };

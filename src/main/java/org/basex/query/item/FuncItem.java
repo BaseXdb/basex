@@ -12,7 +12,7 @@ import org.basex.query.expr.VarRef;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
-import org.basex.query.util.VarList;
+import org.basex.query.util.VarStack;
 import org.basex.util.InputInfo;
 import static org.basex.util.Token.*;
 import org.basex.util.Util;
@@ -34,7 +34,7 @@ public final class FuncItem extends FItem {
   private final SeqType cast;
 
   /** The closure of this function item. */
-  private final VarList closure = new VarList();
+  private final VarStack closure = new VarStack();
 
   /**
    * Constructor.
@@ -62,13 +62,13 @@ public final class FuncItem extends FItem {
    * @param cst cast flag
    */
   public FuncItem(final Var[] arg, final Expr body, final FuncType t,
-      final VarList cl, final boolean cst) {
+      final VarStack cl, final boolean cst) {
+
     this(null, arg, body, t, cst);
     if(cl != null) {
       for(int i = cl.size; --i >= 0;) {
         final Var v = cl.vars[i];
-        if(body.count(v) != 0 && !closure.contains(v))
-          closure.set(v.copy());
+        if(body.count(v) != 0 && !closure.contains(v)) closure.add(v.copy());
       }
     }
   }
@@ -91,10 +91,10 @@ public final class FuncItem extends FItem {
    */
   private void bindVars(final QueryContext ctx, final Value[] args)
       throws QueryException {
-    for(int i = closure.size; --i >= 0;)
-      ctx.vars.add(closure.vars[i].copy());
-    for(int a = vars.length; --a >= 0;)
-      ctx.vars.add(vars[a].bind(args[a], ctx).copy());
+    for(int v = closure.size; --v >= 0;)
+      ctx.vars.add(closure.vars[v].copy());
+    for(int v = vars.length; --v >= 0;)
+      ctx.vars.add(vars[v].bind(args[v], ctx).copy());
   }
 
   @Override
@@ -102,7 +102,7 @@ public final class FuncItem extends FItem {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
-    final int s = ctx.vars.size();
+    final VarStack cs = ctx.vars.cache(args.length);
     final Value cv = ctx.value;
     try {
       bindVars(ctx, args);
@@ -112,7 +112,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.promote(v, ctx, ii) : v;
     } finally {
       ctx.value = cv;
-      ctx.vars.size(s);
+      ctx.vars.reset(cs);
     }
   }
 
@@ -129,7 +129,7 @@ public final class FuncItem extends FItem {
       final Value... args) throws QueryException {
 
     // bind variables and cache context
-    final int s = ctx.vars.size();
+    final VarStack cs = ctx.vars.cache(args.length);
     final Value cv = ctx.value;
     try {
       bindVars(ctx, args);
@@ -139,7 +139,7 @@ public final class FuncItem extends FItem {
       return cast != null ? cast.cast(it, expr, false, ctx, ii) : it;
     } finally {
       ctx.value = cv;
-      ctx.vars.size(s);
+      ctx.vars.reset(cs);
     }
   }
 

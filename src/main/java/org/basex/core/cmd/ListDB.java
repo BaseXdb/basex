@@ -41,7 +41,7 @@ public final class ListDB extends Command {
     if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
 
     final Table table = new Table();
-    table.description = INFONRES;
+    table.description = INFORES;
     table.header.add(INFOPATH);
     table.header.add(INFOTYPE);
     table.header.add(DataText.CONTENT_TYPE);

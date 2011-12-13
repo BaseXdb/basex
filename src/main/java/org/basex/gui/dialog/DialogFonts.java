@@ -39,7 +39,7 @@ public final class DialogFonts extends Dialog {
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
 
-    final BaseXBack p = new BaseXBack(new TableLayout(1, 4, 8, 6));
+    final BaseXBack p = new BaseXBack(new TableLayout(1, 4, 8, 0));
     font = new BaseXList(fonts, this);
     font.setSize(150, 112);
     p.add(font);

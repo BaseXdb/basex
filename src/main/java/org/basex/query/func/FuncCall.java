@@ -6,6 +6,8 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
+import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
@@ -111,6 +113,27 @@ public abstract class FuncCall extends Arr {
     final String desc = def.toString();
     return new TokenBuilder().add(desc.substring(0,
         desc.indexOf('(') + 1)).addSep(expr, SEP).add(PAR2).toString();
+  }
+
+  /**
+   * Returns the data instance for the specified argument.
+   * @param i index of argument
+   * @param ctx query context
+   * @return data instance
+   * @throws QueryException query exception
+   */
+  protected Data data(final int i, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = checkEmpty(expr[i].item(ctx, input));
+    final Type ip = it.type;
+    if(ip.isNode()) return checkDBNode(it).data;
+    if(ip.isString())  {
+      final String name = string(it.string(input));
+      if(!MetaData.validName(name, false)) INVDB.thrw(input, name);
+      return ctx.resource.data(name, input);
+    }
+    throw STRNODTYPE.thrw(input, this, ip);
   }
 
   /**

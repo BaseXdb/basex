@@ -39,7 +39,6 @@ import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Raw;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
@@ -196,7 +195,7 @@ public final class FNDb extends FuncCall {
     // parse and compile the name test
     final Item name = checkEmpty(expr[2].item(ctx, input));
     final QNm nm = new QNm(checkStr(name, ctx), ctx);
-    if(!nm.hasPrefix()) nm.uri(ctx.ns.uri(EMPTY));
+    if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(EMPTY));
 
     final NameTest nt = new NameTest(nm, NameTest.Name.STD, true, input);
     // no results expected: return empty sequence
@@ -616,27 +615,6 @@ public final class FNDb extends FuncCall {
     return def == Function._DB_OPEN || def == Function._DB_TEXT ||
       def == Function._DB_ATTRIBUTE || def == Function._DB_FULLTEXT ||
       super.iterable();
-  }
-
-  /**
-   * Returns the data instance for the specified argument.
-   * @param i index of argument
-   * @param ctx query context
-   * @return data instance
-   * @throws QueryException query exception
-   */
-  private Data data(final int i, final QueryContext ctx)
-      throws QueryException {
-
-    final Item it = checkEmpty(expr[i].item(ctx, input));
-    final Type ip = it.type;
-    if(ip.isNode()) return checkDBNode(it).data;
-    if(ip.isString())  {
-      final String name = string(it.string(input));
-      if(!MetaData.validName(name, false)) INVDB.thrw(input, name);
-      return ctx.resource.data(name, input);
-    }
-    throw STRNODTYPE.thrw(input, this, ip);
   }
 
   /**

@@ -347,7 +347,7 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public int block(final byte[] client) {
     synchronized(blocked) {
-      int delay = blocked.get(client);
+      int delay = blocked.value(client);
       delay = delay == -1 ? 1 : Math.min(delay, 1024) * 2;
       blocked.add(client, delay);
       return delay;

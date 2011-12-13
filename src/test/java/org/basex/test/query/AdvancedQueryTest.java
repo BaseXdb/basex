@@ -92,10 +92,8 @@ public abstract class AdvancedQueryTest {
     final byte[] msg = Token.token(ex.getMessage());
     boolean found = false;
     for(final Err e : error) found |= Token.contains(msg, e.qname().string());
-    if(!found) {
-      fail("'" + Token.string(error[0].qname().string()) +
-          "' not contained in '" + msg + "'.");
-    }
+    if(!found) fail("'" + Token.string(error[0].qname().string()) +
+        "' not contained in '" + Token.string(msg) + "'.");
   }
 
   /**

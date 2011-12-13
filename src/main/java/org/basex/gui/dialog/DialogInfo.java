@@ -11,9 +11,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.JComponent;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
 
 import org.basex.core.cmd.InfoDB;
 import org.basex.data.Data;
@@ -62,9 +59,7 @@ public final class DialogInfo extends Dialog {
     super(main, INFODB);
 
     // first tab
-    final BaseXBack tab1 = new BaseXBack(new BorderLayout());
-    tab1.setBorder(new CompoundBorder(new EtchedBorder(),
-        new EmptyBorder(8, 8, 8, 8)));
+    final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
 
     final Data data = gui.context.data();
     final MetaData meta = data.meta;

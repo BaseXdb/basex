@@ -38,8 +38,7 @@ public final class InlineFunc extends UserFunc {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-
+    comp(ctx, false);
     // only evaluate if the closure is empty, so we don't lose variables
     return expr.hasFreeVars(ctx) ? this : optPre(item(ctx, input), ctx);
   }
@@ -48,7 +47,7 @@ public final class InlineFunc extends UserFunc {
   public FuncItem item(final QueryContext ctx, final InputInfo ii) {
     final FuncType ft = FuncType.get(this);
     final boolean c = ft.ret != null && !expr.type().instance(ft.ret);
-    return new FuncItem(args, expr, ft, ctx.vars.local(), c);
+    return new FuncItem(args, expr, ft, ctx.vars.locals(), c);
   }
 
   @Override
@@ -88,14 +87,14 @@ public final class InlineFunc extends UserFunc {
 
   @Override
   public String toString() {
-    final StringBuilder tb = new StringBuilder(FUNCTION).append(PAR1);
+    final StringBuilder sb = new StringBuilder(FUNCTION).append(PAR1);
     for(int i = 0; i < args.length; i++) {
-      if(i > 0) tb.append(", ");
-      tb.append(args[i].toString());
+      if(i > 0) sb.append(", ");
+      sb.append(args[i].toString());
     }
-    tb.append(PAR2).append(' ');
-    if(ret != null) tb.append("as ").append(ret.toString()).append(' ');
-    return tb.append("{ ").append(expr).append(" }").toString();
+    sb.append(PAR2).append(' ');
+    if(ret != null) sb.append("as ").append(ret.toString()).append(' ');
+    return sb.append("{ ").append(expr).append(" }").toString();
   }
 
   @Override

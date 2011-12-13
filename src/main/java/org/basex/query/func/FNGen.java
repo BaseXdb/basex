@@ -266,7 +266,7 @@ public final class FNGen extends FuncCall {
    */
   private ANode parseXml(final QueryContext ctx) throws QueryException {
     final byte[] cont = checkEStr(expr[0], ctx);
-    Uri base = ctx.baseURI();
+    Uri base = ctx.sc.baseURI();
     if(expr.length == 2) {
       base = Uri.uri(checkEStr(expr[1], ctx));
       if(!base.isValid()) BASEINV.thrw(input, base);

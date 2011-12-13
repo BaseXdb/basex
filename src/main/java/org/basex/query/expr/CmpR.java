@@ -1,12 +1,15 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
+
 import org.basex.data.MemData;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.StatsType;
 import org.basex.index.Names;
 import org.basex.index.RangeToken;
-import org.basex.index.StatsKey;
+import org.basex.index.Stats;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -17,8 +20,8 @@ import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
-import org.basex.query.path.NameTest;
 import org.basex.query.path.AxisStep;
+import org.basex.query.path.NameTest;
 import org.basex.query.path.Test.Name;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
@@ -140,7 +143,7 @@ public final class CmpR extends Single {
     final boolean attr = s.test.type == NodeType.ATT && ic.data.meta.attrindex;
     if(!text && !attr || !mni || !mxi) return false;
 
-    final StatsKey key = key(ic, text);
+    final Stats key = key(ic, text);
     if(key == null) return false;
 
     // estimate costs for range access; all values out of range: no results
@@ -166,7 +169,7 @@ public final class CmpR extends Single {
    * @param text text flag
    * @return key
    */
-  private StatsKey key(final IndexContext ic, final boolean text) {
+  private Stats key(final IndexContext ic, final boolean text) {
     // statistics are not up-to-date
     if(!ic.data.meta.uptodate || ic.data.nspaces.size() != 0) return null;
 
@@ -183,9 +186,9 @@ public final class CmpR extends Single {
     }
 
     final Names names = text ? ic.data.tagindex : ic.data.atnindex;
-    final StatsKey key = names.stat(names.id(((NameTest) step.test).ln));
-    return key == null || key.kind == StatsKey.Kind.INT ||
-      key.kind == StatsKey.Kind.DBL ? key : null;
+    final Stats key = names.stat(names.id(((NameTest) step.test).ln));
+    return key == null || key.type == StatsType.INTEGER ||
+        key.type == StatsType.DOUBLE ? key : null;
   }
 
   @Override

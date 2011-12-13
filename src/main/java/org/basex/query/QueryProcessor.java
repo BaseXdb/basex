@@ -80,7 +80,7 @@ public final class QueryProcessor extends Progress {
   public QueryProcessor(final String qu, final Expr expr, final Context cx) {
     query = qu;
     ctx = new QueryContext(cx);
-    ctx.initExpr = expr;
+    ctx.ctxItem = expr;
     progress(ctx);
   }
 
@@ -177,7 +177,7 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value) throws QueryException {
-    ctx.initExpr = value instanceof Expr ? (Expr) value :
+    ctx.ctxItem = value instanceof Expr ? (Expr) value :
       JavaFunc.type(value).e(value, null);
     return this;
   }
@@ -193,7 +193,7 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor namespace(final String prefix, final String uri)
       throws QueryException {
-    ctx.namespace(prefix, uri);
+    ctx.sc.namespace(prefix, uri);
     return this;
   }
 

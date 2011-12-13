@@ -1,6 +1,8 @@
 package org.basex.io;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+
 import org.basex.data.Data;
 import org.basex.io.in.BufferInput;
 import org.basex.util.Token;
@@ -33,6 +35,12 @@ public abstract class IO {
   public static final String GZSUFFIX = ".gz";
   /** File prefix. */
   public static final String FILEPREF = "file:";
+  /** Date format which is appended to backups. */
+  public static final SimpleDateFormat DATE =
+    new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+  /** Date pattern. */
+  public static final String DATEPATTERN =
+    "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =

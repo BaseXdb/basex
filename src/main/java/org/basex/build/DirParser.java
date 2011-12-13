@@ -138,18 +138,18 @@ public final class DirParser extends TargetParser {
 
   @Override
   public String info() {
-    final TokenBuilder sb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(skipped.size() != 0) {
-      sb.add(SKIPCORRUPT).add(COL).add(NL);
+      tb.add(SKIPCORRUPT).add(COL).add(NL);
       final int s = skipped.size();
       for(int i = 0; i < s && i < SKIPLOG; i++) {
-        sb.add(LI).add(skipped.get(i)).add(NL);
+        tb.add(LI).add(skipped.get(i)).add(NL);
       }
       if(s > SKIPLOG) {
-        sb.add(LI).addExt(SKIPINFO, s - SKIPLOG).add(NL);
+        tb.add(LI).addExt(SKIPINFO, s - SKIPLOG).add(NL);
       }
     }
-    return sb.toString();
+    return tb.toString();
   };
 
   @Override

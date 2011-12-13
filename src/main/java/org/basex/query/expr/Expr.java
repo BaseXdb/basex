@@ -13,7 +13,7 @@ import org.basex.query.path.AxisPath;
 import org.basex.query.path.MixedPath;
 import org.basex.query.util.IndexContext;
 import org.basex.query.util.Var;
-import org.basex.query.util.VarList;
+import org.basex.query.util.VarStack;
 import org.basex.util.InputInfo;
 
 /**
@@ -283,11 +283,11 @@ public abstract class Expr extends ExprInfo {
    *         in this expression, {@code false} otherwise
    */
   boolean hasFreeVars(final QueryContext ctx) {
-    final VarList global = ctx.vars.global();
+    final VarStack global = ctx.vars.globals();
     for(int i = global.size; --i >= 0;) {
       if(count(global.vars[i]) > 0) return true;
     }
-    final VarList vars = ctx.vars.local();
+    final VarStack vars = ctx.vars.locals();
     for(int i = vars.size; --i >= 0;) {
       if(count(vars.vars[i]) > 0) return true;
     }

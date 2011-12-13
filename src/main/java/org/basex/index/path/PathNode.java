@@ -4,9 +4,12 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Text;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
+import org.basex.index.Stats;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.serial.Serializer;
+import org.basex.query.item.ANode;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.ObjList;
@@ -16,6 +19,7 @@ import org.basex.util.list.ObjList;
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
+ * @author Andreas Weiler
  */
 public final class PathNode {
   /** Tag/attribute name reference. */
@@ -24,23 +28,25 @@ public final class PathNode {
   public final byte kind;
   /** Parent. */
   public final PathNode par;
-  /** Number of occurrences. */
-  public int size;
   /** Children. */
-  PathNode[] ch;
+  public PathNode[] ch;
+
+  /** Node kind. */
+  public Stats stats;
 
   /**
    * Default constructor.
-   * @param t tag
+   * @param n node name
    * @param k node kind
    * @param p parent node
    */
-  PathNode(final int t, final byte k, final PathNode p) {
+  PathNode(final int n, final byte k, final PathNode p) {
     ch = new PathNode[0];
-    size = 1;
-    name = (short) t;
+    name = (short) n;
     kind = k;
     par = p;
+    stats = new Stats();
+    stats.count = 1;
   }
 
   /**
@@ -52,9 +58,16 @@ public final class PathNode {
   PathNode(final DataInput in, final PathNode p) throws IOException {
     name = (short) in.readNum();
     kind = (byte) in.read();
-    size = in.readNum();
+    final int s = in.readNum();
     ch = new PathNode[in.readNum()];
-    in.readDouble();
+    if(in.readDouble() == 1) {
+      // "1" indicates the format introduced with Version 7.1
+      stats = new Stats(in);
+    } else {
+      // create old format
+      stats = new Stats();
+      stats.count = s;
+    }
     par = p;
     for(int i = 0; i < ch.length; ++i) ch[i] = new PathNode(in, this);
   }
@@ -63,16 +76,22 @@ public final class PathNode {
    * Indexes the specified name along with its kind.
    * @param n name reference
    * @param k node kind
+   * @param v value
+   * @param md meta data
    * @return node reference
    */
-  PathNode index(final int n, final byte k) {
+  PathNode index(final int n, final byte k, final byte[] v, final MetaData md) {
     for(final PathNode c : ch) {
       if(c.kind == k && c.name == n) {
-        c.size++;
+        if(v != null) c.stats.add(v, md);
+        c.stats.count++;
         return c;
       }
     }
+
     final PathNode pn = new PathNode(n, k, this);
+    if(v != null) pn.stats.add(v, md);
+
     final int cs = ch.length;
     final PathNode[] tmp = new PathNode[cs + 1];
     System.arraycopy(ch, 0, tmp, 0, cs);
@@ -89,9 +108,10 @@ public final class PathNode {
   void write(final DataOutput out) throws IOException {
     out.writeNum(name);
     out.write1(kind);
-    out.writeNum(size);
+    out.writeNum(0);
     out.writeNum(ch.length);
-    out.writeDouble(0);
+    out.writeDouble(1);
+    stats.write(out);
     for(final PathNode c : ch) c.write(out);
   }
 
@@ -164,7 +184,7 @@ public final class PathNode {
       case Data.COMM: tb.add(COMM); break;
       case Data.PI:   tb.add(PI); break;
     }
-    tb.add(" " + size + "x");
+    tb.add(": " + stats);
     for(final PathNode p : ch) tb.add(p.info(data, l + 1));
     return tb.finish();
   }
@@ -176,13 +196,13 @@ public final class PathNode {
    * @throws IOException I/O exception
    */
   void plan(final Data data, final Serializer ser) throws IOException {
-    ser.openElement(NODE, KIND, TABLEKINDS[kind]);
+    ser.openElement(ANode.type(kind).string());
     if(kind == Data.ELEM) {
       ser.attribute(NAME, data.tagindex.key(name));
     } else if(kind == Data.ATTR) {
-      ser.attribute(NAME, Token.concat(ATT, data.atnindex.key(name)));
+      ser.attribute(NAME, data.atnindex.key(name));
     }
-    ser.text(Token.token(size));
+    stats.plan(ser);
     for(final PathNode p : ch) p.plan(data, ser);
     ser.closeElement();
   }

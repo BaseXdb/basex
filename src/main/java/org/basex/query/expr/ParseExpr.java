@@ -291,7 +291,7 @@ public abstract class ParseExpr extends Expr {
     final byte[] u = checkStr(e, ctx);
     if(eq(URLCOLL, u)) return;
     final Uri uri = Uri.uri(u);
-    if(uri.isAbsolute() || !eq(ctx.baseURI().resolve(uri).string(),
+    if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri).string(),
         QueryText.URLCOLL)) IMPLCOL.thrw(input, e);
     }
 
@@ -416,7 +416,7 @@ public abstract class ParseExpr extends Expr {
     final String name = string(checkStr(e, ctx));
     IO io = IO.get(name);
     if(!io.exists()) {
-      final IO iob = ctx.baseIO();
+      final IO iob = ctx.sc.baseIO();
       if(iob != null) {
         io = new IOFile(iob.path(), name);
         if(!io.exists()) RESFNF.thrw(input, name);

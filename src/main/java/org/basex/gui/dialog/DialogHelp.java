@@ -26,7 +26,7 @@ public final class DialogHelp extends Dialog {
    */
   public DialogHelp(final GUI main) {
     super(main, HELPTIT, false);
-    panel.border(5, 5, 5, 5);
+    panel.border(5);
     panel.setBackground(Color.white);
 
     area = new BaseXEditor(false, gui);

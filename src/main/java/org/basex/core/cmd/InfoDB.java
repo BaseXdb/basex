@@ -61,8 +61,9 @@ public final class InfoDB extends AInfo {
     format(tb, INFONODES, Integer.toString(meta.size));
 
     // count number of raw files
-    final int raw = meta.binaries().descendants().size();
-    format(tb, INFONRES, Integer.toString(meta.ndocs + raw));
+    final int bin = meta.binaries().descendants().size();
+    format(tb, INFODOCS, Integer.toString(meta.ndocs));
+    format(tb, INFOBIN, Integer.toString(bin));
     format(tb, INFOTIME, DATE.format(new Date(meta.dbtime())));
     if(meta.corrupt) tb.add(' ' + DBCORRUPT + NL);
 

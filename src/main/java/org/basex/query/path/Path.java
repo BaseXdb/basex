@@ -186,7 +186,7 @@ public abstract class Path extends ParseExpr {
     }
 
     long sz = 0;
-    for(final PathNode pn : nodes) sz += pn.size;
+    for(final PathNode pn : nodes) sz += pn.stats.count;
     return sz * m;
   }
 

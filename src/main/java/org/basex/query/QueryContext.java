@@ -19,7 +19,6 @@ import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
@@ -35,17 +34,14 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
-import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
 import org.basex.query.util.JDBCConnections;
-import org.basex.query.util.NSContext;
 import org.basex.query.util.UserFuncs;
 import org.basex.query.util.Var;
-import org.basex.query.util.Variables;
-import org.basex.query.util.format.DecFormatter;
+import org.basex.query.util.VarContext;
 import org.basex.query.util.json.JsonMapConverter;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -54,12 +50,11 @@ import org.basex.util.XMLToken;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.hash.TokenMap;
-import org.basex.util.hash.TokenObjMap;
 import org.basex.util.list.IntList;
 
 /**
- * This abstract query expression provides the architecture for a compiled
- * query.
+ * This class provides query-specific methods and properties.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
@@ -68,12 +63,12 @@ public final class QueryContext extends Progress {
   private static final Pattern BIND =
       Pattern.compile("^((\"|')(.*?)\\2:|(\\{(.*?)\\}))(.+)$");
 
+  /** Static context of an expression. */
+  public StaticContext sc = new StaticContext();
+  /** Variables. */
+  public final VarContext vars = new VarContext();
   /** Functions. */
   public final UserFuncs funcs = new UserFuncs();
-  /** Variables. */
-  public final Variables vars = new Variables();
-  /** Static and dynamic namespaces. */
-  public NSContext ns = new NSContext();
 
   /** Query resources. */
   public final QueryResources resource = new QueryResources(this);
@@ -116,31 +111,6 @@ public final class QueryContext extends Progress {
   /** Current Time. */
   public Tim time;
 
-  /** Decimal-format declarations. */
-  public final TokenObjMap<DecFormatter> decFormats =
-    new TokenObjMap<DecFormatter>();
-  /** URI of the default function namespace. */
-  public byte[] nsFunc = FNURI;
-  /** URI of the default element namespace. */
-  public byte[] nsElem;
-  /** Static base URI. */
-  private byte[] baseURI = EMPTY;
-  /** Default collation. */
-  public Uri collation = Uri.uri(URLCOLL);
-
-  /** Default boundary space. */
-  public boolean spaces;
-  /** Empty order mode. */
-  public boolean orderGreatest;
-  /** Preserve namespaces. */
-  public boolean nsPreserve = true;
-  /** Inherit namespaces. */
-  public boolean nsInherit = true;
-  /** Ordering mode. */
-  public boolean ordered;
-  /** Construction mode. */
-  public boolean construct;
-
   /** Full-text position data (needed for highlighting of full-text results). */
   public FTPosData ftpos;
   /** Full-text token counter (needed for highlighting of full-text results). */
@@ -170,10 +140,8 @@ public final class QueryContext extends Progress {
 
   /** Serializer options. */
   SerializerProp serProp;
-  /** Initial context value type. */
-  SeqType initType;
   /** Initial context value. */
-  Expr initExpr;
+  public Expr ctxItem;
   /** Opened connections to relational databases. */
   JDBCConnections jdbc;
 
@@ -196,7 +164,7 @@ public final class QueryContext extends Progress {
     xquery3 = ctx.prop.is(Prop.XQUERY3);
     inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
     final String path = ctx.prop.get(Prop.QUERYPATH);
-    if(!path.isEmpty()) baseURI = token(path);
+    if(!path.isEmpty()) sc.baseURI(path);
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
   }
 
@@ -206,7 +174,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String qu) throws QueryException {
-    root = new QueryParser(qu, this).parse(baseIO(), null);
+    root = new QueryParser(qu, this).parse(sc.baseIO(), null);
     query = qu;
   }
 
@@ -216,7 +184,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void module(final String qu) throws QueryException {
-    new QueryParser(qu, this).parse(baseIO(), EMPTY);
+    new QueryParser(qu, this).parse(sc.baseIO(), EMPTY);
   }
 
   /**
@@ -234,14 +202,14 @@ public final class QueryContext extends Progress {
       }
     }
 
-    if(initExpr != null) {
+    if(ctxItem != null) {
       // evaluate initial expression
       try {
-        value = initExpr.value(this);
+        value = ctxItem.value(this);
       } catch(final QueryException ex) {
         if(ex.err() != XPNOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
-        CTXINIT.thrw(((ParseExpr) initExpr).input, ex.getMessage());
+        CTXINIT.thrw(((ParseExpr) ctxItem).input, ex.getMessage());
       }
     } else if(nodes != null) {
       // add full-text container reference
@@ -251,8 +219,8 @@ public final class QueryContext extends Progress {
     }
 
     // if specified, convert context item to specified type
-    if(value != null && initType != null) {
-      value = initType.promote(value, this, null);
+    if(value != null && sc.initType != null) {
+      value = sc.initType.promote(value, this, null);
     }
 
     try {
@@ -387,51 +355,31 @@ public final class QueryContext extends Progress {
       JavaFunc.type(val).e(val, null);
 
     // remove optional $ prefix
-    String loc = name.indexOf('$') == 0 ? name.substring(1) : name;
+    String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
     byte[] uri = EMPTY;
 
     // check for namespace declaration
-    final Matcher m = BIND.matcher(loc);
+    final Matcher m = BIND.matcher(nm);
     if(m.find()) {
       String u = m.group(3);
       if(u == null) u = m.group(5);
       uri = token(u);
-      loc = m.group(6);
+      nm = m.group(6);
     }
-    final byte[] ln = token(loc);
-    if(loc.isEmpty() || !XMLToken.isNCName(ln)) return;
+    final byte[] ln = token(nm);
+    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return;
 
     // bind variable
-    final QNm nm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
-    final Var gl = vars.global().get(nm);
+    final QNm qnm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
+    final Var gl = vars.globals().get(qnm);
     if(gl == null) {
       // assign new variable
-      vars.setGlobal(Var.create(this, null, nm).bind(ex, this));
+      vars.updateGlobal(Var.create(this, null, qnm).bind(ex, this));
     } else {
       // reset declaration state and bind new expression
       gl.declared = false;
       gl.bind(gl.type != null ? gl.type.type.e(ex.item(this, null),
           this, null) : ex, this);
-    }
-  }
-
-  /**
-   * Declares a namespace.
-   * A namespace is undeclared if the {@code uri} is an empty string.
-   * The default element namespaces is set if the {@code prefix} is empty.
-   * @param prefix namespace prefix
-   * @param uri namespace uri
-   * @throws QueryException query exception
-   */
-  public void namespace(final String prefix, final String uri)
-      throws QueryException {
-
-    if(prefix.isEmpty()) {
-      nsElem = uri.isEmpty() ? null : token(uri);
-    } else if(uri.isEmpty()) {
-      ns.delete(token(prefix));
-    } else {
-      ns.add(token(prefix), token(uri), null);
     }
   }
 
@@ -442,7 +390,7 @@ public final class QueryContext extends Progress {
    */
   protected void plan(final Serializer ser) throws IOException {
     // only show root node if functions or variables exist
-    final boolean r = funcs.size() != 0 || vars.global().size != 0;
+    final boolean r = funcs.size() != 0 || vars.globals().size != 0;
     if(r) ser.openElement(PLAN);
     funcs.plan(ser);
     vars.plan(ser);
@@ -491,24 +439,6 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Copies properties of the specified context.
-   * @param ctx query context
-   */
-  public void copy(final QueryContext ctx) {
-    baseURI = ctx.baseURI;
-    spaces = ctx.spaces;
-    construct = ctx.construct;
-    nsInherit = ctx.nsInherit;
-    nsPreserve = ctx.nsPreserve;
-    collation = ctx.collation;
-    nsElem = ctx.nsElem;
-    nsFunc = ctx.nsFunc;
-    orderGreatest = ctx.orderGreatest;
-    ordered = ctx.ordered;
-    ns = ctx.ns;
-  }
-
-  /**
    * Adds some optimization info.
    * @param string evaluation info
    * @param ext text text extensions
@@ -529,30 +459,6 @@ public final class QueryContext extends Progress {
     if(firstEval) info.add(NL).add(QUERYEVAL).add(NL);
     info.add(QUERYSEP).add(string).add(NL);
     firstEval = false;
-  }
-
-  /**
-   * Returns an IO representation of the base URI, or {@code null}.
-   * @return IO reference
-   */
-  public IO baseIO() {
-    return baseURI.length != 0 ? IO.get(string(baseURI)) : null;
-  }
-
-  /**
-   * Returns a URI representation of the base URI.
-   * @return IO reference
-   */
-  public Uri baseURI() {
-    return Uri.uri(baseURI);
-  }
-
-  /**
-   * Sets the base URI.
-   * @param uri uri to be set
-   */
-  public void baseURI(final String uri) {
-    baseURI = token(uri);
   }
 
   /**
@@ -602,10 +508,5 @@ public final class QueryContext extends Progress {
   @Override
   public double prog() {
     return 0;
-  }
-
-  @Override
-  public String toString() {
-    return Util.name(this) + '[' + baseIO() + ']';
   }
 }

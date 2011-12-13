@@ -88,7 +88,7 @@ public final class FNFormat extends FuncCall {
     final QNm frm = new QNm(expr.length == 3 ?
         checkStr(expr[2], ctx) : EMPTY, ctx);
 
-    final DecFormatter df = ctx.decFormats.get(frm.eqname());
+    final DecFormatter df = ctx.sc.decFormats.get(frm.eqname());
     if(df == null) throw FORMNUM.thrw(input, frm);
     return Str.get(df.format(input, it, pic));
   }

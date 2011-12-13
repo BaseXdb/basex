@@ -52,7 +52,7 @@ public final class MAB2Parser extends SingleParser {
   /** Temporary build data. */
   private final byte[][] sig = new byte[500][];
   /** Temporary build data. */
-  private final byte[][] pers = new byte[50][];
+  private final byte[][] auth = new byte[50][];
   /** Temporary build data. */
   private final byte[][] inst = new byte[50][];
 
@@ -96,7 +96,7 @@ public final class MAB2Parser extends SingleParser {
   /** Temporary build data. */
   private int nrSigs;
   /** Temporary build data. */
-  private int nrPers;
+  private int nrAuth;
   /** Temporary build data. */
   private int nrInst;
   /** Temporary build data. */
@@ -302,7 +302,7 @@ public final class MAB2Parser extends SingleParser {
     isbn = null;
     subject = null;
     nrSigs = 0;
-    nrPers = 0;
+    nrAuth = 0;
     nrInst = 0;
     shortTitle = false;
 
@@ -335,7 +335,7 @@ public final class MAB2Parser extends SingleParser {
           title = string(line);
           shortTitle = true;
         } else if(n >= 100 && n < 200 && (n & 3) == 0) {
-          pers[nrPers++] = string(line);
+          auth[nrAuth++] = string(line);
         } else if(n >= 200 && n < 300 && (n & 3) == 0) {
           inst[nrInst++] = string(line);
         } else if(n == 304) {
@@ -390,7 +390,7 @@ public final class MAB2Parser extends SingleParser {
         builder.startElem(MEDIUM, atts);
         add(TYPE, type);
         add(LANGUAGE, language);
-        for(int s = 0; s < nrPers; ++s) add(PERSON, pers[s]);
+        for(int s = 0; s < nrAuth; ++s) add(AUTHOR, auth[s]);
         for(int s = 0; s < nrInst; ++s) add(INSTITUTE, inst[s]);
         add(ORIGINAL, original);
         add(TITLE, title);

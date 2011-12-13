@@ -33,15 +33,16 @@ public final class PathBuilder extends IndexBuilder {
       while(!pars.empty() && pars.peek() > par) pars.pop();
 
       if(kind == Data.DOC) {
-        pars.push(pre);
         path.index(0, kind, pars.size());
+        pars.push(pre);
       } else if(kind == Data.ELEM) {
         path.index(data.name(pre), kind, pars.size());
         pars.push(pre);
       } else if(kind == Data.ATTR) {
-        path.index(data.name(pre), kind, pars.size());
+        path.index(data.name(pre), kind, pars.size(),
+            data.text(pre, false), data.meta);
       } else {
-        path.index(0, kind, pars.size());
+        path.index(0, kind, pars.size(), data.text(pre, true), data.meta);
       }
     }
     data.meta.pathindex = true;

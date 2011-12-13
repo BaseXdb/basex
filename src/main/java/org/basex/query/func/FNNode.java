@@ -66,7 +66,7 @@ public final class FNNode extends FuncCall {
         Uri base = Uri.EMPTY;
         while(!base.isAbsolute()) {
           if(n == null) {
-            base = ctx.baseURI().resolve(base);
+            base = ctx.sc.baseURI().resolve(base);
             break;
           }
           base = Uri.uri(n.baseURI()).resolve(base);

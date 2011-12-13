@@ -3,6 +3,7 @@ package org.basex.gui.view.plot;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -14,12 +15,15 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingUtilities;
+
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -31,7 +35,7 @@ import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
-import org.basex.index.StatsKey.Kind;
+import org.basex.index.StatsType;
 import org.basex.util.list.IntList;
 
 /**
@@ -113,7 +117,7 @@ public final class PlotView extends View {
    */
   public PlotView(final ViewNotifier man) {
     super(PLOTVIEW, HELPPLOT, man);
-    border(5, 5, 5, 5).layout(new BorderLayout());
+    border(5).layout(new BorderLayout());
 
     final BaseXBack panel = new BaseXBack(Fill.NONE).layout(new BorderLayout());
 
@@ -500,16 +504,18 @@ public final class PlotView extends View {
     if(drawX) {
       if(plotChanged) {
         if(plotData.pres.length > 0) axis.calcCaption(pWidth);
-        final Kind kind = plotData.xAxis.type;
-        xLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) &&
+        final StatsType type = plotData.xAxis.type;
+        xLog.setEnabled((type == StatsType.DOUBLE ||
+            type == StatsType.INTEGER) &&
             Math.abs(axis.min - axis.max) >= 1);
       }
     } else {
       // drawing vertical axis line
       if(plotChanged) {
         if(plotData.pres.length > 0) axis.calcCaption(pHeight);
-        final Kind kind = plotData.yAxis.type;
-        yLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) &&
+        final StatsType type = plotData.yAxis.type;
+        yLog.setEnabled((type == StatsType.DOUBLE ||
+            type == StatsType.INTEGER) &&
             Math.abs(axis.min - axis.max) >= 1);
       }
     }
@@ -520,14 +526,14 @@ public final class PlotView extends View {
     }
 
     // getting some axis specific data
-    final Kind type = axis.type;
+    final StatsType type = axis.type;
     final int nrCaptions = axis.nrCaptions;
     final double step = axis.actlCaptionStep;
     final double capRange = 1.0d / (nrCaptions - 1);
     g.setFont(font);
 
     // draw axis and assignment for TEXT data
-    if(type == Kind.TEXT) {
+    if(type == StatsType.TEXT) {
       final int nrCats = axis.nrCats;
       final double[] coSorted = Arrays.copyOf(axis.co, axis.co.length);
       // draw min / max caption
@@ -992,8 +998,8 @@ public final class PlotView extends View {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
     final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
-    return axis.type == Kind.TEXT || axis.type == Kind.CAT ? string(val) :
-      BaseXLayout.value(toDouble(val));
+    return axis.type == StatsType.TEXT || axis.type == StatsType.CATEGORY ?
+        string(val) : BaseXLayout.value(toDouble(val));
   }
 
   @Override

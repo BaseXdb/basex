@@ -34,7 +34,7 @@ public final class BaseXGUI {
   final Context context = new Context();
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
-  /** File, specified as argument. */
+  /** Files, specified as arguments. */
   StringList files = new StringList();
 
   /**

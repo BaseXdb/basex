@@ -7,6 +7,7 @@ import org.basex.data.ExprInfo;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
+import org.basex.util.Array;
 
 /**
  * Variable stack.
@@ -14,17 +15,32 @@ import org.basex.query.item.QNm;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class VarList extends ExprInfo {
+public final class VarStack extends ExprInfo {
   /** Variable expressions. */
-  public Var[] vars = new Var[8];
+  public Var[] vars;
   /** Number of stored variables. */
   public int size;
 
   /**
-   * Stores the specified variable.
+   * Default constructor.
+   */
+  public VarStack() {
+    this(4);
+  }
+
+  /**
+   * Default constructor.
+   * @param c initial capacity
+   */
+  public VarStack(final int c) {
+    vars = new Var[c];
+  }
+
+  /**
+   * Adds or replaces the specified variable.
    * @param v variable
    */
-  public void set(final Var v) {
+  public void update(final Var v) {
     final int i = indexOf(v);
     if(i == -1) add(v);
     else vars[i] = v;
@@ -35,13 +51,13 @@ public final class VarList extends ExprInfo {
    * @param v variable
    */
   public void add(final Var v) {
-    if(size == vars.length) vars = Arrays.copyOf(vars, size << 1);
+    if(size == vars.length) vars = Arrays.copyOf(vars, Array.newSize(size));
     vars[size++] = v;
   }
 
   /**
-   * Finds and returns the variable with the specified name, this should only be
-   * used while parsing because it ignores variable IDs.
+   * Returns a variable with the specified name; should only be
+   * used while parsing because it ignores ids of variables.
    * @param name variable name
    * @return variable
    */
@@ -51,7 +67,7 @@ public final class VarList extends ExprInfo {
   }
 
   /**
-   * Finds and returns the specified variable.
+   * Returns a variable with the same id.
    * @param v variable
    * @return variable
    */
@@ -61,7 +77,7 @@ public final class VarList extends ExprInfo {
   }
 
   /**
-   * Returns the index of the specified variable, or {@code -1}.
+   * Returns the index of a variable with the same id, or {@code -1}.
    * @param v variable
    * @return index
    */
@@ -80,11 +96,11 @@ public final class VarList extends ExprInfo {
   }
 
   /**
-   * Checks if all variables have been correctly declared.
+   * Checks if none of the variables contains an updating expression.
    * @throws QueryException query exception
    */
-  public void check() throws QueryException {
-    for(int i = 0; i < size; ++i) vars[i].check();
+  public void checkUp() throws QueryException {
+    for(int i = 0; i < size; ++i) vars[i].checkUp();
   }
 
   @Override

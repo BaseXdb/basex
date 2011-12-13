@@ -1,11 +1,11 @@
 package org.basex.index.path;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -83,12 +83,29 @@ public final class PathSummary implements Index {
    * @param l current level
    */
   public void index(final int n, final byte k, final int l) {
+    index(n, k, l, null, null);
+  }
+
+  /**
+   * Adds an entry, including its value.
+   * @param n name reference
+   * @param k node kind
+   * @param l current level
+   * @param v value
+   * @param md meta data
+   */
+  public void index(final int n, final byte k, final int l, final byte[] v,
+      final MetaData md) {
+
     if(root == null) {
       root = new PathNode(n, k, null);
       stack.size(0);
       stack.add(root);
+    } else if(l == 0) {
+      if(v != null) root.stats.add(v, md);
+      root.stats.count++;
     } else {
-      stack.set(l, stack.get(l - 1).index(n, k));
+      stack.set(l, stack.get(l - 1).index(n, k, v, md));
     }
   }
 
@@ -188,7 +205,7 @@ public final class PathSummary implements Index {
 
     // sort by number of occurrences
     final double[] tmp = new double[in.size()];
-    for(int i = 0; i < in.size(); ++i) tmp[i] = in.get(i).size;
+    for(int i = 0; i < in.size(); ++i) tmp[i] = in.get(i).stats.count;
     final int[] occ = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes
@@ -237,9 +254,7 @@ public final class PathSummary implements Index {
    * @throws IOException I/O exception
    */
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(PATH);
     root.plan(data, ser);
-    ser.closeElement();
   }
 
   // Unsupported methods ======================================================

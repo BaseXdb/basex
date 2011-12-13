@@ -479,22 +479,22 @@ public enum Function {
   /** Database function: opens a database. */
   _DB_OPEN(FNDb.class, "open(database[,path])", NOD_ZM, 1, STR, STR),
   /** Database function: opens a specific database node. */
-  _DB_OPEN_PRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, ITEM, ITR),
+  _DB_OPEN_PRE(FNDb.class, "open-pre(database,pre)", NOD_ZM, STR, ITR),
   /** Database function: opens a specific database node. */
-  _DB_OPEN_ID(FNDb.class, "open-id(database,id)", NOD_ZM, ITEM, ITR),
+  _DB_OPEN_ID(FNDb.class, "open-id(database,id)", NOD_ZM, STR, ITR),
   /** Database function: searches the text index. */
-  _DB_TEXT(FNDb.class, "text(database,string)", NOD_ZM, ITEM, ITEM),
+  _DB_TEXT(FNDb.class, "text(database,string)", NOD_ZM, STR, ITEM),
   /** Database function: searches the attribute index. */
   _DB_ATTRIBUTE(FNDb.class, "attribute(database,string[,name])",
-      NOD_ZM, 2, ITEM, ITEM, STR),
+      NOD_ZM, 2, STR, ITEM, STR),
   /** Database function: searches the full-text index. */
-  _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, ITEM, STR),
+  _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, STR, STR),
   /** Database function: lists all databases or documents in a database. */
   _DB_LIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   _DB_SYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
-  _DB_INFO(FNDb.class, "info(database[,type])", STR, 1, ITEM, STR),
+  _DB_INFO(FNDb.class, "info(database[,type])", STR, 1, STR, STR),
   /** Database function: returns the node ids of database nodes. */
   _DB_NODE_ID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: returns the pre values of database nodes. */
@@ -505,13 +505,13 @@ public enum Function {
   _DB_ADD(FNDb.class, "add(database,nodes[,name[,path]])",
       EMP, 2, STR, DOC_ZM, STR, STR),
   /** Database function: delete document(s) from a database. */
-  _DB_DELETE(FNDb.class, "delete(database,path)", EMP, ITEM, STR),
+  _DB_DELETE(FNDb.class, "delete(database,path)", EMP, STR, STR),
   /** Database function: rename document(s). */
   _DB_RENAME(FNDb.class, "rename(database,path,newpath)", EMP, STR, STR, STR),
   /** Database function: replace document(s). */
-  _DB_REPLACE(FNDb.class, "replace(database,path,item)", EMP, ITEM, STR, ITEM),
+  _DB_REPLACE(FNDb.class, "replace(database,path,item)", EMP, STR, STR, ITEM),
   /** Database function: optimize database structures. */
-  _DB_OPTIMIZE(FNDb.class, "optimize(name[,all])", EMP, 1, STR, BLN),
+  _DB_OPTIMIZE(FNDb.class, "optimize(database[,all])", EMP, 1, STR, BLN),
   /** Database function: retrieves binary data. */
   _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", RAW, STR, STR),
   /** Database function: stores binary data. */
@@ -523,9 +523,14 @@ public enum Function {
   /** Database function: checks if the specified database or resource exists. */
   _DB_EXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
   /** Database function: returns the content type of a database file. */
-  _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", STR, STR, STR),
+  _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", ITEM, STR, STR),
   /** Database function: returns details for a resource. */
   _DB_DETAILS(FNDb.class, "details(database,path)", ITEM, STR, STR),
+
+  /* FNIndex functions. */
+
+  /** Index function: returns index facet information. */
+  _INDEX_FACETS(FNIndex.class, "facets(database, format)", DOC_O, 1, STR, STR),
 
   /* FNFile functions (EXPath). */
 
@@ -746,17 +751,18 @@ public enum Function {
     URIS.put(FNMath.class, MATHURI);
     // EXPath functions
     URIS.put(FNCrypto.class, CRYPTOURI);
-    URIS.put(FNFile.class, FILEURI);
-    URIS.put(FNHttp.class, HTTPURI);
-    URIS.put(FNZip.class,  ZIPURI);
+    URIS.put(FNFile.class,   FILEURI);
+    URIS.put(FNHttp.class,   HTTPURI);
+    URIS.put(FNZip.class,    ZIPURI);
     // internal functions
-    URIS.put(FNDb.class,   DBURI);
-    URIS.put(FNFt.class,   FTURI);
-    URIS.put(FNHof.class,  HOFURI);
-    URIS.put(FNJson.class, JSONURI);
-    URIS.put(FNSql.class, SQLURI);
-    URIS.put(FNUtil.class, UTILURI);
-    URIS.put(FNXslt.class, XSLTURI);
+    URIS.put(FNDb.class,    DBURI);
+    URIS.put(FNFt.class,    FTURI);
+    URIS.put(FNHof.class,   HOFURI);
+    URIS.put(FNIndex.class, INDEXURI);
+    URIS.put(FNJson.class,  JSONURI);
+    URIS.put(FNSql.class,   SQLURI);
+    URIS.put(FNUtil.class,  UTILURI);
+    URIS.put(FNXslt.class,  XSLTURI);
   }
 
   /** Minimum number of arguments. */
