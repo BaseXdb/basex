@@ -61,7 +61,7 @@ public class TokenSet implements Iterable<byte[]> {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public final void read(final DataInput in) throws IOException {
+  public void read(final DataInput in) throws IOException {
     keys = in.readTokens();
     next = in.readNums();
     bucket = in.readNums();

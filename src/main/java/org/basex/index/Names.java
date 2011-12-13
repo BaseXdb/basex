@@ -1,12 +1,15 @@
 package org.basex.index;
 
-import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.basex.core.Text;
 import org.basex.data.MetaData;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
+import org.basex.io.serial.Serializer;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -22,7 +25,7 @@ import org.basex.util.hash.TokenSet;
  */
 public final class Names extends TokenSet implements Index {
   /** Statistic information. */
-  private StatsKey[] stat;
+  private Stats[] stats;
   /** Reference to meta data. */
   private final MetaData meta;
 
@@ -31,7 +34,7 @@ public final class Names extends TokenSet implements Index {
    * @param md meta data
    */
   public Names(final MetaData md) {
-    stat = new StatsKey[CAP];
+    stats = new Stats[CAP];
     meta = md;
   }
 
@@ -43,16 +46,16 @@ public final class Names extends TokenSet implements Index {
    */
   public Names(final DataInput in, final MetaData md) throws IOException {
     super(in);
-    stat = new StatsKey[keys.length];
+    stats = new Stats[keys.length];
     meta = md;
-    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(in, md);
+    for(int s = 1; s < size; ++s) stats[s] = new Stats(in);
   }
 
   /**
    * Initializes the statistics.
    */
   public void init() {
-    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(meta);
+    for(int s = 1; s < size; ++s) stats[s] = new Stats();
   }
 
   /**
@@ -65,9 +68,9 @@ public final class Names extends TokenSet implements Index {
   public int index(final byte[] k, final byte[] v, final boolean st) {
     final int s = Math.abs(add(k));
     if(st) {
-      if(stat[s] == null) stat[s] = new StatsKey(meta);
-      if(v != null) stat[s].add(v);
-      stat[s].counter++;
+      if(stats[s] == null) stats[s] = new Stats();
+      if(v != null) stats[s].add(v, meta);
+      stats[s].count++;
     }
     return s;
   }
@@ -78,15 +81,15 @@ public final class Names extends TokenSet implements Index {
    * @param v value, used for statistics
    */
   public void index(final int i, final byte[] v) {
-    stat[i].add(v);
+    stats[i].add(v, meta);
   }
 
   @Override
   public void write(final DataOutput out) throws IOException {
     super.write(out);
     for(int s = 1; s < size; ++s) {
-      if(stat[s] == null) stat[s] = new StatsKey(meta);
-      stat[s].finish(out);
+      if(stats[s] == null) stats[s] = new Stats();
+      stats[s].write(out);
     }
   }
 
@@ -95,8 +98,8 @@ public final class Names extends TokenSet implements Index {
    * @param id id
    * @return statistics
    */
-  public StatsKey stat(final int id) {
-    return stat[id];
+  public Stats stat(final int id) {
+    return stats[id];
   }
 
   @Override
@@ -106,8 +109,8 @@ public final class Names extends TokenSet implements Index {
     tl[0] = 0;
     for(int i = 1; i < size; ++i) {
       if(len < keys[i].length) len = keys[i].length;
-      if(stat[i] == null) continue;
-      tl[i] = stat[i].counter;
+      if(stats[i] == null) continue;
+      tl[i] = stats[i].count;
     }
     len += 2;
 
@@ -115,24 +118,39 @@ public final class Names extends TokenSet implements Index {
     final int[] ids = Array.createOrder(tl, false);
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(INDEXSTRUC + HASHSTRUC + NL);
-    tb.add(IDXENTRIES + (size - 1) + NL);
+    tb.add(Text.INDEXSTRUC + Text.HASHSTRUC + Text.NL);
+    tb.add(Text.IDXENTRIES + (size - 1) + Text.NL);
     for(int i = 0; i < size - 1; ++i) {
       final int s = ids[i];
-      if(stat[s] == null) continue;
+      if(stats[s] == null) continue;
       final byte[] key = keys[s];
       tb.add("  ");
       tb.add(key);
       for(int j = 0; j < len - key.length; ++j) tb.add(' ');
-      tb.add(stat[s] + NL);
+      tb.add(stats[s] + Text.NL);
     }
     return tb.finish();
+  }
+
+  /**
+   * Serializes the path node.
+   * @param ser serializer
+   * @throws IOException I/O exception
+   */
+  void plan(final Serializer ser) throws IOException {
+    ser.openElement(INDEX);
+    for(int i = 1; i < size; ++i) {
+      ser.openElement(KEY, NAME, keys[i]);
+      stats[i].plan(ser);
+      ser.closeElement();
+    }
+    ser.closeElement();
   }
 
   @Override
   protected void rehash() {
     super.rehash();
-    stat = Arrays.copyOf(stat, size << 1);
+    stats = Arrays.copyOf(stats, size << 1);
   }
 
   @Override

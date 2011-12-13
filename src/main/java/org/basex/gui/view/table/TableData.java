@@ -7,8 +7,8 @@ import org.basex.core.cmd.Find;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIProp;
+import org.basex.index.StatsType;
 import org.basex.index.Names;
-import org.basex.index.StatsKey.Kind;
 import org.basex.util.Array;
 import org.basex.util.list.BoolList;
 import org.basex.util.list.IntList;
@@ -250,8 +250,8 @@ final class TableData {
 
     final Data data = context.data();
     final Names index = e ? data.tagindex : data.atnindex;
-    final Kind kind = index.stat(c).kind;
-    final boolean num = kind == Kind.INT || kind == Kind.DBL;
+    final StatsType type = index.stat(c).type;
+    final boolean num = type == StatsType.INTEGER || type == StatsType.DOUBLE;
 
     final byte[][] tokens = new byte[rows.size()][];
     final int rs = rows.size();

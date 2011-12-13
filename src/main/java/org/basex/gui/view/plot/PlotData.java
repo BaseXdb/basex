@@ -1,12 +1,14 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
+
 import java.util.Arrays;
+
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import org.basex.index.StatsType;
 import org.basex.index.Names;
-import org.basex.index.StatsKey.Kind;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 
@@ -65,8 +67,8 @@ final class PlotData {
     final TokenList tl = new TokenList();
     if(data.meta.pathindex) {
       for(final byte[] k : data.pthindex.desc(it, true, false)) {
-        final Names index = startsWith(k, '@') ? data.atnindex : data.tagindex;
-        if(index.stat(index.id(delete(k, '@'))).kind != Kind.NONE) tl.add(k);
+        final Names nm = startsWith(k, '@') ? data.atnindex : data.tagindex;
+        if(nm.stat(nm.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
       }
     }
     return tl;

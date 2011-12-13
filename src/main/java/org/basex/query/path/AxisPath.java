@@ -2,7 +2,7 @@ package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
-import org.basex.index.StatsKey;
+import org.basex.index.Stats;
 import org.basex.index.path.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -369,7 +369,7 @@ public class AxisPath extends Path {
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;
 
-    final StatsKey stats = data.tagindex.stat(
+    final Stats stats = data.tagindex.stat(
         data.tagindex.id(s.test.name.local()));
     if(stats != null && stats.leaf) {
       steps = Array.add(steps, AxisStep.get(input, Axis.CHILD, Test.TXT));

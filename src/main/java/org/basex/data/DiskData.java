@@ -202,13 +202,13 @@ public final class DiskData extends Data {
 
   @Override
   public boolean updating(final boolean updating) {
-    final File lock = updateFile();
-    if(!updating) return lock.delete();
+    final File upd = updateFile();
+    if(!updating) return upd.delete();
 
     // try several times (may fail at first run)
     for(int i = 0; i < 10; i++) {
       try {
-        if(lock.createNewFile()) return true;
+        if(upd.createNewFile()) return true;
       } catch(final IOException ex) {
         Performance.sleep(10);
         Util.debug(ex);
@@ -218,8 +218,8 @@ public final class DiskData extends Data {
   }
 
   /**
-   * Returns a lock file.
-   * @return lock file
+   * Returns a file that indicates ongoing updates.
+   * @return updating file
    */
   public File updateFile() {
     return meta.dbfile(DataText.DATAUPD);

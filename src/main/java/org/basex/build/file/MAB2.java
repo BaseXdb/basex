@@ -41,7 +41,7 @@ public interface MAB2 {
   /** Tag. */
   byte[] ORIGINAL = token("Original");
   /** Tag. */
-  byte[] PERSON = token("Person");
+  byte[] AUTHOR = token("Author");
   /** Tag. */
   byte[] PUBLISHER = token("Publisher");
   /** Tag. */

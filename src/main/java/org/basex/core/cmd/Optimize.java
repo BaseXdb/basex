@@ -98,9 +98,9 @@ public final class Optimize extends ACreate {
         tags.pop();
       }
       if(kind == Data.DOC) {
+        if(m.createpath) d.pthindex.index(0, kind, pars.size());
         pars.push(pre);
         tags.push(0);
-        if(m.createpath) d.pthindex.index(0, kind, pars.size());
         ++n;
       } else if(kind == Data.ELEM) {
         final int id = d.name(pre);
@@ -110,12 +110,13 @@ public final class Optimize extends ACreate {
         tags.push(id);
       } else if(kind == Data.ATTR) {
         final int id = d.name(pre);
-        d.atnindex.index(d.atnindex.key(id), d.text(pre, false), true);
-        if(m.createpath) d.pthindex.index(id, kind, pars.size());
+        final byte[] val = d.text(pre, false);
+        d.atnindex.index(d.atnindex.key(id), val, true);
+        if(m.createpath) d.pthindex.index(id, kind, pars.size(), val, m);
       } else {
-        final byte[] txt = d.text(pre, true);
-        if(kind == Data.TEXT) d.tagindex.index(tags.peek(), txt);
-        if(m.createpath) d.pthindex.index(0, kind, pars.size());
+        final byte[] val = d.text(pre, true);
+        if(kind == Data.TEXT) d.tagindex.index(tags.peek(), val);
+        if(m.createpath) d.pthindex.index(0, kind, pars.size(), val, m);
       }
       if(c != null) c.pre = pre;
     }

@@ -1,123 +1,165 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import java.util.Arrays;
+
+import java.util.Locale;
+
+import org.basex.data.Data;
+import org.basex.index.Names;
+import org.basex.index.Stats;
+import org.basex.index.path.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Expr.Use;
+import org.basex.query.item.ANode;
+import org.basex.query.item.FAttr;
+import org.basex.query.item.FDoc;
+import org.basex.query.item.FElem;
+import org.basex.query.item.FTxt;
+import org.basex.query.item.Item;
+import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.util.NSGlobal;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.InputInfo;
-import org.basex.util.Levenshtein;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.Token;
 
 /**
- * Global expression context.
+ * Index functions.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
+ * @author Dimitar Popov
+ * @author Andreas Weiler
  */
-public final class FNIndex extends TokenSet {
-  /** Singleton instance. */
-  private static final FNIndex INSTANCE = new FNIndex();
-  /** Function classes. */
-  private Function[] funcs;
+public final class FNIndex extends FuncCall {
+  /** Name: name. */
+  private static final QNm Q_NAME = new QNm(NAM);
+  /** Name: count. */
+  private static final QNm Q_COUNT = new QNm(COUNT);
+  /** Name: type. */
+  private static final QNm Q_TYPE = new QNm(TYP);
+  /** Name: value. */
+  private static final QNm Q_VALUE = new QNm(VAL);
+  /** Name: min. */
+  private static final QNm Q_MIN = new QNm(MIN);
+  /** Name: max. */
+  private static final QNm Q_MAX = new QNm(MAX);
+  /** Name: elements. */
+  private static final QNm Q_ELM = new QNm(NodeType.ELM.string());
+  /** Name: attributes. */
+  private static final QNm Q_ATT = new QNm(NodeType.ATT.string());
+
+  /** Flag: flat output. */
+  private static final byte[] FLAT = token("flat");
 
   /**
-   * Returns the singleton instance.
-   * @return instance
-   */
-  public static FNIndex get() {
-    return INSTANCE;
-  }
-
-  /**
-   * Constructor, registering XQuery functions.
-   */
-  private FNIndex() {
-    funcs = new Function[CAP];
-    for(final Function def : Function.values()) {
-      final String dsc = def.desc;
-      final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(full(def.uri(), ln));
-      if(i < 0) Util.notexpected("Function defined twice:" + def);
-      funcs[i] = def;
-    }
-  }
-
-  /**
-   * Returns the specified function.
-   * @param name function name
-   * @param uri function uri
-   * @param args optional arguments
-   * @param ctx query context
+   * Constructor.
    * @param ii input info
-   * @return function instance
-   * @throws QueryException query exception
+   * @param f function definition
+   * @param e arguments
    */
-  public FuncCall get(final byte[] name, final byte[] uri,
-      final Expr[] args, final QueryContext ctx, final InputInfo ii)
-          throws QueryException {
-
-    final int id = id(full(uri, name));
-    if(id == 0) return null;
-
-    // create function
-    final Function fl = funcs[id];
-    if(!eq(fl.uri(), uri)) return null;
-
-    final FuncCall f = fl.get(ii, args);
-    if(!ctx.xquery3 && f.uses(Use.X30)) FEATURE30.thrw(ii);
-    // check number of arguments
-    if(args.length < fl.min || args.length > fl.max) XPARGS.thrw(ii, fl);
-    return f;
-  }
-
-  /**
-   * Throws an error if one of the pre-defined functions is similar to the
-   * specified function name.
-   * @param name function name
-   * @param ii input info
-   * @throws QueryException query exception
-   */
-  public void error(final QNm name, final InputInfo ii) throws QueryException {
-    // compare specified name with names of predefined functions
-    final byte[] ln = name.local();
-    final Levenshtein ls = new Levenshtein();
-    for(int k = 1; k < size; ++k) {
-      final int i = indexOf(keys[k], '}');
-      final byte[] u = substring(keys[k], 1, i);
-      final byte[] l = substring(keys[k], i + 1);
-      if(eq(ln, l)) {
-        final byte[] ur = name.uri();
-        FUNSIMILAR.thrw(ii,
-            new TokenBuilder(NSGlobal.prefix(ur)).add(':').add(l),
-            new TokenBuilder(NSGlobal.prefix(u)).add(':').add(l));
-      } else if(ls.similar(ln, l, 0)) {
-        FUNSIMILAR.thrw(ii, name.string(), l);
-      }
-    }
-  }
-
-  /**
-   * Returns a unique name representation of the function,
-   * including the URI and function name.
-   * @param uri namespace uri
-   * @param ln local name
-   * @return full name
-   */
-  private byte[] full(final byte[] uri, final byte[] ln) {
-    return new TokenBuilder().add('{').add(uri).add('}').add(ln).finish();
+  public FNIndex(final InputInfo ii, final Function f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
-  protected void rehash() {
-    super.rehash();
-    funcs = Arrays.copyOf(funcs, size << 1);
+  public Item item(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+
+    switch(def) {
+      case _INDEX_FACETS: return facets(ctx);
+      default:            return super.item(ctx, ii);
+    }
+  }
+
+  /**
+   * Returns facet information about a database.
+   * @param ctx query context
+   * @return facet information
+   * @throws QueryException query exception
+   */
+  private Item facets(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    if(!data.meta.pathindex) throw NOVAIDX.thrw(input);
+
+    final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
+    final NodeCache nc = new NodeCache();
+    nc.add(flat ? flat(data) : tree(data, data.pthindex.root().get(0)));
+    return new FDoc(nc, Token.EMPTY);
+  }
+
+  /**
+   * Returns a flat facet representation.
+   * @param data data reference
+   * @return element
+   */
+  private FElem flat(final Data data) {
+    final FElem elem = new FElem(new QNm(NodeType.DOC.string()));
+    index(data.tagindex, Q_ELM, elem);
+    index(data.atnindex, Q_ATT, elem);
+    return elem;
+  }
+
+  /**
+   * Evaluates name index information.
+   * @param names name index
+   * @param name element name
+   * @param root root node
+   */
+  private void index(final Names names, final QNm name, final FElem root) {
+    for(int i = 0; i < names.size(); ++i) {
+      final FElem sub = new FElem(name);
+      sub.add(new FAttr(Q_NAME, names.key(i + 1)));
+      stats(names.stat(i + 1), sub);
+      root.add(sub);
+    }
+  }
+
+  /**
+   * Returns tree facet representation.
+   * @param data data reference
+   * @param root root node
+   * @return element
+   */
+  private FElem tree(final Data data, final PathNode root) {
+    final FElem elem = new FElem(new QNm(ANode.type(root.kind).string()));
+    final boolean elm = root.kind == Data.ELEM;
+    final Names names = elm ? data.tagindex : data.atnindex;
+    if(root.kind == Data.ATTR || elm) {
+      elem.add(new FAttr(Q_NAME, names.key(root.name)));
+    }
+    stats(root.stats, elem);
+    for(final PathNode p : root.ch) elem.add(tree(data, p));
+    return elem;
+  }
+
+  /**
+   * Attaches statistical information to the specified element.
+   * @param stats statistics
+   * @param elem element
+   */
+  private void stats(final Stats stats, final FElem elem) {
+    final String k = stats.type.toString().toLowerCase(Locale.ENGLISH);
+    elem.add(new FAttr(Q_TYPE, Token.token(k)));
+    elem.add(new FAttr(Q_COUNT, Token.token(stats.count)));
+    switch(stats.type) {
+      case CATEGORY:
+        for(final byte[] c : stats.cats) {
+          final FElem sub = new FElem(Q_VALUE);
+          sub.add(new FAttr(Q_COUNT, Token.token(stats.cats.value(c))));
+          sub.add(new FTxt(c));
+          elem.add(sub);
+        }
+        break;
+      case DOUBLE:
+      case INTEGER:
+        elem.add(new FAttr(Q_MIN, Token.token(stats.min)));
+        elem.add(new FAttr(Q_MAX, Token.token(stats.max)));
+        break;
+      default:
+        break;
+    }
   }
 }

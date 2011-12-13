@@ -180,16 +180,20 @@ public interface DataText {
   byte[] RESULTS = token("results");
   /** Token: result. */
   byte[] RESULT = token("result");
-  /** Token: path. */
-  byte[] PATH = token("path");
   /** Token: name. */
   byte[] NAME = token("name");
-  /** Token: node. */
-  byte[] NODE = token("node");
-  /** Token: kind. */
-  byte[] KIND = token("kind");
   /** Token: size. */
   byte[] SIZE = token("size");
+  /** Token: min. */
+  byte[] MIN = token("min");
+  /** Token: max. */
+  byte[] MAX = token("max");
+  /** Token: count. */
+  byte[] COUNT = token("count");
+  /** Token: index. */
+  byte[] INDEX = token("index");
+  /** Token: key. */
+  byte[] KEY = token("key");
 
   /** Token: json. */
   byte[] JSON = token("json");

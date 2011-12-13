@@ -1,9 +1,10 @@
 package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
-import org.basex.index.StatsKey;
-import org.basex.index.StatsKey.Kind;
+import org.basex.index.StatsType;
+import org.basex.index.Stats;
 import org.basex.util.Array;
 import org.basex.util.hash.TokenSet;
 
@@ -23,7 +24,7 @@ final class PlotAxis {
   /** Number of different categories for x attribute. */
   int nrCats;
   /** Data type. */
-  Kind type;
+  StatsType type;
   /** Coordinates of items. */
   double[] co = {};
   /** First label to be drawn after minimum label. */
@@ -65,7 +66,7 @@ final class PlotAxis {
    */
   private void initialize() {
     tag = false;
-    type = Kind.INT;
+    type = StatsType.INTEGER;
     co = new double[0];
     nrCats = -1;
     firstCat = EMPTY;
@@ -103,13 +104,13 @@ final class PlotAxis {
    */
   void refreshAxis() {
     final Data data = plotData.context.data();
-    final StatsKey key = tag ? data.tagindex.stat(attrID) :
+    final Stats key = tag ? data.tagindex.stat(attrID) :
       data.atnindex.stat(attrID);
     if(key == null) return;
-    type = key.kind;
+    type = key.type;
     if(type == null) return;
-    if(type == Kind.CAT)
-      type = Kind.TEXT;
+    if(type == StatsType.CATEGORY)
+      type = StatsType.TEXT;
 
     final int[] items = plotData.pres;
     if(items.length < 1) return;
@@ -117,13 +118,13 @@ final class PlotAxis {
     final byte[][] vals = new byte[items.length][];
     for(int i = 0; i < items.length; ++i) {
       byte[] value = getValue(items[i]);
-      if(type == Kind.TEXT && value.length > TEXTLENGTH) {
+      if(type == StatsType.TEXT && value.length > TEXTLENGTH) {
         value = substring(value, 0, TEXTLENGTH);
       }
       vals[i] = lc(value);
     }
 
-    if(type == Kind.TEXT)
+    if(type == StatsType.TEXT)
       textToNum(vals);
     else {
       minMax(vals);
@@ -329,7 +330,7 @@ final class PlotAxis {
    * @param space space of view axis available for captions
    */
   void calcCaption(final int space) {
-    if(type == Kind.DBL || type == Kind.INT) {
+    if(type == StatsType.DOUBLE || type == StatsType.INTEGER) {
       final double range = Math.abs(max - min);
       if(range == 0) {
         nrCaptions = 1;
@@ -344,7 +345,7 @@ final class PlotAxis {
       }
 
       // labeling for linear scale
-      final boolean dbl = type == Kind.DBL;
+      final boolean dbl = type == StatsType.DOUBLE;
       actlCaptionStep = calculatedCaptionStep;
       nrCaptions = (int) (range / actlCaptionStep) + 1;
       while(2 * nrCaptions * PlotView.CAPTIONWHITESPACE * 3 < space &&
