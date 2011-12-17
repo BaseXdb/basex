@@ -131,7 +131,7 @@ public class BufferInput extends InputStream {
 
   /**
    * Returns the next byte (see {@link InputStream#read}.
-   * {@code 0} is returned if all bytes have been read.
+   * {@code -1} is returned if all bytes have been read.
    * @return next byte
    * @throws IOException I/O exception
    */
