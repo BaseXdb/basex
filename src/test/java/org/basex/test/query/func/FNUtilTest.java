@@ -33,8 +33,8 @@ public final class FNUtilTest extends AdvancedQueryTest {
   @Test
   public void utilRun() {
     check(_UTIL_RUN);
-    query(_UTIL_RUN.args("etc/test/input.xq"), "XML");
-    error(_UTIL_RUN.args("etc/test/xxx.xq"), Err.UNDOC);
+    query(_UTIL_RUN.args("src/test/resources/input.xq"), "XML");
+    error(_UTIL_RUN.args("src/test/resources/xxx.xq"), Err.UNDOC);
   }
 
   /**

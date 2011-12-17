@@ -19,7 +19,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   /** Test database name. */
   private static final String DB = Util.name(UpdateTest.class);
   /** Test document. */
-  private static final String DOC = "etc/test/xmark.xml";
+  private static final String DOC = "src/test/resources/xmark.xml";
 
   /**
    * Creates a database.

@@ -22,7 +22,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
   /** Test database name. */
   private static final String DB = Util.name(FastReplaceTest.class);
   /** Test document. */
-  private static final String DOC = "etc/test/xmark.xml";
+  private static final String DOC = "src/test/resources/xmark.xml";
 
   /**
    * Creates the db based on xmark.xml.

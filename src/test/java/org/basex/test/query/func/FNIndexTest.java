@@ -21,7 +21,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
   /** Name of test database. */
   private static final String DB = Util.name(FNIndexTest.class);
   /** Test file. */
-  private static final String FILE = "etc/test/input.xml";
+  private static final String FILE = "src/test/resources/input.xml";
 
   /**
    * Initializes a test.

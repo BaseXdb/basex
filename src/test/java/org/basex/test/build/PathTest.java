@@ -31,9 +31,9 @@ public final class PathTest {
   /** Test database name. */
   private static final String WEEK2 = Util.name(PathTest.class) + "3";
   /** Test file. */
-  private static final String INPUTF = "etc/test/input.xml";
+  private static final String INPUTF = "src/test/resources/input.xml";
   /** Test file. */
-  private static final String WEEK = "etc/test/week.zip";
+  private static final String WEEK = "src/test/resources/week.zip";
 
   /**
    * Creates initial databases.

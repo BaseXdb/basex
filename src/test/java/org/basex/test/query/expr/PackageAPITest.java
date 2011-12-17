@@ -34,7 +34,7 @@ import org.junit.Test;
  */
 public final class PackageAPITest extends AdvancedQueryTest {
   /** Test repository. */
-  private static final String REPO = "etc/test/repo/";
+  private static final String REPO = "src/test/resources/repo/";
   /** Context. */
   private Context ctx;
 
@@ -219,7 +219,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void repoInstall() throws BaseXException {
     // try to install non-existing package
     try {
-      new RepoManager(ctx.repo).install("etc/pkg", null);
+      new RepoManager(ctx.repo).install("src/test/resources/pkg", null);
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGNOTEXIST);

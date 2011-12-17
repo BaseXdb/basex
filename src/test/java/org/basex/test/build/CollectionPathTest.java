@@ -23,12 +23,14 @@ public final class CollectionPathTest {
   private static final Context CONTEXT = new Context();
   /** Test database name. */
   private static final String DB = Util.name(CollectionPathTest.class);
+  /** Test files directory. */
+  private static final String DIR = "src/test/resources/";
   /** Test files. */
   private static final String[] FILES = {
-    "etc/test/input.xml", "etc/test/xmark.xml", "etc/test/test.xml"
+    DIR + "input.xml", DIR + "xmark.xml", DIR + "test.xml"
   };
   /** Test ZIP. */
-  private static final String ZIP = "etc/test/xml.zip";
+  private static final String ZIP = DIR + "xml.zip";
 
   /**
    * Creates an initial database.
@@ -38,7 +40,7 @@ public final class CollectionPathTest {
   public static void before() throws BaseXException {
     new CreateDB(DB).execute(CONTEXT);
     for(final String file : FILES) {
-      new Add("etc/test/", file).execute(CONTEXT);
+      new Add(DIR, file).execute(CONTEXT);
     }
     new Add("test/zipped", ZIP).execute(CONTEXT);
   }
@@ -59,7 +61,7 @@ public final class CollectionPathTest {
   @Test
   public void findDoc() throws Exception {
     final String find =
-      "for $x in collection('" + DB + "/etc/test/xmark.xml') " +
+      "for $x in collection('" + DB + '/' + DIR + "xmark.xml') " +
       "where $x//location contains text 'uzbekistan' " +
       "return $x";
     final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
@@ -86,7 +88,7 @@ public final class CollectionPathTest {
   @Test
   public void baseUri() throws Exception {
     final String find =
-      "for $x in collection('" + DB + "/etc/test/xmark.xml') " +
+      "for $x in collection('" + DB + '/' + DIR + "xmark.xml') " +
       "return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
     assertEquals(FILES[1], qp.iter().next().toJava());

@@ -30,9 +30,9 @@ public final class FNDbTest extends AdvancedQueryTest {
   /** Name of test database. */
   private static final String DB = Util.name(FNDbTest.class);
   /** Test file. */
-  private static final String FILE = "etc/test/input.xml";
+  private static final String FILE = "src/test/resources/input.xml";
   /** Test folder. */
-  private static final String FLDR = "etc/test/dir";
+  private static final String FLDR = "src/test/resources/dir";
   /** Number of XML files for folder. */
   private static final int NFLDR;
 

@@ -30,7 +30,7 @@ public final class AddDeleteTest {
   /** Test database name. */
   private static final String DB = Util.name(AddDeleteTest.class);
   /** Test file. */
-  private static final String DIR = "etc/test/";
+  private static final String DIR = "src/test/resources/";
   /** Test file. */
   private static final String FILE = DIR + "input.xml";
   /** Test file. */

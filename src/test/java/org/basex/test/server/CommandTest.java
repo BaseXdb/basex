@@ -73,7 +73,7 @@ public class CommandTest {
   /** Test file name. */
   private static final String FN = "input.xml";
   /** Test folder. */
-  private static final String FLDR = "etc/test";
+  private static final String FLDR = "src/test/resources";
   /** Test file. */
   private static final String FILE = FLDR + '/' + FN;
   /** Test name. */

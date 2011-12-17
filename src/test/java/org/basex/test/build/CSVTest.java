@@ -29,6 +29,8 @@ public final class CSVTest {
   private static final Context CONTEXT = new Context();
   /** Test database name. */
   private static final String NAME = Util.name(CSVTest.class);
+  /** Test CSV file. */
+  private static final String FILE = "src/test/resources/input.csv";
 
   /**
    * Creates the initial database.
@@ -82,12 +84,12 @@ public final class CSVTest {
    */
   @Test
   public void one() throws Exception {
-    new CreateDB(NAME, "etc/test/input.csv").execute(CONTEXT);
+    new CreateDB(NAME, FILE).execute(CONTEXT);
     assertEquals("3", new XQuery("count(//Name)").execute(CONTEXT));
     assertEquals("2", new XQuery("count(//Email)").execute(CONTEXT));
 
     new Set(Prop.PARSEROPT, "format=simple,header=true").execute(CONTEXT);
-    new CreateDB(NAME, "etc/test/input.csv").execute(CONTEXT);
+    new CreateDB(NAME, FILE).execute(CONTEXT);
     assertEquals("3", new XQuery("count(//record)").execute(CONTEXT));
   }
 
@@ -98,7 +100,7 @@ public final class CSVTest {
   @Test
   public void simple() throws Exception {
     new Set(Prop.PARSEROPT, "format=simple,header=true").execute(CONTEXT);
-    new CreateDB(NAME, "etc/test/input.csv").execute(CONTEXT);
+    new CreateDB(NAME, FILE).execute(CONTEXT);
     assertEquals("3", new XQuery("count(//record)").execute(CONTEXT));
   }
 
@@ -109,7 +111,7 @@ public final class CSVTest {
   @Test
   public void sep() throws Exception {
     new Set(Prop.PARSEROPT, "separator=tab,header=true").execute(CONTEXT);
-    new CreateDB(NAME, "etc/test/input.csv").execute(CONTEXT);
+    new CreateDB(NAME, FILE).execute(CONTEXT);
     assertEquals("0", new XQuery("count(//Name)").execute(CONTEXT));
   }
 
