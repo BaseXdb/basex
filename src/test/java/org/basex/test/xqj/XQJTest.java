@@ -70,7 +70,7 @@ public final class XQJTest extends TestCase {
   public void test1() throws Exception {
     final XQConnection conn = conn(drv);
     final XQPreparedExpression expr = conn.prepareExpression(
-        "doc('etc/test/input.xml')//li");
+        "doc('src/test/resources/input.xml')//li");
 
     // query execution
     final XQResultSequence result = expr.executeQuery();
@@ -204,7 +204,7 @@ public final class XQJTest extends TestCase {
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
     final XQExpression ex = conn.createExpression();
-    final String query = "doc('etc/test/input.xml')//title";
+    final String query = "doc('src/test/resources/input.xml')//title";
     //String query = "1,2";
     final XQResultSequence seq = ex.executeQuery(query);
     final XMLStreamReader xsr = seq.getSequenceAsStream();
@@ -453,7 +453,7 @@ public final class XQJTest extends TestCase {
     conn.getStaticContext().setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
     XQExpression xqe = conn.createExpression();
-    final XQSequence xqs = xqe.executeQuery("doc('etc/test/input.xml')");
+    final XQSequence xqs = xqe.executeQuery("doc('src/test/resources/input.xml')");
     xqs.first();
     final XQItem xqi = xqs.getItem();
 
@@ -476,7 +476,7 @@ public final class XQJTest extends TestCase {
       fail("Error expected: no database opened.");
     } catch(final XQException ex) { /* ignored */
     }
-    expr.executeCommand("create db tmp etc/test/input.xml");
+    expr.executeCommand("create db tmp src/test/resources/input.xml");
     expr.executeCommand("info db");
     expr.executeCommand("drop db tmp");
     expr.executeCommand("close");
@@ -503,7 +503,7 @@ public final class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     XQResultSequence result =
-      expr.executeQuery("doc('etc/test/input.xml')//title/text()");
+      expr.executeQuery("doc('src/test/resources/input.xml')//title/text()");
     result.next();
     final XQItem item = conn.createItem(result.getItem());
 

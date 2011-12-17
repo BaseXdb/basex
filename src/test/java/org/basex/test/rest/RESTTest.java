@@ -51,7 +51,7 @@ public class RESTTest {
   private static final String ROOT =
       "http://" + LOCALHOST + ":9998/" + NAME + "/";
   /** Input file. */
-  private static final String FILE = "etc/test/input.xml";
+  private static final String FILE = "src/test/resources/input.xml";
   /** Start servers. */
   private static BaseXHTTP http;
 
