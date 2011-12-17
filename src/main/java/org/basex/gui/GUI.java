@@ -274,8 +274,8 @@ public final class GUI extends AGUI {
     new Thread() {
       @Override
       public void run() {
-        checkVersion();
         views.run();
+        checkVersion();
       }
     }.start();
 
@@ -429,12 +429,13 @@ public final class GUI extends AGUI {
       info.reset();
 
       // sends feedback to the query editor
+      boolean stopped = inf.startsWith(PROGERR);
       if(edit) {
-        editor.info(inf.startsWith(PROGERR) ? PROGERR : inf, ok);
+        editor.info(stopped ? PROGERR : inf, ok);
       }
 
       // check if query feedback was evaluated in the query view
-      if(!ok) {
+      if(!ok && !stopped) {
         // display error in info view
         if((!edit || inf.startsWith(BUGINFO)) && !info.visible()) {
           GUICommands.SHOWINFO.execute(this);

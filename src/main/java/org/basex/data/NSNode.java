@@ -199,26 +199,24 @@ final class NSNode {
 
   /**
    * Prints the node structure for debugging purposes.
-   * @param tb string builder
-   * @param ns namespace reference
+   * @param tb token builder
    * @param l level
+   * @param ns namespace reference
    * @param s start pre value
    * @param e end pre value
    */
   private void print(final TokenBuilder tb, final int l, final Namespaces ns,
       final int s, final int e) {
+
     if(pre >= s && pre <= e) {
       tb.add(NL);
       for(int i = 0; i < l; ++i) tb.add("  ");
-      tb.add("Pre[" + pre + "] ");
+      tb.add(toString() + ' ');
       for(int i = 0; i < vals.length; i += 2) {
         tb.add("xmlns");
         final byte[] p = ns.prefix(vals[i]);
         if(p.length != 0) tb.add(':');
-        tb.add(p);
-        tb.add("=\"");
-        tb.add(ns.uri(vals[i + 1]));
-        tb.add("\" ");
+        tb.add(p).add("=\"").add(ns.uri(vals[i + 1])).add("\" ");
       }
     }
     for(int c = 0; c < size; ++c) ch[c].print(tb, l + 1, ns, s, e);

@@ -7,7 +7,6 @@ import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.query.up.primitives.RenameNode;
@@ -60,8 +59,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void insertIntoShiftPreValues() throws Exception {
     create(12);
-    query("insert node <b xmlns:ns='A'/> into doc('d12')/*:a/*:b", "");
-    new Open("d12").execute(CONTEXT);
+    query("insert node <b xmlns:ns='A'/> into doc('d12')/*:a/*:b");
     assertEquals(NL +
         "  Pre[3] xmlns:ns=\"A\" " + NL +
         "  Pre[4] xmlns=\"B\" ",
@@ -76,8 +74,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void insertIntoShiftPreValues2() throws Exception {
     create(13);
-    query("insert node <c/> as first into doc('d13')/a", "");
-    new Open("d13").execute(CONTEXT);
+    query("insert node <c/> as first into doc('d13')/a");
     assertEquals(NL +
         "  Pre[3] xmlns=\"A\" ",
         CONTEXT.data().nspaces.toString());
@@ -91,8 +88,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void insertIntoShiftPreValues3() throws Exception {
     create(14);
-    query("insert node <n xmlns='D'/> into doc('d14')/*:a/*:b", "");
-    new Open("d14").execute(CONTEXT);
+    query("insert node <n xmlns='D'/> into doc('d14')/*:a/*:b");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[2] xmlns=\"B\" " + NL +
@@ -109,8 +105,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues() throws Exception {
     create(12);
-    query("delete node doc('d12')/a/b", "");
-    new Open("d12").execute(CONTEXT);
+    query("delete node doc('d12')/a/b");
     assertEquals(NL +
         "  Pre[2] xmlns=\"B\" ",
         CONTEXT.data().nspaces.toString());
@@ -124,8 +119,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues2() throws Exception {
     create(14);
-    query("delete node doc('d14')/*:a/*:b", "");
-    new Open("d14").execute(CONTEXT);
+    query("delete node doc('d14')/*:a/*:b");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[2] xmlns=\"C\" ",
@@ -140,8 +134,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues3() throws Exception {
     create(15);
-    query("delete node doc('d15')/*:a/*:c", "");
-    new Open("d15").execute(CONTEXT);
+    query("delete node doc('d15')/*:a/*:c");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[2] xmlns=\"B\" " + NL +
@@ -157,10 +150,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void deleteShiftPreValues4() throws Exception {
     create(16);
-    query("delete node doc('d16')/a/b", "");
-    new Open("d16").execute(CONTEXT);
-    assertEquals("",
-        CONTEXT.data().nspaces.toString());
+    query("delete node doc('d16')/a/b");
+    assertTrue(CONTEXT.data().nspaces.toString().isEmpty());
   }
 
   /**
@@ -259,8 +250,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void nsHierarchy() throws Exception {
     create(9);
-    query("insert node <f xmlns='F'/> into doc('d9')//*:e", "");
-    new Open("d9").execute(CONTEXT);
+    query("insert node <f xmlns='F'/> into doc('d9')//*:e");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[4] xmlns=\"D\" " + NL +
@@ -275,8 +265,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void nsHierarchy2() throws Exception {
     create(10);
-    query("insert node <f xmlns='F'/> into doc('d10')//*:e", "");
-    new Open("d10").execute(CONTEXT);
+    query("insert node <f xmlns='F'/> into doc('d10')//*:e");
     assertEquals(NL +
         "  Pre[1] xmlns=\"A\" " + NL +
         "    Pre[4] xmlns=\"D\" " + NL +
@@ -435,9 +424,10 @@ public final class NamespaceTest extends AdvancedQueryTest {
    */
   @Test
   public void deleteDocumentNode() throws Exception {
-    new Open("d2").execute(CONTEXT);
+    create(2);
     CONTEXT.data().delete(0);
-    assertEquals(true, CONTEXT.data().nspaces.rootEmpty());
+    final byte[] ns = CONTEXT.data().nspaces.globalNS();
+    assertTrue(ns != null && ns.length == 0);
   }
 
   /**
@@ -463,16 +453,15 @@ public final class NamespaceTest extends AdvancedQueryTest {
   /**
    * GH-249: Inserts an element with a prefixed attribute and checks
    * if there are superfluous namespace declarations for the element.
-   * @throws BaseXException basex exception
+   * @throws BaseXException database exception
    */
   @Test
   public void superfluousPrefixDeclaration() throws BaseXException {
     create(18);
     query(
       "declare namespace ns='ns'; " +
-      "insert node <b ns:id='0'/> into /n/a",
-      "");
-    assertEquals(1, CONTEXT.data().nspaces.numberNSNodes());
+      "insert node <b ns:id='0'/> into /n/a");
+    query("//*:a", "<a xmlns:ns='ns'><b ns:id='0'/></a>");
   }
 
   /**
@@ -582,10 +571,9 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @Test
   public void avoidDuplicateNSDeclaration() throws BaseXException {
     create(19);
-    query("" +
+    query(
       "let $b := <a xmlns:x='X' x:id='0'/> " +
-      "return insert node $b//@*:id into /*:n",
-      "");
+      "return insert node $b//@*:id into /*:n");
     assertEquals(1, CONTEXT.data().ns(1).size());
   }
 

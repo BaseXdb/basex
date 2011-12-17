@@ -47,10 +47,10 @@ public final class Namespaces {
    * Empty constructor.
    */
   public Namespaces() {
-    current = new NSNode(-1);
-    root = current;
     pref = new TokenSet();
     uri = new TokenSet();
+    root = new NSNode(-1);
+    current = root;
   }
 
   /**
@@ -61,8 +61,8 @@ public final class Namespaces {
   Namespaces(final DataInput in) throws IOException {
     pref = new TokenSet(in);
     uri = new TokenSet(in);
-    current = new NSNode(in, null);
-    root = current;
+    root = new NSNode(in, null);
+    current = root;
   }
 
   /**
@@ -73,7 +73,7 @@ public final class Namespaces {
   void write(final DataOutput out) throws IOException {
     pref.write(out);
     uri.write(out);
-    current.write(out);
+    root.write(out);
   }
 
   /**
@@ -152,57 +152,22 @@ public final class Namespaces {
   }
 
   /**
-   * Determines the number of {NSNode}s in this namespace hierarchy, which is
-   * the number of nodes that declare a namspace in the document. FOR TESTING
-   * ONLY.
-   * @return number of NSNodes
-   */
-  public int numberNSNodes() {
-    return nrDescendants(root);
-  }
-
-  /**
-   * Determines the number of descendant-or-self nodes for the given node.
-   * @param n node
-   * @return number of descendants-or-self nodes
-   */
-  private int nrDescendants(final NSNode n) {
-    int i = root.equals(n) ? 0 : 1;
-    for(final NSNode child : n.ch)
-      i += nrDescendants(child);
-
-    return i;
-  }
-
-  /**
-   * Returns whether the namespace root node has any children, which means this
-   * function returns whether there are any namespace declarations at all.
-   * @return true if namespace declarations exist.
-   */
-  public boolean rootEmpty() {
-    return root.ch.length == 0;
-  }
-
-  /**
-   * Returns the default global namespace of the database, or {@code null}
-   * if several default namespaces are defined.
+   * Returns the default namespace of the database, or {@code null}
+   * if several (default or prefixed) namespaces are defined.
    * @return global default namespace
    */
   public byte[] globalNS() {
     // no namespaces defined: default namespace is empty
-    if(current.size == 0) return Token.EMPTY;
+    if(root.size == 0) return Token.EMPTY;
     // more than one namespace defined: skip test
-    if(current.size > 1) return null;
+    if(root.size > 1) return null;
     // check namespaces of first child
-    final NSNode n = current.ch[0];
+    final NSNode n = root.ch[0];
+
     // namespace has more children; skip traversal
-    if(n.size != 0 || n.pre != 1) return null;
-    // loop through all globally defined namespaces
-    for(int i = 0; i < n.vals.length; i += 2) {
-      // return default namespace found
-      if(pref.key(n.vals[i]).length == 0) return uri.key(n.vals[i + 1]);
-    }
-    return null;
+    if(n.size != 0 || n.pre != 1 || n.vals.length != 2) return null;
+    // return default namespace or null
+    return pref.key(n.vals[0]).length == 0 ? uri.key(n.vals[1]) : null;
   }
 
   /**
@@ -392,7 +357,7 @@ public final class Namespaces {
    * @return namespaces
    */
   public byte[] table(final int s, final int e) {
-    if(current.size == 0) return Token.EMPTY;
+    if(root.size == 0) return Token.EMPTY;
 
     final Table t = new Table();
     t.header.add(TABLEID);
@@ -401,7 +366,7 @@ public final class Namespaces {
     t.header.add(TABLEPREF);
     t.header.add(TABLEURI);
     for(int i = 0; i < 3; ++i) t.align.add(true);
-    table(t, current, s, e);
+    table(t, root, s, e);
     return t.contents.size() != 0 ? t.finish() : Token.EMPTY;
   }
 
@@ -432,7 +397,7 @@ public final class Namespaces {
    */
   public byte[] info() {
     final TokenObjMap<TokenList> map = new TokenObjMap<TokenList>();
-    info(map, current);
+    info(map, root);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] val : map.keys()) {
       tb.add("  ");
@@ -479,7 +444,7 @@ public final class Namespaces {
    * @return string
    */
   public String toString(final int s, final int e) {
-    return current.print(this, s, e);
+    return root.print(this, s, e);
   }
 
   @Override
