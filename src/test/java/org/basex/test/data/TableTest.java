@@ -26,7 +26,7 @@ public final class TableTest {
   /** Database name. */
   private static final String DB = Util.name(TableTest.class);
   /** Database XML file. */
-  private static final String DBFILE = "etc/test/factbook.zip";
+  private static final String DBFILE = "src/test/resources/factbook.zip";
   /** Select Germany. */
   private static final String SELECT = "//country[@name='Germany']";
   /** Delete Germany. */

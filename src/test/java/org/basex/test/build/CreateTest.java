@@ -29,9 +29,9 @@ public final class CreateTest {
   /** Target. */
   private static final String TARGET = "target/";
   /** Path to test file. */
-  private static final String PATH = "etc/test/input.xml";
+  private static final String PATH = "src/test/resources/input.xml";
   /** Test folder. */
-  private static final String FOLDER = "etc/test/dir";
+  private static final String FOLDER = "src/test/resources/dir";
   /** Test XML fragment. */
   private static final String FRAG = "<xml/>";
 

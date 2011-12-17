@@ -20,7 +20,7 @@ public final class FNGenTest extends AdvancedQueryTest {
   /** Test database name. */
   private static final String NAME = Util.name(FNGenTest.class);
   /** Text file. */
-  private static final String TEXT = "etc/test/input.xml";
+  private static final String TEXT = "src/test/resources/input.xml";
 
   /**
    * Test method for the fn:unparsed-text() function.

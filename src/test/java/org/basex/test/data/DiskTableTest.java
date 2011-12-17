@@ -28,7 +28,7 @@ import static org.basex.data.DataText.*;
  */
 public final class DiskTableTest {
   /** Test file we do updates with. */
-  private static final String TESTFILE = "etc/test/xmark.xml";
+  private static final String TESTFILE = "src/test/resources/xmark.xml";
   /** Test database name. */
   private static final String DB = Util.name(DiskTableTest.class);
   /** Test file we do updates with. */

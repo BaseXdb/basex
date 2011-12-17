@@ -66,14 +66,14 @@ public final class CompressTest {
    * @throws Exception exception */
   @Test
   public void test7() throws Exception {
-    texts("etc/test/xmark.xml");
+    texts("src/test/resources/xmark.xml");
   }
 
   /** Test.
    * @throws Exception exception */
   @Test
   public void test8() throws Exception {
-    texts("etc/test/factbook.zip");
+    texts("src/test/resources/factbook.zip");
   }
 
   /**

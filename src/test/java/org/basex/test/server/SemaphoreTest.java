@@ -28,7 +28,7 @@ public final class SemaphoreTest {
   /** Test database name. */
   private static final String NAME = Util.name(SemaphoreTest.class);
   /** Test file. */
-  private static final String FILE = "etc/test/factbook.zip";
+  private static final String FILE = "src/test/resources/factbook.zip";
   /** Test queries. */
   static final String [] QUERIES = {
     "xquery for $n in (db:open('" + NAME + "')//province)[position() < 100] " +

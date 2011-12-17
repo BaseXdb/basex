@@ -18,6 +18,8 @@ import org.junit.Test;
 public final class MixedTest extends AdvancedQueryTest {
   /** Default database name. */
   private static final String DB = Util.name(MixedTest.class);
+  /** Test XQuery module file. */
+  private static final String XQMFILE = "src/test/resources/hello.xqm";
 
   /**
    * Drops the collection.
@@ -31,16 +33,16 @@ public final class MixedTest extends AdvancedQueryTest {
   /** Catches duplicate module import. */
   @Test
   public void duplImport() {
-    error("import module namespace a='world' at 'etc/test/hello.xqm';" +
-      "import module namespace a='world' at 'etc/test/hello.xqm'; 1",
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "import module namespace a='world' at '" + XQMFILE + "'; 1",
       Err.DUPLMODULE);
   }
 
   /** Catches duplicate module import with different module uri. */
   @Test
   public void duplImportDiffUri() {
-    error("import module namespace a='world' at 'etc/test/hello.xqm';" +
-      "import module namespace a='galaxy' at 'etc/test/hello.xqm'; 1",
+    error("import module namespace a='world' at '" + XQMFILE + "';" +
+      "import module namespace a='galaxy' at '" + XQMFILE + "'; 1",
       Err.WRONGMODULE);
   }
 
