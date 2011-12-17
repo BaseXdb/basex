@@ -36,18 +36,18 @@ public final class Part3 extends Main {
 
     // Create and execute an expression
     XQExpression xqe = xqc.createExpression();
-    String query = "doc('etc/xml/orders.xml')//order[id='174']";
+    String query = "doc('src/main/resources/xml/orders.xml')//order[id='174']";
     XQSequence xqs = xqe.executeQuery(query);
     print("Query: " + query, xqs);
 
     // Create and execute a second expression
-    query = "doc('etc/xml/orders.xml')//order[id='267']";
+    query = "doc('src/main/resources/xml/orders.xml')//order[id='267']";
     xqs = xqe.executeQuery(query);
     print("Query: " + query, xqs);
 
     // Prepare an expression
     query = "declare variable $id as xs:string external; " +
-      "doc('etc/xml/orders.xml')//order[id=$id]";
+      "doc('src/main/resources/xml/orders.xml')//order[id=$id]";
     XQPreparedExpression xqp = xqc.prepareExpression(query);
 
     // Bind a variable and execute the query
@@ -63,7 +63,7 @@ public final class Part3 extends Main {
     // Create {@link Document} instance
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
-    Document dom = builder.parse("etc/xml/orders.xml");
+    Document dom = builder.parse("src/main/resources/xml/orders.xml");
 
     // Bind document to context item
     xqe = xqc.createExpression();
@@ -75,7 +75,7 @@ public final class Part3 extends Main {
     print("Query: " + query, xqs);
 
     // Execute a query from a file input stream
-    InputStream is = new FileInputStream("etc/xml/orders.xq");
+    InputStream is = new FileInputStream("src/main/resources/xml/orders.xq");
     xqs = xqe.executeQuery(is);
     is.close();
     print("Query from input stream", xqs);

@@ -35,7 +35,7 @@ public final class Part5 extends Main {
 
     FileOutputStream fos = new FileOutputStream("result.xml");
     XQSequence xqs = xqe.executeQuery(
-        "doc('etc/xml/orders.xml')//order[id='174']");
+        "doc('src/main/resources/xml/orders.xml')//order[id='174']");
     xqs.writeSequence(fos, new Properties());
     fos.close();
 

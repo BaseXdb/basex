@@ -26,7 +26,7 @@ public final class CSVExample {
     final Context ctx = new Context();
 
     // Input file and name of database
-    final String file = "etc/csv/example.csv";
+    final String file = "src/main/resources/csv/example.csv";
     final String name = "csvexample";
 
     // ------------------------------------------------------------------------

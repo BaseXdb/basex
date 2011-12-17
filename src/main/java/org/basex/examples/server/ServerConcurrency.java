@@ -48,7 +48,7 @@ public final class ServerConcurrency {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    send("CREATE DB input etc/xml/input.xml", session);
+    send("CREATE DB input src/main/resources/xml/input.xml", session);
 
     // ------------------------------------------------------------------------
     // Setup some clients that simultaneously read and write from the database

@@ -37,7 +37,7 @@ public final class Part4 extends Main {
     info("Iterate through query results");
 
     XQSequence xqs = xqe.executeQuery(
-        "doc('etc/xml/employees.xml')//employee");
+        "doc('src/main/resources/xml/employees.xml')//employee");
     while(xqs.next()) {
       Element employee = (Element) xqs.getObject();
       System.out.println(employee);
@@ -47,7 +47,8 @@ public final class Part4 extends Main {
     info("Iterate through numeric values");
 
     xqs = xqe.executeQuery(
-      "doc('etc/xml/orders.xml')/orders/order/xs:decimal(total_price)");
+      "doc('src/main/resources/xml/orders.xml')" +
+      "/orders/order/xs:decimal(total_price)");
     while(xqs.next()) {
       BigDecimal price = (BigDecimal) xqs.getObject();
       System.out.println(price);
@@ -70,7 +71,8 @@ public final class Part4 extends Main {
         System.out.println("Characters/SAX: '" + new String(c, s, l) + "'");
       }
     };
-    xqs = xqe.executeQuery("doc('etc/xml/employees.xml')//employee");
+    xqs = xqe.executeQuery(
+        "doc('src/main/resources/xml/employees.xml')//employee");
     while(xqs.next()) {
       xqs.writeItemToSAX(ch);
     }
@@ -78,13 +80,15 @@ public final class Part4 extends Main {
     // Return sequence via SAX
     info("Return sequence via SAX");
 
-    xqs = xqe.executeQuery("doc('etc/xml/employees.xml')//employee");
+    xqs = xqe.executeQuery(
+        "doc('src/main/resources/xml/employees.xml')//employee");
     xqs.writeSequenceToSAX(ch);
 
     // Return single items via StAX
     info("Return single items via StAX");
 
-    xqs = xqe.executeQuery("doc('etc/xml/employees.xml')//employee");
+    xqs = xqe.executeQuery(
+        "doc('src/main/resources/xml/employees.xml')//employee");
     XMLStreamReader xmlReader = xqs.getSequenceAsStream();
     while(true) {
       int type = xmlReader.next();

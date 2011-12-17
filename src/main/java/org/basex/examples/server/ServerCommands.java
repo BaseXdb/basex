@@ -37,7 +37,7 @@ public final class ServerCommands {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    session.execute(new CreateDB("input", "etc/xml/input.xml"));
+    session.execute(new CreateDB("input", "src/main/resources/xml/input.xml"));
 
     // ------------------------------------------------------------------------
     // Run a query

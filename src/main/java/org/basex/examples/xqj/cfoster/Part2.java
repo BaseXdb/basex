@@ -29,7 +29,8 @@ public final class Part2 extends Main {
     info("Return book titles from 'books.xml'");
 
     String xqueryString =
-      "for $x in doc('etc/xml/books.xml')//book return $x/title/text()";
+      "for $x in doc('src/main/resources/xml/books.xml')//book " +
+      "return $x/title/text()";
 
     XQExpression xqe = conn.createExpression();
     XQResultSequence rs = xqe.executeQuery(xqueryString);
@@ -40,7 +41,8 @@ public final class Part2 extends Main {
     info("Get book prices");
 
     xqueryString =
-      "for $x in doc('etc/xml/books.xml')//book return xs:float($x/price)";
+      "for $x in doc('src/main/resources/xml/books.xml')//book " +
+      "return xs:float($x/price)";
 
     rs = xqe.executeQuery(xqueryString);
     while(rs.next()) {

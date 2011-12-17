@@ -37,7 +37,8 @@ public final class Part10 extends Main {
 
     // Pipeline XQuery expressions
     XQExpression xqe = xqc.createExpression();
-    XQSequence xqs = xqe.executeQuery("doc('etc/xml/orders.xml')//order");
+    XQSequence xqs = xqe.executeQuery(
+        "doc('src/main/resources/xml/orders.xml')//order");
     XQExpression xqe2 = xqc.createExpression();
     xqe2.bindSequence(new QName("orders"), xqs);
 
@@ -57,11 +58,12 @@ public final class Part10 extends Main {
     // Build an XMLFilter for the XSLT transformation
     SAXTransformerFactory stf = (SAXTransformerFactory)
       TransformerFactory.newInstance();
-    XMLFilter xmlf = stf.newXMLFilter(new StreamSource("etc/xml/orders.xsl"));
+    XMLFilter xmlf = stf.newXMLFilter(
+        new StreamSource("src/main/resources/xml/orders.xsl"));
 
     // Create a SAX source, the input for the XSLT transformation
     SAXSource saxSource = new SAXSource(xmlf,
-        new InputSource("etc/xml/orders.xml"));
+        new InputSource("src/main/resources/xml/orders.xml"));
 
     // Create an XQuery expression
     XQPreparedExpression xqp = xqc.prepareExpression(
@@ -80,13 +82,14 @@ public final class Part10 extends Main {
     info("Passing XQuery results to XSLT");
 
     // Create an XQuery expression
-    xqp = xqc.prepareExpression("doc('etc/xml/orders.xml')");
+    xqp = xqc.prepareExpression("doc('src/main/resources/xml/orders.xml')");
     // Create an XQJFilter
     XQJFilter xqjf = new XQJFilter(xqp);
 
     // Create an XMLFilter for the XSLT transformation, the 2nd stage
     stf = (SAXTransformerFactory) TransformerFactory.newInstance();
-    xmlf = stf.newXMLFilter(new StreamSource("etc/xml/orders.xsl"));
+    xmlf = stf.newXMLFilter(
+    new StreamSource("src/main/resources/xml/orders.xsl"));
     xmlf.setParent(xqjf);
 
     // Make sure to capture the SAX events as result of the pipeline

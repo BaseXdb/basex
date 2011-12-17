@@ -35,7 +35,7 @@ public final class CreateCollection {
     // Create a collection and add all documents within the specified path
     System.out.println("\n* Create a collection.");
 
-    new CreateDB("Collection", "etc/").execute(context);
+    new CreateDB("Collection", "src/main/resources/").execute(context);
     new DropDB("Collection").execute(context);
 
     // Variant 2 --------------------------------------------------------------
@@ -44,7 +44,7 @@ public final class CreateCollection {
     System.out.println("\n* Create an empty collection and add documents.");
 
     new CreateDB("Collection").execute(context);
-    new Add("", "etc/").execute(context);
+    new Add("", "src/main/resources/").execute(context);
     new Optimize().execute(context);
 
     // ------------------------------------------------------------------------
