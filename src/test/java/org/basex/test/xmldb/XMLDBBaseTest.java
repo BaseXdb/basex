@@ -21,7 +21,7 @@ import org.basex.core.cmd.DropDB;
  */
 public abstract class XMLDBBaseTest {
   /** Test document. */
-  protected static final String DOCPATH = "etc/test/";
+  protected static final String DOCPATH = "src/test/resources/";
   /** XMLDB driver. */
   protected static final String DRIVER = BXDatabase.class.getName();
   /** Database/document path. */

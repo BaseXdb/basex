@@ -12,7 +12,7 @@ public class XQJTestCase extends TestCase {
   protected XQConnection xqc;
 
   protected void setUp() throws Exception {
-    System.setProperty("com.oracle.xqj.tck.datasource", "etc/test/bxq.properties");
+    System.setProperty("com.oracle.xqj.tck.datasource", "src/test/resources/bxq.properties");
     //System.setProperty("com.oracle.xqj.tck.datasource", "saxonxq.properties");
 
     // Get the file name of the properties file
