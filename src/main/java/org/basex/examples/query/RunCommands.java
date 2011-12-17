@@ -26,7 +26,8 @@ public final class RunCommands {
     // Create a database from a local or remote XML document or XML String
     System.out.println("\n* Create a database.");
 
-    new CreateDB("DBExample", "etc/xml/input.xml").execute(context);
+    new CreateDB("DBExample", "src/main/resources/xml/input.xml").
+      execute(context);
 
     // ------------------------------------------------------------------------
     // Close and reopen the database

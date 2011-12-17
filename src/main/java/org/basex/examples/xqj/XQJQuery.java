@@ -15,7 +15,8 @@ public final class XQJQuery {
   /** Database driver. */
   private static final String DRIVER = "org.basex.api.xqj.BXQDataSource";
   /** Sample query. */
-  private static final String QUERY = "doc('etc/xml/input.xml')//li";
+  private static final String QUERY =
+      "doc('src/main/resources/xml/input.xml')//li";
 
   /**
    * Main method of the example class.

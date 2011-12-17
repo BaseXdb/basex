@@ -37,7 +37,8 @@ public final class RunQueries {
 
     // ------------------------------------------------------------------------
     // Evaluate the specified XQuery
-    String query = "for $x in doc('etc/xml/input.xml')//li return data($x)";
+    String query =
+        "for $x in doc('src/main/resources/xml/input.xml')//li return data($x)";
 
     // ------------------------------------------------------------------------
     // Process the query by using the database command

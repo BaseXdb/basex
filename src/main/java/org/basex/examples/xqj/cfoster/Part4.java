@@ -145,7 +145,8 @@ public final class Part4 extends Main {
     XQExpression expr = conn.createExpression();
 
     String xqueryString =
-      "for $x in doc('etc/xml/books.xml')//book/@isbn return xs:string($x)";
+      "for $x in doc('src/main/resources/xml/books.xml')//book/@isbn " +
+      "return xs:string($x)";
 
     rs = expr.executeQuery(xqueryString);
 
@@ -163,7 +164,7 @@ public final class Part4 extends Main {
     info("Retrieve XML nodes");
 
     expr = conn.createExpression();
-    xqueryString = "doc('etc/xml/books.xml')//book";
+    xqueryString = "doc('src/main/resources/xml/books.xml')//book";
     rs = expr.executeQuery(xqueryString);
     while(rs.next()) {
       Node book = rs.getNode(); // org.w3c.dom.Element
@@ -192,7 +193,8 @@ public final class Part4 extends Main {
     info("Retrieve date values");
 
     xqueryString =
-      "for $x in doc('etc/xml/books.xml')//publish_date return xs:date($x)";
+      "for $x in doc('src/main/resources/xml/books.xml')//publish_date " +
+      "return xs:date($x)";
 
     rs = expr.executeQuery(xqueryString);
 

@@ -61,7 +61,7 @@ public final class Part9 extends Main {
 
     // Create item from query result
     info("Create item from query result");
-    xqs = xqe.executeQuery("doc('etc/xml/orders.xml')//order");
+    xqs = xqe.executeQuery("doc('src/main/resources/xml/orders.xml')//order");
     xqs.next();
     xqi = xqc.createItem(xqs.getItem());
 

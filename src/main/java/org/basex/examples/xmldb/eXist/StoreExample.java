@@ -31,7 +31,7 @@ public final class StoreExample extends Main {
     // Store new XMLResource
     Resource document = col.createResource(null, "XMLResource");
 
-    File f = new File("etc/xml/orders.xml");
+    File f = new File("src/main/resources/xml/orders.xml");
     document.setContent(f);
     System.out.println("Storing document " + f + "...");
     col.storeResource(document);
@@ -39,7 +39,7 @@ public final class StoreExample extends Main {
     // Add second resource
     document = col.createResource(null, "XMLResource");
 
-    f = new File("etc/xml/input.xml");
+    f = new File("src/main/resources/xml/input.xml");
     document.setContent(f);
     System.out.println("Storing document " + f + "...");
     col.storeResource(document);

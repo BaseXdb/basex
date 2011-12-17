@@ -26,7 +26,7 @@ public final class UserExample {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    new CreateDB("input", "etc/xml/input.xml").execute(context);
+    new CreateDB("input", "src/main/resources/xml/input.xml").execute(context);
 
     // ------------------------------------------------------------------------
     // Create a new user with password 'password' (MD5 encoded)

@@ -40,7 +40,7 @@ public final class RESTPut {
     OutputStream out = new BufferedOutputStream(conn.getOutputStream());
     // Create and cache file input stream
     InputStream in = new BufferedInputStream(
-        new FileInputStream("etc/xml/factbook.xml"));
+        new FileInputStream("src/main/resources/xml/factbook.xml"));
 
     // Send document to server
     System.out.println("\n* Send document...");

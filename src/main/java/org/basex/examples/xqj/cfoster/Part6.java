@@ -34,7 +34,8 @@ public final class Part6 extends Main {
 
     XQExpression xqe = conn.createExpression();
 
-    XQResultSequence rs = xqe.executeQuery("doc('etc/xml/books.xml')//book");
+    XQResultSequence rs = xqe.executeQuery(
+        "doc('src/main/resources/xml/books.xml')//book");
 
     XMLStreamReader reader = rs.getSequenceAsStream();
 
@@ -47,7 +48,7 @@ public final class Part6 extends Main {
     // Streaming XQuery Result Sequences with SAX
     info("Stream XQuery Result Sequences with SAX");
 
-    rs = xqe.executeQuery("doc('etc/xml/books.xml')//book");
+    rs = xqe.executeQuery("doc('src/main/resources/xml/books.xml')//book");
     rs.writeSequenceToSAX(new MySAXHandler());
 
     // Closing connection to the Database.

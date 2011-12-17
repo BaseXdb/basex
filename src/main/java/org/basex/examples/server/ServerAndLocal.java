@@ -48,7 +48,8 @@ public final class ServerAndLocal {
     // Locally cache the result of a server-side query
     System.out.println("\n* Cache server-side query results.");
 
-    String result = send("XQUERY for $x in doc('etc/xml/input.xml') return $x");
+    String result = send(
+        "XQUERY for $x in doc('src/main/resources/xml/input.xml') return $x");
 
     // -------------------------------------------------------------------------
     // Create a local database from the XML result string

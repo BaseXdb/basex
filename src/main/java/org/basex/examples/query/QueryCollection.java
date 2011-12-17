@@ -23,10 +23,10 @@ public final class QueryCollection {
     System.out.println("=== QueryCollection ===");
 
     // ------------------------------------------------------------------------
-    // Create a collection from all XML documents in the 'etc' directory
+    // Create a collection from all XML documents in the specified directory
     System.out.println("\n* Create a collection.");
 
-    new CreateDB("Collection", "etc/").execute(context);
+    new CreateDB("Collection", "src/main/resources/").execute(context);
 
     // ------------------------------------------------------------------------
     // List all documents in the database

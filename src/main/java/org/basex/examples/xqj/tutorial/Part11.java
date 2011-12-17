@@ -38,7 +38,8 @@ public final class Part11 extends Main {
     xqc.setStaticContext(xqsc);
 
     XQExpression xqe = xqc.createExpression();
-    XQSequence xqs = xqe.executeQuery("doc('etc/xml/orders.xml')//order");
+    XQSequence xqs = xqe.executeQuery(
+        "doc('src/main/resources/xml/orders.xml')//order");
     XQExpression xqe2 = xqc.createExpression();
     xqe2.bindSequence(new QName("orders"), xqs);
 
@@ -57,7 +58,7 @@ public final class Part11 extends Main {
 
     xqe = xqc.createExpression();
     xqe.bindDocument(XQConstants.CONTEXT_ITEM,
-        new StreamSource("etc/xml/orders.xml"), null);
+        new StreamSource("src/main/resources/xml/orders.xml"), null);
 
     xqs = xqe.executeQuery("/orders/order");
     xqs.writeSequence(System.out, null);

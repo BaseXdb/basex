@@ -43,7 +43,7 @@ public final class Part3 extends Main {
 
     String xqueryString =
       "declare variable $userisbn external; " +
-      "for $x in doc('etc/xml/books.xml')//book " +
+      "for $x in doc('src/main/resources/xml/books.xml')//book " +
       "where $x/@isbn = $userisbn " +
       "return $x/title/text()";
 
@@ -57,7 +57,7 @@ public final class Part3 extends Main {
     xqueryString =
       "declare variable $fromDate as xs:date external; " +
       "declare variable $toDate as xs:date external; " +
-      "for $x in doc('etc/xml/books.xml')//book " +
+      "for $x in doc('src/main/resources/xml/books.xml')//book " +
       "let $publishDate := xs:date($x/publish_date) " +
       "where $publishDate > $fromDate and $publishDate < $toDate " +
       "return $x/title/text()";
