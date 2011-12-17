@@ -18,7 +18,7 @@ import org.junit.Test;
  */
 public final class ServerStressTest {
   /** Input document. */
-  private static final String INPUT = "etc/factbook.zip";
+  private static final String INPUT = "src/test/resources/factbook.zip";
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY = "(doc('test')//text())[position() = %]";
   /** Maximum position to retrieve. */

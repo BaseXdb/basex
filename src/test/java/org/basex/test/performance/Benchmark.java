@@ -32,7 +32,7 @@ public abstract class Benchmark {
   /** Session. */
   private static Session session;
   /** Test document. */
-  private static String input = "etc/factbook.zip";
+  private static String input = "src/test/resources/factbook.zip";
   /** Local vs server flag. */
   private static boolean local;
 
