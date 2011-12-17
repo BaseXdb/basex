@@ -22,7 +22,7 @@ public final class LocalStressTest {
   /** Test database name. */
   private static final String DB = Util.name(LocalStressTest.class);
   /** Input document. */
-  private static final String INPUT = "etc/factbook.zip";
+  private static final String INPUT = "src/test/resources/factbook.zip";
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY = "(//text())[position() = %]";
   /** Maximum position to retrieve. */
