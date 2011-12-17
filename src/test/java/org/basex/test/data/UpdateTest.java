@@ -29,7 +29,7 @@ public abstract class UpdateTest {
   /** Test database name. */
   private static final String DB = Util.name(UpdateTest.class);
   /** Test file we do updates with. */
-  private static final String TESTFILE = "etc/test/test.xml";
+  private static final String TESTFILE = "src/test/resources/test.xml";
   /** Main memory flag. */
   private static boolean mainmem;
 

@@ -23,7 +23,7 @@ public final class FNFtTest extends AdvancedQueryTest {
   /** Name of test database. */
   private static final String DB = Util.name(FNFtTest.class);
   /** Test file. */
-  private static final String FILE = "etc/test/input.xml";
+  private static final String FILE = "src/test/resources/input.xml";
 
   /**
    * Initializes a test.
