@@ -507,7 +507,7 @@ public final class FNDb extends FuncCall {
   }
 
   /**
-   * Performs the put function.
+   * Performs the store function.
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
@@ -526,12 +526,12 @@ public final class FNDb extends FuncCall {
   }
 
   /**
-   * Performs the get function.
+   * Performs the retrieve function.
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Item retrieve(final QueryContext ctx) throws QueryException {
+  private Raw retrieve(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
     final IOFile file = data.meta.binary(path);

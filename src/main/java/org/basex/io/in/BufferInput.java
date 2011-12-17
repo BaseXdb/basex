@@ -185,10 +185,11 @@ public class BufferInput extends InputStream {
     if(ch == -1) return ch;
 
     // encoding can be safely compared by references...
-    if(enc == UTF16LE) return ch | read() << 8;
-    if(enc == UTF16BE) return ch << 8 | read();
+    final String e = enc;
+    if(e == UTF16LE) return ch | read() << 8;
+    if(e == UTF16BE) return ch << 8 | read();
     if(ch < 0x80) return ch;
-    if(enc == UTF8) {
+    if(e == UTF8) {
       final int cl = cl((byte) ch);
       cache[0] = (byte) ch;
       for(int c = 1; c < cl; ++c) cache[c] = (byte) read();

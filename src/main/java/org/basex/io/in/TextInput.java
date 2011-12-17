@@ -61,7 +61,7 @@ public final class TextInput {
   public static TokenBuilder content(final IO in, final String enc)
       throws IOException {
 
-    final TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder(Math.max(32, (int) in.length()));
     final TextInput ti = new TextInput(in);
     try {
       if(enc != null) ti.encoding(enc);

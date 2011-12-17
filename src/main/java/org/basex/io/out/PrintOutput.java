@@ -62,7 +62,7 @@ public class PrintOutput extends OutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    if(size++ < max && os != null) os.write(b);
+    if(size++ < max) os.write(b);
   }
 
   /**

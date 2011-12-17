@@ -3,10 +3,8 @@ package org.basex.query.func;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
-import org.basex.query.item.Str;
 import org.basex.query.util.Err;
 import org.basex.query.util.crypto.DigitalSignature;
 import org.basex.query.util.crypto.Encryption;
@@ -54,8 +52,8 @@ public class FNCrypto extends FuncCall {
         if(expr.length > 6) {
           arg6 = checkItem(expr[6], ctx);
 
-          if(arg6 instanceof Str)arg6Str = true;
-          else if(arg6 instanceof ANode);
+          if(arg6.type.isString()) arg6Str = true;
+          else if(arg6.type.isNode());
           else Err.type(this, AtomType.STR, arg6);
         }
         return new DigitalSignature(ii).generateSignature(

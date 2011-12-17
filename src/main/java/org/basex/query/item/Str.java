@@ -14,7 +14,7 @@ import org.basex.util.list.ByteList;
  * @author Christian Gruen
  */
 public class Str extends Item {
-  /** String data. */
+  /** Zero-length string. */
   public static final Str ZERO = new Str(Token.EMPTY);
   /** String data. */
   protected final byte[] val;
@@ -70,7 +70,7 @@ public class Str extends Item {
 
   @Override
   public final boolean bool(final InputInfo ii) {
-    return string(ii).length != 0;
+    return string().length != 0;
   }
 
   @Override

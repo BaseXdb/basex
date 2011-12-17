@@ -16,11 +16,6 @@ public final class ArrayOutput extends PrintOutput {
   private byte[] buf = new byte[8];
 
   /**
-   * Default constructor.
-   */
-  public ArrayOutput() { }
-
-  /**
    * Sets the maximum number of bytes to be written.
    * Note that the limit might break unicode characters.
    * @param m maximum
@@ -33,9 +28,11 @@ public final class ArrayOutput extends PrintOutput {
 
   @Override
   public void write(final int b) {
-    if(size == max) return;
-    if(size == buf.length) buf = Arrays.copyOf(buf, size << 1);
-    buf[size++] = (byte) b;
+    final int s = size;
+    if(s == max) return;
+    if(s == buf.length) buf = Arrays.copyOf(buf, s << 1);
+    buf[s] = (byte) b;
+    size = s + 1;
   }
 
   /**
