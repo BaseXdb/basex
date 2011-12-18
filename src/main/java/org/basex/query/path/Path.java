@@ -251,7 +251,8 @@ public abstract class Path extends ParseExpr {
    */
   protected Expr children(final QueryContext ctx, final Data data) {
     // skip path check if no path index exists, or if it is out-of-dated
-    if(!data.meta.pathindex || !data.meta.uptodate) return this;
+    if(!data.meta.pathindex || !data.meta.uptodate ||
+        data.nspaces.globalNS() == null) return this;
 
     Path path = this;
     for(int s = 0; s < steps.length; ++s) {
