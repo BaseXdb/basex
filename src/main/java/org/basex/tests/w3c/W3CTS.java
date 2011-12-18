@@ -24,7 +24,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.Serializer;
@@ -749,7 +749,7 @@ public abstract class W3CTS {
    */
   private String read(final IO f) {
     try {
-      return TextInput.content(f).toString();
+      return string(new NewlineInput(f, null).content());
     } catch(final IOException ex) {
       Util.errln(ex);
       return "";
