@@ -202,7 +202,6 @@ public final class ItemTypeTest {
     { "basex:binary" },
     { "xs:base64Binary", "xs:base64Binary('aaaa')" },
     { "xs:hexBinary", "xs:hexBinary('aa')" },
-    { "basex:raw" },
     { "xs:anyURI", "xs:anyURI('a')" },
     { "xs:QName", "xs:QName('a')" },
     { "xs:NOTATION" }

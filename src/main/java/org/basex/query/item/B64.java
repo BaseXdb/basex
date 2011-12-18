@@ -8,12 +8,19 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * Base64Binary item.
+ * Base64 item.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class B64 extends Bin {
+public class B64 extends Bin {
+  /**
+   * Empty constructor.
+   */
+  protected B64() {
+    super(null, AtomType.B64);
+  }
+
   /**
    * Constructor.
    * @param d binary data
@@ -43,8 +50,8 @@ public final class B64 extends Bin {
   }
 
   @Override
-  public byte[] string(final InputInfo ii) {
-    return Base64.encode(val);
+  public byte[] string(final InputInfo ii) throws QueryException {
+    return Base64.encode(val(ii));
   }
 
   @Override
@@ -73,6 +80,6 @@ public final class B64 extends Bin {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", string(null));
+    return Util.info("\"%\"", Base64.encode(data));
   }
 }

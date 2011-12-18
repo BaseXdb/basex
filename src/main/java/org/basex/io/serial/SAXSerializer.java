@@ -4,6 +4,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 
+import org.basex.core.BaseXException;
 import org.basex.data.Result;
 import org.basex.query.item.Item;
 import org.basex.util.Util;
@@ -152,7 +153,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     try {
       content.startElement("", string(tag), string(tag), atts);
     } catch(final SAXException ex) {
-      throw new IOException(ex.getMessage());
+      throw new BaseXException(ex);
     }
   }
 
@@ -167,7 +168,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     try {
       content.endElement("", string(tag), string(tag));
     } catch(final SAXException ex) {
-      throw new IOException(ex.getMessage());
+      throw new BaseXException(ex);
     }
   }
 
@@ -177,7 +178,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     try {
       content.characters(c, 0, c.length);
     } catch(final SAXException ex) {
-      throw new IOException(ex.getMessage());
+      throw new BaseXException(ex);
     }
   }
 
@@ -187,7 +188,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
       final char[] c = string(t).toCharArray();
       if(lexical != null) lexical.comment(c, 0, t.length);
     } catch(final SAXException ex) {
-      throw new IOException(ex.getMessage());
+      throw new BaseXException(ex);
     }
   }
 
@@ -196,12 +197,12 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     try {
       content.processingInstruction(string(n), string(v));
     } catch(final SAXException ex) {
-      throw new IOException(ex.getMessage());
+      throw new BaseXException(ex);
     }
   }
 
   @Override
   public void finishItem(final Item b) throws IOException {
-    throw new IOException("Items cannot be serialized");
+    throw new BaseXException("Items cannot be serialized");
   }
 }

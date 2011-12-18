@@ -1,5 +1,6 @@
 package org.basex.io.out;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -21,6 +22,15 @@ public final class BufferOutput extends OutputStream {
   private final OutputStream os;
   /** Current buffer position. */
   private int pos;
+
+  /**
+   * Constructor.
+   * @param file target file
+   * @throws IOException I/O exception
+   */
+  public BufferOutput(final String file) throws IOException {
+    this(new FileOutputStream(file), IO.BLOCKSIZE);
+  }
 
   /**
    * Constructor with a default buffer size.

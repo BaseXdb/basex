@@ -562,7 +562,7 @@ final class XMLScanner extends Progress {
    */
   private int consume() throws IOException {
     while(true) {
-      final int ch = input.next();
+      final int ch = input.read();
       if(ch < 0) return 0;
       if(ch > 0 && ch < ' ' && !ws(ch)) error(XMLCHAR, ch);
 
@@ -688,7 +688,7 @@ final class XMLScanner extends Progress {
 
         final TextInput tin = input;
         try {
-          final IO file = input.io().merge(name);
+          final IO file = input.input().merge(name);
           cont = file.read();
           input = new TextInput(new IOContent(cont, name));
         } catch(final IOException ex) {
@@ -1013,7 +1013,7 @@ final class XMLScanner extends Progress {
 
   @Override
   public String det() {
-    return Util.info(SCANPOS, input.io().path(), input.line());
+    return Util.info(SCANPOS, input.input().path(), input.line());
   }
 
   @Override

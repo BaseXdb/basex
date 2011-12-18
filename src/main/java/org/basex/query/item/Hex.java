@@ -5,7 +5,7 @@ import static org.basex.query.util.Err.*;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.util.TokenBuilder;
 
 /**
  * HexBinary item.
@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public class Hex extends Bin {
+public final class Hex extends Bin {
   /**
    * Constructor.
    * @param b bytes
@@ -42,16 +42,8 @@ public class Hex extends Bin {
     this(b.val(ii));
   }
 
-  /**
-   * Constructor.
-   * @param t data type
-   */
-  protected Hex(final AtomType t) {
-    super(null, t);
-  }
-
   @Override
-  public final byte[] string(final InputInfo ii) throws QueryException {
+  public byte[] string(final InputInfo ii) throws QueryException {
     return Token.hex(val(ii), true);
   }
 
@@ -64,19 +56,19 @@ public class Hex extends Bin {
 
   /**
    * Converts the input into a byte array.
-   * @param h input
+   * @param d textual data
    * @param ii input info
-   * @return byte array
+   * @return decoded string
    * @throws QueryException query exception
    */
-  private static byte[] decode(final byte[] h, final InputInfo ii)
+  private static byte[] decode(final byte[] d, final InputInfo ii)
       throws QueryException {
 
-    if((h.length & 1) != 0) throw FUNCAST.thrw(ii, AtomType.HEX, (char) h[0]);
-    final int l = h.length >>> 1;
+    if((d.length & 1) != 0) throw FUNCAST.thrw(ii, AtomType.HEX, (char) d[0]);
+    final int l = d.length >>> 1;
     final byte[] v = new byte[l];
     for(int i = 0; i < l; ++i) {
-      v[i] = (byte) ((dec(h[i << 1], ii) << 4) + dec(h[(i << 1) + 1], ii));
+      v[i] = (byte) ((dec(d[i << 1], ii) << 4) + dec(d[(i << 1) + 1], ii));
     }
     return v;
   }
@@ -98,6 +90,7 @@ public class Hex extends Bin {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", Token.hex(val, true));
+    return new TokenBuilder().add('"').add(Token.hex(data, true)).
+        add('"').toString();
   }
 }

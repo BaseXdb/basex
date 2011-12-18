@@ -9,9 +9,10 @@ import org.basex.data.Data;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
 import org.basex.query.func.Function;
+import org.basex.query.item.Item;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
-import org.basex.util.hash.TokenMap;
+import org.basex.util.hash.TokenObjMap;
 
 /**
  * Update primitive for the {@link Function#_DB_STORE} function.
@@ -21,20 +22,20 @@ import org.basex.util.hash.TokenMap;
  */
 public final class DBStore extends UpdatePrimitive {
   /** Keys. */
-  private final TokenMap map = new TokenMap();
+  private final TokenObjMap<Item> map = new TokenObjMap<Item>();
 
   /**
    * Constructor.
    * @param d data
    * @param path target path
-   * @param val value to be stored
+   * @param it item to be stored
    * @param info input info
    */
-  public DBStore(final Data d, final byte[] path, final byte[] val,
+  public DBStore(final Data d, final byte[] path, final Item it,
       final InputInfo info) {
 
     super(PrimitiveType.DBSTORE, -1, d, info);
-    map.add(path, val);
+    map.add(path, it);
   }
 
   @Override
@@ -52,7 +53,7 @@ public final class DBStore extends UpdatePrimitive {
         final IOFile file = data.meta.binary(string(path));
         if(file == null) UPDBPUTERR.thrw(input, path);
         new IOFile(file.dir()).md();
-        file.write(map.get(path));
+        file.write(map.get(path).input(input));
       } catch(final IOException ex) {
         Util.debug(ex);
         UPDBPUTERR.thrw(input, path);

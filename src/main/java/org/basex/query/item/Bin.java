@@ -1,6 +1,5 @@
 package org.basex.query.item;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.basex.io.in.ArrayInput;
@@ -10,14 +9,14 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
- * Base64Binary item. Derived from java.util.prefs.Base64.
+ * Binary item.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public abstract class Bin extends Item {
   /** Binary data. */
-  protected byte[] val;
+  protected byte[] data;
 
   /**
    * Constructor.
@@ -26,7 +25,7 @@ public abstract class Bin extends Item {
    */
   protected Bin(final byte[] d, final Type t) {
     super(t);
-    val = d;
+    data = d;
   }
 
   /**
@@ -37,12 +36,12 @@ public abstract class Bin extends Item {
    */
   @SuppressWarnings("unused")
   protected byte[] val(final InputInfo ii) throws QueryException {
-    return val;
+    return data;
   }
 
   @Override
-  public InputStream input() throws IOException {
-    return new ArrayInput(val);
+  public InputStream input(final InputInfo ii) throws QueryException {
+    return new ArrayInput(data);
   }
 
   @Override
@@ -54,6 +53,6 @@ public abstract class Bin extends Item {
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof Bin)) return false;
     final Bin b = (Bin) cmp;
-    return type == b.type && Token.eq(val, b.val);
+    return type == b.type && Token.eq(data, b.data);
   }
 }

@@ -140,7 +140,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
       "66 97 115 101 88");
     query(_UTIL_TO_BYTES.args("xs:base64Binary(<x>AAE=</x>)"), "0 1");
     query(_UTIL_TO_BYTES.args("a"), 97);
-    query(COUNT.args(_UTIL_TO_BYTES.args("a\u00f4c")), 4);
+    query(COUNT.args(_UTIL_TO_BYTES.args("\u00e4")), 2);
     query(COUNT.args(_UTIL_TO_BYTES.args(123)), 3);
   }
 

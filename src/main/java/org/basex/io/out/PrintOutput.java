@@ -2,7 +2,6 @@ package org.basex.io.out;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.Prop;
@@ -35,7 +34,7 @@ public class PrintOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public PrintOutput(final String fn) throws IOException {
-    this(new BufferOutput(new FileOutputStream(fn)));
+    this(new BufferOutput(fn));
   }
 
   /**

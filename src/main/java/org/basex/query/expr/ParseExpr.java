@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.User;
@@ -11,15 +11,14 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
 import org.basex.query.func.Function;
-import org.basex.query.item.Bin;
+import org.basex.query.item.ANode;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
@@ -350,20 +349,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified expression yields a binary item.
-   * @param e expression to be evaluated
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  public final byte[] checkBin(final Expr e, final QueryContext ctx)
-      throws QueryException {
-    final Item it = checkEmpty(e.item(ctx, input));
-    return it instanceof Bin ? ((Bin) it).toJava() : it.string(input);
-  }
-
-  /**
-   * Checks the data type and throws an exception, if necessary.
+   * Checks if the specified expression is an empty sequence; if yes, throws
+   * an exception.
    * @param it item to be checked
    * @param t type to be checked
    * @return specified item

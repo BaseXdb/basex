@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -64,15 +64,9 @@ public final class TextParser extends SingleParser {
     builder.startElem(TEXT, atts);
 
     final TokenBuilder tb = new TokenBuilder();
-    final TextInput ti = new TextInput(src);
+    final NewlineInput ti = new NewlineInput(src, encoding);
     try {
-      ti.encoding(encoding);
-      for(int ch; (ch = ti.next()) != -1;) {
-        // normalize newlines
-        if(ch == '\r') {
-          if(ti.next() != '\n') ti.prev(1);
-          ch = '\n';
-        }
+      for(int ch; (ch = ti.read()) != -1;) {
         if(ch == '\n' && lines) {
           builder.startElem(LINE, atts);
           builder.text(tb.finish());

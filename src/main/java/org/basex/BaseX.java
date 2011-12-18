@@ -15,11 +15,12 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.io.out.PrintOutput;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Args;
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
@@ -78,7 +79,8 @@ public class BaseX extends Main {
           // query file
           final IO io = IO.get(val);
           if(!io.exists()) throw new BaseXException(FILEWHICH, val);
-          final String query = TextInput.content(io).toString().trim();
+          final String query = Token.string(
+              new NewlineInput(io, null).content()).trim();
           execute(new Set(Prop.QUERYPATH, io.path()), false);
           execute(new XQuery(query), verbose);
         } else if(key.equals("i")) {

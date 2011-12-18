@@ -1,6 +1,7 @@
 package org.basex.io.in;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import org.basex.io.IO;
@@ -9,18 +10,19 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This class provides a convenient access to text input.
- * The encoding will initially be guessed by analyzing the first bytes.
+ * The input encoding will be guessed by analyzing the first bytes.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class TextInput {
-  /** Input stream reference. */
-  private BufferInput[] in = new BufferInput[1];
+public class TextInput extends InputStream {
+  /** Input file. */
+  protected IO input;
+
+  /** Input streams. */
+  private BufferInput[] inputs = new BufferInput[1];
   /** Input pointer. */
   private int ip;
-  /** Input file. */
-  private final IO file;
   /** Current line. */
   private int line = 1;
 
@@ -33,50 +35,23 @@ public final class TextInput {
 
   /**
    * Constructor.
-   * @param f file reference
+   * @param is input stream
    * @throws IOException I/O exception
    */
-  public TextInput(final IO f) throws IOException {
-    in[0] = f.buffer();
-    in[0].encoding();
-    file = f;
-  }
-  /**
-   * Returns the contents of the specified file.
-   * @param in input path
-   * @return file contents
-   * @throws IOException I/O exception
-   */
-  public static TokenBuilder content(final IO in) throws IOException {
-    return content(in, null);
+  public TextInput(final InputStream is) throws IOException {
+    inputs[0] = is instanceof BufferInput ? (BufferInput) is :
+      new BufferInput(is);
+    inputs[0].encoding();
   }
 
   /**
-   * Returns the contents of the specified file, using the specified encoding.
-   * @param in input path
-   * @param enc encoding (will be ignored if set to {@code null})
-   * @return file contents
+   * Constructor.
+   * @param in file reference
    * @throws IOException I/O exception
    */
-  public static TokenBuilder content(final IO in, final String enc)
-      throws IOException {
-
-    final TokenBuilder tb = new TokenBuilder(Math.max(32, (int) in.length()));
-    final TextInput ti = new TextInput(in);
-    try {
-      if(enc != null) ti.encoding(enc);
-      for(int ch; (ch = ti.next()) != -1;) {
-        // normalize newlines
-        if(ch == '\r') {
-          if(ti.next() != '\n') ti.prev(1);
-          ch = '\n';
-        }
-        tb.add(ch);
-      }
-    } finally {
-      ti.close();
-    }
-    return tb;
+  public TextInput(final IO in) throws IOException {
+    this(in.buffer());
+    input = in;
   }
 
   /**
@@ -85,15 +60,15 @@ public final class TextInput {
    * @throws IOException I/O exception
    */
   public void encoding(final String e) throws IOException {
-    in[0].encoding(e);
+    inputs[0].encoding(e);
   }
 
   /**
    * Returns the IO reference.
    * @return file reference
    */
-  public IO io() {
-    return file;
+  public IO input() {
+    return input;
   }
 
   /**
@@ -105,16 +80,12 @@ public final class TextInput {
     pos();
   }
 
-  /**
-   * Reads the next character from the cached input buffers.
-   * @return next character
-   * @throws IOException I/O exception
-   */
-  public int next() throws IOException {
+  @Override
+  public int read() throws IOException {
     if(pp != 0) return last[lp + pp++ & 0x0F];
 
-    int ch = in[ip].readChar();
-    while(ch == -1 && ip != 0) ch = in[--ip].readChar();
+    int ch = inputs[ip].readChar();
+    while(ch == -1 && ip != 0) ch = inputs[--ip].readChar();
     last[lp++] = ch;
     lp &= 0x0F;
     if(ip == 0 && ch == '\n') ++line;
@@ -141,17 +112,14 @@ public final class TextInput {
    * @throws IOException I/O exception
    */
   private void add(final ArrayInput ci) throws IOException {
-    if(++ip == in.length) in = Arrays.copyOf(in, ip << 1);
-    in[ip] = ci;
+    if(++ip == inputs.length) inputs = Arrays.copyOf(inputs, ip << 1);
+    inputs[ip] = ci;
     ci.encoding();
   }
 
-  /**
-   * Finishes the file input.
-   * @throws IOException I/O exception
-   */
+  @Override
   public void close() throws IOException {
-    in[0].close();
+    inputs[0].close();
   }
 
   /**
@@ -159,7 +127,7 @@ public final class TextInput {
    * @return file position
    */
   public int pos() {
-    return Math.max(0, in[0].size() + pp);
+    return Math.max(0, inputs[0].size() + pp);
   }
 
   /**
@@ -175,7 +143,23 @@ public final class TextInput {
    * @return file position
    */
   public long length() {
-    return in[0].length();
+    return inputs[0].length();
+  }
+
+  /**
+   * Retrieves and returns the whole text and closes the stream.
+   * @return contents
+   * @throws IOException I/O exception
+   */
+  public byte[] content() throws IOException {
+    // guess input size
+    final int l = Math.max(32, input == null ? 0 : (int) input.length());
+    final TokenBuilder tb = new TokenBuilder(l);
+    try {
+      for(int ch; (ch = read()) != -1;) tb.add(ch);
+    } finally {
+      close();
+    }
+    return tb.finish();
   }
 }
-

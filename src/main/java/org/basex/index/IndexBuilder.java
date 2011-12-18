@@ -2,6 +2,8 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Progress;
 import org.basex.data.Data;
 import org.basex.util.Performance;
@@ -57,7 +59,7 @@ public abstract class IndexBuilder extends Progress {
   protected final boolean memFull() throws IOException {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
-      if(cc >= 0) throw new IOException(PROCMEM + PROCMEMCREATE);
+      if(cc >= 0) throw new BaseXException(PROCMEM + PROCMEMCREATE);
       if(Util.debug) Util.err("!");
       merge = true;
       cc = 30;

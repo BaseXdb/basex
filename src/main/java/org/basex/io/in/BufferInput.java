@@ -138,6 +138,7 @@ public class BufferInput extends InputStream {
   @Override
   public int read() throws IOException {
     final int blen = buffer.length;
+    final byte[] buf = buffer;
     if(bpos >= bsize) {
       if(bsize == 0 || bsize == blen) {
         // reset mark if buffer is full
@@ -147,12 +148,12 @@ public class BufferInput extends InputStream {
         bpos = 0;
       }
       int r;
-      while((r = in.read(buffer, bsize, blen - bsize)) == 0);
+      while((r = in.read(buf, bsize, blen - bsize)) == 0);
       if(r < 0) return -1;
       bsize += r;
       read += r;
     }
-    return buffer[bpos++] & 0xFF;
+    return buf[bpos++] & 0xFF;
   }
 
   /**
@@ -161,30 +162,33 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O Exception
    */
   public final String readString() throws IOException {
-    return bytes().toString();
+    final ByteList bl = new ByteList();
+    for(int l; (l = read()) > 0;) bl.add(l);
+    return bl.toString();
   }
 
   /**
-   * Reads a bytes array from the input stream, suffixed by a {@code 0} byte.
+   * Reads a byte array from the input stream, suffixed by a {@code 0} byte.
    * @return token
    * @throws IOException I/O Exception
    */
   public final byte[] readBytes() throws IOException {
-    return bytes().toArray();
+    final ByteList bl = new ByteList();
+    for(int l; (l = read()) > 0;) bl.add(l);
+    return bl.toArray();
   }
 
   /**
-   * Returns the next character, or {@code -1} if end of stream is reached.
-   * Erroneous characters are ignored.
+   * Returns the next character (code point), or {@code -1} if end of stream
+   * is reached. Erroneous characters are ignored.
    * @return next character
    * @throws IOException I/O exception
    */
   public final int readChar() throws IOException {
-    // handle different encodings
     final int ch = read();
     if(ch == -1) return ch;
 
-    // encoding can be safely compared by references...
+    // handle different encodings (comparing by references is safe here)
     final String e = enc;
     if(e == UTF16LE) return ch | read() << 8;
     if(e == UTF16BE) return ch << 8 | read();
@@ -257,16 +261,5 @@ public class BufferInput extends InputStream {
   public final synchronized void reset() throws IOException {
     if(bmark == -1) throw new IOException("Mark cannot be reset.");
     bpos = bmark;
-  }
-
-  /**
-   * Reads bytes from the input stream, suffixed by a {@code 0} byte.
-   * @return byte list
-   * @throws IOException I/O Exception
-   */
-  private ByteList bytes() throws IOException {
-    final ByteList bl = new ByteList();
-    for(int l; (l = read()) > 0;) bl.add(l);
-    return bl;
   }
 }

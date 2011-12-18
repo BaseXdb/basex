@@ -26,7 +26,7 @@ import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.io.Zip;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
@@ -125,7 +125,7 @@ public final class FNZip extends FuncCall {
     final String enc = expr.length < 3 ? null : string(checkStr(expr[2], ctx));
     final IO io = new IOContent(entry(ctx));
     try {
-      return Str.get(TextInput.content(io, enc).finish());
+      return Str.get(new NewlineInput(io, enc).content());
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     }

@@ -171,8 +171,6 @@ public final class SeqType {
   /** Single function. */
   public static final SeqType MAP_O = new SeqType(
       MapType.get(AtomType.AAT, ITEM_ZM));
-  /** One xs:raw. */
-  public static final SeqType RAW = AtomType.RAW.seq();
   /** One xs:hexBinary. */
   public static final SeqType HEX = AtomType.HEX.seq();
   /** Single xs:base64Binary. */

@@ -55,8 +55,7 @@ public final class ParserProp extends AProp {
       if(obj == null) {
         final String in = key.toUpperCase(Locale.ENGLISH);
         final String sim = similar(in);
-        throw new IOException(
-            Util.info(sim != null ? SETSIMILAR : SETWHICH, in, sim));
+        throw new BaseXException(sim != null ? SETSIMILAR : SETWHICH, in, sim);
       }
       if(obj instanceof Integer) {
         final int i = sprop.length < 2 ? 0 : Token.toInt(sprop[1]);

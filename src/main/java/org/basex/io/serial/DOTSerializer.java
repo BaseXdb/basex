@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.data.ExprInfo;
+import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -106,7 +107,11 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   public void finishItem(final Item it) throws IOException {
-    print(norm(atom(it)), DOTData.ITEM);
+    try {
+      print(norm(it.string(null)), DOTData.ITEM);
+    } catch(final QueryException ex) {
+      throw new SerializerException(ex.err());
+    }
   }
 
   @Override

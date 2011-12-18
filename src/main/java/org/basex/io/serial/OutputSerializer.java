@@ -7,6 +7,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
@@ -14,7 +15,9 @@ import org.basex.core.Prop;
 import org.basex.data.FTPos;
 import org.basex.io.MimeTypes;
 import org.basex.io.out.PrintOutput;
+import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.StrStream;
 import org.basex.util.TokenBuilder;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTSpan;
@@ -284,8 +287,23 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   public void finishItem(final Item it) throws IOException {
     if(ind) print(' ');
-    final byte[] atom = atom(it);
-    for(int a = 0; a < atom.length; a += cl(atom, a)) code(cp(atom, a));
+
+    try {
+      if(it instanceof StrStream) {
+        final InputStream ni = ((StrStream) it).input(null);
+        try {
+          for(int i; (i = ni.read()) != -1;) code(i);
+        } finally {
+          ni.close();
+        }
+      } else {
+        final byte[] atom = it.string(null);
+        for(int a = 0; a < atom.length; a += cl(atom, a)) code(cp(atom, a));
+      }
+    } catch(final QueryException ex) {
+      throw new SerializerException(ex.err());
+    }
+
     ind = format;
     item = true;
   }

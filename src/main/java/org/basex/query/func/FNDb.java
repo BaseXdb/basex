@@ -37,7 +37,7 @@ import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Int;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Raw;
+import org.basex.query.item.B64Stream;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -434,8 +434,8 @@ public final class FNDb extends FuncCall {
 
     final IOFile file = data.meta.binary(path);
     if(file != null && file.exists() && !file.isDir()) {
-      final byte[] val = checkBin(doc, ctx);
-      ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
+      final Item it = checkItem(doc, ctx);
+      ctx.updates.add(new DBStore(data, token(path), it, input), ctx);
     }
     return null;
   }
@@ -520,8 +520,8 @@ public final class FNDb extends FuncCall {
     final IOFile file = data.meta.binary(path);
     if(file == null || file.isDir()) RESINV.thrw(input, path);
 
-    final byte[] val = checkBin(expr[2], ctx);
-    ctx.updates.add(new DBStore(data, token(path), val, input), ctx);
+    final Item it = checkItem(expr[2], ctx);
+    ctx.updates.add(new DBStore(data, token(path), it, input), ctx);
     return null;
   }
 
@@ -531,12 +531,12 @@ public final class FNDb extends FuncCall {
    * @return {@code null}
    * @throws QueryException query exception
    */
-  private Raw retrieve(final QueryContext ctx) throws QueryException {
+  private B64Stream retrieve(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
     final IOFile file = data.meta.binary(path);
     if(file == null || !file.exists() || file.isDir()) RESFNF.thrw(input, path);
-    return new Raw(file, path);
+    return new B64Stream(file, DBERR);
   }
 
   /**

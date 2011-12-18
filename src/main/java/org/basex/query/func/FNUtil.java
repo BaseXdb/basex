@@ -4,6 +4,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,8 +12,7 @@ import java.util.UUID;
 import java.util.zip.CRC32;
 
 import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -338,33 +338,45 @@ public final class FNUtil extends FuncCall {
   }
 
   /**
-   * Extracts the bytes from the given item.
+   * Extracts the bytes from a given item.
    * @param ctx query context
    * @return resulting value
    * @throws QueryException query exception
    */
   private Iter toBytes(final QueryContext ctx) throws QueryException {
-    final byte[] bytes = checkBin(expr[0], ctx);
+    final Item it = checkItem(expr[0], ctx);
+    final ByteList bl = new ByteList();
+    final InputStream is = it.input(input);
+    try {
+      try {
+        for(int ch; (ch = is.read()) != -1;) bl.add(ch);
+      } finally {
+        is.close();
+      }
+    } catch(final IOException ex) {
+      CONVERT.thrw(input, ex);
+    }
+
     return new ValueIter() {
-      final int bl = bytes.length;
+      final int bs = bl.size();
       int pos;
 
       @Override
       public Value value() {
-        final long[] tmp = new long[bl - pos];
-        for(int i = 0; i < tmp.length; i++) tmp[i] = bytes[pos + i];
+        final long[] tmp = new long[bs - pos];
+        for(int i = 0; i < tmp.length; i++) tmp[i] = bl.get(pos + i);
         return IntSeq.get(tmp, AtomType.BYT);
       }
       @Override
       public Item get(final long i) {
-        return Int.get(bytes[(int) i], AtomType.BYT);
+        return Int.get(bl.get((int) i), AtomType.BYT);
       }
       @Override
       public Item next() { return pos < size() ? get(pos++) : null; }
       @Override
       public boolean reset() { pos = 0; return true; }
       @Override
-      public long size() { return bl; }
+      public long size() { return bs; }
     };
   }
 
@@ -375,10 +387,15 @@ public final class FNUtil extends FuncCall {
    * @throws QueryException query exception
    */
   private Str toString(final QueryContext ctx) throws QueryException {
-    final byte[] val = checkBin(expr[0], ctx);
+    final Item it = checkItem(expr[0], ctx);
     final String enc = expr.length == 2 ? string(checkStr(expr[1], ctx)) : UTF8;
     try {
-      return Str.get(TextInput.content(new IOContent(val), enc).finish());
+      final InputStream is = it.input(input);
+      try {
+        return Str.get(new NewlineInput(is, enc).content());
+      } finally {
+        is.close();
+      }
     } catch(final IOException ex) {
       throw CONVERT.thrw(input, ex);
     }

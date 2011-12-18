@@ -6,13 +6,14 @@ import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import org.basex.core.Prop;
 import org.basex.core.cmd.Copy;
 import org.basex.io.IOFile;
-import org.basex.io.in.TextInput;
+import org.basex.io.out.BufferOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
@@ -20,12 +21,13 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
-import org.basex.query.item.B64;
+import org.basex.query.item.B64Stream;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dtm;
-import org.basex.query.item.Item;
 import org.basex.query.item.Int;
+import org.basex.query.item.Item;
 import org.basex.query.item.Str;
+import org.basex.query.item.StrStream;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -308,14 +310,10 @@ public final class FNFile extends FuncCall {
    * @return Base64Binary
    * @throws QueryException query exception
    */
-  private B64 readBinary(final File path) throws QueryException {
+  private B64Stream readBinary(final File path) throws QueryException {
     if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
-    try {
-      return new B64(new IOFile(path).read());
-    } catch(final IOException ex) {
-      throw FILEERROR.thrw(input, ex);
-    }
+    return new B64Stream(new IOFile(path), FILEERROR);
   }
 
   /**
@@ -325,18 +323,14 @@ public final class FNFile extends FuncCall {
    * @return string
    * @throws QueryException query exception
    */
-  private Str readText(final File path, final QueryContext ctx)
+  private StrStream readText(final File path, final QueryContext ctx)
       throws QueryException {
 
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
     if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
-    try {
-      return Str.get(TextInput.content(new IOFile(path), enc).finish());
-    } catch(final IOException ex) {
-      throw FILEERROR.thrw(input, ex);
-    }
+    return new StrStream(new IOFile(path), enc, FILEERROR);
   }
 
   /**
@@ -348,7 +342,7 @@ public final class FNFile extends FuncCall {
    */
   private Iter readTextLines(final File path, final QueryContext ctx)
       throws QueryException {
-    return FNGen.textIter(readText(path, ctx).string());
+    return FNGen.textIter(readText(path, ctx), input);
   }
 
   /**
@@ -396,10 +390,18 @@ public final class FNFile extends FuncCall {
 
     if(path.isDirectory()) PATHISDIR.thrw(input, path);
     try {
-      final FileOutputStream out = new FileOutputStream(path, append);
+      final FileOutputStream fos = new FileOutputStream(path, append);
+      final BufferOutput out = new BufferOutput(fos);
       try {
         final Iter ir = expr[1].iter(ctx);
-        for(Item it; (it = ir.next()) != null;) out.write(checkBin(it, ctx));
+        for(Item it; (it = ir.next()) != null;) {
+          final InputStream is = it.input(input);
+          try {
+            for(int i; (i = is.read()) != -1;)  out.write(i);
+          } finally {
+            is.close();
+          }
+        }
       } finally {
         out.close();
       }

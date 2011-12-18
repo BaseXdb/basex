@@ -15,7 +15,7 @@ import org.basex.build.file.HTMLParser;
 import org.basex.core.Prop;
 import org.basex.io.IOContent;
 import org.basex.io.MimeTypes;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.query.QueryException;
 import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
@@ -191,12 +191,12 @@ public final class ResponseHandler {
    * in UTF-8.
    * @param io connection input stream
    * @param c content type
-   * @param cs response content charset
+   * @param ce response content charset
    * @return payload as byte array
    * @throws IOException I/O Exception
    */
   private static byte[] extractPayload(final InputStream io, final String c,
-      final String cs) throws IOException {
+      final String ce) throws IOException {
 
     final BufferedInputStream bis = new BufferedInputStream(io);
     try {
@@ -205,7 +205,8 @@ public final class ResponseHandler {
       // In case of XML, HTML or text content type, use supplied character set
       if(MimeTypes.isXML(c) || c.equals(MimeTypes.TEXT_HTML) ||
           c.startsWith(MimeTypes.MIME_TEXT_PREFIX))
-        return TextInput.content(new IOContent(bl.toArray()), cs).finish();
+        return new NewlineInput(new IOContent(bl.toArray()), ce).content();
+
       // In case of binary data, do not encode anything
       return bl.toArray();
     } finally {
@@ -381,12 +382,12 @@ public final class ResponseHandler {
    * @param io connection input stream
    * @param sep separation boundary
    * @param end closing boundary
-   * @param cs part content encoding
+   * @param ce part content encoding
    * @return payload part content
    * @throws IOException I/O Exception
    */
   private static byte[] extractPartPayload(final InputStream io,
-      final byte[] sep, final byte[] end, final String cs) throws IOException {
+      final byte[] sep, final byte[] end, final String ce) throws IOException {
 
     final ByteList bl = new ByteList();
     while(true) {
@@ -399,7 +400,7 @@ public final class ResponseHandler {
       }
       bl.add(next).add('\n');
     }
-    return TextInput.content(new IOContent(bl.toArray()), cs).finish();
+    return new NewlineInput(new IOContent(bl.toArray()), ce).content();
   }
 
   /**

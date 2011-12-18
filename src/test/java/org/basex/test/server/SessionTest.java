@@ -201,7 +201,8 @@ public abstract class SessionTest {
     session.store("X", new ArrayInput(""));
     check("", session.query(_DB_RETRIEVE.args(DB, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
-    check("0001FF", session.query(_DB_RETRIEVE.args(DB, "X")).execute());
+    check("0001FF", session.query(
+        "xs:hexBinary(" + _DB_RETRIEVE.args(DB, "X") + ")").execute());
     session.execute("drop db " + DB);
   }
 

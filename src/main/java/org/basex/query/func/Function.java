@@ -513,7 +513,7 @@ public enum Function {
   /** Database function: optimize database structures. */
   _DB_OPTIMIZE(FNDb.class, "optimize(database[,all])", EMP, 1, STR, BLN),
   /** Database function: retrieves binary data. */
-  _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", RAW, STR, STR),
+  _DB_RETRIEVE(FNDb.class, "retrieve(database,path)", B64, STR, STR),
   /** Database function: stores binary data. */
   _DB_STORE(FNDb.class, "store(database,path,value)", EMP, STR, STR, ITEM),
   /** Database function: checks if the specified resource is an xml document. */
@@ -567,7 +567,7 @@ public enum Function {
   _FILE_READ_TEXT_LINES(FNFile.class, "read-text-lines(path[,encoding])",
       STR_ZM, 1, STR, STR),
   /** XQuery function */
-  _FILE_READ_BINARY(FNFile.class, "read-binary(path)", RAW, STR),
+  _FILE_READ_BINARY(FNFile.class, "read-binary(path)", B64, STR),
   /** XQuery function */
   _FILE_WRITE(FNFile.class, "write(path,data[,params])",
       EMP, 2, STR, ITEM_ZM, NOD),

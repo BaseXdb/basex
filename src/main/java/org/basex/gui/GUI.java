@@ -429,7 +429,7 @@ public final class GUI extends AGUI {
       info.reset();
 
       // sends feedback to the query editor
-      boolean stopped = inf.startsWith(PROGERR);
+      final boolean stopped = inf.startsWith(PROGERR);
       if(edit) {
         editor.info(stopped ? PROGERR : inf, ok);
       }

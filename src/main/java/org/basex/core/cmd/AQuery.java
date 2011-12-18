@@ -13,6 +13,7 @@ import org.basex.core.Prop;
 import org.basex.data.Result;
 import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.out.BufferOutput;
 import org.basex.io.out.NullOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.DOTSerializer;
@@ -238,15 +239,14 @@ abstract class AQuery extends Command {
     // show dot plan
     try {
       if(prop.is(Prop.DOTPLAN)) {
-        final ArrayOutput ao = new ArrayOutput();
-        final DOTSerializer d = new DOTSerializer(ao, prop.is(Prop.DOTCOMPACT));
-        qp.plan(d);
-        d.close();
-
         final String path = context.prop.get(Prop.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
-        new IOFile(dot).write(ao.toArray());
+
+        final BufferOutput bo = new BufferOutput(dot);
+        final DOTSerializer d = new DOTSerializer(bo, prop.is(Prop.DOTCOMPACT));
+        qp.plan(d);
+        d.close();
 
         if(prop.is(Prop.DOTDISPLAY))
           new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();

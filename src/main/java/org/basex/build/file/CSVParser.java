@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.basex.build.SingleParser;
+import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.io.in.BufferInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 import org.basex.util.XMLToken;
 import org.basex.util.list.TokenList;
 
@@ -96,14 +96,14 @@ public final class CSVParser extends SingleParser {
     String s = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
     separator = s.equals(SEPARATORS[0]) ? ',' : s.equals(SEPARATORS[1]) ? ';' :
       s.equals(SEPARATORS[2]) ? '\t' : -1;
-    if(separator == -1) throw new IOException(
-        Util.info(SETVAL, ParserProp.SEPARATOR[0], s));
+    if(separator == -1) throw new BaseXException(
+        SETVAL, ParserProp.SEPARATOR[0], s);
 
     // set XML format
     s = props.get(ParserProp.FORMAT).toLowerCase(Locale.ENGLISH);
     simple = s.equals(FORMATS[0]);
-    if(!simple && !s.equals(FORMATS[1])) throw new IOException(
-        Util.info(SETVAL, ParserProp.FORMAT[0], s));
+    if(!simple && !s.equals(FORMATS[1])) throw new BaseXException(
+        SETVAL, ParserProp.FORMAT[0], s);
     encoding = props.get(ParserProp.ENCODING);
   }
 
@@ -112,38 +112,28 @@ public final class CSVParser extends SingleParser {
     builder.startElem(CSV, atts);
 
     final TokenBuilder tb = new TokenBuilder();
-    final BufferInput bi = src.buffer();
-    bi.encoding(encoding);
+    final NewlineInput bi = new NewlineInput(src, encoding);
 
     boolean quoted = false, open = true;
     int ch = -1;
     while(true) {
-      if(ch == -1) ch = bi.readChar();
+      if(ch == -1) ch = bi.read();
       if(ch == -1) break;
       if(quoted) {
         if(ch == '"') {
-          ch = bi.readChar();
+          ch = bi.read();
           if(ch != '"') {
             quoted = false;
             continue;
           }
         }
-        while(ch == '\r') {
-          ch = bi.readChar();
-          if(ch != '\n') tb.add('\n');
-        }
-        if(ch != '\r') tb.add(ch);
+        tb.add(ch);
       } else if(ch == separator) {
         if(open) {
           open();
           open = false;
         }
         add(tb);
-      } else if(ch == '\r') {
-        ch = bi.readChar();
-        if(ch == '\n') continue;
-        finish(tb, open);
-        open = true;
       } else if(ch == '\n') {
         finish(tb, open);
         open = true;

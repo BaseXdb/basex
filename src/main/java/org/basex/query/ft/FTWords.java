@@ -15,7 +15,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTNode;
 import org.basex.query.item.Item;
-import org.basex.query.item.Str;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.IndexContext;
@@ -462,9 +461,10 @@ public final class FTWords extends FTExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(!(query instanceof Str)) sb.append("{ ");
+    final boolean str = query instanceof Item && ((Item) query).type.isString();
+    if(!str) sb.append("{ ");
     sb.append(query);
-    if(!(query instanceof Str)) sb.append(" }");
+    if(!str) sb.append(" }");
     switch(mode) {
       case M_ALL:
         sb.append(' ' + ALL);

@@ -12,7 +12,6 @@ import org.basex.data.Data;
 import org.basex.data.ExprInfo;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
-import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.util.Atts;
 import org.basex.util.list.IntList;
@@ -456,20 +455,6 @@ public abstract class Serializer {
    */
   protected byte[] info(final ExprInfo expr) {
     return token(expr.info());
-  }
-
-  /**
-   * Returns the string representation of the specified item.
-   * @param it item to be atomized
-   * @return string
-   * @throws IOException I/O exception
-   */
-  protected final byte[] atom(final Item it) throws IOException {
-    try {
-      return it.string(null);
-    } catch(final QueryException ex) {
-      throw new IOException(ex.getMessage(), ex);
-    }
   }
 
   // PRIVATE METHODS ==========================================================

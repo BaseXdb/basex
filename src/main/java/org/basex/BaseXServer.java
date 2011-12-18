@@ -2,6 +2,7 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -12,7 +13,6 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
-import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
 import org.basex.server.ClientListener;
 import org.basex.server.ClientSession;
@@ -41,7 +41,7 @@ public final class BaseXServer extends Main implements Runnable {
   /** Event server socket. */
   ServerSocket esocket;
   /** Stop file. */
-  IOFile stop;
+  File stop;
   /** Log. */
   Log log;
 
@@ -191,8 +191,8 @@ public final class BaseXServer extends Main implements Runnable {
    * @param port server port
    * @return stop file
    */
-  private static IOFile stopFile(final int port) {
-    return new IOFile(Prop.TMP, Util.name(BaseXServer.class) + port);
+  private static File stopFile(final int port) {
+    return new File(Prop.TMP, Util.name(BaseXServer.class) + port);
   }
 
   @Override
@@ -326,9 +326,9 @@ public final class BaseXServer extends Main implements Runnable {
    * @throws IOException I/O exception
    */
   public static void stop(final int port, final int eport) throws IOException {
-    final IOFile stop = stopFile(port);
+    final File stop = stopFile(port);
     try {
-      stop.write(Token.EMPTY);
+      stop.createNewFile();
       new Socket(LOCALHOST, eport).close();
       new Socket(LOCALHOST, port).close();
       // check if server was really stopped

@@ -241,7 +241,7 @@ public final class DocIndex implements Index {
     order = Array.createOrder(paths, false, true);
   }
 
-  // Inherited ==methods ======================================================
+  // Inherited methods ========================================================
 
   @Override
   public void close() { }

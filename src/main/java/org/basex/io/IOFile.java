@@ -14,6 +14,7 @@ import java.util.zip.ZipInputStream;
 
 import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
+import org.basex.io.out.BufferOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
@@ -272,7 +273,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Writes the specified file contents.
+   * Writes the specified byte array.
    * @param c contents
    * @throws IOException I/O exception
    */
@@ -281,7 +282,22 @@ public final class IOFile extends IO {
     try {
       out.write(c);
     } finally {
-      try { out.close(); } catch(final IOException ex) { }
+      out.close();
+    }
+  }
+
+  /**
+   * Writes the specified input.
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  public void write(final InputStream in) throws IOException {
+    final BufferOutput out = new BufferOutput(path);
+    try {
+      for(int i; (i = in.read()) != -1;) out.write(i);
+    } finally {
+      try { in.close(); } catch(final IOException ex) { }
+      out.close();
     }
   }
 

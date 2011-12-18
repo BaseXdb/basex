@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
@@ -24,6 +24,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
+import org.basex.query.item.StrStream;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -200,15 +201,11 @@ public final class FNGen extends FuncCall {
    * @return result
    * @throws QueryException query exception
    */
-  private Str unparsedText(final QueryContext ctx) throws QueryException {
+  private StrStream unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     if(enc != null && !Charset.isSupported(enc)) WHICHENC.thrw(input, enc);
-    try {
-      return Str.get(TextInput.content(io, enc).finish());
-    } catch(final IOException ex) {
-      throw WRONGINPUT.thrw(input, io, ex);
-    }
+    return new StrStream(io, enc, WRONGINPUT);
   }
 
   /**
@@ -218,21 +215,26 @@ public final class FNGen extends FuncCall {
    * @throws QueryException query exception
    */
   Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
-    return textIter(unparsedText(ctx).string());
+    return textIter(unparsedText(ctx), input);
   }
 
   /**
    * Returns the specified text as lines.
-   * @param str input text
+   * @param si text input
+   * @param ii input info
    * @return result
+   * @throws QueryException query exception
    */
-  public static Iter textIter(final byte[] str) {
+  static Iter textIter(final StrStream si, final InputInfo ii)
+      throws QueryException {
+
+    final byte[] str = si.string(ii);
     return new Iter() {
       int p = -1;
       @Override
       public Item next() {
         final ByteList bl = new ByteList();
-        while(++p < str.length && str[p] != 0x0a) bl.add(str[p]);
+        while(++p < str.length && str[p] != '\n') bl.add(str[p]);
         return p + 1 < str.length || bl.size() != 0 ?
             Str.get(bl.toArray()) : null;
       }
@@ -251,7 +253,12 @@ public final class FNGen extends FuncCall {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
-      TextInput.content(io, enc);
+      final NewlineInput nli = new NewlineInput(io, enc);
+      try {
+        while(nli.read() != -1);
+      } finally {
+        nli.close();
+      }
       return Bln.TRUE;
     } catch(final IOException ex) {
       return Bln.FALSE;

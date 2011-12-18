@@ -177,15 +177,12 @@ public abstract class Item extends Value {
 
   /**
    * Returns an input stream.
-   * @return content
-   * @throws IOException I/O exception
+   * @param ii input info
+   * @return input stream
+   * @throws QueryException query exception
    */
-  public InputStream input() throws IOException {
-    try {
-      return new ArrayInput(string(null));
-    } catch(final QueryException ex) {
-      throw new IOException(ex.getMessage(), ex);
-    }
+  public InputStream input(final InputInfo ii) throws QueryException {
+    return new ArrayInput(string(ii));
   }
 
   @Override
