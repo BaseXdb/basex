@@ -10,9 +10,7 @@ import java.util.Map;
 import org.basex.api.HTTPSession;
 import org.basex.core.Context;
 import org.basex.data.Result;
-import org.basex.io.IOContent;
-import org.basex.io.in.BufferInput;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.NewlineInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerProp;
@@ -24,7 +22,6 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.DataBuilder;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.list.ByteList;
 
 /**
  * REST-based evaluation of POST operations.
@@ -42,11 +39,7 @@ public class RESTPost extends RESTCode {
     if(enc == null) enc = Token.UTF8;
 
     // perform queries
-    final BufferInput bis = new BufferInput(ctx.in);
-    final ByteList bl = new ByteList();
-    for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
-    final IOContent cont = new IOContent(bl.toArray());
-    final String input = TextInput.content(cont, enc).toString();
+    final String input = Token.string(new NewlineInput(ctx.in, enc).content());
 
     final Context context = HTTPSession.context();
     Result node = null;

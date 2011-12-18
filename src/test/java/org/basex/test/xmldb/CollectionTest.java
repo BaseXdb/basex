@@ -249,7 +249,8 @@ public class CollectionTest extends XMLDBBaseTest {
 
   @Test
   public void testRemoveResource() throws Exception {
-    Resource res = coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
+    final Resource res =
+        coll.createResource("Correct", XMLResource.RESOURCE_TYPE);
     res.setContent("<xml/>");
     coll.storeResource(res);
 

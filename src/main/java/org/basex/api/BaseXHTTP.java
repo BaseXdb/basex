@@ -3,6 +3,7 @@ package org.basex.api;
 import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -19,7 +20,6 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
-import org.basex.io.IOFile;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -283,8 +283,8 @@ public final class BaseXHTTP {
    * @param port server port
    * @return stop file
    */
-  private static IOFile stopFile(final int port) {
-    return new IOFile(Prop.TMP, Util.name(BaseXHTTP.class) + port);
+  private static File stopFile(final int port) {
+    return new File(Prop.TMP, Util.name(BaseXHTTP.class) + port);
   }
 
   /**
@@ -293,9 +293,9 @@ public final class BaseXHTTP {
    * @throws IOException I/O exception
    */
   private static void stop(final int port) throws IOException {
-    final IOFile stop = stopFile(port);
+    final File stop = stopFile(port);
     try {
-      stop.write(Token.EMPTY);
+      stop.createNewFile();
       new Socket(LOCALHOST, port).close();
       // give the notified process some time to quit
       Performance.sleep(100);
@@ -329,7 +329,7 @@ public final class BaseXHTTP {
     /** Server socket. */
     private final ServerSocket ss;
     /** Stop file. */
-    private final IOFile stop;
+    private final File stop;
 
     /**
      * Constructor.
