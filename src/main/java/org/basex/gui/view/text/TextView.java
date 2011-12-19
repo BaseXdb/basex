@@ -170,7 +170,7 @@ public final class TextView extends View implements ActionListener {
    */
   public void setText(final ArrayOutput out, final Command c) {
     final byte[] buf = out.buffer();
-    final int size = out.size();
+    final int size = (int) out.size();
     final byte[] chop = Token.token(DOTS);
     if(out.finished() && size >= chop.length) {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);

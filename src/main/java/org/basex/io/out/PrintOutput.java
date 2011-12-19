@@ -19,9 +19,9 @@ public class PrintOutput extends OutputStream {
   /** Output stream reference. */
   private final OutputStream os;
   /** Maximum numbers of bytes to write. */
-  protected int max = Integer.MAX_VALUE;
+  protected long max = Long.MAX_VALUE;
   /** Number of bytes written. */
-  protected int size;
+  protected long size;
 
   /** Protected default constructor. */
   protected PrintOutput() {
@@ -139,7 +139,7 @@ public class PrintOutput extends OutputStream {
    * Returns the number of written bytes.
    * @return number of written bytes
    */
-  public final int size() {
+  public final long size() {
     return size;
   }
 

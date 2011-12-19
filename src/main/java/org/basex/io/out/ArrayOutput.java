@@ -28,7 +28,7 @@ public final class ArrayOutput extends PrintOutput {
 
   @Override
   public void write(final int b) {
-    final int s = size;
+    final int s = (int) size;
     if(s == max) return;
     if(s == buf.length) buf = Arrays.copyOf(buf, s << 1);
     buf[s] = (byte) b;
@@ -40,7 +40,7 @@ public final class ArrayOutput extends PrintOutput {
    * @return byte array
    */
   public byte[] toArray() {
-    return Arrays.copyOf(buf, size);
+    return Arrays.copyOf(buf, (int) size);
   }
 
   @Override
@@ -65,6 +65,6 @@ public final class ArrayOutput extends PrintOutput {
 
   @Override
   public String toString() {
-    return Token.string(buf, 0, size);
+    return Token.string(buf, 0, (int) size);
   }
 }
