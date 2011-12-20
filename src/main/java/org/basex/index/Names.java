@@ -60,28 +60,30 @@ public final class Names extends TokenSet implements Index {
 
   /**
    * Indexes a name and returns its unique id.
-   * @param k name to be found
-   * @param v value, evaluated in statistics
+   * @param n name to be added
+   * @param v value, added to statistics
    * @param st statistics flag
    * @return name id
    */
-  public int index(final byte[] k, final byte[] v, final boolean st) {
-    final int s = Math.abs(add(k));
+  public int index(final byte[] n, final byte[] v, final boolean st) {
+    final int i = Math.abs(add(n));
     if(st) {
-      if(stats[s] == null) stats[s] = new Stats();
-      if(v != null) stats[s].add(v, meta);
-      stats[s].count++;
+      if(stats[i] == null) stats[i] = new Stats();
+      final Stats stat = stats[i];
+      if(v != null) stat.add(v, meta);
+      stat.count++;
     }
-    return s;
+    return i;
   }
 
   /**
+   * Adds a value to the statistics of the specified key.
    * Evaluates the value for the specified key id.
-   * @param i key id
-   * @param v value, used for statistics
+   * @param n name id
+   * @param v value, added to statistics
    */
-  public void index(final int i, final byte[] v) {
-    stats[i].add(v, meta);
+  public void index(final int n, final byte[] v) {
+    stats[n].add(v, meta);
   }
 
   @Override

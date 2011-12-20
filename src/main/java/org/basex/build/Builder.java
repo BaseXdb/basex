@@ -59,7 +59,7 @@ public abstract class Builder extends Progress {
   /** Size stack. */
   private boolean inDoc;
   /** Current tree height. */
-  private int lvl;
+  private int level;
   /** Element counter. */
   private int c;
 
@@ -96,7 +96,7 @@ public abstract class Builder extends Progress {
 
     // add document node and parse document
     parser.parse(this);
-    if(lvl != 0) error(DOCOPEN, parser.detail(), tags.key(tstack.get(lvl)));
+    if(level != 0) error(DOCOPEN, parser.detail(), tags.key(tstack.get(level)));
 
     // no nodes inserted: add default document node
     if(meta.size == 0) {
@@ -116,8 +116,8 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void startDoc(final byte[] value) throws IOException {
-    if(meta.createpath) path.index(0, Data.DOC, lvl);
-    pstack.set(lvl++, meta.size);
+    if(meta.createpath) path.index(0, Data.DOC, level);
+    pstack.set(level++, meta.size);
     addDoc(value);
     ns.open();
   }
@@ -127,7 +127,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void endDoc() throws IOException {
-    final int pre = pstack.get(--lvl);
+    final int pre = pstack.get(--level);
     setSize(pre, meta.size - pre);
     meta.ndocs++;
     ns.close(meta.size);
@@ -154,7 +154,7 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     final int pre = addElem(nm, att);
-    ++lvl;
+    ++level;
     return pre;
   }
 
@@ -168,7 +168,7 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     addElem(nm, att);
-    final int pre = pstack.get(lvl);
+    final int pre = pstack.get(level);
     ns.close(pre);
     if(att.size() > IO.MAXATTS) setSize(pre, meta.size - pre);
   }
@@ -179,8 +179,8 @@ public abstract class Builder extends Progress {
    */
   public final void endElem() throws IOException {
     checkStop();
-    --lvl;
-    final int pre = pstack.get(lvl);
+    --level;
+    final int pre = pstack.get(level);
     setSize(pre, meta.size - pre);
     ns.close(pre);
   }
@@ -195,7 +195,7 @@ public abstract class Builder extends Progress {
     final byte[] t = meta.chop ? trim(value) : value;
 
     // check if text appears before or after root node
-    final boolean ignore = !inDoc || lvl == 1;
+    final boolean ignore = !inDoc || level == 1;
     if((meta.chop && t.length != 0 || !ws(t)) && ignore)
       error(inDoc ? AFTERROOT : BEFOREROOT, parser.detail());
 
@@ -323,16 +323,16 @@ public abstract class Builder extends Progress {
     // get tag reference
     int n = tags.index(nm, null, true);
 
-    if(meta.createpath) path.index(n, Data.ELEM, lvl);
+    if(meta.createpath) path.index(n, Data.ELEM, level);
 
     // cache pre value
     final int pre = meta.size;
     // remember tag id and parent reference
-    tstack.set(lvl, n);
-    pstack.set(lvl, pre);
+    tstack.set(level, n);
+    pstack.set(level, pre);
 
     // get and store element references
-    final int dis = lvl != 0 ? pre - pstack.get(lvl - 1) : 1;
+    final int dis = level != 0 ? pre - pstack.get(level - 1) : 1;
     final int as = att.size();
     final boolean ne = ns.open();
     int u = ns.uri(nm, true);
@@ -343,14 +343,14 @@ public abstract class Builder extends Progress {
       n = atts.index(att.name(a), att.string(a), true);
       u = ns.uri(att.name(a), false);
       if(meta.createpath)
-        path.index(n, Data.ATTR, lvl + 1, att.string(a), meta);
+        path.index(n, Data.ATTR, level + 1, att.string(a), meta);
       addAttr(n, att.string(a), Math.min(IO.MAXATTS, a + 1), u);
     }
 
-    if(lvl != 0) {
-      if(lvl > 1) {
+    if(level != 0) {
+      if(level > 1) {
         // set leaf node information in index
-        tags.stat(tstack.get(lvl - 1)).leaf = false;
+        tags.stat(tstack.get(level - 1)).leaf = false;
       } else if(inDoc) {
         // don't allow more than one root node
         error(MOREROOTS, parser.detail(), nm);
@@ -390,13 +390,17 @@ public abstract class Builder extends Progress {
   private void addText(final byte[] value, final byte kind)
       throws IOException {
 
-    // text node processing for statistics
-    if(kind == Data.TEXT) tags.index(tstack.get(lvl - 1), value);
-    // set leaf node information in index
-    else if(lvl > 1) tags.stat(tstack.get(lvl - 1)).leaf = false;
+    final int l = level;
+    if(l > 1) {
+      final int tag = tstack.get(l - 1);
+      // text node processing for statistics
+      if(kind == Data.TEXT) tags.index(tag, value);
+      // set leaf node information in index
+      else tags.stat(tag).leaf = false;
+    }
 
-    if(meta.createpath) path.index(0, kind, lvl, value, meta);
-    addText(value, lvl == 0 ? 1 : meta.size - pstack.get(lvl - 1), kind);
+    if(meta.createpath) path.index(0, kind, l, value, meta);
+    addText(value, l == 0 ? 1 : meta.size - pstack.get(l - 1), kind);
   }
 
   /**
