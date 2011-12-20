@@ -108,10 +108,11 @@ public final class DocIndex implements Index {
   /**
    * Replaces entries in the index.
    * @param pre insertion position
+   * @param size number of deleted nodes
    * @param d data reference to be copied
    */
-  public void replace(final int pre, final Data d) {
-    delete(pre, d.meta.size);
+  public void replace(final int pre, final int size, final Data d) {
+    delete(pre, size);
     insert(pre, d);
   }
 

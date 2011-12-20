@@ -581,14 +581,14 @@ public abstract class Data {
    */
   public final void replace(final int rpre, final Data data) {
     meta.update();
-    docindex.replace(rpre, data);
 
     final int dsize = data.meta.size;
-    buffer(dsize);
-
     final int rkind = kind(rpre);
     final int rsize = size(rpre, rkind);
     final int rpar = parent(rpre, rkind);
+    final int diff = dsize - rsize;
+    buffer(dsize);
+    docindex.replace(rpre, rsize, data);
 
     if(meta.updindex) {
       // update index
@@ -641,7 +641,6 @@ public abstract class Data {
     buffer(1);
 
     // no distance/size update if the two subtrees are of equal size
-    final int diff = dsize - rsize;
     if(diff == 0) return;
 
     // increase/decrease size of ancestors, adjust distances of siblings
