@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
-import org.basex.core.Prop;
 import org.basex.data.FTPos;
 import org.basex.io.MimeTypes;
 import org.basex.io.out.PrintOutput;
@@ -99,14 +98,6 @@ public abstract class OutputSerializer extends Serializer {
     final String ver = p.get(S_VERSION).isEmpty() ?
         versions.length > 0 ? versions[0] : "" : p.check(S_VERSION, versions);
 
-    // project specific properties
-    indents = Math.max(0, toInt(p.get(S_INDENTS)));
-    tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
-    wPre    = token(p.get(S_WRAP_PREFIX));
-    wUri    = token(p.get(S_WRAP_URI));
-    wrap    = wPre.length != 0;
-    out     = PrintOutput.get(os);
-
     final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);
     final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
     final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
@@ -114,17 +105,27 @@ public abstract class OutputSerializer extends Serializer {
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
     final String enc = normEncoding(p.get(S_ENCODING), null);
-    utf8 = enc == UTF8;
     encoding = Charset.forName(enc);
+    utf8 = enc == UTF8;
+
+    // project specific properties
+    indents = Math.max(0, toInt(p.get(S_INDENTS)));
+    format  = p.yes(S_FORMAT);
+    tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
+    wPre    = token(p.get(S_WRAP_PREFIX));
+    wUri    = token(p.get(S_WRAP_URI));
+    wrap    = wPre.length != 0;
+    final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
+    nl = (eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n").
+        getBytes(encoding);
+
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);
-    format  = p.yes(S_FORMAT);
-    indent  = p.yes(S_INDENT) && format;
     escape  = p.yes(S_ESCAPE_URI_ATTRIBUTES);
     content = p.yes(S_INCLUDE_CONTENT_TYPE);
     undecl  = p.yes(S_UNDECLARE_PREFIXES);
-    nl = utf8 ? token(Prop.NL) : Prop.NL.getBytes(encoding);
+    indent  = p.yes(S_INDENT) && format;
 
     if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
     if(!supported(enc)) SERENCODING.thrwSerial(enc);
@@ -137,6 +138,7 @@ public abstract class OutputSerializer extends Serializer {
     }
 
     // print byte-order-mark
+    out = PrintOutput.get(os);
     if(bom) {
       // comparison by reference
       if(enc == UTF8) {

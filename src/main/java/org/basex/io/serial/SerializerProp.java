@@ -7,6 +7,7 @@ import static org.basex.query.util.Err.*;
 import java.util.Map.Entry;
 
 import org.basex.core.AProp;
+import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -66,6 +67,9 @@ public final class SerializerProp extends AProp {
   public static final Object[] S_VERSION = {
     "version", "" };
 
+  /** Specific serialization parameter: newline. */
+  public static final Object[] S_NEWLINE = {
+    "newline", Prop.NL };
   /** Specific serialization parameter: formatting. */
   public static final Object[] S_FORMAT = {
     "format", YES };

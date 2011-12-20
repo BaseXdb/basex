@@ -114,6 +114,14 @@ public interface DataText {
 
   /** Omit flag. */
   String OMIT = "omit";
+
+  /** NL flag. */
+  String S_NL = "\\n";
+  /** CR flag. */
+  String S_CR = "\\r";
+  /** CRNL flag. */
+  String S_CRNL = "\\r\\n";
+
   /** Version. */
   String V10 = "1.0";
   /** Version. */
