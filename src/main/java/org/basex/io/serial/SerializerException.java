@@ -1,46 +1,52 @@
 package org.basex.io.serial;
 
 import java.io.IOException;
-import org.basex.core.BaseXException;
-import org.basex.query.util.Err;
-import org.basex.util.TokenBuilder;
+import org.basex.query.QueryException;
+import org.basex.util.InputInfo;
 
 /**
- * This class signals that an exception occurred during query serialization.
+ * This class indicates exceptions during the serialization of a query.
+ * This exception contains a {@link QueryException}, which can later be
+ * unwrapped.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
 public final class SerializerException extends IOException {
-  /** Error reference. */
-  private final Err err;
+  /** Wrapped query exception. */
+  private final QueryException exception;
 
   /**
    * Default constructor.
-   * @param er error reference
-   * @param ext error extension
+   * @param qe query exception
    */
-  public SerializerException(final Err er, final Object... ext) {
-    super(BaseXException.message(er.desc, ext));
-    err = er;
+  public SerializerException(final QueryException qe) {
+    super(qe.getMessage());
+    exception = qe;
+  }
+
+  @Override
+  public QueryException getCause() {
+    return exception;
   }
 
   /**
-   * Returns the error.
-   * @return error
+   * Returns the query exception.
+   * @param input input info
+   * @return query exception
    */
-  public Err err() {
-    return err;
+  public QueryException getCause(final InputInfo input) {
+    if(input != null) exception.info(input);
+    return exception;
   }
 
   @Override
   public String getLocalizedMessage() {
-    return super.getMessage();
+    return exception.getLocalizedMessage();
   }
 
   @Override
   public String getMessage() {
-    return new TokenBuilder().add('[').add(err.qname().string()).
-        add(']').add(getLocalizedMessage()).toString();
+    return exception.getMessage();
   }
 }

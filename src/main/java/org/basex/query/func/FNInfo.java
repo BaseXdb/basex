@@ -54,7 +54,7 @@ public final class FNInfo extends FuncCall {
         }
         if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
         final Value val = al > 2 ? expr[2].value(ctx) : null;
-        throw new QueryException(input, name, val, msg);
+        throw new QueryException(input, name, msg).value(val);
       case TRACE:
         return new Iter() {
           final Iter ir = expr[0].iter(ctx);

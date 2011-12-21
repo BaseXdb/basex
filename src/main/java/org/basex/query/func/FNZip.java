@@ -361,7 +361,7 @@ public final class FNZip extends FuncCall {
                 } while((n = ch.next()) != null);
                 ser.close();
               } catch(final SerializerException ex) {
-                throw new QueryException(input, ex);
+                throw ex.getCause(input);
               }
             }
           }

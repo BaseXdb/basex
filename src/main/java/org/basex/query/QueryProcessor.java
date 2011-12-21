@@ -213,7 +213,7 @@ public final class QueryProcessor extends Progress {
     try {
       return Serializer.get(os, ctx.serProp(true));
     } catch(final SerializerException ex) {
-      throw new QueryException(null, ex);
+      throw ex.getCause();
     }
   }
 

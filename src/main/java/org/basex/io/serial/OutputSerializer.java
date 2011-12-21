@@ -105,7 +105,11 @@ public abstract class OutputSerializer extends Serializer {
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
     final String enc = normEncoding(p.get(S_ENCODING), null);
-    encoding = Charset.forName(enc);
+    try {
+      encoding = Charset.forName(enc);
+    } catch(final Exception ex) {
+      throw SERENCODING.thrwSerial(enc);
+    }
     utf8 = enc == UTF8;
 
     // project specific properties
@@ -128,7 +132,6 @@ public abstract class OutputSerializer extends Serializer {
     indent  = p.yes(S_INDENT) && format;
 
     if(!maps.isEmpty()) SERMAP.thrwSerial(maps);
-    if(!supported(enc)) SERENCODING.thrwSerial(enc);
 
     if(docsys.isEmpty()) {
       docsys = null;
@@ -303,7 +306,7 @@ public abstract class OutputSerializer extends Serializer {
         for(int a = 0; a < atom.length; a += cl(atom, a)) code(cp(atom, a));
       }
     } catch(final QueryException ex) {
-      throw new SerializerException(ex.err());
+      throw new SerializerException(ex);
     }
 
     ind = format;

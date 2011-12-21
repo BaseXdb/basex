@@ -75,7 +75,7 @@ public final class FNJson extends FuncCall {
       node.serialize(json);
       json.close();
     } catch(final SerializerException ex) {
-      throw new QueryException(input, ex);
+      throw ex.getCause(input);
     } catch(final IOException ex) {
       SERANY.thrw(input, ex);
     }

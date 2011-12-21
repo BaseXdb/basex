@@ -549,10 +549,7 @@ public final class CommandParser extends InputParser {
    */
   private QueryException error(final StringList comp, final String m,
       final Object... e) {
-
-    final QueryException q = new QueryException(input(), new QNm(), null, m, e);
-    q.complete(this, comp);
-    return q;
+    return new QueryException(input(), new QNm(), m, e).suggest(this, comp);
   }
 
   /**

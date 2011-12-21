@@ -39,7 +39,7 @@ public final class RawSerializer extends TextSerializer {
         is.close();
       }
     } catch(final QueryException ex) {
-      throw new SerializerException(ex.err());
+      throw new SerializerException(ex);
     }
   }
 

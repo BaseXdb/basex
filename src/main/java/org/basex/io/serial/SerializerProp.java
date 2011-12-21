@@ -152,19 +152,16 @@ public final class SerializerProp extends AProp {
    * @param found found value
    * @param allowed allowed values
    * @return exception
+   * @throws SerializerException serializer exception
    */
   public static SerializerException error(final Object key, final String found,
-      final String... allowed) {
+      final String... allowed) throws SerializerException {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.addExt(SERVAL, key, allowed[0]);
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
     tb.addExt(SERVAL3, found);
-    try {
-      return SERANY.thrwSerial(tb);
-    } catch(final SerializerException ex) {
-      return ex;
-    }
+    throw SERANY.thrwSerial(tb);
   }
 
   @Override

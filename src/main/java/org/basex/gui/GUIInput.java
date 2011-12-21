@@ -180,7 +180,7 @@ public final class GUIInput extends BaseXTextField {
       final String suf = getText().substring(pre.length());
       new CommandParser(suf, gui.context).parse(true);
     } catch(final QueryException ex) {
-      sl = ex.complete();
+      sl = ex.suggest();
       final int marked = ex.markedCol() + (excl ? 2 : 1);
       if(ex.markedCol() > -1 && marked <= query.length()) {
         pre = query.substring(0, marked);
@@ -205,7 +205,7 @@ public final class GUIInput extends BaseXTextField {
       sl = qs.complete();
       pre = query.substring(0, qs.qm);
     } catch(final QueryException ex) {
-      sl = ex.complete();
+      sl = ex.suggest();
       pre = query.substring(0, ex.col() - (ex.col() == 1 ? 1 : 0));
     }
     if(getCaretPosition() < pre.length()) sl = null;

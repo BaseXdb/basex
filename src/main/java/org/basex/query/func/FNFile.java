@@ -367,7 +367,7 @@ public final class FNFile extends FuncCall {
         for(Item it; (it = ir.next()) != null;) it.serialize(ser);
         ser.close();
       } catch(final SerializerException ex) {
-        throw new QueryException(input, ex);
+        throw ex.getCause(input);
       } finally {
         out.close();
       }

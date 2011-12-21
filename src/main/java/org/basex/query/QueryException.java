@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import org.basex.core.BaseXException;
 import org.basex.io.IO;
-import org.basex.io.serial.SerializerException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
@@ -15,7 +14,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.list.StringList;
 
 /**
- * This class indicates exceptions during query parsing or evaluation.
+ * This class indicates exceptions during the parsing or evaluation of a query.
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
@@ -29,8 +28,8 @@ public final class QueryException extends Exception {
   private Value value = Empty.SEQ;
   /** File reference. */
   private IO file;
-  /** Code completions. */
-  private StringList complete;
+  /** Code suggestions. */
+  private StringList suggest;
   /** Error line and column. */
   private int[] lineCol;
   /** Marked error column. */
@@ -43,38 +42,23 @@ public final class QueryException extends Exception {
    * @param ext error extension
    */
   public QueryException(final InputInfo ii, final Err er, final Object... ext) {
-    this(ii, er.qname(), null, er.desc, ext);
+    this(ii, er.qname(), er.desc, ext);
     err = er;
-  }
-
-  /**
-   * Default constructor.
-   * @param ii input info
-   * @param ex serializer exception
-   */
-  public QueryException(final InputInfo ii, final SerializerException ex) {
-    this(ii, ex.err().qname(), null, ex.getLocalizedMessage());
-    err = ex.err();
   }
 
   /**
    * Constructor, specifying the error code and message as string.
    * @param ii input info
    * @param errc error code
-   * @param val error value
    * @param msg error message
    * @param ext error extension
    */
-  public QueryException(final InputInfo ii, final QNm errc, final Value val,
-      final String msg, final Object... ext) {
+  public QueryException(final InputInfo ii, final QNm errc, final String msg,
+      final Object... ext) {
 
     super(BaseXException.message(msg, ext));
     name = errc;
-    value = val;
-    if(ii == null) return;
-
-    file = ii.file;
-    lineCol = ii.lineCol();
+    if(ii != null) info(ii);
   }
 
   /**
@@ -110,21 +94,44 @@ public final class QueryException extends Exception {
   }
 
   /**
-   * Returns suggestions for code completions.
+   * Returns suggestions for code suggestions.
    * @return suggestions
    */
-  public StringList complete() {
-    return complete == null ? new StringList() : complete;
+  public StringList suggest() {
+    return suggest == null ? new StringList() : suggest;
   }
 
   /**
-   * Sets suggestions for code completions.
+   * Sets code suggestions.
    * @param qp query parser
-   * @param comp completions
+   * @param sug code suggestions
+   * @return self reference
    */
-  public void complete(final InputParser qp, final StringList comp) {
-    complete = comp;
+  public QueryException suggest(final InputParser qp, final StringList sug) {
+    suggest = sug;
     pos(qp);
+    return this;
+  }
+
+  /**
+   * Sets input info.
+   * @param ii input info
+   * @return self reference
+   */
+  public QueryException info(final InputInfo ii) {
+    file = ii.file;
+    lineCol = ii.lineCol();
+    return this;
+  }
+
+  /**
+   * Sets the error value.
+   * @param v error value
+   * @return self reference
+   */
+  public QueryException value(final Value v) {
+    value = v;
+    return this;
   }
 
   /**
