@@ -68,8 +68,8 @@ public final class SerializerProp extends AProp {
     "version", "" };
 
   /** Specific serialization parameter: newline. */
-  public static final Object[] S_NEWLINE = {
-    "newline", Prop.NL };
+  public static final Object[] S_NEWLINE = { "newline",
+    Prop.NL.equals("\r") ? S_CR : Prop.NL.equals("\n") ? S_NL  : S_CRNL };
   /** Specific serialization parameter: formatting. */
   public static final Object[] S_FORMAT = {
     "format", YES };
