@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import org.basex.core.Text;
 import org.basex.core.cmd.Open;
+import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
 import org.basex.server.Query;
 import org.basex.util.Token;
@@ -82,8 +83,11 @@ abstract class RESTCode {
   void wrap(final String val, final RESTContext ctx) throws RESTException {
     ctx.wrapping = Util.yes(val);
     if(!ctx.wrapping && !Util.no(val)) {
-      throw new RESTException(SC_BAD_REQUEST, SerializerProp.error(WRAP,
-          val, Text.YES, Text.NO).getMessage());
+      try {
+        SerializerProp.error(WRAP, val, Text.YES, Text.NO);
+      } catch(final SerializerException ex) {
+        throw new RESTException(SC_BAD_REQUEST, ex.getMessage());
+      }
     }
   }
 
