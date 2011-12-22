@@ -221,26 +221,6 @@ public final class PathSummary implements Index {
     return out;
   }
 
-  /**
-   * Adds nodes to the hash set if they comply to the specified arguments.
-   * @param in input node
-   * @param out output nodes
-   * @param t name reference
-   * @param k node kind
-   * @param desc if false, return only children
-   */
-  public void add(final PathNode in, final ObjList<PathNode> out,
-      final int t, final int k, final boolean desc) {
-
-    for(final PathNode n : in.ch) {
-      if(desc) add(n, out, t, k, desc);
-      if(k == -1 && n.kind != Data.ATTR || k == n.kind &&
-          (t == 0 || t == n.name)) {
-        out.add(n);
-      }
-    }
-  }
-
   // Info =====================================================================
 
   @Override

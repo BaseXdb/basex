@@ -6,9 +6,10 @@ import static org.basex.query.util.Err.*;
 import java.io.IOException;
 
 import org.basex.data.Data;
+import org.basex.index.Names;
+import org.basex.index.Stats;
 import org.basex.index.path.PathNode;
 import org.basex.io.serial.Serializer;
-import org.basex.index.Stats;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -158,12 +159,12 @@ public class AxisStep extends Preds {
   }
 
   /**
-   * Returns all path nodes that yield results for this step.
-   * @param nodes input nodes
+   * Returns the path nodes that are the result of this step.
+   * @param nodes initial path nodes
    * @param data data reference
-   * @return path nodes, or {@code null} if size cannot be evaluated
+   * @return resulting path nodes, or {@code null} if nodes cannot be evaluated
    */
-  final ObjList<PathNode> size(final ObjList<PathNode> nodes,
+  final ObjList<PathNode> nodes(final ObjList<PathNode> nodes,
       final Data data) {
 
     // skip steps with predicates or different namespaces
@@ -173,27 +174,53 @@ public class AxisStep extends Preds {
     int kind = -1, name = 0;
     if(test.type != null) {
       kind = ANode.kind(test.type);
-      // skip processing instructions and attributes
-      if(kind == Data.PI || kind == Data.ATTR) return null;
+      if(kind == Data.PI) return null;
 
       if(test.test == Name.NAME) {
-        // element test (*:ln)
-        name = data.tagindex.id(((NameTest) test).ln);
+        // element/attribute test (*:ln)
+        final Names names = kind == Data.ATTR ? data.atnindex : data.tagindex;
+        name = names.id(((NameTest) test).ln);
       } else if(test.test != null && test.test != Name.ALL) {
         // skip namespace and standard tests
         return null;
       }
     }
 
-    // skip axes other than descendant and child
-    final boolean desc = axis == Axis.DESC;
-    if(!desc && axis != Axis.CHILD) return null;
+    // skip axes other than descendant, child, and attribute
+    if(axis != Axis.ATTR && axis != Axis.CHILD && axis != Axis.DESC &&
+       axis != Axis.DESCORSELF && axis != Axis.SELF) return null;
 
-    final ObjList<PathNode> out = new ObjList<PathNode>();
-    for(final PathNode pn : nodes) {
-      data.pthindex.add(pn, out, name, kind, desc);
+    final ObjList<PathNode> tmp = new ObjList<PathNode>();
+    for(final PathNode n : nodes) {
+      if(axis == Axis.SELF || axis == Axis.DESCORSELF) {
+        if(kind == -1 || kind == n.kind && (name == 0 || name == n.name)) {
+          if(!tmp.contains(n)) tmp.add(n);
+        }
+      }
+      if(axis != Axis.SELF) add(n, tmp, name, kind);
     }
-    return out;
+    return tmp;
+  }
+
+  /**
+   * Adds path nodes to the list if they comply with the given test conditions.
+   * @param node root node
+   * @param nodes output nodes
+   * @param name name id, or {@code 0} as wildcard
+   * @param kind node kind, or {@code -1} for all types
+   */
+  private void add(final PathNode node, final ObjList<PathNode> nodes,
+      final int name, final int kind) {
+
+    for(final PathNode n : node.ch) {
+      if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
+        add(n, nodes, name, kind);
+      }
+      if(kind == -1 && (n.kind != Data.ATTR ^ axis == Axis.ATTR) ||
+         kind == n.kind && (name == 0 || name == n.name)) {
+        if(!nodes.contains(n)) nodes.add(n);
+      }
+    }
   }
 
   /**
@@ -235,7 +262,7 @@ public class AxisStep extends Preds {
       if(axis == Axis.SELF) sb.append(".");
     }
     if(sb.length() == 0) {
-      if(axis == Axis.ATTR) sb.append("@");
+      if(axis == Axis.ATTR && test != Test.NOD) sb.append("@");
       else if(axis != Axis.CHILD) sb.append(axis + "::");
       sb.append(test);
     }

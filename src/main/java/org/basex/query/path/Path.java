@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.basex.data.Data;
 import org.basex.index.path.PathNode;
@@ -24,7 +23,6 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.path.Test.Name;
 import org.basex.query.util.Var;
-import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.list.ObjList;
 
@@ -138,8 +136,11 @@ public abstract class Path extends ParseExpr {
 
       if(curr.axis == CHILD && !curr.uses(Use.POS)) {
         // descendant-or-self::node()/child::X -> descendant::X
-        Array.move(st, l, -1, st.length - l);
-        st = Arrays.copyOf(st, st.length - 1);
+        final int sl = st.length;
+        final Expr[] tmp = new Expr[sl - 1];
+        System.arraycopy(st, 0, tmp, 0, l - 1);
+        System.arraycopy(st, l, tmp, l - 1, sl - l);
+        st = tmp;
         curr.axis = DESC;
         opt = true;
       } else if(curr.axis == ATTR && !curr.uses(Use.POS)) {
@@ -167,15 +168,14 @@ public abstract class Path extends ParseExpr {
   protected long size(final QueryContext ctx) {
     final Value rt = root(ctx);
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
-    if(data == null || !data.meta.pathindex || !data.meta.uptodate ||
-        !data.single()) return -1;
+    if(data == null || !data.meta.pathindex || !data.meta.uptodate) return -1;
 
     ObjList<PathNode> nodes = data.pthindex.root();
     long m = 1;
     for(int s = 0; s < steps.length; s++) {
       final AxisStep curr = axisStep(s);
       if(curr != null) {
-        nodes = curr.size(nodes, data);
+        nodes = curr.nodes(nodes, data);
         if(nodes == null) return -1;
       } else if(s + 1 == steps.length) {
         m = steps[s].size();

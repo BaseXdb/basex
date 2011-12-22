@@ -130,7 +130,6 @@ public class AxisPath extends Path {
     final Path path = finish(ctx);
 
     // heuristics: wrap with filter expression if only one result is expected
-    //return path;
     return size() != 1 ? path :
       new Filter(input, this, Pos.get(1, size(), input)).comp2(ctx);
   }

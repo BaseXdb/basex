@@ -16,8 +16,13 @@ import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 
 /**
- * This index contains references to all document nodes in a database.
- * It is incrementally updated if the database is modified.
+ * <p>This index contains references to all document nodes in a database.
+ * The document nodes are incrementally updated.</p>
+ *
+ * <p>If updates are performed, the document paths and the pre/path mapping
+ * variables are discarded, as their update would be more expensive in numerous
+ * cases (e.g. when bulk insertions of new documents are performed). A tree
+ * structure could be introduced to offer better general performance.</p>
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
