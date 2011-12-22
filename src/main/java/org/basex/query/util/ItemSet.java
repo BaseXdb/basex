@@ -1,9 +1,12 @@
 package org.basex.query.util;
 
 import java.util.Arrays;
+import java.util.Iterator;
+
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Set for quickly indexing items.
@@ -11,19 +14,19 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-public final class ItemSet {
+public final class ItemSet implements Iterable<Item> {
   /** Initial hash capacity. */
   private static final int CAP = 1 << 3;
-  /** Hash keys. */
-  private int[] keys = new int[CAP];
+  /** Hash values. */
+  private int[] hash = new int[CAP];
   /** Pointers to the next token. */
   private int[] next = new int[CAP];
   /** Hash table buckets. */
   private int[] bucket = new int[CAP];
-  /** Items. */
-  private Item[] values = new Item[CAP];
+  /** Hashed items. */
+  protected Item[] keys = new Item[CAP];
   /** Hash entries. Actual hash size is {@code size - 1}. */
-  private int size = 1;
+  protected int size = 1;
 
   /**
    * Indexes the specified item.
@@ -38,12 +41,12 @@ public final class ItemSet {
     final int h = i.hash(ii);
     final int p = h & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(values[id].equiv(ii, i)) return false;
+      if(keys[id].equiv(ii, i)) return false;
     }
 
     next[size] = bucket[p];
-    keys[size] = h;
-    values[size] = i;
+    hash[size] = h;
+    keys[size] = i;
     bucket[p] = size++;
     return true;
   }
@@ -59,7 +62,7 @@ public final class ItemSet {
     for(int i = 0; i < l; ++i) {
       int id = bucket[i];
       while(id != 0) {
-        final int p = keys[id] & s - 1;
+        final int p = hash[id] & s - 1;
         final int nx = next[id];
         next[id] = b[p];
         b[p] = id;
@@ -68,9 +71,30 @@ public final class ItemSet {
     }
     bucket = b;
     next = Arrays.copyOf(next, s);
-    keys = Arrays.copyOf(keys, s);
+    hash = Arrays.copyOf(hash, s);
     final Item[] i = new Item[s];
-    System.arraycopy(values, 0, i, 0, size);
-    values = i;
+    System.arraycopy(keys, 0, i, 0, size);
+    keys = i;
+  }
+
+  /**
+   * Returns the number of entries.
+   * @return number of entries
+   */
+  public int size() {
+    return size - 1;
+  }
+
+  @Override
+  public Iterator<Item> iterator() {
+    return new Iterator<Item>() {
+      private int c = 1;
+      @Override
+      public boolean hasNext() { return c < size; }
+      @Override
+      public Item next() { return keys[c++]; }
+      @Override
+      public void remove() { Util.notexpected(); }
+    };
   }
 }

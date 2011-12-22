@@ -83,7 +83,7 @@ public final class Prop extends AProp {
   /** Maximum length of index entries. */
   public static final Object[] MAXLEN = { "MAXLEN", 96 };
   /** Maximum number of name categories. */
-  public static final Object[] MAXCATS = { "MAXCATS", 64 };
+  public static final Object[] MAXCATS = { "MAXCATS", 100 };
   /** Flag for automatic index update. */
   public static final Object[] UPDINDEX = { "UPDINDEX", false };
 

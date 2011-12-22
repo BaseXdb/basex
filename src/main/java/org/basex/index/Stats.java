@@ -20,17 +20,18 @@ import org.basex.util.hash.TokenIntMap;
  * @author Christian Gruen
  */
 public final class Stats {
-  /** Data type. */
-  public StatsType type;
   /** Categories. */
   public TokenIntMap cats;
+  /** Data type. */
+  public StatsType type;
   /** Minimum value. */
   public double min;
   /** Maximum value. */
   public double max;
   /** Number of occurrences. */
   public int count;
-  /** Leaf node flag. */
+  /** Leaf node flag. This flag indicates if a node has children other than
+   * texts and attributes. */
   public boolean leaf;
 
   /**
@@ -38,7 +39,7 @@ public final class Stats {
    */
   public Stats() {
     cats = new TokenIntMap();
-    type = StatsType.INTEGER;
+    type = StatsType.NONE;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
     leaf = true;
@@ -77,12 +78,6 @@ public final class Stats {
    * @throws IOException I/O exception
    */
   public void write(final DataOutput out) throws IOException {
-    if(cats != null && cats.size() == 0) {
-      // no value was added
-      type = StatsType.NONE;
-      leaf = false;
-    }
-
     // 0x10 indicates format introduced with Version 7.1
     out.writeNum(type.ordinal() | 0x10);
     if(type == StatsType.INTEGER || type == StatsType.DOUBLE) {
@@ -110,38 +105,41 @@ public final class Stats {
     final int vl = val.length;
     if(vl == 0 || type == StatsType.TEXT || ws(val)) return;
 
+    StatsType t = type;
+    if(t == StatsType.NONE) t = StatsType.INTEGER;
+
     if(cats != null && cats.size() <= meta.maxcats) {
       if(val.length > meta.maxlen) {
-        type = StatsType.TEXT;
+        t = StatsType.TEXT;
         cats = null;
       } else {
         cats.add(val, Math.max(1, cats.value(val) + 1));
       }
     }
-    if(type == StatsType.INTEGER) {
+    if(t == StatsType.INTEGER) {
       final long d = toLong(val);
       if(d == Long.MIN_VALUE) {
-        type = StatsType.DOUBLE;
+        t = StatsType.DOUBLE;
       } else {
         if(min > d) min = d;
         if(max < d) max = d;
       }
     }
-    if(type == StatsType.DOUBLE) {
+    if(t == StatsType.DOUBLE) {
       final double d = toDouble(val);
       if(Double.isNaN(d)) {
-        type = cats.size() <= meta.maxcats ?
-            StatsType.CATEGORY : StatsType.TEXT;
+        t = cats.size() <= meta.maxcats ? StatsType.CATEGORY : StatsType.TEXT;
       } else {
         if(min > d) min = d;
         if(max < d) max = d;
       }
-    } else if(type == StatsType.CATEGORY) {
+    } else if(t == StatsType.CATEGORY) {
       if(cats.size() > meta.maxcats) {
-        type = StatsType.TEXT;
+        t = StatsType.TEXT;
         cats = null;
       }
     }
+    type = t;
   }
 
   @Override

@@ -396,6 +396,26 @@ public class AxisPath extends Path {
     return get(input, root, stps);
   }
 
+  /**
+   * Returns the path nodes that will result from this path.
+   * @param ctx query context
+   * @return path nodes, or {@code null} if nodes cannot be evaluated
+   */
+  public ObjList<PathNode> nodes(final QueryContext ctx) {
+    final Value rt = root(ctx);
+    final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
+    if(data == null || !data.meta.pathindex || !data.meta.uptodate) return null;
+
+    ObjList<PathNode> nodes = data.pthindex.root();
+    for(int s = 0; s < steps.length; s++) {
+      final AxisStep curr = axisStep(s);
+      if(curr == null) return null;
+      nodes = curr.nodes(nodes, data);
+      if(nodes == null) return null;
+    }
+    return nodes;
+  }
+
   @Override
   public final int count(final Var v) {
     int c = 0;

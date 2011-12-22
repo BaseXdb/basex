@@ -186,7 +186,7 @@ final class FTFuzzy extends FTIndex {
 
   /**
    * Collects all tokens and their sizes found in the index structure.
-   * @param stats statistic reference
+   * @param stats statistics
    */
   private void addOccs(final IndexStats stats) {
     int i = 0;

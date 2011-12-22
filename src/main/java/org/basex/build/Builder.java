@@ -342,8 +342,9 @@ public abstract class Builder extends Progress {
     for(int a = 0; a < as; ++a) {
       n = atts.index(att.name(a), att.string(a), true);
       u = ns.uri(att.name(a), false);
-      if(meta.createpath)
+      if(meta.createpath) {
         path.index(n, Data.ATTR, level + 1, att.string(a), meta);
+      }
       addAttr(n, att.string(a), Math.min(IO.MAXATTS, a + 1), u);
     }
 

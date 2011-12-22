@@ -1,26 +1,32 @@
 package org.basex.query.func;
 
 import org.basex.data.Data;
+import org.basex.index.StatsType;
+import org.basex.index.path.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
+import org.basex.query.item.Atm;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
 import org.basex.query.item.Int;
+import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.AxisIter;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.ValueIter;
+import org.basex.query.path.AxisPath;
 import org.basex.query.util.ItemSet;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
+import org.basex.util.list.ObjList;
 
 /**
  * Sequence functions.
@@ -135,7 +141,7 @@ public final class FNSeq extends FuncCall {
   }
 
   @Override
-  public Expr cmp(final QueryContext ctx) {
+  public Expr cmp(final QueryContext ctx) throws QueryException {
     // static typing:
     // index-of will create integers, insert-before might add new types
     if(def == Function.INDEX_OF || def == Function.INSERT_BEFORE) return this;
@@ -143,15 +149,49 @@ public final class FNSeq extends FuncCall {
     // all other types will return existing types
     final Type t = expr[0].type().type;
     SeqType.Occ o = SeqType.Occ.ZM;
-
-    // head will return at most one item
-    if(def == Function.HEAD) o = SeqType.Occ.ZO;
-
     // at most one returned item
     if(def == Function.SUBSEQUENCE && expr[0].type().one()) o = SeqType.Occ.ZO;
-
+    // head will return at most one item
+    else if(def == Function.HEAD) o = SeqType.Occ.ZO;
     type = SeqType.get(t, o);
+
+    // pre-evaluate distinct values
+    if(def == Function.DISTINCT_VALUES) return cmpDist(ctx);
+
     return this;
+  }
+
+  /**
+   * Pre-evaluates distinct-values() function, utilizing database statistics.
+   * @param ctx query context
+   * @return original or optimized expression
+   * @throws QueryException query exception
+   */
+  private Expr cmpDist(final QueryContext ctx) throws QueryException {
+    // can only be performed on axis paths
+    if(!(expr[0] instanceof AxisPath)) return this;
+    // try to get statistics for resulting nodes
+    final ObjList<PathNode> nodes = ((AxisPath) expr[0]).nodes(ctx);
+    if(nodes == null) return this;
+    // loop through all nodes
+    final ItemSet is = new ItemSet();
+    for(PathNode pn : nodes) {
+      // retrieve text child if addressed node is an element
+      if(pn.kind == Data.ELEM) {
+        if(!pn.stats.leaf) return this;
+        for(final PathNode n : pn.ch) if(n.kind == Data.TEXT) pn = n;
+      }
+      // skip nodes others than texts and attributes
+      if(pn.kind != Data.TEXT && pn.kind != Data.ATTR) return this;
+      // check if distinct values are available
+      if(pn.stats.type != StatsType.CATEGORY) return this;
+      // if yes, add them to the item set
+      for(final byte[] c : pn.stats.cats) is.index(input, new Atm(c));
+    }
+    // return resulting sequence
+    final ItemCache ic = new ItemCache(is.size());
+    for(final Item i : is) ic.add(i);
+    return ic.value();
   }
 
   /**

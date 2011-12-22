@@ -69,7 +69,7 @@ public final class DocIndex implements Index {
    * @return document nodes
    */
   public synchronized IntList docs() {
-    if(docs == null) initDocs();
+    if(docs == null) init();
     return docs;
   }
 
@@ -225,7 +225,7 @@ public final class DocIndex implements Index {
   /**
    * Initializes the document index.
    */
-  private synchronized void initDocs() {
+  public synchronized void init() {
     update();
     docs = new IntList();
     final int is = data.meta.size;

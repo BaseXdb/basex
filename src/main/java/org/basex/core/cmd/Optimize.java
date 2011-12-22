@@ -81,6 +81,7 @@ public final class Optimize extends ACreate {
 
     // refresh indexes
     d.pthindex.close();
+    d.docindex.init();
     d.tagindex.init();
     d.atnindex.init();
     final MetaData m = d.meta;

@@ -95,6 +95,8 @@ public abstract class Data {
   public Namespaces nspaces;
   /** Path summary index. */
   public PathSummary pthindex;
+  /** Document index. */
+  public final DocIndex docindex = new DocIndex(this);
 
   /** Index reference for a name attribute. */
   public int nameID;
@@ -109,8 +111,6 @@ public abstract class Data {
   protected Index atvindex;
   /** Full-text index instance. */
   protected Index ftxindex;
-  /** Document index. */
-  protected final DocIndex docindex = new DocIndex(this);
   /** ID->PRE mapping. */
   protected IdPreMap idmap;
 

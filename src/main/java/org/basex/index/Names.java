@@ -24,9 +24,9 @@ import org.basex.util.hash.TokenSet;
  * @author Lukas Kircher
  */
 public final class Names extends TokenSet implements Index {
-  /** Statistic information. */
+  /** Statistical information. */
   private Stats[] stats;
-  /** Reference to meta data. */
+  /** Meta data. */
   private final MetaData meta;
 
   /**

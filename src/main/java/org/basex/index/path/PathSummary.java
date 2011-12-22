@@ -74,7 +74,7 @@ public final class PathSummary implements Index {
     root = null;
   }
 
-  // Traversal ================================================================
+  // Build Index ==============================================================
 
   /**
    * Adds an entry.
@@ -108,6 +108,8 @@ public final class PathSummary implements Index {
       stack.set(l, stack.get(l - 1).index(n, k, v, md));
     }
   }
+
+  // Traverse Index ===========================================================
 
   /**
    * Returns the root node.

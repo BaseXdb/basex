@@ -22,7 +22,7 @@ import org.basex.util.list.ObjList;
  * @author Andreas Weiler
  */
 public final class PathNode {
-  /** Tag/attribute name reference. */
+  /** Tag/attribute name id. */
   public final short name;
   /** Node kind, defined in the {@link Data} class. */
   public final byte kind;
@@ -30,7 +30,6 @@ public final class PathNode {
   public final PathNode par;
   /** Children. */
   public PathNode[] ch;
-
   /** Node kind. */
   public Stats stats;
 
@@ -74,7 +73,7 @@ public final class PathNode {
 
   /**
    * Indexes the specified name along with its kind.
-   * @param n name reference
+   * @param n name id
    * @param k node kind
    * @param v value
    * @param md meta data
@@ -101,7 +100,7 @@ public final class PathNode {
   }
 
   /**
-   * Writes the node to the specified output.
+   * Writes the node to the specified output stream.
    * @param out output stream
    * @throws IOException I/O exception
    */
@@ -111,6 +110,13 @@ public final class PathNode {
     out.writeNum(0);
     out.writeNum(ch.length);
     out.writeDouble(1);
+
+    // update leaf flag
+    boolean leaf = stats.leaf;
+    for(final PathNode c : ch) {
+      leaf &= c.kind == Data.TEXT || c.kind == Data.ATTR;
+    }
+    stats.leaf = leaf;
     stats.write(out);
     for(final PathNode c : ch) c.write(out);
   }
@@ -128,7 +134,7 @@ public final class PathNode {
    * Recursively adds the node and its descendants to the specified list
    * with the specified name.
    * @param nodes node list
-   * @param n name reference
+   * @param n name id
    * @param k node kind
    */
   void addDesc(final ObjList<PathNode> nodes, final int n, final int k) {

@@ -155,7 +155,7 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
-   * Returns number of entries.
+   * Returns the number of entries.
    * @return number of entries
    */
   public final int size() {
@@ -190,11 +190,11 @@ public class TokenSet implements Iterable<byte[]> {
   @Override
   public final Iterator<byte[]> iterator() {
     return new Iterator<byte[]>() {
-      private int c;
+      private int c = 1;
       @Override
-      public boolean hasNext() { return ++c < size; }
+      public boolean hasNext() { return c < size; }
       @Override
-      public byte[] next() { return keys[c]; }
+      public byte[] next() { return keys[c++]; }
       @Override
       public void remove() { Util.notexpected(); }
     };

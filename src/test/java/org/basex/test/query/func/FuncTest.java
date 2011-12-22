@@ -14,13 +14,13 @@ public final class FuncTest extends QueryTest {
   static {
     doc =
       "<desclist xml:lang='en'>" +
-      "<desc xml:lang='en-US'><line>A line of text.</line></desc>" +
-      "<desc xml:lang='fr'><line>Une ligne de texte.</line></desc>" +
+      "<desc xml:lang='en-US'><line>blue</line></desc>" +
+      "<desc xml:lang='fr'><line>bleu</line></desc>" +
       "</desclist>";
 
     queries = new Object[][] {
       { "false 1", bool(false), "false()" },
-      { "true 2", bool(true), "true()" },
+      { "true  2", bool(true),  "true()" },
 
       { "count  1", "count()" },
       { "count  2", "count(1, 1)" },
@@ -84,13 +84,11 @@ public final class FuncTest extends QueryTest {
       { "deep-equal  6", bool(false), "deep-equal('1', 1)" },
       { "deep-equal  7", bool(true),  "deep-equal((), ())" },
       { "deep-equal  8", bool(false), "deep-equal(<a>1</a>, 1)" },
-      { "deep-equal  9", bool(true),  "deep-equal(text{'a'}, text{'a'})" },
-      { "deep-equal 10", bool(false), "deep-equal(text{'a'}, text{'b'})" },
-      { "deep-equal 11", bool(true),
-        "deep-equal(comment{'a'}, comment{'a'})" },
-      { "deep-equal 12", bool(false),
-        "deep-equal(comment{'a'}, comment{'b'})" },
-      { "deep-equal 13", bool(false), "deep-equal(text{'a'}, comment{'a'})" },
+      { "deep-equal  9", bool(true),  "deep-equal(text{'a'},text{'a'})" },
+      { "deep-equal 10", bool(false), "deep-equal(text{'a'},text{'b'})" },
+      { "deep-equal 11", bool(true), "deep-equal(comment{'a'},comment{'a'})" },
+      { "deep-equal 12", bool(false), "deep-equal(comment{'a'},comment{'b'})" },
+      { "deep-equal 13", bool(false), "deep-equal(text{'a'},comment{'a'})" },
       { "deep-equal 14", bool(false),
         "deep-equal(comment{ 'a' }, processing-instruction{ 'a' } { 'a' })" },
 
@@ -119,6 +117,10 @@ public final class FuncTest extends QueryTest {
       { "pow 5", dbl(1.0e0), "math:pow(1, xs:double('NaN'))" },
       { "pow 6", dbl(Double.NaN), "math:pow(-2.5e0, 2.00000001e0)" },
 
+      { "distinct-values 1", str("blue", "bleu"),
+        "for $i in distinct-values(//line) return string($i)" },
+      { "distinct-values 2", itr(2),
+        "count(distinct-values(//line/text()))" },
     };
   }
 

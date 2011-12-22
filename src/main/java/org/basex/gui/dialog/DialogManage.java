@@ -81,7 +81,7 @@ public final class DialogManage extends Dialog {
     // create database chooser
     final StringList dbs = List.list(main.context, true);
     choice = new BaseXList(dbs.toArray(), this, !m);
-    choice.setSize(160, 450);
+    choice.setSize(190, 500);
 
     final Font f = panel.getFont();
     doc1 = new BaseXLabel(" ").border(0, 0, 5, 0);
@@ -107,7 +107,7 @@ public final class DialogManage extends Dialog {
     doc2.setFont(f.deriveFont(f.getSize2D() + 7));
 
     backups = new BaseXList(new String[] { }, this);
-    backups.setSize(400, 330);
+    backups.setSize(400, 380);
     // backup buttons
     backup = new BaseXButton(BUTTONBACKUP, this);
     restore = new BaseXButton(BUTTONRESTORE, this);
