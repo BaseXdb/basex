@@ -2,6 +2,8 @@ package org.basex.index;
 
 import java.io.IOException;
 
+import org.basex.util.list.TokenList;
+
 /**
  * This interface defines the methods which have to be implemented
  * by an index structure.
@@ -15,6 +17,13 @@ public interface Index {
    * @return info
    */
   byte[] info();
+
+  /**
+   * Returns all entries that start with the specified prefix.
+   * @param prefix prefix
+   * @return entries
+   */
+  TokenList entries(final byte[] prefix);
 
   /**
    * Returns an iterator for the index results.

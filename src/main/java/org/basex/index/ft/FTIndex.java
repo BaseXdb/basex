@@ -6,7 +6,9 @@ import org.basex.data.FTMatches;
 import org.basex.index.Index;
 import org.basex.index.IndexCache;
 import org.basex.io.random.DataAccess;
+import org.basex.util.Util;
 import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * This abstract class defines methods for the available full-text indexes.
@@ -128,5 +130,10 @@ public abstract class FTIndex implements Index {
         return Integer.toString(size);
       }
     };
+  }
+
+  @Override
+  public TokenList entries(final byte[] prefix) {
+    throw Util.notexpected();
   }
 }

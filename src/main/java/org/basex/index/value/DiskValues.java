@@ -18,6 +18,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.hash.IntMap;
 import org.basex.util.hash.TokenObjMap;
 import org.basex.util.list.IntList;
+import org.basex.util.list.TokenList;
 
 /**
  * This class provides access to attribute values and text contents stored on
@@ -37,7 +38,7 @@ public class DiskValues implements Index {
   protected final boolean text;
   /** Data reference. */
   protected final Data data;
-  /** Cache tokens. */
+  /** Cached tokens. */
   protected final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
   protected final IntMap<byte[]> ctext = new IntMap<byte[]>();
@@ -100,19 +101,40 @@ public class DiskValues implements Index {
   @Override
   public synchronized int count(final IndexToken it) {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
-    if(it.get().length > data.meta.maxlen) return Integer.MAX_VALUE;
 
-    final byte[] tok = it.get();
-    final int id = cache.id(tok);
+    final byte[] key = it.get();
+    if(key.length > data.meta.maxlen) return Integer.MAX_VALUE;
+
+    final int id = cache.id(key);
     if(id > 0) return cache.size(id);
 
-    final int ix = get(tok);
+    final int ix = get(key);
     if(ix < 0) return 0;
+    // get position in heap file
     final long pos = idxr.read5(ix * 5L);
-    // the first number is the number of hits:
+    // the first heap entry represents the number of hits
     final int nr = idxl.readNum(pos);
-    cache.add(it.get(), nr, pos + Num.length(nr));
+    cache.add(key, nr, pos + Num.length(nr));
     return nr;
+  }
+
+  @Override
+  public TokenList entries(final byte[] prefix) {
+    final TokenList tl = new TokenList();
+
+    int ix = get(prefix);
+    if(ix < 0) ix = -ix - 1;
+    idxr.cursor(ix * 5l);
+    for(; ix < size; ix++) {
+      final long pos = idxr.read5();
+      final int nr = idxl.readNum(pos);
+      final int pre = idxl.readNum();
+      final byte[] key = data.text(pre, text);
+      cache.add(key, nr, pos + Num.length(nr));
+      if(!startsWith(key, prefix)) break;
+      tl.add(key);
+    }
+    return tl;
   }
 
   /**
@@ -232,7 +254,6 @@ public class DiskValues implements Index {
 
   /**
    * Binary search for key in the {@link #idxr}.
-   * <p>
    * <em>Important:</em> This method has to be called while being in the monitor
    * of this {@link DiskValues} instance, e.g. from a {@code synchronized}
    * method.

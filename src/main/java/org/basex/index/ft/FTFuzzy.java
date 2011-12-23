@@ -157,7 +157,7 @@ final class FTFuzzy extends FTIndex {
   /**
    * Determines the pointer on a token.
    * @param tok token looking for
-   * @return int pointer or -1 if token was not found
+   * @return int pointer or {@code -1} if token was not found
    */
   private int token(final byte[] tok) {
     final int tl = tok.length;
@@ -231,7 +231,7 @@ final class FTFuzzy extends FTIndex {
    * @param tok token looking for
    * @param k number of errors allowed
    * @param f fast evaluation
-   * @return int[][] data
+   * @return iterator
    */
   private IndexIterator fuzzy(final byte[] tok, final int k, final boolean f) {
     FTIndexIterator it = FTIndexIterator.FTEMPTY;

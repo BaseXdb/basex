@@ -14,6 +14,7 @@ import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenSet;
+import org.basex.util.list.TokenList;
 
 /**
  * This class indexes and organizes the tags or attribute names,
@@ -167,6 +168,11 @@ public final class Names extends TokenSet implements Index {
 
   @Override
   public int count(final IndexToken token) {
+    throw Util.notexpected();
+  }
+
+  @Override
+  public TokenList entries(final byte[] prefix) {
     throw Util.notexpected();
   }
 }

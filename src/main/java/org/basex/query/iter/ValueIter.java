@@ -19,5 +19,9 @@ public abstract class ValueIter extends Iter {
   @Override
   public abstract boolean reset();
   @Override
-  public abstract Value value();
+  public Value value() {
+    final ItemCache ic = new ItemCache((int) size());
+    for(Item i; (i = next()) != null;) ic.add(i);
+    return ic.value();
+  }
 }

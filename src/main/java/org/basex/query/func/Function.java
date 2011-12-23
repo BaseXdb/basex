@@ -531,6 +531,11 @@ public enum Function {
 
   /** Index function: returns index facet information. */
   _INDEX_FACETS(FNIndex.class, "facets(database, format)", DOC_O, 1, STR, STR),
+  /** Index function: returns texts. */
+  _INDEX_TEXTS(FNIndex.class, "texts(database, prefix)", STR_ZM, 1, STR, STR),
+  /** Index function: returns attribute values. */
+  _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database, prefix)",
+      STR_ZM, 1, STR, STR),
 
   /* FNFile functions (EXPath). */
 

@@ -266,4 +266,9 @@ public final class DocIndex implements Index {
   public byte[] info() {
     throw Util.notexpected();
   }
+
+  @Override
+  public TokenList entries(final byte[] prefix) {
+    throw Util.notexpected();
+  }
 }

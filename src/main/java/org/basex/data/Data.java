@@ -97,6 +97,12 @@ public abstract class Data {
   public PathSummary pthindex;
   /** Document index. */
   public final DocIndex docindex = new DocIndex(this);
+  /** Text index. */
+  public Index txtindex;
+  /** Attribute value index. */
+  public Index atvindex;
+  /** Full-text index instance. */
+  public Index ftxindex;
 
   /** Index reference for a name attribute. */
   public int nameID;
@@ -105,12 +111,6 @@ public abstract class Data {
 
   /** Table access file. */
   protected TableAccess table;
-  /** Text index. */
-  protected Index txtindex;
-  /** Attribute value index. */
-  protected Index atvindex;
-  /** Full-text index instance. */
-  protected Index ftxindex;
   /** ID->PRE mapping. */
   protected IdPreMap idmap;
 

@@ -252,6 +252,11 @@ public final class PathSummary implements Index {
   }
 
   @Override
+  public TokenList entries(final byte[] prefix) {
+    throw Util.notexpected();
+  }
+
+  @Override
   public String toString() {
     return string(info());
   }
