@@ -14,6 +14,7 @@ import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.border.EmptyBorder;
 
+import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.dialog.Dialog;
@@ -127,6 +128,8 @@ public class BaseXButton extends JButton {
    */
   public static void setMnemonics(final StringBuilder mnem,
       final AbstractButton... buttons) {
+    // Do not set Mnemonics for Mac! Alt+key used for special characters.
+    if (Prop.MAC) return;
 
     for(final AbstractButton b : buttons) {
       // find and assign unused mnemomic
