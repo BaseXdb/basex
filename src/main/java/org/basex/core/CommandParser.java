@@ -68,6 +68,7 @@ import org.basex.core.cmd.ShowSessions;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
+import org.basex.gui.dialog.DialogPass;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -77,6 +78,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.Levenshtein;
+import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
@@ -163,7 +165,7 @@ public final class CommandParser extends InputParser {
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
-            return new CreateUser(name(cmd), string(null));
+            return new CreateUser(name(cmd), password());
           case EVENT:
             return new CreateEvent(name(cmd));
         }
@@ -175,7 +177,7 @@ public final class CommandParser extends InputParser {
           case DATABASE: case DB:
             return new AlterDB(name(cmd), name(cmd));
           case USER:
-            return new AlterUser(name(cmd), string(null));
+            return new AlterUser(name(cmd), password());
         }
         break;
       case OPEN:
@@ -253,7 +255,7 @@ public final class CommandParser extends InputParser {
       case SET:
         return new Set(name(cmd), string(null));
       case PASSWORD:
-        return new Password(string(null));
+        return new Password(password());
       case HELP:
         String hc = name(null);
         String form = null;
@@ -311,6 +313,20 @@ public final class CommandParser extends InputParser {
       default:
     }
     throw Util.notexpected("command specified, but not implemented yet");
+  }
+
+  /**
+   * Parses and returns a password.
+   * In command line and server mode, read from stdin, on GUI command line
+   * prompt using a password box.
+   * @return String md5-hashed password or empty string if cancelled
+   * @throws QueryException query exception
+   */
+  protected String password() throws QueryException {
+    // gui -> gui autocompletion, Prop.gui -> BaseX in GUI mode
+    if (gui || !Prop.gui) return string(null);
+    final DialogPass dp = new DialogPass();
+    return dp.ok() ? Token.md5(dp.pass()) : "";
   }
 
   /**
