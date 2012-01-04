@@ -27,6 +27,7 @@ import org.basex.core.AProp;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
+import org.basex.core.CommandParser.PasswordReader;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Find;
@@ -38,6 +39,7 @@ import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogHelp;
+import org.basex.gui.dialog.DialogPass;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -310,8 +312,16 @@ public final class GUI extends AGUI {
       if(i == in.length()) return;
 
       try {
+        CommandParser cmdParser = new CommandParser(in.substring(i), context);
+        PasswordReader pwReader = cmdParser.new PasswordReader() {
+          @Override
+          public String password() throws QueryException {
+            final DialogPass dp = new DialogPass();
+            return dp.ok() ? Token.md5(dp.pass()) : "";
+          }
+        };
         // parse and run all commands
-        execute(false, new CommandParser(in.substring(i), context).parse());
+        execute(false, cmdParser.parse(pwReader));
       } catch(final QueryException ex) {
         if(!info.visible()) GUICommands.SHOWINFO.execute(this);
         info.setInfo(ex.getMessage(), null, null, false);

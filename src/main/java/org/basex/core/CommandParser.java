@@ -68,7 +68,6 @@ import org.basex.core.cmd.ShowSessions;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
-import org.basex.gui.dialog.DialogPass;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -78,7 +77,6 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.Levenshtein;
-import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
@@ -90,10 +88,27 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public final class CommandParser extends InputParser {
+  /**
+   * Reads a password from command line. Can be used to inject other code to
+   * read a password (eg. using GUI).
+   */
+  public class PasswordReader {
+    /**
+     * Parses and returns a password.
+     * In command line and server mode, read from stdin, on GUI command line
+     * prompt using a password box.
+     * @return String md5-hashed password or empty string if cancelled
+     * @throws QueryException query exception
+     */
+    public String password() throws QueryException {
+      return string(null);
+    }
+  }
+
   /** Context. */
   private final Context ctx;
   /** Flag for gui command. */
-  private boolean gui;
+  boolean gui;
 
   /**
    * Constructor, parsing the input queries.
@@ -124,10 +139,20 @@ public final class CommandParser extends InputParser {
    * @throws QueryException query exception
    */
   public Command[] parse() throws QueryException {
+    return parse(new PasswordReader());
+  }
+
+  /**
+   * Parses the input and returns a command list.
+   * @param pwReader Password Reader used when reading passwords.
+   * @return commands
+   * @throws QueryException query exception
+   */
+  public Command[] parse(final PasswordReader pwReader) throws QueryException {
     Command[] list = new Command[0];
     while(true) {
       final Cmd cmd = consume(Cmd.class, null);
-      list = Array.add(list, parse(cmd, false));
+      list = Array.add(list, parse(cmd, false, pwReader));
       consumeWS();
       if(!more()) return list;
       if(!consume(';')) throw help(null, cmd);
@@ -152,8 +177,20 @@ public final class CommandParser extends InputParser {
    * @return resulting command
    * @throws QueryException query exception
    */
-  private Command parse(final Cmd cmd, final boolean s)
-      throws QueryException {
+  private Command parse(final Cmd cmd, final boolean s) throws QueryException {
+    return parse(cmd, s, new PasswordReader());
+  }
+
+  /**
+   * Parses a single command.
+   * @param cmd command definition
+   * @param s single command expected
+   * @param pwReader Password Reader used for reading passwords.
+   * @return resulting command
+   * @throws QueryException query exception
+   */
+  private Command parse(final Cmd cmd, final boolean s,
+      final PasswordReader pwReader) throws QueryException {
 
     switch(cmd) {
       case CREATE:
@@ -165,7 +202,7 @@ public final class CommandParser extends InputParser {
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case USER:
-            return new CreateUser(name(cmd), password());
+            return new CreateUser(name(cmd), pwReader.password());
           case EVENT:
             return new CreateEvent(name(cmd));
         }
@@ -177,7 +214,7 @@ public final class CommandParser extends InputParser {
           case DATABASE: case DB:
             return new AlterDB(name(cmd), name(cmd));
           case USER:
-            return new AlterUser(name(cmd), password());
+            return new AlterUser(name(cmd), pwReader.password());
         }
         break;
       case OPEN:
@@ -255,7 +292,7 @@ public final class CommandParser extends InputParser {
       case SET:
         return new Set(name(cmd), string(null));
       case PASSWORD:
-        return new Password(password());
+        return new Password(pwReader.password());
       case HELP:
         String hc = name(null);
         String form = null;
@@ -316,27 +353,13 @@ public final class CommandParser extends InputParser {
   }
 
   /**
-   * Parses and returns a password.
-   * In command line and server mode, read from stdin, on GUI command line
-   * prompt using a password box.
-   * @return String md5-hashed password or empty string if cancelled
-   * @throws QueryException query exception
-   */
-  protected String password() throws QueryException {
-    // gui -> gui autocompletion, Prop.gui -> BaseX in GUI mode
-    if (gui || !Prop.gui) return string(null);
-    final DialogPass dp = new DialogPass();
-    return dp.ok() ? Token.md5(dp.pass()) : "";
-  }
-
-  /**
    * Parses and returns a string, delimited by a space or semicolon.
    * Quotes can be used to include spaces.
    * @param cmd referring command; if specified, the result must not be empty
    * @return string
    * @throws QueryException query exception
    */
-  private String string(final Cmd cmd) throws QueryException {
+  String string(final Cmd cmd) throws QueryException {
     final StringBuilder sb = new StringBuilder();
     consumeWS();
     boolean q = false;
