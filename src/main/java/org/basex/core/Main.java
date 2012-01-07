@@ -7,11 +7,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
 import java.util.Scanner;
+
 import org.basex.core.Commands.Cmd;
-import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Exit;
-import org.basex.core.cmd.Password;
 import org.basex.query.QueryException;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -104,19 +102,18 @@ public abstract class Main {
    * @throws IOException database exception
    */
   protected final boolean execute(final String in) throws IOException {
+    final PasswordReader pr = new PasswordReader() {
+      @Override
+      public String password() throws QueryException {
+        Util.out(SERVERPW + COLS);
+        return md5(Util.password());
+      }
+    };
+    final CommandParser cp = new CommandParser(in, context).password(pr);
+
     try {
-      for(final Command cmd : new CommandParser(in, context).parse()) {
+      for(final Command cmd : cp.parse()) {
         if(cmd instanceof Exit) return false;
-
-        // offer optional password input
-        final int i = cmd instanceof Password && cmd.args[0] == null ? 0 :
-          (cmd instanceof CreateUser || cmd instanceof AlterUser) &&
-          cmd.args[1] == null ? 1 : -1;
-
-        if(i != -1) {
-          Util.out(SERVERPW + COLS);
-          cmd.args[i] = md5(Util.password());
-        }
         execute(cmd, verbose);
       }
     } catch(final QueryException ex) {
