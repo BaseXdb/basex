@@ -712,6 +712,8 @@ public enum Function {
   /** Utility function: compares items in depth and offers some more options. */
   _UTIL_DEEP_EQUAL(FNUtil.class, "deep-equal(item,item[,options])",
       BLN, 2, ITEM_ZM, ITEM_ZM, ITEM),
+  /** Utility function: returns the path to the query file. */
+  _UTIL_PATH(FNUtil.class, "path()", STR),
 
   /* FNXslt functions. */
 

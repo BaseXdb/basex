@@ -166,4 +166,13 @@ public final class FNUtilTest extends AdvancedQueryTest {
     final String s2 = query(_UTIL_UUID.args());
     assertTrue(!s1.equals(s2));
   }
+
+  /**
+   * Test method for the util:path() function.
+   */
+  @Test
+  public void utilPath() {
+    check(_UTIL_PATH);
+    query(_UTIL_PATH.args(), "");
+  }
 }

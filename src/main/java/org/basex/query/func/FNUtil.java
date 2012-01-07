@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 import java.util.zip.CRC32;
 
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.in.NewlineInput;
 import org.basex.query.QueryContext;
@@ -87,6 +88,7 @@ public final class FNUtil extends FuncCall {
       case _UTIL_UUID:              return uuid();
       case _UTIL_TO_STRING:         return toString(ctx);
       case _UTIL_DEEP_EQUAL:        return deep(ctx);
+      case _UTIL_PATH:              return filename(ctx);
       default:                      return super.item(ctx, ii);
     }
   }
@@ -434,6 +436,16 @@ public final class FNUtil extends FuncCall {
       }
     }
     return Bln.get(cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1])));
+  }
+
+  /**
+   * Returns the name of the query file, or {@code null} if none is given.
+   * @param ctx query context
+   * @return filename
+   */
+  private Str filename(final QueryContext ctx) {
+    final String fn = ctx.context.prop.get(Prop.QUERYPATH);
+    return fn.isEmpty() ? null : Str.get(fn);
   }
 
   @Override
