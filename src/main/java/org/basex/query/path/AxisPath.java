@@ -210,7 +210,7 @@ public class AxisPath extends Path {
       // check if path before index step needs to be inverted and traversed
       final Test test = DocTest.get(ctx, data);
       boolean inv = true;
-      if(test == Test.DOC && data.meta.pathindex || data.meta.uptodate) {
+      if(test == Test.DOC && data.meta.pathindex && data.meta.uptodate) {
         int j = 0;
         for(; j <= smin; ++j) {
           // invert if axis is not a child or has predicates

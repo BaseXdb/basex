@@ -193,7 +193,7 @@ public abstract class Data {
 
   /**
    * Returns the pre values of all document nodes.
-   * A single dummy is returned if the database is empty.
+   * A single dummy node is returned if the database is empty.
    * @return root nodes
    */
   public final IntList docs() {
