@@ -315,7 +315,6 @@ public abstract class W3CTS {
       final QueryProcessor xq = new QueryProcessor(in, curr, context);
       context.prop.set(Prop.QUERYINFO, false);
 
-      // limit result sizes to 1MB
       final ArrayOutput ao = new ArrayOutput();
       final TokenBuilder files = new TokenBuilder();
 
