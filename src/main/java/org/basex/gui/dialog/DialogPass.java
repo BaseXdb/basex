@@ -18,13 +18,20 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
  */
-final class DialogPass extends Dialog {
+public final class DialogPass extends Dialog {
   /** New password. */
   private final BaseXPassword pass;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Info label. */
   private final BaseXLabel info;
+
+  /**
+   * Default constructor creating invisible frame as main window.
+   */
+  public DialogPass() {
+    this(null);
+  }
 
   /**
    * Default constructor.
@@ -72,7 +79,7 @@ final class DialogPass extends Dialog {
    * Returns the password.
    * @return password
    */
-  String pass() {
+  public String pass() {
     return new String(pass.getPassword());
   }
 }
