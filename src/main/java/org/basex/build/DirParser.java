@@ -10,7 +10,6 @@ import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
-import org.basex.io.in.BufferInput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
@@ -112,11 +111,9 @@ public final class DirParser extends TargetParser {
         IO in = io;
         if(skip) {
           // parse file twice to ensure that it is well-formed
-          BufferInput bi = null;
           try {
             // cache file contents to allow or speed up a second run
-            bi = io.buffer();
-            in = new IOContent(bi.readBytes());
+            in = new IOContent(io.read());
             in.name(io.name());
             parser = Parser.fileParser(in, prop, targ);
             MemBuilder.build("", parser, prop);
@@ -124,13 +121,15 @@ public final class DirParser extends TargetParser {
             Util.debug(ex.getMessage());
             skipped.add(io.path());
             ok = false;
-          } finally {
-            if(bi != null) bi.close();
           }
         }
-        parser = Parser.fileParser(in, prop, targ);
 
-        if(ok) parser.parse(b);
+        if(ok) {
+          parser = Parser.fileParser(in, prop, targ);
+          parser.parse(b);
+        } else {
+          parser = null;
+        }
         if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
       }
     }
