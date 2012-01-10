@@ -540,7 +540,7 @@ public enum Err {
   NSMISS(XPST, 81, "QName % has no namespace."),
 
   /** XPTY0004: Typing exception. */
-  XPSEQ(XPTY, 4, "No sequence % allowed."),
+  XPSEQ(XPTY, 4, "Single item expected, % found."),
   /** XPTY0004: Typing exception. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
   /** XPTY0004: Promoting exception. */
