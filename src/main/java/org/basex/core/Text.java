@@ -1003,10 +1003,6 @@ public interface Text {
   /** Command info. */
   String GUISHOWMAPTT = lang("c_showmaptt");
   /** Command info. */
-  String GUISHOWMENU = lang("c_showmenu");
-  /** Command info. */
-  String GUISHOWMENUTT = lang("c_showmenutt");
-  /** Command info. */
   String GUISHOWPLOT = lang("c_showplot");
   /** Command info. */
   String GUISHOWPLOTTT = lang("c_showplottt");

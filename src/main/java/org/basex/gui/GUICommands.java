@@ -456,22 +456,6 @@ public enum GUICommands implements GUICommand {
 
   /* VIEW MENU */
 
-  /** Shows the menu. */
-  SHOWMENU(GUISHOWMENU, null, GUISHOWMENUTT, false, true) {
-    @Override
-    public void execute(final GUI gui) {
-      gui.gprop.invert(GUIProp.SHOWMENU);
-      gui.updateControl(gui.menu, gui.gprop.is(GUIProp.SHOWMENU),
-          BorderLayout.NORTH);
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWMENU));
-    }
-  },
-
   /** Shows the buttons. */
   SHOWBUTTONS(GUISHOWBUTTONS, null, GUISHOWBUTTONSTT, false, true) {
     @Override

@@ -420,7 +420,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Sets the disk cursor.
+   * Reads a block from disk.
    * @param b block to fetch
    */
   private void readBlock(final int b) {
@@ -442,7 +442,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Move the cursor to a free block (either new or existing empty one).
+   * Moves the cursor to a free block (either new or existing empty one).
    */
   private void freeBlock() {
     final int b = pagemap.nextClearBit(0);

@@ -151,8 +151,6 @@ public final class GUIProp extends AProp {
   /** Last XQuery files. */
   public static final Object[] QUERIES = { "QUERIES", new String[0] };
 
-  /** Flag for displaying the menu in the GUI window. */
-  public static final Object[] SHOWMENU = { "SHOWMENU", true };
   /** Flag for activated help view. */
   public static final Object[] SHOWHELP = { "SHOWHELP", false };
   /** Last updated version. */

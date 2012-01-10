@@ -159,7 +159,7 @@ public final class GUI extends AGUI {
 
     // add menu bar
     menu = new GUIMenu(this);
-    if(gprop.is(GUIProp.SHOWMENU)) setJMenuBar(menu);
+    setJMenuBar(menu);
 
     buttons = new BaseXBack(new BorderLayout());
     toolbar = new GUIToolBar(TOOLBAR, this);
@@ -673,10 +673,7 @@ public final class GUI extends AGUI {
    * @param full fullscreen mode
    */
   public void fullscreen(final boolean full) {
-    if(full ^ fullscr == null) {
-      if(!gprop.is(GUIProp.SHOWMENU)) GUICommands.SHOWMENU.execute(this);
-      return;
-    }
+    if(full ^ fullscr == null) return;
 
     if(full) {
       control.remove(buttons);
@@ -703,7 +700,6 @@ public final class GUI extends AGUI {
       add(top);
     }
 
-    gprop.set(GUIProp.SHOWMENU, !full);
     gprop.set(GUIProp.SHOWBUTTONS, !full);
     gprop.set(GUIProp.SHOWINPUT, !full);
     gprop.set(GUIProp.SHOWSTATUS, !full);
