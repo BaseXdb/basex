@@ -34,7 +34,6 @@ import org.basex.util.hash.TokenIntMap;
  *
  * @author BaseX Team 2005-11, BSD License
  * @author Christian Gruen
- * @author Dimitar Popov
  * @author Andreas Weiler
  */
 public final class FNIndex extends FuncCall {
@@ -115,17 +114,34 @@ public final class FNIndex extends FuncCall {
 
     final Data data = data(0, ctx);
     final byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    return entries(data, prefix, it, this);
+  }
+
+  /**
+   * Returns all entries of the specified index.
+   * @param data data reference
+   * @param prefix prefix
+   * @param it index type
+   * @param call calling function
+   * @return text entries
+   * @throws QueryException query exception
+   */
+  static Iter entries(final Data data, final byte[] prefix, final IndexType it,
+      final FuncCall call) throws QueryException {
 
     final Index index;
     final boolean avl;
     if(it == IndexType.TEXT) {
       index = data.txtindex;
       avl = data.meta.textindex;
-    } else {
+    } else if(it == IndexType.ATTRIBUTE) {
       index = data.atvindex;
       avl = data.meta.attrindex;
+    } else {
+      index = data.ftxindex;
+      avl = data.meta.ftxtindex;
     }
-    if(!avl) NOINDEX.thrw(input, data.meta.name, it);
+    if(!avl) NOINDEX.thrw(call.input, data.meta.name, it);
 
     final TokenIntMap entries = index.entries(prefix);
     return new ValueIter() {

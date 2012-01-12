@@ -18,6 +18,7 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.list.IntList;
 
 /**
@@ -141,6 +142,12 @@ final class FTTrie extends FTIndex {
     final int[] node = node(token, id);
     return node == null ? FTIndexIterator.FTEMPTY :
       iter(currID, node[node.length - 1], inB, fast);
+  }
+
+  @Override
+  public TokenIntMap entries(final byte[] prefix) {
+    Util.notexpected(this);
+    return null;
   }
 
   /**

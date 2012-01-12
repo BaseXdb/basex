@@ -123,7 +123,6 @@ public class DiskValues implements Index {
   @Override
   public TokenIntMap entries(final byte[] prefix) {
     final TokenIntMap tim = new TokenIntMap();
-
     int ix = get(prefix);
     if(ix < 0) ix = -ix - 1;
     idxr.cursor(ix * 5l);

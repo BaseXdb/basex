@@ -7,6 +7,7 @@ import static org.basex.util.ft.FTFlag.*;
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.MemData;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -25,6 +26,7 @@ import org.basex.query.util.Err;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
+import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.list.IntList;
 
@@ -64,6 +66,7 @@ public final class FNFt extends FuncCall {
       case _FT_SCORE:   return score(ctx);
       case _FT_MARK:    return mark(ctx, false);
       case _FT_EXTRACT: return mark(ctx, true);
+      case _FT_TOKENS:  return tokens(ctx);
       default:          return super.iter(ctx);
     }
   }
@@ -189,14 +192,42 @@ public final class FNFt extends FuncCall {
     if(!data.meta.ftxtindex) NOIDX.thrw(fun.input, fun);
 
     final FTOpt tmp = ctx.ftopt;
-    ctx.ftopt = new FTOpt();
-    ctx.ftopt.set(CS, data.meta.casesens);
-    ctx.ftopt.set(DC, data.meta.diacritics);
-    ctx.ftopt.set(ST, data.meta.stemming);
-    ctx.ftopt.ln = data.meta.language;
+    ctx.ftopt = options(data);
     final FTWords words = new FTWords(fun.input, ic.data, Str.get(str), ctx);
     ctx.ftopt = tmp;
     return new FTIndexAccess(fun.input, words, ic).iter(ctx);
+  }
+
+  /**
+   * Performs the tokens function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter tokens(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+
+    byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    if(prefix.length != 0) {
+      final FTLexer ftl = new FTLexer(options(data));
+      ftl.init(prefix);
+      prefix = ftl.nextToken();
+    }
+    return FNIndex.entries(data, prefix, IndexType.FULLTEXT, this);
+  }
+
+  /**
+   * Returns default full-text options, overwritten by database options.
+   * @param data data reference
+   * @return iterator
+   */
+  private static FTOpt options(final Data data) {
+    final FTOpt ftopt = new FTOpt();
+    ftopt.set(CS, data.meta.casesens);
+    ftopt.set(DC, data.meta.diacritics);
+    ftopt.set(ST, data.meta.stemming);
+    ftopt.ln = data.meta.language;
+    return ftopt;
   }
 
   @Override

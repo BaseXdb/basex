@@ -18,6 +18,7 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.FTLexer;
+import org.basex.util.hash.TokenIntMap;
 
 /**
  * <p>This class provides access to a fuzzy full-text index structure
@@ -127,6 +128,35 @@ final class FTFuzzy extends FTIndex {
           size(p, tok.length), inZ, false) : FTIndexIterator.FTEMPTY;
     }
     return iter(cache.pointer(id), cache.size(id), inZ, false);
+  }
+
+  @Override
+  public TokenIntMap entries(final byte[] prefix) {
+    final TokenIntMap tim = new TokenIntMap();
+
+    for(int s = prefix.length; s < tp.length - 1; s++) {
+      int p = tp[s];
+      if(p == -1) continue;
+      int i = s + 1;
+      int r = -1;
+      do r = tp[i++]; while(r == -1);
+      inY.cursor(p);
+      boolean f = false;
+      while(p < r) {
+        final byte[] tok = inY.readBytes(s);
+        final long poi = inY.read5();
+        final int size = inY.read4();
+        cache.add(tok, size, poi);
+        if(startsWith(tok, prefix)) {
+          tim.add(tok, size);
+          f = true;
+        } else if(f) {
+          break;
+        }
+        p += s + ENTRY;
+      }
+    }
+    return tim;
   }
 
   @Override

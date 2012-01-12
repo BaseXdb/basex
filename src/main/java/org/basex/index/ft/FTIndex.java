@@ -1,13 +1,12 @@
 package org.basex.index.ft;
 
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.index.Index;
 import org.basex.index.IndexCache;
 import org.basex.io.random.DataAccess;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenIntMap;
 import org.basex.util.list.IntList;
 
 /**
@@ -130,10 +129,5 @@ public abstract class FTIndex implements Index {
         return Integer.toString(size);
       }
     };
-  }
-
-  @Override
-  public TokenIntMap entries(final byte[] prefix) {
-    throw Util.notexpected();
   }
 }

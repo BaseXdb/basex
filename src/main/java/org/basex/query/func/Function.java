@@ -610,17 +610,20 @@ public enum Function {
 
   /* FNFt functions. */
 
-  /** Database function: searches the full-text index. */
+  /** Full-text function: searches the full-text index. */
   _FT_SEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
-  /** Database function: counts the hits of a full-text request. */
+  /** Full-text function: counts the hits of a full-text request. */
   _FT_COUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
-  /** Database function: marks the hits of a full-text request. */
+  /** Full-text function: marks the hits of a full-text request. */
   _FT_MARK(FNFt.class, "mark(nodes[,tag])", NOD_ZM, 1, NOD_ZM, STR),
-  /** Database function: extracts full-text results. */
+  /** Full-text function: extracts full-text results. */
   _FT_EXTRACT(FNFt.class, "extract(nodes[,tag[,length]])",
       NOD_ZM, 1, ITEM_ZM, STR, ITR),
-  /** Database function: returns the full-text score. */
+  /** Full-text function: returns the full-text score. */
   _FT_SCORE(FNFt.class, "score(items)", DBL_ZM, ITEM_ZM),
+  /** Full-text function: returns indexed tokens. */
+  _FT_TOKENS(FNFt.class, "tokens(database, prefix)",
+      ITEM_ZM, 1, STR, STR),
 
   /* FNHof functions. */
 
