@@ -14,6 +14,7 @@ import org.basex.io.out.DataOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.util.Array;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.TokenList;
 
@@ -123,6 +124,7 @@ public final class PathSummary implements Index {
 
   /**
    * Returns all parents of the specified nodes.
+   * Used by the query optimizers.
    * @param in input nodes
    * @return parent nodes
    */
@@ -134,6 +136,7 @@ public final class PathSummary implements Index {
 
   /**
    * Returns all children or descendants of the specified nodes.
+   * Called from the query parser and optimizer.
    * @param in input nodes
    * @param desc if false, return only children
    * @return descendant nodes
@@ -153,7 +156,7 @@ public final class PathSummary implements Index {
 
   /**
    * Returns all children or descendants of the specified nodes with the
-   * specified tag or attribute value.
+   * specified tag or attribute value. Called from the query optimizer.
    * @param n name reference
    * @param k node kind
    * @return descendant nodes
@@ -166,6 +169,7 @@ public final class PathSummary implements Index {
 
   /**
    * Returns descendant tags and attributes for the specified start key.
+   * Used by the GUI.
    * @param k input key
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
@@ -179,6 +183,7 @@ public final class PathSummary implements Index {
 
   /**
    * Returns descendant tags and attributes for the specified descendant path.
+   * Used by the GUI.
    * @param tl input steps
    * @param d if false, return only children
    * @param o true/false: sort by occurrence/lexicographically
@@ -252,7 +257,7 @@ public final class PathSummary implements Index {
   }
 
   @Override
-  public TokenList entries(final byte[] prefix) {
+  public TokenIntMap entries(final byte[] prefix) {
     throw Util.notexpected();
   }
 

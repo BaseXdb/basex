@@ -2,7 +2,7 @@ package org.basex.index;
 
 import java.io.IOException;
 
-import org.basex.util.list.TokenList;
+import org.basex.util.hash.TokenIntMap;
 
 /**
  * This interface defines the methods which have to be implemented
@@ -23,7 +23,7 @@ public interface Index {
    * @param prefix prefix
    * @return entries
    */
-  TokenList entries(final byte[] prefix);
+  TokenIntMap entries(final byte[] prefix);
 
   /**
    * Returns an iterator for the index results.

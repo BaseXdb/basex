@@ -12,8 +12,8 @@ import org.basex.index.IndexStats;
 import org.basex.index.IndexToken;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.hash.TokenSet;
-import org.basex.util.list.TokenList;
 
 /**
  * This class provides a main memory access to attribute values and
@@ -96,13 +96,13 @@ public class MemValues extends TokenSet implements Index {
   }
 
   @Override
-  public TokenList entries(final byte[] prefix) {
-    final TokenList tl = new TokenList();
+  public TokenIntMap entries(final byte[] prefix) {
+    final TokenIntMap tim = new TokenIntMap();
     for(int m = 1; m < size; ++m) {
       final byte[] key = keys[m];
-      if(startsWith(key, prefix)) tl.add(key);
+      if(startsWith(key, prefix)) tim.add(key, len[m]);
     }
-    return tl;
+    return tim;
   }
 
   @Override

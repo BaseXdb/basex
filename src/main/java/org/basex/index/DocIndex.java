@@ -12,6 +12,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 
@@ -268,7 +269,7 @@ public final class DocIndex implements Index {
   }
 
   @Override
-  public TokenList entries(final byte[] prefix) {
+  public TokenIntMap entries(final byte[] prefix) {
     throw Util.notexpected();
   }
 }
