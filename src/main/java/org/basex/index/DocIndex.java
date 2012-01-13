@@ -160,6 +160,52 @@ public final class DocIndex implements Index {
   }
 
   /**
+   * Returns the child documents for the given path.
+   * @param path path
+   * document folders
+   * @param docsOnly search only for documents not document folders
+   * @return child paths
+   */
+  public synchronized byte[][] childDocuments(final byte[] path,
+      final boolean docsOnly) {
+    final String pth = MetaData.normPath(string(path));
+    if(pth == null || data.empty()) return new byte[][] {};
+    if(paths == null) initPaths();
+
+    final TokenList tl = new TokenList();
+    // normalize path to one leading + one trailing slash!
+    byte[] tp = concat(SLASH, token(pth));
+    // if the given path is the root, don't add a trailing slash
+    if(pth.length() > 0) tp = concat(tp, SLASH);
+    for(final byte[] to : paths) {
+      if(startsWith(to, tp)) {
+        byte[] toAdd = substring(to, tp.length, to.length);
+        final int i = indexOf(toAdd, SLASH);
+        // no more slashes means this must be a leaf
+        if(docsOnly && i == -1) tl.add(toAdd);
+        else if(!docsOnly && i >= 0) tl.add(split(toAdd, '/')[0]);
+      }
+    }
+    return tl.toArray();
+  }
+
+  /**
+   * Determines whether the given path is the path to a document
+   * folder.
+   * @param path given path (must be normalized, means one leading but
+   * no trailing slash.
+   * @return path to a folder or not
+   */
+  public synchronized boolean isDocumentFolder(final byte[] path) {
+    if(path == null || data.empty()) return false;
+    if(paths == null) initPaths();
+    final byte[] pa = concat(path, SLASH);
+    for(final byte[] b : paths) if(startsWith(b, pa)) return true;
+
+    return false;
+  }
+
+  /**
    * Returns the pre values of the document node matching the specified path.
    * @param path input path
    * @return root nodes

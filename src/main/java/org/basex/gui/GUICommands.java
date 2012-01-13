@@ -17,7 +17,6 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.Cs;
-import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.Export;
 import org.basex.core.cmd.Optimize;
@@ -26,7 +25,6 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogAbout;
-import org.basex.gui.dialog.DialogAdd;
 import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogEdit;
@@ -34,7 +32,6 @@ import org.basex.gui.dialog.DialogExport;
 import org.basex.gui.dialog.DialogFonts;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
-import org.basex.gui.dialog.DialogInput;
 import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogManage;
 import org.basex.gui.dialog.DialogMapLayout;
@@ -86,24 +83,6 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       if(new DialogManage(gui, true).nodb()) Dialog.warn(gui, INFONODB);
-    }
-  },
-
-  /** Opens a dialog to add new documents. */
-  ADD(GUIADD + DOTS, null, GUIADDTT, true, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogAdd dialog = new DialogAdd(gui);
-      if(dialog.ok()) DialogProgress.execute(dialog, "", dialog.cmd());
-    }
-  },
-
-  /** Opens a dialog to delete documents. */
-  DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogInput d = new DialogInput("", DROPTITLE, gui, 0);
-      if(d.ok()) DialogProgress.execute(d, "", new Delete(d.input()));
     }
   },
 

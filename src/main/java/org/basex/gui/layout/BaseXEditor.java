@@ -102,7 +102,7 @@ public class BaseXEditor extends BaseXPanel {
     new BaseXPopup(this, edit ?
       new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
-      new GUICommand[] { new CopyCmd(), null, new AllCmd() });
+      new GUICommand[] { new CopyCmd(), null, new AllCmd() }, gui);
   }
 
   /**

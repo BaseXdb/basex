@@ -208,7 +208,7 @@ public final class PlotView extends View {
     panel.add(box, BorderLayout.SOUTH);
     add(panel, BorderLayout.SOUTH);
 
-    new BaseXPopup(this, POPUP);
+    new BaseXPopup(this, POPUP, gui);
     selectionBox = new ViewRect();
     refreshLayout();
   }

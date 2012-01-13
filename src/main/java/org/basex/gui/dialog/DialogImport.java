@@ -156,6 +156,6 @@ public abstract class DialogImport extends Dialog {
     gui.set(Prop.CREATEFILTER, filter.getText());
     gui.set(Prop.ADDARCHIVES, archives.isSelected());
     gui.set(Prop.SKIPCORRUPT, skip.isSelected());
-    parsing.close();
+    parsing.setOptions();
   }
 }

@@ -42,7 +42,7 @@ public abstract class Dialog extends JDialog {
   private int[] loc;
 
   /** Key listener. */
-  protected final KeyAdapter keys = new KeyAdapter() {
+  public final KeyAdapter keys = new KeyAdapter() {
     @Override
     public void keyReleased(final KeyEvent e) {
       if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);

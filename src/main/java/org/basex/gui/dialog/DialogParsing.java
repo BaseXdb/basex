@@ -241,7 +241,7 @@ public final class DialogParsing extends BaseXBack {
   /**
    * Closes the tab.
    */
-  public void close() {
+  public void setOptions() {
     final String type = parser.getSelectedItem().toString();
     final BaseXCombo cb = type.equals(DataText.M_TEXT) ? tencoding : cencoding;
     props.set(ParserProp.ENCODING, cb.getSelectedItem().toString());

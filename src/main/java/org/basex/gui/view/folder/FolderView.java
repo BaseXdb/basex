@@ -75,7 +75,7 @@ public final class FolderView extends View {
     layout(new BorderLayout());
     scroll = new BaseXBar(this);
     add(scroll, BorderLayout.EAST);
-    new BaseXPopup(this, POPUP);
+    new BaseXPopup(this, POPUP, gui);
   }
 
   @Override

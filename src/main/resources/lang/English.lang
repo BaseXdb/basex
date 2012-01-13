@@ -104,6 +104,18 @@ dc_linesinfo=Splits input into lines
 dc_forminfo=XML format
 dc_separatorinfo=Separator
 
+#
+dc_filter=Filter
+dc_clear=Clear
+dc_addxml=Add XML
+dc_addbin=Add binaries
+dc_inputsrc=Input src
+dc_renamenode=Rename
+dc_renameas=Rename as
+dc_addxmlopt=Add XML options
+dc_filterpath=Filter path
+#
+
 do_title=Open Database
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Do you want to create a new one?
