@@ -3,10 +3,12 @@ package org.basex.util.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
+
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map.Entry;
 import org.basex.data.ExprInfo;
+import org.basex.data.MetaData;
 import org.basex.io.serial.Serializer;
 import org.basex.query.ft.ThesQuery;
 
@@ -35,7 +37,7 @@ public final class FTOpt extends ExprInfo {
    * @param opt parent full-text options
    * @return self reference
    */
-  public FTOpt init(final FTOpt opt) {
+  public FTOpt copy(final FTOpt opt) {
     for(final Entry<FTFlag, Boolean> f : opt.map.entrySet()) {
       final FTFlag fl = f.getKey();
       if(map.get(fl) == null) map.put(fl, f.getValue());
@@ -45,6 +47,19 @@ public final class FTOpt extends ExprInfo {
     if(ln == null) ln = opt.ln;
     if(th == null) th = opt.th;
     else if(opt.th != null) th.merge(opt.th);
+    return this;
+  }
+
+  /**
+   * Copies the full-text options from the specified database meta data.
+   * @param md meta data
+   * @return self reference
+   */
+  public FTOpt copy(final MetaData md) {
+    set(CS, md.casesens);
+    set(DC, md.diacritics);
+    set(ST, md.stemming);
+    ln = md.language;
     return this;
   }
 

@@ -624,6 +624,8 @@ public enum Function {
   /** Full-text function: returns indexed tokens. */
   _FT_TOKENS(FNFt.class, "tokens(database, prefix)",
       ITEM_ZM, 1, STR, STR),
+  /** Full-text function: tokenizes the specified string. */
+  _FT_TOKENIZE(FNFt.class, "tokenize(string)", STR_ZM, STR),
 
   /* FNHof functions. */
 

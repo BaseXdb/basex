@@ -138,6 +138,19 @@ public final class FNFtTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the 'ft:tokenize()' function.
+   */
+  @Test
+  public void ftTokenize() {
+    check(_FT_TOKENIZE);
+    query(_FT_TOKENIZE.args("A bc"), "a bc");
+    query("declare ft-option using stemming; " +
+        _FT_TOKENIZE.args("Gifts"), "gift");
+    query("count(" + _FT_TOKENIZE.args("") + ")", "0");
+    query("count(" + _FT_TOKENIZE.args("a!b:c") + ")", "3");
+  }
+
+  /**
    * Finishes the code.
    * @throws BaseXException database exception
    */

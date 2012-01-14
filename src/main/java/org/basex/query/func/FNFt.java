@@ -2,8 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.FTFlag.*;
-
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.MemData;
@@ -62,12 +60,13 @@ public final class FNFt extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case _FT_SEARCH:  return search(ctx);
-      case _FT_SCORE:   return score(ctx);
-      case _FT_MARK:    return mark(ctx, false);
-      case _FT_EXTRACT: return mark(ctx, true);
-      case _FT_TOKENS:  return tokens(ctx);
-      default:          return super.iter(ctx);
+      case _FT_SEARCH:   return search(ctx);
+      case _FT_SCORE:    return score(ctx);
+      case _FT_MARK:     return mark(ctx, false);
+      case _FT_EXTRACT:  return mark(ctx, true);
+      case _FT_TOKENS:   return tokens(ctx);
+      case _FT_TOKENIZE: return tokenize(ctx);
+      default:           return super.iter(ctx);
     }
   }
 
@@ -191,7 +190,7 @@ public final class FNFt extends FuncCall {
     if(!data.meta.ftxtindex) NOIDX.thrw(fun.input, fun);
 
     final FTOpt tmp = ctx.ftopt;
-    ctx.ftopt = options(data);
+    ctx.ftopt = new FTOpt().copy(data.meta);
     final FTWords words = new FTWords(fun.input, ic.data, Str.get(str), ctx);
     ctx.ftopt = tmp;
     return new FTIndexAccess(fun.input, words, ic).iter(ctx);
@@ -208,7 +207,7 @@ public final class FNFt extends FuncCall {
 
     byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
     if(prefix.length != 0) {
-      final FTLexer ftl = new FTLexer(options(data));
+      final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
       ftl.init(prefix);
       prefix = ftl.nextToken();
     }
@@ -216,17 +215,20 @@ public final class FNFt extends FuncCall {
   }
 
   /**
-   * Returns default full-text options, overwritten by database options.
-   * @param data data reference
+   * Performs the tokenize function.
+   * @param ctx query context
    * @return iterator
+   * @throws QueryException query exception
    */
-  private static FTOpt options(final Data data) {
-    final FTOpt ftopt = new FTOpt();
-    ftopt.set(CS, data.meta.casesens);
-    ftopt.set(DC, data.meta.diacritics);
-    ftopt.set(ST, data.meta.stemming);
-    ftopt.ln = data.meta.language;
-    return ftopt;
+  private Iter tokenize(final QueryContext ctx) throws QueryException {
+    final FTOpt opt = new FTOpt().copy(ctx.ftopt);
+    final FTLexer ftl = new FTLexer(opt).init(checkStr(expr[0], ctx));
+    return new Iter() {
+      @Override
+      public Str next() {
+        return ftl.hasNext() ? Str.get(ftl.nextToken()) : null;
+      }
+    };
   }
 
   @Override

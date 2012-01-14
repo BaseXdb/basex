@@ -450,7 +450,7 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(FTOPTION)) {
           final FTOpt fto = new FTOpt();
           while(ftMatchOption(fto));
-          ctx.ftopt.init(fto);
+          ctx.ftopt.copy(fto);
         } else {
           qp = p;
           return;
