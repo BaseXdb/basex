@@ -285,7 +285,8 @@ public class HTTPClientTest {
     final IO io = new IOContent(req);
     final Parser reqParser = Parser.xmlParser(io, CONTEXT.prop);
     final DBNode dbNode = new DBNode(reqParser, CONTEXT.prop);
-    final Request r = RequestParser.parse(dbNode.children().next(), null, null);
+    final RequestParser rp = new RequestParser(null);
+    final Request r = rp.parse(dbNode.children().next(), null);
 
     assertTrue(r.attrs.size() == 2);
     assertTrue(r.headers.size() == 2);
@@ -319,8 +320,8 @@ public class HTTPClientTest {
     final IO io = new IOContent(multiReq);
     final Parser p = Parser.xmlParser(io, CONTEXT.prop);
     final DBNode dbNode1 = new DBNode(p, CONTEXT.prop);
-    final Request r =
-      RequestParser.parse(dbNode1.children().next(), null, null);
+    final RequestParser rp = new RequestParser(null);
+    final Request r = rp.parse(dbNode1.children().next(), null);
 
     assertTrue(r.attrs.size() == 2);
     assertTrue(r.headers.size() == 2);
@@ -377,8 +378,8 @@ public class HTTPClientTest {
     bodies.add(Str.get("Part2"));
     bodies.add(Str.get("Part3"));
 
-    final Request r = RequestParser.parse(dbNode1.children().next(), bodies,
-        null);
+    final RequestParser rp = new RequestParser(null);
+    final Request r = rp.parse(dbNode1.children().next(), bodies);
 
     assertTrue(r.attrs.size() == 2);
     assertTrue(r.headers.size() == 2);
@@ -484,7 +485,8 @@ public class HTTPClientTest {
       p = Parser.xmlParser(io, CONTEXT.prop);
       dbNode = new DBNode(p, CONTEXT.prop);
       try {
-        RequestParser.parse(dbNode.children().next(), null, null);
+        final RequestParser rp = new RequestParser(null);
+        rp.parse(dbNode.children().next(), null);
         fail("Exception not thrown");
       } catch(final QueryException ex) {
         assertTrue(indexOf(token(ex.getMessage()),
@@ -532,7 +534,8 @@ public class HTTPClientTest {
 
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
+    final HTTPClient hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn.getOutputStream(), req);
     final String expResult = "--boundary42" + CRLF
         + "Content-Type: text/plain; charset=us-ascii" + CRLF + CRLF
         + plain + Prop.NL + CRLF
@@ -550,7 +553,7 @@ public class HTTPClientTest {
   /**
    * Tests writing of request content with different combinations of the body
    * attributes media-type and method.
-   * @throws IOException IO execption
+   * @throws IOException IO exception
    * @throws QueryException query exception
    */
   @Test
@@ -567,7 +570,8 @@ public class HTTPClientTest {
     req1.bodyContent.add(e1);
     // String item child
     req1.bodyContent.add(Str.get("<b>b</b>"));
-    HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
+    HTTPClient hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals("<a>a</a> &lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
 
     // Case 2: No method, media-type='text/plain'
@@ -581,7 +585,8 @@ public class HTTPClientTest {
     req2.bodyContent.add(e2);
     // String item child
     req2.bodyContent.add(Str.get("<b>b</b>"));
-    HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
+    hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals("a&lt;b&gt;b&lt;/b&gt;", fakeConn2.out.toString());
 
     // Case 3: method='text', media-type='text/xml'
@@ -596,7 +601,8 @@ public class HTTPClientTest {
     req3.bodyContent.add(e3);
     // String item child
     req3.bodyContent.add(Str.get("<b>b</b>"));
-    HTTPClient.setRequestContent(fakeConn3.getOutputStream(), req3, null);
+    hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn3.getOutputStream(), req3);
     assertEquals("a&lt;b&gt;b&lt;/b&gt;", fakeConn3.out.toString());
   }
 
@@ -613,7 +619,8 @@ public class HTTPClientTest {
     req1.bodyContent.add(new B64(token("dGVzdA==")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
+    HTTPClient hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "dGVzdA==");
 
     // Case 2: content is a node
@@ -624,7 +631,8 @@ public class HTTPClientTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
+    hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "dGVzdA==");
   }
 
@@ -641,7 +649,8 @@ public class HTTPClientTest {
     req1.bodyContent.add(new Hex(token("74657374")));
     final FakeHttpConnection fakeConn1 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient.setRequestContent(fakeConn1.getOutputStream(), req1, null);
+    HTTPClient hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn1.getOutputStream(), req1);
     assertEquals(fakeConn1.out.toString(), "74657374");
 
     // Case 2: content is a node
@@ -652,7 +661,8 @@ public class HTTPClientTest {
     req2.bodyContent.add(e3);
     final FakeHttpConnection fakeConn2 = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient.setRequestContent(fakeConn2.getOutputStream(), req2, null);
+    hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn2.getOutputStream(), req2);
     assertEquals(fakeConn2.out.toString(), "74657374");
   }
 
@@ -675,7 +685,8 @@ public class HTTPClientTest {
     // HTTP connection
     final FakeHttpConnection fakeConn = new FakeHttpConnection(new URL(
         "http://www.test.com"));
-    HTTPClient.setRequestContent(fakeConn.getOutputStream(), req, null);
+    final HTTPClient hc = new HTTPClient(null, CONTEXT.prop);
+    hc.setRequestContent(fakeConn.getOutputStream(), req);
 
     // Delete file
     f.delete();
@@ -701,8 +712,8 @@ public class HTTPClientTest {
     conn.contentType = "text/plain; charset=CP1251";
     // set content encoded in CP1251
     conn.content = Charset.forName("CP1251").encode(test).array();
-    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.string(),
-        null, CONTEXT.prop, null);
+    final Iter i = new ResponseHandler(null, CONTEXT.prop).getResponse(
+        conn, Bln.FALSE.string(), null);
     // compare results
     assertEquals(test, string(i.get(1).string(null)));
   }
@@ -746,8 +757,8 @@ public class HTTPClientTest {
         + "--boundary42" + CRLF + "Content-Type: text/x-whatever" + CRLF + CRLF
         + ".... fanciest formatted version of same  "
         + "message  goes  here" + CRLF + "..."  + CRLF + "--boundary42--");
-    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.string(),
-        null, CONTEXT.prop, null);
+    final Iter i = new ResponseHandler(null, CONTEXT.prop).getResponse(
+        conn, Bln.FALSE.string(), null);
 
     // Construct expected result
     final ItemCache resultIter = new ItemCache();
@@ -838,8 +849,8 @@ public class HTTPClientTest {
         +  CRLF + "--simple boundary--" + CRLF
         + "This is the epilogue.  It is also to be ignored.");
     // Get response as sequence of XQuery items
-    final Iter i = ResponseHandler.getResponse(conn, Bln.FALSE.string(),
-        null, CONTEXT.prop, null);
+    final Iter i = new ResponseHandler(null, CONTEXT.prop).getResponse(
+        conn, Bln.FALSE.string(), null);
 
     // Construct expected result
     final ItemCache resultIter = new ItemCache();
