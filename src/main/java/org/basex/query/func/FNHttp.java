@@ -47,8 +47,8 @@ public final class FNHttp extends FuncCall {
     }
 
     // send HTTP request
-    return HTTPClient.sendRequest(href, request,
-        cache, input, ctx.context.prop);
+    return new HTTPClient(input, ctx.context.prop).sendRequest(
+        href, request, cache);
   }
 
   @Override

@@ -146,8 +146,7 @@ final class FTTrie extends FTIndex {
 
   @Override
   public TokenIntMap entries(final byte[] prefix) {
-    Util.notexpected(this);
-    return null;
+    throw Util.notexpected(this);
   }
 
   /**

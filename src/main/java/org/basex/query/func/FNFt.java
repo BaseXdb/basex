@@ -172,8 +172,7 @@ public final class FNFt extends FuncCall {
    * @throws QueryException query exception
    */
   Iter search(final QueryContext ctx) throws QueryException {
-    return search(checkDBNode(checkItem(expr[0], ctx)).data,
-        checkStr(expr[1], ctx), this, ctx);
+    return search(data(0, ctx), checkStr(expr[1], ctx), this, ctx);
   }
 
   /**

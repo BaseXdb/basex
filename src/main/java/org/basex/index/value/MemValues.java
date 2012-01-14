@@ -99,8 +99,7 @@ public class MemValues extends TokenSet implements Index {
   public TokenIntMap entries(final byte[] prefix) {
     final TokenIntMap tim = new TokenIntMap();
     for(int m = 1; m < size; ++m) {
-      final byte[] key = keys[m];
-      if(startsWith(key, prefix)) tim.add(key, len[m]);
+      if(startsWith(keys[m], prefix)) tim.add(keys[m], len[m]);
     }
     return tim;
   }

@@ -23,7 +23,7 @@ public final class QueryException extends Exception {
   /** Error reference. */
   private Err err;
   /** Error QName. */
-  private QNm name;
+  private final QNm name;
   /** Error value. */
   private Value value = Empty.SEQ;
   /** File reference. */

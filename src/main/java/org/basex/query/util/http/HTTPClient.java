@@ -30,6 +30,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.http.Request.Part;
 import org.basex.util.Base64;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenMap;
 
@@ -105,76 +106,85 @@ public final class HTTPClient {
   /** HTTP basic authentication. */
   private static final String AUTH_BASIC = "Basic ";
 
-  /** Private constructor. */
-  private HTTPClient() { }
+  /** Input information. */
+  private final InputInfo input;
+  /** Database properties. */
+  private final Prop prop;
 
   /**
-   * Sends an HTTP request.
+   * Constructor.
+   * @param ii input info
+   * @param pr database properties
+   */
+  public HTTPClient(final InputInfo ii, final Prop pr) {
+    input = ii;
+    prop = pr;
+  }
+
+  /**
+   * Sends an HTTP request and returns the response.
    * @param href URL to send the request to
    * @param request request data
    * @param bodies content items
-   * @param ii input info
-   * @param prop query context properties
    * @return HTTP response
    * @throws QueryException query exception
    */
-  public static Iter sendRequest(final byte[] href, final ANode request,
-      final ItemCache bodies, final InputInfo ii, final Prop prop)
-      throws QueryException {
+  public Iter sendRequest(final byte[] href, final ANode request,
+      final ItemCache bodies) throws QueryException {
 
     try {
       if(request == null) {
-        if(href == null || href.length == 0) NOPARAMS.thrw(ii);
-        final HttpURLConnection conn = openConnection(string(href), ii);
+        if(href == null || href.length == 0) NOPARAMS.thrw(input);
+        final HttpURLConnection conn = openConnection(string(href));
         try {
-          return ResponseHandler.getResponse(conn, Bln.FALSE.string(),
-              Bln.FALSE.string(), prop, ii);
+          return new ResponseHandler(input, prop).getResponse(
+              conn, Bln.FALSE.string(), Bln.FALSE.string());
         } finally {
           conn.disconnect();
         }
       }
-      final Request r = RequestParser.parse(request, bodies, ii);
-      final byte[] dest = href == null ? r.attrs.get(HREF) : href;
-      if(dest == null) NOURL.thrw(ii);
 
-      final HttpURLConnection conn = openConnection(string(dest), ii);
+      final Request r = new RequestParser(input).parse(request, bodies);
+      final byte[] dest = href == null ? r.attrs.get(HREF) : href;
+      if(dest == null) NOURL.thrw(input);
+
+      final HttpURLConnection conn = openConnection(string(dest));
       try {
-        setConnectionProps(conn, r, ii);
-        setRequestHeaders(conn, r, ii);
+        setConnectionProps(conn, r);
+        setRequestHeaders(conn, r);
 
         if(r.bodyContent.size() != 0 || r.parts.size() != 0) {
           setContentType(conn, r);
-          setRequestContent(conn.getOutputStream(), r, ii);
+          setRequestContent(conn.getOutputStream(), r);
         }
-        return ResponseHandler.getResponse(conn, r.attrs.get(STATUSONLY),
-            r.attrs.get(OVERMEDIATYPE), prop, ii);
+        return new ResponseHandler(input, prop).getResponse(
+            conn, r.attrs.get(STATUSONLY), r.attrs.get(OVERMEDIATYPE));
       } finally {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      throw HTTPERR.thrw(ii, "Invalid URL");
+      throw HTTPERR.thrw(input, "Invalid URL");
     } catch(final ProtocolException ex) {
-      throw HTTPERR.thrw(ii, "Invalid HTTP method");
+      throw HTTPERR.thrw(input, "Invalid HTTP method");
     } catch(final IOException ex) {
-      throw HTTPERR.thrw(ii, ex);
+      throw HTTPERR.thrw(input, ex);
     }
   }
 
   /**
    * Opens an HTTP connection.
    * @param dest HTTP URI to open connection to
-   * @param ii input info
    * @return HHTP connection
    * @throws QueryException query exception
    * @throws IOException I/O Exception
    * @throws MalformedURLException incorrect url
    */
-  private static HttpURLConnection openConnection(final String dest,
-      final InputInfo ii) throws QueryException, IOException {
+  private HttpURLConnection openConnection(final String dest)
+      throws QueryException, IOException {
+
     final URL url = new URL(dest);
-    final String protocol = url.getProtocol();
-    if(!protocol.equalsIgnoreCase("HTTP") &&
-        !protocol.equalsIgnoreCase("HTTPS")) HTTPERR.thrw(ii, "Invalid URL");
+    if(!Token.eqic(url.getProtocol(), "HTTP", "HTTPS"))
+      HTTPERR.thrw(input, "Invalid URL");
     return (HttpURLConnection) url.openConnection();
   }
 
@@ -182,20 +192,19 @@ public final class HTTPClient {
    * Sets the connection properties.
    * @param conn HTTP connection
    * @param r request data
-   * @param ii input info
    * @throws ProtocolException protocol exception
    * @throws QueryException query exception
    */
-  private static void setConnectionProps(final HttpURLConnection conn,
-      final Request r, final InputInfo ii) throws ProtocolException,
-      QueryException {
+  private void setConnectionProps(final HttpURLConnection conn, final Request r)
+      throws ProtocolException, QueryException {
+
     if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
     conn.setRequestMethod(
         string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH));
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
     final byte[] redirect = r.attrs.get(REDIR);
-    if(redirect != null) setFollowRedirects(Bln.parse(redirect, ii));
+    if(redirect != null) setFollowRedirects(Bln.parse(redirect, input));
   }
 
   /**
@@ -205,6 +214,7 @@ public final class HTTPClient {
    */
   private static void setContentType(final HttpURLConnection conn,
       final Request r) {
+
     final byte[] contTypeHdr = r.headers.get(lc(token(CONT_TYPE)));
     // if header "Content-Type" is set explicitly by the user, its value is used
     if(contTypeHdr != null) {
@@ -228,21 +238,19 @@ public final class HTTPClient {
    * Sets HTTP request headers.
    * @param conn HTTP connection
    * @param r request data
-   * @param ii input info
    * @throws QueryException query exception
    */
-  private static void setRequestHeaders(final HttpURLConnection conn,
-      final Request r, final InputInfo ii) throws QueryException {
+  private void setRequestHeaders(final HttpURLConnection conn,
+      final Request r) throws QueryException {
 
     final byte[][] headerNames = r.headers.keys();
-
     for(final byte[] headerName : headerNames)
       conn.addRequestProperty(string(headerName),
           string(r.headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = r.attrs.get(SENDAUTH);
-    if(sendAuth != null && Bln.parse(sendAuth, ii)) conn.setRequestProperty(
-        AUTH,
+    if(sendAuth != null && Bln.parse(sendAuth, input))
+      conn.setRequestProperty(AUTH,
         encodeCredentials(string(r.attrs.get(USRNAME)),
             string(r.attrs.get(PASSWD))));
   }
@@ -251,16 +259,16 @@ public final class HTTPClient {
    * Set HTTP request content.
    * @param out output stream
    * @param r request data
-   * @param ii input info
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public static void setRequestContent(final OutputStream out, final Request r,
-      final InputInfo ii) throws IOException, QueryException {
+  public void setRequestContent(final OutputStream out, final Request r)
+      throws IOException, QueryException {
+
     if(r.isMultipart) {
-      writeMultipart(r, out, ii);
+      writeMultipart(r, out);
     } else {
-      writePayload(r.bodyContent, r.payloadAttrs, out, ii);
+      writePayload(r.bodyContent, r.payloadAttrs, out);
     }
     out.close();
   }
@@ -281,17 +289,16 @@ public final class HTTPClient {
    * @param payload body/part payload
    * @param payloadAtts payload attributes
    * @param out output stream
-   * @param ii input info
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private static void writePayload(final ItemCache payload,
-      final TokenMap payloadAtts, final OutputStream out, final InputInfo ii)
-      throws IOException, QueryException {
+  private void writePayload(final ItemCache payload, final TokenMap payloadAtts,
+      final OutputStream out) throws IOException, QueryException {
 
     final byte[] mediaType = payloadAtts.get(MEDIATYPE);
     byte[] method = payloadAtts.get(METHOD);
     final byte[] src = payloadAtts.get(SRC);
+
     // no resource to set the content from
     if(src == null) {
       // default value @method is determined by @media-type
@@ -307,9 +314,9 @@ public final class HTTPClient {
       }
       // write content depending on the method
       if(eq(method, BASE64)) {
-        writeBase64(payload, out, ii);
+        writeBase64(payload, out);
       } else if(eq(method, HEXBIN)) {
-        writeHex(payload, out, ii);
+        writeHex(payload, out);
       } else {
         write(payload, payloadAtts, method, out);
       }
@@ -324,20 +331,18 @@ public final class HTTPClient {
    * Writes the payload of a body in case method is base64Binary.
    * @param payload payload
    * @param out connection output stream
-   * @param ii input info
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private static void writeBase64(final ItemCache payload,
-      final OutputStream out, final InputInfo ii) throws IOException,
-      QueryException {
+  private void writeBase64(final ItemCache payload,
+      final OutputStream out) throws IOException, QueryException {
 
     for(int i = 0; i < payload.size(); i++) {
       final Item item = payload.get(i);
       if(item instanceof B64) {
         out.write(((B64) item).toJava());
       } else {
-        out.write(new B64(item.string(ii)).toJava());
+        out.write(new B64(item.string(input)).toJava());
       }
     }
   }
@@ -346,19 +351,18 @@ public final class HTTPClient {
    * Writes the payload of a body in case method is hexBinary.
    * @param payload payload
    * @param out connection output stream
-   * @param ii input info
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private static void writeHex(final ItemCache payload, final OutputStream out,
-      final InputInfo ii) throws IOException, QueryException {
+  private void writeHex(final ItemCache payload, final OutputStream out)
+      throws IOException, QueryException {
 
     for(int i = 0; i < payload.size(); i++) {
       final Item item = payload.get(i);
       if(item instanceof Hex) {
         out.write(((Hex) item).toJava());
       } else {
-        out.write(new Hex(item.string(ii)).toJava());
+        out.write(new Hex(item.string(input)).toJava());
       }
     }
   }
@@ -371,21 +375,21 @@ public final class HTTPClient {
    * @param out connection output stream
    * @throws IOException I/O Exception
    */
-  private static void write(final ItemCache payload,
+  private void write(final ItemCache payload,
       final TokenMap payloadAttrs, final byte[] method, final OutputStream out)
       throws IOException {
 
     // extract serialization parameters
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(token("method=")).add(method);
-    final byte[][] keys = payloadAttrs.keys();
-    for(final byte[] key : keys) {
-      if(!eq(key, SRC) && !eq(key, MEDIATYPE) && !eq(key, METHOD))
+    tb.add(METHOD).add('=').add(method);
+    for(final byte[] key : payloadAttrs.keys()) {
+      if(!eq(key, SRC))
         tb.add(',').add(key).add('=').add(payloadAttrs.get(key));
     }
+
     // serialize items according to the parameters
-    final SerializerProp prop = new SerializerProp(tb.toString());
-    final Serializer ser = Serializer.get(out, prop);
+    final SerializerProp sp = new SerializerProp(tb.toString());
+    final Serializer ser = Serializer.get(out, sp);
     try {
       payload.serialize(ser);
     } finally {
@@ -419,17 +423,15 @@ public final class HTTPClient {
    * connection.
    * @param r request data
    * @param out output stream
-   * @param ii input info
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private static void writeMultipart(final Request r, final OutputStream out,
-      final InputInfo ii) throws IOException, QueryException {
+  private void writeMultipart(final Request r, final OutputStream out)
+      throws IOException, QueryException {
 
     final byte[] boundary = r.payloadAttrs.get(BOUNDARY);
     final Iterator<Part> i = r.parts.iterator();
-    while(i.hasNext())
-      writePart(i.next(), out, boundary, ii);
+    while(i.hasNext()) writePart(i.next(), out, boundary);
     out.write(new TokenBuilder().add("--").
         add(boundary).add("--").add(CRLF).finish());
   }
@@ -439,13 +441,12 @@ public final class HTTPClient {
    * @param part part
    * @param out connection output stream
    * @param boundary boundary
-   * @param ii input info
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private static void writePart(final Part part, final OutputStream out,
-      final byte[] boundary, final InputInfo ii) throws IOException,
-      QueryException {
+  private void writePart(final Part part, final OutputStream out,
+      final byte[] boundary) throws IOException, QueryException {
+
     // write boundary preceded by "--"
     final TokenBuilder boundTb = new TokenBuilder();
     boundTb.add("--").add(boundary).add(CRLF);
@@ -461,7 +462,7 @@ public final class HTTPClient {
     out.write(CRLF);
 
     // write content
-    writePayload(part.bodyContent, part.bodyAttrs, out, ii);
+    writePayload(part.bodyContent, part.bodyAttrs, out);
     out.write(CRLF);
   }
 }
