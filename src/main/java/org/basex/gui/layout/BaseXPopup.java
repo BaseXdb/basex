@@ -30,10 +30,12 @@ public final class BaseXPopup extends JPopupMenu {
    * Constructor.
    * @param comp component reference
    * @param pop popup reference
+   * @param g gui reference
    */
-  public BaseXPopup(final BaseXPanel comp, final GUICommand[] pop) {
+  public BaseXPopup(final Component comp, final GUICommand[] pop,
+      final GUI g) {
     popup = pop;
-    gui = comp.gui;
+    gui = g;
 
     // both listeners must be implemented to support different platforms
     comp.addMouseListener(new MouseAdapter() {
@@ -62,7 +64,7 @@ public final class BaseXPopup extends JPopupMenu {
         item.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e) {
-            if(!gui.updating) c.execute(comp.gui);
+            if(!gui.updating) c.execute(gui);
           }
         });
         item.setMnemonic(c.label().charAt(0));

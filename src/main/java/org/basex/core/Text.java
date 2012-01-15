@@ -1101,6 +1101,10 @@ public interface Text {
   String BUTTONADD = lang("b_add");
   /** Button for resetting options. */
   String BUTTONRESET = lang("b_reset");
+  /** Clear button. */
+  String BUTTONCLEAR = lang("dc_clear");
+  /** Filter button. */
+  String BUTTONFILTER = lang("dc_filter");
 
   // VISUALIZATIONS ===========================================================
 
@@ -1354,6 +1358,22 @@ public interface Text {
   String PREFNAME = lang("dp_names");
   /** Language preference. */
   String PREFLANG = lang("dp_lang") + " (" + lang("dp_restart") + ")";
+
+  // Content Manage Dialog
+  /** Database content text. */
+  String ADDXML = lang("dc_addxml");
+  /** Database content text. */
+  String ADDBIN = lang("dc_addbin");
+  /** Database content text. */
+  String INPUTSRC = lang("dc_inputsrc") + COL;
+  /** Database content text. */
+  String RENAMENODE = lang("dc_renamenode");
+  /** Database content text. */
+  String RENAMEAS = lang("dc_renameas") + COL;
+  /** Database content text. */
+  String ADDXMLOPT = lang("dc_addxmlopt");
+  /** Database content text. */
+  String FILTERPATH = lang("dc_filterpath") + COL;
 
   /** Dialog title for deleting nodes. */
   String DELETECONF = lang("dx_question");

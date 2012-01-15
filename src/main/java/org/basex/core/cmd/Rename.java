@@ -20,11 +20,11 @@ import org.basex.util.list.IntList;
 public final class Rename extends ACreate {
   /**
    * Default constructor.
-   * @param source source path
    * @param target target path
+   * @param source source path
    */
-  public Rename(final String source, final String target) {
-    super(DATAREF | User.WRITE, source, target);
+  public Rename(final String target, final String source) {
+    super(DATAREF | User.WRITE, target, source);
   }
 
   @Override

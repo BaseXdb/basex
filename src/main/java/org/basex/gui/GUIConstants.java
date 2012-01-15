@@ -105,7 +105,7 @@ public final class GUIConstants {
    */
   static final GUICommand[][] MENUITEMS = { {
     CREATE, MANAGE, EMPTY,
-    ADD, DROP, EXPORT, INFO, CLOSE, EMPTY,
+    EXPORT, INFO, CLOSE, EMPTY,
     SERVER, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : EXIT
   }, {

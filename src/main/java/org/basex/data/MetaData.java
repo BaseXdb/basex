@@ -226,6 +226,18 @@ public final class MetaData {
   }
 
   /**
+   * Normalizes a path and also removes trailing white spaces.
+   * @param path path to normalize
+   * @return normalized path
+   */
+  public static String normPath2(final String path) {
+    String p = MetaData.normPath(path);
+    if(!p.endsWith("/")) return p;
+    // remove trailing white space
+    return p.substring(0, p.length() - 1);
+  }
+
+  /**
    * Checks if the specified database name is valid, matching the pattern
    * {@code [-\w]+}, or {@code [-\w*?,]+} if the glob flag is activated.
    * @param name name to be checked

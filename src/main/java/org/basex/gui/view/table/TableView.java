@@ -60,7 +60,7 @@ public final class TableView extends View implements Runnable {
     scroll = new BaseXBar(this);
     content = new TableContent(tdata, scroll);
     add(content, BorderLayout.CENTER);
-    new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, GUIConstants.POPUP, gui);
   }
 
   @Override

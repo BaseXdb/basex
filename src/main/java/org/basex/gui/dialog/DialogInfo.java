@@ -25,6 +25,7 @@ import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
+import org.basex.gui.layout.BaseXManageDBContent;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 import org.basex.io.out.PrintOutput;
@@ -149,12 +150,18 @@ public final class DialogInfo extends Dialog {
         BorderLayout.CENTER);
     tab5.add(panels[3]);
 
+    // sixth tab: documents / raw data
+    final BaseXBack tab6 = new BaseXBack(new BorderLayout());
+    final BaseXBack content = new BaseXManageDBContent(this);
+    tab6.add(content, BorderLayout.CENTER);
+
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, tab1);
     tabs.addTab(NAMESINFO, tab2);
     tabs.addTab(INFOPATHINDEX, tab3);
     tabs.addTab(INDEXINFO, tab4);
     tabs.addTab(FTINFO, tab5);
+    tabs.addTab("Content", tab6);
 
     set(tabs, BorderLayout.CENTER);
 

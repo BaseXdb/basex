@@ -192,6 +192,14 @@ public abstract class Data {
   }
 
   /**
+   * Getter for document index.
+   * @return doc index
+   */
+  public final DocIndex docindex() {
+    return docindex;
+  }
+
+  /**
    * Returns the pre values of all document nodes.
    * A single dummy node is returned if the database is empty.
    * @return root nodes

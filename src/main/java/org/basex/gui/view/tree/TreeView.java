@@ -95,7 +95,7 @@ public final class TreeView extends View implements TreeConstants {
    */
   public TreeView(final ViewNotifier man) {
     super(TREEVIEW, HELPTREE, man);
-    new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, GUIConstants.POPUP, gui);
   }
 
   @Override
