@@ -87,7 +87,7 @@ public class HTTPClientTest {
       + "<book id='2'>" + "<name>Winnetou</name>" + "<author>May</author>"
       + "</book>" + "<book id='3'>" + "<name>Tom Sawyer</name>"
       + "<author>Twain</author>" + "</book>" + "</books>";
-  /** Carriage return/Line feed. */
+  /** Carriage return/line feed. */
   private static final String CRLF = "\r\n";
 
   /** Database context. */
@@ -503,10 +503,9 @@ public class HTTPClientTest {
    */
   @Test
   public void writeMultipartMessage() throws IOException, QueryException {
-    final String plain = "...plain text version of message goes here....";
-    final String rich = ".... richtext version of same message goes here ...";
-    final String fancy = ".... fanciest formatted version of same  message  "
-        + "goes  here...";
+    final String plain = "...plain text....";
+    final String rich = ".... richtext version...";
+    final String fancy = ".... fanciest formatted version...";
 
     final Request req = new Request();
     req.isMultipart = true;
@@ -587,7 +586,7 @@ public class HTTPClientTest {
     req2.bodyContent.add(Str.get("<b>b</b>"));
     hc = new HTTPClient(null, CONTEXT.prop);
     hc.setRequestContent(fakeConn2.getOutputStream(), req2);
-    assertEquals("a&lt;b&gt;b&lt;/b&gt;", fakeConn2.out.toString());
+    assertEquals("a<b>b</b>", fakeConn2.out.toString());
 
     // Case 3: method='text', media-type='text/xml'
     final Request req3 = new Request();
@@ -603,7 +602,7 @@ public class HTTPClientTest {
     req3.bodyContent.add(Str.get("<b>b</b>"));
     hc = new HTTPClient(null, CONTEXT.prop);
     hc.setRequestContent(fakeConn3.getOutputStream(), req3);
-    assertEquals("a&lt;b&gt;b&lt;/b&gt;", fakeConn3.out.toString());
+    assertEquals("a<b>b</b>", fakeConn3.out.toString());
   }
 
   /**
