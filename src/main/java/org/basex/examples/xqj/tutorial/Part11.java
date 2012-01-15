@@ -16,7 +16,7 @@ import javax.xml.xquery.XQStaticContext;
  *
  * Part 11: Processing Large Inputs.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class Part11 extends Main {
   /**

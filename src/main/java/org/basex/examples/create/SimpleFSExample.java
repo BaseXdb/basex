@@ -10,7 +10,7 @@ import org.basex.core.cmd.XQuery;
 /**
  * This example demonstrates a simple filesystem parser.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class SimpleFSExample {

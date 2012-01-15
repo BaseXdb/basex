@@ -11,7 +11,7 @@ import javax.xml.xquery.XQResultSequence;
  *
  * Part 2: Executing XQuery in Java.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class Part2 extends Main {
   /**

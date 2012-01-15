@@ -14,7 +14,7 @@ import org.basex.api.xqj.BXQDataSource;
  *
  * Part 1: An XQJ Introduction.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class Part1 extends Main {
   /**

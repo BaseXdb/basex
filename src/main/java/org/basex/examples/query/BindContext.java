@@ -9,7 +9,7 @@ import org.basex.query.QueryProcessor;
  * This example demonstrates how items can be bound as context item of
  * the XQuery processor.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class BindContext {
   /**

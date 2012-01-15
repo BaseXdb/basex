@@ -8,7 +8,7 @@ import org.xmldb.api.*;
  * This class serves as an example for executing XPath requests with the XML:DB
  * API.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class XMLDBQuery {
   /** Database driver. */

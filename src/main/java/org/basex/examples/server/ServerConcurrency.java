@@ -11,7 +11,7 @@ import org.basex.server.ClientSession;
  * Database information will be shown before and after the
  * clients have been run.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class ServerConcurrency {
   /**

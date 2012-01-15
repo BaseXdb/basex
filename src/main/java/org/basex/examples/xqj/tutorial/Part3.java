@@ -20,7 +20,7 @@ import org.w3c.dom.Document;
  *
  * Part 3: Querying Data from XML Files or Java XML APIs.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class Part3 extends Main {
   /**

@@ -10,7 +10,7 @@ import org.basex.build.Parser;
  * This class serves as a simple filesystem parser and creates an XML
  * representation, which resembles the DeepFS markup.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class SimpleFSParser extends Parser {

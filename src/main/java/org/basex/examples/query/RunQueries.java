@@ -17,7 +17,7 @@ import org.basex.query.iter.Iter;
  * This example demonstrates three variants how XQuery expressions can be
  * evaluated.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class RunQueries {
   /** Database context. */

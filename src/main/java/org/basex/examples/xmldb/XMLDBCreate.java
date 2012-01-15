@@ -7,7 +7,7 @@ import org.xmldb.api.*;
 /**
  * This class serves as an example for creating a database with the XML:DB API.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class XMLDBCreate {
   /** Database driver. */

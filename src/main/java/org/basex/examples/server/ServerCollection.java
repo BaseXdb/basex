@@ -13,7 +13,7 @@ import org.basex.server.ClientSession;
  * It shows how to {@link #add(String, String)} and {@link #modify()} files.
  * For further options see {@link QueryCollection}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class ServerCollection {
   /** Session reference. */

@@ -9,7 +9,7 @@ import javax.xml.xquery.XQResultSequence;
  * This class serves as an example for executing XQuery requests
  * with the XQuery for Java (XQJ) API.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class XQJQuery {
   /** Database driver. */

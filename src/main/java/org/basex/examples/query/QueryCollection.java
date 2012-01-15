@@ -8,7 +8,7 @@ import org.basex.core.cmd.*;
  * This class demonstrates collection relevant queries.
  * It shows how to find and query specific documents.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class QueryCollection {
   /**

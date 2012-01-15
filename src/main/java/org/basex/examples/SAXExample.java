@@ -12,7 +12,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * This class serves as an example for evaluating XQuery requests
  * and serializing the results via the SAX API.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class SAXExample extends DefaultHandler {
   /**
