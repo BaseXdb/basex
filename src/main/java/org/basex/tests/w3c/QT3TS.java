@@ -35,7 +35,7 @@ import org.basex.util.list.ObjList;
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
  * {@code http://dev.w3.org/2011/QT3-test-suite/}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class QT3TS {

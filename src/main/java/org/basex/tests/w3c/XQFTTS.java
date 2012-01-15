@@ -15,7 +15,7 @@ import org.basex.util.ft.StopWords;
 /**
  * XQuery Full Text Test Suite wrapper.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class XQFTTS extends W3CTS {

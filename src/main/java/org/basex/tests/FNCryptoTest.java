@@ -24,7 +24,7 @@ import org.junit.Test;
  * in basex-test package are only executable after a java keystore has been
  * created.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public class FNCryptoTest {

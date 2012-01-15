@@ -18,7 +18,7 @@ import org.junit.Test;
  * This class performs a local stress tests with a specified
  * number of threads and queries.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ReplaceTest {

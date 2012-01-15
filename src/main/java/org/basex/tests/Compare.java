@@ -12,7 +12,7 @@ import org.basex.util.list.StringList;
 /**
  * This class compares query results with other query processors.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Compare {
