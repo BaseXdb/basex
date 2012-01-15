@@ -25,7 +25,7 @@ import org.basex.util.list.StringList;
  * This class loads language specific texts when the {@link #lang}
  * method is called for the first time.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */

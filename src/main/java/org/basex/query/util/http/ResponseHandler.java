@@ -37,7 +37,7 @@ import org.basex.util.list.ByteList;
 /**
  * HTTP response handler. Reads HTTP response and constructs the
  * <http:response/> element.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class ResponseHandler {

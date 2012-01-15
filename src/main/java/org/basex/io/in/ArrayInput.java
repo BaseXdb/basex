@@ -5,7 +5,7 @@ import org.basex.util.Token;
 /**
  * This class allows reading from a cached byte array.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ArrayInput extends BufferInput {

@@ -14,7 +14,7 @@ import org.basex.util.Util;
 /**
  * Abstract super class for function items.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public abstract class FItem extends Item {

@@ -6,7 +6,7 @@ import java.util.HashSet;
 /**
  * Abstract class for stemmer and tokenizer implementations.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
 abstract class LanguageImpl extends FTIterator

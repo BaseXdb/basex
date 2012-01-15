@@ -17,7 +17,7 @@ import org.basex.util.InputInfo;
 /**
  * This class defines is an abstract class for full-text expressions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class FTExpr extends ParseExpr {

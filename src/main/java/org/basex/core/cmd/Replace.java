@@ -11,7 +11,7 @@ import org.basex.io.IOFile;
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Replace extends ACreate {

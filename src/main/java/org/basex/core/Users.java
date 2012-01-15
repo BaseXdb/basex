@@ -19,7 +19,7 @@ import org.basex.util.list.TokenList;
 /**
  * This class organizes all users.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 public final class Users {

@@ -10,7 +10,7 @@ import org.basex.util.Util;
  * This class assembles admin properties which are used all around the project.
  * They are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class MainProp extends AProp {

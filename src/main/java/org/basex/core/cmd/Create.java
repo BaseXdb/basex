@@ -7,7 +7,7 @@ import org.basex.build.Parser;
  * This class allows developers to define their own parser implementations.
  * The class can be instantiated like all other database commands.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Create extends ACreate {

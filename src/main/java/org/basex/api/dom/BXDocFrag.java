@@ -6,7 +6,7 @@ import org.w3c.dom.DocumentFragment;
 /**
  * DOM - Document fragment implementation.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BXDocFrag extends BXNode implements DocumentFragment {

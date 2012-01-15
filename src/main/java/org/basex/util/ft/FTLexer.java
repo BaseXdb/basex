@@ -13,7 +13,7 @@ import org.basex.util.list.StringList;
  * Performs full-text lexing on token. Calls tokenizers, stemmers matching to
  * full-text options to achieve this.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
 public final class FTLexer extends FTIterator implements IndexToken {

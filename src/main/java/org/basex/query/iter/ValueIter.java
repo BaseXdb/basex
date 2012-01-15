@@ -6,7 +6,7 @@ import org.basex.query.item.Value;
 /**
  * Value iterator interface, throwing no exceptions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class ValueIter extends Iter {

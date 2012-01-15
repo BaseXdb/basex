@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * Token set tests.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class TokenSetTest {

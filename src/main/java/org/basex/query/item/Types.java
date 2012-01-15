@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 /**
  * XQuery data type register.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Types {

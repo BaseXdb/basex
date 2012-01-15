@@ -11,7 +11,7 @@ import org.basex.util.list.IntList;
 /**
  * ID -> PRE mapping.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
 public class IdPreMap {

@@ -5,7 +5,7 @@ import static org.basex.util.Token.token;
 /**
  * MAB2 Fields, needed for importing MAB2 data as XML.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public interface MAB2 {

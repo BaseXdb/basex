@@ -5,7 +5,7 @@ import org.basex.io.IO;
 /**
  * This class defines an abstract parser, specifying a target path.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class TargetParser extends Parser {

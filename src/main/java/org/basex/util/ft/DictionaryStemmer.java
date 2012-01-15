@@ -5,7 +5,7 @@ import java.util.Collection;
 /**
  * Dictionary-based stemmer.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
 final class DictionaryStemmer extends Stemmer {

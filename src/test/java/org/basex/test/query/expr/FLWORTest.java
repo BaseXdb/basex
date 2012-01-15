@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * Test cases for FLWOR expressions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public final class FLWORTest {

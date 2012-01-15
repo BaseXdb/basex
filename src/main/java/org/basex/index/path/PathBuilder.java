@@ -9,7 +9,7 @@ import org.basex.util.list.IntList;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class PathBuilder extends IndexBuilder {

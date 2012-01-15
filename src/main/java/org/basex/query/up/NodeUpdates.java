@@ -37,7 +37,7 @@ import org.basex.util.list.ObjList;
  *      Cannot be done on-the-fly as nodes on the preceding axis, which could
  *      also be target nodes, may be affected by merges.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 final class NodeUpdates {

@@ -19,7 +19,7 @@ import org.basex.util.hash.TokenSet;
  * This class provides a main memory access to attribute values and
  * text contents.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class MemValues extends TokenSet implements Index {

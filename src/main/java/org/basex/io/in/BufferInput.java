@@ -20,7 +20,7 @@ import org.basex.util.list.ByteList;
 /**
  * This class uses a byte buffer to speed up input stream processing.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class BufferInput extends InputStream {

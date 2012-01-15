@@ -13,7 +13,7 @@ import org.basex.util.list.TokenList;
 /**
  * This class serializes data as HTML.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class HTMLSerializer extends OutputSerializer {

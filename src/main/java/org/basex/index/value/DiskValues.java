@@ -26,7 +26,7 @@ import org.basex.util.list.IntList;
  * This class provides access to attribute values and text contents stored on
  * disk. The data structure is described in the {@link ValueBuilder} class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class DiskValues implements Index {

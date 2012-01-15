@@ -23,7 +23,7 @@ import static org.basex.data.DataText.*;
 /**
  * This class tests the update functionality of the block storage.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Tim Petrowsky
  */
 public final class DiskTableTest {

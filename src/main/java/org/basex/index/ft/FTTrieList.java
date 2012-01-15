@@ -6,7 +6,7 @@ import org.basex.data.Data;
 /**
  * This class provides access to a sorted token list.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Sebastian Gath
  */
 final class FTTrieList extends FTList {

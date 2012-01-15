@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
@@ -17,7 +16,7 @@ import org.basex.server.Sessions;
  * This class should only be instantiated once in a project; otherwise,
  * database updates may lead to conflicts.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Context {
@@ -244,7 +243,7 @@ public final class Context {
   }
 
   /**
-   * Adds the specified session. Thread-safe by {@link CopyOnWriteArrayList}.
+   * Adds the specified client session.
    * @param s session to be added
    */
   public void add(final ClientListener s) {
@@ -252,7 +251,7 @@ public final class Context {
   }
 
   /**
-   * Removes the specified session.
+   * Removes the specified client session.
    * @param s session to be removed
    */
   public void delete(final ClientListener s) {

@@ -7,7 +7,7 @@ import org.basex.core.BaseXException;
 /**
  * This class parses command-line arguments.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Args {

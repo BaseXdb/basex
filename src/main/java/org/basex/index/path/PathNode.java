@@ -17,7 +17,7 @@ import org.basex.util.list.ObjList;
 /**
  * This class represents a node of the path summary.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */

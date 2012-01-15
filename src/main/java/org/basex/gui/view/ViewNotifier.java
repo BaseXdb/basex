@@ -17,7 +17,7 @@ import org.basex.util.Util;
  * This class serves as a container for all existing views. The observer pattern
  * is used to inform all views on user interactions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ViewNotifier {

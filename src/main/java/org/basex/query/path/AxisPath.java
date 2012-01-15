@@ -30,7 +30,7 @@ import org.basex.util.list.ObjList;
 /**
  * Axis path expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class AxisPath extends Path {

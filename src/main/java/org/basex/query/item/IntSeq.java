@@ -16,7 +16,7 @@ import org.basex.util.Util;
 /**
  * Sequence of {@link Int Integers}, containing at least two of them.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public final class IntSeq extends Seq {

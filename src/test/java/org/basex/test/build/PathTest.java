@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * Tests queries with path in it on collections.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 public final class PathTest {

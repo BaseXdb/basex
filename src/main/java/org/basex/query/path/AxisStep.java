@@ -33,7 +33,7 @@ import org.basex.util.list.ObjList;
 /**
  * Location Step expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class AxisStep extends Preds {

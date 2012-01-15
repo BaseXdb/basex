@@ -18,7 +18,7 @@ import org.basex.gui.view.ViewNotifier;
 /**
  * This view allows the input of database queries.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ExploreView extends View {

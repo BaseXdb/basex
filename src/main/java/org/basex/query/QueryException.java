@@ -16,7 +16,7 @@ import org.basex.util.list.StringList;
 /**
  * This class indicates exceptions during the parsing or evaluation of a query.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class QueryException extends Exception {

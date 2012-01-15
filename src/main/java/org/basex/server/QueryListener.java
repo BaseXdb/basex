@@ -23,7 +23,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Server-side query session in the client-server architecture.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

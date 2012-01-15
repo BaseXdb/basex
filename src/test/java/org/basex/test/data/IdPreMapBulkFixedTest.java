@@ -5,7 +5,7 @@ import org.junit.Test;
 
 /**
  * Fixed ID -> PRE mapping tests.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
 public final class IdPreMapBulkFixedTest extends IdPreMapBulkTestBase {

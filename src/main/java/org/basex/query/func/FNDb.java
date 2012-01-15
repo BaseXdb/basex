@@ -60,7 +60,7 @@ import org.basex.util.list.TokenList;
 /**
  * Database functions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Dimitar Popov
  */
@@ -385,7 +385,7 @@ public final class FNDb extends FuncCall {
     } else {
       final byte[] tp = checkStr(expr[1], ctx);
       final CmdIndexInfo cmd = InfoIndex.info(string(tp));
-      if(cmd == null) NOIDX.thrw(input, this);
+      if(cmd == null) NOINDEX.thrw(input, data.meta.name, this);
       info = InfoIndex.info(cmd, data);
     }
     return Str.get(Token.delete(info, '\r'));

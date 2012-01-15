@@ -7,7 +7,7 @@ import org.basex.util.InputInfo;
 /**
  * Insert into and insert into as last primitive.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class InsertInto extends InsertBase {

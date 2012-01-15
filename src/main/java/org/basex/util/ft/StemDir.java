@@ -8,7 +8,7 @@ import org.basex.util.hash.TokenMap;
 /**
  * Simple stemming directory for full-text requests.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class StemDir extends TokenMap {

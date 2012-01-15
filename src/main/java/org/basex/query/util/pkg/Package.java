@@ -10,7 +10,7 @@ import org.basex.util.list.ObjList;
 /**
  * Package.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class Package {
@@ -57,7 +57,7 @@ public final class Package {
 
   /**
    * Package dependency.
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Rositsa Shadura
    */
   public static final class Dependency {
@@ -87,7 +87,7 @@ public final class Package {
 
   /**
    * Package component.
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Rositsa Shadura
    */
   public static final class Component {

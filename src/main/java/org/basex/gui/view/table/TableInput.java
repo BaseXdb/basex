@@ -12,7 +12,7 @@ import org.basex.util.Performance;
 /**
  * This class allows simple text input for the table headers.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class TableInput implements Runnable {

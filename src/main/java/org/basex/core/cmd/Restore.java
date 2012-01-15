@@ -18,7 +18,7 @@ import org.basex.util.list.StringList;
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Restore extends Command {

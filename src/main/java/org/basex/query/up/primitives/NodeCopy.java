@@ -18,7 +18,7 @@ import org.basex.util.list.ObjList;
 /**
  * Abstract update primitive which holds a copy of nodes to be inserted.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public abstract class NodeCopy extends StructuralUpdate {

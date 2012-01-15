@@ -23,7 +23,7 @@ import org.basex.util.Token;
 /**
  * Project specific button implementation.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class BaseXButton extends JButton {

@@ -19,7 +19,7 @@ import org.basex.util.Util;
 /**
  * Update primitive for the fn:put() function.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class Put extends UpdatePrimitive {

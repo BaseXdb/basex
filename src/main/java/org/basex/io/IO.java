@@ -13,7 +13,7 @@ import org.xml.sax.InputSource;
  * be a local file ({@link IOFile}), a URL ({@link IOUrl}) or a byte array
  * ({@link IOContent}).
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class IO {

@@ -32,7 +32,7 @@ import org.basex.util.list.ByteList;
 /**
  * Server-side client session in the client-server architecture.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

@@ -37,7 +37,7 @@ import static org.basex.util.Token.*;
  * This class provides a text viewer and editor, using the
  * {@link BaseXTextRenderer} class to render the text.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class BaseXEditor extends BaseXPanel {

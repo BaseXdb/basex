@@ -20,7 +20,7 @@ import org.basex.util.list.ObjList;
  * Abstract predicate expression, implemented by {@link Filter} and
  * {@link AxisStep}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Preds extends ParseExpr {

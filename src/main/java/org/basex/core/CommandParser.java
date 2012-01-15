@@ -84,7 +84,7 @@ import org.basex.util.list.StringList;
  * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class CommandParser extends InputParser {

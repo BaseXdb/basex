@@ -25,7 +25,7 @@ import org.basex.util.list.StringList;
 /**
  * Dialog window for inserting new database nodes.
 
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class DialogInsert extends Dialog {

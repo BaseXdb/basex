@@ -6,7 +6,7 @@ import org.basex.gui.GUIConstants;
 /**
  * This class defines syntax highlighting for JSON files.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class JSONSyntax extends BaseXSyntax {

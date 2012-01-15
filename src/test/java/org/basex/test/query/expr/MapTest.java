@@ -7,7 +7,7 @@ import org.junit.Test;
 /**
  * Tests for XQuery Maps.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public final class MapTest extends AdvancedQueryTest {

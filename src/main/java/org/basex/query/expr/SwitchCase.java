@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * Single case of a switch expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class SwitchCase extends Arr {

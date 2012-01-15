@@ -11,7 +11,7 @@ import org.basex.util.list.StringList;
  * This class contains properties which are used in the GUI.
  * They are also stored in the project's home directory.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class GUIProp extends AProp {

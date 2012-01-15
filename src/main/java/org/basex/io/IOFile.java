@@ -23,7 +23,7 @@ import org.xml.sax.InputSource;
 /**
  * {@link IO} reference, representing a local file or directory path.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class IOFile extends IO {

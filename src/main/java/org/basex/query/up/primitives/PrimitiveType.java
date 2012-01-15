@@ -63,7 +63,7 @@ import org.basex.data.Data;
  * S  insert before            P
  * </pre>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public enum PrimitiveType {

@@ -14,7 +14,7 @@ import org.junit.Test;
 /**
  * Admin stress test.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
 public final class AdminStressTest {

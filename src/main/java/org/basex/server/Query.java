@@ -16,7 +16,7 @@ import org.basex.util.list.TokenList;
  * stream that has been specified via the constructor or via
  * {@link Session#setOutputStream(java.io.OutputStream)}.</p>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Query {

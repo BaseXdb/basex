@@ -18,7 +18,7 @@ import org.basex.util.InputInfo;
 /**
  * For clause.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class For extends ForLet {

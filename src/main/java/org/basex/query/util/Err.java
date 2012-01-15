@@ -19,12 +19,12 @@ import org.basex.util.Token;
 /**
  * This class contains all query error messages.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public enum Err {
   /** BASX0001: Evaluation exception. */
-  NOIDX(BASX, 1, "Unknown index '%'."),
+  NOINDEX(BASX, 1, "Database '%' has no % index."),
   /** BASX0002: Evaluation exception. */
   NODBCTX(BASX, 2, "%: database context needed."),
   /** BASX0003: Evaluation exception. */
@@ -67,8 +67,6 @@ public enum Err {
   LOCK(BASX, 20, "Database '%' cannot be flagged as 'updating'."),
   /** BASX0020: Evaluation exception. */
   UNLOCK(BASX, 20, "The 'updating' flag of '%' could not be reset."),
-  /** BASX0021: Evaluation exception. */
-  NOINDEX(BASX, 21, "Database '%' has no % index."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -927,7 +925,7 @@ public enum Err {
   /**
    * Error types.
    *
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Leo Woerteler
    */
   public static enum ErrType {

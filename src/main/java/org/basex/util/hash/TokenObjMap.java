@@ -7,7 +7,7 @@ import java.util.Arrays;
  * extending the {@link TokenSet hash set}.
  * @param <E> generic value type
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class TokenObjMap<E> extends TokenSet {

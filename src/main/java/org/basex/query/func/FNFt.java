@@ -31,7 +31,7 @@ import org.basex.util.list.IntList;
 /**
  * Full-text functions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FNFt extends FuncCall {
@@ -187,7 +187,7 @@ public final class FNFt extends FuncCall {
       final FuncCall fun, final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    if(!data.meta.ftxtindex) NOIDX.thrw(fun.input, fun);
+    if(!data.meta.ftxtindex) NOINDEX.thrw(fun.input, data.meta.name, fun);
 
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = new FTOpt().copy(data.meta);

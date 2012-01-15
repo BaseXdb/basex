@@ -11,7 +11,7 @@ import org.basex.io.out.ArrayOutput;
  * This class defines all methods for iteratively evaluating queries locally.
  * All data is interpreted by the {@link QueryListener}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

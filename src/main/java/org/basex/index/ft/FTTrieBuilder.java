@@ -22,7 +22,7 @@ import org.basex.util.list.TokenList;
  *
  * <p>The file structure is specified in the {@link FTTrie} class.</p>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Sebastian Gath
  * @author Christian Gruen
  */

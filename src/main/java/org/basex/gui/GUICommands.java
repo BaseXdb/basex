@@ -60,7 +60,7 @@ import org.basex.util.list.StringList;
  * This enumeration encapsulates all commands that are triggered by
  * GUI operations.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public enum GUICommands implements GUICommand {

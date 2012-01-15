@@ -8,7 +8,7 @@ import org.basex.io.in.DataInput;
 /**
  * This class provides data for merging temporary value indexes.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class ValueMerger {

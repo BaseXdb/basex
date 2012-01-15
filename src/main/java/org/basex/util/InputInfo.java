@@ -5,7 +5,7 @@ import org.basex.io.IO;
 /**
  * Input information.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class InputInfo {

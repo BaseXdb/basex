@@ -8,7 +8,7 @@ import org.basex.util.Util;
 /**
  * Expression information, used for debugging and logging.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class ExprInfo {

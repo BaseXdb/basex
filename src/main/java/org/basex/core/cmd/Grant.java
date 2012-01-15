@@ -12,7 +12,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'grant' command and grants permissions to users.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Grant extends AUser {

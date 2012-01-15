@@ -7,7 +7,7 @@ import org.basex.util.list.ByteList;
 /**
  * This class provides functions for encoding and decoding Base64 strings.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Base64 {

@@ -16,7 +16,7 @@ import org.basex.util.list.TokenList;
 
 /**
  * Evaluates the 'repo list' command.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class RepoList extends Command {

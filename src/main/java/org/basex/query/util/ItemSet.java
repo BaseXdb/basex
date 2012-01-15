@@ -11,7 +11,7 @@ import org.basex.util.Util;
 /**
  * Set for quickly indexing items.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ItemSet implements Iterable<Item> {

@@ -13,7 +13,7 @@ import org.basex.util.list.TokenList;
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {

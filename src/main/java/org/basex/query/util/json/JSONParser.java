@@ -11,7 +11,7 @@ import org.basex.util.Util;
 /**
  * <p>This class converts a JSON document to a tree representation.</p>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class JSONParser extends InputParser {

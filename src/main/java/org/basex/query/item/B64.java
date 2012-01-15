@@ -10,7 +10,7 @@ import org.basex.util.Util;
 /**
  * Base64 item.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class B64 extends Bin {

@@ -8,7 +8,7 @@ import org.basex.util.Util;
 /**
  * This is a simple container for native integer arrays.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class IntArrayList extends ElementList implements Iterable<int[]> {

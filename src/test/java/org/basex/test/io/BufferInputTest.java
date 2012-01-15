@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  * Test class for the BufferInput method.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BufferInputTest {

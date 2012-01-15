@@ -16,7 +16,7 @@ import org.basex.util.InputInfo;
 /**
  * Delete expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class Delete extends Update {

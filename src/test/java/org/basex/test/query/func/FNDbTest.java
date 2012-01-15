@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery database functions prefixed with "db".
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FNDbTest extends AdvancedQueryTest {
@@ -144,7 +144,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     check(_DB_FULLTEXT);
     // run function without and with index
     new DropIndex("fulltext").execute(CONTEXT);
-    error(_DB_FULLTEXT.args(DB, "assignments"), Err.NOIDX);
+    error(_DB_FULLTEXT.args(DB, "assignments"), Err.NOINDEX);
     new CreateIndex("fulltext").execute(CONTEXT);
     query(_DB_FULLTEXT.args(DB, "assignments"), "Assignments");
     query(_DB_FULLTEXT.args(DB, "XXX"), "");
@@ -197,7 +197,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     // check name indexes
     query(_DB_INFO.args(DB, "tag"));
     query(_DB_INFO.args(DB, "attname"));
-    error(_DB_INFO.args(DB, "XXX"), Err.NOIDX);
+    error(_DB_INFO.args(DB, "XXX"), Err.NOINDEX);
   }
 
   /**

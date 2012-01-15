@@ -41,7 +41,7 @@ import org.basex.util.list.StringList;
 /**
  * Dialog window for displaying information about the server.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 public final class DialogServer extends Dialog {

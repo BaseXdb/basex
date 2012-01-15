@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  * Namespace mappings for function prefixes and URIs are specified in the
  * static code in the {@code NSGlobal} class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public enum Function {

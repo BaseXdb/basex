@@ -12,7 +12,7 @@ import java.util.Locale;
  * <p>Note that, to guarantee a consistent string representation, all string
  * conversions should be done via the methods of this class.</p>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Token {

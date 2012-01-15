@@ -20,7 +20,7 @@ import org.basex.util.Util;
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class CreateBackup extends Command {

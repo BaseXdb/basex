@@ -6,7 +6,7 @@ import org.basex.util.list.ObjList;
 
 /**
  * Container for parsed data from <http:request/>.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class Request {
@@ -25,7 +25,7 @@ public final class Request {
 
   /**
    * Container for parsed data from <part/> element.
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Rositsa Shadura
    */
   public static class Part {

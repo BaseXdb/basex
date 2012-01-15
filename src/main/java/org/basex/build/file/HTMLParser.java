@@ -24,7 +24,7 @@ import org.xml.sax.XMLReader;
  * TagSoup was written by John Cowan and is based on the Apache 2.0 License:
  * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class HTMLParser extends XMLParser {

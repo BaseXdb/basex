@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
 /**
  * Stable order specifier.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class OrderByStable extends OrderBy {

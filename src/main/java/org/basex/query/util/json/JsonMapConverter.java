@@ -28,7 +28,7 @@ import org.basex.util.list.TokenList;
  *   <dd>an XQuery map (e.g.
  *     <code>map{'foo':=42, 'bar':=()}</code>)
  * </dl>
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public final class JsonMapConverter {

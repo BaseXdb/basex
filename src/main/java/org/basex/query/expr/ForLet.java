@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * Abstract For/Let Clause.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class ForLet extends Single {

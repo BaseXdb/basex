@@ -17,7 +17,7 @@ import org.basex.util.ft.FTUnit;
 /**
  * FTWindow expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FTWindow extends FTFilter {

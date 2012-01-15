@@ -18,7 +18,7 @@ import org.basex.util.list.TokenList;
 /**
  * Evaluates the 'show backups' command and shows available backups.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ShowBackups extends Command {

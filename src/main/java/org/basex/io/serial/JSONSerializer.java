@@ -21,7 +21,7 @@ import org.basex.util.list.TokenList;
  * This class serializes data as JSON. The input must conform to the rules
  * defined in the {@link JSONConverter} class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class JSONSerializer extends OutputSerializer {

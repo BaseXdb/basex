@@ -19,7 +19,7 @@ import org.basex.util.list.IntList;
 /**
  * Abstract class for formatting data in different languages.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Formatter extends FormatUtil {

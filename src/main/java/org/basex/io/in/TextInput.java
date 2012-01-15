@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
  * This class provides a convenient access to text input.
  * The input encoding will be guessed by analyzing the first bytes.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class TextInput extends InputStream {

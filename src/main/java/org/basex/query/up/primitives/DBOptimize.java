@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
 /**
  * Update primitive for the optimize function.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
 public final class DBOptimize extends UpdatePrimitive {

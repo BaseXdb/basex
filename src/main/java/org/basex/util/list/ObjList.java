@@ -10,7 +10,7 @@ import org.basex.util.Util;
  * This is an abstract class for storing objects in an array-based list.
  * @param <E> generic value type
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ObjList<E> extends ElementList

@@ -15,7 +15,7 @@ import org.basex.util.Array;
  * Container for all information needed to determine whether an index is
  * accessible or not.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

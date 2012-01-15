@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * Replace node primitive.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class ReplaceNode extends NodeCopy {

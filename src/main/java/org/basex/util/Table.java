@@ -16,7 +16,7 @@ import org.basex.util.list.TokenList;
  * It should be guaranteed that the {@link #header} object has the
  * same number of entries as all {@link #contents} string arrays.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Table {

@@ -28,7 +28,7 @@ import org.basex.util.Util;
 /**
  * Abstract class for database queries.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 abstract class AQuery extends Command {

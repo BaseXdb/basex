@@ -28,7 +28,7 @@ import org.basex.util.list.IntList;
 /**
  * This class offers a real tree view.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View implements TreeConstants {

@@ -16,7 +16,7 @@ import org.basex.data.MetaData;
 /**
  * Evaluates the 'drop database' command and deletes a database.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class DropDB extends Command {

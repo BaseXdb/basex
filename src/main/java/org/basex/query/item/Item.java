@@ -19,7 +19,7 @@ import org.basex.util.Util;
 /**
  * Abstract item.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
@@ -280,7 +280,7 @@ public abstract class Item extends Value {
 
   /**
    * Item iterator.
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Christian Gruen
    */
   private static final class ItemIter extends ValueIter {
