@@ -16,7 +16,7 @@ import org.basex.util.Util;
 /**
  * Java XQuery API - Data Source.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BXQDataSource implements XQDataSource {

@@ -3,7 +3,7 @@
 '
 ' Documentation: http://docs.basex.org/wiki/Clients
 '
-' (C) BaseX Team 2005-11, BSD License
+' (C) BaseX Team 2005-12, BSD License
 
 Imports System
 Imports System.Diagnostics

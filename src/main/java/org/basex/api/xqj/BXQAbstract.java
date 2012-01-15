@@ -35,7 +35,7 @@ import org.xml.sax.XMLReader;
 /**
  * Java XQuery API - Abstract objects.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 abstract class BXQAbstract {

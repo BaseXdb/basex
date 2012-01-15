@@ -15,7 +15,7 @@ import com.bradmcevoy.http.exceptions.BadRequestException;
 /**
  * WebDAV resource representing the list of all databases.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  * @author Dimitar Popov
  */

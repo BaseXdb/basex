@@ -19,7 +19,7 @@ import org.basex.util.Util;
 /**
  * REST-based evaluation of XQuery files.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class RESTRun extends RESTQuery {

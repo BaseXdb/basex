@@ -15,7 +15,7 @@ import org.basex.util.Token;
 /**
  * Java XQuery API - Connection.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class BXQConnection extends BXQDataFactory implements XQConnection {

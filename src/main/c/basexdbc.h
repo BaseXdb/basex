@@ -1,7 +1,7 @@
 /**
  * basexdbc.h : communicate with BaseX database server
  *
- * Copyright (c) 2011, Alexander Holupirek <alex@holupirek.de>, ISC license
+ * Copyright (c) 2005-12, Alexander Holupirek <alex@holupirek.de>, BSD license
  */
 
 /* Connect to BaseX server and open session. Returns socket file descriptor. */

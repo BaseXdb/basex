@@ -37,7 +37,7 @@ import org.w3c.dom.ls.LSOutput;
 /**
  * Java XQuery API - Data Factory.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 class BXQDataFactory extends BXQAbstract implements XQDataFactory {

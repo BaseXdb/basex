@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 -- |
 -- Module      : Example
--- Copyright   : (C) BaseX Team 2005-11
+-- Copyright   : (C) BaseX Team 2005-12
 -- License     : BSD
 --
 -- Maintainer  : leo@woerteler.de

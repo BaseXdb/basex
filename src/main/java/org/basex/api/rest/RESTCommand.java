@@ -9,7 +9,7 @@ import org.basex.server.Session;
 /**
  * REST-based evaluation of database commands.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class RESTCommand extends RESTCode {

@@ -8,7 +8,7 @@ import java.io.InputStream;
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class AddExample {
   /** Hidden default constructor. */

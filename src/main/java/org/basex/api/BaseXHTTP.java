@@ -33,7 +33,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 /**
  * This is the main class for the starting the database HTTP services.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BaseXHTTP {

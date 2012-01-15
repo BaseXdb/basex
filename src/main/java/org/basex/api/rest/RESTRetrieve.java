@@ -24,7 +24,7 @@ import org.basex.util.list.TokenList;
 /**
  * This class retrieves resources.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class RESTRetrieve extends RESTQuery {

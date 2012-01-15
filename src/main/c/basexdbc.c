@@ -1,7 +1,7 @@
 /**
  * basexdbc.c : communicate with BaseX database server
  *
- * Copyright (c) 2011, Alexander Holupirek <alex@holupirek.de>, ISC license
+ * Copyright (c) 2005-12, Alexander Holupirek <alex@holupirek.de>, BSD license
  */
 #include <assert.h>
 #include <err.h>

@@ -1,6 +1,6 @@
 BASEX DATABASE CLIENT FOR C ====================================================
 
-Connect to running BaseX database server (www.basex.org) from C code.
+Connect to running BaseX database server (basex.org) from C code.
 
 Compile dependencies:
 	openssl
@@ -19,7 +19,7 @@ Cleanup:
 	# make clean-all  (removes 'make install'ed files as well)
 
 License:
-	Copyright (c) 2011, Alexander Holupirek <alex@holupirek.de>, ISC license
+	Copyright (c) 2005-12, Alexander Holupirek <alex@holupirek.de>, BSD license
 
 Bug reports:
 	https://github.com/holu/basexdbc/issues

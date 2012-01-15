@@ -66,7 +66,7 @@ import org.junit.Test;
 /**
  * This class tests the server-based HTTP Client.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public class HTTPClientTest {
@@ -277,7 +277,7 @@ public class HTTPClientTest {
     // Simple HTTP request with no errors
     final byte[] req = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "method='POST' href='http://www.basex.org'>"
+        + "method='POST' href='http://basex.org'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:body media-type='text/xml'>" + "Test body content"
@@ -303,7 +303,7 @@ public class HTTPClientTest {
   public void parseMultipartReq() throws IOException, QueryException {
     final byte[] multiReq = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "method='POST' href='http://www.basex.org'>"
+        + "method='POST' href='http://basex.org'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:multipart media-type='multipart/mixed' boundary='xxxx'>"
@@ -357,7 +357,7 @@ public class HTTPClientTest {
   public void parseMultipartReqBodies() throws IOException, QueryException {
     final byte[] multiReq = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "method='POST' href='http://www.basex.org'>"
+        + "method='POST' href='http://basex.org'>"
         + "<http:header name='hdr1' value='hdr1val'/>"
         + "<http:header name='hdr2' value='hdr2val'/>"
         + "<http:multipart media-type='multipart/mixed' boundary='xxxx'>"
@@ -418,41 +418,41 @@ public class HTTPClientTest {
     // Request without method
     final byte[] falseReq1 = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "href='http://www.basex.org'/>");
+        + "href='http://basex.org'/>");
     falseReqs.add(falseReq1);
 
     // Request with send-authorization and no credentials
     final byte[] falseReq2 = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "method='GET' href='http://www.basex.org' "
+        + "method='GET' href='http://basex.org' "
         + "send-authorization='true'/>");
     falseReqs.add(falseReq2);
 
     // Request with send-authorization and only username
     final byte[] falseReq3 = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "method='GET' href='http://www.basex.org' "
+        + "method='GET' href='http://basex.org' "
         + "send-authorization='true' username='test'/>");
     falseReqs.add(falseReq3);
 
     // Request with body that has no media-type
     final byte[] falseReq4 = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "method='POST' href='http://www.basex.org'>" + "<http:body>"
+        + "method='POST' href='http://basex.org'>" + "<http:body>"
         + "</http:body>" + "</http:request>");
     falseReqs.add(falseReq4);
 
     // Request with multipart that has no media-type
     final byte[] falseReq5 = token("<http:request method='POST' "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "href='http://www.basex.org'>" + "<http:multipart boundary='xxx'>"
+        + "href='http://basex.org'>" + "<http:multipart boundary='xxx'>"
         + "</http:multipart>" + "</http:request>");
     falseReqs.add(falseReq5);
 
     // Request with multipart with part that has a body without media-type
     final byte[] falseReq6 = token("<http:request method='POST' "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "href='http://www.basex.org'>" + "<http:multipart boundary='xxx'>"
+        + "href='http://basex.org'>" + "<http:multipart boundary='xxx'>"
         + "<part>" + "<http:header name='hdr1' value-='val1'/>"
         + "<http:body media-type='text/plain'>" + "Part1" + "</http:body>"
         + "</part>" + "<part>" + "<http:header name='hdr1' value-='val1'/>"
@@ -463,13 +463,13 @@ public class HTTPClientTest {
     // Request with schema different from http
     final byte[] falseReq7 = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "href='ftp://www.basex.org'/>");
+        + "href='ftp://basex.org'/>");
     falseReqs.add(falseReq7);
 
     // Request with content and method which must be empty
     final byte[] falseReq8 = token("<http:request "
         + "xmlns:http=\"http://expath.org/ns/http\" "
-        + "method='DELETE' href='http://www.basex.org'>"
+        + "method='DELETE' href='http://basex.org'>"
         + "<http:body media-type='text/plain'>" + "</http:body>"
         + "</http:request>");
     falseReqs.add(falseReq8);
@@ -912,7 +912,7 @@ public class HTTPClientTest {
 
 /**
  * Fake HTTP connection.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 final class FakeHttpConnection extends HttpURLConnection {

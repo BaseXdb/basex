@@ -25,7 +25,7 @@ import org.basex.util.Util;
 /**
  * REST-based evaluation of XQuery expressions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 class RESTQuery extends RESTCode {

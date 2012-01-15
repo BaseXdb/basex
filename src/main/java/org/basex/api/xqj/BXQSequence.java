@@ -33,7 +33,7 @@ import org.xml.sax.ContentHandler;
 /**
  * Java XQuery API - Result Sequence.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class BXQSequence extends BXQAbstract implements XQResultSequence {

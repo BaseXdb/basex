@@ -5,7 +5,7 @@ import org.basex.util.Util;
 /**
  * REST exception. Also thrown to pass on correct status codes.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class RESTException extends Exception {

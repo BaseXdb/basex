@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This class processes GET requests sent to the REST server.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class RESTGet extends RESTCode {
