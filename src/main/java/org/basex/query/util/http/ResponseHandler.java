@@ -224,18 +224,17 @@ public final class ResponseHandler {
    * @param p payload
    * @param c content type
    * @return interpreted payload
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
    */
-  private Item interpretPayload(final byte[] p, final String c)
-      throws IOException, QueryException {
-
-    if(MimeTypes.isXML(c)) {
-      return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
-    }
-    if(c.equals(MimeTypes.TEXT_HTML)) {
-      if(!HTMLParser.available()) throw HTMLERR.thrw(input);
-      return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
+  private Item interpretPayload(final byte[] p, final String c) {
+    try {
+      if(MimeTypes.isXML(c)) {
+        return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
+      }
+      if(c.equals(MimeTypes.TEXT_HTML)) {
+        return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
+      }
+    } catch(final IOException ex) {
+      return new B64(p);
     }
     return c.startsWith(MimeTypes.MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
   }
@@ -284,11 +283,10 @@ public final class ResponseHandler {
    * @param end closing boundary
    * @return part
    * @throws IOException I/O Exception
-   * @throws QueryException query exception
    */
   private FElem extractNextPart(final InputStream io, final boolean status,
       final ItemCache payloads, final byte[] sep, final byte[] end)
-          throws IOException, QueryException {
+          throws IOException {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)

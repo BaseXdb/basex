@@ -133,7 +133,13 @@ public final class RequestParser {
    */
   private static ANode parseHdrs(final AxisMoreIter i, final TokenMap hdrs) {
     ANode n = null;
-    while((n = i.next()) != null && eq(n.name(), HDR)) {
+    while(true) {
+      n = i.next();
+      if(n == null) break;
+      final byte[] nm = n.name();
+      if(nm == null) continue;
+      if(!eq(nm, HDR)) break;
+
       final AxisIter hdrAttrs = n.attributes();
       byte[] name = null;
       byte[] value = null;

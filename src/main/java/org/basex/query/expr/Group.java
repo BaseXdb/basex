@@ -73,6 +73,7 @@ public final class Group extends ParseExpr {
 
   @Override
   public int count(final Var v) {
+    // non-grouping variables must be counted here (not in the return clause)
     int c = 0;
     for(final Var g : groupby) c += g.count(v);
     for(final Var g : nongroup[0]) c += g.count(v);
