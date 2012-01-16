@@ -11,7 +11,7 @@ import org.basex.util.Performance;
  * This is a scrollbar implementation, supporting arbitrary
  * panel heights without increasing the memory consumption.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BaseXBar extends BaseXPanel {

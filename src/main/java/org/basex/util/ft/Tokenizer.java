@@ -6,7 +6,7 @@ import java.util.LinkedList;
 /**
  * Abstract tokenizer.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
 public abstract class Tokenizer extends LanguageImpl {

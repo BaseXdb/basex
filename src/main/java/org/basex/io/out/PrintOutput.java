@@ -12,7 +12,7 @@ import org.basex.util.Token;
  * byte representation (usually UTF8) will be directly output without
  * further character conversion.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {

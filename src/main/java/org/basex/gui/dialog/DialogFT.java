@@ -23,7 +23,7 @@ import org.basex.util.list.StringList;
 /**
  * Full-text creation dialog.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class DialogFT extends BaseXBack {

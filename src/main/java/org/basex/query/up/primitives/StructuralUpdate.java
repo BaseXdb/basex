@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
  * Base class for all update primitives that lead to structural changes /
  * pre value shifts on the database table.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public abstract class StructuralUpdate extends UpdatePrimitive {

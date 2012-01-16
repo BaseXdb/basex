@@ -10,7 +10,7 @@ import java.util.HashMap;
  * This class assembles some reflection methods. If exceptions occur, a
  * {@code null} reference is returned or a runtime exception is thrown.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Reflect {

@@ -33,7 +33,7 @@ import org.basex.util.list.ObjList;
 /**
  * Location Step expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class AxisStep extends Preds {
@@ -216,7 +216,7 @@ public class AxisStep extends Preds {
       if(axis == Axis.DESC || axis == Axis.DESCORSELF) {
         add(n, nodes, name, kind);
       }
-      if(kind == -1 && (n.kind != Data.ATTR ^ axis == Axis.ATTR) ||
+      if(kind == -1 && n.kind != Data.ATTR ^ axis == Axis.ATTR ||
          kind == n.kind && (name == 0 || name == n.name)) {
         if(!nodes.contains(n)) nodes.add(n);
       }

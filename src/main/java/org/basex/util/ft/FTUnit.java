@@ -5,7 +5,7 @@ import java.util.Locale;
 /**
  * Full-text units.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public enum FTUnit {

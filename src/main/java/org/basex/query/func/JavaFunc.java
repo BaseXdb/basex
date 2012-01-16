@@ -24,14 +24,17 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
+import org.basex.query.item.Bln;
+import org.basex.query.item.Dbl;
 import org.basex.query.item.Empty;
+import org.basex.query.item.Flt;
 import org.basex.query.item.FuncType;
+import org.basex.query.item.Int;
 import org.basex.query.item.Jav;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
@@ -45,7 +48,7 @@ import org.w3c.dom.Text;
 /**
  * Java function binding.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class JavaFunc extends Arr {
@@ -89,22 +92,48 @@ public final class JavaFunc extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public Value value(final QueryContext ctx) throws QueryException {
     final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
       arg[a] = expr[a].value(ctx);
       if(arg[a].isEmpty()) XPEMPTY.thrw(input, description());
     }
 
-    Object result = null;
+    Object res = null;
     try {
-      result = mth.equals(NEW) ? constructor(arg) : method(arg);
+      res = mth.equals(NEW) ? constructor(arg) : method(arg);
     } catch(final InvocationTargetException ex) {
       JAVAERR.thrw(input, ex.getCause());
     } catch(final Exception ex) {
       FUNJAVA.thrw(input, description(), arg);
     }
-    return result == null ? Empty.ITER : iter(result);
+    if(res == null) return Empty.SEQ;
+    if(res instanceof Value) return (Value) res;
+    if(!res.getClass().isArray()) return new Jav(res);
+
+    final ItemCache ic = new ItemCache();
+    if(res instanceof boolean[]) {
+      for(final boolean o : (boolean[]) res) ic.add(Bln.get(o));
+    } else if(res instanceof char[]) {
+      for(final char o : (char[]) res) ic.add(Int.get(o));
+    } else if(res instanceof byte[]) {
+      for(final byte o : (byte[]) res) ic.add(Int.get(o));
+    } else if(res instanceof short[]) {
+      for(final short o : (short[]) res) ic.add(Int.get(o));
+    } else if(res instanceof int[]) {
+      for(final int o : (int[]) res) ic.add(Int.get(o));
+    } else if(res instanceof long[]) {
+      for(final long o : (long[]) res) ic.add(Int.get(o));
+    } else if(res instanceof float[]) {
+      for(final float o : (float[]) res) ic.add(Flt.get(o));
+    } else if(res instanceof double[]) {
+      for(final double o : (double[]) res) ic.add(Dbl.get(o));
+    } else {
+      for(final Object o : (Object[]) res) {
+        ic.add(o instanceof Value ? (Value) o : new Jav(o));
+      }
+    }
+    return ic.value();
   }
 
   /**
@@ -242,37 +271,6 @@ public final class JavaFunc extends Arr {
       if(type == GDAY) return AtomType.DAY;
     }
     return AtomType.JAVA;
-  }
-
-  /**
-   * Converts the specified object to an iterator.
-   * @param res object
-   * @return iterator
-   */
-  private Iter iter(final Object res) {
-    if(!res.getClass().isArray()) return new Jav(res).iter();
-
-    final ItemCache ic = new ItemCache();
-    if(res instanceof boolean[]) {
-      for(final Object o : (boolean[]) res) ic.add(new Jav(o));
-    } else if(res instanceof char[]) {
-      for(final Object o : (char[]) res) ic.add(new Jav(o));
-    } else if(res instanceof byte[]) {
-      for(final Object o : (byte[]) res) ic.add(new Jav(o));
-    } else if(res instanceof short[]) {
-      for(final Object o : (short[]) res) ic.add(new Jav(o));
-    } else if(res instanceof int[]) {
-      for(final Object o : (int[]) res) ic.add(new Jav(o));
-    } else if(res instanceof long[]) {
-      for(final Object o : (long[]) res) ic.add(new Jav(o));
-    } else if(res instanceof float[]) {
-      for(final Object o : (float[]) res) ic.add(new Jav(o));
-    } else if(res instanceof double[]) {
-      for(final Object o : (double[]) res) ic.add(new Jav(o));
-    } else {
-      for(final Object o : (Object[]) res) ic.add(new Jav(o));
-    }
-    return ic;
   }
 
   @Override

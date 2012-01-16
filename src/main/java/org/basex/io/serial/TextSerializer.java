@@ -6,7 +6,7 @@ import java.io.OutputStream;
 /**
  * This class serializes data as text.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class TextSerializer extends OutputSerializer {
@@ -42,5 +42,10 @@ public class TextSerializer extends OutputSerializer {
 
   @Override
   protected void finishClose() throws IOException {
+  }
+
+  @Override
+  protected void code(final int ch) throws IOException {
+    printChar(ch);
   }
 }

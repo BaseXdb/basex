@@ -17,7 +17,7 @@ import org.basex.util.list.StringList;
 /**
  * Evaluates the 'copy' command and creates a copy of a database.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 public final class Copy extends Command {

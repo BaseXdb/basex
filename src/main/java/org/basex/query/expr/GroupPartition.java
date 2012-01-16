@@ -17,7 +17,7 @@ import org.basex.util.list.ObjList;
 /**
  * Stores the grouping for a group by clause.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Michael Seiferle
  */
 final class GroupPartition {

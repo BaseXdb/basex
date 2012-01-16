@@ -23,7 +23,7 @@ import org.basex.query.util.json.JsonMapConverter;
 /**
  * This class is an entry point for evaluating XQuery implementations.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Progress {

@@ -14,7 +14,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery index functions prefixed with "ix".
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 public final class FNIndexTest extends AdvancedQueryTest {
@@ -42,7 +42,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the indexFacets() function.
+   * Test method for the facets() function.
    */
   @Test
   public void indexFacets() {
@@ -57,5 +57,39 @@ public final class FNIndexTest extends AdvancedQueryTest {
     query(flat + "//element[@name='title']/@count/data()", 1);
     query(flat + "//element[@name='title']/@type/data()", "category");
     query(flat + "//element[@name='li']/@count/data()", 2);
+  }
+
+  /**
+   * Test method for the tests() function.
+   */
+  @Test
+  public void indexTexts() {
+    check(_INDEX_TEXTS);
+
+    String entries = _INDEX_TEXTS.args(DB);
+    query("count(" + entries + ")", 5);
+    query("exists(" + entries + "/self::value)", "true");
+    query(entries + "/@count = 1", "true");
+    query(entries + "/@count != 1", "false");
+
+    entries = _INDEX_TEXTS.args(DB, "X");
+    query("count(" + entries + ")", 1);
+  }
+
+  /**
+   * Test method for the tests() function.
+   */
+  @Test
+  public void indexAttributes() {
+    check(_INDEX_ATTRIBUTES);
+
+    String entries = _INDEX_ATTRIBUTES.args(DB);
+    query("count(" + entries + ")", 6);
+    query("exists(" + entries + "/self::value)", "true");
+    query(entries + "/@count = 1", "true");
+    query(entries + "/@count != 1", "false");
+
+    entries = _INDEX_ATTRIBUTES.args(DB, "1");
+    query("count(" + entries + ")", 1);
   }
 }

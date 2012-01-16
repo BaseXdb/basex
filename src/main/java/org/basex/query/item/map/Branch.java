@@ -11,7 +11,7 @@ import org.basex.util.InputInfo;
 /**
  * Inner node of a {@link Map}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 final class Branch extends TrieNode {

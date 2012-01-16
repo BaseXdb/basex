@@ -16,7 +16,7 @@ import org.basex.util.Util;
 /**
  * Implementation of the group by clause.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Michael Seiferle
  */
 public final class Group extends ParseExpr {
@@ -73,6 +73,7 @@ public final class Group extends ParseExpr {
 
   @Override
   public int count(final Var v) {
+    // non-grouping variables must be counted here (not in the return clause)
     int c = 0;
     for(final Var g : groupby) c += g.count(v);
     for(final Var g : nongroup[0]) c += g.count(v);

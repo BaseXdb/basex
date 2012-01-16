@@ -7,7 +7,7 @@ import org.basex.util.TokenBuilder;
  * This is an efficient hash map for tokens,
  * extending the {@link TokenSet hash set}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class TokenMap extends TokenSet {

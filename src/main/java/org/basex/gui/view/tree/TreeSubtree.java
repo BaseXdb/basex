@@ -6,7 +6,7 @@ import org.basex.data.Data;
 /**
  * This class stores the subtrees.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Wolfgang Miller
  */
 final class TreeSubtree {

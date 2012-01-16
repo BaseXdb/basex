@@ -24,7 +24,7 @@ import org.basex.util.list.IntList;
 /**
  * This class provides access to resources used by an XQuery expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  */
 public final class QueryResources {
   /** Database context. */

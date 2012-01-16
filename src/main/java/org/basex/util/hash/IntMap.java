@@ -9,7 +9,7 @@ import org.basex.util.Util;
  * This is an efficient hash map, extending the {@link IntSet hash set}.
  * @param <E> generic value type
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class IntMap<E> extends IntSet {

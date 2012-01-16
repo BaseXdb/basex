@@ -12,7 +12,7 @@ import org.junit.Test;
 /**
  * Tests for {@link WesternTokenizer}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
 public final class WesternTokenizerTest {

@@ -22,7 +22,7 @@ import org.junit.Test;
 /**
  * This class tests the correctness of the item types of the client API.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class ItemTypeTest {

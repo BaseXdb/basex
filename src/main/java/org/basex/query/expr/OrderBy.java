@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
 /**
  * Abstract container for order by clauses.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class OrderBy extends ParseExpr {

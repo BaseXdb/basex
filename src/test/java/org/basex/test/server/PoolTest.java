@@ -21,7 +21,7 @@ import org.junit.Test;
 /**
  * This class tests transaction and locking cases.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 public final class PoolTest {

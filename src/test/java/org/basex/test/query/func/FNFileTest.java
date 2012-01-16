@@ -17,7 +17,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the file library.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {
@@ -205,7 +205,7 @@ public final class FNFileTest extends AdvancedQueryTest {
 
     query(_FILE_WRITE.args(PATH1, "\"<a/>\"",
         serialParams("<method value='text'/>")));
-    query(_FILE_READ_TEXT.args(PATH1), "&amp;lt;a/&amp;gt;");
+    query(_FILE_READ_TEXT.args(PATH1), "&lt;a/&gt;");
     query(_FILE_DELETE.args(PATH1));
   }
 
@@ -231,7 +231,7 @@ public final class FNFileTest extends AdvancedQueryTest {
 
     query(_FILE_APPEND.args(PATH1, "\"<a/>\"",
         serialParams("<method value='text'/>")));
-    query(_FILE_READ_TEXT.args(PATH1), "&amp;lt;a/&amp;gt;");
+    query(_FILE_READ_TEXT.args(PATH1), "&lt;a/&gt;");
     query(_FILE_DELETE.args(PATH1));
   }
 

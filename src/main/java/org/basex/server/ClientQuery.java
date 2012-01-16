@@ -12,7 +12,7 @@ import org.basex.io.out.ArrayOutput;
  * client/server architecture. All sent data is received by the
  * {@link ClientListener} and interpreted by the {@link QueryListener}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class ClientQuery extends Query {

@@ -18,7 +18,7 @@ import org.basex.util.Atts;
 /**
  * This class defines a parser, which is used to create new databases instances.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Parser extends Progress {

@@ -41,7 +41,7 @@ import org.basex.util.list.ObjList;
  * This class assembles layout and paint methods which are frequently
  * used in the GUI.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BaseXLayout {
@@ -163,7 +163,7 @@ public final class BaseXLayout {
 
   /**
    * Drag and drop handler.
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Christian Gruen
    */
   public abstract static class DropHandler {

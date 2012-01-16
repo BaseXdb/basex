@@ -11,7 +11,7 @@ import org.basex.query.iter.NodeIter;
 /**
  * Iterative step expression with numeric predicates.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class IterPosStep extends AxisStep {

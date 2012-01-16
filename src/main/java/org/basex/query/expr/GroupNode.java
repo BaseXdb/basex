@@ -8,7 +8,7 @@ import org.basex.util.InputInfo;
 /**
  * GroupNode defines one valid partitioning setting.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Michael Seiferle
  */
 final class GroupNode {

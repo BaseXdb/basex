@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * This class tests the event API.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Roman Raedle
  * @author Andreas Weiler
  */

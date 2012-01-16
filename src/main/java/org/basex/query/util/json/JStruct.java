@@ -5,7 +5,7 @@ import org.basex.util.list.ObjList;
 /**
  * JSON structure.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 abstract class JStruct extends JValue {

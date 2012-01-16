@@ -8,7 +8,7 @@ import org.basex.util.Token;
  * Superclass for all numeric items.
  * It's useful for removing exceptions and unifying hash values.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 abstract class Num extends Item {

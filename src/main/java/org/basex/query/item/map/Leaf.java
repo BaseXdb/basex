@@ -13,7 +13,7 @@ import org.basex.util.InputInfo;
 /**
  * A single binding of a {@link Map}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 final class Leaf extends TrieNode {

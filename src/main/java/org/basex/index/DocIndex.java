@@ -12,6 +12,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.Util;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 
@@ -24,7 +25,7 @@ import org.basex.util.list.TokenList;
  * cases (e.g. when bulk insertions of new documents are performed). A tree
  * structure could be introduced to offer better general performance.</p>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class DocIndex implements Index {
@@ -268,7 +269,7 @@ public final class DocIndex implements Index {
   }
 
   @Override
-  public TokenList entries(final byte[] prefix) {
+  public TokenIntMap entries(final byte[] prefix) {
     throw Util.notexpected();
   }
 }

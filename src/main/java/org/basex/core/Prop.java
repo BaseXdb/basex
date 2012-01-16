@@ -8,7 +8,7 @@ import org.basex.util.Util;
 /**
  * This class assembles properties which are used all around the project.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Prop extends AProp {

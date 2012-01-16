@@ -16,7 +16,7 @@ import org.basex.util.list.TokenList;
  * tolerant alternative to Java's internal SAX parser, which is used by the
  * {@link SAXWrapper} class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class XMLParser extends SingleParser {

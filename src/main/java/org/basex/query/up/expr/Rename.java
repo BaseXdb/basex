@@ -25,7 +25,7 @@ import org.basex.util.Util;
 /**
  * Rename expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class Rename extends Update {

@@ -19,10 +19,12 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.item.map.Map;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -31,7 +33,7 @@ import org.basex.util.InputInfo;
  * Abstract parse expression. All non-value expressions are derived from
  * this class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
@@ -63,8 +65,15 @@ public abstract class ParseExpr extends Expr {
     final Iter ir = iter(ctx);
     final Item it = ir.next();
     if(it == null || ir.size() == 1) return it;
-    final Item n = ir.next();
-    if(n != null) XPSEQ.thrw(ii, this);
+    Item n = ir.next();
+    if(n != null) {
+      final ItemCache ic = new ItemCache();
+      ic.add(it);
+      ic.add(n);
+      n = ir.next();
+      if(n != null) ic.add(Str.get("..."));
+      XPSEQ.thrw(ii, ic.value());
+    }
     return it;
   }
 

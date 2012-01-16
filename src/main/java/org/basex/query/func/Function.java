@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  * Namespace mappings for function prefixes and URIs are specified in the
  * static code in the {@code NSGlobal} class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public enum Function {
@@ -532,7 +532,7 @@ public enum Function {
   /** Index function: returns index facet information. */
   _INDEX_FACETS(FNIndex.class, "facets(database, format)", DOC_O, 1, STR, STR),
   /** Index function: returns texts. */
-  _INDEX_TEXTS(FNIndex.class, "texts(database, prefix)", STR_ZM, 1, STR, STR),
+  _INDEX_TEXTS(FNIndex.class, "texts(database, prefix)", ITEM_ZM, 1, STR, STR),
   /** Index function: returns attribute values. */
   _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database, prefix)",
       STR_ZM, 1, STR, STR),
@@ -619,17 +619,22 @@ public enum Function {
 
   /* FNFt functions. */
 
-  /** Database function: searches the full-text index. */
+  /** Full-text function: searches the full-text index. */
   _FT_SEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
-  /** Database function: counts the hits of a full-text request. */
+  /** Full-text function: counts the hits of a full-text request. */
   _FT_COUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
-  /** Database function: marks the hits of a full-text request. */
+  /** Full-text function: marks the hits of a full-text request. */
   _FT_MARK(FNFt.class, "mark(nodes[,tag])", NOD_ZM, 1, NOD_ZM, STR),
-  /** Database function: extracts full-text results. */
+  /** Full-text function: extracts full-text results. */
   _FT_EXTRACT(FNFt.class, "extract(nodes[,tag[,length]])",
       NOD_ZM, 1, ITEM_ZM, STR, ITR),
-  /** Database function: returns the full-text score. */
+  /** Full-text function: returns the full-text score. */
   _FT_SCORE(FNFt.class, "score(items)", DBL_ZM, ITEM_ZM),
+  /** Full-text function: returns indexed tokens. */
+  _FT_TOKENS(FNFt.class, "tokens(database, prefix)",
+      ITEM_ZM, 1, STR, STR),
+  /** Full-text function: tokenizes the specified string. */
+  _FT_TOKENIZE(FNFt.class, "tokenize(string)", STR_ZM, STR),
 
   /* FNHof functions. */
 

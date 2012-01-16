@@ -34,7 +34,7 @@ import org.basex.util.list.TokenList;
 /**
  * Panel for displaying information about global/local users.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 final class DialogUser extends BaseXBack {

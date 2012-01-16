@@ -1,6 +1,6 @@
 ====================================================== BASEX LICENSE ===
 
-Copyright (c) 2005-11 BaseX Team <info@basex.org>
+Copyright (c) 2005-12 BaseX Team <info@basex.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

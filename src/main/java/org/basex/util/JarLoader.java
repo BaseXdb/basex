@@ -20,7 +20,7 @@ import java.util.jar.JarFile;
  * slightly modified.
  *
  * @author Vitali Yemialyanchyk, www.stopka.us
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class JarLoader extends URLClassLoader {

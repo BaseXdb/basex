@@ -14,7 +14,7 @@ import org.basex.util.TokenBuilder;
  * Efficient Text Editor and Renderer, supporting syntax highlighting and
  * text selections.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class BaseXTextRenderer extends BaseXBack {

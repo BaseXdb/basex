@@ -10,7 +10,7 @@ import org.basex.gui.GUIConstants;
 /**
  * This separator splits several panels and allows panel resizing.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class BaseXSplitSep extends BaseXBack {

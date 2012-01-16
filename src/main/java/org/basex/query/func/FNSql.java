@@ -43,7 +43,7 @@ import org.basex.util.hash.TokenObjMap;
 
 /**
  * Functions on relational databases.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class FNSql extends FuncCall {

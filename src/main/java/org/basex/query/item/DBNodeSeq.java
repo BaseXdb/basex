@@ -15,7 +15,7 @@ import org.basex.util.list.IntList;
 /**
  * Sequence, containing at least two ordered database nodes.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class DBNodeSeq extends Seq {

@@ -6,7 +6,7 @@ import java.util.Arrays;
  * This is an efficient hash set, storing keys in a simple integer array.
  * The {@link IntMap} class extends it to a hash map.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class IntSet {

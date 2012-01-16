@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
 /**
  * Root node.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Root extends Simple {

@@ -10,7 +10,7 @@ import org.basex.util.Util;
 /**
  * Replace value primitive.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class ReplaceValue extends ValueUpdate {

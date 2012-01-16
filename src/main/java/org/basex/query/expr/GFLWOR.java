@@ -22,7 +22,7 @@ import org.basex.util.list.ObjList;
 /**
  * GFLWOR clause.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class GFLWOR extends ParseExpr {

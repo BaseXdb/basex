@@ -7,7 +7,7 @@ import org.junit.Test;
 /**
  * Higher-order function tests.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public final class HigherOrderTest extends AdvancedQueryTest {

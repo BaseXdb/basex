@@ -12,7 +12,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * Base class for the different context modifiers. A context modifier aggregates
  * all updates for a specific context.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public abstract class ContextModifier {

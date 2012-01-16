@@ -9,7 +9,7 @@ import org.basex.util.InputInfo;
  * This exception contains a {@link QueryException}, which can later be
  * unwrapped.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class SerializerException extends IOException {

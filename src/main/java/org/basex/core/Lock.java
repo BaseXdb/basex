@@ -8,7 +8,7 @@ import org.basex.util.Util;
  * Supports multiple readers, limited by {@link MainProp#PARALLEL},
  * and a single writer (readers/writer lock).
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class Lock {

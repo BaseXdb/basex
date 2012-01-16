@@ -15,7 +15,7 @@ import org.basex.util.list.IntList;
 /**
  * Document test for database nodes.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class DocTest extends Test {

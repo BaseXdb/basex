@@ -28,7 +28,7 @@ import org.basex.util.TokenBuilder;
  * <code>SET PARSEROPT lines=no; CREATE DB ...</code><br/>
  * <b>Description</b>: Puts complete input into one text node.</p>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class TextParser extends SingleParser {

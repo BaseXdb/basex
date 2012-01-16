@@ -12,7 +12,7 @@ import org.basex.util.InputInfo;
 /**
  * Pragma extension.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public final class Extension extends Single {

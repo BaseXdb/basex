@@ -23,7 +23,7 @@ import org.basex.util.list.IntList;
  * top and we can stick to pre values as primitive identifier as pre value
  * shifts won't have any effect on updates that have not yet been applied.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 final class DatabaseUpdates {

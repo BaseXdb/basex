@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * EXPath package API: Version tests.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class VersionTest {

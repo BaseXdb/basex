@@ -20,7 +20,7 @@ import org.w3c.dom.Text;
 /**
  * This class converts an DOM document instance to a database representation.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class DOMWrapper extends Parser {

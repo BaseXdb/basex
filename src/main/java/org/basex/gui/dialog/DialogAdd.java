@@ -15,7 +15,7 @@ import org.basex.gui.layout.TableLayout;
 /**
  * Add document dialog.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
 public final class DialogAdd extends DialogImport {

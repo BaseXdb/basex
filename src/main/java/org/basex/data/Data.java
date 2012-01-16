@@ -68,7 +68,7 @@ import org.basex.util.list.TokenList;
  * - Byte    11:  NURI: Namespace (bits: 7-3)
  * </pre>
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {

@@ -7,7 +7,7 @@ import org.basex.query.item.ANode;
  * <b>Important</b>: if nodes that are returned by this iterator are to be
  * further processed, they need to finalized via {@link ANode#finish()}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class AxisIter extends NodeIter {

@@ -29,7 +29,7 @@ import org.xml.sax.XMLReader;
  * DBLP documents contain too many entities and cause an out of memory error.
  * The internal {@link XMLParser} can be used as alternative.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class SAXWrapper extends SingleParser {

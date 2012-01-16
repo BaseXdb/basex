@@ -14,7 +14,7 @@ import org.basex.gui.layout.BaseXPanel;
 /**
  * This panel is added to each view to allow drag and drop operations.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class ViewMover extends BaseXPanel {

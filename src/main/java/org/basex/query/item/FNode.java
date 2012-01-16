@@ -12,7 +12,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Node type.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class FNode extends ANode {

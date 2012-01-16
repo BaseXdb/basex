@@ -4,7 +4,7 @@ package org.basex.index.ft;
  * This class provides an array with several {@link FTIndexTree} instances,
  * one for each token length.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

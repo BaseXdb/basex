@@ -108,7 +108,7 @@ import org.basex.util.hash.TokenSet;
  *  can be among the deleted nodes as a result of a 'replace element content'
  *  statement.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class Updates {

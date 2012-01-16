@@ -14,7 +14,7 @@ import org.basex.util.XMLToken;
 /**
  * Namespace constructor.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class CNSpace extends CName {

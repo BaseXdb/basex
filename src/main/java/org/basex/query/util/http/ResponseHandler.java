@@ -37,7 +37,7 @@ import org.basex.util.list.ByteList;
 /**
  * HTTP response handler. Reads HTTP response and constructs the
  * <http:response/> element.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class ResponseHandler {
@@ -75,28 +75,34 @@ public final class ResponseHandler {
   /** Multipart string. */
   private static final String MULTIPART = "multipart";
 
+  /** Input information. */
+  private final InputInfo input;
+  /** Database properties. */
+  private final Prop prop;
+
   /**
    * Constructor.
+   * @param ii input info
+   * @param pr database properties
    */
-  private ResponseHandler() {
-
+  public ResponseHandler(final InputInfo ii, final Prop pr) {
+    input = ii;
+    prop = pr;
   }
 
   /**
    * Constructs http:response element and reads HTTP response content.
    * @param conn HTTP connection
-   * @param statusOnly indicates if content is required
+   * @param status indicates if content is required
    * @param mediaTypeOvr content type provided by the user to interpret the
    *          response content
-   * @param prop query context properties
-   * @param ii input info
    * @return result sequence of <http:response/> and content items
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  public static ValueIter getResponse(final HttpURLConnection conn,
-      final byte[] statusOnly, final byte[] mediaTypeOvr, final Prop prop,
-      final InputInfo ii) throws IOException, QueryException {
+  public ValueIter getResponse(final HttpURLConnection conn,
+      final byte[] status, final byte[] mediaTypeOvr)
+          throws IOException, QueryException {
 
     final NodeCache attrs = extractAttrs(conn);
     final NodeCache hdrs = extractHdrs(conn);
@@ -104,25 +110,23 @@ public final class ResponseHandler {
         extractContentType(conn.getContentType()) : string(mediaTypeOvr);
     final ItemCache payloads = new ItemCache();
     final FNode body;
-    final boolean s = statusOnly != null && Bln.parse(statusOnly, ii);
+    final boolean s = status != null && Bln.parse(status, input);
+
     // multipart response
     if(cType.startsWith(MULTIPART)) {
-      final byte[] boundary = extractBoundary(conn.getContentType(), ii);
+      final byte[] boundary = extractBoundary(conn.getContentType());
       final NodeCache a = new NodeCache();
       a.add(new FAttr(new QNm(MEDIATYPE, EMPTY), token(cType)));
       a.add(new FAttr(new QNm(BOUNDARY, EMPTY), boundary));
       body = new FElem(new QNm(HTTP_MULTIPART, HTTPURI), extractParts(
-          conn.getInputStream(), s, payloads, concat(token("--"), boundary),
-          prop, ii), a, new Atts(HTTP, HTTPURI));
+          conn.getInputStream(), s, payloads, concat(token("--"), boundary)),
+          a, new Atts(HTTP, HTTPURI));
       // single part response
     } else {
       body = createBody(cType);
       if(!s) payloads.add(
-          interpretPayload(
-              extractPayload(
-                  conn.getInputStream(), cType,
-                  extractCharset(conn.getContentType())),
-              cType, prop, ii));
+          interpretPayload(extractPayload(conn.getInputStream(), cType,
+              extractCharset(conn.getContentType())), cType));
     }
 
     // construct <http:response/>
@@ -148,7 +152,6 @@ public final class ResponseHandler {
     final NodeCache a = new NodeCache();
     a.add(new FAttr(new QNm(STATUS, EMPTY), token(conn.getResponseCode())));
     a.add(new FAttr(new QNm(MSG, EMPTY), token(conn.getResponseMessage())));
-
     return a;
   }
 
@@ -220,21 +223,18 @@ public final class ResponseHandler {
    * node - binary content type => base64Binary.
    * @param p payload
    * @param c content type
-   * @param prop context properties
-   * @param ii input info
    * @return interpreted payload
-   * @throws IOException I/O Exception
-   * @throws QueryException query exception
    */
-  private static Item interpretPayload(final byte[] p, final String c,
-      final Prop prop, final InputInfo ii) throws IOException, QueryException {
-
-    if(MimeTypes.isXML(c)) {
-      return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
-    }
-    if(c.equals(MimeTypes.TEXT_HTML)) {
-      if(!HTMLParser.available()) throw HTMLERR.thrw(ii);
-      return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
+  private Item interpretPayload(final byte[] p, final String c) {
+    try {
+      if(MimeTypes.isXML(c)) {
+        return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
+      }
+      if(c.equals(MimeTypes.TEXT_HTML)) {
+        return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
+      }
+    } catch(final IOException ex) {
+      return new B64(p);
     }
     return c.startsWith(MimeTypes.MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
   }
@@ -242,18 +242,16 @@ public final class ResponseHandler {
   /**
    * Extracts the parts from a multipart message.
    * @param io connection input stream
-   * @param statusOnly indicates if content is required
+   * @param status indicates if content is required
    * @param payloads item cache for part payloads
    * @param sep separation boundary
-   * @param prop context properties
-   * @param ii input info
    * @return array list will all parts
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private static NodeCache extractParts(final InputStream io,
-      final boolean statusOnly, final ItemCache payloads, final byte[] sep,
-      final Prop prop, final InputInfo ii) throws IOException, QueryException {
+  private NodeCache extractParts(final InputStream io, final boolean status,
+      final ItemCache payloads, final byte[] sep)
+          throws IOException, QueryException {
 
     try {
       // read first line of multipart content
@@ -261,16 +259,14 @@ public final class ResponseHandler {
       // RFC 1341: Preamble shall be ignored -> read till 1st boundary
       while(next != null && !eq(sep, next))
         next = readLine(io);
-      if(next == null) REQINV.thrw(ii, "No body specified for http:part");
+      if(next == null) REQINV.thrw(input, "No body specified for http:part");
 
       final byte[] end = concat(sep, token("--"));
-      FElem nextPart = extractNextPart(io, statusOnly, payloads, sep, end,
-          prop, ii);
+      FElem nextPart = extractNextPart(io, status, payloads, sep, end);
       final NodeCache p = new NodeCache();
       while(nextPart != null) {
         p.add(nextPart);
-        nextPart =
-          extractNextPart(io, statusOnly, payloads, sep, end, prop, ii);
+        nextPart = extractNextPart(io, status, payloads, sep, end);
       }
       return p;
     } finally {
@@ -281,20 +277,16 @@ public final class ResponseHandler {
   /**
    * Extracts a part from a multipart message.
    * @param io connection input stream
-   * @param statusOnly indicates if content is required
+   * @param status indicates if content is required
    * @param payloads item cache for part payloads
    * @param sep separation boundary
    * @param end closing boundary
-   * @param prop context properties
-   * @param ii input info
    * @return part
    * @throws IOException I/O Exception
-   * @throws QueryException query exception
    */
-  private static FElem extractNextPart(final InputStream io,
-      final boolean statusOnly, final ItemCache payloads, final byte[] sep,
-      final byte[] end, final Prop prop, final InputInfo ii)
-      throws IOException, QueryException {
+  private FElem extractNextPart(final InputStream io, final boolean status,
+      final ItemCache payloads, final byte[] sep, final byte[] end)
+          throws IOException {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)
@@ -310,7 +302,7 @@ public final class ResponseHandler {
     if(firstLine.length == 0) {
       // part has no headers
       final byte[] p = extractPartPayload(io, sep, end, null);
-      if(!statusOnly) payloads.add(interpretPayload(p, partCType, prop, ii));
+      if(!status) payloads.add(interpretPayload(p, partCType));
     } else {
       // extract headers:
       byte[] nextHdr = firstLine;
@@ -338,8 +330,8 @@ public final class ResponseHandler {
         nextHdr = readLine(io);
       }
       final byte[] p = extractPartPayload(io, sep, end, charset);
-      if(!statusOnly) {
-        payloads.add(interpretPayload(p, partCType, prop, ii));
+      if(!status) {
+        payloads.add(interpretPayload(p, partCType));
       }
     }
     root.add(createBody(partCType));
@@ -417,14 +409,12 @@ public final class ResponseHandler {
   /**
    * Extracts the encapsulation boundary from the content type.
    * @param c content type
-   * @param info input info
    * @return boundary
    * @throws QueryException query exception
    */
-  private static byte[] extractBoundary(final String c, final InputInfo info)
-      throws QueryException {
+  private byte[] extractBoundary(final String c) throws QueryException {
     int index = c.toLowerCase(Locale.ENGLISH).lastIndexOf("boundary=");
-    if(index == -1) REQINV.thrw(info, "No separation boundary specified");
+    if(index == -1) REQINV.thrw(input, "No separation boundary specified");
     String b = c.substring(index + 9); // 9 for "boundary="
     if(b.charAt(0) == '"') {
       // if the boundary is enclosed in quotes, strip them

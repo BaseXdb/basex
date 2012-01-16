@@ -1,19 +1,18 @@
 package org.basex.index.ft;
 
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.index.Index;
 import org.basex.index.IndexCache;
 import org.basex.io.random.DataAccess;
-import org.basex.util.Util;
 import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
 
 /**
  * This abstract class defines methods for the available full-text indexes.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class FTIndex implements Index {
@@ -130,10 +129,5 @@ public abstract class FTIndex implements Index {
         return Integer.toString(size);
       }
     };
-  }
-
-  @Override
-  public TokenList entries(final byte[] prefix) {
-    throw Util.notexpected();
   }
 }

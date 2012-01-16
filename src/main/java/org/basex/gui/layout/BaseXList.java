@@ -27,7 +27,7 @@ import org.basex.util.list.StringList;
  * of the typed in text. Moreover, the cursor keys can be used to scroll
  * through the list, and list entries can be chosen with mouse clicks.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BaseXList extends BaseXBack {

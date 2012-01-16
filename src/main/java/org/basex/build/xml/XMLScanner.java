@@ -20,7 +20,7 @@ import org.basex.util.hash.TokenMap;
 /**
  * This class scans an XML document and creates atomic tokens.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */

@@ -31,7 +31,7 @@ import org.basex.util.list.StringList;
  * This is the starter class for running the database server. It handles
  * concurrent requests from multiple users.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
@@ -377,7 +377,7 @@ public final class BaseXServer extends Main implements Runnable {
   /**
    * Inner class to listen for event registrations.
    *
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Andreas Weiler
    */
   final class EventListener extends Thread {

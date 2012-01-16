@@ -10,7 +10,7 @@ import org.basex.gui.dialog.Dialog;
 /**
  * Project specific CheckBox implementation.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BaseXCheckBox extends JCheckBox {

@@ -22,7 +22,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This index class retrieves range values from the index.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class RangeAccess extends Simple {

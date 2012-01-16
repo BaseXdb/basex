@@ -11,7 +11,7 @@ import org.basex.io.in.BufferInput;
 /**
  * Evaluates the 'retrieve' command and retrieves binary content.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Retrieve extends ACreate {

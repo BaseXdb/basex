@@ -18,7 +18,7 @@ import org.basex.util.list.ObjList;
 /**
  * This class serializes data in the DOT syntax.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class DOTSerializer extends OutputSerializer {

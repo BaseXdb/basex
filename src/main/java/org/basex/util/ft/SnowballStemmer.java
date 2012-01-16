@@ -14,7 +14,7 @@ import org.basex.util.Util;
  * The Snowball stemmers were written by Dr Martin Porter and Richard Boulton
  * and is based on the BSD License: {@code http://snowball.tartarus.org/}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
 final class SnowballStemmer extends Stemmer {

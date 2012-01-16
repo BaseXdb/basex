@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * This class tests the functions of the EXPath Cryptographic module.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public class FNCryptoTest extends AdvancedQueryTest {

@@ -24,7 +24,7 @@ import org.basex.util.list.ByteList;
  * This class parses files in the MAB2 format
  * and sends events to the specified database builder.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class MAB2Parser extends SingleParser {
@@ -583,7 +583,7 @@ public final class MAB2Parser extends SingleParser {
   /**
    * This is a simple data structure for storing MAB2 entries.
    *
-   * @author BaseX Team 2005-11, BSD License
+   * @author BaseX Team 2005-12, BSD License
    * @author Christian Gruen
    */
   static final class MAB2Entry {

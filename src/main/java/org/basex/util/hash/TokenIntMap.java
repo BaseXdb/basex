@@ -10,7 +10,7 @@ import org.basex.io.out.DataOutput;
  * This is an efficient hash map for integers,
  * extending the {@link TokenSet hash set}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class TokenIntMap extends TokenSet {

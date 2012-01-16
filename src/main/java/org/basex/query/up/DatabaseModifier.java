@@ -13,7 +13,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * Database permissions are checked to ensure that a user possesses enough
  * privileges to alter database contents.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 final class DatabaseModifier extends ContextModifier {

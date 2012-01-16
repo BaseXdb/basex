@@ -30,7 +30,7 @@ import org.basex.util.list.TokenList;
 /**
  * FTWords expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {
@@ -376,10 +376,7 @@ public final class FTWords extends FTExpr {
     }
 
     // adopt database options to tokenizer
-    fto.set(CS, md.casesens);
-    fto.set(DC, md.diacritics);
-    fto.set(ST, md.stemming);
-    fto.ln = md.language;
+    fto.copy(md);
 
     // summarize number of hits; break loop if no hits are expected
     final FTLexer ft = new FTLexer(fto);

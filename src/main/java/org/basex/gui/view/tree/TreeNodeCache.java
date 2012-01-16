@@ -7,7 +7,7 @@ import org.basex.util.list.ObjList;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache implements TreeConstants {

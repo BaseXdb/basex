@@ -8,7 +8,7 @@ import org.basex.util.Performance;
 /**
  * This class delays the response to the specified client.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

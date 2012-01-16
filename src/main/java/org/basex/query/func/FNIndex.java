@@ -23,42 +23,38 @@ import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.list.TokenList;
+import org.basex.util.hash.TokenIntMap;
 
 /**
  * Index functions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
- * @author Dimitar Popov
  * @author Andreas Weiler
  */
 public final class FNIndex extends FuncCall {
   /** Name: name. */
-  private static final QNm Q_NAME = new QNm(NAM);
+  protected static final QNm Q_NAME = new QNm(NAM);
   /** Name: count. */
-  private static final QNm Q_COUNT = new QNm(COUNT);
+  protected static final QNm Q_COUNT = new QNm(COUNT);
   /** Name: type. */
-  private static final QNm Q_TYPE = new QNm(TYP);
+  protected static final QNm Q_TYPE = new QNm(TYP);
   /** Name: value. */
-  private static final QNm Q_VALUE = new QNm(VAL);
+  protected static final QNm Q_VALUE = new QNm(VAL);
   /** Name: min. */
-  private static final QNm Q_MIN = new QNm(MIN);
+  protected static final QNm Q_MIN = new QNm(MIN);
   /** Name: max. */
-  private static final QNm Q_MAX = new QNm(MAX);
+  protected static final QNm Q_MAX = new QNm(MAX);
   /** Name: elements. */
-  private static final QNm Q_ELM = new QNm(NodeType.ELM.string());
+  protected static final QNm Q_ELM = new QNm(NodeType.ELM.string());
   /** Name: attributes. */
-  private static final QNm Q_ATT = new QNm(NodeType.ATT.string());
-
+  protected static final QNm Q_ATT = new QNm(NodeType.ATT.string());
   /** Flag: flat output. */
-  private static final byte[] FLAT = token("flat");
+  protected static final byte[] FLAT = token("flat");
 
   /**
    * Constructor.
@@ -103,7 +99,7 @@ public final class FNIndex extends FuncCall {
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
     final NodeCache nc = new NodeCache();
     nc.add(flat ? flat(data) : tree(data, data.pthindex.root().get(0)));
-    return new FDoc(nc, Token.EMPTY);
+    return new FDoc(nc, EMPTY);
   }
 
   /**
@@ -118,26 +114,48 @@ public final class FNIndex extends FuncCall {
 
     final Data data = data(0, ctx);
     final byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    return entries(data, prefix, it, this);
+  }
+
+  /**
+   * Returns all entries of the specified index.
+   * @param data data reference
+   * @param prefix prefix
+   * @param it index type
+   * @param call calling function
+   * @return text entries
+   * @throws QueryException query exception
+   */
+  static Iter entries(final Data data, final byte[] prefix, final IndexType it,
+      final FuncCall call) throws QueryException {
 
     final Index index;
     final boolean avl;
     if(it == IndexType.TEXT) {
       index = data.txtindex;
       avl = data.meta.textindex;
-    } else {
+    } else if(it == IndexType.ATTRIBUTE) {
       index = data.atvindex;
       avl = data.meta.attrindex;
+    } else {
+      index = data.ftxindex;
+      avl = data.meta.ftxtindex;
     }
-    if(!avl) NOINDEX.thrw(input, data.meta.name, it);
+    if(!avl) NOINDEX.thrw(call.input, data.meta.name, it);
 
-    final TokenList entries = index.entries(prefix);
+    final TokenIntMap entries = index.entries(prefix);
     return new ValueIter() {
       final int es = entries.size();
       int pos;
       @Override
-      public Str get(final long i) { return Str.get(entries.get((int) i)); }
+      public ANode get(final long i) {
+        final FElem elem = new FElem(Q_VALUE);
+        elem.add(new FAttr(Q_COUNT, token(entries.value((int) i + 1))));
+        elem.add(new FTxt(entries.key((int) i + 1)));
+        return elem;
+      }
       @Override
-      public Str next() { return pos < size() ? get(pos++) : null; }
+      public ANode next() { return pos < size() ? get(pos++) : null; }
       @Override
       public boolean reset() { pos = 0; return true; }
       @Override
@@ -197,24 +215,33 @@ public final class FNIndex extends FuncCall {
    */
   private void stats(final Stats stats, final FElem elem) {
     final String k = stats.type.toString().toLowerCase(Locale.ENGLISH);
-    elem.add(new FAttr(Q_TYPE, Token.token(k)));
-    elem.add(new FAttr(Q_COUNT, Token.token(stats.count)));
+    elem.add(new FAttr(Q_TYPE, token(k)));
+    elem.add(new FAttr(Q_COUNT, token(stats.count)));
     switch(stats.type) {
       case CATEGORY:
         for(final byte[] c : stats.cats) {
           final FElem sub = new FElem(Q_VALUE);
-          sub.add(new FAttr(Q_COUNT, Token.token(stats.cats.value(c))));
+          sub.add(new FAttr(Q_COUNT, token(stats.cats.value(c))));
           sub.add(new FTxt(c));
           elem.add(sub);
         }
         break;
       case DOUBLE:
       case INTEGER:
-        elem.add(new FAttr(Q_MIN, Token.token(stats.min)));
-        elem.add(new FAttr(Q_MAX, Token.token(stats.max)));
+        elem.add(new FAttr(Q_MIN, token(stats.min)));
+        elem.add(new FAttr(Q_MAX, token(stats.max)));
         break;
       default:
         break;
     }
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return
+      // skip evaluation at compile time
+      u == Use.CTX && (
+        def == Function._INDEX_TEXTS || def == Function._INDEX_ATTRIBUTES) ||
+      super.uses(u);
   }
 }

@@ -18,7 +18,7 @@ import org.basex.io.out.PrintOutput;
 /**
  * Evaluates the 'store' command and stores binary content into the database.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class Store extends ACreate {

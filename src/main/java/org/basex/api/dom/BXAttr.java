@@ -11,7 +11,7 @@ import org.w3c.dom.TypeInfo;
 /**
  * DOM - Attribute implementation.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class BXAttr extends BXNode implements Attr {

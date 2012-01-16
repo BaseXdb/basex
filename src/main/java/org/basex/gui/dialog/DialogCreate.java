@@ -23,7 +23,7 @@ import org.basex.util.list.StringList;
 /**
  * Dialog window for specifying options for creating a new database.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class DialogCreate extends DialogImport {

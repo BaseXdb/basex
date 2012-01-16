@@ -8,7 +8,7 @@ import org.basex.io.IO;
 /**
  * This class allows main memory access to the database table representation.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {

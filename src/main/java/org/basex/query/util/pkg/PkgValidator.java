@@ -19,7 +19,7 @@ import org.basex.util.list.ObjList;
 /**
  * Package validator. This class executes some essential checks before the
  * installation of a package.
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgValidator {

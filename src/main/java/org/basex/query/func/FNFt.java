@@ -2,11 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import static org.basex.util.ft.FTFlag.*;
-
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.MemData;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -25,13 +24,14 @@ import org.basex.query.util.Err;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
+import org.basex.util.ft.FTLexer;
 import org.basex.util.ft.FTOpt;
 import org.basex.util.list.IntList;
 
 /**
  * Full-text functions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FNFt extends FuncCall {
@@ -60,11 +60,13 @@ public final class FNFt extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case _FT_SEARCH:  return search(ctx);
-      case _FT_SCORE:   return score(ctx);
-      case _FT_MARK:    return mark(ctx, false);
-      case _FT_EXTRACT: return mark(ctx, true);
-      default:          return super.iter(ctx);
+      case _FT_SEARCH:   return search(ctx);
+      case _FT_SCORE:    return score(ctx);
+      case _FT_MARK:     return mark(ctx, false);
+      case _FT_EXTRACT:  return mark(ctx, true);
+      case _FT_TOKENS:   return tokens(ctx);
+      case _FT_TOKENIZE: return tokenize(ctx);
+      default:           return super.iter(ctx);
     }
   }
 
@@ -169,8 +171,7 @@ public final class FNFt extends FuncCall {
    * @throws QueryException query exception
    */
   Iter search(final QueryContext ctx) throws QueryException {
-    return search(checkDBNode(checkItem(expr[0], ctx)).data,
-        checkStr(expr[1], ctx), this, ctx);
+    return search(data(0, ctx), checkStr(expr[1], ctx), this, ctx);
   }
 
   /**
@@ -186,17 +187,48 @@ public final class FNFt extends FuncCall {
       final FuncCall fun, final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    if(!data.meta.ftxtindex) NOIDX.thrw(fun.input, fun);
+    if(!data.meta.ftxtindex) NOINDEX.thrw(fun.input, data.meta.name, fun);
 
     final FTOpt tmp = ctx.ftopt;
-    ctx.ftopt = new FTOpt();
-    ctx.ftopt.set(CS, data.meta.casesens);
-    ctx.ftopt.set(DC, data.meta.diacritics);
-    ctx.ftopt.set(ST, data.meta.stemming);
-    ctx.ftopt.ln = data.meta.language;
+    ctx.ftopt = new FTOpt().copy(data.meta);
     final FTWords words = new FTWords(fun.input, ic.data, Str.get(str), ctx);
     ctx.ftopt = tmp;
     return new FTIndexAccess(fun.input, words, ic).iter(ctx);
+  }
+
+  /**
+   * Performs the tokens function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter tokens(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+
+    byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    if(prefix.length != 0) {
+      final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
+      ftl.init(prefix);
+      prefix = ftl.nextToken();
+    }
+    return FNIndex.entries(data, prefix, IndexType.FULLTEXT, this);
+  }
+
+  /**
+   * Performs the tokenize function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter tokenize(final QueryContext ctx) throws QueryException {
+    final FTOpt opt = new FTOpt().copy(ctx.ftopt);
+    final FTLexer ftl = new FTLexer(opt).init(checkStr(expr[0], ctx));
+    return new Iter() {
+      @Override
+      public Str next() {
+        return ftl.hasNext() ? Str.get(ftl.nextToken()) : null;
+      }
+    };
   }
 
   @Override

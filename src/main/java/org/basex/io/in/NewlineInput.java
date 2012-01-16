@@ -11,7 +11,7 @@ import org.basex.io.IO;
  * newline characters {@code \n}, and the input encoding will be guessed by
  * analyzing the first bytes.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class NewlineInput extends TextInput {

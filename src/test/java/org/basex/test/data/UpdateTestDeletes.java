@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 /**
  * This class tests the update features of the {@link Data} class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Tim Petrowsky
  */
 public final class UpdateTestDeletes extends UpdateTest {

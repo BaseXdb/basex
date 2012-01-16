@@ -16,7 +16,7 @@ import org.basex.util.Util;
 /**
  * XQuery 3.0 function data types.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 public class FuncType implements Type {

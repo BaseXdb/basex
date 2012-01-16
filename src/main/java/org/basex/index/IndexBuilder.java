@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class IndexBuilder extends Progress {

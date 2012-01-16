@@ -14,7 +14,7 @@ import org.basex.util.ft.FTOpt;
 /**
  * FTOptions expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FTOptions extends FTExpr {
@@ -35,7 +35,7 @@ public final class FTOptions extends FTExpr {
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     final FTOpt tmp = ctx.ftopt;
-    ctx.ftopt = opt.init(tmp);
+    ctx.ftopt = opt.copy(tmp);
     if(opt.sw != null && ctx.value != null && ctx.value.data() != null)
       opt.sw.comp(ctx.value.data());
     expr[0] = expr[0].comp(ctx);

@@ -14,7 +14,7 @@ import org.basex.util.Util;
  * The Lucene stemmers are based on the Apache License:
  * {@code http://lucene.apache.org/}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class LuceneStemmer extends Stemmer {

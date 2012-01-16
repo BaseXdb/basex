@@ -150,7 +150,7 @@ import org.basex.util.list.TokenList;
 /**
  * Parser for XQuery expressions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {
@@ -450,7 +450,7 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(FTOPTION)) {
           final FTOpt fto = new FTOpt();
           while(ftMatchOption(fto));
-          ctx.ftopt.init(fto);
+          ctx.ftopt.copy(fto);
         } else {
           qp = p;
           return;

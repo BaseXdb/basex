@@ -22,7 +22,7 @@ import org.basex.util.Util;
 /**
  * Parses the package descriptors and performs schema checks.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
 public final class PkgParser {

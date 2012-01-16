@@ -1,12 +1,14 @@
 package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.test.query.AdvancedQueryTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -16,7 +18,7 @@ import org.junit.Test;
 /**
  * This class tests the XQuery full-text extensions.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FNFtTest extends AdvancedQueryTest {
@@ -113,6 +115,39 @@ public final class FNFtTest extends AdvancedQueryTest {
     check(_FT_SCORE);
     query(_FT_SCORE.args(_FT_SEARCH.args(" . ", "2")), "1");
     query(_FT_SCORE.args(_FT_SEARCH.args(" . ", "XML")), "1 0.5");
+  }
+
+  /**
+   * Test method for the 'ft:tokens()' function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void ftTokens() throws BaseXException {
+    check(_FT_TOKENS);
+    new CreateIndex(IndexType.FULLTEXT).execute(CONTEXT);
+
+    String entries = _FT_TOKENS.args(DB);
+    query("count(" + entries + ")", 6);
+    query("exists(" + entries + "/self::value)", "true");
+    query(entries + "/@count = 1", "true");
+    query(entries + "/@count = 2", "true");
+    query(entries + "/@count = 3", "false");
+
+    entries = _FT_TOKENS.args(DB, "a");
+    query("count(" + entries + ")", 1);
+  }
+
+  /**
+   * Test method for the 'ft:tokenize()' function.
+   */
+  @Test
+  public void ftTokenize() {
+    check(_FT_TOKENIZE);
+    query(_FT_TOKENIZE.args("A bc"), "a bc");
+    query("declare ft-option using stemming; " +
+        _FT_TOKENIZE.args("Gifts"), "gift");
+    query("count(" + _FT_TOKENIZE.args("") + ")", "0");
+    query("count(" + _FT_TOKENIZE.args("a!b:c") + ")", "3");
   }
 
   /**

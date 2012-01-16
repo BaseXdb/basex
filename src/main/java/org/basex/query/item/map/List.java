@@ -13,7 +13,7 @@ import org.basex.util.InputInfo;
 /**
  * Leaf that contains a collision list of keys with the same hash code.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
 final class List extends TrieNode {

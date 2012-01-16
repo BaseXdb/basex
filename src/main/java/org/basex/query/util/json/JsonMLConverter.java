@@ -21,7 +21,7 @@ import org.basex.util.hash.TokenObjMap;
  * The specified JSON input is first transformed into a tree representation
  * and then converted to an XML document.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class JsonMLConverter {

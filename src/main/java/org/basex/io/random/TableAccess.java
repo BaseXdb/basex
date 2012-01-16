@@ -8,7 +8,7 @@ import org.basex.io.IO;
  * This abstract class defines the methods for accessing the
  * database table representation.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class TableAccess {

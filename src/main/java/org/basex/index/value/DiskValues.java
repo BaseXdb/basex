@@ -3,7 +3,9 @@ package org.basex.index.value;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.index.Index;
 import org.basex.index.IndexCache;
@@ -16,15 +18,15 @@ import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.hash.IntMap;
+import org.basex.util.hash.TokenIntMap;
 import org.basex.util.hash.TokenObjMap;
 import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
 
 /**
  * This class provides access to attribute values and text contents stored on
  * disk. The data structure is described in the {@link ValueBuilder} class.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class DiskValues implements Index {
@@ -119,9 +121,8 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public TokenList entries(final byte[] prefix) {
-    final TokenList tl = new TokenList();
-
+  public TokenIntMap entries(final byte[] prefix) {
+    final TokenIntMap tim = new TokenIntMap();
     int ix = get(prefix);
     if(ix < 0) ix = -ix - 1;
     idxr.cursor(ix * 5l);
@@ -132,9 +133,9 @@ public class DiskValues implements Index {
       final byte[] key = data.text(pre, text);
       cache.add(key, nr, pos + Num.length(nr));
       if(!startsWith(key, prefix)) break;
-      tl.add(key);
+      tim.add(key, nr);
     }
-    return tl;
+    return tim;
   }
 
   /**

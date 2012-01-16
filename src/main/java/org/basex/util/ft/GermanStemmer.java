@@ -9,7 +9,7 @@ import org.basex.util.TokenBuilder;
  * report "A Fast and Simple Stemming Algorithm for German Words" by
  * J&ouml;rg Caumanns.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class GermanStemmer extends InternalStemmer {

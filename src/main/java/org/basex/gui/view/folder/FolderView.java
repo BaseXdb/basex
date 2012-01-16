@@ -33,7 +33,7 @@ import org.basex.gui.view.ViewNotifier;
 /**
  * This view offers a folder visualization of the database contents.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FolderView extends View {

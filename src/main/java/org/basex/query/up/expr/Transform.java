@@ -26,7 +26,7 @@ import org.basex.util.InputInfo;
 /**
  * Transform expression.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
 public final class Transform extends Arr {
