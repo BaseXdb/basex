@@ -237,11 +237,12 @@ public final class TableDiskAccess extends TableAccess {
         // blocks may not be consecutive
         pagemap.clear(pages[index]);
       }
-      readIndex(index + 1);
+      setIndex(index + 1);
       from = 0;
     }
 
     // if the last block is empty, clear the corresponding bit
+    readBlock(pages[index]);
     final Buffer bf = bm.current();
     if(npre == last) {
       pagemap.clear((int) bf.pos);
@@ -409,13 +410,21 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
+   * Update the index pointers.
+   * @param i new index
+   */
+  private void setIndex(final int i) {
+    index = i;
+    fpre = fpres[i];
+    npre = i + 1 >= blocks ? meta.size : fpres[i + 1];
+  }
+
+  /**
    * Updates the index pointers and fetches the requested block.
    * @param i index of the block to fetch
    */
   private void readIndex(final int i) {
-    index = i;
-    fpre = fpres[i];
-    npre = i + 1 >= blocks ? meta.size : fpres[i + 1];
+    setIndex(i);
     readBlock(pages[i]);
   }
 
