@@ -92,7 +92,7 @@ public class DialogResources extends BaseXBack {
 
         if(n.isLeaf()) {
           n = (TreeNode) n.getParent();
-          trgt = (n.equals(root) ? "" : n.path()) + '/';
+          trgt = (n == null || n.equals(root) ? "" : n.path()) + '/';
         } else {
           filt = trgt;
         }
