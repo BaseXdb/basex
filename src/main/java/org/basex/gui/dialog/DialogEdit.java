@@ -109,7 +109,7 @@ public final class DialogEdit extends Dialog {
     pp.add(info, BorderLayout.WEST);
 
     // create buttons
-    buttons = okCancel(this);
+    buttons = okCancel();
     pp.add(buttons, BorderLayout.EAST);
 
     set(pp, BorderLayout.SOUTH);

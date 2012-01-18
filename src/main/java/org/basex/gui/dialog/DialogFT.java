@@ -169,9 +169,9 @@ final class DialogFT extends BaseXBack {
   }
 
   /**
-   * Closes the dialog.
+   * Sets the chosen options.
    */
-  void close() {
+  void setOptions() {
     final GUI gui = dialog.gui;
     final String lang = language.getSelectedItem().toString();
     gui.set(Prop.LANGUAGE, check[F_LANG].isSelected() ?

@@ -165,11 +165,12 @@ public abstract class IO {
 
   /**
    * Checks if more input streams are found.
+   * @param archive parse archives
    * @return result of check
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  public boolean more() throws IOException {
+  public boolean more(final boolean archive) throws IOException {
     return more ^= true;
   }
 

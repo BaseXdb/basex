@@ -99,7 +99,7 @@ public final class DialogInsert extends Dialog {
     info = new BaseXLabel(" ").border(8, 0, 2, 0);
     pp.add(info, BorderLayout.WEST);
 
-    buttons = okCancel(this);
+    buttons = okCancel();
     pp.add(buttons, BorderLayout.EAST);
     set(pp, BorderLayout.SOUTH);
 

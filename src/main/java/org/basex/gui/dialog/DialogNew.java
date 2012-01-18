@@ -26,9 +26,15 @@ import org.basex.util.list.StringList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogCreate extends DialogImport {
+public final class DialogNew extends Dialog {
+  /** Buttons. */
+  protected final DialogImport options;
   /** Database name. */
-  private final BaseXTextField dbname;
+  private final BaseXTextField target;
+  /** Parsing options. */
+  private final DialogParsing parsing;
+  /** Buttons. */
+  protected final BaseXBack buttons;
 
   /** Path summary flag. */
   private final BaseXCheckBox pathindex;
@@ -47,31 +53,25 @@ public final class DialogCreate extends DialogImport {
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogCreate(final GUI main) {
+  public DialogNew(final GUI main) {
     super(main, CREATEADVTITLE);
 
     db = List.list(main.context);
     final Prop prop = gui.context.prop;
     final GUIProp gprop = main.gprop;
 
-    // create panels
-    final BaseXBack p1 = new BaseXBack(new BorderLayout()).border(8);
+    target = new BaseXTextField(gprop.get(GUIProp.CREATENAME), this);
+    target.addKeyListener(keys);
 
-    final BaseXBack p = new BaseXBack(new TableLayout(8, 2, 8, 0));
-    init(p);
+    final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
+    pnl.add(new BaseXLabel(CREATENAME + COLS, false, true).border(8, 0, 4, 0));
+    pnl.add(target);
 
-    p.add(new BaseXLabel(CREATENAME, false, true).border(8, 0, 4, 0));
-    p.add(new BaseXLabel());
+    // option panels
+    options = new DialogImport(this, pnl);
+    parsing = new DialogParsing(this);
 
-    dbname = new BaseXTextField(gprop.get(GUIProp.CREATENAME), this);
-    dbname.addKeyListener(keys);
-    p.add(dbname);
-    p.add(new BaseXLabel());
-    p1.add(p, BorderLayout.CENTER);
-
-    info = new BaseXLabel(" ");
-    p1.add(info, BorderLayout.SOUTH);
-
+    // index panel
     final BaseXBack p3 = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
     pathindex = new BaseXCheckBox(INFOPATHINDEX,
        prop.is(Prop.PATHINDEX), 0, this);
@@ -88,6 +88,7 @@ public final class DialogCreate extends DialogImport {
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
 
+    // full-text panel
     final BaseXBack p4 = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
@@ -96,49 +97,59 @@ public final class DialogCreate extends DialogImport {
     p4.add(ft);
 
     final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(GENERALINFO, p1);
+    tabs.addTab(GENERALINFO, options);
     tabs.addTab(PARSEINFO, parsing);
     tabs.addTab(INDEXINFO, p3);
     tabs.addTab(FTINFO, p4);
     set(tabs, BorderLayout.CENTER);
 
+    buttons = okCancel();
+    set(buttons, BorderLayout.SOUTH);
+
     action(null);
     finish(null);
   }
 
-  @Override
+  /**
+   * Chooses an input file.
+   * @return resulting file
+   */
   protected IOFile choose() {
-    final IOFile input = super.choose();
-    if(input != null) dbname.setText(input.dbname().replaceAll("[^\\w-]", ""));
+    final IOFile input = options.choose();
+    if(input != null) target.setText(input.dbname().replaceAll("[^\\w-]", ""));
     return input;
   }
 
   @Override
   public void action(final Object cmp) {
-    final boolean valid = action(cmp, true);
+    final boolean valid = options.action(true);
+    parsing.action(cmp);
     ft.action(ftxindex.isSelected());
 
-    final String pth = path.getText().trim();
-    final String nm = dbname.getText().trim();
+    final String nm = target.getText().trim();
     ok = valid && !nm.isEmpty();
 
     String inf = !valid ? PATHWHICH : !ok ? DBWHICH : null;
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = MetaData.validName(nm, false);
+      if(ok) gui.gprop.set(GUIProp.CREATENAME, nm);
+
       if(!ok) {
+        // name of database is invalid
         inf = Util.info(INVALID, EDITNAME);
-      } else if(pth.isEmpty()) {
+      } else if(options.input.getText().trim().isEmpty()) {
+        // database will be empty
         inf = EMPTYDATABASE;
         icon = Msg.WARN;
       } else if(db.contains(nm)) {
+        // old database will be overwritten
         inf = RENAMEOVER;
         icon = Msg.WARN;
       }
     }
-    if(ok) gui.gprop.set(GUIProp.CREATENAME, nm);
 
-    info.setText(inf, icon);
+    options.info.setText(inf, icon);
     enableOK(buttons, BUTTONOK, ok);
   }
 
@@ -150,6 +161,8 @@ public final class DialogCreate extends DialogImport {
     gui.set(Prop.TEXTINDEX, txtindex.isSelected());
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX,   ftxindex.isSelected());
-    ft.close();
+    options.setOptions();
+    parsing.setOptions();
+    ft.setOptions();
   }
 }

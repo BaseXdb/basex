@@ -8,6 +8,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.basex.gui.GUI;
@@ -31,9 +33,21 @@ public final class BaseXPopup extends JPopupMenu {
    * @param comp component reference
    * @param pop popup reference
    */
-  public BaseXPopup(final BaseXPanel comp, final GUICommand[] pop) {
+  public BaseXPopup(final BaseXPanel comp, final GUICommand... pop) {
+    this(comp, comp.gui, pop);
+  }
+
+  /**
+   * Constructor.
+   * @param comp component reference
+   * @param g gui reference
+   * @param pop popup reference
+   */
+  public BaseXPopup(final JComponent comp, final GUI g,
+      final GUICommand... pop) {
+
     popup = pop;
-    gui = comp.gui;
+    gui = g;
 
     // both listeners must be implemented to support different platforms
     comp.addMouseListener(new MouseAdapter() {
@@ -62,7 +76,7 @@ public final class BaseXPopup extends JPopupMenu {
         item.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e) {
-            if(!gui.updating) c.execute(comp.gui);
+            if(!gui.updating) c.execute(gui);
           }
         });
         item.setMnemonic(c.label().charAt(0));

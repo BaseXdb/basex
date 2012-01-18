@@ -51,7 +51,7 @@ public final class DialogColors extends Dialog {
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
-    set(newButtons(this, BUTTONRESET), BorderLayout.SOUTH);
+    set(newButtons(BUTTONRESET), BorderLayout.SOUTH);
 
     finish(gprop.nums(GUIProp.COLORSLOC));
   }

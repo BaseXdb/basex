@@ -1,8 +1,10 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
+
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -41,16 +43,14 @@ public final class DialogFonts extends Dialog {
 
     final BaseXBack p = new BaseXBack(new TableLayout(1, 4, 8, 0));
     font = new BaseXList(fonts, this);
-    font.setSize(150, 112);
     p.add(font);
     font2 = new BaseXList(fonts, this);
-    font2.setSize(150, 112);
     p.add(font2);
     type = new BaseXList(FONTTYPES, this);
-    type.setSize(80, 112);
+    type.setWidth(90);
     p.add(type);
     size = new BaseXList(FTSZ, this);
-    size.setSize(50, 112);
+    size.setWidth(50);
     p.add(size);
 
     final GUIProp gprop = gui.gprop;

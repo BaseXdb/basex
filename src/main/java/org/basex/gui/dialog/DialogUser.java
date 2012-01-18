@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.IOException;
 
 import javax.swing.JScrollPane;
@@ -126,8 +127,7 @@ final class DialogUser extends BaseXBack {
 
     table = new BaseXTable(users, dia);
     final JScrollPane sp = new JScrollPane(table);
-    BaseXLayout.setHeight(sp, 220);
-    BaseXLayout.setWidth(sp, 350);
+    sp.setPreferredSize(new Dimension(350, 220));
     p.add(sp);
 
     final BaseXBack pp = new BaseXBack(new TableLayout(2, 1, 0, 5));
@@ -138,10 +138,6 @@ final class DialogUser extends BaseXBack {
 
     tablePanel.add(info, BorderLayout.SOUTH);
     add(tablePanel);
-
-    BaseXButton.setMnemonics(global ? new BaseXButton[] { create, alter, drop }
-      : new BaseXButton[] { add, drop });
-
     action(null);
   }
 

@@ -942,7 +942,7 @@ public abstract class Data {
     while(p < meta.size) {
       final int k = kind(p);
       dist(p, k, dist(p, k) + size);
-      p += size(p, kind(p));
+      p += size(p, k);
     }
   }
 

@@ -1,15 +1,18 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
 import org.basex.build.file.ParserProp;
 import org.basex.build.xml.CatalogWrapper;
 import org.basex.core.Prop;
 import org.basex.data.DataText;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -44,12 +47,6 @@ public final class DialogParsing extends BaseXBack {
   private final BaseXTextField cfile;
   /** Browse Catalog file. */
   private final BaseXButton browsec;
-  /** Main window reference. */
-  private final Dialog dialog;
-  /** Options panel. */
-  private BaseXBack parseropts;
-  /** XML options panel. */
-  private final BaseXBack xmlopts;
 
   /** CSV options panel. */
   private final BaseXBack csvopts;
@@ -71,6 +68,13 @@ public final class DialogParsing extends BaseXBack {
 
   /** Main panel. */
   private final BaseXBack main;
+  /** Main window reference. */
+  private final GUI gui;
+
+  /** Options panel. */
+  private BaseXBack parseropts;
+  /** XML options panel. */
+  private final BaseXBack xmlopts;
   /** ParserProps. */
   private ParserProp props;
 
@@ -79,10 +83,10 @@ public final class DialogParsing extends BaseXBack {
    * @param d dialog reference
    */
   public DialogParsing(final Dialog d) {
-    dialog = d;
     main = new BaseXBack(new TableLayout(3, 1)).border(8);
+    gui = d.gui;
 
-    final Prop prop = dialog.gui.context.prop;
+    final Prop prop = gui.context.prop;
     try {
       props = new ParserProp(prop.get(Prop.PARSEROPT));
     } catch(final IOException ex) {
@@ -102,7 +106,6 @@ public final class DialogParsing extends BaseXBack {
     chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, d);
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), d);
     browsec = new BaseXButton(BUTTONBROWSE, d);
-    browsec.setMnemonic();
     usecat = new BaseXCheckBox(USECATFILE,
         !prop.get(Prop.CATFILE).isEmpty(), 0, d);
 
@@ -122,7 +125,7 @@ public final class DialogParsing extends BaseXBack {
     createOptionsPanels();
 
     setLayout(new TableLayout(1, 1));
-    options(parser.getSelectedItem().toString());
+    update(parser.getSelectedItem().toString());
     add(main);
   }
 
@@ -181,10 +184,10 @@ public final class DialogParsing extends BaseXBack {
   }
 
   /**
-   * Refreshes the options panel.
+   * Updates the options panel.
    * @param type format type
    */
-  void options(final String type) {
+  void update(final String type) {
     main.removeAll();
 
     final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
@@ -212,9 +215,9 @@ public final class DialogParsing extends BaseXBack {
    * Opens a file dialog to choose an XML catalog or directory.
    */
   void catchoose() {
-    final GUIProp gprop = dialog.gui.gprop;
+    final GUIProp gprop = gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.CREATEPATH), dialog.gui);
+        gprop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
@@ -235,13 +238,13 @@ public final class DialogParsing extends BaseXBack {
       cfile.setEnabled(uc);
       browsec.setEnabled(uc);
     }
-    if(cmp == parser) options(type);
+    if(cmp == parser) update(type);
   }
 
   /**
-   * Closes the tab.
+   * Sets the parsing options.
    */
-  public void close() {
+  public void setOptions() {
     final String type = parser.getSelectedItem().toString();
     final BaseXCombo cb = type.equals(DataText.M_TEXT) ? tencoding : cencoding;
     props.set(ParserProp.ENCODING, cb.getSelectedItem().toString());
@@ -249,11 +252,11 @@ public final class DialogParsing extends BaseXBack {
     props.set(ParserProp.HEADER, header.isSelected());
     props.set(ParserProp.SEPARATOR, separator.getSelectedItem().toString());
     props.set(ParserProp.LINES, lines.isSelected());
-    dialog.gui.set(Prop.PARSEROPT, props.toString());
-    dialog.gui.set(Prop.CHOP, chop.isSelected());
-    dialog.gui.set(Prop.DTD, dtd.isSelected());
-    dialog.gui.set(Prop.INTPARSE, intparse.isSelected());
-    dialog.gui.set(Prop.PARSER, parser.getSelectedItem().toString());
-    dialog.gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText() : "");
+    gui.set(Prop.PARSEROPT, props.toString());
+    gui.set(Prop.CHOP, chop.isSelected());
+    gui.set(Prop.DTD, dtd.isSelected());
+    gui.set(Prop.INTPARSE, intparse.isSelected());
+    gui.set(Prop.PARSER, parser.getSelectedItem().toString());
+    gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText() : "");
   }
 }

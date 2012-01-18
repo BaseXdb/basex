@@ -62,6 +62,8 @@ public final class Prop extends AProp {
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
   /** Flag for adding archives to a database. */
   public static final Object[] ADDARCHIVES = { "ADDARCHIVES", true };
+  /** Flag for adding remaining files as raw files. */
+  public static final Object[] ADDRAW = { "ADDRAW", false };
   /** Flag for skipping corrupt files. */
   public static final Object[] SKIPCORRUPT = { "SKIPCORRUPT", false };
   /** Define import parser. */

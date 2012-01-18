@@ -174,7 +174,7 @@ public final class SAXWrapper extends SingleParser {
     }
     // retrieve/estimate number of bytes to be read
     length = src.length();
-    if(length == 0) length = in.available();
+    if(length <= 0) length = in.available();
 
     // create wrapper
     final InputSource tmp = new InputSource(new InputStream() {

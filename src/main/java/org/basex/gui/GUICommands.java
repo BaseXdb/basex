@@ -17,7 +17,6 @@ import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.Cs;
-import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropIndex;
 import org.basex.core.cmd.Export;
 import org.basex.core.cmd.Optimize;
@@ -26,15 +25,13 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogAbout;
-import org.basex.gui.dialog.DialogAdd;
 import org.basex.gui.dialog.DialogColors;
-import org.basex.gui.dialog.DialogCreate;
+import org.basex.gui.dialog.DialogNew;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogExport;
 import org.basex.gui.dialog.DialogFonts;
 import org.basex.gui.dialog.DialogHelp;
-import org.basex.gui.dialog.DialogInfo;
-import org.basex.gui.dialog.DialogInput;
+import org.basex.gui.dialog.DialogProps;
 import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogManage;
 import org.basex.gui.dialog.DialogMapLayout;
@@ -72,7 +69,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
-      final DialogCreate dialog = new DialogCreate(gui);
+      final DialogNew dialog = new DialogNew(gui);
       if(!dialog.ok()) return;
       final String in = gui.gprop.get(GUIProp.CREATEPATH);
       final String db = gui.gprop.get(GUIProp.CREATENAME);
@@ -89,21 +86,43 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Opens a dialog to add new documents. */
-  ADD(GUIADD + DOTS, null, GUIADDTT, true, false) {
+  /** Shows database info. */
+  INFO(GUIPROPS + DOTS, "% D", GUIPROPSTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogAdd dialog = new DialogAdd(gui);
-      if(dialog.ok()) DialogProgress.execute(dialog, "", dialog.cmd());
-    }
-  },
+      final DialogProps info = new DialogProps(gui);
+      if(info.ok()) {
+        final Data d = gui.context.data();
+        final boolean[] ind = info.indexes();
+        if(info.optimize()) {
+          d.meta.textindex = ind[0];
+          d.meta.attrindex = ind[1];
+          d.meta.ftxtindex   = ind[2];
+          DialogProgress.execute(info, INFOOPT, new Optimize());
+        } else {
+          Command[] cmd = {};
+          if(ind[0] != d.meta.pathindex)
+            cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
+          if(ind[1] != d.meta.textindex)
+            cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
+          if(ind[2] != d.meta.attrindex)
+            cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
+          if(ind[3] != d.meta.ftxtindex)
+            cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
 
-  /** Opens a dialog to delete documents. */
-  DROP(GUIDROP + DOTS, null, GUIDROPTT, true, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogInput d = new DialogInput("", DROPTITLE, gui, 0);
-      if(d.ok()) DialogProgress.execute(d, "", new Delete(d.input()));
+          DialogProgress.execute(info, PROGINDEX, cmd);
+        }
+      }
+    }
+
+    /**
+     * Returns a command for creating/dropping the specified index.
+     * @param create create flag
+     * @param index name of index
+     * @return command instance
+     */
+    private Command cmd(final boolean create, final CmdIndex index) {
+      return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
 
@@ -146,46 +165,6 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       b.setEnabled(gui.context.data() != null && !gui.context.data().empty());
-    }
-  },
-
-  /** Shows database info. */
-  INFO(GUIPROPS + DOTS, "% D", GUIPROPSTT, true, false) {
-    @Override
-    public void execute(final GUI gui) {
-      final DialogInfo info = new DialogInfo(gui);
-      if(info.ok()) {
-        final Data d = gui.context.data();
-        final boolean[] ind = info.indexes();
-        if(info.opt) {
-          d.meta.textindex = ind[0];
-          d.meta.attrindex = ind[1];
-          d.meta.ftxtindex   = ind[2];
-          DialogProgress.execute(info, INFOOPT, new Optimize());
-        } else {
-          Command[] cmd = {};
-          if(ind[0] != d.meta.pathindex)
-            cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
-          if(ind[1] != d.meta.textindex)
-            cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
-          if(ind[2] != d.meta.attrindex)
-            cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
-          if(ind[3] != d.meta.ftxtindex)
-            cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
-
-          DialogProgress.execute(info, PROGINDEX, cmd);
-        }
-      }
-    }
-
-    /**
-     * Returns a command for creating/dropping the specified index.
-     * @param create create flag
-     * @param index name of index
-     * @return command instance
-     */
-    private Command cmd(final boolean create, final CmdIndex index) {
-      return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
 

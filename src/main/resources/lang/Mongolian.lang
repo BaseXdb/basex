@@ -65,6 +65,7 @@ dc_advtitle=Өгөгдлийн санг үүсгэх
 dc_chop=Бичиглэлийн илүү сул зайг хасах
 dc_intparse=Дотоод XML Parser-р хөрвүүлэх
 dc_archives=Архиваар дамжуулан файлыг Parsing хийх
+dc_raw=Add remaining files as raw files
 dc_corrupt=Алдаатай (буруу бичигдсэн) файлуудыг алгасах
 dc_createformat=Оролтын хэлбэр
 dc_dtd=Parse DTD-үүд болон объектууд

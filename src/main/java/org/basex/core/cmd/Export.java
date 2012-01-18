@@ -48,7 +48,7 @@ public final class Export extends Command {
 
   /**
    * Exports the current database to the specified path.
-   * Files and Folders contained in {@code path} will be possibly overwritten.
+   * Files and directories in {@code path} will be possibly overwritten.
    * @param data data reference
    * @param target directory
    * @throws IOException I/O exception

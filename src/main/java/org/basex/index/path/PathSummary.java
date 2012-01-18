@@ -11,7 +11,6 @@ import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.io.serial.Serializer;
 import org.basex.util.Array;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenIntMap;
@@ -233,15 +232,6 @@ public final class PathSummary implements Index {
   @Override
   public byte[] info() {
     return root != null ? chop(root.info(data, 0), 1 << 20) : EMPTY;
-  }
-
-  /**
-   * Serializes the path node.
-   * @param ser serializer
-   * @throws IOException I/O exception
-   */
-  public void plan(final Serializer ser) throws IOException {
-    root.plan(data, ser);
   }
 
   // Unsupported methods ======================================================

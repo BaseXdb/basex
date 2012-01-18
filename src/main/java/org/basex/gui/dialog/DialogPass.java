@@ -54,7 +54,7 @@ public final class DialogPass extends Dialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(this, BUTTONOK, BUTTONCANCEL);
+    buttons = newButtons(BUTTONOK, BUTTONCANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);

@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.basex.core.Prop;
+import org.basex.core.cmd.Store;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -36,6 +37,8 @@ public final class DirParser extends TargetParser {
   private final boolean archives;
   /** Skip corrupt files in directories. */
   private final boolean skip;
+  /** Add remaining files as raw files. */
+  private final boolean raw;
 
   /** Parser reference. */
   private Parser parser;
@@ -63,8 +66,9 @@ public final class DirParser extends TargetParser {
     final String parent = source.dir();
     root = parent.endsWith("/") ? parent : parent + '/';
     skip = prop.is(Prop.SKIPCORRUPT);
+    raw = prop.is(Prop.ADDRAW);
     archives = prop.is(Prop.ADDARCHIVES);
-    filter = !source.isDir() ? null :
+    filter = !source.isDir() && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
   }
 
@@ -87,14 +91,13 @@ public final class DirParser extends TargetParser {
       for(final IO f : ((IOFile) io).children()) parse(b, f);
     } else {
       src = io;
-      if(!archives && src.isArchive()) return;
 
-      // multiple archive files may be parsed in this loop
-      while(io.more()) {
+      while(io.more(archives)) {
         final String nm = Prop.WIN ? io.name().toLowerCase(Locale.ENGLISH) :
           io.name();
-        if(filter != null && !filter.matcher(nm).matches()) continue;
-        b.meta.filesize += src.length();
+
+        final long l = src.length();
+        if(l != -1) b.meta.filesize += l;
 
         // use global target as prefix
         String targ = trg;
@@ -107,30 +110,34 @@ public final class DirParser extends TargetParser {
           targ = (targ + path).replace("//", "/");
         }
 
-        boolean ok = true;
-        IO in = io;
-        if(skip) {
-          // parse file twice to ensure that it is well-formed
-          try {
-            // cache file contents to allow or speed up a second run
-            in = new IOContent(io.read());
-            in.name(io.name());
-            parser = Parser.fileParser(in, prop, targ);
-            MemBuilder.build("", parser, prop);
-          } catch(final IOException ex) {
-            Util.debug(ex.getMessage());
-            skipped.add(io.path());
-            ok = false;
-          }
-        }
-
-        if(ok) {
-          parser = Parser.fileParser(in, prop, targ);
-          parser.parse(b);
+        if(filter != null && !filter.matcher(nm).matches()) {
+          if(raw) Store.store(src.inputSource(), b.meta.binary(targ + name));
         } else {
-          parser = null;
+          boolean ok = true;
+          IO in = io;
+          if(skip) {
+            // parse file twice to ensure that it is well-formed
+            try {
+              // cache file contents to allow or speed up a second run
+              in = new IOContent(io.read());
+              in.name(io.name());
+              parser = Parser.fileParser(in, prop, targ);
+              MemBuilder.build("", parser, prop);
+            } catch(final IOException ex) {
+              Util.debug(ex.getMessage());
+              skipped.add(io.path());
+              ok = false;
+            }
+          }
+
+          if(ok) {
+            parser = Parser.fileParser(in, prop, targ);
+            parser.parse(b);
+          } else {
+            parser = null;
+          }
+          if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
         }
-        if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
       }
     }
   }

@@ -32,6 +32,8 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public abstract class Dialog extends JDialog {
+  /** Used mnemonics. */
+  public final StringBuilder mnem = new StringBuilder();
   /** Reference to main window. */
   public final GUI gui;
   /** Reference to the root panel. */
@@ -41,7 +43,7 @@ public abstract class Dialog extends JDialog {
   /** Dialog position. */
   private int[] loc;
 
-  /** Key listener. */
+  /** Key listener, triggering an action with each click. */
   protected final KeyAdapter keys = new KeyAdapter() {
     @Override
     public void keyReleased(final KeyEvent e) {
@@ -123,8 +125,8 @@ public abstract class Dialog extends JDialog {
   }
 
   /**
-   * Closes the dialog; can be overwritten and stores the dialog position if it
-   * has been specified before.
+   * Closes the dialog and stores the location of the dialog window;
+   * can be overwritten.
    */
   public void close() {
     ok = true;
@@ -152,40 +154,34 @@ public abstract class Dialog extends JDialog {
 
   /**
    * Creates a OK and CANCEL button.
-   * @param dialog reference to the component, reacting on button clicks
    * @return button list
    */
-  protected static BaseXBack okCancel(final Dialog dialog) {
-    return newButtons(dialog, BUTTONOK, BUTTONCANCEL);
+  protected BaseXBack okCancel() {
+    return newButtons(BUTTONOK, BUTTONCANCEL);
   }
 
   /**
    * Creates a new button list.
-   * @param dialog reference to the component, reacting on button clicks
    * @param buttons button names or objects
    * @return button list
    */
-  protected static BaseXBack newButtons(final Dialog dialog,
-      final Object... buttons) {
-
+  protected BaseXBack newButtons(final Object... buttons) {
     // horizontal/vertical layout
-    final BaseXBack panel = new BaseXBack(Fill.NONE).
+    final BaseXBack pnl = new BaseXBack(Fill.NONE).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
-    final StringBuilder mnem = new StringBuilder();
     for(final Object obj : buttons) {
       BaseXButton b = null;
       if(obj instanceof BaseXButton) {
         b = (BaseXButton) obj;
       } else {
-        b = new BaseXButton(obj.toString(), dialog);
+        b = new BaseXButton(obj.toString(), this);
       }
-      BaseXButton.setMnemonics(mnem, b);
-      panel.add(b);
+      pnl.add(b);
     }
 
     final BaseXBack but = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    but.add(panel, BorderLayout.EAST);
+    but.add(pnl, BorderLayout.EAST);
     return but;
   }
 
@@ -197,6 +193,7 @@ public abstract class Dialog extends JDialog {
    */
   protected static void enableOK(final JComponent panel, final String label,
       final boolean enabled) {
+
     for(final Component c : panel.getComponents()) {
       if(!(c instanceof JComponent)) {
         continue;
