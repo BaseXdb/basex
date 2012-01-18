@@ -94,18 +94,14 @@ public final class DialogInput extends Dialog {
   public void action(final Object cmp) {
     final String in = input();
     String msg = null;
-    if(type > 0) {
-      ok = db.contains(in) || in.equals(old);
-      if(ok) msg = Util.info(DBEXIST, in);
-      if(!ok) {
-        ok = MetaData.validName(in, false);
-        if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
-      }
-    } else {
-      final int docs = in.isEmpty() ? 0 : gui.context.data().docs(in).size();
-      msg = Util.info(DELETEPATH, docs);
-      ok = docs != 0;
+    ok = type != 0 && (db.contains(in) || in.equals(old));
+    if(ok) msg = Util.info(DBEXIST, in);
+    if(!ok) {
+      ok = type == 0 ? MetaData.normPath(in) != null :
+          MetaData.validName(in, false);
+      if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
     }
+
     info.setText(msg, type == 1 || type == 2 ? Msg.ERROR : Msg.WARN);
     enableOK(buttons, BUTTONOK, ok);
   }

@@ -50,7 +50,7 @@ public abstract class TreeNode extends DefaultMutableTreeNode
    * Prepares the given path to be used as a tree node. The returned path looks
    * the following:
    * the path ...
-   * 1. is relative to the BaseXData directory
+   * 1. is relative to the database root directory
    * 2. has one leading slash
    * 3. has no trailing slashes, no matter if it represents folder or file
    * @param path path to be prepared
@@ -60,6 +60,14 @@ public abstract class TreeNode extends DefaultMutableTreeNode
     String p = MetaData.normPath(string(path));
     if(p.endsWith("/")) p = p.substring(0, p.length() - 1);
     return concat(SLASH, token(p));
+  }
+
+  /**
+   * Returns the complete path (path + name) of this node as a string.
+   * @return path string
+   */
+  public String path() {
+    return string(preparePath(concat(concat(path, SLASH), name)));
   }
 
   /**
@@ -80,13 +88,5 @@ public abstract class TreeNode extends DefaultMutableTreeNode
   @Override
   public String toString() {
     return string(name);
-  }
-
-  /**
-   * Returns the complete path (path + name) of this node as a string.
-   * @return path string
-   */
-  public String completePath() {
-    return string(preparePath(concat(concat(path, SLASH), name)));
   }
 }

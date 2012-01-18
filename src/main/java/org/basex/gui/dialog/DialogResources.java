@@ -30,12 +30,10 @@ import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.BaseXTree;
-import org.basex.gui.layout.TableLayout;
 import org.basex.gui.layout.TreeFolder;
 import org.basex.gui.layout.TreeLeaf;
 import org.basex.gui.layout.TreeNode;
@@ -56,7 +54,7 @@ public class DialogResources extends BaseXBack {
   /** Search text field. */
   final BaseXTextField filterText;
   /** Database/root node. */
-  final TreeFolder dbnode;
+  final TreeFolder root;
   /** Dialog reference. */
   final DialogProps dialog;
 
@@ -73,13 +71,10 @@ public class DialogResources extends BaseXBack {
     setLayout(new BorderLayout(0, 5));
     dialog = d;
 
-    filterText = new BaseXTextField("", d);
-    BaseXLayout.setWidth(filterText, 220);
-
     // init tree - additional root node necessary to bypass
     // the egg/chicken dilemma
-    final DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-    tree = new BaseXTree(root, d);
+    final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
+    tree = new BaseXTree(rootNode, d);
     tree.setBorder(new EmptyBorder(4, 4, 4, 4));
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(
@@ -91,21 +86,26 @@ public class DialogResources extends BaseXBack {
     tree.addTreeSelectionListener(new TreeSelectionListener() {
       @Override
       public void valueChanged(final TreeSelectionEvent e) {
-        final TreeNode n = (TreeNode) e.getPath().getLastPathComponent();
-        String path = n.equals(dbnode) ? "" : n.completePath();
-        if(!n.isLeaf()) {
-          path += "/";
-          dialog.add.target.setText(path);
+        TreeNode n = (TreeNode) e.getPath().getLastPathComponent();
+        String filt = n.equals(root) ? "" : n.path();
+        String trgt = filt + '/';
+
+        if(n.isLeaf()) {
+          n = (TreeNode) n.getParent();
+          trgt = (n.equals(root) ? "" : n.path()) + '/';
+        } else {
+          filt = trgt;
         }
-        filterText.setText(path);
+        filterText.setText(filt);
+        dialog.add.target.setText(trgt);
       }
     });
 
     // add default children to tree
     final Data data = d.gui.context.data();
-    dbnode = new TreeRootFolder(token(data.meta.name), token("/"), tree, data);
-    ((DefaultTreeModel) tree.getModel()).insertNodeInto(dbnode, root, 0);
-    tree.expandPath(new TreePath(dbnode.getPath()));
+    root = new TreeRootFolder(token(data.meta.name), token("/"), tree, data);
+    ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
+    tree.expandPath(new TreePath(root.getPath()));
 
     filter = new BaseXButton(BUTTONFILTER, d);
     clear = new BaseXButton(BUTTONCLEAR, d);
@@ -119,6 +119,9 @@ public class DialogResources extends BaseXBack {
     buttons.add(clear);
     final BaseXBack btn = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
+
+    filterText = new BaseXTextField("", d.gui);
+    BaseXLayout.setWidth(filterText, 220);
 
     // left panel
     final BaseXBack panel = new BaseXBack(new BorderLayout());
@@ -144,13 +147,13 @@ public class DialogResources extends BaseXBack {
   void filter() {
     final byte[] path = TreeNode.preparePath(token(filterText.getText()));
     if(eq(path, SLASH)) {
-      refreshFolder(dbnode);
+      refreshFolder(root);
       return;
     }
 
     final Data data = dialog.gui.context.data();
     // clear tree to append filtered nodes
-    dbnode.removeAllChildren();
+    root.removeAllChildren();
 
     // check if there's a folder
     final boolean documentFolder = data.docindex.isDir(path);
@@ -158,7 +161,7 @@ public class DialogResources extends BaseXBack {
     final boolean rawFolder = fol.exists() && fol.children().length > 0;
     // create a folder if there's either a raw or document folder
     if(documentFolder || rawFolder) {
-      dbnode.add(new TreeFolder(TreeFolder.name(path),
+      root.add(new TreeFolder(TreeFolder.name(path),
           TreeFolder.path(path), tree, data));
     }
 
@@ -169,10 +172,10 @@ public class DialogResources extends BaseXBack {
         new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, data));
 
     for(final TreeLeaf l : leaves) {
-      if(name.length == 0 || eq(l.name, name)) dbnode.add(l);
+      if(name.length == 0 || eq(l.name, name)) root.add(l);
     }
 
-    ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(dbnode);
+    ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
   }
 
   /**
@@ -199,8 +202,8 @@ public class DialogResources extends BaseXBack {
   void action(final Object comp) {
     if(comp == filter) {
       filter();
-    } else {
-      refreshFolder(dbnode);
+    } else if(comp != null) {
+      refreshFolder(root);
       if(comp == clear) filterText.requestFocus();
     }
   }
@@ -261,7 +264,7 @@ public class DialogResources extends BaseXBack {
       if(n == null) return;
 
       if(!Dialog.confirm(dialog.gui, Text.DELETECONF)) return;
-      DialogProgress.execute(dialog, "", new Delete(n.completePath()));
+      DialogProgress.execute(dialog, "", new Delete(n.path()));
 
       // refresh tree
       final TreeFolder par = (TreeFolder) n.getParent();
@@ -276,7 +279,7 @@ public class DialogResources extends BaseXBack {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final TreeNode n = selection();
-      button.setEnabled(n != null && !n.equals(dbnode));
+      button.setEnabled(n != null && !n.equals(root));
     }
   }
 
@@ -287,12 +290,11 @@ public class DialogResources extends BaseXBack {
       final TreeNode n = selection();
       if(n == null) return;
 
-      final InputDialog d = new InputDialog(BUTTONRENAME,
-          n.completePath(), RENAMEAS);
+      final DialogInput d = new DialogInput(
+          n.path(), RENAMETITLE, dialog.gui, 0);
       if(!d.ok()) return;
 
-      DialogProgress.execute(dialog, "",
-          new Rename(n.completePath(), d.input()));
+      DialogProgress.execute(dialog, "", new Rename(n.path(), d.input()));
 
       // refresh tree
       final TreeFolder par = (TreeFolder) n.getParent();
@@ -307,41 +309,7 @@ public class DialogResources extends BaseXBack {
     @Override
     public void refresh(final GUI gui, final AbstractButton button) {
       final TreeNode n = selection();
-      button.setEnabled(n != null && !n.equals(dbnode) &&
-          !(n instanceof TreeFolder));
-    }
-  }
-
-  /** Rename dialog. */
-  private final class InputDialog extends Dialog {
-    /** New name. */
-    private final BaseXTextField in;
-
-    /**
-     * Constructor.
-     * @param title title
-     * @param name current name of node
-     * @param lblText text for label
-     */
-    protected InputDialog(final String title, final String name,
-        final String lblText) {
-
-      super(dialog.gui, title);
-      final BaseXBack p = new BaseXBack(new TableLayout(2, 1)).border(8);
-      in = new BaseXTextField(name, this);
-      p.add(new BaseXLabel(lblText, true, true));
-      p.add(in);
-      set(p, BorderLayout.NORTH);
-      set(okCancel(), BorderLayout.SOUTH);
-      finish(null);
-    }
-
-    /**
-     * Returns the new name for the target.
-     * @return name
-     */
-    String input() {
-      return in.getText().trim();
+      button.setEnabled(n != null && !n.equals(root));
     }
   }
 }

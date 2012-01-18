@@ -1322,8 +1322,6 @@ public interface Text {
   String RENAMEOVER = lang("dr_over");
   /** Info for creating an empty database. */
   String EMPTYDATABASE = lang("dr_empty");
-  /** % documents will be deleted. */
-  String DELETEPATH = lang("dr_delete");
 
   /** Dialog title for managing databases. */
   String MANAGETITLE = lang("dd_title");
