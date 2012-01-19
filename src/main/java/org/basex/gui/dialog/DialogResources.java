@@ -1,0 +1,315 @@
+package org.basex.gui.dialog;
+
+import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+
+import org.basex.core.Text;
+import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.Rename;
+import org.basex.data.Data;
+import org.basex.gui.GUI;
+import org.basex.gui.GUICommand;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXPopup;
+import org.basex.gui.layout.BaseXTextField;
+import org.basex.gui.layout.BaseXTree;
+import org.basex.gui.layout.TreeFolder;
+import org.basex.gui.layout.TreeLeaf;
+import org.basex.gui.layout.TreeNode;
+import org.basex.gui.layout.TreeRootFolder;
+import org.basex.io.IOFile;
+
+/**
+ * Combination of a JTree and a text field. The tree visualizes the database
+ * content including raw files and documents. The search field allows to
+ * quickly access specific files/documents.
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Lukas Kircher
+ */
+public class DialogResources extends BaseXBack {
+  /** Resource tree. */
+  final BaseXTree tree;
+  /** Search text field. */
+  final BaseXTextField filterText;
+  /** Database/root node. */
+  final TreeFolder root;
+  /** Dialog reference. */
+  final DialogProps dialog;
+
+  /** Filter button. */
+  private final BaseXButton filter;
+  /** Clear button. */
+  private final BaseXButton clear;
+
+  /**
+   * Constructor.
+   * @param d dialog reference
+   */
+  public DialogResources(final DialogProps d) {
+    setLayout(new BorderLayout(0, 5));
+    dialog = d;
+
+    // init tree - additional root node necessary to bypass
+    // the egg/chicken dilemma
+    final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
+    tree = new BaseXTree(rootNode, d);
+    tree.setBorder(new EmptyBorder(4, 4, 4, 4));
+    tree.setRootVisible(false);
+    tree.getSelectionModel().setSelectionMode(
+        TreeSelectionModel.SINGLE_TREE_SELECTION);
+
+    final ImageIcon xml = BaseXLayout.icon("file_xml");
+    final ImageIcon raw = BaseXLayout.icon("file_raw");
+    tree.setCellRenderer(new TreeNodeRenderer(xml, raw));
+    tree.addTreeSelectionListener(new TreeSelectionListener() {
+      @Override
+      public void valueChanged(final TreeSelectionEvent e) {
+        TreeNode n = (TreeNode) e.getPath().getLastPathComponent();
+        String filt = n.equals(root) ? "" : n.path();
+        String trgt = filt + '/';
+
+        if(n.isLeaf()) {
+          n = (TreeNode) n.getParent();
+          trgt = (n == null || n.equals(root) ? "" : n.path()) + '/';
+        } else {
+          filt = trgt;
+        }
+        filterText.setText(filt);
+        dialog.add.target.setText(trgt);
+      }
+    });
+
+    // add default children to tree
+    final Data data = d.gui.context.data();
+    root = new TreeRootFolder(token(data.meta.name), token("/"), tree, data);
+    ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
+    tree.expandPath(new TreePath(root.getPath()));
+
+    filter = new BaseXButton(BUTTONFILTER, d);
+    clear = new BaseXButton(BUTTONCLEAR, d);
+
+    // popup menu for node interaction
+    new BaseXPopup(tree, d.gui, new DeleteCmd(), new RenameCmd());
+
+    // button panel
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    buttons.add(filter);
+    buttons.add(clear);
+    final BaseXBack btn = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    btn.add(buttons, BorderLayout.EAST);
+
+    filterText = new BaseXTextField("", d.gui);
+    BaseXLayout.setWidth(filterText, 220);
+
+    // left panel
+    final BaseXBack panel = new BaseXBack(new BorderLayout());
+    panel.add(filterText, BorderLayout.CENTER);
+    panel.add(btn, BorderLayout.SOUTH);
+
+    add(new JScrollPane(tree), BorderLayout.CENTER);
+    add(panel, BorderLayout.SOUTH);
+  }
+
+  /**
+   * Returns the current tree node selection.
+   * @return selected node
+   */
+  TreeNode selection() {
+    final TreePath t = tree.getSelectionPath();
+    return t == null ? null : (TreeNode) t.getLastPathComponent();
+  }
+
+  /**
+   * Searches the tree for nodes that match the given search text.
+   */
+  void filter() {
+    final byte[] path = TreeNode.preparePath(token(filterText.getText()));
+    if(eq(path, SLASH)) {
+      refreshFolder(root);
+      return;
+    }
+
+    final Data data = dialog.gui.context.data();
+    // clear tree to append filtered nodes
+    root.removeAllChildren();
+
+    // check if there's a folder
+    final boolean documentFolder = data.docindex.isDir(path);
+    final IOFile fol = data.meta.binary(string(path));
+    final boolean rawFolder = fol.exists() && fol.children().length > 0;
+    // create a folder if there's either a raw or document folder
+    if(documentFolder || rawFolder) {
+      root.add(new TreeFolder(TreeFolder.name(path),
+          TreeFolder.path(path), tree, data));
+    }
+
+    // now add the actual files (if there are any)
+    final byte[] name = TreeFolder.name(path);
+    final byte[] sub = TreeFolder.path(path);
+    final TreeLeaf[] leaves = TreeFolder.leaves(
+        new TreeFolder(TreeFolder.name(sub), TreeFolder.path(sub), tree, data));
+
+    for(final TreeLeaf l : leaves) {
+      if(name.length == 0 || eq(l.name, name)) root.add(l);
+    }
+
+    ((DefaultTreeModel) tree.getModel()).nodeStructureChanged(root);
+  }
+
+  /**
+   * Refreshes the given folder node. Removes all its children and reloads
+   * it afterwards.
+   * @param n folder
+   */
+  void refreshFolder(final TreeFolder n) {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        n.removeChildren();
+        final TreePath path = new TreePath(n.getPath());
+        tree.collapsePath(path);
+        tree.expandPath(path);
+      }
+    });
+  }
+
+  /**
+   * Reacts on user input.
+   * @param comp the action component
+   */
+  void action(final Object comp) {
+    if(comp == filter) {
+      filter();
+    } else if(comp != null) {
+      refreshFolder(root);
+      if(comp == clear) filterText.requestFocus();
+    }
+  }
+
+  /**
+   * Custom tree cell renderer to distinguish between raw and xml leaf nodes.
+   * @author BaseX Team 2005-12, BSD License
+   * @author Lukas Kircher
+   */
+  private static final class TreeNodeRenderer extends DefaultTreeCellRenderer {
+    /** Icon for xml files. */
+    private final Icon xmlIcon;
+    /** Icon for raw files. */
+    private final Icon rawIcon;
+
+    /**
+     * Constructor.
+     * @param xml xml icon
+     * @param raw raw icon
+     */
+    TreeNodeRenderer(final Icon xml, final Icon raw) {
+      xmlIcon = xml;
+      rawIcon = raw;
+    }
+
+    @Override
+    public Component getTreeCellRendererComponent(final JTree tree,
+        final Object val, final boolean sel, final boolean exp,
+        final boolean leaf, final int row, final boolean focus) {
+
+      super.getTreeCellRendererComponent(tree, val, sel, exp, leaf, row, focus);
+      if(leaf) setIcon(((TreeLeaf) val).raw ? rawIcon : xmlIcon);
+      return this;
+    }
+  }
+
+  /** GUI Commands for popup menu. */
+  abstract class BaseCmd implements GUICommand {
+    @Override
+    public boolean checked() {
+      return false;
+    }
+    @Override
+    public String help() {
+      return null;
+    }
+    @Override
+    public String key() {
+      return null;
+    }
+  }
+
+  /** Delete cmd. */
+  final class DeleteCmd extends BaseCmd {
+    @Override
+    public void execute(final GUI g) {
+      final TreeNode n = selection();
+      if(n == null) return;
+
+      if(!Dialog.confirm(dialog.gui, Text.DELETECONF)) return;
+      DialogProgress.execute(dialog, "", new Delete(n.path()));
+
+      // refresh tree
+      final TreeFolder par = (TreeFolder) n.getParent();
+      if(par != null) refreshFolder(par);
+    }
+
+    @Override
+    public String label() {
+      return BUTTONDELETE + DOTS;
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final TreeNode n = selection();
+      button.setEnabled(n != null && !n.equals(root));
+    }
+  }
+
+  /** Rename cmd. */
+  final class RenameCmd extends BaseCmd {
+    @Override
+    public void execute(final GUI g) {
+      final TreeNode n = selection();
+      if(n == null) return;
+
+      final DialogInput d = new DialogInput(
+          n.path(), RENAMETITLE, dialog.gui, 0);
+      if(!d.ok()) return;
+
+      DialogProgress.execute(dialog, "", new Rename(n.path(), d.input()));
+
+      // refresh tree
+      final TreeFolder par = (TreeFolder) n.getParent();
+      if(par != null) refreshFolder(par);
+    }
+
+    @Override
+    public String label() {
+      return BUTTONRENAME;
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton button) {
+      final TreeNode n = selection();
+      button.setEnabled(n != null && !n.equals(root));
+    }
+  }
+}

@@ -5,63 +5,96 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 
 import org.basex.core.cmd.Add;
-import org.basex.gui.GUI;
+import org.basex.data.MetaData;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.util.Util;
 
 /**
- * Add document dialog.
+ * Panel for adding new resources.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
+ * @author Lukas Kircher
  */
-public final class DialogAdd extends DialogImport {
+public class DialogAdd extends BaseXBack {
   /** Directory path. */
-  private final BaseXTextField target;
+  final BaseXTextField target;
+  /** Dialog reference. */
+  final DialogProps dialog;
+
+  /** Filter button. */
+  private final BaseXButton add;
+  /** Import options. */
+  private final DialogImport options;
+  /** Parsing options. */
+  private final DialogParsing parsing;
 
   /**
-   * Default constructor.
-   * @param main reference to the main window
+   * Constructor.
+   * @param d dialog reference
    */
-  public DialogAdd(final GUI main) {
-    super(main, GUIADD);
+  public DialogAdd(final DialogProps d) {
+    dialog = d;
+    setLayout(new BorderLayout());
 
-    final BaseXBack p = new BaseXBack(new TableLayout(11, 2, 8, 0)).border(8);
-    init(p);
+    target = new BaseXTextField("/", d);
+    target.addKeyListener(d.keys);
 
-    p.add(new BaseXLabel(CREATETARGET, true, true).border(8, 0, 4, 0));
-    p.add(new BaseXLabel());
+    final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
+    pnl.add(new BaseXLabel(CREATETARGET + COLS, true, true).border(8, 0, 4, 0));
+    pnl.add(target);
 
-    target = new BaseXTextField("/", this);
-    target.addKeyListener(keys);
-    p.add(target);
-    p.add(new BaseXLabel());
+    // option panels
+    options = new DialogImport(d, pnl);
+    parsing = new DialogParsing(d);
 
-    info = new BaseXLabel(" ").border(18, 0, 0, 0);
-    p.add(info);
-
-    final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(GENERALINFO, p);
+    final BaseXTabs tabs = new BaseXTabs(d);
+    tabs.addTab(GENERALINFO, options);
     tabs.addTab(PARSEINFO, parsing);
-    set(tabs, BorderLayout.CENTER);
+    add(tabs, BorderLayout.NORTH);
 
-    action(null);
-    finish(null);
-  }
+    // buttons
+    add = new BaseXButton(BUTTONADD + DOTS, d);
+    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    buttons.add(add);
 
-  @Override
-  public void action(final Object cmp) {
-    action(cmp, false);
+    final BaseXBack btn = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    btn.add(buttons, BorderLayout.EAST);
+    add(btn, BorderLayout.EAST);
   }
 
   /**
-   * Returns the add command to be executed.
-   * @return add command
+   * Reacts on user input.
+   * @param comp the action component
    */
-  public Add cmd() {
-    return new Add(target.getText().trim(), path.getText().trim());
+  void action(final Object comp) {
+    final String src = options.input();
+    final String trg = target.getText().trim();
+
+    if(comp == add) {
+      options.setOptions();
+      parsing.setOptions();
+      DialogProgress.execute(dialog, "", new Add(trg, src));
+      dialog.resources.action(comp);
+    } else {
+      boolean ok = options.action(false);
+      parsing.action(comp);
+
+      String inf = !ok ? PATHWHICH : !ok ? DBWHICH : null;
+      Msg icon = Msg.ERROR;
+      if(ok) {
+        // check if target path is valid
+        ok = MetaData.normPath(trg) != null;
+        if(!ok) inf = Util.info(INVALID, CREATETARGET);
+      }
+      options.info.setText(inf, icon);
+      add.setEnabled(ok);
+    }
   }
 }

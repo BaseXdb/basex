@@ -101,7 +101,7 @@ public final class DialogManage extends Dialog {
     final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
     tab1.add(doc1, BorderLayout.NORTH);
     tab1.add(detail, BorderLayout.CENTER);
-    tab1.add(newButtons(this, drop, rename, copy, open), BorderLayout.SOUTH);
+    tab1.add(newButtons(drop, rename, copy, open), BorderLayout.SOUTH);
 
     doc2 = new BaseXLabel(" ").border(0, 0, 5, 0);
     doc2.setFont(f.deriveFont(f.getSize2D() + 7));
@@ -118,7 +118,7 @@ public final class DialogManage extends Dialog {
     final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);
     tab2.add(doc2, BorderLayout.NORTH);
     tab2.add(backups, BorderLayout.CENTER);
-    tab2.add(newButtons(this, backup, restore, delete, deleteAll),
+    tab2.add(newButtons(backup, restore, delete, deleteAll),
         BorderLayout.SOUTH);
 
     final BaseXTabs tabs = new BaseXTabs(this);

@@ -53,14 +53,14 @@ final class DialogMessage extends Dialog {
       yes = new BaseXButton(BUTTONYES, this);
       no = new BaseXButton(BUTTONNO, this);
       if(ic == Msg.QUESTION) {
-        buttons = newButtons(this, yes, no);
+        buttons = newButtons(yes, no);
       } else {
         cancel = new BaseXButton(BUTTONCANCEL, this);
-        buttons = newButtons(this, yes, no, cancel);
+        buttons = newButtons(yes, no, cancel);
       }
     } else {
       yes = new BaseXButton(BUTTONOK, this);
-      buttons = newButtons(this, yes);
+      buttons = newButtons(yes);
     }
     set(buttons, BorderLayout.SOUTH);
 

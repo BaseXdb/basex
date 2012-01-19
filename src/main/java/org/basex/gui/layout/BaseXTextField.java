@@ -22,7 +22,7 @@ import org.basex.gui.layout.BaseXLayout.DropHandler;
  */
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
-  public static final int DWIDTH = 280;
+  public static final int DWIDTH = 320;
   /** Last input. */
   String last = "";
   /** Text area to search in. */

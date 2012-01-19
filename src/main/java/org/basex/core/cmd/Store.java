@@ -14,6 +14,7 @@ import org.basex.io.IOContent;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.PrintOutput;
+import org.xml.sax.InputSource;
 
 /**
  * Evaluates the 'store' command and stores binary content into the database.
@@ -66,32 +67,46 @@ public final class Store extends ACreate {
     // add directory if it does not exist anyway
     new IOFile(file.dir()).md();
 
-    PrintOutput po = null;
     try {
-      po = new PrintOutput(file.path());
-      try {
-        final Reader r = in.getCharacterStream();
-        final InputStream is = in.getByteStream();
-        final String  id = in.getSystemId();
-        if(r != null) {
-          for(int c; (c = r.read()) != -1;) po.utf8(c);
-        } else if(is != null) {
-          for(int b; (b = is.read()) != -1;) po.write(b);
-        } else if(id != null) {
-          final BufferInput bi = IO.get(id).buffer();
-          try {
-            for(int b; (b = bi.read()) != -1;) po.write(b);
-          } finally {
-            bi.close();
-          }
-        }
-      } finally {
-        po.close();
-      }
+      store(in, file);
     } catch(final IOException ex) {
       return error(DBNOTSTORED, ex.getMessage());
     }
     return info(QUERYEXEC, perf);
+  }
+
+  /**
+   * Stores the specified source to the specified file.
+   * @param in input source
+   * @param file target file
+   * @throws IOException I/O exception
+   */
+  public static void store(final InputSource in, final IOFile file)
+      throws IOException {
+
+    // add directory if it does not exist anyway
+    new IOFile(file.dir()).md();
+
+    PrintOutput po = new PrintOutput(file.path());
+    try {
+      final Reader r = in.getCharacterStream();
+      final InputStream is = in.getByteStream();
+      final String  id = in.getSystemId();
+      if(r != null) {
+        for(int c; (c = r.read()) != -1;) po.utf8(c);
+      } else if(is != null) {
+        for(int b; (b = is.read()) != -1;) po.write(b);
+      } else if(id != null) {
+        final BufferInput bi = IO.get(id).buffer();
+        try {
+          for(int b; (b = bi.read()) != -1;) po.write(b);
+        } finally {
+          bi.close();
+        }
+      }
+    } finally {
+      po.close();
+    }
   }
 
   @Override

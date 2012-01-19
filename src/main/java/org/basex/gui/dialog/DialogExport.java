@@ -72,7 +72,6 @@ public final class DialogExport extends Dialog {
     p.add(path);
 
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
-    browse.setMnemonic();
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) { choose(); }
@@ -115,7 +114,7 @@ public final class DialogExport extends Dialog {
     p = new BaseXBack(new BorderLayout());
     info = new BaseXLabel(" ").border(18, 0, 0, 0);
     p.add(info, BorderLayout.WEST);
-    buttons = okCancel(this);
+    buttons = okCancel();
     p.add(buttons, BorderLayout.EAST);
     set(p, BorderLayout.SOUTH);
 

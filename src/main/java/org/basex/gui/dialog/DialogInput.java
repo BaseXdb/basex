@@ -44,6 +44,7 @@ public final class DialogInput extends Dialog {
    */
   public DialogInput(final String o, final String tit, final GUI main,
        final int t) {
+
     super(main, tit);
     old = o;
     db = List.list(main.context);
@@ -51,11 +52,11 @@ public final class DialogInput extends Dialog {
 
     String title = "";
     if(type == 0) {
-      title = CREATETARGET;
+      title = CREATETARGET + COLS;
     } else if(type == 1) {
-      title = CREATENAME;
+      title = CREATENAME + COLS;
     } else if(type == 2) {
-      title = CREATENAMEC;
+      title = CREATENAMEC + COLS;
     }
 
     set(new BaseXLabel(title, false, true).border(
@@ -75,7 +76,7 @@ public final class DialogInput extends Dialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(this, BUTTONOK, BUTTONCANCEL);
+    buttons = newButtons(BUTTONOK, BUTTONCANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);
@@ -93,18 +94,14 @@ public final class DialogInput extends Dialog {
   public void action(final Object cmp) {
     final String in = input();
     String msg = null;
-    if(type > 0) {
-      ok = db.contains(in) || in.equals(old);
-      if(ok) msg = Util.info(DBEXIST, in);
-      if(!ok) {
-        ok = MetaData.validName(in, false);
-        if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
-      }
-    } else {
-      final int docs = in.isEmpty() ? 0 : gui.context.data().docs(in).size();
-      msg = Util.info(DELETEPATH, docs);
-      ok = docs != 0;
+    ok = type != 0 && (db.contains(in) || in.equals(old));
+    if(ok) msg = Util.info(DBEXIST, in);
+    if(!ok) {
+      ok = type == 0 ? MetaData.normPath(in) != null :
+          MetaData.validName(in, false);
+      if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
     }
+
     info.setText(msg, type == 1 || type == 2 ? Msg.ERROR : Msg.WARN);
     enableOK(buttons, BUTTONOK, ok);
   }

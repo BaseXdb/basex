@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.event.MouseInputAdapter;
 
 import org.basex.gui.dialog.Dialog;
@@ -200,11 +199,10 @@ public final class BaseXList extends BaseXBack {
     list.addMouseListener(mouse);
     list.addMouseMotionListener(mouse);
     text.setFont(list.getFont());
+    BaseXLayout.setWidth(text, list.getWidth());
     BaseXLayout.addInteraction(list, d);
 
-    scroll = new JScrollPane(list,
-        ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    scroll = new JScrollPane(list);
     add(scroll);
     setIndex(0);
   }
@@ -295,6 +293,15 @@ public final class BaseXList extends BaseXBack {
   public void setSize(final int w, final int h) {
     BaseXLayout.setWidth(text, w);
     BaseXLayout.setSize(scroll, w, h);
+  }
+
+  /**
+   * Sets the width of the component.
+   * @param w width
+   */
+  public void setWidth(final int w) {
+    BaseXLayout.setWidth(text, w);
+    BaseXLayout.setWidth(scroll, w);
   }
 
   /**

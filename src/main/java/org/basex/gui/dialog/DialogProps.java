@@ -3,19 +3,12 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-
-import javax.swing.JComponent;
 
 import org.basex.core.cmd.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
-import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -24,52 +17,62 @@ import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Info database dialog.
+ * Database properties dialog.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogInfo extends Dialog {
+public final class DialogProps extends Dialog {
   /** Index checkboxes. */
   private final BaseXCheckBox[] indexes = new BaseXCheckBox[4];
-  /** Editable full-text options. */
-  private DialogFT ft;
   /** Button panel. */
   private final BaseXBack buttons;
   /** Optimize button. */
-  private final Object optimize;
+  private final BaseXButton optimize;
 
+  /** Resource panel. */
+  DialogResources resources;
+  /** Add panel. */
+  DialogAdd add;
+
+  /** Editable full-text options. */
+  private DialogFT ft;
   /** Optimize flag. */
-  public boolean opt;
+  private boolean opt;
 
   /**
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogInfo(final GUI main) {
+  public DialogProps(final GUI main) {
     super(main, INFODB);
-
-    // first tab
-    final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
+    panel.setLayout(new BorderLayout(5, 0));
 
     final Data data = gui.context.data();
-    final MetaData meta = data.meta;
 
-    final Font f = tab1.getFont();
-    final BaseXLabel doc = new BaseXLabel(meta.name).border(0, 0, 5, 0);
+    final BaseXButton okButton = new BaseXButton(BUTTONOK, this);
+    optimize = new BaseXButton(BUTTONOPT, this);
+    buttons = newButtons(optimize, okButton, BUTTONCANCEL);
+
+    // resource tree
+    resources = new DialogResources(this);
+
+    // tab: database info
+    final BaseXBack tabInfo = new BaseXBack(new BorderLayout(0, 8)).border(8);
+    final Font f = tabInfo.getFont();
+    final BaseXLabel doc = new BaseXLabel(data.meta.name).border(0, 0, 5, 0);
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
-    tab1.add(doc, BorderLayout.NORTH);
+    tabInfo.add(doc, BorderLayout.NORTH);
 
-    final byte[] db = InfoDB.db(meta, true, false, true);
+    final byte[] db = InfoDB.db(data.meta, true, false, true);
     final TokenBuilder info = new TokenBuilder(db);
     if(data.nspaces.size() != 0) {
       info.bold().add(NL + INFONS + NL).norm().add(data.nspaces.info());
@@ -77,12 +80,17 @@ public final class DialogInfo extends Dialog {
 
     final BaseXEditor text = text(info.finish());
     text.setFont(f);
-    tab1.add(text, BorderLayout.CENTER);
+    tabInfo.add(text, BorderLayout.CENTER);
 
-    // second tab
-    final BaseXBack tab2 = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
-    tab2.add(addIndex(true, data));
-    tab2.add(addIndex(false, data));
+    // tab: resources
+    add = new DialogAdd(this);
+    final BaseXBack tabRes = add.border(8);
+
+    // tab: name indexes
+    final BaseXBack tabNames =
+        new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
+    tabNames.add(addIndex(true, data));
+    tabNames.add(addIndex(false, data));
 
     final String[] cb = {
         INFOPATHINDEX, INFOTEXTINDEX, INFOATTRINDEX, INFOFTINDEX };
@@ -96,71 +104,47 @@ public final class DialogInfo extends Dialog {
       panels[i] = new BaseXBack(new BorderLayout());
     }
 
-    // third tab
-    final BaseXBack tab3 = new BaseXBack(new GridLayout(1, 1)).border(8);
-    JComponent north = indexes[0];
-    if(val[0]) {
-      north = new BaseXBack(new BorderLayout());
-      north.add(indexes[0], BorderLayout.WEST);
-      final BaseXButton export = new BaseXButton(GUIEXPORT, this);
-      export.setMnemonic();
-      export.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-          final IO file = save(gui, true);
-          if(file != null) {
-            PrintOutput po = null;
-            try {
-              po = new PrintOutput(file.path());
-              data.pthindex.plan(Serializer.get(po));
-            } catch(final IOException ex) {
-              Dialog.error(gui, NOTSAVED);
-            } finally {
-              if(po != null) try { po.close(); } catch(final IOException x) { }
-            }
-          }
-        }
-      });
-      north.add(export, BorderLayout.EAST);
-    }
-
-    panels[0].add(north, BorderLayout.NORTH);
+    // tab: path index
+    final BaseXBack tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
+    panels[0].add(indexes[0], BorderLayout.NORTH);
     panels[0].add(text(val[0] ? data.info(IndexType.PATH) :
       Token.token(PATHINDEXINFO)), BorderLayout.CENTER);
-    tab3.add(panels[0]);
+    tabPath.add(panels[0]);
 
-    // fourth tab
-    final BaseXBack tab4 = new BaseXBack(new GridLayout(2, 1)).border(8);
+    // tab: value indexes
+    final BaseXBack tabValues = new BaseXBack(new GridLayout(2, 1)).border(8);
     panels[1].add(indexes[1], BorderLayout.NORTH);
     panels[1].add(text(val[1] ? data.info(IndexType.TEXT) :
       Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
-    tab4.add(panels[1]);
+    tabValues.add(panels[1]);
 
     panels[2].add(indexes[2], BorderLayout.NORTH);
     panels[2].add(text(val[2] ? data.info(IndexType.ATTRIBUTE) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
-    tab4.add(panels[2]);
+    tabValues.add(panels[2]);
 
-    // fifth tab
-    final BaseXBack tab5 = new BaseXBack(new GridLayout(1, 1)).border(8);
+    // tab: full-text index
+    final BaseXBack tabFT = new BaseXBack(new GridLayout(1, 1)).border(8);
     panels[3].add(indexes[3], BorderLayout.NORTH);
     if(!val[3]) ft = new DialogFT(this, false);
     panels[3].add(val[3] ? text(data.info(IndexType.FULLTEXT)) : ft,
         BorderLayout.CENTER);
-    tab5.add(panels[3]);
+    tabFT.add(panels[3]);
 
     final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(GENERALINFO, tab1);
-    tabs.addTab(NAMESINFO, tab2);
-    tabs.addTab(INFOPATHINDEX, tab3);
-    tabs.addTab(INDEXINFO, tab4);
-    tabs.addTab(FTINFO, tab5);
+    tabs.addTab(GENERALINFO, tabInfo);
+    tabs.addTab("Add Resources", tabRes);
+    tabs.addTab(NAMESINFO, tabNames);
+    tabs.addTab(INFOPATHINDEX, tabPath);
+    tabs.addTab(INDEXINFO, tabValues);
+    tabs.addTab(FTINFO, tabFT);
 
-    set(tabs, BorderLayout.CENTER);
+    final BaseXBack back = new BaseXBack(new BorderLayout());
+    back.add(tabs, BorderLayout.CENTER);
+    back.add(buttons, BorderLayout.SOUTH);
 
-    optimize = new BaseXButton(BUTTONOPT, this);
-    buttons = newButtons(this, optimize, BUTTONOK, BUTTONCANCEL);
-    set(buttons, BorderLayout.SOUTH);
+    set(back, BorderLayout.CENTER);
+    set(resources, BorderLayout.WEST);
 
     action(null);
     setResizable(true);
@@ -189,16 +173,16 @@ public final class DialogInfo extends Dialog {
 
   /**
    * Adds an index panel.
-   * @param tag tag/attribute flag
+   * @param elem element/attribute flag
    * @param data data reference
    * @return panel
    */
-  private BaseXBack addIndex(final boolean tag, final Data data) {
+  private BaseXBack addIndex(final boolean elem, final Data data) {
     final BaseXBack p = new BaseXBack(new BorderLayout());
-    String lbl = tag ? INFOTAGS : INFOATTS;
+    String lbl = elem ? INFOTAGS : INFOATTS;
     if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
-    final IndexType index = tag ? IndexType.TAG : IndexType.ATTNAME;
+    final IndexType index = elem ? IndexType.TAG : IndexType.ATTNAME;
     p.add(text(data.info(index)), BorderLayout.CENTER);
     return p;
   }
@@ -211,7 +195,7 @@ public final class DialogInfo extends Dialog {
   private BaseXEditor text(final byte[] txt) {
     final BaseXEditor text = new BaseXEditor(false, this);
     text.setText(txt);
-    text.setPreferredSize(new Dimension(550, 160));
+    BaseXLayout.setHeight(text, 200);
     return text;
   }
 
@@ -227,6 +211,9 @@ public final class DialogInfo extends Dialog {
 
   @Override
   public void action(final Object cmp) {
+    resources.action(cmp);
+    add.action(cmp);
+
     opt = cmp == optimize;
     if(opt) close();
     if(ft != null) ft.action(indexes[3].isSelected());
@@ -236,6 +223,14 @@ public final class DialogInfo extends Dialog {
   @Override
   public void close() {
     super.close();
-    if(ft != null) ft.close();
+    if(ft != null) ft.setOptions();
+  }
+
+  /**
+   * Returns the optimize flag.
+   * @return flag
+   */
+  public boolean optimize() {
+    return opt;
   }
 }

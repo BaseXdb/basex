@@ -133,7 +133,6 @@ public final class DialogServer extends Dialog {
     stop = new BaseXButton(BUTTONSTOP, this);
     connect = new BaseXButton(BUTTONCONNECT, this);
     disconnect = new BaseXButton(BUTTONDISCONNECT, this);
-    BaseXButton.setMnemonics(start, stop, connect, disconnect);
 
     host = new BaseXTextField(ctx.mprop.get(MainProp.HOST), this);
     host.addKeyListener(keys);
@@ -204,7 +203,6 @@ public final class DialogServer extends Dialog {
     sedb = new BaseXEditor(false, this);
     sedb.setFont(start.getFont());
     refreshSess = new BaseXButton(BUTTONREFRESH, this);
-    refreshSess.setMnemonic();
 
     p = new BaseXBack(new GridLayout(2, 1, 0, 2));
 
@@ -227,7 +225,6 @@ public final class DialogServer extends Dialog {
     logs.border(8).layout(new BorderLayout());
     delete = new BaseXButton(BUTTONDELETE, this);
     deleteAll = new BaseXButton(BUTTONDELALL, this);
-    BaseXButton.setMnemonics(delete, deleteAll);
 
     logc = new BaseXCombo(this);
     logt = new BaseXEditor(false, this);
@@ -237,7 +234,6 @@ public final class DialogServer extends Dialog {
     logt.border(5);
     infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
     refreshLog = new BaseXButton(BUTTONREFRESH, this);
-    refreshLog.setMnemonic();
 
     p = new BaseXBack(new BorderLayout());
     pp = new BaseXBack();

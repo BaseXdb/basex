@@ -65,6 +65,7 @@ dc_advtitle=データベースオプション
 dc_chop=空白を取り除く
 dc_intparse=内部XMLパーサーを使用
 dc_archives=アーカイブ内のファイルを解析する
+dc_raw=Add remaining files as raw files
 dc_corrupt=不正な（非整形式の）ファイルをスキップする
 dc_createformat=入力形式
 dc_dtd=DTDとエントリーを解析する

@@ -1,15 +1,15 @@
 package org.basex.index.path;
 
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
+
 import org.basex.core.Text;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.index.Stats;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.item.ANode;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.ObjList;
@@ -193,23 +193,5 @@ public final class PathNode {
     tb.add(": " + stats);
     for(final PathNode p : ch) tb.add(p.info(data, l + 1));
     return tb.finish();
-  }
-
-  /**
-   * Serializes the path node.
-   * @param data data reference
-   * @param ser serializer
-   * @throws IOException I/O exception
-   */
-  void plan(final Data data, final Serializer ser) throws IOException {
-    ser.openElement(ANode.type(kind).string());
-    if(kind == Data.ELEM) {
-      ser.attribute(NAME, data.tagindex.key(name));
-    } else if(kind == Data.ATTR) {
-      ser.attribute(NAME, data.atnindex.key(name));
-    }
-    stats.plan(ser);
-    for(final PathNode p : ch) p.plan(data, ser);
-    ser.closeElement();
   }
 }

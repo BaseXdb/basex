@@ -1,5 +1,6 @@
 package org.basex.io;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +17,7 @@ import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.BufferOutput;
 import org.basex.util.TokenBuilder;
+import org.basex.util.list.ByteList;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
@@ -30,7 +32,7 @@ public final class IOFile extends IO {
   /** File reference. */
   private final File file;
 
-  /** Input stream reference. */
+  /** Input stream reference to archived contents. */
   private InputStream is;
   /** File length. */
   private long len = -1;
@@ -91,14 +93,25 @@ public final class IOFile extends IO {
 
   @Override
   public byte[] read() throws IOException {
-    final DataInputStream dis = new DataInputStream(new FileInputStream(file));
-    final byte[] cont = new byte[(int) file.length()];
-    try {
-      dis.readFully(cont);
-    } finally {
-      dis.close();
+    final long l = length();
+    if(l > -1) {
+      // read all bytes in one go if length is known
+      final DataInputStream dis = new DataInputStream(
+          is == null ? new FileInputStream(file) : is);
+      final byte[] cont = new byte[(int) l];
+      try {
+        dis.readFully(cont);
+      } finally {
+        if(is == null) dis.close();
+      }
+      return cont;
     }
-    return cont;
+
+    // otherwise, read from stream
+    final BufferedInputStream bis = new BufferedInputStream(is);
+    final ByteList bl = new ByteList();
+    for(int b; (b = bis.read()) != -1;) bl.add(b);
+    return bl.toArray();
   }
 
   @Override
@@ -118,49 +131,58 @@ public final class IOFile extends IO {
 
   @Override
   public long length() {
-    if(len == -1) len = file.length();
+    if(len == -1 && is == null) len = file.length();
     return len;
   }
 
   @Override
-  public boolean more() throws IOException {
-    // process gzip files
-    if(path.toLowerCase(Locale.ENGLISH).endsWith(GZSUFFIX)) {
+  public boolean more(final boolean archives) throws IOException {
+    if(archives) {
       if(is == null) {
-        is = new GZIPInputStream(new FileInputStream(file));
-      } else {
+        // process gzip files; assume input to be XML
+        if(path.toLowerCase(Locale.ENGLISH).endsWith(GZSUFFIX)) {
+          is = new GZIPInputStream(new FileInputStream(file));
+          init(name + XMLSUFFIX);
+          len = -1;
+          return true;
+        }
+        // process zip archives
+        if(isArchive()) {
+          is = new ZipInputStream(new FileInputStream(file)) {
+            @Override
+            public void close() throws IOException {
+              if(zip == null) super.close();
+            }
+          };
+        }
+      }
+      // check if stream returns more items
+      if(is != null) {
+        if(is instanceof ZipInputStream && moreZIP()) return true;
         is.close();
         is = null;
+        return false;
       }
-      return is != null;
-    }
 
-    // process zip files
-    if(is instanceof ZipInputStream || isArchive()) {
-      if(is == null) {
-        // keep stream open until last file was parsed...
-        is = new ZipInputStream(new FileInputStream(file)) {
-          @Override
-          public void close() throws IOException {
-            if(zip == null) super.close();
-          }
-        };
-      }
-      while(true) {
-        zip = ((ZipInputStream) is).getNextEntry();
-        if(zip == null) break;
-        len = zip.getSize();
-        init(zip.getName());
-        if(path.toLowerCase(Locale.ENGLISH).endsWith(XMLSUFFIX) &&
-            !zip.isDirectory()) return true;
-      }
-      is.close();
-      is = null;
-      return false;
     }
-
     // work on normal files
-    return more ^= true;
+    return super.more(archives);
+  }
+
+  /**
+   * Checks if a ZIP stream contains more entries.
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  private boolean moreZIP() throws IOException {
+    while(true) {
+      zip = ((ZipInputStream) is).getNextEntry();
+      if(zip == null) break;
+      len = zip.getSize();
+      init(zip.getName());
+      if(!zip.isDirectory()) return true;
+    }
+    return false;
   }
 
   @Override

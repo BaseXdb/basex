@@ -80,7 +80,7 @@ public final class DialogAbout extends Dialog {
     add(p, BorderLayout.NORTH);
 
     p = new BaseXBack();
-    p.add(newButtons(this, BUTTONOK));
+    p.add(newButtons(BUTTONOK));
     add(p, BorderLayout.EAST);
 
     finish(null);

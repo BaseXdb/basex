@@ -913,14 +913,6 @@ public interface Text {
   /** Command info. */
   String GUIPROPSTT = lang("c_propstt");
   /** Command info. */
-  String GUIADD = lang("c_add");
-  /** Command info. */
-  String GUIADDTT = lang("c_addtt");
-  /** Command info. */
-  String GUIDROP = lang("c_drop");
-  /** Command info. */
-  String GUIDROPTT = lang("c_droptt");
-  /** Command info. */
   String GUIINSERT = lang("c_insert");
   /** Command info. */
   String GUIINSERTTT = lang("c_inserttt");
@@ -1101,6 +1093,10 @@ public interface Text {
   String BUTTONADD = lang("b_add");
   /** Button for resetting options. */
   String BUTTONRESET = lang("b_reset");
+  /** Clear button. */
+  String BUTTONCLEAR = lang("b_clear");
+  /** Filter button. */
+  String BUTTONFILTER = lang("b_filter");
 
   // VISUALIZATIONS ===========================================================
 
@@ -1145,11 +1141,11 @@ public interface Text {
   /** Database creation filter. */
   String CREATEPATTERN = lang("dc_pattern");
   /** Name of database. */
-  String CREATENAME = lang("dc_name") + COLS;
+  String CREATENAME = lang("dc_name");
   /** Name of database copy. */
-  String CREATENAMEC = lang("dc_namec") + COLS;
+  String CREATENAMEC = lang("dc_namec");
   /** Target path. */
-  String CREATETARGET = lang("dc_target") + COLS;
+  String CREATETARGET = lang("dc_target");
 
   /** XML file description. */
   String CREATEXMLDESC = "XML Documents";
@@ -1174,8 +1170,10 @@ public interface Text {
   String CREATEDTD = lang("dc_dtd");
   /** Internal parser. */
   String CREATEINTPARSE = lang("dc_intparse");
-  /** Parse archives. */
+  /** Parse files inside archives. */
   String CREATEARCHIVES = lang("dc_archives");
+  /** Add remaining files as raw files. */
+  String CREATERAW = lang("dc_raw");
   /** Skip corrupt files. */
   String CREATECORRUPT = lang("dc_corrupt");
   /** SAX parsing information. */
@@ -1242,11 +1240,11 @@ public interface Text {
   String GENERALINFO = lang("dc_general");
   /** General info. */
   String PARSEINFO = lang("dc_parse");
-  /** Indexing info. */
+  /** Name indexes. */
   String NAMESINFO = lang("dc_names");
-  /** Indexing info. */
+  /** Value indexes. */
   String INDEXINFO = lang("dc_index");
-  /** Indexing info. */
+  /** Full-text index. */
   String FTINFO = lang("dc_ft");
 
   /** Dialog title for opening a database. */
@@ -1324,8 +1322,6 @@ public interface Text {
   String RENAMEOVER = lang("dr_over");
   /** Info for creating an empty database. */
   String EMPTYDATABASE = lang("dr_empty");
-  /** % documents will be deleted. */
-  String DELETEPATH = lang("dr_delete");
 
   /** Dialog title for managing databases. */
   String MANAGETITLE = lang("dd_title");
@@ -1354,6 +1350,18 @@ public interface Text {
   String PREFNAME = lang("dp_names");
   /** Language preference. */
   String PREFLANG = lang("dp_lang") + " (" + lang("dp_restart") + ")";
+
+  // Content Manage Dialog
+  /** Database content text. */
+  String ADDXML = lang("dc_addxml");
+  /** Database content text. */
+  String ADDBIN = lang("dc_addbin");
+  /** Database content text. */
+  String INPUTSRC = lang("dc_inputsrc") + COL;
+  /** Database content text. */
+  String RENAMEAS = lang("dc_renameas") + COL;
+  /** Database content text. */
+  String FILTERPATH = lang("dc_filterpath") + COL;
 
   /** Dialog title for deleting nodes. */
   String DELETECONF = lang("dx_question");

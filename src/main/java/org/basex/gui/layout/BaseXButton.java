@@ -2,6 +2,7 @@ package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -53,6 +54,7 @@ public class BaseXButton extends JButton {
         if(ESCAPE.is(e)) d.cancel();
       }
     });
+    setMnemonic(this, d.mnem);
   }
 
   /**
@@ -107,41 +109,24 @@ public class BaseXButton extends JButton {
   }
 
   /**
-   * Sets a mnemomic.
+   * Sets a mnemomic for the specified button.
+   * @param b button
+   * @param mnem mnemonics that have already been assigned
    */
-  public void setMnemonic() {
-    setMnemonics(this);
-  }
+  public static void setMnemonic(final AbstractButton b,
+      final StringBuilder mnem) {
+    // do not set mnemonics for Mac! Alt+key used for special characters.
+    if(Prop.MAC) return;
 
-  /**
-   * Sets mnemomics for the specified buttons.
-   * @param buttons buttons
-   */
-  public static void setMnemonics(final AbstractButton... buttons) {
-    setMnemonics(new StringBuilder(), buttons);
-  }
-
-  /**
-   * Sets mnemomics for the specified buttons.
-   * @param mnem assigned mnemonics
-   * @param buttons buttons
-   */
-  public static void setMnemonics(final StringBuilder mnem,
-      final AbstractButton... buttons) {
-    // Do not set Mnemonics for Mac! Alt+key used for special characters.
-    if (Prop.MAC) return;
-
-    for(final AbstractButton b : buttons) {
-      // find and assign unused mnemomic
-      final String label = b.getText();
-      for(int l = 0; l < label.length(); l++) {
-        final char ch = Character.toLowerCase(label.charAt(l));
-        if(!Token.letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
-          continue;
-        b.setMnemonic(ch);
-        mnem.append(ch);
-        break;
-      }
+    // find and assign unused mnemomic
+    final String label = b.getText();
+    for(int l = 0; l < label.length(); l++) {
+      final char ch = Character.toLowerCase(label.charAt(l));
+      if(!Token.letter(ch) || mnem.indexOf(Character.toString(ch)) != -1)
+        continue;
+      b.setMnemonic(ch);
+      mnem.append(ch);
+      break;
     }
   }
 

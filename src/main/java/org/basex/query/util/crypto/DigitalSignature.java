@@ -212,12 +212,12 @@ public final class DigitalSignature {
         if(!ceDOM.getDocumentElement().getNodeName().
             equals("digital-certificate"))
           CRYPTOINVNM.thrw(input, ceDOM);
-        final NodeList ceChilds = ceDOM.getDocumentElement().getChildNodes();
-        final int s = ceChilds.getLength();
+        final NodeList ceChildren = ceDOM.getDocumentElement().getChildNodes();
+        final int s = ceChildren.getLength();
         int ci = 0;
         // iterate child axis to retrieve keystore setup
         while(ci < s) {
-          final Node cn = ceChilds.item(ci++);
+          final Node cn = ceChildren.item(ci++);
           final String name = cn.getNodeName();
           if(name.equals("keystore-type"))
             ksTY = cn.getTextContent();
