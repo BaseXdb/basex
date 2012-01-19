@@ -35,6 +35,7 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
@@ -134,6 +135,11 @@ public final class JavaFunc extends Arr {
       }
     }
     return ic.value();
+  }
+
+  @Override
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    return value(ctx).iter();
   }
 
   /**
