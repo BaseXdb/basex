@@ -14,11 +14,11 @@ import org.basex.query.util.pkg.RepoManager;
 import org.basex.util.InputInfo;
 
 /**
- * Functions on EXPath packages
- * 
+ * Functions on EXPath packages.
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
- * 
+ *
  */
 public final class FNPkg extends FuncCall {
   /**
@@ -27,7 +27,7 @@ public final class FNPkg extends FuncCall {
    * @param f function definition
    * @param e arguments
    */
-  protected FNPkg(InputInfo ii, Function f, Expr[] e) {
+  protected FNPkg(final InputInfo ii, final Function f, final Expr[] e) {
     super(ii, f, e);
   }
 

@@ -607,9 +607,9 @@ public enum Function {
   _SQL_COMMIT(FNSql.class, "commit(id)", EMP, ITR),
   /** XQuery function */
   _SQL_ROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
-  
+
   /* FNPkg functions. */
-  
+
   /** XQuery function. */
   _PKG_INSTALL(FNPkg.class, "install(uri)", EMP, STR),
   /** XQuery function. */

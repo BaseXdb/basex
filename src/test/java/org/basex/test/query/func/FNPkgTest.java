@@ -11,7 +11,7 @@ import org.junit.Test;
 
 /**
  * This class tests the functions for EXPath package management.
- * 
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
