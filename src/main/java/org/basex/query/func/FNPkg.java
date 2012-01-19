@@ -2,14 +2,14 @@ package org.basex.query.func;
 
 import static org.basex.util.Token.*;
 
-import java.util.Iterator;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
+import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.pkg.Package;
 import org.basex.query.util.pkg.RepoManager;
 import org.basex.util.InputInfo;
 
@@ -34,16 +34,12 @@ public final class FNPkg extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
-    final Iterator<byte[]> i = ctx.context.repo.pkgDict().iterator();
     switch(def) {
       case _PKG_LIST:
-        return new Iter() {
-          @Override
-          public Item next() throws QueryException {
-            final byte[] next = i.next();
-            return next == null ? null : Str.get(next);
-          }
-        };
+        final ItemCache cache = new ItemCache();
+        for(final byte[] p : ctx.context.repo.pkgDict())
+          if(p != null) cache.add(Str.get(Package.name(p)));
+        return cache;
       default:
         return super.iter(ctx);
     }

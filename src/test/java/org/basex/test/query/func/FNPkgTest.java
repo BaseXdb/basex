@@ -18,6 +18,12 @@ import org.junit.Test;
 public class FNPkgTest extends AdvancedQueryTest {
   /** Test repository. */
   private static final String REPO = "src/test/resources/repo/";
+  /** Pkg3 directory. */
+  private static final String PKGDIR = normalize("http://www.pkg3.com-10.0");
+  /** Pkg3 name. */
+  private static final String PKG3NAME = "http://www.pkg3.com";
+  /** Pkg4 name. */
+  private static final String PKG4NAME = "http://www.pkg4.com";
 
   /**
    * Prepare test.
@@ -26,7 +32,7 @@ public class FNPkgTest extends AdvancedQueryTest {
   public void setupBeforeClass() {
     CONTEXT.repo.init(REPO);
   }
-  
+
   /**
    * Test method for pkg:install().
    */
@@ -34,31 +40,48 @@ public class FNPkgTest extends AdvancedQueryTest {
   public void install() {
     check(_PKG_INSTALL);
     query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
-    final String dirName = normalize("http://www.pkg3.com-10.0");
-    assertTrue(dir(dirName));
-    assertTrue(file(dirName + "/expath-pkg.xml"));
-    assertTrue(dir(dirName + "/pkg3"));
-    assertTrue(dir(dirName + "/pkg3/mod"));
-    assertTrue(file(dirName + "/pkg3/mod/pkg3mod1.xql"));
-    query(_PKG_DELETE.args(dirName));
+    assertTrue(dir(PKGDIR));
+    assertTrue(file(PKGDIR + "/expath-pkg.xml"));
+    assertTrue(dir(PKGDIR + "/pkg3"));
+    assertTrue(dir(PKGDIR + "/pkg3/mod"));
+    assertTrue(file(PKGDIR + "/pkg3/mod/pkg3mod1.xql"));
+    query(_PKG_DELETE.args(PKGDIR));
   }
-  
+
   /**
    * Test method for pkg:delete().
    */
   @Test
   public void delete() {
     check(_PKG_DELETE);
+    // Install
+    query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
+    // Delete by directory name
+    query(_PKG_DELETE.args(PKGDIR));
+    assertTrue(!dir(PKGDIR));
+    // Install again
+    query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
+    // Delete by package name
+    query(_PKG_DELETE.args("http://www.pkg3.com"));
+    assertTrue(!dir(PKGDIR));
   }
-  
+
   /**
    * Test method for pkg:list().
    */
   @Test
   public void list() {
     check(_PKG_LIST);
+    // Install pkg3
+    query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
+    // Install pkg4
+    query(_PKG_INSTALL.args(REPO + "pkg4.xar"));
+    contains(_PKG_LIST.toString(), PKG3NAME);
+    contains(_PKG_LIST.toString(), PKG4NAME);
+    query(_PKG_DELETE.args(PKG4NAME));
+    query(_PKG_DELETE.args(PKG3NAME));
   }
-  
+
   /**
    * Checks if the specified path points to a file.
    * @param path file path
@@ -77,7 +100,7 @@ public class FNPkgTest extends AdvancedQueryTest {
   private static boolean dir(final String path) {
     return new File(REPO + path).isDirectory();
   }
-  
+
   /**
    * Normalizes the given path.
    * @param path path
