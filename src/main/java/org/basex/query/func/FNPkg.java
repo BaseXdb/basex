@@ -48,9 +48,10 @@ public final class FNPkg extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     checkAdmin(ctx);
     final RepoManager repoMng = new RepoManager(ctx.context.repo);
-    // Either path to package or package name
+    // either path to package or package name
     final String pkg = string(checkStr(expr[0], ctx));
     switch(def) {
       case _PKG_INSTALL:
@@ -64,4 +65,9 @@ public final class FNPkg extends FuncCall {
     }
   }
 
+  @Override
+  public boolean uses(final Use u) {
+    // don't allow pre-evaluation
+    return u == Use.CTX || super.uses(u);
+  }
 }
