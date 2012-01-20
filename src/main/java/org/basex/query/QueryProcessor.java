@@ -132,7 +132,7 @@ public final class QueryProcessor extends Progress {
    */
   public Result execute() throws QueryException {
     compile();
-    return ctx.eval();
+    return ctx.execute();
   }
 
   /**

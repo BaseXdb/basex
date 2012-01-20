@@ -622,12 +622,12 @@ public class QueryParser extends InputParser {
       final Object obj = ctx.context.prop.get(key);
       if(obj == null) error(NOOPTION, key);
       // cache old value (to be reset after query evaluation)
-      if(ctx.queryOpt == null) {
-        ctx.queryOpt = new HashMap<String, String>();
+      if(ctx.dbOptions == null) {
+        ctx.dbOptions = new HashMap<String, String>();
         ctx.globalOpt = new HashMap<String, Object>();
       }
       ctx.globalOpt.put(key, obj);
-      ctx.queryOpt.put(key, string(val));
+      ctx.dbOptions.put(key, string(val));
     }
     // ignore unknown options
   }

@@ -84,7 +84,7 @@ public final class QueryContext extends Progress {
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
   /** Query options (are valid during query execution). */
-  public HashMap<String, String> queryOpt;
+  public HashMap<String, String> dbOptions;
   /** Global options (will be set after query execution). */
   public HashMap<String, Object> globalOpt;
 
@@ -196,8 +196,8 @@ public final class QueryContext extends Progress {
     if(inf) compInfo(NL + QUERYCOMP);
 
     // temporarily set database values
-    if(queryOpt != null) {
-      for(final Entry<String, String> e : queryOpt.entrySet()) {
+    if(dbOptions != null) {
+      for(final Entry<String, String> e : dbOptions.entrySet()) {
         Set.set(e.getKey(), e.getValue(), context.prop);
       }
     }
@@ -278,7 +278,7 @@ public final class QueryContext extends Progress {
    * @return resulting value
    * @throws QueryException query exception
    */
-  Result eval() throws QueryException {
+  Result execute() throws QueryException {
     // evaluates the query
     final Iter ir = iter();
     final ItemCache ic = new ItemCache();
