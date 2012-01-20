@@ -266,18 +266,17 @@ final class FTFuzzy extends FTIndex {
   private IndexIterator fuzzy(final byte[] tok, final int k, final boolean f) {
     FTIndexIterator it = FTIndexIterator.FTEMPTY;
     final int tl = tok.length;
-    final int e = Math.min(tp.length, tl + k);
+    final int e = Math.min(tp.length - 1, tl + k);
     int s = Math.max(1, tl - k) - 1;
 
-    final int err = data.meta.prop.num(Prop.LSERROR);
     while(++s <= e) {
       int p = tp[s];
       if(p == -1) continue;
       int i = s + 1;
       int r = -1;
-      do r = tp[i++]; while(r == -1);
+      while(i < tp.length && r == -1) r = tp[i++];
       while(p < r) {
-        if(ls.similar(inY.readBytes(p, s), tok, err)) {
+        if(ls.similar(inY.readBytes(p, s), tok, k)) {
           it = FTIndexIterator.union(
               iter(pointer(p, s), size(p, s), inZ, f), it);
         }
