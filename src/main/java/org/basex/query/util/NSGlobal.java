@@ -13,18 +13,22 @@ import org.basex.util.Atts;
 public final class NSGlobal {
   /** Namespaces, containing prefixes and uris. */
   private static final Atts NS = new Atts();
+  /** Reserved namespaces. */
+  private static final int RESERVED;
 
   static {
-    // pre-declared namespaces (the order is important here)
-    NS.add(LOCAL, LOCALURI);
+    // reserved namespaces
     NS.add(XML, XMLURI);
     NS.add(XS, XSURI);
     NS.add(XSI, XSIURI);
     NS.add(FN, FNURI);
-    NS.add(OPT, OPTIONURI);
-    // implementation-defined pre-declarations
-    NS.add(MAP, MAPURI);
     NS.add(MATH, MATHURI);
+    NS.add(MAP, MAPURI);
+    RESERVED = NS.size();
+
+    // implementation-defined pre-declarations
+    NS.add(LOCAL, LOCALURI);
+    NS.add(OPT, OPTIONURI);
     NS.add(OUTPUT, OUTPUTURI);
     NS.add(ERR, ERRORURI);
     // BaseX namespaces
@@ -73,13 +77,12 @@ public final class NSGlobal {
   }
 
   /**
-   * Checks if the specified uri is a standard uri.
+   * Checks if the specified uri is a reserved namespace.
    * @param uri uri to be checked
    * @return result of check
    */
-  public static boolean standard(final byte[] uri) {
-    // first ('local') namespace is skipped
-    for(int s = NS.size() - 1; s > 0; s--) {
+  public static boolean reserved(final byte[] uri) {
+    for(int s = RESERVED - 1; s >= 0; s--) {
       if(eq(NS.string(s), uri)) return true;
     }
     return false;

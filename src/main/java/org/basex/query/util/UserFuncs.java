@@ -207,7 +207,7 @@ public final class UserFuncs extends ExprInfo {
     final byte[] uri = name.uri();
     if(uri.length == 0) FUNNONS.thrw(ii, name.string());
 
-    if(NSGlobal.standard(uri)) {
+    if(NSGlobal.reserved(uri)) {
       if(fun.declared) NAMERES.thrw(ii, name.string());
       funError(name, ii);
     }
