@@ -15,10 +15,10 @@ import org.basex.util.InputInfo;
 
 /**
  * Functions on EXPath packages.
- *
+ * 
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
- *
+ * 
  */
 public final class FNPkg extends FuncCall {
   /**
@@ -52,7 +52,7 @@ public final class FNPkg extends FuncCall {
     checkAdmin(ctx);
     final RepoManager repoMng = new RepoManager(ctx.context.repo);
     // either path to package or package name
-    final String pkg = string(checkStr(expr[0], ctx));
+    final String pkg = expr.length == 0 ? null : string(checkStr(expr[0], ctx));
     switch(def) {
       case _PKG_INSTALL:
         repoMng.install(pkg, ii);
