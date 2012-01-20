@@ -15,10 +15,9 @@ import org.basex.util.InputInfo;
 
 /**
  * Functions on EXPath packages.
- * 
+ *
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
- * 
  */
 public final class FNPkg extends FuncCall {
   /**
