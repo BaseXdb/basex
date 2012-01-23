@@ -105,8 +105,8 @@ public final class JavaFunc extends Arr {
       res = mth.equals(NEW) ? constructor(arg) : method(arg);
     } catch(final InvocationTargetException ex) {
       JAVAERR.thrw(input, ex.getCause());
-    } catch(final Exception ex) {
-      FUNJAVA.thrw(input, description(), arg);
+    } catch(final Throwable ex) {
+      FUNJAVA.thrw(input, description());
     }
     if(res == null) return Empty.SEQ;
     if(res instanceof Value) return (Value) res;

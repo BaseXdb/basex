@@ -231,7 +231,7 @@ public enum Err {
   /** FORG0006: Evaluation exception. */
   TYPECMP(FORG, 6, "% is not comparable."),
   /** FORG0006: Evaluation exception. */
-  FUNJAVA(FORG, 6, "Invalid arguments for %: %."),
+  FUNJAVA(FORG, 6, "Invalid arguments for %."),
   /** FORG0006: Evaluation exception. */
   INVBASE(FORG, 6, "Unsupported base: %."),
   /** FORG0006: Evaluation exception. */
