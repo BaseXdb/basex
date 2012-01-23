@@ -45,7 +45,7 @@ public final class Replace extends ACreate {
     if(path == null || path.isEmpty()) return error(DIRERR, args[0]);
 
     final Data data = context.data();
-    final int pre = data.doc(path);
+    final int pre = data.doc(path, false);
     // check if path points to a single file
     if(pre != -1 && data.docs(path).size() != 1) return error(DIRERR, path);
 

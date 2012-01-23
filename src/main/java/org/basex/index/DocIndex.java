@@ -34,9 +34,15 @@ public final class DocIndex implements Index {
   /** Pre values of document nodes. */
   private IntList docs;
   /** Sorted document paths. */
-  private byte[][] paths;
-  /** Mapping between document paths and pre values. */
-  private int[] order;
+  private TokenList paths;
+  /** Initial and temporal list which holds the pre value of all documents.
+   * will be deleted after the document index has been called for first time. */
+  private IntList tmp;
+
+  /** Ordered path indexes. */
+  private int[] pathorder;
+  /** Path order valid. */
+  private boolean ordered;
 
   /**
    * Constructor.
@@ -52,7 +58,7 @@ public final class DocIndex implements Index {
    * @throws IOException I/O exception
    */
   public synchronized void read(final DataInput in) throws IOException {
-    docs = in.readDiffs();
+    tmp = in.readDiffs();
   }
 
   /**
@@ -70,8 +76,44 @@ public final class DocIndex implements Index {
    * @return document nodes
    */
   public synchronized IntList docs() {
-    if(docs == null) init();
+    if(docs == null) init(tmp);
     return docs;
+  }
+
+  /**
+   * Initializes the document index.
+   */
+  public synchronized void init() {
+    init(null);
+  }
+
+  /**
+   * Initializes the document index. If the given argument is null, the
+   * PRE values are determined via scanning the table.
+   * @param pres sorted document pre values, may be null
+   */
+  private synchronized void init(final IntList pres) {
+    // document PRE values
+    if(pres == null) {
+      docs = new IntList();
+      final int is = data.meta.size;
+      for(int i = 0; i < is;) {
+        final int k = data.kind(i);
+        if(k == Data.DOC) docs.add(i);
+        i += data.size(i, k);
+      }
+    } else
+      docs = pres;
+
+    // document paths
+    final int ds = docs.size();
+    paths = new TokenList(ds);
+    for(int d = 0; d < ds; d++) {
+      final byte[] txt = data.text(docs.get(d), true);
+      paths.add(concat(SLASH, Prop.WIN ? lc(txt) : txt));
+    }
+
+    data.meta.dirty = true;
   }
 
   /**
@@ -89,12 +131,24 @@ public final class DocIndex implements Index {
       dpre += d.size(dpre, k);
     }
 
+    // init paths before modifying docs, otherwise paths would
+    // be larger than docs after insert
+    final int[] presA = pres.toArray();
     final IntList il = docs();
     int i = il.sortedIndexOf(pre);
     if(i < 0) i = -i - 1;
-    il.insert(i, pres.toArray());
+    il.insert(i, presA);
     il.move(dsize, i + pres.size());
-    update();
+
+    final byte[][] t = new byte[presA.length][];
+    for(int j = 0; j < t.length; j++) {
+      // substract pre to retrieve paths from given data instance
+      final byte[] b = d.text(presA[j] - pre, true);
+      t[j] = concat(SLASH, Prop.WIN ? lc(b) : b);
+    }
+    paths.insert(i, t);
+
+    ordered = false;
   }
 
   /**
@@ -103,12 +157,33 @@ public final class DocIndex implements Index {
    * @param size number of deleted nodes
    */
   public void delete(final int pre, final int size) {
+    // init paths before modifying docs, otherwise paths would
+    // be smaller than docs after delete
     final IntList il = docs();
     int i = il.sortedIndexOf(pre);
+    final boolean found = i >= 0;
     if(i < 0) i = -i - 1;
     else il.delete(i);
     il.move(-size, i);
-    update();
+
+    if(!found) return;
+    paths.delete(i);
+
+    ordered = false;
+  }
+
+  /**
+   * Updates the index after a document has been renamed.
+   * @param pre pre value of updated document
+   * @param value new name
+   */
+  public void rename(final int pre, final byte[] value) {
+    docs();
+
+    paths.set(docs.sortedIndexOf(pre),
+        concat(SLASH, Prop.WIN ? lc(value) : value));
+
+    ordered = false;
   }
 
   /**
@@ -123,15 +198,8 @@ public final class DocIndex implements Index {
   }
 
   /**
-   * Discards the document paths.
-   */
-  public synchronized void update() {
-    paths = null;
-    order = null;
-  }
-
-  /**
    * Returns the pre values of all document nodes matching the specified path.
+   * Exact || prefix match!
    * @param path input path
    * @return root nodes
    */
@@ -144,41 +212,52 @@ public final class DocIndex implements Index {
     final IntList doc = docs();
     if(pth.isEmpty()) return doc;
 
-    // initialize and sort document paths
-    if(paths == null) initPaths();
-
     // normalize paths
     final byte[] exct = concat(SLASH, Prop.WIN ? lc(token(pth)) : token(pth));
     final byte[] pref = concat(exct, SLASH);
 
-    // relevant paths: start from the first hit and return all subsequent hits
+    // relevant paths: exact hits and prefixes
     final IntList il = new IntList();
-    for(int p = find(exct); p < paths.length; p++) {
-      if(eq(paths[p], exct) || startsWith(paths[p], pref))
-        il.add(doc.get(order[p]));
+    /* could be optimized for future access by sorting the paths first
+     * and then accessing only the relevant paths. Sorting might slow down
+     * bulk operations like insert/delete/replace though.
+     */
+    for(int p = 0; p < paths.size(); p++) {
+      final byte[] b = paths.get(p);
+      if(eq(b, exct) || startsWith(b, pref))
+        il.add(doc.get(p));
     }
     return il.sort();
   }
 
   /**
-   * Returns the pre values of the document node matching the specified path.
+   * Returns the pre value of the document node matching the specified path.
+   * Exact match! Document paths can be sorted for faster future access or
+   * sorting can be disabled as it slows down bulk inserts/deletes/replaces.
    * @param path input path
+   * @param sort sort paths before access
    * @return root nodes
    */
-  public synchronized int doc(final String path) {
+  public synchronized int doc(final String path, final boolean sort) {
     // invalid or empty path, or no documents: return -1
     final String pth = MetaData.normPath(path);
     if(pth == null || pth.isEmpty() || data.empty()) return -1;
 
-    // initialize and sort document paths
-    if(paths == null) initPaths();
-
     // normalize paths
     final byte[] exct = concat(SLASH, Prop.WIN ? lc(token(pth)) : token(pth));
 
-    // relevant paths: start from the first hit and return all subsequent hits
-    final int p = find(exct);
-    return p < paths.length && eq(paths[p], exct) ? docs.get(order[p]) : -1;
+    // relevant paths: exact match
+    if(sort) {
+      createOrder();
+      final int p = find(exct);
+      return p > -1 && p < paths.size() && eq(paths.get(pathorder[p]), exct) ?
+          docs.get(pathorder[p]) : -1;
+    }
+
+    for(int i = 0; i < paths.size(); i++)
+      if(eq(paths.get(i), exct)) return docs.get(i);
+
+    return -1;
   }
 
   /**
@@ -208,13 +287,13 @@ public final class DocIndex implements Index {
    */
   private int find(final byte[] v) {
     // binary search
-    int l = 0, h = order.length - 1;
+    int l = 0, h = pathorder.length - 1;
     while(l <= h) {
       int m = l + h >>> 1;
-      final int c = diff(paths[m], v);
+      final int c = diff(paths.get(pathorder[m]), v);
       if(c == 0) {
         // find first entry
-        while(m > 0 && eq(paths[m - 1], v)) --m;
+        while(m > 0 && eq(paths.get(pathorder[m - 1]), v)) --m;
         return m;
       }
       if(c < 0) l = m + 1;
@@ -224,30 +303,14 @@ public final class DocIndex implements Index {
   }
 
   /**
-   * Initializes the document index.
+   * Sorts the document paths.
    */
-  public synchronized void init() {
-    update();
-    docs = new IntList();
-    final int is = data.meta.size;
-    for(int i = 0; i < is; i += data.size(i, Data.DOC)) docs.add(i);
-    data.meta.dirty = true;
-  }
+  private void createOrder() {
+    if(ordered) return;
 
-  /**
-   * Initializes the document paths.
-   */
-  private synchronized void initPaths() {
-    final IntList doc = docs();
-    final int ds = doc.size();
-    paths = new byte[ds][];
-    for(int d = 0; d < ds; d++) {
-      final byte[] txt = data.text(doc.get(d), true);
-      paths[d] = concat(SLASH, Prop.WIN ? lc(txt) : txt);
-    }
-    order = Array.createOrder(paths, false, true);
+    pathorder = Array.createOrder(paths.toArray(), false, true);
+    ordered = true;
   }
-
 
   /**
    * Determines whether the given path is the path to a document directory.
@@ -257,7 +320,6 @@ public final class DocIndex implements Index {
    */
   public synchronized boolean isDir(final byte[] path) {
     if(path == null || data.empty()) return false;
-    if(paths == null) initPaths();
 
     final byte[] pa = concat(path, SLASH);
     for(final byte[] b : paths) if(startsWith(b, pa)) return true;
@@ -275,7 +337,6 @@ public final class DocIndex implements Index {
 
     final String pth = MetaData.normPath(string(path));
     if(pth == null || data.empty()) return new byte[][] {};
-    if(paths == null) initPaths();
 
     final TokenList tl = new TokenList();
     // normalize path to one leading + one trailing slash!
