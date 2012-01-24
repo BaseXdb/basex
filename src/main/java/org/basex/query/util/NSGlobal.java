@@ -41,12 +41,13 @@ public final class NSGlobal {
     NS.add(SQL, SQLURI);
     NS.add(UTIL, UTILURI);
     NS.add(XSLT, XSLTURI);
-    NS.add(PKG, PACKURI);
+    NS.add(REPO, REPOURI);
     // EXPath namespaces
     NS.add(CRYPTO, CRYPTOURI);
     NS.add(FILE, FILEURI);
     NS.add(HTTP, HTTPURI);
     NS.add(ZIP, ZIPURI);
+    NS.add(PKG, PKGURI);
   }
 
   /** Private constructor. */

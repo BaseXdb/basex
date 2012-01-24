@@ -15,7 +15,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public class FNPkgTest extends AdvancedQueryTest {
+public class FNPRepoTest extends AdvancedQueryTest {
   /** Test repository. */
   private static final String REPO = "src/test/resources/repo/";
   /** Pkg3 directory. */
