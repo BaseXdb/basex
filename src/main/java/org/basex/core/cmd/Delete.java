@@ -1,6 +1,5 @@
 package org.basex.core.cmd;
 
-import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
 
 import org.basex.core.Context;
@@ -31,13 +30,13 @@ public final class Delete extends ACreate {
     final String target = args[0];
 
     // delete documents
-    final IntList docs = data.docs(target);
+    final IntList docs = data.resources.docs(target);
     delete(context, docs);
-    // delete raw resources
-    final TokenList raw = files(data, target);
-    delete(data, raw);
+    // delete binaries
+    final TokenList bins = data.resources.binaries(target);
+    delete(data, target);
 
-    return info(PATHDELETED, docs.size() + raw.size(), perf);
+    return info(PATHDELETED, docs.size() + bins.size(), perf);
   }
 
   /**
@@ -59,29 +58,11 @@ public final class Delete extends ACreate {
   /**
    * Deletes the specified resources.
    * @param data data reference
-   * @param res resources to be deleted
-   * @return {@code null}, or the name of a resource that could not be deleted
+   * @param res resource to be deleted
+   * @return success flag
    */
-  public static byte[] delete(final Data data, final TokenList res) {
-    for(final byte[] key : res) {
-      final IOFile file = data.meta.binary(string(key));
-      if(file == null || !file.delete()) return key;
-    }
-    return null;
-  }
-
-  /**
-   * Returns the resources to be deleted.
-   * @param data data reference
-   * @param res resources to be deleted
-   * @return resources
-   */
-  public static TokenList files(final Data data, final String res) {
-    // delete raw resources
-    final TokenList tl = data.files(res);
-    // if necessary, delete root directory
-    final IOFile bin = data.meta.binary(res);
-    if(bin != null && bin.isDir()) tl.add(res);
-    return tl;
+  public static boolean delete(final Data data, final String res) {
+    final IOFile file = data.meta.binary(res);
+    return file != null && file.delete();
   }
 }

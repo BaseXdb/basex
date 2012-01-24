@@ -38,7 +38,7 @@ final class TreeNodeCache implements TreeConstants {
         maxLevel = l + 1;
       } else {
         final int ts = data.meta.size;
-        final IntList roots = data.docs();
+        final IntList roots = data.resources.docs();
         alil.add(new IntList());
         for(int i = 0, is = roots.size(); i < is; ++i) {
           final int root = roots.get(i);

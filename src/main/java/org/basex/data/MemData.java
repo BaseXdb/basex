@@ -43,7 +43,7 @@ public final class MemData extends Data {
     }
     tagindex = tag == null ? new Names(meta) : tag;
     atnindex = att == null ? new Names(meta) : att;
-    pthindex = ps == null ? new PathSummary(this) : ps;
+    paths = ps == null ? new PathSummary(this) : ps;
     nspaces = ns == null ? new Namespaces() : ns;
   }
 
@@ -53,7 +53,7 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    this(data.tagindex, data.atnindex, data.pthindex, null, data.meta.prop);
+    this(data.tagindex, data.atnindex, data.paths, null, data.meta.prop);
   }
 
   /**

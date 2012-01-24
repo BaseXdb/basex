@@ -15,10 +15,10 @@ public class BaseXTree extends JTree {
   /**
    * Constructor.
    * @param root root node
-   * @param win parent window
+   * @param w window reference
    */
-  public BaseXTree(final DefaultMutableTreeNode root, final Window win) {
+  public BaseXTree(final DefaultMutableTreeNode root, final Window w) {
     super(root);
-    BaseXLayout.addInteraction(this, win);
+    BaseXLayout.addInteraction(this, w);
   }
 }

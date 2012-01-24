@@ -269,8 +269,8 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Returns all descendants of the path.
-   * @return descendants
+   * Returns the relative paths of all descendant files.
+   * @return relative paths
    */
   public synchronized StringList descendants() {
     final StringList files = new StringList();
@@ -281,10 +281,10 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Adds binary files to the specified list.
+   * Adds the relative paths of all descendant files to the specified list.
    * @param io current file
    * @param files file list
-   * @param off root prefix
+   * @param off string length of root path
    */
   private void add(final IOFile io, final StringList files, final int off) {
     if(io.isDir()) {

@@ -87,7 +87,7 @@ public class DialogAdd extends BaseXBack {
       parsing.action(comp);
 
       String inf = !ok ? PATHWHICH : !ok ? DBWHICH : null;
-      Msg icon = Msg.ERROR;
+      final Msg icon = Msg.ERROR;
       if(ok) {
         // check if target path is valid
         ok = MetaData.normPath(trg) != null;

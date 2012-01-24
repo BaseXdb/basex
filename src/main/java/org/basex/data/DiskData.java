@@ -73,9 +73,9 @@ public final class DiskData extends Data {
         if(k.isEmpty()) break;
         if(k.equals(DBTAGS))      tagindex = new Names(in, meta);
         else if(k.equals(DBATTS)) atnindex = new Names(in, meta);
-        else if(k.equals(DBPATH)) pthindex = new PathSummary(this, in);
+        else if(k.equals(DBPATH)) paths = new PathSummary(this, in);
         else if(k.equals(DBNS))   nspaces = new Namespaces(in);
-        else if(k.equals(DBDOCS)) docindex.read(in);
+        else if(k.equals(DBDOCS)) resources.read(in);
       }
       // open data and indexes
       init();
@@ -108,8 +108,8 @@ public final class DiskData extends Data {
     meta = md;
     tagindex = nm;
     atnindex = at;
-    pthindex = ps;
-    pthindex.finish(this);
+    paths = ps;
+    paths.finish(this);
     nspaces = n;
     if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     init();
@@ -136,11 +136,11 @@ public final class DiskData extends Data {
     out.writeToken(token(DBATTS));
     atnindex.write(out);
     out.writeToken(token(DBPATH));
-    pthindex.write(out);
+    paths.write(out);
     out.writeToken(token(DBNS));
     nspaces.write(out);
     out.writeToken(token(DBDOCS));
-    docindex.write(out);
+    resources.write(out);
     out.write(0);
     out.close();
     if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
@@ -183,7 +183,7 @@ public final class DiskData extends Data {
       case TEXT:      txtindex = null; break;
       case ATTRIBUTE: atvindex = null; break;
       case FULLTEXT:  ftxindex = null; break;
-      case PATH:      pthindex.close(); break;
+      case PATH:      paths.close(); break;
       default:        break;
     }
   }
@@ -195,7 +195,7 @@ public final class DiskData extends Data {
       case TEXT:      txtindex = index; break;
       case ATTRIBUTE: atvindex = index; break;
       case FULLTEXT:  ftxindex = index; break;
-      case PATH:      pthindex = (PathSummary) index; break;
+      case PATH:      paths = (PathSummary) index; break;
       default:        break;
     }
   }

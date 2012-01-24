@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.basex.core.cmd.InfoStorage;
-import org.basex.index.DocIndex;
 import org.basex.index.IdPreMap;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Names;
+import org.basex.index.Resources;
 import org.basex.index.path.PathSummary;
 import org.basex.io.IO;
 import org.basex.io.random.TableAccess;
@@ -25,7 +25,6 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
 
 /**
  * This class provides access to the database storage.
@@ -94,9 +93,9 @@ public abstract class Data {
   /** Namespace index. */
   public Namespaces nspaces;
   /** Path summary index. */
-  public PathSummary pthindex;
-  /** Document index. */
-  public final DocIndex docindex = new DocIndex(this);
+  public PathSummary paths;
+  /** Resource index. */
+  public final Resources resources = new Resources(this);
   /** Text index. */
   public Index txtindex;
   /** Attribute value index. */
@@ -192,55 +191,6 @@ public abstract class Data {
   }
 
   /**
-   * Returns the pre values of all document nodes.
-   * A single dummy node is returned if the database is empty.
-   * @return root nodes
-   */
-  public final IntList docs() {
-    return docindex.docs();
-  }
-
-  /**
-   * Returns the pre values of the document nodes for the specified path.
-   * @param path input path
-   * @return root nodes
-   */
-  public final IntList docs(final String path) {
-    return docindex.docs(path);
-  }
-
-  /**
-   * Returns the pre value of the node that matches the specified path,
-   * or {@code -1}.
-   * @param path input path
-   * @return pre value
-   */
-  public final int doc(final String path) {
-    return docindex.doc(path, true);
-  }
-
-  /**
-   * Returns the pre value of the node that matches the specified path,
-   * or {@code -1}. In case of bulk insert/delete/replace operations
-   * sorting of the document paths can be suppressed to save time.
-   * @param path input path
-   * @param sort sort paths before access
-   * @return pre value
-   */
-  public final int doc(final String path, final boolean sort) {
-    return docindex.doc(path, sort);
-  }
-
-  /**
-   * Returns the paths of all binary files matching the specified path.
-   * @param path input path
-   * @return root nodes
-   */
-  public final TokenList files(final String path) {
-    return docindex.files(path);
-  }
-
-  /**
    * Returns info on the specified index structure.
    * @param type index type
    * @return info
@@ -261,7 +211,7 @@ public abstract class Data {
       case TEXT:      return txtindex;
       case ATTRIBUTE: return atvindex;
       case FULLTEXT:  return ftxindex;
-      case PATH:      return pthindex;
+      case PATH:      return paths;
       default:        throw Util.notexpected();
     }
   }
@@ -584,7 +534,7 @@ public abstract class Data {
     updateText(pre, kind == PI ? trim(concat(name(pre, kind), SPACE, value)) :
       value, kind);
 
-    if(kind == DOC) docindex.rename(pre, value);
+    if(kind == DOC) resources.rename(pre, value);
   }
 
   /**
@@ -601,7 +551,7 @@ public abstract class Data {
     final int rpar = parent(rpre, rkind);
     final int diff = dsize - rsize;
     buffer(dsize);
-    docindex.replace(rpre, rsize, data);
+    resources.replace(rpre, rsize, data);
 
     if(meta.updindex) {
       // update index
@@ -687,7 +637,7 @@ public abstract class Data {
     // indicates if database is empty
     final boolean empty = pre == 0 && s == meta.size;
     // update document index: delete specified entry
-    if(!empty) docindex.delete(pre, s);
+    if(!empty) resources.delete(pre, s);
 
     if(meta.updindex) {
       // delete child records from indexes
@@ -769,7 +719,7 @@ public abstract class Data {
 
     // update value and document indexes
     if(meta.updindex) indexBegin();
-    docindex.insert(ipre, data);
+    resources.insert(ipre, data);
 
     // indicates if database only contains a dummy node
     final boolean dummy = empty() && data.kind(0) == DOC;

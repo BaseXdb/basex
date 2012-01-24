@@ -11,6 +11,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.MetaData;
+import org.basex.index.Resources;
 import org.basex.io.MimeTypes;
 import org.basex.util.Table;
 import org.basex.util.Util;
@@ -50,7 +51,8 @@ public final class ListDB extends Command {
     try {
       // add xml documents
       final Data data = Open.open(db, context);
-      final IntList il = data.docs(path);
+      final Resources res = data.resources;
+      final IntList il = res.docs(path);
       for(int i = 0, ds = il.size(); i < ds; i++) {
         final int pre = il.get(i);
         final TokenList tl = new TokenList(3);
@@ -62,7 +64,7 @@ public final class ListDB extends Command {
         table.contents.add(tl);
       }
       // add binary resources
-      for(final byte[] file : data.files(path)) {
+      for(final byte[] file : res.binaries(path)) {
         final String f = string(file);
         final TokenList tl = new TokenList(3);
         tl.add(file);

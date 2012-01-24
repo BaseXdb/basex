@@ -144,7 +144,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       if(!elem.startsWith("@")) tl.add(Token.token(elem));
     }
 
-    final TokenList tmp = data.pthindex.desc(tl, true, false);
+    final TokenList tmp = data.paths.desc(tl, true, false);
     final String[] keys = entries(tmp.toArray());
     final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);

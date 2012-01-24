@@ -50,7 +50,7 @@ final class PlotData {
     final Data data = context.data();
     final TokenList tl = new TokenList();
     if(data.meta.pathindex) {
-      for(final byte[] k : data.pthindex.desc(EMPTY, true, true)) {
+      for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
         if(getCategories(k).size() > 1) tl.add(k);
       }
     }
@@ -66,7 +66,7 @@ final class PlotData {
     final Data data = context.data();
     final TokenList tl = new TokenList();
     if(data.meta.pathindex) {
-      for(final byte[] k : data.pthindex.desc(it, true, false)) {
+      for(final byte[] k : data.paths.desc(it, true, false)) {
         final Names nm = startsWith(k, '@') ? data.atnindex : data.tagindex;
         if(nm.stat(nm.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
       }

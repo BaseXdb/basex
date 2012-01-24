@@ -4,17 +4,13 @@ import static org.basex.util.Token.*;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.index.DocIndex;
-import org.basex.io.IOFile;
-import org.basex.util.hash.TokenSet;
+import org.basex.index.Resources;
+import org.basex.util.hash.TokenBoolMap;
 import org.basex.util.list.TokenList;
 
 /**
@@ -31,12 +27,12 @@ public class TreeFolder extends TreeNode {
    * Constructor.
    * @param nm displayed node name
    * @param pth folder path
-   * @param jtree JTree reference
+   * @param bxt tree reference
    * @param d data reference
    */
-  public TreeFolder(final byte[] nm, final byte[] pth, final JTree jtree,
+  public TreeFolder(final byte[] nm, final byte[] pth, final BaseXTree bxt,
       final Data d) {
-    super(nm, pth, jtree, d);
+    super(nm, pth, bxt, d);
   }
 
   @Override
@@ -47,7 +43,6 @@ public class TreeFolder extends TreeNode {
     for(final byte[] b : folders(this)) {
       add(new TreeFolder(b, subfolder(), tree, data));
     }
-
     // ... then leaves.
     for(final TreeLeaf l : leaves(this)) add(l);
 
@@ -61,21 +56,9 @@ public class TreeFolder extends TreeNode {
    * @return folders
    */
   private static byte[][] folders(final TreeFolder node) {
-    final TokenSet ts = new TokenSet();
-
-    // gather raw file children for this path
-    for(final IOFile f : rawChildren(node.subfolder(), node.data)) {
-      if(f.isDir()) ts.add(name(token(f.path())));
-    }
-
-    // gather document child folders for this path
-    // folders
-    for(final byte[] c : node.data.docindex.children(node.subfolder(), false)) {
-      ts.add(c);
-    }
-
-    // sort keys
-    return new TokenList(ts.keys()).sort(Prop.WIN).toArray();
+    final Resources res = node.data.resources;
+    final TokenBoolMap ts = res.children(node.subfolder(), true);
+    return new TokenList(ts.keys()).sort(!Prop.WIN).toArray();
   }
 
   /**
@@ -84,25 +67,20 @@ public class TreeFolder extends TreeNode {
    * @return raw file / document leaves
    */
   public static TreeLeaf[] leaves(final TreeFolder node) {
-    final Set<TreeLeaf> leaves = new HashSet<TreeLeaf>();
+    // get child resources
+    final Resources res = node.data.resources;
+    final TokenBoolMap tbm = res.children(node.subfolder(), false);
 
-    // gather raw file children for this path
-    for(final IOFile f : rawChildren(node.subfolder(), node.data)) {
-      if(!f.isDir()) leaves.add(new TreeLeaf(token(f.name()),
-          node.subfolder(), true, node.tree, node.data));
+    // create leaf nodes
+    final int ts = tbm.size();
+    final TreeLeaf[] leaves = new TreeLeaf[ts];
+    for(int t = 0; t < ts; t++) {
+      leaves[t] = new TreeLeaf(tbm.key(t + 1), node.subfolder(),
+          tbm.value(t + 1), node.tree, node.data);
     }
 
-    // gather document children for this path
-    // folders
-    final DocIndex di = node.data.docindex;
-    for(final byte[] c : di.children(node.subfolder(), true)) {
-      leaves.add(new TreeLeaf(c, node.subfolder(), false,
-          node.tree, node.data));
-    }
-
-    // sort leaves
-    final TreeLeaf[] tobesorted = leaves.toArray(new TreeLeaf[leaves.size()]);
-    Arrays.sort(tobesorted, new Comparator<TreeLeaf>() {
+    // sort and return leaves
+    Arrays.sort(leaves, new Comparator<TreeLeaf>() {
       @Override
       public int compare(final TreeLeaf l1, final TreeLeaf l2) {
         final byte[] n1 = l1.name;
@@ -110,18 +88,7 @@ public class TreeFolder extends TreeNode {
         return Prop.WIN ? diff(lc(n1), lc(n2)) : diff(n1, n2);
       }
     });
-
-    return tobesorted;
-  }
-
-  /**
-   * Returns raw file children for a given path.
-   * @param path path
-   * @param data Data reference
-   * @return children of path
-   */
-  private static IOFile[] rawChildren(final byte[] path, final Data data) {
-    return data.meta.binary(string(path)).children();
+    return leaves;
   }
 
   /**

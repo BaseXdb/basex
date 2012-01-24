@@ -1,8 +1,7 @@
 package org.basex.gui.layout;
 
-import javax.swing.JTree;
-
 import org.basex.data.Data;
+
 
 /**
  * JTree node which represents the root folder. The root folder carries
@@ -17,12 +16,12 @@ public class TreeRootFolder extends TreeFolder {
    * Constructor.
    * @param nm name
    * @param pth path
-   * @param jtree JTree
-   * @param d Data
+   * @param bxt tree reference
+   * @param d data reference
    */
-  public TreeRootFolder(final byte[] nm, final byte[] pth, final JTree jtree,
-      final Data d) {
-    super(nm, pth, jtree, d);
+  public TreeRootFolder(final byte[] nm, final byte[] pth,
+      final BaseXTree bxt, final Data d) {
+    super(nm, pth, bxt, d);
   }
 
   @Override

@@ -80,8 +80,8 @@ public final class Optimize extends ACreate {
       throws IOException {
 
     // refresh indexes
-    d.pthindex.close();
-    d.docindex.init();
+    d.paths.close();
+    d.resources.init();
     d.tagindex.init();
     d.atnindex.init();
     final MetaData m = d.meta;
@@ -100,27 +100,27 @@ public final class Optimize extends ACreate {
       }
       final int level = pars.size();
       if(kind == Data.DOC) {
-        if(m.createpath) d.pthindex.index(0, kind, level);
+        if(m.createpath) d.paths.index(0, kind, level);
         pars.push(pre);
         tags.push(0);
         ++n;
       } else if(kind == Data.ELEM) {
         final int id = d.name(pre);
         d.tagindex.index(d.tagindex.key(id), null, true);
-        if(m.createpath) d.pthindex.index(id, kind, level);
+        if(m.createpath) d.paths.index(id, kind, level);
         pars.push(pre);
         tags.push(id);
       } else if(kind == Data.ATTR) {
         final int id = d.name(pre);
         final byte[] val = d.text(pre, false);
         d.atnindex.index(d.atnindex.key(id), val, true);
-        if(m.createpath) d.pthindex.index(id, kind, level, val, m);
+        if(m.createpath) d.paths.index(id, kind, level, val, m);
       } else {
         final byte[] val = d.text(pre, true);
         if(kind == Data.TEXT && level > 1) {
           d.tagindex.index(tags.peek(), val);
         }
-        if(m.createpath) d.pthindex.index(0, kind, level, val, m);
+        if(m.createpath) d.paths.index(0, kind, level, val, m);
       }
       if(c != null) c.pre = pre;
     }

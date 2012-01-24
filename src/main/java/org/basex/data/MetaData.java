@@ -297,7 +297,7 @@ public final class MetaData {
 
   /**
    * Returns the specified binary file, or {@code null} if the resource
-   * path cannot be resolved (e.g. points to a parent directory).
+   * path cannot be resolved (e.g. if it points to a parent directory).
    * @param pth internal file path
    * @return binary directory
    */

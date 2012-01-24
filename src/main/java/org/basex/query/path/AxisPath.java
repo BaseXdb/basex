@@ -222,7 +222,7 @@ public class AxisPath extends Path {
 
           // support only unique paths with nodes on the correct level
           final int name = data.tagindex.id(s.test.name.local());
-          final ObjList<PathNode> pn = data.pthindex.desc(name, Data.ELEM);
+          final ObjList<PathNode> pn = data.paths.desc(name, Data.ELEM);
           if(pn.size() != 1 || pn.get(0).level() != j + 1) break;
         }
         inv = j <= smin;
@@ -406,7 +406,7 @@ public class AxisPath extends Path {
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
     if(data == null || !data.meta.pathindex || !data.meta.uptodate) return null;
 
-    ObjList<PathNode> nodes = data.pthindex.root();
+    ObjList<PathNode> nodes = data.paths.root();
     for(int s = 0; s < steps.length; s++) {
       final AxisStep curr = axisStep(s);
       if(curr == null) return null;

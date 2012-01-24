@@ -170,7 +170,7 @@ public abstract class Path extends ParseExpr {
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
     if(data == null || !data.meta.pathindex || !data.meta.uptodate) return -1;
 
-    ObjList<PathNode> nodes = data.pthindex.root();
+    ObjList<PathNode> nodes = data.paths.root();
     long m = 1;
     for(int s = 0; s < steps.length; s++) {
       final AxisStep curr = axisStep(s);
@@ -278,7 +278,7 @@ public abstract class Path extends ParseExpr {
           if(pn.get(0).name != pn.get(j).name) nm = null;
         }
         qnm.add(nm);
-        pn = data.pthindex.parent(pn);
+        pn = data.paths.parent(pn);
       }
       ctx.compInfo(OPTCHILD, steps[s]);
 
@@ -310,7 +310,7 @@ public abstract class Path extends ParseExpr {
 
         // check if one of the addressed nodes is on the correct level
         final int name = data.tagindex.id(st.test.name.local());
-        for(final PathNode pn : data.pthindex.desc(name, Data.ELEM)) {
+        for(final PathNode pn : data.paths.desc(name, Data.ELEM)) {
           if(pn.level() == s + 1) continue LOOP;
         }
         ctx.compInfo(OPTPATH, path);
@@ -341,7 +341,7 @@ public abstract class Path extends ParseExpr {
     // skip request if no path index exists or might be out-of-date
     if(!data.meta.pathindex || !data.meta.uptodate) return null;
 
-    ObjList<PathNode> in = data.pthindex.root();
+    ObjList<PathNode> in = data.paths.root();
     for(int s = 0; s <= l; ++s) {
       final AxisStep curr = axisStep(s);
       if(curr == null) return null;
@@ -352,7 +352,7 @@ public abstract class Path extends ParseExpr {
       final int name = data.tagindex.id(curr.test.name.local());
 
       final ObjList<PathNode> al = new ObjList<PathNode>();
-      for(final PathNode pn : data.pthindex.desc(in, desc)) {
+      for(final PathNode pn : data.paths.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels
           if(al.size() != 0 && al.get(0).level() != pn.level()) return null;

@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import static org.basex.util.Token.*;
 
-import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -26,7 +25,7 @@ public abstract class TreeNode extends DefaultMutableTreeNode
    *  File / folder name is not part of the path. */
   final byte[] path;
   /** Tree reference for lazy loading. */
-  final JTree tree;
+  final BaseXTree tree;
   /** Data reference. */
   final Data data;
 
@@ -34,14 +33,14 @@ public abstract class TreeNode extends DefaultMutableTreeNode
    * Constructor.
    * @param nm displayed node name
    * @param pth folder path
-   * @param jtree JTree reference
+   * @param bxt tree reference
    * @param d data reference
    */
-  public TreeNode(final byte[] nm, final byte[] pth, final JTree jtree,
+  public TreeNode(final byte[] nm, final byte[] pth, final BaseXTree bxt,
       final Data d) {
     name = nm;
     path = pth;
-    tree = jtree;
+    tree = bxt;
     data = d;
     tree.addTreeWillExpandListener(this);
   }

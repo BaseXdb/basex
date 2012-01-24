@@ -223,10 +223,10 @@ public final class AddDeleteTest {
     io.write(Token.token("<x"));
 
     new Set(Prop.SKIPCORRUPT, true).execute(CONTEXT);
-    assertEquals(0, CONTEXT.data().docs("").size());
+    assertEquals(0, CONTEXT.data().resources.docs("").size());
     new Add("x", "<x").execute(CONTEXT);
     new Add("x", CORRUPT).execute(CONTEXT);
-    assertEquals(0, CONTEXT.data().docs("").size());
+    assertEquals(0, CONTEXT.data().resources.docs("").size());
     new Set(Prop.SKIPCORRUPT, false).execute(CONTEXT);
 
     try {
@@ -242,6 +242,6 @@ public final class AddDeleteTest {
    * @return number of documents
    */
   private int docs() {
-    return CONTEXT.data().docs("").size();
+    return CONTEXT.data().resources.docs("").size();
   }
 }

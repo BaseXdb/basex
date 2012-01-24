@@ -45,11 +45,11 @@ public final class DBRename extends UpdatePrimitive {
   }
 
   @Override
-  public void apply() throws QueryException {
+  public void apply() {
     for(final Entry<String, String> op : map.entrySet()) {
-      final IOFile src = data.meta.binary(op.getKey());
-      if(src.exists() && !src.rename(data.meta.binary(op.getValue())))
-        UPDBRENAMEERR.thrw(input, src);
+      final IOFile src = new IOFile(op.getKey());
+      final IOFile trg = new IOFile(op.getValue());
+      if(src.exists()) src.rename(trg);
     }
   }
 

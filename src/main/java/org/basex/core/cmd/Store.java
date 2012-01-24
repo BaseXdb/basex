@@ -87,7 +87,7 @@ public final class Store extends ACreate {
     // add directory if it does not exist anyway
     new IOFile(file.dir()).md();
 
-    PrintOutput po = new PrintOutput(file.path());
+    final PrintOutput po = new PrintOutput(file.path());
     try {
       final Reader r = in.getCharacterStream();
       final InputStream is = in.getByteStream();

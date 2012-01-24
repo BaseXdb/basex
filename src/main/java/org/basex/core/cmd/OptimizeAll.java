@@ -177,7 +177,7 @@ public final class OptimizeAll extends ACreate {
           if(cmd != null) cmd.pre++;
         }
       };
-      final IntList il = data.docs();
+      final IntList il = data.resources.docs();
       for(int i = 0, is = il.size(); i < is; i++) ser.node(data, il.get(i));
     }
   }

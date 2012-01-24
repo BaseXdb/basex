@@ -1,8 +1,7 @@
 package org.basex.gui.layout;
 
-import javax.swing.JTree;
-
 import org.basex.data.Data;
+
 
 /**
  * JTree node which represents a leaf (which represents either a raw file
@@ -20,12 +19,12 @@ public final class TreeLeaf extends TreeNode {
    * @param pth node path
    * @param nm name of content node
    * @param rw represented node is raw file
-   * @param jtree JTree reference
+   * @param bxt tree reference
    * @param d data reference
    */
   public TreeLeaf(final byte[] nm, final byte[] pth, final boolean rw,
-      final JTree jtree, final Data d) {
-    super(nm, pth, jtree, d);
+      final BaseXTree bxt, final Data d) {
+    super(nm, pth, bxt, d);
     raw = rw;
   }
 

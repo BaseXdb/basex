@@ -38,7 +38,6 @@ import org.basex.gui.layout.TreeFolder;
 import org.basex.gui.layout.TreeLeaf;
 import org.basex.gui.layout.TreeNode;
 import org.basex.gui.layout.TreeRootFolder;
-import org.basex.io.IOFile;
 
 /**
  * Combination of a JTree and a text field. The tree visualizes the database
@@ -155,12 +154,9 @@ public class DialogResources extends BaseXBack {
     // clear tree to append filtered nodes
     root.removeAllChildren();
 
-    // check if there's a folder
-    final boolean documentFolder = data.docindex.isDir(path);
-    final IOFile fol = data.meta.binary(string(path));
-    final boolean rawFolder = fol.exists() && fol.children().length > 0;
+    // check if there's a directory
     // create a folder if there's either a raw or document folder
-    if(documentFolder || rawFolder) {
+    if(data.resources.isDir(path)) {
       root.add(new TreeFolder(TreeFolder.name(path),
           TreeFolder.path(path), tree, data));
     }

@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
+import org.basex.index.Resources;
 import org.basex.query.util.pkg.Repo;
 import org.basex.server.ClientListener;
 import org.basex.server.Sessions;
@@ -128,8 +129,9 @@ public final class Context {
    */
   public Nodes current() {
     if(current == null && data != null) {
+      final Resources res = data.resources;
       current = new Nodes(
-          (path == null ? data.docs() : data.docs(path)).toArray(), data);
+          (path == null ? res.docs() : res.docs(path)).toArray(), data);
       current.root = path == null;
     }
     return current;

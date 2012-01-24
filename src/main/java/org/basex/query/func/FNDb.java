@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
 import org.basex.core.User;
-import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.InfoIndex;
@@ -17,6 +16,7 @@ import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.Resources;
 import org.basex.io.IOFile;
 import org.basex.io.MimeTypes;
 import org.basex.io.out.ArrayOutput;
@@ -27,6 +27,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.item.ANode;
+import org.basex.query.item.B64Stream;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.DBNodeSeq;
@@ -34,10 +35,9 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.FNode;
-import org.basex.query.item.Item;
 import org.basex.query.item.Int;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
-import org.basex.query.item.B64Stream;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -147,7 +147,7 @@ public final class FNDb extends FuncCall {
   private Value open(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = expr.length < 2 ? "" : path(1, ctx);
-    return DBNodeSeq.get(data.docs(path), data, true, path.isEmpty());
+    return DBNodeSeq.get(data.resources.docs(path), data, true, path.isEmpty());
   }
 
   /**
@@ -239,11 +239,12 @@ public final class FNDb extends FuncCall {
       final Data data = data(0, ctx);
       final String path = string(el == 1 ? EMPTY : checkStr(expr[1], ctx));
       // add xml resources
-      final IntList il = data.docs(path);
+      final Resources res = data.resources;
+      final IntList il = res.docs(path);
       final int is = il.size();
       for(int i = 0; i < is; i++) tl.add(data.text(il.get(i), true));
       // add binary resources
-      for(final byte[] file : data.files(path)) tl.add(file);
+      for(final byte[] file : res.binaries(path)) tl.add(file);
     }
     tl.sort(!Prop.WIN);
 
@@ -286,7 +287,8 @@ public final class FNDb extends FuncCall {
       // check if raw file or XML document exists
       final String path = path(1, ctx);
       final IOFile io = data.meta.binary(path);
-      return Bln.get(io.exists() && !io.isDir() || data.doc(path) != -1);
+      return Bln.get(io.exists() && !io.isDir() ||
+          data.resources.doc(path) != -1);
     } catch(final QueryException ex) {
       if(ex.err() == NODB) return Bln.FALSE;
       throw ex;
@@ -302,7 +304,7 @@ public final class FNDb extends FuncCall {
   private Bln isXML(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
-    return Bln.get(data.doc(path) != -1);
+    return Bln.get(data.resources.doc(path) != -1);
   }
 
   /**
@@ -314,7 +316,7 @@ public final class FNDb extends FuncCall {
   private Str contentType(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
-    if(data.doc(path) != -1) return Str.get(MimeTypes.APP_XML);
+    if(data.resources.doc(path) != -1) return Str.get(MimeTypes.APP_XML);
     final IOFile io = data.meta.binary(path);
     if(!io.exists() || io.isDir()) RESFNF.thrw(input, path);
     return Str.get(MimeTypes.get(path));
@@ -331,7 +333,7 @@ public final class FNDb extends FuncCall {
     final String path = path(1, ctx);
 
     // xml resource
-    final int pre = d.doc(path);
+    final int pre = d.resources.doc(path);
     if(pre != -1)
       return resource(token(path), false, 0, APP_XML, d.meta.time);
 
@@ -422,14 +424,15 @@ public final class FNDb extends FuncCall {
     final Item doc = checkItem(expr[2], ctx);
 
     // collect all old documents
-    final int pre = data.doc(path);
+    final Resources res = data.resources;
+    final int pre = res.doc(path);
     if(pre != -1) {
-      if(data.docs(path).size() != 1) DOCTRGMULT.thrw(input);
+      if(res.docs(path).size() != 1) DOCTRGMULT.thrw(input);
       ctx.updates.add(new DeleteNode(pre, data, input), ctx);
     }
-    // delete raw resources
-    final TokenList raw = Delete.files(data, path);
-    ctx.updates.add(new DBDelete(data, raw, input), ctx);
+    // delete binary resources
+    final IOFile bin = data.meta.binary(path);
+    if(bin != null) ctx.updates.add(new DBDelete(data, path, input), ctx);
     ctx.updates.add(new DBAdd(data, input, doc, path, ctx.context), ctx);
 
     final IOFile file = data.meta.binary(path);
@@ -453,13 +456,14 @@ public final class FNDb extends FuncCall {
     final String path = path(1, ctx);
 
     // delete XML resources
-    final IntList docs = data.docs(path);
+    final IntList docs = data.resources.docs(path);
     for(int i = 0, is = docs.size(); i < is; i++) {
       ctx.updates.add(new DeleteNode(docs.get(i), data, input), ctx);
     }
     // delete raw resources
-    final TokenList raw = Delete.files(data, path);
-    ctx.updates.add(new DBDelete(data, raw, input), ctx);
+    final IOFile bin = data.meta.binary(path);
+    if(bin == null) UPDBDELERR.thrw(input, path);
+    ctx.updates.add(new DBDelete(data, path, input), ctx);
     return null;
   }
 
@@ -473,21 +477,23 @@ public final class FNDb extends FuncCall {
     checkWrite(ctx);
 
     final Data data = data(0, ctx);
-    final String src = path(1, ctx);
-    final String trg = path(2, ctx);
+    final String source = path(1, ctx);
+    final String target = path(2, ctx);
 
     // the first step of the path should be the database name
-    final IntList il = data.docs(src);
+    final IntList il = data.resources.docs(source);
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
-      final String target = Rename.target(data, pre, src, trg);
-      if(target.isEmpty()) EMPTYPATH.thrw(input, this);
-      ctx.updates.add(new ReplaceValue(pre, data, input, token(target)), ctx);
+      final String trg = Rename.target(data, pre, source, target);
+      if(trg.isEmpty()) EMPTYPATH.thrw(input, this);
+      ctx.updates.add(new ReplaceValue(pre, data, input, token(trg)), ctx);
     }
     // rename files
-    if(data.meta.binary(src) != null && data.meta.binary(trg) != null)
-      ctx.updates.add(new DBRename(data, src, trg, input), ctx);
+    final IOFile src = data.meta.binary(source);
+    final IOFile trg = data.meta.binary(target);
+    if(src == null || trg == null) UPDBRENAMEERR.thrw(input, src);
 
+    ctx.updates.add(new DBRename(data, src.path(), trg.path(), input), ctx);
     return null;
   }
 

@@ -98,7 +98,7 @@ public final class FNIndex extends FuncCall {
 
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
     final NodeCache nc = new NodeCache();
-    nc.add(flat ? flat(data) : tree(data, data.pthindex.root().get(0)));
+    nc.add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
     return new FDoc(nc, EMPTY);
   }
 
