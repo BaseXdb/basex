@@ -38,14 +38,14 @@ public class FNPRepoTest extends AdvancedQueryTest {
    */
   @Test
   public void install() {
-    check(_PKG_INSTALL);
-    query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
+    check(_REPO_INSTALL);
+    query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     assertTrue(dir(PKGDIR));
     assertTrue(file(PKGDIR + "/expath-pkg.xml"));
     assertTrue(dir(PKGDIR + "/pkg3"));
     assertTrue(dir(PKGDIR + "/pkg3/mod"));
     assertTrue(file(PKGDIR + "/pkg3/mod/pkg3mod1.xql"));
-    query(_PKG_DELETE.args(PKGDIR));
+    query(_REPO_DELETE.args(PKGDIR));
   }
 
   /**
@@ -53,16 +53,16 @@ public class FNPRepoTest extends AdvancedQueryTest {
    */
   @Test
   public void delete() {
-    check(_PKG_DELETE);
+    check(_REPO_DELETE);
     // Install
-    query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
+    query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // Delete by directory name
-    query(_PKG_DELETE.args(PKGDIR));
+    query(_REPO_DELETE.args(PKGDIR));
     assertTrue(!dir(PKGDIR));
     // Install again
-    query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
+    query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // Delete by package name
-    query(_PKG_DELETE.args("http://www.pkg3.com"));
+    query(_REPO_DELETE.args("http://www.pkg3.com"));
     assertTrue(!dir(PKGDIR));
   }
 
@@ -71,15 +71,15 @@ public class FNPRepoTest extends AdvancedQueryTest {
    */
   @Test
   public void list() {
-    check(_PKG_LIST);
+    check(_REPO_LIST);
     // Install pkg3
-    query(_PKG_INSTALL.args(REPO + "pkg3.xar"));
+    query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
     // Install pkg4
-    query(_PKG_INSTALL.args(REPO + "pkg4.xar"));
-    contains(_PKG_LIST.toString(), PKG3NAME);
-    contains(_PKG_LIST.toString(), PKG4NAME);
-    query(_PKG_DELETE.args(PKG4NAME));
-    query(_PKG_DELETE.args(PKG3NAME));
+    query(_REPO_INSTALL.args(REPO + "pkg4.xar"));
+    contains(_REPO_LIST.toString(), PKG3NAME);
+    contains(_REPO_LIST.toString(), PKG4NAME);
+    query(_REPO_DELETE.args(PKG4NAME));
+    query(_REPO_DELETE.args(PKG3NAME));
   }
 
   /**
