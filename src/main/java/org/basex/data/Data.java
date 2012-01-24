@@ -216,7 +216,19 @@ public abstract class Data {
    * @return pre value
    */
   public final int doc(final String path) {
-    return docindex.doc(path);
+    return docindex.doc(path, true);
+  }
+
+  /**
+   * Returns the pre value of the node that matches the specified path,
+   * or {@code -1}. In case of bulk insert/delete/replace operations
+   * sorting of the document paths can be suppressed to save time.
+   * @param path input path
+   * @param sort sort paths before access
+   * @return pre value
+   */
+  public final int doc(final String path, final boolean sort) {
+    return docindex.doc(path, sort);
   }
 
   /**
@@ -568,10 +580,11 @@ public abstract class Data {
    */
   public final void update(final int pre, final int kind, final byte[] value) {
     meta.update();
-    if(kind == DOC) docindex.update();
 
     updateText(pre, kind == PI ? trim(concat(name(pre, kind), SPACE, value)) :
       value, kind);
+
+    if(kind == DOC) docindex.rename(pre, value);
   }
 
   /**

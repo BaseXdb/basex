@@ -99,6 +99,29 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   }
 
   /**
+   * Inserts the given elements at the specified position.
+   * @param i insert position
+   * @param e elements to insert
+   */
+  public void insert(final int i, final byte[][] e) {
+    final int l = e.length;
+    if(l == 0) return;
+
+    if(size + l > list.length) list = Arrays.copyOf(list, newSize(size + l));
+    Array.move(list, i, l, size - i);
+    System.arraycopy(e, 0, list, i, l);
+    size += l;
+  }
+
+  /**
+   * Deletes the element at the specified position.
+   * @param i position to delete
+   */
+  public void delete(final int i) {
+    Array.move(list, i + 1, -1, --size - i);
+  }
+
+  /**
    * Returns the element at the specified index.
    * @param i index
    * @return element
