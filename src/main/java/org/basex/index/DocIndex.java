@@ -122,7 +122,7 @@ public final class DocIndex implements Index {
    * @param d data reference to be inserted
    */
   public void insert(final int pre, final Data d) {
-    // find all document nodes
+    // find all document nodes in the given data instance
     final int dsize = d.meta.size;
     final IntList pres = new IntList();
     for(int dpre = 0; dpre < dsize;) {
@@ -131,8 +131,7 @@ public final class DocIndex implements Index {
       dpre += d.size(dpre, k);
     }
 
-    // init paths before modifying docs, otherwise paths would
-    // be larger than docs after insert
+    // insert DOC nodes and move pre values of following DOC nodes
     final int[] presA = pres.toArray();
     final IntList il = docs();
     int i = il.sortedIndexOf(pre);
@@ -147,7 +146,6 @@ public final class DocIndex implements Index {
       t[j] = concat(SLASH, Prop.WIN ? lc(b) : b);
     }
     paths.insert(i, t);
-
     ordered = false;
   }
 
@@ -157,8 +155,6 @@ public final class DocIndex implements Index {
    * @param size number of deleted nodes
    */
   public void delete(final int pre, final int size) {
-    // init paths before modifying docs, otherwise paths would
-    // be smaller than docs after delete
     final IntList il = docs();
     int i = il.sortedIndexOf(pre);
     final boolean found = i >= 0;
@@ -168,7 +164,6 @@ public final class DocIndex implements Index {
 
     if(!found) return;
     paths.delete(i);
-
     ordered = false;
   }
 
@@ -182,7 +177,6 @@ public final class DocIndex implements Index {
 
     paths.set(docs.sortedIndexOf(pre),
         concat(SLASH, Prop.WIN ? lc(value) : value));
-
     ordered = false;
   }
 
@@ -253,7 +247,6 @@ public final class DocIndex implements Index {
       return p > -1 && p < paths.size() && eq(paths.get(pathorder[p]), exct) ?
           docs.get(pathorder[p]) : -1;
     }
-
     for(int i = 0; i < paths.size(); i++)
       if(eq(paths.get(i), exct)) return docs.get(i);
 
