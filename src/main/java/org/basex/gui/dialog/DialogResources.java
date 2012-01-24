@@ -11,7 +11,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -180,15 +179,11 @@ public class DialogResources extends BaseXBack {
    * @param n folder
    */
   void refreshFolder(final TreeFolder n) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        n.removeChildren();
-        final TreePath path = new TreePath(n.getPath());
-        tree.collapsePath(path);
-        tree.expandPath(path);
-      }
-    });
+    if(n == null) return;
+    n.removeChildren();
+    final TreePath path = new TreePath(n.getPath());
+    tree.collapsePath(path);
+    tree.expandPath(path);
   }
 
   /**
@@ -236,7 +231,7 @@ public class DialogResources extends BaseXBack {
     }
   }
 
-  /** GUI Commands for popup menu. */
+  /** GUI commands for popup menu. */
   abstract class BaseCmd implements GUICommand {
     @Override
     public boolean checked() {
@@ -252,19 +247,20 @@ public class DialogResources extends BaseXBack {
     }
   }
 
-  /** Delete cmd. */
+  /** Delete command. */
   final class DeleteCmd extends BaseCmd {
     @Override
     public void execute(final GUI g) {
       final TreeNode n = selection();
-      if(n == null) return;
+      if(n == null || !Dialog.confirm(dialog.gui, Text.DELETECONF)) return;
 
-      if(!Dialog.confirm(dialog.gui, Text.DELETECONF)) return;
-      DialogProgress.execute(dialog, "", new Delete(n.path()));
-
-      // refresh tree
-      final TreeFolder par = (TreeFolder) n.getParent();
-      if(par != null) refreshFolder(par);
+      final Thread post = new Thread() {
+        @Override
+        public void run() {
+          refreshFolder((TreeFolder) n.getParent());
+        }
+      };
+      DialogProgress.execute(dialog, "", post, new Delete(n.path()));
     }
 
     @Override
@@ -279,7 +275,7 @@ public class DialogResources extends BaseXBack {
     }
   }
 
-  /** Rename cmd. */
+  /** Rename command. */
   final class RenameCmd extends BaseCmd {
     @Override
     public void execute(final GUI g) {
@@ -290,11 +286,13 @@ public class DialogResources extends BaseXBack {
           n.path(), RENAMETITLE, dialog.gui, 0);
       if(!d.ok()) return;
 
-      DialogProgress.execute(dialog, "", new Rename(n.path(), d.input()));
-
-      // refresh tree
-      final TreeFolder par = (TreeFolder) n.getParent();
-      if(par != null) refreshFolder(par);
+      final Thread post = new Thread() {
+        @Override
+        public void run() {
+          refreshFolder((TreeFolder) n.getParent());
+        }
+      };
+      DialogProgress.execute(dialog, "", post, new Rename(n.path(), d.input()));
     }
 
     @Override

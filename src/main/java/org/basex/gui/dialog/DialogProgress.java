@@ -41,11 +41,11 @@ public final class DialogProgress extends Dialog implements ActionListener {
   /**
    * Default constructor.
    * @param main reference to the main window
-   * @param message waiting message
+   * @param title dialog title
    * @param cmd progress reference
    */
-  DialogProgress(final GUI main, final String message, final Command cmd) {
-    super(main, message, false);
+  DialogProgress(final GUI main, final String title, final Command cmd) {
+    super(main, title, false);
 
     info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
@@ -111,6 +111,19 @@ public final class DialogProgress extends Dialog implements ActionListener {
    */
   public static void execute(final Dialog d, final String t,
       final Command... cmds) {
+    execute(d, t, null, cmds);
+  }
+
+  /**
+   * Runs the specified commands, decorated by a progress dialog, and
+   * calls {@link Dialog#action} if the dialog is closed.
+   * @param d reference to the dialog window
+   * @param t dialog title (may be an empty string)
+   * @param post post-processing step
+   * @param cmds commands to be run
+   */
+  public static void execute(final Dialog d, final String t,
+      final Thread post, final Command... cmds) {
 
     // start database creation thread
     new Thread() {
@@ -152,6 +165,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
         d.setEnabled(true);
         d.action(null);
+        if(post != null) post.run();
       }
     }.start();
   }
