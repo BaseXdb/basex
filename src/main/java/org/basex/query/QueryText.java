@@ -457,6 +457,8 @@ public interface QueryText {
   byte[] SQL = token("sql");
   /** Crypto token. */
   byte[] CRYPTO = token("crytpo");
+  /** Repo token. */
+  byte[] REPO = token("repo");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -521,8 +523,8 @@ public interface QueryText {
   byte[] XSLTURI = token(BXMODULES + "xslt");
   /** SQL Module URI. */
   byte[] SQLURI = token(BXMODULES + "sql");
-  /** Package URI. */
-  byte[] PACKURI = token(BXMODULES + "pkg");
+  /** Repo URI. */
+  byte[] REPOURI = token(BXMODULES + "repo");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
