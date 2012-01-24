@@ -19,14 +19,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class FNPkg extends FuncCall {
+public final class FNRepo extends FuncCall {
   /**
    * Constructor.
    * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNPkg(final InputInfo ii, final Function f, final Expr[] e) {
+  protected FNRepo(final InputInfo ii, final Function f, final Expr[] e) {
     super(ii, f, e);
   }
 
@@ -34,7 +34,7 @@ public final class FNPkg extends FuncCall {
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     switch(def) {
-      case _PKG_LIST:
+      case _REPO_LIST:
         final ItemCache cache = new ItemCache();
         for(final byte[] p : ctx.context.repo.pkgDict())
           if(p != null) cache.add(Str.get(Package.name(p)));
@@ -53,10 +53,10 @@ public final class FNPkg extends FuncCall {
     // either path to package or package name
     final String pkg = expr.length == 0 ? null : string(checkStr(expr[0], ctx));
     switch(def) {
-      case _PKG_INSTALL:
+      case _REPO_INSTALL:
         repoMng.install(pkg, ii);
         return null;
-      case _PKG_DELETE:
+      case _REPO_DELETE:
         repoMng.delete(pkg, ii);
         return null;
       default:

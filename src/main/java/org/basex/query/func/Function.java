@@ -608,14 +608,14 @@ public enum Function {
   /** XQuery function */
   _SQL_ROLLBACK(FNSql.class, "rollback(id)", EMP, ITR),
 
-  /* FNPkg functions. */
+  /* FNRepo functions. */
 
   /** XQuery function. */
-  _PKG_INSTALL(FNPkg.class, "install(uri)", EMP, STR),
+  _REPO_INSTALL(FNRepo.class, "install(uri)", EMP, STR),
   /** XQuery function. */
-  _PKG_DELETE(FNPkg.class, "delete(uri)", EMP, STR),
+  _REPO_DELETE(FNRepo.class, "delete(uri)", EMP, STR),
   /** XQuery function. */
-  _PKG_LIST(FNPkg.class, "list()", STR_ZM),
+  _REPO_LIST(FNRepo.class, "list()", STR_ZM),
 
   /* FNFt functions. */
 
@@ -775,7 +775,7 @@ public enum Function {
     URIS.put(FNFile.class,   FILEURI);
     URIS.put(FNHttp.class,   HTTPURI);
     URIS.put(FNZip.class,    ZIPURI);
-    URIS.put(FNPkg.class, REPOURI);
+    URIS.put(FNRepo.class, REPOURI);
     // internal functions
     URIS.put(FNDb.class,    DBURI);
     URIS.put(FNFt.class,    FTURI);
