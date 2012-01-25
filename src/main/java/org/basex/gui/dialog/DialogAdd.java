@@ -80,8 +80,13 @@ public class DialogAdd extends BaseXBack {
     if(comp == add) {
       options.setOptions();
       parsing.setOptions();
-      DialogProgress.execute(dialog, "", new Add(trg, src));
-      dialog.resources.action(comp);
+      final Thread t = new Thread() {
+        @Override
+        public void run() {
+          dialog.resources.refreshNewFolder(trg);
+        }
+      };
+      DialogProgress.execute(dialog, "", t, new Add(trg, src));
     } else {
       boolean ok = options.action(false);
       parsing.action(comp);
