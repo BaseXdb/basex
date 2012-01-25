@@ -108,7 +108,7 @@ public final class FNDb extends FuncCall {
   public Value value(final QueryContext ctx) throws QueryException {
     switch(def) {
       case _DB_OPEN: return open(ctx);
-      default:     return super.value(ctx);
+      default:       return super.value(ctx);
     }
   }
 
@@ -580,7 +580,7 @@ public final class FNDb extends FuncCall {
     try {
       // run serialization
       final Serializer ser = Serializer.get(ao, ctx.serProp(true));
-      final ValueIter ir = expr[1].value(ctx).iter();
+      final ValueIter ir = ctx.value(expr[1]).iter();
       for(Item it; (it = ir.next()) != null;) it.serialize(ser);
       ser.close();
     } catch(final SerializerException ex) {

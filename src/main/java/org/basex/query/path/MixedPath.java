@@ -62,7 +62,7 @@ public final class MixedPath extends Path {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // creates an iterator from the root value
-    final Value v = root != null ? root.value(ctx) : checkCtx(ctx);
+    final Value v = root != null ? ctx.value(root) : checkCtx(ctx);
     Iter res = v.iter();
 
     final Value cv = ctx.value;

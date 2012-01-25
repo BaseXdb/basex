@@ -58,7 +58,7 @@ public final class BaseFuncCall extends UserFuncCall {
       final VarStack cs = addArgs(ctx, args);
       ctx.tailCalls = 0;
       try {
-        return fun.value(ctx);
+        return ctx.value(fun);
       } catch(final Continuation c) {
         fun = c.getFunc();
         args = c.getArgs();

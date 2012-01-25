@@ -224,8 +224,10 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public IOFile merge(final String f) {
-    return f.contains(":") ? new IOFile(f) : new IOFile(dir(), f);
+  public IO merge(final String f) {
+    final IO io = IO.get(f);
+    if(!(io instanceof IOFile)) return io;
+    return f.contains(":") ? io : new IOFile(dir(), f);
   }
 
   /**

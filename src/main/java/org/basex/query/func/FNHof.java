@@ -36,13 +36,13 @@ public final class FNHof extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case _HOF_SORT_WITH: return sortWith(ctx);
+      case _HOF_SORT_WITH:  return sortWith(ctx);
       case _HOF_ID:
-      case _HOF_CONST:     return expr[0].iter(ctx);
+      case _HOF_CONST:      return ctx.iter(expr[0]);
       case _HOF_FOLD_LEFT1: return foldLeft1(ctx).iter();
-      case _HOF_UNTIL:     return until(ctx).iter();
-      case _HOF_ITERATE:   return iterate(ctx);
-      default:             return super.iter(ctx);
+      case _HOF_UNTIL:      return until(ctx).iter();
+      case _HOF_ITERATE:    return iterate(ctx);
+      default:              return super.iter(ctx);
     }
   }
 
@@ -52,7 +52,7 @@ public final class FNHof extends FuncCall {
       case _HOF_FOLD_LEFT1: return foldLeft1(ctx);
       case _HOF_UNTIL:      return until(ctx);
       case _HOF_ID:
-      case _HOF_CONST:      return expr[0].value(ctx);
+      case _HOF_CONST:      return ctx.value(expr[0]);
       default:              return super.value(ctx);
     }
   }
@@ -119,7 +119,7 @@ public final class FNHof extends FuncCall {
   private Value until(final QueryContext ctx) throws QueryException {
     final FItem pred = withArity(0, 1, ctx);
     final FItem fun = withArity(1, 1, ctx);
-    Value v = expr[2].value(ctx);
+    Value v = ctx.value(expr[2]);
     while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
       v = fun.invValue(ctx, input, v);
     }
@@ -135,8 +135,8 @@ public final class FNHof extends FuncCall {
   private Iter iterate(final QueryContext ctx) throws QueryException {
     final FItem f = withArity(0, 1, ctx);
     return new Iter() {
-      /** Current value. */
-      Value v = expr[1].value(ctx);
+      // current value
+      Value v = ctx.value(expr[1]);
       long i, len = v.size();
 
       @Override

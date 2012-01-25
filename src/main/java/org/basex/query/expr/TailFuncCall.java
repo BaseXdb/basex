@@ -47,7 +47,7 @@ public final class TailFuncCall extends UserFuncCall {
 
     // cache arguments, evaluate function and reset variable scope
     final VarStack cs = addArgs(ctx, args(ctx));
-    final Value v = func.value(ctx);
+    final Value v = ctx.value(func);
     ctx.vars.reset(cs);
     return v;
   }

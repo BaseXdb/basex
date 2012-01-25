@@ -3578,15 +3578,21 @@ public class QueryParser extends InputParser {
    * @return io instance
    */
   private IO io(final String fn) {
-    IO fl = IO.get(fn);
-    // if file does not exist, try base uri
-    if(!fl.exists()) {
-      final IO base = ctx.sc.baseIO();
-      if(base != null) fl = base.merge(fn);
+    IO io = IO.get(fn);
+    if(io.exists()) return io;
+
+    // append with base uri
+    final IO base = ctx.sc.baseIO();
+    if(base != null) {
+      final IO io2 = base.merge(fn);
+      if(!io2.eq(io) && io2.exists()) return io2;
     }
-    // if file does not exist, try query directory
-    if(!fl.exists() && file != null) fl = file.merge(fn);
-    return fl;
+    // append with query directory
+    if(file != null) {
+      final IO io2 = file.merge(fn);
+      if(!io2.eq(io) && io2.exists()) return io2;
+    }
+    return io;
   }
 
   /**

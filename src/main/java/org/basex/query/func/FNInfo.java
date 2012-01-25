@@ -53,7 +53,7 @@ public final class FNInfo extends FuncCall {
           name = (QNm) checkType(it, AtomType.QNM);
         }
         if(al > 1) msg = Token.string(checkEStr(expr[1], ctx));
-        final Value val = al > 2 ? expr[2].value(ctx) : null;
+        final Value val = al > 2 ? ctx.value(expr[2]) : null;
         throw new QueryException(input, name, msg).value(val);
       case TRACE:
         return new Iter() {

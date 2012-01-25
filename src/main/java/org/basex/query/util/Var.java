@@ -178,7 +178,7 @@ public final class Var extends ParseExpr {
       final Value v = ctx.value;
       ctx.value = null;
       try {
-        value = cast(expr.comp(ctx).value(ctx), ctx);
+        value = cast(ctx.value(expr.comp(ctx)), ctx);
       } finally {
         ctx.value = v;
       }

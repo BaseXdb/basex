@@ -96,7 +96,7 @@ public final class JavaFunc extends Arr {
   public Value value(final QueryContext ctx) throws QueryException {
     final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
-      arg[a] = expr[a].value(ctx);
+      arg[a] = ctx.value(expr[a]);
       if(arg[a].isEmpty()) XPEMPTY.thrw(input, description());
     }
 

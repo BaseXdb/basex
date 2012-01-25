@@ -86,7 +86,7 @@ public final class Let extends ForLet {
             }
             v = Dbl.get(Scoring.let(s, c));
           } else {
-            v = expr.value(ctx);
+            v = ctx.value(expr);
           }
           ctx.vars.add(vr.bind(v, ctx));
           more = true;

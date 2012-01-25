@@ -203,7 +203,7 @@ public final class FNFunc extends FuncCall {
     // don't convert to a value if not necessary
     if(x == null) return expr[1].iter(ctx);
 
-    Value sum = expr[1].value(ctx);
+    Value sum = ctx.value(expr[1]);
     do sum = f.invValue(ctx, input, sum, x);
     while((x = xs.next()) != null);
 
@@ -218,11 +218,11 @@ public final class FNFunc extends FuncCall {
    */
   private Iter foldRight(final QueryContext ctx) throws QueryException {
     final FItem f = withArity(0, 2, ctx);
-    final Value xs = expr[2].value(ctx);
+    final Value xs = ctx.value(expr[2]);
     // evaluate start value lazily if it's passed straight through
     if(xs.isEmpty()) return expr[1].iter(ctx);
 
-    Value res = expr[1].value(ctx);
+    Value res = ctx.value(expr[1]);
     for(long i = xs.size(); --i >= 0;)
       res = f.invValue(ctx, input, xs.itemAt(i), res);
 

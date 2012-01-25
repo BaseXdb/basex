@@ -216,8 +216,13 @@ final class Docs {
     if(pth.isEmpty()) return docs;
 
     // normalize paths
-    final byte[] exct = normalize(token(pth));
-    final byte[] pref = concat(exct, SLASH);
+    byte[] exct = EMPTY;
+    byte[] pref = normalize(token(pth));
+    // check for explicit directory indicator
+    if(!pth.endsWith("/")) {
+      exct = pref;
+      pref = concat(exct, SLASH);
+    }
 
     // relevant paths: exact hits and prefixes
     final IntList il = new IntList();
@@ -262,7 +267,6 @@ final class Docs {
     for(int t = 0; t < ts; t++) {
       if(eq(paths.get(t), exct)) return docs.get(t);
     }
-
     return -1;
   }
 

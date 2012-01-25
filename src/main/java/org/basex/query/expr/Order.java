@@ -78,7 +78,7 @@ public final class Order extends ParseExpr {
     final Item[] k = new Item[ob.length];
     for(int o = k.length; o-- > 0;) k[o] = ob[o].key(ctx, ks.size());
     ks.add(k);
-    vs.add(e.value(ctx));
+    vs.add(ctx.value(e));
   }
 
   @Override

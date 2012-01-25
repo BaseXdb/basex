@@ -76,6 +76,8 @@ public final class IOUrl extends IO {
 
   @Override
   public IO merge(final String f) {
+    final IO io = IO.get(f);
+    if(!(io instanceof IOFile)) return io;
     return IO.get((path.endsWith("/") ? path :
       path.replace("^(.*/).*", "$1")) + f);
   }

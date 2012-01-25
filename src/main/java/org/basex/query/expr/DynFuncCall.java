@@ -79,7 +79,7 @@ public final class DynFuncCall extends Arr {
    */
   private Value[] argv(final QueryContext ctx) throws QueryException {
     final Value[] argv = new Value[expr.length - 1];
-    for(int i = argv.length; --i >= 0;) argv[i] = expr[i].value(ctx);
+    for(int i = argv.length; --i >= 0;) argv[i] = ctx.value(expr[i]);
     return argv;
   }
 

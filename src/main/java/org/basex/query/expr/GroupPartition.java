@@ -67,11 +67,10 @@ final class GroupPartition {
    * @throws QueryException exception
    */
   void add(final QueryContext ctx) throws QueryException  {
-
     final int gl = gv.length;
     final Value[] vals = new Value[gl];
     for(int i = 0; i < gl; i++) {
-      final Value val = ctx.vars.get(gv[i]).value(ctx);
+      final Value val = ctx.value(ctx.vars.get(gv[i]));
       if(val.size() > 1) XGRP.thrw(input);
       vals[i] = val;
     }
@@ -112,7 +111,7 @@ final class GroupPartition {
 
     for(int i = 0; i < ngl; ++i) {
       ItemCache ic = sq[i];
-      final Value result = ctx.vars.get(ngv[0][i]).value(ctx);
+      final Value result = ctx.value(ctx.vars.get(ngv[0][i]));
       if(ic == null) {
         ic = new ItemCache();
         sq[i] = ic;

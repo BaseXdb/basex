@@ -282,7 +282,7 @@ public class AxisPath extends Path {
     final long cp = ctx.pos;
 
     try {
-      Value r = root != null ? root.value(ctx) : cv;
+      Value r = root != null ? ctx.value(root) : cv;
 
       if(!cache || citer == null || lvalue.type != NodeType.DOC ||
           r.type != NodeType.DOC || !((ANode) lvalue).is((ANode) r)) {

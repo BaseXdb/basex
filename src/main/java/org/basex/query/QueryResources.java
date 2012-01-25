@@ -1,6 +1,8 @@
 package org.basex.query;
 
 import static org.basex.query.util.Err.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.core.User;
@@ -136,11 +138,31 @@ public final class QueryResources {
       if(IO.get(data[d].meta.original).eq(io)) return data[d];
     }
 
-    // retrieve new data reference
-    final IO base = ctx.sc.baseIO();
-    Data d = doc(input, base == null, col, ii);
-    // throws an exception if reference is not found
-    if(d == null) d = doc(base.merge(input).path(), true, col, ii);
+    IOException ex = null;
+    Data d = null;
+    try {
+      // try to retrieve data reference
+      d = Check.check(ctx.context, input);
+    } catch(final IOException e) {
+      ex = e;
+      // try to retrieve data reference relative to base uri
+      final IO base = ctx.sc.baseIO();
+      if(base != null) {
+        try {
+          final String path = base.merge(input).path();
+          if(!path.equals(input)) d = Check.check(ctx.context, path);
+        } catch(final IOException exc) { /* ignore exception */ }
+      }
+    }
+
+    if(d == null) {
+      // handle first exception
+      Util.debug(ex);
+      if(col) NOCOLL.thrw(ii, ex);
+      if(ex instanceof FileNotFoundException) RESFNF.thrw(ii, input);
+      IOERR.thrw(ii, ex);
+    }
+
     // add reference to pool of opened databases
     addData(d);
     return d;
@@ -232,28 +254,6 @@ public final class QueryResources {
   private void addCollection(final Data d, final String path) {
     addCollection(DBNodeSeq.get(d.resources.docs(path), d, true,
         path.isEmpty()), d.meta.name);
-  }
-
-  /**
-   * Opens the database or creates a new database instance for the specified
-   * document.
-   * @param path document path
-   * @param err error flag
-   * @param col collection flag
-   * @param ii input info
-   * @return data reference
-   * @throws QueryException query exception
-   */
-  private Data doc(final String path, final boolean err, final boolean col,
-      final InputInfo ii) throws QueryException {
-
-    try {
-      return Check.check(ctx.context, path);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      if(err) (col ? NOCOLL : IOERR).thrw(ii, ex);
-      return null;
-    }
   }
 
   /**

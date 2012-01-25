@@ -72,7 +72,7 @@ public final class Try extends Single {
       // don't catch errors from error handlers
       if(qe != null) return err(ctx, qe);
       try {
-        return expr.value(ctx);
+        return ctx.value(expr);
       } catch(final QueryException ex) {
         return err(ctx, ex);
       }

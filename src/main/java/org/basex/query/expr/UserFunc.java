@@ -140,7 +140,7 @@ public class UserFunc extends Single {
     final Atts ns = ctx.sc.ns.reset();
     ctx.value = null;
     try {
-      final Value v = expr.value(ctx);
+      final Value v = ctx.value(expr);
       // optionally promote return value to target type
       return cast ? ret.promote(v, ctx, input) : v;
     } finally {

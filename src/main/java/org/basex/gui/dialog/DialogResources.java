@@ -193,11 +193,9 @@ public class DialogResources extends BaseXBack {
   void action(final Object comp) {
     if(comp == filter) {
       filter();
-    } else if(comp != null) {
-      if(comp == clear) {
-        filterText.requestFocus();
-        refreshFolder(root);
-      }
+    } else if(comp == clear) {
+      filterText.requestFocus();
+      refreshFolder(root);
     }
   }
 

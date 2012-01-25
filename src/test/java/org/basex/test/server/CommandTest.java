@@ -88,7 +88,7 @@ public class CommandTest {
   */
   @BeforeClass
   public static void start() throws IOException {
-    CONTEXT.mprop.set(MainProp.DBPATH, dbpath().path());
+    CONTEXT.mprop.set(MainProp.DBPATH, sandbox().path());
     session = new LocalSession(CONTEXT);
     cleanUp();
   }
@@ -114,7 +114,7 @@ public class CommandTest {
   @AfterClass
   @SuppressWarnings("unused")
   public static void finish() throws IOException {
-    assertTrue(dbpath().delete());
+    assertTrue(sandbox().delete());
     CONTEXT.close();
   }
 
@@ -131,7 +131,7 @@ public class CommandTest {
    * Returns the temporary database path.
    * @return database path
    */
-  public static IOFile dbpath() {
+  public static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
   }
 
