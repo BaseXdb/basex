@@ -289,7 +289,7 @@ public class DialogResources extends BaseXBack {
       final Thread post = new Thread() {
         @Override
         public void run() {
-          refreshFolder((TreeFolder) n.getParent());
+          refreshNewFolder(n.path());
         }
       };
       DialogProgress.execute(dialog, "", post, new Delete(n.path()));
@@ -321,7 +321,7 @@ public class DialogResources extends BaseXBack {
       final Thread post = new Thread() {
         @Override
         public void run() {
-          refreshFolder((TreeFolder) n.getParent());
+          refreshNewFolder(n.path());
         }
       };
       DialogProgress.execute(dialog, "", post, new Rename(n.path(), d.input()));
