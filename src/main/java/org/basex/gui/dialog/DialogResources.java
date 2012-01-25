@@ -206,9 +206,8 @@ public class DialogResources extends BaseXBack {
    * Due to lazy evaluation of the tree inserted documents/files are only
    * added to the tree after the parent folder has been reloaded.
    * @param p path of new node
-   * @return folder to search for
    */
-  public TreeFolder retrieveNewFolder(final String p) {
+  public void refreshNewFolder(final String p) {
     final byte[][] pathComp = split(token(p), '/');
 
     TreeNode n = root;
@@ -228,8 +227,8 @@ public class DialogResources extends BaseXBack {
       }
     }
 
-    return n instanceof TreeFolder ? (TreeFolder) n :
-      (TreeFolder) n.getParent();
+    refreshFolder(n instanceof TreeFolder ? (TreeFolder) n :
+      (TreeFolder) n.getParent());
   }
 
   /**

@@ -83,8 +83,7 @@ public class DialogAdd extends BaseXBack {
       final Thread t = new Thread() {
         @Override
         public void run() {
-          dialog.resources.refreshFolder(
-              dialog.resources.retrieveNewFolder(trg));
+          dialog.resources.refreshNewFolder(trg);
         }
       };
       DialogProgress.execute(dialog, "", t, new Add(trg, src));
