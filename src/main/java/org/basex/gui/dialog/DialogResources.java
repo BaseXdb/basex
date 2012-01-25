@@ -194,9 +194,41 @@ public class DialogResources extends BaseXBack {
     if(comp == filter) {
       filter();
     } else if(comp != null) {
-      refreshFolder(root);
-      if(comp == clear) filterText.requestFocus();
+      if(comp == clear) {
+        filterText.requestFocus();
+        refreshFolder(root);
+      }
     }
+  }
+
+  /**
+   * Expands the tree after a node with the given path has been inserted.
+   * Due to lazy evaluation of the tree inserted documents/files are only
+   * added to the tree after the parent folder has been reloaded.
+   * @param p path of new node
+   */
+  public void refreshNewFolder(final String p) {
+    final byte[][] pathComp = split(token(p), '/');
+
+    TreeNode n = root;
+    for(final byte[] c : pathComp) {
+      // make sure folder is reloaded
+      if(n instanceof TreeFolder)
+        ((TreeFolder) n).reload();
+
+      // find next child to continue with
+      for(int i = 0; i < n.getChildCount(); i++) {
+        final TreeNode ch = (TreeNode) n.getChildAt(i);
+        if(eq(ch.name, c)) {
+          // continue with the child if path component matches
+          n = ch;
+          break;
+        }
+      }
+    }
+
+    refreshFolder(n instanceof TreeFolder ? (TreeFolder) n :
+      (TreeFolder) n.getParent());
   }
 
   /**
