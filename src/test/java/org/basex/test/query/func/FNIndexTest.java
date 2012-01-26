@@ -60,7 +60,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the tests() function.
+   * Test method for the texts() function.
    */
   @Test
   public void indexTexts() {
@@ -77,7 +77,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the tests() function.
+   * Test method for the attributes() function.
    */
   @Test
   public void indexAttributes() {
@@ -91,5 +91,29 @@ public final class FNIndexTest extends AdvancedQueryTest {
 
     entries = _INDEX_ATTRIBUTES.args(DB, "1");
     query("count(" + entries + ")", 1);
+  }
+
+  /**
+   * Test method for the element-names() function.
+   */
+  @Test
+  public void indexElementNames() {
+    check(_INDEX_ELEMENT_NAMES);
+
+    final String entries = _INDEX_ELEMENT_NAMES.args(DB);
+    query("count(" + entries + ")", 9);
+    query("exists(" + entries + "/self::value)", "true");
+  }
+
+  /**
+   * Test method for the attribute-names() function.
+   */
+  @Test
+  public void indexAttributeNames() {
+    check(_INDEX_ATTRIBUTE_NAMES);
+
+    final String entries = _INDEX_ATTRIBUTE_NAMES.args(DB);
+    query("count(" + entries + ")", 5);
+    query("exists(" + entries + "/self::value)", "true");
   }
 }

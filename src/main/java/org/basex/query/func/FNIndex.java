@@ -72,16 +72,18 @@ public final class FNIndex extends FuncCall {
 
     switch(def) {
       case _INDEX_FACETS: return facets(ctx);
-      default:            return super.item(ctx, ii);
+      default: return super.item(ctx, ii);
     }
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
-      case _INDEX_TEXTS:      return entries(ctx, IndexType.TEXT);
-      case _INDEX_ATTRIBUTES: return entries(ctx, IndexType.ATTRIBUTE);
-      default:                return super.iter(ctx);
+      case _INDEX_TEXTS: return values(ctx, IndexType.TEXT);
+      case _INDEX_ATTRIBUTES: return values(ctx, IndexType.ATTRIBUTE);
+      case _INDEX_ELEMENT_NAMES: return names(ctx, IndexType.TAG);
+      case _INDEX_ATTRIBUTE_NAMES: return names(ctx, IndexType.ATTNAME);
+      default: return super.iter(ctx);
     }
   }
 
@@ -103,13 +105,13 @@ public final class FNIndex extends FuncCall {
   }
 
   /**
-   * Returns all entries of the specified index.
+   * Returns all entries of the specified value index.
    * @param ctx query context
    * @param it index type
    * @return text entries
    * @throws QueryException query exception
    */
-  private Iter entries(final QueryContext ctx, final IndexType it)
+  private Iter values(final QueryContext ctx, final IndexType it)
       throws QueryException {
 
     final Data data = data(0, ctx);
@@ -118,7 +120,7 @@ public final class FNIndex extends FuncCall {
   }
 
   /**
-   * Returns all entries of the specified index.
+   * Returns all entries of the specified value index.
    * @param data data reference
    * @param prefix prefix
    * @param it index type
@@ -144,6 +146,39 @@ public final class FNIndex extends FuncCall {
     if(!avl) NOINDEX.thrw(call.input, data.meta.name, it);
 
     final TokenIntMap entries = index.entries(prefix);
+    return new ValueIter() {
+      final int es = entries.size();
+      int pos;
+      @Override
+      public ANode get(final long i) {
+        final FElem elem = new FElem(Q_VALUE);
+        elem.add(new FAttr(Q_COUNT, token(entries.value((int) i + 1))));
+        elem.add(new FTxt(entries.key((int) i + 1)));
+        return elem;
+      }
+      @Override
+      public ANode next() { return pos < size() ? get(pos++) : null; }
+      @Override
+      public boolean reset() { pos = 0; return true; }
+      @Override
+      public long size() { return es; }
+    };
+  }
+
+  /**
+   * Returns all entries of the specified name index.
+   * @param ctx query context
+   * @param it index type
+   * @return text entries
+   * @throws QueryException query exception
+   */
+  private Iter names(final QueryContext ctx, final IndexType it)
+      throws QueryException {
+
+    final Data data = data(0, ctx);
+
+    final Index index = it == IndexType.TAG ? data.tagindex : data.atnindex;
+    final TokenIntMap entries = index.entries(EMPTY);
     return new ValueIter() {
       final int es = entries.size();
       int pos;
@@ -240,8 +275,7 @@ public final class FNIndex extends FuncCall {
   public boolean uses(final Use u) {
     return
       // skip evaluation at compile time
-      u == Use.CTX && (
-        def == Function._INDEX_TEXTS || def == Function._INDEX_ATTRIBUTES) ||
-      super.uses(u);
+      u == Use.CTX && (def == Function._INDEX_TEXTS ||
+      def == Function._INDEX_ATTRIBUTES) || super.uses(u);
   }
 }

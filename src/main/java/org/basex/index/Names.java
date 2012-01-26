@@ -135,6 +135,15 @@ public final class Names extends TokenSet implements Index {
     return tb.finish();
   }
 
+  @Override
+  public TokenIntMap entries(final byte[] prefix) {
+    final TokenIntMap tim = new TokenIntMap();
+    for(int i = 1; i < size; ++i) {
+      tim.add(keys[i], stats[i].count);
+    }
+    return tim;
+  }
+
   /**
    * Serializes the path node.
    * @param ser serializer
@@ -168,11 +177,6 @@ public final class Names extends TokenSet implements Index {
 
   @Override
   public int count(final IndexToken token) {
-    throw Util.notexpected();
-  }
-
-  @Override
-  public TokenIntMap entries(final byte[] prefix) {
     throw Util.notexpected();
   }
 }

@@ -536,6 +536,11 @@ public enum Function {
   /** Index function: returns attribute values. */
   _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database, prefix)",
       STR_ZM, 1, STR, STR),
+  /** Index function: returns element names. */
+  _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)", STR_ZM, STR),
+  /** Index function: returns attribute names. */
+  _INDEX_ATTRIBUTE_NAMES(FNIndex.class, "attribute-names(database)",
+      STR_ZM, STR),
 
   /* FNFile functions (EXPath). */
 
