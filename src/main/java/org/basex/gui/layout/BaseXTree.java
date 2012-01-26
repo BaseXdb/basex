@@ -22,7 +22,6 @@ public class BaseXTree extends JTree {
    */
   public BaseXTree(final DefaultMutableTreeNode root, final Window w) {
     super(root);
-    final BaseXTree t = this;
     BaseXLayout.addInteraction(this, w);
     this.addMouseListener(new MouseListener() {
       @Override
@@ -30,6 +29,8 @@ public class BaseXTree extends JTree {
       }
       @Override
       public void mousePressed(final MouseEvent e) {
+        if(SwingUtilities.isRightMouseButton(e))
+          setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
       }
       @Override
       public void mouseExited(final MouseEvent e) {
@@ -39,8 +40,6 @@ public class BaseXTree extends JTree {
       }
       @Override
       public void mouseClicked(final MouseEvent e) {
-        if(SwingUtilities.isRightMouseButton(e))
-          t.setSelectionRow(t.getClosestRowForLocation(e.getX(), e.getY()));
       }
     });
   }
