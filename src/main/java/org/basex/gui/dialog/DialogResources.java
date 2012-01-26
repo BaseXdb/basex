@@ -316,13 +316,14 @@ public class DialogResources extends BaseXBack {
           n.path(), RENAMETITLE, dialog.gui, 0);
       if(!d.ok()) return;
 
+      final String p = string(TreeNode.preparePath(token(d.input())));
       final Thread post = new Thread() {
         @Override
         public void run() {
-          refreshNewFolder(n.path());
+          refreshNewFolder(p);
         }
       };
-      DialogProgress.execute(dialog, "", post, new Rename(n.path(), d.input()));
+      DialogProgress.execute(dialog, "", post, new Rename(n.path(), p));
     }
 
     @Override
