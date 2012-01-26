@@ -1,8 +1,8 @@
 package org.basex.gui.layout;
 
 import java.awt.Window;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -23,23 +23,11 @@ public class BaseXTree extends JTree {
   public BaseXTree(final DefaultMutableTreeNode root, final Window w) {
     super(root);
     BaseXLayout.addInteraction(this, w);
-    this.addMouseListener(new MouseListener() {
-      @Override
-      public void mouseReleased(final MouseEvent e) {
-      }
+    addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
         if(SwingUtilities.isRightMouseButton(e))
           setSelectionRow(getClosestRowForLocation(e.getX(), e.getY()));
-      }
-      @Override
-      public void mouseExited(final MouseEvent e) {
-      }
-      @Override
-      public void mouseEntered(final MouseEvent e) {
-      }
-      @Override
-      public void mouseClicked(final MouseEvent e) {
       }
     });
   }

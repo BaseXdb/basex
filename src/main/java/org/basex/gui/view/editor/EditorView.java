@@ -300,11 +300,9 @@ public final class EditorView extends View {
     final BaseXFileChooser fc = new BaseXFileChooser(GUIOPEN,
         gui.gprop.get(GUIProp.XQPATH), gui);
     fc.addFilter(CREATEXQEXDESC, IO.XQSUFFIXES);
+
     final IOFile file = fc.select(BaseXFileChooser.Mode.FOPEN);
-    if(file != null) {
-      open(file);
-      getEditor().opened = true;
-    }
+    if(file != null) open(file);
   }
 
   /**
@@ -313,8 +311,8 @@ public final class EditorView extends View {
    */
   public boolean save() {
     final EditorArea edit = getEditor();
-    if(!edit.opened) return saveAs();
-    save(edit);
+    if(!edit.opened()) return saveAs();
+    save(edit.file());
     return true;
   }
 
@@ -331,8 +329,7 @@ public final class EditorView extends View {
 
     final IOFile file = fc.select(BaseXFileChooser.Mode.FSAVE);
     if(file == null) return false;
-    edit.file(file);
-    save(edit);
+    save(file);
     return true;
   }
 
@@ -353,28 +350,30 @@ public final class EditorView extends View {
     if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
 
     EditorArea edit = find(file, true);
-    if(edit != null) {
-      // switch to open file
-      tabs.setSelectedComponent(edit);
-      return edit;
-    }
-    // get current editor
-    edit = getEditor();
-    // create new tab if current text is stored on disk, or has been modified
-    if(edit.opened || edit.mod) edit = addTab();
-
     try {
+      if(edit != null) {
+        // switch to open file
+        tabs.setSelectedComponent(edit);
+        // check if file in memory was modified, and save it if necessary
+        if(!confirm(edit)) return edit;
+      } else {
+        // get current editor
+        edit = getEditor();
+        // create new tab if current text is stored on disk or has been modified
+        if(edit.opened() || edit.mod) edit = addTab();
+        edit.file(file);
+      }
+
+      // set new text, update file history and refresh the file modification
       edit.setText(file.read());
-      edit.opened = true;
-      edit.file(file);
       gui.gprop.recent(file);
       refresh(false, true);
       if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
-      return edit;
+
     } catch(final IOException ex) {
       Dialog.error(gui, NOTOPENED);
-      return edit;
     }
+    return edit;
   }
 
   /**
@@ -467,7 +466,7 @@ public final class EditorView extends View {
    */
   public boolean saveable() {
     final EditorArea area = getEditor();
-    return !area.opened || area.mod;
+    return !area.opened() || area.mod;
   }
 
   /**
@@ -504,20 +503,22 @@ public final class EditorView extends View {
    */
   EditorArea find(final IO file, final boolean opened) {
     for(final EditorArea edit : editors()) {
-      if(edit.file().eq(file) && (!opened || edit.opened)) return edit;
+      if(edit.file().eq(file) && (!opened || edit.opened())) return edit;
     }
     return null;
   }
 
   /**
    * Saves the specified editor contents.
-   * @param edit editor area
+   * @param file file to write
    */
-  private void save(final EditorArea edit) {
+  private void save(final IOFile file) {
     try {
-      edit.file().write(getEditor().getText());
-      edit.opened = true;
-      gui.gprop.recent(edit.file());
+      final EditorArea edit = getEditor();
+      file.write(edit.getText());
+      edit.file(file);
+      edit.tstamp = file.date();
+      gui.gprop.recent(file);
       refresh(false, true);
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
@@ -532,7 +533,7 @@ public final class EditorView extends View {
     // collect numbers of existing files
     final BoolList bl = new BoolList();
     for(final EditorArea edit : editors()) {
-      if(edit.opened) continue;
+      if(edit.opened()) continue;
       final String n = edit.file().name().substring(EDITORFILE.length());
       bl.set(n.isEmpty() ? 1 : Integer.parseInt(n), true);
     }
@@ -600,7 +601,7 @@ public final class EditorView extends View {
   }
 
   /**
-   * Shows a quit dialog the specified editor.
+   * Shows a quit dialog for the specified editor.
    * @param edit editor to be saved
    * @return {@code false} if confirmation was canceled
    */

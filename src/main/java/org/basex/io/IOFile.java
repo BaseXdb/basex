@@ -34,8 +34,8 @@ public final class IOFile extends IO {
 
   /** Input stream reference to archived contents. */
   private InputStream is;
-  /** File length. */
-  private long len = -1;
+  /** Expected size of a stream input. */
+  private long isSize = -1;
   /** Zip entry. */
   ZipEntry zip;
 
@@ -131,8 +131,7 @@ public final class IOFile extends IO {
 
   @Override
   public long length() {
-    if(len == -1 && is == null) len = file.length();
-    return len;
+    return isSize != -1 ? isSize : file.length();
   }
 
   @Override
@@ -143,7 +142,7 @@ public final class IOFile extends IO {
         if(path.toLowerCase(Locale.ENGLISH).endsWith(GZSUFFIX)) {
           is = new GZIPInputStream(new FileInputStream(file));
           init(name + XMLSUFFIX);
-          len = -1;
+          isSize = -1;
           return true;
         }
         // process zip archives
@@ -177,12 +176,11 @@ public final class IOFile extends IO {
   private boolean moreZIP() throws IOException {
     while(true) {
       zip = ((ZipInputStream) is).getNextEntry();
-      if(zip == null) break;
-      len = zip.getSize();
+      isSize = zip == null ? -1 : zip.getSize();
+      if(zip == null) return false;
       init(zip.getName());
       if(!zip.isDirectory()) return true;
     }
-    return false;
   }
 
   @Override

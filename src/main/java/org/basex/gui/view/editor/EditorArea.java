@@ -3,8 +3,11 @@ package org.basex.gui.view.editor;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
 
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
@@ -29,12 +32,11 @@ final class EditorArea extends BaseXEditor {
   /** View reference. */
   final EditorView view;
   /** File in tab. */
-  private IOFile file;
-
+  IOFile file;
+  /** Timestamp. */
+  long tstamp;
   /** Flag for modified content. */
   boolean mod;
-  /** Opened flag; states if file was opened from disk. */
-  boolean opened;
 
   /** Last error position. */
   int error = -1;
@@ -58,6 +60,31 @@ final class EditorArea extends BaseXEditor {
     file = f;
     label = new BaseXLabel(f.name());
     setSyntax(f);
+
+    addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(final FocusEvent e) {
+        if(opened() && !mod) {
+          try {
+            // reload file that has been modified
+            final long t = tstamp;
+            if(file.date() != t) {
+              setText(new IOFile(file.path()).read());
+              tstamp = t;
+            }
+          } catch(final IOException ex) { /* ignored */ }
+        }
+      }
+    });
+  }
+
+  /**
+   * Returns {@code true} if a file has been opened from disk
+   * (i.e., has a valid timestamp).
+   * @return result of check
+   */
+  boolean opened() {
+    return tstamp != 0;
   }
 
   @Override
@@ -140,6 +167,7 @@ final class EditorArea extends BaseXEditor {
    */
   void file(final IOFile f) {
     file = f;
+    tstamp = f.date();
     setSyntax(file);
   }
 

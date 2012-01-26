@@ -144,7 +144,7 @@ public final class Namespaces {
    */
   public int size() {
     /* returns the size of the uri container - if we delete nodes from
-     * the namespace structure via this.delete(pre,s) the container size isn't
+     * the namespace structure via delete(pre,s) the container size isn't
      * changed at all, as only NSNodes in the range pre,pre+s-1 are deleted.
      * COUNTERINTUITIVE?
      */
