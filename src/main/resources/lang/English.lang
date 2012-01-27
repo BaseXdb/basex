@@ -487,7 +487,7 @@ gc_setval=Could not set '%' to '%'.
 
 # Info Strings
 info_wait=Please Wait
-info_index=Indexes
+info_index=Indexing
 info_opt=Optimizing Database
 info_stats=Create statistics
 info_dbname=Name
@@ -502,7 +502,6 @@ info_time=Timestamp
 info_mem=Used Main Memory
 info_nodes=Nodes
 info_encoding=Encoding
-info_dbpath=Database Path
 info_nodb=No database found
 info_dberror=could not be opened.
 info_chop=Whitespace Chopping
@@ -519,6 +518,8 @@ info_outofdate=out-of-date
 info_db=Database Properties
 info_resource=Resource Properties
 info_general=General Information
+info_moptions=Main Options
+info_options=Options
 info_resultchop=chopped
 info_on=ON
 info_off=OFF

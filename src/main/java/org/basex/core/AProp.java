@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Prop.*;
 import static org.basex.util.Token.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -9,9 +10,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.TreeMap;
 
 import org.basex.io.IO;
 import org.basex.util.Levenshtein;
@@ -26,9 +27,9 @@ import org.basex.util.list.StringList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class AProp {
+public abstract class AProp implements Iterable<String> {
   /** Properties. */
-  protected final HashMap<String, Object> props = new HashMap<String, Object>();
+  protected final TreeMap<String, Object> props = new TreeMap<String, Object>();
   /** Property file. */
   private final String filename;
 
@@ -384,5 +385,10 @@ public abstract class AProp {
   @Override
   public String toString() {
     return Util.name(this) + props;
+  }
+
+  @Override
+  public final Iterator<String> iterator() {
+    return props.keySet().iterator();
   }
 }

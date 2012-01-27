@@ -368,7 +368,7 @@ public final class FNDb extends FuncCall {
   /**
    * Performs the system function.
    * @param ctx query context
-   * @return iterator
+   * @return node
    */
   private ANode system(final QueryContext ctx) {
     return toNode(Info.info(ctx.context), SYSTEM);
@@ -377,10 +377,10 @@ public final class FNDb extends FuncCall {
   /**
    * Performs the info function.
    * @param ctx query context
-   * @return iterator
+   * @return node
    * @throws QueryException query exception
    */
-  private Item info(final QueryContext ctx) throws QueryException {
+  private ANode info(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final boolean create = ctx.context.user.perm(User.CREATE);
     return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
@@ -401,8 +401,8 @@ public final class FNDb extends FuncCall {
 
       final FElem n = new FElem(new QNm(token(cols[0].replaceAll(" |-", ""))));
       if(cols[0].startsWith(" ")) {
-        node.add(n);
-        n.add(new FTxt(token(cols[1])));
+        if(node != null) node.add(n);
+        if(!cols[1].isEmpty()) n.add(new FTxt(token(cols[1])));
       } else {
         node = n;
         top.add(n);

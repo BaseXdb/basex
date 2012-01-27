@@ -3578,7 +3578,7 @@ public class QueryParser extends InputParser {
    * @return io instance
    */
   private IO io(final String fn) {
-    IO io = IO.get(fn);
+    final IO io = IO.get(fn);
     if(io.exists()) return io;
 
     // append with base uri

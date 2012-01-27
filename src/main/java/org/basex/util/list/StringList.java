@@ -112,11 +112,11 @@ public class StringList extends ElementList implements Iterable<String> {
   @Override
   public final Iterator<String> iterator() {
     return new Iterator<String>() {
-      private int c = -1;
+      private int c;
       @Override
-      public boolean hasNext() { return ++c < size; }
+      public boolean hasNext() { return c < size; }
       @Override
-      public String next() { return list[c]; }
+      public String next() { return list[c++]; }
       @Override
       public void remove() { Util.notexpected(); }
     };

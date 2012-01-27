@@ -792,8 +792,6 @@ public interface Text {
   String INFOPATHINDEX = lang("info_pathindex");
   /** Info on up-to-date. */
   String INFOUPTODATE = lang("info_uptodate");
-  /** Info on database path. */
-  String INFODBPATH = lang("info_dbpath");
 
   /** Info on tags. */
   String INFOTAGS = lang("info_tags");
@@ -812,6 +810,11 @@ public interface Text {
   String INFORESOURCE = lang("info_resource");
   /** Database info. */
   String INFOGENERAL = lang("info_general");
+  /** Database options. */
+  String INFOMOPTIONS = lang("info_moptions");
+  /** Database options. */
+  String INFOOPTIONS = lang("info_options");
+
   /** Database info. */
   String RESULTCHOP = " (" + lang("info_resultchop") + ")";
   /** Option flag. */

@@ -1,15 +1,14 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 
-import org.basex.core.MainProp;
+import org.basex.core.AProp;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 
 /**
  * Evaluates the 'info' command and returns general database information.
@@ -42,20 +41,16 @@ public final class Info extends AInfo {
     format(tb, VERSINFO, VERSION);
     if(context.user.perm(User.CREATE)) {
       Performance.gc(3);
-      format(tb, INFODBPATH, context.mprop.get(MainProp.DBPATH));
       format(tb, INFOMEM, Performance.getMem());
     }
-    final Prop prop = context.prop;
-    tb.add(NL + INFORESOURCE + NL);
-    format(tb, INFOCHOP, Util.flag(prop.is(Prop.CHOP)));
-
-    tb.add(NL + INFOINDEX + NL);
-    format(tb, INFOPATHINDEX, Util.flag(prop.is(Prop.PATHINDEX)));
-    format(tb, INFOTEXTINDEX, Util.flag(prop.is(Prop.TEXTINDEX)));
-    format(tb, INFOATTRINDEX, Util.flag(prop.is(Prop.ATTRINDEX)));
-    format(tb, INFOFTINDEX,   Util.flag(prop.is(Prop.FTINDEX)) +
-        (prop.is(Prop.FTINDEX) && prop.is(Prop.WILDCARDS) ?
-        " (" + INFOWCINDEX + ")" : ""));
+    if(context.user.perm(User.ADMIN)) {
+      final AProp prop = context.mprop;
+      tb.add(NL + INFOMOPTIONS + NL);
+      for(final String s : prop) format(tb, s, prop.get(s).toString());
+    }
+    final AProp prop = context.prop;
+    tb.add(NL + INFOOPTIONS + NL);
+    for(final String s : prop) format(tb, s, prop.get(s).toString());
     return tb.toString();
   }
 }
