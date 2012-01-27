@@ -224,7 +224,7 @@ public final class DialogManage extends Dialog {
         try {
           in = new DataInput(meta.dbfile(DATAINF));
           meta.read(in);
-          detail.setText(InfoDB.db(meta, true, true, true));
+          detail.setText(Token.token(InfoDB.db(meta, true, true, true)));
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
         } finally {

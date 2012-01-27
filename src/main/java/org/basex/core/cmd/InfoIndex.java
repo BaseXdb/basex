@@ -60,15 +60,6 @@ public final class InfoIndex extends AInfo {
 
   /**
    * Prints information on the specified index.
-   * @param index index type
-   * @return success flag
-   */
-  public static CmdIndexInfo info(final String index) {
-    return getOption(index, CmdIndexInfo.class);
-  }
-
-  /**
-   * Prints information on the specified index.
    * @param idx index type
    * @param data data reference
    * @return success flag

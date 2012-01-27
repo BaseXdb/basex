@@ -36,7 +36,7 @@ public final class Info extends AInfo {
    * @param context database context
    * @return info string
    */
-  public static byte[] info(final Context context) {
+  public static String info(final Context context) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INFOGENERAL + NL);
     format(tb, VERSINFO, VERSION);
@@ -56,6 +56,6 @@ public final class Info extends AInfo {
     format(tb, INFOFTINDEX,   Util.flag(prop.is(Prop.FTINDEX)) +
         (prop.is(Prop.FTINDEX) && prop.is(Prop.WILDCARDS) ?
         " (" + INFOWCINDEX + ")" : ""));
-    return tb.finish();
+    return tb.toString();
   }
 }

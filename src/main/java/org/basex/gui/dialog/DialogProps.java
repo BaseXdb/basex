@@ -72,7 +72,7 @@ public final class DialogProps extends Dialog {
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     tabInfo.add(doc, BorderLayout.NORTH);
 
-    final byte[] db = InfoDB.db(data.meta, true, false, true);
+    final String db = InfoDB.db(data.meta, true, false, true);
     final TokenBuilder info = new TokenBuilder(db);
     if(data.nspaces.size() != 0) {
       info.bold().add(NL + INFONS + NL).norm().add(data.nspaces.info());

@@ -494,7 +494,7 @@ public enum Function {
   /** Database function: lists system information. */
   _DB_SYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
-  _DB_INFO(FNDb.class, "info(database[,type])", STR, 1, STR, STR),
+  _DB_INFO(FNDb.class, "info(database)", STR, STR),
   /** Database function: returns the node ids of database nodes. */
   _DB_NODE_ID(FNDb.class, "node-id(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: returns the pre values of database nodes. */

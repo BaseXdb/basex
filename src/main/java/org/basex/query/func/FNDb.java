@@ -5,12 +5,10 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
-import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.InfoIndex;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
@@ -35,6 +33,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.FNode;
+import org.basex.query.item.FTxt;
 import org.basex.query.item.Int;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
@@ -53,7 +52,6 @@ import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 
@@ -65,6 +63,10 @@ import org.basex.util.list.TokenList;
  * @author Dimitar Popov
  */
 public final class FNDb extends FuncCall {
+  /** Resource element name. */
+  private static final QNm SYSTEM = new QNm(token("System"));
+  /** Resource element name. */
+  private static final QNm DATABASE = new QNm(token("Database"));
   /** Resource element name. */
   private static final QNm RESOURCE = new QNm(token("resource"));
   /** Path element name. */
@@ -368,8 +370,8 @@ public final class FNDb extends FuncCall {
    * @param ctx query context
    * @return iterator
    */
-  private Str system(final QueryContext ctx) {
-    return Str.get(Token.delete(Info.info(ctx.context), '\r'));
+  private ANode system(final QueryContext ctx) {
+    return toNode(Info.info(ctx.context), SYSTEM);
   }
 
   /**
@@ -378,19 +380,35 @@ public final class FNDb extends FuncCall {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Str info(final QueryContext ctx) throws QueryException {
+  private Item info(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final byte[] info;
-    if(expr.length == 1) {
-      final boolean create = ctx.context.user.perm(User.CREATE);
-      info = InfoDB.db(data.meta, false, true, create);
-    } else {
-      final byte[] tp = checkStr(expr[1], ctx);
-      final CmdIndexInfo cmd = InfoIndex.info(string(tp));
-      if(cmd == null) NOINDEX.thrw(input, data.meta.name, this);
-      info = InfoIndex.info(cmd, data);
+    final boolean create = ctx.context.user.perm(User.CREATE);
+    return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
+  }
+
+  /**
+   * Converts the specified info string to a node fragment.
+   * @param root name of the root node
+   * @param str string to be converted
+   * @return node
+   */
+  private static ANode toNode(final String str, final QNm root) {
+    final FElem top = new FElem(root);
+    FElem node = null;
+    for(final String l : str.split("\r\n?|\n")) {
+      final String[] cols = l.split(": ", 2);
+      if(cols[0].isEmpty()) continue;
+
+      final FElem n = new FElem(new QNm(token(cols[0].replaceAll(" |-", ""))));
+      if(cols[0].startsWith(" ")) {
+        node.add(n);
+        n.add(new FTxt(token(cols[1])));
+      } else {
+        node = n;
+        top.add(n);
+      }
     }
-    return Str.get(Token.delete(info, '\r'));
+    return top;
   }
 
   /**

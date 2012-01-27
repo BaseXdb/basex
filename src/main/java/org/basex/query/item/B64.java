@@ -73,7 +73,7 @@ public class B64 extends Bin {
     try {
       return Base64.decode(d);
     } catch(final IllegalArgumentException ex) {
-      final String chars = ex.getMessage().replaceAll(".*?: |\\.$", "");
+      final String chars = ex.getMessage().replaceAll("^.*?: |\\.$", "");
       throw FUNCAST.thrw(ii, AtomType.B64, chars);
     }
   }

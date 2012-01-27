@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
 
 import org.basex.core.BaseXException;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -174,30 +175,17 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbSystem() {
     check(_DB_SYSTEM);
-    contains(_DB_SYSTEM.args(), INFOON);
+    contains(_DB_SYSTEM.args(), Prop.VERSION);
   }
 
   /**
    * Test method for the db:info() function.
-   * @throws BaseXException database exception
    */
   @Test
-  public void dbInfo() throws BaseXException {
+  public void dbInfo() {
     check(_DB_INFO);
-    // standard test
-    contains(_DB_INFO.args(DB), INFOON);
-
-    // drop indexes and check index queries
-    final String[] types = { "text", "attribute", "fulltext" };
-    for(final String type : types) new DropIndex(type).execute(CONTEXT);
-    for(final String type : types) query(_DB_INFO.args(DB, type));
-    // create indexes and check index queries
-    for(final String type : types) new CreateIndex(type).execute(CONTEXT);
-    for(final String type : types) query(_DB_INFO.args(DB, type));
-    // check name indexes
-    query(_DB_INFO.args(DB, "tag"));
-    query(_DB_INFO.args(DB, "attname"));
-    error(_DB_INFO.args(DB, "XXX"), Err.NOINDEX);
+    query("count(" + _DB_INFO.args(DB) + "//" +
+        INFODBSIZE.replaceAll(" |-", "") + ")", 1);
   }
 
   /**

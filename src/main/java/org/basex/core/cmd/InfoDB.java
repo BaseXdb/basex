@@ -49,7 +49,7 @@ public final class InfoDB extends AInfo {
    * @param create create permissions
    * @return info string
    */
-  public static byte[] db(final MetaData meta, final boolean bold,
+  public static String db(final MetaData meta, final boolean bold,
       final boolean index, final boolean create) {
 
     final TokenBuilder tb = new TokenBuilder();
@@ -88,7 +88,7 @@ public final class InfoDB extends AInfo {
             meta.wildcards ? " (" + INFOWCINDEX + ")" : ""));
       }
     }
-    return tb.finish();
+    return tb.toString();
   }
 
   @Override
