@@ -35,6 +35,8 @@ public final class QueryProcessor extends Progress {
   private boolean parsed;
   /** Compilation flag. */
   private boolean compiled;
+  /** Closed flag. */
+  private boolean closed;
 
   /**
    * Default constructor.
@@ -265,16 +267,18 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void close() throws QueryException {
+    // close only once
+    if(closed) return;
     // reset database properties to initial value
-    if(ctx.globalOpt != null) {
-      for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {
-        ctx.context.prop.set(e.getKey(), e.getValue());
-      }
-      ctx.globalOpt = null;
+    for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {
+      ctx.context.prop.set(e.getKey(), e.getValue());
     }
-    // close all database connections
+    // close database connections
     ctx.resource.close();
+    // close JDBC connections
     if(ctx.jdbc != null) ctx.jdbc.close();
+    // close dynamically loaded JAR files
+    if(ctx.jars != null) ctx.jars.close();
   }
 
   /**

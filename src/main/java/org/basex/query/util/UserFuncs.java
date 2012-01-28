@@ -1,37 +1,37 @@
 package org.basex.query.util;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.core.User;
 import org.basex.data.ExprInfo;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.UserFuncCall;
 import org.basex.query.expr.BaseFuncCall;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.UserFunc;
+import org.basex.query.expr.UserFuncCall;
 import org.basex.query.expr.VarRef;
-import org.basex.query.func.Functions;
 import org.basex.query.func.FuncCall;
 import org.basex.query.func.Function;
+import org.basex.query.func.Functions;
 import org.basex.query.func.JavaFunc;
+import org.basex.query.item.AtomType;
 import org.basex.query.item.FItem;
 import org.basex.query.item.FuncItem;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
-import org.basex.util.Reflect;
-import org.basex.util.TokenBuilder;
 
 /**
  * Container for a user-defined function.
@@ -66,7 +66,7 @@ public final class UserFuncs extends ExprInfo {
   public TypedFunc get(final QNm name, final Expr[] args, final boolean dyn,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
 
-    // find function
+    // get namespace and local name
     final byte[] uri = name.uri();
     final byte[] ln = name.local();
 
@@ -86,32 +86,12 @@ public final class UserFuncs extends ExprInfo {
       return TypedFunc.constr(new Cast(ii, args[0], to), to);
     }
 
-    // check Java functions - only allowed with administrator permissions
+    // Java function (only allowed with administrator permissions)
     if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
-      final String c = string(substring(uri, JAVAPRE.length));
-      // convert dashes to upper-case initials
-      final TokenBuilder tb = new TokenBuilder().add(c).add('.');
-      boolean dash = false;
-      for(int p = 0; p < ln.length; p += cl(ln, p)) {
-        final int ch = cp(ln, p);
-        if(dash) {
-          tb.add(Character.toUpperCase(ch));
-          dash = false;
-        } else {
-          dash = ch == '-';
-          if(!dash) tb.add(ch);
-        }
-      }
-
-      final String java = tb.toString();
-      final int i = java.lastIndexOf(".");
-      final Class<?> cls = Reflect.find(java.substring(0, i));
-      if(cls == null) FUNCJAVA.thrw(ii, java);
-      final String mth = java.substring(i + 1);
-      return TypedFunc.java(new JavaFunc(ii, cls, mth, args));
+      return TypedFunc.java(JavaFunc.get(name, args, ctx, ii));
     }
 
-    // check predefined functions
+    // predefined functions
     final FuncCall fun = Functions.get().get(ln, uri, args, ctx, ii);
     if(fun != null) {
       for(final Function f : Function.UPDATING) {
@@ -123,7 +103,7 @@ public final class UserFuncs extends ExprInfo {
       return new TypedFunc(fun, fun.def.type(args.length));
     }
 
-    // find local function
+    // local function
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].name;
       if(eq(ln, qn.local()) && eq(uri, qn.uri()) && args.length ==

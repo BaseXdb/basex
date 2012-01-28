@@ -4,11 +4,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
@@ -132,7 +134,6 @@ import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.JarLoader;
-import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
@@ -622,10 +623,6 @@ public class QueryParser extends InputParser {
       final Object obj = ctx.context.prop.get(key);
       if(obj == null) error(NOOPTION, key);
       // cache old value (to be reset after query evaluation)
-      if(ctx.dbOptions == null) {
-        ctx.dbOptions = new HashMap<String, String>();
-        ctx.globalOpt = new HashMap<String, Object>();
-      }
       ctx.globalOpt.put(key, obj);
       ctx.dbOptions.put(key, string(val));
     }
@@ -900,24 +897,25 @@ public class QueryParser extends InputParser {
   private void loadJars(final IO jarDesc,
       final IOFile pkgDir, final String modDir) throws QueryException {
 
-    final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
-    final URL[] urls = new URL[desc.jars.size()];
-    // Collect jar files
-    int i = 0;
-    for(final byte[] jar : desc.jars) {
+    try {
+      final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
+      final URL[] urls = new URL[desc.jars.size()];
+      // Collect jar files
+      int i = 0;
+      for(final byte[] jar : desc.jars) {
       // Assumes that jar is in the directory containing the xquery modules
       final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
-      try {
         urls[i++] = new URL(IO.FILEPREF + path);
-      } catch(final MalformedURLException ex) {
-        Util.debug(ex.getMessage());
       }
-    }
-    // Add jars to classpath
-    Reflect.setJarLoader(new JarLoader(urls));
-    // Load public classes
-    for(final byte[] c : desc.classes) {
-      ctx.sc.ns.add(c, EMPTY, input());
+      // Add jars to classpath
+      ctx.jars = new JarLoader(urls);
+
+      // Load public classes
+      for(final byte[] c : desc.classes) {
+        ctx.sc.ns.add(c, EMPTY, input());
+      }
+    } catch(final MalformedURLException ex) {
+      Util.errln(ex.getMessage());
     }
   }
   /**

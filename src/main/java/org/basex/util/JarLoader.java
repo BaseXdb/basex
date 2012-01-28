@@ -1,10 +1,11 @@
 package org.basex.util;
 
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public final class JarLoader extends URLClassLoader {
    * Cleans up jar file factory cache.
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked" })
+  @SuppressWarnings({ "unchecked" })
   public boolean cleanupJarFileFactory() {
     boolean res = false;
     Class<?> classJarURLConnection = null;
@@ -163,7 +164,7 @@ public final class JarLoader extends URLClassLoader {
    * @param cl class loader
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked" })
+  @SuppressWarnings({ "unchecked" })
   public boolean closeClassLoader(final ClassLoader cl) {
     boolean res = false;
     if(cl == null) {
@@ -238,11 +239,11 @@ public final class JarLoader extends URLClassLoader {
    * @param cl class loader
    * @return result
    */
-  @SuppressWarnings({ "nls", "unchecked" })
+  @SuppressWarnings({ "unchecked" })
   public boolean finalizeNativeLibs(final ClassLoader cl) {
     boolean res = false;
     final Class<?> classClassLoader = ClassLoader.class;
-    java.lang.reflect.Field nativeLibraries = null;
+    Field nativeLibraries = null;
     try {
       nativeLibraries = classClassLoader.getDeclaredField("nativeLibraries");
     } catch(final NoSuchFieldException ex) {
@@ -264,7 +265,7 @@ public final class JarLoader extends URLClassLoader {
     res = true;
     final Vector<Object> nativeLib = (Vector<Object>) obj;
     for(final Object lib : nativeLib) {
-      java.lang.reflect.Method finalize = null;
+      Method finalize = null;
       try {
         finalize = lib.getClass().getDeclaredMethod("finalize", new Class[0]);
       } catch(final NoSuchMethodException ex) {

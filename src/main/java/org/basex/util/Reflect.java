@@ -22,8 +22,6 @@ public final class Reflect {
     new HashMap<String, Class<?>>();
   /** Cached fields. */
   private static HashMap<String, Field> fields = new HashMap<String, Field>();
-  /** Class loader for jars. */
-  public static JarLoader jarLoader;
 
   /** Hidden constructor. */
   private Reflect() { }
@@ -44,31 +42,47 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class reference to the specified class, or {@code null}.
+   * Returns a reference to the specified class, or {@code null}.
    * @param name class name
    * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String name) {
-    Class<?> c = classes.get(name);
+    final Class<?> c = classes.get(name);
+    if(c != null) return c;
     try {
-      if(c == null) {
-        try {
-          c = Class.forName(name);
-          if(!accessible(c)) return null;
-          classes.put(name, c);
-          return c;
-        } catch(final ClassNotFoundException ex) {
-          if(jarLoader != null) {
-            c = Class.forName(name, true, jarLoader);
-            if(!accessible(c)) return null;
-            classes.put(name, c);
-          }
-          return c;
-        }
-      }
-      return c;
-    } catch(final Exception ex) { }
-    return null;
+      return cache(name, Class.forName(name));
+    } catch(final Throwable ex) {
+      return null;
+    }
+  }
+
+  /**
+   * Returns a reference to a class located in the specified jar loader,
+   * or {@code null}.
+   * @param name class name
+   * @param jar jar loader
+   * @return reference, or {@code null} if the class is not found
+   */
+  public static Class<?> find(final String name, final JarLoader jar) {
+    try {
+      return cache(name, Class.forName(name, true, jar));
+    } catch(final Throwable ex) {
+      return null;
+    }
+  }
+
+  /**
+   * Caches the specified class.
+   * @param name class name
+   * @param c class
+   * @return reference, or {@code null} if the class is not found
+   */
+  private static Class<?> cache(final String name, final Class<?> c) {
+    try {
+      if(!Reflect.accessible(c)) return null;
+      classes.put(name, c);
+    } catch(final Throwable ex) { }
+    return c;
   }
 
   /**
@@ -84,7 +98,7 @@ public final class Reflect {
       try {
         f = clazz.getField(name);
         fields.put(key, f);
-      } catch(final Exception ex) { }
+      } catch(final Throwable ex) { }
     }
     return f;
   }
@@ -132,12 +146,12 @@ public final class Reflect {
       try {
         try {
           m = clazz.getConstructor(types);
-        } catch(final Exception ex) {
+        } catch(final Throwable ex) {
           m = clazz.getDeclaredConstructor(types);
           m.setAccessible(true);
         }
         cons.put(key, m);
-      } catch(final Exception ex) {
+      } catch(final Throwable ex) {
         Util.debug(ex);
       }
     }
@@ -160,12 +174,12 @@ public final class Reflect {
     try {
       try {
         m = clazz.getMethod(name, types);
-      } catch(final Exception ex) {
+      } catch(final Throwable ex) {
         m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
       }
       //methods.put(key, m);
-    } catch(final Exception ex) {
+    } catch(final Throwable ex) {
       Util.debug(ex);
     }
     return m;
@@ -179,7 +193,7 @@ public final class Reflect {
   public static Object get(final Class<?> clazz) {
     try {
       return clazz != null ? clazz.newInstance() : null;
-    } catch(final Exception ex) {
+    } catch(final Throwable ex) {
       Util.debug(ex);
       return null;
     }
@@ -194,7 +208,7 @@ public final class Reflect {
   public static Object get(final Constructor<?> clazz, final Object... args) {
     try {
       return clazz != null ? clazz.newInstance(args) : null;
-    } catch(final Exception ex) {
+    } catch(final Throwable ex) {
       Util.debug(ex);
       return null;
     }
@@ -212,7 +226,7 @@ public final class Reflect {
 
     try {
       return method != null ? method.invoke(object, args) : null;
-    } catch(final Exception ex) {
+    } catch(final Throwable ex) {
       Util.debug(ex);
       return null;
     }
@@ -224,10 +238,10 @@ public final class Reflect {
    * @param method method to run
    * @param args arguments
    * @return result of method call
-   * @throws Exception exception
+   * @throws Throwable throwable
    */
   public static Object invoke(final Object object, final String method,
-      final Object... args) throws Exception {
+      final Object... args) throws Throwable {
 
     if(object == null) return null;
 
@@ -260,14 +274,6 @@ public final class Reflect {
       }
     }
     return m.invoke(object, args);
-  }
-
-  /**
-   * Sets the class loader for jars.
-   * @param l loader
-   */
-  public static void setJarLoader(final JarLoader l) {
-    jarLoader = l;
   }
 
   /**

@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static javax.xml.datatype.DatatypeConstants.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -32,12 +33,15 @@ import org.basex.query.item.FuncType;
 import org.basex.query.item.Int;
 import org.basex.query.item.Jav;
 import org.basex.query.item.NodeType;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
+import org.basex.util.Reflect;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -85,11 +89,56 @@ public final class JavaFunc extends Arr {
    * @param m Java method/field
    * @param a arguments
    */
-  public JavaFunc(final InputInfo ii, final Class<?> c, final String m,
+  private JavaFunc(final InputInfo ii, final Class<?> c, final String m,
       final Expr[] a) {
     super(ii, a);
     cls = c;
     mth = m;
+  }
+
+  /**
+   * Returns a new Java function instance.
+   * @param name function name
+   * @param args arguments
+   * @param ctx query context
+   * @param ii input info
+   * @return Java function
+   * @throws QueryException query exception
+   */
+  public static JavaFunc get(final QNm name, final Expr[] args,
+      final QueryContext ctx, final InputInfo ii) throws QueryException {
+
+    final byte[] uri = name.uri();
+    final byte[] ln = name.local();
+
+    // convert dashes to upper-case initials
+    final byte[] c = substring(uri, JAVAPRE.length);
+    final TokenBuilder tb = new TokenBuilder().add(c).add('.');
+    boolean dash = false;
+    for(int p = 0; p < ln.length; p += cl(ln, p)) {
+      final int ch = cp(ln, p);
+      if(dash) {
+        tb.add(Character.toUpperCase(ch));
+        dash = false;
+      } else {
+        dash = ch == '-';
+        if(!dash) tb.add(ch);
+      }
+    }
+
+    final String java = tb.toString();
+    final int i = java.lastIndexOf(".");
+
+    final String nm = java.substring(0, i);
+    Class<?> cls = Reflect.find(nm);
+    if(cls == null && ctx.jars != null) {
+      cls = Reflect.find(nm, ctx.jars);
+    }
+
+    if(cls == null) FUNCJAVA.thrw(ii, java);
+
+    final String mth = java.substring(i + 1);
+    return new JavaFunc(ii, cls, mth, args);
   }
 
   @Override

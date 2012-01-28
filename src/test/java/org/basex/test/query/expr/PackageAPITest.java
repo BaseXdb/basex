@@ -19,7 +19,6 @@ import org.basex.query.util.pkg.PkgParser;
 import org.basex.query.util.pkg.PkgValidator;
 import org.basex.query.util.pkg.RepoManager;
 import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Reflect;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
 import org.basex.util.hash.TokenObjMap;
@@ -258,13 +257,10 @@ public final class PackageAPITest extends AdvancedQueryTest {
     final QueryProcessor qp = new QueryProcessor(
         "import module namespace j='jar'; j:print('test')", ctx);
     assertEquals(qp.execute().toString(), "test");
-    qp.execute();
+    qp.close();
 
-    // Close jar loader
-    Reflect.jarLoader.close();
-
-    // Delete package
-    new IOFile(REPO, dir).delete();
+    // delete package
+    assertTrue(new IOFile(REPO, dir).delete());
   }
 
   /**
