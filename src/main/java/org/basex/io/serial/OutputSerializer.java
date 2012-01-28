@@ -52,6 +52,8 @@ public abstract class OutputSerializer extends Serializer {
   protected final boolean escape;
   /** CData elements. */
   protected final TokenList cdata = new TokenList();
+  /** Suppress indentation elements. */
+  protected final TokenList suppress = new TokenList();
   /** Indentation flag. */
   protected final boolean indent;
   /** Include content type flag. */
@@ -153,6 +155,13 @@ public abstract class OutputSerializer extends Serializer {
       }
     }
 
+    final String supp = p.get(S_SUPPRESS_INDENTATION);
+    if(!supp.isEmpty()) {
+      for(final String c : supp.split("\\s+")) {
+        if(!c.isEmpty()) suppress.add(token(c));
+      }
+    }
+
     // print document declaration
     if(this instanceof XMLSerializer || this instanceof XHTMLSerializer) {
       final String cdse = p.get(S_CDATA_SECTION_ELEMENTS);
@@ -235,7 +244,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void finishText(final byte[] b) throws IOException {
-    if(cdata.size() == 0 || tags.empty() || !cdata.contains(tags.peek())) {
+    if(cdata.empty() || tags.empty() || !cdata.contains(tags.peek())) {
       for(int k = 0; k < b.length; k += cl(b, k)) code(cp(b, k));
     } else {
       print(CDATA_O);
@@ -395,9 +404,15 @@ public abstract class OutputSerializer extends Serializer {
    */
   protected final void indent() throws IOException {
     if(!indent) return;
+
     if(item) {
       item = false;
     } else {
+      if(!suppress.empty() && !tags.empty()) {
+        for(final byte[] s : suppress) {
+          if(tags.contains(s)) return;
+        }
+      }
       print(nl);
       final int ls = level * indents;
       for(int l = 0; l < ls; ++l) print(tab);

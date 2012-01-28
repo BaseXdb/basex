@@ -43,6 +43,9 @@ public final class SerializerProp extends AProp {
   public static final Object[] S_INDENT = {
     "indent", YES };
   /** Serialization parameter. */
+  public static final Object[] S_SUPPRESS_INDENTATION = {
+    "suppress-indentation", "" };
+  /** Serialization parameter. */
   public static final Object[] S_MEDIA_TYPE = {
     "media-type", "" };
   /** Serialization parameter: xml/xhtml/html/text. */
