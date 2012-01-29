@@ -29,6 +29,11 @@ public final class BindContext {
     String query = "declare context item external; .";
 
     // ------------------------------------------------------------------------
+    // Show query
+    System.out.println("\n* Query:");
+    System.out.println(query);
+
+    // ------------------------------------------------------------------------
     // Create a query processor
     QueryProcessor proc = new QueryProcessor(query, context);
 
@@ -44,10 +49,9 @@ public final class BindContext {
     // Execute the query
     Result result = proc.execute();
 
-    System.out.println("\n* Execute query:");
-
     // ------------------------------------------------------------------------
     // Print result as string
+    System.out.println("\n* Result:");
     System.out.println(result);
 
     // ------------------------------------------------------------------------

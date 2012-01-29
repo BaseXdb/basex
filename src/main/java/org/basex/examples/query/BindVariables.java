@@ -28,9 +28,14 @@ public final class BindVariables {
     // ------------------------------------------------------------------------
     // Specify query to be executed
     String query =
-      "declare variable $var1 as xs:string external; " +
-      "declare variable $var2 external; " +
+      "declare variable $var1 as xs:string external;\n" +
+      "declare variable $var2 external;\n" +
       "($var1, $var2)";
+
+    // ------------------------------------------------------------------------
+    // Show query
+    System.out.println("\n* Query:");
+    System.out.println(query);
 
     // ------------------------------------------------------------------------
     // Create a query processor
@@ -50,7 +55,7 @@ public final class BindVariables {
     // Execute the query
     Result result = proc.execute();
 
-    System.out.println("\n* Execute query:");
+    System.out.println("\n* Result:");
 
     // ------------------------------------------------------------------------
     // Print result as string
