@@ -137,7 +137,7 @@ abstract class BXQAbstract {
 
     try {
       // return item with correct type
-      return check(e, t).e(v, null);
+      return check(e, t).cast(v, null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

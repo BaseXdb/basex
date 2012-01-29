@@ -281,7 +281,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     try {
       final double d = it.dbl(null);
       if(!it.type.isNumber() || d != (long) d) throw new BXQException(NUM, d);
-      return type.e(it, null, null).itr(null);
+      return type.cast(it, null, null).itr(null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

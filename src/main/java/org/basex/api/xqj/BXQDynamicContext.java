@@ -216,7 +216,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     // don't cast sequences
     if(tt != v.type && v instanceof Item) {
       try {
-        vl = tt.e((Item) v, qp.ctx, null);
+        vl = tt.cast((Item) v, qp.ctx, null);
       } catch(final QueryException ex) {
         throw new BXQException(ex);
       }
