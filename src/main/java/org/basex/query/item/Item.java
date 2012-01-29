@@ -187,7 +187,7 @@ public abstract class Item extends Value {
 
   @Override
   public final SeqType type() {
-    return type.seq();
+    return type.seqType();
   }
 
   @Override

@@ -153,7 +153,7 @@ public abstract class Date extends Item {
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
     final long d1 = days();
-    final Date d = (Date) (it.type.isDate() ? it : type.e(it, null, ii));
+    final Date d = (Date) (it.type.isDate() ? it : type.cast(it, null, ii));
     final long d2 = d.days();
     return d1 == d2 && seconds().doubleValue() == d.seconds().doubleValue();
   }
@@ -161,7 +161,7 @@ public abstract class Date extends Item {
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     final long d1 = days();
-    final Date d = (Date) (it.type.isDate() ? it : type.e(it, null, ii));
+    final Date d = (Date) (it.type.isDate() ? it : type.cast(it, null, ii));
     final long d2 = d.days();
     if(d1 != d2) return (int) (d1 - d2);
     return seconds().subtract(d.seconds()).signum();

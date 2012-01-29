@@ -94,7 +94,7 @@ public final class FNAcc extends StandardFunc {
     final Type t = it.type;
     if(t.isFunction()) FNATM.thrw(input, this);
     try {
-      return t == AtomType.DBL ? it : AtomType.DBL.e(it, ctx, input);
+      return t == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, input);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }

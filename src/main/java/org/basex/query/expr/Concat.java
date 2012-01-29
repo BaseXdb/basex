@@ -28,7 +28,7 @@ public final class Concat extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     if(allAreValues()) return optPre(item(ctx, input), ctx);
-    type = AtomType.STR.seq();
+    type = AtomType.STR.seqType();
     size = 1;
     return this;
   }

@@ -114,7 +114,7 @@ public final class FNQName extends StandardFunc {
 
     if(it == null) return null;
     final QNm nm = (QNm) checkType(it, AtomType.QNM);
-    return AtomType.NCN.e(Str.get(nm.local()), ctx, input);
+    return AtomType.NCN.cast(Str.get(nm.local()), ctx, input);
   }
 
   /**
@@ -130,7 +130,7 @@ public final class FNQName extends StandardFunc {
     if(it == null) return null;
     final QNm nm = (QNm) checkType(it, AtomType.QNM);
     return nm.hasPrefix() ?
-        AtomType.NCN.e(Str.get(nm.prefix()), ctx, input) : null;
+        AtomType.NCN.cast(Str.get(nm.prefix()), ctx, input) : null;
   }
 
   /**

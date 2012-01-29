@@ -12,31 +12,30 @@ import org.basex.util.InputInfo;
  */
 public interface Type {
   /**
-   * Constructs a new item from the specified item.
+   * Casts the specified item to the XQuery data type.
    * @param it item to be converted
    * @param ctx query context
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+  Item cast(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException;
 
   /**
-   * Constructs a new item from the specified Java object.
-   * The Java object is supposed to have a correct mapping type.
+   * Casts the specified Java object to the XQuery data type.
    * @param o Java object
    * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
-  Item e(final Object o, final InputInfo ii) throws QueryException;
+  Item cast(final Object o, final InputInfo ii) throws QueryException;
 
   /**
-   * Returns the sequence type of this type.
+   * Returns the sequence type of this data type.
    * @return sequence type
    */
-  SeqType seq();
+  SeqType seqType();
 
   // PUBLIC AND STATIC METHODS ================================================
 

@@ -120,7 +120,7 @@ public abstract class JavaMapping extends Arr {
     if(res instanceof Iter) return ((Iter) res).value();
     // find XQuery mapping for specified type
     final Type type = type(res);
-    if(type != null) return type.e(res, null);
+    if(type != null) return type.cast(res, null);
 
     if(!res.getClass().isArray()) return new Jav(res);
 

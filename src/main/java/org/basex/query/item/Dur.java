@@ -185,7 +185,7 @@ public class Dur extends Item {
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    final Dur d = (Dur) (!it.type.isDuration() ? type.e(it, null, ii) : it);
+    final Dur d = (Dur) (!it.type.isDuration() ? type.cast(it, null, ii) : it);
     final double s1 = sc == null ? 0 : sc.doubleValue();
     final double s2 = d.sc == null ? 0 : d.sc.doubleValue();
     return mon == d.mon && s1 == s2;

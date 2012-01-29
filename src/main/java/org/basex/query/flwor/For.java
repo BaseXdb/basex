@@ -62,7 +62,7 @@ public final class For extends ForLet {
       var.ret = SeqType.get(type.type, SeqType.Occ.ZM);
     } else {
       var.size = Math.min(1, size);
-      var.ret = type.type.seq();
+      var.ret = type.type.seqType();
     }
 
     ctx.vars.add(var);

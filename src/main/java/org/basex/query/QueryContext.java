@@ -344,7 +344,7 @@ public final class QueryContext extends Progress {
         if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
         final Type typ = Types.find(nm, true);
         if(typ == null) NOTYPE.thrw(null, nm);
-        obj = typ.e(obj, null);
+        obj = typ.cast(obj, null);
       }
     }
     bind(name, obj);
@@ -385,7 +385,7 @@ public final class QueryContext extends Progress {
     } else {
       // reset declaration state and bind new expression
       gl.declared = false;
-      gl.bind(gl.type != null ? gl.type.type.e(ex.item(this, null),
+      gl.bind(gl.type != null ? gl.type.type.cast(ex.item(this, null),
           this, null) : ex, this);
     }
   }

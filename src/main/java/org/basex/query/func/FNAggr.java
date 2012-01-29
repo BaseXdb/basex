@@ -119,7 +119,7 @@ public final class FNAggr extends StandardFunc {
     if(res == null) return null;
 
     // check if first item is comparable
-    cmp.e(input, res, res);
+    cmp.eval(input, res, res);
 
     // strings or dates
     if(!res.type.isUntyped() && res.type.isString() || res.type.isDate()) {
@@ -127,21 +127,21 @@ public final class FNAggr extends StandardFunc {
         if(it.type != res.type) {
           FUNCMP.thrw(input, description(), res.type, it.type);
         }
-        if(cmp.e(input, res, it)) res = it;
+        if(cmp.eval(input, res, it)) res = it;
       }
       return res;
     }
 
     // durations or numbers
     Type t = res.type.isUntyped() ? DBL : res.type;
-    if(res.type != t) res = t.e(res, ctx, input);
+    if(res.type != t) res = t.cast(res, ctx, input);
 
     for(Item it; (it = iter.next()) != null;) {
       t = type(res, it);
       if(!it.type.isDuration() && Double.isNaN(it.dbl(input)) ||
-          cmp.e(input, res, it))
+          cmp.eval(input, res, it))
         res = it;
-      if(res.type != t) res = t.e(res, ctx, input);
+      if(res.type != t) res = t.cast(res, ctx, input);
     }
     return res;
   }

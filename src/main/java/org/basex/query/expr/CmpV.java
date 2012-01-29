@@ -28,7 +28,7 @@ public final class CmpV extends Cmp {
     /** Item comparison:less or equal. */
     LE("le") {
       @Override
-      public boolean e(final InputInfo ii, final Item a, final Item b)
+      public boolean eval(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
         final int v = a.diff(ii, b);
         return v != Item.UNDEF && v <= 0;
@@ -42,7 +42,7 @@ public final class CmpV extends Cmp {
     /** Item comparison:less. */
     LT("lt") {
       @Override
-      public boolean e(final InputInfo ii, final Item a, final Item b)
+      public boolean eval(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
         final int v = a.diff(ii, b);
         return v != Item.UNDEF && v < 0;
@@ -56,7 +56,7 @@ public final class CmpV extends Cmp {
     /** Item comparison:greater of equal. */
     GE("ge") {
       @Override
-      public boolean e(final InputInfo ii, final Item a, final Item b)
+      public boolean eval(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
         final int v = a.diff(ii, b);
         return v != Item.UNDEF && v >= 0;
@@ -70,7 +70,7 @@ public final class CmpV extends Cmp {
     /** Item comparison:greater. */
     GT("gt") {
       @Override
-      public boolean e(final InputInfo ii, final Item a, final Item b)
+      public boolean eval(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
         final int v = a.diff(ii, b);
         return v != Item.UNDEF && v > 0;
@@ -84,7 +84,7 @@ public final class CmpV extends Cmp {
     /** Item comparison:equal. */
     EQ("eq") {
       @Override
-      public boolean e(final InputInfo ii, final Item a, final Item b)
+      public boolean eval(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
         return a.eq(ii, b);
       }
@@ -97,7 +97,7 @@ public final class CmpV extends Cmp {
     /** Item comparison:not equal. */
     NE("ne") {
       @Override
-      public boolean e(final InputInfo ii, final Item a, final Item b)
+      public boolean eval(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
         return !a.eq(ii, b);
       }
@@ -124,7 +124,7 @@ public final class CmpV extends Cmp {
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean e(final InputInfo ii, final Item a, final Item b)
+    public abstract boolean eval(final InputInfo ii, final Item a, final Item b)
         throws QueryException;
 
     /**
@@ -211,7 +211,7 @@ public final class CmpV extends Cmp {
     if(a == null) return null;
     final Item b = expr[1].item(ctx, input);
     if(b == null) return null;
-    if(a.comparable(b)) return Bln.get(op.e(input, a, b));
+    if(a.comparable(b)) return Bln.get(op.eval(input, a, b));
 
     if(a.type.isFunction()) FNEQ.thrw(input, a);
     if(b.type.isFunction()) FNEQ.thrw(input, b);

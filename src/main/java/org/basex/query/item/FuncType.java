@@ -52,7 +52,7 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final SeqType seq() {
+  public final SeqType seqType() {
     if(seq == null) seq = new SeqType(this);
     return seq;
   }
@@ -78,7 +78,7 @@ public class FuncType implements Type {
   }
 
   @Override
-  public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
+  public FItem cast(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     if(!it.type.isFunction()) throw Err.cast(ii, this, it);
@@ -87,7 +87,7 @@ public class FuncType implements Type {
   }
 
   @Override
-  public final Item e(final Object o, final InputInfo ii) {
+  public final Item cast(final Object o, final InputInfo ii) {
     throw Util.notexpected(o);
   }
 

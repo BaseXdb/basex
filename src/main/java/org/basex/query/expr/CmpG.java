@@ -266,7 +266,7 @@ public final class CmpG extends Cmp {
         !ta.isFunction() && !tb.isFunction() ||
         ta == AtomType.QNM || tb == AtomType.QNM))
       XPTYPECMP.thrw(input, ta, tb);
-    return op.op.e(input, a, b);
+    return op.op.eval(input, a, b);
   }
 
   @Override

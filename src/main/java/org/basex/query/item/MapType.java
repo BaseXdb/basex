@@ -24,7 +24,7 @@ public final class MapType extends FuncType {
    * @param rt return type
    */
   MapType(final AtomType arg, final SeqType rt) {
-    super(new SeqType[]{ arg.seq() }, rt);
+    super(new SeqType[]{ arg.seqType() }, rt);
     keyType = arg;
   }
 
@@ -39,7 +39,7 @@ public final class MapType extends FuncType {
   }
 
   @Override
-  public FItem e(final Item it, final QueryContext ctx, final InputInfo ii)
+  public FItem cast(final Item it, final QueryContext ctx, final InputInfo ii)
 
       throws QueryException {
     if(!it.type.isMap() || !((Map) it).hasType(this)) Err.cast(ii, this, it);

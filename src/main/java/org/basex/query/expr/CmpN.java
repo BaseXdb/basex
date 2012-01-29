@@ -25,7 +25,7 @@ public final class CmpN extends Arr {
     /** Node comparison: same. */
     EQ("is") {
       @Override
-      public boolean e(final ANode a, final ANode b) {
+      public boolean eval(final ANode a, final ANode b) {
         return a.is(b);
       }
     },
@@ -33,7 +33,7 @@ public final class CmpN extends Arr {
     /** Node comparison: before. */
     ET("<<") {
       @Override
-      public boolean e(final ANode a, final ANode b) {
+      public boolean eval(final ANode a, final ANode b) {
         return a.diff(b) < 0;
       }
     },
@@ -41,7 +41,7 @@ public final class CmpN extends Arr {
     /** Node comparison: after. */
     GT(">>") {
       @Override
-      public boolean e(final ANode a, final ANode b) {
+      public boolean eval(final ANode a, final ANode b) {
         return a.diff(b) > 0;
       }
     };
@@ -64,7 +64,7 @@ public final class CmpN extends Arr {
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean e(ANode a, ANode b) throws QueryException;
+    public abstract boolean eval(ANode a, ANode b) throws QueryException;
 
     @Override
     public String toString() {
@@ -103,7 +103,7 @@ public final class CmpN extends Arr {
     if(a == null) return null;
     final Item b = expr[1].item(ctx, input);
     if(b == null) return null;
-    return Bln.get(op.e(checkNode(a), checkNode(b)));
+    return Bln.get(op.eval(checkNode(a), checkNode(b)));
   }
 
   @Override

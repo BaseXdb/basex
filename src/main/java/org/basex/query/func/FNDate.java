@@ -185,7 +185,7 @@ public final class FNDate extends StandardFunc {
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.type.isUntyped() ? t.e(it, ctx, input) : checkType(it, t);
+    return it.type.isUntyped() ? t.cast(it, ctx, input) : checkType(it, t);
   }
 
   /**

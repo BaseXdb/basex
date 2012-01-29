@@ -123,7 +123,7 @@ public final class Var extends ParseExpr {
     type = t;
     if(value != null && !value.type.instanceOf(t.type) &&
         value instanceof Item) {
-      value = type.type.e((Item) value, ctx, input);
+      value = type.type.cast((Item) value, ctx, input);
     }
   }
 
