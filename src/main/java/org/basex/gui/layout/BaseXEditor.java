@@ -412,6 +412,11 @@ public class BaseXEditor extends BaseXPanel {
       return;
     }
 
+    System.out.println();
+    System.out.print(e.getKeyCode());
+    System.out.print(" / " + (int) e.getKeyChar());
+    System.out.println(" / " + e.getModifiers());
+
     final boolean marking = e.isShiftDown() &&
       !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e);
     final boolean nomark = !text.marked();
