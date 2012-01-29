@@ -65,13 +65,7 @@ public final class FNInfo extends StandardFunc {
             if(i != null) {
               final TokenBuilder tb = new TokenBuilder(s);
               if(s.length != 0) tb.add(COLS);
-              tb.add(i.toString());
-              // if GUI is used, or if user is no admin, trace info is cached
-              if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
-                ctx.evalInfo(tb.finish());
-              } else {
-                Util.errln(tb);
-              }
+              dump(tb.add(i.toString()).toString(), ctx);
             }
             return i;
           }
@@ -116,5 +110,19 @@ public final class FNInfo extends StandardFunc {
         sig == Function.AVAILABLE_ENVIRONMENT_VARIABLES) ||
       u == Use.NDT && (sig == Function.ERROR || sig == Function.TRACE) ||
       super.uses(u);
+  }
+
+  /**
+   * Dumps the specified info to standard error or the info view of the GUI.
+   * @param info info
+   * @param ctx query context
+   */
+  static void dump(final String info, final QueryContext ctx) {
+    // if GUI is used, or if user is no admin, trace info is cached
+    if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
+      ctx.evalInfo(Token.token(info));
+    } else {
+      Util.errln(info);
+    }
   }
 }

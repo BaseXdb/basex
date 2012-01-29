@@ -120,7 +120,7 @@ public final class FNHof extends StandardFunc {
     final FItem pred = withArity(0, 1, ctx);
     final FItem fun = withArity(1, 1, ctx);
     Value v = ctx.value(expr[2]);
-    while(!checkType(pred.invItem(ctx, input, v), AtomType.BLN).bool(input)) {
+    while(!checkBln(pred.invItem(ctx, input, v), ctx)) {
       v = fun.invValue(ctx, input, v);
     }
     return v;

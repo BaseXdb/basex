@@ -20,7 +20,6 @@ import org.basex.io.serial.SerializerException;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.AtomType;
 import org.basex.query.item.B64Stream;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dtm;
@@ -474,8 +473,7 @@ public final class FNFile extends StandardFunc {
    */
   private boolean optionalBool(final int i, final QueryContext ctx)
       throws QueryException {
-    return expr.length > i &&
-      checkType(expr[i].item(ctx, input), AtomType.BLN).bool(input);
+    return expr.length > i && checkBln(expr[i], ctx);
   }
 
   @Override

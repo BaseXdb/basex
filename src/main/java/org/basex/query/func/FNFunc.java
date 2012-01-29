@@ -153,8 +153,7 @@ public final class FNFunc extends StandardFunc {
         do {
           final Item it = xs.next();
           if(it == null) return null;
-          final Item b = f.invItem(ctx, input, it);
-          if(checkType(b, AtomType.BLN).bool(input)) return it;
+          if(checkBln(f.invItem(ctx, input, it), ctx)) return it;
         } while(true);
       }
     };

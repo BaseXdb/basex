@@ -19,7 +19,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Bln;
-import org.basex.query.item.Dbl;
 import org.basex.query.item.Hex;
 import org.basex.query.item.Int;
 import org.basex.query.item.IntSeq;
@@ -59,6 +58,8 @@ public final class FNUtil extends StandardFunc {
     switch(sig) {
       case _UTIL_EVAL:     return eval(ctx).iter();
       case _UTIL_RUN:      return run(ctx).iter();
+      case _UTIL_MEM:      return mem(ctx);
+      case _UTIL_TIME:     return time(ctx);
       case _UTIL_TO_BYTES: return toBytes(ctx);
       default:             return super.iter(ctx);
     }
@@ -78,8 +79,6 @@ public final class FNUtil extends StandardFunc {
       throws QueryException {
     switch(sig) {
       case _UTIL_FORMAT:            return format(ctx);
-      case _UTIL_MB:                return mb(ctx);
-      case _UTIL_MS:                return ms(ctx);
       case _UTIL_INTEGER_FROM_BASE: return fromBase(ctx, ii);
       case _UTIL_INTEGER_TO_BASE:   return toBase(ctx, ii);
       case _UTIL_MD5:               return hash(ctx, "MD5");
@@ -159,29 +158,39 @@ public final class FNUtil extends StandardFunc {
    * @return memory consumption
    * @throws QueryException query exception
    */
-  private Dbl mb(final QueryContext ctx) throws QueryException {
-    // check caching flag
-    final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), AtomType.BLN).bool(input);
-
+  private Iter mem(final QueryContext ctx) throws QueryException {
     // measure initial memory consumption
     Performance.gc(3);
-    final long l = Performance.mem();
+    final long min = Performance.mem();
 
-    // create (and, optionally, cache) result value
-    Value val = ctx.value(expr[0]);
-    if(c) val = val.cache().value();
+    // check caching flag
+    if(expr.length == 2 && checkBln(expr[1], ctx)) {
+      final Value v = ctx.value(expr[0]).cache().value();
+      dump(min, ctx);
+      return v.iter();
+    }
 
-    // measure resulting memory consumption
+    return new Iter() {
+      final Iter ir = expr[0].iter(ctx);
+      @Override
+      public Item next() throws QueryException {
+        final Item i = ir.next();
+        if(i == null) dump(min, ctx);
+        return i;
+      }
+    };
+  }
+
+  /**
+   * Dumps the memory consumption.
+   * @param min initial memory usage
+   * @param ctx query context
+   */
+  void dump(final long min, final QueryContext ctx) {
     Performance.gc(2);
-    final double d = Performance.mem() - l;
-
-    // loop through all results to avoid premature result disposal
-    final Iter ir = val.iter();
-    while(ir.next() != null);
-
-    // return memory consumption in megabytes
-    return Dbl.get(Math.max(0, d) / 1024 / 1024d);
+    final long max = Performance.mem();
+    final long mb = Math.max(0, max - min);
+    FNInfo.dump(Performance.format(mb), ctx);
   }
 
   /**
@@ -190,24 +199,26 @@ public final class FNUtil extends StandardFunc {
    * @return time in milliseconds
    * @throws QueryException query exception
    */
-  private Dbl ms(final QueryContext ctx) throws QueryException {
-    // check caching flag
-    final boolean c = expr.length == 2 &&
-      checkType(expr[1].item(ctx, input), AtomType.BLN).bool(input);
-
+  private Iter time(final QueryContext ctx) throws QueryException {
     // create timer
     final Performance p = new Performance();
 
-    // iterate (and, optionally, cache) results
-    if(c) {
-      ctx.value(expr[0]).cache();
-    } else {
-      final Iter ir = ctx.iter(expr[0]);
-      while(ir.next() != null);
+    // check caching flag
+    if(expr.length == 2 && checkBln(expr[1], ctx)) {
+      final Value v = ctx.value(expr[0]).cache().value();
+      FNInfo.dump(p.getTimer(), ctx);
+      return v.iter();
     }
 
-    // return measured time in milliseconds
-    return Dbl.get(p.getTime() / 10000 / 100d);
+    return new Iter() {
+      final Iter ir = expr[0].iter(ctx);
+      @Override
+      public Item next() throws QueryException {
+        final Item i = ir.next();
+        if(i == null) FNInfo.dump(p.getTimer(), ctx);
+        return i;
+      }
+    };
   }
 
   /** Digits used in base conversion. */
@@ -451,8 +462,8 @@ public final class FNUtil extends StandardFunc {
   @Override
   public boolean uses(final Use u) {
     return u == Use.NDT && (sig == Function._UTIL_EVAL ||
-        sig == Function._UTIL_RUN || sig == Function._UTIL_MB ||
-        sig == Function._UTIL_MS || sig == Function._UTIL_UUID) ||
+        sig == Function._UTIL_RUN || sig == Function._UTIL_MEM ||
+        sig == Function._UTIL_TIME || sig == Function._UTIL_UUID) ||
       super.uses(u);
   }
 }

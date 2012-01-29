@@ -38,25 +38,25 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
-   * Test method for the util:mb() function.
+   * Test method for the util:mem() function.
    */
   @Test
-  public void utilMB() {
-    check(_UTIL_MB);
-    query(_UTIL_MB.args("()"));
-    query(_UTIL_MB.args(" 1 to 1000", false));
-    query(_UTIL_MB.args(" 1 to 1000", true));
+  public void utilMem() {
+    check(_UTIL_MEM);
+    query(_UTIL_MEM.args("()"));
+    query(COUNT.args(_UTIL_MEM.args(" 1 to 100000 ", false)), "100000");
+    query(COUNT.args(_UTIL_MEM.args(" 1 to 100000 ", true)), "100000");
   }
 
   /**
-   * Test method for the util:ms() function.
+   * Test method for the util:time() function.
    */
   @Test
-  public void utilMS() {
-    check(_UTIL_MS);
-    query(_UTIL_MS.args("()"));
-    query(_UTIL_MS.args(" 1 to 1000", false));
-    query(_UTIL_MS.args(" 1 to 1000", true));
+  public void utilTime() {
+    check(_UTIL_TIME);
+    query(_UTIL_TIME.args("()"));
+    query(COUNT.args(_UTIL_TIME.args(" 1 to 100000 ", false)), "100000");
+    query(COUNT.args(_UTIL_TIME.args(" 1 to 100000 ", true)), "100000");
   }
 
   /**

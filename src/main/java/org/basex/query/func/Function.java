@@ -705,10 +705,10 @@ public enum Function {
   _UTIL_RUN(FNUtil.class, "run(string)", ITEM_ZM, STR),
   /** Utility function: formats a string using the printf syntax. */
   _UTIL_FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
-  /** Utility function: returns the memory consumption in mb. */
-  _UTIL_MB(FNUtil.class, "mb(expr[,cache])", DBL, 1, ITEM_ZM, BLN),
-  /** Utility function: measures the execution time of an expression. */
-  _UTIL_MS(FNUtil.class, "ms(expr[,cache])", DBL, 1, ITEM_ZM, BLN),
+  /** Utility function: dumps the memory consumption. */
+  _UTIL_MEM(FNUtil.class, "mem(expr[,cache])", ITEM_ZM, 1, ITEM_ZM, BLN),
+  /** Utility function: dumps the execution time of an expression. */
+  _UTIL_TIME(FNUtil.class, "time(expr[,cache])", ITEM_ZM, 1, ITEM_ZM, BLN),
   /** Utility function: converts a number to a given base. */
   _UTIL_INTEGER_TO_BASE(FNUtil.class, "integer-to-base(num,base)",
       STR, ITR, ITR),
