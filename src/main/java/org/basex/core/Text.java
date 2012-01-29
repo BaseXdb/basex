@@ -825,6 +825,8 @@ public interface Text {
   String INFOERROR = lang("info_error") + COLS;
   /** Error info. */
   String INFOENTRIES = "(" + lang("info_entries") + ")";
+  /** Keyword. */
+  String INFODIRECTORY = lang("info_directory");
 
   // MENU ENTRIES =============================================================
 

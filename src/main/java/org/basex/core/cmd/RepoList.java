@@ -33,7 +33,7 @@ public final class RepoList extends Command {
     t.description = PACKAGES;
     t.header.add(DataText.TABLEURI);
     t.header.add(VERSINFO);
-    t.header.add(DIALOGFC);
+    t.header.add(INFODIRECTORY);
 
     for(final byte[] p : context.repo.pkgDict()) {
       if(p != null) {

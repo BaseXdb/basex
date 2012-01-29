@@ -526,6 +526,7 @@ info_off=OFF
 info_error=Error
 info_entries=% entries
 info_browsererror=Failed to open a browser.\nPlease manually open the URL:\n\n%
+info_directory=Directory
 
 # Command Help
 ch_nohelp=Sorry, no help available.
