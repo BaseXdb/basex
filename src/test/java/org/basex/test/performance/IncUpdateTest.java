@@ -2,6 +2,8 @@ package org.basex.test.performance;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.basex.core.Context;
@@ -15,6 +17,9 @@ import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This test class performs some incremental updates.
@@ -22,7 +27,17 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
+@RunWith(Parameterized.class)
 public final class IncUpdateTest {
+  /**
+   * Test parameters.
+   * @return parameters
+   */
+  @Parameters
+  public static List<Object[]> params() {
+    return Arrays.asList(new Object[][] { {false}, {true} });
+  }
+
   /** Test database name. */
   private static final String DB = Util.name(IncUpdateTest.class);
   /** Database context. */
@@ -32,12 +47,24 @@ public final class IncUpdateTest {
   /** Maximum number of entries. */
   private static final int MAX = 2000 / STEPS;
 
+  /** Incremental index update flag. */
+  private final boolean ixupdate;
+
+  /**
+   * Constructor.
+   * @param u incremental index update flag.
+   */
+  public IncUpdateTest(final boolean u) {
+    ixupdate = u;
+  }
+
   /**
    * Initializes the test.
    * @throws Exception exception
    */
   @Before
   public void init() throws Exception {
+    new Set(Prop.UPDINDEX, ixupdate).execute(CONTEXT);
     new CreateDB(DB, "<xml/>").execute(CONTEXT);
     new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
   }
