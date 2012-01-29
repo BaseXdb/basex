@@ -1,12 +1,14 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
@@ -21,7 +23,7 @@ import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
-import org.basex.query.func.JavaFunc;
+import org.basex.query.func.JavaMapping;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -130,8 +132,8 @@ abstract class BXQAbstract {
     if(t == null && v instanceof BXQItem) return ((BXQItem) v).it;
 
     // get xquery mapping
-    final Type e = JavaFunc.type(v);
-    if(e == AtomType.JAVA) throw new BXQException(CONV, Util.name(v));
+    final Type e = JavaMapping.type(v);
+    if(e == null) throw new BXQException(CONV, Util.name(v));
 
     try {
       // return item with correct type
