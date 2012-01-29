@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.flwor;
 
 import static org.basex.query.QueryText.*;
 
@@ -7,6 +7,11 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.And;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.Filter;
+import org.basex.query.expr.If;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.func.Function;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;

@@ -24,7 +24,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNFormat extends FuncCall {
+public final class FNFormat extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -39,7 +39,7 @@ public final class FNFormat extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    switch(def) {
+    switch(sig) {
       case FORMAT_INTEGER:  return formatInteger(ctx);
       case FORMAT_NUMBER:   return formatNumber(ctx);
       case FORMAT_DATETIME: return formatDate(AtomType.DTM, ctx);

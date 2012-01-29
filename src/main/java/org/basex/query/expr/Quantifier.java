@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.flwor.For;
+import org.basex.query.flwor.ForLet;
 import org.basex.query.item.Bln;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;

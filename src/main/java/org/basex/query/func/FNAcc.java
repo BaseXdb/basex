@@ -22,7 +22,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNAcc extends FuncCall {
+public final class FNAcc extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -38,7 +38,7 @@ public final class FNAcc extends FuncCall {
       throws QueryException {
 
     final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
-    switch(def) {
+    switch(sig) {
       case POSITION:
         return Int.get(ctx.pos);
       case LAST:
@@ -103,7 +103,7 @@ public final class FNAcc extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     return u == Use.CTX && expr.length == 0 ||
-        u == Use.POS && (def == Function.POSITION || def == Function.LAST) ||
-        super.uses(u);
+        u == Use.POS && (sig == Function.POSITION ||
+        sig == Function.LAST) || super.uses(u);
   }
 }

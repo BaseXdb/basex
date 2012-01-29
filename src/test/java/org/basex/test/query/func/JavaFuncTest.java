@@ -38,7 +38,7 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests calling some Java static methods from XQuery. */
   @Test
   public void staticMethod() {
-    query("'java:java.lang.Math':sqrt(xs:double(9.0))", 3.0);
+    query("'java:java.lang.Math':sqrt(xs:double(9.0))", 3);
   }
 
   /** Tests calling some Java static methods from XQuery. */

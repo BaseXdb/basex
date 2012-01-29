@@ -62,7 +62,7 @@ import org.basex.util.list.TokenList;
  * @author Christian Gruen
  * @author Dimitar Popov
  */
-public final class FNDb extends FuncCall {
+public final class FNDb extends StandardFunc {
   /** Resource element name. */
   private static final QNm SYSTEM = new QNm(token("System"));
   /** Resource element name. */
@@ -94,7 +94,7 @@ public final class FNDb extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _DB_OPEN:      return open(ctx).iter();
       case _DB_TEXT:      return text(ctx);
       case _DB_ATTRIBUTE: return attribute(ctx);
@@ -108,7 +108,7 @@ public final class FNDb extends FuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _DB_OPEN: return open(ctx);
       default:       return super.value(ctx);
     }
@@ -118,7 +118,7 @@ public final class FNDb extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    switch(def) {
+    switch(sig) {
       case _DB_EVENT:        return event(ctx);
       case _DB_OPEN_ID:      return open(ctx, true);
       case _DB_OPEN_PRE:     return open(ctx, false);
@@ -615,20 +615,20 @@ public final class FNDb extends FuncCall {
 
   @Override
   public boolean isVacuous() {
-    return def == Function._DB_EVENT;
+    return sig == Function._DB_EVENT;
   }
 
   @Override
   public boolean uses(final Use u) {
     final boolean up =
-      def == Function._DB_ADD || def == Function._DB_DELETE ||
-      def == Function._DB_RENAME || def == Function._DB_REPLACE ||
-      def == Function._DB_OPTIMIZE || def == Function._DB_STORE;
+      sig == Function._DB_ADD || sig == Function._DB_DELETE ||
+      sig == Function._DB_RENAME || sig == Function._DB_REPLACE ||
+      sig == Function._DB_OPTIMIZE || sig == Function._DB_STORE;
     return
       // skip evaluation at compile time
       u == Use.CTX && (
-        def == Function._DB_TEXT || def == Function._DB_ATTRIBUTE ||
-        def == Function._DB_FULLTEXT || def == Function._DB_EVENT || up) ||
+        sig == Function._DB_TEXT || sig == Function._DB_ATTRIBUTE ||
+        sig == Function._DB_FULLTEXT || sig == Function._DB_EVENT || up) ||
       u == Use.UPD && up ||
       super.uses(u);
   }
@@ -636,8 +636,8 @@ public final class FNDb extends FuncCall {
   @Override
   public boolean iterable() {
     // index functions will always yield ordered and duplicate-free results
-    return def == Function._DB_OPEN || def == Function._DB_TEXT ||
-      def == Function._DB_ATTRIBUTE || def == Function._DB_FULLTEXT ||
+    return sig == Function._DB_OPEN || sig == Function._DB_TEXT ||
+      sig == Function._DB_ATTRIBUTE || sig == Function._DB_FULLTEXT ||
       super.iterable();
   }
 

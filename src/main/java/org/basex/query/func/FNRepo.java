@@ -19,7 +19,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-11, BSD License
  * @author Rositsa Shadura
  */
-public final class FNRepo extends FuncCall {
+public final class FNRepo extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -33,7 +33,7 @@ public final class FNRepo extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
-    switch(def) {
+    switch(sig) {
       case _REPO_LIST:
         final ItemCache cache = new ItemCache();
         for(final byte[] p : ctx.context.repo.pkgDict())
@@ -52,7 +52,7 @@ public final class FNRepo extends FuncCall {
     final RepoManager repoMng = new RepoManager(ctx.context.repo);
     // either path to package or package name
     final String pkg = expr.length == 0 ? null : string(checkStr(expr[0], ctx));
-    switch(def) {
+    switch(sig) {
       case _REPO_INSTALL:
         repoMng.install(pkg, ii);
         return null;

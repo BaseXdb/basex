@@ -169,7 +169,6 @@ public final class Reflect {
       final Class<?>... types) {
 
     if(clazz == null) return null;
-
     Method m = null;
     try {
       try {
@@ -178,7 +177,6 @@ public final class Reflect {
         m = clazz.getDeclaredMethod(name, types);
         m.setAccessible(true);
       }
-      //methods.put(key, m);
     } catch(final Throwable ex) {
       Util.debug(ex);
     }
@@ -200,7 +198,7 @@ public final class Reflect {
   }
 
   /**
-   * Returns a class instance, or throws a runtime exception.
+   * Returns a class instance, or {@code null}.
    * @param clazz class
    * @param args arguments
    * @return instance
@@ -215,7 +213,7 @@ public final class Reflect {
   }
 
   /**
-   * Invoked the specified method.
+   * Invokes the specified method.
    * @param method method to run
    * @param object object ({@code null} for static methods)
    * @param args arguments
@@ -233,7 +231,7 @@ public final class Reflect {
   }
 
   /**
-   * Invoked the specified method.
+   * Invokes the specified method.
    * @param object object
    * @param method method to run
    * @param args arguments

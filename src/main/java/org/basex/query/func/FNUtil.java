@@ -43,7 +43,7 @@ import org.basex.util.list.ByteList;
  * @author Christian Gruen
  * @author Leo Woerteler
  */
-public final class FNUtil extends FuncCall {
+public final class FNUtil extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -56,7 +56,7 @@ public final class FNUtil extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _UTIL_EVAL:     return eval(ctx).iter();
       case _UTIL_RUN:      return run(ctx).iter();
       case _UTIL_TO_BYTES: return toBytes(ctx);
@@ -66,7 +66,7 @@ public final class FNUtil extends FuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _UTIL_EVAL: return eval(ctx);
       case _UTIL_RUN:  return run(ctx);
       default:         return super.value(ctx);
@@ -76,7 +76,7 @@ public final class FNUtil extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _UTIL_FORMAT:            return format(ctx);
       case _UTIL_MB:                return mb(ctx);
       case _UTIL_MS:                return ms(ctx);
@@ -450,9 +450,9 @@ public final class FNUtil extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && (def == Function._UTIL_EVAL ||
-        def == Function._UTIL_RUN || def == Function._UTIL_MB ||
-        def == Function._UTIL_MS || def == Function._UTIL_UUID) ||
+    return u == Use.NDT && (sig == Function._UTIL_EVAL ||
+        sig == Function._UTIL_RUN || sig == Function._UTIL_MB ||
+        sig == Function._UTIL_MS || sig == Function._UTIL_UUID) ||
       super.uses(u);
   }
 }

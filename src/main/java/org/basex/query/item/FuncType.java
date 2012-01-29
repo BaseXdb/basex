@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.UserFunc;
+import org.basex.query.func.UserFunc;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import static org.basex.query.QueryText.*;

@@ -1,8 +1,10 @@
-package org.basex.query.expr;
+package org.basex.query.flwor;
 
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.Single;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 

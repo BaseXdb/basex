@@ -2,7 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV.Op;
-import org.basex.query.func.FuncCall;
+import org.basex.query.func.StandardFunc;
 import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -76,10 +76,10 @@ public abstract class Cmp extends Arr {
        o == Op.EQ && v != (int) v) return Bln.FALSE;
     // EXISTS: c > (v<1), c >= (v<=1), c != (v=0)
     if(o == Op.GT && v < 1 || o == Op.GE && v <= 1 || o == Op.NE && v == 0)
-      return Function.EXISTS.get(input, ((FuncCall) expr[0]).expr);
+      return Function.EXISTS.get(input, ((StandardFunc) expr[0]).expr);
     // EMPTY: c < (v<=1), c <= (v<1), c = (v=0)
     if(o == Op.LT && v <= 1 || o == Op.LE && v < 1 || o == Op.EQ && v == 0)
-      return Function.EMPTY.get(input, ((FuncCall) expr[0]).expr);
+      return Function.EMPTY.get(input, ((StandardFunc) expr[0]).expr);
 
     return this;
   }

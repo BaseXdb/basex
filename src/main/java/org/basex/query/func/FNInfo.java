@@ -25,7 +25,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNInfo extends FuncCall {
+public final class FNInfo extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -38,7 +38,7 @@ public final class FNInfo extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case ERROR:
         final int al = expr.length;
         if(al == 0) FUNERR1.thrw(input);
@@ -90,7 +90,7 @@ public final class FNInfo extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case ENVIRONMENT_VARIABLE:
         final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
         return e != null ? Str.get(e) : null;
@@ -101,20 +101,20 @@ public final class FNInfo extends FuncCall {
 
   @Override
   public Expr cmp(final QueryContext ctx) {
-    if(def == Function.TRACE) type = expr[0].type();
+    if(sig == Function.TRACE) type = expr[0].type();
     return this;
   }
 
   @Override
   public boolean isVacuous() {
-    return def == Function.ERROR;
+    return sig == Function.ERROR;
   }
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == Function.ENVIRONMENT_VARIABLE ||
-        def == Function.AVAILABLE_ENVIRONMENT_VARIABLES) ||
-      u == Use.NDT && (def == Function.ERROR || def == Function.TRACE) ||
+    return u == Use.X30 && (sig == Function.ENVIRONMENT_VARIABLE ||
+        sig == Function.AVAILABLE_ENVIRONMENT_VARIABLES) ||
+      u == Use.NDT && (sig == Function.ERROR || sig == Function.TRACE) ||
       super.uses(u);
   }
 }

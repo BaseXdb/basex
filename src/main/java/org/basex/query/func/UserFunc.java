@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
@@ -7,6 +7,8 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
+import org.basex.query.expr.Single;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
@@ -66,7 +68,7 @@ public class UserFunc extends Single {
    * Checks the function for updating behavior.
    * @throws QueryException query exception
    */
-  public final void checkUp() throws QueryException {
+  final void checkUp() throws QueryException {
     final boolean u = expr.uses(Use.UPD);
     if(updating) {
       // updating function
@@ -90,7 +92,7 @@ public class UserFunc extends Single {
    * @param cache cache variables
    * @throws QueryException query exception
    */
-  public void comp(final QueryContext ctx, final boolean cache)
+  void comp(final QueryContext ctx, final boolean cache)
       throws QueryException {
 
     if(compiled) return;

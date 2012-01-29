@@ -38,7 +38,7 @@ import org.basex.util.hash.TokenObjMap;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNXslt extends FuncCall {
+public final class FNXslt extends StandardFunc {
   /** Element: parameters. */
   private static final QNm E_PARAM = new QNm(token("parameters"), XSLTURI);
 
@@ -173,7 +173,7 @@ public final class FNXslt extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && def == Function._UTIL_TRANSFORM || super.uses(u);
+    return u == Use.NDT && sig == Function._UTIL_TRANSFORM || super.uses(u);
   }
 
   /**

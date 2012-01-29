@@ -22,7 +22,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class FNHof extends FuncCall {
+public final class FNHof extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -35,7 +35,7 @@ public final class FNHof extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _HOF_SORT_WITH:  return sortWith(ctx);
       case _HOF_ID:
       case _HOF_CONST:      return ctx.iter(expr[0]);
@@ -48,7 +48,7 @@ public final class FNHof extends FuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _HOF_FOLD_LEFT1: return foldLeft1(ctx);
       case _HOF_UNTIL:      return until(ctx);
       case _HOF_ID:
@@ -60,7 +60,7 @@ public final class FNHof extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _HOF_ID:
       case _HOF_CONST: return expr[0].item(ctx, ii);
       default:         return super.item(ctx, ii);
@@ -170,7 +170,7 @@ public final class FNHof extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return def == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 ||
+    return sig == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 ||
         super.uses(u);
   }
 }

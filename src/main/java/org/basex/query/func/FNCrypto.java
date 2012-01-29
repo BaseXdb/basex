@@ -16,7 +16,7 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public class FNCrypto extends FuncCall {
+public class FNCrypto extends StandardFunc {
 
   /**
    * Constructor.
@@ -32,7 +32,7 @@ public class FNCrypto extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    switch(def) {
+    switch(sig) {
       case _CRYPTO_HMAC:
         return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],
             ctx), checkStr(expr[2], ctx),

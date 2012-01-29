@@ -2,7 +2,7 @@ package org.basex.query.util;
 
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.JavaFunc;
+import org.basex.query.func.JavaMapping;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.SeqType;
 
@@ -61,7 +61,7 @@ public final class TypedFunc {
    * @param f java function
    * @return typed function
    */
-  public static TypedFunc java(final JavaFunc f) {
+  public static TypedFunc java(final JavaMapping f) {
     return new TypedFunc(f, FuncType.arity(f.expr.length));
   }
 }

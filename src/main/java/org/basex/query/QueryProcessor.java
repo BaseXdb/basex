@@ -7,6 +7,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map.Entry;
+
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.data.Nodes;
@@ -14,9 +15,8 @@ import org.basex.data.Result;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.JavaFunc;
+import org.basex.query.func.JavaMapping;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.json.JsonMapConverter;
 
@@ -69,8 +69,7 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor(final String qu, final Object o, final Context cx)
       throws QueryException {
-    this(qu, o instanceof ItemCache ? ((ItemCache) o).value() :
-        o instanceof Expr ? (Expr) o : JavaFunc.type(o).e(o, null), cx);
+    this(qu, o instanceof Expr ? (Expr) o : JavaMapping.toValue(o), cx);
   }
 
   /**
@@ -180,7 +179,7 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor context(final Object value) throws QueryException {
     ctx.ctxItem = value instanceof Expr ? (Expr) value :
-      JavaFunc.type(value).e(value, null);
+      JavaMapping.toValue(value);
     return this;
   }
 

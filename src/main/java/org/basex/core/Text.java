@@ -46,7 +46,7 @@ public interface Text {
   /** Project namespace. */
   String NAMELC = NAME.toLowerCase(Locale.ENGLISH);
   /** URL. */
-  String URL = "http://www." + NAMELC + ".org";
+  String URL = "http://" + NAMELC + ".org";
   /** URL of the community page. */
   String COMMUNITY_URL = URL + "/community";
   /** URL of the documentation. */

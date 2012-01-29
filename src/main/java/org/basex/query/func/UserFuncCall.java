@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Arr;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.QNm;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarStack;
@@ -24,7 +26,7 @@ public abstract class UserFuncCall extends Arr {
    * A continuation that's thrown to free stack frames.
    * @author Leo Woerteler
    */
-  public final class Continuation extends RuntimeException {
+  final class Continuation extends RuntimeException {
     /** Arguments. */
     private final Var[] args;
 
@@ -32,7 +34,7 @@ public abstract class UserFuncCall extends Arr {
      * Constructor.
      * @param arg arguments
      */
-    public Continuation(final Var[] arg) {
+    Continuation(final Var[] arg) {
       args = arg;
     }
 
@@ -70,7 +72,7 @@ public abstract class UserFuncCall extends Arr {
    * @param nm function name
    * @param arg arguments
    */
-  public UserFuncCall(final InputInfo ii, final QNm nm, final Expr... arg) {
+  UserFuncCall(final InputInfo ii, final QNm nm, final Expr... arg) {
     super(ii, arg);
     name = nm;
   }
@@ -79,7 +81,7 @@ public abstract class UserFuncCall extends Arr {
    * Initializes the function call after all functions have been declared.
    * @param f function reference
    */
-  public void init(final UserFunc f) {
+  void init(final UserFunc f) {
     func = f;
   }
 
@@ -87,7 +89,7 @@ public abstract class UserFuncCall extends Arr {
    * Getter for the called function.
    * @return user-defined function
    */
-  public final UserFunc func() {
+  final UserFunc func() {
     return func;
   }
 

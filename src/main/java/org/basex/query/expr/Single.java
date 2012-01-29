@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-abstract class Single extends ParseExpr {
+public abstract class Single extends ParseExpr {
   /** Expression. */
   public Expr expr;
 

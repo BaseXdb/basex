@@ -26,7 +26,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNDate extends FuncCall {
+public final class FNDate extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -46,7 +46,7 @@ public final class FNDate extends FuncCall {
     final boolean d = expr.length == 2;
     final Item zon = d ? expr[1].item(ctx, input) : null;
 
-    switch(def) {
+    switch(sig) {
       case YEARS_FROM_DURATION:
         return yea(checkDur(it));
       case YEAR_FROM_DATETIME:

@@ -129,7 +129,7 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  Expr markTailCalls() {
+  public Expr markTailCalls() {
     for(final TypeCase t : cases) t.markTailCalls();
     return this;
   }

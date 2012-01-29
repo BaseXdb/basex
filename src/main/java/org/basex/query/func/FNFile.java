@@ -40,7 +40,7 @@ import org.basex.util.list.StringList;
  * @author Rositsa Shadura
  * @author Christian Gruen
  */
-public final class FNFile extends FuncCall {
+public final class FNFile extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -56,7 +56,7 @@ public final class FNFile extends FuncCall {
     checkAdmin(ctx);
     final File path = new File(string(checkStr(expr[0], ctx)));
 
-    switch(def) {
+    switch(sig) {
       case _FILE_LIST:            return list(path, ctx);
       case _FILE_READ_TEXT_LINES: return readTextLines(path, ctx);
       default:                    return super.iter(ctx);
@@ -71,7 +71,7 @@ public final class FNFile extends FuncCall {
     final File path = expr.length == 0 ? null : new File(
         string(checkStr(expr[0], ctx)));
 
-    switch(def) {
+    switch(sig) {
       case _FILE_APPEND:           return write(path, ctx, true);
       case _FILE_APPEND_BINARY:    return writeBinary(path, ctx, true);
       case _FILE_COPY:             return copy(path, ctx, true);

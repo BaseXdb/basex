@@ -56,7 +56,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "}(function($f) { 42 })",
         "42",
         // both outer inline functions are pre-compiled
-        "exists(//DynFuncCall)",
+        "exists(//DynamicFunc)",
         "every $f in outermost(//DynFuncCall)/* satisfies" +
         "  $f instance of element(FuncItem)"
     );
@@ -76,7 +76,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:foo() { abs(?) };" +
         "function-lookup(xs:QName('local:foo'), 0)()(-42)",
         "42",
-        "exists(//PartFunApp)"
+        "exists(//PartFunc)"
     );
   }
 }

@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FuncCall;
+import org.basex.query.func.StandardFunc;
 import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -51,7 +51,7 @@ public final class If extends Arr {
     // if not(A) then B else C -> if A then C else B
     if(expr[0].isFunction(Function.NOT)) {
       ctx.compInfo(OPTWRITE, this);
-      expr[0] = ((FuncCall) expr[0]).expr[0];
+      expr[0] = ((StandardFunc) expr[0]).expr[0];
       final Expr tmp = expr[1];
       expr[1] = expr[2];
       expr[2] = tmp;
@@ -126,7 +126,7 @@ public final class If extends Arr {
   }
 
   @Override
-  Expr markTailCalls() {
+  public Expr markTailCalls() {
     expr[1] = expr[1].markTailCalls();
     expr[2] = expr[2].markTailCalls();
     return this;

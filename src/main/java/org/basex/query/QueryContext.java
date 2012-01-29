@@ -6,6 +6,8 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -24,7 +26,8 @@ import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
-import org.basex.query.func.JavaFunc;
+import org.basex.query.func.JavaMapping;
+import org.basex.query.func.UserFuncs;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
@@ -39,7 +42,6 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
 import org.basex.query.util.JDBCConnections;
-import org.basex.query.util.UserFuncs;
 import org.basex.query.util.Var;
 import org.basex.query.util.VarContext;
 import org.basex.query.util.json.JsonMapConverter;
@@ -143,6 +145,9 @@ public final class QueryContext extends Progress {
   SerializerProp serProp;
   /** Initial context value. */
   public Expr ctxItem;
+  /** Java modules. */
+  public HashMap<QueryModule, ArrayList<Method>> javaModules =
+      new HashMap<QueryModule, ArrayList<Method>>();
   /** JAR modules. */
   public JarLoader jars;
   /** Opened connections to relational databases. */
@@ -354,8 +359,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void bind(final String name, final Object val) throws QueryException {
-    final Expr ex = val instanceof Expr ? (Expr) val :
-      JavaFunc.type(val).e(val, null);
+    final Expr ex = val instanceof Expr ? (Expr) val : JavaMapping.toValue(val);
 
     // remove optional $ prefix
     String nm = name.indexOf('$') == 0 ? name.substring(1) : name;

@@ -29,32 +29,32 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenObjMap;
 
 /**
- * Function call for built-in functions.
+ * Standard (built-in) functions.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class FuncCall extends Arr {
-  /** Element: output:serialization-parameter. */
+public abstract class StandardFunc extends Arr {
+  /** Element: output:serialization-parameters. */
   private static final QNm E_PARAM =
     new QNm(token("serialization-parameters"), OUTPUTURI);
   /** Attribute: value. */
   private static final QNm A_VALUE = new QNm(token("value"));
 
-  /** Function definition. */
-  public Function def;
+  /** Function signature. */
+  Function sig;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param fd function definition
+   * @param s function definition
    * @param args arguments
    */
-  protected FuncCall(final InputInfo ii, final Function fd,
+  protected StandardFunc(final InputInfo ii, final Function s,
       final Expr... args) {
     super(ii, args);
-    def = fd;
-    type = def.ret;
+    sig = s;
+    type = sig.ret;
   }
 
   @Override
@@ -65,7 +65,7 @@ public abstract class FuncCall extends Arr {
     if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues())
       return optPre(cmp(ctx), ctx);
     // pre-evaluate function
-    return optPre(def.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
+    return optPre(sig.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
   }
 
   /**
@@ -93,24 +93,24 @@ public abstract class FuncCall extends Arr {
 
   @Override
   public final boolean isFunction(final Function f) {
-    return def == f;
+    return sig == f;
   }
 
   @Override
   public final String description() {
-    return def.toString();
+    return sig.toString();
   }
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, token(def.desc));
+    ser.openElement(this, NAM, token(sig.desc));
     for(final Expr arg : expr) arg.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public final String toString() {
-    final String desc = def.toString();
+    final String desc = sig.toString();
     return new TokenBuilder().add(desc.substring(0,
         desc.indexOf('(') + 1)).addSep(expr, SEP).add(PAR2).toString();
   }
@@ -145,7 +145,7 @@ public abstract class FuncCall extends Arr {
    * @throws SerializerException serializer exception
    * @throws QueryException query exception
    */
-  static SerializerProp serialPar(final FuncCall fun, final int arg,
+  static SerializerProp serialPar(final StandardFunc fun, final int arg,
       final QueryContext ctx) throws SerializerException, QueryException {
 
     // check if enough arguments are available

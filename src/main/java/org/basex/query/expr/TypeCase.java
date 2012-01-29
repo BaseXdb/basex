@@ -100,7 +100,7 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  TypeCase markTailCalls() {
+  public TypeCase markTailCalls() {
     expr = expr.markTailCalls();
     return this;
   }

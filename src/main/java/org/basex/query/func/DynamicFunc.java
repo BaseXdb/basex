@@ -1,10 +1,12 @@
-package org.basex.query.expr;
+package org.basex.query.func;
 
 import java.io.IOException;
 
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Arr;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.FItem;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.Item;
@@ -19,19 +21,19 @@ import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
- * Function call.
+ * Dynamic function call.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class DynFuncCall extends Arr {
+public final class DynamicFunc extends Arr {
   /**
    * Function constructor.
    * @param ii input info
    * @param fun function expression
    * @param arg arguments
    */
-  public DynFuncCall(final InputInfo ii, final Expr fun, final Expr[] arg) {
+  public DynamicFunc(final InputInfo ii, final Expr fun, final Expr[] arg) {
     super(ii, Array.add(arg, fun));
   }
 
@@ -49,10 +51,7 @@ public final class DynFuncCall extends Arr {
     }
 
     // maps can only contain fully evaluated Values, so this is safe
-    if(allAreValues() && f instanceof Map)
-      return optPre(value(ctx), ctx);
-
-    return this;
+    return allAreValues() && f instanceof Map ? optPre(value(ctx), ctx) : this;
   }
 
   @Override

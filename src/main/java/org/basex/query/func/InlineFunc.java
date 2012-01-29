@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.FuncItem;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.SeqType;

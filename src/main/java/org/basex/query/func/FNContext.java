@@ -25,7 +25,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNContext extends FuncCall {
+public final class FNContext extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -42,7 +42,7 @@ public final class FNContext extends FuncCall {
     final Iter[] arg = new Iter[expr.length];
     for(int a = 0; a < expr.length; ++a) arg[a] = ctx.iter(expr[a]);
 
-    switch(def) {
+    switch(sig) {
       case CURRENT_DATE:
         return currDate(ctx);
       case CURRENT_DATETIME:

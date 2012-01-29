@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.UserFuncCall;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -22,7 +23,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class VarRef extends ParseExpr {
   /** Variable name. */
-  Var var;
+  public Var var;
 
   /**
    * Constructor.

@@ -27,7 +27,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNPat extends FuncCall {
+public final class FNPat extends StandardFunc {
   /** Root element for the analyze-string-result function. */
   private static final QNm ANALYZE =
     new QNm(token("fn:analyze-string-result"), FNURI);
@@ -52,7 +52,7 @@ public final class FNPat extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case TOKENIZE:   return tokenize(checkEStr(expr[0], ctx), ctx);
       default:         return super.iter(ctx);
     }
@@ -61,7 +61,7 @@ public final class FNPat extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case MATCHES:        return matches(checkEStr(expr[0], ctx), ctx);
       case REPLACE:        return replace(checkEStr(expr[0], ctx), ctx);
       case ANALYZE_STRING: return analyzeString(checkEStr(expr[0], ctx), ctx);
@@ -229,7 +229,7 @@ public final class FNPat extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return def == Function.ANALYZE_STRING && (u == Use.X30 || u == Use.CNS) ||
+    return sig == Function.ANALYZE_STRING && (u == Use.X30 || u == Use.CNS) ||
         super.uses(u);
   }
 }

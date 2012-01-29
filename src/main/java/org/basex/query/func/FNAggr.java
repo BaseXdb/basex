@@ -20,7 +20,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNAggr extends FuncCall {
+public final class FNAggr extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -36,7 +36,7 @@ public final class FNAggr extends FuncCall {
       throws QueryException {
 
     final Iter iter = ctx.iter(expr[0]);
-    switch(def) {
+    switch(sig) {
       case COUNT:
         long c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
@@ -63,7 +63,7 @@ public final class FNAggr extends FuncCall {
     final long c = e.size();
     if(c < 0 || e.uses(Use.NDT) || e.uses(Use.CNS)) return this;
 
-    switch(def) {
+    switch(sig) {
       case COUNT:
         return Int.get(c);
       case SUM:

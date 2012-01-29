@@ -34,7 +34,7 @@ import org.basex.util.list.ObjList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNSeq extends FuncCall {
+public final class FNSeq extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -48,7 +48,7 @@ public final class FNSeq extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case HEAD: return head(ctx);
       default:   return super.item(ctx, ii);
     }
@@ -56,7 +56,7 @@ public final class FNSeq extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case INDEX_OF:        return indexOf(ctx);
       case DISTINCT_VALUES: return distinctValues(ctx);
       case INSERT_BEFORE:   return insertBefore(ctx);
@@ -144,19 +144,22 @@ public final class FNSeq extends FuncCall {
   public Expr cmp(final QueryContext ctx) throws QueryException {
     // static typing:
     // index-of will create integers, insert-before might add new types
-    if(def == Function.INDEX_OF || def == Function.INSERT_BEFORE) return this;
+    if(sig == Function.INDEX_OF ||
+       sig == Function.INSERT_BEFORE) return this;
 
     // all other types will return existing types
     final Type t = expr[0].type().type;
     SeqType.Occ o = SeqType.Occ.ZM;
     // at most one returned item
-    if(def == Function.SUBSEQUENCE && expr[0].type().one()) o = SeqType.Occ.ZO;
+    if(sig == Function.SUBSEQUENCE && expr[0].type().one())
+      o = SeqType.Occ.ZO;
+
     // head will return at most one item
-    else if(def == Function.HEAD) o = SeqType.Occ.ZO;
+    else if(sig == Function.HEAD) o = SeqType.Occ.ZO;
     type = SeqType.get(t, o);
 
     // pre-evaluate distinct values
-    if(def == Function.DISTINCT_VALUES) return cmpDist(ctx);
+    if(sig == Function.DISTINCT_VALUES) return cmpDist(ctx);
 
     return this;
   }
@@ -427,7 +430,7 @@ public final class FNSeq extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == Function.HEAD || def == Function.TAIL) ||
+    return u == Use.X30 && (sig == Function.HEAD || sig == Function.TAIL) ||
       super.uses(u);
   }
 }

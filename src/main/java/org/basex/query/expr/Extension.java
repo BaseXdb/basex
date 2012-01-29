@@ -58,7 +58,7 @@ public final class Extension extends Single {
   }
 
   @Override
-  Expr markTailCalls() {
+  public Expr markTailCalls() {
     expr = expr.markTailCalls();
     return this;
   }

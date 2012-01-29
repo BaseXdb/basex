@@ -25,7 +25,7 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNNode extends FuncCall {
+public final class FNNode extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -44,7 +44,7 @@ public final class FNNode extends FuncCall {
     final Item it = (expr.length != 0 ? expr[0] :
       checkCtx(ctx)).item(ctx, input);
 
-    switch(def) {
+    switch(sig) {
       case NODE_NAME:
         QNm qname = it != null ? checkNode(it).qname() : null;
         return qname != null && qname.string().length != 0 ? qname : null;
@@ -146,10 +146,10 @@ public final class FNNode extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && (def == Function.GENERATE_ID ||
-        def == Function.PATH || def == Function.HAS_CHILDREN ||
+    return u == Use.X30 && (sig == Function.GENERATE_ID ||
+        sig == Function.PATH || sig == Function.HAS_CHILDREN ||
         expr.length == 0 &&
-        (def == Function.DOCUMENT_URI || def == Function.NODE_NAME)) ||
+        (sig == Function.DOCUMENT_URI || sig == Function.NODE_NAME)) ||
         u == Use.CTX && expr.length == 0 || super.uses(u);
   }
 }

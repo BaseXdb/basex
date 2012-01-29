@@ -3,9 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.PartFunApp;
 import org.basex.query.expr.VarRef;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Empty;
@@ -26,7 +24,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class FNFunc extends FuncCall {
+public final class FNFunc extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -39,7 +37,7 @@ public final class FNFunc extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case MAP:        return map(ctx);
       case FILTER:     return filter(ctx);
       case MAP_PAIRS:  return zip(ctx);
@@ -52,7 +50,7 @@ public final class FNFunc extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case FUNCTION_ARITY:
         return Int.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
       case FUNCTION_NAME:
@@ -110,7 +108,7 @@ public final class FNFunc extends FuncCall {
       vals[j] = new VarRef(ii, vars[i]);
     }
 
-    return new PartFunApp(ii, new DynFuncCall(ii, f, vals),
+    return new PartFunc(ii, new DynamicFunc(ii, f, vals),
         vars).comp(ctx).item(ctx, ii);
   }
 
@@ -261,7 +259,8 @@ public final class FNFunc extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return (def == Function.PARTIAL_APPLY || def == Function.FUNCTION_LOOKUP)
-        && u == Use.CTX || u == Use.X30 || super.uses(u);
+    return (sig == Function.PARTIAL_APPLY ||
+        sig == Function.FUNCTION_LOOKUP) &&
+        u == Use.CTX || u == Use.X30 || super.uses(u);
   }
 }

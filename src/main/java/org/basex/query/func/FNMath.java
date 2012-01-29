@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNMath extends FuncCall {
+public final class FNMath extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -36,7 +36,7 @@ public final class FNMath extends FuncCall {
     }
     final double e = expr.length == 2 ? checkDbl(expr[1], ctx) : 0;
 
-    switch(def) {
+    switch(sig) {
       case _MATH_PI:     return Dbl.get(PI);
       case _MATH_E:      return Dbl.get(E);
       case _MATH_SQRT:   return Dbl.get(sqrt(d));
@@ -79,7 +79,7 @@ public final class FNMath extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     // random() is non-deterministic; don't pre-evaluate
-    return u == Use.X30 || u == Use.NDT && def == Function._MATH_RANDOM ||
+    return u == Use.X30 || u == Use.NDT && sig == Function._MATH_RANDOM ||
       super.uses(u);
   }
 }

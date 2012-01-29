@@ -17,7 +17,7 @@ import org.basex.util.Util;
 import org.basex.util.hash.TokenSet;
 
 /**
- * Global expression context.
+ * Static functions.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -60,7 +60,7 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  public FuncCall get(final byte[] name, final byte[] uri,
+  public StandardFunc get(final byte[] name, final byte[] uri,
       final Expr[] args, final QueryContext ctx, final InputInfo ii)
           throws QueryException {
 
@@ -71,7 +71,7 @@ public final class Functions extends TokenSet {
     final Function fl = funcs[id];
     if(!eq(fl.uri(), uri)) return null;
 
-    final FuncCall f = fl.get(ii, args);
+    final StandardFunc f = fl.get(ii, args);
     if(!ctx.xquery3 && f.uses(Use.X30)) FEATURE30.thrw(ii);
     // check number of arguments
     if(args.length < fl.min || args.length > fl.max) XPARGS.thrw(ii, fl);

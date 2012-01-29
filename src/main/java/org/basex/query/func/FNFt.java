@@ -34,7 +34,7 @@ import org.basex.util.list.IntList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNFt extends FuncCall {
+public final class FNFt extends StandardFunc {
   /** Marker element. */
   private static final byte[] MARK = token("mark");
 
@@ -51,7 +51,7 @@ public final class FNFt extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _FT_COUNT: return count(ctx);
       default:        return super.item(ctx, ii);
     }
@@ -59,7 +59,7 @@ public final class FNFt extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _FT_SEARCH:   return search(ctx);
       case _FT_SCORE:    return score(ctx);
       case _FT_MARK:     return mark(ctx, false);
@@ -184,7 +184,7 @@ public final class FNFt extends FuncCall {
    * @throws QueryException query exception
    */
   static Iter search(final Data data, final byte[] str,
-      final FuncCall fun, final QueryContext ctx) throws QueryException {
+      final StandardFunc fun, final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     if(!data.meta.ftxtindex) NOINDEX.thrw(fun.input, data.meta.name, fun);
@@ -234,6 +234,6 @@ public final class FNFt extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     // skip evaluation at compile time
-    return u == Use.CTX && def == Function._FT_SEARCH || super.uses(u);
+    return u == Use.CTX && sig == Function._FT_SEARCH || super.uses(u);
   }
 }

@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.QNm;
 import org.basex.query.util.TypedFunc;
 import org.basex.query.util.Var;
@@ -19,14 +20,14 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class PartFunApp extends UserFunc {
+public final class PartFunc extends UserFunc {
   /**
    * Function constructor for static calls.
    * @param ii input info
    * @param fun typed function expression
    * @param arg arguments
    */
-  public PartFunApp(final InputInfo ii, final TypedFunc fun, final Var[] arg) {
+  public PartFunc(final InputInfo ii, final TypedFunc fun, final Var[] arg) {
     super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), true);
     expr = fun.fun;
   }
@@ -37,7 +38,7 @@ public final class PartFunApp extends UserFunc {
    * @param func function expression
    * @param arg arguments
    */
-  public PartFunApp(final InputInfo ii, final Expr func, final Var[] arg) {
+  public PartFunc(final InputInfo ii, final Expr func, final Var[] arg) {
     // [LW] XQuery/HOF: dynamic type propagation
     super(ii, new QNm(), nn(arg), func.type(), true);
     expr = func;

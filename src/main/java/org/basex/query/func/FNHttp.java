@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public final class FNHttp extends FuncCall {
+public final class FNHttp extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info

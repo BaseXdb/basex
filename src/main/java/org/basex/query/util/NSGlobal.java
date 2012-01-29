@@ -11,7 +11,7 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 public final class NSGlobal {
-  /** Namespaces, containing prefixes and uris. */
+  /** Namespace: prefixes and namespace URIs. */
   private static final Atts NS = new Atts();
   /** Reserved namespaces. */
   private static final int RESERVED;

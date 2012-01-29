@@ -26,7 +26,7 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNQName extends FuncCall {
+public final class FNQName extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -39,7 +39,7 @@ public final class FNQName extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case IN_SCOPE_PREFIXES: return inscope(ctx);
       default:                return super.iter(ctx);
     }
@@ -52,7 +52,7 @@ public final class FNQName extends FuncCall {
     // functions have 1 or 2 arguments...
     final Item it = expr[0].item(ctx, input);
     final Item it2 = expr.length == 2 ? expr[1].item(ctx, input) : null;
-    switch(def) {
+    switch(sig) {
       case RESOLVE_QNAME:            return resolveQName(ctx, it, it2);
       case QNAME:                    return qName(it, it2);
       case LOCAL_NAME_FROM_QNAME:    return lnFromQName(ctx, it);

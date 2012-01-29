@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import org.basex.data.ExprInfo;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.flwor.GFLWOR;
+import org.basex.query.flwor.Group;
 import org.basex.query.func.Function;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -282,7 +284,7 @@ public abstract class Expr extends ExprInfo {
    * @return {@code true} if there are variables which are used but not declared
    *         in this expression, {@code false} otherwise
    */
-  boolean hasFreeVars(final QueryContext ctx) {
+  public boolean hasFreeVars(final QueryContext ctx) {
     final VarStack global = ctx.vars.globals();
     for(int i = global.size; --i >= 0;) {
       if(count(global.vars[i]) > 0) return true;
@@ -298,7 +300,7 @@ public abstract class Expr extends ExprInfo {
    * Finds and marks tail calls, enabling TCO.
    * @return the expression, with tail calls marked
    */
-  Expr markTailCalls() {
+  public Expr markTailCalls() {
     return this;
   }
 }

@@ -14,7 +14,7 @@ import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 
 /**
- * Signatures of all statically available XQuery functions:
+ * Definitions of all built-in XQuery functions.
  * Namespace mappings for function prefixes and URIs are specified in the
  * static code in the {@code NSGlobal} class.
  *
@@ -767,8 +767,8 @@ public enum Function {
    * Mapping between function classes and namespace URIs.
    * If no mapping exists, {@link #FNURI} will be assumed as default mapping.
    */
-  private static final HashMap<Class<? extends FuncCall>, byte[]> URIS =
-    new HashMap<Class<? extends FuncCall>, byte[]>();
+  private static final HashMap<Class<? extends StandardFunc>, byte[]> URIS =
+    new HashMap<Class<? extends StandardFunc>, byte[]>();
 
   // initialization of class/uri mappings and statically known modules
   static {
@@ -805,7 +805,7 @@ public enum Function {
   final SeqType ret;
 
   /** Function classes. */
-  private final Class<? extends FuncCall> func;
+  private final Class<? extends StandardFunc> func;
 
   /**
    * Default constructor.
@@ -814,7 +814,7 @@ public enum Function {
    * @param r return type
    * @param typ arguments types
    */
-  private Function(final Class<? extends FuncCall> fun,
+  private Function(final Class<? extends StandardFunc> fun,
       final String dsc, final SeqType r, final SeqType... typ) {
     this(fun, dsc, r, typ.length, typ);
   }
@@ -828,7 +828,7 @@ public enum Function {
    *   the maximum number of arguments is variable
    * @param typ arguments types
    */
-  private Function(final Class<? extends FuncCall> fun,
+  private Function(final Class<? extends StandardFunc> fun,
       final String dsc, final SeqType r, final int m, final SeqType... typ) {
 
     func = fun;
@@ -845,8 +845,8 @@ public enum Function {
    * @param arg arguments
    * @return function
    */
-  public FuncCall get(final InputInfo ii, final Expr... arg) {
-    return (FuncCall) Reflect.get(Reflect.find(
+  public StandardFunc get(final InputInfo ii, final Expr... arg) {
+    return (StandardFunc) Reflect.get(Reflect.find(
         func, InputInfo.class, Function.class, Expr[].class), ii, this, arg);
   }
 
@@ -854,7 +854,7 @@ public enum Function {
    * Returns the namespace URI of this function.
    * @return function
    */
-  public final byte[] uri() {
+  final byte[] uri() {
     final byte[] u = URIS.get(func);
     return u == null ? FNURI : u;
   }
@@ -864,7 +864,7 @@ public enum Function {
    * @param arity number of arguments
    * @return function type
    */
-  public final FuncType type(final int arity) {
+  final FuncType type(final int arity) {
     final SeqType[] arg = new SeqType[arity];
     if(arity != 0 && max == Integer.MAX_VALUE) {
       System.arraycopy(args, 0, arg, 0, args.length);

@@ -36,7 +36,7 @@ import org.basex.util.hash.TokenIntMap;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public final class FNIndex extends FuncCall {
+public final class FNIndex extends StandardFunc {
   /** Name: name. */
   protected static final QNm Q_NAME = new QNm(NAM);
   /** Name: count. */
@@ -70,7 +70,7 @@ public final class FNIndex extends FuncCall {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    switch(def) {
+    switch(sig) {
       case _INDEX_FACETS: return facets(ctx);
       default: return super.item(ctx, ii);
     }
@@ -78,7 +78,7 @@ public final class FNIndex extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _INDEX_TEXTS: return values(ctx, IndexType.TEXT);
       case _INDEX_ATTRIBUTES: return values(ctx, IndexType.ATTRIBUTE);
       case _INDEX_ELEMENT_NAMES: return names(ctx, IndexType.TAG);
@@ -129,7 +129,7 @@ public final class FNIndex extends FuncCall {
    * @throws QueryException query exception
    */
   static Iter entries(final Data data, final byte[] prefix, final IndexType it,
-      final FuncCall call) throws QueryException {
+      final StandardFunc call) throws QueryException {
 
     final Index index;
     final boolean avl;
@@ -275,7 +275,7 @@ public final class FNIndex extends FuncCall {
   public boolean uses(final Use u) {
     return
       // skip evaluation at compile time
-      u == Use.CTX && (def == Function._INDEX_TEXTS ||
-      def == Function._INDEX_ATTRIBUTES) || super.uses(u);
+      u == Use.CTX && (sig == Function._INDEX_TEXTS ||
+      sig == Function._INDEX_ATTRIBUTES) || super.uses(u);
   }
 }

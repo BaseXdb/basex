@@ -1,4 +1,4 @@
-package org.basex.query.expr;
+package org.basex.query.flwor;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;

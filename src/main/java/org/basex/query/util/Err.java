@@ -231,7 +231,9 @@ public enum Err {
   /** FORG0006: Evaluation exception. */
   TYPECMP(FORG, 6, "% is not comparable."),
   /** FORG0006: Evaluation exception. */
-  FUNJAVA(FORG, 6, "Invalid arguments for %."),
+  JAVAFUN(FORG, 6, "Invalid arguments: %(%) found."),
+  /** FORG0006: Evaluation exception. */
+  JAVAMOD(FORG, 6, "Invalid arguments:\n% expected, % found."),
   /** FORG0006: Evaluation exception. */
   INVBASE(FORG, 6, "Unsupported base: %."),
   /** FORG0006: Evaluation exception. */
@@ -526,7 +528,7 @@ public enum Err {
   /** XPST0017: Parsing exception. */
   FUNCUNKNOWN(XPST, 17, "Unknown function '%(...)'."),
   /** XPST0017: Parsing exception. */
-  FUNCJAVA(XPST, 17, "Unknown Java function '%(...)'."),
+  WHICHJAVA(XPST, 17, "Unknown Java function '%(...)'."),
 
   /** XPST0051: Parsing exception. */
   TYPEUNKNOWN(XPST, 51, "Unknown type %."),
@@ -649,7 +651,11 @@ public enum Err {
   /** XQST0057: Parsing exception. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059: Parsing exception. */
-  NOMODULE(XQST, 59, "Unknown module for namespace '%'."),
+  NOCONS(XQST, 59, "% must inhert %."),
+  /** XQST0059: Parsing exception. */
+  NOINV(XQST, 59, "Could not instantiate Java class '%'."),
+  /** XQST0059: Parsing exception. */
+  NOMODULE(XQST, 59, "No module found for namespace '%'."),
   /** XQST0059: Parsing exception. */
   NOMODULEFILE(XQST, 59, "Module not found: '%'."),
   /** XQST0059: Parsing exception. */

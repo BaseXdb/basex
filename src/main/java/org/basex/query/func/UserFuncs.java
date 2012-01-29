@@ -1,4 +1,4 @@
-package org.basex.query.util;
+package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
@@ -11,16 +11,9 @@ import org.basex.data.ExprInfo;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.BaseFuncCall;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.UserFunc;
-import org.basex.query.expr.UserFuncCall;
 import org.basex.query.expr.VarRef;
-import org.basex.query.func.FuncCall;
-import org.basex.query.func.Function;
-import org.basex.query.func.Functions;
-import org.basex.query.func.JavaFunc;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.FItem;
 import org.basex.query.item.FuncItem;
@@ -29,6 +22,9 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
+import org.basex.query.util.NSGlobal;
+import org.basex.query.util.TypedFunc;
+import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
@@ -40,7 +36,7 @@ import org.basex.util.Levenshtein;
  * @author Christian Gruen
  */
 public final class UserFuncs extends ExprInfo {
-  /** Cached function call. */
+  /** Cached function calls. */
   private UserFuncCall[][] calls = { };
   /** Local functions. */
   private UserFunc[] func = { };
@@ -88,19 +84,19 @@ public final class UserFuncs extends ExprInfo {
 
     // Java function (only allowed with administrator permissions)
     if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
-      return TypedFunc.java(JavaFunc.get(name, args, ctx, ii));
+      return TypedFunc.java(JavaMapping.get(name, args, ctx, ii));
     }
 
     // predefined functions
-    final FuncCall fun = Functions.get().get(ln, uri, args, ctx, ii);
+    final StandardFunc fun = Functions.get().get(ln, uri, args, ctx, ii);
     if(fun != null) {
       for(final Function f : Function.UPDATING) {
-        if(fun.def == f) {
+        if(fun.sig == f) {
           ctx.updating = true;
           break;
         }
       }
-      return new TypedFunc(fun, fun.def.type(args.length));
+      return new TypedFunc(fun, fun.sig.type(args.length));
     }
 
     // local function
@@ -181,7 +177,6 @@ public final class UserFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public int add(final UserFunc fun, final InputInfo ii) throws QueryException {
-
     final QNm name = fun.name;
 
     final byte[] uri = name.uri();

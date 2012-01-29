@@ -6,9 +6,9 @@ import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryText.*;
-import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.VarRef;
+import org.basex.query.func.DynamicFunc;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
@@ -179,7 +179,7 @@ public final class FuncItem extends FItem {
       vars[i] = ctx.uniqueVar(ii, t.args[i]);
       refs[i] = new VarRef(ii, vars[i]);
     }
-    return new FuncItem(fun.name, vars, new DynFuncCall(ii, fun, refs), t,
+    return new FuncItem(fun.name, vars, new DynamicFunc(ii, fun, refs), t,
         fun.cast != null);
   }
 

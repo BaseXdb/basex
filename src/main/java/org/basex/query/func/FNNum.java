@@ -21,7 +21,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNNum extends FuncCall {
+public final class FNNum extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -41,7 +41,7 @@ public final class FNNum extends FuncCall {
     final Type ip = it.type;
     if(!ip.isUntyped() && !ip.isNumber()) Err.number(this, it);
     final double d = it.dbl(input);
-    switch(def) {
+    switch(sig) {
       case ABS:                return abs(it, input);
       case CEILING:            return num(it, d, StrictMath.ceil(d));
       case FLOOR:              return num(it, d, StrictMath.floor(d));
@@ -166,7 +166,7 @@ public final class FNNum extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == Function.ROUND && expr.length == 2 ||
+    return u == Use.X30 && sig == Function.ROUND && expr.length == 2 ||
       super.uses(u);
   }
 }

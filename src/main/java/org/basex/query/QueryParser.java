@@ -6,8 +6,10 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -34,26 +36,16 @@ import org.basex.query.expr.CmpN;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Concat;
 import org.basex.query.expr.Context;
-import org.basex.query.expr.DynFuncCall;
 import org.basex.query.expr.Except;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Extension;
 import org.basex.query.expr.Filter;
-import org.basex.query.expr.For;
-import org.basex.query.expr.ForLet;
-import org.basex.query.expr.GFLWOR;
 import org.basex.query.expr.If;
-import org.basex.query.expr.InlineFunc;
 import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
-import org.basex.query.expr.Let;
 import org.basex.query.expr.List;
 import org.basex.query.expr.LitMap;
 import org.basex.query.expr.Or;
-import org.basex.query.expr.OrderBy;
-import org.basex.query.expr.OrderByExpr;
-import org.basex.query.expr.OrderByStable;
-import org.basex.query.expr.PartFunApp;
 import org.basex.query.expr.Pragma;
 import org.basex.query.expr.Quantifier;
 import org.basex.query.expr.Range;
@@ -66,8 +58,14 @@ import org.basex.query.expr.TypeCase;
 import org.basex.query.expr.TypeSwitch;
 import org.basex.query.expr.Unary;
 import org.basex.query.expr.Union;
-import org.basex.query.expr.UserFunc;
 import org.basex.query.expr.VarRef;
+import org.basex.query.flwor.For;
+import org.basex.query.flwor.ForLet;
+import org.basex.query.flwor.GFLWOR;
+import org.basex.query.flwor.Let;
+import org.basex.query.flwor.OrderBy;
+import org.basex.query.flwor.OrderByExpr;
+import org.basex.query.flwor.OrderByStable;
 import org.basex.query.ft.FTAnd;
 import org.basex.query.ft.FTContains;
 import org.basex.query.ft.FTContent;
@@ -86,6 +84,10 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
+import org.basex.query.func.DynamicFunc;
+import org.basex.query.func.InlineFunc;
+import org.basex.query.func.PartFunc;
+import org.basex.query.func.UserFunc;
 import org.basex.query.func.Variable;
 import org.basex.query.item.Atm;
 import org.basex.query.item.AtomType;
@@ -134,6 +136,7 @@ import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.JarLoader;
+import org.basex.util.Reflect;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.XMLToken;
@@ -777,25 +780,49 @@ public class QueryParser extends InputParser {
         do {
           module(stringLiteral(), uri);
         } while(wsConsumeWs(COMMA));
-      } else {
-        // search for uri in namespace dictionary
-        final TokenSet pkgs = ctx.context.repo.nsDict().get(uri);
-        if(pkgs != null) {
-          // load packages with modules having the given uri
-          for(final byte[] pkg : pkgs) {
-            if(pkg != null) loadPackage(pkg, new TokenSet(), new TokenSet());
-          }
-        } else {
-          // check statically known modules
-          boolean found = false;
-          for(final byte[] u : MODULES) found |= eq(uri, u);
-          // check pre-declared modules
-          final byte[] path = ctx.modDeclared.get(uri);
-          if(path != null) module(path, uri);
-          // module not found: show error
-          else if(!found) error(NOMODULE, uri);
-        }
+        return;
       }
+
+      if(startsWith(uri, JAVAPRE)) {
+        // check for Java modules
+        final String path = string(substring(uri, JAVAPRE.length));
+        final Class<?> clz = Reflect.find(path);
+        if(clz == null) error(NOMODULE, uri);
+        // class must be directly derived from JavaModule
+        if(clz.getSuperclass() != QueryModule.class)
+          error(NOCONS, path, QueryModule.class);
+        final QueryModule jm = (QueryModule) Reflect.get(clz);
+        if(jm == null) error(NOINV, uri);
+        jm.init(ctx, input());
+        // add all public methods of the class
+        final ArrayList<Method> list = new ArrayList<Method>();
+        for(final Method m : clz.getMethods()) {
+          if(m.getDeclaringClass() == clz) list.add(m);
+        }
+        // put class into module cache
+        ctx.javaModules.put(jm, list);
+        return;
+      }
+
+      // search for uri in namespace dictionary
+      final TokenSet pkgs = ctx.context.repo.nsDict().get(uri);
+      if(pkgs != null) {
+        // load packages with modules having the given uri
+        for(final byte[] pkg : pkgs) {
+          if(pkg != null) loadPackage(pkg, new TokenSet(), new TokenSet());
+        }
+        return;
+      }
+
+      // check statically known modules
+      boolean found = false;
+      for(final byte[] u : MODULES) found |= eq(uri, u);
+      // check pre-declared modules
+      final byte[] path = ctx.modDeclared.get(uri);
+      if(path != null) module(path, uri);
+      // module not found: show error
+      else if(!found) error(NOMODULE, uri);
+
     } catch(final StackOverflowError ex) {
       error(CIRCMODULE);
     }
@@ -858,7 +885,7 @@ public class QueryParser extends InputParser {
 
     final Package pkg = new PkgParser(ctx.context.repo, input()).parse(pkgDesc);
     // check if package contains a jar descriptor
-    final IO jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
+    final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // add jars to classpath
     if(jarDesc.exists()) loadJars(jarDesc, pkgDir, string(pkg.abbrev));
 
@@ -894,30 +921,27 @@ public class QueryParser extends InputParser {
    * @param modDir module directory
    * @throws QueryException query exception
    */
-  private void loadJars(final IO jarDesc,
+  private void loadJars(final IOFile jarDesc,
       final IOFile pkgDir, final String modDir) throws QueryException {
 
-    try {
-      final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
-      final URL[] urls = new URL[desc.jars.size()];
-      // Collect jar files
-      int i = 0;
-      for(final byte[] jar : desc.jars) {
-      // Assumes that jar is in the directory containing the xquery modules
-      final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(jar));
-        urls[i++] = new URL(IO.FILEPREF + path);
+    final ObjList<URL> urls = new ObjList<URL>();
+    // add existing URLs
+    if(ctx.jars != null) for(final URL u : ctx.jars.getURLs()) urls.add(u);
+    // add new URLs
+    final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
+    for(final byte[] u : desc.jars) {
+      // assumes that jar is in the directory containing the xquery modules
+      final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(u));
+      try {
+        urls.add(new URL(IO.FILEPREF + path));
+      } catch(final MalformedURLException ex) {
+        Util.errln(ex.getMessage());
       }
-      // Add jars to classpath
-      ctx.jars = new JarLoader(urls);
-
-      // Load public classes
-      for(final byte[] c : desc.classes) {
-        ctx.sc.ns.add(c, EMPTY, input());
-      }
-    } catch(final MalformedURLException ex) {
-      Util.errln(ex.getMessage());
     }
+    // add jars to classpath
+    ctx.jars = new JarLoader(urls.toArray(new URL[urls.size()]));
   }
+
   /**
    * Parses the "VarDecl" rule.
    * @throws QueryException query exception
@@ -1975,8 +1999,8 @@ public class QueryParser extends InputParser {
 
         final Var[] part = new Var[args.length];
         final boolean pt = partial(args, part);
-        e = new DynFuncCall(input(), e, args);
-        if(pt) e = new PartFunApp(input(), e, part);
+        e = new DynamicFunc(input(), e, args);
+        if(pt) e = new PartFunc(input(), e, part);
       }
     } while(e != old);
     return e;
@@ -2244,7 +2268,7 @@ public class QueryParser extends InputParser {
         final TypedFunc f = ctx.funcs.get(name, args, false, ctx, input());
         if(f != null) {
           alter = null;
-          return part ? new PartFunApp(input(), f, vars) : f.fun;
+          return part ? new PartFunc(input(), f, vars) : f.fun;
         }
       }
     }

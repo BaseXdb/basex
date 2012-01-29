@@ -26,7 +26,7 @@ import org.basex.util.XMLToken;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNStr extends FuncCall {
+public final class FNStr extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -41,7 +41,7 @@ public final class FNStr extends FuncCall {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
 
-    switch(def) {
+    switch(sig) {
       case STRING_TO_CODEPOINTS:
         return str2cp(e.item(ctx, input));
       default:
@@ -51,7 +51,7 @@ public final class FNStr extends FuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case STRING_TO_CODEPOINTS:
         final int[] tmp = cps(checkEStr(expr[0], ctx));
         final long[] vals = new long[tmp.length];
@@ -67,7 +67,7 @@ public final class FNStr extends FuncCall {
       throws QueryException {
     final Expr e = expr[0];
 
-    switch(def) {
+    switch(sig) {
       case CODEPOINTS_TO_STRING:
         return cp2str(ctx.iter(e));
       case COMPARE:
@@ -305,7 +305,7 @@ public final class FNStr extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == Function.STRING_JOIN && expr.length == 1 ||
+    return u == Use.X30 && sig == Function.STRING_JOIN && expr.length == 1 ||
       super.uses(u);
   }
 }

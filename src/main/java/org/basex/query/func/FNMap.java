@@ -16,7 +16,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class FNMap extends FuncCall {
+public final class FNMap extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -29,7 +29,7 @@ public final class FNMap extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _MAP_GET:  return get(ctx).iter();
       case _MAP_KEYS: return map(ctx).keys().iter();
       default:        return super.iter(ctx);
@@ -38,7 +38,7 @@ public final class FNMap extends FuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _MAP_GET:  return get(ctx);
       case _MAP_KEYS: return map(ctx).keys();
       default:        return super.value(ctx);
@@ -48,7 +48,7 @@ public final class FNMap extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _MAP_NEW:       return newMap(ctx, ii);
       case _MAP_ENTRY:     return entry(ctx, ii);
       case _MAP_CONTAINS:  return contains(ctx, ii);

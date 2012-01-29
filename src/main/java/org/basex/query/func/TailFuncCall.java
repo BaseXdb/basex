@@ -1,7 +1,8 @@
-package org.basex.query.expr;
+package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Value;
@@ -15,7 +16,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class TailFuncCall extends UserFuncCall {
+final class TailFuncCall extends UserFuncCall {
   /**
    * Constructor.
    * @param ii input info
@@ -23,7 +24,7 @@ public final class TailFuncCall extends UserFuncCall {
    * @param f function
    * @param arg arguments
    */
-  public TailFuncCall(final InputInfo ii, final QNm nm, final UserFunc f,
+  TailFuncCall(final InputInfo ii, final QNm nm, final UserFunc f,
       final Expr[] arg) {
     super(ii, nm, arg);
     func = f;

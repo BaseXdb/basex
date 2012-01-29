@@ -23,7 +23,7 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNId extends FuncCall {
+public final class FNId extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -41,7 +41,7 @@ public final class FNId extends FuncCall {
       checkCtx(ctx)).item(ctx, input));
 
     final ANode node = checkNode(it);
-    switch(def) {
+    switch(sig) {
       case ID:              return id(ctx.iter(expr[0]), node);
       case IDREF:           return idref(ctx.iter(expr[0]), node);
       case ELEMENT_WITH_ID: return elid(ctx.iter(expr[0]), node);
@@ -56,7 +56,7 @@ public final class FNId extends FuncCall {
     final Item it = checkEmpty((expr.length == 2 ? expr[1] :
       checkCtx(ctx)).item(ctx, input));
 
-    switch(def) {
+    switch(sig) {
       case LANG:  return lang(lc(checkEStr(expr[0], ctx)), checkNode(it));
       default:    return super.item(ctx, ii);
     }
@@ -206,7 +206,7 @@ public final class FNId extends FuncCall {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X30 && def == Function.ELEMENT_WITH_ID ||
+    return u == Use.X30 && sig == Function.ELEMENT_WITH_ID ||
       u == Use.CTX && expr.length == 1 || super.uses(u);
   }
 }

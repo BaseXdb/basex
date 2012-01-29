@@ -39,7 +39,7 @@ import org.basex.util.list.ByteList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNGen extends FuncCall {
+public final class FNGen extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -52,7 +52,7 @@ public final class FNGen extends FuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(def) {
+    switch(sig) {
       case DATA:                return data(ctx);
       case COLLECTION:          return collection(ctx).iter();
       case URI_COLLECTION:      return uriCollection(ctx);
@@ -64,7 +64,7 @@ public final class FNGen extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case DOC:                     return doc(ctx);
       case DOC_AVAILABLE:           return docAvailable(ctx);
       case UNPARSED_TEXT:           return unparsedText(ctx);
@@ -78,12 +78,12 @@ public final class FNGen extends FuncCall {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    return def == Function.COLLECTION ? collection(ctx) : super.value(ctx);
+    return sig == Function.COLLECTION ? collection(ctx) : super.value(ctx);
   }
 
   @Override
   public Expr cmp(final QueryContext ctx) {
-    if(def == Function.DATA &&  expr.length == 1) {
+    if(sig == Function.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();
       type = t.type.isNode() ? SeqType.get(AtomType.ATM, t.occ) : t;
     }
@@ -312,19 +312,21 @@ public final class FNGen extends FuncCall {
   @Override
   public boolean uses(final Use u) {
     return
-      u == Use.CNS && def == Function.PARSE_XML ||
-      u == Use.UPD && def == Function.PUT ||
-      u == Use.X30 && (def == Function.DATA && expr.length == 0 ||
-        def == Function.UNPARSED_TEXT || def == Function.UNPARSED_TEXT_LINES ||
-        def == Function.UNPARSED_TEXT_AVAILABLE || def == Function.PARSE_XML ||
-        def == Function.URI_COLLECTION || def == Function.SERIALIZE) ||
-      u == Use.CTX && (def == Function.DATA && expr.length == 0 ||
-        def == Function.PUT) && expr.length == 0 || super.uses(u);
+      u == Use.CNS && sig == Function.PARSE_XML ||
+      u == Use.UPD && sig == Function.PUT ||
+      u == Use.X30 && (sig == Function.DATA && expr.length == 0 ||
+        sig == Function.UNPARSED_TEXT ||
+        sig == Function.UNPARSED_TEXT_LINES ||
+        sig == Function.UNPARSED_TEXT_AVAILABLE ||
+        sig == Function.PARSE_XML ||
+        sig == Function.URI_COLLECTION || sig == Function.SERIALIZE) ||
+      u == Use.CTX && (sig == Function.DATA && expr.length == 0 ||
+        sig == Function.PUT) && expr.length == 0 || super.uses(u);
   }
 
   @Override
   public boolean iterable() {
     // collections will never yield duplicates
-    return def == Function.COLLECTION || super.iterable();
+    return sig == Function.COLLECTION || super.iterable();
   }
 }

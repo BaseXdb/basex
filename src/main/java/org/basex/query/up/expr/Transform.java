@@ -10,7 +10,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Let;
+import org.basex.query.flwor.Let;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;

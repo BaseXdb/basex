@@ -27,7 +27,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNJson extends FuncCall {
+public final class FNJson extends StandardFunc {
   /**
    * Constructor.
    * @param ii input info
@@ -41,7 +41,7 @@ public final class FNJson extends FuncCall {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(def) {
+    switch(sig) {
       case _JSON_PARSE:
         return new JSONConverter(input).parse(checkStr(expr[0], ctx));
       case _JSON_PARSE_ML:

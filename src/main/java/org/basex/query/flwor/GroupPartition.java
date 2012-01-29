@@ -1,8 +1,9 @@
-package org.basex.query.expr;
+package org.basex.query.flwor;
 
 import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;

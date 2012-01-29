@@ -46,7 +46,7 @@ import org.basex.util.hash.TokenObjMap;
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public final class FNSql extends FuncCall {
+public final class FNSql extends StandardFunc {
   /** Types. */
   /** Type int. */
   private static final byte[] INT = AtomType.INT.string();
@@ -110,7 +110,7 @@ public final class FNSql extends FuncCall {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
-    switch(def) {
+    switch(sig) {
       case _SQL_EXECUTE: return execute(ctx);
       default:         return super.iter(ctx);
     }
@@ -121,7 +121,7 @@ public final class FNSql extends FuncCall {
       throws QueryException {
 
     checkAdmin(ctx);
-    switch(def) {
+    switch(sig) {
       case _SQL_INIT:     return init(ctx);
       case _SQL_CONNECT:  return connect(ctx);
       case _SQL_PREPARE:  return prepare(ctx);

@@ -57,7 +57,7 @@ import org.basex.util.list.StringList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FNZip extends FuncCall {
+public final class FNZip extends StandardFunc {
   /** Element: zip:file. */
   private static final QNm E_FILE = new QNm(token("zip:file"), ZIPURI);
   /** Element: zip:dir. */
@@ -92,7 +92,7 @@ public final class FNZip extends FuncCall {
       throws QueryException {
 
     checkAdmin(ctx);
-    switch(def) {
+    switch(sig) {
       case _ZIP_BINARY_ENTRY:     return binaryEntry(ctx);
       case _ZIP_TEXT_ENTRY:       return textEntry(ctx);
       case _ZIP_HTML_ENTRY:       return xmlEntry(ctx, true);
