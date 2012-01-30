@@ -3,8 +3,6 @@ package org.basex.api.webdav;
 import static org.basex.api.webdav.BXNotAuthorizedResource.*;
 import static org.basex.api.webdav.BXServletRequest.*;
 
-import java.io.IOException;
-
 import org.basex.api.HTTPSession;
 import org.basex.server.LoginException;
 import org.basex.server.Session;
@@ -42,14 +40,14 @@ public class BXResourceFactory implements ResourceFactory {
 
         final String db = p.getFirst();
         return p.getLength() == 1 ?
-          listDBs(s).contains(db) ? database(s, db, session) : null :
+          dbExists(s, db) ? database(s, db, session) : null :
           resource(s, db, p.getStripFirst().toString(), session);
       } finally {
         s.close();
       }
     } catch(final LoginException ex) {
       return NOAUTH;
-    } catch(final IOException ex) {
+    } catch(final Exception ex) {
       Util.errln(ex);
     }
     return null;

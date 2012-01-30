@@ -2,7 +2,6 @@ package org.basex.api.webdav;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.basex.api.HTTPSession;
@@ -25,7 +24,7 @@ public class BXRoot extends BXFolder {
    * @param s current session
    */
   public BXRoot(final HTTPSession s) {
-    super(null, null, 0L, s);
+    super(null, null, 0, s);
   }
 
   @Override
@@ -49,12 +48,11 @@ public class BXRoot extends BXFolder {
   }
 
   @Override
-  public BXResource child(final String childName) {
+  public BXResource child(final String name) {
     return new BXCode<BXResource>(this) {
       @Override
       public BXResource get() throws IOException {
-        return listDBs(s).contains(childName) ?
-            database(s, childName, session) : null;
+        return dbExists(s, name) ? database(s, name, session) : null;
       }
     }.evalNoEx();
   }
@@ -64,9 +62,7 @@ public class BXRoot extends BXFolder {
     return new BXCode<List<BXResource>>(this) {
       @Override
       public List<BXResource> get() throws IOException {
-        final List<BXResource> dbs = new ArrayList<BXResource>();
-        for(final String d : listDBs(s)) dbs.add(database(s, d, session));
-        return dbs;
+        return databases(s, session);
       }
     }.evalNoEx();
   }

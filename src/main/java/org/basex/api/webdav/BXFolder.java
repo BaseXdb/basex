@@ -111,22 +111,20 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         final List<BXResource> ch = new ArrayList<BXResource>();
         final HashSet<String> paths = new HashSet<String>();
         final Query q = s.query(
-            "for $r in " + _DB_LIST.args("$d", "$p") +
-            "let $a := " + _DB_DETAILS.args("$d", "$r") +
-            "return (" +
-                SUBSTRING_AFTER.args("$a/@path/data()", "$p") + ',' +
-                "$a/@raw/data()," +
-                "$a/@content-type/data()," +
-                "$a/@modified-date/data()," +
-                "$a/@size/data())");
+            "for $a in " + _DB_LIST_DETAILS.args("$d", "$p") +
+            "return ($a/@raw/data()," +
+                    "$a/@content-type/data()," +
+                    "$a/@modified-date/data()," +
+                    "$a/@size/data()," +
+                    SUBSTRING_AFTER.args("$a/text()", "$p") + ")");
         q.bind("d", db);
         q.bind("p", path);
         while(q.more()) {
-          final String p = stripLeadingSlash(q.next());
           final boolean raw = Boolean.parseBoolean(q.next());
           final String ctype = q.next();
           final long mod = Long.parseLong(q.next());
           final Long size = raw ? Long.valueOf(q.next()) : null;
+          final String p = stripLeadingSlash(q.next());
           final int ix = p.indexOf(SEP);
           // check if document or folder
           if(ix < 0) {

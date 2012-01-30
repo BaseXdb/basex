@@ -3,13 +3,15 @@ package org.basex.api.webdav;
 import static org.basex.query.func.Function.*;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import org.basex.api.HTTPSession;
 import org.basex.core.Text;
 import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.InfoDB;
 import org.basex.core.cmd.Open;
 import org.basex.io.in.ArrayInput;
 import org.basex.server.Query;
@@ -31,8 +33,9 @@ import com.bradmcevoy.http.Resource;
  * @author Dimitar Popov
  */
 public abstract class BXResource implements Resource {
-  /** Date format of the "Time Stamp" field in INFO DB. */
-  private static final String DATEFORMAT = "dd.MM.yyyy HH:mm:ss";
+  /** Time string. */
+  static final String TIME =
+      Text.INFOTIME.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH);
   /** File path separator. */
   static final char SEP = '/';
   /** Dummy file for empty folder.*/
@@ -41,7 +44,7 @@ public abstract class BXResource implements Resource {
   protected final String db;
   /** Resource path (without leading '/'). */
   protected final String path;
-  /** Information on current session. */
+  /** HTTP session reference. */
   protected final HTTPSession session;
   /** Last modified date. */
   protected final Date mdate;
@@ -113,7 +116,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * List all databases.
+   * Lists all databases.
    * @param s session
    * @return a list of database names
    * @throws IOException I/O exception
@@ -130,7 +133,27 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Get a valid database name from a general file name.
+   * Checks if the specified database exists.
+   * @param s session
+   * @param db database to be found
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  static boolean dbExists(final Session s, final String db)
+      throws IOException {
+
+    final Query q = s.query(_DB_LIST.args() + "[. = $db]");
+    q.bind("db", db);
+    try {
+      if(q.more()) return true;
+    } finally {
+      q.close();
+    }
+    return false;
+  }
+
+  /**
+   * Gets a valid database name from a general file name.
    * @param n name
    * @return valid database name
    */
@@ -149,7 +172,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Check a folder for a dummy document and delete it.
+   * Checks a folder for a dummy document and delete it.
    * @param s active client session
    * @param db database name
    * @param p path
@@ -169,7 +192,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Check if a folder is empty and create a dummy document.
+   * Checks if a folder is empty and create a dummy document.
    * @param s active client session
    * @param db database name
    * @param p path
@@ -187,7 +210,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Create a folder or document resource.
+   * Creates a folder or document resource.
    * @param s active client session
    * @param d database name
    * @param p resource path
@@ -202,7 +225,7 @@ public abstract class BXResource implements Resource {
   }
 
   /**
-   * Create a file resource.
+   * Creates a file resource.
    * @param s active client session
    * @param d database name
    * @param p resource path
@@ -213,21 +236,21 @@ public abstract class BXResource implements Resource {
   static BXFile file(final Session s, final String d, final String p,
       final HTTPSession hs) throws IOException {
     final Query q = s.query(
-        "let $a := " + _DB_DETAILS.args("$d", "$p") +
+        "let $a := " + _DB_LIST_DETAILS.args("$d", "$p") +
         "return (" +
-            "$a/@path/data()," +
             "$a/@raw/data()," +
             "$a/@content-type/data()," +
             "$a/@modified-date/data()," +
-            "$a/@size/data())");
+            "$a/@size/data()," +
+            "$a/text())");
     q.bind("d", d);
     q.bind("p", p);
     try {
-      final String path = stripLeadingSlash(q.next());
       final boolean raw = Boolean.parseBoolean(q.next());
       final String ctype = q.next();
       final long mod = Long.parseLong(q.next());
       final Long size = raw ? Long.valueOf(q.next()) : null;
+      final String path = stripLeadingSlash(q.next());
       return new BXFile(d, path, mod, raw, ctype, size, hs);
     } finally {
       q.close();
@@ -245,11 +268,38 @@ public abstract class BXResource implements Resource {
    */
   static BXFolder folder(final Session s, final String d, final String p,
       final HTTPSession hs) throws IOException {
-    return new BXFolder(d, p, databaseTimestamp(s, d), hs);
+    return new BXFolder(d, p, timestamp(s, d), hs);
   }
 
   /**
-   * Create a database folder resource.
+   * Creates a database folder resource.
+   * @param s active client session
+   * @param hs current session
+   * @return requested resource
+   * @throws IOException I/O exception
+   */
+  static List<BXResource> databases(final Session s, final HTTPSession hs)
+      throws IOException {
+
+    final List<BXResource> dbs = new ArrayList<BXResource>();
+    final Query q = s.query("for $d in " + _DB_LIST_DETAILS.args() +
+        "return ($d/text(), $d/@modified-date/data())");
+    try {
+      while(q.more()) {
+        final String name = q.next();
+        final long tstamp = InfoDB.DATE.parse(q.next()).getTime();
+        dbs.add(new BXDatabase(name, tstamp, hs));
+      }
+    } catch(final Exception ex) {
+      Util.errln(ex);
+    } finally {
+      q.close();
+    }
+    return dbs;
+  }
+
+  /**
+   * Creates database folder resource.
    * @param s active client session
    * @param d database name
    * @param hs current session
@@ -258,39 +308,33 @@ public abstract class BXResource implements Resource {
    */
   static BXDatabase database(final Session s, final String d,
       final HTTPSession hs) throws IOException {
-    return new BXDatabase(d, databaseTimestamp(s, d), hs);
+    return new BXDatabase(d, timestamp(s, d), hs);
   }
 
   /**
-   * Retrieve the time stamp of a database.
+   * Retrieves the time stamp of a database.
    * @param s active session
    * @param d database name
    * @return database time stamp
    * @throws IOException I/O exception
    */
-  private static Long databaseTimestamp(final Session s, final String d)
+  private static long timestamp(final Session s, final String d)
       throws IOException {
-    final Query q = s.query(_DB_INFO.args("$p"));
+
+    final Query q = s.query(DATA.args(_DB_INFO.args("$p") +
+        "/descendant::" + TIME + "[1]"));
     q.bind("p", d);
-    final String inf = q.execute();
-    // parse the timestamp
-    final String ts = Text.INFOTIME + Text.COLS;
-    final int p = inf.indexOf(ts);
-    if(p >= 0) {
-      final String dt = inf.substring(p + ts.length(), inf.indexOf(Text.NL, p));
-      if(!dt.isEmpty()) {
-        try {
-          return new SimpleDateFormat(DATEFORMAT).parse(dt).getTime();
-        } catch(final ParseException e) {
-          Util.errln(e);
-        }
-      }
+    try {
+      // retrieve and parse timestamp
+      return InfoDB.DATE.parse(q.execute()).getTime();
+    } catch(final Exception ex) {
+      Util.errln(ex);
+      return 0;
     }
-    return null;
   }
 
   /**
-   * Check if any resources start with the given path.
+   * Checks if any of the resources start with the given path.
    * @param s active client session
    * @param d database
    * @param p path
