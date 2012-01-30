@@ -127,12 +127,12 @@ public final class QueryResources {
   public Data data(final String input, final boolean col, final InputInfo ii)
       throws QueryException {
 
-    // check if a data instance with the same name exists
+    // check if an opened database with the same name exists
     for(int d = 0; d < datas; ++d) {
       if(data[d].meta.name.equals(input)) return data[d];
     }
 
-    // check if a database with the same file path exists
+    // check if an opened database with the same file path exists
     final IO io = IO.get(input);
     for(int d = 0; d < datas; ++d) {
       if(IO.get(data[d].meta.original).eq(io)) return data[d];

@@ -185,8 +185,8 @@ public final class FTWords extends FTExpr {
             iat.tokenNum(++ctx.ftoknum);
           }
         }
-        return iat != null && iat.more() ? new FTNode(iat.matches(), data,
-            iat.next(), len, iat.size(), iat.score()) : null;
+        return iat == null || !iat.more() ? null : new FTNode(iat.matches(),
+            data, iat.next(), len, iat.size(), iat.score());
       }
     };
   }
@@ -264,7 +264,7 @@ public final class FTWords extends FTExpr {
     first = true;
     final FTLexer intok = ftt.copy(ctx.fttoken);
 
-    // use shortcut for default processing
+    // use shortcut for default options
     int num = 0;
     if(fast) {
       for(final byte[] t : txt) {

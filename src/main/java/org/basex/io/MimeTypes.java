@@ -72,7 +72,6 @@ public final class MimeTypes {
         c.endsWith(MIME_XML_SUFFIX);
   }
 
-
   /** Hash map containing all assignments. */
   private static final HashMap<String, String> TYPES =
       new HashMap<String, String>();

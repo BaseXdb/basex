@@ -42,7 +42,7 @@ public final class BaseXGUI {
    * @param args command-line arguments.
    * An XML document or query file can be specified as argument
    */
-  public static void main(final String[] args) {
+  public static void main(final String... args) {
     try {
       new BaseXGUI(args);
     } catch(final BaseXException ex) {
@@ -56,7 +56,7 @@ public final class BaseXGUI {
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  public BaseXGUI(final String[] args) throws BaseXException {
+  public BaseXGUI(final String... args) throws BaseXException {
     parseArguments(args);
 
     // set mac specific properties

@@ -55,7 +55,6 @@ public final class JavaModuleFunc extends JavaMapping {
     } catch(final InvocationTargetException ex) {
       throw JAVAERR.thrw(input, ex.getCause());
     } catch(final Throwable ex) {
-      System.out.println("?");
       final TokenBuilder found = new TokenBuilder();
       for(final Object a : args) {
         if(found.size() != 0) found.add(", ");

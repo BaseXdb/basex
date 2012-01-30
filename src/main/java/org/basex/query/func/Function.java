@@ -491,6 +491,9 @@ public enum Function {
   _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, STR, STR),
   /** Database function: lists all databases or documents in a database. */
   _DB_LIST(FNDb.class, "list([database[,path]])", STR_ZM, 0, STR, STR),
+  /** Database function: lists databases details. */
+  _DB_LIST_DETAILS(FNDb.class, "list-details([database[,path]])",
+      NOD_ZM, 0, STR, STR),
   /** Database function: lists system information. */
   _DB_SYSTEM(FNDb.class, "system()", STR),
   /** Database function: returns database or index information. */
@@ -524,23 +527,21 @@ public enum Function {
   _DB_EXISTS(FNDb.class, "exists(database[,path])", BLN, 1, STR, STR),
   /** Database function: returns the content type of a database file. */
   _DB_CONTENT_TYPE(FNDb.class, "content-type(database,path)", ITEM, STR, STR),
-  /** Database function: returns details for a resource. */
-  _DB_DETAILS(FNDb.class, "details(database,path)", ITEM, STR, STR),
 
   /* FNIndex functions. */
 
   /** Index function: returns index facet information. */
   _INDEX_FACETS(FNIndex.class, "facets(database, format)", DOC_O, 1, STR, STR),
   /** Index function: returns texts. */
-  _INDEX_TEXTS(FNIndex.class, "texts(database, prefix)", ITEM_ZM, 1, STR, STR),
+  _INDEX_TEXTS(FNIndex.class, "texts(database, prefix)", NOD_ZM, 1, STR, STR),
   /** Index function: returns attribute values. */
   _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database, prefix)",
-      STR_ZM, 1, STR, STR),
+      NOD_ZM, 1, STR, STR),
   /** Index function: returns element names. */
-  _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)", STR_ZM, STR),
+  _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)", NOD_ZM, STR),
   /** Index function: returns attribute names. */
   _INDEX_ATTRIBUTE_NAMES(FNIndex.class, "attribute-names(database)",
-      STR_ZM, STR),
+      NOD_ZM, STR),
 
   /* FNFile functions (EXPath). */
 

@@ -3,6 +3,8 @@ package org.basex.test.query.func;
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
 
+import java.util.Locale;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
@@ -170,6 +172,33 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the db:list-details() function.
+   */
+  @Test
+  public void dbListDetails() {
+    check(_DB_LIST_DETAILS);
+    query(_DB_ADD.args(DB, "\"<a/>\"", "xml"));
+    query(_DB_STORE.args(DB, "raw", "bla"));
+
+    final String xmlCall = _DB_LIST_DETAILS.args(DB, "xml");
+    query(xmlCall + "/@raw/data()", "false");
+    query(xmlCall + "/@content-type/data()", MimeTypes.APP_XML);
+    query(xmlCall + "/@modified-date/data()", CONTEXT.data().meta.time);
+    query(xmlCall + "/@size/data()", "");
+    query(xmlCall + "/text()", "xml");
+
+    final String rawCall = _DB_LIST_DETAILS.args(DB, "raw");
+    query(rawCall + "/@raw/data()", "true");
+    query(rawCall + "/@content-type/data()", MimeTypes.APP_OCTET);
+    query(rawCall + "/@modified-date/data() > 0", "true");
+    query(rawCall + "/@size/data()", "3");
+    query(rawCall + "/text()", "raw");
+
+    query(_DB_LIST_DETAILS.args(DB, "test"), "");
+    error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), Err.NODB);
+  }
+
+  /**
    * Test method for the db:system() function.
    */
   @Test
@@ -185,7 +214,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbInfo() {
     check(_DB_INFO);
     query("count(" + _DB_INFO.args(DB) + "//" +
-        INFODBSIZE.replaceAll(" |-", "") + ")", 1);
+        INFODBSIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ")", 1);
   }
 
   /**
@@ -413,31 +442,5 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_CONTENT_TYPE.args(DB, "xml"), MimeTypes.APP_XML);
     query(_DB_CONTENT_TYPE.args(DB, "raw"), MimeTypes.APP_OCTET);
     error(_DB_CONTENT_TYPE.args(DB, "test"), Err.RESFNF);
-  }
-
-  /**
-   * Test method for the db:details() function.
-   */
-  @Test
-  public void dbDetails() {
-    check(_DB_DETAILS);
-    query(_DB_ADD.args(DB, "\"<a/>\"", "xml"));
-    query(_DB_STORE.args(DB, "raw", "bla"));
-
-    final String xmlCall = _DB_DETAILS.args(DB, "xml");
-    query(xmlCall + "/@path/data()", "xml");
-    query(xmlCall + "/@raw/data()", "false");
-    query(xmlCall + "/@content-type/data()", MimeTypes.APP_XML);
-    query(xmlCall + "/@modified-date/data()", CONTEXT.data().meta.time);
-    query(xmlCall + "/@size/data()", "");
-
-    final String rawCall = _DB_DETAILS.args(DB, "raw");
-    query(rawCall + "/@path/data()", "raw");
-    query(rawCall + "/@raw/data()", "true");
-    query(rawCall + "/@content-type/data()", MimeTypes.APP_OCTET);
-    query(rawCall + "/@modified-date/data() > 0", "true");
-    query(rawCall + "/@size/data()", "3");
-
-    error(_DB_DETAILS.args(DB, "test"), Err.RESFNF);
   }
 }

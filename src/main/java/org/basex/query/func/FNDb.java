@@ -1,9 +1,11 @@
 package org.basex.query.func;
 
+import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -15,8 +17,10 @@ import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Resources;
+import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.MimeTypes;
+import org.basex.io.in.DataInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
@@ -53,6 +57,7 @@ import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
 import org.basex.util.InputInfo;
 import org.basex.util.list.IntList;
+import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
 
 /**
@@ -64,23 +69,25 @@ import org.basex.util.list.TokenList;
  */
 public final class FNDb extends StandardFunc {
   /** Resource element name. */
-  private static final QNm SYSTEM = new QNm(token("System"));
+  static final QNm SYSTEM = new QNm(token("system"));
   /** Resource element name. */
-  private static final QNm DATABASE = new QNm(token("Database"));
+  static final QNm DATABASE = new QNm(token("database"));
   /** Resource element name. */
-  private static final QNm RESOURCE = new QNm(token("resource"));
+  static final QNm RESOURCE = new QNm(token("resource"));
+  /** Resource element name. */
+  static final QNm RESOURCES = new QNm(token("resources"));
   /** Path element name. */
-  private static final QNm PATH = new QNm(token("path"));
+  static final QNm PATH = new QNm(token("path"));
   /** Raw element name. */
-  private static final QNm RAW = new QNm(token("raw"));
+  static final QNm RAW = new QNm(token("raw"));
   /** Size element name. */
-  private static final QNm SIZE = new QNm(token("size"));
+  static final QNm SIZE = new QNm(token("size"));
   /** Content type element name. */
-  private static final QNm CTYPE = new QNm(token("content-type"));
+  static final QNm CTYPE = new QNm(token("content-type"));
   /** Modified date element name. */
-  private static final QNm MDATE = new QNm(token("modified-date"));
+  static final QNm MDATE = new QNm(token("modified-date"));
   /** MIME type application/xml. */
-  private static final byte[] APP_XML = token(MimeTypes.APP_XML);
+  static final byte[] APP_XML = token(MimeTypes.APP_XML);
 
   /**
    * Constructor.
@@ -95,14 +102,15 @@ public final class FNDb extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _DB_OPEN:      return open(ctx).iter();
-      case _DB_TEXT:      return text(ctx);
-      case _DB_ATTRIBUTE: return attribute(ctx);
-      case _DB_FULLTEXT:  return fulltext(ctx);
-      case _DB_LIST:      return list(ctx);
-      case _DB_NODE_ID:   return node(ctx, true);
-      case _DB_NODE_PRE:  return node(ctx, false);
-      default:            return super.iter(ctx);
+      case _DB_OPEN:         return open(ctx).iter();
+      case _DB_TEXT:         return text(ctx);
+      case _DB_ATTRIBUTE:    return attribute(ctx);
+      case _DB_FULLTEXT:     return fulltext(ctx);
+      case _DB_LIST:         return list(ctx);
+      case _DB_LIST_DETAILS: return listDetails(ctx);
+      case _DB_NODE_ID:      return node(ctx, true);
+      case _DB_NODE_PRE:     return node(ctx, false);
+      default:               return super.iter(ctx);
     }
   }
 
@@ -135,7 +143,6 @@ public final class FNDb extends StandardFunc {
       case _DB_EXISTS:       return exists(ctx);
       case _DB_IS_XML:       return isXML(ctx);
       case _DB_CONTENT_TYPE: return contentType(ctx);
-      case _DB_DETAILS:      return details(ctx);
       default:               return super.item(ctx, ii);
     }
   }
@@ -208,7 +215,7 @@ public final class FNDb extends StandardFunc {
       final NodeIter ir = ia.iter(ctx);
 
       @Override
-      public Item next() throws QueryException {
+      public ANode next() throws QueryException {
         ANode n;
         while((n = ir.next()) != null && !nt.eval(n));
         return n;
@@ -253,13 +260,99 @@ public final class FNDb extends StandardFunc {
     return new Iter() {
       int pos;
       @Override
-      public Item get(final long i) { return Str.get(tl.get((int) i)); }
+      public Str get(final long i) { return Str.get(tl.get((int) i)); }
       @Override
-      public Item next() { return pos < size() ? get(pos++) : null; }
+      public Str next() { return pos < size() ? get(pos++) : null; }
       @Override
       public boolean reset() { pos = 0; return true; }
       @Override
       public long size() { return tl.size(); }
+    };
+  }
+
+  /**
+   * Performs the list-details function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter listDetails(final QueryContext ctx) throws QueryException {
+    if(expr.length == 0) return listDBs(ctx);
+
+    final Data data = data(0, ctx);
+    final String path =
+        string(expr.length == 1 ? EMPTY : checkStr(expr[1], ctx));
+    final IntList il = data.resources.docs(path);
+    final TokenList tl = data.resources.binaries(path);
+
+    return new Iter() {
+      final int is = il.size(), ts = tl.size();
+      int ip, tp;
+      @Override
+      public ANode get(final long i) throws QueryException {
+        if(i < is) {
+          final byte[] pt = data.text(il.get((int) i), true);
+          return resource(pt, false, 0, APP_XML, data.meta.time);
+        }
+        if(i < is + ts) {
+          final byte[] pt = tl.get(is - (int) i);
+          final IO io = data.meta.binary(string(pt));
+          return resource(pt, true, io.length(),
+              token(MimeTypes.get(io.path())), io.date());
+        }
+        return null;
+      }
+      @Override
+      public ANode next() throws QueryException {
+        return ip < is ? get(ip++) : tp < ts ? get(ip + tp++) : null;
+      }
+      @Override
+      public boolean reset() { ip = 0; tp = 0; return true; }
+      @Override
+      public long size() { return ip + is; }
+    };
+  }
+
+
+  /**
+   * Performs the list-details for databases function.
+   * @param ctx query context
+   * @return iterator
+   */
+  private Iter listDBs(final QueryContext ctx) {
+    final StringList sl = List.list(ctx.context);
+    return new Iter() {
+      int pos;
+      @Override
+      public ANode get(final long i) throws QueryException {
+        final FElem res = new FElem(DATABASE);
+        final String name = sl.get((int) i);
+        final MetaData meta = new MetaData(name, ctx.context);
+        DataInput di = null;
+        try {
+          di = new DataInput(meta.dbfile(DATAINF));
+          meta.read(di);
+          res.add(new FAttr(RESOURCES, token(meta.ndocs)));
+          final String tstamp = InfoDB.DATE.format(new Date(meta.dbtime()));
+          res.add(new FAttr(MDATE, token(tstamp)));
+          if(ctx.context.perm(User.CREATE, meta))
+            res.add(new FAttr(PATH, token(meta.original.toString())));
+          res.add(new FTxt(token(name)));
+        } catch(final IOException ex) {
+          NODB.thrw(input, name);
+        } finally {
+          if(di != null) try { di.close(); } catch(final IOException ex) { }
+        }
+        return res;
+      }
+      @Override
+      public ANode next() throws QueryException {
+        return pos < size() ? get(pos++) : null;
+      }
+      @Override
+      public boolean reset() { pos = 0; return true; }
+      @Override
+      public long size() { return sl.size(); }
     };
   }
 
@@ -325,28 +418,6 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
-   * Performs the details function.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  private Item details(final QueryContext ctx) throws QueryException {
-    final Data d = data(0, ctx);
-    final String path = path(1, ctx);
-
-    // xml resource
-    final int pre = d.resources.doc(path);
-    if(pre != -1)
-      return resource(token(path), false, 0, APP_XML, d.meta.time);
-
-    // binary resource
-    final IOFile io = d.meta.binary(path);
-    if(!io.exists() || io.isDir()) RESFNF.thrw(input, path);
-    return resource(token(path), true, io.length(),
-        token(MimeTypes.get(path)), io.date());
-  }
-
-  /**
    * Create a <code>&lt;resource/&gt;</code> node.
    * @param path path
    * @param raw is the resource a raw file
@@ -355,10 +426,10 @@ public final class FNDb extends StandardFunc {
    * @param mdate modified date
    * @return <code>&lt;resource/&gt;</code> node
    */
-  private static FNode resource(final byte[] path, final boolean raw,
+  static FNode resource(final byte[] path, final boolean raw,
       final long size, final byte[] ctype, final long mdate) {
     final FElem res = new FElem(RESOURCE).
-        add(new FAttr(PATH, path)).
+        add(new FTxt(path)).
         add(new FAttr(RAW, token(raw))).
         add(new FAttr(CTYPE, ctype)).
         add(new FAttr(MDATE, token(mdate)));
@@ -399,7 +470,8 @@ public final class FNDb extends StandardFunc {
       final String[] cols = l.split(": ", 2);
       if(cols[0].isEmpty()) continue;
 
-      final FElem n = new FElem(new QNm(token(cols[0].replaceAll(" |-", ""))));
+      final String name = cols[0].replaceAll(" |-", "");
+      final FElem n = new FElem(new QNm(lc(token(name))));
       if(cols[0].startsWith(" ")) {
         if(node != null) node.add(n);
         if(!cols[1].isEmpty()) n.add(new FTxt(token(cols[1])));
@@ -577,7 +649,7 @@ public final class FNDb extends StandardFunc {
       final Iter ir = ctx.iter(expr[0]);
 
       @Override
-      public Item next() throws QueryException {
+      public Int next() throws QueryException {
         final Item it = ir.next();
         if(it == null) return null;
         final DBNode node = checkDBNode(it);

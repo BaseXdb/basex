@@ -24,7 +24,7 @@ import org.basex.util.Util;
  */
 public final class InfoDB extends AInfo {
   /** Date format. */
-  private static final SimpleDateFormat DATE =
+  public static final SimpleDateFormat DATE =
     new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
   /**
