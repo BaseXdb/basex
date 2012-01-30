@@ -413,7 +413,9 @@ public class BaseXEditor extends BaseXPanel {
     }
 
     final boolean marking = e.isShiftDown() &&
-      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e);
+      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e)
+      // necessary on Macs as the shift button is pressed for REDO
+      && !REDO.is(e);
     final boolean nomark = !text.marked();
     if(marking && nomark) text.startMark();
     boolean down = true;
