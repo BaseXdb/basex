@@ -122,7 +122,7 @@ public final class PlotView extends View {
     final BaseXBack panel = new BaseXBack(Fill.NONE).layout(new BorderLayout());
 
     Box box = new Box(BoxLayout.X_AXIS);
-    xLog = new BaseXCheckBox(PLOTLOG, false, null);
+    xLog = new BaseXCheckBox(PLOTLOG, false, gui);
     xLog.setSelected(gui.gprop.is(GUIProp.PLOTXLOG));
     xLog.addActionListener(new ActionListener() {
       @Override
@@ -139,7 +139,7 @@ public final class PlotView extends View {
       }
     }, -6, 6, gui.gprop.num(GUIProp.PLOTDOTS), gui);
     BaseXLayout.setWidth(dots, 40);
-    yLog = new BaseXCheckBox(PLOTLOG, false, null);
+    yLog = new BaseXCheckBox(PLOTLOG, false, gui);
     yLog.setSelected(gui.gprop.is(GUIProp.PLOTYLOG));
     yLog.addActionListener(new ActionListener() {
       @Override

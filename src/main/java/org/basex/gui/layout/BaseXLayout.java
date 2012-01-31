@@ -190,11 +190,7 @@ public final class BaseXLayout {
       }
     });
 
-    final boolean dialog = win instanceof Dialog;
-    final GUI gui = dialog ? ((Dialog) win).gui : win instanceof GUI ?
-        (GUI) win : null;
-
-    if(dialog) {
+    if(win instanceof Dialog) {
       // add default keys
       final Dialog d = (Dialog) win;
       comp.addKeyListener(new KeyAdapter() {
@@ -212,10 +208,16 @@ public final class BaseXLayout {
           }
         }
       });
+      return;
     }
-    if(gui == null) return;
 
-    // add default keys
+    if(!(win instanceof GUI)) {
+      Util.notexpected("Reference to main window required to add shortcuts.");
+      return;
+    }
+    final GUI gui = (GUI) win;
+
+    // add default keys for main window
     comp.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -232,10 +234,12 @@ public final class BaseXLayout {
           }
         }
 
+        // jump to input bar
         if(INPUT1.is(e) || INPUT2.is(e)) {
           gui.input.requestFocusInWindow();
         }
 
+        // change font size
         final int fs = gui.gprop.num(GUIProp.FONTSIZE);
         int nfs = fs;
         if(INCFONT1.is(e) || INCFONT2.is(e)) {

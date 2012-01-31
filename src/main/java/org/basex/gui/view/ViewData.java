@@ -3,6 +3,7 @@ package org.basex.gui.view;
 import static org.basex.data.DataText.*;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
+import org.basex.query.func.Function;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.list.IntList;
@@ -57,10 +58,9 @@ public final class ViewData {
       k = data.kind(p);
     }
 
+    final byte[] doc = content(data, p, true);
     final TokenBuilder tb = new TokenBuilder();
-    tb.add("doc(\"");
-    tb.add(content(data, p, true));
-    tb.add("\")");
+    tb.add(Function._DB_OPEN.args(data.meta.name, Token.string(doc)));
     for(int i = il.size() - 1; i >= 0; i--) {
       tb.add('/');
       tb.add(content(data, il.get(i), true));
