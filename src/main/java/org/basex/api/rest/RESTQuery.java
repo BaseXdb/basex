@@ -102,7 +102,7 @@ class RESTQuery extends RESTCode {
     } catch(final IOException ex) {
       // suppress information on queried file
       final String m1 = Util.message(ex);
-      final String m2 = m1.replaceAll(STOPPED + ".*" + NL, "");
+      final String m2 = m1.replaceAll(STOPPED_AT + ".*" + NL, "");
       throw m1.equals(m2) ? ex : new IOException(m2, ex.getCause());
     }
   }

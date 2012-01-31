@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.basex.api.HTTPSession;
+import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.InfoDB;
@@ -35,7 +36,7 @@ import com.bradmcevoy.http.Resource;
 public abstract class BXResource implements Resource {
   /** Time string. */
   static final String TIME =
-      Text.INFOTIME.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH);
+      Text.TIMESTAMP.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH);
   /** File path separator. */
   static final char SEP = '/';
   /** Dummy file for empty folder.*/
@@ -96,7 +97,7 @@ public abstract class BXResource implements Resource {
 
   @Override
   public String getRealm() {
-    return Text.NAME;
+    return Prop.NAME;
   }
 
   @Override

@@ -376,7 +376,7 @@ public class RESTTest {
   public void delete1() throws IOException {
     put(DB, new FileInputStream(FILE));
     // delete database
-    assertEquals(delete(DB).trim(), Util.info(DBDROPPED, DB));
+    assertEquals(delete(DB).trim(), Util.info(DB_DROPPED_X, DB));
     try {
       // no database left
       delete(DB);
@@ -401,7 +401,7 @@ public class RESTTest {
     // no 'b' directory left
     assertContains(delete(DB + "/b"), "0 document");
     // delete database
-    assertEquals(delete(DB).trim(), Util.info(DBDROPPED, DB));
+    assertEquals(delete(DB).trim(), Util.info(DB_DROPPED_X, DB));
     try {
       // no database left
       delete(DB);

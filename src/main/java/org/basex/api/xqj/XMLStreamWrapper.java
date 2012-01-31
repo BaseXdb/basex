@@ -88,6 +88,6 @@ final class XMLStreamWrapper extends Parser {
 
   @Override
   public String det() {
-    return Util.info(NODESPARSED, src.name(), nodes);
+    return Util.info(NODES_PARSED_X, src.name(), nodes);
   }
 }

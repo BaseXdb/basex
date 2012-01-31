@@ -67,7 +67,7 @@ final class RESTRetrieve extends RESTQuery {
       final Serializer ser = Serializer.get(ctx.out, sprop);
       initResponse(sprop, ctx);
 
-      ser.openElement(DATABASE, DataText.NAME, token(ctx.db()),
+      ser.openElement(DATABASE, DataText.T_NAME, token(ctx.db()),
         RESOURCES, token(table.contents.size()));
       ser.namespace(REST, RESTURI);
       list(table, ser, RESOURCE, 0);

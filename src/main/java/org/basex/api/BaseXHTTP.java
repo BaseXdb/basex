@@ -90,14 +90,14 @@ public final class BaseXHTTP {
     if(port == eport || port == hport || port == sport) same = port;
     else if(eport == hport || eport == sport) same = eport;
     else if(hport == sport) same = hport;
-    if(same != -1) throw new BaseXException(SERVERPORTS, same);
+    if(same != -1) throw new BaseXException(PORT_TWICE_X, same);
 
     final String shost = mprop.get(MainProp.SERVERHOST);
 
     if(service) {
       start(hport, args);
-      Util.outln(HTTP + ' ' + SERVERSTART);
-      if(server) Util.outln(SERVERSTART);
+      Util.outln(HTTP + ' ' + SRV_STARTED);
+      if(server) Util.outln(SRV_STARTED);
       // keep the console window a little bit, so the user can read the message
       Performance.sleep(1000);
       return;
@@ -105,8 +105,8 @@ public final class BaseXHTTP {
 
     if(stopped) {
       stop();
-      Util.outln(HTTP + ' ' + SERVERSTOPPED);
-      if(server) Util.outln(SERVERSTOPPED);
+      Util.outln(HTTP + ' ' + SRV_STOPPED);
+      if(server) Util.outln(SRV_STOPPED);
       // keep the console window a little bit, so the user can read the message
       Performance.sleep(1000);
       return;
@@ -115,7 +115,7 @@ public final class BaseXHTTP {
     // request password on command line if only the user was specified
     if(System.getProperty(DBUSER) != null) {
       while(System.getProperty(DBPASS) == null) {
-        Util.out(SERVERPW + COLS);
+        Util.out(PASSWORD + COLS);
         System.setProperty(DBPASS, Util.password());
       }
     }
@@ -124,10 +124,10 @@ public final class BaseXHTTP {
       // default mode: start database server
       if(quiet) new BaseXServer(ctx, "-z");
       else new BaseXServer(ctx);
-      Util.outln(HTTP + ' ' + SERVERSTART);
+      Util.outln(HTTP + ' ' + SRV_STARTED);
     } else {
       // local or client mode
-      Util.outln(CONSOLE + HTTP + ' ' + SERVERSTART, SERVERMODE);
+      Util.outln(CONSOLE + HTTP + ' ' + SRV_STARTED, SERVERMODE);
     }
 
     jetty = new Server();
@@ -159,7 +159,7 @@ public final class BaseXHTTP {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        Util.outln(HTTP + ' ' + SERVERSTOPPED);
+        Util.outln(HTTP + ' ' + SRV_STOPPED);
       }
     });
   }
@@ -266,7 +266,7 @@ public final class BaseXHTTP {
       throws BaseXException {
 
     // check if server is already running (needs some time)
-    if(ping(LOCALHOST, port)) throw new BaseXException(SERVERBIND);
+    if(ping(LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
 
     Util.start(BaseXHTTP.class, args);
 
@@ -275,7 +275,7 @@ public final class BaseXHTTP {
       if(ping(LOCALHOST, port)) return;
       Performance.sleep(100);
     }
-    throw new BaseXException(SERVERERROR);
+    throw new BaseXException(CONNECTION_ERROR);
   }
 
   /**

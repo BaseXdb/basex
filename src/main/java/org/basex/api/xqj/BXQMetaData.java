@@ -5,6 +5,8 @@ import java.nio.charset.Charset;
 import java.util.Set;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQMetaData;
+
+import org.basex.core.Prop;
 import org.basex.core.Text;
 
 /**
@@ -49,7 +51,7 @@ final class BXQMetaData extends BXQAbstract implements XQMetaData {
   @Override
   public String getProductName() throws XQException {
     opened();
-    return Text.NAME;
+    return Prop.NAME;
   }
 
   @Override

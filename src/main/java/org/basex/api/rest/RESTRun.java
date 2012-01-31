@@ -44,7 +44,7 @@ public class RESTRun extends RESTQuery {
     final IOFile io = new IOFile(path, input);
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
         throw new RESTException(HttpServletResponse.SC_NOT_FOUND,
-            Util.info(FILEWHICH, input));
+            Util.info(FILE_NOT_FOUND_X, input));
 
     // set query path
     ctx.session.execute(new Set(Prop.QUERYPATH, io.path()));

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.basex.api.HTTPText;
-import org.basex.core.Text;
+import org.basex.core.Prop;
 
 import com.bradmcevoy.http.HttpManager;
 import com.bradmcevoy.http.Request;
@@ -51,7 +51,7 @@ public class WebDAVServlet implements Servlet {
 
   @Override
   public String getServletInfo() {
-    return Text.NAME + HTTPText.SERVLET;
+    return Prop.NAME + HTTPText.SERVLET;
   }
 
   @Override
