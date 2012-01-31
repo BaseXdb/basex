@@ -35,22 +35,22 @@ public final class AlterDB extends Command {
     final String db = args[0];
     final String name = args[1];
     // check if names are valid
-    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
-    if(!MetaData.validName(name, false)) return error(NAMEINVALID, name);
+    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
+    if(!MetaData.validName(name, false)) return error(NAME_INVALID_X, name);
 
     // database does not exist
-    if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);
+    if(!mprop.dbexists(db)) return error(DB_NOT_FOUND_X, db);
     // target database exists already
-    if(mprop.dbexists(name)) return error(DBEXIST, name);
+    if(mprop.dbexists(name)) return error(DB_EXISTS_X, name);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);
     // check if database is still pinned
-    if(context.pinned(db)) return error(DBPINNED, db);
+    if(context.pinned(db)) return error(DB_PINNED_X, db);
 
     // try to alter database
     return alter(db, name, mprop) && (!closed || new Open(name).run(context)) ?
-      info(DBALTERED, db, name) : error(DBNOTALTERED, db);
+      info(DB_RENAMED_X, db, name) : error(DB_NOT_RENAMED_X, db);
   }
 
   /**

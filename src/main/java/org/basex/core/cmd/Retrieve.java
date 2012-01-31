@@ -26,11 +26,11 @@ public final class Retrieve extends ACreate {
   @Override
   protected boolean run() throws IOException {
     final String path = MetaData.normPath(args[0]);
-    if(path == null) return error(NAMEINVALID, args[0]);
+    if(path == null) return error(NAME_INVALID_X, args[0]);
 
     final IOFile bin = context.data().meta.binary(path);
     if(bin == null || !bin.exists() || bin.isDir())
-      return error(FILEWHICH, path);
+      return error(FILE_NOT_FOUND_X, path);
 
     try {
       final BufferInput bi = bin.buffer();
@@ -39,9 +39,9 @@ public final class Retrieve extends ACreate {
       } finally {
         bi.close();
       }
-      return info(QUERYEXEC, perf);
+      return info(QUERY_EXECUTED_X, perf);
     } catch(final IOException ex) {
-      return error(DBNOTSTORED, ex.getMessage());
+      return error(FILE_NOT_STORED_X, ex.getMessage());
     }
   }
 }

@@ -29,7 +29,8 @@ public final class DropBackup extends Command {
 
   @Override
   protected boolean run() {
-    if(!MetaData.validName(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!MetaData.validName(args[0], true))
+      return error(NAME_INVALID_X, args[0]);
 
     final String[] dbs = databases(args[0]);
     // loop through all databases and drop backups
@@ -40,7 +41,7 @@ public final class DropBackup extends Command {
     // of a backup file
     if(dbs.length == 0) drop(args[0], context);
 
-    return info(DBBACKDROP, args[0] + "*" + IO.ZIPSUFFIX);
+    return info(BACKUP_DROPPED_X, args[0] + "*" + IO.ZIPSUFFIX);
   }
 
   /**

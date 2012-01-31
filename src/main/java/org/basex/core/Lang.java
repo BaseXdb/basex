@@ -70,8 +70,8 @@ public final class Lang {
         for(String line; (line = br.readLine()) != null;) {
           final int i = line.indexOf('=');
           if(i == -1 || line.startsWith("#")) continue;
-          final String key = line.substring(0, i);
-          String val = line.substring(i + 1);
+          final String key = line.substring(0, i).trim();
+          String val = line.substring(i + 1).trim();
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
           if(Util.langkeys) val = "[" + key + COLS + val + "]";
           if(TETXTS.get(key) == null) {

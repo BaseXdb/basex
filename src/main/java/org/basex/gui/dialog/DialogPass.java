@@ -38,7 +38,7 @@ public final class DialogPass extends Dialog {
    * @param main reference to the main window
    */
   DialogPass(final GUI main) {
-    super(main, ALTERPW);
+    super(main, ALTER_PW);
 
     pass = new BaseXPassword(this);
     pass.addKeyListener(new KeyAdapter() {
@@ -54,7 +54,7 @@ public final class DialogPass extends Dialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(BUTTONOK, BUTTONCANCEL);
+    buttons = newButtons(B_OK, CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);
@@ -65,8 +65,8 @@ public final class DialogPass extends Dialog {
     final String nm = pass();
     ok = !nm.isEmpty() && nm.matches("[^ ;'\\\"]*");
     info.setText(ok || nm.isEmpty() ? null :
-      Util.info(INVALID, SERVERPW), Msg.ERROR);
-    enableOK(buttons, BUTTONOK, ok);
+      Util.info(INVALID_X, PASSWORD), Msg.ERROR);
+    enableOK(buttons, B_OK, ok);
   }
 
   @Override

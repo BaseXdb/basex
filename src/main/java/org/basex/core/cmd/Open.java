@@ -42,18 +42,18 @@ public final class Open extends Command {
       path = db.substring(i + 1);
       db = db.substring(0, i);
     }
-    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     try {
       final Data data = open(db, context);
       context.openDB(data, path);
-      if(data.meta.oldindex) info(INDUPDATE);
-      if(data.meta.corrupt)  info(DBCORRUPT);
-      return info(DBOPENED, db, perf);
+      if(data.meta.oldindex) info(H_INDEX_FORMAT);
+      if(data.meta.corrupt)  info(DB_CORRUPT);
+      return info(DB_OPENED_X, db, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();
-      return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
+      return msg.isEmpty() ? error(DB_NOT_OPENED_X, db) : error(msg);
     }
   }
 
@@ -77,7 +77,7 @@ public final class Open extends Command {
     if(data == null) {
       // check if document exists
       if(!ctx.mprop.dbexists(name))
-        throw new FileNotFoundException(Util.info(DBNOTFOUND, name));
+        throw new FileNotFoundException(Util.info(DB_NOT_FOUND_X, name));
 
       data = new DiskData(name, ctx);
       ctx.pin(data);
@@ -86,6 +86,6 @@ public final class Open extends Command {
     if(ctx.perm(User.READ, data.meta)) return data;
 
     Close.close(data, ctx);
-    throw new BaseXException(PERMNO, CmdPerm.READ);
+    throw new BaseXException(PERM_NEEDED_X, CmdPerm.READ);
   }
 }

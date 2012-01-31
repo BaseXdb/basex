@@ -47,7 +47,7 @@ public class DialogAdd extends BaseXBack {
     target.addKeyListener(d.keys);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
-    pnl.add(new BaseXLabel(CREATETARGET + COLS, true, true).border(8, 0, 4, 0));
+    pnl.add(new BaseXLabel(TARGET_PATH + COLS, true, true).border(8, 0, 4, 0));
     pnl.add(target);
 
     // option panels
@@ -55,12 +55,12 @@ public class DialogAdd extends BaseXBack {
     parsing = new DialogParsing(d);
 
     final BaseXTabs tabs = new BaseXTabs(d);
-    tabs.addTab(GENERALINFO, options);
-    tabs.addTab(PARSEINFO, parsing);
+    tabs.addTab(GENERAL, options);
+    tabs.addTab(PARSING, parsing);
     add(tabs, BorderLayout.NORTH);
 
     // buttons
-    add = new BaseXButton(BUTTONADD + DOTS, d);
+    add = new BaseXButton(ADD + DOTS, d);
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.add(add);
 
@@ -91,12 +91,12 @@ public class DialogAdd extends BaseXBack {
       boolean ok = options.action(false);
       parsing.action(comp);
 
-      String inf = !ok ? PATHWHICH : !ok ? DBWHICH : null;
+      String inf = !ok ? FILE_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
       final Msg icon = Msg.ERROR;
       if(ok) {
         // check if target path is valid
         ok = MetaData.normPath(trg) != null;
-        if(!ok) inf = Util.info(INVALID, CREATETARGET);
+        if(!ok) inf = Util.info(INVALID_X, TARGET_PATH);
       }
       options.info.setText(inf, icon);
       add.setEnabled(ok);

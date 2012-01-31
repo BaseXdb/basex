@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import static org.basex.server.ServerCmd.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
@@ -117,7 +116,7 @@ public final class ClientListener extends Thread {
         server.unblock(address);
         context.add(this);
       } else {
-        if(!us.isEmpty()) log.write(this, SERVERDENIED + COLS + us);
+        if(!us.isEmpty()) log.write(this, ACCESS_DENIED + COLS + us);
         new ClientDelayer(server.block(address), this, server).start();
       }
     } catch(final IOException ex) {
@@ -144,21 +143,21 @@ public final class ClientListener extends Thread {
 
           last = System.currentTimeMillis();
           perf.getTime();
-          sc = get(b);
+          sc = ServerCmd.get(b);
           cmd = null;
-          if(sc == CREATE) {
+          if(sc == ServerCmd.CREATE) {
             create();
-          } else if(sc == ADD) {
+          } else if(sc == ServerCmd.ADD) {
             add();
-          } else if(sc == WATCH) {
+          } else if(sc == ServerCmd.WATCH) {
             watch();
-          } else if(sc == UNWATCH) {
+          } else if(sc == ServerCmd.UNWATCH) {
             unwatch();
-          } else if(sc == REPLACE) {
+          } else if(sc == ServerCmd.REPLACE) {
             replace();
-          } else if(sc == STORE) {
+          } else if(sc == ServerCmd.STORE) {
             store();
-          } else if(sc != COMMAND) {
+          } else if(sc != ServerCmd.COMMAND) {
             query(sc);
           } else {
             // database command
@@ -169,7 +168,7 @@ public final class ClientListener extends Thread {
           quit();
           break;
         }
-        if(sc != COMMAND) continue;
+        if(sc != ServerCmd.COMMAND) continue;
 
         // parse input and create command instance
         try {
@@ -177,7 +176,7 @@ public final class ClientListener extends Thread {
         } catch(final QueryException ex) {
           // log invalid command
           final String msg = ex.getMessage();
-          log.write(this, cmd, INFOERROR + msg);
+          log.write(this, cmd, ERROR_C + msg);
           // send 0 to mark end of potential result
           out.write(0);
           // send {INFO}0
@@ -201,7 +200,7 @@ public final class ClientListener extends Thread {
         } catch(final BaseXException ex) {
           ok = false;
           info = ex.getMessage();
-          if(info.startsWith(PROGERR)) info = SERVERTIMEOUT;
+          if(info.startsWith(INTERRUPTED)) info = TIMEOUT_EXCEEDED;
         }
         // stop timeout
         command.stopTimeout();
@@ -218,7 +217,8 @@ public final class ClientListener extends Thread {
         }
       }
     } catch(final IOException ex) {
-      log.write(this, sc == COMMAND ? cmd : sc, INFOERROR + ex.getMessage());
+      log.write(this, sc == ServerCmd.COMMAND ? cmd : sc,
+          ERROR_C + ex.getMessage());
       Util.debug(ex);
       command = null;
       quit();
@@ -328,7 +328,7 @@ public final class ClientListener extends Thread {
    */
   private void info(final String info, final boolean ok) throws IOException {
     // write feedback to log file
-    log.write(this, ok ? OK : INFOERROR + info, perf);
+    log.write(this, ok ? OK : ERROR_C + info, perf);
     // send {MSG}0 and (0|1) as (success|error) flag
     out.writeString(info);
     send(ok);
@@ -404,11 +404,11 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.add(this);
-      message = EVENTWAT;
+      message = WATCHING_EVENT_X;
     } else if(s == null) {
-      message = EVENTNO;
+      message = EVENT_UNKNOWN_X;
     } else {
-      message = EVENTALR;
+      message = EVENT_WATCHED_X;
     }
     info(Util.info(message, name), ok);
   }
@@ -425,11 +425,11 @@ public final class ClientListener extends Thread {
     String message = "";
     if(ok) {
       s.remove(this);
-      message = EVENTUNWAT;
+      message = UNWATCHING_EVENT_X;
     } else if(s == null) {
-      message = EVENTNO;
+      message = EVENT_UNKNOWN_X;
     } else {
-      message = EVENTNOUW;
+      message = EVENT_NOT_WATCHED_X;
     }
     info(Util.info(message, name), ok);
     out.flush();
@@ -447,7 +447,7 @@ public final class ClientListener extends Thread {
     String err = null;
     try {
       final QueryListener qp;
-      if(sc == QUERY) {
+      if(sc == ServerCmd.QUERY) {
         final String query = arg;
         qp = new QueryListener(query, context);
         arg = Integer.toString(id++);
@@ -462,24 +462,25 @@ public final class ClientListener extends Thread {
 
         // ID has already been removed
         if(qp == null) {
-          if(sc != CLOSE) throw new IOException("Unknown Query ID: " + arg);
-        } else if(sc == BIND) {
+          if(sc != ServerCmd.CLOSE)
+            throw new IOException("Unknown Query ID: " + arg);
+        } else if(sc == ServerCmd.BIND) {
           final String key = in.readString();
           final String val = in.readString();
           final String typ = in.readString();
           qp.bind(key, val, typ);
           log.write(this, sc + "(" + arg + ")", key, val, typ, OK, perf);
-        } else if(sc == ITER) {
+        } else if(sc == ServerCmd.ITER) {
           qp.execute(true, out, true);
-        } else if(sc == EXEC) {
+        } else if(sc == ServerCmd.EXEC) {
           qp.execute(false, out, true);
-        } else if(sc == INFO) {
+        } else if(sc == ServerCmd.INFO) {
           out.print(qp.info());
-        } else if(sc == OPTIONS) {
+        } else if(sc == ServerCmd.OPTIONS) {
           out.print(qp.options());
-        } else if(sc == CLOSE) {
+        } else if(sc == ServerCmd.CLOSE) {
           queries.remove(arg);
-        } else if(sc == NEXT) {
+        } else if(sc == ServerCmd.NEXT) {
           throw new Exception("Protocol for query iteration is out-of-dated.");
         }
         // send 0 as end marker
@@ -488,11 +489,11 @@ public final class ClientListener extends Thread {
       // send 0 as success flag
       out.write(0);
       // write log file (bind and execute have been logged before)
-      if(sc != BIND) log.write(this, sc + "(" + arg + ")", OK, perf);
+      if(sc != ServerCmd.BIND) log.write(this, sc + "(" + arg + ")", OK, perf);
     } catch(final Exception ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
-      log.write(this, sc + "(" + arg + ")", INFOERROR + err);
+      log.write(this, sc + "(" + arg + ")", ERROR_C + err);
       queries.remove(arg);
     }
     if(err != null) {

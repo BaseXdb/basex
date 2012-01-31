@@ -19,6 +19,6 @@ final class JBoolean extends JAtom {
 
   @Override
   byte[] type() {
-    return BOOL;
+    return T_BOOLEAN;
   }
 }

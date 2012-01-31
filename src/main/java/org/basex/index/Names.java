@@ -121,8 +121,8 @@ public final class Names extends TokenSet implements Index {
     final int[] ids = Array.createOrder(tl, false);
 
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(Text.INDEXSTRUC + Text.HASHSTRUC + Text.NL);
-    tb.add(Text.IDXENTRIES + (size - 1) + Text.NL);
+    tb.add(Text.LI_STRUCTURE + Text.HASH + Text.NL);
+    tb.add(Text.LI_ENTRIES + (size - 1) + Text.NL);
     for(int i = 0; i < size - 1; ++i) {
       final int s = ids[i];
       if(stats[s] == null) continue;
@@ -150,9 +150,9 @@ public final class Names extends TokenSet implements Index {
    * @throws IOException I/O exception
    */
   void plan(final Serializer ser) throws IOException {
-    ser.openElement(INDEX);
+    ser.openElement(T_INDEX);
     for(int i = 1; i < size; ++i) {
-      ser.openElement(KEY, NAME, keys[i]);
+      ser.openElement(T_KEY, T_NAME, keys[i]);
       stats[i].plan(ser);
       ser.closeElement();
     }

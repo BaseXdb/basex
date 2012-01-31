@@ -105,8 +105,8 @@ public class DialogResources extends BaseXBack {
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
     tree.expandPath(new TreePath(root.getPath()));
 
-    filter = new BaseXButton(BUTTONFILTER, d);
-    clear = new BaseXButton(BUTTONCLEAR, d);
+    filter = new BaseXButton(FILTER, d);
+    clear = new BaseXButton(CLEAR, d);
 
     // popup menu for node interaction
     new BaseXPopup(tree, d.gui, new DeleteCmd(), new RenameCmd());
@@ -282,7 +282,7 @@ public class DialogResources extends BaseXBack {
     @Override
     public void execute(final GUI g) {
       final TreeNode n = selection();
-      if(n == null || !Dialog.confirm(dialog.gui, Text.DELETECONF)) return;
+      if(n == null || !Dialog.confirm(dialog.gui, Text.DELETE_NODES)) return;
 
       final Thread post = new Thread() {
         @Override
@@ -295,7 +295,7 @@ public class DialogResources extends BaseXBack {
 
     @Override
     public String label() {
-      return BUTTONDELETE + DOTS;
+      return DELETE + DOTS;
     }
 
     @Override
@@ -313,7 +313,7 @@ public class DialogResources extends BaseXBack {
       if(n == null) return;
 
       final DialogInput d = new DialogInput(
-          n.path(), RENAMETITLE, dialog.gui, 0);
+          n.path(), RENAME_DB, dialog.gui, 0);
       if(!d.ok()) return;
 
       final String p = string(TreeNode.preparePath(token(d.input())));
@@ -328,7 +328,7 @@ public class DialogResources extends BaseXBack {
 
     @Override
     public String label() {
-      return BUTTONRENAME;
+      return RENAME_D;
     }
 
     @Override

@@ -79,9 +79,9 @@ public final class BaseXMem extends BaseXPanel {
     final long max = rt.maxMemory();
     final long used = occ - rt.freeMemory();
 
-    final String inf = MEMTOTAL + Performance.format(max, true) + NL
-        + MEMRESERVED + Performance.format(occ, true) + NL + MEMUSED
-        + Performance.format(used, true) + NL + NL + MEMHELP;
+    final String inf = TOTAL_MEM_C + Performance.format(max, true) + NL
+        + RESERVED_MEM_C + Performance.format(occ, true) + NL + MEMUSED_C
+        + Performance.format(used, true) + NL + NL + H_USED_MEM;
 
     Dialog.info(gui, inf);
   }

@@ -41,6 +41,8 @@ public final class Prop extends AProp {
       System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = Util.homeDir();
+  /** Default language. */
+  public static final String LANG = "English";
 
   /** Property information. */
   static final String PROPHEADER = "# Property File." + Prop.NL

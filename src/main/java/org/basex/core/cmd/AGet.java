@@ -29,6 +29,7 @@ abstract class AGet extends Command {
   protected final boolean whichKey() {
     final String key = args[0].toUpperCase(Locale.ENGLISH);
     final String sim = prop.similar(key);
-    return sim != null ? error(SETSIMILAR, key, sim) : error(SETWHICH, key);
+    return sim != null ? error(UNKNOWN_OPT_SIMILAR_X, key, sim) :
+      error(UNKNOWN_OPTION_X, key);
   }
 }

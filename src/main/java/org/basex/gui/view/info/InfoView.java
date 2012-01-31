@@ -63,7 +63,7 @@ public final class InfoView extends View {
     border(6, 6, 6, 6).layout(new BorderLayout());
 
     north = new BaseXBack(Fill.NONE).layout(new BorderLayout());
-    header = new BaseXLabel(INFOTIT);
+    header = new BaseXLabel(QUERY_INFO);
     north.add(header, BorderLayout.NORTH);
     north.add(header, BorderLayout.NORTH);
     timer = new BaseXLabel(" ", true, false);
@@ -135,28 +135,28 @@ public final class InfoView extends View {
     for(int i = 0; i < split.length; ++i) {
       final String line = split[i];
       final int s = line.indexOf(':');
-      if(line.startsWith(QUERYPARSE) || line.startsWith(QUERYCOMPILE) ||
-          line.startsWith(QUERYEVALUATE) || line.startsWith(QUERYPRINT) ||
-          line.startsWith(QUERYTOTAL)) {
+      if(line.startsWith(PARSING_CC) || line.startsWith(COMPILING_CC) ||
+          line.startsWith(EVALUATING_CC) || line.startsWith(PRINTING_CC) ||
+          line.startsWith(TOTAL_TIME_CC)) {
         final int t = line.indexOf(" ms");
         sl.add(line.substring(0, s).trim());
         il.add((int) (Double.parseDouble(line.substring(s + 1, t)) * 100));
-      } else if(line.startsWith(QUERYSTRING)) {
+      } else if(line.startsWith(QUERY_C)) {
         qu = line.substring(s + 1).trim();
-      } else if(line.startsWith(QUERYPLAN)) {
+      } else if(line.startsWith(QUERY_PLAN_C)) {
         while(++i < split.length && !split[i].isEmpty()) plan.add(split[i]);
         --i;
-      } else if(line.startsWith(QUERYCOMP)) {
+      } else if(line.startsWith(COMPILING_C)) {
         while(++i < split.length && !split[i].isEmpty()) comp.add(split[i]);
-      } else if(line.startsWith(QUERYRESULT)) {
+      } else if(line.startsWith(RESULT_C)) {
         res = line.substring(s + 1).trim();
-      } else if(line.startsWith(QUERYEVAL)) {
+      } else if(line.startsWith(EVALUATING_C)) {
         while(split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
         --i;
       } else if(!ok) {
         err += line + NL;
-      } else if(line.startsWith(QUERYHITS) || line.startsWith(QUERYUPDATED)
-          || line.startsWith(QUERYPRINTED)) {
+      } else if(line.startsWith(HITS_X_CC) || line.startsWith(UPDATED_CC)
+          || line.startsWith(PRINTED_CC)) {
           stats.add("- " + line);
       }
     }
@@ -169,32 +169,32 @@ public final class InfoView extends View {
     if(!ok || !q) {
       text.bold();
       if(q) {
-        add(QUERYQU, cmd.toString().replaceAll("^.*? ", "").trim());
+        add(QUERY_C + " ", cmd.toString().replaceAll("^.*? ", "").trim());
       } else if(cmd != null) {
-        text.bold().add(BUTTONCMD + COLS).norm().addExt(cmd).nline();
+        text.bold().add(COMMAND + COLS).norm().addExt(cmd).nline();
       }
       if(ok) {
         text.add(info).nline();
       } else {
-        add(QUERYCOMP, comp);
-        add(QUERYPLAN, plan);
-        add(INFOERROR, err.replaceAll(STOPPED + ".*\\r?\\n", ""));
+        add(COMPILING_C, comp);
+        add(QUERY_PLAN_C, plan);
+        add(ERROR_C, err.replaceAll(STOPPED_AT + ".*\\r?\\n", ""));
       }
     } else if(sl.size() != 0) {
       text.reset();
-      add(QUERYEVAL, eval);
-      add(QUERYQU, qu);
-      add(QUERYCOMP, comp);
-      if(comp.size() != 0) add(QUERYRESULT, res);
-      add(QUERYTIME, sl);
-      add(QUERYRESULT, stats);
-      add(QUERYPLAN, plan);
+      add(EVALUATING_C, eval);
+      add(QUERY_C + " ", qu);
+      add(COMPILING_C, comp);
+      if(comp.size() != 0) add(RESULT_C, res);
+      add(TIMING_C, sl);
+      add(RESULT_C, stats);
+      add(QUERY_PLAN_C, plan);
       final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
       total = Performance.getTimer(il.get(il.size() - 1) * 10000L * runs, runs);
     }
 
     area.setText(text.finish());
-    if(total != null) timer.setText(QUERYTOTAL + total);
+    if(total != null) timer.setText(TOTAL_TIME_CC + total);
     repaint();
   }
 

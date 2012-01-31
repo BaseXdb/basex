@@ -38,7 +38,7 @@ public final class ShowUsers extends Command {
   protected boolean run() throws IOException {
     final String name = args[0];
     if(name != null && !MetaData.validName(name, false))
-      return error(NAMEINVALID, name);
+      return error(NAME_INVALID_X, name);
 
     if(name == null) {
       out.println(context.users.info(null));
@@ -51,7 +51,7 @@ public final class ShowUsers extends Command {
       } catch(final IOException ex) {
         Util.debug(ex);
         final String msg = ex.getMessage();
-        return msg.isEmpty() ? error(DBOPENERR, name) : error(msg);
+        return msg.isEmpty() ? error(DB_NOT_OPENED_X, name) : error(msg);
       }
     }
     return true;

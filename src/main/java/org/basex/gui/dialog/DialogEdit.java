@@ -54,7 +54,7 @@ public final class DialogEdit extends Dialog {
    * @param p pre value
    */
   public DialogEdit(final GUI main, final int p) {
-    super(main, EDITTITLE);
+    super(main, EDIT_DATA);
     pre = p;
 
     // create checkboxes
@@ -64,7 +64,7 @@ public final class DialogEdit extends Dialog {
     final Data data = context.data();
     kind = data.kind(pre);
 
-    final String title = Util.info(EDITTEXT, EDITKIND[kind]);
+    final String title = Util.info(EDIT_X, NODE_KINDS[kind]);
     final BaseXLabel label = new BaseXLabel(title, true, true);
     pp.add(label, BorderLayout.NORTH);
 
@@ -122,10 +122,10 @@ public final class DialogEdit extends Dialog {
     ok = kind != Data.TEXT || input3.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
-      if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID, EDITNAME);
+      if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID_X, NAME);
     }
     info.setText(msg, Msg.ERROR);
-    enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, B_OK, ok);
   }
 
   @Override

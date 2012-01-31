@@ -171,14 +171,14 @@ final class FTFuzzy extends FTIndex {
   @Override
   public synchronized byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(INDEXSTRUC + FUZZYSTRUC + NL);
-    tb.addExt("- %: %" + NL, CREATEST, Util.flag(data.meta.stemming));
-    tb.addExt("- %: %" + NL, CREATECS, Util.flag(data.meta.casesens));
-    tb.addExt("- %: %" + NL, CREATEDC, Util.flag(data.meta.diacritics));
+    tb.add(LI_STRUCTURE + FUZZY + NL);
+    tb.addExt("- %: %" + NL, STEMMING, Util.flag(data.meta.stemming));
+    tb.addExt("- %: %" + NL, CASE_SENSITIVITY, Util.flag(data.meta.casesens));
+    tb.addExt("- %: %" + NL, DIACRITICS, Util.flag(data.meta.diacritics));
     if(data.meta.language != null)
-      tb.addExt("- %: %" + NL, CREATELN, data.meta.language);
+      tb.addExt("- %: %" + NL, LANGUAGE, data.meta.language);
     final long l = inX.length() + inY.length() + inZ.length();
-    tb.add(SIZEDISK + Performance.format(l, true) + NL);
+    tb.add(LI_SIZE + Performance.format(l, true) + NL);
 
     final IndexStats stats = new IndexStats(data);
     addOccs(stats);

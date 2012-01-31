@@ -1,6 +1,5 @@
 package org.basex.gui;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.GUICommands.*;
 import java.awt.Color;
 import java.awt.Container;
@@ -38,12 +37,12 @@ import org.basex.gui.view.View;
  *  <li> add a boolean visibility flag with the view name included
  *    in the {@link GUIProp} class {@link GUIProp#SHOWMAP})</li>
  *  <li> add strings for the menu text and command description in the
- *    {@link Text} class (e.g. {@link Text#GUISHOWMAP} an
- *    {@link Text#GUISHOWMAPTT}).
+ *    {@link Text} class (e.g. {@link Text#MAP} an
+ *    {@link Text#H_MAP}).
  *  <li> optionally add localized translations in the .lang files
  *    (e.g. {@code c_showmap} and {@code c_showmaptt})
  *  <li> add a corresponding command in the {@link GUICommands} class
- *   (e.g. {@link GUICommands#SHOWMAP})and add a reference in the
+ *   (e.g. {@link GUICommands#C_SHOWMAP})and add a reference in the
  *   {@link #MENUITEMS} menu structure</li>
  * </ul>
  *
@@ -87,16 +86,17 @@ public final class GUIConstants {
 
   /** Toolbar entries, containing the button commands. */
   static final GUICommands[] TOOLBAR = {
-    CREATE, MANAGE, INFO, CLOSE, null, GOHOME, GOBACK, GOUP, GOFORWARD, null,
-    SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER,
-    SHOWPLOT, SHOWTABLE, SHOWEXPLORE
+    C_CREATE, C_MANAGE, C_INFO, C_CLOSE, null,
+    C_GOHOME, C_GOBACK, C_GOUP, C_GOFORWARD, null,
+    C_SHOWEDITOR, C_SHOWINFO, null, C_SHOWTEXT, C_SHOWMAP, C_SHOWTREE,
+    C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE
   };
 
   // MENUBARS =================================================================
 
   /** Top menu entries. */
   static final String[] MENUBAR = {
-    MENUDB, MENUQUERY, MENUVIEW, MENUNODES, MENUOPTIONS, MENUHELP
+    Text.DATABASE, Text.EDITOR, Text.VIEW, Text.NODES, Text.OPTIONS, Text.HELP
   };
 
   /**
@@ -104,33 +104,34 @@ public final class GUIConstants {
    * {@link #EMPTY} references serve as menu separators.
    */
   static final GUICommand[][] MENUITEMS = { {
-    CREATE, MANAGE, EMPTY,
-    INFO, EXPORT, CLOSE, EMPTY,
-    SERVER, Prop.MAC ? null : EMPTY,
-    Prop.MAC ? null : EXIT
+    C_CREATE, C_MANAGE, EMPTY,
+    C_INFO, C_EXPORT, C_CLOSE, EMPTY,
+    C_SERVER, Prop.MAC ? null : EMPTY,
+    Prop.MAC ? null : C_EXIT
   }, {
-    SHOWXQUERY, SHOWINFO, EMPTY,
-    EDITNEW, EDITOPEN, EDITSAVE, EDITSAVEAS, EDITCLOSE
+    C_EDITNEW, C_EDITOPEN, C_EDITSAVE, C_EDITSAVEAS, C_EDITCLOSE,
+    EMPTY, C_SHOWEDITOR, C_SHOWINFO
   }, {
-    SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, EMPTY,
-    SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE,
-    SHOWEXPLORE, EMPTY, FULL
+    C_SHOWBUTTONS, C_SHOWINPUT, C_SHOWSTATUS, EMPTY,
+    C_SHOWTEXT, C_SHOWMAP, C_SHOWTREE, C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE,
+    C_SHOWEXPLORE, EMPTY, C_FULL
   }, {
-    COPY, PASTE, DELETE, INSERT, EDIT, EMPTY,
-    COPYPATH, FILTER
+    C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, EMPTY,
+    C_COPYPATH, C_FILTER
   }, {
-    RTEXEC, RTFILTER, EMPTY,
-    COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
-    Prop.MAC ? null : PREFS
+    C_RTEXEC, C_RTFILTER, EMPTY,
+    C_COLOR, C_FONTS, C_MAPLAYOUT, C_TREEOPTIONS, Prop.MAC ? null : EMPTY,
+    Prop.MAC ? null : C_PREFS
   }, {
-    HELP, Prop.MAC ? null : EMPTY,
-    COMMUNITY, UPDATES, Prop.MAC ? null : EMPTY,
-    Prop.MAC ? null : ABOUT
+    C_HELP, Prop.MAC ? null : EMPTY,
+    C_COMMUNITY, C_UPDATES, Prop.MAC ? null : EMPTY,
+    Prop.MAC ? null : C_ABOUT
   }};
 
   /** Context menu entries. */
   public static final GUICommands[] POPUP = {
-    GOBACK, FILTER, null, COPY, PASTE, DELETE, INSERT, EDIT, null, COPYPATH
+    C_GOBACK, C_FILTER, null, C_COPY, C_PASTE, C_DELETE, C_INSERT, C_EDIT, null,
+    C_COPYPATH
   };
 
   // CURSORS ==================================================================
@@ -248,12 +249,10 @@ public final class GUIConstants {
   public static Font lfont;
   /** Font. */
   public static Font font;
-  /** Monospace font. */
-  public static Font mfont;
-  /** Monospace character widths. */
-  public static int[] mfwidth;
   /** Bold Font. */
   public static Font bfont;
+  /** Monospace font. */
+  public static Font mfont;
 
   /** Default monospace font widths. */
   private static int[] dwidth;
@@ -263,6 +262,8 @@ public final class GUIConstants {
   private static int[] fwidth;
   /** Bold character widths. */
   private static int[] bwidth;
+  /** Monospace character widths. */
+  public static int[] mfwidth;
 
   // KEYS =====================================================================
 
@@ -311,11 +312,22 @@ public final class GUIConstants {
     color2A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
     color3A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
 
+    final String f = prop.get(GUIProp.FONT);
+    final int type = prop.num(GUIProp.FONTTYPE);
+    final int size = prop.num(GUIProp.FONTSIZE);
+    font  = new Font(f, type, size);
+    mfont = new Font(prop.get(GUIProp.MONOFONT), type, size);
+    bfont = new Font(f, Font.BOLD, size);
+    lfont = new Font(f, type, size + 8);
     dfont = new Font(prop.get(GUIProp.MONOFONT), 0,
         UIManager.getFont("TextArea.font").getSize() - 1);
-    dwidth = new Container().getFontMetrics(dfont).getWidths();
 
-    initFonts(prop);
+    final Container comp = new Container();
+    dwidth  = comp.getFontMetrics(dfont).getWidths();
+    fwidth  = comp.getFontMetrics(font).getWidths();
+    lwidth  = comp.getFontMetrics(lfont).getWidths();
+    mfwidth = comp.getFontMetrics(mfont).getWidths();
+    bwidth  = comp.getFontMetrics(bfont).getWidths();
   }
 
   /**
@@ -328,31 +340,12 @@ public final class GUIConstants {
   }
 
   /**
-   * Initializes fonts.
-   * @param prop gui properties
-   */
-  public static void initFonts(final GUIProp prop) {
-    final Container comp = new Container();
-    final String f = prop.get(GUIProp.FONT);
-    final int type = prop.num(GUIProp.FONTTYPE);
-    final int size = prop.num(GUIProp.FONTSIZE);
-    font  = new Font(f, type, size);
-    mfont = new Font(prop.get(GUIProp.MONOFONT), type, size);
-    bfont = new Font(f, Font.BOLD, size);
-    lfont = new Font(f, type, size + 8);
-    fwidth  = comp.getFontMetrics(font).getWidths();
-    lwidth  = comp.getFontMetrics(lfont).getWidths();
-    mfwidth = comp.getFontMetrics(mfont).getWidths();
-    bwidth  = comp.getFontMetrics(bfont).getWidths();
-  }
-
-  /**
    * Returns the character widths for the current font.
    * @param f font reference
    * @return character widths
    */
   public static int[] fontWidths(final Font f) {
-    if(f == font) return fwidth;
+    if(f == font)  return fwidth;
     if(f == mfont) return mfwidth;
     if(f == bfont) return bwidth;
     if(f == lfont) return lwidth;

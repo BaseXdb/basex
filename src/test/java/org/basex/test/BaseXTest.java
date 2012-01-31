@@ -157,8 +157,8 @@ public abstract class BaseXTest extends MainTest {
    */
   @Test
   public void verbose() throws IOException {
-    contains(Text.QUERYEXEC.replaceAll(" %.*", ""), "-v", "-q1");
-    contains(Text.QUERYTOTAL, "-V", "-q1");
+    contains(Text.QUERY_EXECUTED_X.replaceAll(" %.*", ""), "-v", "-q1");
+    contains(Text.TOTAL_TIME_CC, "-V", "-q1");
   }
 
   /**

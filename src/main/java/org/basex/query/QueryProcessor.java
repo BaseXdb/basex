@@ -341,11 +341,11 @@ public final class QueryProcessor extends Progress {
 
   @Override
   public String tit() {
-    return QUERYEVAL;
+    return EVALUATING_C;
   }
 
   @Override
   public String det() {
-    return QUERYEVAL;
+    return EVALUATING_C;
   }
 }

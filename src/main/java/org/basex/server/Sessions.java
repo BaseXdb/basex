@@ -20,7 +20,7 @@ public final class Sessions extends CopyOnWriteArrayList<ClientListener> {
    */
   public synchronized String info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(SRVSESSIONS, size()).add(size() != 0 ? COL : DOT);
+    tb.addExt(SESSIONS_X, size()).add(size() != 0 ? COL : DOT);
 
     final StringList sl = new StringList();
     for(final ClientListener sp : this) {

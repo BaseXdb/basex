@@ -34,7 +34,7 @@ public final class DialogAbout extends Dialog {
    * @param main reference to the main window
    */
   public DialogAbout(final GUI main) {
-    super(main, ABOUTTITLE);
+    super(main, ABOUT);
 
     BaseXBack p = new BaseXBack(new BorderLayout(12, 0));
     p.setBackground(Color.white);
@@ -67,11 +67,11 @@ public final class DialogAbout extends Dialog {
     pp.add(new BaseXLabel(COPYRIGHT));
     pp.add(new BaseXLabel(LICENSE));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(new BaseXLabel(DEVELOPER));
+    pp.add(new BaseXLabel(CHIEF_ARCHITECT));
     pp.add(Box.createVerticalStrut(7));
-    pp.add(new BaseXLabel(CONTRIBUTE1));
-    pp.add(new BaseXLabel(CONTRIBUTE2));
-    pp.add(new BaseXLabel(CONTRIBUTE3));
+    pp.add(new BaseXLabel(TEAM1));
+    pp.add(new BaseXLabel(TEAM2));
+    pp.add(new BaseXLabel(TEAM3));
     pp.add(Box.createVerticalStrut(7));
     final String lang = main.context.mprop.get(MainProp.LANG);
     pp.add(new BaseXLabel(TRANSLATION + " (" + lang + "): " +
@@ -80,7 +80,7 @@ public final class DialogAbout extends Dialog {
     add(p, BorderLayout.NORTH);
 
     p = new BaseXBack();
-    p.add(newButtons(BUTTONOK));
+    p.add(newButtons(B_OK));
     add(p, BorderLayout.EAST);
 
     finish(null);

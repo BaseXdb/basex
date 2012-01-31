@@ -76,7 +76,7 @@ public final class DialogManage extends Dialog {
    * @param m show manage dialog
    */
   public DialogManage(final GUI main, final boolean m) {
-    super(main, m ? MANAGETITLE : OPENTITLE);
+    super(main, m ? MANAGE_DB : OPEN_DB);
 
     // create database chooser
     final StringList dbs = List.list(main.context, true);
@@ -92,10 +92,10 @@ public final class DialogManage extends Dialog {
     BaseXLayout.setWidth(detail, 400);
 
     // database buttons
-    copy = new BaseXButton(BUTTONCOPY, this);
-    rename = new BaseXButton(BUTTONRENAME, this);
-    open = new BaseXButton(BUTTONOPEN, this);
-    drop = new BaseXButton(BUTTONDROP, this);
+    copy = new BaseXButton(COPY_D, this);
+    rename = new BaseXButton(RENAME_D, this);
+    open = new BaseXButton(OPEN, this);
+    drop = new BaseXButton(DROP_D, this);
 
     // first tab
     final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);
@@ -109,10 +109,10 @@ public final class DialogManage extends Dialog {
     backups = new BaseXList(new String[] { }, this);
     backups.setSize(400, 380);
     // backup buttons
-    backup = new BaseXButton(BUTTONBACKUP, this);
-    restore = new BaseXButton(BUTTONRESTORE, this);
-    delete = new BaseXButton(BUTTONDELETE, this);
-    deleteAll = new BaseXButton(BUTTONDELALL + DOTS, this);
+    backup = new BaseXButton(BACKUP, this);
+    restore = new BaseXButton(RESTORE_D, this);
+    delete = new BaseXButton(DELETE, this);
+    deleteAll = new BaseXButton(DELETE_ALL + DOTS, this);
 
     // second tab
     final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);
@@ -122,7 +122,7 @@ public final class DialogManage extends Dialog {
         BorderLayout.SOUTH);
 
     final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(DIALOGINFO, tab1);
+    tabs.addTab(INFORMATION, tab1);
     tabs.addTab(BACKUPS, tab2);
 
     panel.setLayout(new BorderLayout(8, 0));
@@ -173,17 +173,17 @@ public final class DialogManage extends Dialog {
       for(final String s : dbs) {
         if(ctx.mprop.dbexists(s)) cmds.add(new DropDB(s));
       }
-      if(!Dialog.confirm(gui, Util.info(DROPCONF, cmds.size()))) return;
+      if(!Dialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
       refresh = true;
 
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, RENAMETITLE, gui, 1);
+      final DialogInput dr = new DialogInput(db, RENAME_DB, gui, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
       cmds.add(new AlterDB(db, dr.input()));
       refresh = true;
 
     } else if(cmp == copy) {
-      final DialogInput dc = new DialogInput(db, COPYTITLE, gui, 2);
+      final DialogInput dc = new DialogInput(db, COPY_DB, gui, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
       cmds.add(new Copy(db, dc.input()));
       refresh = true;
@@ -193,7 +193,8 @@ public final class DialogManage extends Dialog {
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.mprop.dbexists(db) || Dialog.confirm(gui, OVERWRITE))
+      if(!gui.context.mprop.dbexists(db) ||
+          Dialog.confirm(gui, OVERWRITE_DB_QUESTION))
         cmds.add(new Restore(db));
 
     } else if(cmp == backups) {
@@ -207,7 +208,7 @@ public final class DialogManage extends Dialog {
 
     } else if(cmp == deleteAll) {
       final String[] back = backups.getList();
-      if(!Dialog.confirm(gui, Util.info(DROPBACKUP, back.length))) return;
+      if(!Dialog.confirm(gui, Util.info(DROP_BACKUPS_X, back.length))) return;
       for(final String b : back) cmds.add(new DropBackup(b));
       refresh = true;
 
@@ -231,7 +232,8 @@ public final class DialogManage extends Dialog {
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
       } else {
-        detail.setText(dbs.size() == 1 ? Token.token(ONLYBACKUP) : Token.EMPTY);
+        detail.setText(dbs.size() == 1 ?
+            Token.token(ONLY_BACKUP) : Token.EMPTY);
       }
 
       // enable or disable buttons

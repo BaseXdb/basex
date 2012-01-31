@@ -119,8 +119,8 @@ public abstract class Data {
    */
   @SuppressWarnings("unused")
   public void init() throws IOException {
-    nameID = atnindex.id(DataText.NAME);
-    sizeID = atnindex.id(DataText.SIZE);
+    nameID = atnindex.id(DataText.T_NAME);
+    sizeID = atnindex.id(DataText.T_SIZE);
   }
 
   /**

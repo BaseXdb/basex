@@ -364,7 +364,7 @@ public final class MetaData {
         else if(k.equals(DBFTLN))     language   = Language.get(v);
       }
     }
-    if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
+    if(!storage.equals(STORAGE)) throw new BuildException(H_DB_FORMAT, storage);
     if(!istorage.equals(ISTORAGE)) {
       oldindex = true;
       update();

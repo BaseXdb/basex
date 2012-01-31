@@ -11,6 +11,6 @@ import static org.basex.data.DataText.*;
 final class JArray extends JStruct {
   @Override
   byte[] type() {
-    return ARR;
+    return T_ARRAY;
   }
 }

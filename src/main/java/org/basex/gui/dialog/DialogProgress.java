@@ -61,12 +61,12 @@ public final class DialogProgress extends Dialog implements ActionListener {
     final BaseXBack s = new BaseXBack(new BorderLayout()).border(10, 0, 0, 0);
     final BaseXBack m = new BaseXBack(new TableLayout(1, 2, 5, 0));
     mem = new BaseXMem(this, false);
-    m.add(new BaseXLabel(MEMUSED));
+    m.add(new BaseXLabel(MEMUSED_C));
     m.add(mem);
     s.add(m, BorderLayout.WEST);
 
     if(cmd.stoppable()) {
-      final BaseXButton cancel = new BaseXButton(BUTTONCANCEL, this);
+      final BaseXButton cancel = new BaseXButton(CANCEL, this);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);
@@ -152,11 +152,12 @@ public final class DialogProgress extends Dialog implements ActionListener {
           final String time = perf.toString();
           gui.info.setInfo(info, cmd, time, ok);
           gui.info.reset();
-          gui.status.setText(Util.info(PROCTIME, time));
+          gui.status.setText(Util.info(TIME_NEEDED_X, time));
 
           // close progress window and show error if command failed
           wait.dispose();
-          if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
+          if(!ok) Dialog.error(gui, info.equals(INTERRUPTED) ?
+              CREATION_CANCELED : info);
 
           // initialize views if database was closed before
           if(newData) gui.notify.init();

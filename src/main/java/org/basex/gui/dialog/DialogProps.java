@@ -53,14 +53,14 @@ public final class DialogProps extends Dialog {
    * @param main reference to the main window
    */
   public DialogProps(final GUI main) {
-    super(main, INFODB);
+    super(main, DB_PROPS);
     panel.setLayout(new BorderLayout(5, 0));
 
     final Data data = gui.context.data();
 
-    final BaseXButton okButton = new BaseXButton(BUTTONOK, this);
-    optimize = new BaseXButton(BUTTONOPT, this);
-    buttons = newButtons(optimize, okButton, BUTTONCANCEL);
+    final BaseXButton okButton = new BaseXButton(B_OK, this);
+    optimize = new BaseXButton(OPTIMIZE_D, this);
+    buttons = newButtons(optimize, okButton, CANCEL);
 
     // resource tree
     resources = new DialogResources(this);
@@ -75,7 +75,7 @@ public final class DialogProps extends Dialog {
     final String db = InfoDB.db(data.meta, true, false, true);
     final TokenBuilder info = new TokenBuilder(db);
     if(data.nspaces.size() != 0) {
-      info.bold().add(NL + INFONS + NL).norm().add(data.nspaces.info());
+      info.bold().add(NL + NAMESPACES + NL).norm().add(data.nspaces.info());
     }
 
     final BaseXEditor text = text(info.finish());
@@ -93,7 +93,7 @@ public final class DialogProps extends Dialog {
     tabNames.add(addIndex(false, data));
 
     final String[] cb = {
-        INFOPATHINDEX, INFOTEXTINDEX, INFOATTRINDEX, INFOFTINDEX };
+        PATH_INDEX, TEXT_INDEX, ATTRIBUTE_INDEX, FULLTEXT_INDEX };
     final boolean[] val = { data.meta.pathindex, data.meta.textindex,
         data.meta.attrindex, data.meta.ftxtindex };
 
@@ -108,19 +108,19 @@ public final class DialogProps extends Dialog {
     final BaseXBack tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
     panels[0].add(indexes[0], BorderLayout.NORTH);
     panels[0].add(text(val[0] ? data.info(IndexType.PATH) :
-      Token.token(PATHINDEXINFO)), BorderLayout.CENTER);
+      Token.token(H_PATH_INDEX)), BorderLayout.CENTER);
     tabPath.add(panels[0]);
 
     // tab: value indexes
     final BaseXBack tabValues = new BaseXBack(new GridLayout(2, 1)).border(8);
     panels[1].add(indexes[1], BorderLayout.NORTH);
     panels[1].add(text(val[1] ? data.info(IndexType.TEXT) :
-      Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
+      Token.token(H_TEXT_INDEX)), BorderLayout.CENTER);
     tabValues.add(panels[1]);
 
     panels[2].add(indexes[2], BorderLayout.NORTH);
     panels[2].add(text(val[2] ? data.info(IndexType.ATTRIBUTE) :
-      Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
+      Token.token(H_ATTR_INDEX)), BorderLayout.CENTER);
     tabValues.add(panels[2]);
 
     // tab: full-text index
@@ -132,12 +132,12 @@ public final class DialogProps extends Dialog {
     tabFT.add(panels[3]);
 
     final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(GENERALINFO, tabInfo);
-    tabs.addTab(INFORES, tabRes);
-    tabs.addTab(NAMESINFO, tabNames);
-    tabs.addTab(INFOPATHINDEX, tabPath);
-    tabs.addTab(INDEXINFO, tabValues);
-    tabs.addTab(FTINFO, tabFT);
+    tabs.addTab(GENERAL, tabInfo);
+    tabs.addTab(RESOURCES, tabRes);
+    tabs.addTab(NAMES, tabNames);
+    tabs.addTab(PATH_INDEX, tabPath);
+    tabs.addTab(INDEXES, tabValues);
+    tabs.addTab(FULLTEXT, tabFT);
 
     final BaseXBack back = new BaseXBack(new BorderLayout());
     back.add(tabs, BorderLayout.CENTER);
@@ -161,9 +161,9 @@ public final class DialogProps extends Dialog {
    */
   static IO save(final GUI gui, final boolean single) {
     // open file chooser for XML creation
-    final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
+    final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
         gui.gprop.get(GUIProp.SAVEPATH), gui);
-    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
+    fc.addFilter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
     final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
       BaseXFileChooser.Mode.DSAVE);
@@ -179,8 +179,8 @@ public final class DialogProps extends Dialog {
    */
   private BaseXBack addIndex(final boolean elem, final Data data) {
     final BaseXBack p = new BaseXBack(new BorderLayout());
-    String lbl = elem ? INFOTAGS : INFOATTS;
-    if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
+    String lbl = elem ? ELEMENTS : ATTRIBUTES;
+    if(!data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
     final IndexType index = elem ? IndexType.TAG : IndexType.ATTNAME;
     p.add(text(data.info(index)), BorderLayout.CENTER);
@@ -217,7 +217,7 @@ public final class DialogProps extends Dialog {
     opt = cmp == optimize;
     if(opt) close();
     if(ft != null) ft.action(indexes[3].isSelected());
-    enableOK(buttons, BUTTONOPT, !gui.context.data().meta.uptodate);
+    enableOK(buttons, OPTIMIZE_D, !gui.context.data().meta.uptodate);
   }
 
   @Override

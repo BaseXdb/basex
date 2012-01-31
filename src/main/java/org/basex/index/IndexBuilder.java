@@ -59,7 +59,7 @@ public abstract class IndexBuilder extends Progress {
   protected final boolean memFull() throws IOException {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
-      if(cc >= 0) throw new BaseXException(PROCMEM + PROCMEMCREATE);
+      if(cc >= 0) throw new BaseXException(OUT_OF_MEM + HELP_OUT_OF_MEM);
       if(Util.debug) Util.err("!");
       merge = true;
       cc = 30;
@@ -82,7 +82,7 @@ public abstract class IndexBuilder extends Progress {
 
   @Override
   public final String tit() {
-    return PROGINDEX;
+    return CREATING_INDEXES;
   }
 
   @Override

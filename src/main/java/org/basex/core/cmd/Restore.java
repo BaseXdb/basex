@@ -36,7 +36,7 @@ public final class Restore extends Command {
   @Override
   protected boolean run() {
     String db = args[0];
-    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     // find backup file with or without date suffix
     File file = mprop.dbpath(db + IO.ZIPSUFFIX);
@@ -48,16 +48,17 @@ public final class Restore extends Command {
       final Pattern pa = Pattern.compile(IO.DATEPATTERN + '$');
       db = pa.split(db)[0];
     }
-    if(!file.exists()) return error(DBBACKNF, db);
+    if(!file.exists()) return error(BACKUP_NOT_FOUND_X, db);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, db);
     // check if database is still pinned
-    if(context.pinned(db)) return error(DBPINNED, db);
+    if(context.pinned(db)) return error(DB_PINNED_X, db);
 
     // try to restore database
     return restore(file) && (!closed || new Open(db).run(context)) ?
-        info(DBRESTORE, file.getName(), perf) : error(DBNORESTORE, db);
+        info(DB_RESTORED_X, file.getName(), perf) :
+          error(DB_NOT_RESTORED_X, db);
   }
 
   /**
@@ -77,7 +78,7 @@ public final class Restore extends Command {
 
   @Override
   protected String tit() {
-    return BUTTONRESTORE;
+    return RESTORE_D;
   }
 
   @Override

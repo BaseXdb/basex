@@ -65,7 +65,7 @@ public final class IOUrl extends IO {
     } catch(final RuntimeException ex) {
       // catch unexpected runtime exceptions
       Util.debug(ex);
-      throw new BaseXException(PARSEERR, path);
+      throw new BaseXException(NOT_PARSED_X, path);
     }
   }
 

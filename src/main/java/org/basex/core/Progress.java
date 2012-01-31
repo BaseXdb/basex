@@ -112,7 +112,7 @@ public abstract class Progress {
    * @return header information
    */
   protected String tit() {
-    return INFOWAIT;
+    return PLEASE_WAIT_D;
   }
 
   /**
@@ -120,7 +120,7 @@ public abstract class Progress {
    * @return header information
    */
   protected String det() {
-    return INFOWAIT;
+    return PLEASE_WAIT_D;
   }
 
   /**

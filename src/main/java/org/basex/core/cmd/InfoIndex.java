@@ -41,7 +41,7 @@ public final class InfoIndex extends AInfo {
     final Data data = context.data();
     if(args[0] != null) {
       final CmdIndexInfo ci = getOption(CmdIndexInfo.class);
-      if(ci == null) return error(CMDUNKNOWN, this);
+      if(ci == null) return error(UNKNOWN_CMD_X, this);
       final byte[] inf = info(ci, data);
       out.print(inf);
       return inf.length != 0;
@@ -66,17 +66,17 @@ public final class InfoIndex extends AInfo {
    */
   public static byte[] info(final CmdIndexInfo idx, final Data data) {
     switch(idx) {
-      case TAG:       return info(INFOTAGS, IndexType.TAG, data, true);
-      case ATTNAME:   return info(INFOATTS, IndexType.ATTNAME, data, true);
-      case TEXT:      return info(INFOTEXTINDEX, IndexType.TEXT, data,
+      case TAG:       return info(ELEMENTS, IndexType.TAG, data, true);
+      case ATTNAME:   return info(ATTRIBUTES, IndexType.ATTNAME, data, true);
+      case TEXT:      return info(TEXT_INDEX, IndexType.TEXT, data,
           data.meta.textindex);
-      case ATTRIBUTE: return info(INFOATTRINDEX, IndexType.ATTRIBUTE, data,
+      case ATTRIBUTE: return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data,
           data.meta.attrindex);
-      case FULLTEXT:  return info(INFOFTINDEX, IndexType.FULLTEXT, data,
+      case FULLTEXT:  return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data,
           data.meta.ftxtindex);
-      case PATH:      return info(INFOPATHINDEX, IndexType.PATH, data,
+      case PATH:      return info(PATH_INDEX, IndexType.PATH, data,
           data.meta.pathindex);
-      default:        return Token.token(LI + INDNOTAVL);
+      default:        return Token.token(LI + NOT_AVAILABLE);
     }
   }
 
@@ -93,7 +93,7 @@ public final class InfoIndex extends AInfo {
 
     final TokenBuilder tb = new TokenBuilder(ds).add(NL);
     if(avl) tb.add(data.info(it));
-    else tb.add(LI).addExt(INDNOTAVL, it).add(NL);
+    else tb.add(LI).addExt(NOT_AVAILABLE, it).add(NL);
     return tb.add(NL).finish();
   }
 

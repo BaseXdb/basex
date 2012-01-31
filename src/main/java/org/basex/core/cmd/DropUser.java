@@ -42,22 +42,23 @@ public final class DropUser extends AUser {
   @Override
   protected boolean run(final String user, final String db) {
     // admin cannot be dropped
-    if(user.equals(ADMIN)) return !info(USERADMIN);
+    if(user.equals(ADMIN)) return !info(ADMIN_STATIC_X);
 
     // drop global user
     if(db == null) {
       for(final ClientListener s : context.sessions) {
-        if(s.context().user.name.equals(user)) return !info(USERLOG, user);
+        if(s.context().user.name.equals(user))
+          return !info(USER_LOGGED_IN_X, user);
       }
       context.users.drop(context.users.get(user));
-      return info(USERDROP, user);
+      return info(USER_DROPPED_X, user);
     }
 
     // drop local user
     try {
       final Data data = Open.open(db, context);
       if(data.meta.users.drop(data.meta.users.get(user))) {
-        info(USERDROPON, user, db);
+        info(USER_DROPPED_X_X, user, db);
         data.meta.dirty = true;
         data.flush();
       }
@@ -66,7 +67,7 @@ public final class DropUser extends AUser {
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();
-      return !info(msg.isEmpty() ? DBOPENERR : msg, db);
+      return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
     }
   }
 

@@ -180,9 +180,9 @@ public final class QueryException extends Exception {
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
     if(lineCol != null) {
-      tb.add(STOPPED).add(' ').addExt(LINEINFO, lineCol[0]);
-      if(lineCol[1] != 0) tb.add(QueryText.SEP).addExt(COLINFO, lineCol[1]);
-      if(file != null) tb.add(' ').addExt(FILEINFO, file);
+      tb.add(STOPPED_AT).add(' ').addExt(LINE_X, lineCol[0]);
+      if(lineCol[1] != 0) tb.add(QueryText.SEP).addExt(COLUMN_X, lineCol[1]);
+      if(file != null) tb.add(' ').addExt(IN_FILE_X, file);
       tb.add(COL).add(NL);
     }
     final byte[] code = name.local();

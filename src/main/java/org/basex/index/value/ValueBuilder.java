@@ -234,6 +234,6 @@ public final class ValueBuilder extends IndexBuilder {
 
   @Override
   public String det() {
-    return text ? INDEXTXT : INDEXATT;
+    return text ? INDEX_TEXT_D : INDEX_ATTRIBUTES_D;
   }
 }

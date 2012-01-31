@@ -39,14 +39,14 @@ public final class ListDB extends Command {
     final int s = str.indexOf('/');
     final String db = s == -1 ? str : str.substring(0, s);
     final String path = s == -1 ? "" : str.substring(s + 1);
-    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     final Table table = new Table();
-    table.description = INFORES;
-    table.header.add(INFOPATH);
-    table.header.add(INFOTYPE);
+    table.description = RESOURCES;
+    table.header.add(INPUT_PATH);
+    table.header.add(TYPE);
     table.header.add(DataText.CONTENT_TYPE);
-    table.header.add(INFODBSIZE);
+    table.header.add(SIZE);
 
     try {
       // add xml documents
@@ -77,7 +77,7 @@ public final class ListDB extends Command {
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();
-      return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
+      return msg.isEmpty() ? error(DB_NOT_OPENED_X, db) : error(msg);
     }
     table.sort();
     out.println(table.finish());

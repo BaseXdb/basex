@@ -99,7 +99,7 @@ public final class BaseXServer extends Main implements Runnable {
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
     // check if ports are distinct
-    if(port == eport) throw new BaseXException(SERVERPORTS, port);
+    if(port == eport) throw new BaseXException(PORT_TWICE_X, port);
 
     final String host = mprop.get(MainProp.SERVERHOST);
     final InetAddress addr = host.isEmpty() ? null :
@@ -107,14 +107,14 @@ public final class BaseXServer extends Main implements Runnable {
 
     if(service) {
       start(port, args);
-      Util.outln(SERVERSTART);
+      Util.outln(SRV_STARTED);
       Performance.sleep(1000);
       return;
     }
 
     if(stopped) {
       stop(port, eport);
-      Util.outln(SERVERSTOPPED);
+      Util.outln(SRV_STOPPED);
       Performance.sleep(1000);
       return;
     }
@@ -124,7 +124,7 @@ public final class BaseXServer extends Main implements Runnable {
       for(final String c : commands) execute(c);
 
       log = new Log(context, quiet);
-      log.write(SERVERSTART);
+      log.write(SRV_STARTED);
 
       socket = new ServerSocket();
       socket.setReuseAddress(true);
@@ -138,16 +138,16 @@ public final class BaseXServer extends Main implements Runnable {
       Runtime.getRuntime().addShutdownHook(new Thread() {
         @Override
         public void run() {
-          log.write(SERVERSTOPPED);
+          log.write(SRV_STOPPED);
           log.close();
-          Util.outln(SERVERSTOPPED);
+          Util.outln(SRV_STOPPED);
         }
       });
 
       new Thread(this).start();
       while(!running) Performance.sleep(100);
 
-      Util.outln(CONSOLE + (console ? CONSOLE2 : SERVERSTART), SERVERMODE);
+      Util.outln(CONSOLE + (console ? TRY_MORE_X : SRV_STARTED), SERVERMODE);
 
       if(console) {
         console();
@@ -166,7 +166,7 @@ public final class BaseXServer extends Main implements Runnable {
       try {
         final Socket s = socket.accept();
         if(stop.exists()) {
-          if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
+          if(!stop.delete()) log.write(Util.info(FILE_NOT_DELETED_X, stop));
           quit();
         } else {
           // drop inactive connections
@@ -290,7 +290,7 @@ public final class BaseXServer extends Main implements Runnable {
       throws BaseXException {
 
     // check if server is already running (needs some time)
-    if(ping(LOCALHOST, port)) throw new BaseXException(SERVERBIND);
+    if(ping(LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
 
     Util.start(BaseXServer.class, args);
 
@@ -299,7 +299,7 @@ public final class BaseXServer extends Main implements Runnable {
       if(ping(LOCALHOST, port)) return;
       Performance.sleep(100);
     }
-    throw new BaseXException(SERVERERROR);
+    throw new BaseXException(CONNECTION_ERROR);
   }
 
   /**

@@ -48,11 +48,11 @@ public final class BaseXClient extends BaseX {
     if(session == null) {
       // user/password input
       while(user == null) {
-        Util.out(SERVERUSER + COLS);
+        Util.out(USERNAME + COLS);
         user = Util.input();
       }
       while(pass == null) {
-        Util.out(SERVERPW + COLS);
+        Util.out(PASSWORD + COLS);
         pass = Util.password();
       }
       session = new ClientSession(context, user, pass, out);

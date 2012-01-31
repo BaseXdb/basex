@@ -62,7 +62,7 @@ public final class DiskData extends Data {
 
     // don't allow to open locked databases
     if(updateFile().exists())
-      throw new BaseXException(Text.DBUPDATED, meta.name);
+      throw new BaseXException(Text.DB_UPDATED_X, meta.name);
 
     final DataInput in = new DataInput(meta.dbfile(DATAINF));
     try {

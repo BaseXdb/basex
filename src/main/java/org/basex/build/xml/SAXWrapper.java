@@ -120,7 +120,7 @@ public final class SAXWrapper extends SingleParser {
       if(is != null) r.parse(is);
       else r.parse(saxs.getSystemId());
     } catch(final SAXParseException ex) {
-      final String msg = Util.info(SCANPOS, in, ex.getLineNumber(),
+      final String msg = Util.info(SCANPOS_X_X, in, ex.getLineNumber(),
           ex.getColumnNumber()) + COLS + ex.getMessage();
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());
@@ -202,7 +202,7 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public String det() {
-    return length == 0 ? super.det() : Util.info(SCANPOS, src.name(), line);
+    return length == 0 ? super.det() : Util.info(SCANPOS_X_X, src.name(), line);
   }
 
   @Override

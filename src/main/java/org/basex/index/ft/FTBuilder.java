@@ -83,9 +83,10 @@ public abstract class FTBuilder extends IndexBuilder {
     fto.sw = new StopWords(d, prop.get(Prop.STOPWORDS));
     fto.ln = Language.get(prop);
 
-    if(!Tokenizer.supportFor(fto.ln)) throw new BaseXException(NOTOK, fto.ln);
+    if(!Tokenizer.supportFor(fto.ln))
+      throw new BaseXException(NO_TOKENIZER_X, fto.ln);
     if(prop.is(Prop.STEMMING) && !Stemmer.supportFor(fto.ln))
-      throw new BaseXException(NOSTEM, fto.ln);
+      throw new BaseXException(NO_STEMMER_X, fto.ln);
 
     scm = d.meta.scoring;
     max = -1;
@@ -313,6 +314,6 @@ public abstract class FTBuilder extends IndexBuilder {
 
   @Override
   public final String det() {
-    return INDEXFTX;
+    return INDEX_FULLTEXT_D;
   }
 }

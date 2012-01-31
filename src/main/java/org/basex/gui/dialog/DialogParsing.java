@@ -101,12 +101,12 @@ public final class DialogParsing extends BaseXBack {
     parser = new BaseXCombo(d, parsers.toArray());
     parser.setSelectedItem(prop.get(Prop.PARSER));
 
-    intparse = new BaseXCheckBox(CREATEINTPARSE, prop.is(Prop.INTPARSE), 0, d);
-    dtd = new BaseXCheckBox(CREATEDTD, prop.is(Prop.DTD), 12, d);
-    chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, d);
+    intparse = new BaseXCheckBox(INT_PARSER, prop.is(Prop.INTPARSE), 0, d);
+    dtd = new BaseXCheckBox(PARSE_DTDS, prop.is(Prop.DTD), 12, d);
+    chop = new BaseXCheckBox(CHOP_WS, prop.is(Prop.CHOP), 0, d);
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), d);
-    browsec = new BaseXButton(BUTTONBROWSE, d);
-    usecat = new BaseXCheckBox(USECATFILE,
+    browsec = new BaseXButton(BROWSE_D, d);
+    usecat = new BaseXCheckBox(USE_CATALOG_FILE,
         !prop.get(Prop.CATFILE).isEmpty(), 0, d);
 
     lines = new BaseXCheckBox("Lines", props.is(ParserProp.LINES), 0, d);
@@ -134,10 +134,10 @@ public final class DialogParsing extends BaseXBack {
    */
   void createOptionsPanels() {
     xmlopts.add(intparse);
-    xmlopts.add(new BaseXLabel(INTPARSEINFO, true, false));
+    xmlopts.add(new BaseXLabel(H_INT_PARSER, true, false));
     xmlopts.add(dtd);
     xmlopts.add(chop);
-    xmlopts.add(new BaseXLabel(CHOPPINGINFO, false, false).border(0, 0, 8, 0));
+    xmlopts.add(new BaseXLabel(H_CHOP_WS, false, false).border(0, 0, 8, 0));
     xmlopts.add(new BaseXLabel());
 
     // catalog resolver
@@ -157,30 +157,30 @@ public final class DialogParsing extends BaseXBack {
     xmlopts.add(fl);
     if(!rsen) {
       final BaseXBack rs = new BaseXBack(new TableLayout(2, 1));
-      rs.add(new BaseXLabel(USECATHLP).color(GUIConstants.DGRAY));
-      rs.add(new BaseXLabel(USECATHLP2).color(GUIConstants.DGRAY));
+      rs.add(new BaseXLabel(HELP1_USE_CATALOG).color(GUIConstants.DGRAY));
+      rs.add(new BaseXLabel(HELP2_USE_CATALOG).color(GUIConstants.DGRAY));
       xmlopts.add(rs);
     }
 
     BaseXBack p = new BaseXBack(new TableLayout(3, 2, 8, 4));
-    p.add(new BaseXLabel(INFOENCODING + COL, true, false));
+    p.add(new BaseXLabel(ENCODING + COL, true, false));
     p.add(cencoding);
-    p.add(new BaseXLabel(SEPARATORINFO, true, false));
+    p.add(new BaseXLabel(SEPARATOR, true, false));
     p.add(separator);
-    p.add(new BaseXLabel(FORMINFO, true, false));
+    p.add(new BaseXLabel(XML_FORMAT, true, false));
     p.add(format);
     csvopts.add(p);
     p = new BaseXBack(new TableLayout(2, 1));
     p.add(header);
-    p.add(new BaseXLabel(HEADERINFO, true, false));
+    p.add(new BaseXLabel(FIRST_LINE_HEADER, true, false));
     csvopts.add(p);
 
     p = new BaseXBack(new TableLayout(1, 2, 8, 4));
-    p.add(new BaseXLabel(INFOENCODING + COL, true, false));
+    p.add(new BaseXLabel(ENCODING + COL, true, false));
     p.add(tencoding);
     textopts.add(p);
     textopts.add(lines);
-    textopts.add(new BaseXLabel(LINESINFO, true, false));
+    textopts.add(new BaseXLabel(SPLIT_INPUT_LINES, true, false));
   }
 
   /**
@@ -191,10 +191,10 @@ public final class DialogParsing extends BaseXBack {
     main.removeAll();
 
     final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    p.add(new BaseXLabel(CREATEFORMAT, true, true));
+    p.add(new BaseXLabel(INPUT_FORMAT, true, true));
     p.add(parser);
     main.add(p);
-    main.add(new BaseXLabel(FORMATINFO, true, false));
+    main.add(new BaseXLabel(H_INPUT_FORMAT, true, false));
 
     if(type.equals(DataText.M_XML)) {
       parseropts = xmlopts;
@@ -216,9 +216,9 @@ public final class DialogParsing extends BaseXBack {
    */
   void catchoose() {
     final GUIProp gprop = gui.gprop;
-    final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
+    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
         gprop.get(GUIProp.CREATEPATH), gui);
-    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
+    fc.addFilter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
     if(file != null) cfile.setText(file.path());

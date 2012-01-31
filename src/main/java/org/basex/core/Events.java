@@ -88,7 +88,7 @@ public final class Events extends HashMap<String, Sessions> {
    */
   public synchronized String info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(EVENTS, size()).add(size() != 0 ? COL : DOT);
+    tb.addExt(EVENTS_X, size()).add(size() != 0 ? COL : DOT);
 
     final String[] names = keySet().toArray(new String[size()]);
     Arrays.sort(names);

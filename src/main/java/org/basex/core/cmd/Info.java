@@ -37,19 +37,19 @@ public final class Info extends AInfo {
    */
   public static String info(final Context context) {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(INFOGENERAL + NL);
+    tb.add(GENERAL_INFO + NL);
     format(tb, VERSINFO, VERSION);
     if(context.user.perm(User.CREATE)) {
       Performance.gc(3);
-      format(tb, INFOMEM, Performance.getMem());
+      format(tb, USED_MEM, Performance.getMem());
     }
     if(context.user.perm(User.ADMIN)) {
       final AProp prop = context.mprop;
-      tb.add(NL + INFOMOPTIONS + NL);
+      tb.add(NL + MAIN_OPTIONS + NL);
       for(final String s : prop) format(tb, s, prop.get(s).toString());
     }
     final AProp prop = context.prop;
-    tb.add(NL + INFOOPTIONS + NL);
+    tb.add(NL + OPTIONS + NL);
     for(final String s : prop) format(tb, s, prop.get(s).toString());
     return tb.toString();
   }

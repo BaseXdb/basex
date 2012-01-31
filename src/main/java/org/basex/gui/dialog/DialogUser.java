@@ -85,19 +85,19 @@ final class DialogUser extends BaseXBack {
     user = new BaseXTextField("", dia);
     user.addKeyListener(dia.keys);
     BaseXLayout.setWidth(user, 100);
-    create = new BaseXButton(BUTTONCREATE, dia);
+    create = new BaseXButton(CREATE, dia);
     pass = new BaseXPassword(dia.gui);
     pass.addKeyListener(dia.keys);
     BaseXLayout.setWidth(pass, 100);
-    alter = new BaseXButton(BUTTONALTER, dia);
-    drop = new BaseXButton(BUTTONDROP, dia);
+    alter = new BaseXButton(S_ALTER, dia);
+    drop = new BaseXButton(DROP_D, dia);
     info = new BaseXLabel(" ");
 
-    add(new BaseXLabel(CREATEU + COLS, false, true));
+    add(new BaseXLabel(S_CREATEU + COLS, false, true));
     BaseXBack p = new BaseXBack(new TableLayout(1, 5, 8, 0)).border(0, 0, 5, 0);
-    p.add(new BaseXLabel(SERVERUSER + COLS));
+    p.add(new BaseXLabel(USERNAME + COLS));
     p.add(user);
-    p.add(new BaseXLabel(SERVERPW + COLS));
+    p.add(new BaseXLabel(PASSWORD + COLS));
     p.add(pass);
     p.add(create);
     add(p);
@@ -107,13 +107,13 @@ final class DialogUser extends BaseXBack {
     databases = new BaseXCombo(dia);
     BaseXLayout.setWidth(databases, 210);
     addUser = new BaseXCombo(dia);
-    add = new BaseXButton(BUTTONADD, dia);
+    add = new BaseXButton(ADD, dia);
     BaseXLayout.setWidth(addUser, 131);
 
     if(!global) {
       p = new BaseXBack(new TableLayout(2, 3, 8, 2));
       p.add(new BaseXLabel(DATABASES + COL, false, true));
-      p.add(new BaseXLabel(BUTTONADD + COL, false, true));
+      p.add(new BaseXLabel(ADD + COL, false, true));
       p.add(new BaseXLabel());
       p.add(databases);
       p.add(addUser);
@@ -122,7 +122,7 @@ final class DialogUser extends BaseXBack {
     }
 
     p = new BaseXBack(new TableLayout(2, 2, 8, 5));
-    p.add(new BaseXLabel(global ? GLOBPERM : LOCPERM, false, true));
+    p.add(new BaseXLabel(global ? S_GLOBPERM : S_LOCPERM, false, true));
     p.add(new BaseXLabel());
 
     table = new BaseXTable(users, dia);
@@ -161,7 +161,7 @@ final class DialogUser extends BaseXBack {
             (Integer) o[1], 0).toString();
 
         final boolean confirm = !g && uname.equals(dia.loguser.getText());
-        if(confirm && !Dialog.confirm(dia.gui, Util.info(DBREVOKE))) return;
+        if(confirm && !Dialog.confirm(dia.gui, Util.info(S_DBREVOKE))) return;
 
         sess.execute(new Grant(perm, uname, db));
         msg = sess.info();
@@ -191,7 +191,7 @@ final class DialogUser extends BaseXBack {
       } else if(cmp == drop) {
         String msg2 = "";
         final int[] rows = table.getSelectedRows();
-        if(Dialog.confirm(dia.gui, Util.info(DRQUESTION, rows.length))) {
+        if(Dialog.confirm(dia.gui, Util.info(S_DRQUESTION, rows.length))) {
           for(final int r : rows) {
             sess.execute(new DropUser(table.data.value(r, 0), db));
             if(msg == null) msg = sess.info();
@@ -248,8 +248,8 @@ final class DialogUser extends BaseXBack {
 
     Msg icon = ok ? Msg.SUCCESS : Msg.ERROR;
     if(msg == null && !(valname && valpass && newname && valdrop)) {
-      msg = !newname ? Util.info(USERKNOWN, user.getText()) : !valdrop ?
-          USERADMIN : Util.info(INVALID, !valname ? SERVERUSER : SERVERPW);
+      msg = !newname ? Util.info(USER_EXISTS_X, user.getText()) : !valdrop ?
+          ADMIN_STATIC_X : Util.info(INVALID_X, !valname ? USERNAME : PASSWORD);
       icon = Msg.WARN;
     }
     info.setText(msg, icon);

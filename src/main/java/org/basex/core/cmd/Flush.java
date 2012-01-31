@@ -28,6 +28,6 @@ public final class Flush extends Command {
     prop.set(Prop.AUTOFLUSH, true);
     data.flush();
     prop.set(Prop.AUTOFLUSH, af);
-    return info(DBFLUSHED, data.meta.name, perf);
+    return info(DB_FLUSHED_X, data.meta.name, perf);
   }
 }

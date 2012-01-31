@@ -113,9 +113,9 @@ public abstract class View extends BaseXPanel {
     } else if(SPACE.is(e)) {
       gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
     } else if(ENTER.is(e)) {
-      GUICommands.FILTER.execute(gui);
+      GUICommands.C_FILTER.execute(gui);
     } else if(GOBACK2.is(e)) {
-      GUICommands.GOBACK.execute(gui);
+      GUICommands.C_GOBACK.execute(gui);
     }
   }
 

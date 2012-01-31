@@ -42,10 +42,10 @@ public final class List extends Command {
     table.description = DATABASES;
 
     final boolean create = context.user.perm(User.CREATE);
-    table.header.add(INFODBNAME);
-    table.header.add(INFORES);
-    table.header.add(INFODBSIZE);
-    if(create) table.header.add(INFOPATH);
+    table.header.add(T_NAME);
+    table.header.add(RESOURCES);
+    table.header.add(SIZE);
+    if(create) table.header.add(INPUT_PATH);
 
     for(final String name : list(context)) {
       DataInput di = null;
@@ -60,7 +60,7 @@ public final class List extends Command {
         docs = meta.ndocs;
         if(context.perm(User.READ, meta)) file = meta.original.toString();
       } catch(final IOException ex) {
-        file = INFODBERR;
+        file = ERROR;
       } finally {
         if(di != null) try { di.close(); } catch(final IOException ex) { }
       }

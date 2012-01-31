@@ -56,13 +56,13 @@ public final class DialogExport extends Dialog {
    * @param main reference to the main window
    */
   public DialogExport(final GUI main) {
-    super(main, GUIEXPORT);
+    super(main, EXPORT_XML);
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack(new TableLayout(3, 1, 0, 4));
 
     BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 0));
-    out = new BaseXLabel(OUTDIR + COL, true, true).border(0, 0, 4, 0);
+    out = new BaseXLabel(OUTPUT_DIR + COL, true, true).border(0, 0, 4, 0);
     p.add(out);
     p.add(new BaseXLabel());
 
@@ -71,7 +71,7 @@ public final class DialogExport extends Dialog {
     path.addKeyListener(keys);
     p.add(path);
 
-    final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
+    final BaseXButton browse = new BaseXButton(BROWSE_D, this);
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) { choose(); }
@@ -80,7 +80,7 @@ public final class DialogExport extends Dialog {
     pp.add(p);
 
     p = new BaseXBack(new TableLayout(2, 1));
-    p.add(new BaseXLabel(INFOENCODING + COL, true, true).border(0, 0, 4, 0));
+    p.add(new BaseXLabel(ENCODING + COL, true, true).border(0, 0, 4, 0));
 
     final Prop prop = gui.context.prop;
     SerializerProp sp = null;
@@ -105,7 +105,7 @@ public final class DialogExport extends Dialog {
     p.add(encoding);
     pp.add(p);
 
-    format = new BaseXCheckBox(OUTINDENT,
+    format = new BaseXCheckBox(INDENT_WITH_WS,
         sp.get(SerializerProp.S_INDENT).equals(YES), 0, this);
     pp.add(format);
     set(pp, BorderLayout.CENTER);
@@ -146,7 +146,7 @@ public final class DialogExport extends Dialog {
    * Opens a file dialog to choose an XML document or directory.
    */
   void choose() {
-    final IOFile io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).
+    final IOFile io = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).
       select(BaseXFileChooser.Mode.DOPEN);
     if(io != null) path.setText(io.path());
   }
@@ -163,9 +163,9 @@ public final class DialogExport extends Dialog {
   public void action(final Object cmp) {
     final IOFile io = new IOFile(path());
     ok = !path().isEmpty();
-    info.setText(io.children().length > 0 ? OVERFILE
+    info.setText(io.children().length > 0 ? DIR_NOT_EMPTY
         : null, ok ? Msg.WARN : Msg.ERROR);
-    enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, B_OK, ok);
   }
 
   @Override

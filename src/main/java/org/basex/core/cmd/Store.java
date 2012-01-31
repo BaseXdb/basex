@@ -44,12 +44,13 @@ public final class Store extends ACreate {
   protected boolean run() {
     final boolean create = context.user.perm(User.CREATE);
     String path = MetaData.normPath(args[0]);
-    if(path == null || path.endsWith(".")) return error(NAMEINVALID, args[0]);
+    if(path == null || path.endsWith("."))
+      return error(NAME_INVALID_X, args[0]);
 
     if(in == null) {
       final IO io = IO.get(args[1]);
       if(!io.exists() || io.isDir())
-        return error(FILEWHICH, create ? io : args[1]);
+        return error(FILE_NOT_FOUND_X, create ? io : args[1]);
       in = io.inputSource();
       // set/add name of document
       if((path.isEmpty() || path.endsWith("/")) && !(io instanceof IOContent))
@@ -57,12 +58,12 @@ public final class Store extends ACreate {
     }
 
     // ensure that the final name is not empty
-    if(path.isEmpty()) return error(NAMEINVALID, path);
+    if(path.isEmpty()) return error(NAME_INVALID_X, path);
 
     // ensure that the name is not empty and contains no trailing dots
     final IOFile file = context.data().meta.binary(path);
     if(path.isEmpty() || path.endsWith(".") || file == null || file.isDir())
-      return error(NAMEINVALID, create ? path : args[0]);
+      return error(NAME_INVALID_X, create ? path : args[0]);
 
     // add directory if it does not exist anyway
     new IOFile(file.dir()).md();
@@ -70,9 +71,9 @@ public final class Store extends ACreate {
     try {
       store(in, file);
     } catch(final IOException ex) {
-      return error(DBNOTSTORED, ex.getMessage());
+      return error(FILE_NOT_STORED_X, ex.getMessage());
     }
-    return info(QUERYEXEC, perf);
+    return info(QUERY_EXECUTED_X, perf);
   }
 
   /**

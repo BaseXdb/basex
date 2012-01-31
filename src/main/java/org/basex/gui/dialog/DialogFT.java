@@ -69,13 +69,13 @@ final class DialogFT extends BaseXBack {
     layout(new TableLayout(create ? 9 : 16, 1));
 
     final Prop prop = d.gui.context.prop;
-    add(new BaseXLabel(FTINDEXINFO, true, false));
+    add(new BaseXLabel(H_FULLTEXT_INDEX, true, false));
 
     final String sw = prop.get(Prop.STOPWORDS);
-    final String[] cb = { CREATELN, CREATEWC, CREATEST, CREATECS,
-        CREATEDC, CREATESCT, CREATESW };
-    final String[] desc = { FTLANGINFO, WCINDEXINFO, FTSTEMINFO, FTCSINFO,
-        FTDCINFO, FTSCINFO, FTSWINFO };
+    final String[] cb = { LANGUAGE, SUPPORT_WILDCARDS, STEMMING,
+        CASE_SENSITIVITY, DIACRITICS, TFIDF_SCORING, STOPWORD_LIST };
+    final String[] desc = { H_LANGUAGE, H_WILDCARD, H_STEMMING, H_CASE,
+        H_DIACRITICS, H_SCORING, H_STOPWORDS };
     final boolean[] val = {
         !prop.get(Prop.LANGUAGE).isEmpty(), prop.is(Prop.WILDCARDS),
         prop.is(Prop.STEMMING), prop.is(Prop.CASESENS),
@@ -111,7 +111,7 @@ final class DialogFT extends BaseXBack {
 
     final BaseXBack b2 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     b2.add(check[F_SCORE]);
-    scoring = new BaseXCombo(d, CREATESCT1, CREATESCT2);
+    scoring = new BaseXCombo(d, DOCUMENTS, TEXT_NODES);
     b2.add(scoring);
     add(b2);
     if(!create) add(labels[F_SCORE]);
@@ -122,7 +122,7 @@ final class DialogFT extends BaseXBack {
         sw.isEmpty() ? d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
     b3.add(swpath);
 
-    swbrowse = new BaseXButton(BUTTONBROWSE, d);
+    swbrowse = new BaseXButton(BROWSE_D, d);
     swbrowse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -139,7 +139,7 @@ final class DialogFT extends BaseXBack {
    */
   void chooseStop() {
     final GUIProp gprop = dialog.gui.gprop;
-    final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
+    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
         gprop.get(GUIProp.STOPPATH), dialog.gui);
     final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
     if(file != null) {

@@ -80,7 +80,7 @@ public final class IndexStats {
    * @param tb token builder reference
    */
   public void print(final TokenBuilder tb) {
-    tb.add(IDXENTRIES + size + NL);
+    tb.add(LI_ENTRIES + size + NL);
     int m = 0;
     int c = 0;
     for(int o = 0; o < max; ++o) {

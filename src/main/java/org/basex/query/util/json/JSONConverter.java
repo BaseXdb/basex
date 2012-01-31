@@ -57,14 +57,15 @@ public final class JSONConverter {
   /** Plural. */
   private static final byte[] S = { 's' };
   /** Global data type attributes. */
-  private static final byte[][] ATTRS = { concat(BOOL, S), concat(NUM, S),
-    concat(NULL, S), concat(ARR, S), concat(OBJ, S) };
+  private static final byte[][] ATTRS = {
+    concat(T_BOOLEAN, S), concat(T_NUMBER, S),
+    concat(NULL, S), concat(T_ARRAY, S), concat(T_OBJECT, S) };
   /** Names of data type classes. */
   private static final Class<?>[] CLASSES = {
       JBoolean.class, JNumber.class, JNull.class, JArray.class, JObject.class
   };
   /** Name: type. */
-  private static final QNm Q_TYPE = new QNm(TYPE);
+  private static final QNm Q_TYPE = new QNm(T_TYPE);
 
   /** Cached names. */
   private final TokenObjMap<QNm> qnames = new TokenObjMap<QNm>();
@@ -90,10 +91,10 @@ public final class JSONConverter {
   public ANode parse(final byte[] q) throws QueryException {
     final JStruct node = new JSONParser(q, input).parse();
     // find unique data types
-    types.add(JSON, node.getClass());
+    types.add(T_JSON, node.getClass());
     analyze(node);
     // create XML fragment
-    final FElem root = create(JSON, node);
+    final FElem root = create(T_JSON, node);
     // attach data types to root node
     attach(root);
     // return node
@@ -109,7 +110,7 @@ public final class JSONConverter {
       final JStruct n = (JStruct) value;
       for(int s = 0; s < n.size(); s++) {
         final boolean obj = value instanceof JObject;
-        final byte[] name = convert(obj ? ((JObject) n).name(s) : VALUE);
+        final byte[] name = convert(obj ? ((JObject) n).name(s) : T_VALUE);
         final Class<?> clz = n.value(s).getClass();
         final Class<?> type = types.get(name);
         if(type == null) {
@@ -139,7 +140,7 @@ public final class JSONConverter {
       if(type) root.add(new FAttr(Q_TYPE, value.type()));
       final JStruct n = (JStruct) value;
       for(int s = 0; s < n.size(); s++) {
-        root.add(create(obj ? ((JObject) n).name(s) : VALUE, n.value(s)));
+        root.add(create(obj ? ((JObject) n).name(s) : T_VALUE, n.value(s)));
       }
     } else {
       final JAtom a = (JAtom) value;

@@ -43,7 +43,7 @@ public final class Optimize extends ACreate {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-    return info(DBOPTIMIZED, m.name, perf);
+    return info(DB_OPTIMIZED_X, m.name, perf);
   }
 
   @Override
@@ -58,7 +58,7 @@ public final class Optimize extends ACreate {
 
   @Override
   public String det() {
-    return INFOSTATS;
+    return CREATE_STATS_D;
   }
 
   /**

@@ -60,7 +60,7 @@ public final class Run extends AQuery {
     if(query == null) {
       final IO io = IO.get(args[0]);
       if(!io.exists()) throw new BaseXException(
-          FILEWHICH, ctx.user.perm(User.CREATE) ? io : args[0]);
+          FILE_NOT_FOUND_X, ctx.user.perm(User.CREATE) ? io : args[0]);
       query = Token.string(io.read());
       ctx.prop.set(Prop.QUERYPATH, io.path());
     }

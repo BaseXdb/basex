@@ -19,6 +19,6 @@ final class JNumber extends JAtom {
 
   @Override
   byte[] type() {
-    return NUM;
+    return T_NUMBER;
   }
 }

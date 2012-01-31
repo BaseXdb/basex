@@ -465,7 +465,7 @@ public abstract class SessionTest {
     query.execute();
     final String info = query.info();
     assertTrue("Total Time not contained in '" + info + "'.",
-        info.contains(QUERYTOTAL));
+        info.contains(TOTAL_TIME_CC));
     query.close();
   }
 

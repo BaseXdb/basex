@@ -16,7 +16,7 @@ public final class LoginException extends IOException {
    * Constructor.
    */
   public LoginException() {
-    super(SERVERDENIED);
+    super(ACCESS_DENIED);
   }
   /**
    * Constructs an exception with the specified message and extension.

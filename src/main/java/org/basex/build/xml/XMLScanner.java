@@ -693,7 +693,7 @@ final class XMLScanner extends Progress {
           input = new TextInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           Util.debug(ex);
-          throw error(PARSEERR, name);
+          throw error(NOT_PARSED_X, name);
         }
 
         if(consume(XDECL)) {
@@ -1013,7 +1013,7 @@ final class XMLScanner extends Progress {
 
   @Override
   public String det() {
-    return Util.info(SCANPOS, input.input().path(), input.line());
+    return Util.info(SCANPOS_X_X, input.input().path(), input.line());
   }
 
   @Override

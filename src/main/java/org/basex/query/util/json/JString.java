@@ -19,6 +19,6 @@ final class JString extends JAtom {
 
   @Override
   byte[] type() {
-    return STR;
+    return T_STRING;
   }
 }

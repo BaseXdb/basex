@@ -54,11 +54,11 @@ public final class DialogPrefs extends Dialog {
    * @param main reference to the main window
    */
   public DialogPrefs(final GUI main) {
-    super(main, PREFSTITLE);
+    super(main, PREFERENCES);
 
     // create checkboxes
     final BaseXBack pp = new BaseXBack(new TableLayout(11, 1));
-    pp.add(new BaseXLabel(DATABASEPATH, true, true));
+    pp.add(new BaseXLabel(DATABASE_PATH, true, true));
 
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
@@ -66,11 +66,11 @@ public final class DialogPrefs extends Dialog {
     final GUIProp gprop = gui.gprop;
     path = new BaseXTextField(mprop.dbpath().path(), this);
 
-    final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
+    final BaseXButton button = new BaseXButton(BROWSE_D, this);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final IOFile file = new BaseXFileChooser(DIALOGFC, path.getText(),
+        final IOFile file = new BaseXFileChooser(CHOOSE_DIR, path.getText(),
             gui).select(BaseXFileChooser.Mode.DOPEN);
         if(file != null) path.setText(file.dir());
       }
@@ -79,28 +79,30 @@ public final class DialogPrefs extends Dialog {
     p.add(path);
     p.add(button);
     pp.add(p);
-    pp.add(new BaseXLabel(PREFINTER, true, true).border(10, 0, 8, 0));
+    pp.add(new BaseXLabel(GUI_INTERACTIONS, true, true).border(10, 0, 8, 0));
 
     // checkbox for realtime mouse focus
-    javalook = new BaseXCheckBox(PREFLF, gprop.is(GUIProp.JAVALOOK), this);
+    javalook = new BaseXCheckBox(JAVA_LF, gprop.is(GUIProp.JAVALOOK), this);
     pp.add(javalook);
 
     // checkbox for realtime mouse focus
-    focus = new BaseXCheckBox(PREFFOCUS, gprop.is(GUIProp.MOUSEFOCUS), this);
+    focus = new BaseXCheckBox(RT_FOCUS, gprop.is(GUIProp.MOUSEFOCUS), this);
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLEFILE, gprop.is(GUIProp.SIMPLEFD), this);
+    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER,
+        gprop.is(GUIProp.SIMPLEFD), this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    names = new BaseXCheckBox(PREFNAME, gprop.is(GUIProp.SHOWNAME), 12, this);
+    names = new BaseXCheckBox(SHOW_NAME_ATTS,
+        gprop.is(GUIProp.SHOWNAME), 12, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && data.nameID != 0);
     pp.add(names);
 
     // checkbox for simple file dialog
-    pp.add(new BaseXLabel(PREFLANG, true, true));
+    pp.add(new BaseXLabel(LANGUAGE_RESTART, true, true));
 
     p = new BaseXBack(new TableLayout(1, 2, 12, 0));
 

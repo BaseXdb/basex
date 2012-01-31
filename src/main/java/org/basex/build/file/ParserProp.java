@@ -55,12 +55,13 @@ public final class ParserProp extends AProp {
       if(obj == null) {
         final String in = key.toUpperCase(Locale.ENGLISH);
         final String sim = similar(in);
-        throw new BaseXException(sim != null ? SETSIMILAR : SETWHICH, in, sim);
+        throw new BaseXException(
+            sim != null ? UNKNOWN_OPT_SIMILAR_X : UNKNOWN_OPTION_X, in, sim);
       }
       if(obj instanceof Integer) {
         final int i = sprop.length < 2 ? 0 : Token.toInt(sprop[1]);
         if(i == Integer.MIN_VALUE)
-          throw new BaseXException(SETVAL, key, sprop[1]);
+          throw new BaseXException(INVALID_VALUE_X_X, key, sprop[1]);
         set(key, i);
       } else if(obj instanceof Boolean) {
         final String val = sprop.length < 2 ? TRUE : sprop[1];

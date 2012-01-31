@@ -72,7 +72,7 @@ public final class ViewNotifier {
       boolean close = false;
       for(final View v : view) close |= v.visible() && v.db();
       if(close && fs > LARGEDB && Dialog.confirm(gui,
-          Util.info(OPENLARGE, Performance.format(fs)))) {
+          Util.info(H_LARGE_DB, Performance.format(fs)))) {
         for(final View v : view) if(v.visible() && v.db()) v.visible(false);
       }
     } else {

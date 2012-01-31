@@ -2,6 +2,7 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.Token.*;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -175,7 +176,7 @@ public final class GUI extends AGUI {
 
     nav = new BaseXBack(new BorderLayout(5, 0)).border(2, 2, 0, 2);
 
-    mode = new BaseXCombo(this, BUTTONSEARCH, BUTTONXQUERY, BUTTONCMD);
+    mode = new BaseXCombo(this, SEARCH, XQUERY, COMMAND);
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {
@@ -193,7 +194,7 @@ public final class GUI extends AGUI {
 
     input = new GUIInput(this);
 
-    hist = new BaseXButton(this, "hist", HELPHIST);
+    hist = new BaseXButton(this, "hist", token(H_SHOW_HISTORY));
     hist.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -224,7 +225,7 @@ public final class GUI extends AGUI {
     b.add(input, BorderLayout.CENTER);
     nav.add(b, BorderLayout.CENTER);
 
-    go = new BaseXButton(this, "go", HELPGO);
+    go = new BaseXButton(this, "go", token(H_EXECUTE_QUERY));
     go.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -232,7 +233,7 @@ public final class GUI extends AGUI {
       }
     });
 
-    filter = BaseXButton.command(GUICommands.FILTER, this);
+    filter = BaseXButton.command(GUICommands.C_FILTER, this);
 
     b = new BaseXBack(new TableLayout(1, 3));
     b.add(go);
@@ -322,7 +323,7 @@ public final class GUI extends AGUI {
         // parse and execute all commands
         execute(false, cp.parse());
       } catch(final QueryException ex) {
-        if(!info.visible()) GUICommands.SHOWINFO.execute(this);
+        if(!info.visible()) GUICommands.C_SHOWINFO.execute(this);
         info.setInfo(ex.getMessage(), null, null, false);
         info.reset();
       }
@@ -438,16 +439,16 @@ public final class GUI extends AGUI {
       info.reset();
 
       // sends feedback to the query editor
-      final boolean stopped = inf.startsWith(PROGERR);
+      final boolean stopped = inf.startsWith(INTERRUPTED);
       if(edit) {
-        editor.info(stopped ? PROGERR : inf, ok);
+        editor.info(stopped ? INTERRUPTED : inf, ok);
       }
 
       // check if query feedback was evaluated in the query view
       if(!ok && !stopped) {
         // display error in info view
         if((!edit || inf.startsWith(BUGINFO)) && !info.visible()) {
-          GUICommands.SHOWINFO.execute(this);
+          GUICommands.C_SHOWINFO.execute(this);
         }
       } else {
         // get query result
@@ -458,7 +459,7 @@ public final class GUI extends AGUI {
         // treat text view different to other views
         if(nodes == null) {
           // display text view
-          if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
+          if(!text.visible()) GUICommands.C_SHOWTEXT.execute(this);
           text.setText(ao, c);
         }
 
@@ -495,15 +496,15 @@ public final class GUI extends AGUI {
           }
         }
         // show number of hits
-        setHits(result == null ? 0 : result.size());
+        setResults(result == null ? 0 : result.size());
 
         // show status info
-        status.setText(Util.info(PROCTIME, time));
+        status.setText(Util.info(TIME_NEEDED_X, time));
       }
     } catch(final Exception ex) {
       // unexpected error
       Util.stack(ex);
-      Dialog.error(this, Util.info(PROCERR, c,
+      Dialog.error(this, Util.info(EXEC_ERROR, c,
           !ex.toString().isEmpty() ? ex.toString() : ex.getMessage()));
       updating = false;
     }
@@ -618,7 +619,7 @@ public final class GUI extends AGUI {
    */
   public void refreshControls() {
     final Nodes marked = context.marked;
-    if(marked != null) setHits(marked.size());
+    if(marked != null) setResults(marked.size());
 
     filter.setEnabled(marked != null && marked.size() != 0);
 
@@ -649,11 +650,11 @@ public final class GUI extends AGUI {
   }
 
   /**
-   * Sets hits information.
-   * @param n number of hits
+   * Sets results information.
+   * @param n number of results
    */
-  private void setHits(final long n) {
-    hits.setText(n + " " + HITS);
+  private void setResults(final long n) {
+    hits.setText(Util.info(RESULTS_X, n));
   }
 
   /**
@@ -725,8 +726,8 @@ public final class GUI extends AGUI {
             Pattern.DOTALL).matcher(page);
         if(m.matches()) {
           final Version latest = new Version(m.group(2));
-          if(disk.compareTo(latest) < 0 &&
-              Dialog.confirm(this, Util.info(GUICHECKVER, NAME, latest))) {
+          if(disk.compareTo(latest) < 0 && Dialog.confirm(this,
+              Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
             Dialog.browse(this, UPDATE_URL);
           } else {
             // don't show update dialog anymore if it has been rejected once

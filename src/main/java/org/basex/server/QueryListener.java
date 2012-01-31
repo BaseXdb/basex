@@ -130,9 +130,9 @@ final class QueryListener extends Progress {
       // generate query info
       final int up = qp.updates();
       final TokenBuilder tb = new TokenBuilder();
-      tb.addExt(QUERYHITS + "% %" + NL, c, c == 1 ? VALHIT : VALHITS);
-      tb.addExt(QUERYUPDATED + "% %" + NL, up, up == 1 ? VALHIT : VALHITS);
-      tb.addExt(QUERYTOTAL + "%", perf);
+      tb.addExt(HITS_X_CC + "% %" + NL, c, c == 1 ? ITEM : ITEMS);
+      tb.addExt(UPDATED_CC + "% %" + NL, up, up == 1 ? ITEM : ITEMS);
+      tb.addExt(TOTAL_TIME_CC + "%", perf);
       info = tb.toString();
 
     } catch(final QueryException ex) {

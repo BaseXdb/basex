@@ -37,7 +37,7 @@ public final class RepoDelete extends Command {
   protected boolean run() throws IOException {
     try {
       new RepoManager(context.repo).delete(args[0], ii);
-      return info(REPODEL, args[0]);
+      return info(PKG_DELETED_X, args[0]);
     } catch(final QueryException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

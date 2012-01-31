@@ -22,6 +22,6 @@ public final class Password extends AUser {
     final String user = context.user.name;
     final String pass = args[0];
     return isMD5(pass) && context.users.alter(user, pass) ?
-        info(USERALTER, user) : error(USERMD5);
+        info(PW_CHANGED_X, user) : error(PW_NOT_VALID);
   }
 }

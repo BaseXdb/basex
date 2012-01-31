@@ -172,20 +172,20 @@ public final class Stats {
    */
   public void plan(final Serializer ser) throws IOException {
     final String t = type.toString().toLowerCase(Locale.ENGLISH);
-    ser.attribute(TYPE, Token.token(t));
-    ser.attribute(COUNT, Token.token(count));
+    ser.attribute(T_TYPE, Token.token(t));
+    ser.attribute(T_COUNT, Token.token(count));
     switch(type) {
       case CATEGORY:
         for(final byte[] cat : cats) {
-          ser.openElement(VALUE, COUNT, Token.token(cats.value(cat)));
+          ser.openElement(T_VALUE, T_COUNT, Token.token(cats.value(cat)));
           ser.text(cat);
           ser.closeElement();
         }
         break;
       case DOUBLE:
       case INTEGER:
-        ser.attribute(MIN, Token.token(min));
-        ser.attribute(MAX, Token.token(max));
+        ser.attribute(T_MIN, Token.token(min));
+        ser.attribute(T_MAX, Token.token(max));
         break;
       default:
         break;

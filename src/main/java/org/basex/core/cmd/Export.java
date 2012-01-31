@@ -40,7 +40,7 @@ public final class Export extends Command {
     try {
       final Data data = context.data();
       export(data, args[0]);
-      return info(DBEXPORTED, data.meta.name, perf);
+      return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

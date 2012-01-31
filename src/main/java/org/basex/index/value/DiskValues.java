@@ -74,9 +74,9 @@ public class DiskValues implements Index {
   @Override
   public synchronized byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.add(INDEXSTRUC + TREESTRUC + NL);
+    tb.add(LI_STRUCTURE + SORTED_LIST + NL);
     final long l = idxl.length() + idxr.length();
-    tb.add(SIZEDISK + Performance.format(l, true) + NL);
+    tb.add(LI_SIZE + Performance.format(l, true) + NL);
     final IndexStats stats = new IndexStats(data);
     for(int m = 0; m < size; ++m) {
       final long pos = idxr.read5(m * 5L);

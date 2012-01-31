@@ -192,7 +192,8 @@ public abstract class OutputSerializer extends Serializer {
 
     // open results element
     if(wrap) {
-      openElement(wPre.length != 0 ? concat(wPre, COLON, RESULTS) : RESULTS);
+      openElement(wPre.length != 0 ?
+          concat(wPre, COLON, T_RESULTS) : T_RESULTS);
       namespace(wPre, wUri);
     }
   }
@@ -212,7 +213,7 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   public void openResult() throws IOException {
     if(wrap) {
-      openElement(wPre.length != 0 ? concat(wPre, COLON, RESULT) : RESULT);
+      openElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
       ind = false;
     }
   }

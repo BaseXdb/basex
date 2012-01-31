@@ -232,12 +232,12 @@ public abstract class Builder extends Progress {
 
   @Override
   public final String tit() {
-    return PROGCREATE;
+    return CREATING_DB;
   }
 
   @Override
   public final String det() {
-    return spos == 0 ? parser.detail() : DBFINISH;
+    return spos == 0 ? parser.detail() : FINISHING_D;
   }
 
   @Override

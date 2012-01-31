@@ -78,7 +78,7 @@ public class BaseX extends Main {
         } else if(key.equals("f")) {
           // query file
           final IO io = IO.get(val);
-          if(!io.exists()) throw new BaseXException(FILEWHICH, val);
+          if(!io.exists()) throw new BaseXException(FILE_NOT_FOUND_X, val);
           final String query = Token.string(
               new NewlineInput(io, null).content()).trim();
           execute(new Set(Prop.QUERYPATH, io.path()), false);
@@ -97,7 +97,7 @@ public class BaseX extends Main {
 
       if(console) {
         // enter interactive mode
-        Util.outln(CONSOLE + CONSOLE2, sa() ? LOCALMODE : CLIENTMODE);
+        Util.outln(CONSOLE + TRY_MORE_X, sa() ? LOCALMODE : CLIENTMODE);
         console();
       }
 

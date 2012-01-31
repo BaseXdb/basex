@@ -30,11 +30,12 @@ public final class DropDB extends Command {
 
   @Override
   protected boolean run() {
-    if(!MetaData.validName(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!MetaData.validName(args[0], true))
+      return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
     final String[] dbs = databases(args[0]);
-    if(dbs.length == 0) return info(DBNOTDROPPED, args[0]);
+    if(dbs.length == 0) return info(NO_DB_DROPPED, args[0]);
 
     // loop through all databases
     boolean ok = true;
@@ -43,14 +44,14 @@ public final class DropDB extends Command {
       close(context, db);
       // check if database is still pinned
       if(context.pinned(db)) {
-        info(DBPINNED, db);
+        info(DB_PINNED_X, db);
         ok = false;
       } else if(!drop(db, mprop)) {
         // dropping was not successful
-        info(DBDROPERROR, db);
+        info(DB_NOT_DROPPED_X, db);
         ok = false;
       } else {
-        info(DBDROPPED, db);
+        info(DB_DROPPED_X, db);
       }
     }
     return ok;

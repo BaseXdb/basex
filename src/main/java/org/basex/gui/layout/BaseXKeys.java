@@ -44,8 +44,9 @@ public enum BaseXKeys {
 
   // Editing
 
-  /** Undo.              */ UNDO(SC, VK_Z, true),
-  /** Redo.              */ REDO(MAC ? SC | SHF : SC, MAC ? VK_Z : VK_Y, true),
+  /** Undo.              */ UNDOSTEP(SC, VK_Z, true),
+  /** Redo.              */ REDOSTEP(MAC ? SC | SHF : SC,
+                             MAC ? VK_Z : VK_Y, true),
 
   /** Cut.               */ CUT1(SC, VK_X, true),
   /** Cut.               */ CUT2(SHF, VK_DELETE, true),

@@ -2,6 +2,7 @@ package org.basex.gui.view.text;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.util.Token.*;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -68,7 +69,7 @@ public final class TextView extends View implements ActionListener {
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
 
-    home = BaseXButton.command(GUICommands.HOME, gui);
+    home = BaseXButton.command(GUICommands.C_HOME, gui);
     home.setEnabled(false);
 
     BaseXBack sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 2));
@@ -76,10 +77,10 @@ public final class TextView extends View implements ActionListener {
     sp.add(Box.createHorizontalStrut(8));
     b.add(sp, BorderLayout.WEST);
 
-    header = new BaseXLabel(TEXTTIT, true, false);
+    header = new BaseXLabel(TEXT, true, false);
     b.add(header, BorderLayout.CENTER);
 
-    final BaseXButton save = new BaseXButton(gui, "save", HELPSAVE);
+    final BaseXButton save = new BaseXButton(gui, "save", token(H_SAVE_RESULT));
     save.addActionListener(this);
     find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
@@ -176,7 +177,7 @@ public final class TextView extends View implements ActionListener {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     area.setText(buf, size);
-    header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
+    header.setText(TEXT + (out.finished() ? CHOPPED : ""));
     home.setEnabled(gui.context.data() != null);
     refresh = true;
     if(!out.finished()) {
@@ -189,7 +190,7 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public void actionPerformed(final ActionEvent e) {
-    final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
+    final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
         gui.gprop.get(GUIProp.SAVEPATH), gui);
     final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
     if(file == null) return;
@@ -208,7 +209,7 @@ public final class TextView extends View implements ActionListener {
           out.write(t);
       }
     } catch(final IOException ex) {
-      Dialog.error(gui, NOTSAVED);
+      Dialog.error(gui, FILE_NOT_SAVED);
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ex) { }
     }

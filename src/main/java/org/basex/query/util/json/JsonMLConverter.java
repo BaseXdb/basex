@@ -57,7 +57,7 @@ public final class JsonMLConverter {
    * @throws QueryException query exception
    */
   private FElem create(final JValue value) throws QueryException {
-    return elem((JArray) check(value, ARR, "element constructor"));
+    return elem((JArray) check(value, T_ARRAY, "element constructor"));
   }
 
   /**
@@ -72,7 +72,7 @@ public final class JsonMLConverter {
     for(int s = 0; s < value.size(); s++) {
       final JValue val = value.value(s);
       if(s == 0) {
-        final JString str = (JString) check(val, STR, "element name");
+        final JString str = (JString) check(val, T_STRING, "element name");
         elem = new FElem(qname(str.value));
       } else if(s == 1 && val instanceof JObject) {
         attr(elem, (JObject) val);
@@ -101,7 +101,8 @@ public final class JsonMLConverter {
       throws QueryException {
 
     for(int s = 0; s < attr.size(); s++) {
-      final JString v = (JString) check(attr.value(s), STR, "attribute value");
+      final JString v = (JString) check(attr.value(s), T_STRING,
+          "attribute value");
       elem.add(new FAttr(qname(attr.name(s)), v.value));
     }
   }

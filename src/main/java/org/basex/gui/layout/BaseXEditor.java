@@ -415,7 +415,7 @@ public class BaseXEditor extends BaseXPanel {
     final boolean marking = e.isShiftDown() &&
       !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e)
       // necessary on Macs as the shift button is pressed for REDO
-      && !REDO.is(e);
+      && !REDOSTEP.is(e);
     final boolean nomark = !text.marked();
     if(marking && nomark) text.startMark();
     boolean down = true;
@@ -469,9 +469,9 @@ public class BaseXEditor extends BaseXPanel {
         cut();
       } else if(PASTE1.is(e) || PASTE2.is(e)) {
         paste();
-      } else if(UNDO.is(e)) {
+      } else if(UNDOSTEP.is(e)) {
         undo();
-      } else if(REDO.is(e)) {
+      } else if(REDOSTEP.is(e)) {
         redo();
       } else if(COMMENT.is(e)) {
         text.comment(rend.getSyntax());
@@ -814,7 +814,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public String label() {
-      return GUIUNDO;
+      return UNDO;
     }
   }
 
@@ -831,7 +831,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public String label() {
-      return GUIREDO;
+      return REDO;
     }
   }
 
@@ -848,7 +848,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public String label() {
-      return GUICUT;
+      return CUT;
     }
   }
 
@@ -864,7 +864,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public String label() {
-      return GUICOPY;
+      return COPY;
     }
   }
 
@@ -880,7 +880,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public String label() {
-      return GUIPASTE;
+      return PASTE;
     }
   }
 
@@ -897,7 +897,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public String label() {
-      return GUIDELETE;
+      return DELETE;
     }
   }
 
@@ -912,7 +912,7 @@ public class BaseXEditor extends BaseXPanel {
     }
     @Override
     public String label() {
-      return GUIALL;
+      return SELECT_ALL;
     }
   }
 }

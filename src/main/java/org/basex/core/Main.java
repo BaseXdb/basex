@@ -75,7 +75,7 @@ public abstract class Main {
         if(in.isEmpty()) continue;
         try {
           if(!execute(in)) {
-            Util.outln(CLIENTBYE[new Random().nextInt(4)]);
+            Util.outln(BYE[new Random().nextInt(4)]);
             return;
           }
         } catch(final IOException ex) {
@@ -105,7 +105,7 @@ public abstract class Main {
     final PasswordReader pr = new PasswordReader() {
       @Override
       public String password() throws QueryException {
-        Util.out(SERVERPW + COLS);
+        Util.out(PASSWORD + COLS);
         return md5(Util.password());
       }
     };

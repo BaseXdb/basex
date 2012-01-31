@@ -28,10 +28,13 @@ public final class JSONSerializer extends OutputSerializer {
   /** Plural. */
   private static final byte[] S = { 's' };
   /** Global data type attributes. */
-  private static final byte[][] ATTRS = { concat(BOOL, S), concat(NUM, S),
-    concat(NULL, S), concat(ARR, S), concat(OBJ, S), concat(STR, S) };
+  private static final byte[][] ATTRS = {
+    concat(T_BOOLEAN, S), concat(T_NUMBER, S),
+    concat(NULL, S), concat(T_ARRAY, S),
+    concat(T_OBJECT, S), concat(T_STRING, S) };
   /** Supported data types. */
-  private static final byte[][] TYPES = { BOOL, NUM, NULL, ARR, OBJ, STR };
+  private static final byte[][] TYPES = {
+    T_BOOLEAN, T_NUMBER, NULL, T_ARRAY, T_OBJECT, T_STRING };
   /** Cached data types. */
   private final TokenSet[] typeCache = new TokenSet[TYPES.length];
   /** Comma flag. */
@@ -53,7 +56,8 @@ public final class JSONSerializer extends OutputSerializer {
 
   @Override
   protected void startOpen(final byte[] name) throws IOException {
-    if(level == 0 && !eq(name, JSON)) error("<%> expected as root node", JSON);
+    if(level == 0 && !eq(name, T_JSON))
+      error("<%> expected as root node", T_JSON);
     types.set(level, null);
     comma.set(level + 1, false);
   }
@@ -71,7 +75,7 @@ public final class JSONSerializer extends OutputSerializer {
         }
       }
     }
-    if(eq(name, TYPE)) {
+    if(eq(name, T_TYPE)) {
       types.set(level, value);
       if(!eq(value, TYPES))
         error("Element <%> has invalid type \"%\"", tag, value);
@@ -88,11 +92,11 @@ public final class JSONSerializer extends OutputSerializer {
     if(level > 0) {
       indent(level);
       final byte[] par = types.get(level - 1);
-      if(eq(par, OBJ)) {
+      if(eq(par, T_OBJECT)) {
         print('"');
         print(name(tag));
         print("\": ");
-      } else if(!eq(par, ARR)) {
+      } else if(!eq(par, T_ARRAY)) {
         error("Element <%> is typed as \"%\" and cannot be nested",
             tags.get(level - 1), par);
       }
@@ -104,27 +108,28 @@ public final class JSONSerializer extends OutputSerializer {
       final int tl = typeCache.length;
       while(++t < tl && typeCache[t].id(tag) == 0);
       if(t != tl) type = TYPES[t];
-      else type = STR;
+      else type = T_STRING;
       types.set(level,  type);
     }
 
-    if(eq(type, OBJ)) {
+    if(eq(type, T_OBJECT)) {
       print('{');
-    } else if(eq(type, ARR)) {
+    } else if(eq(type, T_ARRAY)) {
       print('[');
     } else if(level == 0) {
-      error("Element <%> must be typed as \"%\" or \"%\"", JSON, OBJ, ARR);
+      error("Element <%> must be typed as \"%\" or \"%\"",
+          T_JSON, T_OBJECT, T_ARRAY);
     }
   }
 
   @Override
   public void finishText(final byte[] text) throws IOException {
     final byte[] type = types.get(level - 1);
-    if(eq(type, STR)) {
+    if(eq(type, T_STRING)) {
       print('"');
       for(final byte ch : text) code(ch);
       print('"');
-    } else if(eq(type, BOOL, NUM)) {
+    } else if(eq(type, T_BOOLEAN, T_NUMBER)) {
       print(text);
     } else if(trim(text).length != 0) {
       error("Element <%> is typed as \"%\" and cannot have a value",
@@ -136,11 +141,11 @@ public final class JSONSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     finishOpen();
     final byte[] type = types.get(level);
-    if(eq(type, STR)) {
+    if(eq(type, T_STRING)) {
       print("\"\"");
     } else if(eq(type, NULL)) {
       print(NULL);
-    } else if(!eq(type, OBJ, ARR)) {
+    } else if(!eq(type, T_OBJECT, T_ARRAY)) {
       error("Value expected for type \"%\"", type);
     }
     finishClose();
@@ -149,10 +154,10 @@ public final class JSONSerializer extends OutputSerializer {
   @Override
   protected void finishClose() throws IOException {
     final byte[] type = types.get(level);
-    if(eq(type, ARR)) {
+    if(eq(type, T_ARRAY)) {
       indent(level);
       print(']');
-    } else if(eq(type, OBJ)) {
+    } else if(eq(type, T_OBJECT)) {
       indent(level);
       print('}');
     }

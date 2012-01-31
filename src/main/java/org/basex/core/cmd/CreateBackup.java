@@ -35,11 +35,12 @@ public final class CreateBackup extends Command {
 
   @Override
   protected boolean run() {
-    if(!MetaData.validName(args[0], true)) return error(NAMEINVALID, args[0]);
+    if(!MetaData.validName(args[0], true))
+      return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases
     final String[] dbs = databases(args[0]);
-    if(dbs.length == 0) return error(DBNOTFOUND, args[0]);
+    if(dbs.length == 0) return error(DB_NOT_FOUND_X, args[0]);
 
     // loop through all databases
     boolean ok = true;
@@ -47,9 +48,9 @@ public final class CreateBackup extends Command {
       if(!mprop.dbpath(db).isDirectory()) continue;
       if(backup(db)) {
         // backup was successful
-        info(DBBACKUP, db, perf);
+        info(DB_BACKUP_X, db, perf);
       } else {
-        info(DBNOBACKUP, db);
+        info(DB_NOT_BACKUP_X, db);
         ok = false;
       }
     }
@@ -78,7 +79,7 @@ public final class CreateBackup extends Command {
 
   @Override
   protected String tit() {
-    return BUTTONBACKUP;
+    return BACKUP;
   }
 
   @Override

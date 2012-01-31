@@ -89,7 +89,7 @@ public final class DOMWrapper extends Parser {
 
   @Override
   public String det() {
-    return Util.info(NODESPARSED, filename, nodes);
+    return Util.info(NODES_PARSED_X, filename, nodes);
   }
 
   @Override

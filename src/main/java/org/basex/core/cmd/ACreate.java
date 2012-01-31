@@ -76,13 +76,13 @@ public abstract class ACreate extends Command {
    * @return success of operation
    */
   protected final boolean build(final Parser parser, final String db) {
-    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
+    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     // close open database
     new Close().run(context);
 
     try {
-      if(context.pinned(db)) return error(DBPINNED, db);
+      if(context.pinned(db)) return error(DB_PINNED_X, db);
 
       final boolean mem = prop.is(Prop.MAINMEM);
       builder = mem ? new MemBuilder(db, parser, prop) :
@@ -104,7 +104,7 @@ public abstract class ACreate extends Command {
         data.meta.pathindex = data.meta.createpath;
         data.flush();
       }
-      return info(parser.info() + DBCREATED, db, perf);
+      return info(parser.info() + DB_CREATED_X_X, db, perf);
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final IOException ex) {
@@ -112,13 +112,13 @@ public abstract class ACreate extends Command {
       abort();
       final String msg = ex.getMessage();
       return error(msg != null && msg.length() != 0 ? msg :
-        Util.info(PARSEERR, parser.src));
+        Util.info(NOT_PARSED_X, parser.src));
     } catch(final Exception ex) {
       // known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
       Util.debug(ex);
       abort();
-      return error(Util.info(PARSEERR, parser.src));
+      return error(Util.info(NOT_PARSED_X, parser.src));
     }
   }
 

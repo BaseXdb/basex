@@ -124,7 +124,7 @@ public final class BaseXFileChooser {
       io = new IOFile(io.path() + suffix);
 
     // show replace dialog
-    return !io.exists() || Dialog.confirm(gui, Util.info(FILEREPLACE, io)) ?
+    return !io.exists() || Dialog.confirm(gui, Util.info(FILE_EXISTS_X, io)) ?
         io : null;
   }
 

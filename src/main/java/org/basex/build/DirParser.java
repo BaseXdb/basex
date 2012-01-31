@@ -147,13 +147,13 @@ public final class DirParser extends TargetParser {
   public String info() {
     final TokenBuilder tb = new TokenBuilder();
     if(skipped.size() != 0) {
-      tb.add(SKIPCORRUPT).add(COL).add(NL);
+      tb.add(SKIPPED).add(COL).add(NL);
       final int s = skipped.size();
       for(int i = 0; i < s && i < SKIPLOG; i++) {
         tb.add(LI).add(skipped.get(i)).add(NL);
       }
       if(s > SKIPLOG) {
-        tb.add(LI).addExt(SKIPINFO, s - SKIPLOG).add(NL);
+        tb.add(LI).addExt(MORE_SKIPPED_X, s - SKIPLOG).add(NL);
       }
     }
     return tb.toString();

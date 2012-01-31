@@ -38,7 +38,7 @@ public final class Kill extends AUser {
         final String cs = cl.toString().replaceAll("\\[|\\]", "");
         if(cl.context() == context) {
           // show error if own session is addressed
-          if(cs.equals(arg)) return error(USERKILLSELF, arg);
+          if(cs.equals(arg)) return error(KILL_SELF_X, arg);
         } else if(cs.startsWith(arg)) {
           info(LI + cs);
           cl.quit();
@@ -46,7 +46,7 @@ public final class Kill extends AUser {
         }
       }
     }
-    return ok && info(USERKILL, count);
+    return ok && info(SESSIONS_KILLED_X, count);
   }
 
   @Override

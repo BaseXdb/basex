@@ -84,7 +84,7 @@ public final class Datas {
    */
   public String info() {
     final TokenBuilder tb = new TokenBuilder();
-    tb.addExt(SRVDATABASES, list.size());
+    tb.addExt(OPENED_DB_X, list.size());
     tb.add(list.size() != 0 ? COL : DOT);
     for(final PData d : list) {
       tb.add(NL + LI + d.data.meta.name + " (" + d.pins + "x)");

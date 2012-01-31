@@ -1,8 +1,9 @@
 package org.basex.gui.dialog;
 
-import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import javax.swing.SwingUtilities;
+
+import org.basex.core.Text;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
@@ -34,7 +35,7 @@ final class DialogMessage extends Dialog {
    * @param ic message type
    */
   DialogMessage(final GUI main, final String txt, final Msg ic) {
-    super(main, ic == Msg.ERROR ? DIALOGERR : DIALOGINFO);
+    super(main, ic == Msg.ERROR ? Text.ERROR : Text.INFORMATION);
 
     panel.setLayout(new BorderLayout(12, 0));
 
@@ -50,16 +51,16 @@ final class DialogMessage extends Dialog {
 
     final BaseXBack buttons;
     if(ic == Msg.QUESTION || ic == Msg.YESNOCANCEL) {
-      yes = new BaseXButton(BUTTONYES, this);
-      no = new BaseXButton(BUTTONNO, this);
+      yes = new BaseXButton(Text.B_YES, this);
+      no = new BaseXButton(Text.B_NO, this);
       if(ic == Msg.QUESTION) {
         buttons = newButtons(yes, no);
       } else {
-        cancel = new BaseXButton(BUTTONCANCEL, this);
+        cancel = new BaseXButton(Text.CANCEL, this);
         buttons = newButtons(yes, no, cancel);
       }
     } else {
-      yes = new BaseXButton(BUTTONOK, this);
+      yes = new BaseXButton(Text.B_OK, this);
       buttons = newButtons(yes);
     }
     set(buttons, BorderLayout.SOUTH);

@@ -246,7 +246,7 @@ public abstract class Command extends Progress {
    */
   protected final <E extends Enum<E>> E getOption(final Class<E> typ) {
     final E e = getOption(args[0], typ);
-    if(e == null) error(CMDWHICH, args[0]);
+    if(e == null) error(UNKNOWN_TRY_X, args[0]);
     return e;
   }
 
@@ -292,7 +292,7 @@ public abstract class Command extends Progress {
   private boolean exec(final Context ctx, final OutputStream os) {
     // check if data reference is available
     final Data data = ctx.data();
-    if(data == null && (flags & DATAREF) != 0) return error(PROCNODB);
+    if(data == null && (flags & DATAREF) != 0) return error(NO_DB_OPENED);
 
     // check permissions
     if(!ctx.perm(flags & 0xFF, data != null ? data.meta : null)) {
@@ -300,7 +300,7 @@ public abstract class Command extends Progress {
       int i = perms.length;
       final int f = flags & 0xFF;
       while(--i >= 0 && (1 << i & f) == 0);
-      return error(PERMNO, perms[i + 1]);
+      return error(PERM_NEEDED_X, perms[i + 1]);
     }
 
     // check concurrency of commands
@@ -330,15 +330,15 @@ public abstract class Command extends Progress {
     } catch(final ProgressException ex) {
       // process was interrupted by the user or server
       abort();
-      return error(PROGERR);
+      return error(INTERRUPTED);
     } catch(final Throwable ex) {
       // unexpected error
       Performance.gc(2);
       abort();
       if(ex instanceof OutOfMemoryError) {
         Util.debug(ex);
-        return error(PROCMEM + ((flags & (User.CREATE | User.WRITE)) != 0 ?
-            PROCMEMCREATE : ""));
+        return error(OUT_OF_MEM + ((flags & (User.CREATE | User.WRITE)) != 0 ?
+            HELP_OUT_OF_MEM : ""));
       }
       return error(Util.bug(ex));
     } finally {

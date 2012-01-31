@@ -57,17 +57,18 @@ abstract class AUser extends Command {
     final String u = args[off];
     final String d = off + 1 < args.length ? args[off + 1] : null;
 
-    if(!MetaData.validName(u, true)) return error(NAMEINVALID, u);
-    if(d != null && !MetaData.validName(d, true)) return error(NAMEINVALID, d);
+    if(!MetaData.validName(u, true)) return error(NAME_INVALID_X, u);
+    if(d != null && !MetaData.validName(d, true))
+      return error(NAME_INVALID_X, d);
 
     // retrieve all users; stop if no user is found
     final String[] users = users(u);
-    if(users.length == 0) return info(USERNO, u) && opt;
+    if(users.length == 0) return info(UNKNOWN_USER_X, u) && opt;
     // retrieve all databases
     String[] dbs = null;
     if(d != null) {
       dbs = databases(d);
-      if(dbs.length == 0) return info(DBNOTFOUND, d) && opt;
+      if(dbs.length == 0) return info(DB_NOT_FOUND_X, d) && opt;
     }
 
     // loop through all users

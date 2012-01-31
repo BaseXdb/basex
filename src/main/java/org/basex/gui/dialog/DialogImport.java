@@ -52,14 +52,14 @@ public final class DialogImport extends BaseXBack {
     border(8);
 
     // add options
-    add(new BaseXLabel(CREATETITLE + COL, true, true).border(0, 0, 4, 0));
+    add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 4, 0));
 
     final BaseXBack b = new BaseXBack(new TableLayout(1, 2, 8, 0));
     input = new BaseXTextField(gui.gprop.get(GUIProp.CREATEPATH), dialog);
     input.addKeyListener(dialog.keys);
     b.add(input);
 
-    final BaseXButton browse = new BaseXButton(BUTTONBROWSE, dialog);
+    final BaseXButton browse = new BaseXButton(BROWSE_D, dialog);
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
@@ -71,17 +71,18 @@ public final class DialogImport extends BaseXBack {
     add(b);
 
     final Prop prop = gui.context.prop;
-    skip = new BaseXCheckBox(CREATECORRUPT, prop.is(Prop.SKIPCORRUPT), dialog);
+    skip = new BaseXCheckBox(SKIP_CORRUPT_FILES,
+        prop.is(Prop.SKIPCORRUPT), dialog);
     add(skip);
 
-    archives = new BaseXCheckBox(CREATEARCHIVES, prop.is(Prop.ADDARCHIVES),
+    archives = new BaseXCheckBox(PARSE_ARCHIVES, prop.is(Prop.ADDARCHIVES),
         dialog);
     add(archives);
 
-    add(new BaseXLabel(CREATEPATTERN + COL, true, true).border(8, 0, 4, 0));
+    add(new BaseXLabel(FILE_PATTERNS + COL, true, true).border(8, 0, 4, 0));
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), dialog);
     add(filter);
-    raw = new BaseXCheckBox(CREATERAW, prop.is(Prop.ADDRAW), dialog);
+    raw = new BaseXCheckBox(ADD_RAW_FILES, prop.is(Prop.ADDRAW), dialog);
     add(raw);
 
     // add additional options
@@ -115,14 +116,14 @@ public final class DialogImport extends BaseXBack {
    * @return file chooser
    */
   protected IOFile inputFile() {
-    final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
+    final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
         gui.gprop.get(GUIProp.CREATEPATH), gui);
-    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
-    fc.addFilter(CREATEHTMLDESC, IO.HTMLSUFFIXES);
-    fc.addFilter(CREATECSVDESC, IO.CSVSUFFIX);
-    fc.addFilter(CREATETXTDESC, IO.TXTSUFFIX);
-    fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
-    fc.addFilter(CREATEZIPDESC, IO.ZIPSUFFIXES);
+    fc.addFilter(XML_DOCUMENTS, IO.XMLSUFFIX);
+    fc.addFilter(HTML_DOCUMENTS, IO.HTMLSUFFIXES);
+    fc.addFilter(CSV_DOCUMENTS, IO.CSVSUFFIX);
+    fc.addFilter(PLAIN_TEXT, IO.TXTSUFFIX);
+    fc.addFilter(GZIP_ARCHIVES, IO.GZSUFFIX);
+    fc.addFilter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
     final IOFile file = fc.select(BaseXFileChooser.Mode.FDOPEN);
     if(file != null) gui.gprop.set(GUIProp.CREATEPATH, file.path());
     return file;

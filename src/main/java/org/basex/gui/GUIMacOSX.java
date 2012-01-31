@@ -1,10 +1,11 @@
 package org.basex.gui;
 
-import static org.basex.core.Text.*;
 import java.awt.Image;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+
+import org.basex.core.Prop;
 import org.basex.gui.layout.BaseXLayout;
 
 /**
@@ -49,7 +50,7 @@ public final class GUIMacOSX {
    */
   public GUIMacOSX() throws Exception {
     // name for the dock icon and the application menu
-    System.setProperty(P_ABOUT_NAME, NAME);
+    System.setProperty(P_ABOUT_NAME, Prop.NAME);
     // show menu in the screen menu instead of inside the application window
     System.setProperty(P_SCREEN_MENU_BAR, "true");
 
@@ -131,7 +132,7 @@ public final class GUIMacOSX {
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUICommands.ABOUT).execute(main);
+      ((GUICommand) GUICommands.C_ABOUT).execute(main);
     }
 
     /**
@@ -153,7 +154,7 @@ public final class GUIMacOSX {
     /** Called when the Preference item in the application menu is selected. */
     public void handlePreferences() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUICommands.PREFS).execute(main);
+      ((GUICommand) GUICommands.C_PREFS).execute(main);
     }
 
     /**
@@ -165,7 +166,7 @@ public final class GUIMacOSX {
     /** Called when the application is sent the Quit event. */
     public void handleQuit() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUICommands.EXIT).execute(main);
+      ((GUICommand) GUICommands.C_EXIT).execute(main);
     }
 
     /**

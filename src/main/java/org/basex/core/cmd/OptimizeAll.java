@@ -52,7 +52,7 @@ public final class OptimizeAll extends ACreate {
       optimizeAll(data, context, this);
 
       final Open open = new Open(data.meta.name);
-      return open.run(context) ? info(DBOPTIMIZED, data.meta.name, perf) :
+      return open.run(context) ? info(DB_OPTIMIZED_X, data.meta.name, perf) :
         error(open.info());
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -72,7 +72,7 @@ public final class OptimizeAll extends ACreate {
 
   @Override
   public String det() {
-    return INFOSTATS;
+    return CREATE_STATS_D;
   }
 
   @Override
@@ -92,14 +92,15 @@ public final class OptimizeAll extends ACreate {
   public static void optimizeAll(final Data data, final Context ctx,
       final OptimizeAll cmd) throws IOException {
 
-    if(!(data instanceof DiskData)) throw new BaseXException(PROCMM);
+    if(!(data instanceof DiskData)) throw new BaseXException(NO_MAINMEM);
 
     final DiskData old = (DiskData) data;
     final MetaData m = old.meta;
     if(cmd != null) cmd.size = m.size;
 
     // check if database is also pinned by other users
-    if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DBPINNED, m.name);
+    if(ctx.datas.pins(m.name) > 1)
+      throw new BaseXException(DB_PINNED_X, m.name);
 
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
@@ -135,9 +136,9 @@ public final class OptimizeAll extends ACreate {
     // drop old database and rename temporary to final name
     // usually, no exceptions should be thrown here anymore
     if(!DropDB.drop(m.name, ctx.mprop))
-      throw new BaseXException(DBDROPERROR, m.name);
+      throw new BaseXException(DB_NOT_DROPPED_X, m.name);
     if(!AlterDB.alter(tname, m.name, ctx.mprop))
-      throw new BaseXException(DBNOTALTERED, tname);
+      throw new BaseXException(DB_NOT_RENAMED_X, tname);
   }
 
   /**

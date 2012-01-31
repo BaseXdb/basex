@@ -30,10 +30,10 @@ public final class RepoList extends Command {
   @Override
   protected boolean run() throws IOException {
     final Table t = new Table();
-    t.description = PACKAGES;
+    t.description = PACKAGES_X;
     t.header.add(DataText.TABLEURI);
     t.header.add(VERSINFO);
-    t.header.add(INFODIRECTORY);
+    t.header.add(DIRECTORY);
 
     for(final byte[] p : context.repo.pkgDict()) {
       if(p != null) {

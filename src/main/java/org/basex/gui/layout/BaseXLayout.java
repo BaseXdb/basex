@@ -210,13 +210,13 @@ public final class BaseXLayout {
         // browse back/forward
         if(gui.context.data() != null) {
           if(GOBACK.is(e)) {
-            GUICommands.GOBACK.execute(gui);
+            GUICommands.C_GOBACK.execute(gui);
           } else if(GOFORWARD.is(e)) {
-            GUICommands.GOFORWARD.execute(gui);
+            GUICommands.C_GOFORWARD.execute(gui);
           } else if(GOUP.is(e)) {
-            GUICommands.GOUP.execute(gui);
+            GUICommands.C_GOUP.execute(gui);
           } else if(GOHOME.is(e)) {
-            GUICommands.GOHOME.execute(gui);
+            GUICommands.C_GOHOME.execute(gui);
           }
         }
 
@@ -457,6 +457,6 @@ public final class BaseXLayout {
    * @return character width
    */
   public static int width(final Graphics g, final int[] cw, final int c) {
-    return c > 255 ? g.getFontMetrics().charWidth(c) : cw[c];
+    return c >= cw.length ? g.getFontMetrics().charWidth(c) : cw[c];
   }
 }

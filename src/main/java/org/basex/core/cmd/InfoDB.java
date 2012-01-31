@@ -55,37 +55,38 @@ public final class InfoDB extends AInfo {
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ?
         new TokenBuilder().bold().add('%').norm().toString() : "%") + NL;
-    tb.addExt(header, INFODB);
-    format(tb, INFODBNAME, meta.name);
-    format(tb, INFODBSIZE, Performance.format(meta.dbsize()));
-    format(tb, INFONODES, Integer.toString(meta.size));
+    tb.addExt(header, DB_PROPS);
+    format(tb, NAME, meta.name);
+    format(tb, SIZE, Performance.format(meta.dbsize()));
+    format(tb, NODES, Integer.toString(meta.size));
 
     // count number of raw files
     final int bin = meta.binaries().descendants().size();
-    format(tb, INFODOCS, Integer.toString(meta.ndocs));
-    format(tb, INFOBIN, Integer.toString(bin));
-    format(tb, INFOTIME, DATE.format(new Date(meta.dbtime())));
-    if(meta.corrupt) tb.add(' ' + DBCORRUPT + NL);
+    format(tb, DOCUMENTS, Integer.toString(meta.ndocs));
+    format(tb, BINARIES, Integer.toString(bin));
+    format(tb, TIMESTAMP, DATE.format(new Date(meta.dbtime())));
+    if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
-    tb.add(NL).addExt(header, INFORESOURCE);
-    if(create && !meta.original.isEmpty()) format(tb, INFOPATH, meta.original);
+    tb.add(NL).addExt(header, RESOURCE_PROPS);
+    if(create && !meta.original.isEmpty())
+      format(tb, INPUT_PATH, meta.original);
     if(meta.filesize != 0)
-      format(tb, INFODOCSIZE, Performance.format(meta.filesize));
-    format(tb, INFOTIME, DATE.format(new Date(meta.time)));
-    format(tb, INFOENCODING, meta.encoding);
-    format(tb, INFOCHOP, Util.flag(meta.chop));
+      format(tb, INPUT_SIZE, Performance.format(meta.filesize));
+    format(tb, TIMESTAMP, DATE.format(new Date(meta.time)));
+    format(tb, ENCODING, meta.encoding);
+    format(tb, WS_CHOPPING, Util.flag(meta.chop));
 
     if(index) {
-      tb.add(NL).addExt(header, INDEXINFO);
+      tb.add(NL).addExt(header, INDEXES);
       if(meta.oldindex) {
-        tb.add(" " + INDUPDATE + NL);
+        tb.add(" " + H_INDEX_FORMAT + NL);
       } else {
-        format(tb, INFOUPTODATE, String.valueOf(meta.uptodate));
-        format(tb, INFOPATHINDEX, Util.flag(meta.pathindex));
-        format(tb, INFOTEXTINDEX, Util.flag(meta.textindex));
-        format(tb, INFOATTRINDEX, Util.flag(meta.attrindex));
-        format(tb, INFOFTINDEX, Util.flag(meta.ftxtindex) + (meta.ftxtindex &&
-            meta.wildcards ? " (" + INFOWCINDEX + ")" : ""));
+        format(tb, UP_TO_DATE, String.valueOf(meta.uptodate));
+        format(tb, PATH_INDEX, Util.flag(meta.pathindex));
+        format(tb, TEXT_INDEX, Util.flag(meta.textindex));
+        format(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
+        format(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex) +
+            (meta.ftxtindex && meta.wildcards ? " (" + WILDCARDS + ")" : ""));
       }
     }
     return tb.toString();

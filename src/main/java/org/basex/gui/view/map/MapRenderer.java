@@ -1,11 +1,12 @@
 package org.basex.gui.view.map;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Arrays;
+
+import org.basex.core.Text;
 import org.basex.data.FTPos;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.ft.FTLexer;
@@ -93,7 +94,7 @@ final class MapRenderer {
         if(ll != 0) yy += fh;
         if(yy + fh > r.y + r.h) {
           // text to high, skip drawing
-          if(draw) g.drawString(DOTS, xx + ll, yy);
+          if(draw) g.drawString(Text.DOTS, xx + ll, yy);
           return r.h;
         }
 
@@ -129,7 +130,7 @@ final class MapRenderer {
         yy += fh;
         if(yy + fh > r.y + r.h) {
           // text to high, skip drawing
-          if(draw) g.drawString(DOTS, xx + ll, yy);
+          if(draw) g.drawString(Text.DOTS, xx + ll, yy);
           return r.h;
         }
       }

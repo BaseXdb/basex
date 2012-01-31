@@ -40,16 +40,17 @@ public final class Copy extends Command {
     final String db = args[0];
     final String newdb = args[1];
     // check if names are valid
-    if(!MetaData.validName(db, false)) return error(NAMEINVALID, db);
-    if(!MetaData.validName(newdb, false)) return error(NAMEINVALID, newdb);
+    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
+    if(!MetaData.validName(newdb, false)) return error(NAME_INVALID_X, newdb);
 
     // database does not exist
-    if(!mprop.dbexists(db)) return error(DBNOTFOUND, db);
+    if(!mprop.dbexists(db)) return error(DB_NOT_FOUND_X, db);
     // target database exists already
-    if(mprop.dbexists(newdb)) return error(DBEXIST, newdb);
+    if(mprop.dbexists(newdb)) return error(DB_EXISTS_X, newdb);
 
     // try to copy database
-    return copy(db, newdb) ? info(DBCOPY, db, perf) : error(DBNOCOPY, db);
+    return copy(db, newdb) ? info(DB_COPIED_X, db, perf) :
+      error(DB_NOT_COPIED_X, db);
   }
 
   /**
@@ -111,7 +112,7 @@ public final class Copy extends Command {
 
   @Override
   protected String tit() {
-    return BUTTONCOPY;
+    return COPY_D;
   }
 
   @Override

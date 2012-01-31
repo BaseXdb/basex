@@ -56,10 +56,10 @@ public final class DialogInsert extends Dialog {
    * @param main reference to the main window
    */
   public DialogInsert(final GUI main) {
-    super(main, INSERTTITLE);
+    super(main, INSERT_NEW_DATA);
 
-    label1 = new BaseXLabel(EDITNAME + COLS, true, true).border(0, 0, 0, 0);
-    label2 = new BaseXLabel(EDITVALUE + COLS, true, true).border(0, 0, 0, 0);
+    label1 = new BaseXLabel(NAME + COLS, true, true).border(0, 0, 0, 0);
+    label2 = new BaseXLabel(VALUE + COLS, true, true).border(0, 0, 0, 0);
 
     input1 = new BaseXTextField(this);
     input1.addKeyListener(keys);
@@ -81,9 +81,9 @@ public final class DialogInsert extends Dialog {
     };
 
     final int lkind = gui.gprop.num(GUIProp.LASTINSERT);
-    radio = new BaseXRadio[EDITKIND.length];
-    for(int i = 1; i < EDITKIND.length; ++i) {
-      radio[i] = new BaseXRadio(EDITKIND[i], false, this);
+    radio = new BaseXRadio[NODE_KINDS.length];
+    for(int i = 1; i < NODE_KINDS.length; ++i) {
+      radio[i] = new BaseXRadio(NODE_KINDS[i], false, this);
       radio[i].addActionListener(al);
       radio[i].setSelected(i == lkind);
       radio[i].addKeyListener(keys);
@@ -138,17 +138,19 @@ public final class DialogInsert extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    for(int i = 1; i < EDITKIND.length; ++i) if(radio[i].isSelected()) kind = i;
+    for(int i = 1; i < NODE_KINDS.length; ++i) {
+      if(radio[i].isSelected()) kind = i;
+    }
     gui.gprop.set(GUIProp.LASTINSERT, kind);
 
     String msg = null;
     ok = kind != Data.TEXT || input2.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
-      if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID, EDITNAME);
+      if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID_X, NAME);
     }
     info.setText(msg, Msg.ERROR);
-    enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, B_OK, ok);
   }
 
   @Override

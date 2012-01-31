@@ -78,7 +78,7 @@ public final class Check extends Command {
         io.date() == in.date();
       if(found && ctx.perm(User.READ, data.meta)) return data;
       Close.close(data, ctx);
-      if(found) throw new BaseXException(PERMNO, CmdPerm.READ);
+      if(found) throw new BaseXException(PERM_NEEDED_X, CmdPerm.READ);
     }
 
     // choose OPEN if user has no create permissions, or if database exists
@@ -86,7 +86,8 @@ public final class Check extends Command {
       return Open.open(name, ctx);
 
     // check if file exists
-    if(!io.exists()) throw new FileNotFoundException(Util.info(FILEWHICH, io));
+    if(!io.exists()) throw new FileNotFoundException(
+        Util.info(FILE_NOT_FOUND_X, io));
 
     // if force flag is set to false, create a main memory instance
     if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(io, ctx);

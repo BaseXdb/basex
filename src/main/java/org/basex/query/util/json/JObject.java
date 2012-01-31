@@ -35,6 +35,6 @@ final class JObject extends JStruct {
 
   @Override
   byte[] type() {
-    return OBJ;
+    return T_OBJECT;
   }
 }

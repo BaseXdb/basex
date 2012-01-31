@@ -198,7 +198,7 @@ public final class QueryContext extends Progress {
    */
   public void compile() throws QueryException {
     // dump compilation info
-    if(inf) compInfo(NL + QUERYCOMP);
+    if(inf) compInfo(NL + COMPILING_C);
 
     // temporarily set database values
     if(dbOptions != null) {
@@ -240,7 +240,7 @@ public final class QueryContext extends Progress {
     }
 
     // dump resulting query
-    if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
+    if(inf) info.add(NL + RESULT_C + funcs + root + NL);
   }
 
   /**
@@ -460,7 +460,7 @@ public final class QueryContext extends Progress {
    */
   public void evalInfo(final byte[] string) {
     if(!inf) return;
-    if(firstEval) info.add(NL).add(QUERYEVAL).add(NL);
+    if(firstEval) info.add(NL).add(EVALUATING_C).add(NL);
     info.add(QUERYSEP).add(string).add(NL);
     firstEval = false;
   }
@@ -501,12 +501,12 @@ public final class QueryContext extends Progress {
 
   @Override
   public String tit() {
-    return QUERYEVAL;
+    return EVALUATING_C;
   }
 
   @Override
   public String det() {
-    return QUERYEVAL;
+    return EVALUATING_C;
   }
 
   @Override

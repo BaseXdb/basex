@@ -36,7 +36,7 @@ public final class Delete extends ACreate {
     final TokenList bins = data.resources.binaries(target);
     delete(data, target);
 
-    return info(PATHDELETED, docs.size() + bins.size(), perf);
+    return info(DOCS_DELETED_X_X, docs.size() + bins.size(), perf);
   }
 
   /**

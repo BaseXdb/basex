@@ -67,7 +67,7 @@ public class BaseXTextField extends JTextField {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(UNDO.is(e) || REDO.is(e)) {
+        if(UNDOSTEP.is(e) || REDOSTEP.is(e)) {
           final String t = getText();
           setText(last);
           last = t;

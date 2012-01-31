@@ -54,7 +54,7 @@ public final class DialogNew extends Dialog {
    * @param main reference to the main window
    */
   public DialogNew(final GUI main) {
-    super(main, CREATEADVTITLE);
+    super(main, CREATE_DATABASE);
 
     db = List.list(main.context);
     final Prop prop = gui.context.prop;
@@ -64,7 +64,7 @@ public final class DialogNew extends Dialog {
     target.addKeyListener(keys);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
-    pnl.add(new BaseXLabel(CREATENAME + COLS, false, true).border(8, 0, 4, 0));
+    pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 4, 0));
     pnl.add(target);
 
     // option panels
@@ -73,34 +73,35 @@ public final class DialogNew extends Dialog {
 
     // index panel
     final BaseXBack p3 = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
-    pathindex = new BaseXCheckBox(INFOPATHINDEX,
+    pathindex = new BaseXCheckBox(PATH_INDEX,
        prop.is(Prop.PATHINDEX), 0, this);
     p3.add(pathindex);
-    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
+    p3.add(new BaseXLabel(H_PATH_INDEX, true, false));
 
-    txtindex = new BaseXCheckBox(INFOTEXTINDEX,
+    txtindex = new BaseXCheckBox(TEXT_INDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
-    p3.add(new BaseXLabel(TXTINDEXINFO, true, false));
+    p3.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
-    atvindex = new BaseXCheckBox(INFOATTRINDEX,
+    atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX,
         prop.is(Prop.ATTRINDEX), 0, this);
     p3.add(atvindex);
-    p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
+    p3.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
     final BaseXBack p4 = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
-    ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);
+    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX,
+        prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
 
     ft = new DialogFT(this, true);
     p4.add(ft);
 
     final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(GENERALINFO, options);
-    tabs.addTab(PARSEINFO, parsing);
-    tabs.addTab(INDEXINFO, p3);
-    tabs.addTab(FTINFO, p4);
+    tabs.addTab(GENERAL, options);
+    tabs.addTab(PARSING, parsing);
+    tabs.addTab(INDEXES, p3);
+    tabs.addTab(FULLTEXT, p4);
     set(tabs, BorderLayout.CENTER);
 
     buttons = okCancel();
@@ -129,7 +130,7 @@ public final class DialogNew extends Dialog {
     final String nm = target.getText().trim();
     ok = valid && !nm.isEmpty();
 
-    String inf = !valid ? PATHWHICH : !ok ? DBWHICH : null;
+    String inf = !valid ? FILE_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = MetaData.validName(nm, false);
@@ -137,20 +138,20 @@ public final class DialogNew extends Dialog {
 
       if(!ok) {
         // name of database is invalid
-        inf = Util.info(INVALID, EDITNAME);
+        inf = Util.info(INVALID_X, NAME);
       } else if(options.input.getText().trim().isEmpty()) {
         // database will be empty
-        inf = EMPTYDATABASE;
+        inf = EMPTY_DB;
         icon = Msg.WARN;
       } else if(db.contains(nm)) {
         // old database will be overwritten
-        inf = RENAMEOVER;
+        inf = OVERWRITE_DB;
         icon = Msg.WARN;
       }
     }
 
     options.info.setText(inf, icon);
-    enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, B_OK, ok);
   }
 
   @Override

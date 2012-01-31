@@ -53,7 +53,7 @@ public final class Grant extends AUser {
     } else if(cmd == CmdPerm.ADMIN && args[2] == null) {
       prm = User.ADMIN;
     }
-    if(prm == -1) return error(PERMINV, args[0]);
+    if(prm == -1) return error(PERM_UNKNOWN_X, args[0]);
 
     return run(1, false);
   }
@@ -61,13 +61,13 @@ public final class Grant extends AUser {
   @Override
   protected boolean run(final String user, final String db) {
     // admin cannot be modified
-    if(user.equals(ADMIN)) return !info(USERADMIN);
+    if(user.equals(ADMIN)) return !info(ADMIN_STATIC_X);
 
     // set global permissions
     if(db == null) {
       context.users.get(user).perm = prm;
       context.users.write();
-      return info(GRANT, args[0], user);
+      return info(GRANTED_X_X, args[0], user);
     }
 
     // set local permissions
@@ -83,11 +83,11 @@ public final class Grant extends AUser {
       data.meta.dirty = true;
       data.flush();
       Close.close(data, context);
-      return info(GRANTON, args[0], user, db);
+      return info(GRANTED_ON_X_X_X, args[0], user, db);
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();
-      return !info(msg.isEmpty() ? DBOPENERR : msg, db);
+      return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
     }
   }
 

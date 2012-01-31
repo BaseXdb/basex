@@ -36,10 +36,10 @@ public final class Help extends Command {
 
     if(key != null) {
       final Cmd cmd = getOption(key, Cmd.class);
-      if(cmd == null) return error(CMDUNKNOWN, this);
+      if(cmd == null) return error(UNKNOWN_CMD_X, this);
       out.print(cmd.help(true, wiki));
     } else {
-      out.println(CMDHELP);
+      out.println(TRY_SPECIFIC_X);
       for(final Cmd c : Cmd.values()) out.print(c.help(false, wiki));
     }
     return true;

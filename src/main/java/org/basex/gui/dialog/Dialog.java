@@ -157,7 +157,7 @@ public abstract class Dialog extends JDialog {
    * @return button list
    */
   protected BaseXBack okCancel() {
-    return newButtons(BUTTONOK, BUTTONCANCEL);
+    return newButtons(B_OK, CANCEL);
   }
 
   /**
@@ -265,7 +265,7 @@ public abstract class Dialog extends JDialog {
     try {
       Desktop.getDesktop().browse(new URI(url));
     } catch(final Exception ex) {
-      error(gui, Util.info(INFOBROSERERR, URL));
+      error(gui, Util.info(H_BROWSER_ERROR_X, URL));
     }
   }
 }

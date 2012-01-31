@@ -30,7 +30,7 @@ public final class DropIndex extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(data instanceof MemData) return error(PROCMM);
+    if(data instanceof MemData) return error(NO_MAINMEM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
     switch(ci) {
@@ -47,19 +47,19 @@ public final class DropIndex extends ACreate {
         data.meta.createpath = false;
         return drop(IndexType.PATH);
       default:
-        return error(CMDUNKNOWN, this);
+        return error(UNKNOWN_CMD_X, this);
     }
   }
 
   /**
    * Drops the specified index.
-   * @param index index type
+   * @param idx index type
    * @return success of operation
    */
-  private boolean drop(final IndexType index) {
+  private boolean drop(final IndexType idx) {
     try {
-      return drop(index, context.data()) ?
-          info(INDDROP, index, perf) : error(INDDROPERROR, index);
+      return drop(idx, context.data()) ? info(INDEX_DROPPED_X_X, idx, perf) :
+        error(INDEX_NOT_DROPPED_X, idx);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

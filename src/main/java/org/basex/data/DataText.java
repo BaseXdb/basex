@@ -185,41 +185,41 @@ public interface DataText {
   byte[] E_NBSP = token("&nbsp;");
 
   /** Token: results. */
-  byte[] RESULTS = token("results");
+  byte[] T_RESULTS = token("results");
   /** Token: result. */
-  byte[] RESULT = token("result");
+  byte[] T_RESULT = token("result");
   /** Token: name. */
-  byte[] NAME = token("name");
+  byte[] T_NAME = token("name");
   /** Token: size. */
-  byte[] SIZE = token("size");
+  byte[] T_SIZE = token("size");
   /** Token: min. */
-  byte[] MIN = token("min");
+  byte[] T_MIN = token("min");
   /** Token: max. */
-  byte[] MAX = token("max");
+  byte[] T_MAX = token("max");
   /** Token: count. */
-  byte[] COUNT = token("count");
+  byte[] T_COUNT = token("count");
   /** Token: index. */
-  byte[] INDEX = token("index");
+  byte[] T_INDEX = token("index");
   /** Token: key. */
-  byte[] KEY = token("key");
+  byte[] T_KEY = token("key");
 
   /** Token: json. */
-  byte[] JSON = token("json");
+  byte[] T_JSON = token("json");
   /** Token: type. */
-  byte[] TYPE = token("type");
+  byte[] T_TYPE = token("type");
   /** Token: value. */
-  byte[] VALUE = token("value");
+  byte[] T_VALUE = token("value");
 
   /** Token: string. */
-  byte[] STR = token("string");
+  byte[] T_STRING = token("string");
   /** Token: number. */
-  byte[] NUM = token("number");
+  byte[] T_NUMBER = token("number");
   /** Token: boolean. */
-  byte[] BOOL = token("boolean");
+  byte[] T_BOOLEAN = token("boolean");
   /** Token: array. */
-  byte[] ARR = token("array");
+  byte[] T_ARRAY = token("array");
   /** Token: object. */
-  byte[] OBJ = token("object");
+  byte[] T_OBJECT = token("object");
 
   /** Comment output. */
   byte[] COMM_O = token("<!--");

@@ -32,7 +32,7 @@ public final class CreateIndex extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(data instanceof MemData) return error(PROCMM);
+    if(data instanceof MemData) return error(NO_MAINMEM);
 
     try {
       IndexType index = null;
@@ -61,12 +61,12 @@ public final class CreateIndex extends ACreate {
           index = IndexType.PATH;
           break;
         default:
-          return error(CMDUNKNOWN, this);
+          return error(UNKNOWN_CMD_X, this);
       }
       create(index, data, this);
       data.flush();
 
-      return info(INDCREATED, index, perf);
+      return info(INDEX_CREATED_X_X, index, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

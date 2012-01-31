@@ -52,11 +52,11 @@ public final class DialogInput extends Dialog {
 
     String title = "";
     if(type == 0) {
-      title = CREATETARGET + COLS;
+      title = TARGET_PATH + COLS;
     } else if(type == 1) {
-      title = CREATENAME + COLS;
+      title = NAME_OF_DB + COLS;
     } else if(type == 2) {
-      title = CREATENAMEC + COLS;
+      title = NAME_OF_DB_COPY + COLS;
     }
 
     set(new BaseXLabel(title, false, true).border(
@@ -76,7 +76,7 @@ public final class DialogInput extends Dialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(BUTTONOK, BUTTONCANCEL);
+    buttons = newButtons(B_OK, CANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);
@@ -95,15 +95,15 @@ public final class DialogInput extends Dialog {
     final String in = input();
     String msg = null;
     ok = type != 0 && (db.contains(in) || in.equals(old));
-    if(ok) msg = Util.info(DBEXIST, in);
+    if(ok) msg = Util.info(DB_EXISTS_X, in);
     if(!ok) {
       ok = type == 0 ? MetaData.normPath(in) != null :
           MetaData.validName(in, false);
-      if(!ok) msg = in.isEmpty() ? DBWHICH : Util.info(INVALID, EDITNAME);
+      if(!ok) msg = in.isEmpty() ? ENTER_DB_NAME : Util.info(INVALID_X, NAME);
     }
 
     info.setText(msg, type == 1 || type == 2 ? Msg.ERROR : Msg.WARN);
-    enableOK(buttons, BUTTONOK, ok);
+    enableOK(buttons, B_OK, ok);
   }
 
   @Override

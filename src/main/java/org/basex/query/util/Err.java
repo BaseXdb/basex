@@ -32,11 +32,11 @@ public enum Err {
   /** BASX0004: Evaluation exception. */
   IDINVALID(BASX, 4, "%: value '%' out of range."),
   /** BASX0005: Evaluation exception. */
-  PERMNO(BASX, 5, Text.PERMNO),
+  PERMNO(BASX, 5, Text.PERM_NEEDED_X),
   /** BASX0006: Evaluation exception. */
   DBCLOSE(BASX, 6, "Not all databases properly closed."),
   /** BASX0007: Evaluation exception. */
-  QUERYNODES(BASX, 7, Text.QUERYNODESERR),
+  QUERYNODES(BASX, 7, Text.NO_DB_NODES),
   /** BASX0008: Evaluation exception. */
   EXPSINGLE(BASX, 8, "Database '%' contains more than one document."),
   /** BASX0009: Evaluation exception. */

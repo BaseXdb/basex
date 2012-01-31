@@ -19,16 +19,16 @@ public final class MainProp extends AProp {
 
   /** Database path. */
   public static final Object[] DBPATH = { "DBPATH",
-    Prop.HOME + (USERHOME ? Text.NAME + "Data" : "data") };
+    Prop.HOME + (USERHOME ? Prop.NAME + "Data" : "data") };
   /** HTTP path. */
   public static final Object[] HTTPPATH = { "HTTPPATH",
-    Prop.HOME + (USERHOME ? Text.NAME + "HTTP" : "http") };
+    Prop.HOME + (USERHOME ? Prop.NAME + "HTTP" : "http") };
   /** Package repository path. */
   public static final Object[] REPOPATH = { "REPOPATH",
-    Prop.HOME + (USERHOME ? Text.NAME + "Repo" : "repo") };
+    Prop.HOME + (USERHOME ? Prop.NAME + "Repo" : "repo") };
 
   /** Language name. */
-  public static final Object[] LANG = { "LANG", Text.LANGUAGE };
+  public static final Object[] LANG = { "LANG", Prop.LANG };
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
 

@@ -37,18 +37,18 @@ public final class Replace extends ACreate {
     // check if the input source has already been initialized
     if(in == null) {
       final IO io = IO.get(args[1]);
-      if(!io.exists()) return error(FILEWHICH, io);
+      if(!io.exists()) return error(FILE_NOT_FOUND_X, io);
       in = io.inputSource();
     }
 
     final String path = MetaData.normPath(args[0]);
-    if(path == null || path.isEmpty()) return error(DIRERR, args[0]);
+    if(path == null || path.isEmpty()) return error(NO_DIR_ALLOWED_X, args[0]);
 
     final Data data = context.data();
     final int pre = data.resources.doc(path, false);
     // check if path points to a single file
     if(pre != -1 && data.resources.docs(path).size() != 1)
-      return error(DIRERR, path);
+      return error(NO_DIR_ALLOWED_X, path);
 
     final IOFile file = data.meta.binary(path);
     if(file != null && file.exists()) {
@@ -67,6 +67,6 @@ public final class Replace extends ACreate {
       // flushes changes
       data.flush();
     }
-    return info(PATHREPLACED, 1, perf);
+    return info(DOCS_REPLACED_X_X, 1, perf);
   }
 }

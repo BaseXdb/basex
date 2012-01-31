@@ -97,13 +97,13 @@ public final class CSVParser extends SingleParser {
     separator = s.equals(SEPARATORS[0]) ? ',' : s.equals(SEPARATORS[1]) ? ';' :
       s.equals(SEPARATORS[2]) ? '\t' : -1;
     if(separator == -1) throw new BaseXException(
-        SETVAL, ParserProp.SEPARATOR[0], s);
+        INVALID_VALUE_X_X, ParserProp.SEPARATOR[0], s);
 
     // set XML format
     s = props.get(ParserProp.FORMAT).toLowerCase(Locale.ENGLISH);
     simple = s.equals(FORMATS[0]);
     if(!simple && !s.equals(FORMATS[1])) throw new BaseXException(
-        SETVAL, ParserProp.FORMAT[0], s);
+        INVALID_VALUE_X_X, ParserProp.FORMAT[0], s);
     encoding = props.get(ParserProp.ENCODING);
   }
 

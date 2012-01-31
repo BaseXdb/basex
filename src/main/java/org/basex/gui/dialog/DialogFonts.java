@@ -36,7 +36,7 @@ public final class DialogFonts extends Dialog {
    * @param main reference to the main window
    */
   public DialogFonts(final GUI main) {
-    super(main, FONTTITLE, false);
+    super(main, CHOOSE_FONT, false);
 
     final String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().
       getAvailableFontFamilyNames();
@@ -46,7 +46,7 @@ public final class DialogFonts extends Dialog {
     p.add(font);
     font2 = new BaseXList(fonts, this);
     p.add(font2);
-    type = new BaseXList(FONTTYPES, this);
+    type = new BaseXList(FONT_TYPES, this);
     type.setWidth(90);
     p.add(type);
     size = new BaseXList(FTSZ, this);
@@ -56,7 +56,7 @@ public final class DialogFonts extends Dialog {
     final GUIProp gprop = gui.gprop;
     font.setValue(gprop.get(GUIProp.FONT));
     font2.setValue(gprop.get(GUIProp.MONOFONT));
-    type.setValue(FONTTYPES[gprop.num(GUIProp.FONTTYPE)]);
+    type.setValue(FONT_TYPES[gprop.num(GUIProp.FONTTYPE)]);
     size.setValue(Integer.toString(gui.gprop.num(GUIProp.FONTSIZE)));
 
     set(p, BorderLayout.CENTER);

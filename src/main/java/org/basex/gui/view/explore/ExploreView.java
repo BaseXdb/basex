@@ -38,12 +38,12 @@ public final class ExploreView extends View {
 
     layout(new BorderLayout(0, 4)).border(6, 6, 6, 6).setFocusable(false);
 
-    header = new BaseXLabel(EXPLORETIT, true, false);
+    header = new BaseXLabel(EXPLORER, true, false);
 
     final BaseXBack b = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     b.add(header, BorderLayout.CENTER);
 
-    filter = BaseXButton.command(GUICommands.FILTER, gui);
+    filter = BaseXButton.command(GUICommands.C_FILTER, gui);
     filter.addKeyListener(this);
 
     b.add(filter, BorderLayout.EAST);

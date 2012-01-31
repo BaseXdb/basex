@@ -43,8 +43,8 @@ public class BaseXButton extends JButton {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final String text = getText();
-        if(text.equals(BUTTONCANCEL)) d.cancel();
-        else if(text.equals(BUTTONOK)) d.close();
+        if(text.equals(CANCEL)) d.cancel();
+        else if(text.equals(B_OK)) d.close();
         else d.action(e.getSource());
       }
     });
@@ -64,7 +64,7 @@ public class BaseXButton extends JButton {
    * @param hlp help text
    */
   public BaseXButton(final Window gui, final String img, final byte[] hlp) {
-    super(BaseXLayout.icon("cmd-" + img));
+    super(BaseXLayout.icon(img));
     BaseXLayout.addInteraction(this, gui);
     if(hlp != null) setToolTipText(Token.string(hlp));
 
@@ -96,7 +96,6 @@ public class BaseXButton extends JButton {
    * @return button
    */
   public static BaseXButton command(final GUICommand cmd, final GUI gui) {
-    // images are defined via the 'cmd-' prefix and the command in lower case
     final BaseXButton button = new BaseXButton(gui,
         cmd.toString().toLowerCase(Locale.ENGLISH), Token.token(cmd.help()));
     button.addActionListener(new ActionListener() {

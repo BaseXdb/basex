@@ -81,7 +81,7 @@ public final class CreateDB extends ACreate {
       }
     } else {
       final IO io = IO.get(args[1]);
-      if(!io.exists()) return error(FILEWHICH, io);
+      if(!io.exists()) return error(FILE_NOT_FOUND_X, io);
       if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
       parser = new DirParser(io, prop);
     }
@@ -101,14 +101,14 @@ public final class CreateDB extends ACreate {
 
     // check permissions
     if(!ctx.user.perm(User.CREATE))
-      throw new BaseXException(PERMNO, CmdPerm.CREATE);
+      throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);
 
     // create main memory database instance
     final Prop prop = ctx.prop;
     if(prop.is(Prop.MAINMEM)) return MemBuilder.build(name, parser, ctx.prop);
 
     // database is currently locked by another process
-    if(ctx.pinned(name)) throw new BaseXException(DBPINNED, name);
+    if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
 
     // build database and index structures
     final Builder builder = new DiskBuilder(name, parser, ctx);
@@ -139,7 +139,7 @@ public final class CreateDB extends ACreate {
       final Context ctx) throws IOException {
 
     if(ctx.user.perm(User.CREATE)) return MemBuilder.build(parser, ctx.prop);
-    throw new BaseXException(PERMNO, CmdPerm.CREATE);
+    throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);
   }
 
   /**
@@ -152,7 +152,7 @@ public final class CreateDB extends ACreate {
   public static synchronized MemData mainMem(final IO source, final Context ctx)
       throws IOException {
     if(!source.exists()) throw new FileNotFoundException(
-        Util.info(FILEWHICH, source));
+        Util.info(FILE_NOT_FOUND_X, source));
     return mainMem(new DirParser(source, ctx.prop), ctx);
   }
 

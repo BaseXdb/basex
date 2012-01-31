@@ -509,7 +509,8 @@ public final class CommandParser extends InputParser {
     final Enum<?>[] alt = list(cmp, token);
     if(token == null) {
       // show command error or available command extensions
-      throw par == null ? error(list(alt), CMDNO) : help(list(alt), par);
+      throw par == null ? error(list(alt), EXPECTING_CMD) :
+        help(list(alt), par);
     }
 
     // output error for similar commands
@@ -518,11 +519,11 @@ public final class CommandParser extends InputParser {
     for(final Enum<?> s : list(cmp, null)) {
       final byte[] sm = lc(token(s.name().toLowerCase(Locale.ENGLISH)));
       if(ls.similar(name, sm, 0) && Cmd.class.isInstance(s))
-        throw error(list(alt), CMDSIMILAR, name, sm);
+        throw error(list(alt), UNKNOWN_SIMILAR_X, name, sm);
     }
 
     // show unknown command error or available command extensions
-    throw par == null ? error(list(alt), CMDWHICH, token) :
+    throw par == null ? error(list(alt), UNKNOWN_TRY_X, token) :
       help(list(alt), par);
   }
 
@@ -534,7 +535,7 @@ public final class CommandParser extends InputParser {
    * @return QueryException query exception
    */
   private QueryException help(final StringList alt, final Cmd cmd) {
-    return error(alt, PROCSYNTAX, cmd.help(true, false));
+    return error(alt, SYNTAX_X, cmd.help(true, false));
   }
 
   /**

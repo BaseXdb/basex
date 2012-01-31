@@ -83,7 +83,6 @@ public class TextInput extends InputStream {
   @Override
   public int read() throws IOException {
     if(pp != 0) return last[lp + pp++ & 0x0F];
-
     int ch = inputs[ip].readChar();
     while(ch == -1 && ip != 0) ch = inputs[--ip].readChar();
     last[lp++] = ch;

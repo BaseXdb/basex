@@ -33,25 +33,25 @@ public final class DialogColors extends Dialog {
    * @param main reference to the main window
    */
   public DialogColors(final GUI main) {
-    super(main, SCHEMATITLE, false);
+    super(main, COLOR_SCHEMA, false);
 
     final GUIProp gprop = gui.gprop;
     final BaseXBack p = new BaseXBack(new TableLayout(3, 2, 16, 8));
 
-    p.add(new BaseXLabel(SCHEMARED));
+    p.add(new BaseXLabel(RED));
     sliderRed = newSlider(gprop.num(GUIProp.COLORRED));
     p.add(sliderRed);
 
-    p.add(new BaseXLabel(SCHEMAGREEN));
+    p.add(new BaseXLabel(GREEN));
     sliderGreen = newSlider(gprop.num(GUIProp.COLORGREEN));
     p.add(sliderGreen);
 
-    p.add(new BaseXLabel(SCHEMABLUE));
+    p.add(new BaseXLabel(BLUE));
     sliderBlue = newSlider(gprop.num(GUIProp.COLORBLUE));
     p.add(sliderBlue);
 
     set(p, BorderLayout.CENTER);
-    set(newButtons(BUTTONRESET), BorderLayout.SOUTH);
+    set(newButtons(RESET), BorderLayout.SOUTH);
 
     finish(gprop.nums(GUIProp.COLORSLOC));
   }

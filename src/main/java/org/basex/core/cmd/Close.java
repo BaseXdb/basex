@@ -29,10 +29,10 @@ public final class Close extends Command {
     try {
       close(data, context);
       context.closeDB();
-      return info(DBCLOSED, data.meta.name);
+      return info(DB_CLOSED_X, data.meta.name);
     } catch(final IOException ex) {
       Util.debug(ex);
-      return error(DBCLOSEERR, data.meta.name);
+      return error(DB_NOT_CLOSED_X, data.meta.name);
     }
   }
 

@@ -25,17 +25,17 @@ public final class DialogTreeOptions extends Dialog {
    * @param main reference to the main window
    */
   public DialogTreeOptions(final GUI main) {
-    super(main, TREEOPTIONSTITLE, false);
+    super(main, TREE_OPTIONS, false);
 
     final BaseXBack p = new BaseXBack(new TableLayout(2, 1, 0, 8));
     final GUIProp gprop = gui.gprop;
 
     // create checkbox
-    slim = new BaseXCheckBox(TREESLIM, gprop.is(GUIProp.TREESLIMS), this);
+    slim = new BaseXCheckBox(ADJUST_NODES, gprop.is(GUIProp.TREESLIMS), this);
     p.add(slim);
 
     // create checkbox
-    atts = new BaseXCheckBox(TREEATT, gprop.is(GUIProp.TREEATTS), this);
+    atts = new BaseXCheckBox(SHOW_ATTS, gprop.is(GUIProp.TREEATTS), this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);

@@ -37,21 +37,21 @@ public final class DialogMapLayout extends Dialog {
    * @param main reference to the main window
    */
   public DialogMapLayout(final GUI main) {
-    super(main, MAPLAYOUTTITLE, false);
+    super(main, MAP_LAYOUT, false);
 
     final BaseXBack p = new BaseXBack(new TableLayout(4, 1, 0, 8));
 
     // create list
-    algo = new BaseXList(MAPALG, this);
+    algo = new BaseXList(MAP_LAYOUTS, this);
     p.add(algo);
 
     // create drop down
     final GUIProp gprop = gui.gprop;
-    border = new BaseXCombo(this, MAPOFFSET);
+    border = new BaseXCombo(this, MAP_CHOICES);
     border.setSelectedIndex(gprop.num(GUIProp.MAPOFFSETS));
 
     BaseXBack tmp = new BaseXBack(new TableLayout(1, 3));
-    tmp.add(new BaseXLabel(MAPOFF));
+    tmp.add(new BaseXLabel(OFFSETS + COL));
     tmp.add(Box.createHorizontalStrut(25));
     tmp.add(border);
     p.add(tmp);
@@ -59,7 +59,7 @@ public final class DialogMapLayout extends Dialog {
     algo.setSize(200, 100);
 
     // create slider
-    sizeLabel = new BaseXLabel(MAPSIZE);
+    sizeLabel = new BaseXLabel(RATIO + COLS);
     sizeSlider = new BaseXSlider(0, 100, gprop.num(GUIProp.MAPWEIGHT), this);
     BaseXLayout.setWidth(sizeSlider, p.getPreferredSize().width);
 
@@ -69,7 +69,7 @@ public final class DialogMapLayout extends Dialog {
     p.add(tmp);
 
     // create checkbox
-    atts = new BaseXCheckBox(MAPATT, gprop.is(GUIProp.MAPATTS), this);
+    atts = new BaseXCheckBox(SHOW_ATTS, gprop.is(GUIProp.MAPATTS), this);
     p.add(atts);
 
     set(p, BorderLayout.CENTER);
@@ -86,8 +86,8 @@ public final class DialogMapLayout extends Dialog {
     gprop.set(GUIProp.MAPATTS, atts.isSelected());
     final int sizeprp = sizeSlider.value();
     gprop.set(GUIProp.MAPWEIGHT, sizeprp);
-    sizeLabel.setText(MAPSIZE + " " + (sizeprp > 45 && sizeprp < 55 ?
-      MAPBOTH : sizeprp < 45 ?  MAPCHILDREN : MAPTEXTSIZE));
+    sizeLabel.setText(RATIO + COLS + (sizeprp > 45 && sizeprp < 55 ?
+      CHILDREN_TEXT_LEN : sizeprp < 45 ?  NUMBER_CHILDREN : TEXT_LENGTH));
 
     gui.notify.layout();
   }

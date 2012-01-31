@@ -29,7 +29,7 @@ public final class Util {
   /** Flag for using default standard input. */
   private static final boolean NOCONSOLE = System.console() == null;
   /** Language (applied after restart). */
-  public static String language = LANGUAGE;
+  public static String language = Prop.LANG;
   /** Flag for showing language keys. */
   public static boolean langkeys;
   /** Debug mode. */
@@ -168,12 +168,12 @@ public final class Util {
   public static String message(final Throwable ex) {
     debug(ex);
     final String msg = ex.getMessage();
-    if(ex instanceof BindException) return SERVERBIND;
-    else if(ex instanceof LoginException) return SERVERDENIED;
-    else if(ex instanceof ConnectException) return SERVERERROR;
-    else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
-    else if(ex instanceof SocketException) return SERVERERROR;
-    else if(ex instanceof UnknownHostException) return info(SERVERUNKNOWN, msg);
+    if(ex instanceof BindException) return SRV_RUNNING;
+    else if(ex instanceof LoginException) return ACCESS_DENIED;
+    else if(ex instanceof ConnectException) return CONNECTION_ERROR;
+    else if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
+    else if(ex instanceof SocketException) return CONNECTION_ERROR;
+    else if(ex instanceof UnknownHostException) return info(UNKNOWN_HOST, msg);
     return msg != null && !msg.isEmpty() ? msg : ex.toString();
   }
 

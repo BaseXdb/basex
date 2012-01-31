@@ -129,7 +129,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void openResult() throws IOException {
-    openElement(RESULT);
+    openElement(T_RESULT);
   }
 
   @Override

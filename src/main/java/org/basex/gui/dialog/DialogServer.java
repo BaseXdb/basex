@@ -117,22 +117,22 @@ public final class DialogServer extends Dialog {
    * @param main reference to the main window
    */
   public DialogServer(final GUI main) {
-    super(main, GUISERVER);
+    super(main, S_SERVER_ADMIN);
     databases.border(8);
     tabs = new BaseXTabs(this);
-    tabs.add(CONNECT, conn);
+    tabs.add(S_CONNECT, conn);
     tabs.add(USERS, user);
     tabs.add(DATABASES, databases);
-    tabs.add(SESSIONS, sess);
-    tabs.add(LOCALLOGS, logs);
+    tabs.add(S_SESSIONS, sess);
+    tabs.add(S_LOCALLOGS, logs);
 
     // server tab
     conn.border(8).layout(new BorderLayout(0, 32));
 
-    start = new BaseXButton(BUTTONSTART, this);
-    stop = new BaseXButton(BUTTONSTOP, this);
-    connect = new BaseXButton(BUTTONCONNECT, this);
-    disconnect = new BaseXButton(BUTTONDISCONNECT, this);
+    start = new BaseXButton(START, this);
+    stop = new BaseXButton(STOP, this);
+    connect = new BaseXButton(CONNECT, this);
+    disconnect = new BaseXButton(DISCONNECT, this);
 
     host = new BaseXTextField(ctx.mprop.get(MainProp.HOST), this);
     host.addKeyListener(keys);
@@ -151,11 +151,11 @@ public final class DialogServer extends Dialog {
     BaseXBack p = new BaseXBack(new TableLayout(6, 1, 0, 0));
 
     // local server panel
-    p.add(new BaseXLabel(LOCALSERVER + COLS, true, true));
+    p.add(new BaseXLabel(S_LOCALSERVER + COLS, true, true));
 
     BaseXBack pp = new BaseXBack(new TableLayout(2, 2, 8, 4)).border(
         0, 0, 0, 0);
-    pp.add(new BaseXLabel(PORT + COLS));
+    pp.add(new BaseXLabel(S_PORT + COLS));
     pp.add(ports);
     pp.add(new BaseXLabel());
     BaseXBack ppp = new BaseXBack(new TableLayout(1, 2, 5, 0));
@@ -165,17 +165,17 @@ public final class DialogServer extends Dialog {
     p.add(pp);
 
     p.add(new BaseXLabel());
-    p.add(new BaseXLabel(ADMINLOGIN + COLS, true, true).border(8, 0, 4, 0));
+    p.add(new BaseXLabel(S_ADLOGIN + COLS, true, true).border(8, 0, 4, 0));
 
     // login panel
     pp = new BaseXBack(new TableLayout(5, 2, 8, 4));
-    pp.add(new BaseXLabel(SERVERUSER + COLS));
+    pp.add(new BaseXLabel(USERNAME + COLS));
     pp.add(loguser);
-    pp.add(new BaseXLabel(SERVERPW + COLS));
+    pp.add(new BaseXLabel(PASSWORD + COLS));
     pp.add(logpass);
-    pp.add(new BaseXLabel(HOST + COLS));
+    pp.add(new BaseXLabel(S_HOST + COLS));
     pp.add(host);
-    pp.add(new BaseXLabel(PORT + COLS));
+    pp.add(new BaseXLabel(S_PORT + COLS));
     pp.add(portc);
     pp.add(new BaseXLabel());
     ppp = new BaseXBack(new TableLayout(1, 2, 5, 0));
@@ -188,10 +188,10 @@ public final class DialogServer extends Dialog {
     conn.add(p, BorderLayout.CENTER);
 
     p = new BaseXBack(new TableLayout(2, 1));
-    BaseXLabel l = new BaseXLabel(SERVERINFO1);
+    BaseXLabel l = new BaseXLabel(S_INFO1);
     l.setForeground(GUIConstants.DGRAY);
     p.add(l);
-    l = new BaseXLabel(SERVERINFO2);
+    l = new BaseXLabel(S_INFO2);
     l.setForeground(GUIConstants.DGRAY);
     p.add(l);
     conn.add(p, BorderLayout.SOUTH);
@@ -202,12 +202,12 @@ public final class DialogServer extends Dialog {
     sese.setFont(start.getFont());
     sedb = new BaseXEditor(false, this);
     sedb.setFont(start.getFont());
-    refreshSess = new BaseXButton(BUTTONREFRESH, this);
+    refreshSess = new BaseXButton(REFRESH, this);
 
     p = new BaseXBack(new GridLayout(2, 1, 0, 2));
 
     pp = new BaseXBack(new BorderLayout());
-    pp.add(new BaseXLabel(SESSIONS + COLS, false, true), BorderLayout.NORTH);
+    pp.add(new BaseXLabel(S_SESSIONS + COLS, false, true), BorderLayout.NORTH);
     pp.add(sese, BorderLayout.CENTER);
     p.add(pp);
 
@@ -223,8 +223,8 @@ public final class DialogServer extends Dialog {
 
     // logging tab
     logs.border(8).layout(new BorderLayout());
-    delete = new BaseXButton(BUTTONDELETE, this);
-    deleteAll = new BaseXButton(BUTTONDELALL, this);
+    delete = new BaseXButton(DELETE, this);
+    deleteAll = new BaseXButton(DELETE_ALL, this);
 
     logc = new BaseXCombo(this);
     logt = new BaseXEditor(false, this);
@@ -233,7 +233,7 @@ public final class DialogServer extends Dialog {
 
     logt.border(5);
     infoL = new BaseXLabel(" ").border(8, 0, 0, 0);
-    refreshLog = new BaseXButton(BUTTONREFRESH, this);
+    refreshLog = new BaseXButton(REFRESH, this);
 
     p = new BaseXBack(new BorderLayout());
     pp = new BaseXBack();
@@ -298,7 +298,7 @@ public final class DialogServer extends Dialog {
         }
         try {
           BaseXServer.start(p);
-          msg = SERVERSTART;
+          msg = SRV_STARTED;
           running = true;
         } catch(final BaseXException ex) {
           msg = ex.getMessage();
@@ -309,9 +309,9 @@ public final class DialogServer extends Dialog {
             ctx.mprop.num(MainProp.EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
-        if(!connected) msg = SERVERSTOPPED;
+        if(!connected) msg = SRV_STOPPED;
         if(host.getText().equals(LOCALHOST)) logpass.setText("");
-        if(!connected) super.setTitle(GUISERVER);
+        if(!connected) super.setTitle(S_SERVER_ADMIN);
       } else if(cmp == connect || cmp == loguser || cmp == logpass ||
           cmp == host || cmp == portc) {
         gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
@@ -322,16 +322,16 @@ public final class DialogServer extends Dialog {
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
-        super.setTitle(GUISERVER + LI + loguser.getText() + "@" + host.getText()
-            + COL + portc.getText());
-        msg = Util.info(CONNECTED, host.getText(), portc.getText());
+        super.setTitle(S_SERVER_ADMIN + LI + loguser.getText() + "@" +
+            host.getText() + COL + portc.getText());
+        msg = Util.info(S_CONNECTED, host.getText(), portc.getText());
         refreshSess();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
         logpass.setText("");
-        super.setTitle(GUISERVER);
-        msg = DISCONNECTED;
+        super.setTitle(S_SERVER_ADMIN);
+        msg = S_DISCONNECTED;
       } else if(cmp == refreshSess) {
         refreshSess();
       } else if(cmp == refreshLog || cmp == logc) {
@@ -348,7 +348,7 @@ public final class DialogServer extends Dialog {
           logc.setSelectedIndex(-1);
           refreshLog();
         } else {
-          msg2 = Util.info(DBNOTDELETED, f.getName());
+          msg2 = Util.info(FILE_NOT_DELETED_X, f.getName());
           icon = Msg.ERROR;
         }
       } else if(cmp == deleteAll) {
@@ -358,7 +358,7 @@ public final class DialogServer extends Dialog {
           if(!f.delete()) file = f;
         }
         if(file != null) {
-          msg2 = Util.info(DBNOTDELETED, file.getName());
+          msg2 = Util.info(FILE_NOT_DELETED_X, file.getName());
           icon = Msg.ERROR;
         }
         logc.setSelectedIndex(-1);
@@ -370,7 +370,7 @@ public final class DialogServer extends Dialog {
     } catch(final Exception ex) {
       icon = Msg.ERROR;
       msg = Util.message(ex);
-      if(msg.equals(Util.info(PERMNO, CmdPerm.values()[4]))) {
+      if(msg.equals(Util.info(PERM_NEEDED_X, CmdPerm.values()[4]))) {
         try {
           cs.execute(new Exit());
         } catch(final IOException exx) {
@@ -390,8 +390,8 @@ public final class DialogServer extends Dialog {
 
     if(msg == null && msg2 == null &&
         !(valpl && valh && valp && vallu && vallp)) {
-      msg = Util.info(INVALID, !valpl ? LOCALPORT : !valh ? HOST :
-        !valp ? PORT : !vallu ? SERVERUSER : SERVERPW);
+      msg = Util.info(INVALID_X, !valpl ? S_LOCALPORT : !valh ? S_HOST :
+        !valp ? S_PORT : !vallu ? USERNAME : PASSWORD);
       icon = Msg.WARN;
     }
     infoC.setText(msg, icon);

@@ -214,7 +214,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbInfo() {
     check(_DB_INFO);
     query("count(" + _DB_INFO.args(DB) + "//" +
-        INFODBSIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ")", 1);
+        SIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ")", 1);
   }
 
   /**

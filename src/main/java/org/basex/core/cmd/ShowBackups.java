@@ -33,8 +33,8 @@ public final class ShowBackups extends Command {
   protected boolean run() throws IOException {
     final Table table = new Table();
     table.description = BACKUPS;
-    table.header.add(INFODBNAME);
-    table.header.add(INFODBSIZE);
+    table.header.add(NAME);
+    table.header.add(SIZE);
 
     for(final IO f : mprop.dbpath().children()) {
       final String name = f.name();

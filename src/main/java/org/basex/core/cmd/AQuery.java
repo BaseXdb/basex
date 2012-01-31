@@ -121,7 +121,7 @@ abstract class AQuery extends Command {
         // dump some query info
         if(prop.is(Prop.QUERYINFO)) evalInfo(query, hits, updates, runs);
         out.flush();
-        return info(NL + QUERYEXEC, perf.getTimer(runs));
+        return info(NL + QUERY_EXECUTED_X, perf.getTimer(runs));
       } catch(final QueryException ex) {
         Util.debug(ex);
         err = ex.getMessage();
@@ -129,7 +129,7 @@ abstract class AQuery extends Command {
         Util.debug(ex);
         err = ex.getMessage();
       } catch(final ProgressException ex) {
-        err = PROGERR;
+        err = INTERRUPTED;
         // store any useful info (e.g. query plan):
         inf = info();
       } catch(final RuntimeException ex) {
@@ -144,9 +144,9 @@ abstract class AQuery extends Command {
     }
 
     error(err);
-    if(Util.debug || err.startsWith(PROGERR)) {
+    if(Util.debug || err.startsWith(INTERRUPTED)) {
       info(NL);
-      info(QUERYSTRING + query);
+      info(QUERY_CC + query);
       info(qp.info());
       info(inf);
     }
@@ -217,16 +217,16 @@ abstract class AQuery extends Command {
 
     final long total = pars + comp + eval + prnt;
     info(NL);
-    info(QUERYSTRING + QueryProcessor.removeComments(query, Integer.MAX_VALUE));
+    info(QUERY_CC + QueryProcessor.removeComments(query, Integer.MAX_VALUE));
     info(qp.info());
-    info(QUERYPARSE + Performance.getTimer(pars, runs));
-    info(QUERYCOMPILE + Performance.getTimer(comp, runs));
-    info(QUERYEVALUATE + Performance.getTimer(eval, runs));
-    info(QUERYPRINT + Performance.getTimer(prnt, runs));
-    info(QUERYTOTAL + Performance.getTimer(total, runs) + NL);
-    info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS));
-    info(QUERYUPDATED + updates + " " + (updates == 1 ? VALHIT : VALHITS));
-    info(QUERYPRINTED + Performance.format(out.size()));
+    info(PARSING_CC + Performance.getTimer(pars, runs));
+    info(COMPILING_CC + Performance.getTimer(comp, runs));
+    info(EVALUATING_CC + Performance.getTimer(eval, runs));
+    info(PRINTING_CC + Performance.getTimer(prnt, runs));
+    info(TOTAL_TIME_CC + Performance.getTimer(total, runs) + NL);
+    info(HITS_X_CC + hits + " " + (hits == 1 ? ITEM : ITEMS));
+    info(UPDATED_CC + updates + " " + (updates == 1 ? ITEM : ITEMS));
+    info(PRINTED_CC + Performance.format(out.size()));
   }
 
   /**
@@ -255,7 +255,7 @@ abstract class AQuery extends Command {
       if(prop.is(Prop.XMLPLAN)) {
         final ArrayOutput ao = new ArrayOutput();
         qp.plan(Serializer.get(ao));
-        info(NL + QUERYPLAN);
+        info(NL + QUERY_PLAN_C);
         info(ao.toString());
       }
     } catch(final Exception ex) {

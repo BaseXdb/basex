@@ -38,7 +38,7 @@ public final class Set extends AGet {
       if(v == null && !context.client()) {
         // disallow modification of database path if any database is opened
         if(key.equals(MainProp.DBPATH[0]) && context.datas.size() > 0) {
-          return error(SETVAL, key, val);
+          return error(INVALID_VALUE_X_X, key, val);
         }
         v = set(key, val, mprop);
       }
@@ -47,7 +47,7 @@ public final class Set extends AGet {
       return info(key + COLS + v);
     } catch(final Exception ex) {
       Util.debug(ex);
-      return error(SETVAL, key, val);
+      return error(INVALID_VALUE_X_X, key, val);
     }
   }
 
