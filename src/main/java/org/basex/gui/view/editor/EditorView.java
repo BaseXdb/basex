@@ -105,7 +105,6 @@ public final class EditorView extends View {
     final BaseXButton hist = new BaseXButton(gui, "hist", HELPRECENT);
 
     find = new BaseXTextField(gui);
-    find.setSearch(null);
     BaseXLayout.setHeight(find, (int) openB.getPreferredSize().getHeight());
 
     BaseXBack sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 7));
@@ -126,7 +125,7 @@ public final class EditorView extends View {
     tabs.setFocusable(false);
 
     addCreateTab();
-    addTab();
+    addTab().setSearch(find);
     add(tabs, BorderLayout.CENTER);
 
     south = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
