@@ -34,7 +34,7 @@ public final class ExploreView extends View {
    * @param man view manager
    */
   public ExploreView(final ViewNotifier man) {
-    super(EXPLOREVIEW, HELPEXPLORE, man);
+    super(EXPLOREVIEW, man);
 
     layout(new BorderLayout(0, 4)).border(6, 6, 6, 6).setFocusable(false);
 

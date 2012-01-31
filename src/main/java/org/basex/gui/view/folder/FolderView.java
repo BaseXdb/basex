@@ -1,6 +1,5 @@
 package org.basex.gui.view.folder;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 
@@ -70,7 +69,7 @@ public final class FolderView extends View {
    * @param man view manager
    */
   public FolderView(final ViewNotifier man) {
-    super(FOLDERVIEW, HELPFOLDER, man);
+    super(FOLDERVIEW, man);
     createBoxes();
     layout(new BorderLayout());
     scroll = new BaseXBar(this);

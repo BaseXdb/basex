@@ -133,7 +133,7 @@ public final class DialogProps extends Dialog {
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, tabInfo);
-    tabs.addTab("Add Resources", tabRes);
+    tabs.addTab(INFORES, tabRes);
     tabs.addTab(NAMESINFO, tabNames);
     tabs.addTab(INFOPATHINDEX, tabPath);
     tabs.addTab(INDEXINFO, tabValues);

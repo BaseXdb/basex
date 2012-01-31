@@ -116,7 +116,7 @@ public final class PlotView extends View {
    * @param man view manager
    */
   public PlotView(final ViewNotifier man) {
-    super(PLOTVIEW, HELPPLOT, man);
+    super(PLOTVIEW, man);
     border(5).layout(new BorderLayout());
 
     final BaseXBack panel = new BaseXBack(Fill.NONE).layout(new BorderLayout());

@@ -66,18 +66,6 @@ public interface Text {
 
   // CONSOLE INFO =============================================================
 
-  /** Console text. */
-  String CONSOLE = TITLE + " [%]" + NL;
-  /** Console text. */
-  String CONSOLE2 = lang("help_intro", "help") + NL;
-  /** Version information. */
-  String VERSINFO = lang("version");
-
-  /** Goodbye information. */
-  String[] CLIENTBYE = {
-      lang("bye1"), lang("bye2"), lang("bye3"), lang("bye4")
-  };
-
   /** Local (standalone) mode. */
   String LOCALMODE = "Standalone";
   /** Start information. */
@@ -161,6 +149,18 @@ public interface Text {
 
   /** Bug info. */
   String BUGINFO = "Potential bug? Improper use? Your feedback is welcome:";
+
+  /** Console text. */
+  String CONSOLE = TITLE + " [%]" + NL;
+  /** Console text. */
+  String CONSOLE2 = lang("help_intro", "help") + NL;
+  /** Version information. */
+  String VERSINFO = lang("version");
+
+  /** Goodbye information. */
+  String[] CLIENTBYE = {
+      lang("bye1"), lang("bye2"), lang("bye3"), lang("bye4")
+  };
 
   // SERVER ===================================================================
 
@@ -972,21 +972,17 @@ public interface Text {
   /** Command info. */
   String GUISHOWFOLDERTT = lang("c_showfoldertt");
   /** Command info. */
-  String GUISHOWHELP = lang("c_showhelp");
+  String GUIHELP = lang("c_help");
   /** Command info. */
-  String GUISHOWHELPTT = lang("c_showhelptt");
+  String GUIHELPTT = lang("c_helptt");
   /** Command info. */
-  String GUISHOWCOMMUNITY = lang("c_community");
+  String GUICOMMUNITY = lang("c_community");
   /** Command info. */
-  String GUISHOWCOMMUNITYTT = lang("c_communitytt");
+  String GUICOMMUNITYTT = lang("c_communitytt");
   /** Command info. */
-  String GUISHOWDOC = lang("c_doc");
+  String GUIUPDATES = lang("c_updates");
   /** Command info. */
-  String GUISHOWDOCTT = lang("c_doctt");
-  /** Command info. */
-  String GUISHOWUPDATES = lang("c_updates");
-  /** Command info. */
-  String GUISHOWUPDATESTT = lang("c_updatestt");
+  String GUIUPDATESTT = lang("c_updatestt");
   /** Command info. */
   String GUISHOWINFO = lang("c_showinfo");
   /** Command info. */
@@ -1113,8 +1109,6 @@ public interface Text {
   String INFOTIT = lang("info_title");
   /** Query title. */
   String EXPLORETIT = lang("explore_title");
-  /** Help title. */
-  String HELPTIT = lang("help_title");
   /** Text title. */
   String TEXTTIT = lang("text_title");
   /** Editor title. */
@@ -1356,22 +1350,10 @@ public interface Text {
   /** Language preference. */
   String PREFLANG = lang("dp_lang") + " (" + lang("dp_restart") + ")";
 
-  // Content Manage Dialog
-  /** Database content text. */
-  String ADDXML = lang("dc_addxml");
-  /** Database content text. */
-  String ADDBIN = lang("dc_addbin");
-  /** Database content text. */
-  String INPUTSRC = lang("dc_inputsrc") + COL;
-  /** Database content text. */
-  String RENAMEAS = lang("dc_renameas") + COL;
-  /** Database content text. */
-  String FILTERPATH = lang("dc_filterpath") + COL;
-
   /** Dialog title for deleting nodes. */
   String DELETECONF = lang("dx_question");
   /** Dialog title for closing XQuery file. */
-  String XQUERYCONF = lang("dq_question");
+  String CLOSECONF = lang("dq_question");
 
   /** Dialog title for exporting nodes. */
   String OUTDIR = lang("dx_outdir");
@@ -1483,32 +1465,6 @@ public interface Text {
   byte[] HELPSAVE = token(lang("h_save"));
   /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
-  /** Help dialog. */
-  byte[] HELPCMD = token(lang("h_cmd"));
-  /** Help dialog. */
-  byte[] HELPSEARCHXML = token(lang("h_searchxml"));
-  /** Help dialog. */
-  byte[] HELPXPATH = token(lang("h_xpath"));
-  /** Help string. */
-  byte[] HELPMAP = token(lang("h_map"));
-  /** Help string. */
-  byte[] HELPTREE = token(lang("h_tree"));
-  /** Help string. */
-  byte[] HELPPLOT = token(lang("h_plot"));
-  /** Help string. */
-  byte[] HELPFOLDER = token(lang("h_folder"));
-  /** Help string. */
-  byte[] HELPTABLE = token(lang("h_table"));
-  /** Help string. */
-  byte[] HELPTEXT = token(lang("h_text"));
-  /** Help string. */
-  byte[] HELPINFOO = token(lang("h_info"));
-  /** Help string. */
-  byte[] HELPEXPLORE = token(lang("h_explore"));
-  /** Help string. */
-  byte[] HELPXQUERYY = token(lang("h_xquery"));
-  /** Help string. */
-  byte[] HELPMOVER = token(lang("h_mover"));
 
   /** Dummy string to check if all language strings have been assigned. */
   String DUMMY = lang(null);

@@ -1,6 +1,5 @@
 package org.basex.gui.view.table;
 
-import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 
@@ -52,7 +51,7 @@ public final class TableView extends View implements Runnable {
    * @param man view manager
    */
   public TableView(final ViewNotifier man) {
-    super(TABLEVIEW, HELPTABLE, man);
+    super(TABLEVIEW, man);
     tdata = new TableData(gui.context, gui.gprop);
     layout(new BorderLayout());
     header = new TableHeader(this);

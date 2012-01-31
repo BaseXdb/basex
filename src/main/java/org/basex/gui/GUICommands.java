@@ -26,17 +26,16 @@ import org.basex.data.Nodes;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogAbout;
 import org.basex.gui.dialog.DialogColors;
-import org.basex.gui.dialog.DialogNew;
 import org.basex.gui.dialog.DialogEdit;
 import org.basex.gui.dialog.DialogExport;
 import org.basex.gui.dialog.DialogFonts;
-import org.basex.gui.dialog.DialogHelp;
-import org.basex.gui.dialog.DialogProps;
 import org.basex.gui.dialog.DialogInsert;
 import org.basex.gui.dialog.DialogManage;
 import org.basex.gui.dialog.DialogMapLayout;
+import org.basex.gui.dialog.DialogNew;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
+import org.basex.gui.dialog.DialogProps;
 import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.view.ViewData;
@@ -694,44 +693,24 @@ public enum GUICommands implements GUICommand {
 
   /* HELP MENU */
 
-  /** Shows the help window. */
-  SHOWHELP(GUISHOWHELP, "F1", GUISHOWHELPTT, false, true) {
-    @Override
-    public void execute(final GUI gui) {
-      if(!gui.gprop.is(GUIProp.SHOWHELP)) {
-        gui.gprop.set(GUIProp.SHOWHELP, true);
-        gui.help = new DialogHelp(gui);
-        gui.refreshControls();
-      } else {
-        gui.help.close();
-      }
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      b.setSelected(gui.gprop.is(GUIProp.SHOWHELP));
-    }
-  },
-
-  /** Opens the community web page. */
-  SHOWCOMMUNITY(GUISHOWCOMMUNITY, null, GUISHOWCOMMUNITYTT, false, false) {
-    @Override
-    public void execute(final GUI gui) {
-      Dialog.browse(gui, COMMUNITY_URL);
-    }
-  },
-
-  /** Opens the community web page. */
-  SHOWDOC(GUISHOWDOC, null, GUISHOWDOCTT, false, false) {
+  /** Shows the documentation web page. */
+  HELP(GUIHELP, "F1", GUIHELPTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       Dialog.browse(gui, DOC_URL);
     }
   },
 
+  /** Opens the community web page. */
+  COMMUNITY(GUICOMMUNITY, null, GUICOMMUNITYTT, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      Dialog.browse(gui, COMMUNITY_URL);
+    }
+  },
+
   /** Opens the update web page. */
-  SHOWUPDATES(GUISHOWUPDATES, null, GUISHOWUPDATESTT, false, false) {
+  UPDATES(GUIUPDATES, null, GUIUPDATESTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       Dialog.browse(gui, UPDATE_URL);

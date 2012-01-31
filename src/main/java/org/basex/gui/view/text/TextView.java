@@ -62,7 +62,7 @@ public final class TextView extends View implements ActionListener {
    * @param man view manager
    */
   public TextView(final ViewNotifier man) {
-    super(TEXTVIEW, HELPTEXT, man);
+    super(TEXTVIEW, man);
 
     border(6, 6, 6, 6).layout(new BorderLayout(0, 4)).setFocusable(false);
 

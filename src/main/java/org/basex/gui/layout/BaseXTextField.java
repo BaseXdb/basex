@@ -27,8 +27,6 @@ public class BaseXTextField extends JTextField {
   String last = "";
   /** Text area to search in. */
   BaseXEditor area;
-  /** Button help. */
-  byte[] help;
 
   /**
    * Constructor.
@@ -62,7 +60,7 @@ public class BaseXTextField extends JTextField {
     addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        BaseXLayout.focus(e.getComponent(), help);
+        BaseXLayout.focus(e.getComponent());
       }
     });
 
@@ -117,13 +115,5 @@ public class BaseXTextField extends JTextField {
   public void setText(final String txt) {
     last = txt;
     super.setText(txt);
-  }
-
-  /**
-   * Sets the text field help text.
-   * @param hlp help text
-   */
-  public final void help(final byte[] hlp) {
-    help = hlp;
   }
 }

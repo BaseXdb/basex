@@ -93,7 +93,7 @@ public final class EditorView extends View {
    * @param man view manager
    */
   public EditorView(final ViewNotifier man) {
-    super(EDITORVIEW, HELPXQUERYY, man);
+    super(EDITORVIEW, man);
 
     border(6, 6, 6, 6).layout(new BorderLayout()).setFocusable(false);
 
@@ -607,7 +607,7 @@ public final class EditorView extends View {
   private boolean confirm(final EditorArea edit) {
     if(edit.mod) {
       final Boolean ok = Dialog.yesNoCancel(gui,
-          Util.info(XQUERYCONF, edit.file().name()));
+          Util.info(CLOSECONF, edit.file().name()));
       if(ok == null || ok && !save()) return false;
     }
     return true;

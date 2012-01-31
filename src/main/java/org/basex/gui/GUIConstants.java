@@ -89,7 +89,7 @@ public final class GUIConstants {
   static final GUICommands[] TOOLBAR = {
     CREATE, MANAGE, INFO, CLOSE, null, GOHOME, GOBACK, GOUP, GOFORWARD, null,
     SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER,
-    SHOWPLOT, SHOWTABLE, SHOWEXPLORE, null, SHOWHELP
+    SHOWPLOT, SHOWTABLE, SHOWEXPLORE
   };
 
   // MENUBARS =================================================================
@@ -123,8 +123,8 @@ public final class GUIConstants {
     COLOR, FONTS, MAPLAYOUT, TREEOPTIONS, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : PREFS
   }, {
-    SHOWHELP, Prop.MAC ? null : EMPTY,
-    SHOWCOMMUNITY, SHOWDOC, SHOWUPDATES, Prop.MAC ? null : EMPTY,
+    HELP, Prop.MAC ? null : EMPTY,
+    COMMUNITY, UPDATES, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : ABOUT
   }};
 

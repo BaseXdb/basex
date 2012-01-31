@@ -22,11 +22,10 @@ public abstract class View extends BaseXPanel {
   /**
    * Registers the specified view.
    * @param name name of view
-   * @param hlp help text
    * @param man view manager
    */
-  protected View(final String name, final byte[] hlp, final ViewNotifier man) {
-    super(hlp, man.gui);
+  protected View(final String name, final ViewNotifier man) {
+    super(man.gui);
     mode(man.gui.gprop.is(GUIProp.GRADIENT) ? Fill.GRADIENT : Fill.PLAIN);
     setFocusable(true);
     setBackground(Color.white);

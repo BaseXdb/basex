@@ -1,6 +1,5 @@
 package org.basex.gui.view;
 
-import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -28,7 +27,7 @@ final class ViewMover extends BaseXPanel {
    * @param main reference to the main window
    */
   ViewMover(final AGUI main) {
-    super(HELPMOVER, main);
+    super(main);
     setLayout(new BorderLayout());
     BaseXLayout.setHeight(this, SIZE);
     addKeyListener(this);

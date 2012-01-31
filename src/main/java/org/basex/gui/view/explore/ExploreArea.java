@@ -104,7 +104,6 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     }
     if(!pi) return;
 
-    all.help(HELPSEARCHXML);
     addKeys(gui.context.data());
     panel.revalidate();
     panel.repaint();

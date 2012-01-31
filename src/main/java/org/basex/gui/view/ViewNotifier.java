@@ -7,7 +7,6 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
-import org.basex.gui.dialog.DialogHelp;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -81,7 +80,7 @@ public final class ViewNotifier {
       for(final Window w : gui.getOwnedWindows()) {
         if(!(w.isVisible() && w instanceof Dialog)) continue;
         final Dialog d = (Dialog) w;
-        if(!(d.isModal() || w instanceof DialogHelp)) ((Dialog) w).cancel();
+        if(!d.isModal()) ((Dialog) w).cancel();
       }
     }
 
@@ -226,7 +225,6 @@ public final class ViewNotifier {
    * Notifies all views of layout changes.
    */
   public void layout() {
-    if(gui.help != null) gui.help.refresh();
     for(final View v : view) v.refreshLayout();
   }
 

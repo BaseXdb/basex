@@ -26,21 +26,12 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
   public final GUI gui;
 
   /**
-   * Constructor, setting the help text.
+   * Constructor, setting default interactions.
    * @param win parent reference, {@link Dialog} or {@link GUI} instance
    */
   protected BaseXPanel(final Window win) {
-    this(null, win);
-  }
-
-  /**
-   * Constructor, setting the help text.
-   * @param hlp help text
-   * @param win parent reference, {@link Dialog} or {@link GUI} instance
-   */
-  protected BaseXPanel(final byte[] hlp, final Window win) {
     gui = win instanceof GUI ? (GUI) win : ((Dialog) win).gui;
-    BaseXLayout.addInteraction(this, win, hlp);
+    BaseXLayout.addInteraction(this, win);
   }
 
   @Override

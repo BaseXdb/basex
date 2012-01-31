@@ -41,12 +41,13 @@ b_delete=Delete
 b_delall=Delete All
 b_add=Add
 b_reset=Reset
+b_filter=Filter
+b_clear=Clear
 
 # Visualizations
 no_data=No data available
 no_space=Thiếu chỗ
 info_title=Thông tin câu hỏi
-help_title=Giúp đỡ
 text_title=Văn bản
 explore_title=Khảo sát
 editor_title=Editor
@@ -115,7 +116,6 @@ dr_title2=Delete documents
 dr_title3=Copy Database
 dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè.
 dr_empty=An empty database will be created.
-dr_delete=% documents will be deleted.
 
 dd_title=Manage Databases
 dd_question=% database(s) will be dropped.
@@ -252,10 +252,6 @@ c_goup=Đi lên
 c_gouptt=Chuyển lên một cấp.
 c_props=Thông tin
 c_propstt=Hiển thị thông tin trên cơ sở dữ liệu đang mở.
-c_add=Add documents
-c_addtt=Adds documents to the currently opened database.
-c_drop=Delete documents
-c_droptt=Delete documents from the currently opened database.
 c_insert=Mới
 c_inserttt=Tạo một nút XML mới.
 c_maplayout=Bố cục bản đồ
@@ -279,12 +275,10 @@ c_showbuttons=Nút
 c_showbuttonstt=Bật tắt thanh nút
 c_showexplore=Bộ thông dò
 c_showexplorett=Hiển thị thanh thông dò.
-c_showhelp=Giúp đỡ
-c_showhelptt=Hiển thị phần giúp đỡ đưa thông tin về bộ phận đang tụ vào.
 c_community=Community
 c_communitytt=Show the community web page (opens your default browser).
-c_doc=Documentation
-c_doctt=Show the documentation web page.
+c_help=Giúp đỡ
+c_helptt=Show the documentation web page.
 c_updates=Check for Updates
 c_updatestt=Show the update web page.
 c_showfolder=Thư mục
@@ -523,6 +517,7 @@ info_off=Tắt
 info_error=Lỗi
 info_entries=% mục
 info_browsererror=Failed to open a browser. Please manually open the URL in your favorite browser:\n\n%
+info_directory=Directory
 
 # Command Help
 ch_nohelp=Xin lỗi, không thấy hướng dẫn nào.
@@ -621,16 +616,3 @@ h_save=Saves the result.
 h_go=Chạy lệnh hỏi.
 h_stop=Dừng qua trình hiện hành.
 h_recent=Những tệp vừa được mở
-h_cmd=Bạn có thể nhập lệnh BaseX vào đây. Thử 'Giúp đỡ' để xem tất cả các câu lệnh.\n\nBạn có thể lấy lại các thông tin nhập với phím LÊN hoặc XUỐNG.
-h_searchxml=Gõ cái gì đó vào miền văn bản để tìm nó trong cơ sở dữ liệu. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tags và văn bản\n=...   Tìm thấy chính xác nút văn bản\n@ ...  Tìm thấy thuộc tính và giá trị thuộc tính\n@=   Tìm thấy chính xác giá trị thuộc tính\n/...     Đánh giá dữ liệu nhập theo XQuery
-h_xpath=Chế độ XQuery cho phép dữ liệu nhập là những câu hỏi XQuery đơn giản.
-h_map=Cách vẽ này được gọi là bản đồ cây (TreeMap). Tất cả nút của văn bản XML được vẽ thành một hình chữ nhật, lấp đầy diện tích. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
-h_tree=This visualization is called TreeView. It shows the XML document as tree, drawing the nodes in their hierarchical order. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
-h_plot=Cách vẽ này được gọi mảnh phân tán (Scatterplot). Tất cả nút XML được hiển thị trên một mảnh. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
-h_folder=Cách vẽ này hiển thị tất cả nut XML trong thư mục hiển thị. Nút có thể mở ra hay đóng khi nhấp lên mũi tên. Mặc dù chúng sẽ nổi lên khi được nhấp đơn hay zoom vào khi nhấp đôi. Đây là cách hiệu quả để soi văn bản XML. Một thực đơn xòe ra khi nhấp chuột phải lên phần tử.
-h_table=Cách vẽ này hiển thị tất cả nut XML trong một bản(table). Nếu bạn nhấp lên văn bản, Tất cả nút có cùng văn bản(text) sẽ nổi lên. Nhấp đôi lên văn bản, kết quả lệnh hỏi sẽ được lọc. Một thực đơn xòe ra khi nhấp chuột phải lên phần tử.
-h_text=Thanh này hiển thị kết quả lệnh hỏi hay văn bản dữ liệu xuất ra khác.\n\nPhím tắt: Nhấn '-' và '+' để đổi kích cỡ phông của tất cả thanh. Gõ vào khung xòe ra để chạy một tìm kiếm tiếp. Nó là cách đơn giản để tìm một điểm văn bản cụ thể.
-h_info=Thanh này hiển thị thông tin dịch và đánh giá lệnh hỏi XQuery, bao gồm vài tiểu sử đơn giản.
-h_explore=Chế độ tìm kiếm đơn giản cho phép hỏi đơn giản trong văn bản XML.
-h_xquery=Trong vùng văn bản này, ban có thể nhập lệnh hỏi XQuery. Dữ liệu nhập được đánh giá sau mỗi lần nhấn phím.\n\n Ví dụ sau cho thấy tất cả tựa sách với chủ đề 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
-h_mover=Bạn có thể đổi vị trí hiển thị khi kéo thanh trên cùng của tất cả thanh hiển thị đến chỗ khác trong cửa sổ chính.\n Nếu bạn dời hiển thị ra ngoài cửa sổ chính, nó sẽ đóng.

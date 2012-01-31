@@ -86,7 +86,7 @@ public final class MapView extends View implements Runnable {
    * @param man view manager
    */
   public MapView(final ViewNotifier man) {
-    super(MAPVIEW, HELPMAP, man);
+    super(MAPVIEW, man);
     new BaseXPopup(this, POPUP);
   }
 

@@ -77,8 +77,6 @@ public final class QueryContext extends Progress {
   public final QueryResources resource = new QueryResources(this);
   /** Database context. */
   public final Context context;
-  /** Query string. */
-  public String query;
   /** XQuery version flag. */
   public boolean xquery3;
 
@@ -183,7 +181,6 @@ public final class QueryContext extends Progress {
    */
   public void parse(final String qu) throws QueryException {
     root = new QueryParser(qu, this).parse(sc.baseIO(), null);
-    query = qu;
   }
 
   /**

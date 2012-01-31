@@ -151,8 +151,6 @@ public final class GUIProp extends AProp {
   /** Last XQuery files. */
   public static final Object[] QUERIES = { "QUERIES", new String[0] };
 
-  /** Flag for activated help view. */
-  public static final Object[] SHOWHELP = { "SHOWHELP", false };
   /** Last updated version. */
   public static final Object[] UPDATEVERSION = { "UPDATEVERSION",
     Prop.VERSION.replaceAll(" .*", "") };

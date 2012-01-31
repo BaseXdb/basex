@@ -65,7 +65,7 @@ public class BaseXButton extends JButton {
    */
   public BaseXButton(final Window gui, final String img, final byte[] hlp) {
     super(BaseXLayout.icon("cmd-" + img));
-    BaseXLayout.addInteraction(this, gui, hlp);
+    BaseXLayout.addInteraction(this, gui);
     if(hlp != null) setToolTipText(Token.string(hlp));
 
     // trim horizontal button margins

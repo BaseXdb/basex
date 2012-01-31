@@ -41,8 +41,9 @@ public final class GUIMenu extends JMenuBar {
 
     // create menu for each top level menu entries
     int c = 0;
-    for(int b = 0; b < MENUBAR.length; ++b)
+    for(int b = 0; b < MENUBAR.length; ++b) {
       for(int i = 0; i < MENUITEMS[b].length; ++i) ++c;
+    }
     items = new JMenuItem[c];
 
     c = 0;

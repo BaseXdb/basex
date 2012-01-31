@@ -48,7 +48,6 @@ b_clear=Clear
 no_data=No data available
 no_space=Not enough space
 info_title=Query Info
-help_title=Help
 text_title=Text
 explore_title=Explore
 editor_title=Editor
@@ -106,12 +105,6 @@ dc_headerinfo=Parse first line as table header
 dc_linesinfo=Splits input into lines
 dc_forminfo=XML format
 dc_separatorinfo=Separator
-
-dc_addxml=Add XML
-dc_addbin=Add binaries
-dc_inputsrc=Input src
-dc_renameas=Rename/move to
-dc_filterpath=Filter path
 
 do_title=Open Database
 do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
@@ -282,12 +275,10 @@ c_showbuttons=Buttons
 c_showbuttonstt=Switch the button bar on/off.
 c_showexplore=Explorer
 c_showexplorett=Show the explorer panel.
-c_showhelp=Help
-c_showhelptt=Show the help view. which provides information on the currently focused component.
 c_community=Community
 c_communitytt=Show the community web page.
-c_doc=Documentation
-c_doctt=Show the documentation web page.
+c_help=Help
+c_helptt=Show the documentation web page.
 c_updates=Check for Updates
 c_updatestt=Show the update web page.
 c_showfolder=Folder
@@ -620,21 +611,8 @@ ch_store1=Store raw data.
 ch_store2=Stores raw data to the specified [%].
 
 # Help Texts
-h_hist=Show input history.
-h_save=Saves the result.
 h_go=Executes the query.
 h_stop=Stops the current process.
+h_hist=Show input history.
+h_save=Saves the result.
 h_recent=Recently opened files
-h_cmd=Here you can enter BaseX commands. Try 'help' to get a survey on all available commands.\n\nYou can retrieve previous inputs with the cursor keys UP and DOWN.
-h_searchxml=Just type something in the text field to search in your XML document. The following syntax is supported:\n...      Find tags and texts\n=...   Find exact text nodes\n@ ...  Find attributes and attribute values\n@=   Find exact attribute values\n/...     Evaluate input as XQuery
-h_xpath=The XQuery mode allows the input of simple XQuery requests.
-h_map=This visualization is called TreeMap. All nodes of the XML document are represented as rectangles, filling the complete area. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
-h_tree=This visualization is called TreeView. It shows the XML document as tree, drawing the nodes in their hierarchical order. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
-h_plot=This visualization is called Scatterplot. All XML nodes are displayed in a plot representation. Nodes can be highlighted by single clicks and filtered by double clicks. A popup menu will be shown by right-clicking on an element.
-h_folder=This visualization displays all XML nodes in folder view. Nodes can be expanded or closed by clicks on the arrows. Although they can be highlighted by single clicks and zoomed in by double clicks. This is an efficient way to explore the XML document. A popup menu will be shown by right-clicking on an element.
-h_table=This visualization displays XML nodes in a table. If you click on a text, all nodes with the same text are highlighted. By double-clicking on a text, the query results are filtered. A popup menu will be shown by right-clicking on an element.
-h_text=This panel displays query results and other textual output.\n\nKey Shortcuts: Press '-' and '+' to change the font size of all panels. Type in any text into the find popup to launch an incremental search for it. It's an easy way to find special text points.
-h_info=This panel displays information on the compilation and evaluation of an XQuery request, including some profiling information.
-h_explore=The simple search mode allows simple queries in the XML document.
-h_xquery=In this text area, you can edit your XQuery expression. The input is evaluated after each key click.\n\n The following example would show all book titles with the topic 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
-h_mover=You can change the position of a view by dragging the bar on top of all view panels to any other place inside the main window.\n If you move a view outside the main window, it will be closed.

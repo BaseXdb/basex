@@ -170,7 +170,7 @@ public final class BaseXList extends BaseXBack {
     final MouseInputAdapter mouse = new MouseInputAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        BaseXLayout.focus(text, null);
+        BaseXLayout.focus(text);
       }
       @Override
       public void mousePressed(final MouseEvent e) {

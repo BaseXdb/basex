@@ -41,12 +41,13 @@ b_delete=Verwijder
 b_delall=Verwijder alles
 b_add=Toevoegen
 b_reset=Reset
+b_filter=Filter
+b_clear=Clear
 
 # Visualizations
 no_data=Geen gegevens beschikbaar
 no_space=Niet genoeg ruimte
 info_title=Query info
-help_title=Help
 text_title=Tekst
 explore_title=Verken
 editor_title=Editor
@@ -115,7 +116,6 @@ dr_title2=Verwijder documenten
 dr_title3=Copy database
 dr_over=Oude database wordt overschreven.
 dr_empty=Een lege database wordt gemaakt.
-dr_delete=% documenten worden verwijderd.
 
 dd_title=Manage databases
 dd_question=% database(s) zal verwijderd worden.
@@ -252,10 +252,6 @@ c_goup=Ga omhoog
 c_gouptt=Ga een niveau omhoog.
 c_props=Eigenschappen
 c_propstt=Toon informatie over de geopende database.
-c_add=Voegt documenten toe
-c_addtt=Voegt documenten toe aan de geopende database.
-c_drop=Verwijder documenten
-c_droptt=Verwijder documenten uit de geopende database.
 c_insert=Nieuw
 c_inserttt=Maakt een nieuwe XML node.
 c_maplayout=Map Layout
@@ -279,12 +275,10 @@ c_showbuttons=Knoppen
 c_showbuttonstt=Schakel de knoppenbalk aan/uit.
 c_showexplore=Verkenner
 c_showexplorett=Toon het Verkennerspaneel.
-c_showhelp=Help
-c_showhelptt=Toont informatie over de component met focus.
 c_community=Gemeenschap
 c_communitytt=Toont de Basex gemeenschap webpagina.
-c_doc=Documentation
-c_doctt=Show the documentation web page.
+c_help=Help
+c_helptt=Show the documentation web page.
 c_updates=Controleer op updates.
 c_updatestt=Toon de webpagina met updates.
 c_showfolder=Folder
@@ -523,6 +517,7 @@ info_off=UIT
 info_error=Fout
 info_entries=% entries
 info_browsererror=Kon geen browser openen.\nOpen zelf de URL:\n\n%
+info_directory=Directory
 
 # Command Help
 ch_nohelp=Sorry, geen help beschikbaar.
@@ -621,16 +616,3 @@ h_save=Bewaart het resultaat.
 h_go=Voer de query uit.
 h_stop=Stopt het actuele proces.
 h_recent=Recent geopende bestanden
-h_cmd=Hier kun je BaseX commando's invoeren. Probeer 'help' voor een overzicht van beschikbare commando's.\n\nJe kunt eerdere invoer terughalen met de UP en DOWN cursor keys.
-h_searchxml=Type iets in het tekstveld om in je XML document te zoeken. De volgende syntax wordt ondersteund:\n...      Vind tags en tekst\n=...   Vind exacte tekst nodes\n@ ...  Vind attributen en attribute waarden\n@=   Vind exacte attribute waarden\n/...     Evalueer input als XQuery
-h_xpath=In de XQuery mode kun je simpele XQuery requests opgeven.
-h_map=Deze visualisatie heet TreeMap. Alle nodes van het XML document worden als vierkanten getoond, het hele vlak wordt gevuld. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
-h_tree=Deze visualizatie heet TreeView. Zij toont het XML document als boom en tekent de nodes in een hierarchie. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
-h_plot=Deze visualisatie heet Scatterplot. Alle XML nodes worden getoond in een plot. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
-h_folder=Deze visualisatie toont alle XML nodes in een folder view. Nodes kunnen uitgeklapt en ingeklapt worden door op de pijlen te klikken. Nodes kun je uitlichten met een muisklik en zoomen kun je door te dubbelklikken. Dit is een efficiënte manier om je XML document te verkennen. Als je met rechts klikt op een element krijg je een popup menu.
-h_table=Deze visualisatie toont XML nodes in een tabel. Als je op een tekst klikt worden alle nodes met dezelfde tekst uitgelicht. Door te dubbelklikken op een tekst worden de query resultaten gefilterd.  Als je met rechts klikt op een element krijg je een popup menu.
-h_text=Dit paneel toont query resultaten en andere tekstuele output.\n\nToetsen: Type '-' en '+' om de font grootte van alle penelen te wijzigen. Type tekst in de Vind popup om incrementeel te zoeken. Dat is een gemakkelijke manier om speciale teksten te vinden.
-h_info=Dit paneel toont informatie over de compilatie en uitvoering van een XQuery request, inclusief enige profiling informatie.
-h_explore=De Eenvoudige Zoek Mode faciliteert eenvoudige queries in het XML document.
-h_xquery=In dit tekst veld kun je een XQuery invoeren. De invoer wordt uitgevoerd na elke toetsaanslag.\n\nHet volgende voorbeeld toont alle boek titels met het onderwerp 'BaseX':\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
-h_mover=Je kunt een view verplaatsen door het met de bovenste balk te verslepen.\n Als je een view buiten het hoofd window sleept wordt het gesloten.

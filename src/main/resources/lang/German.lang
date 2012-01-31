@@ -41,12 +41,13 @@ b_delete=Löschen
 b_delall=Alles löschen
 b_add=Hinzufügen
 b_reset=Zurücksetzen
+b_filter=Filtern
+b_clear=Leeren
 
 # Visualizations
 no_data=Keine Daten verfügbar
 no_space=Zu wenig Platz
 info_title=Anfrage-Info
-help_title=Hilfe
 text_title=Text
 explore_title=Explore
 editor_title=Editor
@@ -115,7 +116,6 @@ dr_title2=Dokumente löschen
 dr_title3=Datebank kopieren
 dr_over=Alte Datenbank wird überschrieben.
 dr_empty=Eine leere Datenbank wird erstellt.
-dr_delete=% Dokumente werden gelöscht.
 
 dd_title=Datenbankmanagement
 dd_question=% Datenbank(en) werden gelöscht.
@@ -252,10 +252,6 @@ c_goup=Hoch
 c_gouptt=Wechselt eine Ebene nach oben.
 c_props=Eigenschaften
 c_propstt=Zeigt Informationen über die aktuelle Datenbank an.
-c_add=Dokumente hinzufügen
-c_addtt=Fügt der aktuell geöffneten Datenbank Dokumente.
-c_drop=Dokumente löschen
-c_droptt=Löscht Dokumente aus der aktuell geöffneten Datenbank.
 c_insert=Neu
 c_inserttt=Erzeugt einen neuen XML-Knoten.
 c_maplayout=Map-Layout
@@ -281,12 +277,10 @@ c_showexplore=Explorer
 c_showexplorett=Zeigt den Explorer an.
 c_showfolder=Verzeichnis
 c_showfoldertt=Zeigt die Verzeichnisansicht an.
-c_showhelp=Hilfe
-c_showhelptt=Zeigt die Hilfsansicht an. Diese Ansicht bietet interaktive Informationen über die derzeit ausgewählten Komponenten.
 c_community=Community
 c_communitytt=Zeigt die Community-Webseite.
-c_doc=Dokumentation
-c_doctt=Zeigt die Dokumentations-Webseite.
+c_help=Hilfe
+c_helptt=Zeigt die Dokumentations-Webseite.
 c_updates=Nach Updates suchen
 c_updatestt=Zeigt die Update-Webseite.
 c_showinfo=Anfrage-Info
@@ -523,6 +517,7 @@ info_off=AUS
 info_error=Fehler
 info_entries=% Einträge
 info_browsererror=Browser konnte nicht geöffnet werden. Bitte die URL von Hand im Browser öffnen:\n\n%
+info_directory=Verzeichnis
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.
@@ -621,16 +616,3 @@ h_save=Speichert das Ergebnis.
 h_go=Führt die Anfrage aus.
 h_stop=Stoppt den aktuellen Prozess.
 h_recent=Zuletzt geöffnete Dateien
-h_cmd=Hier können BaseX Befehle eingegeben werden. Versuche 'help' um eine Übersicht über alle Befehle zu bekommen.\n\nVorherige Eingaben können durch die Cursortasten Hoch und Runter angezeigt werden.
-h_searchxml=Hier kann ein beliebiger Suchbegriff für die Suche im XML Dokument eingegeben werden. Die folgende Syntax wird unterstützt:\n...      Finde Tags und Texte\n=...   Finde die exakten Textknoten\n@ ...  Finde Attribute und Attributwerte\n@=   Finde die exakten Attributwerte\n/...     Führe die Eingabe als XQuery aus
-h_xpath=Der XQuery-Modus erlaubt die Eingabe und Ausführung von XQuery-Anfragen.
-h_map=Diese Visualisierung wird TreeMap genannt. Alle Knoten des XML Dokuments werden als Rechtecke, welche den kompletten Bereich ausfüllen repräsentiert. Knoten können durch einen einfachen Klick hervorgehoben und durch einen Doppel-Klick gefiltert werden. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
-h_tree=Diese Visualisierung nennt sich TreeView. Sie stellt das XML-Dokument als Baum dar, indem die einzelnen Knoten nach hierarchischen Ordnung gezeichnet werden. Knoten können durch einen einfachen Klick hervorgehoben und durch einen Doppel-Klick gefiltert werden. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
-h_plot=Diese Visualisierung wird Scatterplot genannt. Knoten können durch einen einfachen Klick hervorgehoben und durch einen Doppel-Klick gefiltert werden. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
-h_folder=Diese Visualisierung stellt alle XML Knoten in einer Verzeichnisdarstellung dar. Knoten können durch Klicks auf die Pfeile expandiert oder geschlossen werden. Ebenso können sie durch einen einfachen Klick hervorgehoben und durch einen Doppel-Klick gezoomt werden. Dies ist eine effiziente Art ein XML Dokument zu erforschen. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
-h_table=Diese Visualisierung stellt die XML Knoten als Tabelle dar. Bei Klick auf einen Text werden alle Knoten mit demselben Text hervorgehoben. Bei einem Doppel-Klick auf einen Text werden die Anfrageergebnisse gefiltert. Ein Popup-Menü wird durch einen Rechtsklick auf ein Element angezeigt.
-h_text=Hier werden Anfrage-Ergebnisse und alle anderen textuellen Ausgaben dargestellt.\n\nShortcuts: Drücke '-' und '+' um die Schriftgröße in allen Anzeigefeldern zu verändern. Hier kann ein beliebiger Text in das Finden-Popup eingegeben werden um eine inkrementelle Suche zu starten. Dies ist ein einfacher Weg um spezielle Textpassagen zu finden.
-h_info=Hier werden Informationen über die Kompilierung und Evaluation von XQuery-Anfragen dargestellt.
-h_explore=Der einfache Such-Modus erlaubt einfache Anfragen an das XML Dokument.
-h_xquery=In dieses Textfeld kann jede XQuery-Anfrage eingegeben werden. Die Eingabe wird nach jedem Klick ausgewertet.\n\nDas folgende Beispiel würde alle Büchertitel mit dem Thema 'BaseX' liefern:\n\n for $a in //book\n where $a/topic = "XML"\n return $a/title"
-h_mover=Die Position einer Ansicht kann durch ziehen am oberen Balken des Fensters auf jegliche Position im Hauptfenster verändert werden.\n Wenn eine Ansicht nach außerhalb des Hauptfensters bewegt wird, wird sie geschlossen.

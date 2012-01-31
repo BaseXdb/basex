@@ -55,14 +55,12 @@ public final class BaseXLayout {
   /**
    * Sets the help text for the specified component.
    * @param cont input container
-   * @param help help text
    */
-  static void focus(final Component cont, final byte[] help) {
+  static void focus(final Component cont) {
     final GUI gui = gui(cont);
     if(gui == null) return;
     if(gui.gprop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
     if(gui.fullscreen) return;
-    if(help != null && gui.gprop.is(GUIProp.SHOWHELP)) gui.help.setText(help);
   }
 
   /**
@@ -111,15 +109,6 @@ public final class BaseXLayout {
    */
   static void setSize(final Component comp, final int w, final int h) {
     comp.setPreferredSize(new Dimension(w, h));
-  }
-
-  /**
-   * Adds default interactions to the specified component.
-   * @param comp component
-   * @param win parent window
-   */
-  static void addInteraction(final Component comp, final Window win) {
-    addInteraction(comp, win, null);
   }
 
   /**
@@ -178,15 +167,12 @@ public final class BaseXLayout {
    * Adds default interactions to the specified component.
    * @param comp component
    * @param win parent window
-   * @param hlp help text
    */
-  static void addInteraction(final Component comp, final Window win,
-        final byte[] hlp) {
-
+  static void addInteraction(final Component comp, final Window win) {
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseEntered(final MouseEvent e) {
-        focus(comp, hlp);
+        focus(comp);
       }
     });
 

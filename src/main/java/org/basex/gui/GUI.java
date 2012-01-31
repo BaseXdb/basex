@@ -38,7 +38,6 @@ import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.gui.dialog.Dialog;
-import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogPass;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -93,8 +92,6 @@ public final class GUI extends AGUI {
   public boolean updating;
   /** Fullscreen flag. */
   public boolean fullscreen;
-  /** Help dialog. */
-  public DialogHelp help;
   /** Result panel. */
   public final GUIMenu menu;
   /** Button panel. */
@@ -633,7 +630,6 @@ public final class GUI extends AGUI {
     final int t = mode.getSelectedIndex();
     final int s = data == null ? 2 : gprop.num(GUIProp.SEARCHMODE);
 
-    input.help(s == 0 ? HELPSEARCHXML : s == 1 ? HELPXPATH : HELPCMD);
     mode.setEnabled(data != null);
     go.setEnabled(s == 2 || !gprop.is(GUIProp.EXECRT));
 
