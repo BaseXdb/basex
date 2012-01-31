@@ -248,10 +248,10 @@ public abstract class W3CTS {
     po.close();
 
     if(reporting) {
-      po = new PrintOutput(report + NAME + IO.XMLSUFFIX);
-      print(po, report + NAME + "Pre" + IO.XMLSUFFIX);
+      po = new PrintOutput(report + Prop.NAME + IO.XMLSUFFIX);
+      print(po, report + Prop.NAME + "Pre" + IO.XMLSUFFIX);
       po.print(logReport.toString());
-      print(po, report + NAME + "Pos" + IO.XMLSUFFIX);
+      print(po, report + Prop.NAME + "Pos" + IO.XMLSUFFIX);
       po.close();
     }
 
@@ -350,7 +350,7 @@ public abstract class W3CTS {
           ex.printStackTrace();
         }
         er = ex.getMessage();
-        if(er.startsWith(STOPPED)) er = er.substring(er.indexOf('\n') + 1);
+        if(er.startsWith(STOPPED_AT)) er = er.substring(er.indexOf('\n') + 1);
         if(er.startsWith("[")) er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
         // unexpected error - dump stack trace
       }

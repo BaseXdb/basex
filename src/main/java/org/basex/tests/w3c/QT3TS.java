@@ -1,6 +1,6 @@
 package org.basex.tests.w3c;
 
-import static org.basex.core.Text.*;
+import static org.basex.core.Prop.NL;
 import static org.basex.tests.w3c.QT3Constants.*;
 import static org.basex.util.Token.*;
 
@@ -11,6 +11,7 @@ import java.util.HashSet;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -769,7 +770,7 @@ public final class QT3TS {
         " -e  check error codes" + NL +
         " -i  also save ignored files" + NL +
         " -v  verbose output",
-        Util.info(CONSOLE, Util.name(this)));
+        Util.info(Text.CONSOLE, Util.name(this)));
 
     while(arg.more()) {
       if(arg.dash()) {
