@@ -87,6 +87,10 @@ public class DialogAdd extends BaseXBack {
         }
       };
       DialogProgress.execute(dialog, "", t, new Add(trg, src));
+
+    } else if (comp == options.browse) {
+      target.setText(options.dbname);
+
     } else {
       boolean ok = options.action(false);
       parsing.action(comp);

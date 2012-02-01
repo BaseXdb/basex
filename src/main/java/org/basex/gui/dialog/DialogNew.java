@@ -16,7 +16,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
@@ -111,16 +110,6 @@ public final class DialogNew extends Dialog {
     finish(null);
   }
 
-  /**
-   * Chooses an input file.
-   * @return resulting file
-   */
-  protected IOFile choose() {
-    final IOFile input = options.choose();
-    if(input != null) target.setText(input.dbname().replaceAll("[^\\w-]", ""));
-    return input;
-  }
-
   @Override
   public void action(final Object cmp) {
     final boolean valid = options.action(true);
@@ -149,6 +138,8 @@ public final class DialogNew extends Dialog {
         icon = Msg.WARN;
       }
     }
+
+    if(cmp == options.browse) target.setText(options.dbname);
 
     options.info.setText(inf, icon);
     enableOK(buttons, B_OK, ok);
