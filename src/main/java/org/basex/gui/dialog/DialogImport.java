@@ -39,6 +39,10 @@ public final class DialogImport extends BaseXBack {
   final BaseXTextField filter;
   /** Dialog reference. */
   final GUI gui;
+  /** Browse button. */
+  final BaseXButton browse;
+  /** DB name. */
+  String dbname;
 
   /**
    * Constructor.
@@ -55,16 +59,21 @@ public final class DialogImport extends BaseXBack {
     add(new BaseXLabel(FILE_OR_DIR + COL, true, true).border(0, 0, 4, 0));
 
     final BaseXBack b = new BaseXBack(new TableLayout(1, 2, 8, 0));
+
     input = new BaseXTextField(gui.gprop.get(GUIProp.CREATEPATH), dialog);
+
     input.addKeyListener(dialog.keys);
     b.add(input);
 
-    final BaseXButton browse = new BaseXButton(BROWSE_D, dialog);
+    browse = new BaseXButton(BROWSE_D, dialog);
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final IOFile in = inputFile();
-        if(in != null) input.setText(in.path());
+        if(in != null) {
+          input.setText(in.path());
+          dbname = in.dbname();
+        }
       }
     });
     b.add(browse);
@@ -99,16 +108,6 @@ public final class DialogImport extends BaseXBack {
    */
   String input() {
     return input.getText().trim();
-  }
-
-  /**
-   * Opens a file dialog to choose an XML document or directory.
-   * @return chosen file, or {@code null}
-   */
-  protected IOFile choose() {
-    final IOFile in = inputFile();
-    if(in != null) input.setText(in.path());
-    return in;
   }
 
   /**
