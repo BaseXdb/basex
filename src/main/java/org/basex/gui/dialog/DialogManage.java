@@ -136,14 +136,6 @@ public final class DialogManage extends Dialog {
   }
 
   /**
-   * Returns the name of the selected database.
-   * @return database name
-   */
-  public String db() {
-    return choice.getValue();
-  }
-
-  /**
    * Tests if no databases have been found.
    * @return result of check
    */

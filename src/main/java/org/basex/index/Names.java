@@ -1,7 +1,5 @@
 package org.basex.index;
 
-import static org.basex.data.DataText.*;
-
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -9,7 +7,6 @@ import org.basex.core.Text;
 import org.basex.data.MetaData;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.io.serial.Serializer;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -142,21 +139,6 @@ public final class Names extends TokenSet implements Index {
       tim.add(keys[i], stats[i].count);
     }
     return tim;
-  }
-
-  /**
-   * Serializes the path node.
-   * @param ser serializer
-   * @throws IOException I/O exception
-   */
-  void plan(final Serializer ser) throws IOException {
-    ser.openElement(T_INDEX);
-    for(int i = 1; i < size; ++i) {
-      ser.openElement(T_KEY, T_NAME, keys[i]);
-      stats[i].plan(ser);
-      ser.closeElement();
-    }
-    ser.closeElement();
   }
 
   @Override

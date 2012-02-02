@@ -33,15 +33,6 @@ public final class Uri extends Str {
   }
 
   /**
-   * Compares the specified uri.
-   * @param uri uri to be compared
-   * @return result of check
-   */
-  public boolean eq(final Uri uri) {
-    return val == uri.val || Token.eq(val, uri.val);
-  }
-
-  /**
    * Appends the specified address. If one of the URIs is invalid,
    * the original uri is returned.
    * @param add address to be appended

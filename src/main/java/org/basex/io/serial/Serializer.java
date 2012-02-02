@@ -294,14 +294,6 @@ public abstract class Serializer {
     emptyElement(info(expr), atts);
   }
 
-  /**
-   * Returns the current level.
-   * @return level
-   */
-  public final int level() {
-    return tags.size();
-  }
-
   // OVERWRITABLE PUBLIC METHODS ==============================================
 
   /**

@@ -270,8 +270,8 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_ADD.args(DB, FLDR, "test/dir"));
     query(COUNT.args(COLLECTION.args(DB + "/test/dir")), NFLDR);
 
-    query("for $f in " + _FILE_LIST.args(FLDR) + " return " +
-        _DB_ADD.args(DB, "$f", "dir"));
+    query("for $f in " + _FILE_LIST.args(FLDR, "true()", "*.xml") +
+        " return " + _DB_ADD.args(DB, "$f", "dir"));
     query(COUNT.args(COLLECTION.args(DB + "/dir")), NFLDR);
 
     query("for $i in 1 to 3 return " +

@@ -1,16 +1,12 @@
 package org.basex.index;
 
-import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import org.basex.data.MetaData;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.util.Token;
 import org.basex.util.hash.TokenIntMap;
 
 /**
@@ -163,32 +159,5 @@ public final class Stats {
     }
     if(leaf) sb.append(", leaf");
     return sb.toString();
-  }
-
-  /**
-   * Serializes the statistics.
-   * @param ser serializer
-   * @throws IOException I/O exception
-   */
-  public void plan(final Serializer ser) throws IOException {
-    final String t = type.toString().toLowerCase(Locale.ENGLISH);
-    ser.attribute(T_TYPE, Token.token(t));
-    ser.attribute(T_COUNT, Token.token(count));
-    switch(type) {
-      case CATEGORY:
-        for(final byte[] cat : cats) {
-          ser.openElement(T_VALUE, T_COUNT, Token.token(cats.value(cat)));
-          ser.text(cat);
-          ser.closeElement();
-        }
-        break;
-      case DOUBLE:
-      case INTEGER:
-        ser.attribute(T_MIN, Token.token(min));
-        ser.attribute(T_MAX, Token.token(max));
-        break;
-      default:
-        break;
-    }
   }
 }

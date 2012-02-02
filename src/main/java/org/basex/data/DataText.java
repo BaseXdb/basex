@@ -192,16 +192,6 @@ public interface DataText {
   byte[] T_NAME = token("name");
   /** Token: size. */
   byte[] T_SIZE = token("size");
-  /** Token: min. */
-  byte[] T_MIN = token("min");
-  /** Token: max. */
-  byte[] T_MAX = token("max");
-  /** Token: count. */
-  byte[] T_COUNT = token("count");
-  /** Token: index. */
-  byte[] T_INDEX = token("index");
-  /** Token: key. */
-  byte[] T_KEY = token("key");
 
   /** Token: json. */
   byte[] T_JSON = token("json");

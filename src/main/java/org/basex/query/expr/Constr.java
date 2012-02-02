@@ -61,16 +61,6 @@ public final class Constr {
   }
 
   /**
-   * Adds a namespace array.
-   * @param nsp namespace array
-   * @return self reference
-   */
-  public Constr add(final Atts nsp) {
-    nspaces = nsp;
-    return this;
-  }
-
-  /**
    * Constructs child and attribute nodes.
    * @param expr input expressions
    * @return self reference

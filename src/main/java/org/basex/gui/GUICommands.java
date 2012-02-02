@@ -78,10 +78,12 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Opens a dialog to manage databases. */
-  C_MANAGE(OPEN_MANAGE + DOTS, "% O", H_OPEN_MANAGE, false, false) {
+  C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% O", H_OPEN_MANAGE, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogManage(gui, true).nodb()) Dialog.warn(gui, NO_DB_FOUND);
+      if(new DialogManage(gui, true).nodb()) {
+        if(Dialog.confirm(gui, NEW_DB_QUESTION)) C_CREATE.execute(gui);
+      }
     }
   },
 

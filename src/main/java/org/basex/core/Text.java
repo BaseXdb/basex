@@ -753,9 +753,6 @@ public interface Text {
   /** "Encoding". */
   String ENCODING = lang("encoding");
 
-  /** "No database found". */
-  String NO_DB_FOUND = lang("no_db_found");
-
   /** Info on whitespace chopping. */
   String WS_CHOPPING = lang("ws_chopping");
   /** Info on text indexing. */
@@ -1074,8 +1071,7 @@ public interface Text {
   /** Dialog title for opening a database. */
   String OPEN_DB = lang("open_db");
   /** Dialog asking if a new database should be be created. */
-  String NEW_DB_QUESTION = NO_DB_FOUND + NL +
-      lang("new_db_question") + NL + " ";
+  String NEW_DB_QUESTION = lang("no_db_found") + NL + lang("new_db_question");
 
   /** File dialog error. */
   String FILE_NOT_OPENED = lang("file_not_opened");
@@ -1102,8 +1098,7 @@ public interface Text {
 
   /** Dialog title for renaming a database. */
   String RENAME_DB = lang("rename_db");
-  /** Dialog title for dropping documents. */
-  String DELETE_DOCS = lang("delete_docs");
+
   /** Dialog title for copying a database. */
   String COPY_DB = lang("copy_db");
   /** Info for overwriting a database. */

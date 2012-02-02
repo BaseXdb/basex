@@ -10,17 +10,14 @@ import org.basex.core.cmd.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -150,25 +147,6 @@ public final class DialogProps extends Dialog {
     setResizable(true);
     setMinimumSize(getPreferredSize());
     finish(null);
-  }
-
-  /**
-   * Displays a file save dialog and returns the file name or {@code null}
-   * if dialog was canceled.
-   * @param gui gui reference
-   * @param single file vs directory dialog
-   * @return io reference
-   */
-  static IO save(final GUI gui, final boolean single) {
-    // open file chooser for XML creation
-    final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
-        gui.gprop.get(GUIProp.SAVEPATH), gui);
-    fc.addFilter(XML_DOCUMENTS, IO.XMLSUFFIX);
-
-    final IO file = fc.select(single ? BaseXFileChooser.Mode.FSAVE :
-      BaseXFileChooser.Mode.DSAVE);
-    if(file != null) gui.gprop.set(GUIProp.SAVEPATH, file.path());
-    return file;
   }
 
   /**

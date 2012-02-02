@@ -86,7 +86,7 @@ public final class GUIConstants {
 
   /** Toolbar entries, containing the button commands. */
   static final GUICommands[] TOOLBAR = {
-    C_CREATE, C_MANAGE, C_INFO, C_CLOSE, null,
+    C_CREATE, C_OPEN_MANAGE, C_INFO, C_CLOSE, null,
     C_GOHOME, C_GOBACK, C_GOUP, C_GOFORWARD, null,
     C_SHOWEDITOR, C_SHOWINFO, null, C_SHOWTEXT, C_SHOWMAP, C_SHOWTREE,
     C_SHOWFOLDER, C_SHOWPLOT, C_SHOWTABLE, C_SHOWEXPLORE
@@ -104,7 +104,7 @@ public final class GUIConstants {
    * {@link #EMPTY} references serve as menu separators.
    */
   static final GUICommand[][] MENUITEMS = { {
-    C_CREATE, C_MANAGE, EMPTY,
+    C_CREATE, C_OPEN_MANAGE, EMPTY,
     C_INFO, C_EXPORT, C_CLOSE, EMPTY,
     C_SERVER, Prop.MAC ? null : EMPTY,
     Prop.MAC ? null : C_EXIT

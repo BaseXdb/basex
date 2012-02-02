@@ -121,12 +121,6 @@ public final class GUIProp extends AProp {
   /** Dialog location. */
   public static final Object[] COLORSLOC =
     { "COLORSLOC", new int[] { 530, 620 } };
-  /** Dialog location. */
-  public static final Object[] HELPLOC =
-    { "HELPLOC", new int[] { 690, 484 } };
-  /** Dialog size. */
-  public static final Object[] HELPSIZE =
-    { "HELPSIZE", new int[] { 300, 250 } };
 
   /** Path for creating new databases. */
   public static final Object[] CREATEPATH = { "CREATEPATH", Prop.HOME };

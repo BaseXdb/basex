@@ -160,8 +160,8 @@ public enum Err {
 
   /** FOHC0001: Evaluation exception. */
   HTTPERR(FOHC, 1, "An HTTP error occurred: %."),
-  /** FOHC0002: Evaluation exception. */
-  HTMLERR(FOHC, 2, "Error parsing entity as XML or HTML."),
+  /** FOHC0002: Evaluation exception.
+  HTMLERR(FOHC, 2, "Error parsing entity as XML or HTML."), */
   /** FOHC003: Evaluation exception. */
   SRCATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** FOHC0004: Evaluation exception. */
@@ -827,18 +827,18 @@ public enum Err {
   CRYPTOXPINV(FOCX, 4, "XPath expression is invalid."),
   /** FOCX03: Crypto Exception. */
   CRYPTOINVNM(FOCX, 5, "Invalid name for $digital-certificate root."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOINVCH(FOCX, 6, "Invalid child element of $digital-certificate."),
+  /* FOCX03: Crypto Exception.
+  CRYPTOINVCH(FOCX, 6, "Invalid child element of $digital-certificate."), */
   /** FOCX03: Crypto Exception. */
   CRYPTOKSNULL(FOCX, 7, "Key store is null."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOIOERR(FOCX, 8, "I/O error while reading keystore."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOPERMDEN(FOCX, 9, "Permission denied to read keystore."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOKSURLINV(FOCX, 10, "Keystore URL is invalid."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOKSTYPE(FOCX, 11, "Keystore type is not supported."),
+  /* FOCX03: Crypto Exception.
+  CRYPTOIOERR(FOCX, 8, "I/O error while reading keystore."), */
+  /* FOCX03: Crypto Exception.
+  CRYPTOPERMDEN(FOCX, 9, "Permission denied to read keystore."), */
+  /* FOCX03: Crypto Exception.
+  CRYPTOKSURLINV(FOCX, 10, "Keystore URL is invalid."), */
+  /* FOCX03: Crypto Exception.
+  CRYPTOKSTYPE(FOCX, 11, "Keystore type is not supported."), */
   /** FOCX03: Crypto Exception. */
   CRYPTONOKEY(FOCX, 12, "Cannot find key for alias in given keystore."),
   /** FOCX13: Crypto Exception. */
@@ -859,14 +859,14 @@ public enum Err {
   CRYPTOILLBLO(FOCX, 20, "Illegal block size."),
   /** FOCX21: Crypto Exception. */
   CRYPTOINVALGO(FOCX, 21, "Algorithm is not supported."),
-  /** FOCX22: Crypto Exception. */
-  CRYPTODECTYP(FOCX, 22, "Decryption type is not supported."),
+  /* FOCX22: Crypto Exception.
+  CRYPTODECTYP(FOCX, 22, "Decryption type is not supported."), */
   /** FOCX999: Crypto Exception. */
   CRYPTOSIGTYPINV(FOCX, 9999, "Signature type is not supported."),
-  /** FOCX998: Crypto Exception. */
-  CRYPTONOTSUPP(FOCX, 9998, "Not (yet) supported."),
-  /** FOCX997: Crypto Exception. */
-  CRYPTOSYMERR(FOCX, 9997, "Algorithm not compatible with encryption type."),
+  /** FOCX998: Crypto Exception.
+  CRYPTONOTSUPP(FOCX, 9998, "Not (yet) supported."), */
+  /* FOCX997: Crypto Exception.
+  CRYPTOSYMERR(FOCX, 9997, "Algorithm not compatible with encryption type."), */
   /** FOCX996: Crypto Exception. */
   CRYPTOIOEXC(FOCX, 9996, "IO Exception."),
   /** FOCX995: Crypto Exception. */

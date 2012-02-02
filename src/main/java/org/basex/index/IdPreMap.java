@@ -108,15 +108,6 @@ public class IdPreMap {
   /**
    * Find the PRE values of a given list of IDs.
    * @param ids IDs
-   * @return a sorted array of PRE values
-   */
-  public int[] pre(final int[] ids) {
-    return pre(ids, 0, ids.length);
-  }
-
-  /**
-   * Find the PRE values of a given list of IDs.
-   * @param ids IDs
    * @param off start position in ids (inclusive)
    * @param len number of ids
    * @return a sorted array of PRE values
@@ -187,15 +178,6 @@ public class IdPreMap {
 
     // add the new interval
     add(pos, pre, id, id + c - 1, inc, oid);
-  }
-
-  /**
-   * Delete a record.
-   * @param pre PRE value of the record
-   * @param id ID of the record
-   */
-  public void delete(final int pre, final int id) {
-    delete(pre, id, -1);
   }
 
   /**
