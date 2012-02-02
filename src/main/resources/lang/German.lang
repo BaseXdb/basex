@@ -88,7 +88,6 @@ db_restored_%        = '%' wiederhergestellt (%).
 db_updated_%         = Die Datenbank '%' wird gerade aktualisert, oder das Update wurde nicht abgeschlossen.
 delete               = Löschen
 delete_all           = Alles löschen
-delete_docs          = Dokumente löschen
 delete_nodes         = Möchten Sie wirklich löschen?
 diacritics           = Diakritische Zeichen
 dir_not_empty        = Verzeichnis ist nicht leer.

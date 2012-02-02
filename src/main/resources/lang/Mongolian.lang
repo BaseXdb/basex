@@ -88,7 +88,6 @@ db_restored_%        = '%' нь %-нд сэргээгдсэн.
 db_updated_%         = Database '%' is being updated, or update was not completed.
 delete               = Устгах
 delete_all           = Бүгдийг устгах
-delete_docs          = Документ устгах
 delete_nodes         = Та устгахдаа итгэлтэй байна уу?
 diacritics           = Ялгах тэмдэгнүүд
 dir_not_empty        = Байршил хоосон биш байна

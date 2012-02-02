@@ -88,7 +88,6 @@ db_restored_%        = '%' ripristinato in %.
 db_updated_%         = La base di dati '%' è in fase di aggiornamento.
 delete               = Cancella
 delete_all           = Cancella tutto
-delete_docs          = Cancella documenti
 delete_nodes         = Cancellare. Sei sicuro?
 diacritics           = Segni diacritici
 dir_not_empty        = La cartella non è vuota.

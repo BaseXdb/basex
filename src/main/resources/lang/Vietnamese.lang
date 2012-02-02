@@ -88,7 +88,6 @@ db_restored_%        = '%' restored in %.
 db_updated_%         = Database '%' is being updated, or update was not completed.
 delete               = Xóa
 delete_all           = Delete All
-delete_docs          = Delete documents
 delete_nodes         = Bạn thực sự muốn xóa?
 diacritics           = Dấu phụ phân biệt
 dir_not_empty        = Directory is not empty.

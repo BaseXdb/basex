@@ -88,7 +88,6 @@ db_restored_%        = '%' は % にリストアされました。
 db_updated_%         = データベース '%' が更新されています。または、更新は完了しませんでした
 delete               = 削除
 delete_all           = 全て削除
-delete_docs          = ドキュメントの削除
 delete_nodes         = 本当に削除しますか？
 diacritics           = 補助記号（発音区別符号）
 dir_not_empty        = ディレクトリが空ではありません。
