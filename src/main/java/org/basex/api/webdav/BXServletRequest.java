@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -86,15 +85,6 @@ public class BXServletRequest extends AbstractRequest {
     method = Request.Method.valueOf(r.getMethod());
     url = r.getRequestURL().toString(); // MiltonUtils.stripContext(r);
     REQUEST.set(r);
-  }
-
-  /**
-   * Returns the current session associated with this request, or if the request
-   * does not have a session, creates one.
-   * @return the <code>HttpSession</code> associated with this request
-   */
-  public HttpSession getSession() {
-    return req.getSession();
   }
 
   @Override

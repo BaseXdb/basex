@@ -19,7 +19,6 @@ import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Token;
 import org.basex.util.Util;
-import org.basex.util.list.StringList;
 
 import com.bradmcevoy.http.Auth;
 import com.bradmcevoy.http.Request;
@@ -114,23 +113,6 @@ public abstract class BXResource implements Resource {
   @Override
   public Date getModifiedDate() {
     return mdate;
-  }
-
-  /**
-   * Lists all databases.
-   * @param s session
-   * @return a list of database names
-   * @throws IOException I/O exception
-   */
-  static StringList listDBs(final Session s) throws IOException {
-    final StringList result = new StringList();
-    final Query q = s.query(_DB_LIST.args());
-    try {
-      while(q.more()) result.add(q.next());
-    } finally {
-      q.close();
-    }
-    return result;
   }
 
   /**

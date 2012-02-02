@@ -41,15 +41,6 @@ public final class BXQDataSource implements XQDataSource {
   }
 
   /**
-   * Default constructor, specifying a new database context.
-   * @param ctx database context
-   */
-  public BXQDataSource(final Context ctx) {
-    this();
-    context = ctx;
-  }
-
-  /**
    * Returns the static database context reference.
    * @return database context
    */

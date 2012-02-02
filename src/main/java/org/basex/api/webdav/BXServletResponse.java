@@ -30,15 +30,6 @@ public class BXServletResponse extends AbstractResponse {
   private static final ThreadLocal<HttpServletResponse> RESPONSE =
       new ThreadLocal<HttpServletResponse>();
 
-  /**
-   * We make this available via a thread-local so it can be accessed from parts
-   * of the application which don't have a reference to the servlet response.
-   * @return the current {@link HttpServletResponse}
-   */
-  public static HttpServletResponse getResponse() {
-    return RESPONSE.get();
-  }
-
   /** HTTP servlet response. */
   private final HttpServletResponse res;
   /** Response headers. */
