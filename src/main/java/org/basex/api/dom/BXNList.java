@@ -14,15 +14,15 @@ import org.w3c.dom.NodeList;
  */
 public class BXNList implements NodeList {
   /** XQuery node set. */
-  protected NodeCache xquery;
+  NodeCache xquery;
   /** XQuery node set. */
-  protected Nodes nodes;
+  Nodes nodes;
 
   /**
    * Constructor.
    * @param nb nodes
    */
-  protected BXNList(final NodeCache nb) {
+  BXNList(final NodeCache nb) {
     xquery = nb;
     xquery.sort();
   }

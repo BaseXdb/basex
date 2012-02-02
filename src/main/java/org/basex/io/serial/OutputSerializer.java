@@ -31,41 +31,41 @@ import org.basex.util.list.TokenList;
  */
 public abstract class OutputSerializer extends Serializer {
   /** (X)HTML: elements with an empty content model. */
-  protected static final TokenList EMPTIES = new TokenList();
+  static final TokenList EMPTIES = new TokenList();
   /** (X)HTML: URI attributes. */
-  protected static final TokenSet URIS = new TokenSet();
+  static final TokenSet URIS = new TokenSet();
 
   /** System document type. */
-  protected String docsys;
+  private String docsys;
   /** Public document type. */
-  protected String docpub;
+  private String docpub;
   /** Flag for printing content type. */
-  protected int ct;
+  int ct;
   /** Indentation flag (used for formatting). */
-  protected boolean ind;
+  boolean ind;
   /** Item flag (used for formatting). */
-  protected boolean item;
+  private boolean item;
   /** Script flag. */
-  protected boolean script;
+  boolean script;
 
   /** URI escape flag. */
-  protected final boolean escape;
+  final boolean escape;
   /** CData elements. */
-  protected final TokenList cdata = new TokenList();
+  private final TokenList cdata = new TokenList();
   /** Suppress indentation elements. */
-  protected final TokenList suppress = new TokenList();
+  private final TokenList suppress = new TokenList();
   /** Indentation flag. */
-  protected final boolean indent;
+  final boolean indent;
   /** Include content type flag. */
-  protected final boolean content;
+  final boolean content;
   /** Media type. */
-  protected final String media;
+  private final String media;
   /** Charset. */
-  protected final Charset encoding;
+  private final Charset encoding;
   /** New line. */
-  protected final byte[] nl;
+  final byte[] nl;
   /** Output stream. */
-  protected final PrintOutput out;
+  final PrintOutput out;
 
   /** UTF8 flag. */
   private final boolean utf8;
@@ -73,14 +73,12 @@ public abstract class OutputSerializer extends Serializer {
   // project specific properties
 
   /** Number of spaces to indent. */
-  protected final int indents;
+  final int indents;
   /** Tabular character. */
-  protected final char tab;
+  final char tab;
 
   /** Format items. */
   private final boolean format;
-  /** URI for wrapped results. */
-  private final byte[] wUri;
   /** Prefix for wrapped results. */
   private final byte[] wPre;
   /** Wrapper flag. */
@@ -119,7 +117,8 @@ public abstract class OutputSerializer extends Serializer {
     format  = p.yes(S_FORMAT);
     tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
     wPre    = token(p.get(S_WRAP_PREFIX));
-    wUri    = token(p.get(S_WRAP_URI));
+    /* URI for wrapped results. */
+    byte[] wUri = token(p.get(S_WRAP_URI));
     wrap    = wPre.length != 0;
     final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = (eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n").
@@ -328,7 +327,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character to be encoded and printed
    * @throws IOException I/O exception
    */
-  protected void code(final int ch) throws IOException {
+  void code(final int ch) throws IOException {
     if(!format) {
       printChar(ch);
     } else if(ch < ' ' && ch != '\n' && ch != '\t' || ch > 0x7F && ch < 0xA0) {
@@ -363,7 +362,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param dt document type, or {@code null} for html type
    * @throws IOException I/O exception
    */
-  protected void doctype(final byte[] dt) throws IOException {
+  void doctype(final byte[] dt) throws IOException {
     if(level != 0 || docsys == null) return;
     if(ind) indent();
     print(DOCTYPE);
@@ -403,7 +402,7 @@ public abstract class OutputSerializer extends Serializer {
    * Indents the next text.
    * @throws IOException I/O exception
    */
-  protected final void indent() throws IOException {
+  final void indent() throws IOException {
     if(!indent) return;
 
     if(item) {
@@ -425,7 +424,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character
    * @throws IOException I/O exception
    */
-  protected final void hex(final int ch) throws IOException {
+  final void hex(final int ch) throws IOException {
     print("&#x");
     print(HEX[ch >> 4]);
     print(HEX[ch & 15]);
@@ -438,7 +437,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character to be printed
    * @throws IOException I/O exception
    */
-  protected final void printChar(final int ch) throws IOException {
+  final void printChar(final int ch) throws IOException {
     if(ch == '\n') out.write(nl);
     else print(ch);
   }
@@ -448,7 +447,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param ch character to be printed
    * @throws IOException I/O exception
    */
-  protected void print(final int ch) throws IOException {
+  void print(final int ch) throws IOException {
     // comparison by reference
     if(utf8) out.utf8(ch);
     else out.write(new TokenBuilder(4).add(ch).toString().getBytes(encoding));
@@ -459,7 +458,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param token token to be printed
    * @throws IOException I/O exception
    */
-  protected final void print(final byte[] token) throws IOException {
+  final void print(final byte[] token) throws IOException {
     // comparison by reference
     if(utf8) {
       for(final byte b : token) out.write(b);
@@ -473,7 +472,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param s string to be printed
    * @throws IOException I/O exception
    */
-  protected final void print(final String s) throws IOException {
+  final void print(final String s) throws IOException {
     // comparison by reference
     if(utf8) {
       for(final byte b : token(s)) out.write(b);
@@ -489,7 +488,7 @@ public abstract class OutputSerializer extends Serializer {
    * @return {@code true} if declaration was printed
    * @throws IOException I/O exception
    */
-  protected boolean ct(final boolean empty, final boolean html)
+  boolean ct(final boolean empty, final boolean html)
       throws IOException {
 
     if(ct != 1) return false;

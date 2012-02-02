@@ -23,7 +23,7 @@ public abstract class Value extends Expr {
    * Constructor.
    * @param t data type
    */
-  protected Value(final Type t) {
+  Value(final Type t) {
     type = t;
   }
 

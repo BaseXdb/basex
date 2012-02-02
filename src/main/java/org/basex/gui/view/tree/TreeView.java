@@ -82,8 +82,6 @@ public final class TreeView extends View implements TreeConstants {
   private boolean nes;
   /** If something is in focus. */
   private boolean inFocus;
-  /** If window-size changed. */
-  private boolean winChange;
   /** Show attributes. */
   private boolean showAtts;
   /** Slim rectangles to text length. */
@@ -192,6 +190,8 @@ public final class TreeView extends View implements TreeConstants {
     if(paintType == Refresh.INIT || paintType == Refresh.CONTEXT)
       sub.generateBorders(c);
 
+    /* If window-size changed. */
+    boolean winChange;
     if((winChange = windowSizeChanged()) && paintType == Refresh.VOID
         || paintType == Refresh.INIT || paintType == Refresh.CONTEXT
         || paintType == Refresh.RESIZE) {
@@ -369,14 +369,14 @@ public final class TreeView extends View implements TreeConstants {
     final int h = nodeHeight;
     final boolean br = tr.bigRect(sub, rn, lv);
     boolean txt = !br && fontHeight <= h;
-    boolean fill = false;
+    boolean fill;
     boolean border = false;
     final int xx = r.x;
     final int ww = r.w;
     final boolean marked = marked(xx, y);
 
     Color borderColor = null;
-    Color fillColor = null;
+    Color fillColor;
     Color textColor = Color.BLACK;
 
     switch(t) {
@@ -686,7 +686,7 @@ public final class TreeView extends View implements TreeConstants {
     final int size = d.size(pre, k);
 
     // rectangle center
-    int rc = -1;
+    int rc;
 
     if(br) {
       rc = drawNodeInBigRectangle(g, rn, lv, r, pre);
@@ -973,7 +973,7 @@ public final class TreeView extends View implements TreeConstants {
         if(r.contains(mx)) {
           frect = r;
           flv = lv;
-          int pre = -1;
+          int pre;
 
           // if multiple pre values, then approximate pre value
           if(tr.bigRect(sub, rn, lv)) {

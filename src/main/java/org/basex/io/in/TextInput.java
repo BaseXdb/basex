@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  */
 public class TextInput extends InputStream {
   /** Input file. */
-  protected IO input;
+  private IO input;
 
   /** Input streams. */
   private BufferInput[] inputs = new BufferInput[1];
@@ -38,7 +38,7 @@ public class TextInput extends InputStream {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  public TextInput(final InputStream is) throws IOException {
+  TextInput(final InputStream is) throws IOException {
     inputs[0] = is instanceof BufferInput ? (BufferInput) is :
       new BufferInput(is);
     inputs[0].encoding();

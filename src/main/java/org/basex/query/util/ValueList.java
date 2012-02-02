@@ -13,7 +13,7 @@ import org.basex.util.list.ElementList;
  */
 public final class ValueList extends ElementList {
   /** List entries. */
-  Value[] list = new Value[CAP];
+  private Value[] list = new Value[CAP];
 
   /**
    * Default constructor.
@@ -26,7 +26,7 @@ public final class ValueList extends ElementList {
    * Constructor, specifying an initial array capacity.
    * @param c array capacity
    */
-  public ValueList(final int c) {
+  private ValueList(final int c) {
     list = new Value[c];
   }
 

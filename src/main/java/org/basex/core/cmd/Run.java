@@ -21,7 +21,7 @@ import org.basex.util.Util;
  */
 public final class Run extends AQuery {
   /** Query string. */
-  String query;
+  private String query;
 
   /**
    * Default constructor.
@@ -56,7 +56,7 @@ public final class Run extends AQuery {
    * @return query string
    * @throws IOException I/O exception
    */
-  protected String read(final Context ctx) throws IOException {
+  String read(final Context ctx) throws IOException {
     if(query == null) {
       final IO io = IO.get(args[0]);
       if(!io.exists()) throw new BaseXException(

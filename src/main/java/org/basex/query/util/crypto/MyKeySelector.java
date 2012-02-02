@@ -23,7 +23,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public class MyKeySelector extends KeySelector {
+class MyKeySelector extends KeySelector {
   /**
    * Wrapper for KeySelector results.
    *

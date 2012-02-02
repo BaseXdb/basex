@@ -23,7 +23,7 @@ public abstract class OrderBy extends ParseExpr {
    * Empty constructor for stable sorting.
    * @param ii input info
    */
-  protected OrderBy(final InputInfo ii) {
+  OrderBy(final InputInfo ii) {
     super(ii);
   }
 

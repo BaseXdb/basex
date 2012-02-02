@@ -18,7 +18,7 @@ abstract class AGet extends Command {
    * @param f command flags
    * @param a arguments
    */
-  protected AGet(final int f, final String... a) {
+  AGet(final int f, final String... a) {
     super(f, a);
   }
 
@@ -26,7 +26,7 @@ abstract class AGet extends Command {
    * Creates an error message for an unknown key and returns {@code false}.
    * @return false
    */
-  protected final boolean whichKey() {
+  final boolean whichKey() {
     final String key = args[0].toUpperCase(Locale.ENGLISH);
     final String sim = prop.similar(key);
     return sim != null ? error(UNKNOWN_OPT_SIMILAR_X, key, sim) :

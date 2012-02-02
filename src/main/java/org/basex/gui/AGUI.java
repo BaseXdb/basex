@@ -24,7 +24,7 @@ public abstract class AGUI extends JFrame {
    * @param ctx database context
    * @param gprops gui properties
    */
-  protected AGUI(final Context ctx, final GUIProp gprops) {
+  AGUI(final Context ctx, final GUIProp gprops) {
     setIconImage(BaseXLayout.image("icon"));
     setTitle(null);
     context = ctx;

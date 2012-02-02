@@ -39,7 +39,7 @@ final class FTTrieBuilder extends FTBuilder {
    * @param d data reference
    * @throws IOException IOException
    */
-  protected FTTrieBuilder(final Data d) throws IOException {
+  FTTrieBuilder(final Data d) throws IOException {
     super(d);
   }
 

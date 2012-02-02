@@ -19,8 +19,8 @@ abstract class InsertBase extends NodeCopy {
    * @param i input info
    * @param nc node copy
    */
-  protected InsertBase(final PrimitiveType t, final int p, final Data d,
-      final InputInfo i, final NodeCache nc) {
+  InsertBase(final PrimitiveType t, final int p, final Data d,
+             final InputInfo i, final NodeCache nc) {
     super(t, p, d, i, nc);
   }
 

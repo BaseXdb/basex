@@ -23,7 +23,7 @@ public abstract class Cmp extends Arr {
    * @param e1 first expression
    * @param e2 second expression
    */
-  public Cmp(final InputInfo ii, final Expr e1, final Expr e2) {
+  Cmp(final InputInfo ii, final Expr e1, final Expr e2) {
     super(ii, e1, e2);
   }
 
@@ -32,7 +32,7 @@ public abstract class Cmp extends Arr {
    * The operator itself needs to be swapped by the calling expression.
    * @return resulting expression
    */
-  protected final boolean swap() {
+  final boolean swap() {
     // move value or path without root to second position
     final boolean swap = expr[0].isValue() && !expr[1].isValue() ||
       expr[0] instanceof AxisPath && ((AxisPath) expr[0]).root != null &&
@@ -59,7 +59,7 @@ public abstract class Cmp extends Arr {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  protected final Expr compCount(final Op o) throws QueryException {
+  final Expr compCount(final Op o) throws QueryException {
     // evaluate argument
     final Expr a = expr[1];
     if(!a.isItem()) return this;

@@ -47,9 +47,9 @@ public final class DiskData extends Data {
   /** Values access file. */
   private DataAccess values;
   /** Texts buffered for subsequent index updates. */
-  TokenObjMap<IntList> txts;
+  private TokenObjMap<IntList> txts;
   /** Attribute values buffered for subsequent index updates. */
-  TokenObjMap<IntList> atvs;
+  private TokenObjMap<IntList> atvs;
 
   /**
    * Default constructor, called from {@link Open#open}.

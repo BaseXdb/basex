@@ -82,7 +82,7 @@ public abstract class Iter {
    * @param it item array
    * @return resulting array
    */
-  protected static Item[] extend(final Item[] it) {
+  static Item[] extend(final Item[] it) {
     final int s = it.length;
     final Item[] tmp = new Item[Array.newSize(s)];
     System.arraycopy(it, 0, tmp, 0, s);

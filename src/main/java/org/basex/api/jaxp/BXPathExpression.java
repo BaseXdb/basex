@@ -37,7 +37,7 @@ final class BXPathExpression implements XPathExpression {
    * Constructor.
    * @param qu query
    */
-  protected BXPathExpression(final String qu) {
+  BXPathExpression(final String qu) {
     xproc = new QueryProcessor(qu, context);
   }
 

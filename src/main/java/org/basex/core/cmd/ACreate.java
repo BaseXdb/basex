@@ -30,8 +30,6 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public abstract class ACreate extends Command {
-  /** Builder instance. */
-  private Builder builder;
   /** Flag for creating new data instances. */
   private boolean closing;
 
@@ -39,7 +37,7 @@ public abstract class ACreate extends Command {
    * Protected constructor, specifying command arguments.
    * @param arg arguments
    */
-  protected ACreate(final String... arg) {
+  ACreate(final String... arg) {
     this(User.CREATE, arg);
     closing = true;
   }
@@ -49,7 +47,7 @@ public abstract class ACreate extends Command {
    * @param flags command flags
    * @param arg arguments
    */
-  protected ACreate(final int flags, final String... arg) {
+  ACreate(final int flags, final String... arg) {
     super(flags, arg);
   }
 
@@ -75,7 +73,7 @@ public abstract class ACreate extends Command {
    * @param db name of database
    * @return success of operation
    */
-  protected final boolean build(final Parser parser, final String db) {
+  final boolean build(final Parser parser, final String db) {
     if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     // close open database
@@ -85,8 +83,9 @@ public abstract class ACreate extends Command {
       if(context.pinned(db)) return error(DB_PINNED_X, db);
 
       final boolean mem = prop.is(Prop.MAINMEM);
-      builder = mem ? new MemBuilder(db, parser, prop) :
-        new DiskBuilder(db, parser, context);
+      /* Builder instance. */
+      Builder builder = mem ? new MemBuilder(db, parser, prop) :
+              new DiskBuilder(db, parser, context);
 
       Data data = progress(builder).build();
       if(mem) {
@@ -129,11 +128,11 @@ public abstract class ACreate extends Command {
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  protected static void create(final IndexType index, final Data data,
-      final ACreate cmd) throws IOException {
+  static void create(final IndexType index, final Data data,
+                     final ACreate cmd) throws IOException {
 
     if(data instanceof MemData) return;
-    IndexBuilder ib = null;
+    IndexBuilder ib;
     switch(index) {
       case TEXT:      ib = new ValueBuilder(data, true); break;
       case ATTRIBUTE: ib = new ValueBuilder(data, false); break;

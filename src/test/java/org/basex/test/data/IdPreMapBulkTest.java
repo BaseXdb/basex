@@ -36,7 +36,7 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
   public void bulkInsertCorrectness() {
     for(int k = 0; k < ITER; ++k) {
       setUp();
-      for(int c = 1, id = baseid + 1, i = 0; i < opcount; i += c) {
+      for(int c, id = baseid + 1, i = 0; i < opcount; i += c) {
         c = RANDOM.nextInt(BULK) + 1;
         insert(RANDOM.nextInt(id), id, c);
         check();

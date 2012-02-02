@@ -30,10 +30,11 @@ final class DatabaseUpdates {
   /** Data reference. */
   private final Data data;
   /** Pre values of target nodes. */
-  IntList nodes = new IntList(0);
+  private IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
-  final IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
+  private final IntMap<NodeUpdates> updatePrimitives =
+      new IntMap<NodeUpdates>();
 
   /**
    * Constructor.
@@ -63,7 +64,7 @@ final class DatabaseUpdates {
    * process is aborted.
    * @throws QueryException query exception
    */
-  protected void check() throws QueryException {
+  void check() throws QueryException {
     // get and sort keys (pre/id values)
     final int s = updatePrimitives.size();
     nodes = new IntList(s);
@@ -193,7 +194,7 @@ final class DatabaseUpdates {
    * Applies all updates for this specific database.
    * @throws QueryException query exception
    */
-  protected void apply() throws QueryException {
+  void apply() throws QueryException {
     treeAwareUpdates();
 
     // mark disk database instances as updating
@@ -247,7 +248,7 @@ final class DatabaseUpdates {
    * @param n pre value
    * @return true if ancestor deleted
    */
-  protected boolean ancestorDeleted(final int n) {
+  boolean ancestorDeleted(final int n) {
     final NodeUpdates up = updatePrimitives.get(n);
     if(up != null && up.updatesDestroyIdentity(n)) return true;
 

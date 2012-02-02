@@ -22,7 +22,7 @@ abstract class AUser extends Command {
    * @param f command flags
    * @param a arguments
    */
-  protected AUser(final int f, final String... a) {
+  AUser(final int f, final String... a) {
     super(f, a);
   }
 
@@ -30,7 +30,7 @@ abstract class AUser extends Command {
    * Protected constructor, specifying command arguments.
    * @param a arguments
    */
-  protected AUser(final String... a) {
+  AUser(final String... a) {
     this(User.ADMIN, a);
   }
 
@@ -41,7 +41,7 @@ abstract class AUser extends Command {
    * @param name user name pattern
    * @return array with database names
    */
-  protected final String[] users(final String name) {
+  final String[] users(final String name) {
     final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
     return context.users.find(Pattern.compile(pat,
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0));
@@ -53,7 +53,7 @@ abstract class AUser extends Command {
    * @param opt indicates if user/database argument is optional
    * @return success flag
    */
-  protected boolean run(final int off, final boolean opt) {
+  boolean run(final int off, final boolean opt) {
     final String u = args[off];
     final String d = off + 1 < args.length ? args[off + 1] : null;
 
@@ -88,7 +88,7 @@ abstract class AUser extends Command {
    * @param md5 string to be checked
    * @return result of check
    */
-  protected boolean isMD5(final String md5) {
+  boolean isMD5(final String md5) {
     return md5 != null && md5.matches("[0-9a-f]{32}");
   }
 
@@ -99,7 +99,7 @@ abstract class AUser extends Command {
    * @return success flag
    */
   @SuppressWarnings("unused")
-  protected boolean run(final String user, final String db) {
+  boolean run(final String user, final String db) {
     return true;
   }
 }

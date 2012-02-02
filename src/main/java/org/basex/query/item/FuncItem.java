@@ -171,8 +171,8 @@ public final class FuncItem extends FItem {
    * @param t type to coerce to
    * @return coerced function item
    */
-  public static FuncItem coerce(final QueryContext ctx, final InputInfo ii,
-      final FuncItem fun, final FuncType t) {
+  private static FuncItem coerce(final QueryContext ctx, final InputInfo ii,
+                                 final FuncItem fun, final FuncType t) {
     final Var[] vars = new Var[fun.vars.length];
     final Expr[] refs = new Expr[vars.length];
     for(int i = vars.length; i-- > 0;) {

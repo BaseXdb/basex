@@ -30,8 +30,6 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public final class BaseXList extends BaseXBack {
-  /** Scroll pane. */
-  private final JScrollPane scroll;
   /** Single choice. */
   final boolean single;
   /** Text field. */
@@ -42,6 +40,9 @@ public final class BaseXList extends BaseXBack {
   String[] values;
   /** Numeric list. */
   boolean num = true;
+
+  /** Scroll pane. */
+  private final JScrollPane scroll;
 
   /**
    * Default constructor.

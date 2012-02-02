@@ -56,9 +56,9 @@ public final class FTWords extends FTExpr {
   boolean first;
   /** Search mode; default: {@link FTMode#M_ANY}. */
   FTMode mode = FTMode.M_ANY;
-  /** Query expression. */
-  Expr query;
 
+  /** Query expression. */
+  private Expr query;
   /** Minimum and maximum occurrences. */
   private Expr[] occ;
   /** Current token number. */
@@ -143,7 +143,7 @@ public final class FTWords extends FTExpr {
           final FTLexer lex = new FTLexer(ftt.opt);
 
           // index iterator tree
-          FTIndexIterator ia = null;
+          FTIndexIterator ia;
           // number of distinct tokens
           int t  = 0;
           // loop through all tokens

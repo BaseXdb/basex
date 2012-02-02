@@ -31,6 +31,9 @@ public final class DialogPrefs extends Dialog {
   /** Information on available languages. */
   private static final String[][] LANGS = Lang.parse();
 
+  /** Directory path. */
+  final BaseXTextField path;
+
   /** Language label. */
   private final BaseXLabel creds;
   /** Language combobox. */
@@ -43,11 +46,6 @@ public final class DialogPrefs extends Dialog {
   private final BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox javalook;
-  /** Buttons. */
-  private final BaseXBack buttons;
-
-  /** Directory path. */
-  final BaseXTextField path;
 
   /**
    * Default constructor.
@@ -118,7 +116,8 @@ public final class DialogPrefs extends Dialog {
     pp.add(p);
 
     // create buttons
-    buttons = okCancel();
+    /* Buttons. */
+    BaseXBack buttons = okCancel();
     set(buttons, BorderLayout.SOUTH);
 
     set(pp, BorderLayout.CENTER);

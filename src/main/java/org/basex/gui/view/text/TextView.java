@@ -43,8 +43,6 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class TextView extends View implements ActionListener {
-  /** Find text field. */
-  private final BaseXTextField find;
   /** Header string. */
   private final BaseXLabel header;
   /** Home button. */
@@ -82,7 +80,8 @@ public final class TextView extends View implements ActionListener {
 
     final BaseXButton save = new BaseXButton(gui, "save", token(H_SAVE_RESULT));
     save.addActionListener(this);
-    find = new BaseXTextField(gui);
+    /* Find text field. */
+    BaseXTextField find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
 
     sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3));

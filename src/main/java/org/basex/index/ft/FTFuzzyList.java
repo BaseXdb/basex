@@ -31,7 +31,7 @@ final class FTFuzzyList extends FTList {
    * @param cf current file
    * @throws IOException I/O Exception
    */
-  protected FTFuzzyList(final Data d, final int cf) throws IOException {
+  FTFuzzyList(final Data d, final int cf) throws IOException {
     super(d, cf, 'y', 'z');
     tp = new int[d.meta.maxlen + 3];
     for(int i = 0; i < tp.length; ++i) tp[i] = -1;

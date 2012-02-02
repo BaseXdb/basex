@@ -69,7 +69,7 @@ import org.junit.Test;
  */
 public class CommandTest {
   /** Database context. */
-  protected static final Context CONTEXT = new Context();
+  static final Context CONTEXT = new Context();
   /** Test file name. */
   private static final String FN = "input.xml";
   /** Test folder. */
@@ -79,7 +79,7 @@ public class CommandTest {
   /** Test name. */
   private static final String NAME = Util.name(CommandTest.class);
   /** Test name. */
-  protected static final String NAME2 = NAME + '2';
+  static final String NAME2 = NAME + '2';
   /** Socket reference. */
   static Session session;
 
@@ -98,7 +98,7 @@ public class CommandTest {
    * DBs & User {@link #NAME} and {@link #NAME2}
    * @throws IOException I/O exception
    */
-  protected static void cleanUp() throws IOException {
+  static void cleanUp() throws IOException {
     session.execute(new DropBackup(NAME));
     session.execute(new DropBackup(NAME2));
     session.execute(new DropDB(NAME));
@@ -131,7 +131,7 @@ public class CommandTest {
    * Returns the temporary database path.
    * @return database path
    */
-  public static IOFile sandbox() {
+  static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
   }
 
@@ -642,7 +642,7 @@ public class CommandTest {
    * @param cmd command reference
    * @return result as string
    */
-  protected final String ok(final Command cmd) {
+  final String ok(final Command cmd) {
     try {
       return session.execute(cmd);
     } catch(final IOException ex) {
@@ -655,7 +655,7 @@ public class CommandTest {
    * Assumes that this command fails.
    * @param cmd command reference
    */
-  protected final void no(final Command cmd) {
+  final void no(final Command cmd) {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");

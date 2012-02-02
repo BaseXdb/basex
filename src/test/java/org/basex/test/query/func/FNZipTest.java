@@ -228,7 +228,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @return parameter string
    * @throws IOException I/O Exception
    */
-  protected static String zipParams(final String arg) throws IOException {
+  private static String zipParams(final String arg) throws IOException {
     return "<file xmlns='http://expath.org/ns/zip' href='" +
     new File(TMPZIP).getCanonicalPath() + "'>" + arg + "</file>";
   }
@@ -239,7 +239,7 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @param data expected file contents
    * @throws IOException I/O exception
    */
-  protected static void checkZipEntry(final String file, final byte[] data)
+  private static void checkZipEntry(final String file, final byte[] data)
       throws IOException {
 
     ZipFile zf = null;

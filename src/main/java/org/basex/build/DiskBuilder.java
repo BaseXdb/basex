@@ -38,7 +38,7 @@ public final class DiskBuilder extends Builder {
   private DataOutput sout;
 
   /** Admin properties. */
-  final MainProp mprop;
+  private final MainProp mprop;
   /** Text compressor. */
   private final Compress comp;
 

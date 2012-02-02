@@ -20,7 +20,7 @@ import org.basex.util.list.IntList;
  */
 public final class DBNodeSeq extends Seq {
   /** Data reference. */
-  public final Data data;
+  private final Data data;
   /** Pre values. */
   public final int[] pres;
   /** Complete. */

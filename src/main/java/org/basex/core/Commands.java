@@ -1,8 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import java.util.regex.Pattern;
-import org.basex.core.cmd.Set;
 
 /**
  * This class defines the available command-line commands.
@@ -49,13 +47,6 @@ public interface Commands {
     private final String[] help;
 
     /**
-     * Empty constructor.
-     */
-    private Cmd() {
-      this(null);
-    }
-
-    /**
      * Default constructor.
      * @param h help texts, or {@code null} if command is hidden.
      */
@@ -75,7 +66,7 @@ public interface Commands {
         wiki(sb);
       } else {
         if(help == null) {
-          if(detail) sb.append(NOHELP + NL);
+          if(detail) sb.append(NOHELP).append(NL);
         } else {
           sb.append(this + " " + help[0] + NL + "  " + help[1] + NL);
           if(detail) sb.append(NL + help[2] + NL);

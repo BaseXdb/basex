@@ -44,7 +44,7 @@ abstract class FTList {
    * @param ds structure
    * @throws IOException I/O exception
    */
-  protected FTList(final Data d, final int p, final char ss, final char ds)
+  FTList(final Data d, final int p, final char ss, final char ds)
       throws IOException {
     files = d.meta.dbfile(DATAFTX + p + ss);
     filed = d.meta.dbfile(DATAFTX + p + ds);

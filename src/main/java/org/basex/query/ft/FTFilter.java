@@ -21,7 +21,7 @@ import org.basex.util.ft.FTUnit;
  */
 public abstract class FTFilter extends FTExpr {
   /** Optional unit. */
-  protected FTUnit unit = FTUnit.WORD;
+  FTUnit unit = FTUnit.WORD;
 
   /**
    * Constructor.
@@ -91,7 +91,7 @@ public abstract class FTFilter extends FTExpr {
    * Is overwritten by some filters to perform other checks.
    * @return result of check
    */
-  protected boolean content() {
+  boolean content() {
     return unit != FTUnit.WORD;
   }
 
@@ -101,7 +101,7 @@ public abstract class FTFilter extends FTExpr {
    * @param ft tokenizer
    * @return new position
    */
-  protected final int pos(final int p, final FTLexer ft) {
+  final int pos(final int p, final FTLexer ft) {
     // ft can be zero if unit is WORD
     return unit == FTUnit.WORD ? p : ft.pos(p, unit);
   }

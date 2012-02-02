@@ -56,7 +56,7 @@ public final class BaseXGUI {
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  public BaseXGUI(final String... args) throws BaseXException {
+  private BaseXGUI(final String... args) throws BaseXException {
     parseArguments(args);
 
     // set mac specific properties

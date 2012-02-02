@@ -112,7 +112,7 @@ public final class PathTest {
   /** Checks the results of the queries with the db week.
    * @throws Exception exception
    */
-  public void weekTest() throws Exception {
+  void weekTest() throws Exception {
     final String count = "count(collection('" + WEEK1 +
       "/week/monday')/root/monday/text[text() = 'text'])";
     final QueryProcessor qp = new QueryProcessor(count, CONTEXT);
@@ -129,7 +129,7 @@ public final class PathTest {
   /** Checks the results of the queries with the db week.
    * @throws Exception exception
    */
-  public void weekTest2() throws Exception {
+  void weekTest2() throws Exception {
     final String count = "count(collection('" + WEEK1 +
       "/week/monday')/root/monday/text[text() = 'text'])," +
       " count(collection('" + WEEK2 +

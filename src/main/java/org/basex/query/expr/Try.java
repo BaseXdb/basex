@@ -18,7 +18,7 @@ import org.basex.util.InputInfo;
  */
 public final class Try extends Single {
   /** Query exception. */
-  QueryException qe;
+  private QueryException qe;
   /** Catches. */
   private final Catch[] ctch;
 

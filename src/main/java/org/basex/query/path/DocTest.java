@@ -20,7 +20,7 @@ import org.basex.util.list.IntList;
  */
 final class DocTest extends Test {
   /** Database nodes. */
-  final Nodes nodes;
+  private final Nodes nodes;
 
   /**
    * Constructor.

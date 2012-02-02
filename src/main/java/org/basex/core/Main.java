@@ -104,7 +104,7 @@ public abstract class Main {
   protected final boolean execute(final String in) throws IOException {
     final PasswordReader pr = new PasswordReader() {
       @Override
-      public String password() throws QueryException {
+      public String password() {
         Util.out(PASSWORD + COLS);
         return md5(Util.password());
       }
@@ -141,7 +141,7 @@ public abstract class Main {
    * Returns multiple lines from standard input.
    * @return list of strings
    */
-  protected final StringList inputs() {
+  final StringList inputs() {
     final StringList sl = new StringList();
     // find end of input from interactive user input
     final Scanner scan = new Scanner(System.in).useDelimiter("\\z");

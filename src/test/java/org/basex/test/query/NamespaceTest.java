@@ -678,7 +678,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
    * @param db database numbers
    * @throws BaseXException database exception
    */
-  public void create(final int... db) throws BaseXException {
+  void create(final int... db) throws BaseXException {
     for(final int d : db) {
       final String[] doc = docs[d - 1];
       new CreateDB(doc[0], doc[1]).execute(CONTEXT);

@@ -64,7 +64,7 @@ public final class InfoIndex extends AInfo {
    * @param data data reference
    * @return success flag
    */
-  public static byte[] info(final CmdIndexInfo idx, final Data data) {
+  private static byte[] info(final CmdIndexInfo idx, final Data data) {
     switch(idx) {
       case TAG:       return info(ELEMENTS, IndexType.TAG, data, true);
       case ATTNAME:   return info(ATTRIBUTES, IndexType.ATTNAME, data, true);

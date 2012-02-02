@@ -48,7 +48,7 @@ public abstract class ParseExpr extends Expr {
    * Constructor.
    * @param ii input info
    */
-  public ParseExpr(final InputInfo ii) {
+  protected ParseExpr(final InputInfo ii) {
     input = ii;
   }
 
@@ -90,7 +90,7 @@ public abstract class ParseExpr extends Expr {
   public final Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    Item it = null;
+    Item it;
     if(type().zeroOrOne()) {
       it = item(ctx, input);
     } else {

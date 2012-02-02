@@ -10,7 +10,7 @@ import java.awt.Color;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class BaseXSyntax {
+abstract class BaseXSyntax {
   /** Simple syntax. */
   static final BaseXSyntax SIMPLE = new BaseXSyntax() {
     @Override

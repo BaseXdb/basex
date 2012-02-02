@@ -82,7 +82,7 @@ final class WordnetStemmer extends Stemmer {
    * check if the library is available.
    * @param fti full-text iterator
    */
-  WordnetStemmer(final FTIterator fti) {
+  private WordnetStemmer(final FTIterator fti) {
     super(fti);
     stemmer = Reflect.get(CTR, DICT);
   }

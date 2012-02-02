@@ -48,7 +48,7 @@ public abstract class Logical extends Arr {
    * Flattens nested logical expressions.
    * @param ctx query context
    */
-  protected final void compFlatten(final QueryContext ctx) {
+  final void compFlatten(final QueryContext ctx) {
     // flatten nested expressions
     final ObjList<Expr> tmp = new ObjList<Expr>(expr.length);
     for(int p = 0; p < expr.length; ++p) {

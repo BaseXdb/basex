@@ -30,15 +30,15 @@ public final class DialogImport extends BaseXBack {
   /** Resource to add. */
   final BaseXTextField input;
   /** Add contents of archives. */
-  final BaseXCheckBox archives;
+  private final BaseXCheckBox archives;
   /** Skip corrupt files. */
-  final BaseXCheckBox skip;
+  private final BaseXCheckBox skip;
   /** Add remaining files as raw files. */
-  final BaseXCheckBox raw;
+  private final BaseXCheckBox raw;
   /** Document filter. */
-  final BaseXTextField filter;
+  private final BaseXTextField filter;
   /** Dialog reference. */
-  final GUI gui;
+  private final GUI gui;
   /** Browse button. */
   final BaseXButton browse;
   /** DB name. */
@@ -114,7 +114,7 @@ public final class DialogImport extends BaseXBack {
    * Returns an XML file chosen by the user.
    * @return file chooser
    */
-  protected IOFile inputFile() {
+  IOFile inputFile() {
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
         gui.gprop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(XML_DOCUMENTS, IO.XMLSUFFIX);
@@ -143,8 +143,8 @@ public final class DialogImport extends BaseXBack {
    * @param empty allow empty input
    * @return success flag, or {@code false} if specified input is not found
    */
-  protected boolean action(final boolean empty) {
-    boolean ok = true;
+  boolean action(final boolean empty) {
+    boolean ok;
     info.setText(null, null);
 
     final String in = input.getText().trim();

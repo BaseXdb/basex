@@ -23,17 +23,17 @@ import org.junit.Test;
  */
 public abstract class SessionTest {
   /** Test database name. */
-  protected static final String DB = Util.name(SessionTest.class);
+  private static final String DB = Util.name(SessionTest.class);
   /** Raw output method. */
-  protected static final String RAW = "declare option output:method 'raw';";
+  private static final String RAW = "declare option output:method 'raw';";
   /** Output stream. */
-  protected ArrayOutput out;
+  ArrayOutput out;
   /** Serialization parameters to wrap query result with an element. */
-  protected static final String WRAPPER =
+  private static final String WRAPPER =
     "declare option output:wrap-prefix 'db';" +
     "declare option output:wrap-uri 'ns';";
   /** Client session. */
-  protected Session session;
+  Session session;
 
   /** Stops a session. */
   @After
@@ -545,7 +545,7 @@ public abstract class SessionTest {
    * @param exp expected string
    * @param ret string returned from the client API
    */
-  protected final void check(final Object exp, final Object ret) {
+  final void check(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));

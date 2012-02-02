@@ -28,11 +28,11 @@ public class BufferInput extends InputStream {
   private final byte[] cache = new byte[4];
 
   /** Byte buffer. */
-  protected final byte[] buffer;
+  final byte[] buffer;
   /** Current buffer position. */
-  protected int bpos;
+  int bpos;
   /** Current buffer size. */
-  protected int bsize;
+  int bsize;
 
   /** Reference to the data input stream. */
   private InputStream in;
@@ -80,7 +80,7 @@ public class BufferInput extends InputStream {
    * Empty constructor.
    * @param buf buffer
    */
-  protected BufferInput(final byte[] buf) {
+  BufferInput(final byte[] buf) {
     buffer = buf;
     bsize = buf.length;
     length = bsize;
@@ -212,8 +212,7 @@ public class BufferInput extends InputStream {
         for(int c = 0; c < cb.limit(); ++c) i |= cb.get(c) << (c << 3);
         return i;
       } catch(final CharacterCodingException ex) {
-        // tolerate erroneous characters
-        return ch;
+        // ignore erroneous characters
       }
     }
   }

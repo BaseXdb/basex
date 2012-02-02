@@ -65,7 +65,7 @@ final class FTTrie extends FTIndex {
    * @param d data reference
    * @throws IOException I/O Exception
    */
-  protected FTTrie(final Data d) throws IOException {
+  FTTrie(final Data d) throws IOException {
     super(d);
     inA = new DataAccess(d.meta.dbfile(DATAFTX + 'a'));
     inB = new DataAccess(d.meta.dbfile(DATAFTX + 'b'));
@@ -387,11 +387,6 @@ final class FTTrie extends FTIndex {
   private int[] counter;
 
   /**
-   * Saves node values from .-wildcard search according to records in id-array.
-   */
-  private byte[] valuesFound;
-
-  /**
    * Method for wildcards search in trie.
    * @param token search token
    * @param pos position
@@ -549,6 +544,10 @@ final class FTTrie extends FTIndex {
     final int[] rne = entry(resultNode);
     // append 1 symbol
     // not completely processed (value current node)
+    /*
+    Saves node values from .-wildcard search according to records in id-array.
+   */
+    byte[] valuesFound;
     if(rne[0] > counter[0] && resultNode > 0) {
       // replace wildcard with value from currentCompressedTrieNode
       vsn[posw] = (byte) rne[counter[0] + 1];
@@ -676,7 +675,7 @@ final class FTTrie extends FTIndex {
           // leaf node found with appropriate value
           if(c < d + p + r) return FTIndexIterator.FTEMPTY;
 
-          FTIndexIterator ld = FTIndexIterator.FTEMPTY;
+          FTIndexIterator ld;
           ld = iter(cdid, cne[cne.length - 1], inB, f);
           for(int t = cne[0] + 1; t < cne.length - 1; t += 2) {
             ld = FTIndexIterator.union(fuzzy(cne[t], null, -1,

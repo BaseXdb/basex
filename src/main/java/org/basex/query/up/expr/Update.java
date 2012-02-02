@@ -23,7 +23,7 @@ abstract class Update extends Arr {
    * @param ii input info
    * @param e expressions
    */
-  protected Update(final InputInfo ii, final Expr... e) {
+  Update(final InputInfo ii, final Expr... e) {
     super(ii, e);
   }
 
@@ -40,8 +40,8 @@ abstract class Update extends Arr {
    * @throws QueryException query exception
    * @return specified node list
    */
-  protected final NodeCache checkNS(final NodeCache list, final ANode targ,
-      final QueryContext ctx) throws QueryException {
+  final NodeCache checkNS(final NodeCache list, final ANode targ,
+                          final QueryContext ctx) throws QueryException {
 
     for(int a = 0; a < list.size(); ++a) {
       final QNm name = list.get(a).qname();

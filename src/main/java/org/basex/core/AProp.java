@@ -40,7 +40,7 @@ public abstract class AProp implements Iterable<String> {
    * If the {@code prop} argument is set to null, reading is omitted.
    * @param prop property file extension
    */
-  public AProp(final String prop) {
+  protected AProp(final String prop) {
     filename = HOME + IO.BASEXSUFFIX + prop;
 
     try {
@@ -221,7 +221,7 @@ public abstract class AProp implements Iterable<String> {
    * @return value
    */
   public final int num(final Object[] key) {
-    return ((Integer) get(key, Integer.class)).intValue();
+    return (Integer) get(key, Integer.class);
   }
 
   /**
@@ -230,7 +230,7 @@ public abstract class AProp implements Iterable<String> {
    * @return value
    */
   public final boolean is(final Object[] key) {
-    return ((Boolean) get(key, Boolean.class)).booleanValue();
+    return (Boolean) get(key, Boolean.class);
   }
 
   /**
@@ -378,7 +378,7 @@ public abstract class AProp implements Iterable<String> {
   /**
    * Sets static properties.
    */
-  protected void finish() {
+  void finish() {
     // nothing to do; if necessary, is overwritten.
   }
 

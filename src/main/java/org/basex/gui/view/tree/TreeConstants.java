@@ -60,7 +60,7 @@ interface TreeConstants {
     /** New context. */        CONTEXT,
     /** New window-size. */    RESIZE,
     /** Void. */ VOID
-  };
+  }
 
   /** Draw kinds. */
   enum Draw {

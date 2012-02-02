@@ -13,15 +13,15 @@ import org.basex.io.IO;
  */
 public abstract class TableAccess {
   /** Meta data. */
-  protected final MetaData meta;
+  final MetaData meta;
   /** Dirty index flag. */
-  protected boolean dirty;
+  boolean dirty;
 
   /**
    * Constructor.
    * @param md meta data
    */
-  protected TableAccess(final MetaData md) {
+  TableAccess(final MetaData md) {
     meta = md;
   }
 

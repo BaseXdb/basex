@@ -36,7 +36,7 @@ public abstract class ContextModifier {
    * @param p update primitive
    * @throws QueryException query exception
    */
-  protected final void add(final UpdatePrimitive p) throws QueryException {
+  final void add(final UpdatePrimitive p) throws QueryException {
     final Data data = p.data;
     DatabaseUpdates dbp = pendingUpdates.get(data);
     if(dbp == null) {

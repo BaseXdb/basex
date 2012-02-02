@@ -94,7 +94,7 @@ public final class GUI extends AGUI {
   /** Fullscreen flag. */
   public boolean fullscreen;
   /** Result panel. */
-  public final GUIMenu menu;
+  private final GUIMenu menu;
   /** Button panel. */
   public final BaseXBack buttons;
   /** Navigation/input panel. */
@@ -312,7 +312,7 @@ public final class GUI extends AGUI {
       try {
         final PasswordReader pr = new PasswordReader() {
           @Override
-          public String password() throws QueryException {
+          public String password() {
             final DialogPass dp = new DialogPass();
             return dp.ok() ? Token.md5(dp.pass()) : "";
           }
@@ -454,7 +454,7 @@ public final class GUI extends AGUI {
         // get query result
         final Result result = c.result();
         final Nodes nodes = result instanceof Nodes &&
-          ((Nodes) result).size() != 0 ? (Nodes) result : null;
+          result.size() != 0 ? (Nodes) result : null;
 
         // treat text view different to other views
         if(nodes == null) {

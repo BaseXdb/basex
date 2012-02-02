@@ -23,11 +23,11 @@ import org.basex.util.list.ObjList;
  */
 public abstract class NodeCopy extends StructuralUpdate {
   /** Nodes to be inserted. */
-  protected ObjList<NodeCache> insert = new ObjList<NodeCache>(1);
+  ObjList<NodeCache> insert = new ObjList<NodeCache>(1);
   /** Final copy of insertion nodes. */
-  protected MemData md;
+  MemData md;
   /** Number of insert operations (initialized by {@link #prepare}). */
-  protected int size;
+  int size;
 
   /**
    * Constructor.
@@ -37,8 +37,8 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @param i input info
    * @param nc node copy
    */
-  protected NodeCopy(final PrimitiveType t, final int p, final Data d,
-      final InputInfo i, final NodeCache nc) {
+  NodeCopy(final PrimitiveType t, final int p, final Data d,
+           final InputInfo i, final NodeCache nc) {
     super(t, p, d, i);
     insert.add(nc);
   }
@@ -74,7 +74,7 @@ public abstract class NodeCopy extends StructuralUpdate {
    * which is used for finding duplicate attributes and namespace conflicts.
    * @param pool name pool
    */
-  protected final void add(final NamePool pool) {
+  final void add(final NamePool pool) {
     for(int p = 0; p < md.meta.size; ++p) {
       final int k = md.kind(p);
       if(k != Data.ATTR && k != Data.ELEM || md.parent(p, k) > -1) continue;
@@ -90,7 +90,7 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @param n iterator
    * @return iterator with merged text nodes
    */
-  protected static NodeCache mergeNodeCacheText(final NodeCache n) {
+  private static NodeCache mergeNodeCacheText(final NodeCache n) {
     final NodeCache s = new NodeCache();
     ANode i = n.next();
     while(i != null) {

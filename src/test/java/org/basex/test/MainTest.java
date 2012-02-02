@@ -16,13 +16,13 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class MainTest {
+abstract class MainTest {
   /** Null output stream. */
-  protected static final PrintStream NULL = new PrintStream(new NullOutput());
+  static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test database name. */
-  protected static final String NAME = Util.name(MainTest.class);
+  static final String NAME = Util.name(MainTest.class);
   /** Input file. */
-  protected static final IOFile IN = new IOFile(Prop.TMP + NAME + ".in");
+  static final IOFile IN = new IOFile(Prop.TMP + NAME + ".in");
 
   /**
    * Runs a request with the specified arguments.
@@ -38,7 +38,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected final void equals(final String exp, final String... args)
+  final void equals(final String exp, final String... args)
       throws IOException {
     assertEquals(exp, run(args));
   }
@@ -50,7 +50,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected final void contains(final String exp, final String... args)
+  final void contains(final String exp, final String... args)
       throws IOException {
 
     final String result = run(args);

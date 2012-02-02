@@ -71,6 +71,8 @@ public final class EditorView extends View {
   final BaseXTabs tabs;
   /** Search field. */
   final BaseXTextField find;
+  /** Execute button. */
+  final BaseXButton go;
   /** Thread counter. */
   int threadID;
 
@@ -81,10 +83,6 @@ public final class EditorView extends View {
 
   /** Header string. */
   private final BaseXLabel header;
-  /** Scroll Pane. */
-  private final BaseXBack south;
-  /** Execute button. */
-  final BaseXButton go;
   /** Filter button. */
   private final BaseXButton filter;
 
@@ -128,7 +126,8 @@ public final class EditorView extends View {
     addTab().setSearch(find);
     add(tabs, BorderLayout.CENTER);
 
-    south = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
+    /* Scroll Pane. */
+    BaseXBack south = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
     info = new BaseXLabel(" ");
     info.setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
@@ -617,7 +616,7 @@ public final class EditorView extends View {
    * Returns all editors.
    * @return editors
    */
-  public EditorArea[] editors() {
+  EditorArea[] editors() {
     final ObjList<EditorArea> edits = new ObjList<EditorArea>();
     for(final Component c : tabs.getComponents()) {
       if(c instanceof EditorArea) edits.add((EditorArea) c);

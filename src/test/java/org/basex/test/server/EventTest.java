@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.util.HashSet;
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
 import org.basex.server.EventNotifier;
 import org.basex.util.Util;
@@ -192,7 +191,6 @@ public final class EventTest {
 
   /**
    * Concurrent events.
-   * @throws BaseXException command exception
    * @throws Exception exception
    */
   @Test

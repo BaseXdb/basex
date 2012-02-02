@@ -27,13 +27,13 @@ import org.basex.util.list.StringList;
  */
 public final class DialogNew extends Dialog {
   /** Buttons. */
-  protected final DialogImport options;
+  private final DialogImport options;
   /** Database name. */
   private final BaseXTextField target;
   /** Parsing options. */
   private final DialogParsing parsing;
   /** Buttons. */
-  protected final BaseXBack buttons;
+  private final BaseXBack buttons;
 
   /** Path summary flag. */
   private final BaseXCheckBox pathindex;

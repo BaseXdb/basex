@@ -22,7 +22,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public class DialogAdd extends BaseXBack {
+class DialogAdd extends BaseXBack {
   /** Directory path. */
   final BaseXTextField target;
   /** Dialog reference. */

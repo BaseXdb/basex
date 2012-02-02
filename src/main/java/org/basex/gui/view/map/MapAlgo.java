@@ -12,7 +12,7 @@ abstract class MapAlgo {
    * @param r Array of rectangles
    * @return average aspect ratio
    */
-  protected static double lineRatio(final MapRects r) {
+  static double lineRatio(final MapRects r) {
     if(r.size == 0) return Double.MAX_VALUE;
     double ar = 0;
     int dev = 0;

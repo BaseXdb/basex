@@ -20,5 +20,5 @@ public enum FTFlag {
   /** Wildcards flag. */
   WC,
   /** Fuzzy flag. */
-  FZ;
+  FZ
 }

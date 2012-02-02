@@ -82,11 +82,11 @@ public final class Num {
     final int v = array[p++] & 0xFF;
     switch((v & 0xC0) >>> 6) {
       case 0: return v;
-      case 1: return (v & 0x3F) << 8 | array[p++] & 0xFF;
+      case 1: return (v & 0x3F) << 8 | array[p] & 0xFF;
       case 2: return (v & 0x3F) << 24 | (array[p++] & 0xFF) << 16 |
-        (array[p++] & 0xFF) << 8 | array[p++] & 0xFF;
+        (array[p++] & 0xFF) << 8 | array[p] & 0xFF;
       default: return (array[p++] & 0xFF) << 24 | (array[p++] & 0xFF) << 16 |
-        (array[p++] & 0xFF) << 8 | array[p++] & 0xFF;
+        (array[p++] & 0xFF) << 8 | array[p] & 0xFF;
     }
   }
 
@@ -181,6 +181,6 @@ public final class Num {
     } else if(l == 2) {
       a[i++] = (byte) (v >>> 8 | 0x40);
     }
-    a[i++] = (byte) v;
+    a[i] = (byte) v;
   }
 }

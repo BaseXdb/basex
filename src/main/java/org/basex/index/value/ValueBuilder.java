@@ -233,7 +233,7 @@ public final class ValueBuilder extends IndexBuilder {
   }
 
   @Override
-  public String det() {
+  protected String det() {
     return text ? INDEX_TEXT_D : INDEX_ATTRIBUTES_D;
   }
 }

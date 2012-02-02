@@ -132,7 +132,7 @@ public final class RequestParser {
    * @return body or multipart
    */
   private static ANode parseHdrs(final AxisMoreIter i, final TokenMap hdrs) {
-    ANode n = null;
+    ANode n;
     while(true) {
       n = i.next();
       if(n == null) break;

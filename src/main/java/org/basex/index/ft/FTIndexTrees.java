@@ -18,7 +18,7 @@ class FTIndexTrees {
    * Constructor.
    * @param size number of tree instances
    */
-  protected FTIndexTrees(final int size) {
+  FTIndexTrees(final int size) {
     trees = new FTIndexTree[size + 1];
   }
 

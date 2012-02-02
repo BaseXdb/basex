@@ -29,8 +29,6 @@ import org.basex.util.Performance;
 final class EditorArea extends BaseXEditor {
   /** File label. */
   final BaseXLabel label;
-  /** View reference. */
-  final EditorView view;
   /** File in tab. */
   IOFile file;
   /** Timestamp. */
@@ -48,6 +46,9 @@ final class EditorArea extends BaseXEditor {
   /** This flag indicates if the current input is executable, i.e.,
    *  no XML file and no XQuery module. */
   boolean exec = true;
+
+  /** View reference. */
+  private final EditorView view;
 
   /**
    * Constructor.

@@ -32,13 +32,13 @@ import org.basex.util.Util;
  */
 public abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
-  protected final FTLexer lex;
+  private final FTLexer lex;
   /** Current lexer position. */
-  protected int pos;
+  int pos;
   /** Scoring mode; see {@link Prop#SCORING}. */
-  protected final int scm;
+  final int scm;
   /** Number of indexed tokens. */
-  protected long ntok;
+  private long ntok;
 
   /** Document units (all document or text nodes in a document). */
   private final IntList unit = new IntList();
@@ -72,7 +72,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param d data reference
    * @throws IOException IOException
    */
-  protected FTBuilder(final Data d) throws IOException {
+  FTBuilder(final Data d) throws IOException {
     super(d);
 
     final Prop prop = d.meta.prop;
@@ -98,7 +98,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * Extracts and indexes words from the specified data reference.
    * @throws IOException I/O Exception
    */
-  protected final void index() throws IOException {
+  final void index() throws IOException {
     // delete old index
     abort();
 
@@ -160,7 +160,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * Calculates the tf-idf data for a single token.
    * @param vpre pre values for a token
    */
-  protected final void calcFreq(final byte[] vpre) {
+  final void calcFreq(final byte[] vpre) {
     int np = 4;
     int nl = Num.length(vpre, np);
     int p = Num.get(vpre, np);
@@ -201,8 +201,8 @@ public abstract class FTBuilder extends IndexBuilder {
    * @return written size
    * @throws IOException I/O exception
    */
-  protected final int merge(final DataOutput out, final IntList il,
-      final FTList[] v) throws IOException {
+  final int merge(final DataOutput out, final IntList il,
+                  final FTList[] v) throws IOException {
 
     int s = 0;
     final TokenBuilder tbp = new TokenBuilder();
@@ -236,8 +236,8 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param vpos compressed pos values
    * @throws IOException IOException
    */
-  protected final void writeFTData(final DataOutput out, final byte[] vpre,
-      final byte[] vpos) throws IOException {
+  final void writeFTData(final DataOutput out, final byte[] vpre,
+                         final byte[] vpos) throws IOException {
 
     int np = 4, pp = 4, lp = -1, lu = -1;
     final int ns = Num.size(vpre);
@@ -277,7 +277,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param lists lists
    * @return boolean
    */
-  protected final boolean check(final FTList[] lists) {
+  final boolean check(final FTList[] lists) {
     for(final FTList l : lists) if(l.tok.length > 0) return true;
     return false;
   }
@@ -313,7 +313,7 @@ public abstract class FTBuilder extends IndexBuilder {
   }
 
   @Override
-  public final String det() {
+  protected final String det() {
     return INDEX_FULLTEXT_D;
   }
 }

@@ -39,8 +39,6 @@ public final class GUIMacOSX {
 
   /** Reference to the main gui. */
   GUI main;
-  /** Reference to the loaded 'Application' class. */
-  private final Class<?> appClass;
   /** Instance of the 'Application' class. */
   private final Object appObj;
 
@@ -55,7 +53,8 @@ public final class GUIMacOSX {
     System.setProperty(P_SCREEN_MENU_BAR, "true");
 
     // load native java classes...
-    appClass = Class.forName(C_APPLICATION);
+    /* Reference to the loaded 'Application' class. */
+    Class<?> appClass = Class.forName(C_APPLICATION);
     appObj = invoke(appClass, null, "getApplication", EC, EO);
     Class.forName(C_APPLICATION_EVENT);
 
@@ -106,7 +105,6 @@ public final class GUIMacOSX {
    * @author Bastian Lemke
    */
   class AppInvocationHandler implements InvocationHandler {
-
     @Override
     public Object invoke(final Object proxy, final Method method,
         final Object[] args) throws Throwable {
@@ -132,7 +130,7 @@ public final class GUIMacOSX {
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
       // explicit cast to circumvent Java compiler bug
-      ((GUICommand) GUICommands.C_ABOUT).execute(main);
+      GUICommands.C_ABOUT.execute(main);
     }
 
     /**
@@ -203,8 +201,8 @@ public final class GUIMacOSX {
    * @return return value of the method
    * @throws Exception if any error occurs.
    */
-  static Object invoke(final Object obj, final String method, final boolean arg)
-      throws Exception {
+  static Object invoke(final Object obj, final String method,
+      final boolean arg) throws Exception {
     return invoke(obj, method, Boolean.TYPE, arg);
   }
 

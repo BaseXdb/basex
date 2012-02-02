@@ -33,9 +33,9 @@ import org.basex.util.list.StringList;
  */
 public class BaseX extends Main {
   /** User name. */
-  protected String user;
+  String user;
   /** Password. */
-  protected String pass;
+  String pass;
 
   /** Flag for writing properties to disk. */
   private boolean writeProps;
@@ -111,7 +111,7 @@ public class BaseX extends Main {
    * Tests if this client is stand-alone.
    * @return stand-alone flag
    */
-  protected boolean sa() {
+  boolean sa() {
     return true;
   }
 

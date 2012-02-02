@@ -275,7 +275,7 @@ public final class IdPreMapTest {
      */
     DummyIdPreMap copy() {
       final int[] a = new int[ids.size()];
-      for(int i = size() - 1; i >= 0; --i) a[i] = ids.get(i).intValue();
+      for(int i = size() - 1; i >= 0; --i) a[i] = ids.get(i);
       return new DummyIdPreMap(a);
     }
   }

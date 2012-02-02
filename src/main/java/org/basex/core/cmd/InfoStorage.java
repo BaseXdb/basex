@@ -122,7 +122,7 @@ public final class InfoStorage extends AQuery {
     else tl.add(u);
     tl.add(TABLEKINDS[k]);
 
-    byte[] cont = null;
+    byte[] cont;
     if(k == Data.ELEM) {
       cont = data.name(p, k);
     } else if(k == Data.ATTR) {

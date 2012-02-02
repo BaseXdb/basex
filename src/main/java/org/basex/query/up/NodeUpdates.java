@@ -179,7 +179,7 @@ final class NodeUpdates {
    * this target.
    * @return pre values of destroyed node identities
    */
-  protected IntList destroyedNodeIdentities() {
+  IntList destroyedNodeIdentities() {
     final IntList d = new IntList();
     for(final UpdatePrimitive p : prim) {
       final PrimitiveType t = p.type;

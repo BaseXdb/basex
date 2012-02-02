@@ -19,7 +19,7 @@ public abstract class SingleParser extends TargetParser {
    * @param source document source
    * @param path target path
    */
-  public SingleParser(final IO source, final String path) {
+  protected SingleParser(final IO source, final String path) {
     super(source, path);
   }
 

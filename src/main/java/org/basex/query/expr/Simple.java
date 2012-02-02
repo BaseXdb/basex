@@ -18,7 +18,7 @@ public abstract class Simple extends ParseExpr {
    * Constructor.
    * @param ii input info
    */
-  public Simple(final InputInfo ii) {
+  protected Simple(final InputInfo ii) {
     super(ii);
   }
 

@@ -42,7 +42,7 @@ public final class Zip extends Progress {
    * @return number of entries
    * @throws IOException I/O exception
    */
-  public int size() throws IOException {
+  int size() throws IOException {
     int c = 0;
     ZipInputStream in = null;
     try {
@@ -135,7 +135,7 @@ public final class Zip extends Progress {
     try {
       // create output stream for zipping; use fast compression
       out = new ZipOutputStream(new BufferedOutputStream(
-          new FileOutputStream(((IOFile) archive).path())));
+          new FileOutputStream(archive.path())));
       out.setLevel(1);
       out.putNextEntry(new ZipEntry(source.getName() + '/'));
       out.closeEntry();

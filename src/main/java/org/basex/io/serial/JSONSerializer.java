@@ -199,7 +199,7 @@ public final class JSONSerializer extends OutputSerializer {
    * @param lvl level
    * @throws IOException I/O exception
    */
-  protected void indent(final int lvl) throws IOException {
+  void indent(final int lvl) throws IOException {
     print(nl);
     final int ls = lvl * indents;
     for(int l = 0; l < ls; ++l) print(tab);

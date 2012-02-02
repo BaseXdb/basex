@@ -18,8 +18,8 @@ abstract class ValueUpdate extends UpdatePrimitive {
    * @param d data
    * @param info input info
    */
-  protected ValueUpdate(final PrimitiveType t, final int p, final Data d,
-      final InputInfo info) {
+  ValueUpdate(final PrimitiveType t, final int p, final Data d,
+              final InputInfo info) {
     super(t, p, d, info);
   }
 }

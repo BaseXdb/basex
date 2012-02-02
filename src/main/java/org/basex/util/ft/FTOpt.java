@@ -25,7 +25,7 @@ public final class FTOpt extends ExprInfo {
 
   /** Stemming dictionary. */
   public StemDir sd;
-  /** Stopwords. */
+  /** Stop words. */
   public StopWords sw;
   /** Thesaurus. */
   public ThesQuery th;
@@ -90,7 +90,7 @@ public final class FTOpt extends ExprInfo {
    */
   public boolean is(final FTFlag f) {
     final Boolean b = map.get(f);
-    return b != null && b.booleanValue();
+    return b != null && b;
   }
 
   @Override

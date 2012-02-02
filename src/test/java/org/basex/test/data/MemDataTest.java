@@ -26,7 +26,7 @@ public class MemDataTest {
   /** XML document. */
   private static final byte[] XML = Token.token(XMLSTR);
   /** Database context. */
-  protected static final Context CTX = new Context();
+  static final Context CTX = new Context();
   /** Tested {@link MemData} instance. */
   private Data data;
 

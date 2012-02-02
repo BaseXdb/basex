@@ -209,7 +209,7 @@ public final class DataOutput extends OutputStream {
    * @param v value to be written
    * @throws IOException I/O exception
    */
-  public void write8(final long v) throws IOException {
+  void write8(final long v) throws IOException {
     write((byte) (v >>> 56));
     write((byte) (v >>> 48));
     write((byte) (v >>> 40));

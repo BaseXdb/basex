@@ -20,21 +20,21 @@ abstract class FormatUtil {
     0x1D7E2, 0x1D7EC, 0x1D7F6
   };
   /** Kanji digits. */
-  protected static final int[] KANJI = {
+  static final int[] KANJI = {
     0x3007, 0x4e00, 0x4e8c, 0x4e09, 0x56db, 0x4e94, 0x516d, 0x4e03, 0x516b,
     0x4e5d, 0x5341, 0x767E, 0x5343, 0x4e07, 0x5104, 0x5146 };
 
   /** Roman numbers (1-10). */
-  protected static final byte[][] ROMANI =
+  static final byte[][] ROMANI =
     tokens("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX");
   /** Roman numbers (10-100). */
-  protected static final byte[][] ROMANX =
+  static final byte[][] ROMANX =
     tokens("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC");
   /** Roman numbers (100-1000). */
-  protected static final byte[][] ROMANC =
+  static final byte[][] ROMANC =
     tokens("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM");
   /** Roman numbers (1000-3000). */
-  protected static final byte[][] ROMANM = tokens("", "M", "MM", "MMM");
+  static final byte[][] ROMANM = tokens("", "M", "MM", "MMM");
 
   /** Alphabet sequences. */
   private static final String[] SEQS = {
@@ -93,7 +93,7 @@ abstract class FormatUtil {
    * @param ch character to be checked
    * @return character sequence, or {@code null}
    */
-  protected static String sequence(final int ch) {
+  static String sequence(final int ch) {
     for(final String seq : SEQS) if(ch == seq.charAt(0)) return seq;
     return null;
   }
@@ -102,7 +102,7 @@ abstract class FormatUtil {
   protected enum Case {
     /** Lower case. */ LOWER,
     /** Upper case. */ UPPER,
-    /** Standard.   */ STANDARD;
+    /** Standard.   */ STANDARD
   }
 
   /**
@@ -110,7 +110,7 @@ abstract class FormatUtil {
    * @param ch character
    * @return zero base
    */
-  protected static final int zeroes(final int ch) {
+  static int zeroes(final int ch) {
     for(final int z : ZEROES) if(ch >= z && ch <= z + 9) return z;
     return -1;
   }
@@ -122,7 +122,7 @@ abstract class FormatUtil {
    * @param pos position
    * @return character
    */
-  protected static final int ch(final byte[] in, final int pos) {
+  static int ch(final byte[] in, final int pos) {
     return pos >= 0 && pos < in.length ? cp(in, pos) : 0;
   }
 }

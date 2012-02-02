@@ -26,8 +26,8 @@ final class SquarifiedAlgo extends MapAlgo {
     double hh = r.h;
 
     MapRects row = new MapRects();
-    int height = 0;
-    int width = 0;
+    int height;
+    int width;
     double weight = 0;
     double sumweight = 1;
     double tmpratio;

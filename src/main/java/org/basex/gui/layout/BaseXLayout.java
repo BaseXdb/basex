@@ -68,19 +68,9 @@ public final class BaseXLayout {
    * @param cont input container
    * @return gui
    */
-  static GUI gui(final Component cont) {
+  private static GUI gui(final Component cont) {
     final Container c = cont.getParent();
     return c == null || c instanceof GUI ? (GUI) c : gui(c);
-  }
-
-  /**
-   * Returns the dialog reference of the specified container.
-   * @param cont input container
-   * @return gui
-   */
-  static Dialog dialog(final Component cont) {
-    final Container c = cont.getParent();
-    return c == null || c instanceof Dialog ? (Dialog) c : dialog(c);
   }
 
   /**
@@ -270,7 +260,7 @@ public final class BaseXLayout {
    * @param name name of image
    * @return url
    */
-  public static URL imageURL(final String name) {
+  private static URL imageURL(final String name) {
     final String path = "/img/" + name + ".png";
     final URL url = GUI.class.getResource(path);
     if(url == null) Util.errln("Not found: " + path);
@@ -308,7 +298,7 @@ public final class BaseXLayout {
     final float gf = (c2.getGreen() - g) / (float) h;
     final float bf = (c2.getBlue() - b) / (float) h;
 
-    int nr = 0, ng = 0, nb = 0;
+    int nr, ng, nb;
     int cr = 0, cg = 0, cb = 0;
     int hh = 0;
     for(int y = 0; y < h; ++y) {

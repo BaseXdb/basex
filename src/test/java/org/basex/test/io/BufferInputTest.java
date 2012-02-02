@@ -94,7 +94,7 @@ public final class BufferInputTest {
    * @param data1 first array
    * @param data2 first array
    */
-  static void assertEquals(final byte[] data1, final byte[] data2) {
+  private static void assertEquals(final byte[] data1, final byte[] data2) {
     assertTrue("Original and read data differs.", Token.eq(data1, data2));
   }
 }

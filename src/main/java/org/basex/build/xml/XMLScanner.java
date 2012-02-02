@@ -679,7 +679,7 @@ final class XMLScanner extends Progress {
       }
       final int qu = consume(); // [11]
       if(qu == '\'' || qu == '"') {
-        int ch = 0;
+        int ch;
         final TokenBuilder tok = new TokenBuilder();
         while((ch = nextChar()) != qu) tok.add(ch);
         if(!f) return null;

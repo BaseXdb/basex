@@ -16,7 +16,8 @@ import org.basex.util.TokenBuilder;
  */
 public final class FormatParser extends FormatUtil {
   /** With pattern: ","  min-width ("-" max-width)?. */
-  static final Pattern WIDTH = Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
+  private static final Pattern WIDTH =
+      Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
   /** Input information. */
   private final InputInfo input;

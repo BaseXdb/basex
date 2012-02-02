@@ -34,8 +34,6 @@ public final class TableView extends View implements Runnable {
   private static final double[] ZOOM = {
     1, .99, .98, .97, 1, 1.03, 1.05, .9, .8, .6, .35, .18, .13, .09, .05, .03
   };
-  /** Current zoom step. */
-  private int zoomstep;
   /** Table data. */
   final TableData tdata;
 
@@ -147,7 +145,8 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void run() {
-    zoomstep = ZOOM.length;
+    /* Current zoom step. */
+    int zoomstep = ZOOM.length;
     while(--zoomstep >= 0) {
       scroll.height(tdata.rows.size() * tdata.rowH(ZOOM[zoomstep]));
       repaint();

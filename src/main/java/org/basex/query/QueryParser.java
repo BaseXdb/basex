@@ -173,7 +173,7 @@ public class QueryParser extends InputParser {
   };
 
   /** Query context. */
-  public final QueryContext ctx;
+  final QueryContext ctx;
 
   /** Temporary token builder. */
   private final TokenBuilder tok = new TokenBuilder();
@@ -272,7 +272,7 @@ public class QueryParser extends InputParser {
    * @param val value
    * @throws QueryException query exception
    */
-  public final void bind(final StringBuilder key, final StringBuilder val)
+  final void bind(final StringBuilder key, final StringBuilder val)
       throws QueryException {
 
     final String k = key.toString().trim();
@@ -1380,7 +1380,7 @@ public class QueryParser extends InputParser {
     wsCheck(PAR2);
 
     // collect all cases
-    Expr[] cases = {};
+    Expr[] cases;
     do {
       cases = new Expr[1];
       while(wsConsumeWs(CASE)) cases = add(cases, single());
@@ -1410,7 +1410,7 @@ public class QueryParser extends InputParser {
 
     TypeCase[] cases = { };
     final int s = ctx.vars.size();
-    boolean cs = true;
+    boolean cs;
     do {
       cs = wsConsumeWs(CASE);
       if(!cs) wsCheck(DEFAULT);
@@ -1927,10 +1927,9 @@ public class QueryParser extends InputParser {
     final int p = qp;
     if(consume('*')) {
       // name test: *
-      if(!consume(':')) return new NameTest(att, input());
+      if(!consume(':')) return new NameTest(att);
       // name test: *:name
-      return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Name.NAME, att,
-          input());
+      return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Name.NAME, att);
     }
 
     final QNm name = eQName(null, SKIPCHECK);
@@ -1954,13 +1953,13 @@ public class QueryParser extends InputParser {
         if(name.hasPrefix() || !consume(':')) {
           skipWS();
           names.add(new QNmCheck(name, !att));
-          return new NameTest(name, NameTest.Name.STD, att, input());
+          return new NameTest(name, NameTest.Name.STD, att);
         }
         // name test: prefix:*
         if(consume('*')) {
           final QNm nm = new QNm(concat(name.string(), COLON));
           names.add(new QNmCheck(nm, !att));
-          return new NameTest(nm, NameTest.Name.NS, att, input());
+          return new NameTest(nm, NameTest.Name.NS, att);
         }
       }
     } else if(ctx.xquery3 && quote(curr())) {
@@ -1968,7 +1967,7 @@ public class QueryParser extends InputParser {
       final byte[] u = stringLiteral();
       if(consume(':') && consume('*')) {
         final QNm nm = new QNm(COLON, u);
-        return new NameTest(nm, NameTest.Name.NS, att, input());
+        return new NameTest(nm, NameTest.Name.NS, att);
       }
     }
     qp = p;

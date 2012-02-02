@@ -34,7 +34,7 @@ public class ViewRect {
    * @param ww width
    * @param hh height
    */
-  public ViewRect(final int xx, final int yy, final int ww, final int hh) {
+  protected ViewRect(final int xx, final int yy, final int ww, final int hh) {
     x = xx;
     y = yy;
     w = ww;

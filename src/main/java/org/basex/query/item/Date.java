@@ -20,9 +20,9 @@ import org.basex.util.Util;
  */
 public abstract class Date extends Item {
   /** Date pattern. */
-  protected static final String ZONE = "((\\+|-)([0-9]{2}):([0-9]{2})|Z)?";
+  static final String ZONE = "((\\+|-)([0-9]{2}):([0-9]{2})|Z)?";
   /** Day per months. */
-  protected static final byte[] DAYS = {
+  static final byte[] DAYS = {
     31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
   /** Date pattern. */
   private static final Pattern DAT = Pattern.compile(
@@ -48,7 +48,7 @@ public abstract class Date extends Item {
    * @param typ data type
    * @param d date reference
    */
-  protected Date(final Type typ, final Date d) {
+  Date(final Type typ, final Date d) {
     super(typ);
     xc = (XMLGregorianCalendar) d.xc.clone();
   }
@@ -61,8 +61,8 @@ public abstract class Date extends Item {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected Date(final Type typ, final byte[] d, final String e,
-      final InputInfo ii) throws QueryException {
+  Date(final Type typ, final byte[] d, final String e,
+       final InputInfo ii) throws QueryException {
     super(typ);
     try {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
@@ -79,7 +79,7 @@ public abstract class Date extends Item {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void date(final byte[] d, final String e, final InputInfo ii)
+  final void date(final byte[] d, final String e, final InputInfo ii)
       throws QueryException {
 
     final Matcher mt = DAT.matcher(Token.string(d).trim());
@@ -94,7 +94,7 @@ public abstract class Date extends Item {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void time(final byte[] d, final String e, final InputInfo ii)
+  final void time(final byte[] d, final String e, final InputInfo ii)
       throws QueryException {
 
     final Matcher mt = TIM.matcher(Token.string(d).trim());
@@ -116,8 +116,8 @@ public abstract class Date extends Item {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void zone(final Matcher mt, final int p, final byte[] val,
-      final InputInfo ii) throws QueryException {
+  final void zone(final Matcher mt, final int p, final byte[] val,
+                  final InputInfo ii) throws QueryException {
 
     if(mt.group(p) == null || mt.group(p).equals("Z")) return;
     final int th = Token.toInt(mt.group(p + 2));
@@ -132,7 +132,7 @@ public abstract class Date extends Item {
    * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void calc(final Dur a, final boolean p, final InputInfo ii)
+  final void calc(final Dur a, final boolean p, final InputInfo ii)
       throws QueryException {
 
     if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.string(ii));
@@ -176,7 +176,7 @@ public abstract class Date extends Item {
    * Returns the date in seconds.
    * @return seconds
    */
-  protected final BigDecimal seconds() {
+  final BigDecimal seconds() {
     final int h = xc.getHour() == UNDEF ? 0 : xc.getHour();
     final int m = xc.getMinute() == UNDEF ? 0 : xc.getMinute();
     final int s = xc.getSecond() == UNDEF ? 0 : xc.getSecond();
@@ -190,7 +190,7 @@ public abstract class Date extends Item {
    * Returns the number of days since AD.
    * @return days
    */
-  protected final long days() {
+  final long days() {
     final int y = xc.getYear() == UNDEF ? 0 : xc.getYear();
     final int m = xc.getMonth() == UNDEF ? 0 : xc.getMonth() - 1;
     final int d = xc.getDay() == UNDEF ? 0 : xc.getDay() - 1;

@@ -12,7 +12,7 @@ import org.basex.build.Parser;
  */
 public final class Create extends ACreate {
   /** Parser instance. */
-  final Parser parser;
+  private final Parser parser;
 
   /**
    * Convenience constructor for specifying a parser, input path and

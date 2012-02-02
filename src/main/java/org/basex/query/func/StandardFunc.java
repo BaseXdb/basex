@@ -50,8 +50,8 @@ public abstract class StandardFunc extends Arr {
    * @param s function definition
    * @param args arguments
    */
-  protected StandardFunc(final InputInfo ii, final Function s,
-      final Expr... args) {
+  StandardFunc(final InputInfo ii, final Function s,
+               final Expr... args) {
     super(ii, args);
     sig = s;
     type = sig.ret;
@@ -75,7 +75,7 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr cmp(final QueryContext ctx) throws QueryException {
+  Expr cmp(final QueryContext ctx) throws QueryException {
     return this;
   }
 
@@ -85,7 +85,7 @@ public abstract class StandardFunc extends Arr {
    * @return atomized item
    * @throws QueryException query exception
    */
-  protected final Item atom(final Item it) throws QueryException {
+  final Item atom(final Item it) throws QueryException {
     final Type ip = it.type;
     return ip.isNode() ? ip == NodeType.PI || ip == NodeType.COM ?
         Str.get(it.string(input)) : new Atm(it.string(input)) : it;
@@ -122,7 +122,7 @@ public abstract class StandardFunc extends Arr {
    * @return data instance
    * @throws QueryException query exception
    */
-  protected Data data(final int i, final QueryContext ctx)
+  Data data(final int i, final QueryContext ctx)
       throws QueryException {
 
     final Item it = checkEmpty(expr[i].item(ctx, input));

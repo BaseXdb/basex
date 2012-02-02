@@ -49,7 +49,7 @@ public abstract class IO {
   public static final String[] ZIPSUFFIXES =
     { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".gz" };
   /** XML suffixes. */
-  public static final String[] XMLSUFFIXES =
+  static final String[] XMLSUFFIXES =
     { XMLSUFFIX, ".xsl", ".xslt" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
@@ -72,17 +72,17 @@ public abstract class IO {
   public static final long OFFCOMP = 0x4000000000L;
 
   /** File path. The path uses forward slashes, no matter which OS is used. */
-  protected String path;
+  String path;
   /** First call. */
-  protected boolean more;
+  private boolean more;
   /** File name. */
-  protected String name;
+  String name;
 
   /**
    * Protected constructor.
    * @param p path
    */
-  protected IO(final String p) {
+  IO(final String p) {
     init(p);
   }
 
@@ -90,7 +90,7 @@ public abstract class IO {
    * Sets the file path and name.
    * @param p file path
    */
-  protected final void init(final String p) {
+  final void init(final String p) {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given

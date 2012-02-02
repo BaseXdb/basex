@@ -131,7 +131,7 @@ public abstract class QueryTest {
    * Creates a container for the specified node values.
    * @return node array
    */
-  public static ItemCache empty() {
+  protected static ItemCache empty() {
     return new ItemCache(new Item[] {}, 0);
   }
 
@@ -140,7 +140,7 @@ public abstract class QueryTest {
    * @param nodes node values
    * @return node array
    */
-  public static Nodes node(final int... nodes) {
+  protected static Nodes node(final int... nodes) {
     return new Nodes(nodes);
   }
 
@@ -149,7 +149,7 @@ public abstract class QueryTest {
    * @param str string
    * @return iterator
    */
-  public static ItemCache str(final String... str) {
+  protected static ItemCache str(final String... str) {
     final ItemCache ii = new ItemCache();
     for(final String s : str) ii.add(Str.get(s));
     return ii;
@@ -160,7 +160,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  public static ItemCache dbl(final double d) {
+  protected static ItemCache dbl(final double d) {
     return item(Dbl.get(d));
   }
 
@@ -169,7 +169,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  public static ItemCache itr(final long... d) {
+  protected static ItemCache itr(final long... d) {
     final ItemCache ii = new ItemCache();
     for(final long dd : d) ii.add(Int.get(dd));
     return ii;
@@ -180,7 +180,7 @@ public abstract class QueryTest {
    * @param b boolean value
    * @return iterator
    */
-  public static ItemCache bool(final boolean... b) {
+  protected static ItemCache bool(final boolean... b) {
     final ItemCache ii = new ItemCache();
     for(final boolean bb : b) ii.add(Bln.get(bb));
     return ii;

@@ -15,8 +15,6 @@ import org.basex.gui.layout.BaseXPanel;
  * @author Christian Gruen
  */
 public final class GUIStatus extends BaseXPanel {
-  /** Memory usage. */
-  private final BaseXMem mem;
   /** Status text. */
   private final BaseXLabel label;
 
@@ -33,7 +31,8 @@ public final class GUIStatus extends BaseXPanel {
     layout(new BorderLayout(4, 0));
     label = new BaseXLabel(OK).border(0, 4, 0, 0);
     add(label, BorderLayout.CENTER);
-    mem = new BaseXMem(main, true);
+    /* Memory usage. */
+    BaseXMem mem = new BaseXMem(main, true);
     add(mem, BorderLayout.EAST);
   }
 

@@ -120,7 +120,7 @@ public final class BaseXTable extends JTable {
       if(val instanceof Boolean) {
         final JCheckBox box = new JCheckBox();
         box.setHorizontalAlignment(SwingConstants.CENTER);
-        box.setSelected(((Boolean) val).booleanValue());
+        box.setSelected((Boolean) val);
         box.setEnabled(isCellEditable(row, col));
         box.setOpaque(false);
         return box;

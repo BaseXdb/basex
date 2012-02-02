@@ -31,7 +31,7 @@ public abstract class InputParser {
    * Constructor.
    * @param q input query
    */
-  public InputParser(final String q) {
+  protected InputParser(final String q) {
     this(q, null);
   }
 
@@ -40,7 +40,7 @@ public abstract class InputParser {
    * @param q input query
    * @param f file
    */
-  public InputParser(final String q, final IO f) {
+  protected InputParser(final String q, final IO f) {
     query = q;
     ql = query.length();
     file = f;
@@ -155,7 +155,7 @@ public abstract class InputParser {
    * Creates input information.
    * @return input information
    */
-  public final InputInfo input() {
+  protected final InputInfo input() {
     return new InputInfo(this);
   }
 }

@@ -19,7 +19,7 @@ import org.basex.util.ft.FTOpt;
  */
 public final class FTOptions extends FTExpr {
   /** FTOptions. */
-  final FTOpt opt;
+  private final FTOpt opt;
 
   /**
    * Constructor.

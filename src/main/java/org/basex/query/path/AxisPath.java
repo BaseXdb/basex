@@ -47,7 +47,7 @@ public class AxisPath extends Path {
    * @param r root expression; can be a {@code null} reference
    * @param s axis steps
    */
-  protected AxisPath(final InputInfo ii, final Expr r, final Expr... s) {
+  AxisPath(final InputInfo ii, final Expr r, final Expr... s) {
     super(ii, r, s);
   }
 
@@ -56,7 +56,7 @@ public class AxisPath extends Path {
    * @param ctx query context
    * @return resulting operator
    */
-  protected final AxisPath finish(final QueryContext ctx) {
+  final AxisPath finish(final QueryContext ctx) {
     // evaluate number of results
     size = size(ctx);
     type = SeqType.get(steps[steps.length - 1].type().type, size);
@@ -246,7 +246,7 @@ public class AxisPath extends Path {
       }
 
       // create resulting expression
-      AxisPath result = null;
+      AxisPath result;
       final boolean simple = invSteps.length == 0 && newPreds.length == 0;
       if(ie instanceof AxisPath) {
         result = (AxisPath) ie;

@@ -17,7 +17,7 @@ abstract class BXChar extends BXNode implements CharacterData {
    * Constructor.
    * @param n node reference
    */
-  protected BXChar(final ANode n) {
+  BXChar(final ANode n) {
     super(n);
   }
 

@@ -25,7 +25,7 @@ final class StripAlgo extends MapAlgo {
     double ww = r.w;
 
     MapRects row = new MapRects();
-    int width = 0;
+    int width;
     double weight = 0;
     double sumweight = 1;
     double tmpratio;

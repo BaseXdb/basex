@@ -50,7 +50,7 @@ public final class GlobTest {
       glob = g;
       results = r;
     }
-  };
+  }
 
   /**
    * Glob test.

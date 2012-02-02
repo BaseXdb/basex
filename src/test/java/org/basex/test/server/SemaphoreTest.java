@@ -39,9 +39,9 @@ public final class SemaphoreTest {
   private static final int TESTS = 5;
 
   /** Server reference. */
-  static BaseXServer server;
+  private static BaseXServer server;
   /** Socket reference. */
-  static Session sess;
+  private static Session sess;
 
   /** Starts the server.
    * @throws IOException exception

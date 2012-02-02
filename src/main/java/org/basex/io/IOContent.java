@@ -14,7 +14,7 @@ import org.xml.sax.InputSource;
  */
 public final class IOContent extends IO {
   /** Content. */
-  protected byte[] cont;
+  private byte[] cont;
 
   /**
    * Constructor.

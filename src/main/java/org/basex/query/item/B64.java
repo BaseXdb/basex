@@ -17,7 +17,7 @@ public class B64 extends Bin {
   /**
    * Empty constructor.
    */
-  protected B64() {
+  B64() {
     super(null, AtomType.B64);
   }
 

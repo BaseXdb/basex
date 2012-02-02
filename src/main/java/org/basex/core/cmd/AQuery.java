@@ -33,7 +33,7 @@ import org.basex.util.Util;
  */
 abstract class AQuery extends Command {
   /** Query result. */
-  protected Result result;
+  Result result;
 
   /** Query processor. */
   private QueryProcessor qp;
@@ -55,7 +55,7 @@ abstract class AQuery extends Command {
    * @param flags command flags
    * @param arg arguments
    */
-  protected AQuery(final int flags, final String... arg) {
+  AQuery(final int flags, final String... arg) {
     super(flags, arg);
   }
 
@@ -64,10 +64,10 @@ abstract class AQuery extends Command {
    * @param query query
    * @return success flag
    */
-  protected final boolean query(final String query) {
+  final boolean query(final String query) {
     final Performance p = new Performance();
 
-    String err = null;
+    String err;
     String inf = "";
     if(qe != null) {
       err = qe.getMessage();
@@ -159,7 +159,7 @@ abstract class AQuery extends Command {
    * @param qu query
    * @return result of check
    */
-  protected final boolean updating(final Context ctx, final String qu) {
+  final boolean updating(final Context ctx, final String qu) {
     // keyword found; parse query to get sure
     try {
       final Performance p = new Performance();
@@ -178,7 +178,7 @@ abstract class AQuery extends Command {
   /**
    * Performs the first argument as XQuery and returns a node set.
    */
-  protected final void queryNodes() {
+  final void queryNodes() {
     try {
       result = queryProcessor(args[0], context).queryNodes();
     } catch(final QueryException ex) {
@@ -194,8 +194,8 @@ abstract class AQuery extends Command {
    * @param ctx database context
    * @return query processor
    */
-  protected final QueryProcessor queryProcessor(final String query,
-      final Context ctx) {
+  final QueryProcessor queryProcessor(final String query,
+                                      final Context ctx) {
     if(qp == null) qp = progress(new QueryProcessor(query, ctx));
     return qp;
   }

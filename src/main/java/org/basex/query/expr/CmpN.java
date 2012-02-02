@@ -62,9 +62,8 @@ public final class CmpN extends Arr {
      * @param a first node
      * @param b second node
      * @return result
-     * @throws QueryException query exception
      */
-    public abstract boolean eval(ANode a, ANode b) throws QueryException;
+    public abstract boolean eval(ANode a, ANode b);
 
     @Override
     public String toString() {

@@ -69,7 +69,7 @@ final class FTFuzzy extends FTIndex {
    * @param d data reference
    * @throws IOException I/O Exception
    */
-  protected FTFuzzy(final Data d) throws IOException {
+  FTFuzzy(final Data d) throws IOException {
     super(d);
 
     // cache token length index
@@ -147,7 +147,7 @@ final class FTFuzzy extends FTIndex {
       int p = tp[s];
       if(p == -1) continue;
       int i = s + 1;
-      int r = -1;
+      int r;
       do r = tp[i++]; while(r == -1);
       inY.cursor(p);
       boolean f = false;

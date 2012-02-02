@@ -78,7 +78,7 @@ public final class QueryProcessor extends Progress {
    * @param expr initial context expression
    * @param cx database context
    */
-  public QueryProcessor(final String qu, final Expr expr, final Context cx) {
+  private QueryProcessor(final String qu, final Expr expr, final Context cx) {
     query = qu;
     ctx = new QueryContext(cx);
     ctx.ctxItem = expr;

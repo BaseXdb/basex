@@ -21,16 +21,16 @@ import org.basex.util.Util;
  */
 public class Dur extends Item {
   /** Seconds per day. */
-  protected static final long DAYSECONDS = 86400;
+  static final long DAYSECONDS = 86400;
   /** Date pattern. */
   private static final Pattern DUR = Pattern.compile(
       "(-?)P(([0-9]+)Y)?(([0-9]+)M)?(([0-9]+)D)?" +
       "(T(([0-9]+)H)?(([0-9]+)M)?(([0-9]+(\\.[0-9]+)?)?S)?)?");
 
   /** Number of months. */
-  protected int mon;
+  int mon;
   /** Number of seconds. */
-  protected BigDecimal sc;
+  BigDecimal sc;
 
   /**
    * Constructor.
@@ -46,7 +46,7 @@ public class Dur extends Item {
    * Constructor.
    * @param t data type
    */
-  protected Dur(final Type t) {
+  Dur(final Type t) {
     super(t);
   }
 
@@ -54,7 +54,7 @@ public class Dur extends Item {
    * Constructor.
    * @param d duration
    */
-  protected Dur(final Dur d) {
+  Dur(final Dur d) {
     this(d, AtomType.DUR);
   }
 
@@ -178,7 +178,7 @@ public class Dur extends Item {
    * Returns the seconds in a token.
    * @return seconds
    */
-  protected final byte[] sc() {
+  final byte[] sc() {
     return chopNumber(token(sec().abs().toPlainString()));
   }
 

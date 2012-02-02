@@ -62,7 +62,7 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishOpen() throws IOException {
+  protected void finishOpen() throws IOException {
     final byte[] attr = tb.finish();
     if(color == null) color = DOTData.color(string(tag));
     if(color == null) color = attr.length == 0 ? DOTData.ELEM1 : DOTData.ELEM2;

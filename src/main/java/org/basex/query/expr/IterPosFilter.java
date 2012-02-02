@@ -75,7 +75,7 @@ final class IterPosFilter extends Filter {
         final long cs = ctx.size;
 
         try {
-          Item item = null;
+          Item item;
           if(direct) {
             // directly access relevant items
             item = iter.size() < cpos ? null : iter.get(cpos - 1);

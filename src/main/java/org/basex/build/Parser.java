@@ -101,7 +101,7 @@ public abstract class Parser extends Progress {
    * @return xml parser
    * @throws IOException I/O exception
    */
-  public static SingleParser xmlParser(final IO source, final Prop prop,
+  private static SingleParser xmlParser(final IO source, final Prop prop,
       final String target) throws IOException {
 
     // XML: use internal parser
@@ -118,8 +118,8 @@ public abstract class Parser extends Progress {
    * @return xml parser
    * @throws IOException I/O exception
    */
-  public static SingleParser fileParser(final IO source, final Prop prop,
-      final String target) throws IOException {
+  static SingleParser fileParser(final IO source, final Prop prop,
+                                 final String target) throws IOException {
 
     // use file specific parser
     final String parser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH);

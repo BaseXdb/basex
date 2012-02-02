@@ -20,7 +20,7 @@ public abstract class CFrag extends Arr {
    * @param ii input info
    * @param n name
    */
-  protected CFrag(final InputInfo ii, final Expr... n) {
+  CFrag(final InputInfo ii, final Expr... n) {
     super(ii, n);
     type = SeqType.NOD;
   }
@@ -39,7 +39,7 @@ public abstract class CFrag extends Arr {
    * @param pref info prefix
    * @return string
    */
-  protected final String info(final String pref) {
+  final String info(final String pref) {
     return pref + " constructor";
   }
 

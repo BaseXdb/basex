@@ -10,7 +10,7 @@ import java.util.Collection;
  */
 final class DictionaryStemmer extends Stemmer {
   /** Stem dictionary. */
-  final StemDir dict;
+  private final StemDir dict;
 
   /**
    * Constructor.

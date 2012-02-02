@@ -29,7 +29,7 @@ public final class RangeAccess extends Simple {
   /** Index type. */
   final RangeToken ind;
   /** Index context. */
-  final IndexContext ictx;
+  private final IndexContext ictx;
 
   /**
    * Constructor.

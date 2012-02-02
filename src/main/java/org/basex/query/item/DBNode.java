@@ -63,7 +63,7 @@ public class DBNode extends ANode {
    * @param r parent reference
    * @param t node type
    */
-  protected DBNode(final Data d, final int p, final ANode r, final NodeType t) {
+  DBNode(final Data d, final int p, final ANode r, final NodeType t) {
     super(t);
     data = d;
     pre = p;
@@ -191,9 +191,8 @@ public class DBNode extends ANode {
 
   @Override
   public final boolean is(final ANode node) {
-    if(node == this) return true;
-    if(!(node instanceof DBNode)) return false;
-    return data == node.data() && pre == ((DBNode) node).pre;
+    return node == this || node instanceof DBNode &&
+            data == node.data() && pre == ((DBNode) node).pre;
   }
 
   @Override

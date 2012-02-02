@@ -32,13 +32,13 @@ public abstract class BXNode implements Node {
     "#document-fragment"
   };
   /** Data reference. */
-  protected final ANode node;
+  final ANode node;
 
   /**
    * Constructor.
    * @param n node reference
    */
-  protected BXNode(final ANode n) {
+  BXNode(final ANode n) {
     node = n;
   }
 
@@ -56,7 +56,7 @@ public abstract class BXNode implements Node {
    * Returns a numeric value for the node kind.
    * @return node kind
    */
-  protected int kind() {
+  int kind() {
     return node.kind();
   }
 
@@ -270,7 +270,7 @@ public abstract class BXNode implements Node {
    * @param tag tag name
    * @return nodes
    */
-  protected final BXNList getElements(final String tag) {
+  final BXNList getElements(final String tag) {
     final NodeCache nb = new NodeCache();
     final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
@@ -286,7 +286,7 @@ public abstract class BXNode implements Node {
    * @param ai axis iterator
    * @return node cache
    */
-  protected static final NodeCache finish(final AxisIter ai) {
+  static NodeCache finish(final AxisIter ai) {
     final NodeCache nc = new NodeCache();
     for(ANode n; (n = ai.next()) != null;) nc.add(n.finish());
     return nc;
@@ -303,7 +303,7 @@ public abstract class BXNode implements Node {
   /**
    * Throws a DOM modification exception.
    */
-  protected final void readOnly() {
+  final void readOnly() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

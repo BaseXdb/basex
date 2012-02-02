@@ -193,7 +193,7 @@ public final class ClientListener extends Thread {
 
         // execute command and send {RESULT}
         boolean ok = true;
-        String info = null;
+        String info;
         try {
           command.execute(context, new EncodingOutput(out));
           info = command.info();
@@ -401,7 +401,7 @@ public final class ClientListener extends Thread {
     final String name = in.readString();
     final Sessions s = context.events.get(name);
     final boolean ok = s != null && !s.contains(this);
-    String message = "";
+    String message;
     if(ok) {
       s.add(this);
       message = WATCHING_EVENT_X;
@@ -422,7 +422,7 @@ public final class ClientListener extends Thread {
 
     final Sessions s = context.events.get(name);
     final boolean ok = s != null && s.contains(this);
-    String message = "";
+    String message;
     if(ok) {
       s.remove(this);
       message = UNWATCHING_EVENT_X;

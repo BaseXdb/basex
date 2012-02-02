@@ -17,7 +17,7 @@ public class Str extends Item {
   /** Zero-length string. */
   public static final Str ZERO = new Str(Token.EMPTY);
   /** String data. */
-  protected final byte[] val;
+  final byte[] val;
 
   /**
    * Constructor.
@@ -32,7 +32,7 @@ public class Str extends Item {
    * @param v value
    * @param t data type
    */
-  protected Str(final byte[] v, final Type t) {
+  Str(final byte[] v, final Type t) {
     super(t);
     val = v;
   }

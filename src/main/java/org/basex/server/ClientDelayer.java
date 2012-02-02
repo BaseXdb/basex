@@ -12,7 +12,7 @@ import org.basex.util.Performance;
  * @author Andreas Weiler
  * @author Christian Gruen
  */
-public final class ClientDelayer extends Thread {
+final class ClientDelayer extends Thread {
   /** Server instance. */
   private final BaseXServer server;
   /** Client listener. */

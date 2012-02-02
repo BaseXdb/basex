@@ -198,7 +198,7 @@ public final class UpdateTestTags extends UpdateTest {
    */
   private void insertTag(final int par, final int pos,
       final byte[] name, final int kind) {
-    int root = par;
+    int root;
     final Data data = CONTEXT.data();
     if(pos == 0) {
       root = par + data.size(par, kind);

@@ -10,9 +10,9 @@ import org.basex.util.InputInfo;
  */
 public abstract class QueryModule {
   /** Query context. */
-  protected QueryContext context;
+  public QueryContext context;
   /** Input info. */
-  protected InputInfo input;
+  public InputInfo input;
 
   /**
    * Constructor.

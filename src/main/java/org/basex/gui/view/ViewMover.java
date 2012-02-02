@@ -20,7 +20,7 @@ final class ViewMover extends BaseXPanel {
   /** Size of splitter. */
   private static final int SIZE = 9;
   /** Flag if current mover is active. */
-  boolean active;
+  private boolean active;
 
   /**
    * Constructor.

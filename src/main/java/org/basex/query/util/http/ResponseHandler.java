@@ -204,7 +204,7 @@ public final class ResponseHandler {
     final BufferedInputStream bis = new BufferedInputStream(io);
     try {
       final ByteList bl = new ByteList();
-      for(int i = 0; (i = bis.read()) != -1;) bl.add(i);
+      for(int i; (i = bis.read()) != -1;) bl.add(i);
       // In case of XML, HTML or text content type, use supplied character set
       if(MimeTypes.isXML(c) || c.equals(MimeTypes.TEXT_HTML) ||
           c.startsWith(MimeTypes.MIME_TEXT_PREFIX))

@@ -32,9 +32,9 @@ import org.basex.util.list.StringList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogParsing extends BaseXBack {
+final class DialogParsing extends BaseXBack {
   /** Parser. */
-  public final BaseXCombo parser;
+  private final BaseXCombo parser;
   /** Internal XML parsing. */
   private final BaseXCheckBox intparse;
   /** DTD mode. */

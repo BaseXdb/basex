@@ -47,8 +47,6 @@ public final class FolderView extends View {
   private BufferedImage closedBox;
   /** Opened Box. */
   private BufferedImage openedBox;
-  /** Empty Box. */
-  private BufferedImage emptyBox;
 
   /** Scroll Bar. */
   private final BaseXBar scroll;
@@ -333,8 +331,9 @@ public final class FolderView extends View {
     boxW = s - boxMargin;
     final int sp = Math.max(1, s >> 4);
 
-    emptyBox = new BufferedImage(boxW + 1, boxW + 1,
-        BufferedImage.TYPE_INT_ARGB);
+    /* Empty Box. */
+    BufferedImage emptyBox = new BufferedImage(boxW + 1, boxW + 1,
+            BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = emptyBox.createGraphics();
     smooth(g);
     g.setColor(color5);

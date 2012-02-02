@@ -42,13 +42,14 @@ import static org.basex.util.Token.*;
  */
 public class BaseXEditor extends BaseXPanel {
   /** Text array to be written. */
-  protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
+  transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
-  protected final BaseXTextRenderer rend;
+  final BaseXTextRenderer rend;
+  /** Undo history; if set to {@code null}, text will be read-only. */
+  final transient Undo undo;
+
   /** Scrollbar reference. */
   private final BaseXBar scroll;
-  /** Undo history; if set to {@code null}, text will be read-only. */
-  protected final transient Undo undo;
   /** Search field. */
   private BaseXTextField find;
 
@@ -188,7 +189,7 @@ public class BaseXEditor extends BaseXPanel {
    * Sets a syntax highlighter, based on the file format.
    * @param file file reference
    */
-  public final void setSyntax(final IO file) {
+  protected final void setSyntax(final IO file) {
     setSyntax(file.name().endsWith(IO.JSONSUFFIX) ? new JSONSyntax() :
       file.isXML() ? new XMLSyntax() : new XQuerySyntax());
   }
@@ -640,7 +641,7 @@ public class BaseXEditor extends BaseXPanel {
   /**
    * Undoes the text.
    */
-  protected final void undo() {
+  final void undo() {
     if(undo == null) return;
     text = new BaseXTextTokens(undo.prev());
     rend.setText(text);
@@ -651,7 +652,7 @@ public class BaseXEditor extends BaseXPanel {
   /**
    * Redoes the text.
    */
-  protected final void redo() {
+  final void redo() {
     if(undo == null) return;
     text = new BaseXTextTokens(undo.next());
     rend.setText(text);
@@ -662,7 +663,7 @@ public class BaseXEditor extends BaseXPanel {
   /**
    * Cuts the selected text to the clipboard.
    */
-  protected final void cut() {
+  final void cut() {
     text.pos(text.cursor());
     if(copy()) delete();
   }
@@ -671,7 +672,7 @@ public class BaseXEditor extends BaseXPanel {
    * Copies the selected text to the clipboard.
    * @return true if text was copied
    */
-  protected final boolean copy() {
+  final boolean copy() {
     final String txt = text.copy();
     if(txt.isEmpty()) {
       text.noMark();
@@ -688,7 +689,7 @@ public class BaseXEditor extends BaseXPanel {
    * Pastes the clipboard text.
    * @return success flag
    */
-  protected final boolean paste() {
+  final boolean paste() {
     return paste(clip());
   }
 
@@ -697,7 +698,7 @@ public class BaseXEditor extends BaseXPanel {
    * @param txt string to be pasted
    * @return success flag
    */
-  protected final boolean paste(final String txt) {
+  final boolean paste(final String txt) {
     if(txt == null || undo == null) return false;
     text.pos(text.cursor());
     undo.cursor(text.cursor());
@@ -710,7 +711,7 @@ public class BaseXEditor extends BaseXPanel {
   /**
    * Deletes the selected text.
    */
-  protected final void delete() {
+  final void delete() {
     if(undo == null) return;
     text.pos(text.cursor());
     undo.cursor(text.cursor());
@@ -736,7 +737,7 @@ public class BaseXEditor extends BaseXPanel {
   /**
    * Finishes a command.
    */
-  public void finish() {
+  void finish() {
     text.setCaret();
     rend.calc();
     showCursor(2);
@@ -744,7 +745,7 @@ public class BaseXEditor extends BaseXPanel {
   }
 
   /** Cursor. */
-  final Timer cursor = new Timer(500, new ActionListener() {
+  private final Timer cursor = new Timer(500, new ActionListener() {
     @Override
     public void actionPerformed(final ActionEvent e) {
       rend.cursor(!rend.cursor());
@@ -757,7 +758,7 @@ public class BaseXEditor extends BaseXPanel {
    * new one has been started.
    * @param start start/stop flag
    */
-  protected final void cursor(final boolean start) {
+  final void cursor(final boolean start) {
     cursor.stop();
     if(start) cursor.start();
     rend.cursor(start);

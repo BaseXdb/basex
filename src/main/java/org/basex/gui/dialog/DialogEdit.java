@@ -28,8 +28,6 @@ public final class DialogEdit extends Dialog {
   public final StringList result = new StringList();
   /** Node kind. */
   public final int kind;
-  /** Pre value. */
-  private final int pre;
   /** Button panel. */
   private final BaseXBack buttons;
   /** Info label. */
@@ -55,7 +53,8 @@ public final class DialogEdit extends Dialog {
    */
   public DialogEdit(final GUI main, final int p) {
     super(main, EDIT_DATA);
-    pre = p;
+    /* Pre value. */
+    int pre = p;
 
     // create checkboxes
     BaseXBack pp = new BaseXBack(new BorderLayout());

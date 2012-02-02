@@ -26,13 +26,13 @@ public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
   /** Score value. Will be {@code null} if not assigned. */
-  protected Double score;
+  Double score;
 
   /**
    * Constructor.
    * @param t data type
    */
-  protected Item(final Type t) {
+  Item(final Type t) {
     super(t);
   }
 
@@ -233,7 +233,7 @@ public abstract class Item extends Value {
    * @return never
    * @throws QueryException query exception
    */
-  protected final QueryException castErr(final Object val, final InputInfo ii)
+  final QueryException castErr(final Object val, final InputInfo ii)
       throws QueryException {
     return FUNCAST.thrw(ii, type, val);
   }
@@ -246,8 +246,8 @@ public abstract class Item extends Value {
    * @return never
    * @throws QueryException query exception
    */
-  public final QueryException dateErr(final byte[] i, final String ex,
-      final InputInfo ii) throws QueryException {
+  final QueryException dateErr(final byte[] i, final String ex,
+                               final InputInfo ii) throws QueryException {
     throw DATEFORMAT.thrw(ii, type, i, ex);
   }
 

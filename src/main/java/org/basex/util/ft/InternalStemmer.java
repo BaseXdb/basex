@@ -12,7 +12,7 @@ public abstract class InternalStemmer extends Stemmer {
    * Constructor.
    * @param fti full-text iterator
    */
-  protected InternalStemmer(final FTIterator fti) {
+  InternalStemmer(final FTIterator fti) {
     super(fti);
   }
 

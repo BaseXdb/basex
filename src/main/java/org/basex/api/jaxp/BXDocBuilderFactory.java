@@ -13,7 +13,7 @@ import org.xml.sax.SAXException;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class BXDocBuilderFactory extends DocumentBuilderFactory {
+final class BXDocBuilderFactory extends DocumentBuilderFactory {
   @Override
   public DocumentBuilder newDocumentBuilder()
       throws ParserConfigurationException {

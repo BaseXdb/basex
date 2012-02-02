@@ -30,23 +30,23 @@ import org.basex.util.list.IntList;
  */
 public abstract class Builder extends Progress {
   /** Tree structure. */
-  protected final PathSummary path = new PathSummary(null);
+  final PathSummary path = new PathSummary(null);
   /** Namespace index. */
-  protected final Namespaces ns = new Namespaces();
+  final Namespaces ns = new Namespaces();
   /** Parser instance. */
-  protected final Parser parser;
+  final Parser parser;
   /** Property instance. */
-  protected final Prop prop;
+  final Prop prop;
   /** Database name. */
-  protected final String name;
+  final String name;
 
   /** Number of cached size values. */
-  protected int ssize;
+  int ssize;
   /** Currently stored size value. */
-  protected int spos;
+  int spos;
 
   /** Meta data on built database. */
-  protected MetaData meta;
+  MetaData meta;
   /** Tag name index. */
   private Names tags;
   /** Attribute name index. */
@@ -69,7 +69,7 @@ public abstract class Builder extends Progress {
    * @param parse parser
    * @param pr properties
    */
-  protected Builder(final String nm, final Parser parse, final Prop pr) {
+  Builder(final String nm, final Parser parse, final Prop pr) {
     parser = parse;
     prop = pr;
     name = nm;
@@ -84,7 +84,7 @@ public abstract class Builder extends Progress {
    * @param at attribute name index
    * @throws IOException I/O exception
    */
-  protected final void parse(final MetaData md, final Names ta, final Names at)
+  final void parse(final MetaData md, final Names ta, final Names at)
       throws IOException {
 
     final Performance perf = Util.debug ? new Performance() : null;
@@ -231,7 +231,7 @@ public abstract class Builder extends Progress {
   // PROGRESS INFORMATION =====================================================
 
   @Override
-  public final String tit() {
+  protected final String tit() {
     return CREATING_DB;
   }
 

@@ -34,29 +34,29 @@ public abstract class UpdateTest {
   private static boolean mainmem;
 
   /** JUnit tag. */
-  protected static final byte[] JUNIT = token("junit");
+  static final byte[] JUNIT = token("junit");
   /** JUnit tag. */
-  protected static final byte[] FOO = token("foo");
+  static final byte[] FOO = token("foo");
   /** JUnit tag. */
-  protected static final byte[] NAME = token("name");
+  static final byte[] NAME = token("name");
   /** JUnit tag. */
-  protected static final byte[] PARENTNODE = token("parentnode");
+  static final byte[] PARENTNODE = token("parentnode");
   /** JUnit tag. */
-  protected static final byte[] CONTEXTNODE = token("contextnode");
+  static final byte[] CONTEXTNODE = token("contextnode");
   /** JUnit tag. */
-  protected static final byte[] ID = token("id");
+  static final byte[] ID = token("id");
   /** JUnit tag. */
-  protected static final byte[] B = token("b");
+  static final byte[] B = token("b");
   /** Database context. */
-  protected static final Context CONTEXT = new Context();
+  static final Context CONTEXT = new Context();
   /** Test file size in nodes. */
-  protected int size;
+  int size;
 
   /**
    * Initializes the test class.
    */
   @BeforeClass
-  public static final void setUpBeforeClass() {
+  public static void setUpBeforeClass() {
     final Prop prop = CONTEXT.prop;
     prop.set(Prop.TEXTINDEX, false);
     prop.set(Prop.ATTRINDEX, false);
@@ -93,7 +93,7 @@ public abstract class UpdateTest {
   /**
    * Reloads the database.
    */
-  protected final void reload() {
+  final void reload() {
     if(mainmem) return;
     exec(new Close());
     exec(new Open(DB));
@@ -104,7 +104,7 @@ public abstract class UpdateTest {
    * @param exp expected value
    * @param act actual value
    */
-  protected final void assertArraysEquals(final byte[] exp, final byte[] act) {
+  final void assertArraysEquals(final byte[] exp, final byte[] act) {
     assertEquals("array lengths don't equal", exp.length, act.length);
     for(int i = 0; i < exp.length; ++i) assertEquals(exp[i], act[i]);
   }

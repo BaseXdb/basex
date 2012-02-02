@@ -158,7 +158,7 @@ public final class OptimizeAll extends ACreate {
      * @param d disk data
      * @param c calling command (can be {@code null})
      */
-    protected DBParser(final DiskData d, final OptimizeAll c) {
+    DBParser(final DiskData d, final OptimizeAll c) {
       super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original));
       data = d;
       cmd = c;

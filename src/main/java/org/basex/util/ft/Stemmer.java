@@ -36,7 +36,7 @@ public abstract class Stemmer extends LanguageImpl {
   /**
    * Constructor.
    */
-  protected Stemmer() {
+  Stemmer() {
     this(null);
   }
 
@@ -44,7 +44,7 @@ public abstract class Stemmer extends LanguageImpl {
    * Constructor.
    * @param ft full-text iterator.
    */
-  protected Stemmer(final FTIterator ft) {
+  Stemmer(final FTIterator ft) {
     iter = ft;
   }
 

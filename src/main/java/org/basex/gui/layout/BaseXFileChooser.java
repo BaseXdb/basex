@@ -82,7 +82,7 @@ public final class BaseXFileChooser {
    * @return resulting input reference
    */
   public IOFile select(final Mode mode) {
-    IOFile io = null;
+    IOFile io;
     if(fd != null) {
       if(mode == Mode.FDOPEN) fd.setFile(" ");
       fd.setMode(mode == Mode.FSAVE || mode == Mode.DSAVE ?

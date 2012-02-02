@@ -25,15 +25,15 @@ import org.basex.util.list.TokenList;
  */
 public abstract class Serializer {
   /** Default serialization parameters. */
-  protected static final SerializerProp PROPS = new SerializerProp();
+  static final SerializerProp PROPS = new SerializerProp();
   /** Stack of opened tags. */
-  protected final TokenList tags = new TokenList();
+  final TokenList tags = new TokenList();
   /** Current level. */
-  protected int level;
+  int level;
   /** Current tag. */
-  protected byte[] tag;
+  byte[] tag;
   /** Declare namespaces flag. */
-  protected boolean undecl;
+  boolean undecl;
 
   /** Currently available namespaces. */
   private final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
@@ -420,7 +420,7 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void finishText(final byte[] v, final FTPos ftp)
+  void finishText(final byte[] v, final FTPos ftp)
       throws IOException {
     text(v);
   }
@@ -431,21 +431,21 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void openDoc(final byte[] n) throws IOException { };
+  void openDoc(final byte[] n) throws IOException { }
 
   /**
    * Closes a document.
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  protected void closeDoc() throws IOException { };
+  void closeDoc() throws IOException { }
 
   /**
    * Returns the name of the specified expression.
    * @param expr expression
    * @return name
    */
-  protected byte[] info(final ExprInfo expr) {
+  byte[] info(final ExprInfo expr) {
     return token(expr.info());
   }
 

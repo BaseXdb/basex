@@ -30,9 +30,9 @@ public final class Order extends ParseExpr {
   final OrderBy[] ob;
 
   /** Keys to sort by. */
-  ObjList<Item[]> keys;
+  private ObjList<Item[]> keys;
   /** Values to sort. */
-  ValueList values;
+  private ValueList values;
 
  /**
    * Constructor.

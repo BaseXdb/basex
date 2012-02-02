@@ -30,7 +30,7 @@ public final class Compare {
   public enum Flag {
     /** Compare all node types. */ ALLNODES,
     /** Compare namespaces.     */ NAMESPACES,
-  };
+  }
 
   /** Input info. */
   private final InputInfo input;

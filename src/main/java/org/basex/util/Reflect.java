@@ -279,7 +279,7 @@ public final class Reflect {
    * @param cls class
    * @return {@code true} if a class is accessible
    */
-  public static boolean accessible(final Class<?> cls) {
+  private static boolean accessible(final Class<?> cls) {
     // non public classes cannot be instantiated
     return Modifier.isPublic(cls.getModifiers());
   }

@@ -15,6 +15,7 @@ import org.basex.util.Util;
  */
 public final class ObjList<E> extends ElementList
     implements Iterable<E>, RandomAccess {
+
   /** Element container. */
   Object[] list;
 

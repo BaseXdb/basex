@@ -28,7 +28,7 @@ public final class Var extends ParseExpr {
   /** Variable name. */
   public final QNm name;
   /** Variable ID. */
-  public final int id;
+  private final int id;
 
   /** Expected return type. */
   public SeqType ret;

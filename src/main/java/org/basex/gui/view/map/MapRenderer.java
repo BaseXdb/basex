@@ -295,12 +295,12 @@ final class MapRenderer {
     final int ww = r.w;
     final int ys = r.y + 3;
     int yy = ys;
-    int wl = 0, ll = 0; // word and line length
+    int wl, ll = 0; // word and line length
 
     final Color textc = color(r.level + 4);
     g.setColor(textc);
-    int lastl = 0, count = -1;
-    int ct = 0, pp = 0, sl = 0, pl = 0;
+    int lastl, count = -1;
+    int ct, pp = 0, sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     double error = 0;
 
@@ -419,7 +419,7 @@ final class MapRenderer {
     final int ys = r.y + 3;
     int yy = ys;
 
-    int wl = 0; // word length
+    int wl; // word length
     double ll = 0; // line length
     double e = 0;
 
@@ -572,10 +572,10 @@ final class MapRenderer {
         final int bpsl = data[1][psl] == sl ? psl + 1 : psl;
         final int bsl = data[1][psl] == sl ? 0 : sl;
         ll = sd * 2 + sp;
-        int l = 0;
+        int l;
         byte[] tok;
         int p = cc >= data[0][i] ? cc - data[0][i] : 0;
-        boolean apm = false;
+        boolean apm;
 
         while(p > -1 && i > -1) {
           // append punctuation mark

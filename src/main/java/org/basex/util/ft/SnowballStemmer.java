@@ -65,7 +65,7 @@ final class SnowballStemmer extends Stemmer {
    * @param fti full-text iterator
    * @param lang language of the text to stem
    */
-  SnowballStemmer(final Language lang, final FTIterator fti) {
+  private SnowballStemmer(final Language lang, final FTIterator fti) {
     super(fti);
     clazz = CLASSES.get(lang);
     stemmer = Reflect.get(clazz.clz);

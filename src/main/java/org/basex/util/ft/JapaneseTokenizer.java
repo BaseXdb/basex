@@ -32,37 +32,35 @@ public class JapaneseTokenizer extends Tokenizer {
   private static final String LANG = "ja";
 
   /** The kind of POS(Noun). */
-  static final String MEISHI = "\u540D\u8A5E";
+  private static final String MEISHI = "\u540D\u8A5E";
   /** The kind of POS(Pre-noun Adjectival). */
-  static final String RENTAISHI = "\u9023\u4F53\u8A5E";
+  private static final String RENTAISHI = "\u9023\u4F53\u8A5E";
   /** The kind of POS(Adverb). */
-  static final String HUKUSHI = "\u526F\u8A5E";
+  private static final String HUKUSHI = "\u526F\u8A5E";
   /** The kind of POS(Verb). */
-  static final String DOUSHI = "\u52D5\u8A5E";
+  private static final String DOUSHI = "\u52D5\u8A5E";
   /** The kind of POS(Conjunction). */
-  static final String SETSUZOKUSHI = "\u63A5\u982D\u8A5E";
+  private static final String SETSUZOKUSHI = "\u63A5\u982D\u8A5E";
   /** The kind of POS(Modal verbs). */
-  static final String JYODOUSHI = "\u52A9\u52D5\u8A5E";
+  private static final String JYODOUSHI = "\u52A9\u52D5\u8A5E";
   /** The kind of POS(Postpositional particle). */
-  static final String JYOSHI = "\u52A9\u8A5E";
+  private static final String JYOSHI = "\u52A9\u8A5E";
   /** The kind of POS(Adjective). */
-  static final String KEIYOUSHI = "\u5F62\u5BB9\u8A5E";
+  private static final String KEIYOUSHI = "\u5F62\u5BB9\u8A5E";
   /** The kind of POS(Mark). */
-  static final String KIGOU = "\u8A18\u53F7";
+  private static final String KIGOU = "\u8A18\u53F7";
   /** The kind of POS(Interjection). */
-  static final String KANDOUSHI = "\u8A18\u53F7";
+  private static final String KANDOUSHI = "\u8A18\u53F7";
   /** The kind of POS(Filler). */
-  static final String FILLER = "\u30D5\u30A3\u30E9\u30FC";
+  private static final String FILLER = "\u30D5\u30A3\u30E9\u30FC";
   /** The kind of POS(Others). */
-  static final String SONOTA = "\u305D\u306E;\u4ED6";
+  private static final String SONOTA = "\u305D\u306E;\u4ED6";
 
   /** Constant of Feature(Mark). */
-  static final String KIGOU_FEATURE = "\u8A18\u53F7,*,*,*,*,*,*,*,*";
+  private static final String KIGOU_FEATURE = "\u8A18\u53F7,*,*,*,*,*,*,*,*";
   /** Constant of Feature(Noun). */
-  static final String MEISHI_FEATURE = "\u540D\u8A5E,*,*,*,*,*,*,*,*";
+  private static final String MEISHI_FEATURE = "\u540D\u8A5E,*,*,*,*,*,*,*,*";
 
-  /** Igo constructor. */
-  private static Constructor<?> tgr;
   /** Igo instance. */
   private static Object tagger;
   /** Parse method. */
@@ -119,7 +117,8 @@ public class JapaneseTokenizer extends Tokenizer {
       if(clz == null) {
         Util.debug("Could not initialize Igo Japanese lexer.");
       } else {
-        tgr = Reflect.find(clz, String.class);
+        /* Igo constructor. */
+        Constructor<?> tgr = Reflect.find(clz, String.class);
         tagger = Reflect.get(tgr, dic.toString());
         if(tagger == null) {
           available = false;
@@ -561,7 +560,7 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return part of speech
      */
     public int getHinshi() {
-      int hinshi = 0;
+      int hinshi;
       // morphological analyzer certainly returns
       // the single ascii char as a "noun".
       final byte[] s = token(mSurface);

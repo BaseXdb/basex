@@ -19,7 +19,7 @@ abstract class TrieNode {
   /** Number of children on each level. */
   static final int KIDS = 1 << Map.BITS;
   /** Mask for the bits used on the current level. */
-  static final int MASK = KIDS - 1;
+  private static final int MASK = KIDS - 1;
 
   /** The empty node. */
   static final TrieNode EMPTY = new TrieNode(0) {
@@ -188,7 +188,7 @@ abstract class TrieNode {
    * @param lvl current level
    * @return hash key
    */
-  static final int key(final int hash, final int lvl) {
+  static int key(final int hash, final int lvl) {
     return hash >>> lvl * Map.BITS & MASK;
   }
 
@@ -222,7 +222,7 @@ abstract class TrieNode {
    * @return {@code true} if both values are deep equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  static final boolean deep(final Value a, final Value b, final InputInfo ii)
+  static boolean deep(final Value a, final Value b, final InputInfo ii)
       throws QueryException {
     return a.size() == b.size() && Compare.deep(a, b, ii);
   }
@@ -235,7 +235,7 @@ abstract class TrieNode {
    * @return {@code true} if both items are equal, {@code false} otherwise
    * @throws QueryException query exception
    */
-  static final boolean eq(final Item a, final Item b, final InputInfo ii)
+  static boolean eq(final Item a, final Item b, final InputInfo ii)
       throws QueryException {
     return a.comparable(b) && a.eq(ii, b);
   }

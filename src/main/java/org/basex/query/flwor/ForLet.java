@@ -24,7 +24,7 @@ public abstract class ForLet extends Single {
    * @param e variable input
    * @param v variable
    */
-  protected ForLet(final InputInfo ii, final Expr e, final Var v) {
+  ForLet(final InputInfo ii, final Expr e, final Var v) {
     super(ii, e);
     var = v;
   }

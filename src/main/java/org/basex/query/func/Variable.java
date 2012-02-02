@@ -32,9 +32,9 @@ public enum Variable {
   XSLTVERSION(XSLTURI, "version", Str.get(FNXslt.get(false)));
 
   /** Variable name. */
-  final QNm qname;
+  private final QNm qname;
   /** Variable value. */
-  final Value value;
+  private final Value value;
 
   /**
    * Constructor.

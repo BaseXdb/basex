@@ -691,15 +691,15 @@ public enum AtomType implements Type {
   public final Type par;
 
   /** Number flag. */
-  final boolean num;
+  private final boolean num;
   /** Untyped flag. */
-  final boolean unt;
+  private final boolean unt;
   /** String flag. */
-  final boolean str;
+  private final boolean str;
   /** Duration flag. */
-  public final boolean dur;
+  private final boolean dur;
   /** Date flag. */
-  public final boolean dat;
+  private final boolean dat;
 
   /** String representation. */
   private final byte[] string;

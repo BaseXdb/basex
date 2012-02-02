@@ -57,7 +57,7 @@ public abstract class Formatter extends FormatUtil {
    * @param ord ordinal suffix
    * @return token
    */
-  public abstract byte[] word(final long n, final byte[] ord);
+  protected abstract byte[] word(final long n, final byte[] ord);
 
   /**
    * Returns an ordinal representation for the specified number.
@@ -65,7 +65,7 @@ public abstract class Formatter extends FormatUtil {
    * @param ord ordinal suffix
    * @return ordinal
    */
-  public abstract byte[] ordinal(final long n, final byte[] ord);
+  protected abstract byte[] ordinal(final long n, final byte[] ord);
 
   /**
    * Returns the specified month (0-11).
@@ -74,7 +74,7 @@ public abstract class Formatter extends FormatUtil {
    * @param max maximum length
    * @return month
    */
-  public abstract byte[] month(final int n, final int min, final int max);
+  protected abstract byte[] month(final int n, final int min, final int max);
 
   /**
    * Returns the specified day of the week (0-6, Sunday-Saturday).
@@ -83,27 +83,27 @@ public abstract class Formatter extends FormatUtil {
    * @param max maximum length
    * @return day of week
    */
-  public abstract byte[] day(final int n, final int min, final int max);
+  protected abstract byte[] day(final int n, final int min, final int max);
 
   /**
    * Returns the am/pm marker.
    * @param am am flag
    * @return am/pm marker
    */
-  public abstract byte[] ampm(final boolean am);
+  protected abstract byte[] ampm(final boolean am);
 
   /**
    * Returns the calendar.
    * @return calendar
    */
-  public abstract byte[] calendar();
+  protected abstract byte[] calendar();
 
   /**
    * Returns the era.
    * @param year year
    * @return era
    */
-  public abstract byte[] era(final int year);
+  protected abstract byte[] era(final int year);
 
   /**
    * Formats the specified date.

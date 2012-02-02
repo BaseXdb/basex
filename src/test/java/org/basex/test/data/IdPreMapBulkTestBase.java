@@ -14,13 +14,13 @@ import org.junit.Before;
  */
 public abstract class IdPreMapBulkTestBase {
   /** Number of update operations to execute in each test. */
-  protected int opcount = 7000;
+  int opcount = 7000;
   /** Initial number of records. */
-  protected int baseid = 400;
+  int baseid = 400;
   /** ID -> PRE map to compare to. */
-  protected DummyIdPreMap basemap;
+  private DummyIdPreMap basemap;
   /** ID -> PRE map to test. */
-  protected IdPreMap testedmap;
+  private IdPreMap testedmap;
   /** Sequence of performed operations and parameters. */
   private ArrayList<int[]> ops;
 
@@ -40,7 +40,7 @@ public abstract class IdPreMapBulkTestBase {
    * @param id id value
    * @param c number of inserted records
    */
-  protected final void insert(final int pre, final int id, final int c) {
+  final void insert(final int pre, final int id, final int c) {
     ops.add(new int[] { pre, id, c});
     testedmap.insert(pre, id, c);
     basemap.insert(pre, id, c);
@@ -51,14 +51,14 @@ public abstract class IdPreMapBulkTestBase {
    * @param pre pre value
    * @param c number of deleted records
    */
-  protected final void delete(final int pre, final int c) {
+  final void delete(final int pre, final int c) {
     ops.add(new int[] { pre, basemap.id(pre), c});
     testedmap.delete(pre, basemap.id(pre), c);
     basemap.delete(pre, basemap.id(pre), c);
   }
 
   /** Check the two mappings. */
-  protected final void check() {
+  final void check() {
     for(int pre = 0; pre < basemap.size(); pre++) {
       final int id = basemap.id(pre);
       final int p = testedmap.pre(id);
@@ -70,7 +70,7 @@ public abstract class IdPreMapBulkTestBase {
   }
 
   /** Print inserted and deleted records and the tested map. */
-  protected final void dump() {
+  final void dump() {
     final StringBuilder s = new StringBuilder();
     for(final int[] o : ops) {
       s.append(o[2] > 0 ? "insert(" : "delete(");
@@ -155,7 +155,7 @@ public abstract class IdPreMapBulkTestBase {
      */
     public DummyIdPreMap copy() {
       final int[] a = new int[idlist.size()];
-      for(int i = size() - 1; i >= 0; --i) a[i] = idlist.get(i).intValue();
+      for(int i = size() - 1; i >= 0; --i) a[i] = idlist.get(i);
       return new DummyIdPreMap(a);
     }
 

@@ -17,9 +17,9 @@ public final class TokenBuilder {
   /** Half new line. */
   public static final byte HLINE = 0x01;
   /** Bold flag. */
-  public static final byte BOLD = 0x02;
+  private static final byte BOLD = 0x02;
   /** Standard flag. */
-  public static final byte NORM = 0x03;
+  private static final byte NORM = 0x03;
   /** Mark flag. */
   public static final byte MARK = 0x04;
   /** New line. */
@@ -133,16 +133,16 @@ public final class TokenBuilder {
       addByte((byte) ch);
     } else if(ch <= 0x7FF) {
       addByte((byte) (ch >>  6 & 0x1F | 0xC0));
-      addByte((byte) (ch >>  0 & 0x3F | 0x80));
+      addByte((byte) (ch & 0x3F | 0x80));
     } else if(ch <= 0xFFFF) {
       addByte((byte) (ch >> 12 & 0x0F | 0xE0));
       addByte((byte) (ch >>  6 & 0x3F | 0x80));
-      addByte((byte) (ch >>  0 & 0x3F | 0x80));
+      addByte((byte) (ch & 0x3F | 0x80));
     } else {
       addByte((byte) (ch >> 18 & 0x07 | 0xF0));
       addByte((byte) (ch >> 12 & 0x3F | 0x80));
       addByte((byte) (ch >>  6 & 0x3F | 0x80));
-      addByte((byte) (ch >>  0 & 0x3F | 0x80));
+      addByte((byte) (ch & 0x3F | 0x80));
     }
     return this;
   }

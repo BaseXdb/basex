@@ -13,7 +13,7 @@ import org.basex.util.Util;
  */
 public final class Jav extends Item {
   /** Java object. */
-  public final Object val;
+  private final Object val;
 
   /**
    * Constructor.

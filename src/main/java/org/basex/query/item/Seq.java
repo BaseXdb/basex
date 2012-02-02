@@ -15,13 +15,13 @@ import org.basex.util.InputInfo;
  */
 public abstract class Seq extends Value {
   /** Length. */
-  protected final long size;
+  final long size;
 
   /**
    * Constructor.
    * @param s size
    */
-  protected Seq(final long s) {
+  Seq(final long s) {
     this(s, AtomType.SEQ);
   }
 
@@ -30,7 +30,7 @@ public abstract class Seq extends Value {
    * @param s size
    * @param t type
    */
-  protected Seq(final long s, final Type t) {
+  Seq(final long s, final Type t) {
     super(t);
     size = s;
   }

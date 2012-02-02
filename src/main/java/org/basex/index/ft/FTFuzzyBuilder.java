@@ -32,7 +32,7 @@ final class FTFuzzyBuilder extends FTBuilder {
    * @param d data reference
    * @throws IOException IOException
    */
-  protected FTFuzzyBuilder(final Data d) throws IOException {
+  FTFuzzyBuilder(final Data d) throws IOException {
     super(d);
     tree = new FTIndexTrees(d.meta.maxlen);
   }

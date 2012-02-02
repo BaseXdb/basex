@@ -49,8 +49,6 @@ public final class DecFormatter extends FormatUtil {
   private int percent = '%';
   /** Permille sign. */
   private int permille = '\u2030';
-  /** Zero-digit sign. */
-  private int zero = '0';
 
   /**
    * Default constructor.
@@ -70,6 +68,8 @@ public final class DecFormatter extends FormatUtil {
       throws QueryException {
 
     // assign map values
+    /* Zero-digit sign. */
+    int zero = '0';
     if(map != null) {
       for(final Entry<String, String> e : map.entrySet()) {
         final String key = e.getKey(), val = e.getValue();
@@ -101,7 +101,7 @@ public final class DecFormatter extends FormatUtil {
     // check for duplicate characters
     final IntSet is = new IntSet();
     for(final int i : new int[] { decimal, grouping, percent, permille,
-        zero, optional, pattern }) {
+            zero, optional, pattern }) {
       if(is.add(i) < 0) DUPLDECFORM.thrw(ii, (char) i);
     }
 
@@ -154,7 +154,7 @@ public final class DecFormatter extends FormatUtil {
     for(final byte[] pt : patterns) {
       boolean frac = false, pas = false, act = false;
       boolean dg = false, opt1 = false, opt2 = false;
-      int cl = 0, pc = 0, pm = 0, ls = 0;
+      int cl, pc = 0, pm = 0, ls = 0;
 
       // loop through all characters
       for(int i = 0; i < pt.length; i += cl) {

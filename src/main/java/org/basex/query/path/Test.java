@@ -19,11 +19,11 @@ public abstract class Test {
   /** Static PI node test. */
   public static final Test PI = new KindTest(NodeType.PI);
   /** Static element node test. */
-  public static final Test ELM = new KindTest(NodeType.ELM);
+  private static final Test ELM = new KindTest(NodeType.ELM);
   /** Static document node test. */
   public static final Test DOC = new KindTest(NodeType.DOC);
   /** Static attribute node test. */
-  public static final Test ATT = new KindTest(NodeType.ATT);
+  private static final Test ATT = new KindTest(NodeType.ATT);
   /** Static comment node test. */
   public static final Test COM = new KindTest(NodeType.COM);
   /** Static node test. */
@@ -50,7 +50,7 @@ public abstract class Test {
   public QNm name;
 
   /** Mutable QName instance. */
-  protected final QNm tmpq = new QNm();
+  final QNm tmpq = new QNm();
 
   /**
    * Returns a test instance.

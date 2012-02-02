@@ -21,7 +21,7 @@ import org.basex.util.Util;
  */
 public final class IntSeq extends Seq {
   /** Values. */
-  final long[] vals;
+  private final long[] vals;
 
   /**
    * Constructor.

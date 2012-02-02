@@ -12,7 +12,7 @@ import org.basex.util.Util;
  */
 final class DOTData {
   /** Font. */
-  static final String FONT = "Tahoma"; //"Charter BT";
+  private static final String FONT = "Tahoma"; //"Charter BT";
 
   /** Node entry. */
   static final String HEADER =

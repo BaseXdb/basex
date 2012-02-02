@@ -28,7 +28,7 @@ public final class Language implements Comparable<Language> {
   public static final HashMap<String, Language> ALL =
       new HashMap<String, Language>();
   /** Available languages, indexed by their display. */
-  public static final HashMap<String, Language> DISP =
+  private static final HashMap<String, Language> DISP =
       new HashMap<String, Language>();
 
   static {

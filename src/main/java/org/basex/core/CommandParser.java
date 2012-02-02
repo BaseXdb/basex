@@ -94,7 +94,7 @@ public final class CommandParser extends InputParser {
   /** Password reader. */
   private PasswordReader passwords;
   /** Suggest possible completions. */
-  boolean suggest;
+  private boolean suggest;
 
   /**
    * Constructor, parsing the input queries.

@@ -595,9 +595,9 @@ public final class PlotView extends View {
 
       // draw LOGARITHMIC SCALE
       if(axis.log) {
-        int l = 0;
-        double a = 0;
-        double b = 0;
+        int l;
+        double a;
+        double b;
 
         // draw labels for negative values
         if(axis.min < 0) {

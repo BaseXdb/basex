@@ -35,8 +35,6 @@ public class IndexTree {
   private final BoolList mod = new BoolList();
   /** Tree root node. */
   private int root = -1;
-  /** Last iterator node. */
-  private int ln;
 
   /**
    * Indexes the specified key and value.
@@ -57,8 +55,8 @@ public class IndexTree {
    * @param exist flag for using existing index
    * @return int node
    */
-  public final int index(final byte[] key, final int value,
-      final boolean exist) {
+  protected final int index(final byte[] key, final int value,
+                            final boolean exist) {
 
     // index is empty.. create root node
     if(root == -1) {
@@ -130,7 +128,8 @@ public class IndexTree {
    * @return next pointer
    */
   public final int next() {
-    ln = cn;
+    /* Last iterator node. */
+    int ln = cn;
     if(r(cn) != -1) {
       cn = r(cn);
       while(l(cn) != -1) cn = l(cn);

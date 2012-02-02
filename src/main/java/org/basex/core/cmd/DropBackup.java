@@ -50,7 +50,7 @@ public final class DropBackup extends Command {
    * @param ctx database context
    * @return number of dropped backups
    */
-  public static int drop(final String db, final Context ctx) {
+  private static int drop(final String db, final Context ctx) {
     final IOFile dir = ctx.mprop.dbpath();
     int c = 0;
     for(final IOFile f : dir.children()) {

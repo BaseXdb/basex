@@ -27,7 +27,7 @@ public final class GUIMenu extends JMenuBar {
   /** Referenced menu items. */
   private final JMenuItem[] items;
   /** Reference to main window. */
-  final GUI gui;
+  private final GUI gui;
 
   /**
    * Initializes the menu bar.

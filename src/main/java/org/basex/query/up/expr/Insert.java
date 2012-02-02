@@ -85,7 +85,7 @@ public final class Insert extends Update {
         UPTRGTYP.thrw(input);
     }
 
-    UpdatePrimitive up = null;
+    UpdatePrimitive up;
     DBNode dbn;
     // no update primitive is created if node list is empty
     if(aList.size() > 0) {

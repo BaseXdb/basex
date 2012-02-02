@@ -83,7 +83,7 @@ final class MapList extends IntList {
    * @return calculated weight
    */
   private double weight(final int[] textLen, final Data data, final int i) {
-    double d = 0;
+    double d;
     if(textLen != null) {
       d = textLen[list[i]];
     } else {

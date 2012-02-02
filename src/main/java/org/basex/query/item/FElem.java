@@ -43,7 +43,7 @@ public final class FElem extends FNode {
    * @param n tag name
    */
   public FElem(final QNm n) {
-    this(n, (Atts) null);
+    this(n, null);
   }
 
   /**

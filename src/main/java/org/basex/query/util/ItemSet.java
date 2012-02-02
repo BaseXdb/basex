@@ -24,9 +24,9 @@ public final class ItemSet implements Iterable<Item> {
   /** Hash table buckets. */
   private int[] bucket = new int[CAP];
   /** Hashed items. */
-  protected Item[] keys = new Item[CAP];
+  Item[] keys = new Item[CAP];
   /** Hash entries. Actual hash size is {@code size - 1}. */
-  protected int size = 1;
+  int size = 1;
 
   /**
    * Indexes the specified item.

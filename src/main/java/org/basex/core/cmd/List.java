@@ -119,7 +119,7 @@ public final class List extends Command {
    * @param s name of backup file
    * @return name of database
    */
-  static String dbname(final String s) {
+  private static String dbname(final String s) {
     return PA.split(s)[0];
   }
 }

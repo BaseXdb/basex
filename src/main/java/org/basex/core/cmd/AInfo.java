@@ -10,13 +10,13 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class AInfo extends Command {
+abstract class AInfo extends Command {
   /**
    * Protected constructor.
    * @param p properties
    * @param a arguments
    */
-  protected AInfo(final int p, final String... a) {
+  AInfo(final int p, final String... a) {
     super(p, a);
   }
 
@@ -26,8 +26,8 @@ public abstract class AInfo extends Command {
    * @param key key
    * @param val value
    */
-  protected static void format(final TokenBuilder tb, final String key,
-      final String val) {
+  static void format(final TokenBuilder tb, final String key,
+                     final String val) {
     tb.add(' ').add(key).add(COLS).add(val).add(NL);
   }
 }

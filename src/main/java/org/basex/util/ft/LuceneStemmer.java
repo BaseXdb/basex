@@ -64,7 +64,7 @@ final class LuceneStemmer extends Stemmer {
       Util.debug("Could not initialize \"%\" Lucene stemmer class.", lang);
       return;
     }
-    boolean ch = false;
+    boolean ch;
     Method m = Reflect.method(clz, "stem", String.class);
     ch = m == null;
     if(ch) m = Reflect.method(clz, "stem", char[].class, int.class);
@@ -94,7 +94,7 @@ final class LuceneStemmer extends Stemmer {
    * @param lang language of the text to stem
    * @param fti full-text iterator
    */
-  LuceneStemmer(final Language lang, final FTIterator fti) {
+  private LuceneStemmer(final Language lang, final FTIterator fti) {
     super(fti);
     clazz = CLASSES.get(lang);
     stemmer = Reflect.get(clazz.clz);

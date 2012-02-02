@@ -37,8 +37,8 @@ public final class UpdatableDiskValues extends DiskValues {
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  UpdatableDiskValues(final Data d, final boolean txt, final String pref)
-      throws IOException {
+  private UpdatableDiskValues(final Data d, final boolean txt,
+      final String pref) throws IOException {
     super(d, txt, pref);
   }
 

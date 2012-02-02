@@ -44,7 +44,7 @@ public abstract class Path extends ParseExpr {
    * @param r root expression; can be a {@code null} reference
    * @param s axis steps
    */
-  protected Path(final InputInfo ii, final Expr r, final Expr[] s) {
+  Path(final InputInfo ii, final Expr r, final Expr[] s) {
     super(ii);
     root = r;
     steps = s;
@@ -57,7 +57,7 @@ public abstract class Path extends ParseExpr {
    * @param path path steps
    * @return class instance
    */
-  public static final Path get(final InputInfo ii, final Expr r,
+  public static Path get(final InputInfo ii, final Expr r,
       final Expr... path) {
 
     // check if all steps are axis steps
@@ -98,7 +98,7 @@ public abstract class Path extends ParseExpr {
    * @param ctx query context
    * @return root
    */
-  protected final Value root(final QueryContext ctx) {
+  final Value root(final QueryContext ctx) {
     final Value v = ctx != null ? ctx.value : null;
     // no root specified: return context, if it does not reference a document
     // as e.g. happens in //a(b|c)
@@ -123,7 +123,7 @@ public abstract class Path extends ParseExpr {
    * Optimizes descendant-or-self steps and static types.
    * @param ctx query context
    */
-  protected void optSteps(final QueryContext ctx) {
+  void optSteps(final QueryContext ctx) {
     boolean opt = false;
     Expr[] st = steps;
     for(int l = 1; l < st.length; ++l) {
@@ -145,7 +145,7 @@ public abstract class Path extends ParseExpr {
         opt = true;
       } else if(curr.axis == ATTR && !curr.uses(Use.POS)) {
         // descendant-or-self::node()/@X -> descendant-or-self::*/@X
-        prev.test = new NameTest(false, prev.input);
+        prev.test = new NameTest(false);
         opt = true;
       }
     }
@@ -165,7 +165,7 @@ public abstract class Path extends ParseExpr {
    * @param ctx query context
    * @return number of results
    */
-  protected long size(final QueryContext ctx) {
+  long size(final QueryContext ctx) {
     final Value rt = root(ctx);
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
     if(data == null || !data.meta.pathindex || !data.meta.uptodate) return -1;
@@ -195,7 +195,7 @@ public abstract class Path extends ParseExpr {
    * @param stps step array
    * @return empty step, or {@code null}
    */
-  protected AxisStep voidStep(final Expr[] stps) {
+  AxisStep voidStep(final Expr[] stps) {
     for(int l = 0; l < stps.length; ++l) {
       final AxisStep s = axisStep(l);
       if(s == null) continue;
@@ -249,7 +249,7 @@ public abstract class Path extends ParseExpr {
    * @param data data reference
    * @return path
    */
-  protected Expr children(final QueryContext ctx, final Data data) {
+  Expr children(final QueryContext ctx, final Data data) {
     // skip path check if no path index exists, or if it is out-of-dated
     if(!data.meta.pathindex || !data.meta.uptodate ||
         data.nspaces.globalNS() == null) return this;
@@ -289,8 +289,8 @@ public abstract class Path extends ParseExpr {
         final Expr[] preds = t == ts - 1 ?
             ((AxisStep) steps[s]).preds : new Expr[0];
         final QNm nm = qnm.get(ts - t - 1);
-        final NameTest nt = nm == null ? new NameTest(false, input) :
-          new NameTest(nm, Name.NAME, false, input);
+        final NameTest nt = nm == null ? new NameTest(false) :
+          new NameTest(nm, Name.NAME, false);
         stps[t] = AxisStep.get(input, Axis.CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
@@ -326,7 +326,7 @@ public abstract class Path extends ParseExpr {
    * @param i index
    * @return step
    */
-  public AxisStep axisStep(final int i) {
+  AxisStep axisStep(final int i) {
     return steps[i] instanceof AxisStep ? (AxisStep) steps[i] : null;
   }
 
@@ -337,7 +337,7 @@ public abstract class Path extends ParseExpr {
    * @param l last step to be checked
    * @return path nodes
    */
-  protected ObjList<PathNode> pathNodes(final Data data, final int l) {
+  ObjList<PathNode> pathNodes(final Data data, final int l) {
     // skip request if no path index exists or might be out-of-date
     if(!data.meta.pathindex || !data.meta.uptodate) return null;
 

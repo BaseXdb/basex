@@ -70,7 +70,7 @@ public final class DataAccess {
    * Sets the file length.
    * @param l file length
    */
-  public synchronized void length(final long l) {
+  synchronized void length(final long l) {
     changed |= l != len;
     len = l;
   }
@@ -254,7 +254,7 @@ public final class DataAccess {
    * Writes a byte to the current position.
    * @param v value to be written
    */
-  public void write1(final int v) {
+  void write1(final int v) {
     write(v);
   }
 
@@ -340,7 +340,7 @@ public final class DataAccess {
    * Appends a value to the file and return it's offset.
    * @param v number to be appended
    */
-  public void writeNum(final int v) {
+  void writeNum(final int v) {
     if(v < 0 || v > 0x3FFFFFFF) {
       write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
     } else if(v > 0x3FFF) {

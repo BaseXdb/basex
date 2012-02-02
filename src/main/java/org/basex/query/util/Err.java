@@ -969,7 +969,7 @@ public enum Err {
     /** XQTY Error type. */ XQTY,
     /** XUDY Error type. */ XUDY,
     /** XUST Error type. */ XUST,
-    /** XUTY Error type. */ XUTY;
+    /** XUTY Error type. */ XUTY
   }
 
   // initialization of error/uri mappings

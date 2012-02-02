@@ -31,12 +31,12 @@ import org.xml.sax.InputSource;
  */
 public abstract class Command extends Progress {
   /** Commands flag: standard. */
-  public static final int STANDARD = 256;
+  protected static final int STANDARD = 256;
   /** Commands flag: data reference needed. */
-  public static final int DATAREF = 512;
+  protected static final int DATAREF = 512;
 
   /** Container for query information. */
-  protected final TokenBuilder info = new TokenBuilder();
+  private final TokenBuilder info = new TokenBuilder();
   /** Command arguments. */
   protected final String[] args;
 
@@ -61,7 +61,7 @@ public abstract class Command extends Progress {
    * @param flag command flags
    * @param arg arguments
    */
-  public Command(final int flag, final String... arg) {
+  protected Command(final int flag, final String... arg) {
     flags = flag;
     args = arg;
   }
@@ -178,7 +178,7 @@ public abstract class Command extends Progress {
    * correctly built, as commands are sent to the server as strings.
    * @param cb command builder
    */
-  public void build(final CommandBuilder cb) {
+  protected void build(final CommandBuilder cb) {
     cb.init().args();
   }
 
@@ -257,7 +257,7 @@ public abstract class Command extends Progress {
    * @param <E> token type
    * @return option
    */
-  protected static final <E extends Enum<E>> E getOption(final String s,
+  protected static <E extends Enum<E>> E getOption(final String s,
       final Class<E> typ) {
     try {
       return Enum.valueOf(typ, s.toUpperCase(Locale.ENGLISH));
@@ -273,7 +273,7 @@ public abstract class Command extends Progress {
    * @param db database to be closed
    * @return closed flag
    */
-  protected static final boolean close(final Context ctx, final String db) {
+  protected static boolean close(final Context ctx, final String db) {
     final boolean close = ctx.data() != null &&
       db.equals(ctx.data().meta.name) && ctx.datas.pins(db) == 1;
     return close && new Close().run(ctx);
@@ -304,7 +304,7 @@ public abstract class Command extends Progress {
     }
 
     // check concurrency of commands
-    boolean ok = false;
+    boolean ok;
     final boolean writing = updating(ctx);
     ctx.register(writing);
     ok = run(ctx, os);

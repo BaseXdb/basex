@@ -74,8 +74,8 @@ public class AxisStep extends Preds {
    * @param t node test
    * @param p predicates
    */
-  protected AxisStep(final InputInfo ii, final Axis a, final Test t,
-      final Expr... p) {
+  AxisStep(final InputInfo ii, final Axis a, final Test t,
+           final Expr... p) {
     super(ii, p);
     axis = a;
     test = t;

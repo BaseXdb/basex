@@ -36,7 +36,7 @@ public abstract class Preds extends ParseExpr {
    * @param ii input info
    * @param p predicates
    */
-  public Preds(final InputInfo ii, final Expr[] p) {
+  protected Preds(final InputInfo ii, final Expr[] p) {
     super(ii);
     preds = p;
   }

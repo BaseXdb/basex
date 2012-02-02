@@ -18,7 +18,7 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DataFTBuilder {
+final class DataFTBuilder {
   /** Dots. */
   private static final byte[] DOTS = token(Text.DOTS);
   /** Full-text position data. */

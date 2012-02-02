@@ -206,7 +206,7 @@ public final class FNDb extends StandardFunc {
     final QNm nm = new QNm(checkStr(name, ctx), ctx);
     if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(EMPTY));
 
-    final NameTest nt = new NameTest(nm, NameTest.Name.STD, true, input);
+    final NameTest nt = new NameTest(nm, NameTest.Name.STD, true);
     // no results expected: return empty sequence
     if(!nt.comp(ctx)) return Empty.ITER;
 
@@ -428,6 +428,7 @@ public final class FNDb extends StandardFunc {
    */
   static FNode resource(final byte[] path, final boolean raw,
       final long size, final byte[] ctype, final long mdate) {
+
     final FElem res = new FElem(RESOURCE).
         add(new FTxt(path)).
         add(new FAttr(RAW, token(raw))).

@@ -196,9 +196,9 @@ public final class DigitalSignature {
 
       final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
 
-      PrivateKey pk = null;
-      PublicKey puk = null;
-      KeyInfo ki = null;
+      PrivateKey pk;
+      PublicKey puk;
+      KeyInfo ki;
 
       // dealing with given certificate details to initialize the keystore
       if(ce != null) {
@@ -270,7 +270,7 @@ public final class DigitalSignature {
       }
 
       final Document inputNode = toDOMNode(node);
-      List<Transform> tfList = null;
+      List<Transform> tfList;
 
 
       // validating a given XPath expression to get nodes to be signed
@@ -305,8 +305,8 @@ public final class DigitalSignature {
 
 
       // prepare document signature
-      DOMSignContext signContext = null;
-      XMLSignature xmlSig = null;
+      DOMSignContext signContext;
+      XMLSignature xmlSig;
 
       // enveloped signature
       if(eq(type, DEFT)) {
@@ -420,7 +420,7 @@ public final class DigitalSignature {
    * @throws QueryException query exception
    */
   private ANode toDBNode(final Node n) throws QueryException {
-    String xmlString = null;
+    String xmlString;
 
     DBNode dbn = null;
 

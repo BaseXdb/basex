@@ -13,7 +13,7 @@ import org.basex.util.Performance;
  */
 public abstract class Progress {
   /** Stopped flag. */
-  protected boolean stopped;
+  private boolean stopped;
   /** Timeout thread. */
   private Thread timeout;
   /** Sub progress. */
@@ -50,7 +50,7 @@ public abstract class Progress {
    * @param prog progress
    * @return passed on progress reference
    */
-  public final <P extends Progress> P progress(final P prog) {
+  protected final <P extends Progress> P progress(final P prog) {
     sub = prog;
     if(stopped) sub.stop();
     return prog;
@@ -75,7 +75,7 @@ public abstract class Progress {
   /**
    * Aborts a failed or interrupted progress.
    */
-  public void abort() {
+  protected void abort() {
     if(sub != null) sub.abort();
   }
 

@@ -140,8 +140,8 @@ public final class Encryption {
    * @throws IllegalBlockSizeException ex
    * @throws BadPaddingException ex
    */
-  public byte[] encrypt(final byte[] in, final byte[] k,
-      final byte[] a, final int ivl)
+  byte[] encrypt(final byte[] in, final byte[] k,
+                 final byte[] a, final int ivl)
           throws InvalidKeyException, InvalidAlgorithmParameterException,
           NoSuchAlgorithmException, NoSuchPaddingException,
           IllegalBlockSizeException, BadPaddingException {
@@ -178,8 +178,8 @@ public final class Encryption {
    * @throws IllegalBlockSizeException ex
    * @throws BadPaddingException ex
    */
-  public byte[] decrypt(final byte[] in, final byte[] k,
-      final byte[] a, final int ivl)
+  byte[] decrypt(final byte[] in, final byte[] k,
+                 final byte[] a, final int ivl)
           throws NoSuchAlgorithmException,
       NoSuchPaddingException, InvalidKeyException,
       InvalidAlgorithmParameterException, IllegalBlockSizeException,

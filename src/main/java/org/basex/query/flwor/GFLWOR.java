@@ -32,15 +32,15 @@ import org.basex.util.list.ObjList;
  */
 public class GFLWOR extends ParseExpr {
   /** Return expression. */
-  protected Expr ret;
+  Expr ret;
   /** For/Let expression. */
-  protected ForLet[] fl;
+  ForLet[] fl;
   /** Where clause. */
-  protected Expr where;
+  Expr where;
   /** Order clause. */
-  protected Order order;
+  private Order order;
   /** Group by clause. */
-  protected Group group;
+  private Group group;
 
   /**
    * GFLWOR constructor.
@@ -348,7 +348,7 @@ public class GFLWOR extends ParseExpr {
    * @param i index
    * @return number of occurrences
    */
-  public final int count(final Var v, final int i) {
+  final int count(final Var v, final int i) {
     int c = 0;
     for(int f = i; f < fl.length; f++) c += fl[f].count(v);
     if(where != null) c += where.count(v);

@@ -46,7 +46,7 @@ import org.basex.util.list.StringList;
  */
 public final class DialogServer extends Dialog {
   /** Password textfield. */
-  public final BaseXPassword logpass;
+  private final BaseXPassword logpass;
 
   /** Tabulators. */
   final BaseXTabs tabs;
@@ -73,8 +73,6 @@ public final class DialogServer extends Dialog {
   private final Context ctx = gui.context;
   /** Updates log file. */
   private final BaseXButton refreshLog;
-  /** Server panel. */
-  private final BaseXBack conn = new BaseXBack();
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
@@ -120,6 +118,8 @@ public final class DialogServer extends Dialog {
     super(main, S_SERVER_ADMIN);
     databases.border(8);
     tabs = new BaseXTabs(this);
+    /* Server panel. */
+    BaseXBack conn = new BaseXBack();
     tabs.add(S_CONNECT, conn);
     tabs.add(USERS, user);
     tabs.add(DATABASES, databases);

@@ -31,19 +31,19 @@ import org.basex.util.list.IntList;
  */
 public class DiskValues implements Index {
   /** Number of index entries. */
-  protected int size;
+  int size;
   /** ID references. */
-  protected final DataAccess idxr;
+  final DataAccess idxr;
   /** ID lists. */
-  protected final DataAccess idxl;
+  final DataAccess idxl;
   /** Value type (texts/attributes). */
-  protected final boolean text;
+  final boolean text;
   /** Data reference. */
-  protected final Data data;
+  final Data data;
   /** Cached tokens. */
-  protected final IndexCache cache = new IndexCache();
+  final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  protected final IntMap<byte[]> ctext = new IntMap<byte[]>();
+  final IntMap<byte[]> ctext = new IntMap<byte[]>();
 
   /**
    * Constructor, initializing the index structure.
@@ -153,7 +153,7 @@ public class DiskValues implements Index {
    * @param ps offset
    * @return iterator
    */
-  protected IndexIterator iter(final int s, final long ps) {
+  IndexIterator iter(final int s, final long ps) {
     final IntList pres = new IntList(s);
     long p = ps;
     for(int l = 0, v = 0; l < s; ++l) {
@@ -169,7 +169,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  protected IndexIterator idRange(final RangeToken tok) {
+  IndexIterator idRange(final RangeToken tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -206,7 +206,7 @@ public class DiskValues implements Index {
    * @param ids id list
    * @return iterator
    */
-  protected IndexIterator iter(final IntList ids) {
+  IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
       int p = -1;
       int s = ids.size();
@@ -238,7 +238,7 @@ public class DiskValues implements Index {
    * @param pos position of the id-list in {@link #idxl}
    * @return pre value
    */
-  protected int firstpre(final long pos) {
+  int firstpre(final long pos) {
     // read the number of ids in the list
     idxl.readNum(pos);
     return idxl.readNum();
@@ -249,7 +249,7 @@ public class DiskValues implements Index {
    * @param key token to be found
    * @return if the key is found: index of the key else: -(insertion point - 1)
    */
-  protected int get(final byte[] key) {
+  int get(final byte[] key) {
     return get(key, 0, size - 1);
   }
 
@@ -263,7 +263,7 @@ public class DiskValues implements Index {
    * @param last end of the search interval
    * @return if the key is found: index of the key else: -(insertion point - 1)
    */
-  protected int get(final byte[] key, final int first, final int last) {
+  int get(final byte[] key, final int first, final int last) {
     int l = first, h = last;
     while(l <= h) {
       final int m = l + h >>> 1;

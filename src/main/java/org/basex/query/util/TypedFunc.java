@@ -24,7 +24,7 @@ public final class TypedFunc {
    * @param ret return type
    * @param args argument types
    */
-  public TypedFunc(final Expr f, final SeqType ret, final SeqType... args) {
+  private TypedFunc(final Expr f, final SeqType ret, final SeqType... args) {
     this(f, FuncType.get(ret, args));
   }
 

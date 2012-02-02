@@ -176,7 +176,7 @@ public final class CmpR extends Single {
     final AxisPath path = (AxisPath) expr;
     final int st = path.steps.length;
 
-    AxisStep step = null;
+    AxisStep step;
     if(text) {
       step = st == 1 ? ic.step : path.step(st - 2);
       if(!(step.test.test == Name.NAME)) return null;

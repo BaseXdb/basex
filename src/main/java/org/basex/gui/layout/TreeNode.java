@@ -36,8 +36,8 @@ public abstract class TreeNode extends DefaultMutableTreeNode
    * @param bxt tree reference
    * @param d data reference
    */
-  public TreeNode(final byte[] nm, final byte[] pth, final BaseXTree bxt,
-      final Data d) {
+  TreeNode(final byte[] nm, final byte[] pth, final BaseXTree bxt,
+           final Data d) {
     name = nm;
     path = pth;
     tree = bxt;

@@ -84,7 +84,7 @@ public final class DataInput extends BufferInput {
    * @return integer array
    * @throws IOException I/O Exception
    */
-  public int[] readNums(final int s) throws IOException {
+  int[] readNums(final int s) throws IOException {
     final int[] array = new int[s];
     for(int a = 0; a < s; ++a) array[a] = readNum();
     return array;
@@ -139,10 +139,10 @@ public final class DataInput extends BufferInput {
    * @return read value
    * @throws IOException I/O Exception
    */
-  public long read8() throws IOException {
+  long read8() throws IOException {
     return ((long) read() << 56) + ((long) (read() & 255) << 48)
         + ((long) (read() & 255) << 40) + ((long) (read() & 255) << 32)
         + ((long) (read() & 255) << 24) + ((read() & 255) << 16)
-        + ((read() & 255) << 8) + ((read() & 255) << 0);
+        + ((read() & 255) << 8) + ((read() & 255));
   }
 }

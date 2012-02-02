@@ -145,8 +145,7 @@ public final class XMLToken {
     if(i == l) return true;
     if(i == p || v[i] != ':') return false;
     final int j = ncName(v, i + 1);
-    if(j == i + 1 || j != l) return false;
-    return true;
+    return j == l && j != i + 1;
   }
 
   /**

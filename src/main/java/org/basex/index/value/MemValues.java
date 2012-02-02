@@ -24,11 +24,11 @@ import org.basex.util.hash.TokenSet;
  */
 public class MemValues extends TokenSet implements Index {
   /** IDs. */
-  protected int[][] ids = new int[CAP][];
+  int[][] ids = new int[CAP][];
   /** ID array lengths. */
-  protected int[] len = new int[CAP];
+  int[] len = new int[CAP];
   /** Data instance. */
-  protected final Data data;
+  final Data data;
 
   /**
    * Constructor.

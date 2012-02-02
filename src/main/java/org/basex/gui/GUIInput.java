@@ -32,9 +32,9 @@ public final class GUIInput extends BaseXTextField {
   final GUI gui;
   /** JComboBox. */
   final BaseXCombo box;
-
   /** BasicComboPopup Menu. */
   ComboPopup pop;
+
   /** String for temporary input. */
   private String pre = "";
 
@@ -197,7 +197,7 @@ public final class GUIInput extends BaseXTextField {
     final Data data = gui.context.data();
     if(data == null || !data.meta.pathindex) return;
 
-    StringList sl = null;
+    StringList sl;
     try {
       final QuerySuggest qs = new QuerySuggest(query,
           new QueryContext(gui.context), data);

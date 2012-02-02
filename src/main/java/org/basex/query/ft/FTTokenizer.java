@@ -19,13 +19,9 @@ import org.basex.util.list.TokenList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class FTTokenizer {
+final class FTTokenizer {
   /** Wildcard object cache. */
-  public TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
-  /** Token comparator. */
-  private final TokenComparator cmp;
-  /** Cache. */
-  final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
+  TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
   /** Levenshtein reference. */
   final Levenshtein ls = new Levenshtein();
   /** Calling expression. */
@@ -34,6 +30,11 @@ public final class FTTokenizer {
   final FTOpt opt;
   /** Levenshtein error. */
   final int lserr;
+
+  /** Token comparator. */
+  private final TokenComparator cmp;
+  /** Cache. */
+  private final TokenObjMap<FTTokens> cache = new TokenObjMap<FTTokens>();
 
   /**
    * Constructor.

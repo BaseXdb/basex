@@ -74,7 +74,7 @@ public final class FNNum extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  public static Item abs(final Item it, final InputInfo ii)
+  private static Item abs(final Item it, final InputInfo ii)
       throws QueryException {
 
     final double d = it.dbl(ii);

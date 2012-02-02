@@ -36,8 +36,6 @@ public final class DialogExport extends Dialog {
   private final BaseXTextField path;
   /** Database info. */
   private final BaseXLabel info;
-  /** Output label. */
-  private final BaseXLabel out;
   /** XML formatting. */
   private final BaseXCheckBox format;
   /** Encoding. */
@@ -62,7 +60,9 @@ public final class DialogExport extends Dialog {
     final BaseXBack pp = new BaseXBack(new TableLayout(3, 1, 0, 4));
 
     BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 0));
-    out = new BaseXLabel(OUTPUT_DIR + COL, true, true).border(0, 0, 4, 0);
+    /* Output label. */
+    final BaseXLabel out = new BaseXLabel(
+        OUTPUT_DIR + COL, true, true).border(0, 0, 4, 0);
     p.add(out);
     p.add(new BaseXLabel());
 
@@ -83,7 +83,7 @@ public final class DialogExport extends Dialog {
     p.add(new BaseXLabel(ENCODING + COL, true, true).border(0, 0, 4, 0));
 
     final Prop prop = gui.context.prop;
-    SerializerProp sp = null;
+    SerializerProp sp;
     try {
       sp = new SerializerProp(prop.get(Prop.EXPORTER));
     } catch(final IOException ex) {

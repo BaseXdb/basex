@@ -19,14 +19,15 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 final class DialogMessage extends Dialog {
-  /** This flag indicates if the dialog was canceled. */
-  boolean canceled = true;
   /** Ok/yes button. */
   BaseXButton yes;
+
+  /** This flag indicates if the dialog was canceled. */
+  private boolean canceled = true;
   /** No button. */
-  BaseXButton no;
+  private BaseXButton no;
   /** Cancel button. */
-  BaseXButton cancel;
+  private BaseXButton cancel;
 
   /**
    * Default constructor.

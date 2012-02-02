@@ -51,7 +51,7 @@ public final class JarLoader extends URLClassLoader {
    * @return result
    */
   @SuppressWarnings({ "unchecked" })
-  public boolean cleanupJarFileFactory() {
+  boolean cleanupJarFileFactory() {
     boolean res = false;
     Class<?> classJarURLConnection = null;
     try {
@@ -165,7 +165,7 @@ public final class JarLoader extends URLClassLoader {
    * @return result
    */
   @SuppressWarnings({ "unchecked" })
-  public boolean closeClassLoader(final ClassLoader cl) {
+  boolean closeClassLoader(final ClassLoader cl) {
     boolean res = false;
     if(cl == null) {
       return res;
@@ -240,7 +240,7 @@ public final class JarLoader extends URLClassLoader {
    * @return result
    */
   @SuppressWarnings({ "unchecked" })
-  public boolean finalizeNativeLibs(final ClassLoader cl) {
+  boolean finalizeNativeLibs(final ClassLoader cl) {
     boolean res = false;
     final Class<?> classClassLoader = ClassLoader.class;
     Field nativeLibraries = null;
@@ -274,7 +274,7 @@ public final class JarLoader extends URLClassLoader {
       if(finalize != null) {
         finalize.setAccessible(true);
         try {
-          finalize.invoke(lib, new Object[0]);
+          finalize.invoke(lib);
         } catch(final IllegalAccessException ex) {
           Util.errln(ex);
         } catch(final InvocationTargetException ex) {

@@ -37,14 +37,14 @@ public abstract class Dialog extends JDialog {
   /** Reference to main window. */
   public final GUI gui;
   /** Reference to the root panel. */
-  protected final BaseXBack panel;
+  final BaseXBack panel;
   /** Remembers if the window was correctly closed. */
-  protected boolean ok;
+  boolean ok;
   /** Dialog position. */
   private int[] loc;
 
   /** Key listener, triggering an action with each click. */
-  protected final KeyAdapter keys = new KeyAdapter() {
+  final KeyAdapter keys = new KeyAdapter() {
     @Override
     public void keyReleased(final KeyEvent e) {
       if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);
@@ -56,7 +56,7 @@ public abstract class Dialog extends JDialog {
    * @param main reference to main window
    * @param title dialog title
    */
-  protected Dialog(final GUI main, final String title) {
+  Dialog(final GUI main, final String title) {
     this(main, title, true);
   }
 
@@ -66,7 +66,7 @@ public abstract class Dialog extends JDialog {
    * @param title dialog title
    * @param modal modal flag
    */
-  protected Dialog(final GUI main, final String title, final boolean modal) {
+  Dialog(final GUI main, final String title, final boolean modal) {
     super(main, title, modal);
     gui = main;
     panel = new BaseXBack(new BorderLayout()).border(10, 10, 10, 10);
@@ -85,7 +85,7 @@ public abstract class Dialog extends JDialog {
    * @param comp component to be added
    * @param pos layout position
    */
-  protected final void set(final Component comp, final String pos) {
+  final void set(final Component comp, final String pos) {
     panel.add(comp, pos);
   }
 
@@ -93,7 +93,7 @@ public abstract class Dialog extends JDialog {
    * Finalizes the dialog layout and sets it visible.
    * @param l optional dialog location, relative to main window
    */
-  protected final void finish(final int[] l) {
+  final void finish(final int[] l) {
     pack();
     if(l == null) setLocationRelativeTo(gui);
     else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
@@ -156,7 +156,7 @@ public abstract class Dialog extends JDialog {
    * Creates a OK and CANCEL button.
    * @return button list
    */
-  protected BaseXBack okCancel() {
+  BaseXBack okCancel() {
     return newButtons(B_OK, CANCEL);
   }
 
@@ -165,13 +165,13 @@ public abstract class Dialog extends JDialog {
    * @param buttons button names or objects
    * @return button list
    */
-  protected BaseXBack newButtons(final Object... buttons) {
+  BaseXBack newButtons(final Object... buttons) {
     // horizontal/vertical layout
     final BaseXBack pnl = new BaseXBack(Fill.NONE).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
     for(final Object obj : buttons) {
-      BaseXButton b = null;
+      BaseXButton b;
       if(obj instanceof BaseXButton) {
         b = (BaseXButton) obj;
       } else {
@@ -191,8 +191,8 @@ public abstract class Dialog extends JDialog {
    * @param label button label
    * @param enabled enabled/disabled
    */
-  protected static void enableOK(final JComponent panel, final String label,
-      final boolean enabled) {
+  static void enableOK(final JComponent panel, final String label,
+                       final boolean enabled) {
 
     for(final Component c : panel.getComponents()) {
       if(!(c instanceof JComponent)) {

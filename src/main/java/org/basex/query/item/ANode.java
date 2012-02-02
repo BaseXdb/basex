@@ -42,15 +42,15 @@ public abstract class ANode extends Item {
   public final int id = ++sid;
 
   /** Cached string value. */
-  protected byte[] val;
+  byte[] val;
   /** Parent node. */
-  protected ANode par;
+  ANode par;
 
   /**
    * Constructor.
    * @param t data type
    */
-  protected ANode(final NodeType t) {
+  ANode(final NodeType t) {
     super(t);
   }
 
@@ -392,7 +392,7 @@ public abstract class ANode extends Item {
    * @param ch child nodes
    * @param nc node cache
    */
-  protected final void addDesc(final AxisMoreIter ch, final NodeCache nc) {
+  final void addDesc(final AxisMoreIter ch, final NodeCache nc) {
     for(ANode n; (n = ch.next()) != null;) {
       nc.add(n.finish());
       addDesc(n.children(), nc);

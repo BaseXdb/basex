@@ -53,7 +53,7 @@ public final class BitArray {
    * Initialize the bit array with a new size. All bits will be set to 0.
    * @param n initial number of bits (> 0)
    */
-  public void init(final int n) {
+  void init(final int n) {
     setWords(new long[(Math.max(0, n - 1) >>> WORD_POWER) + 1], n);
   }
 

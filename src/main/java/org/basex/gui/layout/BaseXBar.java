@@ -44,8 +44,6 @@ public final class BaseXBar extends BaseXPanel {
   int dragPos;
   /** Flag for button clicks. */
   boolean button;
-  /** Flag for scrolling upward. */
-  boolean up;
   /** Flag for scrolling downward. */
   boolean down;
   /** Flag for sliding the scrollbar. */
@@ -57,6 +55,8 @@ public final class BaseXBar extends BaseXPanel {
   /** Current panel height. */
   int height;
 
+  /** Flag for scrolling upward. */
+  private boolean up;
   /** Scrollbar slider offset. */
   private int barOffset;
   /** Flag for permanent scrollbar visibility. */

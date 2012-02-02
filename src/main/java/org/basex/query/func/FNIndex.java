@@ -38,23 +38,23 @@ import org.basex.util.hash.TokenIntMap;
  */
 public final class FNIndex extends StandardFunc {
   /** Name: name. */
-  protected static final QNm Q_NAME = new QNm(NAM);
+  static final QNm Q_NAME = new QNm(NAM);
   /** Name: count. */
-  protected static final QNm Q_COUNT = new QNm(COUNT);
+  static final QNm Q_COUNT = new QNm(COUNT);
   /** Name: type. */
-  protected static final QNm Q_TYPE = new QNm(TYP);
+  static final QNm Q_TYPE = new QNm(TYP);
   /** Name: value. */
-  protected static final QNm Q_VALUE = new QNm(VAL);
+  static final QNm Q_VALUE = new QNm(VAL);
   /** Name: min. */
-  protected static final QNm Q_MIN = new QNm(MIN);
+  static final QNm Q_MIN = new QNm(MIN);
   /** Name: max. */
-  protected static final QNm Q_MAX = new QNm(MAX);
+  static final QNm Q_MAX = new QNm(MAX);
   /** Name: elements. */
-  protected static final QNm Q_ELM = new QNm(NodeType.ELM.string());
+  static final QNm Q_ELM = new QNm(NodeType.ELM.string());
   /** Name: attributes. */
-  protected static final QNm Q_ATT = new QNm(NodeType.ATT.string());
+  static final QNm Q_ATT = new QNm(NodeType.ATT.string());
   /** Flag: flat output. */
-  protected static final byte[] FLAT = token("flat");
+  static final byte[] FLAT = token("flat");
 
   /**
    * Constructor.

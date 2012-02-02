@@ -19,7 +19,7 @@ import org.basex.util.Util;
  */
 public final class MimeTypes {
   /** Media type: text/xml. */
-  public static final String TEXT_XML = "text/xml";
+  private static final String TEXT_XML = "text/xml";
   /** Media type: text/html. */
   public static final String TEXT_HTML = "text/html";
   /** Media type: text/plain. */
@@ -34,13 +34,13 @@ public final class MimeTypes {
   public static final String APP_JSON = "application/json";
 
   /** XML media type. */
-  public static final String APPL_EXT_XML =
+  private static final String APPL_EXT_XML =
       "application/xml-external-parsed-entity";
   /** XML media type. */
-  public static final String TXT_EXT_XML =
+  private static final String TXT_EXT_XML =
       "text/xml-external-parsed-entity";
   /** XML media types' suffix. */
-  public static final String MIME_XML_SUFFIX = "+xml";
+  private static final String MIME_XML_SUFFIX = "+xml";
   /** Text media types' prefix. */
   public static final String MIME_TEXT_PREFIX = "text/";
 

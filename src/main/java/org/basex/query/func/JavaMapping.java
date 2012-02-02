@@ -56,9 +56,9 @@ import org.w3c.dom.Text;
  */
 public abstract class JavaMapping extends Arr {
   /** New keyword. */
-  protected static final String NEW = "new";
+  static final String NEW = "new";
   /** Input Java types. */
-  protected static final Class<?>[] JAVA = {
+  private static final Class<?>[] JAVA = {
     String.class,     boolean.class,  Boolean.class,      byte.class,
     Byte.class,       short.class,    Short.class,        int.class,
     Integer.class,    long.class,     Long.class,         float.class,
@@ -67,7 +67,7 @@ public abstract class JavaMapping extends Arr {
     Character.class,  URI.class,      URL.class,          Map.class
   };
   /** Resulting XQuery types. */
-  protected static final Type[] XQUERY = {
+  private static final Type[] XQUERY = {
     AtomType.STR, AtomType.BLN, AtomType.BLN, AtomType.BYT,
     AtomType.BYT, AtomType.SHR, AtomType.SHR, AtomType.INT,
     AtomType.INT, AtomType.LNG, AtomType.LNG, AtomType.FLT,
@@ -81,7 +81,7 @@ public abstract class JavaMapping extends Arr {
    * @param ii input info
    * @param a arguments
    */
-  protected JavaMapping(final InputInfo ii, final Expr[] a) {
+  JavaMapping(final InputInfo ii, final Expr[] a) {
     super(ii, a);
   }
 
@@ -239,7 +239,7 @@ public abstract class JavaMapping extends Arr {
    * @param type Java type
    * @return xquery type
    */
-  protected static Type type(final Class<?> type) {
+  static Type type(final Class<?> type) {
     for(int j = 0; j < JAVA.length; ++j) {
       if(JAVA[j].isAssignableFrom(type)) return XQUERY[j];
     }

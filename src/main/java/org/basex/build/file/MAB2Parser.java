@@ -61,46 +61,6 @@ public final class MAB2Parser extends SingleParser {
   /** Input to be parsed. */
   private final DataAccess input;
 
-  /** Temporary build data. */
-  private byte[] mvID;
-  /** Temporary build data. */
-  private byte[] bibID;
-  /** Temporary build data. */
-  private byte[] title;
-  /** Temporary build data. */
-  private byte[] description;
-  /** Temporary build data. */
-  private byte[] type;
-  /** Temporary build data. */
-  private byte[] language;
-  /** Temporary build data. */
-  private byte[] original;
-  /** Temporary build data. */
-  private byte[] subtitle;
-  /** Temporary build data. */
-  private byte[] town;
-  /** Temporary build data. */
-  private byte[] publisher;
-  /** Temporary build data. */
-  private byte[] year;
-  /** Temporary build data. */
-  private byte[] format;
-  /** Temporary build data. */
-  private byte[] details;
-  /** Temporary build data. */
-  private byte[] note;
-  /** Temporary build data. */
-  private byte[] isbn;
-  /** Temporary build data. */
-  private byte[] subject;
-  /** Temporary build data. */
-  private int nrSigs;
-  /** Temporary build data. */
-  private int nrAuth;
-  /** Temporary build data. */
-  private int nrInst;
-  /** Temporary build data. */
-  private boolean shortTitle;
   /** Temporary read position. */
   private long off;
   /** Maximum id. */
@@ -285,26 +245,46 @@ public final class MAB2Parser extends SingleParser {
   private byte[] addEntry(final DataAccess in, final long pos, final int sb,
       final byte[] last) throws IOException {
 
-    mvID = null;
-    bibID = null;
-    title = null;
-    description = null;
-    type = null;
-    language = null;
-    original = null;
-    subtitle = null;
-    town = null;
-    publisher = null;
-    year = null;
-    format = null;
-    details = null;
-    note = null;
-    isbn = null;
-    subject = null;
-    nrSigs = 0;
-    nrAuth = 0;
-    nrInst = 0;
-    shortTitle = false;
+    /* Temporary build data. */
+    byte[] mvID = null;
+    /* Temporary build data. */
+    byte[] bibID = null;
+    /* Temporary build data. */
+    byte[] title = null;
+    /* Temporary build data. */
+    byte[] description = null;
+    /* Temporary build data. */
+    byte[] type = null;
+    /* Temporary build data. */
+    byte[] language = null;
+    /* Temporary build data. */
+    byte[] original = null;
+    /* Temporary build data. */
+    byte[] subtitle = null;
+    /* Temporary build data. */
+    byte[] town = null;
+    /* Temporary build data. */
+    byte[] publisher = null;
+    /* Temporary build data. */
+    byte[] year = null;
+    /* Temporary build data. */
+    byte[] format = null;
+    /* Temporary build data. */
+    byte[] details = null;
+    /* Temporary build data. */
+    byte[] note = null;
+    /* Temporary build data. */
+    byte[] isbn = null;
+    /* Temporary build data. */
+    byte[] subject = null;
+    /* Temporary build data. */
+    int nrSigs = 0;
+    /* Temporary build data. */
+    int nrAuth = 0;
+    /* Temporary build data. */
+    int nrInst = 0;
+    /* Temporary build data. */
+    boolean shortTitle = false;
 
     // position disk cursor
     in.cursor(pos);

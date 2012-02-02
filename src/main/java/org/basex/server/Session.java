@@ -24,7 +24,7 @@ public abstract class Session {
   /** Client output stream. */
   protected OutputStream out;
   /** Command info. */
-  protected String info;
+  String info;
 
   /**
    * Executes a {@link Command} and returns the result as string or serializes
@@ -127,7 +127,7 @@ public abstract class Session {
    * @param output client output stream; if set to {@code null}, all
    * results will be returned as strings.
    */
-  protected Session(final OutputStream output) {
+  Session(final OutputStream output) {
     out = output;
   }
 

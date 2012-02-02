@@ -157,7 +157,7 @@ public final class DirParser extends TargetParser {
       }
     }
     return tb.toString();
-  };
+  }
 
   @Override
   public String det() {

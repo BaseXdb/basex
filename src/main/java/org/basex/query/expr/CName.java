@@ -27,7 +27,7 @@ public abstract class CName extends CFrag {
   /** Description. */
   private final String desc;
   /** QName. */
-  protected Expr name;
+  Expr name;
 
   /**
    * Constructor.
@@ -36,8 +36,8 @@ public abstract class CName extends CFrag {
    * @param n name
    * @param v attribute values
    */
-  public CName(final String d, final InputInfo ii, final Expr n,
-      final Expr... v) {
+  CName(final String d, final InputInfo ii, final Expr n,
+        final Expr... v) {
     super(ii, v);
     name = n;
     desc = d;
@@ -57,7 +57,7 @@ public abstract class CName extends CFrag {
    * @return resulting value
    * @throws QueryException query exception
    */
-  protected final byte[] value(final QueryContext ctx, final InputInfo ii)
+  final byte[] value(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final TokenBuilder tb = new TokenBuilder();
@@ -80,7 +80,7 @@ public abstract class CName extends CFrag {
    * @return result
    * @throws QueryException query exception
    */
-  protected final QNm qname(final QueryContext ctx, final InputInfo ii)
+  final QNm qname(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final Item it = checkItem(name, ctx);

@@ -14,7 +14,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JSONParser extends InputParser {
+final class JSONParser extends InputParser {
   /** Error: invalid character. */
   private static final String INVALID = "Invalid character: \"%\"";
   /** Error: invalid and expected character. */

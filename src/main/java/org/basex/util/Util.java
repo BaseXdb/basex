@@ -263,7 +263,7 @@ public final class Util {
    * @param th throwable
    * @return string array
    */
-  public static String[] toArray(final Throwable th) {
+  private static String[] toArray(final Throwable th) {
     final StackTraceElement[] st = th.getStackTrace();
     final String[] obj = new String[st.length + 1];
     obj[0] = th.toString();

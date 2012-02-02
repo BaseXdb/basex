@@ -16,14 +16,14 @@ import org.basex.util.Token;
  */
 public abstract class Bin extends Item {
   /** Binary data. */
-  protected byte[] data;
+  byte[] data;
 
   /**
    * Constructor.
    * @param d binary data
    * @param t type
    */
-  protected Bin(final byte[] d, final Type t) {
+  Bin(final byte[] d, final Type t) {
     super(t);
     data = d;
   }
@@ -35,7 +35,7 @@ public abstract class Bin extends Item {
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected byte[] val(final InputInfo ii) throws QueryException {
+  byte[] val(final InputInfo ii) throws QueryException {
     return data;
   }
 

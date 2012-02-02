@@ -8,7 +8,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
-import org.basex.util.InputInfo;
 
 /**
  * Name test.
@@ -17,18 +16,15 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
-  /** Input information. */
-  public final InputInfo input;
   /** Local name. */
   public final byte[] ln;
 
   /**
    * Empty constructor ('*').
    * @param att attribute flag
-   * @param ii input info
    */
-  public NameTest(final boolean att, final InputInfo ii) {
-    this(null, Name.ALL, att, ii);
+  public NameTest(final boolean att) {
+    this(null, Name.ALL, att);
   }
 
   /**
@@ -36,15 +32,12 @@ public final class NameTest extends Test {
    * @param nm name
    * @param t type of name test
    * @param att attribute flag
-   * @param ii input info
    */
-  public NameTest(final QNm nm, final Name t, final boolean att,
-      final InputInfo ii) {
+  public NameTest(final QNm nm, final Name t, final boolean att) {
     type = att ? NodeType.ATT : NodeType.ELM;
     ln = nm != null ? nm.local() : null;
     name = nm;
     test = t;
-    input = ii;
   }
 
   @Override

@@ -21,7 +21,7 @@ import org.basex.util.Util;
  */
 public final class ViewNotifier {
   /** Large database size (minimum database size to show warning). */
-  public static final long LARGEDB = 200000000;
+  private static final long LARGEDB = 200000000;
   /** Maximum history size. */
   public static final int MAXHIST = 20;
   /** History pointer. */
@@ -155,7 +155,7 @@ public final class ViewNotifier {
     final Context context = gui.context;
 
     // browse back/forward
-    String query = "";
+    String query;
     if(forward) {
       if(hist == maxhist) return;
       query = queries[++hist];

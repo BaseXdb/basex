@@ -29,7 +29,7 @@ public abstract class FTExpr extends ParseExpr {
    * @param ii input info
    * @param e expression
    */
-  protected FTExpr(final InputInfo ii, final FTExpr... e) {
+  FTExpr(final InputInfo ii, final FTExpr... e) {
     super(ii);
     expr = e;
     type = SeqType.BLN;
@@ -95,7 +95,7 @@ public abstract class FTExpr extends ParseExpr {
    * Checks if sub expressions of a mild not operator violate the grammar.
    * @return result of check
    */
-  protected boolean usesExclude() {
+  boolean usesExclude() {
     for(final FTExpr e : expr) if(e.usesExclude()) return true;
     return false;
   }
@@ -112,7 +112,7 @@ public abstract class FTExpr extends ParseExpr {
    * @param sep separator
    * @return string representation
    */
-  protected final String toString(final Object sep) {
+  final String toString(final Object sep) {
     final StringBuilder sb = new StringBuilder();
     for(int e = 0; e != expr.length; ++e) {
       sb.append((e != 0 ? sep.toString() : "") + expr[e]);

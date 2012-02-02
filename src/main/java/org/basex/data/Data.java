@@ -109,9 +109,9 @@ public abstract class Data {
   public int sizeID;
 
   /** Table access file. */
-  protected TableAccess table;
+  TableAccess table;
   /** ID->PRE mapping. */
-  protected IdPreMap idmap;
+  IdPreMap idmap;
 
   /**
    * Dissolves the references to often used tag names and attributes.
@@ -204,7 +204,7 @@ public abstract class Data {
    * @param type index type
    * @return index
    */
-  protected final Index index(final IndexType type) {
+  final Index index(final IndexType type) {
     switch(type) {
       case TAG:       return tagindex;
       case ATTNAME:   return atnindex;
@@ -262,7 +262,7 @@ public abstract class Data {
    * @param id unique node id
    * @return pre value or -1 if id was not found
    */
-  public final int preold(final int id) {
+  final int preold(final int id) {
     // find pre value in table
     for(int p = Math.max(0, id); p < meta.size; ++p)
       if(id == id(p)) return p;
@@ -451,7 +451,7 @@ public abstract class Data {
    * @param pre pre value
    * @return disk offset
    */
-  protected final long textOff(final int pre) {
+  final long textOff(final int pre) {
     return table.read5(pre, 3);
   }
 
@@ -924,7 +924,7 @@ public abstract class Data {
    * @param pre pre value
    * @param off offset
    */
-  protected final void textOff(final int pre, final long off) {
+  final void textOff(final int pre, final long off) {
     table.write5(pre, 3, off);
   }
 
@@ -995,7 +995,7 @@ public abstract class Data {
    * Sets the update buffer to a new size.
    * @param size number of table entries
    */
-  public final void buffer(final int size) {
+  final void buffer(final int size) {
     final int bs = size << IO.NODEPOWER;
     if(b.length != bs) b = new byte[bs];
   }
@@ -1125,10 +1125,10 @@ public abstract class Data {
       final int kind);
 
   /** Notify the index structures that an update operation is started. */
-  protected void indexBegin() { }
+  void indexBegin() { }
 
   /** Notify the index structures that an update operation is finished. */
-  protected void indexEnd() { }
+  void indexEnd() { }
 
   /**
    * Delete a node and its descendants from the corresponding indexes.
@@ -1144,7 +1144,7 @@ public abstract class Data {
    * @param end end pre value
    * @return table
    */
-  public final String toString(final int start, final int end) {
+  final String toString(final int start, final int end) {
     return string(InfoStorage.table(this, start, end));
   }
 

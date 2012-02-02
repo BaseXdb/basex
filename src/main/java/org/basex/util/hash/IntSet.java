@@ -11,11 +11,11 @@ import java.util.Arrays;
  */
 public class IntSet {
   /** Initial hash capacity. */
-  protected static final int CAP = 1 << 3;
+  static final int CAP = 1 << 3;
   /** Hash entries. Actual hash size is {@code size - 1}. */
-  protected int size = 1;
+  int size = 1;
   /** Hash keys. */
-  protected int[] keys;
+  int[] keys;
 
   /** Pointers to the next token. */
   private int[] next;
@@ -54,7 +54,7 @@ public class IntSet {
    * @param key key to be found
    * @return id or 0 if nothing was found
    */
-  public final int id(final int key) {
+  final int id(final int key) {
     final int p = key & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
       if(key == keys[id]) return id;
@@ -82,7 +82,7 @@ public class IntSet {
   /**
    * Resizes the hash table.
    */
-  protected void rehash() {
+  void rehash() {
     final int s = size << 1;
     final int[] tmp = new int[s];
 

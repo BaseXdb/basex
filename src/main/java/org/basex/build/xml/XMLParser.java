@@ -171,7 +171,7 @@ public class XMLParser extends SingleParser {
   }
 
   @Override
-  public final String det() {
+  protected final String det() {
     return scanner.det();
   }
 

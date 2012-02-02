@@ -29,7 +29,7 @@ public final class ItemSeq extends Seq {
    * @param it items
    * @param s size
    */
-  protected ItemSeq(final Item[] it, final int s) {
+  ItemSeq(final Item[] it, final int s) {
     super(s);
     item = it;
   }

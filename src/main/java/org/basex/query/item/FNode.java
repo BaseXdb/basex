@@ -20,7 +20,7 @@ public abstract class FNode extends ANode {
    * Constructor.
    * @param t data type
    */
-  protected FNode(final NodeType t) {
+  FNode(final NodeType t) {
     super(t);
   }
 
@@ -135,7 +135,7 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  protected final AxisMoreIter iter(final NodeCache iter) {
+  final AxisMoreIter iter(final NodeCache iter) {
     return new AxisMoreIter() {
       /** Child counter. */ int c;
       @Override
@@ -158,7 +158,7 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  protected final byte[] string(final NodeCache iter) {
+  final byte[] string(final NodeCache iter) {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < iter.size(); ++c) {

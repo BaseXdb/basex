@@ -31,11 +31,11 @@ public final class PoolTest {
   private static final String NAME = Util.name(PoolTest.class);
 
   /** Server reference. */
-  static BaseXServer server;
+  private static BaseXServer server;
   /** Socket reference. */
-  static Session session1;
+  private static Session session1;
   /** Socket reference. */
-  static Session session2;
+  private static Session session2;
 
   /**
    * Starts the server.

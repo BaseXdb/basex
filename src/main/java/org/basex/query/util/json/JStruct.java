@@ -10,7 +10,7 @@ import org.basex.util.list.ObjList;
  */
 abstract class JStruct extends JValue {
   /** Values. */
-  final ObjList<JValue> nodes = new ObjList<JValue>();
+  private final ObjList<JValue> nodes = new ObjList<JValue>();
 
   /**
    * Adds a child.

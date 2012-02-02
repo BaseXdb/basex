@@ -47,8 +47,6 @@ import org.basex.gui.layout.TreeRootFolder;
  * @author Lukas Kircher
  */
 public class DialogResources extends BaseXBack {
-  /** Resource tree. */
-  final BaseXTree tree;
   /** Search text field. */
   final BaseXTextField filterText;
   /** Database/root node. */
@@ -56,6 +54,8 @@ public class DialogResources extends BaseXBack {
   /** Dialog reference. */
   final DialogProps dialog;
 
+  /** Resource tree. */
+  private final BaseXTree tree;
   /** Filter button. */
   private final BaseXButton filter;
   /** Clear button. */

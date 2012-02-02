@@ -25,7 +25,7 @@ public final class TableDiskAccess extends TableAccess {
   /** File storing all blocks. */
   private final RandomAccessFile file;
   /** Filename prefix. */
-  final String pref;
+  private final String pref;
 
   /** FirstPre values (sorted ascending; length={@link #allBlocks}). */
   private int[] fpres;

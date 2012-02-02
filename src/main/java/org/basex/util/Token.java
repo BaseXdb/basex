@@ -36,7 +36,7 @@ public final class Token {
   /** Token 'null'. */
   public static final byte[] NULL = token("null");
   /** Token 'NaN'. */
-  public static final byte[] NAN = token("NaN");
+  private static final byte[] NAN = token("NaN");
   /** Token 'INF'. */
   public static final byte[] INF = token("INF");
   /** Token '-INF'. */
@@ -46,7 +46,7 @@ public final class Token {
   /** Digit '0'. */
   public static final byte[] ZERO = { '0' };
   /** Digit '-0'. */
-  public static final byte[] MZERO = { '-', '0' };
+  private static final byte[] MZERO = { '-', '0' };
   /** Digit '1'. */
   public static final byte[] ONE = { '1' };
   /** Slash. */
@@ -66,9 +66,9 @@ public final class Token {
   /** UTF8 encoding string (variant). */
   public static final String UTF82 = "UTF8";
   /** UTF16 encoding string. */
-  public static final String UTF16 = "UTF-16";
+  private static final String UTF16 = "UTF-16";
   /** UTF16 encoding string. */
-  public static final String UTF162 = "UTF16";
+  private static final String UTF162 = "UTF16";
   /** UTF16BE (=UTF16) encoding string. */
   public static final String UTF16BE = "UTF-16BE";
   /** UTF16 encoding string. */
