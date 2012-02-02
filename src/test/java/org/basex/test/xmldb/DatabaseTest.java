@@ -10,7 +10,6 @@ import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
-import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB/API Database implementation.

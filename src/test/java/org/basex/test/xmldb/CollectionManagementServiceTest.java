@@ -10,7 +10,6 @@ import org.xmldb.api.base.Database;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.modules.CollectionManagementService;
 import org.xmldb.api.modules.XMLResource;
-import junit.framework.TestCase;
 
 /**
  * This class tests the XMLDB/API CollectionManagementService implementation.
