@@ -12,7 +12,7 @@ COMPILING BASEX --------------------------------------------------------
  or don't have JUnit installed, just delete the 'test' package inside
  the project and rebuild the project.
 
- See http://docs.basex.org/wiki/Maven for how use Maven.
+ See http://docs.basex.org/wiki/Maven for information on how to use Maven.
 
  You can launch the following classes, which are all placed in the main
  package org.basex:
