@@ -271,10 +271,9 @@ public abstract class Expr extends ExprInfo {
    * Optionally adds a text node to an expression for potential index rewriting.
    * @param ctx query context
    * @return expression
-   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr addText(final QueryContext ctx) throws QueryException {
+  public Expr addText(final QueryContext ctx) {
     return this;
   }
 

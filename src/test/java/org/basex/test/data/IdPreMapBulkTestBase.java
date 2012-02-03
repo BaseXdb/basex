@@ -96,12 +96,12 @@ public abstract class IdPreMapBulkTestBase {
 
     /**
      * Constructor.
-     * @param i initial list of ids.
+     * @param list initial list of ids.
      */
-    public DummyIdPreMap(final int[] i) {
-      super(i.length - 1);
-      idlist = new ArrayList<Integer>(i.length);
-      for(int k = 0; k < i.length; ++k) idlist.add(i[k]);
+    public DummyIdPreMap(final int[] list) {
+      super(list.length - 1);
+      idlist = new ArrayList<Integer>(list.length);
+      for(final int l : list) idlist.add(l);
     }
 
     @Override

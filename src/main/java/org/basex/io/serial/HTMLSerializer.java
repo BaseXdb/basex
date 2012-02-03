@@ -101,7 +101,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    if(ct(false, true)) return;
+    ct(false, true);
   }
 
   @Override

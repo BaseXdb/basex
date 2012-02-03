@@ -208,8 +208,8 @@ public class DiskValues implements Index {
    */
   IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
+      final int s = ids.size();
       int p = -1;
-      int s = ids.size();
 
       @Override
       public boolean more() {

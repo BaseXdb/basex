@@ -104,9 +104,9 @@ public final class FTOr extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     int is = 0;
-    for(int i = 0; i < expr.length; ++i) {
+    for(final FTExpr e : expr) {
       // no index access if negative operators is found
-      if(!expr[i].indexAccessible(ic) || ic.not) return false;
+      if(!e.indexAccessible(ic) || ic.not) return false;
       ic.not = false;
       is = Math.min(Integer.MIN_VALUE, is + ic.costs());
     }

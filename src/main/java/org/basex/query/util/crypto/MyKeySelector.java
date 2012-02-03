@@ -58,33 +58,33 @@ class MyKeySelector extends KeySelector {
 
     final SignatureMethod sm = (SignatureMethod) m;
     @SuppressWarnings("unchecked")
-    final List<Object> l = ki.getContent();
+    final List<Object> list = ki.getContent();
 
-    for(int i = 0; i < l.size(); i++) {
-        final XMLStructure s = (XMLStructure) l.get(i);
-        PublicKey pk = null;
-        if(s instanceof KeyValue) {
-          try {
-            pk = ((KeyValue) s).getPublicKey();
-          } catch(final KeyException ke) {
-            throw new KeySelectorException(ke);
-          }
-
-        } else if(s instanceof X509Data) {
-          for(final Object d : ((X509Data) s).getContent())
-            if(d instanceof X509Certificate)
-                pk = ((X509Certificate) d).getPublicKey();
+    for(final Object l : list) {
+      final XMLStructure s = (XMLStructure) l;
+      PublicKey pk = null;
+      if(s instanceof KeyValue) {
+        try {
+          pk = ((KeyValue) s).getPublicKey();
+        } catch(final KeyException ke) {
+          throw new KeySelectorException(ke);
         }
 
-        if(pk != null) {
-          final String sa = sm.getAlgorithm();
-          final String ka = pk.getAlgorithm();
-          if(ka.equalsIgnoreCase("DSA") && sa.equalsIgnoreCase(
-              "http://www.w3.org/2000/09/xmldsig#dsa-sha1") ||
-              ka.equalsIgnoreCase("RSA") && sa.equalsIgnoreCase(
-                  "http://www.w3.org/2000/09/xmldsig#rsa-sha1"))
-            return new MyKeySelectorResult(pk);
-        }
+      } else if(s instanceof X509Data) {
+        for(final Object d : ((X509Data) s).getContent())
+          if(d instanceof X509Certificate)
+            pk = ((X509Certificate) d).getPublicKey();
+      }
+
+      if(pk != null) {
+        final String sa = sm.getAlgorithm();
+        final String ka = pk.getAlgorithm();
+        if(ka.equalsIgnoreCase("DSA") && sa.equalsIgnoreCase(
+                "http://www.w3.org/2000/09/xmldsig#dsa-sha1") ||
+                ka.equalsIgnoreCase("RSA") && sa.equalsIgnoreCase(
+                        "http://www.w3.org/2000/09/xmldsig#rsa-sha1"))
+          return new MyKeySelectorResult(pk);
+      }
     }
 
     throw new KeySelectorException("No KeyValue element found");

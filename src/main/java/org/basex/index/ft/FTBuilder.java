@@ -285,9 +285,8 @@ public abstract class FTBuilder extends IndexBuilder {
   /**
    * Indexes a single token.
    * @param tok token to be indexed
-   * @throws IOException IOException
    */
-  abstract void index(final byte[] tok) throws IOException;
+  abstract void index(final byte[] tok);
 
   /**
    * Returns the number of disjunct tokens.

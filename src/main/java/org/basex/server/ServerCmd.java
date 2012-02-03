@@ -39,7 +39,7 @@ public enum ServerCmd {
   COMMAND(-1);
 
   /** Control code (soon obsolete). */
-  public int code;
+  public final int code;
 
   /**
    * Constructor.

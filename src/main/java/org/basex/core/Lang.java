@@ -10,7 +10,6 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -97,9 +96,8 @@ public final class Lang {
   static synchronized String lang(final String key) {
     if(key == null) {
       if(CHECK && check.size() != 0) {
-        final Iterator<String> it = check.keySet().iterator();
-        while(it.hasNext()) Util.errln("%." + SUFFIX + ": '%' not used",
-            Util.language, it.next());
+        for(final String s : check.keySet())
+          Util.errln("%." + SUFFIX + ": '%' not used", Util.language, s);
       }
       return null;
     }

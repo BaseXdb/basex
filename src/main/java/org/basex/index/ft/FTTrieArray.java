@@ -57,12 +57,12 @@ final class FTTrieArray {
 
   /**
    * Inserts a node in the next array.
+   *
    * @param cn int current node
    * @param ti int id to insert
    * @param ip int position where to insert ti
-   * @return Id on next[currentNode]
    */
-  private int insertNode(final int cn, final int ti, final int ip) {
+  private void insertNode(final int cn, final int ti, final int ip) {
     final int[] cnn = next.get(cn);
     final int[] tmp = new int[cnn.length + 1];
     System.arraycopy(cnn, 0, tmp, 0, ip);
@@ -71,7 +71,6 @@ final class FTTrieArray {
     // copy remain
     System.arraycopy(cnn, ip, tmp, ip + 1, tmp.length - ip - 1);
     next.set(cn, tmp);
-    return ip;
   }
 
   /**

@@ -1,7 +1,6 @@
 package org.basex.query.path;
 
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -74,10 +73,9 @@ public abstract class Test {
    * Optimizes and compiles the expression.
    * @param ctx query context
    * @return false if test always returns false
-   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public boolean comp(final QueryContext ctx) throws QueryException {
+  public boolean comp(final QueryContext ctx) {
     return true;
   }
 

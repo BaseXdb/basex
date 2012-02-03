@@ -41,7 +41,7 @@ public class XHTMLSerializer extends OutputSerializer {
   @Override
   protected void finishOpen() throws IOException {
     super.finishOpen();
-    if(ct(false, false)) return;
+    ct(false, false);
   }
 
   @Override

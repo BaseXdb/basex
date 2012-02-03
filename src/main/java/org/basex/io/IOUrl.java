@@ -95,7 +95,7 @@ public final class IOUrl extends IO {
   public static String file(final String url) {
     String file = url;
     try {
-      if(file.indexOf("%") != -1) file = URLDecoder.decode(file, Prop.ENCODING);
+      if(file.indexOf('%') != -1) file = URLDecoder.decode(file, Prop.ENCODING);
     } catch(final Exception ex) { /* ignored. */ }
     // remove file scheme
     if(file.startsWith(FILEPREF)) file = file.substring(FILEPREF.length());

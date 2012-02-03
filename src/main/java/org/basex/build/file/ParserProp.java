@@ -3,7 +3,6 @@ package org.basex.build.file;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Locale;
 
 import org.basex.core.AProp;
@@ -75,11 +74,9 @@ public final class ParserProp extends AProp {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    final Iterator<String> it = props.keySet().iterator();
-    while(it.hasNext()) {
+    for(final String str : props.keySet()) {
       if(sb.length() != 0) sb.append(',');
-      final String s = it.next();
-      sb.append(s + '=' + props.get(s));
+      sb.append(str).append('=').append(props.get(str));
     }
     return sb.toString();
   }

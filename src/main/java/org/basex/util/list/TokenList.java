@@ -167,8 +167,10 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @return array
    */
   public String[] toStringArray() {
-    final String[] items = new String[size];
-    for(int i = 0; i < items.length; ++i) items[i] = string(list[i]);
+    final int is = size;
+    final byte[][] l = list;
+    final String[] items = new String[is];
+    for(int i = 0; i < is; ++i) items[i] = string(l[i]);
     return items;
   }
 

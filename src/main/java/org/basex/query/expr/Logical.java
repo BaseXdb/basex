@@ -51,12 +51,12 @@ public abstract class Logical extends Arr {
   final void compFlatten(final QueryContext ctx) {
     // flatten nested expressions
     final ObjList<Expr> tmp = new ObjList<Expr>(expr.length);
-    for(int p = 0; p < expr.length; ++p) {
-      if(expr[p].getClass().isInstance(this)) {
-        for(final Expr e : ((Logical) expr[p]).expr) tmp.add(e);
-        ctx.compInfo(OPTFLAT, expr[p]);
+    for(final Expr ex : expr) {
+      if(ex.getClass().isInstance(this)) {
+        for(final Expr e : ((Logical) ex).expr) tmp.add(e);
+        ctx.compInfo(OPTFLAT, ex);
       } else {
-        tmp.add(expr[p]);
+        tmp.add(ex);
       }
     }
     if(expr.length != tmp.size()) expr = tmp.toArray(new Expr[tmp.size()]);

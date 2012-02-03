@@ -150,7 +150,7 @@ public class TokenSet implements Iterable<byte[]> {
    */
   public final byte[][] keys() {
     final byte[][] tmp = new byte[size()][];
-    for(int i = 1; i < size; ++i) tmp[i - 1] = keys[i];
+    System.arraycopy(keys, 1, tmp, 0, size - 1);
     return tmp;
   }
 

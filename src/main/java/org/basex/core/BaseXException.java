@@ -36,14 +36,15 @@ public final class BaseXException extends IOException {
    * @return argument
    */
   public static String message(final String info, final Object[] ext) {
-    for(int i = 0; i < ext.length; ++i) {
-      if(ext[i] instanceof byte[]) {
-        ext[i] = Token.string((byte[]) ext[i]);
-      } else if(ext[i] instanceof Throwable) {
-        final Throwable th = (Throwable) ext[i];
-        ext[i] = th.getMessage() != null ? th.getMessage() : th.toString();
-      } else if(!(ext[i] instanceof String)) {
-        ext[i] = ext[i].toString();
+    final int es = ext.length;
+    for(int e = 0; e < es; ++e) {
+      if(ext[e] instanceof byte[]) {
+        ext[e] = Token.string((byte[]) ext[e]);
+      } else if(ext[e] instanceof Throwable) {
+        final Throwable th = (Throwable) ext[e];
+        ext[e] = th.getMessage() != null ? th.getMessage() : th.toString();
+      } else if(!(ext[e] instanceof String)) {
+        ext[e] = ext[e].toString();
       }
     }
     return Util.info(info, ext);

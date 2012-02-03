@@ -231,14 +231,14 @@ public final class FNStr extends StandardFunc {
     final int[] rep =  cps(checkStr(expr[2], ctx));
 
     final TokenBuilder tmp = new TokenBuilder(tok.length);
-    for(int i = 0; i < tok.length; ++i) {
+    for(final int t : tok) {
       int j = -1;
-      while(++j < srch.length && tok[i] != srch[j]);
+      while(++j < srch.length && t != srch[j]) ;
       if(j < srch.length) {
         if(j >= rep.length) continue;
         tmp.add(rep[j]);
       } else {
-        tmp.add(tok[i]);
+        tmp.add(t);
       }
     }
     return Str.get(tmp.finish());

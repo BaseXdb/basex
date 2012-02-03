@@ -58,7 +58,7 @@ public final class List extends Command {
         meta.read(di);
         size = meta.dbsize();
         docs = meta.ndocs;
-        if(context.perm(User.READ, meta)) file = meta.original.toString();
+        if(context.perm(User.READ, meta)) file = meta.original;
       } catch(final IOException ex) {
         file = ERROR;
       } finally {

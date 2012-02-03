@@ -1273,7 +1273,7 @@ public final class Token {
       // will be only initialized if needed
       norm = new char[0x200];
       for(int n = 0; n < norm.length; ++n) norm[n] = (char) n;
-      for(int n = 0; n < NC.length; ++n) norm[NC[n][0]] = NC[n][1];
+      for(char[] aNC : NC) norm[aNC[0]] = aNC[1];
     }
     return norm;
   }

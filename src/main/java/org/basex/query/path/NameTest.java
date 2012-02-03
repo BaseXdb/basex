@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -41,7 +40,7 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean comp(final QueryContext ctx) throws QueryException {
+  public boolean comp(final QueryContext ctx) {
     // retrieve current data reference
     final Data data = ctx.data();
     if(data == null) return true;

@@ -78,7 +78,8 @@ public abstract class AProp implements Iterable<String> {
 
           // extract numeric value in key
           int num = 0;
-          for(int s = 0; s < key.length(); ++s) {
+          final int ss = key.length();
+          for(int s = 0; s < ss; ++s) {
             if(Character.isDigit(key.charAt(s))) {
               num = Integer.parseInt(key.substring(s));
               key = key.substring(0, s);
@@ -175,12 +176,14 @@ public abstract class AProp implements Iterable<String> {
         if(val instanceof String[]) {
           final String[] str = (String[]) val;
           bw.write(key + " = " + str.length + NL);
-          for(int i = 0; i < str.length; ++i) {
+          final int is = str.length;
+          for(int i = 0; i < is; ++i) {
             if(str[i] != null) bw.write(key + (i + 1) + " = " + str[i] + NL);
           }
         } else if(val instanceof int[]) {
           final int[] num = (int[]) val;
-          for(int i = 0; i < num.length; ++i) {
+          final int ns = num.length;
+          for(int i = 0; i < ns; ++i) {
             bw.write(key + i + " = " + num[i] + NL);
           }
         } else {
@@ -335,9 +338,7 @@ public abstract class AProp implements Iterable<String> {
   public final String similar(final String key) {
     final byte[] name = token(key);
     final Levenshtein ls = new Levenshtein();
-    final Iterator<String> it = props.keySet().iterator();
-    while(it.hasNext()) {
-      final String prop = it.next();
+    for(final String prop : props.keySet()) {
       if(ls.similar(name, token(prop), 0)) return prop;
     }
     return null;

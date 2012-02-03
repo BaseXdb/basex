@@ -219,7 +219,6 @@ final class XMLScanner extends Progress {
     } else if(s(c)) {
       // scan whitespace...
       type = Type.WS;
-      return;
     } else if(isStartChar(c)) {
       // scan tag name...
       type = state == State.ATT ? Type.ATTNAME : Type.TAGNAME;
@@ -238,13 +237,12 @@ final class XMLScanner extends Progress {
    * @throws IOException I/O exception
    */
   private void scanATTVALUE(final int ch) throws IOException {
-    final int c = ch;
-    if(c == quote) {
+    if(ch == quote) {
       type = Type.QUOTE;
       state = State.ATT;
     } else {
       type = Type.ATTVALUE;
-      attValue(c);
+      attValue(ch);
       prev(1);
     }
   }
@@ -628,16 +626,14 @@ final class XMLScanner extends Progress {
 
   /**
    * Consumes an Nmtoken. [7]
-   * @return name
    * @throws IOException I/O exception
    */
-  private byte[] nmtoken() throws IOException {
+  private void nmtoken() throws IOException {
     final TokenBuilder name = new TokenBuilder();
     int c;
     while(isChar(c = nextChar())) name.add(c);
     prev(1);
     if(name.size() == 0) error(INVNAME);
-    return name.finish();
   }
 
   /**
@@ -734,19 +730,13 @@ final class XMLScanner extends Progress {
 
   /**
    * Scans an external subset declaration. [31]
-   * @return true if a declaration was found
    * @throws IOException I/O exception
    */
-  private boolean extSubsetDecl() throws IOException {
-    boolean found = false;
+  private void extSubsetDecl() throws IOException {
     while(true) {
       s();
-      if(markupDecl()) {
-        found = true;
-        continue;
-      }
-      if(!consume(COND)) return found;
-      found = true;
+      if(markupDecl()) continue;
+      if(!consume(COND)) return;
 
       s(); // [61]
       final boolean incl = consume(INCL);

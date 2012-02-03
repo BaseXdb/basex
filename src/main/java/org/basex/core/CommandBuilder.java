@@ -51,7 +51,8 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder args() {
-    for(int a = 0; a < cmd.args.length; ++a) arg(a);
+    final int as = cmd.args.length;
+    for(int a = 0; a < as; ++a) arg(a);
     return this;
   }
 

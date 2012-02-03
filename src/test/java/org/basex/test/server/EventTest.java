@@ -244,7 +244,7 @@ public final class EventTest {
   }
 
   /** Single client. */
-  private static final class Client extends Thread {
+  static final class Client extends Thread {
     /** Client session. */
     private final ClientSession cs;
     /** First event. */

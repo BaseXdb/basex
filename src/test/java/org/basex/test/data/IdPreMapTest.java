@@ -144,7 +144,7 @@ public final class IdPreMapTest {
     }
     // perform the actual test:
     final Performance p = new Performance();
-    for(int i = 0; i < d.length; ++i) m.insert(d[i][0], d[i][1], 1);
+    for(int[] a : d) m.insert(a[0], a[1], 1);
     if(VERBOSE) Util.errln(d.length + " records inserted in: " + p);
   }
 

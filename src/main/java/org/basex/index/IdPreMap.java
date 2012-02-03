@@ -197,11 +197,9 @@ public class IdPreMap {
     int oid = id;
 
     if(rows > 0) {
-      final int pre1 = pre;
-      final int pre2 = pre - c - 1;
-
-      int i1 = findPre(pre1);
-      int i2 = -c > 1 ? findPre(pre2) : i1;
+      final int p = pre - c - 1;
+      int i1 = findPre(pre);
+      int i2 = -c > 1 ? findPre(p) : i1;
 
       final boolean found1 = i1 >= 0;
       final boolean found2 = i2 >= 0;
@@ -221,7 +219,7 @@ public class IdPreMap {
       final int min2;
       final int max2;
       if(i2 >= rows) {
-        min2 = max2 = pre2 + 1;
+        min2 = max2 = p + 1;
       } else {
         min2 = pres[i2];
         max2 = pres[i2] + nids[i2] - fids[i2];
@@ -234,9 +232,9 @@ public class IdPreMap {
       }
 
       if(i1 == i2) {
-        // pre1 <= pre2 <= max2
-        if(pre1 <= min1) {
-          if(pre2 == max2) {
+        // pre1 <= p <= max2
+        if(pre <= min1) {
+          if(p == max2) {
             if(i2 + 1 < rows && pres[i2 + 1] == pre) {
               // remove interval if the next one (already changed) is the same
               remove(i1, i2);
@@ -247,29 +245,29 @@ public class IdPreMap {
               nids[i2] = -1;
               //remove(i1, i2 - 1);
             }
-          } else if(min2 <= pre2 && pre2 < max2) {
+          } else if(min2 <= p && p < max2) {
             incs[i2] += c;
             pres[i2] = pre;
-            fids[i2] += pre2 - min2 + 1;
+            fids[i2] += p - min2 + 1;
             //remove(i1, i2 - 1);
-          } else if(pre2 < min2 - 1) {
+          } else if(p < min2 - 1) {
             // the interval is not adjacent to next one => should be added
             add(i1, pre, -1, -1, i1 > 0 ? incs[i1 - 1] + c : c, oid);
           }
-        } else if(min1 < pre1) {
-          if(min2 < pre2 && pre2 < max2) {
-            final int fid = fids[i2] + pre2 - min2 + 1;
-            add(i2 + 1, pre2 + c + 1, fid, nids[i2], incs[i1] + c, oids[i2]);
+        } else if(min1 < pre) {
+          if(min2 < p && p < max2) {
+            final int fid = fids[i2] + p - min2 + 1;
+            add(i2 + 1, p + c + 1, fid, nids[i2], incs[i1] + c, oids[i2]);
           }
-          final int s = max1 - pre1 + 1;
+          final int s = max1 - pre + 1;
           nids[i1] -= s;
           incs[i1] -= s;
         }
       } else if(i1 < i2) {
-        // pre1 <= max1 < pre2 <= max2
+        // pre1 <= max1 < p <= max2
         // min1 <= max1 < min2 <= max2
-        if(pre1 <= min1) {
-          if(pre2 == max2) {
+        if(pre <= min1) {
+          if(p == max2) {
             if(i2 + 1 < rows && pres[i2 + 1] == pre) {
               // remove interval if the next one (already changed) is the same
               remove(i1, i2);
@@ -280,12 +278,12 @@ public class IdPreMap {
               nids[i2] = -1;
               remove(i1, i2 - 1);
             }
-          } else if(min2 <= pre2 && pre2 < max2) {
+          } else if(min2 <= p && p < max2) {
             incs[i2] += c;
             pres[i2] = pre;
-            fids[i2] += pre2 - min2 + 1;
+            fids[i2] += p - min2 + 1;
             remove(i1, i2 - 1);
-          } else if(pre2 < min2) {
+          } else if(p < min2) {
             if(i2 < rows && pres[i2] == pre) {
               // remove interval if the next one (already changed) is the same
               remove(i1, --i2);
@@ -297,26 +295,26 @@ public class IdPreMap {
               remove(i1, i2 - 1);
             }
           }
-        } else if(min1 < pre1) {
-          if(pre2 == max2) {
+        } else if(min1 < pre) {
+          if(p == max2) {
             inc += incs[i2];
             oid = oids[i2];
             remove(i1 + 1, i2);
-            nids[i1] -= max1 - pre1 + 1;
+            nids[i1] -= max1 - pre + 1;
             incs[i1] = inc;
             oids[i1] = oid;
-          } else if(min2 <= pre2 && pre2 < max2) {
-            fids[i2] += pre2 - min2 + 1;
+          } else if(min2 <= p && p < max2) {
+            fids[i2] += p - min2 + 1;
             incs[i2] += c;
             pres[i2] = pre;
             remove(i1 + 1, i2 - 1);
-            final int s = max1 - pre1 + 1;
+            final int s = max1 - pre + 1;
             nids[i1] -= s;
             incs[i1] -= s;
-          } else if(pre2 < min2) {
+          } else if(p < min2) {
             incs[i1] = incs[i2 - 1] + c;
             remove(i1 + 1, i2 - 1);
-            final int s = max1 - pre1 + 1;
+            final int s = max1 - pre + 1;
             nids[i1] -= s;
           }
         }

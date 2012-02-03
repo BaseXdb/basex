@@ -359,7 +359,7 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final Expr addText(final QueryContext ctx) throws QueryException {
+  public final Expr addText(final QueryContext ctx) {
     final AxisStep s = step(steps.length - 1);
 
     if(s.preds.length != 0 || !s.axis.down || s.test.type == NodeType.ATT ||

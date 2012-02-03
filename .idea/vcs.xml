@@ -2,6 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../basex-api" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../basex-examples" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../basex-tests" vcs="Git" />
   </component>
 </project>
 

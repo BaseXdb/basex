@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.util.Util;
 
@@ -127,11 +126,9 @@ public final class JsonMLSerializer extends OutputSerializer {
    * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
-   * @return build exception
    * @throws IOException I/O exception
    */
-  private QueryException error(final String msg, final Object... ext)
-      throws IOException {
+  private void error(final String msg, final Object... ext) throws IOException {
     throw JSONSER.thrwSerial(Util.inf(msg, ext));
   }
 }

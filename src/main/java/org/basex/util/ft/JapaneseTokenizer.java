@@ -219,12 +219,8 @@ public class JapaneseTokenizer extends Tokenizer {
    * @return result of check
    */
   private static boolean isFtChar(final String s) {
-    if(s.equals(".") || s.equals("?") ||
-       s.equals("*") || s.equals("+") || s.equals("\\") ||
-       s.equals("{") || s.equals("}")) {
-      return true;
-    }
-    return false;
+    return s.equals(".") || s.equals("?") || s.equals("*") || s.equals("+") ||
+           s.equals("\\") || s.equals("{") || s.equals("}");
   }
 
   /**
@@ -488,29 +484,29 @@ public class JapaneseTokenizer extends Tokenizer {
   /** Morpheme class. */
   static class Morpheme {
     /** A part of speech in the context, NEISHI(Noun). */
-    private static final int HINSHI_MEISHI = 1;
+    static final int HINSHI_MEISHI = 1;
     /** A part of speech in the context, RENTAISHI(Pre-noun Adjectival). */
-    private static final int HINSHI_RENTAISHI = 2;
+    static final int HINSHI_RENTAISHI = 2;
     /** A part of speech in the context, HUKUSHI(Adverb). */
-    private static final int HINSHI_HUKUSHI = 3;
+    static final int HINSHI_HUKUSHI = 3;
     /** A part of speech in the context, DOUSHI(Verb). */
-    private static final int HINSHI_DOUSHI = 4;
+    static final int HINSHI_DOUSHI = 4;
     /** A part of speech in the context, SETSUZOKUSHI(Conjunction). */
-    private static final int HINSHI_SETSUZOKUSHI = 5;
+    static final int HINSHI_SETSUZOKUSHI = 5;
     /** A part of speech in the context, JYODOUSHI(Modal verbs). */
-    private static final int HINSHI_JYODOUSHI = 6;
+    static final int HINSHI_JYODOUSHI = 6;
     /** A part of speech in the context, JYOSHI(Postpositional particle). */
-    private static final int HINSHI_JYOSHI = 7;
+    static final int HINSHI_JYOSHI = 7;
     /** A part of speech in the context, KEIYOUSHI(Adjective). */
-    private static final int HINSHI_KEIYOUSHI = 8;
+    static final int HINSHI_KEIYOUSHI = 8;
     /** A part of speech in the context, KIGOU(Mark). */
-    private static final int HINSHI_KIGOU = 9;
+    static final int HINSHI_KIGOU = 9;
     /** A part of speech in the context, KANDOUSHI(Interjection). */
-    private static final int HINSHI_KANDOUSHI = 10;
+    static final int HINSHI_KANDOUSHI = 10;
     /** A part of speech in the context, FILLER(Filler). */
-    private static final int HINSHI_FILLER = 11;
+    static final int HINSHI_FILLER = 11;
     /** A part of speech in the context, Others. */
-    private static final int HINSHI_SONOTA = 0;
+    static final int HINSHI_SONOTA = 0;
 
     /** Surface of Morpheme. */
     private final String mSurface;

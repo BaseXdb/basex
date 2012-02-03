@@ -56,7 +56,7 @@ public final class Base64 {
         bl.add('=');
         bl.add('=');
       } else {
-        final int b1 = token[c++] & 0xff;
+        final int b1 = token[c] & 0xff;
         bl.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
         bl.add(H2B[b1 << 2 & 0x3f]);
         bl.add('=');
@@ -122,7 +122,7 @@ public final class Base64 {
       final int c0 = b2h(s[c++]);
       final int c1 = b2h(s[c++]);
       val[o++] = (byte) (c0 << 2 | c1 >> 4);
-      if(m == 1) val[o++] = (byte) (c1 << 4 | b2h(s[c++]) >> 2);
+      if(m == 1) val[o] = (byte) (c1 << 4 | b2h(s[c]) >> 2);
     }
     return val;
   }

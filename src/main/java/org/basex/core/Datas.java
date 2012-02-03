@@ -122,10 +122,10 @@ public final class Datas {
    * @author Andreas Weiler
    */
   private static final class PData {
+    /** Data reference. */
+    final Data data;
     /** Number of current database users. */
     int pins = 1;
-    /** Data reference. */
-    Data data;
 
     /**
      * Default constructor.

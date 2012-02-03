@@ -38,12 +38,12 @@ public class IndexTree {
 
   /**
    * Indexes the specified key and value.
+   *
    * @param key key to be indexed
    * @param value value to be indexes
-   * @return int node
    */
-  public final int index(final byte[] key, final int value) {
-    return index(key, value, true);
+  public final void index(final byte[] key, final int value) {
+    index(key, value, true);
   }
 
   /**
@@ -56,7 +56,7 @@ public class IndexTree {
    * @return int node
    */
   protected final int index(final byte[] key, final int value,
-                            final boolean exist) {
+      final boolean exist) {
 
     // index is empty.. create root node
     if(root == -1) {

@@ -405,16 +405,15 @@ final class FTTrie extends FTIndex {
    * PosWildCard points on bytes[], at position, where . is situated
    * recCall flags recursive calls
    * @param id current node
-   * @param token search token
+   * @param tok search token
    * @param posw wildcards position
    * @param first flag for first call
    * @param fast fast evaluation
    * @return result iterator
    */
-  private FTIndexIterator wc(final int id, final byte[] token,
+  private FTIndexIterator wc(final int id, final byte[] tok,
       final int posw, final boolean first, final boolean fast) {
 
-    final byte[] vsn = token;
     byte[] aw = null;
     byte[] bw = null;
 
@@ -426,58 +425,58 @@ final class FTTrie extends FTIndex {
     if(posw > 0) {
       // copy part before wildcard
       bw = new byte[posw];
-      System.arraycopy(vsn, 0, bw, 0, posw);
+      System.arraycopy(tok, 0, bw, 0, posw);
       resultNode = wc(id, bw);
       if(resultNode == -1) return FTIndexIterator.FTEMPTY;
     } else {
       resultNode = 0;
     }
 
-    final byte wildcard = posw + 1 >= vsn.length ? (byte) '.' : vsn[posw + 1];
-    if(wildcard == '?') {
+    final byte wc = posw + 1 >= tok.length ? (byte) '.' : tok[posw + 1];
+    if(wc == '?') {
       // append 0 or 1 symbols
       // look in trie without wildcard
-      byte[] sc = new byte[vsn.length - 2 - currentLength];
+      byte[] sc = new byte[tok.length - 2 - currentLength];
       // copy unprocessed part before wildcard
       if(bw != null) {
         System.arraycopy(bw, 0, sc, 0, bw.length);
       }
       // copy part after wildcard
       if(bw == null) {
-        System.arraycopy(vsn, posw + 2, sc, 0, sc.length);
+        System.arraycopy(tok, posw + 2, sc, 0, sc.length);
       } else {
-        System.arraycopy(vsn, posw + 2, sc, bw.length, sc.length - bw.length);
+        System.arraycopy(tok, posw + 2, sc, bw.length, sc.length - bw.length);
       }
 
       d = iter(0, sc, fast);
 
       // lookup in trie with . as wildcard
-      sc = new byte[vsn.length - 1];
+      sc = new byte[tok.length - 1];
       if(bw != null) {
         // copy unprocessed part before wildcard
         System.arraycopy(bw, 0, sc, 0, bw.length);
         sc[bw.length] = '.';
 
         // copy part after wildcard
-        System.arraycopy(vsn, posw + 2, sc, bw.length + 1,
+        System.arraycopy(tok, posw + 2, sc, bw.length + 1,
             sc.length - bw.length - 1);
       } else {
         // copy unprocessed part before wildcard
         sc[0] = '.';
         // copy part after wildcard
-        System.arraycopy(vsn, posw + 2, sc, 1, sc.length - 1);
+        System.arraycopy(tok, posw + 2, sc, 1, sc.length - 1);
       }
       // attach both result
       d = FTIndexIterator.union(wc(0, sc, posw, false, fast), d);
       return d;
     }
 
-    if(wildcard == '*') {
+    if(wc == '*') {
       // append 0 or n symbols
       // valueSearchNode == .*
-      if(!(posw == 0 && vsn.length == 2)) {
+      if(!(posw == 0 && tok.length == 2)) {
         // lookup in trie without wildcard
-        final byte[] searchChar = new byte[vsn.length - 2 - currentLength];
+        final byte[] searchChar = new byte[tok.length - 2 - currentLength];
         // copy unprocessed part before wildcard
         if(bw != null) {
           System.arraycopy(bw, 0, searchChar, 0, bw.length);
@@ -485,13 +484,13 @@ final class FTTrie extends FTIndex {
         // copy part after wildcard
         if(bw == null) {
           aw = new byte[searchChar.length];
-          System.arraycopy(vsn, posw + 2, searchChar, 0, searchChar.length);
-          System.arraycopy(vsn, posw + 2, aw, 0, searchChar.length);
+          System.arraycopy(tok, posw + 2, searchChar, 0, searchChar.length);
+          System.arraycopy(tok, posw + 2, aw, 0, searchChar.length);
         } else {
           aw = new byte[searchChar.length - bw.length];
-          System.arraycopy(vsn, posw + 2, searchChar,
+          System.arraycopy(tok, posw + 2, searchChar,
               bw.length, searchChar.length - bw.length);
-          System.arraycopy(vsn, posw + 2, aw,
+          System.arraycopy(tok, posw + 2, aw,
               0, searchChar.length - bw.length);
         }
         d = iter(0, searchChar, fast);
@@ -505,18 +504,18 @@ final class FTTrie extends FTIndex {
       return FTIndexIterator.union(d, idata);
     }
 
-    if(wildcard == '+') {
+    if(wc == '+') {
       // append 1 or more symbols
       final int[] rne = entry(resultNode);
-      final byte[] nvsn = new byte[vsn.length + 1];
+      final byte[] nvsn = new byte[tok.length + 1];
       int l = 0;
       if(bw != null) {
         System.arraycopy(bw, 0, nvsn, 0, bw.length);
         l = bw.length;
       }
 
-      if(0 < vsn.length - posw - 2) {
-        System.arraycopy(vsn, posw + 2, nvsn, posw + 3, vsn.length - posw - 2);
+      if(0 < tok.length - posw - 2) {
+        System.arraycopy(tok, posw + 2, nvsn, posw + 3, tok.length - posw - 2);
       }
 
       nvsn[l + 1] = '.';
@@ -550,15 +549,10 @@ final class FTTrie extends FTIndex {
     byte[] valuesFound;
     if(rne[0] > counter[0] && resultNode > 0) {
       // replace wildcard with value from currentCompressedTrieNode
-      vsn[posw] = (byte) rne[counter[0] + 1];
+      tok[posw] = (byte) rne[counter[0] + 1];
 
       // . wildcards left
-      final FTIndexIterator resultData = iter(0, vsn, fast);
-      // save nodeValues for recursive method call
-      if(resultData.size() != 0 && first) {
-        valuesFound = new byte[] {(byte) rne[counter[0] + 1]};
-      }
-      return resultData;
+      return iter(0, tok, fast);
     }
 
     if(rne[0] == counter[0] || resultNode == 0) {
@@ -567,8 +561,8 @@ final class FTTrie extends FTIndex {
       if(!more(rne)) return FTIndexIterator.FTEMPTY;
 
       FTIndexIterator tmpNode = FTIndexIterator.FTEMPTY;
-      aw = new byte[vsn.length - posw];
-      System.arraycopy(vsn, posw + 1, aw, 1, aw.length - 1);
+      aw = new byte[tok.length - posw];
+      System.arraycopy(tok, posw + 1, aw, 1, aw.length - 1);
 
       // simple method call
       if(!first) {
