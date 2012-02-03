@@ -216,7 +216,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public String createId() throws XMLDBException {
     final String[] res = listResources();
-    String id = null;
+    String id;
     do {
       id = Long.toString(System.currentTimeMillis());
     } while(exists(res, id));
@@ -254,7 +254,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       final Object k = f.get(md);
 
       if(k instanceof Boolean) {
-        final boolean b = val == null ? !((Boolean) k).booleanValue() :
+        final boolean b = val == null ? !(Boolean) k :
           val.equalsIgnoreCase(TRUE);
         f.setBoolean(md, b);
       } else if(k instanceof Integer) {

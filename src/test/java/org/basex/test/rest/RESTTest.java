@@ -499,12 +499,11 @@ public class RESTTest {
    * Executes the specified PUT request.
    * @param query request
    * @param is input stream
-   * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private String put(final String query, final InputStream is)
+  private void put(final String query, final InputStream is)
       throws IOException {
-    return put(query, is, null);
+    put(query, is, null);
   }
 
   /**
@@ -512,10 +511,9 @@ public class RESTTest {
    * @param query request
    * @param is input stream
    * @param ctype content type (optional)
-   * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private String put(final String query, final InputStream is,
+  private void put(final String query, final InputStream is,
       final String ctype) throws IOException {
 
     final URL url = new URL(ROOT + query);
@@ -532,7 +530,7 @@ public class RESTTest {
       bos.close();
     }
     try {
-      return read(conn.getInputStream());
+      read(conn.getInputStream());
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {

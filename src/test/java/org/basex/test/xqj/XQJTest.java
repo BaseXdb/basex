@@ -1,10 +1,13 @@
 package org.basex.test.xqj;
 
+import static org.junit.Assert.*;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Properties;
+
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,11 +28,9 @@ import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQStaticContext;
-import junit.framework.TestCase;
 
 import org.basex.io.out.ArrayOutput;
 import org.basex.util.Util;
-import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -42,15 +43,9 @@ import org.xml.sax.InputSource;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class XQJTest extends TestCase {
+public final class XQJTest {
   /** Driver reference. */
-  private String drv;
-
-  @Before
-  @Override
-  protected void setUp() {
-    drv = "org.basex.api.xqj.BXQDataSource";
-  }
+  private static final String DRIVER = "org.basex.api.xqj.BXQDataSource";
 
   /**
    * Creates and returns a connection to the specified driver.
@@ -68,7 +63,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test1() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQPreparedExpression expr = conn.prepareExpression(
         "doc('src/test/resources/input.xml')//li");
 
@@ -87,7 +82,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test2() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
     final XQSequence seq = expr.executeQuery("'Hello World!'");
     final ArrayOutput ao = new ArrayOutput();
@@ -102,7 +97,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test4() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
 
     final XQPreparedExpression expr = conn.prepareExpression(
         "declare variable $i as xs:integer external; $i");
@@ -120,7 +115,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test5() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
 
     conn.createItemFromString("Hello",
         conn.createAtomicType(XQItemType.XQBASETYPE_NCNAME));
@@ -132,7 +127,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test6() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
 
     try {
       conn.createItemFromInt(1000,
@@ -148,7 +143,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test7() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
 
     try {
       conn.createItemFromByte((byte) 123,
@@ -164,7 +159,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test9() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder parser = factory.newDocumentBuilder();
     final Document doc = parser.parse(
@@ -183,7 +178,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test10() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQStaticContext sc = conn.getStaticContext();
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
@@ -199,7 +194,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test11() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQStaticContext sc = conn.getStaticContext();
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
@@ -217,7 +212,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void test12() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQStaticContext sc = conn.getStaticContext();
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
@@ -242,8 +237,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test13() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
 
     final XQResultSequence seq = expr.executeQuery("<H><K/><K/></H>");
@@ -255,8 +251,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test14() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
 
     final XQResultSequence seq = expr.executeQuery("1,'test'");
@@ -273,8 +270,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test15() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
 
     final String query = "<H><K>B</K></H>";
@@ -290,8 +288,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test16() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
 
     final String query = "<ee>Hello world!</ee>";
@@ -305,8 +304,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test19() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
 
     try {
       final XQPreparedExpression expr = conn.prepareExpression(
@@ -325,8 +325,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test20() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
 
     final XQResultSequence result = expr.executeQuery("'Hello world!'");
@@ -338,8 +339,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test21() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQItemType elm = conn.createAtomicType(XQItemType.XQBASETYPE_INTEGER);
     elm.getItemOccurrence();
   }
@@ -348,8 +350,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test22() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQStaticContext xqsc = conn.getStaticContext();
     xqsc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
     final XQExpression expr = conn.createExpression();
@@ -363,8 +366,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test23() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQItemType expr = conn.createItemType();
     try {
       expr.getTypeName();
@@ -377,20 +381,13 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test25() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
 
     final Object[] objects = {
-        Boolean.valueOf(true),
-        Byte.valueOf((byte) 2),
-        Float.valueOf(3f),
-        Double.valueOf(4),
-        Integer.valueOf(5),
-        Long.valueOf(6),
-        Short.valueOf((short) 7), "8",
-        new BigDecimal(9),
-        new BigInteger("10"),
-        new QName("elf"),
+      true, (byte) 2, 3f, (double) 4, 5, (long) 6, (short) 7, "8",
+      new BigDecimal(9), new BigInteger("10"), new QName("elf"),
     };
 
     for(final Object o : objects) {
@@ -407,8 +404,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test32() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression xqe = conn.createExpression();
     XQSequence xqs;
 
@@ -433,8 +431,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void test34() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQPreparedExpression expr = conn.prepareExpression(
         "declare variable $v external; $v");
 
@@ -448,8 +447,9 @@ public final class XQJTest extends TestCase {
    * Test.
    * @throws Exception exception
    */
+  @Test
   public void contextItem() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     conn.getStaticContext().setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
     XQExpression xqe = conn.createExpression();
@@ -469,7 +469,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void exec() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
     try {
       expr.executeCommand("info db");
@@ -488,7 +488,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void createVar() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
     expr.executeQuery("declare variable $x := 1; $x");
     conn.close();
@@ -500,7 +500,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void context() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
     XQResultSequence result =
       expr.executeQuery("doc('src/test/resources/input.xml')//title/text()");
@@ -521,7 +521,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void bind() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
     expr.bindInt(new QName("x"), 21, null);
 
@@ -537,7 +537,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void bindWithType() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
     expr.bindInt(new QName("x"), 21, null);
     expr.executeQuery("declare variable $x as xs:integer external; $x");
@@ -549,7 +549,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void bindTwice() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQExpression expr = conn.createExpression();
     XQResultSequence xqs;
 
@@ -574,7 +574,7 @@ public final class XQJTest extends TestCase {
    */
   @Test
   public void testStatic() throws Exception {
-    final XQConnection conn = conn(drv);
+    final XQConnection conn = conn(DRIVER);
     final XQStaticContext xqs = conn.getStaticContext();
     xqs.declareNamespace("p", "u");
     conn.setStaticContext(xqs);

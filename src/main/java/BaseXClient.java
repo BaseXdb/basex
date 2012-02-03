@@ -285,7 +285,7 @@ public class BaseXClient {
             notifiers.get(name).notify(data);
           }
         } catch(final IOException ex) {
-          // [CG] check if exception should be thrown
+          // loop will be quit if no data can be received anymore
         }
       }
     }.start();

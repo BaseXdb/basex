@@ -8,7 +8,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.core.ProgressException;
 import org.basex.util.Atts;
 import org.basex.util.Util;
 
@@ -74,8 +73,6 @@ final class XMLStreamWrapper extends Parser {
         }
       }
       builder.endDoc();
-    } catch(final ProgressException ex) {
-      throw ex;
     } catch(final IOException ex) {
       Util.stack(ex);
       throw ex;

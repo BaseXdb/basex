@@ -42,7 +42,7 @@ public class RESTPost extends RESTCode {
     final String input = Token.string(new NewlineInput(ctx.in, enc).content());
 
     final Context context = HTTPSession.context();
-    Result node = null;
+    Result node;
     try {
       node = new QueryProcessor(CHECK, input, context).execute();
     } catch(final QueryException ex) {
@@ -52,7 +52,7 @@ public class RESTPost extends RESTCode {
 
     final SerializerProp sp = new SerializerProp();
     QueryProcessor qp;
-    RESTCode code = null;
+    RESTCode code;
 
     try {
       // handle serialization parameters

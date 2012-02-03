@@ -6,7 +6,6 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -315,7 +314,7 @@ public final class BaseXHTTP {
     try {
       // create connection
       final URL url = new URL("http://" + host + ":" + port);
-      ((HttpURLConnection) url.openConnection()).getInputStream();
+      url.openConnection().getInputStream();
       return true;
     } catch(final IOException ex) {
       // if page is not found, server is running

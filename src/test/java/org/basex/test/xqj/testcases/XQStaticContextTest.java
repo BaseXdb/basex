@@ -24,7 +24,7 @@ public class XQStaticContextTest extends XQJTestCase {
 
   public void testGetNamespaceURI() throws XQException {
 
-    String[] prefixes = null;
+    String[] prefixes;
     final XQStaticContext xqsc = xqc.getStaticContext();
     prefixes = xqsc.getNamespacePrefixes();
 

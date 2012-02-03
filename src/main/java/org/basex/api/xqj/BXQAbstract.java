@@ -90,7 +90,7 @@ abstract class BXQAbstract {
    * @return object
    * @throws BXQException exception
    */
-  protected static final Object valid(final Object obj, final Class<?> type)
+  protected static Object valid(final Object obj, final Class<?> type)
       throws BXQException {
     if(obj == null) throw new BXQException(NULL, Util.name(type));
     return obj;

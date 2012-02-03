@@ -330,7 +330,7 @@ public class HTTPClientTest {
 
     // check parts
     final Iterator<Part> i = r.parts.iterator();
-    Part part = null;
+    Part part;
     part = i.next();
     assertTrue(part.headers.size() == 2);
     assertTrue(part.bodyContent.size() == 1);
@@ -475,8 +475,8 @@ public class HTTPClientTest {
     falseReqs.add(falseReq8);
 
     final Iterator<byte[]> i = falseReqs.iterator();
-    IO io = null;
-    Parser p = null;
+    IO io;
+    Parser p;
     DBNode dbNode;
     byte[] it;
     while(i.hasNext()) {
@@ -923,7 +923,7 @@ final class FakeHttpConnection extends HttpURLConnection {
   /** Content. */
   byte[] content;
   /** Connection output stream. */
-  ByteArrayOutputStream out;
+  final ByteArrayOutputStream out;
 
   /**
    * Constructor.
@@ -964,10 +964,7 @@ final class FakeHttpConnection extends HttpURLConnection {
   public String getHeaderField(final String field) {
     final List<String> values = headers.get(field);
     final StringBuilder sb = new StringBuilder();
-    final Iterator<String> i = values.iterator();
-    while(i.hasNext()) {
-      sb.append(i.next()).append(';');
-    }
+    for(final String v : values) sb.append(v).append(';');
     return sb.substring(0, sb.length() - 1);
   }
 

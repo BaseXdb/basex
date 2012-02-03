@@ -414,7 +414,7 @@ final class IterStreamReader implements XMLStreamReader {
       case ELM: kind = START_ELEMENT; return;
       case COM: kind = COMMENT; return;
       case PI : kind = PROCESSING_INSTRUCTION; return;
-      default:  kind = CHARACTERS; return;
+      default:  kind = CHARACTERS;
     }
   }
 
@@ -532,7 +532,7 @@ final class IterStreamReader implements XMLStreamReader {
 
     /** Constructor. */
     FNodeReader() {
-      iter.add(((FNode) node).self());
+      iter.add(node.self());
       hasNext();
     }
 

@@ -30,7 +30,7 @@ import org.basex.util.Util;
  */
 class RESTQuery extends RESTCode {
   /** External variables. */
-  protected Map<String, String[]> variables;
+  protected final Map<String, String[]> variables;
   /** Query input. */
   protected final String input;
   /** Optional context item. */

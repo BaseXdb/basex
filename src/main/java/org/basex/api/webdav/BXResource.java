@@ -156,40 +156,38 @@ public abstract class BXResource implements Resource {
 
   /**
    * Checks a folder for a dummy document and delete it.
+   *
    * @param s active client session
    * @param db database name
    * @param p path
-   * @return {@code true} if dummy document existed
    * @throws IOException I/O exception
    */
-  static boolean deleteDummy(final Session s, final String db, final String p)
+  static void deleteDummy(final Session s, final String db, final String p)
       throws IOException {
 
     final String dummy = p + SEP + DUMMY;
-    if(!pathExists(s, db, dummy)) return false;
+    if(!pathExists(s, db, dummy)) return;
 
     // path contains dummy document
     s.execute(new Open(db));
     s.execute(new Delete(dummy));
-    return true;
   }
 
   /**
    * Checks if a folder is empty and create a dummy document.
+   *
    * @param s active client session
    * @param db database name
    * @param p path
-   * @return {@code true} if dummy document was created
    * @throws IOException I/O exception
    */
-  static boolean createDummy(final Session s, final String db, final String p)
+  static void createDummy(final Session s, final String db, final String p)
       throws IOException {
     // check if path is a folder and is empty
-    if(p.matches("[^/]") || pathExists(s, db, p)) return false;
+    if(p.matches("[^/]") || pathExists(s, db, p)) return;
 
     s.execute(new Open(db));
     s.store(p + SEP + DUMMY, new ArrayInput(Token.EMPTY));
-    return true;
   }
 
   /**
