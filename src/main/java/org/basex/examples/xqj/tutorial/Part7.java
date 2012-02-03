@@ -73,9 +73,9 @@ public final class Part7 extends Main {
     xqp = xqc.prepareExpression(
         "declare variable $i as xs:integer external; $i+1");
     QName[] variables = xqp.getAllExternalVariables();
-    for(int i = 0; i < variables.length; ++i) {
-      xqst = xqp.getStaticVariableType(variables[i]);
-      System.out.println("Variable $" + variables[i] + ": " + xqst);
+    for(final QName v : variables) {
+      xqst = xqp.getStaticVariableType(v);
+      System.out.println("Variable $" + v + ": " + xqst);
     }
 
     // Close the connection
