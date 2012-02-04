@@ -1,6 +1,7 @@
 package org.basex.build;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -37,8 +38,8 @@ public final class DirParser extends TargetParser {
   private final boolean archives;
   /** Skip corrupt files in directories. */
   private final boolean skip;
-  /** Add remaining files as raw files. */
-  private final boolean raw;
+  /** Database path for storing binary files. */
+  protected IOFile binaries;
 
   /** Parser reference. */
   private Parser parser;
@@ -49,9 +50,10 @@ public final class DirParser extends TargetParser {
    * Constructor.
    * @param source source path
    * @param pr database properties
+   * @param path future database path
    */
-  public DirParser(final IO source, final Prop pr) {
-    this(source, "", pr);
+  public DirParser(final IO source, final Prop pr, final IOFile path) {
+    this(source, "", pr, path);
   }
 
   /**
@@ -59,18 +61,23 @@ public final class DirParser extends TargetParser {
    * @param source source path
    * @param target target path
    * @param pr database properties
+   * @param path future database path
    */
-  public DirParser(final IO source, final String target, final Prop pr) {
+  public DirParser(final IO source, final String target, final Prop pr,
+      final IOFile path) {
+
     super(source, target);
     prop = pr;
     final String parent = source.dir();
     root = parent.endsWith("/") ? parent : parent + '/';
     skip = prop.is(Prop.SKIPCORRUPT);
-    raw = prop.is(Prop.ADDRAW);
     archives = prop.is(Prop.ADDARCHIVES);
     filter = !source.isDir() && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
+    binaries = path != null && prop.is(Prop.ADDRAW) ?
+        new IOFile(path, M_RAW) : null;
   }
+
 
   @Override
   public void parse(final Builder build) throws IOException {
@@ -93,8 +100,8 @@ public final class DirParser extends TargetParser {
       src = io;
 
       while(io.more(archives)) {
-        final String nm = Prop.WIN ? io.name().toLowerCase(Locale.ENGLISH) :
-          io.name();
+        String nm = io.name();
+        if(Prop.WIN) nm = nm.toLowerCase(Locale.ENGLISH);
 
         final long l = src.length();
         if(l != -1) b.meta.filesize += l;
@@ -103,6 +110,7 @@ public final class DirParser extends TargetParser {
         String targ = trg;
         final String name = src.name();
         String path = src.path();
+
         // add relative path without root (prefix) and file name (suffix)
         if(path.endsWith('/' + name)) {
           path = path.substring(0, path.length() - name.length());
@@ -111,8 +119,9 @@ public final class DirParser extends TargetParser {
         }
 
         if(filter != null && !filter.matcher(nm).matches()) {
-          if(raw) {
-            Store.store(src.inputSource(), b.meta.binary(targ + name));
+          // store binary files
+          if(binaries != null) {
+            Store.store(src.inputSource(), new IOFile(binaries, targ + name));
           }
         } else {
           boolean ok = true;

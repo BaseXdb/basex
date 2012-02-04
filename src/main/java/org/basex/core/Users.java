@@ -2,13 +2,13 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Table;
@@ -26,7 +26,7 @@ public final class Users {
   /** User array. */
   private final List<User> list = new ArrayList<User>(0);
   /** Filename; set to {@code null} if the instance handles local users. */
-  private File file;
+  private IOFile file;
 
   /**
    * Constructor for global users.
@@ -35,7 +35,7 @@ public final class Users {
   public Users(final boolean global) {
     if(!global) return;
 
-    file = new File(Prop.HOME, IO.BASEXSUFFIX + "perm");
+    file = new IOFile(Prop.HOME, IO.BASEXSUFFIX + "perm");
     if(!file.exists()) {
       // define default admin user with all rights
       list.add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));

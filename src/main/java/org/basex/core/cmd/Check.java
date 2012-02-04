@@ -93,6 +93,7 @@ public final class Check extends Command {
     if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(io, ctx);
 
     // otherwise, create a persistent database instance
-    return CreateDB.create(name, new DirParser(io, ctx.prop), ctx);
+    final DirParser dp = new DirParser(io, ctx.prop, ctx.mprop.dbpath(name));
+    return CreateDB.create(name, dp, ctx);
   }
 }

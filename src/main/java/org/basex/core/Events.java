@@ -3,12 +3,12 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.server.ClientListener;
@@ -26,7 +26,7 @@ import org.basex.util.Util;
  */
 public final class Events extends HashMap<String, Sessions> {
   /** Event file. */
-  private final File file = new File(Prop.HOME, IO.BASEXSUFFIX + "events");
+  private final IOFile file = new IOFile(Prop.HOME, IO.BASEXSUFFIX + "events");
 
   /**
    * Constructor.

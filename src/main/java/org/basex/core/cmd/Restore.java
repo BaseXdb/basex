@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
@@ -39,10 +38,10 @@ public final class Restore extends Command {
     if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     // find backup file with or without date suffix
-    File file = mprop.dbpath(db + IO.ZIPSUFFIX);
+    IOFile file = mprop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
       final StringList list = ShowBackups.list(db, true, context);
-      if(list.size() != 0) file = new File(list.get(0));
+      if(list.size() != 0) file = new IOFile(list.get(0));
     } else {
       // db is already the name of a backup -> extract db name
       final Pattern pa = Pattern.compile(IO.DATEPATTERN + '$');
@@ -57,7 +56,7 @@ public final class Restore extends Command {
 
     // try to restore database
     return restore(file) && (!closed || new Open(db).run(context)) ?
-        info(DB_RESTORED_X, file.getName(), perf) :
+        info(DB_RESTORED_X, file.name(), perf) :
           error(DB_NOT_RESTORED_X, db);
   }
 
@@ -66,9 +65,9 @@ public final class Restore extends Command {
    * @param file file
    * @return success flag
    */
-  private boolean restore(final File file) {
+  private boolean restore(final IOFile file) {
     try {
-      progress(new Zip(new IOFile(file))).unzip(mprop.dbpath());
+      progress(new Zip(file)).unzip(mprop.dbpath());
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

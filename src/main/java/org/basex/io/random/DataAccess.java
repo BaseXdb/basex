@@ -1,10 +1,10 @@
 package org.basex.io.random;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Num;
 import org.basex.util.Util;
 
@@ -31,8 +31,8 @@ public final class DataAccess {
    * @param f the file to be read
    * @throws IOException I/O Exception
    */
-  public DataAccess(final File f) throws IOException {
-    file = new RandomAccessFile(f, "rw");
+  public DataAccess(final IOFile f) throws IOException {
+    file = new RandomAccessFile(f.file(), "rw");
     len = file.length();
     cursor(0);
   }

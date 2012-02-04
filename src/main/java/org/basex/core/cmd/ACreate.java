@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.IOException;
-import org.basex.build.Builder;
+
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
@@ -82,25 +82,22 @@ public abstract class ACreate extends Command {
     try {
       if(context.pinned(db)) return error(DB_PINNED_X, db);
 
-      final boolean mem = prop.is(Prop.MAINMEM);
-      /* Builder instance. */
-      final Builder builder = mem ? new MemBuilder(db, parser, prop) :
-              new DiskBuilder(db, parser, context);
-
-      Data data = progress(builder).build();
-      if(mem) {
+      // database builder instance.
+      if(prop.is(Prop.MAINMEM)) {
+        final Data data = progress(new MemBuilder(db, parser, prop)).build();
         context.openDB(data);
         context.pin(data);
       } else {
+        Data data = progress(new DiskBuilder(db, parser, context)).build();
         data.close();
         final Open open = new Open(db);
         if(!open.run(context)) return error(open.info());
 
         data = context.data();
+        data.meta.pathindex = data.meta.createpath;
         if(data.meta.createtext) create(IndexType.TEXT,      data, this);
         if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
         if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
-        data.meta.pathindex = data.meta.createpath;
         data.flush();
       }
       return info(parser.info() + DB_CREATED_X_X, db, perf);

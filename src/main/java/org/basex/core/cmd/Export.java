@@ -86,7 +86,7 @@ public final class Export extends Command {
     final IOFile bin = data.meta.binaries();
     for(final String s : bin.descendants()) {
       final String u = unique(exported, new IOFile(root.path(), s).path());
-      Copy.copy(new File(bin.file(), s), new File(u));
+      Copy.copy(new File(bin.path(), s), new File(u));
     }
   }
 

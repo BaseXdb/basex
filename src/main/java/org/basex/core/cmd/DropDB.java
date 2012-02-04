@@ -1,17 +1,16 @@
 package org.basex.core.cmd;
 
-import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 
-import java.io.File;
-
-import org.basex.core.MainProp;
 import org.basex.core.Command;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Context;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdDrop;
+import org.basex.core.Context;
+import org.basex.core.MainProp;
+import org.basex.core.User;
 import org.basex.data.MetaData;
+import org.basex.io.IOFile;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.
@@ -74,15 +73,12 @@ public final class DropDB extends Command {
    * @param pat file pattern
    * @return success of operation
    */
-  public static synchronized boolean drop(final File path, final String pat) {
+  public static synchronized boolean drop(final IOFile path, final String pat) {
     boolean ok = path.exists();
     // try to delete all files
-    final File[] files = path.listFiles();
-    if(files != null) {
-      for(final File sub : files) {
-        ok &= sub.isDirectory() ? drop(sub, pat) :
-          pat != null && !sub.getName().matches(pat) || sub.delete();
-      }
+    for(final IOFile sub : path.children()) {
+      ok &= sub.isDir() ? drop(sub, pat) :
+        pat != null && !sub.name().matches(pat) || sub.delete();
     }
     // only delete directory if no pattern was specified
     return (pat != null || path.delete()) && ok;

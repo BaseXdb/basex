@@ -2,7 +2,6 @@ package org.basex.io.in;
 
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +14,7 @@ import java.util.Arrays;
 import java.util.zip.ZipInputStream;
 
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.list.ByteList;
 
 /**
@@ -53,8 +53,8 @@ public class BufferInput extends InputStream {
    * @param file the file to be read
    * @throws IOException I/O Exception
    */
-  public BufferInput(final File file) throws IOException {
-    this(new FileInputStream(file));
+  public BufferInput(final IOFile file) throws IOException {
+    this(new FileInputStream(file.file()));
     length = file.length();
   }
 

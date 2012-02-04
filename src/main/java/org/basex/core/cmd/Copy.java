@@ -60,8 +60,8 @@ public final class Copy extends Command {
    * @return success flag
    */
   private boolean copy(final String db, final String newdb) {
-    final File src = mprop.dbpath(db);
-    final File trg = mprop.dbpath(newdb);
+    final File src = mprop.dbpath(db).file();
+    final File trg = mprop.dbpath(newdb).file();
 
     // return false if source cannot be opened, or target cannot be created
     final StringList files = new IOFile(src).descendants();

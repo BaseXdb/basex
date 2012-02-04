@@ -2,7 +2,6 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.build.DiskBuilder;
 import org.basex.core.BaseXException;
@@ -19,13 +18,13 @@ import org.basex.index.value.DiskValues;
 import org.basex.index.value.UpdatableDiskValues;
 import org.basex.index.Names;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.random.DataAccess;
 import org.basex.io.random.TableDiskAccess;
 import org.basex.util.Compress;
 import org.basex.util.Num;
-import org.basex.util.Performance;
 import org.basex.util.hash.TokenObjMap;
 import org.basex.util.list.IntList;
 import org.basex.util.Util;
@@ -202,26 +201,15 @@ public final class DiskData extends Data {
 
   @Override
   public boolean updating(final boolean updating) {
-    final File upd = updateFile();
-    if(!updating) return upd.delete();
-
-    // try several times (may fail at first run)
-    for(int i = 0; i < 10; i++) {
-      try {
-        if(upd.createNewFile()) return true;
-      } catch(final IOException ex) {
-        Performance.sleep(10);
-        Util.debug(ex);
-      }
-    }
-    return false;
+    final IOFile upd = updateFile();
+    return updating ? upd.touch() : upd.delete();
   }
 
   /**
    * Returns a file that indicates ongoing updates.
    * @return updating file
    */
-  public File updateFile() {
+  public IOFile updateFile() {
     return meta.dbfile(DataText.DATAUPD);
   }
 

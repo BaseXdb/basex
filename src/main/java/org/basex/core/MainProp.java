@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import java.io.File;
 import java.util.Random;
 
 import org.basex.io.IOFile;
@@ -70,8 +69,8 @@ public final class MainProp extends AProp {
    * @param db name of the database
    * @return database filename
    */
-  public File dbpath(final String db) {
-    return new File(get(DBPATH), db);
+  public IOFile dbpath(final String db) {
+    return new IOFile(get(DBPATH), db);
   }
 
   /**

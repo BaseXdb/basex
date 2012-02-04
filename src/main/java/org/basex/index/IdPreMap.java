@@ -1,11 +1,11 @@
 package org.basex.index;
 
+import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.list.IntList;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -50,7 +50,7 @@ public class IdPreMap {
    * @param f file to read from
    * @throws IOException I/O error while reading from the file
    */
-  public IdPreMap(final File f) throws IOException {
+  public IdPreMap(final IOFile f) throws IOException {
     final DataInput in = new DataInput(f);
     try {
       baseid = in.readNum();
@@ -70,7 +70,7 @@ public class IdPreMap {
    * @param f file to write to
    * @throws IOException I/O error while writing to the file
    */
-  public void write(final File f) throws IOException {
+  public void write(final IOFile f) throws IOException {
     final DataOutput out = new DataOutput(f);
     try {
       out.writeNum(baseid);

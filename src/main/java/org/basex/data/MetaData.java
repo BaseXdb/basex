@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.basex.build.BuildException;
@@ -27,6 +26,8 @@ import org.basex.util.ft.Language;
  * @author Christian Gruen
  */
 public final class MetaData {
+  /** Database path. Set to {@code null} if database is in main memory. */
+  public final IOFile path;
   /** Properties. */
   public final Prop prop;
 
@@ -105,9 +106,6 @@ public final class MetaData {
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
 
-  /** Database path. Set to {@code null} for main memory instances. */
-  private final File path;
-
   /**
    * Constructor, specifying the database properties.
    * @param pr database properties
@@ -166,7 +164,7 @@ public final class MetaData {
 
     // return true if the database exists and if the
     // specified path and database name equal each other
-    final File file = mprop.dbpath(db);
+    final IOFile file = mprop.dbpath(db);
     final boolean exists = file.exists();
     if(!exists || path.equals(db)) return exists;
 
@@ -251,7 +249,7 @@ public final class MetaData {
    * @return database size
    */
   public long dbsize() {
-    return path != null ? dbsize(new IOFile(path)) : 0;
+    return path != null ? dbsize(path) : 0;
   }
 
   /**
@@ -259,7 +257,7 @@ public final class MetaData {
    * @return database size
    */
   public long dbtime() {
-    return path != null ? new IOFile(path).date() : 0;
+    return path != null ? path.date() : 0;
   }
 
   /**
@@ -283,7 +281,7 @@ public final class MetaData {
    * @param fn filename
    * @return database filename
    */
-  public File dbfile(final String fn) {
+  public IOFile dbfile(final String fn) {
     return file(path, fn);
   }
 
@@ -482,7 +480,7 @@ public final class MetaData {
    * @param fn filename
    * @return database filename
    */
-  private static File file(final File path, final String fn) {
-    return new File(path, fn + IO.BASEXSUFFIX);
+  private static IOFile file(final IOFile path, final String fn) {
+    return new IOFile(path, fn + IO.BASEXSUFFIX);
   }
 }

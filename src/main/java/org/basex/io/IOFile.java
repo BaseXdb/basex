@@ -16,7 +16,9 @@ import java.util.zip.ZipInputStream;
 import org.basex.core.Prop;
 import org.basex.io.in.BufferInput;
 import org.basex.io.out.BufferOutput;
+import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.basex.util.list.ByteList;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
@@ -89,6 +91,23 @@ public final class IOFile extends IO {
    */
   public File file() {
     return file;
+  }
+
+  /**
+   * Creates a new instance of this file.
+   * @return success flag
+   */
+  public boolean touch() {
+    // try several times (may fail at first run, particularly on Windows)
+    for(int i = 0; i < 10; i++) {
+      try {
+        if(file.createNewFile()) return true;
+      } catch(final IOException ex) {
+        Performance.sleep(50);
+        Util.debug(ex);
+      }
+    }
+    return false;
   }
 
   @Override
@@ -214,7 +233,7 @@ public final class IOFile extends IO {
   @Override
   public BufferInput buffer() throws IOException {
     // return file stream
-    if(is == null) return new BufferInput(file);
+    if(is == null) return new BufferInput(this);
     // return input stream
     final BufferInput in = new BufferInput(is);
     if(zip != null && zip.getSize() != -1) in.length(zip.getSize());

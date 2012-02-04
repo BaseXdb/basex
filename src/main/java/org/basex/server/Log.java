@@ -2,7 +2,6 @@ package org.basex.server;
 
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -11,6 +10,7 @@ import java.util.Date;
 
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.io.IOFile;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
@@ -29,7 +29,7 @@ public final class Log {
   /** Quiet flag. */
   private final boolean quiet;
   /** Logging directory. */
-  private final File dir;
+  private final IOFile dir;
 
   /** Start date of log. */
   private String start;
@@ -83,10 +83,10 @@ public final class Log {
    * @param d date, used for file name
    */
   private synchronized void create(final Date d) {
-    dir.mkdirs();
+    dir.md();
     start = DATE.format(d);
     try {
-      fos = new FileOutputStream(new File(dir, start + ".log"), true);
+      fos = new FileOutputStream(new IOFile(dir, start + ".log").file(), true);
     } catch(final IOException ex) {
       Util.stack(ex);
     }

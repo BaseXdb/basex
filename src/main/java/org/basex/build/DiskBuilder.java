@@ -57,7 +57,7 @@ public final class DiskBuilder extends Builder {
   @Override
   public DiskData build() throws IOException {
     DropDB.drop(name, mprop);
-    mprop.dbpath(name).mkdirs();
+    mprop.dbpath(name).md();
 
     final IO file = parser.src;
     final MetaData md = new MetaData(name, prop, mprop);

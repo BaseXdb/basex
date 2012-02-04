@@ -1,9 +1,9 @@
 package org.basex.io.in;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
 
+import org.basex.io.IOFile;
 import org.basex.util.Num;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
@@ -21,7 +21,7 @@ public final class DataInput extends BufferInput {
    * @param file the file to be read
    * @throws IOException I/O Exception
    */
-  public DataInput(final File file) throws IOException {
+  public DataInput(final IOFile file) throws IOException {
     super(file);
   }
 

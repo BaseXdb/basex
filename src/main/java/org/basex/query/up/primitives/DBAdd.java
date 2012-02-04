@@ -138,7 +138,7 @@ public final class DBAdd extends InsertBase {
       new DataBuilder(mdata).build(nd);
       mdata.update(0, Data.DOC, pth);
     } else if(dt.isString()) {
-      final DirParser p = new DirParser(io, target, ctx.prop);
+      final DirParser p = new DirParser(io, target, ctx.prop, data.meta.path);
       final MemBuilder b = new MemBuilder(data.meta.name, p, ctx.prop);
       try {
         mdata = b.build();

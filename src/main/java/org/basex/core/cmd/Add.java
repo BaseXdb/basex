@@ -13,6 +13,7 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.core.CommandBuilder;
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -80,13 +81,14 @@ public final class Add extends ACreate {
       name = name.substring(s + 1);
     }
 
+    final Data data = context.data();
     final Parser parser;
     if(io != null) {
       // set name of document
       if(!name.isEmpty()) io.name(name);
       // get name from io reference
       else if(!(io instanceof IOContent)) name = io.name();
-      parser = new DirParser(io, target, prop);
+      parser = new DirParser(io, target, prop, data.meta.path);
     } else {
       parser = new SAXWrapper(new SAXSource(in), name, target, context.prop);
     }
@@ -103,13 +105,13 @@ public final class Add extends ACreate {
       Performance.gc(2);
       large = fl > rt.freeMemory() / 3;
     }
+    // in main memory mode, never write to disk
+    if(prop.is(Prop.MAINMEM)) large = false;
 
     // create random database name for disk-based creation
-    final Data data = context.data();
-    final String dbname = large ? context.mprop.random(data.meta.name) : name;
-
-    build = large ? new DiskBuilder(dbname, parser, context) :
-      new MemBuilder(dbname, parser, context.prop);
+    final String db = large ? context.mprop.random(data.meta.name) : name;
+    build = large ? new DiskBuilder(db, parser, context) :
+      new MemBuilder(db, parser, context.prop);
 
     Data tmp = null;
     try {
@@ -121,14 +123,17 @@ public final class Add extends ACreate {
         data.flush();
       }
       return info(parser.info() + PATH_ADDED_X_X, name, perf);
+
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(Util.message(ex));
+
     } finally {
       // close and drop intermediary database instance
       try { build.close(); } catch(final IOException e) { }
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
-      if(large) DropDB.drop(dbname, context.mprop);
+      // drop temporary database instance
+      if(large) DropDB.drop(db, context.mprop);
     }
   }
 

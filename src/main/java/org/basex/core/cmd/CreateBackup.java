@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -45,7 +44,7 @@ public final class CreateBackup extends Command {
     // loop through all databases
     boolean ok = true;
     for(final String db : dbs) {
-      if(!mprop.dbpath(db).isDirectory()) continue;
+      if(!mprop.dbpath(db).isDir()) continue;
       if(backup(db)) {
         // backup was successful
         info(DB_BACKUP_X, db, perf);
@@ -64,9 +63,9 @@ public final class CreateBackup extends Command {
    */
   private boolean backup(final String db) {
     try {
-      final File path = mprop.dbpath(db);
-      final IOFile file = new IOFile(mprop.dbpath(db + "-" +
-          IO.DATE.format(new Date()) + IO.ZIPSUFFIX));
+      final IOFile path = mprop.dbpath(db);
+      final IOFile file = mprop.dbpath(db + "-" +
+      IO.DATE.format(new Date()) + IO.ZIPSUFFIX);
 
       final Zip zip = progress(new Zip(file));
       zip.zip(path);

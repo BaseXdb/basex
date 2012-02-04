@@ -2,9 +2,9 @@ package org.basex.index.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.data.Data;
+import org.basex.io.IOFile;
 import org.basex.io.random.DataAccess;
 
 /**
@@ -15,7 +15,7 @@ import org.basex.io.random.DataAccess;
  */
 final class FTFuzzyList extends FTList {
   /** Size file. */
-  private final File sizes;
+  private final IOFile sizes;
   /** Token positions. */
   private final int[] tp;
   /** Pointer on current token length. */

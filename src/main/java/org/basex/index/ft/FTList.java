@@ -1,9 +1,9 @@
 package org.basex.index.ft;
 
 import static org.basex.data.DataText.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.data.Data;
+import org.basex.io.IOFile;
 import org.basex.io.random.DataAccess;
 
 /**
@@ -19,9 +19,9 @@ abstract class FTList {
   /** Storing pre and pos values for each token. */
   private final DataAccess dat;
   /** Structure file. */
-  private final File files;
+  private final IOFile files;
   /** Data file. */
-  private final File filed;
+  private final IOFile filed;
   /** Wasted flag. */
   private boolean wasted;
 

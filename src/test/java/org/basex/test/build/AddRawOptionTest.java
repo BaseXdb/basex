@@ -21,7 +21,6 @@ import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -82,9 +81,8 @@ public class AddRawOptionTest {
    * @throws Exception error
    */
   @Test
-  @Ignore("GH-357")
   public void testAdd() throws Exception {
-    new Add(DBNAME, DIR).execute(CTX);
+    new Add("", DIR).execute(CTX);
     assertAllFilesExist();
   }
 

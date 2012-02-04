@@ -83,7 +83,7 @@ public final class CreateDB extends ACreate {
       final IO io = IO.get(args[1]);
       if(!io.exists()) return error(FILE_NOT_FOUND_X, io);
       if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
-      parser = new DirParser(io, prop);
+      parser = new DirParser(io, prop, mprop.dbpath(name));
     }
     return build(parser, name);
   }
@@ -110,8 +110,10 @@ public final class CreateDB extends ACreate {
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
 
-    // build database and index structures
+    // create disk builder, set database path
     final Builder builder = new DiskBuilder(name, parser, ctx);
+
+    // build database and index structures
     try {
       final Data data = builder.build();
       if(data.meta.createtext) data.setIndex(IndexType.TEXT,
@@ -151,9 +153,10 @@ public final class CreateDB extends ACreate {
    */
   public static synchronized MemData mainMem(final IO source, final Context ctx)
       throws IOException {
+
     if(!source.exists()) throw new FileNotFoundException(
         Util.info(FILE_NOT_FOUND_X, source));
-    return mainMem(new DirParser(source, ctx.prop), ctx);
+    return mainMem(new DirParser(source, ctx.prop, null), ctx);
   }
 
   @Override

@@ -1,12 +1,12 @@
 package org.basex.io.out;
 
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Num;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
@@ -37,7 +37,7 @@ public final class DataOutput extends OutputStream {
    * @param db name of the database
    * @throws IOException I/O exception
    */
-  public DataOutput(final File db) throws IOException {
+  public DataOutput(final IOFile db) throws IOException {
     this(db, IO.BLOCKSIZE);
   }
 
@@ -48,8 +48,8 @@ public final class DataOutput extends OutputStream {
    * @param bufs size of the buffer to use
    * @throws IOException I/O exception
    */
-  public DataOutput(final File db, final int bufs) throws IOException {
-    os = new BufferOutput(new FileOutputStream(db), bufs);
+  public DataOutput(final IOFile db, final int bufs) throws IOException {
+    os = new BufferOutput(new FileOutputStream(db.file()), bufs);
   }
 
   @Override

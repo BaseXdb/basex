@@ -68,7 +68,7 @@ public final class BufferInputTest {
     io.write(data);
 
     final ArrayOutput ao = new ArrayOutput();
-    final BufferInput bi = new BufferInput(io.file());
+    final BufferInput bi = new BufferInput(io);
     bi.reset();
     // guess encoding
     bi.encoding();

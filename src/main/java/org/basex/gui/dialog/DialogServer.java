@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.io.File;
 import java.io.IOException;
 
 import javax.swing.event.ChangeEvent;
@@ -102,7 +101,7 @@ public final class DialogServer extends Dialog {
   /** Combobox for log files. */
   private final BaseXCombo logc;
   /** String for log dir. */
-  private final File logdir = ctx.mprop.dbpath(".logs");
+  private final IOFile logd = ctx.mprop.dbpath(".logs");
   /** ClientSession. */
   private ClientSession cs;
   /** Boolean for check is server is running. */
@@ -337,28 +336,28 @@ public final class DialogServer extends Dialog {
       } else if(cmp == refreshLog || cmp == logc) {
         byte[] cont = Token.EMPTY;
         if(logc.getSelectedIndex() != -1) {
-          final File f = new File(logdir, logc.getSelectedItem().toString());
-          cont = new IOFile(f).read();
+          final IOFile f = new IOFile(logd, logc.getSelectedItem().toString());
+          cont = f.read();
         }
         logt.setText(cont);
         logt.scrollToEnd();
       } else if(cmp == delete) {
-        final File f = new File(logdir, logc.getSelectedItem().toString());
+        final IOFile f = new IOFile(logd, logc.getSelectedItem().toString());
         if(f.delete()) {
           logc.setSelectedIndex(-1);
           refreshLog();
         } else {
-          msg2 = Util.info(FILE_NOT_DELETED_X, f.getName());
+          msg2 = Util.info(FILE_NOT_DELETED_X, f.name());
           icon = Msg.ERROR;
         }
       } else if(cmp == deleteAll) {
-        File file = null;
+        IOFile file = null;
         for(int i = 0; i < logc.getItemCount(); ++i) {
-          final File f = new File(logdir, logc.getItemAt(i).toString());
+          final IOFile f = new IOFile(logd, logc.getItemAt(i).toString());
           if(!f.delete()) file = f;
         }
         if(file != null) {
-          msg2 = Util.info(FILE_NOT_DELETED_X, file.getName());
+          msg2 = Util.info(FILE_NOT_DELETED_X, file.name());
           icon = Msg.ERROR;
         }
         logc.setSelectedIndex(-1);
@@ -435,10 +434,10 @@ public final class DialogServer extends Dialog {
    */
   void refreshLog() {
     logc.removeAllItems();
-    final String[] files = logdir.list();
     final StringList sl = new StringList();
-    if(files != null) {
-      for(final String s : files) if(s.endsWith(".log")) sl.add(s);
+    for(final IOFile s : logd.children()) {
+      final String name = s.name();
+      if(name.endsWith(".log")) sl.add(name);
     }
     sl.sort(false, false);
     for(final String s : sl) logc.addItem(s);

@@ -2,12 +2,12 @@ package org.basex.util.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Util;
@@ -49,7 +49,7 @@ public final class StopWords extends TokenSet {
 
     // try to parse the stop words file of the current database
     try {
-      final File file = data.meta.dbfile(DATASWL);
+      final IOFile file = data.meta.dbfile(DATASWL);
       if(!file.exists()) return;
       final DataInput in = new DataInput(data.meta.dbfile(DATASWL));
       try {

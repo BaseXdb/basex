@@ -124,7 +124,7 @@ public final class Zip extends Progress {
    * @param source source directory to be zipped
    * @throws IOException I/O exception
    */
-  public void zip(final File source) throws IOException {
+  public void zip(final IOFile source) throws IOException {
     if(!(archive instanceof IOFile))
       throw new FileNotFoundException(archive.path());
 
@@ -137,18 +137,18 @@ public final class Zip extends Progress {
       out = new ZipOutputStream(new BufferedOutputStream(
           new FileOutputStream(archive.path())));
       out.setLevel(1);
-      out.putNextEntry(new ZipEntry(source.getName() + '/'));
+      out.putNextEntry(new ZipEntry(source.name() + '/'));
       out.closeEntry();
 
       // loop through all files
-      final StringList files = new IOFile(source).descendants();
+      final StringList files = source.descendants();
       total = files.size();
       for(final String io : files) {
         curr++;
         FileInputStream in = null;
         try {
-          in = new FileInputStream(new File(source, io));
-          out.putNextEntry(new ZipEntry(source.getName() + '/' + io));
+          in = new FileInputStream(new File(source.file(), io));
+          out.putNextEntry(new ZipEntry(source.name() + '/' + io));
           for(int c; (c = in.read(data)) != -1;) out.write(data, 0, c);
           out.closeEntry();
         } finally {

@@ -3,7 +3,6 @@ package org.basex.build.file;
 import static org.basex.build.file.MAB2.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -11,6 +10,7 @@ import org.basex.build.BuildException;
 import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.random.DataAccess;
 import org.basex.util.Performance;
@@ -80,7 +80,7 @@ public final class MAB2Parser extends SingleParser {
     // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     flat = props.is(ParserProp.FLAT);
-    input = new DataAccess(new File(source.path()));
+    input = new DataAccess(new IOFile(source.path()));
   }
 
   @Override
@@ -548,7 +548,7 @@ public final class MAB2Parser extends SingleParser {
    */
   private void index(final TokenMap hash, final String fn) {
     try {
-      final DataAccess in = new DataAccess(new File(fn + ".dat"));
+      final DataAccess in = new DataAccess(new IOFile(fn + ".dat"));
       while(true) {
         final byte[] key = find(in, (byte) '\t');
         final byte[] val = find(in, (byte) '\n');

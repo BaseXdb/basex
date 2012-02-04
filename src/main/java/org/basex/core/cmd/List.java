@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
@@ -66,8 +65,8 @@ public final class List extends Command {
       }
 
       // count number of raw files
-      final File dir = new File(mprop.dbpath(name), M_RAW);
-      final int bin = new IOFile(dir).descendants().size();
+      final IOFile dir = new IOFile(mprop.dbpath(name), M_RAW);
+      final int bin = dir.descendants().size();
 
       // create entry
       if(file != null) {

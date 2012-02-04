@@ -1,9 +1,6 @@
 package org.basex.test.data;
 
 import static org.junit.Assert.*;
-
-import java.io.File;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.Close;
@@ -11,6 +8,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.DataText;
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +36,7 @@ public final class TableTest {
   /** Context. */
   private Context ctx;
   /** Table file. */
-  private File tbl;
+  private IOFile tbl;
 
   /**
    * Set up method.

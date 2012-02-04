@@ -78,7 +78,7 @@ public final class TableDiskAccess extends TableAccess {
     in.close();
 
     // initialize data file
-    file = new RandomAccessFile(meta.dbfile(pf), "rw");
+    file = new RandomAccessFile(meta.dbfile(pf).file(), "rw");
     readIndex(0);
   }
 
