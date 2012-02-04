@@ -1,16 +1,9 @@
 package org.basex.tests.w3c;
 
-import static org.basex.core.Prop.NL;
-import static org.basex.tests.w3c.QT3Constants.*;
-import static org.basex.util.Token.*;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
+import static org.basex.core.Prop.NL;
 import org.basex.core.Text;
 import org.basex.core.cmd.Set;
 import org.basex.io.IO;
@@ -21,16 +14,18 @@ import org.basex.query.func.Function;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.util.Compare.Flag;
-import org.basex.tests.w3c.qt3api.XQEmpty;
-import org.basex.tests.w3c.qt3api.XQException;
-import org.basex.tests.w3c.qt3api.XQItem;
-import org.basex.tests.w3c.qt3api.XQValue;
-import org.basex.tests.w3c.qt3api.XQuery;
+import static org.basex.tests.w3c.QT3Constants.*;
+import org.basex.tests.w3c.qt3api.*;
 import org.basex.util.Args;
 import org.basex.util.Performance;
+import static org.basex.util.Token.*;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.ObjList;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
@@ -78,7 +73,7 @@ public final class QT3TS {
   /** Global environments. */
   private final ObjList<QT3Env> genvs = new ObjList<QT3Env>();
   /** Default path to the test suite. */
-  protected String path = "g:/XML/w3c/qt3ts/";
+  protected final String path = "g:/XML/w3c/qt3ts/";
 
   /**
    * Main method of the test class.
@@ -332,7 +327,7 @@ public final class QT3TS {
       right.add(tmp.finish());
       correct++;
     } else {
-      tmp.add("Expect: " + noComments(msg)).add(NL).add(NL);;
+      tmp.add("Expect: " + noComments(msg)).add(NL).add(NL);
       wrong.add(tmp.finish());
     }
 
@@ -585,10 +580,10 @@ public final class QT3TS {
       if(exp.size() != res.size())
         return Util.info("% results (found: %)", exp.size(), res.size());
 
-      for(final Object s : exp.toArray()) {
+      for(final String s : exp.toArray(new String[exp.size()])) {
         if(!res.contains(s)) return Util.info("% (missing)", s);
       }
-      for(final Object s : res.toArray()) {
+      for(final String s : res.toArray(new String[exp.size()])) {
         if(!exp.contains(s))
           return Util.info("% (missing in expected result)", s);
       }

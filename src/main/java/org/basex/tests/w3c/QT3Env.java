@@ -37,11 +37,11 @@ class QT3Env {
   final String name;
 
   /** Collection uri. */
-  String collURI;
+  final String collURI;
   /** Collection context flag. */
-  boolean collContext;
+  final boolean collContext;
   /** Collection sources. */
-  StringList collSources;
+  final StringList collSources;
 
   /**
    * Constructor.

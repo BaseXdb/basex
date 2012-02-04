@@ -25,14 +25,14 @@ import org.junit.BeforeClass;
  * @author Christian Gruen
  */
 public abstract class Benchmark {
+  /** Test document. */
+  private static final String INPUT = "src/test/resources/factbook.zip";
   /** Global context. */
   private static final Context CONTEXT = new Context();
   /** Server reference. */
   private static BaseXServer server;
   /** Session. */
   private static Session session;
-  /** Test document. */
-  private static String input = "src/test/resources/factbook.zip";
   /** Local vs server flag. */
   private static boolean local;
 
@@ -103,6 +103,6 @@ public abstract class Benchmark {
    * @throws IOException I/O exception
    */
   private void check() throws IOException {
-    session.execute(new Check(input));
+    session.execute(new Check(INPUT));
   }
 }

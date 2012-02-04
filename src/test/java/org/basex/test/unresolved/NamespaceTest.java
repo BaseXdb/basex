@@ -36,7 +36,7 @@ public final class NamespaceTest {
   private static Context context;
 
   /** Test documents. */
-  private static String[][] docs = {
+  private static final String[][] DOCS = {
     { "d1", "<a xmlns:ns0='A'><b><d xmlns:ns1='D'>" +
         "<g xmlns:ns2='G'/></d></b></a>" },
     { "d2", "<n/>" }
@@ -129,7 +129,7 @@ public final class NamespaceTest {
   @Before
   public void startTest() throws BaseXException {
     // create all test databases
-    for(final String[] doc : docs) {
+    for(final String[] doc : DOCS) {
       new CreateDB(doc[0], doc[1]).execute(context);
     }
   }
@@ -140,7 +140,7 @@ public final class NamespaceTest {
   @AfterClass
   public static void finish() throws BaseXException {
     // drop all test databases
-    for(final String[] doc : docs) {
+    for(final String[] doc : DOCS) {
       new DropDB(doc[0]).execute(context);
     }
     context.close();
@@ -160,8 +160,8 @@ public final class NamespaceTest {
       if(first != null) new XQuery(first).execute(context);
       final String result = new XQuery(second).execute(context);
       // quotes are replaced by apostrophes to simplify comparison
-      assertEquals(expected.replaceAll("\\\"", "'"),
-          result.replaceAll("\\\"", "'"));
+      assertEquals(expected.replaceAll("\"", "'"),
+              result.replaceAll("\"", "'"));
     } catch(final BaseXException ex) {
       fail(Util.message(ex));
     }

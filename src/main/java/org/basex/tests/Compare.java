@@ -2,6 +2,8 @@ package org.basex.tests;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -130,7 +132,7 @@ public abstract class Compare {
   public static String execute(final String[] proc) {
     try {
       final ArrayList<String> al = new ArrayList<String>();
-      for(int p = 1; p < proc.length; p++) al.add(proc[p]);
+      al.addAll(Arrays.asList(proc).subList(1, proc.length));
 
       final ProcessBuilder pb = new ProcessBuilder(al);
       pb.redirectErrorStream(true);

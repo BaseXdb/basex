@@ -87,10 +87,6 @@ public abstract class W3CTS {
   private String expected;
   /** Reported results. */
   private String results;
-  /** Reports. */
-  private String report;
-  /** Test sources. */
-  private String sources;
 
   /** Maximum length of result output. */
   private int maxout = 500;
@@ -144,7 +140,7 @@ public abstract class W3CTS {
    * Constructor.
    * @param nm name of test
    */
-  public W3CTS(final String nm) {
+  protected W3CTS(final String nm) {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
@@ -166,8 +162,10 @@ public abstract class W3CTS {
     queries = path + "Queries/XQuery/";
     expected = path + "ExpectedTestResults/";
     results = path + "ReportingResults/Results/";
-    report = path + "ReportingResults/";
-    sources = path + "TestSources/";
+    /* Reports. */
+    final String report = path + "ReportingResults/";
+    /* Test sources. */
+    final String sources = path + "TestSources/";
 
     final Performance perf = new Performance();
     context.prop.set(Prop.CHOP, false);

@@ -11,7 +11,7 @@ import org.basex.util.Util;
  */
 final class XQSequence extends XQValue {
   /** Wrapped sequence. */
-  Seq sequence;
+  final Seq sequence;
 
   /**
    * Constructor.
