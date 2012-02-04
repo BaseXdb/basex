@@ -276,7 +276,7 @@ public final class InfoView extends View {
     for(int i = 0; i < l - 1; ++i) {
       if(i != focus) continue;
       final int bx = w - bw + bs * i;
-      g.setColor(color4);
+      g.setColor(color3);
       g.fillRect(bx, by, bs + 1, bh);
     }
 

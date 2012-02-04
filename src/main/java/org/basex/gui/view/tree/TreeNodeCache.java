@@ -12,7 +12,7 @@ import org.basex.util.list.ObjList;
  */
 final class TreeNodeCache implements TreeConstants {
   /** Document depth. */
-  private int maxLevel;
+  private final int maxLevel;
   /** All nodes document nodes per level. */
   private final IntList[] nodes;
 

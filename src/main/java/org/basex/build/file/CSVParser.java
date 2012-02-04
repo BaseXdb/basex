@@ -196,7 +196,7 @@ public final class CSVParser extends SingleParser {
       return;
     }
 
-    byte[] t;
+    final byte[] t;
     if(simple) {
       t = ENTRY;
     } else {

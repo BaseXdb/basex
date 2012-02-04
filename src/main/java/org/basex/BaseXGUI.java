@@ -1,17 +1,9 @@
 package org.basex;
 
-import static org.basex.core.Text.*;
-
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.util.Enumeration;
-import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import static org.basex.core.Text.*;
 import org.basex.core.cmd.Check;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -23,6 +15,10 @@ import org.basex.util.Args;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.Enumeration;
+
 /**
  * This is the starter class for the graphical frontend.
  *
@@ -32,10 +28,10 @@ import org.basex.util.list.StringList;
 public final class BaseXGUI {
   /** Database context. */
   final Context context = new Context();
+  /** Files, specified as arguments. */
+  final StringList files = new StringList();
   /** Mac OS X GUI optimizations. */
   GUIMacOSX osxGUI;
-  /** Files, specified as arguments. */
-  StringList files = new StringList();
 
   /**
    * Main method.

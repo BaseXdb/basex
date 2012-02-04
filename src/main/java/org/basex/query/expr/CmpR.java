@@ -176,7 +176,7 @@ public final class CmpR extends Single {
     final AxisPath path = (AxisPath) expr;
     final int st = path.steps.length;
 
-    AxisStep step;
+    final AxisStep step;
     if(text) {
       step = st == 1 ? ic.step : path.step(st - 2);
       if(!(step.test.test == Name.NAME)) return null;
@@ -201,9 +201,11 @@ public final class CmpR extends Single {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(min != Double.NEGATIVE_INFINITY) sb.append(min + (mni ? " <= " : " < "));
+    if(min != Double.NEGATIVE_INFINITY)
+      sb.append(min).append(mni ? " <= " : " < ");
     sb.append(expr);
-    if(max != Double.POSITIVE_INFINITY) sb.append((mxi ? " <= " : " < ") + max);
+    if(max != Double.POSITIVE_INFINITY)
+      sb.append(mxi ? " <= " : " < ").append(max);
     return sb.toString();
   }
 }

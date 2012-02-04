@@ -263,7 +263,7 @@ public class AxisStep extends Preds {
     }
     if(sb.length() == 0) {
       if(axis == Axis.ATTR && test != Test.NOD) sb.append("@");
-      else if(axis != Axis.CHILD) sb.append(axis + "::");
+      else if(axis != Axis.CHILD) sb.append(axis).append("::");
       sb.append(test);
     }
     return sb.append(super.toString()).toString();

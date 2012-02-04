@@ -131,8 +131,8 @@ public final class Pos extends Simple {
   public String toString() {
     final StringBuilder sb = new StringBuilder("position() ");
     if(max == Long.MAX_VALUE) sb.append('>');
-    sb.append("= " + min);
-    if(max != Long.MAX_VALUE && min != max) sb.append(" to " + max);
+    sb.append("= ").append(min);
+    if(max != Long.MAX_VALUE && min != max) sb.append(" to ").append(max);
     return sb.toString();
   }
 }

@@ -85,7 +85,10 @@ public final class FLWR extends GFLWOR {
         return true;
       }
 
-      /** Initializes the iterator. */
+      /**
+       * Initializes the iterator.
+       * @throws QueryException query exception
+       */
       private void init() throws QueryException {
         if(iter != null) return;
         iter = new Iter[fl.length];

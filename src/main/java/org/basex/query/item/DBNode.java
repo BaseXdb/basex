@@ -9,7 +9,6 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.AxisIter;
@@ -209,7 +208,7 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final ANode copy(final QueryContext ctx) {
+  public final ANode deepCopy() {
     // adopt index structures if database is a main-memory instance
     final MemData md = data instanceof MemData ?
         new MemData(data) : new MemData(data.meta.prop);

@@ -16,7 +16,7 @@ import org.junit.Test;
  */
 public final class UTF8Test {
   /** Database context. */
-  private static Context context = new Context();
+  private static final Context CONTEXT = new Context();
   /** UTF8 character set. */
   private static final Charset CS_UTF8 = Charset.availableCharsets().get(UTF8);
 
@@ -50,7 +50,7 @@ public final class UTF8Test {
   @Test
   public void entities() throws BaseXException {
     for(int i = 0xA0; i <= Character.MAX_CODE_POINT; i++) {
-      final String qu = new XQuery("'&#" + i + ";'").execute(context);
+      final String qu = new XQuery("'&#" + i + ";'").execute(CONTEXT);
       assertEquals(new String(Character.toChars(i)), qu);
       if(i == 0x400) i = 0xFFF;
       else if(i == 0x1400) i = 0xFFFF;

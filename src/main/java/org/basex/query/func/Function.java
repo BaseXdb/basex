@@ -895,7 +895,7 @@ public enum Function {
     for(final Object a : arg) {
       if(tb.size() != 0) tb.add(',');
       final String s = a.toString();
-      if(s.matches("^([\\w\\d-_:\\.]*\\(|<|\"|\\$| ).*") ||
+      if(s.matches("^([-\\w_:\\.]*\\(|<|\"|\\$| ).*") ||
           a instanceof Integer) {
         tb.add(s);
       } else if(a instanceof Boolean) {

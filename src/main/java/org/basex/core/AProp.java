@@ -1,24 +1,18 @@
 package org.basex.core;
 
 import static org.basex.core.Prop.*;
-import static org.basex.util.Token.*;
+import org.basex.io.IO;
+import org.basex.util.Levenshtein;
+import static org.basex.util.Token.token;
+import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.TreeMap;
-
-import org.basex.io.IO;
-import org.basex.util.Levenshtein;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
 
 /**
  * This class assembles properties which are used all around the project. They
@@ -260,7 +254,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final void set(final Object[] key, final String val) {
-    set(key, val, String.class);
+    setObject(key, val);
   }
 
   /**
@@ -269,7 +263,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final void set(final Object[] key, final int val) {
-    set(key, val, Integer.class);
+    setObject(key, val);
   }
 
   /**
@@ -278,7 +272,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final void set(final Object[] key, final boolean val) {
-    set(key, val, Boolean.class);
+    setObject(key, val);
   }
 
   /**
@@ -287,7 +281,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final void set(final Object[] key, final String[] val) {
-    set(key, val, String[].class);
+    setObject(key, val);
   }
 
   /**
@@ -296,7 +290,7 @@ public abstract class AProp implements Iterable<String> {
    * @param val value to be written
    */
   public final void set(final Object[] key, final int[] val) {
-    set(key, val, int[].class);
+    setObject(key, val);
   }
 
   /**
@@ -363,17 +357,13 @@ public abstract class AProp implements Iterable<String> {
 
   /**
    * Sets the specified value.
+   *
    * @param key key
-   * @param c expected type
    * @param val value
-   * @return true if the value has changed
    */
-  private boolean set(final Object[] key, final Object val, final Class<?> c) {
-    final Object old = get(key, c);
-    final boolean eq = old.equals(val);
+  private void setObject(final Object[] key, final Object val) {
     props.put(key[0].toString(), val);
     finish();
-    return !eq;
   }
 
   /**

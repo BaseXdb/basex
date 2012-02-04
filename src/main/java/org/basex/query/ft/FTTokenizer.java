@@ -21,7 +21,7 @@ import org.basex.util.list.TokenList;
  */
 final class FTTokenizer {
   /** Wildcard object cache. */
-  TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
+  final TokenObjMap<FTWildcard> wcCache = new TokenObjMap<FTWildcard>();
   /** Levenshtein reference. */
   final Levenshtein ls = new Levenshtein();
   /** Calling expression. */

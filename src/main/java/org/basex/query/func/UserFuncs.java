@@ -262,9 +262,9 @@ public final class UserFuncs extends ExprInfo {
     // find similar local function
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
-    for(int n = 0; n < func.length; ++n) {
-      if(ls.similar(nm, lc(func[n].name.local()), 0)) {
-        FUNSIMILAR.thrw(ii, name.string(), func[n].name.string());
+    for(final UserFunc f : func) {
+      if(ls.similar(nm, lc(f.name.local()), 0)) {
+        FUNSIMILAR.thrw(ii, name.string(), f.name.string());
       }
     }
   }
@@ -273,14 +273,14 @@ public final class UserFuncs extends ExprInfo {
   public void plan(final Serializer ser) throws IOException {
     if(func.length == 0) return;
     ser.openElement(this);
-    for(int i = 0; i < func.length; ++i) func[i].plan(ser);
+    for(final UserFunc f : func) f.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < func.length; ++i) sb.append(func[i].toString());
+    for(final UserFunc f : func) sb.append(f.toString());
     return sb.toString();
   }
 }

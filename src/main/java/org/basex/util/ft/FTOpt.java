@@ -1,16 +1,17 @@
 package org.basex.util.ft;
 
+import org.basex.data.ExprInfo;
+import org.basex.data.MetaData;
+import org.basex.io.serial.Serializer;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
+import org.basex.query.ft.ThesQuery;
+import static org.basex.util.Token.TRUE;
+import static org.basex.util.Token.token;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map.Entry;
-import org.basex.data.ExprInfo;
-import org.basex.data.MetaData;
-import org.basex.io.serial.Serializer;
-import org.basex.query.ft.ThesQuery;
 
 /**
  * This class contains all full-text options.
@@ -70,7 +71,7 @@ public final class FTOpt extends ExprInfo {
    * @return self reference
    */
   public FTOpt set(final FTFlag f, final boolean v) {
-    map.put(f, Boolean.valueOf(v));
+    map.put(f, v);
     return this;
   }
 

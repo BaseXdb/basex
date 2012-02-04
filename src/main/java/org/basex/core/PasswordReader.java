@@ -6,12 +6,12 @@ package org.basex.core;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class PasswordReader {
+public interface PasswordReader {
   /**
    * Parses and returns a password.
    * In command line and server mode, read from stdin, on GUI command line
    * prompt using a password box.
    * @return password or empty string
    */
-  public abstract String password();
+  String password();
 }

@@ -144,8 +144,9 @@ public final class Repo {
         for(final Component comp : pkg.comps) {
           // add component's namespace to namespace dictionary
           if(comp.uri != null) {
-            if(nsDict.id(comp.uri) != 0) {
-              nsDict.get(comp.uri).add(name);
+            final TokenSet ts = nsDict.get(comp.uri);
+            if(ts != null) {
+              ts.add(name);
             } else {
               nsDict.add(comp.uri, new TokenSet(name));
             }

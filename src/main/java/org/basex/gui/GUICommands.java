@@ -882,7 +882,7 @@ public enum GUICommands implements GUICommand {
    * @return quoted string
    */
   static String quote(final String s) {
-    return "\"" + s.replaceAll("\\\"", "&quot;") + "\"";
+    return "\"" + s.replaceAll("\"", "&quot;") + "\"";
   }
 
   /**

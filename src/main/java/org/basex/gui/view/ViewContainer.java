@@ -124,7 +124,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     final Insets i = getInsets();
 
     if(gui.gprop.is(GUIProp.GRADIENT)) {
-      BaseXLayout.fill(g, color1, color2,
+      BaseXLayout.fill(g, WHITE, color1,
           i.left, i.top, w - i.right, h - i.bottom);
     }
     if(w < 150 || h < 160) return;

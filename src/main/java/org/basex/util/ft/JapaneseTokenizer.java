@@ -1,6 +1,10 @@
 package org.basex.util.ft;
 
+import org.basex.core.Prop;
+import org.basex.util.Reflect;
 import static org.basex.util.Token.*;
+import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.File;
@@ -10,11 +14,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.basex.core.Prop;
-import org.basex.util.Reflect;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 
 /**
  * Japanese lexer using igo (http://igo.sourceforge.jp/).
@@ -53,8 +52,6 @@ public class JapaneseTokenizer extends Tokenizer {
   private static final String KANDOUSHI = "\u8A18\u53F7";
   /** The kind of POS(Filler). */
   private static final String FILLER = "\u30D5\u30A3\u30E9\u30FC";
-  /** The kind of POS(Others). */
-  private static final String SONOTA = "\u305D\u306E;\u4ED6";
 
   /** Constant of Feature(Mark). */
   private static final String KIGOU_FEATURE = "\u8A18\u53F7,*,*,*,*,*,*,*,*";
@@ -118,7 +115,7 @@ public class JapaneseTokenizer extends Tokenizer {
         Util.debug("Could not initialize Igo Japanese lexer.");
       } else {
         /* Igo constructor. */
-        Constructor<?> tgr = Reflect.find(clz, String.class);
+        final Constructor<?> tgr = Reflect.find(clz, String.class);
         tagger = Reflect.get(tgr, dic.toString());
         if(tagger == null) {
           available = false;
@@ -556,7 +553,7 @@ public class JapaneseTokenizer extends Tokenizer {
      * @return part of speech
      */
     public int getHinshi() {
-      int hinshi;
+      final int hinshi;
       // morphological analyzer certainly returns
       // the single ascii char as a "noun".
       final byte[] s = token(mSurface);
@@ -586,8 +583,6 @@ public class JapaneseTokenizer extends Tokenizer {
           hinshi = HINSHI_KANDOUSHI;
         } else if(h.equals(FILLER)) {
           hinshi = HINSHI_FILLER;
-        } else if(h.equals(SONOTA)) {
-          hinshi = HINSHI_SONOTA;
         } else {
           hinshi = HINSHI_SONOTA;
         }

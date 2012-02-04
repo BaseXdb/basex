@@ -311,7 +311,7 @@ final class TableData {
    * Resets the filter entries.
    */
   void resetFilter() {
-    for(int f = 0; f < cols.length; ++f) cols[f].filter = "";
+    for(final TableCol col : cols) col.filter = "";
   }
 
   /**

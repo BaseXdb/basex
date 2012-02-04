@@ -57,7 +57,7 @@ public final class BaseXMem extends BaseXPanel {
 
     // show current memory usage
     final boolean full = used * 6 / 5 > max;
-    g.setColor(full ? colormark4 : color2);
+    g.setColor(full ? colormark4 : color1);
     g.fillRect(2, 2, Math.max(1, (int) (used * (ww - 6) / max)), hh - 6);
 
     // print current memory usage

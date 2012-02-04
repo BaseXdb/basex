@@ -1,16 +1,15 @@
 package org.basex.test.data;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Random;
-
 import org.basex.index.IdPreMap;
 import org.basex.util.Performance;
 import org.basex.util.Util;
 import org.basex.util.list.IntList;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * ID -> PRE mapping test.
@@ -144,7 +143,7 @@ public final class IdPreMapTest {
     }
     // perform the actual test:
     final Performance p = new Performance();
-    for(int[] a : d) m.insert(a[0], a[1], 1);
+    for(final int[] a : d) m.insert(a[0], a[1], 1);
     if(VERBOSE) Util.errln(d.length + " records inserted in: " + p);
   }
 
@@ -255,8 +254,7 @@ public final class IdPreMapTest {
      * Size of the map.
      * @return number of stored records
      */
-    @Override
-    public int size() {
+    int size() {
       return ids.size();
     }
 

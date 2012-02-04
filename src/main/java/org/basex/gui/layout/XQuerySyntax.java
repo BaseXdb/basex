@@ -3,6 +3,7 @@ package org.basex.gui.layout;
 import static org.basex.data.DataText.*;
 import java.awt.Color;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashSet;
 import org.basex.gui.GUIConstants;
 import org.basex.query.QueryText;
@@ -41,12 +42,11 @@ public final class XQuerySyntax extends BaseXSyntax {
       for(final Field f : QueryText.class.getFields()) {
         if(f.getName().equals("IGNORE")) break;
         final String s = (String) f.get(null);
-        for(final String ss : s.split("-")) KEYS.add(ss);
+        Collections.addAll(KEYS, s.split("-"));
       }
       for(final Function f : Function.values()) {
         final String s = f.toString();
-        for(final String ss : s.substring(0, s.indexOf("(")).split("-"))
-          FUNC.add(ss);
+        Collections.addAll(FUNC, s.substring(0, s.indexOf("(")).split("-"));
       }
     } catch(final Exception ex) {
       Util.stack(ex);

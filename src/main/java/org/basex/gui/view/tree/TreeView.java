@@ -1,21 +1,11 @@
 package org.basex.gui.view.tree;
 
-import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
-
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Transparency;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferedImage;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import javax.swing.SwingUtilities;
 import org.basex.core.Context;
+import static org.basex.core.Text.NO_SPACE;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
+import static org.basex.gui.GUIConstants.*;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
@@ -24,6 +14,14 @@ import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * This class offers a real tree view.
@@ -191,7 +189,7 @@ public final class TreeView extends View implements TreeConstants {
       sub.generateBorders(c);
 
     /* If window-size changed. */
-    boolean winChange;
+    final boolean winChange;
     if((winChange = windowSizeChanged()) && paintType == Refresh.VOID
         || paintType == Refresh.INIT || paintType == Refresh.CONTEXT
         || paintType == Refresh.RESIZE) {
@@ -369,7 +367,7 @@ public final class TreeView extends View implements TreeConstants {
     final int h = nodeHeight;
     final boolean br = tr.bigRect(sub, rn, lv);
     boolean txt = !br && fontHeight <= h;
-    boolean fill;
+    final boolean fill;
     boolean border = false;
     final int xx = r.x;
     final int ww = r.w;
@@ -383,12 +381,12 @@ public final class TreeView extends View implements TreeConstants {
       case RECTANGLE:
         borderColor = getColorPerLevel(lv, false);
         fillColor = getColorPerLevel(lv, true);
-        txt = txt & DRAW_NODE_TEXT;
+        txt &= DRAW_NODE_TEXT;
         border = BORDER_RECTANGLES;
         fill = FILL_RECTANGLES;
         break;
       case HIGHLIGHT:
-        borderColor = color5;
+        borderColor = color4;
         final int alpha = 0xDD000000;
         final int rgb = GUIConstants.LGRAY.getRGB();
         fillColor = new Color(rgb + alpha, true);
@@ -396,7 +394,7 @@ public final class TreeView extends View implements TreeConstants {
         fill = !br && !marked;
         break;
       case MARK:
-        borderColor = h > 2 && r.w > 4 ? colormarkA : colormark1;
+        borderColor = h > 2 && r.w > 4 ? colormark1A : colormark1;
         fillColor = colormark1;
         border = true;
         fill = true;
@@ -686,7 +684,7 @@ public final class TreeView extends View implements TreeConstants {
     final int size = d.size(pre, k);
 
     // rectangle center
-    int rc;
+    final int rc;
 
     if(br) {
       rc = drawNodeInBigRectangle(g, rn, lv, r, pre);
@@ -879,8 +877,8 @@ public final class TreeView extends View implements TreeConstants {
    * @return color
    */
   private Color getConnectionColor(final Draw t) {
-    int alpha;
-    int rgb;
+    final int alpha;
+    final int rgb;
 
     switch(t) {
       case CONNECTION:
@@ -973,7 +971,7 @@ public final class TreeView extends View implements TreeConstants {
         if(r.contains(mx)) {
           frect = r;
           flv = lv;
-          int pre;
+          final int pre;
 
           // if multiple pre values, then approximate pre value
           if(tr.bigRect(sub, rn, lv)) {

@@ -404,7 +404,7 @@ public abstract class Path extends ParseExpr {
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
     if(root != null) sb.append(root);
-    for(final Expr s : steps) sb.append((sb.length() != 0 ? "/" : "") + s);
+    for(final Expr s : steps) sb.append(sb.length() != 0 ? "/" : "").append(s);
     return sb.toString();
   }
 }

@@ -180,7 +180,7 @@ public final class FNFile extends StandardFunc {
       throws QueryException {
 
     // get canonical representation to resolve symbolic links
-    File dir;
+    final File dir;
     try {
       dir = path.getCanonicalFile();
     } catch(final IOException ex) {

@@ -1,20 +1,20 @@
 package org.basex.test.server;
 
-import static org.basex.core.Text.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.Random;
 import org.basex.BaseXServer;
-import org.basex.core.Command;
+import static org.basex.core.Text.ADMIN;
+import static org.basex.core.Text.LOCALHOST;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
 import org.basex.util.Util;
 import org.junit.AfterClass;
+import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * This class tests the order of incoming commands.
@@ -24,7 +24,7 @@ import org.junit.Test;
  */
 public final class SemaphoreTest {
   /** Create random number. */
-  static Random rand = new Random();
+  static final Random RANDOM = new Random();
   /** Test database name. */
   private static final String NAME = Util.name(SemaphoreTest.class);
   /** Test file. */
@@ -89,21 +89,6 @@ public final class SemaphoreTest {
   }
 
   /**
-   * Returns query result.
-   * @param cmd command reference
-   * @param session session
-   * @return String result
-   */
-  String checkRes(final Command cmd, final Session session) {
-    try {
-      return session.execute(cmd);
-    } catch(final IOException ex) {
-      fail(Util.message(ex));
-      return null;
-    }
-  }
-
-  /**
    * Returns a session instance.
    * @return session
    * @throws IOException exception
@@ -131,7 +116,7 @@ public final class SemaphoreTest {
     @Override
     public void run() {
       try {
-        final int t = rand.nextInt(2);
+        final int t = RANDOM.nextInt(2);
         session.execute(QUERIES[t]);
       } catch(final IOException ex) {
         fail(Util.message(ex));

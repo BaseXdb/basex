@@ -1,15 +1,7 @@
 package org.basex.core.cmd;
 
+import org.basex.core.*;
 import static org.basex.core.Text.*;
-import static org.basex.query.util.Err.*;
-
-import java.io.IOException;
-
-import org.basex.core.Command;
-import org.basex.core.CommandBuilder;
-import org.basex.core.Context;
-import org.basex.core.ProgressException;
-import org.basex.core.Prop;
 import org.basex.data.Result;
 import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
@@ -22,8 +14,11 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
+import static org.basex.query.util.Err.XPSTACK;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+
+import java.io.IOException;
 
 /**
  * Abstract class for database queries.
@@ -90,7 +85,7 @@ abstract class AQuery extends Command {
           if(r == 0) plan(true);
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
-          Serializer ser;
+          final Serializer ser;
 
           if(prop.is(Prop.CACHEQUERY)) {
             result = qp.execute();

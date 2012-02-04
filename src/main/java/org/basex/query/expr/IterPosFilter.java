@@ -14,7 +14,7 @@ import org.basex.query.iter.Iter;
  */
 final class IterPosFilter extends Filter {
   /** Offset flag. */
-  boolean off;
+  final boolean off;
 
   /**
    * Constructor.

@@ -143,10 +143,9 @@ public final class JsonMLConverter {
    * Raises an error with the specified message.
    * @param msg error message
    * @param ext error details
-   * @return build exception
    * @throws QueryException query exception
    */
-  private QueryException error(final String msg, final Object... ext)
+  private void error(final String msg, final Object... ext)
       throws QueryException {
     throw JSONMLPARSE.thrw(input, Util.inf(msg, ext));
   }

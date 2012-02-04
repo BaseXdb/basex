@@ -1,16 +1,16 @@
 package org.basex.gui.dialog;
 
-import java.awt.BorderLayout;
-import javax.swing.SwingUtilities;
-
 import org.basex.core.Text;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXEditor;
+import org.basex.gui.layout.BaseXLabel;
 import org.basex.util.Token;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Dialog window for messages.
@@ -20,14 +20,12 @@ import org.basex.util.Token;
  */
 final class DialogMessage extends Dialog {
   /** Ok/yes button. */
-  BaseXButton yes;
+  final BaseXButton yes;
 
   /** This flag indicates if the dialog was canceled. */
   private boolean canceled = true;
   /** No button. */
   private BaseXButton no;
-  /** Cancel button. */
-  private BaseXButton cancel;
 
   /**
    * Default constructor.
@@ -57,7 +55,8 @@ final class DialogMessage extends Dialog {
       if(ic == Msg.QUESTION) {
         buttons = newButtons(yes, no);
       } else {
-        cancel = new BaseXButton(Text.CANCEL, this);
+        /* Cancel button. */
+        final BaseXButton cancel = new BaseXButton(Text.CANCEL, this);
         buttons = newButtons(yes, no, cancel);
       }
     } else {

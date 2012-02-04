@@ -248,10 +248,4 @@ public final class UpdateTestText extends UpdateTest {
     md.insert(0);
     data.insert(pre, par, md);
   }
-
-  /** Don't remove. */
-  @Test
-  public void foo() {
-    return;
-  }
 }

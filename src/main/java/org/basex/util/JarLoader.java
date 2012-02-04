@@ -9,7 +9,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.jar.JarFile;
 
@@ -112,9 +111,8 @@ public final class JarLoader extends URLClassLoader {
     if(urlCache != null) {
       final HashMap<Object, Object> urlCacheTmp =
         (HashMap<Object, Object>) urlCache.clone();
-      final Iterator<Object> it = urlCacheTmp.keySet().iterator();
-      while(it.hasNext()) {
-        obj = it.next();
+      for(final Object o : urlCacheTmp.keySet()) {
+        obj = o;
         if(!(obj instanceof JarFile)) {
           continue;
         }
@@ -136,9 +134,7 @@ public final class JarLoader extends URLClassLoader {
       // urlCache := null
       final HashMap<Object, Object> fileCacheTmp =
         (HashMap<Object, Object>) fileCache.clone();
-      final Iterator<Object> it = fileCacheTmp.keySet().iterator();
-      while(it.hasNext()) {
-        final Object key = it.next();
+      for(final Object key : fileCacheTmp.keySet()) {
         obj = fileCache.get(key);
         if(!(obj instanceof JarFile)) {
           continue;

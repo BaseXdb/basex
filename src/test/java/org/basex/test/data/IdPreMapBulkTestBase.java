@@ -1,11 +1,10 @@
 package org.basex.test.data;
 
-import static org.junit.Assert.*;
+import org.basex.index.IdPreMap;
+import static org.junit.Assert.fail;
+import org.junit.Before;
 
 import java.util.ArrayList;
-
-import org.basex.index.IdPreMap;
-import org.junit.Before;
 
 /**
  * Base class with common functionality for all ID -> PRE mapping tests.
@@ -123,8 +122,7 @@ public abstract class IdPreMapBulkTestBase {
      * Size of the map.
      * @return number of stored records
      */
-    @Override
-    public int size() {
+    int size() {
       return idlist.size();
     }
 
@@ -135,28 +133,6 @@ public abstract class IdPreMapBulkTestBase {
      */
     public int id(final int pre) {
       return idlist.get(pre);
-    }
-
-    /**
-     * Returns a set of unique node ids.
-     * @param pre first pre value
-     * @param s number of records
-     * @return node ids
-     */
-    public final int[] ids(final int pre, final int s) {
-      final int[] ids = new int[s];
-      for(int i = 0; i < s; ++i) ids[i] = id(pre + i);
-      return ids;
-    }
-
-    /**
-     * Create a copy of the current object.
-     * @return deep copy of the object
-     */
-    public DummyIdPreMap copy() {
-      final int[] a = new int[idlist.size()];
-      for(int i = size() - 1; i >= 0; --i) a[i] = idlist.get(i);
-      return new DummyIdPreMap(a);
     }
 
     @Override

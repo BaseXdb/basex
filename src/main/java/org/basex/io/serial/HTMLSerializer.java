@@ -1,14 +1,14 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import static org.basex.query.util.Err.*;
+import static org.basex.query.util.Err.SERILL;
+import static org.basex.query.util.Err.SERPI;
 import static org.basex.util.Token.*;
+import org.basex.util.hash.TokenSet;
+import org.basex.util.list.TokenList;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
-import org.basex.util.hash.TokenSet;
-import org.basex.util.list.TokenList;
 
 /**
  * This class serializes data as HTML.
@@ -116,7 +116,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script &= !SCRIPTS.contains(lc(tag));
+    script = script && !SCRIPTS.contains(lc(tag));
   }
 
   // HTML Serializer: cache elements

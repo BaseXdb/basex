@@ -1,17 +1,18 @@
 package org.basex.gui.layout;
 
+import org.basex.gui.GUI;
+import org.basex.gui.GUICommands;
+import org.basex.gui.GUIConstants;
 import static org.basex.gui.GUIConstants.*;
+import org.basex.gui.GUIProp;
+import org.basex.gui.dialog.Dialog;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
+import org.basex.util.Util;
+import org.basex.util.list.ObjList;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.Window;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -25,17 +26,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-
-import org.basex.gui.GUI;
-import org.basex.gui.GUICommands;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
-import org.basex.util.Util;
-import org.basex.util.list.ObjList;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -60,7 +50,6 @@ public final class BaseXLayout {
     final GUI gui = gui(cont);
     if(gui == null) return;
     if(gui.gprop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
-    if(gui.fullscreen) return;
   }
 
   /**
@@ -145,12 +134,12 @@ public final class BaseXLayout {
    * @author BaseX Team 2005-12, BSD License
    * @author Christian Gruen
    */
-  public abstract static class DropHandler {
+  public interface DropHandler {
     /**
      * Drops a file.
      * @param obj object to be dropped
      */
-    public abstract void drop(final Object obj);
+    void drop(final Object obj);
   }
 
   /**
@@ -367,7 +356,7 @@ public final class BaseXLayout {
     final int xx = Math.min(w - tw - 8, x);
     g.setColor(GUIConstants.color(c));
     g.fillRect(xx - 1, y - th, tw + 4, th);
-    g.setColor(GUIConstants.color1);
+    g.setColor(GUIConstants.WHITE);
     g.drawString(tt, xx, y - 4);
   }
 
@@ -383,18 +372,18 @@ public final class BaseXLayout {
 
   /**
    * Draws the specified string.
+   *
    * @param g graphics reference
    * @param s text
    * @param x x coordinate
    * @param y y coordinate
    * @param w width
    * @param fs font size
-   * @return width of printed string
    */
-  public static int chopString(final Graphics g, final byte[] s,
+  public static void chopString(final Graphics g, final byte[] s,
       final int x, final int y, final int w, final int fs) {
 
-    if(w < 12) return w;
+    if(w < 12) return;
     final int[] cw = fontWidths(g.getFont());
 
     int j = s.length;
@@ -416,7 +405,6 @@ public final class BaseXLayout {
       Util.debug(ex);
     }
     g.drawString(string(s, 0, j), x, y + fs);
-    return fw;
   }
 
   /**

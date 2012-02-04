@@ -27,7 +27,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   private static final String DB = Util.name(NamespaceTest.class);
 
   /** Test documents. */
-  private static String[][] docs = {
+  private static final String[][] DOCS = {
     { "d1", "<x/>" },
     { "d2", "<x xmlns='xx'/>" },
     { "d3", "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>" },
@@ -680,7 +680,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
    */
   void create(final int... db) throws BaseXException {
     for(final int d : db) {
-      final String[] doc = docs[d - 1];
+      final String[] doc = DOCS[d - 1];
       new CreateDB(doc[0], doc[1]).execute(CONTEXT);
     }
   }
@@ -692,7 +692,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
   @AfterClass
   public static void finish() throws BaseXException {
     // drop all test databases
-    for(final String[] db : docs) new DropDB(db[0]).execute(CONTEXT);
+    for(final String[] db : DOCS) new DropDB(db[0]).execute(CONTEXT);
     new DropDB(DB).execute(CONTEXT);
     CONTEXT.close();
   }
@@ -721,8 +721,8 @@ public final class NamespaceTest extends AdvancedQueryTest {
       final String result = new XQuery(second).execute(CONTEXT).trim();
 
       // quotes are replaced by apostrophes to simplify comparison
-      final String res = result.replaceAll("\\\"", "'");
-      final String exp = expected.replaceAll("\\\"", "'");
+      final String res = result.replaceAll("\"", "'");
+      final String exp = expected.replaceAll("\"", "'");
       if(!exp.equals(res)) fail("\nExpected: " + exp + "\nFound: " + res);
     } catch(final BaseXException ex) {
       fail(Util.message(ex));

@@ -104,7 +104,7 @@ public final class Compress extends ByteList {
     final int l = Num.get(txt, 0);
     final byte[] res = new byte[l];
     for(int r = 0; r < l; r++) {
-      int b;
+      final int b;
       if(pull()) { // 1 xxx
         b = pull(3);
       } else if(pull()) { // 01 xxx

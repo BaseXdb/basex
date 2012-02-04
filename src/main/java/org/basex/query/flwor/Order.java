@@ -127,9 +127,9 @@ public final class Order extends ParseExpr {
    */
   class OrderedIter extends Iter {
     /** Sort keys. */
-    ObjList<Item[]> kl;
+    final ObjList<Item[]> kl;
     /** Values to sort. */
-    ValueList vl;
+    final ValueList vl;
     /** End position. */
     int end;
     /** Current position. */

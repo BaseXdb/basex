@@ -297,7 +297,7 @@ public final class FNDate extends StandardFunc {
     }
 
     final int zn = date.xc.getTimezone();
-    int tz;
+    final int tz;
     if(zon == null) {
       final Calendar c = Calendar.getInstance();
       tz = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000;

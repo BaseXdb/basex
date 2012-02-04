@@ -2,7 +2,6 @@ package org.basex.query.item;
 
 import java.util.Arrays;
 
-import org.basex.query.QueryContext;
 import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
@@ -36,7 +35,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public ANode copy(final QueryContext ctx) {
+  public ANode deepCopy() {
     return copy();
   }
 

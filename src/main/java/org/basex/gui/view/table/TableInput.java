@@ -54,7 +54,7 @@ final class TableInput implements Runnable {
    */
   void paint(final Graphics g, final int x, final int y, final int w,
       final int h) {
-    g.setColor(GUIConstants.color5);
+    g.setColor(GUIConstants.color4);
     g.drawRect(x, y - 1, w - 1, h);
     g.setColor(Color.black);
     g.setFont(GUIConstants.font);

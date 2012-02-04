@@ -22,14 +22,14 @@ public final class FTPosData {
 
   /**
    * Adds position data.
+   *
    * @param d data reference
    * @param pre pre value
    * @param all full-text matches
-   * @return self reference
    */
-  public FTPosData add(final Data d, final int pre, final FTMatches all) {
+  public void add(final Data d, final int pre, final FTMatches all) {
     if(data == null) data = d;
-    else if(data != d) return this;
+    else if(data != d) return;
 
     final IntList ps = new IntList();
     for(final FTMatch m : all) {
@@ -47,7 +47,6 @@ public final class FTPosData {
     } else {
       pos[c].union(ps.toArray());
     }
-    return this;
   }
 
   /**

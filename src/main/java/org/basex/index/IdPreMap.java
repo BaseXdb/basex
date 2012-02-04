@@ -1,12 +1,13 @@
 package org.basex.index;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.list.IntList;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * ID -> PRE mapping.
@@ -339,14 +340,6 @@ public class IdPreMap {
     }
 
     return b.toString();
-  }
-
-  /**
-   * Size of the mapping table (only for debugging purposes!).
-   * @return number of rows in the table
-   */
-  public int size() {
-    return rows;
   }
 
   /**

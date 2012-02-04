@@ -1,13 +1,7 @@
 package org.basex.core;
 
-import static org.basex.core.Text.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Locale;
-
 import org.basex.core.Commands.CmdPerm;
+import static org.basex.core.Text.*;
 import org.basex.core.cmd.Close;
 import org.basex.data.Data;
 import org.basex.data.Result;
@@ -20,6 +14,11 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Locale;
 
 /**
  * This class provides the architecture for all internal command
@@ -304,7 +303,7 @@ public abstract class Command extends Progress {
     }
 
     // check concurrency of commands
-    boolean ok;
+    final boolean ok;
     final boolean writing = updating(ctx);
     ctx.register(writing);
     ok = run(ctx, os);

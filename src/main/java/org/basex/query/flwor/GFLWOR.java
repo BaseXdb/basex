@@ -40,7 +40,7 @@ public class GFLWOR extends ParseExpr {
   /** Order clause. */
   private Order order;
   /** Group by clause. */
-  private Group group;
+  private final Group group;
 
   /**
    * GFLWOR constructor.
@@ -394,7 +394,8 @@ public class GFLWOR extends ParseExpr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; ++i) sb.append((i != 0 ? " " : "") + fl[i]);
+    for(int i = 0; i != fl.length; ++i)
+      sb.append(i != 0 ? " " : "").append(fl[i]);
     if(where != null) sb.append(" " + WHERE + " " + where);
     if(group != null) sb.append(group);
     if(order != null) sb.append(order);

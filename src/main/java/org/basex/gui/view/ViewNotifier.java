@@ -155,7 +155,7 @@ public final class ViewNotifier {
     final Context context = gui.context;
 
     // browse back/forward
-    String query;
+    final String query;
     if(forward) {
       if(hist == maxhist) return;
       query = queries[++hist];

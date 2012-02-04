@@ -1,21 +1,20 @@
 package org.basex.io.serial;
 
-import static org.basex.data.DataText.*;
-import static org.basex.io.serial.SerializerProp.*;
-import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.basex.data.Data;
+import static org.basex.data.DataText.*;
 import org.basex.data.ExprInfo;
 import org.basex.data.FTPos;
 import org.basex.data.FTPosData;
+import static org.basex.io.serial.SerializerProp.S_METHOD;
+import static org.basex.query.QueryText.XMLURI;
 import org.basex.query.item.Item;
 import org.basex.util.Atts;
+import static org.basex.util.Token.*;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * This is an interface for serializing trees.
@@ -168,24 +167,24 @@ public abstract class Serializer {
 
   /**
    * Serializes a node of the specified data reference.
+   *
    * @param data data reference
    * @param pre pre value to start from
-   * @return last pre value
    * @throws IOException I/O exception
    */
-  public final int node(final Data data, final int pre) throws IOException {
-    return node(data, pre, null);
+  public final void node(final Data data, final int pre) throws IOException {
+    node(data, pre, null);
   }
 
   /**
    * Serializes a node of the specified data reference.
+   *
    * @param data data reference
    * @param pre pre value to start from
    * @param ft full-text data
-   * @return last pre value
    * @throws IOException I/O exception
    */
-  public final int node(final Data data, final int pre, final FTPosData ft)
+  public final void node(final Data data, final int pre, final FTPosData ft)
       throws IOException {
 
     boolean doc = false;
@@ -268,7 +267,6 @@ public abstract class Serializer {
     // process remaining elements...
     while(--l >= 0) closeElement();
     if(doc) closeDoc();
-    return s;
   }
 
   /**

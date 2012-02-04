@@ -118,7 +118,7 @@ public abstract class OutputSerializer extends Serializer {
     tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
     wPre    = token(p.get(S_WRAP_PREFIX));
     /* URI for wrapped results. */
-    byte[] wUri = token(p.get(S_WRAP_URI));
+    final byte[] wUri = token(p.get(S_WRAP_URI));
     wrap    = wPre.length != 0;
     final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = (eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n").

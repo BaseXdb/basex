@@ -189,7 +189,6 @@ public final class BaseXList extends BaseXBack {
       public void mouseClicked(final MouseEvent e) {
         if(e.getClickCount() == 2) {
           d.close();
-          return;
         }
       }
     };

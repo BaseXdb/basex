@@ -352,8 +352,8 @@ public final class FNSeq extends StandardFunc {
     final long max = iter.size();
     return max != -1 ? new Iter() {
       // directly access specified items
+      final long m = Math.min(e, max + 1);
       long c = Math.max(1, s);
-      long m = Math.min(e, max + 1);
 
       @Override
       public Item next() throws QueryException {

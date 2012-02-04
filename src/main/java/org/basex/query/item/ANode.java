@@ -1,25 +1,19 @@
 package org.basex.query.item;
 
-import java.io.IOException;
-
-import org.basex.api.dom.BXAttr;
-import org.basex.api.dom.BXComm;
-import org.basex.api.dom.BXDoc;
-import org.basex.api.dom.BXElem;
-import org.basex.api.dom.BXNode;
-import org.basex.api.dom.BXPI;
-import org.basex.api.dom.BXText;
+import org.basex.api.dom.*;
 import org.basex.data.Data;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.iter.NodeCache;
 import org.basex.query.iter.AxisIter;
 import org.basex.query.iter.AxisMoreIter;
+import org.basex.query.iter.NodeCache;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
+
+import java.io.IOException;
 
 /**
  * Abstract node type.
@@ -92,10 +86,9 @@ public abstract class ANode extends Item {
 
   /**
    * Returns a deep copy of the node.
-   * @param ctx query context
    * @return node copy
    */
-  public abstract ANode copy(final QueryContext ctx);
+  public abstract ANode deepCopy();
 
   /**
    * Returns the name of the node, composed of an optional prefix

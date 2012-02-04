@@ -207,12 +207,12 @@ public final class BaseXDSlider extends BaseXPanel {
     final int hh = h / 2;
 
     final boolean focus = hasFocus();
-    g.setColor(focus ? Color.white : color1);
+    g.setColor(focus ? Color.white : WHITE);
     g.fillRect(0, hh - 4, w, 8);
     g.setColor(Color.black);
     g.drawLine(0, hh - 4, w - 1, hh - 4);
     g.drawLine(0, hh - 4, 0, hh + 4);
-    g.setColor(color3);
+    g.setColor(color2);
     g.drawLine(w - 1, hh - 4, w - 1, hh + 4);
     g.drawLine(0, hh + 4, w, hh + 4);
 
@@ -220,7 +220,7 @@ public final class BaseXDSlider extends BaseXPanel {
     BaseXLayout.drawCell(g, r.xs, r.xe + ARROW, 2, h - 2, false);
 
     if(r.xs + ARROW < r.xe) {
-      g.setColor(color5);
+      g.setColor(color4);
       g.drawLine(r.xs + ARROW, 3, r.xs + ARROW, h - 4);
       g.drawLine(r.xe - 1, 3, r.xe - 1, h - 4);
       g.setColor(Color.white);
@@ -236,7 +236,7 @@ public final class BaseXDSlider extends BaseXPanel {
     final Polygon pol = new Polygon(
         new int[] { r.xs + 11, r.xs + 5, r.xs + 5, r.xs + 11 },
         new int[] { hh - 5, hh - 1, hh, hh + 5 }, 4);
-    g.setColor(focus ? color5 : GRAY);
+    g.setColor(focus ? color4 : GRAY);
     g.fillPolygon(pol);
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);
@@ -291,10 +291,14 @@ public final class BaseXDSlider extends BaseXPanel {
 
   /** Range class. */
   private static class Range {
-    /** Range distance. */ double dist;
-    /** Start position. */ int xs;
-    /** End position.   */ int xe;
-    /** Slider width.   */ int w;
+    /** Range distance. */
+    final double dist;
+    /** Start position. */
+    final int xs;
+    /** End position.   */
+    final int xe;
+    /** Slider width.   */
+    final int w;
 
     /**
      * Constructor.

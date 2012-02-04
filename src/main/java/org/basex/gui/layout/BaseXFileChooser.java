@@ -120,7 +120,7 @@ public final class BaseXFileChooser {
     if(mode != Mode.FSAVE) return io;
 
     // add file suffix to file to be saved
-    if(suffix != null && io.path().indexOf(".") == -1)
+    if(suffix != null && !io.path().contains("."))
       io = new IOFile(io.path() + suffix);
 
     // show replace dialog

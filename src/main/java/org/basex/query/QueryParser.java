@@ -3781,10 +3781,9 @@ public class QueryParser extends InputParser {
 
   /**
    * Throws the alternative error message.
-   * @return never
    * @throws QueryException query exception
    */
-  private QueryException error() throws QueryException {
+  private void error() throws QueryException {
     qp = ap;
     if(alter != FUNCUNKNOWN) throw error(alter);
     ctx.funcs.funError(alterFunc, input());

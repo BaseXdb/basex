@@ -82,7 +82,10 @@ public class FTIndexQueryTest {
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @interface InputData {
-  /** Input data. */
+  /**
+   * Input data.
+   * @return string
+   */
   String value();
 }
 
@@ -112,7 +115,7 @@ class CreateDBRule implements MethodRule {
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        InputData input = method.getAnnotation(InputData.class);
+        final InputData input = method.getAnnotation(InputData.class);
         if(input != null) new CreateDB(db, input.value()).execute(ctx);
         base.evaluate();
       }

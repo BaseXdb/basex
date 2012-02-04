@@ -32,7 +32,7 @@ public final class TableDiskAccess extends TableAccess {
   /** Index array storing BlockNumbers (length={@link #allBlocks}). */
   private int[] pages;
   /** Bitmap storing free (=0) and occupied (=1) pages. */
-  private BitArray pagemap;
+  private final BitArray pagemap;
 
   /** Pre value of the first entry in the current block. */
   private int fpre = -1;

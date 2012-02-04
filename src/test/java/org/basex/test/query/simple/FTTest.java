@@ -561,10 +561,10 @@ public final class FTTest extends QueryTest {
   protected String details() {
     final Prop prop = context.prop;
     final StringBuilder sb = new StringBuilder();
-    sb.append(set(Prop.FTINDEX, prop) + ";");
-    sb.append(set(Prop.WILDCARDS, prop) + ";");
-    sb.append(set(Prop.STEMMING, prop) + ";");
-    sb.append(set(Prop.DIACRITICS, prop) + ";");
+    sb.append(set(Prop.FTINDEX, prop)).append(";");
+    sb.append(set(Prop.WILDCARDS, prop)).append(";");
+    sb.append(set(Prop.STEMMING, prop)).append(";");
+    sb.append(set(Prop.DIACRITICS, prop)).append(";");
     sb.append(set(Prop.CASESENS, prop));
     return sb.toString();
   }

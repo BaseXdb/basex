@@ -109,7 +109,7 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public Expr remove(final Var v) {
-    for(int c = 0; c < cases.length; ++c) cases[c].remove(v);
+    for(final TypeCase c : cases) c.remove(v);
     ts = ts.remove(v);
     return this;
   }

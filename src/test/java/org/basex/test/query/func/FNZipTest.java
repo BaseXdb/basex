@@ -209,8 +209,8 @@ public final class FNZipTest extends AdvancedQueryTest {
     // create and compare identical zip file
     query(_ZIP_UPDATE_ENTRIES.args(list, TMPZIP));
     final String list2 = query(_ZIP_ENTRIES.args(TMPZIP));
-    assertEquals(list.replaceAll(" href=\\\".*?\\\"", ""),
-        list2.replaceAll(" href=\\\".*?\\\"", ""));
+    assertEquals(list.replaceAll(" href=\".*?\"", ""),
+        list2.replaceAll(" href=\".*?\"", ""));
 
     // remove one directory
     list = list.replaceAll("<zip:dir name=.test.>.*</zip:dir>", "");

@@ -117,7 +117,7 @@ public final class DialogPrefs extends Dialog {
 
     // create buttons
     /* Buttons. */
-    BaseXBack buttons = okCancel();
+    final BaseXBack buttons = okCancel();
     set(buttons, BorderLayout.SOUTH);
 
     set(pp, BorderLayout.CENTER);

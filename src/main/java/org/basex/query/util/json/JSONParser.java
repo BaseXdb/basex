@@ -213,39 +213,34 @@ final class JSONParser extends InputParser {
 
   /**
    * Consumes consecutive whitespace characters.
-   * @return true if whitespaces were found
    */
-  private boolean skipWS() {
-    final int p = qp;
+  private void skipWS() {
     while(more()) {
       final int c = curr();
       if(c == 0 || c > ' ') break;
       ++qp;
     }
-    return p != qp;
   }
 
   /**
    * Skips whitespaces, raises an error if the specified character cannot be
    * consumed.
+   *
    * @param ch character to be found
-   * @return expected character
    * @throws QueryException query exception
    */
-  private int wsCheck(final char ch) throws QueryException {
+  private void wsCheck(final char ch) throws QueryException {
     if(!wsConsume(ch)) error(INVALEXP, curr(), "\"" + ch + "\"");
-    return ch;
   }
 
   /**
    * Raises an error if the specified character cannot be consumed.
+   *
    * @param ch character to be found
-   * @return expected character
    * @throws QueryException query exception
    */
-  private int check(final char ch) throws QueryException {
+  private void check(final char ch) throws QueryException {
     if(!consume(ch)) error(INVALEXP, curr(), "\"" + ch + "\"");
-    return ch;
   }
 
   /**

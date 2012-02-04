@@ -47,34 +47,30 @@ final class TreeRects implements TreeConstants {
 
   /**
    * Generates cached rectangles.
+   *
+   * @param sub subtree
+   * @param c context
    * @param g graphics reference
    * @param rn root number
-   * @param c context
-   * @param sub subtree
    * @param ds draw start
    * @param dw draw width
    * @param slim slim to text
-   * @return tree distance
    */
-  private int generateRects(final TreeSubtree sub, final Context c,
+  private void generateRects(final TreeSubtree sub, final Context c,
       final Graphics g, final int rn, final int ds, final double dw,
       final boolean slim) {
 
     final int h = sub.getSubtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
-    double w = -1;
 
     for(int lv = 0; lv < h; ++lv) {
-
-      w = dw / sub.levelSize(rn, lv);
-
+      final double w = dw / sub.levelSize(rn, lv);
       if(w < 2) {
         bigRectangle(rn, lv, ds, dw);
       } else {
         normalRectangle(sub, c, g, rn, lv, ds, w, slim);
       }
     }
-    return (int) w;
   }
 
   /**

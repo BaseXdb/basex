@@ -119,7 +119,7 @@ public final class DialogServer extends Dialog {
     databases.border(8);
     tabs = new BaseXTabs(this);
     /* Server panel. */
-    BaseXBack conn = new BaseXBack();
+    final BaseXBack conn = new BaseXBack();
     tabs.add(S_CONNECT, conn);
     tabs.add(USERS, user);
     tabs.add(DATABASES, databases);
@@ -385,7 +385,7 @@ public final class DialogServer extends Dialog {
       Integer.parseInt(ports.getText()) <= 65535;
     final boolean vallu = loguser.getText().matches("[\\w]*");
     final boolean vallp = new String(
-        logpass.getPassword()).matches("[^ ;'\\\"]*");
+        logpass.getPassword()).matches("[^ ;'\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
     if(msg == null && msg2 == null &&

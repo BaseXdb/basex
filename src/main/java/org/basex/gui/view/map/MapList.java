@@ -83,7 +83,7 @@ final class MapList extends IntList {
    * @return calculated weight
    */
   private double weight(final int[] textLen, final Data data, final int i) {
-    double d;
+    final double d;
     if(textLen != null) {
       d = textLen[list[i]];
     } else {
@@ -97,8 +97,8 @@ final class MapList extends IntList {
   public String toString() {
     final StringBuilder sb = new StringBuilder(Util.name(this) + '[');
     for(int i = 0; i < size; ++i) {
-      sb.append((i == 0 ? "" : ", ") + list[i]);
-      if(weight != null) sb.append("/" + weight[i]);
+      sb.append(i == 0 ? "" : ", ").append(list[i]);
+      if(weight != null) sb.append("/").append(weight[i]);
     }
     return sb.append(']').toString();
   }

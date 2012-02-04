@@ -143,6 +143,6 @@ public final class DataInput extends BufferInput {
     return ((long) read() << 56) + ((long) (read() & 255) << 48)
         + ((long) (read() & 255) << 40) + ((long) (read() & 255) << 32)
         + ((long) (read() & 255) << 24) + ((read() & 255) << 16)
-        + ((read() & 255) << 8) + ((read() & 255));
+        + ((read() & 255) << 8) + (read() & 255);
   }
 }

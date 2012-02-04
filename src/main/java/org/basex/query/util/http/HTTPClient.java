@@ -13,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.Locale;
 
 import org.basex.core.Prop;
@@ -430,8 +429,7 @@ public final class HTTPClient {
       throws IOException, QueryException {
 
     final byte[] boundary = r.payloadAttrs.get(BOUNDARY);
-    final Iterator<Part> i = r.parts.iterator();
-    while(i.hasNext()) writePart(i.next(), out, boundary);
+    for(final Part part : r.parts) writePart(part, out, boundary);
     out.write(new TokenBuilder().add("--").
         add(boundary).add("--").add(CRLF).finish());
   }

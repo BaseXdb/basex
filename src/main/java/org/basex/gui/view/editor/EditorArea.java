@@ -1,6 +1,17 @@
 package org.basex.gui.view.editor;
 
-import static org.basex.gui.layout.BaseXKeys.*;
+import org.basex.core.Prop;
+import org.basex.core.cmd.XQuery;
+import org.basex.gui.GUIProp;
+import org.basex.gui.layout.BaseXEditor;
+import static org.basex.gui.layout.BaseXKeys.EXEC;
+import static org.basex.gui.layout.BaseXKeys.modifier;
+import org.basex.gui.layout.BaseXLabel;
+import org.basex.io.IOFile;
+import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
+import org.basex.util.Performance;
 import static org.basex.util.Token.*;
 
 import java.awt.event.FocusAdapter;
@@ -8,17 +19,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-
-import org.basex.core.Prop;
-import org.basex.core.cmd.XQuery;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.io.IOFile;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.util.Performance;
 
 /**
  * This class extends the text editor by XQuery features.
@@ -34,18 +34,15 @@ final class EditorArea extends BaseXEditor {
   /** Timestamp. */
   long tstamp;
   /** Flag for modified content. */
-  boolean mod;
+  boolean modified;
 
-  /** Last error position. */
-  int error = -1;
   /** Thread counter. */
   int threadID;
 
   /** Last input. */
   byte[] last = EMPTY;
-  /** This flag indicates if the current input is executable, i.e.,
-   *  no XML file and no XQuery module. */
-  boolean exec = true;
+  /** This flag indicates if the input is an executable XQuery main module. */
+  boolean executable = true;
 
   /** View reference. */
   private final EditorView view;
@@ -65,7 +62,7 @@ final class EditorArea extends BaseXEditor {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        if(opened() && !mod) {
+        if(opened() && !modified) {
           try {
             // reload file that has been modified
             final long t = tstamp;
@@ -121,23 +118,28 @@ final class EditorArea extends BaseXEditor {
     final byte[] in = getText();
     final boolean eq = eq(in, last);
     if(eq && !force) return;
-    view.refresh(mod || !eq, false);
+    last = in;
+    view.refresh(modified || !eq, false);
+
     view.pos.setText(pos());
     gui.context.prop.set(Prop.QUERYPATH, file.path());
-    last = in;
 
     if(file.isXML()) {
+      // non-executable input
       view.info("", true);
-      exec = false;
+      executable = false;
     } else {
+      // check if input is/might be an xquery main module
       final String qu = in.length == 0 ? "()" : string(in);
-      exec = !module(in);
-      if(exec && (force || gui.gprop.is(GUIProp.EXECRT))) {
+      executable = !module(in);
+      if(executable && (force || gui.gprop.is(GUIProp.EXECRT))) {
+        // execute query if forced, or if realtime execution is activated
         gui.execute(true, new XQuery(qu));
       } else {
+        // parse query
         final QueryContext ctx = new QueryContext(gui.context);
         try {
-          if(!exec) ctx.module(qu);
+          if(!executable) ctx.module(qu);
           else ctx.parse(qu);
           view.info("", true);
         } catch(final QueryException ex) {
@@ -145,6 +147,13 @@ final class EditorArea extends BaseXEditor {
         }
       }
     }
+  }
+
+  /**
+   * Updates the editor.
+   */
+  void update() {
+    release(true);
   }
 
   /**
@@ -174,15 +183,22 @@ final class EditorArea extends BaseXEditor {
 
   /**
    * Highlights the error.
+   * @param pos error position
+   * @param cursor move cursor to error position
    */
-  void markError() {
+  void markError(final int pos, final boolean cursor) {
+    if(cursor) {
+      requestFocusInWindow();
+      setCaret(pos);
+    }
+
     final int thread = ++threadID;
-    final int sleep = error == -1 ? 0 : 500;
+    final int sleep = pos == -1 ? 0 : 500;
     new Thread() {
       @Override
       public void run() {
         Performance.sleep(sleep);
-        if(thread == threadID) error(error);
+        if(thread == threadID) error(pos);
       }
     }.start();
   }

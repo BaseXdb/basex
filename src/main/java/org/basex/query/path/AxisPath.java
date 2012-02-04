@@ -246,7 +246,7 @@ public class AxisPath extends Path {
       }
 
       // create resulting expression
-      AxisPath result;
+      final AxisPath result;
       final boolean simple = invSteps.length == 0 && newPreds.length == 0;
       if(ie instanceof AxisPath) {
         result = (AxisPath) ie;

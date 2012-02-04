@@ -46,15 +46,15 @@ final class MapRenderer {
 
   /**
    * Draws a text.
+   *
    * @param g graphics reference
    * @param r rectangle
    * @param s text to be drawn
    * @param fs font size
-   * @return last height that was occupied
    */
-  static int drawText(final Graphics g, final MapRect r, final byte[] s,
+  static void drawText(final Graphics g, final MapRect r, final byte[] s,
       final int fs) {
-    return drawText(g, r, s, true, fs);
+    drawText(g, r, s, true, fs);
   }
 
   /**
@@ -293,8 +293,7 @@ final class MapRenderer {
     final FTPos ftp = r.pos;
     final int xx = r.x;
     final int ww = r.w;
-    final int ys = r.y + 3;
-    int yy = ys;
+    int yy = r.y + 3;
     int wl, ll = 0; // word and line length
 
     final Color textc = color(r.level + 4);
@@ -390,7 +389,6 @@ final class MapRenderer {
         ++ppl;
         if(sen) {
           yy += r.thumblh;
-          wl = 0;
           ll = 0;
           // skip rest if no space is left
           if(yy + r.thumblh >= r.y + mh) return r.h;
@@ -416,9 +414,7 @@ final class MapRenderer {
     final double ww = r.w;
     final FTPos ftp = r.pos;
 
-    final int ys = r.y + 3;
-    int yy = ys;
-
+    int yy = r.y + 3;
     int wl; // word length
     double ll = 0; // line length
     double e = 0;
@@ -467,8 +463,6 @@ final class MapRenderer {
       }
 
       ll += r.thumbf;
-      wl = 0;
-
       if(ppl < data[2].length && pl == data[2][ppl]) {
         // new paragraph
         yy += r.thumblh;
@@ -550,7 +544,6 @@ final class MapRenderer {
               r.thumbsw : r.thumbf);
         } else {
           // split token to safe space
-          ir = inRect(r.x + (int) ll, yy, ww - (int) ll, r.thumbfh, x, y);
           yy += r.thumblh;
           wl -= ww - ll;
           ir = inRect(r.x, yy, wl, r.thumbfh, x, y);
@@ -685,7 +678,6 @@ final class MapRenderer {
         ++ppl;
         if(sen) {
           yy += r.thumblh;
-          wl = 0;
           ll = 0;
         }
       }

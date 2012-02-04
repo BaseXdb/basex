@@ -64,7 +64,7 @@ final class LuceneStemmer extends Stemmer {
       Util.debug("Could not initialize \"%\" Lucene stemmer class.", lang);
       return;
     }
-    boolean ch;
+    final boolean ch;
     Method m = Reflect.method(clz, "stem", String.class);
     ch = m == null;
     if(ch) m = Reflect.method(clz, "stem", char[].class, int.class);

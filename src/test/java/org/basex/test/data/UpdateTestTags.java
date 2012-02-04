@@ -182,14 +182,6 @@ public final class UpdateTestTags extends UpdateTest {
   }
 
   /**
-   * Don't remove.
-   */
-  @Test
-  public void foo() {
-    return;
-  }
-
-  /**
    * Inserts a tag.
    * @param par parent node
    * @param pos inserting position

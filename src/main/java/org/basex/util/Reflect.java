@@ -15,13 +15,14 @@ import java.util.HashMap;
  */
 public final class Reflect {
   /** Cached constructors. */
-  private static HashMap<String, Constructor<?>> cons =
+  private static final HashMap<String, Constructor<?>> CONS =
     new HashMap<String, Constructor<?>>();
   /** Cached classes. */
-  private static HashMap<String, Class<?>> classes =
+  private static final HashMap<String, Class<?>> CLASSES =
     new HashMap<String, Class<?>>();
   /** Cached fields. */
-  private static HashMap<String, Field> fields = new HashMap<String, Field>();
+  private static final HashMap<String, Field> FIELDS =
+      new HashMap<String, Field>();
 
   /** Hidden constructor. */
   private Reflect() { }
@@ -47,7 +48,7 @@ public final class Reflect {
    * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String name) {
-    final Class<?> c = classes.get(name);
+    final Class<?> c = CLASSES.get(name);
     if(c != null) return c;
     try {
       return cache(name, Class.forName(name));
@@ -80,7 +81,7 @@ public final class Reflect {
   private static Class<?> cache(final String name, final Class<?> c) {
     try {
       if(!Reflect.accessible(c)) return null;
-      classes.put(name, c);
+      CLASSES.put(name, c);
     } catch(final Throwable ex) { }
     return c;
   }
@@ -93,11 +94,11 @@ public final class Reflect {
    */
   public static Field field(final Class<?> clazz, final String name) {
     final String key = clazz.getName() + name;
-    Field f = fields.get(key);
+    Field f = FIELDS.get(key);
     if(f == null) {
       try {
         f = clazz.getField(name);
-        fields.put(key, f);
+        FIELDS.put(key, f);
       } catch(final Throwable ex) { }
     }
     return f;
@@ -141,7 +142,7 @@ public final class Reflect {
     for(final Class<?> c : types) sb.append(c.getName());
     final String key = sb.toString();
 
-    Constructor<?> m = cons.get(key);
+    Constructor<?> m = CONS.get(key);
     if(m == null) {
       try {
         try {
@@ -150,7 +151,7 @@ public final class Reflect {
           m = clazz.getDeclaredConstructor(types);
           m.setAccessible(true);
         }
-        cons.put(key, m);
+        CONS.put(key, m);
       } catch(final Throwable ex) {
         Util.debug(ex);
       }
@@ -228,50 +229,6 @@ public final class Reflect {
       Util.debug(ex);
       return null;
     }
-  }
-
-  /**
-   * Invokes the specified method.
-   * @param object object
-   * @param method method to run
-   * @param args arguments
-   * @return result of method call
-   * @throws Throwable throwable
-   */
-  public static Object invoke(final Object object, final String method,
-      final Object... args) throws Throwable {
-
-    if(object == null) return null;
-
-    final Class<?>[] clz = new Class<?>[args.length];
-    for(int a = 0; a < args.length; a++) clz[a] = args[a].getClass();
-
-    final Class<?> c = object.getClass();
-    Method m = method(c, method, clz);
-
-    if(m == null) {
-      // method not found: replace arguments with first interfaces
-      for(int a = 0; a < args.length; a++) {
-        final Class<?>[] ic = clz[a].getInterfaces();
-        if(ic.length != 0) clz[a] = ic[0];
-      }
-      m = method(c, method, clz);
-
-      while(m == null) {
-        // method not found: replace arguments with super classes
-        boolean same = true;
-        for(int a = 0; a < args.length; a++) {
-          final Class<?> ic = clz[a].getSuperclass();
-          if(ic != null && ic != Object.class) {
-            clz[a] = ic;
-            same = false;
-          }
-        }
-        if(same) return null;
-        m = method(c, method, clz);
-      }
-    }
-    return m.invoke(object, args);
   }
 
   /**

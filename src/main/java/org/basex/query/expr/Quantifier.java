@@ -128,7 +128,7 @@ public final class Quantifier extends ParseExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(every ? EVERY : SOME);
-    for(final For f : fl) sb.append(" " + f);
+    for(final For f : fl) sb.append(" ").append(f);
     return sb.append(" " + SATISFIES + " " + sat).toString();
   }
 }

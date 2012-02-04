@@ -20,12 +20,12 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public final class QueryException extends Exception {
-  /** Error reference. */
-  private Err err;
   /** Error QName. */
   private final QNm name;
   /** Error value. */
-  private Value value = Empty.SEQ;
+  private transient Value value = Empty.SEQ;
+  /** Error reference. */
+  private Err err;
   /** File reference. */
   private IO file;
   /** Code suggestions. */

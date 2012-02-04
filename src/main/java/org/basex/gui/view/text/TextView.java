@@ -81,7 +81,7 @@ public final class TextView extends View implements ActionListener {
     final BaseXButton save = new BaseXButton(gui, "save", token(H_SAVE_RESULT));
     save.addActionListener(this);
     /* Find text field. */
-    BaseXTextField find = new BaseXTextField(gui);
+    final BaseXTextField find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) save.getPreferredSize().getHeight());
 
     sp = new BaseXBack(Fill.NONE).layout(new TableLayout(1, 3));

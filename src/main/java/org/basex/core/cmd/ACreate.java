@@ -84,7 +84,7 @@ public abstract class ACreate extends Command {
 
       final boolean mem = prop.is(Prop.MAINMEM);
       /* Builder instance. */
-      Builder builder = mem ? new MemBuilder(db, parser, prop) :
+      final Builder builder = mem ? new MemBuilder(db, parser, prop) :
               new DiskBuilder(db, parser, context);
 
       Data data = progress(builder).build();
@@ -132,7 +132,7 @@ public abstract class ACreate extends Command {
                      final ACreate cmd) throws IOException {
 
     if(data instanceof MemData) return;
-    IndexBuilder ib;
+    final IndexBuilder ib;
     switch(index) {
       case TEXT:      ib = new ValueBuilder(data, true); break;
       case ATTRIBUTE: ib = new ValueBuilder(data, false); break;

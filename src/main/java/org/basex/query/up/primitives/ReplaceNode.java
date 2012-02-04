@@ -58,10 +58,8 @@ public final class ReplaceNode extends NodeCopy {
   @Override
   public boolean adjacentTexts(final int c) {
     final int p = pre + c;
-    final int affectedPre = p;
-    boolean merged = mergeTexts(data, affectedPre - 1, affectedPre);
-    merged |= mergeTexts(data, affectedPre + md.meta.size - 1,
-        affectedPre + md.meta.size);
+    boolean merged = mergeTexts(data, p - 1, p);
+    merged |= mergeTexts(data, p + md.meta.size - 1, p + md.meta.size);
 
     return merged;
   }

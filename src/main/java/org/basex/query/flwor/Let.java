@@ -75,7 +75,7 @@ public final class Let extends ForLet {
       public Item next() throws QueryException {
         if(!more) {
           vs = ctx.vars.size();
-          Value v;
+          final Value v;
           if(score) {
             // assign average score value
             double s = 0;

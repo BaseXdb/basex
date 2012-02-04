@@ -268,6 +268,8 @@ public final class QueryProcessor extends Progress {
   public void close() throws QueryException {
     // close only once
     if(closed) return;
+    closed = true;
+
     // reset database properties to initial value
     for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {
       ctx.context.prop.set(e.getKey(), e.getValue());

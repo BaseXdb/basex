@@ -53,32 +53,30 @@ public final class DialogEdit extends Dialog {
    */
   public DialogEdit(final GUI main, final int p) {
     super(main, EDIT_DATA);
-    /* Pre value. */
-    int pre = p;
 
     // create checkboxes
     BaseXBack pp = new BaseXBack(new BorderLayout());
 
     final Context context = gui.context;
     final Data data = context.data();
-    kind = data.kind(pre);
+    kind = data.kind(p);
 
     final String title = Util.info(EDIT_X, NODE_KINDS[kind]);
     final BaseXLabel label = new BaseXLabel(title, true, true);
     pp.add(label, BorderLayout.NORTH);
 
     if(kind == Data.ELEM) {
-      old1 = string(data.name(pre, kind));
+      old1 = string(data.name(p, kind));
     } else if(kind == Data.DOC) {
-      old1 = string(data.text(pre, true));
+      old1 = string(data.text(p, true));
     } else if(kind == Data.TEXT || kind == Data.COMM) {
-      old3 = data.atom(pre);
+      old3 = data.atom(p);
     } else if(kind == Data.ATTR) {
-      old1 = string(data.name(pre, kind));
-      old2 = string(data.atom(pre));
+      old1 = string(data.name(p, kind));
+      old2 = string(data.atom(p));
     } else {
-      old1 = string(data.name(pre, kind));
-      old3 = data.atom(pre);
+      old1 = string(data.name(p, kind));
+      old3 = data.atom(p);
     }
     final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
     if(old1 != null) {

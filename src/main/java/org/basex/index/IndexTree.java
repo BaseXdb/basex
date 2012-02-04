@@ -129,7 +129,7 @@ public class IndexTree {
    */
   public final int next() {
     /* Last iterator node. */
-    int ln = cn;
+    final int ln = cn;
     if(r(cn) != -1) {
       cn = r(cn);
       while(l(cn) != -1) cn = l(cn);

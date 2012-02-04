@@ -80,7 +80,7 @@ public final class Add extends ACreate {
       name = name.substring(s + 1);
     }
 
-    Parser parser;
+    final Parser parser;
     if(io != null) {
       // set name of document
       if(!name.isEmpty()) io.name(name);

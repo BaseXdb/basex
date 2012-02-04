@@ -1,29 +1,23 @@
 package org.basex.gui.dialog;
 
-import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.core.Text.*;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.URI;
-
-import javax.swing.JComponent;
-import javax.swing.JDialog;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
+import static org.basex.gui.layout.BaseXKeys.ENTER;
+import static org.basex.gui.layout.BaseXKeys.modifier;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.net.URI;
 
 /**
  * This class provides the architecture for consistent dialog windows.
@@ -171,7 +165,7 @@ public abstract class Dialog extends JDialog {
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
 
     for(final Object obj : buttons) {
-      BaseXButton b;
+      final BaseXButton b;
       if(obj instanceof BaseXButton) {
         b = (BaseXButton) obj;
       } else {
@@ -196,7 +190,6 @@ public abstract class Dialog extends JDialog {
 
     for(final Component c : panel.getComponents()) {
       if(!(c instanceof JComponent)) {
-        continue;
       } else if(c instanceof BaseXButton) {
         final BaseXButton b = (BaseXButton) c;
         if(b.getText().equals(label)) b.setEnabled(enabled);
@@ -236,15 +229,6 @@ public abstract class Dialog extends JDialog {
    */
   public static void info(final GUI gui, final String text) {
     new DialogMessage(gui, text.trim(), Msg.SUCCESS);
-  }
-
-  /**
-   * Static information dialog.
-   * @param gui parent reference
-   * @param text text
-   */
-  public static void warn(final GUI gui, final String text) {
-    new DialogMessage(gui, text.trim(), Msg.WARN);
   }
 
   /**

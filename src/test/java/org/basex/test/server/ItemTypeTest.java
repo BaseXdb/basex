@@ -1,23 +1,22 @@
 package org.basex.test.server;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.basex.BaseXServer;
 import org.basex.core.Text;
 import org.basex.io.in.DecodingInput;
 import org.basex.server.ClientQuery;
 import org.basex.server.ClientSession;
-import org.basex.util.Util;
 import org.basex.util.list.ByteList;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * This class tests the correctness of the item types of the client API.
@@ -26,8 +25,6 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class ItemTypeTest {
-  /** Test database name. */
-  protected static final String DB = Util.name(SessionTest.class);
   /** Server reference. */
   private static BaseXServer server;
   /** Client session. */

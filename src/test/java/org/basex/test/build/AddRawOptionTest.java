@@ -104,7 +104,7 @@ public class AddRawOptionTest {
     }
 
     assertTrue("No files were imported", files.size() > 0);
-    for(File f : FILES) {
+    for(final File f : FILES) {
       final String fname = f.getName();
       assertTrue("File " + fname + " is not imported", files.contains(fname));
     }

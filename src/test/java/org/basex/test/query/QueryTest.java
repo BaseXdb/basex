@@ -60,7 +60,7 @@ public abstract class QueryTest {
    */
   @Test
   public void test() throws BaseXException {
-    final String file = doc.replaceAll("\\\"", "\\\\\"");
+    final String file = doc.replaceAll("\"", "\\\\\"");
     final String name = Util.name(QueryTest.class);
     final boolean up = this instanceof XQUPTest;
     new CreateDB(name, file).execute(context);

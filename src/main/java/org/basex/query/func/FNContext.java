@@ -16,7 +16,6 @@ import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 
 /**
@@ -39,8 +38,6 @@ public final class FNContext extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Iter[] arg = new Iter[expr.length];
-    for(int a = 0; a < expr.length; ++a) arg[a] = ctx.iter(expr[a]);
 
     switch(sig) {
       case CURRENT_DATE:

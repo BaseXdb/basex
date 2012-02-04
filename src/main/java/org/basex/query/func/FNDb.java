@@ -336,7 +336,7 @@ public final class FNDb extends StandardFunc {
           final String tstamp = InfoDB.DATE.format(new Date(meta.dbtime()));
           res.add(new FAttr(MDATE, token(tstamp)));
           if(ctx.context.perm(User.CREATE, meta))
-            res.add(new FAttr(PATH, token(meta.original.toString())));
+            res.add(new FAttr(PATH, token(meta.original)));
           res.add(new FTxt(token(name)));
         } catch(final IOException ex) {
           NODB.thrw(input, name);

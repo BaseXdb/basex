@@ -54,7 +54,7 @@ public final class GUIMacOSX {
 
     // load native java classes...
     /* Reference to the loaded 'Application' class. */
-    Class<?> appClass = Class.forName(C_APPLICATION);
+    final Class<?> appClass = Class.forName(C_APPLICATION);
     appObj = invoke(appClass, null, "getApplication", EC, EO);
     Class.forName(C_APPLICATION_EVENT);
 

@@ -118,6 +118,7 @@ public final class For extends ForLet {
 
       /**
        * Initializes the iterator.
+       * @throws QueryException query exception
        */
       private void init() throws QueryException {
         if(ir == null) {
@@ -134,6 +135,7 @@ public final class For extends ForLet {
        * @param it item
        * @param i position counter
        * @return specified item
+       * @throws QueryException query exception
        */
       private Item bind(final Item it, final long i) throws QueryException {
         v.bind(it, ctx);

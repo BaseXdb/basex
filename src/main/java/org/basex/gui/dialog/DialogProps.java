@@ -36,9 +36,9 @@ public final class DialogProps extends Dialog {
   private final BaseXButton optimize;
 
   /** Resource panel. */
-  DialogResources resources;
+  final DialogResources resources;
   /** Add panel. */
-  DialogAdd add;
+  final DialogAdd add;
 
   /** Editable full-text options. */
   private DialogFT ft;

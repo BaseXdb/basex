@@ -144,7 +144,7 @@ public final class DialogImport extends BaseXBack {
    * @return success flag, or {@code false} if specified input is not found
    */
   boolean action(final boolean empty) {
-    boolean ok;
+    final boolean ok;
     info.setText(null, null);
 
     final String in = input.getText().trim();
@@ -154,7 +154,7 @@ public final class DialogImport extends BaseXBack {
     ok = empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
     final boolean dir = ok && io.isDir();
     filter.setEnabled(dir);
-    raw.setEnabled(dir);
+    raw.setEnabled(dir && !gui.context.prop.is(Prop.MAINMEM));
     return ok;
   }
 }

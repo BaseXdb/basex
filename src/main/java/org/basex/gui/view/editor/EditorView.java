@@ -1,11 +1,32 @@
 package org.basex.gui.view.editor;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
-import static org.basex.util.Token.*;
+import org.basex.data.Nodes;
+import org.basex.gui.GUICommands;
+import org.basex.gui.GUIConstants;
+import static org.basex.gui.GUIConstants.EDITORVIEW;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.GUIMenu;
+import org.basex.gui.GUIProp;
+import org.basex.gui.dialog.Dialog;
+import org.basex.gui.layout.*;
+import org.basex.gui.layout.BaseXLayout.DropHandler;
+import org.basex.gui.view.View;
+import org.basex.gui.view.ViewNotifier;
+import org.basex.io.IO;
+import org.basex.io.IOFile;
+import org.basex.util.Performance;
+import static org.basex.util.Token.cl;
+import static org.basex.util.Token.token;
+import org.basex.util.Util;
+import org.basex.util.list.BoolList;
+import org.basex.util.list.ObjList;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -14,38 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.Box;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import org.basex.data.Nodes;
-import org.basex.gui.GUICommands;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.GUIMenu;
-import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXFileChooser;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXLayout.DropHandler;
-import org.basex.gui.layout.BaseXTabs;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewNotifier;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.basex.util.list.BoolList;
-import org.basex.util.list.ObjList;
 
 /**
  * This view allows the input and evaluation of queries and documents.
@@ -127,7 +116,8 @@ public final class EditorView extends View {
     add(tabs, BorderLayout.CENTER);
 
     /* Scroll Pane. */
-    BaseXBack south = new BaseXBack(Fill.NONE).layout(new BorderLayout(8, 0));
+    final BaseXBack south = new BaseXBack(Fill.NONE).layout(
+        new BorderLayout(8, 0));
     info = new BaseXLabel(" ");
     info.setText(OK, Msg.SUCCESS);
     pos = new BaseXLabel(" ");
@@ -205,12 +195,9 @@ public final class EditorView extends View {
           edit = find(IO.get(errFile), false);
           if(edit == null) edit = open(new IOFile(errFile));
           tabs.setSelectedComponent(edit);
-          edit.error = errPos;
         }
-        if(edit.error == -1) return;
-        edit.setCaret(edit.error);
-        edit.requestFocusInWindow();
-        edit.markError();
+        if(errPos == -1) return;
+        edit.markError(errPos, true);
         pos.setText(edit.pos());
       }
     });
@@ -237,9 +224,11 @@ public final class EditorView extends View {
         edit.setSearch(find);
         gui.refreshControls();
         refreshMark();
+        pos.setText(edit.pos());
         if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
       }
     });
+
     BaseXLayout.addDrop(this, new DropHandler() {
       @Override
       public void drop(final Object file) {
@@ -256,7 +245,7 @@ public final class EditorView extends View {
 
   @Override
   public void refreshMark() {
-    go.setEnabled(getEditor().exec && !gui.gprop.is(GUIProp.EXECRT));
+    go.setEnabled(getEditor().executable && !gui.gprop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.gprop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
@@ -358,7 +347,7 @@ public final class EditorView extends View {
         // get current editor
         edit = getEditor();
         // create new tab if current text is stored on disk or has been modified
-        if(edit.opened() || edit.mod) edit = addTab();
+        if(edit.opened() || edit.modified) edit = addTab();
         edit.file(file);
       }
 
@@ -434,18 +423,59 @@ public final class EditorView extends View {
 
   /**
    * Evaluates the info message resulting from a query execution.
-   * @param inf info message
+   * @param message info message
    * @param ok true if query was successful
    */
-  public void info(final String inf, final boolean ok) {
+  public void info(final String message, final boolean ok) {
     ++threadID;
-    info.setCursor(error(inf, ok) ?
+    info.setCursor(error(message, ok) ?
         GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
-    info.setText(ok ? OK : inf.replaceAll(STOPPED_AT +
+    info.setText(ok ? OK : message.replaceAll(STOPPED_AT +
+            ".*\\r?\\n\\[.*?\\] ", ""), ok ? Msg.SUCCESS : Msg.ERROR);
+    info.setText(ok ? OK : message.replaceAll(STOPPED_AT +
         ".*\\r?\\n\\[.*?\\] ", ""), ok ? Msg.SUCCESS : Msg.ERROR);
-    info.setToolTipText(ok ? null : inf);
+    info.setToolTipText(ok ? null : message);
     stop.setEnabled(false);
     go.setEnabled(true);
+  }
+
+  /**
+   * Handles info messages resulting from a query execution.
+   * @param message info message
+   * @param ok true if query was successful
+   * @return true if error was found
+   */
+  private boolean error(final String message, final boolean ok) {
+    errPos = -1;
+    errFile = null;
+    EditorArea edit = getEditor();
+    final String msg = message.replaceAll("[\\r\\n].*", "");
+    if(!ok) {
+      final Matcher m = FILEPATTERN.matcher(msg);
+      if(!m.matches()) return true;
+
+      errFile = m.group(3);
+      edit = find(IO.get(errFile), false);
+      if(edit == null) return true;
+
+      final int el = Integer.parseInt(m.group(1));
+      final int ec = Integer.parseInt(m.group(2));
+      errPos = edit.last.length;
+      // find approximate error position
+      final int ll = errPos;
+      for(int e = 0, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
+        if(l > el || l == el && c == ec) {
+          errPos = e;
+          break;
+        }
+        if(edit.last[e] == '\n') {
+          ++l;
+          c = 0;
+        }
+      }
+    }
+    edit.markError(errPos, false);
+    return errPos != -1;
   }
 
   /**
@@ -464,7 +494,7 @@ public final class EditorView extends View {
    */
   public boolean saveable() {
     final EditorArea area = getEditor();
-    return !area.opened() || area.mod;
+    return !area.opened() || area.modified;
   }
 
   /**
@@ -484,12 +514,12 @@ public final class EditorView extends View {
   void refresh(final boolean mod, final boolean force) {
     final EditorArea edit = getEditor();
     refreshMark();
-    if(edit.mod == mod && !force) return;
+    if(edit.modified == mod && !force) return;
 
     String title = edit.file().name();
     if(mod) title += "*";
     edit.label.setText(title);
-    edit.mod = mod;
+    edit.modified = mod;
     gui.refreshControls();
   }
 
@@ -604,7 +634,7 @@ public final class EditorView extends View {
    * @return {@code false} if confirmation was canceled
    */
   private boolean confirm(final EditorArea edit) {
-    if(edit.mod) {
+    if(edit.modified) {
       final Boolean ok = Dialog.yesNoCancel(gui,
           Util.info(CLOSE_FILE_X, edit.file().name()));
       if(ok == null || ok && !save()) return false;
@@ -622,44 +652,5 @@ public final class EditorView extends View {
       if(c instanceof EditorArea) edits.add((EditorArea) c);
     }
     return edits.toArray(new EditorArea[edits.size()]);
-  }
-
-  /**
-   * Handles info messages resulting from a query execution.
-   * @param message info message
-   * @param ok true if query was successful
-   * @return true if error was found
-   */
-  boolean error(final String message, final boolean ok) {
-    errPos = -1;
-    EditorArea edit = getEditor();
-    final String msg = message.replaceAll("[\\r\\n].*", "");
-    if(!ok) {
-      final Matcher m = FILEPATTERN.matcher(msg);
-      if(!m.matches()) return true;
-
-      errFile = m.group(3);
-      edit = find(IO.get(errFile), false);
-      if(edit == null) return true;
-
-      final int el = Integer.parseInt(m.group(1));
-      final int ec = Integer.parseInt(m.group(2));
-      errPos = edit.last.length;
-      // find approximate error position
-      final int ll = errPos;
-      for(int e = 0, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
-        if(l > el || l == el && c == ec) {
-          errPos = e;
-          break;
-        }
-        if(edit.last[e] == '\n') {
-          ++l;
-          c = 0;
-        }
-      }
-    }
-    edit.error = errPos;
-    edit.markError();
-    return errPos != -1;
   }
 }

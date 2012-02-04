@@ -45,8 +45,8 @@ final class SplitAlgo extends MapAlgo {
 
     int xx = r.x;
     int yy = r.y;
-    int ww = !(r.w > r.h) ? r.w : (int) (r.w * 1 / sw * w);
-    int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sw * w);
+    int ww = !(r.w > r.h) ? r.w : (int) (r.w / sw * w);
+    int hh = r.w > r.h ? r.h : (int) (r.h / sw * w);
     // paint both rectangles if enough space is left
     if(ww > 0 && hh > 0 && w > 0) rects.add(calcMap(
         new MapRect(xx, yy, ww, hh, 0, r.level), ml, ns, ni, w));

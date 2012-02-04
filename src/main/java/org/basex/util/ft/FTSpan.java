@@ -13,9 +13,9 @@ public final class FTSpan {
   /** Text. */
   public byte[] text;
   /** Token position. */
-  public int pos;
+  public final int pos;
   /** Special character flag. */
-  public boolean special;
+  public final boolean special;
 
   /**
    * Constructor.

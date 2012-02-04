@@ -1,12 +1,12 @@
 package org.basex.gui.view.map;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.view.ViewData;
+
+import java.awt.*;
 
 /**
  * Provides an interface for data specific TreeMap visualizations.
@@ -58,51 +58,12 @@ abstract class MapPainter {
       final float scale);
 
   /**
-   * Draws a single rectangle.
-   * @param g graphics reference
-   * @param rect rectangle to be drawn
-   * @return if space is left in the paint area
-   */
-  abstract boolean drawRectangle(final Graphics g, final MapRect rect);
-
-  /**
-   * Reacts on a mouse over/mouse click on the focused area.
-   * @param click mouse click (false: mouse move)
-   * @param rect current rectangle
-   * @param mx mouse x
-   * @param my mouse y
-   * @return true if area is mouse sensitive
-   */
-  @SuppressWarnings("unused")
-  boolean mouse(final MapRect rect, final int mx, final int my,
-      final boolean click) {
-    return false;
-  }
-
-  /**
-   * Initializes the painter.
-   * @param rects rectangle array
-   */
-  @SuppressWarnings("unused")
-  void init(final MapRects rects) { }
-
-  /**
    * Returns the content for the specified pre value.
    * @param data data reference
    * @param mr map rectangle
    * @return byte[] content
    */
-  byte[] content(final Data data, final MapRect mr) {
+  final byte[] content(final Data data, final MapRect mr) {
     return ViewData.content(data, mr.pre, false);
   }
-
-  /**
-   * Resets the painter.
-   */
-  void reset() { }
-
-  /**
-   * Closes the painter.
-   */
-  void close() { }
 }

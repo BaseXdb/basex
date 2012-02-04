@@ -115,7 +115,7 @@ public abstract class FTExpr extends ParseExpr {
   final String toString(final Object sep) {
     final StringBuilder sb = new StringBuilder();
     for(int e = 0; e != expr.length; ++e) {
-      sb.append((e != 0 ? sep.toString() : "") + expr[e]);
+      sb.append(e != 0 ? sep.toString() : "").append(expr[e]);
     }
     return sb.toString();
   }

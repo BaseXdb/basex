@@ -1,14 +1,9 @@
 package org.basex.core;
 
-import static org.basex.core.Lang.*;
+import org.basex.core.Commands.*;
+import static org.basex.core.Lang.lang;
+
 import java.util.Locale;
-import org.basex.core.Commands.CmdCreate;
-import org.basex.core.Commands.CmdDrop;
-import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Commands.CmdInfo;
-import org.basex.core.Commands.CmdPerm;
-import org.basex.core.Commands.CmdRepo;
-import org.basex.core.Commands.CmdShow;
 
 /**
  * This class contains internationalized text strings, which are used
@@ -613,29 +608,29 @@ public interface Text {
   /** Query info: separator. */
   String QUERYSEP = LI;
 
-  /** Query info: query. */
+  /** "Query: ". */
   String QUERY_CC = lang("query") + COLS;
-  /** Query info: compiling. */
+  /** "Parsing: ". */
   String PARSING_CC = lang("parsing") + COLS;
-  /** Query info: compiling. */
+  /** "Compiling: ". */
   String COMPILING_CC = lang("compiling") + COLS;
-  /** Query info: evaluating. */
+  /** "Evaluating: ". */
   String EVALUATING_CC = lang("evaluating") + COLS;
-  /** Query info: time for printing. */
+  /** "Printing: ". */
   String PRINTING_CC = lang("printing") + COLS;
-  /** Query info: total time. */
+  /** "Total time: ". */
   String TOTAL_TIME_CC = lang("total_time") + COLS;
-  /** Query hits. */
+  /** "Hit(s): ". */
   String HITS_X_CC = lang("hit_s") + COLS;
-  /** Query info: updated data. */
+  /** "Updated: ". */
   String UPDATED_CC = lang("updated") + COLS;
-  /** Query info: printed data. */
+  /** "Printed: ". */
   String PRINTED_CC = lang("printed") + COLS;
-  /** Query hits. */
+  /** "Results: %". */
   String RESULTS_X = lang("results_%");
-  /** Insert query info. */
+  /** "Query must yield database nodes.". */
   String NO_DB_NODES = lang("no_db_nodes");
-  /** Query executed. */
+  /** "Query executed in %". */
   String QUERY_EXECUTED_X = lang("query_executed_%");
 
   /** Stopped info. */

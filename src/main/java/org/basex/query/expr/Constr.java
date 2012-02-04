@@ -31,7 +31,7 @@ public final class Constr {
   /** Attribute array. */
   public final NodeCache atts = new NodeCache();
   /** Namespace array. */
-  public Atts nspaces = new Atts();
+  public final Atts nspaces = new Atts();
   /** Error: attribute position. */
   public boolean errAtt;
   /** Error: namespace position. */
@@ -167,7 +167,7 @@ public final class Constr {
         }
 
         // [CG] Element construction: avoid full copy of sub tree if not needed
-        node = node.copy(ctx);
+        node = node.deepCopy();
         children.add(node);
       }
       more = false;

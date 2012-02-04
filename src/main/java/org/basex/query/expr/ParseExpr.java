@@ -90,7 +90,7 @@ public abstract class ParseExpr extends Expr {
   public final Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    Item it;
+    final Item it;
     if(type().zeroOrOne()) {
       it = item(ctx, input);
     } else {

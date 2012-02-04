@@ -239,7 +239,9 @@ public class ClientSession extends Session {
             final String l = bi.readString();
             if(n != null) n.notify(l);
           }
-        } catch(final IOException ex) { }
+        } catch(final IOException ex) {
+          // listener did not receive any more input
+        }
       }
     }.start();
   }

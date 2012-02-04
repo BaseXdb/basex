@@ -35,7 +35,7 @@ public final class CreateIndex extends ACreate {
     if(data instanceof MemData) return error(NO_MAINMEM);
 
     try {
-      IndexType index;
+      final IndexType index;
       final CmdIndex ci = getOption(CmdIndex.class);
       switch(ci) {
         case TEXT:

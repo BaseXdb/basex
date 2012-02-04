@@ -233,7 +233,6 @@ public final class DataBuilder {
     data.elem(pre - par, tn, size(nd, true), s, u, ne);
     data.insert(ms);
 
-    final int pp = pre;
     int p = pre + 1;
 
     // add attributes
@@ -246,7 +245,7 @@ public final class DataBuilder {
     data.nspaces.close(ms);
 
     // update size if additional nodes have been added by the descendants
-    if(s != p - pp) data.size(ms, Data.ELEM, p - pp);
+    if(s != p - pre) data.size(ms, Data.ELEM, p - pre);
     return p;
   }
 

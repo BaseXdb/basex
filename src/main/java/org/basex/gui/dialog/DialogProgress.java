@@ -1,22 +1,16 @@
 package org.basex.gui.dialog;
 
-import static org.basex.core.Text.*;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JProgressBar;
-import javax.swing.Timer;
 import org.basex.core.Command;
+import static org.basex.core.Text.*;
 import org.basex.gui.GUI;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXMem;
-import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.*;
 import org.basex.util.Performance;
 import org.basex.util.Util;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Dialog window for displaying the progress of a command execution.
@@ -166,7 +160,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
         d.setEnabled(true);
         d.action(null);
-        if(post != null) post.run();
+        if(post != null) post.start();
       }
     }.start();
   }

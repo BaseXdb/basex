@@ -1,38 +1,22 @@
 package org.basex.gui.dialog;
 
-import static org.basex.core.Text.*;
-import static org.basex.data.DataText.*;
-
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.io.IOException;
-
 import org.basex.core.Command;
 import org.basex.core.Context;
-import org.basex.core.cmd.AlterDB;
-import org.basex.core.cmd.Copy;
-import org.basex.core.cmd.CreateBackup;
-import org.basex.core.cmd.DropBackup;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.InfoDB;
+import static org.basex.core.Text.*;
+import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
-import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Restore;
-import org.basex.core.cmd.ShowBackups;
+import static org.basex.data.DataText.DATAINF;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXList;
-import org.basex.gui.layout.BaseXTabs;
+import org.basex.gui.layout.*;
 import org.basex.io.in.DataInput;
 import org.basex.util.Token;
 import org.basex.util.Util;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
+
+import java.awt.*;
+import java.io.IOException;
 
 /**
  * Open database dialog.
@@ -64,9 +48,9 @@ public final class DialogManage extends Dialog {
   /** Refresh list of databases. */
   private boolean refresh;
   /** Combobox that lists available backups for a database. */
-  private BaseXList backups;
+  private final BaseXList backups;
   /** Delete button for backups. */
-  private BaseXButton delete;
+  private final BaseXButton delete;
   /** Deletes all backups. */
   private final BaseXButton deleteAll;
 

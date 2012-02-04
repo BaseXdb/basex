@@ -88,9 +88,7 @@ public final class CommandBuilder {
       if(key != null) tb.add(' ').add(key);
       tb.add(' ');
       if(a.indexOf(' ') != -1 || a.indexOf(';') != -1) {
-        tb.add('"');
-        tb.add(a.replaceAll("\"", "\\\""));
-        tb.add('"');
+        tb.add('"').add(a.replaceAll("\"", "\\\"")).add('"');
       } else {
         tb.add(a);
       }

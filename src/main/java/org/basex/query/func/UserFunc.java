@@ -37,7 +37,7 @@ public class UserFunc extends Single {
   public final boolean declared;
 
   /** Return type. */
-  public SeqType ret;
+  public final SeqType ret;
   /** Updating flag. */
   public boolean updating;
   /** Cast flag. */

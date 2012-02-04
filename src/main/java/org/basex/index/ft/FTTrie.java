@@ -418,7 +418,7 @@ final class FTTrie extends FTIndex {
     byte[] bw = null;
 
     final int currentLength = 0;
-    int resultNode;
+    final int resultNode;
 
     FTIndexIterator d = FTIndexIterator.FTEMPTY;
     // wildcard not at beginning
@@ -546,7 +546,7 @@ final class FTTrie extends FTIndex {
     /*
     Saves node values from .-wildcard search according to records in id-array.
    */
-    byte[] valuesFound;
+    final byte[] valuesFound;
     if(rne[0] > counter[0] && resultNode > 0) {
       // replace wildcard with value from currentCompressedTrieNode
       tok[posw] = (byte) rne[counter[0] + 1];

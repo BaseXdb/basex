@@ -27,7 +27,7 @@ public final class FNGenTest extends AdvancedQueryTest {
    * @throws Exception exception
    */
   @Test
-  public void fnUnparsedText() throws Exception {
+  public void fnUnparsed3Text() throws Exception {
     check(UNPARSED_TEXT);
     contains(UNPARSED_TEXT.args(TEXT), "?&gt;&lt;html");
     contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "?&gt;&lt;html");

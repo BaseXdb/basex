@@ -196,6 +196,8 @@ public final class GUIConstants {
   /** Background color. */
   public static final Color DGRAY = new Color(64, 64, 64);
 
+  /** Bright GUI color. */
+  public static final Color WHITE = Color.white;
   /** Color for control characters. */
   public static final Color RED = new Color(208, 0, 0);
   /** Color for highlighting errors. */
@@ -207,16 +209,14 @@ public final class GUIConstants {
   /** Color for control characters. */
   public static final Color PINK = new Color(160, 0, 160);
 
-  /** Bright GUI color. */
-  public static Color color1 = Color.white;
   /** Second bright GUI color. */
+  public static Color color1;
+  /** Middle color. */
   public static Color color2;
   /** Middle color. */
   public static Color color3;
-  /** Middle color. */
-  public static Color color4;
   /** Dark color. */
-  public static Color color5;
+  public static Color color4;
 
   /** Mark color. */
   public static Color colormark1;
@@ -228,13 +228,13 @@ public final class GUIConstants {
   public static Color colormark4;
 
   /** Alpha color. */
-  public static Color colorA;
+  public static Color color1A;
   /** Transparent background color. */
   public static Color color2A;
   /** Transparent frame color. */
   public static Color color3A;
   /** Mark color, custom alpha value. */
-  public static Color colormarkA;
+  public static Color colormark1A;
   /** Second mark color, custom alpha value. */
   public static Color colormark2A;
 
@@ -290,13 +290,13 @@ public final class GUIConstants {
 
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GREEN)
-    color2 = new Color(col(r, 24), col(g, 25), col(b, 40));
-    color3 = new Color(col(r, 32), col(g, 32), col(b, 44));
-    color4 = new Color(col(r, 48), col(g, 50), col(b, 40));
-    color5 = new Color(col(r, 140), col(g, 100), col(b, 70));
-    colorA = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
+    color1 = new Color(col(r, 24), col(g, 25), col(b, 40));
+    color2 = new Color(col(r, 32), col(g, 32), col(b, 44));
+    color3 = new Color(col(r, 48), col(g, 50), col(b, 40));
+    color4 = new Color(col(r, 140), col(g, 100), col(b, 70));
+    color1A = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
 
-    colormarkA = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
+    colormark1A = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
     colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 100);
     colormark1 = new Color(col(r, 16), col(g, 120), col(b, 240));
     colormark2 = new Color(col(r, 16), col(g, 80), col(b, 160));

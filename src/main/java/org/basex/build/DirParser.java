@@ -111,8 +111,9 @@ public final class DirParser extends TargetParser {
         }
 
         if(filter != null && !filter.matcher(nm).matches()) {
-          // [CG] Add raw files?
-          if(raw) Store.store(src.inputSource(), b.meta.binary(targ + name));
+          if(raw) {
+            Store.store(src.inputSource(), b.meta.binary(targ + name));
+          }
         } else {
           boolean ok = true;
           IO in = io;

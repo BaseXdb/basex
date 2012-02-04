@@ -228,8 +228,7 @@ final class DialogUser extends BaseXBack {
     }
 
     final boolean valname = user.getText().matches("[\\w]*");
-    final boolean valpass = new String(
-        pass.getPassword()).matches("[^ ;'\\\"]*");
+    final boolean valpass = new String(pass.getPassword()).matches("[^ ;'\"]*");
     boolean newname = true;
     for(int r = 0; r < users.contents.size(); ++r)
       newname &= !users.value(r, 0).equals(user.getText());

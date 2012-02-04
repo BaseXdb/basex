@@ -1,19 +1,11 @@
 package org.basex.gui.view.map;
 
-import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
-import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferedImage;
-import javax.swing.SwingUtilities;
+import static org.basex.core.Text.DOTS;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
+import static org.basex.gui.GUIConstants.*;
 import org.basex.gui.GUIProp;
+import static org.basex.gui.layout.BaseXKeys.*;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
@@ -24,6 +16,14 @@ import org.basex.util.Token;
 import org.basex.util.ft.FTLexer;
 import org.basex.util.list.IntList;
 import org.basex.util.list.TokenList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
 
 /**
  * This view is a TreeMap implementation.
@@ -101,7 +101,6 @@ public final class MapView extends View implements Runnable {
 
   @Override
   public void refreshInit() {
-    if(painter != null) painter.close();
     painter = null;
     mainRects = null;
     focused = null;
@@ -273,9 +272,6 @@ public final class MapView extends View implements Runnable {
     final boolean nf = focused != fr || fr != null && fr.thumb;
     focused = fr;
 
-    if(fr != null) gui.cursor(painter.mouse(focused, mouseX, mouseY, false) ?
-        CURSORHAND : CURSORARROW);
-
     if(nf) gui.notify.focus(focused != null ? focused.pre : -1, this);
     return nf;
   }
@@ -299,7 +295,6 @@ public final class MapView extends View implements Runnable {
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 
-    painter.init(mainRects);
     drawMap(map, mainRects, 1f);
     focus();
     /*
@@ -374,7 +369,7 @@ public final class MapView extends View implements Runnable {
       final int y = f.y;
       final int w = f.w;
       final int h = f.h;
-      g.setColor(color5);
+      g.setColor(color4);
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 
@@ -480,14 +475,6 @@ public final class MapView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
     if(focus()) repaint();
-  }
-
-  @Override
-  public void mouseClicked(final MouseEvent e) {
-    if(gui.updating) return;
-    // process mouse clicks by the specific painter
-    if(SwingUtilities.isLeftMouseButton(e) && focused != null)
-      painter.mouse(focused, mouseX, mouseY, true);
   }
 
   @Override
@@ -611,8 +598,6 @@ public final class MapView extends View implements Runnable {
    * Initializes the text lengths and stores them into an array.
    */
   private void initLen() {
-    painter.reset();
-
     final Data data = gui.context.data();
     if(textLen != null || gui.gprop.num(GUIProp.MAPWEIGHT) == 0) return;
 

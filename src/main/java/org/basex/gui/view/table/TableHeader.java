@@ -100,7 +100,7 @@ final class TableHeader extends BaseXPanel {
     int w = getWidth();
     final int h = getHeight();
     final int hh = h >> 1;
-    g.setColor(color3);
+    g.setColor(color2);
     g.drawLine(0, h - 1, w, h - 1);
 
     w -= bs;
@@ -328,10 +328,8 @@ final class TableHeader extends BaseXPanel {
           for(final TableCol c : tdata.cols) vis |= c != col && c.width != 0;
 
           if(vis) {
-            final double vw = sel ? col.hwidth : 0;
-            final double hw = sel ? 0 : col.width;
-            col.hwidth = hw;
-            col.width = vw;
+            col.hwidth = sel ? 0 : col.width;
+            col.width = sel ? col.hwidth : 0;
           } else {
             mi.setSelected(true);
           }
@@ -403,11 +401,6 @@ final class TableHeader extends BaseXPanel {
         control(e) || !box.add(e)) return;
     tdata.cols[inputCol].filter = box.text;
     view.query();
-  }
-
-  @Override
-  public void keyReleased(final KeyEvent e) {
-    if(tdata.roots == null || tdata.roots.size() == 0) return;
   }
 }
 

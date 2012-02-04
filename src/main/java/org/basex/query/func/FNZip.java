@@ -474,8 +474,7 @@ public final class FNZip extends StandardFunc {
       paths.add(name);
     }
     final StringList sl = new StringList();
-    final Iterator<String> it = paths.iterator();
-    while(it.hasNext()) sl.add(it.next());
+    for(final String path : paths) sl.add(path);
     return sl;
   }
 

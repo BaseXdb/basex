@@ -227,7 +227,7 @@ public final class FolderView extends View {
     }
     if(y < -lineH) return;
 
-    g.setColor(color2);
+    g.setColor(color1);
     g.drawLine(2, y + boxMargin - 1, totalW - 5, y + boxMargin - 1);
 
     final byte[] name = ViewData.content(data, pre, false);
@@ -235,30 +235,28 @@ public final class FolderView extends View {
     int p = gui.context.focused;
     while(p > pre) p = ViewData.parent(data, p);
     if(pre == p) {
-      g.setColor(color3);
+      g.setColor(color2);
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
     }
-    final int xx = x;
 
     if(elem) {
       final boolean large = gui.gprop.num(GUIProp.FONTSIZE) > 20;
       final int yy = y - boxW - (large ? 6 : 3);
       final Image box = opened[pre] ? openedBox : closedBox;
-      g.drawImage(box, xx - lineH, yy, this);
+      g.drawImage(box, x - lineH, yy, this);
     }
 
     g.setFont(fnt);
     g.setColor(col);
 
-    final int yy = y;
     final int tw = totalW + 6;
     final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
-    BaseXLayout.chopString(g, name, xx, yy - fsz, tw - xx - 10, fsz);
+    BaseXLayout.chopString(g, name, x, y - fsz, tw - x - 10, fsz);
 
     if(gui.context.focused == pre) {
-      g.setColor(color5);
-      g.drawRect(1, yy - boxW - boxMargin, totalW - 3, lineH + 1);
-      g.drawRect(2, yy - boxW - boxMargin + 1, totalW - 5, lineH - 1);
+      g.setColor(color4);
+      g.drawRect(1, y - boxW - boxMargin, totalW - 3, lineH + 1);
+      g.drawRect(2, y - boxW - boxMargin + 1, totalW - 5, lineH - 1);
     }
   }
 
@@ -332,13 +330,13 @@ public final class FolderView extends View {
     final int sp = Math.max(1, s >> 4);
 
     /* Empty Box. */
-    BufferedImage emptyBox = new BufferedImage(boxW + 1, boxW + 1,
+    final BufferedImage emptyBox = new BufferedImage(boxW + 1, boxW + 1,
             BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = emptyBox.createGraphics();
     smooth(g);
-    g.setColor(color5);
-    g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
     g.setColor(color4);
+    g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
+    g.setColor(color3);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
 
     openedBox = new BufferedImage(boxW + 1, boxW + 1,
@@ -349,10 +347,10 @@ public final class FolderView extends View {
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
         boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
     p.translate(0, -1);
-    g.setColor(color5);
+    g.setColor(color4);
     g.fillPolygon(p);
     p.translate(-1, -1);
-    g.setColor(color4);
+    g.setColor(color3);
     g.fillPolygon(p);
 
     closedBox = new BufferedImage(boxW + 1, boxW + 1,
@@ -363,10 +361,10 @@ public final class FolderView extends View {
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
         new int[] { 0, boxW >> 1, boxW }, 3);
     p.translate(-1, 1);
-    g.setColor(color5);
+    g.setColor(color4);
     g.fillPolygon(p);
     p.translate(-1, -1);
-    g.setColor(color4);
+    g.setColor(color3);
     g.fillPolygon(p);
   }
 

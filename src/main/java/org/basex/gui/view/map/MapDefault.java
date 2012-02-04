@@ -1,7 +1,5 @@
 package org.basex.gui.view.map;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -9,6 +7,8 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
+
+import java.awt.*;
 
 /**
  * Adds default paint operations to TreeMap.
@@ -82,8 +82,13 @@ final class MapDefault extends MapPainter {
     }
   }
 
-  @Override
-  boolean drawRectangle(final Graphics g, final MapRect rect) {
+  /**
+   * Draws a single rectangle.
+   *
+   * @param g graphics reference
+   * @param rect rectangle to be drawn
+   */
+  private void drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;
 
@@ -117,6 +122,5 @@ final class MapDefault extends MapPainter {
     }
     rect.x -= 3;
     rect.w += 3;
-    return true;
   }
 }

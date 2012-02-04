@@ -129,8 +129,7 @@ final class PlotAxis {
     else {
       minMax(vals);
       // calculations for axis labeling
-      if(log) prepareLogAxis();
-      else prepareLinAxis();
+      if(!log) prepareLinAxis();
 
       // coordinates for TEXT already calculated in textToNum()
       for(int i = 0; i < vals.length; ++i)
@@ -282,7 +281,6 @@ final class PlotAxis {
     if(log) {
       logMin = ln(min);
       logMax = ln(max);
-      return;
     }
   }
 
@@ -314,15 +312,6 @@ final class PlotAxis {
     final int pow = range < 10 ? 0 :
       (int) Math.floor(Math.log10(range) + .5d) - 1;
     calculatedCaptionStep = (int) Math.pow(10, pow);
-  }
-
-  /**
-   * Executes some calculations to support a dynamic axis labelling for a
-   * logarithmic scale.
-   */
-  private void prepareLogAxis() {
-    // range as driving force for following calculations, no matter if INT
-    // or DBL ... whatsoever
   }
 
   /**

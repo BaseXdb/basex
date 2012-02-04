@@ -145,17 +145,16 @@ public abstract class Builder extends Progress {
 
   /**
    * Opens a new element node.
+   *
    * @param nm tag name
    * @param att attributes
-   * @return preValue of the created node
    * @throws IOException I/O exception
    */
-  public final int startElem(final byte[] nm, final Atts att)
+  public final void startElem(final byte[] nm, final Atts att)
       throws IOException {
 
-    final int pre = addElem(nm, att);
+    addElem(nm, att);
     ++level;
-    return pre;
   }
 
   /**
@@ -314,12 +313,12 @@ public abstract class Builder extends Progress {
 
   /**
    * Adds an element node to the storage.
+   *
    * @param nm tag name
    * @param att attributes
-   * @return pre value of the created node
    * @throws IOException I/O exception
    */
-  private int addElem(final byte[] nm, final Atts att) throws IOException {
+  private void addElem(final byte[] nm, final Atts att) throws IOException {
     // get tag reference
     int n = tags.index(nm, null, true);
 
@@ -367,7 +366,6 @@ public abstract class Builder extends Progress {
     limit(atts.size(), 0x8000, LIMITATTS);
     limit(ns.size(), 0x100, LIMITNS);
     if(meta.size < 0) limit(0, 0, LIMITRANGE);
-    return pre;
   }
 
   /**

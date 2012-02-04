@@ -85,9 +85,11 @@ public final class QueryContext extends Progress {
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
   /** Query options (are valid during query execution). */
-  public HashMap<String, String> dbOptions = new HashMap<String, String>();
+  public final HashMap<String, String> dbOptions =
+      new HashMap<String, String>();
   /** Global options (will be set after query execution). */
-  public HashMap<String, Object> globalOpt = new HashMap<String, Object>();
+  public final HashMap<String, Object> globalOpt =
+      new HashMap<String, Object>();
 
   /** Root expression of the query. */
   public Expr root;
@@ -144,7 +146,7 @@ public final class QueryContext extends Progress {
   /** Initial context value. */
   public Expr ctxItem;
   /** Java modules. */
-  public HashMap<QueryModule, ArrayList<Method>> javaModules =
+  public final HashMap<QueryModule, ArrayList<Method>> javaModules =
       new HashMap<QueryModule, ArrayList<Method>>();
   /** JAR modules. */
   public JarLoader jars;

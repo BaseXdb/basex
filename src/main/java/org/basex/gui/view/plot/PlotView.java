@@ -252,10 +252,10 @@ public final class PlotView extends View {
     final Graphics g = img.getGraphics();
     smooth(g);
 
-    Color c = colorA;
-    if(marked) c = colormarkA;
+    Color c = color1A;
+    if(marked) c = colormark1A;
     if(markedSub) c = colormark2A;
-    if(focus) c = color5;
+    if(focus) c = color4;
 
     g.setColor(c);
     g.fillOval(0, 0, size, size);
@@ -276,7 +276,7 @@ public final class PlotView extends View {
     drawAxis(g, false);
 
     // draw items
-    g.setColor(color5);
+    g.setColor(color4);
     for(int i = 0; i < plotData.pres.length; ++i) {
       drawItem(g, plotData.xAxis.co[i],
           plotData.yAxis.co[i], false, false, false);
@@ -750,9 +750,9 @@ public final class PlotView extends View {
         Transparency.BITMASK);
     final Graphics2D g2d = img.createGraphics();
     smooth(g2d);
-    g2d.rotate(ROTATE, imgW, 0 + textH);
+    g2d.rotate(ROTATE, imgW, textH);
     g2d.setFont(font);
-    g2d.setColor(im ? color4 : Color.black);
+    g2d.setColor(im ? color3 : Color.black);
     g2d.drawString(caption, fs, fs);
     return img;
   }

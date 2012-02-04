@@ -14,7 +14,7 @@ import org.basex.query.item.Type;
  */
 public final class KindTest extends Test {
   /** Type name. */
-  public Type extype;
+  public final Type extype;
 
   /**
    * Constructor.

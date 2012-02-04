@@ -1,20 +1,20 @@
 package org.basex.query.func;
 
+import org.basex.io.serial.Serializer;
+import org.basex.query.QueryException;
+import org.basex.query.QueryModule;
 import static org.basex.query.QueryText.*;
-import static org.basex.query.util.Err.*;
+import org.basex.query.expr.Expr;
+import org.basex.query.item.Value;
+import static org.basex.query.util.Err.JAVAERR;
+import static org.basex.query.util.Err.JAVAMOD;
+import org.basex.util.InputInfo;
+import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryModule;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Value;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * Java function binding.
@@ -48,7 +48,7 @@ public final class JavaModuleFunc extends JavaMapping {
       try {
         return mth.invoke(module, (Object[]) args);
       } catch(final IllegalArgumentException iae) {
-        Object[] ar = new Object[args.length];
+        final Object[] ar = new Object[args.length];
         for(int a = 0; a < args.length; a++) ar[a] = args[a].toJava();
         return mth.invoke(module, ar);
       }
@@ -56,10 +56,9 @@ public final class JavaModuleFunc extends JavaMapping {
       throw JAVAERR.thrw(input, ex.getCause());
     } catch(final Throwable ex) {
       final TokenBuilder found = new TokenBuilder();
-      for(final Object a : args) {
+      for(final Value a : args) {
         if(found.size() != 0) found.add(", ");
-        found.addExt(a instanceof Value ? ((Value) a).type :
-          a.getClass().getSimpleName());
+        found.addExt(a.type);
       }
       throw JAVAMOD.thrw(input, signature(), name() + '(' + found + ')');
     }

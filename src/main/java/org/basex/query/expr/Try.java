@@ -135,7 +135,7 @@ public final class Try extends Single {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("try { " + expr + " }");
-    for(final Catch c : ctch) sb.append(" " + c);
+    for(final Catch c : ctch) sb.append(" ").append(c);
     return sb.toString();
   }
 }

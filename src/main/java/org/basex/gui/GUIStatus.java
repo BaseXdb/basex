@@ -32,7 +32,7 @@ public final class GUIStatus extends BaseXPanel {
     label = new BaseXLabel(OK).border(0, 4, 0, 0);
     add(label, BorderLayout.CENTER);
     /* Memory usage. */
-    BaseXMem mem = new BaseXMem(main, true);
+    final BaseXMem mem = new BaseXMem(main, true);
     add(mem, BorderLayout.EAST);
   }
 

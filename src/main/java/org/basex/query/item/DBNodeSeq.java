@@ -24,7 +24,7 @@ public final class DBNodeSeq extends Seq {
   /** Pre values. */
   public final int[] pres;
   /** Complete. */
-  public boolean complete;
+  public final boolean complete;
 
   /**
    * Constructor.

@@ -16,7 +16,7 @@ import org.junit.Test;
  */
 public final class FLWORTest {
   /** Database context. */
-  private static Context context = new Context();
+  private static final Context CONTEXT = new Context();
 
   /** Tests shadowing of outer variables. */
   @Test
@@ -33,10 +33,10 @@ public final class FLWORTest {
    */
   private void query(final String query, final String expected) {
     try {
-      final String result = new XQuery(query).execute(context);
+      final String result = new XQuery(query).execute(CONTEXT);
       // quotes are replaced by apostrophes to simplify comparison
-      assertEquals(expected.replaceAll("\\\"", "'"),
-          result.replaceAll("\\\"", "'"));
+      assertEquals(expected.replaceAll("\"", "'"),
+          result.replaceAll("\"", "'"));
     } catch(final BaseXException ex) {
       fail(Util.message(ex));
     }
