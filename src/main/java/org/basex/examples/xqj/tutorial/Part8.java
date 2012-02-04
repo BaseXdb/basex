@@ -39,7 +39,7 @@ public final class Part8 extends Main {
     xqp = xqc.prepareExpression(
       "declare variable $id as xs:integer external; " +
       "doc('src/main/resources/xml/orders.xml')//order[id=$id]");
-    xqp.bindObject(new QName("id"), Integer.valueOf(174), null);
+    xqp.bindObject(new QName("id"), 174, null);
     print("Bind item to external variable", xqp);
 
     // Bind integers to external variables
@@ -53,8 +53,8 @@ public final class Part8 extends Main {
       "$v1 instance of xs:int, " +
       "$v2 instance of xs:integer, " +
       "$v2 instance of xs:int");
-    xqp.bindObject(new QName("v1"), Integer.valueOf(174), null);
-    xqp.bindObject(new QName("v2"), Integer.valueOf(174), xsinteger);
+    xqp.bindObject(new QName("v1"), 174, null);
+    xqp.bindObject(new QName("v2"), 174, xsinteger);
     print("Bind integers to external variables", xqp);
 
     // Bind atomic values

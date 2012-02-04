@@ -104,10 +104,10 @@ public final class Part4 extends Main {
     items = new XQItem[3];
 
     // Create an XQItem with a type of xs:int
-    items[0] = conn.createItemFromObject(Integer.valueOf(5), null);
+    items[0] = conn.createItemFromObject(5, null);
 
     // Create an XQItem with a type of xs:float
-    items[1] = conn.createItemFromObject(Float.valueOf(123.4f), null);
+    items[1] = conn.createItemFromObject(123.4f, null);
 
     // Create an XQItem with a type of xs:hexBinary
     items[2] = conn.createItemFromObject(new byte[] { 1, 2, 3, 4 }, null);
@@ -123,9 +123,9 @@ public final class Part4 extends Main {
     list.add(conn.createItemFromInt(1, null));
     list.add(conn.createItemFromInt(2, null));
     list.add(conn.createItemFromInt(3, null));
-    list.add(Integer.valueOf(4));
-    list.add(Integer.valueOf(5));
-    list.add(Integer.valueOf(6));
+    list.add(4);
+    list.add(5);
+    list.add(6);
 
     XQSequence sequence = conn.createSequence(list.iterator());
 
