@@ -284,13 +284,13 @@ public class DialogResources extends BaseXBack {
       final TreeNode n = selection();
       if(n == null || !Dialog.confirm(dialog.gui, Text.DELETE_NODES)) return;
 
-      final Thread post = new Thread() {
+      final Runnable run = new Runnable() {
         @Override
         public void run() {
           refreshNewFolder(n.path());
         }
       };
-      DialogProgress.execute(dialog, "", post, new Delete(n.path()));
+      DialogProgress.execute(dialog, "", run, new Delete(n.path()));
     }
 
     @Override
@@ -317,13 +317,13 @@ public class DialogResources extends BaseXBack {
       if(!d.ok()) return;
 
       final String p = string(TreeNode.preparePath(token(d.input())));
-      final Thread post = new Thread() {
+      final Runnable run = new Runnable() {
         @Override
         public void run() {
           refreshNewFolder(p);
         }
       };
-      DialogProgress.execute(dialog, "", post, new Rename(n.path(), p));
+      DialogProgress.execute(dialog, "", run, new Rename(n.path(), p));
     }
 
     @Override

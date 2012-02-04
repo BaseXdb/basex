@@ -1,21 +1,16 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
-import java.math.BigDecimal;
-import java.util.regex.Pattern;
-import javax.xml.namespace.QName;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import static org.basex.query.QueryText.*;
 import org.basex.query.util.Err;
 import static org.basex.query.util.Err.*;
+import org.basex.util.*;
+import static org.basex.util.Token.*;
 
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.XMLToken;
+import javax.xml.namespace.QName;
+import java.math.BigDecimal;
+import java.util.regex.Pattern;
 
 /**
  * XQuery data types.

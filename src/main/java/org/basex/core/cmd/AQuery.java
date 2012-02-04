@@ -189,8 +189,8 @@ abstract class AQuery extends Command {
    * @param ctx database context
    * @return query processor
    */
-  final QueryProcessor queryProcessor(final String query,
-                                      final Context ctx) {
+  private QueryProcessor queryProcessor(final String query,
+      final Context ctx) {
     if(qp == null) qp = progress(new QueryProcessor(query, ctx));
     return qp;
   }

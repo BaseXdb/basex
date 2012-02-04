@@ -80,13 +80,13 @@ class DialogAdd extends BaseXBack {
     if(comp == add) {
       options.setOptions();
       parsing.setOptions();
-      final Thread t = new Thread() {
+      final Runnable run = new Runnable() {
         @Override
         public void run() {
           dialog.resources.refreshNewFolder(trg);
         }
       };
-      DialogProgress.execute(dialog, "", t, new Add(trg, src));
+      DialogProgress.execute(dialog, "", run, new Add(trg, src));
 
     } else if (comp == options.browse) {
       target.setText(options.dbname);

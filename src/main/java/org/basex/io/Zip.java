@@ -42,7 +42,7 @@ public final class Zip extends Progress {
    * @return number of entries
    * @throws IOException I/O exception
    */
-  int size() throws IOException {
+  private int size() throws IOException {
     int c = 0;
     ZipInputStream in = null;
     try {

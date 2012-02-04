@@ -216,7 +216,7 @@ public class BaseXEditor extends BaseXPanel {
    * Jumps to the end of the text.
    */
   public final void scrollToEnd() {
-    SwingUtilities.invokeLater(new Thread() {
+    SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         text.pos(text.size());
@@ -778,7 +778,7 @@ public class BaseXEditor extends BaseXPanel {
   }
 
   /** Calculation counter. */
-  private final transient Thread calc = new Thread() {
+  private final transient Runnable calc = new Runnable() {
     @Override
     public void run() {
       rend.calc();

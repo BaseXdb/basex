@@ -117,7 +117,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
    * @param cmds commands to be run
    */
   public static void execute(final Dialog d, final String t,
-      final Thread post, final Command... cmds) {
+      final Runnable post, final Command... cmds) {
 
     // start database creation thread
     new Thread() {
@@ -160,7 +160,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
         d.setEnabled(true);
         d.action(null);
-        if(post != null) post.start();
+        if(post != null) post.run();
       }
     }.start();
   }
