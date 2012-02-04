@@ -1,6 +1,7 @@
 package org.basex.test.query;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import org.basex.core.BaseXException;
@@ -9,12 +10,11 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
+import org.basex.query.*;
 import org.basex.query.up.primitives.RenameNode;
 import org.basex.query.util.Err;
 import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * This class tests namespaces.
@@ -661,6 +661,52 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
         "<c xmlns:ns0_1='ns2' xmlns:ns0='ns1' ns0:att1='' ns0_1:att2=''/>" +
         "</b></a>");
+  }
+
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  @Ignore
+  public void xuty0004() {
+    try {
+      new QueryProcessor("declare variable $input-context external;" +
+          "let $source as node()* := (" +
+          "    <status>on leave</status>," +
+          "    <!-- for 6 months -->" +
+          "  )," +
+          "  $target := $input-context/works[1]/employee[1]" +
+          "return insert nodes $source into $target", CONTEXT).execute();
+    } catch(final QueryException ex) {
+      assertEquals("XUTY0004", string(ex.qname().local()));
+    }
+    fail("should throw XUTY0004");
+  }
+
+  /**
+   * [LK] Namespaces: Test query.
+   * Tests preserve, no-inherit for copy expression. Related to XQUTS
+   * id-insert-expr-081-no-inherit.xq. Tests if no-inherit has a persistent
+   * effect. Is it actually supposed to?
+   * The <new/> tag is inserted into a fragment f using no-inherit and copy.
+   * The resulting fragment is inserted into a database. The
+   * namespaces in scope with prefix 'ns' are finally checked for the
+   * inserted <new/> tag. If the result is non-empty we may have a problem -
+   * being not able propagate the no-inherit flag to our table.
+   */
+  @Test
+  @Ignore
+  public void copyPreserveNoInheritPersistent() {
+    query("declare copy-namespaces preserve,no-inherit;" +
+        "declare namespace my = 'ns';" +
+        "let $v :=" +
+        "(copy $c := <my:n><my:a/></my:n>" +
+        "modify insert node <new/> into $c " +
+        "return $c)" +
+        "return insert node $v into doc('d2')/n",
+        "namespace-uri-for-prefix('my', doc('d2')//*:new)",
+        "");
   }
 
   /**

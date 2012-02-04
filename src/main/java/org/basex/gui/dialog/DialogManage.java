@@ -61,6 +61,7 @@ public final class DialogManage extends Dialog {
    */
   public DialogManage(final GUI main, final boolean m) {
     super(main, m ? MANAGE_DB : OPEN_DB);
+    panel.setLayout(new BorderLayout(8, 0));
 
     // create database chooser
     final StringList dbs = List.list(main.context, true);
@@ -70,10 +71,10 @@ public final class DialogManage extends Dialog {
     final Font f = panel.getFont();
     doc1 = new BaseXLabel(" ").border(0, 0, 5, 0);
     doc1.setFont(f.deriveFont(f.getSize2D() + 7));
+    doc1.setSize(400, doc1.getHeight());
 
     detail = new BaseXEditor(false, this);
     detail.border(5).setFont(f);
-    BaseXLayout.setWidth(detail, 400);
 
     // database buttons
     copy = new BaseXButton(COPY_D, this);
@@ -88,10 +89,11 @@ public final class DialogManage extends Dialog {
     tab1.add(newButtons(drop, rename, copy, open), BorderLayout.SOUTH);
 
     doc2 = new BaseXLabel(" ").border(0, 0, 5, 0);
-    doc2.setFont(f.deriveFont(f.getSize2D() + 7));
+    doc2.setFont(doc1.getFont());
 
     backups = new BaseXList(new String[] { }, this);
     backups.setSize(400, 380);
+
     // backup buttons
     backup = new BaseXButton(BACKUP, this);
     restore = new BaseXButton(RESTORE_D, this);
@@ -109,14 +111,14 @@ public final class DialogManage extends Dialog {
     tabs.addTab(INFORMATION, tab1);
     tabs.addTab(BACKUPS, tab2);
 
-    panel.setLayout(new BorderLayout(8, 0));
-
+    BaseXLayout.setWidth(detail, 400);
+    BaseXLayout.setWidth(doc1, 400);
+    BaseXLayout.setWidth(doc2, 400);
     set(choice, BorderLayout.CENTER);
     set(tabs, BorderLayout.EAST);
-    action(null);
-    if(dbs.size() == 0) return;
 
-    finish(null);
+    action(null);
+    if(dbs.size() != 0) finish(null);
   }
 
   /**

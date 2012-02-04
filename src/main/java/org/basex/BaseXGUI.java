@@ -131,9 +131,13 @@ public final class BaseXGUI {
   /**
    * Parses the command-line arguments, specified by the user.
    * @param args command-line arguments
+   * @throws BaseXException database exception
    */
-  private void parseArguments(final String[] args) {
+  private void parseArguments(final String[] args) throws BaseXException {
     final Args arg = new Args(args, this, GUIINFO, Util.info(CONSOLE, GUIMODE));
-    while(arg.more()) files.add(arg.string());
+    while(arg.more()) {
+      if(arg.dash()) arg.usage();
+      files.add(arg.string());
+    }
   }
 }

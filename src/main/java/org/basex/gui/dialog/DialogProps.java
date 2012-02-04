@@ -53,19 +53,18 @@ public final class DialogProps extends Dialog {
     super(main, DB_PROPS);
     panel.setLayout(new BorderLayout(5, 0));
 
-    final Data data = gui.context.data();
-
-    final BaseXButton okButton = new BaseXButton(B_OK, this);
     optimize = new BaseXButton(OPTIMIZE_D, this);
-    buttons = newButtons(optimize, okButton, CANCEL);
+    buttons = newButtons(optimize, OK, CANCEL);
 
     // resource tree
     resources = new DialogResources(this);
 
     // tab: database info
+    final Data data = gui.context.data();
     final BaseXBack tabInfo = new BaseXBack(new BorderLayout(0, 8)).border(8);
     final Font f = tabInfo.getFont();
     final BaseXLabel doc = new BaseXLabel(data.meta.name).border(0, 0, 5, 0);
+    BaseXLayout.setWidth(doc, 400);
     doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     tabInfo.add(doc, BorderLayout.NORTH);
 
@@ -140,8 +139,8 @@ public final class DialogProps extends Dialog {
     back.add(tabs, BorderLayout.CENTER);
     back.add(buttons, BorderLayout.SOUTH);
 
-    set(back, BorderLayout.CENTER);
     set(resources, BorderLayout.WEST);
+    set(back, BorderLayout.CENTER);
 
     action(null);
     setResizable(true);

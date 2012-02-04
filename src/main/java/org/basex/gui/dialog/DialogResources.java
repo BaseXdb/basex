@@ -3,40 +3,18 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.*;
 
-import javax.swing.AbstractButton;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.tree.*;
 
-import org.basex.core.Text;
-import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.Rename;
-import org.basex.data.Data;
-import org.basex.gui.GUI;
-import org.basex.gui.GUICommand;
-import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPopup;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.BaseXTree;
-import org.basex.gui.layout.TreeFolder;
-import org.basex.gui.layout.TreeLeaf;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 import org.basex.gui.layout.TreeNode;
-import org.basex.gui.layout.TreeRootFolder;
 
 /**
  * Combination of a JTree and a text field. The tree visualizes the database
@@ -72,8 +50,7 @@ public class DialogResources extends BaseXBack {
     // init tree - additional root node necessary to bypass
     // the egg/chicken dilemma
     final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
-    tree = new BaseXTree(rootNode, d);
-    tree.setBorder(new EmptyBorder(4, 4, 4, 4));
+    tree = new BaseXTree(rootNode, d).border(4, 4, 4, 4);
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(
         TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -112,21 +89,24 @@ public class DialogResources extends BaseXBack {
     new BaseXPopup(tree, d.gui, new DeleteCmd(), new RenameCmd());
 
     // button panel
-    final BaseXBack buttons = new BaseXBack(Fill.NONE);
+    final BaseXBack buttons = new BaseXBack();
     buttons.add(filter);
     buttons.add(clear);
-    final BaseXBack btn = new BaseXBack(Fill.NONE).layout(new BorderLayout());
+    final BaseXBack btn = new BaseXBack().layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
 
     filterText = new BaseXTextField("", d.gui);
-    BaseXLayout.setWidth(filterText, 220);
+    BaseXLayout.setWidth(filterText, 250);
 
     // left panel
     final BaseXBack panel = new BaseXBack(new BorderLayout());
     panel.add(filterText, BorderLayout.CENTER);
     panel.add(btn, BorderLayout.SOUTH);
 
-    add(new JScrollPane(tree), BorderLayout.CENTER);
+    final JScrollPane sp = new JScrollPane(tree);
+    BaseXLayout.setWidth(sp, 250);
+    //sp.setSize(190, 500);
+    add(sp, BorderLayout.CENTER);
     add(panel, BorderLayout.SOUTH);
   }
 
