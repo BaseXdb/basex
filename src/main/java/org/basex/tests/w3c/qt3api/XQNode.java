@@ -14,7 +14,7 @@ import org.basex.util.Util;
  */
 final class XQNode extends XQItem {
   /** Wrapped node. */
-  final ANode node;
+  private final ANode node;
 
   /**
    * Constructor.

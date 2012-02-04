@@ -14,9 +14,9 @@ import org.basex.util.list.StringList;
  */
 public final class XQuery implements Iterable<XQItem> {
   /** Query processor. */
-  final QueryProcessor qp;
+  private final QueryProcessor qp;
   /** Query iterator. */
-  Iter ir;
+  private Iter ir;
 
   /**
    * Constructor.

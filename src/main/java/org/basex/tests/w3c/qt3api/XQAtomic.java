@@ -10,7 +10,7 @@ import org.basex.util.Token;
  */
 class XQAtomic extends XQItem {
   /** Wrapped item. */
-  final Item item;
+  private final Item item;
 
   /**
    * Constructor.
