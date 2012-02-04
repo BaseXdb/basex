@@ -175,6 +175,7 @@ input_path           = Cammino dell'input
 input_size           = Dimensione dell'input
 insert_new_data      = Inserisci nuovi dati
 int_parser           = Usa il parser XML interno
+interrupted          = Interrupted.
 invalid_%            = % non valido.
 invalid_value_%_%    = Non è possibile impostare '%' a '%'.
 italics              = Corsivo

@@ -1,36 +1,7 @@
 package org.basex.gui;
 
+import org.basex.core.*;
 import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
-import static org.basex.util.Token.*;
-
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.Box;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-
-import org.basex.core.AProp;
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
-import org.basex.core.CommandParser;
-import org.basex.core.Context;
-import org.basex.core.PasswordReader;
-import org.basex.core.Prop;
 import org.basex.core.cmd.Find;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
@@ -38,14 +9,10 @@ import org.basex.data.Data;
 import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import static org.basex.gui.GUIConstants.*;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogPass;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.*;
 import org.basex.gui.view.ViewContainer;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.editor.EditorView;
@@ -62,8 +29,19 @@ import org.basex.io.out.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import static org.basex.util.Token.token;
 import org.basex.util.Util;
 import org.basex.util.Version;
+
+import javax.swing.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.EtchedBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class is the main window of the GUI. It is the central instance
@@ -385,9 +363,8 @@ public final class GUI extends AGUI {
    * @return success flag
    */
   boolean exec(final Command c, final boolean edit) {
-    final int thread = ++threadID;
-
     // wait when command is still running
+    final int thread = ++threadID;
     while(command != null) {
       command.stop();
       Performance.sleep(50);
@@ -439,13 +416,14 @@ public final class GUI extends AGUI {
       info.reset();
 
       // sends feedback to the query editor
-      final boolean stopped = inf.startsWith(INTERRUPTED);
+      final boolean interrupted = inf.startsWith(INTERRUPTED);
       if(edit) {
-        editor.info(stopped ? INTERRUPTED : inf, ok);
+        editor.info(interrupted ? INTERRUPTED : ok ? OK : inf,
+                ok || interrupted);
       }
 
       // check if query feedback was evaluated in the query view
-      if(!ok && !stopped) {
+      if(!ok && !interrupted) {
         // display error in info view
         if((!edit || inf.startsWith(BUGINFO)) && !info.visible()) {
           GUICommands.C_SHOWINFO.execute(this);

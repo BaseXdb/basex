@@ -175,6 +175,7 @@ input_path           = Dokumentpfad
 input_size           = Dokument-Größe
 insert_new_data      = Neue Daten einfügen
 int_parser           = Internen XML-Parser benutzen
+interrupted          = Abgebrochen.
 invalid_%            = % ist ungültig.
 invalid_value_%_%    = Fehler beim Setzen von '%' auf '%'.
 italics              = Kursiv

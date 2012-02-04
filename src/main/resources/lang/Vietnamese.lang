@@ -175,6 +175,7 @@ input_path           = Đường dẫn nguồn
 input_size           = Kích cỡ nhập vào
 insert_new_data      = Nhập dữ liệu mới
 int_parser           = Sử dụng bộ phân tích XML nội bộ
+interrupted          = Interrupted.
 invalid_%            = % is invalid.
 invalid_value_%_%    = Could not set '%' to '%'.
 italics              = Nghiên

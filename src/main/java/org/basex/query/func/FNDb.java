@@ -298,7 +298,7 @@ public final class FNDb extends StandardFunc {
           final byte[] pt = tl.get(is - (int) i);
           final IO io = data.meta.binary(string(pt));
           return resource(pt, true, io.length(),
-              token(MimeTypes.get(io.path())), io.date());
+              token(MimeTypes.get(io.path())), io.timeStamp());
         }
         return null;
       }

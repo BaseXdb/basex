@@ -153,7 +153,7 @@ public abstract class IO {
    * Returns the modification date of this file.
    * @return modification date
    */
-  public long date() {
+  public long timeStamp() {
     return System.currentTimeMillis();
   }
 

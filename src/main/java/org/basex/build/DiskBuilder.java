@@ -63,7 +63,7 @@ public final class DiskBuilder extends Builder {
     final MetaData md = new MetaData(name, prop, mprop);
     md.original = file != null ? file.path() : "";
     md.filesize = file != null ? file.length() : 0;
-    md.time = file != null ? file.date() : System.currentTimeMillis();
+    md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
     md.dirty = true;
 
     // calculate optimized output buffer sizes to reduce disk fragmentation

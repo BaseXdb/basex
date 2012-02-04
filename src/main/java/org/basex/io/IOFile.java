@@ -144,7 +144,7 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public long date() {
+  public long timeStamp() {
     return file.lastModified();
   }
 

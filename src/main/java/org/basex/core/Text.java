@@ -440,7 +440,7 @@ public interface Text {
   /** Out of memory error. */
   String OUT_OF_MEM = lang("out_of_mem");
   /** Progress exception. */
-  String INTERRUPTED = "Interrupted" + DOT;
+  String INTERRUPTED = lang("interrupted");
 
   /** Unknown command error. */
   String EXPECTING_CMD = lang("expecting_cmd");

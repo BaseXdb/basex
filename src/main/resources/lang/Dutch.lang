@@ -175,6 +175,7 @@ input_path           = Input Pad
 input_size           = Input grootte
 insert_new_data      = Voeg nieuwe data toe
 int_parser           = Gebruik interne XML parser
+interrupted          = Interrupted.
 invalid_%            = % is ongeldig.
 invalid_value_%_%    = Kon '%' niet de waarde '%' geven.
 italics              = Cursief

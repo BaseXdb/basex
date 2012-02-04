@@ -175,6 +175,7 @@ input_path           = Jejak masukan
 input_size           = Ukuran masukan
 insert_new_data      = Masukkan data baru
 int_parser           = Gunakan XML parser internal
+interrupted          = Interrupted.
 invalid_%            = % tidak sah.
 invalid_value_%_%    = Tidak dapat mengatur '%' menjadi '%'.
 italics              = Miring

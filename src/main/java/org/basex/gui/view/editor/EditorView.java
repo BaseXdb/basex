@@ -404,18 +404,11 @@ public final class EditorView extends View {
     new Thread() {
       @Override
       public void run() {
-        // prevent updating queries from interruption as this may corrupt
-        // the database
-        if(gui.updating)
-          go.setEnabled(false);
-
         Performance.sleep(200);
         if(thread == threadID) {
           info.setToolTipText(null);
           info.setText(PLEASE_WAIT_D, Msg.SUCCESS);
-          // only allow non-updating queries to be interrupted
-          if(!gui.updating)
-            stop.setEnabled(true);
+          stop.setEnabled(true);
         }
       }
     }.start();
@@ -423,55 +416,50 @@ public final class EditorView extends View {
 
   /**
    * Evaluates the info message resulting from a query execution.
-   * @param message info message
+   * @param msg info message
    * @param ok true if query was successful
    */
-  public void info(final String message, final boolean ok) {
+  public void info(final String msg, final boolean ok) {
     ++threadID;
-    info.setCursor(error(message, ok) ?
-        GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
-    info.setText(ok ? OK : message.replaceAll(STOPPED_AT +
-            ".*\\r?\\n\\[.*?\\] ", ""), ok ? Msg.SUCCESS : Msg.ERROR);
-    info.setText(ok ? OK : message.replaceAll(STOPPED_AT +
-        ".*\\r?\\n\\[.*?\\] ", ""), ok ? Msg.SUCCESS : Msg.ERROR);
-    info.setToolTipText(ok ? null : message);
+    errPos = -1;
+    errFile = null;
+    info.setCursor(!ok && error(msg) ?
+            GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+    info.setText(msg.replaceAll(STOPPED_AT + ".*\\r?\\n\\[.*?\\] ", ""),
+        ok ? Msg.SUCCESS : Msg.ERROR);
+    info.setToolTipText(ok ? null : msg);
     stop.setEnabled(false);
     go.setEnabled(true);
   }
 
   /**
    * Handles info messages resulting from a query execution.
-   * @param message info message
+   * @param msg info message
    * @param ok true if query was successful
    * @return true if error was found
    */
-  private boolean error(final String message, final boolean ok) {
-    errPos = -1;
-    errFile = null;
+  private boolean error(final String msg) {
     EditorArea edit = getEditor();
-    final String msg = message.replaceAll("[\\r\\n].*", "");
-    if(!ok) {
-      final Matcher m = FILEPATTERN.matcher(msg);
-      if(!m.matches()) return true;
+    final Matcher m = FILEPATTERN.matcher(msg.replaceAll("[\\r\\n].*", ""));
+    if(!m.matches()) return true;
 
-      errFile = m.group(3);
-      edit = find(IO.get(errFile), false);
-      if(edit == null) return true;
+    errFile = m.group(3);
+    edit = find(IO.get(errFile), false);
+    if(edit == null) return true;
 
-      final int el = Integer.parseInt(m.group(1));
-      final int ec = Integer.parseInt(m.group(2));
-      errPos = edit.last.length;
-      // find approximate error position
-      final int ll = errPos;
-      for(int e = 0, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
-        if(l > el || l == el && c == ec) {
-          errPos = e;
-          break;
-        }
-        if(edit.last[e] == '\n') {
-          ++l;
-          c = 0;
-        }
+    final int el = Integer.parseInt(m.group(1));
+    final int ec = Integer.parseInt(m.group(2));
+    // find approximate error position
+    final int ll = edit.last.length;
+    errPos = ll;
+    for(int e = 0, l = 1, c = 1; e < ll; ++c, e += cl(edit.last, e)) {
+      if(l > el || l == el && c == ec) {
+        errPos = e;
+        break;
+      }
+      if(edit.last[e] == '\n') {
+        ++l;
+        c = 0;
       }
     }
     edit.markError(errPos, false);
@@ -545,7 +533,7 @@ public final class EditorView extends View {
       final EditorArea edit = getEditor();
       file.write(edit.getText());
       edit.file(file);
-      edit.tstamp = file.date();
+      edit.tstamp = file.timeStamp();
       gui.gprop.recent(file);
       refresh(false, true);
     } catch(final IOException ex) {

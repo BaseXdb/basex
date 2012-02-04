@@ -75,7 +75,7 @@ public final class Check extends Command {
     if(data != null) {
       final IO in = IO.get(data.meta.original);
       final boolean found = !data.meta.original.isEmpty() && in.eq(io) &&
-        io.date() == in.date();
+        io.timeStamp() == in.timeStamp();
       if(found && ctx.perm(User.READ, data.meta)) return data;
       Close.close(data, ctx);
       if(found) throw new BaseXException(PERM_NEEDED_X, CmdPerm.READ);

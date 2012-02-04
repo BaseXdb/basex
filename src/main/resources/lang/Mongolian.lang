@@ -176,6 +176,7 @@ input_path           = Оролтын зам
 input_size           = Оролтын хэмжээ
 insert_new_data      = Шинээр өгөгдөл оруулах
 int_parser           = Дотоод XML Parser-р хөрвүүлэх
+interrupted          = Interrupted.
 invalid_%            = % нь хүчинтэй.
 invalid_value_%_%    = '%'-г '%'-руу тохируулах боломжгүй.
 italics              = Налуу

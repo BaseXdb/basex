@@ -175,6 +175,7 @@ input_path           = 文書のパス
 input_size           = 文書のサイズ
 insert_new_data      = 新規データの作成
 int_parser           = 内部XMLパーサーを使用
+interrupted          = Interrupted.
 invalid_%            = % は不正です。
 invalid_value_%_%    = プロパティ '%' を '%' に変更する事が出来ませんでした。
 italics              = 斜体

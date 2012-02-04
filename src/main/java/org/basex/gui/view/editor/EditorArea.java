@@ -4,8 +4,7 @@ import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXEditor;
-import static org.basex.gui.layout.BaseXKeys.EXEC;
-import static org.basex.gui.layout.BaseXKeys.modifier;
+import static org.basex.gui.layout.BaseXKeys.*;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
@@ -13,6 +12,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Performance;
 import static org.basex.util.Token.*;
+import static org.basex.core.Text.*;
 
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -66,7 +66,7 @@ final class EditorArea extends BaseXEditor {
           try {
             // reload file that has been modified
             final long t = tstamp;
-            if(file.date() != t) {
+            if(file.timeStamp() != t) {
               setText(new IOFile(file.path()).read());
               tstamp = t;
             }
@@ -126,7 +126,7 @@ final class EditorArea extends BaseXEditor {
 
     if(file.isXML()) {
       // non-executable input
-      view.info("", true);
+      view.info(OK, true);
       executable = false;
     } else {
       // check if input is/might be an xquery main module
@@ -141,7 +141,7 @@ final class EditorArea extends BaseXEditor {
         try {
           if(!executable) ctx.module(qu);
           else ctx.parse(qu);
-          view.info("", true);
+          view.info(OK, true);
         } catch(final QueryException ex) {
           view.info(ex.getMessage(), false);
         }
@@ -177,7 +177,7 @@ final class EditorArea extends BaseXEditor {
    */
   void file(final IOFile f) {
     file = f;
-    tstamp = f.date();
+    tstamp = f.timeStamp();
     setSyntax(file);
   }
 

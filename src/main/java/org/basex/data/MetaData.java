@@ -186,7 +186,7 @@ public final class MetaData {
           ok &= io.eq(IO.get(v));
           i--;
         } else if(k.equals(DBTIME)) {
-          ok &= io.date() == toLong(v);
+          ok &= io.timeStamp() == toLong(v);
           i--;
         }
       }
@@ -257,7 +257,7 @@ public final class MetaData {
    * @return database size
    */
   public long dbtime() {
-    return path != null ? path.date() : 0;
+    return path != null ? path.timeStamp() : 0;
   }
 
   /**
