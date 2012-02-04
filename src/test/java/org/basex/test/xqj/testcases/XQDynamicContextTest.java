@@ -1,6 +1,16 @@
 // Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.xqj.testcases;
 
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.xquery.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -8,26 +18,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.SimpleTimeZone;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItem;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQSequence;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Element;
-import org.w3c.dom.ProcessingInstruction;
-import org.w3c.dom.Text;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 @SuppressWarnings("all")
 public class XQDynamicContextTest extends XQJTestCase {
@@ -291,7 +281,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -370,7 +360,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -453,7 +443,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -525,7 +515,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
     xqpe.close();
 
     xqe.close();
@@ -607,7 +597,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -887,37 +877,37 @@ public class XQDynamicContextTest extends XQJTestCase {
 
     xqe = xqc.createExpression();
 
-    xqe.bindObject(new QName("v"), Boolean.valueOf(true), null);
+    xqe.bindObject(new QName("v"), true, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:boolean");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
 
-    xqe.bindObject(new QName("v"), new Byte((byte)1), null);
+    xqe.bindObject(new QName("v"), (byte) 1, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:byte");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
 
-    xqe.bindObject(new QName("v"), new Float(1), null);
+    xqe.bindObject(new QName("v"), (float) 1, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:float");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
 
-    xqe.bindObject(new QName("v"), new Double(1), null);
+    xqe.bindObject(new QName("v"), (double) 1, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:double");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
 
-    xqe.bindObject(new QName("v"), new Integer(1), null);
+    xqe.bindObject(new QName("v"), 1, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:int");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
 
-    xqe.bindObject(new QName("v"), new Long(1), null);
+    xqe.bindObject(new QName("v"), (long) 1, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:long");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
 
-    xqe.bindObject(new QName("v"), new Short((short)1), null);
+    xqe.bindObject(new QName("v"), (short) 1, null);
     xqs = xqe.executeQuery("declare variable $v external; $v instance of xs:short");
     xqs.next();
     assertTrue(msg, xqs.getBoolean());
@@ -1615,7 +1605,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindNode() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 

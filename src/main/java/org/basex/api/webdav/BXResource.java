@@ -55,7 +55,7 @@ public abstract class BXResource implements Resource {
    * @param p resource path
    * @param s current session
    */
-  public BXResource(final String d, final String p, final HTTPSession s) {
+  protected BXResource(final String d, final String p, final HTTPSession s) {
     db = d;
     path = stripLeadingSlash(p);
     mdate = null;
@@ -69,7 +69,7 @@ public abstract class BXResource implements Resource {
    * @param m last modification date
    * @param s current session
    */
-  public BXResource(final String d, final String p, final long m,
+  protected BXResource(final String d, final String p, final long m,
       final HTTPSession s) {
     db = d;
     path = stripLeadingSlash(p);

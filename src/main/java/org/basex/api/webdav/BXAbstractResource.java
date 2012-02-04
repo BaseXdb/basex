@@ -31,7 +31,7 @@ public abstract class BXAbstractResource extends BXResource implements
    * @param m last modified date
    * @param s current session
    */
-  public BXAbstractResource(final String d, final String p, final long m,
+  protected BXAbstractResource(final String d, final String p, final long m,
       final HTTPSession s) {
     super(d, p, m, s);
   }
