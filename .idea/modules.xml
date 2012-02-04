@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/basex.iml" filepath="$PROJECT_DIR$/basex.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../basex-api/basex-api.iml" filepath="$PROJECT_DIR$/../basex-api/basex-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../basex-examples/basex-examples.iml" filepath="$PROJECT_DIR$/../basex-examples/basex-examples.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../basex-tests/basex-tests.iml" filepath="$PROJECT_DIR$/../basex-tests/basex-tests.iml" />
+    </modules>
+  </component>
+</project>
+
