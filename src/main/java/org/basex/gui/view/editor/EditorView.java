@@ -1,10 +1,27 @@
 package org.basex.gui.view.editor;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.EDITORVIEW;
+import static org.basex.util.Token.cl;
+import static org.basex.util.Token.token;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.Box;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
-import static org.basex.gui.GUIConstants.EDITORVIEW;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.GUIMenu;
@@ -17,24 +34,9 @@ import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.Performance;
-import static org.basex.util.Token.cl;
-import static org.basex.util.Token.token;
 import org.basex.util.Util;
 import org.basex.util.list.BoolList;
 import org.basex.util.list.ObjList;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This view allows the input and evaluation of queries and documents.
@@ -435,7 +437,6 @@ public final class EditorView extends View {
   /**
    * Handles info messages resulting from a query execution.
    * @param msg info message
-   * @param ok true if query was successful
    * @return true if error was found
    */
   private boolean error(final String msg) {
