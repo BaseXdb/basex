@@ -107,7 +107,7 @@ public class DatabaseTest extends XMLDBBaseTest {
    * @param exp expected error code
    * @param ex exception
    */
-  void checkCode(final int exp, final XMLDBException ex) {
+  static void checkCode(final int exp, final XMLDBException ex) {
     assertEquals("Wrong error code.", exp, ex.errorCode);
   }
 }

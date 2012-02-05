@@ -46,10 +46,10 @@ public class RESTTest {
   private static final String URI = string(RESTText.RESTURI);
   /** Opening result. */
   private static final String WRAP =
-      "<" + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
+          '<' + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
   /** Root path. */
   private static final String ROOT =
-      "http://" + LOCALHOST + ":9998/" + NAME + "/";
+      "http://" + LOCALHOST + ":9998/" + NAME + '/';
   /** Input file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** Start servers. */
@@ -149,7 +149,7 @@ public class RESTTest {
    */
   @Test
   public void getBind() throws IOException {
-    assertEquals("123", get("?"
+    assertEquals("123", get('?'
         + "query=declare+variable+$x+as+xs:integer+external;$x&$x=123"));
   }
 
@@ -417,7 +417,7 @@ public class RESTTest {
    * @param str string
    * @param sub sub string
    */
-  private void assertContains(final String str, final String sub) {
+  private static void assertContains(final String str, final String sub) {
     if(!str.contains(sub)) {
       fail("'" + sub + "' not contained in '" + str + "'.");
     }
@@ -575,7 +575,7 @@ public class RESTTest {
    * @return string
    * @throws IOException I/O exception
    */
-  private String read(final InputStream is) throws IOException {
+  private static String read(final InputStream is) throws IOException {
     final ArrayOutput baos = new ArrayOutput();
     final BufferInput bis = new BufferInput(is);
     for(int i; (i = bis.read()) != -1;) baos.write(i);

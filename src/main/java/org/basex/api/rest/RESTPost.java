@@ -121,8 +121,9 @@ public class RESTPost extends RESTCode {
    * @return atomized item
    * @throws QueryException query exception
    */
-  private String value(final String query, final Object item,
+  private static String value(final String query, final Object item,
       final Context context) throws QueryException {
+
     final QueryProcessor qp = new QueryProcessor(query, item, context);
     final Item it = qp.iter().next();
     return it == null ? null : Token.string(it.string(null));

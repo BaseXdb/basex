@@ -273,7 +273,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * @param id id to be found
    * @return result of check
    */
-  private boolean exists(final String[] list, final String id) {
+  private static boolean exists(final String[] list, final String id) {
     for(final String l : list) if(l.equals(id)) return true;
     return false;
   }
@@ -293,7 +293,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * @return xml resource
    * @throws XMLDBException exception
    */
-  private BXXMLResource checkXML(final Resource res) throws XMLDBException {
+  private static BXXMLResource checkXML(final Resource res)
+      throws XMLDBException {
+
     if(!(res instanceof BXXMLResource)) {
       throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + res);
     }

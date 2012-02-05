@@ -30,7 +30,7 @@ public class RESTCommand extends RESTCode {
     open(ctx);
     // set default content type to raw
     final String sprop = SerializerProp.S_METHOD[0] + "=" + DataText.M_TEXT +
-        "," + ctx.serialization;
+            ',' + ctx.serialization;
     initResponse(new SerializerProp(sprop), ctx);
 
     // perform command

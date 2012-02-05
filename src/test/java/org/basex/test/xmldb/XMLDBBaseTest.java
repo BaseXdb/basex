@@ -26,7 +26,7 @@ public abstract class XMLDBBaseTest {
   protected static final String DRIVER = BXDatabase.class.getName();
   /** Database/document path. */
   protected static final String URL =
-      "xmldb:" + NAMELC + "://" + LOCALHOST + ":" + MainProp.PORT[1] + '/';
+      "xmldb:" + NAMELC + "://" + LOCALHOST + ':' + MainProp.PORT[1] + '/';
   /** Name of the collection. */
   protected static final String COLL = "XMLDB";
   /** Database/document path. */

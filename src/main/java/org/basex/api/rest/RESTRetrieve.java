@@ -84,7 +84,7 @@ final class RESTRetrieve extends RESTQuery {
       } else {
         // retrieve raw file; prefix user parameters with media type
         final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + type;
-        initResponse(new SerializerProp(ct + "," + ctx.serialization), ctx);
+        initResponse(new SerializerProp(ct + ',' + ctx.serialization), ctx);
         session.setOutputStream(ctx.out);
         session.execute(new Retrieve(ctx.dbpath()));
       }
@@ -105,7 +105,7 @@ final class RESTRetrieve extends RESTQuery {
    * @param skip number of columns to skip
    * @throws IOException I/O exceptions
    */
-  private void list(final Table table, final Serializer ser,
+  private static void list(final Table table, final Serializer ser,
       final byte[] header, final int skip) throws IOException {
 
     for(final TokenList l : table.contents) {

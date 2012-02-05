@@ -181,7 +181,7 @@ final class BXQMetaData extends BXQAbstract implements XQMetaData {
    * @param pre flag
    * @return pre or suffix
    */
-  private int version(final String t, final boolean pre) {
+  private static int version(final String t, final boolean pre) {
     return Integer.parseInt(t.replaceAll(pre ? ".*\\.| .*" : "\\..*", ""));
   }
 }

@@ -355,7 +355,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
    * @param it input type
    * @throws XQException exception
    */
-  private void checkAttr(final int it) throws XQException {
+  private static void checkAttr(final int it) throws XQException {
     if(it != XQItemType.XQBASETYPE_UNTYPED &&
         it != XQItemType.XQBASETYPE_ANYTYPE) return;
     throw new BXQException(ATT);

@@ -267,7 +267,8 @@ final class BXQStaticContext implements XQStaticContext {
    * @return specified input value
    * @throws BXQException exception
    */
-  private int check(final int val, final String msg) throws BXQException {
+  private static int check(final int val, final String msg)
+      throws BXQException {
     if(val != 1 && val != 2) throw new BXQException(ARG, msg);
     return val;
   }

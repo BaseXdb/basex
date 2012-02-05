@@ -344,7 +344,7 @@ public class CollectionTest extends XMLDBBaseTest {
    * @param exp expected error code
    * @param ex exception
    */
-  private void checkCode(final int exp, final XMLDBException ex) {
+  private static void checkCode(final int exp, final XMLDBException ex) {
     assertEquals("Wrong error code.", exp, ex.errorCode);
   }
 

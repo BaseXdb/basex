@@ -439,7 +439,7 @@ final class IterStreamReader implements XMLStreamReader {
   /**
    * Reader for {@link FNode} instances.
    */
-  abstract class NodeReader {
+  abstract static class NodeReader {
     /**
      * Checks if the node reader can return more nodes.
      * @return result of check

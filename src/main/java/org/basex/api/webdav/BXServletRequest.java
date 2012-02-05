@@ -60,8 +60,8 @@ public class BXServletRequest extends AbstractRequest {
     CONTENT_TYPES.put(ContentType.HTTP, Response.HTTP);
     CONTENT_TYPES.put(ContentType.MULTIPART, Response.MULTIPART);
     CONTENT_TYPES.put(ContentType.XML, Response.XML);
-    for(final ContentType key : CONTENT_TYPES.keySet())
-      TYPE_CONTENTS.put(CONTENT_TYPES.get(key), key);
+    for(final Map.Entry<ContentType, String> entry : CONTENT_TYPES.entrySet())
+      TYPE_CONTENTS.put(entry.getValue(), entry.getKey());
   }
 
   /** Thread local variable to hold the current request. */

@@ -177,7 +177,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
     final String result = xqi.getItemAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.indexOf("<e>Hello world!</e>") != -1);
   }
 
   public void testCreateItemFromDocument_Reader() throws XQException {
@@ -226,7 +226,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
     final String result = xqi.getItemAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.indexOf("<e>Hello world!</e>") != -1);
   }
 
   public void testCreateItemFromDocument_InputStream() throws XQException, UnsupportedEncodingException {
@@ -275,7 +275,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
     final String result = xqi.getItemAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.indexOf("<e>Hello world!</e>") != -1);
   }
 
   public void testCreateItemFromDocument_XMLStreamReader() throws XQException {
@@ -321,7 +321,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
     final String result = xqi.getItemAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.indexOf("<e>Hello world!</e>") != -1);
 
     xqe.close();
   }
@@ -372,7 +372,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createItemFromDocument() failed with message: " + e.getMessage());
     }
     final String result = xqi.getItemAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.indexOf("<e>Hello world!</e>") != -1);
   }
 
   public void testCreateItemFromObject() throws XQException {
@@ -723,7 +723,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createItemFromNode() failed with message: " + e.getMessage());
     }
     final String result = xqi.getItemAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.indexOf("<e>Hello world!</e>") != -1);
   }
 
   public void testCreateItemFromShort() throws XQException {
@@ -844,7 +844,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createSequence() failed with message: " + e.getMessage());
     }
     final String result = xqsresult.getSequenceAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains 'Hello world!', but it is '" + result + "'", result.indexOf("Hello world!") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains 'Hello world!', but it is '" + result + '\'', result.indexOf("Hello world!") != -1);
 
     xqs.close();
     try {
@@ -886,7 +886,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-1.5: createSequence() failed with message: " + e.getMessage());
     }
     final String result = xqsresult.getSequenceAsString(null);
-    assertTrue("A-XQDF-1.5: Expects serialized result contains 'Hello world!', but it is '" + result + "'", result.indexOf("Hello world!") != -1);
+    assertTrue("A-XQDF-1.5: Expects serialized result contains 'Hello world!', but it is '" + result + '\'', result.indexOf("Hello world!") != -1);
   }
 
   public void testCreateAtomicType() throws XQException {

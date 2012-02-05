@@ -36,7 +36,7 @@ abstract class RESTCode {
    * @param ctx rest context
    * @param sprop serialization properties
    */
-  void initResponse(final SerializerProp sprop, final RESTContext ctx) {
+  static void initResponse(final SerializerProp sprop, final RESTContext ctx) {
     // set encoding
     ctx.res.setCharacterEncoding(sprop.get(SerializerProp.S_ENCODING));
 
@@ -65,7 +65,7 @@ abstract class RESTCode {
    * @param ctx rest context
    * @throws RESTException REST exception
    */
-  void open(final RESTContext ctx) throws RESTException {
+  static void open(final RESTContext ctx) throws RESTException {
     if(ctx.db() == null) return;
     try {
       ctx.session.execute(new Open(ctx.all()));
@@ -80,7 +80,9 @@ abstract class RESTCode {
    * @param ctx rest context
    * @throws RESTException REST exception
    */
-  void wrap(final String val, final RESTContext ctx) throws RESTException {
+  static void wrap(final String val, final RESTContext ctx)
+      throws RESTException {
+
     ctx.wrapping = Util.yes(val);
     if(!ctx.wrapping && !Util.no(val)) {
       try {

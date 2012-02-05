@@ -615,7 +615,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-23.1: getSequenceAsString failed with message: " + e.getMessage());
     }
-    assertTrue("A-XQS-23.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQS-23.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
 
     xqe = xqc.createExpression();
@@ -1167,7 +1167,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-24.1: writeSequence failed with message: " + e.getMessage());
     }
-    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString("UTF-8") + "'", result.toString("UTF-8").indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString("UTF-8") + '\'', result.toString("UTF-8").indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
 
     xqe = xqc.createExpression();
@@ -1240,7 +1240,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-24.1: writeSequence failed with message: " + e.getMessage());
     }
-    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString() + "'", result.toString().indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString() + '\'', result.toString().indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
 
     xqe = xqc.createExpression();
@@ -1310,7 +1310,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-24.1: writeSequence failed with message: " + e.getMessage());
     }
-    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer.toString() + "'", result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer.toString() + '\'', result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
   }
 
@@ -1372,7 +1372,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-24.1: writeSequence failed with message: " + e.getMessage());
     }
-    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString() + "'", result.toString().indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString() + '\'', result.toString().indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
   }
 }

@@ -116,7 +116,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
                     "$a/@content-type/data()," +
                     "$a/@modified-date/data()," +
                     "$a/@size/data()," +
-                    SUBSTRING_AFTER.args("$a/text()", "$p") + ")");
+                    SUBSTRING_AFTER.args("$a/text()", "$p") + ')');
         q.bind("d", db);
         q.bind("p", path);
         while(q.more()) {

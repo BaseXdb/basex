@@ -149,7 +149,7 @@ abstract class BXQAbstract {
    * @return string
    * @throws BXQException exception
    */
-  protected final byte[] content(final Reader r) throws BXQException {
+  protected static final byte[] content(final Reader r) throws BXQException {
     valid(r, XMLReader.class);
     try {
       final ByteList bl = new ByteList();
@@ -168,7 +168,9 @@ abstract class BXQAbstract {
    * @return string
    * @throws BXQException exception
    */
-  protected final byte[] content(final InputStream is) throws BXQException {
+  protected static final byte[] content(final InputStream is)
+      throws BXQException {
+
     valid(is, InputStream.class);
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -301,7 +303,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws BXQException exception
    */
-  private DBNode checkNode(final Data d) throws BXQException {
+  private static DBNode checkNode(final Data d) throws BXQException {
     valid(d, Data.class);
     return new DBNode(d, 0);
   }

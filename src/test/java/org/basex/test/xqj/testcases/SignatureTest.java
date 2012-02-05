@@ -24,7 +24,7 @@ public class SignatureTest extends XQJTestCase {
 
     // class
     sb.append(Modifier.toString(c.getModifiers()));
-    sb.append(" ");
+    sb.append(' ');
     sb.append(c.getName());
     if (c.getSuperclass() != null) {
       sb.append(" extends ");
@@ -40,7 +40,7 @@ public class SignatureTest extends XQJTestCase {
       it = set.iterator();
       while (it.hasNext()) {
         sb.append((String)it.next());
-        if (it.hasNext()) sb.append(",");
+        if (it.hasNext()) sb.append(',');
       }
     }
     sb.append("\r\n{\r\n");
@@ -52,9 +52,9 @@ public class SignatureTest extends XQJTestCase {
       if (!fields[i].getDeclaringClass().equals(c)) continue;
       final StringBuffer tmp = new StringBuffer();
       tmp.append(Modifier.toString(fields[i].getModifiers()));
-      tmp.append(" ");
+      tmp.append(' ');
       tmp.append(fields[i].getType().getName());
-      tmp.append(" ");
+      tmp.append(' ');
       tmp.append(fields[i].getName());
       tmp.append("\r\n");
       set.add(tmp.toString());
@@ -70,21 +70,21 @@ public class SignatureTest extends XQJTestCase {
     for(final Constructor constructor : constructors) {
       final StringBuffer tmp = new StringBuffer();
       tmp.append(Modifier.toString(constructor.getModifiers()));
-      tmp.append(" ");
+      tmp.append(' ');
       tmp.append(c.getName());
       tmp.append(" (");
       final Class[] parameters = constructor.getParameterTypes();
       for (int j = 0; j < parameters.length; ++j) {
         tmp.append(parameters[j].getName());
-        if (j != parameters.length-1) tmp.append(",");
+        if (j != parameters.length-1) tmp.append(',');
       }
-      tmp.append(")");
+      tmp.append(')');
       final Class[] exceptions = constructor.getExceptionTypes();
       if (exceptions != null && exceptions.length > 0) {
         tmp.append(" throws ");
         for (int j = 0; j < exceptions.length; ++j) {
           tmp.append(exceptions[j].getName());
-          if (j != exceptions.length-1) tmp.append(",");
+          if (j != exceptions.length-1) tmp.append(',');
         }
       }
       tmp.append("\r\n");
@@ -102,23 +102,23 @@ public class SignatureTest extends XQJTestCase {
       final StringBuffer tmp = new StringBuffer();
       if (!methods[i].getDeclaringClass().equals(c)) continue;
       tmp.append(Modifier.toString(methods[i].getModifiers()));
-      tmp.append(" ");
+      tmp.append(' ');
       tmp.append(methods[i].getReturnType().getName());
-      tmp.append(" ");
+      tmp.append(' ');
       tmp.append(methods[i].getName());
       tmp.append(" (");
       final Class[] parameters = methods[i].getParameterTypes();
       for (int j = 0; j < parameters.length; ++j) {
         tmp.append(parameters[j].getName());
-        if (j != parameters.length-1) tmp.append(",");
+        if (j != parameters.length-1) tmp.append(',');
       }
-      tmp.append(")");
+      tmp.append(')');
       final Class[] exceptions = methods[i].getExceptionTypes();
       if (exceptions != null && exceptions.length > 0) {
         tmp.append(" throws ");
         for (int j = 0; j < exceptions.length; ++j) {
           tmp.append(exceptions[j].getName());
-          if (j != exceptions.length-1) tmp.append(",");
+          if (j != exceptions.length-1) tmp.append(',');
         }
       }
       tmp.append("\r\n");

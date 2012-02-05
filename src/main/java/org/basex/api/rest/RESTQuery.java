@@ -112,7 +112,7 @@ class RESTQuery extends RESTCode {
    * @param ctx REST context
    * @return serialization options
    */
-  String serial(final RESTContext ctx) {
+  static String serial(final RESTContext ctx) {
     final TokenBuilder ser = new TokenBuilder(ctx.serialization);
     if(ctx.wrapping) {
       if(ser.size() != 0) ser.add(',');

@@ -18,12 +18,12 @@ public class TestContentHandler extends DefaultHandler {
   public void endElement(final String namespaceURI, final String localName, final String qName) throws SAXException {
     buffer.append("</");
     buffer.append(localName);
-    buffer.append(">");
+    buffer.append('>');
   }
 
   public void startElement(final String namespaceURI, final String localName, final String qName, final Attributes atts) throws SAXException {
-    buffer.append("<");
+    buffer.append('<');
     buffer.append(localName);
-    buffer.append(">");
+    buffer.append('>');
   }
 }

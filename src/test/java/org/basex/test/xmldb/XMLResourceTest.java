@@ -163,7 +163,7 @@ public class XMLResourceTest extends XMLDBBaseTest {
    * @throws XMLDBException exception
    * @throws IOException I/O exception
    */
-  private void compare(final String file, final Resource r)
+  private static void compare(final String file, final Resource r)
       throws XMLDBException, IOException {
 
     // compare serialized node with input file

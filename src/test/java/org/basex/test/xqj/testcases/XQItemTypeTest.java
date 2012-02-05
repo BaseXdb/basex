@@ -9,7 +9,7 @@ import javax.xml.xquery.XQSequenceType;
 @SuppressWarnings("all")
 public class XQItemTypeTest extends XQJTestCase {
 
-  private void testSimpleType(final XQItemType xqtype, final int itemKind) throws XQException {
+  private static void testSimpleType(final XQItemType xqtype, final int itemKind) throws XQException {
     try {
       xqtype.getBaseType();
       fail("A-XQIT-1.2: getBaseType() must throw an XQException.");

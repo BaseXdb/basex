@@ -50,7 +50,7 @@ public final class RESTServlet extends HttpServlet {
    * @param res servlet response
    * @throws IOException I/O exception
    */
-  private void run(final RESTCode code, final HttpServletRequest req,
+  private static void run(final RESTCode code, final HttpServletRequest req,
       final HttpServletResponse res) throws IOException {
 
     final RESTContext ctx = new RESTContext(req, res);

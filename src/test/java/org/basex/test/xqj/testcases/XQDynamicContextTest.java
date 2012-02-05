@@ -281,7 +281,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -360,7 +360,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -443,7 +443,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -515,7 +515,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.contains("<e>Hello world!</e>"));
     xqpe.close();
 
     xqe.close();
@@ -597,7 +597,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindDocument() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 
@@ -1605,7 +1605,7 @@ public class XQDynamicContextTest extends XQJTestCase {
       fail("A-XQDC-1.7: bindNode() failed with message: " + e.getMessage());
     }
     final String result = xqpe.executeQuery().getSequenceAsString(null);
-    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.contains("<e>Hello world!</e>"));
+    assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + '\'', result.contains("<e>Hello world!</e>"));
     xqpe.close();
   }
 

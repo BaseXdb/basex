@@ -313,7 +313,7 @@ public final class BaseXHTTP {
   private static boolean ping(final String host, final int port) {
     try {
       // create connection
-      final URL url = new URL("http://" + host + ":" + port);
+      final URL url = new URL("http://" + host + ':' + port);
       url.openConnection().getInputStream();
       return true;
     } catch(final IOException ex) {
