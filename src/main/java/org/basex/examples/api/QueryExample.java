@@ -1,6 +1,7 @@
 package org.basex.examples.api;
 
 import java.io.IOException;
+import org.basex.examples.api.BaseXClient.Query;
 
 /**
  * This example shows how queries can be executed in an iterative manner.
@@ -27,7 +28,7 @@ public final class QueryExample {
       try {
         // create query instance
         final String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
-        final BaseXClient.Query query = session.query(input);
+        final Query query = session.query(input);
 
         // loop through all results
         while(query.more()) {

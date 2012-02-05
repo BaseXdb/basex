@@ -21,7 +21,7 @@ public class Fruits extends QueryModule {
    * @param fruit index of fruit to be returned
    * @return fruit string
    */
-  public static String convenient(final int fruit) {
+  public String convenient(final int fruit) {
     final int i = fruit;
     final String f = FRUITS[i % FRUITS.length];
     return f;

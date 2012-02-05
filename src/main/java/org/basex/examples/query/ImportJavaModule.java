@@ -35,7 +35,7 @@ public final class ImportJavaModule {
         "element fast {\n" +
         "  for $i in 1 to 4\n" +
         "  return fruits:fast($i)\n" +
-                '}';
+        "}";
 
     System.out.println("\n* Query:");
     System.out.println(query);
