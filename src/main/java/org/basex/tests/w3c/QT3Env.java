@@ -80,8 +80,8 @@ class QT3Env {
    * @param elem element to be parsed
    * @return map list
    */
-  ObjList<HashMap<String, String>> list(final Context ctx, final XQValue env,
-      final String elem) {
+  static ObjList<HashMap<String, String>> list(final Context ctx,
+      final XQValue env, final String elem) {
 
     final ObjList<HashMap<String, String>> list =
         new ObjList<HashMap<String, String>>();

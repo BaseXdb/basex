@@ -449,7 +449,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertError(final QT3Result result, final XQValue expect) {
-    final String exp = asString("@" + CODE, expect);
+    final String exp = asString('@' + CODE, expect);
     if(result.exc == null) return exp;
     final String res = result.exc.getCode();
     return !errors || exp.equals("*") || exp.equals(res) ? null : exp;
@@ -617,8 +617,8 @@ public final class QT3TS {
       if(exp.equals(res)) return null;
 
       // include check for comments, processing instructions and namespaces
-      String flags = "'" + Flag.ALLNODES + "'";
-      if(!pref) flags += ",'" + Flag.NAMESPACES + "'";
+      String flags = "'" + Flag.ALLNODES + '\'';
+      if(!pref) flags += ",'" + Flag.NAMESPACES + '\'';
       final String query = "util:deep-equal(<X>" + exp + "</X>," +
           "<X>" + res + "</X>,(" + flags + "))";
       return asBoolean(query, expect) ? null : exp;
@@ -634,7 +634,7 @@ public final class QT3TS {
    * @return optional expected test suite result
    */
   private String assertSerialError(final XQValue value, final XQValue expect) {
-    final String exp = asString("@" + CODE, expect);
+    final String exp = asString('@' + CODE, expect);
     try {
       value.toString();
       return exp;
@@ -750,7 +750,7 @@ public final class QT3TS {
    * @return result
    */
   private static String normNL(final String in) {
-    return in.replaceAll("\r\n|\r|\n", Prop.NL);
+    return in.replaceAll("\r\n|\r|\n", NL);
   }
 
   /**

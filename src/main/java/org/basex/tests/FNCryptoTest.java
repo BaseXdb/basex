@@ -150,7 +150,7 @@ public class FNCryptoTest {
    * @param query query
    * @param expected expected output
    */
-  private void query(final String query, final String expected) {
+  private static void query(final String query, final String expected) {
     query(null, query, expected);
   }
 

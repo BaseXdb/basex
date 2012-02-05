@@ -8,7 +8,6 @@ import org.basex.BaseXServer;
 import org.basex.core.MainProp;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.Text;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
@@ -48,7 +47,7 @@ public abstract class Benchmark {
         new BaseXServer("-z", "-p9999", "-e9998") : null;
 
     session = local ? new LocalSession(CONTEXT) :
-      new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
+      new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
 
     // Create test database
     session.execute(new Set(Prop.QUERYINFO, true));
@@ -68,7 +67,7 @@ public abstract class Benchmark {
    * @param queries queries to be evaluated
    * @throws Exception exception
    */
-  protected void update(final String queries) throws Exception {
+  protected static void update(final String queries) throws Exception {
     update(1, queries);
   }
 
@@ -79,7 +78,7 @@ public abstract class Benchmark {
    * @param r runs the number for the specified number of time
    * @throws IOException I/O exception
    */
-  protected void update(final int r, final String query)
+  protected static void update(final int r, final String query)
       throws IOException {
 
     // loop through number of runs for a single query
@@ -93,7 +92,7 @@ public abstract class Benchmark {
    * @return result
    * @throws IOException I/O exception
    */
-  protected String query(final String query) throws IOException {
+  protected static String query(final String query) throws IOException {
     check();
     return session.execute(new XQuery(query));
   }

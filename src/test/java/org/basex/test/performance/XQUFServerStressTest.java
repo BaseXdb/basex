@@ -62,7 +62,7 @@ public final class XQUFServerStressTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
+  private static void run(final int clients, final int runs) throws Exception {
     // Run server instance
     /* Server. */
     final BaseXServer server = new BaseXServer("-p9999", "-e9998", "-z");
@@ -80,7 +80,9 @@ public final class XQUFServerStressTest {
    * @param runs number of runs
    * @throws Exception exception
    */
-  private void insert(final int clients, final int runs) throws Exception {
+  private static void insert(final int clients, final int runs)
+      throws Exception {
+
     final ClientSession s = newSession();
     s.execute(new CreateDB(DB, "<doc/>"));
     s.close();
@@ -93,7 +95,9 @@ public final class XQUFServerStressTest {
    * @param runs number of runs
    * @throws Exception exception
    */
-  private void delete(final int clients, final int runs) throws Exception {
+  private static void delete(final int clients, final int runs)
+      throws Exception {
+
     final ClientSession s = newSession();
     s.execute(new CreateDB(DB, "<doc/>"));
     final int c = 100 + clients * clients;

@@ -344,12 +344,13 @@ public abstract class W3CTS {
       } catch(final Exception ex) {
         if(!(ex instanceof QueryException || ex instanceof IOException)) {
           System.err.println("\n*** " + outname + " ***");
-          System.err.println(in + "\n");
+          System.err.println(in + '\n');
           ex.printStackTrace();
         }
         er = ex.getMessage();
         if(er.startsWith(STOPPED_AT)) er = er.substring(er.indexOf('\n') + 1);
-        if(er.startsWith("[")) er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
+        if(!er.isEmpty() && er.charAt(0) == '[')
+          er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
         // unexpected error - dump stack trace
       }
 
@@ -385,7 +386,7 @@ public abstract class W3CTS {
       if(files.size() != 0) {
         log.append(" [");
         log.append(files);
-        log.append("]");
+        log.append(']');
       }
       log.append(NL);
 
@@ -440,7 +441,7 @@ public abstract class W3CTS {
               final ItemCache ia = toIter(actual, frag);
               if(Compare.deep(ia, ic, null)) break;
             } catch(final Throwable ex) {
-              System.err.println("\n" + outname + ":");
+              System.err.println('\n' + outname + ':');
               ex.printStackTrace();
             }
           }
@@ -449,7 +450,7 @@ public abstract class W3CTS {
           if(print) {
             if(expOut.size() == 0) result.add(error(pth + outname, expError));
             logErr.append(logStr);
-            logErr.append("[" + testid + " ] ");
+            logErr.append('[' + testid + " ] ");
             logErr.append(norm(string(result.get(0))));
             logErr.append(NL);
             logErr.append("[Wrong] ");
@@ -475,7 +476,7 @@ public abstract class W3CTS {
         if(expOut.size() == 0 || !expError.isEmpty()) {
           if(print) {
             logOK2.append(logStr);
-            logOK2.append("[" + testid + " ] ");
+            logOK2.append('[' + testid + " ] ");
             logOK2.append(norm(expError));
             logOK2.append(NL);
             logOK2.append("[Rght?] ");
@@ -488,7 +489,7 @@ public abstract class W3CTS {
         } else {
           if(print) {
             logErr2.append(logStr);
-            logErr2.append("[" + testid + " ] ");
+            logErr2.append('[' + testid + " ] ");
             logErr2.append(norm(string(result.get(0))));
             logErr2.append(NL);
             logErr2.append("[Wrong] ");
@@ -685,7 +686,7 @@ public abstract class W3CTS {
   private String error(final String nm, final String error) {
     final String error2 = expected + nm + ".log";
     final IO file = new IOFile(error2);
-    return file.exists() ? error + "/" + read(file) : error;
+    return file.exists() ? error + '/' + read(file) : error;
   }
 
   /**
@@ -826,7 +827,7 @@ public abstract class W3CTS {
         } else if(c == 'g') {
           group = arg.string();
         } else if(c == 'p') {
-          path = arg.string() + "/";
+          path = arg.string() + '/';
         } else if(c == 't') {
           timer = arg.number();
         } else if(c == 'v') {

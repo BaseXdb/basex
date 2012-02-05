@@ -18,7 +18,7 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public abstract class Compare {
-  /** XSLT flag, not final to prevent dead-code warnings. */
+  /** XSLT flag; not set to 'final' to circumvent dead-code warnings. */
   private static boolean xsltMode;
   /** Verbose mode. */
   private static final boolean VERBOSE = true;
@@ -75,8 +75,7 @@ public abstract class Compare {
     while(true) {
       final String line = br.readLine();
       if(line == null) break;
-      if(line.length() == 0 || line.startsWith("#")) continue;
-      query(line);
+      if(!line.isEmpty() && line.charAt(0) != '#') query(line);
     }
     br.close();
 
