@@ -31,9 +31,7 @@ class DialogAdd extends BaseXBack {
   /** Filter button. */
   private final BaseXButton add;
   /** Import options. */
-  private final DialogImport options;
-  /** Parsing options. */
-  private final DialogParsing parsing;
+  private final DialogImport general;
 
   /**
    * Constructor.
@@ -47,15 +45,15 @@ class DialogAdd extends BaseXBack {
     target.addKeyListener(d.keys);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
-    pnl.add(new BaseXLabel(TARGET_PATH + COLS, true, true).border(8, 0, 4, 0));
+    pnl.add(new BaseXLabel(TARGET_PATH + COLS, true, true).border(12, 0, 6, 0));
     pnl.add(target);
 
     // option panels
-    options = new DialogImport(d, pnl);
-    parsing = new DialogParsing(d);
+    final DialogParsing parsing = new DialogParsing(d);
+    general = new DialogImport(d, pnl, parsing);
 
     final BaseXTabs tabs = new BaseXTabs(d);
-    tabs.addTab(GENERAL, options);
+    tabs.addTab(GENERAL, general);
     tabs.addTab(PARSING, parsing);
     add(tabs, BorderLayout.NORTH);
 
@@ -74,12 +72,11 @@ class DialogAdd extends BaseXBack {
    * @param comp the action component
    */
   void action(final Object comp) {
-    final String src = options.input();
+    final String src = general.input();
     final String trg = target.getText().trim();
 
     if(comp == add) {
-      options.setOptions();
-      parsing.setOptions();
+      general.setOptions();
       final Runnable run = new Runnable() {
         @Override
         public void run() {
@@ -88,13 +85,11 @@ class DialogAdd extends BaseXBack {
       };
       DialogProgress.execute(dialog, "", run, new Add(trg, src));
 
-    } else if (comp == options.browse) {
-      target.setText(options.dbname);
+    } else if (comp == general.browse) {
+      target.setText(general.dbname);
 
     } else {
-      boolean ok = options.action(false);
-      parsing.action(comp);
-
+      boolean ok = general.action(comp, false);
       String inf = !ok ? FILE_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
       final Msg icon = Msg.ERROR;
       if(ok) {
@@ -102,7 +97,7 @@ class DialogAdd extends BaseXBack {
         ok = MetaData.normPath(trg) != null;
         if(!ok) inf = Util.info(INVALID_X, TARGET_PATH);
       }
-      options.info.setText(inf, icon);
+      general.info.setText(inf, icon);
       add.setEnabled(ok);
     }
   }

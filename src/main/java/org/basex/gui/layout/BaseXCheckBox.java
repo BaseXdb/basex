@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
-import java.awt.Insets;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
@@ -38,15 +37,24 @@ public final class BaseXCheckBox extends JCheckBox {
     setOpaque(false);
     setMargin(new Insets(0, 0, dist, 0));
     if(dist == 0) setFont(getFont().deriveFont(1));
-
     BaseXLayout.addInteraction(this, win);
-
     if(!(win instanceof Dialog)) return;
+
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         ((Dialog) win).action(e.getSource());
       }
     });
+  }
+
+  /**
+   * Chooses a large font.
+   * @return self reference
+   */
+  public BaseXCheckBox large() {
+    final Font f = getFont();
+    setFont(new Font(f.getName(), Font.PLAIN, (int) f.getSize2D() + 7));
+    return this;
   }
 }

@@ -78,15 +78,15 @@ public final class CSVParser extends SingleParser {
 
   /**
    * Constructor.
-   * @param path file path
-   * @param ta database target
+   * @param source document source
+   * @param target target path
    * @param prop database properties
    * @throws IOException I/O exception
    */
-  public CSVParser(final IO path, final String ta, final Prop prop)
+  public CSVParser(final IO source, final String target, final Prop prop)
       throws IOException {
 
-    super(path, ta);
+    super(source, target);
 
     // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
@@ -112,16 +112,16 @@ public final class CSVParser extends SingleParser {
     builder.startElem(CSV, atts);
 
     final TokenBuilder tb = new TokenBuilder();
-    final NewlineInput bi = new NewlineInput(src, encoding);
+    final NewlineInput nli = new NewlineInput(src, encoding);
 
     boolean quoted = false, open = true;
     int ch = -1;
     while(true) {
-      if(ch == -1) ch = bi.read();
+      if(ch == -1) ch = nli.read();
       if(ch == -1) break;
       if(quoted) {
         if(ch == '"') {
-          ch = bi.read();
+          ch = nli.read();
           if(ch != '"') {
             quoted = false;
             continue;
@@ -140,11 +140,11 @@ public final class CSVParser extends SingleParser {
       } else if(ch == '"') {
         quoted = true;
       } else {
-        tb.add(ch);
+        tb.add(XMLToken.valid(ch) ? ch : '?');
       }
       ch = -1;
     }
-    bi.close();
+    nli.close();
 
     finish(tb, open);
     builder.endElem();

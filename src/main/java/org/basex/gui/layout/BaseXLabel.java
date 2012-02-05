@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
-import java.awt.Color;
+import java.awt.*;
+
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import org.basex.gui.GUIConstants.Msg;
@@ -36,7 +37,7 @@ public class BaseXLabel extends JLabel {
    */
   public BaseXLabel(final String txt, final boolean dist, final boolean bold) {
     super(txt);
-    if(dist) border(0, 0, 8, 0);
+    if(dist) border(0, 0, 6, 0);
     setFont(getFont().deriveFont(bold ? 1 : 0));
   }
 
@@ -72,6 +73,16 @@ public class BaseXLabel extends JLabel {
   public void setText(final String text, final Msg icon) {
     setIcon(text == null ? null : icon.small);
     setText(text == null ? " " : text);
+  }
+
+  /**
+   * Chooses a large font.
+   * @return self reference
+   */
+  public BaseXLabel large() {
+    final Font f = getFont();
+    setFont(new Font(f.getName(), Font.PLAIN, (int) f.getSize2D() + 7));
+    return this;
   }
 
   @Override

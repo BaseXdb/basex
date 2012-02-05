@@ -68,17 +68,15 @@ public final class DialogManage extends Dialog {
     choice = new BaseXList(dbs.toArray(), this, !m);
     choice.setSize(190, 500);
 
-    final Font f = panel.getFont();
-    doc1 = new BaseXLabel(" ").border(0, 0, 5, 0);
-    doc1.setFont(f.deriveFont(f.getSize2D() + 7));
+    doc1 = new BaseXLabel(" ").large();
     doc1.setSize(400, doc1.getHeight());
 
     detail = new BaseXEditor(false, this);
-    detail.border(5).setFont(f);
+    detail.border(5).setFont(panel.getFont());
 
     // database buttons
-    copy = new BaseXButton(COPY_D, this);
     rename = new BaseXButton(RENAME_D, this);
+    copy = new BaseXButton(COPY_D, this);
     open = new BaseXButton(OPEN, this);
     drop = new BaseXButton(DROP_D, this);
 
@@ -193,7 +191,7 @@ public final class DialogManage extends Dialog {
     } else if(cmp != backups) {
       final String title = dbs.size() == 1 ? db : dbs.size() + " " + DATABASES;
       doc1.setText(title);
-      doc2.setText(title);
+      doc2.setText(BACKUPS + COLS + title);
 
       active = ctx.mprop.dbexists(db);
       if(active) {

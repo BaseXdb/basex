@@ -8,6 +8,7 @@ import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.QNm;
+import org.basex.query.util.*;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
@@ -53,7 +54,7 @@ import org.basex.util.hash.TokenObjMap;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class JSONConverter {
+public final class JSONConverter extends XMLConverter {
   /** Plural. */
   private static final byte[] S = { 's' };
   /** Global data type attributes. */
@@ -71,23 +72,16 @@ public final class JSONConverter {
   private final TokenObjMap<QNm> qnames = new TokenObjMap<QNm>();
   /** Cached types. */
   private final TokenObjMap<Class<?>> types = new TokenObjMap<Class<?>>();
-  /** Input info. */
-  private final InputInfo input;
 
   /**
    * Constructor.
    * @param ii input info
    */
   public JSONConverter(final InputInfo ii) {
-    input = ii;
+    super(ii);
   }
 
-  /**
-   * Parses the input.
-   * @param q query
-   * @return resulting node
-   * @throws QueryException query exception
-   */
+  @Override
   public ANode parse(final byte[] q) throws QueryException {
     final JStruct node = new JSONParser(q, input).parse();
     // find unique data types

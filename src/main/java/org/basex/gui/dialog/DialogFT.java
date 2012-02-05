@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.border.*;
+
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
@@ -118,9 +120,10 @@ final class DialogFT extends BaseXBack {
     if(!create) add(labels[F_SCORE]);
 
     add(check[F_STOP]);
+    check[F_STOP].setBorder(new EmptyBorder(0, 0, 4, 0));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    swpath = new BaseXTextField(
-        sw.isEmpty() ? d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
+    swpath = new BaseXTextField(sw.isEmpty() ?
+        d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(BROWSE_D, d);

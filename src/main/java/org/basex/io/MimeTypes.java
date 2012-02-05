@@ -34,6 +34,8 @@ public final class MimeTypes {
   public static final String APP_XQUERY = "application/xquery";
   /** Media type: application/json. */
   public static final String APP_JSON = "application/json";
+  /** Media type: application/jsonml+json. */
+  public static final String APP_JSONML = "application/jsonml+json";
 
   /** XML media type. */
   private static final String APPL_EXT_XML =

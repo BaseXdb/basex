@@ -27,11 +27,9 @@ import org.basex.util.list.StringList;
  */
 public final class DialogNew extends Dialog {
   /** Buttons. */
-  private final DialogImport options;
+  private final DialogImport general;
   /** Database name. */
   private final BaseXTextField target;
-  /** Parsing options. */
-  private final DialogParsing parsing;
   /** Buttons. */
   private final BaseXBack buttons;
 
@@ -63,44 +61,49 @@ public final class DialogNew extends Dialog {
     target.addKeyListener(keys);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
-    pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 4, 0));
+    pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(12, 0, 6, 0));
     pnl.add(target);
 
     // option panels
-    options = new DialogImport(this, pnl);
-    parsing = new DialogParsing(this);
+    final DialogParsing parsing = new DialogParsing(this);
+    general = new DialogImport(this, pnl, parsing);
 
     // index panel
-    final BaseXBack p3 = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
+    final BaseXBack indexes =
+        new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
+
+    //indexes.add(new BaseXLabel(INDEXES).border(0, 0, 16, 0).large());
+
     pathindex = new BaseXCheckBox(PATH_INDEX,
-       prop.is(Prop.PATHINDEX), 0, this);
-    p3.add(pathindex);
-    p3.add(new BaseXLabel(H_PATH_INDEX, true, false));
+        prop.is(Prop.PATHINDEX), 0, this).large();;
+    indexes.add(pathindex);
+    indexes.add(new BaseXLabel(H_PATH_INDEX, true, false));
 
     txtindex = new BaseXCheckBox(TEXT_INDEX,
-        prop.is(Prop.TEXTINDEX), 0, this);
-    p3.add(txtindex);
-    p3.add(new BaseXLabel(H_TEXT_INDEX, true, false));
+        prop.is(Prop.TEXTINDEX), 0, this).large();;
+    indexes.add(txtindex);
+    indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
     atvindex = new BaseXCheckBox(ATTRIBUTE_INDEX,
-        prop.is(Prop.ATTRINDEX), 0, this);
-    p3.add(atvindex);
-    p3.add(new BaseXLabel(H_ATTR_INDEX, true, false));
+        prop.is(Prop.ATTRINDEX), 0, this).large();
+    indexes.add(atvindex);
+    indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
-    final BaseXBack p4 = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
+    final BaseXBack fulltext =
+        new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(FULLTEXT_INDEX,
-        prop.is(Prop.FTINDEX), 0, this);
-    p4.add(ftxindex);
+        prop.is(Prop.FTINDEX), 0, this).large();
+    fulltext.add(ftxindex);
 
     ft = new DialogFT(this, true);
-    p4.add(ft);
+    fulltext.add(ft);
 
     final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(GENERAL, options);
+    tabs.addTab(GENERAL, general);
     tabs.addTab(PARSING, parsing);
-    tabs.addTab(INDEXES, p3);
-    tabs.addTab(FULLTEXT, p4);
+    tabs.addTab(INDEXES, indexes);
+    tabs.addTab(FULLTEXT, fulltext);
     set(tabs, BorderLayout.CENTER);
 
     buttons = okCancel();
@@ -112,8 +115,7 @@ public final class DialogNew extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    final boolean valid = options.action(true);
-    parsing.action(cmp);
+    final boolean valid = general.action(cmp, true);
     ft.action(ftxindex.isSelected());
 
     final String nm = target.getText().trim();
@@ -128,7 +130,7 @@ public final class DialogNew extends Dialog {
       if(!ok) {
         // name of database is invalid
         inf = Util.info(INVALID_X, NAME);
-      } else if(options.input.getText().trim().isEmpty()) {
+      } else if(general.input.getText().trim().isEmpty()) {
         // database will be empty
         inf = EMPTY_DB;
         icon = Msg.WARN;
@@ -139,9 +141,9 @@ public final class DialogNew extends Dialog {
       }
     }
 
-    if(cmp == options.browse) target.setText(options.dbname);
+    if(cmp == general.browse) target.setText(general.dbname);
 
-    options.info.setText(inf, icon);
+    general.info.setText(inf, icon);
     enableOK(buttons, B_OK, ok);
   }
 
@@ -149,12 +151,12 @@ public final class DialogNew extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
+
     gui.set(Prop.PATHINDEX, pathindex.isSelected());
     gui.set(Prop.TEXTINDEX, txtindex.isSelected());
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX,   ftxindex.isSelected());
-    options.setOptions();
-    parsing.setOptions();
+    general.setOptions();
     ft.setOptions();
   }
 }

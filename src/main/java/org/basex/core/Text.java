@@ -996,12 +996,14 @@ public interface Text {
 
   /** XML file description. */
   String XML_DOCUMENTS = "XML Documents";
+  /** JSON file description. */
+  String JSON_DOCUMENTS = "JSON Documents";
   /** HTML file description. */
   String HTML_DOCUMENTS = "HTML Documents";
   /** CSV file description. */
   String CSV_DOCUMENTS = "Comma-Separated Values";
   /** TXT file description. */
-  String PLAIN_TEXT = "Plain text";
+  String PLAIN_TEXT = "Plain Text";
   /** ZIP file description. */
   String ZIP_ARCHIVES = "ZIP Archives";
   /** GZ file description. */
@@ -1043,6 +1045,8 @@ public interface Text {
   /** Full-text, document-based. */
   String TEXT_NODES = lang("text_nodes");
 
+  /** JsonML information. */
+  String PARSE_AS_JSONML = lang("parse_as_jsonml");
   /** TEXT Lines information. */
   String SPLIT_INPUT_LINES = lang("split_input_lines");
   /** CSV header information. */
@@ -1371,6 +1375,11 @@ public interface Text {
   String H_LARGE_DB = lang("h_large_db") + NL + ' ';
   /** Dialog for downloading a new version. */
   String H_NEW_VERSION = lang("h_new_version");
+
+  /** HTML Parser. */
+  String H_HTML_PARSER = lang("h_html_parser");
+  /** No HTML Parser. */
+  String H_NO_HTML_PARSER = lang("h_no_html_parser");
 
   // SERVER TEXTS =============================================================
 

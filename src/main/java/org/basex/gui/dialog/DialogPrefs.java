@@ -78,7 +78,7 @@ public final class DialogPrefs extends Dialog {
     p.add(path);
     p.add(button);
     pp.add(p);
-    pp.add(new BaseXLabel(GUI_INTERACTIONS, true, true).border(10, 0, 8, 0));
+    pp.add(new BaseXLabel(GUI_INTERACTIONS, true, true).border(12, 0, 6, 0));
 
     // checkbox for realtime mouse focus
     javalook = new BaseXCheckBox(JAVA_LF, gprop.is(GUIProp.JAVALOOK), this);

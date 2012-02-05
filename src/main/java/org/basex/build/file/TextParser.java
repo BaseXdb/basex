@@ -7,7 +7,7 @@ import org.basex.build.SingleParser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.in.NewlineInput;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 
 /**
  * This class parses files in the plain-text format
@@ -44,15 +44,15 @@ public final class TextParser extends SingleParser {
 
   /**
    * Constructor.
-   * @param path file path
-   * @param ta database target
+   * @param source document source
+   * @param target target path
    * @param prop database properties
    * @throws IOException I/O exception
    */
-  public TextParser(final IO path, final String ta, final Prop prop)
+  public TextParser(final IO source, final String target, final Prop prop)
       throws IOException {
 
-    super(path, ta);
+    super(source, target);
     // set parser properties
     final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
     lines = props.is(ParserProp.LINES);
@@ -64,20 +64,20 @@ public final class TextParser extends SingleParser {
     builder.startElem(TEXT, atts);
 
     final TokenBuilder tb = new TokenBuilder();
-    final NewlineInput ti = new NewlineInput(src, encoding);
+    final NewlineInput nli = new NewlineInput(src, encoding);
     try {
-      for(int ch; (ch = ti.read()) != -1;) {
+      for(int ch; (ch = nli.read()) != -1;) {
         if(ch == '\n' && lines) {
           builder.startElem(LINE, atts);
           builder.text(tb.finish());
           builder.endElem();
           tb.reset();
         } else {
-          tb.add(ch);
+          tb.add(XMLToken.valid(ch) ? ch : '?');
         }
       }
     } finally {
-      ti.close();
+      nli.close();
     }
     if(!lines) builder.text(tb.finish());
     builder.endElem();

@@ -29,13 +29,13 @@ public class XMLParser extends SingleParser {
    * Constructor.
    * @param source document source
    * @param target target path
-   * @param pr database properties
+   * @param prop database properties
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO source, final String target, final Prop pr)
+  public XMLParser(final IO source, final String target, final Prop prop)
       throws IOException {
     super(source, target);
-    scanner = new XMLScanner(source, pr);
+    scanner = new XMLScanner(source, prop);
   }
 
   @Override

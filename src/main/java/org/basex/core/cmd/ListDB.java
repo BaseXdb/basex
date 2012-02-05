@@ -59,7 +59,7 @@ public final class ListDB extends Command {
         final byte[] file = data.text(pre, true);
         tl.add(file);
         tl.add(DataText.M_XML);
-        tl.add(MimeTypes.get(string(file)));
+        tl.add(MimeTypes.APP_XML);
         tl.add(data.size(pre, Data.DOC));
         table.contents.add(tl);
       }

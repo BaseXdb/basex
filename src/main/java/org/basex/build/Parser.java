@@ -2,11 +2,7 @@ package org.basex.build;
 
 import java.io.IOException;
 import java.util.Locale;
-
-import org.basex.build.file.CSVParser;
-import org.basex.build.file.HTMLParser;
-import org.basex.build.file.MAB2Parser;
-import org.basex.build.file.TextParser;
+import org.basex.build.file.*;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Progress;
@@ -129,6 +125,8 @@ public abstract class Parser extends Progress {
       return new TextParser(source, target, prop);
     if(parser.equals(DataText.M_MAB2))
       return new MAB2Parser(source, target, prop);
+    if(parser.equals(DataText.M_JSON))
+      return new JSONParser(source, target, prop);
     if(parser.equals(DataText.M_CSV))
       return new CSVParser(source, target, prop);
     return xmlParser(source, prop, target);

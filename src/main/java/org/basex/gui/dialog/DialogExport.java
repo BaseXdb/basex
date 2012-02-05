@@ -63,7 +63,7 @@ public final class DialogExport extends Dialog {
     BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 0));
     /* Output label. */
     final BaseXLabel out = new BaseXLabel(
-        OUTPUT_DIR + COL, true, true).border(0, 0, 4, 0);
+        OUTPUT_DIR + COL, true, true).border(0, 0, 6, 0);
     p.add(out);
     p.add(new BaseXLabel());
 
@@ -81,7 +81,7 @@ public final class DialogExport extends Dialog {
     pp.add(p);
 
     p = new BaseXBack(new TableLayout(2, 1));
-    p.add(new BaseXLabel(ENCODING + COL, true, true).border(0, 0, 4, 0));
+    p.add(new BaseXLabel(ENCODING + COL, true, true).border(0, 0, 6, 0));
 
     final Prop prop = gui.context.prop;
     SerializerProp sp;

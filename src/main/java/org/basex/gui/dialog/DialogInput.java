@@ -59,7 +59,7 @@ public final class DialogInput extends Dialog {
       title = NAME_OF_DB_COPY + COLS;
     }
 
-    set(new BaseXLabel(title, false, true).border(0, 0, 4, 0),
+    set(new BaseXLabel(title, false, true).border(0, 0, 6, 0),
         BorderLayout.NORTH);
 
     input = new BaseXTextField(o, this);

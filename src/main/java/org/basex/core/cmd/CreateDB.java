@@ -2,38 +2,25 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
-import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.*;
 
-import org.basex.build.Builder;
-import org.basex.build.DirParser;
-import org.basex.build.DiskBuilder;
-import org.basex.build.MemBuilder;
+import org.basex.build.*;
 import org.basex.build.Parser;
-import org.basex.build.xml.SAXWrapper;
-import org.basex.core.CommandBuilder;
+import org.basex.build.xml.*;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.MemData;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.ft.FTBuilder;
-import org.basex.index.value.ValueBuilder;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.in.BufferInput;
-import org.basex.io.in.LookupInput;
-import org.basex.util.Util;
-import org.xml.sax.InputSource;
+import org.basex.index.ft.*;
+import org.basex.index.value.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.util.*;
+import org.xml.sax.*;
 
 /**
  * Evaluates the 'create db' command and creates a new database.
@@ -62,17 +49,24 @@ public final class CreateDB extends ACreate {
   @Override
   protected boolean run() {
     final String name = args[0];
+    IO io = null;
+
     Parser parser = Parser.emptyParser();
+    final String format = prop.get(Prop.PARSER);
     if(args.length < 1 || args[1] == null) {
       if(in != null && in.getByteStream() != null) {
-        InputStream is = in.getByteStream();
-        if(!(is instanceof BufferedInputStream ||
-            is instanceof BufferInput)) is = new BufferedInputStream(is);
         try {
-          final LookupInput li = new LookupInput(is);
-          if(li.lookup() != -1) {
-            parser = new SAXWrapper(new SAXSource(new InputSource(li)),
-                name + IO.XMLSUFFIX, "", context.prop);
+          io = cache();
+          if(io == null) {
+            InputStream is = in.getByteStream();
+            if(!(is instanceof BufferedInputStream ||
+                is instanceof BufferInput)) is = new BufferedInputStream(is);
+
+            final LookupInput li = new LookupInput(is);
+            if(li.lookup() != -1) {
+              parser = new SAXWrapper(new SAXSource(new InputSource(li)),
+                  name + '.' + format, "", context.prop);
+            }
           }
         } catch(final IOException ex) {
           Util.debug(ex);
@@ -80,11 +74,15 @@ public final class CreateDB extends ACreate {
         }
       }
     } else {
-      final IO io = IO.get(args[1]);
+      io = IO.get(args[1]);
+    }
+
+    if(io != null) {
       if(!io.exists()) return error(FILE_NOT_FOUND_X, io);
-      if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
+      if(io instanceof IOContent) io.name(name + '.' + format);
       parser = new DirParser(io, prop, mprop.dbpath(name));
     }
+
     return build(parser, name);
   }
 

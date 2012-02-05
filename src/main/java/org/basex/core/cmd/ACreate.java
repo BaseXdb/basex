@@ -3,25 +3,19 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.build.DiskBuilder;
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
-import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.ProgressException;
-import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.data.MetaData;
-import org.basex.index.IndexBuilder;
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.ft.FTBuilder;
-import org.basex.index.path.PathBuilder;
-import org.basex.index.value.ValueBuilder;
-import org.basex.util.Util;
+import org.basex.index.ft.*;
+import org.basex.index.path.*;
+import org.basex.index.value.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract class for database creation commands.
@@ -116,6 +110,29 @@ public abstract class ACreate extends Command {
       abort();
       return error(Util.info(NOT_PARSED_X, parser.src));
     }
+  }
+
+  /**
+   * Returns cached input if the input is streamed and a data format different
+   * than XML has been chosen.
+   * @return cached input
+   * @throws IOException I/O exception
+   */
+  protected IOContent cache() throws IOException {
+    if(in == null || prop.get(Prop.PARSER).equals(DataText.M_XML)) return null;
+
+    final InputStream is = in.getByteStream();
+    final BufferedInputStream bis = new BufferedInputStream(is);
+    final ByteList ao = new ByteList();
+    try {
+      for(int b; (b = bis.read()) != -1;) ao.add(b);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      throw ex;
+    } finally {
+      try { bis.close(); } catch(final IOException ex) { /* ignored */ }
+    }
+    return new IOContent(ao.toArray());
   }
 
   /**

@@ -2,25 +2,16 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.*;
 
-import org.basex.build.Builder;
-import org.basex.build.DirParser;
-import org.basex.build.DiskBuilder;
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
-import org.basex.build.xml.SAXWrapper;
-import org.basex.core.CommandBuilder;
-import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.util.Performance;
-import org.basex.util.Util;
+import org.basex.build.*;
+import org.basex.build.xml.*;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'add' command and adds a document to a collection.<br/>
@@ -70,6 +61,17 @@ public final class Add extends ACreate {
     IO io = null;
     if(in == null) {
       io = IO.get(args[1]);
+    } else if(in.getSystemId() != null) {
+      io = IO.get(in.getSystemId());
+    } else if(in.getByteStream() != null) {
+      try {
+        io = cache();
+      } catch(final IOException ex) {
+        return error(Util.message(ex));
+      }
+    }
+
+    if(io != null) {
       if(!io.exists()) return error(FILE_NOT_FOUND_X, create ? io : args[1]);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
     }
@@ -83,6 +85,7 @@ public final class Add extends ACreate {
 
     final Data data = context.data();
     final Parser parser;
+
     if(io != null) {
       // set name of document
       if(!name.isEmpty()) io.name(name);

@@ -63,9 +63,9 @@ public final class DialogProps extends Dialog {
     final Data data = gui.context.data();
     final BaseXBack tabInfo = new BaseXBack(new BorderLayout(0, 8)).border(8);
     final Font f = tabInfo.getFont();
-    final BaseXLabel doc = new BaseXLabel(data.meta.name).border(0, 0, 5, 0);
+    final BaseXLabel doc = new BaseXLabel(data.meta.name).border(
+        0, 0, 5, 0).large();
     BaseXLayout.setWidth(doc, 400);
-    doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     tabInfo.add(doc, BorderLayout.NORTH);
 
     final String db = InfoDB.db(data.meta, true, false, true);
@@ -95,7 +95,7 @@ public final class DialogProps extends Dialog {
 
     final BaseXBack[] panels = new BaseXBack[indexes.length];
     for(int i = 0; i < indexes.length; ++i) {
-      indexes[i] = new BaseXCheckBox(cb[i], val[i], 0, this);
+      indexes[i] = new BaseXCheckBox(cb[i], val[i], 0, this).large();
       indexes[i].setEnabled(data instanceof DiskData);
       panels[i] = new BaseXBack(new BorderLayout());
     }

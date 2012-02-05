@@ -29,6 +29,8 @@ public final class ParserProp extends AProp {
   public static final Object[] FLAT = { "flat", false };
   /** Parser option: encoding. */
   public static final Object[] ENCODING = { "encoding", Token.UTF8 };
+  /** Parser option: jsonml format. */
+  public static final Object[] JSONML = { "jsonml", false };
 
   /**
    * Constructor.

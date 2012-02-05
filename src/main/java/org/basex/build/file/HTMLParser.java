@@ -15,6 +15,7 @@ import org.basex.util.Reflect;
 import org.basex.util.Util;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
@@ -47,20 +48,21 @@ public final class HTMLParser extends XMLParser {
    * Constructor.
    * @param source document source
    * @param target target path
-   * @param pr database properties
+   * @param prop database properties
    * @throws IOException I/O exception
    */
-  public HTMLParser(final IO source, final String target, final Prop pr)
+  public HTMLParser(final IO source, final String target, final Prop prop)
       throws IOException {
-    super(toXML(source), target, pr);
+    super(toXML(source), target, prop);
   }
 
   /**
    * Converts an HTML document to XML.
    * @param io io reference
    * @return parser
+   * @throws IOException I/O exception
    */
-  private static IO toXML(final IO io) {
+  private static IO toXML(final IO io) throws IOException {
     // reader could not be initialized; fall back to XML
     if(READER == null) return io;
 
@@ -91,7 +93,7 @@ public final class HTMLParser extends XMLParser {
       reader.setContentHandler((ContentHandler) Reflect.get(WRITER, sw));
       reader.parse(is);
       return new IOContent(token(sw.toString()), io.name());
-    } catch(final Exception ex) {
+    } catch(final SAXException ex) {
       Util.debug(ex);
       return io;
     }
