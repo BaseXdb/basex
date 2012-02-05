@@ -62,7 +62,7 @@ public final class CollStressTest {
   public void specificOpened() throws Exception {
     new Open(DB).execute(CONTEXT);
     for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + DB + "/" + i + "')").execute(CONTEXT);
+      new XQuery("collection('" + DB + '/' + i + "')").execute(CONTEXT);
     }
   }
 
@@ -74,7 +74,7 @@ public final class CollStressTest {
   public void specificClosed() throws Exception {
     new Close().execute(CONTEXT);
     for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + DB + "/" + i + "')").execute(CONTEXT);
+      new XQuery("collection('" + DB + '/' + i + "')").execute(CONTEXT);
     }
   }
 
@@ -85,7 +85,7 @@ public final class CollStressTest {
   @Test
   public void allOpened() throws Exception {
     new Open(DB).execute(CONTEXT);
-    new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
+    new XQuery("for $i in 0 to " + (SIZE - 1) + ' ' +
       "return collection(concat('" + DB + "/', $i))").execute(CONTEXT);
   }
 
@@ -96,7 +96,7 @@ public final class CollStressTest {
   @Test
   public void allClosed() throws Exception {
     new Close().execute(CONTEXT);
-    new XQuery("for $i in 0 to " + (SIZE - 1) + " " +
+    new XQuery("for $i in 0 to " + (SIZE - 1) + ' ' +
       "return collection(concat('" + DB + "/', $i))").execute(CONTEXT);
   }
 }

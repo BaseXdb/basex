@@ -77,7 +77,7 @@ public final class LocalStressTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
+  private static void run(final int clients, final int runs) throws Exception {
     // Create test database
     Command cmd = new CreateDB(DB, INPUT);
     cmd.execute(CONTEXT);

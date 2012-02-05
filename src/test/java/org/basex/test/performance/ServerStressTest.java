@@ -73,7 +73,7 @@ public final class ServerStressTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private void run(final int clients, final int runs) throws Exception {
+  private static void run(final int clients, final int runs) throws Exception {
     // Run server instance
     server = new BaseXServer("-p9999", "-e9998", "-z");
 

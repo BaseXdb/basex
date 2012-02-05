@@ -156,7 +156,7 @@ public final class IncUpdateTest {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i < MAX * STEPS; i++) {
       sb.append((char) ('@' + (rnd.nextInt() & 0x1F)));
-      query("replace value of node /* with '" + sb + "'");
+      query("replace value of node /* with '" + sb + '\'');
       query("string-length(/*)", sb.length());
     }
   }

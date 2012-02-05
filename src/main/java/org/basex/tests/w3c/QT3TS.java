@@ -35,6 +35,9 @@ import java.util.HashSet;
  * @author Christian Gruen
  */
 public final class QT3TS {
+  /** Default path to the test suite. */
+  protected static final String PATH = "g:/XML/w3c/qt3ts/";
+
   /** Maximum length of result output. */
   private int maxout = 2000;
 
@@ -72,8 +75,6 @@ public final class QT3TS {
   protected final Context ctx = new Context();
   /** Global environments. */
   private final ObjList<QT3Env> genvs = new ObjList<QT3Env>();
-  /** Default path to the test suite. */
-  protected final String path = "g:/XML/w3c/qt3ts/";
 
   /**
    * Main method of the test class.
@@ -101,7 +102,7 @@ public final class QT3TS {
     new Set(Prop.CHOP, false).execute(ctx);
     new Set(Prop.INTPARSE, false).execute(ctx);
 
-    final XQuery qdoc = new XQuery("doc(' " + path + "/" + CATALOG + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + PATH + '/' + CATALOG + "')", ctx);
     final XQValue doc = qdoc.value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
@@ -125,7 +126,7 @@ public final class QT3TS {
     result.append(" Ignored : ").append(ignored).append(NL);
 
     Util.outln(NL + "Writing log file..." + NL);
-    final PrintOutput po = new PrintOutput(path + "qt3ts.log");
+    final PrintOutput po = new PrintOutput(PATH + "qt3ts.log");
     po.println("QT3TS RESULTS __________________________" + NL);
     po.println(result.toString());
     po.println("WRONG __________________________________" + NL);
@@ -150,7 +151,7 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    final XQuery qdoc = new XQuery("doc(' " + path + '/' + name + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + PATH + '/' + name + "')", ctx);
     final XQValue doc = qdoc.value();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XQValue set = qset.value();
@@ -380,7 +381,7 @@ public final class QT3TS {
    * @param ref reference
    * @return environment
    */
-  private QT3Env envs(final ObjList<QT3Env> envs, final String ref) {
+  private static QT3Env envs(final ObjList<QT3Env> envs, final String ref) {
     for(final QT3Env e : envs) if(e.name.equals(ref)) return e;
     return null;
   }
@@ -520,7 +521,7 @@ public final class QT3TS {
    * @param expect expected result
    * @return optional expected test suite result
    */
-  private String assertCount(final XQValue value, final XQValue expect) {
+  private static String assertCount(final XQValue value, final XQValue expect) {
     final long exp = expect.getInteger();
     final int res = value.size();
     return exp == res ? null : Util.info("% items (% found)", exp, res);
@@ -674,7 +675,7 @@ public final class QT3TS {
    * @param exp expected
    * @return optional expected test suite result
    */
-  private String assertBoolean(final XQValue value, final boolean exp) {
+  private static String assertBoolean(final XQValue value, final boolean exp) {
     return value.getType().eq(SeqType.BLN) && value.getBoolean() == exp ?
         null : Util.info(exp);
   }
@@ -684,7 +685,7 @@ public final class QT3TS {
    * @param value resulting value
    * @return optional expected test suite result
    */
-  private String assertEmpty(final XQValue value) {
+  private static String assertEmpty(final XQValue value) {
     return value == XQEmpty.EMPTY ? null : "";
   }
 

@@ -65,6 +65,6 @@ final class XQSequence extends XQValue {
       if(sb.length() != 1) sb.append(',');
       sb.append(it.toString());
     }
-    return sb.append(")").toString();
+    return sb.append(')').toString();
   }
 }

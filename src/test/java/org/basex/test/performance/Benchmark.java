@@ -102,7 +102,7 @@ public abstract class Benchmark {
    * Creates or opens the test database.
    * @throws IOException I/O exception
    */
-  private void check() throws IOException {
+  private static void check() throws IOException {
     session.execute(new Check(INPUT));
   }
 }

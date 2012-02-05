@@ -110,7 +110,7 @@ public final class XQUFServerStressTest {
    * @param runs number of runs
    * @throws Exception exception
    */
-  private void run(final String query, final int clt, final int runs)
+  private static void run(final String query, final int clt, final int runs)
       throws Exception {
 
     final Client[] cl = new Client[clt];

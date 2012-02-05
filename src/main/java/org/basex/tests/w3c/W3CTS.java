@@ -268,7 +268,7 @@ public abstract class W3CTS {
    * @param t total value
    * @return percentage
    */
-  private String pc(final int v, final long t) {
+  private static String pc(final int v, final long t) {
     return (t == 0 ? 100 : v * 10000 / t / 100d) + "%";
   }
 
@@ -733,7 +733,9 @@ public abstract class W3CTS {
    * @param f file path
    * @throws Exception exception
    */
-  private void print(final PrintOutput po, final String f) throws Exception {
+  private static void print(final PrintOutput po, final String f)
+      throws Exception {
+
     final BufferedReader br = new BufferedReader(new FileReader(f));
     for(String line; (line = br.readLine()) != null;) po.println(line);
     br.close();
@@ -744,7 +746,7 @@ public abstract class W3CTS {
    * @param f file to be read
    * @return content
    */
-  private String read(final IO f) {
+  private static String read(final IO f) {
     try {
       return string(new NewlineInput(f, null).content());
     } catch(final IOException ex) {

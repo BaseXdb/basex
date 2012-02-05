@@ -101,7 +101,7 @@ public final class CollAddTest {
    * @param flush force flush of updates
    * @throws Exception exception
    */
-  private void add(final int n, final boolean flush) throws Exception {
+  private static void add(final int n, final boolean flush) throws Exception {
     new Set(Prop.AUTOFLUSH, flush).execute(CONTEXT);
 
     // Create test database

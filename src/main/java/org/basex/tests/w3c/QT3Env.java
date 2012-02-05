@@ -49,7 +49,7 @@ class QT3Env {
    * @param env environment item
    */
   QT3Env(final Context ctx, final XQValue env) {
-    name = XQuery.string("@" + NNAME, env, ctx);
+    name = XQuery.string('@' + NNAME, env, ctx);
     sources = list(ctx, env, SOURCE);
     params = list(ctx, env, PARAM);
     namespaces = list(ctx, env, NAMESPACE);
@@ -97,7 +97,7 @@ class QT3Env {
    * @param env root element
    * @return map
    */
-  HashMap<String, String> map(final Context ctx, final XQValue env) {
+  static HashMap<String, String> map(final Context ctx, final XQValue env) {
     final HashMap<String, String> map = new HashMap<String, String>();
     final XQuery query = new XQuery("@*", ctx).context(env);
     for(final XQItem it : query) map.put(it.getName(), it.getString());
@@ -107,14 +107,14 @@ class QT3Env {
 
   /**
    * Returns a single attribute string.
-   * @param elem name of element
+   * @param elm name of element
    * @param ctx database context
    * @param env root element
    * @return map
    */
-  String string(final String elem, final Context ctx, final XQValue env) {
+  static String string(final String elm, final Context ctx, final XQValue env) {
     String value = null;
-    final XQuery query = new XQuery("*:" + elem, ctx).context(env);
+    final XQuery query = new XQuery("*:" + elm, ctx).context(env);
     final XQItem it = query.next();
     if(it != null) {
       final XQuery qattr = new XQuery("string(@*)", ctx).context(it);

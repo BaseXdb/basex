@@ -65,7 +65,9 @@ public final class ServerMemTest {
    * @param parallel number of parallel runs
    * @throws Exception exception
    */
-  private void run(final int clients, final int parallel) throws Exception {
+  private static void run(final int clients, final int parallel)
+      throws Exception {
+
     // Run server instance
     server = new BaseXServer("-p9999", "-e9998", "-z",
         "-cset parallel " + parallel);

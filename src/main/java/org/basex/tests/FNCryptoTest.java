@@ -161,7 +161,7 @@ public class FNCryptoTest {
    * @param second second query
    * @param expected expected output
    */
-  private void query(final String first, final String second,
+  private static void query(final String first, final String second,
       final String expected) {
 
     try {
