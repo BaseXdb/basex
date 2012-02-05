@@ -227,57 +227,57 @@ public interface Text {
 
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.BACKUP + "|" + CmdCreate.DATABASE + "|" + CmdCreate.EVENT +
-    "|" + CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
+    "[" + CmdCreate.BACKUP + '|' + CmdCreate.DATABASE + '|' +
+    CmdCreate.EVENT + '|' + CmdCreate.INDEX + '|' + CmdCreate.USER + "] [...]",
     lang("c_create1"),
     lang("c_create2") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
-      "  " + lang("c_create4", C_NAME) + NL +
+    "  " + lang("c_create4", C_NAME) + NL +
     LI + CmdCreate.DATABASE + " [" + C_NAME + "] ([" + C_INPUT + "]):"  + NL +
-      "  " + lang("c_create3", C_NAME, C_INPUT) + NL +
+    "  " + lang("c_create3", C_NAME, C_INPUT) + NL +
     LI + CmdCreate.EVENT + " [" + C_NAME + "]: " + NL +
-      "  " + lang("c_create9") + NL +
-    LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
-      "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]:" + NL +
-      "  " + lang("c_create5") + NL +
+    "  " + lang("c_create9") + NL +
+    LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE +
+    '|' + CmdIndex.FULLTEXT + '|' + CmdIndex.PATH + "]:" + NL +
+    "  " + lang("c_create5") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
-      "  " + lang("c_create8")
+    "  " + lang("c_create8")
   };
 
   /** Command help. */
   String[] HELPCOPY = {
-    "[" + C_NAME + "] [new" + C_NAME + "]", lang("c_copy1"), lang("c_copy2")
+    '[' + C_NAME + "] [new" + C_NAME + ']', lang("c_copy1"), lang("c_copy2")
   };
 
   /** Command help. */
   String[] HELPCHECK = {
-    "[" + C_INPUT + "]", lang("c_check1"), lang("c_check2")
+    '[' + C_INPUT + ']', lang("c_check1"), lang("c_check2")
   };
   /** Command help. */
   String[] HELPADD = {
-    "(" + TO + " [" + C_PATH + "]) [" + C_INPUT + "]",
+    '(' + TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
     lang("c_add1"), lang("c_add2", C_INPUT, C_PATH)
   };
   /** Command help. */
   String[] HELPSTORE = {
-    "(" + TO + " [" + C_PATH + "]) [" + C_INPUT + "]",
+    '(' + TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
     lang("c_store1"), lang("c_store2", C_PATH)
   };
   /** Command help. */
   String[] HELPRETRIEVE = {
-    "[" + C_PATH + "]", lang("c_retrieve1"), lang("c_retrieve2", C_PATH)
+    '[' + C_PATH + ']', lang("c_retrieve1"), lang("c_retrieve2", C_PATH)
   };
   /** Command help. */
   String[] HELPDELETE = {
-    "[" + C_PATH  + "]", lang("c_delete1"), lang("c_delete2")
+    '[' + C_PATH  + ']', lang("c_delete1"), lang("c_delete2")
   };
   /** Command help. */
   String[] HELPOPEN = {
-    "[" + C_PATH + "]", lang("c_open1"), lang("c_open2", C_PATH)
+    '[' + C_PATH + ']', lang("c_open1"), lang("c_open2", C_PATH)
   };
   /** Command help. */
   String[] HELPINFO = {
-    "([" + CmdInfo.DATABASE + "|" + CmdInfo.INDEX + "|" +
+    "([" + CmdInfo.DATABASE + '|' + CmdInfo.INDEX + '|' +
     CmdInfo.STORAGE + "])",
     lang("c_info1"),
     lang("c_info21") + NL +
@@ -285,7 +285,7 @@ public interface Text {
     LI + CmdInfo.DATABASE + ": " + lang("c_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("c_info24") + NL +
     LI + CmdInfo.STORAGE + " [start end] | [" + C_QUERY + "]: " +
-    lang("c_info25")
+      lang("c_info25")
   };
   /** Command help. */
   String[] HELPCLOSE = {
@@ -297,8 +297,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPDROP = {
-    "[" + CmdDrop.BACKUP + "|" + CmdDrop.DATABASE + "|" + "|" + CmdDrop.EVENT +
-      CmdDrop.INDEX + "|" + CmdDrop.USER + "] [...]",
+    "[" + CmdDrop.BACKUP + '|' + CmdDrop.DATABASE + '|' + '|' + CmdDrop.EVENT +
+      CmdDrop.INDEX + '|' + CmdDrop.USER + "] [...]",
     lang("c_drop1"),
     lang("c_drop2") + NL +
     LI + CmdDrop.BACKUP + " [" + C_NAME + "]:" + NL +
@@ -307,24 +307,24 @@ public interface Text {
       "  " + lang("c_drop21") + NL +
     LI + CmdDrop.EVENT + " [" + C_NAME + "]:" + NL +
       "  " + lang("c_drop25", C_NAME) + NL +
-    LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
-      CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
+    LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + '|' + CmdIndex.TEXT + '|' +
+      CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("c_drop22") + NL +
     LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [database]): " + NL +
       "  " + lang("c_drop23")
   };
   /** Command help. */
   String[] HELPEXPORT = {
-    "[" + C_PATH + "]", lang("c_export1"), lang("c_export2", C_PATH)
+    '[' + C_PATH + ']', lang("c_export1"), lang("c_export2", C_PATH)
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {
-    "(" + ALL + ")", lang("c_optimize1"), lang("c_optimize2", ALL)
+    '(' + ALL + ')', lang("c_optimize1"), lang("c_optimize2", ALL)
   };
 
   /** Command help. */
   String[] HELPXQUERY = {
-    "[" + C_QUERY + "]", lang("c_xquery1"), lang("c_xquery2")
+    '[' + C_QUERY + ']', lang("c_xquery1"), lang("c_xquery2")
   };
   /** Command help. */
   String[] HELPFIND = {
@@ -336,33 +336,33 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRUN = {
-    "[" + C_PATH + "]", lang("c_run1"), lang("c_run2", C_PATH)
+    '[' + C_PATH + ']', lang("c_run1"), lang("c_run2", C_PATH)
   };
   /** Command help. */
   String[] HELPCS = {
-    "[" + C_QUERY + "]", lang("c_cs1"), lang("c_cs2")
+    '[' + C_QUERY + ']', lang("c_cs1"), lang("c_cs2")
   };
   /** Command help. */
   String[] HELPKILL = {
-    "[" + C_NAME + "]", lang("c_kill1"), lang("c_kill2")
+    '[' + C_NAME + ']', lang("c_kill1"), lang("c_kill2")
   };
   /** Command help. */
   String[] HELPRENAME = {
-    "[" + C_PATH  + "] [newpath]", lang("c_rename1"), lang("c_rename2")
+    '[' + C_PATH  + "] [newpath]", lang("c_rename1"), lang("c_rename2")
   };
   /** Command help. */
   String[] HELPREPLACE = {
-    "[" + C_PATH  + "] [" + C_INPUT + "]",
+    '[' + C_PATH  + "] [" + C_INPUT + ']',
     lang("c_replace1"), lang("c_replace2")
   };
   /** Command help. */
   String[] HELPRESTORE = {
-    "[" + C_NAME + "-(date)]", lang("c_restore1"), lang("c_restore2")
+    '[' + C_NAME + "-(date)]", lang("c_restore1"), lang("c_restore2")
   };
   /** Command help. */
   String[] HELPSHOW = {
-    "[" + CmdShow.BACKUPS + "|" + CmdShow.DATABASES + "|" + CmdShow.EVENTS +
-    "|" + CmdShow.SESSIONS + "|" + CmdShow.USERS + "]",
+    "[" + CmdShow.BACKUPS + '|' + CmdShow.DATABASES + '|' + CmdShow.EVENTS +
+    '|' + CmdShow.SESSIONS + '|' + CmdShow.USERS + ']',
     lang("c_show1"),
     lang("c_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("c_show22") + NL +
@@ -373,15 +373,15 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPGRANT = {
-    "[" + CmdPerm.NONE + "|" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
-    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [database]) " + TO +
+    "[" + CmdPerm.NONE + '|' + CmdPerm.READ + '|' + CmdPerm.WRITE + '|' +
+    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [database]) " + TO +
     " [user]",
     lang("c_grant1"),
     lang("c_grant2")
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + CmdCreate.DATABASE + "|" + CmdCreate.USER + "] [...]",
+    "[" + CmdCreate.DATABASE + '|' + CmdCreate.USER + "] [...]",
     lang("c_alter1"),
     lang("c_alter2") + NL  +
     LI + CmdCreate.DATABASE + " [" + C_NAME + "] [newname]" + NL +
@@ -397,7 +397,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPGET = {
-      "[option]", lang("c_get1", "info"), lang("c_get2", "option")
+    "[option]", lang("c_get1", "info"), lang("c_get2", "option")
   };
   /** Command help. */
   String[] HELPPASSWORD = {
@@ -405,15 +405,15 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPREPO = {
-      "[" + CmdRepo.DELETE + "|" + CmdRepo.INSTALL + "|" + CmdRepo.LIST + "]",
-      lang("c_repo1"),
-      lang("c_repo2") + NL +
-      LI + CmdRepo.DELETE + " [" + C_PKGNAME + "|" + C_PKGDIR + "]:" +  NL +
-      "  " + lang("c_repo3", C_PKGNAME, C_PKGDIR) + NL +
-      LI + CmdRepo.INSTALL + " [" + C_PKGPATH + "]:" + NL +
-      "  " + lang("c_repo4", C_PKGPATH) + NL +
-      LI + CmdRepo.LIST + ":" + NL +
-      "  " + lang("c_repo5")
+    "[" + CmdRepo.DELETE + '|' + CmdRepo.INSTALL + '|' + CmdRepo.LIST + ']',
+    lang("c_repo1"),
+    lang("c_repo2") + NL +
+    LI + CmdRepo.DELETE + " [" + C_PKGNAME + '|' + C_PKGDIR + "]:" +  NL +
+    "  " + lang("c_repo3", C_PKGNAME, C_PKGDIR) + NL +
+    LI + CmdRepo.INSTALL + " [" + C_PKGPATH + "]:" + NL +
+    "  " + lang("c_repo4", C_PKGPATH) + NL +
+    LI + CmdRepo.LIST + ':' + NL +
+    "  " + lang("c_repo5")
   };
   /** Command help. */
   String[] HELPHELP = {
@@ -431,7 +431,7 @@ public interface Text {
   /** Command syntax information. */
   String SYNTAX_X = lang("syntax") + ": %";
   /** Command execution error. */
-  String EXEC_ERROR = lang("exec_error_%") + COL + NL + "%";
+  String EXEC_ERROR = lang("exec_error_%") + COL + NL + '%';
 
   /** No database error. */
   String NO_DB_OPENED = lang("no_db_opened");
@@ -464,7 +464,7 @@ public interface Text {
   /** Builder error. */
   String CREATION_CANCELED = lang("creation_canceled");
   /** Create database information. */
-  String NODES_PARSED_X = " \"%\" (" + lang("nodes_parsed_%") + ")";
+  String NODES_PARSED_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
   /** Scanner position. */
   String SCANPOS_X_X = "\"%\" (" + lang("line") + " %)";
 
@@ -713,8 +713,8 @@ public interface Text {
   /** Invalid key. */
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
   /** Unknown command error. */
-  String UNKNOWN_OPT_SIMILAR_X =
-      lang("unknown_option_%") + ' ' + lang("similar_cmd_%");
+  String UNKNOWN_OPT_SIMILAR_X = lang("unknown_option_%") + ' ' +
+      lang("similar_cmd_%");
   /** Invalid value. */
   String INVALID_VALUE_X_X = lang("invalid_value_%_%");
 
@@ -782,9 +782,9 @@ public interface Text {
   String MAIN_OPTIONS = lang("main_options");
 
   /** "(chopped)". */
-  String CHOPPED = " (" + lang("chopped") + ")";
+  String CHOPPED = " (" + lang("chopped") + ')';
   /** "(% entries)". */
-  String ENTRIES = "(" + lang("entries_%") + ")";
+  String ENTRIES = '(' + lang("entries_%") + ')';
   /** "Directory". */
   String DIRECTORY = lang("directory");
   /** "Error". */
@@ -1129,7 +1129,7 @@ public interface Text {
   /** Interactions. */
   String GUI_INTERACTIONS = lang("gui_interactions");
   /** Look and feel. */
-  String JAVA_LF = lang("java_lf") + " (" + lang("requires_restart") + ")";
+  String JAVA_LF = lang("java_lf") + " (" + lang("requires_restart") + ')';
   /** Focus. */
   String RT_FOCUS = lang("rt_focus");
   /** Simple file dialog. */
@@ -1137,8 +1137,8 @@ public interface Text {
   /** Name display flag. */
   String SHOW_NAME_ATTS = lang("show_name_atts");
   /** Language preference. */
-  String LANGUAGE_RESTART = lang("language") +
-      " (" + lang("requires_restart") + ")";
+  String LANGUAGE_RESTART = lang("language") + " (" +
+      lang("requires_restart") + ')';
 
   /** Dialog title for inserting new data. */
   String INSERT_NEW_DATA = lang("insert_new_data");
@@ -1368,7 +1368,7 @@ public interface Text {
   /** Index update. */
   String H_INDEX_FORMAT = lang("h_index_format");
   /** Dialog title for opening a large database. */
-  String H_LARGE_DB = lang("h_large_db") + NL + " ";
+  String H_LARGE_DB = lang("h_large_db") + NL + ' ';
   /** Dialog for downloading a new version. */
   String H_NEW_VERSION = lang("h_new_version");
 

@@ -396,9 +396,9 @@ public class GFLWOR extends ParseExpr {
     final StringBuilder sb = new StringBuilder();
     for(int i = 0; i != fl.length; ++i)
       sb.append(i != 0 ? " " : "").append(fl[i]);
-    if(where != null) sb.append(" " + WHERE + " " + where);
+    if(where != null) sb.append(' ' + WHERE + ' ' + where);
     if(group != null) sb.append(group);
     if(order != null) sb.append(order);
-    return sb.append(" " + RETURN + " " + ret).toString();
+    return sb.append(' ' + RETURN + ' ' + ret).toString();
   }
 }

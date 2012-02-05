@@ -79,14 +79,14 @@ public final class InfoDB extends AInfo {
     if(index) {
       tb.add(NL).addExt(header, INDEXES);
       if(meta.oldindex) {
-        tb.add(" " + H_INDEX_FORMAT + NL);
+        tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
         format(tb, UP_TO_DATE, String.valueOf(meta.uptodate));
         format(tb, PATH_INDEX, Util.flag(meta.pathindex));
         format(tb, TEXT_INDEX, Util.flag(meta.textindex));
         format(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
         format(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex) +
-            (meta.ftxtindex && meta.wildcards ? " (" + WILDCARDS + ")" : ""));
+            (meta.ftxtindex && meta.wildcards ? " (" + WILDCARDS + ')' : ""));
       }
     }
     return tb.toString();

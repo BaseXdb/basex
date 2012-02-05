@@ -95,7 +95,7 @@ public abstract class Command extends Progress {
    * @param is input stream
    */
   public void setInput(final InputStream is) {
-    setInput(new InputSource(is));
+    in = new InputSource(is);
   }
 
   /**

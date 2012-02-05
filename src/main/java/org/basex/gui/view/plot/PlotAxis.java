@@ -236,7 +236,7 @@ final class PlotAxis {
    * @param d value
    * @return base e logarithm for d
    */
-  private double ln(final double d) {
+  private static double ln(final double d) {
     return d == 0 ? 0 : Math.log1p(Math.abs(d));
   }
 

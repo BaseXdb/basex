@@ -55,7 +55,7 @@ abstract class MainTest {
 
     final String result = run(args);
     if(!result.contains(exp)) {
-      fail("'" + exp + "' not contained in '" + result + "'.");
+      fail('\'' + exp + "' not contained in '" + result + "'.");
     }
   }
 }

@@ -101,7 +101,7 @@ public final class PoolTest {
    * @param pin expected number of pins
    * @param name name of database
    */
-  private void pins(final int pin, final String name) {
+  private static void pins(final int pin, final String name) {
     assertEquals(pin, server.context.datas.pins(name));
   }
 
@@ -110,7 +110,7 @@ public final class PoolTest {
    * @param cmd command reference
    * @param session Session
    */
-  void ok(final Command cmd, final Session session) {
+  static void ok(final Command cmd, final Session session) {
     try {
       session.execute(cmd);
     } catch(final IOException ex) {
@@ -123,7 +123,7 @@ public final class PoolTest {
    * @param cmd command reference
    * @param session Session
    */
-  private void no(final Command cmd, final Session session) {
+  private static void no(final Command cmd, final Session session) {
     try {
       session.execute(cmd);
       fail("Command was supposed to fail.");

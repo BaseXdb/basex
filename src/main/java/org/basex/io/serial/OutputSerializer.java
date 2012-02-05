@@ -369,11 +369,11 @@ public abstract class OutputSerializer extends Serializer {
     if(dt == null) print(M_HTML);
     else print(dt);
     if(docpub != null) {
-      print(" " + PUBLIC + " \"" + docpub + "\"");
+      print(' ' + PUBLIC + " \"" + docpub + '"');
     } else {
-      print(" " + SYSTEM);
+      print(' ' + SYSTEM);
     }
-    print(" \"" + docsys + "\"");
+    print(" \"" + docsys + '"');
     print(ELEM_C);
     print(nl);
     docsys = null;

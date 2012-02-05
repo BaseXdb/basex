@@ -230,7 +230,7 @@ final class JSONParser extends InputParser {
    * @throws QueryException query exception
    */
   private void wsCheck(final char ch) throws QueryException {
-    if(!wsConsume(ch)) error(INVALEXP, curr(), "\"" + ch + "\"");
+    if(!wsConsume(ch)) error(INVALEXP, curr(), "\"" + ch + '"');
   }
 
   /**
@@ -240,7 +240,7 @@ final class JSONParser extends InputParser {
    * @throws QueryException query exception
    */
   private void check(final char ch) throws QueryException {
-    if(!consume(ch)) error(INVALEXP, curr(), "\"" + ch + "\"");
+    if(!consume(ch)) error(INVALEXP, curr(), "\"" + ch + '"');
   }
 
   /**

@@ -60,8 +60,8 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append((ex ? "-" : "+") + "[" + q + ": ");
-    sb.append(s == e ? "" + s : s + "-" + e);
-    return sb.append("]").toString();
+    sb.append((ex ? "-" : "+") + '[' + q + ": ");
+    sb.append(s == e ? String.valueOf(s) : s + "-" + e);
+    return sb.append(']').toString();
   }
 }

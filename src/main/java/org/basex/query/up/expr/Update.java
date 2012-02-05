@@ -41,7 +41,7 @@ abstract class Update extends Arr {
    * @return specified node list
    */
   final NodeCache checkNS(final NodeCache list, final ANode targ,
-                          final QueryContext ctx) throws QueryException {
+      final QueryContext ctx) throws QueryException {
 
     for(int a = 0; a < list.size(); ++a) {
       final QNm name = list.get(a).qname();

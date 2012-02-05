@@ -278,7 +278,7 @@ public class ClientSession extends Session {
    * @return value of check
    * @throws IOException I/O exception
    */
-  boolean ok(final BufferInput bi) throws IOException {
+  static boolean ok(final BufferInput bi) throws IOException {
     return bi.read() == 0;
   }
 
@@ -302,7 +302,9 @@ public class ClientSession extends Session {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  void receive(final BufferInput bi, final OutputStream os) throws IOException {
+  static void receive(final BufferInput bi, final OutputStream os)
+      throws IOException {
+
     final DecodingInput di = new DecodingInput(bi);
     for(int b; (b = di.read()) != -1;) os.write(b);
   }

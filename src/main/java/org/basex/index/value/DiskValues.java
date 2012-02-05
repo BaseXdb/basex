@@ -206,7 +206,7 @@ public class DiskValues implements Index {
    * @param ids id list
    * @return iterator
    */
-  IndexIterator iter(final IntList ids) {
+  static IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
       final int s = ids.size();
       int p = -1;

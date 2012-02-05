@@ -98,7 +98,7 @@ public final class NameTest extends Test {
     if(test == Name.ALL) return "*";
     if(test == Name.NAME) return "*:" + string(name.string());
     final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
-      "{" + string(name.uri()) + "}";
+            '{' + string(name.uri()) + '}';
     return uri + (test == Name.NS ? "*" : string(name.string()));
   }
 }

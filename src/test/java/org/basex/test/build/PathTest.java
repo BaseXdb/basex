@@ -27,9 +27,9 @@ public final class PathTest {
   /** Test database name. */
   private static final String INPUT = Util.name(PathTest.class);
   /** Test database name. */
-  private static final String WEEK1 = Util.name(PathTest.class) + "2";
+  private static final String WEEK1 = Util.name(PathTest.class) + '2';
   /** Test database name. */
-  private static final String WEEK2 = Util.name(PathTest.class) + "3";
+  private static final String WEEK2 = Util.name(PathTest.class) + '3';
   /** Test file. */
   private static final String INPUTF = "src/test/resources/input.xml";
   /** Test file. */
@@ -112,7 +112,7 @@ public final class PathTest {
   /** Checks the results of the queries with the db week.
    * @throws Exception exception
    */
-  void weekTest() throws Exception {
+  static void weekTest() throws Exception {
     final String count = "count(collection('" + WEEK1 +
       "/week/monday')/root/monday/text[text() = 'text'])";
     final QueryProcessor qp = new QueryProcessor(count, CONTEXT);
@@ -129,7 +129,7 @@ public final class PathTest {
   /** Checks the results of the queries with the db week.
    * @throws Exception exception
    */
-  void weekTest2() throws Exception {
+  static void weekTest2() throws Exception {
     final String count = "count(collection('" + WEEK1 +
       "/week/monday')/root/monday/text[text() = 'text'])," +
       " count(collection('" + WEEK2 +

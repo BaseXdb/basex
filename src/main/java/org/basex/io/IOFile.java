@@ -305,7 +305,9 @@ public final class IOFile extends IO {
    * @param files file list
    * @param off string length of root path
    */
-  private void add(final IOFile io, final StringList files, final int off) {
+  private static void add(final IOFile io, final StringList files,
+      final int off) {
+
     if(io.isDir()) {
       for(final IOFile f : io.children()) add(f, files, off);
     } else {

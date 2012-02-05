@@ -377,6 +377,6 @@ public final class CmpG extends Cmp {
 
   @Override
   public String toString() {
-    return toString(" " + op + " ");
+    return toString(" " + op + ' ');
   }
 }

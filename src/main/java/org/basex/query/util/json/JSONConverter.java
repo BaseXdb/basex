@@ -180,7 +180,7 @@ public final class JSONConverter {
    * @param name name
    * @return converted name
    */
-  private byte[] convert(final byte[] name) {
+  private static byte[] convert(final byte[] name) {
     // convert name to valid XML representation
     final TokenBuilder tb = new TokenBuilder();
     for(int n = 0; n < name.length; n += cl(name, n)) {

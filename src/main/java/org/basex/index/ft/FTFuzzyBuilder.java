@@ -126,7 +126,7 @@ final class FTFuzzyBuilder extends FTBuilder {
    * @param lp last offset
    * @throws IOException I/O exception
    */
-  private void writeInd(final DataOutput outX, final IntList il,
+  private static void writeInd(final DataOutput outX, final IntList il,
       final int ls, final int lp) throws IOException {
 
     final int is = il.size();

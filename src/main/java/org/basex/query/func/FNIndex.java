@@ -248,7 +248,7 @@ public final class FNIndex extends StandardFunc {
    * @param stats statistics
    * @param elem element
    */
-  private void stats(final Stats stats, final FElem elem) {
+  private static void stats(final Stats stats, final FElem elem) {
     final String k = stats.type.toString().toLowerCase(Locale.ENGLISH);
     elem.add(new FAttr(Q_TYPE, token(k)));
     elem.add(new FAttr(Q_COUNT, token(stats.count)));

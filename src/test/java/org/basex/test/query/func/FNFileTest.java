@@ -26,7 +26,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   /** Test path. */
   private static final String PATH1 = Prop.TMP + NAME;
   /** Test path. */
-  private static final String PATH2 = Prop.TMP + NAME + "2";
+  private static final String PATH2 = Prop.TMP + NAME + '2';
   /** Test path. */
   private static final String PATH3 = Prop.TMP + NAME + "/x";
   /** Test path. */

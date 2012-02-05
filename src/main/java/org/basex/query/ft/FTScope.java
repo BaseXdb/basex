@@ -72,6 +72,6 @@ public final class FTScope extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + (same ? SAME : DIFFERENT) + " " + unit;
+    return super.toString() + (same ? SAME : DIFFERENT) + ' ' + unit;
   }
 }

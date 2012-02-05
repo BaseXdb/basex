@@ -157,7 +157,7 @@ public final class DialogProps extends Dialog {
   private BaseXBack addIndex(final boolean elem, final Data data) {
     final BaseXBack p = new BaseXBack(new BorderLayout());
     String lbl = elem ? ELEMENTS : ATTRIBUTES;
-    if(!data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ")";
+    if(!data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ')';
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
     final IndexType index = elem ? IndexType.TAG : IndexType.ATTNAME;
     p.add(text(data.info(index)), BorderLayout.CENTER);

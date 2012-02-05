@@ -131,7 +131,7 @@ public final class SAXWrapper extends SingleParser {
       // occurs, e.g. if document encoding is invalid:
       // prefix message with source id
       String msg = ex.getMessage();
-      if(in != null) msg = "\"" + in + '"' + COLS + msg;
+      if(in != null) msg = '"' + in + '"' + COLS + msg;
       // wrap and return original message
       final IOException ioe = new IOException(msg);
       ioe.setStackTrace(ex.getStackTrace());

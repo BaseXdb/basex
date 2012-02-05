@@ -402,7 +402,7 @@ public final class TableDiskAccess extends TableAccess {
         np = m == last ? meta.size : fpres[m + 1];
       }
       if(l > h) Util.notexpected("Data Access out of bounds [pre:" + pre +
-          ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
+          ", indexSize:" + blocks + ", access:" + l + " > " + h + ']');
 
       readIndex(m);
     }

@@ -191,7 +191,7 @@ public final class FNSql extends StandardFunc {
    * @param options options
    * @return connection properties
    */
-  private Properties connProps(final TokenObjMap<Object> options) {
+  private static Properties connProps(final TokenObjMap<Object> options) {
     final Properties props = new Properties();
     for(final byte[] next : options.keys()) {
       if(next != null) props.setProperty(string(next),
@@ -287,7 +287,7 @@ public final class FNSql extends StandardFunc {
    * @param params element <sql:parameter/>
    * @return number of parameters
    */
-  private long countParams(final ANode params) {
+  private static long countParams(final ANode params) {
     final AxisIter ch = params.children();
     long c = ch.size();
     if(c == -1) do

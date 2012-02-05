@@ -224,6 +224,6 @@ final class NSNode {
 
   @Override
   public String toString() {
-    return "Pre[" + pre + "]";
+    return "Pre[" + pre + ']';
   }
 }

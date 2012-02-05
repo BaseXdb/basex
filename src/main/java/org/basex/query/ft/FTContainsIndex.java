@@ -75,6 +75,6 @@ final class FTContainsIndex extends FTContains {
 
   @Override
   public String toString() {
-    return expr + " " + CONTAINS + " " + TEXT + " " + ftexpr;
+    return expr + " " + CONTAINS + ' ' + TEXT + ' ' + ftexpr;
   }
 }

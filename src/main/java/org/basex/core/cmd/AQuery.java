@@ -219,8 +219,8 @@ abstract class AQuery extends Command {
     info(EVALUATING_CC + Performance.getTimer(eval, runs));
     info(PRINTING_CC + Performance.getTimer(prnt, runs));
     info(TOTAL_TIME_CC + Performance.getTimer(total, runs) + NL);
-    info(HITS_X_CC + hits + " " + (hits == 1 ? ITEM : ITEMS));
-    info(UPDATED_CC + updates + " " + (updates == 1 ? ITEM : ITEMS));
+    info(HITS_X_CC + hits + ' ' + (hits == 1 ? ITEM : ITEMS));
+    info(UPDATED_CC + updates + ' ' + (updates == 1 ? ITEM : ITEMS));
     info(PRINTED_CC + Performance.format(out.size()));
   }
 

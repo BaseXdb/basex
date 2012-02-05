@@ -174,8 +174,8 @@ public final class DialogExport extends Dialog {
     super.close();
     final boolean indent = format.isSelected();
     gui.set(Prop.EXPORTER,
-        SerializerProp.S_INDENT[0] + "=" + (indent ? YES : NO) + "," +
-        SerializerProp.S_ENCODING[0] + "=" + encoding.getSelectedItem() + "," +
-        SerializerProp.S_OMIT_XML_DECLARATION[0] + "=" + NO);
+        SerializerProp.S_INDENT[0] + "=" + (indent ? YES : NO) + ',' +
+        SerializerProp.S_ENCODING[0] + '=' + encoding.getSelectedItem() + ',' +
+        SerializerProp.S_OMIT_XML_DECLARATION[0] + '=' + NO);
   }
 }

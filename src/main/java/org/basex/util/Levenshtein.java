@@ -84,7 +84,7 @@ public final class Levenshtein {
    * @param c 3rd value
    * @return minimum
    */
-  private int m(final int a, final int b, final int c) {
+  private static int m(final int a, final int b, final int c) {
     final int d = a < b ? a : b;
     return d < c ? d : c;
   }
@@ -95,7 +95,7 @@ public final class Levenshtein {
    * @param sb second token to be compared
    * @return true if the arrays are equal
    */
-  private boolean same(final byte[] tk, final byte[] sb) {
+  private static boolean same(final byte[] tk, final byte[] sb) {
     int t = 0, s = 0;
     for(; t < tk.length && s < sb.length; t += cl(tk, t), s += cl(sb, s)) {
       if(lc(norm(cp(tk, t))) != lc(norm(cp(sb, t)))) return false;

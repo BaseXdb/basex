@@ -334,7 +334,7 @@ public enum Calc {
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  final void checkRange(final InputInfo ii, final double d)
+  static final void checkRange(final InputInfo ii, final double d)
       throws QueryException {
     if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) RANGE.thrw(ii, d);
   }
@@ -344,7 +344,7 @@ public enum Calc {
    * @return string
    */
   final String info() {
-    return "'" + name + "' operator";
+    return '\'' + name + "' operator";
   }
 
   @Override

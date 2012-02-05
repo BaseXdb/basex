@@ -169,7 +169,7 @@ public final class InfoView extends View {
     if(!ok || !q) {
       text.bold();
       if(q) {
-        add(QUERY_C + " ", cmd.toString().replaceAll("^.*? ", "").trim());
+        add(QUERY_C + ' ', cmd.toString().replaceAll("^.*? ", "").trim());
       } else if(cmd != null) {
         text.bold().add(COMMAND + COLS).norm().addExt(cmd).nline();
       }
@@ -183,7 +183,7 @@ public final class InfoView extends View {
     } else if(sl.size() != 0) {
       text.reset();
       add(EVALUATING_C, eval);
-      add(QUERY_C + " ", qu);
+      add(QUERY_C + ' ', qu);
       add(COMPILING_C, comp);
       if(comp.size() != 0) add(RESULT_C, res);
       add(TIMING_C, sl);
@@ -217,7 +217,7 @@ public final class InfoView extends View {
     final int is = list.size();
     for(int i = 0; i < is; ++i) {
       String line = list.get(i);
-      if(list == strings) line = " " + QUERYSEP + line + ":  " +
+      if(list == strings) line = ' ' + QUERYSEP + line + ":  " +
         Performance.getTimer(stat.get(i) * 10000L * runs, runs);
       text.add(line).nline();
     }

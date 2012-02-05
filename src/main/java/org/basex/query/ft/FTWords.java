@@ -479,7 +479,7 @@ public final class FTWords extends FTExpr {
     }
 
     if(occ != null) {
-      sb.append(OCCURS + " " + occ[0] + " " + TO + " " + occ[1] + " " + TIMES);
+      sb.append(OCCURS + ' ' + occ[0] + ' ' + TO + ' ' + occ[1] + ' ' + TIMES);
     }
     return sb.toString();
   }

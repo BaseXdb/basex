@@ -143,7 +143,7 @@ final class TreeRects implements TreeConstants {
    * @param rn root number
    * @param lv level
    * @param ix index
-   * @return TreeRect rectanlge
+   * @return tree rectangle
    */
   TreeRect getTreeRectPerIndex(final int rn, final int lv, final int ix) {
     return rects[rn][lv][ix];
@@ -156,7 +156,7 @@ final class TreeRects implements TreeConstants {
    * @param pre pre
    * @return text
    */
-  byte[] getText(final Context c, final int rn, final int pre) {
+  static byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data();
     if(pre == c.current().list[rn]) return ViewData.path(d, pre);
     return ViewData.content(d, pre, false);
@@ -168,7 +168,7 @@ final class TreeRects implements TreeConstants {
    * @param b byte array
    * @return optimal rectangle width
    */
-  private int calcOptimalRectWidth(final Graphics g, final byte[] b) {
+  private static int calcOptimalRectWidth(final Graphics g, final byte[] b) {
     return BaseXLayout.width(g, b);
   }
 

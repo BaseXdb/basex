@@ -188,8 +188,9 @@ public final class UpdateTestTags extends UpdateTest {
    * @param name tag name
    * @param kind node kind
    */
-  private void insertTag(final int par, final int pos,
+  private static void insertTag(final int par, final int pos,
       final byte[] name, final int kind) {
+
     int root;
     final Data data = CONTEXT.data();
     if(pos == 0) {

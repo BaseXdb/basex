@@ -87,8 +87,8 @@ public final class OrderByExpr extends OrderBy {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(expr.toString());
-    if(desc) sb.append(" " + DESCENDING);
-    if(!lst) sb.append(" " + EMPTYORD + " " + GREATEST);
+    if(desc) sb.append(' ' + DESCENDING);
+    if(!lst) sb.append(' ' + EMPTYORD + ' ' + GREATEST);
     return sb.toString();
   }
 }

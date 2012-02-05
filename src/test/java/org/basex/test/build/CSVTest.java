@@ -120,7 +120,7 @@ public final class CSVTest {
    * @param data data to write
    * @throws IOException I/O exception
    */
-  private void write(final String data) throws IOException {
+  private static void write(final String data) throws IOException {
     new IOFile(Prop.TMP, NAME).write(token(data));
   }
 }

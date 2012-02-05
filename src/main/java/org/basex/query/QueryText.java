@@ -601,7 +601,7 @@ public interface QueryText {
   /** Example for a Time format. */
   String XTIME = "23:59:59";
   /** Example for a DateTime format. */
-  String XDTM = XDATE + "T" + XTIME;
+  String XDTM = XDATE + 'T' + XTIME;
   /** Example for a DayTimeDuration format. */
   String XDTD = "P23DT12M34S";
   /** Example for a YearMonthDuration format. */

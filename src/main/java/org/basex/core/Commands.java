@@ -83,7 +83,7 @@ public interface Commands {
       if(help == null) return;
 
       sb.append("===" + this + "===" + NL + NL);
-      sb.append("'''<code>" + this + " " + help[0] + "</code>'''" + NL + NL);
+      sb.append("'''<code>" + this + ' ' + help[0] + "</code>'''" + NL + NL);
 
       for(String s : help[2].split(NL)) {
         if(s.startsWith("- ")) {

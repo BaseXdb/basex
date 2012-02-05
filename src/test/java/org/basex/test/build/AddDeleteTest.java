@@ -241,7 +241,7 @@ public final class AddDeleteTest {
    * Returns the number of documents in the current database.
    * @return number of documents
    */
-  private int docs() {
+  private static int docs() {
     return CONTEXT.data().resources.docs("").size();
   }
 }

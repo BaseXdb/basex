@@ -597,7 +597,7 @@ public class BaseXEditor extends BaseXPanel {
 
     if(ENTER.is(e)) {
       // adopt indentation from previous line
-      final StringBuilder sb = new StringBuilder().append(e.getKeyChar());
+      final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
       int s = 0, t = 0;
       for(int p = text.pos() - 1; p >= 0; p--) {
         final byte b = text.text[p];
@@ -724,7 +724,7 @@ public class BaseXEditor extends BaseXPanel {
    * Returns the clipboard text.
    * @return text
    */
-  final String clip() {
+  static final String clip() {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable tr = clip.getContents(null);
@@ -787,7 +787,7 @@ public class BaseXEditor extends BaseXPanel {
   };
 
   /** Text command. */
-  abstract class TextCmd implements GUICommand {
+  abstract static class TextCmd implements GUICommand {
     @Override
     public boolean checked() {
       return false;

@@ -323,7 +323,7 @@ final class DialogUser extends BaseXBack {
    * @param n number
    * @return String
    */
-  private String numberof(final String w, final int n) {
+  private static String numberof(final String w, final int n) {
     return "(" + n + " " + w + ")";
   }
 

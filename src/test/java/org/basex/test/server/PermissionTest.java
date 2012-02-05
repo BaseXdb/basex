@@ -64,7 +64,7 @@ public final class PermissionTest {
   /** Name of test database and user. */
   private static final String NAME = Util.name(PermissionTest.class);
   /** Name of the database to be renamed. */
-  private static final String RENAMED = Util.name(PermissionTest.class) + "r";
+  private static final String RENAMED = Util.name(PermissionTest.class) + 'r';
   /** Test repository. **/
   private static final String REPO = "src/test/resources/repo/";
 
@@ -135,7 +135,7 @@ public final class PermissionTest {
     no(new XQuery("for $item in doc('" + NAME + "')//xml " +
       "return rename node $item as 'null'"), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
-    no(new Rename(RENAMED, RENAMED + "2"), testSession);
+    no(new Rename(RENAMED, RENAMED + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -175,7 +175,7 @@ public final class PermissionTest {
     no(new Optimize(), testSession);
     no(new CreateDB(NAME, "<xml/>"), testSession);
     no(new Replace(RENAMED, "<xml />"), testSession);
-    no(new Rename(RENAMED, RENAMED + "2"), testSession);
+    no(new Rename(RENAMED, RENAMED + '2'), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB(NAME), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -196,8 +196,8 @@ public final class PermissionTest {
   public void writePermsNeeded() {
     ok(new Grant("write", NAME), adminSession);
     ok(new Open(RENAMED), testSession);
-    ok(new Rename(RENAMED, RENAMED + "2"), testSession);
-    ok(new Rename(RENAMED + "2", RENAMED), testSession);
+    ok(new Rename(RENAMED, RENAMED + '2'), testSession);
+    ok(new Rename(RENAMED + '2', RENAMED), testSession);
 
     // replace Test
     ok(new Close(), testSession);

@@ -49,7 +49,7 @@ public abstract class AdvancedQueryTest {
     final String exp = result.toString();
     if(!res.equals(exp))
       fail("Wrong result:\n[Q] " + query + "\n[E] \u00bb" + result +
-          "\u00ab\n[F] \u00bb" + res + "\u00ab");
+          "\u00ab\n[F] \u00bb" + res + '\u00ab');
   }
 
   /**
@@ -92,7 +92,7 @@ public abstract class AdvancedQueryTest {
     final byte[] msg = Token.token(ex.getMessage());
     boolean found = false;
     for(final Err e : error) found |= Token.contains(msg, e.qname().string());
-    if(!found) fail("'" + Token.string(error[0].qname().string()) +
+    if(!found) fail('\'' + Token.string(error[0].qname().string()) +
         "' not contained in '" + Token.string(msg) + "'.");
   }
 
@@ -102,21 +102,21 @@ public abstract class AdvancedQueryTest {
    * @param def function definition
    * types are supported.
    */
-  protected void check(final Function def) {
+  protected static void check(final Function def) {
     final String desc = def.toString();
     final String name = desc.replaceAll("\\(.*", "");
 
     // test too few, too many, and wrong argument types
     for(int al = Math.max(def.min - 1, 0); al <= def.max + 1; al++) {
       final boolean in = al >= def.min && al <= def.max;
-      final StringBuilder qu = new StringBuilder(name + "(");
+      final StringBuilder qu = new StringBuilder(name + '(');
       int any = 0;
       for(int a = 0; a < al; a++) {
         if(a != 0) qu.append(", ");
         if(in) {
           // test arguments
           if(def.args[a].type == AtomType.STR) {
-            qu.append("1");
+            qu.append('1');
           } else { // any type (skip test)
             qu.append("'X'");
             if(SeqType.STR.instance(def.args[a])) any++;
@@ -128,7 +128,7 @@ public abstract class AdvancedQueryTest {
       }
       // skip test if all types are arbitrary
       if((def.min > 0 || al != 0) && (any == 0 || any != al)) {
-        final String query = qu.append(")").toString();
+        final String query = qu.append(')').toString();
         if(in) error(query, Err.XPTYPE, Err.NODBCTX, Err.NODB);
         else error(query, Err.XPARGS);
       }

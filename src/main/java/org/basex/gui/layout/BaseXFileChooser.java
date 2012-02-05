@@ -70,7 +70,7 @@ public final class BaseXFileChooser {
       fc.addChoosableFileFilter(new Filter(suf, dsc));
       fc.setFileFilter(ff);
     } else {
-      fd.setFile("*" + suf[0]);
+      fd.setFile('*' + suf[0]);
     }
     // treat first filter as default
     if(suffix == null) suffix = suf[0];
@@ -93,7 +93,7 @@ public final class BaseXFileChooser {
 
       final String dir = fd.getDirectory();
       return new IOFile(mode == Mode.DOPEN || mode == Mode.DSAVE ? dir :
-        dir + "/" + fd.getFile());
+        dir + '/' + fd.getFile());
     }
 
     int state = 0;
@@ -162,7 +162,7 @@ public final class BaseXFileChooser {
         if(sb.length() != 0) sb.append(", ");
         sb.append('*').append(s);
       }
-      return desc + " (" + sb + ")";
+      return desc + " (" + sb + ')';
     }
   }
 }

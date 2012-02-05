@@ -134,7 +134,7 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  final AxisMoreIter iter(final NodeCache iter) {
+  static final AxisMoreIter iter(final NodeCache iter) {
     return new AxisMoreIter() {
       /** Child counter. */ int c;
       @Override

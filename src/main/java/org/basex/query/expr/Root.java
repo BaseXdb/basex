@@ -45,7 +45,7 @@ public final class Root extends Simple {
    * @param v input node
    * @return root node
    */
-  public ANode root(final Value v) {
+  public static ANode root(final Value v) {
     if(!v.type.isNode()) return null;
     ANode n = (ANode) v;
     while(true) {

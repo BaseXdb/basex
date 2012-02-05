@@ -163,7 +163,7 @@ public final class PkgParser {
    * @param node root node
    * @return child element iterator
    */
-  private AxisIter childElements(final ANode node) {
+  private static AxisIter childElements(final ANode node) {
     return new AxisIter() {
       /** Child iterator. */
       final AxisIter ch = node.children();

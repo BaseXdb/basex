@@ -119,6 +119,6 @@ public final class CmpN extends Arr {
 
   @Override
   public String toString() {
-    return toString(" " + op + " ");
+    return toString(" " + op + ' ');
   }
 }

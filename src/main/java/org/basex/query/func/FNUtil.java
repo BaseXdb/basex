@@ -109,7 +109,7 @@ public final class FNUtil extends StandardFunc {
    * @return resulting value
    * @throws QueryException query exception
    */
-  private Value eval(final QueryContext ctx, final byte[] qu)
+  private static Value eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
 
     final QueryContext qc = new QueryContext(ctx.context);
@@ -186,7 +186,7 @@ public final class FNUtil extends StandardFunc {
    * @param min initial memory usage
    * @param ctx query context
    */
-  void dump(final long min, final QueryContext ctx) {
+  static void dump(final long min, final QueryContext ctx) {
     Performance.gc(2);
     final long max = Performance.mem();
     final long mb = Math.max(0, max - min);
@@ -235,7 +235,7 @@ public final class FNUtil extends StandardFunc {
    * @param shift number of bits to use for one digit
    * @return string representation of the given number
    */
-  private Str toBaseFast(final long num, final int shift) {
+  private static Str toBaseFast(final long num, final int shift) {
     final byte[] bytes = new byte[(64 + shift - 1) / shift];
     final int mask = (1 << shift) - 1;
     long n = num;
@@ -418,7 +418,7 @@ public final class FNUtil extends StandardFunc {
    * Creates a random UUID.
    * @return random UUID
    */
-  private Str uuid() {
+  private static Str uuid() {
     return Str.get(UUID.randomUUID());
   }
 
@@ -454,7 +454,7 @@ public final class FNUtil extends StandardFunc {
    * @param ctx query context
    * @return filename
    */
-  private Str filename(final QueryContext ctx) {
+  private static Str filename(final QueryContext ctx) {
     final String fn = ctx.context.prop.get(Prop.QUERYPATH);
     return fn.isEmpty() ? null : Str.get(fn);
   }

@@ -265,7 +265,7 @@ public final class MetaData {
    * @param io current file
    * @return file length
    */
-  private long dbsize(final IOFile io) {
+  private static long dbsize(final IOFile io) {
     long s = 0;
     if(io.isDir()) {
       for(final IOFile f : io.children()) s += dbsize(f);
@@ -433,7 +433,7 @@ public final class MetaData {
    * @param v value
    * @return result
    */
-  private boolean toBool(final String v) {
+  private static boolean toBool(final String v) {
     return v.equals("1");
   }
 
@@ -468,7 +468,7 @@ public final class MetaData {
    * @param v value
    * @throws IOException I/O exception
    */
-  private void writeInfo(final DataOutput out, final String k,
+  private static void writeInfo(final DataOutput out, final String k,
       final String v) throws IOException {
     out.writeToken(token(k));
     out.writeToken(token(v));

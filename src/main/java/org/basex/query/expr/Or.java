@@ -99,6 +99,6 @@ public final class Or extends Logical {
 
   @Override
   public String toString() {
-    return toString(" " + OR + " ");
+    return toString(' ' + OR + ' ');
   }
 }

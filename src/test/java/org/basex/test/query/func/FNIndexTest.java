@@ -67,13 +67,13 @@ public final class FNIndexTest extends AdvancedQueryTest {
     check(_INDEX_TEXTS);
 
     String entries = _INDEX_TEXTS.args(DB);
-    query("count(" + entries + ")", 5);
+    query("count(" + entries + ')', 5);
     query("exists(" + entries + "/self::value)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count != 1", "false");
 
     entries = _INDEX_TEXTS.args(DB, "X");
-    query("count(" + entries + ")", 1);
+    query("count(" + entries + ')', 1);
   }
 
   /**
@@ -84,13 +84,13 @@ public final class FNIndexTest extends AdvancedQueryTest {
     check(_INDEX_ATTRIBUTES);
 
     String entries = _INDEX_ATTRIBUTES.args(DB);
-    query("count(" + entries + ")", 6);
+    query("count(" + entries + ')', 6);
     query("exists(" + entries + "/self::value)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count != 1", "false");
 
     entries = _INDEX_ATTRIBUTES.args(DB, "1");
-    query("count(" + entries + ")", 1);
+    query("count(" + entries + ')', 1);
   }
 
   /**
@@ -101,7 +101,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
     check(_INDEX_ELEMENT_NAMES);
 
     final String entries = _INDEX_ELEMENT_NAMES.args(DB);
-    query("count(" + entries + ")", 9);
+    query("count(" + entries + ')', 9);
     query("exists(" + entries + "/self::value)", "true");
   }
 
@@ -113,7 +113,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
     check(_INDEX_ATTRIBUTE_NAMES);
 
     final String entries = _INDEX_ATTRIBUTE_NAMES.args(DB);
-    query("count(" + entries + ")", 5);
+    query("count(" + entries + ')', 5);
     query("exists(" + entries + "/self::value)", "true");
   }
 }

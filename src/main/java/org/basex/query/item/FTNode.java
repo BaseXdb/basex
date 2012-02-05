@@ -56,6 +56,6 @@ public final class FTNode extends DBNode {
 
   @Override
   public String toString() {
-    return super.toString() + (all != null ? " (" + all.size + ")" : "");
+    return super.toString() + (all != null ? " (" + all.size + ')' : "");
   }
 }

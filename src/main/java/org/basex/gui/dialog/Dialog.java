@@ -186,7 +186,7 @@ public abstract class Dialog extends JDialog {
    * @param enabled enabled/disabled
    */
   static void enableOK(final JComponent panel, final String label,
-                       final boolean enabled) {
+      final boolean enabled) {
 
     for(final Component c : panel.getComponents()) {
       if(!(c instanceof JComponent)) {

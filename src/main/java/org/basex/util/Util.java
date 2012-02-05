@@ -204,7 +204,7 @@ public final class Util {
   public static void gc(final Performance perf) {
     if(!debug) return;
     Performance.gc(4);
-    errln(" " + perf + " (" + Performance.getMem() + ")");
+    errln(" " + perf + " (" + Performance.getMem() + ')');
   }
 
   /**

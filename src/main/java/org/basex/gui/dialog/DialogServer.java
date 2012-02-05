@@ -321,7 +321,7 @@ public final class DialogServer extends Dialog {
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
-        super.setTitle(S_SERVER_ADMIN + LI + loguser.getText() + "@" +
+        super.setTitle(S_SERVER_ADMIN + LI + loguser.getText() + '@' +
             host.getText() + COL + portc.getText());
         msg = Util.info(S_CONNECTED, host.getText(), portc.getText());
         refreshSess();

@@ -108,7 +108,7 @@ public final class StoreTest {
    * Tests if the size of the text store has not changed.
    * @param old old size
    */
-  private void check(final long old) {
+  private static void check(final long old) {
     assertEquals(old, CONTEXT.data().meta.dbfile(DataText.DATATXT).length());
   }
 }

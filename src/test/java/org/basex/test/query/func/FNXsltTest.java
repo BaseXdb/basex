@@ -39,7 +39,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
     final String doc = "<a/>";
     String style = wrap("<xsl:template match='/'><X/></xsl:template>");
     query(_UTIL_TRANSFORM.args(doc, style), "<X/>");
-    query(_UTIL_TRANSFORM.args(doc, "\"" + style + "\""), "<X/>");
+    query(_UTIL_TRANSFORM.args(doc, '"' + style + '"'), "<X/>");
 
     style = wrap("<xsl:param name='t'/><xsl:template match='/'>" +
       "<X><xsl:value-of select='$t'/></X></xsl:template>");

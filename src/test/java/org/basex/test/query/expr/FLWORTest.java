@@ -31,7 +31,7 @@ public final class FLWORTest {
    * @param query query
    * @param expected expected output
    */
-  private void query(final String query, final String expected) {
+  private static void query(final String query, final String expected) {
     try {
       final String result = new XQuery(query).execute(CONTEXT);
       // quotes are replaced by apostrophes to simplify comparison

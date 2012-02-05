@@ -82,7 +82,7 @@ class MyKeySelector extends KeySelector {
         if(ka.equalsIgnoreCase("DSA") && sa.equalsIgnoreCase(
                 "http://www.w3.org/2000/09/xmldsig#dsa-sha1") ||
                 ka.equalsIgnoreCase("RSA") && sa.equalsIgnoreCase(
-                        "http://www.w3.org/2000/09/xmldsig#rsa-sha1"))
+                    "http://www.w3.org/2000/09/xmldsig#rsa-sha1"))
           return new MyKeySelectorResult(pk);
       }
     }

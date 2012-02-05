@@ -52,7 +52,7 @@ public final class RenameNode extends ValueUpdate {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + targetNode() + ", " + name + "]";
+    return Util.name(this) + '[' + targetNode() + ", " + name + ']';
   }
 
   @Override

@@ -91,7 +91,7 @@ public final class FTOr extends FTExpr {
    * @param i1 first item
    * @param i2 second item
    */
-  void or(final FTNode i1, final FTNode i2) {
+  static void or(final FTNode i1, final FTNode i2) {
     final FTMatches all = new FTMatches(
         (byte) Math.max(i1.all.sTokenNum, i2.all.sTokenNum));
 

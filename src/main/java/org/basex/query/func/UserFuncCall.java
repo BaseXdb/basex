@@ -121,7 +121,7 @@ public abstract class UserFuncCall extends Arr {
    * @param vs variables to add
    * @return old stack size
    */
-  VarStack addArgs(final QueryContext ctx, final Var[] vs) {
+  static VarStack addArgs(final QueryContext ctx, final Var[] vs) {
     // move variables to stack
     final VarStack vl = ctx.vars.cache(vs.length);
     for(final Var v : vs) ctx.vars.add(v);

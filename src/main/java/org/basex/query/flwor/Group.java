@@ -104,7 +104,7 @@ public final class Group extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(" " + GROUP + " " + BY + " ").
+    return new TokenBuilder(' ' + GROUP + ' ' + BY + ' ').
       addSep(groupby, SEP).toString();
   }
 }

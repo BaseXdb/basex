@@ -95,7 +95,7 @@ public abstract class FTIndexIterator extends IndexIterator {
 
       @Override
       public String toString() {
-        return "(" + i1 + " | " + i2 + ")";
+        return "(" + i1 + " | " + i2 + ')';
       }
     };
   }
@@ -154,7 +154,7 @@ public abstract class FTIndexIterator extends IndexIterator {
 
       @Override
       public String toString() {
-        return "(" + i1 + " & " + i2 + ")";
+        return "(" + i1 + " & " + i2 + ')';
       }
     };
   }

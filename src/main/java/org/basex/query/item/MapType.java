@@ -60,6 +60,6 @@ public final class MapType extends FuncType {
   @Override
   public String toString() {
     return keyType == AtomType.AAT && ret.eq(SeqType.ITEM_ZM) ? "map(*)"
-        : "map(" + keyType + ", " + ret + ")";
+        : "map(" + keyType + ", " + ret + ')';
   }
 }

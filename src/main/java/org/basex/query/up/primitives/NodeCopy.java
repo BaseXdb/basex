@@ -116,6 +116,6 @@ public abstract class NodeCopy extends StructuralUpdate {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + targetNode() + ", " + size() + " ops]";
+    return Util.name(this) + '[' + targetNode() + ", " + size() + " ops]";
   }
 }

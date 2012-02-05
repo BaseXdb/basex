@@ -107,7 +107,7 @@ public final class FNDate extends StandardFunc {
    * @param it date
    * @return years
    */
-  private Item yea(final Item it) {
+  private static Item yea(final Item it) {
     return Int.get(it instanceof Dur ? ((Dur) it).yea() :
       ((Date) it).xc.getYear());
   }
@@ -117,7 +117,7 @@ public final class FNDate extends StandardFunc {
    * @param it date
    * @return months
    */
-  private Item mon(final Item it) {
+  private static Item mon(final Item it) {
     return Int.get(it instanceof Dur ? ((Dur) it).mon() :
       ((Date) it).xc.getMonth());
   }
@@ -127,7 +127,7 @@ public final class FNDate extends StandardFunc {
    * @param it date
    * @return days
    */
-  private Item day(final Item it) {
+  private static Item day(final Item it) {
     return Int.get(it instanceof Dur ? (int) ((Dur) it).day() :
       ((Date) it).xc.getDay());
   }
@@ -137,7 +137,7 @@ public final class FNDate extends StandardFunc {
    * @param it date
    * @return hours
    */
-  private Item hou(final Item it) {
+  private static Item hou(final Item it) {
     return Int.get(it instanceof Dur ? (int) ((Dur) it).hou() :
       ((Date) it).xc.getHour());
   }
@@ -147,7 +147,7 @@ public final class FNDate extends StandardFunc {
    * @param it date
    * @return minutes
    */
-  private Item min(final Item it) {
+  private static Item min(final Item it) {
     return Int.get(it instanceof Dur ? ((Dur) it).min() :
       ((Date) it).xc.getMinute());
   }
@@ -157,7 +157,7 @@ public final class FNDate extends StandardFunc {
    * @param it date
    * @return seconds
    */
-  private Item sec(final Item it) {
+  private static Item sec(final Item it) {
     if(it instanceof Dur) return Dec.get(((Dur) it).sec().doubleValue());
     final int s = ((Date) it).xc.getSecond();
     final BigDecimal d = ((Date) it).xc.getFractionalSecond();
@@ -169,7 +169,7 @@ public final class FNDate extends StandardFunc {
    * @param it input item
    * @return timezone
    */
-  private Item zon(final Item it) {
+  private static Item zon(final Item it) {
     final int z = ((Date) it).xc.getTimezone();
     return z == Item.UNDEF ? null : new DTd(z);
   }

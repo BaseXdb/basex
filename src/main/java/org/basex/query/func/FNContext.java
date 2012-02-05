@@ -102,17 +102,17 @@ public final class FNContext extends StandardFunc {
     final String zon = new SimpleDateFormat("Z").format(d);
     final String ymd = new SimpleDateFormat("yyyy-MM-dd").format(d);
     final String hms = new SimpleDateFormat("HH:mm:ss.S").format(d);
-    final String zone = zon.substring(0, 3) + ":" + zon.substring(3);
+    final String zone = zon.substring(0, 3) + ':' + zon.substring(3);
     ctx.date = new Dat(token(ymd + zone), input);
     ctx.time = new Tim(token(hms + zone), input);
-    ctx.dtm = new Dtm(token(ymd + "T" + hms + zone), input);
+    ctx.dtm = new Dtm(token(ymd + 'T' + hms + zone), input);
   }
 
   /**
    * Returns the current DateTime.
    * @return current date
    */
-  private Item implZone() {
+  private static Item implZone() {
     final Date d = Calendar.getInstance().getTime();
     final String zone = new SimpleDateFormat("Z").format(d);
     final byte[] z = token(zone);

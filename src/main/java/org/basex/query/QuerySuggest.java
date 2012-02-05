@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.Stack;
 
 import org.basex.data.Data;
-import org.basex.index.path.PathNode;
+import org.basex.index.path.*;
 import org.basex.query.path.Axis;
 import org.basex.query.path.Test;
 import org.basex.query.util.Err;
@@ -75,7 +75,7 @@ public final class QuerySuggest extends QueryParser {
   @Override
   protected void checkAxis(final Axis axis) {
     all = axis != Axis.CHILD && axis != Axis.DESC || !data.meta.pathindex ?
-      new ObjList<PathNode>() : data.paths.desc(curr, axis == Axis.DESC);
+      new ObjList<PathNode>() : PathSummary.desc(curr, axis == Axis.DESC);
     curr = all;
     show = true;
   }

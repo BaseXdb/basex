@@ -242,7 +242,7 @@ public class DialogResources extends BaseXBack {
   }
 
   /** GUI commands for popup menu. */
-  abstract class BaseCmd implements GUICommand {
+  abstract static class BaseCmd implements GUICommand {
     @Override
     public boolean checked() {
       return false;

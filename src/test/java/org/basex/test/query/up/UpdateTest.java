@@ -26,7 +26,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    * @param input input database string, if null, then use default.
    * @throws BaseXException database exception
    */
-  private void createDB(final String input) throws BaseXException {
+  private static void createDB(final String input) throws BaseXException {
     new CreateDB(DB, input == null ? DOC : input).execute(CONTEXT);
   }
 

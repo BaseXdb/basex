@@ -250,7 +250,7 @@ final class FTTrie extends FTIndex {
    * @param node current node entry
    * @return boolean leaf node or inner node
    */
-  private boolean more(final int[] node) {
+  private static boolean more(final int[] node) {
     return node[0] + 1 < node.length - 1;
   }
 
@@ -265,7 +265,7 @@ final class FTTrie extends FTIndex {
    * @param ins byte looking for
    * @return inserting position
    */
-  private int pos(final int[] cne, final byte ins) {
+  private static int pos(final int[] cne, final byte ins) {
     int i = cne[0] + 1;
     final int s = cne.length - 1;
     while(i < s && diff((byte) cne[i + 1], ins) < 0) i += 2;

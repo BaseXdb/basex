@@ -216,7 +216,7 @@ public final class Map extends FItem {
    * Collation of this map.
    * @return collation
    */
-  public Str collation() {
+  public static Str collation() {
     return Str.get(URLCOLL);
   }
 

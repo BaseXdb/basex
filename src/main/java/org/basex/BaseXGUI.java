@@ -104,7 +104,7 @@ public final class BaseXGUI {
    * Initializes the GUI.
    * @param prop gui properties
    */
-  void init(final GUIProp prop) {
+  static void init(final GUIProp prop) {
     try {
       // added to handle possible JDK 1.6 bug (thanks to Makoto Yui)
       UIManager.getInstalledLookAndFeels();

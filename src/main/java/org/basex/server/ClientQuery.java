@@ -70,7 +70,7 @@ public class ClientQuery extends Query {
     cs.sout.flush();
     final BufferInput bi = new BufferInput(cs.sin);
     cache(bi);
-    if(!cs.ok(bi)) throw new BaseXException(bi.readString());
+    if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
   }
 
   /**
@@ -89,8 +89,8 @@ public class ClientQuery extends Query {
     cs.send(arg);
     cs.sout.flush();
     final BufferInput bi = new BufferInput(cs.sin);
-    cs.receive(bi, os);
-    if(!cs.ok(bi)) throw new BaseXException(bi.readString());
+    ClientSession.receive(bi, os);
+    if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
     return os.toString();
   }
 }

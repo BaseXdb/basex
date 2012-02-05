@@ -130,7 +130,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @param ex exception
    * @throws SAXException SAX exception
    */
-  private void error(final IOException ex) throws SAXException {
+  private static void error(final IOException ex) throws SAXException {
     final SAXException ioe = new SAXException(ex.getMessage());
     ioe.setStackTrace(ex.getStackTrace());
     throw ioe;

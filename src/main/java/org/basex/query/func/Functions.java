@@ -111,7 +111,7 @@ public final class Functions extends TokenSet {
    * @param ln local name
    * @return full name
    */
-  private byte[] full(final byte[] uri, final byte[] ln) {
+  private static byte[] full(final byte[] uri, final byte[] ln) {
     return new TokenBuilder().add('{').add(uri).add('}').add(ln).finish();
   }
 

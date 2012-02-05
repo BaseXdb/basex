@@ -117,7 +117,7 @@ final class Branch extends TrieNode {
       while((used & 1 << j) == 0) j++;
       final int e = i == s - 1 ? 2 : 0;
       sb.append(ind).append(ENDS[e]).append(
-          String.format("%x", j)).append("\n");
+          String.format("%x", j)).append('\n');
       kids[j].toString(sb, ind + ENDS[e + 1]);
     }
     return sb;

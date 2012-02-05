@@ -153,6 +153,6 @@ public final class DBAdd extends InsertBase {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + docs.get(0) + "]";
+    return Util.name(this) + '[' + docs.get(0) + ']';
   }
 }

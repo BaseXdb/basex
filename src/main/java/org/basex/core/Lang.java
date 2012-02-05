@@ -60,7 +60,7 @@ public final class Lang {
       if(DISALLOW) throw new Error("Language file was accessed.");
       if(chk) check = new HashMap<String, Boolean>();
 
-      final String path = "/" + SUFFIX + "/" + lang + "." + SUFFIX;
+      final String path = '/' + SUFFIX + '/' + lang + '.' + SUFFIX;
       final InputStream is = Lang.class.getResourceAsStream(path);
       if(is == null) {
         Util.errln(path + " not found.");
@@ -72,7 +72,7 @@ public final class Lang {
           final String key = line.substring(0, i).trim();
           String val = line.substring(i + 1).trim();
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-          if(Util.langkeys) val = "[" + key + COLS + val + "]";
+          if(Util.langkeys) val = '[' + key + COLS + val + ']';
           if(TETXTS.get(key) == null) {
             TETXTS.put(key, val);
           } else if(chk) {
@@ -106,7 +106,7 @@ public final class Lang {
     if(val == null) {
       if(TETXTS.size() != 0) Util.errln("%." + SUFFIX + ": '%' missing",
           Util.language, key);
-      return "[" + key + "]";
+      return '[' + key + ']';
     }
     if(CHECK) check.remove(key);
     return val;
@@ -132,7 +132,7 @@ public final class Lang {
 
     try {
       // supported protocols: jar and file
-      final URL url = Lang.class.getResource("/" + SUFFIX);
+      final URL url = Lang.class.getResource('/' + SUFFIX);
       if(url.getProtocol().equals("jar")) {
         final JarURLConnection conn = (JarURLConnection) url.openConnection();
         final String pre = conn.getEntryName();
@@ -151,7 +151,7 @@ public final class Lang {
         }
       } else {
         for(final IO f : new IOFile(url.getFile()).children()) {
-          langs.add(f.name().replaceAll("." + SUFFIX, ""));
+          langs.add(f.name().replaceAll('.' + SUFFIX, ""));
           creds.add(credits(f.read()));
         }
       }

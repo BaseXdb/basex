@@ -70,7 +70,7 @@ public final class FTContent extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + (start || end ? AT + " " +
-        (start ? START : END) : ENTIRE + " " + CONTENT);
+    return super.toString() + (start || end ? AT + ' ' +
+        (start ? START : END) : ENTIRE + ' ' + CONTENT);
   }
 }

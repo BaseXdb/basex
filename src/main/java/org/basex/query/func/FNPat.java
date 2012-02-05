@@ -117,7 +117,7 @@ public final class FNPat extends StandardFunc {
    * @param g group number
    * @return next group number and position in string
    */
-  private int[] match(final Matcher m, final String str, final FElem par,
+  private static int[] match(final Matcher m, final String str, final FElem par,
       final int g) {
 
     final FElem nd = new FElem(g == 0 ? MATCH : MGROUP);
@@ -145,7 +145,7 @@ public final class FNPat extends StandardFunc {
    * @param text text
    * @param par root node
    */
-  private void nonmatch(final String text, final FElem par) {
+  private static void nonmatch(final String text, final FElem par) {
     final FElem sub = new FElem(NONMATCH);
     sub.add(new FTxt(token(text)));
     par.add(sub);

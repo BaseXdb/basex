@@ -71,7 +71,7 @@ public abstract class SessionTest {
     check("<db:results xmlns:db=\"ns\">" +
           "  <db:result>1</db:result>" +
           "</db:results>",
-          session.execute("xquery " + WRAPPER + "1"));
+          session.execute("xquery " + WRAPPER + '1'));
   }
 
   /** Runs an erroneous query command.
@@ -128,9 +128,9 @@ public abstract class SessionTest {
   public final void add() throws IOException {
     session.execute("create db " + DB);
     session.add(DB, new ArrayInput("<X/>"));
-    check("1", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
+    check("1", session.query("count(" + _DB_OPEN.args(DB) + ')').execute());
     for(int i = 0; i < 9; i++) session.add(DB, new ArrayInput("<X/>"));
-    check("10", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
+    check("10", session.query("count(" + _DB_OPEN.args(DB) + ')').execute());
   }
 
   /**
@@ -160,13 +160,13 @@ public abstract class SessionTest {
   @Test
   public final void replace() throws IOException {
     session.execute("create db " + DB);
-    check("0", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
+    check("0", session.query("count(" + _DB_OPEN.args(DB) + ')').execute());
     session.replace(DB, new ArrayInput("<X/>"));
-    check("1", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
-    session.replace(DB + "2", new ArrayInput("<X/>"));
-    check("2", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
-    session.replace(DB + "2", new ArrayInput("<X/>"));
-    check("2", session.query("count(" + _DB_OPEN.args(DB) + ")").execute());
+    check("1", session.query("count(" + _DB_OPEN.args(DB) + ')').execute());
+    session.replace(DB + '2', new ArrayInput("<X/>"));
+    check("2", session.query("count(" + _DB_OPEN.args(DB) + ')').execute());
+    session.replace(DB + '2', new ArrayInput("<X/>"));
+    check("2", session.query("count(" + _DB_OPEN.args(DB) + ')').execute());
   }
 
   /**
@@ -202,7 +202,7 @@ public abstract class SessionTest {
     check("", session.query(_DB_RETRIEVE.args(DB, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
     check("0001FF", session.query(
-        "xs:hexBinary(" + _DB_RETRIEVE.args(DB, "X") + ")").execute());
+        "xs:hexBinary(" + _DB_RETRIEVE.args(DB, "X") + ')').execute());
     session.execute("drop db " + DB);
   }
 

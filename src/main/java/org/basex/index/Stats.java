@@ -146,10 +146,10 @@ public final class Stats {
         sb.append(", " + cats.size() + " values");
         break;
       case DOUBLE:
-        sb.append(", numeric(" + min + " - " + max + ")");
+        sb.append(", numeric(" + min + " - " + max + ')');
         break;
       case INTEGER:
-        sb.append(", numeric(" + (int) min + " - " + (int) max + ")");
+        sb.append(", numeric(" + (int) min + " - " + (int) max + ')');
         break;
       case TEXT:
         sb.append(", strings");

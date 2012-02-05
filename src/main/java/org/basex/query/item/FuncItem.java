@@ -149,7 +149,7 @@ public final class FuncItem extends FItem {
     final StringBuilder sb = new StringBuilder(FUNCTION).append('(');
     for(final Var v : vars)
       sb.append(v).append(v == vars[vars.length - 1] ? "" : ", ");
-    return sb.append(")").append(ft.ret != null ? " as " + ft.ret :
+    return sb.append(')').append(ft.ret != null ? " as " + ft.ret :
       "").append(" { ").append(expr).append(" }").toString();
   }
 
@@ -172,7 +172,8 @@ public final class FuncItem extends FItem {
    * @return coerced function item
    */
   private static FuncItem coerce(final QueryContext ctx, final InputInfo ii,
-                                 final FuncItem fun, final FuncType t) {
+      final FuncItem fun, final FuncType t) {
+
     final Var[] vars = new Var[fun.vars.length];
     final Expr[] refs = new Expr[vars.length];
     for(int i = vars.length; i-- > 0;) {

@@ -187,7 +187,7 @@ public final class Updates {
    * @param trgID ID of fragment for which we calculate the pre value
    * @return pre value
    */
-  private int preSteps(final ANode node, final int trgID) {
+  private static int preSteps(final ANode node, final int trgID) {
     if(node.id == trgID)
       return 0;
 

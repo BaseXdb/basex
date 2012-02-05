@@ -455,7 +455,7 @@ public final class ClientListener extends Thread {
         // send {ID}0
         out.writeString(arg);
         // write log file
-        log.write(this, sc + "(" + arg + ")", query, OK, perf);
+        log.write(this, sc + "(" + arg + ')', query, OK, perf);
       } else {
         // find query process
         qp = queries.get(arg);
@@ -469,7 +469,7 @@ public final class ClientListener extends Thread {
           final String val = in.readString();
           final String typ = in.readString();
           qp.bind(key, val, typ);
-          log.write(this, sc + "(" + arg + ")", key, val, typ, OK, perf);
+          log.write(this, sc + "(" + arg + ')', key, val, typ, OK, perf);
         } else if(sc == ServerCmd.ITER) {
           qp.execute(true, out, true);
         } else if(sc == ServerCmd.EXEC) {
@@ -489,11 +489,11 @@ public final class ClientListener extends Thread {
       // send 0 as success flag
       out.write(0);
       // write log file (bind and execute have been logged before)
-      if(sc != ServerCmd.BIND) log.write(this, sc + "(" + arg + ")", OK, perf);
+      if(sc != ServerCmd.BIND) log.write(this, sc + "(" + arg + ')', OK, perf);
     } catch(final Exception ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
-      log.write(this, sc + "(" + arg + ")", ERROR_C + err);
+      log.write(this, sc + "(" + arg + ')', ERROR_C + err);
       queries.remove(arg);
     }
     if(err != null) {

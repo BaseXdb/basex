@@ -208,7 +208,7 @@ final class EditorArea extends BaseXEditor {
    * @param qu query to check
    * @return result of check
    */
-  private boolean module(final byte[] qu) {
+  private static boolean module(final byte[] qu) {
     return QueryProcessor.removeComments(string(qu), 20).startsWith(
         "module namespace ");
   }

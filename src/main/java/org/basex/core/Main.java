@@ -141,7 +141,7 @@ public abstract class Main {
    * Returns multiple lines from standard input.
    * @return list of strings
    */
-  final StringList inputs() {
+  static final StringList inputs() {
     final StringList sl = new StringList();
     // find end of input from interactive user input
     final Scanner scan = new Scanner(System.in).useDelimiter("\\z");

@@ -135,7 +135,7 @@ public final class TableMemAccess extends TableAccess {
    * @param i index
    * @return long value
    */
-  private long getLong(final byte[] v, final int i) {
+  private static long getLong(final byte[] v, final int i) {
     return (v[i] & 0xFFL) << 56 | (v[i + 1] & 0xFFL) << 48 |
        (v[i + 2] & 0xFFL) << 40 | (v[i + 3] & 0xFFL) << 32 |
        (v[i + 4] & 0xFFL) << 24 | (v[i + 5] & 0xFFL) << 16 |

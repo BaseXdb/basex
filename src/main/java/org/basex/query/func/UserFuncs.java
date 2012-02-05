@@ -126,7 +126,7 @@ public final class UserFuncs extends ExprInfo {
    * @return literal function expression
    * @throws QueryException query exception
    */
-  public FItem get(final QNm name, final long arity, final boolean dyn,
+  public static FItem get(final QNm name, final long arity, final boolean dyn,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final Expr[] args = new Expr[(int) arity];

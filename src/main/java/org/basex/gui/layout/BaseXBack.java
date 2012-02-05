@@ -130,7 +130,7 @@ public class BaseXBack extends JPanel {
    * Activates graphics anti-aliasing.
    * @param g graphics reference
    */
-  protected final void smooth(final Graphics g) {
+  protected static final void smooth(final Graphics g) {
     ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
   }

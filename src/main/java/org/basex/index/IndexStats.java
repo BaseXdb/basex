@@ -104,8 +104,8 @@ public final class IndexStats {
    * @param ocs occurrences
    * @param len text length
    */
-  private void print(final TokenBuilder tb, final byte[][] txt, final int[] ocs,
-      final int len) {
+  private static void print(final TokenBuilder tb, final byte[][] txt,
+      final int[] ocs, final int len) {
 
     for(int o = 0; o < ocs.length; ++o) {
       if(txt[o].length == 0) continue;

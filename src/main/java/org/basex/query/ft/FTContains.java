@@ -152,6 +152,6 @@ public class FTContains extends ParseExpr {
 
   @Override
   public String toString() {
-    return expr + " " + CONTAINS + " " + TEXT + " " + ftexpr;
+    return expr + " " + CONTAINS + ' ' + TEXT + ' ' + ftexpr;
   }
 }

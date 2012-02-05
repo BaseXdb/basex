@@ -66,7 +66,7 @@ public final class Arith extends Arr {
 
   @Override
   public String description() {
-    return "'" + calc.name + "' expression";
+    return '\'' + calc.name + "' expression";
   }
 
   @Override

@@ -110,7 +110,7 @@ public final class PkgValidator {
         break;
       }
       // extract version
-      final int i = Text.VERSION.indexOf(" ");
+      final int i = Text.VERSION.indexOf(' ');
       final String v = i == -1 ? Text.VERSION : Text.VERSION.substring(0, i);
       // check if current version is acceptable for the dependency
       supported = availVersion(d, new TokenSet(token(v))) != null;
@@ -125,8 +125,9 @@ public final class PkgValidator {
    *          for a package or current version of BaseX
    * @return available appropriate version
    */
-  private byte[] availVersion(final Dependency dep,
+  private static byte[] availVersion(final Dependency dep,
       final TokenSet currentVers) {
+
     if(currentVers.size() == 0) return null;
     if(dep.versions != null) {
       // get acceptable versions for secondary package/processor

@@ -217,7 +217,7 @@ public abstract class IO {
    */
   public final String dbname() {
     final String n = name();
-    final int i = n.lastIndexOf(".");
+    final int i = n.lastIndexOf('.');
     return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w-]", "");
   }
 

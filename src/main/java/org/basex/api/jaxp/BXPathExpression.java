@@ -89,7 +89,7 @@ final class BXPathExpression implements XPathExpression {
    * @return result
    * @throws XPathExpressionException xpath exception
    */
-  private Object finish(final Result item, final QName res)
+  private static Object finish(final Result item, final QName res)
       throws XPathExpressionException {
 
     final Nodes nodes = item instanceof Nodes ? (Nodes) item : null;

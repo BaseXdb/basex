@@ -132,7 +132,7 @@ final class QueryListener extends Progress {
       final TokenBuilder tb = new TokenBuilder();
       tb.addExt(HITS_X_CC + "% %" + NL, c, c == 1 ? ITEM : ITEMS);
       tb.addExt(UPDATED_CC + "% %" + NL, up, up == 1 ? ITEM : ITEMS);
-      tb.addExt(TOTAL_TIME_CC + "%", perf);
+      tb.addExt(TOTAL_TIME_CC + '%', perf);
       info = tb.toString();
 
     } catch(final QueryException ex) {

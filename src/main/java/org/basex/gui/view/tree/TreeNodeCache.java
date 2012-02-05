@@ -64,15 +64,15 @@ final class TreeNodeCache implements TreeConstants {
 
   /**
    * Saves node line in parentList.
-   * @param parentList array with nodes of the line before
+   * @param par array with nodes of the line before
    * @param data the data reference
    * @return IntList filled with nodes of the current line
    */
-  private IntList getNextNodeLine(final IntList parentList, final Data data) {
-    final int l = parentList.size();
+  private static IntList getNextNodeLine(final IntList par, final Data data) {
+    final int l = par.size();
     final IntList line = new IntList();
     for(int i = 0; i < l; ++i) {
-      final int p = parentList.get(i);
+      final int p = par.get(i);
       final ChildIterator iter = new ChildIterator(data, p);
       while(iter.more()) {
         final int pre = iter.next();

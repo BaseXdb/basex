@@ -184,7 +184,7 @@ public final class FNXslt extends StandardFunc {
    * @return transformed result
    * @throws Exception exception
    */
-  private byte[] transform(final IO in, final IO xsl,
+  private static byte[] transform(final IO in, final IO xsl,
       final TokenObjMap<Object> par) throws Exception {
 
     // create transformer

@@ -124,7 +124,7 @@ public final class DiskTableTest {
       assertEquals("Old entry " + (startByteNum >> IO.NODEPOWER)
           + " (byte " + startByteNum % (1 << IO.NODEPOWER)
           + ") and new entry " + (currentByteNum >> IO.NODEPOWER)
-          + " (byte " + currentByteNum % (1 << IO.NODEPOWER) + ")",
+          + " (byte " + currentByteNum % (1 << IO.NODEPOWER) + ')',
           startByte, currentByte);
     }
   }
@@ -359,7 +359,7 @@ public final class DiskTableTest {
    * @param e number of entries to create
    * @return byte array containing the number of entries (all bytes 5)
    */
-  private byte[] getTestEntries(final int e) {
+  private static byte[] getTestEntries(final int e) {
     final byte[] result = new byte[e << IO.NODEPOWER];
     for(int i = 0; i < result.length; ++i) result[i] = 5;
     return result;

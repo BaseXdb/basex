@@ -104,13 +104,13 @@ public final class FTDistance extends FTFilter {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, token(QueryText.DISTANCE),
-        token(dist[0] + "-" + dist[1] + " " + unit));
+        token(dist[0] + "-" + dist[1] + ' ' + unit));
     super.plan(ser);
   }
 
   @Override
   public String toString() {
     return super.toString() + QueryText.DISTANCE + PAR1 +
-      dist[0] + "-" + dist[1] + " " + unit + PAR2;
+      dist[0] + '-' + dist[1] + ' ' + unit + PAR2;
   }
 }

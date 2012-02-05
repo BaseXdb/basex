@@ -150,7 +150,7 @@ public final class CreateTest {
    * Returns the name of the database.
    * @return database name
    */
-  private String db() {
+  private static String db() {
     return CONTEXT.data().meta.name;
   }
 
@@ -158,7 +158,7 @@ public final class CreateTest {
    * Returns the name of the first document in the database.
    * @return first document name
    */
-  private String docName() {
+  private static String docName() {
     return Token.string(CONTEXT.data().text(CONTEXT.current().list[0], true));
   }
 }

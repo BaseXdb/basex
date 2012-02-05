@@ -98,7 +98,7 @@ final class MapList extends IntList {
     final StringBuilder sb = new StringBuilder(Util.name(this) + '[');
     for(int i = 0; i < size; ++i) {
       sb.append(i == 0 ? "" : ", ").append(list[i]);
-      if(weight != null) sb.append("/").append(weight[i]);
+      if(weight != null) sb.append('/').append(weight[i]);
     }
     return sb.append(']').toString();
   }

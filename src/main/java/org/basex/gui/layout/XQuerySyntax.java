@@ -46,7 +46,7 @@ public final class XQuerySyntax extends BaseXSyntax {
       }
       for(final Function f : Function.values()) {
         final String s = f.toString();
-        Collections.addAll(FUNC, s.substring(0, s.indexOf("(")).split("-"));
+        Collections.addAll(FUNC, s.substring(0, s.indexOf('(')).split("-"));
       }
     } catch(final Exception ex) {
       Util.stack(ex);

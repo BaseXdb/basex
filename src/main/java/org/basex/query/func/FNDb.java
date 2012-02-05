@@ -442,7 +442,7 @@ public final class FNDb extends StandardFunc {
    * @param ctx query context
    * @return node
    */
-  private ANode system(final QueryContext ctx) {
+  private static ANode system(final QueryContext ctx) {
     return toNode(Info.info(ctx.context), SYSTEM);
   }
 

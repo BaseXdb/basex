@@ -115,6 +115,6 @@ public final class FTWeight extends FTExpr {
 
   @Override
   public String toString() {
-    return expr[0] + " " + QueryText.WEIGHT + " " + weight;
+    return expr[0] + " " + QueryText.WEIGHT + ' ' + weight;
   }
 }

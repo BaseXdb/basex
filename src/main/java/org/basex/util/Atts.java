@@ -133,7 +133,7 @@ public final class Atts {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.name(this) + "[");
+    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(", ");
       tb.add(nm[i]).add("=\"").add(st[i]).add("\"");

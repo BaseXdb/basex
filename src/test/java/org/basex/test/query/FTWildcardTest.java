@@ -87,13 +87,13 @@ public class FTWildcardTest {
 
       final String[] good = TEXTS_GOOD[i];
       for(final String element : good) {
-        assertTrue("\"" + q + "\" did NOT match \"" + element + "\"",
+        assertTrue('"' + q + "\" did NOT match \"" + element + '"',
             wc.match(token(element)));
       }
 
       final String[] bad = TEXTS_BAD[i];
       for(final String element : bad) {
-        assertFalse("\"" + q + "\" matched \"" + element + "\"",
+        assertFalse('"' + q + "\" matched \"" + element + '"',
             wc.match(token(element)));
       }
     }

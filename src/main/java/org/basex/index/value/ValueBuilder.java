@@ -209,7 +209,7 @@ public final class ValueBuilder extends IndexBuilder {
    * @param il values
    * @throws IOException I/O exception
    */
-  private void write(final DataOutput outL, final DataOutput outR,
+  private static void write(final DataOutput outL, final DataOutput outR,
       final IntList il) throws IOException {
 
     // sort values before writing

@@ -84,11 +84,7 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
-import org.basex.query.func.DynamicFunc;
-import org.basex.query.func.InlineFunc;
-import org.basex.query.func.PartFunc;
-import org.basex.query.func.UserFunc;
-import org.basex.query.func.Variable;
+import org.basex.query.func.*;
 import org.basex.query.item.Atm;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Dbl;
@@ -1049,7 +1045,7 @@ public class QueryParser extends InputParser {
    * @param name name to be checked
    * @return result of check
    */
-  private boolean keyword(final QNm name) {
+  private static boolean keyword(final QNm name) {
     if(name.hasPrefix()) return false;
     final byte[] str = name.string();
     for(final byte[] key : KEYWORDS) if(eq(key, str)) return true;
@@ -2120,8 +2116,7 @@ public class QueryParser extends InputParser {
     if(name != null && consume('#')) {
       final long card = ((Int) numericLiteral(true)).itr(null);
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
-
-      return ctx.funcs.get(name, card, false, ctx, input());
+      return UserFuncs.get(name, card, false, ctx, input());
     }
 
     qp = pos;

@@ -107,6 +107,6 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + QueryText.WINDOW + " " + win + " " + unit;
+    return super.toString() + QueryText.WINDOW + ' ' + win + ' ' + unit;
   }
 }

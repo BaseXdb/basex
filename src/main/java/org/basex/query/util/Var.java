@@ -268,7 +268,7 @@ public final class Var extends ParseExpr {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
       tb.add(DOLLAR).add(name.string());
-      if(type != null) tb.add(" " + AS);
+      if(type != null) tb.add(' ' + AS);
     }
     if(type != null) tb.add(" " + type);
     return tb.toString();

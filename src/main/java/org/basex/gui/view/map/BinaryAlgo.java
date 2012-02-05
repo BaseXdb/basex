@@ -22,7 +22,7 @@ final class BinaryAlgo extends MapAlgo {
    * @param sumweight weight of this recursion level
    * @return rectangles
    */
-  private MapRects calcMap(final MapRect r, final MapList ml,
+  private static MapRects calcMap(final MapRect r, final MapList ml,
       final int ns, final int ne, final double sumweight) {
 
     if(ne - ns == 0) {

@@ -90,7 +90,7 @@ public class AddRawOptionTest {
    * Check if all files and only they exist in the database.
    * @throws IOException I/O exception
    */
-  private void assertAllFilesExist() throws IOException {
+  private static void assertAllFilesExist() throws IOException {
     final HashSet<String> files = new HashSet<String>();
     final Session session = new LocalSession(CTX);
     try {

@@ -119,7 +119,7 @@ public abstract class Parser extends Progress {
    * @throws IOException I/O exception
    */
   static SingleParser fileParser(final IO source, final Prop prop,
-                                 final String target) throws IOException {
+      final String target) throws IOException {
 
     // use file specific parser
     final String parser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH);

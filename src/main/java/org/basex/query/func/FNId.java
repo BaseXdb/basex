@@ -111,7 +111,7 @@ public final class FNId extends StandardFunc {
    * @param node attribute
    * @return resulting node list
    */
-  private Bln lang(final byte[] lang, final ANode node) {
+  private static Bln lang(final byte[] lang, final ANode node) {
     for(ANode n = node; n != null; n = n.parent()) {
       final AxisIter atts = n.attributes();
       for(ANode at; (at = atts.next()) != null;) {
@@ -146,7 +146,7 @@ public final class FNId extends StandardFunc {
    * @param node node
    * @throws QueryException query exception
    */
-  private void add(final byte[][] ids, final NodeCache nc,
+  private static void add(final byte[][] ids, final NodeCache nc,
       final ANode node) throws QueryException {
 
     AxisIter ai = node.attributes();
@@ -170,7 +170,7 @@ public final class FNId extends StandardFunc {
    * @param node node
    * @throws QueryException query exception
    */
-  private void addRef(final byte[][] ids, final NodeCache nc,
+  private static void addRef(final byte[][] ids, final NodeCache nc,
       final ANode node) throws QueryException {
 
     AxisIter ai = node.attributes();

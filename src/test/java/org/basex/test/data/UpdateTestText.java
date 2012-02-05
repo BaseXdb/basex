@@ -225,7 +225,7 @@ public final class UpdateTestText extends UpdateTest {
    * @param kind node kind
    * @throws IOException I/O exception
    */
-  private void insertText(final int par, final int pos, final byte[] val,
+  private static void insertText(final int par, final int pos, final byte[] val,
       final byte kind) throws IOException {
 
     final Data data = CONTEXT.data();

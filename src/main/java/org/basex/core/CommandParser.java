@@ -545,8 +545,8 @@ public final class CommandParser extends InputParser {
    * @param i user input
    * @return completions
    */
-  private <T extends Enum<T>> Enum<?>[] list(final Class<T> en,
-      final String i) {
+  private static <T extends Enum<T>> Enum<?>[] list(
+      final Class<T> en, final String i) {
 
     Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase(Locale.ENGLISH);
@@ -579,7 +579,7 @@ public final class CommandParser extends InputParser {
    * @param comp input completions
    * @return string list
    */
-  private StringList list(final Enum<?>[] comp) {
+  private static StringList list(final Enum<?>[] comp) {
     final StringList list = new StringList();
     for(final Enum<?> c : comp) list.add(c.name().toLowerCase(Locale.ENGLISH));
     return list;

@@ -31,8 +31,8 @@ public abstract class QueryPlanTest {
    * @param res result or {@code null} for no comparison
    * @param pr queries on the query plan
    */
-  final void check(final String qu, final String res,
-                   final String... pr) {
+  static final void check(final String qu, final String res,
+      final String... pr) {
 
     final QueryProcessor qp = new QueryProcessor(qu, CTX);
     try {

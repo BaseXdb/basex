@@ -6,7 +6,7 @@ import static org.basex.query.path.Axis.*;
 import java.io.IOException;
 
 import org.basex.data.Data;
-import org.basex.index.path.PathNode;
+import org.basex.index.path.*;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -108,7 +108,7 @@ public abstract class Path extends ParseExpr {
     // no root reference, no context: return null
     if(!(root instanceof Root) || v == null) return null;
     // return context sequence or root of current context
-    return v.size() != 1 ? v : ((Root) root).root(v);
+    return v.size() != 1 ? v : Root.root(v);
   }
 
   @Override
@@ -278,7 +278,7 @@ public abstract class Path extends ParseExpr {
           if(pn.get(0).name != pn.get(j).name) nm = null;
         }
         qnm.add(nm);
-        pn = data.paths.parent(pn);
+        pn = PathSummary.parent(pn);
       }
       ctx.compInfo(OPTCHILD, steps[s]);
 
@@ -352,7 +352,7 @@ public abstract class Path extends ParseExpr {
       final int name = data.tagindex.id(curr.test.name.local());
 
       final ObjList<PathNode> al = new ObjList<PathNode>();
-      for(final PathNode pn : data.paths.desc(in, desc)) {
+      for(final PathNode pn : PathSummary.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels
           if(al.size() != 0 && al.get(0).level() != pn.level()) return null;

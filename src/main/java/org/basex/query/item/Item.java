@@ -247,7 +247,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   final QueryException dateErr(final byte[] i, final String ex,
-                               final InputInfo ii) throws QueryException {
+      final InputInfo ii) throws QueryException {
     throw DATEFORMAT.thrw(ii, type, i, ex);
   }
 

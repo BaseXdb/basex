@@ -214,7 +214,7 @@ public final class FNStr extends StandardFunc {
    * @param d double value
    * @return substring position
    */
-  private int subPos(final double d) {
+  private static int subPos(final double d) {
     final int i = (int) d;
     return d == i ? i - 1 : (int) StrictMath.floor(d - .5);
   }

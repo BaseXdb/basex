@@ -62,7 +62,7 @@ public final class BufferInputTest {
    * @param data data to be tested
    * @throws IOException I/O exception
    */
-  private void run(final byte[] data) throws IOException {
+  private static void run(final byte[] data) throws IOException {
     for(int d = 0; d < data.length; d++) data[d] = (byte) d;
     final IOFile io = new IOFile(Prop.TMP, DB);
     io.write(data);

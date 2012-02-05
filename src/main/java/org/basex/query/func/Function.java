@@ -901,10 +901,10 @@ public enum Function {
       } else if(a instanceof Boolean) {
         tb.add(s + "()");
       } else {
-        tb.add("\"" + s.replaceAll("\"", "\"\"") + "\"");
+        tb.add('"' + s.replaceAll("\"", "\"\"") + '"');
       }
     }
-    return toString().replaceAll("\\(.*", "(") + tb + ")";
+    return toString().replaceAll("\\(.*", "(") + tb + ')';
   }
 
   @Override

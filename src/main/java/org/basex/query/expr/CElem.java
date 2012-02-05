@@ -154,7 +154,7 @@ public final class CElem extends CName {
    * Removes unused namespaces.
    * @param node to be modified
    */
-  private void noPreserve(final ANode node) {
+  private static void noPreserve(final ANode node) {
     final Atts ns = node.namespaces();
     final byte[] pref = node.qname().prefix();
     for(int i = ns.size() - 1; i >= 0; i--) {
@@ -172,7 +172,7 @@ public final class CElem extends CName {
    * @param node to be modified
    * @param nsp in-scope namespaces
    */
-  private void inherit(final ANode node, final Atts nsp) {
+  private static void inherit(final ANode node, final Atts nsp) {
     final Atts ns = node.namespaces();
     for(int a = nsp.size() - 1; a >= 0; a--) {
       final byte[] pref = nsp.name(a);
@@ -189,7 +189,9 @@ public final class CElem extends CName {
    * @param ns namespaces
    * @return resulting prefix
    */
-  private byte[] addNS(final byte[] pref, final byte[] uri, final Atts ns) {
+  private static byte[] addNS(final byte[] pref, final byte[] uri,
+      final Atts ns) {
+
     final byte[] u = ns.string(pref);
     if(u == null) {
       // add undeclared namespace

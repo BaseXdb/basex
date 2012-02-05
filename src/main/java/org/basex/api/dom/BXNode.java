@@ -134,7 +134,7 @@ public abstract class BXNode implements Node {
    * @param n node instance
    * @return resulting node
    */
-  private BXNode toJava(final ANode n) {
+  private static BXNode toJava(final ANode n) {
     return n != null ? n.toJava() : null;
   }
 
@@ -262,7 +262,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final String toString() {
-    return "[" + getNodeName() + ": " + getNodeValue() + "]";
+    return '[' + getNodeName() + ": " + getNodeValue() + ']';
   }
 
   /**
@@ -303,7 +303,7 @@ public abstract class BXNode implements Node {
   /**
    * Throws a DOM modification exception.
    */
-  final void readOnly() {
+  static final void readOnly() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

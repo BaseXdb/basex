@@ -106,7 +106,7 @@ public final class CompressTest {
    * Tests the correctness of the compressed tokens.
    * @param tokens test tokens
    */
-  private void run(final byte[]... tokens) {
+  private static void run(final byte[]... tokens) {
     final Compress comp = new Compress();
     for(final byte[] token : tokens) {
       final byte[] cpr = comp.pack(token);

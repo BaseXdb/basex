@@ -81,7 +81,7 @@ public final class JavaModuleFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return module.getClass().getSimpleName() + "." + mth.getName();
+    return module.getClass().getSimpleName() + '.' + mth.getName();
   }
 
   /**

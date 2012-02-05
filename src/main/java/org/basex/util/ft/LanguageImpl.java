@@ -34,7 +34,7 @@ abstract class LanguageImpl extends FTIterator
    * @param ln language
    * @return collection
    */
-  Collection<Language> collection(final String ln) {
+  static Collection<Language> collection(final String ln) {
     final HashSet<Language> coll = new HashSet<Language>();
     final Language lang = Language.get(ln);
     if(lang != null) coll.add(lang);

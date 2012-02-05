@@ -408,7 +408,8 @@ public abstract class Builder extends Progress {
    * @param ext message extension
    * @throws IOException I/O exception
    */
-  private void error(final String msg, final Object... ext) throws IOException {
+  private static void error(final String msg, final Object... ext)
+      throws IOException {
     throw new BuildException(msg, ext);
   }
 }

@@ -130,7 +130,7 @@ public final class MAB2Parser extends SingleParser {
       else entry.pos(pos);
 
       if(Util.debug) {
-        if((++i & 0x7FFF) == 0) Util.err(" " + i + "\n");
+        if((++i & 0x7FFF) == 0) Util.err(" " + i + '\n');
         else if((i & 0xFFF) == 0) Util.err("!");
         else if((i & 0x3FF) == 0) Util.err(".");
       }
@@ -207,7 +207,7 @@ public final class MAB2Parser extends SingleParser {
    * @param in input stream
    * @return next text
    */
-  private byte[] ident(final DataAccess in) {
+  private static byte[] ident(final DataAccess in) {
     in.read1();
     int l = 0;
     for(byte b; (b = in.read1()) >= ' ';) CACHE[l++] = b;

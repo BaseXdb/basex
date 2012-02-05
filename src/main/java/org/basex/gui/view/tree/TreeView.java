@@ -452,7 +452,7 @@ public final class TreeView extends View implements TreeConstants {
   private void drawRectangleText(final Graphics g, final int rn, final int lv,
       final TreeRect r, final int pre) {
 
-    String s = Token.string(tr.getText(gui.context, rn, pre)).trim();
+    String s = Token.string(TreeRects.getText(gui.context, rn, pre)).trim();
     if(r.w < BaseXLayout.width(g, s)
         && r.w < BaseXLayout.width(g, "..".concat(s.substring(s.length() - 1)))
             + MIN_TXT_SPACE) return;
@@ -480,7 +480,7 @@ public final class TreeView extends View implements TreeConstants {
    * @param fill if true it returns fill color, rectangle color else
    * @return draw color
    */
-  private Color getColorPerLevel(final int l, final boolean fill) {
+  private static Color getColorPerLevel(final int l, final boolean fill) {
     final int till = l < CHANGE_COLOR_TILL ? l : CHANGE_COLOR_TILL;
     return fill ? color(till) : color(till + 2);
   }
@@ -728,7 +728,7 @@ public final class TreeView extends View implements TreeConstants {
     final int x = r.x;
     final int y = getYperLevel(lv);
     final int h = nodeHeight;
-    final String s = Token.string(tr.getText(gui.context, rn, pre));
+    final String s = Token.string(TreeRects.getText(gui.context, rn, pre));
     final int w = BaseXLayout.width(g, s);
 
     g.setColor(color(8));
@@ -803,7 +803,7 @@ public final class TreeView extends View implements TreeConstants {
    * @param r TreeRect
    * @return center
    */
-  private int getRectCenter(final TreeRect r) {
+  private static int getRectCenter(final TreeRect r) {
     return (2 * r.x + r.w) / 2;
   }
 
@@ -876,7 +876,7 @@ public final class TreeView extends View implements TreeConstants {
    * @param t draw type
    * @return color
    */
-  private Color getConnectionColor(final Draw t) {
+  private static Color getConnectionColor(final Draw t) {
     final int alpha;
     final int rgb;
 

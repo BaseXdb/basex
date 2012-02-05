@@ -115,7 +115,9 @@ final class FormatterEN extends Formatter {
    * @param n number to be formatted
    * @param ord ordinal suffix
    */
-  private void word(final TokenBuilder tb, final long n, final byte[] ord) {
+  private static void word(final TokenBuilder tb, final long n,
+      final byte[] ord) {
+
     if(n == 0) {
       //tb.add(ZERO);
     } else if(n < 20) {

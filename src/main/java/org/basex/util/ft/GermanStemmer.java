@@ -143,7 +143,7 @@ final class GermanStemmer extends InternalStemmer {
    * @param tb token builder
    * @return new token builder
    */
-  private TokenBuilder resub(final TokenBuilder tb) {
+  private static TokenBuilder resub(final TokenBuilder tb) {
     final TokenBuilder tmp = new TokenBuilder();
     final int s = tb.size();
     for(int c = 0; c < s; c++) {
@@ -174,7 +174,7 @@ final class GermanStemmer extends InternalStemmer {
    * @param tb token builder
    * @return token builder
    */
-  private TokenBuilder part(final TokenBuilder tb) {
+  private static TokenBuilder part(final TokenBuilder tb) {
     for(int c = 0; c < tb.size() - 4; c++) {
       if(tb.get(c) == 'g' && tb.get(c + 1) == 'e' &&
           tb.get(c + 2) == 'g' && tb.get(c + 3) == 'e') {

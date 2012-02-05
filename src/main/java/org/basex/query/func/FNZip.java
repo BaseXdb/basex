@@ -223,7 +223,7 @@ public final class FNZip extends StandardFunc {
    * @param name name of directory
    * @return element
    */
-  private FElem createDir(final FElem par, final String name) {
+  private static FElem createDir(final FElem par, final String name) {
     final FElem e = new FElem(E_DIR);
     e.add(new FAttr(A_NAME, token(name)));
     par.add(e);
@@ -235,7 +235,7 @@ public final class FNZip extends StandardFunc {
    * @param par parent node
    * @param name name of directory
    */
-  private void createFile(final FElem par, final String name) {
+  private static void createFile(final FElem par, final String name) {
     final FElem e = new FElem(E_ENTRY);
     e.add(new FAttr(A_NAME, token(name)));
     par.add(e);
@@ -378,7 +378,7 @@ public final class FNZip extends StandardFunc {
    * @return properties
    * @throws SerializerException serializer exception
    */
-  private SerializerProp serPar(final ANode node, final QueryContext ctx)
+  private static SerializerProp serPar(final ANode node, final QueryContext ctx)
       throws SerializerException {
 
     // interpret query parameters
@@ -457,7 +457,7 @@ public final class FNZip extends StandardFunc {
    * @param zf zip file file to be parsed
    * @return binary result
    */
-  private StringList paths(final ZipFile zf) {
+  private static StringList paths(final ZipFile zf) {
     // traverse all zip entries and create intermediate map,
     // as zip entries are not sorted
     //final StringList paths = new StringList();

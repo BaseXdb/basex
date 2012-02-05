@@ -229,7 +229,7 @@ final class FTTrieArray {
    * @param e end position
    * @return data byte[]
    */
-  private byte[] bytes(final byte[] d, final int s, final int e) {
+  private static byte[] bytes(final byte[] d, final int s, final int e) {
     if(d == null || d.length < e || s < 0 || s == e) return null;
     final byte[] tmp = new byte[e - s];
     System.arraycopy(d, s, tmp, 0, tmp.length);

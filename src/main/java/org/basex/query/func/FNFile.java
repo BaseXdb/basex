@@ -141,7 +141,7 @@ public final class FNFile extends StandardFunc {
    * @param path file path
    * @return result
    */
-  private Str dirName(final File path) {
+  private static Str dirName(final File path) {
     final String pth = path.getParent();
     return Str.get(pth == null ? "." : pth);
   }
@@ -165,7 +165,7 @@ public final class FNFile extends StandardFunc {
    * @param path file path
    * @return result
    */
-  private Uri pathToUri(final File path) {
+  private static Uri pathToUri(final File path) {
     return Uri.uri(token(path.toURI().toString()));
   }
 

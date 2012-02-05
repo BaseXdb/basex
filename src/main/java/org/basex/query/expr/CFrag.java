@@ -39,7 +39,7 @@ public abstract class CFrag extends Arr {
    * @param pref info prefix
    * @return string
    */
-  final String info(final String pref) {
+  static final String info(final String pref) {
     return pref + " constructor";
   }
 

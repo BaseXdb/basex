@@ -307,7 +307,7 @@ public final class Namespaces {
     // remind uri before insert of first node n to connect siblings of n to
     // according namespace
     uriStack.set(uriL - 1, uriI);
-    setRoot(n);
+    current = n;
   }
 
   /**
@@ -341,7 +341,7 @@ public final class Namespaces {
    * @param insert true if insert operation, false if delete
    * @param nodes new nodes that have been added as part of delete/insert
    */
-  private void update(final NSNode n, final int pre, final int ms,
+  private static void update(final NSNode n, final int pre, final int ms,
       final boolean insert, final Set<NSNode> nodes) {
     if(!nodes.contains(n) && n.pre >= (insert ? pre : pre + ms))
       n.pre += insert ? ms : ms * -1;

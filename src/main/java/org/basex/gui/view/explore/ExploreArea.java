@@ -301,7 +301,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     String qu = tb.toString();
     final boolean root = gui.context.root();
     final boolean rt = gui.gprop.is(GUIProp.FILTERRT);
-    if(!qu.isEmpty() && !rt && !root) qu = "." + qu;
+    if(!qu.isEmpty() && !rt && !root) qu = '.' + qu;
 
     String simple = all.getText().trim();
     if(!simple.isEmpty()) {
@@ -322,7 +322,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param key keys
    * @return key array
    */
-  private String[] entries(final byte[][] key) {
+  private static String[] entries(final byte[][] key) {
     final StringList sl = new StringList();
     sl.add(Util.info(ENTRIES, key.length));
     for(final byte[] k : key) sl.add(Token.string(k));

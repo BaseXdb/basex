@@ -70,6 +70,6 @@ public final class Cast extends Single {
 
   @Override
   public String toString() {
-    return expr + " " + CAST + " " + AS + " " + type;
+    return expr + " " + CAST + ' ' + AS + ' ' + type;
   }
 }

@@ -127,14 +127,14 @@ public final class FNFtTest extends AdvancedQueryTest {
     new CreateIndex(IndexType.FULLTEXT).execute(CONTEXT);
 
     String entries = _FT_TOKENS.args(DB);
-    query("count(" + entries + ")", 6);
+    query("count(" + entries + ')', 6);
     query("exists(" + entries + "/self::value)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count = 2", "true");
     query(entries + "/@count = 3", "false");
 
     entries = _FT_TOKENS.args(DB, "a");
-    query("count(" + entries + ")", 1);
+    query("count(" + entries + ')', 1);
   }
 
   /**
@@ -146,8 +146,8 @@ public final class FNFtTest extends AdvancedQueryTest {
     query(_FT_TOKENIZE.args("A bc"), "a bc");
     query("declare ft-option using stemming; " +
         _FT_TOKENIZE.args("Gifts"), "gift");
-    query("count(" + _FT_TOKENIZE.args("") + ")", "0");
-    query("count(" + _FT_TOKENIZE.args("a!b:c") + ")", "3");
+    query("count(" + _FT_TOKENIZE.args("") + ')', "0");
+    query("count(" + _FT_TOKENIZE.args("a!b:c") + ')', "3");
   }
 
   /**

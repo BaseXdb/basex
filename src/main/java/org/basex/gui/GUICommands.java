@@ -313,7 +313,7 @@ public enum GUICommands implements GUICommand {
       gui.context.marked = new Nodes(n.data);
       gui.context.copied = null;
       gui.context.focused = -1;
-      gui.execute(new XQuery("delete nodes (" + sb + ")"));
+      gui.execute(new XQuery("delete nodes (" + sb + ')'));
     }
 
     @Override
@@ -882,7 +882,7 @@ public enum GUICommands implements GUICommand {
    * @return quoted string
    */
   static String quote(final String s) {
-    return "\"" + s.replaceAll("\"", "&quot;") + "\"";
+    return '"' + s.replaceAll("\"", "&quot;") + '"';
   }
 
   /**

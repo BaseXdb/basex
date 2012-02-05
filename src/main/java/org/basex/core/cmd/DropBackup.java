@@ -41,7 +41,7 @@ public final class DropBackup extends Command {
     // of a backup file
     if(dbs.length == 0) drop(args[0], context);
 
-    return info(BACKUP_DROPPED_X, args[0] + "*" + IO.ZIPSUFFIX);
+    return info(BACKUP_DROPPED_X, args[0] + '*' + IO.ZIPSUFFIX);
   }
 
   /**

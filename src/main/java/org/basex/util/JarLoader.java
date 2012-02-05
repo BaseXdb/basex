@@ -236,7 +236,7 @@ public final class JarLoader extends URLClassLoader {
    * @return result
    */
   @SuppressWarnings({ "unchecked" })
-  boolean finalizeNativeLibs(final ClassLoader cl) {
+  static boolean finalizeNativeLibs(final ClassLoader cl) {
     boolean res = false;
     final Class<?> classClassLoader = ClassLoader.class;
     Field nativeLibraries = null;

@@ -127,7 +127,7 @@ public final class PathSummary implements Index {
    * @param in input nodes
    * @return parent nodes
    */
-  public ObjList<PathNode> parent(final ObjList<PathNode> in) {
+  public static ObjList<PathNode> parent(final ObjList<PathNode> in) {
     final ObjList<PathNode> out = new ObjList<PathNode>();
     for(final PathNode n : in) if(!out.contains(n.par)) out.add(n.par);
     return out;
@@ -140,7 +140,7 @@ public final class PathSummary implements Index {
    * @param desc if false, return only children
    * @return descendant nodes
    */
-  public ObjList<PathNode> desc(final ObjList<PathNode> in,
+  public static ObjList<PathNode> desc(final ObjList<PathNode> in,
       final boolean desc) {
 
     final ObjList<PathNode> out = new ObjList<PathNode>();

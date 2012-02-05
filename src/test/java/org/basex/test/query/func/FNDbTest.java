@@ -214,7 +214,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbInfo() {
     check(_DB_INFO);
     query("count(" + _DB_INFO.args(DB) + "//" +
-        SIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ")", 1);
+        SIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ')', 1);
   }
 
   /**
@@ -277,7 +277,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query("for $i in 1 to 3 return " +
         _DB_ADD.args(DB, "\"<root/>\"", "\"doc\" || $i"));
     query(COUNT.args(" for $i in 1 to 3 return " +
-        COLLECTION.args("\"" + DB + "/doc\" || $i")), 3);
+        COLLECTION.args('"' + DB + "/doc\" || $i")), 3);
   }
 
   /**
@@ -366,7 +366,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     check(_DB_RETRIEVE);
     error(_DB_RETRIEVE.args(DB, "raw"), Err.RESFNF);
     query(_DB_STORE.args(DB, "raw", "xs:hexBinary('41')"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw") + ")", "41");
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw") + ')', "41");
     query(_DB_DELETE.args(DB, "raw"));
     error(_DB_RETRIEVE.args(DB, "raw"), Err.RESFNF);
   }
@@ -379,9 +379,9 @@ public final class FNDbTest extends AdvancedQueryTest {
     check(_DB_STORE);
     query(_DB_STORE.args(DB, "raw1", "xs:hexBinary('41')"));
     query(_DB_STORE.args(DB, "raw2", "b"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw2") + ")", "62");
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw2") + ')', "62");
     query(_DB_STORE.args(DB, "raw3", 123));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw3") + ")", "313233");
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw3") + ')', "313233");
   }
 
   /**

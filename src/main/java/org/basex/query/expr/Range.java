@@ -91,6 +91,6 @@ public final class Range extends Arr {
 
   @Override
   public String toString() {
-    return PAR1 + toString(" " + QueryText.TO + " ") + PAR2;
+    return PAR1 + toString(' ' + QueryText.TO + ' ') + PAR2;
   }
 }

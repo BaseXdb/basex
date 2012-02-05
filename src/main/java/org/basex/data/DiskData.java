@@ -445,11 +445,13 @@ public final class DiskData extends Data {
    * @param m records to be inserted
    * @return the new thread
    */
-  private Thread runIndexInsert(final DiskValues dv,
+  private static Thread runIndexInsert(final DiskValues dv,
       final TokenObjMap<IntList> m) {
-    final Thread t = new Thread() { @Override public void run() {
-      dv.index(m);
-    }};
+
+    final Thread t = new Thread() {
+      @Override
+      public void run() { dv.index(m); }
+    };
     t.start();
     return t;
   }
@@ -460,11 +462,13 @@ public final class DiskData extends Data {
    * @param m records to be deleted
    * @return the new thread
    */
-  private Thread runIndexDelete(final DiskValues dv,
+  private static Thread runIndexDelete(final DiskValues dv,
       final TokenObjMap<IntList> m) {
-    final Thread t = new Thread() { @Override public void run() {
-      dv.delete(m);
-    }};
+
+    final Thread t = new Thread() {
+      @Override
+      public void run() { dv.delete(m); }
+    };
     t.start();
     return t;
   }

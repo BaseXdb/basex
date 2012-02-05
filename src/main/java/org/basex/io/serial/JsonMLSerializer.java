@@ -128,7 +128,8 @@ public final class JsonMLSerializer extends OutputSerializer {
    * @param ext error details
    * @throws IOException I/O exception
    */
-  private void error(final String msg, final Object... ext) throws IOException {
+  private static void error(final String msg, final Object... ext)
+      throws IOException {
     throw JSONSER.thrwSerial(Util.inf(msg, ext));
   }
 }

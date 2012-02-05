@@ -369,21 +369,20 @@ public final class HTTPClient {
   /**
    * Writes the payload of a body using the serialization parameters.
    * @param payload payload
-   * @param payloadAttrs payload attributes
+   * @param attrs payload attributes
    * @param method serialization method
    * @param out connection output stream
    * @throws IOException I/O Exception
    */
-  private void write(final ItemCache payload,
-      final TokenMap payloadAttrs, final byte[] method, final OutputStream out)
-      throws IOException {
+  private static void write(final ItemCache payload, final TokenMap attrs,
+      final byte[] method, final OutputStream out) throws IOException {
 
     // extract serialization parameters
     final TokenBuilder tb = new TokenBuilder();
     tb.add(METHOD).add('=').add(method);
-    for(final byte[] key : payloadAttrs.keys()) {
+    for(final byte[] key : attrs.keys()) {
       if(!eq(key, SRC))
-        tb.add(',').add(key).add('=').add(payloadAttrs.get(key));
+        tb.add(',').add(key).add('=').add(attrs.get(key));
     }
 
     // serialize items according to the parameters

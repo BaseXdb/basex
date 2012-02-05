@@ -188,14 +188,14 @@ public class CommandTest {
     ok(new CreateBackup(NAME));
     ok(new Restore(NAME));
     ok(new DropBackup(NAME));
-    ok(new CreateBackup(NAME + "*"));
+    ok(new CreateBackup(NAME + '*'));
     ok(new Restore(NAME2));
-    ok(new DropBackup(NAME + "*"));
+    ok(new DropBackup(NAME + '*'));
     no(new Restore(":"));
     ok(new CreateBackup(NAME + "?," + NAME));
     ok(new DropBackup(NAME2));
     ok(new Restore(NAME));
-    no(new Restore(NAME + "?"));
+    no(new Restore(NAME + '?'));
     ok(new DropBackup(NAME));
   }
 
@@ -275,15 +275,15 @@ public class CommandTest {
     ok(new DropDB(NAME));
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
-    ok(new DropDB(NAME + "*"));
+    ok(new DropDB(NAME + '*'));
     no(new Open(NAME2));
     no(new DropDB(":"));
     no(new DropDB(""));
 
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
-    ok(new DropDB(NAME + "," + NAME2));
-    no(new DropDB(NAME + ", " + ":"));
+    ok(new DropDB(NAME + ',' + NAME2));
+    no(new DropDB(NAME + ", " + ':'));
   }
 
   /** Command test. */
@@ -309,8 +309,8 @@ public class CommandTest {
     ok(new CreateDB(NAME));
     ok(new CreateUser(NAME, md5(NAME)));
     ok(new CreateUser(NAME2, md5(NAME)));
-    ok(new DropUser(NAME2, NAME + "*"));
-    ok(new DropUser(NAME + "," + NAME2));
+    ok(new DropUser(NAME2, NAME + '*'));
+    ok(new DropUser(NAME + ',' + NAME2));
   }
 
   /** Command test. */
@@ -356,12 +356,12 @@ public class CommandTest {
     ok(new CreateUser(NAME, md5("test")));
     no(new Grant("something", NAME2));
     ok(new CreateDB(NAME));
-    ok(new Grant("none", NAME + "*", NAME + "*"));
+    ok(new Grant("none", NAME + '*', NAME + '*'));
     no(new Grant("all", NAME2));
     no(new Grant("all", ":*?", ":*:"));
-    ok(new DropUser(NAME + "," + NAME2));
+    ok(new DropUser(NAME + ',' + NAME2));
     no(new Grant("all", NAME));
-    no(new Grant("all", NAME + "*", ":"));
+    no(new Grant("all", NAME + '*', ":"));
   }
 
   /** Command test. */
@@ -642,7 +642,7 @@ public class CommandTest {
    * @param cmd command reference
    * @return result as string
    */
-  final String ok(final Command cmd) {
+  static final String ok(final Command cmd) {
     try {
       return session.execute(cmd);
     } catch(final IOException ex) {
@@ -655,7 +655,7 @@ public class CommandTest {
    * Assumes that this command fails.
    * @param cmd command reference
    */
-  final void no(final Command cmd) {
+  static final void no(final Command cmd) {
     try {
       session.execute(cmd);
       fail("\"" + cmd + "\" was supposed to fail.");

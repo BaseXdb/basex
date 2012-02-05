@@ -182,7 +182,7 @@ public final class IndexOptimizeTest {
    * Creates a test database.
    * @throws Exception exception
    */
-  private void createDoc() throws Exception {
+  private static void createDoc() throws Exception {
     new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a></xml>").execute(CONTEXT);
     new Close().execute(CONTEXT);
   }
@@ -191,7 +191,7 @@ public final class IndexOptimizeTest {
    * Creates a test collection.
    * @throws Exception exception
    */
-  private void createColl() throws Exception {
+  private static void createColl() throws Exception {
     new CreateDB(NAME).execute(CONTEXT);
     new Add("one", "<xml><a>1</a><a>2 3</a></xml>").execute(CONTEXT);
     new Add("two", "<xml><a>4</a><a>5 6</a></xml>").execute(CONTEXT);
@@ -213,7 +213,7 @@ public final class IndexOptimizeTest {
    * @param query query to be tested
    * @param result expected query result
    */
-  private void check(final String query, final String result) {
+  private static void check(final String query, final String result) {
     // compile query
     ArrayOutput plan = null;
     QueryProcessor qp = new QueryProcessor(query, CONTEXT);

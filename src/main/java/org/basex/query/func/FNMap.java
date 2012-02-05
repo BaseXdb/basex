@@ -54,7 +54,7 @@ public final class FNMap extends StandardFunc {
       case _MAP_CONTAINS:  return contains(ctx, ii);
       case _MAP_SIZE:      return map(ctx).mapSize();
       case _MAP_REMOVE:    return remove(ctx, ii);
-      case _MAP_COLLATION: return map(ctx).collation();
+      case _MAP_COLLATION: return Map.collation();
       default:             return super.item(ctx, ii);
     }
   }

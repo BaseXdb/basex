@@ -116,8 +116,8 @@ public abstract class Date extends Item {
    * @param ii input info
    * @throws QueryException query exception
    */
-  final void zone(final Matcher mt, final int p, final byte[] val,
-                  final InputInfo ii) throws QueryException {
+  static final void zone(final Matcher mt, final int p, final byte[] val,
+      final InputInfo ii) throws QueryException {
 
     if(mt.group(p) == null || mt.group(p).equals("Z")) return;
     final int th = Token.toInt(mt.group(p + 2));

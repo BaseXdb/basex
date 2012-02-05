@@ -87,7 +87,7 @@ abstract class AUser extends Command {
    * @param md5 string to be checked
    * @return result of check
    */
-  boolean isMD5(final String md5) {
+  static boolean isMD5(final String md5) {
     return md5 != null && md5.matches("[0-9a-f]{32}");
   }
 

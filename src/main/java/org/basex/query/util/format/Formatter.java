@@ -326,7 +326,7 @@ public abstract class Formatter extends FormatUtil {
    * @param tb token builder
    * @param n number to be formatted
    */
-  private void japanese(final TokenBuilder tb, final long n) {
+  private static void japanese(final TokenBuilder tb, final long n) {
     if(n == 0) {
       tb.add(KANJI[0]);
     } else {

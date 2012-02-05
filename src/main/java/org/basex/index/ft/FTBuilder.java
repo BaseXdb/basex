@@ -202,7 +202,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   final int merge(final DataOutput out, final IntList il,
-                  final FTList[] v) throws IOException {
+      final FTList[] v) throws IOException {
 
     int s = 0;
     final TokenBuilder tbp = new TokenBuilder();
@@ -237,7 +237,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * @throws IOException IOException
    */
   final void writeFTData(final DataOutput out, final byte[] vpre,
-                         final byte[] vpos) throws IOException {
+      final byte[] vpos) throws IOException {
 
     int np = 4, pp = 4, lp = -1, lu = -1;
     final int ns = Num.size(vpre);
@@ -277,7 +277,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param lists lists
    * @return boolean
    */
-  final boolean check(final FTList[] lists) {
+  static final boolean check(final FTList[] lists) {
     for(final FTList l : lists) if(l.tok.length > 0) return true;
     return false;
   }

@@ -64,7 +64,7 @@ public final class CreateBackup extends Command {
   private boolean backup(final String db) {
     try {
       final IOFile path = mprop.dbpath(db);
-      final IOFile file = mprop.dbpath(db + "-" +
+      final IOFile file = mprop.dbpath(db + '-' +
       IO.DATE.format(new Date()) + IO.ZIPSUFFIX);
 
       final Zip zip = progress(new Zip(file));

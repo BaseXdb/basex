@@ -2,9 +2,7 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.ErrType.*;
-
-import java.util.HashMap;
-
+import java.util.EnumMap;
 import org.basex.core.Text;
 import org.basex.io.serial.SerializerException;
 import org.basex.query.QueryException;
@@ -925,8 +923,8 @@ public enum Err {
    * Mapping between function classes and namespace URIs.
    * If no mapping exists, {@link #FNURI} will be assumed as default mapping.
    */
-  private static final HashMap<ErrType, byte[]> URIS =
-      new HashMap<ErrType, byte[]>();
+  private static final EnumMap<ErrType, byte[]> URIS =
+      new EnumMap<ErrType, byte[]>(ErrType.class);
 
   /**
    * Error types.

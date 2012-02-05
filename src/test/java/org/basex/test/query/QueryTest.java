@@ -100,7 +100,7 @@ public abstract class QueryTest {
             sb.append("error");
           }
           s = val.size() != 1 ? "#" + val.size() : "";
-          sb.append("\n[F" + s + "] '" + val + "' " + details() + "\n");
+          sb.append("\n[F" + s + "] '" + val + "' " + details() + '\n');
           ++fail;
         }
       } catch(final BaseXException ex) {
@@ -109,8 +109,8 @@ public abstract class QueryTest {
           final String cp = correct && (!(cmp instanceof Nodes) ||
               ((Nodes) cmp).data != null) ? cmp.toString() : "()";
           sb.append("[" + qu[0] + "] " + query + "\n[E] " +
-              cp + "\n[F] " + msg.replaceAll("\r\n?|\n", " ") + " " +
-              details() + "\n");
+              cp + "\n[F] " + msg.replaceAll("\r\n?|\n", " ") + ' ' +
+              details() + '\n');
           ++fail;
         }
       }

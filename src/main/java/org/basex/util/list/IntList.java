@@ -330,7 +330,7 @@ public class IntList extends ElementList {
    * @param b second token
    * @return result
    */
-  private int s(final byte[] a, final byte[] b) {
+  private static int s(final byte[] a, final byte[] b) {
     final double n = Token.toDouble(a) - Token.toDouble(b);
     return n > 0 ? 1 : n < 0 ? -1 : 0;
   }
@@ -341,7 +341,7 @@ public class IntList extends ElementList {
    * @param b second token
    * @return result
    */
-  private int d(final byte[] a, final byte[] b) {
+  private static int d(final byte[] a, final byte[] b) {
     return a == null ? b == null ? 0 : -1 : b == null ? 1 : Token.diff(a, b);
   }
 

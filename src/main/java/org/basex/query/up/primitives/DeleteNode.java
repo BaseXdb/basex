@@ -49,7 +49,7 @@ public final class DeleteNode extends StructuralUpdate {
 
   @Override
   public String toString() {
-    return Util.name(this) + "[" + targetNode() + "]";
+    return Util.name(this) + '[' + targetNode() + ']';
   }
 
   @Override

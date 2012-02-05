@@ -117,7 +117,7 @@ public final class RegEx {
           final char c2 = mt.group(2).charAt(0);
           final TokenBuilder tb2 = new TokenBuilder("[");
           for(char c = c1; c <= c2; ++c) tb2.add(c);
-          pattern = pattern.replaceAll("\\[" + c1 + "-" + c2, tb2.toString());
+          pattern = pattern.replaceAll("\\[" + c1 + '-' + c2, tb2.toString());
         }
 
         // remove excluded characters in classes
@@ -131,7 +131,7 @@ public final class RegEx {
           for(int e = 0; e < ex.length(); ++e) {
             out = out.replaceAll(ex.substring(e, e + 1), "");
           }
-          pattern = pattern.replaceAll("\\[" + in + "-\\[.*?\\]", "[" + out);
+          pattern = pattern.replaceAll("\\[" + in + "-\\[.*?\\]", '[' + out);
         }
       }
       return Pattern.compile(pattern, m);
@@ -157,7 +157,7 @@ public final class RegEx {
    */
   private static String replace(final String cls, final char incl) {
     final int[] v = cls.startsWith("Is") ? MAP.get(cls.substring(2)) : null;
-    if(v == null) return "\\" + incl + "{" + cls + "}";
+    if(v == null) return "\\" + incl + '{' + cls + '}';
     final TokenBuilder tb = new TokenBuilder().add('[');
     if(incl == 'P') tb.add("!");
     for(int i = 0; i < v.length;) {

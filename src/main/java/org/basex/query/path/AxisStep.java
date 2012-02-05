@@ -259,10 +259,10 @@ public class AxisStep extends Preds {
     final StringBuilder sb = new StringBuilder();
     if(test == Test.NOD) {
       if(axis == Axis.PARENT) sb.append("..");
-      if(axis == Axis.SELF) sb.append(".");
+      if(axis == Axis.SELF) sb.append('.');
     }
     if(sb.length() == 0) {
-      if(axis == Axis.ATTR && test != Test.NOD) sb.append("@");
+      if(axis == Axis.ATTR && test != Test.NOD) sb.append('@');
       else if(axis != Axis.CHILD) sb.append(axis).append("::");
       sb.append(test);
     }

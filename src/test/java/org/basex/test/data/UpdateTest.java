@@ -104,7 +104,7 @@ public abstract class UpdateTest {
    * @param exp expected value
    * @param act actual value
    */
-  final void assertArraysEquals(final byte[] exp, final byte[] act) {
+  static final void assertArraysEquals(final byte[] exp, final byte[] act) {
     assertEquals("array lengths don't equal", exp.length, act.length);
     for(int i = 0; i < exp.length; ++i) assertEquals(exp[i], act[i]);
   }
@@ -124,7 +124,7 @@ public abstract class UpdateTest {
    * if errors occur.
    * @param cmd command reference
    */
-  private void exec(final Command cmd) {
+  private static void exec(final Command cmd) {
     try {
       cmd.execute(CONTEXT);
     } catch(final BaseXException ex) {

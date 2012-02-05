@@ -341,7 +341,7 @@ final class Docs {
    * @param path input path (without leading slash)
    * @return canonical path
    */
-  private byte[] normalize(final byte[] path) {
+  private static byte[] normalize(final byte[] path) {
     return concat(SLASH, Prop.WIN ? lc(path) : path);
   }
 }

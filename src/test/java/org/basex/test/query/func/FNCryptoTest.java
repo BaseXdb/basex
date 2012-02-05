@@ -235,7 +235,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
         "</KeyInfo></Signature></a>";
 
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
-        "c:validate-signature(" + input + ")",
+        "c:validate-signature(" + input + ')',
         "true");
   }
 
