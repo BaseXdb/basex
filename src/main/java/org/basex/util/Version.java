@@ -21,7 +21,7 @@ public final class Version implements Comparable<Version> {
    * @param version according to semantic versioning
    */
   public Version(final String version) {
-    this(Token.token(version));
+    this(token(version));
   }
 
   /**
@@ -30,9 +30,9 @@ public final class Version implements Comparable<Version> {
    */
   public Version(final byte[] version) {
     final byte[][] versions = split(version, '.');
-    major = Token.toInt(versions[0]);
-    minor = versions.length > 1 ? Token.toInt(versions[1]) : -1;
-    patch = versions.length > 2 ? Token.toInt(versions[2]) : -1;
+    major = toInt(versions[0]);
+    minor = versions.length > 1 ? toInt(versions[1]) : -1;
+    patch = versions.length > 2 ? toInt(versions[2]) : -1;
   }
 
   /**

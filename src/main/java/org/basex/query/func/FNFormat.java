@@ -12,7 +12,6 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 import org.basex.query.util.format.FormatParser;
 import org.basex.query.util.format.Formatter;
 import org.basex.query.util.format.DecFormatter;
@@ -82,7 +81,7 @@ public final class FNFormat extends StandardFunc {
     // evaluate arguments
     Item it = expr[0].item(ctx, input);
     if(it == null) it = Dbl.NAN;
-    else if(!it.type.isUntyped() && !it.type.isNumber()) Err.number(this, it);
+    else if(!it.type.isUntyped() && !it.type.isNumber()) number(this, it);
 
     final String pic = string(checkStr(expr[1], ctx));
     final QNm frm = new QNm(expr.length == 3 ?

@@ -8,7 +8,7 @@ package org.basex.index;
  */
 public interface IndexToken {
   /** Index types. */
-  public enum IndexType {
+  enum IndexType {
     /** Attribute names. */ ATTNAME,
     /** Tag index.       */ TAG,
     /** Text index.      */ TEXT,

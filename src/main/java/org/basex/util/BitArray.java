@@ -1,10 +1,11 @@
 package org.basex.util;
 
 import static java.lang.Long.*;
+import java.util.BitSet;
 
 /**
  * Bit array that grows when needed. The implementation is similar to
- * {@link java.util.BitSet}.
+ * {@link BitSet}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov

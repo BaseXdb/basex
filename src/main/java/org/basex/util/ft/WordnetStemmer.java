@@ -74,7 +74,6 @@ final class WordnetStemmer extends Stemmer {
 
   /** Empty constructor. */
   WordnetStemmer() {
-    super();
   }
 
   /**
@@ -114,7 +113,7 @@ final class WordnetStemmer extends Stemmer {
     @SuppressWarnings("unchecked")
     final List<String> l = (List<String>)
       Reflect.invoke(FIND_STEMS, stemmer, string(word));
-    final byte[] result = l.size() == 0 ? word : token(l.get(0));
+    final byte[] result = l.isEmpty() ? word : token(l.get(0));
     return result.length == 0 ? word : result;
   }
 }

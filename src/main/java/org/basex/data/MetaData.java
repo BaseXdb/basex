@@ -444,7 +444,7 @@ public final class MetaData {
    * @param pr property to write
    * @throws IOException I/O exception
    */
-  private void writeInfo(final DataOutput out, final String k,
+  private static void writeInfo(final DataOutput out, final String k,
       final boolean pr) throws IOException {
     writeInfo(out, k, pr ? "1" : "0");
   }
@@ -456,7 +456,7 @@ public final class MetaData {
    * @param v value
    * @throws IOException I/O exception
    */
-  private void writeInfo(final DataOutput out, final String k,
+  private static void writeInfo(final DataOutput out, final String k,
       final long v) throws IOException {
     writeInfo(out, k, Long.toString(v));
   }

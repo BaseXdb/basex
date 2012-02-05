@@ -42,7 +42,7 @@ public enum Variable {
    * @param name name
    * @param val item value
    */
-  private Variable(final byte[] uri, final String name, final Value val) {
+  Variable(final byte[] uri, final String name, final Value val) {
     qname = new QNm(token(name), uri);
     value = val;
   }

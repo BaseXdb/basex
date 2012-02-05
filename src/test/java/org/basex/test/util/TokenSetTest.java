@@ -48,7 +48,7 @@ public class TokenSetTest {
   public void delete() {
     for(final byte[] t : LIST) set.delete(t);
     for(final byte[] t : LIST)
-      assertTrue("Token should not be contained in list.", set.id(t) == 0);
+      assertEquals("Token should not be contained in list.", 0, set.id(t));
   }
 
   /** Tests removed tokens. */
@@ -59,12 +59,12 @@ public class TokenSetTest {
       assertTrue("Token is missing in list.", set.id(t) != 0);
     for(final byte[] t : LIST) set.delete(t);
     for(final byte[] t : LIST)
-      assertTrue("Token should not be contained in list.", set.id(t) == 0);
+      assertEquals("Token should not be contained in list.", 0, set.id(t));
     for(final byte[] t : LIST) set.add(t);
     for(final byte[] t : LIST)
       assertTrue("Token is missing in list.", set.id(t) != 0);
     for(final byte[] t : LIST) set.delete(t);
     for(final byte[] t : LIST)
-      assertTrue("Token should not be contained in list.", set.id(t) == 0);
+      assertEquals("Token should not be contained in list.", 0, set.id(t));
   }
 }

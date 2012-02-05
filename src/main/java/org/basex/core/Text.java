@@ -8,7 +8,7 @@ import java.util.Locale;
 /**
  * This class contains internationalized text strings, which are used
  * throughout the project. If this class is called first, the Strings
- * are initialized by the {@link org.basex.core.Lang} class.
+ * are initialized by the {@link Lang} class.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

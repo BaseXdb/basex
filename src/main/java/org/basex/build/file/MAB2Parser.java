@@ -191,7 +191,7 @@ public final class MAB2Parser extends SingleParser {
    * @param in input stream
    * @return id
    */
-  private byte[] par(final DataAccess in) {
+  private static byte[] par(final DataAccess in) {
     while(in.more()) {
       if(in.read1() != '\n') continue;
       final int b1 = in.read1();

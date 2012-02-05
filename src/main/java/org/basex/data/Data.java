@@ -791,7 +791,7 @@ public abstract class Data {
             }
             // no potential for infinite loop, cause dummy root always a match,
             // in this case ancPre ends iteration
-            if(cand.size() > 0) curr = cand.remove(0);
+            if(!cand.isEmpty()) curr = cand.remove(0);
           }
         }
         nspaces.setNearestRoot(cn, par);

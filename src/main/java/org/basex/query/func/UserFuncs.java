@@ -20,6 +20,7 @@ import org.basex.query.item.FuncItem;
 import org.basex.query.item.FuncType;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Type;
 import org.basex.query.item.Types;
 import org.basex.query.util.NSGlobal;
@@ -78,7 +79,7 @@ public final class UserFuncs extends ExprInfo {
         FUNCUNKNOWN.thrw(ii, name.string());
       }
       if(args.length != 1) FUNCTYPE.thrw(ii, name.string());
-      final SeqType to = SeqType.get(type, SeqType.Occ.ZO);
+      final SeqType to = SeqType.get(type, Occ.ZO);
       return TypedFunc.constr(new Cast(ii, args[0], to), to);
     }
 

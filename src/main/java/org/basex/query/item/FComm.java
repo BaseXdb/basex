@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.Util;
 import org.w3c.dom.Comment;
 
@@ -36,7 +35,7 @@ public final class FComm extends FNode {
    * @param com DOM node
    */
   FComm(final Comment com) {
-    this(Token.token(com.getData()));
+    this(token(com.getData()));
   }
 
   @Override

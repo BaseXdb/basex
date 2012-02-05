@@ -5,7 +5,7 @@ import static org.basex.query.item.AtomType.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
-import org.basex.query.expr.CmpV;
+import org.basex.query.expr.CmpV.Op;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
@@ -42,9 +42,9 @@ public final class FNAggr extends StandardFunc {
         if(c == -1) do ++c; while(iter.next() != null);
         return Int.get(c);
       case MIN:
-        return minmax(iter, CmpV.Op.GT, ctx);
+        return minmax(iter, Op.GT, ctx);
       case MAX:
-        return minmax(iter, CmpV.Op.LT, ctx);
+        return minmax(iter, Op.LT, ctx);
       case SUM:
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
@@ -110,7 +110,7 @@ public final class FNAggr extends StandardFunc {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item minmax(final Iter iter, final CmpV.Op cmp,
+  private Item minmax(final Iter iter, final Op cmp,
       final QueryContext ctx) throws QueryException {
 
     if(expr.length == 2) checkColl(expr[1], ctx);

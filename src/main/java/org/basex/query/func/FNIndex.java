@@ -203,7 +203,7 @@ public final class FNIndex extends StandardFunc {
    * @param data data reference
    * @return element
    */
-  private FElem flat(final Data data) {
+  private static FElem flat(final Data data) {
     final FElem elem = new FElem(new QNm(NodeType.DOC.string()));
     index(data.tagindex, Q_ELM, elem);
     index(data.atnindex, Q_ATT, elem);
@@ -216,7 +216,9 @@ public final class FNIndex extends StandardFunc {
    * @param name element name
    * @param root root node
    */
-  private void index(final Names names, final QNm name, final FElem root) {
+  private static void index(final Names names, final QNm name,
+      final FElem root) {
+
     for(int i = 0; i < names.size(); ++i) {
       final FElem sub = new FElem(name);
       sub.add(new FAttr(Q_NAME, names.key(i + 1)));
@@ -231,7 +233,7 @@ public final class FNIndex extends StandardFunc {
    * @param root root node
    * @return element
    */
-  private FElem tree(final Data data, final PathNode root) {
+  private static FElem tree(final Data data, final PathNode root) {
     final FElem elem = new FElem(new QNm(ANode.type(root.kind).string()));
     final boolean elm = root.kind == Data.ELEM;
     final Names names = elm ? data.tagindex : data.atnindex;

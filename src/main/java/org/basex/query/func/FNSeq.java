@@ -5,7 +5,7 @@ import org.basex.index.StatsType;
 import org.basex.index.path.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.CmpV;
+import org.basex.query.expr.CmpV.Op;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Atm;
@@ -15,6 +15,7 @@ import org.basex.query.item.Int;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.AxisIter;
@@ -149,13 +150,12 @@ public final class FNSeq extends StandardFunc {
 
     // all other types will return existing types
     final Type t = expr[0].type().type;
-    SeqType.Occ o = SeqType.Occ.ZM;
+    Occ o = Occ.ZM;
     // at most one returned item
-    if(sig == Function.SUBSEQUENCE && expr[0].type().one())
-      o = SeqType.Occ.ZO;
+    if(sig == Function.SUBSEQUENCE && expr[0].type().one()) o = Occ.ZO;
 
     // head will return at most one item
-    else if(sig == Function.HEAD) o = SeqType.Occ.ZO;
+    else if(sig == Function.HEAD) o = Occ.ZO;
     type = SeqType.get(t, o);
 
     // pre-evaluate distinct values
@@ -249,8 +249,7 @@ public final class FNSeq extends StandardFunc {
           final Item i = ir.next();
           if(i == null) return null;
           ++c;
-          if(i.comparable(it) && CmpV.Op.EQ.eval(input, i, it))
-            return Int.get(c);
+          if(i.comparable(it) && Op.EQ.eval(input, i, it)) return Int.get(c);
         }
       }
     };

@@ -534,8 +534,7 @@ public class JapaneseTokenizer extends Tokenizer {
      */
     public boolean isMark() {
       final int hinshi = getHinshi();
-      return hinshi == Morpheme.HINSHI_KIGOU ||
-             hinshi == Morpheme.HINSHI_FILLER;
+      return hinshi == HINSHI_KIGOU || hinshi == HINSHI_FILLER;
     }
 
     /**
@@ -544,8 +543,7 @@ public class JapaneseTokenizer extends Tokenizer {
      */
     public boolean isAttachedWord() {
       final int hinshi = getHinshi();
-      return hinshi == Morpheme.HINSHI_JYODOUSHI ||
-             hinshi == Morpheme.HINSHI_JYOSHI;
+      return hinshi == HINSHI_JYODOUSHI || hinshi == HINSHI_JYOSHI;
     }
 
     /**

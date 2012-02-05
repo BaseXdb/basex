@@ -196,7 +196,7 @@ public interface BuildText {
      * Enumeration constructor.
      * @param s string representation
      */
-    private Type(final String s) {
+    Type(final String s) {
       string = s;
     }
   }

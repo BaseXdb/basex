@@ -54,7 +54,7 @@ public abstract class Stemmer extends LanguageImpl {
    * @return result of check
    */
   public static boolean supportFor(final Language l) {
-    for(final Stemmer s : Stemmer.IMPL) if(s.supports(l)) return true;
+    for(final Stemmer s : IMPL) if(s.supports(l)) return true;
     return false;
   }
 

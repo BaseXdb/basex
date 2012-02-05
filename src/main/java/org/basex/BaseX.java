@@ -4,8 +4,8 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
+import java.util.Map.Entry;
 import org.basex.core.BaseXException;
 import org.basex.core.Main;
 import org.basex.core.MainProp;
@@ -215,7 +215,7 @@ public class BaseX extends Main {
     // set cached options
     if(serial.length() != 0) options.put(Prop.SERIALIZER, serial);
     if(bind.length() != 0) options.put(Prop.BINDINGS, bind);
-    for(final Map.Entry<Object[], Object> entry : options.entrySet()) {
+    for(final Entry<Object[], Object> entry : options.entrySet()) {
       try {
         execute(new Set(entry.getKey(), entry.getValue()), false);
       } catch(final IOException ex) {

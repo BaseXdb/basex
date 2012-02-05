@@ -29,7 +29,7 @@ public final class Uri extends Str {
    * @return uri instance
    */
   public static Uri uri(final byte[] v) {
-    return v.length == 0 ? Uri.EMPTY : new Uri(Token.norm(v));
+    return v.length == 0 ? EMPTY : new Uri(Token.norm(v));
   }
 
   /**

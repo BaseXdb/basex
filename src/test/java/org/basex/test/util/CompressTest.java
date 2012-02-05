@@ -81,7 +81,7 @@ public final class CompressTest {
    * @param file file to be parsed
    * @throws Exception exception
    */
-  private void texts(final String file) throws Exception {
+  private static void texts(final String file) throws Exception {
     final Context ctx = new Context();
     final String query = "let $doc := doc('" + file + "')" +
       "for $i in $doc//(@hohoho | text()) return data($i)";

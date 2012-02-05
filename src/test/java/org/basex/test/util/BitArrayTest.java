@@ -25,7 +25,7 @@ public final class BitArrayTest {
   @Test
   public void getTrimmedWords() {
     a.setWords(new long[] {-1L, 0L}, 64);
-    assertTrue("Array not trimmed correctly", a.toArray().length == 1);
+    assertEquals("Array not trimmed correctly", 1, a.toArray().length);
   }
 
   /** Test method for {@link BitArray#get(int)}. */
@@ -58,6 +58,6 @@ public final class BitArrayTest {
   @Test
   public void nextClearBitInt() {
     a.setWords(new long[] {-1L, 0L}, 64);
-    assertTrue("Incorrect next clear bit", a.nextClearBit(0) == 64);
+    assertEquals("Incorrect next clear bit", 64, a.nextClearBit(0));
   }
 }

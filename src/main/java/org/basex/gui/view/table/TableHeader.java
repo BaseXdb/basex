@@ -387,7 +387,7 @@ final class TableHeader extends BaseXPanel {
         transferFocus();
       } else {
         inputCol = in;
-        box = new TableInput(TableHeader.this, tdata.cols[inputCol].filter);
+        box = new TableInput(this, tdata.cols[inputCol].filter);
       }
     } else {
       box.code(e);

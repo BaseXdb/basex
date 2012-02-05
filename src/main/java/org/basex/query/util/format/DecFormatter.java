@@ -73,7 +73,7 @@ public final class DecFormatter extends FormatUtil {
     if(map != null) {
       for(final Entry<String, String> e : map.entrySet()) {
         final String key = e.getKey(), val = e.getValue();
-        int cp = val.length() == 0 ? 0 : val.codePointAt(0);
+        int cp = val.isEmpty() ? 0 : val.codePointAt(0);
         if(Character.charCount(cp) != val.length()) cp = 0;
 
         if(key.equals(DF_INF)) {

@@ -94,7 +94,7 @@ public final class Context {
    * Closes the database context.
    */
   public synchronized void close() {
-    while(sessions.size() > 0) sessions.get(0).quit();
+    while(!sessions.isEmpty()) sessions.get(0).quit();
     datas.close();
   }
 

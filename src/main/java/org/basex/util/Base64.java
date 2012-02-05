@@ -12,7 +12,7 @@ import org.basex.util.list.ByteList;
  */
 public final class Base64 {
   /** Ending characters. */
-  private static final byte[] ENDING = Token.token("AQgw");
+  private static final byte[] ENDING = token("AQgw");
 
   /** Hidden constructor. */
   private Base64() { }
@@ -102,8 +102,7 @@ public final class Base64 {
         --n;
       }
       if(s[l - 2] == '=') ++m;
-      if(m == 2 && !Token.contains(ENDING, s[l - 3]))
-        error(Token.substring(s, l - 3));
+      if(m == 2 && !contains(ENDING, s[l - 3])) error(substring(s, l - 3));
     }
 
     final byte[] val = new byte[3 * g - m];

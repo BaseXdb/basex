@@ -58,14 +58,14 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    tb.addExt(DOTATTR, DOTData.name(string(n)), v);
+    tb.addExt(DOTATTR, name(string(n)), v);
   }
 
   @Override
   protected void finishOpen() throws IOException {
     final byte[] attr = tb.finish();
-    if(color == null) color = DOTData.color(string(tag));
-    if(color == null) color = attr.length == 0 ? DOTData.ELEM1 : DOTData.ELEM2;
+    if(color == null) color = color(string(tag));
+    if(color == null) color = attr.length == 0 ? ELEM1 : ELEM2;
     print(concat(tag, attr), color);
   }
 
@@ -108,7 +108,7 @@ public final class DOTSerializer extends OutputSerializer {
   @Override
   public void finishItem(final Item it) throws IOException {
     try {
-      print(norm(it.string(null)), DOTData.ITEM);
+      print(norm(it.string(null)), ITEM);
     } catch(final QueryException ex) {
       throw new SerializerException(ex);
     }
@@ -148,7 +148,7 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   protected byte[] info(final ExprInfo expr) {
-    color = DOTData.color(expr);
-    return token(DOTData.name(expr));
+    color = color(expr);
+    return token(name(expr));
   }
 }

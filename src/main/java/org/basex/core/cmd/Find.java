@@ -104,7 +104,7 @@ public final class Find extends AQuery {
       final String[] spl = split(filter.get(i));
       for(final String s : spl) {
         byte[] term = token(s);
-        if(contains(term, '"')) term = replace(term, '\"', ' ');
+        if(contains(term, '"')) term = replace(term, '"', ' ');
         term = trim(term);
         if(term.length == 0) continue;
         tb.add('[');

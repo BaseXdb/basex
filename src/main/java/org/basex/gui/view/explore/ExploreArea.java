@@ -11,7 +11,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.basex.core.cmd.Find;
 import org.basex.data.Data;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
@@ -77,8 +76,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     });
     add(all, BorderLayout.NORTH);
 
-    panel = new BaseXBack(GUIConstants.Fill.NONE).layout(
-        new TableLayout(20, 2, 10, 5));
+    panel = new BaseXBack(Fill.NONE).layout(new TableLayout(20, 2, 10, 5));
     add(panel, BorderLayout.CENTER);
   }
 

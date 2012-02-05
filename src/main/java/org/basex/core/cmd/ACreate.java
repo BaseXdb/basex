@@ -107,7 +107,7 @@ public abstract class ACreate extends Command {
       Util.debug(ex);
       abort();
       final String msg = ex.getMessage();
-      return error(msg != null && msg.length() != 0 ? msg :
+      return error(msg != null && !msg.isEmpty() ? msg :
         Util.info(NOT_PARSED_X, parser.src));
     } catch(final Exception ex) {
       // known exceptions:

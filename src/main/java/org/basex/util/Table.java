@@ -91,7 +91,7 @@ public final class Table {
    * @return value
    */
   public String value(final int r, final int c) {
-    return Token.string(contents.get(r).get(c));
+    return string(contents.get(r).get(c));
   }
 
   /**

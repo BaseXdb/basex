@@ -30,6 +30,7 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
+import org.basex.query.util.Err.ErrType;
 import org.basex.util.InputInfo;
 import org.basex.util.list.ByteList;
 
@@ -189,7 +190,7 @@ public final class FNGen extends StandardFunc {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
       final Err err = ex.err();
-      if(err != null && err.type == Err.ErrType.FODC &&
+      if(err != null && err.type == ErrType.FODC &&
           (err.num == 2 || err.num == 4)) return Bln.FALSE;
       throw ex;
     }

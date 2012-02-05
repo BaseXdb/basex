@@ -8,7 +8,6 @@ import org.basex.data.FTStringMatch;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -103,14 +102,14 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(QueryText.DISTANCE),
+    ser.openElement(this, token(DISTANCE),
         token(dist[0] + "-" + dist[1] + ' ' + unit));
     super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return super.toString() + QueryText.DISTANCE + PAR1 +
+    return super.toString() + DISTANCE + PAR1 +
       dist[0] + '-' + dist[1] + ' ' + unit + PAR2;
   }
 }

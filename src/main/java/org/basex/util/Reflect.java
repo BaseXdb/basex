@@ -80,7 +80,7 @@ public final class Reflect {
    */
   private static Class<?> cache(final String name, final Class<?> c) {
     try {
-      if(!Reflect.accessible(c)) return null;
+      if(!accessible(c)) return null;
       CLASSES.put(name, c);
     } catch(final Throwable ex) { }
     return c;

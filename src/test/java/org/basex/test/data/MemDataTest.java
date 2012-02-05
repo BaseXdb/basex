@@ -55,9 +55,9 @@ public class MemDataTest {
   public void replaceValue() throws BaseXException {
     new XQuery("replace value of node /a/b with 'test2'").execute(CTX);
     final String o = new XQuery("/a/b[text() = 'test']").execute(CTX);
-    assertTrue("Old node found", o.length() == 0);
+    assertTrue("Old node found", o.isEmpty());
     final String n = new XQuery("/a/b[text() = 'test2']").execute(CTX);
-    assertTrue("New node not found", n.length() > 0);
+    assertTrue("New node not found", !n.isEmpty());
   }
 
   /**
@@ -68,9 +68,9 @@ public class MemDataTest {
   public void replaceNode() throws BaseXException {
     new XQuery("replace node /a/b with <d f='test2'/>").execute(CTX);
     final String o = new XQuery("/a/b").execute(CTX);
-    assertTrue("Old node found", o.length() == 0);
+    assertTrue("Old node found", o.isEmpty());
     final String n = new XQuery("//d[@f = 'test2']").execute(CTX);
-    assertTrue("New node not found", n.length() > 0);
+    assertTrue("New node not found", !n.isEmpty());
   }
 
   /**
@@ -81,10 +81,10 @@ public class MemDataTest {
   public void insertNode() throws BaseXException {
     new XQuery("insert node <d>test2</d> as first into /a").execute(CTX);
     final String r = new XQuery("//d[text() = 'test2']").execute(CTX);
-    assertTrue("Node not found", r.length() > 0);
+    assertTrue("Node not found", !r.isEmpty());
     new XQuery("insert node <d>test2</d> as first into /a").execute(CTX);
     final String c = new XQuery("count(//d[text() = 'test2'])").execute(CTX);
-    assertTrue("Second node not found", 2 == Integer.parseInt(c));
+    assertEquals("Second node not found", 2, Integer.parseInt(c));
   }
 
 
@@ -96,9 +96,9 @@ public class MemDataTest {
   public void insertDuplicateNode() throws BaseXException {
     new XQuery("insert node <d>test</d> as first into /a").execute(CTX);
     final String r = new XQuery("//d[text() = 'test']").execute(CTX);
-    assertTrue("Node not found", r.length() > 0);
+    assertTrue("Node not found", !r.isEmpty());
     final String c = new XQuery("count(//*[text() = 'test'])").execute(CTX);
-    assertTrue("Second node not found", 2 == Integer.parseInt(c));
+    assertEquals("Second node not found", 2, Integer.parseInt(c));
   }
 
   /**
@@ -109,7 +109,7 @@ public class MemDataTest {
   public void deleteNode() throws BaseXException {
     new XQuery("delete node //b").execute(CTX);
     final String r = new XQuery("//*[text() = 'test']").execute(CTX);
-    assertTrue("Node not deleted", r.length() == 0);
+    assertTrue("Node not deleted", r.isEmpty());
   }
 
   /**
@@ -119,6 +119,6 @@ public class MemDataTest {
   @Test
   public void findNonexistingNode() throws BaseXException {
     final String r = new XQuery("//*[text() = 'test0']").execute(CTX);
-    assertTrue("Found non-existing node", r.length() == 0);
+    assertTrue("Found non-existing node", r.isEmpty());
   }
 }

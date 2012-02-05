@@ -9,7 +9,6 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.func.Function;
 import org.basex.query.item.ANode;
 import org.basex.query.item.AtomType;
@@ -140,7 +139,7 @@ public abstract class ParseExpr extends Expr {
    * @return optimized expression
    */
   protected final Expr optPre(final Expr opt, final QueryContext ctx) {
-    if(opt != this) ctx.compInfo(QueryText.OPTPRE, this);
+    if(opt != this) ctx.compInfo(OPTPRE, this);
     return opt == null ? Empty.SEQ : opt;
   }
 
@@ -220,7 +219,7 @@ public abstract class ParseExpr extends Expr {
 
     final Item it = checkNoEmpty(e.item(ctx, input), AtomType.DBL);
     final Type ip = it.type;
-    if(!ip.isUntyped() && !ip.isNumber()) Err.number(this, it);
+    if(!ip.isUntyped() && !ip.isNumber()) number(this, it);
     return it.dbl(input);
   }
 
@@ -286,8 +285,8 @@ public abstract class ParseExpr extends Expr {
     final byte[] u = checkStr(e, ctx);
     if(eq(URLCOLL, u)) return;
     final Uri uri = Uri.uri(u);
-    if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri).string(),
-        QueryText.URLCOLL)) IMPLCOL.thrw(input, e);
+    if(uri.isAbsolute() || !eq(ctx.sc.baseURI().resolve(uri).string(), URLCOLL))
+      IMPLCOL.thrw(input, e);
     }
 
   /**

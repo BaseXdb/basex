@@ -2,6 +2,48 @@ package org.basex.io.serial;
 
 import static org.basex.core.Text.*;
 import org.basex.data.ExprInfo;
+import org.basex.query.expr.And;
+import org.basex.query.expr.Arith;
+import org.basex.query.expr.CFrag;
+import org.basex.query.expr.Cast;
+import org.basex.query.expr.Catch;
+import org.basex.query.expr.CmpG;
+import org.basex.query.expr.CmpN;
+import org.basex.query.expr.CmpR;
+import org.basex.query.expr.CmpV;
+import org.basex.query.expr.Context;
+import org.basex.query.expr.Except;
+import org.basex.query.expr.If;
+import org.basex.query.expr.IndexAccess;
+import org.basex.query.expr.InterSect;
+import org.basex.query.expr.List;
+import org.basex.query.expr.Or;
+import org.basex.query.expr.Pos;
+import org.basex.query.expr.Preds;
+import org.basex.query.expr.Quantifier;
+import org.basex.query.expr.Range;
+import org.basex.query.expr.RangeAccess;
+import org.basex.query.expr.Root;
+import org.basex.query.expr.Try;
+import org.basex.query.expr.Union;
+import org.basex.query.expr.VarRef;
+import org.basex.query.flwor.FLWR;
+import org.basex.query.flwor.ForLet;
+import org.basex.query.flwor.GFLWOR;
+import org.basex.query.flwor.Order;
+import org.basex.query.flwor.OrderBy;
+import org.basex.query.flwor.OrderByExpr;
+import org.basex.query.ft.FTContains;
+import org.basex.query.ft.FTExpr;
+import org.basex.query.ft.FTIndexAccess;
+import org.basex.query.func.StandardFunc;
+import org.basex.query.func.UserFunc;
+import org.basex.query.func.UserFuncCall;
+import org.basex.query.func.UserFuncs;
+import org.basex.query.path.AxisStep;
+import org.basex.query.path.Path;
+import org.basex.query.util.Var;
+import org.basex.query.util.VarStack;
 import org.basex.util.Util;
 
 /**
@@ -51,70 +93,70 @@ final class DOTData {
     { "6666FF", "Item" },
     { "6666FF", "sequence" },
     // violet
-    { "9933FF", org.basex.query.expr.CFrag.class },
-    { "9933CC", org.basex.query.expr.And.class },
-    { "9933CC", org.basex.query.expr.Or.class },
-    { "9933CC", org.basex.query.expr.Union.class },
-    { "9933CC", org.basex.query.expr.InterSect.class },
-    { "9933CC", org.basex.query.expr.Except.class },
+    { "9933FF", CFrag.class },
+    { "9933CC", And.class },
+    { "9933CC", Or.class },
+    { "9933CC", Union.class },
+    { "9933CC", InterSect.class },
+    { "9933CC", Except.class },
     { "9933CC", "Then" },
     { "9933CC", "Else" },
     // pink
-    { "CC3399", org.basex.query.expr.If.class },
-    { "CC3399", org.basex.query.expr.Quantifier.class },
+    { "CC3399", If.class },
+    { "CC3399", Quantifier.class },
     { "CC3399", "Where" },
-    { "CC3399", org.basex.query.flwor.Order.class },
-    { "CC6699", org.basex.query.flwor.OrderBy.class },
+    { "CC3399", Order.class },
+    { "CC6699", OrderBy.class },
     // red
-    { "FF3333", org.basex.query.expr.Arith.class },
-    { "FF3333", org.basex.query.expr.CmpG.class },
-    { "FF3333", org.basex.query.expr.CmpN.class },
-    { "FF3333", org.basex.query.expr.CmpV.class },
-    { "FF3333", org.basex.query.expr.CmpR.class },
-    { "FF3333", org.basex.query.expr.Pos.class },
-    { "FF3333", org.basex.query.ft.FTContains.class },
-    { "FF6666", org.basex.query.ft.FTExpr.class },
-    { "FF6666", org.basex.query.expr.Try.class },
-    { "FF6666", org.basex.query.expr.Catch.class },
+    { "FF3333", Arith.class },
+    { "FF3333", CmpG.class },
+    { "FF3333", CmpN.class },
+    { "FF3333", CmpV.class },
+    { "FF3333", CmpR.class },
+    { "FF3333", Pos.class },
+    { "FF3333", FTContains.class },
+    { "FF6666", FTExpr.class },
+    { "FF6666", Try.class },
+    { "FF6666", Catch.class },
     // orange
-    { "AA9988", org.basex.query.func.UserFunc.class },
-    { "776655", org.basex.query.func.UserFuncs.class },
-    { "CC6600", org.basex.query.path.Path.class },
-    { "FF9900", org.basex.query.expr.Preds.class },
+    { "AA9988", UserFunc.class },
+    { "776655", UserFuncs.class },
+    { "CC6600", Path.class },
+    { "FF9900", Preds.class },
     // green
-    { "009900", org.basex.query.flwor.GFLWOR.class },
-    { "339933", org.basex.query.util.VarStack.class },
-    { "33CC33", org.basex.query.flwor.ForLet.class },
-    { "33CC33", org.basex.query.expr.List.class },
-    { "33CC33", org.basex.query.expr.Range.class },
-    { "33CC33", org.basex.query.expr.Context.class },
+    { "009900", GFLWOR.class },
+    { "339933", VarStack.class },
+    { "33CC33", ForLet.class },
+    { "33CC33", List.class },
+    { "33CC33", Range.class },
+    { "33CC33", Context.class },
     { "33CC33", "Return" },
-    { "66CC66", org.basex.query.util.Var.class },
-    { "66CC66", org.basex.query.expr.Cast.class },
+    { "66CC66", Var.class },
+    { "66CC66", Cast.class },
     // cyan
-    { "009999", org.basex.query.func.UserFuncCall.class },
-    { "00BBBB", org.basex.query.func.StandardFunc.class },
-    { "00BBBB", org.basex.query.expr.Root.class },
-    { "00BBBB", org.basex.query.expr.VarRef.class },
-    { "00BBBB", org.basex.query.expr.IndexAccess.class },
-    { "00BBBB", org.basex.query.expr.RangeAccess.class },
-    { "00BBBB", org.basex.query.ft.FTIndexAccess.class },
+    { "009999", UserFuncCall.class },
+    { "00BBBB", StandardFunc.class },
+    { "00BBBB", Root.class },
+    { "00BBBB", VarRef.class },
+    { "00BBBB", IndexAccess.class },
+    { "00BBBB", RangeAccess.class },
+    { "00BBBB", FTIndexAccess.class },
   };
 
   /** Hash map, caching expression names. */
   private static final Object[][] NAMES = {
-    { "Calculation", org.basex.query.expr.Arith.class },
-    { "Comparison", org.basex.query.expr.CmpG.class },
-    { "Comparison", org.basex.query.expr.CmpN.class },
-    { "Comparison", org.basex.query.expr.CmpV.class },
-    { "Comparison", org.basex.query.expr.CmpR.class },
-    { "FLWOR", org.basex.query.flwor.FLWR.class },
-    { "Declaration", org.basex.query.func.UserFunc.class },
-    { "Function", org.basex.query.func.StandardFunc.class },
-    { null, org.basex.query.path.Path.class },
-    { "Step", org.basex.query.path.AxisStep.class },
-    { "Variables", org.basex.query.util.VarStack.class },
-    { "OrderBy", org.basex.query.flwor.OrderByExpr.class },
+    { "Calculation", Arith.class },
+    { "Comparison", CmpG.class },
+    { "Comparison", CmpN.class },
+    { "Comparison", CmpV.class },
+    { "Comparison", CmpR.class },
+    { "FLWOR", FLWR.class },
+    { "Declaration", UserFunc.class },
+    { "Function", StandardFunc.class },
+    { null, Path.class },
+    { "Step", AxisStep.class },
+    { "Variables", VarStack.class },
+    { "OrderBy", OrderByExpr.class },
     { "operator", "op" },
   };
 

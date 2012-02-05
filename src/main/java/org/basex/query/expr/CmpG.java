@@ -93,7 +93,7 @@ public final class CmpG extends Cmp {
      * @param n string representation
      * @param c comparator
      */
-    private Op(final String n, final CmpV.Op c) {
+    Op(final String n, final CmpV.Op c) {
       name = n;
       op = c;
     }

@@ -164,8 +164,7 @@ public final class SeqType {
   public static final SeqType ELM_ZM = new SeqType(NodeType.ELM, Occ.ZM);
 
   /** The general map type. */
-  public static final MapType ANY_MAP = new MapType(AtomType.AAT,
-      SeqType.ITEM_ZM);
+  public static final MapType ANY_MAP = new MapType(AtomType.AAT, ITEM_ZM);
   /** Single function. */
   public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZM);
   /** Single function. */

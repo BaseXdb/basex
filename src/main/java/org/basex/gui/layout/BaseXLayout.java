@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
-import org.basex.gui.GUIConstants;
 import static org.basex.gui.GUIConstants.*;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
@@ -354,9 +353,9 @@ public final class BaseXLayout {
     final int tw = width(g, tt);
     final int th = g.getFontMetrics().getHeight();
     final int xx = Math.min(w - tw - 8, x);
-    g.setColor(GUIConstants.color(c));
+    g.setColor(color(c));
     g.fillRect(xx - 1, y - th, tw + 4, th);
-    g.setColor(GUIConstants.WHITE);
+    g.setColor(WHITE);
     g.drawString(tt, xx, y - 4);
   }
 

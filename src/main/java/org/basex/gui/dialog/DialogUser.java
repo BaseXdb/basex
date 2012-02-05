@@ -324,7 +324,7 @@ final class DialogUser extends BaseXBack {
    * @return String
    */
   private static String numberof(final String w, final int n) {
-    return "(" + n + " " + w + ")";
+    return "(" + n + ' ' + w + ')';
   }
 
   /**

@@ -47,7 +47,7 @@ public final class Bln extends Item {
    * @return item
    */
   public static Bln get(final double s) {
-    return s == 0 ? Bln.FALSE : new Bln(true, s);
+    return s == 0 ? FALSE : new Bln(true, s);
   }
 
   /**

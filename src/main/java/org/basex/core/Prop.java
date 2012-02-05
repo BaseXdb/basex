@@ -45,8 +45,8 @@ public final class Prop extends AProp {
   public static final String LANG = "English";
 
   /** Property information. */
-  static final String PROPHEADER = "# Property File." + Prop.NL
-      + "# You can set additional options at the end of the file." + Prop.NL;
+  static final String PROPHEADER = "# Property File." + NL
+      + "# You can set additional options at the end of the file." + NL;
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 

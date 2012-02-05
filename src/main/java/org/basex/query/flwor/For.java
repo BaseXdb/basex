@@ -12,6 +12,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Int;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -59,7 +60,7 @@ public final class For extends ForLet {
     type = expr.type();
     size = expr.size();
     if(ctx.grouping) {
-      var.ret = SeqType.get(type.type, SeqType.Occ.ZM);
+      var.ret = SeqType.get(type.type, Occ.ZM);
     } else {
       var.size = Math.min(1, size);
       var.ret = type.type.seqType();

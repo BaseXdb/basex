@@ -12,6 +12,7 @@ import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
+import org.basex.gui.view.map.MapView;
 
 /**
  * GUI Constants used in different views.
@@ -27,7 +28,7 @@ import org.basex.gui.view.View;
  *  <li> add a string for your view, as shown below</li>
  *  <li> add the string in the {@link #VIEWS} string below</li>
  *  <li> create your view implementation in a new sub package
- *    (e.g. {@link org.basex.gui.view.map.MapView}).
+ *    (e.g. {@link MapView}).
  *  <li> add a new {@link View} instance in the {@link GUI} constructor.</li>
  * </ul>
  *
@@ -174,14 +175,14 @@ public final class GUIConstants {
      * @param s small icon
      * @param l large icon
      */
-    private Msg(final String s, final String l) {
+    Msg(final String s, final String l) {
       small = BaseXLayout.icon(s);
       large = UIManager.getIcon("OptionPane." + l + "Icon");
     }
   }
 
   /** Background fill options. */
-  public static enum Fill {
+  public enum Fill {
     /** Opaque fill mode.  */ PLAIN,
     /** Transparent mode.  */ NONE,
     /** Downward gradient. */ GRADIENT

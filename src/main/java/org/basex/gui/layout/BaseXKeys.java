@@ -112,7 +112,7 @@ public enum BaseXKeys {
    * @param k key code
    * @param ex modifiers exclusive
    */
-  private BaseXKeys(final int m, final int k, final boolean ex) {
+  BaseXKeys(final int m, final int k, final boolean ex) {
     mod = m;
     key = k;
     excl = ex;
@@ -123,7 +123,7 @@ public enum BaseXKeys {
    * @param m modifiers
    * @param k key code
    */
-  private BaseXKeys(final int m, final int k) {
+  BaseXKeys(final int m, final int k) {
     this(m, k, false);
   }
 
@@ -132,7 +132,7 @@ public enum BaseXKeys {
    * @param k key code
    * @param ig ignore modifiers
    */
-  private BaseXKeys(final int k, final boolean ig) {
+  BaseXKeys(final int k, final boolean ig) {
     this(0, k, ig);
   }
 
@@ -140,7 +140,7 @@ public enum BaseXKeys {
    * Constructor without modifiers.
    * @param k key code
    */
-  private BaseXKeys(final int k) {
+  BaseXKeys(final int k) {
     this(0, k);
   }
 

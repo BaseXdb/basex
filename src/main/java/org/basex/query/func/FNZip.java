@@ -186,7 +186,7 @@ public final class FNZip extends StandardFunc {
    * @param pref directory prefix
    * @return current prefix
    */
-  private String createEntries(final Iterator<String> it,
+  private static String createEntries(final Iterator<String> it,
       final FElem par, final String pref) {
 
     String path = null;

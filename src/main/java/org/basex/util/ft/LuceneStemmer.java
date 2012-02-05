@@ -80,12 +80,11 @@ final class LuceneStemmer extends Stemmer {
    * @return result of check
    */
   static boolean available() {
-    return CLASSES.size() > 0;
+    return !CLASSES.isEmpty();
   }
 
   /** Empty constructor. */
   LuceneStemmer() {
-    super();
   }
 
   /**

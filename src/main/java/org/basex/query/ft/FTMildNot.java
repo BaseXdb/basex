@@ -105,6 +105,6 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public String toString() {
-    return toString(" " + NOT + " " + IN + " ");
+    return toString(' ' + NOT + ' ' + IN + ' ');
   }
 }

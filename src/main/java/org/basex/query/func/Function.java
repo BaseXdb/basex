@@ -815,8 +815,8 @@ public enum Function {
    * @param r return type
    * @param typ arguments types
    */
-  private Function(final Class<? extends StandardFunc> fun,
-      final String dsc, final SeqType r, final SeqType... typ) {
+  Function(final Class<? extends StandardFunc> fun, final String dsc,
+      final SeqType r, final SeqType... typ) {
     this(fun, dsc, r, typ.length, typ);
   }
 
@@ -829,8 +829,8 @@ public enum Function {
    *   the maximum number of arguments is variable
    * @param typ arguments types
    */
-  private Function(final Class<? extends StandardFunc> fun,
-      final String dsc, final SeqType r, final int m, final SeqType... typ) {
+  Function(final Class<? extends StandardFunc> fun, final String dsc,
+      final SeqType r, final int m, final SeqType... typ) {
 
     func = fun;
     desc = dsc;

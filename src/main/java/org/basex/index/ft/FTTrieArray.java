@@ -213,7 +213,7 @@ final class FTTrieArray {
    * @param b2 input array two
    * @return intersection of b1 and b2
    */
-  private byte[] intersection(final byte[] b1, final byte[] b2) {
+  private static byte[] intersection(final byte[] b1, final byte[] b2) {
     if(b1 == null || b2 == null) return null;
 
     final int ml = Math.min(b1.length, b2.length);

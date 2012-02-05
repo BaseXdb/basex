@@ -16,6 +16,7 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
@@ -129,13 +130,13 @@ public final class DialogExport extends Dialog {
    * @return encoding combo box
    */
   static BaseXCombo encoding(final Dialog dialog, final String encoding) {
-    final BaseXCombo cb = new BaseXCombo(dialog, DialogExport.ENCODINGS);
+    final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
     boolean f = false;
     String enc = encoding;
-    for(final String s : DialogExport.ENCODINGS) f |= s.equals(enc);
+    for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase(Locale.ENGLISH);
-      for(final String s : DialogExport.ENCODINGS) f |= s.equals(enc);
+      for(final String s : ENCODINGS) f |= s.equals(enc);
     }
     cb.setSelectedItem(enc);
     cb.addKeyListener(dialog.keys);
@@ -147,7 +148,7 @@ public final class DialogExport extends Dialog {
    */
   void choose() {
     final IOFile io = new BaseXFileChooser(CHOOSE_DIR, path.getText(), gui).
-      select(BaseXFileChooser.Mode.DOPEN);
+      select(Mode.DOPEN);
     if(io != null) path.setText(io.path());
   }
 

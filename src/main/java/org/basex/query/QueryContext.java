@@ -336,7 +336,7 @@ public final class QueryContext extends Progress {
 
     Object obj = val;
     if(type != null && !type.isEmpty()) {
-      if(type.equals(QueryText.JSONSTR)) {
+      if(type.equals(JSONSTR)) {
         obj = JsonMapConverter.parse(token(val.toString()), null);
       } else {
         final QNm nm = new QNm(token(type), this);

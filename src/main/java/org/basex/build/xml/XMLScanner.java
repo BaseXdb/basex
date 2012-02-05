@@ -36,7 +36,7 @@ final class XMLScanner extends Progress {
   private static final byte[] AMPER = { '&' };
 
   /** Scanning states. */
-  private static enum State {
+  private enum State {
     /** Content state.   */ CONTENT,
     /** Tag state.       */ TAG,
     /** Attribute state. */ ATT,

@@ -55,8 +55,7 @@ public abstract class QueryPlanTest {
       CTX.openDB(plan);
       for(final String p : pr) {
         if(!new XQuery(p).execute(CTX).equals("true"))
-          fail(p + ":" + NL + qp.ctx.root + NL
-              + new XQuery("/").execute(CTX));
+          fail(p + ':' + NL + qp.ctx.root + NL + new XQuery("/").execute(CTX));
       }
     } catch(final Exception ex) {
       throw new Error(ex.getMessage(), ex);

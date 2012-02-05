@@ -12,6 +12,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Compare;
@@ -120,7 +121,7 @@ public final class FNSimple extends StandardFunc {
       case EXISTS:
         // ignore non-deterministic expressions (e.g.: error())
         return e.size() == -1 || e.uses(Use.NDT) || e.uses(Use.CNS) ? this :
-          Bln.get(sig == Function.EMPTY ^ e.size() != 0);
+          Bln.get(sig == Function.EMPTY ^ !e.isEmpty());
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
         return e.type().eq(SeqType.BLN) ? e : this;
@@ -148,13 +149,13 @@ public final class FNSimple extends StandardFunc {
         }
         return this;
       case ZERO_OR_ONE:
-        type = SeqType.get(e.type().type, SeqType.Occ.ZO);
+        type = SeqType.get(e.type().type, Occ.ZO);
         return e.type().zeroOrOne() ? e : this;
       case EXACTLY_ONE:
-        type = SeqType.get(e.type().type, SeqType.Occ.O);
+        type = SeqType.get(e.type().type, Occ.O);
         return e.type().one() ? e : this;
       case ONE_OR_MORE:
-        type = SeqType.get(e.type().type, SeqType.Occ.OM);
+        type = SeqType.get(e.type().type, Occ.OM);
         return !e.type().mayBeZero() ? e : this;
       case UNORDERED:
         return e;
@@ -174,7 +175,7 @@ public final class FNSimple extends StandardFunc {
       if(!e.type().mayBeNum()) ex = e;
     } else if(sig == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.isNode() || e.size() > 0) ex = e;
+      if(e.type().type.isNode() || !e.isEmpty()) ex = e;
     }
     if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;

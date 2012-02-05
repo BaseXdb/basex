@@ -249,7 +249,7 @@ public enum Calc {
    * Constructor.
    * @param n name
    */
-  private Calc(final String n) {
+  Calc(final String n) {
     name = n;
   }
 

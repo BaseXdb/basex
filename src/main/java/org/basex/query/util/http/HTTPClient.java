@@ -29,7 +29,6 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.http.Request.Part;
 import org.basex.util.Base64;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.hash.TokenMap;
 
@@ -182,7 +181,7 @@ public final class HTTPClient {
       throws QueryException, IOException {
 
     final URL url = new URL(dest);
-    if(!Token.eqic(url.getProtocol(), "HTTP", "HTTPS"))
+    if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
       HTTPERR.thrw(input, "Invalid URL");
     return (HttpURLConnection) url.openConnection();
   }

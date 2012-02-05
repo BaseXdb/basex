@@ -14,7 +14,7 @@ import org.basex.util.list.TokenList;
  * It is implemented by {@link ClientQuery}.</p>
  * <p>Results are either returned as string or serialized to the output
  * stream that has been specified via the constructor or via
- * {@link Session#setOutputStream(java.io.OutputStream)}.</p>
+ * {@link Session#setOutputStream(OutputStream)}.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

@@ -12,6 +12,7 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXFileChooser;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
@@ -123,7 +124,7 @@ public final class DialogImport extends BaseXBack {
     fc.addFilter(PLAIN_TEXT, IO.TXTSUFFIX);
     fc.addFilter(GZIP_ARCHIVES, IO.GZSUFFIX);
     fc.addFilter(ZIP_ARCHIVES, IO.ZIPSUFFIXES);
-    final IOFile file = fc.select(BaseXFileChooser.Mode.FDOPEN);
+    final IOFile file = fc.select(Mode.FDOPEN);
     if(file != null) gui.gprop.set(GUIProp.CREATEPATH, file.path());
     return file;
   }

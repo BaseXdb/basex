@@ -262,7 +262,7 @@ public abstract class Path extends ParseExpr {
 
       // ignore axes other than descendant, or numeric predicates
       final AxisStep curr = axisStep(s);
-      if(curr == null || curr.axis != Axis.DESC || curr.uses(Use.POS)) continue;
+      if(curr == null || curr.axis != DESC || curr.uses(Use.POS)) continue;
 
       // check if child steps can be retrieved for current step
       ObjList<PathNode> pn = pathNodes(data, s);
@@ -291,7 +291,7 @@ public abstract class Path extends ParseExpr {
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
           new NameTest(nm, Name.NAME, false);
-        stps[t] = AxisStep.get(input, Axis.CHILD, nt, preds);
+        stps[t] = AxisStep.get(input, CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
       path = get(input, root, stps);
@@ -304,7 +304,7 @@ public abstract class Path extends ParseExpr {
       for(int s = 0; s < path.steps.length; ++s) {
         // only verify child steps; ignore namespaces
         final AxisStep st = path.axisStep(s);
-        if(st == null || st.axis != Axis.CHILD) break;
+        if(st == null || st.axis != CHILD) break;
         if(st.test.test == Name.ALL || st.test.test == null) continue;
         if(st.test.test != Name.NAME) break;
 
@@ -345,8 +345,8 @@ public abstract class Path extends ParseExpr {
     for(int s = 0; s <= l; ++s) {
       final AxisStep curr = axisStep(s);
       if(curr == null) return null;
-      final boolean desc = curr.axis == Axis.DESC;
-      if(!desc && curr.axis != Axis.CHILD || curr.test.test != Name.NAME)
+      final boolean desc = curr.axis == DESC;
+      if(!desc && curr.axis != CHILD || curr.test.test != Name.NAME)
         return null;
 
       final int name = data.tagindex.id(curr.test.name.local());

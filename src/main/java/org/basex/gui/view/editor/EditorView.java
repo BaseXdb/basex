@@ -28,6 +28,7 @@ import org.basex.gui.GUIMenu;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.*;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
@@ -290,7 +291,7 @@ public final class EditorView extends View {
         gui.gprop.get(GUIProp.XQPATH), gui);
     fc.addFilter(XQUERY_FILES, IO.XQSUFFIXES);
 
-    final IOFile file = fc.select(BaseXFileChooser.Mode.FOPEN);
+    final IOFile file = fc.select(Mode.FOPEN);
     if(file != null) open(file);
   }
 
@@ -316,7 +317,7 @@ public final class EditorView extends View {
       new BaseXFileChooser(SAVE_AS, edit.file().path(), gui);
     fc.addFilter(XQUERY_FILES, IO.XQSUFFIXES);
 
-    final IOFile file = fc.select(BaseXFileChooser.Mode.FSAVE);
+    final IOFile file = fc.select(Mode.FSAVE);
     if(file == null) return false;
     save(file);
     return true;

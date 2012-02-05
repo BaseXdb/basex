@@ -8,7 +8,7 @@ import org.basex.util.list.ElementList;
 
 /**
  * This class serves as an efficient constructor for byte arrays.
- * It bears some resemblance to Java's {@link java.lang.StringBuilder}.
+ * It bears some resemblance to Java's {@link StringBuilder}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

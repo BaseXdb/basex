@@ -14,7 +14,6 @@ import javax.swing.SwingUtilities;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
@@ -57,7 +56,7 @@ public final class TableView extends View implements Runnable {
     scroll = new BaseXBar(this);
     content = new TableContent(tdata, scroll);
     add(content, BorderLayout.CENTER);
-    new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, POPUP);
   }
 
   @Override
@@ -219,12 +218,12 @@ public final class TableView extends View implements Runnable {
 
     final String str = content.focusedString;
     gui.cursor(valid && str != null && str.length() <= data.meta.maxlen ?
-      GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+      CURSORHAND : CURSORARROW);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) {
-    gui.cursor(GUIConstants.CURSORARROW);
+    gui.cursor(CURSORARROW);
     gui.notify.focus(-1, null);
   }
 
@@ -252,7 +251,7 @@ public final class TableView extends View implements Runnable {
         //repaint();
       } else {
         Nodes nodes = context.marked;
-        if(getCursor() == GUIConstants.CURSORARROW) {
+        if(getCursor() == CURSORARROW) {
           nodes = new Nodes(tdata.getRoot(nodes.data, pre), nodes.data);
         }
         gui.notify.context(nodes, false, null);

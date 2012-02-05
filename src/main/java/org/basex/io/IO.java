@@ -99,9 +99,8 @@ public abstract class IO {
   }
 
   /**
-   * <p>Returns an {@link IO} representation for the specified string. The type
-   * of the returned {@link IO} instance is dynamically chosen; it depends
-   * on the string value:</p>
+   * <p>Returns a class instance for the specified string. The type of the
+   * returned instance depends on the string value:</p>
    * <ul>
    * <li>{@link IOContent}: if the string starts with an angle bracket (&lt;)
    *   or if it is a {@code null} reference, it is interpreted as XML fragment

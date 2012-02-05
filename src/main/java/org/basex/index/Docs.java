@@ -298,7 +298,7 @@ final class Docs {
       // normalize path to one leading + one trailing slash!
       byte[] tp = concat(SLASH, token(pth));
       // if the given path is the root, don't add a trailing slash
-      if(pth.length() > 0) tp = concat(tp, SLASH);
+      if(!pth.isEmpty()) tp = concat(tp, SLASH);
       for(final byte[] to : paths()) {
         if(startsWith(to, tp)) {
           final byte[] toAdd = substring(to, tp.length, to.length);

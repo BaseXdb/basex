@@ -98,12 +98,12 @@ public final class IOFile extends IO {
    * @return success flag
    */
   public boolean touch() {
-    // try several times (may fail at first run, particularly on Windows)
+    // some file systems require several runs
     for(int i = 0; i < 10; i++) {
       try {
         if(file.createNewFile()) return true;
       } catch(final IOException ex) {
-        Performance.sleep(50);
+        Performance.sleep(i * 10);
         Util.debug(ex);
       }
     }
@@ -351,11 +351,16 @@ public final class IOFile extends IO {
   public boolean delete() {
     boolean ok = true;
     if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
-    return file.delete() && ok;
+    // some file systems require several runs
+    for(int i = 0; i < 10; i++) {
+      if(file.delete() && !file.exists()) return ok;
+      Performance.sleep(i * 10);
+    }
+    return false;
   }
 
   /**
-   * Renames the specified IO reference.
+   * Renames the file to the specified name.
    * @param trg target reference
    * @return success flag
    */

@@ -53,7 +53,7 @@ public final class List extends Arr {
       // check if all expressions are values
       v &= e.isValue();
       // skip expression that will not add any results
-      if(e.size() == 0) continue;
+      if(e.isEmpty()) continue;
       // evaluate sequence type
       final SeqType et = e.type();
       type = type == SeqType.EMP ? et :

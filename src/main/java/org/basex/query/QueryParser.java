@@ -700,7 +700,7 @@ public class QueryParser extends InputParser {
         map.put(s, string(stringLiteral()));
         break;
       }
-      if(map.size() == 0) error(NODECLFORM, prop);
+      if(map.isEmpty()) error(NODECLFORM, prop);
     } while(n != map.size());
 
     // completes the format declaration

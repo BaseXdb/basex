@@ -14,7 +14,6 @@ import javax.swing.Box;
 import org.basex.core.Command;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
@@ -22,6 +21,7 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXFileChooser;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
@@ -33,7 +33,6 @@ import org.basex.io.IO;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.Serializer;
-import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -121,8 +120,8 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
-    area.setFont(GUIConstants.mfont);
+    header.setFont(lfont);
+    area.setFont(mfont);
   }
 
   @Override
@@ -171,7 +170,7 @@ public final class TextView extends View implements ActionListener {
   public void setText(final ArrayOutput out, final Command c) {
     final byte[] buf = out.buffer();
     final int size = (int) out.size();
-    final byte[] chop = Token.token(DOTS);
+    final byte[] chop = token(DOTS);
     if(out.finished() && size >= chop.length) {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
@@ -191,7 +190,7 @@ public final class TextView extends View implements ActionListener {
   public void actionPerformed(final ActionEvent e) {
     final BaseXFileChooser fc = new BaseXFileChooser(SAVE_AS,
         gui.gprop.get(GUIProp.SAVEPATH), gui);
-    final IO file = fc.select(BaseXFileChooser.Mode.FSAVE);
+    final IO file = fc.select(Mode.FSAVE);
     if(file == null) return;
     gui.gprop.set(GUIProp.SAVEPATH, file.path());
 
@@ -204,8 +203,7 @@ public final class TextView extends View implements ActionListener {
         ns.serialize(Serializer.get(out));
       } else {
         final byte[] txt = area.getText();
-        for(final byte t : txt) if(t < 0 || t > ' ' || Token.ws(t))
-          out.write(t);
+        for(final byte t : txt) if(t < 0 || t > ' ' || ws(t)) out.write(t);
       }
     } catch(final IOException ex) {
       Dialog.error(gui, FILE_NOT_SAVED);

@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Util.*;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -17,7 +18,6 @@ import java.util.jar.JarFile;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.Token;
-import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
 /**
@@ -47,7 +47,7 @@ public final class Lang {
   private Lang() { }
 
   /** Reads the language file. */
-  static { read(Util.language, CHECK); }
+  static { read(language, CHECK); }
 
   /**
    * Reads the specified language file.
@@ -63,7 +63,7 @@ public final class Lang {
       final String path = '/' + SUFFIX + '/' + lang + '.' + SUFFIX;
       final InputStream is = Lang.class.getResourceAsStream(path);
       if(is == null) {
-        Util.errln(path + " not found.");
+        errln(path + " not found.");
       } else {
         br = new BufferedReader(new InputStreamReader(is, Token.UTF8));
         for(String line; (line = br.readLine()) != null;) {
@@ -72,17 +72,17 @@ public final class Lang {
           final String key = line.substring(0, i).trim();
           String val = line.substring(i + 1).trim();
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
-          if(Util.langkeys) val = '[' + key + COLS + val + ']';
+          if(langkeys) val = '[' + key + COLS + val + ']';
           if(TETXTS.get(key) == null) {
             TETXTS.put(key, val);
           } else if(chk) {
-            Util.errln("%." + SUFFIX + ": '%' assigned twice", lang, key);
+            errln("%." + SUFFIX + ": '%' assigned twice", lang, key);
           }
           if(chk) check.put(key, true);
         }
       }
     } catch(final IOException ex) {
-      Util.errln(ex);
+      errln(ex);
     } finally {
       if(br != null) try { br.close(); } catch(final IOException ex) { }
     }
@@ -95,17 +95,17 @@ public final class Lang {
    */
   static synchronized String lang(final String key) {
     if(key == null) {
-      if(CHECK && check.size() != 0) {
+      if(CHECK && !check.isEmpty()) {
         for(final String s : check.keySet())
-          Util.errln("%." + SUFFIX + ": '%' not used", Util.language, s);
+          errln("%." + SUFFIX + ": '%' not used", language, s);
       }
       return null;
     }
 
     final String val = TETXTS.get(key);
     if(val == null) {
-      if(TETXTS.size() != 0) Util.errln("%." + SUFFIX + ": '%' missing",
-          Util.language, key);
+      if(!TETXTS.isEmpty())
+        errln("%." + SUFFIX + ": '%' missing", language, key);
       return '[' + key + ']';
     }
     if(CHECK) check.remove(key);
@@ -119,7 +119,7 @@ public final class Lang {
    * @return string
    */
   static synchronized String lang(final String key, final Object... e) {
-    return Util.info(lang(key), e);
+    return info(lang(key), e);
   }
 
   /**
@@ -156,7 +156,7 @@ public final class Lang {
         }
       }
     } catch(final IOException ex) {
-      Util.errln(ex);
+      errln(ex);
     }
     return new String[][] { langs.toArray(), creds.toArray() };
   }

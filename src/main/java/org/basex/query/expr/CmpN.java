@@ -53,7 +53,7 @@ public final class CmpN extends Arr {
      * Constructor.
      * @param n string representation
      */
-    private Op(final String n) {
+    Op(final String n) {
       name = n;
     }
 

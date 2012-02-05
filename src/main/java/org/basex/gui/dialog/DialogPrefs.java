@@ -16,6 +16,7 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
@@ -69,7 +70,7 @@ public final class DialogPrefs extends Dialog {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final IOFile file = new BaseXFileChooser(CHOOSE_DIR, path.getText(),
-            gui).select(BaseXFileChooser.Mode.DOPEN);
+            gui).select(Mode.DOPEN);
         if(file != null) path.setText(file.dir());
       }
     });

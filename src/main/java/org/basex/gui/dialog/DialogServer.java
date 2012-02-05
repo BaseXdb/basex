@@ -310,7 +310,7 @@ public final class DialogServer extends Dialog {
         connected = connected && ping(false);
         if(!connected) msg = SRV_STOPPED;
         if(host.getText().equals(LOCALHOST)) logpass.setText("");
-        if(!connected) super.setTitle(S_SERVER_ADMIN);
+        if(!connected) setTitle(S_SERVER_ADMIN);
       } else if(cmp == connect || cmp == loguser || cmp == logpass ||
           cmp == host || cmp == portc) {
         gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
@@ -321,15 +321,15 @@ public final class DialogServer extends Dialog {
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
-        super.setTitle(S_SERVER_ADMIN + LI + loguser.getText() + '@' +
-            host.getText() + COL + portc.getText());
+        setTitle(S_SERVER_ADMIN + LI + loguser.getText() + '@' +
+                host.getText() + COL + portc.getText());
         msg = Util.info(S_CONNECTED, host.getText(), portc.getText());
         refreshSess();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
         logpass.setText("");
-        super.setTitle(S_SERVER_ADMIN);
+        setTitle(S_SERVER_ADMIN);
         msg = S_DISCONNECTED;
       } else if(cmp == refreshSess) {
         refreshSess();

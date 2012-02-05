@@ -3,6 +3,9 @@ package org.basex.test.query.func;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
+import java.io.*;
+
+import org.basex.io.out.*;
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
@@ -14,6 +17,9 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNUtilTest extends AdvancedQueryTest {
+  /** Null output stream. */
+  static final PrintStream NULL = new PrintStream(new NullOutput());
+
   /**
    * Test method for the util:eval() function.
    */
@@ -42,10 +48,13 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilMem() {
+    final PrintStream err = System.err;
+    System.setErr(NULL);
     check(_UTIL_MEM);
     query(_UTIL_MEM.args("()"));
     query(COUNT.args(_UTIL_MEM.args(" 1 to 100000 ", false)), "100000");
     query(COUNT.args(_UTIL_MEM.args(" 1 to 100000 ", true)), "100000");
+    System.setErr(err);
   }
 
   /**
@@ -53,10 +62,13 @@ public final class FNUtilTest extends AdvancedQueryTest {
    */
   @Test
   public void utilTime() {
+    final PrintStream err = System.err;
+    System.setErr(NULL);
     check(_UTIL_TIME);
     query(_UTIL_TIME.args("()"));
     query(COUNT.args(_UTIL_TIME.args(" 1 to 100000 ", false)), "100000");
     query(COUNT.args(_UTIL_TIME.args(" 1 to 100000 ", true)), "100000");
+    System.setErr(err);
   }
 
   /**

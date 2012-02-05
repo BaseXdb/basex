@@ -64,7 +64,9 @@ public final class DropDB extends Command {
    */
   public static synchronized boolean drop(final String db,
       final MainProp mprop) {
-    return drop(mprop.dbpath(db), null);
+
+    final IOFile dbpath = mprop.dbpath(db);
+    return dbpath.exists() && drop(dbpath, null);
   }
 
   /**

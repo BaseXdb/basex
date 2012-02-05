@@ -165,7 +165,7 @@ public final class JavaFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return cls.getSimpleName() + "." + mth;
+    return cls.getSimpleName() + '.' + mth;
   }
 
   @Override

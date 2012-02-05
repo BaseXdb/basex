@@ -246,7 +246,7 @@ public final class FNZipTest extends AdvancedQueryTest {
     try {
       zf = new ZipFile(TMPZIP);
       final ZipEntry ze = zf.getEntry(file);
-      assertTrue("File not found: " + file, ze != null);
+      assertNotNull("File not found: " + file, ze);
       final DataInputStream is = new DataInputStream(zf.getInputStream(ze));
       final byte[] dt = new byte[(int) ze.getSize()];
       is.readFully(dt);

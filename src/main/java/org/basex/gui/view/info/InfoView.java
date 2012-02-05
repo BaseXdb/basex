@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
@@ -92,9 +91,9 @@ public final class InfoView extends View {
 
   @Override
   public void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
-    timer.setFont(GUIConstants.font);
-    area.setFont(GUIConstants.font);
+    header.setFont(lfont);
+    timer.setFont(font);
+    area.setFont(font);
   }
 
   @Override

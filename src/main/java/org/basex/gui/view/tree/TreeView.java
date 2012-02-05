@@ -91,7 +91,7 @@ public final class TreeView extends View implements TreeConstants {
    */
   public TreeView(final ViewNotifier man) {
     super(TREEVIEW, man);
-    new BaseXPopup(this, GUIConstants.POPUP);
+    new BaseXPopup(this, POPUP);
   }
 
   @Override
@@ -320,7 +320,7 @@ public final class TreeView extends View implements TreeConstants {
     int xx = x;
     final int y = getYperLevel(lv);
     int nh = nodeHeight;
-    g.setColor(GUIConstants.color2A);
+    g.setColor(color2A);
     while(nh > 0) {
       nh -= ss;
       if(nh < 0) nh = 0;
@@ -453,9 +453,8 @@ public final class TreeView extends View implements TreeConstants {
       final TreeRect r, final int pre) {
 
     String s = Token.string(TreeRects.getText(gui.context, rn, pre)).trim();
-    if(r.w < BaseXLayout.width(g, s)
-        && r.w < BaseXLayout.width(g, "..".concat(s.substring(s.length() - 1)))
-            + MIN_TXT_SPACE) return;
+    if(r.w < BaseXLayout.width(g, s) && r.w < BaseXLayout.width(
+        g, ".." + s.substring(s.length() - 1)) + MIN_TXT_SPACE) return;
 
     final int x = r.x;
     final int y = getYperLevel(lv);
@@ -464,10 +463,10 @@ public final class TreeView extends View implements TreeConstants {
     int tw = BaseXLayout.width(g, s);
 
     if(tw > r.w) {
-      s = s.concat("..");
+      s += "..";
       while((tw = BaseXLayout.width(g, s)) + MIN_TXT_SPACE > r.w
           && s.length() > 3) {
-        s = s.substring(0, (s.length() - 2) / 2).concat("..");
+        s = s.substring(0, (s.length() - 2) / 2) + "..";
       }
     }
     final int yy = (int) (y + (nodeHeight + fontHeight - 4) / 2d);

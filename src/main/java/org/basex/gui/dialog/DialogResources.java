@@ -9,7 +9,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
-import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
@@ -262,7 +261,7 @@ public class DialogResources extends BaseXBack {
     @Override
     public void execute(final GUI g) {
       final TreeNode n = selection();
-      if(n == null || !Dialog.confirm(dialog.gui, Text.DELETE_NODES)) return;
+      if(n == null || !Dialog.confirm(dialog.gui, DELETE_NODES)) return;
 
       final Runnable run = new Runnable() {
         @Override

@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import java.util.Arrays;
 
 import org.basex.query.QueryException;
+import org.basex.query.util.*;
 import org.basex.util.InputInfo;
 
 /**
@@ -29,7 +30,7 @@ public class FTWildcard {
    * Parse and construct a new wild card expression.
    * @param query input wild card expression
    * @param ii input info
-   * @throws QueryException {@link org.basex.query.util.Err#FTREG}, if the wild
+   * @throws QueryException {@link Err#FTREG}, if the wild
    * card expression is not valid
    */
   public FTWildcard(final byte[] query, final InputInfo ii)

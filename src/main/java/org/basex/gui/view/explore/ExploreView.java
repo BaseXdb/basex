@@ -6,7 +6,6 @@ import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
@@ -78,7 +77,7 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
+    header.setFont(lfont);
     refreshMark();
   }
 

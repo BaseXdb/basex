@@ -161,7 +161,7 @@ public class GFLWOR extends ParseExpr {
 
     // remove FLWOR expression if a FOR clause yields an empty sequence
     for(final ForLet f : fl) {
-      if(f instanceof For && f.size() == 0) {
+      if(f instanceof For && f.isEmpty()) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
       }

@@ -33,7 +33,6 @@ public final class BaseXTable extends JTable {
    * @param d dialog reference
    */
   public BaseXTable(final Table t, final Dialog d) {
-    super();
     data = t;
     dialog = d;
     model = new TableModel();

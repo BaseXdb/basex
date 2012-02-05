@@ -61,7 +61,7 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   private void checkDepends(final Package pkg) throws QueryException {
-    final ObjList<Dependency> procs = new ObjList<Package.Dependency>();
+    final ObjList<Dependency> procs = new ObjList<Dependency>();
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor

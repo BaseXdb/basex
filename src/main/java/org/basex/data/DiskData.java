@@ -210,7 +210,7 @@ public final class DiskData extends Data {
    * @return updating file
    */
   public IOFile updateFile() {
-    return meta.dbfile(DataText.DATAUPD);
+    return meta.dbfile(DATAUPD);
   }
 
   @Override

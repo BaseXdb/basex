@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
-import org.basex.core.Text;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Kill;
 import org.basex.server.ClientSession;
@@ -67,8 +66,8 @@ public final class ServerCommandTest extends CommandTest {
    */
   @Test
   public void kill() throws IOException {
-    ok(new Kill(Text.ADMIN));
-    ok(new Kill(Text.ADMIN + '2'));
+    ok(new Kill(ADMIN));
+    ok(new Kill(ADMIN + '2'));
     ok(new Kill(Prop.NAME + '*'));
     ok(new CreateUser(NAME2, Token.md5("test")));
     final ClientSession cs = new ClientSession(LOCALHOST, 9999, NAME2, "test");

@@ -110,6 +110,6 @@ public final class FTNot extends FTExpr {
 
   @Override
   public String toString() {
-    return FTNOT + " " + expr[0];
+    return FTNOT + ' ' + expr[0];
   }
 }

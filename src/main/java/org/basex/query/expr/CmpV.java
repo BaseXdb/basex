@@ -114,7 +114,7 @@ public final class CmpV extends Cmp {
      * Constructor.
      * @param n string representation
      */
-    private Op(final String n) { name = n; }
+    Op(final String n) { name = n; }
 
     /**
      * Evaluates the expression.

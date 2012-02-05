@@ -576,7 +576,7 @@ public final class FTTest extends QueryTest {
    * @return string
    */
   private static String set(final Object[] key, final AProp prop) {
-    return "set " + key[0] + " " + prop.is(key);
+    return "set " + key[0] + ' ' + prop.is(key);
   }
 
   /* TABLE REPRESENTATION

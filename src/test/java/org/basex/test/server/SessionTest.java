@@ -7,6 +7,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
+import org.basex.core.BaseXException;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.server.Query;
@@ -76,7 +77,7 @@ public abstract class SessionTest {
 
   /** Runs an erroneous query command.
    * @throws IOException I/O exception */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void commandError() throws IOException {
     session.execute("xquery (");
   }
@@ -85,7 +86,7 @@ public abstract class SessionTest {
    * Runs a query command and retrieves the result as string.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void commandErr() throws IOException {
     session.execute("1,<a/>+''");
   }
@@ -106,7 +107,7 @@ public abstract class SessionTest {
    * Stops because of invalid input.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void createErr() throws IOException {
     session.create(DB, new ArrayInput("<"));
   }
@@ -115,7 +116,7 @@ public abstract class SessionTest {
    * Stops because of an invalid database name.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void createNameErr() throws IOException {
     session.create("", new ArrayInput(""));
   }
@@ -137,7 +138,7 @@ public abstract class SessionTest {
    * Adds a file with an invalid file name.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void addNameErr() throws IOException {
     session.execute("create db " + DB);
     session.add("", new ArrayInput("<X/>"));
@@ -147,7 +148,7 @@ public abstract class SessionTest {
    * Adds a file with missing input.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void addNoInput() throws IOException {
     session.execute("create db " + DB);
     session.add("", new ArrayInput(""));
@@ -173,7 +174,7 @@ public abstract class SessionTest {
    * Replaces a file with an invalid file name.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void replaceNameErr() throws IOException {
     session.execute("create db " + DB);
     session.replace("", new ArrayInput("<X/>"));
@@ -183,7 +184,7 @@ public abstract class SessionTest {
    * Adds a file with missing input.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void replaceNoInput() throws IOException {
     session.execute("create db " + DB);
     session.replace("", new ArrayInput(""));
@@ -220,7 +221,7 @@ public abstract class SessionTest {
    * Stores binary content in the database.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void storeNoDB() throws IOException {
     session.store("X", new ArrayInput("!"));
   }
@@ -229,7 +230,7 @@ public abstract class SessionTest {
    * Stores binary content in the database.
    * @throws IOException I/O exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public final void storeInvalid() throws IOException {
     session.execute("create db " + DB);
     session.store("..", new ArrayInput("!"));
@@ -419,7 +420,7 @@ public abstract class SessionTest {
   /** Runs a query with an external variable declaration.
    * @throws IOException exception
    */
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public void queryBind2() throws IOException {
     session.query("declare variable $a external; $a").next();
   }
@@ -471,21 +472,21 @@ public abstract class SessionTest {
 
   /** Runs an erroneous query.
    * @throws IOException expected exception*/
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public void queryError() throws IOException {
     session.query("(").next();
   }
 
   /** Runs an erroneous query.
    * @throws IOException expected exception*/
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public void queryError2() throws IOException {
     session.query("(1,'a')[. eq 1]").execute();
   }
 
   /** Runs an erroneous query.
    * @throws IOException expected exception*/
-  @Test(expected = org.basex.core.BaseXException.class)
+  @Test(expected = BaseXException.class)
   public void queryError3() throws IOException {
     final Query query = session.query("(1,'a')[. eq 1]");
     check("1", query.next());

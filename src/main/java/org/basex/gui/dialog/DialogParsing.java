@@ -20,6 +20,7 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
@@ -220,7 +221,7 @@ final class DialogParsing extends BaseXBack {
         gprop.get(GUIProp.CREATEPATH), gui);
     fc.addFilter(XML_DOCUMENTS, IO.XMLSUFFIX);
 
-    final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
+    final IO file = fc.select(Mode.FDOPEN);
     if(file != null) cfile.setText(file.path());
   }
 

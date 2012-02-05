@@ -26,7 +26,6 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.ValueIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -168,7 +167,7 @@ public final class Map extends FItem {
   public Map coerceTo(final FuncType ft, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
     if(!(ft instanceof MapType) || !hasType((MapType) ft))
-      throw Err.cast(ii, ft, this);
+      throw cast(ii, ft, this);
 
     return this;
   }
@@ -216,7 +215,7 @@ public final class Map extends FItem {
    * Collation of this map.
    * @return collation
    */
-  public static Str collation() {
+  public Str collation() {
     return Str.get(URLCOLL);
   }
 
@@ -294,6 +293,6 @@ public final class Map extends FItem {
     final StringBuilder sb = root.toString(new StringBuilder("map{ "));
     // remove superfluous comma
     if(root.size > 0) sb.deleteCharAt(sb.length() - 2);
-    return sb.append("}").toString();
+    return sb.append('}').toString();
   }
 }

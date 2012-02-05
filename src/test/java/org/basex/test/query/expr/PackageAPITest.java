@@ -331,14 +331,14 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // try to delete pkg4 (use package name)
     new RepoDelete("http://www.pkg4.com", null).execute(ctx);
     // check if pkg4 is unregistered from the repo
-    assertTrue(ctx.repo.pkgDict().id(token("http://www.pkg4.com-2.0")) == 0);
+    assertEquals(0, ctx.repo.pkgDict().id(token("http://www.pkg4.com-2.0")));
 
     // check if pkg4 directory was deleted
     assertTrue(!dir(pkg4Dir));
     // try to delete pkg3 (use package dir)
     new RepoDelete(pkg3Dir, null).execute(ctx);
     // check if pkg3 is unregistered from the repo
-    assertTrue(ctx.repo.pkgDict().id(token("http://www.pkg3.com-10.0")) == 0);
+    assertEquals(0, ctx.repo.pkgDict().id(token("http://www.pkg3.com-10.0")));
     // check if pkg3 directory was deleted
     assertTrue(!dir(pkg3Dir));
   }

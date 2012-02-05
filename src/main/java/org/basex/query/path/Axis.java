@@ -119,7 +119,7 @@ public enum Axis {
    * @param n axis string
    * @param d descendant flag
    */
-  private Axis(final String n, final boolean d) {
+  Axis(final String n, final boolean d) {
     name = n;
     down = d;
   }
@@ -142,18 +142,18 @@ public enum Axis {
    */
   final Axis invert() {
     switch(this) {
-      case ANC:        return Axis.DESC;
-      case ANCORSELF:  return Axis.DESCORSELF;
+      case ANC:        return DESC;
+      case ANCORSELF:  return DESCORSELF;
       case ATTR:
-      case CHILD:      return Axis.PARENT;
-      case DESC:       return Axis.ANC;
-      case DESCORSELF: return Axis.ANCORSELF;
-      case FOLLSIBL:   return Axis.PRECSIBL;
-      case FOLL:       return Axis.PREC;
-      case PARENT:     return Axis.CHILD;
-      case PRECSIBL:   return Axis.FOLLSIBL;
-      case PREC:       return Axis.FOLL;
-      case SELF:       return Axis.SELF;
+      case CHILD:      return PARENT;
+      case DESC:       return ANC;
+      case DESCORSELF: return ANCORSELF;
+      case FOLLSIBL:   return PRECSIBL;
+      case FOLL:       return PREC;
+      case PARENT:     return CHILD;
+      case PRECSIBL:   return FOLLSIBL;
+      case PREC:       return FOLL;
+      case SELF:       return SELF;
       default:         return null;
     }
   }

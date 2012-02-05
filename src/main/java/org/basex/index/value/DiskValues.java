@@ -256,7 +256,7 @@ public class DiskValues implements Index {
   /**
    * Binary search for key in the {@link #idxr}.
    * <em>Important:</em> This method has to be called while being in the monitor
-   * of this {@link DiskValues} instance, e.g. from a {@code synchronized}
+   * of this instance, e.g. from a {@code synchronized}
    * method.
    * @param key token to be found
    * @param first begin of the search interval

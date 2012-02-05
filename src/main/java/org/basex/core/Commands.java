@@ -50,7 +50,7 @@ public interface Commands {
      * Default constructor.
      * @param h help texts, or {@code null} if command is hidden.
      */
-    private Cmd(final String... h) {
+    Cmd(final String... h) {
       help = h;
     }
 

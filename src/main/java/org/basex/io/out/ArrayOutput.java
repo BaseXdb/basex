@@ -1,11 +1,12 @@
 package org.basex.io.out;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import org.basex.util.Token;
 
 /**
  * This class caches the output bytes in an array, similar to the
- * {@link java.io.ByteArrayOutputStream} class. Bytes that exceed an
+ * {@link ByteArrayOutputStream} class. Bytes that exceed an
  * optional maximum are ignored.
  *
  * @author BaseX Team 2005-12, BSD License

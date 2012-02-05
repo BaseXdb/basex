@@ -62,7 +62,7 @@ public final class AlterDB extends Command {
    */
   public static synchronized boolean alter(final String db,
       final String dbnew, final MainProp pr) {
-    return pr.dbpath(db).file().renameTo(pr.dbpath(dbnew).file());
+    return pr.dbpath(db).rename(pr.dbpath(dbnew));
   }
 
   @Override

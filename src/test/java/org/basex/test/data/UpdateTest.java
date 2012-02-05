@@ -93,7 +93,7 @@ public abstract class UpdateTest {
   /**
    * Reloads the database.
    */
-  final void reload() {
+  static final void reload() {
     if(mainmem) return;
     exec(new Close());
     exec(new Open(DB));

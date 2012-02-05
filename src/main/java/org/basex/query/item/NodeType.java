@@ -172,7 +172,7 @@ public enum NodeType implements Type {
    * @param nm string representation
    * @param pr parent type
    */
-  private NodeType(final String nm, final Type pr) {
+  NodeType(final String nm, final Type pr) {
     string = Token.token(nm);
     par = pr;
   }

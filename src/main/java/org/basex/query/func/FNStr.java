@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.Arrays;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -273,13 +274,13 @@ public final class FNStr extends StandardFunc {
   private Item normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkEStr(expr[0], ctx);
 
-    Normalizer.Form form = Normalizer.Form.NFC;
+    Form form = Form.NFC;
     if(expr.length == 2) {
       final byte[] n = uc(trim(checkStr(expr[1], ctx)));
       if(n.length == 0) return Str.get(str);
 
       try {
-        form = Normalizer.Form.valueOf(string(n));
+        form = Form.valueOf(string(n));
       } catch(final IllegalArgumentException ex) {
         NORMUNI.thrw(input, n);
       }

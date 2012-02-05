@@ -8,6 +8,7 @@ import java.awt.Point;
 import java.util.Locale;
 
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIConstants.Fill;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -65,7 +66,7 @@ final class BaseXTextRenderer extends BaseXBack {
    * @param b scrollbar reference
    */
   BaseXTextRenderer(final BaseXTextTokens t, final BaseXBar b) {
-    mode(GUIConstants.Fill.NONE).setFont(GUIConstants.dfont);
+    mode(Fill.NONE).setFont(GUIConstants.dfont);
     text = t;
     bar = b;
   }

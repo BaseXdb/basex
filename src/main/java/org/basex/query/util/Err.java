@@ -932,7 +932,7 @@ public enum Err {
    * @author BaseX Team 2005-12, BSD License
    * @author Leo Woerteler
    */
-  public static enum ErrType {
+  public enum ErrType {
     /** BASX Error type. */ BASX,
     /** FOCX Error type. */ FOCX,
     /** FOAR Error type. */ FOAR,

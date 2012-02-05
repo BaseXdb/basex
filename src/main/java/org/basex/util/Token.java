@@ -2,6 +2,8 @@ package org.basex.util;
 
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -378,20 +380,20 @@ public final class Token {
   }
 
   /** US charset. */
-  private static final java.text.DecimalFormatSymbols LOC =
-    new java.text.DecimalFormatSymbols(java.util.Locale.US);
+  private static final DecimalFormatSymbols LOC =
+    new DecimalFormatSymbols(Locale.US);
   /** Scientific double output. */
-  private static final java.text.DecimalFormat SD =
-    new java.text.DecimalFormat("0.0##################E0", LOC);
+  private static final DecimalFormat SD =
+    new DecimalFormat("0.0##################E0", LOC);
   /** Decimal double output. */
-  private static final java.text.DecimalFormat DD =
-    new java.text.DecimalFormat("#####0.0################", LOC);
+  private static final DecimalFormat DD =
+    new DecimalFormat("#####0.0################", LOC);
   /** Scientific float output. */
-  private static final java.text.DecimalFormat SF =
-    new java.text.DecimalFormat("0.0######E0", LOC);
+  private static final DecimalFormat SF =
+    new DecimalFormat("0.0######E0", LOC);
   /** Decimal float output. */
-  private static final java.text.DecimalFormat DF =
-    new java.text.DecimalFormat("#####0.0######", LOC);
+  private static final DecimalFormat DF =
+    new DecimalFormat("#####0.0######", LOC);
 
   /**
    * Creates a byte array representation from the specified double value;

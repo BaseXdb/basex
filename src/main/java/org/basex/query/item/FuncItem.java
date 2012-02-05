@@ -189,7 +189,7 @@ public final class FuncItem extends FItem {
       final InputInfo ii) throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
-    return type.instanceOf(ft) ? this : FuncItem.coerce(ctx, ii, this, ft);
+    return type.instanceOf(ft) ? this : coerce(ctx, ii, this, ft);
   }
 
   @Override

@@ -367,7 +367,7 @@ public final class Namespaces {
     t.header.add(TABLEURI);
     for(int i = 0; i < 3; ++i) t.align.add(true);
     table(t, root, s, e);
-    return t.contents.size() != 0 ? t.finish() : Token.EMPTY;
+    return t.contents.isEmpty() ? Token.EMPTY : t.finish();
   }
 
   /**

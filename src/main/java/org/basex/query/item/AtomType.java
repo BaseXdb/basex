@@ -714,9 +714,8 @@ public enum AtomType implements Type {
    * @param d duration flag
    * @param t date flag
    */
-  private AtomType(final String nm, final Type pr, final byte[] ur,
-      final boolean n, final boolean u, final boolean s, final boolean d,
-      final boolean t) {
+  AtomType(final String nm, final Type pr, final byte[] ur, final boolean n,
+      final boolean u, final boolean s, final boolean d, final boolean t) {
     string = token(nm);
     par = pr;
     uri = ur;
@@ -816,10 +815,9 @@ public enum AtomType implements Type {
     checkNum(it, ii);
 
     final Type ip = it.type;
-    if(ip == AtomType.DBL || ip == AtomType.FLT) {
+    if(ip == DBL || ip == FLT) {
       final double d = it.dbl(ii);
-      if(Double.isNaN(d) || d == 1 / 0d || d == -1 / 0d)
-        Err.value(ii, this, it);
+      if(Double.isNaN(d) || d == 1 / 0d || d == -1 / 0d) value(ii, this, it);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) INTRANGE.thrw(ii, d);
       if(min != max && (d < min || d > max)) FUNCAST.thrw(ii, this, it);
       return (long) d;
@@ -896,7 +894,7 @@ public enum AtomType implements Type {
       final byte[] uri = type.uri();
       for(final AtomType t : values()) {
         // skip non-standard types
-        if(t == AtomType.SEQ || t == AtomType.JAVA) continue;
+        if(t == SEQ || t == JAVA) continue;
         if(eq(ln, t.string) && eq(uri, t.uri)) return t;
       }
     }

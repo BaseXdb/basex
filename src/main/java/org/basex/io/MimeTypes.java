@@ -24,6 +24,8 @@ public final class MimeTypes {
   public static final String TEXT_HTML = "text/html";
   /** Media type: text/plain. */
   public static final String TEXT_PLAIN = "text/plain";
+  /** Media type: text/comma-separated-values. */
+  public static final String TEXT_CSV = "text/comma-separated-values";
   /** Media type: text/plain. */
   public static final String APP_OCTET = "application/octet-stream";
   /** Media type: application/xml. */
@@ -56,7 +58,7 @@ public final class MimeTypes {
   public static String get(final String path) {
     final int i = path.lastIndexOf('.');
     if(i != -1) {
-      final String ct = MimeTypes.TYPES.get(path.substring(i + 1));
+      final String ct = TYPES.get(path.substring(i + 1));
       if(ct != null) return ct;
     }
     return APP_OCTET;

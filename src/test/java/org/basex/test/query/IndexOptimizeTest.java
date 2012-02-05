@@ -203,7 +203,7 @@ public final class IndexOptimizeTest {
    * Check if specified query was rewritten for index access.
    * @param query query to be tested
    */
-  private void check(final String query) {
+  private static void check(final String query) {
     check(query, null);
   }
 

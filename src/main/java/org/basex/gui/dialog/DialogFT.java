@@ -12,6 +12,7 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
@@ -141,7 +142,7 @@ final class DialogFT extends BaseXBack {
     final GUIProp gprop = dialog.gui.gprop;
     final BaseXFileChooser fc = new BaseXFileChooser(FILE_OR_DIR,
         gprop.get(GUIProp.STOPPATH), dialog.gui);
-    final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
+    final IO file = fc.select(Mode.FOPEN);
     if(file != null) {
       swpath.setText(file.path());
       gprop.set(GUIProp.STOPPATH, file.path());

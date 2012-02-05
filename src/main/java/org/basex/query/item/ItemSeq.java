@@ -8,6 +8,7 @@ import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -55,7 +56,7 @@ public final class ItemSeq extends Seq {
       for(int s = 1; s != size && t != AtomType.ITEM; ++s) {
         if(t != item[s].type) t = AtomType.ITEM;
       }
-      seq = SeqType.get(t, SeqType.Occ.OM);
+      seq = SeqType.get(t, Occ.OM);
     }
     return seq;
   }
