@@ -34,7 +34,7 @@ public final class Part3 extends Main {
 
     // Lookup specific ISBN
     String isbnID = args.length > 0 ? args[0] : DEFAULT_ISBN;
-    info("Lookup books by ISBN '" + isbnID + "'");
+    info("Lookup books by ISBN '" + isbnID + '\'');
 
     XQExpression xqe = conn.createExpression();
 

@@ -246,7 +246,9 @@ public class BaseXClient {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  void receive(final InputStream is, final OutputStream os) throws IOException {
+  static void receive(final InputStream is, final OutputStream os)
+      throws IOException {
+
     for(int b; (b = is.read()) > 0;) {
       // read next byte if 0xFF is received
       os.write(b == 0xFF ? is.read() : b);

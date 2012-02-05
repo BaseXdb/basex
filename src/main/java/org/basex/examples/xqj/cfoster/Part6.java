@@ -63,15 +63,15 @@ public final class Part6 extends Main {
   static String getEventString(final XMLStreamReader reader) {
     switch(reader.getEventType()) {
       case XMLStreamConstants.START_ELEMENT:
-        return "START_ELEMENT:\t\"" + reader.getLocalName() + "\"";
+        return "START_ELEMENT:\t\"" + reader.getLocalName() + '"';
       case XMLStreamConstants.END_ELEMENT:
-        return "END_ELEMENT:\t\"" + reader.getLocalName() + "\"";
+        return "END_ELEMENT:\t\"" + reader.getLocalName() + '"';
       case XMLStreamConstants.START_DOCUMENT:
         return "START_DOCUMENT";
       case XMLStreamConstants.END_DOCUMENT:
         return "END_DOCUMENT";
       case XMLStreamConstants.CHARACTERS:
-        return "CHARACTERS:\t\"" + reader.getText() + "\"";
+        return "CHARACTERS:\t\"" + reader.getText() + '"';
     }
     return "";
   }
@@ -88,17 +88,17 @@ public final class Part6 extends Main {
     @Override
     public void startElement(final String u, final String name, final String qn,
         final Attributes a) {
-      System.out.println("Start Element:\t\"" + name + "\"");
+      System.out.println("Start Element:\t\"" + name + '"');
     }
 
     @Override
     public void endElement(final String u, final String name, final String qn) {
-      System.out.println("End Element:\t\"" + name + "\"");
+      System.out.println("End Element:\t\"" + name + '"');
     }
 
     @Override
     public void characters(final char[] ch, final int start, final int len) {
-      System.out.println("Characters:\t\"" + new String(ch, start, len) + "\"");
+      System.out.println("Characters:\t\"" + new String(ch, start, len) + '"');
     }
 
     @Override

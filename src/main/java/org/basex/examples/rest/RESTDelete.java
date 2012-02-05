@@ -31,7 +31,7 @@ public final class RESTDelete {
 
     // Print the HTTP response code
     System.out.println("\n* HTTP response: " + conn.getResponseCode() +
-        " (" + conn.getResponseMessage() + ")");
+        " (" + conn.getResponseMessage() + ')');
 
     // The java URL connection to the resource
     url = new URL("http://localhost:8984/rest/factbook");
@@ -44,7 +44,7 @@ public final class RESTDelete {
 
     // Print the HTTP response code
     System.out.println("\n* HTTP response: " + conn.getResponseCode() +
-        " (" + conn.getResponseMessage() + ")");
+        " (" + conn.getResponseMessage() + ')');
 
     // Close connection
     conn.disconnect();

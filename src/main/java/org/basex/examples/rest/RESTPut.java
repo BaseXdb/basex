@@ -50,7 +50,7 @@ public final class RESTPut {
 
     // Print the HTTP response code
     System.out.println("\n* HTTP response: " + conn.getResponseCode() +
-        " (" + conn.getResponseMessage() + ")");
+        " (" + conn.getResponseMessage() + ')');
 
     // Close connection
     conn.disconnect();

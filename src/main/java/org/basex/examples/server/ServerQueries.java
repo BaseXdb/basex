@@ -78,7 +78,7 @@ public final class ServerQueries {
 
     // Loop through all results
     while(query.more()) {
-      System.out.print(query.next() + " ");
+      System.out.print(query.next() + ' ');
     }
     System.out.println();
 

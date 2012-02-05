@@ -54,7 +54,7 @@ public final class RESTPost {
     // Print the HTTP response code
     int code = conn.getResponseCode();
     System.out.println("\n* HTTP response: " + code +
-        " (" + conn.getResponseMessage() + ")");
+        " (" + conn.getResponseMessage() + ')');
 
     // Check if request was successful
     if(code == HttpURLConnection.HTTP_OK) {

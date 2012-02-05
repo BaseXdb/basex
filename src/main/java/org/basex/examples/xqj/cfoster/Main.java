@@ -18,7 +18,7 @@ abstract class Main {
    */
   static void init(final String info) {
     System.out.println("=== XQJ Tutorial/cfoster.net ===");
-    System.out.println("Part " + info + "");
+    System.out.println("Part " + info);
   }
 
   /**

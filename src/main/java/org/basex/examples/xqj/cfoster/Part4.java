@@ -203,7 +203,7 @@ public final class Part4 extends Main {
       int day   = cal.getDay();
       int month = cal.getMonth();
       int year  = cal.getYear();
-      System.out.println(year + "/" + month + "/" + day);
+      System.out.println(year + "/" + month + '/' + day);
     }
 
     // Closing connection to the Database.

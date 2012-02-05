@@ -21,7 +21,7 @@ abstract class Main {
    */
   static void init(final String info) {
     System.out.println("=== XQJ Tutorial/xquery.com ===");
-    System.out.println("Part " + info + "");
+    System.out.println("Part " + info);
   }
 
   /**

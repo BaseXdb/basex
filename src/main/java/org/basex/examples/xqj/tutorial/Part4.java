@@ -68,7 +68,7 @@ public final class Part4 extends Main {
     ContentHandler ch = new DefaultHandler() {
       @Override
       public void characters(final char[] c, final int s, final int l) {
-        System.out.println("Characters/SAX: '" + new String(c, s, l) + "'");
+        System.out.println("Characters/SAX: '" + new String(c, s, l) + '\'');
       }
     };
     xqs = xqe.executeQuery(
