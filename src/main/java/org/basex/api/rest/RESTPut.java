@@ -31,19 +31,18 @@ public class RESTPut extends RESTCode {
     boolean xml = true;
     InputStream in = ctx.in;
     final String ct = ctx.req.getContentType();
+    // choose correct importer
     if(APP_JSON.equals(ct)) {
-      // convert json to xml
-      in = new ArrayInput("<JSON/>");
-      xml = true;
+      session.execute("set parser json");
+    } else if(APP_JSONML.equals(ct)) {
+      session.execute("set parser json");
+      session.execute("set parseropt jsonml=true");
     } else if(TEXT_PLAIN.equals(ct)) {
-      // convert text to xml
-      in = new ArrayInput("<TEXT/>");
+      session.execute("set parser text");
     } else if(TEXT_CSV.equals(ct)) {
-      // convert CSV to xml
-      in = new ArrayInput("<CSV/>");
+      session.execute("set parser csv");
     } else if(TEXT_HTML.equals(ct)) {
-      // convert HTML to xml
-      in = new ArrayInput("<HTML/>");
+      session.execute("set parser html");
     } else if(ct != null && !APP_XML.equals(ct)) {
       xml = false;
     }
