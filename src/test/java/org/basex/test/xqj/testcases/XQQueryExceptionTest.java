@@ -62,7 +62,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
 
     try {
       final XQQueryException ex = new XQQueryException("Hello world!", "VendorCode", new QName("foo"), 7, 8, 56,
-                                                 "moduleuri", xqs, (XQStackTraceElement[])null);
+                                                 "moduleuri", xqs, null);
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", "Hello world!", ex.getMessage());
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", "VendorCode", ex.getVendorCode());
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", new QName("foo"), ex.getErrorCode());
@@ -70,8 +70,8 @@ public class XQQueryExceptionTest extends XQJTestCase {
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", 8, ex.getColumnNumber());
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", 56, ex.getPosition());
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", "moduleuri", ex.getModuleURI());
-      assertTrue("A-XQQEX-1.1: XQQueryException successfully created", xqs == ex.getErrorObject());
-      assertTrue("A-XQQEX-1.1: XQQueryException successfully created", null == ex.getQueryStackTrace());
+      assertSame("A-XQQEX-1.1: XQQueryException successfully created", xqs, ex.getErrorObject());
+      assertNull("A-XQQEX-1.1: XQQueryException successfully created", ex.getQueryStackTrace());
     } catch (final Exception e) {
       fail("A-XQQEX-1.1: Creating XQQueryException faild with message: " + e.getMessage());
     }
@@ -89,7 +89,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
 
     try {
       final XQQueryException ex = new XQQueryException("Hello world!");
-      assertEquals("A-XQQEX-2.2: Error code is null when not available", null, ex.getErrorCode());
+      assertNull("A-XQQEX-2.2: Error code is null when not available", ex.getErrorCode());
     } catch (final Exception e) {
       fail("A-XQQEX-2.2: Retrieve error code from an XQQueryException failed with message: " + e.getMessage());
     }
@@ -101,7 +101,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
 
     try {
       final XQQueryException ex = new XQQueryException("Hello world!", "VendorCode", new QName("foo"), 7, 8, 56,
-                                                 "moduleuri", xqs, (XQStackTraceElement[])null);
+                                                 "moduleuri", xqs, null);
       final XQSequence errorObject = ex.getErrorObject();
       errorObject.next();
       assertEquals("A-XQQEX-3.1: Retrieve error object from an XQQueryException", 1, errorObject.getInt());
@@ -111,7 +111,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
 
     try {
       final XQQueryException ex = new XQQueryException("Hello world!");
-      assertEquals("A-XQQEX-3.2: Error object is null when not available", null, ex.getErrorObject());
+      assertNull("A-XQQEX-3.2: Error object is null when not available", ex.getErrorObject());
     } catch (final Exception e) {
       fail("A-XQQEX-3.2: Retrieve error object from an XQQueryException failed with message: " + e.getMessage());
     }
@@ -146,7 +146,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
 
     try {
       final XQQueryException ex = new XQQueryException("Hello world!");
-      assertEquals("A-XQQEX-5.2: Query stack trace is null when not available", null, ex.getQueryStackTrace());
+      assertNull("A-XQQEX-5.2: Query stack trace is null when not available", ex.getQueryStackTrace());
     } catch (final Exception e) {
       fail("A-XQQEX-5.2: Retrieve Query stack trace from an XQQueryException failed with message: " + e.getMessage());
     }
@@ -163,7 +163,7 @@ public class XQQueryExceptionTest extends XQJTestCase {
 
     try {
       final XQQueryException ex = new XQQueryException("Hello world!");
-      assertEquals("A-XQQEX-6.2: module uri is null when not available", null, ex.getModuleURI());
+      assertNull("A-XQQEX-6.2: module uri is null when not available", ex.getModuleURI());
     } catch (final Exception e) {
       fail("A-XQQEX-6.2: Retrieve module uri from an XQQueryException failed with message: " + e.getMessage());
     }

@@ -59,7 +59,7 @@ final class RESTRetrieve extends RESTQuery {
     } else if(!exists(ctx)) {
       // list database resources
       final Table table = new Table(session.execute(new ListDB(ctx.all())));
-      if(table.contents.size() == 0)
+      if(table.contents.isEmpty())
         throw new RESTException(SC_NOT_FOUND, ERR_NORES);
 
       final String serial = ctx.serialization;

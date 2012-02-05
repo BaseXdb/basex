@@ -32,9 +32,9 @@ public class XQPreparedExpressionTest extends XQJTestCase {
     xqpe = xqc.prepareExpression("'Hello world!'");
     xqpe.executeQuery();
 
-    assertEquals("A-XQPE-2.1: isClosed() on open prepared expression", false, xqpe.isClosed());
+    assertFalse("A-XQPE-2.1: isClosed() on open prepared expression", xqpe.isClosed());
     xqpe.close();
-    assertEquals("A-XQPE-2.2: isClosed() on closed prepared expressions", true, xqpe.isClosed());
+    assertTrue("A-XQPE-2.2: isClosed() on closed prepared expressions", xqpe.isClosed());
   }
 
   public void testClose() throws XQException {
@@ -49,7 +49,7 @@ public class XQPreparedExpressionTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQPE-3.1: closing prepared expression failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQPE-3.2: Closing an expression, closes any result sequences obtained from this expression", true, xqs.isClosed());
+    assertTrue("A-XQPE-3.2: Closing an expression, closes any result sequences obtained from this expression", xqs.isClosed());
   }
 
   public void testExecuteQuery() throws XQException {

@@ -49,7 +49,7 @@ import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Compare;
-import org.basex.query.util.Err;
+import org.basex.query.util.Err.ErrType;
 import org.basex.query.util.http.HTTPClient;
 import org.basex.query.util.http.Request;
 import org.basex.query.util.http.Request.Part;
@@ -249,7 +249,7 @@ public class HTTPClientTest {
       new XQuery("http:send-request(<http:request/>)").execute(CONTEXT);
     } catch(final BaseXException ex) {
       assertTrue(indexOf(token(ex.getMessage()),
-          token(Err.ErrType.FOHC.toString())) != -1);
+          token(ErrType.FOHC.toString())) != -1);
     }
   }
 
@@ -263,7 +263,7 @@ public class HTTPClientTest {
       c.execute(CONTEXT);
     } catch(final BaseXException ex) {
       assertTrue(indexOf(token(ex.getMessage()),
-          token(Err.ErrType.FOHC.toString())) != -1);
+          token(ErrType.FOHC.toString())) != -1);
     }
   }
 
@@ -288,10 +288,10 @@ public class HTTPClientTest {
     final RequestParser rp = new RequestParser(null);
     final Request r = rp.parse(dbNode.children().next(), null);
 
-    assertTrue(r.attrs.size() == 2);
-    assertTrue(r.headers.size() == 2);
+    assertEquals(2, r.attrs.size());
+    assertEquals(2, r.headers.size());
     assertTrue(r.bodyContent.size() != 0);
-    assertTrue(r.payloadAttrs.size() == 1);
+    assertEquals(1, r.payloadAttrs.size());
   }
 
   /**
@@ -323,28 +323,28 @@ public class HTTPClientTest {
     final RequestParser rp = new RequestParser(null);
     final Request r = rp.parse(dbNode1.children().next(), null);
 
-    assertTrue(r.attrs.size() == 2);
-    assertTrue(r.headers.size() == 2);
+    assertEquals(2, r.attrs.size());
+    assertEquals(2, r.headers.size());
     assertTrue(r.isMultipart);
-    assertTrue(r.parts.size() == 3);
+    assertEquals(3, r.parts.size());
 
     // check parts
     final Iterator<Part> i = r.parts.iterator();
     Part part;
     part = i.next();
-    assertTrue(part.headers.size() == 2);
-    assertTrue(part.bodyContent.size() == 1);
-    assertTrue(part.bodyAttrs.size() == 1);
+    assertEquals(2, part.headers.size());
+    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyAttrs.size());
 
     part = i.next();
-    assertTrue(part.headers.size() == 1);
-    assertTrue(part.bodyContent.size() == 1);
-    assertTrue(part.bodyAttrs.size() == 1);
+    assertEquals(1, part.headers.size());
+    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyAttrs.size());
 
     part = i.next();
-    assertTrue(part.headers.size() == 0);
-    assertTrue(part.bodyContent.size() == 1);
-    assertTrue(part.bodyAttrs.size() == 1);
+    assertEquals(0, part.headers.size());
+    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyAttrs.size());
   }
 
   /**
@@ -381,27 +381,27 @@ public class HTTPClientTest {
     final RequestParser rp = new RequestParser(null);
     final Request r = rp.parse(dbNode1.children().next(), bodies);
 
-    assertTrue(r.attrs.size() == 2);
-    assertTrue(r.headers.size() == 2);
+    assertEquals(2, r.attrs.size());
+    assertEquals(2, r.headers.size());
     assertTrue(r.isMultipart);
-    assertTrue(r.parts.size() == 3);
+    assertEquals(3, r.parts.size());
 
     // check parts
     final Iterator<Part> i = r.parts.iterator();
     Part part = i.next();
-    assertTrue(part.headers.size() == 2);
-    assertTrue(part.bodyContent.size() == 1);
-    assertTrue(part.bodyAttrs.size() == 1);
+    assertEquals(2, part.headers.size());
+    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyAttrs.size());
 
     part = i.next();
-    assertTrue(part.headers.size() == 1);
-    assertTrue(part.bodyContent.size() == 1);
-    assertTrue(part.bodyAttrs.size() == 1);
+    assertEquals(1, part.headers.size());
+    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyAttrs.size());
 
     part = i.next();
-    assertTrue(part.headers.size() == 0);
-    assertTrue(part.bodyContent.size() == 1);
-    assertTrue(part.bodyAttrs.size() == 1);
+    assertEquals(0, part.headers.size());
+    assertEquals(1, part.bodyContent.size());
+    assertEquals(1, part.bodyAttrs.size());
   }
 
   /**
@@ -490,7 +490,7 @@ public class HTTPClientTest {
         fail("Exception not thrown");
       } catch(final QueryException ex) {
         assertTrue(indexOf(token(ex.getMessage()),
-            token(Err.ErrType.FOHC.toString())) != -1);
+            token(ErrType.FOHC.toString())) != -1);
       }
     }
 

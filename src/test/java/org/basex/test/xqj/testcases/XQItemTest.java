@@ -34,9 +34,9 @@ public class XQItemTest extends XQJTestCase {
     xqs.next();
     xqi = xqs.getItem();
 
-    assertEquals("A-XQE-1.1: isClosed() on open item", false, xqi.isClosed());
+    assertFalse("A-XQE-1.1: isClosed() on open item", xqi.isClosed());
     xqi.close();
-    assertEquals("A-XQE-1.2: isClosed() on closed item", true, xqi.isClosed());
+    assertTrue("A-XQE-1.2: isClosed() on closed item", xqi.isClosed());
 
     xqe.close();
   }

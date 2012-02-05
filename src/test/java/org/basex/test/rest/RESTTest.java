@@ -419,7 +419,7 @@ public class RESTTest {
    */
   private static void assertContains(final String str, final String sub) {
     if(!str.contains(sub)) {
-      fail("'" + sub + "' not contained in '" + str + "'.");
+      fail('\'' + sub + "' not contained in '" + str + "'.");
     }
   }
 
@@ -429,7 +429,7 @@ public class RESTTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private String get(final String query) throws IOException {
+  private static String get(final String query) throws IOException {
     final URL url = new URL(ROOT + query);
 
     // create connection
@@ -449,7 +449,7 @@ public class RESTTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private String ct(final String query) throws IOException {
+  private static String ct(final String query) throws IOException {
     final URL url = new URL(ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
@@ -469,7 +469,7 @@ public class RESTTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private String post(final String path, final String query)
+  private static String post(final String path, final String query)
       throws IOException {
     final URL url = new URL(ROOT + path);
 
@@ -501,7 +501,7 @@ public class RESTTest {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  private void put(final String query, final InputStream is)
+  private static void put(final String query, final InputStream is)
       throws IOException {
     put(query, is, null);
   }
@@ -513,7 +513,7 @@ public class RESTTest {
    * @param ctype content type (optional)
    * @throws IOException I/O exception
    */
-  private void put(final String query, final InputStream is,
+  private static void put(final String query, final InputStream is,
       final String ctype) throws IOException {
 
     final URL url = new URL(ROOT + query);
@@ -545,8 +545,8 @@ public class RESTTest {
    * @return exception
    * @throws IOException I/O exception
    */
-  private IOException error(final HttpURLConnection conn, final IOException ex)
-      throws IOException {
+  private static IOException error(final HttpURLConnection conn,
+      final IOException ex) throws IOException {
     final String msg = read(conn.getErrorStream());
     throw new BaseXException(msg.isEmpty() ? ex.getMessage() : msg);
 
@@ -558,7 +558,7 @@ public class RESTTest {
    * @return response code
    * @throws IOException I/O exception
    */
-  private String delete(final String query) throws IOException {
+  private static String delete(final String query) throws IOException {
     final URL url = new URL(ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {

@@ -1,4 +1,4 @@
-import java.io.IOException;
+import java.io.*;
 
 /**
  * This example shows how to use the event feature.
@@ -41,7 +41,7 @@ public final class EventExample {
    */
   private static class Notifier implements BaseXClient.EventNotifier {
     /** Constructor. */
-    public Notifier() { }
+    Notifier() { }
 
     @Override
     public void notify(final String value) {

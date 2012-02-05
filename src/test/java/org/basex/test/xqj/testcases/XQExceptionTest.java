@@ -35,7 +35,7 @@ public class XQExceptionTest extends XQJTestCase {
 
     try {
       final XQException ex = new XQException("Hello world!");
-      assertEquals("A-XQEX-2.2: Vendor code is null when not available", null, ex.getVendorCode());
+      assertNull("A-XQEX-2.2: Vendor code is null when not available", ex.getVendorCode());
     } catch (final Exception e) {
       fail("A-XQEX-2.2: Retrieve vendor code from an XQException failed with message: " + e.getMessage());
     }

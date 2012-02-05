@@ -543,7 +543,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     }
     assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", XQItemType.XQITEMKIND_ATOMIC, xqi.getItemType().getItemKind());
     assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", XQItemType.XQBASETYPE_DOUBLE, xqi.getItemType().getBaseType());
-    assertTrue("A-XQDF-1.5: Successful createItemFromXXX.", 1d == xqi.getDouble());
+    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", 1d, xqi.getDouble(), 0.0);
   }
 
   public void testCreateItemFromFloat() throws XQException {
@@ -580,7 +580,7 @@ public class XQDataFactoryTest extends XQJTestCase {
     }
     assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", XQItemType.XQITEMKIND_ATOMIC, xqi.getItemType().getItemKind());
     assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", XQItemType.XQBASETYPE_FLOAT, xqi.getItemType().getBaseType());
-    assertTrue("A-XQDF-1.5: Successful createItemFromXXX.", 1d == xqi.getFloat());
+    assertEquals("A-XQDF-1.5: Successful createItemFromXXX.", 1d, xqi.getFloat(), 0.0);
 }
 
   public void testCreateItemFromInt() throws XQException {
@@ -1174,7 +1174,7 @@ public class XQDataFactoryTest extends XQJTestCase {
       fail("A-XQDF-9.1: createProcessingInstructionType() failed with message: " + e.getMessage());
     }
     assertEquals("A-XQDF-9.1: Successful createProcessingInstructionType.", XQItemType.XQITEMKIND_PI, xqtype.getItemKind());
-    assertEquals("A-XQDF-9.1: Successful createProcessingInstructionType.", (String)null, xqtype.getPIName());
+    assertNull("A-XQDF-9.1: Successful createProcessingInstructionType.", xqtype.getPIName());
     assertEquals("A-XQDF-9.1: Successful createProcessingInstructionType.", XQItemType.OCC_EXACTLY_ONE, xqtype.getItemOccurrence());
 
     try {

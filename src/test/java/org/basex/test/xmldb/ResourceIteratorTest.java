@@ -45,11 +45,11 @@ public class ResourceIteratorTest extends XMLDBBaseTest {
   public void testHasMoreResources() throws Exception {
     // test result
     ResourceIterator iter = serv.query("/").getIterator();
-    assertEquals("Result expected.", true, iter.hasMoreResources());
+    assertTrue("Result expected.", iter.hasMoreResources());
 
     // test empty result
     iter = serv.query("//Unknown").getIterator();
-    assertEquals("Result expected.", false, iter.hasMoreResources());
+    assertFalse("Result expected.", iter.hasMoreResources());
   }
 
   @Test

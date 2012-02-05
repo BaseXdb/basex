@@ -11,7 +11,7 @@ public class XQCancelledExceptionTest extends XQJTestCase {
   public void testConstructor() {
     try {
       final XQCancelledException ex = new XQCancelledException("Hello world!", "VendorCode", new QName("foo"), 7, 8, 56,
-                                                         "moduleuri", null, (XQStackTraceElement[])null);
+                                                         "moduleuri", null, null);
       assertEquals("A-XQCEX-1.1: XQCancelledException successfully created", "Hello world!", ex.getMessage());
       assertEquals("A-XQCEX-1.1: XQCancelledException successfully created", "VendorCode", ex.getVendorCode());
       assertEquals("A-XQCEX-1.1: XQCancelledException successfully created", new QName("foo"), ex.getErrorCode());
@@ -19,7 +19,7 @@ public class XQCancelledExceptionTest extends XQJTestCase {
       assertEquals("A-XQCEX-1.1: XQCancelledException successfully created", 8, ex.getColumnNumber());
       assertEquals("A-XQCEX-1.1: XQCancelledException successfully created", 56, ex.getPosition());
       assertEquals("A-XQCEX-1.1: XQCancelledException successfully created", "moduleuri", ex.getModuleURI());
-      assertTrue("A-XQCEX-1.1: XQCancelledException successfully created", null == ex.getQueryStackTrace());
+      assertNull("A-XQCEX-1.1: XQCancelledException successfully created", ex.getQueryStackTrace());
     } catch (final Exception e) {
       fail("A-XQCEX-1.1: Creating XQCancelledException faild with message: " + e.getMessage());
     }

@@ -11,7 +11,6 @@ import org.basex.api.HTTPSession;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.core.Prop;
-import org.basex.core.Text;
 import org.basex.core.cmd.Get;
 import org.basex.core.cmd.Set;
 import org.basex.io.IOFile;
@@ -67,7 +66,7 @@ class RESTQuery extends RESTCode {
     if(item != null) {
       // create main memory instance of the document specified as context node
       final boolean mm = ctx.session.execute(
-          new Get(Prop.MAINMEM)).split(Text.COLS)[1].equals(Text.TRUE);
+          new Get(Prop.MAINMEM)).split(COLS)[1].equals(TRUE);
       ctx.session.execute(new Set(Prop.MAINMEM, true));
       ctx.session.create(Util.name(RESTQuery.class), new ArrayInput(item));
       if(!mm) ctx.session.execute(new Set(Prop.MAINMEM, false));

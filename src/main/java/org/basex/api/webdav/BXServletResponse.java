@@ -35,7 +35,7 @@ public class BXServletResponse extends AbstractResponse {
   /** Response headers. */
   private final Map<String, String> headers = new HashMap<String, String>();
   /** Response status. */
-  private Response.Status status;
+  private Status status;
 
   /**
    * Constructor.
@@ -63,13 +63,13 @@ public class BXServletResponse extends AbstractResponse {
   }
 
   @Override
-  public void setStatus(final Response.Status s) {
+  public void setStatus(final Status s) {
     res.setStatus(s.code);
     status = s;
   }
 
   @Override
-  public Response.Status getStatus() {
+  public Status getStatus() {
     return status;
   }
 
@@ -109,7 +109,7 @@ public class BXServletResponse extends AbstractResponse {
   @Override
   public void setAuthenticateHeader(final List<String> challenges) {
     for(final String ch : challenges) {
-      res.addHeader(Response.Header.WWW_AUTHENTICATE.code, ch);
+      res.addHeader(Header.WWW_AUTHENTICATE.code, ch);
     }
   }
 

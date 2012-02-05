@@ -33,7 +33,7 @@ public class RESTPost extends RESTCode {
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
     final Map<?, ?> map = ctx.req.getParameterMap();
-    if(map.size() != 0) throw new RESTException(SC_BAD_REQUEST, ERR_NOPARAM);
+    if(!map.isEmpty()) throw new RESTException(SC_BAD_REQUEST, ERR_NOPARAM);
 
     String enc = ctx.req.getCharacterEncoding();
     if(enc == null) enc = Token.UTF8;

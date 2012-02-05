@@ -19,6 +19,13 @@ import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQSequence;
 import org.basex.test.xqj.TestContentHandler;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -78,7 +85,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs = xqe.executeQuery("xs:boolean('true')");
     xqs.next();
     try {
-      assertEquals("A-XQIA-1.6: getBoolean on xs:boolean failed", true, xqs.getBoolean());
+      assertTrue("A-XQIA-1.6: getBoolean on xs:boolean failed", xqs.getBoolean());
     } catch (final XQException e) {
       fail("A-XQIA-1.6: getBoolean on xs:boolean failed with message: " + e.getMessage());
     }
@@ -546,7 +553,7 @@ public class XQItemAccessorTest extends XQJTestCase {
   public void testGetNode() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
-    org.w3c.dom.Node node = null;
+    Node node = null;
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("'1'");
@@ -601,7 +608,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQIA-3.1: getNode on element() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQIA-3.1: getNode on element() failed", true, node instanceof org.w3c.dom.Element);
+    assertTrue("A-XQIA-3.1: getNode on element() failed", node instanceof Element);
     assertEquals("A-XQIA-3.1: getNode on element() failed", "e", node.getLocalName());
     xqs.next();
     try {
@@ -609,7 +616,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQIA-3.1: getNode on attribute() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQIA-3.1: getNode on attribute() failed", true, node instanceof org.w3c.dom.Attr);
+    assertTrue("A-XQIA-3.1: getNode on attribute() failed", node instanceof Attr);
     assertEquals("A-XQIA-3.1: getNode on attribute() failed", "a", node.getLocalName());
     xqe.close();
   }
@@ -720,15 +727,15 @@ public class XQItemAccessorTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQIA-4.1: getObject on element() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQIA-4.1: getObject on element() failed", true, object instanceof org.w3c.dom.Element);
-    assertEquals("A-XQIA-4.1: getObject on element() failed", "e", ((org.w3c.dom.Node)object).getLocalName());
+    assertTrue("A-XQIA-4.1: getObject on element() failed", object instanceof Element);
+    assertEquals("A-XQIA-4.1: getObject on element() failed", "e", ((Node)object).getLocalName());
     xqs.next();
     try {
       object = xqs.getObject();
     } catch (final XQException e) {
       fail("A-XQIA-4.1: getObject on xs:string failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQIA-4.1: getObject on xs:string failed", true, object instanceof String);
+    assertTrue("A-XQIA-4.1: getObject on xs:string failed", object instanceof String);
     assertEquals("A-XQIA-4.1: getObject on xs:string failed", "Hello world!", (String)object);
     xqe.close();
   }
@@ -883,17 +890,17 @@ public class XQItemAccessorTest extends XQJTestCase {
       xqs.next();
       if (duration != null) assertTrue(msg + "for xs:yearMonthDuration", duration.isInstance(xqs.getObject()));
       xqs.next();
-      assertTrue(msg + "for attribute", xqs.getObject() instanceof org.w3c.dom.Attr);
+      assertTrue(msg + "for attribute", xqs.getObject() instanceof Attr);
       xqs.next();
-      assertTrue(msg + "for comment", xqs.getObject() instanceof org.w3c.dom.Comment);
+      assertTrue(msg + "for comment", xqs.getObject() instanceof Comment);
       xqs.next();
-      assertTrue(msg + "for document", xqs.getObject() instanceof org.w3c.dom.Document);
+      assertTrue(msg + "for document", xqs.getObject() instanceof Document);
       xqs.next();
-      assertTrue(msg + "for element", xqs.getObject() instanceof org.w3c.dom.Element);
+      assertTrue(msg + "for element", xqs.getObject() instanceof Element);
       xqs.next();
-      assertTrue(msg + "for processing instruction", xqs.getObject() instanceof org.w3c.dom.ProcessingInstruction);
+      assertTrue(msg + "for processing instruction", xqs.getObject() instanceof ProcessingInstruction);
       xqs.next();
-      assertTrue(msg + "for text", xqs.getObject() instanceof org.w3c.dom.Text);
+      assertTrue(msg + "for text", xqs.getObject() instanceof Text);
       } catch (final XQException e) {
         e.printStackTrace();
        fail("A-XQIA-4.1: getObject on element() failed with message: " + e.getMessage());
@@ -1159,12 +1166,12 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs = xqe.executeQuery("'Hello world!'");
     xqs.next();
     try {
-      assertEquals("A-XQIA-7.3: instanceOf failed", true, xqs.instanceOf(xqstringtype));
+      assertTrue("A-XQIA-7.3: instanceOf failed", xqs.instanceOf(xqstringtype));
     } catch (final XQException e) {
       fail("A-XQIA-7.3: instanceOf() failed with message: " + e.getMessage());
     }
     try {
-      assertEquals("A-XQIA-7.4: instanceOf failed", false, xqs.instanceOf(xqinttype));
+      assertFalse("A-XQIA-7.4: instanceOf failed", xqs.instanceOf(xqinttype));
     } catch (final XQException e) {
       fail("A-XQIA-7.4: instanceOf() failed with message: " + e.getMessage());
     }
@@ -1401,7 +1408,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
     try {
-      xqs.writeItemToSAX((ContentHandler)null);
+      xqs.writeItemToSAX(null);
       fail("A-XQIA-11.3: writeItem accepts a null buffer as first argument");
     } catch (final XQException e) {
       // Expect an XQException
@@ -1417,7 +1424,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQIA-11.1: writeItem failed with message: " + e.getMessage());
     }
-    assertTrue("A-XQIA-11.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer.toString() + '\'', result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQIA-11.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer + '\'', result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
   }
 
@@ -1477,7 +1484,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
     try {
-      xqs.writeItemToResult((Result)null);
+      xqs.writeItemToResult(null);
       fail("A-XQIA-11.3: writeItemToResult accepts a null buffer as first argument");
     } catch (final XQException e) {
       // Expect an XQException

@@ -26,7 +26,7 @@ public class XQItemTypeTest extends XQJTestCase {
     } catch (final XQException e) {
       // Expect an XQException
     }
-    assertEquals("A-XQIT-6.2: getSchemaURI() returns null.", null, xqtype.getSchemaURI());
+    assertNull("A-XQIT-6.2: getSchemaURI() returns null.", xqtype.getSchemaURI());
     try {
       xqtype.getTypeName();
       fail("A-XQIT-7.2: getTypeName() must throw an XQException.");
@@ -57,7 +57,7 @@ public class XQItemTypeTest extends XQJTestCase {
     } catch (final XQException e) {
       // Expect an XQException
     }
-    assertEquals("A-XQIT-6.2: getSchemaURI() returns null.", null, xqtype.getSchemaURI());
+    assertNull("A-XQIT-6.2: getSchemaURI() returns null.", xqtype.getSchemaURI());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
@@ -80,7 +80,7 @@ public class XQItemTypeTest extends XQJTestCase {
     xqtype.toString();
     assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "a", xqtype.getNodeName().getLocalPart());
     assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());
-    assertEquals("A-XQIT-6.2: getSchemaURI() returns null.", null, xqtype.getSchemaURI());
+    assertNull("A-XQIT-6.2: getSchemaURI() returns null.", xqtype.getSchemaURI());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
@@ -116,7 +116,7 @@ public class XQItemTypeTest extends XQJTestCase {
     xqtype.toString();
     assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "e", xqtype.getNodeName().getLocalPart());
     assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());
-    assertEquals("A-XQIT-6.2: getSchemaURI() returns null", null, xqtype.getSchemaURI());
+    assertNull("A-XQIT-6.2: getSchemaURI() returns null", xqtype.getSchemaURI());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
@@ -143,7 +143,7 @@ public class XQItemTypeTest extends XQJTestCase {
     xqtype.toString();
     assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "e", xqtype.getNodeName().getLocalPart());
     assertEquals("A-XQIT-5.1: getNodeName() returns the correct QName.", "http://www.xqj.org", xqtype.getNodeName().getNamespaceURI());
-    assertEquals("A-XQIT-6.2: getSchemaURI() returns null", null, xqtype.getSchemaURI());
+    assertNull("A-XQIT-6.2: getSchemaURI() returns null", xqtype.getSchemaURI());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "string", xqtype.getTypeName().getLocalPart());
     assertEquals("A-XQIT-7.1: getTypeName() returns the correct QName.", "http://www.w3.org/2001/XMLSchema", xqtype.getTypeName().getNamespaceURI());
     assertFalse("A-XQIT-8.1: isAnonymousType() reports if the type is anonymous.", xqtype.isAnonymousType());
@@ -187,7 +187,7 @@ public class XQItemTypeTest extends XQJTestCase {
     } catch (final XQException e) {
       // Expect an XQException
     }
-    assertEquals("A-XQIT-6.2: getSchemaURI() returns null", null, xqtype.getSchemaURI());
+    assertNull("A-XQIT-6.2: getSchemaURI() returns null", xqtype.getSchemaURI());
     try {
       xqtype.getTypeName();
       fail("A-XQIT-7.2: getTypeName() must throw an XQException.");

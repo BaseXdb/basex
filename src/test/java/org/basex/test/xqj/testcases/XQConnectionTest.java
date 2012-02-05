@@ -33,8 +33,8 @@ public class XQConnectionTest extends XQJTestCase {
       fail("A-XQC-1.1: closing connection failed with message: " + e.getMessage());
     }
 
-    assertEquals("A-XQC-1.2: closing a connection, closes dependent objects", true, xqe.isClosed());
-    assertEquals("A-XQC-1.2: closing a connection, closes dependent objects", true, xqs.isClosed());
+    assertTrue("A-XQC-1.2: closing a connection, closes dependent objects", xqe.isClosed());
+    assertTrue("A-XQC-1.2: closing a connection, closes dependent objects", xqs.isClosed());
   }
 
   public void testSetAutoCommit() throws XQException {
@@ -223,9 +223,9 @@ public class XQConnectionTest extends XQJTestCase {
     XQConnection my_xqc;
     my_xqc = xqds.getConnection();
 
-    assertEquals("A-XQC-7.1: isClosed() on open connection", false, my_xqc.isClosed());
+    assertFalse("A-XQC-7.1: isClosed() on open connection", my_xqc.isClosed());
     my_xqc.close();
-    assertEquals("A-XQC-7.2: isClosed() on closed connection", true, my_xqc.isClosed());
+    assertTrue("A-XQC-7.2: isClosed() on closed connection", my_xqc.isClosed());
   }
 
   public void testPrepareExpression() throws XQException {
@@ -304,7 +304,7 @@ public class XQConnectionTest extends XQJTestCase {
     }
 
     try {
-      xqpe = xqc.prepareExpression("'Hello world!'", (XQStaticContext)null);
+      xqpe = xqc.prepareExpression("'Hello world!'", null);
       xqpe.close();
       fail("A-XQC-8.5: prepareExpression() with a null XQStaticContext must throw an XQException.");
     } catch (final XQException e) {
@@ -412,7 +412,7 @@ public class XQConnectionTest extends XQJTestCase {
     }
 
     try {
-      xqpe = xqc.prepareExpression(new StringReader("'Hello world!'"), (XQStaticContext)null);
+      xqpe = xqc.prepareExpression(new StringReader("'Hello world!'"), null);
       xqpe.close();
       fail("A-XQC-8.5: prepareExpression() with a null XQStaticContext must throw an XQException.");
     } catch (final XQException e) {
@@ -520,7 +520,7 @@ public class XQConnectionTest extends XQJTestCase {
     }
 
     try {
-      xqpe = xqc.prepareExpression(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")), (XQStaticContext)null);
+      xqpe = xqc.prepareExpression(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")), null);
       xqpe.close();
       fail("A-XQC-8.5: prepareExpression() with a null XQStaticContext must throw an XQException.");
     } catch (final XQException e) {

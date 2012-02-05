@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
@@ -44,7 +45,7 @@ public class BXServletRequest extends AbstractRequest {
   /** HTTP servlet request. */
   private final HttpServletRequest req;
   /** Request method. */
-  private final Request.Method method;
+  private final Method method;
   /** Request URL. */
   private final String url;
   /** Authentication. */
@@ -60,7 +61,7 @@ public class BXServletRequest extends AbstractRequest {
     CONTENT_TYPES.put(ContentType.HTTP, Response.HTTP);
     CONTENT_TYPES.put(ContentType.MULTIPART, Response.MULTIPART);
     CONTENT_TYPES.put(ContentType.XML, Response.XML);
-    for(final Map.Entry<ContentType, String> entry : CONTENT_TYPES.entrySet())
+    for(final Entry<ContentType, String> entry : CONTENT_TYPES.entrySet())
       TYPE_CONTENTS.put(entry.getValue(), entry.getKey());
   }
 
@@ -82,7 +83,7 @@ public class BXServletRequest extends AbstractRequest {
    */
   public BXServletRequest(final HttpServletRequest r) {
     req = r;
-    method = Request.Method.valueOf(r.getMethod());
+    method = Method.valueOf(r.getMethod());
     url = r.getRequestURL().toString(); // MiltonUtils.stripContext(r);
     REQUEST.set(r);
   }
@@ -93,12 +94,12 @@ public class BXServletRequest extends AbstractRequest {
   }
 
   @Override
-  public String getRequestHeader(final Request.Header header) {
+  public String getRequestHeader(final Header header) {
     return req.getHeader(header.code);
   }
 
   @Override
-  public Request.Method getMethod() {
+  public Method getMethod() {
     return method;
   }
 
@@ -115,8 +116,8 @@ public class BXServletRequest extends AbstractRequest {
   @Override
   public Auth getAuthorization() {
     if(auth != null) return auth;
-    final String enc = getRequestHeader(Request.Header.AUTHORIZATION);
-    if(enc == null || enc.length() == 0) return null;
+    final String enc = getRequestHeader(Header.AUTHORIZATION);
+    if(enc == null || enc.isEmpty()) return null;
     auth = new Auth(enc);
     return auth;
   }
@@ -221,7 +222,7 @@ public class BXServletRequest extends AbstractRequest {
    * Request content type.
    * @return the content type of the current request
    */
-  protected Response.ContentType getRequestContentType() {
+  protected ContentType getRequestContentType() {
     final String s = req.getContentType();
     if(s == null) return null;
     if(s.contains(Response.MULTIPART)) return ContentType.MULTIPART;

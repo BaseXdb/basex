@@ -36,9 +36,9 @@ public class XQExpressionTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqe.executeQuery("'Hello world!'");
 
-    assertEquals("A-XQE-2.1: isClosed() on open expression", false, xqe.isClosed());
+    assertFalse("A-XQE-2.1: isClosed() on open expression", xqe.isClosed());
     xqe.close();
-    assertEquals("A-XQE-2.2: isClosed() on closed expressions", true, xqe.isClosed());
+    assertTrue("A-XQE-2.2: isClosed() on closed expressions", xqe.isClosed());
   }
 
   public void testClose() throws XQException {
@@ -54,7 +54,7 @@ public class XQExpressionTest extends XQJTestCase {
       fail("A-XQE-3.1: closing expression failed with message: " + e.getMessage());
     }
 
-    assertEquals("A-XQE-3.2: Closing an expression, closes any result sequences obtained from this expression", true, xqs.isClosed());
+    assertTrue("A-XQE-3.2: Closing an expression, closes any result sequences obtained from this expression", xqs.isClosed());
   }
 
   public void testExecuteCommand_String() throws XQException {

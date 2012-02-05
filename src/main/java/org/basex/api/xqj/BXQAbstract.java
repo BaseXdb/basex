@@ -271,7 +271,7 @@ abstract class BXQAbstract {
    * @return document node
    * @throws BXQException exception
    */
-  protected final DBNode createNode(final IO io) throws BXQException {
+  protected static final DBNode createNode(final IO io) throws BXQException {
     try {
       final Context ctx = BXQDataSource.context();
       return checkNode(CreateDB.mainMem(io, ctx));

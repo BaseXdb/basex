@@ -3,6 +3,7 @@ package org.basex.test.xqj.testcases;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -168,7 +169,7 @@ public class SignatureTest extends XQJTestCase {
     final InputStream signatureStream = getClass().getResourceAsStream(signatureFile__);
     assertNotNull("Signature file '" + signatureFile__ + "' not found in classpath.", signatureStream);
 
-    final java.io.InputStreamReader signatureReader = new java.io.InputStreamReader(signatureStream, "UTF-8");
+    final InputStreamReader signatureReader = new InputStreamReader(signatureStream, "UTF-8");
     final Reader in = new BufferedReader(signatureReader);
     int ch;
     final StringBuffer expected = new StringBuffer();

@@ -6,6 +6,7 @@ import java.io.StringReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 @SuppressWarnings("all")
 public class TestXMLFilter extends XMLFilterImpl {
@@ -13,11 +14,11 @@ public class TestXMLFilter extends XMLFilterImpl {
   InputSource inputSource;
 
   public TestXMLFilter(final String document) throws SAXException {
-    super(org.xml.sax.helpers.XMLReaderFactory.createXMLReader());
+    super(XMLReaderFactory.createXMLReader());
     inputSource = new InputSource(new StringReader(document));
   }
 
   public void parse(final String systemId) throws IOException, SAXException {
-    super.parse(inputSource);
+    parse(inputSource);
   }
 }

@@ -3,7 +3,7 @@ package org.basex.api.xqj;
 import static org.basex.api.xqj.BXQText.*;
 import java.io.PrintWriter;
 import java.sql.Connection;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
@@ -100,7 +100,7 @@ public final class BXQDataSource implements XQDataSource {
   @Override
   public void setProperties(final Properties prop) throws XQException {
     if(prop == null) throw new BXQException(NULL, Util.name(Properties.class));
-    for(final Map.Entry<?, ?> o : prop.entrySet()) {
+    for(final Entry<?, ?> o : prop.entrySet()) {
       setProperty(o.getKey().toString(), o.getValue().toString());
     }
   }

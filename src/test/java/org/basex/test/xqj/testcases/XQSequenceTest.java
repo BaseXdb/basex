@@ -62,7 +62,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-2.1: absolute() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-2.1: absolute(2) failed", true, b);
+    assertTrue("A-XQS-2.1: absolute(2) failed", b);
     assertEquals("A-XQS-2.1: absolute(2) failed", 2, xqs.getInt());
     xqe.close();
 
@@ -73,8 +73,8 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-2.4: absolute() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-2.4: absolute(5) failed", false, b);
-    assertEquals("A-XQS-2.4: absolute(5) failed", true, xqs.isAfterLast());
+    assertFalse("A-XQS-2.4: absolute(5) failed", b);
+    assertTrue("A-XQS-2.4: absolute(5) failed", xqs.isAfterLast());
     xqe.close();
 
     xqe = xqc.createExpression();
@@ -84,8 +84,8 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-2.3: absolute() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-2.3: absolute(0) failed", false, b);
-    assertEquals("A-XQS-2.3: absolute(0) failed", true, xqs.isBeforeFirst());
+    assertFalse("A-XQS-2.3: absolute(0) failed", b);
+    assertTrue("A-XQS-2.3: absolute(0) failed", xqs.isBeforeFirst());
     xqe.close();
 
     xqe = xqc.createExpression();
@@ -95,7 +95,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-2.2: absolute() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-2.2: absolute(-2) failed", true, b);
+    assertTrue("A-XQS-2.2: absolute(-2) failed", b);
     assertEquals("A-XQS-2.2: absolute(-2) failed", 3, xqs.getInt());
     xqe.close();
 
@@ -106,8 +106,8 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-2.4: absolute() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-2.4: absolute(-5) failed", false, b);
-    assertEquals("A-XQS-2.4: absolute(-5) failed", true, xqs.isBeforeFirst());
+    assertFalse("A-XQS-2.4: absolute(-5) failed", b);
+    assertTrue("A-XQS-2.4: absolute(-5) failed", xqs.isBeforeFirst());
     xqe.close();
   }
 
@@ -147,7 +147,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-3.1: afterLast() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-3.1: afterLast() failed", true, xqs.isAfterLast());
+    assertTrue("A-XQS-3.1: afterLast() failed", xqs.isAfterLast());
     xqe.close();
   }
 
@@ -187,7 +187,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-4.1: beforeFirst() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-4.1: beforeFirst() failed", true, xqs.isBeforeFirst());
+    assertTrue("A-XQS-4.1: beforeFirst() failed", xqs.isBeforeFirst());
     xqe.close();
   }
 
@@ -208,8 +208,8 @@ public class XQSequenceTest extends XQJTestCase {
       fail("A-XQS-5.1: close() failed with message: " + e.getMessage());
     }
 
-    assertEquals("A-XQS-5.1: close() doesn't close sequence", true, xqs.isClosed());
-    assertEquals("A-XQS-5.2: close() doesn't close items obtained from the sequence", true, xqi.isClosed());
+    assertTrue("A-XQS-5.1: close() doesn't close sequence", xqs.isClosed());
+    assertTrue("A-XQS-5.2: close() doesn't close items obtained from the sequence", xqi.isClosed());
 
     xqe.close();
   }
@@ -221,9 +221,9 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1,2,3,4");
 
-    assertEquals("A-XQS-6.1: isClosed() on open sequence", false, xqs.isClosed());
+    assertFalse("A-XQS-6.1: isClosed() on open sequence", xqs.isClosed());
     xqs.close();
-    assertEquals("A-XQS-6.2: isClosed() on closed sequence", true, xqs.isClosed());
+    assertTrue("A-XQS-6.2: isClosed() on closed sequence", xqs.isClosed());
 
     xqe.close();
   }
@@ -336,19 +336,19 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
-      assertEquals("A-XQS-9.2: isOnItem() failed when before first item", false, xqs.isOnItem());
+      assertFalse("A-XQS-9.2: isOnItem() failed when before first item", xqs.isOnItem());
     } catch (final XQException e) {
       fail("A-XQS-9.2: isOnItem() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-9.1: isOnItem() failed when on item", true, xqs.isOnItem());
+      assertTrue("A-XQS-9.1: isOnItem() failed when on item", xqs.isOnItem());
     } catch (final XQException e) {
       fail("A-XQS-9.1: isOnItem() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-9.2: isOnItem() failed when after last item", false, xqs.isOnItem());
+      assertFalse("A-XQS-9.2: isOnItem() failed when after last item", xqs.isOnItem());
     } catch (final XQException e) {
       fail("A-XQS-9.2: isOnItem() failed with message: " + e.getMessage());
     }
@@ -373,7 +373,7 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
-      assertEquals("A-XQS-10.2: isScrollable() failed for SCROLLTYPE_FORWARD_ONLY sequence", false, xqs.isScrollable());
+      assertFalse("A-XQS-10.2: isScrollable() failed for SCROLLTYPE_FORWARD_ONLY sequence", xqs.isScrollable());
     } catch (final XQException e) {
       fail("A-XQS-10.2: isScrollable() failed with message: " + e.getMessage());
     }
@@ -386,7 +386,7 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
-      assertEquals("A-XQS-10.1: isScrollable() failed for SCROLLTYPE_SCROLLABLE sequence", true, xqs.isScrollable());
+      assertTrue("A-XQS-10.1: isScrollable() failed for SCROLLTYPE_SCROLLABLE sequence", xqs.isScrollable());
     } catch (final XQException e) {
       fail("A-XQS-10.1: isScrollable() failed with message: " + e.getMessage());
     }
@@ -430,7 +430,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-11.1: first() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-11.1: first() failed", true, b);
+    assertTrue("A-XQS-11.1: first() failed", b);
     assertEquals("A-XQS-11.1: first() failed", 1, xqs.getInt());
     xqe.close();
 
@@ -441,7 +441,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-11.2: first() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-11.2: first() failed", false, b);
+    assertFalse("A-XQS-11.2: first() failed", b);
     xqe.close();
   }
 
@@ -660,19 +660,19 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
-      assertEquals("A-XQS-13.3: isAfterLast() failed when before first item", false, xqs.isAfterLast());
+      assertFalse("A-XQS-13.3: isAfterLast() failed when before first item", xqs.isAfterLast());
     } catch (final XQException e) {
       fail("A-XQS-13.3: isAfterLast() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-13.3: isAfterLast() failed when on item", false, xqs.isAfterLast());
+      assertFalse("A-XQS-13.3: isAfterLast() failed when on item", xqs.isAfterLast());
     } catch (final XQException e) {
       fail("A-XQS-13.3: isAfterLast() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-13.2: isAfterLast() failed when after last item", true, xqs.isAfterLast());
+      assertTrue("A-XQS-13.2: isAfterLast() failed when after last item", xqs.isAfterLast());
     } catch (final XQException e) {
       fail("A-XQS-13.2: isAfterLast() failed with message: " + e.getMessage());
     }
@@ -681,7 +681,7 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     try {
-      assertEquals("A-XQS-13.3: isAfterLast() failed in case of empty sequence", false, xqs.isAfterLast());
+      assertFalse("A-XQS-13.3: isAfterLast() failed in case of empty sequence", xqs.isAfterLast());
     } catch (final XQException e) {
       fail("A-XQS-13.4: isAfterLast() failed with message: " + e.getMessage());
     }
@@ -720,19 +720,19 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
-      assertEquals("A-XQS-14.2: isBeforeFirst() failed when before first item", true, xqs.isBeforeFirst());
+      assertTrue("A-XQS-14.2: isBeforeFirst() failed when before first item", xqs.isBeforeFirst());
     } catch (final XQException e) {
       fail("A-XQS-14.2: isBeforeFirst() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-14.3: isBeforeFirst() failed when on item", false, xqs.isBeforeFirst());
+      assertFalse("A-XQS-14.3: isBeforeFirst() failed when on item", xqs.isBeforeFirst());
     } catch (final XQException e) {
       fail("A-XQS-14.3: isBeforeFirst() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-14.3: isBeforeFirst() failed when after last item", false, xqs.isBeforeFirst());
+      assertFalse("A-XQS-14.3: isBeforeFirst() failed when after last item", xqs.isBeforeFirst());
     } catch (final XQException e) {
       fail("A-XQS-14.3: isBeforeFirst() failed with message: " + e.getMessage());
     }
@@ -741,7 +741,7 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     try {
-      assertEquals("A-XQS-14.2: isBeforeFirst() failed in case of empty sequence", false, xqs.isBeforeFirst());
+      assertFalse("A-XQS-14.2: isBeforeFirst() failed in case of empty sequence", xqs.isBeforeFirst());
     } catch (final XQException e) {
       fail("A-XQS-14.1: isBeforeFirst() failed with message: " + e.getMessage());
     }
@@ -780,19 +780,19 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
-      assertEquals("A-XQS-15.3: isFirst() failed when before first item", false, xqs.isFirst());
+      assertFalse("A-XQS-15.3: isFirst() failed when before first item", xqs.isFirst());
     } catch (final XQException e) {
       fail("A-XQS-15.3: isFirst() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-15.2: isFirst() failed when on item", true, xqs.isFirst());
+      assertTrue("A-XQS-15.2: isFirst() failed when on item", xqs.isFirst());
     } catch (final XQException e) {
       fail("A-XQS-15.2: isFirst() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-15.3: isFirst() failed when after last item", false, xqs.isFirst());
+      assertFalse("A-XQS-15.3: isFirst() failed when after last item", xqs.isFirst());
     } catch (final XQException e) {
       fail("A-XQS-15.3: isFirst() failed with message: " + e.getMessage());
     }
@@ -831,19 +831,19 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("1");
     try {
-      assertEquals("A-XQS-16.3: isLast() failed when before first item", false, xqs.isLast());
+      assertFalse("A-XQS-16.3: isLast() failed when before first item", xqs.isLast());
     } catch (final XQException e) {
       fail("A-XQS-16.3: isLast() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-16.2: isLast() failed when on item", true, xqs.isLast());
+      assertTrue("A-XQS-16.2: isLast() failed when on item", xqs.isLast());
     } catch (final XQException e) {
       fail("A-XQS-16.2: isLast() failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
-      assertEquals("A-XQS-16.3: isLast() failed when after last item", false, xqs.isLast());
+      assertFalse("A-XQS-16.3: isLast() failed when after last item", xqs.isLast());
     } catch (final XQException e) {
       fail("A-XQS-16.3: isLast() failed with message: " + e.getMessage());
     }
@@ -887,7 +887,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-17.1: last() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-17.1: last() failed", true, b);
+    assertTrue("A-XQS-17.1: last() failed", b);
     assertEquals("A-XQS-17.1: last() failed", 4, xqs.getInt());
     xqe.close();
 
@@ -898,7 +898,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-17.2: last() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-17.2: last() failed", false, b);
+    assertFalse("A-XQS-17.2: last() failed", b);
     xqe.close();
   }
 
@@ -925,27 +925,27 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-18.1: next() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-18.1: next() failed", true, b);
+    assertTrue("A-XQS-18.1: next() failed", b);
     assertEquals("A-XQS-18.1: next() failed", 1, xqs.getInt());
     try {
       b = xqs.next();
     } catch (final XQException e) {
       fail("A-XQS-18.1: next() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-18.1: next() failed", true, b);
+    assertTrue("A-XQS-18.1: next() failed", b);
     assertEquals("A-XQS-18.1: next() failed", 2, xqs.getInt());
     try {
       b = xqs.next();
     } catch (final XQException e) {
       fail("A-XQS-18.2: next() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-18.2: next() failed", false, b);
+    assertFalse("A-XQS-18.2: next() failed", b);
     xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     b = xqs.next();
-    assertEquals("next() failed", false, b);
+    assertFalse("next() failed", b);
     xqe.close();
   }
 
@@ -987,28 +987,28 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-19.1: previous() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-19.1: previous() failed", true, b);
+    assertTrue("A-XQS-19.1: previous() failed", b);
     assertEquals("A-XQS-19.1: previous() failed", 2, xqs.getInt());
     try {
       b = xqs.previous();
     } catch (final XQException e) {
       fail("A-XQS-19.1: previous() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-19.1: previous() failed", true, b);
+    assertTrue("A-XQS-19.1: previous() failed", b);
     assertEquals("A-XQS-19.1: previous() failed", 1, xqs.getInt());
     try {
       b = xqs.previous();
     } catch (final XQException e) {
       fail("A-XQS-19.2: previous() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-19.2: previous() failed", false, b);
+    assertFalse("A-XQS-19.2: previous() failed", b);
     xqe.close();
 
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("()");
     xqs.afterLast();
     b = xqs.previous();
-    assertEquals("previous() failed", false, b);
+    assertFalse("previous() failed", b);
     xqe.close();
   }
 
@@ -1049,22 +1049,22 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-20.1: relative() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-20.1: relative(2) failed", true, b);
+    assertTrue("A-XQS-20.1: relative(2) failed", b);
     assertEquals("A-XQS-20.1: relative(2) failed", 2, xqs.getInt());
     try {
       b = xqs.relative(2);
     } catch (final XQException e) {
       fail("A-XQS-20.1: relative() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-20.1: relative(2) failed", true, b);
+    assertTrue("A-XQS-20.1: relative(2) failed", b);
     assertEquals("A-XQS-20.1: relative(2) failed", 4, xqs.getInt());
     try {
       b = xqs.relative(2);
     } catch (final XQException e) {
       fail("A-XQS-20.4: relative() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-20.4: relative(2) failed", false, b);
-    assertEquals("A-XQS-20.4: relative(2) failed", true, xqs.isAfterLast());
+    assertFalse("A-XQS-20.4: relative(2) failed", b);
+    assertTrue("A-XQS-20.4: relative(2) failed", xqs.isAfterLast());
     xqe.close();
 
     xqe = xqc.createExpression();
@@ -1074,8 +1074,8 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-20.3: relative() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-20.3: relative(0) failed", false, b);
-    assertEquals("A-XQS-20.3: relative(0) failed", true, xqs.isBeforeFirst());
+    assertFalse("A-XQS-20.3: relative(0) failed", b);
+    assertTrue("A-XQS-20.3: relative(0) failed", xqs.isBeforeFirst());
     xqe.close();
 
     xqe = xqc.createExpression();
@@ -1086,22 +1086,22 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-20.2: relative() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-20.2: relative(-2) failed", true, b);
+    assertTrue("A-XQS-20.2: relative(-2) failed", b);
     assertEquals("A-XQS-20.2: relative(-2) failed", 3, xqs.getInt());
     try {
       b = xqs.relative(-2);
     } catch (final XQException e) {
       fail("A-XQS-20.2: relative() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-20.2: relative(-2) failed", true, b);
+    assertTrue("A-XQS-20.2: relative(-2) failed", b);
     assertEquals("A-XQS-20.2: relative(-2) failed", 1, xqs.getInt());
     try {
       b = xqs.relative(-2);
     } catch (final XQException e) {
       fail("A-XQS-20.4: relative() failed with message: " + e.getMessage());
     }
-    assertEquals("A-XQS-20.4: relative(-2) failed", false, b);
-    assertEquals("A-XQS-20.4: relative(-2) failed", true, xqs.isBeforeFirst());
+    assertFalse("A-XQS-20.4: relative(-2) failed", b);
+    assertTrue("A-XQS-20.4: relative(-2) failed", xqs.isBeforeFirst());
     xqe.close();
   }
 
@@ -1295,7 +1295,7 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
-      xqs.writeSequenceToSAX((ContentHandler)null);
+      xqs.writeSequenceToSAX(null);
       fail("A-XQS-24.3: writeSequence accepts a null buffer as first argument");
     } catch (final XQException e) {
       // Expect an XQException
@@ -1310,7 +1310,7 @@ public class XQSequenceTest extends XQJTestCase {
     } catch (final XQException e) {
       fail("A-XQS-24.1: writeSequence failed with message: " + e.getMessage());
     }
-    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer.toString() + '\'', result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
+    assertTrue("A-XQS-24.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer + '\'', result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
     xqe.close();
   }
 
@@ -1357,7 +1357,7 @@ public class XQSequenceTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     try {
-      xqs.writeSequenceToResult((Result)null);
+      xqs.writeSequenceToResult(null);
       fail("A-XQS-24.3: writeSequence accepts a null buffer as first argument");
     } catch (final XQException e) {
       // Expect an XQException

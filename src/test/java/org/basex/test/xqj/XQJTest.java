@@ -557,12 +557,12 @@ public final class XQJTest {
       expr.bindInt(new QName("v"), 1, null);
       xqs = expr.executeQuery("declare variable $v external; $v");
       xqs.next();
-      assertTrue(xqs.getInt() == 1);
+      assertEquals(1, xqs.getInt());
 
       expr.bindInt(new QName("v"), 2, null);
       xqs = expr.executeQuery("declare variable $v external; $v");
       xqs.next();
-      assertTrue(xqs.getInt() == 2);
+      assertEquals(2, xqs.getInt());
     } catch(final XQException ex) { /* ignored */
       fail(Util.message(ex));
     }

@@ -1280,7 +1280,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_DOUBLE, xqs.getItemType().getBaseType());
-    assertTrue("A-XQDC-1.7: Successful bindXXX.", 1d == xqs.getDouble());
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", 1d, xqs.getDouble(), 0.0);
     xqpe.close();
   }
 
@@ -1352,7 +1352,7 @@ public class XQDynamicContextTest extends XQJTestCase {
     xqs.next();
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQITEMKIND_ATOMIC, xqs.getItemType().getItemKind());
     assertEquals("A-XQDC-1.7: Successful bindXXX.", XQItemType.XQBASETYPE_FLOAT, xqs.getItemType().getBaseType());
-    assertTrue("A-XQDC-1.7: Successful bindXXX.", 1f == xqs.getFloat());
+    assertEquals("A-XQDC-1.7: Successful bindXXX.", 1f, xqs.getFloat(), 0.0);
     xqpe.close();
   }
 
