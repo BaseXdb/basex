@@ -78,7 +78,7 @@ public final class FNHof extends StandardFunc {
     final FItem f = withArity(0, 2, ctx);
     final Iter xs = expr[1].iter(ctx);
 
-    Value sum = checkEmpty(xs.next());
+    Value sum = checkNoEmpty(xs.next());
     for(Item x; (x = xs.next()) != null;) sum = f.invValue(ctx, input, sum, x);
     return sum;
   }
@@ -120,7 +120,7 @@ public final class FNHof extends StandardFunc {
     final FItem pred = withArity(0, 1, ctx);
     final FItem fun = withArity(1, 1, ctx);
     Value v = ctx.value(expr[2]);
-    while(!checkBln(pred.invItem(ctx, input, v), ctx)) {
+    while(!checkBln(checkNoEmpty(pred.invItem(ctx, input, v)), ctx)) {
       v = fun.invValue(ctx, input, v);
     }
     return v;

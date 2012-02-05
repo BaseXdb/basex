@@ -238,19 +238,6 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is no empty sequence.
-   * @param it item to be checked
-   * @param t expected type
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  private Item checkNoEmpty(final Item it, final Type t)
-      throws QueryException {
-    if(it == null) XPEMPTYPE.thrw(input, description(), t);
-    return it;
-  }
-
-  /**
    * Checks if the specified item is a number.
    * Returns a token representation or an exception.
    * @param it item to be checked
@@ -354,7 +341,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final Item checkItem(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkEmpty(e.item(ctx, input));
+    return checkNoEmpty(e.item(ctx, input));
   }
 
   /**
@@ -368,19 +355,31 @@ public abstract class ParseExpr extends Expr {
   public final Item checkType(final Item it, final Type t)
       throws QueryException {
 
-    if(!checkEmpty(it).type.instanceOf(t)) Err.type(this, t, it);
+    if(!checkNoEmpty(it).type.instanceOf(t)) Err.type(this, t, it);
     return it;
   }
 
   /**
-   * Checks if the specified item is an empty sequence; if yes, throws
-   * an exception.
+   * Checks if the specified item is no empty sequence.
    * @param it item to be checked
    * @return specified item
    * @throws QueryException query exception
    */
-  public final Item checkEmpty(final Item it) throws QueryException {
+  public final Item checkNoEmpty(final Item it) throws QueryException {
     if(it == null) XPEMPTY.thrw(input, description());
+    return it;
+  }
+
+  /**
+   * Checks if the specified item is no empty sequence.
+   * @param it item to be checked
+   * @param t expected type
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  private Item checkNoEmpty(final Item it, final Type t)
+      throws QueryException {
+    if(it == null) XPEMPTYPE.thrw(input, description(), t);
     return it;
   }
 

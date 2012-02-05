@@ -37,7 +37,7 @@ public final class FNId extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = checkEmpty((expr.length == 2 ? expr[1] :
+    final Item it = checkNoEmpty((expr.length == 2 ? expr[1] :
       checkCtx(ctx)).item(ctx, input));
 
     final ANode node = checkNode(it);
@@ -53,7 +53,7 @@ public final class FNId extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = checkEmpty((expr.length == 2 ? expr[1] :
+    final Item it = checkNoEmpty((expr.length == 2 ? expr[1] :
       checkCtx(ctx)).item(ctx, input));
 
     switch(sig) {

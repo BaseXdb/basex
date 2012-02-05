@@ -202,7 +202,7 @@ public final class FNDb extends StandardFunc {
     if(expr.length < 3) return ia.iter(ctx);
 
     // parse and compile the name test
-    final Item name = checkEmpty(expr[2].item(ctx, input));
+    final Item name = checkNoEmpty(expr[2].item(ctx, input));
     final QNm nm = new QNm(checkStr(name, ctx), ctx);
     if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(EMPTY));
 

@@ -158,7 +158,7 @@ public final class FNXslt extends StandardFunc {
    * @throws Exception exception
    */
   private IO read(final Expr e, final QueryContext ctx) throws Exception {
-    final Item it = checkEmpty(e.item(ctx, input));
+    final Item it = checkNoEmpty(e.item(ctx, input));
     final Type ip = it.type;
     if(ip.isNode()) {
       final ArrayOutput ao = new ArrayOutput();

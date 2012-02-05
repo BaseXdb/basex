@@ -125,7 +125,7 @@ public abstract class StandardFunc extends Arr {
   Data data(final int i, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmpty(expr[i].item(ctx, input));
+    final Item it = checkNoEmpty(expr[i].item(ctx, input));
     final Type ip = it.type;
     if(ip.isNode()) return checkDBNode(it).data;
     if(ip.isString())  {
