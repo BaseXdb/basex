@@ -319,7 +319,7 @@ public final class GUIConstants {
     font  = new Font(f, type, size);
     mfont = new Font(prop.get(GUIProp.MONOFONT), type, size);
     bfont = new Font(f, Font.BOLD, size);
-    lfont = new Font(f, type, size + 8);
+    lfont = new Font(f, type, size + 10);
     dfont = new Font(prop.get(GUIProp.MONOFONT), 0,
         UIManager.getFont("TextArea.font").getSize() - 1);
 
