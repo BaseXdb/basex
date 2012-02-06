@@ -9,9 +9,8 @@ import org.basex.test.query.QueryTest;
  * @author Christian Gruen
  */
 public final class XPathMarkFTTest extends QueryTest {
-  /** Constructor. */
-  static {
-    doc =
+  /** Test document. */
+  public static final String DOC =
       "<?xml version='1.0' encoding='UTF-8'?>" +
       //"<!DOCTYPE A SYSTEM 'alphabet.dtd'>" +
       "<A id='n1' pre='1' post='26' xml:lang='en'>" +
@@ -47,7 +46,8 @@ public final class XPathMarkFTTest extends QueryTest {
       "<Z id='n26' pre='26' post='24' idrefs='n8 n17'" +
       " xml:lang='it'>zuzzurellone</Z></X></A>";
 
-    queries = new Object[][] {
+  /** Test queries. */
+  public static final Object[][] QUERIES = new Object[][] {
       { "A01", node(59, 64, 79), "//L/*" },
       { "A02", node(20), "//L/parent::*" },
       { "A03", node(59, 64, 68, 73, 79), "//L/descendant::*" },
@@ -133,6 +133,11 @@ public final class XPathMarkFTTest extends QueryTest {
       { "T06", node(64), "//L/N" },
       { "T07", node(59, 64, 79), "//L/*" }
     };
+
+  /** Constructor. */
+  static {
+    doc = DOC;
+    queries = QUERIES;
   }
 
   /* TABLE REPRESENTATION

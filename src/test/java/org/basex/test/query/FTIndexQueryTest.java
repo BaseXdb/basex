@@ -1,12 +1,11 @@
 package org.basex.test.query;
 
+import static org.basex.query.func.Function.*;
 import static org.basex.util.Util.name;
 import static org.junit.Assert.*;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -14,6 +13,7 @@ import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
+import org.basex.test.query.simple.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -29,6 +29,7 @@ import org.junit.runners.model.Statement;
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
+@InputData("<x>A x B</x>")
 public class FTIndexQueryTest {
   /** Context of database without full-text index. */
   private static final Context CTX = new Context();
@@ -64,23 +65,61 @@ public class FTIndexQueryTest {
     CTX_IX.close();
   }
 
-  /**
-   * Word distance test.
-   * @throws BaseXException if query execution fails
-   */
+  /** Run all tests from {@link FTTest}. */
+  @Test
+  @InputData(FTTest.DOC)
+  public void testFTTest() {
+    for(final Object[] q : FTTest.QUERIES)
+      if(q.length == 3) assertQuery((String) q[2]);
+  }
+
+  /** Run all tests from {@link XPathMarkFTTest}. */
+  @Test
+  @InputData(XPathMarkFTTest.DOC)
+  public void testXPathMarkFTTest() {
+    for(final Object[] q : XPathMarkFTTest.QUERIES) assertQuery((String) q[2]);
+  }
+
+  /** Word distance test. */
   @Test
   @Ignore("GH-359")
-  @InputData("<x>A x B</x>")
-  public void testWordsDistance() throws BaseXException {
-    final String q =
-        "//*[text() contains text 'A B' all words distance exactly 0 words]";
-    assertEquals(new XQuery(q).execute(CTX), new XQuery(q).execute(CTX_IX));
+  public void testWordsDistance() {
+    assertQuery(
+        "//*[text() contains text 'A B' all words distance exactly 0 words]");
+  }
+
+  /** {@code ft:mark()} test with ft option {@code all words}. */
+  @Test
+  @Ignore("GH-337")
+  public void testFTMarkAllWords() {
+    assertQuery(
+        _FT_MARK.args(" //*[text() contains text {'A B'} all words], 'b'"));
+  }
+
+  /** {@code ft:mark()} test with {@code ftand}. */
+  @Test
+  public void testFTMarkFTAnd() {
+    assertQuery(
+        _FT_MARK.args(" //*[text() contains text 'A' ftand 'B'], 'b'"));
+  }
+
+  /**
+   * Assert that a query returns the same result with and without ft index.
+   * @param q query
+   */
+  private static void assertQuery(final String q) {
+    try {
+      assertEquals("Query failed:\n" + q + '\n',
+          new XQuery(q).execute(CTX), new XQuery(q).execute(CTX_IX));
+      // [DP]: assert that index was really used
+    } catch (final BaseXException e) {
+      fail("Query failed:\n" + q + "\nMessage: " + e.getMessage());
+    }
   }
 }
 
 /** Annotation to provide input data for a test. */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
 @interface InputData {
   /**
    * Input data.
@@ -115,7 +154,11 @@ class CreateDBRule implements MethodRule {
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {
-        final InputData input = method.getAnnotation(InputData.class);
+        InputData input = method.getAnnotation(InputData.class);
+        if(input == null) {
+          input = method.getMethod().getDeclaringClass().getAnnotation(
+              InputData.class);
+        }
         if(input != null) new CreateDB(db, input.value()).execute(ctx);
         base.evaluate();
       }
