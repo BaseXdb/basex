@@ -29,7 +29,7 @@ public class DialogResources extends BaseXBack {
   /** Database/root node. */
   final TreeFolder root;
   /** Dialog reference. */
-  final DialogProps dialog;
+  final Dialog dialog;
 
   /** Resource tree. */
   private final BaseXTree tree;
@@ -40,16 +40,16 @@ public class DialogResources extends BaseXBack {
 
   /**
    * Constructor.
-   * @param d dialog reference
+   * @param dp dialog reference
    */
-  public DialogResources(final DialogProps d) {
+  public DialogResources(final DialogProps dp) {
     setLayout(new BorderLayout(0, 5));
-    dialog = d;
+    dialog = dp;
 
     // init tree - additional root node necessary to bypass
     // the egg/chicken dilemma
     final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
-    tree = new BaseXTree(rootNode, d).border(4, 4, 4, 4);
+    tree = new BaseXTree(rootNode, dp).border(4, 4, 4, 4);
     tree.setRootVisible(false);
     tree.getSelectionModel().setSelectionMode(
         TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -71,21 +71,21 @@ public class DialogResources extends BaseXBack {
           filt = trgt;
         }
         filterText.setText(filt);
-        dialog.add.target.setText(trgt);
+        dp.add.target.setText(trgt);
       }
     });
 
     // add default children to tree
-    final Data data = d.gui.context.data();
+    final Data data = dp.gui.context.data();
     root = new TreeRootFolder(token(data.meta.name), token("/"), tree, data);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
     tree.expandPath(new TreePath(root.getPath()));
 
-    filter = new BaseXButton(FILTER, d);
-    clear = new BaseXButton(CLEAR, d);
+    filter = new BaseXButton(FILTER, dp);
+    clear = new BaseXButton(CLEAR, dp);
 
     // popup menu for node interaction
-    new BaseXPopup(tree, d.gui, new DeleteCmd(), new RenameCmd());
+    new BaseXPopup(tree, dp.gui, new DeleteCmd(), new RenameCmd());
 
     // button panel
     final BaseXBack buttons = new BaseXBack();
@@ -94,7 +94,7 @@ public class DialogResources extends BaseXBack {
     final BaseXBack btn = new BaseXBack().layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
 
-    filterText = new BaseXTextField("", d.gui);
+    filterText = new BaseXTextField("", dp);
     BaseXLayout.setWidth(filterText, 250);
 
     // left panel
