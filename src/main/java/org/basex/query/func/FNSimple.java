@@ -121,7 +121,7 @@ public final class FNSimple extends StandardFunc {
       case EXISTS:
         // ignore non-deterministic expressions (e.g.: error())
         return e.size() == -1 || e.uses(Use.NDT) || e.uses(Use.CNS) ? this :
-          Bln.get(sig == Function.EMPTY ^ !e.isEmpty());
+          Bln.get(sig == Function.EMPTY ^ e.size() != 0);
       case BOOLEAN:
         // simplify, e.g.: if(boolean(A)) -> if(A)
         return e.type().eq(SeqType.BLN) ? e : this;
@@ -175,7 +175,7 @@ public final class FNSimple extends StandardFunc {
       if(!e.type().mayBeNum()) ex = e;
     } else if(sig == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
-      if(e.type().type.isNode() || !e.isEmpty()) ex = e;
+      if(e.type().type.isNode() || e.size() > 0) ex = e;
     }
     if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;
