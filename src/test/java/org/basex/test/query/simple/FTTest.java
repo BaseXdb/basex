@@ -16,9 +16,8 @@ public final class FTTest extends QueryTest {
   /** Test all flag. */
   private static final boolean ALL = true;
 
-  /** Constructor. */
-  static {
-    doc =
+  /** Test document. */
+  public static final String DOC =
       "<fttest>\n" +
       "  <co>\n" +
       "     <w>xml in the first sentence. second sentence. " +
@@ -50,7 +49,8 @@ public final class FTTest extends QueryTest {
       "  <mix>B<sub/>A</mix>\n" +
       "</fttest>";
 
-    queries = new Object[][] {
+  /** Test queries. */
+  public static final Object[][] QUERIES = new Object[][] {
       { "Simple 1", bool(true), "'a' contains text 'a'" },
       { "Simple 2", bool(true), "'a b' contains text 'b'" },
       { "Simple 3", bool(false), "'abc' contains text 'b'" },
@@ -198,6 +198,7 @@ public final class FTTest extends QueryTest {
       { "FTWildCard 22", bool(true), "'aa' <- 'a.' using wildcards" },
       { "FTWildCard 23", bool(true), "'a' <- 'a.{0,1}' using wildcards" },
       { "FTWildCard 24", bool(true), "'aa' <- 'a.{0,1}' using wildcards" },
+      // parsing tests: should throw exception
       { "FTWildCard 25", "'aa' <- 'a.{0, 1}' using wildcards" },
       { "FTWildCard 26", "'a' <- 'a.{-1,1}' using wildcards" },
       { "FTWildCard 27", "'a' <- 'a.{1}' using wildcards" },
@@ -532,6 +533,11 @@ public final class FTTest extends QueryTest {
       { "FTUnaryNot 15", node(25, 27, 29, 31, 33),
         "//fti [text() <- 'adf' ftor ftnot 'adf']" },
     };
+
+  /** Constructor. */
+  static {
+    doc = DOC;
+    queries = QUERIES;
   }
 
   @Test
