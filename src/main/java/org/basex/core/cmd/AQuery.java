@@ -232,13 +232,14 @@ abstract class AQuery extends Command {
     if(c != prop.is(Prop.COMPPLAN)) return;
 
     // show dot plan
+    BufferOutput bo = null;
     try {
       if(prop.is(Prop.DOTPLAN)) {
         final String path = context.prop.get(Prop.QUERYPATH);
         final String dot = path.isEmpty() ? "plan.dot" :
             new IOFile(path).name().replaceAll("\\..*?$", ".dot");
 
-        final BufferOutput bo = new BufferOutput(dot);
+        bo = new BufferOutput(dot);
         final DOTSerializer d = new DOTSerializer(bo, prop.is(Prop.DOTCOMPACT));
         qp.plan(d);
         d.close();
@@ -255,6 +256,8 @@ abstract class AQuery extends Command {
       }
     } catch(final Exception ex) {
       Util.stack(ex);
+    } finally {
+      if(bo != null) try { bo.close(); } catch(final IOException ex) { }
     }
   }
 
