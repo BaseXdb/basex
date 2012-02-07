@@ -41,6 +41,8 @@ public final class DirParser extends TargetParser {
   /** Database path for storing binary files. */
   protected IOFile binaries;
 
+  /** Last source. */
+  private IO lastSrc;
   /** Parser reference. */
   private Parser parser;
   /** Element counter. */
@@ -100,6 +102,8 @@ public final class DirParser extends TargetParser {
       src = io;
 
       while(io.more(archives)) {
+        b.checkStop();
+
         String nm = io.name();
         if(Prop.WIN) nm = nm.toLowerCase(Locale.ENGLISH);
 
@@ -144,9 +148,8 @@ public final class DirParser extends TargetParser {
           if(ok) {
             parser = Parser.fileParser(in, prop, targ);
             parser.parse(b);
-          } else {
-            parser = null;
           }
+          parser = null;
           if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
         }
       }
@@ -171,12 +174,15 @@ public final class DirParser extends TargetParser {
 
   @Override
   public String det() {
-    return parser != null ? parser.detail() : "";
+    return parser != null ? parser.detail() : src.path();
   }
 
   @Override
   public double prog() {
-    return parser != null ? parser.progress() : 0;
+    if(parser != null) return parser.progress();
+    if(lastSrc == src) return 1;
+    lastSrc = src;
+    return Math.random();
   }
 
   @Override

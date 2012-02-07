@@ -20,10 +20,10 @@ import java.awt.event.ActionListener;
  */
 public final class DialogProgress extends Dialog implements ActionListener {
   /** Maximum value of progress bar. */
-  private static final int MAX = 500;
+  private static final int MAX = 600;
   /** Refresh action. */
   private final Timer timer = new Timer(100, this);
-  /** Information label. */
+   /** Information label. */
   private final BaseXLabel info;
   /** Memory usage. */
   private final BaseXMem mem;
