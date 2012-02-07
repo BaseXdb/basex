@@ -78,7 +78,7 @@ public final class DialogManage extends Dialog {
     rename = new BaseXButton(RENAME_D, this);
     copy = new BaseXButton(COPY_D, this);
     open = new BaseXButton(OPEN, this);
-    drop = new BaseXButton(DROP_D, this);
+    drop = new BaseXButton(DROP + DOTS, this);
 
     // first tab
     final BaseXBack tab1 = new BaseXBack(new BorderLayout(0, 8)).border(8);

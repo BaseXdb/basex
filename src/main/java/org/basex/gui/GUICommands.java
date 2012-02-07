@@ -2,55 +2,22 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 
-import java.awt.BorderLayout;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
+import java.awt.*;
+import java.awt.datatransfer.*;
 
-import javax.swing.AbstractButton;
+import javax.swing.*;
 
-import org.basex.core.Command;
-import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateIndex;
-import org.basex.core.cmd.Cs;
-import org.basex.core.cmd.DropIndex;
-import org.basex.core.cmd.Export;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.gui.dialog.*;
 import org.basex.gui.dialog.Dialog;
-import org.basex.gui.dialog.DialogAbout;
-import org.basex.gui.dialog.DialogColors;
-import org.basex.gui.dialog.DialogEdit;
-import org.basex.gui.dialog.DialogExport;
-import org.basex.gui.dialog.DialogFonts;
-import org.basex.gui.dialog.DialogInsert;
-import org.basex.gui.dialog.DialogManage;
-import org.basex.gui.dialog.DialogMapLayout;
-import org.basex.gui.dialog.DialogNew;
-import org.basex.gui.dialog.DialogPrefs;
-import org.basex.gui.dialog.DialogProgress;
-import org.basex.gui.dialog.DialogProps;
-import org.basex.gui.dialog.DialogServer;
-import org.basex.gui.dialog.DialogTreeOptions;
-import org.basex.gui.view.ViewData;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.query.func.Function;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Int;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.Str;
-import org.basex.util.Array;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
+import org.basex.gui.view.*;
+import org.basex.io.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This enumeration encapsulates all commands that are triggered by
@@ -91,39 +58,7 @@ public enum GUICommands implements GUICommand {
   C_INFO(PROPERTIES + DOTS, "% D", H_PROPERTIES, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final DialogProps info = new DialogProps(gui);
-      if(info.ok()) {
-        final Data d = gui.context.data();
-        final boolean[] ind = info.indexes();
-        if(info.optimize()) {
-          d.meta.textindex = ind[0];
-          d.meta.attrindex = ind[1];
-          d.meta.ftxtindex   = ind[2];
-          DialogProgress.execute(info, OPTIMIZING_DB_D, new Optimize());
-        } else {
-          Command[] cmd = {};
-          if(ind[0] != d.meta.pathindex)
-            cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
-          if(ind[1] != d.meta.textindex)
-            cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
-          if(ind[2] != d.meta.attrindex)
-            cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
-          if(ind[3] != d.meta.ftxtindex)
-            cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
-
-          DialogProgress.execute(info, CREATING_INDEXES, cmd);
-        }
-      }
-    }
-
-    /**
-     * Returns a command for creating/dropping the specified index.
-     * @param create create flag
-     * @param index name of index
-     * @return command instance
-     */
-    private Command cmd(final boolean create, final CmdIndex index) {
-      return create ? new CreateIndex(index) : new DropIndex(index);
+      new DialogProps(gui);
     }
   },
 

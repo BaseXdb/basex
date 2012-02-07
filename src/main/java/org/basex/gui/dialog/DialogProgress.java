@@ -34,7 +34,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
+   * @param main main window
    * @param title dialog title
    * @param cmd progress reference
    */
@@ -133,6 +133,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
           // open wait dialog
           final DialogProgress wait = new DialogProgress(gui, t, cmd);
+          wait.setAlwaysOnTop(true);
 
           // execute command
           final Performance perf = new Performance();
@@ -158,7 +159,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
         }
 
         d.setEnabled(true);
-        d.action(null);
+        d.action(d);
         if(post != null) post.run();
       }
     }.start();

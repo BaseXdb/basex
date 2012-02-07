@@ -921,6 +921,8 @@ public interface Text {
   /** "Backup". */
   String BACKUP = lang("backup");
 
+  /** Button text for deleting files. */
+  String DROP = lang("drop");
   /** Button text for optimization. */
   String OPTIMIZE_D = lang("optimize") + DOTS;
   /** Button text for renaming databases. */
@@ -929,8 +931,6 @@ public interface Text {
   String RESTORE_D = lang("restore") + DOTS;
   /** Button text for copying databases. */
   String COPY_D = lang("copy") + DOTS;
-  /** Button text for deleting files. */
-  String DROP_D = lang("drop") + DOTS;
   /** Button text for browsing files/directories. */
   String BROWSE_D = lang("browse") + DOTS;
 

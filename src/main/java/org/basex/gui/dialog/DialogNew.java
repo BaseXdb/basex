@@ -116,7 +116,7 @@ public final class DialogNew extends Dialog {
   @Override
   public void action(final Object cmp) {
     final boolean valid = general.action(cmp, true);
-    ft.action(ftxindex.isSelected());
+    ft.action();
 
     final String nm = target.getText().trim();
     ok = valid && !nm.isEmpty();

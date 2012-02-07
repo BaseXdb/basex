@@ -90,7 +90,7 @@ final class DialogUser extends BaseXBack {
     pass.addKeyListener(dia.keys);
     BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(S_ALTER, dia);
-    drop = new BaseXButton(DROP_D, dia);
+    drop = new BaseXButton(DROP + DOTS, dia);
     info = new BaseXLabel(" ");
 
     add(new BaseXLabel(S_CREATEU + COLS, false, true));

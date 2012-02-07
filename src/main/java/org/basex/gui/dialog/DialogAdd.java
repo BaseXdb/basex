@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.awt.BorderLayout;
 
-import org.basex.core.cmd.Add;
+import org.basex.core.cmd.*;
 import org.basex.data.MetaData;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
@@ -23,15 +23,17 @@ import org.basex.util.Util;
  * @author Lukas Kircher
  */
 class DialogAdd extends BaseXBack {
-  /** Directory path. */
-  final BaseXTextField target;
   /** Dialog reference. */
   final DialogProps dialog;
+  /** Target path. */
+  final BaseXTextField target;
 
-  /** Filter button. */
-  private final BaseXButton add;
-  /** Import options. */
+  /** General options. */
   private final DialogImport general;
+  /** Add button. */
+  private final BaseXButton add;
+  /** Optimize button. */
+  private final BaseXButton optimize;
 
   /**
    * Constructor.
@@ -59,8 +61,10 @@ class DialogAdd extends BaseXBack {
 
     // buttons
     add = new BaseXButton(ADD + DOTS, d);
+    optimize = new BaseXButton(OPTIMIZE_D, d);
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.add(add);
+    buttons.add(optimize);
 
     final BaseXBack btn = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
@@ -85,6 +89,9 @@ class DialogAdd extends BaseXBack {
       };
       DialogProgress.execute(dialog, "", run, new Add(trg, src));
 
+    } else if (comp == optimize) {
+      DialogProgress.execute(dialog, "", new Optimize());
+
     } else if (comp == general.browse) {
       target.setText(general.dbname);
 
@@ -99,6 +106,7 @@ class DialogAdd extends BaseXBack {
       }
       general.info.setText(inf, icon);
       add.setEnabled(ok);
+      optimize.setEnabled(!dialog.gui.context.data().meta.uptodate);
     }
   }
 }

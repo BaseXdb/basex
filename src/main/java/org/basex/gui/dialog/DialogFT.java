@@ -65,14 +65,14 @@ final class DialogFT extends BaseXBack {
   /**
    * Constructor.
    * @param d dialog reference
-   * @param create flag
+   * @param create create dialog
    */
   DialogFT(final Dialog d, final boolean create) {
     dialog = d;
     layout(new TableLayout(create ? 9 : 16, 1));
 
     final Prop prop = d.gui.context.prop;
-    add(new BaseXLabel(H_FULLTEXT_INDEX, true, false));
+    add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 12, 0));
 
     final String sw = prop.get(Prop.STOPWORDS);
     final String[] cb = { LANGUAGE, SUPPORT_WILDCARDS, STEMMING,
@@ -154,9 +154,9 @@ final class DialogFT extends BaseXBack {
 
   /**
    * Reacts on user input.
-   * @param ftx full-text flag
    */
-  void action(final boolean ftx) {
+  void action() {
+    /*
     for(int f = 0; f < check.length; ++f) {
       check[f].setEnabled(ftx);
       if(labels[f] != null) labels[f].setEnabled(ftx);
@@ -165,6 +165,7 @@ final class DialogFT extends BaseXBack {
     scoring.setEnabled(ftx && check[F_SCORE].isSelected());
     swbrowse.setEnabled(ftx && check[F_STOP].isSelected());
     swpath.setEnabled(ftx && check[F_STOP].isSelected());
+    */
 
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
