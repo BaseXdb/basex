@@ -903,23 +903,23 @@ public interface Text {
 
   // BUTTONS ==================================================================
 
-  /** Button text for confirming actions. */
+  /** Button: " OK ". */
   String B_OK = "  " + lang("ok") + "  ";
-  /** Button text for choosing actions. */
+  /** Button: " yes ". */
   String B_YES = "  " + lang("yes") + "  ";
-  /** Button text for choosing actions. */
+  /** Button: " no ". */
   String B_NO = "  " + lang("no") + "  ";
+  /** Button: "cancel". */
+  String B_CANCEL = lang("cancel");
 
-  /** Search mode. */
+  /** "Search". */
   String SEARCH = lang("search");
-  /** Command mode. */
+  /** "Command". */
   String COMMAND = lang("command");
-  /** XQuery mode. */
+  /** "XQuery". */
   String XQUERY = lang("xquery");
-  /** Button text for creating backup of databases. */
+  /** "Backup". */
   String BACKUP = lang("backup");
-  /** Button text for canceling actions. */
-  String CANCEL = lang("cancel");
 
   /** Button text for optimization. */
   String OPTIMIZE_D = lang("optimize") + DOTS;

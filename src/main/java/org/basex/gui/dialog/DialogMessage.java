@@ -56,7 +56,7 @@ final class DialogMessage extends Dialog {
         buttons = newButtons(yes, no);
       } else {
         /* Cancel button. */
-        final BaseXButton cancel = new BaseXButton(Text.CANCEL, this);
+        final BaseXButton cancel = new BaseXButton(Text.B_CANCEL, this);
         buttons = newButtons(yes, no, cancel);
       }
     } else {

@@ -60,7 +60,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
     s.add(m, BorderLayout.WEST);
 
     if(cmd.stoppable()) {
-      final BaseXButton cancel = new BaseXButton(CANCEL, this);
+      final BaseXButton cancel = new BaseXButton(B_CANCEL, this);
       s.add(cancel, BorderLayout.EAST);
     }
     set(s, BorderLayout.SOUTH);
@@ -133,7 +133,6 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
           // open wait dialog
           final DialogProgress wait = new DialogProgress(gui, t, cmd);
-          wait.setAlwaysOnTop(true);
 
           // execute command
           final Performance perf = new Performance();
