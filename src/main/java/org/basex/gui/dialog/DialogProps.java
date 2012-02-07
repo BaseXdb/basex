@@ -54,7 +54,7 @@ public final class DialogProps extends Dialog {
     panel.setLayout(new BorderLayout(5, 0));
 
     optimize = new BaseXButton(OPTIMIZE_D, this);
-    buttons = newButtons(optimize, OK, CANCEL);
+    buttons = newButtons(optimize, B_OK, CANCEL);
 
     // resource tree
     resources = new DialogResources(this);
