@@ -5,7 +5,7 @@ import static org.basex.query.util.pkg.Package.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.Text;
+import org.basex.core.*;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.query.QueryException;
@@ -110,8 +110,8 @@ public final class PkgValidator {
         break;
       }
       // extract version
-      final int i = Text.VERSION.indexOf(' ');
-      final String v = i == -1 ? Text.VERSION : Text.VERSION.substring(0, i);
+      final int i = Prop.VERSION.indexOf(' ');
+      final String v = i == -1 ? Prop.VERSION : Prop.VERSION.substring(0, i);
       // check if current version is acceptable for the dependency
       supported = availVersion(d, new TokenSet(token(v))) != null;
     }

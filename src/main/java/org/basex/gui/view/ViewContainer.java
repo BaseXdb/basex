@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.StringTokenizer;
 
+import org.basex.core.*;
 import org.basex.gui.AGUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
@@ -136,7 +137,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     g.setColor(new Color(0, 0, 0, 255 - STEPS[count]));
     g.setFont(getFont().deriveFont(22f));
-    BaseXLayout.drawCenter(g, VERSINFO + ' ' + VERSION, w, y + 30 + lh);
+    BaseXLayout.drawCenter(g, VERSINFO + ' ' + Prop.VERSION, w, y + 30 + lh);
   }
 
   /**

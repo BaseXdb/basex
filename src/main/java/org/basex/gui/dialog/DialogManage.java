@@ -66,17 +66,17 @@ public final class DialogManage extends Dialog {
     // create database chooser
     final StringList dbs = List.list(main.context, true);
     choice = new BaseXList(dbs.toArray(), this, !m);
-    choice.setSize(190, 500);
+    choice.setSize(200, 500);
 
     doc1 = new BaseXLabel(" ").large();
-    doc1.setSize(400, doc1.getHeight());
+    doc1.setSize(420, doc1.getHeight());
 
     detail = new BaseXEditor(false, this);
     detail.border(5).setFont(panel.getFont());
 
     // database buttons
-    rename = new BaseXButton(RENAME_D, this);
-    copy = new BaseXButton(COPY_D, this);
+    rename = new BaseXButton(RENAME + DOTS, this);
+    copy = new BaseXButton(COPY + DOTS, this);
     open = new BaseXButton(OPEN, this);
     drop = new BaseXButton(DROP + DOTS, this);
 
@@ -86,7 +86,7 @@ public final class DialogManage extends Dialog {
     tab1.add(detail, BorderLayout.CENTER);
     tab1.add(newButtons(drop, rename, copy, open), BorderLayout.SOUTH);
 
-    doc2 = new BaseXLabel(" ").border(0, 0, 5, 0);
+    doc2 = new BaseXLabel(" ").border(0, 0, 6, 0);
     doc2.setFont(doc1.getFont());
 
     backups = new BaseXList(new String[] { }, this);
@@ -94,7 +94,7 @@ public final class DialogManage extends Dialog {
 
     // backup buttons
     backup = new BaseXButton(BACKUP, this);
-    restore = new BaseXButton(RESTORE_D, this);
+    restore = new BaseXButton(RESTORE, this);
     delete = new BaseXButton(DELETE, this);
     deleteAll = new BaseXButton(DELETE_ALL + DOTS, this);
 

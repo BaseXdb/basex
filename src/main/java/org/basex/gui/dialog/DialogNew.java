@@ -53,6 +53,9 @@ public final class DialogNew extends Dialog {
   public DialogNew(final GUI main) {
     super(main, CREATE_DATABASE);
 
+    // define buttons first to assign simplest mnemonics
+    buttons = okCancel();
+
     db = List.list(main.context);
     final Prop prop = gui.context.prop;
     final GUIProp gprop = main.gprop;
@@ -106,7 +109,6 @@ public final class DialogNew extends Dialog {
     tabs.addTab(FULLTEXT, fulltext);
     set(tabs, BorderLayout.CENTER);
 
-    buttons = okCancel();
     set(buttons, BorderLayout.SOUTH);
 
     action(null);

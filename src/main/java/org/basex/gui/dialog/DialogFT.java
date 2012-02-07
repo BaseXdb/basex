@@ -161,11 +161,11 @@ final class DialogFT extends BaseXBack {
       check[f].setEnabled(ftx);
       if(labels[f] != null) labels[f].setEnabled(ftx);
     }
-    language.setEnabled(ftx && check[F_LANG].isSelected());
-    scoring.setEnabled(ftx && check[F_SCORE].isSelected());
-    swbrowse.setEnabled(ftx && check[F_STOP].isSelected());
-    swpath.setEnabled(ftx && check[F_STOP].isSelected());
     */
+    language.setEnabled(check[F_LANG].isSelected());
+    scoring.setEnabled(check[F_SCORE].isSelected());
+    swbrowse.setEnabled(check[F_STOP].isSelected());
+    swpath.setEnabled(check[F_STOP].isSelected());
 
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);

@@ -77,7 +77,7 @@ public class DialogResources extends BaseXBack {
 
     // add default children to tree
     final Data data = dp.gui.context.data();
-    root = new TreeRootFolder(token(data.meta.name), token("/"), tree, data);
+    root = new TreeRootFolder(token("/"), token("/"), tree, data);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
     tree.expandPath(new TreePath(root.getPath()));
 
@@ -94,7 +94,7 @@ public class DialogResources extends BaseXBack {
     final BaseXBack btn = new BaseXBack().layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
 
-    filterText = new BaseXTextField("", dp);
+    filterText = new BaseXTextField("/", dp);
     BaseXLayout.setWidth(filterText, 250);
 
     // left panel
@@ -119,9 +119,36 @@ public class DialogResources extends BaseXBack {
   }
 
   /**
+   * Refreshes the given folder node. Removes all its children and reloads
+   * it afterwards.
+   * @param n folder
+   */
+  private void refreshFolder(final TreeFolder n) {
+    if(n == null) return;
+    n.removeChildren();
+    final TreePath path = new TreePath(n.getPath());
+    tree.collapsePath(path);
+    tree.expandPath(path);
+  }
+
+  /**
+   * Reacts on user input.
+   * @param comp the action component
+   */
+  void action(final Object comp) {
+    if(comp == filter) {
+      filter();
+    } else if(comp == clear) {
+      filterText.setText("/");
+      filterText.requestFocus();
+      refreshFolder(root);
+    }
+  }
+
+  /**
    * Searches the tree for nodes that match the given search text.
    */
-  void filter() {
+  private void filter() {
     final byte[] path = TreeNode.preparePath(token(filterText.getText()));
     if(eq(path, SLASH)) {
       refreshFolder(root);
@@ -153,38 +180,12 @@ public class DialogResources extends BaseXBack {
   }
 
   /**
-   * Refreshes the given folder node. Removes all its children and reloads
-   * it afterwards.
-   * @param n folder
-   */
-  void refreshFolder(final TreeFolder n) {
-    if(n == null) return;
-    n.removeChildren();
-    final TreePath path = new TreePath(n.getPath());
-    tree.collapsePath(path);
-    tree.expandPath(path);
-  }
-
-  /**
-   * Reacts on user input.
-   * @param comp the action component
-   */
-  void action(final Object comp) {
-    if(comp == filter) {
-      filter();
-    } else if(comp == clear) {
-      filterText.requestFocus();
-      refreshFolder(root);
-    }
-  }
-
-  /**
    * Expands the tree after a node with the given path has been inserted.
    * Due to lazy evaluation of the tree inserted documents/files are only
    * added to the tree after the parent folder has been reloaded.
    * @param p path of new node
    */
-  public void refreshNewFolder(final String p) {
+  void refreshNewFolder(final String p) {
     final byte[][] pathComp = split(token(p), '/');
 
     TreeNode n = root;
@@ -291,8 +292,7 @@ public class DialogResources extends BaseXBack {
       final TreeNode n = selection();
       if(n == null) return;
 
-      final DialogInput d = new DialogInput(
-          n.path(), RENAME_DB, dialog.gui, 0);
+      final DialogInput d = new DialogInput(n.path(), RENAME, dialog.gui, 0);
       if(!d.ok()) return;
 
       final String p = string(TreeNode.preparePath(token(d.input())));
@@ -307,7 +307,7 @@ public class DialogResources extends BaseXBack {
 
     @Override
     public String label() {
-      return RENAME_D;
+      return RENAME + DOTS;
     }
 
     @Override

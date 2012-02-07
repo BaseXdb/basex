@@ -1,6 +1,7 @@
 package org.basex.gui;
 
 import org.basex.core.*;
+
 import static org.basex.core.Text.*;
 import org.basex.core.cmd.Find;
 import org.basex.core.cmd.Set;
@@ -693,7 +694,7 @@ public final class GUI extends AGUI {
    */
   void checkVersion() {
     final Version disk = new Version(gprop.get(GUIProp.UPDATEVERSION));
-    final Version used = new Version(VERSION.replaceAll(" .*", ""));
+    final Version used = new Version(Prop.VERSION.replaceAll(" .*", ""));
     if(disk.compareTo(used) < 0) {
       // update version property to latest used version
       gprop.set(GUIProp.UPDATEVERSION, used.toString());

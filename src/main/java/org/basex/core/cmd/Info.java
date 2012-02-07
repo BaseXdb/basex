@@ -4,9 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 
-import org.basex.core.AProp;
-import org.basex.core.Context;
-import org.basex.core.User;
+import org.basex.core.*;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -38,7 +36,7 @@ public final class Info extends AInfo {
   public static String info(final Context context) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(GENERAL_INFO + NL);
-    format(tb, VERSINFO, VERSION);
+    format(tb, VERSINFO, Prop.VERSION);
     if(context.user.perm(User.CREATE)) {
       Performance.gc(3);
       format(tb, USED_MEM, Performance.getMem());

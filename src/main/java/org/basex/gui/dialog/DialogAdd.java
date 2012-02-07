@@ -61,7 +61,7 @@ class DialogAdd extends BaseXBack {
 
     // buttons
     add = new BaseXButton(ADD + DOTS, d);
-    optimize = new BaseXButton(OPTIMIZE_D, d);
+    optimize = new BaseXButton(OPTIMIZE + DOTS, d);
     final BaseXBack buttons = new BaseXBack(Fill.NONE);
     buttons.add(add);
     buttons.add(optimize);

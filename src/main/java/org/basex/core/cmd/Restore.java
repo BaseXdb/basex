@@ -77,7 +77,7 @@ public final class Restore extends Command {
 
   @Override
   protected String tit() {
-    return RESTORE_D;
+    return RESTORE;
   }
 
   @Override

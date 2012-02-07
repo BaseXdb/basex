@@ -112,7 +112,7 @@ public final class Copy extends Command {
 
   @Override
   protected String tit() {
-    return COPY_D;
+    return COPY;
   }
 
   @Override

@@ -66,7 +66,7 @@ public final class DialogProps extends Dialog {
     final BaseXBack tabInfo = new BaseXBack(new BorderLayout(0, 8)).border(8);
     final Font f = tabInfo.getFont();
     final BaseXLabel doc = new BaseXLabel(data.meta.name).border(
-        0, 0, 5, 0).large();
+        0, 0, 6, 0).large();
     BaseXLayout.setWidth(doc, 400);
     tabInfo.add(doc, BorderLayout.NORTH);
 
@@ -89,7 +89,7 @@ public final class DialogProps extends Dialog {
       String lbl = LABELS[i];
       if(!data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ')';
       labels[i] = new BaseXLabel(lbl).large();
-      panels[i] = new BaseXBack(new BorderLayout());
+      panels[i] = new BaseXBack(new BorderLayout(0, 4));
       infos[i] = new BaseXEditor(false, this);
       BaseXLayout.setHeight(infos[i], 200);
       if(i >= 2) {
@@ -142,7 +142,7 @@ public final class DialogProps extends Dialog {
    * @param info optional info to display
    */
   private void add(final int p, final BaseXBack tab, final BaseXBack info) {
-    final BaseXBack idx = new BaseXBack(new BorderLayout());
+    final BaseXBack idx = new BaseXBack(new BorderLayout(8, 0));
     idx.add(labels[p], BorderLayout.WEST);
     if(indxs[p] != null) idx.add(indxs[p], BorderLayout.EAST);
     panels[p].add(idx, BorderLayout.NORTH);
@@ -166,7 +166,7 @@ public final class DialogProps extends Dialog {
   public void action(final Object cmp) {
     for(int i = 0; i < LABELS.length; i++) {
       if(indxs[i] == null || cmp != indxs[i]) continue;
-      final Command cmd = indxs[i].getText().equals(DROP) ?
+      final Command cmd = indxs[i].getText().equals(DROP + DOTS) ?
           new DropIndex(TYPES[i]) : new CreateIndex(TYPES[i]);
       DialogProgress.execute(this, "", cmd);
       return;
@@ -187,7 +187,7 @@ public final class DialogProps extends Dialog {
         if(i < 3 && !data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ')';
         labels[i].setText(lbl);
         infos[i].setText(val[i] ? data.info(TYPES[i]) : Token.token(HELP[i]));
-        if(indxs[i] != null) indxs[i].setText(val[i] ? DROP : CREATE);
+        if(indxs[i] != null) indxs[i].setText((val[i] ? DROP : CREATE) + DOTS);
       }
       // full-text options
       tabFT.removeAll();

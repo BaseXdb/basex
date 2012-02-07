@@ -19,9 +19,6 @@ public interface Text {
 
   /** New line. */
   String NL = Prop.NL;
-  /** Code version (must contain major, minor and optional patch number). */
-  String VERSION = Prop.VERSION;
-
   /** Colon. */
   String COL = ":";
   /** Colon/space. */
@@ -50,7 +47,7 @@ public interface Text {
   /** Company info. */
   String COMPANY = Prop.NAME + " Team";
   /** Title and version. */
-  String TITLE = Prop.NAME + ' ' + VERSION;
+  String TITLE = Prop.NAME + ' ' + Prop.VERSION;
 
   // CONSOLE INFO =============================================================
 
@@ -924,13 +921,12 @@ public interface Text {
   /** Button text for deleting files. */
   String DROP = lang("drop");
   /** Button text for optimization. */
-  String OPTIMIZE_D = lang("optimize") + DOTS;
+  String OPTIMIZE = lang("optimize");
   /** Button text for renaming databases. */
-  String RENAME_D = lang("rename") + DOTS;
+  String RENAME = lang("rename");
   /** Button text for restoring databases. */
-  String RESTORE_D = lang("restore") + DOTS;
-  /** Button text for copying databases. */
-  String COPY_D = lang("copy") + DOTS;
+  String RESTORE = lang("restore");
+
   /** Button text for browsing files/directories. */
   String BROWSE_D = lang("browse") + DOTS;
 
