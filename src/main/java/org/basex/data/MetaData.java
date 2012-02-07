@@ -16,7 +16,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.basex.util.ft.Language;
 
 /**
@@ -180,7 +180,8 @@ public final class MetaData {
       while(i != 0 && !(k = string(in.readToken())).isEmpty()) {
         final String v = string(in.readToken());
         if(k.equals(DBSTR)) {
-          ok &= STORAGE.equals(v);
+          ok &= STORAGE.equals(v) || new Version(STORAGE).compareTo(
+              new Version(v)) > 0;
           i--;
         } else if(k.equals(DBFNAME)) {
           ok &= io.eq(IO.get(v));
@@ -362,11 +363,12 @@ public final class MetaData {
         else if(k.equals(DBFTLN))     language   = Language.get(v);
       }
     }
-    if(!storage.equals(STORAGE)) throw new BuildException(H_DB_FORMAT, storage);
-    if(!istorage.equals(ISTORAGE)) {
-      oldindex = true;
-      update();
-    }
+    // check version of database storage
+    if(!storage.equals(STORAGE) && new Version(storage).compareTo(new Version(
+        STORAGE)) > 0) throw new BuildException(H_DB_FORMAT, storage);
+    // check version of database indexes
+    oldindex = !istorage.equals(ISTORAGE) &&
+        new Version(istorage).compareTo(new Version(ISTORAGE)) > 0;
     corrupt = dbfile(DATAUPD).exists();
   }
 
