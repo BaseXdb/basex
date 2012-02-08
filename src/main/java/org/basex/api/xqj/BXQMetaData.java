@@ -7,7 +7,6 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQMetaData;
 
 import org.basex.core.Prop;
-import org.basex.core.Text;
 
 /**
  * Java XQuery API - Meta Data.
@@ -39,13 +38,13 @@ final class BXQMetaData extends BXQAbstract implements XQMetaData {
   @Override
   public int getProductMajorVersion() throws XQException {
     opened();
-    return version(Text.VERSION, true);
+    return version(Prop.VERSION, true);
   }
 
   @Override
   public int getProductMinorVersion() throws XQException {
     opened();
-    return version(Text.VERSION, false);
+    return version(Prop.VERSION, false);
   }
 
   @Override
@@ -57,7 +56,7 @@ final class BXQMetaData extends BXQAbstract implements XQMetaData {
   @Override
   public String getProductVersion() throws XQException {
     opened();
-    return Text.VERSION;
+    return Prop.VERSION;
   }
 
   @Override
