@@ -96,7 +96,7 @@ final class TableData {
       int c = 0;
       for(final byte[] kk : data.paths.desc(k, true, false)) {
         final Names nm = startsWith(kk, '@') ? data.atnindex : data.tagindex;
-        if(nm.stat(nm.id(delete(kk, '@'))).leaf) ++c;
+        if(nm.stat(nm.id(delete(kk, '@'))).isLeaf()) ++c;
       }
       // add keys with a minimum of three columns
       if(c > 2) roots.add(k);
@@ -123,7 +123,7 @@ final class TableData {
       final boolean elem = !startsWith(k, '@');
       final byte[] key = delete(k, '@');
       final Names index = elem ? data.tagindex : data.atnindex;
-      if(index.stat(index.id(key)).leaf) addCol(key, elem);
+      if(index.stat(index.id(key)).isLeaf()) addCol(key, elem);
     }
 
     context(true);

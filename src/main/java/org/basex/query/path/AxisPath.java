@@ -370,7 +370,7 @@ public class AxisPath extends Path {
 
     final Stats stats = data.tagindex.stat(
         data.tagindex.id(s.test.name.local()));
-    if(stats != null && stats.leaf) {
+    if(stats != null && stats.isLeaf()) {
       steps = Array.add(steps, AxisStep.get(input, Axis.CHILD, Test.TXT));
       ctx.compInfo(OPTTEXT, this);
     }

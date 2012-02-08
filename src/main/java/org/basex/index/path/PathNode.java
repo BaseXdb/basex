@@ -112,11 +112,11 @@ public final class PathNode {
     out.writeDouble(1);
 
     // update leaf flag
-    boolean leaf = stats.leaf;
+    boolean leaf = stats.isLeaf();
     for(final PathNode c : ch) {
       leaf &= c.kind == Data.TEXT || c.kind == Data.ATTR;
     }
-    stats.leaf = leaf;
+    stats.setLeaf(leaf);
     stats.write(out);
     for(final PathNode c : ch) c.write(out);
   }
