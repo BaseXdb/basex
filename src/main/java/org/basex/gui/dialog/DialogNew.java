@@ -120,6 +120,9 @@ public final class DialogNew extends Dialog {
     final boolean valid = general.action(cmp, true);
     ft.action();
 
+    // ...must be located before remaining checks
+    if(cmp == general.browse) target.setText(general.dbname);
+
     final String nm = target.getText().trim();
     ok = valid && !nm.isEmpty();
 
@@ -142,8 +145,6 @@ public final class DialogNew extends Dialog {
         icon = Msg.WARN;
       }
     }
-
-    if(cmp == general.browse) target.setText(general.dbname);
 
     general.info.setText(inf, icon);
     enableOK(buttons, B_OK, ok);
