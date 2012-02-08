@@ -350,7 +350,7 @@ public abstract class Builder extends Progress {
     if(level != 0) {
       if(level > 1) {
         // set leaf node information in index
-        tags.stat(tstack.get(level - 1)).leaf = false;
+        tags.stat(tstack.get(level - 1)).setLeaf(false);
       } else if(inDoc) {
         // don't allow more than one root node
         error(MOREROOTS, parser.detail(), nm);
@@ -395,7 +395,7 @@ public abstract class Builder extends Progress {
       // text node processing for statistics
       if(kind == Data.TEXT) tags.index(tag, value);
       // set leaf node information in index
-      else tags.stat(tag).leaf = false;
+      else tags.stat(tag).setLeaf(false);
     }
 
     if(meta.createpath) path.index(0, kind, l, value, meta);
