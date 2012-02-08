@@ -94,7 +94,7 @@ public class AxisStep extends Preds {
     if(ctx.leaf) {
       final Stats s =
         data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
-      ctx.leaf = s != null && s.leaf;
+      ctx.leaf = s != null && s.isLeaf();
     }
 
     // as predicates will not necessarily start from the document node,

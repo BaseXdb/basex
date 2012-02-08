@@ -28,7 +28,7 @@ public final class Stats {
   public int count;
   /** Leaf node flag. This flag indicates if a node has children other than
    * texts and attributes. */
-  public boolean leaf;
+  private boolean leaf;
 
   /**
    * Default constructor.
@@ -39,6 +39,23 @@ public final class Stats {
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
     leaf = true;
+  }
+
+  /**
+   * Getter for leaf.
+   * @return leaf
+   */
+  public boolean isLeaf() {
+    return leaf;
+  }
+
+  /**
+   * Setter for leaf.
+   * @param l leaf or not
+   */
+  public void setLeaf(final boolean l) {
+    leaf = l;
+    if(!l) type = StatsType.TEXT;
   }
 
   /**
