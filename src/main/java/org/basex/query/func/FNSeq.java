@@ -181,7 +181,7 @@ public final class FNSeq extends StandardFunc {
     for(PathNode pn : nodes) {
       // retrieve text child if addressed node is an element
       if(pn.kind == Data.ELEM) {
-        if(!pn.stats.leaf) return this;
+        if(!pn.stats.isLeaf()) return this;
         for(final PathNode n : pn.ch) if(n.kind == Data.TEXT) pn = n;
       }
       // skip nodes others than texts and attributes
