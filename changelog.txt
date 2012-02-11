@@ -36,7 +36,7 @@ VERSION 7.1 (February 8, 2012) -----------------------------------------
   - document index: faster updates
 
   OPTIONS
-  - ADDRAW: add raw files if not filtered by CREATEFILTLER
+  - ADDRAW: add raw files if not filtered by CREATEFILTER
   - MAXLEN: max. length of strings to be added to the index structures
   - MAXCATS: max. number of distinct values stored in statistics
   - UPDINDEX: turn on incremental index updates for value indexes
