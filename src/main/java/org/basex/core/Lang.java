@@ -15,8 +15,7 @@ import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.basex.io.IO;
-import org.basex.io.IOFile;
+import org.basex.io.*;
 import org.basex.util.Token;
 import org.basex.util.list.StringList;
 
@@ -150,7 +149,7 @@ public final class Lang {
           creds.add(credits(cont));
         }
       } else {
-        for(final IO f : new IOFile(url.getFile()).children()) {
+        for(final IO f : new IOFile(IOUrl.file(url.toString())).children()) {
           langs.add(f.name().replaceAll('.' + SUFFIX, ""));
           creds.add(credits(f.read()));
         }

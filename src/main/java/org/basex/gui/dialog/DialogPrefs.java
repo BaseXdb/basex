@@ -80,7 +80,7 @@ public final class DialogPrefs extends Dialog {
     pp.add(p);
     pp.add(new BaseXLabel(GUI_INTERACTIONS, true, true).border(12, 0, 6, 0));
 
-    // checkbox for realtime mouse focus
+    // checkbox for Java look and feel
     javalook = new BaseXCheckBox(JAVA_LF, gprop.is(GUIProp.JAVALOOK), this);
     pp.add(javalook);
 
@@ -107,21 +107,17 @@ public final class DialogPrefs extends Dialog {
 
     lang = new BaseXCombo(this, LANGS[0]);
     lang.setSelectedItem(mprop.get(MainProp.LANG));
-
     p.add(lang);
+
     creds = new BaseXLabel(" ");
-    p.add(creds);
     creds.setText(TRANSLATION + COLS +
         creds(lang.getSelectedItem().toString()));
+    p.add(creds);
 
     pp.add(p);
 
-    // create buttons
-    /* Buttons. */
-    final BaseXBack buttons = okCancel();
-    set(buttons, BorderLayout.SOUTH);
-
     set(pp, BorderLayout.CENTER);
+    set(okCancel(), BorderLayout.SOUTH);
     finish(null);
   }
 
