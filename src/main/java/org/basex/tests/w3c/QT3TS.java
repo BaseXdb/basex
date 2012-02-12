@@ -167,7 +167,13 @@ public final class QT3TS {
 
       // run all test cases
       final XQuery qts = new XQuery("*:test-case", ctx).context(set);
-      for(final XQItem its : qts) testCase(its, envs);
+      for(final XQItem its : qts) {
+        try {
+          testCase(its, envs);
+        } catch(final IOException ex) {
+          Util.debug(ex);
+        }
+      }
       qts.close();
     }
     qset.close();
