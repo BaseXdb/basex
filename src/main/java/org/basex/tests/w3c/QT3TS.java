@@ -299,7 +299,7 @@ public final class QT3TS {
       ex.printStackTrace();
     }
 
-    final long time = perf.getTime() / 1000000;
+    final long time = perf.time() / 1000000;
     if(verbose) Util.outln(name + ": " + time + " ms");
 
     // revert to XQuery as default
