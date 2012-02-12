@@ -137,7 +137,7 @@ public final class MAB2Parser extends SingleParser {
     }
 
     if(Util.debug) Util.err("\nParse Offsets (%): %/%\n", ids.size(), p,
-        Performance.getMem());
+        Performance.getMemory());
 
     // create all titles
     for(i = 1; i <= ids.size(); ++i) {
@@ -151,7 +151,8 @@ public final class MAB2Parser extends SingleParser {
       }
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem();
     }
-    if(Util.debug) Util.err("\nCreate Titles: %/%\n", p, Performance.getMem());
+    if(Util.debug) Util.err("\nCreate Titles: %/%\n", p,
+        Performance.getMemory());
     builder.endElem();
 
     // write the mediovis ids back to disk

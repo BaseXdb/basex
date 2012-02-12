@@ -142,7 +142,7 @@ public final class ClientListener extends Thread {
           }
 
           last = System.currentTimeMillis();
-          perf.getTime();
+          perf.time();
           sc = ServerCmd.get(b);
           cmd = null;
           if(sc == ServerCmd.CREATE) {

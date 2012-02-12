@@ -14,7 +14,7 @@ public final class Performance {
    * Returns the measured execution time in nanoseconds.
    * @return execution time
    */
-  public long getTime() {
+  public long time() {
     final long time2 = System.nanoTime();
     final long diff = time2 - time;
     time = time2;
@@ -26,8 +26,8 @@ public final class Performance {
    * the timer.
    * @return execution time
    */
-  public String getTimer() {
-    return getTimer(1);
+  public String getTime() {
+    return getTime(1);
   }
 
   /**
@@ -36,9 +36,9 @@ public final class Performance {
    * @param runs number of runs
    * @return execution time
    */
-  public String getTimer(final int runs) {
+  public String getTime(final int runs) {
     final long time2 = System.nanoTime();
-    final String t = getTimer(time2 - time, runs);
+    final String t = getTime(time2 - time, runs);
     time = time2;
     return t;
   }
@@ -49,7 +49,7 @@ public final class Performance {
    * @param runs number of runs
    * @return execution time
    */
-  public static String getTimer(final long time, final int runs) {
+  public static String getTime(final long time, final int runs) {
     return time / runs / 10000 / 100d + " ms" + (runs > 1 ? " (avg)" : "");
   }
 
@@ -57,8 +57,8 @@ public final class Performance {
    * Returns a formatted representation of the current memory consumption.
    * @return memory consumption
    */
-  public static String getMem() {
-    return format(mem());
+  public static String getMemory() {
+    return format(memory());
   }
 
   /**
@@ -118,13 +118,13 @@ public final class Performance {
    * Returns the current memory consumption in bytes.
    * @return memory consumption
    */
-  public static long mem() {
+  public static long memory() {
     final Runtime rt = Runtime.getRuntime();
     return rt.totalMemory() - rt.freeMemory();
   }
 
   @Override
   public String toString() {
-    return getTimer();
+    return getTime();
   }
 }

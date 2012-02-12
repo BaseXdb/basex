@@ -410,7 +410,7 @@ public final class GUI extends AGUI {
       } finally {
         updating = false;
       }
-      final String time = perf.getTimer();
+      final String time = perf.getTime();
 
       // show query info
       info.setInfo(inf, c, time, ok);

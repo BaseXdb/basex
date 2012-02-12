@@ -197,14 +197,12 @@ public final class Util {
   }
 
   /**
-   * Performs garbage collection and prints performance information.
-   * if the debug flag is set.
+   * Prints performance information if the {@link #debug} flag is set.
    * @param perf performance reference
    */
-  public static void gc(final Performance perf) {
+  public static void memory(final Performance perf) {
     if(!debug) return;
-    Performance.gc(4);
-    errln(" " + perf + " (" + Performance.getMem() + ')');
+    errln(" " + perf + " (" + Performance.getMemory() + ')');
   }
 
   /**

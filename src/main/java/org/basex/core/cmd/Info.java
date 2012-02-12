@@ -39,7 +39,7 @@ public final class Info extends AInfo {
     format(tb, VERSINFO, Prop.VERSION);
     if(context.user.perm(User.CREATE)) {
       Performance.gc(3);
-      format(tb, USED_MEM, Performance.getMem());
+      format(tb, USED_MEM, Performance.getMemory());
     }
     if(context.user.perm(User.ADMIN)) {
       final AProp prop = context.mprop;

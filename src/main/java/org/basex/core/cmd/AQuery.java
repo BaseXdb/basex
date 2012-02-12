@@ -77,11 +77,11 @@ abstract class AQuery extends Command {
           if(r != 0) qp = null;
           qp = queryProcessor(query, context);
           qp.parse();
-          pars += init + p.getTime();
+          pars += init + p.time();
           init = 0;
           if(r == 0) plan(false);
           qp.compile();
-          comp += p.getTime();
+          comp += p.time();
           if(r == 0) plan(true);
 
           final PrintOutput po = r == 0 && serial ? out : new NullOutput();
@@ -89,13 +89,13 @@ abstract class AQuery extends Command {
 
           if(prop.is(Prop.CACHEQUERY)) {
             result = qp.execute();
-            eval += p.getTime();
+            eval += p.time();
             ser = qp.getSerializer(po);
             result.serialize(ser);
             hits = result.size();
           } else {
             final Iter ir = qp.iter();
-            eval += p.getTime();
+            eval += p.time();
             hits = 0;
             Item it = ir.next();
             ser = qp.getSerializer(po);
@@ -111,12 +111,12 @@ abstract class AQuery extends Command {
           updates = qp.updates();
           ser.close();
           qp.close();
-          prnt += p.getTime();
+          prnt += p.time();
         }
         // dump some query info
         if(prop.is(Prop.QUERYINFO)) evalInfo(query, hits, updates, runs);
         out.flush();
-        return info(NL + QUERY_EXECUTED_X, perf.getTimer(runs));
+        return info(NL + QUERY_EXECUTED_X, perf.getTime(runs));
       } catch(final QueryException ex) {
         Util.debug(ex);
         err = ex.getMessage();
@@ -160,7 +160,7 @@ abstract class AQuery extends Command {
       final Performance p = new Performance();
       qp = progress(new QueryProcessor(qu, ctx));
       qp.parse();
-      init = p.getTime();
+      init = p.time();
       return qp.ctx.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
@@ -214,11 +214,11 @@ abstract class AQuery extends Command {
     info(NL);
     info(QUERY_CC + QueryProcessor.removeComments(query, Integer.MAX_VALUE));
     info(qp.info());
-    info(PARSING_CC + Performance.getTimer(pars, runs));
-    info(COMPILING_CC + Performance.getTimer(comp, runs));
-    info(EVALUATING_CC + Performance.getTimer(eval, runs));
-    info(PRINTING_CC + Performance.getTimer(prnt, runs));
-    info(TOTAL_TIME_CC + Performance.getTimer(total, runs) + NL);
+    info(PARSING_CC + Performance.getTime(pars, runs));
+    info(COMPILING_CC + Performance.getTime(comp, runs));
+    info(EVALUATING_CC + Performance.getTime(eval, runs));
+    info(PRINTING_CC + Performance.getTime(prnt, runs));
+    info(TOTAL_TIME_CC + Performance.getTime(total, runs) + NL);
     info(HITS_X_CC + hits + ' ' + (hits == 1 ? ITEM : ITEMS));
     info(UPDATED_CC + updates + ' ' + (updates == 1 ? ITEM : ITEMS));
     info(PRINTED_CC + Performance.format(out.size()));

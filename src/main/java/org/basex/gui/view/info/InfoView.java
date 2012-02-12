@@ -189,7 +189,7 @@ public final class InfoView extends View {
       add(RESULT_C, stats);
       add(QUERY_PLAN_C, plan);
       final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
-      total = Performance.getTimer(il.get(il.size() - 1) * 10000L * runs, runs);
+      total = Performance.getTime(il.get(il.size() - 1) * 10000L * runs, runs);
     }
 
     area.setText(text.finish());
@@ -217,7 +217,7 @@ public final class InfoView extends View {
     for(int i = 0; i < is; ++i) {
       String line = list.get(i);
       if(list == strings) line = ' ' + QUERYSEP + line + ":  " +
-        Performance.getTimer(stat.get(i) * 10000L * runs, runs);
+        Performance.getTime(stat.get(i) * 10000L * runs, runs);
       text.add(line).nline();
     }
     text.hline();
@@ -249,7 +249,7 @@ public final class InfoView extends View {
     final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     final int f = focus == -1 ? l - 1 : focus;
     timer.setText(strings.get(f) + COLS +
-        Performance.getTimer(stat.get(f) * 10000L * runs, runs));
+        Performance.getTime(stat.get(f) * 10000L * runs, runs));
     repaint();
   }
 

@@ -153,7 +153,7 @@ public abstract class FTBuilder extends IndexBuilder {
       data.meta.minscore = min;
     }
     data.meta.ftxtindex = true;
-    Util.gc(perf);
+    Util.memory(perf);
   }
 
   /**

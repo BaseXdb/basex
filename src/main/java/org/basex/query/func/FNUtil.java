@@ -161,7 +161,7 @@ public final class FNUtil extends StandardFunc {
   private Iter mem(final QueryContext ctx) throws QueryException {
     // measure initial memory consumption
     Performance.gc(3);
-    final long min = Performance.mem();
+    final long min = Performance.memory();
 
     // check caching flag
     if(expr.length == 2 && checkBln(expr[1], ctx)) {
@@ -188,7 +188,7 @@ public final class FNUtil extends StandardFunc {
    */
   static void dump(final long min, final QueryContext ctx) {
     Performance.gc(2);
-    final long max = Performance.mem();
+    final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
     FNInfo.dump(Performance.format(mb), ctx);
   }
@@ -206,7 +206,7 @@ public final class FNUtil extends StandardFunc {
     // check caching flag
     if(expr.length == 2 && checkBln(expr[1], ctx)) {
       final Value v = ctx.value(expr[0]).cache().value();
-      FNInfo.dump(p.getTimer(), ctx);
+      FNInfo.dump(p.getTime(), ctx);
       return v.iter();
     }
 
@@ -215,7 +215,7 @@ public final class FNUtil extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         final Item i = ir.next();
-        if(i == null) FNInfo.dump(p.getTimer(), ctx);
+        if(i == null) FNInfo.dump(p.getTime(), ctx);
         return i;
       }
     };

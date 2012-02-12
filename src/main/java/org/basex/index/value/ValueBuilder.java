@@ -89,7 +89,7 @@ public final class ValueBuilder extends IndexBuilder {
     if(text) data.meta.textindex = true;
     else data.meta.attrindex = true;
 
-    Util.gc(perf);
+    Util.memory(perf);
     return data.meta.updindex ?
         new UpdatableDiskValues(data, text) : new DiskValues(data, text);
   }
