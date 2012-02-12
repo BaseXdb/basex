@@ -130,7 +130,7 @@ public final class GUIMacOSX {
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
       // explicit cast to circumvent Java compiler bug
-      GUICommands.C_ABOUT.execute(main);
+      ((GUICommand) GUICommands.C_ABOUT).execute(main);
     }
 
     /**
