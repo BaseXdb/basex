@@ -178,8 +178,8 @@ public final class QueryResources {
   public Value collection(final String input, final InputInfo ii)
       throws QueryException {
 
-    // no collection specified.. return default collection/current context set
     int c = 0;
+    // no collection specified.. return default collection/current context set
     if(input == null) {
       // no default collection was defined
       if(colls == 0) NODEFCOLL.thrw(ii);
@@ -189,6 +189,7 @@ public final class QueryResources {
 
       // find specified collection
       while(c < colls && !collName[c].equals(input)) ++c;
+      // unknown collection
       if(c == colls) {
         final IO base = ctx.sc.baseIO();
         if(base != null) {
@@ -200,7 +201,7 @@ public final class QueryResources {
 
       // add new collection if not found
       if(c == colls) {
-        String root = input.replaceFirst("/+$", "");
+        String root = input.replaceFirst("^/+|/+$", "");
         String path = "";
         final int s = root.indexOf('/');
         if(s != -1) {
