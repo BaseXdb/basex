@@ -5,7 +5,6 @@ import static org.basex.api.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
@@ -20,9 +19,8 @@ import org.basex.server.Session;
 public class RESTDelete extends RESTCode {
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
-    final Map<?, ?> map = ctx.req.getParameterMap();
-    if(!map.isEmpty()) throw new RESTException(SC_BAD_REQUEST, ERR_NOPARAM);
-
+    // parse database options
+    parseOptions(ctx);
     // open addressed database
     open(ctx);
 

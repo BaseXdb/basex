@@ -6,8 +6,6 @@ import static org.basex.io.MimeTypes.*;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
-
 import org.basex.core.cmd.Delete;
 import org.basex.io.in.ArrayInput;
 import org.basex.server.Session;
@@ -21,8 +19,8 @@ import org.basex.server.Session;
 public class RESTPut extends RESTCode {
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
-    final Map<?, ?> map = ctx.req.getParameterMap();
-    if(!map.isEmpty()) throw new RESTException(SC_BAD_REQUEST, ERR_NOPARAM);
+    // parse database options
+    parseOptions(ctx);
 
     // create new database or update resource
     final Session session = ctx.session;

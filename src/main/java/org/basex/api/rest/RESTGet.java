@@ -3,16 +3,12 @@ package org.basex.api.rest;
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.basex.api.*;
-import org.basex.core.*;
-import org.basex.core.cmd.Set;
-import org.basex.io.serial.SerializerProp;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.io.serial.*;
+import org.basex.util.*;
 
 /**
  * This class processes GET requests sent to the REST server.
@@ -30,14 +26,13 @@ final class RESTGet extends RESTCode {
     String input = null;
     byte[] item = null;
 
-    final Context context = HTTPSession.context();
+    // parse database options
+    final Map<String, String[]> params = params(ctx);
     final TokenBuilder ser = new TokenBuilder();
-    final Map<?, ?> map = ctx.req.getParameterMap();
     final SerializerProp sp = new SerializerProp();
-    for(final Entry<?, ?> s : map.entrySet()) {
-      final String key = s.getKey().toString();
-      final String[] vals = s.getValue() instanceof String[] ?
-          (String[]) s.getValue() : new String[] { s.getValue().toString() };
+    for(final Entry<String, String[]> param : params.entrySet()) {
+      final String key = param.getKey();
+      final String[] vals = param.getValue();
       final String val = vals[0];
 
       if(Token.eqic(key, COMMAND, QUERY, RUN)) {
@@ -54,10 +49,7 @@ final class RESTGet extends RESTCode {
       } else if(sp.get(key) != null) {
         // serialization parameters
         for(final String v : vals) ser.add(key).add('=').add(v).add(',');
-      } else if(context.prop.get(key.toUpperCase(Locale.ENGLISH)) != null) {
-        // database options
-        ctx.session.execute(new Set(key, val));
-      } else {
+      } else if(!parseOption(ctx, param)) {
         // external variables
         vars.put(key, new String[] { val });
       }

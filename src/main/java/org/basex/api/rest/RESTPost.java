@@ -51,8 +51,7 @@ public class RESTPost extends RESTCode {
 
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
-    final Map<?, ?> map = ctx.req.getParameterMap();
-    if(!map.isEmpty()) throw new RESTException(SC_BAD_REQUEST, ERR_NOPARAM);
+    parseOptions(ctx);
 
     String enc = ctx.req.getCharacterEncoding();
     if(enc == null) enc = Token.UTF8;
@@ -87,7 +86,7 @@ public class RESTPost extends RESTCode {
         } else if(name.equals(WRAP)) {
           wrap(value, ctx);
         } else {
-          throw new RESTException(SC_BAD_REQUEST, ERR_PARAM + name);
+          throw new RESTException(SC_BAD_REQUEST, ERR_PARAM, name);
         }
       }
       ctx.serialization = ser.toString();

@@ -230,11 +230,11 @@ public class RESTTest {
   }
 
   /**
-   * POST Test: specify an option.
+   * GET Test: specify an option.
    * @throws IOException I/O exception
    */
   @Test
-  public void getOption1() throws IOException {
+  public void getOption() throws IOException {
     assertEquals("2",
         get("?query=switch(1)+case+1+return+2+default+return+3&" +
         Prop.XQUERY3[0] + "=true")
@@ -242,6 +242,7 @@ public class RESTTest {
     try {
       get("?query=switch(1)+case+1+return+2+default+return+3&" +
           Prop.XQUERY3[0] + "=false");
+      fail("Error expected.");
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }
@@ -331,7 +332,7 @@ public class RESTTest {
    * @throws IOException I/O exception
    */
   @Test
-  public void postOption1() throws IOException {
+  public void postOption() throws IOException {
     assertEquals("2", post("", "<query xmlns=\"" + URI + "\">" +
         "<text>switch(1) case 1 return 2 default return 3</text>" +
         "<option name='" + Prop.XQUERY3[0] + "' value='true'/></query>"));
@@ -340,6 +341,7 @@ public class RESTTest {
       post("", "<query xmlns=\"" + URI + "\">" +
         "<text>switch(1) case 1 return 2 default return 3</text>" +
         "<option name='" + Prop.XQUERY3[0] + "' value='false'/></query>");
+      fail("Error expected.");
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }
@@ -406,6 +408,24 @@ public class RESTTest {
   }
 
   /**
+   * PUT Test: specify an option.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void putOption() throws IOException {
+    put(DB + "?" + Prop.CHOP[0] + "=true", new FileInputStream(FILE));
+    assertEquals("5", get(DB + "?query=count(//text())"));
+    put(DB + "?" + Prop.CHOP[0] + "=false", new FileInputStream(FILE));
+    assertEquals("22", get(DB + "?query=count(//text())"));
+
+    try {
+      put(DB + "?xxx=yyy", new FileInputStream(FILE));
+      fail("Error expected.");
+    } catch(final IOException ex) {
+    }
+  }
+
+  /**
    * DELETE Test.
    * @throws IOException I/O exception
    */
@@ -444,6 +464,21 @@ public class RESTTest {
       delete(DB);
       fail("Error expected.");
     } catch(final FileNotFoundException ex) {
+    }
+  }
+
+  /**
+   * DELETE Test: specify an option.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void deleteOption() throws IOException {
+    put(DB, null);
+    delete(DB + "/a?" + Prop.CHOP[0] + "=true");
+    try {
+      delete(DB + "/a?xxx=true");
+      fail("Error expected.");
+    } catch(final IOException ex) {
     }
   }
 

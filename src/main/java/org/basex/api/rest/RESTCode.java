@@ -6,15 +6,17 @@ import static org.basex.data.DataText.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.Function.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
-import org.basex.core.Text;
-import org.basex.core.cmd.Open;
-import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.SerializerProp;
-import org.basex.server.Query;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.api.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
+import org.basex.io.serial.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * Abstract class for performing REST operations.
@@ -132,5 +134,55 @@ abstract class RESTCode {
     q.bind("d", ctx.db());
     q.bind("p", ctx.dbpath());
     return q.execute();
+  }
+
+  /**
+   * Returns all query parameters.
+   * @param ctx rest context
+   * @return parameters
+   */
+  static Map<String, String[]> params(final RESTContext ctx) {
+    final Map<String, String[]> params = new HashMap<String, String[]>();
+    final Map<?, ?> map = ctx.req.getParameterMap();
+    for(final Entry<?, ?> s : map.entrySet()) {
+      final String key = s.getKey().toString();
+      final String[] vals = s.getValue() instanceof String[] ?
+          (String[]) s.getValue() : new String[] { s.getValue().toString() };
+      params.put(key, vals);
+    }
+    return params;
+  }
+
+  /**
+   * Parses and sets database options.
+   * Throws an exception if an option is unknown.
+   * @param ctx rest context
+   * @throws RESTException REST exception
+   * @throws IOException I/O exception
+   */
+  static void parseOptions(final RESTContext ctx)
+      throws RESTException, IOException {
+
+    for(final Entry<String, String[]> param : params(ctx).entrySet()) {
+     if(!parseOption(ctx, param)) {
+       throw new RESTException(SC_BAD_REQUEST, ERR_PARAM, param.getKey());
+     }
+    }
+  }
+
+  /**
+   * Parses and sets a single database option.
+   * @param ctx rest context
+   * @param param current parameter
+   * @return success flag
+   * @throws IOException I/O exception
+   */
+  static boolean parseOption(final RESTContext ctx,
+      final Entry<String, String[]> param) throws IOException {
+
+    final String key = param.getKey().toUpperCase(Locale.ENGLISH);
+    final boolean found = HTTPSession.context().prop.get(key) != null;
+    if(found) ctx.session.execute(new Set(key, param.getValue()[0]));
+    return found;
   }
 }
