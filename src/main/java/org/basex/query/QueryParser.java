@@ -1369,7 +1369,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr switchh() throws QueryException {
-    if(!wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
+    if(!ctx.xquery3 || !wsConsumeWs(SWITCH, PAR1, TYPEPAR)) return null;
     wsCheck(PAR1);
     final Expr expr = check(expr(), NOSWITCH);
     SwitchCase[] exprs = { };
