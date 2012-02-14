@@ -231,7 +231,7 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public BufferInput buffer() throws IOException {
+  public BufferInput inputStream() throws IOException {
     // return file stream
     if(is == null) return new BufferInput(this);
     // return input stream

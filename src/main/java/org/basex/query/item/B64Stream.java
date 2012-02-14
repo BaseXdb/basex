@@ -53,7 +53,7 @@ public final class B64Stream extends B64 {
   @Override
   public InputStream input(final InputInfo ii) throws QueryException {
     try {
-      return input.buffer();
+      return input.inputStream();
     } catch(final IOException ex) {
       throw error.thrw(ii, ex);
     }

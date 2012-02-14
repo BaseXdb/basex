@@ -174,22 +174,22 @@ public abstract class IO {
   }
 
   /**
-   * Returns the next input source.
+   * Returns an input source.
    * @return input source
    */
   public abstract InputSource inputSource();
 
   /**
-   * Returns a buffered reader for the input.
-   * @return buffered reader
+   * Returns a buffered input stream.
+   * @return input stream
    * @throws IOException I/O exception
    */
-  public abstract BufferInput buffer() throws IOException;
+  public abstract BufferInput inputStream() throws IOException;
 
   /**
    * Merges two filenames.
-   * @param fn file name/path to be merged
-   * @return contents
+   * @param fn file name/path to be appended
+   * @return resulting reference
    */
   public abstract IO merge(final String fn);
 

@@ -2,19 +2,15 @@ package org.basex.io;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.net.*;
+import java.util.regex.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
-import org.basex.io.in.BufferInput;
-import org.basex.util.Util;
-import org.basex.util.list.ByteList;
-import org.xml.sax.InputSource;
+import org.basex.core.*;
+import org.basex.io.in.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.xml.sax.*;
 
 /**
  * {@link IO} reference, representing a URL.
@@ -34,11 +30,11 @@ public final class IOUrl extends IO {
   @Override
   public byte[] read() throws IOException {
     final ByteList bl = new ByteList();
-    final BufferedInputStream bis = new BufferedInputStream(inputStream());
+    final BufferInput bi = inputStream();
     try {
-      for(int b; (b = bis.read()) != -1;) bl.add(b);
+      for(int b; (b = bi.read()) != -1;) bl.add(b);
     } finally {
-      try { bis.close(); } catch(final IOException ex) { }
+      try { bi.close(); } catch(final IOException ex) { }
     }
     return bl.toArray();
   }
@@ -49,19 +45,10 @@ public final class IOUrl extends IO {
   }
 
   @Override
-  public BufferInput buffer() throws IOException {
-    return new BufferInput(inputStream());
-  }
-
-  /**
-   * Returns the input stream.
-   * @return input stream
-   * @throws IOException I/O exception
-   */
-  private InputStream inputStream() throws IOException {
+  public BufferInput inputStream() throws IOException {
     final URL url = new URL(path);
     try {
-      return url.openStream();
+      return new BufferInput(url.openStream());
     } catch(final RuntimeException ex) {
       // catch unexpected runtime exceptions
       Util.debug(ex);

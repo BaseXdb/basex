@@ -34,7 +34,7 @@ public final class NewlineInput extends TextInput {
    * @throws IOException I/O exception
    */
   public NewlineInput(final IO in, final String enc) throws IOException {
-    this(in.buffer(), enc);
+    this(in.inputStream(), enc);
   }
 
   @Override

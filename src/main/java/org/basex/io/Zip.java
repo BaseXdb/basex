@@ -46,7 +46,7 @@ public final class Zip extends Progress {
     int c = 0;
     ZipInputStream in = null;
     try {
-      in = new ZipInputStream(archive.buffer());
+      in = new ZipInputStream(archive.inputStream());
       while(in.getNextEntry() != null) c++;
       return c;
     } finally {
@@ -63,7 +63,7 @@ public final class Zip extends Progress {
   public byte[] read(final String path) throws IOException {
     ZipInputStream in = null;
     try {
-      in = new ZipInputStream(archive.buffer());
+      in = new ZipInputStream(archive.inputStream());
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         if(!path.equals(ze.getName())) continue;
         final int s = (int) ze.getSize();
@@ -97,7 +97,7 @@ public final class Zip extends Progress {
     total = size();
     curr = 0;
     try {
-      in = new ZipInputStream(archive.buffer());
+      in = new ZipInputStream(archive.inputStream());
       for(ZipEntry ze; (ze = in.getNextEntry()) != null;) {
         curr++;
         final IOFile trg = new IOFile(target, ze.getName());

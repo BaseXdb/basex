@@ -50,7 +50,7 @@ public class TextInput extends InputStream {
    * @throws IOException I/O exception
    */
   public TextInput(final IO in) throws IOException {
-    this(in.buffer());
+    this(in.inputStream());
     input = in;
   }
 
