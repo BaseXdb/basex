@@ -55,12 +55,13 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-bcdioqsuvVwxz] [file]" + NL +
+    " [-bcdiLoqsuvVwxz] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
     "  -c<cmd>     Execute database command(s)" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
+    "  -L          Add trailing newline after query result" + NL +
     "  -o<file>    Write output to file" + NL +
     "  -q<expr>    Execute XQuery expression" + NL +
     "  -s<pars>    Set serialization parameter(s)" + NL +
@@ -74,12 +75,13 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-bcdinopPqsUvVwxz] [file]" + NL +
+    " [-bcdiLnopPqsUvVwxz] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
     "  -c<cmd>     Execute database command(s)" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
+    "  -L          Add trailing newline after query result" + NL +
     "  -n<name>    Set server (host) name" + NL +
     "  -o<file>    Write output to file" + NL +
     "  -p<num>     Set server port" + NL +
