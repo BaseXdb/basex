@@ -19,7 +19,7 @@ import java.net.URL;
 
 import org.basex.api.BaseXHTTP;
 import org.basex.api.rest.RESTText;
-import org.basex.core.BaseXException;
+import org.basex.core.*;
 import org.basex.data.DataText;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.in.BufferInput;
@@ -40,7 +40,7 @@ import org.junit.Test;
 public class RESTTest {
   /** Test database. */
   private static final String DB = Util.name(RESTTest.class);
-  /** REST identified. */
+  /** REST identifier. */
   private static final String NAME = "rest";
   /** REST URI. */
   private static final String URI = string(RESTText.RESTURI);
@@ -230,6 +230,24 @@ public class RESTTest {
   }
 
   /**
+   * POST Test: specify an option.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void getOption1() throws IOException {
+    assertEquals("2",
+        get("?query=switch(1)+case+1+return+2+default+return+3&" +
+        Prop.XQUERY3[0] + "=true")
+    );
+    try {
+      get("?query=switch(1)+case+1+return+2+default+return+3&" +
+          Prop.XQUERY3[0] + "=false");
+    } catch(final IOException ex) {
+      assertContains(ex.getMessage(), "[XPST0003]");
+    }
+  }
+
+  /**
    * POST Test: execute a query.
    * @throws IOException I/O exception
    */
@@ -306,6 +324,25 @@ public class RESTTest {
         "<text>.</text>" +
         "<context><a/></context>" +
         "</query>"));
+  }
+
+  /**
+   * POST Test: specify an option.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void postOption1() throws IOException {
+    assertEquals("2", post("", "<query xmlns=\"" + URI + "\">" +
+        "<text>switch(1) case 1 return 2 default return 3</text>" +
+        "<option name='" + Prop.XQUERY3[0] + "' value='true'/></query>"));
+
+    try {
+      post("", "<query xmlns=\"" + URI + "\">" +
+        "<text>switch(1) case 1 return 2 default return 3</text>" +
+        "<option name='" + Prop.XQUERY3[0] + "' value='false'/></query>");
+    } catch(final IOException ex) {
+      assertContains(ex.getMessage(), "[XPST0003]");
+    }
   }
 
   /** POST Test: execute buggy query. */

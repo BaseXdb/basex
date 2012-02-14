@@ -1,27 +1,32 @@
 package org.basex.api.rest;
 
 import static javax.servlet.http.HttpServletResponse.*;
+import static org.basex.api.rest.RESTSchema.*;
 import static org.basex.api.rest.RESTText.*;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
-import org.basex.api.HTTPSession;
-import org.basex.core.Context;
-import org.basex.data.Result;
-import org.basex.io.in.NewlineInput;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.DataBuilder;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import javax.xml.*;
+import javax.xml.parsers.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+import javax.xml.validation.*;
+
+import org.basex.api.*;
+import org.basex.build.Parser;
+import org.basex.core.*;
+import org.basex.core.cmd.Set;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.xml.sax.*;
 
 /**
  * REST-based evaluation of POST operations.
@@ -30,6 +35,20 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class RESTPost extends RESTCode {
+  /** Validator for POST schemas. */
+  private static final Validator VALIDATOR;
+
+  static {
+    Validator v = null;
+    try {
+      v = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).
+          newSchema(new StreamSource(new ArrayInput(POST))).newValidator();
+    } catch(final SAXException ex) {
+      Util.notexpected(ex);
+    }
+    VALIDATOR = v;
+  }
+
   @Override
   void run(final RESTContext ctx) throws RESTException, IOException {
     final Map<?, ?> map = ctx.req.getParameterMap();
@@ -39,15 +58,16 @@ public class RESTPost extends RESTCode {
     if(enc == null) enc = Token.UTF8;
 
     // perform queries
-    final String input = Token.string(new NewlineInput(ctx.in, enc).content());
+    final byte[] in = new NewlineInput(ctx.in, enc).content();
+    validate(in);
 
     final Context context = HTTPSession.context();
-    Result node;
+    DBNode doc;
     try {
-      node = new QueryProcessor(CHECK, input, context).execute();
-    } catch(final QueryException ex) {
-      throw new RESTException(SC_BAD_REQUEST, ex.getMessage().
-          replaceAll("\\r?\\n+", " ").replaceAll(".*\\[\\w+\\d*\\] ", ""));
+      final Parser parser = Parser.xmlParser(new IOContent(in), context.prop);
+      doc = new DBNode(parser, context.prop);
+    } catch(final IOException ex) {
+      throw new RESTException(SC_BAD_REQUEST, ex.getMessage());
     }
 
     final SerializerProp sp = new SerializerProp();
@@ -57,7 +77,7 @@ public class RESTPost extends RESTCode {
     try {
       // handle serialization parameters
       final TokenBuilder ser = new TokenBuilder();
-      qp = new QueryProcessor("*:parameter", node, context);
+      qp = new QueryProcessor("*/*:parameter", doc, context);
       Iter ir = qp.iter();
       for(Item param; (param = ir.next()) != null;) {
         final String name = value("data(@name)", param, context);
@@ -72,9 +92,18 @@ public class RESTPost extends RESTCode {
       }
       ctx.serialization = ser.toString();
 
+      // handle database options
+      qp = new QueryProcessor("*/*:option", doc, context);
+      ir = qp.iter();
+      for(Item opt; (opt = ir.next()) != null;) {
+        final String name = value("data(@name)", opt, context);
+        final String value = value("data(@value)", opt, context);
+        ctx.session.execute(new Set(name, value));
+      }
+
       // handle variables
       final Map<String, String[]> vars = new HashMap<String, String[]>();
-      qp = new QueryProcessor("*:variable", node, context);
+      qp = new QueryProcessor("*/*:variable", doc, context);
       ir = qp.iter();
       for(Item var; (var = ir.next()) != null;) {
         final String name = value("data(@name)", var, context);
@@ -85,7 +114,7 @@ public class RESTPost extends RESTCode {
 
       // handle input
       byte[] item = null;
-      qp = new QueryProcessor("*:context/node()", node, context);
+      qp = new QueryProcessor("*/*:context/node()", doc, context);
       ir = qp.iter();
       for(Item n; (n = ir.next()) != null;) {
         if(item != null) throw new RESTException(SC_BAD_REQUEST, ERR_CTXITEM);
@@ -97,8 +126,8 @@ public class RESTPost extends RESTCode {
       }
 
       // handle request
-      final String request = value("local-name(.)", node, context);
-      final String text = value("*:text/text()", node, context);
+      final String request = value("local-name(*)", doc, context);
+      final String text = value("*/*:text/text()", doc, context);
       if(request.equals(COMMAND)) {
         code = new RESTCommand(text);
       } else if(request.equals(RUN)) {
@@ -129,31 +158,20 @@ public class RESTPost extends RESTCode {
     return it == null ? null : Token.string(it.string(null));
   }
 
-  /** XQuery for checking the syntax of the POST request. */
-  private static final String CHECK = new TokenBuilder().
-    add("declare namespace n = \"").add(RESTURI).add("\"; ").
-    add("declare variable $n := \"").add(RESTURI).add("\"; ").
-    add("declare function n:c($test as item()*, $err as xs:string) { ").
-    add("if($test) then () else fn:error(xs:QName(\"SYNTAX\"), $err) }; ").
-    add("let $input := parse-xml(.)/* return ( ").
-    add("n:c(every $x in $input/self::* satisfies namespace-uri($x) eq $n, ").
-    add("\"Nodes must belong to \"\"\" || $n || \"\"\" namespace.\"), ").
-    add("n:c(local-name($input) = ('query','command','run'), ").
-    add("\"Invalid request: <\" || name($input) || \"/>.\"), ").
-    add("n:c($input/*:text, 'Missing <text/> element.'), ").
-    add("n:c($input/*:text/text(), '<text/> element has no content.'), ").
-    add("for $ch in $input/* return ( ").
-    add("n:c(local-name($ch) = ('text', 'parameter', ").
-    add("if(local-name($input) = 'command') then () ").
-    add("else ('context','variable')), ").
-    add("\"Invalid child: <\" || name($ch) || \"/>.\"), ").
-    add("for $p in $ch/(self::*:parameter|self::*:variable) ").
-    add("let $atts := ('name','value', if(local-name($p) = 'parameter') ").
-    add("then () else 'type') return ( ").
-    add("n:c($p/@name, '''name'' attribute missing.'), ").
-    add("n:c($p/@value, '''value'' attribute missing.'), ").
-    add("for $a in $p/@* return ").
-    add("n:c(local-name($a) = $atts, ").
-    add("\"Invalid attribute: @\" || name($a) || \".\") ").
-    add(")),$input)").toString();
+  /**
+   * Validates the specified XML input against the POST schema.
+   * @param input input document
+   * @throws RESTException exception
+   */
+  private static void validate(final byte[] input) throws RESTException {
+    try {
+      final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      dbf.setNamespaceAware(true);
+      final DocumentBuilder db = dbf.newDocumentBuilder();
+      VALIDATOR.validate(new DOMSource(db.parse(new ArrayInput(input))));
+    } catch(final Exception ex) {
+      // validation fails
+      throw new RESTException(SC_BAD_REQUEST, ex.getMessage());
+    }
+  }
 }

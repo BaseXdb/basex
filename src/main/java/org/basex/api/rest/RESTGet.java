@@ -4,10 +4,12 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.api.*;
+import org.basex.core.*;
+import org.basex.core.cmd.Set;
 import org.basex.io.serial.SerializerProp;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -28,6 +30,7 @@ final class RESTGet extends RESTCode {
     String input = null;
     byte[] item = null;
 
+    final Context context = HTTPSession.context();
     final TokenBuilder ser = new TokenBuilder();
     final Map<?, ?> map = ctx.req.getParameterMap();
     final SerializerProp sp = new SerializerProp();
@@ -51,6 +54,9 @@ final class RESTGet extends RESTCode {
       } else if(sp.get(key) != null) {
         // serialization parameters
         for(final String v : vals) ser.add(key).add('=').add(v).add(',');
+      } else if(context.prop.get(key.toUpperCase(Locale.ENGLISH)) != null) {
+        // database options
+        ctx.session.execute(new Set(key, val));
       } else {
         // external variables
         vars.put(key, new String[] { val });
