@@ -20,6 +20,7 @@ public abstract class Stemmer extends LanguageImpl {
     // built-in stemmers
     IMPL.add(new EnglishStemmer(null));
     IMPL.add(new GermanStemmer(null));
+    IMPL.add(new IndonesianStemmer(null));
     IMPL.add(new DummyStemmer(null));
 
     if(SnowballStemmer.available()) IMPL.add(new SnowballStemmer());
