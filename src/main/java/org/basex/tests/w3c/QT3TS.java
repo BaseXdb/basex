@@ -261,6 +261,7 @@ public final class QT3TS {
       final XQItem uri = qmod.next();
       if(uri == null) break;
       final XQItem file = qmod.next();
+      if(file == null) break;
       query.addModule(uri.getString(), base + file.getString());
     }
 
