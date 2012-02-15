@@ -43,7 +43,10 @@ public final class Unary extends Single {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     type = expr.type();
-    if(!type.isNum()) type = SeqType.ITR;
+    if(!type.type.isNumber()) {
+      // expression will always yield a number, empty sequence or error
+      type = type.mayBeZero() ? SeqType.ITR_ZO : SeqType.ITR;
+    }
     return expr.isValue() ? preEval(ctx) : this;
   }
 

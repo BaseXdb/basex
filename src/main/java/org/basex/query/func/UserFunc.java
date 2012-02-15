@@ -56,6 +56,7 @@ public class UserFunc extends Single {
    */
   public UserFunc(final InputInfo ii, final QNm n, final Var[] a,
       final SeqType r, final boolean d) {
+
     super(ii, null);
     name = n;
     ret = r;
@@ -108,8 +109,11 @@ public class UserFunc extends Single {
     // convert all function calls in tail position to proper tail calls
     if(tco()) expr = expr.markTailCalls();
 
-    // remove redundant cast
-    if(ret != null && (ret.type == AtomType.BLN || ret.type == AtomType.FLT ||
+    if(ret == null) return;
+    // adopt expected return type
+    type = ret;
+    // remove redundant casts
+    if((ret.type == AtomType.BLN || ret.type == AtomType.FLT ||
         ret.type == AtomType.DBL || ret.type == AtomType.QNM ||
         ret.type == AtomType.URI) && ret.eq(expr.type())) {
       ctx.compInfo(OPTCAST, ret);

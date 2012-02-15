@@ -21,7 +21,7 @@ import org.basex.util.Token;
  */
 public final class CmpN extends Arr {
   /** Comparators. */
-  public enum Op {
+  public enum OpN {
     /** Node comparison: same. */
     EQ("is") {
       @Override
@@ -53,7 +53,7 @@ public final class CmpN extends Arr {
      * Constructor.
      * @param n string representation
      */
-    Op(final String n) {
+    OpN(final String n) {
       name = n;
     }
 
@@ -72,7 +72,7 @@ public final class CmpN extends Arr {
   }
 
   /** Comparator. */
-  private final Op op;
+  private final OpN op;
 
   /**
    * Constructor.
@@ -81,7 +81,7 @@ public final class CmpN extends Arr {
    * @param e2 second expression
    * @param o comparator
    */
-  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final Op o) {
+  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final OpN o) {
     super(ii, e1, e2);
     op = o;
     type = SeqType.BLN_ZO;

@@ -7,6 +7,8 @@ import java.io.IOException;
 import org.basex.io.serial.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.CmpG.*;
+import org.basex.query.expr.CmpV.*;
 import org.basex.query.func.Function;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -47,15 +49,15 @@ public abstract class Preds extends ParseExpr {
 
     for(int p = 0; p < preds.length; ++p) {
       Expr pr = preds[p].comp(ctx).compEbv(ctx);
-      pr = Pos.get(CmpV.Op.EQ, pr, pr, input);
+      pr = Pos.get(OpV.EQ, pr, pr, input);
 
       // position() = last() -> last()
       if(pr instanceof CmpG || pr instanceof CmpV) {
         final Cmp cmp = (Cmp) pr;
         if(cmp.expr[0].isFunction(Function.POSITION) &&
            cmp.expr[1].isFunction(Function.LAST)) {
-          if(cmp instanceof CmpG && ((CmpG) cmp).op == CmpG.Op.EQ ||
-             cmp instanceof CmpV && ((CmpV) cmp).op == CmpV.Op.EQ) {
+          if(cmp instanceof CmpG && ((CmpG) cmp).op == OpG.EQ ||
+             cmp instanceof CmpV && ((CmpV) cmp).op == OpV.EQ) {
             ctx.compInfo(OPTWRITE, pr);
             pr = cmp.expr[1];
           }
@@ -103,7 +105,8 @@ public abstract class Preds extends ParseExpr {
     boolean np1 = true;
     boolean np2 = true;
     for(int p = 0; p < preds.length; p++) {
-      final boolean np = !preds[p].type().mayBeNum() && !preds[p].uses(Use.POS);
+      final boolean np = !preds[p].type().mayBeNumber() &&
+          !preds[p].uses(Use.POS);
       np1 &= np;
       if(p > 0) np2 &= np;
     }
@@ -137,7 +140,7 @@ public abstract class Preds extends ParseExpr {
   @Override
   public boolean uses(final Use u) {
     for(final Expr p : preds) {
-      if(u == Use.POS && p.type().mayBeNum() || p.uses(u)) return true;
+      if(u == Use.POS && p.type().mayBeNumber() || p.uses(u)) return true;
     }
     return false;
   }

@@ -397,18 +397,10 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type is a single number.
-   * @return result of check
-   */
-  public boolean isNum() {
-    return one() && type.isNumber();
-  }
-
-  /**
    * Tests if the type may be numeric.
    * @return result of check
    */
-  public boolean mayBeNum() {
+  public boolean mayBeNumber() {
     return type.isNumber() || type == AtomType.ITEM;
   }
 

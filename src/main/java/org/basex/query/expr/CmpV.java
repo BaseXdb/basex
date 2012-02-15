@@ -24,7 +24,7 @@ import org.basex.util.Token;
  */
 public final class CmpV extends Cmp {
   /** Comparators. */
-  public enum Op {
+  public enum OpV {
     /** Item comparison:less or equal. */
     LE("le") {
       @Override
@@ -34,9 +34,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v <= 0;
       }
       @Override
-      public Op swap() { return GE; }
+      public OpV swap() { return GE; }
       @Override
-      public Op invert() { return GT; }
+      public OpV invert() { return GT; }
     },
 
     /** Item comparison:less. */
@@ -48,9 +48,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v < 0;
       }
       @Override
-      public Op swap() { return GT; }
+      public OpV swap() { return GT; }
       @Override
-      public Op invert() { return GE; }
+      public OpV invert() { return GE; }
     },
 
     /** Item comparison:greater of equal. */
@@ -62,9 +62,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v >= 0;
       }
       @Override
-      public Op swap() { return LE; }
+      public OpV swap() { return LE; }
       @Override
-      public Op invert() { return LT; }
+      public OpV invert() { return LT; }
     },
 
     /** Item comparison:greater. */
@@ -76,9 +76,9 @@ public final class CmpV extends Cmp {
         return v != Item.UNDEF && v > 0;
       }
       @Override
-      public Op swap() { return LT; }
+      public OpV swap() { return LT; }
       @Override
-      public Op invert() { return LE; }
+      public OpV invert() { return LE; }
     },
 
     /** Item comparison:equal. */
@@ -89,9 +89,9 @@ public final class CmpV extends Cmp {
         return a.eq(ii, b);
       }
       @Override
-      public Op swap() { return EQ; }
+      public OpV swap() { return EQ; }
       @Override
-      public Op invert() { return NE; }
+      public OpV invert() { return NE; }
     },
 
     /** Item comparison:not equal. */
@@ -102,9 +102,9 @@ public final class CmpV extends Cmp {
         return !a.eq(ii, b);
       }
       @Override
-      public Op swap() { return NE; }
+      public OpV swap() { return NE; }
       @Override
-      public Op invert() { return EQ; }
+      public OpV invert() { return EQ; }
     };
 
     /** String representation. */
@@ -114,7 +114,7 @@ public final class CmpV extends Cmp {
      * Constructor.
      * @param n string representation
      */
-    Op(final String n) { name = n; }
+    OpV(final String n) { name = n; }
 
     /**
      * Evaluates the expression.
@@ -131,20 +131,20 @@ public final class CmpV extends Cmp {
      * Swaps the comparator.
      * @return swapped comparator
      */
-    public abstract Op swap();
+    public abstract OpV swap();
 
     /**
      * Inverts the comparator.
      * @return inverted comparator
      */
-    public abstract Op invert();
+    public abstract OpV invert();
 
     @Override
     public String toString() { return name; }
   }
 
   /** Comparator. */
-  Op op;
+  OpV op;
 
   /**
    * Constructor.
@@ -153,7 +153,7 @@ public final class CmpV extends Cmp {
    * @param e2 second expression
    * @param o operator
    */
-  public CmpV(final InputInfo ii, final Expr e1, final Expr e2, final Op o) {
+  public CmpV(final InputInfo ii, final Expr e1, final Expr e2, final OpV o) {
     super(ii, e1, e2);
     op = o;
   }
@@ -186,8 +186,8 @@ public final class CmpV extends Cmp {
       // position() CMP number
       e = Pos.get(op, e2, e, input);
       if(e != this) ctx.compInfo(OPTWRITE, this);
-    } else if(e1.type().eq(SeqType.BLN) && (op == Op.EQ && e2 == Bln.FALSE ||
-        op == Op.NE && e2 == Bln.TRUE)) {
+    } else if(e1.type().eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
+        op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
       e = Function.NOT.get(input, e1);
     }
@@ -198,8 +198,8 @@ public final class CmpV extends Cmp {
   public Expr compEbv(final QueryContext ctx) {
     // e.g.: if($x eq true()) -> if($x)
     // checking one direction is sufficient, as operators may have been swapped
-    return (op == Op.EQ && expr[1] == Bln.TRUE ||
-            op == Op.NE && expr[1] == Bln.FALSE) &&
+    return (op == OpV.EQ && expr[1] == Bln.TRUE ||
+            op == OpV.NE && expr[1] == Bln.FALSE) &&
       expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
   }
 

@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.QueryException;
-import org.basex.query.expr.CmpV.Op;
+import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.StandardFunc;
 import org.basex.query.func.Function;
 import org.basex.query.item.Bln;
@@ -59,7 +59,7 @@ public abstract class Cmp extends Arr {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  final Expr compCount(final Op o) throws QueryException {
+  final Expr compCount(final OpV o) throws QueryException {
     // evaluate argument
     final Expr a = expr[1];
     if(!a.isItem()) return this;
@@ -69,16 +69,16 @@ public abstract class Cmp extends Arr {
 
     final double v = it.dbl(input);
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
-    if((o == Op.GT || o == Op.NE) && v < 0 || o == Op.GE && v <= 0 ||
-       o == Op.NE && v != (int) v) return Bln.TRUE;
+    if((o == OpV.GT || o == OpV.NE) && v < 0 || o == OpV.GE && v <= 0 ||
+       o == OpV.NE && v != (int) v) return Bln.TRUE;
     // FALSE: c < (v<=0), c <= (v<0), c = (v<0), c = not-int(v)
-    if(o == Op.LT && v <= 0 || (o == Op.LE || o == Op.EQ) && v < 0 ||
-       o == Op.EQ && v != (int) v) return Bln.FALSE;
+    if(o == OpV.LT && v <= 0 || (o == OpV.LE || o == OpV.EQ) && v < 0 ||
+       o == OpV.EQ && v != (int) v) return Bln.FALSE;
     // EXISTS: c > (v<1), c >= (v<=1), c != (v=0)
-    if(o == Op.GT && v < 1 || o == Op.GE && v <= 1 || o == Op.NE && v == 0)
+    if(o == OpV.GT && v < 1 || o == OpV.GE && v <= 1 || o == OpV.NE && v == 0)
       return Function.EXISTS.get(input, ((StandardFunc) expr[0]).expr);
     // EMPTY: c < (v<=1), c <= (v<1), c = (v=0)
-    if(o == Op.LT && v <= 1 || o == Op.LE && v < 1 || o == Op.EQ && v == 0)
+    if(o == OpV.LT && v <= 1 || o == OpV.LE && v < 1 || o == OpV.EQ && v == 0)
       return Function.EMPTY.get(input, ((StandardFunc) expr[0]).expr);
 
     return this;

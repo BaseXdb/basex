@@ -63,7 +63,7 @@ public class AxisStep extends Preds {
       final Expr... p) {
 
     boolean num = false;
-    for(final Expr pr : p) num |= pr.type().mayBeNum() || pr.uses(Use.POS);
+    for(final Expr pr : p) num |= pr.type().mayBeNumber() || pr.uses(Use.POS);
     return num ? new AxisStep(ii, a, t, p) : new IterStep(ii, a, t, p);
   }
 

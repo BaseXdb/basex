@@ -36,7 +36,7 @@ public abstract class ElementList {
    * @param min minimum size
    * @return new array size
    */
-  final int newSize(final int min) {
+  protected final int newSize(final int min) {
     return Math.max(newSize(), min);
   }
 

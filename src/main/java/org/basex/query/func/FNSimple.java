@@ -172,7 +172,7 @@ public final class FNSimple extends StandardFunc {
     Expr ex = this;
     if(sig == Function.BOOLEAN) {
       // (test)[boolean(A)] -> (test)[A]
-      if(!e.type().mayBeNum()) ex = e;
+      if(!e.type().mayBeNumber()) ex = e;
     } else if(sig == Function.EXISTS) {
       // if(exists(node*)) -> if(node*)
       if(e.type().type.isNode() || e.size() > 0) ex = e;

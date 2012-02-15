@@ -5,7 +5,7 @@ import org.basex.index.StatsType;
 import org.basex.index.path.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.CmpV.Op;
+import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Atm;
@@ -249,7 +249,7 @@ public final class FNSeq extends StandardFunc {
           final Item i = ir.next();
           if(i == null) return null;
           ++c;
-          if(i.comparable(it) && Op.EQ.eval(input, i, it)) return Int.get(c);
+          if(i.comparable(it) && OpV.EQ.eval(input, i, it)) return Int.get(c);
         }
       }
     };
