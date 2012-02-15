@@ -67,7 +67,7 @@ public class TextInput extends InputStream {
    * Returns the IO reference.
    * @return file reference
    */
-  public IO input() {
+  public IO io() {
     return input;
   }
 
