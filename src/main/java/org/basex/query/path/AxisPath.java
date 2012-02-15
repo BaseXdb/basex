@@ -213,12 +213,10 @@ public class AxisPath extends Path {
       if(test == Test.DOC && data.meta.pathindex && data.meta.uptodate) {
         int j = 0;
         for(; j <= smin; ++j) {
-          // invert if axis is not a child or has predicates
           final AxisStep s = axisStep(j);
-          if(s == null) break;
-          if(s.axis != Axis.CHILD || s.preds.length > 0 && j != smin) break;
-          if(s.test.test == Name.ALL || s.test.test == null) continue;
-          if(s.test.test != Name.NAME) break;
+          // step must use child axis and name test, and have no predicates
+          if(s == null || s.test.test != Name.NAME || s.axis != Axis.CHILD ||
+              j != smin && s.preds.length > 0) break;
 
           // support only unique paths with nodes on the correct level
           final int name = data.tagindex.id(s.test.name.local());
