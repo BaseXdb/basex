@@ -24,15 +24,15 @@ import java.io.OutputStream;
  */
 public abstract class Serializer {
   /** Default serialization parameters. */
-  static final SerializerProp PROPS = new SerializerProp();
+  protected static final SerializerProp PROPS = new SerializerProp();
   /** Stack of opened tags. */
-  final TokenList tags = new TokenList();
+  protected final TokenList tags = new TokenList();
   /** Current level. */
-  int level;
+  protected int level;
   /** Current tag. */
-  byte[] tag;
+  protected byte[] tag;
   /** Declare namespaces flag. */
-  boolean undecl;
+  protected boolean undecl;
 
   /** Currently available namespaces. */
   private final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
