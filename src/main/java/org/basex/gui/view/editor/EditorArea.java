@@ -193,11 +193,10 @@ final class EditorArea extends BaseXEditor {
     }
 
     final int thread = ++threadID;
-    final int sleep = pos == -1 ? 0 : 500;
     new Thread() {
       @Override
       public void run() {
-        Performance.sleep(sleep);
+        Performance.sleep(pos == -1 ? 0 : 500);
         if(thread == threadID) error(pos);
       }
     }.start();

@@ -407,7 +407,7 @@ public final class EditorView extends View {
     new Thread() {
       @Override
       public void run() {
-        Performance.sleep(200);
+        Performance.sleep(500);
         if(thread == threadID) {
           info.setToolTipText(null);
           info.setText(PLEASE_WAIT_D, Msg.SUCCESS);
