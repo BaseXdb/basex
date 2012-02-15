@@ -61,7 +61,6 @@ abstract class AQuery extends Command {
    */
   final boolean query(final String query) {
     final Performance p = new Performance();
-
     String err;
     String inf = "";
     if(qe != null) {
@@ -116,7 +115,8 @@ abstract class AQuery extends Command {
         // dump some query info
         if(prop.is(Prop.QUERYINFO)) evalInfo(query, hits, updates, runs);
         out.flush();
-        return info(NL + QUERY_EXECUTED_X, perf.getTime(runs));
+        final long time = pars + comp + eval + prnt;
+        return info(NL + QUERY_EXECUTED_X, Performance.getTime(time, runs));
       } catch(final QueryException ex) {
         Util.debug(ex);
         err = ex.getMessage();
