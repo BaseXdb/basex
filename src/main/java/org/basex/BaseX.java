@@ -1,7 +1,6 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
@@ -34,8 +33,6 @@ public class BaseX extends Main {
   private boolean writeProps;
   /** Operations to be executed. */
   private StringList ops;
-  /** Trailing newline. */
-  protected boolean newline;
 
   /**
    * Main method, launching the standalone mode.
@@ -68,8 +65,22 @@ public class BaseX extends Main {
         final String key = ops.get(i);
         final String val = ops.get(i + 1);
         if(key.equals("c")) {
-          // run database command
+          // run single command
           execute(val);
+        } else if(key.equals("C")) {
+          // run commands from script file
+          final IO io = IO.get(val);
+          if(!io.exists()) throw new BaseXException(FILE_NOT_FOUND_X, val);
+          final NewlineInput nli = new NewlineInput(io, null);
+          try {
+            for(String line; (line = nli.readLine()) != null;) {
+              final String l = line.trim();
+              // ignore empty lines and comments
+              if(!l.isEmpty() && !l.startsWith("#")) execute(l);
+            }
+          } finally {
+            nli.close();
+          }
         } else if(key.equals("f")) {
           // query file
           final IO io = IO.get(val);
@@ -88,7 +99,6 @@ public class BaseX extends Main {
           // run query
           execute(new XQuery(val), verbose);
         }
-        if(newline && eq(key, "f", "q")) out.write(token(NL));
       }
 
       if(console) {
@@ -138,6 +148,9 @@ public class BaseX extends Main {
         } else if(c == 'c') {
           // specify command to be evaluated
           ops.add("c").add(arg.string());
+        } else if(c == 'C') {
+          // specify command script to be evaluated
+          ops.add("C").add(arg.string());
         } else if(c == 'd') {
           // activate debug mode
           context.mprop.set(MainProp.DEBUG, true);

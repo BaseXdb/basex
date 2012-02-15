@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.basex.io.IO;
+import org.basex.util.*;
 
 /**
  * This class provides a convenient access to text input. System dependent
@@ -43,5 +44,19 @@ public final class NewlineInput extends TextInput {
     if(ch != '\r') return ch;
     if(super.read() != '\n') prev(1);
     return '\n';
+  }
+
+  /**
+   * Reads a single line.
+   * @return line
+   * @throws IOException I/O exception
+   */
+  public String readLine() throws IOException {
+    final TokenBuilder tb = new TokenBuilder();
+    for(int ch; (ch = read()) != -1;) {
+      if(ch == '\n') return tb.toString();
+      tb.add(ch);
+    }
+    return null;
   }
 }

@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 import org.basex.core.Commands.Cmd;
-import org.basex.core.cmd.Exit;
+import org.basex.core.cmd.*;
 import org.basex.query.QueryException;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -33,6 +33,8 @@ public abstract class Main {
   protected Session session;
   /** Verbose mode. */
   protected boolean verbose;
+  /** Trailing newline. */
+  protected boolean newline;
 
   /**
    * Constructor.
@@ -134,6 +136,7 @@ public abstract class Main {
 
     final Session ss = session();
     ss.execute(cmd);
+    if(newline && cmd instanceof XQuery) out.write(token(NL));
     if(info) Util.out(ss.info());
   }
 

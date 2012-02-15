@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Text;
+import org.basex.core.*;
 import org.basex.core.cmd.CreateDB;
 import org.junit.After;
 import org.junit.Test;
@@ -107,6 +105,16 @@ public abstract class BaseXTest extends MainTest {
   }
 
   /**
+   * Tests command scripts.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void commands() throws IOException {
+    IN.write(token("xquery 1" + Prop.NL + "xquery 2" + Prop.NL));
+    equals("12", "-C" + IN.path());
+  }
+
+  /**
    * Test query evaluation.
    * @throws IOException I/O exception
    */
@@ -140,6 +148,17 @@ public abstract class BaseXTest extends MainTest {
   @Test(expected = BaseXException.class)
   public void runErr() throws IOException {
     run("-rx", "-q2");
+  }
+
+  /**
+   * Test trailing newline.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void newline() throws IOException {
+    equals("1", "-q1");
+    equals("1" + Prop.NL, "-L", "-q1");
+    equals("1" + Prop.NL + "2" + Prop.NL, "-L", "-q1", "-q2");
   }
 
   /**

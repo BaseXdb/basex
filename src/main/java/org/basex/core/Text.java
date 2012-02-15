@@ -55,10 +55,11 @@ public interface Text {
   String LOCALMODE = "Standalone";
   /** Start information. */
   String LOCALINFO =
-    " [-bcdiLoqsuvVwxz] [file]" + NL +
+    " [-bcCdiLoqsuvVwxz] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
-    "  -c<cmd>     Execute database command(s)" + NL +
+    "  -c<cmds>    Execute database commands" + NL +
+    "  -C<file>    Execute commands from script" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
     "  -L          Add trailing newline after query result" + NL +
@@ -75,10 +76,11 @@ public interface Text {
   String CLIENTMODE = "Client";
   /** Client start information. */
   String CLIENTINFO =
-    " [-bcdiLnopPqsUvVwxz] [file]" + NL +
+    " [-bcCdiLnopPqsUvVwxz] [file]" + NL +
     "  [file]      Execute XQuery file" + NL +
     "  -b<pars>    Bind external XQuery variables" + NL +
-    "  -c<cmd>     Execute database command(s)" + NL +
+    "  -c<cmds>    Execute database commands" + NL +
+    "  -C<file>    Execute commands from script" + NL +
     "  -d          Activate debugging mode" + NL +
     "  -i<input>   Open initial file or database" + NL +
     "  -L          Add trailing newline after query result" + NL +
@@ -100,7 +102,7 @@ public interface Text {
   String SERVERINFO =
     " [-cdeipSz] [stop]" + NL +
     "  stop      Stop running server" + NL +
-    "  -c<cmd>   Execute initial database command(s)" + NL +
+    "  -c<cmds>  Execute initial database commands" + NL +
     "  -d        Activate debugging mode" + NL +
     "  -e<num>   Set event port" + NL +
     "  -i        Enter interactive mode" + NL +
