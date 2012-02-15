@@ -686,12 +686,12 @@ final class XMLScanner extends Progress {
         try {
           final IO file = input.io().merge(name);
           cont = file.read();
-          input = new TextInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           Util.debug(ex);
           // skip unknown DTDs/entities
           cont = new byte[] { '?' };
         }
+        input = new TextInput(new IOContent(cont, name));
 
         if(consume(XDECL)) {
           check(XML); s();
@@ -703,8 +703,8 @@ final class XMLScanner extends Progress {
           cont = Arrays.copyOfRange(cont, input.pos(), cont.length);
         }
 
+        s();
         if(r) {
-          s();
           extSubsetDecl();
           if(!consume((char) 0)) error(INVEND);
         }
