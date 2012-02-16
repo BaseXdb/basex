@@ -79,4 +79,18 @@ public final class FuncItemTest extends QueryPlanTest {
         "exists(//PartFunc)"
     );
   }
+
+  /**
+   * Checks if statically used functions are compiled at compile time.
+   * Added because of issue GH-382.
+   */
+  @Test
+  public void compStatUsedTest() {
+    check("declare function local:a() { local:b() };" +
+        "declare function local:b() { 42 };" +
+        "local:a#0()",
+        "42",
+        "exists(//FuncItem)"
+    );
+  }
 }

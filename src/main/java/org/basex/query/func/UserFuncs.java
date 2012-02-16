@@ -144,7 +144,7 @@ public final class UserFuncs extends ExprInfo {
     }
 
     // compile the function if it hasn't been done statically
-    if(f.fun instanceof UserFuncCall) {
+    if(dyn && f.fun instanceof UserFuncCall) {
       final UserFunc usf = ((UserFuncCall) f.fun).func();
       if(usf != null && usf.declared) usf.comp(ctx);
     }
