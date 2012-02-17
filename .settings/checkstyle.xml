@@ -27,6 +27,7 @@
     <module name="RedundantImport"/>
     <module name="LineLength">
       <property name="ignorePattern" value="^import"/>
+      <property name="max" value="90"/>
       <property name="tabWidth" value="2"/>
     </module>
     <module name="EmptyForIteratorPad"/>
