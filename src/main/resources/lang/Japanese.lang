@@ -330,6 +330,7 @@ undo                 = 元に戻す
 unknown_cmd_%        = 不明なコマンドです '%'。
 unknown_host         = '%' は不明なホスト名です。
 unknown_option_%     = '%' は不明なオプションです。
+unknown_parser_%     = Unknown parser '%'.
 unknown_user_%       = ユーザー '%' が見付かりません。
 unwatching_event_%   = イベント '%' は監視外です。
 up_to_date           = 最新

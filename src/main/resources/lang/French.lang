@@ -330,6 +330,7 @@ undo                 = Annuler
 unknown_cmd_%        = Commande '%' inconnue.
 unknown_host         = Serveur '%' inconnu.
 unknown_option_%     = Option '%' inconnue.
+unknown_parser_%     = Unknown parser '%'.
 unknown_user_%       = Utilisateur '%' inconnu.
 unwatching_event_%   = Evènement '%' non observé.
 up_to_date           = A jour

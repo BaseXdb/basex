@@ -330,6 +330,7 @@ undo                 = Herstel
 unknown_cmd_%        = Onbekend commando '%'.
 unknown_host         = Onbekende host '%'.
 unknown_option_%     = Onbekende optie '%'.
+unknown_parser_%     = Unknown parser '%'.
 unknown_user_%       = Gebruiker '%' is onbekend.
 unwatching_event_%   = Event '%' niet langer bekeken.
 up_to_date           = bijgewerkt

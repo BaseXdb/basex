@@ -331,6 +331,7 @@ undo                 = Үйлдэл буцаах
 unknown_cmd_%        = '%' тодорхойгүй комманд.
 unknown_host         = Тодорхойлогдоогүй '%' хост байна.
 unknown_option_%     = '%' тодорхойгүй тохиргоо.
+unknown_parser_%     = Unknown parser '%'.
 unknown_user_%       = Хэрэглэгч '%' тодорхойгүй.
 unwatching_event_%   = Үйл ажиллагаа(event) '%' хянагдаагүй.
 up_to_date           = Саяхан шинэчлэгдсэн, шинэ

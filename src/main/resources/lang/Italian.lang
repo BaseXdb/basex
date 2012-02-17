@@ -330,6 +330,7 @@ undo                 = Annulla
 unknown_cmd_%        = Comando sconosciuto: '%'.
 unknown_host         = Host sconosciuto '%'.
 unknown_option_%     = Opzione sconosciuta '%'.
+unknown_parser_%     = Unknown parser '%'.
 unknown_user_%       = L'utente '%' è sconosciuto.
 unwatching_event_%   = Evento '%' non osservato.
 up_to_date           = Aggiornato
