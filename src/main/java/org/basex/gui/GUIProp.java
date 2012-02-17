@@ -124,7 +124,7 @@ public final class GUIProp extends AProp {
 
   /** Path for creating new databases. */
   public static final Object[] CREATEPATH = { "CREATEPATH", Prop.HOME };
-  /** Path for creating new XML Documents. */
+  /** Path for creating new XML documents. */
   public static final Object[] SAVEPATH = { "SAVEPATH", Prop.HOME };
   /** Path for XQuery files. */
   public static final Object[] XQPATH = { "XQPATH", Prop.HOME };
