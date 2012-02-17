@@ -401,6 +401,7 @@ h_no_html_parser     = No HTML parser is available; input will be treated as ord
 h_open_file          = Ouvre un fichier texte.
 h_open_manage        = Administre les bases de données existantes.
 h_out_of_mem         = Voici quelques suggestions qui peuvent vous aider :\n- augmenter la mémoire maximum allouée à Java avec le paramètre -Xmx<size>\n- Choisir le parseur XML interne via la GUI ou via 'set intparse on'\n- Désactiver les index du texte et des attributs.
+h_parse_error        = The input may be correctly parsed after switching off the internal XML parser.
 h_paste              = Colle les noeuds précédemment copiés.
 h_path_index         = Définir un index des chemins accélère les résolutions de chemins.
 h_plot               = Afficher la visualisation par diagramme de dispersion.

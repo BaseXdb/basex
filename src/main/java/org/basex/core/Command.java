@@ -337,7 +337,7 @@ public abstract class Command extends Progress {
       if(ex instanceof OutOfMemoryError) {
         Util.debug(ex);
         return error(OUT_OF_MEM + ((flags & (User.CREATE | User.WRITE)) != 0 ?
-            HELP_OUT_OF_MEM : ""));
+            H_OUT_OF_MEM : ""));
       }
       return error(Util.bug(ex));
     } finally {

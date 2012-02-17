@@ -401,6 +401,7 @@ h_no_html_parser     = No HTML parser is available; input will be treated as ord
 h_open_file          = Opent een tekst bestand.
 h_open_manage        = Beheert bestaande databases.
 h_out_of_mem         = De volgende hints kunnen je helpen:\n- vergroot Java's heap size met de vlag -Xmx<size>\n- kies de interne XML parser in de GUI of via 'set intparse on'\n- deactiveer de text en attribute indexen.
+h_parse_error        = The input may be correctly parsed after switching off the internal XML parser.
 h_paste              = Plakt eerder gekopieerde nodes.
 h_path_index         = Een 'path summary' (pad-index) versnelt het vergelijken van paden.
 h_plot               = Toon de scatter-plot visualisatie.

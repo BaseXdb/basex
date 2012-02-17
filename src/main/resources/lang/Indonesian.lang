@@ -399,6 +399,7 @@ h_new_version        = Versi yang baru telah tersedia (% %)!\nApakah anda ingin 
 h_open_file          = Buka satu berkas yang ada.
 h_open_manage        = Kelola basis data yang ada.
 h_out_of_mem         = Petunjuk berikut mungkin dapat membantu anda:\n- naikkan ukuran heap Java dengan penanda -Xmx<size>\n- pilih pengurai XML internal dalam GUI atau melalui 'set intparse on'\n- matikan indeks teks dan indeks atribut.
+h_parse_error        = The input may be correctly parsed after switching off the internal XML parser.
 h_paste              = Tempel simpul yang telah disalin sebelumnya.
 h_path_index         = Ringkasan jejak mempercepat penemuan jejak.
 h_plot               = Tampilkan visualisai titik tersebar.

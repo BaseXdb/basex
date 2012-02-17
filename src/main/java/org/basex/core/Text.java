@@ -1234,7 +1234,9 @@ public interface Text {
   /** Memory help. */
   String H_USED_MEM = lang("h_used_mem");
   /** Out of memory error due to database creation. */
-  String HELP_OUT_OF_MEM = NL + lang("h_out_of_mem");
+  String H_OUT_OF_MEM = NL + lang("h_out_of_mem");
+  /** XML parsing error due to internal XML Parser. */
+  String H_PARSE_ERROR = NL + lang("h_parse_error");
 
   /** Help string. */
   String H_EXECUTE_QUERY = lang("h_execute_query");

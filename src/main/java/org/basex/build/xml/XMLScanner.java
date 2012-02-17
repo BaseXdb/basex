@@ -995,10 +995,10 @@ final class XMLScanner extends Progress {
    * @param e error message
    * @param a error arguments
    * @return build exception (indicates that an error is raised)
-   * @throws IOException I/O exception
+   * @throws BuildException build exception
    */
   private BuildException error(final String e, final Object... a)
-      throws IOException {
+      throws BuildException {
     throw new BuildException(det() + COLS + e, a);
   }
 

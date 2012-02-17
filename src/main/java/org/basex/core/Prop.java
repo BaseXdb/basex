@@ -72,8 +72,8 @@ public final class Prop extends AProp {
   public static final Object[] PARSER = { "PARSER", "xml" };
   /** Define parser options. */
   public static final Object[] PARSEROPT = { "PARSEROPT",
-    "flat=false,encoding=UTF-8,lines=true,format=verbose,header=false," +
-    "separator=comma" };
+    "encoding=UTF-8,flat=false,format=verbose,header=false,jsonml=false," +
+    "lines=true,separator=comma" };
 
   /** Flag for creating a path summary. */
   public static final Object[] PATHINDEX = { "PATHINDEX", true };

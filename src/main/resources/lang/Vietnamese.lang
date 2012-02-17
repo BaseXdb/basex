@@ -401,6 +401,7 @@ h_no_html_parser     = No HTML parser is available; input will be treated as ord
 h_open_file          = Mở tệp lệnh hỏi.
 h_open_manage        = Manages existing databases.
 h_out_of_mem         = - tăng kích cỡ Java's heap với cờ -Xmx<size>\n- chọn bộ phân tích nội bộ trong giao diện hoặc qua 'thiết đặt intparse '\n- tắt văn bản và thuộc tính indexes.
+h_parse_error        = The input may be correctly parsed after switching off the internal XML parser.
 h_paste              = Dán nút đã chép trước đây.
 h_path_index         = A path summary speeds up path resolutions.
 h_plot               = Hiển thị phác họa mảng phân tán.
