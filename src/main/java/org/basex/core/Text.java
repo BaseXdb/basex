@@ -835,6 +835,8 @@ public interface Text {
   /** Command info. */
   String DELETE = lang("delete");
   /** Command info. */
+  String INSTALL = lang("install");
+  /** Command info. */
   String OPEN_MANAGE = lang("open_manage");
   /** Command info. */
   String EDIT = lang("edit");
@@ -900,6 +902,8 @@ public interface Text {
   String SAVE = lang("save");
   /** Command info. */
   String SAVE_AS = lang("save_as");
+  /** Command info. */
+  String PACKAGES = lang("packages");
 
   /** Command info. */
   String FONTS_D = lang("fonts") + DOTS;
@@ -1012,6 +1016,8 @@ public interface Text {
   String PLAIN_TEXT = "Plain Text";
   /** ZIP file description. */
   String ZIP_ARCHIVES = "ZIP Archives";
+  /** XAR file description. */
+  String XML_ARCHIVES = "XML Archives";
   /** XQuery file extensions description. */
   String XQUERY_FILES = "XQuery Files";
 
@@ -1071,8 +1077,6 @@ public interface Text {
   /** Full-text index. */
   String FULLTEXT = lang("fulltext");
 
-  /** Dialog title for opening a database. */
-  String OPEN_DB = lang("open_db");
   /** Dialog asking if a new database should be be created. */
   String NEW_DB_QUESTION = lang("no_db_found") + NL + lang("new_db_question");
 
@@ -1117,6 +1121,8 @@ public interface Text {
   String ONLY_BACKUP = lang("only_backup");
   /** Dialog text for dropping a backup. */
   String DROP_BACKUPS_X = lang("drop_backups_%") + NL + ARE_YOU_SURE;
+  /** Dialog text for dropping a package. */
+  String DELETE_PACKAGES_X = lang("delete_packages_%") + NL + ARE_YOU_SURE;
   /** Dialog text for overwriting a backup. */
   String OVERWRITE_DB_QUESTION = OVERWRITE_DB + NL + ARE_YOU_SURE;
 
@@ -1269,6 +1275,8 @@ public interface Text {
   String H_DELETE = lang("h_delete");
   /** Command info. */
   String H_OPEN_MANAGE = lang("h_open_manage");
+  /** Command info. */
+  String H_PACKAGES = lang("h_packages");
 
   /** Command info. */
   String H_EDIT = lang("h_edit");

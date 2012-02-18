@@ -31,6 +31,8 @@ public abstract class IO {
   public static final String JSONSUFFIX = ".json";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
+  /** XAR file suffix. */
+  public static final String XARSUFFIX = ".xar";
   /** File prefix. */
   public static final String FILEPREF = "file:";
   /** Date format which is appended to backups. */
@@ -45,7 +47,7 @@ public abstract class IO {
     { XQSUFFIX, ".xqm", ".xqy", ".xql", ".xqu", ".xquery" };
   /** ZIP suffixes. */
   public static final String[] ZIPSUFFIXES =
-    { ZIPSUFFIX, GZSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };
+    { ZIPSUFFIX, GZSUFFIX, XARSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };
   /** XML suffixes. */
   public static final String[] XMLSUFFIXES =
     { XMLSUFFIX, ".xsd", ".xsl", ".xslt", ".svg", ".rdf", ".rss" };

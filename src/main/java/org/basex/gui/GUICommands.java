@@ -48,7 +48,7 @@ public enum GUICommands implements GUICommand {
   C_OPEN_MANAGE(OPEN_MANAGE + DOTS, "% O", H_OPEN_MANAGE, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogManage(gui, true).nodb()) {
+      if(new DialogManage(gui).nodb()) {
         if(Dialog.confirm(gui, NEW_DB_QUESTION)) C_CREATE.execute(gui);
       }
     }
@@ -366,6 +366,14 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
       b.setSelected(gui.gprop.is(GUIProp.SHOWINFO));
+    }
+  },
+
+  /** Repository manager. */
+  C_PACKAGES(PACKAGES + DOTS, null, H_PACKAGES, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      new DialogPackages(gui);
     }
   },
 
@@ -751,26 +759,26 @@ public enum GUICommands implements GUICommand {
 
   /** States if the command needs a data reference. */
   private final boolean data;
-  /** Menu entry. */
-  private final String entry;
+  /** Menu label. */
+  private final String label;
   /** Key shortcut. */
   private final String key;
   /** Help string. */
   private final String help;
-  /** Flag for commands that can be (un)checked. */
+  /** Displays a checkbox, indicating the current selection state. */
   private final boolean checked;
 
   /**
    * Constructor.
-   * @param e text of the menu item
+   * @param l label of the menu item
    * @param k key shortcut
    * @param h help string
-   * @param d data reference flag
-   * @param c checked flag
+   * @param d requires a database to be opened
+   * @param c displays a checkbox, indicating the current selection state
    */
-  GUICommands(final String e, final String k, final String h, final boolean d,
+  GUICommands(final String l, final String k, final String h, final boolean d,
       final boolean c) {
-    entry = e;
+    label = l;
     key = k;
     help = h;
     data = d;
@@ -789,7 +797,7 @@ public enum GUICommands implements GUICommand {
   public String help() { return help; }
 
   @Override
-  public String label() { return entry; }
+  public String label() { return label; }
 
   @Override
   public String key() { return key; }

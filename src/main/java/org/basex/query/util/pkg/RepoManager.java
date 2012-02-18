@@ -96,6 +96,7 @@ public final class RepoManager {
    */
   public void delete(final String pkg, final InputInfo ii)
       throws QueryException {
+
     boolean found = false;
     for(final byte[] nextPkg : repo.pkgDict()) {
       if(nextPkg == null) continue;

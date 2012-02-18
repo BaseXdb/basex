@@ -130,6 +130,8 @@ public final class GUIProp extends AProp {
   public static final Object[] XQPATH = { "XQPATH", Prop.HOME };
   /** Path for stopwords. */
   public static final Object[] STOPPATH = { "STOPPATH", Prop.HOME };
+  /** Package path. */
+  public static final Object[] PKGPATH = { "PKGPATH", Prop.HOME };
   /** Name of new database. */
   public static final Object[] CREATENAME = { "CREATENAME", "" };
 

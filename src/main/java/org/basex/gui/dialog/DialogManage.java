@@ -57,15 +57,14 @@ public final class DialogManage extends Dialog {
   /**
    * Default constructor.
    * @param main reference to the main window
-   * @param m show manage dialog
    */
-  public DialogManage(final GUI main, final boolean m) {
-    super(main, m ? MANAGE_DB : OPEN_DB);
+  public DialogManage(final GUI main) {
+    super(main, MANAGE_DB);
     panel.setLayout(new BorderLayout(8, 0));
 
     // create database chooser
     final StringList dbs = List.list(main.context, true);
-    choice = new BaseXList(dbs.toArray(), this, !m);
+    choice = new BaseXList(dbs.toArray(), this, false);
     choice.setSize(200, 500);
 
     doc1 = new BaseXLabel(" ").large();
