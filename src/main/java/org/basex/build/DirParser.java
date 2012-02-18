@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.basex.core.Prop;
 import org.basex.core.cmd.Store;
+import org.basex.data.*;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.IOFile;
@@ -34,13 +35,18 @@ public final class DirParser extends TargetParser {
   private final Prop prop;
   /** Initial file path. */
   private final String root;
+
   /** Parse archives in directories. */
   private final boolean archives;
   /** Skip corrupt files in directories. */
-  private final boolean skip;
-  /** Database path for storing binary files. */
-  protected IOFile binaries;
+  private final boolean skipCorrupt;
+  /** Add ignored files as raw files. */
+  private final boolean addRaw;
+  /** Raw parsing. */
+  private final boolean rawParser;
 
+  /** Database path for storing binary files. */
+  protected IOFile rawPath;
   /** Last source. */
   private IO lastSrc;
   /** Parser reference. */
@@ -72,14 +78,19 @@ public final class DirParser extends TargetParser {
     prop = pr;
     final String parent = source.dir();
     root = parent.endsWith("/") ? parent : parent + '/';
-    skip = prop.is(Prop.SKIPCORRUPT);
+    skipCorrupt = prop.is(Prop.SKIPCORRUPT);
     archives = prop.is(Prop.ADDARCHIVES);
+    addRaw = prop.is(Prop.ADDRAW);
+    rawParser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH).
+        equals(DataText.M_RAW);
+
     filter = !source.isDir() && !source.isArchive() ? null :
       Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
-    binaries = path != null && prop.is(Prop.ADDRAW) ?
+    // choose binary storage if (disk-based) database path is known and
+    // if raw parser or "add raw" option were chosen
+    rawPath = path != null && (addRaw || rawParser) ?
         new IOFile(path, M_RAW) : null;
   }
-
 
   @Override
   public void parse(final Builder build) throws IOException {
@@ -101,56 +112,73 @@ public final class DirParser extends TargetParser {
     } else {
       src = io;
 
+      // loop through all (potentially zipped) files
       while(io.more(archives)) {
         b.checkStop();
 
-        String nm = io.name();
-        if(Prop.WIN) nm = nm.toLowerCase(Locale.ENGLISH);
-
-        final long l = src.length();
+        // add file size for database meta information
+        final long l = io.length();
         if(l != -1) b.meta.filesize += l;
 
-        // use global target as prefix
+        // use global target as path prefix
         String targ = trg;
-        final String name = src.name();
-        String path = src.path();
+        String path = io.path();
 
         // add relative path without root (prefix) and file name (suffix)
+        final String name = io.name();
         if(path.endsWith('/' + name)) {
           path = path.substring(0, path.length() - name.length());
           if(path.startsWith(root)) path = path.substring(root.length());
           targ = (targ + path).replace("//", "/");
         }
 
-        if(filter != null && !filter.matcher(nm).matches()) {
-          // store binary files
-          if(binaries != null) {
-            Store.store(src.inputSource(), new IOFile(binaries, targ + name));
+        // check if file passes the name filter pattern
+        boolean exclude = false;
+        if(filter != null) {
+          String nm = io.name();
+          if(Prop.WIN) nm = name.toLowerCase(Locale.ENGLISH);
+          exclude = !filter.matcher(nm).matches();
+        }
+
+        if(exclude) {
+          // exclude file: check if will be added as raw file
+          if(addRaw && rawPath != null) {
+            Store.store(io.inputSource(), new IOFile(rawPath, targ + name));
           }
         } else {
-          boolean ok = true;
-          IO in = io;
-          if(skip) {
-            // parse file twice to ensure that it is well-formed
-            try {
-              // cache file contents to allow or speed up a second run
-              in = new IOContent(io.read());
-              in.name(io.name());
-              parser = Parser.fileParser(in, prop, targ);
-              MemBuilder.build("", parser, prop);
-            } catch(final IOException ex) {
-              Util.debug(ex.getMessage());
-              skipped.add(io.path());
-              ok = false;
+          if(rawParser) {
+            // store input in raw format if database path is known
+            if(rawPath != null) {
+              Store.store(io.inputSource(), new IOFile(rawPath, targ + name));
             }
-          }
+          } else {
+            // store input as XML
+            boolean ok = true;
+            IO in = io;
+            if(skipCorrupt) {
+              // parse file twice to ensure that it is well-formed
+              try {
+                // cache file contents to allow or speed up a second run
+                in = new IOContent(io.read());
+                in.name(io.name());
+                parser = Parser.fileParser(in, prop, targ);
+                MemBuilder.build("", parser, prop);
+              } catch(final IOException ex) {
+                Util.debug(ex.getMessage());
+                skipped.add(io.path());
+                ok = false;
+              }
+            }
 
-          if(ok) {
-            parser = Parser.fileParser(in, prop, targ);
-            parser.parse(b);
+            // parse file
+            if(ok) {
+              parser = Parser.fileParser(in, prop, targ);
+              parser.parse(b);
+            }
+            parser = null;
+            // dump debug data
+            if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
           }
-          parser = null;
-          if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
         }
       }
     }

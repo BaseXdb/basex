@@ -1,5 +1,6 @@
 package org.basex.build;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.Locale;
 import org.basex.build.file.*;
@@ -129,6 +130,8 @@ public abstract class Parser extends Progress {
       return new JSONParser(source, target, prop);
     if(parser.equals(DataText.M_CSV))
       return new CSVParser(source, target, prop);
-    return xmlParser(source, prop, target);
+    if(parser.equals(DataText.M_XML))
+      return xmlParser(source, prop, target);
+    throw new BuildException(UNKNOWN_PARSER_X, parser);
   }
 }

@@ -24,6 +24,8 @@ import org.basex.io.*;
 final class DialogParsing extends BaseXBack {
   /** Format label. */
   private final BaseXLabel label;
+  /** Tabulators. */
+  private final BaseXTabs tabs;
 
   /** Internal XML parsing. */
   private final BaseXCheckBox intparse;
@@ -81,10 +83,12 @@ final class DialogParsing extends BaseXBack {
   /**
    * Default constructor.
    * @param d dialog reference
+   * @param t tabs
    */
-  public DialogParsing(final Dialog d) {
+  public DialogParsing(final Dialog d, final BaseXTabs t) {
     main = new BaseXBack(new TableLayout(2, 1)).border(8);
     gui = d.gui;
+    tabs = t;
 
     label = new BaseXLabel(" ").border(0, 0, 12, 0).large();
 
@@ -231,8 +235,9 @@ final class DialogParsing extends BaseXBack {
 
     main.removeAll();
     main.add(label);
-    main.add(parseropts);
+    if(parseropts != null) main.add(parseropts);
     main.revalidate();
+    tabs.setEnabledAt(1, !type.equals(DataText.M_RAW));
   }
 
   /**

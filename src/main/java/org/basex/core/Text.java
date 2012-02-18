@@ -711,11 +711,13 @@ public interface Text {
 
   // GENERAL COMMANDS =========================================================
 
-  /** Invalid key. */
+  /** "Unknown option '%'". */
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
   /** Unknown command error. */
   String UNKNOWN_OPT_SIMILAR_X = lang("unknown_option_%") + ' ' +
       lang("similar_cmd_%");
+  /** "Unknown parser '%'". */
+  String UNKNOWN_PARSER_X = lang("unknown_parser_%");
   /** Invalid value. */
   String INVALID_VALUE_X_X = lang("invalid_value_%_%");
 
@@ -1006,8 +1008,6 @@ public interface Text {
   String PLAIN_TEXT = "Plain Text";
   /** ZIP file description. */
   String ZIP_ARCHIVES = "ZIP Archives";
-  /** GZ file description. */
-  String GZIP_ARCHIVES = "GZIP Archives";
   /** XQuery file extensions description. */
   String XQUERY_FILES = "XQuery Files";
 

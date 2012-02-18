@@ -61,8 +61,26 @@ public final class DialogProps extends Dialog {
     // resource tree
     resources = new DialogResources(this);
 
-    // tab: database info
+    // tab: resources
+    add = new DialogAdd(this);
+    ft = new DialogFT(this, false);
+    final BaseXBack tabRes = add.border(8);
+
     final Data data = gui.context.data();
+    for(int i = 0; i < LABELS.length; ++i) {
+      String lbl = LABELS[i];
+      if(!data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ')';
+      labels[i] = new BaseXLabel(lbl).large();
+      panels[i] = new BaseXBack(new BorderLayout(0, 4));
+      infos[i] = new BaseXEditor(false, this);
+      BaseXLayout.setHeight(infos[i], 200);
+      if(i >= 2) {
+        indxs[i] = new BaseXButton("", this);
+        indxs[i].setEnabled(data instanceof DiskData);
+      }
+    }
+
+    // tab: database info
     final BaseXBack tabInfo = new BaseXBack(new BorderLayout(0, 8)).border(8);
     final Font f = tabInfo.getFont();
     final BaseXLabel doc = new BaseXLabel(data.meta.name).border(
@@ -79,24 +97,6 @@ public final class DialogProps extends Dialog {
     final BaseXEditor text = text(info.finish());
     text.setFont(f);
     tabInfo.add(text, BorderLayout.CENTER);
-
-    // tab: resources
-    add = new DialogAdd(this);
-    ft = new DialogFT(this, false);
-    final BaseXBack tabRes = add.border(8);
-
-    for(int i = 0; i < LABELS.length; ++i) {
-      String lbl = LABELS[i];
-      if(!data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ')';
-      labels[i] = new BaseXLabel(lbl).large();
-      panels[i] = new BaseXBack(new BorderLayout(0, 4));
-      infos[i] = new BaseXEditor(false, this);
-      BaseXLayout.setHeight(infos[i], 200);
-      if(i >= 2) {
-        indxs[i] = new BaseXButton("", this);
-        indxs[i].setEnabled(data instanceof DiskData);
-      }
-    }
 
     // tab: name indexes
     final BaseXBack tabNames =
@@ -119,8 +119,8 @@ public final class DialogProps extends Dialog {
     add(5, tabFT, null);
 
     final BaseXTabs tabs = new BaseXTabs(this);
-    tabs.addTab(GENERAL, tabInfo);
     tabs.addTab(RESOURCES, tabRes);
+    tabs.addTab(INFORMATION, tabInfo);
     tabs.addTab(NAMES, tabNames);
     tabs.addTab(PATH_INDEX, tabPath);
     tabs.addTab(INDEXES, tabValues);

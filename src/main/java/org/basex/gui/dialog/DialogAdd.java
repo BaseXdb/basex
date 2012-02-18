@@ -47,14 +47,14 @@ class DialogAdd extends BaseXBack {
     target.addKeyListener(d.keys);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
-    pnl.add(new BaseXLabel(TARGET_PATH + COLS, true, true).border(12, 0, 6, 0));
+    pnl.add(new BaseXLabel(TARGET_PATH + COLS, true, true).border(8, 0, 6, 0));
     pnl.add(target);
 
     // option panels
-    final DialogParsing parsing = new DialogParsing(d);
+    final BaseXTabs tabs = new BaseXTabs(d);
+    final DialogParsing parsing = new DialogParsing(d, tabs);
     general = new DialogImport(d, pnl, parsing);
 
-    final BaseXTabs tabs = new BaseXTabs(d);
     tabs.addTab(GENERAL, general);
     tabs.addTab(PARSING, parsing);
     add(tabs, BorderLayout.NORTH);
@@ -69,6 +69,8 @@ class DialogAdd extends BaseXBack {
     final BaseXBack btn = new BaseXBack(Fill.NONE).layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
     add(btn, BorderLayout.EAST);
+
+    action(general.parser);
   }
 
   /**
@@ -92,7 +94,7 @@ class DialogAdd extends BaseXBack {
     } else if (comp == optimize) {
       DialogProgress.execute(dialog, "", new Optimize());
 
-    } else if (comp == general.browse) {
+    } else if (comp == general.browse || comp == general.input) {
       target.setText(general.dbname);
 
     } else {

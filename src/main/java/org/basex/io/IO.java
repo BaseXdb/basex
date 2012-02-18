@@ -27,8 +27,6 @@ public abstract class IO {
   public static final String ZIPSUFFIX = ".zip";
   /** CSV file suffix. */
   public static final String CSVSUFFIX = ".csv";
-  /** Text file suffix. */
-  public static final String TXTSUFFIX = ".txt";
   /** JSON file suffix. */
   public static final String JSONSUFFIX = ".json";
   /** GZIP file suffix. */
@@ -44,16 +42,19 @@ public abstract class IO {
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
-    { XQSUFFIX, ".xqm", ".xqy", ".xql", ".xquery" };
+    { XQSUFFIX, ".xqm", ".xqy", ".xql", ".xqu", ".xquery" };
   /** ZIP suffixes. */
   public static final String[] ZIPSUFFIXES =
-    { ZIPSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods", ".gz" };
+    { ZIPSUFFIX, GZSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };
   /** XML suffixes. */
-  static final String[] XMLSUFFIXES =
-    { XMLSUFFIX, ".xsl", ".xslt" };
+  public static final String[] XMLSUFFIXES =
+    { XMLSUFFIX, ".xsd", ".xsl", ".xslt", ".svg", ".rdf", ".rss" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
+  /** Text suffixes. */
+  public static final String[] TXTSUFFIXES = {
+    ".txt", ".text", ".ini", ".conf" };
 
   /** Disk block/page size (default: 4096). */
   public static final int BLOCKSIZE = 1 << 12;

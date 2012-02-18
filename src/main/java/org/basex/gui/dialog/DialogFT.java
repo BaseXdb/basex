@@ -1,27 +1,18 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.border.*;
+import java.awt.event.*;
 
-import org.basex.core.Prop;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXFileChooser;
+import javax.swing.*;
+
+import org.basex.core.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.io.IO;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.Language;
-import org.basex.util.list.StringList;
+import org.basex.io.*;
+import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * Full-text creation dialog.
@@ -69,7 +60,7 @@ final class DialogFT extends BaseXBack {
    */
   DialogFT(final Dialog d, final boolean create) {
     dialog = d;
-    layout(new TableLayout(create ? 9 : 16, 1));
+    layout(new TableLayout(create ? 10 : 17, 1));
 
     final Prop prop = d.gui.context.prop;
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 12, 0));
@@ -120,7 +111,7 @@ final class DialogFT extends BaseXBack {
     if(!create) add(labels[F_SCORE]);
 
     add(check[F_STOP]);
-    check[F_STOP].setBorder(new EmptyBorder(0, 0, 4, 0));
+    add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
     swpath = new BaseXTextField(sw.isEmpty() ?
         d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);

@@ -26,7 +26,7 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public final class DialogNew extends Dialog {
-  /** Buttons. */
+  /** General dialog. */
   private final DialogImport general;
   /** Database name. */
   private final BaseXTextField target;
@@ -64,11 +64,12 @@ public final class DialogNew extends Dialog {
     target.addKeyListener(keys);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
-    pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(12, 0, 6, 0));
+    pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
     pnl.add(target);
 
     // option panels
-    final DialogParsing parsing = new DialogParsing(this);
+    final BaseXTabs tabs = new BaseXTabs(this);
+    final DialogParsing parsing = new DialogParsing(this, tabs);
     general = new DialogImport(this, pnl, parsing);
 
     // index panel
@@ -102,7 +103,6 @@ public final class DialogNew extends Dialog {
     ft = new DialogFT(this, true);
     fulltext.add(ft);
 
-    final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERAL, general);
     tabs.addTab(PARSING, parsing);
     tabs.addTab(INDEXES, indexes);
@@ -111,17 +111,18 @@ public final class DialogNew extends Dialog {
 
     set(buttons, BorderLayout.SOUTH);
 
-    action(null);
+    action(general.parser);
     finish(null);
   }
 
   @Override
-  public void action(final Object cmp) {
-    final boolean valid = general.action(cmp, true);
+  public void action(final Object comp) {
+    final boolean valid = general.action(comp, true);
     ft.action();
 
     // ...must be located before remaining checks
-    if(cmp == general.browse) target.setText(general.dbname);
+    if(comp == general.browse || comp == general.input)
+      target.setText(general.dbname);
 
     final String nm = target.getText().trim();
     ok = valid && !nm.isEmpty();
