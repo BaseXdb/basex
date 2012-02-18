@@ -2,15 +2,10 @@ package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 
-import java.awt.Window;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.JTextField;
+import javax.swing.*;
 
 import org.basex.gui.layout.BaseXLayout.DropHandler;
 
@@ -57,13 +52,6 @@ public class BaseXTextField extends JTextField {
       }
     });
 
-    addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseEntered(final MouseEvent e) {
-        BaseXLayout.focus(e.getComponent());
-      }
-    });
-
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
@@ -72,6 +60,7 @@ public class BaseXTextField extends JTextField {
           setText(last);
           last = t;
         }
+        // check search area
         if(area == null) return;
         final String text = getText();
         final boolean enter = ENTER.is(e);
@@ -82,6 +71,7 @@ public class BaseXTextField extends JTextField {
           area.find(text, FINDPREV.is(e) || FINDPREV2.is(e) || e.isShiftDown());
         }
       }
+
       @Override
       public void keyReleased(final KeyEvent e) {
         if(area == null) return;

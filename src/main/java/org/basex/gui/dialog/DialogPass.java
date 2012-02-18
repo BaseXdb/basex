@@ -1,16 +1,13 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.BorderLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import org.basex.gui.GUI;
+
+import java.awt.*;
+
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXPassword;
-import org.basex.util.Util;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * Open database dialog.
@@ -41,12 +38,6 @@ public final class DialogPass extends Dialog {
     super(main, ALTER_PW);
 
     pass = new BaseXPassword(this);
-    pass.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);
-      }
-    });
     info = new BaseXLabel(" ");
 
     final BaseXBack p = new BaseXBack(new BorderLayout(0, 8));

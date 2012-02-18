@@ -1,28 +1,23 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Locale;
-import java.util.SortedMap;
-import org.basex.core.Prop;
-import org.basex.gui.GUI;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.nio.charset.*;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXFileChooser;
+import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.io.IOFile;
-import org.basex.io.serial.SerializerProp;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.util.*;
 
 /**
  * Dialog window for changing some project's preferences.
@@ -37,12 +32,14 @@ public final class DialogExport extends Dialog {
   private final BaseXTextField path;
   /** Database info. */
   private final BaseXLabel info;
-  /** XML formatting. */
-  private final BaseXCheckBox format;
+  /** Serialization method. */
+  private final BaseXCombo method;
   /** Encoding. */
   private final BaseXCombo encoding;
   /** Buttons. */
   private final BaseXBack buttons;
+  /** Parameters. */
+  private final BaseXTextField params;
 
   // initialize encodings
   static {
@@ -58,39 +55,43 @@ public final class DialogExport extends Dialog {
     super(main, EXPORT_XML);
 
     // create checkboxes
-    final BaseXBack pp = new BaseXBack(new TableLayout(3, 1, 0, 4));
+    final BaseXBack p = new BaseXBack(new TableLayout(4, 1, 0, 0));
+    p.add(new BaseXLabel(OUTPUT_DIR + COL, true, true).border(0, 0, 6, 0));
 
-    BaseXBack p = new BaseXBack(new TableLayout(2, 2, 8, 0));
-    /* Output label. */
-    final BaseXLabel out = new BaseXLabel(
-        OUTPUT_DIR + COL, true, true).border(0, 0, 6, 0);
-    p.add(out);
-    p.add(new BaseXLabel());
+    // output label
+    BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
     final String dir = new IOFile(gui.context.data().meta.original).dir();
     path = new BaseXTextField(dir, this);
     path.addKeyListener(keys);
-    p.add(path);
+    pp.add(path);
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);
     browse.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
-    p.add(browse);
-    pp.add(p);
+    pp.add(browse);
+    p.add(pp);
 
-    p = new BaseXBack(new TableLayout(2, 1));
-    p.add(new BaseXLabel(ENCODING + COL, true, true).border(0, 0, 6, 0));
-
+    // encoding
     final Prop prop = gui.context.prop;
+    final String exporter = prop.get(Prop.EXPORTER);
     SerializerProp sp;
     try {
-      sp = new SerializerProp(prop.get(Prop.EXPORTER));
+      sp = new SerializerProp(exporter);
     } catch(final IOException ex) {
       // ignore invalid serialization parameters
       sp = new SerializerProp();
     }
+
+    // encoding and method
+    final String[] methods = new String[DataText.METHODS.length - 1];
+    for(int m = 0; m < methods.length; m++) {
+      methods[m] = DataText.METHODS[m].toUpperCase(Locale.ENGLISH);
+    }
+    method = new BaseXCombo(this, methods);
+    method.setSelectedItem(sp.get(SerializerProp.S_METHOD).toUpperCase(Locale.ENGLISH));
 
     encoding = new BaseXCombo(this, ENCODINGS);
     String enc = gui.context.data().meta.encoding;
@@ -101,33 +102,39 @@ public final class DialogExport extends Dialog {
       for(final String s : ENCODINGS) f |= s.equals(enc);
     }
     encoding.setSelectedItem(f ? enc : sp.get(SerializerProp.S_ENCODING));
-    encoding.addKeyListener(keys);
-    BaseXLayout.setWidth(encoding, BaseXTextField.DWIDTH);
-    p.add(encoding);
-    pp.add(p);
 
-    format = new BaseXCheckBox(INDENT_WITH_WS,
-        sp.get(SerializerProp.S_INDENT).equals(YES), 0, this);
-    pp.add(format);
-    set(pp, BorderLayout.CENTER);
+    params = new BaseXTextField(exporter, this);
+    params.addKeyListener(keys);
 
-    // create buttons
-    p = new BaseXBack(new BorderLayout());
-    info = new BaseXLabel(" ").border(18, 0, 0, 0);
-    p.add(info, BorderLayout.WEST);
+    pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
+    pp.add(new BaseXLabel(METHOD + COL, true, true));
+    pp.add(method);
+    pp.add(new BaseXLabel(ENCODING + COL, true, true));
+    pp.add(encoding);
+    pp.add(new BaseXLabel(PARAMETERS + COL, true, true));
+    pp.add(params);
+    p.add(pp);
+    info = new BaseXLabel(" ").border(8, 0, 0, 0);
+    p.add(info);
+
+    // indentation
+    set(p, BorderLayout.CENTER);
+
+    // buttons
+    pp = new BaseXBack(new BorderLayout());
     buttons = okCancel();
-    p.add(buttons, BorderLayout.EAST);
-    set(p, BorderLayout.SOUTH);
+    pp.add(buttons, BorderLayout.EAST);
+    set(pp, BorderLayout.SOUTH);
 
-    action(null);
+    action(method);
     finish(null);
   }
 
   /**
-   * Creates an encoding combo box.
+   * Creates an encoding combo box and selects the specified encoding.
    * @param dialog dialog reference
    * @param encoding original encoding
-   * @return encoding combo box
+   * @return combo box
    */
   static BaseXCombo encoding(final Dialog dialog, final String encoding) {
     final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
@@ -139,7 +146,6 @@ public final class DialogExport extends Dialog {
       for(final String s : ENCODINGS) f |= s.equals(enc);
     }
     cb.setSelectedItem(enc);
-    cb.addKeyListener(dialog.keys);
     return cb;
   }
 
@@ -161,22 +167,58 @@ public final class DialogExport extends Dialog {
   }
 
   @Override
-  public void action(final Object cmp) {
+  public void action(final Object comp) {
+    if(comp == method || comp == encoding) {
+      final StringBuilder sb = new StringBuilder();
+      // add method
+      final String meth = method.getSelectedItem().toString().toLowerCase(Locale.ENGLISH);
+      final boolean noxml = Token.eq(meth, DataText.M_XML, DataText.M_XHTML);
+      add(sb, SerializerProp.S_METHOD, meth);
+      // add encoding
+      if(add(sb, SerializerProp.S_ENCODING, encoding.getSelectedItem()) && noxml) {
+        // add omit-xml-declaration if encoding was set and if method is not X(HT)ML
+        sb.append(',');
+        sb.append(SerializerProp.S_OMIT_XML_DECLARATION[0]).append('=').append(NO);
+      }
+      params.setText(sb.toString());
+    }
+
     final IOFile io = new IOFile(path());
+    String inf = io.isDir() && io.children().length > 0 ? DIR_NOT_EMPTY : null;
     ok = !path().isEmpty();
-    info.setText(io.children().length > 0 ? DIR_NOT_EMPTY
-        : null, ok ? Msg.WARN : Msg.ERROR);
+
+    if(ok && comp == params) {
+      // validate serialization parameters
+      try {
+        Serializer.get(new ArrayOutput(), new SerializerProp(params.getText()));
+      } catch(final IOException ex) {
+        ok = false;
+        inf = ex.getLocalizedMessage();
+      }
+    }
+
+    info.setText(inf, ok ? Msg.WARN : Msg.ERROR);
     enableOK(buttons, B_OK, ok);
+  }
+
+  /**
+   * Adds a non-standard serialization parameter.
+   * @param sb string builder
+   * @param key key
+   * @param val value
+   * @return {@code true} if parameter was added
+   */
+  private boolean add(final StringBuilder sb, final Object[] key, final Object val) {
+    if(Serializer.PROPS.get(key).equals(val)) return false;
+    if(sb.length() != 0) sb.append(',');
+    sb.append(key[0]).append('=').append(val);
+    return true;
   }
 
   @Override
   public void close() {
     if(!ok) return;
     super.close();
-    final boolean indent = format.isSelected();
-    gui.set(Prop.EXPORTER,
-        SerializerProp.S_INDENT[0] + "=" + (indent ? YES : NO) + ',' +
-        SerializerProp.S_ENCODING[0] + '=' + encoding.getSelectedItem() + ',' +
-        SerializerProp.S_OMIT_XML_DECLARATION[0] + '=' + NO);
+    gui.set(Prop.EXPORTER, params.getText());
   }
 }

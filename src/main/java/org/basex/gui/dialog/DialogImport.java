@@ -75,10 +75,11 @@ public final class DialogImport extends BaseXBack {
 
     final String in = gui.gprop.get(GUIProp.CREATEPATH);
     input = new BaseXTextField(gui.gprop.get(GUIProp.CREATEPATH), dial);
+    input.addKeyListener(dial.keys);
+
     final IO io = IO.get(in);
     if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
 
-    input.addKeyListener(dial.keys);
     browse = new BaseXButton(BROWSE_D, dial);
     browse.addActionListener(new ActionListener() {
       @Override
@@ -96,6 +97,7 @@ public final class DialogImport extends BaseXBack {
     final Prop prop = gui.context.prop;
     final StringList parsers = new StringList(PARSING.length);
     for(final String p : PARSING) parsers.add(p.toUpperCase(Locale.ENGLISH));
+
     parser = new BaseXCombo(dial, parsers.toArray());
     parser.setSelectedItem(prop.get(Prop.PARSER).toUpperCase(Locale.ENGLISH));
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), dial);

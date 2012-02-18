@@ -76,8 +76,6 @@ public final class DialogNew extends Dialog {
     final BaseXBack indexes =
         new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
 
-    //indexes.add(new BaseXLabel(INDEXES).border(0, 0, 16, 0).large());
-
     pathindex = new BaseXCheckBox(PATH_INDEX,
         prop.is(Prop.PATHINDEX), 0, this).large();;
     indexes.add(pathindex);

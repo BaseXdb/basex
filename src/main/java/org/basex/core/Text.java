@@ -750,6 +750,10 @@ public interface Text {
   String INPUT_SIZE = lang("input_size");
   /** "Encoding". */
   String ENCODING = lang("encoding");
+  /** "Method". */
+  String METHOD = lang("method");
+  /** "Parameters". */
+  String PARAMETERS = lang("parameters");
 
   /** Info on whitespace chopping. */
   String WS_CHOPPING = lang("ws_chopping");

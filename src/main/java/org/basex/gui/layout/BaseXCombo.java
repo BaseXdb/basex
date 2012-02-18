@@ -1,9 +1,10 @@
 package org.basex.gui.layout;
 
-import java.awt.Window;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import javax.swing.JComboBox;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+
 import org.basex.gui.dialog.Dialog;
 
 /**

@@ -24,7 +24,7 @@ import java.io.OutputStream;
  */
 public abstract class Serializer {
   /** Default serialization parameters. */
-  protected static final SerializerProp PROPS = new SerializerProp();
+  public static final SerializerProp PROPS = new SerializerProp();
   /** Stack of opened tags. */
   protected final TokenList tags = new TokenList();
   /** Current level. */
@@ -62,8 +62,7 @@ public abstract class Serializer {
       final SerializerProp props) throws IOException {
 
     if(props == null) return get(os);
-    final String m = props.check(S_METHOD,
-        M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_RAW);
+    final String m = props.check(S_METHOD, METHODS);
     if(M_XHTML.equals(m))  return new XHTMLSerializer(os, props);
     if(M_HTML.equals(m))   return new HTMLSerializer(os, props);
     if(M_TEXT.equals(m))   return new TextSerializer(os, props);
