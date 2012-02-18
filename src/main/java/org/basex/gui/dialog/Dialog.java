@@ -1,23 +1,19 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import static org.basex.gui.layout.BaseXKeys.ENTER;
-import static org.basex.gui.layout.BaseXKeys.modifier;
-import org.basex.gui.layout.TableLayout;
-import org.basex.util.Util;
+import static org.basex.gui.layout.BaseXKeys.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.net.*;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.net.URI;
+
+import org.basex.gui.*;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIConstants.Msg;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * This class provides the architecture for consistent dialog windows.
@@ -41,7 +37,8 @@ public abstract class Dialog extends JDialog {
   final KeyAdapter keys = new KeyAdapter() {
     @Override
     public void keyReleased(final KeyEvent e) {
-      if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);
+      // don't trigger any action for modifier keys
+      if(!modifier(e)) action(e.getSource());
     }
   };
 
