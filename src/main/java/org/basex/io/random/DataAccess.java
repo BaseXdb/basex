@@ -251,14 +251,6 @@ public final class DataAccess {
   }
 
   /**
-   * Writes a byte to the current position.
-   * @param v value to be written
-   */
-  void write1(final int v) {
-    write(v);
-  }
-
-  /**
    * Writes a 5-byte value to the specified position.
    * @param p position in the file
    * @param v value to be written
@@ -337,10 +329,36 @@ public final class DataAccess {
   }
 
   /**
+   * Write a token to the file.
+   * @param buf buffer containing the token
+   * @param offset offset in the buffer where the token starts
+   * @param length token length
+   */
+  public void writeToken(final byte[] buf, final int offset, final int length) {
+    writeNum(length);
+
+    final int last = offset + length;
+    int o = offset;
+
+    while(o < last) {
+      final Buffer bf = buffer(off == IO.BLOCKSIZE);
+      final int l = Math.min(last - o, IO.BLOCKSIZE - off);
+      System.arraycopy(buf, o, bf.data, off, l);
+      bf.dirty = true;
+      off += l;
+      o += l;
+    }
+
+    // adjust file size if needed
+    final long nl = bm.current().pos + off;
+    if(nl > len) length(nl);
+  }
+
+  /**
    * Appends a value to the file and return it's offset.
    * @param v number to be appended
    */
-  void writeNum(final int v) {
+  private void writeNum(final int v) {
     if(v < 0 || v > 0x3FFFFFFF) {
       write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
     } else if(v > 0x3FFF) {
@@ -387,7 +405,7 @@ public final class DataAccess {
         cursor(pos + size);
       }
       // fill gap with 0xFF for future updates
-      while(t++ < os) write1(0xFF);
+      while(t++ < os) write(0xFF);
     }
     return o;
   }
