@@ -101,7 +101,7 @@ public final class DiskBuilder extends Builder {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-    DropDB.drop(meta.name, mprop);
+    if(meta != null) DropDB.drop(meta.name, mprop);
   }
 
   @Override
