@@ -95,10 +95,9 @@ public final class DialogImport extends BaseXBack {
 
     final Prop prop = gui.context.prop;
     final StringList parsers = new StringList(PARSING.length);
-    final String type = prop.get(Prop.PARSER);
     for(final String p : PARSING) parsers.add(p.toUpperCase(Locale.ENGLISH));
     parser = new BaseXCombo(dial, parsers.toArray());
-    parser.setSelectedItem(type.toUpperCase(Locale.ENGLISH));
+    parser.setSelectedItem(prop.get(Prop.PARSER).toUpperCase(Locale.ENGLISH));
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), dial);
     BaseXLayout.setWidth(filter, 200);
 
@@ -169,13 +168,13 @@ public final class DialogImport extends BaseXBack {
       if(dir) filter.setText(r ? "*" : "*." + type);
     }
 
-    if(comp == input) setType(in);
-
-    info.setText(null, null);
     final boolean ok = empty ? in.isEmpty() || io.exists() :
       !in.isEmpty() && io.exists();
 
-    filter.setEnabled(dir && ok);
+    if(comp == input) setType(in, ok);
+
+    info.setText(null, null);
+    filter.setEnabled(dir);
     addRaw.setEnabled(dir && !r && !gui.context.prop.is(Prop.MAINMEM));
     skipCorrupt.setEnabled(!r);
     archives.setEnabled(dir || io.isArchive());
@@ -204,17 +203,19 @@ public final class DialogImport extends BaseXBack {
     final IOFile in = inputFile();
     if(in == null) return;
     input.setText(in.path());
-    setType(in.path());
+    setType(in.path(), true);
   }
 
   /**
    * Chooses the correct input type.
    * @param in input
+   * @param ok ok flag
    */
-  void setType(final String in) {
+  void setType(final String in, final boolean ok) {
     // get file path, update input path and database name
     final IO io = IO.get(in);
     if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
+    if(!ok) return;
 
     final boolean dir = io.isDir();
     final boolean archive = io.isArchive();

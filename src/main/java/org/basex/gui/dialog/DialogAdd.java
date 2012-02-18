@@ -94,11 +94,11 @@ class DialogAdd extends BaseXBack {
     } else if (comp == optimize) {
       DialogProgress.execute(dialog, "", new Optimize());
 
-    } else if (comp == general.browse || comp == general.input) {
-      target.setText(general.dbname);
-
     } else {
       boolean ok = general.action(comp, false);
+      if(comp == general.browse || comp == general.input)
+        target.setText(general.dbname);
+
       String inf = !ok ? FILE_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
       final Msg icon = Msg.ERROR;
       if(ok) {
