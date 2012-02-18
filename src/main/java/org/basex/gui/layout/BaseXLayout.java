@@ -48,7 +48,8 @@ public final class BaseXLayout {
   static void focus(final Component cont) {
     final GUI gui = gui(cont);
     if(gui == null) return;
-    if(gui.gprop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
+    if(gui.gprop.is(GUIProp.MOUSEFOCUS) && cont.isEnabled())
+      cont.requestFocusInWindow();
   }
 
   /**
