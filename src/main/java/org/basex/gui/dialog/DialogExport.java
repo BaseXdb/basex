@@ -52,7 +52,7 @@ public final class DialogExport extends Dialog {
    * @param main reference to the main window
    */
   public DialogExport(final GUI main) {
-    super(main, EXPORT_XML);
+    super(main, EXPORT);
 
     // create checkboxes
     final BaseXBack p = new BaseXBack(new TableLayout(4, 1, 0, 0));

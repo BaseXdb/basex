@@ -63,7 +63,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Exports a database. */
-  C_EXPORT(EXPORT_XML + DOTS, null, H_EXPORT_XML, true, false) {
+  C_EXPORT(EXPORT + DOTS, null, H_EXPORT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final DialogExport dialog = new DialogExport(gui);

@@ -841,7 +841,7 @@ public interface Text {
   /** Command info. */
   String EXIT = lang("exit");
   /** Command info. */
-  String EXPORT_XML = lang("export_xml");
+  String EXPORT = lang("export");
   /** Command info. */
   String FILTER_SELECTED = lang("filter_selected");
   /** Command info. */
@@ -1275,7 +1275,7 @@ public interface Text {
   /** Command info. */
   String H_EXIT = lang("h_exit");
   /** Command info. */
-  String H_EXPORT_XML = lang("h_export_xml");
+  String H_EXPORT = lang("h_export");
   /** Command info. */
   String H_FILTER_SELECTED = lang("h_filter_selected");
   /** Command info. */
