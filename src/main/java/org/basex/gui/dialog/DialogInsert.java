@@ -2,25 +2,18 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.ButtonGroup;
-import org.basex.data.Data;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIProp;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+
+import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXRadio;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.util.Util;
-import org.basex.util.XMLToken;
-import org.basex.util.list.StringList;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Dialog window for inserting new database nodes.
@@ -63,12 +56,11 @@ public final class DialogInsert extends Dialog {
 
     input1 = new BaseXTextField(this);
     input1.addKeyListener(keys);
-    BaseXLayout.setWidth(input1, 320);
+    BaseXLayout.setWidth(input1, 500);
 
     input2 = new BaseXEditor(true, this);
-    input2.setFont(GUIConstants.mfont);
     input2.addKeyListener(keys);
-    BaseXLayout.setWidth(input2, 320);
+    BaseXLayout.setWidth(input2, 500);
 
     final BaseXBack knd = new BaseXBack(new TableLayout(1, 5));
     final ButtonGroup group = new ButtonGroup();
@@ -117,7 +109,7 @@ public final class DialogInsert extends Dialog {
   void change(final Object src) {
     int n = 0;
     for(int r = 0; r < radio.length; ++r) if(src == radio[r]) n = r;
-    BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 200);
+    BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 150);
 
     back.removeAll();
     back.layout(new BorderLayout(0, 4));

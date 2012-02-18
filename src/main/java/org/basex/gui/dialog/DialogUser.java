@@ -179,7 +179,7 @@ final class DialogUser extends BaseXBack {
         setSess(sess);
       } else if(cmp == databases) {
         setData();
-      } else if(cmp == create || cmp == user || cmp == pass) {
+      } else if(cmp == create) {
         final String u = user.getText();
         final String p = Token.md5(new String(pass.getPassword()));
         sess.execute(new CreateUser(u, p));

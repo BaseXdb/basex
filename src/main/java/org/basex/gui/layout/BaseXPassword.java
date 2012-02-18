@@ -1,11 +1,10 @@
 package org.basex.gui.layout;
 
-import static org.basex.gui.layout.BaseXKeys.*;
-
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.JPasswordField;
+import javax.swing.*;
+
 import org.basex.gui.dialog.Dialog;
 
 /**
@@ -31,12 +30,5 @@ public final class BaseXPassword extends JPasswordField {
         BaseXLayout.focus(e.getComponent());
       }
     });
-
-    addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        if(!modifier(e)) ((Dialog) win).action(e.getSource());
-      }
-    });
-}
+  }
 }

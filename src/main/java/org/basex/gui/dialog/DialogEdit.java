@@ -82,7 +82,7 @@ public final class DialogEdit extends Dialog {
     if(old1 != null) {
       input1 = new BaseXTextField(old1, this);
       input1.addKeyListener(keys);
-      BaseXLayout.setWidth(input1, 320);
+      BaseXLayout.setWidth(input1, 500);
       b.add(input1, BorderLayout.NORTH);
     }
     if(old2 != null) {
@@ -94,7 +94,7 @@ public final class DialogEdit extends Dialog {
       input3 = new BaseXEditor(true, this);
       input3.setText(old3);
       input3.addKeyListener(keys);
-      input3.setPreferredSize(new Dimension(320, 200));
+      input3.setPreferredSize(new Dimension(500, 150));
       b.add(input3, BorderLayout.CENTER);
       setResizable(true);
     }

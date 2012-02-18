@@ -102,8 +102,7 @@ public final class BaseXServer extends Main implements Runnable {
     if(port == eport) throw new BaseXException(PORT_TWICE_X, port);
 
     final String host = mprop.get(MainProp.SERVERHOST);
-    final InetAddress addr = host.isEmpty() ? null :
-      InetAddress.getByName(host);
+    final InetAddress addr = host.isEmpty() ? null : InetAddress.getByName(host);
 
     if(service) {
       start(port, args);
@@ -223,8 +222,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   @Override
   protected void parseArguments(final String[] args) throws IOException {
-    final Args arg = new Args(args, this, SERVERINFO,
-        Util.info(CONSOLE, SERVERMODE));
+    final Args arg = new Args(args, this, SERVERINFO, Util.info(CONSOLE, SERVERMODE));
 
     commands = new StringList();
     boolean daemon = false;

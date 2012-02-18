@@ -143,7 +143,7 @@ public final class DialogServer extends Dialog {
     portc.addKeyListener(keys);
     loguser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
     loguser.addKeyListener(keys);
-    logpass = new BaseXPassword(main);
+    logpass = new BaseXPassword(this);
     logpass.addKeyListener(keys);
     infoC = new BaseXLabel(" ").border(12, 0, 0, 0);
 
@@ -288,15 +288,16 @@ public final class DialogServer extends Dialog {
     String msg2 = null;
 
     try {
-      if(cmp == start || cmp == ports) {
-        final int p = Integer.parseInt(ports.getText());
+      if(cmp == start) {
+        final String p = ports.getText();
         gui.setMain(MainProp.SERVERPORT, p);
         if(host.getText().equals(LOCALHOST)) {
           gui.setMain(MainProp.PORT, p);
-          portc.setText(ports.getText());
+          gui.setMain(MainProp.EVENTPORT, p + 1);
+          portc.setText(p);
         }
         try {
-          BaseXServer.start(p);
+          BaseXServer.start(Integer.parseInt(p), "-p", p, "-e", p + 1);
           msg = SRV_STARTED;
           running = true;
         } catch(final BaseXException ex) {
@@ -304,6 +305,7 @@ public final class DialogServer extends Dialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
+        gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
         if(running) BaseXServer.stop(ctx.mprop.num(MainProp.SERVERPORT),
             ctx.mprop.num(MainProp.EVENTPORT));
         running = ping(true);
@@ -311,9 +313,7 @@ public final class DialogServer extends Dialog {
         if(!connected) msg = SRV_STOPPED;
         if(host.getText().equals(LOCALHOST)) logpass.setText("");
         if(!connected) setTitle(S_SERVER_ADMIN);
-      } else if(cmp == connect || cmp == loguser || cmp == logpass ||
-          cmp == host || cmp == portc) {
-        gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
+      } else if(cmp == connect) {
         final String pw = new String(logpass.getPassword());
         gui.setMain(MainProp.HOST, host.getText());
         gui.setMain(MainProp.PORT, Integer.parseInt(portc.getText()));
