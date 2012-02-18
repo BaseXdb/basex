@@ -171,22 +171,8 @@ public final class DataAccess {
    * @return text as byte array
    */
   public synchronized byte[] readToken() {
-    int l = readNum();
-    int ll = IO.BLOCKSIZE - off;
-    final byte[] b = new byte[l];
-
-    System.arraycopy(buffer(false).data, off, b, 0, Math.min(l, ll));
-    if(l > ll) {
-      l -= ll;
-      while(l > IO.BLOCKSIZE) {
-        System.arraycopy(buffer(true).data, 0, b, ll, IO.BLOCKSIZE);
-        ll += IO.BLOCKSIZE;
-        l -= IO.BLOCKSIZE;
-      }
-      System.arraycopy(buffer(true).data, 0, b, ll, l);
-    }
-    off += l;
-    return b;
+    final int l = readNum();
+    return readBytes(l);
   }
 
   /**
@@ -202,12 +188,25 @@ public final class DataAccess {
 
   /**
    * Reads a number of bytes.
-   * @param l length
+   * @param n length
    * @return byte array
    */
-  public synchronized byte[] readBytes(final int l) {
+  public synchronized byte[] readBytes(final int n) {
+    int l = n;
+    int ll = IO.BLOCKSIZE - off;
     final byte[] b = new byte[l];
-    for(int i = 0; i < b.length; ++i) b[i] = read1();
+
+    System.arraycopy(buffer(false).data, off, b, 0, Math.min(l, ll));
+    if(l > ll) {
+      l -= ll;
+      while(l > IO.BLOCKSIZE) {
+        System.arraycopy(buffer(true).data, 0, b, ll, IO.BLOCKSIZE);
+        ll += IO.BLOCKSIZE;
+        l -= IO.BLOCKSIZE;
+      }
+      System.arraycopy(buffer(true).data, 0, b, ll, l);
+    }
+    off += l;
     return b;
   }
 
@@ -324,8 +323,7 @@ public final class DataAccess {
    */
   public void writeToken(final long p, final byte[] v) {
     cursor(p);
-    writeNum(v.length);
-    for(final byte b : v) write(b);
+    writeToken(v, 0, v.length);
   }
 
   /**

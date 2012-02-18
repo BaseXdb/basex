@@ -13,7 +13,19 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-/** Tests for class {@link DataAccess}. */
+/**
+ * Tests for class {@link DataAccess}.
+ * <br/>
+ * <p>The read operations are tested using a pre-created file with different
+ * types of values at fixed positions; the values occupy the first
+ * {@link IO#BLOCKSIZE} bytes of the file.</p>
+ * <br/>
+ * <p>In order to test cross-block reads, a string is written at position
+ * {@link IO#BLOCKSIZE} - 5.</p>
+ * <br/>
+ * <p>Write operations are tested by writing a value at a specified random
+ * position.</p>
+ */
 public class DataAccessTest {
   /** String. */
   private static final String STR = "string with characters: öäü10";
@@ -53,6 +65,8 @@ public class DataAccessTest {
   private static final int[] CINT1_BIN = numToByteArray(CINT1);
   /** Block boundary position for testing cross block reads and writes. */
   private static final long BLOCK_BOUNDARY_POS = IO.BLOCKSIZE - 5;
+  /** Random position to test write operations. */
+  private static final long RANDOM_POS = 15L;
 
   /** Temporary file. */
   protected IOFile file;
@@ -253,7 +267,7 @@ public class DataAccessTest {
    */
   @Test
   public final void testWrite4LongInt() throws IOException {
-    final long pos = 15L;
+    final long pos = RANDOM_POS;
     da.write4(pos, INT);
     da.flush();
 
@@ -266,7 +280,7 @@ public class DataAccessTest {
    */
   @Test
   public final void testWrite4Int() throws IOException {
-    final long pos = 15L;
+    final long pos = RANDOM_POS;
     da.cursor(pos);
     da.write4(pos, INT);
     da.flush();
@@ -280,7 +294,7 @@ public class DataAccessTest {
    */
   @Test
   public final void testWriteToken() throws IOException {
-    final long pos = 15L;
+    final long pos = RANDOM_POS;
     da.writeToken(pos, Token.token(STR));
     da.flush();
 
@@ -292,24 +306,9 @@ public class DataAccessTest {
    * @throws IOException I/O exception
    */
   @Test
-  public final void testWriteLongToken() throws IOException {
-    final long pos = 15L;
+  public final void testWriteTokenBig() throws IOException {
+    final long pos = RANDOM_POS;
     da.writeToken(pos, Token.token(STR_LONG));
-    da.flush();
-
-    assertContent(pos, STR_LONG_BIN);
-  }
-
-  /**
-   * Test method for {@link DataAccess#writeToken(byte[], int, int)}.
-   * @throws IOException I/O exception
-   */
-  @Test
-  public final void testWriteLongTokenNew() throws IOException {
-    final long pos = 15L;
-    da.cursor(pos);
-    final byte[] token = Token.token(STR_LONG);
-    da.writeToken(token, 0, token.length);
     da.flush();
 
     assertContent(pos, STR_LONG_BIN);
@@ -317,16 +316,9 @@ public class DataAccessTest {
 
   /** Performance test for {@link DataAccess#writeToken(long, byte[])}. */
   @Test
-  public final void testPerfWriteLongToken() {
+  public final void testPerfWriteTokenBig() {
     final byte[] token = Token.token(STR_LONG);
     for(int i = 0; i < 10000; ++i) da.writeToken(da.cursor(), token);
-  }
-
-  /** Performance test for {@link DataAccess#writeToken(byte[], int, int)}. */
-  @Test
-  public final void testPerfWriteLongTokenNew() {
-    final byte[] token = Token.token(STR_LONG);
-    for(int i = 0; i < 10000; ++i) da.writeToken(token, 0, token.length);
   }
 
   /**
@@ -335,7 +327,7 @@ public class DataAccessTest {
    */
   @Test
   public final void testWriteNum() throws IOException {
-    long pos = 15L;
+    long pos = RANDOM_POS;
     da.cursor(pos);
     da.writeNum(da.cursor(), CINT5);
     da.writeNum(da.cursor(), CINT4);
