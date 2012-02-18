@@ -178,6 +178,7 @@ public final class DialogImport extends BaseXBack {
     filter.setEnabled(dir && ok);
     addRaw.setEnabled(dir && !r && !gui.context.prop.is(Prop.MAINMEM));
     skipCorrupt.setEnabled(!r);
+    archives.setEnabled(dir || io.isArchive());
     return ok;
   }
 
