@@ -103,7 +103,7 @@ public final class QueryContext extends Progress {
   Nodes nodes;
 
   /** Current full-text options. */
-  public FTOpt ftopt = new FTOpt();
+  private FTOpt ftOpt;
   /** Current full-text token. */
   public FTLexer fttoken;
 
@@ -120,7 +120,7 @@ public final class QueryContext extends Progress {
   public byte ftoknum;
 
   /** Pending updates. */
-  public final Updates updates = new Updates();
+  public Updates updates;
   /** Indicates if this query might perform updates. */
   public boolean updating;
 
@@ -183,6 +183,7 @@ public final class QueryContext extends Progress {
    */
   public void parse(final String qu) throws QueryException {
     root = new QueryParser(qu, this).parse(sc.baseIO(), null);
+    if(updating) updates = new Updates();
   }
 
   /**
@@ -202,8 +203,8 @@ public final class QueryContext extends Progress {
     // dump compilation info
     if(inf) compInfo(NL + COMPILING_C);
 
-    // temporarily set database values
-    if(dbOptions != null) {
+    // temporarily set database values (size check added for better performance)
+    if(dbOptions.size() != 0) {
       for(final Entry<String, String> e : dbOptions.entrySet()) {
         Set.set(e.getKey(), e.getValue(), context.prop);
       }
@@ -499,6 +500,23 @@ public final class QueryContext extends Progress {
 
     // otherwise, apply global serialization option
     return new SerializerProp(serial);
+  }
+
+  /**
+   * Returns the current full-text options. Creates a new instance if called first.
+   * @return full-text options
+   */
+  public FTOpt ftOpt() {
+    if(ftOpt == null) ftOpt = new FTOpt();
+    return ftOpt;
+  }
+
+  /**
+   * Sets full-text options.
+   * @param opt full-text options
+   */
+  public void ftOpt(final FTOpt opt) {
+    ftOpt = opt;
   }
 
   @Override

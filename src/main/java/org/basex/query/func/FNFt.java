@@ -189,10 +189,10 @@ public final class FNFt extends StandardFunc {
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     if(!data.meta.ftxtindex) NOINDEX.thrw(fun.input, data.meta.name, fun);
 
-    final FTOpt tmp = ctx.ftopt;
-    ctx.ftopt = new FTOpt().copy(data.meta);
+    final FTOpt tmp = ctx.ftOpt();
+    ctx.ftOpt(new FTOpt().copy(data.meta));
     final FTWords words = new FTWords(fun.input, ic.data, Str.get(str), ctx);
-    ctx.ftopt = tmp;
+    ctx.ftOpt(tmp);
     return new FTIndexAccess(fun.input, words, ic).iter(ctx);
   }
 
@@ -221,7 +221,7 @@ public final class FNFt extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter tokenize(final QueryContext ctx) throws QueryException {
-    final FTOpt opt = new FTOpt().copy(ctx.ftopt);
+    final FTOpt opt = new FTOpt().copy(ctx.ftOpt());
     final FTLexer ftl = new FTLexer(opt).init(checkStr(expr[0], ctx));
     return new Iter() {
       @Override

@@ -121,8 +121,7 @@ public abstract class OutputSerializer extends Serializer {
     final byte[] wUri = token(p.get(S_WRAP_URI));
     wrap    = wPre.length != 0;
     final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
-    nl = (eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n").
-        getBytes(encoding);
+    nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
 
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);

@@ -25,11 +25,22 @@ public final class Uri extends Str {
 
   /**
    * Creates a new uri instance.
-   * @param v value
+   * @param uri value
    * @return uri instance
    */
-  public static Uri uri(final byte[] v) {
-    return v.length == 0 ? EMPTY : new Uri(Token.norm(v));
+  public static Uri uri(final byte[] uri) {
+    return uri(uri, true);
+  }
+
+  /**
+   * Creates a new uri instance.
+   * @param uri value
+   * @param normalize chop leading and trailing whitespaces
+   * @return uri instance
+   */
+  public static Uri uri(final byte[] uri, final boolean normalize) {
+    final byte[] u = normalize ? Token.norm(uri) : uri;
+    return u.length == 0 ? EMPTY : new Uri(u);
   }
 
   /**
@@ -43,7 +54,7 @@ public final class Uri extends Str {
     try {
       final URI base = new URI(Token.string(val));
       final URI uri = base.resolve(Token.string(Token.uri(add.val, true)));
-      return uri(Token.token(uri.toString()));
+      return uri(Token.token(uri.toString()), false);
     } catch(final Exception ex) {
       return this;
     }

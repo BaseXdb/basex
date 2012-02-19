@@ -216,16 +216,15 @@ public final class Token {
   /**
    * Returns a unified representation of the specified encoding.
    * @param encoding input encoding
-   * @param old (optional) old encoding
+   * @param old previous encoding (optional)
    * @return encoding
    */
   public static String normEncoding(final String encoding, final String old) {
     final String e = encoding.toUpperCase(Locale.ENGLISH);
-    if(eq(e, UTF8, UTF82)) return UTF8;
-    if(e.equals(UTF16BE)) return UTF16BE;
-    if(e.equals(UTF16LE)) return UTF16LE;
-    if(eq(e, UTF16, UTF162))
-      return old == UTF16BE || old == UTF16LE ? old : UTF16BE;
+    if(eq(e, UTF8, UTF82))   return UTF8;
+    if(e.equals(UTF16BE))    return UTF16BE;
+    if(e.equals(UTF16LE))    return UTF16LE;
+    if(eq(e, UTF16, UTF162)) return old == UTF16BE || old == UTF16LE ? old : UTF16BE;
     return encoding;
   }
 

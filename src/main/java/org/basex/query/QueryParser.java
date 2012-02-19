@@ -449,7 +449,7 @@ public class QueryParser extends InputParser {
         } else if(wsConsumeWs(FTOPTION)) {
           final FTOpt fto = new FTOpt();
           while(ftMatchOption(fto));
-          ctx.ftopt.copy(fto);
+          ctx.ftOpt().copy(fto);
         } else {
           qp = p;
           return;
@@ -716,8 +716,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(COLLATION)) return false;
     if(declColl) error(DUPLCOLL);
     declColl = true;
-    final byte[] cl = ctx.sc.baseURI().resolve(
-        Uri.uri(stringLiteral())).string();
+    final byte[] cl = ctx.sc.baseURI().resolve(Uri.uri(stringLiteral())).string();
     if(!eq(URLCOLL, cl)) error(COLLWHICH, cl);
     return true;
   }
@@ -1875,16 +1874,20 @@ public class QueryParser extends InputParser {
       }
     } else {
       for(final Axis a : Axis.values()) {
-        if(wsConsumeWs(a.name, COLS, NOLOCSTEP)) {
-          wsConsume(COLS);
+        final int p = qp;
+        if(!wsConsumeWs(a.name)) continue;
+        alter = NOLOCSTEP;
+        if(wsConsumeWs(COLS)) {
           ap = qp;
           ax = a;
           test = nodeTest(a == Axis.ATTR, true);
           checkTest(test, a == Axis.ATTR);
           break;
         }
+        qp = p;
       }
     }
+
     if(ax == null) {
       ax = Axis.CHILD;
       test = nodeTest(false, true);

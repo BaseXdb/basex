@@ -53,7 +53,7 @@ public final class FNNode extends StandardFunc {
         final ANode node = checkNode(it);
         if(node.type != NodeType.DOC) return null;
         final byte[] uri = node.baseURI();
-        return uri.length == 0 ? null : Uri.uri(uri);
+        return uri.length == 0 ? null : Uri.uri(uri, false);
       case NILLED:
         // always false, as no schema information is given
         return it == null || checkNode(it).type != NodeType.ELM ? null :
@@ -69,7 +69,7 @@ public final class FNNode extends StandardFunc {
             base = ctx.sc.baseURI().resolve(base);
             break;
           }
-          base = Uri.uri(n.baseURI()).resolve(base);
+          base = Uri.uri(n.baseURI(), false).resolve(base);
           n = n.parent();
         }
         return base;
@@ -81,7 +81,7 @@ public final class FNNode extends StandardFunc {
         return qname != null ? Str.get(qname.local()) : Str.ZERO;
       case NAMESPACE_URI:
         qname = it != null ? checkNode(it).qname() : null;
-        return qname != null ? Uri.uri(qname.uri()) : Uri.EMPTY;
+        return qname != null ? Uri.uri(qname.uri(), false) : Uri.EMPTY;
       case ROOT:
         if(it == null) return null;
         n = checkNode(it);

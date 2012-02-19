@@ -287,7 +287,7 @@ public final class QueryProcessor extends Progress {
    * @return number of updates
    */
   public int updates() {
-    return ctx.updates.size();
+    return ctx.updating ? ctx.updates.size() : 0;
   }
 
   /**

@@ -49,10 +49,10 @@ public final class FNContext extends StandardFunc {
       case IMPLICIT_TIMEZONE:
         return implZone();
       case DEFAULT_COLLATION:
-        return ctx.sc.baseURI().resolve(ctx.sc.collation);
+        return ctx.sc.baseURI().resolve(ctx.sc.collation());
       case STATIC_BASE_URI:
         final IO base = ctx.sc.baseIO();
-        return base == null ? null : Uri.uri(token(ctx.sc.baseIO().url()));
+        return base == null ? null : Uri.uri(token(base.url()), false);
       default:
         return super.item(ctx, ii);
     }

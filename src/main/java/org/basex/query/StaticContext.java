@@ -26,8 +26,6 @@ public final class StaticContext {
   public byte[] nsFunc = FNURI;
   /** Context item static type. */
   public SeqType initType;
-  /** Default collation. */
-  public Uri collation = Uri.uri(URLCOLL);
 
   /** Construction mode. */
   public boolean construct;
@@ -44,6 +42,8 @@ public final class StaticContext {
 
   /** Static Base URI. */
   private byte[] baseURI = EMPTY;
+  /** Default collation. */
+  private Uri collation = Uri.uri(URLCOLL, false);
 
   /** Decimal formats. */
   public final TokenObjMap<DecFormatter> decFormats =
@@ -102,7 +102,7 @@ public final class StaticContext {
    * @return IO reference
    */
   public Uri baseURI() {
-    return Uri.uri(baseURI);
+    return Uri.uri(baseURI, false);
   }
 
   /**
@@ -110,7 +110,23 @@ public final class StaticContext {
    * @param uri uri to be set
    */
   public void baseURI(final String uri) {
-    baseURI = token(uri);
+    baseURI = norm(token(uri));
+  }
+
+  /**
+   * Returns a URI representation of the base URI.
+   * @return IO reference
+   */
+  public Uri collation() {
+    return collation;
+  }
+
+  /**
+   * Sets the collation.
+   * @param uri uri to be set
+   */
+  public void collation(final String uri) {
+    collation = Uri.uri(token(uri));
   }
 
   @Override

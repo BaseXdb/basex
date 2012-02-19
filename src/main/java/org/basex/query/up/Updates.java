@@ -114,7 +114,7 @@ import org.basex.util.hash.TokenSet;
 public final class Updates {
   /** Current context modifier. */
   public ContextModifier mod;
-  /** Mapping between fragment IDs and the temorary data instances created
+  /** Mapping between fragment IDs and the temporary data instances created
    * to apply updates on the corresponding fragments. */
   private final IntMap<MemData> fragmentIDs = new IntMap<MemData>();
   /** Set which contains all URIs which are targeted during a snapshot. */
@@ -181,6 +181,22 @@ public final class Updates {
   }
 
   /**
+   * Executes all updates.
+   * @throws QueryException query exception
+   */
+  public void applyUpdates() throws QueryException {
+    if(mod != null) mod.applyUpdates();
+  }
+
+  /**
+   * Number of updates on the pending update list.
+   * @return #updates
+   */
+  public int size() {
+    return mod == null ? 0 : mod.size();
+  }
+
+  /**
    * Recursively determines the pre value for a given fragment node within the
    * corresponding data reference.
    * @param node current
@@ -204,21 +220,5 @@ public final class Updates {
       s += preSteps(n, trgID);
     }
     return s;
-  }
-
-  /**
-   * Executes all updates.
-   * @throws QueryException query exception
-   */
-  public void applyUpdates() throws QueryException {
-    if(mod != null) mod.applyUpdates();
-  }
-
-  /**
-   * Number of updates on the pending update list.
-   * @return #updates
-   */
-  public int size() {
-    return mod == null ? 0 : mod.size();
   }
 }

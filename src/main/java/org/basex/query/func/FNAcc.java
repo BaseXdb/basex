@@ -48,14 +48,12 @@ public final class FNAcc extends StandardFunc {
       case NUMBER:
         return number(ctx.iter(e), ctx);
       case STRING_LENGTH:
-        return Int.get(len(checkEStr(expr.length == 0 ?
-            string(e, ii, ctx) : e, ctx)));
+        return Int.get(len(checkEStr(expr.length == 0 ? string(e, ii, ctx) : e, ctx)));
       case NORMALIZE_SPACE:
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
         final Item it = e.item(ctx, input);
-        return it == null ? null :
-          Uri.uri(((QNm) checkType(it, AtomType.QNM)).uri());
+        return it == null ? null : Uri.uri(((QNm) checkType(it, AtomType.QNM)).uri());
       default:
         return super.item(ctx, ii);
     }
