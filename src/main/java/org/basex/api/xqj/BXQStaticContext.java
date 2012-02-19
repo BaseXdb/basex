@@ -4,16 +4,12 @@ import static javax.xml.xquery.XQConstants.*;
 import static org.basex.api.xqj.BXQText.*;
 import static org.basex.util.Token.*;
 
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQStaticContext;
+import javax.xml.xquery.*;
 
-import org.basex.core.Context;
-import org.basex.io.IO;
-import org.basex.query.QueryException;
-import org.basex.query.StaticContext;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Uri;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
 
 /**
  * Java XQuery API - Static Context.
@@ -107,7 +103,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getDefaultCollation() {
-    return string(sc.collation.string());
+    return string(sc.collation().string());
   }
 
   @Override
@@ -211,12 +207,11 @@ final class BXQStaticContext implements XQStaticContext {
   @Override
   public void setDefaultCollation(final String uri) throws XQException {
     BXQAbstract.valid(uri, String.class);
-    sc.collation = Uri.uri(token(uri));
+    sc.collation(uri);
   }
 
   @Override
-  public void setDefaultElementTypeNamespace(final String uri)
-      throws XQException {
+  public void setDefaultElementTypeNamespace(final String uri) throws XQException {
     BXQAbstract.valid(uri, String.class);
     sc.nsElem = !uri.isEmpty() ? token(uri) : null;
   }
@@ -228,8 +223,7 @@ final class BXQStaticContext implements XQStaticContext {
   }
 
   @Override
-  public void setDefaultOrderForEmptySequences(final int mode)
-      throws BXQException {
+  public void setDefaultOrderForEmptySequences(final int mode) throws BXQException {
     sc.orderGreatest = check(mode, ARGO) ==
       DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST;
   }
