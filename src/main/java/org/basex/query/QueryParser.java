@@ -34,7 +34,6 @@ import org.basex.query.expr.Catch;
 import org.basex.query.expr.CmpG;
 import org.basex.query.expr.CmpN;
 import org.basex.query.expr.CmpV;
-import org.basex.query.expr.Concat;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Except;
 import org.basex.query.expr.Expr;
@@ -1527,7 +1526,7 @@ public class QueryParser extends InputParser {
 
     final ExprList el = new ExprList(e);
     do add(el, range()); while(wsConsume(CONCAT));
-    return new Concat(input(), el.finish());
+    return Function.CONCAT.get(input(), el.finish());
   }
 
   /**
