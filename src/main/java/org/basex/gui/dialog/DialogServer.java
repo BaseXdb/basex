@@ -293,7 +293,8 @@ public final class DialogServer extends Dialog {
           portc.setText(p);
         }
         try {
-          BaseXServer.start(Integer.parseInt(p), "-p", p, "-e", p + 1);
+          final int port = Integer.parseInt(p);
+          BaseXServer.start(port, "-p", p, "-e", Integer.toString(port + 1));
           msg = SRV_STARTED;
           running = true;
         } catch(final BaseXException ex) {

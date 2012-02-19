@@ -9,7 +9,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class ExprList extends ElementList {
+public final class ExprList extends ElementList {
   /** Element container. */
   protected Expr[] list;
 
@@ -34,7 +34,7 @@ public class ExprList extends ElementList {
    * @param p position
    * @return value
    */
-  public final Expr get(final int p) {
+  public Expr get(final int p) {
     return list[p];
   }
 
@@ -43,7 +43,7 @@ public class ExprList extends ElementList {
    * @param e element to be added
    * @return self reference
    */
-  public final ExprList add(final Expr e) {
+  public ExprList add(final Expr e) {
     if(size == list.length) resize(newSize());
     list[size++] = e;
     return this;
@@ -54,7 +54,7 @@ public class ExprList extends ElementList {
    * @param i index
    * @param e element to be set
    */
-  public final void set(final int i, final Expr e) {
+  public void set(final int i, final Expr e) {
     if(i >= list.length) resize(newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);
@@ -64,7 +64,7 @@ public class ExprList extends ElementList {
    * Resizes the array.
    * @param s new size
    */
-  public final void resize(final int s) {
+  private void resize(final int s) {
     final Expr[] tmp = new Expr[s];
     System.arraycopy(list, 0, tmp, 0, size);
     list = tmp;
@@ -72,10 +72,10 @@ public class ExprList extends ElementList {
 
   /**
    * Returns an array with all elements.
-   * Warning: might returns the internal representation.
-   * @return array
+   * Warning: returns the internal array representation for better performance.
+   * @return internal array
    */
-  public final Expr[] finish() {
+  public Expr[] finish() {
     if(size != list.length) {
       final Expr[] tmp = new Expr[size];
       System.arraycopy(list, 0, tmp, 0, size);

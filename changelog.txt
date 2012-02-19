@@ -3,6 +3,28 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.1.1 (February 19, 2012) --------------------------------------
+
+  GUI:
+  - new "Package" dialog: to list, install and delete XQuery Packages
+  - "New/Add" dialog: "RAW" input format allows import of raw files;
+    automatic detection of input formats, increased usability
+  - "Export" dialog enhanced to support other methods like JSON,
+    and various serialization parameters
+
+  Command-Line:
+  - new option -L: add trailing newline after query result
+  - new option -C: execute commands from batch script
+
+  REST:
+  - new "option" parameter: set options before executing request
+
+  Full-Text:
+  - Indonesian Stemmer (thanks Andria Arisal!)
+
+  IO:
+  - faster read/write access to byte arrays
+
 VERSION 7.1 (February 8, 2012) -----------------------------------------
 
   GUI
