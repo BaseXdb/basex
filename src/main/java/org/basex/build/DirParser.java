@@ -159,8 +159,10 @@ public final class DirParser extends TargetParser {
               // parse file twice to ensure that it is well-formed
               try {
                 // cache file contents to allow or speed up a second run
-                in = new IOContent(io.read());
-                in.name(io.name());
+                if(!(io instanceof IOContent)) {
+                  in = new IOContent(io.read());
+                  in.name(io.name());
+                }
                 parser = Parser.fileParser(in, prop, targ);
                 MemBuilder.build("", parser, prop);
               } catch(final IOException ex) {

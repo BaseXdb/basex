@@ -116,30 +116,20 @@ public final class DialogServer extends Dialog {
   public DialogServer(final GUI main) {
     super(main, S_SERVER_ADMIN);
     databases.border(8);
-    tabs = new BaseXTabs(this);
-    /* Server panel. */
-    final BaseXBack conn = new BaseXBack();
-    tabs.add(S_CONNECT, conn);
-    tabs.add(USERS, user);
-    tabs.add(DATABASES, databases);
-    tabs.add(S_SESSIONS, sess);
-    tabs.add(S_LOCALLOGS, logs);
 
-    // server tab
-    conn.border(8).layout(new BorderLayout(0, 32));
-
+    // connection tab
+    final BaseXBack conn = new BaseXBack(new BorderLayout(0, 32)).border(8);
     start = new BaseXButton(START, this);
     stop = new BaseXButton(STOP, this);
     connect = new BaseXButton(CONNECT, this);
     disconnect = new BaseXButton(DISCONNECT, this);
 
-    host = new BaseXTextField(ctx.mprop.get(MainProp.HOST), this);
+    final MainProp mprop = ctx.mprop;
+    host = new BaseXTextField(mprop.get(MainProp.HOST), this);
     host.addKeyListener(keys);
-    ports = new BaseXTextField(Integer.toString(
-        ctx.mprop.num(MainProp.SERVERPORT)), this);
+    ports = new BaseXTextField(Integer.toString(mprop.num(MainProp.SERVERPORT)), this);
     ports.addKeyListener(keys);
-    portc = new BaseXTextField(Integer.toString(
-        ctx.mprop.num(MainProp.PORT)), this);
+    portc = new BaseXTextField(Integer.toString(mprop.num(MainProp.PORT)), this);
     portc.addKeyListener(keys);
     loguser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
     loguser.addKeyListener(keys);
@@ -147,13 +137,11 @@ public final class DialogServer extends Dialog {
     logpass.addKeyListener(keys);
     infoC = new BaseXLabel(" ").border(12, 0, 0, 0);
 
-    BaseXBack p = new BaseXBack(new TableLayout(6, 1, 0, 0));
-
     // local server panel
+    BaseXBack p = new BaseXBack(new TableLayout(6, 1, 0, 0));
     p.add(new BaseXLabel(S_LOCALSERVER + COLS, true, true));
 
-    BaseXBack pp = new BaseXBack(new TableLayout(2, 2, 8, 4)).border(
-        0, 0, 0, 0);
+    BaseXBack pp = new BaseXBack(new TableLayout(2, 2, 8, 4)).border(0, 0, 0, 0);
     pp.add(new BaseXLabel(S_PORT + COLS));
     pp.add(ports);
     pp.add(new BaseXLabel());
@@ -248,6 +236,12 @@ public final class DialogServer extends Dialog {
     p.add(refreshLog, BorderLayout.EAST);
     logs.add(p, BorderLayout.SOUTH);
 
+    tabs = new BaseXTabs(this);
+    tabs.add(S_CONNECT, conn);
+    tabs.add(USERS, user);
+    tabs.add(DATABASES, databases);
+    tabs.add(S_SESSIONS, sess);
+    tabs.add(S_LOCALLOGS, logs);
     set(tabs, BorderLayout.CENTER);
 
     // test if server is running
@@ -277,12 +271,14 @@ public final class DialogServer extends Dialog {
    * @return boolean success
    */
   private boolean ping(final boolean local) {
-    return BaseXServer.ping(local ? LOCALHOST : ctx.mprop.get(MainProp.HOST),
-        ctx.mprop.num(local ? MainProp.SERVERPORT : MainProp.PORT));
+    final MainProp mprop = ctx.mprop;
+    return BaseXServer.ping(local ? LOCALHOST : mprop.get(MainProp.HOST),
+        mprop.num(local ? MainProp.SERVERPORT : MainProp.PORT));
   }
 
   @Override
   public void action(final Object cmp) {
+    final MainProp mprop = ctx.mprop;
     Msg icon = Msg.SUCCESS;
     String msg = null;
     String msg2 = null;
@@ -306,8 +302,8 @@ public final class DialogServer extends Dialog {
         }
       } else if(cmp == stop) {
         gui.gprop.set(GUIProp.SERVERUSER, loguser.getText());
-        if(running) BaseXServer.stop(ctx.mprop.num(MainProp.SERVERPORT),
-            ctx.mprop.num(MainProp.EVENTPORT));
+        if(running) BaseXServer.stop(mprop.num(MainProp.SERVERPORT),
+            mprop.num(MainProp.EVENTPORT));
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = SRV_STOPPED;
@@ -383,8 +379,7 @@ public final class DialogServer extends Dialog {
     final boolean valpl = ports.getText().matches("[\\d]+") &&
       Integer.parseInt(ports.getText()) <= 65535;
     final boolean vallu = loguser.getText().matches("[\\w]*");
-    final boolean vallp = new String(
-        logpass.getPassword()).matches("[^ ;'\"]*");
+    final boolean vallp = new String(logpass.getPassword()).matches("[^ ;'\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
     if(msg == null && msg2 == null &&
@@ -417,7 +412,7 @@ public final class DialogServer extends Dialog {
       logpass.setText("");
       connect.setEnabled(false);
     }
-    ctx.mprop.write();
+    mprop.write();
   }
 
   /**

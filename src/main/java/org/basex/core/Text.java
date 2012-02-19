@@ -1033,6 +1033,8 @@ public interface Text {
   String PARSE_ARCHIVES = lang("parse_archives");
   /** Add remaining files as raw files. */
   String ADD_RAW_FILES = lang("add_raw_files");
+  /** "Add Resources". */
+  String ADD_RESOURCES = lang("add_resources");
   /** Skip corrupt files. */
   String SKIP_CORRUPT_FILES = lang("skip_corrupt_files");
   /** SAX parsing information. */

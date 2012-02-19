@@ -51,8 +51,7 @@ public class DialogResources extends BaseXBack {
     final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode();
     tree = new BaseXTree(rootNode, dp).border(4, 4, 4, 4);
     tree.setRootVisible(false);
-    tree.getSelectionModel().setSelectionMode(
-        TreeSelectionModel.SINGLE_TREE_SELECTION);
+    tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
     final ImageIcon xml = BaseXLayout.icon("file_xml");
     final ImageIcon raw = BaseXLayout.icon("file_raw");
@@ -77,7 +76,8 @@ public class DialogResources extends BaseXBack {
 
     // add default children to tree
     final Data data = dp.gui.context.data();
-    root = new TreeRootFolder(token("/"), token("/"), tree, data);
+    final String label = data.meta.name + " (/)";
+    root = new TreeRootFolder(token(label), token("/"), tree, data);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
     tree.expandPath(new TreePath(root.getPath()));
 

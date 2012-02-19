@@ -173,7 +173,7 @@ public final class DialogImport extends BaseXBack {
     final boolean ok = empty ? in.isEmpty() || io.exists() :
       !in.isEmpty() && io.exists();
 
-    if(comp == input) setType(in, ok);
+    if(ok && comp == input) setType(in);
 
     info.setText(null, null);
     filter.setEnabled(dir);
@@ -205,24 +205,21 @@ public final class DialogImport extends BaseXBack {
     final IOFile in = inputFile();
     if(in == null) return;
     input.setText(in.path());
-    setType(in.path(), true);
+    setType(in.path());
   }
 
   /**
    * Chooses the correct input type.
    * @param in input
-   * @param ok ok flag
    */
-  void setType(final String in, final boolean ok) {
+  void setType(final String in) {
     // get file path, update input path and database name
     final IO io = IO.get(in);
-    if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
-    if(!ok) return;
+    if(!in.isEmpty() && io instanceof IOFile) dbname = io.dbname();
 
     final boolean dir = io.isDir();
     final boolean archive = io.isArchive();
-    filter.setText(io instanceof IOFile && !dir && !archive ? io.name() :
-      "*" + IO.XMLSUFFIX);
+    if(dir || archive) filter.setText("*" + IO.XMLSUFFIX);
 
     // evaluate input type
     String type = null;

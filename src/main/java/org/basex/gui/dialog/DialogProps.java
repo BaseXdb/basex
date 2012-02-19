@@ -80,13 +80,31 @@ public final class DialogProps extends Dialog {
       }
     }
 
+    // tab: name indexes
+    final BaseXBack tabNames = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
+    add(0, tabNames, null);
+    add(1, tabNames, null);
+
+    // tab: path index
+    final BaseXBack tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
+    add(2, tabPath, null);
+
+    // tab: value indexes
+    final BaseXBack tabValues = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
+    add(3, tabValues, null);
+    add(4, tabValues, null);
+
+    // tab: full-text index
+    tabFT = new BaseXBack(new GridLayout(1, 1)).border(8);
+    add(5, tabFT, null);
+
     // tab: database info
-    final BaseXBack tabInfo = new BaseXBack(new BorderLayout(0, 8)).border(8);
-    final Font f = tabInfo.getFont();
+    final BaseXBack tabGeneral = new BaseXBack(new BorderLayout(0, 8)).border(8);
+    final Font f = tabGeneral.getFont();
     final BaseXLabel doc = new BaseXLabel(data.meta.name).border(
         0, 0, 6, 0).large();
     BaseXLayout.setWidth(doc, 400);
-    tabInfo.add(doc, BorderLayout.NORTH);
+    tabGeneral.add(doc, BorderLayout.NORTH);
 
     final String db = InfoDB.db(data.meta, true, false, true);
     final TokenBuilder info = new TokenBuilder(db);
@@ -96,35 +114,15 @@ public final class DialogProps extends Dialog {
 
     final BaseXEditor text = text(info.finish());
     text.setFont(f);
-    tabInfo.add(text, BorderLayout.CENTER);
-
-    // tab: name indexes
-    final BaseXBack tabNames =
-        new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
-    add(0, tabNames, null);
-    add(1, tabNames, null);
-
-    // tab: path index
-    final BaseXBack tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
-    add(2, tabPath, null);
-
-    // tab: value indexes
-    final BaseXBack tabValues =
-        new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
-    add(3, tabValues, null);
-    add(4, tabValues, null);
-
-    // tab: full-text index
-    tabFT = new BaseXBack(new GridLayout(1, 1)).border(8);
-    add(5, tabFT, null);
+    tabGeneral.add(text, BorderLayout.CENTER);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(RESOURCES, tabRes);
-    tabs.addTab(INFORMATION, tabInfo);
     tabs.addTab(NAMES, tabNames);
     tabs.addTab(PATH_INDEX, tabPath);
     tabs.addTab(INDEXES, tabValues);
     tabs.addTab(FULLTEXT, tabFT);
+    tabs.addTab(GENERAL, tabGeneral);
 
     set(resources, BorderLayout.WEST);
     set(tabs, BorderLayout.CENTER);
