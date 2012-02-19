@@ -165,7 +165,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
-    if(e != null && ctx.updating && e.uses(Use.UPD)) UPNOT.thrw(input, description());
+    if(e != null && ctx.updating() && e.uses(Use.UPD)) UPNOT.thrw(input, description());
     return e;
   }
 
@@ -178,7 +178,7 @@ public abstract class ParseExpr extends Expr {
   public void checkUp(final QueryContext ctx, final Expr... expr)
       throws QueryException {
 
-    if(!ctx.updating) return;
+    if(!ctx.updating()) return;
     int s = 0;
     for(final Expr e : expr) {
       if(e.isVacuous()) continue;

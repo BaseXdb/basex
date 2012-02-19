@@ -485,7 +485,7 @@ public class QueryParser extends InputParser {
       } else if(wsConsumeWs(VARIABLE)) {
         varDecl();
       } else if(wsConsumeWs(UPDATING)) {
-        ctx.updating = true;
+        ctx.updating(true);
         wsCheck(FUNCTION);
         functionDecl(true);
       } else if(wsConsumeWs(FUNCTION)) {
@@ -3335,7 +3335,7 @@ public class QueryParser extends InputParser {
       if(!after && !before) error(INCOMPLETE);
     }
     final Expr trg = check(single(), INCOMPLETE);
-    ctx.updating = true;
+    ctx.updating(true);
     return new Insert(input(), s, first, last, before, after, trg);
   }
 
@@ -3350,7 +3350,7 @@ public class QueryParser extends InputParser {
       qp = p;
       return null;
     }
-    ctx.updating = true;
+    ctx.updating(true);
     return new Delete(input(), check(single(), INCOMPLETE));
   }
 
@@ -3369,7 +3369,7 @@ public class QueryParser extends InputParser {
     final Expr trg = check(single(), INCOMPLETE);
     wsCheck(AS);
     final Expr n = check(single(), INCOMPLETE);
-    ctx.updating = true;
+    ctx.updating(true);
     return new Rename(input(), trg, n);
   }
 
@@ -3394,7 +3394,7 @@ public class QueryParser extends InputParser {
     final Expr t = check(single(), INCOMPLETE);
     wsCheck(WITH);
     final Expr r = check(single(), INCOMPLETE);
-    ctx.updating = true;
+    ctx.updating(true);
     return new Replace(input(), t, r, v);
   }
 
@@ -3405,8 +3405,8 @@ public class QueryParser extends InputParser {
    */
   private Expr transform() throws QueryException {
     if(!wsConsumeWs(COPY, DOLLAR, INCOMPLETE)) return null;
-    final boolean u = ctx.updating;
-    ctx.updating = false;
+    final boolean u = ctx.updating();
+    ctx.updating(false);
     final int s = ctx.vars.size();
 
     Let[] fl = { };
@@ -3424,7 +3424,7 @@ public class QueryParser extends InputParser {
     final Expr r = check(single(), INCOMPLETE);
 
     ctx.vars.size(s);
-    ctx.updating = u;
+    ctx.updating(u);
     return new Transform(input(), fl, m, r);
   }
 

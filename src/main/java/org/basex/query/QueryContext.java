@@ -121,8 +121,6 @@ public final class QueryContext extends Progress {
 
   /** Pending updates. */
   public Updates updates;
-  /** Indicates if this query might perform updates. */
-  public boolean updating;
 
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
@@ -152,6 +150,9 @@ public final class QueryContext extends Progress {
   public JarLoader jars;
   /** Opened connections to relational databases. */
   JDBCConnections jdbc;
+
+  /** Indicates if this query includes updating expressions. */
+  private boolean updating;
 
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
@@ -183,7 +184,6 @@ public final class QueryContext extends Progress {
    */
   public void parse(final String qu) throws QueryException {
     root = new QueryParser(qu, this).parse(sc.baseIO(), null);
-    if(updating) updates = new Updates();
   }
 
   /**
@@ -517,6 +517,24 @@ public final class QueryContext extends Progress {
    */
   public void ftOpt(final FTOpt opt) {
     ftOpt = opt;
+  }
+
+  /**
+   * Returns the updating flag.
+   * @return updating flag
+   */
+  public boolean updating() {
+    return updating;
+  }
+
+  /**
+   * Sets the updating flag.
+   * @param up updating flag
+   */
+  public void updating(final boolean up) {
+    // initializes the update container
+    if(up && updates == null) updates = new Updates();
+    updating = up;
   }
 
   @Override

@@ -93,7 +93,7 @@ public final class UserFuncs extends ExprInfo {
     if(fun != null) {
       for(final Function f : Function.UPDATING) {
         if(fun.sig == f) {
-          ctx.updating = true;
+          ctx.updating(true);
           break;
         }
       }

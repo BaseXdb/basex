@@ -96,7 +96,7 @@ final class QueryListener extends Progress {
     boolean mon = false;
     try {
       init();
-      ctx.register(qp.ctx.updating);
+      ctx.register(qp.ctx.updating());
       mon = true;
 
       // create serializer
@@ -139,7 +139,7 @@ final class QueryListener extends Progress {
       throw new BaseXException(ex);
     } finally {
       try { qp.close(); } catch(final QueryException ex) { }
-      if(mon) ctx.unregister(qp.ctx.updating);
+      if(mon) ctx.unregister(qp.ctx.updating());
     }
   }
 

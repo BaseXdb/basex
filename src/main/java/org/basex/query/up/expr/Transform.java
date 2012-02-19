@@ -48,8 +48,8 @@ public final class Transform extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    final boolean u = ctx.updating;
-    ctx.updating = true;
+    final boolean u = ctx.updating();
+    ctx.updating(true);
 
     final int s = ctx.vars.size();
     for(final Let c : copies) {
@@ -61,7 +61,7 @@ public final class Transform extends Arr {
     if(!expr[0].uses(Use.UPD) && !expr[0].isVacuous()) UPEXPECTT.thrw(input);
     checkUp(expr[1], ctx);
     ctx.vars.size(s);
-    ctx.updating = u;
+    ctx.updating(u);
     return this;
   }
 
