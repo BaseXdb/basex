@@ -10,9 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
+import org.basex.core.cmd.*;
 import org.basex.test.query.simple.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -161,6 +159,7 @@ class CreateDBRule implements MethodRule {
         }
         if(input != null) new CreateDB(db, input.value()).execute(ctx);
         base.evaluate();
+        if(input != null) new DropDB(db).execute(ctx);
       }
     };
   }

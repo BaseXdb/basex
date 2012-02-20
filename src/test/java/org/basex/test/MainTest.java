@@ -5,10 +5,12 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.basex.core.Prop;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.io.IOFile;
 import org.basex.io.out.NullOutput;
 import org.basex.util.Util;
+import org.junit.*;
 
 /**
  * Tests the command-line arguments of the starter classes.
@@ -16,13 +18,26 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-abstract class MainTest {
+public abstract class MainTest {
   /** Null output stream. */
   static final PrintStream NULL = new PrintStream(new NullOutput());
   /** Test database name. */
   static final String NAME = Util.name(MainTest.class);
   /** Input file. */
   static final IOFile IN = new IOFile(Prop.TMP + NAME + ".in");
+
+  /** Drop test database. */
+  @AfterClass
+  public static void cleanUp() {
+    final Context ctx = new Context();
+    try {
+      new DropDB(NAME).execute(ctx);
+    } catch(BaseXException e) {
+      Util.debug(e);
+    } finally {
+      ctx.close();
+    }
+  }
 
   /**
    * Runs a request with the specified arguments.

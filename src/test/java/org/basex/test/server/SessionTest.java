@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.basex.core.BaseXException;
+import org.basex.core.cmd.*;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.server.Query;
@@ -40,6 +41,7 @@ public abstract class SessionTest {
   @After
   public final void stopSession() {
     try {
+      session.execute(new DropDB(DB));
       session.close();
     } catch(final IOException ex) {
       fail(Util.message(ex));
