@@ -196,6 +196,17 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Sorts the data in the order of the specified numeric array.
+   * Note that the input array will be resorted as well.
+   * The algorithm is derived from {@link Arrays#sort(int[])}.
+   * @param num token array to sort by
+   * @param asc ascending
+   */
+  public final void sort(final int[] num, final boolean asc) {
+    sort(0, size, asc, num);
+  }
+
+  /**
    * Sorts the array.
    * @param s offset
    * @param e length
@@ -325,6 +336,68 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Sorts the array.
+   * @param s offset
+   * @param e length
+   * @param f ascending/descending sort
+   * @param t sort tokens
+   */
+  private void sort(final int s, final int e, final boolean f, final int[] t) {
+    if(e < 7) {
+      for(int i = s; i < e + s; ++i) {
+        for(int j = i; j > s; j--) {
+          final int h = t[j - 1] - t[j];
+          if(f ? h < 0 : h > 0) break;
+          s(j, j - 1, t);
+        }
+      }
+      return;
+    }
+
+    int m = s + (e >> 1);
+    if(e > 7) {
+      int l = s;
+      int n = s + e - 1;
+      if(e > 40) {
+        final int k = e >>> 3;
+        l = m(l, l + k, l + (k << 1));
+        m = m(m - k, m, m + k);
+        n = m(n - (k << 1), n - k, n);
+      }
+      m = m(l, m, n);
+    }
+    final int v = t[m];
+
+    int a = s, b = a, c = s + e - 1, d = c;
+    while(true) {
+      while(b <= c) {
+        final int h = t[b] - v;
+        if(f ? h > 0 : h < 0) break;
+        if(h == 0) s(a++, b, t);
+        ++b;
+      }
+      while(c >= b) {
+        final int h = t[c] - v;
+        if(f ? h < 0 : h > 0) break;
+        if(h == 0) s(c, d--, t);
+        --c;
+      }
+      if(b > c) break;
+      s(b++, c--, t);
+    }
+
+    int k;
+    final int n = s + e;
+    k = Math.min(a - s, b - a);
+    s(s, b - k, k, t);
+    k = Math.min(d - c, n - d - 1);
+    s(b, n - k, k, t);
+
+    if((k = b - a) > 1) sort(s, k, f, t);
+    if((k = d - c) > 1) sort(n - k, k, f, t);
+  }
+
+  /**
    * Compares two numeric tokens and returns an integer.
    * @param a first token
    * @param b second token
@@ -376,6 +449,21 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Swaps two array elements.
+   * @param a first offset
+   * @param b second offset
+   * @param t sort tokens
+   */
+  private void s(final int a, final int b, final int[] t) {
+    final int l = list[a];
+    list[a] = list[b];
+    list[b] = l;
+    final int c = t[a];
+    t[a] = t[b];
+    t[b] = c;
+  }
+
+  /**
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
    * @param a first offset
    * @param b second offset
@@ -394,6 +482,17 @@ public class IntList extends ElementList {
    * @param t sort tokens
    */
   private void s(final int a, final int b, final int n, final double[] t) {
+    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
+  }
+
+  /**
+   * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+   * @param a first offset
+   * @param b second offset
+   * @param n number of elements
+   * @param t sort tokens
+   */
+  private void s(final int a, final int b, final int n, final int[] t) {
     for(int i = 0; i < n; ++i) s(a + i, b + i, t);
   }
 
