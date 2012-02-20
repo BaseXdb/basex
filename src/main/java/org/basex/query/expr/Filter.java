@@ -95,8 +95,8 @@ public class Filter extends Preds {
     if(preds.length == 1) {
       final Expr p = preds[0];
       final SeqType st = p.type();
-      off = st.type.isNumber() && st.zeroOrOne() && !p.uses(Use.CTX) &&
-          !p.uses(Use.NDT);
+      off = st.type.isNumber() && st.zeroOrOne() && !p.uses(Use.CTX) && !p.uses(Use.NDT);
+      if(off) type = SeqType.get(type.type, Occ.ZO);
     }
 
     // iterator for simple numeric predicate

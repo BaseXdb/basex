@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.*;
-import org.basex.query.item.SeqType.Occ;
 import org.basex.query.iter.Iter;
 
 /**
@@ -24,11 +23,10 @@ final class IterPosFilter extends Filter {
   IterPosFilter(final Filter f, final boolean o) {
     super(f.input, f.root, f.preds);
     off = o;
+    type = f.type;
     last = f.last;
     size = f.size;
     pos = f.pos;
-    // offset access: filter will return at most one result
-    type = o ? SeqType.get(f.type.type, Occ.ZO) : f.type;
   }
 
   @Override
