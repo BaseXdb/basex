@@ -508,6 +508,8 @@ public enum Err {
   NOCATCH(XPST, 3, "Expecting catch clause."),
   /** XPST0003: Parsing exception. */
   WHICHANN(XPST, 3, "Annotation % is unknown."),
+  /** XPST0003: Parsing exception. */
+  ANNVALUE(XPST, 3, "Annotation literal expected."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
@@ -638,6 +640,8 @@ public enum Err {
   ATTDUPL(XQST, 40, "Duplicate attribute '%'."),
   /** XQST0045: Parsing exception. */
   NAMERES(XQST, 45, "Function %(...) uses reserved namespace."),
+  /** XQST0045: Parsing exception. */
+  ANNRES(XQST, 45, "Annotation % uses reserved namespace."),
   /** XQST0047: Parsing exception. */
   DUPLMODULE(XQST, 47, "Module is declared twice: '%'."),
   /** XQST0047: Parsing exception. */
@@ -704,6 +708,8 @@ public enum Err {
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099: Parsing exception. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  /** XQST0106: Parsing exception. */
+  ANNVIS(XQST, 106, "Conflicting annotations found."),
   /** XQST0107: Parsing exception. */
   CTXINIT(XQST, 107, "Context item depends on itself."),
   /** XQST0108: Parsing exception. */

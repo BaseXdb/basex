@@ -23,12 +23,12 @@ public final class NSGlobal {
     NS.add(XSI, XSIURI);
     NS.add(FN, FNURI);
     NS.add(MATH, MATHURI);
+    NS.add(OPT, OPTIONURI);
     NS.add(MAP, MAPURI);
     RESERVED = NS.size();
 
     // implementation-defined pre-declarations
     NS.add(LOCAL, LOCALURI);
-    NS.add(OPT, OPTIONURI);
     NS.add(OUTPUT, OUTPUTURI);
     NS.add(ERR, ERRORURI);
     // BaseX namespaces

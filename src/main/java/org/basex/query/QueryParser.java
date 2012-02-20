@@ -473,6 +473,7 @@ public class QueryParser extends InputParser {
       } else if(wsConsumeWs(UPDATING)) {
         ctx.updating(true);
         wsCheck(FUNCTION);
+        skipWS();
         functionDecl(true, null);
       } else if(wsConsumeWs(FUNCTION)) {
         functionDecl(false, null);
@@ -480,7 +481,7 @@ public class QueryParser extends InputParser {
         optionDecl();
       } else if(wsConsumeWs(DEFAULT)) {
         error(PROLOGORDER);
-      } else if(curr('%')) {
+      } else if(ctx.xquery3 && curr('%')) {
         annotatedDecl();
       } else {
         qp = p;
@@ -513,18 +514,27 @@ public class QueryParser extends InputParser {
    */
   private Ann annotations() throws QueryException {
     final Ann ann = new Ann();
-    while(consume('%')) {
+    while(wsConsume("%")) {
       final QNm name = eQName(QNAMEINV, ctx.sc.nsFunc);
       final ItemCache ic = new ItemCache(1);
       if(wsConsumeWs(PAR1)) {
-        do ic.add(literal()); while(wsConsumeWs(COMMA));
+        do {
+          final Item it = literal();
+          if(it == null) error(ANNVALUE);
+          ic.add(it);
+        } while(wsConsumeWs(COMMA));
         wsCheck(PAR2);
       }
+      skipWS();
+
+      if(name.eq(Ann.PUBLIC) || name.eq(Ann.PRIVATE)) {
+        // only one visibility modifier allowed
+        if(ann.contains(Ann.PUBLIC) || ann.contains(Ann.PRIVATE)) error(ANNVIS);
+      } else if(NSGlobal.reserved(name.uri())) {
+        // no global namespaces allowed
+        error(ANNRES, name);
+      }
       ann.add(name, ic.value());
-      /* check if specified annotation is statically known
-      if(!name.eq(Ann.A_PUBLIC) && !name.eq(Ann.A_PRIVATE)) {
-        error(WHICHANN, name);
-      }*/
     }
     skipWS();
     return ann;
@@ -932,7 +942,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Parses the "VarDecl" rule.
+   * Parses the "ContextItemDecl" rule.
    * @throws QueryException query exception
    */
   private void contextItemDecl() throws QueryException {
@@ -1019,8 +1029,6 @@ public class QueryParser extends InputParser {
   private void functionDecl(final boolean up, final Ann ann)
       throws QueryException {
 
-    skipWS();
-
     final QNm name = eQName(FUNCNAME, ctx.sc.nsFunc);
     if(keyword(name)) error(RESERVED, name);
     if(module != null && !eq(name.uri(), module.uri())) error(MODNS, name);
@@ -1030,9 +1038,7 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final UserFunc func = new UserFunc(input(), name, args, optAsType(), ann, true);
-    func.updating = up;
-
+    final UserFunc func = new UserFunc(input(), name, args, optAsType(), ann, true, up);
     ctx.funcs.add(func, input());
     if(!wsConsumeWs(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
     ctx.vars.reset(vl);
@@ -2094,7 +2100,7 @@ public class QueryParser extends InputParser {
     final int pos = qp;
 
     // parse annotations
-    final Ann ann = curr('%') ? annotations() : null;
+    final Ann ann = ctx.xquery3 && curr('%') ? annotations() : null;
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       final int s = ctx.vars.size();
@@ -2779,7 +2785,7 @@ public class QueryParser extends InputParser {
     }
 
     // needs to be further processed
-    final Ann ann = curr('%') ? annotations() : null;
+    final Ann ann = ctx.xquery3 && curr('%') ? annotations() : null;
     final QNm name = eQName(TYPEINVALID, null);
     // parse non-atomic types
     final boolean atom = !wsConsumeWs(PAR1);

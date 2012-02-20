@@ -111,7 +111,7 @@ public final class UserFuncs extends ExprInfo {
     // add function call for function that has not been defined yet
     if(!dyn && Types.find(name, false) == null) {
       return new TypedFunc(add(ii, name, add(new UserFunc(ii, name,
-          new Var[args.length], null, null, false), ii), args),
+          new Var[args.length], null, null, false, false), ii), args),
           FuncType.arity(args.length));
     }
     return null;

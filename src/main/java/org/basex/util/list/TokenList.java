@@ -146,7 +146,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
 
   /**
    * Checks if the specified element is found in the list.
-   * @param e element to be checked
+   * @param e element to be found
    * @return result of check
    */
   public boolean contains(final byte[] e) {

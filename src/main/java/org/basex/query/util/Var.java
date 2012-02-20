@@ -25,10 +25,10 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Var extends ParseExpr {
-  /** Annotations. */
-  public final Ann ann;
   /** Variable name. */
   public final QNm name;
+  /** Annotations. */
+  public final Ann ann;
   /** Variable ID. */
   private final int id;
 

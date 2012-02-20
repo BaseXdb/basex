@@ -28,22 +28,21 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class UserFunc extends Single {
-  /** Annotations. */
-  public final Ann ann;
   /** Function name. */
   public final QNm name;
   /** Arguments. */
   public final Var[] args;
   /** Declaration flag. */
   public final boolean declared;
-
   /** Return type. */
   public final SeqType ret;
+  /** Annotations. */
+  public final Ann ann;
   /** Updating flag. */
-  public boolean updating;
+  public final boolean updating;
+
   /** Cast flag. */
   private boolean cast;
-
   /** Compilation flag. */
   private boolean compiled;
 
@@ -54,18 +53,33 @@ public class UserFunc extends Single {
    * @param v arguments
    * @param r return type
    * @param a annotations
-   * @param d declaration flag
    */
   public UserFunc(final InputInfo ii, final QNm n, final Var[] v,
-      final SeqType r, final Ann a, final boolean d) {
+      final SeqType r, final Ann a) {
+    this(ii, n, v, r, a, true, false);
+  }
+
+  /**
+   * Function constructor.
+   * @param ii input info
+   * @param n function name
+   * @param v arguments
+   * @param r return type
+   * @param a annotations
+   * @param d declaration flag
+   * @param u updating flag
+   */
+  public UserFunc(final InputInfo ii, final QNm n, final Var[] v,
+      final SeqType r, final Ann a, final boolean d, final boolean u) {
 
     super(ii, null);
     name = n;
     args = v;
     ret = r;
+    cast = r != null;
     ann = a == null ? new Ann() : a;
     declared = d;
-    cast = r != null;
+    updating = u;
   }
 
   /**

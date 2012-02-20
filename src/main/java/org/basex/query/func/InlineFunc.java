@@ -29,7 +29,7 @@ public final class InlineFunc extends UserFunc {
    */
   public InlineFunc(final InputInfo ii, final SeqType r, final Var[] v,
       final Expr e, final Ann a) {
-    super(ii, null, v, r, a, true);
+    super(ii, null, v, r, a);
     expr = e;
   }
 

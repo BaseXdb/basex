@@ -28,7 +28,7 @@ public final class PartFunc extends UserFunc {
    * @param arg arguments
    */
   public PartFunc(final InputInfo ii, final TypedFunc fun, final Var[] arg) {
-    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), null, true);
+    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), null);
     expr = fun.fun;
   }
 
@@ -40,7 +40,7 @@ public final class PartFunc extends UserFunc {
    */
   public PartFunc(final InputInfo ii, final Expr func, final Var[] arg) {
     // [LW] XQuery/HOF: dynamic type propagation
-    super(ii, new QNm(), nn(arg), func.type(), null, true);
+    super(ii, new QNm(), nn(arg), func.type(), null);
     expr = func;
   }
 

@@ -65,7 +65,7 @@ public class StringList extends ElementList implements Iterable<String> {
 
   /**
    * Checks if the specified element is found in the list.
-   * @param e element to be checked
+   * @param e element to be found
    * @return result of check
    */
   public final boolean contains(final String e) {
