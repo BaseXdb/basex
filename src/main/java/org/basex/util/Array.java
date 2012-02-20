@@ -133,6 +133,19 @@ public final class Array {
   }
 
   /**
+   * Sorts the specified numeric tokens and returns an integer array
+   * with offsets to of the sorted tokens.
+   * @param tok token array to sort by
+   * @param asc ascending
+   * @return sorted integer array
+   */
+  public static int[] createOrder(final int[] tok, final boolean asc) {
+    final IntList il = number(tok.length);
+    il.sort(tok, asc);
+    return il.toArray();
+  }
+
+  /**
    * Returns an integer list with a number list.
    * @param l array size
    * @return number list
