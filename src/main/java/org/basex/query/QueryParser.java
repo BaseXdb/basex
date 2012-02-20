@@ -87,24 +87,10 @@ import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
 import org.basex.query.func.*;
-import org.basex.query.item.Atm;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Dec;
-import org.basex.query.item.Empty;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.Int;
-import org.basex.query.item.MapType;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
+import org.basex.query.item.*;
 import org.basex.query.item.SeqType.Occ;
-import org.basex.query.item.Str;
-import org.basex.query.item.Type;
-import org.basex.query.item.Types;
-import org.basex.query.item.Uri;
-import org.basex.query.item.Value;
 import org.basex.query.item.map.Map;
+import org.basex.query.iter.*;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisStep;
 import org.basex.query.path.KindTest;
@@ -141,7 +127,7 @@ import org.basex.util.ft.Language;
 import org.basex.util.ft.Stemmer;
 import org.basex.util.ft.StopWords;
 import org.basex.util.ft.Tokenizer;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.hash.*;
 import org.basex.util.list.ObjList;
 import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
@@ -483,13 +469,13 @@ public class QueryParser extends InputParser {
       if(ctx.xquery3 && wsConsumeWs(CONTEXT)) {
         contextItemDecl();
       } else if(wsConsumeWs(VARIABLE)) {
-        varDecl();
+        varDecl(null);
       } else if(wsConsumeWs(UPDATING)) {
         ctx.updating(true);
         wsCheck(FUNCTION);
-        functionDecl(true);
+        functionDecl(true, null);
       } else if(wsConsumeWs(FUNCTION)) {
-        functionDecl(false);
+        functionDecl(false, null);
       } else if(wsConsumeWs(OPTION)) {
         optionDecl();
       } else if(wsConsumeWs(DEFAULT)) {
@@ -510,11 +496,11 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void annotatedDecl() throws QueryException {
-    annotation();
+    final Ann ann = annotations();
     if(wsConsumeWs(VARIABLE)) {
-      varDecl();
+      varDecl(ann);
     } else if(wsConsumeWs(FUNCTION)) {
-      functionDecl(false);
+      functionDecl(false, ann);
     } else {
       error(VARFUNC);
     }
@@ -522,17 +508,26 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "Annotation" rule.
+   * @return annotations
    * @throws QueryException query exception
    */
-  private void annotation() throws QueryException {
-    // XQuery30: annotations (currently ignored)
-    check('%');
-    eQName(QNAMEINV, ctx.sc.nsFunc);
-    if(wsConsumeWs(PAR1)) {
-      do literal(); while(wsConsumeWs(COMMA));
-      wsCheck(PAR2);
+  private Ann annotations() throws QueryException {
+    final Ann ann = new Ann();
+    while(consume('%')) {
+      final QNm name = eQName(QNAMEINV, ctx.sc.nsFunc);
+      final ItemCache ic = new ItemCache(1);
+      if(wsConsumeWs(PAR1)) {
+        do ic.add(literal()); while(wsConsumeWs(COMMA));
+        wsCheck(PAR2);
+      }
+      ann.add(name, ic.value());
+      /* check if specified annotation is statically known
+      if(!name.eq(Ann.A_PUBLIC) && !name.eq(Ann.A_PRIVATE)) {
+        error(WHICHANN, name);
+      }*/
     }
     skipWS();
+    return ann;
   }
 
   /**
@@ -956,10 +951,11 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "VarDecl" rule.
+   * @param ann annotations
    * @throws QueryException query exception
    */
-  private void varDecl() throws QueryException {
-    final Var v = typedVar();
+  private void varDecl(final Ann ann) throws QueryException {
+    final Var v = typedVar(ann);
     if(module != null && !eq(v.name.uri(), module.uri())) error(MODNS, v);
 
     // check if variable has already been declared
@@ -986,11 +982,12 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a variable declaration with optional type.
+   * @param ann annotations
    * @return parsed variable
    * @throws QueryException query exception
    */
-  private Var typedVar() throws QueryException {
-    return Var.create(ctx, input(), varName(), optAsType());
+  private Var typedVar(final Ann ann) throws QueryException {
+    return Var.create(ctx, input(), varName(), optAsType(), ann);
   }
 
   /**
@@ -1015,10 +1012,13 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "FunctionDecl" rule.
+   * @param ann annotations
    * @param up updating flag
    * @throws QueryException query exception
    */
-  private void functionDecl(final boolean up) throws QueryException {
+  private void functionDecl(final boolean up, final Ann ann)
+      throws QueryException {
+
     skipWS();
 
     final QNm name = eQName(FUNCNAME, ctx.sc.nsFunc);
@@ -1030,7 +1030,7 @@ public class QueryParser extends InputParser {
     final Var[] args = paramList();
     wsCheck(PAR2);
 
-    final UserFunc func = new UserFunc(input(), name, args, optAsType(), true);
+    final UserFunc func = new UserFunc(input(), name, args, optAsType(), ann, true);
     func.updating = up;
 
     ctx.funcs.add(func, input());
@@ -1063,7 +1063,7 @@ public class QueryParser extends InputParser {
         if(args.length == 0) break;
         check('$');
       }
-      final Var var = typedVar();
+      final Var var = typedVar(null);
       ctx.vars.add(var);
       for(final Var v : args)
         if(v.name.eq(var.name)) error(FUNCDUPL, var);
@@ -1196,7 +1196,7 @@ public class QueryParser extends InputParser {
         // if one groups variables such as $x as xs:integer, then the resulting
         // sequence isn't compatible with the type and can't be assigned
         ngrp[i] = Var.create(ctx, input(), v.name, v.type != null
-            && v.type.one() ? SeqType.get(v.type.type, Occ.OM) : null);
+            && v.type.one() ? SeqType.get(v.type.type, Occ.OM) : null, null);
         ctx.vars.add(ngrp[i]);
       }
 
@@ -1248,12 +1248,12 @@ public class QueryParser extends InputParser {
 
         final QNm name = varName();
         final SeqType type = score ? SeqType.DBL : optAsType();
-        final Var var = Var.create(ctx, input(), name, type);
+        final Var var = Var.create(ctx, input(), name, type, null);
 
         final Var ps = fr && wsConsumeWs(AT) ? Var.create(ctx, input(),
-            varName(), SeqType.ITR) : null;
+            varName(), SeqType.ITR, null) : null;
         final Var sc = fr && wsConsumeWs(SCORE) ? Var.create(ctx, input(),
-            varName(), SeqType.DBL) : null;
+            varName(), SeqType.DBL, null) : null;
 
         wsCheck(fr ? IN : ASSIGN);
         final Expr e = check(single(), NOVARDECL);
@@ -1348,7 +1348,7 @@ public class QueryParser extends InputParser {
     final int s = ctx.vars.size();
     For[] fl = { };
     do {
-      final Var var = typedVar();
+      final Var var = typedVar(null);
       wsCheck(IN);
       final Expr e = check(single(), NOSOME);
       ctx.vars.add(var);
@@ -1414,7 +1414,7 @@ public class QueryParser extends InputParser {
         name = varName();
         if(cs) wsCheck(AS);
       }
-      final Var v = Var.create(ctx, input(), name, cs ? sequenceType() : null);
+      final Var v = Var.create(ctx, input(), name, cs ? sequenceType() : null, null);
       if(name != null) ctx.vars.add(v);
       wsCheck(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
@@ -2094,7 +2094,7 @@ public class QueryParser extends InputParser {
     final int pos = qp;
 
     // parse annotations
-    while(curr('%')) annotation();
+    final Ann ann = curr('%') ? annotations() : null;
     // inline function
     if(wsConsume(FUNCTION) && wsConsume(PAR1)) {
       final int s = ctx.vars.size();
@@ -2104,8 +2104,10 @@ public class QueryParser extends InputParser {
       final SeqType type = optAsType();
       final Expr body = enclosed(NOFUNBODY);
       ctx.vars.size(s);
-      return new InlineFunc(input(), type, args, body);
+      return new InlineFunc(input(), type, args, body, ann);
     }
+    // annotations not allowed here
+    if(ann != null) error(NOANN);
 
     // named function reference
     qp = pos;
@@ -2125,7 +2127,7 @@ public class QueryParser extends InputParser {
    * @return query expression, or {@code null}
    * @throws QueryException query exception
    */
-  private Expr literal() throws QueryException {
+  private Item literal() throws QueryException {
     final char c = curr();
     // literals
     if(digit(c) || c == '.') return numericLiteral(false);
@@ -2154,7 +2156,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr numericLiteral(final boolean itr) throws QueryException {
+  private Item numericLiteral(final boolean itr) throws QueryException {
     tok.reset();
     while(digit(curr())) tok.add(consume());
 
@@ -2181,7 +2183,7 @@ public class QueryParser extends InputParser {
    * @return expression
    * @throws QueryException query exception
    */
-  private Expr checkDbl() throws QueryException {
+  private Dbl checkDbl() throws QueryException {
     if(!consume('e') && !consume('E')) error(NUMBERWS);
     tok.add('e');
     if(curr('+') || curr('-')) tok.add(consume());
@@ -2776,18 +2778,14 @@ public class QueryParser extends InputParser {
       return ret;
     }
 
-    boolean ann = false;
-    while(curr('%')) {
-      annotation();
-      ann = true;
-    }
-
+    // needs to be further processed
+    final Ann ann = curr('%') ? annotations() : null;
     final QNm name = eQName(TYPEINVALID, null);
     // parse non-atomic types
     final boolean atom = !wsConsumeWs(PAR1);
 
     Type t = Types.find(name, atom);
-    if(ann && (t == null || !t.isFunction())) error(NOANN);
+    if(ann != null && (t == null || !t.isFunction())) error(NOANN);
 
     tok.reset();
     if(!atom) {
@@ -2838,8 +2836,7 @@ public class QueryParser extends InputParser {
 
     if(t == null) {
       if(atom) error(TYPEUNKNOWN, name);
-      error(NOTYPE,
-          new TokenBuilder(name.string()).add('(').add(tok.finish()).add(')'));
+      error(NOTYPE, new TokenBuilder(name.string()).add('(').add(tok.finish()).add(')'));
     }
     return t;
   }
@@ -3411,7 +3408,7 @@ public class QueryParser extends InputParser {
 
     Let[] fl = { };
     do {
-      final Var v = Var.create(ctx, input(), varName());
+      final Var v = Var.create(ctx, input(), varName(), null);
       wsCheck(ASSIGN);
       final Expr e = check(single(), INCOMPLETE);
       ctx.vars.add(v);

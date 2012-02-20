@@ -506,6 +506,8 @@ public enum Err {
   NOANN(XPST, 3, "No annotation allowed here."),
   /** XPST0003: Parsing exception. */
   NOCATCH(XPST, 3, "Expecting catch clause."),
+  /** XPST0003: Parsing exception. */
+  WHICHANN(XPST, 3, "Annotation % is unknown."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),

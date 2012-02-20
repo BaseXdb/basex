@@ -25,6 +25,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Var extends ParseExpr {
+  /** Annotations. */
+  public final Ann ann;
   /** Variable name. */
   public final QNm name;
   /** Variable ID. */
@@ -48,12 +50,15 @@ public final class Var extends ParseExpr {
    * @param n variable name
    * @param t data type
    * @param i variable ID
+   * @param a annotations
    */
-  private Var(final InputInfo ii, final QNm n, final SeqType t, final int i) {
+  private Var(final InputInfo ii, final QNm n, final SeqType t, final int i,
+      final Ann a) {
     super(ii);
     name = n;
     type = t;
     id = i;
+    ann = a == null ? new Ann() : a;
   }
 
   /**
@@ -62,11 +67,12 @@ public final class Var extends ParseExpr {
    * @param ii input info
    * @param n variable name
    * @param t type
+   * @param a annotations
    * @return variable
    */
   public static Var create(final QueryContext ctx, final InputInfo ii,
-      final QNm n, final SeqType t) {
-    return new Var(ii, n, t, ctx.varIDs++);
+      final QNm n, final SeqType t, final Ann a) {
+    return new Var(ii, n, t, ctx.varIDs++, a);
   }
 
   /**
@@ -74,11 +80,12 @@ public final class Var extends ParseExpr {
    * @param ctx query context
    * @param ii input info
    * @param n variable name
+   * @param a annotations
    * @return variable
    */
   public static Var create(final QueryContext ctx, final InputInfo ii,
-      final QNm n) {
-    return create(ctx, ii, n, (SeqType) null);
+      final QNm n, final Ann a) {
+    return create(ctx, ii, n, (SeqType) null, a);
   }
 
   /**
@@ -87,11 +94,12 @@ public final class Var extends ParseExpr {
    * @param ii input info
    * @param n variable name
    * @param v variable to be bound
+   * @param a annotations
    * @return variable
    */
   public static Var create(final QueryContext ctx, final InputInfo ii,
-      final QNm n, final Value v) {
-    final Var var = create(ctx, ii, n, v.type());
+      final QNm n, final Value v, final Ann a) {
+    final Var var = create(ctx, ii, n, v.type(), a);
     var.expr = v;
     var.value = v;
     return var;
@@ -213,7 +221,7 @@ public final class Var extends ParseExpr {
    * @return copy
    */
   public Var copy() {
-    final Var v = new Var(input, name, type, id);
+    final Var v = new Var(input, name, type, id, ann);
     v.global = global;
     v.value = value;
     v.expr = expr;

@@ -1,21 +1,16 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.FuncItem;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Inline function.
@@ -28,13 +23,14 @@ public final class InlineFunc extends UserFunc {
    * Constructor.
    * @param ii input info
    * @param r return type
-   * @param argv arguments
-   * @param body function body
+   * @param v arguments
+   * @param e function body
+   * @param a annotations
    */
-  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] argv,
-      final Expr body) {
-    super(ii, null, argv, r, true);
-    expr = body;
+  public InlineFunc(final InputInfo ii, final SeqType r, final Var[] v,
+      final Expr e, final Ann a) {
+    super(ii, null, v, r, a, true);
+    expr = e;
   }
 
   @Override

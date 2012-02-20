@@ -28,7 +28,7 @@ public final class PartFunc extends UserFunc {
    * @param arg arguments
    */
   public PartFunc(final InputInfo ii, final TypedFunc fun, final Var[] arg) {
-    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), true);
+    super(ii, new QNm(), nn(fun.type.type(arg)), fun.ret(), null, true);
     expr = fun.fun;
   }
 
@@ -40,7 +40,7 @@ public final class PartFunc extends UserFunc {
    */
   public PartFunc(final InputInfo ii, final Expr func, final Var[] arg) {
     // [LW] XQuery/HOF: dynamic type propagation
-    super(ii, new QNm(), nn(arg), func.type(), true);
+    super(ii, new QNm(), nn(arg), func.type(), null, true);
     expr = func;
   }
 
@@ -58,7 +58,7 @@ public final class PartFunc extends UserFunc {
   public Expr comp(final QueryContext ctx) throws QueryException {
     comp(ctx, false);
     // defer creation of function item because of closure
-    return new InlineFunc(input, ret, args, expr).comp(ctx);
+    return new InlineFunc(input, ret, args, expr, ann).comp(ctx);
   }
 
   @Override

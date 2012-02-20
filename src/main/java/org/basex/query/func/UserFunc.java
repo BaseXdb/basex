@@ -15,8 +15,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Var;
-import org.basex.query.util.VarStack;
+import org.basex.query.util.*;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -29,6 +28,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class UserFunc extends Single {
+  /** Annotations. */
+  public final Ann ann;
   /** Function name. */
   public final QNm name;
   /** Arguments. */
@@ -50,17 +51,19 @@ public class UserFunc extends Single {
    * Function constructor.
    * @param ii input info
    * @param n function name
-   * @param a arguments
+   * @param v arguments
    * @param r return type
+   * @param a annotations
    * @param d declaration flag
    */
-  public UserFunc(final InputInfo ii, final QNm n, final Var[] a,
-      final SeqType r, final boolean d) {
+  public UserFunc(final InputInfo ii, final QNm n, final Var[] v,
+      final SeqType r, final Ann a, final boolean d) {
 
     super(ii, null);
     name = n;
+    args = v;
     ret = r;
-    args = a;
+    ann = a == null ? new Ann() : a;
     declared = d;
     cast = r != null;
   }

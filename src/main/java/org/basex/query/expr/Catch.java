@@ -48,7 +48,7 @@ public final class Catch extends Single {
     super(ii, null);
     codes = c;
     for(int i = 0; i < QNM.length; i++) vars[i] =
-      Var.create(ctx, null, QNM[i], TYPES[i]);
+      Var.create(ctx, null, QNM[i], TYPES[i], null);
   }
 
   @Override

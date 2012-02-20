@@ -381,7 +381,7 @@ public final class QueryContext extends Progress {
     final Var gl = vars.globals().get(qnm);
     if(gl == null) {
       // assign new variable
-      vars.updateGlobal(Var.create(this, null, qnm).bind(ex, this));
+      vars.updateGlobal(Var.create(this, null, qnm, null).bind(ex, this));
     } else {
       // reset declaration state and bind new expression
       gl.declared = false;
@@ -442,7 +442,7 @@ public final class QueryContext extends Progress {
    * @return variable
    */
   public Var uniqueVar(final InputInfo ii, final SeqType type) {
-    return Var.create(this, ii, new QNm(token(varIDs)), type);
+    return Var.create(this, ii, new QNm(token(varIDs)), type, null);
   }
 
   /**

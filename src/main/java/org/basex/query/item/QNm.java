@@ -184,8 +184,7 @@ public final class QNm extends Item {
    * @return full name
    */
   public byte[] eqname() {
-    return new TokenBuilder().add('"').add(Str.get(uri()).toString()).
-        add("\":").add(local()).finish();
+    return new TokenBuilder().add('{').add(uri()).add('}').add(local()).finish();
   }
 
   @Override
