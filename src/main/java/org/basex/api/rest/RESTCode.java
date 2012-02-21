@@ -28,17 +28,17 @@ abstract class RESTCode {
   /**
    * Performs the REST operation.
    * @param ctx rest context
-   * @throws RESTException REST exception
+   * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  abstract void run(final RESTContext ctx) throws RESTException, IOException;
+  abstract void run(final HTTPContext ctx) throws HTTPException, IOException;
 
   /**
    * Initializes the output. Sets the expected encoding and content type.
    * @param ctx rest context
    * @param sprop serialization properties
    */
-  static void initResponse(final SerializerProp sprop, final RESTContext ctx) {
+  static void initResponse(final SerializerProp sprop, final HTTPContext ctx) {
     // set encoding
     ctx.res.setCharacterEncoding(sprop.get(SerializerProp.S_ENCODING));
 
@@ -65,14 +65,14 @@ abstract class RESTCode {
   /**
    * Opens the addressed database.
    * @param ctx rest context
-   * @throws RESTException REST exception
+   * @throws HTTPException REST exception
    */
-  static void open(final RESTContext ctx) throws RESTException {
+  static void open(final HTTPContext ctx) throws HTTPException {
     if(ctx.db() == null) return;
     try {
-      ctx.session.execute(new Open(ctx.all()));
+      ctx.session.execute(new Open(ctx.path()));
     } catch(final IOException ex) {
-      throw new RESTException(SC_NOT_FOUND, ex.getMessage());
+      throw new HTTPException(SC_NOT_FOUND, ex.getMessage());
     }
   }
 
@@ -80,17 +80,17 @@ abstract class RESTCode {
    * Sets the wrapping flag.
    * @param val value
    * @param ctx rest context
-   * @throws RESTException REST exception
+   * @throws HTTPException REST exception
    */
-  static void wrap(final String val, final RESTContext ctx)
-      throws RESTException {
+  static void wrap(final String val, final HTTPContext ctx)
+      throws HTTPException {
 
     ctx.wrapping = Util.yes(val);
     if(!ctx.wrapping && !Util.no(val)) {
       try {
         SerializerProp.error(WRAP, val, Text.YES, Text.NO);
       } catch(final SerializerException ex) {
-        throw new RESTException(SC_BAD_REQUEST, ex.getMessage());
+        throw new HTTPException(SC_BAD_REQUEST, ex.getMessage());
       }
     }
   }
@@ -101,7 +101,7 @@ abstract class RESTCode {
    * @return number of documents
    * @throws IOException I/O exception
    */
-  protected static boolean exists(final RESTContext ctx) throws IOException {
+  protected static boolean exists(final HTTPContext ctx) throws IOException {
     final Query q = ctx.session.query(_DB_EXISTS.args("$d", "$p"));
     q.bind("d", ctx.db());
     q.bind("p", ctx.dbpath());
@@ -114,7 +114,7 @@ abstract class RESTCode {
    * @return result of check
    * @throws IOException I/O exception
    */
-  protected static boolean isRaw(final RESTContext ctx) throws IOException {
+  protected static boolean isRaw(final HTTPContext ctx) throws IOException {
     final Query q = ctx.session.query(_DB_IS_RAW.args("$d", "$p"));
     q.bind("d", ctx.db());
     q.bind("p", ctx.dbpath());
@@ -127,7 +127,7 @@ abstract class RESTCode {
    * @return content type
    * @throws IOException I/O exception
    */
-  protected static String contentType(final RESTContext ctx)
+  protected static String contentType(final HTTPContext ctx)
       throws IOException {
 
     final Query q = ctx.session.query(_DB_CONTENT_TYPE.args("$d", "$p"));
@@ -141,7 +141,7 @@ abstract class RESTCode {
    * @param ctx rest context
    * @return parameters
    */
-  static Map<String, String[]> params(final RESTContext ctx) {
+  static Map<String, String[]> params(final HTTPContext ctx) {
     final Map<String, String[]> params = new HashMap<String, String[]>();
     final Map<?, ?> map = ctx.req.getParameterMap();
     for(final Entry<?, ?> s : map.entrySet()) {
@@ -157,15 +157,15 @@ abstract class RESTCode {
    * Parses and sets database options.
    * Throws an exception if an option is unknown.
    * @param ctx rest context
-   * @throws RESTException REST exception
+   * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  static void parseOptions(final RESTContext ctx)
-      throws RESTException, IOException {
+  static void parseOptions(final HTTPContext ctx)
+      throws HTTPException, IOException {
 
     for(final Entry<String, String[]> param : params(ctx).entrySet()) {
      if(!parseOption(ctx, param)) {
-       throw new RESTException(SC_BAD_REQUEST, ERR_PARAM, param.getKey());
+       throw new HTTPException(SC_BAD_REQUEST, ERR_PARAM, param.getKey());
      }
     }
   }
@@ -177,7 +177,7 @@ abstract class RESTCode {
    * @return success flag
    * @throws IOException I/O exception
    */
-  static boolean parseOption(final RESTContext ctx,
+  static boolean parseOption(final HTTPContext ctx,
       final Entry<String, String[]> param) throws IOException {
 
     final String key = param.getKey().toUpperCase(Locale.ENGLISH);

@@ -4,11 +4,11 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.DropDB;
-import org.basex.server.Session;
+import org.basex.api.*;
+import org.basex.core.cmd.*;
+import org.basex.server.*;
 
 /**
  * REST-based evaluation of DELETE operations.
@@ -18,7 +18,7 @@ import org.basex.server.Session;
  */
 public class RESTDelete extends RESTCode {
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     // parse database options
     parseOptions(ctx);
     // open addressed database
@@ -26,7 +26,7 @@ public class RESTDelete extends RESTCode {
 
     final Session session = ctx.session;
     if(ctx.depth() == 0) {
-      throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
+      throw new HTTPException(SC_NOT_FOUND, ERR_NOPATH);
     } else if(ctx.depth() == 1) {
       session.execute(new DropDB(ctx.db()));
     } else {

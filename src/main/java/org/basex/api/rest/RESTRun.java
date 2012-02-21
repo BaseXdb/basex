@@ -1,20 +1,17 @@
 package org.basex.api.rest;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.basex.api.HTTPSession;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.core.Prop;
+import org.basex.api.*;
+import org.basex.core.*;
 import org.basex.core.cmd.Set;
-import org.basex.io.IOFile;
-import org.basex.util.Util;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * REST-based evaluation of XQuery files.
@@ -34,7 +31,7 @@ public class RESTRun extends RESTQuery {
   }
 
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     // get root directory for files
     final Context context = HTTPSession.context();
     final String path = context.mprop.get(MainProp.HTTPPATH);
@@ -43,8 +40,7 @@ public class RESTRun extends RESTQuery {
     final IOFile root = new IOFile(path);
     final IOFile io = new IOFile(path, input);
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
-        throw new RESTException(HttpServletResponse.SC_NOT_FOUND,
-            Util.info(FILE_NOT_FOUND_X, input));
+        throw new HTTPException(SC_NOT_FOUND, Util.info(FILE_NOT_FOUND_X, input));
 
     // set query path
     ctx.session.execute(new Set(Prop.QUERYPATH, io.path()));

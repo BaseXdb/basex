@@ -21,4 +21,12 @@
     <servlet-name>REST</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>RESTful XQuery</servlet-name>
+    <servlet-class>org.basex.api.restxq.RestXqServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RESTful XQuery</servlet-name>
+    <url-pattern>/restxq/*</url-pattern>
+  </servlet-mapping>
 </web-app>

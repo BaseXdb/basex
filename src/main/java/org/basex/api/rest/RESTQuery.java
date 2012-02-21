@@ -3,23 +3,19 @@ package org.basex.api.rest;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
 
-import org.basex.api.HTTPSession;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Get;
+import org.basex.api.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
-import org.basex.io.IOFile;
-import org.basex.io.in.ArrayInput;
-import org.basex.io.serial.SerializerProp;
-import org.basex.server.Query;
-import org.basex.server.Session;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.serial.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * REST-based evaluation of XQuery expressions.
@@ -49,7 +45,7 @@ class RESTQuery extends RESTCode {
   }
 
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     query(input, ctx);
   }
 
@@ -57,11 +53,11 @@ class RESTQuery extends RESTCode {
    * Evaluates the specified query.
    * @param in query input
    * @param ctx REST context
-   * @throws RESTException REST exception
+   * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  protected void query(final String in, final RESTContext ctx)
-      throws RESTException, IOException {
+  protected void query(final String in, final HTTPContext ctx)
+      throws HTTPException, IOException {
 
     if(item != null) {
       // create main memory instance of the document specified as context node
@@ -111,7 +107,7 @@ class RESTQuery extends RESTCode {
    * @param ctx REST context
    * @return serialization options
    */
-  static String serial(final RESTContext ctx) {
+  static String serial(final HTTPContext ctx) {
     final TokenBuilder ser = new TokenBuilder(ctx.serialization);
     if(ctx.wrapping) {
       if(ser.size() != 0) ser.add(',');

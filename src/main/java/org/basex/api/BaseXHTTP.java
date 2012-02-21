@@ -14,6 +14,7 @@ import java.net.URL;
 
 import org.basex.BaseXServer;
 import org.basex.api.rest.RESTServlet;
+import org.basex.api.restxq.*;
 import org.basex.api.webdav.WebDAVServlet;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -42,6 +43,8 @@ public final class BaseXHTTP {
   private boolean webdav = true;
   /** Activate REST. */
   private boolean rest = true;
+  /** Activate RestXQ. */
+  private boolean restxq = true;
   /** Start database server. */
   private boolean server;
 
@@ -140,6 +143,7 @@ public final class BaseXHTTP {
             org.mortbay.jetty.servlet.Context.SESSIONS);
 
     if(rest)   jctx.addServlet(RESTServlet.class, "/rest/*");
+    if(restxq) jctx.addServlet(RestXqServlet.class, "/restxq/*");
     if(webdav) jctx.addServlet(WebDAVServlet.class, "/webdav/*");
 
     final ResourceHandler rh = new ResourceHandler();
@@ -233,6 +237,9 @@ public final class BaseXHTTP {
             break;
           case 'W': // deactivate WebDAV service
             webdav = false;
+            break;
+          case 'X': // deactivate RestXQ service
+            restxq = false;
             break;
           case 'z': // suppress logging
             quiet = true;

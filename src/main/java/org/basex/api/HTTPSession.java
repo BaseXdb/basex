@@ -1,16 +1,14 @@
 package org.basex.api;
 
 import static org.basex.api.HTTPText.*;
-import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 
-import org.basex.core.Context;
-import org.basex.server.ClientSession;
-import org.basex.server.LocalSession;
-import org.basex.server.LoginException;
-import org.basex.server.Session;
-import org.basex.util.Base64;
+import javax.servlet.http.*;
+
+import org.basex.core.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * This class offers methods for managing login data and creating database

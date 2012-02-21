@@ -1,10 +1,11 @@
 package org.basex.api.rest;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.data.DataText;
-import org.basex.io.serial.SerializerProp;
-import org.basex.server.Session;
+import org.basex.api.*;
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.server.*;
 
 /**
  * REST-based evaluation of database commands.
@@ -25,7 +26,7 @@ public class RESTCommand extends RESTCode {
   }
 
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     // open addressed database
     open(ctx);
     // set default content type to raw

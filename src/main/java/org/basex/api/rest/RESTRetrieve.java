@@ -4,22 +4,21 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
-import org.basex.core.Prop;
+import org.basex.api.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
-import org.basex.core.cmd.ListDB;
-import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Set;
-import org.basex.data.DataText;
-import org.basex.io.MimeTypes;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.server.Session;
-import org.basex.util.Table;
-import org.basex.util.list.TokenList;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.server.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class retrieves resources.
@@ -40,7 +39,7 @@ final class RESTRetrieve extends RESTQuery {
   }
 
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     // open addressed database
     open(ctx);
 
@@ -58,9 +57,8 @@ final class RESTRetrieve extends RESTQuery {
       ser.close();
     } else if(!exists(ctx)) {
       // list database resources
-      final Table table = new Table(session.execute(new ListDB(ctx.all())));
-      if(table.contents.isEmpty())
-        throw new RESTException(SC_NOT_FOUND, ERR_NORES);
+      final Table table = new Table(session.execute(new ListDB(ctx.path())));
+      if(table.contents.isEmpty()) throw new HTTPException(SC_NOT_FOUND, ERR_NORES);
 
       final String serial = ctx.serialization;
       final SerializerProp sprop = new SerializerProp(serial);

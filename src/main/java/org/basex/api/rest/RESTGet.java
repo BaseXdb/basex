@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.basex.api.*;
 import org.basex.io.serial.*;
 import org.basex.util.*;
 
@@ -18,7 +19,7 @@ import org.basex.util.*;
  */
 final class RESTGet extends RESTCode {
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     final Map<String, String[]> vars = new HashMap<String, String[]>();
 
     // handle query parameters
@@ -37,7 +38,7 @@ final class RESTGet extends RESTCode {
 
       if(Token.eqic(key, COMMAND, QUERY, RUN)) {
         if(operation != null || vals.length > 1)
-          throw new RESTException(SC_BAD_REQUEST, ERR_ONLYONE);
+          throw new HTTPException(SC_BAD_REQUEST, ERR_ONLYONE);
         operation = key;
         input = val;
       } else if(key.equalsIgnoreCase(WRAP)) {

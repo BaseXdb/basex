@@ -1,14 +1,14 @@
-package org.basex.api.rest;
+package org.basex.api;
 
 import org.basex.util.Util;
 
 /**
- * REST exception. Also thrown to pass on correct status codes.
+ * HTTP exception. Also thrown to pass on correct status codes.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class RESTException extends Exception {
+public final class HTTPException extends Exception {
   /** Status code. */
   private final int stat;
 
@@ -18,7 +18,7 @@ public final class RESTException extends Exception {
    * @param message message, or {@code null}
    * @param extension message extension
    */
-  public RESTException(final int status, final String message,
+  public HTTPException(final int status, final String message,
       final Object... extension) {
 
     super(Util.info(message, extension));

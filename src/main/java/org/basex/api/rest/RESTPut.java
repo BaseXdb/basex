@@ -4,11 +4,12 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
 import static org.basex.io.MimeTypes.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import org.basex.core.cmd.Delete;
-import org.basex.io.in.ArrayInput;
-import org.basex.server.Session;
+import java.io.*;
+
+import org.basex.api.*;
+import org.basex.core.cmd.*;
+import org.basex.io.in.*;
+import org.basex.server.*;
 
 /**
  * REST-based evaluation of PUT operations.
@@ -18,16 +19,16 @@ import org.basex.server.Session;
  */
 public class RESTPut extends RESTCode {
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     // parse database options
     parseOptions(ctx);
 
     // create new database or update resource
     final Session session = ctx.session;
-    if(ctx.depth() == 0) throw new RESTException(SC_NOT_FOUND, ERR_NOPATH);
+    if(ctx.depth() == 0) throw new HTTPException(SC_NOT_FOUND, ERR_NOPATH);
 
     boolean xml = true;
-    InputStream in = ctx.in;
+    final InputStream in = ctx.in;
     final String ct = ctx.req.getContentType();
     // choose correct importer
     if(APP_JSON.equals(ct)) {
@@ -65,6 +66,6 @@ public class RESTPut extends RESTCode {
     }
 
     // return correct status and command info
-    throw new RESTException(SC_CREATED, session.info());
+    throw new HTTPException(SC_CREATED, session.info());
   }
 }

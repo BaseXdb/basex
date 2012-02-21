@@ -50,7 +50,7 @@ public class RESTPost extends RESTCode {
   }
 
   @Override
-  void run(final RESTContext ctx) throws RESTException, IOException {
+  void run(final HTTPContext ctx) throws HTTPException, IOException {
     parseOptions(ctx);
 
     String enc = ctx.req.getCharacterEncoding();
@@ -66,7 +66,7 @@ public class RESTPost extends RESTCode {
       final Parser parser = Parser.xmlParser(new IOContent(in), context.prop);
       doc = new DBNode(parser, context.prop);
     } catch(final IOException ex) {
-      throw new RESTException(SC_BAD_REQUEST, ex.getMessage());
+      throw new HTTPException(SC_BAD_REQUEST, ex.getMessage());
     }
 
     final SerializerProp sp = new SerializerProp();
@@ -86,7 +86,7 @@ public class RESTPost extends RESTCode {
         } else if(name.equals(WRAP)) {
           wrap(value, ctx);
         } else {
-          throw new RESTException(SC_BAD_REQUEST, ERR_PARAM, name);
+          throw new HTTPException(SC_BAD_REQUEST, ERR_PARAM, name);
         }
       }
       ctx.serialization = ser.toString();
@@ -116,7 +116,7 @@ public class RESTPost extends RESTCode {
       qp = new QueryProcessor("*/*:context/node()", doc, context);
       ir = qp.iter();
       for(Item n; (n = ir.next()) != null;) {
-        if(item != null) throw new RESTException(SC_BAD_REQUEST, ERR_CTXITEM);
+        if(item != null) throw new HTTPException(SC_BAD_REQUEST, ERR_CTXITEM);
         // create main memory instance of the specified node
         n = DataBuilder.stripNS((ANode) n, RESTURI, qp.ctx);
         final ArrayOutput ao = new ArrayOutput();
@@ -136,8 +136,7 @@ public class RESTPost extends RESTCode {
       }
       code.run(ctx);
     } catch(final QueryException ex) {
-      throw new RESTException(SC_BAD_REQUEST, ex.getMessage().
-          replaceAll("\\r?\\n+", " ").replaceAll(".*\\[\\w+\\d*\\] ", ""));
+      throw new HTTPException(SC_BAD_REQUEST, ex.getLocalizedMessage());
     }
   }
 
@@ -160,9 +159,9 @@ public class RESTPost extends RESTCode {
   /**
    * Validates the specified XML input against the POST schema.
    * @param input input document
-   * @throws RESTException exception
+   * @throws HTTPException exception
    */
-  private static void validate(final byte[] input) throws RESTException {
+  private static void validate(final byte[] input) throws HTTPException {
     try {
       final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setNamespaceAware(true);
@@ -170,7 +169,7 @@ public class RESTPost extends RESTCode {
       VALIDATOR.validate(new DOMSource(db.parse(new ArrayInput(input))));
     } catch(final Exception ex) {
       // validation fails
-      throw new RESTException(SC_BAD_REQUEST, ex.getMessage());
+      throw new HTTPException(SC_BAD_REQUEST, ex.getMessage());
     }
   }
 }
