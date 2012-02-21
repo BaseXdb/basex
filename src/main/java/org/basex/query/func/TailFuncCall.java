@@ -53,8 +53,6 @@ final class TailFuncCall extends UserFuncCall {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    checkHeight(ctx);
-
     // [LW] make result streamable
     return value(ctx).iter();
   }

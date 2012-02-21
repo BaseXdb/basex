@@ -183,21 +183,33 @@ public final class FNStr extends StandardFunc {
    */
   private Item substr(final QueryContext ctx) throws QueryException {
     // normalize positions
-    final double ds = checkDbl(expr[1], ctx);
     final byte[] str = checkEStr(expr[0], ctx);
-    if(Double.isNaN(ds)) return Str.ZERO;
 
-    final boolean end = expr.length == 3;
-    int l = len(str);
-    int s = subPos(ds);
-    int e = end ? subPos(checkDbl(expr[2], ctx) + 1) : l;
+    
+    final Item is = checkItem(expr[1], ctx);
+    int s;
+    if(is instanceof Int) {
+      s = (int) is.itr(input) - 1;
+    } else {
+      final double ds = is.dbl(input);
+      if(Double.isNaN(ds)) return Str.ZERO;
+      s = subPos(ds);
+    }
+
+    final boolean end = expr.length == 3, ascii = ascii(str);
+    int l = ascii ? str.length : len(str);
+    int e = l;
+    if(end) {
+      final Item ie = checkItem(expr[2], ctx);
+      e = ie instanceof Int ? (int) ie.itr(input) : subPos(ie.dbl(input) + 1);
+    }
     if(s < 0) {
       e += s;
       s = 0;
     }
     e = Math.min(l, end ? s + e : Integer.MAX_VALUE);
     if(s >= e) return Str.ZERO;
-    if(ascii(str)) return Str.get(substring(str, s, e));
+    if(ascii) return Str.get(substring(str, s, e));
 
     int ss = s;
     int ee = e;
