@@ -163,10 +163,13 @@ public final class FNUtil extends StandardFunc {
     Performance.gc(3);
     final long min = Performance.memory();
 
+    // optional message
+    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+
     // check caching flag
-    if(expr.length == 2 && checkBln(expr[1], ctx)) {
+    if(expr.length > 1 && checkBln(expr[1], ctx)) {
       final Value v = ctx.value(expr[0]).cache().value();
-      dump(min, ctx);
+      dump(min, msg, ctx);
       return v.iter();
     }
 
@@ -175,7 +178,7 @@ public final class FNUtil extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         final Item i = ir.next();
-        if(i == null) dump(min, ctx);
+        if(i == null) dump(min, msg, ctx);
         return i;
       }
     };
@@ -184,13 +187,14 @@ public final class FNUtil extends StandardFunc {
   /**
    * Dumps the memory consumption.
    * @param min initial memory usage
+   * @param msg message (can be {@code null})
    * @param ctx query context
    */
-  static void dump(final long min, final QueryContext ctx) {
+  static void dump(final long min, final byte[] msg, final QueryContext ctx) {
     Performance.gc(2);
     final long max = Performance.memory();
     final long mb = Math.max(0, max - min);
-    FNInfo.dump(Performance.format(mb), ctx);
+    FNInfo.dump(token(Performance.format(mb)), msg, ctx);
   }
 
   /**
@@ -203,10 +207,13 @@ public final class FNUtil extends StandardFunc {
     // create timer
     final Performance p = new Performance();
 
+    // optional message
+    final byte[] msg = expr.length > 2 ? checkStr(expr[2], ctx) : null;
+
     // check caching flag
-    if(expr.length == 2 && checkBln(expr[1], ctx)) {
+    if(expr.length > 1 && checkBln(expr[1], ctx)) {
       final Value v = ctx.value(expr[0]).cache().value();
-      FNInfo.dump(p.getTime(), ctx);
+      FNInfo.dump(token(p.getTime()), msg, ctx);
       return v.iter();
     }
 
@@ -215,7 +222,7 @@ public final class FNUtil extends StandardFunc {
       @Override
       public Item next() throws QueryException {
         final Item i = ir.next();
-        if(i == null) FNInfo.dump(p.getTime(), ctx);
+        if(i == null) FNInfo.dump(token(p.getTime()), msg, ctx);
         return i;
       }
     };

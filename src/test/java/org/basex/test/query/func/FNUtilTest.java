@@ -52,8 +52,9 @@ public final class FNUtilTest extends AdvancedQueryTest {
     System.setErr(NULL);
     check(_UTIL_MEM);
     query(_UTIL_MEM.args("()"));
-    query(COUNT.args(_UTIL_MEM.args(" 1 to 100000 ", false)), "100000");
-    query(COUNT.args(_UTIL_MEM.args(" 1 to 100000 ", true)), "100000");
+    query(COUNT.args(_UTIL_MEM.args(" 1 to 100 ", false)), "100");
+    query(COUNT.args(_UTIL_MEM.args(" 1 to 100 ", true)), "100");
+    query(COUNT.args(_UTIL_MEM.args(" 1 to 100 ", true, "label")), "100");
     System.setErr(err);
   }
 
@@ -66,8 +67,9 @@ public final class FNUtilTest extends AdvancedQueryTest {
     System.setErr(NULL);
     check(_UTIL_TIME);
     query(_UTIL_TIME.args("()"));
-    query(COUNT.args(_UTIL_TIME.args(" 1 to 100000 ", false)), "100000");
-    query(COUNT.args(_UTIL_TIME.args(" 1 to 100000 ", true)), "100000");
+    query(COUNT.args(_UTIL_TIME.args(" 1 to 100 ", false)), "100");
+    query(COUNT.args(_UTIL_TIME.args(" 1 to 100 ", true)), "100");
+    query(COUNT.args(_UTIL_TIME.args(" 1 to 100 ", true, "label")), "100");
     System.setErr(err);
   }
 

@@ -228,7 +228,7 @@ public enum Function {
   ERROR(FNInfo.class, "error([code[,desc[,object]]])", EMP, 0,
       QNM_ZO, STR, ITEM_ZM),
   /** XQuery function. */
-  TRACE(FNInfo.class, "trace(item,msg)", ITEM_ZM, ITEM_ZM, STR),
+  TRACE(FNInfo.class, "trace(value,label)", ITEM_ZM, ITEM_ZM, STR),
   /** XQuery function. */
   ENVIRONMENT_VARIABLE(FNInfo.class, "environment-variable(string)",
       STR_ZO, STR),
@@ -707,9 +707,9 @@ public enum Function {
   /** Utility function: formats a string using the printf syntax. */
   _UTIL_FORMAT(FNUtil.class, "format(format,item1[,...])", STR, -2, STR, ITEM),
   /** Utility function: dumps the memory consumption. */
-  _UTIL_MEM(FNUtil.class, "mem(expr[,cache])", ITEM_ZM, 1, ITEM_ZM, BLN),
+  _UTIL_MEM(FNUtil.class, "mem(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
   /** Utility function: dumps the execution time of an expression. */
-  _UTIL_TIME(FNUtil.class, "time(expr[,cache])", ITEM_ZM, 1, ITEM_ZM, BLN),
+  _UTIL_TIME(FNUtil.class, "time(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
   /** Utility function: converts a number to a given base. */
   _UTIL_INTEGER_TO_BASE(FNUtil.class, "integer-to-base(num,base)",
       STR, ITR, ITR),
