@@ -39,7 +39,7 @@ public final class RestXqServlet extends HttpServlet {
       final RestXqModule module = RestXqModules.get().find(http);
 
       // no module found: return 404
-      if(module == null) throw new HTTPException(SC_NOT_FOUND, ERR_NOT_FOUND);
+      if(module == null) throw new HTTPException(SC_NOT_FOUND, ERR_PATH_NOT_FOUND);
 
       // process module
       module.process(http);
@@ -51,9 +51,11 @@ public final class RestXqServlet extends HttpServlet {
       http.status(ex.getStatus(), ex.getMessage());
     } catch(final LoginException ex) {
       http.status(SC_UNAUTHORIZED, ex.getMessage());
+    } catch(final IOException ex) {
+      http.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));
-      http.status(SC_INTERNAL_SERVER_ERROR, ERR_UNEXPECTED + ex.getMessage());
+      http.status(SC_INTERNAL_SERVER_ERROR, Util.info(ERR_UNEXPECTED, ex.getMessage()));
     }
   }
 }

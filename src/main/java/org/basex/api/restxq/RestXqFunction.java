@@ -1,9 +1,11 @@
 package org.basex.api.restxq;
 
+import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.restxq.RestXqText.*;
 
 import java.util.*;
 import org.basex.api.*;
+import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.util.list.*;
@@ -25,9 +27,11 @@ final class RestXqFunction {
    * Checks a function for RESTFful annotations.
    * Constructor.
    * @param func function to be parsed
+   * @param file input file
    * @return {@code true} if module contains relevant annotations
+   * @throws HTTPException HTTP exception
    */
-  boolean init(final UserFunc func) {
+  boolean update(final UserFunc func, final IOFile file) throws HTTPException {
     final EnumSet<HTTPMethod> rxm = EnumSet.noneOf(HTTPMethod.class);
 
     // loop through all annotations
@@ -38,8 +42,13 @@ final class RestXqFunction {
       boolean f = true;
       if(name.eq(PATH)) {
         final Value v = func.ann.values[a];
-        // [CG] RestXq: handle incorrect path annotations
-        if(v instanceof Str) paths.add(HTTPContext.toSteps(((Str) v).toJava()));
+        if(!(v instanceof Str)) {
+          throw new HTTPException(SC_NOT_IMPLEMENTED, ERR_PATH_ANN, file.name(), func);
+        }
+        final String[] steps = HTTPContext.toSteps(((Str) v).toJava());
+
+        paths.add(steps);
+
       } else if(name.eq(GET)) {
         rxm.add(HTTPMethod.GET);
       } else if(name.eq(POST)) {

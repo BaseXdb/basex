@@ -27,7 +27,12 @@ public interface RestXqText {
   QNm DELETE = new QNm(Token.token("DELETE"), RESTXQURI);
 
   /** Error message. */
-  String ERR_UNEXPECTED = "Unexpected error: ";
+  String ERR_UNEXPECTED = "Unexpected error: %";
   /** Error message. */
-  String ERR_NOT_FOUND = "Path not found.";
+  String ERR_PATH_NOT_FOUND = "No XQuery function found to process the specified path.";
+  /** Error message. */
+  String ERR_PATH_ANN =
+    "Error: Path annotation must contain a single string.\n" +
+    "Module: %\n" +
+    "Function: %";
 }
