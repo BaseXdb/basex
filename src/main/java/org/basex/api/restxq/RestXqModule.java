@@ -140,15 +140,12 @@ final class RestXqModule {
       arg.bind(Str.get("[variable]"), qc);
     }
 
-    // compile function
-    bfc.comp(qc);
-
-    // evaluate function
-    final ValueIter ir = bfc.value(qc).iter();
+    // compile and evaluate function
+    final ValueIter ir = bfc.comp(qc).value(qc).iter();
 
     // serialize result
     final Serializer ser = Serializer.get(http.out);
-    for(Item it; (it = ir.next()) != null;) ser.item(it);
+    for(Item it; (it = ir.next()) != null;) it.serialize(ser);
     ser.close();
   }
 }
