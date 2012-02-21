@@ -2,12 +2,15 @@ package org.basex.api;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.HTTPText.*;
+import static org.basex.data.DataText.*;
+import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
 
 import javax.servlet.http.*;
 
+import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -60,6 +63,34 @@ public final class HTTPContext {
     res.setCharacterEncoding(UTF8);
     steps = toSteps(req.getPathInfo());
     path = join(0);
+  }
+
+  /**
+   * Initializes the output. Sets the expected encoding and content type.
+   * @param sprop serialization properties
+   */
+  public void initResponse(final SerializerProp sprop) {
+    // set encoding
+    res.setCharacterEncoding(sprop.get(SerializerProp.S_ENCODING));
+
+    // set content type
+    String type = sprop.get(SerializerProp.S_MEDIA_TYPE);
+    if(type.isEmpty()) {
+      // determine content type dependent on output method
+      final String mt = sprop.get(SerializerProp.S_METHOD);
+      if(mt.equals(M_RAW)) {
+        type = APP_OCTET;
+      } else if(mt.equals(M_XML)) {
+        type = APP_XML;
+      } else if(Token.eq(mt, M_JSON, M_JSONML)) {
+        type = APP_JSON;
+      } else if(Token.eq(mt, M_XHTML, M_HTML)) {
+        type = TEXT_HTML;
+      } else {
+        type = TEXT_PLAIN;
+      }
+    }
+    res.setContentType(type);
   }
 
   /**

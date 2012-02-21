@@ -21,41 +21,53 @@ import org.basex.util.list.*;
  */
 final class RestXqFunction {
   /** Step pattern. */
+  // [CG] RestXq: step needs to be further revised:
+  // - spaces allowed? omit curly brackets? support correct QName syntax?
   private static final Pattern STEP = Pattern.compile("^(\\w+|\\{\\$[\\w:]+\\})$");
 
   /** Paths. */
   final ObjList<String[]> paths = new ObjList<String[]>();
   /** Supported methods. */
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
+  /** Associated user function. */
+  UserFunc funct;
+  /** Consumed media type. */
+  String consumes;
+  /** Returned media type. */
+  String produces;
+
+  /**
+   * Constructor.
+   * @param uf associated user function
+   */
+  RestXqFunction(final UserFunc uf) {
+    funct = uf;
+  }
 
   /**
    * Checks a function for RESTFful annotations.
-   * Constructor.
-   * @param func function to be parsed
    * @param file input file
    * @return {@code true} if module contains relevant annotations
    * @throws HTTPException HTTP exception
    */
-  boolean update(final UserFunc func, final IOFile file) throws HTTPException {
+  boolean update(final IOFile file) throws HTTPException {
     final EnumSet<HTTPMethod> rxm = EnumSet.noneOf(HTTPMethod.class);
 
     // loop through all annotations
     boolean found = false;
-    for(int a = 0; a < func.ann.size(); a++) {
-      final QNm name = func.ann.names[a];
+    for(int a = 0; a < funct.ann.size(); a++) {
+      final QNm name = funct.ann.names[a];
+      final Value val = funct.ann.values[a];
       boolean f = true;
       if(name.eq(PATH)) {
-        // get path
-        final Value v = func.ann.values[a];
-        if(!(v instanceof Str)) throw error(PATH_NO_STRING, func, file);
-        // check syntax
-        final String[] steps = HTTPContext.toSteps(((Str) v).toJava());
+        // check path string
+        if(!(val instanceof Str)) error(Util.info(SINGLE_STRING, PATH), funct, file);
+        // check syntax of single steps
+        final String[] steps = HTTPContext.toSteps(((Str) val).toJava());
         for(final String s : steps) {
-          if(!STEP.matcher(s).matches())
-            throw error(Util.info(STEP_SYNTAX, s), func, file);
+          if(!STEP.matcher(s).matches()) error(Util.info(STEP_SYNTAX, s), funct, file);
         }
         paths.add(steps);
-
       } else if(name.eq(GET)) {
         rxm.add(HTTPMethod.GET);
       } else if(name.eq(POST)) {
@@ -64,6 +76,12 @@ final class RestXqFunction {
         rxm.add(HTTPMethod.PUT);
       } else if(name.eq(DELETE)) {
         rxm.add(HTTPMethod.DELETE);
+      } else if(name.eq(CONSUMES)) {
+        if(!(val instanceof Str)) error(Util.info(SINGLE_STRING, CONSUMES), funct, file);
+        consumes = ((Str) val).toJava();
+      } else if(name.eq(PRODUCES)) {
+        if(!(val instanceof Str)) error(Util.info(SINGLE_STRING, PRODUCES), funct, file);
+        produces = ((Str) val).toJava();
       } else {
         f = false;
       }
@@ -98,13 +116,15 @@ final class RestXqFunction {
   }
 
   /**
-   * Checks if the function supports the specified path and method.
+   * Creates an exception with the specified message.
    * @param msg message
    * @param func function to be parsed
    * @param file input file
    * @return instance
+   * @throws HTTPException HTTP exception
    */
-  private HTTPException error(final String msg, final UserFunc func, final IOFile file) {
-    return new HTTPException(SC_NOT_IMPLEMENTED, STATIC_ERROR, msg, file.name(), func);
+  private HTTPException error(final String msg, final UserFunc func, final IOFile file)
+      throws HTTPException {
+    throw new HTTPException(SC_NOT_IMPLEMENTED, STATIC_ERROR, msg, file.name(), func);
   }
 }

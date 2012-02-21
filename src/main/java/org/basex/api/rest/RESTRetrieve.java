@@ -49,7 +49,7 @@ final class RESTRetrieve extends RESTQuery {
       final Table table = new Table(session.execute(new List()));
       final SerializerProp sprop = new SerializerProp(ctx.serialization);
       final Serializer ser = Serializer.get(ctx.out, sprop);
-      initResponse(sprop, ctx);
+      ctx.initResponse(sprop);
       ser.openElement(DATABASES, RESOURCES, token(table.contents.size()));
       ser.namespace(REST, RESTURI);
       list(table, ser, DATABASE, 1);
@@ -63,7 +63,7 @@ final class RESTRetrieve extends RESTQuery {
       final String serial = ctx.serialization;
       final SerializerProp sprop = new SerializerProp(serial);
       final Serializer ser = Serializer.get(ctx.out, sprop);
-      initResponse(sprop, ctx);
+      ctx.initResponse(sprop);
 
       ser.openElement(DATABASE, DataText.T_NAME, token(ctx.db()),
         RESOURCES, token(table.contents.size()));
@@ -82,13 +82,13 @@ final class RESTRetrieve extends RESTQuery {
       } else {
         // retrieve raw file; prefix user parameters with media type
         final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + type;
-        initResponse(new SerializerProp(ct + ',' + ctx.serialization), ctx);
+        ctx.initResponse(new SerializerProp(ct + ',' + ctx.serialization));
         session.setOutputStream(ctx.out);
         session.execute(new Retrieve(ctx.dbpath()));
       }
     } else {
       // retrieve xml file
-      initResponse(new SerializerProp(ctx.serialization), ctx);
+      ctx.initResponse(new SerializerProp(ctx.serialization));
       session.execute(new Set(Prop.SERIALIZER, serial(ctx)));
       session.setOutputStream(ctx.out);
       session.query(".").execute();

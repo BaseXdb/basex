@@ -32,7 +32,7 @@ public class RESTCommand extends RESTCode {
     // set default content type to raw
     final String sprop = SerializerProp.S_METHOD[0] + "=" + DataText.M_TEXT +
             ',' + ctx.serialization;
-    initResponse(new SerializerProp(sprop), ctx);
+    ctx.initResponse(new SerializerProp(sprop));
 
     // perform command
     final Session session = ctx.session;

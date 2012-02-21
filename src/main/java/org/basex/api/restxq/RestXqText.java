@@ -11,29 +11,43 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public interface RestXqText {
+abstract class RestXqText {
   /** RESTful annotation URI. */
-  byte[] RESTXQURI = token("http://exquery.org/ns/rest/annotation/");
+  static final byte[] RESTXQURI = token("http://exquery.org/ns/rest/annotation/");
 
-  /** Path annotation. */
-  QNm PATH = new QNm(Token.token("path"), RESTXQURI);
-  /** GET annotation. */
-  QNm GET = new QNm(Token.token("GET"), RESTXQURI);
-  /** POST annotation. */
-  QNm POST = new QNm(Token.token("POST"), RESTXQURI);
-  /** PUT annotation. */
-  QNm PUT = new QNm(Token.token("PUT"), RESTXQURI);
-  /** DELETE annotation. */
-  QNm DELETE = new QNm(Token.token("DELETE"), RESTXQURI);
+  /** Annotation "path". */
+  static final QNm PATH = qnm("rest:path");
+  /** Annotation "GET". */
+  static final QNm GET = qnm("rest:GET");
+  /** Annotation "POST". */
+  static final QNm POST = qnm("rest:POST");
+  /** Annotation "PUT". */
+  static final QNm PUT = qnm("rest:PUT");
+  /** Annotation "DELETE". */
+  static final QNm DELETE = qnm("rest:DELETE");
+  /** Annotation "produces". */
+  static final QNm PRODUCES = qnm("rest:produces");
+  /** Annotation "consumes". */
+  static final QNm CONSUMES = qnm("rest:consumes");
 
   /** Error message. */
-  String STATIC_ERROR = "Error: %\nModule: %\nFunction: %";
+  static final String STATIC_ERROR = "Error: %\nModule: %\nFunction: %";
   /** Error message. */
-  String UNEXPECTED_ERROR = "Unexpected error: %";
+  static final String UNEXPECTED_ERROR = "Unexpected error: %";
   /** Error message. */
-  String PATH_NOT_FOUND = "No XQuery function found to process the specified path.";
+  static final String PATH_NOT_FOUND =
+      "No XQuery function found to process the specified path.";
   /** Error message. */
-  String PATH_NO_STRING = "Path annotation must contain a single string.";
+  static final String SINGLE_STRING = "Annotation % must contain a single string.";
   /** Error message. */
-  String STEP_SYNTAX = "The specified template is invalid: \"%\".";
+  static final String STEP_SYNTAX = "The specified template is invalid: \"%\".";
+
+  /**
+   * Creates a new QName, using the RESTful annotations URI.
+   * @param n name
+   * @return QName
+   */
+  static QNm qnm(final String n) {
+    return new QNm(Token.token(n), RESTXQURI);
+  }
 }

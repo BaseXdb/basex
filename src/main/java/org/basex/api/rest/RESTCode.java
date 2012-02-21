@@ -2,8 +2,6 @@ package org.basex.api.rest;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.rest.RESTText.*;
-import static org.basex.data.DataText.*;
-import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.Function.*;
 
 import java.io.*;
@@ -32,35 +30,6 @@ abstract class RESTCode {
    * @throws IOException I/O exception
    */
   abstract void run(final HTTPContext ctx) throws HTTPException, IOException;
-
-  /**
-   * Initializes the output. Sets the expected encoding and content type.
-   * @param ctx rest context
-   * @param sprop serialization properties
-   */
-  static void initResponse(final SerializerProp sprop, final HTTPContext ctx) {
-    // set encoding
-    ctx.res.setCharacterEncoding(sprop.get(SerializerProp.S_ENCODING));
-
-    // set content type
-    String type = sprop.get(SerializerProp.S_MEDIA_TYPE);
-    if(type.isEmpty()) {
-      // determine content type dependent on output method
-      final String method = sprop.get(SerializerProp.S_METHOD);
-      if(method.equals(M_RAW)) {
-        type = APP_OCTET;
-      } else if(method.equals(M_XML)) {
-        type = APP_XML;
-      } else if(Token.eq(method, M_JSON, M_JSONML)) {
-        type = APP_JSON;
-      } else if(Token.eq(method, M_XHTML, M_HTML)) {
-        type = TEXT_HTML;
-      } else {
-        type = TEXT_PLAIN;
-      }
-    }
-    ctx.res.setContentType(type);
-  }
 
   /**
    * Opens the addressed database.

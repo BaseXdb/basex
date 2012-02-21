@@ -16,7 +16,6 @@ import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
-
 /**
  * This class caches information on a single XQuery module with RESTful annotations.
  *
@@ -24,6 +23,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class RestXqModule {
+  // [CG] RestXq: how to resolve conflicting paths? what is "more specific"?
+
   /** Supported methods. */
   final ObjList<RestXqFunction> functions = new ObjList<RestXqFunction>();
   /** File reference. */
@@ -32,7 +33,7 @@ final class RestXqModule {
   long time;
 
   /**
-.   * Constructor.
+   * Constructor.
    * @param in xquery module
    */
   RestXqModule(final IOFile in) {
@@ -51,8 +52,8 @@ final class RestXqModule {
     // loop through all functions
     final QueryContext qc = parse();
     for(final UserFunc uf : qc.funcs.funcs()) {
-      final RestXqFunction func = new RestXqFunction();
-      if(func.update(uf, file)) functions.add(func);
+      final RestXqFunction func = new RestXqFunction(uf);
+      if(func.update(file)) functions.add(func);
     }
     return !functions.empty();
   }
@@ -98,10 +99,10 @@ final class RestXqModule {
     final QueryContext qc = parse();
     // loop through all functions
     for(final UserFunc uf : qc.funcs.funcs()) {
-      // find and evaluate relevant function
-      final RestXqFunction func = new RestXqFunction();
-      if(func.update(uf, file) && func.supports(http)) {
-        process(uf, qc, http);
+      // recover and evaluate relevant function
+      final RestXqFunction rxf = new RestXqFunction(uf);
+      if(rxf.update(file) && rxf.supports(http)) {
+        process(rxf, qc, http);
         return;
       }
     }
@@ -131,17 +132,18 @@ final class RestXqModule {
 
   /**
    * Evaluates the specified function.
-   * @param uf user-defined function
+   * @param rxf function container
    * @param qc query context
    * @param http HTTP context
    * @throws HTTPException HTTP exception
    * @throws IOException I/O exception
    */
-  void process(final UserFunc uf, final QueryContext qc, final HTTPContext http)
+  void process(final RestXqFunction rxf, final QueryContext qc, final HTTPContext http)
       throws HTTPException, IOException {
 
     try {
       // wrap function with a function call
+      final UserFunc uf = rxf.funct;
       final BaseFuncCall bfc = new BaseFuncCall(null, uf.name, uf.args);
       bfc.init(uf);
 
@@ -153,6 +155,11 @@ final class RestXqModule {
 
       // compile and evaluate function
       final ValueIter ir = bfc.comp(qc).value(qc).iter();
+
+      // set serialization parameters
+      final SerializerProp sp = qc.serParams(false);
+      if(rxf.produces != null) sp.set(SerializerProp.S_MEDIA_TYPE, rxf.produces);
+      http.initResponse(sp);
 
       // serialize result
       final Serializer ser = Serializer.get(http.out);
