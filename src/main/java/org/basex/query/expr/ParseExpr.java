@@ -4,7 +4,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.User;
+import org.basex.core.Commands.CmdPerm;
+import org.basex.core.*;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
@@ -447,7 +448,15 @@ public abstract class ParseExpr extends Expr {
    */
   private void checkPerm(final QueryContext ctx, final byte p)
       throws QueryException {
-    if(!ctx.context.user.perm(p)) PERMNO.thrw(input, p);
+
+    if(ctx.context.user.perm(p)) return;
+    final CmdPerm perm;
+    if(p == User.ADMIN) perm = CmdPerm.ADMIN;
+    else if(p == User.ADMIN) perm = CmdPerm.ADMIN;
+    else if(p == User.CREATE) perm = CmdPerm.CREATE;
+    else if(p == User.WRITE) perm = CmdPerm.WRITE;
+    else perm = CmdPerm.READ;
+    throw PERMNO.thrw(input, perm);
   }
 
   /**
