@@ -121,6 +121,11 @@ public final class FuncTest extends QueryTest {
         "for $i in distinct-values(//line) return string($i)" },
       { "distinct-values 2", itr(2),
         "count(distinct-values(//line/text()))" },
+
+      { "substring 1", str("bar"), "substring('foobar', 4)" },
+      { "substring 2", str("foo"), "substring('foobar', 1, 3)" },
+      { "substring 3", str(""), "substring('foobar', xs:double('NaN'), 3)" },
+      { "substring 4", str("foo"), "substring('foobar', -1, 5)" },
     };
   }
 
