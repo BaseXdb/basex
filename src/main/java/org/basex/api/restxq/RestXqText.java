@@ -27,12 +27,13 @@ public interface RestXqText {
   QNm DELETE = new QNm(Token.token("DELETE"), RESTXQURI);
 
   /** Error message. */
-  String ERR_UNEXPECTED = "Unexpected error: %";
+  String STATIC_ERROR = "Error: %\nModule: %\nFunction: %";
   /** Error message. */
-  String ERR_PATH_NOT_FOUND = "No XQuery function found to process the specified path.";
+  String UNEXPECTED_ERROR = "Unexpected error: %";
   /** Error message. */
-  String ERR_PATH_ANN =
-    "Error: Path annotation must contain a single string.\n" +
-    "Module: %\n" +
-    "Function: %";
+  String PATH_NOT_FOUND = "No XQuery function found to process the specified path.";
+  /** Error message. */
+  String PATH_NO_STRING = "Path annotation must contain a single string.";
+  /** Error message. */
+  String STEP_SYNTAX = "The specified template is invalid: \"%\".";
 }

@@ -4,12 +4,14 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.api.restxq.RestXqText.*;
 
 import java.util.*;
+import java.util.regex.*;
+
 import org.basex.api.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
-
 
 /**
  * This class represents a single RESTful function.
@@ -18,6 +20,9 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class RestXqFunction {
+  /** Step pattern. */
+  private static final Pattern STEP = Pattern.compile("^(\\w+|\\{\\$[\\w:]+\\})$");
+
   /** Paths. */
   final ObjList<String[]> paths = new ObjList<String[]>();
   /** Supported methods. */
@@ -37,16 +42,18 @@ final class RestXqFunction {
     // loop through all annotations
     boolean found = false;
     for(int a = 0; a < func.ann.size(); a++) {
-      // [CG] RestXq: handle REST annotations that do not match the specification
       final QNm name = func.ann.names[a];
       boolean f = true;
       if(name.eq(PATH)) {
+        // get path
         final Value v = func.ann.values[a];
-        if(!(v instanceof Str)) {
-          throw new HTTPException(SC_NOT_IMPLEMENTED, ERR_PATH_ANN, file.name(), func);
-        }
+        if(!(v instanceof Str)) throw error(PATH_NO_STRING, func, file);
+        // check syntax
         final String[] steps = HTTPContext.toSteps(((Str) v).toJava());
-
+        for(final String s : steps) {
+          if(!STEP.matcher(s).matches())
+            throw error(Util.info(STEP_SYNTAX, s), func, file);
+        }
         paths.add(steps);
 
       } else if(name.eq(GET)) {
@@ -80,7 +87,6 @@ final class RestXqFunction {
         if(path.length != http.depth()) continue;
         // check single steps
         for(int p = 0; p < path.length; p++) {
-          // [CG] RestXq: handle incorrect path annotations
           if(!path[p].equals(http.step(p)) && !path[p].startsWith("{")) {
             continue PATHS;
           }
@@ -89,5 +95,16 @@ final class RestXqFunction {
       }
     }
     return false;
+  }
+
+  /**
+   * Checks if the function supports the specified path and method.
+   * @param msg message
+   * @param func function to be parsed
+   * @param file input file
+   * @return instance
+   */
+  private HTTPException error(final String msg, final UserFunc func, final IOFile file) {
+    return new HTTPException(SC_NOT_IMPLEMENTED, STATIC_ERROR, msg, file.name(), func);
   }
 }
