@@ -53,7 +53,7 @@ public final class InlineFunc extends UserFunc {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public ValueIter iter(final QueryContext ctx) {
     return value(ctx).iter();
   }
 

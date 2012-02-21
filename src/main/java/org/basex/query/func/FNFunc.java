@@ -76,7 +76,7 @@ public final class FNFunc extends StandardFunc {
     final QNm name = (QNm) checkType(expr[0].item(ctx, ii), AtomType.QNM);
     final long arity = checkItr(expr[1], ctx);
     try {
-      return UserFuncs.get(name, arity, true, ctx, ii);
+      return Functions.get(name, arity, true, ctx, ii);
     } catch(final QueryException e) {
       // function not found
       return null;

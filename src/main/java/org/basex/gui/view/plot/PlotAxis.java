@@ -124,9 +124,9 @@ final class PlotAxis {
       vals[i] = lc(value);
     }
 
-    if(type == StatsType.TEXT)
+    if(type == StatsType.TEXT) {
       textToNum(vals);
-    else {
+    } else {
       minMax(vals);
       // calculations for axis labeling
       if(!log) prepareLinAxis();

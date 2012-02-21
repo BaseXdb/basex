@@ -14,7 +14,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -173,7 +173,7 @@ public class UserFunc extends Single {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
+  public ValueIter iter(final QueryContext ctx) throws QueryException {
     return value(ctx).iter();
   }
 
@@ -190,7 +190,9 @@ public class UserFunc extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(name.string());
+    final TokenBuilder tb = new TokenBuilder().add(DECLARE).add(' ').addExt(ann);
+    if(updating) tb.add(UPDATING).add(' ');
+    tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(ret != null) tb.add(' ' + AS + ' ' + ret);
     if(expr != null) tb.add(" { " + expr + " }; ");

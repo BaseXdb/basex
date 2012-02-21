@@ -21,6 +21,8 @@ public abstract class IO {
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
+  /** XQuery module suffix. */
+  public static final String XQMSUFFIX = ".xqm";
   /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
   /** ZIP file suffix. */
@@ -44,7 +46,7 @@ public abstract class IO {
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =
-    { XQSUFFIX, ".xqm", ".xqy", ".xql", ".xqu", ".xquery" };
+    { XQSUFFIX, XQMSUFFIX, ".xqy", ".xql", ".xqu", ".xquery" };
   /** ZIP suffixes. */
   public static final String[] ZIPSUFFIXES =
     { ZIPSUFFIX, GZSUFFIX, XARSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };

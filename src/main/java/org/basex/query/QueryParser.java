@@ -207,9 +207,7 @@ public class QueryParser extends InputParser {
    * @param c query context
    * @throws QueryException query exception
    */
-  public QueryParser(final String q, final QueryContext c)
-      throws QueryException {
-
+  public QueryParser(final String q, final QueryContext c) throws QueryException {
     super(q, c.sc.baseIO());
     ctx = c;
 
@@ -245,7 +243,6 @@ public class QueryParser extends InputParser {
     bind(key, val);
   }
 
-
   /**
    * Binds the specified variable.
    * If a URI is specified, the query is treated as a module.
@@ -253,7 +250,7 @@ public class QueryParser extends InputParser {
    * @param val value
    * @throws QueryException query exception
    */
-  final void bind(final StringBuilder key, final StringBuilder val)
+  private void bind(final StringBuilder key, final StringBuilder val)
       throws QueryException {
 
     final String k = key.toString().trim();
@@ -2121,7 +2118,7 @@ public class QueryParser extends InputParser {
     if(name != null && consume('#')) {
       final long card = ((Int) numericLiteral(true)).itr(null);
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
-      return UserFuncs.get(name, card, false, ctx, input());
+      return Functions.get(name, card, false, ctx, input());
     }
 
     qp = pos;
@@ -2264,7 +2261,7 @@ public class QueryParser extends InputParser {
 
         final Var[] vars = new Var[args.length];
         final boolean part = partial(args, vars);
-        final TypedFunc f = ctx.funcs.get(name, args, false, ctx, input());
+        final TypedFunc f = Functions.get(name, args, false, ctx, input());
         if(f != null) {
           alter = null;
           return part ? new PartFunc(input(), f, vars) : f.fun;

@@ -52,7 +52,7 @@ public final class JarParser {
         // ignore namespace to improve compatibility
         if(eq(JAR, name.local())) desc.jars.add(next.string());
         else if(eq(CLASS, name.local())) desc.classes.add(next.string());
-        // [CG] add message for unknown elements
+        // [CG] Packaging: add warning if unknown elements are encountered
       }
       if(desc.jars.size() == 0) JARDESCINV.thrw(input, NOJARS);
       else if(desc.classes.size() == 0) JARDESCINV.thrw(input, NOCLASS);

@@ -17,14 +17,14 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class BaseFuncCall extends UserFuncCall {
+public final class BaseFuncCall extends UserFuncCall {
   /**
    * Function constructor.
    * @param ii input info
    * @param nm function name
    * @param arg arguments
    */
-  BaseFuncCall(final InputInfo ii, final QNm nm, final Expr... arg) {
+  public BaseFuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
     super(ii, nm, arg);
   }
 

@@ -236,7 +236,7 @@ public final class QueryContext extends Progress {
       // variables will be compiled if called for the first time
       funcs.comp(this);
       // compile the expression
-      root = root.comp(this);
+      if(root != null) root = root.comp(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       XPSTACK.thrw(null);
@@ -397,7 +397,7 @@ public final class QueryContext extends Progress {
    */
   void plan(final Serializer ser) throws IOException {
     // only show root node if functions or variables exist
-    final boolean r = funcs.size() != 0 || vars.globals().size != 0;
+    final boolean r = funcs.funcs().length != 0 || vars.globals().size != 0;
     if(r) ser.openElement(PLAN);
     funcs.plan(ser);
     vars.plan(ser);

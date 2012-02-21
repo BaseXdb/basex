@@ -166,7 +166,7 @@ public final class Constr {
           text.reset();
         }
 
-        // [CG] Element construction: avoid full copy of sub tree if not needed
+        // [CG] XQuery, element construction: avoid full copy of sub tree if not needed
         node = node.deepCopy();
         children.add(node);
       }

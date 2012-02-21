@@ -1,34 +1,17 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.User;
-import org.basex.data.ExprInfo;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Cast;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.VarRef;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.FItem;
-import org.basex.query.item.FuncItem;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.SeqType.Occ;
-import org.basex.query.item.Type;
-import org.basex.query.item.Types;
-import org.basex.query.util.NSGlobal;
-import org.basex.query.util.TypedFunc;
-import org.basex.query.util.Var;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.Levenshtein;
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Container for a user-defined function.
@@ -37,120 +20,62 @@ import org.basex.util.Levenshtein;
  * @author Christian Gruen
  */
 public final class UserFuncs extends ExprInfo {
+  /** User-defined functions. */
+  private UserFunc[] funcs = { };
   /** Cached function calls. */
   private UserFuncCall[][] calls = { };
-  /** Local functions. */
-  private UserFunc[] func = { };
-
-  /**
-   * Returns the number of functions.
-   * @return function
-   */
-  public int size() {
-    return func.length;
-  }
 
   /**
    * Returns the specified function.
    * @param name name of the function
    * @param args optional arguments
    * @param dyn compile-/run-time flag
-   * @param ctx query context
    * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
-  public TypedFunc get(final QNm name, final Expr[] args, final boolean dyn,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
+  TypedFunc get(final QNm name, final Expr[] args, final boolean dyn, final InputInfo ii)
+      throws QueryException {
 
-    // get namespace and local name
-    final byte[] uri = name.uri();
-    final byte[] ln = name.local();
+    final UserFuncCall call;
+    final FuncType type;
 
-    // parse data type constructors
-    if(eq(uri, XSURI)) {
-      final Type type = AtomType.find(name, true);
-      if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
-        final Levenshtein ls = new Levenshtein();
-        for(final AtomType t : AtomType.values()) {
-          if(t.par != null && ls.similar(lc(ln), lc(t.string()), 0))
-            FUNSIMILAR.thrw(ii, name.string(), t.string());
-        }
-        FUNCUNKNOWN.thrw(ii, name.string());
-      }
-      if(args.length != 1) FUNCTYPE.thrw(ii, name.string());
-      final SeqType to = SeqType.get(type, Occ.ZO);
-      return TypedFunc.constr(new Cast(ii, args[0], to), to);
+    final int al = args.length;
+    final int id = indexOf(name, args);
+    if(id != -1) {
+      // function has already been defined
+      call = add(ii, funcs[id].name, id, args);
+      type = FuncType.get(funcs[id]);
+    } else if(!dyn && Types.find(name, false) == null) {
+      // add function call for function that has not been defined yet
+      final UserFunc uf = new UserFunc(ii, name, new Var[al], null, null, false, false);
+      call = add(ii, name, add(uf, ii), args);
+      type = FuncType.arity(al);
+    } else {
+      return null;
     }
-
-    // Java function (only allowed with administrator permissions)
-    if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
-      return TypedFunc.java(JavaMapping.get(name, args, ctx, ii));
-    }
-
-    // predefined functions
-    final StandardFunc fun = Functions.get().get(ln, uri, args, ctx, ii);
-    if(fun != null) {
-      for(final Function f : Function.UPDATING) {
-        if(fun.sig == f) {
-          ctx.updating(true);
-          break;
-        }
-      }
-      return new TypedFunc(fun, fun.sig.type(args.length));
-    }
-
-    // local function
-    for(int l = 0; l < func.length; ++l) {
-      final QNm qn = func[l].name;
-      if(eq(ln, qn.local()) && eq(uri, qn.uri()) && args.length ==
-        func[l].args.length) return new TypedFunc(
-            add(ii, qn, l, args), FuncType.get(func[l]));
-    }
-
-    // add function call for function that has not been defined yet
-    if(!dyn && Types.find(name, false) == null) {
-      return new TypedFunc(add(ii, name, add(new UserFunc(ii, name,
-          new Var[args.length], null, null, false, false), ii), args),
-          FuncType.arity(args.length));
-    }
-    return null;
+    return new TypedFunc(call, type);
   }
 
   /**
-   * Returns the specified function literal.
-   * @param name function name
-   * @param arity number of arguments
-   * @param dyn dynamic invocation flag
-   * @param ctx query context
-   * @param ii input info
-   * @return literal function expression
-   * @throws QueryException query exception
+   * Returns an index to the specified function, or {@code -1}.
+   * @param name name of the function
+   * @param args optional arguments
+   * @return function instance
    */
-  public static FItem get(final QNm name, final long arity, final boolean dyn,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
-
-    final Expr[] args = new Expr[(int) arity];
-    final Var[] vars = new Var[args.length];
-    for(int i = 0; i < args.length; i++) {
-      vars[i] = ctx.uniqueVar(ii, null);
-      args[i] = new VarRef(ii, vars[i]);
+  private int indexOf(final QNm name, final Expr[] args) {
+    for(int id = 0; id < funcs.length; ++id) {
+      if(name.eq(funcs[id].name) && args.length == funcs[id].args.length) return id;
     }
+    return -1;
+  }
 
-    final TypedFunc f = ctx.funcs.get(name, args, dyn, ctx, ii);
-    if(f == null) {
-      if(!dyn) FUNCUNKNOWN.thrw(ii, name + "#" + arity);
-      return null;
-    }
-
-    // compile the function if it hasn't been done statically
-    if(dyn && f.fun instanceof UserFuncCall) {
-      final UserFunc usf = ((UserFuncCall) f.fun).func();
-      if(usf != null && usf.declared) usf.comp(ctx);
-    }
-
-    final FuncType ft = f.type;
-    return new FuncItem(name, vars, f.fun, ft, false);
+  /**
+   * Returns all user-defined functions.
+   * @return function array
+   */
+  public UserFunc[] funcs() {
+    return funcs;
   }
 
   /**
@@ -163,9 +88,10 @@ public final class UserFuncs extends ExprInfo {
    */
   private UserFuncCall add(final InputInfo ii, final QNm nm, final int id,
       final Expr[] arg) {
+
     final UserFuncCall call = new BaseFuncCall(ii, nm, arg);
     // for dynamic calls
-    if(func[id].declared) call.init(func[id]);
+    if(funcs[id].declared) call.init(funcs[id]);
     calls[id] = Array.add(calls[id], call);
     return call;
   }
@@ -179,7 +105,6 @@ public final class UserFuncs extends ExprInfo {
    */
   public int add(final UserFunc fun, final InputInfo ii) throws QueryException {
     final QNm name = fun.name;
-
     final byte[] uri = name.uri();
     if(uri.length == 0) FUNNONS.thrw(ii, name.string());
 
@@ -189,15 +114,15 @@ public final class UserFuncs extends ExprInfo {
     }
 
     final byte[] ln = name.local();
-    for(int l = 0; l < func.length; ++l) {
-      final QNm qn = func[l].name;
+    for(int l = 0; l < funcs.length; ++l) {
+      final QNm qn = funcs[l].name;
       final byte[] u = qn.uri();
       final byte[] nm = qn.local();
 
-      if(eq(ln, nm) && eq(uri, u) && fun.args.length == func[l].args.length) {
+      if(eq(ln, nm) && eq(uri, u) && fun.args.length == funcs[l].args.length) {
         // declare function that has been called before
-        if(!func[l].declared) {
-          func[l] = fun;
+        if(!funcs[l].declared) {
+          funcs[l] = fun;
           return l;
         }
         // duplicate declaration
@@ -205,9 +130,9 @@ public final class UserFuncs extends ExprInfo {
       }
     }
     // add function skeleton
-    func = Array.add(func, fun);
+    funcs = Array.add(funcs, fun);
     calls = Array.add(calls, new UserFuncCall[0]);
-    return func.length - 1;
+    return funcs.length - 1;
   }
 
   /**
@@ -217,13 +142,13 @@ public final class UserFuncs extends ExprInfo {
    */
   public void check() throws QueryException {
     // initialize function calls
-    for(int i = 0; i < func.length; ++i) {
-      for(final UserFuncCall c : calls[i]) c.init(func[i]);
+    for(int i = 0; i < funcs.length; ++i) {
+      for(final UserFuncCall c : calls[i]) c.init(funcs[i]);
     }
-    for(final UserFunc f : func) {
+    for(final UserFunc f : funcs) {
       if(!f.declared || f.expr == null) {
         // function has not been declare yet
-        for(final UserFunc uf : func) {
+        for(final UserFunc uf : funcs) {
           // check if another function with same name exists
           if(f != uf && f.name.eq(uf.name)) {
             FUNCTYPE.thrw(f.input, uf.name.string());
@@ -242,9 +167,9 @@ public final class UserFuncs extends ExprInfo {
    * @throws QueryException query exception
    */
   public void comp(final QueryContext ctx) throws QueryException {
-    for(int i = 0; i < func.length; i++) {
+    for(int i = 0; i < funcs.length; i++) {
       // only compile those functions that are used
-      if(calls[i].length != 0) func[i].comp(ctx);
+      if(calls[i].length != 0) funcs[i].comp(ctx);
     }
   }
 
@@ -254,16 +179,14 @@ public final class UserFuncs extends ExprInfo {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void funError(final QNm name, final InputInfo ii)
-      throws QueryException {
-
+  public void funError(final QNm name, final InputInfo ii) throws QueryException {
     // find global function
     Functions.get().error(name, ii);
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
     final byte[] nm = lc(name.local());
-    for(final UserFunc f : func) {
+    for(final UserFunc f : funcs) {
       if(ls.similar(nm, lc(f.name.local()), 0)) {
         FUNSIMILAR.thrw(ii, name.string(), f.name.string());
       }
@@ -272,16 +195,16 @@ public final class UserFuncs extends ExprInfo {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    if(func.length == 0) return;
+    if(funcs.length == 0) return;
     ser.openElement(this);
-    for(final UserFunc f : func) f.plan(ser);
+    for(final UserFunc f : funcs) f.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final UserFunc f : func) sb.append(f.toString());
+    for(final UserFunc f : funcs) sb.append(f.toString());
     return sb.toString();
   }
 }

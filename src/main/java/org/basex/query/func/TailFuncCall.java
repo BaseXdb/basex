@@ -24,15 +24,13 @@ final class TailFuncCall extends UserFuncCall {
    * @param f function
    * @param arg arguments
    */
-  TailFuncCall(final InputInfo ii, final QNm nm, final UserFunc f,
-      final Expr[] arg) {
+  TailFuncCall(final InputInfo ii, final QNm nm, final UserFunc f, final Expr[] arg) {
     super(ii, nm, arg);
     func = f;
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkHeight(ctx);
 
     // cache arguments, evaluate function and reset variable scope

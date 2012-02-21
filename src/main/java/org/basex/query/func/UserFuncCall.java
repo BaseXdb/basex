@@ -81,7 +81,7 @@ public abstract class UserFuncCall extends Arr {
    * Initializes the function call after all functions have been declared.
    * @param f function reference
    */
-  void init(final UserFunc f) {
+  public void init(final UserFunc f) {
     func = f;
   }
 

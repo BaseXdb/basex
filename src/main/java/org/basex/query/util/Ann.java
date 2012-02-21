@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
+
 import java.util.*;
 
 import org.basex.query.*;
@@ -16,15 +17,15 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Ann extends ElementList {
-  /** Annotation "public". */
+  /** Annotation "private". */
   public static final QNm PRIVATE = new QNm(Token.token(QueryText.PRIVATE), FNURI);
   /** Annotation "public". */
   public static final QNm PUBLIC = new QNm(Token.token(QueryText.PUBLIC), FNURI);
 
   /** QNames. */
-  private QNm[] names = new QNm[1];
+  public QNm[] names = new QNm[1];
   /** Values. */
-  private Value[] values = new Value[1];
+  public Value[] values = new Value[1];
 
   /**
    * Adds a QName/Value pair.
@@ -82,5 +83,24 @@ public final class Ann extends ElementList {
   public Value value(final QNm e) {
     final int i = indexOf(e);
     return i != -1 ? values[i] : null;
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = 0; i < size; ++i) {
+      tb.add('%').add(names[i].string());
+      long s = values[i].size();
+      if(s != 0) {
+        tb.add('(');
+        for(int a = 0; a < s; a++) {
+          if(a != 0) tb.add(',');
+          tb.add(values[i].itemAt(a).toString());
+        }
+        tb.add(')');
+      }
+      tb.add(' ');
+    }
+    return tb.toString();
   }
 }
