@@ -154,6 +154,6 @@ final class QueryListener extends Progress {
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }
-    options = qp.ctx.serProp(false);
+    options = qp.ctx.serParams(false);
   }
 }

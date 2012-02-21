@@ -12,7 +12,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * This class contains serialization properties.
+ * This class defines all available serialization parameters.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

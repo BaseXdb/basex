@@ -486,19 +486,19 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns the serialization properties.
-   * @param opt return {@code null} reference if no properties are specified
-   * @return serialization properties
+   * Returns the serialization parameters used for and specified by this query.
+   * @param optional if {@code true}, a {@code null} reference is returned if no
+   *   parameters have been specified
+   * @return serialization parameters
    * @throws SerializerException serializer exception
    */
-  public SerializerProp serProp(final boolean opt) throws SerializerException {
-    // if available, use local query properties
+  public SerializerProp serParams(final boolean optional) throws SerializerException {
+    // if available, return parameters specified by the query
     if(serProp != null) return serProp;
-
+    // retrieve global parameters
     final String serial = context.prop.get(Prop.SERIALIZER);
-    if(opt && serial.isEmpty()) return null;
-
-    // otherwise, apply global serialization option
+    if(optional && serial.isEmpty()) return null;
+    // otherwise, if requested, return default parameters
     return new SerializerProp(serial);
   }
 

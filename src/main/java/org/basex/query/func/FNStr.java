@@ -185,7 +185,6 @@ public final class FNStr extends StandardFunc {
     // normalize positions
     final byte[] str = checkEStr(expr[0], ctx);
 
-    
     final Item is = checkItem(expr[1], ctx);
     int s;
     if(is instanceof Int) {

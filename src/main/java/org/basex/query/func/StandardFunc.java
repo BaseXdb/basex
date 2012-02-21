@@ -179,7 +179,7 @@ public abstract class StandardFunc extends Arr {
       if(tb.size() != 0) tb.add(',');
       tb.add(key).add('=').addExt(tm.get(key));
     }
-    return tb.size() == 0 ? ctx.serProp(true) :
+    return tb.size() == 0 ? ctx.serParams(true) :
       new SerializerProp(tb.toString());
   }
 }

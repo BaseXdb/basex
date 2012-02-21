@@ -390,7 +390,7 @@ public final class FNZip extends StandardFunc {
       if(tb.size() != 0) tb.add(',');
       tb.add(name.local()).add('=').add(at.string());
     }
-    return tb.size() == 0 ? ctx.serProp(true) :
+    return tb.size() == 0 ? ctx.serParams(true) :
       new SerializerProp(tb.toString());
   }
 

@@ -670,7 +670,7 @@ public final class FNDb extends StandardFunc {
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
-      final Serializer ser = Serializer.get(ao, ctx.serProp(true));
+      final Serializer ser = Serializer.get(ao, ctx.serParams(true));
       final ValueIter ir = ctx.value(expr[1]).iter();
       for(Item it; (it = ir.next()) != null;) it.serialize(ser);
       ser.close();
