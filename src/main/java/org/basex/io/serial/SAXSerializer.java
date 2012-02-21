@@ -202,7 +202,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   }
 
   @Override
-  public void finishItem(final Item b) throws IOException {
-    throw new BaseXException("Items cannot be serialized");
+  public void finishAtomic(final Item b) throws IOException {
+    throw new BaseXException("Atomic values cannot be serialized");
   }
 }

@@ -154,14 +154,14 @@ public abstract class Serializer {
   }
 
   /**
-   * Serializes an item. This method is internally called;
-   * call {@link Item#serialize} instead.
+   * Serializes an atomic value. This method is used internally;
+   * call {@link Item#serialize} to serialize nodes.
    * @param item text bytes
    * @throws IOException I/O exception
    */
-  public final void item(final Item item) throws IOException {
+  public final void atomic(final Item item) throws IOException {
     finishElement();
-    finishItem(item);
+    finishAtomic(item);
   }
 
   /**
@@ -408,7 +408,7 @@ public abstract class Serializer {
    * @param i item
    * @throws IOException I/O exception
    */
-  protected abstract void finishItem(final Item i) throws IOException;
+  protected abstract void finishAtomic(final Item i) throws IOException;
 
   /**
    * Serializes a text.

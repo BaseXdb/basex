@@ -106,7 +106,7 @@ public final class DOTSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishItem(final Item it) throws IOException {
+  public void finishAtomic(final Item it) throws IOException {
     try {
       print(norm(it.string(null)), ITEM);
     } catch(final QueryException ex) {

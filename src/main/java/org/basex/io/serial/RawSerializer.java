@@ -29,7 +29,7 @@ public final class RawSerializer extends TextSerializer {
   }
 
   @Override
-  public void finishItem(final Item it) throws IOException {
+  public void finishAtomic(final Item it) throws IOException {
     try {
       final InputStream is = it.input(null);
       try {

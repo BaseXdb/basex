@@ -223,7 +223,7 @@ public abstract class Item extends Value {
    */
   public void serialize(final Serializer ser) throws IOException {
     // this method is overwritten by some data types
-    ser.item(this);
+    ser.atomic(this);
   }
 
   /**

@@ -189,8 +189,8 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishItem(final Item value) throws IOException {
-    error("Items cannot be serialized");
+  public void finishAtomic(final Item value) throws IOException {
+    error("Atomic values cannot be serialized");
   }
 
   /**

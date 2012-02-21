@@ -101,8 +101,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       final Data data = gui.context.data();
-      b.setEnabled(data != null &&
-          (!data.empty() || data.meta.binaries().children().length != 0));
+      b.setEnabled(data != null && (!data.empty() || data.meta.binaries().exists()));
     }
   },
 

@@ -43,7 +43,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void finishItem(final Item b) throws IOException {
+  public final void finishAtomic(final Item b) throws IOException {
     Util.notexpected();
   }
 

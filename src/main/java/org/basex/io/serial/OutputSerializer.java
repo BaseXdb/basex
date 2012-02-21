@@ -298,7 +298,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void finishItem(final Item it) throws IOException {
+  public void finishAtomic(final Item it) throws IOException {
     if(ind) print(' ');
 
     try {
