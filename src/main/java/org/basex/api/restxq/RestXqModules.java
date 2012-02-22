@@ -36,7 +36,7 @@ final class RestXqModules {
    * @return instance
    */
   RestXqModule find(final HTTPContext http) throws HTTPException {
-    update();
+    analyze();
     for(final RestXqModule mod : modules.values()) {
       if(mod.find(http) != null) return mod;
     }
@@ -47,7 +47,7 @@ final class RestXqModules {
    * Updates the module cache. Parses new modules and discards obsolete ones.
    * @throws HTTPException HTTP exception
    */
-  private void update() throws HTTPException {
+  private void analyze() throws HTTPException {
     final Context ctx = HTTPSession.context();
     // create new cache
     final HashMap<String, RestXqModule> tmp = new HashMap<String, RestXqModule>();
@@ -70,7 +70,7 @@ final class RestXqModules {
         module = new RestXqModule(file);
       }
       // add module if it has been parsed, and if it contains annotations
-      if(parsed || module.update()) {
+      if(parsed || module.analyze()) {
         module.touch();
         tmp.put(path, module);
       }

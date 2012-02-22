@@ -8,6 +8,8 @@ import java.util.regex.*;
 
 import org.basex.api.*;
 import org.basex.io.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
@@ -25,69 +27,78 @@ final class RestXqFunction {
   // - spaces allowed? omit curly brackets? support correct QName syntax?
   private static final Pattern STEP = Pattern.compile("^(\\w+|\\{\\$[\\w:]+\\})$");
 
+  /** Associated user function. */
+  UserFunc funct;
+  /** Associated file. */
+  IOFile file;
+
+  /** Serialization parameters. */
+  final SerializerProp output = new SerializerProp();
   /** Paths. */
   final ObjList<String[]> paths = new ObjList<String[]>();
   /** Supported methods. */
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
-  /** Associated user function. */
-  UserFunc funct;
   /** Consumed media type. */
-  String consumes;
+  StringList consumes = new StringList();
   /** Returned media type. */
-  String produces;
+  StringList produces = new StringList();
 
   /**
    * Constructor.
    * @param uf associated user function
+   * @param in input file
    */
-  RestXqFunction(final UserFunc uf) {
+  RestXqFunction(final UserFunc uf, final IOFile in) {
     funct = uf;
+    file = in;
   }
 
   /**
    * Checks a function for RESTFful annotations.
-   * @param file input file
    * @return {@code true} if module contains relevant annotations
    * @throws HTTPException HTTP exception
    */
-  boolean update(final IOFile file) throws HTTPException {
-    final EnumSet<HTTPMethod> rxm = EnumSet.noneOf(HTTPMethod.class);
+  boolean analyze() throws HTTPException {
+    final EnumSet<HTTPMethod> mth = EnumSet.noneOf(HTTPMethod.class);
 
     // loop through all annotations
     boolean found = false;
     for(int a = 0; a < funct.ann.size(); a++) {
       final QNm name = funct.ann.names[a];
-      final Value val = funct.ann.values[a];
+      final Value value = funct.ann.values[a];
       boolean f = true;
       if(name.eq(PATH)) {
-        // check path string
-        if(!(val instanceof Str)) error(Util.info(SINGLE_STRING, PATH), funct, file);
-        // check syntax of single steps
-        final String[] steps = HTTPContext.toSteps(((Str) val).toJava());
+        // get path string and check syntax of single steps
+        final String v = string(value, SINGLE_STRING, PATH);
+        final String[] steps = HTTPContext.toSteps(v);
         for(final String s : steps) {
-          if(!STEP.matcher(s).matches()) error(Util.info(STEP_SYNTAX, s), funct, file);
+          if(!STEP.matcher(s).matches()) error(STEP_SYNTAX, s);
         }
         paths.add(steps);
       } else if(name.eq(GET)) {
-        rxm.add(HTTPMethod.GET);
+        mth.add(HTTPMethod.GET);
       } else if(name.eq(POST)) {
-        rxm.add(HTTPMethod.POST);
+        mth.add(HTTPMethod.POST);
       } else if(name.eq(PUT)) {
-        rxm.add(HTTPMethod.PUT);
+        mth.add(HTTPMethod.PUT);
       } else if(name.eq(DELETE)) {
-        rxm.add(HTTPMethod.DELETE);
+        mth.add(HTTPMethod.DELETE);
       } else if(name.eq(CONSUMES)) {
-        if(!(val instanceof Str)) error(Util.info(SINGLE_STRING, CONSUMES), funct, file);
-        consumes = ((Str) val).toJava();
+        consumes.add(string(value, SINGLE_STRING, CONSUMES));
       } else if(name.eq(PRODUCES)) {
-        if(!(val instanceof Str)) error(Util.info(SINGLE_STRING, PRODUCES), funct, file);
-        produces = ((Str) val).toJava();
+        produces.add(string(value, SINGLE_STRING, PRODUCES));
+      } else if(Token.eq(name.uri(), QueryText.OUTPUTURI)) {
+        // output parameters
+        final String key = Token.string(name.local());
+        final String val = string(value, OUTPUT_STRING, key);
+        if(output.get(key) == null) error(UNKNOWN_SER, key);
+        output.set(key, val);
       } else {
         f = false;
       }
       found |= f;
     }
-    if(!rxm.isEmpty()) methods = rxm;
+    if(!mth.isEmpty()) methods = mth;
     return found;
   }
 
@@ -105,10 +116,15 @@ final class RestXqFunction {
         if(path.length != http.depth()) continue;
         // check single steps
         for(int p = 0; p < path.length; p++) {
-          if(!path[p].equals(http.step(p)) && !path[p].startsWith("{")) {
-            continue PATHS;
-          }
+          if(!path[p].equals(http.step(p)) && !path[p].startsWith("{")) continue PATHS;
         }
+        // check consumed content type
+        if(!consumes.empty() && !consumes.contains(http.req.getContentType())) continue;
+
+        // check producing content type
+        if(!produces.empty() && produces.contains(http.req.getHeader("Accept")))
+          return true;
+
         return true;
       }
     }
@@ -116,15 +132,30 @@ final class RestXqFunction {
   }
 
   /**
+   * Returns the specified value as an atomic string, or throws an exception.
+   * @param value value
+   * @param msg error message
+   * @param ext error extension
+   * @return string
+   * @throws HTTPException HTTP exception
+   */
+  private String string(final Value value, final String msg, final Object... ext)
+      throws HTTPException {
+
+    if(!(value instanceof Str)) error(msg, ext);
+    return ((Str) value).toJava();
+  }
+
+  /**
    * Creates an exception with the specified message.
    * @param msg message
-   * @param func function to be parsed
-   * @param file input file
+   * @param ext error extension
    * @return instance
    * @throws HTTPException HTTP exception
    */
-  private HTTPException error(final String msg, final UserFunc func, final IOFile file)
+  private HTTPException error(final String msg, final Object... ext)
       throws HTTPException {
-    throw new HTTPException(SC_NOT_IMPLEMENTED, STATIC_ERROR, msg, file.name(), func);
+    throw new HTTPException(SC_NOT_IMPLEMENTED, STATIC_ERROR,
+        Util.info(msg, ext), file.name(), funct);
   }
 }

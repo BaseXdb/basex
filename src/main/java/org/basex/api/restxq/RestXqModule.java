@@ -46,14 +46,14 @@ final class RestXqModule {
    * @return {@code true} if module contains relevant annotations
    * @throws HTTPException HTTP exception
    */
-  boolean update() throws HTTPException {
+  boolean analyze() throws HTTPException {
     functions.reset();
 
     // loop through all functions
     final QueryContext qc = parse();
     for(final UserFunc uf : qc.funcs.funcs()) {
-      final RestXqFunction func = new RestXqFunction(uf);
-      if(func.update(file)) functions.add(func);
+      final RestXqFunction rxf = new RestXqFunction(uf, file);
+      if(rxf.analyze()) functions.add(rxf);
     }
     return !functions.empty();
   }
@@ -100,8 +100,8 @@ final class RestXqModule {
     // loop through all functions
     for(final UserFunc uf : qc.funcs.funcs()) {
       // recover and evaluate relevant function
-      final RestXqFunction rxf = new RestXqFunction(uf);
-      if(rxf.update(file) && rxf.supports(http)) {
+      final RestXqFunction rxf = new RestXqFunction(uf, file);
+      if(rxf.analyze() && rxf.supports(http)) {
         process(rxf, qc, http);
         return;
       }
@@ -157,9 +157,7 @@ final class RestXqModule {
       final ValueIter ir = bfc.comp(qc).value(qc).iter();
 
       // set serialization parameters
-      final SerializerProp sp = qc.serParams(false);
-      if(rxf.produces != null) sp.set(SerializerProp.S_MEDIA_TYPE, rxf.produces);
-      http.initResponse(sp);
+      http.initResponse(rxf.output);
 
       // serialize result
       final Serializer ser = Serializer.get(http.out);

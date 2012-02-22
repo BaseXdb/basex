@@ -35,12 +35,16 @@ abstract class RestXqText {
   /** Error message. */
   static final String UNEXPECTED_ERROR = "Unexpected error: %";
   /** Error message. */
-  static final String PATH_NOT_FOUND =
-      "No XQuery function found to process the specified path.";
+  static final String NOT_FOUND = "No XQuery function found to process the request.";
   /** Error message. */
   static final String SINGLE_STRING = "Annotation % must contain a single string.";
   /** Error message. */
-  static final String STEP_SYNTAX = "The specified template is invalid: \"%\".";
+  static final String STEP_SYNTAX = "Invalid template found: \"%\".";
+  /** Error message. */
+  static final String OUTPUT_STRING =
+      "Output parameter \"%\" must contain a single string.";
+  /** Error message. */
+  static final String UNKNOWN_SER = "Unknown serialization parameter \"%\".";
 
   /**
    * Creates a new QName, using the RESTful annotations URI.

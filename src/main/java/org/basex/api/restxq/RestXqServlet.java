@@ -39,7 +39,7 @@ public final class RestXqServlet extends HttpServlet {
       final RestXqModule module = RestXqModules.get().find(http);
 
       // no module found: return 404
-      if(module == null) throw new HTTPException(SC_NOT_FOUND, PATH_NOT_FOUND);
+      if(module == null) throw new HTTPException(SC_NOT_FOUND, NOT_FOUND);
 
       // process module
       module.process(http);
