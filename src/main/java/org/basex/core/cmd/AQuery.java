@@ -170,6 +170,11 @@ abstract class AQuery extends Command {
     }
   }
 
+  @Override
+  public boolean updated() {
+    return qp == null || qp.updates() != 0;
+  }
+
   /**
    * Performs the first argument as XQuery and returns a node set.
    */

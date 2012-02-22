@@ -448,8 +448,8 @@ public final class GUI extends AGUI {
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
-        } else if(up) {
-          // update command
+        } else if(up && c.updated()) {
+          // data has been updated
           notify.update();
         } else if(result != null) {
           final Nodes nd = context.current();

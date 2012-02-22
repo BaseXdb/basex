@@ -144,6 +144,15 @@ public abstract class Command extends Progress {
   }
 
   /**
+   * Checks if the command has updated any data.
+   * If this method is called before command execution, it always returns {@code true}.
+   * @return result of check
+   */
+  public boolean updated() {
+    return true;
+  }
+
+  /**
    * Returns true if this command will change the {@link Context#data}
    * reference. This method is required by the progress dialog in the frontend.
    * @param ctx database context
