@@ -5,6 +5,7 @@ import java.util.*;
 import org.basex.api.*;
 import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.query.*;
 
 /**
  * This class caches RESTful XQuery modules found in the HTTP root directory.
@@ -32,10 +33,10 @@ final class RestXqModules {
   /**
    * Returns the module that matches the specified request, or {@code null}.
    * @param http HTTP context
-   * @throws HTTPException HTTP exception
+   * @throws QueryException query exception
    * @return instance
    */
-  RestXqModule find(final HTTPContext http) throws HTTPException {
+  RestXqModule find(final HTTPContext http) throws QueryException {
     analyze();
     for(final RestXqModule mod : modules.values()) {
       if(mod.find(http) != null) return mod;
@@ -45,9 +46,9 @@ final class RestXqModules {
 
   /**
    * Updates the module cache. Parses new modules and discards obsolete ones.
-   * @throws HTTPException HTTP exception
+   * @throws QueryException query exception
    */
-  private void analyze() throws HTTPException {
+  private void analyze() throws QueryException {
     final Context ctx = HTTPSession.context();
     // create new cache
     final HashMap<String, RestXqModule> tmp = new HashMap<String, RestXqModule>();

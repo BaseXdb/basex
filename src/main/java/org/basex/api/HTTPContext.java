@@ -40,8 +40,8 @@ public final class HTTPContext {
   /** Result wrapping. */
   public boolean wrapping;
 
-  /** Steps. */
-  private final String[] steps;
+  /** Segments. */
+  private final String[] segments;
   /** Full path. */
   private final String path;
 
@@ -61,7 +61,7 @@ public final class HTTPContext {
     out = res.getOutputStream();
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
-    steps = toSteps(req.getPathInfo());
+    segments = toSegments(req.getPathInfo());
     path = join(0);
   }
 
@@ -98,7 +98,7 @@ public final class HTTPContext {
    * @return path depth
    */
   public int depth() {
-    return steps.length;
+    return segments.length;
   }
 
   /**
@@ -110,12 +110,12 @@ public final class HTTPContext {
   }
 
   /**
-   * Returns a single step.
-   * @param s step
-   * @return specified step
+   * Returns a single path segment.
+   * @param s offset
+   * @return specified segment
    */
-  public String step(final int s) {
-    return steps[s];
+  public String segment(final int s) {
+    return segments[s];
   }
 
   /**
@@ -132,7 +132,20 @@ public final class HTTPContext {
    * @return database
    */
   public String db() {
-    return depth() == 0 ? null : steps[0];
+    return depth() == 0 ? null : segments[0];
+  }
+
+  /**
+   * Returns an array with all accepted content types.
+   * if the root directory was specified.
+   * @return database
+   */
+  public String[] produces() {
+    final String[] acc = req.getHeader("Accept").split("\\s*,\\s*");
+    for(int a = 0; a < acc.length; a++) {
+      if(acc[a].indexOf(';') != -1) acc[a] = acc[a].replaceAll("\\w*;.*", "");
+    }
+    return acc;
   }
 
   /**
@@ -151,11 +164,11 @@ public final class HTTPContext {
   // STATIC METHODS =====================================================================
 
   /**
-   * Converts the path to a string array.
+   * Converts the path to a string array, containing the single segments.
    * @param path path, or {@code null}
    * @return path depth
    */
-  public static String[] toSteps(final String path) {
+  public static String[] toSegments(final String path) {
     final StringList sl = new StringList();
     if(path != null) {
       final TokenBuilder tb = new TokenBuilder();
@@ -178,14 +191,14 @@ public final class HTTPContext {
 
   /**
    * Joins the path.
-   * @param s step to start with
+   * @param s segment to start with
    * @return joined path
    */
   private String join(final int s) {
     final TokenBuilder tb = new TokenBuilder();
-    for(int p = s; p < steps.length; p++) {
+    for(int p = s; p < segments.length; p++) {
       if(tb.size() != 0) tb.add('/');
-      tb.add(steps[p]);
+      tb.add(segments[p]);
     }
     return tb.toString();
   }

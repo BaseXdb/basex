@@ -1,8 +1,7 @@
 package org.basex.api.restxq;
 
-import static javax.servlet.http.HttpServletResponse.*;
-
 import java.io.*;
+import java.util.*;
 
 import org.basex.api.*;
 import org.basex.core.*;
@@ -12,9 +11,7 @@ import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * This class caches information on a single XQuery module with RESTful annotations.
@@ -23,10 +20,10 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 final class RestXqModule {
-  // [CG] RestXq: how to resolve conflicting paths? what is "more specific"?
+  // [CG] RestXq: resolve conflicting paths. what is "more specific"?
 
   /** Supported methods. */
-  final ObjList<RestXqFunction> functions = new ObjList<RestXqFunction>();
+  final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
   /** File reference. */
   final IOFile file;
   /** Parsing timestamp. */
@@ -44,18 +41,18 @@ final class RestXqModule {
   /**
    * Checks the module for RESTFful annotations.
    * @return {@code true} if module contains relevant annotations
-   * @throws HTTPException HTTP exception
+   * @throws QueryException query exception
    */
-  boolean analyze() throws HTTPException {
-    functions.reset();
+  boolean analyze() throws QueryException {
+    functions.clear();
 
     // loop through all functions
     final QueryContext qc = parse();
     for(final UserFunc uf : qc.funcs.funcs()) {
-      final RestXqFunction rxf = new RestXqFunction(uf, file);
+      final RestXqFunction rxf = new RestXqFunction(uf, qc);
       if(rxf.analyze()) functions.add(rxf);
     }
-    return !functions.empty();
+    return !functions.isEmpty();
   }
 
   /**
@@ -82,7 +79,7 @@ final class RestXqModule {
    */
   RestXqFunction find(final HTTPContext http) {
     for(final RestXqFunction f : functions) {
-      if(f.supports(http)) return f;
+      if(f.matches(http)) return f;
     }
     return null;
   }
@@ -91,17 +88,17 @@ final class RestXqModule {
    * Processes the HTTP request.
    * @param http HTTP context
    * Parses new modules and discards obsolete ones.
-   * @throws HTTPException HTTP exception
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void process(final HTTPContext http) throws HTTPException, IOException {
+  void process(final HTTPContext http) throws QueryException, IOException {
     // create new XQuery instance
     final QueryContext qc = parse();
     // loop through all functions
     for(final UserFunc uf : qc.funcs.funcs()) {
       // recover and evaluate relevant function
-      final RestXqFunction rxf = new RestXqFunction(uf, file);
-      if(rxf.analyze() && rxf.supports(http)) {
+      final RestXqFunction rxf = new RestXqFunction(uf, qc);
+      if(rxf.analyze() && rxf.matches(http)) {
         process(rxf, qc, http);
         return;
       }
@@ -113,9 +110,9 @@ final class RestXqModule {
   /**
    * Parses the module and returns the query context.
    * @return query context
-   * @throws HTTPException HTTP exception
+   * @throws QueryException query exception
    */
-  private QueryContext parse() throws HTTPException {
+  private QueryContext parse() throws QueryException {
     try {
       final String query = Token.string(file.read());
       final Context ctx = HTTPSession.context();
@@ -123,10 +120,9 @@ final class RestXqModule {
       qc.sc.baseURI(file.path());
       qc.module(query);
       return qc;
-    } catch(final QueryException ex) {
-      throw new HTTPException(SC_NOT_IMPLEMENTED, ex.getMessage());
     } catch(final IOException ex) {
-      throw new HTTPException(SC_NOT_IMPLEMENTED, ex.getMessage());
+      // Unexpected: XQuery module could not be opened
+      throw new RuntimeException(ex.getMessage());
     }
   }
 
@@ -135,36 +131,29 @@ final class RestXqModule {
    * @param rxf function container
    * @param qc query context
    * @param http HTTP context
-   * @throws HTTPException HTTP exception
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  void process(final RestXqFunction rxf, final QueryContext qc, final HTTPContext http)
-      throws HTTPException, IOException {
+  private void process(final RestXqFunction rxf, final QueryContext qc,
+      final HTTPContext http) throws QueryException, IOException {
 
-    try {
-      // wrap function with a function call
-      final UserFunc uf = rxf.funct;
-      final BaseFuncCall bfc = new BaseFuncCall(null, uf.name, uf.args);
-      bfc.init(uf);
+    // wrap function with a function call
+    final UserFunc uf = rxf.function;
+    final BaseFuncCall bfc = new BaseFuncCall(null, uf.name, uf.args);
+    bfc.init(uf);
 
-      // bind variables
-      for(final Var arg : uf.args) {
-        // [CG] RestXq: bind correct variables, throw exception for unbound variables
-        arg.bind(Str.get("[variable]"), qc);
-      }
+    // bind variables
+    rxf.bind(http);
 
-      // compile and evaluate function
-      final ValueIter ir = bfc.comp(qc).value(qc).iter();
+    // compile and evaluate function
+    final ValueIter ir = bfc.comp(qc).value(qc).iter();
 
-      // set serialization parameters
-      http.initResponse(rxf.output);
+    // set serialization parameters
+    http.initResponse(rxf.output);
 
-      // serialize result
-      final Serializer ser = Serializer.get(http.out);
-      for(Item it; (it = ir.next()) != null;) it.serialize(ser);
-      ser.close();
-    } catch(final QueryException ex) {
-      throw new HTTPException(SC_NOT_IMPLEMENTED, ex.getMessage());
-    }
+    // serialize result
+    final Serializer ser = Serializer.get(http.out);
+    for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+    ser.close();
   }
 }

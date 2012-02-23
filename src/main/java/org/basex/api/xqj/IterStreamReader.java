@@ -2,32 +2,19 @@ package org.basex.api.xqj;
 
 import static org.basex.util.Token.*;
 
-import java.util.NoSuchElementException;
-import java.util.Properties;
+import java.util.*;
 
-import javax.xml.namespace.NamespaceContext;
-import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.namespace.*;
+import javax.xml.stream.*;
 
-import org.basex.api.jaxp.BXNamespaceContext;
-import org.basex.data.Data;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.FNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.util.NSContext;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
+import org.basex.api.jaxp.*;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * XML Stream Reader implementation.
@@ -524,9 +511,9 @@ final class IterStreamReader implements XMLStreamReader {
   /** Reader for traversing {@link FNode} instances. */
   private final class FNodeReader extends NodeReader {
     /** Axis iterator. */
-    private final ObjList<AxisIter> iter = new ObjList<AxisIter>();
+    private final ArrayList<AxisIter> iter = new ArrayList<AxisIter>();
     /** Node stack. */
-    private final ObjList<ANode> nodes = new ObjList<ANode>();
+    private final ArrayList<ANode> nodes = new ArrayList<ANode>();
     /** Stack level. */
     private int l;
 
@@ -540,10 +527,14 @@ final class IterStreamReader implements XMLStreamReader {
     boolean hasNext() {
       final ANode n = iter.get(l).next();
       if(n != null) {
+        while(l >= nodes.size()) nodes.add(null);
         nodes.set(l, n);
         node = n;
         type();
-        if(kind == START_ELEMENT) iter.set(++l, n.children());
+        if(kind == START_ELEMENT) {
+          while(l + 1 >= iter.size()) iter.add(null);
+          iter.set(++l, n.children());
+        }
       } else {
         if(--l < 0) return false;
         node = nodes.get(l);

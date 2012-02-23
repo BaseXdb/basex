@@ -648,10 +648,10 @@ public class RESTTest {
    * @throws IOException I/O exception
    */
   private static String read(final InputStream is) throws IOException {
-    final ArrayOutput baos = new ArrayOutput();
-    final BufferInput bis = new BufferInput(is);
-    for(int i; (i = bis.read()) != -1;) baos.write(i);
-    bis.close();
-    return baos.toString();
+    final ArrayOutput ao = new ArrayOutput();
+    final BufferInput bi = new BufferInput(is);
+    for(int i; (i = bi.read()) != -1;) ao.write(i);
+    bi.close();
+    return ao.toString();
   }
 }
