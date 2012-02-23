@@ -494,6 +494,11 @@ public interface QueryText {
   /** Option URI. */
   byte[] OPTIONURI = token(W3URI + "/2011/xquery-options");
 
+  /** EXQuery URI. */
+  String EXQUERY = "http://exquery.org/ns/";
+  /** REXQ URI. */
+  byte[] REXQURI = token(EXQUERY + "rest/annotation");
+
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";
   /** Cryptographic module URI. */

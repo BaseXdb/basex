@@ -139,7 +139,7 @@ public abstract class Data {
    * Empty databases can be recognized by a single document node.
    * @return result of check
    */
-  public final boolean empty() {
+  public final boolean isEmpty() {
     return meta.size == 1 && kind(0) == DOC;
   }
 
@@ -722,7 +722,7 @@ public abstract class Data {
     resources.insert(ipre, data);
 
     // indicates if database only contains a dummy node
-    final boolean dummy = empty() && data.kind(0) == DOC;
+    final boolean dummy = isEmpty() && data.kind(0) == DOC;
     final int dsize = data.meta.size;
 
     final int buf = Math.min(dsize, IO.BLOCKSIZE >> IO.NODEPOWER);

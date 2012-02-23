@@ -2,26 +2,19 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import java.util.Iterator;
 
-import org.basex.build.DirParser;
-import org.basex.build.MemBuilder;
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.Type;
-import org.basex.query.util.DataBuilder;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
-import org.basex.util.list.ObjList;
-import org.basex.util.list.TokenList;
+import java.io.*;
+import java.util.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Add primitive.
@@ -31,7 +24,7 @@ import org.basex.util.list.TokenList;
  */
 public final class DBAdd extends InsertBase {
   /** Documents to add. */
-  private ObjList<Item> docs = new ObjList<Item>();
+  private ArrayList<Item> docs = new ArrayList<Item>();
   /** Paths to which the new document(s) will be added. */
   private TokenList paths = new TokenList();
   /** Database context. */
@@ -82,6 +75,7 @@ public final class DBAdd extends InsertBase {
     md = new MemData(data);
     for(int i = 0; i < docs.size(); i++) {
       md.insert(md.meta.size, -1, docData(docs.get(i),  paths.get(i)));
+      // clear entries to recover memory
       docs.set(i, null);
       paths.set(i, null);
       size++;

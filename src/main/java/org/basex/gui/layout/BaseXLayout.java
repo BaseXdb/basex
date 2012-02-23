@@ -1,30 +1,23 @@
 package org.basex.gui.layout;
 
-import org.basex.gui.GUI;
-import org.basex.gui.GUICommands;
 import static org.basex.gui.GUIConstants.*;
-import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
-import org.basex.util.Util;
-import org.basex.util.list.ObjList;
+
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
+import java.awt.event.*;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
+
+import org.basex.gui.*;
+import org.basex.gui.dialog.Dialog;
+import org.basex.util.*;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -114,8 +107,8 @@ public final class BaseXLayout {
    * @return contents
    */
   @SuppressWarnings("unchecked")
-  public static ObjList<Object> contents(final Transferable tr) {
-    final ObjList<Object> list = new ObjList<Object>();
+  public static ArrayList<Object> contents(final Transferable tr) {
+    final ArrayList<Object> list = new ArrayList<Object>();
     try {
       if(tr.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
         for(final File fl : (List<File>)

@@ -1,8 +1,9 @@
 package org.basex.query.util.http;
 
-import org.basex.query.iter.ItemCache;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.list.ObjList;
+import java.util.*;
+
+import org.basex.query.iter.*;
+import org.basex.util.hash.*;
 
 /**
  * Container for parsed data from <http:request/>.
@@ -19,7 +20,7 @@ public final class Request {
   /** Body content. */
   public final ItemCache bodyContent = new ItemCache();
   /** Parts in case of multipart request. */
-  public final ObjList<Part> parts = new ObjList<Part>();
+  public final ArrayList<Part> parts = new ArrayList<Part>();
   /** Indicator for multipart request. */
   public boolean isMultipart;
 

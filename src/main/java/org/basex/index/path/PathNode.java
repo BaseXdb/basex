@@ -3,6 +3,7 @@ package org.basex.index.path;
 import static org.basex.data.DataText.*;
 
 import java.io.IOException;
+import java.util.*;
 
 import org.basex.core.Text;
 import org.basex.data.Data;
@@ -12,7 +13,6 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.list.ObjList;
 
 /**
  * This class represents a node of the path summary.
@@ -125,7 +125,7 @@ public final class PathNode {
    * Recursively adds the node and its descendants to the specified list.
    * @param nodes node list
    */
-  void addDesc(final ObjList<PathNode> nodes) {
+  void addDesc(final ArrayList<PathNode> nodes) {
     nodes.add(this);
     for(final PathNode n : ch) n.addDesc(nodes);
   }
@@ -137,7 +137,7 @@ public final class PathNode {
    * @param n name id
    * @param k node kind
    */
-  void addDesc(final ObjList<PathNode> nodes, final int n, final int k) {
+  void addDesc(final ArrayList<PathNode> nodes, final int n, final int k) {
     if(n == name && k == kind) nodes.add(this);
     for(final PathNode pn : ch) pn.addDesc(nodes, n, k);
   }

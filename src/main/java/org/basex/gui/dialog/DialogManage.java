@@ -1,22 +1,21 @@
 package org.basex.gui.dialog;
 
-import org.basex.core.Command;
-import org.basex.core.Context;
 import static org.basex.core.Text.*;
-import org.basex.core.cmd.*;
-import org.basex.core.cmd.List;
-import static org.basex.data.DataText.DATAINF;
-import org.basex.data.MetaData;
-import org.basex.gui.GUI;
-import org.basex.gui.layout.*;
-import org.basex.io.in.DataInput;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.list.ObjList;
-import org.basex.util.list.StringList;
+import static org.basex.data.DataText.*;
 
 import java.awt.*;
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.core.cmd.List;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.io.in.DataInput;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Open database dialog.
@@ -138,7 +137,7 @@ public final class DialogManage extends Dialog {
 
     final StringList dbs = choice.getValues();
     final String db = choice.getValue();
-    final ObjList<Command> cmds = new ObjList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<Command>();
     boolean active = dbs.size() > 0;
 
     if(cmp == open) {

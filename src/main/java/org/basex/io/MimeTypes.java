@@ -68,12 +68,26 @@ public final class MimeTypes {
 
   /**
    * Checks if the content type is an XML content type.
-   * @param c content type
+   * @param type content type
    * @return result
    */
-  public static boolean isXML(final String c) {
-    return eq(c, TEXT_XML, TXT_EXT_XML, APP_XML, APPL_EXT_XML) ||
-        c.endsWith(MIME_XML_SUFFIX);
+  public static boolean isXML(final String type) {
+    return eq(type, TEXT_XML, TXT_EXT_XML, APP_XML, APPL_EXT_XML) ||
+        type.endsWith(MIME_XML_SUFFIX);
+  }
+
+  /**
+   * Checks if a content type is accepted by the specified pattern.
+   * @param type content type
+   * @param pattern pattern
+   * @return result
+   */
+  public static boolean matches(final String type, final String pattern) {
+    final String[] t = type.split("/", 2);
+    final String[] p = pattern.split("/", 2);
+    return t.length == 2 && p.length == 2 &&
+        (p[0].equals("*") || p[0].equals(t[0])) &&
+        (p[1].equals("*") || p[1].equals(t[1]));
   }
 
   /** Hash map containing all assignments. */

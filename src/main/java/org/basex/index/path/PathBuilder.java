@@ -30,7 +30,7 @@ public final class PathBuilder extends IndexBuilder {
     for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
-      while(!pars.empty() && pars.peek() > par) pars.pop();
+      while(!pars.isEmpty() && pars.peek() > par) pars.pop();
 
       if(kind == Data.DOC) {
         path.index(0, kind, pars.size());

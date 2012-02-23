@@ -41,7 +41,7 @@ public abstract class ParseExpr extends Expr {
   public final InputInfo input;
   /** Cardinality of result; unknown if set to -1. */
   public long size = -1;
-  /** Data type. */
+  /** Static type. */
   public SeqType type;
 
   /**

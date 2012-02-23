@@ -2,21 +2,18 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpV.*;
-import org.basex.query.func.Function;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.path.AxisStep;
-import org.basex.query.util.Var;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.list.ObjList;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.CmpG.OpG;
+import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.query.path.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and
@@ -76,7 +73,7 @@ public abstract class Preds extends ParseExpr {
         ctx.compInfo(OPTPRED, pr.description());
         final Expr[] and = ((And) pr).expr;
         final int m = and.length - 1;
-        final ObjList<Expr> tmp = new ObjList<Expr>(preds.length + m);
+        final ArrayList<Expr> tmp = new ArrayList<Expr>(preds.length + m);
         for(int i = 0; i < p; i++) tmp.add(preds[i]);
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric

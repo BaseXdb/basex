@@ -3,32 +3,19 @@ package org.basex.query.path;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
-import org.basex.data.Data;
-import org.basex.index.Names;
-import org.basex.index.Stats;
-import org.basex.index.path.PathNode;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.Preds;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
-import org.basex.query.item.Value;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.NodeIter;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.index.path.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 import org.basex.query.path.Test.Name;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.list.ObjList;
+import org.basex.util.*;
 
 /**
  * Location Step expression.
@@ -164,7 +151,7 @@ public class AxisStep extends Preds {
    * @param data data reference
    * @return resulting path nodes, or {@code null} if nodes cannot be evaluated
    */
-  final ObjList<PathNode> nodes(final ObjList<PathNode> nodes,
+  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes,
       final Data data) {
 
     // skip steps with predicates or different namespaces
@@ -190,7 +177,7 @@ public class AxisStep extends Preds {
     if(axis != Axis.ATTR && axis != Axis.CHILD && axis != Axis.DESC &&
        axis != Axis.DESCORSELF && axis != Axis.SELF) return null;
 
-    final ObjList<PathNode> tmp = new ObjList<PathNode>();
+    final ArrayList<PathNode> tmp = new ArrayList<PathNode>();
     for(final PathNode n : nodes) {
       if(axis == Axis.SELF || axis == Axis.DESCORSELF) {
         if(kind == -1 || kind == n.kind && (name == 0 || name == n.name)) {
@@ -209,7 +196,7 @@ public class AxisStep extends Preds {
    * @param name name id, or {@code 0} as wildcard
    * @param kind node kind, or {@code -1} for all types
    */
-  private void add(final PathNode node, final ObjList<PathNode> nodes,
+  private void add(final PathNode node, final ArrayList<PathNode> nodes,
       final int name, final int kind) {
 
     for(final PathNode n : node.ch) {

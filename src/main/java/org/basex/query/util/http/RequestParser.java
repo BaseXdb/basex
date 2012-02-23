@@ -3,16 +3,14 @@ package org.basex.query.util.http;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Item;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.AxisMoreIter;
-import org.basex.query.iter.ItemCache;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.http.Request.Part;
-import org.basex.util.InputInfo;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.list.ObjList;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Request parser.
@@ -193,9 +191,8 @@ public final class RequestParser {
    * @param parts list for multipart parts
    * @throws QueryException query exception
    */
-  private void parseMultipart(final ANode multipart,
-      final ItemCache contItems, final TokenMap attrs,
-      final ObjList<Part> parts) throws QueryException {
+  private void parseMultipart(final ANode multipart, final ItemCache contItems,
+      final TokenMap attrs, final ArrayList<Part> parts) throws QueryException {
 
     parseAttrs(multipart, attrs);
     if(attrs.get(MEDIATYPE) == null) REQINV.thrw(input,

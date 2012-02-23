@@ -243,7 +243,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void finishText(final byte[] b) throws IOException {
-    if(cdata.empty() || tags.empty() || !cdata.contains(tags.peek())) {
+    if(cdata.isEmpty() || tags.isEmpty() || !cdata.contains(tags.peek())) {
       for(int k = 0; k < b.length; k += cl(b, k)) code(cp(b, k));
     } else {
       print(CDATA_O);
@@ -407,7 +407,7 @@ public abstract class OutputSerializer extends Serializer {
     if(item) {
       item = false;
     } else {
-      if(!suppress.empty() && !tags.empty()) {
+      if(!suppress.isEmpty() && !tags.isEmpty()) {
         for(final byte[] s : suppress) {
           if(tags.contains(s)) return;
         }

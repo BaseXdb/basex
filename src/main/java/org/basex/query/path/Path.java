@@ -3,28 +3,18 @@ package org.basex.query.path;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
-import org.basex.data.Data;
+import org.basex.data.*;
 import org.basex.index.path.*;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.CAttr;
-import org.basex.query.expr.CDoc;
-import org.basex.query.expr.Context;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
-import org.basex.query.expr.Root;
-import org.basex.query.item.Empty;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.path.Test.Name;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
-import org.basex.util.list.ObjList;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Path expression.
@@ -170,7 +160,7 @@ public abstract class Path extends ParseExpr {
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
     if(data == null || !data.meta.pathindex || !data.meta.uptodate) return -1;
 
-    ObjList<PathNode> nodes = data.paths.root();
+    ArrayList<PathNode> nodes = data.paths.root();
     long m = 1;
     for(int s = 0; s < steps.length; s++) {
       final AxisStep curr = axisStep(s);
@@ -265,11 +255,11 @@ public abstract class Path extends ParseExpr {
       if(curr == null || curr.axis != DESC || curr.uses(Use.POS)) continue;
 
       // check if child steps can be retrieved for current step
-      ObjList<PathNode> pn = pathNodes(data, s);
+      ArrayList<PathNode> pn = pathNodes(data, s);
       if(pn == null) continue;
 
       // cache child steps
-      final ObjList<QNm> qnm = new ObjList<QNm>();
+      final ArrayList<QNm> qnm = new ArrayList<QNm>();
       while(pn.get(0).par != null) {
         QNm nm = new QNm(data.tagindex.key(pn.get(0).name));
         // skip children with prefixes
@@ -337,11 +327,11 @@ public abstract class Path extends ParseExpr {
    * @param l last step to be checked
    * @return path nodes
    */
-  ObjList<PathNode> pathNodes(final Data data, final int l) {
+  ArrayList<PathNode> pathNodes(final Data data, final int l) {
     // skip request if no path index exists or might be out-of-date
     if(!data.meta.pathindex || !data.meta.uptodate) return null;
 
-    ObjList<PathNode> in = data.paths.root();
+    ArrayList<PathNode> in = data.paths.root();
     for(int s = 0; s <= l; ++s) {
       final AxisStep curr = axisStep(s);
       if(curr == null) return null;
@@ -351,7 +341,7 @@ public abstract class Path extends ParseExpr {
 
       final int name = data.tagindex.id(curr.test.name.local());
 
-      final ObjList<PathNode> al = new ObjList<PathNode>();
+      final ArrayList<PathNode> al = new ArrayList<PathNode>();
       for(final PathNode pn : PathSummary.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels

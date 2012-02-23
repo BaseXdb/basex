@@ -3,6 +3,7 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 
 import java.awt.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -96,7 +97,7 @@ public final class DialogPackages extends Dialog {
     }
 
     final StringList pkgs = packages.getValues();
-    final ObjList<Command> cmds = new ObjList<Command>();
+    final ArrayList<Command> cmds = new ArrayList<Command>();
 
     final byte[] key = Token.token(packages.getValue());
     final TokenMap pkg = ctx.repo.pkgDict();

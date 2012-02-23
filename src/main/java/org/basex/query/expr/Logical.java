@@ -2,13 +2,11 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Bln;
-import org.basex.query.item.SeqType;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.list.ObjList;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Logical expression, extended by {@link And} and {@link Or}.
@@ -50,7 +48,7 @@ public abstract class Logical extends Arr {
    */
   final void compFlatten(final QueryContext ctx) {
     // flatten nested expressions
-    final ObjList<Expr> tmp = new ObjList<Expr>(expr.length);
+    final ArrayList<Expr> tmp = new ArrayList<Expr>(expr.length);
     for(final Expr ex : expr) {
       if(ex.getClass().isInstance(this)) {
         for(final Expr e : ((Logical) ex).expr) tmp.add(e);

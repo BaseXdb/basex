@@ -1,19 +1,14 @@
 package org.basex.query.up.primitives;
 
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.up.NamePool;
-import org.basex.query.util.DataBuilder;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.ObjList;
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Abstract update primitive which holds a copy of nodes to be inserted.
@@ -23,7 +18,7 @@ import org.basex.util.list.ObjList;
  */
 public abstract class NodeCopy extends StructuralUpdate {
   /** Nodes to be inserted. */
-  ObjList<NodeCache> insert = new ObjList<NodeCache>(1);
+  ArrayList<NodeCache> insert = new ArrayList<NodeCache>(1);
   /** Final copy of insertion nodes. */
   MemData md;
   /** Number of insert operations (initialized by {@link #prepare}). */
@@ -59,7 +54,7 @@ public abstract class NodeCopy extends StructuralUpdate {
         seq.add(n);
         size++;
       }
-      // save memory
+      // clear entries to recover memory
       insert.set(i, null);
     }
     insert = null;

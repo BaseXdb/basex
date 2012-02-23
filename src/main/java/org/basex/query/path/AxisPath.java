@@ -1,31 +1,20 @@
 package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
-import org.basex.data.Data;
-import org.basex.index.Stats;
-import org.basex.index.path.PathNode;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.Filter;
-import org.basex.query.expr.Pos;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Empty;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.NodeIter;
-import org.basex.query.path.Test.Name;
 import static org.basex.query.util.Err.*;
 
-import org.basex.query.util.IndexContext;
-import org.basex.query.util.Var;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.list.ObjList;
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.index.path.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.Test.Name;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Axis path expression.
@@ -220,7 +209,7 @@ public class AxisPath extends Path {
 
           // support only unique paths with nodes on the correct level
           final int name = data.tagindex.id(s.test.name.local());
-          final ObjList<PathNode> pn = data.paths.desc(name, Data.ELEM);
+          final ArrayList<PathNode> pn = data.paths.desc(name, Data.ELEM);
           if(pn.size() != 1 || pn.get(0).level() != j + 1) break;
         }
         inv = j <= smin;
@@ -399,12 +388,12 @@ public class AxisPath extends Path {
    * @param ctx query context
    * @return path nodes, or {@code null} if nodes cannot be evaluated
    */
-  public ObjList<PathNode> nodes(final QueryContext ctx) {
+  public ArrayList<PathNode> nodes(final QueryContext ctx) {
     final Value rt = root(ctx);
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
     if(data == null || !data.meta.pathindex || !data.meta.uptodate) return null;
 
-    ObjList<PathNode> nodes = data.paths.root();
+    ArrayList<PathNode> nodes = data.paths.root();
     for(int s = 0; s < steps.length; s++) {
       final AxisStep curr = axisStep(s);
       if(curr == null) return null;

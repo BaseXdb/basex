@@ -1,6 +1,6 @@
 package org.basex.query.util.json;
 
-import org.basex.util.list.ObjList;
+import java.util.*;
 
 /**
  * JSON structure.
@@ -10,7 +10,7 @@ import org.basex.util.list.ObjList;
  */
 abstract class JStruct extends JValue {
   /** Values. */
-  private final ObjList<JValue> nodes = new ObjList<JValue>();
+  private final ArrayList<JValue> nodes = new ArrayList<JValue>();
 
   /**
    * Adds a child.

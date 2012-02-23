@@ -3,21 +3,16 @@ package org.basex.query.flwor;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Array.*;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.ValueList;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.ObjList;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Order by expression.
@@ -30,7 +25,7 @@ public final class Order extends ParseExpr {
   final OrderBy[] ob;
 
   /** Keys to sort by. */
-  private ObjList<Item[]> keys;
+  private ArrayList<Item[]> keys;
   /** Values to sort. */
   private ValueList values;
 
@@ -61,7 +56,7 @@ public final class Order extends ParseExpr {
    * @param vs value list
    * @return reference to this object for convenience
    */
-  Order set(final ObjList<Item[]> ks, final ValueList vs) {
+  Order set(final ArrayList<Item[]> ks, final ValueList vs) {
     keys = ks;
     values = vs;
     return this;
@@ -75,7 +70,7 @@ public final class Order extends ParseExpr {
    * @param vs value list
    * @throws QueryException query exception
    */
-  void add(final QueryContext ctx, final Expr e, final ObjList<Item[]> ks,
+  void add(final QueryContext ctx, final Expr e, final ArrayList<Item[]> ks,
       final ValueList vs) throws QueryException {
     final Item[] k = new Item[ob.length];
     for(int o = k.length; o-- > 0;) k[o] = ob[o].key(ctx, ks.size());
@@ -127,7 +122,7 @@ public final class Order extends ParseExpr {
    */
   class OrderedIter extends Iter {
     /** Sort keys. */
-    final ObjList<Item[]> kl;
+    final ArrayList<Item[]> kl;
     /** Values to sort. */
     final ValueList vl;
     /** End position. */
@@ -144,7 +139,7 @@ public final class Order extends ParseExpr {
      * @param ks sort keys
      * @param vs values
      */
-    public OrderedIter(final ObjList<Item[]> ks, final ValueList vs) {
+    public OrderedIter(final ArrayList<Item[]> ks, final ValueList vs) {
       kl = ks;
       vl = vs;
     }

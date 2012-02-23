@@ -88,7 +88,7 @@ public class XMLParser extends SingleParser {
       final byte[] tag = consumeToken(Type.TAGNAME);
       skipSpace();
 
-      if(tags.empty()) throw new BuildException(AFTERROOT, det());
+      if(tags.isEmpty()) throw new BuildException(AFTERROOT, det());
       final byte[] open = tags.pop();
       if(!eq(open, tag)) throw new BuildException(CLOSINGTAG, det(), tag, open);
 

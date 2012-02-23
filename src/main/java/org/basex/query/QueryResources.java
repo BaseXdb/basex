@@ -63,7 +63,7 @@ public final class QueryResources {
 
     // assign initial context value
     // (if database only contains an empty root node, assign empty sequence)
-    ctx.value = d.empty() ? Empty.SEQ :
+    ctx.value = d.isEmpty() ? Empty.SEQ :
       DBNodeSeq.get(new IntList(nodes.list), d, nodes.root, nodes.root);
 
     // create default collection: use initial node set if it contains all

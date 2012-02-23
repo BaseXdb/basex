@@ -209,7 +209,7 @@ final class Docs {
   synchronized IntList docs(final String path) {
     // invalid path, or no documents: return empty list
     final String pth = MetaData.normPath(path);
-    if(pth == null || data.empty()) return new IntList(0);
+    if(pth == null || data.isEmpty()) return new IntList(0);
 
     // empty path: return all documents
     final IntList docs = docs();
@@ -248,7 +248,7 @@ final class Docs {
   synchronized int doc(final String path, final boolean sort) {
     // invalid or empty path, or no documents: return -1
     final String pth = MetaData.normPath(path);
-    if(pth == null || pth.isEmpty() || data.empty()) return -1;
+    if(pth == null || pth.isEmpty() || data.isEmpty()) return -1;
 
     // normalize paths
     final byte[] exct = normalize(token(pth));
@@ -277,7 +277,7 @@ final class Docs {
    * @return path to a directory or not
    */
   synchronized boolean isDir(final byte[] path) {
-    if(path == null || data.empty()) return false;
+    if(path == null || data.isEmpty()) return false;
     final byte[] pa = concat(path, SLASH);
     for(final byte[] b : paths()) if(startsWith(b, pa)) return true;
     return false;
@@ -294,7 +294,7 @@ final class Docs {
       final boolean dir, final TokenBoolMap tbm) {
 
     final String pth = MetaData.normPath(string(path));
-    if(pth != null && !data.empty()) {
+    if(pth != null && !data.isEmpty()) {
       // normalize path to one leading + one trailing slash!
       byte[] tp = concat(SLASH, token(pth));
       // if the given path is the root, don't add a trailing slash

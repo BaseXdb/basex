@@ -66,7 +66,7 @@ public final class Export extends Command {
 
     // export XML documents
     final IntList il = data.resources.docs();
-    if(!data.empty()) {
+    if(!data.isEmpty()) {
       for(int i = 0, is = il.size(); i < is; i++) {
         final int pre = il.get(i);
         // create file path

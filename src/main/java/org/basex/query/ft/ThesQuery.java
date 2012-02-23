@@ -1,9 +1,10 @@
 package org.basex.query.ft;
 
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.list.ObjList;
-import org.basex.util.list.TokenList;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Simple Thesaurus entry for full-text requests.
@@ -13,7 +14,7 @@ import org.basex.util.list.TokenList;
  */
 public final class ThesQuery {
   /** Thesaurus root references. */
-  private final ObjList<Thesaurus> thes = new ObjList<Thesaurus>(1);
+  private final ArrayList<Thesaurus> thes = new ArrayList<Thesaurus>(1);
 
   /**
    * Adds two thesaurus definitions.

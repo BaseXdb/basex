@@ -94,7 +94,7 @@ public final class Optimize extends ACreate {
     for(int pre = 0; pre < m.size; ++pre) {
       final byte kind = (byte) d.kind(pre);
       final int par = d.parent(pre, kind);
-      while(!pars.empty() && pars.peek() > par) {
+      while(!pars.isEmpty() && pars.peek() > par) {
         pars.pop();
         tags.pop();
       }

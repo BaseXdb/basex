@@ -2,27 +2,18 @@ package org.basex.query.flwor;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.And;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.Filter;
-import org.basex.query.expr.If;
-import org.basex.query.expr.ParseExpr;
-import org.basex.query.func.Function;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.iter.Iter;
-import org.basex.query.path.AxisPath;
-import org.basex.query.util.ValueList;
-import org.basex.query.util.Var;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.list.ObjList;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * GFLWOR clause.
@@ -286,10 +277,10 @@ public class GFLWOR extends ParseExpr {
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
 
     // evaluate pre grouping tuples
-    ObjList<Item[]> keys = null;
+    ArrayList<Item[]> keys = null;
     ValueList vals = null;
     if(order != null) {
-      keys = new ObjList<Item[]>();
+      keys = new ArrayList<Item[]>();
       vals = new ValueList();
     }
     if(group != null) group.init(order);
@@ -315,7 +306,8 @@ public class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private void iter(final QueryContext ctx, final Iter[] it, final int p,
-      final ObjList<Item[]> ks, final ValueList vs) throws QueryException {
+      final ArrayList<Item[]> ks, final ValueList vs) throws QueryException {
+
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {

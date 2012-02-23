@@ -1,19 +1,17 @@
 package org.basex.query.flwor;
 
 import static org.basex.query.util.Err.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
-import org.basex.query.item.Value;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.ValueList;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
-import org.basex.util.hash.IntMap;
-import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
+
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Stores the grouping for a group by clause.
@@ -33,9 +31,9 @@ final class GroupPartition {
   private final Var[][] ngv;
 
   /** Group partitioning. */
-  private final ObjList<GroupNode> part = new ObjList<GroupNode>();
+  private final ArrayList<GroupNode> part = new ArrayList<GroupNode>();
   /** Resulting sequence for non-grouping variables. */
-  private final ObjList<ItemCache[]> items;
+  private final ArrayList<ItemCache[]> items;
   /** HashValue, position (with overflow bucket). */
   private final IntMap<IntList> hashes = new IntMap<IntList>();
 
@@ -52,7 +50,7 @@ final class GroupPartition {
     gv = g;
     ngv = ng;
     order = ob;
-    items = ngv[0].length != 0 ? new ObjList<ItemCache[]>() : null;
+    items = ngv[0].length != 0 ? new ArrayList<ItemCache[]>() : null;
     input = ii;
   }
 
@@ -130,7 +128,7 @@ final class GroupPartition {
    * @return iterator on the result set
    * @throws QueryException query exception
    */
-  Iter ret(final QueryContext ctx, final Expr ret, final ObjList<Item[]> ks,
+  Iter ret(final QueryContext ctx, final Expr ret, final ArrayList<Item[]> ks,
       final ValueList vs) throws QueryException {
     final ItemCache ic = new ItemCache();
 

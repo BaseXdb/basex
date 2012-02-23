@@ -321,6 +321,9 @@ public enum Err {
   /** FTST0019: Parsing exception. */
   FTDUP(FTST, 19, "Match option '%' was declared twice."),
 
+  /** REXQ9999: Evaluation exception. */
+  REXQERROR(REXQ, 9999, "%"),
+
   /** SESU0007: Serialization exception. */
   SERENCODING(SESU, 7, "Encoding not supported: '%'."),
   /** SEPM0009: Serialization exception. */
@@ -964,6 +967,7 @@ public enum Err {
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
     /** PACK Error type. */ PACK,
+    /** REXQ Error type. */ REXQ,
     /** SEPM Error type. */ SEPM,
     /** SERE Error type. */ SERE,
     /** SEPM Error type. */ SESU,
@@ -983,6 +987,7 @@ public enum Err {
     URIS.put(BASX,  BASEXURI);
     URIS.put(FOCX,  CRYPTOURI);
     URIS.put(PACK,  PKGURI);
+    URIS.put(REXQ,  REXQURI);
     URIS.put(FOZP,  ZIPURI);
   }
 

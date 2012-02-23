@@ -60,7 +60,7 @@ public abstract class ElementList {
    * Tests is the container has no elements.
    * @return result of check
    */
-  public final boolean empty() {
+  public final boolean isEmpty() {
     return size == 0;
   }
 

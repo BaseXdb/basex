@@ -1,8 +1,9 @@
 package org.basex.gui.view.tree;
 
-import org.basex.data.Data;
-import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.util.list.*;
 
 /**
  * This class determines nodes per level and caches them.
@@ -22,7 +23,7 @@ final class TreeNodeCache implements TreeConstants {
    * @param atts show attributes
    */
   TreeNodeCache(final Data data, final boolean atts) {
-      final ObjList<IntList> alil = new ObjList<IntList>();
+      final ArrayList<IntList> alil = new ArrayList<IntList>();
 
       if(USE_CHILDITERATOR) {
         IntList parList = new IntList(1);

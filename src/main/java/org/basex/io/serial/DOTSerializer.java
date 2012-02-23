@@ -4,16 +4,14 @@ import static org.basex.data.DataText.*;
 import static org.basex.io.serial.DOTData.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.*;
 
-import org.basex.data.ExprInfo;
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
-import org.basex.util.list.ObjList;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class serializes data in the DOT syntax.
@@ -26,7 +24,7 @@ public final class DOTSerializer extends OutputSerializer {
   private final boolean compact;
 
   /** Cached children. */
-  private final ObjList<IntList> children = new ObjList<IntList>();
+  private final ArrayList<IntList> children = new ArrayList<IntList>();
   /** Cached attributes. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Cached nodes. */

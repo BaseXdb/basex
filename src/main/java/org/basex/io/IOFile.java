@@ -1,28 +1,16 @@
 package org.basex.io;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Locale;
-import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
+import java.util.zip.*;
 
-import org.basex.core.Prop;
-import org.basex.io.in.BufferInput;
-import org.basex.io.out.BufferOutput;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.ByteList;
-import org.basex.util.list.ObjList;
-import org.basex.util.list.StringList;
-import org.xml.sax.InputSource;
+import org.basex.core.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.xml.sax.*;
 
 /**
  * {@link IO} reference, representing a local file or directory path.
@@ -278,7 +266,7 @@ public final class IOFile extends IO {
     final File[] ch = file.listFiles();
     if(ch == null) return new IOFile[] {};
 
-    final ObjList<IOFile> io = new ObjList<IOFile>(ch.length);
+    final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
     final Pattern p = Pattern.compile(pattern,
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
     for(final File f : ch) {

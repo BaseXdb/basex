@@ -5,16 +5,15 @@ import static org.basex.query.util.pkg.Package.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
+import java.util.*;
+
 import org.basex.core.*;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.query.QueryException;
+import org.basex.io.*;
+import org.basex.query.*;
 import org.basex.query.util.pkg.Package.Component;
 import org.basex.query.util.pkg.Package.Dependency;
-import org.basex.util.InputInfo;
-import org.basex.util.Version;
-import org.basex.util.hash.TokenSet;
-import org.basex.util.list.ObjList;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Package validator. This class executes some essential checks before the
@@ -61,7 +60,7 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   private void checkDepends(final Package pkg) throws QueryException {
-    final ObjList<Dependency> procs = new ObjList<Dependency>();
+    final ArrayList<Dependency> procs = new ArrayList<Dependency>();
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
@@ -100,7 +99,7 @@ public final class PkgValidator {
    * @param procs processor dependencies
    * @throws QueryException query exception
    */
-  private void checkProcs(final ObjList<Dependency> procs)
+  private void checkProcs(final ArrayList<Dependency> procs)
       throws QueryException {
 
     boolean supported = false;

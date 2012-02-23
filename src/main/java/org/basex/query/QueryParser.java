@@ -5,132 +5,42 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.*;
+import java.lang.reflect.*;
+import java.net.*;
+import java.util.*;
 
-import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.expr.And;
-import org.basex.query.expr.Arith;
-import org.basex.query.expr.CAttr;
-import org.basex.query.expr.CComm;
-import org.basex.query.expr.CDoc;
-import org.basex.query.expr.CElem;
-import org.basex.query.expr.CNSpace;
-import org.basex.query.expr.CPI;
-import org.basex.query.expr.CTxt;
-import org.basex.query.expr.Calc;
-import org.basex.query.expr.Cast;
-import org.basex.query.expr.Castable;
-import org.basex.query.expr.Catch;
-import org.basex.query.expr.CmpG;
-import org.basex.query.expr.CmpN;
-import org.basex.query.expr.CmpV;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.serial.*;
+import org.basex.query.expr.*;
+import org.basex.query.expr.CmpG.OpG;
+import org.basex.query.expr.CmpN.OpN;
+import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.Context;
-import org.basex.query.expr.Except;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.Extension;
-import org.basex.query.expr.Filter;
-import org.basex.query.expr.If;
-import org.basex.query.expr.Instance;
-import org.basex.query.expr.InterSect;
 import org.basex.query.expr.List;
-import org.basex.query.expr.LitMap;
-import org.basex.query.expr.Or;
-import org.basex.query.expr.Pragma;
-import org.basex.query.expr.Quantifier;
-import org.basex.query.expr.Range;
-import org.basex.query.expr.Root;
-import org.basex.query.expr.Switch;
-import org.basex.query.expr.SwitchCase;
-import org.basex.query.expr.Treat;
-import org.basex.query.expr.Try;
-import org.basex.query.expr.TypeCase;
-import org.basex.query.expr.TypeSwitch;
-import org.basex.query.expr.Unary;
-import org.basex.query.expr.Union;
-import org.basex.query.expr.VarRef;
-import org.basex.query.expr.CmpG.*;
-import org.basex.query.expr.CmpN.*;
-import org.basex.query.expr.CmpV.*;
-import org.basex.query.flwor.For;
-import org.basex.query.flwor.ForLet;
-import org.basex.query.flwor.GFLWOR;
-import org.basex.query.flwor.Let;
-import org.basex.query.flwor.OrderBy;
-import org.basex.query.flwor.OrderByExpr;
-import org.basex.query.flwor.OrderByStable;
-import org.basex.query.ft.FTAnd;
-import org.basex.query.ft.FTContains;
-import org.basex.query.ft.FTContent;
-import org.basex.query.ft.FTDistance;
-import org.basex.query.ft.FTExpr;
-import org.basex.query.ft.FTExtensionSelection;
-import org.basex.query.ft.FTMildNot;
-import org.basex.query.ft.FTNot;
-import org.basex.query.ft.FTOptions;
-import org.basex.query.ft.FTOr;
-import org.basex.query.ft.FTOrder;
-import org.basex.query.ft.FTScope;
-import org.basex.query.ft.FTWeight;
-import org.basex.query.ft.FTWindow;
-import org.basex.query.ft.FTWords;
+import org.basex.query.flwor.*;
+import org.basex.query.ft.*;
 import org.basex.query.ft.FTWords.FTMode;
-import org.basex.query.ft.ThesQuery;
-import org.basex.query.ft.Thesaurus;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.item.SeqType.Occ;
+import org.basex.query.item.Type;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.*;
-import org.basex.query.path.Axis;
-import org.basex.query.path.AxisStep;
-import org.basex.query.path.KindTest;
-import org.basex.query.path.NameTest;
-import org.basex.query.path.Path;
-import org.basex.query.path.Test;
-import org.basex.query.up.expr.Delete;
-import org.basex.query.up.expr.Insert;
-import org.basex.query.up.expr.Rename;
-import org.basex.query.up.expr.Replace;
-import org.basex.query.up.expr.Transform;
+import org.basex.query.path.*;
+import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
-import org.basex.query.util.format.DecFormatter;
-import org.basex.query.util.pkg.JarDesc;
-import org.basex.query.util.pkg.JarParser;
-import org.basex.query.util.pkg.Package;
+import org.basex.query.util.format.*;
+import org.basex.query.util.pkg.*;
 import org.basex.query.util.pkg.Package.Component;
 import org.basex.query.util.pkg.Package.Dependency;
-import org.basex.query.util.pkg.PkgParser;
-import org.basex.query.util.pkg.PkgText;
-import org.basex.query.util.pkg.PkgValidator;
+import org.basex.query.util.pkg.Package;
+import org.basex.util.*;
 import org.basex.util.Array;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
-import org.basex.util.InputParser;
-import org.basex.util.JarLoader;
-import org.basex.util.Reflect;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.XMLToken;
-import org.basex.util.ft.FTOpt;
-import org.basex.util.ft.FTUnit;
-import org.basex.util.ft.Language;
-import org.basex.util.ft.Stemmer;
-import org.basex.util.ft.StopWords;
-import org.basex.util.ft.Tokenizer;
+import org.basex.util.ft.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.ObjList;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+import org.basex.util.list.*;
 
 /**
  * Parser for XQuery expressions.
@@ -199,7 +109,7 @@ public class QueryParser extends InputParser {
   private boolean declVars;
 
   /** Cached QNames. */
-  private final ObjList<QNmCheck> names = new ObjList<QNmCheck>();
+  private final ArrayList<QNmCheck> names = new ArrayList<QNmCheck>();
 
   /**
    * Constructor.
@@ -920,7 +830,7 @@ public class QueryParser extends InputParser {
   private void loadJars(final IOFile jarDesc,
       final IOFile pkgDir, final String modDir) throws QueryException {
 
-    final ObjList<URL> urls = new ObjList<URL>();
+    final ArrayList<URL> urls = new ArrayList<URL>();
     // add existing URLs
     if(ctx.jars != null) for(final URL u : ctx.jars.getURLs()) urls.add(u);
     // add new URLs
@@ -1165,7 +1075,7 @@ public class QueryParser extends InputParser {
       do grp = groupSpec(fl, grp); while(wsConsume(COMMA));
 
       // find all non-grouping variables that aren't shadowed
-      final ObjList<Var> ng = new ObjList<Var>();
+      final ArrayList<Var> ng = new ArrayList<Var>();
       Map ngp = Map.EMPTY;
       for(final ForLet f : fl) {
         vars: for(final Var v : f.vars()) {
@@ -1176,15 +1086,17 @@ public class QueryParser extends InputParser {
           for(final Var g : grp) {
             if(v.is(g)) {
               if(pos >= 0) {
-                ng.delete(pos);
+                ng.remove(pos);
                 ngp = ngp.delete(old.itemAt(0), null);
               }
               continue vars;
             }
           }
 
-          if(pos >= 0) ng.set(pos, v);
-          else {
+          if(pos >= 0) {
+            while(pos >= ng.size()) ng.add(null);
+            ng.set(pos, v);
+          } else {
             ng.add(v);
             ngp = ngp.insert(v.name, Int.get(ng.size() - 1), null);
           }
@@ -3812,7 +3724,7 @@ public class QueryParser extends InputParser {
    */
   private void assignURI(final int npos) throws QueryException {
     for(int i = npos; i < names.size(); i++) {
-      if(names.get(i).assign(npos == 0)) names.delete(i--);
+      if(names.get(i).assign(npos == 0)) names.remove(i--);
     }
   }
 
