@@ -1,14 +1,12 @@
 package org.basex.tests.w3c;
 
 import static org.basex.tests.w3c.QT3Constants.*;
-import java.util.HashMap;
 
-import org.basex.core.Context;
-import org.basex.tests.w3c.qt3api.XQItem;
-import org.basex.tests.w3c.qt3api.XQValue;
-import org.basex.tests.w3c.qt3api.XQuery;
-import org.basex.util.list.ObjList;
-import org.basex.util.list.StringList;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.tests.w3c.qt3api.*;
+import org.basex.util.list.*;
 
 /**
  * Driver environment for the {@link QT3TS} test suite driver.
@@ -18,15 +16,15 @@ import org.basex.util.list.StringList;
  */
 class QT3Env {
   /** Namespaces: prefix, uri. */
-  final ObjList<HashMap<String, String>> namespaces;
+  final ArrayList<HashMap<String, String>> namespaces;
   /** Sources: role, file, validation, uri, xml:id. */
-  final ObjList<HashMap<String, String>> sources;
+  final ArrayList<HashMap<String, String>> sources;
   /** Parameters: name, as, select, declared. */
-  final ObjList<HashMap<String, String>> params;
+  final ArrayList<HashMap<String, String>> params;
   /** Decimal Formats: decimal-separator, grouping-separator,
       digit, pattern-separator, infinity, NaN, per-mille,
       minus-sign, name, percent, zero-digit. */
-  final ObjList<HashMap<String, String>> formats;
+  final ArrayList<HashMap<String, String>> formats;
   /** Schemas: uri, file, xml:id. */
   final HashMap<String, String> schemas;
   /** Collations: uri, default. */
@@ -54,8 +52,10 @@ class QT3Env {
     params = list(ctx, env, PARAM);
     namespaces = list(ctx, env, NAMESPACE);
     formats = list(ctx, env, DECIMAL_FORMAT);
-    schemas = list(ctx, env, SCHEMA).get(0);
-    collations = list(ctx, env, COLLATION).get(0);
+    ArrayList<HashMap<String, String>> al = list(ctx, env, SCHEMA);
+    schemas = al.isEmpty() ? null : al.get(0);
+    al = list(ctx, env, COLLATION);
+    collations = al.isEmpty() ? null : al.get(0);
     baseURI = string(STATIC_BASE_URI, ctx, env);
 
     // collections
@@ -80,11 +80,11 @@ class QT3Env {
    * @param elem element to be parsed
    * @return map list
    */
-  static ObjList<HashMap<String, String>> list(final Context ctx,
+  static ArrayList<HashMap<String, String>> list(final Context ctx,
       final XQValue env, final String elem) {
 
-    final ObjList<HashMap<String, String>> list =
-        new ObjList<HashMap<String, String>>();
+    final ArrayList<HashMap<String, String>> list =
+        new ArrayList<HashMap<String, String>>();
     final XQuery query = new XQuery("*:" + elem, ctx).context(env);
     for(final XQItem it : query) list.add(map(ctx, it));
     query.close();

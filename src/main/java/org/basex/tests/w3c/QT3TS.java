@@ -1,31 +1,23 @@
 package org.basex.tests.w3c;
 
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.core.Prop;
-import static org.basex.core.Prop.NL;
-import org.basex.core.Text;
-import org.basex.core.cmd.Set;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.out.PrintOutput;
-import org.basex.query.QueryProcessor;
-import org.basex.query.func.Function;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Str;
-import org.basex.query.util.Compare.Flag;
+import static org.basex.core.Prop.*;
 import static org.basex.tests.w3c.QT3Constants.*;
-import org.basex.tests.w3c.qt3api.*;
-import org.basex.util.Args;
-import org.basex.util.Performance;
 import static org.basex.util.Token.*;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.ObjList;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.*;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.Set;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.query.util.Compare.Flag;
+import org.basex.tests.w3c.qt3api.*;
+import org.basex.tests.w3c.qt3api.XQuery;
+import org.basex.util.*;
 
 /**
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
@@ -74,7 +66,7 @@ public final class QT3TS {
   /** Database context. */
   protected final Context ctx = new Context();
   /** Global environments. */
-  private final ObjList<QT3Env> genvs = new ObjList<QT3Env>();
+  private final ArrayList<QT3Env> genvs = new ArrayList<QT3Env>();
 
   /**
    * Main method of the test class.
@@ -161,7 +153,7 @@ public final class QT3TS {
     if(supported(set)) {
       // parse environment of test-set
       final XQuery qenv = new XQuery("*:environment", ctx).context(set);
-      final ObjList<QT3Env> envs = new ObjList<QT3Env>();
+      final ArrayList<QT3Env> envs = new ArrayList<QT3Env>();
       for(final XQItem ienv : qenv) envs.add(new QT3Env(ctx, ienv));
       qenv.close();
 
@@ -185,7 +177,7 @@ public final class QT3TS {
    * @param envs environments
    * @throws Exception exception
    */
-  private void testCase(final XQItem test, final ObjList<QT3Env> envs)
+  private void testCase(final XQItem test, final ArrayList<QT3Env> envs)
       throws Exception {
 
     if(total++ % 500 == 0) Util.out(".");
@@ -388,7 +380,7 @@ public final class QT3TS {
    * @param ref reference
    * @return environment
    */
-  private static QT3Env envs(final ObjList<QT3Env> envs, final String ref) {
+  private static QT3Env envs(final ArrayList<QT3Env> envs, final String ref) {
     for(final QT3Env e : envs) if(e.name.equals(ref)) return e;
     return null;
   }
