@@ -1,5 +1,7 @@
 package org.basex.test.query.expr;
 
+import javax.management.*;
+
 import org.basex.query.util.Err;
 import org.basex.test.query.AdvancedQueryTest;
 import org.junit.Test;
@@ -41,6 +43,7 @@ public final class AnnotationsTest extends AdvancedQueryTest {
     error("declare %unknown local:x() { 1 }; local:x(); $x", Err.ANNRES);
     error("declare %pfff:public variable $x := 1; $x", Err.NOURI);
     error("declare %public %public variable $x := 1; $x", Err.ANNVIS);
+    throw new RuntimeException("evil, but temporary one to test travis-ci");
   }
 
   /**  Test for empty-sequence() as function item. */
