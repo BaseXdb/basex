@@ -734,6 +734,8 @@ public enum Function {
       BLN, 2, ITEM_ZM, ITEM_ZM, ITEM),
   /** Utility function: returns the path to the query file. */
   _UTIL_PATH(FNUtil.class, "path()", STR),
+  /** Utility function: passes type information to {@code fn:trace()}. */
+  _UTIL_TYPE(FNUtil.class, "type(expr)", ITEM_ZM, ITEM_ZM),
 
   /* FNXslt functions. */
 
