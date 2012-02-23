@@ -189,4 +189,16 @@ public final class FNUtilTest extends AdvancedQueryTest {
     check(_UTIL_PATH);
     query(_UTIL_PATH.args(), "");
   }
+
+  /**
+   * Test method for the util:type() function.
+   */
+  @Test
+  public void utilType() {
+    check(_UTIL_TYPE);
+    query(_UTIL_TYPE.args("()"), "");
+    query(_UTIL_TYPE.args("1"), "1");
+    query(_UTIL_TYPE.args("(1, 2, 3)"), "1 2 3");
+    query(_UTIL_TYPE.args("<x a='1' b='2' c='3'/>/@*/data()"), "1 2 3");
+  }
 }

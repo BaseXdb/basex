@@ -29,10 +29,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Compare;
 import org.basex.query.util.Compare.Flag;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.Performance;
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.basex.util.list.ByteList;
 
 /**
@@ -61,6 +58,7 @@ public final class FNUtil extends StandardFunc {
       case _UTIL_MEM:      return mem(ctx);
       case _UTIL_TIME:     return time(ctx);
       case _UTIL_TO_BYTES: return toBytes(ctx);
+      case _UTIL_TYPE:     return value(ctx).iter();
       default:             return super.iter(ctx);
     }
   }
@@ -70,6 +68,7 @@ public final class FNUtil extends StandardFunc {
     switch(sig) {
       case _UTIL_EVAL: return eval(ctx);
       case _UTIL_RUN:  return run(ctx);
+      case _UTIL_TYPE: return cmp(ctx).value(ctx);
       default:         return super.value(ctx);
     }
   }
@@ -131,6 +130,17 @@ public final class FNUtil extends StandardFunc {
     } catch(final IOException ex) {
       throw IOERR.thrw(input, ex);
     }
+  }
+
+  @Override
+  Expr cmp(final QueryContext ctx) throws QueryException {
+    final Expr e = super.cmp(ctx);
+    if(sig == Function._UTIL_TYPE) {
+      FNInfo.dump(Util.inf("{ type: %, size: % }", expr[0].type(), expr[0].size()),
+          Token.token(expr[0].toString()), ctx);
+      return expr[0];
+    }
+    return e;
   }
 
   /**
