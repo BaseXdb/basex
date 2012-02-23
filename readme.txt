@@ -63,6 +63,8 @@ USING GIT --------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
+ We use Travis CI to test our code.
+
  Any kind of feedback is welcome; please check out the documentation at
  http://docs.basex.org
 
