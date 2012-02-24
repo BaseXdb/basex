@@ -100,7 +100,7 @@ final class NSNode {
    * @param uri namespace URI reference
    */
   void delete(final int uri) {
-    for(final NSNode n : ch) n.delete(uri);
+    for(int c = 0; c < size; ++c) ch[c].delete(uri);
     final IntList il = new IntList(vals.length);
     for(int v = 0; v < vals.length; v += 2) {
       if(vals[v + 1] != uri) {

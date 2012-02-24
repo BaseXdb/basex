@@ -10,10 +10,12 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
+import org.basex.io.*;
 import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.up.primitives.RenameNode;
-import org.basex.query.util.Err;
-import org.basex.util.Util;
+import org.basex.query.util.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -661,6 +663,19 @@ public final class NamespaceTest extends AdvancedQueryTest {
         "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
         "<c xmlns:ns0_1='ns2' xmlns:ns0='ns1' ns0:att1='' ns0_1:att2=''/>" +
         "</b></a>");
+  }
+
+  /**
+   * Test query for stripping existing namespaces.
+   * @throws Exception exception
+   */
+  @Test
+  public void stripNS() throws Exception {
+    final IO io = IO.get("<a xmlns:a='a'><b><c/><c/><c/></b></a>");
+    final ANode root = new DBNode(io, CONTEXT.prop);
+    final QueryProcessor qp = new QueryProcessor("/*:a/*:b", root, CONTEXT);
+    final ANode sub = (ANode) qp.iter().next();
+    DataBuilder.stripNS(sub, token("a"), qp.ctx);
   }
 
   /**
