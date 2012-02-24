@@ -97,20 +97,20 @@ public class RestXqTest {
   /**
    * GET Test.
    * @throws Exception exception
-   */
   @Test
   public void get() throws Exception {
     assertEquals("root", get(""));
   }
+   */
 
   /**
    * GET Test.
    * @throws Exception exception
-   */
   @Test
   public void get2() throws Exception {
     assertEquals("one", get("one"));
   }
+   */
 
   /**
    * GET Test.
