@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Comparator;
 
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.
@@ -75,6 +76,20 @@ public final class Token {
   public static final String UTF16BE = "UTF-16BE";
   /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
+  /** Comparator for byte arrays. */
+  public static final Comparator<byte[]> COMP = new Comparator<byte[]>() {
+    @Override
+    public int compare(final byte[] o1, final byte[] o2) {
+      return diff(o1, o2);
+    }
+  };
+  /** Case-insensitive comparator for byte arrays. */
+  public static final Comparator<byte[]> LC_COMP = new Comparator<byte[]>() {
+    @Override
+    public int compare(final byte[] o1, final byte[] o2) {
+      return diff(lc(o1), lc(o2));
+    }
+  };
 
   /** Hidden constructor. */
   private Token() { }
