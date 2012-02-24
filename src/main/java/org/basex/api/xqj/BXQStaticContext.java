@@ -44,7 +44,7 @@ final class BXQStaticContext implements XQStaticContext {
     if(name != null) {
       final Context ctx = BXQDataSource.context();
       ctx.user = ctx.users.get(name);
-      if(ctx.user == null || !string(ctx.user.password).equals(md5(pw)))
+      if(ctx.user == null || !ctx.user.password.equals(md5(pw)))
         throw new BXQException(DENIED, name);
     }
     sc = new StaticContext();
