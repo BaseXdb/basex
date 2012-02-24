@@ -675,7 +675,7 @@ public final class NamespaceTest extends AdvancedQueryTest {
     final ANode root = new DBNode(io, CONTEXT.prop);
     final QueryProcessor qp = new QueryProcessor("/*:a/*:b", root, CONTEXT);
     final ANode sub = (ANode) qp.iter().next();
-    DataBuilder.stripNS(sub, token("a"), qp.ctx);
+    DataBuilder.stripNS(sub, token("a"), CONTEXT);
   }
 
   /**

@@ -2,18 +2,12 @@ package org.basex.query.util;
 
 import static org.basex.util.Token.*;
 
-import org.basex.data.Data;
-import org.basex.data.FTPosData;
-import org.basex.data.MemData;
-import org.basex.query.QueryContext;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.NodeCache;
-import org.basex.util.Atts;
-import org.basex.util.list.TokenList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Class for building memory-based database nodes.
@@ -276,14 +270,13 @@ public final class DataBuilder {
    * Returns a new node without the specified namespace.
    * @param node node to be copied
    * @param ns namespace to be stripped
-   * @param ctx query context
+   * @param ctx database context
    * @return new node
    */
-  public static ANode stripNS(final ANode node, final byte[] ns,
-      final QueryContext ctx) {
+  public static ANode stripNS(final ANode node, final byte[] ns, final Context ctx) {
     if(node.type != NodeType.ELM) return node;
 
-    final MemData md = new MemData(ctx.context.prop);
+    final MemData md = new MemData(ctx.prop);
     final DataBuilder db = new DataBuilder(md);
     db.build(node);
 

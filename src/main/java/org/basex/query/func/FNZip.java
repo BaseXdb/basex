@@ -4,52 +4,23 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.TreeSet;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
+import java.io.*;
+import java.util.*;
+import java.util.zip.*;
 
-import org.basex.build.Parser;
-import org.basex.build.file.HTMLParser;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.IOFile;
-import org.basex.io.Zip;
-import org.basex.io.in.NewlineInput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.B64;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FElem;
-import org.basex.query.item.Hex;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.util.DataBuilder;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.ByteList;
-import org.basex.util.list.StringList;
+import org.basex.build.*;
+import org.basex.build.file.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Functions on zip files.
@@ -357,7 +328,7 @@ public final class FNZip extends StandardFunc {
               try {
                 final Serializer ser = Serializer.get(zos, serPar(node, ctx));
                 do {
-                  DataBuilder.stripNS(n, ZIPURI, ctx).serialize(ser);
+                  DataBuilder.stripNS(n, ZIPURI, ctx.context).serialize(ser);
                 } while((n = ch.next()) != null);
                 ser.close();
               } catch(final SerializerException ex) {
