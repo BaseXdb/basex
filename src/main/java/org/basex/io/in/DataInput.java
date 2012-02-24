@@ -2,7 +2,6 @@ package org.basex.io.in;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-
 import org.basex.io.IOFile;
 import org.basex.util.Num;
 import org.basex.util.Token;
