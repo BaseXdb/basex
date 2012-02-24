@@ -118,7 +118,7 @@ public class RESTPost extends RESTCode {
       for(Item n; (n = ir.next()) != null;) {
         if(item != null) throw new HTTPException(SC_BAD_REQUEST, ERR_CTXITEM);
         // create main memory instance of the specified node
-        n = DataBuilder.stripNS((ANode) n, RESTURI, qp.ctx);
+        n = DataBuilder.stripNS((ANode) n, RESTURI, context);
         final ArrayOutput ao = new ArrayOutput();
         n.serialize(Serializer.get(ao));
         item = ao.toArray();

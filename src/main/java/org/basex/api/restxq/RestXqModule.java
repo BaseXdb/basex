@@ -1,5 +1,7 @@
 package org.basex.api.restxq;
 
+import static javax.servlet.http.HttpServletResponse.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -155,5 +157,8 @@ final class RestXqModule {
     final Serializer ser = Serializer.get(http.out);
     for(Item it; (it = ir.next()) != null;) it.serialize(ser);
     ser.close();
+
+    // send OK status
+    http.status(SC_OK, null);
   }
 }

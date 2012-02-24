@@ -1,8 +1,6 @@
 package org.basex.api.rest;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.api.rest.RESTText.*;
-
 import java.io.*;
 
 import javax.servlet.http.*;
@@ -69,7 +67,7 @@ public final class RESTServlet extends HttpServlet {
       ctx.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));
-      ctx.status(SC_INTERNAL_SERVER_ERROR, ERR_UNEXPECTED + ex.getMessage());
+      ctx.status(SC_INTERNAL_SERVER_ERROR, ex.toString());
     }
   }
 }

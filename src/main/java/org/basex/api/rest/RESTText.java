@@ -25,7 +25,7 @@ public interface RESTText {
   byte[] RESOURCES = token("resources");
 
   /** Error message. */
-  String ERR_UNEXPECTED = "Unexpected error: ";
+  String ERR_UNEXPECTED = "Server-side error: ";
   /** Error message. */
   String ERR_PARAM = "Unknown parameter: '%'.";
   /** Error message. */

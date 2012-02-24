@@ -45,9 +45,6 @@ public final class RestXqServlet extends HttpServlet {
       // process module
       module.process(http);
 
-      // send OK status; [CG] RestXq: may be moved into the actual processing code
-      http.status(SC_OK, null);
-
     } catch(final HTTPException ex) {
       http.status(ex.getStatus(), ex.getMessage());
     } catch(final LoginException ex) {
@@ -55,7 +52,7 @@ public final class RestXqServlet extends HttpServlet {
     } catch(final IOException ex) {
       http.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final QueryException ex) {
-      http.status(SC_NOT_IMPLEMENTED, ex.getMessage());
+      http.status(SC_BAD_REQUEST, ex.getMessage());
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));
       http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED_ERROR, ex.getMessage()));
