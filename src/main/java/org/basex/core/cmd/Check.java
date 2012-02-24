@@ -54,8 +54,7 @@ public final class Check extends Command {
   }
 
   /**
-   * Opens the specified database; if it does not exist, create a new
-   * database instance.
+   * Opens the specified database; create a new one if it does not exist.
    * @param ctx database context
    * @param path document path
    * @return data reference
@@ -64,7 +63,7 @@ public final class Check extends Command {
   public static synchronized Data check(final Context ctx, final String path)
       throws IOException {
 
-    // choose OPEN if user has no create permissions, or if database exists
+    // don't create new database if user has insufficient permissions
     final boolean create = ctx.user.perm(User.CREATE);
 
     final IO io = IO.get(path);
@@ -85,8 +84,8 @@ public final class Check extends Command {
     if(!create || MetaData.found(path, name, ctx.mprop))
       return Open.open(name, ctx);
 
-    // check if file exists
-    if(!io.exists()) throw new FileNotFoundException(
+    // check if input is an existing file
+    if(!io.exists() || io.isDir()) throw new FileNotFoundException(
         Util.info(FILE_NOT_FOUND_X, io));
 
     // if force flag is set to false, create a main memory instance

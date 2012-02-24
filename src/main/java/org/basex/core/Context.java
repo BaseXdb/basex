@@ -202,7 +202,8 @@ public final class Context {
   }
 
   /**
-   * Pins the specified database.
+   * Pins and returns an existing data reference for the specified database, or
+   * returns {@code null}.
    * @param name name of database
    * @return data reference
    */
