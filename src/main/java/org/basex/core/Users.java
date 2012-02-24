@@ -38,7 +38,7 @@ public final class Users {
     file = new IOFile(Prop.HOME, IO.BASEXSUFFIX + "perm");
     if(!file.exists()) {
       // define default admin user with all rights
-      list.add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
+      list.add(new User(ADMIN, md5(ADMIN), User.ADMIN));
     } else {
       DataInput in = null;
       try {
@@ -61,7 +61,7 @@ public final class Users {
     final int s = in.readNum();
     for(int u = 0; u < s; ++u) {
       final User user = new User(string(in.readToken()),
-        in.readToken(), in.readNum());
+        string(in.readToken()), in.readNum());
       list.add(user);
     }
   }
@@ -89,7 +89,7 @@ public final class Users {
   public synchronized boolean create(final String usern, final String pass) {
     // check if user exists already
     return get(usern) == null &&
-        create(new User(usern, token(pass), User.NONE));
+        create(new User(usern, pass, User.NONE));
   }
 
   /**
@@ -114,7 +114,7 @@ public final class Users {
     final User user = get(usern);
     if(user == null) return false;
 
-    user.password = token(pass);
+    user.password = pass;
     write();
     return true;
   }
@@ -163,7 +163,7 @@ public final class Users {
     out.writeNum(list.size());
     for(final User user : list) {
       out.writeToken(token(user.name));
-      out.writeToken(user.password);
+      out.writeToken(token(user.password));
       out.writeNum(user.perm);
     }
   }
