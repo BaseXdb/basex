@@ -174,7 +174,7 @@ public final class SerializerProp extends AProp {
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();
     for(final Entry<String, Object> e : props.entrySet()) {
-      if(tb.size() != 0) tb.add(',');
+      if(!tb.isEmpty()) tb.add(',');
       tb.add(e.getKey()).add('=').addExt(e.getValue());
     }
     return tb.toString();

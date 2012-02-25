@@ -57,7 +57,7 @@ public final class JavaModuleFunc extends JavaMapping {
     } catch(final Throwable ex) {
       final TokenBuilder found = new TokenBuilder();
       for(final Value a : args) {
-        if(found.size() != 0) found.add(", ");
+        if(!found.isEmpty()) found.add(", ");
         found.addExt(a.type);
       }
       throw JAVAMOD.thrw(input, signature(), name() + '(' + found + ')');
@@ -91,7 +91,7 @@ public final class JavaModuleFunc extends JavaMapping {
   private String signature() {
     final TokenBuilder exp = new TokenBuilder();
     for(final Class<?> c : mth.getParameterTypes()) {
-      if(exp.size() != 0) exp.add(", ");
+      if(!exp.isEmpty()) exp.add(", ");
       exp.add(c.getSimpleName());
     }
     return name() + '(' + exp + ')';

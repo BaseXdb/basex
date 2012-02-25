@@ -25,7 +25,7 @@ public final class TokenBuilder {
   /** New line. */
   public static final byte NLINE = 0x0a;
 
-  /** Character array. */
+  /** Byte (code point) array. */
   private byte[] chars;
   /** Current token size. */
   private int size;
@@ -63,19 +63,27 @@ public final class TokenBuilder {
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
+   * Returns the number of bytes.
+   * @return number of bytes
    */
   public int size() {
     return size;
   }
 
   /**
-   * Sets the number of entries.
-   * @param s number of entries
+   * Sets the number of bytes. Note that no bound check are performed by this method.
+   * @param s number of bytes
    */
   public void size(final int s) {
     size = s;
+  }
+
+  /**
+   * Tests if the token is empty.
+   * @return result of check
+   */
+  public boolean isEmpty() {
+    return size == 0;
   }
 
   /**

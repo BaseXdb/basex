@@ -923,7 +923,7 @@ public final class Token {
     for(int i = 0; i < l; i += cl(token, i)) {
       final int c = cp(token, i);
       if(c == sep) {
-        if(tb.size() != 0) {
+        if(!tb.isEmpty()) {
           split[s++] = tb.finish();
           tb.reset();
         }
@@ -931,7 +931,7 @@ public final class Token {
         tb.add(c);
       }
     }
-    if(tb.size() != 0) split[s++] = tb.finish();
+    if(!tb.isEmpty()) split[s++] = tb.finish();
     return Array.copyOf(split, s);
   }
 

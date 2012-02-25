@@ -489,7 +489,7 @@ public final class MAB2Parser extends SingleParser {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] lang : split(t, '+')) {
       final byte[] l = languages.get(lang);
-      if(tb.size() != 0) tb.add('+');
+      if(!tb.isEmpty()) tb.add('+');
       tb.add(l != null ? l : t);
     }
     return tb.finish();

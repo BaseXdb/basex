@@ -633,7 +633,7 @@ final class XMLScanner extends Progress {
     int c;
     while(isChar(c = nextChar())) name.add(c);
     prev(1);
-    if(name.size() == 0) error(INVNAME);
+    if(name.isEmpty()) error(INVNAME);
   }
 
   /**
@@ -966,7 +966,7 @@ final class XMLScanner extends Progress {
       prev(1);
     }
     check((char) d);
-    if(enc.size() == 0) error(DECLENCODE, enc);
+    if(enc.isEmpty()) error(DECLENCODE, enc);
     final String e = string(enc.finish());
     input.encoding(e);
     return e;

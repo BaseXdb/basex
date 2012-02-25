@@ -121,7 +121,7 @@ final class TableContent extends BaseXBack {
 
         // add content to column (skip too long contents)...
         if(tb[c].size() < 100) {
-          if(tb[c].size() != 0) tb[c].add("; ");
+          if(!tb[c].isEmpty()) tb[c].add("; ");
           tb[c].add(data.text(ti.pre, ti.text));
         }
       }
@@ -139,7 +139,7 @@ final class TableContent extends BaseXBack {
         final double ce = x + cw;
 
         if(ce != 0) {
-          final byte[] str = tb[c].size() != 0 ? tb[c].finish() : null;
+          final byte[] str = tb[c].isEmpty() ? null : tb[c].finish();
           if(str != null) {
             if(tdata.mouseX > x && tdata.mouseX < ce || fcol == c) {
               fx = (int) x;

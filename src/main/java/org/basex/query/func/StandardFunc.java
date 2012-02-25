@@ -176,10 +176,9 @@ public abstract class StandardFunc extends Arr {
     // use default parameters if no parameters have been assigned
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] key : tm) {
-      if(tb.size() != 0) tb.add(',');
+      if(!tb.isEmpty()) tb.add(',');
       tb.add(key).add('=').addExt(tm.get(key));
     }
-    return tb.size() == 0 ? ctx.serParams(true) :
-      new SerializerProp(tb.toString());
+    return tb.isEmpty() ? ctx.serParams(true) : new SerializerProp(tb.toString());
   }
 }

@@ -895,7 +895,7 @@ public enum Function {
   public final String args(final Object... arg) {
     final TokenBuilder tb = new TokenBuilder();
     for(final Object a : arg) {
-      if(tb.size() != 0) tb.add(',');
+      if(!tb.isEmpty()) tb.add(',');
       final String s = a.toString();
       if(s.matches("^([-\\w_:\\.]*\\(|<|\"|\\$| ).*") ||
           a instanceof Integer) {

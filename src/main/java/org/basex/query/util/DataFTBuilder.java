@@ -70,7 +70,7 @@ final class DataFTBuilder {
       final FTSpan span = lex.next();
       // check if current text is still to be marked or already marked
       if(ftp.contains(span.pos) || marked) {
-        if(tb.size() != 0) {
+        if(!tb.isEmpty()) {
           // write current text node
           tl.add(tb.finish());
           len += tb.size();
@@ -85,7 +85,7 @@ final class DataFTBuilder {
       tb.add(span.text);
     }
     // write last text node
-    if(tb.size() != 0) {
+    if(!tb.isEmpty()) {
       tl.add(tb.finish());
       len += tb.size();
     }

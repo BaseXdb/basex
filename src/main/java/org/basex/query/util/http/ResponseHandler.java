@@ -366,7 +366,7 @@ public final class ResponseHandler {
         tb.add(b);
       }
     }
-    return tb.size() == 0 ? null : tb.finish();
+    return tb.isEmpty() ? null : tb.finish();
   }
 
   /**

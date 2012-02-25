@@ -358,11 +358,10 @@ public final class FNZip extends StandardFunc {
     for(ANode at; (at = ati.next()) != null;) {
       final QNm name = at.qname();
       if(name.eq(A_NAME) || name.eq(A_SRC)) continue;
-      if(tb.size() != 0) tb.add(',');
+      if(!tb.isEmpty()) tb.add(',');
       tb.add(name.local()).add('=').add(at.string());
     }
-    return tb.size() == 0 ? ctx.serParams(true) :
-      new SerializerProp(tb.toString());
+    return tb.isEmpty() ? ctx.serParams(true) : new SerializerProp(tb.toString());
   }
 
   /**

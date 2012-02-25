@@ -54,7 +54,7 @@ public final class JavaFunc extends JavaMapping {
     } catch(final Throwable ex) {
       final TokenBuilder found = new TokenBuilder();
       for(final Value c : args) {
-        if(found.size() != 0) found.add(", ");
+        if(!found.isEmpty()) found.add(", ");
         found.add(c.type.toString());
       }
       throw JAVAFUN.thrw(input, name(), found);

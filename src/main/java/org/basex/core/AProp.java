@@ -111,7 +111,7 @@ public abstract class AProp implements Iterable<String> {
 
     // check if all mandatory files have been read
     try {
-      if(err.size() == 0) {
+      if(err.isEmpty()) {
         boolean ok = true;
         for(final Field f : getClass().getFields()) {
           final Object obj = f.get(null);
@@ -125,7 +125,7 @@ public abstract class AProp implements Iterable<String> {
       Util.notexpected(ex);
     }
 
-    if(err.size() != 0) {
+    if(!err.isEmpty()) {
       Util.err(err.toString());
       write();
     }

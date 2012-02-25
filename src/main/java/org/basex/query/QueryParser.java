@@ -1853,8 +1853,7 @@ public class QueryParser extends InputParser {
             tok.add(consume());
           }
           skipWS();
-          return tok.trim().size() == 0 ? Test.get(type) : kindTest(type,
-              tok.finish());
+          return tok.trim().isEmpty() ? Test.get(type) : kindTest(type, tok.finish());
         }
       } else {
         qp = p2;
@@ -2294,7 +2293,7 @@ public class QueryParser extends InputParser {
         tb.add(delim);
       } while(true);
 
-      if(tb.size() != 0) add(attv, Str.get(tb.finish()));
+      if(!tb.isEmpty()) add(attv, Str.get(tb.finish()));
 
       // parse namespace declarations
       final boolean pr = startsWith(atn, XMLNSC);
@@ -2669,7 +2668,7 @@ public class QueryParser extends InputParser {
       consume('*') ? Occ.ZM : Occ.O;
     if(t == AtomType.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
 
-    final KindTest kt = tok.size() == 0 ? null : kindTest(t, tok.finish());
+    final KindTest kt = tok.isEmpty() ? null : kindTest(t, tok.finish());
     tok.reset();
 
     // use empty name test if types are different
@@ -3080,7 +3079,7 @@ public class QueryParser extends InputParser {
     tok.reset();
     while(digit(curr()))
       tok.add(consume());
-    if(tok.size() == 0) error(INTEXP);
+    if(tok.isEmpty()) error(INTEXP);
     return Int.get(toLong(tok.finish()));
   }
 

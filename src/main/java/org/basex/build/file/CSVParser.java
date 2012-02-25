@@ -172,7 +172,7 @@ public final class CSVParser extends SingleParser {
       throws IOException {
 
     boolean close = !open;
-    if(open && tb.size() != 0) {
+    if(open && !tb.isEmpty()) {
       open();
       close = true;
     }
@@ -204,7 +204,7 @@ public final class CSVParser extends SingleParser {
       t = headers.get(col);
     }
 
-    if(tb.size() != 0 || simple) {
+    if(!tb.isEmpty() || simple) {
       builder.startElem(t, atts);
       builder.text(tb.finish());
       builder.endElem();
@@ -226,7 +226,7 @@ public final class CSVParser extends SingleParser {
         XMLToken.isNCChar(cp)) ? cp : '_');
     }
     // no valid characters found: add default column name
-    if(nm.size() == 0) nm.add(COLUMN);
+    if(nm.isEmpty()) nm.add(COLUMN);
 
     // tag exists: attach enumerator
     byte[] fb = nm.finish();

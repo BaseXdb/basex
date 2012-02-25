@@ -287,7 +287,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
       if(attr) {
         key = "descendant-or-self::node()/" + key;
-        if(tb.size() == 0) tb.add("//*");
+        if(tb.isEmpty()) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;
       } else {
         tb.add("//" + key);

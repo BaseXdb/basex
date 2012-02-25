@@ -248,7 +248,7 @@ public final class JSONSerializer extends OutputSerializer {
     }
     if(mode == 2) {
       tb.add('_');
-    } else if(mode > 0 && tb.size() != 0) {
+    } else if(mode > 0 && !tb.isEmpty()) {
       tb.add('?');
     }
     return tb.finish();

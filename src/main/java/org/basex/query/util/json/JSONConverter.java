@@ -157,14 +157,14 @@ public final class JSONConverter extends XMLConverter {
       final Class<?> clz = types.value(i);
       for(int b = 0; b < builders.length; b++) {
         if(clz == CLASSES[b]) {
-          if(builders[b].size() != 0) builders[b].add(' ');
+          if(!builders[b].isEmpty()) builders[b].add(' ');
           builders[b].add(types.key(i));
           break;
         }
       }
     }
     for(int b = 0; b < builders.length; b++) {
-      if(builders[b].size() == 0) continue;
+      if(builders[b].isEmpty()) continue;
       root.add(new FAttr(qname(ATTRS[b]), builders[b].trim().finish()));
     }
   }
@@ -195,7 +195,7 @@ public final class JSONConverter extends XMLConverter {
         tb.add(buf);
       }
     }
-    if(tb.size() == 0) tb.add('_');
+    if(tb.isEmpty()) tb.add('_');
     return tb.finish();
   }
 

@@ -141,7 +141,7 @@ public final class FNNode extends StandardFunc {
 
     final TokenBuilder tb = new TokenBuilder();
     for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));
-    return Str.get(tb.size() == 0 ? Token.SLASH : tb.finish());
+    return Str.get(tb.isEmpty() ? Token.SLASH : tb.finish());
   }
 
   @Override

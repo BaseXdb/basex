@@ -74,7 +74,7 @@ public final class Constr {
         final Iter iter = ctx.iter(e);
         for(Item ch; (ch = iter.next()) != null && add(ch););
       }
-      if(text.size() != 0) children.add(new FTxt(text.finish()));
+      if(!text.isEmpty()) children.add(new FTxt(text.finish()));
       return this;
     } finally {
       ctx.sc.ns.size(s);
@@ -110,7 +110,7 @@ public final class Constr {
         // type: attribute node
 
         // no attribute allowed after texts or child nodes
-        if(text.size() != 0 || children.size() != 0) {
+        if(!text.isEmpty() || children.size() != 0) {
           errAtt = true;
           return false;
         }
@@ -134,7 +134,7 @@ public final class Constr {
         // type: namespace node
 
         // no attribute allowed after texts or child nodes
-        if(text.size() != 0 || children.size() != 0) {
+        if(!text.isEmpty() || children.size() != 0) {
           errNS = true;
           return false;
         }
@@ -161,7 +161,7 @@ public final class Constr {
         // type: element/comment/processing instruction node
 
         // add text node
-        if(text.size() != 0) {
+        if(!text.isEmpty()) {
           children.add(new FTxt(text.finish()));
           text.reset();
         }

@@ -125,7 +125,7 @@ public final class Find extends AQuery {
         tb.add(']');
       }
     }
-    return tb.size() == 0 ? "/" : (root ? "/" : "") +
+    return tb.isEmpty() ? "/" : (root ? "/" : "") +
         Axis.DESCORSELF + "::*:" + string(tag) + tb;
   }
 
