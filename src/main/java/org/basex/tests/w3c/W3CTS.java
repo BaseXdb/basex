@@ -383,16 +383,11 @@ public abstract class W3CTS {
       String expError = text("*:expected-error/text()", state);
 
       final StringBuilder log = new StringBuilder(pth + inname + IO.XQSUFFIX);
-      if(files.size() != 0) {
-        log.append(" [");
-        log.append(files);
-        log.append(']');
-      }
+      if(!files.isEmpty()) log.append(" [").append(files).append(']');
       log.append(NL);
 
       /** Remove comments. */
-      log.append(norm(in));
-      log.append(NL);
+      log.append(norm(in)).append(NL);
       final String logStr = log.toString();
       // skip queries with variable results
       final boolean print = currTime || !logStr.contains("current-");
@@ -575,7 +570,7 @@ public abstract class W3CTS {
     for(int c = 0; c < nod.size(); ++c) {
       final byte[] nm = data.atom(nod.list[c]);
       String src = srcs.get(string(nm));
-      if(tb.size() != 0) tb.add(", ");
+      if(!tb.isEmpty()) tb.add(", ");
       tb.add(nm);
 
       Expr expr = null;

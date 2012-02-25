@@ -466,9 +466,9 @@ public final class QT3TS {
       final TokenBuilder tb = new TokenBuilder();
       for(final XQItem it : query) {
         final String msg = test(res, it);
-        if(msg != null) tb.add(tb.size() != 0 ? ", " : "").add(msg);
+        if(msg != null) tb.add(tb.isEmpty() ? "" : ", ").add(msg);
       }
-      return tb.size() == 0 ? null : tb.toString();
+      return tb.isEmpty() ? null : tb.toString();
     } finally {
       query.close();
     }
@@ -487,7 +487,7 @@ public final class QT3TS {
       for(final XQItem it : query) {
         final String msg = test(res, it);
         if(msg == null) return null;
-        tb.add(tb.size() != 0 ? ", " : "").add(msg);
+        tb.add(tb.isEmpty() ? "" : ", ").add(msg);
       }
       return "any of { " + tb + " }";
     } finally {
