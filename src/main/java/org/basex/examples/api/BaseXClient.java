@@ -288,9 +288,7 @@ public class BaseXClient {
             final String data = new String(os.toByteArray(), UTF8);
             notifiers.get(name).notify(data);
           }
-        } catch(final IOException ex) {
-          // [CG] check if exception should be thrown
-        }
+        } catch(final IOException ex) { /* ignored */ }
       }
     }.start();
   }
