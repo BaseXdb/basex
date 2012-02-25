@@ -99,7 +99,6 @@ public class RestXqTest {
    * @throws Exception exception
    */
   @Test
-  @Ignore
   public void get() throws Exception {
     assertEquals("root", get(""));
   }
@@ -109,7 +108,6 @@ public class RestXqTest {
    * @throws Exception exception
    */
   @Test
-  @Ignore
   public void get2() throws Exception {
     assertEquals("one", get("one"));
   }
@@ -118,10 +116,9 @@ public class RestXqTest {
    * GET Test.
    * @throws Exception exception
    */
-  @Ignore
   @Test
   public void get3() throws Exception {
-    assertEquals("var", get("var"));
+    assertEquals("x", get("one/x"));
   }
 
   // PRIVATE METHODS ==========================================================

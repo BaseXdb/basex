@@ -1,6 +1,6 @@
 module namespace junit = "http://basex.org/modules/restxq/junit";
 
-declare namespace rest = "http://exquery.org/ns/rest/annotation/";
+declare namespace rest = "http://exquery.org/ns/rest/annotation";
 
 declare
   %rest:GET
@@ -18,7 +18,7 @@ declare
 
 declare
   %rest:GET
-  %rest:path("/var")
+  %rest:path("/one/{$x}")
   function junit:var($x) {
     $x
 };

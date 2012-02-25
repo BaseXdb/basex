@@ -61,10 +61,11 @@ final class RestXqFunction {
     for(int a = 0, as = function.ann.size(); a < as; a++) {
       final QNm name = function.ann.names[a];
       final Value value = function.ann.values[a];
-      boolean f = true;
       final byte[] local = name.local();
       final byte[] uri = name.uri();
-      if(eq(uri, QueryText.REXQURI)) {
+      // later: change to equality
+      boolean rexq = startsWith(uri, QueryText.REXQURI);
+      if(rexq) {
         if(eq(PATH, local)) {
           path = new RestXqPath(toString(value, SINGLE_STRING, PATH), this);
         } else if(eq(GET, local)) {
@@ -88,17 +89,17 @@ final class RestXqFunction {
         final String val = toString(value, OUTPUT_STRING, key);
         if(output.get(key) == null) error(UNKNOWN_SER, key);
         output.set(key, val);
-      } else {
-        f = false;
       }
-      found |= f;
+      found |= rexq;
     }
     if(!mth.isEmpty()) methods = mth;
 
-    for(final Var v : function.args) {
-      if(!v.declared) error(VAR_UNDEFINED, v.name.string());
+    if(found) {
+      if(path == null) error(PATH_UNDEFINED, PATH);
+      for(final Var v : function.args) {
+        if(!v.declared) error(VAR_UNDEFINED, v.name.string());
+      }
     }
-
     return found;
   }
 

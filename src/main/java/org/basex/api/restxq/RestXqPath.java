@@ -52,7 +52,8 @@ public class RestXqPath {
         }
         if(r == args.length) rxf.error(UNKNOWN_VAR, vn);
         if(args[r].declared) rxf.error(VAR_ASSIGNED, vn);
-        if(!args[r].type.type.instanceOf(AtomType.AAT))
+        final SeqType type = args[r].type;
+        if(type != null && !type.type.instanceOf(AtomType.AAT))
           rxf.error(VAR_ATOMIC, vn, AtomType.AAT);
         args[r].declared = true;
       }

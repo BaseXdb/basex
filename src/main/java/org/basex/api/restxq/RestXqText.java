@@ -45,6 +45,8 @@ interface RestXqText {
   /** Error message. */
   String VAR_UNDEFINED = "No assignment found for variable $%.";
   /** Error message. */
+  String PATH_UNDEFINED = "No path assignment found.";
+  /** Error message. */
   String VAR_ATOMIC = "Variable $% must inherit from %.";
   /** Error message. */
   String UNEXPECTED_ERROR = "Unexpected error: %";
