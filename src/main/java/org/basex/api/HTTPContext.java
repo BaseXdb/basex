@@ -175,14 +175,14 @@ public final class HTTPContext {
       for(int s = 0; s < path.length(); s++) {
         final char ch = path.charAt(s);
         if(ch == '/') {
-          if(tb.size() == 0) continue;
+          if(tb.isEmpty()) continue;
           sl.add(tb.toString());
           tb.reset();
         } else {
           tb.add(ch);
         }
       }
-      if(tb.size() != 0) sl.add(tb.toString());
+      if(!tb.isEmpty()) sl.add(tb.toString());
     }
     return sl.toArray();
   }
@@ -197,7 +197,7 @@ public final class HTTPContext {
   private String join(final int s) {
     final TokenBuilder tb = new TokenBuilder();
     for(int p = s; p < segments.length; p++) {
-      if(tb.size() != 0) tb.add('/');
+      if(!tb.isEmpty()) tb.add('/');
       tb.add(segments[p]);
     }
     return tb.toString();

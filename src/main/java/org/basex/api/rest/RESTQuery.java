@@ -110,7 +110,7 @@ class RESTQuery extends RESTCode {
   static String serial(final HTTPContext ctx) {
     final TokenBuilder ser = new TokenBuilder(ctx.serialization);
     if(ctx.wrapping) {
-      if(ser.size() != 0) ser.add(',');
+      if(!ser.isEmpty()) ser.add(',');
       ser.addExt(SerializerProp.S_WRAP_PREFIX[0]).add('=').add(REST).add(',');
       ser.addExt(SerializerProp.S_WRAP_URI[0]).add('=').add(RESTURI);
     }

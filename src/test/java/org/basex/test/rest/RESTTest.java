@@ -95,6 +95,15 @@ public class RESTTest {
    * @throws Exception exception
    */
   @Test
+  public void get0() throws Exception {
+    assertEquals("1", get("?query=1"));
+  }
+
+  /**
+   * GET Test.
+   * @throws Exception exception
+   */
+  @Test
   public void get() throws Exception {
     assertEquals("1 2 3", get("?query=1+to+3&wrap=no"));
   }
@@ -621,7 +630,6 @@ public class RESTTest {
       final IOException ex) throws IOException {
     final String msg = read(conn.getErrorStream());
     throw new BaseXException(msg.isEmpty() ? ex.getMessage() : msg);
-
   }
 
   /**
