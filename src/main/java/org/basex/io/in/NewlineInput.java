@@ -53,10 +53,11 @@ public final class NewlineInput extends TextInput {
    */
   public String readLine() throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    for(int ch; (ch = read()) != -1;) {
+    while(true) {
+      final int ch = read();
+      if(ch == -1) return tb.isEmpty() ? null : tb.toString();
       if(ch == '\n') return tb.toString();
       tb.add(ch);
     }
-    return null;
   }
 }
