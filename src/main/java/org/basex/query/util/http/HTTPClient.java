@@ -136,7 +136,7 @@ public final class HTTPClient {
         final HttpURLConnection conn = openConnection(string(href));
         try {
           return new ResponseHandler(input, prop).getResponse(
-              conn, Bln.FALSE.string(), Bln.FALSE.string());
+              conn, Bln.FALSE.string(), null);
         } finally {
           conn.disconnect();
         }
