@@ -1,39 +1,23 @@
 package org.basex.query.util.http;
 
-import static org.basex.query.util.http.HTTPText.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.query.util.http.HTTPText.*;
 import static org.basex.util.Token.*;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.util.Locale;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import org.basex.build.Parser;
-import org.basex.build.file.HTMLParser;
-import org.basex.core.Prop;
-import org.basex.io.IOContent;
-import org.basex.io.MimeTypes;
-import org.basex.io.in.NewlineInput;
-import org.basex.query.QueryException;
-import org.basex.query.item.B64;
-import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.ValueIter;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.ByteList;
+import org.basex.build.file.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * HTTP response handler. Reads HTTP response and constructs the
@@ -193,7 +177,7 @@ public final class HTTPResponse {
   private Item interpretPayload(final byte[] p, final String c) {
     try {
       if(MimeTypes.isXML(c)) {
-        return new DBNode(Parser.xmlParser(new IOContent(p), prop), prop);
+        return new DBNode(new IOContent(p), prop);
       }
       if(c.equals(MimeTypes.TEXT_HTML)) {
         return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);

@@ -49,7 +49,7 @@ public final class HTTPRequestParser {
     final byte[] method = lc(r.attrs.get(METHOD));
 
     // it is an error if content is set for HTTP verbs which must be empty
-    if((eq(method, TRACE, DELETE)) && (payload != null || bodies != null))
+    if(eq(method, TRACE, DELETE) && (payload != null || bodies != null))
       REQINV.thrw(input, "Body not expected for method " + string(method));
 
     if(payload != null) {

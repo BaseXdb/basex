@@ -512,7 +512,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   WHICHANN(XPST, 3, "Annotation % is unknown."),
   /** XPST0003: Parsing exception. */
-  ANNVALUE(XPST, 3, "Annotation literal expected."),
+  ANNVALUE(XPST, 3, "Literal expected after annotation."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),

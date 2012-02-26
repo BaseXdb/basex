@@ -1,15 +1,15 @@
 package org.basex.build.xml;
 
-import static org.basex.core.Text.*;
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.build.BuildException;
-import org.basex.build.SingleParser;
+
+import java.io.*;
+
+import org.basex.build.*;
 import org.basex.build.BuildText.Type;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.util.list.TokenList;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
@@ -41,32 +41,32 @@ public class XMLParser extends SingleParser {
 
   @Override
   public final void parse() throws IOException {
-    try {
-      // loop until all tokens have been processed
-      scanner.more();
-      while(true) {
-        if(scanner.type == Type.TEXT) {
-          builder.text(scanner.token.finish());
-        } else if(scanner.type == Type.COMMENT) {
-          builder.comment(scanner.token.finish());
-        } else if(scanner.type == Type.PI) {
-          builder.pi(scanner.token.finish());
-        } else if(scanner.type == Type.EOF) {
-          break;
-        } else if(scanner.type != Type.DTD) {
-          if(!parseTag()) break;
-          continue;
-        }
-        if(!scanner.more()) break;
+    // loop until all tokens have been processed
+    scanner.more();
+    while(true) {
+      if(scanner.type == Type.TEXT) {
+        builder.text(scanner.token.finish());
+      } else if(scanner.type == Type.COMMENT) {
+        builder.comment(scanner.token.finish());
+      } else if(scanner.type == Type.PI) {
+        builder.pi(scanner.token.finish());
+      } else if(scanner.type == Type.EOF) {
+        break;
+      } else if(scanner.type != Type.DTD) {
+        if(!parseTag()) break;
+        continue;
       }
-      scanner.close();
-      builder.encoding(scanner.encoding);
+      if(!scanner.more()) break;
+    }
+    scanner.close();
+    builder.encoding(scanner.encoding);
+
+    /*try {
     } catch(final BuildException ex) {
-      final String msg = ex.getMessage() + H_PARSE_ERROR;
-      final BuildException e = new BuildException(msg);
+      final BuildException e = new BuildException(ex.getMessage() + H_PARSE_ERROR);
       e.setStackTrace(ex.getStackTrace());
       throw e;
-    }
+    }*/
   }
 
   @Override
