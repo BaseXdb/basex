@@ -1,4 +1,4 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi;
 
 import java.util.Iterator;
 
@@ -6,13 +6,14 @@ import org.basex.core.Context;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.iter.Iter;
+import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.Util;
 import org.basex.util.list.StringList;
 
 /**
  * Wrapper for evaluating XQuery expressions.
  */
-public final class XQuery implements Iterable<XQItem> {
+public final class XQuery implements Iterable<XdmItem> {
   /** Query processor. */
   private final QueryProcessor qp;
   /** Query iterator. */
@@ -31,15 +32,15 @@ public final class XQuery implements Iterable<XQItem> {
    * Binds an initial context.
    * @param value context value to be bound
    * @return self reference
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
   public XQuery context(final Object value) {
     try {
-      if(value != null) qp.context(value instanceof XQValue ?
-          ((XQValue) value).internal() : value);
+      if(value != null) qp.context(value instanceof XdmValue ?
+          ((XdmValue) value).internal() : value);
       return this;
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -48,15 +49,15 @@ public final class XQuery implements Iterable<XQItem> {
    * @param key key
    * @param value value to be bound
    * @return self reference
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
   public XQuery bind(final String key, final Object value) {
     try {
-      qp.bind(key, value instanceof XQValue ?
-          ((XQValue) value).internal() : value);
+      qp.bind(key, value instanceof XdmValue ?
+          ((XdmValue) value).internal() : value);
       return this;
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -73,7 +74,7 @@ public final class XQuery implements Iterable<XQItem> {
       qp.namespace(prefix, uri);
       return this;
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -81,7 +82,7 @@ public final class XQuery implements Iterable<XQItem> {
    * Adds a collection.
    * @param name name of the collection
    * @param paths document paths
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
   public void addCollection(final String name, final String[] paths) {
     final StringList sl = new StringList();
@@ -89,7 +90,7 @@ public final class XQuery implements Iterable<XQItem> {
     try {
       qp.ctx.resource.addCollection(name, sl.toArray());
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -97,13 +98,13 @@ public final class XQuery implements Iterable<XQItem> {
    * Adds a document.
    * @param name name of the collection
    * @param path document path
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
   public void addDocument(final String name, final String path) {
     try {
       qp.ctx.resource.addDoc(name, path);
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -111,7 +112,7 @@ public final class XQuery implements Iterable<XQItem> {
    * Adds a module.
    * @param uri module uri
    * @param file file reference
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
   public void addModule(final String uri, final String file) {
     qp.module(uri, file);
@@ -122,7 +123,7 @@ public final class XQuery implements Iterable<XQItem> {
    * Sets the base URI.
    * @param base base URI
    * @return self reference
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
   public XQuery baseURI(final String base) {
     qp.ctx.sc.baseURI(base);
@@ -132,48 +133,48 @@ public final class XQuery implements Iterable<XQItem> {
   /**
    * Returns the next item, or {@code null} if all items have been returned.
    * @return next result item
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
-  public XQItem next() {
+  public XdmItem next() {
     try {
       if(ir == null) ir = qp.iter();
-      return XQItem.get(ir.next());
+      return XdmItem.get(ir.next());
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
   /**
    * Returns the result value.
    * @return result value
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
-  public XQValue value() {
+  public XdmValue value() {
     try {
-      return XQValue.get(qp.value());
+      return XdmValue.get(qp.value());
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
   /**
    * Closes the query; should always be called after all items have been
    * processed.
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
   public void close() {
     try {
       qp.close();
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
   @Override
-  public Iterator<XQItem> iterator() {
-    return new Iterator<XQItem>() {
+  public Iterator<XdmItem> iterator() {
+    return new Iterator<XdmItem>() {
       /** Current item. */
-      private XQItem next;
+      private XdmItem next;
 
       @Override
       public boolean hasNext() {
@@ -182,8 +183,8 @@ public final class XQuery implements Iterable<XQItem> {
       }
 
       @Override
-      public XQItem next() {
-        final XQItem it = hasNext() ? next : null;
+      public XdmItem next() {
+        final XdmItem it = hasNext() ? next : null;
         next = null;
         return it;
       }
@@ -202,12 +203,12 @@ public final class XQuery implements Iterable<XQItem> {
    * @param ctx database context
    * @return optional expected test suite result
    */
-  public static String string(final String query, final XQValue val,
+  public static String string(final String query, final XdmValue val,
       final Context ctx) {
 
     final XQuery qp = new XQuery(query, ctx).context(val);
     try {
-      final XQItem it = qp.next();
+      final XdmItem it = qp.next();
       return it == null ? "" : it.getString();
     } finally {
       qp.close();

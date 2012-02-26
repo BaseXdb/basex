@@ -1,4 +1,4 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi.xdm;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
@@ -7,21 +7,22 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.util.Compare;
+import org.basex.tests.bxapi.*;
 import org.basex.util.Util;
 
 /**
  * Wrapper for representing XQuery values.
  */
-public abstract class XQValue implements Iterable<XQItem> {
+public abstract class XdmValue implements Iterable<XdmItem> {
   /**
    * Returns a new XQuery value.
    * @param val value
    * @return result
    */
-  public static XQValue get(final Value val) {
-    return val instanceof Empty ? XQEmpty.EMPTY :
-        val instanceof Item ? XQItem.get((Item) val) :
-      new XQSequence((Seq) val);
+  public static XdmValue get(final Value val) {
+    return val instanceof Empty ? XdmEmpty.EMPTY :
+        val instanceof Item ? XdmItem.get((Item) val) :
+      new XdmSequence((Seq) val);
   }
 
   /**
@@ -78,13 +79,13 @@ public abstract class XQValue implements Iterable<XQItem> {
    * Checks if the two values are deep-equal, according to XQuery.
    * @param value second value
    * @return result of check
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
-  public boolean deepEqual(final XQValue value) {
+  public boolean deepEqual(final XdmValue value) {
     try {
       return Compare.deep(internal(), value.internal(), null);
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -104,5 +105,5 @@ public abstract class XQValue implements Iterable<XQItem> {
    * Should be made invisible to other packages.
    * @return value
    */
-  abstract Value internal();
+  public abstract Value internal();
 }

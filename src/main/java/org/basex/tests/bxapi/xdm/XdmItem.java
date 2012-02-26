@@ -1,24 +1,25 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi.xdm;
 
 import java.util.Iterator;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
+import org.basex.tests.bxapi.*;
 import org.basex.util.Util;
 
 /**
  * Wrapper for representing XQuery items.
  */
-public abstract class XQItem extends XQValue {
+public abstract class XdmItem extends XdmValue {
   /**
    * Returns a new XQuery value.
    * @param val value
    * @return result
    */
-  public static XQItem get(final Item val) {
+  public static XdmItem get(final Item val) {
     return val == null ? null : val instanceof ANode ?
-        new XQNode((ANode) val) : new XQAtomic(val);
+        new XdmNode((ANode) val) : new XdmAtomic(val);
   }
 
   @Override
@@ -27,25 +28,25 @@ public abstract class XQItem extends XQValue {
   }
 
   @Override
-  abstract Item internal();
+  public abstract Item internal();
 
   /**
    * Checks if the two items are equal, according to XQuery.
    * @param item second item
    * @return result of check
-   * @throws XQException exception
+   * @throws XQueryException exception
    */
-  public boolean equal(final XQItem item) {
+  public boolean equal(final XdmItem item) {
     try {
       return item != null && internal().eq(null, item.internal());
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
   @Override
-  public final Iterator<XQItem> iterator() {
-    return new Iterator<XQItem>() {
+  public final Iterator<XdmItem> iterator() {
+    return new Iterator<XdmItem>() {
       private boolean more = true;
 
       @Override
@@ -54,9 +55,9 @@ public abstract class XQItem extends XQValue {
       }
 
       @Override
-      public XQItem next() {
+      public XdmItem next() {
         more = false;
-        return XQItem.this;
+        return XdmItem.this;
       }
 
       @Override

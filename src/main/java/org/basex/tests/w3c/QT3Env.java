@@ -5,7 +5,8 @@ import static org.basex.tests.w3c.QT3Constants.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.tests.w3c.qt3api.*;
+import org.basex.tests.bxapi.*;
+import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.list.*;
 
 /**
@@ -14,7 +15,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-class QT3Env {
+final class QT3Env {
   /** Namespaces: prefix, uri. */
   final ArrayList<HashMap<String, String>> namespaces;
   /** Sources: role, file, validation, uri, xml:id. */
@@ -46,7 +47,7 @@ class QT3Env {
    * @param ctx database context
    * @param env environment item
    */
-  QT3Env(final Context ctx, final XQValue env) {
+  QT3Env(final Context ctx, final XdmValue env) {
     name = XQuery.string('@' + NNAME, env, ctx);
     sources = list(ctx, env, SOURCE);
     params = list(ctx, env, PARAM);
@@ -69,7 +70,7 @@ class QT3Env {
     collSources = new StringList();
     final XQuery qsrc = new XQuery("*:collection/*:source/@file", ctx).
         context(env);
-    for(final XQItem iatt : qsrc) collSources.add(iatt.getString());
+    for(final XdmItem iatt : qsrc) collSources.add(iatt.getString());
     qsrc.close();
   }
 
@@ -81,12 +82,12 @@ class QT3Env {
    * @return map list
    */
   static ArrayList<HashMap<String, String>> list(final Context ctx,
-      final XQValue env, final String elem) {
+      final XdmValue env, final String elem) {
 
     final ArrayList<HashMap<String, String>> list =
         new ArrayList<HashMap<String, String>>();
     final XQuery query = new XQuery("*:" + elem, ctx).context(env);
-    for(final XQItem it : query) list.add(map(ctx, it));
+    for(final XdmItem it : query) list.add(map(ctx, it));
     query.close();
     return list;
   }
@@ -97,10 +98,10 @@ class QT3Env {
    * @param env root element
    * @return map
    */
-  static HashMap<String, String> map(final Context ctx, final XQValue env) {
+  static HashMap<String, String> map(final Context ctx, final XdmValue env) {
     final HashMap<String, String> map = new HashMap<String, String>();
     final XQuery query = new XQuery("@*", ctx).context(env);
-    for(final XQItem it : query) map.put(it.getName(), it.getString());
+    for(final XdmItem it : query) map.put(it.getName(), it.getString());
     query.close();
     return map;
   }
@@ -112,10 +113,10 @@ class QT3Env {
    * @param env root element
    * @return map
    */
-  static String string(final String elm, final Context ctx, final XQValue env) {
+  static String string(final String elm, final Context ctx, final XdmValue env) {
     String value = null;
     final XQuery query = new XQuery("*:" + elm, ctx).context(env);
-    final XQItem it = query.next();
+    final XdmItem it = query.next();
     if(it != null) {
       final XQuery qattr = new XQuery("string(@*)", ctx).context(it);
       value = qattr.next().getString();

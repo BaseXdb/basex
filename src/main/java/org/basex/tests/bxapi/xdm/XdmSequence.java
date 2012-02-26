@@ -1,4 +1,4 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi.xdm;
 
 import java.util.Iterator;
 import org.basex.query.item.Seq;
@@ -9,7 +9,7 @@ import org.basex.util.Util;
 /**
  * Wrapper for representing XQuery values.
  */
-final class XQSequence extends XQValue {
+final class XdmSequence extends XdmValue {
   /** Wrapped sequence. */
   final Seq sequence;
 
@@ -17,7 +17,7 @@ final class XQSequence extends XQValue {
    * Constructor.
    * @param seq sequence
    */
-  XQSequence(final Seq seq) {
+  XdmSequence(final Seq seq) {
     sequence = seq;
   }
 
@@ -32,8 +32,8 @@ final class XQSequence extends XQValue {
   }
 
   @Override
-  public Iterator<XQItem> iterator() {
-    return new Iterator<XQItem>() {
+  public Iterator<XdmItem> iterator() {
+    return new Iterator<XdmItem>() {
       private int c;
 
       @Override
@@ -42,8 +42,8 @@ final class XQSequence extends XQValue {
       }
 
       @Override
-      public XQItem next() {
-        return XQItem.get(sequence.itemAt(c++));
+      public XdmItem next() {
+        return XdmItem.get(sequence.itemAt(c++));
       }
 
       @Override
@@ -61,7 +61,7 @@ final class XQSequence extends XQValue {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("(");
-    for(final XQItem it : this) {
+    for(final XdmItem it : this) {
       if(sb.length() != 1) sb.append(',');
       sb.append(it.toString());
     }

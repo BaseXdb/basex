@@ -20,7 +20,7 @@
   <dependencies>
     <dependency>
       <groupId>org.basex</groupId>
-      <artifactId>basex</artifactId>
+      <artifactId>basex-api</artifactId>
       <version>7.1.2-SNAPSHOT</version>
     </dependency>
       <dependency>

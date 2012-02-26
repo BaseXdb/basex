@@ -1,4 +1,4 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi.xdm;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import org.basex.util.Util;
 /**
  * Wrapper for representing an XQuery node.
  */
-final class XQNode extends XQItem {
+final class XdmNode extends XdmItem {
   /** Wrapped node. */
   private final ANode node;
 
@@ -20,7 +20,7 @@ final class XQNode extends XQItem {
    * Constructor.
    * @param n node
    */
-  XQNode(final ANode n) {
+  XdmNode(final ANode n) {
     node = n;
   }
 
@@ -65,7 +65,7 @@ final class XQNode extends XQItem {
   // PACKAGE PROTECTED METHODS ================================================
 
   @Override
-  ANode internal() {
+  public ANode internal() {
     return node;
   }
 }

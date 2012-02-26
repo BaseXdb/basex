@@ -1,4 +1,4 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi.xdm;
 
 import java.util.Iterator;
 
@@ -10,14 +10,14 @@ import org.basex.util.Util;
 /**
  * Wrapper for representing an empty sequence.
  */
-public final class XQEmpty extends XQValue {
+public final class XdmEmpty extends XdmValue {
   /** Empty sequence. */
-  public static final XQEmpty EMPTY = new XQEmpty();
+  public static final XdmEmpty EMPTY = new XdmEmpty();
 
   /**
    * Private Constructor.
    */
-  private XQEmpty() { }
+  private XdmEmpty() { }
 
   @Override
   public SeqType getType() {
@@ -30,15 +30,15 @@ public final class XQEmpty extends XQValue {
   }
 
   @Override
-  public Iterator<XQItem> iterator() {
-    return new Iterator<XQItem>() {
+  public Iterator<XdmItem> iterator() {
+    return new Iterator<XdmItem>() {
       @Override
       public boolean hasNext() {
         return false;
       }
 
       @Override
-      public XQItem next() {
+      public XdmItem next() {
         return null;
       }
 

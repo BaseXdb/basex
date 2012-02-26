@@ -1,14 +1,15 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi.xdm;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.tests.bxapi.*;
 import org.basex.util.Token;
 
 /**
  * Wrapper for representing XQuery items.
  */
-class XQAtomic extends XQItem {
+final class XdmAtomic extends XdmItem {
   /** Wrapped item. */
   private final Item item;
 
@@ -16,7 +17,7 @@ class XQAtomic extends XQItem {
    * Constructor.
    * @param it item
    */
-  XQAtomic(final Item it) {
+  XdmAtomic(final Item it) {
     item = it;
   }
 
@@ -25,7 +26,7 @@ class XQAtomic extends XQItem {
     try {
       return item.bool(null);
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -34,7 +35,7 @@ class XQAtomic extends XQItem {
     try {
       return Token.string(item.string(null));
     } catch(final QueryException ex) {
-      throw new XQException(ex);
+      throw new XQueryException(ex);
     }
   }
 
@@ -51,7 +52,7 @@ class XQAtomic extends XQItem {
   // PACKAGE PROTECTED METHODS ================================================
 
   @Override
-  Item internal() {
+  public Item internal() {
     return item;
   }
 }

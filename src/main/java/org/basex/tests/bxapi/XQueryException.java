@@ -1,4 +1,4 @@
-package org.basex.tests.w3c.qt3api;
+package org.basex.tests.bxapi;
 
 import org.basex.query.QueryException;
 import org.basex.util.Token;
@@ -7,12 +7,12 @@ import org.basex.util.Token;
  * XQuery error. Inherited from {@link RuntimeException} to provide
  * generic iterators.
  */
-public final class XQException extends RuntimeException {
+public final class XQueryException extends RuntimeException {
   /**
    * Constructor.
    * @param ex exception
    */
-  public XQException(final QueryException ex) {
+  public XQueryException(final QueryException ex) {
     super(ex);
   }
 
