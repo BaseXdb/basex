@@ -6,11 +6,12 @@ import org.basex.query.iter.*;
 import org.basex.util.hash.*;
 
 /**
- * Container for parsed data from <http:request/>.
+ * Container for parsed data from {@code <http:request/>}.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public final class Request {
+public final class HTTPRequest {
   /** Request attributes. */
   public final TokenMap attrs = new TokenMap();
   /** Request headers. */

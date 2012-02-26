@@ -32,11 +32,11 @@ public interface QueryText {
   /** Parser token. */
   String ATTRIBUTE = "attribute";
   /** Parser token. */
-  String BASEURI = "base-uri";
+  String BASE_URI = "base-uri";
   /** Parser token. */
   String BEFORE = "before";
   /** Parser token. */
-  String BOUNDARY = "boundary-space";
+  String BOUNDARY_SPACE = "boundary-space";
   /** Parser token. */
   String BY = "by";
   /** Parser token. */
@@ -62,9 +62,9 @@ public interface QueryText {
   /** Parser token. */
   String COPY = "copy";
   /** Parser token. */
-  String COPYNS = "copy-namespaces";
+  String COPY_NAMESPACES = "copy-namespaces";
   /** Parser token. */
-  String DECFORMAT = "decimal-format";
+  String DECIMAL_FORMAT = "decimal-format";
   /** Parser token. */
   String DECLARE = "declare";
   /** Parser token. */
@@ -110,7 +110,7 @@ public interface QueryText {
   /** Parser token. */
   String FROM = "from";
   /** Parser token. */
-  String FTOPTION = "ft-option";
+  String FT_OPTION = "ft-option";
   /** Parser token. */
   String FTAND = "ftand";
   /** Parser token. */
@@ -174,9 +174,9 @@ public interface QueryText {
   /** Parser token. */
   String NSPACE = "namespace";
   /** Parser token. */
-  String NOINHERIT = "no-inherit";
+  String NO_INHERIT = "no-inherit";
   /** Parser token. */
-  String NOPRESERVE = "no-preserve";
+  String NO_PRESERVE = "no-preserve";
   /** Parser token. */
   String NODE = "node";
   /** Parser token. */
@@ -230,9 +230,9 @@ public interface QueryText {
   /** Parser token. */
   String SCHEMA = "schema";
   /** Parser token. */
-  String SCHEMAATTRIBUTE = "schema-attribute";
+  String SCHEMA_ATTRIBUTE = "schema-attribute";
   /** Parser token. */
-  String SCHEMAELEMENT = "schema-element";
+  String SCHEMA_ELEMENT = "schema-element";
   /** Parser token. */
   String SCORE = "score";
   /** Parser token. */

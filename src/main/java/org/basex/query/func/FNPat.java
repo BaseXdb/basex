@@ -29,16 +29,15 @@ import org.basex.util.InputInfo;
  */
 public final class FNPat extends StandardFunc {
   /** Root element for the analyze-string-result function. */
-  private static final QNm ANALYZE =
-    new QNm(token("fn:analyze-string-result"), FNURI);
+  private static final QNm ANALYZE = new QNm("fn:analyze-string-result", FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm MATCH = new QNm(token("fn:match"), FNURI);
+  private static final QNm MATCH = new QNm("fn:match", FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm NONMATCH = new QNm(token("fn:non-match"), FNURI);
+  private static final QNm NONMATCH = new QNm("fn:non-match", FNURI);
   /** Element for the analyze-string-result function. */
-  private static final QNm MGROUP = new QNm(token("fn:group"), FNURI);
+  private static final QNm MGROUP = new QNm("fn:group", FNURI);
   /** Attribute for the analyze-string-result function. */
-  private static final QNm NR = new QNm(token("nr"));
+  private static final QNm NR = new QNm("nr");
 
   /**
    * Constructor.

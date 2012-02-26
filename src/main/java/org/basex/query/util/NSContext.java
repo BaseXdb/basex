@@ -29,9 +29,9 @@ public final class NSContext {
   public void add(final byte[] pref, final byte[] uri, final InputInfo ii)
       throws QueryException {
 
-    if(eq(pref, XML) || eq(pref, XMLNS)) BINDXML.thrw(ii, pref);
-    if(eq(XMLURI, uri)) BINDXMLURI.thrw(ii, uri, XML);
-    if(eq(XMLNSURI, uri)) BINDXMLURI.thrw(ii, uri, XMLNS);
+    if(eq(pref, XML, XMLNS)) BINDXML.thrw(ii, pref);
+    if(eq(uri, XMLURI)) BINDXMLURI.thrw(ii, uri, XML);
+    if(eq(uri, XMLNSURI)) BINDXMLURI.thrw(ii, uri, XMLNS);
     ns.add(pref, uri);
   }
 

@@ -40,7 +40,7 @@ import org.basex.util.hash.TokenObjMap;
  */
 public final class FNXslt extends StandardFunc {
   /** Element: parameters. */
-  private static final QNm E_PARAM = new QNm(token("parameters"), XSLTURI);
+  private static final QNm E_PARAM = new QNm("parameters", XSLTURI);
 
   /** XSLT implementations. */
   private static final String[] IMPL = {

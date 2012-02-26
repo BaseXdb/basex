@@ -69,23 +69,23 @@ import org.basex.util.list.TokenList;
  */
 public final class FNDb extends StandardFunc {
   /** Resource element name. */
-  static final QNm SYSTEM = new QNm(token("system"));
+  static final QNm SYSTEM = new QNm("system");
   /** Resource element name. */
-  static final QNm DATABASE = new QNm(token("database"));
+  static final QNm DATABASE = new QNm("database");
   /** Resource element name. */
-  static final QNm RESOURCE = new QNm(token("resource"));
+  static final QNm RESOURCE = new QNm("resource");
   /** Resource element name. */
-  static final QNm RESOURCES = new QNm(token("resources"));
+  static final QNm RESOURCES = new QNm("resources");
   /** Path element name. */
-  static final QNm PATH = new QNm(token("path"));
+  static final QNm PATH = new QNm("path");
   /** Raw element name. */
-  static final QNm RAW = new QNm(token("raw"));
+  static final QNm RAW = new QNm("raw");
   /** Size element name. */
-  static final QNm SIZE = new QNm(token("size"));
+  static final QNm SIZE = new QNm("size");
   /** Content type element name. */
-  static final QNm CTYPE = new QNm(token("content-type"));
+  static final QNm CTYPE = new QNm("content-type");
   /** Modified date element name. */
-  static final QNm MDATE = new QNm(token("modified-date"));
+  static final QNm MDATE = new QNm("modified-date");
   /** MIME type application/xml. */
   static final byte[] APP_XML = token(MimeTypes.APP_XML);
 

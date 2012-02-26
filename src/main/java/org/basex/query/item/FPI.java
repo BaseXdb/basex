@@ -41,7 +41,7 @@ public final class FPI extends FNode {
    * @param pi DOM node
    */
   public FPI(final ProcessingInstruction pi) {
-    this(new QNm(token(pi.getTarget())), token(pi.getData()));
+    this(new QNm(pi.getTarget()), token(pi.getData()));
   }
 
   @Override

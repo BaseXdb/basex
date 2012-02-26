@@ -35,7 +35,7 @@ public final class FAttr extends FNode {
    * @param attr DOM node
    */
   public FAttr(final Attr attr) {
-    this(new QNm(token(attr.getName())), token(attr.getValue()));
+    this(new QNm(attr.getName()), token(attr.getValue()));
   }
 
   @Override

@@ -2,50 +2,24 @@ package org.basex.query.util.http;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+import static org.basex.query.util.http.HTTPText.*;
 
 import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.http.Request.Part;
+import org.basex.query.util.http.HTTPRequest.Part;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
  * Request parser.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public final class RequestParser {
-  /** http:header element. */
-  private static final byte[] HDR = token("http:header");
-  /** Header attribute: name. */
-  private static final byte[] HDR_NAME = token("name");
-  /** Header attribute: value. */
-  private static final byte[] HDR_VALUE = token("value");
-  /** http:multipart element. */
-  private static final byte[] MULTIPART = token("http:multipart");
-  /** http:body element. */
-  private static final byte[] BODY = token("http:body");
-
-  /** Request attribute: HTTP method. */
-  private static final byte[] METHOD = token("method");
-  /** Request attribute: username. */
-  private static final byte[] USRNAME = token("username");
-  /** Request attribute: password. */
-  private static final byte[] PASSWD = token("password");
-  /** Request attribute: send-authorization. */
-  private static final byte[] SENDAUTH = token("send-authorization");
-  /** Body attribute: media-type. */
-  private static final byte[] MEDIATYPE = token("media-type");
-  /** Body attribute: media-type. */
-  private static final byte[] SRC = token("src");
-  /** HTTP method TRACE. */
-  private static final byte[] TRACE = token("trace");
-  /** HTTP method DELETE. */
-  private static final byte[] DELETE = token("delete");
-
+public final class HTTPRequestParser {
   /** Input information. */
   private final InputInfo input;
 
@@ -53,7 +27,7 @@ public final class RequestParser {
    * Constructor.
    * @param ii input info
    */
-  public RequestParser(final InputInfo ii) {
+  public HTTPRequestParser(final InputInfo ii) {
     input = ii;
   }
 
@@ -64,23 +38,24 @@ public final class RequestParser {
    * @return parsed request
    * @throws QueryException query exception
    */
-  public Request parse(final ANode request, final ItemCache bodies)
+  public HTTPRequest parse(final ANode request, final ItemCache bodies)
       throws QueryException {
 
-    final Request r = new Request();
+    final HTTPRequest r = new HTTPRequest();
     parseAttrs(request, r.attrs);
     checkRequest(r);
 
     final ANode payload = parseHdrs(request.children(), r.headers);
-    final byte[] httpMethod = lc(r.attrs.get(METHOD));
+    final byte[] method = lc(r.attrs.get(METHOD));
+
     // it is an error if content is set for HTTP verbs which must be empty
-    if((eq(TRACE, httpMethod) || eq(DELETE, httpMethod)) &&
-        (payload != null || bodies != null))
-      REQINV.thrw(input, "Body not expected for method " + string(httpMethod));
+    if((eq(method, TRACE, DELETE)) && (payload != null || bodies != null))
+      REQINV.thrw(input, "Body not expected for method " + string(method));
 
     if(payload != null) {
+      final QNm pl = payload.qname();
       // single part request
-      if(eq(payload.name(), BODY)) {
+      if(pl.eq(HTTP_BODY)) {
         Item it = null;
         if(bodies != null) {
           // $bodies must contain exactly one item
@@ -92,7 +67,7 @@ public final class RequestParser {
         parseBody(payload, it, r.payloadAttrs, r.bodyContent);
         r.isMultipart = false;
         // multipart request
-      } else if(eq(payload.name(), MULTIPART)) {
+      } else if(pl.eq(HTTP_MULTIPART)) {
         int i = 0;
         final AxisMoreIter ch = payload.children();
         while(ch.next() != null)
@@ -105,7 +80,7 @@ public final class RequestParser {
         parseMultipart(payload, bodies, r.payloadAttrs, r.parts);
         r.isMultipart = true;
       } else {
-        REQINV.thrw(input);
+        REQINV.thrw(input, "Unknown payload element " + pl);
       }
     }
     return r;
@@ -134,17 +109,18 @@ public final class RequestParser {
     while(true) {
       n = i.next();
       if(n == null) break;
-      final byte[] nm = n.name();
+      final QNm nm = n.qname();
       if(nm == null) continue;
-      if(!eq(nm, HDR)) break;
+      if(!nm.eq(HTTP_HEADER)) break;
 
       final AxisIter hdrAttrs = n.attributes();
       byte[] name = null;
       byte[] value = null;
 
       for(ANode attr; (attr = hdrAttrs.next()) != null;) {
-        if(eq(attr.name(), HDR_NAME)) name = attr.string();
-        if(eq(attr.name(), HDR_VALUE)) value = attr.string();
+        final QNm qn = attr.qname();
+        if(qn.eq(Q_NAME)) name = attr.string();
+        if(qn.eq(Q_VALUE)) value = attr.string();
 
         if(name != null && name.length != 0 && value != null
             && value.length != 0) {
@@ -195,8 +171,9 @@ public final class RequestParser {
       final TokenMap attrs, final ArrayList<Part> parts) throws QueryException {
 
     parseAttrs(multipart, attrs);
-    if(attrs.get(MEDIATYPE) == null) REQINV.thrw(input,
-        "Attribute media-type of http:multipart is mandatory");
+    if(attrs.get(MEDIA_TYPE) == null)
+      REQINV.thrw(input, "Attribute media-type of http:multipart is mandatory");
+
     final AxisMoreIter i = multipart.children();
     if(contItems == null) {
       // content is set from <http:body/> children of <http:part/> elements
@@ -230,19 +207,16 @@ public final class RequestParser {
    * @param r request
    * @throws QueryException query exception
    */
-  private void checkRequest(final Request r) throws QueryException {
+  private void checkRequest(final HTTPRequest r) throws QueryException {
     // @method denotes the HTTP verb and is mandatory
-    if(r.attrs.get(METHOD) == null)
-      REQINV.thrw(input, "Attribute method is mandatory");
+    if(r.attrs.get(METHOD) == null) REQINV.thrw(input, "Attribute method is mandatory");
 
     // check parameters needed in case of authorization
-    final byte[] sendAuth = r.attrs.get(SENDAUTH);
+    final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
     if(sendAuth != null && Boolean.parseBoolean(string(sendAuth))) {
-      final byte[] usrname = r.attrs.get(USRNAME);
-      final byte[] passwd = r.attrs.get(PASSWD);
-
-      if(usrname == null && passwd != null || usrname != null && passwd == null
-          || usrname == null && passwd == null)
+      final byte[] un = r.attrs.get(USERNAME);
+      final byte[] pw = r.attrs.get(PASSWORD);
+      if(un == null && pw != null || un != null && pw == null || un == null && pw == null)
         REQINV.thrw(input, "Provided credentials are invalid");
     }
   }
@@ -257,7 +231,7 @@ public final class RequestParser {
       throws QueryException {
 
     // @media-type is mandatory
-    if(bodyAttrs.get(MEDIATYPE) == null)
+    if(bodyAttrs.get(MEDIA_TYPE) == null)
       REQINV.thrw(input, "Attribute media-type of http:body is mandatory");
 
     // if src attribute is used to set the content of the body, no

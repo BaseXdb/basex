@@ -3,34 +3,23 @@ package org.basex.query.util.http;
 import static java.lang.Integer.*;
 import static java.net.HttpURLConnection.*;
 import static org.basex.data.DataText.*;
+import static org.basex.io.MimeTypes.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.query.util.http.HTTPText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.util.Locale;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import org.basex.core.Prop;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.B64;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Hex;
-import org.basex.query.item.Item;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.http.Request.Part;
-import org.basex.util.Base64;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.hash.TokenMap;
+import org.basex.core.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.http.HTTPRequest.Part;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * HTTP Client.
@@ -39,71 +28,6 @@ import org.basex.util.hash.TokenMap;
  * @author Rositsa Shadura
  */
 public final class HTTPClient {
-  /** Request attribute: HTTP method. */
-  private static final byte[] METHOD = token("method");
-  /** Request attribute: username. */
-  private static final byte[] USRNAME = token("username");
-  /** Request attribute: password. */
-  private static final byte[] PASSWD = token("password");
-  /** Request attribute: send-authorization. */
-  private static final byte[] SENDAUTH = token("send-authorization");
-  /** Body attribute: media-type. */
-  private static final byte[] MEDIATYPE = token("media-type");
-
-  /** Request attribute: href. */
-  private static final byte[] HREF = token("href");
-  /** Request attribute: status-only. */
-  private static final byte[] STATUSONLY = token("status-only");
-  /** Request attribute: override-media-type. */
-  private static final byte[] OVERMEDIATYPE = token("override-media-type");
-  /** Request attribute: follow-redirect. */
-  private static final byte[] REDIR = token("follow-redirect");
-  /** Request attribute: timeout. */
-  private static final byte[] TIMEOUT = token("timeout");
-
-  /** boundary marker. */
-  private static final byte[] BOUNDARY = token("boundary");
-  /** Carriage return/line feed. */
-  private static final byte[] CRLF = token("\r\n");
-  /** Default multipart boundary. */
-  private static final String DEFAULT_BOUND = "1BEF0A57BE110FD467A";
-
-  /** Body attribute: src. */
-  private static final byte[] SRC = token("src");
-
-  /** Media Types. */
-  /** XML media type. */
-  private static final byte[] APPL_XHTML = token("application/html+xml");
-  /** XML media type. */
-  private static final byte[] APPL_XML = token("application/xml");
-  /** XML media type. */
-  private static final byte[] APPL_EXT_XML =
-    token("application/xml-external-parsed-entity");
-  /** XML media type. */
-  private static final byte[] TXT_XML = token("text/xml");
-  /** XML media type. */
-  private static final byte[] TXT_EXT_XML =
-    token("text/xml-external-parsed-entity");
-  /** XML media types' suffix. */
-  private static final byte[] MIME_XML_SUFFIX = token("+xml");
-  /** HTML media type. */
-  private static final byte[] TXT_HTML = token("text/html");
-  /** Text media types' prefix. */
-  private static final byte[] MIME_TEXT_PREFIX = token("text/");
-
-  /** Serialization methods defined by the EXPath specification. */
-  /** Method http:base64Binary. */
-  private static final byte[] BASE64 = token("http:base64Binary");
-  /** Method http:hexBinary. */
-  private static final byte[] HEXBIN = token("http:hexBinary");
-
-  /** HTTP header: Content-Type. */
-  private static final String CONT_TYPE = "Content-Type";
-  /** HTTP header: Authorization. */
-  private static final String AUTH = "Authorization";
-  /** HTTP basic authentication. */
-  private static final String AUTH_BASIC = "Basic ";
-
   /** Input information. */
   private final InputInfo input;
   /** Database properties. */
@@ -135,14 +59,14 @@ public final class HTTPClient {
         if(href == null || href.length == 0) NOPARAMS.thrw(input);
         final HttpURLConnection conn = openConnection(string(href));
         try {
-          return new ResponseHandler(input, prop).getResponse(
+          return new HTTPResponse(input, prop).getResponse(
               conn, Bln.FALSE.string(), null);
         } finally {
           conn.disconnect();
         }
       }
 
-      final Request r = new RequestParser(input).parse(request, bodies);
+      final HTTPRequest r = new HTTPRequestParser(input).parse(request, bodies);
       final byte[] dest = href == null ? r.attrs.get(HREF) : href;
       if(dest == null) NOURL.thrw(input);
 
@@ -155,8 +79,8 @@ public final class HTTPClient {
           setContentType(conn, r);
           setRequestContent(conn.getOutputStream(), r);
         }
-        return new ResponseHandler(input, prop).getResponse(
-            conn, r.attrs.get(STATUSONLY), r.attrs.get(OVERMEDIATYPE));
+        return new HTTPResponse(input, prop).getResponse(
+            conn, r.attrs.get(STATUS_ONLY), r.attrs.get(OVERRIDE_MEDIA_TYPE));
       } finally {
         conn.disconnect();
       }
@@ -193,15 +117,14 @@ public final class HTTPClient {
    * @throws ProtocolException protocol exception
    * @throws QueryException query exception
    */
-  private void setConnectionProps(final HttpURLConnection conn, final Request r)
+  private void setConnectionProps(final HttpURLConnection conn, final HTTPRequest r)
       throws ProtocolException, QueryException {
 
     if(r.bodyContent != null || r.parts.size() != 0) conn.setDoOutput(true);
-    conn.setRequestMethod(
-        string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH));
+    conn.setRequestMethod(string(r.attrs.get(METHOD)).toUpperCase(Locale.ENGLISH));
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
-    final byte[] redirect = r.attrs.get(REDIR);
+    final byte[] redirect = r.attrs.get(FOLLOW_REDIRECT);
     if(redirect != null) setFollowRedirects(Bln.parse(redirect, input));
   }
 
@@ -211,24 +134,22 @@ public final class HTTPClient {
    * @param r request data
    */
   private static void setContentType(final HttpURLConnection conn,
-      final Request r) {
+      final HTTPRequest r) {
 
-    final byte[] contTypeHdr = r.headers.get(lc(token(CONT_TYPE)));
+    final byte[] contTypeHdr = r.headers.get(lc(token(CONTENT_TYPE)));
     // if header "Content-Type" is set explicitly by the user, its value is used
     if(contTypeHdr != null) {
-      conn.setRequestProperty(CONT_TYPE, string(contTypeHdr));
+      conn.setRequestProperty(CONTENT_TYPE, string(contTypeHdr));
       // otherwise @media-type of <http:body/> is considered
     } else {
-      final String mediaType = string(r.payloadAttrs.get(MEDIATYPE));
+      String mt = string(r.payloadAttrs.get(MEDIA_TYPE));
       if(r.isMultipart) {
         final byte[] b = r.payloadAttrs.get(BOUNDARY);
-        final String boundary = b != null ? string(b) : DEFAULT_BOUND;
-        final StringBuilder sb = new StringBuilder();
-        sb.append(mediaType).append("; ").append("boundary=").append(boundary);
-        conn.setRequestProperty(CONT_TYPE, sb.toString());
-      } else {
-        conn.setRequestProperty(CONT_TYPE, mediaType);
+        final byte[] boundary = b != null ? b : DEFAULT_BOUND;
+        final TokenBuilder tb = new TokenBuilder();
+        mt = tb.add(mt).add("; ").add(BOUNDARY).add('=').add(boundary).toString();
       }
+      conn.setRequestProperty(CONTENT_TYPE, mt);
     }
   }
 
@@ -239,18 +160,18 @@ public final class HTTPClient {
    * @throws QueryException query exception
    */
   private void setRequestHeaders(final HttpURLConnection conn,
-      final Request r) throws QueryException {
+      final HTTPRequest r) throws QueryException {
 
     final byte[][] headerNames = r.headers.keys();
     for(final byte[] headerName : headerNames)
       conn.addRequestProperty(string(headerName),
           string(r.headers.get(headerName)));
     // HTTP Basic Authentication
-    final byte[] sendAuth = r.attrs.get(SENDAUTH);
+    final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
     if(sendAuth != null && Bln.parse(sendAuth, input))
-      conn.setRequestProperty(AUTH,
-        encodeCredentials(string(r.attrs.get(USRNAME)),
-            string(r.attrs.get(PASSWD))));
+      conn.setRequestProperty(AUTHORIZATION,
+        encodeCredentials(string(r.attrs.get(USERNAME)),
+            string(r.attrs.get(PASSWORD))));
   }
 
   /**
@@ -260,7 +181,7 @@ public final class HTTPClient {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  public void setRequestContent(final OutputStream out, final Request r)
+  public void setRequestContent(final OutputStream out, final HTTPRequest r)
       throws IOException, QueryException {
 
     if(r.isMultipart) {
@@ -278,7 +199,7 @@ public final class HTTPClient {
    * @return encoded credentials
    */
   private static String encodeCredentials(final String u, final String p) {
-    return AUTH_BASIC + Base64.encode(u + ':' + p);
+    return BASIC + ' ' + Base64.encode(u + ':' + p);
   }
 
   /**
@@ -293,30 +214,35 @@ public final class HTTPClient {
   private void writePayload(final ItemCache payload, final TokenMap payloadAtts,
       final OutputStream out) throws IOException, QueryException {
 
-    final byte[] mediaType = payloadAtts.get(MEDIATYPE);
-    byte[] method = payloadAtts.get(METHOD);
-    final byte[] src = payloadAtts.get(SRC);
+    final byte[] t = payloadAtts.get(MEDIA_TYPE);
+    String type = t == null ? null : string(t);
 
     // no resource to set the content from
+    final byte[] src = payloadAtts.get(SRC);
     if(src == null) {
       // default value @method is determined by @media-type
-      if(method == null) {
-        if(eq(mediaType, APPL_XHTML)) method = token(M_XHTML);
-        else if(eq(mediaType, APPL_XML) || eq(mediaType, APPL_EXT_XML)
-            || eq(mediaType, TXT_XML) || eq(mediaType, TXT_EXT_XML)
-            || endsWith(mediaType, MIME_XML_SUFFIX)) method = token(M_XML);
-        else if(eq(mediaType, TXT_HTML)) method = token(M_HTML);
-        else if(startsWith(mediaType, MIME_TEXT_PREFIX)) method = token(M_TEXT);
-        // default serialization method is XML
-        else method = token(M_XML);
+      byte[] m = payloadAtts.get(METHOD);
+      if(m == null) {
+        if(eq(type, APP_HTML_XML)) {
+          m = token(M_XHTML);
+        } else if(isXML(type)) {
+          m = token(M_XML);
+        } else if(eq(type, TEXT_HTML)) {
+          m = token(M_HTML);
+        } else if(type != null && type.startsWith(MIME_TEXT_PREFIX)) {
+          m = token(M_TEXT);
+        } else {
+          // default serialization method is XML
+          m = token(M_XML);
+        }
       }
       // write content depending on the method
-      if(eq(method, BASE64)) {
+      if(eq(m, BASE64)) {
         writeBase64(payload, out);
-      } else if(eq(method, HEXBIN)) {
+      } else if(eq(m, HEXBIN)) {
         writeHex(payload, out);
       } else {
-        write(payload, payloadAtts, method, out);
+        write(payload, payloadAtts, m, out);
       }
     } else {
       // if the src attribute is present, the content is set as the content of
@@ -380,8 +306,7 @@ public final class HTTPClient {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(METHOD).add('=').add(method);
     for(final byte[] key : attrs.keys()) {
-      if(!eq(key, SRC))
-        tb.add(',').add(key).add('=').add(attrs.get(key));
+      if(!eq(key, SRC)) tb.add(',').add(key).add('=').add(attrs.get(key));
     }
 
     // serialize items according to the parameters
@@ -423,7 +348,7 @@ public final class HTTPClient {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private void writeMultipart(final Request r, final OutputStream out)
+  private void writeMultipart(final HTTPRequest r, final OutputStream out)
       throws IOException, QueryException {
 
     final byte[] boundary = r.payloadAttrs.get(BOUNDARY);

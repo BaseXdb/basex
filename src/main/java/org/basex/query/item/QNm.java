@@ -47,11 +47,37 @@ public final class QNm extends Item {
   /**
    * Constructor.
    * @param n name
+   */
+  public QNm(final String n) {
+    this(token(n));
+  }
+
+  /**
+   * Constructor.
+   * @param n name
    * @param u namespace URI
    */
   public QNm(final byte[] n, final byte[] u) {
     this(n);
     uri(u);
+  }
+
+  /**
+   * Constructor.
+   * @param n name
+   * @param u namespace URI
+   */
+  public QNm(final String n, final byte[] u) {
+    this(token(n), u);
+  }
+
+  /**
+   * Constructor.
+   * @param n name
+   * @param u namespace URI
+   */
+  public QNm(final String n, final String u) {
+    this(token(n), token(u));
   }
 
   /**

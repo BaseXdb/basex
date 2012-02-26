@@ -26,6 +26,14 @@ public final class IOContent extends IO {
   /**
    * Constructor.
    * @param c contents
+   */
+  public IOContent(final String c) {
+    this(Token.token(c), "");
+  }
+
+  /**
+   * Constructor.
+   * @param c contents
    * @param p content path
    */
   public IOContent(final byte[] c, final String p) {

@@ -67,21 +67,19 @@ public final class FNSql extends StandardFunc {
   /** Type timestamp. */
   private static final byte[] TIMESTAMP = token("timestamp");
 
-  /** Names. */
   /** Row. */
-  private static final QNm Q_ROW = new QNm(token("sql:row"), SQLURI);
+  private static final QNm Q_ROW = new QNm("sql:row", SQLURI);
   /** Column. */
-  private static final QNm Q_COLUMN = new QNm(token("sql:column"), SQLURI);
+  private static final QNm Q_COLUMN = new QNm("sql:column", SQLURI);
   /** Name. */
-  private static final QNm Q_NAME = new QNm(token("name"), EMPTY);
+  private static final QNm Q_NAME = new QNm("name", EMPTY);
 
-  /** Elements. */
   /** <sql:options/>. */
-  private static final QNm E_OPS = new QNm(token("options"), SQLURI);
+  private static final QNm E_OPS = new QNm("options", SQLURI);
   /** <sql:parameters/>. */
-  private static final QNm E_PARAMS = new QNm(token("parameters"), SQLURI);
+  private static final QNm E_PARAMS = new QNm("parameters", SQLURI);
   /** <sql:parameter/>. */
-  private static final QNm E_PARAM = new QNm(token("parameter"), SQLURI);
+  private static final QNm E_PARAM = new QNm("parameter", SQLURI);
 
   /** Connection options. */
   /** Auto-commit mode. */

@@ -36,10 +36,9 @@ import org.basex.util.hash.TokenObjMap;
  */
 public abstract class StandardFunc extends Arr {
   /** Element: output:serialization-parameters. */
-  private static final QNm E_PARAM =
-    new QNm(token("serialization-parameters"), OUTPUTURI);
+  private static final QNm E_PARAM = new QNm("serialization-parameters", OUTPUTURI);
   /** Attribute: value. */
-  private static final QNm A_VALUE = new QNm(token("value"));
+  private static final QNm A_VALUE = new QNm("value");
 
   /** Function signature. */
   Function sig;

@@ -18,35 +18,36 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class MimeTypes {
-  /** Media type: text/xml. */
-  private static final String TEXT_XML = "text/xml";
-  /** Media type: text/html. */
-  public static final String TEXT_HTML = "text/html";
-  /** Media type: text/plain. */
-  public static final String TEXT_PLAIN = "text/plain";
-  /** Media type: text/comma-separated-values. */
-  public static final String TEXT_CSV = "text/comma-separated-values";
-  /** Media type: text/plain. */
-  public static final String APP_OCTET = "application/octet-stream";
-  /** Media type: application/xml. */
-  public static final String APP_XML = "application/xml";
-  /** Media type: application/xquery. */
-  public static final String APP_XQUERY = "application/xquery";
+  /** Media type: application/html+xml. */
+  public static final String APP_HTML_XML = "application/html+xml";
   /** Media type: application/json. */
   public static final String APP_JSON = "application/json";
   /** Media type: application/jsonml+json. */
   public static final String APP_JSONML = "application/jsonml+json";
+  /** Media type: text/plain. */
+  public static final String APP_OCTET = "application/octet-stream";
+  /** Media type: application/xml. */
+  public static final String APP_XML = "application/xml";
+  /** Media type: application/xml-external-parsed-entity. */
+  public static final String APP_EXT_XML = "application/xml-external-parsed-entity";
+  /** Media type: application/xquery. */
+  public static final String APP_XQUERY = "application/xquery";
 
-  /** XML media type. */
-  private static final String APPL_EXT_XML =
-      "application/xml-external-parsed-entity";
-  /** XML media type. */
-  private static final String TXT_EXT_XML =
-      "text/xml-external-parsed-entity";
+  /** Media type: text/comma-separated-values. */
+  public static final String TEXT_CSV = "text/comma-separated-values";
+  /** Media type: text/html. */
+  public static final String TEXT_HTML = "text/html";
+  /** Media type: text/plain. */
+  public static final String TEXT_PLAIN = "text/plain";
+  /** Media type: text/xml. */
+  public static final String TEXT_XML = "text/xml";
+
   /** XML media types' suffix. */
-  private static final String MIME_XML_SUFFIX = "+xml";
+  public static final String MIME_XML_SUFFIX = "+xml";
   /** Text media types' prefix. */
   public static final String MIME_TEXT_PREFIX = "text/";
+  /** XML media type. */
+  public static final String TEXT_XML_EXT = "text/xml-external-parsed-entity";
 
   /** Private constructor. */
   private MimeTypes() { }
@@ -72,7 +73,7 @@ public final class MimeTypes {
    * @return result
    */
   public static boolean isXML(final String type) {
-    return eq(type, TEXT_XML, TXT_EXT_XML, APP_XML, APPL_EXT_XML) ||
+    return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_EXT_XML) ||
         type.endsWith(MIME_XML_SUFFIX);
   }
 

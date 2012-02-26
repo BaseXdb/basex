@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
 import java.io.File;
 
@@ -43,7 +42,7 @@ public enum Variable {
    * @param val item value
    */
   Variable(final byte[] uri, final String name, final Value val) {
-    qname = new QNm(token(name), uri);
+    qname = new QNm(name, uri);
     value = val;
   }
 

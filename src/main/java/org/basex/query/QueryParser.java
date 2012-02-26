@@ -59,7 +59,7 @@ public class QueryParser extends InputParser {
     NodeType.ELM.string(), AtomType.EMP.string(), FuncType.ANY_FUN.string(),
     token(IF), AtomType.ITEM.string(),
     NodeType.NSP.string(), NodeType.NOD.string(), NodeType.PI.string(),
-    token(SCHEMAATTRIBUTE), token(SCHEMAELEMENT), token(SWITCH),
+    token(SCHEMA_ATTRIBUTE), token(SCHEMA_ELEMENT), token(SWITCH),
     NodeType.TXT.string(), token(TYPESWITCH)
   };
 
@@ -323,9 +323,9 @@ public class QueryParser extends InputParser {
           if(!defaultNamespaceDecl() && !defaultCollationDecl()
               && !emptyOrderDecl() && !(ctx.xquery3 && decimalFormatDecl(true)))
             error(DECLINCOMPLETE);
-        } else if(wsConsumeWs(BOUNDARY)) {
+        } else if(wsConsumeWs(BOUNDARY_SPACE)) {
           boundarySpaceDecl();
-        } else if(wsConsumeWs(BASEURI)) {
+        } else if(wsConsumeWs(BASE_URI)) {
           baseURIDecl();
         } else if(wsConsumeWs(CONSTRUCTION)) {
           constructionDecl();
@@ -333,13 +333,13 @@ public class QueryParser extends InputParser {
           orderingModeDecl();
         } else if(wsConsumeWs(REVALIDATION)) {
           revalidationDecl();
-        } else if(wsConsumeWs(COPYNS)) {
+        } else if(wsConsumeWs(COPY_NAMESPACES)) {
           copyNamespacesDecl();
-        } else if(ctx.xquery3 && wsConsumeWs(DECFORMAT)) {
+        } else if(ctx.xquery3 && wsConsumeWs(DECIMAL_FORMAT)) {
           decimalFormatDecl(false);
         } else if(wsConsumeWs(NSPACE)) {
           namespaceDecl();
-        } else if(wsConsumeWs(FTOPTION)) {
+        } else if(wsConsumeWs(FT_OPTION)) {
           final FTOpt fto = new FTOpt();
           while(ftMatchOption(fto));
           ctx.ftOpt().copy(fto);
@@ -575,10 +575,10 @@ public class QueryParser extends InputParser {
     if(declPres) error(DUPLCOPYNS);
     declPres = true;
     ctx.sc.nsPreserve = wsConsumeWs(PRESERVE);
-    if(!ctx.sc.nsPreserve) wsCheck(NOPRESERVE);
+    if(!ctx.sc.nsPreserve) wsCheck(NO_PRESERVE);
     wsCheck(COMMA);
     ctx.sc.nsInherit = wsConsumeWs(INHERIT);
-    if(!ctx.sc.nsInherit) wsCheck(NOINHERIT);
+    if(!ctx.sc.nsInherit) wsCheck(NO_INHERIT);
   }
 
   /**
@@ -588,7 +588,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private boolean decimalFormatDecl(final boolean def) throws QueryException {
-    if(def && !wsConsumeWs(DECFORMAT)) return false;
+    if(def && !wsConsumeWs(DECIMAL_FORMAT)) return false;
 
     // use empty name for default declaration
     final QNm name = def ? new QNm() : eQName(QNAMEINV, null);
@@ -2308,9 +2308,9 @@ public class QueryParser extends InputParser {
         } else {
           if(pr) {
             if(uri.length == 0) error(NSEMPTYURI);
-            if(eq(pref, XML) || eq(pref, XMLNS)) error(BINDXML, pref);
-            if(eq(XMLURI, uri)) error(BINDXMLURI, uri, XML);
-            if(eq(XMLNSURI, uri)) error(BINDXMLURI, uri, XMLNS);
+            if(eq(pref, XML, XMLNS)) error(BINDXML, pref);
+            if(eq(uri, XMLURI)) error(BINDXMLURI, uri, XML);
+            if(eq(uri, XMLNSURI)) error(BINDXMLURI, uri, XMLNS);
             ctx.sc.ns.add(pref, uri);
           } else {
             ctx.sc.nsElem = uri;

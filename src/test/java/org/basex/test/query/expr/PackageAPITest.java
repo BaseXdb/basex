@@ -81,8 +81,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /** Test for missing mandatory attributes. */
   @Test
   public void mandatoryAttr() {
-    error(new IOContent(token("<package "
-        + "xmlns:http='http://expath.org/ns/pkg' spec='1.0'/>")),
+    error(new IOContent("<package xmlns:http='http://expath.org/ns/pkg' spec='1.0'/>"),
         Err.PKGDESCINV, "Missing mandatory attribute not detected.");
   }
 

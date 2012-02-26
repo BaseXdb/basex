@@ -1,5 +1,6 @@
 package org.basex.query.util.http;
 
+import static org.basex.query.util.http.HTTPText.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
@@ -36,45 +37,12 @@ import org.basex.util.list.ByteList;
 
 /**
  * HTTP response handler. Reads HTTP response and constructs the
- * <http:response/> element.
+ * {@code <http:response/>} element.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public final class ResponseHandler {
-  /** Response element. */
-  /** http:response element. */
-  private static final byte[] HTTP_RESPONSE = token("http:response");
-  /** http:multipart element. */
-  private static final byte[] HTTP_MULTIPART = token("http:multipart");
-  /** part element. */
-  private static final byte[] PART = token("part");
-  /** boundary marker. */
-  private static final byte[] BOUNDARY = token("boundary");
-
-  /** Header element. */
-  /** http:header element. */
-  private static final byte[] HTTP_HEADER = token("http:header");
-  /** Header attribute: name. */
-  private static final byte[] HDR_NAME = token("name");
-  /** Header attribute: value. */
-  private static final byte[] HDR_VALUE = token("value");
-
-  /** Body element. */
-  /** http:body element. */
-  private static final byte[] HTTP_BODY = token("http:body");
-  /** Body attribute: media-type. */
-  private static final byte[] MEDIATYPE = token("media-type");
-
-  /** Response attribute: status. */
-  private static final byte[] STATUS = token("status");
-  /** Response attribute: message. */
-  private static final byte[] MSG = token("message");
-
-  /** HTTP header Content-Type lower case. */
-  private static final byte[] CONT_TYPE_LC = token("content-type");
-  /** Multipart string. */
-  private static final String MULTIPART = "multipart";
-
+public final class HTTPResponse {
   /** Input information. */
   private final InputInfo input;
   /** Database properties. */
@@ -85,7 +53,7 @@ public final class ResponseHandler {
    * @param ii input info
    * @param pr database properties
    */
-  public ResponseHandler(final InputInfo ii, final Prop pr) {
+  public HTTPResponse(final InputInfo ii, final Prop pr) {
     input = ii;
     prop = pr;
   }
@@ -116,9 +84,9 @@ public final class ResponseHandler {
     if(cType.startsWith(MULTIPART)) {
       final byte[] boundary = extractBoundary(conn.getContentType());
       final NodeCache a = new NodeCache();
-      a.add(new FAttr(new QNm(MEDIATYPE, EMPTY), token(cType)));
-      a.add(new FAttr(new QNm(BOUNDARY, EMPTY), boundary));
-      body = new FElem(new QNm(HTTP_MULTIPART, HTTPURI), extractParts(
+      a.add(new FAttr(Q_MEDIA_TYPE, token(cType)));
+      a.add(new FAttr(Q_BOUNDARY, boundary));
+      body = new FElem(HTTP_MULTIPART, extractParts(
           conn.getInputStream(), s, payloads, concat(token("--"), boundary)),
           a, new Atts(HTTP, HTTPURI));
       // single part response
@@ -130,7 +98,7 @@ public final class ResponseHandler {
     }
 
     // construct <http:response/>
-    final FElem responseEl = new FElem(new QNm(HTTP_RESPONSE, HTTPURI),
+    final FElem responseEl = new FElem(HTTP_RESPONSE,
         hdrs, attrs, new Atts(HTTP, HTTPURI));
     responseEl.add(body);
     // result
@@ -151,7 +119,7 @@ public final class ResponseHandler {
       throws IOException {
     final NodeCache a = new NodeCache();
     a.add(new FAttr(new QNm(STATUS, EMPTY), token(conn.getResponseCode())));
-    a.add(new FAttr(new QNm(MSG, EMPTY), token(conn.getResponseMessage())));
+    a.add(new FAttr(new QNm(MESSAGE, EMPTY), token(conn.getResponseMessage())));
     return a;
   }
 
@@ -166,11 +134,9 @@ public final class ResponseHandler {
     final NodeCache h = new NodeCache();
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
-        final FElem hdr = new FElem(new QNm(HTTP_HEADER, HTTPURI),
-            new Atts(HTTP, HTTPURI));
-        hdr.add(new FAttr(new QNm(HDR_NAME, EMPTY), token(headerName)));
-        hdr.add(new FAttr(new QNm(HDR_VALUE, EMPTY),
-            token(conn.getHeaderField(headerName))));
+        final FElem hdr = new FElem(HTTP_HEADER, new Atts(HTTP, HTTPURI));
+        hdr.add(new FAttr(Q_NAME, token(headerName)));
+        hdr.add(new FAttr(Q_VALUE, token(conn.getHeaderField(headerName))));
         h.add(hdr);
       }
     }
@@ -183,9 +149,8 @@ public final class ResponseHandler {
    * @return body
    */
   private static FElem createBody(final String mediaType) {
-    final FElem b = new FElem(new QNm(HTTP_BODY, HTTPURI),
-        new Atts(HTTP, HTTPURI));
-    b.add(new FAttr(new QNm(MEDIATYPE, EMPTY), token(mediaType)));
+    final FElem b = new FElem(HTTP_BODY, new Atts(HTTP, HTTPURI));
+    b.add(new FAttr(Q_MEDIA_TYPE, token(mediaType)));
     return b;
   }
 
@@ -296,7 +261,7 @@ public final class ResponseHandler {
     // last line is reached:
     if(firstLine == null || eq(firstLine, end)) return null;
 
-    final FElem root = new FElem(new QNm(PART, EMPTY), new Atts(HTTP, HTTPURI));
+    final FElem root = new FElem(Q_PART, new Atts(HTTP, HTTPURI));
 
     //final NodeCache partCh = new NodeCache();
     if(firstLine.length == 0) {
@@ -308,7 +273,7 @@ public final class ResponseHandler {
       byte[] nextHdr = firstLine;
       while(nextHdr != null && nextHdr.length > 0) {
         // extract charset from header 'Content-Type'
-        if(startsWith(lc(nextHdr), CONT_TYPE_LC))
+        if(startsWith(lc(nextHdr), CONTENT_TYPE_LC))
           charset = extractCharset(string(nextHdr));
         // parse header:
         final int pos = indexOf(nextHdr, ':');
@@ -320,11 +285,11 @@ public final class ResponseHandler {
             final byte[] value = trim(substring(nextHdr, pos + 1,
                 nextHdr.length));
             // construct attributes
-            final FElem hdr = new FElem(new QNm(HTTP_HEADER, HTTPURI));
-            hdr.add(new FAttr(new QNm(HDR_NAME, EMPTY), name));
-            hdr.add(new FAttr(new QNm(HDR_VALUE, EMPTY), value));
+            final FElem hdr = new FElem(HTTP_HEADER);
+            hdr.add(new FAttr(Q_NAME, name));
+            hdr.add(new FAttr(Q_VALUE, value));
             root.add(hdr);
-            if(eq(lc(name), CONT_TYPE_LC)) partCType = string(value);
+            if(eq(lc(name), CONTENT_TYPE_LC)) partCType = string(value);
           }
         }
         nextHdr = readLine(io);

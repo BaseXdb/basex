@@ -30,19 +30,19 @@ import org.basex.util.list.*;
  */
 public final class FNZip extends StandardFunc {
   /** Element: zip:file. */
-  private static final QNm E_FILE = new QNm(token("zip:file"), ZIPURI);
+  private static final QNm E_FILE = new QNm("zip:file", ZIPURI);
   /** Element: zip:dir. */
-  private static final QNm E_DIR = new QNm(token("zip:dir"), ZIPURI);
+  private static final QNm E_DIR = new QNm("zip:dir", ZIPURI);
   /** Element: zip:entry. */
-  private static final QNm E_ENTRY = new QNm(token("zip:entry"), ZIPURI);
+  private static final QNm E_ENTRY = new QNm("zip:entry", ZIPURI);
   /** Attribute: href. */
-  private static final QNm A_HREF = new QNm(token("href"));
+  private static final QNm A_HREF = new QNm("href");
   /** Attribute: name. */
-  private static final QNm A_NAME = new QNm(token("name"));
+  private static final QNm A_NAME = new QNm("name");
   /** Attribute: src. */
-  private static final QNm A_SRC = new QNm(token("src"));
+  private static final QNm A_SRC = new QNm("src");
   /** Attribute: src. */
-  private static final QNm A_METHOD = new QNm(token("method"));
+  private static final QNm A_METHOD = new QNm("method");
   /** Method "base64". */
   private static final String M_BASE64 = "base64";
   /** Method "hex". */

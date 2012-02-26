@@ -163,7 +163,7 @@ public enum Err {
   /** FOHC003: Evaluation exception. */
   SRCATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
   /** FOHC0004: Evaluation exception. */
-  REQINV(FOHC, 4, "The request element is invalid: %."),
+  REQINV(FOHC, 4, "Invalid request element: %."),
   /** FOHC005: Evaluation exception. */
   NOURL(FOHC, 5, "No URL specified."),
   /** FOHC006: Evaluation exception. */
