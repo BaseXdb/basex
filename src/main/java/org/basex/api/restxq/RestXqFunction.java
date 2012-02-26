@@ -95,7 +95,7 @@ final class RestXqFunction {
     if(!mth.isEmpty()) methods = mth;
 
     if(found) {
-      if(path == null) error(PATH_UNDEFINED, PATH);
+      if(path == null) error(ANN_MISSING, PATH);
       for(final Var v : function.args) {
         if(!v.declared) error(VAR_UNDEFINED, v.name.string());
       }
@@ -131,8 +131,10 @@ final class RestXqFunction {
   private boolean consumes(final HTTPContext http) {
     // return true if no type is given
     if(consumes.isEmpty()) return true;
-
+    // return true if no content type is specified by the user
     final String cons = http.req.getContentType();
+    if(cons == null) return true;
+
     for(int c = 0; c < consumes.size(); c++) {
       if(MimeTypes.matches(consumes.get(c), cons)) return true;
     }

@@ -7,6 +7,7 @@ import java.io.*;
 import javax.servlet.http.*;
 
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -95,10 +96,10 @@ public final class HTTPSession {
   private static String[] login(final HttpServletRequest req)
       throws LoginException {
 
-    final String auth = req.getHeader(AUTHORIZATION);
+    final String auth = req.getHeader(DataText.AUTHORIZATION);
     if(auth != null) {
       final String[] values = auth.split(" ");
-      if(values[0].equals(BASIC)) {
+      if(values[0].equals(DataText.BASIC)) {
         final String[] cred = Base64.decode(values[1]).split(":", 2);
         if(cred.length != 2) throw new LoginException(NOPASSWD);
         return cred;

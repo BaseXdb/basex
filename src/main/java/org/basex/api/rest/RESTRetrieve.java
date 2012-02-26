@@ -39,58 +39,58 @@ final class RESTRetrieve extends RESTQuery {
   }
 
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws HTTPException, IOException {
     // open addressed database
-    open(ctx);
+    open(http);
 
-    final Session session = ctx.session;
-    if(ctx.depth() == 0) {
+    final Session session = http.session;
+    if(http.depth() == 0) {
       // list databases
       final Table table = new Table(session.execute(new List()));
-      final SerializerProp sprop = new SerializerProp(ctx.serialization);
-      final Serializer ser = Serializer.get(ctx.out, sprop);
-      ctx.initResponse(sprop);
+      final SerializerProp sprop = new SerializerProp(http.serialization);
+      final Serializer ser = Serializer.get(http.out, sprop);
+      http.initResponse(sprop);
       ser.openElement(DATABASES, RESOURCES, token(table.contents.size()));
       ser.namespace(REST, RESTURI);
       list(table, ser, DATABASE, 1);
       ser.closeElement();
       ser.close();
-    } else if(!exists(ctx)) {
+    } else if(!exists(http)) {
       // list database resources
-      final Table table = new Table(session.execute(new ListDB(ctx.path())));
+      final Table table = new Table(session.execute(new ListDB(http.path())));
       if(table.contents.isEmpty()) throw new HTTPException(SC_NOT_FOUND, ERR_NORES);
 
-      final String serial = ctx.serialization;
+      final String serial = http.serialization;
       final SerializerProp sprop = new SerializerProp(serial);
-      final Serializer ser = Serializer.get(ctx.out, sprop);
-      ctx.initResponse(sprop);
+      final Serializer ser = Serializer.get(http.out, sprop);
+      http.initResponse(sprop);
 
-      ser.openElement(DATABASE, DataText.T_NAME, token(ctx.db()),
+      ser.openElement(DATABASE, DataText.T_NAME, token(http.db()),
         RESOURCES, token(table.contents.size()));
       ser.namespace(REST, RESTURI);
       list(table, ser, RESOURCE, 0);
       ser.closeElement();
       ser.close();
-    } else if(isRaw(ctx)) {
-      final String type = contentType(ctx);
+    } else if(isRaw(http)) {
+      final String type = contentType(http);
       if(type.equals(MimeTypes.APP_XQUERY)) {
         // execute raw file as query
         final ArrayOutput ao = new ArrayOutput();
         session.setOutputStream(ao);
-        session.execute(new Retrieve(ctx.dbpath()));
-        query(ao.toString(), ctx);
+        session.execute(new Retrieve(http.dbpath()));
+        query(ao.toString(), http);
       } else {
         // retrieve raw file; prefix user parameters with media type
         final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + type;
-        ctx.initResponse(new SerializerProp(ct + ',' + ctx.serialization));
-        session.setOutputStream(ctx.out);
-        session.execute(new Retrieve(ctx.dbpath()));
+        http.initResponse(new SerializerProp(ct + ',' + http.serialization));
+        session.setOutputStream(http.out);
+        session.execute(new Retrieve(http.dbpath()));
       }
     } else {
       // retrieve xml file
-      ctx.initResponse(new SerializerProp(ctx.serialization));
-      session.execute(new Set(Prop.SERIALIZER, serial(ctx)));
-      session.setOutputStream(ctx.out);
+      http.initResponse(new SerializerProp(http.serialization));
+      session.execute(new Set(Prop.SERIALIZER, serial(http)));
+      session.setOutputStream(http.out);
       session.query(".").execute();
     }
   }

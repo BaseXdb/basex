@@ -19,17 +19,17 @@ import org.basex.server.*;
  */
 public class RESTPut extends RESTCode {
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws HTTPException, IOException {
     // parse database options
-    parseOptions(ctx);
+    parseOptions(http);
 
     // create new database or update resource
-    final Session session = ctx.session;
-    if(ctx.depth() == 0) throw new HTTPException(SC_NOT_FOUND, ERR_NOPATH);
+    final Session session = http.session;
+    if(http.depth() == 0) throw new HTTPException(SC_NOT_FOUND, ERR_NOPATH);
 
     boolean xml = true;
-    final InputStream in = ctx.in;
-    final String ct = ctx.req.getContentType();
+    final InputStream in = http.in;
+    final String ct = http.req.getContentType();
     // choose correct importer
     if(APP_JSON.equals(ct)) {
       session.execute("set parser json");
@@ -46,22 +46,22 @@ public class RESTPut extends RESTCode {
       xml = false;
     }
 
-    if(ctx.depth() == 1) {
+    if(http.depth() == 1) {
       // store data as XML or raw file, depending on content type
       if(xml) {
-        session.create(ctx.db(), in);
+        session.create(http.db(), in);
       } else {
-        session.create(ctx.db(), new ArrayInput(""));
-        session.store(ctx.db(), in);
+        session.create(http.db(), new ArrayInput(""));
+        session.store(http.db(), in);
       }
     } else {
-      open(ctx);
+      open(http);
       // store data as XML or raw file, depending on content type
       if(xml) {
-        session.replace(ctx.dbpath(), in);
+        session.replace(http.dbpath(), in);
       } else {
-        session.execute(new Delete(ctx.dbpath()));
-        session.store(ctx.dbpath(), in);
+        session.execute(new Delete(http.dbpath()));
+        session.store(http.dbpath(), in);
       }
     }
 

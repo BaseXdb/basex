@@ -18,21 +18,21 @@ import org.basex.server.*;
  */
 public class RESTDelete extends RESTCode {
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws HTTPException, IOException {
     // parse database options
-    parseOptions(ctx);
+    parseOptions(http);
     // open addressed database
-    open(ctx);
+    open(http);
 
-    final Session session = ctx.session;
-    if(ctx.depth() == 0) {
+    final Session session = http.session;
+    if(http.depth() == 0) {
       throw new HTTPException(SC_NOT_FOUND, ERR_NOPATH);
-    } else if(ctx.depth() == 1) {
-      session.execute(new DropDB(ctx.db()));
+    } else if(http.depth() == 1) {
+      session.execute(new DropDB(http.db()));
     } else {
-      session.execute(new Delete(ctx.dbpath()));
+      session.execute(new Delete(http.dbpath()));
     }
     // return command info
-    ctx.out.write(token(session.info()));
+    http.out.write(token(session.info()));
   }
 }

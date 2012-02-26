@@ -16,21 +16,13 @@ public interface HTTPText {
   String DBUSER = "org.basex.user";
   /** Configuration: database user password. */
   String DBPASS = "org.basex.password";
-  /** Configuration: operation mode:
-      "local", "client", or default ({@code null}). */
+  /** Configuration: operation mode: "local", "client", or default ({@code null}). */
   String DBMODE = "org.basex.mode";
 
   /** Mode: local. */
   String LOCAL = "local";
   /** Mode: client. */
   String CLIENT = "client";
-
-  /** Authorization string. */
-  String AUTHORIZATION = "Authorization";
-  /** WWW-Authentication string. */
-  String WWW_AUTHENTICATE = "WWW-Authenticate";
-  /** Basic string. */
-  String BASIC = "Basic";
 
   /** Error: no password. */
   String NOPASSWD = "No username/password specified.";

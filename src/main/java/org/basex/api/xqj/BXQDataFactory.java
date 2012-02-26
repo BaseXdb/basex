@@ -27,7 +27,6 @@ import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.ItemCache;
-import org.basex.util.Token;
 import org.basex.util.Util;
 import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -189,7 +188,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       final XQItemType it) throws XQException {
     valid(v, String.class);
     check(NodeType.DOC, it);
-    return new BXQItem(createNode(new IOContent(Token.token(v))));
+    return new BXQItem(createNode(new IOContent(v)));
   }
 
   @Override

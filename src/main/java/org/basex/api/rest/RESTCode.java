@@ -25,21 +25,21 @@ import org.basex.util.*;
 abstract class RESTCode {
   /**
    * Performs the REST operation.
-   * @param ctx rest context
+   * @param http HTTP context
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  abstract void run(final HTTPContext ctx) throws HTTPException, IOException;
+  abstract void run(final HTTPContext http) throws HTTPException, IOException;
 
   /**
    * Opens the addressed database.
-   * @param ctx rest context
+   * @param http HTTP context
    * @throws HTTPException REST exception
    */
-  static void open(final HTTPContext ctx) throws HTTPException {
-    if(ctx.db() == null) return;
+  static void open(final HTTPContext http) throws HTTPException {
+    if(http.db() == null) return;
     try {
-      ctx.session.execute(new Open(ctx.path()));
+      http.session.execute(new Open(http.path()));
     } catch(final IOException ex) {
       throw new HTTPException(SC_NOT_FOUND, ex.getMessage());
     }
@@ -48,14 +48,14 @@ abstract class RESTCode {
   /**
    * Sets the wrapping flag.
    * @param val value
-   * @param ctx rest context
+   * @param http HTTP context
    * @throws HTTPException REST exception
    */
-  static void wrap(final String val, final HTTPContext ctx)
+  static void wrap(final String val, final HTTPContext http)
       throws HTTPException {
 
-    ctx.wrapping = Util.yes(val);
-    if(!ctx.wrapping && !Util.no(val)) {
+    http.wrapping = Util.yes(val);
+    if(!http.wrapping && !Util.no(val)) {
       try {
         SerializerProp.error(WRAP, val, Text.YES, Text.NO);
       } catch(final SerializerException ex) {
@@ -66,53 +66,53 @@ abstract class RESTCode {
 
   /**
    * Checks if any resource with the specified name exists.
-   * @param ctx REST context
+   * @param http HTTP context
    * @return number of documents
    * @throws IOException I/O exception
    */
-  protected static boolean exists(final HTTPContext ctx) throws IOException {
-    final Query q = ctx.session.query(_DB_EXISTS.args("$d", "$p"));
-    q.bind("d", ctx.db());
-    q.bind("p", ctx.dbpath());
+  protected static boolean exists(final HTTPContext http) throws IOException {
+    final Query q = http.session.query(_DB_EXISTS.args("$d", "$p"));
+    q.bind("d", http.db());
+    q.bind("p", http.dbpath());
     return q.execute().equals(Text.TRUE);
   }
 
   /**
    * Checks if the specified path points to a binary resource.
-   * @param ctx REST context
+   * @param http HTTP context
    * @return result of check
    * @throws IOException I/O exception
    */
-  protected static boolean isRaw(final HTTPContext ctx) throws IOException {
-    final Query q = ctx.session.query(_DB_IS_RAW.args("$d", "$p"));
-    q.bind("d", ctx.db());
-    q.bind("p", ctx.dbpath());
+  protected static boolean isRaw(final HTTPContext http) throws IOException {
+    final Query q = http.session.query(_DB_IS_RAW.args("$d", "$p"));
+    q.bind("d", http.db());
+    q.bind("p", http.dbpath());
     return q.execute().equals(Text.TRUE);
   }
 
   /**
    * Returns the content type of a database resource.
-   * @param ctx REST context
+   * @param http HTTP context
    * @return content type
    * @throws IOException I/O exception
    */
-  protected static String contentType(final HTTPContext ctx)
+  protected static String contentType(final HTTPContext http)
       throws IOException {
 
-    final Query q = ctx.session.query(_DB_CONTENT_TYPE.args("$d", "$p"));
-    q.bind("d", ctx.db());
-    q.bind("p", ctx.dbpath());
+    final Query q = http.session.query(_DB_CONTENT_TYPE.args("$d", "$p"));
+    q.bind("d", http.db());
+    q.bind("p", http.dbpath());
     return q.execute();
   }
 
   /**
    * Returns all query parameters.
-   * @param ctx rest context
+   * @param http HTTP context
    * @return parameters
    */
-  static Map<String, String[]> params(final HTTPContext ctx) {
+  static Map<String, String[]> params(final HTTPContext http) {
     final Map<String, String[]> params = new HashMap<String, String[]>();
-    final Map<?, ?> map = ctx.req.getParameterMap();
+    final Map<?, ?> map = http.req.getParameterMap();
     for(final Entry<?, ?> s : map.entrySet()) {
       final String key = s.getKey().toString();
       final String[] vals = s.getValue() instanceof String[] ?
@@ -125,15 +125,15 @@ abstract class RESTCode {
   /**
    * Parses and sets database options.
    * Throws an exception if an option is unknown.
-   * @param ctx rest context
+   * @param http HTTP context
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  static void parseOptions(final HTTPContext ctx)
+  static void parseOptions(final HTTPContext http)
       throws HTTPException, IOException {
 
-    for(final Entry<String, String[]> param : params(ctx).entrySet()) {
-     if(!parseOption(ctx, param)) {
+    for(final Entry<String, String[]> param : params(http).entrySet()) {
+     if(!parseOption(http, param)) {
        throw new HTTPException(SC_BAD_REQUEST, ERR_PARAM, param.getKey());
      }
     }
@@ -141,17 +141,17 @@ abstract class RESTCode {
 
   /**
    * Parses and sets a single database option.
-   * @param ctx rest context
+   * @param http HTTP context
    * @param param current parameter
    * @return success flag
    * @throws IOException I/O exception
    */
-  static boolean parseOption(final HTTPContext ctx,
+  static boolean parseOption(final HTTPContext http,
       final Entry<String, String[]> param) throws IOException {
 
     final String key = param.getKey().toUpperCase(Locale.ENGLISH);
     final boolean found = HTTPSession.context().prop.get(key) != null;
-    if(found) ctx.session.execute(new Set(key, param.getValue()[0]));
+    if(found) http.session.execute(new Set(key, param.getValue()[0]));
     return found;
   }
 }

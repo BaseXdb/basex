@@ -58,8 +58,7 @@ final class RestXqModule {
   }
 
   /**
-   * Checks if the file has been modified.
-   * If yes, updates the timestamp.
+   * Checks if the timestamp is still up-to-date.
    * @return result of check
    */
   boolean uptodate() {
@@ -68,7 +67,6 @@ final class RestXqModule {
 
   /**
    * Updates the timestamp.
-   * If yes, updates the timestamp.
    */
   void touch() {
     time = file.timeStamp();
@@ -80,8 +78,8 @@ final class RestXqModule {
    * @return instance
    */
   RestXqFunction find(final HTTPContext http) {
-    for(final RestXqFunction f : functions) {
-      if(f.matches(http)) return f;
+    for(final RestXqFunction rxf : functions) {
+      if(rxf.matches(http)) return rxf;
     }
     return null;
   }
@@ -124,7 +122,7 @@ final class RestXqModule {
       return qc;
     } catch(final IOException ex) {
       // Unexpected: XQuery module could not be opened
-      throw new RuntimeException(ex.getMessage());
+      throw new RuntimeException(Util.message(ex));
     }
   }
 

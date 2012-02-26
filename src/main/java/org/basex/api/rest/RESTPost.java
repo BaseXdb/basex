@@ -50,14 +50,14 @@ public class RESTPost extends RESTCode {
   }
 
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
-    parseOptions(ctx);
+  void run(final HTTPContext http) throws HTTPException, IOException {
+    parseOptions(http);
 
-    String enc = ctx.req.getCharacterEncoding();
+    String enc = http.req.getCharacterEncoding();
     if(enc == null) enc = Token.UTF8;
 
     // perform queries
-    final byte[] in = new NewlineInput(ctx.in, enc).content();
+    final byte[] in = new NewlineInput(http.in, enc).content();
     validate(in);
 
     final Context context = HTTPSession.context();
@@ -84,12 +84,12 @@ public class RESTPost extends RESTCode {
         if(sp.get(name) != null) {
           ser.add(name).add('=').add(value).add(',');
         } else if(name.equals(WRAP)) {
-          wrap(value, ctx);
+          wrap(value, http);
         } else {
           throw new HTTPException(SC_BAD_REQUEST, ERR_PARAM, name);
         }
       }
-      ctx.serialization = ser.toString();
+      http.serialization = ser.toString();
 
       // handle database options
       qp = new QueryProcessor("*/*:option", doc, context);
@@ -97,7 +97,7 @@ public class RESTPost extends RESTCode {
       for(Item opt; (opt = ir.next()) != null;) {
         final String name = value("data(@name)", opt, context);
         final String value = value("data(@value)", opt, context);
-        ctx.session.execute(new Set(name, value));
+        http.session.execute(new Set(name, value));
       }
 
       // handle variables
@@ -134,7 +134,7 @@ public class RESTPost extends RESTCode {
       } else {
         code = new RESTQuery(text, vars, item);
       }
-      code.run(ctx);
+      code.run(http);
     } catch(final QueryException ex) {
       throw new HTTPException(SC_BAD_REQUEST, ex.getLocalizedMessage());
     }

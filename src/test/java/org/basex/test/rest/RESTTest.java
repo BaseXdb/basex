@@ -1,35 +1,21 @@
 package org.basex.test.rest;
 
-import static org.basex.api.HTTPText.*;
 import static org.basex.core.Text.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.*;
+import java.net.*;
 
-import org.basex.api.BaseXHTTP;
-import org.basex.api.rest.RESTText;
+import org.basex.api.rest.*;
 import org.basex.core.*;
-import org.basex.data.DataText;
-import org.basex.io.in.ArrayInput;
-import org.basex.io.in.BufferInput;
-import org.basex.io.out.ArrayOutput;
-import org.basex.util.Base64;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.data.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the embedded REST implementation.
@@ -37,9 +23,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class RESTTest {
-  /** Test database. */
-  private static final String DB = Util.name(RESTTest.class);
+public class RESTTest extends HTTPTest {
   /** REST identifier. */
   private static final String NAME = "rest";
   /** REST URI. */
@@ -52,8 +36,6 @@ public class RESTTest {
       "http://" + LOCALHOST + ":9998/" + NAME + '/';
   /** Input file. */
   private static final String FILE = "src/test/resources/input.xml";
-  /** Start servers. */
-  private static BaseXHTTP http;
 
   // INITIALIZERS =============================================================
 
@@ -64,28 +46,6 @@ public class RESTTest {
   @BeforeClass
   public static void start() throws Exception {
     init(true);
-  }
-
-  /**
-   * Initializes the test.
-   * @param local local flag
-   * @throws Exception exception
-   */
-  protected static void init(final boolean local) throws Exception {
-    final StringList sl = new StringList();
-    if(local) sl.add("-l");
-    sl.add(new String[] {"-p9996", "-e9997", "-h9998", "-s9999", "-z",
-        "-U" + ADMIN, "-P" + ADMIN });
-    http = new BaseXHTTP(sl.toArray());
-  }
-
-  /**
-   * Finish test.
-   * @throws Exception exception
-   */
-  @AfterClass
-  public static void stop() throws Exception {
-    http.stop();
   }
 
   // TEST METHODS =============================================================
@@ -516,7 +476,8 @@ public class RESTTest {
     // create connection
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
-      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
+      final BufferInput bi = new BufferInput(conn.getInputStream());
+      return read(bi).replaceAll("\r?\n *", "");
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {
@@ -561,7 +522,7 @@ public class RESTTest {
     conn.setRequestProperty(DataText.CONTENT_TYPE, APP_XML);
     // basic authentication example
     final String encoded = Base64.encode(ADMIN + ':' + ADMIN);
-    conn.setRequestProperty(AUTHORIZATION, BASIC + ' ' + encoded);
+    conn.setRequestProperty(DataText.AUTHORIZATION, DataText.BASIC + ' ' + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
     out.write(token(query));

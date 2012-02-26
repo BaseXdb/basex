@@ -45,36 +45,36 @@ class RESTQuery extends RESTCode {
   }
 
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
-    query(input, ctx);
+  void run(final HTTPContext http) throws HTTPException, IOException {
+    query(input, http);
   }
 
   /**
    * Evaluates the specified query.
    * @param in query input
-   * @param ctx REST context
+   * @param http HTTP context
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  protected void query(final String in, final HTTPContext ctx)
+  protected void query(final String in, final HTTPContext http)
       throws HTTPException, IOException {
 
     if(item != null) {
       // create main memory instance of the document specified as context node
-      final boolean mm = ctx.session.execute(
+      final boolean mm = http.session.execute(
           new Get(Prop.MAINMEM)).split(COLS)[1].equals(TRUE);
-      ctx.session.execute(new Set(Prop.MAINMEM, true));
-      ctx.session.create(Util.name(RESTQuery.class), new ArrayInput(item));
-      if(!mm) ctx.session.execute(new Set(Prop.MAINMEM, false));
+      http.session.execute(new Set(Prop.MAINMEM, true));
+      http.session.create(Util.name(RESTQuery.class), new ArrayInput(item));
+      if(!mm) http.session.execute(new Set(Prop.MAINMEM, false));
     } else {
       // open addressed database
-      open(ctx);
+      open(http);
     }
 
     // send serialization options to the server
-    final Session session = ctx.session;
-    session.execute(new Set(Prop.SERIALIZER, serial(ctx)));
-    session.setOutputStream(ctx.out);
+    final Session session = http.session;
+    session.execute(new Set(Prop.SERIALIZER, serial(http)));
+    session.setOutputStream(http.out);
 
     // set query path to http path
     final Context context = HTTPSession.context();
@@ -91,7 +91,7 @@ class RESTQuery extends RESTCode {
         if(val.length == 1) qu.bind(e.getKey(), val[0]);
       }
       // initializes the response with query serialization options
-      ctx.initResponse(new SerializerProp(qu.options()));
+      http.initResponse(new SerializerProp(qu.options()));
       // run query
       qu.execute();
     } catch(final IOException ex) {
@@ -103,13 +103,13 @@ class RESTQuery extends RESTCode {
   }
 
   /**
-   * Returns the serialization options.
-   * @param ctx REST context
-   * @return serialization options
+   * Returns a string representation of the used serialization parameters.
+   * @param http HTTP context
+   * @return serialization parameters
    */
-  static String serial(final HTTPContext ctx) {
-    final TokenBuilder ser = new TokenBuilder(ctx.serialization);
-    if(ctx.wrapping) {
+  static String serial(final HTTPContext http) {
+    final TokenBuilder ser = new TokenBuilder(http.serialization);
+    if(http.wrapping) {
       if(!ser.isEmpty()) ser.add(',');
       ser.addExt(SerializerProp.S_WRAP_PREFIX[0]).add('=').add(REST).add(',');
       ser.addExt(SerializerProp.S_WRAP_URI[0]).add('=').add(RESTURI);

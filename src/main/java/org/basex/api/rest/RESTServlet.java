@@ -50,24 +50,24 @@ public final class RESTServlet extends HttpServlet {
   private static void run(final RESTCode code, final HttpServletRequest req,
       final HttpServletResponse res) throws IOException {
 
-    final HTTPContext ctx = new HTTPContext(req, res);
+    final HTTPContext http = new HTTPContext(req, res);
     try {
-      ctx.session = new HTTPSession(req).login();
+      http.session = new HTTPSession(req).login();
     } catch(final LoginException ex) {
-      ctx.status(SC_UNAUTHORIZED, ex.getMessage());
+      http.status(SC_UNAUTHORIZED, ex.getMessage());
       return;
     }
 
     try {
-      code.run(ctx);
-      ctx.status(SC_OK, null);
+      code.run(http);
+      http.status(SC_OK, null);
     } catch(final HTTPException ex) {
-      ctx.status(ex.getStatus(), ex.getMessage());
+      http.status(ex.getStatus(), ex.getMessage());
     } catch(final IOException ex) {
-      ctx.status(SC_BAD_REQUEST, Util.message(ex));
+      http.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));
-      ctx.status(SC_INTERNAL_SERVER_ERROR, ex.toString());
+      http.status(SC_INTERNAL_SERVER_ERROR, ex.toString());
     }
   }
 }

@@ -111,7 +111,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   public void bindDocument(final QName qn, final String v, final String base,
       final XQItemType t) throws XQException {
     valid(v, String.class);
-    bind(qn, createNode(new IOContent(Token.token(v))), t);
+    bind(qn, createNode(new IOContent(v)), t);
   }
 
   @Override

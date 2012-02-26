@@ -19,7 +19,7 @@ import org.basex.util.*;
  */
 final class RESTGet extends RESTCode {
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws HTTPException, IOException {
     final Map<String, String[]> vars = new HashMap<String, String[]>();
 
     // handle query parameters
@@ -28,7 +28,7 @@ final class RESTGet extends RESTCode {
     byte[] item = null;
 
     // parse database options
-    final Map<String, String[]> params = params(ctx);
+    final Map<String, String[]> params = params(http);
     final TokenBuilder ser = new TokenBuilder();
     final SerializerProp sp = new SerializerProp();
     for(final Entry<String, String[]> param : params.entrySet()) {
@@ -43,19 +43,19 @@ final class RESTGet extends RESTCode {
         input = val;
       } else if(key.equalsIgnoreCase(WRAP)) {
         // wrapping flag
-        wrap(val, ctx);
+        wrap(val, http);
       } else if(key.equalsIgnoreCase(CONTEXT)) {
         // context parameter
         item = Token.token(val);
       } else if(sp.get(key) != null) {
         // serialization parameters
         for(final String v : vals) ser.add(key).add('=').add(v).add(',');
-      } else if(!parseOption(ctx, param)) {
+      } else if(!parseOption(http, param)) {
         // external variables
         vars.put(key, new String[] { val });
       }
     }
-    ctx.serialization = ser.toString();
+    http.serialization = ser.toString();
 
     final RESTCode code;
     if(operation == null) {
@@ -67,6 +67,6 @@ final class RESTGet extends RESTCode {
     } else {
       code = new RESTCommand(input);
     }
-    code.run(ctx);
+    code.run(http);
   }
 }

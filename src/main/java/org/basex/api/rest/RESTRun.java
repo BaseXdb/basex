@@ -31,7 +31,7 @@ public class RESTRun extends RESTQuery {
   }
 
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws HTTPException, IOException {
     // get root directory for files
     final Context context = HTTPSession.context();
     final String path = context.mprop.get(MainProp.HTTPPATH);
@@ -43,9 +43,9 @@ public class RESTRun extends RESTQuery {
         throw new HTTPException(SC_NOT_FOUND, Util.info(FILE_NOT_FOUND_X, input));
 
     // set query path
-    ctx.session.execute(new Set(Prop.QUERYPATH, io.path()));
+    http.session.execute(new Set(Prop.QUERYPATH, io.path()));
 
     // perform query
-    query(string(io.read()), ctx);
+    query(string(io.read()), http);
   }
 }

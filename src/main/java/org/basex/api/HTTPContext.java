@@ -1,7 +1,6 @@
 package org.basex.api;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.api.HTTPText.*;
 import static org.basex.data.DataText.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
@@ -10,6 +9,7 @@ import java.io.*;
 
 import javax.servlet.http.*;
 
+import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -157,7 +157,7 @@ public final class HTTPContext {
   public void status(final int code, final String message) throws IOException {
     if(session != null) session.close();
     res.setStatus(code);
-    if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
+    if(code == SC_UNAUTHORIZED) res.setHeader(DataText.WWW_AUTHENTICATE, DataText.BASIC);
     if(message != null) out.write(token(message));
   }
 

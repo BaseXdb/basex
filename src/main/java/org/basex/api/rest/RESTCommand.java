@@ -26,17 +26,17 @@ public class RESTCommand extends RESTCode {
   }
 
   @Override
-  void run(final HTTPContext ctx) throws HTTPException, IOException {
+  void run(final HTTPContext http) throws HTTPException, IOException {
     // open addressed database
-    open(ctx);
+    open(http);
     // set default content type to raw
     final String sprop = SerializerProp.S_METHOD[0] + "=" + DataText.M_TEXT +
-            ',' + ctx.serialization;
-    ctx.initResponse(new SerializerProp(sprop));
+            ',' + http.serialization;
+    http.initResponse(new SerializerProp(sprop));
 
     // perform command
-    final Session session = ctx.session;
-    session.setOutputStream(ctx.out);
+    final Session session = http.session;
+    session.setOutputStream(http.out);
     session.execute(input);
   }
 }
