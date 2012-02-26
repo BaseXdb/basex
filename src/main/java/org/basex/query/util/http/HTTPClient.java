@@ -215,7 +215,7 @@ public final class HTTPClient {
       final OutputStream out) throws IOException, QueryException {
 
     final byte[] t = payloadAtts.get(MEDIA_TYPE);
-    String type = t == null ? null : string(t);
+    final String type = t == null ? null : string(t);
 
     // no resource to set the content from
     final byte[] src = payloadAtts.get(SRC);

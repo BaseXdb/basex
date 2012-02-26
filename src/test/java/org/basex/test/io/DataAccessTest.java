@@ -34,7 +34,7 @@ public class DataAccessTest {
   /** Byte. */
   private static final byte BYTE = Byte.MIN_VALUE;
   /** Long (5-byte long). */
-  private static final long LONG = 1L << (5 * Byte.SIZE - 1); // 39 shifts
+  private static final long LONG = 1L << 5 * Byte.SIZE - 1; // 39 shifts
   /** Integer. */
   private static final int INT = Integer.MAX_VALUE;
   /** Integer, which should take 5 bytes when compressed. */
@@ -183,7 +183,7 @@ public class DataAccessTest {
   /** Test method for {@link DataAccess#readNum()}. */
   @Test
   public final void testReadNum() {
-    long off = STR_BIN.length + BYTE_BIN.length + LONG_BIN.length +
+    final long off = STR_BIN.length + BYTE_BIN.length + LONG_BIN.length +
         INT_BIN.length;
     da.cursor(off);
     assertEquals(CINT5, da.readNum());
@@ -386,7 +386,7 @@ public class DataAccessTest {
     write(out, CINT2_BIN);
     write(out, CINT1_BIN);
 
-    final long off = (out.getFilePointer() >>> 12) << 12;
+    final long off = out.getFilePointer() >>> 12 << 12;
     out.seek(off + BLOCK_BOUNDARY_POS);
     write(out, STR_BIN);
   }

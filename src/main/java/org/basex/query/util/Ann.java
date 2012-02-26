@@ -90,7 +90,7 @@ public final class Ann extends ElementList {
     final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < size; ++i) {
       tb.add('%').add(names[i].string());
-      long s = values[i].size();
+      final long s = values[i].size();
       if(s != 0) {
         tb.add('(');
         for(int a = 0; a < s; a++) {

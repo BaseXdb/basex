@@ -512,7 +512,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   WHICHANN(XPST, 3, "Annotation % is unknown."),
   /** XPST0003: Parsing exception. */
-  ANNVALUE(XPST, 3, "Annotation literal expected."),
+  ANNVALUE(XPST, 3, "Literal expected after annotation."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
@@ -632,7 +632,7 @@ public enum Err {
   /** XQST0033: Parsing exception. */
   DUPLNSDECL(XQST, 33, "Duplicate declaration of prefix '%'."),
   /** XQST0034: Parsing exception. */
-  FUNCDEFINED(XQST, 34, "Duplicate declaration of function '%'."),
+  FUNCDEFINED(XQST, 34, "Duplicate declaration of %."),
   /** XQST0038: Parsing exception. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0076: Parsing exception. */

@@ -32,8 +32,8 @@ public abstract class MainTest {
     final Context ctx = new Context();
     try {
       new DropDB(NAME).execute(ctx);
-    } catch(BaseXException e) {
-      Util.debug(e);
+    } catch(final BaseXException ex) {
+      Util.debug(ex);
     } finally {
       ctx.close();
     }
