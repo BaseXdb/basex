@@ -29,12 +29,12 @@ final class RestXqFunction {
 
   /** Serialization parameters. */
   final SerializerProp output = new SerializerProp();
+  /** Consumed media type. */
+  private final StringList consumes = new StringList();
+  /** Returned media type. */
+  private final StringList produces = new StringList();
   /** Supported methods. */
   private EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
-  /** Consumed media type. */
-  private StringList consumes = new StringList();
-  /** Returned media type. */
-  private StringList produces = new StringList();
   /** Path. */
   private RestXqPath path;
 
@@ -64,10 +64,10 @@ final class RestXqFunction {
       final byte[] local = name.local();
       final byte[] uri = name.uri();
       // later: change to equality
-      boolean rexq = startsWith(uri, QueryText.REXQURI);
+      final boolean rexq = startsWith(uri, QueryText.REXQURI);
       if(rexq) {
         if(eq(PATH, local)) {
-          path = new RestXqPath(toString(value, SINGLE_STRING, PATH), this);
+          path = new RestXqPath(toString(value, name), this);
         } else if(eq(GET, local)) {
           mth.add(HTTPMethod.GET);
         } else if(eq(POST, local)) {
@@ -77,16 +77,16 @@ final class RestXqFunction {
         } else if(eq(DELETE, local)) {
           mth.add(HTTPMethod.DELETE);
         } else if(eq(CONSUMES, local)) {
-          consumes.add(toString(value, SINGLE_STRING, CONSUMES));
+          consumes.add(toString(value, name));
         } else if(eq(PRODUCES, local)) {
-          produces.add(toString(value, SINGLE_STRING, PRODUCES));
+          produces.add(toString(value, name));
         } else {
-          error(NOT_SUPPORTED, name);
+          error(NOT_SUPPORTED, "%", name.string());
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
         // output parameters
         final String key = string(local);
-        final String val = toString(value, OUTPUT_STRING, key);
+        final String val = toString(value, name);
         if(output.get(key) == null) error(UNKNOWN_SER, key);
         output.set(key, val);
       }
@@ -162,15 +162,12 @@ final class RestXqFunction {
   /**
    * Returns the specified value as an atomic string, or throws an exception.
    * @param value value
-   * @param msg error message
-   * @param ext error extension
+   * @param name name
    * @return string
    * @throws QueryException HTTP exception
    */
-  private String toString(final Value value, final String msg, final Object... ext)
-      throws QueryException {
-
-    if(!(value instanceof Str)) error(msg, ext);
+  private String toString(final Value value, final QNm name) throws QueryException {
+    if(!(value instanceof Str)) error(SINGLE_STRING, "%", name.string());
     return ((Str) value).toJava();
   }
 

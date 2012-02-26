@@ -25,17 +25,17 @@ interface RestXqText {
   byte[] CONSUMES = token("consumes");
 
   /** Error message. */
-  String SINGLE_STRING = "Annotation % must contain a single string.";
+  String ANN_MISSING = "Annotation % is missing.";
+  /** Error message. */
+  String NOT_SUPPORTED = "Annotation %% is invalid or not supported.";
+  /** Error message. */
+  String SINGLE_STRING = "Annotation %% must specify a single string.";
   /** Error message. */
   String INVALID_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */
-  String OUTPUT_STRING = "Output parameter \"%\" must contain a single string.";
-  /** Error message. */
-  String UNKNOWN_SER = "Unknown serialization parameter \"%\".";
-  /** Error message. */
-  String NOT_SUPPORTED = "Annotation % is invalid or not supported.";
-  /** Error message. */
   String INVALID_VAR = "Invalid variable name: $%.";
+  /** Error message. */
+  String VAR_ATOMIC = "Variable $% must inherit from %.";
   /** Error message. */
   String UNKNOWN_VAR = "Variable $% is not specified as argument.";
   /** Error message. */
@@ -43,9 +43,7 @@ interface RestXqText {
   /** Error message. */
   String VAR_UNDEFINED = "Variable $% is not assigned by the annotations.";
   /** Error message. */
-  String ANN_MISSING = "Annotation % is missing.";
-  /** Error message. */
-  String VAR_ATOMIC = "Variable $% must inherit from %.";
+  String UNKNOWN_SER = "Unknown serialization parameter \"%\".";
 
   /** Error message. */
   String NOT_FOUND = "No XQuery function found to process the request.";

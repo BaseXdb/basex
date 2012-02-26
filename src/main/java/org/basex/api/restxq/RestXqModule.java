@@ -22,14 +22,12 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 final class RestXqModule {
-  // [CG] RestXq: resolve conflicting paths. what is "more specific"?
-
   /** Supported methods. */
-  final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
+  private final ArrayList<RestXqFunction> functions = new ArrayList<RestXqFunction>();
   /** File reference. */
-  final IOFile file;
+  private final IOFile file;
   /** Parsing timestamp. */
-  long time;
+  private long time;
 
   /**
    * Constructor.

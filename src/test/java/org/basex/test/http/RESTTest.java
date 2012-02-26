@@ -1,4 +1,4 @@
-package org.basex.test.rest;
+package org.basex.test.http;
 
 import static org.basex.core.Text.*;
 import static org.basex.io.MimeTypes.*;

@@ -1,4 +1,4 @@
-package org.basex.test.rest;
+package org.basex.test.http;
 
 import org.junit.BeforeClass;
 

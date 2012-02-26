@@ -14,7 +14,6 @@ import javax.xml.transform.stream.*;
 import javax.xml.validation.*;
 
 import org.basex.api.*;
-import org.basex.build.Parser;
 import org.basex.core.*;
 import org.basex.core.cmd.Set;
 import org.basex.io.*;
@@ -63,8 +62,7 @@ public class RESTPost extends RESTCode {
     final Context context = HTTPSession.context();
     DBNode doc;
     try {
-      final Parser parser = Parser.xmlParser(new IOContent(in), context.prop);
-      doc = new DBNode(parser, context.prop);
+      doc = new DBNode(new IOContent(in), context.prop);
     } catch(final IOException ex) {
       throw new HTTPException(SC_BAD_REQUEST, ex.getMessage());
     }

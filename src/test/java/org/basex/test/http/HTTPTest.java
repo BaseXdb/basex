@@ -1,4 +1,4 @@
-package org.basex.test.rest;
+package org.basex.test.http;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
@@ -26,6 +26,17 @@ public abstract class HTTPTest {
   protected static final String DB = Util.name(HTTPTest.class);
   /** Start servers. */
   private static BaseXHTTP http;
+
+  /* [CG] RestXq: OPEN ISSUES
+   * - resolve conflicting paths: what is "more specific"?
+   * - check methods (TRACE/CONNECT don't return anything)
+   * - POST/PUT: bind request body to variable
+   * - %rest:query-param: query string parameters
+   * - %rest:form-param: "application/x-www-form-urlencoded"
+   * - %rest:header-param: request headers
+   * - %rest:cookie-param: cookies
+   * - check compatibility of annotation and function return type
+   */
 
   // INITIALIZATION =====================================================================
 
