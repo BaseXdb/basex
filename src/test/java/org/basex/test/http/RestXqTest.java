@@ -214,6 +214,8 @@ public final class RestXqTest extends HTTPTest {
    */
   private static void install(final String function) throws IOException {
     module().write(new TokenBuilder(HEADER).add(function).finish());
+    // wait 1 millisecond to guarantee new timestamp
+    Performance.sleep(1);
   }
 
   /**

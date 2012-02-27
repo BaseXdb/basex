@@ -11,6 +11,11 @@ import static org.basex.util.Token.*;
 interface RestXqText {
   /** Annotation "path". */
   byte[] PATH = token("path");
+  /** Annotation "produces". */
+  byte[] PRODUCES = token("produces");
+  /** Annotation "consumes". */
+  byte[] CONSUMES = token("consumes");
+
   /** Annotation "GET". */
   byte[] GET = token("GET");
   /** Annotation "POST". */
@@ -19,10 +24,10 @@ interface RestXqText {
   byte[] PUT = token("PUT");
   /** Annotation "DELETE". */
   byte[] DELETE = token("DELETE");
-  /** Annotation "produces". */
-  byte[] PRODUCES = token("produces");
-  /** Annotation "consumes". */
-  byte[] CONSUMES = token("consumes");
+  /** Annotation "OPTIONS". */
+  byte[] OPTIONS = token("OPTIONS");
+  /** Annotation "HEAD". */
+  byte[] HEAD = token("HEAD");
 
   /** Error message. */
   String ANN_MISSING = "Annotation % is missing.";

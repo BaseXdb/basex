@@ -59,3 +59,14 @@ public final class RestXqServlet extends HttpServlet {
     }
   }
 }
+
+/* [CG] RestXq: OPEN ISSUES
+ * - resolve conflicting paths: what is "more specific"?
+ * - check methods (TRACE/CONNECT don't return anything)
+ * - POST/PUT: bind request body to variable
+ * - %rest:query-param: query string parameters
+ * - %rest:form-param: "application/x-www-form-urlencoded"
+ * - %rest:header-param: request headers
+ * - %rest:cookie-param: cookies
+ * - check compatibility of annotation and function return type
+ */

@@ -18,12 +18,8 @@ public enum HTTPMethod {
   DELETE,
   /** HEAD method. */
   HEAD,
-  /** TRACE method. */
-  TRACE,
   /** OPTIONS method. */
-  OPTIONS,
-  /** CONNECT method. */
-  CONNECT;
+  OPTIONS;
 
   /**
    * Finds the specified method, or returns {@code null}.

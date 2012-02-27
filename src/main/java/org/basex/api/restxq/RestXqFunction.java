@@ -68,20 +68,14 @@ final class RestXqFunction {
       if(rexq) {
         if(eq(PATH, local)) {
           path = new RestXqPath(toString(value, name), this);
-        } else if(eq(GET, local)) {
-          mth.add(HTTPMethod.GET);
-        } else if(eq(POST, local)) {
-          mth.add(HTTPMethod.POST);
-        } else if(eq(PUT, local)) {
-          mth.add(HTTPMethod.PUT);
-        } else if(eq(DELETE, local)) {
-          mth.add(HTTPMethod.DELETE);
         } else if(eq(CONSUMES, local)) {
           consumes.add(toString(value, name));
         } else if(eq(PRODUCES, local)) {
           produces.add(toString(value, name));
         } else {
-          error(NOT_SUPPORTED, "%", name.string());
+          final HTTPMethod m = HTTPMethod.get(string(local));
+          if(m == null) error(NOT_SUPPORTED, "%", name.string());
+          mth.add(m);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
         // output parameters
