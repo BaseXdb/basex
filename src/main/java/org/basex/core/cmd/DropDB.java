@@ -33,7 +33,7 @@ public final class DropDB extends Command {
       return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
-    final StringList dbs = context.getDatabases().listDBs(args[0]);
+    final StringList dbs = context.databases().listDBs(args[0]);
     if(dbs.size() == 0) return info(NO_DB_DROPPED, args[0]);
 
     // loop through all databases
@@ -62,11 +62,9 @@ public final class DropDB extends Command {
    * @param ctx database context
    * @return success flag
    */
-  public static synchronized boolean drop(final String db,
-      final Context ctx) {
+  public static synchronized boolean drop(final String db, final Context ctx) {
     final IOFile dbpath = ctx.mprop.dbpath(db);
-    return dbpath.exists() && drop(dbpath, null)
-        && ctx.getDatabases().delete(db);
+    return dbpath.exists() && drop(dbpath, null) && ctx.databases().delete(db);
   }
 
   /**

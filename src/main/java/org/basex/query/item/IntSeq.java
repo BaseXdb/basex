@@ -63,7 +63,7 @@ public final class IntSeq extends Seq {
 
   @Override
   public SeqType type() {
-    return SeqType.get(type, Occ.OM);
+    return SeqType.get(type, Occ.ONE_MORE);
   }
 
   @Override

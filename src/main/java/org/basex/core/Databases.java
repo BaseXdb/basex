@@ -9,8 +9,9 @@ import org.basex.util.list.TwoWayTokenMap;
 import static org.basex.util.Token.*;
 
 /**
- * Manages two-way-map of all available databases. Used for locking.
+ * Manages a two-way-map of all available databases and backups. Used for locking.
  *
+ * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
 public final class Databases {
@@ -18,21 +19,19 @@ public final class Databases {
   private final TwoWayTokenMap databases = new TwoWayTokenMap();
   /** Available backups. */
   private final TwoWayTokenMap backups = new TwoWayTokenMap();
-  /** Database context. */
-  private final Context ctx;
   /** Pattern to extract the database name from a backup file name. */
   private static final Pattern PA =
       Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
 
-  /** Create new instance, load available databases.
-   * @param c Database context */
+  /**
+   * Creates a new instance and loads available databases.
+   * @param c Database context
+   */
   Databases(final Context c) {
-    ctx = c;
-
-    for(final IOFile f : ctx.mprop.dbpath().children()) {
+    for(final IOFile f : c.mprop.dbpath().children()) {
       final String name = f.name();
       if(name.endsWith(IO.ZIPSUFFIX)) {
-        add(dbname(name), true);
+        add(PA.split(name)[0], true);
       } else if(f.isDir() && !name.startsWith(".")) {
         add(name);
       }
@@ -40,27 +39,27 @@ public final class Databases {
   }
 
   /**
-   * Add database to list. If already present, do nothing.
-   * @param db Database name
+   * Adds a database to the list. If already present, does nothing.
+   * @param db database name
    */
   public void add(final String db) {
     add(db, false);
   }
 
   /**
-   * Add database or backup to list. If already present, do nothing.
-   * @param db Database or backup name
-   * @param backup Is Backup?
+   * Adds a database or backup to the list. If already present, does nothing.
+   * @param db database or backup name
+   * @param backup is backup?
    */
   public void add(final String db, final boolean backup) {
-    final TwoWayTokenMap map = whichMap(backup);
+    final TwoWayTokenMap map = map(backup);
     if(!map.contains(db)) map.add(db);
   }
 
   /**
-   * Renames a database in list without changing its key.
-   * @param oldDB Old database name
-   * @param newDB New database name
+   * Renames a database in the list without changing its key.
+   * @param oldDB old database name
+   * @param newDB new database name
    */
   public void alter(final String oldDB, final String newDB) {
     databases.delete(newDB);
@@ -68,27 +67,27 @@ public final class Databases {
   }
 
   /**
-   * Deletes a database from list.
-   * @param db Database name
-   * @return Found database?
+   * Deletes a database from the list.
+   * @param db database name
+   * @return found database?
    */
   public boolean delete(final String db) {
     return delete(db, false);
   }
 
   /**
-   * Deletes a database or backup from list.
-   * @param db Database or backup name
-   * @param backup Is backup?
-   * @return Found database or Backup?
+   * Deletes a database or backup from the list.
+   * @param db database or backup name
+   * @param backup is backup?
+   * @return found database or backup?
    */
   public boolean delete(final String db, final boolean backup) {
-    return whichMap(backup).delete(db) != -1;
+    return map(backup).delete(db) != -1;
   }
 
   /**
    * Lists all available databases and backups.
-   * @return Database and backup list
+   * @return database and backup list
    */
   public StringList list() {
     return list(true, true, null);
@@ -96,16 +95,16 @@ public final class Databases {
 
   /**
    * Lists all available databases.
-   * @return Database list
+   * @return database list
    */
   public StringList listDBs() {
     return list(true, false, null);
   }
 
   /**
-   * Lists all available databases matching name. Glob patterns supported.
-   * @param name Database name, glob patterns allowed
-   * @return Database list
+   * Lists all available databases matching the given name. Supports glob patterns.
+   * @param name database name, glob patterns allowed
+   * @return database list
    */
   public StringList listDBs(final String name) {
     return list(true, false, name);
@@ -113,7 +112,7 @@ public final class Databases {
 
   /**
    * Lists all available backups.
-   * @return Backup list
+   * @return backup list
    */
   public StringList listBackups() {
     return list(false, true, null);
@@ -121,27 +120,25 @@ public final class Databases {
 
   /**
    * Lists all available backups.
-   * @param name Backup name, glob patterns allowed
-   * @return Backup list
+   * @param name backup name, glob patterns allowed
+   * @return backup list
    */
   public StringList listBackups(final String name) {
     return list(false, true, name);
   }
 
   /**
-   * Lists all available databases and optionally backups. Filters for
-   * {@code name} if not null with glob support.
-   * @param db Return databases?
-   * @param backup Return backups?
-   * @param name Filter for name.
-   * @return Database and Backups list
+   * Returns the sorted names of all available databases and, optionally, backups.
+   * Filters for {@code name} if not null with glob support.
+   * @param db return databases?
+   * @param backup return backups?
+   * @param name filter for name.
+   * @return database and backups list
    */
-  public StringList list(final boolean db, final boolean backup,
-      final String name) {
+  private StringList list(final boolean db, final boolean backup, final String name) {
     final Pattern pattern = Pattern.compile(
-        null == name ? ".*" :
-          name.matches(".*[*?,].*") ? IOFile.regex(name) : name,
-              Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
+        null == name ? ".*" : name.matches(".*[*?,].*") ? IOFile.regex(name) : name,
+            Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
     final StringList dbs = new StringList();
     if(db) listAll(databases, dbs, pattern);
     if(backup) listAll(backups, dbs, pattern);
@@ -151,11 +148,11 @@ public final class Databases {
   }
 
   /**
-   * Adds all contained databases to StringList. If pattern is given, filter
+   * Adds all contained databases to the specified list. If a pattern is given, filters
    * according to it.
-   * @param dbs Databases
-   * @param list List which contained databases are added to
-   * @param pattern Match pattern or {@code null}
+   * @param dbs databases
+   * @param list list which contained databases are added to
+   * @param pattern match pattern or {@code null}
    */
   private void listAll(final TwoWayTokenMap dbs, final StringList list,
       final Pattern pattern) {
@@ -166,41 +163,29 @@ public final class Databases {
         list.add(name);
       }
     }
-
   }
 
   /**
-   * Returns database or backup map depended on backup flag.
-   * @param backup Is Backup?
-   * @return Matching map.
+   * Returns the database or backup map dependent on the backup flag.
+   * @param backup is backup?
+   * @return matching map
    */
-  private TwoWayTokenMap whichMap(final boolean backup) {
+  private TwoWayTokenMap map(final boolean backup) {
     return backup ? backups : databases;
   }
 
   /**
-   * Extracts the name of a database from its backup file.
-   * @param s name of backup file
-   * @return name of database
-   */
-  private static String dbname(final String s) {
-    return PA.split(s)[0];
-  }
-
-  /**
-   * Returns paths of all backups of the specified database.
+   * Returns the sorted paths of all backups of the specified database.
    * @param db database
    * @param ctx database context
-   * @param onlyName Only return the file names (delete the path)?
    * @return paths of available backups
    */
-  public static StringList listBackupPaths(final String db, final Context ctx,
-      final boolean onlyName) {
+  public static StringList backupPaths(final String db, final Context ctx) {
     final StringList sl = new StringList();
     for(final IOFile f : ctx.mprop.dbpath().children()) {
       final String name = f.name();
       if(name.matches(db + IO.DATEPATTERN + IO.ZIPSUFFIX)) {
-        sl.add(onlyName ? f.name() : f.path());
+        sl.add(f.path());
       }
     }
     sl.sort(false, false);

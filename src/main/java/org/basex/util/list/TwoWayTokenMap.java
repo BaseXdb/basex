@@ -4,19 +4,22 @@ import static org.basex.util.Token.*;
 
 import java.util.Arrays;
 
+import org.basex.util.*;
 import org.basex.util.hash.TokenIntMap;
 
 /**
- * Two-way Token Map allows efficient key->value and value->key lookups.
- * Also speeds up "contains"-operation.
+ * <p>Two-way Token Map allows efficient key->value and value->key lookups.
+ * Also speeds up "contains"-operation.</p>
  *
- * Value->key is done using {@link TokenList} which is an ArrayList.
- * Key->value is done using {@link TokenIntMap} which is an HashMap.
+ * <ul>
+ * <li> Value->key is done using {@link TokenList} which is an ArrayList.</li>
+ * <li> Key->value is done using {@link TokenIntMap} which is an HashMap.</li>
+ * </ul>
  *
- * Elements may not be inserted twice (bijection).
+ * <p>Elements may not be inserted twice (bijection).</p>
  *
+ * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
- *
  */
 public class TwoWayTokenMap extends TokenList {
   /** TokenIntMap for reverse lookup. */
@@ -29,7 +32,7 @@ public class TwoWayTokenMap extends TokenList {
    */
   @Override
   public void add(final byte[] e) {
-    if (-1 == map.value(e)) {
+    if(-1 == map.value(e)) {
       super.add(e);
       map.add(e, size);
     } else {
@@ -65,7 +68,7 @@ public class TwoWayTokenMap extends TokenList {
    */
   @Override
   public void set(final int i, final byte[] e) {
-    if (-1 == map.value(e) || Arrays.equals(get(i), e)) {
+    if(-1 == map.value(e) || Arrays.equals(get(i), e)) {
       map.delete(get(i));
       super.set(i, e);
       map.add(e, i + 1);
@@ -125,13 +128,13 @@ public class TwoWayTokenMap extends TokenList {
    */
   @Override
   public TokenList sort(final boolean cs) {
-    throw new UnsupportedOperationException();
+    throw Util.notimplemented();
   }
 
   /**
    * Gets key by value.
    * @param val Value to search for
-   * @return Key or -1 if not found
+   * @return key or -1 if not found
    */
   public int getKey(final byte[] val) {
     final int key = map.value(val);
@@ -141,7 +144,7 @@ public class TwoWayTokenMap extends TokenList {
   /**
    * Gets key by value.
    * @param val Value to search for
-   * @return Key or -1 if not found
+   * @return key or -1 if not found
    */
   public int getKey(final long val) {
     return getKey(token(val));
@@ -150,17 +153,17 @@ public class TwoWayTokenMap extends TokenList {
   /**
    * Gets key by value.
    * @param val Value to search for
-   * @return Key or -1 if not found
+   * @return key or -1 if not found
    */
   public int getKey(final String val) {
     return getKey(token(val));
   }
 
   /**
-   * Gets key by value. {@link #size()} will not represent actual size any more
+   * Deletes a value. {@link #size()} will not represent actual size any more
    * and {@link #get} will return null values for this key afterwards!
    * @param val Value to delete
-   * @return Key or -1 if not found
+   * @return key or -1 if not found
    */
   public int delete(final byte[] val) {
     int key = map.value(val);
@@ -173,10 +176,10 @@ public class TwoWayTokenMap extends TokenList {
   }
 
   /**
-   * Gets key by value. {@link #size()} will not represent actual size any more
+   * Deletes a value. {@link #size()} will not represent actual size any more
    * and {@link #get} will return null values for this key afterwards!
    * @param val Value to delete
-   * @return Key or -1 if not found
+   * @return key or -1 if not found
    */
   public final int delete(final String val) {
     return delete(token(val));

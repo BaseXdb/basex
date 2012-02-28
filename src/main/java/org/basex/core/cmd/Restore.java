@@ -38,7 +38,7 @@ public final class Restore extends Command {
     // find backup file with or without date suffix
     IOFile file = mprop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
-      final StringList list = Databases.listBackupPaths(db, context, false);
+      final StringList list = Databases.backupPaths(db, context);
       if(list.size() != 0) file = new IOFile(list.get(0));
     } else {
       // db is already the name of a backup -> extract db name
@@ -67,7 +67,7 @@ public final class Restore extends Command {
   private boolean restore(final IOFile file, final String db) {
     try {
       progress(new Zip(file)).unzip(mprop.dbpath());
-      context.getDatabases().add(db);
+      context.databases().add(db);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

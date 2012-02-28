@@ -242,7 +242,7 @@ public final class FNDb extends StandardFunc {
     final TokenList tl = new TokenList();
     final int el = expr.length;
     if(el == 0) {
-      for(final String s : ctx.context.getDatabases().listDBs())
+      for(final String s : ctx.context.databases().listDBs())
         tl.add(s);
     } else {
       final Data data = data(0, ctx);
@@ -320,7 +320,7 @@ public final class FNDb extends StandardFunc {
    * @return iterator
    */
   private Iter listDBs(final QueryContext ctx) {
-    final StringList sl = ctx.context.getDatabases().listDBs();
+    final StringList sl = ctx.context.databases().listDBs();
     return new Iter() {
       int pos;
       @Override

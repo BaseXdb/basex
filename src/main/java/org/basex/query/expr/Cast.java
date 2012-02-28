@@ -51,7 +51,7 @@ public final class Cast extends Single {
       if(e != this) optPre(e, ctx);
     }
     // adopt occurrence of argument
-    if(e == this && t.one()) type = SeqType.get(type.type, Occ.O);
+    if(e == this && t.one()) type = SeqType.get(type.type, Occ.ONE);
     return e;
   }
 

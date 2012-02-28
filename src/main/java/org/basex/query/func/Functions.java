@@ -146,7 +146,7 @@ public final class Functions extends TokenSet {
         FUNCUNKNOWN.thrw(ii, name.string());
       }
       if(args.length != 1) FUNCTYPE.thrw(ii, name.string());
-      final SeqType to = SeqType.get(type, Occ.ZO);
+      final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
       return TypedFunc.constr(new Cast(ii, args[0], to), to);
     }
 

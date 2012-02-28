@@ -98,16 +98,14 @@ public final class OptimizeAll extends ACreate {
     if(cmd != null) cmd.size = m.size;
 
     // check if database is also pinned by other users
-    if(ctx.datas.pins(m.name) > 1)
-      throw new BaseXException(DB_PINNED_X, m.name);
+    if(ctx.datas.pins(m.name) > 1) throw new BaseXException(DB_PINNED_X, m.name);
 
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
-    ctx.getDatabases().add(tname);
+    ctx.databases().add(tname);
 
     // build database and index structures
-    final DiskBuilder builder = new DiskBuilder(tname,
-        new DBParser(old, cmd), ctx);
+    final DiskBuilder builder = new DiskBuilder(tname, new DBParser(old, cmd), ctx);
     try {
       final DiskData d = builder.build();
       if(m.createtext) create(IndexType.TEXT, d, cmd);

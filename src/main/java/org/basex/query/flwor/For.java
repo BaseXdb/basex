@@ -60,7 +60,7 @@ public final class For extends ForLet {
     type = expr.type();
     size = expr.size();
     if(ctx.grouping) {
-      var.ret = SeqType.get(type.type, Occ.ZM);
+      var.ret = SeqType.get(type.type, Occ.ZERO_MORE);
     } else {
       var.size = Math.min(1, size);
       var.ret = type.type.seqType();

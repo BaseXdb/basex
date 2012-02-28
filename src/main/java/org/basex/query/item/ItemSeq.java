@@ -56,7 +56,7 @@ public final class ItemSeq extends Seq {
       for(int s = 1; s != size && t != AtomType.ITEM; ++s) {
         if(t != item[s].type) t = AtomType.ITEM;
       }
-      seq = SeqType.get(t, Occ.OM);
+      seq = SeqType.get(t, Occ.ONE_MORE);
     }
     return seq;
   }

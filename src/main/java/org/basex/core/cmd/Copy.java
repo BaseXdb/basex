@@ -78,7 +78,7 @@ public final class Copy extends Command {
     }
     // drop new database if error occurred
     if(!ok) DropDB.drop(newdb, context);
-    else context.getDatabases().add(newdb);
+    else context.databases().add(newdb);
     return ok;
   }
 

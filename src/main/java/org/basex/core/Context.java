@@ -90,7 +90,7 @@ public final class Context {
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
-    databases = ctx.getDatabases();
+    databases = ctx.databases();
   }
 
   /**
@@ -280,9 +280,8 @@ public final class Context {
    * Get list of currently available databases.
    * @return the databases
    */
-  public Databases getDatabases() {
+  public Databases databases() {
     if(null == databases) databases = new Databases(this);
     return databases;
   }
-
 }

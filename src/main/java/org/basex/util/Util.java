@@ -75,7 +75,7 @@ public final class Util {
   public static RuntimeException notimplemented(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder("Not Implemented");
     if(ext.length != 0) tb.addExt(" (%)", ext);
-    throw new RuntimeException(tb.add('.').toString());
+    throw new UnsupportedOperationException(tb.add('.').toString());
   }
 
   /**

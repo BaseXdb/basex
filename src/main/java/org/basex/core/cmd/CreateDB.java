@@ -125,7 +125,7 @@ public final class CreateDB extends ACreate {
     } finally {
       try { builder.close(); } catch(final IOException exx) { Util.debug(exx); }
     }
-    ctx.getDatabases().add(name);
+    ctx.databases().add(name);
     return Open.open(name, ctx);
   }
 

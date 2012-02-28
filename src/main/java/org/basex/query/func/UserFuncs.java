@@ -126,7 +126,7 @@ public final class UserFuncs extends ExprInfo {
           return l;
         }
         // duplicate declaration
-        FUNCDEFINED.thrw(ii, fun);
+        FUNCDEFINED.thrw(ii, fun.name.string());
       }
     }
     // add function skeleton

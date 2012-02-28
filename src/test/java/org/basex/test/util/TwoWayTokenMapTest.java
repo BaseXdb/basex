@@ -13,7 +13,7 @@ import org.junit.Test;
 /**
  * Tests for {@link TwoWayTokenMapTest}.
  *
- * @author BaseX Team 2005-11, BSD License
+ * @author BaseX Team 2005-12, BSD License
  * @author Jens Erat
  */
 public final class TwoWayTokenMapTest {

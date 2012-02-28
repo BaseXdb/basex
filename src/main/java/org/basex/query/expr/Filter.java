@@ -75,7 +75,7 @@ public class Filter extends Preds {
       if(size == 0) return optPre(null, ctx);
       type = SeqType.get(t.type, size);
     } else {
-      type = SeqType.get(t.type, t.zeroOrOne() ? Occ.ZO : Occ.ZM);
+      type = SeqType.get(t.type, t.zeroOrOne() ? Occ.ZERO_ONE : Occ.ZERO_MORE);
     }
 
     // no numeric predicates.. use simple iterator
@@ -96,7 +96,7 @@ public class Filter extends Preds {
       final Expr p = preds[0];
       final SeqType st = p.type();
       off = st.type.isNumber() && st.zeroOrOne() && !p.uses(Use.CTX) && !p.uses(Use.NDT);
-      if(off) type = SeqType.get(type.type, Occ.ZO);
+      if(off) type = SeqType.get(type.type, Occ.ZERO_ONE);
     }
 
     // iterator for simple numeric predicate

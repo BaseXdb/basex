@@ -172,7 +172,7 @@ public final class CmpV extends Cmp {
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
     type = SeqType.get(AtomType.BLN, e1.size() == 1 && e2.size() == 1 ?
-        Occ.O : Occ.ZO);
+        Occ.ONE : Occ.ZERO_ONE);
 
     Expr e = this;
     if(oneIsEmpty()) {

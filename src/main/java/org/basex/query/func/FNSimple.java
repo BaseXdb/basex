@@ -149,13 +149,13 @@ public final class FNSimple extends StandardFunc {
         }
         return this;
       case ZERO_OR_ONE:
-        type = SeqType.get(e.type().type, Occ.ZO);
+        type = SeqType.get(e.type().type, Occ.ZERO_ONE);
         return e.type().zeroOrOne() ? e : this;
       case EXACTLY_ONE:
-        type = SeqType.get(e.type().type, Occ.O);
+        type = SeqType.get(e.type().type, Occ.ONE);
         return e.type().one() ? e : this;
       case ONE_OR_MORE:
-        type = SeqType.get(e.type().type, Occ.OM);
+        type = SeqType.get(e.type().type, Occ.ONE_MORE);
         return !e.type().mayBeZero() ? e : this;
       case UNORDERED:
         return e;

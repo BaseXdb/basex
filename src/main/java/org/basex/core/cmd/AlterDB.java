@@ -62,7 +62,7 @@ public final class AlterDB extends Command {
   public static synchronized boolean alter(final String db,
       final String dbnew, final Context ctx) {
     if(ctx.mprop.dbpath(db).rename(ctx.mprop.dbpath(dbnew))) {
-      ctx.getDatabases().alter(db, dbnew);
+      ctx.databases().alter(db, dbnew);
       return true;
     }
     return false;

@@ -39,7 +39,7 @@ public final class CreateBackup extends Command {
       return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases
-    final StringList dbs = context.getDatabases().listDBs(args[0]);
+    final StringList dbs = context.databases().listDBs(args[0]);
     if(dbs.size() == 0) return error(DB_NOT_FOUND_X, args[0]);
 
     // loop through all databases
@@ -70,7 +70,7 @@ public final class CreateBackup extends Command {
 
       final Zip zip = progress(new Zip(file));
       zip.zip(path);
-      context.getDatabases().add(db, true);
+      context.databases().add(db, true);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);

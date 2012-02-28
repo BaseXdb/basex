@@ -136,12 +136,12 @@ public final class FNSeq extends StandardFunc {
 
     // all other types will return existing types
     final Type t = expr[0].type().type;
-    Occ o = Occ.ZM;
+    Occ o = Occ.ZERO_MORE;
     // at most one returned item
-    if(sig == Function.SUBSEQUENCE && expr[0].type().one()) o = Occ.ZO;
+    if(sig == Function.SUBSEQUENCE && expr[0].type().one()) o = Occ.ZERO_ONE;
 
     // head will return at most one item
-    else if(sig == Function.HEAD) o = Occ.ZO;
+    else if(sig == Function.HEAD) o = Occ.ZERO_ONE;
     type = SeqType.get(t, o);
 
     // pre-evaluate distinct values

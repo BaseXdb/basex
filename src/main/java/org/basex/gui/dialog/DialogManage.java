@@ -75,7 +75,7 @@ public final class DialogManage extends Dialog {
     panel.setLayout(new BorderLayout(8, 0));
 
     // create database chooser
-    final StringList dbs = main.context.getDatabases().list();
+    final StringList dbs = main.context.databases().list();
     choice = new BaseXList(dbs.toArray(), this, false);
     choice.setSize(200, 500);
 
@@ -143,7 +143,7 @@ public final class DialogManage extends Dialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      choice.setData(ctx.getDatabases().list().toArray());
+      choice.setData(ctx.databases().list().toArray());
       choice.requestFocusInWindow();
       refresh = false;
     }
@@ -235,7 +235,7 @@ public final class DialogManage extends Dialog {
       backup.setEnabled(active);
 
       // enable/disable backup buttons
-      final String[] back = Databases.listBackupPaths(db, ctx, false).toArray();// ctx.getDatabases().listBackups(db).toArray();
+      final String[] back = Databases.backupPaths(db, ctx).toArray();
       active = back.length > 0;
       backups.setData(back);
       backups.setEnabled(active);

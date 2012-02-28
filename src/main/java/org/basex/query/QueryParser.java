@@ -1111,7 +1111,7 @@ public class QueryParser extends InputParser {
         // if one groups variables such as $x as xs:integer, then the resulting
         // sequence isn't compatible with the type and can't be assigned
         ngrp[i] = Var.create(ctx, input(), v.name, v.type != null
-            && v.type.one() ? SeqType.get(v.type.type, Occ.OM) : null, null);
+            && v.type.one() ? SeqType.get(v.type.type, Occ.ONE_MORE) : null, null);
         ctx.vars.add(ngrp[i]);
       }
 
@@ -2648,7 +2648,7 @@ public class QueryParser extends InputParser {
     if(t == null) error(TYPEUNKNOWN, name);
     if(t == AtomType.AAT || t == AtomType.NOT) error(CASTUNKNOWN, name);
     skipWS();
-    return SeqType.get(t, consume('?') ? Occ.ZO : Occ.O);
+    return SeqType.get(t, consume('?') ? Occ.ZERO_ONE : Occ.ONE);
   }
 
   /**
@@ -2664,9 +2664,9 @@ public class QueryParser extends InputParser {
 
     // parse occurrence indicator
     skipWS();
-    final Occ occ = consume('?') ? Occ.ZO : consume('+') ? Occ.OM :
-      consume('*') ? Occ.ZM : Occ.O;
-    if(t == AtomType.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
+    final Occ occ = consume('?') ? Occ.ZERO_ONE : consume('+') ? Occ.ONE_MORE :
+      consume('*') ? Occ.ZERO_MORE : Occ.ONE;
+    if(t == AtomType.EMP && occ != Occ.ONE) error(EMPTYSEQOCC, t);
 
     final KindTest kt = tok.isEmpty() ? null : kindTest(t, tok.finish());
     tok.reset();

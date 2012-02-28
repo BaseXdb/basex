@@ -93,7 +93,7 @@ public abstract class ACreate extends Command {
         if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
         if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
         data.flush();
-        context.getDatabases().add(db);
+        context.databases().add(db);
       }
       return info(parser.info() + DB_CREATED_X_X, db, perf);
     } catch(final ProgressException ex) {

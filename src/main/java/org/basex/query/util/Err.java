@@ -632,7 +632,7 @@ public enum Err {
   /** XQST0033: Parsing exception. */
   DUPLNSDECL(XQST, 33, "Duplicate declaration of prefix '%'."),
   /** XQST0034: Parsing exception. */
-  FUNCDEFINED(XQST, 34, "Duplicate declaration of %."),
+  FUNCDEFINED(XQST, 34, "Duplicate declaration of function %(...)."),
   /** XQST0038: Parsing exception. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
   /** XQST0076: Parsing exception. */

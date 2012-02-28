@@ -58,7 +58,7 @@ public final class List extends Arr {
       final SeqType et = e.type();
       type = type == SeqType.EMP ? et :
         SeqType.get(et.type == type.type ? et.type : AtomType.ITEM,
-            et.mayBeZero() && type.mayBeZero() ? Occ.ZM : Occ.OM);
+            et.mayBeZero() && type.mayBeZero() ? Occ.ZERO_MORE : Occ.ONE_MORE);
     }
 
     // return cached integer sequence, cached values or self reference

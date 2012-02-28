@@ -46,7 +46,7 @@ public final class DialogInput extends Dialog {
 
     super(main, tit);
     old = o;
-    db = main.context.getDatabases().listDBs();
+    db = main.context.databases().listDBs();
     type = t;
 
     String title = "";
