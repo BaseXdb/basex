@@ -13,7 +13,7 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class TokenList extends ElementList implements Iterable<byte[]> {
+public class TokenList extends ElementList implements Iterable<byte[]> {
   /** Element container. */
   byte[][] list;
 

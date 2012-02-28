@@ -3,16 +3,29 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
-import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.io.IOException;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
-import org.basex.core.cmd.List;
-import org.basex.data.*;
-import org.basex.gui.*;
-import org.basex.gui.layout.*;
+import org.basex.core.cmd.AlterDB;
+import org.basex.core.cmd.Copy;
+import org.basex.core.cmd.CreateBackup;
+import org.basex.core.cmd.DropBackup;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Restore;
+import org.basex.data.MetaData;
+import org.basex.gui.GUI;
+import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXEditor;
+import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXList;
+import org.basex.gui.layout.BaseXTabs;
+import java.util.*;
+
 import org.basex.io.in.DataInput;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -62,7 +75,7 @@ public final class DialogManage extends Dialog {
     panel.setLayout(new BorderLayout(8, 0));
 
     // create database chooser
-    final StringList dbs = List.list(main.context, true);
+    final StringList dbs = main.context.getDatabases().list();
     choice = new BaseXList(dbs.toArray(), this, false);
     choice.setSize(200, 500);
 
@@ -130,7 +143,7 @@ public final class DialogManage extends Dialog {
     final Context ctx = gui.context;
     if(refresh) {
       // rebuild databases and focus list chooser
-      choice.setData(List.list(ctx, true).toArray());
+      choice.setData(ctx.getDatabases().list().toArray());
       choice.requestFocusInWindow();
       refresh = false;
     }
@@ -222,7 +235,7 @@ public final class DialogManage extends Dialog {
       backup.setEnabled(active);
 
       // enable/disable backup buttons
-      final String[] back = ShowBackups.list(db, false, ctx).toArray();
+      final String[] back = Databases.listBackupPaths(db, ctx, false).toArray();// ctx.getDatabases().listBackups(db).toArray();
       active = back.length > 0;
       backups.setData(back);
       backups.setEnabled(active);

@@ -57,6 +57,8 @@ public final class Context {
   private final Lock lock;
   /** Data reference. */
   private Data data;
+  /** Databases list. */
+  private Databases databases;
 
   /**
    * Default constructor, which should only be called once in a project.
@@ -88,6 +90,7 @@ public final class Context {
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
+    databases = ctx.getDatabases();
   }
 
   /**
@@ -272,4 +275,14 @@ public final class Context {
         md.users.get(user.name);
     return (us == null ? user : us).perm(p);
   }
+
+  /**
+   * Get list of currently available databases.
+   * @return the databases
+   */
+  public Databases getDatabases() {
+    if(null == databases) databases = new Databases(this);
+    return databases;
+  }
+
 }

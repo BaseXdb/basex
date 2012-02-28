@@ -11,7 +11,6 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.cmd.Info;
 import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.List;
 import org.basex.core.cmd.Rename;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -243,7 +242,8 @@ public final class FNDb extends StandardFunc {
     final TokenList tl = new TokenList();
     final int el = expr.length;
     if(el == 0) {
-      for(final String s : List.list(ctx.context)) tl.add(s);
+      for(final String s : ctx.context.getDatabases().listDBs())
+        tl.add(s);
     } else {
       final Data data = data(0, ctx);
       final String path = string(el == 1 ? EMPTY : checkStr(expr[1], ctx));
@@ -320,7 +320,7 @@ public final class FNDb extends StandardFunc {
    * @return iterator
    */
   private Iter listDBs(final QueryContext ctx) {
-    final StringList sl = List.list(ctx.context);
+    final StringList sl = ctx.context.getDatabases().listDBs();
     return new Iter() {
       int pos;
       @Override

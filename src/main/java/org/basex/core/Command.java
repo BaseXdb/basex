@@ -5,14 +5,12 @@ import static org.basex.core.Text.*;
 import org.basex.core.cmd.Close;
 import org.basex.data.Data;
 import org.basex.data.Result;
-import org.basex.io.IOFile;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.out.NullOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
-import org.basex.util.list.StringList;
 import org.xml.sax.InputSource;
 
 import java.io.IOException;
@@ -227,23 +225,6 @@ public abstract class Command extends Progress {
   protected final boolean info(final String str, final Object... ext) {
     info.addExt(str, ext).add(NL);
     return true;
-  }
-
-  /**
-   * Returns all databases matching the specified glob pattern.
-   * If the specified pattern does not contain any special characters,
-   * it is treated as literal.
-   * @param name database name pattern
-   * @return array with database names
-   */
-  protected final String[] databases(final String name) {
-    final String pat = name.matches(".*[*?,].*") ? IOFile.regex(name) : name;
-    final StringList sl = new StringList();
-    for(final IOFile f : mprop.dbpath().children(pat)) {
-      final String n = f.name();
-      if(!n.contains(".")) sl.add(n);
-    }
-    return sl.toArray();
   }
 
   /**

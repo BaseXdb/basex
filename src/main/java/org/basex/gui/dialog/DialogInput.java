@@ -5,7 +5,6 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import org.basex.core.cmd.List;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
@@ -47,7 +46,7 @@ public final class DialogInput extends Dialog {
 
     super(main, tit);
     old = o;
-    db = List.list(main.context);
+    db = main.context.getDatabases().listDBs();
     type = t;
 
     String title = "";

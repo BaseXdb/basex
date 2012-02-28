@@ -47,7 +47,6 @@ import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
-import org.basex.core.cmd.ShowBackups;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
@@ -80,6 +79,14 @@ public class CommandTest {
   private static final String NAME = Util.name(CommandTest.class);
   /** Test name. */
   static final String NAME2 = NAME + '2';
+  /** Valid test database names. */
+  static final String[] VALID_NAMES = {"unittest-a1", "1a-unittest",
+    "0", "a", "-", "_", "A",
+    "100characters_______020_______030_______040_______050_______060_______070_"
+    + "______080_______090_______100_______110_______120____128"};
+  /** Invalid test database names. */
+  static final String[] INVALID_NAMES = {"\\", "\0", "\t", "", "ä",
+    " ", ".", "/", ":", "*?", "+", "*", "%", "%s", "", "\n"};
   /** Socket reference. */
   static Session session;
 
@@ -105,6 +112,11 @@ public class CommandTest {
     session.execute(new DropDB(NAME2));
     session.execute(new DropUser(NAME));
     session.execute(new DropUser(NAME2));
+    for (String name : VALID_NAMES) {
+      session.execute(new DropBackup(name));
+      session.execute(new DropDB(name));
+      session.execute(new DropUser(name));
+    }
   }
 
   /**
@@ -197,6 +209,18 @@ public class CommandTest {
     ok(new Restore(NAME));
     no(new Restore(NAME + '?'));
     ok(new DropBackup(NAME));
+    for (String name : VALID_NAMES) {
+      no(new CreateBackup(name));
+      ok(new CreateDB(name));
+      ok(new CreateBackup(name));
+      ok(new Restore(name));
+      ok(new DropBackup(name));
+      no(new Restore(name));
+      no(new DropBackup(name));
+    }
+    for (String name : INVALID_NAMES) {
+      no(new CreateBackup(name));
+    }
   }
 
   /** Command test. */
@@ -205,14 +229,14 @@ public class CommandTest {
     ok(new CreateDB(NAME, FILE));
     ok(new InfoDB());
     ok(new CreateDB(NAME, FILE));
-    ok(new CreateDB("abcde"));
-    ok(new DropDB("abcde"));
+    for (String validName : VALID_NAMES) {
+      ok(new CreateDB(validName));
+      ok(new DropDB(validName));
+    }
     // invalid database names
-    no(new CreateDB(""));
-    no(new CreateDB(" "));
-    no(new CreateDB(":"));
-    no(new CreateDB("*?"));
-    no(new CreateDB("/"));
+    for (String invalidName : INVALID_NAMES) {
+      no(new CreateDB(invalidName));
+    }
   }
 
   /** Command test. */
@@ -228,11 +252,16 @@ public class CommandTest {
   /** Command test. */
   @Test
   public final void createUser() {
-    ok(new CreateUser(NAME2, md5("test")));
-    no(new CreateUser(NAME2, md5("test")));
-    ok(new DropUser(NAME2));
     no(new CreateUser("", ""));
     no(new CreateUser(":", ""));
+    for (String validName : VALID_NAMES) {
+      ok(new CreateUser(validName, md5("test")));
+      no(new CreateUser(validName, md5("test")));
+      ok(new DropUser(validName));
+    }
+    for (String invalidName : INVALID_NAMES) {
+      no(new CreateUser(invalidName, md5("test")));
+    }
   }
 
   /** Command test. */
@@ -514,8 +543,8 @@ public class CommandTest {
     // deleting a backup passing the exact backup name as argument
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    ok(new DropBackup(ShowBackups.list(NAME, false, CONTEXT).get(0)));
-    assertEquals(0, ShowBackups.list(NAME, false, CONTEXT).size());
+    ok(new DropBackup(CONTEXT.getDatabases().listBackups().get(0)));
+    assertEquals(0, CONTEXT.getDatabases().listBackups(NAME).size());
   }
 
   /**
@@ -529,12 +558,12 @@ public class CommandTest {
     ok(new DropBackup(NAME));
 
     // dropping a specific backup (database name + time stamp)
-    // how to get my hands on the created backup name?
+    // TODO how to get my hands on the created backup name?
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    final String[] b = ShowBackups.list(NAME, false, CONTEXT).toArray();
+    final String[] b = CONTEXT.getDatabases().listBackups(NAME).toArray();
     ok(new DropBackup(b[0]));
-    assertEquals(0, ShowBackups.list(NAME, false, CONTEXT).size());
+    assertEquals(0, CONTEXT.getDatabases().listBackups(NAME).size());
 
     /* Creates 2 dbs: one with a short name (1), the other with a
      * longer name (2). (1) is a prefix of (2). Tests then, whether
@@ -545,7 +574,7 @@ public class CommandTest {
     ok(new CreateBackup(NAME));
     ok(new CreateBackup(NAME2));
     ok(new DropBackup(NAME));
-    assertEquals(1, ShowBackups.list(NAME2, false, CONTEXT).size());
+    assertEquals(1, CONTEXT.getDatabases().listBackups(NAME2).size());
   }
 
   /** Retrieves raw data. */

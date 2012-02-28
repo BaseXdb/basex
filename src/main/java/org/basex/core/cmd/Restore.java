@@ -4,9 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.User;
+import org.basex.core.*;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -40,7 +38,7 @@ public final class Restore extends Command {
     // find backup file with or without date suffix
     IOFile file = mprop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
-      final StringList list = ShowBackups.list(db, true, context);
+      final StringList list = Databases.listBackupPaths(db, context, false);
       if(list.size() != 0) file = new IOFile(list.get(0));
     } else {
       // db is already the name of a backup -> extract db name
@@ -55,7 +53,7 @@ public final class Restore extends Command {
     if(context.pinned(db)) return error(DB_PINNED_X, db);
 
     // try to restore database
-    return restore(file) && (!closed || new Open(db).run(context)) ?
+    return restore(file, db) && (!closed || new Open(db).run(context)) ?
         info(DB_RESTORED_X, file.name(), perf) :
           error(DB_NOT_RESTORED_X, db);
   }
@@ -63,11 +61,13 @@ public final class Restore extends Command {
   /**
    * Restores the specified database.
    * @param file file
+   * @param db database name
    * @return success flag
    */
-  private boolean restore(final IOFile file) {
+  private boolean restore(final IOFile file, final String db) {
     try {
       progress(new Zip(file)).unzip(mprop.dbpath());
+      context.getDatabases().add(db);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);
