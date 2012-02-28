@@ -22,7 +22,7 @@ public final class RestXqTest extends HTTPTest {
   private static final String ROOT = "http://" + LOCALHOST + ":9998/restxq/";
   /** Query header. */
   private static final String HEADER =
-    "module namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
+    "module  namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
     "declare namespace R = 'http://exquery.org/ns/rest/annotation';" + Prop.NL;
 
   // INITIALIZERS =============================================================
@@ -33,7 +33,7 @@ public final class RestXqTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(true);
+    init(ROOT, true);
   }
 
   // TEST METHODS =============================================================
@@ -41,38 +41,38 @@ public final class RestXqTest extends HTTPTest {
   /** Retrieve root.
    * @throws Exception exception */
   @Test public void getRoot() throws Exception {
-    ok("declare %R:path('') function m:f() { 'root' };", "/", "root");
+    get("declare %R:path('') function m:f() { 'root' };", "/", "root");
   }
 
   /** Retrieve path.
    * @throws Exception exception */
   @Test public void getTest() throws Exception {
-    ok("declare %R:path('/test') function m:f() {'ok'};", "test", "ok");
+    get("declare %R:path('/test') function m:f() {'ok'};", "test", "ok");
   }
 
   /** Retrieve path with variable.
    * @throws Exception exception */
   @Test public void getVariable() throws Exception {
     final String f = "declare %R:path('/var/{$x}') function m:f($x) {$x};";
-    ok(f, "var/x", "x");
-    ok(f, "var/y", "y");
+    get(f, "var/x", "x");
+    get(f, "var/y", "y");
   }
 
   /** Retrieve path with variable on root level.
    * @throws Exception exception */
   @Test public void getRootVariable() throws Exception {
     final String f = "declare %R:path('{$x}/a/b/c') function m:f($x) {$x};";
-    ok(f, "x/a/b/c", "x");
+    get(f, "x/a/b/c", "x");
     // wrong path
-    no(f, "x/a/b/d");
+    getE(f, "x/a/b/d");
   }
 
   /** Retrieve path with typed variable.
    * @throws Exception exception */
   @Test public void getInteger() throws Exception {
     final String f = "declare %R:path('/{$x}') function m:f($x as xs:int) {$x};";
-    ok(f, "2", "2");
-    no(f, "StRiNg");
+    get(f, "2", "2");
+    getE(f, "StRiNg");
   }
 
   /** Retrieve path with multiple variables.
@@ -80,8 +80,8 @@ public final class RestXqTest extends HTTPTest {
   @Test public void getMultiply() throws Exception {
     final String f = "declare %R:path('{$x}/{$y}') function " +
         "m:f($x as xs:integer,$y as xs:integer) {$x*$y};";
-    ok(f, "2/3", "6");
-    no(f, "2/x");
+    get(f, "2/3", "6");
+    getE(f, "2/x");
   }
 
   /**
@@ -90,19 +90,19 @@ public final class RestXqTest extends HTTPTest {
    */
   @Test public void errorPath() throws Exception {
     // correct syntax
-    ok("declare %R:path('') function m:f() {()};", "", "");
+    get("declare %R:path('') function m:f() {()};", "", "");
     // no path annotation
-    no("declare %R:GET function m:f() {()};", "");
+    getE("declare %R:GET function m:f() {()};", "");
     // no path argument
-    no("declare %R:path function m:f() {()};", "");
+    getE("declare %R:path function m:f() {()};", "");
     // empty path argument
-    no("declare %R:path(()) function m:f() {()};", "");
+    getE("declare %R:path(()) function m:f() {()};", "");
     // two path arguments
-    no("declare %R:path(('a', 'b')) function m:f() {()};", "a");
-    no("declare %R:path('a') %R:path('b') function m:f() {()};", "a");
+    getE("declare %R:path(('a', 'b')) function m:f() {()};", "a");
+    getE("declare %R:path('a') %R:path('b') function m:f() {()};", "a");
     // path not found
-    no("declare %R:path('') function m:f() { 1 };", "X");
-    no("declare %R:path('a') function m:f() { 1 };", "");
+    getE("declare %R:path('') function m:f() { 1 };", "X");
+    getE("declare %R:path('a') function m:f() { 1 };", "");
   }
 
   /**
@@ -111,21 +111,21 @@ public final class RestXqTest extends HTTPTest {
    */
   @Test public void errorPathVar() throws Exception {
     // correct syntax
-    ok("declare %R:path('{$x}') function m:f($x) {$x};", "1", "1");
+    get("declare %R:path('{$x}') function m:f($x) {$x};", "1", "1");
     // invalid variable definitions
-    no("declare %R:path('{a}') function m:f() {()};", "a");
-    no("declare %R:path('{ $a }') function m:f() {()};", "a");
+    getE("declare %R:path('{a}') function m:f() {()};", "a");
+    getE("declare %R:path('{ $a }') function m:f() {()};", "a");
     // invalid variable name
-    no("declare %R:path('{$x::x}') function m:f() {()};", "a");
-    no("declare %R:path('{$x x}') function m:f() {()};", "a");
+    getE("declare %R:path('{$x::x}') function m:f() {()};", "a");
+    getE("declare %R:path('{$x x}') function m:f() {()};", "a");
     // missing argument
-    no("declare %R:path('{$x}') function m:f() {()};", "a");
+    getE("declare %R:path('{$x}') function m:f() {()};", "a");
     // variable in template specified twice
-    no("declare %R:path('{$x}/{$x}') function m:f($x) {()};", "a");
+    getE("declare %R:path('{$x}/{$x}') function m:f($x) {()};", "a");
     // variable in template missing
-    no("declare %R:path('') function m:f($x) {()};", "");
+    getE("declare %R:path('') function m:f($x) {()};", "");
     // variable must inherit xs:anyAtomicType
-    no("declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
+    getE("declare %R:path('{$x}') function m:f($x as node()) {$x};", "1");
   }
 
   /**
@@ -134,9 +134,9 @@ public final class RestXqTest extends HTTPTest {
    */
   @Test public void errorAnn() throws Exception {
     // correct syntax
-    ok("declare %R:path('') function m:f() {'x'};", "", "x");
+    get("declare %R:path('') function m:f() {'x'};", "", "x");
     // invalid annotation
-    no("declare %R:path('') %R:xyz function m:f() {'x'};", "");
+    getE("declare %R:path('') %R:xyz function m:f() {'x'};", "");
   }
 
   /**
@@ -145,12 +145,12 @@ public final class RestXqTest extends HTTPTest {
    */
   @Test public void errorOutput() throws Exception {
     // correct syntax
-    ok("declare %R:path('') %output:method('text') function m:f() {'9'};", "", "9");
+    get("declare %R:path('') %output:method('text') function m:f() {'9'};", "", "9");
     // unknown serialization parameter
-    no("declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
+    getE("declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
     // parameter must contain single string
-    no("declare %R:path('') %output:method function m:f() {'9'};", "");
-    no("declare %R:path('') %output:method(('xml','html')) function m:f() {'9'};", "");
+    getE("declare %R:path('') %output:method function m:f() {'9'};", "");
+    getE("declare %R:path('') %output:method(('xml','html')) function m:f() {'9'};", "");
   }
 
   /**
@@ -159,10 +159,10 @@ public final class RestXqTest extends HTTPTest {
    */
   @Test public void errorConsumes() throws Exception {
     // correct syntax
-    ok("declare %R:path('') %R:consumes('a/b') function m:f() {()};", "", "");
+    get("declare %R:path('') %R:consumes('a/b') function m:f() {()};", "", "");
     // duplicate annotation
-    no("declare %R:path('') %R:consumes(('a','b')) function m:f(){()};", "");
-    no("declare %R:path('') %R:consumes('a') %R:consumes('b') function m:f(){()};", "");
+    getE("declare %R:path('') %R:consumes(('a','b')) function m:f(){()};", "");
+    getE("declare %R:path('') %R:consumes('a') %R:consumes('b') function m:f(){()};", "");
   }
 
   /**
@@ -171,10 +171,25 @@ public final class RestXqTest extends HTTPTest {
    */
   @Test public void errorProduces() throws Exception {
     // correct syntax
-    ok("declare %R:path('') %R:produces('a/b') function m:f() {()};", "", "");
+    get("declare %R:path('') %R:produces('a/b') function m:f() {()};", "", "");
     // duplicate annotation
-    no("declare %R:path('') %R:produces(('a','b')) function m:f(){()};", "");
-    no("declare %R:path('') %R:produces('a') %R:produces('b') function m:f(){()};", "");
+    getE("declare %R:path('') %R:produces(('a','b')) function m:f(){()};", "");
+    getE("declare %R:path('') %R:produces('a') %R:produces('b') function m:f(){()};", "");
+  }
+
+  /**
+   * Errors around the {@code %HEAD} method.
+   * @throws Exception exception
+   */
+  @Test public void errorHEAD() throws Exception {
+    // correct return type
+    head("declare %R:HEAD %R:path('') function m:f() { <R:response/> };", "", "");
+    head("declare %R:HEAD %R:path('') function m:f() as element(R:response) " +
+        "{ <R:response/> };", "", "");
+    // wrong type
+    headE("declare %R:HEAD %R:path('') function m:f() { () };", "");
+    headE("declare %R:HEAD %R:path('') function m:f() { <response/> };", "");
+    headE("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {()};", "");
   }
 
   // PRIVATE METHODS ==========================================================
@@ -186,10 +201,10 @@ public final class RestXqTest extends HTTPTest {
    * @param exp expected result
    * @throws IOException I/O exception
    */
-  private static void ok(final String function, final String query, final String exp)
+  private static void get(final String function, final String query, final String exp)
       throws IOException {
     install(function);
-    assertEquals(exp, get(ROOT, query));
+    assertEquals(exp, get(query));
   }
 
   /**
@@ -198,10 +213,40 @@ public final class RestXqTest extends HTTPTest {
    * @param query request
    * @throws IOException I/O exception
    */
-  private static void no(final String function, final String query) throws IOException {
+  private static void getE(final String function, final String query) throws IOException {
     install(function);
     try {
-      get(ROOT, query);
+      get(query);
+      fail("Error expected: " + query);
+    } catch(final BaseXException ex) {
+    }
+  }
+
+  /**
+   * Executes the specified HEAD request and tests the result.
+   * @param function function to test
+   * @param query request
+   * @param exp expected result
+   * @throws IOException I/O exception
+   */
+  private static void head(final String function, final String query, final String exp)
+      throws IOException {
+    install(function);
+    assertEquals(exp, head(query));
+  }
+
+  /**
+   * Executes the specified HEAD request and tests for an error.
+   * @param function function to test
+   * @param query request
+   * @throws IOException I/O exception
+   */
+  private static void headE(final String function, final String query)
+      throws IOException {
+
+    install(function);
+    try {
+      head(query);
       fail("Error expected: " + query);
     } catch(final BaseXException ex) {
     }

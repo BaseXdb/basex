@@ -1,6 +1,6 @@
 package org.basex.test.http;
 
-import org.junit.BeforeClass;
+import org.junit.*;
 
 /**
  * This class tests the embedded HTTP Client.
@@ -15,6 +15,6 @@ public class ServerHTTPClientTest extends HTTPClientTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(false);
+    init(RESTURL, false);
   }
 }

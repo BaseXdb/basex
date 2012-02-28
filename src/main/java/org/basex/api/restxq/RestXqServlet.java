@@ -62,7 +62,7 @@ public final class RestXqServlet extends HttpServlet {
 
 /* [CG] RestXq: OPEN ISSUES
  * - resolve conflicting paths: what is "more specific"?
- * - check methods (TRACE/CONNECT don't return anything)
+ * - check methods: HEAD must only return rest:reponse element
  * - POST/PUT: bind request body to variable
  * - %rest:query-param: query string parameters
  * - %rest:form-param: "application/x-www-form-urlencoded"

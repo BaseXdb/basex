@@ -1,6 +1,7 @@
 package org.basex.api.restxq;
 
 import static javax.servlet.http.HttpServletResponse.*;
+import static org.basex.api.restxq.RestXqText.*;
 
 import java.io.*;
 import java.util.*;
@@ -12,6 +13,7 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.query.iter.*;
 import org.basex.util.*;
 
@@ -144,13 +146,21 @@ final class RestXqModule {
     rxf.bind(http);
 
     // compile and evaluate function
-    final ValueIter ir = bfc.comp(qc).value(qc).iter();
+    final Value result = bfc.comp(qc).value(qc);
+
+    // [CG] RestXq: what happens if a method specified more methods than HEAD?
+    if(rxf.methods.size() == 1 && rxf.methods.contains(HTTPMethod.HEAD)) {
+      final QNm response = new QNm(RESPONSE, QueryText.REXQURI);
+      final SeqType type = SeqType.get(NodeType.ELM, Occ.ONE, response);
+      if(!type.instance(result)) rxf.error(HEAD_METHOD);
+    }
 
     // set serialization parameters
     http.initResponse(rxf.output);
 
     // serialize result
     final Serializer ser = Serializer.get(http.out);
+    final ValueIter ir = result.iter();
     for(Item it; (it = ir.next()) != null;) it.serialize(ser);
     ser.close();
 

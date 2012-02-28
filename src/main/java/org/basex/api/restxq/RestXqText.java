@@ -16,18 +16,8 @@ interface RestXqText {
   /** Annotation "consumes". */
   byte[] CONSUMES = token("consumes");
 
-  /** Annotation "GET". */
-  byte[] GET = token("GET");
-  /** Annotation "POST". */
-  byte[] POST = token("POST");
-  /** Annotation "PUT". */
-  byte[] PUT = token("PUT");
-  /** Annotation "DELETE". */
-  byte[] DELETE = token("DELETE");
-  /** Annotation "OPTIONS". */
-  byte[] OPTIONS = token("OPTIONS");
-  /** Annotation "HEAD". */
-  byte[] HEAD = token("HEAD");
+  /** Element "rest:response". */
+  byte[] RESPONSE = token("response");
 
   /** Error message. */
   String ANN_MISSING = "Annotation % is missing.";
@@ -40,7 +30,7 @@ interface RestXqText {
   /** Error message. */
   String INVALID_VAR = "Invalid variable name: $%.";
   /** Error message. */
-  String VAR_ATOMIC = "Variable $% must inherit from %.";
+  String VAR_TYPE = "Variable $% must inherit from %.";
   /** Error message. */
   String UNKNOWN_VAR = "Variable $% is not specified as argument.";
   /** Error message. */
@@ -49,6 +39,10 @@ interface RestXqText {
   String VAR_UNDEFINED = "Variable $% is not assigned by the annotations.";
   /** Error message. */
   String UNKNOWN_SER = "Unknown serialization parameter \"%\".";
+  /** Error message. */
+  String HEAD_METHOD = "HEAD method must only return 'rest:reponse' element.";
+  /** Error message. */
+  String METHOD_VALUE = "Method % does not allow values.";
 
   /** Error message. */
   String NOT_FOUND = "No XQuery function found to process the request.";

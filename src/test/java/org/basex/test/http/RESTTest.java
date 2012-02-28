@@ -1,8 +1,7 @@
 package org.basex.test.http;
 
-import static org.basex.core.Text.*;
+import static org.basex.api.HTTPMethod.*;
 import static org.basex.io.MimeTypes.*;
-import static org.basex.query.func.Function.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
@@ -13,7 +12,7 @@ import org.basex.api.rest.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
+import org.basex.query.func.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -26,14 +25,14 @@ import org.junit.*;
 public class RESTTest extends HTTPTest {
   /** REST identifier. */
   private static final String NAME = "rest";
+  /** Root path. */
+  protected static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + NAME + '/';
+
   /** REST URI. */
   private static final String URI = string(RESTText.RESTURI);
   /** Opening result. */
   private static final String WRAP =
-          '<' + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
-  /** Root path. */
-  private static final String ROOT =
-      "http://" + LOCALHOST + ":9998/" + NAME + '/';
+      '<' + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
   /** Input file. */
   private static final String FILE = "src/test/resources/input.xml";
 
@@ -45,7 +44,7 @@ public class RESTTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(true);
+    init(ROOT, true);
   }
 
   // TEST METHODS =============================================================
@@ -182,20 +181,20 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void getContentType() throws Exception {
-    assertEquals(APP_XML, ct("?query=1"));
-    assertEquals(TEXT_PLAIN, ct("?command=info"));
+    assertEquals(APP_XML, contentType("?query=1"));
+    assertEquals(TEXT_PLAIN, contentType("?command=info"));
 
-    assertEquals(APP_XML, ct("?query=1&method=xml"));
-    assertEquals(TEXT_HTML, ct("?query=1&method=xhtml"));
-    assertEquals(TEXT_HTML, ct("?query=1&method=html"));
-    assertEquals(TEXT_PLAIN, ct("?query=1&method=text"));
-    assertEquals(APP_OCTET, ct("?query=1&method=raw"));
-    assertEquals(APP_JSON, ct("?query=<json+type='object'/>&method=json"));
-    assertEquals(APP_JSON, ct("?query=<json/>&method=jsonml"));
+    assertEquals(APP_XML, contentType("?query=1&method=xml"));
+    assertEquals(TEXT_HTML, contentType("?query=1&method=xhtml"));
+    assertEquals(TEXT_HTML, contentType("?query=1&method=html"));
+    assertEquals(TEXT_PLAIN, contentType("?query=1&method=text"));
+    assertEquals(APP_OCTET, contentType("?query=1&method=raw"));
+    assertEquals(APP_JSON, contentType("?query=<json+type='object'/>&method=json"));
+    assertEquals(APP_JSON, contentType("?query=<json/>&method=jsonml"));
 
-    assertEquals(APP_XML, ct("?query=1&media-type=application/xml"));
-    assertEquals(TEXT_HTML, ct("?query=1&media-type=text/html"));
-    assertEquals("xxx", ct("?query=1&media-type=xxx"));
+    assertEquals(APP_XML, contentType("?query=1&media-type=application/xml"));
+    assertEquals(TEXT_HTML, contentType("?query=1&media-type=text/html"));
+    assertEquals("xxx", contentType("?query=1&media-type=xxx"));
   }
 
   /**
@@ -371,8 +370,8 @@ public class RESTTest extends HTTPTest {
     put(DB + "/a", new ArrayInput(token("<a>A</a>")));
     put(DB + "/b", new ArrayInput(token("<b>B</b>")));
     assertEquals("2", get(DB + "?query=count(//text())"));
-    assertEquals("2", get("?query=count(" + _DB_OPEN.args(DB) + "//text())"));
-    assertEquals("1", get("?query=count(" + _DB_OPEN.args(DB, "b") + "/*)"));
+    assertEquals("2", get("?query=count(" + Function._DB_OPEN.args(DB) + "//text())"));
+    assertEquals("1", get("?query=count(" + Function._DB_OPEN.args(DB, "b") + "/*)"));
     delete(DB);
   }
 
@@ -402,12 +401,12 @@ public class RESTTest extends HTTPTest {
   public void delete1() throws IOException {
     put(DB, new FileInputStream(FILE));
     // delete database
-    assertEquals(delete(DB).trim(), Util.info(DB_DROPPED_X, DB));
+    assertEquals(delete(DB).trim(), Util.info(Text.DB_DROPPED_X, DB));
     try {
       // no database left
       delete(DB);
       fail("Error expected.");
-    } catch(final FileNotFoundException ex) {
+    } catch(final BaseXException ex) {
     }
   }
 
@@ -427,12 +426,12 @@ public class RESTTest extends HTTPTest {
     // no 'b' directory left
     assertContains(delete(DB + "/b"), "0 document");
     // delete database
-    assertEquals(delete(DB).trim(), Util.info(DB_DROPPED_X, DB));
+    assertEquals(delete(DB).trim(), Util.info(Text.DB_DROPPED_X, DB));
     try {
       // no database left
       delete(DB);
       fail("Error expected.");
-    } catch(final FileNotFoundException ex) {
+    } catch(final BaseXException ex) {
     }
   }
 
@@ -459,49 +458,7 @@ public class RESTTest extends HTTPTest {
    * @param sub sub string
    */
   private static void assertContains(final String str, final String sub) {
-    if(!str.contains(sub)) {
-      fail('\'' + sub + "' not contained in '" + str + "'.");
-    }
-  }
-
-  /**
-   * Executes the specified GET request and returns the result.
-   * @param query request
-   * @return string result, or {@code null} for a failure.
-   * @throws IOException I/O exception
-   */
-  private static String get(final String query) throws IOException {
-    final URL url = new URL(ROOT + query);
-
-    // create connection
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    try {
-      final BufferInput bi = new BufferInput(conn.getInputStream());
-      return read(bi).replaceAll("\r?\n *", "");
-    } catch(final IOException ex) {
-      throw error(conn, ex);
-    } finally {
-      conn.disconnect();
-    }
-  }
-
-  /**
-   * Executes the specified GET request and returns the content type.
-   * @param query request
-   * @return string result, or {@code null} for a failure.
-   * @throws IOException I/O exception
-   */
-  private static String ct(final String query) throws IOException {
-    final URL url = new URL(ROOT + query);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    try {
-      read(conn.getInputStream());
-      return conn.getContentType();
-    } catch(final IOException ex) {
-      throw error(conn, ex);
-    } finally {
-      conn.disconnect();
-    }
+    if(!str.contains(sub)) fail('\'' + sub + "' not contained in '" + str + "'.");
   }
 
   /**
@@ -511,17 +468,15 @@ public class RESTTest extends HTTPTest {
    * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private static String post(final String path, final String query)
-      throws IOException {
-    final URL url = new URL(ROOT + path);
-
+  private static String post(final String path, final String query) throws IOException {
     // create connection
+    final URL url = new URL(ROOT + path);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
-    conn.setRequestMethod("POST");
+    conn.setRequestMethod(POST.name());
     conn.setRequestProperty(DataText.CONTENT_TYPE, APP_XML);
-    // basic authentication example
-    final String encoded = Base64.encode(ADMIN + ':' + ADMIN);
+    // basic authentication
+    final String encoded = Base64.encode(Text.ADMIN + ':' + Text.ADMIN);
     conn.setRequestProperty(DataText.AUTHORIZATION, DataText.BASIC + ' ' + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
@@ -543,8 +498,7 @@ public class RESTTest extends HTTPTest {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  private static void put(final String query, final InputStream is)
-      throws IOException {
+  private static void put(final String query, final InputStream is) throws IOException {
     put(query, is, null);
   }
 
@@ -552,16 +506,16 @@ public class RESTTest extends HTTPTest {
    * Executes the specified PUT request.
    * @param query request
    * @param is input stream
-   * @param ctype content type (optional)
+   * @param ctype content type (optional, may be {@code null})
    * @throws IOException I/O exception
    */
-  private static void put(final String query, final InputStream is,
-      final String ctype) throws IOException {
+  private static void put(final String query, final InputStream is, final String ctype)
+      throws IOException {
 
     final URL url = new URL(ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
-    conn.setRequestMethod("PUT");
+    conn.setRequestMethod(PUT.name());
     if(ctype != null) conn.setRequestProperty(DataText.CONTENT_TYPE, ctype);
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     if(is != null) {
@@ -581,46 +535,21 @@ public class RESTTest extends HTTPTest {
   }
 
   /**
-   * Returns an exception with improved error message.
-   * @param conn connection reference
-   * @param ex exception
-   * @return exception
-   * @throws IOException I/O exception
-   */
-  private static IOException error(final HttpURLConnection conn,
-      final IOException ex) throws IOException {
-    final String msg = read(conn.getErrorStream());
-    throw new BaseXException(msg.isEmpty() ? ex.getMessage() : msg);
-  }
-
-  /**
-   * Executes the specified DELETE request.
+   * Executes the specified GET request and returns the content type.
    * @param query request
-   * @return response code
+   * @return string result, or {@code null} for a failure.
    * @throws IOException I/O exception
    */
-  private static String delete(final String query) throws IOException {
+  private static String contentType(final String query) throws IOException {
     final URL url = new URL(ROOT + query);
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     try {
-      conn.setRequestMethod("DELETE");
-      return read(conn.getInputStream());
+      read(conn.getInputStream());
+      return conn.getContentType();
+    } catch(final IOException ex) {
+      throw error(conn, ex);
     } finally {
       conn.disconnect();
     }
-  }
-
-  /**
-   * Returns a string result from the specified input stream.
-   * @param is input stream
-   * @return string
-   * @throws IOException I/O exception
-   */
-  private static String read(final InputStream is) throws IOException {
-    final ArrayOutput ao = new ArrayOutput();
-    final BufferInput bi = new BufferInput(is);
-    for(int i; (i = bi.read()) != -1;) ao.write(i);
-    bi.close();
-    return ao.toString();
   }
 }

@@ -31,15 +31,15 @@ import org.junit.*;
  * @author Rositsa Shadura
  */
 public class HTTPClientTest extends HTTPTest {
+  /** Example url. */
+  static final String RESTURL = "http://" + LOCALHOST + ":9998/rest/" + DB;
+
   /** Status code. */
   private static final byte[] STATUS = token("status");
   /** Body attribute media-type. */
   private static final byte[] MEDIATYPE = token("media-type");
   /** Body attribute method. */
   private static final byte[] METHOD = token("method");
-  /** Example url. */
-  private static final String RESTURL =
-      "http://" + LOCALHOST + ":9998/rest/" + DB;
   /** Books document. */
   private static final String BOOKS = "<books>" + "<book id='1'>"
       + "<name>Sherlock Holmes</name>" + "<author>Doyle</author>" + "</book>"
@@ -58,7 +58,7 @@ public class HTTPClientTest extends HTTPTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    init(true);
+    init(RESTURL, true);
   }
 
   /**
