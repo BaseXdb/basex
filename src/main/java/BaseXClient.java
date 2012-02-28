@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Java client for BaseX.
@@ -39,6 +40,9 @@ public class BaseXClient {
   Socket esocket;
   /** Socket host name. */
   String ehost;
+  /** Cached event items. */
+  private LinkedBlockingQueue<Event> eventCache =
+          new LinkedBlockingQueue<Event>();
 
   /**
    * Constructor.
@@ -151,10 +155,10 @@ public class BaseXClient {
   /**
    * Watches an event.
    * @param name event name
-   * @param notifier event notification
+   * @param eventNotifier event notification
    * @throws IOException I/O exception
    */
-  public void watch(final String name, final EventNotifier notifier)
+  public void watch(final String name, final EventNotifier eventNotifier)
       throws IOException {
     out.write(10);
     if(esocket == null) {
@@ -173,7 +177,7 @@ public class BaseXClient {
     send(name);
     info = receive();
     if(!ok()) throw new IOException(info);
-    notifiers.put(name, notifier);
+    notifiers.put(name, eventNotifier);
   }
 
   /**
@@ -284,12 +288,26 @@ public class BaseXClient {
             os = new ByteArrayOutputStream();
             receive(bi, os);
             final String data = new String(os.toByteArray(), UTF8);
-            notifiers.get(name).notify(data);
+            eventCache.add(new Event(name, data));
           }
         } catch(final IOException ex) {
           // loop will be quit if no data can be received anymore
         }
       }
+    }.start();
+
+    new Thread() {
+        @Override
+        public void run() {
+            while(true) {
+                try {
+                    Event e = eventCache.take();
+                    notifiers.get(e.getName()).notify(e.getValue());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }.start();
   }
 
@@ -445,6 +463,43 @@ public class BaseXClient {
       if(!ok()) throw new IOException(receive());
       return s;
     }
+  }
+
+  /**
+   * Inner class for event mechanism.
+   */
+  public final class Event {
+
+      /** Name of event. */
+      private String name;
+      /** Value of event. */
+      private String value;
+
+      /**
+       * Default constructor.
+       * @param n event name
+       * @param v event value
+       */
+      private Event(final String n, final String v) {
+          name = n;
+          value = v;
+      }
+
+      /**
+       * Returns name of event.
+       * @return event name
+       */
+      public String getName() {
+          return name;
+      }
+
+      /**
+       * Returns value of event.
+       * @return event value
+       */
+      public String getValue() {
+          return value;
+      }
   }
 
   /**
