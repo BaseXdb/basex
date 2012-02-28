@@ -47,7 +47,6 @@ import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Retrieve;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
-import org.basex.core.cmd.ShowBackups;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.Store;
 import org.basex.core.cmd.XQuery;
@@ -514,8 +513,8 @@ public class CommandTest {
     // deleting a backup passing the exact backup name as argument
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    ok(new DropBackup(ShowBackups.list(NAME, false, CONTEXT).get(0)));
-    assertEquals(0, ShowBackups.list(NAME, false, CONTEXT).size());
+    ok(new DropBackup(CONTEXT.getDatabases().listBackups().get(0)));
+    assertEquals(0, CONTEXT.getDatabases().listBackups(NAME).size());
   }
 
   /**
@@ -529,12 +528,12 @@ public class CommandTest {
     ok(new DropBackup(NAME));
 
     // dropping a specific backup (database name + time stamp)
-    // how to get my hands on the created backup name?
+    // TODO how to get my hands on the created backup name?
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    final String[] b = ShowBackups.list(NAME, false, CONTEXT).toArray();
+    final String[] b = CONTEXT.getDatabases().listBackups(NAME).toArray();
     ok(new DropBackup(b[0]));
-    assertEquals(0, ShowBackups.list(NAME, false, CONTEXT).size());
+    assertEquals(0, CONTEXT.getDatabases().listBackups(NAME).size());
 
     /* Creates 2 dbs: one with a short name (1), the other with a
      * longer name (2). (1) is a prefix of (2). Tests then, whether
@@ -545,7 +544,7 @@ public class CommandTest {
     ok(new CreateBackup(NAME));
     ok(new CreateBackup(NAME2));
     ok(new DropBackup(NAME));
-    assertEquals(1, ShowBackups.list(NAME2, false, CONTEXT).size());
+    assertEquals(1, CONTEXT.getDatabases().listBackups(NAME2).size());
   }
 
   /** Retrieves raw data. */

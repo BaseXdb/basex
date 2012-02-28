@@ -103,6 +103,7 @@ public final class OptimizeAll extends ACreate {
 
     // find unique temporary database name
     final String tname = ctx.mprop.random(m.name);
+    ctx.getDatabases().add(tname);
 
     // build database and index structures
     final DiskBuilder builder = new DiskBuilder(tname,
@@ -134,9 +135,9 @@ public final class OptimizeAll extends ACreate {
 
     // drop old database and rename temporary to final name
     // usually, no exceptions should be thrown here anymore
-    if(!DropDB.drop(m.name, ctx.mprop))
+    if(!DropDB.drop(m.name, ctx))
       throw new BaseXException(DB_NOT_DROPPED_X, m.name);
-    if(!AlterDB.alter(tname, m.name, ctx.mprop))
+    if(!AlterDB.alter(tname, m.name, ctx))
       throw new BaseXException(DB_NOT_RENAMED_X, tname);
   }
 

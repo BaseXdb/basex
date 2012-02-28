@@ -4,16 +4,17 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
+import java.util.regex.*;
+
+import org.basex.data.MetaData;
+import org.basex.io.in.DataInput;
+import org.basex.util.Table;
 
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.User;
-import org.basex.data.MetaData;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.io.in.DataInput;
-import org.basex.util.Table;
 import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
 
@@ -46,7 +47,7 @@ public final class List extends Command {
     table.header.add(SIZE);
     if(create) table.header.add(INPUT_PATH);
 
-    for(final String name : list(context)) {
+    for(final String name : context.getDatabases().listDBs()) {
       DataInput di = null;
       String file = null;
       long size = 0;

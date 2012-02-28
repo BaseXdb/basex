@@ -87,7 +87,7 @@ public final class DiskTableTest {
   public void tearDown() {
     try {
       if(tda != null) tda.close();
-      DropDB.drop(DB, CONTEXT.mprop);
+      DropDB.drop(DB, CONTEXT);
     } catch(final Exception ex) {
       Util.stack(ex);
     }

@@ -121,4 +121,18 @@ public class StringList extends ElementList implements Iterable<String> {
       public void remove() { Util.notexpected(); }
     };
   }
+
+  /**
+   * Removes double elements in a sorted list. Does not change input.
+   * @param l Sorted list
+   * @return Unique sorted list
+   */
+  public static StringList unique(final StringList l) {
+    final StringList out = new StringList(l.size());
+    out.add(l.get(0));
+    for(int i = 1; i < l.size(); i++) {
+      if(!l.get(i).equals(l.get(i - 1))) out.add(l.get(i));
+    }
+    return out;
+  }
 }

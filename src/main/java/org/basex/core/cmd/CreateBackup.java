@@ -15,6 +15,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.Zip;
 import org.basex.util.Util;
+import org.basex.util.list.StringList;
 
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
@@ -38,8 +39,8 @@ public final class CreateBackup extends Command {
       return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases
-    final String[] dbs = databases(args[0]);
-    if(dbs.length == 0) return error(DB_NOT_FOUND_X, args[0]);
+    final StringList dbs = context.getDatabases().listDBs(args[0]);
+    if(dbs.size() == 0) return error(DB_NOT_FOUND_X, args[0]);
 
     // loop through all databases
     boolean ok = true;
@@ -69,6 +70,7 @@ public final class CreateBackup extends Command {
 
       final Zip zip = progress(new Zip(file));
       zip.zip(path);
+      context.getDatabases().add(db, true);
       return true;
     } catch(final IOException ex) {
       Util.debug(ex);
