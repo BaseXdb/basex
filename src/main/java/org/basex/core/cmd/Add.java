@@ -136,7 +136,7 @@ public final class Add extends ACreate {
       try { build.close(); } catch(final IOException e) { }
       if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
       // drop temporary database instance
-      if(large) DropDB.drop(db, context.mprop);
+      if(large) DropDB.drop(db, context);
     }
   }
 

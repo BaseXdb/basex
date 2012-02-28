@@ -38,7 +38,9 @@ public final class DiskBuilder extends Builder {
   private DataOutput sout;
 
   /** Admin properties. */
-  private final MainProp mprop;
+  final MainProp mprop;
+  /** Database context. */
+  final Context context;
   /** Text compressor. */
   private final Compress comp;
 
@@ -51,12 +53,13 @@ public final class DiskBuilder extends Builder {
   public DiskBuilder(final String nm, final Parser parse, final Context ctx) {
     super(nm, parse, ctx.prop);
     comp = new Compress();
+    context = ctx;
     mprop = ctx.mprop;
   }
 
   @Override
   public DiskData build() throws IOException {
-    DropDB.drop(name, mprop);
+    DropDB.drop(name, context);
     mprop.dbpath(name).md();
 
     final IO file = parser.src;
@@ -101,7 +104,7 @@ public final class DiskBuilder extends Builder {
     } catch(final IOException ex) {
       Util.debug(ex);
     }
-    if(meta != null) DropDB.drop(meta.name, mprop);
+    if(meta != null) DropDB.drop(meta.name, context);
   }
 
   @Override

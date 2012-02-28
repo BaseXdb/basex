@@ -2,13 +2,12 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.MainProp;
-import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.User;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
+import org.basex.core.Context;
+import org.basex.core.User;
 import org.basex.data.MetaData;
 
 /**
@@ -49,20 +48,24 @@ public final class AlterDB extends Command {
     if(context.pinned(db)) return error(DB_PINNED_X, db);
 
     // try to alter database
-    return alter(db, name, mprop) && (!closed || new Open(name).run(context)) ?
-      info(DB_RENAMED_X, db, name) : error(DB_NOT_RENAMED_X, db);
+    return alter(db, name, context) && (!closed || new Open(name).run(context))
+        ? info(DB_RENAMED_X, db, name) : error(DB_NOT_RENAMED_X, db);
   }
 
   /**
    * Renames the specified database.
    * @param db database name
    * @param dbnew new database name
-   * @param pr database properties
+   * @param ctx database context
    * @return success flag
    */
   public static synchronized boolean alter(final String db,
-      final String dbnew, final MainProp pr) {
-    return pr.dbpath(db).rename(pr.dbpath(dbnew));
+      final String dbnew, final Context ctx) {
+    if(ctx.mprop.dbpath(db).rename(ctx.mprop.dbpath(dbnew))) {
+      ctx.getDatabases().alter(db, dbnew);
+      return true;
+    }
+    return false;
   }
 
   @Override
