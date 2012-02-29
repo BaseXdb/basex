@@ -32,7 +32,9 @@ import org.junit.*;
  */
 public class HTTPClientTest extends HTTPTest {
   /** Example url. */
-  static final String RESTURL = "http://" + LOCALHOST + ":9998/rest/" + DB;
+  static final String ROOT = "http://" + LOCALHOST + ":9998/rest/";
+  /** Example url. */
+  static final String RESTURL = ROOT + DB;
 
   /** Status code. */
   private static final byte[] STATUS = token("status");
@@ -59,25 +61,6 @@ public class HTTPClientTest extends HTTPTest {
   @BeforeClass
   public static void start() throws Exception {
     init(RESTURL, true);
-  }
-
-  /**
-   * Creates a test database.
-   * @throws BaseXException database exception
-   */
-  @Before
-  public void init() throws BaseXException {
-    new CreateDB(DB, BOOKS).execute(CONTEXT);
-    new Close().execute(CONTEXT);
-  }
-
-  /**
-   * Deletes the test database.
-   * @throws BaseXException database exception
-   */
-  @After
-  public void finish() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
   }
 
   /**
@@ -133,7 +116,7 @@ public class HTTPClientTest extends HTTPTest {
   public void postGet() throws Exception {
     // GET1 - just send a GET request
     QueryProcessor qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' href='" + RESTURL + "'/>)", CONTEXT);
+        + "<http:request method='get' href='" + ROOT + "'/>)", CONTEXT);
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -143,7 +126,7 @@ public class HTTPClientTest extends HTTPTest {
     // GET2 - with override-media-type='text/plain'
     qp = new QueryProcessor("http:send-request("
         + "<http:request method='get' override-media-type='text/plain'/>, '"
-        + RESTURL + "')", CONTEXT);
+        + ROOT + "')", CONTEXT);
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
@@ -152,7 +135,7 @@ public class HTTPClientTest extends HTTPTest {
 
     // Get3 - with status-only='true'
     qp = new QueryProcessor("http:send-request("
-        + "<http:request method='get' status-only='true'/>, '" + RESTURL + "')",
+        + "<http:request method='get' status-only='true'/>, '" + ROOT + "')",
         CONTEXT);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
@@ -164,11 +147,18 @@ public class HTTPClientTest extends HTTPTest {
    */
   @Test
   public void postDelete() throws Exception {
+    // add document to be deleted
+    QueryProcessor qp = new QueryProcessor("http:send-request("
+        + "<http:request method='put'>"
+        + "<http:body media-type='text/xml'><ToBeDeleted/></http:body>"
+        + "</http:request>, '" + RESTURL + "')", CONTEXT);
+    qp.execute();
+    qp.close();
+
     // DELETE
-    final QueryProcessor qp = new QueryProcessor("http:send-request("
+    qp = new QueryProcessor("http:send-request("
         + "<http:request method='delete' status-only='true'/>, '"
-        + RESTURL + "')",
-        CONTEXT);
+        + RESTURL + "')", CONTEXT);
     checkResponse(qp.execute(), HttpURLConnection.HTTP_OK, 1);
     qp.close();
   }

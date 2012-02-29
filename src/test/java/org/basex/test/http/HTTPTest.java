@@ -39,9 +39,13 @@ public abstract class HTTPTest {
    */
   protected static void init(final String rt, final boolean local) throws Exception {
     final Context ctx = HTTPSession.context();
-    final IOFile tmp = sandbox();
-    assertTrue(tmp.md());
-    ctx.mprop.set(MainProp.HTTPPATH, tmp.path());
+    final IOFile sb = sandbox();
+    final IOFile dbPath = new IOFile(sb, "data");
+    dbPath.md();
+    ctx.mprop.set(MainProp.DBPATH, dbPath.path());
+    final IOFile httpPath = new IOFile(sb, "http");
+    httpPath.md();
+    ctx.mprop.set(MainProp.HTTPPATH, httpPath.path());
     root = rt;
 
     final StringList sl = new StringList();
@@ -58,7 +62,7 @@ public abstract class HTTPTest {
   @AfterClass
   public static void stop() throws Exception {
     http.stop();
-    assertTrue(sandbox().delete());
+    assertTrue("Sandbox could not be deleted.", sandbox().delete());
   }
 
   // PROTECTED METHODS ==================================================================
