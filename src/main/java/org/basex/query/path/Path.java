@@ -158,7 +158,7 @@ public abstract class Path extends ParseExpr {
   long size(final QueryContext ctx) {
     final Value rt = root(ctx);
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
-    if(data == null || !data.meta.pathindex || !data.meta.uptodate) return -1;
+    if(data == null || !data.meta.uptodate) return -1;
 
     ArrayList<PathNode> nodes = data.paths.root();
     long m = 1;
@@ -241,8 +241,7 @@ public abstract class Path extends ParseExpr {
    */
   Expr children(final QueryContext ctx, final Data data) {
     // skip path check if no path index exists, or if it is out-of-dated
-    if(!data.meta.pathindex || !data.meta.uptodate ||
-        data.nspaces.globalNS() == null) return this;
+    if(!data.meta.uptodate || data.nspaces.globalNS() == null) return this;
 
     Path path = this;
     for(int s = 0; s < steps.length; ++s) {
@@ -329,7 +328,7 @@ public abstract class Path extends ParseExpr {
    */
   ArrayList<PathNode> pathNodes(final Data data, final int l) {
     // skip request if no path index exists or might be out-of-date
-    if(!data.meta.pathindex || !data.meta.uptodate) return null;
+    if(!data.meta.uptodate) return null;
 
     ArrayList<PathNode> in = data.paths.root();
     for(int s = 0; s <= l; ++s) {

@@ -95,12 +95,10 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final Data data = gui.context.data();
     if(!main.visible() || data == null) return;
 
-    final boolean pi = data.meta.pathindex;
-    if(!pi || panel.getComponentCount() != 0) {
-      if(!pi) init();
+    if(panel.getComponentCount() != 0) {
+      init();
       return;
     }
-    if(!pi) return;
 
     addKeys(gui.context.data());
     panel.revalidate();

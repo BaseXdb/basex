@@ -72,68 +72,68 @@ public final class Optimize extends ACreate {
 
   /**
    * Optimize data structures.
-   * @param d data
+   * @param data data
    * @param c calling command (can be null)
    * @throws IOException I/O Exception during index rebuild
    */
-  private static void optimize(final Data d, final Optimize c)
+  private static void optimize(final Data data, final Optimize c)
       throws IOException {
 
-    // refresh indexes
-    d.paths.close();
-    d.resources.init();
-    d.tagindex.init();
-    d.atnindex.init();
-    final MetaData m = d.meta;
-    m.dirty = true;
+    // initialize structural indexes
+    final MetaData md = data.meta;
+    if(!md.uptodate) {
+      data.paths.close();
+      data.resources.init();
+      data.tagindex.init();
+      data.atnindex.init();
+      md.dirty = true;
 
-    final IntList pars = new IntList();
-    final IntList tags = new IntList();
-    int n = 0;
+      final IntList pars = new IntList();
+      final IntList tags = new IntList();
+      int n = 0;
 
-    for(int pre = 0; pre < m.size; ++pre) {
-      final byte kind = (byte) d.kind(pre);
-      final int par = d.parent(pre, kind);
-      while(!pars.isEmpty() && pars.peek() > par) {
-        pars.pop();
-        tags.pop();
-      }
-      final int level = pars.size();
-      if(kind == Data.DOC) {
-        if(m.createpath) d.paths.index(0, kind, level);
-        pars.push(pre);
-        tags.push(0);
-        ++n;
-      } else if(kind == Data.ELEM) {
-        final int id = d.name(pre);
-        d.tagindex.index(d.tagindex.key(id), null, true);
-        if(m.createpath) d.paths.index(id, kind, level);
-        pars.push(pre);
-        tags.push(id);
-      } else if(kind == Data.ATTR) {
-        final int id = d.name(pre);
-        final byte[] val = d.text(pre, false);
-        d.atnindex.index(d.atnindex.key(id), val, true);
-        if(m.createpath) d.paths.index(id, kind, level, val, m);
-      } else {
-        final byte[] val = d.text(pre, true);
-        if(kind == Data.TEXT && level > 1) {
-          d.tagindex.index(tags.peek(), val);
+      for(int pre = 0; pre < md.size; ++pre) {
+        final byte kind = (byte) data.kind(pre);
+        final int par = data.parent(pre, kind);
+        while(!pars.isEmpty() && pars.peek() > par) {
+          pars.pop();
+          tags.pop();
         }
-        if(m.createpath) d.paths.index(0, kind, level, val, m);
+        final int level = pars.size();
+        if(kind == Data.DOC) {
+          data.paths.index(0, kind, level);
+          pars.push(pre);
+          tags.push(0);
+          ++n;
+        } else if(kind == Data.ELEM) {
+          final int id = data.name(pre);
+          data.tagindex.index(data.tagindex.key(id), null, true);
+          data.paths.index(id, kind, level);
+          pars.push(pre);
+          tags.push(id);
+        } else if(kind == Data.ATTR) {
+          final int id = data.name(pre);
+          final byte[] val = data.text(pre, false);
+          data.atnindex.index(data.atnindex.key(id), val, true);
+          data.paths.index(id, kind, level, val, md);
+        } else {
+          final byte[] val = data.text(pre, true);
+          if(kind == Data.TEXT && level > 1) data.tagindex.index(tags.peek(), val);
+          data.paths.index(0, kind, level, val, md);
+        }
+        if(c != null) c.pre = pre;
       }
-      if(c != null) c.pre = pre;
+      md.ndocs = n;
+      md.uptodate = true;
     }
-    m.ndocs = n;
-    m.pathindex = m.createpath;
-    m.uptodate = true;
 
     try {
-      optimize(IndexType.ATTRIBUTE, d, m.createattr, c);
-      optimize(IndexType.TEXT,      d, m.createtext, c);
-      optimize(IndexType.FULLTEXT,  d, m.createftxt, c);
+      // rebuild value indexes
+      optimize(IndexType.ATTRIBUTE, data, md.createattr, md.attrindex, c);
+      optimize(IndexType.TEXT,      data, md.createtext, md.textindex, c);
+      optimize(IndexType.FULLTEXT,  data, md.createftxt, md.ftxtindex, c);
     } finally {
-      d.flush();
+      data.flush();
     }
   }
 
@@ -142,12 +142,17 @@ public final class Optimize extends ACreate {
    * @param type index type
    * @param d data reference
    * @param create create flag
+   * @param old old flag
    * @param c calling command
    * @throws IOException I/O exception
    *
    */
   private static void optimize(final IndexType type, final Data d,
-      final boolean create, final Optimize c) throws IOException {
+      final boolean create, final boolean old, final Optimize c) throws IOException {
+
+    // check if flags are already consistent
+    if(create == old) return;
+    // create or drop index
     if(create) create(type, d, c);
     else drop(type, d);
   }

@@ -239,7 +239,7 @@ public interface Text {
     LI + CmdCreate.EVENT + " [" + C_NAME + "]: " + NL +
     "  " + lang("c_create9") + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + '|' + CmdIndex.ATTRIBUTE +
-    '|' + CmdIndex.FULLTEXT + '|' + CmdIndex.PATH + "]:" + NL +
+    '|' + CmdIndex.FULLTEXT + "]:" + NL +
     "  " + lang("c_create5") + NL +
     LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("c_create8")
@@ -308,7 +308,7 @@ public interface Text {
       "  " + lang("c_drop21") + NL +
     LI + CmdDrop.EVENT + " [" + C_NAME + "]:" + NL +
       "  " + lang("c_drop25", C_NAME) + NL +
-    LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + '|' + CmdIndex.TEXT + '|' +
+    LI + CmdDrop.INDEX + " [" + CmdIndex.TEXT + '|' +
       CmdIndex.ATTRIBUTE + '|' + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("c_drop22") + NL +
     LI + CmdDrop.USER + " [" + C_NAME + "] (" + ON + " [database]): " + NL +

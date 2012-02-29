@@ -64,7 +64,6 @@ public final class MemBuilder extends Builder {
     md.createattr = true;
     md.textindex = true;
     md.attrindex = true;
-    md.pathindex = md.createpath;
     final IO file = parser.src;
     md.original = file != null ? file.path() : "";
     md.filesize = file != null ? file.length() : 0;

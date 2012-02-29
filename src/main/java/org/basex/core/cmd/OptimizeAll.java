@@ -111,7 +111,6 @@ public final class OptimizeAll extends ACreate {
       if(m.createtext) create(IndexType.TEXT, d, cmd);
       if(m.createattr) create(IndexType.ATTRIBUTE, d, cmd);
       if(m.createftxt) create(IndexType.FULLTEXT, d, cmd);
-      if(m.createpath) create(IndexType.PATH, d, cmd);
       d.meta.filesize = m.filesize;
       d.meta.users    = m.users;
       d.meta.dirty    = true;

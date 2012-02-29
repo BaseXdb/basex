@@ -3,10 +3,7 @@ package org.basex.gui.dialog;
 import org.basex.core.Text;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.*;
 import org.basex.util.Token;
 
 import javax.swing.*;
@@ -36,17 +33,19 @@ final class DialogMessage extends Dialog {
   DialogMessage(final GUI main, final String txt, final Msg ic) {
     super(main, ic == Msg.ERROR ? Text.ERROR : Text.INFORMATION);
 
-    panel.setLayout(new BorderLayout(12, 0));
+    panel.setLayout(new BorderLayout());
 
+    final BaseXBack back = new BaseXBack(new TableLayout(1, 2, 12, 0));
     final BaseXLabel b = new BaseXLabel();
     b.setIcon(ic.large);
-    set(b, BorderLayout.WEST);
+    back.add(b);
 
     final BaseXEditor text = new BaseXEditor(false, this);
     text.setFont(b.getFont());
     text.setText(Token.token(txt));
-    text.setFocusable(true);
-    set(text, BorderLayout.CENTER);
+    back.add(text);
+
+    set(back, BorderLayout.NORTH);
 
     final BaseXBack buttons;
     if(ic == Msg.QUESTION || ic == Msg.YESNOCANCEL) {
@@ -55,9 +54,7 @@ final class DialogMessage extends Dialog {
       if(ic == Msg.QUESTION) {
         buttons = newButtons(yes, no);
       } else {
-        /* Cancel button. */
-        final BaseXButton cancel = new BaseXButton(Text.B_CANCEL, this);
-        buttons = newButtons(yes, no, cancel);
+        buttons = newButtons(yes, no, new BaseXButton(Text.B_CANCEL, this));
       }
     } else {
       yes = new BaseXButton(Text.B_OK, this);

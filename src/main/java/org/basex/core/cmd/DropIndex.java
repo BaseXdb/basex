@@ -43,9 +43,6 @@ public final class DropIndex extends ACreate {
       case FULLTEXT:
         data.meta.createftxt = false;
         return drop(IndexType.FULLTEXT);
-      case PATH:
-        data.meta.createpath = false;
-        return drop(IndexType.PATH);
       default:
         return error(UNKNOWN_CMD_X, this);
     }

@@ -301,7 +301,7 @@ public final class PlotView extends View {
     g.setFont(font);
     g.setColor(Color.black);
     final Data data = gui.context.data();
-    final boolean nd = data == null || !data.meta.pathindex;
+    final boolean nd = data == null;
     if(nd || plotWidth - sz < 0 || plotHeight - sz < 0) {
       BaseXLayout.drawCenter(g, nd ? NO_DATA : NO_SPACE, w, h / 2 - MARGIN[0]);
       return;

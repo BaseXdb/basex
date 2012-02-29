@@ -68,14 +68,13 @@ public final class InfoIndex extends AInfo {
     switch(idx) {
       case TAG:       return info(ELEMENTS, IndexType.TAG, data, true);
       case ATTNAME:   return info(ATTRIBUTES, IndexType.ATTNAME, data, true);
+      case PATH:      return info(PATH_INDEX, IndexType.PATH, data, true);
       case TEXT:      return info(TEXT_INDEX, IndexType.TEXT, data,
           data.meta.textindex);
       case ATTRIBUTE: return info(ATTRIBUTE_INDEX, IndexType.ATTRIBUTE, data,
           data.meta.attrindex);
       case FULLTEXT:  return info(FULLTEXT_INDEX, IndexType.FULLTEXT, data,
           data.meta.ftxtindex);
-      case PATH:      return info(PATH_INDEX, IndexType.PATH, data,
-          data.meta.pathindex);
       default:        return Token.token(LI + NOT_AVAILABLE);
     }
   }

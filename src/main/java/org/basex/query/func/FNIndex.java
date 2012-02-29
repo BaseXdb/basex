@@ -95,9 +95,6 @@ public final class FNIndex extends StandardFunc {
    */
   private Item facets(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    if(!data.meta.pathindex)
-      NOINDEX.thrw(input, data.meta.name, IndexType.PATH);
-
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
     final NodeCache nc = new NodeCache();
     nc.add(flat ? flat(data) : tree(data, data.paths.root().get(0)));

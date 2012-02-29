@@ -49,10 +49,8 @@ final class PlotData {
   TokenList getItems() {
     final Data data = context.data();
     final TokenList tl = new TokenList();
-    if(data.meta.pathindex) {
-      for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
-        if(getCategories(k).size() > 1) tl.add(k);
-      }
+    for(final byte[] k : data.paths.desc(EMPTY, true, true)) {
+      if(getCategories(k).size() > 1) tl.add(k);
     }
     return tl;
   }
@@ -65,11 +63,9 @@ final class PlotData {
   TokenList getCategories(final byte[] it) {
     final Data data = context.data();
     final TokenList tl = new TokenList();
-    if(data.meta.pathindex) {
-      for(final byte[] k : data.paths.desc(it, true, false)) {
-        final Names nm = startsWith(k, '@') ? data.atnindex : data.tagindex;
-        if(nm.stat(nm.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
-      }
+    for(final byte[] k : data.paths.desc(it, true, false)) {
+      final Names nm = startsWith(k, '@') ? data.atnindex : data.tagindex;
+      if(nm.stat(nm.id(delete(k, '@'))).type != StatsType.NONE) tl.add(k);
     }
     return tl;
   }

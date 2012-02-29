@@ -60,8 +60,7 @@ public final class BaseXGUI {
       try {
         osxGUI = new GUIMacOSX();
       } catch(final Exception ex) {
-        throw new BaseXException(
-            "Failed to initialize native Mac OS X interface", ex);
+        throw new BaseXException("Failed to initialize native Mac OS X interface", ex);
       }
     }
 

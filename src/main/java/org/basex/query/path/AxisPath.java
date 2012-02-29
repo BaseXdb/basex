@@ -199,7 +199,7 @@ public class AxisPath extends Path {
       // check if path before index step needs to be inverted and traversed
       final Test test = DocTest.get(ctx, data);
       boolean inv = true;
-      if(test == Test.DOC && data.meta.pathindex && data.meta.uptodate) {
+      if(test == Test.DOC && data.meta.uptodate) {
         int j = 0;
         for(; j <= smin; ++j) {
           final AxisStep s = axisStep(j);
@@ -355,8 +355,7 @@ public class AxisPath extends Path {
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;
 
-    final Stats stats = data.tagindex.stat(
-        data.tagindex.id(s.test.name.local()));
+    final Stats stats = data.tagindex.stat(data.tagindex.id(s.test.name.local()));
     if(stats != null && stats.isLeaf()) {
       steps = Array.add(steps, AxisStep.get(input, Axis.CHILD, Test.TXT));
       ctx.compInfo(OPTTEXT, this);
@@ -391,7 +390,7 @@ public class AxisPath extends Path {
   public ArrayList<PathNode> nodes(final QueryContext ctx) {
     final Value rt = root(ctx);
     final Data data = rt != null && rt.type == NodeType.DOC ? rt.data() : null;
-    if(data == null || !data.meta.pathindex || !data.meta.uptodate) return null;
+    if(data == null || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> nodes = data.paths.root();
     for(int s = 0; s < steps.length; s++) {

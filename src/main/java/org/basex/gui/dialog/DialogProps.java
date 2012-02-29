@@ -30,8 +30,8 @@ public final class DialogProps extends Dialog {
   };
   /** Label strings. */
   private static final String[] LABELS = {
-      ELEMENTS, ATTRIBUTES, PATH_INDEX, TEXT_INDEX,
-      ATTRIBUTE_INDEX, FULLTEXT_INDEX };
+    ELEMENTS, ATTRIBUTES, PATH_INDEX, TEXT_INDEX, ATTRIBUTE_INDEX, FULLTEXT_INDEX
+  };
   /** Index labels. */
   private final BaseXLabel[] labels = new BaseXLabel[LABELS.length];
   /** Index buttons. */
@@ -68,14 +68,12 @@ public final class DialogProps extends Dialog {
 
     final Data data = gui.context.data();
     for(int i = 0; i < LABELS.length; ++i) {
-      String lbl = LABELS[i];
-      if(!data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ')';
-      labels[i] = new BaseXLabel(lbl).large();
+      labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
       infos[i] = new BaseXEditor(false, this);
       BaseXLayout.setHeight(infos[i], 200);
-      if(i >= 2) {
-        indxs[i] = new BaseXButton("", this);
+      if(i != 1) {
+        indxs[i] = new BaseXButton(" ", this);
         indxs[i].setEnabled(data instanceof DiskData);
       }
     }
@@ -101,8 +99,7 @@ public final class DialogProps extends Dialog {
     // tab: database info
     final BaseXBack tabGeneral = new BaseXBack(new BorderLayout(0, 8)).border(8);
     final Font f = tabGeneral.getFont();
-    final BaseXLabel doc = new BaseXLabel(data.meta.name).border(
-        0, 0, 6, 0).large();
+    final BaseXLabel doc = new BaseXLabel(data.meta.name).border(0, 0, 6, 0).large();
     BaseXLayout.setWidth(doc, 400);
     tabGeneral.add(doc, BorderLayout.NORTH);
 
@@ -162,12 +159,16 @@ public final class DialogProps extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    for(int i = 0; i < LABELS.length; i++) {
-      if(indxs[i] == null || cmp != indxs[i]) continue;
-      final Command cmd = indxs[i].getText().equals(DROP + DOTS) ?
+    if(cmp != null) {
+      for(int i = 0; i < LABELS.length; i++) {
+        if(cmp != indxs[i]) continue;
+        final String label = indxs[i].getText();
+        final Command cmd = label.equals(OPTIMIZE + DOTS) ?
+          new Optimize() : label.equals(DROP + DOTS) ?
           new DropIndex(TYPES[i]) : new CreateIndex(TYPES[i]);
-      DialogProgress.execute(this, "", cmd);
-      return;
+        DialogProgress.execute(this, "", cmd);
+        return;
+      }
     }
 
     resources.action(cmp);
@@ -175,24 +176,32 @@ public final class DialogProps extends Dialog {
 
     final Data data = gui.context.data();
     final boolean[] val = {
-        true, true, data.meta.pathindex, data.meta.textindex,
-        data.meta.attrindex, data.meta.ftxtindex
+      true, true, true, data.meta.textindex, data.meta.attrindex, data.meta.ftxtindex
     };
 
     if(cmp == this) {
+      final boolean utd = data.meta.uptodate;
       for(int i = 0; i < LABELS.length; ++i) {
+        // structural index/statistics?
+        final boolean struct = i < 3;
         String lbl = LABELS[i];
-        if(i < 3 && !data.meta.uptodate) lbl += " (" + OUT_OF_DATE + ')';
+        if(struct && !utd) lbl += " (" + OUT_OF_DATE + ')';
+        // updates labels and infos
         labels[i].setText(lbl);
         infos[i].setText(val[i] ? data.info(TYPES[i]) : Token.token(HELP[i]));
-        if(indxs[i] != null) indxs[i].setText((val[i] ? DROP : CREATE) + DOTS);
+        // update button (label, disable/enable)
+        if(indxs[i] != null) {
+          indxs[i].setText((struct ? OPTIMIZE : val[i] ? DROP : CREATE) + DOTS);
+          if(struct) indxs[i].setEnabled(!utd);
+        }
       }
       // full-text options
+      final int f = 5;
       tabFT.removeAll();
-      panels[5].removeAll();
-      add(5, tabFT, val[5] ? null : ft);
-      panels[5].revalidate();
-      panels[5].repaint();
+      panels[f].removeAll();
+      add(f, tabFT, val[f] ? null : ft);
+      panels[f].revalidate();
+      panels[f].repaint();
     }
 
     ft.action();

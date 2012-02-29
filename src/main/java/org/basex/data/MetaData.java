@@ -57,16 +57,12 @@ public final class MetaData {
   public boolean attrindex;
   /** Indicates if a full-text index exists. */
   public boolean ftxtindex;
-  /** Indicates if a path index exists. */
-  public boolean pathindex;
   /** Indicates if text index is to be recreated. */
   public boolean createtext;
   /** Indicates if attribute index is to be recreated. */
   public boolean createattr;
   /** Indicates if full-text index is to be recreated. */
   public boolean createftxt;
-  /** Indicates if path index is to be recreated. */
-  public boolean createpath;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;
@@ -137,7 +133,6 @@ public final class MetaData {
     createtext = prop.is(Prop.TEXTINDEX);
     createattr = prop.is(Prop.ATTRINDEX);
     createftxt = prop.is(Prop.FTINDEX);
-    createpath = prop.is(Prop.PATHINDEX);
     diacritics = prop.is(Prop.DIACRITICS);
     wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
@@ -347,11 +342,9 @@ public final class MetaData {
         else if(k.equals(DBFTDC))     diacritics = toBool(v);
         else if(k.equals(DBCHOP))     chop       = toBool(v);
         else if(k.equals(DBUPDIDX))   updindex   = toBool(v);
-        else if(k.equals(DBPTHIDX))   pathindex  = toBool(v);
         else if(k.equals(DBTXTIDX))   textindex  = toBool(v);
         else if(k.equals(DBATVIDX))   attrindex  = toBool(v);
         else if(k.equals(DBFTXIDX))   ftxtindex  = toBool(v);
-        else if(k.equals(DBCRTPTH))   createpath = toBool(v);
         else if(k.equals(DBCRTTXT))   createtext = toBool(v);
         else if(k.equals(DBCRTATV))   createattr = toBool(v);
         else if(k.equals(DBCRTFTX))   createftxt = toBool(v);
@@ -359,10 +352,13 @@ public final class MetaData {
         else if(k.equals(DBFTST))     stemming   = toBool(v);
         else if(k.equals(DBFTCS))     casesens   = toBool(v);
         else if(k.equals(DBFTDC))     diacritics = toBool(v);
-        else if(k.equals(DBUPTODATE)) uptodate   = toBool(v);
         else if(k.equals(DBFTLN))     language   = Language.get(v);
+        else if(k.equals(DBUPTODATE)) uptodate   = toBool(v);
+        // legacy: set up-to-date flag to false if path index does not exist
+        else if(k.equals(DBPTHIDX) && !toBool(v)) uptodate = false;
       }
     }
+
     // check version of database storage
     if(!storage.equals(STORAGE) && new Version(storage).compareTo(new Version(
         STORAGE)) > 0) throw new BuildException(H_DB_FORMAT, storage);
@@ -388,11 +384,9 @@ public final class MetaData {
     writeInfo(out, DBSIZE,     size);
     writeInfo(out, DBCHOP,     chop);
     writeInfo(out, DBUPDIDX,   updindex);
-    writeInfo(out, DBPTHIDX,   pathindex);
     writeInfo(out, DBTXTIDX,   textindex);
     writeInfo(out, DBATVIDX,   attrindex);
     writeInfo(out, DBFTXIDX,   ftxtindex);
-    writeInfo(out, DBCRTPTH,   createpath);
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTFTX,   createftxt);

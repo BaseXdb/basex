@@ -120,7 +120,6 @@ public final class CreateDB extends ACreate {
         new ValueBuilder(data, false).build());
       if(data.meta.createftxt) data.setIndex(IndexType.FULLTEXT,
         FTBuilder.get(data).build());
-      data.meta.pathindex = data.meta.createpath;
       data.close();
     } finally {
       try { builder.close(); } catch(final IOException exx) { Util.debug(exx); }

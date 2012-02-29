@@ -56,10 +56,6 @@ public final class CreateIndex extends ACreate {
           data.meta.language = Language.get(prop);
           index = IndexType.FULLTEXT;
           break;
-        case PATH:
-          data.meta.createpath = true;
-          index = IndexType.PATH;
-          break;
         default:
           return error(UNKNOWN_CMD_X, this);
       }

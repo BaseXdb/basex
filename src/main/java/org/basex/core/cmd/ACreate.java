@@ -11,7 +11,6 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.*;
-import org.basex.index.path.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -88,7 +87,6 @@ public abstract class ACreate extends Command {
         if(!open.run(context)) return error(open.info());
 
         data = context.data();
-        data.meta.pathindex = data.meta.createpath;
         if(data.meta.createtext) create(IndexType.TEXT,      data, this);
         if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
         if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
@@ -143,8 +141,8 @@ public abstract class ACreate extends Command {
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  static void create(final IndexType index, final Data data,
-      final ACreate cmd) throws IOException {
+  static void create(final IndexType index, final Data data, final ACreate cmd)
+      throws IOException {
 
     if(data instanceof MemData) return;
     final IndexBuilder ib;
@@ -152,7 +150,6 @@ public abstract class ACreate extends Command {
       case TEXT:      ib = new ValueBuilder(data, true); break;
       case ATTRIBUTE: ib = new ValueBuilder(data, false); break;
       case FULLTEXT:  ib = FTBuilder.get(data); break;
-      case PATH:      ib = new PathBuilder(data); break;
       default:        throw Util.notexpected();
     }
     data.closeIndex(index);
@@ -166,9 +163,7 @@ public abstract class ACreate extends Command {
    * @return success of operation
    * @throws IOException I/O exception
    */
-  static boolean drop(final IndexType index, final Data data)
-      throws IOException {
-
+  static boolean drop(final IndexType index, final Data data) throws IOException {
     String pat = null;
     switch(index) {
       case TEXT:
@@ -182,9 +177,6 @@ public abstract class ACreate extends Command {
       case FULLTEXT:
         data.meta.ftxtindex = false;
         pat = DATAFTX;
-        break;
-      case PATH:
-        data.meta.pathindex = false;
         break;
       default:
     }
