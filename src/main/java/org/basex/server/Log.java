@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -45,6 +45,15 @@ public final class Log {
     dir = ctx.mprop.dbpath(".logs");
     quiet = q;
     if(!q) create(new Date());
+  }
+
+  /**
+   * Writes an error to the log file.
+   * @param th throwable
+   */
+  public synchronized void error(final Throwable th) {
+    Util.stack(th);
+    if(!quiet) write(Util.bug(th));
   }
 
   /**

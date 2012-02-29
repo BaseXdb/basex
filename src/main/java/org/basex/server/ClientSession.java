@@ -229,12 +229,12 @@ public class ClientSession extends Session {
    * @param in input stream
    */
   private void listen(final InputStream in) {
+    final BufferInput bi = new BufferInput(in);
     new Thread() {
       @Override
       public void run() {
         try {
           while(true) {
-            final BufferInput bi = new BufferInput(in);
             final EventNotifier n = notifiers.get(bi.readString());
             final String l = bi.readString();
             if(n != null) n.notify(l);

@@ -144,7 +144,7 @@ public final class BaseXServer extends Main implements Runnable {
       });
 
       new Thread(this).start();
-      while(!running) Performance.sleep(100);
+      while(!running) Performance.sleep(10);
 
       Util.outln(CONSOLE + (console ? TRY_MORE_X : SRV_STARTED), SERVERMODE);
 
@@ -153,7 +153,7 @@ public final class BaseXServer extends Main implements Runnable {
         quit();
       }
     } catch(final IOException ex) {
-      if(log != null) log.write(ex.getMessage());
+      if(log != null) log.error(ex);
       throw ex;
     }
   }
@@ -178,7 +178,9 @@ public final class BaseXServer extends Main implements Runnable {
           }
           new ClientListener(s, context, log, this).start();
         }
-      } catch(final IOException ex) {
+      } catch(final Throwable ex) {
+        // socket was closed..
+        if(log != null) log.error(ex);
         // socket was closed..
         break;
       }
@@ -208,8 +210,7 @@ public final class BaseXServer extends Main implements Runnable {
       esocket.close();
       socket.close();
     } catch(final IOException ex) {
-      log.write(ex.getMessage());
-      Util.stack(ex);
+      if(log != null) log.error(ex);
     }
     console = false;
   }

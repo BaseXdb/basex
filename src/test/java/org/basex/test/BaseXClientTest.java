@@ -90,7 +90,7 @@ public final class BaseXClientTest extends BaseXTest {
     System.setOut(NULL);
     System.setErr(NULL);
     final StringList sl =
-        new StringList().add("-p9999").add("-e9998").add(sargs);
+        new StringList().add("-z").add("-p9999").add("-e9998").add(sargs);
     final BaseXServer bxs = new BaseXServer(sl.toArray());
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));
