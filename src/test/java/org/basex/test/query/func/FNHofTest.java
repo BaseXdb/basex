@@ -60,17 +60,17 @@ public final class FNHofTest extends AdvancedQueryTest {
   @Test
   public void hofTopKByTest() {
     check(_HOF_TOP_K_BY);
-    query("hof:top-k-by(function($x) {-$x}, 0, 1 to 1000)", "");
-    query("hof:top-k-by(function($x) {-$x}, 5, ())", "");
-    query("hof:top-k-by(function($x) {-$x}, 5, 1 to 1000)", "1 2 3 4 5");
+    query("hof:top-k-by(1 to 1000, function($x) {-$x}, 0)", "");
+    query("hof:top-k-by((), function($x) {-$x}, 5)", "");
+    query("hof:top-k-by(1 to 1000, function($x) {-$x}, 5)", "1 2 3 4 5");
   }
 
   /** Test method for the {@code hof:top-k-with()} function. */
   @Test
   public void hofTopKWithTest() {
     check(_HOF_TOP_K_WITH);
-    query("hof:top-k-with(function($x,$y) {$x > $y}, 0, 1 to 1000)", "");
-    query("hof:top-k-with(function($x,$y) {$x > $y}, 5, ())", "");
-    query("hof:top-k-with(function($x,$y) {$x > $y}, 5, 1 to 5)", "1 2 3 4 5");
+    query("hof:top-k-with(1 to 1000, function($x,$y) {$x > $y}, 0)", "");
+    query("hof:top-k-with((), function($x,$y) {$x > $y}, 5)", "");
+    query("hof:top-k-with(1 to 5, function($x,$y) {$x > $y}, 5)", "1 2 3 4 5");
   }
 }

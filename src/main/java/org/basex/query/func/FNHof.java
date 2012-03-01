@@ -131,11 +131,11 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value topKBy(final QueryContext ctx) throws QueryException {
-    final FItem getKey = withArity(0, 1, ctx);
-    final long k = checkItr(expr[1], ctx);
+    final FItem getKey = withArity(1, 1, ctx);
+    final long k = checkItr(expr[2], ctx);
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
-    final Iter iter = expr[2].iter(ctx);
+    final Iter iter = expr[0].iter(ctx);
     final MinHeap<Item, Item> heap = new MinHeap<Item, Item>((int) k,
         new Comparator<Item>(){
       @Override
@@ -167,11 +167,11 @@ public final class FNHof extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value topKWith(final QueryContext ctx) throws QueryException {
-    final Comparator<Item> cmp = getComp(0, ctx);
-    final long k = checkItr(expr[1], ctx);
+    final Comparator<Item> cmp = getComp(1, ctx);
+    final long k = checkItr(expr[2], ctx);
     if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
-    final Iter iter = expr[2].iter(ctx);
+    final Iter iter = expr[0].iter(ctx);
     final MinHeap<Item, Item> heap = new MinHeap<Item, Item>((int) k, cmp);
 
     try {
