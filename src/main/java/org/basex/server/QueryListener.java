@@ -104,8 +104,7 @@ final class QueryListener extends Progress {
       final boolean wrap = !options.get(S_WRAP_PREFIX).isEmpty();
 
       // iterate through results
-      final PrintOutput po =
-          PrintOutput.get(enc ? new EncodingOutput(out) : out);
+      final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);
       if(iter && wrap) po.write(1);
 
       final Serializer ser = Serializer.get(po, options);

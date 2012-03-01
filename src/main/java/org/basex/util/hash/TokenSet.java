@@ -20,9 +20,9 @@ public class TokenSet implements Iterable<byte[]> {
   /** Initial hash capacity. */
   protected static final int CAP = 1 << 3;
   /** Hash entries. Note: actual number of entries is {@code size - 1}. */
-  protected int size = 1;
+  public int size = 1;
   /** Hashed keys. */
-  protected byte[][] keys;
+  public byte[][] keys;
 
   /** Pointers to the next token. */
   private int[] next;

@@ -233,7 +233,8 @@ public final class FNFt extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    // skip evaluation at compile time
-    return u == Use.CTX && sig == Function._FT_SEARCH || super.uses(u);
+    // skip pre-evaluation, because cached results may get very large
+    return u == Use.CTX && (sig == Function._FT_SEARCH ||
+        sig == Function._FT_TOKENS) || super.uses(u);
   }
 }

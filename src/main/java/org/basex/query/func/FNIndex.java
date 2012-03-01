@@ -4,30 +4,17 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.Locale;
+import java.util.*;
 
-import org.basex.data.Data;
-import org.basex.index.Index;
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.Names;
-import org.basex.index.Stats;
-import org.basex.index.path.PathNode;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FDoc;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.ValueIter;
-import org.basex.util.InputInfo;
-import org.basex.util.hash.TokenIntMap;
+import org.basex.index.path.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Index functions.
@@ -141,25 +128,7 @@ public final class FNIndex extends StandardFunc {
       avl = data.meta.ftxtindex;
     }
     if(!avl) NOINDEX.thrw(call.input, data.meta.name, it);
-
-    final TokenIntMap entries = index.entries(prefix);
-    return new ValueIter() {
-      final int es = entries.size();
-      int pos;
-      @Override
-      public ANode get(final long i) {
-        final FElem elem = new FElem(Q_VALUE);
-        elem.add(new FAttr(Q_COUNT, token(entries.value((int) i + 1))));
-        elem.add(new FTxt(entries.key((int) i + 1)));
-        return elem;
-      }
-      @Override
-      public ANode next() { return pos < size() ? get(pos++) : null; }
-      @Override
-      public boolean reset() { pos = 0; return true; }
-      @Override
-      public long size() { return es; }
-    };
+    return entries(index, prefix);
   }
 
   /**
@@ -173,25 +142,27 @@ public final class FNIndex extends StandardFunc {
       throws QueryException {
 
     final Data data = data(0, ctx);
+    return entries(it == IndexType.TAG ? data.tagindex : data.atnindex, EMPTY);
+  }
 
-    final Index index = it == IndexType.TAG ? data.tagindex : data.atnindex;
-    final TokenIntMap entries = index.entries(EMPTY);
-    return new ValueIter() {
-      final int es = entries.size();
-      int pos;
+  /**
+   * Returns all entries of the specified index.
+   * @param index index
+   * @param prefix prefix
+   * @return entry iterator
+   */
+  private static Iter entries(final Index index, final byte[] prefix) {
+    return new Iter() {
+      final EntryIterator ei = index.entries(prefix);
       @Override
-      public ANode get(final long i) {
+      public ANode next() {
+        final byte[] token = ei.next();
+        if(token == null) return null;
         final FElem elem = new FElem(Q_VALUE);
-        elem.add(new FAttr(Q_COUNT, token(entries.value((int) i + 1))));
-        elem.add(new FTxt(entries.key((int) i + 1)));
+        elem.add(new FAttr(Q_COUNT, token(ei.count())));
+        elem.add(new FTxt(token));
         return elem;
       }
-      @Override
-      public ANode next() { return pos < size() ? get(pos++) : null; }
-      @Override
-      public boolean reset() { pos = 0; return true; }
-      @Override
-      public long size() { return es; }
     };
   }
 
@@ -272,9 +243,8 @@ public final class FNIndex extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return
-      // skip evaluation at compile time
-      u == Use.CTX && (sig == Function._INDEX_TEXTS ||
-      sig == Function._INDEX_ATTRIBUTES) || super.uses(u);
+    // skip pre-evaluation, because cached results may get very large
+    return u == Use.CTX && (sig == Function._INDEX_TEXTS ||
+        sig == Function._INDEX_ATTRIBUTES) || super.uses(u);
   }
 }

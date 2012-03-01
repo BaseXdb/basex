@@ -2,20 +2,15 @@ package org.basex.index.path;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.index.Index;
-import org.basex.index.IndexIterator;
-import org.basex.index.IndexToken;
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Array;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenIntMap;
-import org.basex.util.list.TokenList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class stores the path summary of a database.
@@ -248,7 +243,7 @@ public final class PathSummary implements Index {
   }
 
   @Override
-  public TokenIntMap entries(final byte[] prefix) {
+  public EntryIterator entries(final byte[] prefix) {
     throw Util.notexpected();
   }
 

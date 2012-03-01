@@ -6,13 +6,9 @@ import static org.basex.util.Token.*;
 import java.util.Arrays;
 
 import org.basex.data.Data;
-import org.basex.index.Index;
-import org.basex.index.IndexIterator;
-import org.basex.index.IndexStats;
-import org.basex.index.IndexToken;
+import org.basex.index.*;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
-import org.basex.util.hash.TokenIntMap;
 import org.basex.util.hash.TokenSet;
 
 /**
@@ -96,12 +92,21 @@ public class MemValues extends TokenSet implements Index {
   }
 
   @Override
-  public TokenIntMap entries(final byte[] prefix) {
-    final TokenIntMap tim = new TokenIntMap();
-    for(int m = 1; m < size; ++m) {
-      if(startsWith(keys[m], prefix)) tim.add(keys[m], len[m]);
-    }
-    return tim;
+  public EntryIterator entries(final byte[] prefix) {
+    return new EntryIterator() {
+      int c;
+      @Override
+      public byte[] next() {
+        while(++c < size) {
+          if(startsWith(keys[c], prefix)) return keys[c];
+        }
+        return null;
+      }
+      @Override
+      public int count() {
+        return len[c];
+      }
+    };
   }
 
   @Override

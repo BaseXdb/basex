@@ -4,23 +4,14 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.data.Data;
-import org.basex.index.Index;
-import org.basex.index.IndexCache;
-import org.basex.index.IndexIterator;
-import org.basex.index.IndexStats;
-import org.basex.index.IndexToken;
-import org.basex.index.RangeToken;
-import org.basex.io.random.DataAccess;
-import org.basex.util.Num;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.hash.IntMap;
-import org.basex.util.hash.TokenIntMap;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.list.IntList;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.io.random.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides access to attribute values and text contents stored on
@@ -121,21 +112,28 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public TokenIntMap entries(final byte[] prefix) {
-    final TokenIntMap tim = new TokenIntMap();
-    int ix = get(prefix);
-    if(ix < 0) ix = -ix - 1;
-    idxr.cursor(ix * 5l);
-    for(; ix < size; ix++) {
-      final long pos = idxr.read5();
-      final int nr = idxl.readNum(pos);
-      final int pre = idxl.readNum();
-      final byte[] key = data.text(pre, text);
-      cache.add(key, nr, pos + Num.length(nr));
-      if(!startsWith(key, prefix)) break;
-      tim.add(key, nr);
-    }
-    return tim;
+  public EntryIterator entries(final byte[] prefix) {
+    final int i = get(prefix);
+    return new EntryIterator() {
+      int ix = (i < 0 ? -i - 1 : i) - 1;
+      int nr;
+      @Override
+      public synchronized byte[] next() {
+        while(++ix < size) {
+          final long pos = idxr.read5(ix * 5l);
+          nr = idxl.readNum(pos);
+          final byte[] key = data.text(idxl.readNum(), text);
+          if(!startsWith(key, prefix)) break;
+          if(prefix.length != 0) cache.add(key, nr, pos + Num.length(nr));
+          return key;
+        }
+        return null;
+      }
+      @Override
+      public int count() {
+        return nr;
+      }
+    };
   }
 
   /**

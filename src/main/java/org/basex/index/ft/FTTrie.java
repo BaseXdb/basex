@@ -4,22 +4,17 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
-import java.io.IOException;
-import java.util.Arrays;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.DataText;
-import org.basex.index.IndexIterator;
-import org.basex.index.IndexStats;
-import org.basex.index.IndexToken;
-import org.basex.io.random.DataAccess;
-import org.basex.util.Num;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.hash.TokenIntMap;
-import org.basex.util.list.IntList;
+
+import java.io.*;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.io.random.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class performs full-text index requests on a compressed trie on disk.
@@ -145,7 +140,7 @@ final class FTTrie extends FTIndex {
   }
 
   @Override
-  public TokenIntMap entries(final byte[] prefix) {
+  public EntryIterator entries(final byte[] prefix) {
     throw Util.notexpected(this);
   }
 

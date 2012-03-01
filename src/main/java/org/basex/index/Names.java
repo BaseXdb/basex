@@ -10,7 +10,6 @@ import org.basex.io.out.DataOutput;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
-import org.basex.util.hash.TokenIntMap;
 import org.basex.util.hash.TokenSet;
 
 /**
@@ -23,7 +22,7 @@ import org.basex.util.hash.TokenSet;
  */
 public final class Names extends TokenSet implements Index {
   /** Statistical information. */
-  private Stats[] stats;
+  protected Stats[] stats;
   /** Meta data. */
   private final MetaData meta;
 
@@ -133,12 +132,12 @@ public final class Names extends TokenSet implements Index {
   }
 
   @Override
-  public TokenIntMap entries(final byte[] prefix) {
-    final TokenIntMap tim = new TokenIntMap();
-    for(int i = 1; i < size; ++i) {
-      tim.add(keys[i], stats[i].count);
-    }
-    return tim;
+  public EntryIterator entries(final byte[] prefix) {
+    return new EntryIterator() {
+      int c;
+      @Override public byte[] next() { return ++c < size ? keys[c] : null; }
+      @Override public int count() { return stats[c].count; }
+    };
   }
 
   @Override
