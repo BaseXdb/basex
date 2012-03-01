@@ -5,16 +5,12 @@ import java.util.Comparator;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryError;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.FItem;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.Item;
-import org.basex.query.item.Value;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
 
 /**
  * Implementation-specific functions on functions.
@@ -36,12 +32,13 @@ public final class FNHof extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _HOF_SORT_WITH:  return sortWith(ctx);
+      case _HOF_SORT_WITH:  return sortWith(ctx).iter();
       case _HOF_ID:
       case _HOF_CONST:      return ctx.iter(expr[0]);
       case _HOF_FOLD_LEFT1: return foldLeft1(ctx).iter();
       case _HOF_UNTIL:      return until(ctx).iter();
-      case _HOF_ITERATE:    return iterate(ctx);
+      case _HOF_TOP_K_BY:   return topKBy(ctx).iter();
+      case _HOF_TOP_K_WITH: return topKWith(ctx).iter();
       default:              return super.iter(ctx);
     }
   }
@@ -49,10 +46,13 @@ public final class FNHof extends StandardFunc {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     switch(sig) {
+      case _HOF_SORT_WITH:  return sortWith(ctx);
       case _HOF_FOLD_LEFT1: return foldLeft1(ctx);
       case _HOF_UNTIL:      return until(ctx);
       case _HOF_ID:
       case _HOF_CONST:      return ctx.value(expr[0]);
+      case _HOF_TOP_K_BY:   return topKBy(ctx);
+      case _HOF_TOP_K_WITH: return topKWith(ctx);
       default:              return super.value(ctx);
     }
   }
@@ -65,6 +65,12 @@ public final class FNHof extends StandardFunc {
       case _HOF_CONST: return expr[0].item(ctx, ii);
       default:         return super.item(ctx, ii);
     }
+  }
+
+  @Override
+  Expr cmp(final QueryContext ctx) throws QueryException {
+    if(sig == Function._HOF_ID || sig == Function._HOF_CONST) return expr[0];
+    return super.cmp(ctx);
   }
 
   /**
@@ -89,25 +95,17 @@ public final class FNHof extends StandardFunc {
    * @return sorted sequence
    * @throws QueryException query exception
    */
-  private ItemCache sortWith(final QueryContext ctx) throws QueryException {
-    final FItem lt = withArity(0, 2, ctx);
-    final ItemCache ic = expr[1].value(ctx).cache();
+  private Value sortWith(final QueryContext ctx) throws QueryException {
+    final Value v = expr[1].value(ctx);
+    final Comparator<Item> cmp = getComp(0, ctx);
+    if(v.size() < 2) return v;
+    final ItemCache ic = v.cache();
     try {
-      Arrays.sort(ic.item, 0, (int) ic.size(), new Comparator<Item>(){
-        @Override
-        public int compare(final Item it1, final Item it2) {
-          try {
-            return checkType(lt.invItem(ctx, input, it1, it2),
-                AtomType.BLN).bool(input) ? -1 : 1;
-          } catch(final QueryException qe) {
-            throw new QueryError(qe);
-          }
-        }
-      });
+      Arrays.sort(ic.item, 0, (int) ic.size(), cmp);
     } catch(final QueryError err) {
       throw err.wrapped();
     }
-    return ic;
+    return ic.value();
   }
 
   /**
@@ -127,26 +125,88 @@ public final class FNHof extends StandardFunc {
   }
 
   /**
-   * Repeatedly applies a function to an argument, lazily returning all results.
+   * The best k elements of the input sequence according to a sort key.
    * @param ctx query context
-   * @return result iterator
-   * @throws QueryException query context
+   * @return best k elements
+   * @throws QueryException query exception
    */
-  private Iter iterate(final QueryContext ctx) throws QueryException {
-    final FItem f = withArity(0, 1, ctx);
-    return new Iter() {
-      // current value
-      Value v = ctx.value(expr[1]);
-      long i, len = v.size();
+  private Value topKBy(final QueryContext ctx) throws QueryException {
+    final FItem getKey = withArity(1, 1, ctx);
+    final long k = checkItr(expr[2], ctx);
+    if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
 
+    final Iter iter = expr[0].iter(ctx);
+    final MinHeap<Item, Item> heap = new MinHeap<Item, Item>((int) k,
+        new Comparator<Item>(){
       @Override
-      public Item next() throws QueryException {
-        while(i >= len) {
-          v = f.invValue(ctx, input, v);
-          i = 0;
-          len = v.size();
+      public int compare(final Item it1, final Item it2) {
+        try {
+          return CmpV.OpV.LT.eval(input, it1, it2) ? -1 : 1;
+        } catch(final QueryException qe) {
+          throw new QueryError(qe);
         }
-        return v.itemAt(i++);
+      }
+    });
+
+    try {
+      for(Item it; (it = iter.next()) != null;) {
+        heap.insert(checkNoEmpty(getKey.invItem(ctx, input, it)), it);
+        if(heap.size() > k) heap.removeMin();
+      }
+    } catch(final QueryError e) { throw e.wrapped(); }
+
+    final Item[] arr = new Item[heap.size()];
+    for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
+    return Seq.get(arr, arr.length);
+  }
+
+  /**
+   * The best k elements of the input sequence according to a less-than predicate.
+   * @param ctx query context
+   * @return best k elements
+   * @throws QueryException query exception
+   */
+  private Value topKWith(final QueryContext ctx) throws QueryException {
+    final Comparator<Item> cmp = getComp(1, ctx);
+    final long k = checkItr(expr[2], ctx);
+    if(k < 1 || k > Integer.MAX_VALUE / 2) return Empty.SEQ;
+
+    final Iter iter = expr[0].iter(ctx);
+    final MinHeap<Item, Item> heap = new MinHeap<Item, Item>((int) k, cmp);
+
+    try {
+      for(Item it; (it = iter.next()) != null;) {
+        heap.insert(it, it);
+        if(heap.size() > k) heap.removeMin();
+      }
+    } catch(final QueryError e) { throw e.wrapped(); }
+
+    final Item[] arr = new Item[heap.size()];
+    for(int i = arr.length; --i >= 0;) arr[i] = heap.removeMin();
+    return Seq.get(arr, arr.length);
+  }
+
+  /**
+   * Gets a comparator from a less-than predicate as function item.
+   * The {@link Comparator#compare(Object, Object)} method throws a {@link QueryError}
+   * if the comparison throws a {@link QueryException}.
+   * @param pos argument position of the predicate
+   * @param ctx query context
+   * @return comparator
+   * @throws QueryException exception
+   */
+  private Comparator<Item> getComp(final int pos, final QueryContext ctx)
+      throws QueryException {
+    final FItem lt = withArity(pos, 2, ctx);
+    return new Comparator<Item>(){
+      @Override
+      public int compare(final Item a, final Item b) {
+        try {
+          return checkType(lt.invItem(ctx, input, a == null ? Empty.SEQ : a,
+              b == null ? Empty.SEQ : b), AtomType.BLN).bool(input) ? -1 : 1;
+        } catch(final QueryException qe) {
+          throw new QueryError(qe);
+        }
       }
     };
   }

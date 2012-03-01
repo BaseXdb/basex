@@ -659,8 +659,11 @@ public enum Function {
   _HOF_FOLD_LEFT1(FNHof.class, "fold-left1(function,non-empty-seq)", ITEM_ZM,
       FuncType.get(ITEM_ZM, ITEM_ZM, ITEM).seqType(), ITEM_OM),
   /** XQuery Function. */
-  _HOF_ITERATE(FNHof.class, "iterate(fun, seq)", ITEM_ZM,
-      FuncType.arity(1).seqType(), ITEM_ZM),
+  _HOF_TOP_K_BY(FNHof.class, "top-k-by(seq,key-fun,k)", ITEM_ZM, ITEM_ZM,
+      FuncType.arity(1).seqType(), ITR),
+  /** XQuery function. */
+  _HOF_TOP_K_WITH(FNHof.class, "top-k-with(seq,less-than,k)", ITEM_ZM, ITEM_ZM,
+      FuncType.get(BLN, ITEM_ZO, ITEM_ZO).seqType(), ITR),
 
   /* FNCrypto functions (EXPath Cryptographic module). */
 
