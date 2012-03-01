@@ -81,6 +81,10 @@ public interface HTTPText {
   QNm Q_MEDIA_TYPE = new QNm(MEDIA_TYPE);
   /** boundary marker. */
   QNm Q_BOUNDARY = new QNm(BOUNDARY);
+  /** Header attribute: name. */
+  QNm Q_STATUS = new QNm(STATUS);
+  /** Header attribute: name. */
+  QNm Q_MESSAGE = new QNm(MESSAGE);
 
   /** Multipart string. */
   String MULTIPART = "multipart";

@@ -72,7 +72,7 @@ public final class FNSql extends StandardFunc {
   /** Column. */
   private static final QNm Q_COLUMN = new QNm("sql:column", SQLURI);
   /** Name. */
-  private static final QNm Q_NAME = new QNm("name", EMPTY);
+  private static final QNm Q_NAME = new QNm("name");
 
   /** <sql:options/>. */
   private static final QNm E_OPS = new QNm("options", SQLURI);

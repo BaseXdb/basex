@@ -5,10 +5,8 @@ import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
-import org.basex.query.item.Str;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.pkg.Package;
 import org.basex.query.util.pkg.RepoManager;
 import org.basex.util.InputInfo;
@@ -20,6 +18,13 @@ import org.basex.util.InputInfo;
  * @author Rositsa Shadura
  */
 public final class FNRepo extends StandardFunc {
+  /** Element name. */
+  private static final QNm PACKAGE = new QNm("package");
+  /** Header attribute: name. */
+  private static final QNm NAME = new QNm("name");
+  /** Header attribute: name. */
+  private static final QNm VERSION = new QNm("version");
+
   /**
    * Constructor.
    * @param ii input info
@@ -32,36 +37,45 @@ public final class FNRepo extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
     switch(sig) {
-      case _REPO_LIST:
-        final ItemCache cache = new ItemCache();
-        for(final byte[] p : ctx.context.repo.pkgDict())
-          if(p != null) cache.add(Str.get(Package.name(p)));
-        return cache;
-      default:
-        return super.iter(ctx);
+      case _REPO_LIST: return list(ctx);
+      default:         return super.iter(ctx);
     }
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkAdmin(ctx);
-    final RepoManager repoMng = new RepoManager(ctx.context.repo);
+    final RepoManager rm = new RepoManager(ctx.context.repo);
     // either path to package or package name
     final String pkg = expr.length == 0 ? null : string(checkStr(expr[0], ctx));
     switch(sig) {
       case _REPO_INSTALL:
-        repoMng.install(pkg, ii);
+        rm.install(pkg, ii);
         return null;
       case _REPO_DELETE:
-        repoMng.delete(pkg, ii);
+        rm.delete(pkg, ii);
         return null;
       default:
         return super.item(ctx, ii);
     }
+  }
+
+  /**
+   * Performs the list function.
+   * @param ctx query context
+   * @return iterator
+   */
+  private Iter list(final QueryContext ctx) {
+    final NodeCache cache = new NodeCache();
+    for(final byte[] p : ctx.context.repo.pkgDict()) {
+      if(p == null) continue;
+      final FElem elem = new FElem(PACKAGE);
+      elem.add(new FAttr(NAME, Package.name(p)));
+      elem.add(new FAttr(VERSION, Package.version(p)));
+      cache.add(elem);
+    }
+    return cache;
   }
 
   @Override

@@ -94,9 +94,7 @@ public final class RepoManager {
    * @param ii input info
    * @throws QueryException query exception
    */
-  public void delete(final String pkg, final InputInfo ii)
-      throws QueryException {
-
+  public void delete(final String pkg, final InputInfo ii) throws QueryException {
     boolean found = false;
     for(final byte[] nextPkg : repo.pkgDict()) {
       if(nextPkg == null) continue;
@@ -129,6 +127,7 @@ public final class RepoManager {
    */
   private byte[] primary(final byte[] pkgName, final InputInfo ii)
       throws QueryException {
+
     for(final byte[] nextPkg : repo.pkgDict()) {
       if(nextPkg != null && !eq(nextPkg, pkgName)) {
         // check only packages different from the current one

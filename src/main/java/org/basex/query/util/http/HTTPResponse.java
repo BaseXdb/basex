@@ -102,8 +102,8 @@ public final class HTTPResponse {
   private static NodeCache extractAttrs(final HttpURLConnection conn)
       throws IOException {
     final NodeCache a = new NodeCache();
-    a.add(new FAttr(new QNm(STATUS, EMPTY), token(conn.getResponseCode())));
-    a.add(new FAttr(new QNm(MESSAGE, EMPTY), token(conn.getResponseMessage())));
+    a.add(new FAttr(Q_STATUS, token(conn.getResponseCode())));
+    a.add(new FAttr(Q_MESSAGE, token(conn.getResponseMessage())));
     return a;
   }
 
@@ -114,7 +114,6 @@ public final class HTTPResponse {
    * @return node cache with http:header elements
    */
   private static NodeCache extractHdrs(final HttpURLConnection conn) {
-
     final NodeCache h = new NodeCache();
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
