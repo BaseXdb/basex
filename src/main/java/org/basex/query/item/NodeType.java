@@ -35,10 +35,10 @@ import org.w3c.dom.Text;
  */
 public enum NodeType implements Type {
   /** Node type. */
-  NOD("node", AtomType.ITEM),
+  NOD("node", AtomType.ITEM, 8),
 
   /** Text type. */
-  TXT("text", NOD) {
+  TXT("text", NOD, 9) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
       return o instanceof BXText ? ((BXText) o).getNod() : new FTxt((Text) o);
@@ -46,7 +46,7 @@ public enum NodeType implements Type {
   },
 
   /** PI type. */
-  PI("processing-instruction", NOD) {
+  PI("processing-instruction", NOD, 10) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
@@ -55,7 +55,7 @@ public enum NodeType implements Type {
   },
 
   /** Element type. */
-  ELM("element", NOD) {
+  ELM("element", NOD, 11) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
@@ -64,7 +64,7 @@ public enum NodeType implements Type {
   },
 
   /** Document type. */
-  DOC("document-node", NOD) {
+  DOC("document-node", NOD, 12) {
     @Override
     public ANode cast(final Object o, final InputInfo ii)
         throws QueryException {
@@ -86,10 +86,10 @@ public enum NodeType implements Type {
   },
 
   /** Document element type. */
-  DEL("document-node(element())", NOD),
+  DEL("document-node(element())", NOD, 13),
 
   /** Attribute type. */
-  ATT("attribute", NOD) {
+  ATT("attribute", NOD, 14) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
       return o instanceof BXAttr ? ((BXAttr) o).getNod() : new FAttr((Attr) o);
@@ -97,7 +97,7 @@ public enum NodeType implements Type {
   },
 
   /** Comment type. */
-  COM("comment", NOD) {
+  COM("comment", NOD, 15) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
@@ -106,12 +106,14 @@ public enum NodeType implements Type {
   },
 
   /** Namespace type. */
-  NSP("namespace-node", NOD);
+  NSP("namespace-node", NOD, 16);
 
   /** String representation. */
   private final byte[] string;
   /** Parent type. */
   private final Type par;
+  /** Type id . */
+  private final int id;
   /** Sequence type. */
   private SeqType seq;
 
@@ -171,10 +173,12 @@ public enum NodeType implements Type {
    * Constructor.
    * @param nm string representation
    * @param pr parent type
+   * @param i type id
    */
-  NodeType(final String nm, final Type pr) {
+  NodeType(final String nm, final Type pr, final int i) {
     string = Token.token(nm);
     par = pr;
+    id = i;
   }
 
   @Override
@@ -221,7 +225,7 @@ public enum NodeType implements Type {
 
   @Override
   public int id() {
-    return ordinal() + 8;
+    return id;
   }
 
   @Override
