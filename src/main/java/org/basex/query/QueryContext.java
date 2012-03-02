@@ -520,7 +520,7 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns the updating flag.
+   * Returns {@code true} if the query may perform updates.
    * @return updating flag
    */
   public boolean updating() {

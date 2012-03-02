@@ -59,6 +59,11 @@ public class LocalQuery extends Query {
   }
 
   @Override
+  public boolean updating() throws IOException {
+    return ql.updating();
+  }
+
+  @Override
   public void close() {
   }
 }

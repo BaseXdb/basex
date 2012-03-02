@@ -108,6 +108,13 @@ public abstract class Query {
   public abstract String options() throws IOException;
 
   /**
+   * Returns {@code true} if the query may perform updates.
+   * @return updating flag
+   * @throws IOException I/O exception
+   */
+  public abstract boolean updating() throws IOException;
+
+  /**
    * Returns query info.
    * @return query info
    * @throws IOException I/O exception

@@ -46,6 +46,11 @@ public class ClientQuery extends Query {
   }
 
   @Override
+  public boolean updating() throws IOException {
+    return Boolean.parseBoolean(cs.exec(ServerCmd.UPDATING, id, null));
+  }
+
+  @Override
   public void bind(final String n, final Object v, final String t) throws IOException {
     cs.exec(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' + (t == null ? "" : t), null);
   }

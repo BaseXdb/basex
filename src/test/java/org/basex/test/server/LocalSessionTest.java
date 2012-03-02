@@ -1,10 +1,8 @@
 package org.basex.test.server;
 
-import org.basex.core.Context;
-import org.basex.server.LocalSession;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.basex.core.*;
+import org.basex.server.*;
+import org.junit.*;
 
 /**
  * This class tests the local API.

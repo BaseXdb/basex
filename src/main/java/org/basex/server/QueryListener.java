@@ -76,11 +76,21 @@ final class QueryListener extends Progress {
   /**
    * Returns the serialization options.
    * @return serialization options
-   * @throws IOException Exception
+   * @throws IOException I/O Exception
    */
   String options() throws IOException {
     init();
     return options.toString();
+  }
+
+  /**
+   * Returns {@code true} if the query may perform updates.
+   * @return updating flag
+   * @throws IOException I/O Exception
+   */
+  boolean updating() throws IOException {
+    init();
+    return qp.updating();
   }
 
   /**
@@ -89,7 +99,7 @@ final class QueryListener extends Progress {
    * @param out output stream
    * @param enc encode stream
    * @param full return full type information
-   * @throws IOException Exception
+   * @throws IOException I/O Exception
    */
   void execute(final boolean iter, final OutputStream out, final boolean enc,
       final boolean full) throws IOException {
@@ -97,7 +107,7 @@ final class QueryListener extends Progress {
     boolean mon = false;
     try {
       init();
-      ctx.register(qp.ctx.updating());
+      ctx.register(qp.updating());
       mon = true;
 
       // create serializer
@@ -143,13 +153,13 @@ final class QueryListener extends Progress {
       throw new BaseXException(ex);
     } finally {
       try { qp.close(); } catch(final QueryException ex) { }
-      if(mon) ctx.unregister(qp.ctx.updating());
+      if(mon) ctx.unregister(qp.updating());
     }
   }
 
   /**
    * Parses the query and retrieves the serialization options.
-   * @throws IOException Exception
+   * @throws IOException I/O Exception
    */
   private void init() throws IOException {
     if(options != null) return;

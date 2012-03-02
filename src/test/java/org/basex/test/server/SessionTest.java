@@ -11,6 +11,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.cmd.*;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.out.ArrayOutput;
+import org.basex.io.serial.*;
 import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.util.Util;
@@ -431,8 +432,7 @@ public abstract class SessionTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindURI() throws IOException {
-    final Query query = session.query(
-        "declare variable $a external; $a");
+    final Query query = session.query("declare variable $a external; $a");
     query.bind("$a", "X", "xs:anyURI");
     check("X", query.next());
     query.close();
@@ -442,8 +442,7 @@ public abstract class SessionTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindInt() throws IOException {
-    final Query query = session.query(
-        "declare variable $a as xs:integer external; $a");
+    final Query query = session.query("declare variable $a as xs:integer external; $a");
     query.bind("a", "5", "xs:integer");
     check("5", query.next());
     query.close();
@@ -453,8 +452,7 @@ public abstract class SessionTest {
    * @throws IOException I/O exception */
   @Test
   public void queryBindDynamic() throws IOException {
-    final Query query = session.query(
-        "declare variable $a as xs:integer external; $a");
+    final Query query = session.query("declare variable $a as xs:integer external; $a");
     query.bind("a", "1");
     check("1", query.execute());
     query.close();
@@ -467,8 +465,37 @@ public abstract class SessionTest {
     final Query query = session.query("1 to 2");
     query.execute();
     final String info = query.info();
-    assertTrue("Total Time not contained in '" + info + "'.",
-        info.contains(TOTAL_TIME_CC));
+    assertTrue("Time time missing: '" + info + "'.", info.contains(TOTAL_TIME_CC));
+    query.close();
+  }
+
+  /** Runs a query and checks the serialization parameters.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryOptions() throws IOException {
+    final Query query = session.query("declare option output:encoding 'US-ASCII';()");
+    query.execute();
+    final SerializerProp sp = new SerializerProp(query.options());
+    assertEquals("US-ASCII", sp.get(SerializerProp.S_ENCODING));
+    query.close();
+  }
+
+  /** Runs a query and checks the updating flag.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryUpdating() throws IOException {
+    // test non-updating query
+    Query query = session.query("12345678");
+    assertFalse(query.updating());
+    check("12345678", query.execute());
+    assertFalse(query.updating());
+    query.close();
+
+    // test updating query
+    query = session.query("insert node <a/> into <b/>");
+    assertTrue(query.updating());
+    check("", query.execute());
+    assertTrue(query.updating());
     query.close();
   }
 

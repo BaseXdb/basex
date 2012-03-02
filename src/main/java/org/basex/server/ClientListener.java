@@ -6,11 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
-import org.basex.core.CommandParser;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
+import org.basex.core.*;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -460,8 +456,7 @@ public final class ClientListener extends Thread {
 
         // ID has already been removed
         if(qp == null) {
-          if(sc != ServerCmd.CLOSE)
-            throw new IOException("Unknown Query ID: " + arg);
+          if(sc != ServerCmd.CLOSE) throw new IOException("Unknown Query ID: " + arg);
         } else if(sc == ServerCmd.BIND) {
           final String key = in.readString();
           final String val = in.readString();
@@ -478,6 +473,8 @@ public final class ClientListener extends Thread {
           out.print(qp.info());
         } else if(sc == ServerCmd.OPTIONS) {
           out.print(qp.options());
+        } else if(sc == ServerCmd.UPDATING) {
+          out.print(Boolean.toString(qp.updating()));
         } else if(sc == ServerCmd.CLOSE) {
           queries.remove(arg);
         } else if(sc == ServerCmd.NEXT) {
