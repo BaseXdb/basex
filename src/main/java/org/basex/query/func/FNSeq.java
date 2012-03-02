@@ -86,7 +86,7 @@ public final class FNSeq extends StandardFunc {
       if(outer) {
         // skip the subtree of the last added node
         nc.size(0);
-        final DBNode dummy = new DBNode(fst.data, 0);
+        final DBNode dummy = new DBNode(fst.data);
         final NodeCache src = new NodeCache(nodes, len);
         for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
           final DBNode nd = (DBNode) nodes[next];

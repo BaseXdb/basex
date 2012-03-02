@@ -66,14 +66,12 @@ public enum NodeType implements Type {
   /** Document type. */
   DOC("document-node", NOD, 12) {
     @Override
-    public ANode cast(final Object o, final InputInfo ii)
-        throws QueryException {
-
+    public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
       if(o instanceof Document) {
         try {
           final DOMWrapper p = new DOMWrapper((Document) o, "");
-          return new DBNode(MemBuilder.build(p, new Prop()), 0);
+          return new DBNode(MemBuilder.build(p, new Prop()));
         } catch(final IOException ex) {
           UNDOC.thrw(ii, ex);
         }

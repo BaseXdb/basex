@@ -38,7 +38,15 @@ public class DBNode extends ANode {
   private Atts nsp;
 
   /**
-   * Constructor.
+   * Constructor, creating a document node from the specified data reference.
+   * @param d data reference
+   */
+  public DBNode(final Data d) {
+    this(d, 0);
+  }
+
+  /**
+   * Constructor, creating a node from the specified data reference.
    * @param d data reference
    * @param p pre value
    */
@@ -47,7 +55,7 @@ public class DBNode extends ANode {
   }
 
   /**
-   * Constructor.
+   * Constructor, specifying full node information.
    * @param d data reference
    * @param p pre value
    * @param k node kind
@@ -57,7 +65,7 @@ public class DBNode extends ANode {
   }
 
   /**
-   * Constructor.
+   * Constructor, specifying full node information.
    * @param d data reference
    * @param p pre value
    * @param r parent reference
@@ -87,7 +95,7 @@ public class DBNode extends ANode {
    * @throws IOException I/O exception
    */
   public DBNode(final Parser parser, final Prop prop) throws IOException {
-    this(MemBuilder.build("", parser, prop), 0);
+    this(MemBuilder.build("", parser, prop));
   }
 
   /**
@@ -214,7 +222,7 @@ public class DBNode extends ANode {
     final MemData md = data instanceof MemData ?
         new MemData(data) : new MemData(data.meta.prop);
     new DataBuilder(md).build(this);
-    return new DBNode(md, 0);
+    return new DBNode(md);
 
     /*if(hasChildren()) {
       // adopt index structures if database is a main-memory instance

@@ -304,6 +304,6 @@ public final class DataBuilder {
       }
     }
     if(del) md.nspaces.delete(ns);
-    return new DBNode(md, 0);
+    return new DBNode(md);
   }
 }

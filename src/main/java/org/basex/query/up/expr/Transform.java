@@ -86,7 +86,7 @@ public final class Transform extends Arr {
         new DataBuilder(md).build((ANode) i);
 
         // add resulting node to variable
-        ctx.vars.add(fo.var.bind(new DBNode(md, 0), ctx).copy());
+        ctx.vars.add(fo.var.bind(new DBNode(md), ctx).copy());
         pu.addData(md);
       }
 
