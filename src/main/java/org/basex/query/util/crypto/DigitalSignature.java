@@ -3,82 +3,27 @@ package org.basex.query.util.crypto;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
+import java.io.*;
+import java.security.*;
+import java.security.cert.*;
+import java.util.*;
 
-import javax.xml.crypto.MarshalException;
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dom.DOMStructure;
-import javax.xml.crypto.dsig.CanonicalizationMethod;
-import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.crypto.dsig.Reference;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.crypto.dsig.SignedInfo;
-import javax.xml.crypto.dsig.Transform;
-import javax.xml.crypto.dsig.XMLObject;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureException;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMSignContext;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
-import javax.xml.crypto.dsig.keyinfo.X509IssuerSerial;
-import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.crypto.*;
+import javax.xml.crypto.dom.*;
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.dom.*;
+import javax.xml.crypto.dsig.keyinfo.*;
+import javax.xml.crypto.dsig.spec.*;
+import javax.xml.parsers.*;
+import javax.xml.xpath.*;
 
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.io.IO;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
-import org.basex.util.InputInfo;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.hash.TokenSet;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
 /**
  * This class generates and validates digital signatures for XML data.
@@ -155,13 +100,14 @@ public final class DigitalSignature {
    * @param expr XPath expression which specifies node to be signed
    * @param ce certificate which contains keystore information for
    *        signing the node, may be null
+   * @param ii input info
    *
    * @return signed node
    * @throws QueryException query exception
    */
-  public ANode generateSignature(final ANode node, final byte[] c,
+  public Item generateSignature(final ANode node, final byte[] c,
       final byte[] d, final byte[] sig, final byte[] ns, final byte[] t,
-      final byte[] expr, final ANode ce) throws QueryException {
+      final byte[] expr, final ANode ce, final InputInfo ii) throws QueryException {
 
     // checking input variables
     byte[] b = c;
@@ -190,7 +136,7 @@ public final class DigitalSignature {
     if(ti == 0) CRYPTOSIGTYPINV.thrw(input, t);
     final byte[] type = b;
 
-    ANode signedNode = null;
+    Item signedNode = null;
 
     try {
 
@@ -341,7 +287,7 @@ public final class DigitalSignature {
 
       // actually sign the document
       xmlSig.sign(signContext);
-      signedNode = toDBNode(inputNode);
+      signedNode = NodeType.DOC.cast(inputNode, ii);
 
     } catch(final XPathExpressionException e) {
       CRYPTOXPINV.thrw(input, e);
@@ -368,7 +314,6 @@ public final class DigitalSignature {
     } catch(final InvalidAlgorithmParameterException e) {
       CRYPTOALGEXC.thrw(input, e);
     }
-
     return signedNode;
   }
 
@@ -396,8 +341,6 @@ public final class DigitalSignature {
       final XMLSignature signature = fac.unmarshalXMLSignature(valContext);
       coreVal = signature.validate(valContext);
 
-      return Bln.get(coreVal);
-
     } catch(final XMLSignatureException e) {
       CRYPTOIOEXC.thrw(input, e);
     } catch(final SAXException e) {
@@ -414,53 +357,14 @@ public final class DigitalSignature {
   }
 
   /**
-   * Creates a BaseX database node from the given DOM node.
-   * @param n DOM node
-   * @return database node
-   * @throws QueryException query exception
-   */
-  private ANode toDBNode(final Node n) throws QueryException {
-    final String xmlString;
-
-    DBNode dbn = null;
-
-    try {
-      final TransformerFactory transfac = TransformerFactory.newInstance();
-      final Transformer trans = transfac.newTransformer();
-
-      //create string from xml tree
-      final StringWriter sw = new StringWriter();
-      final StreamResult result = new StreamResult(sw);
-      final DOMSource source = new DOMSource(n);
-      trans.transform(source, result);
-      xmlString = sw.toString();
-
-      final Parser parser = Parser.xmlParser(IO.get(xmlString), new Prop());
-      final MemBuilder builder = new MemBuilder("", parser, new Prop());
-      final Data mem = builder.build();
-      dbn = new DBNode(mem, 1);
-
-    } catch(final IOException e) {
-      CRYPTOIOEXC.thrw(input, e);
-    } catch(final TransformerException e) {
-      CRYPTOIOEXC.thrw(input, e);
-    }
-
-    return dbn;
-  }
-
-  /**
    * Serializes the given XML node to a byte array.
    * @param n node to be serialized
    * @return byte array containing XML
    * @throws IOException exception
    */
-  private static byte[] nodeToBytes(final ANode n)
-      throws IOException {
-
+  private static byte[] nodeToBytes(final ANode n) throws IOException {
     final ByteArrayOutputStream b = new ByteArrayOutputStream();
-    final Serializer s = Serializer.get(b,
-        new SerializerProp("format=no"));
+    final Serializer s = Serializer.get(b, new SerializerProp("format=no"));
     n.serialize(s);
     s.close();
     return b.toByteArray();
