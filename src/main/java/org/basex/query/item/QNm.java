@@ -11,6 +11,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.*;
 
 /**
  * QName item.
@@ -216,6 +217,11 @@ public final class QNm extends Item {
   @Override
   public int hash(final InputInfo ii) throws QueryException {
     return Token.hash(local());
+  }
+
+  @Override
+  public byte[] xdmInfo() {
+    return new ByteList().add(super.xdmInfo()).add(uri()).add(0).toArray();
   }
 
   @Override

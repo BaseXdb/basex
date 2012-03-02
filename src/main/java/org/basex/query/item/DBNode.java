@@ -170,8 +170,7 @@ public class DBNode extends ANode {
     byte[] uri = Token.EMPTY;
     final boolean pref = Token.indexOf(nm, ':') != -1;
     if(pref || data.nspaces.size() != 0) {
-      final int n = pref ? data.nspaces.uri(nm, pre) :
-        data.uri(pre, data.kind(pre));
+      final int n = pref ? data.nspaces.uri(nm, pre) : data.uri(pre, data.kind(pre));
       final byte[] u = n > 0 ? data.nspaces.uri(n) : pref ?
           NSGlobal.uri(Token.prefix(nm)) : null;
       if(u != null) uri = u;
@@ -476,8 +475,10 @@ public class DBNode extends ANode {
 
   @Override
   public byte[] xdmInfo() {
-    return type != NodeType.DOC ? super.xdmInfo() :
-        new ByteList().add(super.xdmInfo()).add(baseURI()).add(0).toArray();
+    final ByteList bl = new ByteList().add(super.xdmInfo());
+    if(type == NodeType.DOC) bl.add(baseURI()).add(0);
+    else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
+    return bl.toArray();
   }
 
   @Override

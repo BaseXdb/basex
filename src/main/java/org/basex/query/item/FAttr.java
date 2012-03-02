@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.basex.io.serial.Serializer;
 import org.basex.util.Util;
+import org.basex.util.list.*;
+
 import static org.basex.util.Token.*;
 import org.w3c.dom.Attr;
 
@@ -61,6 +63,11 @@ public final class FAttr extends FNode {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, NAM, name.string(), VAL, val);
+  }
+
+  @Override
+  public byte[] xdmInfo() {
+    return new ByteList().add(super.xdmInfo()).add(name.uri()).add(0).toArray();
   }
 
   @Override

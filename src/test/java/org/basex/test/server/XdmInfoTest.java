@@ -75,6 +75,7 @@ public final class XdmInfoTest {
       assertTrue("Types are different.\nExpected: " + t[0] +
           "\nFound: " + TYPES[ti.type][0], t == TYPES[ti.type]);
       assertEquals(Token.string(ti.result), TYPES[ti.type][2]);
+      if(t.length > 3) assertEquals(Token.string(ti.uri), TYPES[ti.type][3]);
       tq.close();
     }
   }
@@ -196,7 +197,8 @@ public final class XdmInfoTest {
     { "element()", "<a/>", "<a/>" },
     { "document-node()", "document { 'a' }", "a", "" },
     { "document-node(element())" },
-    { "attribute()", "attribute a { 'b' }", " a=\"b\"" },
+    { "attribute()", "attribute xml:a { 'b' }", " xml:a=\"b\"",
+      "http://www.w3.org/XML/1998/namespace" },
     { "comment()", "comment { 'a' } ", "<!--a-->" },
     { }, { }, { }, { }, { }, { }, { }, { },
     { }, { }, { }, { }, { }, { }, { }, { },
@@ -251,7 +253,7 @@ public final class XdmInfoTest {
     { "xs:base64Binary", "xs:base64Binary('aaaa')", "aaaa" },
     { "xs:hexBinary", "xs:hexBinary('aa')", "AA" },
     { "xs:anyURI", "xs:anyURI('a')", "a" },
-    { "xs:QName", "xs:QName('xml:a')", "xml:a" },
+    { "xs:QName", "xs:QName('xml:a')", "xml:a", "http://www.w3.org/XML/1998/namespace" },
     { "xs:NOTATION" }
   };
 }
