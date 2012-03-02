@@ -21,6 +21,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.ft.Scoring;
+import org.basex.util.list.*;
 
 /**
  * Disk-based Node item.
@@ -463,6 +464,12 @@ public class DBNode extends ANode {
         Token.token(data.meta.name));
     if(pre != 0) ser.attribute(PRE, Token.token(pre));
     ser.closeElement();
+  }
+
+  @Override
+  public byte[] xdmInfo() {
+    return type != NodeType.DOC ? super.xdmInfo() :
+        new ByteList().add(super.xdmInfo()).add(baseURI()).add(0).toArray();
   }
 
   @Override
