@@ -1830,9 +1830,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Test nodeTest(final boolean att, final boolean all)
-      throws QueryException {
-
+  private Test nodeTest(final boolean att, final boolean all) throws QueryException {
     final int p = qp;
     if(consume('*')) {
       // name test: *
@@ -1853,7 +1851,7 @@ public class QueryParser extends InputParser {
             tok.add(consume());
           }
           skipWS();
-          return tok.trim().isEmpty() ? Test.get(type) : kindTest(type, tok.finish());
+          return tok.trim().isEmpty() ? Test.get(type) : kindTest(type);
         }
       } else {
         qp = p2;
@@ -2667,13 +2665,17 @@ public class QueryParser extends InputParser {
     final Occ occ = consume('?') ? Occ.ZERO_ONE : consume('+') ? Occ.ONE_MORE :
       consume('*') ? Occ.ZERO_MORE : Occ.ONE;
     if(t == AtomType.EMP && occ != Occ.ONE) error(EMPTYSEQOCC, t);
+    skipWS();
 
-    final KindTest kt = tok.isEmpty() ? null : kindTest(t, tok.finish());
-    tok.reset();
+    // simple test
+    if(tok.trim().isEmpty()) return SeqType.get(t, occ);
+
+    // to be revised: support for document nodes
+    final KindTest kt = kindTest(t);
+    if(kt instanceof DocTest) return SeqType.get(t, occ);
 
     // use empty name test if types are different
-    skipWS();
-    return SeqType.get(t, occ, kt == null ? null : kt.extype == null ||
+    return SeqType.get(t, occ, kt.extype == null ||
         t == kt.extype || !kt.extype.isNode() ? kt.name : new QNm());
   }
 
@@ -2758,14 +2760,13 @@ public class QueryParser extends InputParser {
   /**
    * Checks the arguments of the kind test.
    * @param t type
-   * @param k kind arguments
    * @return arguments
    * @throws QueryException query exception
    */
-  private KindTest kindTest(final Type t, final byte[] k)
-      throws QueryException {
-
-    byte[] nm = trim(k);
+  private KindTest kindTest(final Type t) throws QueryException {
+    byte[] k = tok.finish();
+    byte[] nm = k;
+    tok.reset();
 
     // processing-instruction test
     if(t == NodeType.PI) {
@@ -2776,6 +2777,11 @@ public class QueryParser extends InputParser {
         error(TESTINVALID, t, k);
       }
       return new KindTest((NodeType) t, new QNm(nm), null);
+    }
+
+    // document test
+    if(t == NodeType.DOC) {
+      return new DocTest(NodeType.ELM);
     }
 
     // element/attribute test

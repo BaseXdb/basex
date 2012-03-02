@@ -279,6 +279,14 @@ public abstract class Item extends Value {
   }
 
   /**
+   * Returns meta data on the current item.
+   * @return type string
+   */
+  public byte[] xdmInfo() {
+    return new byte[] { (byte) type.id() };
+  }
+
+  /**
    * Item iterator.
    * @author BaseX Team 2005-12, BSD License
    * @author Christian Gruen

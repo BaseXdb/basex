@@ -21,7 +21,7 @@ import org.basex.util.list.TokenList;
  */
 public abstract class Query {
   /** Client output stream. */
-  OutputStream out;
+  protected OutputStream out;
   /** Cached results. */
   protected TokenList cache;
   /** Cache pointer. */

@@ -24,28 +24,27 @@ public class LocalQuery extends Query {
    * @param ctx database context
    * @param o output stream to write query output
    */
-  LocalQuery(final String q, final Context ctx, final OutputStream o) {
+  protected LocalQuery(final String q, final Context ctx, final OutputStream o) {
     ql = new QueryListener(q, ctx);
     out = o;
   }
 
   @Override
-  public void bind(final String n, final Object v, final String t)
-      throws IOException {
+  public void bind(final String n, final Object v, final String t) throws IOException {
     ql.bind(n, v, t);
   }
 
   @Override
   protected void cache() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
-    ql.execute(true, ao, true);
+    ql.execute(true, ao, true, false);
     cache(new ArrayInput(ao.toArray()));
   }
 
   @Override
   public String execute() throws IOException {
     final OutputStream os = out == null ? new ArrayOutput() : out;
-    ql.execute(false, os, false);
+    ql.execute(false, os, false, false);
     return out == null ? os.toString() : null;
   }
 

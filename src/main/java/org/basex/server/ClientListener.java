@@ -469,9 +469,11 @@ public final class ClientListener extends Thread {
           qp.bind(key, val, typ);
           log.write(this, sc + "(" + arg + ')', key, val, typ, OK, perf);
         } else if(sc == ServerCmd.ITER) {
-          qp.execute(true, out, true);
+          qp.execute(true, out, true, false);
         } else if(sc == ServerCmd.EXEC) {
-          qp.execute(false, out, true);
+          qp.execute(false, out, true, false);
+        } else if(sc == ServerCmd.FULL) {
+          qp.execute(true, out, true, true);
         } else if(sc == ServerCmd.INFO) {
           out.print(qp.info());
         } else if(sc == ServerCmd.OPTIONS) {

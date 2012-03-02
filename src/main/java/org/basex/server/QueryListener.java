@@ -88,10 +88,11 @@ final class QueryListener extends Progress {
    * @param iter iterative evaluation
    * @param out output stream
    * @param enc encode stream
+   * @param full return full type information
    * @throws IOException Exception
    */
-  void execute(final boolean iter, final OutputStream out, final boolean enc)
-      throws IOException {
+  void execute(final boolean iter, final OutputStream out, final boolean enc,
+      final boolean full) throws IOException {
 
     boolean mon = false;
     try {
@@ -111,7 +112,11 @@ final class QueryListener extends Progress {
       int c = 0;
       for(Item it; (it = ir.next()) != null;) {
         if(iter && !wrap) {
-          po.write(it.type.id());
+          if(full) {
+            po.print(it.xdmInfo());
+          } else {
+            po.write(it.type.id());
+          }
           ser.reset();
         }
         ser.openResult();

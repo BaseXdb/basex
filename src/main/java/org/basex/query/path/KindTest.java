@@ -12,7 +12,7 @@ import org.basex.query.item.Type;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class KindTest extends Test {
+public class KindTest extends Test {
   /** Type name. */
   public final Type extype;
 
@@ -47,9 +47,11 @@ public final class KindTest extends Test {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(type.toString());
-    // ...
+  public final String toString() {
+    final StringBuilder sb = new StringBuilder().append(type);
+    /*sb.append('(');
+    if(extype != null) sb.append(extype).append("()");
+    sb.append(')');*/
     return sb.toString();
   }
 }

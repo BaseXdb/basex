@@ -35,6 +35,8 @@ public enum ServerCmd {
   REPLACE(12),
   /** Code for storing raw data in a database: {path}0{input}0. */
   STORE(13),
+  /** Code for executing a query and returning all information relevant for XQJ: {id}0. */
+  FULL(31),
   /** Code for running a database command: {path}0{input}0. */
   COMMAND(-1);
 

@@ -23,9 +23,9 @@ import org.basex.util.Util;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class LocalSession extends Session {
+public class LocalSession extends Session {
   /** Database context. */
-  private final Context ctx;
+  protected final Context ctx;
 
   /**
    * Default constructor.
@@ -42,8 +42,8 @@ public final class LocalSession extends Session {
    * @param pass password
    * @throws LoginException login exception
    */
-  public LocalSession(final Context context, final String user,
-      final String pass) throws LoginException {
+  public LocalSession(final Context context, final String user, final String pass)
+      throws LoginException {
     this(context, user, pass, null);
   }
 
@@ -55,8 +55,8 @@ public final class LocalSession extends Session {
    * @param output output stream
    * @throws LoginException login exception
    */
-  public LocalSession(final Context context, final String user,
-      final String pass, final OutputStream output) throws LoginException {
+  public LocalSession(final Context context, final String user, final String pass,
+      final OutputStream output) throws LoginException {
 
     this(context, output);
     final User usr = ctx.users.get(user);
@@ -76,26 +76,22 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  public void create(final String name, final InputStream input)
-    throws IOException {
+  public void create(final String name, final InputStream input) throws IOException {
     execute(new CreateDB(name), input);
   }
 
   @Override
-  public void add(final String path, final InputStream input)
-      throws IOException {
+  public void add(final String path, final InputStream input) throws IOException {
     execute(new Add(path), input);
   }
 
   @Override
-  public void replace(final String path, final InputStream input)
-      throws IOException {
+  public void replace(final String path, final InputStream input) throws IOException {
     execute(new Replace(path), input);
   }
 
   @Override
-  public void store(final String path, final InputStream input)
-      throws IOException {
+  public void store(final String path, final InputStream input) throws IOException {
     execute(new Store(path), input);
   }
 
@@ -105,8 +101,7 @@ public final class LocalSession extends Session {
    * @param input input stream
    * @throws BaseXException database exception
    */
-  private void execute(final Command cmd, final InputStream input)
-      throws BaseXException {
+  private void execute(final Command cmd, final InputStream input) throws BaseXException {
     cmd.setInput(input);
     cmd.execute(ctx);
     info = cmd.info();
@@ -127,8 +122,7 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  protected void execute(final String str, final OutputStream os)
-      throws BaseXException {
+  protected void execute(final String str, final OutputStream os) throws BaseXException {
     try {
       execute(new CommandParser(str, ctx).parseSingle(), os);
     } catch(final QueryException ex) {
@@ -137,8 +131,7 @@ public final class LocalSession extends Session {
   }
 
   @Override
-  protected void execute(final Command cmd, final OutputStream os)
-      throws BaseXException {
+  protected void execute(final Command cmd, final OutputStream os) throws BaseXException {
     cmd.execute(ctx, os);
     info = cmd.info();
   }

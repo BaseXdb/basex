@@ -8,6 +8,7 @@ import org.basex.query.iter.AxisMoreIter;
 import org.basex.query.iter.NodeCache;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
+import org.basex.util.list.*;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -90,6 +91,11 @@ public final class FDoc extends FNode {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, BASE, base);
+  }
+
+  @Override
+  public byte[] xdmInfo() {
+    return new ByteList().add(super.xdmInfo()).add(base).add(0).toArray();
   }
 
   @Override

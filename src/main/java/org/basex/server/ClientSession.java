@@ -16,8 +16,7 @@ import org.basex.core.Context;
 import org.basex.core.MainProp;
 import org.basex.io.in.BufferInput;
 import org.basex.io.in.DecodingInput;
-import org.basex.io.out.EncodingOutput;
-import org.basex.io.out.PrintOutput;
+import org.basex.io.out.*;
 import org.basex.util.Token;
 
 /**
@@ -42,12 +41,12 @@ import org.basex.util.Token;
  */
 public class ClientSession extends Session {
   /** Event notifications. */
-  final Map<String, EventNotifier> notifiers =
+  protected final Map<String, EventNotifier> notifiers =
     Collections.synchronizedMap(new HashMap<String, EventNotifier>());
   /** Server output (buffered). */
-  final PrintOutput sout;
+  protected final PrintOutput sout;
   /** Server input. */
-  final InputStream sin;
+  protected final InputStream sin;
 
   /** Socket reference. */
   private final Socket socket;
@@ -63,8 +62,8 @@ public class ClientSession extends Session {
    * @param pass password
    * @throws IOException I/O exception
    */
-  public ClientSession(final Context context, final String user,
-      final String pass) throws IOException {
+  public ClientSession(final Context context, final String user, final String pass)
+      throws IOException {
     this(context, user, pass, null);
   }
 
@@ -77,8 +76,8 @@ public class ClientSession extends Session {
    * be returned as strings.
    * @throws IOException I/O exception
    */
-  public ClientSession(final Context context, final String user,
-      final String pass, final OutputStream output) throws IOException {
+  public ClientSession(final Context context, final String user, final String pass,
+      final OutputStream output) throws IOException {
     this(context.mprop.get(MainProp.HOST), context.mprop.num(MainProp.PORT),
         user, pass, output);
   }
@@ -91,8 +90,8 @@ public class ClientSession extends Session {
    * @param pass password
    * @throws IOException I/O exception
    */
-  public ClientSession(final String host, final int port,
-      final String user, final String pass) throws IOException {
+  public ClientSession(final String host, final int port, final String user,
+      final String pass) throws IOException {
     this(host, port, user, pass, null);
   }
 
@@ -132,26 +131,22 @@ public class ClientSession extends Session {
   }
 
   @Override
-  public void create(final String name, final InputStream input)
-      throws IOException {
+  public void create(final String name, final InputStream input) throws IOException {
     send(ServerCmd.CREATE, input, name);
   }
 
   @Override
-  public void add(final String path, final InputStream input)
-      throws IOException {
+  public void add(final String path, final InputStream input) throws IOException {
     send(ServerCmd.ADD, input, path);
   }
 
   @Override
-  public void replace(final String path, final InputStream input)
-      throws IOException {
+  public void replace(final String path, final InputStream input) throws IOException {
     send(ServerCmd.REPLACE, input, path);
   }
 
   @Override
-  public void store(final String path, final InputStream input)
-      throws IOException {
+  public void store(final String path, final InputStream input) throws IOException {
     send(ServerCmd.STORE, input, path);
   }
 
@@ -278,7 +273,7 @@ public class ClientSession extends Session {
    * @return value of check
    * @throws IOException I/O exception
    */
-  static boolean ok(final BufferInput bi) throws IOException {
+  protected static boolean ok(final BufferInput bi) throws IOException {
     return bi.read() == 0;
   }
 
@@ -289,8 +284,9 @@ public class ClientSession extends Session {
    * @param strings string arguments
    * @throws IOException I/O exception
    */
-  void send(final ServerCmd cmd, final InputStream input,
+  protected void send(final ServerCmd cmd, final InputStream input,
       final String... strings) throws IOException {
+
     sout.write(cmd.code);
     for(final String s : strings) send(s);
     send(input);
@@ -302,9 +298,8 @@ public class ClientSession extends Session {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  static void receive(final BufferInput bi, final OutputStream os)
+  protected static void receive(final BufferInput bi, final OutputStream os)
       throws IOException {
-
     final DecodingInput di = new DecodingInput(bi);
     for(int b; (b = di.read()) != -1;) os.write(b);
   }
@@ -314,8 +309,29 @@ public class ClientSession extends Session {
    * @param s string to be sent
    * @throws IOException I/O exception
    */
-  void send(final String s) throws IOException {
+  protected void send(final String s) throws IOException {
     sout.write(Token.token(s));
     sout.write(0);
+  }
+
+  /**
+   * Executes a command and sends the result to the specified output stream.
+   * @param cmd server command
+   * @param arg argument
+   * @param os target output stream
+   * @return string
+   * @throws IOException I/O exception
+   */
+  protected String exec(final ServerCmd cmd, final String arg, final OutputStream os)
+      throws IOException {
+
+    final OutputStream o = os == null ? new ArrayOutput() : os;
+    sout.write(cmd.code);
+    send(arg);
+    sout.flush();
+    final BufferInput bi = new BufferInput(sin);
+    ClientSession.receive(bi, o);
+    if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
+    return o.toString();
   }
 }

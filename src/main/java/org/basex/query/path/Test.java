@@ -14,17 +14,17 @@ import org.basex.util.Util;
  */
 public abstract class Test {
   /** Static text node test. */
-  public static final Test TXT = new KindTest(NodeType.TXT);
+  public static final KindTest TXT = new KindTest(NodeType.TXT);
   /** Static PI node test. */
-  public static final Test PI = new KindTest(NodeType.PI);
+  public static final KindTest PI = new KindTest(NodeType.PI);
   /** Static element node test. */
-  private static final Test ELM = new KindTest(NodeType.ELM);
+  private static final KindTest ELM = new KindTest(NodeType.ELM);
   /** Static document node test. */
-  public static final Test DOC = new KindTest(NodeType.DOC);
+  public static final KindTest DOC = new KindTest(NodeType.DOC);
   /** Static attribute node test. */
-  private static final Test ATT = new KindTest(NodeType.ATT);
+  private static final KindTest ATT = new KindTest(NodeType.ATT);
   /** Static comment node test. */
-  public static final Test COM = new KindTest(NodeType.COM);
+  public static final KindTest COM = new KindTest(NodeType.COM);
   /** Static node test. */
   public static final Test NOD = new Test() {
     @Override
