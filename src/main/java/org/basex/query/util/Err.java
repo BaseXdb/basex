@@ -492,7 +492,7 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   QNAMEINV(XPST, 3, "Expecting QName, '%' found."),
   /** XPST0003: Parsing exception. */
-  PROLOGORDER(XPST, 3, "Default declaration must be declared first."),
+  PROLOGORDER(XPST, 3, "Default declarations must be declared first."),
   /** XPST0003: Parsing exception. */
   FTRANGE(XPST, 3, "Expecting full-text range."),
   /** XPST0003: Parsing exception. */
@@ -513,6 +513,8 @@ public enum Err {
   WHICHANN(XPST, 3, "Annotation % is unknown."),
   /** XPST0003: Parsing exception. */
   ANNVALUE(XPST, 3, "Literal expected after annotation."),
+  /** XPST0003: Parsing exception. */
+  UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
@@ -712,7 +714,9 @@ public enum Err {
   /** XQST0099: Parsing exception. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
   /** XQST0106: Parsing exception. */
-  ANNVIS(XQST, 106, "Conflicting annotations found."),
+  DUPLUPD(XQST, 106, "More than one updating annotation declared."),
+  /** XQST0106: Parsing exception. */
+  DUPLVIS(XQST, 106, "More than one visibility annotation declared."),
   /** XQST0107: Parsing exception. */
   CTXINIT(XQST, 107, "Context item depends on itself."),
   /** XQST0108: Parsing exception. */

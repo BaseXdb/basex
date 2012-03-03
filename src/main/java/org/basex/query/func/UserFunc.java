@@ -56,7 +56,7 @@ public class UserFunc extends Single {
    */
   public UserFunc(final InputInfo ii, final QNm n, final Var[] v,
       final SeqType r, final Ann a) {
-    this(ii, n, v, r, a, true, false);
+    this(ii, n, v, r, a, true);
   }
 
   /**
@@ -67,10 +67,9 @@ public class UserFunc extends Single {
    * @param r return type
    * @param a annotations
    * @param d declaration flag
-   * @param u updating flag
    */
   public UserFunc(final InputInfo ii, final QNm n, final Var[] v,
-      final SeqType r, final Ann a, final boolean d, final boolean u) {
+      final SeqType r, final Ann a, final boolean d) {
 
     super(ii, null);
     name = n;
@@ -79,7 +78,7 @@ public class UserFunc extends Single {
     cast = r != null;
     ann = a == null ? new Ann() : a;
     declared = d;
-    updating = u;
+    updating = ann.contains(Ann.UPDATING);
   }
 
   /**
