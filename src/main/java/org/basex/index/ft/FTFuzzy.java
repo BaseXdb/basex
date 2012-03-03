@@ -10,6 +10,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.IndexCache.CacheEntry;
 import org.basex.io.random.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -98,8 +99,8 @@ final class FTFuzzy extends FTIndex {
     if(lex.ftOpt().is(FZ)) return Math.max(1, data.meta.size / 10);
 
     final byte[] tok = lex.get();
-    final int id = cache.id(tok);
-    if(id > 0) return cache.size(id);
+    final CacheEntry e = cache.get(tok);
+    if(e != null) return e.size;
 
     int s = 0;
     long poi = 0;
@@ -124,13 +125,12 @@ final class FTFuzzy extends FTIndex {
     }
 
     // return cached or new result
-    final int id = cache.id(tok);
-    if(id == 0) {
-      final int p = token(tok);
-      return p > -1 ? iter(pointer(p, tok.length),
-          size(p, tok.length), inZ, false) : FTIndexIterator.FTEMPTY;
-    }
-    return iter(cache.pointer(id), cache.size(id), inZ, false);
+    final CacheEntry e = cache.get(tok);
+    if(e != null) return iter(e.pointer, e.size, inZ, false);
+
+    final int p = token(tok);
+    return p > -1 ? iter(pointer(p, tok.length),
+        size(p, tok.length), inZ, false) : FTIndexIterator.FTEMPTY;
   }
 
   @Override

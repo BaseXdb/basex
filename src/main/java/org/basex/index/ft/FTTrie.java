@@ -11,6 +11,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.IndexCache.CacheEntry;
 import org.basex.io.random.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -77,8 +78,8 @@ final class FTTrie extends FTIndex {
       return Math.max(1, data.meta.size / 10);
 
     final byte[] token = lex.get();
-    final int id = cache.id(token);
-    if(id > 0) return cache.size(id);
+    final CacheEntry e = cache.get(token);
+    if(e != null) return e.size;
 
     int size = 0;
     long poi = 0;
@@ -110,9 +111,9 @@ final class FTTrie extends FTIndex {
     }
 
     // return cached or new result
-    final int id = cache.id(token);
-    return id == 0 ? iter(0, token, false) :
-      iter(cache.pointer(id), cache.size(id), inB, false);
+    final CacheEntry e = cache.get(token);
+    return e == null ? iter(0, token, false) :
+      iter(e.pointer, e.size, inB, false);
   }
 
   @Override
