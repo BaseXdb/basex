@@ -274,11 +274,11 @@ public class BaseXClient {
    * @param is input stream
    */
   private void listen(final InputStream is) {
+    final BufferedInputStream bi = new BufferedInputStream(is);
     new Thread() {
       @Override
       public void run() {
         try {
-          final BufferedInputStream bi = new BufferedInputStream(is);
           while(true) {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             receive(bi, os);
