@@ -1,19 +1,13 @@
 package org.basex.query.item;
 
-import org.basex.api.dom.*;
-import org.basex.data.Data;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.AxisMoreIter;
-import org.basex.query.iter.NodeCache;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import java.io.*;
 
-import java.io.IOException;
+import org.basex.api.dom.*;
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Abstract node type.
@@ -65,15 +59,12 @@ public abstract class ANode extends Item {
   public abstract byte[] string();
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
-    return !it.type.isUntyped() ? it.eq(ii, this) :
-      Token.eq(string(), it.string(ii));
+  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
+    return !it.type.isUntyped() ? it.eq(ii, this) : Token.eq(string(), it.string(ii));
   }
 
   @Override
-  public final int diff(final InputInfo ii, final Item it)
-      throws QueryException {
+  public final int diff(final InputInfo ii, final Item it) throws QueryException {
     return !it.type.isUntyped() ? -it.diff(ii, this) :
       Token.diff(string(), it.string(ii));
   }
@@ -119,7 +110,7 @@ public abstract class ANode extends Item {
    * @param nm temporary qname
    * @return name
    */
-  public abstract QNm update(final QNm nm);
+  public abstract QNm qname(final QNm nm);
 
   /**
    * Minimizes the memory consumption of the node.
@@ -413,7 +404,7 @@ public abstract class ANode extends Item {
       case ATT: return Data.ATTR;
       case COM: return Data.COMM;
       case PI : return Data.PI;
-      default : throw Util.notexpected();
+      default : return -1;
     }
   }
 

@@ -3,7 +3,8 @@ package org.basex.query.item;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import static org.basex.query.QueryText.*;
-import org.basex.query.util.Err;
+import org.basex.query.util.*;
+
 import static org.basex.query.util.Err.*;
 import org.basex.util.*;
 import static org.basex.util.Token.*;
@@ -23,13 +24,13 @@ public enum AtomType implements Type {
   ITEM("item", null, EMPTY, false, false, false, false, false, 32),
 
   /** Any simple type. */
-  UTY("untyped", null, EMPTY, false, false, false, false, false, 33),
+  UTY("untyped", null, XSURI, false, false, false, false, false, 33),
 
   /** Any simple type. */
-  ATY("anyType", null, EMPTY, false, false, false, false, false, 34),
+  ATY("anyType", null, XSURI, false, false, false, false, false, 34),
 
   /** Any simple type. */
-  AST("anySimpleType", null, EMPTY, false, false, false, false, false, 35),
+  AST("anySimpleType", null, XSURI, false, false, false, false, false, 35),
 
   /** Any atomic type. */
   AAT("anyAtomicType", ITEM, XSURI, false, false, false, false, false, 36) {
@@ -646,9 +647,9 @@ public enum AtomType implements Type {
       if(it.type != STR) error(it, ii);
       final byte[] nm = it.string(ii);
       if(nm.length == 0) FUNCAST.thrw(ii, this, it);
-      final QNm name = new QNm(nm, ctx);
-      if(!name.hasURI() && name.hasPrefix()) NSDECL.thrw(ii, name.prefix());
-      return name;
+      final QNm qn = new QNm(nm, ctx);
+      if(!qn.hasURI() && qn.hasPrefix()) NSDECL.thrw(ii, qn.prefix());
+      return qn;
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) {
@@ -657,7 +658,7 @@ public enum AtomType implements Type {
   },
 
   /** NOTATION Type. */
-  NOT("NOTATION", null, XSURI, false, false, false, false, false, 83),
+  NOT("NOTATION", AAT, XSURI, false, false, false, false, false, 83),
 
   /** Empty sequence type. */
   EMP("empty-sequence", null, EMPTY, false, false, false, false, false, 84),
@@ -679,9 +680,10 @@ public enum AtomType implements Type {
   };
 
   /** Language pattern. */
-  static final Pattern LANGPATTERN =
-      Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
+  static final Pattern LANGPATTERN = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
+  /** Name. */
+  public final QNm name;
   /** Parent type. */
   public final Type par;
   /** Type id . */
@@ -698,11 +700,7 @@ public enum AtomType implements Type {
   /** Date flag. */
   private final boolean dat;
 
-  /** String representation. */
-  private final byte[] string;
-  /** URI representation. */
-  private final byte[] uri;
-  /** Sequence type. */
+  /** Sequence type (lazy). */
   private SeqType seq;
 
   /**
@@ -719,9 +717,8 @@ public enum AtomType implements Type {
    */
   AtomType(final String nm, final Type pr, final byte[] ur, final boolean n,
       final boolean u, final boolean s, final boolean d, final boolean t, final int i) {
-    string = token(nm);
+    name = new QNm(nm, ur);
     par = pr;
-    uri = ur;
     num = n;
     unt = u;
     str = s;
@@ -767,7 +764,7 @@ public enum AtomType implements Type {
 
   @Override
   public byte[] string() {
-    return string;
+    return name.string();
   }
 
   @Override
@@ -789,6 +786,31 @@ public enum AtomType implements Type {
     return seq;
   }
 
+  @Override
+  public final boolean instanceOf(final Type t) {
+    return this == t || par != null && par.instanceOf(t);
+  }
+
+  @Override
+  public final boolean isNode() {
+    return false;
+  }
+
+  @Override
+  public int id() {
+    return id;
+  }
+
+  @Override
+  public String toString() {
+    final boolean xs = eq(XSURI, name.uri());
+    final TokenBuilder tb = new TokenBuilder();
+    if(xs) tb.add(NSGlobal.prefix(name.uri())).add(':');
+    tb.add(name.string());
+    if(!xs) tb.add("()");
+    return tb.toString();
+  }
+
   /**
    * Throws an exception if the specified item can't be converted to a number.
    * @param it item
@@ -796,8 +818,7 @@ public enum AtomType implements Type {
    * @return item argument
    * @throws QueryException query exception
    */
-  Item checkNum(final Item it, final InputInfo ii)
-      throws QueryException {
+  Item checkNum(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
     return ip == URI || !ip.isString() && !ip.isNumber() &&
         !ip.isUntyped() && ip != BLN ? error(it, ii) : it;
@@ -812,8 +833,8 @@ public enum AtomType implements Type {
    * @return integer value
    * @throws QueryException query exception
    */
-  long checkLong(final Object o, final long min,
-      final long max, final InputInfo ii) throws QueryException {
+  long checkLong(final Object o, final long min, final long max, final InputInfo ii)
+      throws QueryException {
 
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
     checkNum(it, ii);
@@ -829,8 +850,7 @@ public enum AtomType implements Type {
     final long l = it.itr(ii);
     if(min == max) {
       final double d = it.dbl(ii);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE)
-        FUNCAST.thrw(ii, this, it);
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) FUNCAST.thrw(ii, this, it);
     }
     if(min != max && (l < min || l > max)) FUNCAST.thrw(ii, this, it);
     return l;
@@ -853,8 +873,7 @@ public enum AtomType implements Type {
    * @throws QueryException query exception
    * @return name
    */
-  byte[] checkName(final Item it, final InputInfo ii)
-      throws QueryException {
+  byte[] checkName(final Item it, final InputInfo ii) throws QueryException {
     final byte[] v = norm(it.string(ii));
     if(!XMLToken.isNCName(v)) error(it, ii);
     return v;
@@ -867,55 +886,20 @@ public enum AtomType implements Type {
    * @return dummy item
    * @throws QueryException query exception
    */
-  Item error(final Item it, final InputInfo ii)
-      throws QueryException {
-    Err.cast(ii, this, it);
-    return null;
-  }
-
-  // PUBLIC AND STATIC METHODS ================================================
-
-  @Override
-  public final boolean instanceOf(final Type t) {
-    return this == t || par != null && par.instanceOf(t);
-  }
-
-  @Override
-  public final boolean isNode() {
-    return false;
+  Item error(final Item it, final InputInfo ii) throws QueryException {
+    throw Err.cast(ii, this, it);
   }
 
   /**
    * Finds and returns the specified data type.
    * @param type type as string
-   * @param atom atomic type
+   * @param all accept all types (include those without parent type)
    * @return type or {@code null}
    */
-  public static AtomType find(final QNm type, final boolean atom) {
-    // type must be atomic, or must not have a namespace
-    if(atom ^ type.uri().length == 0) {
-      final byte[] ln = type.local();
-      final byte[] uri = type.uri();
-      for(final AtomType t : values()) {
-        // skip non-standard types
-        if(t == SEQ || t == JAVA) continue;
-        if(eq(ln, t.string) && eq(uri, t.uri)) return t;
-      }
+  public static AtomType find(final QNm type, final boolean all) {
+    for(final AtomType t : values()) {
+      if(t.name.eq(type) && (all || t.par != null)) return t;
     }
     return null;
-  }
-
-  @Override
-  public int id() {
-    return id;
-  }
-
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    if(uri == XSURI) tb.add(XS).add(':');
-    tb.add(string);
-    if(uri != XSURI) tb.add("()");
-    return tb.toString();
   }
 }

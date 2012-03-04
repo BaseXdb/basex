@@ -160,11 +160,11 @@ public class DBNode extends ANode {
 
   @Override
   public final QNm qname() {
-    return update(new QNm());
+    return qname(new QNm());
   }
 
   @Override
-  public final QNm update(final QNm name) {
+  public final QNm qname(final QNm name) {
     // update the name and uri strings in the specified QName
     final byte[] nm = name();
     byte[] uri = Token.EMPTY;

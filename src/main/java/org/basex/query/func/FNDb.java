@@ -205,18 +205,17 @@ public final class FNDb extends StandardFunc {
     final QNm nm = new QNm(checkStr(name, ctx), ctx);
     if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(EMPTY));
 
-    final NameTest nt = new NameTest(nm, NameTest.Name.STD, true);
+    final NameTest nt = new NameTest(nm, NameTest.Mode.STD, true);
     // no results expected: return empty sequence
     if(!nt.comp(ctx)) return Empty.ITER;
 
     // wrap iterator with name test
     return new Iter() {
       final NodeIter ir = ia.iter(ctx);
-
       @Override
       public ANode next() throws QueryException {
         ANode n;
-        while((n = ir.next()) != null && !nt.eval(n));
+        while((n = ir.next()) != null && !nt.eq(n));
         return n;
       }
     };

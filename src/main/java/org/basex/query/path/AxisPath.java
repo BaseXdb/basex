@@ -12,7 +12,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.Test.Name;
+import org.basex.query.path.Test.Mode;
 import org.basex.query.util.*;
 import org.basex.util.*;
 
@@ -204,7 +204,7 @@ public class AxisPath extends Path {
         for(; j <= smin; ++j) {
           final AxisStep s = axisStep(j);
           // step must use child axis and name test, and have no predicates
-          if(s == null || s.test.test != Name.NAME || s.axis != Axis.CHILD ||
+          if(s == null || s.test.mode != Mode.NAME || s.axis != Axis.CHILD ||
               j != smin && s.preds.length > 0) break;
 
           // support only unique paths with nodes on the correct level
@@ -350,7 +350,7 @@ public class AxisPath extends Path {
     final AxisStep s = step(steps.length - 1);
 
     if(s.preds.length != 0 || !s.axis.down || s.test.type == NodeType.ATT ||
-        s.test.test != Name.NAME && s.test.test != Name.STD) return this;
+        s.test.mode != Mode.NAME && s.test.mode != Mode.STD) return this;
 
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;

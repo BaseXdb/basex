@@ -19,7 +19,7 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class Instance extends Single {
-  /** Instance. */
+  /** Sequence type. */
   private final SeqType seq;
 
   /**

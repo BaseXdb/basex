@@ -8,6 +8,8 @@ import org.basex.query.func.UserFunc;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -114,8 +116,21 @@ public class FuncType implements Type {
    * @return function type
    */
   public static FuncType get(final SeqType ret, final SeqType... args) {
-    if(args == null || ret == null) return ANY_FUN;
-    return new FuncType(args, ret);
+    return args == null || ret == null ? ANY_FUN : new FuncType(args, ret);
+  }
+
+  /**
+   * Finds and returns the specified function type.
+   * @param type type as string
+   * @return type or {@code null}
+   */
+  public static Type find(final QNm type) {
+    if(type.uri().length == 0) {
+      final byte[] ln = type.local();
+      if(eq(ln, token(FUNCTION))) return FuncType.ANY_FUN;
+      if(eq(ln, MAP)) return SeqType.ANY_MAP;
+    }
+    return null;
   }
 
   /**

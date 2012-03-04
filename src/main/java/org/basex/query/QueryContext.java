@@ -28,16 +28,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.func.JavaMapping;
 import org.basex.query.func.UserFuncs;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Dat;
-import org.basex.query.item.Dtm;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Tim;
-import org.basex.query.item.Type;
-import org.basex.query.item.Types;
-import org.basex.query.item.Value;
+import org.basex.query.item.*;
 import org.basex.query.iter.ItemCache;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.Updates;
@@ -339,7 +330,7 @@ public final class QueryContext extends Progress {
       } else {
         final QNm nm = new QNm(token(type), this);
         if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
-        final Type typ = Types.find(nm, true);
+        final Type typ = AtomType.find(nm, false);
         if(typ == null) NOTYPE.thrw(null, nm);
         obj = typ.cast(obj, null);
       }

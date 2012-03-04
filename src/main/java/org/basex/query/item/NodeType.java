@@ -14,10 +14,7 @@ import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.basex.util.hash.TokenMap;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -104,7 +101,13 @@ public enum NodeType implements Type {
   },
 
   /** Namespace type. */
-  NSP("namespace-node", NOD, 16);
+  NSP("namespace-node", NOD, 16),
+
+  /** Schema-element. */
+  SCE("schema-element", NOD, 17),
+
+  /** Schema-attribute. */
+  SCA("schema-attribute", NOD, 18);
 
   /** String representation. */
   private final byte[] string;
@@ -114,6 +117,18 @@ public enum NodeType implements Type {
   private final int id;
   /** Sequence type. */
   private SeqType seq;
+
+  /**
+   * Constructor.
+   * @param nm string representation
+   * @param pr parent type
+   * @param i type id
+   */
+  NodeType(final String nm, final Type pr, final int i) {
+    string = Token.token(nm);
+    par = pr;
+    id = i;
+  }
 
   @Override
   public final boolean isNode() {
@@ -167,23 +182,31 @@ public enum NodeType implements Type {
     return null;
   }
 
-  /**
-   * Constructor.
-   * @param nm string representation
-   * @param pr parent type
-   * @param i type id
-   */
-  NodeType(final String nm, final Type pr, final int i) {
-    string = Token.token(nm);
-    par = pr;
-    id = i;
-  }
-
   @Override
   public SeqType seqType() {
     // cannot be statically instantiated due to circular dependency
     if(seq == null) seq = new SeqType(this);
     return seq;
+  }
+
+  @Override
+  public final boolean instanceOf(final Type t) {
+    return this == t || par != null && par.instanceOf(t);
+  }
+
+  @Override
+  public int id() {
+    return id;
+  }
+
+  @Override
+  public byte[] string() {
+    return string;
+  }
+
+  @Override
+  public String toString() {
+    return new TokenBuilder().add(string).add("()").toString();
   }
 
   /**
@@ -193,17 +216,9 @@ public enum NodeType implements Type {
    * @return dummy item
    * @throws QueryException query exception
    */
-  Item error(final Item it, final InputInfo ii)
-      throws QueryException {
+  Item error(final Item it, final InputInfo ii) throws QueryException {
     Err.cast(ii, this, it);
     return null;
-  }
-
-  // PUBLIC AND STATIC METHODS ================================================
-
-  @Override
-  public final boolean instanceOf(final Type t) {
-    return this == t || par != null && par.instanceOf(t);
   }
 
   /**
@@ -219,20 +234,5 @@ public enum NodeType implements Type {
       }
     }
     return null;
-  }
-
-  @Override
-  public int id() {
-    return id;
-  }
-
-  @Override
-  public String toString() {
-    return new TokenBuilder(string).add("()").toString();
-  }
-
-  @Override
-  public byte[] string() {
-    return string;
   }
 }

@@ -30,7 +30,7 @@ public abstract class FNode extends ANode {
   }
 
   @Override
-  public QNm update(final QNm nm) {
+  public QNm qname(final QNm nm) {
     return qname();
   }
 

@@ -57,8 +57,8 @@ public abstract class FItem extends Item {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  public Iter invIter(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Iter invIter(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
     return invValue(ctx, ii, args).iter();
   }
 
@@ -70,8 +70,8 @@ public abstract class FItem extends Item {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
     return invValue(ctx, ii, args).item(ctx, ii);
   }
 
@@ -92,8 +92,7 @@ public abstract class FItem extends Item {
   }
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
+  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
     throw FNEQ.thrw(ii, description());
   }
 

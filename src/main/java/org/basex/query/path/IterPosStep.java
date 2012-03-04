@@ -52,7 +52,7 @@ final class IterPosStep extends AxisStep {
           }
 
           // evaluate node test
-          if(!test.eval(node)) continue;
+          if(!test.eq(node)) continue;
 
           // evaluate predicates
           final long cp = ctx.pos;

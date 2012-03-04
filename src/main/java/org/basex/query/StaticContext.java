@@ -28,7 +28,7 @@ public final class StaticContext {
   public SeqType initType;
 
   /** Construction mode. */
-  public boolean construct;
+  public boolean strip;
   /** Ordering mode. */
   public boolean ordered;
   /** Default order for empty sequences. */
@@ -59,7 +59,7 @@ public final class StaticContext {
     nsFunc = sc.nsFunc;
     // vars, ctxItem, funcs
     collation = sc.collation;
-    construct = sc.construct;
+    strip = sc.strip;
     ordered = sc.ordered;
     orderGreatest = sc.orderGreatest;
     spaces = sc.spaces;

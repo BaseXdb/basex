@@ -1,16 +1,11 @@
 package org.basex.query.path;
 
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.query.QueryContext;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.DBNodeSeq;
-import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.iter.ValueIter;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.IntList;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Document test for inverted location paths.
@@ -57,7 +52,7 @@ final class InvDocTest extends Test {
   }
 
   @Override
-  public boolean eval(final ANode node) {
+  public boolean eq(final ANode node) {
     // no document node, or no database instance
     if(node.type != type || !(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents

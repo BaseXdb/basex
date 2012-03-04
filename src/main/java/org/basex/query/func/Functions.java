@@ -136,15 +136,20 @@ public final class Functions extends TokenSet {
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
-      final Type type = AtomType.find(name, true);
-      if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
+      final AtomType type = AtomType.find(name, false);
+      if(type == null) {
         final Levenshtein ls = new Levenshtein();
         for(final AtomType t : AtomType.values()) {
-          if(t.par != null && ls.similar(lc(ln), lc(t.string()), 0))
+          if(t.par != null && t != AtomType.NOT && t != AtomType.AAT &&
+              ls.similar(lc(ln), lc(t.string()), 0))
             FUNSIMILAR.thrw(ii, name.string(), t.string());
         }
+      }
+      // no constructor function found, or abstract type specified
+      if(type == null || type == AtomType.NOT || type == AtomType.AAT) {
         FUNCUNKNOWN.thrw(ii, name.string());
       }
+
       if(args.length != 1) FUNCTYPE.thrw(ii, name.string());
       final SeqType to = SeqType.get(type, Occ.ZERO_ONE);
       return TypedFunc.constr(new Cast(ii, args[0], to), to);

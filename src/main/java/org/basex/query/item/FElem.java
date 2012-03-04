@@ -62,9 +62,7 @@ public final class FElem extends FNode {
    * @param at attributes; can be {@code null}
    * @param nsp namespaces; can be {@code null}
    */
-  public FElem(final QNm n, final NodeCache ch, final NodeCache at,
-      final Atts nsp) {
-
+  public FElem(final QNm n, final NodeCache ch, final NodeCache at, final Atts nsp) {
     super(NodeType.ELM);
     name = n;
     children = ch;

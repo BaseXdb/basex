@@ -14,7 +14,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
-import org.basex.query.path.Test.Name;
+import org.basex.query.path.Test.Mode;
 import org.basex.util.*;
 
 /**
@@ -26,7 +26,7 @@ import org.basex.util.*;
 public class AxisStep extends Preds {
   /** Axis. */
   Axis axis;
-  /** Node test. */
+  /** Kind test. */
   public Test test;
 
   /**
@@ -76,7 +76,7 @@ public class AxisStep extends Preds {
     // leaf flag indicates that a context node can be replaced by a text() step
     final Data data = ctx.data();
     ctx.leaf = data != null &&
-      test.test == Name.NAME && test.type != NodeType.ATT && axis.down &&
+      test.mode == Mode.NAME && test.type != NodeType.ATT && axis.down &&
       data.meta.uptodate && data.nspaces.size() == 0;
     if(ctx.leaf) {
       final Stats s =
@@ -112,7 +112,7 @@ public class AxisStep extends Preds {
     final AxisIter ai = axis.iter((ANode) v);
 
     final NodeCache nc = new NodeCache();
-    for(ANode n; (n = ai.next()) != null;) if(test.eval(n)) nc.add(n.finish());
+    for(ANode n; (n = ai.next()) != null;) if(test.eq(n)) nc.add(n.finish());
 
     // evaluate predicates
     for(final Expr p : preds) {
@@ -142,7 +142,7 @@ public class AxisStep extends Preds {
    */
   public final boolean simple(final Axis ax, final boolean name) {
     return axis == ax && preds.length == 0 &&
-      (name ? test.test == Name.NAME : test == Test.NOD);
+      (name ? test.mode == Mode.NAME : test == Test.NOD);
   }
 
   /**
@@ -151,9 +151,7 @@ public class AxisStep extends Preds {
    * @param data data reference
    * @return resulting path nodes, or {@code null} if nodes cannot be evaluated
    */
-  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes,
-      final Data data) {
-
+  final ArrayList<PathNode> nodes(final ArrayList<PathNode> nodes, final Data data) {
     // skip steps with predicates or different namespaces
     if(preds.length != 0 || data.nspaces.globalNS() == null) return null;
 
@@ -163,11 +161,11 @@ public class AxisStep extends Preds {
       kind = ANode.kind(test.type);
       if(kind == Data.PI) return null;
 
-      if(test.test == Name.NAME) {
+      if(test.mode == Mode.NAME) {
         // element/attribute test (*:ln)
         final Names names = kind == Data.ATTR ? data.atnindex : data.tagindex;
         name = names.id(((NameTest) test).ln);
-      } else if(test.test != null && test.test != Name.ALL) {
+      } else if(test.mode != null && test.mode != Mode.ALL) {
         // skip namespace and standard tests
         return null;
       }

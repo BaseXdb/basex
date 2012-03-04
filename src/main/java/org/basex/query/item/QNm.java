@@ -202,8 +202,7 @@ public final class QNm extends Item {
 
   @Override
   public QName toJava() {
-    return new QName(Token.string(uri()), Token.string(local()),
-        Token.string(prefix()));
+    return new QName(Token.string(uri()), Token.string(local()), Token.string(prefix()));
   }
 
   /**

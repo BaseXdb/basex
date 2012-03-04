@@ -46,7 +46,7 @@ final class IterStep extends AxisStep {
           final ANode node = ai.next();
           if(node == null) return null;
           // evaluate node test and predicates
-          if(test.eval(node) && preds(node, ctx)) return node.finish();
+          if(test.eq(node) && preds(node, ctx)) return node.finish();
         }
       }
 

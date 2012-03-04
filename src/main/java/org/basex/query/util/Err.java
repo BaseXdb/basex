@@ -7,10 +7,7 @@ import org.basex.core.Text;
 import org.basex.io.serial.SerializerException;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
-import org.basex.query.item.Value;
+import org.basex.query.item.*;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -348,7 +345,7 @@ public enum Err {
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
   /** XPDY0002: Evaluation Exception. */
-  XPNOCTX(XPDY, 2, "No context item set for '%'."),
+  XPNOCTX(XPDY, 2, "No context item set to process '%'."),
   /** XPDY0050: Evaluation exception. */
   CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
   /** XPDY0050: Evaluation exception. */
@@ -364,8 +361,6 @@ public enum Err {
   NOQUOTE(XPST, 3, "Expecting quote%."),
   /** XPST0003: Parsing exception. */
   NOVALIDATE(XPST, 3, "Invalid validation expression."),
-  /** XPST0003: Parsing exception. */
-  NOSCHEMA(XPST, 3, "Unknown schema type: %."),
   /** XPST0003: Parsing exception. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
   /** XPST0003: Parsing exception. */
@@ -428,8 +423,6 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   FUNCMISS(XPST, 3, "Expecting closing bracket for '%(...'."),
   /** XPST0003: Parsing exception. */
-  MAPTKV(XPST, 3, "Expecting '*' or key and value type for '%(...'."),
-  /** XPST0003: Parsing exception. */
   MAPTAAT(XPST, 3, "Expecting atomic key type for map(...), found '%'."),
   /** XPST0003: Parsing exception. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
@@ -486,8 +479,6 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   PIXML(XPST, 3, "Processing instruction has illegal name: '%'."),
   /** XPST0003: Parsing exception. */
-  EMPTYSEQOCC(XPST, 3, "No occurrence indicator defined for %."),
-  /** XPST0003: Parsing exception. */
   TESTINVALID(XPST, 3, "Invalid % test: %."),
   /** XPST0003: Parsing exception. */
   QNAMEINV(XPST, 3, "Expecting QName, '%' found."),
@@ -523,6 +514,8 @@ public enum Err {
   VARUNDEF(XPST, 8, "Undefined variable %."),
   /** XPST0008: Parsing exception. */
   TYPEUNDEF(XPST, 8, "Undefined type '%'."),
+  /** XPST0008: Parsing exception. */
+  SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
 
   /** XPST0017: Parsing Exception. */
   XPARGS(XPST, 17, "%: wrong number of arguments."),
@@ -551,7 +544,7 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
   /** XPTY0004: Promoting exception. */
-  XPINVPROM(XPTY, 4, "Cannot promote type % to %: %."),
+  XPINVPROM(XPTY, 4, "Cannot treat % as %: %."),
   /** XPTY0004: Typing exception. */
   XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
@@ -586,6 +579,8 @@ public enum Err {
   INVQNAME(XPTY, 4, "Invalid QName: '%'."),
   /** XPTY0004: Typing exception. */
   INVARITY(XPTY, 4, "Wrong number of arguments in %, expected %."),
+  /** XPTY0004: Typing exception. */
+  INVNCNAME(XPTY, 4, "Invalid NCName: '%'."),
 
   /** XPTY0018: Typing exception. */
   EVALNODESVALS(XPTY, 18, "Result yields both nodes and atomic values."),
@@ -713,6 +708,8 @@ public enum Err {
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099: Parsing exception. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
+  /** XPST0104: Parsing exception. */
+  NOSCHEMA(XQST, 104, "Unknown schema type: %."),
   /** XQST0106: Parsing exception. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106: Parsing exception. */
@@ -1012,8 +1009,8 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException diff(final InputInfo ii, final Item it1,
-      final Item it2) throws QueryException {
+  public static QueryException diff(final InputInfo ii, final Item it1, final Item it2)
+      throws QueryException {
     throw (it1 == it2 ? TYPECMP : XPTYPECMP).thrw(ii, it1.type, it2.type);
   }
 
@@ -1025,8 +1022,8 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException cast(final InputInfo ii, final Type t,
-      final Value v) throws QueryException {
+  public static QueryException cast(final InputInfo ii, final Type t, final Value v)
+      throws QueryException {
     throw XPINVCAST.thrw(ii, v.type, t, v);
   }
 
@@ -1038,8 +1035,8 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException promote(final InputInfo ii, final Type t,
-      final Value v) throws QueryException {
+  public static QueryException promote(final InputInfo ii, final SeqType t, final Value v)
+      throws QueryException {
     throw XPINVPROM.thrw(ii, v.type, t, v);
   }
 
@@ -1052,8 +1049,8 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException type(final InputInfo ii, final String inf,
-      final Type t, final Item it) throws QueryException {
+  public static QueryException type(final InputInfo ii, final String inf, final Type t,
+      final Item it) throws QueryException {
     throw XPTYPE.thrw(ii, inf, t, it.type);
   }
 
@@ -1065,8 +1062,8 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException type(final ParseExpr e, final Type t,
-      final Item it) throws QueryException {
+  public static QueryException type(final ParseExpr e, final Type t, final Item it)
+      throws QueryException {
     throw type(e.input, e.description(), t, it);
   }
 
@@ -1090,8 +1087,8 @@ public enum Err {
    * @return query exception (indicates that an error is raised)
    * @throws QueryException query exception
    */
-  public static QueryException value(final InputInfo ii, final Type t,
-      final Object v) throws QueryException {
+  public static QueryException value(final InputInfo ii, final Type t, final Object v)
+      throws QueryException {
     throw INVALUE.thrw(ii, t, v);
   }
 

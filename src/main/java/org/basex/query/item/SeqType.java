@@ -6,8 +6,9 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.map.Map;
 import org.basex.query.iter.ItemCache;
+import org.basex.query.path.*;
 import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
 
 /**
  * Stores a sequence type definition.
@@ -168,8 +169,7 @@ public final class SeqType {
   /** Single function. */
   public static final SeqType MAP_ZM = new SeqType(ANY_MAP, Occ.ZERO_MORE);
   /** Single function. */
-  public static final SeqType MAP_O = new SeqType(
-      MapType.get(AtomType.AAT, ITEM_ZM));
+  public static final SeqType MAP_O = new SeqType(ANY_MAP);
   /** One xs:hexBinary. */
   public static final SeqType HEX = AtomType.HEX.seqType();
   /** Single xs:base64Binary. */
@@ -179,8 +179,8 @@ public final class SeqType {
   public final Type type;
   /** Number of occurrences. */
   public final Occ occ;
-  /** Extended type info. */
-  private final QNm ext;
+  /** Optional kind test. */
+  private final Test kind;
 
   /**
    * Private constructor.
@@ -204,12 +204,12 @@ public final class SeqType {
    * Private constructor.
    * @param t type
    * @param o occurrences
-   * @param e extension
+   * @param k kind test
    */
-  private SeqType(final Type t, final Occ o, final QNm e) {
+  private SeqType(final Type t, final Occ o, final Test k) {
     type = t;
     occ = t == AtomType.EMP ? Occ.ZERO : t == AtomType.SEQ ? Occ.ONE_MORE : o;
-    ext = e;
+    kind = k;
   }
 
   /**
@@ -219,7 +219,7 @@ public final class SeqType {
    * @return sequence type
    */
   public static SeqType get(final Type t, final Occ o) {
-    return get(t, o, null);
+    return o == Occ.ONE ? t.seqType() : new SeqType(t, o);
   }
 
   /**
@@ -237,11 +237,11 @@ public final class SeqType {
    * Returns a sequence type.
    * @param t type
    * @param o occurrences
-   * @param e extension
+   * @param k kind test
    * @return sequence type
    */
-  public static SeqType get(final Type t, final Occ o, final QNm e) {
-    return o == Occ.ONE && e == null ? t.seqType() : new SeqType(t, o, e);
+  public static SeqType get(final Type t, final Occ o, final Test k) {
+    return new SeqType(t, o, k);
   }
 
   /**
@@ -263,7 +263,7 @@ public final class SeqType {
       // maps don't have type information attached to them, you have to look...
       final Type ip = it.type;
       if(mt == null) {
-        if(!(ip.instanceOf(type) && checkExt(it))) return false;
+        if(!(ip.instanceOf(type) && checkKind(it))) return false;
       } else {
         if(!(ip.isMap() && ((Map) it).hasType(mt))) return false;
       }
@@ -273,7 +273,7 @@ public final class SeqType {
   }
 
   /**
-   * Tries to promote the given item to this sequence type.
+   * Tries to cast the given item to this sequence type.
    * @param it item to promote
    * @param e producing expression
    * @param cast explicit cast flag
@@ -290,39 +290,46 @@ public final class SeqType {
       return null;
     }
     final boolean correct = cast ? it.type == type : instance(it, ii);
-    return check(correct ? it : type.cast(it, ctx, ii), ii);
+    final Item i = correct ? it : type.cast(it, ctx, ii);
+    if(!checkKind(i)) Err.cast(ii, type, i);
+    return i;
   }
 
   /**
-   * Promotes the specified value.
+   * Tries to promote the specified value to this sequence type.
    * @param val value to be cast
    * @param ctx query context
    * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Value promote(final Value val, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  public Value promote(final Value val, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
 
     final long size = val.size();
-    if(!occ.check(size)) Err.promote(ii, type, val);
+    if(!occ.check(size)) Err.promote(ii, this, val);
 
     // empty sequence has all types
     if(size == 0) return val;
 
-    final Item f = val.itemAt(0);
-
     // take shortcut if it's a single item
-    if(size == 1) return check(instance(f, ii) ? f : type.cast(f, ctx, ii), ii);
+    final Item f = val.itemAt(0);
+    if(size == 1) {
+      final Item it = instance(f, ii) ? f : type.cast(f, ctx, ii);
+      if(!checkKind(it)) Err.promote(ii, this, val);
+      return it;
+    }
 
     // only cache if absolutely necessary
-    if(val.homogenous() && instance(f, ii) && checkExt(f)) return val;
+    if(val.homogenous() && instance(f, ii) && checkKind(f)) return val;
 
     // no way around it...
     final ItemCache ic = new ItemCache((int) size);
     for(long i = 0; i < size; i++) {
-      final Item n = val.itemAt(i);
-      ic.add(check(instance(n, ii) ? n : type.cast(n, ctx, ii), ii));
+      Item n = val.itemAt(i);
+      if(!instance(n, ii)) n = type.cast(n, ctx, ii);
+      if(!checkKind(n)) Err.promote(ii, this, n);
+      ic.add(n);
     }
 
     return ic.value();
@@ -335,9 +342,7 @@ public final class SeqType {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean instance(final Item it, final InputInfo ii)
-      throws QueryException {
-
+  private boolean instance(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
     final boolean ins = ip.instanceOf(type);
     if(!ins && !ip.isUntyped() && !ip.isFunction() &&
@@ -347,9 +352,8 @@ public final class SeqType {
         // xs:anyUri -> xs:string
         (ip != AtomType.URI || type != AtomType.STR) &&
         // xs:decimal -> xs:float/xs:double
-        (type != AtomType.FLT && type != AtomType.DBL ||
-            !ip.instanceOf(AtomType.DEC)))
-      Err.promote(ii, type, it);
+        (type != AtomType.FLT && type != AtomType.DBL || !ip.instanceOf(AtomType.DEC)))
+      Err.promote(ii, this, it);
     return ins;
   }
 
@@ -406,24 +410,12 @@ public final class SeqType {
   }
 
   /**
-   * Checks the sequence extension.
-   * @param it item
-   * @param ii input info
-   * @return same item
-   * @throws QueryException query exception
-   */
-  private Item check(final Item it, final InputInfo ii) throws QueryException {
-    if(!checkExt(it)) XPCAST.thrw(ii, it.type.toString().replaceAll("\\(|\\)", ""), ext);
-    return it;
-  }
-
-  /**
-   * Checks the sequence extension.
+   * Checks the additional kind test.
    * @param it item
    * @return same item
    */
-  private boolean checkExt(final Item it) {
-    return ext == null || ext.eq(((ANode) it).qname());
+  private boolean checkKind(final Item it) {
+    return kind == null || it.type.isNode() && kind.eq((ANode) it);
   }
 
   /**
@@ -446,7 +438,8 @@ public final class SeqType {
 
   @Override
   public String toString() {
-    final String str = type.toString();
-    return (str.contains(" ") && occ != Occ.ONE ? '(' + str + ')' : str) + occ;
+    final StringBuilder sb = new StringBuilder().append(type);
+    if(kind != null) sb.deleteCharAt(sb.length() - 1).append(kind).append(')');
+    return sb.append(occ).toString();
   }
 }

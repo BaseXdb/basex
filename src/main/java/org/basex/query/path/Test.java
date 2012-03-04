@@ -1,13 +1,11 @@
 package org.basex.query.path;
 
-import org.basex.query.QueryContext;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.util.Util;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
- * Node test.
+ * Type test.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -18,23 +16,21 @@ public abstract class Test {
   /** Static PI node test. */
   public static final KindTest PI = new KindTest(NodeType.PI);
   /** Static element node test. */
-  private static final KindTest ELM = new KindTest(NodeType.ELM);
+  public static final KindTest ELM = new KindTest(NodeType.ELM);
   /** Static document node test. */
   public static final KindTest DOC = new KindTest(NodeType.DOC);
   /** Static attribute node test. */
-  private static final KindTest ATT = new KindTest(NodeType.ATT);
+  public static final KindTest ATT = new KindTest(NodeType.ATT);
   /** Static comment node test. */
   public static final KindTest COM = new KindTest(NodeType.COM);
   /** Static node test. */
-  public static final Test NOD = new Test() {
+  public static final Test NOD = new KindTest(NodeType.NOD) {
     @Override
-    public boolean eval(final ANode node) { return true; }
-    @Override
-    public String toString() { return NodeType.NOD.toString(); }
+    public boolean eq(final ANode it) { return true; }
   };
 
   /** Name test types. */
-  public enum Name {
+  public enum Mode {
     /** Accept all nodes (*).     */ ALL,
     /** Test names (*:tag).       */ NAME,
     /** Test namespaces (pre:*).  */ NS,
@@ -44,7 +40,7 @@ public abstract class Test {
   /** Type of node test. */
   public NodeType type;
   /** Type of name test. Set to {@code null} for other kind tests. */
-  public Name test;
+  public Mode mode;
   /** Name test. Set to {@code null} for other kind tests. */
   public QNm name;
 
@@ -80,11 +76,11 @@ public abstract class Test {
   }
 
   /**
-   * Tests the specified node.
-   * @param node temporary node
+   * Tests if the test yields true.
+   * @param node node to be checked
    * @return result of check
    */
-  public abstract boolean eval(final ANode node);
+  public abstract boolean eq(final ANode node);
 
   /**
    * Checks the current and specified test for equality.
@@ -92,7 +88,6 @@ public abstract class Test {
    * @return result of check
    */
   public final boolean sameAs(final Test t) {
-    return test == t.test && type == t.type &&
-      (name == t.name || name.eq(t.name));
+    return mode == t.mode && type == t.type && (name == t.name || name.eq(t.name));
   }
 }

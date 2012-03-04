@@ -1,12 +1,11 @@
 package org.basex.query.path;
 
-import static org.basex.util.Token.*;
 import static org.basex.query.QueryText.*;
-import org.basex.data.Data;
-import org.basex.query.QueryContext;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
+
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Name test.
@@ -23,7 +22,7 @@ public final class NameTest extends Test {
    * @param att attribute flag
    */
   public NameTest(final boolean att) {
-    this(null, Name.ALL, att);
+    this(null, Mode.ALL, att);
   }
 
   /**
@@ -32,11 +31,11 @@ public final class NameTest extends Test {
    * @param t type of name test
    * @param att attribute flag
    */
-  public NameTest(final QNm nm, final Name t, final boolean att) {
+  public NameTest(final QNm nm, final Mode t, final boolean att) {
     type = att ? NodeType.ATT : NodeType.ELM;
     ln = nm != null ? nm.local() : null;
     name = nm;
-    test = t;
+    mode = t;
   }
 
   @Override
@@ -52,19 +51,18 @@ public final class NameTest extends Test {
     // true if results can be expected
     boolean ok = true;
 
-    if(test == Name.STD && !name.hasPrefix()) {
+    if(mode == Mode.STD && !name.hasPrefix()) {
       // no results if default and database namespaces of elements are different
-      ok = type == NodeType.ATT || ctx.sc.nsElem == null ||
-          eq(ns, ctx.sc.nsElem);
+      ok = type == NodeType.ATT || ctx.sc.nsElem == null || Token.eq(ns, ctx.sc.nsElem);
       if(ok) {
         // namespace is irrelevant or identical: ignore prefix to speed up test
         if(ns.length != 0) ctx.compInfo(OPTPREF, ln);
-        test = Name.NAME;
+        mode = Mode.NAME;
       }
     }
 
     // check existence of tag/attribute names
-    ok = ok && (test != Name.NAME || (type == NodeType.ELM ?
+    ok = ok && (mode != Mode.NAME || (type == NodeType.ELM ?
         data.tagindex : data.atnindex).id(ln) != 0);
 
     if(!ok) ctx.compInfo(OPTNAME, name);
@@ -72,33 +70,33 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean eval(final ANode node) {
+  public boolean eq(final ANode node) {
     // only elements and attributes will yield results
     if(node.type != type) return false;
 
-    switch(test) {
+    switch(mode) {
       // wildcard - accept all nodes
       case ALL:
         return true;
       // namespaces wildcard - check only name
       case NAME:
-        return eq(ln, local(node.name()));
+        return Token.eq(ln, Token.local(node.name()));
       // name wildcard - check only namespace
       case NS:
-        return eq(name.uri(), node.update(tmpq).uri());
+        return Token.eq(name.uri(), node.qname(tmpq).uri());
       default:
         // check attributes, or check everything
         return type == NodeType.ATT && !name.hasPrefix() ?
-            eq(ln, node.name()) : name.eq(node.update(tmpq));
+            Token.eq(ln, node.name()) : name.eq(node.qname(tmpq));
     }
   }
 
   @Override
   public String toString() {
-    if(test == Name.ALL) return "*";
-    if(test == Name.NAME) return "*:" + string(name.string());
+    if(mode == Mode.ALL) return "*";
+    if(mode == Mode.NAME) return "*:" + Token.string(name.string());
     final String uri = name.uri().length == 0 || name.hasPrefix() ? "" :
-            '{' + string(name.uri()) + '}';
-    return uri + (test == Name.NS ? "*" : string(name.string()));
+            '{' + Token.string(name.uri()) + '}';
+    return uri + (mode == Mode.NS ? "*" : Token.string(name.string()));
   }
 }
