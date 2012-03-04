@@ -151,9 +151,6 @@ public final class QueryContext extends Progress {
   /** Opened connections to relational databases. */
   JDBCConnections jdbc;
 
-  /** Indicates if this query includes updating expressions. */
-  private boolean updating;
-
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
   /** Info flag. */

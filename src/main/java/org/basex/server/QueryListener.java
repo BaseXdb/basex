@@ -6,9 +6,7 @@ import static org.basex.io.serial.SerializerProp.*;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Progress;
+import org.basex.core.*;
 import org.basex.io.out.EncodingOutput;
 import org.basex.io.out.PrintOutput;
 import org.basex.io.serial.Serializer;
@@ -90,7 +88,7 @@ final class QueryListener extends Progress {
    */
   boolean updating() throws IOException {
     init();
-    return qp.updating();
+    return qp.updating;
   }
 
   /**
@@ -104,56 +102,63 @@ final class QueryListener extends Progress {
   void execute(final boolean iter, final OutputStream out, final boolean enc,
       final boolean full) throws IOException {
 
-    boolean mon = false;
     try {
+      // parses the query
       init();
-      ctx.register(qp.updating());
-      mon = true;
+      try {
+        // registers the process
+        ctx.register(qp);
 
-      // create serializer
-      final Iter ir = qp.iter();
-      final boolean wrap = !options.get(S_WRAP_PREFIX).isEmpty();
+        // create serializer
+        final Iter ir = qp.iter();
+        final boolean wrap = !options.get(S_WRAP_PREFIX).isEmpty();
 
-      // iterate through results
-      final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);
-      if(iter && wrap) po.write(1);
+        // iterate through results
+        final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);
+        if(iter && wrap) po.write(1);
 
-      final Serializer ser = Serializer.get(po, options);
-      int c = 0;
-      for(Item it; (it = ir.next()) != null;) {
-        if(iter && !wrap) {
-          if(full) {
-            po.print(it.xdmInfo());
-          } else {
-            po.write(it.type.id());
+        final Serializer ser = Serializer.get(po, options);
+        int c = 0;
+        for(Item it; (it = ir.next()) != null;) {
+          if(iter && !wrap) {
+            if(full) {
+              po.print(it.xdmInfo());
+            } else {
+              po.write(it.type.id());
+            }
+            ser.reset();
           }
-          ser.reset();
+          ser.openResult();
+          it.serialize(ser);
+          ser.closeResult();
+          if(iter && !wrap) {
+            po.flush();
+            out.write(0);
+          }
+          c++;
         }
-        ser.openResult();
-        it.serialize(ser);
-        ser.closeResult();
-        if(iter && !wrap) {
-          po.flush();
-          out.write(0);
-        }
-        c++;
+        ser.close();
+        if(iter && wrap) out.write(0);
+
+        // generate query info
+        final int up = qp.updates();
+        final TokenBuilder tb = new TokenBuilder();
+        tb.addExt(HITS_X_CC + "% %" + NL, c, c == 1 ? ITEM : ITEMS);
+        tb.addExt(UPDATED_CC + "% %" + NL, up, up == 1 ? ITEM : ITEMS);
+        tb.addExt(TOTAL_TIME_CC + '%', perf);
+        info = tb.toString();
+
+      } catch(final QueryException ex) {
+        throw new BaseXException(ex);
+      } catch(final ProgressException ex) {
+        throw new BaseXException(TIMEOUT_EXCEEDED);
+      } finally {
+        // unregisters the process
+        ctx.unregister(qp);
       }
-      ser.close();
-      if(iter && wrap) out.write(0);
-
-      // generate query info
-      final int up = qp.updates();
-      final TokenBuilder tb = new TokenBuilder();
-      tb.addExt(HITS_X_CC + "% %" + NL, c, c == 1 ? ITEM : ITEMS);
-      tb.addExt(UPDATED_CC + "% %" + NL, up, up == 1 ? ITEM : ITEMS);
-      tb.addExt(TOTAL_TIME_CC + '%', perf);
-      info = tb.toString();
-
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
     } finally {
+      // close processor and stop monitoring
       try { qp.close(); } catch(final QueryException ex) { }
-      if(mon) ctx.unregister(qp.updating());
     }
   }
 

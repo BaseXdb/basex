@@ -292,13 +292,18 @@ public abstract class Command extends Progress {
       return error(PERM_NEEDED_X, perms[i + 1]);
     }
 
-    // check concurrency of commands
-    final boolean ok;
-    final boolean writing = updating(ctx);
-    ctx.register(writing);
-    ok = run(ctx, os);
-    ctx.unregister(writing);
-    return ok;
+    // set updating flag
+    updating = updating(ctx);
+
+    try {
+      // register process
+      ctx.register(this);
+      // run command and return success flag
+      return run(ctx, os);
+    } finally {
+      // guarantee that process will be unregistered
+      ctx.unregister(this);
+    }
   }
 
   /**

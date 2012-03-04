@@ -33,45 +33,55 @@ final class Lock {
   }
 
   /**
-   * Modifications before executing a command.
-   * @param w writing flag
+   * Modifications before executing a process.
+   * @param pr process
    */
-  void lock(final boolean w) {
+  void lock(final Progress pr) {
     final Object o = new Object();
 
     synchronized(mutex) {
+      // add object to queue
       queue.add(o);
+
+      // maximum number of readers
+      final int maxReaders = Math.max(ctx.mprop.num(MainProp.PARALLEL), 1);
 
       while(true) {
         if(!writer && o == queue.get(0)) {
-          if(w) {
+          if(pr.updating) {
+            // check updating process
             if(readers == 0) {
+              // start writing process
               writer = true;
               break;
             }
-          } else if(readers < Math.max(ctx.mprop.num(MainProp.PARALLEL), 1)) {
+          } else if(readers < maxReaders) {
+            // increase number of readers
             ++readers;
             break;
           }
         }
+        // check if process has already been stopped
+        pr.checkStop();
+        // wait for next process to be finalized
         try {
           mutex.wait();
         } catch(final InterruptedException ex) {
           Util.stack(ex);
         }
       }
-
+      // start process, remove from queue
       queue.remove(0);
     }
   }
 
   /**
    * Modifications after executing a command.
-   * @param w writing flag
+   * @param pr process
    */
-  void unlock(final boolean w) {
+  void unlock(final Progress pr) {
     synchronized(mutex) {
-      if(w) {
+      if(pr.updating) {
         writer = false;
       } else {
         --readers;

@@ -233,19 +233,21 @@ public final class Context {
   }
 
   /**
-   * Registers a process.
-   * @param w writing flag
+   * Locks a writing process and starts the timeout.
+   * @param pr process
    */
-  public void register(final boolean w) {
-    lock.lock(w);
+  public void register(final Progress pr) {
+    pr.startTimeout(mprop.num(MainProp.TIMEOUT));
+    lock.lock(pr);
   }
 
   /**
-   * Unregisters a process.
-   * @param w writing flag
+   * Unlocks the process and stops the timeout.
+   * @param pr process
    */
-  public void unregister(final boolean w) {
-    lock.unlock(w);
+  public void unregister(final Progress pr) {
+    lock.unlock(pr);
+    pr.stopTimeout();
   }
 
   /**

@@ -92,6 +92,7 @@ public final class QueryProcessor extends Progress {
   public void parse() throws QueryException {
     if(parsed) return;
     ctx.parse(query);
+    updating = ctx.updating();
     parsed = true;
   }
 
@@ -283,19 +284,11 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Returns {@code true} if the query may perform updates.
-   * @return updating flag
-   */
-  public boolean updating() {
-    return ctx.updating();
-  }
-
-  /**
    * Returns the number of performed updates after query execution, or {@code 0}.
    * @return number of updates
    */
   public int updates() {
-    return updating() ? ctx.updates.size() : 0;
+    return updating ? ctx.updates.size() : 0;
   }
 
   /**

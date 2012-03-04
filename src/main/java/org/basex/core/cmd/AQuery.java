@@ -161,7 +161,7 @@ abstract class AQuery extends Command {
       qp = progress(new QueryProcessor(qu, ctx));
       qp.parse();
       init = p.time();
-      return qp.updating();
+      return qp.updating;
     } catch(final QueryException ex) {
       Util.debug(ex);
       qe = ex;

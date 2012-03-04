@@ -180,15 +180,13 @@ public final class ClientListener extends Thread {
           continue;
         }
 
-        // start timeout
-        command.startTimeout(context.mprop.num(MainProp.TIMEOUT));
-        log.write(this,
-            command.toString().replace('\r', ' ').replace('\n', ' '));
+        log.write(this, command.toString().replace('\r', ' ').replace('\n', ' '));
 
         // execute command and send {RESULT}
         boolean ok = true;
         String info;
         try {
+          // run command
           command.execute(context, new EncodingOutput(out));
           info = command.info();
         } catch(final BaseXException ex) {
@@ -196,8 +194,6 @@ public final class ClientListener extends Thread {
           info = ex.getMessage();
           if(info.startsWith(INTERRUPTED)) info = TIMEOUT_EXCEEDED;
         }
-        // stop timeout
-        command.stopTimeout();
 
         // send 0 to mark end of result
         out.write(0);

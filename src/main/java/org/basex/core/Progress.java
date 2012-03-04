@@ -12,6 +12,9 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public abstract class Progress {
+  /** Updating flag. */
+  public boolean updating;
+
   /** Stopped flag. */
   private boolean stopped;
   /** Timeout thread. */
