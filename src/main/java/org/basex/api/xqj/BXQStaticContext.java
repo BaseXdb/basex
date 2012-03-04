@@ -81,7 +81,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public int getConstructionMode() {
-    return sc.construct ? CONSTRUCTION_MODE_PRESERVE : CONSTRUCTION_MODE_STRIP;
+    return sc.strip ? CONSTRUCTION_MODE_STRIP : CONSTRUCTION_MODE_PRESERVE;
   }
 
   @Override
@@ -183,7 +183,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public void setConstructionMode(final int mode) throws XQException {
-    sc.construct = check(mode, ARGC) == CONSTRUCTION_MODE_PRESERVE;
+    sc.strip = check(mode, ARGC) == CONSTRUCTION_MODE_STRIP;
   }
 
   @Override

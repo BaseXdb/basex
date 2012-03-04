@@ -15,6 +15,7 @@ import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.iter.*;
+import org.basex.query.path.*;
 import org.basex.util.*;
 
 /**
@@ -151,7 +152,8 @@ final class RestXqModule {
     // [CG] RestXq: what happens if a method specified more methods than HEAD?
     if(rxf.methods.size() == 1 && rxf.methods.contains(HTTPMethod.HEAD)) {
       final QNm response = new QNm(RESPONSE, QueryText.REXQURI);
-      final SeqType type = SeqType.get(NodeType.ELM, Occ.ONE, response);
+      final ExtKindTest dt = new ExtKindTest(NodeType.ELM, response, null, qc);
+      final SeqType type = SeqType.get(NodeType.NOD, Occ.ONE, dt);
       if(!type.instance(result)) rxf.error(HEAD_METHOD);
     }
 
