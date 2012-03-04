@@ -47,6 +47,13 @@ public final class MainProp extends AProp {
   /** Server: port, used for stopping the HTTP server. */
   public static final Object[] STOPPORT = { "STOPPORT", 8985 };
 
+  /** Server: proxy host. */
+  public static final Object[] PROXYHOST = { "PROXYHOST", "" };
+  /** Server: proxy port. */
+  public static final Object[] PROXYPORT = { "PROXYPORT", 80 };
+  /** Server: non-proxy host. */
+  public static final Object[] NONPROXYHOSTS = { "NONPROXYHOSTS", "" };
+
   /** Timeout for processing client requests; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
   /** Keep alive time of clients; deactivated if set to 0. */
@@ -109,5 +116,8 @@ public final class MainProp extends AProp {
     Util.language = get(LANG);
     Util.langkeys = is(LANGKEYS);
     Util.debug = is(DEBUG);
+    System.setProperty("http.proxyHost", get(PROXYHOST));
+    System.setProperty("http.proxyPort", Integer.toString(num(PROXYPORT)));
+    System.setProperty("http.nonProxyHosts", get(NONPROXYHOSTS));
   }
 }

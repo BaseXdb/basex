@@ -346,12 +346,10 @@ public abstract class AProp implements Iterable<String> {
    */
   private Object get(final Object[] key, final Class<?> c) {
     final Object entry = props.get(key[0].toString());
-    if(entry == null)
-      throw Util.notexpected("Property " + key[0] + " not defined.");
+    if(entry == null) Util.notexpected("Property " + key[0] + " not defined.");
 
     final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected(
-        "Property '" + key[0] + "' is a " + Util.name(cc));
+    if(c != cc) Util.notexpected("Property '" + key[0] + "' is a " + Util.name(cc));
     return entry;
   }
 
