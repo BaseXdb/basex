@@ -390,11 +390,11 @@ public final class EditorView extends View {
    * Starts a thread, which shows a waiting info after a short timeout.
    */
   public void start() {
-    final int thread = ++threadID;
+    final int thread = threadID;
     new Thread() {
       @Override
       public void run() {
-        Performance.sleep(500);
+        Performance.sleep(200);
         if(thread == threadID) {
           info.setToolTipText(null);
           info.setText(PLEASE_WAIT_D, Msg.SUCCESS);

@@ -4,6 +4,7 @@ import org.basex.core.Prop;
 import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXEditor;
+
 import static org.basex.gui.layout.BaseXKeys.*;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.io.IOFile;
@@ -29,16 +30,15 @@ import java.io.IOException;
 final class EditorArea extends BaseXEditor {
   /** File label. */
   final BaseXLabel label;
+
   /** File in tab. */
   IOFile file;
   /** Timestamp. */
   long tstamp;
   /** Flag for modified content. */
   boolean modified;
-
   /** Thread counter. */
   int threadID;
-
   /** Last input. */
   byte[] last = EMPTY;
   /** This flag indicates if the input is an executable XQuery main module. */
@@ -88,7 +88,13 @@ final class EditorArea extends BaseXEditor {
   @Override
   public void setText(final byte[] t) {
     super.setText(t);
-    last = t;
+    last = getText();
+  }
+
+  @Override
+  public void mouseReleased(final MouseEvent e) {
+    super.mouseReleased(e);
+    view.pos.setText(pos());
   }
 
   @Override
@@ -99,12 +105,6 @@ final class EditorArea extends BaseXEditor {
     } else {
       view.pos.setText(pos());
     }
-  }
-
-  @Override
-  public void mouseReleased(final MouseEvent e) {
-    super.mouseReleased(e);
-    view.pos.setText(pos());
   }
 
   @Override
@@ -120,6 +120,7 @@ final class EditorArea extends BaseXEditor {
     if(eq && !force) return;
     last = in;
     view.refresh(modified || !eq, false);
+    threadID++;
 
     view.pos.setText(pos());
     gui.context.prop.set(Prop.QUERYPATH, file.path());
@@ -147,13 +148,6 @@ final class EditorArea extends BaseXEditor {
         }
       }
     }
-  }
-
-  /**
-   * Updates the editor.
-   */
-  void update() {
-    release(true);
   }
 
   /**
@@ -192,7 +186,7 @@ final class EditorArea extends BaseXEditor {
       setCaret(pos);
     }
 
-    final int thread = ++threadID;
+    final int thread = threadID;
     new Thread() {
       @Override
       public void run() {
@@ -208,7 +202,7 @@ final class EditorArea extends BaseXEditor {
    * @return result of check
    */
   private static boolean module(final byte[] qu) {
-    return QueryProcessor.removeComments(string(qu), 20).startsWith(
-        "module namespace ");
+    final String mod = "module namespace ";
+    return QueryProcessor.removeComments(string(qu), mod.length() + 1).startsWith(mod);
   }
 }
