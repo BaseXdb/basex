@@ -7,7 +7,6 @@ import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
-import org.basex.core.User;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
@@ -59,8 +58,8 @@ public class LocalSession extends Session {
       final OutputStream output) throws LoginException {
 
     this(context, output);
-    final User usr = ctx.users.get(user);
-    if(usr == null || !usr.password.equals(Token.md5(pass)))
+    ctx.user = ctx.users.get(user);
+    if(ctx.user == null || !ctx.user.password.equals(Token.md5(pass)))
       throw new LoginException();
   }
 
