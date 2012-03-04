@@ -37,8 +37,7 @@ class RESTQuery extends RESTCode {
    * @param vars external variables
    * @param it context item
    */
-  RESTQuery(final String in, final Map<String, String[]> vars,
-      final byte[] it) {
+  RESTQuery(final String in, final Map<String, String[]> vars, final byte[] it) {
     input = in;
     variables = vars;
     item = it;

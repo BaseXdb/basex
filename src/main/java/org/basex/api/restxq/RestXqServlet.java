@@ -18,9 +18,8 @@ import org.basex.util.*;
  * root directory (specified by the {@code HTTPPATH} option), and decorated with RESTful
  * annotations.</p>
  *
- * <p>The implementation is based on Adam Retter's excellent paper presented at the
- * XMLPrague 2012 conference, titled
- * "RESTful XQuery - Standardised XQuery 3.0 Annotations for REST".</p>
+ * <p>The implementation is based on Adam Retter's paper presented at XMLPrague 2012,
+ * titled "RESTful XQuery - Standardised XQuery 3.0 Annotations for REST".</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -60,10 +59,11 @@ public final class RestXqServlet extends HttpServlet {
   }
 }
 
-/* [CG] RestXq: OPEN ISSUES
+/* [CG] RestXQ: OPEN ISSUES
+ * - check "updating" modifier
+ * - POST/PUT: bind request body to variable
  * - resolve conflicting paths: what is "more specific"?
  * - check methods: HEAD must only return rest:reponse element
- * - POST/PUT: bind request body to variable
  * - %rest:query-param: query string parameters
  * - %rest:form-param: "application/x-www-form-urlencoded"
  * - %rest:header-param: request headers

@@ -305,7 +305,7 @@ abstract class BXQAbstract {
    */
   private static DBNode checkNode(final Data d) throws BXQException {
     valid(d, Data.class);
-    return new DBNode(d, 0);
+    return new DBNode(d);
   }
 }
 

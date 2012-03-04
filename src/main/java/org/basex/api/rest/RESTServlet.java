@@ -3,6 +3,7 @@ package org.basex.api.rest;
 import static javax.servlet.http.HttpServletResponse.*;
 import java.io.*;
 
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.api.*;
@@ -10,47 +11,26 @@ import org.basex.server.*;
 import org.basex.util.*;
 
 /**
- * REST Servlet.
+ * <p>This servlet receives and processes REST requests.</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class RESTServlet extends HttpServlet {
   @Override
-  protected void doGet(final HttpServletRequest req, final HttpServletResponse res)
-      throws IOException {
-    run(new RESTGet(), req, res);
-  }
-
-  @Override
-  protected void doPost(final HttpServletRequest req, final HttpServletResponse res)
-      throws IOException {
-    run(new RESTPost(), req, res);
-  }
-
-  @Override
-  protected void doPut(final HttpServletRequest req, final HttpServletResponse res)
-      throws IOException {
-    run(new RESTPut(), req, res);
-  }
-
-  @Override
-  protected void doDelete(final HttpServletRequest req,
-      final HttpServletResponse res) throws IOException {
-    run(new RESTDelete(), req, res);
-  }
-
-  /**
-   * Performs the REST request.
-   * @param code code to evaluated
-   * @param req servlet request
-   * @param res servlet response
-   * @throws IOException I/O exception
-   */
-  private static void run(final RESTCode code, final HttpServletRequest req,
-      final HttpServletResponse res) throws IOException {
+  protected void service(final HttpServletRequest req, final HttpServletResponse res)
+      throws IOException, ServletException {
 
     final HTTPContext http = new HTTPContext(req, res);
+    final RESTCode code;
+    switch(http.method) {
+      case DELETE: code = new RESTDelete(); break;
+      case GET:    code = new RESTGet();    break;
+      case POST:   code = new RESTPost();   break;
+      case PUT:    code = new RESTPut();    break;
+      default:     super.service(req, res); return;
+    }
+
     try {
       http.session = new HTTPSession(req).login();
     } catch(final LoginException ex) {
