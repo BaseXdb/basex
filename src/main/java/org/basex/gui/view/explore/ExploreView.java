@@ -8,9 +8,7 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.*;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 
@@ -45,7 +43,9 @@ public final class ExploreView extends View {
     filter = BaseXButton.command(GUICommands.C_FILTER, gui);
     filter.addKeyListener(this);
 
-    b.add(filter, BorderLayout.EAST);
+    final BaseXBack back = new BaseXBack(Fill.NONE);
+    back.add(filter);
+    b.add(back, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     search = new ExploreArea(this);
@@ -70,7 +70,9 @@ public final class ExploreView extends View {
   }
 
   @Override
-  public void refreshContext(final boolean more, final boolean quick) { }
+  public void refreshContext(final boolean more, final boolean quick) {
+    refreshMark();
+  }
 
   @Override
   public void refreshUpdate() { }
