@@ -8,6 +8,7 @@ import java.io.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.IndexCache.CacheEntry;
 import org.basex.io.random.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -82,10 +83,12 @@ public class DiskValues implements Index {
   public synchronized IndexIterator iter(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
-    final int id = cache.id(tok.get());
-    if(id > 0) return iter(cache.size(id), cache.pointer(id));
+    final byte[] key = tok.get();
 
-    final int ix = get(tok.get());
+    final CacheEntry e = cache.get(key);
+    if(e != null) return iter(e.size, e.pointer);
+
+    final int ix = get(key);
     if(ix < 0) return IndexIterator.EMPTY;
     final long pos = idxr.read5(ix * 5L);
     return iter(idxl.readNum(pos), idxl.cursor());
@@ -98,8 +101,8 @@ public class DiskValues implements Index {
     final byte[] key = it.get();
     if(key.length > data.meta.maxlen) return Integer.MAX_VALUE;
 
-    final int id = cache.id(key);
-    if(id > 0) return cache.size(id);
+    final CacheEntry e = cache.get(key);
+    if(e != null) return e.size;
 
     final int ix = get(key);
     if(ix < 0) return 0;

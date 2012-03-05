@@ -2,14 +2,14 @@ package org.basex.index.value;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.data.Data;
-import org.basex.index.IndexIterator;
-import org.basex.index.RangeToken;
-import org.basex.util.Num;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides access to attribute values and text contents stored on
@@ -165,10 +165,8 @@ public final class UpdatableDiskValues extends DiskValues {
     final long newpos = idxl.appendNums(ids);
     idxr.write5(ix * 5L, newpos);
 
-    // check if key is cached and update the cache entry
-    final int cacheid = cache.id(key);
-    if(cacheid > 0)
-      cache.update(cacheid, ids.length, newpos + Num.length(ids.length));
+    // update the cache entry
+    cache.add(key, ids.length, newpos + Num.length(ids.length));
   }
 
   @Override
@@ -220,10 +218,8 @@ public final class UpdatableDiskValues extends DiskValues {
 
     idxl.writeNums(pos, nids);
 
-    // check if key is cached and update the cache entry
-    final int cacheid = cache.id(key);
-    if(cacheid > 0)
-      cache.update(cacheid, nids.length, pos + Num.length(nids.length));
+    // update the cache entry
+    cache.add(key, nids.length, pos + Num.length(nids.length));
 
     return nids.length;
   }
@@ -313,10 +309,8 @@ public final class UpdatableDiskValues extends DiskValues {
       final long newpos = idxl.appendNums(ids);
       idxr.write5(ix * 5L, newpos);
 
-      // check if key is cached and update the cache entry
-      final int cacheid = cache.id(key);
-      if(cacheid > 0)
-        cache.update(cacheid, ids.length, newpos + Num.length(ids.length));
+      // update the cache entry
+      cache.add(key, ids.length, newpos + Num.length(ids.length));
     }
   }
 
