@@ -698,6 +698,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) error(NSMODURI);
     if(modules.contains(uri)) error(DUPLMODULE, uri);
+    modules.add(uri);
 
     if(ns != EMPTY) ctx.sc.ns.add(ns, uri, input());
 
@@ -745,7 +746,9 @@ public class QueryParser extends InputParser {
       for(final byte[] u : MODULES) found |= eq(uri, u);
       // check pre-declared modules
       final byte[] path = ctx.modDeclared.get(uri);
-      if(path != null) module(path, uri);
+      if(path != null) {
+        module(path, uri);
+      }
       // module not found: show error
       else if(!found) error(NOMODULE, uri);
 
@@ -784,7 +787,6 @@ public class QueryParser extends InputParser {
     ctx.sc = new StaticContext();
     new QueryParser(qu, ctx).parse(io, uri);
     ctx.sc = sc;
-    modules.add(uri);
   }
 
   /**
