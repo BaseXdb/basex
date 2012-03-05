@@ -26,7 +26,7 @@ public final class StoreExample extends Main {
     DatabaseManager.registerDatabase(database);
 
     // Create a new collection
-    Collection col = new BXCollection("xmldb", false);
+    Collection col = new BXCollection("xmldb", false, database);
 
     // Store new XMLResource
     Resource document = col.createResource(null, "XMLResource");

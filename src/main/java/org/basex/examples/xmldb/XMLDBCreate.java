@@ -33,7 +33,7 @@ public final class XMLDBCreate {
       System.out.println("\n* Create a new collection.");
 
       // Create a new collection
-      BXCollection coll = new BXCollection(COLL, false);
+      BXCollection coll = new BXCollection(COLL, false, db);
 
       // Close the connection
       coll.close();
@@ -41,7 +41,7 @@ public final class XMLDBCreate {
       System.out.println("\n* Create existing collection.");
 
       // Open an existing collection
-      coll = new BXCollection(COLL, true);
+      coll = new BXCollection(COLL, true, db);
 
       // Close the connection
       coll.close();
