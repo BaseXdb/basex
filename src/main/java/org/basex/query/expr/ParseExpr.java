@@ -403,10 +403,8 @@ public abstract class ParseExpr extends Expr {
    * @return io instance
    * @throws QueryException query exception
    */
-  public final IO checkIO(final Expr e, final QueryContext ctx)
-      throws QueryException {
-
-    checkAdmin(ctx);
+  public final IO checkIO(final Expr e, final QueryContext ctx) throws QueryException {
+    checkCreate(ctx);
     final String name = string(checkStr(e, ctx));
     IO io = IO.get(name);
     if(!io.exists()) {
@@ -425,8 +423,8 @@ public abstract class ParseExpr extends Expr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public final void checkAdmin(final QueryContext ctx) throws QueryException {
-    checkPerm(ctx, User.ADMIN);
+  public final void checkCreate(final QueryContext ctx) throws QueryException {
+    checkPerm(ctx, User.CREATE);
   }
 
   /**
@@ -450,6 +448,7 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     if(ctx.context.user.perm(p)) return;
+    // dump error output
     final CmdPerm perm;
     if(p == User.ADMIN) perm = CmdPerm.ADMIN;
     else if(p == User.ADMIN) perm = CmdPerm.ADMIN;

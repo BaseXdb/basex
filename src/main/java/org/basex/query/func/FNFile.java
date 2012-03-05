@@ -52,7 +52,7 @@ public final class FNFile extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
+    checkCreate(ctx);
     final File path = new File(string(checkStr(expr[0], ctx)));
 
     switch(sig) {
@@ -66,7 +66,7 @@ public final class FNFile extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    checkAdmin(ctx);
+    checkCreate(ctx);
     final File path = expr.length == 0 ? null : new File(
         string(checkStr(expr[0], ctx)));
 

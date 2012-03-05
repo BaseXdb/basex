@@ -45,7 +45,8 @@ public final class FNRepo extends StandardFunc {
 
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
-    checkAdmin(ctx);
+    checkCreate(ctx);
+
     final RepoManager rm = new RepoManager(ctx.context.repo);
     // either path to package or package name
     final String pkg = expr.length == 0 ? null : string(checkStr(expr[0], ctx));

@@ -91,10 +91,8 @@ public final class FNXslt extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
-    checkAdmin(ctx);
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    checkCreate(ctx);
     try {
       final IO in = read(expr[0], ctx);
       final IO xsl = read(expr[1], ctx);

@@ -59,10 +59,8 @@ public final class FNZip extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
-    checkAdmin(ctx);
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    checkCreate(ctx);
     switch(sig) {
       case _ZIP_BINARY_ENTRY:     return binaryEntry(ctx);
       case _ZIP_TEXT_ENTRY:       return textEntry(ctx);
@@ -157,8 +155,8 @@ public final class FNZip extends StandardFunc {
    * @param pref directory prefix
    * @return current prefix
    */
-  private static String createEntries(final Iterator<String> it,
-      final FElem par, final String pref) {
+  private static String createEntries(final Iterator<String> it, final FElem par,
+      final String pref) {
 
     String path = null;
     boolean curr = false;
@@ -257,9 +255,8 @@ public final class FNZip extends StandardFunc {
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void create(final ZipOutputStream zos, final AxisIter ai,
-      final String root, final ZipFile zf, final QueryContext ctx)
-      throws QueryException, IOException {
+  private void create(final ZipOutputStream zos, final AxisIter ai, final String root,
+      final ZipFile zf, final QueryContext ctx) throws QueryException, IOException {
 
     final byte[] data = new byte[IO.BLOCKSIZE];
     for(ANode node; (node = ai.next()) != null;) {

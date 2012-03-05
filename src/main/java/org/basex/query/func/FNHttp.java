@@ -28,15 +28,14 @@ public final class FNHttp extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
+    checkCreate(ctx);
 
     // get request node
     final ANode request = expr[0].item(ctx, input) == null ? null :
       checkNode(expr[0].item(ctx, input));
 
     // get HTTP URI
-    final byte[] href = expr.length >= 2 ?
-        checkEStr(expr[1].item(ctx, input)) : null;
+    final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, input)) : null;
 
     // get parameter $bodies
     ItemCache cache = null;
@@ -47,8 +46,7 @@ public final class FNHttp extends StandardFunc {
     }
 
     // send HTTP request
-    return new HTTPClient(input, ctx.context.prop).sendRequest(
-        href, request, cache);
+    return new HTTPClient(input, ctx.context.prop).sendRequest(href, request, cache);
   }
 
   @Override

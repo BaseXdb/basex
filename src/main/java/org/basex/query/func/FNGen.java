@@ -148,7 +148,7 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item put(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
+    checkCreate(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
     final ANode nd = checkNode(checkNoEmpty(expr[0].item(ctx, input)));
 

@@ -107,7 +107,7 @@ public final class FNSql extends StandardFunc {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
+    checkCreate(ctx);
     switch(sig) {
       case _SQL_EXECUTE: return execute(ctx);
       default:         return super.iter(ctx);
@@ -115,10 +115,8 @@ public final class FNSql extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
-    checkAdmin(ctx);
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    checkCreate(ctx);
     switch(sig) {
       case _SQL_INIT:     return init(ctx);
       case _SQL_CONNECT:  return connect(ctx);
