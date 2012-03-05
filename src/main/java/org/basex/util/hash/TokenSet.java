@@ -8,6 +8,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
+import org.basex.util.list.*;
 
 /**
  * This is an efficient hash set, storing keys in byte arrays.
@@ -18,7 +19,7 @@ import org.basex.util.Util;
  */
 public class TokenSet implements Iterable<byte[]> {
   /** Initial hash capacity. */
-  protected static final int CAP = 1 << 3;
+  protected static final int CAP = ElementList.CAP;
   /** Hash entries. Note: actual number of entries is {@code size - 1}. */
   public int size = 1;
   /** Hashed keys. */
@@ -170,7 +171,7 @@ public class TokenSet implements Iterable<byte[]> {
     final int[] tmp = new int[s];
 
     final int l = bucket.length;
-    for(int i = 0; i != l; ++i) {
+    for(int i = 0; i < l; ++i) {
       int id = bucket[i];
       while(id != 0) {
         final int p = hash(keys[id]) & s - 1;
