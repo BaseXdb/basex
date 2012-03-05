@@ -115,7 +115,7 @@ public abstract class Parser extends Progress {
    * @return xml parser
    * @throws IOException I/O exception
    */
-  static SingleParser fileParser(final IO source, final Prop prop,
+  public static SingleParser fileParser(final IO source, final Prop prop,
       final String target) throws IOException {
 
     // use file specific parser
