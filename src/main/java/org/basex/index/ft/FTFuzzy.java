@@ -77,13 +77,13 @@ final class FTFuzzy extends FTIndex {
     while(--is >= 0) {
       int p = inX.readNum();
       final int r;
-      // legacy issue (7.0.2 -> 7.1)
-      if(p >= 4096) {
+      if(p < tp.length) {
+        r = inX.read4();
+      } else {
+        // legacy issue (7.0.2 -> 7.1)
         r = p << 24 | (inX.read1() & 0xFF) << 16 |
             (inX.read1() & 0xFF) << 8 | inX.read1() & 0xFF;
         p = p >> 8 | 0x40;
-      } else {
-        r = inX.read4();
       }
       tp[p] = r;
     }
