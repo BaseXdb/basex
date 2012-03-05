@@ -20,6 +20,8 @@ import org.basex.util.Token;
 public enum Err {
   /** BASX0001: Evaluation exception. */
   NOINDEX(BASX, 1, "Database '%' has no % index."),
+  /** BASX0001: Evaluation exception. */
+  INDEXENT(BASX, 1, "Not supported by chosen full-text index."),
   /** BASX0002: Evaluation exception. */
   NODBCTX(BASX, 2, "%: database context needed."),
   /** BASX0003: Evaluation exception. */

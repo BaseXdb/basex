@@ -54,8 +54,7 @@ public class DiskValues implements Index {
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  DiskValues(final Data d, final boolean txt, final String pref)
-      throws IOException {
+  DiskValues(final Data d, final boolean txt, final String pref) throws IOException {
     data = d;
     text = txt;
     idxl = new DataAccess(d.meta.dbfile(pref + 'l'));
@@ -235,7 +234,7 @@ public class DiskValues implements Index {
   }
 
   /**
-   * Get the first pre value from the id-list at the specified position.
+   * Gets the first pre value from the id-list at the specified position.
    * @param pos position of the id-list in {@link #idxl}
    * @return pre value
    */
