@@ -216,7 +216,7 @@
         <configuration>
           <descriptorRefs>
             <descriptorRef>src</descriptorRef>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
+            <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
           </descriptorRefs>
           <archive>
             <manifest>
