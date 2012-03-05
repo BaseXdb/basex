@@ -30,7 +30,7 @@ public final class RepoInstall extends Command {
    * @param i input info
    */
   public RepoInstall(final String p, final InputInfo i) {
-    super(User.ADMIN, p);
+    super(User.CREATE, p);
     ii = i;
   }
 

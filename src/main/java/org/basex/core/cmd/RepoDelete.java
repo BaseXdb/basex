@@ -29,7 +29,7 @@ public final class RepoDelete extends Command {
    * @param i input info
    */
   public RepoDelete(final String p, final InputInfo i) {
-    super(User.ADMIN, p);
+    super(User.CREATE, p);
     ii = i;
   }
 

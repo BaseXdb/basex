@@ -23,7 +23,7 @@ public final class RepoList extends Command {
    * Constructor.
    */
   public RepoList() {
-    super(User.ADMIN);
+    super(STANDARD);
   }
 
   @Override
