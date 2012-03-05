@@ -217,7 +217,7 @@ public final class Context {
   /**
    * Unpins a data reference.
    * @param d data reference
-   * @return true if reference was removed from the pool
+   * @return {@code true} if reference was removed from the pool
    */
   public boolean unpin(final Data d) {
     return datas.unpin(d);
@@ -226,7 +226,7 @@ public final class Context {
   /**
    * Checks if the specified database is pinned.
    * @param db name of database
-   * @return int use-status
+   * @return result of check
    */
   public boolean pinned(final String db) {
     return datas.pinned(db);
@@ -237,7 +237,8 @@ public final class Context {
    * @param pr process
    */
   public void register(final Progress pr) {
-    pr.startTimeout(mprop.num(MainProp.TIMEOUT));
+    // administrators will not be affected by the timeout
+    pr.startTimeout(user.perm(User.ADMIN) ? 0 : mprop.num(MainProp.TIMEOUT));
     lock.lock(pr);
   }
 
