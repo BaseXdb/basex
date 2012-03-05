@@ -11,7 +11,6 @@ import org.xmldb.api.base.XMLDBException;
  * Implementation of the ResourceIterator Interface for the XMLDB:API.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
  * @author Christian Gruen
  */
 final class BXResourceIterator implements ResourceIterator, BXXMLDBText,

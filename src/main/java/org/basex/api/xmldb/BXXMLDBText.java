@@ -6,7 +6,6 @@ import static org.basex.core.Text.*;
  * This class organizes textual information for the XMLDB API.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
  * @author Christian Gruen
  */
 interface BXXMLDBText {

@@ -18,12 +18,11 @@ import org.xmldb.api.base.XMLDBException;
  * Implementation of the Database Interface for the XMLDB:API.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
  * @author Christian Gruen
  */
 public final class BXDatabase implements Database, BXXMLDBText {
   /** Database context. */
-  private final Context ctx = new Context();
+  public final Context ctx = new Context();
 
   @Override
   public boolean acceptsURI(final String uri) throws XMLDBException {
@@ -38,7 +37,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
     // create database context
     final String name = getCollectionName(uri);
     final boolean exists = ctx.mprop.dbexists(name);
-    return exists ? new BXCollection(name, exists, ctx) : null;
+    return exists ? new BXCollection(name, true, this) : null;
   }
 
   @Override
@@ -62,9 +61,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
   }
 
   @Override
-  public void setProperty(final String key, final String value)
-      throws XMLDBException {
-
+  public void setProperty(final String key, final String value) throws XMLDBException {
     try {
       new Set(key, value).execute(ctx);
     } catch(final BaseXException ex) {

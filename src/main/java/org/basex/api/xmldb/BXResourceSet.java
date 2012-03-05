@@ -17,12 +17,11 @@ import org.xmldb.api.base.XMLDBException;
  * Implementation of the ResourceSet Interface for the XMLDB:API.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
  * @author Christian Gruen
  */
 final class BXResourceSet implements ResourceSet, BXXMLDBText {
   /** Resources. */
-  private final ArrayList<Resource> res = new ArrayList<Resource>();
+  private final ArrayList<Resource> res;
   /** Collection reference. */
   private final Collection coll;
 
@@ -33,6 +32,7 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
    */
   BXResourceSet(final Result r, final Collection c) {
     // convert result into resource instances
+    res = new ArrayList<Resource>((int) r.size());
     for(int s = 0; s < r.size(); ++s) res.add(new BXXMLResource(r, s, c));
     coll = c;
   }

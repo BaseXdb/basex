@@ -25,10 +25,11 @@ import org.basex.util.list.StringList;
  * Implementation of the Collection Interface for the XMLDB:API.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
  * @author Christian Gruen
  */
 public final class BXCollection implements Collection, BXXMLDBText {
+  /** Database context. */
+  final BXDatabase db;
   /** Database context. */
   Context ctx;
 
@@ -36,25 +37,14 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * Constructor to create/open a collection.
    * @param name name of the database
    * @param open open existing database
+   * @param d database context
    * @throws XMLDBException exception
    */
-  public BXCollection(final String name, final boolean open)
+  public BXCollection(final String name, final boolean open, final Database d)
       throws XMLDBException {
 
-    this(name, open, new Context());
-  }
-
-  /**
-   * Constructor to create/open a collection.
-   * @param name name of the database
-   * @param open open existing database
-   * @param c database context
-   * @throws XMLDBException exception
-   */
-  public BXCollection(final String name, final boolean open, final Context c)
-      throws XMLDBException {
-
-    ctx = c;
+    db = (BXDatabase) d;
+    ctx = db.ctx;
     try {
       ctx.openDB(open ? Open.open(name, ctx) :
         CreateDB.create(name, Parser.emptyParser(), ctx));
@@ -179,8 +169,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     // disallow storage of resources without id
     final String id = res.getId();
-    if(id == null) throw new XMLDBException(
-        ErrorCodes.INVALID_RESOURCE, ERR_ID);
+    if(id == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ERR_ID);
 
     // document exists - delete old one first
     final Resource old = getResource(id);
@@ -193,7 +182,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     try {
       final Parser p = cont instanceof Document ?
         new DOMWrapper((Document) cont, id) :
-        Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop);
+        Parser.fileParser(new IOContent((byte[]) cont, id), ctx.prop, "");
 
       final Data data = ctx.data();
       data.insert(data.meta.size, -1, MemBuilder.build(id, p, ctx.prop));

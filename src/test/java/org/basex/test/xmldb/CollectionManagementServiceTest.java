@@ -19,6 +19,8 @@ import org.xmldb.api.modules.XMLResource;
  */
 @SuppressWarnings("all")
 public class CollectionManagementServiceTest extends XMLDBBaseTest {
+  /** CollectionManagementService string. */
+  private static final String CMS = "CollectionManagementService";
   /** Temporary collection. */
   static final String TEMP = "XMLDBTemp";
   /** Test document. */
@@ -36,8 +38,7 @@ public class CollectionManagementServiceTest extends XMLDBBaseTest {
     final Class<?> c = Class.forName(DRIVER);
     db = (Database) c.newInstance();
     coll = db.getCollection(PATH, LOGIN, PW);
-    serv = (CollectionManagementService) coll.getService(
-        "CollectionManagementService", "1.0");
+    serv = (CollectionManagementService) coll.getService(CMS, "1.0");
   }
 
   @After
@@ -62,13 +63,12 @@ public class CollectionManagementServiceTest extends XMLDBBaseTest {
   @Test
   public void testRemoveCollection() throws Exception {
     serv.removeCollection(TEMP);
-    assertNull("Collection was not removed.",
-        db.getCollection(URL + TEMP, null, null));
+    assertNull("Collection was not removed.", db.getCollection(URL + TEMP, null, null));
   }
 
   @Test
   public void testGetName() throws Exception {
-    assertEquals("CollectionManagementService", serv.getName());
+    assertEquals(CMS, serv.getName());
   }
 
   @Test

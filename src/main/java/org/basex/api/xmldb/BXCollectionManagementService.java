@@ -14,7 +14,6 @@ import org.xmldb.api.modules.CollectionManagementService;
  * specified collection reference is reset every time a database is created.
  *
  * @author BaseX Team 2005-12, BSD License
- * @author Andreas Weiler
  * @author Christian Gruen
  */
 final class BXCollectionManagementService implements
@@ -24,7 +23,7 @@ final class BXCollectionManagementService implements
   static final String MANAGEMENT = "CollectionManagementService";
   /** Service constant. */
   private static final String VERSION = "1.0";
-  /** BXCollection col. */
+  /** Collection reference. */
   private BXCollection coll;
 
   /**
@@ -37,7 +36,7 @@ final class BXCollectionManagementService implements
 
   @Override
   public Collection createCollection(final String name) throws XMLDBException {
-    return new BXCollection(name, false, coll.ctx);
+    return new BXCollection(name, false, coll.db);
   }
 
   @Override
