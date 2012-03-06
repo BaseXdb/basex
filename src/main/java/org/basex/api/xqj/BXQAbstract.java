@@ -253,13 +253,12 @@ abstract class BXQAbstract {
    * @return document node
    * @throws XQException exception
    */
-  protected final DBNode createNode(final XMLStreamReader sr)
-      throws XQException {
+  protected final DBNode createNode(final XMLStreamReader sr) throws XQException {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
       final Context ctx = BXQDataSource.context();
-      return checkNode(CreateDB.mainMem(new XMLStreamWrapper(sr), ctx));
+      return checkNode(CreateDB.mainMem(new XMLStreamWrapper(sr, ctx.prop), ctx));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

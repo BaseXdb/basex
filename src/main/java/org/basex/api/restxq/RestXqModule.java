@@ -164,7 +164,7 @@ final class RestXqModule {
     http.initResponse(rxf.output);
 
     // serialize result
-    final Serializer ser = Serializer.get(http.out);
+    final Serializer ser = Serializer.get(http.out, rxf.output);
     final ValueIter ir = result.iter();
     for(Item it; (it = ir.next()) != null;) it.serialize(ser);
     ser.close();

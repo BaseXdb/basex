@@ -224,7 +224,7 @@ public class RESTTest extends HTTPTest {
   public void post1() throws IOException {
     assertEquals("123",
         post("", "<query xmlns=\"" + URI + "\">" +
-          "<text>123</text><parameter name='wrap' value='no'/></query>"));
+          "<text>123</text><parameter name='wrap' value='no'/></query>", APP_XML));
   }
 
   /**
@@ -235,7 +235,7 @@ public class RESTTest extends HTTPTest {
   public void post2() throws IOException {
     assertEquals("",
         post("", "<query xmlns=\"" + URI + "\">" +
-          "<text>()</text><parameter name='wrap' value='no'/></query>"));
+          "<text>()</text><parameter name='wrap' value='no'/></query>", APP_XML));
   }
 
   /**
@@ -248,7 +248,7 @@ public class RESTTest extends HTTPTest {
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?> 123",
         post("", "<query xmlns=\"" + URI + "\">" +
           "<text>123</text><parameter name='wrap' value='no'/>" +
-          "<parameter name='omit-xml-declaration' value='no'/></query>"));
+          "<parameter name='omit-xml-declaration' value='no'/></query>", APP_XML));
   }
 
   /**
@@ -264,7 +264,7 @@ public class RESTTest extends HTTPTest {
         "<parameter name='wrap' value='no'/>" +
         "<parameter name='omit-xml-declaration' value='no'/>" +
         "<parameter name='omit-xml-declaration' value='yes'/>" +
-        "<parameter name='method' value='xhtml'/>" + "</query>"));
+        "<parameter name='method' value='xhtml'/>" + "</query>", APP_XML));
   }
 
   /**
@@ -279,7 +279,7 @@ public class RESTTest extends HTTPTest {
         "<parameter name='wrap' value='no'/>" +
         "<parameter name='omit-xml-declaration' value='no'/>" +
         "<parameter name='omit-xml-declaration' value='yes'/>" +
-        "</query>"));
+        "</query>", APP_XML));
   }
 
   /**
@@ -292,7 +292,7 @@ public class RESTTest extends HTTPTest {
         "<query xmlns=\"" + URI + "\">" +
         "<text>.</text>" +
         "<context><a/></context>" +
-        "</query>"));
+        "</query>", APP_XML));
   }
 
   /**
@@ -303,12 +303,12 @@ public class RESTTest extends HTTPTest {
   public void postOption() throws IOException {
     assertEquals("2", post("", "<query xmlns=\"" + URI + "\">" +
         "<text>switch(1) case 1 return 2 default return 3</text>" +
-        "<option name='" + Prop.XQUERY3[0] + "' value='true'/></query>"));
+        "<option name='" + Prop.XQUERY3[0] + "' value='true'/></query>", APP_XML));
 
     try {
       post("", "<query xmlns=\"" + URI + "\">" +
         "<text>switch(1) case 1 return 2 default return 3</text>" +
-        "<option name='" + Prop.XQUERY3[0] + "' value='false'/></query>");
+        "<option name='" + Prop.XQUERY3[0] + "' value='false'/></query>", APP_XML);
       fail("Error expected.");
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
@@ -319,8 +319,8 @@ public class RESTTest extends HTTPTest {
   @Test
   public void postErr() {
     try {
-      assertEquals("", post("",
-          "<query xmlns=\"" + URI + "\"><text>(</text></query>"));
+      assertEquals("", post("", "<query xmlns=\"" + URI + "\"><text>(</text></query>",
+          APP_XML));
     } catch(final IOException ex) {
       assertContains(ex.getMessage(), "[XPST0003]");
     }
@@ -459,37 +459,6 @@ public class RESTTest extends HTTPTest {
    */
   private static void assertContains(final String str, final String sub) {
     if(!str.contains(sub)) fail('\'' + sub + "' not contained in '" + str + "'.");
-  }
-
-  /**
-   * Executes the specified PUT request.
-   * @param path path
-   * @param query request
-   * @return string result, or {@code null} for a failure.
-   * @throws IOException I/O exception
-   */
-  private static String post(final String path, final String query) throws IOException {
-    // create connection
-    final URL url = new URL(ROOT + path);
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    conn.setDoOutput(true);
-    conn.setRequestMethod(POST.name());
-    conn.setRequestProperty(DataText.CONTENT_TYPE, APP_XML);
-    // basic authentication
-    final String encoded = Base64.encode(Text.ADMIN + ':' + Text.ADMIN);
-    conn.setRequestProperty(DataText.AUTHORIZATION, DataText.BASIC + ' ' + encoded);
-    // send query
-    final OutputStream out = conn.getOutputStream();
-    out.write(token(query));
-    out.close();
-
-    try {
-      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
-    } catch(final IOException ex) {
-      throw error(conn, ex);
-    } finally {
-      conn.disconnect();
-    }
   }
 
   /**

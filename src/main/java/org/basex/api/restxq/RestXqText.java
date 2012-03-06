@@ -43,6 +43,8 @@ interface RestXqText {
   String HEAD_METHOD = "HEAD method must only return 'rest:reponse' element.";
   /** Error message. */
   String METHOD_VALUE = "Method % does not allow values.";
+  /** Error message. */
+  String INPUT_CONV = "Input could not be converted: %";
 
   /** Error message. */
   String NOT_FOUND = "No XQuery function found to process the request.";

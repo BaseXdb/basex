@@ -8,6 +8,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.*;
 import org.basex.util.Atts;
 import org.basex.util.Util;
 
@@ -28,9 +29,10 @@ final class XMLStreamWrapper extends Parser {
   /**
    * Constructor.
    * @param sr stream reader
+   * @param pr database properties
    */
-  XMLStreamWrapper(final XMLStreamReader sr) {
-    super("");
+  XMLStreamWrapper(final XMLStreamReader sr, final Prop pr) {
+    super("", pr);
     reader = sr;
   }
 

@@ -36,12 +36,12 @@ public class RESTPut extends RESTCode {
     } else if(APP_JSONML.equals(ct)) {
       session.execute("set parser json");
       session.execute("set parseropt jsonml=true");
-    } else if(TEXT_PLAIN.equals(ct)) {
-      session.execute("set parser text");
     } else if(TEXT_CSV.equals(ct)) {
       session.execute("set parser csv");
     } else if(TEXT_HTML.equals(ct)) {
       session.execute("set parser html");
+    } else if(TEXT_PLAIN.equals(ct)) {
+      session.execute("set parser text");
     } else if(ct != null && !APP_XML.equals(ct)) {
       xml = false;
     }

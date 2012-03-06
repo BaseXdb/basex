@@ -60,8 +60,6 @@ public final class RestXqServlet extends HttpServlet {
 }
 
 /* [CG] RestXQ: OPEN ISSUES
- * - check "updating" modifier
- * - POST/PUT: bind request body to variable
  * - resolve conflicting paths: what is "more specific"?
  * - check methods: HEAD must only return rest:reponse element
  * - %rest:query-param: query string parameters

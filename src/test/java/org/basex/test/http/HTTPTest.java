@@ -1,6 +1,7 @@
 package org.basex.test.http;
 
 import static org.basex.api.HTTPMethod.*;
+import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -8,6 +9,7 @@ import java.net.*;
 
 import org.basex.api.*;
 import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -112,6 +114,40 @@ public abstract class HTTPTest {
     try {
       conn.setRequestMethod(method.name());
       return read(new BufferInput(conn.getInputStream())).replaceAll("\r?\n *", "");
+    } catch(final IOException ex) {
+      throw error(conn, ex);
+    } finally {
+      conn.disconnect();
+    }
+  }
+
+  /**
+   * Executes the specified PUT request.
+   * @param query path
+   * @param request request
+   * @param type content type
+   * @return string result, or {@code null} for a failure.
+   * @throws IOException I/O exception
+   */
+  protected static String post(final String query, final String request,
+      final String type) throws IOException {
+
+    // create connection
+    final URL url = new URL(root + query);
+    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setDoOutput(true);
+    conn.setRequestMethod(POST.name());
+    conn.setRequestProperty(DataText.CONTENT_TYPE, type);
+    // basic authentication
+    final String encoded = Base64.encode(Text.ADMIN + ':' + Text.ADMIN);
+    conn.setRequestProperty(DataText.AUTHORIZATION, DataText.BASIC + ' ' + encoded);
+    // send query
+    final OutputStream out = conn.getOutputStream();
+    out.write(token(request));
+    out.close();
+
+    try {
+      return read(conn.getInputStream()).replaceAll("\r?\n *", "");
     } catch(final IOException ex) {
       throw error(conn, ex);
     } finally {

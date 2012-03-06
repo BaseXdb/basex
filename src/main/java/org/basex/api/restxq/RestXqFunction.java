@@ -1,14 +1,18 @@
 package org.basex.api.restxq;
 
-import static org.basex.api.restxq.RestXqText.*;
 import static org.basex.api.HTTPMethod.*;
+import static org.basex.api.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
 import org.basex.api.*;
+import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
@@ -41,6 +45,8 @@ final class RestXqFunction {
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
   /** Path. */
   RestXqPath path;
+  /** Post/Put variable. */
+  QNm postPut;
 
   /**
    * Constructor.
@@ -71,22 +77,30 @@ final class RestXqFunction {
       final boolean rexq = startsWith(uri, QueryText.REXQURI);
       if(rexq) {
         if(eq(PATH, local)) {
+          // annotation "path"
           path = new RestXqPath(toString(value, name), this);
         } else if(eq(CONSUMES, local)) {
+          // annotation "consumes"
           consumes.add(toString(value, name));
         } else if(eq(PRODUCES, local)) {
+          // annotation "produces"
           produces.add(toString(value, name));
         } else {
+          // method annotations
           final HTTPMethod m = HTTPMethod.get(string(local));
           if(m == null) error(NOT_SUPPORTED, "%", name.string());
           if(!value.isEmpty()) {
+            // remember post/put variable
             if(m != POST && m != PUT) error(METHOD_VALUE, m);
-            checkVariable(toString(value, name), AtomType.ITEM);
+            final String val = toString(value, name);
+            checkVariable(val, AtomType.ITEM);
+            final Matcher mt = TEMPLATE.matcher(val);
+            if(mt.find()) postPut = new QNm(token(mt.group(1)));
           }
           mth.add(m);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
-        // output parameters
+        // serialization parameters
         final String key = string(local);
         final String val = toString(value, name);
         if(output.get(key) == null) error(UNKNOWN_SER, key);
@@ -144,27 +158,49 @@ final class RestXqFunction {
    * Binds the annotated variables.
    * @param http http context
    * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  void bind(final HTTPContext http) throws QueryException {
+  void bind(final HTTPContext http) throws QueryException, IOException {
     // loop through all segments and bind variables
-    final QueryContext qc = context;
     for(int s = 0; s < path.segments.length; s++) {
       final String seg = path.segments[s];
       final Matcher m = RestXqFunction.TEMPLATE.matcher(seg);
       if(!m.find()) continue;
-      final QNm qnm = new QNm(token(m.group(1)), qc);
-      final String val = http.segment(s);
+      final QNm qnm = new QNm(token(m.group(1)), context);
+      bind(qnm, new Atm(token(http.segment(s))));
+    }
 
-      // finds the correct variable
-      for(final Var var : function.args) {
-        if(!var.name.eq(qnm)) continue;
-        // creates an atomic value
-        Item item = new Atm(token(val));
-        // casts the value
-        if(var.type != null) item = var.type.type.cast(item, qc, null);
-        // binds the value
-        var.bind(var.type != null ? item : item, qc);
-        break;
+    final Prop prop = context.context.prop;
+    if(postPut != null) {
+      // cache input
+      final BufferInput bi = new BufferInput(http.in);
+      final IOContent io = new IOContent(bi.content());
+      io.name(http.method.toString() + IO.XMLSUFFIX);
+      Item item = null;
+      try {
+        // retrieve the request body in the correct format
+        item = Parser.item(io, prop, http.req.getContentType());
+      } catch(final IOException ex) {
+        error(INPUT_CONV, ex);
+      }
+      bind(postPut, item);
+    }
+  }
+
+  /**
+   * Binds the specified item to a variable.
+   * @param name variable name
+   * @param item item to be bound
+   * @throws QueryException query exception
+   */
+  void bind(final QNm name, final Item item) throws QueryException {
+    Item it = item;
+    for(final Var var : function.args) {
+      if(var.name.eq(name)) {
+        // casts and binds the value
+        if(var.type != null) it = var.type.type.cast(item, context, null);
+        var.bind(it, context);
+        return;
       }
     }
   }

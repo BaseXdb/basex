@@ -1,5 +1,6 @@
 package org.basex.test.http;
 
+import static org.basex.io.MimeTypes.*;
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
@@ -82,6 +83,23 @@ public final class RestXqTest extends HTTPTest {
         "m:f($x as xs:integer,$y as xs:integer) {$x*$y};";
     get(f, "2/3", "6");
     getE(f, "2/x");
+  }
+
+  /** Retrieve path with typed variable.
+   * @throws Exception exception */
+  @Test public void post() throws Exception {
+    String f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
+    post(f, "", "12", "12", TEXT_PLAIN);
+    post(f, "", "<x>A</x>", "<x>A</x>", APP_XML);
+    f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/json/*};";
+    post(f, "", "<A>B</A>", "{ \"A\":\"B\" }", APP_JSON);
+    f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
+    post(f, "", "<A/>", "[\"A\"]", APP_JSONML);
+    f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x/csv/*/*};";
+    post(f, "", "<col>A</col>", "A", TEXT_CSV);
+    f = "declare %R:POST('{$x}') %R:path('') function m:f($x) {$x};";
+    post(f, "", "QUFB", "AAA", APP_OCTET);
+    post(f, "", "QUFB", "AAA", "whatever/type");
   }
 
   /**
@@ -193,6 +211,21 @@ public final class RestXqTest extends HTTPTest {
   }
 
   // PRIVATE METHODS ==========================================================
+
+  /**
+   * Executes the specified POST request and tests the result.
+   * @param function function to test
+   * @param query request
+   * @param exp expected result
+   * @param request request body
+   * @param param post parameters
+   * @throws IOException I/O exception
+   */
+  private static void post(final String function, final String query, final String exp,
+      final String request, final String param) throws IOException {
+    install(function);
+    assertEquals(exp, post(query, request, param));
+  }
 
   /**
    * Executes the specified GET request and tests the result.
