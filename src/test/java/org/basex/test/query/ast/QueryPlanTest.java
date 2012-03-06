@@ -38,7 +38,7 @@ public abstract class QueryPlanTest {
     try {
       // parse compiled query plan
       qp.compile();
-      final Data plan = CreateDB.mainMem(new Parser("") {
+      final Data plan = CreateDB.mainMem(new Parser("", CTX.prop) {
         @Override
         public void parse(final Builder build) throws IOException {
           build.startDoc(QueryText.PLAN);

@@ -2,38 +2,50 @@ package org.basex.build;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.core.*;
 import org.basex.io.IO;
 
 /**
- * This class defines an abstract parser for single documents.
+ * This class defines an abstract parser for single resources.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class SingleParser extends TargetParser {
+public abstract class SingleParser extends Parser {
   /** Builder reference. */
-  public Builder builder;
+  protected Builder builder;
 
   /**
    * Constructor.
-   * @param source document source
-   * @param path target path
+   * @param source input source
+   * @param pr database properties
    */
-  protected SingleParser(final IO source, final String path) {
-    super(source, path);
+  protected SingleParser(final IO source, final Prop pr) {
+    super(source, pr);
   }
 
   @Override
   public final void parse(final Builder build) throws IOException {
     builder = build;
-    builder.startDoc(token(trg + src.name()));
+    builder.startDoc(token(target + src.name()));
     parse();
     builder.endDoc();
   }
 
   /**
-   * Parses the current file.
+   * Parses the current input.
    * @throws IOException I/O exception
    */
-  protected abstract void parse() throws IOException;
+  public abstract void parse() throws IOException;
+
+  /**
+   * Sets the database builder.
+   * @param b builder instance
+   * @return self reference
+   */
+  public SingleParser builder(final Builder b) {
+    builder = b;
+    return this;
+  }
 }

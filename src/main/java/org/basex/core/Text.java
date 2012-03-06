@@ -186,17 +186,12 @@ public interface Text {
 
   // COMMANDS =================================================================
 
-  /** Command keyword. */
-  String ALL = "ALL";
-  /** Command keyword. */
-  String TO = "TO";
-  /** Command keyword. */
-  String ON = "ON";
-  /** Command keyword. */
-  String OFF = "OFF";
-  /** Keyword. */
+  /** OK Keyword. */
   String OK = "OK";
-
+  /** ON flag. */
+  String ON = "ON";
+  /** OFF flag. */
+  String OFF = "OFF";
   /** Yes flag. */
   String YES = "yes";
   /** No flag. */
@@ -206,21 +201,25 @@ public interface Text {
   /** False flag. */
   String FALSE = "false";
 
-  /** Command help. */
+  /** Command keyword. */
+  String C_ALL = "ALL";
+  /** Command keyword. */
+  String C_TO = "TO";
+  /** Command keyword. */
   String C_QUERY = "query";
-  /** Command help. */
+  /** Command keyword. */
   String C_PATH = "path";
-  /** Command help. */
+  /** Command keyword. */
   String C_INPUT = "input";
-  /** Command help. */
+  /** Command keyword. */
   String C_NAME = "name";
-  /** Command help. */
+  /** Command keyword. */
   String C_PW = "password";
-  /** Command help. */
+  /** Command keyword. */
   String C_PKGPATH = "path";
-  /** Command help. */
+  /** Command keyword. */
   String C_PKGNAME = "name";
-  /** Command help. */
+  /** Command keyword. */
   String C_PKGDIR = "dir";
 
   /** No help available. */
@@ -256,12 +255,12 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPADD = {
-    '(' + TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
+    '(' + C_TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
     lang("c_add1"), lang("c_add2", C_INPUT, C_PATH)
   };
   /** Command help. */
   String[] HELPSTORE = {
-    '(' + TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
+    '(' + C_TO + " [" + C_PATH + "]) [" + C_INPUT + ']',
     lang("c_store1"), lang("c_store2", C_PATH)
   };
   /** Command help. */
@@ -320,7 +319,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {
-    '(' + ALL + ')', lang("c_optimize1"), lang("c_optimize2", ALL)
+    '(' + C_ALL + ')', lang("c_optimize1"), lang("c_optimize2", C_ALL)
   };
 
   /** Command help. */
@@ -375,7 +374,7 @@ public interface Text {
   /** Command help. */
   String[] HELPGRANT = {
     "[" + CmdPerm.NONE + '|' + CmdPerm.READ + '|' + CmdPerm.WRITE + '|' +
-    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [database]) " + TO +
+    CmdPerm.CREATE + '|' + CmdPerm.ADMIN + "] (" + ON + " [database]) " + C_TO +
     " [user]",
     lang("c_grant1"),
     lang("c_grant2")
@@ -730,6 +729,8 @@ public interface Text {
   /** Statistics information. */
   String CREATE_STATS_D = lang("create_stats") + DOTS;
 
+  /** "Name". */
+  String ALL = lang("all");
   /** "Name". */
   String NAME = lang("name");
   /** "Size". */
@@ -1152,9 +1153,10 @@ public interface Text {
   String SIMPLE_FILE_CHOOSER = lang("simple_file_chooser");
   /** Name display flag. */
   String SHOW_NAME_ATTS = lang("show_name_atts");
+  /** Maximum number of hits. */
+  String MAX_NO_OF_HITS = lang("max_nr_of_hits");
   /** Language preference. */
-  String LANGUAGE_RESTART = lang("language") + " (" +
-      lang("requires_restart") + ')';
+  String LANGUAGE_RESTART = lang("language") + " (" + lang("requires_restart") + ')';
 
   /** Dialog title for inserting new data. */
   String INSERT_NEW_DATA = lang("insert_new_data");
@@ -1231,13 +1233,11 @@ public interface Text {
   /** Developer info. */
   String CHIEF_ARCHITECT = lang("chief_architect") + ": Christian Gr\u00FCn";
   /** Contributors info. */
-  String TEAM1 = lang("team") +
-      ": Michael Seiferle, Alexander Holupirek,";
+  String TEAM1 = lang("team") + ": Michael Seiferle, Alexander Holupirek,";
   /** Developer names. */
   String TEAM2 = "Dimitar Popov, Rositsa Shadura, Lukas Kircher,";
   /** Developer names. */
-  String TEAM3 = "Leo W\u00F6rteler, Andreas Weiler " +
-      lang("and_others");
+  String TEAM3 = "Leo W\u00F6rteler " + lang("and_others");
   /** Translation. */
   String TRANSLATION = lang("translation");
 

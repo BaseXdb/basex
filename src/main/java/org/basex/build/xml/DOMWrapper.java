@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Stack;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.*;
 import org.basex.util.Util;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -35,9 +36,10 @@ public final class DOMWrapper extends Parser {
    * Constructor.
    * @param doc document instance
    * @param fn filename
+   * @param pr database properties
    */
-  public DOMWrapper(final Document doc, final String fn) {
-    super(fn);
+  public DOMWrapper(final Document doc, final String fn, final Prop pr) {
+    super(fn, pr);
     root = doc;
     filename = fn;
   }

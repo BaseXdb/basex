@@ -85,17 +85,16 @@ public class DBNode extends ANode {
    * @throws IOException I/O exception
    */
   public DBNode(final IO input, final Prop prop) throws IOException {
-    this(Parser.xmlParser(input, prop), prop);
+    this(Parser.xmlParser(input, prop));
   }
 
   /**
    * Constructor, specifying a parser reference.
    * @param parser parser
-   * @param prop database properties
    * @throws IOException I/O exception
    */
-  public DBNode(final Parser parser, final Prop prop) throws IOException {
-    this(MemBuilder.build("", parser, prop));
+  public DBNode(final Parser parser) throws IOException {
+    this(MemBuilder.build("", parser));
   }
 
   /**

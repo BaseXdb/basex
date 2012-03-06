@@ -185,6 +185,6 @@ public enum BaseXKeys {
     final int c = e.getKeyCode();
     return c == VK_ALT || c == VK_SHIFT || c == VK_META || c == VK_CONTROL ||
         c == VK_PAUSE || c == VK_CAPS_LOCK || c == VK_ESCAPE ||
-        (c == VK_TAB && (e.isAltDown()));
+        c == VK_TAB && e.isAltDown();
   }
 }

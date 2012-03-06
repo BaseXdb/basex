@@ -184,7 +184,7 @@ public final class Updates {
    * Executes all updates.
    * @throws QueryException query exception
    */
-  public void applyUpdates() throws QueryException {
+  public void apply() throws QueryException {
     if(mod != null) mod.applyUpdates();
   }
 

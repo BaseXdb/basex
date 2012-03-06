@@ -282,26 +282,18 @@ public final class MapView extends View implements Runnable {
    * @param nodes nodes to draw in the map
    * @param map image to draw rectangles on
    */
-  private void calc(final MapRect rect, final Nodes nodes,
-      final BufferedImage map) {
-
+  private void calc(final MapRect rect, final Nodes nodes, final BufferedImage map) {
     // calculate new main rectangles
     gui.cursor(CURSORWAIT);
 
     initLen();
     layout = new MapLayout(nodes.data, textLen, gui.gprop);
-    layout.makeMap(rect, new MapList(nodes.list.clone()),
-        0, (int) nodes.size() - 1);
+    layout.makeMap(rect, new MapList(nodes.list.clone()), 0, (int) nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 
     drawMap(map, mainRects, 1f);
     focus();
-    /*
-     * Screenshots: try { File file = new File("screenshot.png");
-     * ImageIO.write(mainMap, "png", file); } catch(IOException ex) {
-     * Util.stack(ex); }
-     */
     gui.cursor(CURSORARROW, true);
   }
 

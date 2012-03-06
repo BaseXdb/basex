@@ -44,7 +44,7 @@ public final class BaseXException extends IOException {
         final Throwable th = (Throwable) ext[e];
         ext[e] = th.getMessage();
         final String local = th.getLocalizedMessage();
-        if(th instanceof FileNotFoundException || (ext[e] == null && local != null)) {
+        if(th instanceof FileNotFoundException || ext[e] == null && local != null) {
           ext[e] = th.getClass().getSimpleName() + ": " + local;
         } else if(ext[e] == null) {
           ext[e] = ext[e].toString();

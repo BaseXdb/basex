@@ -150,15 +150,17 @@ public final class TextView extends View implements ActionListener {
    */
   private void setText(final Nodes n) {
     ns = n;
-    if(!visible()) return;
-    try {
-      final ArrayOutput ao =
-        new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
-      if(n != null) n.serialize(Serializer.get(ao));
-      setText(ao, null);
-      refresh = false;
-    } catch(final IOException ex) {
-      Util.debug(ex);
+    if(visible()) {
+      try {
+        final ArrayOutput ao = new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
+        if(n != null) n.serialize(Serializer.get(ao));
+        setText(ao, null);
+        refresh = false;
+      } catch(final IOException ex) {
+        Util.debug(ex);
+      }
+    } else {
+      home.setEnabled(gui.context.data() != null);
     }
   }
 

@@ -1,26 +1,17 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import org.basex.core.MainProp;
-import org.basex.core.Lang;
-import org.basex.core.cmd.Close;
-import org.basex.data.Data;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXFileChooser;
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.io.IOFile;
+import org.basex.io.*;
 
 /**
  * Dialog window for changing some project's preferences.
@@ -30,10 +21,19 @@ import org.basex.io.IOFile;
  */
 public final class DialogPrefs extends Dialog {
   /** Information on available languages. */
+  private static final int[] HITS = {
+    10, 25, 100, 250, 1000, 2500, 10000, 25000, 100000, 250000, 1000000, -1
+  };
+
+  /** Information on available languages. */
   private static final String[][] LANGS = Lang.parse();
 
   /** Directory path. */
   final BaseXTextField path;
+  /** Number of hits. */
+  final BaseXSlider limit;
+  /** Label for number of hits. */
+  final BaseXLabel label;
 
   /** Language label. */
   private final BaseXLabel creds;
@@ -47,6 +47,8 @@ public final class DialogPrefs extends Dialog {
   private final BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox javalook;
+  /** Old value for show names flag. */
+  private final boolean oldShowNames;
 
   /**
    * Default constructor.
@@ -56,7 +58,7 @@ public final class DialogPrefs extends Dialog {
     super(main, PREFERENCES);
 
     // create checkboxes
-    final BaseXBack pp = new BaseXBack(new TableLayout(11, 1));
+    final BaseXBack pp = new BaseXBack(new TableLayout(12, 1));
     pp.add(new BaseXLabel(DATABASE_PATH, true, true));
 
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
@@ -89,61 +91,108 @@ public final class DialogPrefs extends Dialog {
     pp.add(focus);
 
     // checkbox for simple file dialog
-    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER,
-        gprop.is(GUIProp.SIMPLEFD), this);
+    simpfd = new BaseXCheckBox(SIMPLE_FILE_CHOOSER, gprop.is(GUIProp.SIMPLEFD), this);
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    names = new BaseXCheckBox(SHOW_NAME_ATTS,
-        gprop.is(GUIProp.SHOWNAME), 12, this);
+    final boolean sn = gprop.is(GUIProp.SHOWNAME);
+    names = new BaseXCheckBox(SHOW_NAME_ATTS, sn, 6, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && data.nameID != 0);
+    oldShowNames = sn;
     pp.add(names);
 
+    // maximum number of hits to be displayed
+    final int mh = hitsForSlider();
+    limit = new BaseXSlider(0, HITS.length - 1, mh, this, new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) { action(limit); }
+    });
+    label = new BaseXLabel(" ");
+    p = new BaseXBack(new TableLayout(1, 3, 16, 0));
+    p.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
+    p.add(limit);
+    p.add(label);
+    pp.add(p);
+
     // checkbox for simple file dialog
-    pp.add(new BaseXLabel(LANGUAGE_RESTART, true, true));
-
-    p = new BaseXBack(new TableLayout(1, 2, 12, 0));
-
+    pp.add(new BaseXLabel(LANGUAGE_RESTART, true, true).border(16, 0, 6, 0));
     lang = new BaseXCombo(this, LANGS[0]);
     lang.setSelectedItem(mprop.get(MainProp.LANG));
-    p.add(lang);
-
     creds = new BaseXLabel(" ");
-    creds.setText(TRANSLATION + COLS +
-        creds(lang.getSelectedItem().toString()));
+    p = new BaseXBack(new TableLayout(1, 2, 12, 0));
+    p.add(lang);
     p.add(creds);
-
     pp.add(p);
 
     set(pp, BorderLayout.CENTER);
     set(okCancel(), BorderLayout.SOUTH);
+    action(null);
     finish(null);
   }
 
   @Override
   public void action(final Object cmp) {
-    creds.setText(TRANSLATION + COLS +
-        creds(lang.getSelectedItem().toString()));
-    gui.notify.layout();
+    creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem().toString()));
+    if(cmp == names) {
+      gui.gprop.set(GUIProp.SHOWNAME, names.isSelected());
+      gui.notify.layout();
+    } else if(cmp == label) {
+      final int mh = hitsAsProperty();
+      label.setText(mh == -1 ? ALL : Integer.toString(mh));
+    }
   }
 
   @Override
   public void close() {
     final MainProp mprop = gui.context.mprop;
     mprop.set(MainProp.LANG, lang.getSelectedItem().toString());
+
     // new database path: close existing database
     final String dbpath = path.getText();
     if(!mprop.get(MainProp.DBPATH).equals(dbpath)) gui.execute(new Close());
     mprop.set(MainProp.DBPATH, dbpath);
     mprop.write();
+
+    final int mh = hitsAsProperty();
+    gui.context.prop.set(Prop.MAXHITS, mh);
+
     final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.MOUSEFOCUS, focus.isSelected());
-    gprop.set(GUIProp.SHOWNAME, names.isSelected());
     gprop.set(GUIProp.SIMPLEFD, simpfd.isSelected());
     gprop.set(GUIProp.JAVALOOK, javalook.isSelected());
+    gprop.set(GUIProp.MAXHITS, mh);
     gprop.write();
     dispose();
+  }
+
+  @Override
+  public void cancel() {
+    final boolean sn = gui.gprop.is(GUIProp.SHOWNAME);
+    gui.gprop.set(GUIProp.SHOWNAME, oldShowNames);
+    if(sn != oldShowNames) gui.notify.layout();
+    super.cancel();
+  }
+
+  /**
+   * Returns the selected maximum number of hits as property value.
+   * @return maximum number of hits
+   */
+  private int hitsAsProperty() {
+    return HITS[limit.value()];
+  }
+
+  /**
+   * Returns the selected maximum number of hits as slider value.
+   * @return maximum number of hits
+   */
+  private int hitsForSlider() {
+    int mh = gui.gprop.num(Prop.MAXHITS);
+    if(mh == -1) mh = Integer.MAX_VALUE;
+    final int hl = HITS.length - 1;
+    int h = -1;
+    while(++h < hl && HITS[h] < mh);
+    return h;
   }
 
   /**

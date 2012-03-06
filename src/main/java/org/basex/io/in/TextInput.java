@@ -38,9 +38,8 @@ public class TextInput extends InputStream {
    * @param is input stream
    * @throws IOException I/O exception
    */
-  TextInput(final InputStream is) throws IOException {
-    inputs[0] = is instanceof BufferInput ? (BufferInput) is :
-      new BufferInput(is);
+  public TextInput(final InputStream is) throws IOException {
+    inputs[0] = is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
     inputs[0].encoding();
   }
 

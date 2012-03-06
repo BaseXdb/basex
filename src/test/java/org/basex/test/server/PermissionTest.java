@@ -122,9 +122,9 @@ public final class PermissionTest {
     no(new Set(Prop.QUERYINFO, false), testSession);
 
     // repo Stuff
-    no(new RepoInstall(REPO, null), testSession);
-    no(new RepoDelete(REPO, null), testSession);
-    no(new RepoList(), testSession);
+    no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
+    ok(new RepoList(), testSession);
+    no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery read
     no(new XQuery("//xml"), testSession);
@@ -164,9 +164,9 @@ public final class PermissionTest {
     ok(new Find(NAME), testSession);
 
     // repo Stuff
-    no(new RepoInstall(REPO, null), testSession);
-    no(new RepoDelete(REPO, null), testSession);
-    no(new RepoList(), testSession);
+    no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
+    ok(new RepoList(), testSession);
+    no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery update
     no(new XQuery("for $item in doc('" + NAME + "')//xml " +
@@ -206,9 +206,9 @@ public final class PermissionTest {
     ok(new Replace(NAME + ".xml", "<xmlr>2</xmlr>"), testSession);
 
     // repo Stuff
-    no(new RepoInstall(REPO, null), testSession);
-    no(new RepoDelete(REPO, null), testSession);
-    no(new RepoList(), testSession);
+    no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
+    ok(new RepoList(), testSession);
+    no(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     // XQuery Update
     ok(new XQuery("for $item in doc('" + NAME + "')//xml " +
@@ -248,9 +248,9 @@ public final class PermissionTest {
     ok(new DropDB(NAME), testSession);
 
     // repo Stuff
-    no(new RepoInstall(REPO, null), testSession);
-    no(new RepoDelete(REPO, null), testSession);
-    no(new RepoList(), testSession);
+    ok(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
+    ok(new RepoList(), testSession);
+    ok(new RepoDelete("http://www.pkg3.com", null), testSession);
 
     no(new CreateUser(NAME, Token.md5(NAME)), testSession);
     no(new DropUser(NAME), testSession);

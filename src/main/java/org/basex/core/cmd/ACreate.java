@@ -77,7 +77,7 @@ public abstract class ACreate extends Command {
 
       // database builder instance.
       if(prop.is(Prop.MAINMEM)) {
-        final Data data = progress(new MemBuilder(db, parser, prop)).build();
+        final Data data = progress(new MemBuilder(db, parser)).build();
         context.openDB(data);
         context.pin(data);
       } else {

@@ -143,19 +143,14 @@ final class FTFuzzy extends FTIndex {
       public synchronized byte[] next() {
         if(inner) {
           // loop through all entries with the same character length
-          while(i < e) {
+          if(i < e) {
             final byte[] entry = inY.readBytes(i, ti);
-            i += ti + ENTRY;
-            // could be sped up by using binary search for the first entry
             if(startsWith(entry, prefix)) {
               final long poi = inY.read5();
               nr = inY.read4();
               if(prefix.length != 0) cache.add(entry, nr, poi);
-              // mark first hit
+              i += ti + ENTRY;
               return entry;
-            } else if(nr != 0) {
-              // stop after last hit
-              break;
             }
           }
         }
@@ -167,6 +162,7 @@ final class FTFuzzy extends FTIndex {
             do e = tp[c++]; while(e == -1);
             nr = 0;
             inner = true;
+            i = find(prefix, i, e, ti);
             // jump to inner loop
             final byte[] n = next();
             if(n != null) return n;
@@ -180,6 +176,33 @@ final class FTFuzzy extends FTIndex {
         return nr;
       }
     };
+  }
+
+  /**
+   * Binary search.
+   * @param key key to be found
+   * @param i start position
+   * @param e end position
+   * @param ti entry length
+   * @return position where the key was found, or would have been found
+   */
+  int find(final byte[] key, final int i, final int e, final int ti) {
+    final int tl = ti + ENTRY;
+    int l = 0, h = (e - i) / tl;
+    while(l <= h) {
+      final int m = l + h >>> 1;
+      final int p = i + m * tl;
+      byte[] txt = ctext.get(p);
+      if(txt == null) {
+        txt = inY.readBytes(p, ti);
+        ctext.add(p, txt);
+      }
+      final int d = diff(txt, key);
+      if(d == 0) return i + m + tl;
+      if(d < 0) l = m + 1;
+      else h = m - 1;
+    }
+    return i + l * tl;
   }
 
   @Override

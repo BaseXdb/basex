@@ -76,7 +76,7 @@ public final class OptimizeAll extends ACreate {
 
   @Override
   public void build(final CommandBuilder cb) {
-    cb.init(Cmd.OPTIMIZE + " " + ALL);
+    cb.init(Cmd.OPTIMIZE + " " + C_ALL);
   }
 
   /**
@@ -156,7 +156,7 @@ public final class OptimizeAll extends ACreate {
      * @param c calling command (can be {@code null})
      */
     DBParser(final DiskData d, final OptimizeAll c) {
-      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original));
+      super(d.meta.original.isEmpty() ? null : IO.get(d.meta.original), d.meta.prop);
       data = d;
       cmd = c;
     }

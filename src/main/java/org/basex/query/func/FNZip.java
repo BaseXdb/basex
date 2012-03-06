@@ -113,8 +113,7 @@ public final class FNZip extends StandardFunc {
     final Prop prop = ctx.context.prop;
     final IO io = new IOContent(entry(ctx));
     try {
-      return new DBNode(html ? new HTMLParser(io, "", prop) :
-        Parser.xmlParser(io, prop), prop);
+      return new DBNode(html ? new HTMLParser(io, prop) : Parser.xmlParser(io, prop));
     } catch(final IOException ex) {
       throw SAXERR.thrw(input, ex);
     }

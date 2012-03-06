@@ -24,15 +24,13 @@ import org.basex.util.list.StringList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DirParser extends TargetParser {
+public final class DirParser extends Parser {
   /** Number of skipped files to log. */
   private static final int SKIPLOG = 10;
   /** Skipped files. */
   private final StringList skipped = new StringList();
   /** File pattern. */
   private final Pattern filter;
-  /** Properties. */
-  private final Prop prop;
   /** Initial file path. */
   private final String root;
 
@@ -61,21 +59,7 @@ public final class DirParser extends TargetParser {
    * @param path future database path
    */
   public DirParser(final IO source, final Prop pr, final IOFile path) {
-    this(source, "", pr, path);
-  }
-
-  /**
-   * Constructor, specifying a target path.
-   * @param source source path
-   * @param target target path
-   * @param pr database properties
-   * @param path future database path
-   */
-  public DirParser(final IO source, final String target, final Prop pr,
-      final IOFile path) {
-
-    super(source, target);
-    prop = pr;
+    super(source, pr);
     final String parent = source.dir();
     root = parent.endsWith("/") ? parent : parent + '/';
     skipCorrupt = prop.is(Prop.SKIPCORRUPT);
@@ -121,7 +105,7 @@ public final class DirParser extends TargetParser {
         if(l != -1) b.meta.filesize += l;
 
         // use global target as path prefix
-        String targ = trg;
+        String targ = target;
         String path = io.path();
 
         // add relative path without root (prefix) and file name (suffix)
@@ -163,8 +147,8 @@ public final class DirParser extends TargetParser {
                   in = new IOContent(io.read());
                   in.name(io.name());
                 }
-                parser = Parser.fileParser(in, prop, targ);
-                MemBuilder.build("", parser, prop);
+                parser = Parser.singleParser(in, prop, targ);
+                MemBuilder.build("", parser);
               } catch(final IOException ex) {
                 Util.debug(ex.getMessage());
                 skipped.add(io.path());
@@ -174,7 +158,7 @@ public final class DirParser extends TargetParser {
 
             // parse file
             if(ok) {
-              parser = Parser.fileParser(in, prop, targ);
+              parser = Parser.singleParser(in, prop, targ);
               parser.parse(b);
             }
             parser = null;

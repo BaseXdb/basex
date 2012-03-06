@@ -2804,7 +2804,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test documentTest() throws QueryException {
-    boolean elem = consume(ELEMENT);
+    final boolean elem = consume(ELEMENT);
     if(!elem && !consume(SCHEMA_ELEMENT)) return null;
 
     wsCheck(PAR1);
@@ -2819,7 +2819,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test elementTest() throws QueryException {
-    QNm name = eQName(null, ctx.sc.nsElem);
+    final QNm name = eQName(null, ctx.sc.nsElem);
     if(name == null && !consume(ASTERISK)) return null;
 
     Type type = null;
@@ -2840,7 +2840,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test schemaTest() throws QueryException {
-    QNm name = eQName(QNAMEINV, ctx.sc.nsElem);
+    final QNm name = eQName(QNAMEINV, ctx.sc.nsElem);
     throw error(SCHEMAINV, name);
   }
 
@@ -2850,7 +2850,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Test attributeTest() throws QueryException {
-    QNm name = eQName(null, null);
+    final QNm name = eQName(null, null);
     if(name == null && !consume(ASTERISK)) return null;
 
     Type type = null;

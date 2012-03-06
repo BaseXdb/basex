@@ -88,4 +88,6 @@ public interface HTTPText {
 
   /** Multipart string. */
   String MULTIPART = "multipart";
+  /** Payload string. */
+  String PAYLOAD = "payload";
 }

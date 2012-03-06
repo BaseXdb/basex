@@ -67,8 +67,8 @@ public enum NodeType implements Type {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
       if(o instanceof Document) {
         try {
-          final DOMWrapper p = new DOMWrapper((Document) o, "");
-          return new DBNode(MemBuilder.build(p, new Prop()));
+          final DOMWrapper p = new DOMWrapper((Document) o, "", new Prop());
+          return new DBNode(MemBuilder.build(p));
         } catch(final IOException ex) {
           UNDOC.thrw(ii, ex);
         }

@@ -131,9 +131,7 @@ public abstract class Main {
    * @param info verbose flag
    * @throws IOException I/O exception
    */
-  protected final void execute(final Command cmd, final boolean info)
-      throws IOException {
-
+  protected final void execute(final Command cmd, final boolean info) throws IOException {
     final Session ss = session();
     ss.execute(cmd);
     if(newline && cmd instanceof XQuery) out.write(token(NL));

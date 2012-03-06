@@ -361,7 +361,17 @@ final class BaseXTextRenderer extends BaseXBack {
       // don't write whitespaces
       if(ch > ' ') {
         g.setColor(color);
-        g.drawString(text.nextWord(), x, y);
+        String n = text.nextWord();
+        int ww = w - x;
+        if(x + wordW > ww) {
+          // shorten string if it cannot be completely shown (saves memory)
+          int c = 0;
+          for(final int nl = n.length(); c < nl && ww > 0; c++) {
+            ww -= charW(g, n.charAt(c));
+          }
+          n = n.substring(0, c);
+        }
+        g.drawString(n, x, y);
       } else if(ch <= TokenBuilder.MARK) {
         g.setFont(font);
       }

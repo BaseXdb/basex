@@ -7,6 +7,7 @@ import org.basex.data.FTMatches;
 import org.basex.index.Index;
 import org.basex.index.IndexCache;
 import org.basex.io.random.DataAccess;
+import org.basex.util.hash.*;
 import org.basex.util.list.IntList;
 
 /**
@@ -18,6 +19,8 @@ import org.basex.util.list.IntList;
 public abstract class FTIndex implements Index {
   /** Cache for number of hits and data reference per token. */
   final IndexCache cache = new IndexCache();
+  /** Cached texts. Increases used memory, but speeds up repeated queries. */
+  final IntMap<byte[]> ctext = new IntMap<byte[]>();
   /** Data reference. */
   final Data data;
   /** Scoring mode. 1 = document based, 2 = text-node based .*/

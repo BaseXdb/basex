@@ -371,7 +371,6 @@ public final class GUI extends AGUI {
       Performance.sleep(50);
       if(threadID != thread) return true;
     }
-
     cursor(CURSORWAIT);
 
     boolean ok = true;
@@ -419,8 +418,7 @@ public final class GUI extends AGUI {
       // sends feedback to the query editor
       final boolean interrupted = inf.startsWith(INTERRUPTED);
       if(edit) {
-        editor.info(interrupted ? INTERRUPTED : ok ? OK : inf,
-                ok || interrupted);
+        editor.info(interrupted ? INTERRUPTED : ok ? OK : inf, ok || interrupted);
       }
 
       // check if query feedback was evaluated in the query view
@@ -453,6 +451,7 @@ public final class GUI extends AGUI {
           notify.update();
         } else if(result != null) {
           final Nodes nd = context.current();
+          // check if result has changed
           final boolean flt = gprop.is(GUIProp.FILTERRT);
           if(flt || nd != null && !nd.sameAs(current)) {
             // refresh context if at least one node was found
@@ -475,7 +474,7 @@ public final class GUI extends AGUI {
           }
         }
         // show number of hits
-        setResults(result == null ? 0 : result.size());
+        if(!interrupted) setResults(result == null ? 0 : result.size());
 
         // show status info
         status.setText(Util.info(TIME_NEEDED_X, time));
@@ -633,7 +632,9 @@ public final class GUI extends AGUI {
    * @param n number of results
    */
   private void setResults(final long n) {
-    hits.setText(Util.info(RESULTS_X, n));
+    int mh = context.prop.num(Prop.MAXHITS);
+    if(mh < 0) mh = Integer.MAX_VALUE;
+    hits.setText(Util.info(RESULTS_X, (n >= mh ? "\u2265" : "") + n));
   }
 
   /**

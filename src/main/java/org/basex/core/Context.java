@@ -133,8 +133,7 @@ public final class Context {
   public Nodes current() {
     if(current == null && data != null) {
       final Resources res = data.resources;
-      current = new Nodes(
-          (path == null ? res.docs() : res.docs(path)).toArray(), data);
+      current = new Nodes((path == null ? res.docs() : res.docs(path)).toArray(), data);
       current.root = path == null;
     }
     return current;

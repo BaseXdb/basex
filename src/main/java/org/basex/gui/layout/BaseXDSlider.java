@@ -55,13 +55,14 @@ public final class BaseXDSlider extends BaseXPanel {
 
   /**
    * Constructor.
-   * @param main reference to the main window
    * @param mn min value
    * @param mx max value
+   * @param main reference to the main window
    * @param list listener
    */
-  public BaseXDSlider(final Window main, final double mn, final double mx,
+  public BaseXDSlider(final double mn, final double mx, final Window main,
       final ActionListener list) {
+
     super(main);
     listener = list;
     totMin = mn;

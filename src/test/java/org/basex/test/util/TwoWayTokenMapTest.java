@@ -42,7 +42,7 @@ public final class TwoWayTokenMapTest {
       map.add("Test");
       // shouldn't be executed:
       fail("May not insert value twice, Exception should have been thrown!");
-    } catch (IllegalArgumentException e) { }
+    } catch (final IllegalArgumentException e) { }
 
     // Check Keys
     assertEquals(0, map.getKey("Test0"));
@@ -61,7 +61,7 @@ public final class TwoWayTokenMapTest {
         // shouldn't be executed:
         fail("No Key for value, Exception should have been thrown!");
       }
-    } catch (IndexOutOfBoundsException e) { }
+    } catch (final IndexOutOfBoundsException e) { }
 
     // Update values
     map.set(0, token("Test-updated"));
@@ -84,7 +84,7 @@ public final class TwoWayTokenMapTest {
       map.push(token("Stack1"));
       // shouldn't be executed:
       fail("May not insert value twice, Exception should have been thrown!");
-    } catch (IllegalArgumentException e) { }
+    } catch (final IllegalArgumentException e) { }
   }
 
 }

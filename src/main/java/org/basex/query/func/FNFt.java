@@ -93,9 +93,7 @@ public final class FNFt extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter mark(final QueryContext ctx, final boolean ex)
-      throws QueryException {
-
+  private Iter mark(final QueryContext ctx, final boolean ex) throws QueryException {
     byte[] m = MARK;
     int l = ex ? 150 : Integer.MAX_VALUE;
 

@@ -113,14 +113,11 @@ public final class GUIProp extends AProp {
   public static final Object[] PLOTYLOG = { "PLOTYLOG", false };
 
   /** Dialog location. */
-  public static final Object[] MAPLAYOUTLOC =
-    { "MAPLAYOUTLOC", new int[] { 790, 520 } };
+  public static final Object[] MAPLAYOUTLOC = { "MAPLAYOUTLOC", new int[] { 790, 520 } };
   /** Dialog location. */
-  public static final Object[] FONTSLOC =
-    { "FONTSLOC", new int[] { 10, 530 } };
+  public static final Object[] FONTSLOC = { "FONTSLOC", new int[] { 10, 530 } };
   /** Dialog location. */
-  public static final Object[] COLORSLOC =
-    { "COLORSLOC", new int[] { 530, 620 } };
+  public static final Object[] COLORSLOC = { "COLORSLOC", new int[] { 530, 620 } };
 
   /** Path for creating new databases. */
   public static final Object[] CREATEPATH = { "CREATEPATH", Prop.HOME };
@@ -156,6 +153,8 @@ public final class GUIProp extends AProp {
 
   /** Maximum text size to be displayed. */
   public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
+  /** Maximum number of hits to be displayed (-1: return all hits; default: 250K). */
+  public static final Object[] MAXHITS = { "MAXHITS", 250000 };
 
   /**
    * Constructor.
