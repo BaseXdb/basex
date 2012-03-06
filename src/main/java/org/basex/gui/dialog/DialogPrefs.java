@@ -21,6 +21,11 @@ import org.basex.io.*;
  */
 public final class DialogPrefs extends Dialog {
   /** Information on available languages. */
+  private static final int[] HITS = {
+    10, 25, 100, 250, 1000, 2500, 10000, 25000, 100000, 250000, 1000000, -1
+  };
+
+  /** Information on available languages. */
   private static final String[][] LANGS = Lang.parse();
 
   /** Directory path. */
@@ -42,6 +47,8 @@ public final class DialogPrefs extends Dialog {
   private final BaseXCheckBox simpfd;
   /** Simple file dialog checkbox. */
   private final BaseXCheckBox javalook;
+  /** Old value for show names flag. */
+  private final boolean oldShowNames;
 
   /**
    * Default constructor.
@@ -88,15 +95,16 @@ public final class DialogPrefs extends Dialog {
     pp.add(simpfd);
 
     // enable only if current document contains name attributes
-    names = new BaseXCheckBox(SHOW_NAME_ATTS, gprop.is(GUIProp.SHOWNAME), 6, this);
+    final boolean sn = gprop.is(GUIProp.SHOWNAME);
+    names = new BaseXCheckBox(SHOW_NAME_ATTS, sn, 6, this);
     final Data data = gui.context.data();
     names.setEnabled(data != null && data.nameID != 0);
+    oldShowNames = sn;
     pp.add(names);
 
     // maximum number of hits to be displayed
-    int mh = gui.gprop.num(Prop.MAXHITS);
-    mh = mh == -1 ? 6 : Math.min(6, (int) Math.log10(Math.max(10, mh)) - 1);
-    limit = new BaseXSlider(0, 6, mh, this, new ActionListener() {
+    final int mh = hitsForSlider();
+    limit = new BaseXSlider(0, HITS.length - 1, mh, this, new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) { action(limit); }
     });
@@ -126,39 +134,66 @@ public final class DialogPrefs extends Dialog {
   @Override
   public void action(final Object cmp) {
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem().toString()));
-    final int mh = maxHits();
-    label.setText(mh == -1 ? ALL : Integer.toString(mh));
-    if(cmp == names) gui.notify.layout();
+
+    if(cmp == names) {
+      gui.gprop.set(GUIProp.SHOWNAME, names.isSelected());
+      gui.notify.layout();
+    } else if(cmp == label) {
+      final int mh = hitsAsProperty();
+      label.setText(mh == -1 ? ALL : Integer.toString(mh));
+    }
   }
 
   @Override
   public void close() {
     final MainProp mprop = gui.context.mprop;
     mprop.set(MainProp.LANG, lang.getSelectedItem().toString());
+
     // new database path: close existing database
     final String dbpath = path.getText();
     if(!mprop.get(MainProp.DBPATH).equals(dbpath)) gui.execute(new Close());
     mprop.set(MainProp.DBPATH, dbpath);
     mprop.write();
+
+    final int mh = hitsAsProperty();
+    gui.context.prop.set(Prop.MAXHITS, mh);
+
     final GUIProp gprop = gui.gprop;
     gprop.set(GUIProp.MOUSEFOCUS, focus.isSelected());
-    gprop.set(GUIProp.SHOWNAME, names.isSelected());
     gprop.set(GUIProp.SIMPLEFD, simpfd.isSelected());
     gprop.set(GUIProp.JAVALOOK, javalook.isSelected());
-    final int mh = maxHits();
     gprop.set(GUIProp.MAXHITS, mh);
     gprop.write();
-    gui.context.prop.set(Prop.MAXHITS, mh);
     dispose();
+  }
+
+  @Override
+  public void cancel() {
+    final boolean sn = gui.gprop.is(GUIProp.SHOWNAME);
+    gui.gprop.set(GUIProp.SHOWNAME, oldShowNames);
+    if(sn != oldShowNames) gui.notify.layout();
+    super.cancel();
   }
 
   /**
    * Returns the selected maximum number of hits.
    * @return maximum number of hits
    */
-  private int maxHits() {
-    final int mh = limit.value();
-    return mh == 6 ? -1 : (int) Math.pow(10, mh + 1);
+  private int hitsAsProperty() {
+    return HITS[limit.value()];
+  }
+
+  /**
+   * Returns the selected maximum number of hits.
+   * @return maximum number of hits
+   */
+  private int hitsForSlider() {
+    int mh = gui.gprop.num(Prop.MAXHITS);
+    if(mh == -1) mh = Integer.MAX_VALUE;
+    final int hl = HITS.length - 1;
+    int h = -1;
+    while(++h < hl && HITS[h] < mh);
+    return h;
   }
 
   /**

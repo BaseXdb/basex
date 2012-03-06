@@ -256,7 +256,7 @@ public final class QueryContext extends Progress {
     try {
       final Value v = value(root);
       if(updating) {
-        updates.applyUpdates();
+        updates.apply();
         if(context.data() != null) context.update();
       }
       return v;
@@ -273,9 +273,9 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   Result execute() throws QueryException {
-    // GUI: maximum number of hits to be returned
-    int maxhits = context.prop.num(Prop.MAXHITS);
-    if(!Prop.gui || maxhits < 0) maxhits = Integer.MAX_VALUE;
+    // GUI: limit number of hits to be returned and displayed
+    int max = context.prop.num(Prop.MAXHITS);
+    if(!Prop.gui || max < 0) max = Integer.MAX_VALUE;
 
     // evaluates the query
     final Iter ir = iter();
@@ -286,14 +286,14 @@ public final class QueryContext extends Progress {
     if(serProp == null && nodes != null) {
       final IntList pre = new IntList();
 
-      while(pre.size() < maxhits && (it = ir.next()) != null) {
+      while((it = ir.next()) != null) {
         checkStop();
         if(!(it instanceof DBNode) || it.data() != nodes.data) break;
-        pre.add(((DBNode) it).pre);
+        if(pre.size() < max) pre.add(((DBNode) it).pre);
       }
 
       final int ps = pre.size();
-      if(it == null || ps == maxhits) {
+      if(it == null || ps == max) {
         // all nodes have been processed: return GUI-friendly nodeset
         return ps == 0 ? ic : new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
       }
@@ -304,9 +304,9 @@ public final class QueryContext extends Progress {
     }
 
     // use standard iterator
-    while(ic.size() < maxhits && (it = ir.next()) != null) {
+    while((it = ir.next()) != null) {
       checkStop();
-      ic.add(it);
+      if(ic.size() < max) ic.add(it);
     }
     return ic;
   }

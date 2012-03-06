@@ -93,7 +93,7 @@ public final class Transform extends Arr {
       final ContextModifier tmp = ctx.updates.mod;
       ctx.updates.mod = pu;
       ctx.value(expr[0]);
-      ctx.updates.applyUpdates();
+      ctx.updates.apply();
       ctx.updates.mod = tmp;
 
       return ctx.value(expr[1]);
