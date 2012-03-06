@@ -150,10 +150,7 @@ final class RestXqModule {
     final Value result = bfc.comp(qc).value(qc);
 
     // execute updates
-    if(qc.updating()) {
-      qc.updates.applyUpdates();
-      if(qc.data() != null) qc.context.update();
-    }
+    if(qc.updating()) qc.updates.apply();
 
     // [CG] RestXq: what happens if a method specified more methods than HEAD?
     if(rxf.methods.size() == 1 && rxf.methods.contains(HTTPMethod.HEAD)) {
