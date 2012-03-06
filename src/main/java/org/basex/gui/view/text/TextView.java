@@ -152,8 +152,7 @@ public final class TextView extends View implements ActionListener {
     ns = n;
     if(!visible()) return;
     try {
-      final ArrayOutput ao =
-        new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
+      final ArrayOutput ao = new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
       if(n != null) n.serialize(Serializer.get(ao));
       setText(ao, null);
       refresh = false;

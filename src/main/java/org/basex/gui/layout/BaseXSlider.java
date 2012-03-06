@@ -1,9 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -20,6 +18,8 @@ import org.basex.gui.dialog.Dialog;
  * @author Christian Gruen
  */
 public final class BaseXSlider extends BaseXPanel {
+  /** Default width of slider. */
+  private static final int DWIDTH = 120;
   /** Slider width. */
   private static final double SLIDERW = 20;
   /** Listener. */
@@ -28,9 +28,9 @@ public final class BaseXSlider extends BaseXPanel {
   private final int min;
   /** Maximum slider value. */
   private final int max;
-
   /** Listener. */
-  private ActionListener al;
+  private final ActionListener al;
+
   /** Current slider value. */
   private int curr;
   /** Current slider value. */
@@ -43,13 +43,10 @@ public final class BaseXSlider extends BaseXPanel {
    * @param mn min value
    * @param mx max value
    * @param i initial value
-   * @param list listener
-   * @param w reference to the main window
+   * @param w parent window
    */
-  public BaseXSlider(final ActionListener list, final int mn, final int mx,
-      final int i, final Window w) {
-    this(mn, mx, i, w);
-    al = list;
+  public BaseXSlider(final int mn, final int mx, final int i, final Window w) {
+    this(mn, mx, i, w, null);
   }
 
   /**
@@ -57,18 +54,21 @@ public final class BaseXSlider extends BaseXPanel {
    * @param mn min value
    * @param mx max value
    * @param i initial value
-   * @param w parent window
+   * @param w reference to the main window
+   * @param list listener
    */
-  public BaseXSlider(final int mn, final int mx, final int i, final Window w) {
+  public BaseXSlider(final int mn, final int mx, final int i, final Window w,
+      final ActionListener list) {
+
     super(w);
     min = mn;
     max = mx;
     curr = i;
     dl = w instanceof Dialog ? (Dialog) w : null;
+    al = list;
     mode(Fill.NONE).setFocusable(true);
 
-    BaseXLayout.setHeight(this, getFont().getSize() + 3);
-
+    setPreferredSize(new Dimension(DWIDTH, getFont().getSize() + 3));
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
@@ -110,17 +110,16 @@ public final class BaseXSlider extends BaseXPanel {
     final int hh = h / 2;
 
     g.setColor(hasFocus() ? Color.white : GUIConstants.LGRAY);
-    g.fillRect(0, hh - 2, w, 4);
+    g.fillRect(0, hh - 3, w, 4);
     g.setColor(Color.black);
-    g.drawLine(0, hh - 2, w, hh - 2);
-    g.drawLine(0, hh - 2, 0, hh + 2);
+    g.drawLine(0, hh - 3, w, hh - 3);
+    g.drawLine(0, hh - 3, 0, hh + 2);
     g.setColor(GUIConstants.GRAY);
-    g.drawLine(w - 1, hh - 2, w - 1, hh + 2);
+    g.drawLine(w - 1, hh - 3, w - 1, hh + 2);
     g.drawLine(0, hh + 2, w, hh + 2);
 
     final double x = (curr - min) * (w - SLIDERW) / (max - min);
-    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 5, hh + 5,
-        oldCurr != -1);
+    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 6, hh + 6, oldCurr != -1);
   }
 
   @Override

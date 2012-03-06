@@ -37,16 +37,15 @@ public final class Prop extends AProp {
   public static final boolean WIN = OS.startsWith("WIN");
 
   /** User home directory. */
-  public static final String USERHOME =
-      System.getProperty("user.home") + File.separator;
+  public static final String USERHOME = System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */
   public static final String HOME = Util.homeDir();
   /** Default language. */
   public static final String LANG = "English";
 
   /** Property information. */
-  static final String PROPHEADER = "# Property File." + NL
-      + "# You can set additional options at the end of the file." + NL;
+  static final String PROPHEADER = "# Property File." + NL +
+      "# You can set additional options at the end of the file." + NL;
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 
@@ -154,6 +153,9 @@ public final class Prop extends AProp {
   public static final Object[] DOTDISPLAY = { "DOTDISPLAY", true };
   /** Path to dotty. */
   public static final Object[] DOTTY = { "DOTTY", "dotty" };
+
+  /** Maximum number of hits to be displayed in the GUI (will be overwritten). */
+  public static final Object[] MAXHITS = { "MAXHITS", -1 };
 
   // STATIC PROPERTIES ========================================================
 

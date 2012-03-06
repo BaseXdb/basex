@@ -65,8 +65,9 @@ public final class BaseXGUI {
     }
 
     // read properties
-    context.prop.set(Prop.CACHEQUERY, true);
     final GUIProp gprop = new GUIProp();
+    context.prop.set(Prop.CACHEQUERY, true);
+    context.prop.set(Prop.MAXHITS, gprop.num(GUIProp.MAXHITS));
     GUIConstants.init(gprop);
 
     SwingUtilities.invokeLater(new Runnable() {

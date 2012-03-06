@@ -86,10 +86,10 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public boolean sameAs(final Result v) {
+  public boolean sameAs(final Result r) {
     final int s = list.length;
-    if(!(v instanceof Nodes) || v.size() != s) return false;
-    final Nodes n = (Nodes) v;
+    if(!(r instanceof Nodes) || r.size() != s) return false;
+    final Nodes n = (Nodes) r;
     if(data != n.data) return false;
     for(int c = 0; c < s; ++c) if(n.list[c] != list[c]) return false;
     return ftpos == null || ftpos.sameAs(n.ftpos);

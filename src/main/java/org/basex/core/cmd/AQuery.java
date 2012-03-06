@@ -202,7 +202,9 @@ abstract class AQuery extends Command {
 
   @Override
   public final Result result() {
-    return result;
+    final Result r = result;
+    result = null;
+    return r;
   }
 
   /**

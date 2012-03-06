@@ -179,8 +179,7 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value) throws QueryException {
-    ctx.ctxItem = value instanceof Expr ? (Expr) value :
-      JavaMapping.toValue(value);
+    ctx.ctxItem = value instanceof Expr ? (Expr) value : JavaMapping.toValue(value);
     return this;
   }
 
@@ -208,8 +207,8 @@ public final class QueryProcessor extends Progress {
    * @throws IOException query exception
    * @throws QueryException query exception
    */
-  public Serializer getSerializer(final OutputStream os) throws IOException,
-      QueryException {
+  public Serializer getSerializer(final OutputStream os)
+      throws IOException, QueryException {
 
     compile();
     try {

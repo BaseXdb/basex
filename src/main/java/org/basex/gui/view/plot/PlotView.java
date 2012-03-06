@@ -131,13 +131,14 @@ public final class PlotView extends View {
         refreshUpdate();
       }
     });
-    dots = new BaseXSlider(new ActionListener() {
+    dots = new BaseXSlider(-6, 6, gui.gprop.num(GUIProp.PLOTDOTS), gui,
+        new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         gui.gprop.set(GUIProp.PLOTDOTS, dots.value());
         refreshLayout();
       }
-    }, -6, 6, gui.gprop.num(GUIProp.PLOTDOTS), gui);
+    });
     BaseXLayout.setWidth(dots, 40);
     yLog = new BaseXCheckBox(PLOTLOG, false, gui);
     yLog.setSelected(gui.gprop.is(GUIProp.PLOTYLOG));

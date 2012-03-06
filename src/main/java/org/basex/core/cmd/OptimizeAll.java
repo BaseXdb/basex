@@ -76,7 +76,7 @@ public final class OptimizeAll extends ACreate {
 
   @Override
   public void build(final CommandBuilder cb) {
-    cb.init(Cmd.OPTIMIZE + " " + ALL);
+    cb.init(Cmd.OPTIMIZE + " " + C_ALL);
   }
 
   /**

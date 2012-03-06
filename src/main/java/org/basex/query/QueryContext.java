@@ -76,11 +76,9 @@ public final class QueryContext extends Progress {
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
   /** Query options (are valid during query execution). */
-  public final HashMap<String, String> dbOptions =
-      new HashMap<String, String>();
+  public final HashMap<String, String> dbOptions = new HashMap<String, String>();
   /** Global options (will be set after query execution). */
-  public final HashMap<String, Object> globalOpt =
-      new HashMap<String, Object>();
+  public final HashMap<String, Object> globalOpt = new HashMap<String, Object>();
 
   /** Root expression of the query. */
   public Expr root;
@@ -275,26 +273,30 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   Result execute() throws QueryException {
+    // GUI: maximum number of hits to be returned
+    int maxhits = context.prop.num(Prop.MAXHITS);
+    if(!Prop.gui || maxhits < 0) maxhits = Integer.MAX_VALUE;
+
     // evaluates the query
     final Iter ir = iter();
     final ItemCache ic = new ItemCache();
-    Item it;
+    Item it = null;
 
     // check if all results belong to the database of the input context
     if(serProp == null && nodes != null) {
       final IntList pre = new IntList();
 
-      while((it = ir.next()) != null) {
+      while(pre.size() < maxhits && (it = ir.next()) != null) {
         checkStop();
-        if(!(it instanceof DBNode)) break;
-        if(it.data() != nodes.data) break;
+        if(!(it instanceof DBNode) || it.data() != nodes.data) break;
         pre.add(((DBNode) it).pre);
       }
 
-      // completed... return standard nodeset with full-text positions
       final int ps = pre.size();
-      if(it == null) return ps == 0 ? ic :
-          new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
+      if(it == null || ps == maxhits) {
+        // all nodes have been processed: return GUI-friendly nodeset
+        return ps == 0 ? ic : new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
+      }
 
       // otherwise, add nodes to standard iterator
       for(int p = 0; p < ps; ++p) ic.add(new DBNode(nodes.data, pre.get(p)));
@@ -302,7 +304,7 @@ public final class QueryContext extends Progress {
     }
 
     // use standard iterator
-    while((it = ir.next()) != null) {
+    while(ic.size() < maxhits && (it = ir.next()) != null) {
       checkStop();
       ic.add(it);
     }

@@ -93,6 +93,6 @@ public final class Grant extends AUser {
 
   @Override
   public void build(final CommandBuilder cb) {
-    cb.init().arg(0).arg(ON, 2).arg(TO, 1);
+    cb.init().arg(0).arg(ON, 2).arg(C_TO, 1);
   }
 }

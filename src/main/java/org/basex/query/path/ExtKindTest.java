@@ -14,7 +14,7 @@ public class ExtKindTest extends Test {
   /** Type name. */
   private final Type ext;
   /** Strip flag (would be more relevant if XMLSchema was supported). */
-  private boolean strip;
+  private final boolean strip;
 
   /**
    * Constructor.

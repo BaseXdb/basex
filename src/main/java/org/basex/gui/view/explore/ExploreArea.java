@@ -166,7 +166,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   private void addSlider(final double min, final double max, final int pos,
       final boolean itr) {
-    final BaseXDSlider sl = new BaseXDSlider(gui, min, max, this);
+    final BaseXDSlider sl = new BaseXDSlider(min, max, gui, this);
     BaseXLayout.setWidth(sl, COMPW + BaseXDSlider.LABELW);
     sl.itr = itr;
     sl.addKeyListener(main);
