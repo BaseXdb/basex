@@ -69,6 +69,8 @@ import org.basex.util.list.TokenList;
  * @author Dimitar Popov
  */
 public final class FNDb extends StandardFunc {
+  /** Date format used for xs:dateTime generation. */
+  public static final SimpleDateFormat DATE_FORMAT;
   /** Resource element name. */
   static final QNm SYSTEM = new QNm("system");
   /** Resource element name. */
@@ -89,8 +91,7 @@ public final class FNDb extends StandardFunc {
   static final QNm MDATE = new QNm("modified-date");
   /** MIME type application/xml. */
   static final byte[] APP_XML = token(MimeTypes.APP_XML);
-  /** Date format used for xs:dateTime generation */
-  public static final SimpleDateFormat DATE_FORMAT;
+
   static {
     DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));

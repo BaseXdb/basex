@@ -3,28 +3,16 @@ package org.basex.test.query.func;
 import static org.basex.core.Text.*;
 import static org.basex.query.func.Function.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateIndex;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.DropIndex;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.MimeTypes;
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.*;
+import org.basex.query.func.*;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the XQuery database functions prefixed with "db".
@@ -41,12 +29,6 @@ public final class FNDbTest extends AdvancedQueryTest {
   private static final String FLDR = "src/test/resources/dir";
   /** Number of XML files for folder. */
   private static final int NFLDR;
-
-  private static final SimpleDateFormat MODIFIED_DATE_FORMAT;
-  static {
-    MODIFIED_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    MODIFIED_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-  }
 
   static {
     int fc = 0;
@@ -192,14 +174,16 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String xmlCall = _DB_LIST_DETAILS.args(DB, "xml");
     query(xmlCall + "/@raw/data()", "false");
     query(xmlCall + "/@content-type/data()", MimeTypes.APP_XML);
-    query(xmlCall + "/@modified-date/xs:dateTime(.)", MODIFIED_DATE_FORMAT.format(new Date(CONTEXT.data().meta.time)));
+    query(xmlCall + "/@modified-date/xs:dateTime(.)",
+        FNDb.DATE_FORMAT.format(new Date(CONTEXT.data().meta.time)));
     query(xmlCall + "/@size/data()", "");
     query(xmlCall + "/text()", "xml");
 
     final String rawCall = _DB_LIST_DETAILS.args(DB, "raw");
     query(rawCall + "/@raw/data()", "true");
     query(rawCall + "/@content-type/data()", MimeTypes.APP_OCTET);
-    query(rawCall + "/@modified-date/xs:dateTime(.) > xs:dateTime('1971-01-01T00:00:01')", "true");
+    query(rawCall + "/@modified-date/xs:dateTime(.) > " +
+        "xs:dateTime('1971-01-01T00:00:01')", "true");
     query(rawCall + "/@size/data()", "3");
     query(rawCall + "/text()", "raw");
 
