@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
+import org.basex.core.*;
 
 /**
  * This class serves as a simple filesystem parser and creates an XML
@@ -32,9 +33,10 @@ public final class SimpleFSParser extends Parser {
   /**
    * Constructor.
    * @param path file path
+   * @param pr database properties
    */
-  public SimpleFSParser(final String path) {
-    super(path);
+  public SimpleFSParser(final String path, final Prop pr) {
+    super(path, pr);
   }
 
   @Override

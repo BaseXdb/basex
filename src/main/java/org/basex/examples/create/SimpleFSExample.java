@@ -35,7 +35,7 @@ public final class SimpleFSExample {
     final String path = ".";
     final String name = "fsexample";
 
-    final Parser parser = new SimpleFSParser(path);
+    final Parser parser = new SimpleFSParser(path, ctx.prop);
     new Create(parser, name).execute(ctx);
 
     System.out.println("\n* Number of created elements:");
