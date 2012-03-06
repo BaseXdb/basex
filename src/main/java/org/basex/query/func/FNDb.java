@@ -5,7 +5,9 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -87,6 +89,12 @@ public final class FNDb extends StandardFunc {
   static final QNm MDATE = new QNm("modified-date");
   /** MIME type application/xml. */
   static final byte[] APP_XML = token(MimeTypes.APP_XML);
+  /** Date format used for xs:dateTime generation */
+  public static final SimpleDateFormat DATE_FORMAT;
+  static {
+    DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+  }
 
   /**
    * Constructor.
@@ -332,7 +340,7 @@ public final class FNDb extends StandardFunc {
           di = new DataInput(meta.dbfile(DATAINF));
           meta.read(di);
           res.add(new FAttr(RESOURCES, token(meta.ndocs)));
-          final String tstamp = InfoDB.DATE.format(new Date(meta.dbtime()));
+          final String tstamp = DATE_FORMAT.format(new Date(meta.dbtime()));
           res.add(new FAttr(MDATE, token(tstamp)));
           if(ctx.context.perm(User.CREATE, meta))
             res.add(new FAttr(PATH, token(meta.original)));
@@ -428,11 +436,12 @@ public final class FNDb extends StandardFunc {
   static FNode resource(final byte[] path, final boolean raw,
       final long size, final byte[] ctype, final long mdate) {
 
+    final String tstamp = DATE_FORMAT.format(new Date(mdate));
     final FElem res = new FElem(RESOURCE).
         add(new FTxt(path)).
         add(new FAttr(RAW, token(raw))).
         add(new FAttr(CTYPE, ctype)).
-        add(new FAttr(MDATE, token(mdate)));
+        add(new FAttr(MDATE, token(tstamp)));
     return raw ? res.add(new FAttr(SIZE, token(size))) : res;
   }
 
