@@ -153,8 +153,8 @@ public final class GUIProp extends AProp {
 
   /** Maximum text size to be displayed. */
   public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
-  /** Maximum number of hits to be displayed (-1: return all hits; default: 1M). */
-  public static final Object[] MAXHITS = { "MAXHITS", 1000000 };
+  /** Maximum number of hits to be displayed (-1: return all hits; default: 250K). */
+  public static final Object[] MAXHITS = { "MAXHITS", 250000 };
 
   /**
    * Constructor.

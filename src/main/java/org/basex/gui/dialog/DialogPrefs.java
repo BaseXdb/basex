@@ -21,6 +21,11 @@ import org.basex.io.*;
  */
 public final class DialogPrefs extends Dialog {
   /** Information on available languages. */
+  private static final int[] HITS = {
+    10, 25, 100, 250, 1000, 2500, 10000, 25000, 100000, 250000, 1000000, -1
+  };
+
+  /** Information on available languages. */
   private static final String[][] LANGS = Lang.parse();
 
   /** Directory path. */
@@ -94,9 +99,8 @@ public final class DialogPrefs extends Dialog {
     pp.add(names);
 
     // maximum number of hits to be displayed
-    int mh = gui.gprop.num(Prop.MAXHITS);
-    mh = mh == -1 ? 6 : Math.min(6, (int) Math.log10(Math.max(10, mh)) - 1);
-    limit = new BaseXSlider(0, 6, mh, this, new ActionListener() {
+    final int mh = hitsForSlider();
+    limit = new BaseXSlider(0, HITS.length - 1, mh, this, new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) { action(limit); }
     });
@@ -126,7 +130,7 @@ public final class DialogPrefs extends Dialog {
   @Override
   public void action(final Object cmp) {
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem().toString()));
-    final int mh = maxHits();
+    final int mh = hitsAsProperty();
     label.setText(mh == -1 ? ALL : Integer.toString(mh));
     if(cmp == names) gui.notify.layout();
   }
@@ -145,7 +149,7 @@ public final class DialogPrefs extends Dialog {
     gprop.set(GUIProp.SHOWNAME, names.isSelected());
     gprop.set(GUIProp.SIMPLEFD, simpfd.isSelected());
     gprop.set(GUIProp.JAVALOOK, javalook.isSelected());
-    final int mh = maxHits();
+    final int mh = hitsAsProperty();
     gprop.set(GUIProp.MAXHITS, mh);
     gprop.write();
     gui.context.prop.set(Prop.MAXHITS, mh);
@@ -156,9 +160,21 @@ public final class DialogPrefs extends Dialog {
    * Returns the selected maximum number of hits.
    * @return maximum number of hits
    */
-  private int maxHits() {
-    final int mh = limit.value();
-    return mh == 6 ? -1 : (int) Math.pow(10, mh + 1);
+  private int hitsAsProperty() {
+    return HITS[limit.value()];
+  }
+
+  /**
+   * Returns the selected maximum number of hits.
+   * @return maximum number of hits
+   */
+  private int hitsForSlider() {
+    int mh = gui.gprop.num(Prop.MAXHITS);
+    if(mh == -1) mh = Integer.MAX_VALUE;
+    final int hl = HITS.length - 1;
+    int h = -1;
+    while(++h < hl && HITS[h] < mh);
+    return h;
   }
 
   /**
