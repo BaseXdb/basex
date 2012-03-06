@@ -134,7 +134,6 @@ public final class DialogPrefs extends Dialog {
   @Override
   public void action(final Object cmp) {
     creds.setText(TRANSLATION + COLS + creds(lang.getSelectedItem().toString()));
-
     if(cmp == names) {
       gui.gprop.set(GUIProp.SHOWNAME, names.isSelected());
       gui.notify.layout();
@@ -176,7 +175,7 @@ public final class DialogPrefs extends Dialog {
   }
 
   /**
-   * Returns the selected maximum number of hits.
+   * Returns the selected maximum number of hits as property value.
    * @return maximum number of hits
    */
   private int hitsAsProperty() {
@@ -184,7 +183,7 @@ public final class DialogPrefs extends Dialog {
   }
 
   /**
-   * Returns the selected maximum number of hits.
+   * Returns the selected maximum number of hits as slider value.
    * @return maximum number of hits
    */
   private int hitsForSlider() {
