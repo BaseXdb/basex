@@ -70,7 +70,7 @@ public final class MimeTypes {
   /**
    * Checks if the content type is an XML content type.
    * @param type content type
-   * @return result
+   * @return result of check
    */
   public static boolean isXML(final String type) {
     return eq(type, TEXT_XML, TEXT_XML_EXT, APP_XML, APP_EXT_XML) ||
@@ -78,10 +78,19 @@ public final class MimeTypes {
   }
 
   /**
+   * Checks if the main part of the content type is {@code "text"}.
+   * @param type content type
+   * @return result of check
+   */
+  public static boolean isText(final String type) {
+    return type.startsWith(MIME_TEXT_PREFIX);
+  }
+
+  /**
    * Checks if a content type is accepted by the specified pattern.
    * @param type content type
    * @param pattern pattern
-   * @return result
+   * @return result of check
    */
   public static boolean matches(final String type, final String pattern) {
     final String[] t = type.split("/", 2);
@@ -92,8 +101,7 @@ public final class MimeTypes {
   }
 
   /** Hash map containing all assignments. */
-  private static final HashMap<String, String> TYPES =
-      new HashMap<String, String>();
+  private static final HashMap<String, String> TYPES = new HashMap<String, String>();
 
   /** Reads in the mime-types. */
   static {

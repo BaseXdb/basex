@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.core.Progress;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Namespaces;
@@ -35,8 +34,6 @@ public abstract class Builder extends Progress {
   final Namespaces ns = new Namespaces();
   /** Parser instance. */
   final Parser parser;
-  /** Property instance. */
-  final Prop prop;
   /** Database name. */
   final String name;
 
@@ -67,11 +64,9 @@ public abstract class Builder extends Progress {
    * Constructor.
    * @param nm name of database
    * @param parse parser
-   * @param pr properties
    */
-  Builder(final String nm, final Parser parse, final Prop pr) {
+  Builder(final String nm, final Parser parse) {
     parser = parse;
-    prop = pr;
     name = nm;
   }
 

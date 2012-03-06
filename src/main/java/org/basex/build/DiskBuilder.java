@@ -1,24 +1,19 @@
 package org.basex.build;
 
 import static org.basex.data.DataText.*;
-import java.io.IOException;
 
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.core.cmd.DropDB;
-import org.basex.data.Data;
-import org.basex.data.DiskData;
-import org.basex.data.MetaData;
-import org.basex.index.Names;
-import org.basex.io.IO;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
+import org.basex.io.out.*;
 import org.basex.io.out.DataOutput;
-import org.basex.io.out.TableOutput;
-import org.basex.io.random.TableAccess;
-import org.basex.io.random.TableDiskAccess;
-import org.basex.util.Compress;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.io.random.*;
+import org.basex.util.*;
 
 /**
  * This class creates a database instance on disk.
@@ -37,8 +32,6 @@ public final class DiskBuilder extends Builder {
   /** Output stream for temporary values. */
   private DataOutput sout;
 
-  /** Admin properties. */
-  final MainProp mprop;
   /** Database context. */
   final Context context;
   /** Text compressor. */
@@ -51,19 +44,18 @@ public final class DiskBuilder extends Builder {
    * @param ctx database context
    */
   public DiskBuilder(final String nm, final Parser parse, final Context ctx) {
-    super(nm, parse, ctx.prop);
+    super(nm, parse);
     comp = new Compress();
     context = ctx;
-    mprop = ctx.mprop;
   }
 
   @Override
   public DiskData build() throws IOException {
     DropDB.drop(name, context);
-    mprop.dbpath(name).md();
+    context.mprop.dbpath(name).md();
 
     final IO file = parser.src;
-    final MetaData md = new MetaData(name, prop, mprop);
+    final MetaData md = new MetaData(name, context);
     md.original = file != null ? file.path() : "";
     md.filesize = file != null ? file.length() : 0;
     md.time = file != null ? file.timeStamp() : System.currentTimeMillis();

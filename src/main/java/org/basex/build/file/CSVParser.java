@@ -79,25 +79,23 @@ public final class CSVParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param target target path
-   * @param prop database properties
+   * @param pr database properties
    * @throws IOException I/O exception
    */
-  public CSVParser(final IO source, final String target, final Prop prop)
-      throws IOException {
-
-    super(source, target);
+  public CSVParser(final IO source, final Prop pr) throws IOException {
+    super(source, pr);
 
     // set parser properties
-    final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
+    final ParserProp props = new ParserProp(pr.get(Prop.PARSEROPT));
     row = props.is(ParserProp.HEADER) ? 0 : 1;
 
     // set separator
     String s = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
     separator = s.equals(SEPARATORS[0]) ? ',' : s.equals(SEPARATORS[1]) ? ';' :
       s.equals(SEPARATORS[2]) ? '\t' : -1;
-    if(separator == -1) throw new BaseXException(
-        INVALID_VALUE_X_X, ParserProp.SEPARATOR[0], s);
+
+    if(separator == -1) throw new BaseXException(INVALID_VALUE_X_X,
+        ParserProp.SEPARATOR[0], s);
 
     // set XML format
     s = props.get(ParserProp.FORMAT).toLowerCase(Locale.ENGLISH);

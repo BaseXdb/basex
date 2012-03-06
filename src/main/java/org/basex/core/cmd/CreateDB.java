@@ -51,7 +51,7 @@ public final class CreateDB extends ACreate {
     final String name = args[0];
     IO io = null;
 
-    Parser parser = Parser.emptyParser();
+    Parser parser = Parser.emptyParser(context.prop);
     final String format = prop.get(Prop.PARSER);
     if(args.length < 1 || args[1] == null) {
       if(in != null && in.getByteStream() != null) {
@@ -65,7 +65,7 @@ public final class CreateDB extends ACreate {
             final LookupInput li = new LookupInput(is);
             if(li.lookup() != -1) {
               parser = new SAXWrapper(new SAXSource(new InputSource(li)),
-                  name + '.' + format, "", context.prop);
+                  name + '.' + format, context.prop);
             }
           }
         } catch(final IOException ex) {
@@ -103,7 +103,7 @@ public final class CreateDB extends ACreate {
 
     // create main memory database instance
     final Prop prop = ctx.prop;
-    if(prop.is(Prop.MAINMEM)) return MemBuilder.build(name, parser, ctx.prop);
+    if(prop.is(Prop.MAINMEM)) return MemBuilder.build(name, parser);
 
     // database is currently locked by another process
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
@@ -138,7 +138,7 @@ public final class CreateDB extends ACreate {
   public static synchronized MemData mainMem(final Parser parser,
       final Context ctx) throws IOException {
 
-    if(ctx.user.perm(User.CREATE)) return MemBuilder.build(parser, ctx.prop);
+    if(ctx.user.perm(User.CREATE)) return MemBuilder.build(parser);
     throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);
   }
 

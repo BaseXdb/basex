@@ -69,16 +69,13 @@ public final class MAB2Parser extends SingleParser {
   /**
    * Constructor.
    * @param source source data
-   * @param target database target
-   * @param prop database properties
+   * @param pr database properties
    * @throws IOException I/O exception
    */
-  public MAB2Parser(final IO source, final String target, final Prop prop)
-      throws IOException {
-
-    super(source, target);
+  public MAB2Parser(final IO source, final Prop pr) throws IOException {
+    super(source, pr);
     // set parser properties
-    final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
+    final ParserProp props = new ParserProp(pr.get(Prop.PARSEROPT));
     flat = props.is(ParserProp.FLAT);
     input = new DataAccess(new IOFile(source.path()));
   }

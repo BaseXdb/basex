@@ -22,8 +22,7 @@ public final class NewlineInput extends TextInput {
    * @param enc encoding
    * @throws IOException I/O exception
    */
-  public NewlineInput(final InputStream is, final String enc)
-      throws IOException {
+  public NewlineInput(final InputStream is, final String enc) throws IOException {
     super(is);
     if(enc != null) encoding(enc);
   }

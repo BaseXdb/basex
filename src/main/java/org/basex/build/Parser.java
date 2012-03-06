@@ -1,6 +1,9 @@
 package org.basex.build;
 
 import static org.basex.core.Text.*;
+import static org.basex.io.MimeTypes.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.util.Locale;
 import org.basex.build.file.*;
@@ -9,7 +12,9 @@ import org.basex.build.xml.XMLParser;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.DataText;
-import org.basex.io.IO;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.query.item.*;
 import org.basex.util.Atts;
 
 /**
@@ -19,31 +24,33 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 public abstract class Parser extends Progress {
-  /** Empty parser. */
-  private static final Parser DUMMY = new Parser((IO) null) {
-    @Override
-    public void parse(final Builder build) { /* empty */ }
-  };
   /** Source document, or {@code null}. */
   public IO src;
   /** Temporary attribute array.
       To speed up processing, the same instance is used over and over. */
   protected final Atts atts = new Atts();
+  /** Database properties. */
+  protected final Prop prop;
+  /** Target path (empty, or suffixed with a single slash). */
+  protected String target = "";
 
   /**
    * Constructor.
    * @param source document source, or {@code null}
+   * @param pr database properties
    */
-  protected Parser(final String source) {
-    this(source == null ? null : IO.get(source));
+  protected Parser(final String source, final Prop pr) {
+    this(source == null ? null : IO.get(source), pr);
   }
 
   /**
    * Constructor.
    * @param source document source, or {@code null}
+   * @param pr database properties
    */
-  protected Parser(final IO source) {
+  protected Parser(final IO source, final Prop pr) {
     src = source;
+    prop = pr;
   }
 
   /**
@@ -68,70 +75,94 @@ public abstract class Parser extends Progress {
     return "";
   }
 
+  /**
+   * Sets the target path.
+   * @param path target path
+   * @return self reference
+   */
+  public Parser target(final String path) {
+    target = path.isEmpty() ? "" : (path + '/').replaceAll("//+", "/");
+    return this;
+  }
+
   // STATIC METHODS ===========================================================
 
   /**
    * Returns a parser instance for creating empty databases.
+   * @param pr database properties
    * @return parser
    */
-  public static Parser emptyParser() {
-    return DUMMY;
+  public static Parser emptyParser(final Prop pr) {
+    return new Parser((IO) null, pr) {
+      @Override
+      public void parse(final Builder build) { /* empty */ }
+    };
   }
 
   /**
    * Returns an XML parser instance.
-   * @param source input
+   * @param in input source
    * @param prop database properties
    * @return xml parser
    * @throws IOException I/O exception
    */
-  public static SingleParser xmlParser(final IO source, final Prop prop)
+  public static SingleParser xmlParser(final IO in, final Prop prop)
       throws IOException {
-    return xmlParser(source, prop, "");
+    // use internal or default XML parser
+    return prop.is(Prop.INTPARSE) ? new XMLParser(in, prop) : new SAXWrapper(in, prop);
   }
 
   /**
-   * Returns an XML parser instance.
-   * @param source input
+   * Returns a parser instance, based on the current options.
+   * @param in input source
    * @param prop database properties
    * @param target relative path reference
-   * @return xml parser
+   * @return parser
    * @throws IOException I/O exception
    */
-  private static SingleParser xmlParser(final IO source, final Prop prop,
-      final String target) throws IOException {
-
-    // XML: use internal parser
-    if(prop.is(Prop.INTPARSE)) return new XMLParser(source, target, prop);
-    // use default parser
-    return new SAXWrapper(source, target, prop);
-  }
-
-  /**
-   * Returns a file parser instance.
-   * @param source document source
-   * @param prop database properties
-   * @param target relative path reference
-   * @return xml parser
-   * @throws IOException I/O exception
-   */
-  public static SingleParser fileParser(final IO source, final Prop prop,
+  public static SingleParser singleParser(final IO in, final Prop prop,
       final String target) throws IOException {
 
     // use file specific parser
     final String parser = prop.get(Prop.PARSER).toLowerCase(Locale.ENGLISH);
-    if(parser.equals(DataText.M_HTML))
-      return new HTMLParser(source, target, prop);
-    if(parser.equals(DataText.M_TEXT))
-      return new TextParser(source, target, prop);
-    if(parser.equals(DataText.M_MAB2))
-      return new MAB2Parser(source, target, prop);
-    if(parser.equals(DataText.M_JSON))
-      return new JSONParser(source, target, prop);
-    if(parser.equals(DataText.M_CSV))
-      return new CSVParser(source, target, prop);
-    if(parser.equals(DataText.M_XML))
-      return xmlParser(source, prop, target);
-    throw new BuildException(UNKNOWN_PARSER_X, parser);
+    final SingleParser p;
+    if(parser.equals(DataText.M_HTML)) {
+      p = new HTMLParser(in, prop);
+    } else if(parser.equals(DataText.M_TEXT)) {
+      p = new TextParser(in, prop);
+    } else if(parser.equals(DataText.M_MAB2)) {
+      p = new MAB2Parser(in, prop);
+    } else if(parser.equals(DataText.M_JSON)) {
+      p = new JSONParser(in, prop);
+    } else if(parser.equals(DataText.M_CSV)) {
+      p = new CSVParser(in, prop);
+    } else if(parser.equals(DataText.M_XML)) {
+      p = xmlParser(in, prop);
+    } else {
+      throw new BuildException(UNKNOWN_PARSER_X, parser);
+    }
+    p.target(target);
+    return p;
+  }
+
+  /**
+   * Returns an XQuery item for the specified content type.
+   * @param in input source
+   * @param prop database properties
+   * @param type content type (media type)
+   * @return xml parser
+   * @throws IOException I/O exception
+   */
+  public static Item item(final IO in, final Prop prop, final String type)
+      throws IOException {
+
+    final boolean ml = eq(type, APP_JSONML);
+    if(ml || APP_JSON.equals(type))
+      return new DBNode(new JSONParser(in, prop, ParserProp.JSONML[0] + "=" + ml));
+    if(TEXT_CSV.equals(type)) return new DBNode(new CSVParser(in, prop));
+    if(TEXT_HTML.equals(type)) return new DBNode(new HTMLParser(in, prop));
+    if(MimeTypes.isXML(type)) return new DBNode(in, prop);
+    if(MimeTypes.isText(type)) return Str.get(new TextInput(in).content());
+    return new B64(in.read());
   }
 }

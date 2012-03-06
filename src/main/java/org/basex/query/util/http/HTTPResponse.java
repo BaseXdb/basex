@@ -9,7 +9,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.basex.build.file.*;
+import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -170,21 +170,18 @@ public final class HTTPResponse {
    * item: - text content type => string - XML or HTML content type => document
    * node - binary content type => base64Binary.
    * @param p payload
-   * @param c content type
+   * @param ct content type
    * @return interpreted payload
    */
-  private Item interpretPayload(final byte[] p, final String c) {
+  private Item interpretPayload(final byte[] p, final String ct) {
     try {
-      if(MimeTypes.isXML(c)) {
-        return new DBNode(new IOContent(p), prop);
-      }
-      if(c.equals(MimeTypes.TEXT_HTML)) {
-        return new DBNode(new HTMLParser(new IOContent(p), "", prop), prop);
-      }
+      final IOContent io = new IOContent(p);
+      io.name(PAYLOAD + IO.XMLSUFFIX);
+      return Parser.item(io, prop, ct);
     } catch(final IOException ex) {
+      // automagic (to be discussed): return as binary content
       return new B64(p);
     }
-    return c.startsWith(MimeTypes.MIME_TEXT_PREFIX) ? Str.get(p) : new B64(p);
   }
 
   /**

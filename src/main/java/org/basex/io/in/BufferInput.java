@@ -2,20 +2,14 @@ package org.basex.io.in;
 
 import static org.basex.util.Token.*;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.util.Arrays;
-import java.util.zip.ZipInputStream;
+import java.io.*;
+import java.nio.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.zip.*;
 
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.list.ByteList;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * This class uses a byte buffer to speed up input stream processing.
@@ -260,5 +254,21 @@ public class BufferInput extends InputStream {
   public final synchronized void reset() throws IOException {
     if(bmark == -1) throw new IOException("Mark cannot be reset.");
     bpos = bmark;
+  }
+
+  /**
+   * Retrieves and returns the whole text and closes the stream.
+   * @return contents
+   * @throws IOException I/O exception
+   */
+  public byte[] content() throws IOException {
+    // guess input size
+    final ByteList tb = new ByteList();
+    try {
+      for(int ch; (ch = read()) != -1;) tb.add(ch);
+    } finally {
+      close();
+    }
+    return tb.toArray();
   }
 }

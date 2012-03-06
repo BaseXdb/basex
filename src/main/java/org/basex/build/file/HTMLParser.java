@@ -1,22 +1,16 @@
 package org.basex.build.file;
 
 import static org.basex.util.Token.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.lang.reflect.Constructor;
-import org.basex.build.xml.XMLParser;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.in.ArrayInput;
-import org.basex.util.Reflect;
-import org.basex.util.Util;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.basex.build.xml.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.util.*;
+import org.xml.sax.*;
 
 /**
  * This class uses TagSoup to convert HTML input to well-formed XML.
@@ -30,9 +24,8 @@ import org.xml.sax.XMLReader;
  */
 public final class HTMLParser extends XMLParser {
   /** HTML reader. */
-  private static final Class<?> READER = Reflect.find(
-      "org.ccil.cowan.tagsoup.Parser");
-  /** HTML reader. */
+  private static final Class<?> READER = Reflect.find("org.ccil.cowan.tagsoup.Parser");
+  /** HTML writer. */
   private static final Constructor<?> WRITER = Reflect.find(Reflect.find(
       "org.ccil.cowan.tagsoup.XMLWriter"), Writer.class);
 
@@ -47,13 +40,11 @@ public final class HTMLParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param target target path
-   * @param prop database properties
+   * @param pr database properties
    * @throws IOException I/O exception
    */
-  public HTMLParser(final IO source, final String target, final Prop prop)
-      throws IOException {
-    super(toXML(source), target, prop);
+  public HTMLParser(final IO source, final Prop pr) throws IOException {
+    super(toXML(source), pr);
   }
 
   /**
@@ -85,7 +76,7 @@ public final class HTMLParser extends XMLParser {
       }
 
       // define input
-      final InputSource is = new InputSource(new ByteArrayInputStream(content));
+      final InputSource is = new InputSource(new ArrayInput(content));
       is.setEncoding(supported(enc) ? normEncoding(enc, null) : UTF8);
       // define output
       final StringWriter sw = new StringWriter();

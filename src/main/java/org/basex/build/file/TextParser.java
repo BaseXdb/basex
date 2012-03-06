@@ -45,16 +45,13 @@ public final class TextParser extends SingleParser {
   /**
    * Constructor.
    * @param source document source
-   * @param target target path
-   * @param prop database properties
+   * @param pr database properties
    * @throws IOException I/O exception
    */
-  public TextParser(final IO source, final String target, final Prop prop)
-      throws IOException {
-
-    super(source, target);
+  public TextParser(final IO source, final Prop pr) throws IOException {
+    super(source, pr);
     // set parser properties
-    final ParserProp props = new ParserProp(prop.get(Prop.PARSEROPT));
+    final ParserProp props = new ParserProp(pr.get(Prop.PARSEROPT));
     lines = props.is(ParserProp.LINES);
     encoding = props.get(ParserProp.ENCODING);
   }

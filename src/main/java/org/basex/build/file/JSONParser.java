@@ -43,13 +43,23 @@ public final class JSONParser extends XMLParser {
   /**
    * Constructor.
    * @param source document source
-   * @param target target path
-   * @param prop database properties
+   * @param pr database properties
    * @throws IOException I/O exception
    */
-  public JSONParser(final IO source, final String target, final Prop prop)
+  public JSONParser(final IO source, final Prop pr) throws IOException {
+    this(source, pr, pr.get(Prop.PARSEROPT));
+  }
+
+  /**
+   * Constructor.
+   * @param source document source
+   * @param pr database properties
+   * @param options parser options
+   * @throws IOException I/O exception
+   */
+  public JSONParser(final IO source, final Prop pr, final String options)
       throws IOException {
-    super(toXML(source, prop.get(Prop.PARSEROPT)), target, prop);
+    super(toXML(source, options), pr);
   }
 
   /**
@@ -59,9 +69,7 @@ public final class JSONParser extends XMLParser {
    * @return parser
    * @throws IOException I/O exception
    */
-  public static IO toXML(final IO io, final String options)
-    throws IOException {
-
+  public static IO toXML(final IO io, final String options) throws IOException {
     // set parser properties
     final ParserProp props = new ParserProp(options);
     final boolean jsonml = props.is(ParserProp.JSONML);

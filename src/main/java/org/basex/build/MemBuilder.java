@@ -1,7 +1,6 @@
 package org.basex.build;
 
 import java.io.IOException;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.MetaData;
@@ -22,40 +21,35 @@ public final class MemBuilder extends Builder {
    * Constructor.
    * @param nm name of database
    * @param parse parser
-   * @param pr properties
    */
-  public MemBuilder(final String nm, final Parser parse, final Prop pr) {
-    super(nm, parse, pr);
+  public MemBuilder(final String nm, final Parser parse) {
+    super(nm, parse);
   }
 
   /**
    * Builds the main memory database instance without database name.
    * @param parser parser
-   * @param prop properties
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static MemData build(final Parser parser, final Prop prop)
-      throws IOException {
-    return build(parser.src.name(), parser, prop);
+  public static MemData build(final Parser parser) throws IOException {
+    return build(parser.src.name(), parser);
   }
 
   /**
    * Builds a main memory database instance.
    * @param name name of database
    * @param parser parser
-   * @param prop properties
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static MemData build(final String name, final Parser parser,
-      final Prop prop) throws IOException {
-    return new MemBuilder(name, parser, prop).build();
+  public static MemData build(final String name, final Parser parser) throws IOException {
+    return new MemBuilder(name, parser).build();
   }
 
   @Override
   public MemData build() throws IOException {
-    data = new MemData(null, null, path, ns, prop);
+    data = new MemData(null, null, path, ns, parser.prop);
 
     final MetaData md = data.meta;
     md.name = name;

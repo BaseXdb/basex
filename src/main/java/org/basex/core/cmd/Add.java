@@ -85,16 +85,16 @@ public final class Add extends ACreate {
 
     final Data data = context.data();
     final Parser parser;
-
     if(io != null) {
       // set name of document
       if(!name.isEmpty()) io.name(name);
       // get name from io reference
       else if(!(io instanceof IOContent)) name = io.name();
-      parser = new DirParser(io, target, prop, data.meta.path);
+      parser = new DirParser(io, prop, data.meta.path);
     } else {
-      parser = new SAXWrapper(new SAXSource(in), name, target, context.prop);
+      parser = new SAXWrapper(new SAXSource(in), name, context.prop);
     }
+    parser.target(target);
 
     // ensure that the final name is not empty
     if(name.isEmpty()) return error(NAME_INVALID_X, name);
@@ -113,8 +113,7 @@ public final class Add extends ACreate {
 
     // create random database name for disk-based creation
     final String db = large ? context.mprop.random(data.meta.name) : name;
-    build = large ? new DiskBuilder(db, parser, context) :
-      new MemBuilder(db, parser, context.prop);
+    build = large ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
 
     Data tmp = null;
     try {
