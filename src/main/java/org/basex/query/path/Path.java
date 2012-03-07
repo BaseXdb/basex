@@ -47,15 +47,11 @@ public abstract class Path extends ParseExpr {
    * @param path path steps
    * @return class instance
    */
-  public static Path get(final InputInfo ii, final Expr r,
-      final Expr... path) {
-
+  public static Path get(final InputInfo ii, final Expr r, final Expr... path) {
     // check if all steps are axis steps
     boolean axes = true;
     for(final Expr p : path) axes &= p instanceof AxisStep;
-    return axes ?
-        new AxisPath(ii, r, path).finish(null) :
-        new MixedPath(ii, r, path);
+    return axes ? new AxisPath(ii, r, path).finish(null) : new MixedPath(ii, r, path);
   }
 
   @Override

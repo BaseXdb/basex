@@ -175,9 +175,7 @@ public class QueryParser extends InputParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final IO input, final byte[] uri)
-      throws QueryException {
-
+  public final Expr parse(final IO input, final byte[] uri) throws QueryException {
     file = input;
     if(!more()) error(QUERYEMPTY);
 
@@ -197,7 +195,10 @@ public class QueryParser extends InputParser {
     final Expr expr = parse(uri);
     if(more()) {
       if(alter != null) error();
-      error(QUERYEND, rest());
+      final String rest = rest();
+      qp++;
+      if(uri != null) error(MODEXPR, rest);
+      error(QUERYEND, rest);
     }
 
     // completes the parsing step
@@ -226,6 +227,10 @@ public class QueryParser extends InputParser {
       Expr expr = null;
       versionDecl();
       if(u == null) {
+        final int p = qp;
+        if(wsConsumeWs(MODULE, NSPACE, null)) error(MAINMOD);
+        qp = p;
+
         expr = mainModule();
         if(expr == null) {
           if(alter != null) error();
@@ -1726,11 +1731,11 @@ public class QueryParser extends InputParser {
         if(!(st instanceof Context)) add(el, st);
       } while(consume('/'));
     }
+
     // if no location steps have been added, add trailing self::node() step as
     // replacement for context node to bring results in order
-    if(el.size() == 0) {
-      add(el, AxisStep.get(input(), Axis.SELF, Test.NOD));
-    }
+    if(el.size() == 0) add(el, AxisStep.get(input(), Axis.SELF, Test.NOD));
+
     return Path.get(input(), root, el.finish());
   }
 
