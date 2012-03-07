@@ -8,7 +8,6 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
-import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.basex.util.*;
@@ -174,8 +173,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     final String xmlCall = _DB_LIST_DETAILS.args(DB, "xml");
     query(xmlCall + "/@raw/data()", "false");
     query(xmlCall + "/@content-type/data()", MimeTypes.APP_XML);
-    query(xmlCall + "/@modified-date/xs:dateTime(.)",
-        FNDb.DATE_FORMAT.format(new Date(CONTEXT.data().meta.time)));
+    query(xmlCall + "/@modified-date/xs:dateTime(.)");
     query(xmlCall + "/@size/data()", "");
     query(xmlCall + "/text()", "xml");
 

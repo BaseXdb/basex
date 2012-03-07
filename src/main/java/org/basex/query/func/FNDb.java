@@ -288,8 +288,7 @@ public final class FNDb extends StandardFunc {
     if(expr.length == 0) return listDBs(ctx);
 
     final Data data = data(0, ctx);
-    final String path =
-        string(expr.length == 1 ? EMPTY : checkStr(expr[1], ctx));
+    final String path = string(expr.length == 1 ? EMPTY : checkStr(expr[1], ctx));
     final IntList il = data.resources.docs(path);
     final TokenList tl = data.resources.binaries(path);
 
