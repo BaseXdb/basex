@@ -197,7 +197,10 @@ public class QueryParser extends InputParser {
     final Expr expr = parse(uri);
     if(more()) {
       if(alter != null) error();
-      error(QUERYEND, rest());
+      final String rest = rest();
+      qp++;
+      if(uri != null) error(MODEXPR, rest);
+      error(QUERYEND, rest);
     }
 
     // completes the parsing step

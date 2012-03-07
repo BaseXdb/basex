@@ -372,6 +372,8 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   QUERYEND(XPST, 3, "Unexpected end of query: '%'."),
   /** XPST0003: Parsing exception. */
+  MODEXPR(XPST, 3, "No expressions allowed in query modules: '%'."),
+  /** XPST0003: Parsing exception. */
   CMPEXPR(XPST, 3, "Comparison is incomplete."),
   /** XPST0003: Parsing exception. */
   NOTAG(XPST, 3, "Expecting tag name."),
