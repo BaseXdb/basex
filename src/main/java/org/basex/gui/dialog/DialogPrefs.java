@@ -109,7 +109,7 @@ public final class DialogPrefs extends Dialog {
       public void actionPerformed(final ActionEvent e) { action(limit); }
     });
     label = new BaseXLabel(" ");
-    p = new BaseXBack(new TableLayout(1, 3, 16, 0));
+    p = new BaseXBack(new TableLayout(1, 4, 12, 0));
     p.add(new BaseXLabel(MAX_NO_OF_HITS + COL));
     p.add(limit);
     p.add(label);
@@ -137,10 +137,9 @@ public final class DialogPrefs extends Dialog {
     if(cmp == names) {
       gui.gprop.set(GUIProp.SHOWNAME, names.isSelected());
       gui.notify.layout();
-    } else if(cmp == label) {
-      final int mh = hitsAsProperty();
-      label.setText(mh == -1 ? ALL : Integer.toString(mh));
     }
+    final int mh = hitsAsProperty();
+    label.setText(mh == -1 ? ALL : Integer.toString(mh));
   }
 
   @Override
