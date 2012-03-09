@@ -2,28 +2,20 @@ package org.basex.api.webdav;
 
 import static org.basex.query.func.Function.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.io.*;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
 
-import org.basex.api.HTTPSession;
-import org.basex.core.Prop;
-import org.basex.core.Text;
-import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.Open;
-import org.basex.io.in.ArrayInput;
-import org.basex.server.Query;
-import org.basex.server.Session;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.api.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.in.*;
+import org.basex.query.func.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
-import com.bradmcevoy.http.Auth;
-import com.bradmcevoy.http.Request;
+import com.bradmcevoy.http.*;
 import com.bradmcevoy.http.Request.Method;
-import com.bradmcevoy.http.Resource;
 
 /**
  * Base class for all WebDAV resources.
@@ -175,7 +167,6 @@ public abstract class BXResource implements Resource {
 
   /**
    * Checks if a folder is empty and create a dummy document.
-   *
    * @param s active client session
    * @param db database name
    * @param p path
@@ -201,8 +192,9 @@ public abstract class BXResource implements Resource {
    */
   static BXResource resource(final Session s, final String d, final String p,
       final HTTPSession hs) throws IOException {
-    return exists(s, d, p) ? file(s, d, p, hs) :
-      pathExists(s, d, p) ? folder(s, d, p, hs) : null;
+
+    return exists(s, d, p) ? file(s, d, p, hs) : pathExists(s, d, p) ?
+        folder(s, d, p, hs) : null;
   }
 
   /**
@@ -229,7 +221,7 @@ public abstract class BXResource implements Resource {
     try {
       final boolean raw = Boolean.parseBoolean(q.next());
       final String ctype = q.next();
-      final long mod = Long.parseLong(q.next());
+      final long mod = FNDb.parse(q.next());
       final Long size = raw ? Long.valueOf(q.next()) : null;
       final String path = stripLeadingSlash(q.next());
       return new BXFile(d, path, mod, raw, ctype, size, hs);
@@ -268,8 +260,8 @@ public abstract class BXResource implements Resource {
     try {
       while(q.more()) {
         final String name = q.next();
-        final long tstamp = InfoDB.DATE.parse(q.next()).getTime();
-        dbs.add(new BXDatabase(name, tstamp, hs));
+        final long mod = FNDb.parse(q.next());
+        dbs.add(new BXDatabase(name, mod, hs));
       }
     } catch(final Exception ex) {
       Util.errln(ex);
@@ -287,8 +279,8 @@ public abstract class BXResource implements Resource {
    * @return requested resource
    * @throws IOException I/O exception
    */
-  static BXDatabase database(final Session s, final String d,
-      final HTTPSession hs) throws IOException {
+  static BXDatabase database(final Session s, final String d, final HTTPSession hs)
+      throws IOException {
     return new BXDatabase(d, timestamp(s, d), hs);
   }
 

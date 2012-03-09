@@ -5,17 +5,14 @@ import static org.basex.query.func.Function.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.basex.api.HTTPSession;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.Open;
 import org.basex.io.in.BufferInput;
+import org.basex.query.func.*;
 import org.basex.server.Query;
 import org.basex.server.Session;
 
@@ -122,7 +119,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
         while(q.more()) {
           final boolean raw = Boolean.parseBoolean(q.next());
           final String ctype = q.next();
-          final long mod = Long.parseLong(q.next());
+          final long mod = FNDb.parse(q.next());
           final Long size = raw ? Long.valueOf(q.next()) : null;
           final String p = stripLeadingSlash(q.next());
           final int ix = p.indexOf(SEP);

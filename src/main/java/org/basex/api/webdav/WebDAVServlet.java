@@ -1,21 +1,10 @@
 package org.basex.api.webdav;
 
-import java.io.IOException;
+import java.io.*;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
-import org.basex.api.HTTPText;
-import org.basex.core.Prop;
-
-import com.bradmcevoy.http.HttpManager;
-import com.bradmcevoy.http.Request;
-import com.bradmcevoy.http.Response;
+import com.bradmcevoy.http.*;
 
 /**
  * WebDAV servlet.
@@ -23,24 +12,14 @@ import com.bradmcevoy.http.Response;
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
-public class WebDAVServlet implements Servlet {
-  /** Milton resource manager. */
-  private final HttpManager manager = new HttpManager(new BXResourceFactory());
-
+public class WebDAVServlet extends HttpServlet {
   @Override
-  public void init(final ServletConfig config) throws ServletException { }
+  public void service(final HttpServletRequest req, final HttpServletResponse res)
+      throws IOException {
 
-  @Override
-  public ServletConfig getServletConfig() {
-    return null;
-  }
-
-  @Override
-  public void service(final ServletRequest req, final ServletResponse res)
-      throws ServletException, IOException {
-
-    final Request request = new BXServletRequest((HttpServletRequest) req);
-    final Response response = new BXServletResponse((HttpServletResponse) res);
+    final HttpManager manager = new HttpManager(new BXResourceFactory());
+    final Request request = new BXServletRequest(req);
+    final Response response = new BXServletResponse(res);
     try {
       manager.process(request, response);
     } finally {
@@ -48,12 +27,4 @@ public class WebDAVServlet implements Servlet {
       res.flushBuffer();
     }
   }
-
-  @Override
-  public String getServletInfo() {
-    return Prop.NAME + HTTPText.SERVLET;
-  }
-
-  @Override
-  public void destroy() { }
 }
