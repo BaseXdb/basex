@@ -3,3 +3,5 @@ notifications:
   email:
     on_success: never
     on_failure: always
+    recipients:
+      - bxb@inf.uni-konstanz.de
