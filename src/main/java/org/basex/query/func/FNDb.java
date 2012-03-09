@@ -5,7 +5,7 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -56,7 +56,7 @@ import org.basex.query.up.primitives.DBStore;
 import org.basex.query.up.primitives.DeleteNode;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.IndexContext;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
 import org.basex.util.list.IntList;
 import org.basex.util.list.StringList;
 import org.basex.util.list.TokenList;
@@ -70,7 +70,7 @@ import org.basex.util.list.TokenList;
  */
 public final class FNDb extends StandardFunc {
   /** Date format used for xs:dateTime generation. */
-  public static final SimpleDateFormat DATE_FORMAT;
+  static final SimpleDateFormat DATE_FORMAT;
   /** Resource element name. */
   static final QNm SYSTEM = new QNm("system");
   /** Resource element name. */
@@ -720,6 +720,21 @@ public final class FNDb extends StandardFunc {
     return sig == Function._DB_OPEN || sig == Function._DB_TEXT ||
       sig == Function._DB_ATTRIBUTE || sig == Function._DB_FULLTEXT ||
       super.iterable();
+  }
+
+  /**
+   * Parses the specified date and returns its time in milliseconds.
+   * Returns {@code null} if it cannot be converted.
+   * @param date date to be parsed
+   * @return time in milliseconds
+   */
+  public static long parse(final String date) {
+    try {
+      return DATE_FORMAT.parse(date).getTime();
+    } catch(final ParseException ex) {
+      Util.errln(ex);
+      return 0;
+    }
   }
 
   /**
