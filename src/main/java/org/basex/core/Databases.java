@@ -143,8 +143,7 @@ public final class Databases {
     if(db) listAll(databases, dbs, pattern);
     if(backup) listAll(backups, dbs, pattern);
     dbs.sort(false, true);
-    if(db && backup) return StringList.unique(dbs);
-    return dbs;
+    return db && backup ? dbs.unique() : dbs;
   }
 
   /**
