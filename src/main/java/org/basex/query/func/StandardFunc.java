@@ -81,13 +81,14 @@ public abstract class StandardFunc extends Arr {
   /**
    * Atomizes the specified item.
    * @param it input item
+   * @param ii input info
    * @return atomized item
    * @throws QueryException query exception
    */
-  final Item atom(final Item it) throws QueryException {
+  public static final Item atom(final Item it, final InputInfo ii) throws QueryException {
     final Type ip = it.type;
     return ip.isNode() ? ip == NodeType.PI || ip == NodeType.COM ?
-        Str.get(it.string(input)) : new Atm(it.string(input)) : it;
+        Str.get(it.string(ii)) : new Atm(it.string(ii)) : it;
   }
 
   @Override

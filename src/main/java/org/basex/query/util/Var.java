@@ -266,7 +266,7 @@ public final class Var extends ParseExpr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(toString()));
+    ser.openElement(this, NAM, Token.token(toString()), ID, Token.token(id));
     if(expr != null) expr.plan(ser);
     ser.closeElement();
   }

@@ -26,7 +26,6 @@ import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Type;
-import org.basex.query.item.map.Map;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.up.expr.*;
@@ -1086,38 +1085,23 @@ public class QueryParser extends InputParser {
       alter = NOWHERE;
     }
 
-    Var[][] group = null;
+    Group group = null;
     if(ctx.xquery3 && wsConsumeWs(GROUP)) {
       wsCheck(BY);
       ap = qp;
-      Var[] grp = null;
+      Group.Spec[] grp = null;
       do grp = groupSpec(fl, grp); while(wsConsume(COMMA));
 
       // find all non-grouping variables that aren't shadowed
       final ArrayList<Var> ng = new ArrayList<Var>();
-      Map ngp = Map.EMPTY;
-      for(final ForLet f : fl) {
-        vars: for(final Var v : f.vars()) {
-          final Value old = ngp.get(v.name, null);
-          final int pos = old.isItem() ? (int) old.itemAt(0).itr(null) : -1;
-
-          // number of entries is expected to be tiny, so linear search is fast
-          for(final Var g : grp) {
-            if(v.is(g)) {
-              if(pos >= 0) {
-                ng.remove(pos);
-                ngp = ngp.delete(old.itemAt(0), null);
-              }
-              continue vars;
-            }
-          }
-
-          if(pos >= 0) {
-            while(pos >= ng.size()) ng.add(null);
-            ng.set(pos, v);
-          } else {
+      final TokenSet set = new TokenSet();
+      for(final Group.Spec spec : grp) set.add(spec.grp.name.eqname());
+      for(int i = fl.length; --i >= 0;) {
+        for(final Var v : fl[i].vars()) {
+          final byte[] eqn = v.name.eqname();
+          if(set.id(eqn) == 0) {
             ng.add(v);
-            ngp = ngp.insert(v.name, Int.get(ng.size() - 1), null);
+            set.add(eqn);
           }
         }
       }
@@ -1134,19 +1118,25 @@ public class QueryParser extends InputParser {
         ctx.vars.add(ngrp[i]);
       }
 
-      group = new Var[][]{ grp, ng.toArray(new Var[ng.size()]), ngrp };
+      group = new Group(grp[0].input, grp,
+          new Var[][]{ ng.toArray(new Var[ng.size()]), ngrp });
       alter = GRPBY;
     }
 
-    OrderBy[] order = null;
+    Order order = null;
     final boolean stable = wsConsumeWs(STABLE);
     if(stable) wsCheck(ORDER);
 
     if(stable || wsConsumeWs(ORDER)) {
       wsCheck(BY);
       ap = qp;
-      do order = orderSpec(order); while(wsConsume(COMMA));
-      if(order != null) order = Array.add(order, new OrderByStable(input()));
+      OrderBy[] ob = null;
+      do ob = orderSpec(ob); while(wsConsume(COMMA));
+      // don't sort if all order-by clauses are empty
+      if(ob != null) {
+        ob = Array.add(ob, new OrderByStable(input()));
+        order = new Order(ob[0].input, ob);
+      }
       alter = ORDERBY;
     }
 
@@ -1218,6 +1208,8 @@ public class QueryParser extends InputParser {
   /**
    * Parses the "OrderSpec" rule.
    * Parses the "OrderModifier" rule.
+   *
+   * Empty order specs are ignored, {@code order} is then returned unchanged.
    * @param order order array
    * @return new order array
    * @throws QueryException query exception
@@ -1248,26 +1240,42 @@ public class QueryParser extends InputParser {
    * @return new group array
    * @throws QueryException query exception
    */
-  private Var[] groupSpec(final ForLet[] fl, final Var[] group)
+  private Group.Spec[] groupSpec(final ForLet[] fl, final Group.Spec[] group)
       throws QueryException {
 
-    final Var v = checkVar(varName(), GVARNOTDEFINED);
+    final InputInfo ii = input();
+    final QNm name = varName();
+    final SeqType type = optAsType();
+    final Var var = Var.create(ctx, ii, name, type, null);
 
-    // the grouping variable has to be declared by the same FLWOR expression
-    boolean dec = false;
-    for(final ForLet f : fl) {
-      if(f.declares(v)) {
-        dec = true;
-        break;
+    final Expr by;
+    if(type != null || wsConsume(ASSIGN)) {
+      if(type != null) wsCheck(ASSIGN);
+      by = check(single(), NOVARDECL);
+    } else {
+      final Var v = checkVar(var.name, GVARNOTDEFINED);
+      // the grouping variable has to be declared by the same FLWOR expression
+      boolean dec = false;
+      for(final ForLet f : fl) {
+        if(f.declares(v)) {
+          dec = true;
+          break;
+        }
       }
+      if(!dec) throw error(GVARNOTDEFINED, v);
+      by = new VarRef(ii, v);
     }
-    if(!dec) error(GVARNOTDEFINED, v);
 
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
-      if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
+      if(!eq(URLCOLL, coll)) throw error(INVCOLL, coll);
     }
-    return group == null ? new Var[] { v } : Array.add(group, v);
+
+    // add the new grouping var
+    ctx.vars.add(var);
+
+    final Group.Spec grp = new Group.Spec(ii, var, by);
+    return group == null ? new Group.Spec[] { grp } : Array.add(group, grp);
   }
 
   /**

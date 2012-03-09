@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 
 import org.basex.io.serial.Serializer;
@@ -107,12 +106,14 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public boolean sameAs(final Expr cmp) {
-    return cmp instanceof VarRef  && var.sameAs(((VarRef) cmp).var);
+    return cmp instanceof VarRef && var.sameAs(((VarRef) cmp).var);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, token(var.toString()));
+    ser.openElement(this);
+    var.plan(ser);
+    ser.closeElement();
   }
 
   @Override

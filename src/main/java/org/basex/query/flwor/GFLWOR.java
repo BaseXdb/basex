@@ -55,21 +55,18 @@ public class GFLWOR extends ParseExpr {
 
   /**
    * Returns a GFLWOR instance.
-   * @param f variable inputs
-   * @param w where clause
-   * @param o order expression
-   * @param g group by expression
-   * @param r return expression
+   * @param fl variable inputs
+   * @param whr where clause
+   * @param ord order expression
+   * @param grp group-by expression
+   * @param ret return expression
    * @param ii input info
    * @return GFLWOR instance
    */
-  public static GFLWOR get(final ForLet[] f, final Expr w, final OrderBy[] o,
-      final Var[][] g, final Expr r, final InputInfo ii) {
-
-    if(o == null && g == null) return new FLWR(f, w, r, ii);
-    final Order ord = o == null ? null : new Order(ii, o);
-    final Group grp = g == null ? null : new Group(ii, g[0], g[1], g[2]);
-    return new GFLWOR(f, w, ord, grp, r, ii);
+  public static GFLWOR get(final ForLet[] fl, final Expr whr, final Order ord,
+      final Group grp, final Expr ret, final InputInfo ii) {
+    return ord == null && grp == null ? new FLWR(fl, whr, ret, ii) :
+      new GFLWOR(fl, whr, ord, grp, ret, ii);
   }
 
   @Override
