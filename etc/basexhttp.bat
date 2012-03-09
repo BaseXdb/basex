@@ -16,4 +16,4 @@ REM Options for virtual machine
 set VM=-Xmx512m
 
 REM Run code
-java -cp "%CP%;." %VM% org.basex.api.BaseXHTTP %*
+java -cp "%CP%;." %VM% org.basex.BaseXHTTP %*

@@ -20,4 +20,4 @@ CP="$CP$(for JAR in "$BXCORE"/lib/*.jar; do echo -n ":$JAR"; done)"
 VM=-Xmx512m
 
 # Run code
-java -cp "$CP" $VM org.basex.api.BaseXHTTP "$@"
+java -cp "$CP" $VM org.basex.BaseXHTTP "$@"

@@ -1,6 +1,6 @@
 package org.basex.test.http;
 
-import static org.basex.api.HTTPMethod.*;
+import static org.basex.http.HTTPMethod.*;
 import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
@@ -8,9 +8,9 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.net.*;
 
-import org.basex.api.rest.*;
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.http.rest.*;
 import org.basex.io.in.*;
 import org.basex.query.func.*;
 import org.basex.util.*;

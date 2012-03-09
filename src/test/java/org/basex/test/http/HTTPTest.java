@@ -1,15 +1,16 @@
 package org.basex.test.http;
 
-import static org.basex.api.HTTPMethod.*;
+import static org.basex.http.HTTPMethod.*;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
 import java.net.*;
 
-import org.basex.api.*;
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
@@ -24,6 +25,8 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class HTTPTest {
+  /** Database context. */
+  protected static final Context CONTEXT = HTTPContext.init();
   /** Class name. */
   protected static final String DB = Util.name(HTTPTest.class);
   /** Start servers. */
@@ -40,14 +43,13 @@ public abstract class HTTPTest {
    * @throws Exception exception
    */
   protected static void init(final String rt, final boolean local) throws Exception {
-    final Context ctx = HTTPSession.context();
     final IOFile sb = sandbox();
     final IOFile dbPath = new IOFile(sb, "data");
     dbPath.md();
-    ctx.mprop.set(MainProp.DBPATH, dbPath.path());
+    CONTEXT.mprop.set(MainProp.DBPATH, dbPath.path());
     final IOFile httpPath = new IOFile(sb, "http");
     httpPath.md();
-    ctx.mprop.set(MainProp.HTTPPATH, httpPath.path());
+    CONTEXT.mprop.set(MainProp.HTTPPATH, httpPath.path());
     root = rt;
 
     final StringList sl = new StringList();

@@ -1,10 +1,21 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app
+  xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
   version="2.5">
 
   <display-name>BaseX HTTP Server</display-name>
   <description>BaseX HTTP Server</description>
+
+  <!-- Path to XMLDB home directory
+  <context-param>
+    <param-name>org.basex.path</param-name>
+    <param-value>/var/run/basex</param-value>
+  </context-param>
+  -->
+
+  <!--  WebDAV Servlet -->
   <servlet>
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.api.webdav.WebDAVServlet</servlet-class>
@@ -13,6 +24,8 @@
     <servlet-name>WebDAV</servlet-name>
     <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
+
+  <!--  REST Servlet -->
   <servlet>
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.api.rest.RESTServlet</servlet-class>
@@ -21,12 +34,15 @@
     <servlet-name>REST</servlet-name>
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
+
+  <!--  RESTXQ Servlet -->
   <servlet>
-    <servlet-name>RESTful XQuery</servlet-name>
+    <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.api.restxq.RestXqServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>RESTful XQuery</servlet-name>
+    <servlet-name>RESTXQ</servlet-name>
     <url-pattern>/restxq/*</url-pattern>
   </servlet-mapping>
+
 </web-app>

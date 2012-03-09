@@ -1,12 +1,11 @@
 package org.basex.test.http;
 
-import static org.basex.io.MimeTypes.*;
 import static org.basex.core.Text.*;
+import static org.basex.io.MimeTypes.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
 
-import org.basex.api.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.util.*;
@@ -301,8 +300,6 @@ public final class RestXqTest extends HTTPTest {
    * @return test module
    */
   private static IOFile module() {
-    final Context ctx = HTTPSession.context();
-    final String path = ctx.mprop.get(MainProp.HTTPPATH);
-    return new IOFile(path, DB + IO.XQMSUFFIX);
+    return new IOFile(CONTEXT.mprop.get(MainProp.HTTPPATH), DB + IO.XQMSUFFIX);
   }
 }
