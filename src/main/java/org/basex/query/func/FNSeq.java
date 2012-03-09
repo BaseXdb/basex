@@ -260,7 +260,7 @@ public final class FNSeq extends StandardFunc {
           Item i = ir.next();
           if(i == null) return null;
           ctx.checkStop();
-          i = atom(i);
+          i = atom(i, input);
           if(map.index(input, i)) return i;
         }
       }

@@ -106,7 +106,7 @@ public final class FNGen extends StandardFunc {
         final Item it = ir.next();
         if(it == null) return null;
         if(it.type.isFunction()) FNATM.thrw(input, FNGen.this);
-        return atom(it);
+        return atom(it, input);
       }
     };
   }
