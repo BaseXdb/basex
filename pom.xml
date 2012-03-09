@@ -148,10 +148,6 @@
         <configuration>
           <!-- <skipTests>true</skipTests> -->
           <forkMode>always</forkMode>
-          <includes>
-            <include>**/AllTests.java</include>
-            <include>**/XQJTest*.java</include>
-          </includes>
         </configuration>
       </plugin>
       <plugin>
@@ -243,6 +239,26 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.9.1</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <configLocation>.settings/checkstyle.xml</configLocation>
+          <failsOnError>true</failsOnError>
+          <linkXRef>false</linkXRef>
+          <consoleOutput>true</consoleOutput>
+          <violationSeverity>warning</violationSeverity>
+        </configuration>
       </plugin>
     </plugins>
     <!-- Eclipse Maven plugin does not "support copy-dependencies" -->
