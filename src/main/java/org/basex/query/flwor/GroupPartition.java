@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.flwor.Group.Spec;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.*;
@@ -26,7 +27,7 @@ final class GroupPartition {
   private final Order order;
 
   /** Grouping variables. */
-  private final Var[] gv;
+  private final Group.Spec[] gv;
   /** Non-grouping variables. */
   private final Var[][] ngv;
 
@@ -40,14 +41,14 @@ final class GroupPartition {
   /**
    * Sets up an empty partitioning.
    * Sets up the ordering scheme.
-   * @param g grouping variables
+   * @param groupby grouping variables
    * @param ng non-grouping variables
    * @param ob order by specifier
    * @param ii input info
    */
-  GroupPartition(final Var[] g, final Var[][] ng, final Order ob,
+  GroupPartition(final Spec[] groupby, final Var[][] ng, final Order ob,
       final InputInfo ii) {
-    gv = g;
+    gv = groupby;
     ngv = ng;
     order = ob;
     items = ngv[0].length != 0 ? new ArrayList<ItemCache[]>() : null;
@@ -69,7 +70,7 @@ final class GroupPartition {
     final int gl = gv.length;
     final Value[] vals = new Value[gl];
     for(int i = 0; i < gl; i++) {
-      final Value val = ctx.value(ctx.vars.get(gv[i]));
+      final Value val = ctx.value(gv[i]);
       if(val.size() > 1) XGRP.thrw(input);
       vals[i] = val;
     }
@@ -135,7 +136,7 @@ final class GroupPartition {
     for(int i = 0; i < part.size(); ++i) {
       final GroupNode gn = part.get(i);
       for(int j = 0; j < gv.length; ++j)
-        ctx.vars.add(gv[j].copy().bind(gn.vals[j], ctx));
+        ctx.vars.add(gv[j].grp.copy().bind(gn.vals[j], ctx));
 
       if(items != null) {
         final ItemCache[] ii = items.get(i);
