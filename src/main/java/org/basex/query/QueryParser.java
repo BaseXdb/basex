@@ -698,6 +698,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) error(NSMODURI);
     if(modules.contains(uri)) error(DUPLMODULE, uri);
+    modules.add(uri);
 
     if(ns != EMPTY) ctx.sc.ns.add(ns, uri, input());
 
@@ -784,7 +785,6 @@ public class QueryParser extends InputParser {
     ctx.sc = new StaticContext();
     new QueryParser(qu, ctx).parse(io, uri);
     ctx.sc = sc;
-    modules.add(uri);
   }
 
   /**
