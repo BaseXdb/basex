@@ -24,6 +24,8 @@ public final class RestXqTest extends HTTPTest {
   private static final String HEADER =
     "module  namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
     "declare namespace R = 'http://exquery.org/ns/rest/annotation';" + Prop.NL;
+  /** Counter. */
+  private static int count;
 
   // INITIALIZERS =============================================================
 
@@ -290,9 +292,11 @@ public final class RestXqTest extends HTTPTest {
    * @throws IOException I/O exception
    */
   private static void install(final String function) throws IOException {
+    // delete old module
+    final String path = CONTEXT.mprop.get(MainProp.HTTPPATH);
+    for(final IOFile f : new IOFile(path).children()) assertTrue(f.delete());
+    // create new module
     module().write(new TokenBuilder(HEADER).add(function).finish());
-    // wait 1 millisecond to guarantee new timestamp
-    Performance.sleep(1);
   }
 
   /**
@@ -300,6 +304,7 @@ public final class RestXqTest extends HTTPTest {
    * @return test module
    */
   private static IOFile module() {
-    return new IOFile(CONTEXT.mprop.get(MainProp.HTTPPATH), DB + IO.XQMSUFFIX);
+    final String path = CONTEXT.mprop.get(MainProp.HTTPPATH);
+    return new IOFile(path, DB + count++ + IO.XQMSUFFIX);
   }
 }
