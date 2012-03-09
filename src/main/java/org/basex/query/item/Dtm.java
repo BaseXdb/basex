@@ -1,11 +1,13 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import java.text.SimpleDateFormat;
+
+import java.text.*;
+import java.util.*;
+
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import org.basex.util.*;
 
 /**
  * DateTime item.
@@ -14,9 +16,13 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Dtm extends Date {
-  /** Date format. */
-  private static final SimpleDateFormat DATE = new SimpleDateFormat(
-      "yyyy-MM-dd'T'HH:mm:ss.S");
+  /** Unified date format. */
+  public static final SimpleDateFormat FORMAT;
+
+  static {
+    FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+  }
 
   /**
    * Constructor.
@@ -52,7 +58,7 @@ public final class Dtm extends Date {
    * @throws QueryException query exception
    */
   Dtm(final Int tm, final InputInfo ii) throws QueryException {
-    this(Token.token(DATE.format(new java.util.Date(tm.itr(ii)))), ii);
+    this(Token.token(FORMAT.format(new java.util.Date(tm.itr(ii)))), ii);
   }
 
   /**
@@ -62,7 +68,7 @@ public final class Dtm extends Date {
    * @throws QueryException query exception
    */
   public Dtm(final long tm, final InputInfo ii) throws QueryException {
-    this(Token.token(DATE.format(new java.util.Date(tm))), ii);
+    this(Token.token(FORMAT.format(new java.util.Date(tm))), ii);
   }
 
   /**
@@ -84,5 +90,20 @@ public final class Dtm extends Date {
     if(!(cmp instanceof Dtm)) return false;
     final Dtm dtm = (Dtm) cmp;
     return type == dtm.type && xc.equals(dtm.xc);
+  }
+
+  /**
+   * Parses the specified date and returns its time in milliseconds.
+   * Returns {@code null} if it cannot be converted.
+   * @param date date to be parsed
+   * @return time in milliseconds
+   */
+  public static long parse(final String date) {
+    try {
+      return Dtm.FORMAT.parse(date).getTime();
+    } catch(final ParseException ex) {
+      Util.errln(ex);
+      return 0;
+    }
   }
 }

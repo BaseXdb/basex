@@ -4,62 +4,27 @@ import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.text.*;
+import java.io.*;
 import java.util.Date;
-import java.util.TimeZone;
 
-import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.core.cmd.Info;
-import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.Rename;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.Resources;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.MimeTypes;
+import org.basex.index.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.IndexAccess;
-import org.basex.query.item.ANode;
-import org.basex.query.item.B64Stream;
-import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.DBNodeSeq;
-import org.basex.query.item.Empty;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FNode;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.Int;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeIter;
-import org.basex.query.iter.ValueIter;
-import org.basex.query.path.NameTest;
-import org.basex.query.up.primitives.DBAdd;
-import org.basex.query.up.primitives.DBDelete;
-import org.basex.query.up.primitives.DBOptimize;
-import org.basex.query.up.primitives.DBRename;
-import org.basex.query.up.primitives.DBStore;
-import org.basex.query.up.primitives.DeleteNode;
-import org.basex.query.up.primitives.ReplaceValue;
-import org.basex.query.util.IndexContext;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.*;
+import org.basex.query.up.primitives.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
-import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+import org.basex.util.list.*;
 
 /**
  * Database functions.
@@ -69,8 +34,6 @@ import org.basex.util.list.TokenList;
  * @author Dimitar Popov
  */
 public final class FNDb extends StandardFunc {
-  /** Date format used for xs:dateTime generation. */
-  static final SimpleDateFormat DATE_FORMAT;
   /** Resource element name. */
   static final QNm SYSTEM = new QNm("system");
   /** Resource element name. */
@@ -91,11 +54,6 @@ public final class FNDb extends StandardFunc {
   static final QNm MDATE = new QNm("modified-date");
   /** MIME type application/xml. */
   static final byte[] APP_XML = token(MimeTypes.APP_XML);
-
-  static {
-    DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-  }
 
   /**
    * Constructor.
@@ -340,7 +298,7 @@ public final class FNDb extends StandardFunc {
           di = new DataInput(meta.dbfile(DATAINF));
           meta.read(di);
           res.add(new FAttr(RESOURCES, token(meta.ndocs)));
-          final String tstamp = DATE_FORMAT.format(new Date(meta.dbtime()));
+          final String tstamp = Dtm.FORMAT.format(new Date(meta.dbtime()));
           res.add(new FAttr(MDATE, token(tstamp)));
           if(ctx.context.perm(User.CREATE, meta))
             res.add(new FAttr(PATH, token(meta.original)));
@@ -436,7 +394,7 @@ public final class FNDb extends StandardFunc {
   static FNode resource(final byte[] path, final boolean raw,
       final long size, final byte[] ctype, final long mdate) {
 
-    final String tstamp = DATE_FORMAT.format(new Date(mdate));
+    final String tstamp = Dtm.FORMAT.format(new Date(mdate));
     final FElem res = new FElem(RESOURCE).
         add(new FTxt(path)).
         add(new FAttr(RAW, token(raw))).
@@ -720,21 +678,6 @@ public final class FNDb extends StandardFunc {
     return sig == Function._DB_OPEN || sig == Function._DB_TEXT ||
       sig == Function._DB_ATTRIBUTE || sig == Function._DB_FULLTEXT ||
       super.iterable();
-  }
-
-  /**
-   * Parses the specified date and returns its time in milliseconds.
-   * Returns {@code null} if it cannot be converted.
-   * @param date date to be parsed
-   * @return time in milliseconds
-   */
-  public static long parse(final String date) {
-    try {
-      return DATE_FORMAT.parse(date).getTime();
-    } catch(final ParseException ex) {
-      Util.errln(ex);
-      return 0;
-    }
   }
 
   /**
