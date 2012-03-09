@@ -210,6 +210,21 @@ public final class PackageAPITest extends AdvancedQueryTest {
   }
 
   /**
+   * Tests ability to import two modules from the same package.
+   * @throws QueryException query exception
+   */
+  @Test
+  public void importTwoModulesFromPkg() throws QueryException {
+    final QueryProcessor qp = new QueryProcessor(
+      "import module namespace ns1='ns1';" +
+      "import module namespace ns3='ns3';" +
+      "(ns1:test2() eq 'pkg2mod1') and (ns3:test() eq 'pkg2mod2')",
+      ctx);
+    assertEquals(qp.execute().toString(), "true");
+    qp.execute();
+  }
+
+  /**
    * Tests package installation.
    * @throws BaseXException database exception
    */
