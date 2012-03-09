@@ -1,6 +1,6 @@
 package org.basex.examples.rest;
 
-import org.basex.api.BaseXHTTP;
+import org.basex.*;
 
 /**
  * This class runs all REST examples.

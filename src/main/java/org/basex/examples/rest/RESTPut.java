@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.basex.api.BaseXHTTP;
+import org.basex.*;
 
 /**
  * This class is a simple example to demonstrate the REST implementation.
