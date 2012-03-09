@@ -26,14 +26,17 @@ import org.basex.util.list.StringList;
  * @author Christian Gruen
  */
 public final class Util {
-  /** Flag for using default standard input. */
-  private static final boolean NOCONSOLE = System.console() == null;
+  /** Database home directory. */
+  public static final String PATH = "org.basex.path";
   /** Language (applied after restart). */
   public static String language = Prop.LANG;
   /** Flag for showing language keys. */
   public static boolean langkeys;
   /** Debug mode. */
   public static boolean debug;
+
+  /** Flag for using default standard input. */
+  private static final boolean NOCONSOLE = System.console() == null;
 
   /** Hidden constructor. */
   private Util() { }
@@ -287,7 +290,7 @@ public final class Util {
    */
   public static String homeDir() {
     // check user specific property
-    String path = System.getProperty("org.basex.path");
+    String path = System.getProperty(PATH);
     if(path != null) return path + File.separator;
 
     // check working directory for property file
