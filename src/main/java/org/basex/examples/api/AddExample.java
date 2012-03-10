@@ -1,8 +1,5 @@
 package org.basex.examples.api;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * This example shows how documents can be added to databases, and how
@@ -23,8 +20,7 @@ public final class AddExample {
    */
   public static void main(final String[] args) throws IOException {
     // create session
-    final BaseXClient session =
-      new BaseXClient("localhost", 1984, "admin", "admin");
+    final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
 
     try {
       // create empty database

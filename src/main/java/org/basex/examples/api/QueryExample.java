@@ -1,7 +1,5 @@
 package org.basex.examples.api;
-
-import java.io.IOException;
-import org.basex.examples.api.BaseXClient.Query;
+import java.io.*;
 
 /**
  * This example shows how queries can be executed in an iterative manner.
@@ -22,13 +20,12 @@ public final class QueryExample {
   public static void main(final String[] args) {
     try {
       // create session
-      final BaseXClient session =
-        new BaseXClient("localhost", 1984, "admin", "admin");
+      final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
 
       try {
         // create query instance
         final String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
-        final Query query = session.query(input);
+        final BaseXClient.Query query = session.query(input);
 
         // loop through all results
         while(query.more()) {

@@ -1,7 +1,5 @@
 package org.basex.examples.api;
-
-import java.io.IOException;
-import org.basex.examples.api.BaseXClient.EventNotifier;
+import java.io.*;
 
 /**
  * This example shows how to use the event feature.
@@ -20,10 +18,8 @@ public final class EventExample {
    */
   public static void main(final String[] args) {
     try {
-      final BaseXClient session1 =
-        new BaseXClient("localhost", 1984, "admin", "admin");
-      final BaseXClient session2 =
-        new BaseXClient("localhost", 1984, "admin", "admin");
+      final BaseXClient session1 = new BaseXClient("localhost", 1984, "admin", "admin");
+      final BaseXClient session2 = new BaseXClient("localhost", 1984, "admin", "admin");
 
       session1.execute("create event messenger");
       session2.watch("messenger", new Notifier());
@@ -42,9 +38,9 @@ public final class EventExample {
   /**
    * Implementation of the event notifier interface.
    */
-  private static class Notifier implements EventNotifier {
+  private static class Notifier implements BaseXClient.EventNotifier {
     /** Constructor. */
-    public Notifier() { }
+    Notifier() { }
 
     @Override
     public void notify(final String value) {

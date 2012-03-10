@@ -1,9 +1,6 @@
 package org.basex.examples.api;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
 /**
  * This example shows how binary resource can be added to and retrieved from
@@ -24,8 +21,7 @@ public final class BinaryExample {
    */
   public static void main(final String[] args) throws IOException {
     // create session
-    final BaseXClient session =
-      new BaseXClient("localhost", 1984, "admin", "admin");
+    final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
 
     try {
       // create empty database

@@ -1,8 +1,5 @@
 package org.basex.examples.api;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * This example shows how new databases can be created.
@@ -22,8 +19,7 @@ public final class CreateExample {
   public static void main(final String[] args) {
     try {
       // create session
-      final BaseXClient session =
-        new BaseXClient("localhost", 1984, "admin", "admin");
+      final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
 
       try {
         // define input stream

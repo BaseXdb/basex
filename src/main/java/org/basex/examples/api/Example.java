@@ -1,7 +1,5 @@
 package org.basex.examples.api;
-
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * This example shows how commands can be executed via the server instance.
@@ -24,8 +22,7 @@ public final class Example {
       final long time = System.nanoTime();
 
       // create session
-      final BaseXClient session =
-        new BaseXClient("localhost", 1984, "admin", "admin");
+      final BaseXClient session = new BaseXClient("localhost", 1984, "admin", "admin");
 
       // version 1: perform command and print returned string
       System.out.println(session.execute("info"));

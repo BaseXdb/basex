@@ -1,19 +1,9 @@
 package org.basex.examples.api;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.*;
+import java.security.*;
+import java.util.*;
 
 /**
  * Java client for BaseX.
@@ -27,8 +17,7 @@ public class BaseXClient {
   /** UTF-8 charset. */
   static final Charset UTF8 = Charset.forName("UTF-8");
   /** Event notifications. */
-  final Map<String, EventNotifier> notifiers =
-    new HashMap<String, EventNotifier>();
+  final Map<String, EventNotifier> notifiers = new HashMap<String, EventNotifier>();
   /** Output stream. */
   final OutputStream out;
   /** Socket. */
@@ -46,12 +35,12 @@ public class BaseXClient {
    * Constructor.
    * @param host server name
    * @param port server port
-   * @param usern user name
-   * @param pw password
+   * @param user user name
+   * @param pass password
    * @throws IOException Exception
    */
-  public BaseXClient(final String host, final int port, final String usern,
-      final String pw) throws IOException {
+  public BaseXClient(final String host, final int port, final String user,
+      final String pass) throws IOException {
 
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
@@ -62,8 +51,8 @@ public class BaseXClient {
     // receive timestamp
     final String ts = receive();
     // send {Username}0 and hashed {Password/Timestamp}0
-    send(usern);
-    send(md5(md5(pw) + ts));
+    send(user);
+    send(md5(md5(pass) + ts));
 
     // receive success flag
     if(!ok()) throw new IOException("Access denied.");
@@ -75,8 +64,7 @@ public class BaseXClient {
    * @param o output stream
    * @throws IOException Exception
    */
-  public void execute(final String cmd, final OutputStream o)
-      throws IOException {
+  public void execute(final String cmd, final OutputStream o) throws IOException {
     // send {Command}0
     send(cmd);
     receive(in, o);
@@ -112,8 +100,7 @@ public class BaseXClient {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public void create(final String name, final InputStream input)
-      throws IOException {
+  public void create(final String name, final InputStream input) throws IOException {
     send(8, name, input);
   }
 
@@ -123,8 +110,7 @@ public class BaseXClient {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public void add(final String path, final InputStream input)
-      throws IOException {
+  public void add(final String path, final InputStream input) throws IOException {
     send(9, path, input);
   }
 
@@ -134,8 +120,7 @@ public class BaseXClient {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public void replace(final String path, final InputStream input)
-      throws IOException {
+  public void replace(final String path, final InputStream input) throws IOException {
     send(12, path, input);
   }
 
@@ -145,8 +130,7 @@ public class BaseXClient {
    * @param input xml input
    * @throws IOException I/O exception
    */
-  public void store(final String path, final InputStream input)
-      throws IOException {
+  public void store(final String path, final InputStream input) throws IOException {
     send(13, path, input);
   }
 
@@ -156,8 +140,7 @@ public class BaseXClient {
    * @param notifier event notification
    * @throws IOException I/O exception
    */
-  public void watch(final String name, final EventNotifier notifier)
-      throws IOException {
+  public void watch(final String name, final EventNotifier notifier) throws IOException {
     out.write(10);
     if(esocket == null) {
       final int eport = Integer.parseInt(receive());
@@ -246,9 +229,7 @@ public class BaseXClient {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  static void receive(final InputStream is, final OutputStream os)
-      throws IOException {
-
+  static void receive(final InputStream is, final OutputStream os) throws IOException {
     for(int b; (b = is.read()) > 0;) {
       // read next byte if 0xFF is received
       os.write(b == 0xFF ? is.read() : b);
@@ -288,7 +269,9 @@ public class BaseXClient {
             final String data = new String(os.toByteArray(), UTF8);
             notifiers.get(name).notify(data);
           }
-        } catch(final IOException ex) { /* ignored */ }
+        } catch(final IOException ex) {
+          // loop will be quit if no data can be received anymore
+        }
       }
     }.start();
   }
@@ -360,8 +343,7 @@ public class BaseXClient {
      * @param value value
      * @throws IOException I/O exception
      */
-    public void bind(final String name, final String value)
-        throws IOException {
+    public void bind(final String name, final String value) throws IOException {
       exec(3, id + '\0' + name + '\0' + value + '\0');
     }
 
