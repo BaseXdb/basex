@@ -115,13 +115,14 @@ public final class FNNode extends StandardFunc {
         tb.add('@');
         final QNm qnm = n.qname();
         final byte[] uri = qnm.uri();
-        if(uri.length != 0) tb.add('"').add(uri).add("\":");
+        if(uri.length != 0) tb.add("Q{").add(qnm.uri()).add('}');
         tb.add(qnm.local());
       } else if(n.type == NodeType.ELM) {
         final QNm qnm = n.qname();
         final AxisIter ai = n.precedingSibling();
         for(ANode fs; (fs = ai.next()) != null;) if(fs.qname().eq(qnm)) i++;
-        tb.addExt("\"%\":%[%]", qnm.uri(), qnm.local(), i);
+        tb.add("Q{").add(qnm.uri()).add('}').add(qnm.local());
+        tb.add('[').add(Integer.toString(i)).add(']');
       } else if(n.type == NodeType.COM || n.type == NodeType.TXT) {
         final AxisIter ai = n.precedingSibling();
         for(ANode fs; (fs = ai.next()) != null;) if(fs.type == n.type) i++;
@@ -132,7 +133,8 @@ public final class FNNode extends StandardFunc {
         for(ANode fs; (fs = ai.next()) != null;) {
           if(fs.type == n.type && fs.qname().eq(qnm)) i++;
         }
-        tb.addExt("%(\"%\")[%]", n.type.string(), qnm.local(), i);
+        tb.add(n.type.string()).add("(\"").add(qnm.local());
+        tb.add("\")[").add(Integer.toString(i)).add(']');
       }
       tl.add(tb.finish());
       n = n.parent();
