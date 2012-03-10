@@ -39,8 +39,7 @@ public final class FNGenTest extends AdvancedQueryTest {
     io.write(token("A\rB"));
     query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
     io.write(token("A\r\nB\rC\nD"));
-    query(_UTIL_TO_BYTES.args(UNPARSED_TEXT.args(io.path())),
-        "65 10 66 10 67 10 68");
+    query(_UTIL_TO_BYTES.args(UNPARSED_TEXT.args(io.path())), "65 10 66 10 67 10 68");
     assertTrue(io.delete());
     error(UNPARSED_TEXT.args(TEXT, "xyz"), Err.WHICHENC);
   }
@@ -62,7 +61,6 @@ public final class FNGenTest extends AdvancedQueryTest {
     check(SERIALIZE);
     contains(SERIALIZE.args("<x/>"), "&lt;x/&gt;");
     contains(SERIALIZE.args("<x/>", serialParams("")), "&lt;x/&gt;");
-    contains(SERIALIZE.args("<x>a</x>",
-        serialParams("<method value='text'/>")), "a");
+    contains(SERIALIZE.args("<x>a</x>", serialParams("<method value='text'/>")), "a");
   }
 }

@@ -59,10 +59,9 @@ public final class Delete extends ACreate {
    * Deletes the specified resources.
    * @param data data reference
    * @param res resource to be deleted
-   * @return success flag
    */
-  public static boolean delete(final Data data, final String res) {
+  public static void delete(final Data data, final String res) {
     final IOFile file = data.meta.binary(res);
-    return file != null && file.delete();
+    if(file != null) file.delete();
   }
 }
