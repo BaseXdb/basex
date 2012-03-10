@@ -1,4 +1,5 @@
 package org.basex.examples.api;
+
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;

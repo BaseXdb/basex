@@ -1,4 +1,5 @@
 package org.basex.examples.api;
+
 import java.io.*;
 
 /**
