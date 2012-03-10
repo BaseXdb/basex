@@ -4,8 +4,8 @@ import static org.basex.core.Prop.*;
 import org.basex.io.IO;
 import org.basex.util.Levenshtein;
 import static org.basex.util.Token.token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+
+import org.basex.util.*;
 import org.basex.util.list.StringList;
 
 import java.io.*;
@@ -128,6 +128,38 @@ public abstract class AProp implements Iterable<String> {
     if(!err.isEmpty()) {
       Util.err(err.toString());
       write();
+    }
+  }
+
+  /**
+   * Parser a property string and sets the properties accordingly.
+   * @param s property string
+   * @throws IOException io exception
+   */
+  public final void properties(final String s) throws IOException {
+    for(final String ser : s.trim().split(",")) {
+      if(ser.isEmpty()) continue;
+      final String[] sprop = ser.split("=", 2);
+      final String key = sprop[0].trim().toLowerCase(Locale.ENGLISH);
+      final Object obj = get(key);
+      if(obj == null) {
+        final String in = key.toUpperCase(Locale.ENGLISH);
+        final String sim = similar(in);
+        throw new BaseXException(
+            sim != null ? org.basex.core.Text.UNKNOWN_OPT_SIMILAR_X :
+              org.basex.core.Text.UNKNOWN_OPTION_X, in, sim);
+      }
+      if(obj instanceof Integer) {
+        final int i = sprop.length < 2 ? 0 : Token.toInt(sprop[1]);
+        if(i == Integer.MIN_VALUE)
+          throw new BaseXException(org.basex.core.Text.INVALID_VALUE_X_X, key, sprop[1]);
+        set(key, i);
+      } else if(obj instanceof Boolean) {
+        final String val = sprop.length < 2 ? org.basex.core.Text.TRUE : sprop[1];
+        set(key, Util.yes(val));
+      } else {
+        set(key, sprop.length < 2 ? "" : sprop[1]);
+      }
     }
   }
 

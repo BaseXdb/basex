@@ -1,14 +1,9 @@
 package org.basex.build.file;
 
-import static org.basex.core.Text.*;
+import java.io.*;
 
-import java.io.IOException;
-import java.util.Locale;
-
-import org.basex.core.AProp;
-import org.basex.core.BaseXException;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class contains parser properties.
@@ -47,30 +42,7 @@ public final class ParserProp extends AProp {
    */
   public ParserProp(final String s) throws IOException {
     this();
-
-    for(final String ser : s.trim().split(",")) {
-      if(ser.isEmpty()) continue;
-      final String[] sprop = ser.split("=", 2);
-      final String key = sprop[0].trim().toLowerCase(Locale.ENGLISH);
-      final Object obj = get(key);
-      if(obj == null) {
-        final String in = key.toUpperCase(Locale.ENGLISH);
-        final String sim = similar(in);
-        throw new BaseXException(
-            sim != null ? UNKNOWN_OPT_SIMILAR_X : UNKNOWN_OPTION_X, in, sim);
-      }
-      if(obj instanceof Integer) {
-        final int i = sprop.length < 2 ? 0 : Token.toInt(sprop[1]);
-        if(i == Integer.MIN_VALUE)
-          throw new BaseXException(INVALID_VALUE_X_X, key, sprop[1]);
-        set(key, i);
-      } else if(obj instanceof Boolean) {
-        final String val = sprop.length < 2 ? TRUE : sprop[1];
-        set(key, Util.yes(val));
-      } else {
-        set(key, sprop.length < 2 ? "" : sprop[1]);
-      }
-    }
+    super.properties(s);
   }
 
   @Override
