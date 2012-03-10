@@ -23,6 +23,9 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class HTMLParser extends XMLParser {
+  /** TagSoup URL. */
+  private static final String FEATURES = "http://www.ccil.org/~cowan/tagsoup/features/";
+
   /** HTML reader. */
   private static final Class<?> READER = Reflect.find("org.ccil.cowan.tagsoup.Parser");
   /** HTML writer. */
@@ -106,40 +109,31 @@ public final class HTMLParser extends XMLParser {
         opt("method", p);
       }
       if(props.is(HTMLProp.NOBOGONS)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/ignore-bogons", true);
+        reader.setFeature(FEATURES + "ignore-bogons", true);
       }
       if(props.is(HTMLProp.NODEFAULTS)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/default-attributes", false);
+        reader.setFeature(FEATURES + "default-attributes", false);
       }
       if(props.is(HTMLProp.NOCOLONS)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/translate-colons", true);
+        reader.setFeature(FEATURES + "translate-colons", true);
       }
       if(props.is(HTMLProp.NORESTART)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/restart-elements", false);
+        reader.setFeature(FEATURES + "restart-elements", false);
       }
       if(props.is(HTMLProp.IGNORABLE)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/ignorable-whitespace", true);
+        reader.setFeature(FEATURES + "ignorable-whitespace", true);
       }
       if(props.is(HTMLProp.EMPTYBOGONS)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/bogons-empty", true);
+        reader.setFeature(FEATURES + "bogons-empty", true);
       }
       if(props.is(HTMLProp.ANY)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/bogons-empty", false);
+        reader.setFeature(FEATURES + "bogons-empty", false);
       }
       if(props.is(HTMLProp.NOROOTBOGONS)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/root-bogons", false);
+        reader.setFeature(FEATURES + "root-bogons", false);
       }
       if(props.is(HTMLProp.NOCDATA)) {
-        reader.setFeature(
-            "http://www.ccil.org/~cowan/tagsoup/features/cdata-elements", false);
+        reader.setFeature(FEATURES + "cdata-elements", false);
       }
       if(props.is(HTMLProp.LEXICAL)) {
         reader.setProperty("http://xml.org/sax/properties/lexical-handler", writer);
@@ -158,9 +152,9 @@ public final class HTMLParser extends XMLParser {
       reader.setContentHandler((ContentHandler) writer);
       reader.parse(is);
       return new IOContent(token(sw.toString()), io.name());
+
     } catch(final SAXException ex) {
-      System.out.println("problem!");
-      Util.debug(ex);
+      Util.errln(ex);
       return io;
     }
   }

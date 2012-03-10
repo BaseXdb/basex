@@ -49,6 +49,8 @@ final class DialogParsing extends BaseXBack {
 
   /** HTML options panel. */
   private final BaseXBack htmlopts;
+  /** Parameters. */
+  private final BaseXTextField params;
 
   /** CSV options panel. */
   private final BaseXBack csvopts;
@@ -104,16 +106,14 @@ final class DialogParsing extends BaseXBack {
     chop = new BaseXCheckBox(CHOP_WS, prop.is(Prop.CHOP), 0, d);
     cfile = new BaseXTextField(prop.get(Prop.CATFILE), d);
     browsec = new BaseXButton(BROWSE_D, d);
-    usecat = new BaseXCheckBox(USE_CATALOG_FILE,
-      !prop.get(Prop.CATFILE).isEmpty(), 0, d);
+    usecat = new BaseXCheckBox(USE_CATALOG_FILE, !prop.get(Prop.CATFILE).isEmpty(), 0, d);
 
-    jsonml = new BaseXCheckBox(PARSE_AS_JSONML,
-      props.is(ParserProp.JSONML), 0, d);
+    jsonml = new BaseXCheckBox(PARSE_AS_JSONML, props.is(ParserProp.JSONML), 0, d);
 
-    lines = new BaseXCheckBox(SPLIT_INPUT_LINES,
-      props.is(ParserProp.LINES), 0, d);
-    header = new BaseXCheckBox(FIRST_LINE_HEADER,
-      props.is(ParserProp.HEADER), 0, d);
+    params = new BaseXTextField(prop.get(Prop.HTMLOPT), d);
+
+    lines = new BaseXCheckBox(SPLIT_INPUT_LINES, props.is(ParserProp.LINES), 0, d);
+    header = new BaseXCheckBox(FIRST_LINE_HEADER, props.is(ParserProp.HEADER), 0, d);
     separator = new BaseXCombo(d, CSVParser.SEPARATORS);
     separator.setSelectedItem(props.get(ParserProp.SEPARATOR));
     format = new BaseXCombo(d, CSVParser.FORMATS);
@@ -125,7 +125,7 @@ final class DialogParsing extends BaseXBack {
     jencoding = DialogExport.encoding(d, enc);
 
     xmlopts  = new BaseXBack(new TableLayout(8, 1));
-    htmlopts = new BaseXBack(new TableLayout(1, 1));
+    htmlopts = new BaseXBack(new TableLayout(2, 1));
     jsonopts = new BaseXBack(new TableLayout(2, 1));
     csvopts  = new BaseXBack(new TableLayout(2, 1));
     textopts = new BaseXBack(new TableLayout(2, 1));
@@ -169,7 +169,15 @@ final class DialogParsing extends BaseXBack {
     }
 
     final boolean avl = HTMLParser.available();
-    htmlopts.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER));
+    htmlopts.add(new BaseXLabel(avl ? H_HTML_PARSER : H_NO_HTML_PARSER).
+        border(0, 0, 12, 0));
+
+    if(avl) {
+      final BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 0));
+      p.add(new BaseXLabel(PARAMETERS + COL, true, true));
+      p.add(params);
+      htmlopts.add(p);
+    }
 
     BaseXBack p = new BaseXBack(new TableLayout(1, 2, 8, 4));
     p.add(new BaseXLabel(ENCODING + COL, true, true));
@@ -271,5 +279,6 @@ final class DialogParsing extends BaseXBack {
     gui.set(Prop.DTD, dtd.isSelected());
     gui.set(Prop.INTPARSE, intparse.isSelected());
     gui.set(Prop.CATFILE, usecat.isSelected() ? cfile.getText() : "");
+    gui.set(Prop.HTMLOPT, params.getText());
   }
 }

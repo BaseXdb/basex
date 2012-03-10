@@ -72,7 +72,7 @@ public final class Prop extends AProp {
   /** Define parser options. */
   public static final Object[] PARSEROPT = { "PARSEROPT",
     "encoding=UTF-8,flat=false,format=verbose,header=false,jsonml=false," +
-    "lines=true,separator=comma,html=false" };
+    "lines=true,separator=comma" };
   /** Define TagSoup HTML options. */
   public static final Object[] HTMLOPT = { "HTMLOPT",
     "html=false,omit-xml-declaration=false,method=xml,nons=false,nobogons=false," +
