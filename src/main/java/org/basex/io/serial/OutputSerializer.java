@@ -6,22 +6,18 @@ import static org.basex.io.serial.SerializerProp.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.io.*;
+import java.nio.charset.*;
 
-import org.basex.data.FTPos;
-import org.basex.io.MimeTypes;
-import org.basex.io.out.PrintOutput;
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.StrStream;
-import org.basex.util.TokenBuilder;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTSpan;
-import org.basex.util.hash.TokenSet;
-import org.basex.util.list.TokenList;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class serializes data to an output stream.
@@ -95,8 +91,8 @@ public abstract class OutputSerializer extends Serializer {
       final String... versions) throws IOException {
 
     final SerializerProp p = props == null ? PROPS : props;
-    final String ver = p.get(S_VERSION).isEmpty() ?
-        versions.length > 0 ? versions[0] : "" : p.check(S_VERSION, versions);
+    final String ver = versions.length == 0 ? "" :
+        p.get(S_VERSION).isEmpty() ? versions[0] : p.check(S_VERSION, versions);
 
     final boolean decl = !p.yes(S_OMIT_XML_DECLARATION);
     final boolean bom  = p.yes(S_BYTE_ORDER_MARK);
@@ -117,8 +113,6 @@ public abstract class OutputSerializer extends Serializer {
     format  = p.yes(S_FORMAT);
     tab     = p.yes(S_TABULATOR) ? '\t' : ' ';
     wPre    = token(p.get(S_WRAP_PREFIX));
-    /* URI for wrapped results. */
-    final byte[] wUri = token(p.get(S_WRAP_URI));
     wrap    = wPre.length != 0;
     final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
@@ -190,9 +184,8 @@ public abstract class OutputSerializer extends Serializer {
 
     // open results element
     if(wrap) {
-      openElement(wPre.length != 0 ?
-          concat(wPre, COLON, T_RESULTS) : T_RESULTS);
-      namespace(wPre, wUri);
+      openElement(concat(wPre, COLON, T_RESULTS));
+      namespace(wPre, token(p.get(S_WRAP_URI)));
     }
   }
 

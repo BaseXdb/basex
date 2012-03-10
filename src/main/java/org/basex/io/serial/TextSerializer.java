@@ -1,7 +1,6 @@
 package org.basex.io.serial;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * This class serializes data as text.
@@ -16,8 +15,7 @@ public class TextSerializer extends OutputSerializer {
    * @param p serialization properties
    * @throws IOException I/O exception
    */
-  TextSerializer(final OutputStream os, final SerializerProp p)
-      throws IOException {
+  TextSerializer(final OutputStream os, final SerializerProp p) throws IOException {
     super(os, p);
   }
 
