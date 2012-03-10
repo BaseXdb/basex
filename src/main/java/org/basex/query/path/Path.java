@@ -2,6 +2,7 @@ package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
+import static org.basex.query.util.Err.*;
 
 import java.io.*;
 import java.util.*;
@@ -180,20 +181,22 @@ public abstract class Path extends ParseExpr {
    * Checks if the location path contains steps that will never yield results.
    * @param stps step array
    * @return empty step, or {@code null}
+   * @throws QueryException query exception
    */
-  AxisStep voidStep(final Expr[] stps) {
+  AxisStep voidStep(final Expr[] stps) throws QueryException {
     for(int l = 0; l < stps.length; ++l) {
       final AxisStep s = axisStep(l);
       if(s == null) continue;
       final Axis sa = s.axis;
       if(l == 0) {
         if(root instanceof CAttr) {
-          if(sa == CHILD || sa == DESC) return s;
+          // @.../child:: / @.../descendant::
+          if(sa == CHILD || sa == DESC) ATTDESC.thrw(input, root);
         } else if(root instanceof Root || root instanceof Value &&
             ((Value) root).type == NodeType.DOC || root instanceof CDoc) {
           if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
             (sa != SELF && sa != ANCORSELF ||
-             s.test != Test.NOD && s.test != Test.DOC)) return s;
+            s.test != Test.NOD && s.test != Test.DOC)) DOCAXES.thrw(input, root, sa);
         }
       } else {
         final AxisStep ls = axisStep(l - 1);
@@ -219,7 +222,7 @@ public abstract class Path extends ParseExpr {
         } else if(sa == DESC || sa == CHILD || sa == ATTR) {
           // .../descendant:: / .../child:: / .../attribute::
           if(lsa == ATTR || ls.test == Test.TXT || ls.test == Test.COM ||
-             ls.test == Test.PI) return s;
+              ls.test == Test.PI) return s;
         } else if(sa == PARENT || sa == ANC) {
           // .../parent:: / .../ancestor::
           if(ls.test == Test.DOC) return s;

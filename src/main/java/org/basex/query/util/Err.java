@@ -515,6 +515,10 @@ public enum Err {
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
+  /** XPST0005: Parsing exception. */
+  ATTDESC(XPST, 5, "Warning: '%' cannot have descendants."),
+  /** XPST0005: Parsing exception. */
+  DOCAXES(XPST, 5, "Warning: '%' cannot have % nodes."),
 
   /** XPST0008: Parsing exception. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
