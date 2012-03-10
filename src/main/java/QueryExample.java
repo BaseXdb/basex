@@ -1,18 +1,16 @@
-package org.basex.examples.api;
-
 import java.io.IOException;
-import org.basex.examples.api.BaseXClient.Query;
 
 /**
- * This example shows how external variables can be bound to XQuery expressions.
+ * This example shows how queries can be executed in an iterative manner.
+ * Iterative evaluation will be slower, as more server requests are performed.
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-12, BSD License
  */
-public final class QueryBindExample {
+public final class QueryExample {
   /** Hidden default constructor. */
-  private QueryBindExample() { }
+  private QueryExample() { }
 
   /**
    * Main method.
@@ -26,16 +24,16 @@ public final class QueryBindExample {
 
       try {
         // create query instance
-        final String input = "declare variable $name external; " +
-            "for $i in 1 to 10 return element { $name } { $i }";
+        final String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
+        final BaseXClient.Query query = session.query(input);
 
-        final Query query = session.query(input);
+        // loop through all results
+        while(query.more()) {
+          System.out.println(query.next());
+        }
 
-        // bind variable
-        query.bind("$name", "number");
-
-        // print result
-        System.out.print(query.execute());
+        // print query info
+        System.out.println(query.info());
 
         // close query instance
         query.close();

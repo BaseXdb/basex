@@ -1,7 +1,4 @@
-package org.basex.examples.api;
-
-import java.io.IOException;
-import org.basex.examples.api.BaseXClient.EventNotifier;
+import java.io.*;
 
 /**
  * This example shows how to use the event feature.
@@ -42,9 +39,9 @@ public final class EventExample {
   /**
    * Implementation of the event notifier interface.
    */
-  private static class Notifier implements EventNotifier {
+  private static class Notifier implements BaseXClient.EventNotifier {
     /** Constructor. */
-    public Notifier() { }
+    Notifier() { }
 
     @Override
     public void notify(final String value) {

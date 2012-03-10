@@ -1,5 +1,3 @@
-package org.basex.examples.api;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -288,7 +286,9 @@ public class BaseXClient {
             final String data = new String(os.toByteArray(), UTF8);
             notifiers.get(name).notify(data);
           }
-        } catch(final IOException ex) { /* ignored */ }
+        } catch(final IOException ex) {
+          // loop will be quit if no data can be received anymore
+        }
       }
     }.start();
   }

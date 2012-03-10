@@ -1,5 +1,3 @@
-package org.basex.examples.api;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
