@@ -4,7 +4,6 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.restxq.RestXqText.*;
 
 import org.basex.http.*;
-import org.basex.http.rest.*;
 
 /**
  * <p>This servlet receives and processes REST requests.

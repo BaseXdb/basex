@@ -2,7 +2,7 @@ package org.basex.http.webdav;
 
 import java.io.*;
 
-import org.basex.http.rest.*;
+import org.basex.http.*;
 
 import com.bradmcevoy.http.*;
 

@@ -1,4 +1,4 @@
-package org.basex.http.rest;
+package org.basex.http;
 
 import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.HTTPText.*;
@@ -8,7 +8,6 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import org.basex.http.*;
 import org.basex.query.*;
 import org.basex.server.*;
 import org.basex.util.*;
