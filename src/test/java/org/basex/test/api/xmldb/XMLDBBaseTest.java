@@ -11,8 +11,7 @@ import org.basex.api.xmldb.BXDatabase;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.MainProp;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.*;
 
 /**
  * Base class for all XMLDB tests.
@@ -51,6 +50,7 @@ public abstract class XMLDBBaseTest {
    */
   protected static void createDB() throws BaseXException {
     new CreateDB(COLL, DOCPATH + DOC1).execute(CTX);
+    new Close().execute(CTX);
   }
 
   /**

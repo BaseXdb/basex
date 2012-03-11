@@ -1,11 +1,9 @@
 package org.basex.api.xmldb;
 
-import org.basex.core.BaseXException;
-import org.basex.core.cmd.DropDB;
-import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.XMLDBException;
-import org.xmldb.api.modules.CollectionManagementService;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.xmldb.api.base.*;
+import org.xmldb.api.modules.*;
 
 /**
  * Implementation of the CollectionManagementService Interface for the
@@ -69,8 +67,7 @@ final class BXCollectionManagementService implements
   }
 
   @Override
-  public void setProperty(final String nm, final String value)
-      throws XMLDBException {
+  public void setProperty(final String nm, final String value) throws XMLDBException {
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + nm);
   }
 }

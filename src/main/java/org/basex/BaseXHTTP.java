@@ -24,15 +24,16 @@ import org.mortbay.jetty.nio.*;
  */
 public final class BaseXHTTP {
   /** Database context. */
-  private final Context ctx = HTTPContext.init();
+  final Context context = HTTPContext.init();
+  /** Start database server. */
+  boolean server;
+
   /** Activate WebDAV. */
   private boolean webdav = true;
   /** Activate REST. */
   private boolean rest = true;
   /** Activate RestXQ. */
   private boolean restxq = true;
-  /** Start database server. */
-  private boolean server;
 
   /** Start as daemon. */
   private boolean service;
@@ -68,7 +69,7 @@ public final class BaseXHTTP {
     // flag for starting/stopping the database server
     server = !Token.eqic(System.getProperty(DBMODE), LOCAL, CLIENT);
 
-    final MainProp mprop = ctx.mprop;
+    final MainProp mprop = context.mprop;
     final int port = mprop.num(MainProp.SERVERPORT);
     final int eport = mprop.num(MainProp.EVENTPORT);
     final int hport = mprop.num(MainProp.HTTPPORT);
@@ -86,7 +87,7 @@ public final class BaseXHTTP {
       start(hport, args);
       Util.outln(HTTP + ' ' + SRV_STARTED);
       if(server) Util.outln(SRV_STARTED);
-      // keep the console window a little bit, so the user can read the message
+      // keep the console window open for a while, so the user can read the message
       Performance.sleep(1000);
       return;
     }
@@ -95,7 +96,7 @@ public final class BaseXHTTP {
       stop();
       Util.outln(HTTP + ' ' + SRV_STOPPED);
       if(server) Util.outln(SRV_STOPPED);
-      // keep the console window a little bit, so the user can read the message
+      // keep the console window open for a while, so the user can read the message
       Performance.sleep(1000);
       return;
     }
@@ -110,8 +111,8 @@ public final class BaseXHTTP {
 
     if(server) {
       // default mode: start database server
-      if(quiet) new BaseXServer(ctx, "-z");
-      else new BaseXServer(ctx);
+      if(quiet) new BaseXServer(context, "-z");
+      else new BaseXServer(context);
       Util.outln(HTTP + ' ' + SRV_STARTED);
     } else {
       // local or client mode
@@ -134,7 +135,7 @@ public final class BaseXHTTP {
 
     final ResourceHandler rh = new ResourceHandler();
     rh.setWelcomeFiles(new String[] { "index.xml", "index.xhtml", "index.html" });
-    rh.setResourceBase(ctx.mprop.get(MainProp.HTTPPATH));
+    rh.setResourceBase(context.mprop.get(MainProp.HTTPPATH));
 
     final HandlerList hl = new HandlerList();
     hl.addHandler(rh);
@@ -148,6 +149,7 @@ public final class BaseXHTTP {
       @Override
       public void run() {
         Util.outln(HTTP + ' ' + SRV_STOPPED);
+        context.close();
       }
     });
   }
@@ -158,11 +160,11 @@ public final class BaseXHTTP {
    */
   public void stop() throws Exception {
     // notify the jetty monitor, that it should stop
-    stop(ctx.mprop.num(MainProp.STOPPORT));
+    stop(context.mprop.num(MainProp.STOPPORT));
     // server has been started as separate process and need to be stopped
     if(server) {
-      final int port = ctx.mprop.num(MainProp.SERVERPORT);
-      final int eport = ctx.mprop.num(MainProp.EVENTPORT);
+      final int port = context.mprop.num(MainProp.SERVERPORT);
+      final int eport = context.mprop.num(MainProp.EVENTPORT);
       BaseXServer.stop(port, eport);
     }
   }
@@ -183,27 +185,27 @@ public final class BaseXHTTP {
             client = true;
             break;
           case 'd': // activate debug mode
-            ctx.mprop.set(MainProp.DEBUG, true);
+            context.mprop.set(MainProp.DEBUG, true);
             break;
           case 'D': // hidden flag: daemon mode
             daemon = true;
             break;
           case 'e': // parse event port
-            ctx.mprop.set(MainProp.EVENTPORT, arg.number());
+            context.mprop.set(MainProp.EVENTPORT, arg.number());
             break;
           case 'h': // parse HTTP port
-            ctx.mprop.set(MainProp.HTTPPORT, arg.number());
+            context.mprop.set(MainProp.HTTPPORT, arg.number());
             break;
           case 'l': // use local mode
             System.setProperty(DBMODE, LOCAL);
             local = true;
             break;
           case 'n': // parse host name
-            ctx.mprop.set(MainProp.HOST, arg.string());
+            context.mprop.set(MainProp.HOST, arg.string());
             break;
           case 'p': // parse server port
-            ctx.mprop.set(MainProp.PORT, arg.number());
-            ctx.mprop.set(MainProp.SERVERPORT, ctx.mprop.num(MainProp.PORT));
+            context.mprop.set(MainProp.PORT, arg.number());
+            context.mprop.set(MainProp.SERVERPORT, context.mprop.num(MainProp.PORT));
             break;
           case 'R': // deactivate REST service
             rest = false;
@@ -212,7 +214,7 @@ public final class BaseXHTTP {
             System.setProperty(DBPASS, arg.string());
             break;
           case 's': // parse stop port
-            ctx.mprop.set(MainProp.STOPPORT, arg.number());
+            context.mprop.set(MainProp.STOPPORT, arg.number());
             break;
           case 'S': // set service flag
             service = !daemon;
