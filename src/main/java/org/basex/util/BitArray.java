@@ -1,7 +1,8 @@
 package org.basex.util;
 
 import static java.lang.Long.*;
-import java.util.BitSet;
+
+import java.util.*;
 
 /**
  * Bit array that grows when needed. The implementation is similar to
@@ -21,7 +22,9 @@ public final class BitArray {
   /** Bit storage. */
   private long[] words;
   /** Number of used bits. */
-  private long length;
+  private int length;
+  /** All set? If bit is set, array must not be actually true'd. */
+  private boolean all;
 
   /** Construct a new bit array. */
   public BitArray() {
@@ -41,7 +44,7 @@ public final class BitArray {
    * @param a array with bits
    * @param l number of used bits
    */
-  public BitArray(final long[] a, final long l) {
+  public BitArray(final long[] a, final int l) {
     setWords(a, l);
   }
 
@@ -63,9 +66,10 @@ public final class BitArray {
    * @param a array with bits
    * @param l number of used bits
    */
-  public void setWords(final long[] a, final long l) {
+  public void setWords(final long[] a, final int l) {
     words = a;
     length = l;
+    all = false;
   }
 
   /**
@@ -74,6 +78,12 @@ public final class BitArray {
    * @return array of longs
    */
   public long[] toArray() {
+    if (all) {
+      final long[] result = new long[words.length];
+      Arrays.fill(result, WORD_MASK);
+      return result;
+    }
+
     // find the last index of a word which is different from 0:
     int i = words.length;
     while(--i >= 0 && words[i] == 0);
@@ -90,6 +100,7 @@ public final class BitArray {
    */
   public boolean get(final int i) {
     if(i >= length) return false;
+    if(all) return true;
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     final int wordIndex = i >>> WORD_POWER;
     // check if the ith bit is 1
@@ -102,10 +113,33 @@ public final class BitArray {
    */
   public void set(final int i) {
     // calculate the index of the word in the array: i div 2^6 = i >> 6
+    final int oldIndex = length >>> WORD_POWER;
+    if(all && i >= length) {
+      for(int j = 0; j < oldIndex; j++)
+        words[j] = WORD_MASK;
+      words[oldIndex] = Long.MAX_VALUE >> length % WORD_SIZE - 1;
+      all = !(i > length);
+    }
+    // calculate the index of the word in the array: i div 2^6 = i >> 6
     final int wordIndex = i >>> WORD_POWER;
     if(wordIndex >= words.length) expandTo(wordIndex + 1);
     words[wordIndex] |= 1L << i;
-    if(i >= length) length = i + 1L;
+    if(i >= length) length = i + 1;
+  }
+
+  /**
+   * Set all bits.
+   */
+  public void setAll() {
+    all = true;
+  }
+
+  /**
+   * Are all bits set?
+   * @return Whether all bits are set.
+   */
+  public boolean getAll() {
+    return all || nextClearBit(0) == length;
   }
 
   /**
@@ -113,6 +147,10 @@ public final class BitArray {
    * @param i index of the bit
    */
   public void clear(final int i) {
+    if (all) {
+      all = false;
+      Arrays.fill(words, WORD_MASK);
+    }
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     final int wordIndex = i >>> WORD_POWER;
     if(wordIndex >= words.length) expandTo(wordIndex + 1);
@@ -126,6 +164,7 @@ public final class BitArray {
    * @return index of the next clear bit after the i<sup>th</sup> bit
    */
   public int nextClearBit(final int i) {
+    if (all) return length;
     // calculate the index of the word in the array: i div 2^6 = i >> 6
     int wordIndex = i >>> WORD_POWER;
     // invert the word and skip the first i bits:
