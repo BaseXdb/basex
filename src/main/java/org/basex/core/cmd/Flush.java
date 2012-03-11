@@ -2,9 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.Command;
-import org.basex.core.Prop;
-import org.basex.core.User;
+import org.basex.core.*;
 import org.basex.data.Data;
 
 /**
@@ -29,5 +27,10 @@ public final class Flush extends Command {
     data.flush();
     prop.set(Prop.AUTOFLUSH, af);
     return info(DB_FLUSHED_X, data.meta.name, perf);
+  }
+
+  @Override
+  public String pinned(final Context ctx) {
+    return null;
   }
 }

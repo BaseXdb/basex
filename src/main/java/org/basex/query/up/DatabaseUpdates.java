@@ -33,8 +33,7 @@ final class DatabaseUpdates {
   private IntList nodes = new IntList(0);
   /** Mapping between pre values of the target nodes and all update primitives
    * which operate on this target. */
-  private final IntMap<NodeUpdates> updatePrimitives =
-      new IntMap<NodeUpdates>();
+  private final IntMap<NodeUpdates> updatePrimitives = new IntMap<NodeUpdates>();
 
   /**
    * Constructor.
@@ -65,6 +64,9 @@ final class DatabaseUpdates {
    * @throws QueryException query exception
    */
   void check() throws QueryException {
+    // check if database is locked by another process
+    if(data.pinned()) OPENED.thrw(null, data.meta.name);
+
     // get and sort keys (pre/id values)
     final int s = updatePrimitives.size();
     nodes = new IntList(s);
@@ -79,10 +81,7 @@ final class DatabaseUpdates {
         /* check if the identity of all target nodes of fn:put operations is
            still available after the execution of updates. that includes parent
            nodes as well */
-
-        if(p.type == PUT && ancestorDeleted(nodes.get(i))) {
-          UPFOTYPE.thrw(p.input, p);
-        }
+        if(p.type == PUT && ancestorDeleted(nodes.get(i))) UPFOTYPE.thrw(p.input, p);
       }
     }
 
@@ -112,6 +111,86 @@ final class DatabaseUpdates {
         --p;
       }
     }
+  }
+
+  /**
+   * Applies all updates for this specific database.
+   * @throws QueryException query exception
+   */
+  void apply() throws QueryException {
+    optimize();
+
+    // mark disk database instances as updating
+    if(!data.update(true)) LOCK.thrw(null, data.meta.name);
+
+    /*
+     * For each target node, the update primitives in the corresponding
+     * container are applied. Certain operations may lead to text node
+     * adjacency. As the updates in a container, including eventual text node
+     * merges, may not affect the preceding sibling axis (as there could be
+     * other update primitives with a target on this axis), we have to make
+     * sure that updates on the preceding sibling axis have been carried out.
+     *
+     * To achieve this we keep track of the most recently applied container
+     * and resolve text adjacency issues after the next container on the
+     * preceding axis has been executed.
+     */
+    try {
+      NodeUpdates recent = null;
+      // apply updates from the highest to the lowest pre value
+      for(int i = nodes.size() - 1; i >= 0; i--) {
+        final NodeUpdates current = updatePrimitives.get(nodes.get(i));
+        // first run, no recent container
+        if(recent == null)
+          current.makePrimitivesEffective();
+        else
+          recent.resolveExternalTextNodeAdjacency(
+              current.makePrimitivesEffective());
+
+        recent = current;
+      }
+      // resolve text adjacency issues of the last container
+      recent.resolveExternalTextNodeAdjacency(0);
+    } finally {
+      data.flush();
+      // mark disk database instances as updating
+      if(!data.update(false)) UNLOCK.thrw(null, data.meta.name);
+    }
+
+    if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
+      try {
+        Export.export(data, data.meta.original);
+      } catch(final IOException ex) {
+        UPPUTERR.thrw(null, data.meta.original);
+      }
+    }
+  }
+
+  /**
+   * Returns the number of performed updates.
+   * @return number of updates
+   */
+  int size() {
+    int s = 0;
+    for(int i = nodes.size() - 1; i >= 0; i--) {
+      for(final UpdatePrimitive up : updatePrimitives.get(nodes.get(i)).prim) {
+        s += up.size();
+      }
+    }
+    return s;
+  }
+
+  /**
+   * Determines recursively whether an ancestor of a given node is deleted.
+   * @param n pre value
+   * @return true if ancestor deleted
+   */
+  private boolean ancestorDeleted(final int n) {
+    final NodeUpdates up = updatePrimitives.get(n);
+    if(up != null && up.updatesDestroyIdentity(n)) return true;
+
+    final int p = data.parent(n, data.kind(n));
+    return p != -1 && ancestorDeleted(p);
   }
 
   /**
@@ -155,7 +234,7 @@ final class DatabaseUpdates {
    * Identifies unnecessary update operations and removes them from the pending
    * update list.
    */
-  private void treeAwareUpdates() {
+  private void optimize() {
     /* Tree Aware Updates: Unnecessary updates on the descendant axis of a
      * deleted or replaced node or of a node which is target of a replace
      * element content expression are identified and removed from the pending
@@ -188,85 +267,5 @@ final class DatabaseUpdates {
       if(pre != -1) newNodes.add(pre);
     }
     nodes = newNodes;
-  }
-
-  /**
-   * Applies all updates for this specific database.
-   * @throws QueryException query exception
-   */
-  void apply() throws QueryException {
-    treeAwareUpdates();
-
-    // mark disk database instances as updating
-    if(!data.updating(true)) LOCK.thrw(null, data.meta.name);
-
-    /*
-     * For each target node, the update primitives in the corresponding
-     * container are applied. Certain operations may lead to text node
-     * adjacency. As the updates in a container, including eventual text node
-     * merges, may not affect the preceding sibling axis (as there could be
-     * other update primitives with a target on this axis), we have to make
-     * sure that updates on the preceding sibling axis have been carried out.
-     *
-     * To achieve this we keep track of the most recently applied container
-     * and resolve text adjacency issues after the next container on the
-     * preceding axis has been executed.
-     */
-    try {
-      NodeUpdates recent = null;
-      // apply updates from the highest to the lowest pre value
-      for(int i = nodes.size() - 1; i >= 0; i--) {
-        final NodeUpdates current = updatePrimitives.get(nodes.get(i));
-        // first run, no recent container
-        if(recent == null)
-          current.makePrimitivesEffective();
-        else
-          recent.resolveExternalTextNodeAdjacency(
-              current.makePrimitivesEffective());
-
-        recent = current;
-      }
-      // resolve text adjacency issues of the last container
-      recent.resolveExternalTextNodeAdjacency(0);
-    } finally {
-      data.flush();
-      // mark disk database instances as updating
-      if(!data.updating(false)) UNLOCK.thrw(null, data.meta.name);
-    }
-
-    if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
-      try {
-        Export.export(data, data.meta.original);
-      } catch(final IOException ex) {
-        UPPUTERR.thrw(null, data.meta.original);
-      }
-    }
-  }
-
-  /**
-   * Determines recursively whether an ancestor of a given node is deleted.
-   * @param n pre value
-   * @return true if ancestor deleted
-   */
-  boolean ancestorDeleted(final int n) {
-    final NodeUpdates up = updatePrimitives.get(n);
-    if(up != null && up.updatesDestroyIdentity(n)) return true;
-
-    final int p = data.parent(n, data.kind(n));
-    return p != -1 && ancestorDeleted(p);
-  }
-
-  /**
-   * Returns the number of performed updates.
-   * @return number of updates
-   */
-  int size() {
-    int s = 0;
-    for(int i = nodes.size() - 1; i >= 0; i--) {
-      for(final UpdatePrimitive up : updatePrimitives.get(nodes.get(i)).prim) {
-        s += up.size();
-      }
-    }
-    return s;
   }
 }

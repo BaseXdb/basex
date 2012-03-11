@@ -66,7 +66,7 @@ public abstract class ACreate extends Command {
    * @param db name of database
    * @return success of operation
    */
-  final boolean build(final Parser parser, final String db) {
+  protected final boolean build(final Parser parser, final String db) {
     if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
 
     // close open database
@@ -81,12 +81,12 @@ public abstract class ACreate extends Command {
         context.openDB(data);
         context.pin(data);
       } else {
-        Data data = progress(new DiskBuilder(db, parser, context)).build();
-        data.close();
+        // first step: create database
+        progress(new DiskBuilder(db, parser, context)).build().close();
+        // second step: open database and create index structures
         final Open open = new Open(db);
         if(!open.run(context)) return error(open.info());
-
-        data = context.data();
+        final Data data = context.data();
         if(data.meta.createtext) create(IndexType.TEXT,      data, this);
         if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
         if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
@@ -109,6 +109,24 @@ public abstract class ACreate extends Command {
       abort();
       return error(Util.info(NOT_PARSED_X, parser.src));
     }
+  }
+
+  /**
+   * Starts an update by marking the database as 'updating'.
+   * @param data data reference
+   * @return success flag
+   */
+  protected boolean startUpdate(final Data data) {
+    return data.update(true) || error(LOCK_X, data.meta.name);
+  }
+
+  /**
+   * Finalizes an update by removing 'updating' flag.
+   * @param data data reference
+   * @return success flag
+   */
+  protected boolean stopUpdate(final Data data) {
+    return data.update(false) || error(UNLOCK_X, data.meta.name);
   }
 
   /**
@@ -141,7 +159,7 @@ public abstract class ACreate extends Command {
    * @param cmd calling command
    * @throws IOException I/O exception
    */
-  static void create(final IndexType index, final Data data, final ACreate cmd)
+  protected static void create(final IndexType index, final Data data, final ACreate cmd)
       throws IOException {
 
     if(data instanceof MemData) return;
@@ -163,7 +181,9 @@ public abstract class ACreate extends Command {
    * @return success of operation
    * @throws IOException I/O exception
    */
-  static boolean drop(final IndexType index, final Data data) throws IOException {
+  protected static boolean drop(final IndexType index, final Data data)
+      throws IOException {
+
     String pat = null;
     switch(index) {
       case TEXT:
@@ -184,5 +204,21 @@ public abstract class ACreate extends Command {
     data.meta.dirty = true;
     data.flush();
     return pat == null || data.meta.drop(pat + '.');
+  }
+
+  /**
+   * Checks if the addressed database is pinned by this or another process.
+   * @param name name of database
+   * @param ctx database context
+   * @return result of check
+   */
+  protected static boolean pinned(final Context ctx, final String name) {
+    // check if name is not valid or if db will be created in main memory
+    if(!MetaData.validName(name, false)) return false;
+    // check if db is already pinned
+    final Data data = ctx.data();
+    // check if name of opened and specified database are identical
+    return data != null && data.meta.name.equals(name) ?
+        data.pinned() : DiskData.pinned(ctx.mprop.dbpath(name), "");
   }
 }

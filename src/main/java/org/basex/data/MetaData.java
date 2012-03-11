@@ -112,7 +112,7 @@ public final class MetaData {
 
   /**
    * Constructor, specifying the database name and context.
-   * @param db database name
+   * @param db name of the database
    * @param ctx database context
    */
   public MetaData(final String db, final Context ctx) {
@@ -121,7 +121,7 @@ public final class MetaData {
 
   /**
    * Constructor, specifying the database name.
-   * @param db database name
+   * @param db name of the database
    * @param pr database properties
    * @param mprop main properties
    */
@@ -150,13 +150,11 @@ public final class MetaData {
   /**
    * Checks if the specified file path refers to the specified database.
    * @param path file path
-   * @param db database name
+   * @param db name of the database
    * @param mprop main properties
    * @return result of check
    */
-  public static boolean found(final String path, final String db,
-      final MainProp mprop) {
-
+  public static boolean found(final String path, final String db, final MainProp mprop) {
     // return true if the database exists and if the
     // specified path and database name equal each other
     final IOFile file = mprop.dbpath(db);

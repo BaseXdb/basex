@@ -1,64 +1,18 @@
-package org.basex.test.server;
+package org.basex.test.core;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Command;
+import org.basex.core.*;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.core.Prop;
-import org.basex.core.Text;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.AlterDB;
-import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateBackup;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateIndex;
-import org.basex.core.cmd.CreateUser;
-import org.basex.core.cmd.Cs;
-import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.DropBackup;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.DropIndex;
-import org.basex.core.cmd.DropUser;
-import org.basex.core.cmd.Export;
-import org.basex.core.cmd.Find;
-import org.basex.core.cmd.Flush;
-import org.basex.core.cmd.Get;
-import org.basex.core.cmd.Grant;
-import org.basex.core.cmd.Help;
-import org.basex.core.cmd.Info;
-import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.InfoIndex;
-import org.basex.core.cmd.InfoStorage;
-import org.basex.core.cmd.List;
-import org.basex.core.cmd.ListDB;
-import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.OptimizeAll;
-import org.basex.core.cmd.Password;
-import org.basex.core.cmd.Rename;
-import org.basex.core.cmd.Replace;
-import org.basex.core.cmd.Restore;
-import org.basex.core.cmd.Retrieve;
-import org.basex.core.cmd.Run;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.ShowUsers;
-import org.basex.core.cmd.Store;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.Nodes;
-import org.basex.io.IOFile;
-import org.basex.server.LocalSession;
-import org.basex.server.Session;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.server.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the database commands.
@@ -130,7 +84,7 @@ public class CommandTest {
    * Returns the temporary database path.
    * @return database path
    */
-  static IOFile sandbox() {
+  protected static IOFile sandbox() {
     return new IOFile(Prop.TMP, NAME);
   }
 

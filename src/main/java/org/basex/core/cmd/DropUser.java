@@ -47,8 +47,7 @@ public final class DropUser extends AUser {
     // drop global user
     if(db == null) {
       for(final ClientListener s : context.sessions) {
-        if(s.context().user.name.equals(user))
-          return !info(USER_LOGGED_IN_X, user);
+        if(s.context().user.name.equals(user)) return !info(USER_LOGGED_IN_X, user);
       }
       context.users.drop(context.users.get(user));
       return info(USER_DROPPED_X, user);
@@ -57,6 +56,8 @@ public final class DropUser extends AUser {
     // drop local user
     try {
       final Data data = Open.open(db, context);
+      if(data.pinned()) return !info(DB_PINNED_X, db);
+
       if(data.meta.users.drop(data.meta.users.get(user))) {
         info(USER_DROPPED_X_X, user, db);
         data.meta.dirty = true;
@@ -64,6 +65,7 @@ public final class DropUser extends AUser {
       }
       Close.close(data, context);
       return true;
+
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();

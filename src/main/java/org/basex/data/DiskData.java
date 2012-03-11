@@ -3,6 +3,8 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.*;
+
 import org.basex.build.DiskBuilder;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -23,8 +25,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.io.random.DataAccess;
 import org.basex.io.random.TableDiskAccess;
-import org.basex.util.Compress;
-import org.basex.util.Num;
+import org.basex.util.*;
 import org.basex.util.hash.TokenObjMap;
 import org.basex.util.list.IntList;
 import org.basex.util.Util;
@@ -39,6 +40,8 @@ import org.basex.util.Util;
  * @author Tim Petrowsky
  */
 public final class DiskData extends Data {
+  /** ID of data instance. */
+  private final String uuid = UUID.randomUUID().toString();
   /** Text compressor. */
   private final Compress comp = new Compress();
   /** Texts access file. */
@@ -77,7 +80,6 @@ public final class DiskData extends Data {
         else if(k.equals(DBDOCS)) resources.read(in);
       }
       // open data and indexes
-      init();
       if(meta.updindex) {
         idmap = new IdPreMap(meta.dbfile(DATAIDP));
         if(meta.textindex) txtindex = new UpdatableDiskValues(this, true);
@@ -87,6 +89,8 @@ public final class DiskData extends Data {
         if(meta.attrindex) atvindex = new DiskValues(this, false);
       }
       if(meta.ftxtindex) ftxindex = FTIndex.get(this, meta.wildcards);
+      init();
+
     } finally {
       in.close();
     }
@@ -115,12 +119,15 @@ public final class DiskData extends Data {
     flush();
   }
 
-  @Override
+  /**
+   * Initializes the database.
+   * @throws IOException I/O exception
+   */
   public void init() throws IOException {
     table = new TableDiskAccess(meta, DATATBL);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));
-    super.init();
+    pinFile().touch();
   }
 
   /**
@@ -170,6 +177,7 @@ public final class DiskData extends Data {
     closeIndex(IndexType.TEXT);
     closeIndex(IndexType.ATTRIBUTE);
     closeIndex(IndexType.FULLTEXT);
+    pinFile().delete();
   }
 
   @Override
@@ -200,7 +208,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public boolean updating(final boolean updating) {
+  public boolean update(final boolean updating) {
     final IOFile upd = updateFile();
     return updating ? upd.touch() : upd.delete();
   }
@@ -211,6 +219,38 @@ public final class DiskData extends Data {
    */
   public IOFile updateFile() {
     return meta.dbfile(DATAUPD);
+  }
+
+  /**
+   * Returns a pin file specific to this instance.
+   * @return lock file
+   */
+  private IOFile pinFile() {
+    return meta.dbfile(DATAPIN + uuid);
+  }
+
+  @Override
+  public boolean pinned() {
+    return pinned(meta.path, uuid);
+  }
+
+  /**
+   * Checks if a database is pinned by processes that have a UUID different to the
+   * specified one.
+   * @param dbpath database path
+   * @param uuid unique id
+   * @return result of check
+   */
+  public static boolean pinned(final IOFile dbpath, final String uuid) {
+    final int s = DATAPIN.length();
+    final int e = IO.BASEXSUFFIX.length();
+    for(final IOFile f : dbpath.children(DATAPIN + ".*" + IO.BASEXSUFFIX)) {
+      final String n = f.name();
+      if(n.startsWith(DATAPIN)) {
+        if(!n.substring(s, n.length() - e).equals(uuid)) return true;
+      }
+    }
+    return false;
   }
 
   @Override

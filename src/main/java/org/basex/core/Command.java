@@ -2,6 +2,7 @@ package org.basex.core;
 
 import org.basex.core.Commands.CmdPerm;
 import static org.basex.core.Text.*;
+
 import org.basex.core.cmd.Close;
 import org.basex.data.Data;
 import org.basex.data.Result;
@@ -138,7 +139,17 @@ public abstract class Command extends Progress {
    */
   @SuppressWarnings("unused")
   public boolean updating(final Context ctx) {
-    return (flags & (User.CREATE | User.WRITE)) != 0;
+    return createWrite();
+  }
+
+  /**
+   * Checks if the database to be updated is opened (pinned) by a process in another JVM.
+   * @param ctx database context
+   * @return name of pinned database
+   */
+  public String pinned(final Context ctx) {
+    final Data data = ctx.data();
+    return createWrite() && data != null && data.pinned() ? data.meta.name : null;
   }
 
   /**
@@ -151,8 +162,9 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Returns true if this command will change the {@link Context#data}
-   * reference. This method is required by the progress dialog in the frontend.
+   * Closes an open data reference and returns {@code true} if this command will change
+   * the {@link Context#data} reference. This method is required by the progress dialog
+   * in the frontend.
    * @param ctx database context
    * @return result of check
    */
@@ -179,15 +191,6 @@ public abstract class Command extends Progress {
     return false;
   }
 
-  /**
-   * Builds a string representation from the command. This string must be
-   * correctly built, as commands are sent to the server as strings.
-   * @param cb command builder
-   */
-  protected void build(final CommandBuilder cb) {
-    cb.init().args();
-  }
-
   @Override
   public final String toString() {
     final CommandBuilder cb = new CommandBuilder(this);
@@ -203,6 +206,15 @@ public abstract class Command extends Progress {
    * @throws IOException I/O exception
    */
   protected abstract boolean run() throws IOException;
+
+  /**
+   * Builds a string representation from the command. This string must be
+   * correctly built, as commands are sent to the server as strings.
+   * @param cb command builder
+   */
+  protected void build(final CommandBuilder cb) {
+    cb.init().args();
+  }
 
   /**
    * Adds the error message to the message buffer {@link #info}.
@@ -246,8 +258,7 @@ public abstract class Command extends Progress {
    * @param <E> token type
    * @return option
    */
-  protected static <E extends Enum<E>> E getOption(final String s,
-      final Class<E> typ) {
+  protected static <E extends Enum<E>> E getOption(final String s, final Class<E> typ) {
     try {
       return Enum.valueOf(typ, s.toUpperCase(Locale.ENGLISH));
     } catch(final Exception ex) {
@@ -256,19 +267,26 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Closes the specified database if it is currently opened and only
-   * pinned once.
+   * Closes the specified database if it is currently opened and only pinned once.
    * @param ctx database context
    * @param db database to be closed
    * @return closed flag
    */
   protected static boolean close(final Context ctx, final String db) {
     final boolean close = ctx.data() != null &&
-      db.equals(ctx.data().meta.name) && ctx.datas.pins(db) == 1;
+        db.equals(ctx.data().meta.name) && ctx.datas.pins(db) == 1;
     return close && new Close().run(ctx);
   }
 
   // PRIVATE METHODS ==========================================================
+
+  /**
+   * Checks if the command demands write or create permissions.
+   * @return result of check
+   */
+  private boolean createWrite() {
+    return (flags & (User.CREATE | User.WRITE)) != 0;
+  }
 
   /**
    * Executes the command, prints the result to the specified output stream
@@ -291,6 +309,10 @@ public abstract class Command extends Progress {
       while(--i >= 0 && (1 << i & f) == 0);
       return error(PERM_NEEDED_X, perms[i + 1]);
     }
+
+    // check if database is locked by a process in another JVM
+    final String pin = pinned(ctx);
+    if(pin != null) return error(DB_PINNED_X, pin);
 
     // set updating flag
     updating = updating(ctx);
@@ -331,8 +353,7 @@ public abstract class Command extends Progress {
       abort();
       if(ex instanceof OutOfMemoryError) {
         Util.debug(ex);
-        return error(OUT_OF_MEM + ((flags & (User.CREATE | User.WRITE)) != 0 ?
-            H_OUT_OF_MEM : ""));
+        return error(OUT_OF_MEM + (createWrite() ? H_OUT_OF_MEM : ""));
       }
       return error(Util.bug(ex));
     } finally {

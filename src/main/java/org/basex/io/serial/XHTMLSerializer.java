@@ -52,7 +52,7 @@ public class XHTMLSerializer extends OutputSerializer {
       print(ELEM_SC);
     } else {
       print(ELEM_C);
-      ind = false;
+      sep = false;
       finishClose();
     }
   }

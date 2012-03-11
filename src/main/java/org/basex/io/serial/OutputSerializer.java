@@ -37,8 +37,8 @@ public abstract class OutputSerializer extends Serializer {
   private String docpub;
   /** Flag for printing content type. */
   int ct;
-  /** Indentation flag (used for formatting). */
-  boolean ind;
+  /** Separator flag (used for formatting). */
+  boolean sep;
   /** Item flag (used for formatting). */
   private boolean item;
   /** Script flag. */
@@ -176,7 +176,7 @@ public abstract class OutputSerializer extends Serializer {
         }
         print(ATT2);
         print(PI_C);
-        ind = indent;
+        sep = indent;
       } else if(!sa.equals(OMIT) || !ver.equals(V10) && docsys != null) {
         SERSTAND.thrwSerial();
       }
@@ -191,7 +191,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public final void reset() {
-    ind = false;
+    sep = false;
     item = false;
   }
 
@@ -205,7 +205,7 @@ public abstract class OutputSerializer extends Serializer {
   public void openResult() throws IOException {
     if(wrap) {
       openElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
-      ind = false;
+      sep = false;
     }
   }
 
@@ -256,7 +256,7 @@ public abstract class OutputSerializer extends Serializer {
       }
       print(CDATA_C);
     }
-    ind = false;
+    sep = false;
   }
 
   @Override
@@ -269,12 +269,12 @@ public abstract class OutputSerializer extends Serializer {
       final byte[] t = span.text;
       for(int k = 0; k < t.length; k += cl(t, k)) code(cp(t, k));
     }
-    ind = false;
+    sep = false;
   }
 
   @Override
   public void finishComment(final byte[] n) throws IOException {
-    if(ind) indent();
+    if(sep) indent();
     print(COMM_O);
     print(n);
     print(COMM_C);
@@ -282,7 +282,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void finishPi(final byte[] n, final byte[] v) throws IOException {
-    if(ind) indent();
+    if(sep) indent();
     print(PI_O);
     print(n);
     print(' ');
@@ -292,7 +292,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void finishAtomic(final Item it) throws IOException {
-    if(ind) print(' ');
+    if(sep) print(' ');
 
     try {
       if(it instanceof StrStream) {
@@ -310,7 +310,7 @@ public abstract class OutputSerializer extends Serializer {
       throw new SerializerException(ex);
     }
 
-    ind = format;
+    sep = format;
     item = true;
   }
 
@@ -343,10 +343,10 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   protected void startOpen(final byte[] t) throws IOException {
     doctype(t);
-    if(ind) indent();
+    if(sep) indent();
     print(ELEM_O);
     print(t);
-    ind = indent;
+    sep = indent;
   }
 
   /**
@@ -356,7 +356,7 @@ public abstract class OutputSerializer extends Serializer {
    */
   void doctype(final byte[] dt) throws IOException {
     if(level != 0 || docsys == null) return;
-    if(ind) indent();
+    if(sep) indent();
     print(DOCTYPE);
     if(dt == null) print(M_HTML);
     else print(dt);
@@ -383,11 +383,11 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   protected void finishClose() throws IOException {
-    if(ind) indent();
+    if(sep) indent();
     print(ELEM_OS);
     print(tag);
     print(ELEM_C);
-    ind = indent;
+    sep = indent;
   }
 
   /**

@@ -64,7 +64,6 @@ public final class MemBuilder extends Builder {
     md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
 
     parse(md, data.tagindex, data.atnindex);
-    data.init();
     path.finish(data);
     return data;
   }

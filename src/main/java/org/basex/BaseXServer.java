@@ -91,9 +91,7 @@ public final class BaseXServer extends Main implements Runnable {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  public BaseXServer(final Context ctx, final String... args)
-      throws IOException {
-
+  public BaseXServer(final Context ctx, final String... args) throws IOException {
     super(args, ctx);
     final MainProp mprop = context.mprop;
     final int port = mprop.num(MainProp.SERVERPORT);

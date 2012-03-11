@@ -1,7 +1,7 @@
 package org.basex.gui.view;
 
 import static org.basex.data.DataText.*;
-import org.basex.data.Data;
+import org.basex.data.*;
 import org.basex.gui.GUIProp;
 import org.basex.query.func.Function;
 import org.basex.util.Token;
@@ -105,14 +105,31 @@ public final class ViewData {
    * @param pre pre value
    * @return name
    */
-  public static byte[] tag(final GUIProp prop, final Data data,
-      final int pre) {
-
-    if(prop.is(GUIProp.SHOWNAME) && data.nameID != 0) {
-      final byte[] att = data.attValue(data.nameID, pre);
+  public static byte[] tag(final GUIProp prop, final Data data, final int pre) {
+    final int id = ViewData.nameID(data);
+    if(id != 0 && prop.is(GUIProp.SHOWNAME)) {
+      final byte[] att = data.attValue(id, pre);
       if(att != null) return att;
     }
     return content(data, pre, true);
+  }
+
+  /**
+   * Returns the name id of the specified node.
+   * @param data data reference
+   * @return name id
+   */
+  public static int nameID(final Data data) {
+    return data.atnindex.id(DataText.T_NAME);
+  }
+
+  /**
+   * Returns the size id of the specified node.
+   * @param data data reference
+   * @return name id
+   */
+  public static int sizeID(final Data data) {
+    return data.atnindex.id(DataText.T_SIZE);
   }
 
   /**

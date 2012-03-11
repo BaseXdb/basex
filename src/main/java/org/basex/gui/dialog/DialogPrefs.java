@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.view.*;
 import org.basex.io.*;
 
 /**
@@ -98,7 +99,7 @@ public final class DialogPrefs extends Dialog {
     final boolean sn = gprop.is(GUIProp.SHOWNAME);
     names = new BaseXCheckBox(SHOW_NAME_ATTS, sn, 6, this);
     final Data data = gui.context.data();
-    names.setEnabled(data != null && data.nameID != 0);
+    names.setEnabled(data != null && ViewData.nameID(data) != 0);
     oldShowNames = sn;
     pp.add(names);
 

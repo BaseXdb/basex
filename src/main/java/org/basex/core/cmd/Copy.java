@@ -2,17 +2,13 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Command;
-import org.basex.core.User;
-import org.basex.data.MetaData;
-import org.basex.io.IOFile;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'copy' command and creates a copy of a database.
@@ -37,31 +33,35 @@ public final class Copy extends Command {
 
   @Override
   protected boolean run() {
-    final String db = args[0];
-    final String newdb = args[1];
+    final String src = args[0];
+    final String trg = args[1];
     // check if names are valid
-    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
-    if(!MetaData.validName(newdb, false)) return error(NAME_INVALID_X, newdb);
+    if(!MetaData.validName(src, false)) return error(NAME_INVALID_X, src);
+    if(!MetaData.validName(trg, false)) return error(NAME_INVALID_X, trg);
 
-    // database does not exist
-    if(!mprop.dbexists(db)) return error(DB_NOT_FOUND_X, db);
+    // source database does not exist
+    if(!mprop.dbexists(src)) return error(DB_NOT_FOUND_X, src);
     // target database exists already
-    if(mprop.dbexists(newdb)) return error(DB_EXISTS_X, newdb);
+    if(mprop.dbexists(trg)) return error(DB_EXISTS_X, trg);
 
     // try to copy database
-    return copy(db, newdb) ? info(DB_COPIED_X, db, perf) :
-      error(DB_NOT_COPIED_X, db);
+    return copy(src, trg) ? info(DB_COPIED_X, src, perf) : error(DB_NOT_COPIED_X, src);
+  }
+
+  @Override
+  public String pinned(final Context ctx) {
+    return null;
   }
 
   /**
    * Copies the specified database.
-   * @param db database name
-   * @param newdb new database name
+   * @param source name of the database
+   * @param target new database name
    * @return success flag
    */
-  private boolean copy(final String db, final String newdb) {
-    final File src = mprop.dbpath(db).file();
-    final File trg = mprop.dbpath(newdb).file();
+  private boolean copy(final String source, final String target) {
+    final File src = mprop.dbpath(source).file();
+    final File trg = mprop.dbpath(target).file();
 
     // return false if source cannot be opened, or target cannot be created
     final StringList files = new IOFile(src).descendants();
@@ -69,7 +69,9 @@ public final class Copy extends Command {
     boolean ok = true;
     try {
       for(final String file : files) {
-        copy(new File(src, file), new File(trg, file));
+        if(Databases.FILES.matcher(file).matches()) {
+          copy(new File(src, file), new File(trg, file));
+        }
         of++;
       }
     } catch(final IOException ex) {
@@ -77,8 +79,8 @@ public final class Copy extends Command {
       ok = false;
     }
     // drop new database if error occurred
-    if(!ok) DropDB.drop(newdb, context);
-    else context.databases().add(newdb);
+    if(!ok) DropDB.drop(target, context);
+    else context.databases().add(target);
     return ok;
   }
 

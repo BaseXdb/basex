@@ -2,6 +2,8 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 
+import java.io.*;
+
 import org.basex.core.Context;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.OptimizeAll;
@@ -45,8 +47,8 @@ public final class DBOptimize extends UpdatePrimitive {
   public void apply() throws QueryException {
     try {
       if(all) OptimizeAll.optimizeAll(data, ctx, null);
-      else Optimize.optimize(data);
-    } catch(final Exception ex) {
+      else Optimize.optimize(data, null);
+    } catch(final IOException ex) {
       DBERR.thrw(input, ex);
     }
   }

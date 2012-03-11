@@ -2,19 +2,14 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 
-import org.basex.core.CommandBuilder;
-import org.basex.core.User;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.IOFile;
-import org.basex.io.in.BufferInput;
-import org.basex.io.out.PrintOutput;
-import org.xml.sax.InputSource;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
+import org.xml.sax.*;
 
 /**
  * Evaluates the 'store' command and stores binary content into the database.
@@ -44,8 +39,7 @@ public final class Store extends ACreate {
   protected boolean run() {
     final boolean create = context.user.perm(User.CREATE);
     String path = MetaData.normPath(args[0]);
-    if(path == null || path.endsWith("."))
-      return error(NAME_INVALID_X, args[0]);
+    if(path == null || path.endsWith(".")) return error(NAME_INVALID_X, args[0]);
 
     if(in == null) {
       final IO io = IO.get(args[1]);
@@ -61,19 +55,23 @@ public final class Store extends ACreate {
     if(path.isEmpty()) return error(NAME_INVALID_X, path);
 
     // ensure that the name is not empty and contains no trailing dots
-    final IOFile file = context.data().meta.binary(path);
+    final Data data = context.data();
+    final IOFile file = data.meta.binary(path);
     if(path.isEmpty() || path.endsWith(".") || file == null || file.isDir())
       return error(NAME_INVALID_X, create ? path : args[0]);
 
-    // add directory if it does not exist anyway
-    new IOFile(file.dir()).md();
+    // set updating flag
+    if(!startUpdate(data)) return false;
 
+    boolean ok = true;
     try {
       store(in, file);
     } catch(final IOException ex) {
-      return error(FILE_NOT_STORED_X, ex.getMessage());
+      ok = error(FILE_NOT_STORED_X, ex.getMessage());
     }
-    return info(QUERY_EXECUTED_X, perf);
+
+    // remove updating flag and return error or info message
+    return stopUpdate(data) && ok && info(QUERY_EXECUTED_X, perf);
   }
 
   /**
@@ -82,9 +80,7 @@ public final class Store extends ACreate {
    * @param file target file
    * @throws IOException I/O exception
    */
-  public static void store(final InputSource in, final IOFile file)
-      throws IOException {
-
+  public static void store(final InputSource in, final IOFile file) throws IOException {
     // add directory if it does not exist anyway
     new IOFile(file.dir()).md();
 

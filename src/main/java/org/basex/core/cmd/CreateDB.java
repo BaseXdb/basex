@@ -82,8 +82,12 @@ public final class CreateDB extends ACreate {
       if(io instanceof IOContent) io.name(name + '.' + format);
       parser = new DirParser(io, prop, mprop.dbpath(name));
     }
-
     return build(parser, name);
+  }
+
+  @Override
+  public String pinned(final Context ctx) {
+    return ctx.prop.is(Prop.MAINMEM) || !pinned(ctx, args[0]) ? null : args[0];
   }
 
   /**
@@ -135,8 +139,8 @@ public final class CreateDB extends ACreate {
    * @return new database instance
    * @throws IOException I/O exception
    */
-  public static synchronized MemData mainMem(final Parser parser,
-      final Context ctx) throws IOException {
+  public static synchronized MemData mainMem(final Parser parser, final Context ctx)
+      throws IOException {
 
     if(ctx.user.perm(User.CREATE)) return MemBuilder.build(parser);
     throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);

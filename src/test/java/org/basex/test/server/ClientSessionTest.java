@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
+import org.basex.core.*;
 import org.basex.server.ClientSession;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -13,7 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 /**
- * This class tests the client/server API.
+ * This class tests the client/server session API.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -29,6 +30,7 @@ public class ClientSessionTest extends SessionTest {
   @BeforeClass
   public static void startServer() throws IOException {
     server = new BaseXServer("-z", "-p9999", "-e9998");
+    server.context.mprop.set(MainProp.DBPATH, sandbox().path());
   }
 
   /**
@@ -38,6 +40,7 @@ public class ClientSessionTest extends SessionTest {
   @AfterClass
   public static void stop() throws IOException {
     server.stop();
+    assertTrue(sandbox().delete());
   }
 
   /** Starts a session. */

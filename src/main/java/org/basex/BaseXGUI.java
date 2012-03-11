@@ -66,8 +66,11 @@ public final class BaseXGUI {
 
     // read properties
     final GUIProp gprop = new GUIProp();
+    // cache results to pass them on to all visualizations
     context.prop.set(Prop.CACHEQUERY, true);
+    // reduce number of results to save memory
     context.prop.set(Prop.MAXHITS, gprop.num(GUIProp.MAXHITS));
+    // initialize fonts and colors
     GUIConstants.init(gprop);
 
     SwingUtilities.invokeLater(new Runnable() {
@@ -96,6 +99,14 @@ public final class BaseXGUI {
             xml = true;
           }
         }
+      }
+    });
+
+    // guarantee correct shutdown of database context
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public synchronized void run() {
+        context.close();
       }
     });
   }

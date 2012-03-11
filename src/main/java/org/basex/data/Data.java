@@ -84,6 +84,8 @@ public abstract class Data {
   /** Node kind: Processing Instruction. */
   public static final byte PI = 0x05;
 
+  /** Resource index. */
+  public final Resources resources = new Resources(this);
   /** Meta data. */
   public MetaData meta;
   /** Tag index. */
@@ -94,34 +96,19 @@ public abstract class Data {
   public Namespaces nspaces;
   /** Path summary index. */
   public PathSummary paths;
-  /** Resource index. */
-  public final Resources resources = new Resources(this);
   /** Text index. */
   public Index txtindex;
   /** Attribute value index. */
   public Index atvindex;
   /** Full-text index instance. */
   public Index ftxindex;
-
-  /** Index reference for a name attribute. */
-  public int nameID;
-  /** Index reference for a size attribute. */
-  public int sizeID;
+  /** Number of current database users. */
+  public int pins = 1;
 
   /** Table access file. */
   TableAccess table;
   /** ID->PRE mapping. */
   IdPreMap idmap;
-
-  /**
-   * Dissolves the references to often used tag names and attributes.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void init() throws IOException {
-    nameID = atnindex.id(DataText.T_NAME);
-    sizeID = atnindex.id(DataText.T_SIZE);
-  }
 
   /**
    * Closes the current database.
@@ -167,10 +154,16 @@ public abstract class Data {
 
   /**
    * Marks a database as updating.
-   * @param updating updating flag
-   * @return result flag
+   * @param updating updating flag (start/stop updating process)
+   * @return success flag
    */
-  public abstract boolean updating(final boolean updating);
+  public abstract boolean update(final boolean updating);
+
+  /**
+   * Checks if this database is also opened (pinned) by other instances.
+   * @return result of check
+   */
+  public abstract boolean pinned();
 
   /**
    * Returns the indexed pre references for the specified token.

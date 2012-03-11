@@ -4,7 +4,7 @@ import org.basex.io.out.*;
 import org.junit.*;
 
 /**
- * This class tests the local API with an output stream.
+ * This class tests the local session API with an output stream.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

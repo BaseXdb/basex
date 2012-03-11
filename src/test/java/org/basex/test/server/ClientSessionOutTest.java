@@ -4,7 +4,7 @@ import org.basex.io.out.ArrayOutput;
 import org.junit.Before;
 
 /**
- * This class tests the client/server API with an output stream.
+ * This class tests the client/server session API with an output stream.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

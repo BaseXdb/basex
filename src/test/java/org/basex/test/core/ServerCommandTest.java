@@ -1,23 +1,16 @@
-package org.basex.test.server;
+package org.basex.test.core;
 
 import static org.basex.core.Text.*;
-
-import java.io.IOException;
-
-import org.basex.BaseXServer;
-import org.basex.core.MainProp;
-import org.basex.core.Prop;
-import org.basex.core.cmd.CreateUser;
-import org.basex.core.cmd.Kill;
-import org.basex.server.ClientSession;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import java.io.*;
+
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.server.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the database commands with the client/server

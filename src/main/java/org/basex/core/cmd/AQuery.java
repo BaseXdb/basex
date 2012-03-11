@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
+
 import static org.basex.core.Text.*;
 import org.basex.data.Result;
 import org.basex.io.IOFile;
@@ -168,6 +169,16 @@ abstract class AQuery extends Command {
       if(qp != null) try { qp.close(); } catch(final QueryException e) { }
       return false;
     }
+  }
+
+  @Override
+  public boolean updating(final Context ctx) {
+    return super.updating(ctx) || updating(ctx, args[0]);
+  }
+
+  @Override
+  public String pinned(final Context ctx) {
+    return null;
   }
 
   @Override

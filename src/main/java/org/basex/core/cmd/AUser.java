@@ -58,8 +58,7 @@ abstract class AUser extends Command {
     final String d = off + 1 < args.length ? args[off + 1] : null;
 
     if(!MetaData.validName(u, true)) return error(NAME_INVALID_X, u);
-    if(d != null && !MetaData.validName(d, true))
-      return error(NAME_INVALID_X, d);
+    if(d != null && !MetaData.validName(d, true)) return error(NAME_INVALID_X, d);
 
     // retrieve all users; stop if no user is found
     final String[] users = users(u);

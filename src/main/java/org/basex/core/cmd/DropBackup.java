@@ -30,19 +30,19 @@ public final class DropBackup extends Command {
 
   @Override
   protected boolean run() {
-    if(!MetaData.validName(args[0], true))
-      return error(NAME_INVALID_X, args[0]);
+    final String name = args[0];
+    if(!MetaData.validName(name, true)) return error(NAME_INVALID_X, name);
 
-    final StringList dbs = context.databases().listDBs(args[0]);
+    // retrieve all databases
+    final StringList dbs = context.databases().listDBs(name);
     // loop through all databases and drop backups
-    for(final String db : dbs) {
-      drop(db.contains("-") ? db : db + '-', context);
-    }
+    for(final String db : dbs) drop(db.contains("-") ? db : db + '-', context);
+
     // if the given argument is not a database name, it could be the name
     // of a backup file
-    if(dbs.size() == 0) drop(args[0], context);
+    if(dbs.size() == 0) drop(name, context);
 
-    return info(BACKUP_DROPPED_X, args[0] + '*' + IO.ZIPSUFFIX);
+    return info(BACKUP_DROPPED_X, name + '*' + IO.ZIPSUFFIX);
   }
 
   /**

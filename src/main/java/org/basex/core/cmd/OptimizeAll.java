@@ -46,17 +46,17 @@ public final class OptimizeAll extends ACreate {
 
   @Override
   protected boolean run() {
+    final Data data = context.data();
     try {
-      final Data data = context.data();
       optimizeAll(data, context, this);
-
-      final Open open = new Open(data.meta.name);
-      return open.run(context) ? info(DB_OPTIMIZED_X, data.meta.name, perf) :
-        error(open.info());
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(Util.message(ex));
     }
+
+    final Open open = new Open(data.meta.name);
+    return open.run(context) ? info(DB_OPTIMIZED_X, data.meta.name, perf) :
+      error(open.info());
   }
 
   @Override

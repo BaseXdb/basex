@@ -2,13 +2,11 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.Command;
-import org.basex.core.CommandBuilder;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Context;
-import org.basex.core.User;
-import org.basex.data.MetaData;
+import org.basex.data.*;
 import org.basex.util.list.StringList;
 import org.basex.io.IOFile;
 
@@ -18,19 +16,18 @@ import org.basex.io.IOFile;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DropDB extends Command {
+public final class DropDB extends ACreate {
   /**
    * Default constructor.
    * @param name name of database
    */
   public DropDB(final String name) {
-    super(User.CREATE, name);
+    super(name);
   }
 
   @Override
   protected boolean run() {
-    if(!MetaData.validName(args[0], true))
-      return error(NAME_INVALID_X, args[0]);
+    if(!MetaData.validName(args[0], true)) return error(NAME_INVALID_X, args[0]);
 
     // retrieve all databases; return true if no database is found (no error)
     final StringList dbs = context.databases().listDBs(args[0]);
@@ -42,7 +39,7 @@ public final class DropDB extends Command {
       // close database if it's currently opened
       close(context, db);
       // check if database is still pinned
-      if(context.pinned(db)) {
+      if(context.pinned(db) || pinned(context, db)) {
         info(DB_PINNED_X, db);
         ok = false;
       } else if(!drop(db, context)) {
@@ -56,9 +53,14 @@ public final class DropDB extends Command {
     return ok;
   }
 
+  @Override
+  public String pinned(final Context ctx) {
+    return null;
+  }
+
   /**
    * Deletes the specified database.
-   * @param db database name
+   * @param db name of the database
    * @param ctx database context
    * @return success flag
    */

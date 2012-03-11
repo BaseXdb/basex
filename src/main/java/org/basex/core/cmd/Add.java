@@ -54,8 +54,7 @@ public final class Add extends ACreate {
   protected boolean run() {
     final boolean create = context.user.perm(User.CREATE);
     String name = MetaData.normPath(args[0]);
-    if(name == null || name.endsWith("."))
-      return error(NAME_INVALID_X, args[0]);
+    if(name == null || name.endsWith(".")) return error(NAME_INVALID_X, args[0]);
 
     // add slash to the target if the addressed file is an archive or directory
     IO io = null;
@@ -120,10 +119,17 @@ public final class Add extends ACreate {
       tmp = build.build();
       // ignore empty fragments
       if(tmp.meta.size > 1) {
+        // set updating flag
+        if(!startUpdate(data)) return false;
+
         data.insert(data.meta.size, -1, tmp);
         context.update();
         data.flush();
+
+        // remove updating flag
+        if(!stopUpdate(data)) return false;
       }
+      // return info message
       return info(parser.info() + PATH_ADDED_X_X, name, perf);
 
     } catch(final IOException ex) {

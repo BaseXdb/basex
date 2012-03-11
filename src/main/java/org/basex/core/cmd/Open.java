@@ -59,8 +59,7 @@ public final class Open extends Command {
 
   @Override
   public boolean newData(final Context ctx) {
-    new Close().run(ctx);
-    return true;
+    return new Close().run(ctx);
   }
 
   /**
@@ -70,9 +69,7 @@ public final class Open extends Command {
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static Data open(final String name, final Context ctx)
-      throws IOException {
-
+  public static Data open(final String name, final Context ctx) throws IOException {
     Data data = ctx.pin(name);
     if(data == null) {
       // check if document exists

@@ -2,12 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.Context;
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.io.IOFile;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'delete' command and deletes resources from a database.
@@ -29,6 +27,9 @@ public final class Delete extends ACreate {
     final Data data = context.data();
     final String target = args[0];
 
+    // set updating flag
+    if(!startUpdate(data)) return false;
+
     // delete documents
     final IntList docs = data.resources.docs(target);
     delete(context, docs);
@@ -36,7 +37,8 @@ public final class Delete extends ACreate {
     final TokenList bins = data.resources.binaries(target);
     delete(data, target);
 
-    return info(DOCS_DELETED_X_X, docs.size() + bins.size(), perf);
+    // remove updating flag and return info message
+    return stopUpdate(data) && info(DOCS_DELETED_X_X, docs.size() + bins.size(), perf);
   }
 
   /**

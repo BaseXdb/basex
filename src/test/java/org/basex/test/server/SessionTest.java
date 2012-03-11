@@ -7,8 +7,9 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import org.basex.core.BaseXException;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.io.*;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.*;
@@ -64,8 +65,7 @@ public abstract class SessionTest {
   @Test
   public final void commandSerial1() throws IOException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
-    check("<db:results xmlns:db=\"ns\"/>",
-        session.execute("xquery ()"));
+    check("<db:results xmlns:db=\"ns\"/>", session.execute("xquery ()"));
   }
 
   /** Runs a query command and wraps the result.
@@ -575,9 +575,17 @@ public abstract class SessionTest {
    * @param exp expected string
    * @param ret string returned from the client API
    */
-  final void check(final Object exp, final Object ret) {
+  protected final void check(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));
+  }
+
+  /**
+   * Returns the temporary database path.
+   * @return database path
+   */
+  protected static IOFile sandbox() {
+    return new IOFile(Prop.TMP, DB);
   }
 }

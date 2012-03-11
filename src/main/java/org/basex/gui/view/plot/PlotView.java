@@ -32,9 +32,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.layout.BaseXSlider;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewNotifier;
-import org.basex.gui.view.ViewRect;
+import org.basex.gui.view.*;
 import org.basex.index.StatsType;
 import org.basex.util.list.IntList;
 
@@ -360,10 +358,11 @@ public final class PlotView extends View {
         int ya = calcCoordinate(false, y1) + gui.gprop.num(GUIProp.PLOTDOTS);
         final int ww = getWidth();
 
-        final byte[] nm = data.attValue(data.nameID, focused);
+        final int id = ViewData.nameID(data);
+        final byte[] nm = data.attValue(id, focused);
         String name = nm != null ? string(nm) : "";
-        if(!name.isEmpty() && plotData.xAxis.attrID != data.nameID &&
-            plotData.yAxis.attrID != data.nameID) {
+        if(!name.isEmpty() && plotData.xAxis.attrID != id &&
+            plotData.yAxis.attrID != id) {
 
           if(ol > 1) name = ol + "x: " + name + ", ...";
           final int lw = BaseXLayout.width(g, label);

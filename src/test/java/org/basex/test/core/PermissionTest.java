@@ -1,4 +1,4 @@
-package org.basex.test.server;
+package org.basex.test.core;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;

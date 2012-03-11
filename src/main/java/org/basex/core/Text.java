@@ -1,9 +1,16 @@
 package org.basex.core;
 
-import org.basex.core.Commands.*;
-import static org.basex.core.Lang.lang;
+import static org.basex.core.Lang.*;
 
-import java.util.Locale;
+import java.util.*;
+
+import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Commands.CmdDrop;
+import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Commands.CmdInfo;
+import org.basex.core.Commands.CmdPerm;
+import org.basex.core.Commands.CmdRepo;
+import org.basex.core.Commands.CmdShow;
 
 /**
  * This class contains internationalized text strings, which are used
@@ -489,6 +496,11 @@ public interface Text {
   String DOCS_REPLACED_X_X = lang("docs_replaced_%_%");
   /** Parse error. */
   String NOT_PARSED_X = lang("not_parsed_%");
+
+  /** Updating error. */
+  String LOCK_X = "Database '%' cannot be marked as 'updating'.";
+  /** Updating error. */
+  String UNLOCK_X = "Database '%' is still marked as 'updating'.";
 
   /** File not found. */
   String FILE_NOT_FOUND_X = lang("file_not_found_%");

@@ -77,8 +77,13 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
-  public boolean updating(final boolean updating) {
+  public boolean update(final boolean updating) {
     return true;
+  }
+
+  @Override
+  public boolean pinned() {
+    return false;
   }
 
   @Override

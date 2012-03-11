@@ -6,9 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 
-import org.basex.core.Command;
-import org.basex.core.Prop;
-import org.basex.core.User;
+import org.basex.core.*;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -45,6 +43,11 @@ public final class Export extends Command {
       Util.debug(ex);
       return error(ex.getMessage());
     }
+  }
+
+  @Override
+  public String pinned(final Context ctx) {
+    return null;
   }
 
   /**

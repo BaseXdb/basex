@@ -34,16 +34,22 @@ public final class Optimize extends ACreate {
 
   @Override
   protected boolean run() {
-    final Data d = context.data();
-    final MetaData m = d.meta;
+    final Data data = context.data();
+    final MetaData m = data.meta;
     size = m.size;
 
+    // set updating flag
+    if(!startUpdate(data)) return false;
+
+    boolean ok = true;
     try {
-      optimize(d, this);
+      optimize(data, this);
     } catch(final IOException ex) {
-      Util.debug(ex);
+      ok = error(Util.message(ex));
     }
-    return info(DB_OPTIMIZED_X, m.name, perf);
+
+    // remove updating flag and return error or info message
+    return stopUpdate(data) && ok && info(DB_OPTIMIZED_X, m.name, perf);
   }
 
   @Override
@@ -62,23 +68,12 @@ public final class Optimize extends ACreate {
   }
 
   /**
-   * Optimize data structures.
-   * @param d data
-   * @throws IOException I/O Exception during index rebuild
-   */
-  public static void optimize(final Data d) throws IOException {
-    optimize(d, null);
-  }
-
-  /**
-   * Optimize data structures.
+   * Optimizes the structures of a database.
    * @param data data
    * @param c calling command (can be null)
    * @throws IOException I/O Exception during index rebuild
    */
-  private static void optimize(final Data data, final Optimize c)
-      throws IOException {
-
+  public static void optimize(final Data data, final Optimize c) throws IOException {
     // initialize structural indexes
     final MetaData md = data.meta;
     if(!md.uptodate) {

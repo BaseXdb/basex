@@ -15,13 +15,16 @@ import static org.basex.util.Token.*;
  * @author Jens Erat
  */
 public final class Databases {
+  /** Pattern to exclude locking files from database transfer operations. */
+  public static final Pattern FILES = Pattern.compile(".{3,5}" + IO.BASEXSUFFIX);
+  /** Pattern to extract the database name from a backup file name. */
+  public static final Pattern ZIPPATTERN =
+      Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
+
   /** Available databases. */
   private final TwoWayTokenMap databases = new TwoWayTokenMap();
   /** Available backups. */
   private final TwoWayTokenMap backups = new TwoWayTokenMap();
-  /** Pattern to extract the database name from a backup file name. */
-  private static final Pattern PA =
-      Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
 
   /**
    * Creates a new instance and loads available databases.
@@ -31,7 +34,7 @@ public final class Databases {
     for(final IOFile f : c.mprop.dbpath().children()) {
       final String name = f.name();
       if(name.endsWith(IO.ZIPSUFFIX)) {
-        add(PA.split(name)[0], true);
+        add(ZIPPATTERN.split(name)[0], true);
       } else if(f.isDir() && !name.startsWith(".")) {
         add(name);
       }
@@ -40,7 +43,7 @@ public final class Databases {
 
   /**
    * Adds a database to the list. If already present, does nothing.
-   * @param db database name
+   * @param db name of the database
    */
   public void add(final String db) {
     add(db, false);
@@ -68,7 +71,7 @@ public final class Databases {
 
   /**
    * Deletes a database from the list.
-   * @param db database name
+   * @param db name of the database
    * @return found database?
    */
   public boolean delete(final String db) {

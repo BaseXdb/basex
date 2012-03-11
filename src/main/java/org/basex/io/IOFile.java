@@ -259,7 +259,7 @@ public final class IOFile extends IO {
   /**
    * Returns the children of the path that match the specified regular
    * expression.
-   * @param pattern pattern
+   * @param pattern regular expression pattern
    * @return children
    */
   public IOFile[] children(final String pattern) {
@@ -267,8 +267,7 @@ public final class IOFile extends IO {
     if(ch == null) return new IOFile[] {};
 
     final ArrayList<IOFile> io = new ArrayList<IOFile>(ch.length);
-    final Pattern p = Pattern.compile(pattern,
-        Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
+    final Pattern p = Pattern.compile(pattern, Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
     for(final File f : ch) {
       if(p.matcher(f.getName()).matches()) io.add(new IOFile(f));
     }
@@ -293,9 +292,7 @@ public final class IOFile extends IO {
    * @param files file list
    * @param off string length of root path
    */
-  private static void add(final IOFile io, final StringList files,
-      final int off) {
-
+  private static void add(final IOFile io, final StringList files, final int off) {
     if(io.isDir()) {
       for(final IOFile f : io.children()) add(f, files, off);
     } else {

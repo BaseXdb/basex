@@ -50,23 +50,25 @@ public final class Replace extends ACreate {
     if(pre != -1 && data.resources.docs(path).size() != 1)
       return error(NO_DIR_ALLOWED_X, path);
 
+    boolean ok = true;
     final IOFile file = data.meta.binary(path);
     if(file != null && file.exists()) {
       // replace binary file if it already exists
       final Store store = new Store(path);
       store.setInput(in);
-      if(!store.run(context)) return error(store.info());
+      ok = store.run(context) || error(store.info());
     } else {
       // otherwise, add new document as xml
       final Add add = new Add(path);
       add.setInput(in);
-      if(!add.run(context)) return error(add.info());
-
-      // delete old documents if addition was successful
-      if(pre != -1) data.delete(pre);
-      // flushes changes
-      data.flush();
+      ok = add.run(context) || error(add.info());
+      if(ok) {
+        // delete old documents if addition was successful
+        if(pre != -1) data.delete(pre);
+        // flush changes
+        data.flush();
+      }
     }
-    return info(DOCS_REPLACED_X_X, 1, perf);
+    return ok && info(DOCS_REPLACED_X_X, 1, perf);
   }
 }

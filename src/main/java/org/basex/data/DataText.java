@@ -110,6 +110,8 @@ public interface DataText {
   String DATASWL = "swl";
   /** Database - Updating flag. */
   String DATAUPD = "upd";
+  /** Database - Pin flag. */
+  String DATAPIN = "pin-";
 
   // XML SERIALIZATION ========================================================
 

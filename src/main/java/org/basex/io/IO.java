@@ -38,11 +38,9 @@ public abstract class IO {
   /** File prefix. */
   public static final String FILEPREF = "file:";
   /** Date format which is appended to backups. */
-  public static final SimpleDateFormat DATE =
-    new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+  public static final SimpleDateFormat DATE = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
   /** Date pattern. */
-  public static final String DATEPATTERN =
-    "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
+  public static final String DATEPATTERN = "-\\d{4}-\\d{2}-\\d{2}-\\d{2}-\\d{2}-\\d{2}";
 
   /** XQuery suffixes. */
   public static final String[] XQSUFFIXES =

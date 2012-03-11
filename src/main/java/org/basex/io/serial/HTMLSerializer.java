@@ -62,7 +62,7 @@ public class HTMLSerializer extends OutputSerializer {
 
   @Override
   public void finishComment(final byte[] n) throws IOException {
-    if(ind) indent();
+    if(sep) indent();
     print(COMM_O);
     print(n);
     print(COMM_C);
@@ -70,7 +70,7 @@ public class HTMLSerializer extends OutputSerializer {
 
   @Override
   public void finishPi(final byte[] n, final byte[] v) throws IOException {
-    if(ind) indent();
+    if(sep) indent();
     if(contains(v, '>')) SERPI.thrwSerial();
     print(PI_O);
     print(n);
@@ -90,10 +90,10 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void startOpen(final byte[] t) throws IOException {
     doctype(null);
-    if(ind) indent();
+    if(sep) indent();
     print(ELEM_O);
     print(t);
-    ind = indent;
+    sep = indent;
     script = SCRIPTS.contains(lc(t));
     if(content && eq(lc(tag), HEAD)) ct++;
   }
@@ -109,7 +109,7 @@ public class HTMLSerializer extends OutputSerializer {
     if(ct(true, true)) return;
     print(ELEM_C);
     if(EMPTIES.contains(lc(tag))) return;
-    ind = false;
+    sep = false;
     finishClose();
   }
 

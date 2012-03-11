@@ -73,6 +73,8 @@ public final class Grant extends AUser {
     // set local permissions
     try {
       final Data data = Open.open(db, context);
+      if(data.pinned()) return !info(DB_PINNED_X, db);
+
       User u = data.meta.users.get(user);
       // add local user reference
       if(u == null) {
@@ -84,6 +86,7 @@ public final class Grant extends AUser {
       data.flush();
       Close.close(data, context);
       return info(GRANTED_ON_X_X_X, args[0], user, db);
+
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();

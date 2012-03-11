@@ -35,6 +35,9 @@ public final class Rename extends ACreate {
     final String trg = MetaData.normPath(args[1]);
     if(trg == null) return error(NAME_INVALID_X, args[1]);
 
+    // set updating flag
+    if(!startUpdate(data)) return false;
+
     boolean ok = true;
     int c = 0;
     final IntList docs = data.resources.docs(src);
@@ -42,8 +45,7 @@ public final class Rename extends ACreate {
       final int pre = docs.get(i);
       final String target = target(data, pre, src, trg);
       if(target.isEmpty()) {
-        info(NAME_INVALID_X, target);
-        ok = false;
+        ok = !info(NAME_INVALID_X, target);
       } else {
         data.update(pre, Data.DOC, token(target));
         c++;
@@ -51,18 +53,19 @@ public final class Rename extends ACreate {
     }
     // data was changed: update context
     if(c != 0) data.flush();
-    if(!ok) return false;
 
     final IOFile file = data.meta.binary(src);
     if(file != null && file.exists()) {
       final IOFile target = data.meta.binary(trg);
       final IOFile trgdir = new IOFile(target.dir());
       if(!trgdir.exists() && !trgdir.md() || !file.rename(target)) {
-        return error(NAME_INVALID_X, trg);
+        ok = !info(NAME_INVALID_X, trg);
       }
       c++;
     }
-    return info(DOCS_RENAMED_X_X, c, perf);
+
+    // remove updating flag and return error or info message
+    return stopUpdate(data) && info(DOCS_RENAMED_X_X, c, perf) && ok;
   }
 
   /**

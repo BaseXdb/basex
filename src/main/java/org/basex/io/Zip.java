@@ -7,11 +7,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.regex.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import org.basex.core.Progress;
+import org.basex.core.*;
 import org.basex.util.list.ByteList;
 import org.basex.util.list.StringList;
 
@@ -120,13 +121,13 @@ public final class Zip extends Progress {
   }
 
   /**
-   * Zips the specified source directory.
-   * @param source source directory to be zipped
+   * Zips the specified directory.
+   * @param source directory to be zipped
+   * @param pattern regular expression pattern
    * @throws IOException I/O exception
    */
-  public void zip(final IOFile source) throws IOException {
-    if(!(archive instanceof IOFile))
-      throw new FileNotFoundException(archive.path());
+  public void zip(final IOFile source, final Pattern pattern) throws IOException {
+    if(!(archive instanceof IOFile)) throw new FileNotFoundException(archive.path());
 
     final byte[] data = new byte[IO.BLOCKSIZE];
     ZipOutputStream out = null;
@@ -145,6 +146,8 @@ public final class Zip extends Progress {
       total = files.size();
       for(final String io : files) {
         curr++;
+        if(pattern != null && !pattern.matcher(io).matches()) continue;
+
         FileInputStream in = null;
         try {
           in = new FileInputStream(new File(source.file(), io));
