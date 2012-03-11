@@ -82,6 +82,9 @@ public final class SerializerProp extends AProp {
   /** Specific serialization parameter: number of spaces to indent. */
   public static final Object[] S_INDENTS = {
     "indents", "2" };
+  /** Specific serialization parameter: item separator. */
+  public static final Object[] S_SEPARATOR = {
+    "separator", " " };
   /** Specific serialization parameter: prefix of result wrapper. */
   public static final Object[] S_WRAP_PREFIX = {
     "wrap-prefix", "" };

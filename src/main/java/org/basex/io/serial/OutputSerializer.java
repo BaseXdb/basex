@@ -58,6 +58,8 @@ public abstract class OutputSerializer extends Serializer {
   private final String media;
   /** Charset. */
   private final Charset encoding;
+  /** Item separator. */
+  private final byte[] separator;
   /** New line. */
   final byte[] nl;
   /** Output stream. */
@@ -116,6 +118,7 @@ public abstract class OutputSerializer extends Serializer {
     wrap    = wPre.length != 0;
     final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
+    separator = token(p.get(S_SEPARATOR));
 
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
@@ -292,7 +295,15 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void finishAtomic(final Item it) throws IOException {
-    if(sep) print(' ');
+    if(sep) {
+      final byte[] sp = separator;
+      final int sl = sp.length;
+      if(sl == 1) {
+        printChar(sp[0]);
+      } else {
+        for(int s = 0; s < sl; s += cl(sp, s)) printChar(cp(sp, s));
+      }
+    }
 
     try {
       if(it instanceof StrStream) {
