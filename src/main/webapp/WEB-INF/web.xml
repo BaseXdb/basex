@@ -18,7 +18,7 @@
   <!--  WebDAV Servlet -->
   <servlet>
     <servlet-name>WebDAV</servlet-name>
-    <servlet-class>org.basex.api.webdav.WebDAVServlet</servlet-class>
+    <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>WebDAV</servlet-name>
@@ -28,7 +28,7 @@
   <!--  REST Servlet -->
   <servlet>
     <servlet-name>REST</servlet-name>
-    <servlet-class>org.basex.api.rest.RESTServlet</servlet-class>
+    <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>REST</servlet-name>
@@ -38,7 +38,7 @@
   <!--  RESTXQ Servlet -->
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
-    <servlet-class>org.basex.api.restxq.RestXqServlet</servlet-class>
+    <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>RESTXQ</servlet-name>
