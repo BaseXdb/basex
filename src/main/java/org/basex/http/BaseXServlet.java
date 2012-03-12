@@ -29,7 +29,7 @@ public abstract class BaseXServlet extends HttpServlet {
     // get context parameter from web.xml
     String home = sc.getInitParameter(Util.PATH);
     // get web root
-    //if(home == null) home = sc.getRealPath("/");
+    if(home == null) home = sc.getRealPath("/");
 
     // set property (will later be evaluated by the Context constructor)
     if(home != null) System.setProperty(Util.PATH, home);
