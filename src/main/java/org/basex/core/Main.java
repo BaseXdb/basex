@@ -3,17 +3,13 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Random;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
-import org.basex.core.Commands.Cmd;
 import org.basex.core.cmd.*;
-import org.basex.query.QueryException;
-import org.basex.server.Session;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import org.basex.query.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * This is the abstract main class for the starter classes.
@@ -27,7 +23,7 @@ public abstract class Main {
 
   /** Output file for queries. */
   protected OutputStream out = System.out;
-  /** Console mode. */
+  /** Console mode. May be set to {@code false} during execution. */
   protected boolean console;
   /** Session. */
   protected Session session;
@@ -71,18 +67,26 @@ public abstract class Main {
    * Launches the console mode, which reads and executes user input.
    */
   protected final void console() {
+    // create console reader
+    final Scanner cr = new Scanner(System.in);
+    // loop until console is set to false (may happen in server mode)
     while(console) {
       Util.out("> ");
-      for(final String in : inputs()) {
-        if(in.isEmpty()) continue;
-        try {
-          if(!execute(in)) {
-            Util.outln(BYE[new Random().nextInt(4)]);
-            return;
-          }
-        } catch(final IOException ex) {
-          Util.errln(ex);
+      // end of input: break loop
+      if(!cr.hasNextLine()) break;
+      // get next line
+      final String in = cr.nextLine();
+      // skip empty lines
+      if(in.isEmpty()) continue;
+      try {
+        // show goodbye message if method returns false
+        if(!execute(in)) {
+          Util.outln(BYE[new Random().nextInt(4)]);
+          return;
         }
+      } catch(final IOException ex) {
+        // output error messages
+        Util.errln(ex);
       }
     }
   }
@@ -136,24 +140,6 @@ public abstract class Main {
     ss.execute(cmd);
     if(newline && cmd instanceof XQuery) out.write(token(NL));
     if(info) Util.out(ss.info());
-  }
-
-  /**
-   * Returns multiple lines from standard input.
-   * @return list of strings
-   */
-  static final StringList inputs() {
-    final StringList sl = new StringList();
-    // find end of input from interactive user input
-    final Scanner scan = new Scanner(System.in).useDelimiter("\\z");
-    if(scan.hasNext()) {
-      // catch several lines sent from redirected standard input
-      final Scanner lines = new Scanner(scan.next());
-      while(lines.hasNextLine()) sl.add(lines.nextLine());
-    }
-    // no more input: send exit command
-    if(sl.size() == 0) sl.add(Cmd.EXIT.toString());
-    return sl;
   }
 
   /**
