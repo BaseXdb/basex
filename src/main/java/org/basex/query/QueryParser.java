@@ -1866,6 +1866,15 @@ public class QueryParser extends InputParser {
       return new NameTest(new QNm(ncName(QNAMEINV)), NameTest.Mode.NAME, att);
     }
 
+    if(ctx.xquery3 && consume(EQNAME)) {
+      // name test: {...}*
+      final byte[] uri = bracedURILiteral();
+      if(consume('*')) {
+        final QNm nm = new QNm(COLON, uri);
+        return new NameTest(nm, NameTest.Mode.NS, att);
+      }
+    }
+
     final QNm name = eQName(null, SKIPCHECK);
     if(name != null) {
       final int p2 = qp;
@@ -1886,13 +1895,6 @@ public class QueryParser extends InputParser {
           names.add(new QNmCheck(nm, !att));
           return new NameTest(nm, NameTest.Mode.NS, att);
         }
-      }
-    } else if(ctx.xquery3 && quote(curr())) {
-      // name test: '':*
-      final byte[] u = stringLiteral();
-      if(consume(':') && consume('*')) {
-        final QNm nm = new QNm(COLON, u);
-        return new NameTest(nm, NameTest.Mode.NS, att);
       }
     }
     qp = p;
@@ -2145,6 +2147,20 @@ public class QueryParser extends InputParser {
       }
       if(!consume(del)) break;
       tok.add(del);
+    }
+    return tok.finish();
+  }
+
+  /**
+   * Parses the "BracedURILiteral" rule without the "Q{" prefix.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private byte[] bracedURILiteral() throws QueryException {
+    tok.reset();
+    while(!consume('}')) {
+      if(!more()) error(NOQUOTE, found());
+      entity(tok);
     }
     return tok.finish();
   }
@@ -3438,14 +3454,12 @@ public class QueryParser extends InputParser {
    */
   private QNm eQName(final Err err, final byte[] def) throws QueryException {
     final int p = qp;
-    if(ctx.xquery3 && quote(curr())) {
-      final byte[] uri = stringLiteral();
-      if(consume(':')) {
-        final byte[] name = ncName(null);
-        if(name.length != 0) {
-          if(def == URICHECK && uri.length == 0) error(NOURI, name);
-          return new QNm(name, uri);
-        }
+    if(ctx.xquery3 && consume(EQNAME)) {
+      final byte[] uri = bracedURILiteral();
+      final byte[] name = ncName(null);
+      if(name.length != 0) {
+        if(def == URICHECK && uri.length == 0) error(NOURI, name);
+        return new QNm(name, uri);
       }
       qp = p;
     }

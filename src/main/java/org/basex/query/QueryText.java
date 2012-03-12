@@ -356,6 +356,8 @@ public interface QueryText {
   /** Parser token. */
   String BR2 = "]";
   /** Parser token. */
+  String EQNAME = "Q{";
+  /** Parser token. */
   String BRACE1 = "{";
   /** Parser token. */
   String BRACE2 = "}";
