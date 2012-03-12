@@ -68,14 +68,13 @@ public abstract class Main {
    */
   protected final void console() {
     // create console reader
-    final Scanner cr = new Scanner(System.in);
+    final ConsoleReader cr = ConsoleReader.newInstance();
     // loop until console is set to false (may happen in server mode)
     while(console) {
-      Util.out("> ");
-      // end of input: break loop
-      if(!cr.hasNextLine()) break;
       // get next line
-      final String in = cr.nextLine();
+      final String in = cr.readLine();
+      // end of input: break loop
+      if(in == null) break;
       // skip empty lines
       if(in.isEmpty()) continue;
       try {
