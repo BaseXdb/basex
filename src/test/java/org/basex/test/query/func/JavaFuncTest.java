@@ -14,7 +14,7 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests calling some Java constructors from XQuery. */
   @Test
   public void constr() {
-    query("'java:java.lang.Integer':new('123')", 123);
+    query("Q{java:java.lang.Integer}new('123')", 123);
     query("declare namespace rand='java:java.util.Random';" +
         "rand:nextInt(rand:new())");
     query("declare namespace ctx='java:org.basex.core.Context';" +
@@ -24,8 +24,8 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests calling some Java static fields from XQuery. */
   @Test
   public void staticField() {
-    query("'java:java.lang.Math':PI()", Math.PI);
-    query("'java:org.basex.core.Prop':gui()");
+    query("Q{java:java.lang.Math}PI()", Math.PI);
+    query("Q{java:org.basex.core.Prop}gui()");
   }
 
   /** Tests calling some Java object fields from XQuery. */
@@ -38,7 +38,7 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests calling some Java static methods from XQuery. */
   @Test
   public void staticMethod() {
-    query("'java:java.lang.Math':sqrt(xs:double(9.0))", 3);
+    query("Q{java:java.lang.Math}sqrt(xs:double(9.0))", 3);
   }
 
   /** Tests calling some Java static methods from XQuery. */
