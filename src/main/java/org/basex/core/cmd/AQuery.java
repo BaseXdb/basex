@@ -134,9 +134,10 @@ abstract class AQuery extends Command {
       } catch(final StackOverflowError ex) {
         Util.debug(ex);
         err = XPSTACK.desc;
+      } finally {
+        // close processor after exceptions
+        if(qp != null) try { qp.close(); } catch(final QueryException ex) { }
       }
-      // close processor after exceptions
-      if(qp != null) try { qp.close(); } catch(final QueryException ex) { }
     }
 
     error(err);
@@ -205,8 +206,7 @@ abstract class AQuery extends Command {
    * @param ctx database context
    * @return query processor
    */
-  private QueryProcessor queryProcessor(final String query,
-      final Context ctx) {
+  private QueryProcessor queryProcessor(final String query, final Context ctx) {
     if(qp == null) qp = progress(new QueryProcessor(query, ctx));
     return qp;
   }
