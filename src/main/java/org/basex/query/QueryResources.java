@@ -97,9 +97,7 @@ public final class QueryResources {
    * @return database instance
    * @throws QueryException query exception
    */
-  public Data data(final String name, final InputInfo ii)
-      throws QueryException {
-
+  public Data data(final String name, final InputInfo ii) throws QueryException {
     // check if a database with the same name has already been opened
     for(int d = 0; d < datas; ++d) {
       if(data[d].meta.name.equals(name)) return data[d];
@@ -175,9 +173,7 @@ public final class QueryResources {
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final String input, final InputInfo ii)
-      throws QueryException {
-
+  public Value collection(final String input, final InputInfo ii) throws QueryException {
     int c = 0;
     // no collection specified.. return default collection/current context set
     if(input == null) {

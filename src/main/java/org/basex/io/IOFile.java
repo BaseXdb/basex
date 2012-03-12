@@ -201,7 +201,7 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Tests if the file suffix matches the specified suffixed.
+   * Tests if the file suffix matches the specified suffixes.
    * @param suffixes suffixes to compare with
    * @return result of check
    */
