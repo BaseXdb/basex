@@ -45,6 +45,17 @@ public final class FDoc extends FNode {
   }
 
   /**
+   * Adds a node to this node.
+   * @param node node to be added
+   * @return self reference
+   */
+  public FDoc add(final ANode node) {
+    children.add(node);
+    node.parent(this);
+    return this;
+  }
+
+  /**
    * Constructor for DOM nodes.
    * Originally provided by Erdal Karaca.
    * @param doc DOM node
