@@ -1,7 +1,9 @@
 package org.basex.core;
 
+import static org.basex.util.Reflect.*;
 import java.io.*;
 import java.lang.reflect.*;
+
 import org.basex.util.*;
 
 /**
@@ -31,7 +33,6 @@ public abstract class ConsoleReader {
    * @return instance of console reader
    */
   public static final ConsoleReader newInstance() {
-
     if(JLineConsoleReader.isAvailable()) {
       try {
         return new JLineConsoleReader();
@@ -75,10 +76,12 @@ public abstract class ConsoleReader {
 
   /** Implementation which provides advanced features, such as history. */
   private static class JLineConsoleReader extends ConsoleReader {
-    /** JLine console reader class. */
+    /** JLine console reader class name. */
     private static final String JLINE_CONSOLE_READER = "jline.ConsoleReader";
-    /** Implementation. */
-    private final Object reader;
+    /** JLine history class name. */
+    private static final String JLINE_HISTORY = "jline.History";
+    /** BaseX command history file. */
+    private static final String HISTORY_FILE = ".basex_history";
 
     /** JLine console reader class. */
     private final Class<?> clz;
@@ -88,13 +91,18 @@ public abstract class ConsoleReader {
     private final Method setDefaultPrompt;
     /** Method to set the history flag. */
     private final Method setUseHistory;
+    /** Method to set the history. */
+    private final Method setHistory;
+
+    /** Implementation. */
+    private final Object reader;
 
     /**
      * Is JLine implementation available?
      * @return {@code true} if JLine is in the classpath
      */
     public static boolean isAvailable() {
-      return Reflect.available(JLINE_CONSOLE_READER);
+      return available(JLINE_CONSOLE_READER);
     }
 
     /**
@@ -102,15 +110,25 @@ public abstract class ConsoleReader {
      * @throws Exception error
      */
     public JLineConsoleReader() throws Exception {
-      clz = Reflect.find(JLINE_CONSOLE_READER);
+      // reflection
+      clz = find(JLINE_CONSOLE_READER);
+      final Class<?> historyClz = find(JLINE_HISTORY);
+
+      readLine = method(clz, "readLine");
+      setDefaultPrompt = method(clz, "setDefaultPrompt", String.class);
+      setUseHistory = method(clz, "setUseHistory", Boolean.class);
+      setHistory = method(clz, "setHistory", historyClz);
+
+      // initialization
       reader = clz.newInstance();
+      final Object history = historyClz.
+          getConstructor(File.class).
+          newInstance(new File(Util.homeDir(), HISTORY_FILE));
 
-      readLine = Reflect.method(clz, "readLine");
-      setDefaultPrompt = Reflect.method(clz, "setDefaultPrompt", String.class);
-      setUseHistory = Reflect.method(clz, "setUseHistory", Boolean.class);
-
+      // default settings
       setUseHistory(true);
       setPrompt(DEFAULT_PROMPT);
+      invoke(setHistory, reader, history);
     }
 
     /**
@@ -119,19 +137,19 @@ public abstract class ConsoleReader {
      * @return current instance
      */
     public JLineConsoleReader setUseHistory(final boolean h) {
-      Reflect.invoke(setUseHistory, reader, h);
+      invoke(setUseHistory, reader, h);
       return this;
     }
 
     @Override
     public JLineConsoleReader setPrompt(final String prompt) {
-      Reflect.invoke(setDefaultPrompt, reader, prompt);
+      invoke(setDefaultPrompt, reader, prompt);
       return this;
     }
 
     @Override
     public String readLine() {
-      return (String) Reflect.invoke(readLine, reader);
+      return (String) invoke(readLine, reader);
     }
   }
 }
