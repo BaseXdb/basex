@@ -45,17 +45,18 @@ class RESTQuery extends RESTCode {
 
   @Override
   void run(final HTTPContext http) throws HTTPException, IOException {
-    query(input, http);
+    query(input, http, true);
   }
 
   /**
    * Evaluates the specified query.
    * @param in query input
    * @param http HTTP context
+   * @param path set query path
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  protected void query(final String in, final HTTPContext http)
+  protected void query(final String in, final HTTPContext http, final boolean path)
       throws HTTPException, IOException {
 
     final Session session = http.session();
@@ -75,29 +76,24 @@ class RESTQuery extends RESTCode {
     session.execute(new Set(Prop.SERIALIZER, serial(http)));
     session.setOutputStream(http.out);
 
-    // set query path to http path
-    final String path = http.context().mprop.get(MainProp.HTTPPATH);
-    session.execute(new Set(Prop.QUERYPATH, new IOFile(path).path()));
-
-    try {
-      // create query instance
-      final Query qu = session.query(in);
-      // bind external variables
-      for(final Entry<String, String[]> e : variables.entrySet()) {
-        final String[] val = e.getValue();
-        if(val.length == 2) qu.bind(e.getKey(), val[0], val[1]);
-        if(val.length == 1) qu.bind(e.getKey(), val[0]);
-      }
-      // initializes the response with query serialization options
-      http.initResponse(new SerializerProp(qu.options()));
-      // run query
-      qu.execute();
-    } catch(final IOException ex) {
-      // suppress information on queried file
-      final String m1 = Util.message(ex);
-      final String m2 = m1.replaceAll(STOPPED_AT + ".*" + NL, "");
-      throw m1.equals(m2) ? ex : new IOException(m2, ex.getCause());
+    // set absolute path to http directory
+    if(path) {
+      final String pth = http.context().mprop.get(MainProp.HTTPPATH);
+      session.execute(new Set(Prop.QUERYPATH, new IOFile(pth).path()));
     }
+
+    // create query instance
+    final Query qu = session.query(in);
+    // bind external variables
+    for(final Entry<String, String[]> e : variables.entrySet()) {
+      final String[] val = e.getValue();
+      if(val.length == 2) qu.bind(e.getKey(), val[0], val[1]);
+      if(val.length == 1) qu.bind(e.getKey(), val[0]);
+    }
+    // initializes the response with query serialization options
+    http.initResponse(new SerializerProp(qu.options()));
+    // run query
+    qu.execute();
   }
 
   /**

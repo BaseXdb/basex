@@ -78,7 +78,7 @@ final class RESTRetrieve extends RESTQuery {
         final ArrayOutput ao = new ArrayOutput();
         session.setOutputStream(ao);
         session.execute(new Retrieve(http.dbpath()));
-        query(ao.toString(), http);
+        query(ao.toString(), http, true);
       } else {
         // retrieve raw file; prefix user parameters with media type
         final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + type;

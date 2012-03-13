@@ -45,6 +45,6 @@ public class RESTRun extends RESTQuery {
     http.session().execute(new Set(Prop.QUERYPATH, io.path()));
 
     // perform query
-    query(string(io.read()), http);
+    query(string(io.read()), http, false);
   }
 }
