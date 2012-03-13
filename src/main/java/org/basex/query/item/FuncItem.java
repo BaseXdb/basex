@@ -136,7 +136,7 @@ public final class FuncItem extends FItem {
       ctx.value = null;
       final Item it = expr.item(ctx, ii);
       // optionally cast return value to target type
-      return cast != null ? cast.cast(it, expr, false, ctx, ii) : it;
+      return cast != null ? cast.cast(it, false, ctx, ii, expr) : it;
     } finally {
       ctx.value = cv;
       ctx.vars.reset(cs);

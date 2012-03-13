@@ -54,8 +54,8 @@ public class UserFunc extends Single {
    * @param r return type
    * @param a annotations
    */
-  public UserFunc(final InputInfo ii, final QNm n, final Var[] v,
-      final SeqType r, final Ann a) {
+  public UserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
+      final Ann a) {
     this(ii, n, v, r, a, true);
   }
 
@@ -68,8 +68,8 @@ public class UserFunc extends Single {
    * @param a annotations
    * @param d declaration flag
    */
-  public UserFunc(final InputInfo ii, final QNm n, final Var[] v,
-      final SeqType r, final Ann a, final boolean d) {
+  public UserFunc(final InputInfo ii, final QNm n, final Var[] v, final SeqType r,
+      final Ann a, final boolean d) {
 
     super(ii, null);
     name = n;
@@ -109,9 +109,7 @@ public class UserFunc extends Single {
    * @param cache cache variables
    * @throws QueryException query exception
    */
-  void comp(final QueryContext ctx, final boolean cache)
-      throws QueryException {
-
+  void comp(final QueryContext ctx, final boolean cache) throws QueryException {
     if(compiled) return;
     compiled = true;
 
@@ -148,7 +146,7 @@ public class UserFunc extends Single {
     try {
       final Item it = expr.item(ctx, ii);
       // optionally promote return value to target type
-      return cast ? ret.cast(it, this, false, ctx, input) : it;
+      return cast ? ret.cast(it, false, ctx, input, this) : it;
     } finally {
       ctx.value = cv;
       ctx.sc.ns.stack(ns);

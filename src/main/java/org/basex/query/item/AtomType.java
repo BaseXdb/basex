@@ -41,7 +41,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Atm cast(final Object o, final InputInfo ii) {
-      return new Atm(token(o.toString()));
+      return new Atm(o.toString());
     }
   },
 
@@ -54,7 +54,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Atm cast(final Object o, final InputInfo ii) {
-      return new Atm(token(o.toString()));
+      return new Atm(o.toString());
     }
   },
 

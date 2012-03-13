@@ -274,16 +274,16 @@ public final class SeqType {
 
   /**
    * Tries to cast the given item to this sequence type.
-   * @param it item to promote
-   * @param e producing expression
+   * @param it item to cast
    * @param cast explicit cast flag
    * @param ctx query context
    * @param ii input info
+   * @param e producing expression, used for error output
    * @return promoted item
    * @throws QueryException query exception
    */
-  public Item cast(final Item it, final Expr e, final boolean cast,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public Item cast(final Item it, final boolean cast, final QueryContext ctx,
+      final InputInfo ii, final Expr e) throws QueryException {
 
     if(it == null) {
       if(occ == Occ.ONE) XPEMPTY.thrw(ii, e.description());
@@ -297,7 +297,7 @@ public final class SeqType {
 
   /**
    * Tries to promote the specified value to this sequence type.
-   * @param val value to be cast
+   * @param val value to promote
    * @param ctx query context
    * @param ii input info
    * @return resulting item

@@ -19,15 +19,21 @@ public final class Atm extends Str {
     super(v, AtomType.ATM);
   }
 
+  /**
+   * Constructor.
+   * @param v value
+   */
+  public Atm(final String v) {
+    this(Token.token(v));
+  }
+
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return !it.type.isUntyped() ? it.eq(ii, this) :
-      Token.eq(val, it.string(ii));
+    return !it.type.isUntyped() ? it.eq(ii, this) : Token.eq(val, it.string(ii));
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    return !it.type.isUntyped() ? -it.diff(ii, this) :
-      Token.diff(val, it.string(ii));
+    return !it.type.isUntyped() ? -it.diff(ii, this) : Token.diff(val, it.string(ii));
   }
 }

@@ -6,7 +6,6 @@ import java.util.*;
 
 import org.basex.query.*;
 import org.basex.query.item.*;
-import org.basex.query.iter.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -30,31 +29,21 @@ public final class Ann extends ElementList {
   public Value[] values = new Value[1];
 
   /**
-   * Adds a QName/Value pair.
+   * Adds a QName/value pair.
    * @param name QName
    * @param value value
    * @return success flag
    */
   public boolean add(final QNm name, final Value value) {
-    // annotation must only be specified once
-    final int i = indexOf(name);
-    if(i != -1) {
-      // add value to existing entry
-      final ItemCache ic = new ItemCache();
-      ic.add(values[i]);
-      ic.add(value);
-      values[i] = ic.value();
-    } else {
-      // create new entry
-      if(size == names.length) {
-        final int s = newSize();
-        names = Arrays.copyOf(names, s);
-        values = Arrays.copyOf(values, s);
-      }
-      names[size] = name;
-      values[size] = value;
-      size++;
+    // create new entry
+    if(size == names.length) {
+      final int s = newSize();
+      names = Arrays.copyOf(names, s);
+      values = Arrays.copyOf(values, s);
     }
+    names[size] = name;
+    values[size] = value;
+    size++;
     return true;
   }
 
@@ -64,27 +53,21 @@ public final class Ann extends ElementList {
    * @return result of check
    */
   public boolean contains(final QNm e) {
-    return indexOf(e) != -1;
+    for(int i = 0; i < size; ++i) if(names[i].eq(e)) return true;
+    return false;
   }
 
   /**
-   * Returns the offset of an existing element, or {@code -1}.
+   * Returns the values for the specified name.
    * @param e element to be found
-   * @return offset
+   * @return values
    */
-  public int indexOf(final QNm e) {
-    for(int i = 0; i < size; ++i) if(names[i].eq(e)) return i;
-    return -1;
-  }
-
-  /**
-   * Returns the value for the specified name, or {@code null}.
-   * @param e element to be found
-   * @return value
-   */
-  public Value value(final QNm e) {
-    final int i = indexOf(e);
-    return i != -1 ? values[i] : null;
+  public Value[] values(final QNm e) {
+    final ArrayList<Value> al = new ArrayList<Value>();
+    for(int i = 0; i < size; ++i) {
+      if(names[i].eq(e)) al.add(values[i]);
+    }
+    return al.toArray(new Value[al.size()]);
   }
 
   @Override
