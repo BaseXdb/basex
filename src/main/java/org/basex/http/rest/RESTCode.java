@@ -102,23 +102,6 @@ abstract class RESTCode {
   }
 
   /**
-   * Returns all query parameters.
-   * @param http HTTP context
-   * @return parameters
-   */
-  static Map<String, String[]> params(final HTTPContext http) {
-    final Map<String, String[]> params = new HashMap<String, String[]>();
-    final Map<?, ?> map = http.req.getParameterMap();
-    for(final Entry<?, ?> s : map.entrySet()) {
-      final String key = s.getKey().toString();
-      final String[] vals = s.getValue() instanceof String[] ?
-          (String[]) s.getValue() : new String[] { s.getValue().toString() };
-      params.put(key, vals);
-    }
-    return params;
-  }
-
-  /**
    * Parses and sets database options.
    * Throws an exception if an option is unknown.
    * @param http HTTP context
@@ -126,7 +109,7 @@ abstract class RESTCode {
    * @throws IOException I/O exception
    */
   static void parseOptions(final HTTPContext http) throws HTTPException, IOException {
-    for(final Entry<String, String[]> param : params(http).entrySet()) {
+    for(final Entry<String, String[]> param : http.params().entrySet()) {
      if(!parseOption(http, param)) {
        throw new HTTPException(SC_BAD_REQUEST, ERR_PARAM, param.getKey());
      }

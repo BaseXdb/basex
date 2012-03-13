@@ -7,6 +7,8 @@ import static org.basex.io.MimeTypes.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.util.*;
+import java.util.Map.*;
 
 import javax.servlet.http.*;
 
@@ -97,6 +99,22 @@ public final class HTTPContext {
   }
 
   /**
+   * Returns all query parameters.
+   * @return parameters
+   */
+  public Map<String, String[]> params() {
+    final Map<String, String[]> params = new HashMap<String, String[]>();
+    final Map<?, ?> map = req.getParameterMap();
+    for(final Entry<?, ?> s : map.entrySet()) {
+      final String key = s.getKey().toString();
+      final String[] vals = s.getValue() instanceof String[] ?
+          (String[]) s.getValue() : new String[] { s.getValue().toString() };
+      params.put(key, vals);
+    }
+    return params;
+  }
+
+  /**
    * Initializes the output. Sets the expected encoding and content type.
    * @param sprop serialization properties
    */
@@ -142,11 +160,11 @@ public final class HTTPContext {
 
   /**
    * Returns a single path segment.
-   * @param s offset
-   * @return specified segment
+   * @param i index
+   * @return segment
    */
-  public String segment(final int s) {
-    return segments[s];
+  public String segment(final int i) {
+    return segments[i];
   }
 
   /**

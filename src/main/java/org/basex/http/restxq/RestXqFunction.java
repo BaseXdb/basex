@@ -29,24 +29,34 @@ import org.basex.util.list.*;
  */
 final class RestXqFunction {
   /** Pattern for a single template. */
-  static final Pattern TEMPLATE = Pattern.compile("\\{\\$(.+)\\}");
+  private static final Pattern TEMPLATE = Pattern.compile("\\{\\$(.+)\\}");
 
-  /** Serialization parameters. */
-  final SerializerProp output = new SerializerProp();
-  /** Query context. */
-  final QueryContext context;
-  /** Associated user function. */
-  final UserFunc function;
-  /** Consumed media type. */
-  final StringList consumes = new StringList();
-  /** Returned media type. */
-  final StringList produces = new StringList();
   /** Supported methods. */
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
-  /** Path. */
-  RestXqPath path;
+  /** Serialization parameters. */
+  final SerializerProp output = new SerializerProp();
+  /** Associated user function. */
+  final UserFunc function;
+
+  /** Consumed media type. */
+  private final StringList consumes = new StringList();
+  /** Returned media type. */
+  private final StringList produces = new StringList();
+  /** Query parameters. */
+  private final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();
+  /** Query parameters. */
+  private final ArrayList<RestXqParam> formParams = new ArrayList<RestXqParam>();
+  /** Query parameters. */
+  private final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
+  /** Query parameters. */
+  private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
+  /** Query context. */
+  private final QueryContext context;
+
+  /** Path segments. */
+  private String[] segments;
   /** Post/Put variable. */
-  QNm postPut;
+  private QNm postPut;
 
   /**
    * Constructor.
@@ -64,9 +74,8 @@ final class RestXqFunction {
    * @throws QueryException query exception
    */
   boolean analyze() throws QueryException {
+    // parse all annotations
     final EnumSet<HTTPMethod> mth = EnumSet.noneOf(HTTPMethod.class);
-
-    // loop through all annotations
     boolean found = false;
     for(int a = 0, as = function.ann.size(); a < as; a++) {
       final QNm name = function.ann.names[a];
@@ -78,25 +87,42 @@ final class RestXqFunction {
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
-          path = new RestXqPath(toString(value, name), this);
+          if(segments != null) error(ANN_ONCE, "%", name.string());
+          segments = HTTPContext.toSegments(toString(value, name));
+          for(final String s : segments) {
+            if(s.startsWith("{")) checkVariable(s, AtomType.AAT);
+          }
         } else if(eq(CONSUMES, local)) {
+          // [CG] RESTXQ, consumes/produces: "take a SINGLE mandatory string literal"?
           // annotation "consumes"
-          consumes.add(toString(value, name));
+          strings(value, name, consumes);
         } else if(eq(PRODUCES, local)) {
           // annotation "produces"
-          produces.add(toString(value, name));
+          strings(value, name, produces);
+        } else if(eq(QUERY_PARAM, local)) {
+          // annotation "query-param"
+          queryParams.add(param(value, name));
+        } else if(eq(FORM_PARAM, local)) {
+          // annotation "form-param"
+          formParams.add(param(value, name));
+        } else if(eq(HEADER_PARAM, local)) {
+          // annotation "header-param"
+          headerParams.add(param(value, name));
+        } else if(eq(COOKIE_PARAM, local)) {
+          // annotation "cookie-param"
+          cookieParams.add(param(value, name));
         } else {
           // method annotations
           final HTTPMethod m = HTTPMethod.get(string(local));
           if(m == null) error(NOT_SUPPORTED, "%", name.string());
           if(!value.isEmpty()) {
             // remember post/put variable
+            if(postPut != null) error(ANN_ONCE, "%", name.string());
             if(m != POST && m != PUT) error(METHOD_VALUE, m);
             final String val = toString(value, name);
-            checkVariable(val, AtomType.ITEM);
-            final Matcher mt = TEMPLATE.matcher(val);
-            if(mt.find()) postPut = new QNm(token(mt.group(1)));
+            postPut = checkVariable(val, AtomType.ITEM);
           }
+          if(mth.contains(m)) error(ANN_ONCE, "%", name.string());
           mth.add(m);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
@@ -111,7 +137,7 @@ final class RestXqFunction {
     if(!mth.isEmpty()) methods = mth;
 
     if(found) {
-      if(path == null) error(ANN_MISSING, PATH);
+      if(segments == null) error(ANN_MISSING, PATH);
       for(final Var v : function.args) {
         if(!v.declared) error(VAR_UNDEFINED, v.name.string());
       }
@@ -120,37 +146,13 @@ final class RestXqFunction {
   }
 
   /**
-   * Checks the specified template and adds a variable.
-   * @param template template string
-   * @param type allowed type
-   * @throws QueryException query exception
-   */
-  void checkVariable(final String template, final Type type) throws QueryException {
-    final Var[] args = function.args;
-    final Matcher m = TEMPLATE.matcher(template);
-    if(!m.find()) error(INVALID_TEMPLATE, template);
-    final byte[] vn = token(m.group(1));
-    if(!XMLToken.isQName(vn)) error(INVALID_VAR, vn);
-    final QNm qnm = new QNm(vn, context);
-    int r = -1;
-    while(++r < args.length) {
-      if(args[r].name.eq(qnm)) break;
-    }
-    if(r == args.length) error(UNKNOWN_VAR, vn);
-    if(args[r].declared) error(VAR_ASSIGNED, vn);
-    final SeqType st = args[r].type;
-    if(st != null && !st.type.instanceOf(type)) error(VAR_TYPE, vn, type);
-    args[r].declared = true;
-  }
-
-  /**
-   * Checks if the function matches the HTTP request.
+   * Checks if an HTTP request matches this function and its constraints.
    * @param http http context
-   * @return instance
+   * @return result of check
    */
   boolean matches(final HTTPContext http) {
     // check method, path, consumed and produced media type
-    return methods.contains(http.method) && path.matches(http) &&
+    return methods.contains(http.method) && pathMatches(http) &&
         consumes(http) && produces(http);
   }
 
@@ -161,21 +163,22 @@ final class RestXqFunction {
    * @throws IOException I/O exception
    */
   void bind(final HTTPContext http) throws QueryException, IOException {
-    // loop through all segments and bind variables
-    for(int s = 0; s < path.segments.length; s++) {
-      final String seg = path.segments[s];
+    // bind variables from segments
+    for(int s = 0; s < segments.length; s++) {
+      final String seg = segments[s];
       final Matcher m = RestXqFunction.TEMPLATE.matcher(seg);
       if(!m.find()) continue;
       final QNm qnm = new QNm(token(m.group(1)), context);
-      bind(qnm, new Atm(token(http.segment(s))));
+      bind(qnm, new Atm(http.segment(s)));
     }
 
+    // bind request body from post/put method
     final Prop prop = context.context.prop;
     if(postPut != null) {
       // cache input
       final BufferInput bi = new BufferInput(http.in);
       final IOContent io = new IOContent(bi.content());
-      io.name(http.method.toString() + IO.XMLSUFFIX);
+      io.name(http.method + IO.XMLSUFFIX);
       Item item = null;
       try {
         // retrieve the request body in the correct format
@@ -185,6 +188,101 @@ final class RestXqFunction {
       }
       bind(postPut, item);
     }
+
+    // bind query parameters
+    final Map<String, String[]> params = http.params();
+    for(final RestXqParam rxp : queryParams) {
+      final String[] values = params.get(rxp.key);
+      bind(rxp.name, values == null ? rxp.item : new Atm(values[0]));
+    }
+  }
+
+  /**
+   * Creates an exception with the specified message.
+   * @param msg message
+   * @param ext error extension
+   * @return exception
+   * @throws QueryException query exception
+   */
+  QueryException error(final String msg, final Object... ext) throws QueryException {
+    throw new QueryException(function.input, Err.REXQERROR, Util.info(msg, ext));
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
+   * Checks the specified template and adds a variable.
+   * @param tmp template string
+   * @param type allowed type
+   * @return resulting variable
+   * @throws QueryException query exception
+   */
+  private QNm checkVariable(final String tmp, final Type type) throws QueryException {
+    final Var[] args = function.args;
+    final Matcher m = TEMPLATE.matcher(tmp);
+    if(!m.find()) error(INVALID_TEMPLATE, tmp);
+    final byte[] vn = token(m.group(1));
+    if(!XMLToken.isQName(vn)) error(INVALID_VAR, vn);
+    final QNm qnm = new QNm(vn, context);
+    int r = -1;
+    while(++r < args.length && !args[r].name.eq(qnm));
+    if(r == args.length) error(UNKNOWN_VAR, vn);
+    if(args[r].declared) error(VAR_ASSIGNED, vn);
+    final SeqType st = args[r].type;
+    if(st != null && !st.type.instanceOf(type)) error(VAR_TYPE, vn, type);
+    args[r].declared = true;
+    return qnm;
+  }
+
+  /**
+   * Checks if the path matches the HTTP request.
+   * @param http http context
+   * @return result of check
+   */
+  boolean pathMatches(final HTTPContext http) {
+    // check if number of segments match
+    if(segments.length != http.depth()) return false;
+    // check single segments
+    for(int s = 0; s < segments.length; s++) {
+      final String seg = segments[s];
+      if(!seg.equals(http.segment(s)) && !seg.startsWith("{")) return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the consumed content type matches.
+   * @param http http context
+   * @return result of check
+   */
+  private boolean consumes(final HTTPContext http) {
+    // return true if no type is given
+    if(consumes.isEmpty()) return true;
+    // return true if no content type is specified by the user
+    final String co = http.req.getContentType();
+    if(co == null) return true;
+    // check if any combination matches
+    for(final String c : consumes) {
+      if(MimeTypes.matches(c, co)) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the produced content type matches.
+   * @param http http context
+   * @return result of check
+   */
+  private boolean produces(final HTTPContext http) {
+    // return true if no type is given
+    if(produces.isEmpty()) return true;
+    // check if any combination matches
+    for(final String pr : http.produces()) {
+      for(final String p : produces) {
+        if(MimeTypes.matches(p, pr)) return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -193,7 +291,9 @@ final class RestXqFunction {
    * @param item item to be bound
    * @throws QueryException query exception
    */
-  void bind(final QNm name, final Item item) throws QueryException {
+  private void bind(final QNm name, final Item item) throws QueryException {
+    // skip nulled items
+    if(item == null) return;
     Item it = item;
     for(final Var var : function.args) {
       if(var.name.eq(name)) {
@@ -206,56 +306,7 @@ final class RestXqFunction {
   }
 
   /**
-   * Creates an exception with the specified message.
-   * @param msg message
-   * @param ext error extension
-   * @return instance
-   * @throws QueryException query exception
-   */
-  QueryException error(final String msg, final Object... ext) throws QueryException {
-    throw new QueryException(function.input, Err.REXQERROR, Util.info(msg, ext));
-  }
-
-  // PRIVATE METHODS ====================================================================
-
-  /**
-   * Checks if the consumed content type matches.
-   * @param http http context
-   * @return instance
-   */
-  private boolean consumes(final HTTPContext http) {
-    // return true if no type is given
-    if(consumes.isEmpty()) return true;
-    // return true if no content type is specified by the user
-    final String cons = http.req.getContentType();
-    if(cons == null) return true;
-
-    for(int c = 0; c < consumes.size(); c++) {
-      if(MimeTypes.matches(consumes.get(c), cons)) return true;
-    }
-    return false;
-  }
-
-  /**
-   * Checks if the produced content type matches.
-   * @param http http context
-   * @return instance
-   */
-  private boolean produces(final HTTPContext http) {
-    // return true if no type is given
-    if(produces.isEmpty()) return true;
-
-    final String[] prod = http.produces();
-    for(int p = 0; p < produces.size(); p++) {
-      for(final String pr : prod) {
-        if(MimeTypes.matches(produces.get(p), pr)) return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Returns the specified value as an atomic string, or throws an exception.
+   * Returns the specified value as an atomic string.
    * @param value value
    * @param name name
    * @return string
@@ -264,5 +315,46 @@ final class RestXqFunction {
   private String toString(final Value value, final QNm name) throws QueryException {
     if(!(value instanceof Str)) error(SINGLE_STRING, "%", name.string());
     return ((Str) value).toJava();
+  }
+
+  /**
+   * Adds items to the specified list.
+   * @param value value
+   * @param name name
+   * @param list list to add values to
+   * @throws QueryException HTTP exception
+   */
+  private void strings(final Value value, final QNm name, final StringList list)
+      throws QueryException {
+
+    final long vs = value.size();
+    for(int v = 0; v < vs; v++) {
+      final Item it = value.itemAt(v);
+      if(!(it instanceof Str)) error(ANN_STRING, "%", name.string(), it);
+      list.add(((Str) it).toJava());
+    }
+  }
+
+  /**
+   * Returns a parameter.
+   * [CG] RESTXQ: allow identical field names?
+   * @param value value
+   * @param name name
+   * @return parameter
+   * @throws QueryException HTTP exception
+   */
+  private RestXqParam param(final Value value, final QNm name) throws QueryException {
+    final long vs = value.size();
+    if(vs < 2 || vs > 3) error(ANN_PARAMS, "%", name.string());
+    // parameter name
+    final Item key = value.itemAt(0);
+    if(!(key instanceof Str)) error(ANN_STRING, "%", name.string(), key);
+    // variable assignment
+    final Item nm = value.itemAt(1);
+    if(!(nm instanceof Str)) error(ANN_STRING, "%", name.string(), nm);
+    final QNm qnm = checkVariable(((Str) nm).toJava(), AtomType.ITEM);
+    // default value
+    final Item val = vs == 3 ? value.itemAt(2) : null;
+    return new RestXqParam(qnm, ((Str) key).toJava(), val);
   }
 }

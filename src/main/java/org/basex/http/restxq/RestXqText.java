@@ -15,6 +15,14 @@ interface RestXqText {
   byte[] PRODUCES = token("produces");
   /** Annotation "consumes". */
   byte[] CONSUMES = token("consumes");
+  /** Annotation "query-param". */
+  byte[] QUERY_PARAM = token("query-param");
+  /** Annotation "form-param". */
+  byte[] FORM_PARAM = token("form-param");
+  /** Annotation "header-param". */
+  byte[] HEADER_PARAM = token("header-param");
+  /** Annotation "cookie-param". */
+  byte[] COOKIE_PARAM = token("cookie-param");
 
   /** Element "rest:response". */
   byte[] RESPONSE = token("response");
@@ -22,9 +30,15 @@ interface RestXqText {
   /** Error message. */
   String ANN_MISSING = "Annotation % is missing.";
   /** Error message. */
+  String ANN_ONCE = "Annotation %% is specified more than once.";
+  /** Error message. */
   String NOT_SUPPORTED = "Annotation %% is invalid or not supported.";
   /** Error message. */
   String SINGLE_STRING = "Annotation %% must specify a single string.";
+  /** Error message. */
+  String ANN_PARAMS = "Annotation %% requires 2 or 3 parameters.";
+  /** Error message. */
+  String ANN_STRING = "Value of annotation %% is no string: %.";
   /** Error message. */
   String INVALID_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */

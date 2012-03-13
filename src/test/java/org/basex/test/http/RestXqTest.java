@@ -42,8 +42,13 @@ public final class RestXqTest extends HTTPTest {
 
   /** Retrieve root.
    * @throws Exception exception */
-  @Test public void getRoot() throws Exception {
+  @Test public void get() throws Exception {
+    get("declare %R:path('') function m:f() { 'root' };", "", "root");
     get("declare %R:path('') function m:f() { 'root' };", "/", "root");
+    // explicit GET method
+    get("declare %R:GET %R:path('') function m:f() { 'root' };", "", "root");
+    // duplicate GET method
+    getE("declare %R:GET %R:GET %R:path('') function m:f() { 'root' };", "");
   }
 
   /** Retrieve path.
@@ -104,10 +109,10 @@ public final class RestXqTest extends HTTPTest {
   }
 
   /**
-   * Errors around the {@code %path} annotation.
+   * {@code %path} annotation.
    * @throws Exception exception
    */
-  @Test public void errorPath() throws Exception {
+  @Test public void path() throws Exception {
     // correct syntax
     get("declare %R:path('') function m:f() {()};", "", "");
     // no path annotation
@@ -115,9 +120,9 @@ public final class RestXqTest extends HTTPTest {
     // no path argument
     getE("declare %R:path function m:f() {()};", "");
     // empty path argument
-    getE("declare %R:path(()) function m:f() {()};", "");
+    getE("declare %R:path() function m:f() {()};", "");
     // two path arguments
-    getE("declare %R:path(('a', 'b')) function m:f() {()};", "a");
+    getE("declare %R:path('a', 'b') function m:f() {()};", "a");
     getE("declare %R:path('a') %R:path('b') function m:f() {()};", "a");
     // path not found
     getE("declare %R:path('') function m:f() { 1 };", "X");
@@ -125,10 +130,10 @@ public final class RestXqTest extends HTTPTest {
   }
 
   /**
-   * Errors around {@code %path} segments.
+   * {@code %path} segments.
    * @throws Exception exception
    */
-  @Test public void errorPathVar() throws Exception {
+  @Test public void pathVar() throws Exception {
     // correct syntax
     get("declare %R:path('{$x}') function m:f($x) {$x};", "1", "1");
     // invalid variable definitions
@@ -148,10 +153,10 @@ public final class RestXqTest extends HTTPTest {
   }
 
   /**
-   * Errors around various annotations.
+   * Various annotations.
    * @throws Exception exception
    */
-  @Test public void errorAnn() throws Exception {
+  @Test public void various() throws Exception {
     // correct syntax
     get("declare %R:path('') function m:f() {'x'};", "", "x");
     // invalid annotation
@@ -159,48 +164,58 @@ public final class RestXqTest extends HTTPTest {
   }
 
   /**
-   * Errors around serialization parameters.
+   * Serialization parameters.
    * @throws Exception exception
    */
-  @Test public void errorOutput() throws Exception {
+  @Test public void output() throws Exception {
     // correct syntax
     get("declare %R:path('') %output:method('text') function m:f() {'9'};", "", "9");
     // unknown serialization parameter
     getE("declare %R:path('') %output:xyz('abc') function m:f() {'9'};", "");
     // parameter must contain single string
     getE("declare %R:path('') %output:method function m:f() {'9'};", "");
-    getE("declare %R:path('') %output:method(('xml','html')) function m:f() {'9'};", "");
+    getE("declare %R:path('') %output:method('xml','html') function m:f() {'9'};", "");
   }
 
   /**
-   * Errors around the {@code %consumes} annotation.
+   * {@code %consumes} annotation.
    * @throws Exception exception
    */
-  @Test public void errorConsumes() throws Exception {
+  @Test public void consumes() throws Exception {
     // correct syntax
-    get("declare %R:path('') %R:consumes('a/b') function m:f() {()};", "", "");
-    // duplicate annotation
-    getE("declare %R:path('') %R:consumes(('a','b')) function m:f(){()};", "");
-    getE("declare %R:path('') %R:consumes('a') %R:consumes('b') function m:f(){()};", "");
+    get("declare %R:path('') %R:consumes('text/plain') function m:f() {1};", "", "1");
+    get("declare %R:path('') %R:consumes('*/*') function m:f() {1};", "", "1");
+    // duplicate annotations
+    get("declare %R:path('') %R:consumes('text/plain','*/*') function m:f() {1};",
+        "", "1");
+    get("declare %R:path('') %R:consumes('text/plain') %R:consumes('*/*') " +
+        "function m:f() {1};", "", "1");
+    // invalid content type: ignored as no content type has been specified by user
+    get("declare %R:path('') %R:consumes('X') function m:f() {1};", "", "1");
   }
 
   /**
-   * Errors around the {@code %produces} annotation.
+   * {@code %produces} annotation.
    * @throws Exception exception
    */
-  @Test public void errorProduces() throws Exception {
+  @Test public void produces() throws Exception {
     // correct syntax
-    get("declare %R:path('') %R:produces('a/b') function m:f() {()};", "", "");
-    // duplicate annotation
-    getE("declare %R:path('') %R:produces(('a','b')) function m:f(){()};", "");
-    getE("declare %R:path('') %R:produces('a') %R:produces('b') function m:f(){()};", "");
+    get("declare %R:path('') %R:produces('text/plain') function m:f() {1};", "", "1");
+    get("declare %R:path('') %R:produces('*/*') function m:f() {1};", "", "1");
+    // duplicate annotations
+    get("declare %R:path('') %R:produces('text/plain','*/*') function m:f() {1};",
+        "", "1");
+    get("declare %R:path('') %R:produces('text/plain') %R:produces('*/*') " +
+        "function m:f() {1};", "", "1");
+    // invalid content type
+    getE("declare %R:path('') %R:produces('X') function m:f() {1};", "");
   }
 
   /**
-   * Errors around the {@code %HEAD} method.
+   * {@code %HEAD} method.
    * @throws Exception exception
    */
-  @Test public void errorHEAD() throws Exception {
+  @Test public void head() throws Exception {
     // correct return type
     head("declare %R:HEAD %R:path('') function m:f() { <R:response/> };", "", "");
     head("declare %R:HEAD %R:path('') function m:f() as element(R:response) " +
@@ -209,6 +224,29 @@ public final class RestXqTest extends HTTPTest {
     headE("declare %R:HEAD %R:path('') function m:f() { () };", "");
     headE("declare %R:HEAD %R:path('') function m:f() { <response/> };", "");
     headE("declare %R:HEAD %R:path('') function m:f() as element(R:response)* {()};", "");
+  }
+
+  /**
+   * Query parameters.
+   * @throws Exception exception
+   */
+  @Test public void queryParams() throws Exception {
+    // correct syntax
+    get("declare %R:path('') %R:query-param('a','{$v}') " +
+        "function m:f($v) {$v};", "?a=1", "1");
+    get("declare %R:path('') %R:query-param('a','{$a}') " +
+        "function m:f($a) {$a*2};", "?a=1", "2");
+    get("declare %R:path('') %R:query-param('a','{$v}',3) " +
+        "function m:f($v) {$v};", "", "3");
+    get("declare %R:path('') %R:query-param('a','{$a}') %R:query-param('b','{$b}') " +
+        "function m:f($a,$b) {$a*$b};", "?a=2&b=3", "6");
+    // missing variable declaration
+    getE("declare %R:path('') %R:query-param('a','{$a}') function m:f() {1};", "?a=2");
+    // missing assignment and default value
+    getE("declare %R:path('') %R:query-param('a','{$v}') function m:f($v) {$v};", "");
+    // variable is specified more than once
+    getE("declare %R:path('') %R:query-param('a','{$a}') %R:query-param('a','{$a}') " +
+        "function m:f($a) {$a};", "?a=2");
   }
 
   // PRIVATE METHODS ==========================================================

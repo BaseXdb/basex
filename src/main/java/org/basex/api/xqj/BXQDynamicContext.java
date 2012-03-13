@@ -71,10 +71,10 @@ abstract class BXQDynamicContext extends BXQAbstract
   }
 
   @Override
-  public void bindAtomicValue(final QName qn, final String v,
-      final XQItemType t) throws XQException {
+  public void bindAtomicValue(final QName qn, final String v, final XQItemType t)
+      throws XQException {
     valid(t, XQItemType.class);
-    bind(qn, new Atm(Token.token(valid(v, String.class).toString())), t);
+    bind(qn, new Atm(valid(v, String.class).toString()), t);
   }
 
   @Override
@@ -90,8 +90,8 @@ abstract class BXQDynamicContext extends BXQAbstract
   }
 
   @Override
-  public void bindDocument(final QName qn, final InputStream is,
-      final String base, final XQItemType t) throws XQException {
+  public void bindDocument(final QName qn, final InputStream is, final String base,
+      final XQItemType t) throws XQException {
     bind(qn, createNode(is), t);
   }
 
@@ -115,8 +115,8 @@ abstract class BXQDynamicContext extends BXQAbstract
   }
 
   @Override
-  public void bindDocument(final QName qn, final XMLStreamReader sr,
-      final XQItemType t) throws XQException {
+  public void bindDocument(final QName qn, final XMLStreamReader sr, final XQItemType t)
+      throws XQException {
     bind(qn, createNode(sr), t);
   }
 
@@ -163,9 +163,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   }
 
   @Override
-  public void bindSequence(final QName qn, final XQSequence s)
-      throws XQException {
-
+  public void bindSequence(final QName qn, final XQSequence s) throws XQException {
     valid(s, XQSequence.class);
     try {
       bind(qn, ((BXQSequence) s).result.value(), null);
@@ -207,8 +205,8 @@ abstract class BXQDynamicContext extends BXQAbstract
    */
   private void bind(final QName var, final Value v, final XQItemType t)
       throws XQException {
-    opened();
 
+    opened();
     valid(var, QName.class);
 
     final Type tt = check(v.type, t);

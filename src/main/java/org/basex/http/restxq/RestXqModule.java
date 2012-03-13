@@ -97,11 +97,11 @@ final class RestXqModule {
     final QueryContext qc = parse(http);
     // loop through all functions
     for(final UserFunc uf : qc.funcs.funcs()) {
-      // recover and evaluate relevant function
+      // find and evaluate relevant function
       final RestXqFunction rxf = new RestXqFunction(uf, qc);
       if(rxf.analyze() && rxf.matches(http)) {
         process(rxf, qc, http);
-        return;
+        break;
       }
     }
   }
@@ -152,7 +152,7 @@ final class RestXqModule {
     // execute updates
     if(qc.updating()) qc.updates.apply();
 
-    // [CG] RestXq: what happens if a method specified more methods than HEAD?
+    // [CG] RESTXQ: what happens if a function specifies other methods beside HEAD?
     if(rxf.methods.size() == 1 && rxf.methods.contains(HTTPMethod.HEAD)) {
       final QNm response = new QNm(RESPONSE, QueryText.REXQURI);
       final ExtKindTest dt = new ExtKindTest(NodeType.ELM, response, null, qc);

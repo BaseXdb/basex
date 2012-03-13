@@ -29,7 +29,7 @@ public final class RestXqServlet extends BaseXServlet {
   }
 }
 
-/* [CG] RestXQ: OPEN ISSUES
+/* [CG] RESTXQ: Open Issues
  * - resolve conflicting paths: what is "more specific"?
  * - check methods: HEAD must only return rest:reponse element
  * - %rest:query-param: query string parameters
