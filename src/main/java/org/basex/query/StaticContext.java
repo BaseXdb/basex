@@ -77,9 +77,7 @@ public final class StaticContext {
    * @param uri namespace uri
    * @throws QueryException query exception
    */
-  public void namespace(final String prefix, final String uri)
-      throws QueryException {
-
+  public void namespace(final String prefix, final String uri) throws QueryException {
     if(prefix.isEmpty()) {
       nsElem = uri.isEmpty() ? null : token(uri);
     } else if(uri.isEmpty()) {

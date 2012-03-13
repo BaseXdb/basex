@@ -769,7 +769,7 @@ public enum Err {
   /** FOFD1350: Evaluation exception. */
   PICCOMP(FOFD, 1350, "Invalid component in string: '%'."),
   /** FOUT1170: Parsing exception. */
-  WRONGINPUT(FOUT, 1170, "Failed to read '%': %."),
+  WRONGINPUT(FOUT, 1170, "Operation failed: %."),
   /** FOUT1190: Evaluation exception. */
   WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
 

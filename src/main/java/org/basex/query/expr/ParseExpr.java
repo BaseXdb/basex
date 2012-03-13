@@ -451,7 +451,6 @@ public abstract class ParseExpr extends Expr {
     // dump error output
     final CmdPerm perm;
     if(p == User.ADMIN) perm = CmdPerm.ADMIN;
-    else if(p == User.ADMIN) perm = CmdPerm.ADMIN;
     else if(p == User.CREATE) perm = CmdPerm.CREATE;
     else if(p == User.WRITE) perm = CmdPerm.WRITE;
     else perm = CmdPerm.READ;

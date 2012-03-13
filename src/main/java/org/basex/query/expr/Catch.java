@@ -74,7 +74,7 @@ public final class Catch extends Single {
     final int s = prepare(ctx);
     try {
       int i = 0;
-      final byte[] io = ex.file() == null ? EMPTY : token(ex.file().path());
+      final byte[] io = ex.file() == null ? EMPTY : token(ex.file());
       final Value val = ex.value();
       for(final Value v : new Value[] { ex.qname(),
           Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,

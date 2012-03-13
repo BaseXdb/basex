@@ -2,6 +2,8 @@ package org.basex.util;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
+import org.basex.core.*;
 import org.basex.io.IO;
 
 /**
@@ -20,8 +22,8 @@ public abstract class InputParser {
   /** Query length. */
   public final int ql;
 
-  /** Optional reference to query input. */
-  public IO file;
+  /** File reference. */
+  public String file;
   /** Current query position. */
   public int qp;
   /** Marked query position. */
@@ -32,18 +34,17 @@ public abstract class InputParser {
    * @param q input query
    */
   protected InputParser(final String q) {
-    this(q, null);
+    query = q;
+    ql = query.length();
   }
 
   /**
-   * Constructor.
-   * @param q input query
+   * Sets a file reference.
    * @param f file
+   * @param c database context
    */
-  protected InputParser(final String q, final IO f) {
-    query = q;
-    ql = query.length();
-    file = f;
+  protected void file(final IO f, final Context c) {
+    file = f == null || f.isDir() ? null : c.user.perm(User.ADMIN) ? f.path() : f.name();
   }
 
   /**

@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import org.basex.io.IO;
-
 /**
  * Input information.
  *
@@ -11,10 +9,10 @@ import org.basex.io.IO;
 public final class InputInfo {
   /** Input query. */
   private final String query;
+  /** Input file. */
+  public final String file;
   /** Parse position. */
   private final int pos;
-  /** Input file. */
-  public final IO file;
   /** Line and column number. */
   private int[] lc;
 
@@ -24,8 +22,8 @@ public final class InputInfo {
    */
   public InputInfo(final InputParser p) {
     query = p.query;
-    pos = p.qp;
     file = p.file;
+    pos = p.qp;
   }
 
   /**

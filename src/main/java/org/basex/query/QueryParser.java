@@ -64,6 +64,8 @@ public class QueryParser extends InputParser {
 
   /** Query context. */
   final QueryContext ctx;
+  /** Input reference. */
+  private final IO input;
 
   /** Temporary token builder. */
   private final TokenBuilder tok = new TokenBuilder();
@@ -117,8 +119,9 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   public QueryParser(final String q, final QueryContext c) throws QueryException {
-    super(q, c.sc.baseIO());
+    super(q);
     ctx = c;
+    input = c.sc.baseIO();
 
     // parse pre-defined external variables
     final String bind = ctx.context.prop.get(Prop.BINDINGS).trim();
@@ -169,13 +172,14 @@ public class QueryParser extends InputParser {
   /**
    * Parses the specified query or module.
    * If a URI is specified, the query is treated as a module.
-   * @param input optional input file
+   * @param in optional input file
    * @param uri module uri.
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final IO input, final byte[] uri) throws QueryException {
-    file = input;
+  public final Expr parse(final IO in, final byte[] uri) throws QueryException {
+    file(in, ctx.context);
+
     if(!more()) error(QUERYEMPTY);
 
     // checks if the query string contains invalid characters
@@ -308,10 +312,7 @@ public class QueryParser extends InputParser {
     prolog2();
     // check if import and declaration uri match
     // skip test if module has not been imported (in this case, URI is empty)
-    if(u.length != 0 && !eq(u, module.uri())) {
-      final boolean admin = ctx.context.user.perm(User.ADMIN);
-      error(WRONGMODULE, module.uri(), admin ? file.toString() : file.name());
-    }
+    if(u.length != 0 && !eq(u, uri)) error(WRONGMODULE, module.uri(), file);
   }
 
   /**
@@ -760,9 +761,7 @@ public class QueryParser extends InputParser {
    * @param uri module uri
    * @throws QueryException query exception
    */
-  private void module(final byte[] path, final byte[] uri)
-      throws QueryException {
-
+  private void module(final byte[] path, final byte[] uri) throws QueryException {
     final byte[] u = ctx.modParsed.get(path);
     if(u != null) {
       if(!eq(uri, u)) error(WRONGMODULE, uri, path);
@@ -776,8 +775,7 @@ public class QueryParser extends InputParser {
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      final boolean admin = ctx.context.user.perm(User.ADMIN);
-      error(NOMODULEFILE, admin ? io.path() : io.name());
+      error(NOMODULEFILE, ctx.context.user.perm(User.ADMIN) ? io.path() : io.name());
     }
 
     final StaticContext sc = ctx.sc;
@@ -3601,8 +3599,8 @@ public class QueryParser extends InputParser {
       if(!io2.eq(io) && io2.exists()) return io2;
     }
     // append with query directory
-    if(file != null) {
-      final IO io2 = file.merge(fn);
+    if(input != null) {
+      final IO io2 = input.merge(fn);
       if(!io2.eq(io) && io2.exists()) return io2;
     }
     return io;
