@@ -83,9 +83,7 @@ public final class FNIndex extends StandardFunc {
   private Item facets(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final boolean flat = expr.length == 2 && eq(checkStr(expr[1], ctx), FLAT);
-    final NodeCache nc = new NodeCache();
-    nc.add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
-    return new FDoc(nc, EMPTY);
+    return new FDoc(EMPTY).add(flat ? flat(data) : tree(data, data.paths.root().get(0)));
   }
 
   /**

@@ -42,10 +42,13 @@ public final class FDoc extends FNode {
     super(NodeType.DOC);
     children = ch;
     base = b;
+    // update parent references
+    final long ns = (int) ch.size();
+    for(int n = 0; n < ns; ++n) ch.get(n).parent(this);
   }
 
   /**
-   * Adds a node to this node.
+   * Adds a node and updates its parent reference.
    * @param node node to be added
    * @return self reference
    */

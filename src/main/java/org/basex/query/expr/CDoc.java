@@ -25,18 +25,11 @@ public final class CDoc extends CFrag {
   }
 
   @Override
-  public FDoc item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public FDoc item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Constr c = new Constr(ii, ctx).add(expr);
     if(c.errAtt || c.atts.size() != 0) XPATT.thrw(ii);
     if(c.errNS || c.nspaces.size() != 0) XPNS.thrw(ii);
-
-    final FDoc doc = new FDoc(c.children, Token.EMPTY);
-    for(int n = 0; n < c.children.size(); ++n) {
-      c.children.get(n).parent(doc);
-    }
-    return doc;
+    return new FDoc(c.children, Token.EMPTY);
   }
 
   @Override

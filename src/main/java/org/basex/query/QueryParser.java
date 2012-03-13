@@ -2159,7 +2159,7 @@ public class QueryParser extends InputParser {
   private byte[] bracedURILiteral() throws QueryException {
     tok.reset();
     while(!consume('}')) {
-      if(!more()) error(NOQUOTE, found());
+      if(!more()) error(WRONGCHAR, BRACE2, found());
       entity(tok);
     }
     return tok.finish();

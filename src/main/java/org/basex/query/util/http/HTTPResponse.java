@@ -52,9 +52,8 @@ public final class HTTPResponse {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  public ValueIter getResponse(final HttpURLConnection conn,
-      final byte[] status, final byte[] mediaTypeOvr)
-          throws IOException, QueryException {
+  public ValueIter getResponse(final HttpURLConnection conn, final byte[] status,
+      final byte[] mediaTypeOvr) throws IOException, QueryException {
 
     final NodeCache attrs = extractAttrs(conn);
     final NodeCache hdrs = extractHdrs(conn);
@@ -70,21 +69,20 @@ public final class HTTPResponse {
       final NodeCache a = new NodeCache();
       a.add(new FAttr(Q_MEDIA_TYPE, token(cType)));
       a.add(new FAttr(Q_BOUNDARY, boundary));
-      body = new FElem(HTTP_MULTIPART, extractParts(
-          conn.getInputStream(), s, payloads, concat(token("--"), boundary)),
-          a, new Atts(HTTP, HTTPURI));
+      body = new FElem(HTTP_MULTIPART, extractParts(conn.getInputStream(), s,
+          payloads, concat(token("--"), boundary)), a, new Atts(HTTP, HTTPURI));
       // single part response
     } else {
       body = createBody(cType);
-      if(!s) payloads.add(
-          interpretPayload(extractPayload(conn.getInputStream(), cType,
-              extractCharset(conn.getContentType())), cType));
+      if(!s) payloads.add(interpretPayload(extractPayload(conn.getInputStream(),
+          cType, extractCharset(conn.getContentType())), cType));
     }
 
     // construct <http:response/>
     final FElem responseEl = new FElem(HTTP_RESPONSE,
         hdrs, attrs, new Atts(HTTP, HTTPURI));
     responseEl.add(body);
+
     // result
     final ItemCache result = new ItemCache();
     result.add(responseEl);
@@ -99,8 +97,7 @@ public final class HTTPResponse {
    * @return node cache with attributes
    * @throws IOException I/O Exception
    */
-  private static NodeCache extractAttrs(final HttpURLConnection conn)
-      throws IOException {
+  private static NodeCache extractAttrs(final HttpURLConnection conn) throws IOException {
     final NodeCache a = new NodeCache();
     a.add(new FAttr(Q_STATUS, token(conn.getResponseCode())));
     a.add(new FAttr(Q_MESSAGE, token(conn.getResponseMessage())));
@@ -230,8 +227,7 @@ public final class HTTPResponse {
    * @throws IOException I/O Exception
    */
   private FElem extractNextPart(final InputStream io, final boolean status,
-      final ItemCache payloads, final byte[] sep, final byte[] end)
-          throws IOException {
+      final ItemCache payloads, final byte[] sep, final byte[] end) throws IOException {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)

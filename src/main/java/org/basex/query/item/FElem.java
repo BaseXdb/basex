@@ -57,17 +57,27 @@ public final class FElem extends FNode {
 
   /**
    * Constructor.
-   * @param n tag name
+   * @param nm element name
    * @param ch children; can be {@code null}
    * @param at attributes; can be {@code null}
    * @param nsp namespaces; can be {@code null}
    */
-  public FElem(final QNm n, final NodeCache ch, final NodeCache at, final Atts nsp) {
+  public FElem(final QNm nm, final NodeCache ch, final NodeCache at, final Atts nsp) {
     super(NodeType.ELM);
-    name = n;
+    name = nm;
     children = ch;
     atts = at;
     ns = nsp;
+
+    // update parent references
+    if(ch != null) {
+      final long nl = (int) ch.size();
+      for(int n = 0; n < nl; ++n) ch.get(n).parent(this);
+    }
+    if(at != null) {
+      final long al = (int) at.size();
+      for(int a = 0; a < al; ++a) at.get(a).parent(this);
+    }
   }
 
   /**
@@ -183,7 +193,7 @@ public final class FElem extends FNode {
   }
 
   /**
-   * Adds a node to this node.
+   * Adds a node and updates its parent reference.
    * @param node node to be added
    * @return self reference
    */
