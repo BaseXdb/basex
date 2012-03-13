@@ -133,9 +133,7 @@ public final class Reflect {
    * @param types constructor parameters
    * @return {@code null} if the class is not found
    */
-  public static Constructor<?> find(final Class<?> clazz,
-      final Class<?>... types) {
-
+  public static Constructor<?> find(final Class<?> clazz, final Class<?>... types) {
     if(clazz == null) return null;
 
     final StringBuilder sb = new StringBuilder(clazz.getName());
