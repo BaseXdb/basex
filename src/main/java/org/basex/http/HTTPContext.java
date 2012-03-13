@@ -210,7 +210,9 @@ public final class HTTPContext {
    * @throws IOException I/O exception
    */
   public Session session() throws IOException {
-    if(user == null || pass == null) throw new LoginException(NOPASSWD);
+    if(user == null || user.isEmpty() || pass == null || pass.isEmpty())
+      throw new LoginException(NOPASSWD);
+
     if(session == null) session = CLIENT.equals(System.getProperty(DBMODE)) ?
         new ClientSession(context(), user, pass) :
         new LocalSession(context(), user, pass);

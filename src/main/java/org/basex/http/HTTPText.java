@@ -16,7 +16,7 @@ public interface HTTPText {
   String DBUSER = "org.basex.user";
   /** Configuration: database user password. */
   String DBPASS = "org.basex.password";
-  /** Configuration: operation mode: "local", "client", or default ({@code null}). */
+  /** Configuration: operation mode: "local", "client" or default ({@code null}). */
   String DBMODE = "org.basex.mode";
 
   /** Mode: local. */

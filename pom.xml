@@ -185,20 +185,19 @@
             <contextPath>/</contextPath>
           </webAppConfig>
           <systemProperties>
-            <!-- Choose client/server or local mode -->
+            <!-- System properties: check out web.xml for more details. -->
             <systemProperty>
-              <name>org.basex.local</name>
-              <value>false</value>
+              <name>org.basex.mode</name>
+              <value>local</value>
             </systemProperty>
-            <!-- Choose default user/password
             <systemProperty>
               <name>org.basex.user</name>
-              <value>admin</value>
+              <value></value>
             </systemProperty>
             <systemProperty>
               <name>org.basex.password</name>
-              <value>admin</value>
-            </systemProperty> -->
+              <value></value>
+            </systemProperty>
           </systemProperties>
           <!-- Key and port for stopping Jetty
           <stopKey>keyToStopJetty</stopKey> 

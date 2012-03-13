@@ -28,11 +28,26 @@ public abstract class BaseXServlet extends HttpServlet {
     final ServletContext sc = config.getServletContext();
     // get context parameter from web.xml
     String home = sc.getInitParameter(Util.PATH);
-    // get web root
-    if(home == null) home = sc.getRealPath("/");
-
+    // get root path of servlet context
+    if(home == null || home.isEmpty()) home = sc.getRealPath("/");
     // set property (will later be evaluated by the Context constructor)
-    if(home != null) System.setProperty(Util.PATH, home);
+    setProperty(Util.PATH, home);
+
+    // set remaining options
+    setProperty(HTTPText.DBMODE, sc.getInitParameter(HTTPText.DBMODE));
+    setProperty(HTTPText.DBUSER, sc.getInitParameter(HTTPText.DBUSER));
+    setProperty(HTTPText.DBPASS, sc.getInitParameter(HTTPText.DBPASS));
+
+  }
+
+  /**
+   * Sets the specified system property if its value is not {@code null} or empty.
+   * @param key key to be set
+   * @param value value to be set
+   */
+  private void setProperty(final String key, final String value) {
+    // set operation mode: "local" or "client"
+    if(value != null && !value.isEmpty()) System.setProperty(key, value);
   }
 
   @Override

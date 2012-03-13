@@ -8,14 +8,42 @@
   <display-name>BaseX HTTP Server</display-name>
   <description>BaseX HTTP Server</description>
 
-  <!-- Path to XMLDB home directory
+  <!-- The following parameters may also be passed on as system properties: -->
+
+  <!-- Path to the BaseX home directory, in which the .basex configuration file
+       will be placed. By default, no value is specified; as a result, the
+       default servlet context path will be used. -->
   <context-param>
     <param-name>org.basex.path</param-name>
-    <param-value>/var/run/basex</param-value>
+    <param-value></param-value>
   </context-param>
-  -->
 
-  <!--  WebDAV Servlet -->
+  <!-- Operation mode. By default, the value is "local": a new BaseX instance
+       will be created and used for all operations. If "client" is specified,
+       all operations are performed on a remote server instance (the login
+       data of which is stored in the .basex configuration file). -->
+  <context-param>
+    <param-name>org.basex.mode</param-name>
+    <param-value>local</param-value>
+  </context-param>
+
+  <!-- Database user. By default, no value is specified, and the credentials
+       must be specified by the client. Note that it is a clear security risk to
+       store user credentials in this file. -->
+  <context-param>
+    <param-name>org.basex.user</param-name>
+    <param-value></param-value>
+  </context-param>
+
+  <!-- Database password. By default, no value is specified, and the credentials
+       must be specified by the client. Note that it is a clear security risk to
+       store user credentials in this file. -->
+  <context-param>
+    <param-name>org.basex.password</param-name>
+    <param-value></param-value>
+  </context-param>
+
+  <!--  WebDAV Servlet (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
@@ -25,7 +53,7 @@
     <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
 
-  <!--  REST Servlet -->
+  <!--  REST Servlet (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
@@ -35,7 +63,7 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <!--  RESTXQ Servlet -->
+  <!--  RESTXQ Servlet (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>
