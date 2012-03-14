@@ -5,6 +5,7 @@ import static org.basex.http.restxq.RestXqText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -177,45 +178,45 @@ final class RestXqFunction {
 
     // cache request body
     final String ct = http.req.getContentType();
-    final BufferInput bi = new BufferInput(http.in);
-    IOContent cache = null;
+    IOContent body = null;
 
     if(requestBody != null) {
-      cache = new IOContent(bi.content());
-      cache.name(http.method + IO.XMLSUFFIX);
-      Item item = null;
+      body = cache(http, body);
       try {
-        // retrieve the request body in the correct format
-        item = Parser.item(cache, prop, ct);
+        // bind request body in the correct format
+        body.name(http.method + IO.XMLSUFFIX);
+        bind(requestBody, Parser.item(body, prop, ct));
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
-      bind(requestBody, item);
     }
 
     // bind query parameters
+    Map<String, String[]> params = http.params();
     for(final RestXqParam rxp : queryParams) {
-      final String v = http.req.getParameter(rxp.key);
-      bind(rxp.name, v == null ? rxp.item : new Atm(v));
+      final String[] v = params.get(rxp.key);
+      bind(rxp.name, v == null ? rxp.item : new Atm(v[0]));
     }
-    /* bind form parameters
-    final boolean post = MimeTypes.APP_FORM.equals(ct);
+
+    // bind form parameters
     if(formParams.size() != 0) {
-      for(final RestXqParam rxp : formParams) {
-        final String v;
-        if(post) {
-          v = null;
-        } else {
-          v = http.req.getParameter(rxp.key);
-        }
-        bind(rxp.name, v == null ? rxp.item : new Atm(v));
+      if(MimeTypes.APP_FORM.equals(ct)) {
+        // convert POST-encoded parameters
+        body = cache(http, body);
+        params = convert(body.toString());
       }
-    }*/
+      for(final RestXqParam rxp : formParams) {
+        final String[] v = params.get(rxp.key);
+        bind(rxp.name, v == null ? rxp.item : new Atm(v[0]));
+      }
+    }
+
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
       final String v = http.req.getHeader(rxp.key);
       bind(rxp.name, v == null ? rxp.item : new Atm(v));
     }
+
     // bind cookie parameters
     final Cookie[] cookies = http.req.getCookies();
     if(cookies != null) {
@@ -393,5 +394,43 @@ final class RestXqFunction {
     // default value
     final Item val = vs == 3 ? value.itemAt(2) : null;
     return new RestXqParam(qnm, key, val);
+  }
+
+  // PRIVATE STATIC METHODS =============================================================
+
+  /**
+   * Caches the request body, if not done yet.
+   * @param http http context
+   * @param cache cache existing cache reference
+   * @return cache
+   * @throws IOException I/O exception
+   */
+  private static IOContent cache(final HTTPContext http, final IOContent cache)
+      throws IOException {
+
+    if(cache != null) return cache;
+    final BufferInput bi = new BufferInput(http.in);
+    final IOContent io = new IOContent(bi.content());
+    io.name(http.method + IO.XMLSUFFIX);
+    return io;
+  }
+
+  /**
+   * Converts the passed on request body to query parameters.
+   * @param body request body
+   * @return map
+   */
+  private static Map<String, String[]> convert(final String body) {
+    final Map<String, String[]> map = new HashMap<String, String[]>();
+    for(final String nv : body.split("&")) {
+      final String[] parts = nv.split("=", 2);
+      if(parts.length < 2) continue;
+      try {
+        map.put(parts[0], new String[] { URLDecoder.decode(parts[1], Token.UTF8) });
+      } catch(final Exception ex) {
+        Util.notexpected(ex);
+      }
+    }
+    return map;
   }
 }

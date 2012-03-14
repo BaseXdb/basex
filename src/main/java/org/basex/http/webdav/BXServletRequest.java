@@ -185,8 +185,7 @@ public final class BXServletRequest extends AbstractRequest {
    * @param map parsed key-values will be stored here
    * @param qs query string
    */
-  public static void parseQueryString(final Map<String, String> map,
-      final String qs) {
+  public static void parseQueryString(final Map<String, String> map, final String qs) {
     if(qs == null) return;
     for(final String nv : qs.split("&")) {
       final String[] parts = nv.split("=");
