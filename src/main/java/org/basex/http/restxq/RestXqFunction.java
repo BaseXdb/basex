@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+import javax.servlet.http.*;
+
 import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.http.*;
@@ -38,6 +40,8 @@ final class RestXqFunction {
   /** Associated user function. */
   final UserFunc function;
 
+  /** Query context. */
+  private final QueryContext context;
   /** Consumed media type. */
   private final StringList consumes = new StringList();
   /** Returned media type. */
@@ -50,13 +54,10 @@ final class RestXqFunction {
   private final ArrayList<RestXqParam> headerParams = new ArrayList<RestXqParam>();
   /** Query parameters. */
   private final ArrayList<RestXqParam> cookieParams = new ArrayList<RestXqParam>();
-  /** Query context. */
-  private final QueryContext context;
-
   /** Path segments. */
   private String[] segments;
   /** Post/Put variable. */
-  private QNm postPut;
+  private QNm requestBody;
 
   /**
    * Constructor.
@@ -87,7 +88,7 @@ final class RestXqFunction {
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
-          if(segments != null) error(ANN_ONCE, "%", name.string());
+          if(segments != null) error(ANN_TWICE, "%", name.string());
           segments = HTTPContext.toSegments(toString(value, name));
           for(final String s : segments) {
             if(s.startsWith("{")) checkVariable(s, AtomType.AAT);
@@ -114,15 +115,14 @@ final class RestXqFunction {
         } else {
           // method annotations
           final HTTPMethod m = HTTPMethod.get(string(local));
-          if(m == null) error(NOT_SUPPORTED, "%", name.string());
+          if(m == null) error(ANN_UNKNOWN, "%", name.string());
           if(!value.isEmpty()) {
             // remember post/put variable
-            if(postPut != null) error(ANN_ONCE, "%", name.string());
+            if(requestBody != null) error(ANN_TWICE, "%", name.string());
             if(m != POST && m != PUT) error(METHOD_VALUE, m);
-            final String val = toString(value, name);
-            postPut = checkVariable(val, AtomType.ITEM);
+            requestBody = checkVariable(toString(value, name));
           }
-          if(mth.contains(m)) error(ANN_ONCE, "%", name.string());
+          if(mth.contains(m)) error(ANN_TWICE, "%", name.string());
           mth.add(m);
         }
       } else if(eq(uri, QueryText.OUTPUTURI)) {
@@ -174,26 +174,58 @@ final class RestXqFunction {
 
     // bind request body from post/put method
     final Prop prop = context.context.prop;
-    if(postPut != null) {
-      // cache input
-      final BufferInput bi = new BufferInput(http.in);
-      final IOContent io = new IOContent(bi.content());
-      io.name(http.method + IO.XMLSUFFIX);
+
+    // cache request body
+    final String ct = http.req.getContentType();
+    final BufferInput bi = new BufferInput(http.in);
+    IOContent cache = null;
+
+    if(requestBody != null) {
+      cache = new IOContent(bi.content());
+      cache.name(http.method + IO.XMLSUFFIX);
       Item item = null;
       try {
         // retrieve the request body in the correct format
-        item = Parser.item(io, prop, http.req.getContentType());
+        item = Parser.item(cache, prop, ct);
       } catch(final IOException ex) {
         error(INPUT_CONV, ex);
       }
-      bind(postPut, item);
+      bind(requestBody, item);
     }
 
     // bind query parameters
-    final Map<String, String[]> params = http.params();
     for(final RestXqParam rxp : queryParams) {
-      final String[] values = params.get(rxp.key);
-      bind(rxp.name, values == null ? rxp.item : new Atm(values[0]));
+      final String v = http.req.getParameter(rxp.key);
+      bind(rxp.name, v == null ? rxp.item : new Atm(v));
+    }
+    /* bind form parameters
+    final boolean post = MimeTypes.APP_FORM.equals(ct);
+    if(formParams.size() != 0) {
+      for(final RestXqParam rxp : formParams) {
+        final String v;
+        if(post) {
+          v = null;
+        } else {
+          v = http.req.getParameter(rxp.key);
+        }
+        bind(rxp.name, v == null ? rxp.item : new Atm(v));
+      }
+    }*/
+    // bind header parameters
+    for(final RestXqParam rxp : headerParams) {
+      final String v = http.req.getHeader(rxp.key);
+      bind(rxp.name, v == null ? rxp.item : new Atm(v));
+    }
+    // bind cookie parameters
+    final Cookie[] cookies = http.req.getCookies();
+    if(cookies != null) {
+      for(final RestXqParam rxp : cookieParams) {
+        for(final Cookie c : cookies) {
+          if(!rxp.key.equals(c.getName())) continue;
+          final String v = c.getValue();
+          bind(rxp.name, v == null ? rxp.item : new Atm(v));
+        }
+      }
     }
   }
 
@@ -213,6 +245,16 @@ final class RestXqFunction {
   /**
    * Checks the specified template and adds a variable.
    * @param tmp template string
+   * @return resulting variable
+   * @throws QueryException query exception
+   */
+  private QNm checkVariable(final String tmp) throws QueryException {
+    return checkVariable(tmp, AtomType.ITEM);
+  }
+
+  /**
+   * Checks the specified template and adds a variable.
+   * @param tmp template string
    * @param type allowed type
    * @return resulting variable
    * @throws QueryException query exception
@@ -220,16 +262,16 @@ final class RestXqFunction {
   private QNm checkVariable(final String tmp, final Type type) throws QueryException {
     final Var[] args = function.args;
     final Matcher m = TEMPLATE.matcher(tmp);
-    if(!m.find()) error(INVALID_TEMPLATE, tmp);
+    if(!m.find()) error(INV_TEMPLATE, tmp);
     final byte[] vn = token(m.group(1));
-    if(!XMLToken.isQName(vn)) error(INVALID_VAR, vn);
+    if(!XMLToken.isQName(vn)) error(INV_VARNAME, vn);
     final QNm qnm = new QNm(vn, context);
     int r = -1;
     while(++r < args.length && !args[r].name.eq(qnm));
     if(r == args.length) error(UNKNOWN_VAR, vn);
     if(args[r].declared) error(VAR_ASSIGNED, vn);
     final SeqType st = args[r].type;
-    if(st != null && !st.type.instanceOf(type)) error(VAR_TYPE, vn, type);
+    if(st != null && !st.type.instanceOf(type)) error(INV_VARTYPE, vn, type);
     args[r].declared = true;
     return qnm;
   }
@@ -259,11 +301,11 @@ final class RestXqFunction {
     // return true if no type is given
     if(consumes.isEmpty()) return true;
     // return true if no content type is specified by the user
-    final String co = http.req.getContentType();
-    if(co == null) return true;
+    final String ct = http.req.getContentType();
+    if(ct == null) return true;
     // check if any combination matches
     for(final String c : consumes) {
-      if(MimeTypes.matches(c, co)) return true;
+      if(MimeTypes.matches(c, ct)) return true;
     }
     return false;
   }
@@ -294,14 +336,14 @@ final class RestXqFunction {
   private void bind(final QNm name, final Item item) throws QueryException {
     // skip nulled items
     if(item == null) return;
+
     Item it = item;
     for(final Var var : function.args) {
-      if(var.name.eq(name)) {
-        // casts and binds the value
-        if(var.type != null) it = var.type.type.cast(item, context, null);
-        var.bind(it, context);
-        return;
-      }
+      if(!var.name.eq(name)) continue;
+      // casts and binds the value
+      if(var.type != null) it = var.type.type.cast(item, context, null);
+      var.bind(it, context);
+      break;
     }
   }
 
@@ -313,7 +355,7 @@ final class RestXqFunction {
    * @throws QueryException HTTP exception
    */
   private String toString(final Value value, final QNm name) throws QueryException {
-    if(!(value instanceof Str)) error(SINGLE_STRING, "%", name.string());
+    if(!(value instanceof Str)) error(ANN_STRING, "%", name.string());
     return ((Str) value).toJava();
   }
 
@@ -329,9 +371,7 @@ final class RestXqFunction {
 
     final long vs = value.size();
     for(int v = 0; v < vs; v++) {
-      final Item it = value.itemAt(v);
-      if(!(it instanceof Str)) error(ANN_STRING, "%", name.string(), it);
-      list.add(((Str) it).toJava());
+      list.add(toString(value.itemAt(v), name));
     }
   }
 
@@ -346,15 +386,12 @@ final class RestXqFunction {
   private RestXqParam param(final Value value, final QNm name) throws QueryException {
     final long vs = value.size();
     if(vs < 2 || vs > 3) error(ANN_PARAMS, "%", name.string());
-    // parameter name
-    final Item key = value.itemAt(0);
-    if(!(key instanceof Str)) error(ANN_STRING, "%", name.string(), key);
-    // variable assignment
-    final Item nm = value.itemAt(1);
-    if(!(nm instanceof Str)) error(ANN_STRING, "%", name.string(), nm);
-    final QNm qnm = checkVariable(((Str) nm).toJava(), AtomType.ITEM);
+    // name of parameter
+    final String key = toString(value.itemAt(0), name);
+    // variable template
+    final QNm qnm = checkVariable(toString(value.itemAt(1), name));
     // default value
     final Item val = vs == 3 ? value.itemAt(2) : null;
-    return new RestXqParam(qnm, ((Str) key).toJava(), val);
+    return new RestXqParam(qnm, key, val);
   }
 }

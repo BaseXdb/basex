@@ -247,6 +247,10 @@ public final class RestXqTest extends HTTPTest {
     // variable is specified more than once
     getE("declare %R:path('') %R:query-param('a','{$a}') %R:query-param('a','{$a}') " +
         "function m:f($a) {$a};", "?a=2");
+    // parameter is no string
+    getE("declare %R:path('') %R:query-param(1,'{$a}') function m:f($a) {$a};", "?a=2");
+    // invalid path template
+    getE("declare %R:path('') %R:query-param('a','$a') function m:f($a) {$a};", "?a=2");
   }
 
   // PRIVATE METHODS ==========================================================

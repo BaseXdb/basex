@@ -32,9 +32,7 @@ public final class RestXqServlet extends BaseXServlet {
 /* [CG] RESTXQ: Open Issues
  * - resolve conflicting paths: what is "more specific"?
  * - check methods: HEAD must only return rest:reponse element
- * - %rest:query-param: query string parameters
- * - %rest:form-param: "application/x-www-form-urlencoded"
- * - %rest:header-param: request headers
- * - %rest:cookie-param: cookies
+ * - %rest:form-param (?)
+ * - %rest:cookie-param (?)
  * - check compatibility of annotation and function return type
  */

@@ -30,21 +30,19 @@ interface RestXqText {
   /** Error message. */
   String ANN_MISSING = "Annotation % is missing.";
   /** Error message. */
-  String ANN_ONCE = "Annotation %% is specified more than once.";
+  String ANN_TWICE = "Annotation %% is specified more than once.";
   /** Error message. */
-  String NOT_SUPPORTED = "Annotation %% is invalid or not supported.";
-  /** Error message. */
-  String SINGLE_STRING = "Annotation %% must specify a single string.";
+  String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
   /** Error message. */
   String ANN_PARAMS = "Annotation %% requires 2 or 3 parameters.";
   /** Error message. */
   String ANN_STRING = "Value of annotation %% is no string: %.";
   /** Error message. */
-  String INVALID_TEMPLATE = "Invalid path template: \"%\".";
+  String INV_TEMPLATE = "Invalid path template: \"%\".";
   /** Error message. */
-  String INVALID_VAR = "Invalid variable name: $%.";
+  String INV_VARNAME = "Invalid variable name: $%.";
   /** Error message. */
-  String VAR_TYPE = "Variable $% must inherit from %.";
+  String INV_VARTYPE = "Variable $% must inherit from %.";
   /** Error message. */
   String UNKNOWN_VAR = "Variable $% is not specified as argument.";
   /** Error message. */

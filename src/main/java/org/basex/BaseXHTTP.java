@@ -32,7 +32,7 @@ public final class BaseXHTTP {
   private boolean webdav = true;
   /** Activate REST. */
   private boolean rest = true;
-  /** Activate RestXQ. */
+  /** Activate RESTXQ. */
   private boolean restxq = true;
 
   /** Start as daemon. */
@@ -222,10 +222,13 @@ public final class BaseXHTTP {
           case 'U': // specify user name
             System.setProperty(DBUSER, arg.string());
             break;
+          case 'v': // specify user name
+            System.setProperty(DBVERBOSE, Boolean.TRUE.toString());
+            break;
           case 'W': // deactivate WebDAV service
             webdav = false;
             break;
-          case 'X': // deactivate RestXQ service
+          case 'X': // deactivate RESTXQ service
             restxq = false;
             break;
           case 'z': // suppress logging

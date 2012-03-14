@@ -18,6 +18,8 @@ public interface HTTPText {
   String DBPASS = "org.basex.password";
   /** Configuration: operation mode: "local", "client" or default ({@code null}). */
   String DBMODE = "org.basex.mode";
+  /** Configuration: verbose mode. */
+  String DBVERBOSE = "org.basex.verbose";
 
   /** Mode: local. */
   String LOCAL = "local";

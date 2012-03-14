@@ -8,6 +8,7 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -37,7 +38,6 @@ public abstract class BaseXServlet extends HttpServlet {
     setProperty(HTTPText.DBMODE, sc.getInitParameter(HTTPText.DBMODE));
     setProperty(HTTPText.DBUSER, sc.getInitParameter(HTTPText.DBUSER));
     setProperty(HTTPText.DBPASS, sc.getInitParameter(HTTPText.DBPASS));
-
   }
 
   /**
@@ -46,7 +46,6 @@ public abstract class BaseXServlet extends HttpServlet {
    * @param value value to be set
    */
   private void setProperty(final String key, final String value) {
-    // set operation mode: "local" or "client"
     if(value != null && !value.isEmpty()) System.setProperty(key, value);
   }
 
@@ -69,6 +68,10 @@ public abstract class BaseXServlet extends HttpServlet {
       Util.errln(Util.bug(ex));
       http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, Util.message(ex)));
     } finally {
+      if(Boolean.parseBoolean(System.getProperty(HTTPText.DBVERBOSE))) {
+        Util.out("_ REQUEST ___________________________________" + Prop.NL + req);
+        Util.out("_ RESPONSE __________________________________" + Prop.NL + res);
+      }
       http.close();
     }
   }
