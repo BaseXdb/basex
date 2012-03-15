@@ -1,5 +1,4 @@
 module namespace rest = "http://exquery.org/ns/rest/annotation";
-(:declare namespace rest = "http://exquery.org/ns/rest/annotation"; :)
 
 declare
   %rest:path("")
@@ -17,6 +16,8 @@ declare
       </head>
       <body>
         <h2>Welcome to RESTXQ: RESTful Annotations for XQuery</h2>
+        <p>This page is generates in an XQuery module, which is located in the
+        web server's root directory (specified by the <code>HTTPPATH</code> option).</p>
         <p>...</p>
       </body>
     </html>
