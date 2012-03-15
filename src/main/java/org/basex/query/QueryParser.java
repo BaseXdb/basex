@@ -64,8 +64,6 @@ public class QueryParser extends InputParser {
 
   /** Query context. */
   final QueryContext ctx;
-  /** Input reference. */
-  private final IO input;
 
   /** Temporary token builder. */
   private final TokenBuilder tok = new TokenBuilder();
@@ -121,7 +119,6 @@ public class QueryParser extends InputParser {
   public QueryParser(final String q, final QueryContext c) throws QueryException {
     super(q);
     ctx = c;
-    input = c.sc.baseIO();
 
     // parse pre-defined external variables
     final String bind = ctx.context.prop.get(Prop.BINDINGS).trim();
@@ -171,14 +168,13 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the specified query or module.
-   * If a URI is specified, the query is treated as a module.
-   * @param in optional input file
+   * If the specified uri is {@code null}, the query is parsed as main module.
    * @param uri module uri.
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final IO in, final byte[] uri) throws QueryException {
-    file(in, ctx.context);
+  public final Expr parse(final byte[] uri) throws QueryException {
+    file(ctx.sc.baseIO(), ctx.context);
 
     if(!more()) error(QUERYEMPTY);
 
@@ -195,7 +191,7 @@ public class QueryParser extends InputParser {
       p += hs ? Character.charCount(cp) : 1;
     }
 
-    final Expr expr = parse(uri);
+    final Expr expr = module(uri);
     if(more()) {
       if(alter != null) error();
       final String rest = rest();
@@ -220,12 +216,12 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the specified query and starts with the "Module" rule.
-   * If a URI is specified, the query is treated as a module.
+   * If the specified uri is {@code null}, the query is parsed as main module.
    * @param u module uri
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final byte[] u) throws QueryException {
+  public final Expr module(final byte[] u) throws QueryException {
     try {
       Expr expr = null;
       versionDecl();
@@ -695,14 +691,15 @@ public class QueryParser extends InputParser {
       ns = ncName(XPNAME);
       wsCheck(IS);
     }
+
     final byte[] uri = trim(stringLiteral());
     if(uri.length == 0) error(NSMODURI);
     if(modules.contains(uri)) error(DUPLMODULE, uri);
     modules.add(uri);
-
     if(ns != EMPTY) ctx.sc.ns.add(ns, uri, input());
 
     try {
+      // search modules at specified locations
       if(wsConsumeWs(AT)) {
         do {
           module(stringLiteral(), uri);
@@ -710,8 +707,8 @@ public class QueryParser extends InputParser {
         return;
       }
 
+      // check Java modules (inheriting {@link QueryModule})
       if(startsWith(uri, JAVAPRE)) {
-        // check for Java modules
         final String path = string(substring(uri, JAVAPRE.length));
         final Class<?> clz = Reflect.find(path);
         if(clz == null) error(NOMODULE, uri);
@@ -741,13 +738,13 @@ public class QueryParser extends InputParser {
         return;
       }
 
-      // check statically known modules
+      // search for statically known modules
       boolean found = false;
       for(final byte[] u : MODULES) found |= eq(uri, u);
-      // check pre-declared modules
+
+      // search for pre-declared modules
       final byte[] path = ctx.modDeclared.get(uri);
       if(path != null) module(path, uri);
-      // module not found: show error
       else if(!found) error(NOMODULE, uri);
 
     } catch(final StackOverflowError ex) {
@@ -770,7 +767,7 @@ public class QueryParser extends InputParser {
     ctx.modParsed.add(path, uri);
 
     // check specified path and path relative to query file
-    final IO io = io(string(path));
+    final IO io = ctx.sc.io(string(path));
     String qu = null;
     try {
       qu = string(io.read());
@@ -780,7 +777,8 @@ public class QueryParser extends InputParser {
 
     final StaticContext sc = ctx.sc;
     ctx.sc = new StaticContext();
-    new QueryParser(qu, ctx).parse(io, uri);
+    ctx.sc.baseURI(io.path());
+    new QueryParser(qu, ctx).parse(uri);
     ctx.sc = sc;
   }
 
@@ -3255,7 +3253,7 @@ public class QueryParser extends InputParser {
             } else if(wsConsumeWs(AT)) {
               String fn = string(stringLiteral());
               if(ctx.stop != null) fn = ctx.stop.get(fn);
-              final IO fl = io(fn);
+              final IO fl = ctx.sc.io(fn);
               if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
             } else if(!union && !except) {
               error(FTSTOP);
@@ -3291,7 +3289,7 @@ public class QueryParser extends InputParser {
 
     String fn = string(stringLiteral());
     if(ctx.thes != null) fn = ctx.thes.get(fn);
-    final IO fl = io(fn);
+    final IO fl = ctx.sc.io(fn);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0;
@@ -3581,29 +3579,6 @@ public class QueryParser extends InputParser {
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
     error(c, ent);
-  }
-
-  /**
-   * Returns an IO instance for the specified file, or {@code null}.
-   * @param fn filename
-   * @return io instance
-   */
-  private IO io(final String fn) {
-    final IO io = IO.get(fn);
-    if(io.exists()) return io;
-
-    // append with base uri
-    final IO base = ctx.sc.baseIO();
-    if(base != null) {
-      final IO io2 = base.merge(fn);
-      if(!io2.eq(io) && io2.exists()) return io2;
-    }
-    // append with query directory
-    if(input != null) {
-      final IO io2 = input.merge(fn);
-      if(!io2.eq(io) && io2.exists()) return io2;
-    }
-    return io;
   }
 
   /**

@@ -3,7 +3,7 @@ package org.basex.build.xml;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.Builder;
-import org.basex.util.Atts;
+import org.basex.util.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
@@ -131,7 +131,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @throws SAXException SAX exception
    */
   private static void error(final IOException ex) throws SAXException {
-    final SAXException ioe = new SAXException(ex.getMessage());
+    final SAXException ioe = new SAXException(Util.message(ex));
     ioe.setStackTrace(ex.getStackTrace());
     throw ioe;
   }

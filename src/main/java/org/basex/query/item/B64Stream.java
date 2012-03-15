@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import org.basex.io.IO;
 import org.basex.query.QueryException;
+import org.basex.query.func.*;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -61,6 +62,6 @@ public final class B64Stream extends B64 {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", input.name());
+    return Util.info(Function._FILE_READ_BINARY.args(input));
   }
 }

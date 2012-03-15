@@ -43,6 +43,7 @@ public class BaseX extends Main {
     try {
       new BaseX(args);
     } catch(final IOException ex) {
+      Util.debug(ex);
       Util.errln(ex);
       System.exit(1);
     }

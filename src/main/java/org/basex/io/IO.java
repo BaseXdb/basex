@@ -136,7 +136,7 @@ public abstract class IO {
   public abstract byte[] read() throws IOException;
 
   /**
-   * Tests if the file exists.
+   * Tests if the file exists. Returns {@code true} by default.
    * @return result of check
    */
   public boolean exists() {

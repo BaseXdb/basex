@@ -169,7 +169,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String qu) throws QueryException {
-    root = new QueryParser(qu, this).parse(sc.baseIO(), null);
+    root = new QueryParser(qu, this).parse(null);
   }
 
   /**
@@ -178,7 +178,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void module(final String qu) throws QueryException {
-    new QueryParser(qu, this).parse(sc.baseIO(), EMPTY);
+    new QueryParser(qu, this).parse(EMPTY);
   }
 
   /**

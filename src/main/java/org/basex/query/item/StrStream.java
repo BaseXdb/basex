@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.io.in.NewlineInput;
 import org.basex.query.QueryException;
+import org.basex.query.func.*;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -82,6 +83,6 @@ public final class StrStream extends Item {
 
   @Override
   public String toString() {
-    return Util.info("\"%\"", input.name());
+    return Util.info(Function._FILE_READ_TEXT.args(input));
   }
 }

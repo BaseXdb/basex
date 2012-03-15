@@ -167,7 +167,7 @@ public interface Text {
   /** Ports was specified twice. */
   String PORT_TWICE_X = lang("port_twice_%");
   /** Unknown host. */
-  String UNKNOWN_HOST = lang("unknown_host");
+  String UNKNOWN_HOST_X = lang("unknown_host_x");
   /** Timeout exceeded. */
   String TIMEOUT_EXCEEDED = lang("timeout_exceeded");
   /** Connection error. */

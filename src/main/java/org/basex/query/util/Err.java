@@ -673,7 +673,7 @@ public enum Err {
   /** XQST0059: Parsing exception. */
   NOMODULE(XQST, 59, "No module found for namespace '%'."),
   /** XQST0059: Parsing exception. */
-  NOMODULEFILE(XQST, 59, "Module not found: '%'."),
+  NOMODULEFILE(XQST, 59, "Could not retrieve module '%'."),
   /** XQST0059: Parsing exception. */
   WRONGMODULE(XQST, 59, "Wrong URI '%' in imported module '%'."),
   /** XQST0060: Parsing exception. */
@@ -769,7 +769,7 @@ public enum Err {
   /** FOFD1350: Evaluation exception. */
   PICCOMP(FOFD, 1350, "Invalid component in string: '%'."),
   /** FOUT1170: Parsing exception. */
-  WRONGINPUT(FOUT, 1170, "Operation failed: %."),
+  WRONGINPUT(FOUT, 1170, "%"),
   /** FOUT1190: Evaluation exception. */
   WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
 

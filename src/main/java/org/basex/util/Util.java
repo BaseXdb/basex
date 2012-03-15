@@ -2,20 +2,15 @@ package org.basex.util;
 
 import static org.basex.core.Text.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.ConnectException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.security.ProtectionDomain;
-import java.util.Scanner;
+import java.io.*;
+import java.net.*;
+import java.security.*;
+import java.util.*;
 
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.server.LoginException;
-import org.basex.util.list.StringList;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.server.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains static methods, which are used throughout the project.
@@ -169,14 +164,14 @@ public final class Util {
    * @return error message
    */
   public static String message(final Throwable ex) {
-    debug(ex);
     final String msg = ex.getMessage();
     if(ex instanceof BindException) return SRV_RUNNING;
+    else if(ex instanceof FileNotFoundException) return info(FILE_NOT_FOUND_X, msg);
     else if(ex instanceof LoginException) return ACCESS_DENIED;
     else if(ex instanceof ConnectException) return CONNECTION_ERROR;
     else if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
     else if(ex instanceof SocketException) return CONNECTION_ERROR;
-    else if(ex instanceof UnknownHostException) return info(UNKNOWN_HOST, msg);
+    else if(ex instanceof UnknownHostException) return info(UNKNOWN_HOST_X, msg);
     return msg != null && !msg.isEmpty() ? msg : ex.toString();
   }
 

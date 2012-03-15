@@ -454,8 +454,7 @@ public final class CommandParser extends InputParser {
    * @return string result, or {@code null}
    * @throws QueryException query exception
    */
-  private String finish(final Cmd cmd, final StringBuilder s)
-      throws QueryException {
+  private String finish(final Cmd cmd, final StringBuilder s) throws QueryException {
     if(s != null && s.length() != 0) return s.toString();
     if(cmd != null) throw help(null, cmd);
     return null;
@@ -545,9 +544,7 @@ public final class CommandParser extends InputParser {
    * @param i user input
    * @return completions
    */
-  private static <T extends Enum<T>> Enum<?>[] list(
-      final Class<T> en, final String i) {
-
+  private static <T extends Enum<T>> Enum<?>[] list(final Class<T> en, final String i) {
     Enum<?>[] list = new Enum<?>[0];
     final String t = i == null ? "" : i.toUpperCase(Locale.ENGLISH);
     for(final Enum<?> e : en.getEnumConstants()) {
@@ -569,8 +566,7 @@ public final class CommandParser extends InputParser {
    * @param e extension
    * @return query exception
    */
-  private QueryException error(final StringList comp, final String m,
-      final Object... e) {
+  private QueryException error(final StringList comp, final String m, final Object... e) {
     return new QueryException(input(), new QNm(), m, e).suggest(this, comp);
   }
 

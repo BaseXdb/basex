@@ -18,6 +18,9 @@ import org.basex.util.hash.TokenObjMap;
  * @author Christian Gruen
  */
 public final class StaticContext {
+  /** Decimal formats. */
+  public final TokenObjMap<DecFormatter> decFormats = new TokenObjMap<DecFormatter>();
+
   /** Static and dynamic namespaces. */
   public NSContext ns = new NSContext();
   /** Default element/type namespace. */
@@ -44,10 +47,6 @@ public final class StaticContext {
   private byte[] baseURI = EMPTY;
   /** Default collation. */
   private Uri collation = Uri.uri(URLCOLL, false);
-
-  /** Decimal formats. */
-  public final TokenObjMap<DecFormatter> decFormats =
-    new TokenObjMap<DecFormatter>();
 
   /**
    * Adopts values of the specified static context.
@@ -93,6 +92,25 @@ public final class StaticContext {
    */
   public IO baseIO() {
     return baseURI.length != 0 ? IO.get(string(baseURI)) : null;
+  }
+
+  /**
+   * Returns one of two possible IO references for the specified filename:
+   * <ol>
+   * <li>The filename is merged with the base URI. This reference is returned if the
+   *     resulting file exists, or if the plain file does not exist.</li>
+   * <li>Otherwise, or if no base URI exists, the plain reference is returned.</li>
+   * </ol>
+   * @param fn filename
+   * @return io instance
+   */
+  public IO io(final String fn) {
+    final IO io = IO.get(fn);
+    if(baseURI.length != 0) {
+      final IO iob = IO.get(string(baseURI)).merge(fn);
+      if(iob.exists() || !io.exists()) return iob;
+    }
+    return io;
   }
 
   /**

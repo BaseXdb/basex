@@ -49,6 +49,10 @@ public final class IOUrl extends IO {
     final URL url = new URL(path);
     try {
       return new BufferInput(url.openStream());
+    } catch(final IOException ex) {
+      final IOException io = new IOException(Util.message(ex));
+      io.setStackTrace(ex.getStackTrace());
+      throw io;
     } catch(final RuntimeException ex) {
       // catch unexpected runtime exceptions
       Util.debug(ex);

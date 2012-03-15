@@ -26,7 +26,8 @@ public final class BaseXException extends IOException {
    * @param ex exception
    */
   public BaseXException(final Exception ex) {
-    this(ex.getMessage() != null ? ex.getMessage() : ex.toString());
+    super(Util.message(ex));
+    setStackTrace(ex.getStackTrace());
   }
 
   /**
