@@ -206,7 +206,7 @@ public final class CommandParser extends InputParser {
       case RENAME:
         return new Rename(string(cmd), string(cmd));
       case REPLACE:
-        return new Replace(string(cmd), string(cmd));
+        return new Replace(string(cmd), s ? remaining(null) : string(null));
       case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
