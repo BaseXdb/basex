@@ -12,14 +12,16 @@ public interface HTTPText {
   /** Servlet string. */
   String SERVLET = "Servlet";
 
+  /** Configuration prefix. */
+  String DBX = "org.basex.";
   /** Configuration: database user. */
-  String DBUSER = "org.basex.user";
+  String DBUSER = DBX + "user";
   /** Configuration: database user password. */
-  String DBPASS = "org.basex.password";
+  String DBPASS = DBX + "password";
   /** Configuration: operation mode: "local", "client" or default ({@code null}). */
-  String DBMODE = "org.basex.mode";
+  String DBMODE = DBX + "mode";
   /** Configuration: verbose mode. */
-  String DBVERBOSE = "org.basex.verbose";
+  String DBVERBOSE = DBX + "verbose";
 
   /** Mode: local. */
   String LOCAL = "local";

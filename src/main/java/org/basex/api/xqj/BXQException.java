@@ -15,7 +15,7 @@ final class BXQException extends XQException {
    * @param ex query exception
    */
   BXQException(final Exception ex) {
-     this(ex.getMessage());
+     this(Util.message(ex));
      setStackTrace(ex.getStackTrace());
   }
 

@@ -4,6 +4,7 @@ import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.HTTPText.*;
 
 import java.io.*;
+import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -27,17 +28,19 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void init(final ServletConfig config) throws ServletException {
     // get context
     final ServletContext sc = config.getServletContext();
+    // set options
+    Enumeration<?> en = sc.getInitParameterNames();
+    while(en.hasMoreElements()) {
+      final String n = en.nextElement().toString();
+      if(n.startsWith(DBX)) setProperty(n, sc.getInitParameter(n));
+    }
+
     // get context parameter from web.xml
-    String home = sc.getInitParameter(Util.PATH);
+    String home = System.getProperty(Util.PATH);
     // get root path of servlet context
-    if(home == null || home.isEmpty()) home = sc.getRealPath("/");
+    if(home == null) home = sc.getRealPath("/");
     // set property (will later be evaluated by the Context constructor)
     setProperty(Util.PATH, home);
-
-    // set remaining options
-    setProperty(HTTPText.DBMODE, sc.getInitParameter(HTTPText.DBMODE));
-    setProperty(HTTPText.DBUSER, sc.getInitParameter(HTTPText.DBUSER));
-    setProperty(HTTPText.DBPASS, sc.getInitParameter(HTTPText.DBPASS));
   }
 
   /**
