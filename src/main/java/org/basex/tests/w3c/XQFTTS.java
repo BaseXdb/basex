@@ -1,14 +1,12 @@
 package org.basex.tests.w3c;
 
-import java.util.HashMap;
+import java.util.*;
 
-import org.basex.data.Nodes;
-import org.basex.io.IO;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryProcessor;
-import org.basex.query.ft.ThesQuery;
-import org.basex.query.ft.Thesaurus;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.ft.*;
+import org.basex.util.*;
 import org.basex.util.ft.*;
 
 /**
@@ -48,7 +46,7 @@ public final class XQFTTS extends W3CTS {
   }
 
   @Override
-  protected void init(final Nodes root) throws Exception {
+  protected void init(final Nodes root) throws QueryException {
     Util.outln("Caching Full-text Structures...");
     for(final int s : nodes("//*:stopwords", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
@@ -70,9 +68,7 @@ public final class XQFTTS extends W3CTS {
   }
 
   @Override
-  protected void parse(final QueryProcessor qp, final Nodes root)
-      throws Exception {
-
+  protected void parse(final QueryProcessor qp, final Nodes root) throws QueryException {
     final QueryContext ctx = qp.ctx;
     ctx.stop = stop;
     ctx.thes = thes;

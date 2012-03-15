@@ -16,6 +16,7 @@ import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.util.Compare.Flag;
 import org.basex.tests.bxapi.*;
+import org.basex.tests.bxapi.XQuery;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 
@@ -289,8 +290,13 @@ public final class QT3TS {
 
       // run query
       result.value = query.value();
+      // force evaluation of streamed objects to trigger certain error messages
+      final Value v = result.value.internal();
+      if(v instanceof StrStream || v instanceof B64Stream) ((Item) v).string(null);
+
     } catch(final XQueryException ex) {
       result.exc = ex;
+      result.value = null;
     } catch(final Throwable ex) {
       // unexpected error (potential bug)
       result.error = ex;
@@ -312,8 +318,7 @@ public final class QT3TS {
     boolean err = result.value == null;
     String res;
     try {
-      res = result.error != null ? result.error.toString() :
-            result.exc != null ?
+      res = result.error != null ? result.error.toString() : result.exc != null ?
           result.exc.getCode() + ": " + result.exc.getLocalizedMessage() :
           asString("serialize(., map { 'indent' := 'no' })", result.value);
     } catch(final XQueryException ex) {

@@ -3,49 +3,26 @@ package org.basex.tests.w3c;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
 
+import org.basex.core.*;
 import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Check;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.in.NewlineInput;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.expr.Expr;
-import org.basex.query.func.Function;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.Str;
-import org.basex.query.item.Uri;
-import org.basex.query.item.Value;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.util.Compare;
-import org.basex.util.Args;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * XQuery Test Suite wrapper.
@@ -149,9 +126,10 @@ public abstract class W3CTS {
   /**
    * Runs the test suite.
    * @param args command-line arguments
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    */
-  void run(final String[] args) throws Exception {
+  void run(final String[] args) throws QueryException, IOException {
     try {
       parseArguments(args);
     } catch(final IOException ex) {
@@ -275,10 +253,11 @@ public abstract class W3CTS {
   /**
    * Parses the specified test case.
    * @param root root node
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws IOException I/O exception
    * @return true if the query, specified by {@link #single}, was evaluated
    */
-  private boolean parse(final Nodes root) throws Exception {
+  private boolean parse(final Nodes root) throws QueryException, IOException {
     final String pth = text("@FilePath", root);
     final String outname = text("@name", root);
     if(single != null && !outname.startsWith(single)) return true;
@@ -561,10 +540,11 @@ public abstract class W3CTS {
    * @param qp query processor
    * @param first call
    * @return string with input files
-   * @throws Exception exception
+   * @throws QueryException query exception
+   * @throws BaseXException database exception
    */
-  private byte[] file(final Nodes nod, final Nodes var,
-      final QueryProcessor qp, final boolean first) throws Exception {
+  private byte[] file(final Nodes nod, final Nodes var, final QueryProcessor qp,
+      final boolean first) throws QueryException, BaseXException {
 
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < nod.size(); ++c) {
@@ -623,9 +603,7 @@ public abstract class W3CTS {
    * @return expression
    * @throws QueryException query exception
    */
-  private Uri coll(final byte[] name, final QueryProcessor qp)
-      throws QueryException {
-
+  private Uri coll(final byte[] name, final QueryProcessor qp) throws QueryException {
     qp.ctx.resource.addCollection(string(name), colls.get(string(name)));
     return Uri.uri(name);
   }
@@ -637,10 +615,10 @@ public abstract class W3CTS {
    * @param var documents
    * @param pth file path
    * @param qp query processor
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
   private void eval(final Nodes nod, final Nodes var, final String pth,
-      final QueryProcessor qp) throws Exception {
+      final QueryProcessor qp) throws QueryException {
 
     for(int c = 0; c < nod.size(); ++c) {
       final String file = pth + string(data.atom(nod.list[c])) + IO.XQSUFFIX;
@@ -657,10 +635,10 @@ public abstract class W3CTS {
    * @param pth file path
    * @param nm file name
    * @param msg message
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
   private void addLog(final String pth, final String nm, final String msg)
-      throws Exception {
+      throws IOException {
 
     if(reporting) {
       final File file = new File(results + pth);
@@ -689,9 +667,9 @@ public abstract class W3CTS {
    * @param qu query
    * @param root root node
    * @return attribute value
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
-  protected String text(final String qu, final Nodes root) throws Exception {
+  protected String text(final String qu, final Nodes root) throws QueryException {
     final Nodes n = nodes(qu, root);
     final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < n.size(); ++i) {
@@ -706,9 +684,9 @@ public abstract class W3CTS {
    * @param role role
    * @param root root node
    * @return attribute value
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
-  protected String[] aux(final String role, final Nodes root) throws Exception {
+  protected String[] aux(final String role, final Nodes root) throws QueryException {
     return text("*:aux-URI[@role = '" + role + "']", root).split("/");
   }
 
@@ -717,9 +695,9 @@ public abstract class W3CTS {
    * @param qu query
    * @param root root node
    * @return attribute value
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
-  protected Nodes nodes(final String qu, final Nodes root) throws Exception {
+  protected Nodes nodes(final String qu, final Nodes root) throws QueryException {
     return new QueryProcessor(qu, root, context).queryNodes();
   }
 
@@ -727,11 +705,9 @@ public abstract class W3CTS {
    * Adds the specified file to the writer.
    * @param po writer
    * @param f file path
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
-  private static void print(final PrintOutput po, final String f)
-      throws Exception {
-
+  private static void print(final PrintOutput po, final String f) throws IOException {
     final BufferedReader br = new BufferedReader(new FileReader(f));
     for(String line; (line = br.readLine()) != null;) po.println(line);
     br.close();
@@ -754,29 +730,29 @@ public abstract class W3CTS {
   /**
    * Initializes the test.
    * @param root root nodes reference
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected void init(final Nodes root) throws Exception { }
+  protected void init(final Nodes root) throws QueryException { }
 
   /**
    * Performs test specific parsings.
    * @param qp query processor
    * @param root root nodes reference
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   protected void parse(final QueryProcessor qp, final Nodes root)
-    throws Exception { }
+      throws QueryException { }
 
   /**
    * Returns all query states.
    * @param root root node
    * @return states
-   * @throws Exception exception
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  protected Nodes states(final Nodes root) throws Exception {
+  protected Nodes states(final Nodes root) throws QueryException {
     return root;
   }
 

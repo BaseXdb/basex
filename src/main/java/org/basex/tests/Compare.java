@@ -1,15 +1,13 @@
 package org.basex.tests;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.list.ByteList;
-import org.basex.util.list.StringList;
+import org.basex.util.list.*;
 
 /**
  * This class compares query results with other query processors.

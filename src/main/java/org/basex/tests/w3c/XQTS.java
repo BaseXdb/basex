@@ -1,7 +1,7 @@
 package org.basex.tests.w3c;
 
-import org.basex.core.Prop;
-import org.basex.util.Util;
+import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * XQuery Test Suite wrapper.

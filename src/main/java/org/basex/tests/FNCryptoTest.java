@@ -2,22 +2,13 @@ package org.basex.tests;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.io.*;
+import java.security.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the functions of the EXPath Cryptographic module. The tests

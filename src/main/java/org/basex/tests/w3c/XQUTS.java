@@ -1,8 +1,9 @@
 package org.basex.tests.w3c;
 
-import org.basex.core.Prop;
-import org.basex.data.Nodes;
-import org.basex.util.Util;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * XQuery Update Test Suite wrapper.
@@ -29,7 +30,7 @@ public final class XQUTS extends W3CTS {
   }
 
   @Override
-  protected Nodes states(final Nodes root) throws Exception {
+  protected Nodes states(final Nodes root) throws QueryException {
     return nodes("*:state", root);
   }
 
