@@ -17,15 +17,15 @@ import org.basex.util.ft.*;
  */
 public final class XQFTTS extends W3CTS {
   /** Cached stop word files. */
-  private final HashMap<String, String> stop = new HashMap<String, String>();
+  private final HashMap<String, IO> stop = new HashMap<String, IO>();
   /** Cached stop word files. */
-  private final HashMap<String, String> stop2 = new HashMap<String, String>();
+  private final HashMap<String, IO> stop2 = new HashMap<String, IO>();
   /** Cached stemming dictionaries. */
-  private final HashMap<String, String> stem = new HashMap<String, String>();
+  private final HashMap<String, IO> stem = new HashMap<String, IO>();
   /** Cached thesaurus. */
-  private final HashMap<String, String> thes = new HashMap<String, String>();
+  private final HashMap<String, IO> thes = new HashMap<String, IO>();
   /** Cached thesaurus. */
-  private final HashMap<String, String> thes2 = new HashMap<String, String>();
+  private final HashMap<String, IO> thes2 = new HashMap<String, IO>();
 
   /**
    * Main method of the test class.
@@ -51,19 +51,19 @@ public final class XQFTTS extends W3CTS {
     for(final int s : nodes("//*:stopwords", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      stop.put(text("@uri", srcRoot), val);
-      stop2.put(text("@ID", srcRoot), val);
+      stop.put(text("@uri", srcRoot), IO.get(val));
+      stop2.put(text("@ID", srcRoot), IO.get(val));
     }
     for(final int s : nodes("//*:stemming-dictionary", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      stem.put(text("@ID", srcRoot), val);
+      stem.put(text("@ID", srcRoot), IO.get(val));
     }
     for(final int s : nodes("//*:thesaurus", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
-      thes.put(text("@uri", srcRoot), val);
-      thes2.put(text("@ID", srcRoot), val);
+      thes.put(text("@uri", srcRoot), IO.get(val));
+      thes2.put(text("@ID", srcRoot), IO.get(val));
     }
   }
 
@@ -75,27 +75,38 @@ public final class XQFTTS extends W3CTS {
 
     final FTOpt opt = ctx.ftOpt();
     for(final String s : aux("stopwords", root)) {
-      final String fn = stop2.get(s);
+      final IO fn = stop2.get(s);
       if(fn != null) {
         if(opt.sw == null) opt.sw = new StopWords();
-        opt.sw.read(IO.get(fn), false);
+        opt.sw.read(fn, false);
       }
     }
 
     for(final String s : aux("stemming-dictionary", root)) {
-      final String fn = stem.get(s);
+      final IO fn = stem.get(s);
       if(fn != null) {
         if(opt.sd == null) opt.sd = new StemDir();
-        opt.sd.read(IO.get(fn));
+        opt.sd.read(fn);
       }
     }
 
     for(final String s : aux("thesaurus", root)) {
-      final String fn = thes2.get(s);
+      final IO fn = thes2.get(s);
       if(fn != null) {
         if(opt.th == null) opt.th = new ThesQuery();
-        opt.th.add(new Thesaurus(IO.get(fn), context));
+        opt.th.add(new Thesaurus(fn, context));
       }
     }
+  }
+
+  /**
+   * Returns the resulting auxiliary uri in multiple strings.
+   * @param role role
+   * @param root root node
+   * @return attribute value
+   * @throws QueryException query exception
+   */
+  private String[] aux(final String role, final Nodes root) throws QueryException {
+    return text("*:aux-URI[@role = '" + role + "']", root).split("/");
   }
 }

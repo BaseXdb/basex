@@ -290,10 +290,15 @@ public final class QT3TS {
 
       // run query
       result.value = query.value();
-      // force evaluation of streamed objects to trigger certain error messages
       final Value v = result.value.internal();
-      if(v instanceof StrStream || v instanceof B64Stream) ((Item) v).string(null);
-
+      if(v instanceof Streamable) {
+        // force retrieval of streamable items to trigger certain error messages
+        try {
+          ((Streamable) v).input(null).close();
+        } catch(final QueryException ex) {
+          throw new XQueryException(ex);
+        }
+      }
     } catch(final XQueryException ex) {
       result.exc = ex;
       result.value = null;

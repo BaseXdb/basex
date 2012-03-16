@@ -118,7 +118,6 @@ public final class XQuery implements Iterable<XdmItem> {
     qp.module(uri, file);
   }
 
-
   /**
    * Sets the base URI.
    * @param base base URI

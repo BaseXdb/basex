@@ -90,8 +90,7 @@ public abstract class W3CTS {
   /** Cached module files. */
   private final HashMap<String, String> mods = new HashMap<String, String>();
   /** Cached collections. */
-  private final HashMap<String, String[]> colls =
-    new HashMap<String, String[]>();
+  private final HashMap<String, String[]> colls = new HashMap<String, String[]>();
 
   /** OK log. */
   private final StringBuilder logOK = new StringBuilder();
@@ -299,9 +298,7 @@ public abstract class W3CTS {
         files.add(file(nodes("*:input-file", state),
             nodes("*:input-file/@variable", state), xq, n == 0));
         files.add(file(nodes("*:defaultCollection", state), null, xq, n == 0));
-
-        var(nodes("*:input-URI", state),
-            nodes("*:input-URI/@variable", state), xq);
+        var(nodes("*:input-URI", state), nodes("*:input-URI/@variable", state), xq);
         eval(nodes("*:input-query/@name", state),
             nodes("*:input-query/@variable", state), pth, xq);
 
@@ -309,22 +306,25 @@ public abstract class W3CTS {
 
         for(final int p : nodes("*:module", root).list) {
           final String uri = text("@namespace", new Nodes(p, data));
-          final String file = mods.get(string(data.atom(p))) + IO.XQSUFFIX;
+          final String file = IO.get(mods.get(string(data.atom(p))) + IO.XQSUFFIX).path();
           xq.module(uri, file);
         }
 
-        // evaluate and serialize query
-        final SerializerProp sp = new SerializerProp();
-        sp.set(SerializerProp.S_INDENT, context.prop.is(Prop.CHOP) ? YES : NO);
-        final Serializer ser = Serializer.get(ao, sp);
+        // evaluate query
         iter = xq.value().cache();
+
+        // serialize query
+        final SerializerProp sp = new SerializerProp();
+        sp.set(SerializerProp.S_INDENT, NO);
+        final Serializer ser = Serializer.get(ao, sp);
         for(Item it; (it = iter.next()) != null;) it.serialize(ser);
         ser.close();
+
       } catch(final Exception ex) {
         if(!(ex instanceof QueryException || ex instanceof IOException)) {
-          System.err.println("\n*** " + outname + " ***");
-          System.err.println(in + '\n');
-          ex.printStackTrace();
+          Util.errln("\n*** " + outname + " ***");
+          Util.errln(in + '\n');
+          Util.stack(ex);
         }
         er = ex.getMessage();
         if(er.startsWith(STOPPED_AT)) er = er.substring(er.indexOf('\n') + 1);
@@ -415,8 +415,8 @@ public abstract class W3CTS {
               final ItemCache ia = toIter(actual, frag);
               if(Compare.deep(ia, ic, null)) break;
             } catch(final Throwable ex) {
-              System.err.println('\n' + outname + ':');
-              ex.printStackTrace();
+              Util.errln('\n' + outname + ':');
+              Util.stack(ex);
             }
           }
         }
@@ -514,12 +514,11 @@ public abstract class W3CTS {
     try {
       final String str = frag ? "<X>" + xml + "</X>" : xml;
       final Data d = CreateDB.mainMem(IO.get(str), context);
-
-      for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p)))
+      for(int p = frag ? 2 : 0; p < d.meta.size; p += d.size(p, d.kind(p))) {
         it.add(new DBNode(d, p));
+      }
     } catch(final IOException ex) {
-      return new ItemCache(new Item[] {
-          Str.get(Long.toString(System.nanoTime())) }, 1);
+      return new ItemCache(new Item[] { Str.get(Long.toString(System.nanoTime())) }, 1);
     }
     return it;
   }
@@ -677,17 +676,6 @@ public abstract class W3CTS {
       tb.add(data.atom(n.list[i]));
     }
     return tb.toString();
-  }
-
-  /**
-   * Returns the resulting auxiliary uri in multiple strings.
-   * @param role role
-   * @param root root node
-   * @return attribute value
-   * @throws QueryException query exception
-   */
-  protected String[] aux(final String role, final Nodes root) throws QueryException {
-    return text("*:aux-URI[@role = '" + role + "']", root).split("/");
   }
 
   /**
