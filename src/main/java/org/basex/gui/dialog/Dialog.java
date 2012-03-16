@@ -132,7 +132,6 @@ public abstract class Dialog extends JDialog {
       loc[1] = getY() - par.getY();
       gui.gprop.write();
     }
-    System.out.println("-");
     super.dispose();
   }
 

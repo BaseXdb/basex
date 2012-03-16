@@ -79,7 +79,6 @@ public final class BitArrayTest {
     a.set(31);
     a.setAll();
     a.clear(8);
-    System.out.println(Long.toBinaryString(a.toArray()[0]));
     assertFalse("All bits should be false", a.getAll());
     assertTrue("Bits != 8 should be true", a.get(7) && a.get(9) && a.get(31));
     assertFalse("Bit 8 should be false", a.get(8));

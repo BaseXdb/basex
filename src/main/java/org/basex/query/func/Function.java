@@ -786,7 +786,7 @@ public enum Function {
     URIS.put(FNFile.class,   FILEURI);
     URIS.put(FNHttp.class,   HTTPURI);
     URIS.put(FNZip.class,    ZIPURI);
-    URIS.put(FNRepo.class, REPOURI);
+    URIS.put(FNRepo.class,   REPOURI);
     // internal functions
     URIS.put(FNDb.class,    DBURI);
     URIS.put(FNFt.class,    FTURI);
