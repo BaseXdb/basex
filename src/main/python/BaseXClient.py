@@ -229,20 +229,12 @@ class Query():
         self.__id = self.exc(chr(0), q)
 
     # see readme.txt  
-    def bind(self, name, value):
-        self.bind(name, value, "")
-    
+    def bind(self, name, value, datatype=''):
+        self.exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0) + datatype)
+
     # see readme.txt  
-    def bind(self, name, value, type):
-        self.exc(chr(3), self.__id + chr(0) + name + chr(0) + value + chr(0) + type)
-    
-    # see readme.txt  
-    def context(self, value):
-        self.context(self, value, "")
-        
-    # see readme.txt  
-    def context(self, value, type):
-        self.exc(chr(14), self.__id + chr(0) + value + chr(0) + type)
+    def context(self, value, datatype=''):
+        self.exc(chr(14), self.__id + chr(0) + value + chr(0) + datatype)
         
     # see readme.txt  
     def iter(self):
