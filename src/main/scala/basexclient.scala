@@ -6,6 +6,7 @@ import java.util._
 /**
  * Scala client for BaseX.
  * Works with BaseX 7.0 and later
+ * Does not support all bindings yet; your extensions are welcome.
  *
  * Documentation: http://docs.basex.org/wiki/Clients
  *
@@ -227,7 +228,37 @@ class BaseXClient(host: String, port: Int, usern: String, pw: String) {
      * @throws IOException I/O exception
      */
     def bind(name: String, value: String) {
+      bind(name, value, "")
+    }
+
+    /**
+     * Binds a variable with a specific data type.
+     * @param name name of variable
+     * @param value value
+     * @param type data type
+     * @throws IOException I/O exception
+     */
+    def bind(name: String, value: String, type: String) {
       exec(3, id + '\0' + name + '\0' + value + '\0')
+    }
+
+    /**
+     * Binds the context item.
+     * @param value value
+     * @throws IOException I/O exception
+     */
+    def context(value: String) {
+      context(value, "")
+    }
+
+    /**
+     * Binds the context item with a specific data type.
+     * @param value value
+     * @param type data type
+     * @throws IOException I/O exception
+     */
+    def context(value: String, type: String) {
+      exec(14, id + '\0' + value + '\0')
     }
 
     /**

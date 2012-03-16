@@ -1,5 +1,6 @@
 ' Visual Basic client for BaseX.
-' Works with BaseX 7.0 and later
+' Works with BaseX 7.0 and later.
+' Does not support all bindings yet; your extensions are welcome.
 '
 ' Documentation: http://docs.basex.org/wiki/Clients
 '
@@ -185,11 +186,33 @@ End Class
       
     ' see readme.txt
     Public Sub Bind(name As String, value As String)
+      Bind(name, value, "")
+    End Sub
+
+    ' see readme.txt
+    Public Sub Bind(name As String, value As String, type As String)
       session.stream.WriteByte(3)
       session.Send(id)
       session.Send(name)
       session.Send(value)
-      session.stream.WriteByte(0)
+      session.Send(type)
+      Dim Res As String = session.Receive()
+      If Not session.Ok() Then
+        Throw New IOException(session.Receive())
+      End If  
+    End Sub
+
+    ' see readme.txt
+    Public Sub Context(value As String)
+      Context(value, "")
+    End Sub
+
+    ' see readme.txt
+    Public Sub Context(value As String, type As String)
+      session.stream.WriteByte(14)
+      session.Send(id)
+      session.Send(value)
+      session.Send(type)
       Dim Res As String = session.Receive()
       If Not session.Ok() Then
         Throw New IOException(session.Receive())

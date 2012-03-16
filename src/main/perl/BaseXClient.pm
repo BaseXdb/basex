@@ -159,7 +159,16 @@ sub bind {
   shift;
   my $name = shift;
   my $value = shift;
-  exc(chr(3), $id.chr(0).$name.chr(0).$value.chr(0));
+  my $type = shift;
+  exc(chr(3), $id.chr(0).$name.chr(0).$value.chr(0).$type);
+}
+
+# see readme.txt
+sub context {
+  shift;
+  my $value = shift;
+  my $type = shift;
+  exc(chr(14), $id.chr(0).$value.chr(0).$type);
 }
 
 # see readme.txt

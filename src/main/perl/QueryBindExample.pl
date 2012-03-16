@@ -19,7 +19,7 @@ eval {
   my $query = $session->query($input);
 	
   # bind variable
-  $query->bind("name", "number");
+  $query->bind("name", "number", "");
 
   # print result
   print $query->execute()."\n";

@@ -74,7 +74,7 @@ public class RESTPost extends RESTCode {
     try {
       // handle serialization parameters
       final TokenBuilder ser = new TokenBuilder();
-      qp = new QueryProcessor("*/*:parameter", doc, ctx);
+      qp = new QueryProcessor("*/*:parameter", ctx).context(doc);
       Iter ir = qp.iter();
       for(Item param; (param = ir.next()) != null;) {
         final String name = value("data(@name)", param, ctx);
@@ -90,7 +90,7 @@ public class RESTPost extends RESTCode {
       http.serialization = ser.toString();
 
       // handle database options
-      qp = new QueryProcessor("*/*:option", doc, ctx);
+      qp = new QueryProcessor("*/*:option", ctx).context(doc);
       ir = qp.iter();
       for(Item opt; (opt = ir.next()) != null;) {
         final String name = value("data(@name)", opt, ctx);
@@ -100,7 +100,7 @@ public class RESTPost extends RESTCode {
 
       // handle variables
       final Map<String, String[]> vars = new HashMap<String, String[]>();
-      qp = new QueryProcessor("*/*:variable", doc, ctx);
+      qp = new QueryProcessor("*/*:variable", ctx).context(doc);
       ir = qp.iter();
       for(Item var; (var = ir.next()) != null;) {
         final String name = value("data(@name)", var, ctx);
@@ -111,7 +111,7 @@ public class RESTPost extends RESTCode {
 
       // handle input
       byte[] item = null;
-      qp = new QueryProcessor("*/*:context/node()", doc, ctx);
+      qp = new QueryProcessor("*/*:context/node()", ctx).context(doc);
       ir = qp.iter();
       for(Item n; (n = ir.next()) != null;) {
         if(item != null) throw new HTTPException(SC_BAD_REQUEST, ERR_CTXITEM);
@@ -146,10 +146,10 @@ public class RESTPost extends RESTCode {
    * @return atomized item
    * @throws QueryException query exception
    */
-  private static String value(final String query, final Object item,
-      final Context context) throws QueryException {
+  private static String value(final String query, final Item item, final Context context)
+      throws QueryException {
 
-    final QueryProcessor qp = new QueryProcessor(query, item, context);
+    final QueryProcessor qp = new QueryProcessor(query, context).context(item);
     final Item it = qp.iter().next();
     return it == null ? null : Token.string(it.string(null));
   }

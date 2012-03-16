@@ -290,7 +290,25 @@ namespace BaseXClient
     /** see readme.txt */
     public void Bind(string name, string value)
     {
-      Exec(3, id + '\0' + name + '\0' + value + '\0');
+      Bind(name, value, "");
+    }
+
+    /** see readme.txt */
+    public void Bind(string name, string value, string type)
+    {
+      Exec(3, id + '\0' + name + '\0' + value + '\0' + type);
+    }
+
+    /** see readme.txt */
+    public void Context(string value)
+    {
+      Context(value, "");
+    }
+
+    /** see readme.txt */
+    public void Context(string value, string type)
+    {
+      Exec(14, id + '\0' + value + '\0' + type);
     }
 
     /** see readme.txt */

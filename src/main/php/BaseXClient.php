@@ -144,7 +144,22 @@ class Query {
   
   /* see readme.txt */
   public function bind($name, $value) {
-    $this->exec(chr(3), $this->id.chr(0).$name.chr(0).$value.chr(0));
+    $this->bind($name, $value, "");
+  }
+
+  /* see readme.txt */
+  public function bind($name, $value, $type) {
+    $this->exec(chr(3), $this->id.chr(0).$name.chr(0).$value.chr(0).$type);
+  }
+
+  /* see readme.txt */
+  public function context($value) {
+    $this->context($value, "");
+  }
+
+  /* see readme.txt */
+  public function context($value, $type) {
+    $this->exec(chr(14), $this->id.chr(0).$value.chr(0).$type);
   }
 
   /* see readme.txt */

@@ -119,7 +119,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
     try {
       // creates a query instance
-      final QueryProcessor qp = new QueryProcessor(query, nodes, coll.ctx);
+      final QueryProcessor qp = new QueryProcessor(query, coll.ctx).context(nodes);
 
       // add default namespaces
       for(final String n : ns.keySet()) {
