@@ -231,8 +231,8 @@ public final class IOFile extends IO {
   @Override
   public IO merge(final String f) {
     final IO io = IO.get(f);
-    if(!(io instanceof IOFile)) return io;
-    return f.contains(":") ? io : new IOFile(dir(), f);
+    if(!(io instanceof IOFile) || f.contains(":") || f.startsWith("/")) return io;
+    return new IOFile(dir(), f);
   }
 
   /**
