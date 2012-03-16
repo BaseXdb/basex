@@ -177,7 +177,7 @@
               <!-- Choose HTTP port -->
               <port>8984</port>
               <!-- Optionally limit HTTP host
-              <host>8984</host> -->
+              <host>127.0.0.1</host> -->
               <maxIdleTime>60000</maxIdleTime>
             </connector>
           </connectors>
