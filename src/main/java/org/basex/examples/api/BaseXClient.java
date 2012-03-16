@@ -339,13 +339,44 @@ public class BaseXClient {
     }
 
     /**
-     * Binds a variable.
+     * Binds a value to an external variable.
      * @param name name of variable
      * @param value value
      * @throws IOException I/O exception
      */
     public void bind(final String name, final String value) throws IOException {
-      exec(3, id + '\0' + name + '\0' + value + '\0');
+      bind(name, value, "");
+    }
+
+    /**
+     * Binds a value with the specified type to an external variable.
+     * @param name name of variable
+     * @param value value
+     * @param type type (can be an empty string)
+     * @throws IOException I/O exception
+     */
+    public void bind(final String name, final String value, final String type)
+        throws IOException {
+      exec(3, id + '\0' + name + '\0' + value + '\0' + type);
+    }
+
+    /**
+     * Binds a value to the context item.
+     * @param value value
+     * @throws IOException I/O exception
+     */
+    public void context(final String value) throws IOException {
+      context(value, "");
+    }
+
+    /**
+     * Binds a value with the specified type to the context item.
+     * @param value value
+     * @param type type (can be an empty string)
+     * @throws IOException I/O exception
+     */
+    public void context(final String value, final String type) throws IOException {
+      exec(14, id + '\0' + value + '\0' + type);
     }
 
     /**

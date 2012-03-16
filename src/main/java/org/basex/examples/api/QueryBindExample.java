@@ -30,7 +30,7 @@ public final class QueryBindExample {
         final BaseXClient.Query query = session.query(input);
 
         // bind variable
-        query.bind("$name", "number");
+        query.bind("$name", "number", "");
 
         // print result
         System.out.print(query.execute());
