@@ -35,6 +35,11 @@ public class LocalQuery extends Query {
   }
 
   @Override
+  public void context(final Object v, final String t) throws IOException {
+    ql.context(v, t);
+  }
+
+  @Override
   protected void cache() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
     ql.execute(true, ao, true, false);

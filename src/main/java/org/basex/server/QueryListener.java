@@ -49,15 +49,29 @@ final class QueryListener extends Progress {
   }
 
   /**
-   * Binds an object to a global variable.
+   * Binds a value to a global variable.
    * @param n name of variable
-   * @param o object to be bound
+   * @param v value to be bound
    * @param t type
    * @throws IOException query exception
    */
-  void bind(final String n, final Object o, final String t) throws IOException {
+  void bind(final String n, final Object v, final String t) throws IOException {
     try {
-      qp.bind(n, o, t);
+      qp.bind(n, v, t);
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  /**
+   * Binds a value to the context item.
+   * @param v value to be bound
+   * @param t type
+   * @throws IOException query exception
+   */
+  void context(final Object v, final String t) throws IOException {
+    try {
+      qp.context(v, t);
     } catch(final QueryException ex) {
       throw new BaseXException(ex);
     }

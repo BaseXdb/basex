@@ -41,11 +41,28 @@ public abstract class Query {
    * Binds a value with an optional type to an external variable.
    * @param n name of variable
    * @param v value to be bound
-   * @param t data type
+   * @param t data type (may be {@code null})
    * @throws IOException I/O exception
    */
   public abstract void bind(final String n, final Object v, final String t)
       throws IOException;
+
+  /**
+   * Binds a value to the context item.
+   * @param v value to be bound
+   * @throws IOException I/O exception
+   */
+  public final void context(final Object v) throws IOException {
+    context(v, "");
+  }
+
+  /**
+   * Binds a value with an optional type to an external variable.
+   * @param v value to be bound
+   * @param t data type (may be {@code null})
+   * @throws IOException I/O exception
+   */
+  public abstract void context(final Object v, final String t) throws IOException;
 
   /**
    * Returns {@code true} if more items are available.

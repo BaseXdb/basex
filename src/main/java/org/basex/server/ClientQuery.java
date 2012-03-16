@@ -56,6 +56,11 @@ public class ClientQuery extends Query {
   }
 
   @Override
+  public void context(final Object v, final String t) throws IOException {
+    cs.exec(ServerCmd.CONTEXT, id + '\0' + v + '\0' + (t == null ? "" : t), null);
+  }
+
+  @Override
   public String execute() throws IOException {
     return cs.exec(ServerCmd.EXEC, id, out);
   }

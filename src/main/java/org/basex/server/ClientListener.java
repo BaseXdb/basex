@@ -99,8 +99,7 @@ public final class ClientListener extends Thread {
       final String us = in.readString();
       final String pw = in.readString();
       context.user = context.users.get(us);
-      running = context.user != null &&
-          md5(context.user.password + ts).equals(pw);
+      running = context.user != null && md5(context.user.password + ts).equals(pw);
 
       // write log information
       if(running) {
@@ -459,6 +458,11 @@ public final class ClientListener extends Thread {
           final String typ = in.readString();
           qp.bind(key, val, typ);
           log.write(this, sc + "(" + arg + ')', key, val, typ, OK, perf);
+        } else if(sc == ServerCmd.CONTEXT) {
+          final String val = in.readString();
+          final String typ = in.readString();
+          qp.context(val, typ);
+          log.write(this, sc + "(" + arg + ')', val, typ, OK, perf);
         } else if(sc == ServerCmd.ITER) {
           qp.execute(true, out, true, false);
         } else if(sc == ServerCmd.EXEC) {
@@ -482,7 +486,9 @@ public final class ClientListener extends Thread {
       // send 0 as success flag
       out.write(0);
       // write log file (bind and execute have been logged before)
-      if(sc != ServerCmd.BIND) log.write(this, sc + "(" + arg + ')', OK, perf);
+      if(sc != ServerCmd.BIND && sc != ServerCmd.CONTEXT) {
+        log.write(this, sc + "(" + arg + ')', OK, perf);
+      }
     } catch(final Exception ex) {
       // log exception (static or runtime)
       err = ex.getMessage();

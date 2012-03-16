@@ -314,6 +314,8 @@ public interface QueryText {
   /** Parser token. */
   String WORDS = "words";
   /** Parser token. */
+  String XMLSTR = "xml";
+  /** Parser token. */
   String XQUERY = "xquery";
 
   /** Parser token. */

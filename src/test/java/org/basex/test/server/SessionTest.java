@@ -458,6 +458,36 @@ public abstract class SessionTest {
     query.close();
   }
 
+  /** Binds XML to an external variable.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryBindXML() throws IOException {
+    final Query query = session.query("declare variable $a external; $a//text()");
+    query.bind("$a", "<a>XML</a>", "xml");
+    check("XML", query.execute());
+  }
+
+
+  /** Runs a query with a bound context item.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryContext() throws IOException {
+    final Query query = session.query(".");
+    query.context("5");
+    check("5", query.next());
+    query.close();
+  }
+
+  /** Runs a query with a bound context item.
+   * @throws IOException I/O exception */
+  @Test
+  public void queryContextInt() throws IOException {
+    final Query query = session.query(". * 2");
+    query.context("6", "xs:integer");
+    check("12", query.next());
+    query.close();
+  }
+
   /** Runs a query, omitting more().
    * @throws IOException I/O exception */
   @Test

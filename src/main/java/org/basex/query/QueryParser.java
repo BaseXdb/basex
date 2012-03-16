@@ -163,7 +163,7 @@ public class QueryParser extends InputParser {
       throws QueryException {
 
     final String k = key.toString().trim();
-    if(!k.isEmpty()) ctx.bind(k, new Atm(val.toString()));
+    if(!k.isEmpty()) ctx.bind(k, new Atm(val.toString()), null);
   }
 
   /**

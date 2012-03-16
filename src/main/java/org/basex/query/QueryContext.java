@@ -268,133 +268,6 @@ public final class QueryContext extends Progress {
     }
   }
 
-  /**
-   * Evaluates the expression with the specified context set.
-   * @return resulting value
-   * @throws QueryException query exception
-   */
-  Result execute() throws QueryException {
-    // GUI: limit number of hits to be returned and displayed
-    int max = context.prop.num(Prop.MAXHITS);
-    if(!Prop.gui || max < 0) max = Integer.MAX_VALUE;
-
-    // evaluates the query
-    final Iter ir = iter();
-    final ItemCache ic = new ItemCache();
-    Item it = null;
-
-    // check if all results belong to the database of the input context
-    if(serProp == null && nodes != null) {
-      final IntList pre = new IntList();
-
-      while((it = ir.next()) != null) {
-        checkStop();
-        if(!(it instanceof DBNode) || it.data() != nodes.data) break;
-        if(pre.size() < max) pre.add(((DBNode) it).pre);
-      }
-
-      final int ps = pre.size();
-      if(it == null || ps == max) {
-        // all nodes have been processed: return GUI-friendly nodeset
-        return ps == 0 ? ic : new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
-      }
-
-      // otherwise, add nodes to standard iterator
-      for(int p = 0; p < ps; ++p) ic.add(new DBNode(nodes.data, pre.get(p)));
-      ic.add(it);
-    }
-
-    // use standard iterator
-    while((it = ir.next()) != null) {
-      checkStop();
-      if(ic.size() < max) ic.add(it);
-    }
-    return ic;
-  }
-
-  /**
-   * Binds an object to a global variable. If the object is an {@link Expr}
-   * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type. If {@code "json"} is specified as data type,
-   * the value is interpreted according to the rules specified in
-   * {@link JsonMapConverter}.
-   * @param name name of variable
-   * @param val object to be bound
-   * @param type data type
-   * @throws QueryException query exception
-   */
-  public void bind(final String name, final Object val, final String type)
-      throws QueryException {
-
-    Object obj = val;
-    if(type != null && !type.isEmpty()) {
-      if(type.equals(JSONSTR)) {
-        obj = JsonMapConverter.parse(token(val.toString()), null);
-      } else {
-        final QNm nm = new QNm(token(type), this);
-        if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
-        final Type typ = AtomType.find(nm, false);
-        if(typ == null) NOTYPE.thrw(null, nm);
-        obj = typ.cast(obj, null);
-      }
-    }
-    bind(name, obj);
-  }
-
-  /**
-   * Binds an value to a global variable. If the value is an {@link Expr}
-   * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type.
-   * @param name name of variable
-   * @param val value to be bound
-   * @throws QueryException query exception
-   */
-  public void bind(final String name, final Object val) throws QueryException {
-    final Expr ex = val instanceof Expr ? (Expr) val : JavaMapping.toValue(val);
-
-    // remove optional $ prefix
-    String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
-    byte[] uri = EMPTY;
-
-    // check for namespace declaration
-    final Matcher m = BIND.matcher(nm);
-    if(m.find()) {
-      String u = m.group(3);
-      if(u == null) u = m.group(5);
-      uri = token(u);
-      nm = m.group(6);
-    }
-    final byte[] ln = token(nm);
-    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return;
-
-    // bind variable
-    final QNm qnm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
-    final Var gl = vars.globals().get(qnm);
-    if(gl == null) {
-      // assign new variable
-      vars.updateGlobal(Var.create(this, null, qnm, null).bind(ex, this));
-    } else {
-      // reset declaration state and bind new expression
-      gl.declared = false;
-      gl.bind(gl.type != null ? gl.type.type.cast(ex.item(this, null),
-          this, null) : ex, this);
-    }
-  }
-
-  /**
-   * Recursively serializes the query plan.
-   * @param ser serializer
-   * @throws IOException I/O exception
-   */
-  void plan(final Serializer ser) throws IOException {
-    // only show root node if functions or variables exist
-    final boolean r = funcs.funcs().length != 0 || vars.globals().size != 0;
-    if(r) ser.openElement(PLAN);
-    funcs.plan(ser);
-    vars.plan(ser);
-    root.plan(ser);
-    if(r) ser.closeElement();
-  }
 
   /**
    * Evaluates the specified expression and returns an iterator.
@@ -541,5 +414,174 @@ public final class QueryContext extends Progress {
   @Override
   public double prog() {
     return 0;
+  }
+
+  // CLASS METHODS ======================================================================
+
+
+  /**
+   * Evaluates the expression with the specified context set.
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  Result execute() throws QueryException {
+    // GUI: limit number of hits to be returned and displayed
+    int max = context.prop.num(Prop.MAXHITS);
+    if(!Prop.gui || max < 0) max = Integer.MAX_VALUE;
+
+    // evaluates the query
+    final Iter ir = iter();
+    final ItemCache ic = new ItemCache();
+    Item it = null;
+
+    // check if all results belong to the database of the input context
+    if(serProp == null && nodes != null) {
+      final IntList pre = new IntList();
+
+      while((it = ir.next()) != null) {
+        checkStop();
+        if(!(it instanceof DBNode) || it.data() != nodes.data) break;
+        if(pre.size() < max) pre.add(((DBNode) it).pre);
+      }
+
+      final int ps = pre.size();
+      if(it == null || ps == max) {
+        // all nodes have been processed: return GUI-friendly nodeset
+        return ps == 0 ? ic : new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
+      }
+
+      // otherwise, add nodes to standard iterator
+      for(int p = 0; p < ps; ++p) ic.add(new DBNode(nodes.data, pre.get(p)));
+      ic.add(it);
+    }
+
+    // use standard iterator
+    while((it = ir.next()) != null) {
+      checkStop();
+      if(ic.size() < max) ic.add(it);
+    }
+    return ic;
+  }
+
+  /**
+   * Binds a value to the context item, using the same rules as for
+   * {@link #bind binding variables}.
+   * @param val value to be bound
+   * @param type data type (may be {@code null})
+   * @throws QueryException query exception
+   */
+  void context(final Object val, final String type) throws QueryException {
+    ctxItem = cast(val, type);
+  }
+
+  /**
+   * Binds a value to a global variable. The specified type is interpreted as follows:
+   * <ul>
+   * <li>If {@code "json"} is specified, the value is converted according to the rules
+   *     specified in {@link JsonMapConverter}.</li>
+   * <li>If {@code "xml"} is specified, the value is converted to a document node.</li>
+   * <li>Otherwise, the type is interpreted as atomic XDM data type.</li>
+   * </ul>
+   * If the value is an XQuery expression or value {@link Expr}, it is directly assigned.
+   * Otherwise, it is cast to the XQuery data model, using a Java/XQuery mapping.
+   * @param name name of variable
+   * @param val value to be bound
+   * @param type data type (may be {@code null})
+   * @throws QueryException query exception
+   */
+  void bind(final String name, final Object val, final String type)
+      throws QueryException {
+    bind(name, cast(val, type));
+  }
+
+  /**
+   * Recursively serializes the query plan.
+   * @param ser serializer
+   * @throws IOException I/O exception
+   */
+  void plan(final Serializer ser) throws IOException {
+    // only show root node if functions or variables exist
+    final boolean r = funcs.funcs().length != 0 || vars.globals().size != 0;
+    if(r) ser.openElement(PLAN);
+    funcs.plan(ser);
+    vars.plan(ser);
+    root.plan(ser);
+    if(r) ser.closeElement();
+  }
+
+  // PRIVATE METHODS ====================================================================
+
+  /**
+   * Binds an value to a global variable. If the value is an {@link Expr}
+   * instance, it is directly assigned. Otherwise, it is first cast to the
+   * appropriate XQuery type.
+   * @param name name of variable
+   * @param val value to be bound
+   * @throws QueryException query exception
+   */
+  private void bind(final String name, final Expr val) throws QueryException {
+    // remove optional $ prefix
+    String nm = name.indexOf('$') == 0 ? name.substring(1) : name;
+    byte[] uri = EMPTY;
+
+    // check for namespace declaration
+    final Matcher m = BIND.matcher(nm);
+    if(m.find()) {
+      String u = m.group(3);
+      if(u == null) u = m.group(5);
+      uri = token(u);
+      nm = m.group(6);
+    }
+    final byte[] ln = token(nm);
+    if(nm.isEmpty() || !XMLToken.isNCName(ln)) return;
+
+    // bind variable
+    final QNm qnm = uri.length == 0 ? new QNm(ln, this) : new QNm(ln, uri);
+    final Var gl = vars.globals().get(qnm);
+    if(gl == null) {
+      // assign new variable
+      vars.updateGlobal(Var.create(this, null, qnm, null).bind(val, this));
+    } else {
+      // reset declaration state and bind new expression
+      gl.declared = false;
+      gl.bind(gl.type == null ? val :
+        gl.type.type.cast(val.item(this, null), this, null), this);
+    }
+  }
+
+  /**
+   * Casts a value to the specified type.
+   * See {@link #bind(String, Object, String)} for more infos.
+   * @param val value to be cast
+   * @param type data type (may be {@code null})
+   * @return cast value
+   * @throws QueryException query exception
+   */
+  private Expr cast(final Object val, final String type) throws QueryException {
+    // return original value
+    if(type == null || type.isEmpty()) {
+      return val instanceof Expr ? (Expr) val : JavaMapping.toValue(val);
+    }
+
+    // convert to json
+    if(type.equalsIgnoreCase(JSONSTR)) {
+      return JsonMapConverter.parse(token(val.toString()), null);
+    }
+
+    // convert to xml
+    if(type.equalsIgnoreCase(XMLSTR)) {
+      try {
+        return new DBNode(new IOContent(val.toString()), context.prop);
+      } catch(final IOException ex) {
+        throw SAXERR.thrw(null, ex);
+      }
+    }
+
+    // convert to the specified type
+    final QNm nm = new QNm(token(type), this);
+    if(!nm.hasURI() && nm.hasPrefix()) NOURI.thrw(null, nm);
+    final Type typ = AtomType.find(nm, false);
+    if(typ == null) NOTYPE.thrw(null, nm);
+    return typ.cast(val, null);
   }
 }

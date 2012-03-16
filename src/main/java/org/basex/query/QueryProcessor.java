@@ -4,21 +4,17 @@ import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.Map.Entry;
 
+import org.basex.core.*;
 import org.basex.core.Context;
-import org.basex.core.Progress;
-import org.basex.data.Nodes;
-import org.basex.data.Result;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
-import org.basex.query.expr.Expr;
-import org.basex.query.func.JavaMapping;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.json.JsonMapConverter;
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.json.*;
 
 /**
  * This class is an entry point for evaluating XQuery implementations.
@@ -44,44 +40,8 @@ public final class QueryProcessor extends Progress {
    * @param cx database context
    */
   public QueryProcessor(final String qu, final Context cx) {
-    this(qu, cx.current(), cx);
-  }
-
-  /**
-   * Constructor with an initial context set.
-   * @param qu query
-   * @param nodes initial context set
-   * @param cx database context
-   */
-  public QueryProcessor(final String qu, final Nodes nodes, final Context cx) {
     query = qu;
     ctx = new QueryContext(cx);
-    ctx.nodes = nodes;
-    progress(ctx);
-  }
-
-  /**
-   * Constructor with an initial context set.
-   * @param qu query
-   * @param o initial context expression
-   * @param cx database context
-   * @throws QueryException query exception
-   */
-  public QueryProcessor(final String qu, final Object o, final Context cx)
-      throws QueryException {
-    this(qu, o instanceof Expr ? (Expr) o : JavaMapping.toValue(o), cx);
-  }
-
-  /**
-   * Constructor with an initial context set.
-   * @param qu query
-   * @param expr initial context expression
-   * @param cx database context
-   */
-  private QueryProcessor(final String qu, final Expr expr, final Context cx) {
-    query = qu;
-    ctx = new QueryContext(cx);
-    ctx.ctxItem = expr;
     progress(ctx);
   }
 
@@ -138,14 +98,14 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Binds a value to a global variable. If the value is an {@link Expr}
-   * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type. If {@code "json"} is specified as data type,
-   * the value is interpreted according to the rules specified in
-   * {@link JsonMapConverter}.
+   * Binds a value with the specified data type to a global variable.
+   * If the value is an {@link Expr} instance, it is directly assigned.
+   * Otherwise, it is first cast to the appropriate XQuery type. If {@code "json"}
+   * is specified as data type, the value is interpreted according to the rules
+   * specified in {@link JsonMapConverter}.
    * @param name name of variable
    * @param value value to be bound
-   * @param type data type
+   * @param type data type (may be {@code null})
    * @return self reference
    * @throws QueryException query exception
    */
@@ -156,9 +116,7 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Binds a value to a global variable. If the value is an {@link Expr}
-   * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type.
+   * Binds a value to a global variable.
    * @param name name of variable
    * @param value value to be bound
    * @return self reference
@@ -166,20 +124,40 @@ public final class QueryProcessor extends Progress {
    */
   public QueryProcessor bind(final String name, final Object value)
       throws QueryException {
-    ctx.bind(name, value);
-    return this;
+    return bind(name, value, null);
   }
 
   /**
-   * Sets a value as context item. If the value is an {@link Expr}
-   * instance, it is directly assigned. Otherwise, it is first cast to the
-   * appropriate XQuery type.
+   * Binds a value to the context item.
    * @param value value to be bound
    * @return self reference
    * @throws QueryException query exception
    */
   public QueryProcessor context(final Object value) throws QueryException {
-    ctx.ctxItem = value instanceof Expr ? (Expr) value : JavaMapping.toValue(value);
+    return context(value, null);
+  }
+
+  /**
+   * Binds a value with the specified data type to the context item,
+   * using the same rules as for {@link #bind binding variables}.
+   * @param value value to be bound
+   * @param type data type (may be {@code null})
+   * @return self reference
+   * @throws QueryException query exception
+   */
+  public QueryProcessor context(final Object value, final String type)
+      throws QueryException {
+    ctx.context(value, type);
+    return this;
+  }
+
+  /**
+   * Binds an initial nodeset to the context item.
+   * @param nodes node set
+   * @return self reference
+   */
+  public QueryProcessor context(final Nodes nodes) {
+    ctx.nodes = nodes;
     return this;
   }
 
