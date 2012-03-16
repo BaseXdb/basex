@@ -1,20 +1,20 @@
-# Python client for BaseX.
-# Works with BaseX 7.0 and later
-#
-# Documentation: http://docs.basex.org/wiki/Clients
-#
-# (C) BaseX Team 2005-12, Arjen van Elteren
-#     BSD License
+"""
+Python client for BaseX.
+Works with BaseX 7.0 and later
+
+Documentation: http://docs.basex.org/wiki/Clients
+
+(C) BaseX Team 2005-12, Arjen van Elteren
+    BSD License
+"""
 
 import hashlib, socket, array
-import string
 import threading
-import Queue
 
 class SocketInputReader(object):
     
-    def __init__(self, socket):
-        self.__s = socket
+    def __init__(self, sock):
+        self.__s = sock
         self.__buf = array.array('B', chr(0) * 0x1000)
         self.init()
         
@@ -56,11 +56,13 @@ class SocketInputReader(object):
         while not found:
             found, substr = self.read_until(0)
             strings.append(substr)
-        return string.join(strings, "")
+        return ''.join(strings)
 
 class Session(object):
     # see readme.txt
     def __init__(self, host, port, user, pw):
+
+        self.__info = None
 
         # create server connection
         self.__s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -104,20 +106,20 @@ class Session(object):
         return Query(self, q)
 
     # see readme.txt
-    def create(self, name, input):
-        self.sendInput(8, name, input)
+    def create(self, name, content):
+        self.sendInput(8, name, content)
 
     # see readme.txt
-    def add(self, path, input):
-        self.sendInput(9, path, input)
+    def add(self, path, content):
+        self.sendInput(9, path, content)
 
     # see readme.txt
-    def replace(self, path, input):
-        self.sendInput(12, path, input)
+    def replace(self, path, content):
+        self.sendInput(12, path, content)
 
     # see readme.txt
-    def store(self, path, input):
-        self.sendInput(13, path, input)
+    def store(self, path, content):
+        self.sendInput(13, path, content)
 
     # see readme.txt
     def info(self):
@@ -128,10 +130,10 @@ class Session(object):
         self.send('exit')
         self.__s.close()
         if not self.__event_socket is None:
-             self.__event_socket.close()
+            self.__event_socket.close()
 
-    # Initializes the byte transfer.
     def init(self):
+        """Initialize byte transfer"""
         self.__sreader.init()
         
     def register_and_start_listener(self):
@@ -177,37 +179,37 @@ class Session(object):
         info = self.readString()
         if not self.ok():
             raise IOError(info)
-        del self.callbacks[name]
+        del self.__event_callbacks[name]
             
-    # Receives a string from the socket.        
     def readString(self):
+        """Retrieve a string from the socket"""
         return self.__sreader.readString()
 
-    # Returns a single byte from the socket.
     def read(self):
+        """Return a single byte from socket"""
         return self.__sreader.read()
 
-    # Reads until byte is found.
     def read_until(self, byte):
+        """Read until byte is found"""
         return self.__sreader.read_until(byte)
 
-    # Sends the defined str.
-    def send(self, str):
-        self.__s.sendall(str + chr(0))
+    def send(self, value):
+        """Send the defined string"""
+        self.__s.sendall(value + chr(0))
 
     # see readme.txt
-    def sendInput(self, code, arg, input):
-        self.__s.sendall(chr(code) + arg + chr(0) + input + chr(0))
+    def sendInput(self, code, arg, content):
+        self.__s.sendall(chr(code) + arg + chr(0) + content + chr(0))
         self.__info = self.readString()
         if not self.ok():
             raise IOError(self.info())
 
-    # Returns success check.
     def ok(self):
+        """Return success check"""
         return self.read() == 0
 
-    # Returns the received string.
     def receive(self):
+        """Return received string"""
         self.init()
         return self.readString()
     
