@@ -37,8 +37,8 @@ public final class ViewNotifier {
   private final String[] queries = new String[MAXHIST];
   /** Attached views. */
   private View[] view = new View[0];
-  /** Maximum history value. */
-  private int maxhist;
+  /** Number of history entries. */
+  private int histsize;
 
   /**
    * Constructor.
@@ -60,33 +60,25 @@ public final class ViewNotifier {
    * Notifies all views of a data reference change.
    */
   public void init() {
-    final Context ctx = gui.context;
-    final Data data = ctx.data();
+    final Data data = initHistory(gui.context);
     if(data != null) {
-      cont[0] = ctx.current();
-      marked[0] = new Nodes(data);
-
       // if a large database is opened, the user is asked if complex
       /// visualizations should be closed first
-      final long fs = data.meta.dbsize();
-      boolean close = false;
-      for(final View v : view) close |= v.visible() && v.db();
-      if(close && fs > LARGEDB && Dialog.confirm(gui,
-          Util.info(H_LARGE_DB, Performance.format(fs)))) {
+      final long size = data.meta.dbsize();
+      boolean open = false;
+      for(final View v : view) open |= v.visible() && v.db();
+      if(open && size > LARGEDB && Dialog.confirm(gui,
+          Util.info(H_LARGE_DB, Performance.format(size)))) {
         for(final View v : view) if(v.visible() && v.db()) v.visible(false);
       }
     } else {
-      // close all dialogs (except help) together with database
+      // database closed: close open dialogs
       for(final Window w : gui.getOwnedWindows()) {
-        if(!(w.isVisible() && w instanceof Dialog)) continue;
-        final Dialog d = (Dialog) w;
-        if(!d.isModal()) ((Dialog) w).cancel();
+        if(w.isVisible() && w instanceof Dialog) ((Dialog) w).cancel();
       }
     }
 
     gui.context.focused = -1;
-    hist = 0;
-    maxhist = 0;
     for(final View v : view) v.refreshInit();
     gui.layoutViews();
     gui.setTitle(data != null ? data.meta.name : null);
@@ -112,8 +104,8 @@ public final class ViewNotifier {
    * @param vw the calling view
    */
   public void mark(final Nodes mark, final View vw) {
-    final Context context = gui.context;
-    context.marked = mark;
+    final Context ctx = gui.context;
+    ctx.marked = mark;
     for(final View v : view) if(v != vw && v.visible()) v.refreshMark();
     gui.filter.setEnabled(mark.size() != 0);
     gui.refreshControls();
@@ -134,10 +126,10 @@ public final class ViewNotifier {
     final int f = gui.context.focused;
     if(f == -1) return;
 
-    final Context context = gui.context;
-    Nodes nodes = context.marked;
+    final Context ctx = gui.context;
+    Nodes nodes = ctx.marked;
     if(mode == 0) {
-      nodes = new Nodes(f, context.data());
+      nodes = new Nodes(f, ctx.data());
     } else if(mode == 1) {
       nodes.union(new int[] { f });
     } else {
@@ -147,24 +139,21 @@ public final class ViewNotifier {
   }
 
   /**
-   * Moves around in the internal history and notifies all views of
-   * a context change.
+   * Moves around in the internal history and notifies all views of a context change.
    * @param forward move forward or backward
    */
   public void hist(final boolean forward) {
-    final Context context = gui.context;
-
-    // browse back/forward
+    final Context ctx = gui.context;
     final String query;
     if(forward) {
-      if(hist == maxhist) return;
+      if(hist == histsize) return;
       query = queries[++hist];
     } else {
       if(hist == 0) return;
-      marked[hist] = context.marked;
+      marked[hist] = ctx.marked;
       query = queries[--hist];
     }
-    context.set(cont[hist], marked[hist]);
+    ctx.set(cont[hist], marked[hist]);
 
     gui.input.setText(query);
     for(final View v : view) if(v.visible()) v.refreshContext(forward, false);
@@ -178,32 +167,33 @@ public final class ViewNotifier {
    * @param vw the calling view
    */
   public void context(final Nodes nodes, final boolean quick, final View vw) {
-    final Context context = gui.context;
-    final Nodes n = new Nodes(new int[0], context.data(), context.marked.ftpos);
+    final Context ctx = gui.context;
+    final Nodes n = new Nodes(new int[0], ctx.data(), ctx.marked.ftpos);
 
-    if(!cont[hist].sameAs(quick ? context.current() : context.marked)) {
+    // add new entry if current node set has not been cached yet
+    if(!cont[hist].sameAs(quick ? ctx.current() : ctx.marked)) {
       checkHist();
-      if(!quick) {
-        // add new entry
+      if(quick) {
+        // store history entry
+        queries[hist] = "";
+        marked[hist] = new Nodes(ctx.data());
+        // add current entry
+        cont[++hist] = ctx.current();
+      } else {
+        // store history entry
         final String in = gui.input.getText();
         queries[hist] = in;
-        marked[hist] = context.marked;
+        marked[hist] = ctx.marked;
+        // add current entry
         cont[++hist] = nodes;
         queries[hist] = in;
         marked[hist] = n;
-      } else {
-        // check if current node set has already been cached
-        // add new entry
-        queries[hist] = "";
-        marked[hist] = new Nodes(context.data());
-        cont[++hist] = context.current();
       }
-      maxhist = hist;
+      histsize = hist;
     }
-    context.set(nodes, n);
+    ctx.set(nodes, n);
 
-    for(final View v : view) if(v != vw && v.visible())
-      v.refreshContext(true, quick);
+    for(final View v : view) if(v != vw && v.visible()) v.refreshContext(true, quick);
     gui.refreshControls();
   }
 
@@ -211,12 +201,8 @@ public final class ViewNotifier {
    * Notifies all views of updates in the data structure.
    */
   public void update() {
-    final Context context = gui.context;
-    final Data data = context.data();
-    if(data == null) return;
-    hist = 0;
-    maxhist = 0;
-    context.marked = new Nodes(data);
+    final Data data = initHistory(gui.context);
+    gui.context.marked = new Nodes(data);
     for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();
   }
@@ -235,7 +221,7 @@ public final class ViewNotifier {
    */
   public String tooltip(final boolean back) {
     return back ? hist > 0 ? hist > 1 ? queries[hist - 2] : "" : null :
-      hist < maxhist ? queries[hist + 1] : null;
+      hist < histsize ? queries[hist + 1] : null;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -251,5 +237,29 @@ public final class ViewNotifier {
       Array.move(marked, 1, 0, hl - 1);
       --hist;
     }
+  }
+
+  /**
+   * Removes existing history entries and sets an initial entry.
+   * @param ctx database context
+   * @return {@link Data} reference, or {@code null}
+   */
+  private Data initHistory(final Context ctx) {
+    for(int h = 0; h < histsize; h++) {
+      marked[h] = null;
+      cont[h] = null;
+      queries[h] = null;
+    }
+    hist = 0;
+    histsize = 0;
+
+    final Data data = ctx.data();
+    if(data != null) {
+      // new database opened
+      cont[0] = ctx.current();
+      marked[0] = new Nodes(data);
+      queries[0] = "";
+    }
+    return data;
   }
 }

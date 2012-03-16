@@ -84,7 +84,7 @@ public abstract class View extends BaseXPanel {
   public abstract void visible(final boolean v);
 
   /**
-   * Tests if this view needs a database instance.
+   * Tests if this view relies on a database instance.
    * @return result of check
    */
   protected abstract boolean db();
