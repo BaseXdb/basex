@@ -288,7 +288,7 @@ public abstract class W3CTS {
       }
 
       context.prop.set(Prop.QUERYINFO, compile);
-      final QueryProcessor xq = new QueryProcessor(in, curr, context);
+      final QueryProcessor xq = new QueryProcessor(in, context).context(curr);
       context.prop.set(Prop.QUERYINFO, false);
 
       final ArrayOutput ao = new ArrayOutput();
@@ -686,7 +686,7 @@ public abstract class W3CTS {
    * @throws QueryException query exception
    */
   protected Nodes nodes(final String qu, final Nodes root) throws QueryException {
-    return new QueryProcessor(qu, root, context).queryNodes();
+    return new QueryProcessor(qu, context).context(root).queryNodes();
   }
 
   /**
