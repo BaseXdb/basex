@@ -21,6 +21,7 @@ import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
+import org.basex.io.*;
 import org.basex.io.serial.Serializer;
 import org.basex.io.serial.SerializerException;
 import org.basex.io.serial.SerializerProp;
@@ -72,9 +73,9 @@ public final class QueryContext extends Progress {
   public boolean xquery3;
 
   /** Cached stop word files. */
-  public HashMap<String, String> stop;
+  public HashMap<String, IO> stop;
   /** Cached thesaurus files. */
-  public HashMap<String, String> thes;
+  public HashMap<String, IO> thes;
   /** Query options (are valid during query execution). */
   public final HashMap<String, String> dbOptions = new HashMap<String, String>();
   /** Global options (will be set after query execution). */

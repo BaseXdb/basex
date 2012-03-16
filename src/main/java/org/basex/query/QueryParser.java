@@ -3252,8 +3252,8 @@ public class QueryParser extends InputParser {
               wsCheck(PAR2);
             } else if(wsConsumeWs(AT)) {
               String fn = string(stringLiteral());
-              if(ctx.stop != null) fn = ctx.stop.get(fn);
-              final IO fl = ctx.sc.io(fn);
+              // optional: resolve URI reference
+              final IO fl = ctx.stop != null ? ctx.stop.get(fn) : ctx.sc.io(fn);
               if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
             } else if(!union && !except) {
               error(FTSTOP);
@@ -3288,8 +3288,8 @@ public class QueryParser extends InputParser {
     wsCheck(AT);
 
     String fn = string(stringLiteral());
-    if(ctx.thes != null) fn = ctx.thes.get(fn);
-    final IO fl = ctx.sc.io(fn);
+    // optional: resolve URI reference
+    final IO fl = ctx.thes != null ? ctx.thes.get(fn) : ctx.sc.io(fn);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange(true);
     long min = 0;

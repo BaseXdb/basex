@@ -95,22 +95,15 @@ public final class StaticContext {
   }
 
   /**
-   * Returns one of two possible IO references for the specified filename:
-   * <ol>
-   * <li>The filename is merged with the base URI. This reference is returned if the
-   *     resulting file exists, or if the plain file does not exist.</li>
-   * <li>Otherwise, or if no base URI exists, the plain reference is returned.</li>
-   * </ol>
+   * Returns an IO references for the specified filename.
+   * If a base URI exists, it is merged with the specified filename.
+   * Otherwise, a plain reference is returned.
    * @param fn filename
    * @return io instance
    */
   public IO io(final String fn) {
-    final IO io = IO.get(fn);
-    if(baseURI.length != 0) {
-      final IO iob = IO.get(string(baseURI)).merge(fn);
-      if(iob.exists() || !io.exists()) return iob;
-    }
-    return io;
+    final IO base = baseIO();
+    return base != null ? base.merge(fn) : IO.get(fn);
   }
 
   /**

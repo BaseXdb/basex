@@ -42,14 +42,7 @@ public final class BaseXException extends IOException {
       if(ext[e] instanceof byte[]) {
         ext[e] = Token.string((byte[]) ext[e]);
       } else if(ext[e] instanceof Throwable) {
-        final Throwable th = (Throwable) ext[e];
-        ext[e] = th.getMessage();
-        final String local = th.getLocalizedMessage();
-        if(th instanceof FileNotFoundException || ext[e] == null && local != null) {
-          ext[e] = th.getClass().getSimpleName() + ": " + local;
-        } else if(ext[e] == null) {
-          ext[e] = ext[e].toString();
-        }
+        ext[e] = Util.message((Throwable) ext[e]);
       } else if(!(ext[e] instanceof String)) {
         ext[e] = ext[e].toString();
       }
