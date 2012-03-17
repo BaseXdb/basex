@@ -16,7 +16,6 @@ import org.basex.query.item.Int;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
 import org.basex.query.item.YMd;
-import org.basex.query.util.Err;
 import static org.basex.query.util.Err.*;
 import org.basex.util.InputInfo;
 
@@ -30,14 +29,14 @@ public enum Calc {
   /** Addition. */
   PLUS("+") {
     @Override
-    public Item ev(final InputInfo ii, final Item a, final Item b)
-        throws QueryException {
-
+    public Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumber() || ta.isUntyped();
       final boolean t2 = tb.isNumber() || tb.isUntyped();
       if(t1 ^ t2) errNum(ii, !t1 ? a : b);
+
       if(t1 && t2) {
+        // numbers or untyped values
         final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
@@ -50,6 +49,7 @@ public enum Calc {
         return Dec.get(a.dec(ii).add(b.dec(ii)));
       }
 
+      // dates or durations
       if(ta == tb) {
         if(!ta.isDuration()) errNum(ii, !t1 ? a : b);
         if(ta == YMD) return new YMd((YMd) a, (YMd) b, true);
@@ -59,30 +59,23 @@ public enum Calc {
       if(tb == DTM) return new Dtm((Date) b, checkDur(ii, a), true, ii);
       if(ta == DAT) return new Dat((Date) a, checkDur(ii, b), true, ii);
       if(tb == DAT) return new Dat((Date) b, checkDur(ii, a), true, ii);
-      if(ta == TIM) {
-        if(tb != DTD) errType(ii, DTD, b);
-        return new Tim((Tim) a, (DTd) b, true, ii);
-      }
-      if(tb == TIM) {
-        if(ta != DTD) errType(ii, DTD, b);
-        return new Tim((Tim) b, (DTd) a, true, ii);
-      }
-      errType(ii, ta, b);
-      return null;
+      if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTd) b, true, ii);
+      if(tb == TIM && ta == DTD) return new Tim((Tim) b, (DTd) a, true, ii);
+      throw errType(ii, ta, tb);
     }
   },
 
   /** Subtraction. */
   MINUS("-") {
     @Override
-    public Item ev(final InputInfo ii, final Item a, final Item b)
-        throws QueryException {
-
+    public Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException {
       final Type ta = a.type, tb = b.type;
       final boolean t1 = ta.isNumber() || ta.isUntyped();
       final boolean t2 = tb.isNumber() || tb.isUntyped();
       if(t1 ^ t2) errNum(ii, !t1 ? a : b);
+
       if(t1 && t2) {
+        // numbers or untyped values
         final Type t = type(ta, tb);
         if(t == ITR) {
           final long l1 = a.itr(ii);
@@ -95,30 +88,24 @@ public enum Calc {
         return Dec.get(a.dec(ii).subtract(b.dec(ii)));
       }
 
+      // dates or durations
       if(ta == tb) {
-        if(ta == DTM || ta == DAT || ta == TIM)
-          return new DTd((Date) a, (Date) b);
+        if(ta == DTM || ta == DAT || ta == TIM) return new DTd((Date) a, (Date) b);
         if(ta == YMD) return new YMd((YMd) a, (YMd) b, false);
         if(ta == DTD) return new DTd((DTd) a, (DTd) b, false);
         errNum(ii, !t1 ? a : b);
       }
       if(ta == DTM) return new Dtm((Date) a, checkDur(ii, b), false, ii);
       if(ta == DAT) return new Dat((Date) a, checkDur(ii, b), false, ii);
-      if(ta == TIM) {
-        if(tb != DTD) errType(ii, DTD, b);
-        return new Tim((Tim) a, (DTd) b, false, ii);
-      }
-      errType(ii, ta, b);
-      return null;
+      if(ta == TIM && tb == DTD) return new Tim((Tim) a, (DTd) b, false, ii);
+      throw errType(ii, ta, tb);
     }
   },
 
   /** Multiplication. */
   MULT("*") {
     @Override
-    public Item ev(final InputInfo ii, final Item a, final Item b)
-        throws QueryException {
-
+    public Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException {
       final Type ta = a.type, tb = b.type;
       if(ta == YMD) {
         if(!tb.isNumber()) errNum(ii, b);
@@ -139,7 +126,7 @@ public enum Calc {
 
       final boolean t1 = ta.isNumber() || ta.isUntyped();
       final boolean t2 = tb.isNumber() || tb.isUntyped();
-      if(t1 ^ t2) errType(ii, ta, b);
+      if(t1 ^ t2) errType(ii, ta, tb);
       if(t1 && t2) {
         final Type t = type(ta, tb);
         if(t == ITR) {
@@ -152,17 +139,14 @@ public enum Calc {
         if(t == FLT) return Flt.get(a.flt(ii) * b.flt(ii));
         return Dec.get(a.dec(ii).multiply(b.dec(ii)));
       }
-      errNum(ii, !t1 ? a : b);
-      return null;
+      throw errNum(ii, !t1 ? a : b);
     }
   },
 
   /** Division. */
   DIV("div") {
     @Override
-    public Item ev(final InputInfo ii, final Item a, final Item b)
-        throws QueryException {
-
+    public Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException {
       final Type ta = a.type, tb = b.type;
       if(ta == tb) {
         if(ta == YMD) {
@@ -203,26 +187,21 @@ public enum Calc {
   /** Integer division. */
   IDIV("idiv") {
     @Override
-    public Item ev(final InputInfo ii, final Item a, final Item b)
-        throws QueryException {
-
+    public Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException {
       checkNum(ii, a, b);
       final double d1 = a.dbl(ii);
       final double d2 = b.dbl(ii);
       if(d2 == 0) DIVZERO.thrw(ii, a);
       final double d = d1 / d2;
       if(Double.isNaN(d) || Double.isInfinite(d)) DIVFLOW.thrw(ii, d1, d2);
-      return Int.get(type(a.type, b.type) == ITR ?
-          a.itr(ii) / b.itr(ii) : (long) d);
+      return Int.get(type(a.type, b.type) == ITR ? a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
 
   /** Modulo. */
   MOD("mod") {
     @Override
-    public Item ev(final InputInfo ii, final Item a, final Item b)
-        throws QueryException {
-
+    public Item ev(final InputInfo ii, final Item a, final Item b) throws QueryException {
       checkNum(ii, a, b);
       final Type t = type(a.type, b.type);
       if(t == DBL) return Dbl.get(a.dbl(ii) % b.dbl(ii));
@@ -280,23 +259,25 @@ public enum Calc {
   /**
    * Returns a type error.
    * @param ii input info
-   * @param t expected type
-   * @param it item
+   * @param ta first type
+   * @param tb second type
+   * @return query exception
    * @throws QueryException query exception
    */
-  final void errType(final InputInfo ii, final Type t, final Item it)
+  final QueryException errType(final InputInfo ii, final Type ta, final Type tb)
       throws QueryException {
-    Err.type(ii, info(), t, it);
+    throw CALCTYPE.thrw(ii, info(), ta, tb);
   }
 
   /**
    * Returns a numeric type error.
    * @param ii input info
    * @param it item
+   * @return query exception
    * @throws QueryException query exception
    */
-  final void errNum(final InputInfo ii, final Item it) throws QueryException {
-    XPTYPENUM.thrw(ii, info(), it.type);
+  final QueryException errNum(final InputInfo ii, final Item it) throws QueryException {
+    throw XPTYPENUM.thrw(ii, info(), it.type);
   }
 
   /**
@@ -322,6 +303,7 @@ public enum Calc {
    */
   final void checkNum(final InputInfo ii, final Item a, final Item b)
       throws QueryException {
+
     final Type ta = a.type;
     final Type tb = b.type;
     if(!ta.isUntyped() && !ta.isNumber()) errNum(ii, a);
@@ -334,8 +316,7 @@ public enum Calc {
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  static final void checkRange(final InputInfo ii, final double d)
-      throws QueryException {
+  static final void checkRange(final InputInfo ii, final double d) throws QueryException {
     if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) RANGE.thrw(ii, d);
   }
 

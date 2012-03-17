@@ -562,6 +562,8 @@ public enum Err {
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
   /** XPTY0004: Typing Exception. */
+  CALCTYPE(XPTY, 4, "% not defined for % and %."),
+  /** XPTY0004: Typing Exception. */
   STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
   /** XPTY0004: Typing Exception. */
   NODFUNTYPE(XPTY, 4, "%: node() or map expected, % found."),
