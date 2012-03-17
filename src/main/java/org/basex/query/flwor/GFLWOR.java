@@ -322,7 +322,10 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public final boolean uses(final Use u) {
-    return u == Use.VAR || ret.uses(u);
+    for(final ForLet f : fl) if(f.uses(u)) return true;
+    return where != null && where.uses(u) ||
+           order != null && order.uses(u) ||
+           group != null && group.uses(u) || ret.uses(u);
   }
 
   @Override
@@ -349,9 +352,9 @@ public class GFLWOR extends ParseExpr {
   @Override
   public final boolean removable(final Var v) {
     for(final ForLet f : fl) if(!f.removable(v)) return false;
-    return (where == null || where.removable(v))
-        && (order == null || order.removable(v))
-        && (group == null || group.removable(v)) && ret.removable(v);
+    return (where == null || where.removable(v)) &&
+           (order == null || order.removable(v)) &&
+           (group == null || group.removable(v)) && ret.removable(v);
   }
 
   @Override

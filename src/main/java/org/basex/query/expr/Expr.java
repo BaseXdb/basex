@@ -140,10 +140,10 @@ public abstract class Expr extends ExprInfo {
   public abstract long size();
 
   /**
-   * Indicates if an expression uses the specified type/operation.
-   * This method is called by numerous {@link #comp} methods to test
-   * the properties of sub-expressions.
-   * @param u use type to be checked
+   * Indicates if an expression uses the specified type or operation. This method is
+   * called by numerous {@link #comp} methods to test the properties of sub-expressions.
+   * It will return {@code true} as soon as at least one test is successful.
+   * @param u type/operation to be found
    * @return result of check
    */
   public abstract boolean uses(final Use u);
@@ -196,7 +196,6 @@ public abstract class Expr extends ExprInfo {
    * <p>Example in {@link CmpV}:
    * {@code if($x eq true())} is rewritten to {@code if($x)}, if {@code $x}
    * will always yield a single boolean.</p>
-   *
    * @param ctx query context
    * @return optimized expression
    */
@@ -260,7 +259,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Checks if this expression is a certain function.
    * @param f function definition
-   * @return function, or {@code null}
+   * @return result of check
    */
   @SuppressWarnings("unused")
   public boolean isFunction(final Function f) {
