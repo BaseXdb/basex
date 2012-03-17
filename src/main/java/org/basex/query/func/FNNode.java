@@ -37,9 +37,7 @@ public final class FNNode extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
     final Item it = (expr.length != 0 ? expr[0] :
       checkCtx(ctx)).item(ctx, input);
@@ -61,8 +59,8 @@ public final class FNNode extends StandardFunc {
       case BASE_URI:
         if(it == null) return null;
         ANode n = checkNode(it);
-        if(n.type != NodeType.ELM && n.type != NodeType.DOC &&
-            n.parent() == null) return null;
+        if(n.type != NodeType.ELM && n.type != NodeType.DOC && n.parent() == null)
+          return null;
         Uri base = Uri.EMPTY;
         while(!base.isAbsolute()) {
           if(n == null) {

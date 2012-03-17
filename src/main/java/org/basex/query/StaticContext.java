@@ -44,7 +44,7 @@ public final class StaticContext {
   public boolean nsInherit = true;
 
   /** Static Base URI. */
-  private byte[] baseURI = EMPTY;
+  private Uri baseURI = Uri.EMPTY;
   /** Default collation. */
   private Uri collation = Uri.uri(URLCOLL, false);
 
@@ -70,10 +70,10 @@ public final class StaticContext {
 
   /**
    * Declares a namespace.
-   * A namespace is undeclared if the {@code uri} is an empty string.
-   * The default element namespaces is set if the {@code prefix} is empty.
+   * A namespace is undeclared if the specified URI is an empty string.
+   * The default element namespaces is set if the specified prefix is empty.
    * @param prefix namespace prefix
-   * @param uri namespace uri
+   * @param uri namespace URI
    * @throws QueryException query exception
    */
   public void namespace(final String prefix, final String uri) throws QueryException {
@@ -87,11 +87,11 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO representation of the base URI, or {@code null}.
+   * Returns an IO representation of the static base URI, or {@code null}.
    * @return IO reference
    */
   public IO baseIO() {
-    return baseURI.length != 0 ? IO.get(string(baseURI)) : null;
+    return baseURI == Uri.EMPTY ? null : IO.get(baseURI.toJava());
   }
 
   /**
@@ -99,7 +99,7 @@ public final class StaticContext {
    * If a base URI exists, it is merged with the specified filename.
    * Otherwise, a plain reference is returned.
    * @param fn filename
-   * @return io instance
+   * @return io reference
    */
   public IO io(final String fn) {
     final IO base = baseIO();
@@ -107,31 +107,31 @@ public final class StaticContext {
   }
 
   /**
-   * Returns a URI representation of the base URI.
-   * @return IO reference
+   * Returns the static base URI.
+   * @return base URI
    */
   public Uri baseURI() {
-    return Uri.uri(baseURI, false);
+    return baseURI;
   }
 
   /**
-   * Sets the base URI.
+   * Sets the static base URI.
    * @param uri uri to be set
    */
   public void baseURI(final String uri) {
-    baseURI = norm(token(uri));
+    baseURI = uri.length() == 0 ? Uri.EMPTY : Uri.uri(token(IO.get(uri).url()));
   }
 
   /**
-   * Returns a URI representation of the base URI.
-   * @return IO reference
+   * Returns the URI of the default collation.
+   * @return collation URI
    */
   public Uri collation() {
     return collation;
   }
 
   /**
-   * Sets the collation.
+   * Sets the collation URI.
    * @param uri uri to be set
    */
   public void collation(final String uri) {

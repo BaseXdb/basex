@@ -1,9 +1,8 @@
 package org.basex.query.item;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 
-import org.basex.util.Token;
+import org.basex.util.*;
 
 /**
  * URI item.
@@ -56,6 +55,7 @@ public final class Uri extends Str {
       final URI uri = base.resolve(Token.string(Token.uri(add.val, true)));
       return uri(Token.token(uri.toString()), false);
     } catch(final Exception ex) {
+      Util.debug(ex);
       return this;
     }
   }

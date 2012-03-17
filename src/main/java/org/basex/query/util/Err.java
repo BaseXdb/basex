@@ -209,7 +209,7 @@ public enum Err {
   /** FORG0002: Evaluation exception. */
   URIINV(FORG, 2, "Invalid URI: %."),
   /** FORG0002: Evaluation exception. */
-  URIABS(FORG, 2, "URI % is not absolute."),
+  URIABS(FORG, 2, "Base URI % is not absolute."),
 
   /** FORG0003: Evaluation exception. */
   EXPECTZ0(FORG, 3, "Zero or one value expected."),
