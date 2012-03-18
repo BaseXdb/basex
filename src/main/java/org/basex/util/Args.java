@@ -34,9 +34,7 @@ public final class Args {
    * @param u usage info
    * @param h header
    */
-  public Args(final String[] a, final Object o, final String u,
-      final String h) {
-
+  public Args(final String[] a, final Object o, final String u, final String h) {
     args = a;
     usage = u;
     obj = o;

@@ -192,8 +192,7 @@ public final class HTTPResponse {
    * @throws QueryException query exception
    */
   private NodeCache extractParts(final InputStream io, final boolean status,
-      final ItemCache payloads, final byte[] sep)
-          throws IOException, QueryException {
+      final ItemCache payloads, final byte[] sep) throws IOException, QueryException {
 
     try {
       // read first line of multipart content
@@ -319,8 +318,8 @@ public final class HTTPResponse {
    * @return payload part content
    * @throws IOException I/O Exception
    */
-  private static byte[] extractPartPayload(final InputStream io,
-      final byte[] sep, final byte[] end, final String ce) throws IOException {
+  private static byte[] extractPartPayload(final InputStream io, final byte[] sep,
+      final byte[] end, final String ce) throws IOException {
 
     final ByteList bl = new ByteList();
     while(true) {

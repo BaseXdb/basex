@@ -500,8 +500,8 @@ public interface QueryText {
 
   /** EXQuery URI. */
   String EXQUERY = "http://exquery.org/ns/";
-  /** REXQ URI. */
-  byte[] REXQURI = token(EXQUERY + "rest/annotation");
+  /** RESTXQ URI. */
+  byte[] RESTXQURI = token(EXQUERY + "restxq");
 
   /** EXPath URI. */
   String EXPATH = "http://expath.org/ns/";

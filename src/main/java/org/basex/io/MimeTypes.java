@@ -18,6 +18,9 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class MimeTypes {
+  /** Content-Type. */
+  public static final String CONTENT_TYPE = "Content-Type";
+
   /** Media type: application/html+xml. */
   public static final String APP_HTML_XML = "application/html+xml";
   /** Media type: application/json. */

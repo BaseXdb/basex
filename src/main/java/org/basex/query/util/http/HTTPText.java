@@ -12,6 +12,18 @@ import org.basex.query.item.*;
  * @author Rositsa Shadura
  */
 public interface HTTPText {
+  /** WWW-Authentication string. */
+  String WWW_AUTHENTICATE = "WWW-Authenticate";
+  /** HTTP header: Authorization. */
+  String AUTHORIZATION = "Authorization";
+  /** HTTP basic authentication. */
+  String BASIC = "Basic";
+
+  /** Multipart string. */
+  String MULTIPART = "multipart";
+  /** Payload string. */
+  String PAYLOAD = "payload";
+
   /** Request attribute: HTTP method. */
   byte[] METHOD = token("method");
   /** Request attribute: username. */
@@ -85,9 +97,4 @@ public interface HTTPText {
   QNm Q_STATUS = new QNm(STATUS);
   /** Header attribute: name. */
   QNm Q_MESSAGE = new QNm(MESSAGE);
-
-  /** Multipart string. */
-  String MULTIPART = "multipart";
-  /** Payload string. */
-  String PAYLOAD = "payload";
 }

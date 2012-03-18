@@ -141,6 +141,7 @@ public interface Text {
     "  -S         Start as service" + NL +
     "  -U<name>   Specify user name" + NL +
     "  -W         Deactivate WebDAV service" + NL +
+    "  -X         Deactivate RESTXQ service" + NL +
     "  -z         Suppress logging";
 
   /** Bug info. */

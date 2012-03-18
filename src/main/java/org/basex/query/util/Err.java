@@ -1002,7 +1002,7 @@ public enum Err {
     URIS.put(BASX,  BASEXURI);
     URIS.put(FOCX,  CRYPTOURI);
     URIS.put(PACK,  PKGURI);
-    URIS.put(REXQ,  REXQURI);
+    URIS.put(REXQ,  RESTXQURI);
     URIS.put(FOZP,  ZIPURI);
   }
 
@@ -1056,20 +1056,6 @@ public enum Err {
 
   /**
    * Throws a type exception.
-   * @param ii input info
-   * @param inf expression info
-   * @param t expected type
-   * @param it found item
-   * @return query exception (indicates that an error is raised)
-   * @throws QueryException query exception
-   */
-  public static QueryException type(final InputInfo ii, final String inf, final Type t,
-      final Item it) throws QueryException {
-    throw XPTYPE.thrw(ii, inf, t, it.type);
-  }
-
-  /**
-   * Throws a type exception.
    * @param e parsing expression
    * @param t expected type
    * @param it found item
@@ -1078,7 +1064,7 @@ public enum Err {
    */
   public static QueryException type(final ParseExpr e, final Type t, final Item it)
       throws QueryException {
-    throw type(e.input, e.description(), t, it);
+    throw XPTYPE.thrw(e.input, e.description(), t, it.type);
   }
 
   /**

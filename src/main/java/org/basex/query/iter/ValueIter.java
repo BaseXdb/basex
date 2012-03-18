@@ -1,27 +1,61 @@
 package org.basex.query.iter;
 
-import org.basex.query.item.Item;
-import org.basex.query.item.Value;
+import java.util.*;
+
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Value iterator interface, throwing no exceptions.
  *
+ * This class also implements the {@link Iterable} interface, which is why all of its
+ * values can also be retrieved via enhanced for (for-each) loops. Note, however, that
+ * using the {@link #next()} method will give you better performance.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class ValueIter extends Iter {
+public abstract class ValueIter extends Iter implements Iterable<Item> {
   @Override
   public abstract Item next();
+
   @Override
   public abstract Item get(final long i);
+
   @Override
   public abstract long size();
+
   @Override
   public abstract boolean reset();
+
   @Override
   public Value value() {
     final ItemCache ic = new ItemCache((int) size());
     for(Item i; (i = next()) != null;) ic.add(i);
     return ic.value();
+  }
+
+  @Override
+  public final Iterator<Item> iterator() {
+    return new Iterator<Item>() {
+      /** Current node. */
+      private Item n;
+
+      @Override
+      public boolean hasNext() {
+        n = ValueIter.this.next();
+        return n != null;
+      }
+
+      @Override
+      public Item next() {
+        return n;
+      }
+
+      @Override
+      public void remove() {
+        Util.notexpected();
+      }
+    };
   }
 }

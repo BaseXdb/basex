@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
@@ -11,27 +12,19 @@ import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.in.NewlineInput;
 import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
+import org.basex.io.serial.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Str;
-import org.basex.query.item.StrStream;
-import org.basex.query.item.Uri;
-import org.basex.query.item.Value;
+import org.basex.query.item.*;
+import org.basex.query.item.map.*;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.*;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
 import org.basex.query.util.Err.ErrType;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.ByteList;
 
 /**
@@ -41,6 +34,13 @@ import org.basex.util.list.ByteList;
  * @author Christian Gruen
  */
 public final class FNGen extends StandardFunc {
+  /** Element: output:serialization-parameters. */
+  private static final QNm Q_SPARAM = new QNm("serialization-parameters", OUTPUTURI);
+  /** Attribute: value. */
+  private static final QNm A_VALUE = new QNm("value");
+  /** Response node test. */
+  public static final ExtTest OUTPUT_SERIAL = new ExtTest(NodeType.ELM, Q_SPARAM);
+
   /**
    * Constructor.
    * @param ii input info
@@ -329,5 +329,76 @@ public final class FNGen extends StandardFunc {
   public boolean iterable() {
     // collections will never yield duplicates
     return sig == Function.COLLECTION || super.iterable();
+  }
+
+  /**
+   * Creates serialization properties from the specified function argument.
+   * @param fun calling function
+   * @param arg argument with parameters
+   * @param ctx query context
+   * @return serialization parameters
+   * @throws SerializerException serializer exception
+   * @throws QueryException query exception
+   */
+  static SerializerProp serialPar(final StandardFunc fun, final int arg,
+      final QueryContext ctx) throws SerializerException, QueryException {
+
+    // check if enough arguments are available
+    String params = "";
+    if(arg < fun.expr.length) {
+      // retrieve parameters
+      final Item it = fun.expr[arg].item(ctx, fun.input);
+      if(it != null) {
+        if(it instanceof Map) {
+          params = convert(((Map) it).tokenJavaMap(fun.input));
+        } else {
+          // check root node
+          ANode nd = (ANode) fun.checkType(it, NodeType.ELM);
+          if(!OUTPUT_SERIAL.eq(nd)) SERUNKNOWN.thrw(fun.input, nd.qname());
+          // retrieve query parameters
+          params = parameters(nd, fun.input);
+        }
+      }
+    }
+    // use default parameters if no parameters have been assigned
+    return params.isEmpty() ? ctx.serParams(true) : new SerializerProp(params);
+  }
+
+  /**
+   * Returns all serialization options defined by a serialization element.
+   * @param nd root node
+   * @param ii input info
+   * @return serialization tokens
+   * @throws QueryException query exception
+   */
+  public static String parameters(final ANode nd, final InputInfo ii)
+      throws QueryException {
+
+    // interpret query parameters
+    final TokenObjMap<Object> tm = new TokenObjMap<Object>();
+    for(final ANode n : nd.children()) {
+      final QNm qn = n.qname();
+      if(!eq(qn.uri(), OUTPUTURI)) SERUNKNOWN.thrw(ii, qn);
+      final byte[] val = n.attribute(A_VALUE);
+      if(val == null) SERNOVAL.thrw(ii);
+      tm.add(qn.local(), val);
+    }
+    return convert(tm);
+  }
+
+  /**
+   * Converts a token map to a serialization string.
+   * @param map map with serialization options
+   * @return serialization string
+   */
+  private static String convert(final TokenObjMap<Object> map) {
+    final TokenBuilder tb = new TokenBuilder();
+    if(map != null) {
+      for(final byte[] key : map) {
+        if(!tb.isEmpty()) tb.add(',');
+        tb.add(key).add('=').addExt(map.get(key));
+      }
+    }
+    return tb.toString();
   }
 }

@@ -150,8 +150,7 @@ public final class HTTPRequestParser {
       // no linked resource for setting request content
       if(contItem == null) {
         // content is set from <http:body/> children
-        final AxisMoreIter i = body.children();
-        for(ANode n; (n = i.next()) != null;) bodyContent.add(n);
+        for(final ANode n : body.children()) bodyContent.add(n);
       } else {
         // content is set from $bodies parameter
         bodyContent.add(contItem);

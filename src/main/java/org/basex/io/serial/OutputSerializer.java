@@ -491,15 +491,13 @@ public abstract class OutputSerializer extends Serializer {
    * @return {@code true} if declaration was printed
    * @throws IOException I/O exception
    */
-  boolean ct(final boolean empty, final boolean html)
-      throws IOException {
-
+  boolean ct(final boolean empty, final boolean html) throws IOException {
     if(ct != 1) return false;
     ct++;
     if(empty) finishOpen();
     level++;
     startOpen(META);
-    attribute(HTTPEQUIV, token(CONTENT_TYPE));
+    attribute(HTTPEQUIV, token(MimeTypes.CONTENT_TYPE));
     attribute(CONTENT, new TokenBuilder(media.isEmpty() ? MimeTypes.TEXT_HTML :
       media).add(CHARSET).addExt(encoding).finish());
     if(html) {

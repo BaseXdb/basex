@@ -177,15 +177,6 @@ public interface DataText {
   /** Doctype public keyword. */
   String PUBLIC = "PUBLIC";
 
-  /** Content-Type. */
-  String CONTENT_TYPE = "Content-Type";
-  /** WWW-Authentication string. */
-  String WWW_AUTHENTICATE = "WWW-Authenticate";
-  /** HTTP header: Authorization. */
-  String AUTHORIZATION = "Authorization";
-  /** HTTP basic authentication. */
-  String BASIC = "Basic";
-
   /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");
   /** Quote entity. */

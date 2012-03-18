@@ -104,8 +104,7 @@ public abstract class BXNode implements Node {
   @Override
   public final BXNode getLastChild() {
     ANode n = null;
-    final AxisIter ai = node.children();
-    for(ANode t; (t = ai.next()) != null;) n = t;
+    for(final ANode t : node.children()) n = t;
     return toJava(n);
   }
 

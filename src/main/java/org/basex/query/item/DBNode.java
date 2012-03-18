@@ -466,8 +466,7 @@ public class DBNode extends ANode {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(Util.name(this)), NAM,
-        Token.token(data.meta.name));
+    ser.openElement(Token.token(Util.name(this)), NAM, Token.token(data.meta.name));
     if(pre != 0) ser.attribute(PRE, Token.token(pre));
     ser.closeElement();
   }

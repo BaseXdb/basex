@@ -1,34 +1,41 @@
 package org.basex.query.path;
 
-import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
 
 /**
- * Extended kind test.
+ * Extended node test.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class ExtKindTest extends Test {
-  /** Type name. */
+public class ExtTest extends Test {
+  /** Extended type. */
   private final Type ext;
-  /** Strip flag (would be more relevant if XMLSchema was supported). */
+  /** Strip flag (only relevant if specified type is {@code xs:untyped}). */
   private final boolean strip;
 
   /**
    * Constructor.
    * @param t node type
    * @param nm optional node name
-   * @param et extended node type
-   * @param qc query context
    */
-  public ExtKindTest(final NodeType t, final QNm nm, final Type et,
-      final QueryContext qc) {
+  public ExtTest(final NodeType t, final QNm nm) {
+    this(t, nm, null, false);
+  }
+
+  /**
+   * Constructor.
+   * @param t node type
+   * @param nm optional node name
+   * @param et extended node type
+   * @param st strip flag; only relevant if specified type is {@code xs:untyped}
+   */
+  public ExtTest(final NodeType t, final QNm nm, final Type et, final boolean st) {
     type = t;
     name = nm;
     ext = et;
-    strip = qc.sc.strip;
+    strip = st;
   }
 
   @Override

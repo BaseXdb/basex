@@ -67,8 +67,7 @@ public final class FNFile extends StandardFunc {
       throws QueryException {
 
     checkCreate(ctx);
-    final File path = expr.length == 0 ? null : new File(
-        string(checkStr(expr[0], ctx)));
+    final File path = expr.length == 0 ? null : new File(string(checkStr(expr[0], ctx)));
 
     switch(sig) {
       case _FILE_APPEND:           return write(path, ctx, true);
@@ -102,7 +101,7 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item lastModified(final File path) throws QueryException {
-    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path.getAbsolutePath());
     return new Dtm(path.lastModified(), input);
   }
 
@@ -113,8 +112,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item size(final File path) throws QueryException {
-    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
-    if(path.isDirectory()) PATHISDIR.thrw(input, path);
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path.getAbsolutePath());
+    if(path.isDirectory()) PATHISDIR.thrw(input, path.getAbsolutePath());
     return Int.get(path.length());
   }
 
@@ -287,7 +286,7 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item del(final File path) throws QueryException {
-    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path.getAbsolutePath());
     deleteRec(path);
     return null;
   }
@@ -310,8 +309,8 @@ public final class FNFile extends StandardFunc {
    * @throws QueryException query exception
    */
   private B64Stream readBinary(final File path) throws QueryException {
-    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
-    if(path.isDirectory()) PATHISDIR.thrw(input, path);
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path.getAbsolutePath());
+    if(path.isDirectory()) PATHISDIR.thrw(input, path.getAbsolutePath());
     return new B64Stream(new IOFile(path), FILEERROR);
   }
 
@@ -326,8 +325,8 @@ public final class FNFile extends StandardFunc {
       throws QueryException {
 
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
-    if(!path.exists()) PATHNOTEXISTS.thrw(input, path);
-    if(path.isDirectory()) PATHISDIR.thrw(input, path);
+    if(!path.exists()) PATHNOTEXISTS.thrw(input, path.getAbsolutePath());
+    if(path.isDirectory()) PATHISDIR.thrw(input, path.getAbsolutePath());
     if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
     return new StrStream(new IOFile(path), enc, FILEERROR);
   }
@@ -362,7 +361,7 @@ public final class FNFile extends StandardFunc {
       final PrintOutput out = PrintOutput.get(
           new FileOutputStream(path, append));
       try {
-        final Serializer ser = Serializer.get(out, serialPar(this, 2, ctx));
+        final Serializer ser = Serializer.get(out, FNGen.serialPar(this, 2, ctx));
         for(Item it; (it = ir.next()) != null;) it.serialize(ser);
         ser.close();
       } catch(final SerializerException ex) {
@@ -422,7 +421,7 @@ public final class FNFile extends StandardFunc {
       final boolean copy) throws QueryException {
 
     File trg = new File(string(checkStr(expr[1], ctx))).getAbsoluteFile();
-    if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
+    if(!src.exists()) PATHNOTEXISTS.thrw(input, src.getAbsolutePath());
 
     if(trg.isDirectory()) {
       // target is a directory: attach file name

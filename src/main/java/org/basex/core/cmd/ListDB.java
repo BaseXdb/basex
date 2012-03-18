@@ -45,7 +45,7 @@ public final class ListDB extends Command {
     table.description = RESOURCES;
     table.header.add(INPUT_PATH);
     table.header.add(TYPE);
-    table.header.add(DataText.CONTENT_TYPE);
+    table.header.add(MimeTypes.CONTENT_TYPE);
     table.header.add(SIZE);
 
     try {

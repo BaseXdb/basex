@@ -2856,7 +2856,7 @@ public class QueryParser extends InputParser {
       // parse optional question mark
       wsConsume(PLHOLDER);
     }
-    return new ExtKindTest(NodeType.ELM, name, type, ctx);
+    return new ExtTest(NodeType.ELM, name, type, ctx.sc.strip);
   }
 
   /**
@@ -2885,7 +2885,7 @@ public class QueryParser extends InputParser {
       type = AtomType.find(tn, true);
       if(type == null) error(TYPEUNDEF, tn);
     }
-    return new ExtKindTest(NodeType.ATT, name, type, ctx);
+    return new ExtTest(NodeType.ATT, name, type, ctx.sc.strip);
   }
 
   /**
@@ -2904,7 +2904,7 @@ public class QueryParser extends InputParser {
     } else {
       return null;
     }
-    return new ExtKindTest(NodeType.PI, new QNm(nm), null, ctx);
+    return new ExtTest(NodeType.PI, new QNm(nm));
   }
 
   /**

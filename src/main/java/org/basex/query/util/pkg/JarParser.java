@@ -12,7 +12,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.ANode;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.QNm;
-import org.basex.query.iter.AxisIter;
 import org.basex.util.InputInfo;
 
 /**
@@ -46,8 +45,7 @@ public final class JarParser {
     final JarDesc desc = new JarDesc();
     try {
       final ANode node = new DBNode(io, context.prop).children().next();
-      final AxisIter ch = node.children();
-      for(ANode next; (next = ch.next()) != null;) {
+      for(final ANode next : node.children()) {
         final QNm name = next.qname();
         // ignore namespace to improve compatibility
         if(eq(JAR, name.local())) desc.jars.add(next.string());
