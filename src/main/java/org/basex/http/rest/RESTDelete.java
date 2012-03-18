@@ -1,7 +1,5 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.http.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
@@ -26,7 +24,7 @@ public class RESTDelete extends RESTCode {
 
     final Session session = http.session();
     if(http.depth() == 0) {
-      throw new HTTPException(SC_NOT_FOUND, ERR_NOPATH);
+      HTTPErr.NO_PATH.thrw();
     } else if(http.depth() == 1) {
       session.execute(new DropDB(http.db()));
     } else {

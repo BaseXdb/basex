@@ -13,7 +13,6 @@ import java.util.Map.*;
 import javax.servlet.http.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -26,7 +25,7 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class HTTPContext {
-  /** Global database context. */
+  /** Singleton database context. */
   private static Context context;
 
   /** Servlet request. */
@@ -81,10 +80,10 @@ public final class HTTPContext {
     pass = System.getProperty(DBPASS);
 
     // set session-specific credentials
-    final String auth = req.getHeader(DataText.AUTHORIZATION);
+    final String auth = req.getHeader(AUTHORIZATION);
     if(auth != null) {
       final String[] values = auth.split(" ");
-      if(values[0].equals(DataText.BASIC)) {
+      if(values[0].equals(BASIC)) {
         final String[] cred = Base64.decode(values[1]).split(":", 2);
         if(cred.length != 2) throw new LoginException(NOPASSWD);
         user = cred[0];
@@ -131,9 +130,9 @@ public final class HTTPContext {
         type = APP_OCTET;
       } else if(mt.equals(M_XML)) {
         type = APP_XML;
-      } else if(Token.eq(mt, M_JSON, M_JSONML)) {
+      } else if(eq(mt, M_JSON, M_JSONML)) {
         type = APP_JSON;
-      } else if(Token.eq(mt, M_XHTML, M_HTML)) {
+      } else if(eq(mt, M_XHTML, M_HTML)) {
         type = TEXT_HTML;
       } else {
         type = TEXT_PLAIN;
@@ -205,9 +204,12 @@ public final class HTTPContext {
    */
   public void status(final int code, final String message) throws IOException {
     if(session != null) session.close();
-    res.setStatus(code);
-    if(code == SC_UNAUTHORIZED) res.setHeader(DataText.WWW_AUTHENTICATE, DataText.BASIC);
-    if(message != null) out.write(token(message));
+    if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
+    if(message != null && !message.isEmpty()) {
+      res.sendError(code, message);
+    } else {
+      res.setStatus(code);
+    }
   }
 
   /**

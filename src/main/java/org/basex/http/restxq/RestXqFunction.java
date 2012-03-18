@@ -20,19 +20,21 @@ import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
- * This class represents a single RESTful function.
+ * This class represents a single RESTXQ function.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 final class RestXqFunction {
   /** Pattern for a single template. */
-  private static final Pattern TEMPLATE = Pattern.compile("\\{\\$(.+)\\}");
+  private static final Pattern TEMPLATE =
+      Pattern.compile("\\s*\\{\\s*\\$(.+?)\\s*\\}\\s*");
 
   /** Supported methods. */
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
@@ -84,15 +86,14 @@ final class RestXqFunction {
       final Value value = function.ann.values[a];
       final byte[] local = name.local();
       final byte[] uri = name.uri();
-      // later: change to equality
-      final boolean rexq = startsWith(uri, QueryText.REXQURI);
+      final boolean rexq = eq(uri, QueryText.RESTXQURI);
       if(rexq) {
         if(eq(PATH, local)) {
           // annotation "path"
           if(segments != null) error(ANN_TWICE, "%", name.string());
           segments = HTTPContext.toSegments(toString(value, name));
           for(final String s : segments) {
-            if(s.startsWith("{")) checkVariable(s, AtomType.AAT);
+            if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT);
           }
         } else if(eq(CONSUMES, local)) {
           // [CG] RESTXQ, consumes/produces: "take a SINGLE mandatory string literal"?
@@ -167,7 +168,7 @@ final class RestXqFunction {
     // bind variables from segments
     for(int s = 0; s < segments.length; s++) {
       final String seg = segments[s];
-      final Matcher m = RestXqFunction.TEMPLATE.matcher(seg);
+      final Matcher m = TEMPLATE.matcher(seg);
       if(!m.find()) continue;
       final QNm qnm = new QNm(token(m.group(1)), context);
       bind(qnm, new Atm(http.segment(s)));
@@ -193,10 +194,7 @@ final class RestXqFunction {
 
     // bind query parameters
     Map<String, String[]> params = http.params();
-    for(final RestXqParam rxp : queryParams) {
-      final String[] v = params.get(rxp.key);
-      bind(rxp.name, v == null ? rxp.item : new Atm(v[0]));
-    }
+    for(final RestXqParam rxp : queryParams) bind(rxp, params.get(rxp.key));
 
     // bind form parameters
     if(formParams.size() != 0) {
@@ -205,16 +203,17 @@ final class RestXqFunction {
         body = cache(http, body);
         params = convert(body.toString());
       }
-      for(final RestXqParam rxp : formParams) {
-        final String[] v = params.get(rxp.key);
-        bind(rxp.name, v == null ? rxp.item : new Atm(v[0]));
-      }
+      for(final RestXqParam rxp : formParams) bind(rxp, params.get(rxp.key));
     }
 
     // bind header parameters
     for(final RestXqParam rxp : headerParams) {
-      final String v = http.req.getHeader(rxp.key);
-      bind(rxp.name, v == null ? rxp.item : new Atm(v));
+      final StringList sl = new StringList();
+      final Enumeration<?> en =  http.req.getHeaders(rxp.key);
+      while(en.hasMoreElements()) {
+        for(final String s : en.nextElement().toString().split(", *")) sl.add(s);
+      }
+      bind(rxp, sl.toArray());
     }
 
     // bind cookie parameters
@@ -224,7 +223,8 @@ final class RestXqFunction {
         for(final Cookie c : cookies) {
           if(!rxp.key.equals(c.getName())) continue;
           final String v = c.getValue();
-          bind(rxp.name, v == null ? rxp.item : new Atm(v));
+          if(v == null) bind(rxp);
+          else bind(rxp, c.getValue());
         }
       }
     }
@@ -287,7 +287,7 @@ final class RestXqFunction {
     if(segments.length != http.depth()) return false;
     // check single segments
     for(int s = 0; s < segments.length; s++) {
-      final String seg = segments[s];
+      final String seg = segments[s].trim();
       if(!seg.equals(http.segment(s)) && !seg.startsWith("{")) return false;
     }
     return true;
@@ -329,21 +329,40 @@ final class RestXqFunction {
   }
 
   /**
-   * Binds the specified item to a variable.
-   * @param name variable name
-   * @param item item to be bound
+   * Binds the specified parameter to a variable.
+   * @param rxp parameter
+   * @param values values to be bound; the parameter's default value is assigned
+   *        if the argument is {@code null} or empty
    * @throws QueryException query exception
    */
-  private void bind(final QNm name, final Item item) throws QueryException {
-    // skip nulled items
-    if(item == null) return;
+  private void bind(final RestXqParam rxp, final String... values) throws QueryException {
+    final Value val;
+    if(values == null || values.length == 0) {
+      val = rxp.value;
+    } else {
+      final ItemCache ic = new ItemCache();
+      for(final String s : values) ic.add(new Atm(s));
+      val = ic.value();
+    }
+    bind(rxp.name, val);
+  }
 
-    Item it = item;
+  /**
+   * Binds the specified value to a variable.
+   * @param name variable name
+   * @param value value to be bound
+   * @throws QueryException query exception
+   */
+  private void bind(final QNm name, final Value value) throws QueryException {
+    // skip nulled values
+    if(value == null) return;
+
+    Value v = value;
     for(final Var var : function.args) {
       if(!var.name.eq(name)) continue;
       // casts and binds the value
-      if(var.type != null) it = var.type.type.cast(item, context, null);
-      var.bind(it, context);
+      if(var.type != null) v = var.type.promote(value, context, null);
+      var.bind(v, context);
       break;
     }
   }
@@ -378,22 +397,23 @@ final class RestXqFunction {
 
   /**
    * Returns a parameter.
-   * [CG] RESTXQ: allow identical field names?
    * @param value value
    * @param name name
    * @return parameter
    * @throws QueryException HTTP exception
    */
   private RestXqParam param(final Value value, final QNm name) throws QueryException {
+    // [CG] RESTXQ: allow identical field names?
     final long vs = value.size();
-    if(vs < 2 || vs > 3) error(ANN_PARAMS, "%", name.string());
+    if(vs < 2) error(ANN_PARAMS, "%", name.string());
     // name of parameter
     final String key = toString(value.itemAt(0), name);
     // variable template
     final QNm qnm = checkVariable(toString(value.itemAt(1), name));
     // default value
-    final Item val = vs == 3 ? value.itemAt(2) : null;
-    return new RestXqParam(qnm, key, val);
+    final ItemCache ic = new ItemCache();
+    for(int v = 2; v < vs; v++) ic.add(value.itemAt(v));
+    return new RestXqParam(qnm, key, ic.value());
   }
 
   // PRIVATE STATIC METHODS =============================================================

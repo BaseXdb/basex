@@ -57,6 +57,7 @@ public abstract class BaseXServlet extends HttpServlet {
       throws IOException {
 
     http = new HTTPContext(req, res);
+
     try {
       run();
     } catch(final HTTPException ex) {
@@ -69,7 +70,7 @@ public abstract class BaseXServlet extends HttpServlet {
       http.status(SC_BAD_REQUEST, ex.getMessage());
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));
-      http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, Util.message(ex)));
+      http.status(SC_INTERNAL_SERVER_ERROR, Util.info(UNEXPECTED, ex));
     } finally {
       if(Boolean.parseBoolean(System.getProperty(HTTPText.DBVERBOSE))) {
         Util.out("_ REQUEST ___________________________________" + Prop.NL + req);

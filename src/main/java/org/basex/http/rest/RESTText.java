@@ -25,19 +25,6 @@ public interface RESTText {
   /** Attribute. */
   byte[] RESOURCES = token("resources");
 
-  /** Error message. */
-  String ERR_UNEXPECTED = "Server-side error: ";
-  /** Error message. */
-  String ERR_PARAM = "Unknown parameter: '%'.";
-  /** Error message. */
-  String ERR_NOPATH = "No path specified.";
-  /** Error message. */
-  String ERR_NORES = "Path does not exist.";
-  /** Error message. */
-  String ERR_ONLYONE = "Only one operation can be specified.";
-  /** Error message. */
-  String ERR_CTXITEM = "Multiple context items specified.";
-
   /** Command operation. */
   String COMMAND = "command";
   /** Run operation. */

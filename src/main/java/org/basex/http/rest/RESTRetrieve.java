@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.rest.RESTText.*;
 import static org.basex.util.Token.*;
 
@@ -58,7 +57,7 @@ final class RESTRetrieve extends RESTQuery {
     } else if(!exists(http)) {
       // list database resources
       final Table table = new Table(session.execute(new ListDB(http.path())));
-      if(table.contents.isEmpty()) throw new HTTPException(SC_NOT_FOUND, ERR_NORES);
+      if(table.contents.isEmpty()) HTTPErr.UNKNOWN_PATH.thrw();
 
       final String serial = http.serialization;
       final SerializerProp sprop = new SerializerProp(serial);

@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.rest.RESTSchema.*;
 import static org.basex.http.rest.RESTText.*;
 
@@ -22,7 +21,6 @@ import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
-import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.xml.sax.*;
@@ -64,7 +62,7 @@ public class RESTPost extends RESTCode {
     try {
       doc = new DBNode(new IOContent(in), ctx.prop);
     } catch(final IOException ex) {
-      throw new HTTPException(SC_BAD_REQUEST, ex.getMessage());
+      throw HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
 
     final SerializerProp sp = new SerializerProp();
@@ -75,8 +73,7 @@ public class RESTPost extends RESTCode {
       // handle serialization parameters
       final TokenBuilder ser = new TokenBuilder();
       qp = new QueryProcessor("*/*:parameter", ctx).context(doc);
-      Iter ir = qp.iter();
-      for(Item param; (param = ir.next()) != null;) {
+      for(final Item param : qp.value()) {
         final String name = value("data(@name)", param, ctx);
         final String value = value("data(@value)", param, ctx);
         if(sp.get(name) != null) {
@@ -84,39 +81,36 @@ public class RESTPost extends RESTCode {
         } else if(name.equals(WRAP)) {
           wrap(value, http);
         } else {
-          throw new HTTPException(SC_BAD_REQUEST, ERR_PARAM, name);
+          HTTPErr.UNKNOWN_PARAM_X.thrw(name);
         }
       }
       http.serialization = ser.toString();
 
       // handle database options
       qp = new QueryProcessor("*/*:option", ctx).context(doc);
-      ir = qp.iter();
-      for(Item opt; (opt = ir.next()) != null;) {
-        final String name = value("data(@name)", opt, ctx);
-        final String value = value("data(@value)", opt, ctx);
+      for(final Item it : qp.value()) {
+        final String name = value("data(@name)", it, ctx);
+        final String value = value("data(@value)", it, ctx);
         http.session().execute(new Set(name, value));
       }
 
       // handle variables
       final Map<String, String[]> vars = new HashMap<String, String[]>();
       qp = new QueryProcessor("*/*:variable", ctx).context(doc);
-      ir = qp.iter();
-      for(Item var; (var = ir.next()) != null;) {
-        final String name = value("data(@name)", var, ctx);
-        final String value = value("data(@value)", var, ctx);
-        final String type = value("data(@type)", var, ctx);
+      for(final Item it : qp.value()) {
+        final String name = value("data(@name)", it, ctx);
+        final String value = value("data(@value)", it, ctx);
+        final String type = value("data(@type)", it, ctx);
         vars.put(name, new String[] { value, type });
       }
 
       // handle input
       byte[] item = null;
       qp = new QueryProcessor("*/*:context/node()", ctx).context(doc);
-      ir = qp.iter();
-      for(Item n; (n = ir.next()) != null;) {
-        if(item != null) throw new HTTPException(SC_BAD_REQUEST, ERR_CTXITEM);
+      for(final Item it : qp.value()) {
+        if(item != null) HTTPErr.MULTIPLE_CONTEXT_X.thrw();
         // create main memory instance of the specified node
-        n = DataBuilder.stripNS((ANode) n, RESTURI, ctx);
+        final Item n = DataBuilder.stripNS((ANode) it, RESTURI, ctx);
         final ArrayOutput ao = new ArrayOutput();
         n.serialize(Serializer.get(ao));
         item = ao.toArray();
@@ -134,7 +128,7 @@ public class RESTPost extends RESTCode {
       }
       code.run(http);
     } catch(final QueryException ex) {
-      throw new HTTPException(SC_BAD_REQUEST, ex.getLocalizedMessage());
+      HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
   }
 
@@ -142,14 +136,14 @@ public class RESTPost extends RESTCode {
    * Returns the atomized item for the specified query.
    * @param query query
    * @param item context item
-   * @param context database context
+   * @param ctx database context
    * @return atomized item
    * @throws QueryException query exception
    */
-  private static String value(final String query, final Item item, final Context context)
+  private static String value(final String query, final Item item, final Context ctx)
       throws QueryException {
 
-    final QueryProcessor qp = new QueryProcessor(query, context).context(item);
+    final QueryProcessor qp = new QueryProcessor(query, ctx).context(item);
     final Item it = qp.iter().next();
     return it == null ? null : Token.string(it.string(null));
   }
@@ -167,7 +161,7 @@ public class RESTPost extends RESTCode {
       VALIDATOR.validate(new DOMSource(db.parse(new ArrayInput(input))));
     } catch(final Exception ex) {
       // validation fails
-      throw new HTTPException(SC_BAD_REQUEST, ex.getMessage());
+      HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
   }
 }

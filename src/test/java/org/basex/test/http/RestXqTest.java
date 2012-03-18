@@ -12,7 +12,7 @@ import org.basex.util.*;
 import org.junit.*;
 
 /**
- * This class tests the RESTful Annotations for XQuery implementation.
+ * This class contains RESTXQ API tests.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -23,7 +23,7 @@ public final class RestXqTest extends HTTPTest {
   /** Query header. */
   private static final String HEADER =
     "module  namespace m = 'http://basex.org/modules/restxq/test';" + Prop.NL +
-    "declare namespace R = 'http://exquery.org/ns/rest/annotation';" + Prop.NL;
+    "declare namespace R = 'http://exquery.org/ns/restxq';" + Prop.NL;
   /** Counter. */
   private static int count;
 
@@ -236,14 +236,19 @@ public final class RestXqTest extends HTTPTest {
         "function m:f($v) {$v};", "?a=1", "1");
     get("declare %R:path('') %R:query-param('a','{$a}') " +
         "function m:f($a) {$a*2};", "?a=1", "2");
+    get("declare %R:path('') %R:query-param('a','{$a}') " +
+        "function m:f($a as xs:integer*) {count($a)};", "?a=4&a=8", "2");
     get("declare %R:path('') %R:query-param('a','{$v}',3) " +
         "function m:f($v) {$v};", "", "3");
+    get("declare %R:path('') %R:query-param('a','{$v}',4,8) " +
+        "function m:f($v) {count($v)};", "", "2");
     get("declare %R:path('') %R:query-param('a','{$a}') %R:query-param('b','{$b}') " +
         "function m:f($a,$b) {$a*$b};", "?a=2&b=3", "6");
+    // missing assignment: default value is empty sequence
+    get("declare %R:path('') %R:query-param('a','{$v}') " +
+        "function m:f($v) {count($v)};", "", "0");
     // missing variable declaration
     getE("declare %R:path('') %R:query-param('a','{$a}') function m:f() {1};", "?a=2");
-    // missing assignment and default value
-    getE("declare %R:path('') %R:query-param('a','{$v}') function m:f($v) {$v};", "");
     // variable is specified more than once
     getE("declare %R:path('') %R:query-param('a','{$a}') %R:query-param('a','{$a}') " +
         "function m:f($a) {$a};", "?a=2");
@@ -251,6 +256,19 @@ public final class RestXqTest extends HTTPTest {
     getE("declare %R:path('') %R:query-param(1,'{$a}') function m:f($a) {$a};", "?a=2");
     // invalid path template
     getE("declare %R:path('') %R:query-param('a','$a') function m:f($a) {$a};", "?a=2");
+    // invalid type cardinality
+    getE("declare %R:path('') %R:query-param('a','{$a}') " +
+        "function m:f($a as item()) {()};", "?a=4&a=8");
+  }
+
+  /**
+   * Form parameters (same as %query-param if GET is used).
+   * @throws Exception exception
+   */
+  @Test public void formParams() throws Exception {
+    // correct syntax
+    get("declare %R:path('') %R:form-param('a','{$v}') " +
+        "function m:f($v) {$v};", "?a=1", "1");
   }
 
   // PRIVATE METHODS ==========================================================

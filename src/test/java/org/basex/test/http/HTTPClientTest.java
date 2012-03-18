@@ -806,8 +806,7 @@ public class HTTPClientTest extends HTTPTest {
     assertTrue(res.get(0) instanceof FElem);
     final FElem response = (FElem) res.get(0);
     assertNotNull(response.attributes());
-    final NodeIter resAttr = response.attributes();
-    for(ANode attr; (attr = resAttr.next()) != null;) {
+    for(final ANode attr : response.attributes()) {
       if(eq(attr.name(), STATUS) && !eq(attr.string(), token(expStatus))) {
         fail("Expected: " + expStatus + "\nFound: " + string(attr.string()));
       }

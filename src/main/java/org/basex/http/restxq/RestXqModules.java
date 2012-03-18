@@ -8,7 +8,7 @@ import org.basex.io.*;
 import org.basex.query.*;
 
 /**
- * This class caches RESTful XQuery modules found in the HTTP root directory.
+ * This class caches RESXQ modules found in the HTTP root directory.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

@@ -10,19 +10,17 @@ import org.basex.util.*;
  */
 public final class HTTPException extends Exception {
   /** Status code. */
-  private final int stat;
+  private final int status;
 
   /**
    * Constructs an exception with the specified message and extension.
-   * @param status status code
-   * @param message message, or {@code null}
-   * @param extension message extension
+   * @param err error
+   * @param ext message extension
    */
-  public HTTPException(final int status, final String message,
-      final Object... extension) {
-
-    super(Util.info(message, extension));
-    stat = status;
+  public HTTPException(final HTTPErr err, final Object... ext) {
+    //this(err.code, err.desc, ext);
+    super(Util.info(err.desc, ext));
+    status = err.code;
   }
 
   /**
@@ -30,6 +28,6 @@ public final class HTTPException extends Exception {
    * @return status code
    */
   public int getStatus() {
-    return stat;
+    return status;
   }
 }

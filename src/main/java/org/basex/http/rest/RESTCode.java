@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.rest.RESTText.*;
 import static org.basex.query.func.Function.*;
 
@@ -41,7 +40,7 @@ abstract class RESTCode {
     try {
       http.session().execute(new Open(http.path()));
     } catch(final IOException ex) {
-      throw new HTTPException(SC_NOT_FOUND, ex.getMessage());
+      HTTPErr.NOT_FOUND_X.thrw(ex);
     }
   }
 
@@ -57,7 +56,7 @@ abstract class RESTCode {
       try {
         SerializerProp.error(WRAP, val, Text.YES, Text.NO);
       } catch(final SerializerException ex) {
-        throw new HTTPException(SC_BAD_REQUEST, ex.getMessage());
+        HTTPErr.BAD_REQUEST_X.thrw(ex);
       }
     }
   }
@@ -105,14 +104,11 @@ abstract class RESTCode {
    * Parses and sets database options.
    * Throws an exception if an option is unknown.
    * @param http HTTP context
-   * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  static void parseOptions(final HTTPContext http) throws HTTPException, IOException {
+  static void parseOptions(final HTTPContext http) throws IOException {
     for(final Entry<String, String[]> param : http.params().entrySet()) {
-     if(!parseOption(http, param)) {
-       throw new HTTPException(SC_BAD_REQUEST, ERR_PARAM, param.getKey());
-     }
+      parseOption(http, param, true);
     }
   }
 
@@ -120,15 +116,16 @@ abstract class RESTCode {
    * Parses and sets a single database option.
    * @param http HTTP context
    * @param param current parameter
+   * @param force force execution
    * @return success flag
    * @throws IOException I/O exception
    */
-  static boolean parseOption(final HTTPContext http, final Entry<String, String[]> param)
-      throws IOException {
+  static boolean parseOption(final HTTPContext http, final Entry<String, String[]> param,
+      final boolean force) throws IOException {
 
     final String key = param.getKey().toUpperCase(Locale.ENGLISH);
     final boolean found = http.context().prop.get(key) != null;
-    if(found) http.session().execute(new Set(key, param.getValue()[0]));
+    if(found || force) http.session().execute(new Set(key, param.getValue()[0]));
     return found;
   }
 }

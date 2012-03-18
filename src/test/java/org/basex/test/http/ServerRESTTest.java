@@ -3,7 +3,7 @@ package org.basex.test.http;
 import org.junit.BeforeClass;
 
 /**
- * This class tests the server-based REST implementation.
+ * This class tests the server-based REST API.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

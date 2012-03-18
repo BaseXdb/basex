@@ -1,14 +1,11 @@
 package org.basex.http.restxq;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.http.restxq.RestXqText.*;
-
 import org.basex.http.*;
 
 /**
  * <p>This servlet receives and processes REST requests.
  * The evaluated code is defined in XQuery modules, which are located in the web server's
- * root directory (specified by the {@code HTTPPATH} option), and decorated with RESTful
+ * root directory (specified by the {@code HTTPPATH} option), and decorated with RESTXQ
  * annotations.</p>
  *
  * <p>The implementation is based on Adam Retter's paper presented at XMLPrague 2012,
@@ -20,10 +17,13 @@ import org.basex.http.*;
 public final class RestXqServlet extends BaseXServlet {
   @Override
   protected void run() throws Exception {
+    // authenticate user
+    http.session();
+
     // selects an XQuery module for the specified annotation
     final RestXqModule module = RestXqModules.get().find(http);
     // no module found: return 404
-    if(module == null) throw new HTTPException(SC_NOT_FOUND, NOT_FOUND);
+    if(module == null) HTTPErr.NO_XQUERY.thrw();
     // process module
     module.process(http);
   }
@@ -31,6 +31,6 @@ public final class RestXqServlet extends BaseXServlet {
 
 /* [CG] RESTXQ: Open Issues
  * - resolve conflicting paths: what is "more specific"?
- * - check methods: HEAD must only return rest:reponse element
  * - check compatibility of annotation and function return type
+ * - test nested modules
  */

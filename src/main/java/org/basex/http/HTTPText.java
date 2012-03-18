@@ -7,6 +7,13 @@ package org.basex.http;
  * @author Christian Gruen
  */
 public interface HTTPText {
+  /** WWW-Authentication string. */
+  String WWW_AUTHENTICATE = "WWW-Authenticate";
+  /** HTTP header: Authorization. */
+  String AUTHORIZATION = "Authorization";
+  /** HTTP basic authentication. */
+  String BASIC = "Basic";
+
   /** HTTP String. */
   String HTTP = "HTTP";
   /** Servlet string. */
@@ -31,7 +38,7 @@ public interface HTTPText {
   /** Error: no password. */
   String NOPASSWD = "No username/password specified.";
   /** Error: unsupported authorization method. */
-  String WHICHAUTH = "Unsupported authorization method: %.";
+  String WHICHAUTH = "Unsupported Authorization method: %.";
   /** Error: only allow local or client mode. */
   String INVMODE = "You cannot use both local and client mode.";
   /** Error message. */

@@ -9,7 +9,6 @@ import java.net.*;
 
 import org.basex.*;
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
@@ -19,7 +18,7 @@ import org.basex.util.list.*;
 import org.junit.*;
 
 /**
- * This class tests the RESTful Annotations for XQuery implementation.
+ * This class contains common methods for the HTTP services.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -139,10 +138,10 @@ public abstract class HTTPTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod(POST.name());
-    conn.setRequestProperty(DataText.CONTENT_TYPE, type);
+    conn.setRequestProperty(MimeTypes.CONTENT_TYPE, type);
     // basic authentication
     final String encoded = Base64.encode(Text.ADMIN + ':' + Text.ADMIN);
-    conn.setRequestProperty(DataText.AUTHORIZATION, DataText.BASIC + ' ' + encoded);
+    conn.setRequestProperty(HTTPText.AUTHORIZATION, HTTPText.BASIC + ' ' + encoded);
     // send query
     final OutputStream out = conn.getOutputStream();
     out.write(token(request));

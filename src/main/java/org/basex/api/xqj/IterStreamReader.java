@@ -115,8 +115,7 @@ final class IterStreamReader implements XMLStreamReader {
     if(atts == null) {
       checkType(START_ELEMENT, ATTRIBUTE);
       atts = new NodeCache();
-      final AxisIter ai = node.attributes();
-      for(ANode n; (n = ai.next()) != null;) atts.add(n.finish());
+      for(final ANode n : node.attributes()) atts.add(n.finish());
     }
     return atts;
   }

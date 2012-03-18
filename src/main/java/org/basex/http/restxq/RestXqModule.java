@@ -1,24 +1,18 @@
 package org.basex.http.restxq;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.http.restxq.RestXqText.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
 
 import org.basex.http.*;
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.item.*;
-import org.basex.query.item.SeqType.Occ;
-import org.basex.query.iter.*;
-import org.basex.query.path.*;
 import org.basex.util.*;
 
 /**
- * This class caches information on a single XQuery module with RESTful annotations.
+ * This class caches information on a single XQuery module with RESTXQ annotations.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -100,7 +94,7 @@ final class RestXqModule {
       // find and evaluate relevant function
       final RestXqFunction rxf = new RestXqFunction(uf, qc);
       if(rxf.analyze() && rxf.matches(http)) {
-        process(rxf, qc, http);
+        new RestXqResponse(rxf, qc, http).create();
         break;
       }
     }
@@ -116,7 +110,7 @@ final class RestXqModule {
    */
   private QueryContext parse(final HTTPContext http) throws QueryException {
     try {
-      final String query = Token.string(file.read());
+      final String query = string(file.read());
       final QueryContext qc = new QueryContext(http.context());
       qc.sc.baseURI(file.path());
       qc.module(query);
@@ -125,51 +119,5 @@ final class RestXqModule {
       // Unexpected: XQuery module could not be opened
       throw new RuntimeException(Util.message(ex));
     }
-  }
-
-  /**
-   * Evaluates the specified function.
-   * @param rxf function container
-   * @param qc query context
-   * @param http HTTP context
-   * @throws QueryException query exception
-   * @throws IOException I/O exception
-   */
-  private void process(final RestXqFunction rxf, final QueryContext qc,
-      final HTTPContext http) throws QueryException, IOException {
-
-    // wrap function with a function call
-    final UserFunc uf = rxf.function;
-    final BaseFuncCall bfc = new BaseFuncCall(null, uf.name, uf.args);
-    bfc.init(uf);
-
-    // bind variables
-    rxf.bind(http);
-
-    // compile and evaluate function
-    final Value result = bfc.comp(qc).value(qc);
-
-    // execute updates
-    if(qc.updating()) qc.updates.apply();
-
-    // [CG] RESTXQ: what happens if a function specifies other methods beside HEAD?
-    if(rxf.methods.size() == 1 && rxf.methods.contains(HTTPMethod.HEAD)) {
-      final QNm response = new QNm(RESPONSE, QueryText.REXQURI);
-      final ExtKindTest dt = new ExtKindTest(NodeType.ELM, response, null, qc);
-      final SeqType type = SeqType.get(NodeType.NOD, Occ.ONE, dt);
-      if(!type.instance(result)) rxf.error(HEAD_METHOD);
-    }
-
-    // set serialization parameters
-    http.initResponse(rxf.output);
-
-    // serialize result
-    final Serializer ser = Serializer.get(http.out, rxf.output);
-    final ValueIter ir = result.iter();
-    for(Item it; (it = ir.next()) != null;) it.serialize(ser);
-    ser.close();
-
-    // send OK status
-    http.status(SC_OK, null);
   }
 }

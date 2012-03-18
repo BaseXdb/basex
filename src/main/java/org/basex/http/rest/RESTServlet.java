@@ -1,7 +1,5 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
-
 import org.basex.http.*;
 
 /**
@@ -13,14 +11,20 @@ import org.basex.http.*;
 public final class RESTServlet extends BaseXServlet {
   @Override
   protected void run() throws Exception {
-    final RESTCode code;
-    switch(http.method) {
-      case DELETE: code = new RESTDelete(); break;
-      case GET:    code = new RESTGet();    break;
-      case POST:   code = new RESTPost();   break;
-      case PUT:    code = new RESTPut();    break;
-      default:     throw new HTTPException(SC_NOT_IMPLEMENTED, http.method.toString());
-    }
-    code.run(http);
+    code(http.method).run(http);
+  }
+
+  /**
+   * Returns the correct code for the specified HTTP method, or an exception.
+   * @param mth HTTP method
+   * @return code
+   * @throws HTTPException HTTP exception
+   */
+  private RESTCode code(final HTTPMethod mth) throws HTTPException {
+    if(mth == HTTPMethod.GET)    return new RESTGet();
+    if(mth == HTTPMethod.POST)   return new RESTPost();
+    if(mth == HTTPMethod.PUT)    return new RESTPut();
+    if(mth == HTTPMethod.DELETE) return new RESTDelete();
+    throw HTTPErr.NOT_IMPLEMENTED_X.thrw(http.req.getMethod());
   }
 }

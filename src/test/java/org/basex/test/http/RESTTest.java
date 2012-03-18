@@ -9,15 +9,15 @@ import java.io.*;
 import java.net.*;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.http.rest.*;
+import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.func.*;
 import org.basex.util.*;
 import org.junit.*;
 
 /**
- * This class tests the embedded REST implementation.
+ * This class tests the embedded REST API.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -485,7 +485,7 @@ public class RESTTest extends HTTPTest {
     final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setDoOutput(true);
     conn.setRequestMethod(PUT.name());
-    if(ctype != null) conn.setRequestProperty(DataText.CONTENT_TYPE, ctype);
+    if(ctype != null) conn.setRequestProperty(MimeTypes.CONTENT_TYPE, ctype);
     final OutputStream bos = new BufferedOutputStream(conn.getOutputStream());
     if(is != null) {
       // send input stream if it not empty

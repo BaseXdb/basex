@@ -1,6 +1,5 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
 import static org.basex.http.rest.RESTText.*;
 
 import java.io.*;
@@ -37,8 +36,7 @@ final class RESTGet extends RESTCode {
       final String val = vals[0];
 
       if(Token.eqic(key, COMMAND, QUERY, RUN)) {
-        if(operation != null || vals.length > 1)
-          throw new HTTPException(SC_BAD_REQUEST, ERR_ONLYONE);
+        if(operation != null || vals.length > 1) HTTPErr.ONEOP.thrw();
         operation = key;
         input = val;
       } else if(key.equalsIgnoreCase(WRAP)) {
@@ -50,7 +48,7 @@ final class RESTGet extends RESTCode {
       } else if(sp.get(key) != null) {
         // serialization parameters
         for(final String v : vals) ser.add(key).add('=').add(v).add(',');
-      } else if(!parseOption(http, param)) {
+      } else if(!parseOption(http, param, false)) {
         // external variables
         vars.put(key, new String[] { val });
       }

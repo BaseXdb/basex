@@ -1,7 +1,5 @@
 package org.basex.http.rest;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import static org.basex.http.rest.RESTText.*;
 import static org.basex.io.MimeTypes.*;
 
 import java.io.*;
@@ -25,7 +23,7 @@ public class RESTPut extends RESTCode {
 
     // create new database or update resource
     final Session session = http.session();
-    if(http.depth() == 0) throw new HTTPException(SC_NOT_FOUND, ERR_NOPATH);
+    if(http.depth() == 0) HTTPErr.NO_PATH.thrw();
 
     boolean xml = true;
     final InputStream in = http.in;
@@ -66,6 +64,6 @@ public class RESTPut extends RESTCode {
     }
 
     // return correct status and command info
-    throw new HTTPException(SC_CREATED, session.info());
+    throw HTTPErr.CREATED_X.thrw(session.info());
   }
 }

@@ -24,8 +24,18 @@ interface RestXqText {
   /** Annotation "cookie-param". */
   byte[] COOKIE_PARAM = token("cookie-param");
 
-  /** Element "rest:response". */
+  /** Token "header". */
+  byte[] HEADER = token("header");
+  /** Token "response". */
   byte[] RESPONSE = token("response");
+  /** Token "status". */
+  byte[] STATUS = token("status");
+  /** Token "reason". */
+  byte[] REASON = token("reason");
+  /** Token "name". */
+  byte[] NAME = token("name");
+  /** Token "value". */
+  byte[] VALUE = token("value");
 
   /** Error message. */
   String ANN_MISSING = "Annotation % is missing.";
@@ -34,7 +44,7 @@ interface RestXqText {
   /** Error message. */
   String ANN_UNKNOWN = "Annotation %% is invalid or not supported.";
   /** Error message. */
-  String ANN_PARAMS = "Annotation %% requires 2 or 3 parameters.";
+  String ANN_PARAMS = "Annotation %% requires at least 2 parameters.";
   /** Error message. */
   String ANN_STRING = "Value of annotation %% is no string: %.";
   /** Error message. */
@@ -57,7 +67,4 @@ interface RestXqText {
   String METHOD_VALUE = "Method % does not allow values.";
   /** Error message. */
   String INPUT_CONV = "Input could not be converted: %";
-
-  /** Error message. */
-  String NOT_FOUND = "No XQuery function found to process the request.";
 }

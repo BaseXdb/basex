@@ -4,7 +4,7 @@
  :)
 module namespace page = 'http://basex.org/modules/web-page';
 
-declare namespace rest = 'http://exquery.org/ns/rest/annotation';
+declare namespace rest = 'http://exquery.org/ns/restxq';
 
 declare variable $page:style :=
   <style type="text/css"><!--
