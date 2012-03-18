@@ -39,8 +39,7 @@ public final class FNNode extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (expr.length != 0 ? expr[0] :
-      checkCtx(ctx)).item(ctx, input);
+    final Item it = (expr.length != 0 ? expr[0] : checkCtx(ctx)).item(ctx, input);
 
     switch(sig) {
       case NODE_NAME:
@@ -54,8 +53,7 @@ public final class FNNode extends StandardFunc {
         return uri.length == 0 ? null : Uri.uri(uri, false);
       case NILLED:
         // always false, as no schema information is given
-        return it == null || checkNode(it).type != NodeType.ELM ? null :
-          Bln.FALSE;
+        return it == null || checkNode(it).type != NodeType.ELM ? null : Bln.FALSE;
       case BASE_URI:
         if(it == null) return null;
         ANode n = checkNode(it);

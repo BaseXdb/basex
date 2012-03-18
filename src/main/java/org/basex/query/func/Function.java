@@ -257,7 +257,7 @@ public enum Function {
   /** XQuery function. */
   GENERATE_ID(FNNode.class, "generate-id([node])", STR, 0, NOD_ZO),
   /** XQuery function. */
-  HAS_CHILDREN(FNNode.class, "has-children(node)", BLN, NOD_ZM),
+  HAS_CHILDREN(FNNode.class, "has-children([node])", BLN, 0, NOD_ZM),
   /** XQuery function. */
   PATH(FNNode.class, "path([node])", STR_ZO, 0, NOD_ZO),
 
