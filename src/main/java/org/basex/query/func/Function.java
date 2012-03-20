@@ -721,7 +721,7 @@ public enum Function {
   _ZIP_UPDATE_ENTRIES(FNZip.class, "update-entries(zip,output)", EMP, ELM, STR);
 
   /** Updating functions. */
-  public static final Function[] UPDATING = {
+  static final Function[] UPDATING = {
     PUT, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE, _DB_OPTIMIZE, _DB_STORE
   };
 

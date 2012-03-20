@@ -2,11 +2,11 @@ package org.basex.io;
 
 import static org.basex.util.Token.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
+
+import org.basex.io.in.*;
 import org.basex.util.Util;
 
 /**
@@ -20,6 +20,8 @@ import org.basex.util.Util;
 public final class MimeTypes {
   /** Content-Type. */
   public static final String CONTENT_TYPE = "Content-Type";
+  /** Charset. */
+  public static final String CHARSET = "; charset=";
 
   /** Media type: application/html+xml. */
   public static final String APP_HTML_XML = "application/html+xml";
@@ -116,15 +118,15 @@ public final class MimeTypes {
 
   /** Reads in the mime-types. */
   static {
-    BufferedReader br = null;
+    NewlineInput nli = null;
     try {
       final String file = "/mime.txt";
       final InputStream is = MimeTypes.class.getResourceAsStream(file);
       if(is == null) {
         Util.errln(file + " not found.");
       } else {
-        br = new BufferedReader(new InputStreamReader(is));
-        for(String line; (line = br.readLine()) != null;) {
+        nli = new NewlineInput(is);
+        for(String line; (line = nli.readLine()) != null;) {
           final int i = line.indexOf('\t');
           if(i == -1 || line.startsWith("#")) continue;
           TYPES.put(line.substring(0, i), line.substring(i + 1));
@@ -133,7 +135,7 @@ public final class MimeTypes {
     } catch(final IOException ex) {
       Util.errln(ex);
     } finally {
-      if(br != null) try { br.close(); } catch(final IOException ex) { }
+      if(nli != null) try { nli.close(); } catch(final IOException ex) { }
     }
   }
 }

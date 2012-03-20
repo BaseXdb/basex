@@ -8,7 +8,7 @@ import static org.basex.util.Token.token;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public interface MAB2 {
+interface MAB2 {
   /** Root tag. */
   byte[] LIBRARY = token("Library");
   /** Medium tag. */

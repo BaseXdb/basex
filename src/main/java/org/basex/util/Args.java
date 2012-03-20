@@ -111,8 +111,7 @@ public final class Args {
       final StringBuilder sb = new StringBuilder();
       while(p < a.length()) sb.append(a.charAt(p++));
       final String str = sb.toString();
-      return str.equals("-") ?
-          new Scanner(System.in).useDelimiter("\0").next() : str;
+      return str.equals("-") ? new Scanner(System.in).useDelimiter("\0").next() : str;
     }
     return "";
   }
