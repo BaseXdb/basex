@@ -162,10 +162,10 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
     final BufferInput bi = new BufferInput(in, 1 << 22);
     try {
       // guess the content type from the first character
-      bi.encoding();
-      final boolean xml = bi.readChar() == '<';
+      final TextInput ti = new TextInput(bi);
+      final boolean xml = ti.read() == '<';
       try {
-        bi.reset();
+        ti.reset();
       } catch(final IOException e) {
       }
 
