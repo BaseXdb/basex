@@ -29,7 +29,7 @@ public abstract class BaseXServlet extends HttpServlet {
     // get context
     final ServletContext sc = config.getServletContext();
     // set options
-    Enumeration<?> en = sc.getInitParameterNames();
+    final Enumeration<?> en = sc.getInitParameterNames();
     while(en.hasMoreElements()) {
       final String n = en.nextElement().toString();
       if(n.startsWith(DBX)) setProperty(n, sc.getInitParameter(n));

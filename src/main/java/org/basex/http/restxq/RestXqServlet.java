@@ -31,6 +31,6 @@ public final class RestXqServlet extends BaseXServlet {
 
 /* [CG] RESTXQ: Open Issues
  * - resolve conflicting paths: what is "more specific"?
- * - check compatibility of annotation and function return type
+ * - add rest functions
  * - test nested modules
  */

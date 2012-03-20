@@ -40,14 +40,14 @@ final class RestXqFunction {
   EnumSet<HTTPMethod> methods = EnumSet.allOf(HTTPMethod.class);
   /** Serialization parameters. */
   final SerializerProp output = new SerializerProp();
-  /** Associated user function. */
+  /** Associated function. */
   final UserFunc function;
 
   /** Query context. */
   private final QueryContext context;
-  /** Consumed media type. */
+  /** Consumed media types. */
   private final StringList consumes = new StringList();
-  /** Returned media type. */
+  /** Returned media types. */
   private final StringList produces = new StringList();
   /** Query parameters. */
   private final ArrayList<RestXqParam> queryParams = new ArrayList<RestXqParam>();

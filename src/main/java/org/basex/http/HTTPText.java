@@ -16,8 +16,6 @@ public interface HTTPText {
 
   /** HTTP String. */
   String HTTP = "HTTP";
-  /** Servlet string. */
-  String SERVLET = "Servlet";
 
   /** Configuration prefix. */
   String DBX = "org.basex.";

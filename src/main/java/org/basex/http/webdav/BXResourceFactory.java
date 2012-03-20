@@ -21,7 +21,7 @@ import com.bradmcevoy.http.*;
  */
 public final class BXResourceFactory implements ResourceFactory {
   /** HTTP Context. */
-  private HTTPContext http;
+  private final HTTPContext http;
 
   /**
    * Constructor.
