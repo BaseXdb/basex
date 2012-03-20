@@ -1,59 +1,46 @@
 package org.basex.io.in;
 
-import static org.basex.util.Token.*;
-
 import java.io.*;
-import java.nio.*;
-import java.nio.charset.*;
-import java.util.*;
 import java.util.zip.*;
 
 import org.basex.io.*;
 import org.basex.util.list.*;
 
 /**
- * This class uses a byte buffer to speed up input stream processing.
+ * This class uses an internal buffer to speed up input stream processing.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public class BufferInput extends InputStream {
-  /** UTF8 cache. */
-  private final byte[] cache = new byte[4];
-
   /** Byte buffer. */
   final byte[] buffer;
   /** Current buffer position. */
   int bpos;
   /** Current buffer size. */
   int bsize;
+  /** Total length of input to be processed (may be {@code 0}). */
+  long length;
 
   /** Reference to the data input stream. */
-  private InputStream in;
-  /** Default encoding for text files. */
-  private String enc = UTF8;
-  /** Charset decoder. */
-  private CharsetDecoder csd;
-
-  /** Total length of input to be processed (may be {@code 0}). */
-  private long length;
+  private final InputStream in;
   /** Buffer marker to jump back (not available when set to {@code -1}. */
   private int bmark;
   /** Number of read bytes. */
   private int read;
 
   /**
-   * Initializes the file reader.
-   * @param file the file to be read
+   * Constructor.
+   * @param io input to be read
    * @throws IOException I/O Exception
    */
-  public BufferInput(final IOFile file) throws IOException {
-    this(new FileInputStream(file.file()));
-    length = file.length();
+  public BufferInput(final IO io) throws IOException {
+    this(io.inputStream());
+    length = io.length();
   }
 
   /**
-   * Initializes the file reader.
+   * Constructor.
    * @param is input stream
    */
   public BufferInput(final InputStream is) {
@@ -78,49 +65,7 @@ public class BufferInput extends InputStream {
     buffer = buf;
     bsize = buf.length;
     length = bsize;
-  }
-
-  /**
-   * Guesses the file encoding, based on the first characters.
-   * @return encoding
-   * @throws IOException I/O exception
-   */
-  public final String encoding() throws IOException {
-    final int a = read();
-    final int b = read();
-    final int c = read();
-    final int d = read();
-    int skip = 0;
-    if(a == 0xFF && b == 0xFE) { // BOM: FF FE
-      enc = UTF16LE;
-      skip = 2;
-    } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
-      enc = UTF16BE;
-      skip = 2;
-    } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
-      skip = 3;
-    } else if(a == '<' && b == 0 && c == '?' && d == 0) {
-      enc = UTF16LE;
-    } else if(a == 0 && b == '<' && c == 0 && d == '?') {
-      enc = UTF16BE;
-    }
-    reset();
-    for(int s = 0; s < skip; s++) read();
-    return enc;
-  }
-
-  /**
-   * Sets a new encoding.
-   * @param encoding encoding
-   * @throws IOException I/O Exception
-   */
-  public final void encoding(final String encoding) throws IOException {
-    try {
-      enc = normEncoding(encoding, enc);
-      csd = Charset.forName(encoding).newDecoder();
-    } catch(final Exception ex) {
-      throw new IOException(ex.toString());
-    }
+    in = null;
   }
 
   /**
@@ -131,6 +76,16 @@ public class BufferInput extends InputStream {
    */
   @Override
   public int read() throws IOException {
+    return next();
+  }
+
+  /**
+   * Returns the next byte (see {@link InputStream#read}.
+   * {@code -1} is returned if all bytes have been read.
+   * @return next byte
+   * @throws IOException I/O exception
+   */
+  protected int next() throws IOException {
     final int blen = buffer.length;
     final byte[] buf = buffer;
     if(bpos >= bsize) {
@@ -157,7 +112,7 @@ public class BufferInput extends InputStream {
    */
   public final String readString() throws IOException {
     final ByteList bl = new ByteList();
-    for(int l; (l = read()) > 0;) bl.add(l);
+    for(int l; (l = next()) > 0;) bl.add(l);
     return bl.toString();
   }
 
@@ -168,47 +123,8 @@ public class BufferInput extends InputStream {
    */
   public final byte[] readBytes() throws IOException {
     final ByteList bl = new ByteList();
-    for(int l; (l = read()) > 0;) bl.add(l);
+    for(int l; (l = next()) > 0;) bl.add(l);
     return bl.toArray();
-  }
-
-  /**
-   * Returns the next character (code point), or {@code -1} if end of stream
-   * is reached. Erroneous characters are ignored.
-   * @return next character
-   * @throws IOException I/O exception
-   */
-  public final int readChar() throws IOException {
-    final int ch = read();
-    if(ch == -1) return ch;
-
-    // handle different encodings (comparing by references is safe here)
-    final String e = enc;
-    if(e == UTF16LE) return ch | read() << 8;
-    if(e == UTF16BE) return ch << 8 | read();
-    if(ch < 0x80) return ch;
-    if(e == UTF8) {
-      final int cl = cl((byte) ch);
-      cache[0] = (byte) ch;
-      for(int c = 1; c < cl; ++c) cache[c] = (byte) read();
-      return cp(cache, 0);
-    }
-
-    // convert other encodings.. loop until all needed bytes have been read
-    int p = 0;
-    while(true) {
-      if(p == 4) return -cache[0];
-      cache[p++] = (byte) ch;
-      try {
-        final CharBuffer cb = csd.decode(
-            ByteBuffer.wrap(Arrays.copyOf(cache, p)));
-        int i = 0;
-        for(int c = 0; c < cb.limit(); ++c) i |= cb.get(c) << (c << 3);
-        return i;
-      } catch(final CharacterCodingException ex) {
-        // ignore erroneous characters
-      }
-    }
   }
 
   @Override
@@ -235,9 +151,11 @@ public class BufferInput extends InputStream {
   /**
    * Sets the input length.
    * @param l input length
+   * @return self reference
    */
-  public final void length(final long l) {
+  public final BufferInput length(final long l) {
     length = l;
+    return this;
   }
 
   @Override
@@ -262,13 +180,21 @@ public class BufferInput extends InputStream {
    * @throws IOException I/O exception
    */
   public byte[] content() throws IOException {
-    // guess input size
-    final ByteList tb = new ByteList();
     try {
-      for(int ch; (ch = read()) != -1;) tb.add(ch);
+      if(length > 0) {
+        // input length is known in advance
+        final int sl = (int) Math.min(Integer.MAX_VALUE, length);
+        final byte[] bytes = new byte[sl];
+        for(int c = 0; c < sl; c++) bytes[c] = (byte) next();
+        return bytes;
+      }
+      // parse until end of stream
+      final ByteList bl = new ByteList();
+      for(int ch; (ch = next()) != -1;) bl.add(ch);
+      return bl.toArray();
+
     } finally {
       close();
     }
-    return tb.toArray();
   }
 }

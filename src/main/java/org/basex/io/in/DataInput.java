@@ -1,11 +1,10 @@
 package org.basex.io.in;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import org.basex.io.IOFile;
-import org.basex.util.Num;
-import org.basex.util.Token;
-import org.basex.util.list.IntList;
+import java.io.*;
+
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is an input stream for project specific data types.
@@ -17,11 +16,11 @@ import org.basex.util.list.IntList;
 public final class DataInput extends BufferInput {
   /**
    * Constructor.
-   * @param file the file to be read
+   * @param io the input to be read
    * @throws IOException I/O Exception
    */
-  public DataInput(final IOFile file) throws IOException {
-    super(file);
+  public DataInput(final IO io) throws IOException {
+    super(io);
   }
 
   /**

@@ -33,10 +33,8 @@ public final class B64Stream extends B64 implements Streamable {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
-    return type == it.type ? input.eq(((B64Stream) it).input) :
-      super.eq(ii, it);
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+    return type == it.type ? input.eq(((B64Stream) it).input) : super.eq(ii, it);
   }
 
   @Override

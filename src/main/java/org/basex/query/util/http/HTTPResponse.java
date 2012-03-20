@@ -153,7 +153,7 @@ public final class HTTPResponse {
       // In case of XML, HTML or text content type, use supplied character set
       if(MimeTypes.isXML(c) || c.equals(MimeTypes.TEXT_HTML) ||
           c.startsWith(MimeTypes.MIME_TEXT_PREFIX))
-        return new NewlineInput(new IOContent(bl.toArray()), ce).content();
+        return new NewlineInput(new IOContent(bl.toArray())).encoding(ce).content();
 
       // In case of binary data, do not encode anything
       return bl.toArray();
@@ -332,7 +332,7 @@ public final class HTTPResponse {
       }
       bl.add(next).add('\n');
     }
-    return new NewlineInput(new IOContent(bl.toArray()), ce).content();
+    return new NewlineInput(new IOContent(bl.toArray())).encoding(ce).content();
   }
 
   /**

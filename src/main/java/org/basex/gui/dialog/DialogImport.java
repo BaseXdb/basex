@@ -263,9 +263,9 @@ public final class DialogImport extends BaseXBack {
   String guess(final IO in) {
     if(!in.exists()) return null;
 
-    TextInput ti = null;
+    BufferInput ti = null;
     try {
-      ti = new TextInput(in);
+      ti = new BufferInput(in.inputStream());
       int b = ti.read();
       // input starts with opening bracket: may be xml
       if(b == '<') return DataText.M_XML;

@@ -72,7 +72,7 @@ public class BaseX extends Main {
           // run commands from script file
           final IO io = IO.get(val);
           if(!io.exists()) throw new BaseXException(FILE_NOT_FOUND_X, val);
-          final NewlineInput nli = new NewlineInput(io, null);
+          final NewlineInput nli = new NewlineInput(io);
           try {
             for(String line; (line = nli.readLine()) != null;) {
               final String l = line.trim();
@@ -86,7 +86,7 @@ public class BaseX extends Main {
           // query file
           final IO io = IO.get(val);
           if(!io.exists()) throw new BaseXException(FILE_NOT_FOUND_X, val);
-          final String query = Token.string(new NewlineInput(io, null).content()).trim();
+          final String query = Token.string(new NewlineInput(io).content()).trim();
           execute(new Set(Prop.QUERYPATH, io.path()), false);
           execute(new XQuery(query), verbose);
         } else if(key.equals("i")) {

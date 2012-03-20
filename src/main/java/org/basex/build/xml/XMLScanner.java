@@ -12,7 +12,7 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.in.TextInput;
+import org.basex.io.in.*;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.basex.util.hash.TokenMap;
@@ -68,7 +68,7 @@ final class XMLScanner extends Progress {
   /** Current quote character. */
   private int quote;
   /** XML input. */
-  private TextInput input;
+  private XMLInput input;
 
   /**
    * Initializes the scanner.
@@ -77,7 +77,7 @@ final class XMLScanner extends Progress {
    * @throws IOException I/O exception
    */
   XMLScanner(final IO f, final Prop pr) throws IOException {
-    input = new TextInput(f);
+    input = new XMLInput(f);
     for(int e = 0; e < ENTITIES.length; e += 2) {
       ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
     }
@@ -495,7 +495,7 @@ final class XMLScanner extends Progress {
 
     byte[] en = ents.get(name);
     if(en == null) {
-      // unknown entity: try HTML entities
+      // unknown entity: try HTML entities (lazy initialization)
       if(HTMLENTS.size() == 0) {
         for(int s = 0; s < HTMLENTITIES.length; s += 2) {
           HTMLENTS.add(token(HTMLENTITIES[s]), token(HTMLENTITIES[s + 1]));
@@ -682,7 +682,7 @@ final class XMLScanner extends Progress {
         final String name = string(tok.finish());
         if(!dtd && r) return cont;
 
-        final TextInput tin = input;
+        final XMLInput tin = input;
         try {
           final IO file = input.io().merge(name);
           cont = file.read();
@@ -691,7 +691,7 @@ final class XMLScanner extends Progress {
           // skip unknown DTDs/entities
           cont = new byte[] { '?' };
         }
-        input = new TextInput(new IOContent(cont, name));
+        input = new XMLInput(new IOContent(cont, name));
 
         if(consume(XDECL)) {
           check(XML); s();
@@ -922,8 +922,8 @@ final class XMLScanner extends Progress {
       }
     }
 
-    final TextInput tmp = input;
-    input = new TextInput(new IOContent(tok.finish()));
+    final XMLInput tmp = input;
+    input = new XMLInput(new IOContent(tok.finish()));
     tok = new TokenBuilder();
     while((ch = consume()) != 0) {
       if(ch == '&') tok.add(ref(false));

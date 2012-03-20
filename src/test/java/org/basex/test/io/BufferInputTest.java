@@ -4,14 +4,9 @@ import static org.junit.Assert.*;
 
 import java.io.IOException;
 
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.in.BufferInput;
-import org.basex.io.out.ArrayOutput;
-import org.basex.test.build.AddDeleteTest;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.util.*;
 import org.junit.Test;
 
 /**
@@ -21,17 +16,24 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class BufferInputTest {
-  /** Test database name. */
-  private static final String DB = Util.name(AddDeleteTest.class);
-
   /**
    * Test small array.
    * @throws IOException I/O exception
    */
   @Test
   public void read1() throws IOException {
-    final byte[] data = new byte[1];
-    for(int d = 0; d < data.length; d++) data[d] = (byte) d;
+    final byte[] data = { ' ' };
+    run(data);
+  }
+
+  /**
+   * Test intermediate array.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void read255() throws IOException {
+    final byte[] data = new byte[255];
+    for(int d = 0; d < data.length; d++) data[d] = (byte) (' ' + (d & 0x3F));
     run(data);
   }
 
@@ -42,7 +44,7 @@ public final class BufferInputTest {
   @Test
   public void read4095() throws IOException {
     final byte[] data = new byte[4095];
-    for(int d = 0; d < data.length; d++) data[d] = (byte) d;
+    for(int d = 0; d < data.length; d++) data[d] = (byte) (' ' + (d & 0x3F));
     run(data);
   }
 
@@ -53,8 +55,65 @@ public final class BufferInputTest {
   @Test
   public void read65535() throws IOException {
     final byte[] data = new byte[65535];
-    for(int d = 0; d < data.length; d++) data[d] = (byte) d;
+    for(int d = 0; d < data.length; d++) data[d] = (byte) (' ' + (d & 0x3F));
     run(data);
+  }
+
+  /**
+   * Test unknown encoding.
+   * @throws IOException I/O exception
+   */
+  @Test(expected = IOException.class)
+  public void unknownEncoding() throws IOException {
+    encoding("unknown", "");
+  }
+
+  /**
+   * Test alternate encodings.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void ascii() throws IOException {
+    final String in = "a";
+    encoding("Shift_JIS", in);
+    encoding("UTF8", in);
+    encoding("UTF-8", in);
+    encoding("UTF-16LE", in);
+    encoding("UTF-16BE", in);
+    encoding("UTF-32", in);
+    encoding("GBK", in);
+    encoding("GBK", in);
+  }
+
+  /**
+   * Test alternate encodings.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void japanese() throws IOException {
+    final String in = "\u3053\u308c\u306f\u6bb4\u843d\u3067\u3059\u3002";
+    encoding("Shift_JIS", in);
+    encoding("UTF8", in);
+    encoding("UTF-8", in);
+    encoding("UTF-16LE", in);
+    encoding("UTF-16BE", in);
+    encoding("UTF-32", in);
+    encoding("GBK", in);
+    encoding("GBK", in);
+  }
+
+  /**
+   * Test alternate encoding.
+   * @param enc encoding to be tested
+   * @param input input string
+   * @throws IOException I/O exception
+   */
+  public void encoding(final String enc, final String input) throws IOException {
+    final byte[] utf8 = Token.token(input);
+
+    final IO io = new IOContent(input.getBytes(enc));
+    final byte[] cache = new TextInput(io).encoding(enc).content();
+    assertSame(cache, utf8);
   }
 
   /**
@@ -63,26 +122,19 @@ public final class BufferInputTest {
    * @throws IOException I/O exception
    */
   private static void run(final byte[] data) throws IOException {
-    for(int d = 0; d < data.length; d++) data[d] = (byte) d;
-    final IOFile io = new IOFile(Prop.TMP, DB);
-    io.write(data);
+    final TokenBuilder tb = new TokenBuilder();
+    final TextInput ti = new TextInput(new IOContent(data));
+    ti.read();
+    ti.reset();
 
-    final ArrayOutput ao = new ArrayOutput();
-    final BufferInput bi = new BufferInput(io);
-    bi.reset();
-    // guess encoding
-    bi.encoding();
-    bi.readChar();
-    bi.reset();
-
-    for(int b; (b = bi.read()) != -1;) ao.write(b);
+    for(int b; (b = ti.read()) != -1;) tb.add(b);
     try {
-      bi.reset();
+      ti.reset();
       assertTrue("Mark should not be supported for data size of " + data.length,
           data.length < IO.BLOCKSIZE);
-      ao.reset();
-      for(int b; (b = bi.read()) != -1;) ao.write(b);
-      assertEquals(data, ao.toArray());
+      tb.reset();
+      for(int b; (b = ti.read()) != -1;) tb.add(b);
+      assertSame(data, tb.finish());
     } catch(final IOException ex) {
       assertTrue("Mark could not be reset for data size of " + data.length,
           data.length >= IO.BLOCKSIZE);
@@ -94,7 +146,8 @@ public final class BufferInputTest {
    * @param data1 first array
    * @param data2 first array
    */
-  private static void assertEquals(final byte[] data1, final byte[] data2) {
-    assertTrue("Original and read data differs.", Token.eq(data1, data2));
+  private static void assertSame(final byte[] data1, final byte[] data2) {
+    assertEquals("Different array size: ", data1.length, data2.length);
+    assertTrue("Data arrays differ: ", Token.eq(data1, data2));
   }
 }

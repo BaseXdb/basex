@@ -63,11 +63,11 @@ public final class FNZipTest extends AdvancedQueryTest {
   @Test
   public void binaryEntry() {
     check(_ZIP_BINARY_ENTRY);
-//    query(ZIPBIN.args(ZIP, ENTRY1));
-//    contains("xs:hexBinary(" + ZIPBIN.args(ZIP, ENTRY1) + ")", "610A61626F");
-//
-//    error(ZIPBIN.args("abc", "xyz"), Err.ZIPNOTFOUND);
-//    error(ZIPBIN.args(ZIP, ""), Err.ZIPNOTFOUND);
+    query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
+    contains("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ")", "610A61626F");
+
+    error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), Err.ZIPNOTFOUND);
+    error(_ZIP_BINARY_ENTRY.args(ZIP, ""), Err.ZIPNOTFOUND);
   }
 
   /**

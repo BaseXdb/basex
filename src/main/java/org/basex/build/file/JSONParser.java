@@ -76,7 +76,7 @@ public final class JSONParser extends XMLParser {
     final String encoding = props.get(ParserProp.ENCODING);
 
     // parse input, using specified encoding
-    final byte[] content = new NewlineInput(io, encoding).content();
+    final byte[] content = new NewlineInput(io).encoding(encoding).content();
 
     // parse input and convert to XML node
     final ANode node;

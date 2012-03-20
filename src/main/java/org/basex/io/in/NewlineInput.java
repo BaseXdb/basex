@@ -16,32 +16,44 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class NewlineInput extends TextInput {
+  /** Next value ({@code -2} means no caching). */
+  private int next = -2;
+
   /**
    * Constructor.
    * @param is input stream
-   * @param enc encoding
    * @throws IOException I/O exception
    */
-  public NewlineInput(final InputStream is, final String enc) throws IOException {
+  public NewlineInput(final InputStream is) throws IOException {
     super(is);
-    if(enc != null) encoding(enc);
   }
 
   /**
    * Constructor.
    * @param in input
-   * @param enc encoding
    * @throws IOException I/O exception
    */
-  public NewlineInput(final IO in, final String enc) throws IOException {
-    this(in.inputStream(), enc);
+  public NewlineInput(final IO in) throws IOException {
+    this(in.inputStream());
+  }
+
+  @Override
+  public NewlineInput encoding(final String encoding) throws IOException {
+    super.encoding(encoding);
+    return this;
   }
 
   @Override
   public int read() throws IOException {
-    final int ch = super.read();
-    if(ch != '\r') return ch;
-    if(super.read() != '\n') prev(1);
+    int n = next;
+    if(n != -2) {
+      next = -2;
+    } else {
+      n = super.read();
+    }
+    if(n != '\r') return n;
+    n = super.read();
+    if(n != '\n') next = n;
     return '\n';
   }
 

@@ -33,7 +33,7 @@ public final class Retrieve extends ACreate {
       return error(FILE_NOT_FOUND_X, path);
 
     try {
-      final BufferInput bi = bin.inputStream();
+      final BufferInput bi = new BufferInput(bin);
       try {
         for(int b; (b = bi.read()) != -1;) out.write(b);
       } finally {

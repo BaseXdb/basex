@@ -1,12 +1,12 @@
 package org.basex.io.in;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
+import static org.basex.util.Token.*;
 
-import org.basex.io.IO;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import java.io.*;
+
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides a convenient access to text input.
@@ -15,23 +15,11 @@ import org.basex.util.TokenBuilder;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class TextInput extends InputStream {
-  /** Input file. */
-  private IO input;
-
-  /** Input streams. */
-  private BufferInput[] inputs = new BufferInput[1];
-  /** Input pointer. */
-  private int ip;
-  /** Current line. */
-  private int line = 1;
-
-  /** Buffer with most recent characters. */
-  private final int[] last = new int[16];
-  /** Read position. */
-  private int lp;
-  /** Backward pointer. */
-  private int pp;
+public class TextInput extends BufferInput {
+  /** Encoding. */
+  private String encoding;
+  /** Decoder. */
+  private TextDecoder decoder;
 
   /**
    * Constructor.
@@ -39,120 +27,78 @@ public class TextInput extends InputStream {
    * @throws IOException I/O exception
    */
   public TextInput(final InputStream is) throws IOException {
-    inputs[0] = is instanceof BufferInput ? (BufferInput) is : new BufferInput(is);
-    inputs[0].encoding();
+    super(is);
+    guess();
   }
 
   /**
    * Constructor.
-   * @param in file reference
+   * @param io input
    * @throws IOException I/O exception
    */
-  public TextInput(final IO in) throws IOException {
-    this(in.inputStream());
-    input = in;
+  public TextInput(final IO io) throws IOException {
+    super(io);
+    guess();
   }
 
   /**
+   * Tries to guess the character encoding, based on the first bytes.
+   * @throws IOException I/O exception
+   */
+  private void guess() throws IOException {
+    final int a = next();
+    final int b = next();
+    final int c = next();
+    final int d = next();
+    String e = null;
+    int skip = 0;
+    if(a == 0xFF && b == 0xFE) { // BOM: FF FE
+      e = UTF16LE;
+      skip = 2;
+    } else if(a == 0xFE && b == 0xFF) { // BOM: FE FF
+      e = UTF16BE;
+      skip = 2;
+    } else if(a == 0xEF && b == 0xBB && c == 0xBF) { // BOM: EF BB BF
+      skip = 3;
+    } else if(a == '<' && b == 0 && c == '?' && d == 0) {
+      e = UTF16LE;
+    } else if(a == 0 && b == '<' && c == 0 && d == '?') {
+      e = UTF16BE;
+    }
+    reset();
+    for(int s = 0; s < skip; s++) next();
+    encoding(e);
+  }
+
+  /**
+   * Returns the encoding.
    * Sets a new encoding.
-   * @param e encoding
-   * @throws IOException I/O exception
+   * @return encoding
    */
-  public void encoding(final String e) throws IOException {
-    inputs[0].encoding(e);
+  public String encoding() {
+    return encoding;
   }
 
   /**
-   * Returns the IO reference.
-   * @return file reference
+   * Explicitly sets a new encoding.
+   * @param enc encoding (ignored if set to {@code null})
+   * @return self reference
+   * @throws IOException I/O Exception
    */
-  public IO io() {
-    return input;
-  }
-
-  /**
-   * Jumps the specified number of characters back.
-   * @param p number of characters
-   */
-  public void prev(final int p) {
-    pp -= p;
-    pos();
+  public TextInput encoding(final String enc) throws IOException {
+    encoding = normEncoding(enc, encoding);
+    decoder = TextDecoder.get(encoding);
+    return this;
   }
 
   @Override
   public int read() throws IOException {
-    if(pp != 0) return last[lp + pp++ & 0x0F];
-    int ch = inputs[ip].readChar();
-    while(ch == -1 && ip != 0) ch = inputs[--ip].readChar();
-    last[lp++] = ch;
-    lp &= 0x0F;
-    if(ip == 0 && ch == '\n') ++line;
-    return ch;
-  }
-
-  /**
-   * Inserts some bytes in the input stream.
-   * @param val values to insert
-   * @param s add spaces
-   * @return true if everything went alright
-   * @throws IOException I/O exception
-   */
-  public boolean add(final byte[] val, final boolean s) throws IOException {
-    if(s) add(new ArrayInput(Token.SPACE));
-    add(new ArrayInput(val));
-    if(s) add(new ArrayInput(Token.SPACE));
-    return ip < 32;
-  }
-
-  /**
-   * Inserts a cached input buffer.
-   * @param ci buffer to be added
-   * @throws IOException I/O exception
-   */
-  private void add(final ArrayInput ci) throws IOException {
-    if(++ip == inputs.length) inputs = Arrays.copyOf(inputs, ip << 1);
-    inputs[ip] = ci;
-    ci.encoding();
+    return decoder.read(this);
   }
 
   @Override
-  public void close() throws IOException {
-    inputs[0].close();
-  }
-
-  /**
-   * Returns the current file position.
-   * @return file position
-   */
-  public int pos() {
-    return Math.max(0, inputs[0].size() + pp);
-  }
-
-  /**
-   * Returns the current line.
-   * @return line
-   */
-  public int line() {
-    return line;
-  }
-
-  /**
-   * Returns the file length.
-   * @return file position
-   */
-  public long length() {
-    return inputs[0].length();
-  }
-
-  /**
-   * Retrieves and returns the whole text and closes the stream.
-   * @return contents
-   * @throws IOException I/O exception
-   */
   public byte[] content() throws IOException {
-    // guess input size
-    final int l = Math.max(32, input == null ? 0 : (int) input.length());
-    final TokenBuilder tb = new TokenBuilder(l);
+    final TokenBuilder tb = new TokenBuilder(Math.max(ElementList.CAP, (int) length));
     try {
       for(int ch; (ch = read()) != -1;) tb.add(ch);
     } finally {

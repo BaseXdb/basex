@@ -94,7 +94,7 @@ public final class FNZip extends StandardFunc {
     final String enc = expr.length < 3 ? null : string(checkStr(expr[2], ctx));
     final IO io = new IOContent(entry(ctx));
     try {
-      return Str.get(new NewlineInput(io, enc).content());
+      return Str.get(new NewlineInput(io).encoding(enc).content());
     } catch(final IOException ex) {
       throw ZIPFAIL.thrw(input, ex.getMessage());
     }

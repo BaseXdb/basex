@@ -1,18 +1,17 @@
 package org.basex.build.file;
 
-import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
-import java.io.IOException;
-import java.util.Locale;
+import static org.basex.util.Token.*;
 
-import org.basex.build.SingleParser;
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.in.NewlineInput;
-import org.basex.util.TokenBuilder;
-import org.basex.util.XMLToken;
-import org.basex.util.list.TokenList;
+import java.io.*;
+import java.util.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class parses files in the CSV format
@@ -110,7 +109,7 @@ public final class CSVParser extends SingleParser {
     builder.startElem(CSV, atts);
 
     final TokenBuilder tb = new TokenBuilder();
-    final NewlineInput nli = new NewlineInput(src, encoding);
+    final NewlineInput nli = new NewlineInput(src).encoding(encoding);
 
     boolean quoted = false, open = true;
     int ch = -1;
@@ -166,9 +165,7 @@ public final class CSVParser extends SingleParser {
    * @param open open flag
    * @throws IOException I/O exception
    */
-  private void finish(final TokenBuilder tb, final boolean open)
-      throws IOException {
-
+  private void finish(final TokenBuilder tb, final boolean open) throws IOException {
     boolean close = !open;
     if(open && !tb.isEmpty()) {
       open();

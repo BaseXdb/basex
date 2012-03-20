@@ -78,7 +78,7 @@ public final class IOFile extends IO {
    */
   public boolean touch() {
     // some file systems require several runs
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 3; i++) {
       try {
         if(file.createNewFile()) return true;
       } catch(final IOException ex) {
@@ -91,25 +91,7 @@ public final class IOFile extends IO {
 
   @Override
   public byte[] read() throws IOException {
-    final long l = length();
-    if(l > -1) {
-      // read all bytes in one go if length is known
-      final DataInputStream dis = new DataInputStream(
-          is == null ? new FileInputStream(file) : is);
-      final byte[] cont = new byte[(int) l];
-      try {
-        dis.readFully(cont);
-      } finally {
-        if(is == null) dis.close();
-      }
-      return cont;
-    }
-
-    // otherwise, read from stream
-    final BufferedInputStream bis = new BufferedInputStream(is);
-    final ByteList bl = new ByteList();
-    for(int b; (b = bis.read()) != -1;) bl.add(b);
-    return bl.toArray();
+    return new BufferInput(this).content();
   }
 
   @Override
@@ -210,13 +192,8 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public BufferInput inputStream() throws IOException {
-    // return file stream
-    if(is == null) return new BufferInput(this);
-    // return input stream
-    final BufferInput in = new BufferInput(is);
-    if(zip != null && zip.getSize() != -1) in.length(zip.getSize());
-    return in;
+  public InputStream inputStream() throws IOException {
+    return is != null ? is : new FileInputStream(file);
   }
 
   @Override
@@ -329,8 +306,11 @@ public final class IOFile extends IO {
     if(file.exists()) {
       if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
       // some file systems require several runs
-      for(int i = 0; i < 10; i++) {
-        if(file.delete() && !file.exists()) return ok;
+      for(int i = 0; i < 3; i++) {
+        if(file.delete() && !file.exists()) {
+          if(i != 0) System.out.println(i);
+          return ok;
+        }
         Performance.sleep(i * 10);
       }
     }

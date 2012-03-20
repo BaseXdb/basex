@@ -27,7 +27,7 @@ public final class LookupInput extends InputStream {
   }
 
   /**
-   * Returns the current value.
+   * Returns the current (next) value.
    * @return current value
    */
   public int lookup() {

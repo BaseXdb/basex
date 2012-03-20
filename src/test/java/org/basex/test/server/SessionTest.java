@@ -27,7 +27,7 @@ import org.junit.Test;
  */
 public abstract class SessionTest {
   /** Test database name. */
-  private static final String DB = Util.name(SessionTest.class);
+  static final String DB = Util.name(SessionTest.class);
   /** Raw output method. */
   private static final String RAW = "declare option output:method 'raw';";
   /** Output stream. */

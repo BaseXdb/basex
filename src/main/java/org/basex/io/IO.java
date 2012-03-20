@@ -1,12 +1,11 @@
 package org.basex.io;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.io.*;
+import java.text.*;
 
-import org.basex.data.Data;
-import org.basex.io.in.BufferInput;
-import org.basex.util.Token;
-import org.xml.sax.InputSource;
+import org.basex.data.*;
+import org.basex.util.*;
+import org.xml.sax.*;
 
 /**
  * Generic representation for inputs and outputs. The underlying source can
@@ -183,11 +182,11 @@ public abstract class IO {
   public abstract InputSource inputSource();
 
   /**
-   * Returns a buffered input stream.
+   * Returns an input stream.
    * @return input stream
    * @throws IOException I/O exception
    */
-  public abstract BufferInput inputStream() throws IOException;
+  public abstract InputStream inputStream() throws IOException;
 
   /**
    * Merges two filenames.

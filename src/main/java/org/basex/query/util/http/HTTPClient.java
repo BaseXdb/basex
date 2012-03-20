@@ -89,6 +89,7 @@ public final class HTTPClient {
     } catch(final ProtocolException ex) {
       throw HTTPERR.thrw(input, "Invalid HTTP method");
     } catch(final IOException ex) {
+      Util.debug(ex);
       throw HTTPERR.thrw(input, ex);
     }
   }

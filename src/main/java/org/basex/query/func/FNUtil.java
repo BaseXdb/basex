@@ -422,7 +422,7 @@ public final class FNUtil extends StandardFunc {
     try {
       final InputStream is = it.input(input);
       try {
-        return Str.get(new NewlineInput(is, enc).content());
+        return Str.get(new NewlineInput(is).encoding(enc).content());
       } finally {
         is.close();
       }

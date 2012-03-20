@@ -94,7 +94,7 @@ public final class Store extends ACreate {
       } else if(is != null) {
         for(int b; (b = is.read()) != -1;) po.write(b);
       } else if(id != null) {
-        final BufferInput bi = IO.get(id).inputStream();
+        final BufferInput bi = new BufferInput(IO.get(id));
         try {
           for(int b; (b = bi.read()) != -1;) po.write(b);
         } finally {

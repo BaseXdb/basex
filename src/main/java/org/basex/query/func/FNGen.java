@@ -226,9 +226,7 @@ public final class FNGen extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  static Iter textIter(final StrStream si, final InputInfo ii)
-      throws QueryException {
-
+  static Iter textIter(final StrStream si, final InputInfo ii) throws QueryException {
     final byte[] str = si.string(ii);
     return new Iter() {
       int p = -1;
@@ -248,13 +246,11 @@ public final class FNGen extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Bln unparsedTextAvailable(final QueryContext ctx)
-      throws QueryException {
-
+  private Bln unparsedTextAvailable(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
-      final NewlineInput nli = new NewlineInput(io, enc);
+      final NewlineInput nli = new NewlineInput(io).encoding(enc);
       try {
         while(nli.read() != -1);
       } finally {

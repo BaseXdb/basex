@@ -69,13 +69,18 @@ public final class Token {
   /** UTF8 encoding string (variant). */
   public static final String UTF82 = "UTF8";
   /** UTF16 encoding string. */
-  private static final String UTF16 = "UTF-16";
+  public static final String UTF16 = "UTF-16";
   /** UTF16 encoding string. */
-  private static final String UTF162 = "UTF16";
+  public static final String UTF162 = "UTF16";
   /** UTF16BE (=UTF16) encoding string. */
   public static final String UTF16BE = "UTF-16BE";
   /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
+  /** UTF16 encoding string. */
+  public static final String UTF32 = "UTF-32";
+  /** UTF16 encoding string. */
+  public static final String UTF322 = "UTF32";
+
   /** Comparator for byte arrays. */
   public static final Comparator<byte[]> COMP = new Comparator<byte[]>() {
     @Override
@@ -230,16 +235,18 @@ public final class Token {
 
   /**
    * Returns a unified representation of the specified encoding.
-   * @param encoding input encoding
+   * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
    * @param old previous encoding (optional)
    * @return encoding
    */
   public static String normEncoding(final String encoding, final String old) {
+    if(encoding == null) return UTF8;
     final String e = encoding.toUpperCase(Locale.ENGLISH);
     if(eq(e, UTF8, UTF82))   return UTF8;
     if(e.equals(UTF16BE))    return UTF16BE;
     if(e.equals(UTF16LE))    return UTF16LE;
     if(eq(e, UTF16, UTF162)) return old == UTF16BE || old == UTF16LE ? old : UTF16BE;
+    if(eq(e, UTF32, UTF322)) return UTF32;
     return encoding;
   }
 
@@ -544,8 +551,7 @@ public final class Token {
    * @param end last byte to be parsed - exclusive
    * @return resulting long value
    */
-  public static long toLong(final byte[] token, final int start,
-      final int end) {
+  public static long toLong(final byte[] token, final int start, final int end) {
     int t = start;
     while(t < end && token[t] <= ' ') ++t;
     if(t == end) return Long.MIN_VALUE;
@@ -685,8 +691,7 @@ public final class Token {
    * @param strings strings to be compared
    * @return true if one test is successful
    */
-  public static boolean eqic(final String str,
-      final String... strings) {
+  public static boolean eqic(final String str, final String... strings) {
     for(final String s : strings) {
       if(str == null ? s == null : str.equalsIgnoreCase(s))
         return true;
@@ -783,8 +788,7 @@ public final class Token {
    * @param pos start position
    * @return result of test
    */
-  public static int indexOf(final byte[] token, final byte[] sub,
-      final int pos) {
+  public static int indexOf(final byte[] token, final byte[] sub, final int pos) {
     final int sl = sub.length;
     if(sl == 0) return 0;
     final int tl = token.length - sl;
@@ -866,9 +870,7 @@ public final class Token {
    * @param end end position
    * @return substring
    */
-  public static byte[] substring(final byte[] token, final int start,
-      final int end) {
-
+  public static byte[] substring(final byte[] token, final int start, final int end) {
     final int s = Math.max(0, start);
     final int e = Math.min(end, token.length);
     if(s == 0 && e == token.length) return token;
@@ -892,9 +894,7 @@ public final class Token {
    * @param end end position
    * @return resulting text
    */
-  public static byte[] subtoken(final byte[] token, final int start,
-      final int end) {
-
+  public static byte[] subtoken(final byte[] token, final int start, final int end) {
     int s = Math.max(0, start);
     final int e = Math.min(end, token.length);
     if(s == 0 && e == token.length) return token;
@@ -953,9 +953,7 @@ public final class Token {
    * @param replace the new character
    * @return resulting token
    */
-  public static byte[] replace(final byte[] token, final int search,
-      final int replace) {
-
+  public static byte[] replace(final byte[] token, final int search, final int replace) {
     final TokenBuilder tb = new TokenBuilder(token.length);
     final int tl = token.length;
     for(int i = 0; i < tl; i += cl(token, i)) {

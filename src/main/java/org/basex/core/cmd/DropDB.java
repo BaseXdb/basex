@@ -66,24 +66,28 @@ public final class DropDB extends ACreate {
    */
   public static synchronized boolean drop(final String db, final Context ctx) {
     final IOFile dbpath = ctx.mprop.dbpath(db);
-    return dbpath.exists() && drop(dbpath, null) && ctx.databases().delete(db);
+    return dbpath.exists() && drop(dbpath) && ctx.databases().delete(db);
   }
 
   /**
    * Drops a database directory.
    * @param path database path
+   * @return success of operation
+   */
+  public static synchronized boolean drop(final IOFile path) {
+    return path.exists() && path.delete();
+  }
+
+  /**
+   * Recursively drops files in database directory with the specified pattern.
+   * @param path database path
    * @param pat file pattern
    * @return success of operation
    */
   public static synchronized boolean drop(final IOFile path, final String pat) {
-    boolean ok = path.exists();
-    // try to delete all files
-    for(final IOFile sub : path.children()) {
-      ok &= sub.isDir() ? drop(sub, pat) :
-        pat != null && !sub.name().matches(pat) || sub.delete();
-    }
-    // only delete directory if no pattern was specified
-    return (pat != null || path.delete()) && ok;
+    boolean ok = true;
+    for(final IOFile f : path.children()) ok &= !f.name().matches(pat) || f.delete();
+    return ok;
   }
 
   @Override
