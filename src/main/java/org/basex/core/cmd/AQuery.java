@@ -174,7 +174,7 @@ abstract class AQuery extends Command {
 
   @Override
   public boolean updating(final Context ctx) {
-    return super.updating(ctx) || updating(ctx, args[0]);
+    return super.updating(ctx) || args[0] != null && updating(ctx, args[0]);
   }
 
   @Override
