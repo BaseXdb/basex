@@ -708,7 +708,7 @@ public abstract class W3CTS {
    */
   private static String read(final IO f) {
     try {
-      return string(new NewlineInput(f, null).content());
+      return string(new NewlineInput(f).content());
     } catch(final IOException ex) {
       Util.errln(ex);
       return "";
