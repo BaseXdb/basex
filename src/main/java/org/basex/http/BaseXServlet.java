@@ -48,7 +48,7 @@ public abstract class BaseXServlet extends HttpServlet {
    * @param key key to be set
    * @param value value to be set
    */
-  private void setProperty(final String key, final String value) {
+  private static void setProperty(final String key, final String value) {
     if(value != null && !value.isEmpty()) System.setProperty(key, value);
   }
 
