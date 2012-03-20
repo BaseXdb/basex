@@ -8,11 +8,12 @@ import static org.basex.util.Token.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.Map.*;
+import java.util.Map.Entry;
 
 import javax.servlet.http.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -119,7 +120,8 @@ public final class HTTPContext {
    */
   public void initResponse(final SerializerProp sprop) {
     // set encoding
-    res.setCharacterEncoding(sprop.get(SerializerProp.S_ENCODING));
+    final String encoding = sprop.get(SerializerProp.S_ENCODING);
+    res.setCharacterEncoding(encoding);
 
     // set content type
     String type = sprop.get(SerializerProp.S_MEDIA_TYPE);
@@ -138,7 +140,7 @@ public final class HTTPContext {
         type = TEXT_PLAIN;
       }
     }
-    res.setContentType(type);
+    res.setContentType(type + MimeTypes.CHARSET + encoding);
   }
 
   /**

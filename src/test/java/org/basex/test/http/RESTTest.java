@@ -181,20 +181,30 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void getContentType() throws Exception {
-    assertEquals(APP_XML, contentType("?query=1"));
-    assertEquals(TEXT_PLAIN, contentType("?command=info"));
+    assertStartsWith(contentType("?query=1"), APP_XML);
+    assertStartsWith(contentType("?command=info"), TEXT_PLAIN);
 
-    assertEquals(APP_XML, contentType("?query=1&method=xml"));
-    assertEquals(TEXT_HTML, contentType("?query=1&method=xhtml"));
-    assertEquals(TEXT_HTML, contentType("?query=1&method=html"));
-    assertEquals(TEXT_PLAIN, contentType("?query=1&method=text"));
-    assertEquals(APP_OCTET, contentType("?query=1&method=raw"));
-    assertEquals(APP_JSON, contentType("?query=<json+type='object'/>&method=json"));
-    assertEquals(APP_JSON, contentType("?query=<json/>&method=jsonml"));
+    assertStartsWith(contentType("?query=1&method=xml"), APP_XML);
+    assertStartsWith(contentType("?query=1&method=xhtml"), TEXT_HTML);
+    assertStartsWith(contentType("?query=1&method=html"), TEXT_HTML);
+    assertStartsWith(contentType("?query=1&method=text"), TEXT_PLAIN);
+    assertStartsWith(contentType("?query=1&method=raw"), APP_OCTET);
+    assertStartsWith(contentType("?query=<json+type='object'/>&method=json"), APP_JSON);
+    assertStartsWith(contentType("?query=<json/>&method=jsonml"), APP_JSON);
 
-    assertEquals(APP_XML, contentType("?query=1&media-type=application/xml"));
-    assertEquals(TEXT_HTML, contentType("?query=1&media-type=text/html"));
-    assertEquals("xxx", contentType("?query=1&media-type=xxx"));
+    assertStartsWith(contentType("?query=1&media-type=application/xml"), APP_XML);
+    assertStartsWith(contentType("?query=1&media-type=text/html"), TEXT_HTML);
+    assertStartsWith(contentType("?query=1&media-type=xxx"), "xxx");
+  }
+
+  /**
+   * Compares two byte arrays for equality.
+   * @param string full string
+   * @param prefix prefix
+   */
+  private static void assertStartsWith(final String string, final String prefix) {
+    assertTrue("'" + string + "' does not start with '" + prefix + "'",
+        string.startsWith(prefix));
   }
 
   /**
