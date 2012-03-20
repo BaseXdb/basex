@@ -445,8 +445,6 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   PRAGMAINV(XPST, 3, "Invalid pragma expression."),
   /** XPST0003: Parsing exception. */
-  TESTINCOMPLETE(XPST, 3, "Incomplete node test."),
-  /** XPST0003: Parsing exception. */
   CALCEXPR(XPST, 3, "Calculation is incomplete."),
   /** XPST0003: Parsing exception. */
   INVMAPKEY(XPST, 3, "Invalid key, simple expression expected."),
@@ -487,8 +485,6 @@ public enum Err {
   /** XPST0003: Parsing exception. */
   PIXML(XPST, 3, "Processing instruction has illegal name: '%'."),
   /** XPST0003: Parsing exception. */
-  TESTINVALID(XPST, 3, "Invalid % test: %."),
-  /** XPST0003: Parsing exception. */
   QNAMEINV(XPST, 3, "Expecting QName, '%' found."),
   /** XPST0003: Parsing exception. */
   PROLOGORDER(XPST, 3, "Default declarations must be declared first."),
@@ -508,8 +504,6 @@ public enum Err {
   NOANN(XPST, 3, "No annotation allowed here."),
   /** XPST0003: Parsing exception. */
   NOCATCH(XPST, 3, "Expecting catch clause."),
-  /** XPST0003: Parsing exception. */
-  WHICHANN(XPST, 3, "Annotation % is unknown."),
   /** XPST0003: Parsing exception. */
   ANNVALUE(XPST, 3, "Literal expected after annotation."),
   /** XPST0003: Parsing exception. */
@@ -557,8 +551,6 @@ public enum Err {
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
   /** XPTY0004: Promoting exception. */
   XPINVPROM(XPTY, 4, "Cannot treat % as %: %."),
-  /** XPTY0004: Typing exception. */
-  XPCAST(XPTY, 4, "Invalid %(%) cast."),
   /** XPTY0004: Typing Exception. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
   /** XPTY0004: Typing Exception. */
@@ -579,8 +571,6 @@ public enum Err {
   XPTYPECMP(XPTY, 4, "% and % cannot be compared."),
   /** XPTY0004: Typing exception. */
   XPTYPENUM(XPTY, 4, "%: number expected, % found."),
-  /** XPTY0004: Typing exception. */
-  XPINVNAME(XPTY, 4, "Invalid name: '%'."),
   /** XPTY0004: Typing exception. */
   XPNAME(XPTY, 4, "Expecting name."),
   /** XPTY0004: Typing exception. */

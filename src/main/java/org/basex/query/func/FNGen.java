@@ -353,7 +353,7 @@ public final class FNGen extends StandardFunc {
           params = convert(((Map) it).tokenJavaMap(fun.input));
         } else {
           // check root node
-          ANode nd = (ANode) fun.checkType(it, NodeType.ELM);
+          final ANode nd = (ANode) fun.checkType(it, NodeType.ELM);
           if(!OUTPUT_SERIAL.eq(nd)) SERUNKNOWN.thrw(fun.input, nd.qname());
           // retrieve query parameters
           params = parameters(nd, fun.input);

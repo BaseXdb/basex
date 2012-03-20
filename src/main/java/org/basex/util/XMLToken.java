@@ -109,25 +109,6 @@ public final class XMLToken {
    * @param val value to be checked
    * @return result of check
    */
-  public static boolean isEQName(final byte[] val) {
-    final int l = val.length;
-    int i = 0;
-    if(i < l && (val[0] == '"' || val[0] == '\'')) {
-      boolean d = false;
-      while(++i < l) {
-        if(val[i] == val[0]) d ^= true;
-        else if(d) break;
-      }
-      if(i == l || val[i++] != ':') return false;
-    }
-    return isQName(val, i);
-  }
-
-  /**
-   * Checks if the specified token is a valid QName.
-   * @param val value to be checked
-   * @return result of check
-   */
   public static boolean isQName(final byte[] val) {
     return isQName(val, 0);
   }

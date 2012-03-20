@@ -74,8 +74,6 @@ public interface DataText {
   String DBPERM = "PERM";
   /** Documents. */
   String DBDOCS = "DOCS";
-  /** Path indexing. */
-  String DBCRTPTH = "CRTPTH";
   /** Text indexing. */
   String DBCRTTXT = "CRTTXT";
   /** Attribute indexing. */

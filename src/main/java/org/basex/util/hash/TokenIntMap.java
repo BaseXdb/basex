@@ -66,15 +66,6 @@ public final class TokenIntMap extends TokenSet {
     return id == 0 ? -1 : values[id];
   }
 
-  /**
-   * Returns the specified value.
-   * @param i index
-   * @return value
-   */
-  public int value(final int i) {
-    return values[i];
-  }
-
   @Override
   protected void rehash() {
     super.rehash();

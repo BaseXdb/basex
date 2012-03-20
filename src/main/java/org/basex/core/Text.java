@@ -737,8 +737,6 @@ public interface Text {
 
   /** Waiting information. */
   String PLEASE_WAIT_D = lang("please_wait") + DOTS;
-  /** Optimize information. */
-  String OPTIMIZING_DB_D = lang("optimizing_db") + DOTS;
   /** Statistics information. */
   String CREATE_STATS_D = lang("create_stats") + DOTS;
 
@@ -1151,8 +1149,6 @@ public interface Text {
   String OUTPUT_DIR = lang("output_dir");
   /** Dialog title for exporting nodes. */
   String DIR_NOT_EMPTY = lang("dir_not_empty");
-  /** Dialog title for exporting nodes. */
-  String INDENT_WITH_WS = lang("indent_with_ws");
 
   /** Database path. */
   String DATABASE_PATH = lang("database_path");
@@ -1260,8 +1256,6 @@ public interface Text {
   String H_USED_MEM = lang("h_used_mem");
   /** Out of memory error due to database creation. */
   String H_OUT_OF_MEM = NL + lang("h_out_of_mem");
-  /** XML parsing error due to internal XML Parser. */
-  String H_PARSE_ERROR = NL + lang("h_parse_error");
 
   /** Help string. */
   String H_EXECUTE_QUERY = lang("h_execute_query");
@@ -1368,8 +1362,6 @@ public interface Text {
   String H_CHOP_WS = lang("h_chop_ws");
   /** Internal parser information. */
   String H_INT_PARSER = lang("h_int_parser");
-  /** Input format information. */
-  String H_INPUT_FORMAT = lang("h_input_format");
 
   /** Path summary information. */
   String H_PATH_INDEX = lang("h_path_index");

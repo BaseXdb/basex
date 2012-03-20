@@ -103,7 +103,7 @@ public final class Names extends TokenSet implements Index {
 
   @Override
   public byte[] info() {
-    final double[] tl = new double[size];
+    final int[] tl = new int[size];
     int len = 0;
     tl[0] = 0;
     for(int i = 1; i < size; ++i) {

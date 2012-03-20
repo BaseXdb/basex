@@ -79,7 +79,7 @@ public final class And extends Logical {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     int is = 0;
-    final double[] ics = new double[expr.length];
+    final int[] ics = new int[expr.length];
     boolean ia = true;
     for(int e = 0; e < expr.length; ++e) {
       if(expr[e].indexAccessible(ic) && !ic.seq) {

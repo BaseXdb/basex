@@ -12,8 +12,6 @@ import org.basex.query.item.*;
  * @author Rositsa Shadura
  */
 public interface HTTPText {
-  /** WWW-Authentication string. */
-  String WWW_AUTHENTICATE = "WWW-Authenticate";
   /** HTTP header: Authorization. */
   String AUTHORIZATION = "Authorization";
   /** HTTP basic authentication. */

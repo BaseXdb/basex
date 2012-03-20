@@ -206,7 +206,7 @@ public final class PathSummary implements Index {
     }
 
     // sort by number of occurrences
-    final double[] tmp = new double[in.size()];
+    final int[] tmp = new int[in.size()];
     for(int i = 0; i < in.size(); ++i) tmp[i] = in.get(i).stats.count;
     final int[] occ = Array.createOrder(tmp, false);
 

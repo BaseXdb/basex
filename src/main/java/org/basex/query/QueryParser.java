@@ -3251,7 +3251,7 @@ public class QueryParser extends InputParser {
               } while(wsConsume(COMMA));
               wsCheck(PAR2);
             } else if(wsConsumeWs(AT)) {
-              String fn = string(stringLiteral());
+              final String fn = string(stringLiteral());
               // optional: resolve URI reference
               final IO fl = ctx.stop != null ? ctx.stop.get(fn) : ctx.sc.io(fn);
               if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
@@ -3287,7 +3287,7 @@ public class QueryParser extends InputParser {
   private void ftThesaurusID(final ThesQuery thes) throws QueryException {
     wsCheck(AT);
 
-    String fn = string(stringLiteral());
+    final String fn = string(stringLiteral());
     // optional: resolve URI reference
     final IO fl = ctx.thes != null ? ctx.thes.get(fn) : ctx.sc.io(fn);
     final byte[] rel = wsConsumeWs(RELATIONSHIP) ? stringLiteral() : EMPTY;

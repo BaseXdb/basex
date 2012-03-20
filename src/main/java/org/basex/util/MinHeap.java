@@ -65,15 +65,6 @@ public final class MinHeap<K, V> {
   }
 
   /**
-   * Returns the smallest key from this heap.
-   * @return smallest key
-   */
-  @SuppressWarnings("unchecked")
-  public K minKey() {
-    return (K) vals[0];
-  }
-
-  /**
    * returns the value of the smallest key from this heap.
    * @return value of the smallest key
    */

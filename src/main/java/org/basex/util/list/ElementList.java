@@ -49,14 +49,6 @@ public abstract class ElementList {
   }
 
   /**
-   * Sets the number of elements to the specified value.
-   * @param s number of elements
-   */
-  public final void size(final int s) {
-    size = s;
-  }
-
-  /**
    * Tests is the container has no elements.
    * @return result of check
    */

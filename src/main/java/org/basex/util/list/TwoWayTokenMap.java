@@ -146,15 +146,6 @@ public class TwoWayTokenMap extends TokenList {
    * @param val Value to search for
    * @return key or -1 if not found
    */
-  public int getKey(final long val) {
-    return getKey(token(val));
-  }
-
-  /**
-   * Gets key by value.
-   * @param val Value to search for
-   * @return key or -1 if not found
-   */
   public int getKey(final String val) {
     return getKey(token(val));
   }

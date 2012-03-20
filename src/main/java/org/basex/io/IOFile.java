@@ -60,15 +60,6 @@ public final class IOFile extends IO {
    * @param dir directory
    * @param n file name
    */
-  public IOFile(final File dir, final String n) {
-    this(new File(dir, n));
-  }
-
-  /**
-   * Constructor.
-   * @param dir directory
-   * @param n file name
-   */
   public IOFile(final IOFile dir, final String n) {
     this(new File(dir.file, n));
   }
