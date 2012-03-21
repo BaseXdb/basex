@@ -18,10 +18,10 @@
     <param-value></param-value>
   </context-param>
 
-  <!-- Operation mode. By default, the value is "local": a new BaseX instance
-       will be created and used for all operations. If "client" is specified,
-       all operations are performed on a remote server instance (the login
-       data of which is stored in the .basex configuration file). -->
+  <!-- Operation mode. By default, the value is "local": the servlets will
+       access and store data locally using ${org.basex.path}. If "client" is
+       specified, all operations are performed on a remote server instance (the
+       login data of which is stored in the .basex configuration file). -->
   <context-param>
     <param-name>org.basex.mode</param-name>
     <param-value>local</param-value>
