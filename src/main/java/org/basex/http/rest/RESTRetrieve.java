@@ -12,8 +12,6 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Set;
 import org.basex.data.*;
 import org.basex.http.*;
-import org.basex.io.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.server.*;
 import org.basex.util.*;
@@ -71,20 +69,11 @@ final class RESTRetrieve extends RESTQuery {
       ser.closeElement();
       ser.close();
     } else if(isRaw(http)) {
-      final String type = contentType(http);
-      if(type.equals(MimeTypes.APP_XQUERY)) {
-        // execute raw file as query
-        final ArrayOutput ao = new ArrayOutput();
-        session.setOutputStream(ao);
-        session.execute(new Retrieve(http.dbpath()));
-        query(ao.toString(), http, true);
-      } else {
-        // retrieve raw file; prefix user parameters with media type
-        final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + type;
-        http.initResponse(new SerializerProp(ct + ',' + http.serialization));
-        session.setOutputStream(http.out);
-        session.execute(new Retrieve(http.dbpath()));
-      }
+      // retrieve raw file; prefix user parameters with media type
+      final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + contentType(http);
+      http.initResponse(new SerializerProp(ct + ',' + http.serialization));
+      session.setOutputStream(http.out);
+      session.execute(new Retrieve(http.dbpath()));
     } else {
       // retrieve xml file
       http.initResponse(new SerializerProp(http.serialization));
