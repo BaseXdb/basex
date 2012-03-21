@@ -28,6 +28,11 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class FNPat extends StandardFunc {
+  /** Slash pattern. */
+  private static final Pattern SLASH = Pattern.compile("\\$");
+  /** Slash pattern. */
+  private static final Pattern BSLASH = Pattern.compile("\\\\");
+
   /** Root element for the analyze-string-result function. */
   private static final QNm ANALYZE = new QNm("fn:analyze-string-result", FNURI);
   /** Element for the analyze-string-result function. */
@@ -73,7 +78,7 @@ public final class FNPat extends StandardFunc {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   private Item matches(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -87,7 +92,7 @@ public final class FNPat extends StandardFunc {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   private Item analyzeString(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -155,7 +160,7 @@ public final class FNPat extends StandardFunc {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   private Item replace(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -172,7 +177,8 @@ public final class FNPat extends StandardFunc {
     final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
     String r = string(rep);
     if((p.flags() & Pattern.LITERAL) != 0) {
-      r = r.replaceAll("\\\\", "\\\\\\\\").replaceAll("\\$", "\\\\\\$");
+      r = SLASH.matcher(BSLASH.matcher(r).replaceAll("\\\\\\\\")).
+        replaceAll("\\\\\\$");
     }
 
     try {
@@ -189,7 +195,7 @@ public final class FNPat extends StandardFunc {
    * @param val input value
    * @param ctx query context
    * @return function result
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   private Iter tokenize(final byte[] val, final QueryContext ctx)
       throws QueryException {
@@ -217,7 +223,7 @@ public final class FNPat extends StandardFunc {
    * @param mod modifier item
    * @param ctx query context
    * @return modified pattern
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   private Pattern pattern(final Expr pattern, final Expr mod,
       final QueryContext ctx) throws QueryException {

@@ -208,7 +208,9 @@ public final class DialogExport extends Dialog {
    * @param val value
    * @return {@code true} if parameter was added
    */
-  private boolean add(final StringBuilder sb, final Object[] key, final Object val) {
+  private static boolean add(final StringBuilder sb, final Object[] key,
+      final Object val) {
+
     if(Serializer.PROPS.get(key).equals(val)) return false;
     if(sb.length() != 0) sb.append(',');
     sb.append(key[0]).append('=').append(val);

@@ -165,6 +165,6 @@ public final class HTMLParser extends XMLParser {
    * @param v value
    */
   private static void opt(final String p, final String v) {
-    Reflect.invoke(METHOD, WRITER, new Object[] { p, v });
+    Reflect.invoke(METHOD, WRITER, p, v);
   }
 }

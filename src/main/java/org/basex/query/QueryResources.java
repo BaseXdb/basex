@@ -5,6 +5,7 @@ import static org.basex.query.util.Err.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Check;
@@ -29,6 +30,8 @@ import org.basex.util.list.IntList;
  * @author BaseX Team 2005-12, BSD License
  */
 public final class QueryResources {
+  /** Slash pattern. */
+  private static final Pattern SLASHES = Pattern.compile("^/+|/+$");
   /** Database context. */
   private final QueryContext ctx;
 
@@ -197,7 +200,7 @@ public final class QueryResources {
 
       // add new collection if not found
       if(c == colls) {
-        String root = input.replaceFirst("^/+|/+$", "");
+        String root = SLASHES.matcher(input).replaceFirst("");
         String path = "";
         final int s = root.indexOf('/');
         if(s != -1) {

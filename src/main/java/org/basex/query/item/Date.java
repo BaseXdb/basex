@@ -19,7 +19,12 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public abstract class Date extends Item {
-  /** Date pattern. */
+  /** Pattern to convert date to a string. */
+  private static final Pattern TOSTRING1 = Pattern.compile("\\.0+(Z|-.*|\\+.*)?$");
+  /** Pattern to convert date to a string. */
+  private static final Pattern TOSTRING2 = Pattern.compile("(\\.\\d+?)0+(Z|-.*|\\+.*)?$");
+
+    /** Date pattern. */
   static final String ZONE = "((\\+|-)([0-9]{2}):([0-9]{2})|Z)?";
   /** Day per months. */
   static final byte[] DAYS = {
@@ -32,6 +37,7 @@ public abstract class Date extends Item {
       "([0-9]{2}):([0-9]{2}):([0-9]{2})(\\.([0-9]+))?" + ZONE);
   /** Data factory. */
   public static DatatypeFactory df;
+
   /** Calendar instance. */
   public XMLGregorianCalendar xc;
 
@@ -59,7 +65,7 @@ public abstract class Date extends Item {
    * @param d date reference
    * @param e expected format
    * @param ii input info
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   Date(final Type typ, final byte[] d, final String e,
        final InputInfo ii) throws QueryException {
@@ -77,7 +83,7 @@ public abstract class Date extends Item {
    * @param d input format
    * @param e expected format
    * @param ii input info
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   final void date(final byte[] d, final String e, final InputInfo ii)
       throws QueryException {
@@ -92,7 +98,7 @@ public abstract class Date extends Item {
    * @param d input format
    * @param e expected format
    * @param ii input info
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   final void time(final byte[] d, final String e, final InputInfo ii)
       throws QueryException {
@@ -114,7 +120,7 @@ public abstract class Date extends Item {
    * @param p matching position
    * @param val value
    * @param ii input info
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   static final void zone(final Matcher mt, final int p, final byte[] val,
       final InputInfo ii) throws QueryException {
@@ -130,7 +136,7 @@ public abstract class Date extends Item {
    * @param a duration
    * @param p plus/minus flag
    * @param ii input info
-   * @throws QueryException query exception
+   * @throws org.basex.query.QueryException query exception
    */
   final void calc(final Dur a, final boolean p, final InputInfo ii)
       throws QueryException {
@@ -144,8 +150,8 @@ public abstract class Date extends Item {
   @Override
   public final byte[] string(final InputInfo ii) {
     String str = xc.toXMLFormat();
-    str = str.replaceAll("\\.0+(Z|-.*|\\+.*)?$", "$1");
-    str = str.replaceAll("(\\.\\d+?)0+(Z|-.*|\\+.*)?$", "$1$2");
+    str = TOSTRING1.matcher(str).replaceAll("$1");
+    str = TOSTRING2.matcher(str).replaceAll("$1$2");
     return Token.token(str);
   }
 

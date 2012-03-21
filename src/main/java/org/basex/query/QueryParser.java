@@ -847,7 +847,7 @@ public class QueryParser extends InputParser {
 
     final ArrayList<URL> urls = new ArrayList<URL>();
     // add existing URLs
-    if(ctx.jars != null) for(final URL u : ctx.jars.getURLs()) urls.add(u);
+    if(ctx.jars != null) Collections.addAll(urls, ctx.jars.getURLs());
     // add new URLs
     final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
     for(final byte[] u : desc.jars) {

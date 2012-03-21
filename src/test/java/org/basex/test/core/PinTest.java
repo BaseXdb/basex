@@ -208,7 +208,7 @@ public final class PinTest {
    * is opened by two contexts; after closing the database, it is supposed to succeed.
    * @param cmd command to test
    */
-  private void noCloseOk(final Command cmd) {
+  private static void noCloseOk(final Command cmd) {
     // command is supposed to fail, because database is opened by two contexts
     no(cmd, CONTEXT1);
     // close database in second context

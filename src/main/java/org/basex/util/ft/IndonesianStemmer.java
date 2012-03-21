@@ -108,7 +108,7 @@ final class IndonesianStemmer extends InternalStemmer {
    * @param tb token builder
    * @return integer
    */
-  private int countSyllables(final TokenBuilder tb) {
+  private static int countSyllables(final TokenBuilder tb) {
     int t = 0;
     final int s = tb.size();
     for(int c = 0; c < s; c++) {
@@ -123,7 +123,7 @@ final class IndonesianStemmer extends InternalStemmer {
    * @param c char
    * @return boolean
    */
-  private boolean isVowel(final byte c) {
+  private static boolean isVowel(final byte c) {
     switch(c) {
       case 'a':
       case 'e':

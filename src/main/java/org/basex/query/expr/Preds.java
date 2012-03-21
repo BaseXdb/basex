@@ -74,12 +74,12 @@ public abstract class Preds extends ParseExpr {
         final Expr[] and = ((And) pr).expr;
         final int m = and.length - 1;
         final ArrayList<Expr> tmp = new ArrayList<Expr>(preds.length + m);
-        for(int i = 0; i < p; i++) tmp.add(preds[i]);
+        tmp.addAll(Arrays.asList(preds).subList(0, p));
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric
           tmp.add(Function.BOOLEAN.get(input, a).compEbv(ctx));
         }
-        for(int i = p + 1; i < preds.length; i++) tmp.add(preds[i]);
+        tmp.addAll(Arrays.asList(preds).subList(p + 1, preds.length));
         preds = tmp.toArray(new Expr[tmp.size()]);
       } else {
         preds[p] = pr;

@@ -156,7 +156,7 @@ public final class Databases {
    * @param list list which contained databases are added to
    * @param pattern match pattern or {@code null}
    */
-  private void listAll(final TwoWayTokenMap dbs, final StringList list,
+  private static void listAll(final TwoWayTokenMap dbs, final StringList list,
       final Pattern pattern) {
     for(final byte[] database : dbs) {
       if(null == database) continue;

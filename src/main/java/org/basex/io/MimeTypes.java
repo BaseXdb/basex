@@ -35,8 +35,6 @@ public final class MimeTypes {
   public static final String APP_XML = "application/xml";
   /** Media type: application/xml-external-parsed-entity. */
   public static final String APP_EXT_XML = "application/xml-external-parsed-entity";
-  /** Media type: application/xquery. */
-  public static final String APP_XQUERY = "application/xquery";
   /** Media type: application/x-www-form-urlencoded. */
   public static final String APP_FORM = "application/x-www-form-urlencoded";
 

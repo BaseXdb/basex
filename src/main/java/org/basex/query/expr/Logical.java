@@ -51,7 +51,7 @@ public abstract class Logical extends Arr {
     final ArrayList<Expr> tmp = new ArrayList<Expr>(expr.length);
     for(final Expr ex : expr) {
       if(ex.getClass().isInstance(this)) {
-        for(final Expr e : ((Logical) ex).expr) tmp.add(e);
+        Collections.addAll(tmp, ((Logical) ex).expr);
         ctx.compInfo(OPTFLAT, ex);
       } else {
         tmp.add(ex);

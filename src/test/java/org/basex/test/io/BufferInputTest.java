@@ -108,9 +108,10 @@ public final class BufferInputTest {
    * @param input input string
    * @throws IOException I/O exception
    */
-  public void encoding(final String enc, final String input) throws IOException {
-    final byte[] utf8 = Token.token(input);
+  private static void encoding(final String enc, final String input)
+      throws IOException {
 
+    final byte[] utf8 = Token.token(input);
     final IO io = new IOContent(input.getBytes(enc));
     final byte[] cache = new TextInput(io).encoding(enc).content();
     assertSame(cache, utf8);

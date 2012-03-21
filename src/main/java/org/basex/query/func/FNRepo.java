@@ -67,7 +67,7 @@ public final class FNRepo extends StandardFunc {
    * @param ctx query context
    * @return iterator
    */
-  private Iter list(final QueryContext ctx) {
+  private static Iter list(final QueryContext ctx) {
     final NodeCache cache = new NodeCache();
     for(final byte[] p : ctx.context.repo.pkgDict()) {
       if(p == null) continue;
