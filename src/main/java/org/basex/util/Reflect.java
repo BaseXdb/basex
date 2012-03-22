@@ -65,10 +65,15 @@ public final class Reflect {
    * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String name, final JarLoader jar) {
+    Thread currentThread = Thread.currentThread();
+    ClassLoader origLoader = currentThread.getContextClassLoader();
     try {
+      currentThread.setContextClassLoader(jar);
       return cache(name, Class.forName(name, true, jar));
     } catch(final Throwable ex) {
       return null;
+    } finally {
+      currentThread.setContextClassLoader(origLoader);
     }
   }
 
