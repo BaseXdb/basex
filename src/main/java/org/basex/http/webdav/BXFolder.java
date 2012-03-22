@@ -165,7 +165,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
       final TextInput ti = new TextInput(bi);
       final boolean xml = ti.read() == '<';
       try {
-        ti.reset();
+        bi.reset();
       } catch(final IOException e) {
       }
 
