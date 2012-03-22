@@ -307,10 +307,7 @@ public final class IOFile extends IO {
       if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
       // some file systems require several runs
       for(int i = 0; i < 3; i++) {
-        if(file.delete() && !file.exists()) {
-          if(i != 0) System.out.println(i);
-          return ok;
-        }
+        if(file.delete() && !file.exists()) return ok;
         Performance.sleep(i * 10);
       }
     }

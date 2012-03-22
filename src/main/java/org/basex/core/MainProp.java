@@ -126,7 +126,6 @@ public final class MainProp extends AProp {
     Prop.language = get(LANG);
     Prop.langkeys = is(LANGKEYS);
     Prop.debug = is(DEBUG);
-    System.out.println(Prop.language);
     System.setProperty("http.proxyHost", get(PROXYHOST));
     System.setProperty("http.proxyPort", Integer.toString(num(PROXYPORT)));
     System.setProperty("http.nonProxyHosts", get(NONPROXYHOSTS));
