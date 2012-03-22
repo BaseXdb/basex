@@ -12,8 +12,7 @@
 
   <!-- Operation mode: by default, the value is "local": the servlets will
        access and store data locally using ${org.basex.path}. If "client" is
-       specified, all operations are performed on a remote server instance (the
-       login data of which is stored in the .basex configuration file). -->
+       specified, all operations are performed on a remote server instance. -->
   <context-param>
     <param-name>org.basex.mode</param-name>
     <param-value>local</param-value>
