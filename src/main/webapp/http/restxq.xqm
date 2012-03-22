@@ -14,19 +14,11 @@ declare variable $page:style :=
   a { color:#0040A0; text-decoration: none; }
   --></style>;
 
-declare %rest:path("hello/{$world}")
-        %rest:header-param("User-Agent", "{$agent}")
-        function page:hello($world as xs:string, $agent as xs:string*) {
-  <response>
-    <title>Hello { $world }!</title>
-    <info>You requested this page with { $agent }.</info>
-  </response>
-};
-
 declare %rest:path("")
         %output:method("xhtml")
-        %output:doctype-public("-//W3C//DTD HTML 4.01//EN")
-        %output:doctype-system("http://www.w3.org/TR/html4/strict.dtd")
+        %output:omit-xml-declaration("no")
+        %output:doctype-public("-//W3C//DTD XHTML 1.0 Transitional//EN")
+        %output:doctype-system("http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd")
   function page:start() {
 
   let $title := 'Welcome to RESTXQ!' return
@@ -47,6 +39,12 @@ declare %rest:path("")
         <li><a href="/restxq/hello/World">http://localhost:8984/restxq/hello/World</a></li>
         <li><a href="/restxq/hello/Universe">http://localhost:8984/restxq/hello/Universe</a></li>
       </ul>
+      <p>The following form demonstrates the form parameters:</p>
+      <form method="post" action="/restxq/form">
+        <p>Your message:<br />
+        <input name="content" size="50"></input>
+        <input type="submit" /></p>
+      </form>
       <p>The source of this file is shown below:</p>
       <hr/>
       <pre>{ unparsed-text(static-base-uri()) }</pre>
@@ -54,4 +52,24 @@ declare %rest:path("")
       <p style='text-align:right;'><a href='..'>...back to main page</a></p>
     </body>
   </html>
+};
+
+declare %rest:path("hello/{$world}")
+        %rest:GET
+        %rest:header-param("User-Agent", "{$agent}")
+        function page:hello($world as xs:string, $agent as xs:string*) {
+  <response>
+    <title>Hello { $world }!</title>
+    <info>You requested this page with { $agent }.</info>
+  </response>
+};
+
+declare %rest:path("form/")
+        %rest:POST
+        %rest:form-param("content","{$message}", "'no message delivered'")
+        function page:hello-postman($message as xs:string) {
+  <response>
+    <title>Hello!</title>
+    <info>It seems you posted a message: { $message }</info>
+  </response>
 };
