@@ -5,20 +5,12 @@
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
   version="2.5">
 
-  <display-name>BaseX HTTP Server</display-name>
-  <description>BaseX HTTP Server</description>
+  <display-name>BaseX HTTP Services</display-name>
+  <description>BaseX HTTP Services</description>
 
   <!-- The following parameters may also be passed on as system properties: -->
 
-  <!-- Path to the BaseX home directory, in which the .basex configuration file
-       will be placed. By default, no value is specified; as a result, the
-       default servlet context path will be used. -->
-  <context-param>
-    <param-name>org.basex.path</param-name>
-    <param-value></param-value>
-  </context-param>
-
-  <!-- Operation mode. By default, the value is "local": the servlets will
+  <!-- Operation mode: by default, the value is "local": the servlets will
        access and store data locally using ${org.basex.path}. If "client" is
        specified, all operations are performed on a remote server instance (the
        login data of which is stored in the .basex configuration file). -->
@@ -27,7 +19,7 @@
     <param-value>local</param-value>
   </context-param>
 
-  <!-- Database user. By default, no value is specified, and the credentials
+  <!-- Database user: by default, no value is specified, and the credentials
        must be specified by the client. Note that it is a clear security risk to
        store user credentials in this file. -->
   <context-param>
@@ -35,7 +27,7 @@
     <param-value></param-value>
   </context-param>
 
-  <!-- Database password. By default, no value is specified, and the credentials
+  <!-- Database password: by default, no value is specified, and the credentials
        must be specified by the client. Note that it is a clear security risk to
        store user credentials in this file. -->
   <context-param>
@@ -43,7 +35,28 @@
     <param-value></param-value>
   </context-param>
 
-  <!--  WebDAV Servlet (can be deactivated by removing this entry) -->
+  <!-- All database main options (DBATH, HTTPPPATH, etc.) can be overwritten by
+       adding additional context-param elements and prefixing the name with
+       "org.basex.". Relative paths will be prefixed with the servlet path.
+  <context-param>
+    <param-name>org.basex.dbpath</param-name>
+    <param-value>data</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.httppath</param-name>
+    <param-value>http</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.repopath</param-name>
+    <param-value>http</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.lang</param-name>
+    <param-value>English</param-value>
+  </context-param>
+  -->
+
+  <!--  WebDAV Service (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>WebDAV</servlet-name>
     <servlet-class>org.basex.http.webdav.WebDAVServlet</servlet-class>
@@ -53,7 +66,7 @@
     <url-pattern>/webdav/*</url-pattern>
   </servlet-mapping>
 
-  <!--  REST Servlet (can be deactivated by removing this entry) -->
+  <!--  REST Service (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>REST</servlet-name>
     <servlet-class>org.basex.http.rest.RESTServlet</servlet-class>
@@ -63,7 +76,7 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
 
-  <!--  RESTXQ Servlet (can be deactivated by removing this entry) -->
+  <!--  RESTXQ Service (can be deactivated by removing this entry) -->
   <servlet>
     <servlet-name>RESTXQ</servlet-name>
     <servlet-class>org.basex.http.restxq.RestXqServlet</servlet-class>

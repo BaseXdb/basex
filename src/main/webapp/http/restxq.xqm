@@ -16,7 +16,7 @@ declare variable $page:style :=
 
 declare %rest:path("hello/{$world}")
         %rest:header-param("User-Agent", "{$agent}")
-        function page:hello($world as xs:string, $agent as xs:string) {
+        function page:hello($world as xs:string, $agent as xs:string*) {
   <response>
     <title>Hello { $world }!</title>
     <info>You requested this page with { $agent }.</info>

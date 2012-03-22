@@ -96,7 +96,6 @@ final class RestXqFunction {
             if(s.trim().startsWith("{")) checkVariable(s, AtomType.AAT);
           }
         } else if(eq(CONSUMES, local)) {
-          // [CG] RESTXQ, consumes/produces: "take a SINGLE mandatory string literal"?
           // annotation "consumes"
           strings(value, name, consumes);
         } else if(eq(PRODUCES, local)) {

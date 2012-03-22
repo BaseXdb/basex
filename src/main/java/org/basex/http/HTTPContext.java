@@ -10,6 +10,7 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
+import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.basex.core.*;
@@ -93,9 +94,6 @@ public final class HTTPContext {
         throw new LoginException(WHICHAUTH, values[0]);
       }
     }
-
-    // initialize database context
-    init();
   }
 
   /**
@@ -206,12 +204,9 @@ public final class HTTPContext {
    */
   public void status(final int code, final String message) throws IOException {
     if(session != null) session.close();
+    res.setStatus(code);
     if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
-    if(message != null && !message.isEmpty()) {
-      res.sendError(code, message);
-    } else {
-      res.setStatus(code);
-    }
+    if(message != null) out.write(token(message));
   }
 
   /**
@@ -260,15 +255,49 @@ public final class HTTPContext {
   // STATIC METHODS =====================================================================
 
   /**
-   * Returns the static database context instance.
-   * Initializes the context if not done yet.
+   * Initializes the HTTP context.
    * @return context;
    */
   public static Context init() {
-    synchronized(Context.class) {
-      if(context == null) context = new Context();
-    }
+    if(context == null) context = new Context();
     return context;
+  }
+
+  /**
+   * Initializes the servlet context, based on the servlet context.
+   * Parses all context parameters and passes them on to the database context.
+   * @param sc servlet context
+   */
+  static synchronized void init(final ServletContext sc) {
+    // skip process if context has already been initialized
+    if(context != null) return;
+
+    // set servlet path as home directory
+    final String path = sc.getRealPath("/");
+    System.setProperty(Prop.PATH, path);
+
+    // parse all context parameters
+    final HashMap<String, String> map = new HashMap<String, String>();
+    final Enumeration<?> en = sc.getInitParameterNames();
+    while(en.hasMoreElements()) {
+      final String key = en.nextElement().toString();
+      if(!key.startsWith(Prop.DBPREFIX)) continue;
+
+      // only consider parameters that start with "org.basex."
+      String val = sc.getInitParameter(key);
+      if(eq(key, DBUSER, DBPASS, DBMODE, DBVERBOSE)) {
+        // store servlet-specific parameters as system properties
+        System.setProperty(key, val);
+      } else {
+        // prefix relative paths with absolute servlet path
+        if(key.endsWith("path") && !new File(val).isAbsolute()) {
+          val = path + File.separator + val;
+        }
+        // store remaining parameters (without project prefix) in map
+        map.put(key.substring(Prop.DBPREFIX.length()).toUpperCase(Locale.ENGLISH), val);
+      }
+    }
+    context = new Context(map);
   }
 
   /**

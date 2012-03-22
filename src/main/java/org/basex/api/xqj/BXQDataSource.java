@@ -45,7 +45,9 @@ public final class BXQDataSource implements XQDataSource {
    * @return database context
    */
   static Context context() {
-    if(context == null) context = new Context();
+    synchronized(Context.class) {
+      if(context == null) context = new Context();
+    }
     return context;
   }
 

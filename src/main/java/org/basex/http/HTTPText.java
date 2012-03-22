@@ -1,5 +1,7 @@
 package org.basex.http;
 
+import org.basex.core.*;
+
 /**
  * This class assembles texts which are used in the HTTP classes.
  *
@@ -17,16 +19,14 @@ public interface HTTPText {
   /** HTTP String. */
   String HTTP = "HTTP";
 
-  /** Configuration prefix. */
-  String DBX = "org.basex.";
   /** Configuration: database user. */
-  String DBUSER = DBX + "user";
+  String DBUSER = Prop.DBPREFIX + "user";
   /** Configuration: database user password. */
-  String DBPASS = DBX + "password";
+  String DBPASS = Prop.DBPREFIX + "password";
   /** Configuration: operation mode: "local", "client" or default ({@code null}). */
-  String DBMODE = DBX + "mode";
+  String DBMODE = Prop.DBPREFIX + "mode";
   /** Configuration: verbose mode. */
-  String DBVERBOSE = DBX + "verbose";
+  String DBVERBOSE = Prop.DBPREFIX + "verbose";
 
   /** Mode: local. */
   String LOCAL = "local";

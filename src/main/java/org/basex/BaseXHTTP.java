@@ -25,8 +25,6 @@ import org.mortbay.jetty.nio.*;
 public final class BaseXHTTP {
   /** Database context. */
   final Context context = HTTPContext.init();
-  /** Start database server. */
-  boolean server;
 
   /** Activate WebDAV. */
   private boolean webdav = true;
@@ -35,6 +33,8 @@ public final class BaseXHTTP {
   /** Activate RESTXQ. */
   private boolean restxq = true;
 
+  /** Start database server. */
+  private boolean server;
   /** Start as daemon. */
   private boolean service;
   /** Stopped flag. */
