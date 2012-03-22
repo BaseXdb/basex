@@ -860,7 +860,8 @@ public class QueryParser extends InputParser {
       }
     }
     // add jars to classpath
-    ctx.jars = new JarLoader(urls.toArray(new URL[urls.size()]));
+    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+    ctx.jars = new JarLoader(urls.toArray(new URL[urls.size()]), cl);
   }
 
   /**

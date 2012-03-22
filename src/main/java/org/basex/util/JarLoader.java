@@ -29,10 +29,11 @@ public final class JarLoader extends URLClassLoader {
 
   /**
    * Constructor.
-   * @param urls of jars to be loaded.
+   * @param urls of jars to be loaded
+   * @param parent the parent class loader for delegation
    */
-  public JarLoader(final URL[] urls) {
-    super(urls);
+  public JarLoader(final URL[] urls, final ClassLoader parent) {
+    super(urls, parent);
   }
 
   /**
