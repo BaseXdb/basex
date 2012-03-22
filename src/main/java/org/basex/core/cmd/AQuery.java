@@ -141,7 +141,7 @@ abstract class AQuery extends Command {
     }
 
     error(err);
-    if(Util.debug || err.startsWith(INTERRUPTED)) {
+    if(Prop.debug || err.startsWith(INTERRUPTED)) {
       info(NL);
       info(QUERY_CC + query);
       info(qp.info());

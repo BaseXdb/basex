@@ -1,18 +1,16 @@
 package org.basex.core;
 
 import static org.basex.core.Prop.*;
-import org.basex.io.IO;
-import org.basex.util.Levenshtein;
-import static org.basex.util.Token.token;
-
-import org.basex.util.*;
-import org.basex.util.list.StringList;
+import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.TreeMap;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.Map.Entry;
+
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class assembles properties which are used all around the project. They
@@ -25,18 +23,12 @@ public abstract class AProp implements Iterable<String> {
   /** Properties. */
   protected final TreeMap<String, Object> props = new TreeMap<String, Object>();
   /** Property file. */
-  private final String filename;
+  private IOFile file;
 
   /**
-   * Constructor.
-   * Reads the configuration file and initializes the project properties. The
-   * file is located in the user's home directory.
-   * If the {@code prop} argument is set to null, reading is omitted.
-   * @param prop property file extension
+   * Constructor, initializing the default options.
    */
-  protected AProp(final String prop) {
-    filename = HOME + IO.BASEXSUFFIX + prop;
-
+  protected AProp() {
     try {
       for(final Field f : getClass().getFields()) {
         final Object obj = f.get(null);
@@ -47,28 +39,35 @@ public abstract class AProp implements Iterable<String> {
     } catch(final Exception ex) {
       Util.notexpected(ex);
     }
-    if(prop == null) return;
+  }
+
+  /**
+   * Reads the configuration file and initializes the project properties.
+   * The file is located in the project home directory.
+   * @param prop property file extension
+   */
+  protected void read(final String prop) {
+    file = new IOFile(HOME + IO.BASEXSUFFIX + prop);
 
     final StringList read = new StringList();
     final TokenBuilder err = new TokenBuilder();
-    final File file = new File(filename);
     if(!file.exists()) {
-      err.addExt("Saving properties in \"%\"..." + NL, filename);
+      err.addExt("Saving properties in \"%\"..." + NL, file);
     } else {
       BufferedReader br = null;
       try {
-        br = new BufferedReader(new FileReader(file));
+        br = new BufferedReader(new FileReader(file.file()));
         for(String line; (line = br.readLine()) != null;) {
           line = line.trim();
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
           if(d < 0) {
-            err.addExt("%: \"%\" ignored. " + NL, filename, line);
+            err.addExt("%: \"%\" ignored. " + NL, file, line);
             continue;
           }
 
           final String val = line.substring(d + 1).trim();
-          String key = line.substring(0, d).trim().toUpperCase(Locale.ENGLISH);
+          String key = line.substring(0, d).trim();
 
           // extract numeric value in key
           int num = 0;
@@ -84,7 +83,7 @@ public abstract class AProp implements Iterable<String> {
 
           final Object entry = props.get(key);
           if(entry == null) {
-            err.addExt("%: \"%\" not found. " + NL, filename, key);
+            err.addExt("%: \"%\" not found. " + NL, file, key);
           } else if(entry instanceof String) {
             props.put(key, val);
           } else if(entry instanceof Integer) {
@@ -102,7 +101,7 @@ public abstract class AProp implements Iterable<String> {
           }
         }
       } catch(final Exception ex) {
-        err.addExt("% could not be parsed." + NL, filename);
+        err.addExt("% could not be parsed." + NL, file);
         Util.debug(ex);
       } finally {
         if(br != null) try { br.close(); } catch(final IOException ex) { }
@@ -119,7 +118,7 @@ public abstract class AProp implements Iterable<String> {
           final String key = ((Object[]) obj)[0].toString();
           ok &= read.contains(key);
         }
-        if(!ok) err.addExt("Saving properties in \"%\"..." + NL, filename);
+        if(!ok) err.addExt("Saving properties in \"%\"..." + NL, file);
       }
     } catch(final IllegalAccessException ex) {
       Util.notexpected(ex);
@@ -132,49 +131,15 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Parser a property string and sets the properties accordingly.
-   * @param s property string
-   * @throws IOException io exception
-   */
-  public final void properties(final String s) throws IOException {
-    for(final String ser : s.trim().split(",")) {
-      if(ser.isEmpty()) continue;
-      final String[] sprop = ser.split("=", 2);
-      final String key = sprop[0].trim().toLowerCase(Locale.ENGLISH);
-      final Object obj = get(key);
-      if(obj == null) {
-        final String in = key.toUpperCase(Locale.ENGLISH);
-        final String sim = similar(in);
-        throw new BaseXException(
-            sim != null ? org.basex.core.Text.UNKNOWN_OPT_SIMILAR_X :
-              org.basex.core.Text.UNKNOWN_OPTION_X, in, sim);
-      }
-      if(obj instanceof Integer) {
-        final int i = sprop.length < 2 ? 0 : Token.toInt(sprop[1]);
-        if(i == Integer.MIN_VALUE)
-          throw new BaseXException(org.basex.core.Text.INVALID_VALUE_X_X, key, sprop[1]);
-        set(key, i);
-      } else if(obj instanceof Boolean) {
-        final String val = sprop.length < 2 ? org.basex.core.Text.TRUE : sprop[1];
-        set(key, Util.yes(val));
-      } else {
-        set(key, sprop.length < 2 ? "" : sprop[1]);
-      }
-    }
-  }
-
-  /**
    * Writes the properties to disk.
    */
   public final synchronized void write() {
-    final File file = new File(filename);
-
     final StringBuilder user = new StringBuilder();
     BufferedReader br = null;
     try {
       // caches options specified by the user
       if(file.exists()) {
-        br = new BufferedReader(new FileReader(file));
+        br = new BufferedReader(new FileReader(file.file()));
         for(String line; (line = br.readLine()) != null;) {
           if(line.equals(PROPUSER)) break;
         }
@@ -190,7 +155,7 @@ public abstract class AProp implements Iterable<String> {
 
     BufferedWriter bw = null;
     try {
-      bw = new BufferedWriter(new FileWriter(file));
+      bw = new BufferedWriter(new FileWriter(file.file()));
       bw.write(PROPHEADER + NL);
 
       for(final Field f : getClass().getFields()) {
@@ -219,7 +184,7 @@ public abstract class AProp implements Iterable<String> {
       bw.write(NL + PROPUSER + NL);
       bw.write(user.toString());
     } catch(final Exception ex) {
-      Util.errln("% could not be written.", filename);
+      Util.errln("% could not be written.", file);
       Util.debug(ex);
     } finally {
       if(bw != null) try { bw.close(); } catch(final IOException e) { }
@@ -281,58 +246,116 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Sets the specified value for the specified key.
+   * Assigns the specified value for the specified key.
    * @param key key to be found
    * @param val value to be written
    */
   public final void set(final Object[] key, final String val) {
-    setObject(key, val);
+    setObject(key[0].toString(), val);
   }
 
   /**
-   * Sets the specified integer for the specified key.
+   * Assigns the specified integer for the specified key.
    * @param key key to be found
    * @param val value to be written
    */
   public final void set(final Object[] key, final int val) {
-    setObject(key, val);
+    setObject(key[0].toString(), val);
   }
 
   /**
-   * Sets the specified boolean for the specified key.
+   * Assigns the specified boolean for the specified key.
    * @param key key to be found
    * @param val value to be written
    */
   public final void set(final Object[] key, final boolean val) {
-    setObject(key, val);
+    setObject(key[0].toString(), val);
   }
 
   /**
-   * Sets the specified string array for the specified key.
+   * Assigns the specified string array for the specified key.
    * @param key key to be found
    * @param val value to be written
    */
   public final void set(final Object[] key, final String[] val) {
-    setObject(key, val);
+    setObject(key[0].toString(), val);
   }
 
   /**
-   * Sets the specified integer array for the specified key.
+   * Assigns the specified integer array for the specified key.
    * @param key key to be found
    * @param val value to be written
    */
   public final void set(final Object[] key, final int[] val) {
-    setObject(key, val);
+    setObject(key[0].toString(), val);
   }
 
   /**
-   * Sets the specified value for the specified key.
+   * Assigns the specified object for the specified key.
    * @param key key to be found
    * @param val value to be written
    */
-  public final void set(final String key, final Object val) {
+  public final void setObject(final String key, final Object val) {
     props.put(key, val);
     finish();
+  }
+
+  /**
+   * Sets the specified value after casting it to the correct type.
+   * @param key key
+   * @param val value
+   * @return final value, or {@code null} if the key has not been found
+   */
+  public final String set(final String key, final String val) {
+    final Object type = get(key);
+    if(type == null) return null;
+
+    String v = val;
+    if(type instanceof Boolean) {
+      final boolean b = val == null || val.isEmpty() ? !((Boolean) type) : Util.yes(val);
+      setObject(key, b);
+      v = Util.flag(b);
+    } else if(type instanceof Integer) {
+      setObject(key, Integer.parseInt(val));
+      v = String.valueOf(get(key));
+    } else if(type instanceof String) {
+      setObject(key, val);
+    } else {
+      Util.notexpected("Unknown property type: " + type.getClass().getSimpleName());
+    }
+    return v;
+  }
+
+  /**
+   * Parses a property string and sets the properties accordingly.
+   * @param s property string
+   * @throws IOException io exception
+   */
+  protected final void parse(final String s) throws IOException {
+    for(final String ser : s.trim().split(",")) {
+      if(ser.isEmpty()) continue;
+      final String[] sprop = ser.split("=", 2);
+
+      final String key = sprop[0].trim();
+      final String val = sprop.length < 2 ? "" : sprop[1];
+      try {
+        if(set(key, val) != null) continue;
+      } catch(final Exception ex) {
+        throw new BaseXException(Text.INVALID_VALUE_X_X, key, val);
+      }
+      throw new BaseXException(unknown(key));
+    }
+  }
+
+  /**
+   * Returns an error string for an unknown key.
+   * @param key key
+   * @return error string
+   */
+  public final String unknown(final String key) {
+    final String sim = similar(key);
+    return Util.info(sim != null ? Text.UNKNOWN_OPT_SIMILAR_X_X :
+      Text.UNKNOWN_OPTION_X, key, sim);
   }
 
   /**
@@ -386,17 +409,6 @@ public abstract class AProp implements Iterable<String> {
   }
 
   /**
-   * Sets the specified value.
-   *
-   * @param key key
-   * @param val value
-   */
-  private void setObject(final Object[] key, final Object val) {
-    props.put(key[0].toString(), val);
-    finish();
-  }
-
-  /**
    * Sets static properties.
    */
   void finish() {
@@ -404,12 +416,17 @@ public abstract class AProp implements Iterable<String> {
   }
 
   @Override
-  public String toString() {
-    return Util.name(this) + props;
+  public final Iterator<String> iterator() {
+    return props.keySet().iterator();
   }
 
   @Override
-  public final Iterator<String> iterator() {
-    return props.keySet().iterator();
+  public final String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final Entry<String, Object> e : props.entrySet()) {
+      if(!tb.isEmpty()) tb.add(',');
+      tb.add(e.getKey()).add('=').addExt(e.getValue());
+    }
+    return tb.toString();
   }
 }

@@ -163,7 +163,7 @@ public final class DirParser extends Parser {
             }
             parser = null;
             // dump debug data
-            if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
+            if(Prop.debug && (++c & 0x3FF) == 0) Util.err(";");
           }
         }
       }

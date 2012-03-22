@@ -4,12 +4,8 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 
-import java.util.Map.Entry;
-
-import org.basex.core.AProp;
-import org.basex.core.Prop;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class defines all available serialization parameters.
@@ -99,7 +95,7 @@ public final class SerializerProp extends AProp {
    * Constructor.
    */
   public SerializerProp() {
-    super(null);
+    super();
   }
 
   /**
@@ -109,16 +105,12 @@ public final class SerializerProp extends AProp {
    * @throws SerializerException serializer exception
    */
   public SerializerProp(final String s) throws SerializerException {
-    this();
-    if(s == null) return;
-
     for(final String ser : s.trim().split(",")) {
       if(ser.isEmpty()) continue;
       final String[] sprop = ser.split("=", 2);
       final String key = sprop[0].trim();
-      final String val = sprop.length < 2 ? "" : sprop[1].trim();
-      if(get(key) == null) SERINVALID.thrwSerial(key);
-      set(key, val);
+      final String val = set(key, sprop.length < 2 ? "" : sprop[1].trim());
+      if(val == null) SERINVALID.thrwSerial(key);
     }
   }
 
@@ -171,15 +163,5 @@ public final class SerializerProp extends AProp {
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
     tb.addExt(SERVAL3, found);
     throw SERANY.thrwSerial(tb);
-  }
-
-  @Override
-  public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(final Entry<String, Object> e : props.entrySet()) {
-      if(!tb.isEmpty()) tb.add(',');
-      tb.add(e.getKey()).add('=').addExt(e.getValue());
-    }
-    return tb.toString();
   }
 }

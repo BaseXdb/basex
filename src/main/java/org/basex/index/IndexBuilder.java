@@ -1,13 +1,12 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Progress;
-import org.basex.data.Data;
-import org.basex.util.Performance;
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * This interface defines the functions which are needed for building
@@ -48,7 +47,7 @@ public abstract class IndexBuilder extends Progress {
    */
   protected final void check() {
     checkStop();
-    if(Util.debug && (pre & 0x1FFFFF) == 0) Util.err(".");
+    if(Prop.debug && (pre & 0x1FFFFF) == 0) Util.err(".");
   }
 
   /**
@@ -60,7 +59,7 @@ public abstract class IndexBuilder extends Progress {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
       if(cc >= 0) throw new BaseXException(OUT_OF_MEM + H_OUT_OF_MEM);
-      if(Util.debug) Util.err("!");
+      if(Prop.debug) Util.err("!");
       merge = true;
       cc = 30;
     } else {

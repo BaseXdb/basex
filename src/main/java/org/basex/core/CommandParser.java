@@ -513,10 +513,10 @@ public final class CommandParser extends InputParser {
     }
 
     // output error for similar commands
-    final byte[] name = lc(token(token));
+    final byte[] name = uc(token(token));
     final Levenshtein ls = new Levenshtein();
     for(final Enum<?> s : list(cmp, null)) {
-      final byte[] sm = lc(token(s.name().toLowerCase(Locale.ENGLISH)));
+      final byte[] sm = uc(token(s.name()));
       if(ls.similar(name, sm, 0) && Cmd.class.isInstance(s))
         throw error(list(alt), UNKNOWN_SIMILAR_X, name, sm);
     }

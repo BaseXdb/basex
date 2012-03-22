@@ -102,7 +102,7 @@ public abstract class FTBuilder extends IndexBuilder {
     // delete old index
     abort();
 
-    final Performance perf = Util.debug ? new Performance() : null;
+    final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(det());
 
     for(pre = 0; pre < size; ++pre) {

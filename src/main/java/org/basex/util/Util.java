@@ -4,11 +4,9 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
-import java.security.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.server.*;
 import org.basex.util.list.*;
 
@@ -21,15 +19,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Util {
-  /** Database home directory. */
-  public static final String PATH = "org.basex.path";
-  /** Language (applied after restart). */
-  public static String language = Prop.LANG;
-  /** Flag for showing language keys. */
-  public static boolean langkeys;
-  /** Debug mode. */
-  public static boolean debug;
-
   /** Flag for using default standard input. */
   private static final boolean NOCONSOLE = System.console() == null;
 
@@ -166,7 +155,7 @@ public final class Util {
   public static String message(final Throwable ex) {
     final String msg = ex.getMessage();
     if(ex instanceof BindException) return SRV_RUNNING;
-    //else if(ex instanceof FileNotFoundException) return info(FILE_NOT_FOUND_X, msg);
+    else if(ex instanceof FileNotFoundException) return info(FILE_NOT_FOUND_X, msg);
     else if(ex instanceof LoginException) return ACCESS_DENIED;
     else if(ex instanceof ConnectException) return CONNECTION_ERROR;
     else if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;
@@ -181,7 +170,7 @@ public final class Util {
    * @return always false
    */
   public static boolean debug(final Throwable ex) {
-    if(debug && ex != null) stack(ex);
+    if(Prop.debug && ex != null) stack(ex);
     return false;
   }
 
@@ -191,7 +180,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void debug(final Object str, final Object... ext) {
-    if(debug) errln(str, ext);
+    if(Prop.debug) errln(str, ext);
   }
 
   /**
@@ -199,7 +188,7 @@ public final class Util {
    * @param perf performance reference
    */
   public static void memory(final Performance perf) {
-    if(!debug) return;
+    if(!Prop.debug) return;
     errln(" " + perf + " (" + Performance.getMemory() + ')');
   }
 
@@ -265,77 +254,6 @@ public final class Util {
     obj[0] = th.toString();
     for(int i = 0; i < st.length; i++) obj[i + 1] = "  " + st[i];
     return obj;
-  }
-
-  /**
-   * <p>Determines the project's home directory for storing property files
-   * and directories. The directory is chosen as follows:</p>
-   * <ol>
-   * <li>First, the <b>system property</b> {@code "org.basex.path"} is checked.
-   *   If it contains a value, it is chosen as directory path.</li>
-   * <li>If not, the <b>current user directory</b> (defined by the system
-   *   property {@code "user.dir"}) is chosen if the {@code .basex}
-   *   configuration file is found in this directory.</li>
-   * <li>Otherwise, the configuration file is searched in the <b>application
-   *   directory</b> (the folder in which the project is located).</li>
-   * <li>In all other cases, the <b>user's home directory</b> (defined in
-   *   {@code "user.home"}) is chosen.</li>
-   * </ol>
-   * @return home directory
-   */
-  public static String homeDir() {
-    // check user specific property
-    String path = System.getProperty(PATH);
-    if(path != null) return path + File.separator;
-
-    // check working directory for property file
-    path = System.getProperty("user.dir");
-    File config = new File(path, IO.BASEXSUFFIX);
-    if(config.exists()) return config.getParent() + File.separator;
-
-    // not found; check application directory
-    path = applicationPath();
-    if(path != null) {
-      final File app = new File(path);
-      final String dir = app.isFile() ? app.getParent() : app.getPath();
-      config = new File(dir, IO.BASEXSUFFIX);
-      if(config.exists()) return config.getParent() + File.separator;
-    }
-
-    // not found; choose user home directory as default
-    return Prop.USERHOME;
-  }
-
-  /**
-   * Returns the absolute path to this application, or {@code null} if the
-   * path cannot be evaluated.
-   * @return application path.
-   */
-  private static String applicationPath() {
-    final ProtectionDomain pd = Util.class.getProtectionDomain();
-    if(pd == null) return null;
-    // raw application path
-    final String path = pd.getCodeSource().getLocation().getPath();
-    // decode path; URLDecode returns wrong results
-    final TokenBuilder tb = new TokenBuilder();
-    final int pl = path.length();
-    for(int p = 0; p < pl; ++p) {
-      final char ch = path.charAt(p);
-      if(ch == '%' && p + 2 < pl) {
-        tb.addByte((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));
-        p += 2;
-      } else {
-        tb.add(ch);
-      }
-    }
-    try {
-      // return path, using the correct encoding
-      return new String(tb.finish(), Prop.ENCODING);
-    } catch(final Exception ex) {
-      // use default path; not expected to occur
-      stack(ex);
-      return tb.toString();
-    }
   }
 
   /**

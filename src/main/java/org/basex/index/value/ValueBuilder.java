@@ -3,16 +3,16 @@ package org.basex.index.value;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.data.Data;
-import org.basex.index.IndexBuilder;
-import org.basex.index.IndexTree;
+
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.out.DataOutput;
-import org.basex.io.random.DataAccess;
-import org.basex.util.Num;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.io.random.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class builds an index for attribute values and text contents in a
@@ -55,7 +55,7 @@ public final class ValueBuilder extends IndexBuilder {
     // delete old index
     abort();
 
-    final Performance perf = Util.debug ? new Performance() : null;
+    final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(det());
 
     final String f = text ? DATATXT : DATAATV;

@@ -1,13 +1,13 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.data.Nodes;
-import org.basex.index.Resources;
-import org.basex.query.util.pkg.Repo;
-import org.basex.server.ClientListener;
-import org.basex.server.Sessions;
+
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.query.util.pkg.*;
+import org.basex.server.*;
 
 /**
  * This class serves as a central database context.
@@ -64,15 +64,15 @@ public final class Context {
    * Default constructor, which should only be called once in a project.
    */
   public Context() {
-    listener = null;
-    mprop = new MainProp();
-    datas = new Datas();
-    events = new Events();
-    sessions = new Sessions();
-    lock = new Lock(this);
-    users = new Users(true);
-    repo = new Repo(this);
-    user = users.get(ADMIN);
+    this(new MainProp());
+  }
+
+  /**
+   * Default constructor, which should only be called once in a project.
+   * @param props initial properties
+   */
+  public Context(final HashMap<String, String> props) {
+    this(new MainProp(props));
   }
 
   /**
@@ -82,7 +82,6 @@ public final class Context {
    * @param cl client listener
    */
   public Context(final Context ctx, final ClientListener cl) {
-    listener = cl;
     mprop = ctx.mprop;
     datas = ctx.datas;
     events = ctx.events;
@@ -91,6 +90,23 @@ public final class Context {
     users = ctx.users;
     repo = ctx.repo;
     databases = ctx.databases();
+    listener = cl;
+  }
+
+  /**
+   * Private constructor.
+   * @param mp main properties
+   */
+  private Context(final MainProp mp) {
+    mprop = mp;
+    datas = new Datas();
+    events = new Events();
+    sessions = new Sessions();
+    lock = new Lock(this);
+    users = new Users(true);
+    repo = new Repo(this);
+    user = users.get(ADMIN);
+    listener = null;
   }
 
   /**

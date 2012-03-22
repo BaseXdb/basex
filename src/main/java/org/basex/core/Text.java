@@ -726,7 +726,7 @@ public interface Text {
   /** "Unknown option '%'". */
   String UNKNOWN_OPTION_X = lang("unknown_option_%");
   /** Unknown command error. */
-  String UNKNOWN_OPT_SIMILAR_X = lang("unknown_option_%") + ' ' +
+  String UNKNOWN_OPT_SIMILAR_X_X = lang("unknown_option_%") + ' ' +
       lang("similar_cmd_%");
   /** "Unknown parser '%'". */
   String UNKNOWN_PARSER_X = lang("unknown_parser_%");

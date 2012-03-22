@@ -250,7 +250,7 @@ public final class QueryProcessor extends Progress {
 
     // reset database properties to initial value
     for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {
-      ctx.context.prop.set(e.getKey(), e.getValue());
+      ctx.context.prop.setObject(e.getKey(), e.getValue());
     }
     // close database connections
     ctx.resource.close();

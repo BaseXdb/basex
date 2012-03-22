@@ -112,8 +112,7 @@ public class BaseXButton extends JButton {
    * @param b button
    * @param mnem mnemonics that have already been assigned
    */
-  public static void setMnemonic(final AbstractButton b,
-      final StringBuilder mnem) {
+  public static void setMnemonic(final AbstractButton b, final StringBuilder mnem) {
     // do not set mnemonics for Mac! Alt+key used for special characters.
     if(Prop.MAC) return;
 

@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
-import org.basex.core.cmd.Set;
 import org.basex.data.Data;
 import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
@@ -158,7 +157,7 @@ public final class QueryContext extends Progress {
     context = ctx;
     nodes = ctx.current();
     xquery3 = ctx.prop.is(Prop.XQUERY3);
-    inf = ctx.prop.is(Prop.QUERYINFO) || Util.debug;
+    inf = ctx.prop.is(Prop.QUERYINFO) || Prop.debug;
     final String path = ctx.prop.get(Prop.QUERYPATH);
     if(!path.isEmpty()) sc.baseURI(path);
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
@@ -193,7 +192,7 @@ public final class QueryContext extends Progress {
     // temporarily set database values (size check added for better performance)
     if(dbOptions.size() != 0) {
       for(final Entry<String, String> e : dbOptions.entrySet()) {
-        Set.set(e.getKey(), e.getValue(), context.prop);
+        context.prop.set(e.getKey(), e.getValue());
       }
     }
 

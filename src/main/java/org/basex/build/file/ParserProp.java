@@ -31,7 +31,7 @@ public final class ParserProp extends AProp {
    * Constructor.
    */
   public ParserProp() {
-    super(null);
+    super();
   }
 
   /**
@@ -41,17 +41,6 @@ public final class ParserProp extends AProp {
    * @throws IOException I/O exception
    */
   public ParserProp(final String s) throws IOException {
-    this();
-    super.properties(s);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(final String str : props.keySet()) {
-      if(sb.length() != 0) sb.append(',');
-      sb.append(str).append('=').append(props.get(str));
-    }
-    return sb.toString();
+    parse(s);
   }
 }

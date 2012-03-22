@@ -18,8 +18,7 @@ public final class Get extends AGet {
    * @param key property
    */
   public Get(final Object key) {
-    super(User.READ, (key instanceof Object[] ?
-        ((Object[]) key)[0] : key).toString());
+    super(User.READ, (key instanceof Object[] ? ((Object[]) key)[0] : key).toString());
   }
 
   @Override
@@ -27,7 +26,7 @@ public final class Get extends AGet {
     final String key = args[0].toUpperCase(Locale.ENGLISH);
     Object type = prop.get(key);
     if(type == null && !context.client()) type = mprop.get(key);
-    if(type == null) return whichKey();
+    if(type == null) return error(prop.unknown(key));
     out.println(key + COLS + type);
     return true;
   }

@@ -41,6 +41,7 @@ public final class IndexOptimizeTest {
    */
   @BeforeClass
   public static void start() throws Exception {
+    new DropDB(NAME).execute(CONTEXT);
     new Set(Prop.FTINDEX, true).execute(CONTEXT);
     new Set(Prop.QUERYINFO, true).execute(CONTEXT);
   }

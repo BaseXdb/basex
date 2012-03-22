@@ -48,18 +48,10 @@ public final class HTMLProp extends AProp {
 
   /**
    * Constructor.
-   */
-  public HTMLProp() {
-    super(null);
-  }
-
-  /**
-   * Constructor.
    * @param s properties string
    * @throws IOException exception
    */
   public HTMLProp(final String s) throws IOException {
-    this();
-    super.properties(s);
+    parse(s);
   }
 }

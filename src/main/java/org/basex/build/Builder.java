@@ -4,19 +4,15 @@ import static org.basex.build.BuildText.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Progress;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.data.Namespaces;
-import org.basex.index.Names;
-import org.basex.index.path.PathSummary;
-import org.basex.io.IO;
-import org.basex.util.Atts;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.index.path.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides an interface for building database instances.
@@ -82,7 +78,7 @@ public abstract class Builder extends Progress {
   final void parse(final MetaData md, final Names ta, final Names at)
       throws IOException {
 
-    final Performance perf = Util.debug ? new Performance() : null;
+    final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(tit() + DOTS);
 
     meta = md;
@@ -351,7 +347,7 @@ public abstract class Builder extends Progress {
     }
     if(meta.size != 1) inDoc = true;
 
-    if(Util.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
+    if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
 
     // check if data ranges exceed database limits,
     // based on the storage details in {@link Data}

@@ -160,7 +160,7 @@ public final class GUIProp extends AProp {
    * Constructor.
    */
   public GUIProp() {
-    super("gui");
+    read("gui");
     recent(null);
     Prop.gui = true;
   }
@@ -171,7 +171,6 @@ public final class GUIProp extends AProp {
    */
   public void recent(final IOFile file) {
     final StringList sl = new StringList();
-
     String path = null;
     if(file != null) {
       path = file.path();

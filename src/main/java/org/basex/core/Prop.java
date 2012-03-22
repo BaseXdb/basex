@@ -1,9 +1,10 @@
 package org.basex.core;
 
 import java.io.File;
-import java.util.Locale;
+import java.security.*;
 
-import org.basex.util.Util;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class assembles properties which are used all around the project.
@@ -12,8 +13,7 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class Prop extends AProp {
-
-  // CONSTANTS ================================================================
+  // CONSTANTS ==========================================================================
 
   /** Project name. */
   public static final String NAME = "BaseX";
@@ -28,20 +28,21 @@ public final class Prop extends AProp {
   /** System's temporary directory. */
   public static final String TMP = System.getProperty("java.io.tmpdir") + '/';
 
-  /** OS flag (should be ignored whenever possible). */
-  private static final String OS =
-      System.getProperty("os.name").toUpperCase(Locale.ENGLISH);
+  /** OS flag (source: {@code http://lopica.sourceforge.net/os.html}). */
+  private static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
-  public static final boolean MAC = OS.startsWith("MAC");
+  public static final boolean MAC = OS.startsWith("Mac");
   /** Flag denoting if OS belongs to Windows family. */
-  public static final boolean WIN = OS.startsWith("WIN");
+  public static final boolean WIN = OS.startsWith("Windows");
 
-  /** User home directory. */
+  /** Prefix for project specific properties. */
+  public static final String DBPREFIX = "org.basex.";
+  /** System property for specifying database home directory. */
+  public static final String PATH = DBPREFIX + "path";
+  /** User's home directory. */
   public static final String USERHOME = System.getProperty("user.home") + File.separator;
   /** Directory for storing the property files, database directory, etc. */
-  public static final String HOME = Util.homeDir();
-  /** Default language. */
-  public static final String LANG = "English";
+  public static final String HOME = homePath();
 
   /** Property information. */
   static final String PROPHEADER = "# Property File." + NL +
@@ -49,7 +50,18 @@ public final class Prop extends AProp {
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 
-  // OPTIONS ==================================================================
+  // STATIC OPTIONS =====================================================================
+
+  /** Language (applied after restart). */
+  public static String language = "English";
+  /** Flag for prefixing texts with their keys (helps while translating texts). */
+  public static boolean langkeys;
+  /** Debug mode. */
+  public static boolean debug;
+  /** GUI mode. */
+  public static boolean gui;
+
+  // OPTIONS ============================================================================
 
   /** Flag for whitespace chopping. */
   public static final Object[] CHOP = { "CHOP", true };
@@ -162,15 +174,81 @@ public final class Prop extends AProp {
   /** Maximum number of hits to be displayed in the GUI (will be overwritten). */
   public static final Object[] MAXHITS = { "MAXHITS", -1 };
 
-  // STATIC PROPERTIES ========================================================
-
-  /** GUI mode. */
-  public static boolean gui;
-
   /**
    * Constructor.
    */
   public Prop() {
-    super(null);
+    super();
+  }
+
+  /**
+   * <p>Determines the project's home directory for storing property files
+   * and directories. The directory is chosen as follows:</p>
+   * <ol>
+   * <li>First, the <b>system property</b> {@code "org.basex.path"} is checked.
+   *   If it contains a value, it is adopted as home directory.</li>
+   * <li>If not, the <b>current user directory</b> (defined by the system
+   *   property {@code "user.dir"}) is chosen if the {@code .basex}
+   *   configuration file is found in this directory.</li>
+   * <li>Otherwise, the configuration file is searched in the <b>application
+   *   directory</b> (the folder in which the project is located).</li>
+   * <li>In all other cases, the <b>user's home directory</b> (defined in
+   *   {@code "user.home"}) is chosen.</li>
+   * </ol>
+   * @return home directory
+   */
+  private static String homePath() {
+    // check user specific property
+    String path = System.getProperty(PATH);
+    if(path != null) return path + File.separator;
+
+    // check working directory for property file
+    path = System.getProperty("user.dir");
+    File config = new File(path, IO.BASEXSUFFIX);
+    if(config.exists()) return config.getParent() + File.separator;
+
+    // not found; check application directory
+    path = applicationPath();
+    if(path != null) {
+      final File app = new File(path);
+      final String dir = app.isFile() ? app.getParent() : app.getPath();
+      config = new File(dir, IO.BASEXSUFFIX);
+      if(config.exists()) return config.getParent() + File.separator;
+    }
+
+    // not found; choose user home directory as default
+    return Prop.USERHOME;
+  }
+
+  /**
+   * Returns the absolute path to this application, or {@code null} if the
+   * path cannot be evaluated.
+   * @return application path.
+   */
+  private static String applicationPath() {
+    final ProtectionDomain pd = Prop.class.getProtectionDomain();
+    if(pd == null) return null;
+    // raw application path
+    final String path = pd.getCodeSource().getLocation().getPath();
+    // decode path; URLDecode returns wrong results
+    final TokenBuilder tb = new TokenBuilder();
+    final int pl = path.length();
+    for(int p = 0; p < pl; ++p) {
+      final char ch = path.charAt(p);
+      if(ch == '%' && p + 2 < pl) {
+        tb.addByte((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));
+        p += 2;
+      } else {
+        tb.add(ch);
+      }
+    }
+    try {
+      // return path, using the correct encoding
+      return new String(tb.finish(), Prop.ENCODING);
+    } catch(final Exception ex) {
+      // use default path; not expected to occur
+      Util.stack(ex);
+      return tb.toString();
+    }
   }
 }

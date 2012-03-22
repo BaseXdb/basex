@@ -1,10 +1,8 @@
 package org.basex.util.ft;
 
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
-import org.basex.core.Prop;
-import org.basex.util.Util;
+import org.basex.core.*;
 
 /**
  * This class contains language tokens which are valid for the xml:lang
@@ -78,7 +76,7 @@ public final class Language implements Comparable<Language> {
    * @return default language
    */
   public static Language def() {
-    final Language lang = DISP.get(Util.language);
+    final Language lang = DISP.get(Prop.language);
     return lang == null ? get("en") : lang;
   }
 

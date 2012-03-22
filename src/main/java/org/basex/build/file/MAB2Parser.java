@@ -126,14 +126,14 @@ public final class MAB2Parser extends SingleParser {
       if(child) entry.add(pos);
       else entry.pos(pos);
 
-      if(Util.debug) {
+      if(Prop.debug) {
         if((++i & 0x7FFF) == 0) Util.err(" " + i + '\n');
         else if((i & 0xFFF) == 0) Util.err("!");
         else if((i & 0x3FF) == 0) Util.err(".");
       }
     }
 
-    if(Util.debug) Util.err("\nParse Offsets (%): %/%\n", ids.size(), p,
+    if(Prop.debug) Util.err("\nParse Offsets (%): %/%\n", ids.size(), p,
         Performance.getMemory());
 
     // create all titles
@@ -148,7 +148,7 @@ public final class MAB2Parser extends SingleParser {
       }
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem();
     }
-    if(Util.debug) Util.err("\nCreate Titles: %/%\n", p,
+    if(Prop.debug) Util.err("\nCreate Titles: %/%\n", p,
         Performance.getMemory());
     builder.endElem();
 
