@@ -36,11 +36,11 @@ declare %rest:path("")
       server's root directory.</p>
       <p>The following links return a page with dynamic contents:</p>
       <ul>
-        <li><a href="/restxq/hello/World">http://localhost:8984/restxq/hello/World</a></li>
-        <li><a href="/restxq/hello/Universe">http://localhost:8984/restxq/hello/Universe</a></li>
+        <li><a href="hello/World">hello/World</a></li>
+        <li><a href="hello/Universe">hello/Universe</a></li>
       </ul>
       <p>The following form demonstrates the form parameters:</p>
-      <form method="post" action="/restxq/form">
+      <form method="post" action="form">
         <p>Your message:<br />
         <input name="content" size="50"></input>
         <input type="submit" /></p>
