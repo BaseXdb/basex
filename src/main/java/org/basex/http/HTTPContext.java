@@ -132,7 +132,7 @@ public final class HTTPContext {
         type = APP_XML;
       } else if(eq(mt, M_JSON, M_JSONML)) {
         type = APP_JSON;
-      } else if(eq(mt, M_XHTML, M_HTML)) {
+      } else if(eq(mt, M_XHTML, M_HTML5, M_HTML)) {
         type = TEXT_HTML;
       } else {
         type = TEXT_PLAIN;
