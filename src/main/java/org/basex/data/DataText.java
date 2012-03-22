@@ -144,6 +144,8 @@ public interface DataText {
   /** Method. */
   String M_HTML = "html";
   /** Method. */
+  String M_HTML5 = "html5";
+  /** Method. */
   String M_TEXT = "text";
   /** Method. */
   String M_JSON = "json";
@@ -153,7 +155,7 @@ public interface DataText {
   String M_RAW = "raw";
   /** Methods. */
   String[] METHODS = {
-    M_XML, M_XHTML, M_HTML, M_TEXT, M_JSON, M_JSONML, M_RAW
+    M_XML, M_XHTML, M_HTML, M_HTML5, M_TEXT, M_JSON, M_JSONML, M_RAW
   };
 
   /** Normalization. */

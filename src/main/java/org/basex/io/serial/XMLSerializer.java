@@ -17,8 +17,7 @@ public class XMLSerializer extends OutputSerializer {
    * @param p serialization properties
    * @throws IOException I/O exception
    */
-  XMLSerializer(final OutputStream os, final SerializerProp p)
-      throws IOException {
+  XMLSerializer(final OutputStream os, final SerializerProp p) throws IOException {
     super(os, p, V10, V11);
   }
 }
