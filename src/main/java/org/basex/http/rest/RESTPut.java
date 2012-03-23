@@ -27,7 +27,7 @@ public class RESTPut extends RESTCode {
 
     boolean xml = true;
     final InputStream in = http.in;
-    final String ct = http.req.getContentType();
+    final String ct = http.contentType();
     // choose correct importer
     if(APP_JSON.equals(ct)) {
       session.execute("set parser json");

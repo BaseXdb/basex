@@ -113,6 +113,15 @@ public final class HTTPContext {
   }
 
   /**
+   * Returns the content type of a request (without an optional encoding).
+   * @return content type
+   */
+  public String contentType() {
+    final String ct = req.getContentType();
+    return ct != null ? ct.replaceFirst(";.*", "") : null;
+  }
+
+  /**
    * Initializes the output. Sets the expected encoding and content type.
    * @param sprop serialization properties
    */

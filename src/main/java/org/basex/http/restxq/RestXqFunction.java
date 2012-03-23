@@ -177,7 +177,7 @@ final class RestXqFunction {
     final Prop prop = context.context.prop;
 
     // cache request body
-    final String ct = http.req.getContentType();
+    final String ct = http.contentType();
     IOContent body = null;
 
     if(requestBody != null) {
@@ -301,7 +301,7 @@ final class RestXqFunction {
     // return true if no type is given
     if(consumes.isEmpty()) return true;
     // return true if no content type is specified by the user
-    final String ct = http.req.getContentType();
+    final String ct = http.contentType();
     if(ct == null) return true;
     // check if any combination matches
     for(final String c : consumes) {
