@@ -1,14 +1,11 @@
 package org.basex.core.cmd;
 
 import static org.basex.util.Token.*;
-import org.basex.core.Context;
-import org.basex.query.path.Axis;
-import org.basex.util.Array;
-import org.basex.util.TokenBuilder;
-import org.basex.util.XMLToken;
-import org.basex.util.list.BoolList;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+
+import org.basex.core.*;
+import org.basex.query.path.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
@@ -30,6 +27,11 @@ public final class Find extends AQuery {
     return query(find(args[0], context, false));
   }
 
+  @Override
+  public boolean updating(final Context ctx) {
+    return updating(ctx, find(args[0], ctx, false));
+  }
+
   /**
    * Creates an XQuery representation for the specified query.
    * @param query query
@@ -37,9 +39,7 @@ public final class Find extends AQuery {
    * @param root root flag
    * @return query
    */
-  public static String find(final String query, final Context ctx,
-      final boolean root) {
-
+  public static String find(final String query, final Context ctx, final boolean root) {
     // treat input as XQuery
     if(query.startsWith("/")) return query;
 
