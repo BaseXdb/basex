@@ -34,18 +34,17 @@
     <param-value></param-value>
   </context-param>
 
-  <!-- All database main options (dbpath, httppath, etc.) can be overwritten by
-       adding additional context-param elements and prefixing the name with
-       "org.basex.". Relative paths will be prefixed with the servlet path. -->
-  <context-param>
-    <param-name>org.basex.httppath</param-name>
-    <param-value>.</param-value>
-  </context-param>
-
-  <!--
+  <!-- All database main options, which are usually stored in the .basex
+       configuration file (DBPATH, DEBUG, etc.), can be specified as well by
+       prefixing the key with "org.basex.". If an option references a relative
+       path, it will be prefixed with the servlet root path.
   <context-param>
     <param-name>org.basex.dbpath</param-name>
     <param-value>data</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.basex.httppath</param-name>
+    <param-value>.</param-value>
   </context-param>
   <context-param>
     <param-name>org.basex.repopath</param-name>

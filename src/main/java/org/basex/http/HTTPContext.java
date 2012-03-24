@@ -287,6 +287,9 @@ public final class HTTPContext {
 
     // parse all context parameters
     final HashMap<String, String> map = new HashMap<String, String>();
+    // store default web root
+    map.put(MainProp.HTTPPATH[0].toString(), path);
+
     final Enumeration<?> en = sc.getInitParameterNames();
     while(en.hasMoreElements()) {
       final String key = en.nextElement().toString();
