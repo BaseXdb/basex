@@ -1,0 +1,26 @@
+body {
+  font-family: "Trebuchet MS","Droid sans", sans-serif;
+  color: #222222;
+  font-size: 86%;
+  margin: 0 20px 0 20px;
+}
+
+h2 {
+  color: #C00000;
+}
+
+hr {
+  height: 1px;
+  border: 0px;
+  background-color: #222222;
+}
+
+a {
+  color: #C00000;
+  text-decoration: none;
+}
+
+p {
+  margin: 0 0 10px 0;
+}
+
