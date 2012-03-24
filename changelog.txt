@@ -3,6 +3,20 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.2 (March 24, 2012) -------------------------------------------
+
+  - support for the new RESTXQ API for building XQuery web services
+  - improved support for running BaseX as web application
+  - XQuery: higher order functions added to speed up Top-K queries
+  - proxy server settings added
+  - advanced TagSoup options added for importing HTML files
+  - XQuery: faster traversal of full-text index entries: ft:tokens()
+  - Command-line: embedded readline and history support via JLine
+  - XQuery 3.0: annotation added, updated EQName syntax (Q{uri}name)
+  - opened databases are now pinned OS-wide to reduce write conflicts
+  - HTML5 serialization of query results
+  - a printable version of our Wiki documentation
+
 VERSION 7.1.1 (February 19, 2012) --------------------------------------
 
   GUI:
