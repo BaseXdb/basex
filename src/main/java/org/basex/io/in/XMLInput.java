@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  */
 public class XMLInput extends InputStream {
   /** Input file. */
-  private IO input;
+  private final IO input;
 
   /** Input streams. */
   private TextInput[] inputs = new TextInput[1];

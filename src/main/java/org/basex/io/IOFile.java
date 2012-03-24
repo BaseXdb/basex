@@ -78,7 +78,7 @@ public final class IOFile extends IO {
    */
   public boolean touch() {
     // some file systems require several runs
-    for(int i = 0; i < 3; i++) {
+    for(int i = 0; i < 5; i++) {
       try {
         if(file.createNewFile()) return true;
       } catch(final IOException ex) {
@@ -306,9 +306,10 @@ public final class IOFile extends IO {
     if(file.exists()) {
       if(isDir()) for(final IOFile ch : children()) ok &= ch.delete();
       // some file systems require several runs
-      for(int i = 0; i < 3; i++) {
+      for(int i = 0; i < 5; i++) {
         if(file.delete() && !file.exists()) return ok;
         Performance.sleep(i * 10);
+        if(i != 0) System.out.println("DELETE: " + i);
       }
     }
     return false;
