@@ -16,6 +16,8 @@ import org.basex.util.list.*;
  * @author Dimitar Popov
  */
 public class IdPreMap {
+  /** Invalid id-value. */
+  private static final int INV = -1;
   /** Base ID value. */
   private int baseid;
   /** PRE values of the inserted/deleted IDs. */
@@ -93,17 +95,19 @@ public class IdPreMap {
   public int pre(final int id) {
     // no updates or id is not affected by updates
     if(rows == 0 || id < pres[0]) return id;
-    // id was inserted by update
+
     if(id > baseid) {
-      // optimize if performance is low
+      // id was inserted by update
       for(int i = 0; i < rows; ++i) {
-        if(fids[i] == id) return pres[i];
-        if(fids[i] < id && id <= nids[i]) return pres[i] + id - fids[i];
+        // if(fids[i] == id) return pres[i]; // is this optimization?
+        if(fids[i] <= id && id <= nids[i]) return pres[i] + id - fids[i];
       }
+    } else {
+      // id is affected by updates
+      final int i = sortedLastIndexOf(oids, id);
+      return id + incs[i < 0 ? -i - 2 : i];
     }
-    // id is affected by updates
-    final int i = sortedLastIndexOf(oids, id);
-    return id + incs[i < 0 ? -i - 2 : i];
+    return -1;
   }
 
   /**
@@ -170,11 +174,7 @@ public class IdPreMap {
         inc += incs[pos - 1];
       }
 
-      // apply correction to all subsequent intervals
-      for(int k = pos; k < rows; ++k) {
-        pres[k] += c;
-        incs[k] += c;
-      }
+      increment(pos, c);
     }
 
     // add the new interval
@@ -194,134 +194,99 @@ public class IdPreMap {
       return;
     }
 
-    int inc = c;
-    int oid = id;
+    if(rows == 0) {
+      // no previous updates: add a new record
+      add(0, pre, INV, INV, c, id);
+      return;
+    }
 
-    if(rows > 0) {
-      final int p = pre - c - 1;
-      int i1 = findPre(pre);
-      int i2 = -c > 1 ? findPre(p) : i1;
+    final int end = pre - c - 1;
+    final int startIndex = findPre(pre);
 
-      final boolean found1 = i1 >= 0;
-      final boolean found2 = i2 >= 0;
+    // remove all updates which has affected records which now have to be deleted
+    final int removeStart = startIndex < rows && pres[startIndex] < pre ?
+         startIndex + 1 : startIndex;
+    int removeEnd = -1;
+    for(int i = startIndex; i < rows; ++i) {
+      if(end < pres[i] + nids[i] - fids[i]) break;
+      removeEnd = i;
+    }
 
-      if(!found1) i1 = -i1 - 1;
-      if(!found2) i2 = -i2 - 1;
-
-      if(i1 >= rows) {
-        // no other intervals are affected => append the new one
-        add(i1, pre, -1, -1, incs[i1 - 1] + inc, oid);
-        return;
-      }
-
-      final int min1 = pres[i1];
-      final int max1 = pres[i1] + nids[i1] - fids[i1];
-
-      final int min2;
-      final int max2;
-      if(i2 >= rows) {
-        min2 = max2 = p + 1;
-      } else {
-        min2 = pres[i2];
-        max2 = pres[i2] + nids[i2] - fids[i2];
-      }
-
-      // apply correction to all subsequent intervals
-      for(int k = found2 ? i2 + 1 : i2; k < rows; ++k) {
-        pres[k] += c;
-        incs[k] += c;
-      }
-
-      if(i1 == i2) {
-        // pre1 <= p <= max2
-        if(pre <= min1) {
-          if(p == max2) {
-            if(i2 + 1 < rows && pres[i2 + 1] == pre) {
-              // remove interval if the next one (already changed) is the same
-              remove(i1, i2);
-            } else {
-              incs[i2] += c;
-              pres[i2] = pre;
-              fids[i2] = -1;
-              nids[i2] = -1;
-              //remove(i1, i2 - 1);
-            }
-          } else if(min2 <= p && p < max2) {
-            incs[i2] += c;
-            pres[i2] = pre;
-            fids[i2] += p - min2 + 1;
-            //remove(i1, i2 - 1);
-          } else if(p < min2 - 1) {
-            // the interval is not adjacent to next one => should be added
-            add(i1, pre, -1, -1, i1 > 0 ? incs[i1 - 1] + c : c, oid);
-          }
-        } else if(min1 < pre) {
-          if(min2 < p && p < max2) {
-            final int fid = fids[i2] + p - min2 + 1;
-            add(i2 + 1, p + c + 1, fid, nids[i2], incs[i1] + c, oids[i2]);
-          }
-          final int s = max1 - pre + 1;
-          nids[i1] -= s;
-          incs[i1] -= s;
-        }
-      } else if(i1 < i2) {
-        // pre1 <= max1 < p <= max2
-        // min1 <= max1 < min2 <= max2
-        if(pre <= min1) {
-          if(p == max2) {
-            if(i2 + 1 < rows && pres[i2 + 1] == pre) {
-              // remove interval if the next one (already changed) is the same
-              remove(i1, i2);
-            } else {
-              incs[i2] += c;
-              pres[i2] = pre;
-              fids[i2] = -1;
-              nids[i2] = -1;
-              remove(i1, i2 - 1);
-            }
-          } else if(min2 <= p && p < max2) {
-            incs[i2] += c;
-            pres[i2] = pre;
-            fids[i2] += p - min2 + 1;
-            remove(i1, i2 - 1);
-          } else if(p < min2) {
-            if(i2 < rows && pres[i2] == pre) {
-              // remove interval if the next one (already changed) is the same
-              remove(i1, --i2);
-            } else {
-              incs[--i2] += c;
-              pres[i2] = pre;
-              fids[i2] = -1;
-              nids[i2] = -1;
-              remove(i1, i2 - 1);
-            }
-          }
-        } else if(min1 < pre) {
-          if(p == max2) {
-            inc += incs[i2];
-            oid = oids[i2];
-            remove(i1 + 1, i2);
-            nids[i1] -= max1 - pre + 1;
-            incs[i1] = inc;
-            oids[i1] = oid;
-          } else if(min2 <= p && p < max2) {
-            fids[i2] += p - min2 + 1;
-            incs[i2] += c;
-            pres[i2] = pre;
-            remove(i1 + 1, i2 - 1);
-            final int s = max1 - pre + 1;
-            nids[i1] -= s;
-            incs[i1] -= s;
-          } else if(p < min2) {
-            incs[i1] = incs[i2 - 1] + c;
-            remove(i1 + 1, i2 - 1);
-            final int s = max1 - pre + 1;
-            nids[i1] -= s;
-          }
-        }
-      }
+    final int inc;
+    final int oid;
+    int endIndex;
+    if(removeEnd >= 0) {
+      inc = incs[removeEnd];
+      oid = oids[removeEnd];
+      endIndex = removeStart;
+      remove(removeStart, removeEnd);
     } else {
-      add(0, pre, -1, -1, inc, oid);
+      inc = 0 < startIndex ? incs[startIndex - 1] : 0;
+      oid = id;
+      endIndex = startIndex;
+    }
+
+    if(rows <= startIndex) {
+      // the delete does not affect previous updates
+      add(startIndex, pre, INV, INV, inc + c, oid);
+      return;
+    }
+
+    final int min = pres[startIndex];
+    if(startIndex < endIndex) {
+      if(endIndex < rows && pres[endIndex] <= end) {
+        shrinkFromStart(endIndex, pre, c);
+        shrinkFromEnd(startIndex, pre, inc + c);
+      } else {
+        --endIndex;     // endIndex is not processed, so we let the increment do that
+        shrinkFromEnd(startIndex, pre, inc + c);
+      }
+    } else if(min < pre) {
+      add(++endIndex, pres[startIndex], fids[startIndex], nids[startIndex],
+          incs[startIndex], oids[startIndex]);
+      shrinkFromStart(endIndex, pre, c);
+      shrinkFromEnd(startIndex, pre, inc + c);
+    } else if(end < min) {
+      add(endIndex, pre, INV, INV, inc + c, oid);
+    } else {
+      shrinkFromStart(startIndex, pre, c);
+    }
+
+    increment(endIndex + 1, c);
+  }
+
+  /**
+   * Shrink the given tuple from the start.
+   * @param i index of the tuple
+   * @param pre pre-value
+   * @param c number of deleted records (negative number)
+   */
+  private void shrinkFromStart(final int i, final int pre, final int c) {
+    incs[i] += c;
+    fids[i] += pre - c - pres[i];
+    pres[i] = pre;
+  }
+
+  /**
+   * Shrink the given tuple from the end.
+   * @param i index of the tuple
+   * @param pre pre-value
+   * @param inc new inc-value
+   */
+  private void shrinkFromEnd(final int i, final int pre, final int inc) {
+    nids[i] = fids[i] + pre - pres[i] - 1;
+    incs[i] = inc;
+  }
+
+  /**
+   * Increment the pre- and inc-values of all tuples starting from the given index.
+   * @param from start index
+   * @param with increment value
+   */
+  private void increment(final int from, final int with) {
+    for(int i = from; i < rows; ++i) {
+      pres[i] += with;
+      incs[i] += with;
     }
   }
 
@@ -343,10 +308,18 @@ public class IdPreMap {
   }
 
   /**
+   * Size of the map.
+   * @return number of stored tuples.
+   */
+  public int size() {
+    return rows;
+  }
+
+  /**
    * Search for a given pre value.
    * @param pre pre value
-   * @return index of the record where the pre was found, or the negative
-   *         insertion point - 1
+   * @return index of the record where the pre is found, or the insertion point, if not
+   * found
    */
   private int findPre(final int pre) {
     int low = 0;
@@ -359,12 +332,11 @@ public class IdPreMap {
       else if(midValMin > pre) high = mid - 1;
       else return mid; // key found
     }
-    return -(low + 1); // key not found.
+    return low; // key not found.
   }
 
   /**
-   * Binary search for a key in a list. If there are several hits the last one
-   * is returned.
+   * Binary search of a key in a list. If there are several hits the last one is returned.
    * @param a array to search into
    * @param e key to search for
    * @return index of the found hit or where the key ought to be inserted
@@ -398,11 +370,13 @@ public class IdPreMap {
       oids = Arrays.copyOf(oids, s);
     }
     if(i < rows) {
-      System.arraycopy(pres, i, pres, i + 1, rows - i);
-      System.arraycopy(fids, i, fids, i + 1, rows - i);
-      System.arraycopy(nids, i, nids, i + 1, rows - i);
-      System.arraycopy(incs, i, incs, i + 1, rows - i);
-      System.arraycopy(oids, i, oids, i + 1, rows - i);
+      final int destPos = i + 1;
+      final int length = rows - i;
+      System.arraycopy(pres, i, pres, destPos, length);
+      System.arraycopy(fids, i, fids, destPos, length);
+      System.arraycopy(nids, i, nids, destPos, length);
+      System.arraycopy(incs, i, incs, destPos, length);
+      System.arraycopy(oids, i, oids, destPos, length);
     }
     pres[i] = pre;
     fids[i] = fid;
@@ -419,12 +393,14 @@ public class IdPreMap {
    */
   private void remove(final int s, final int e) {
     if(s <= e) {
-      System.arraycopy(pres, e + 1, pres, s, rows - (e + 1));
-      System.arraycopy(fids, e + 1, fids, s, rows - (e + 1));
-      System.arraycopy(nids, e + 1, nids, s, rows - (e + 1));
-      System.arraycopy(incs, e + 1, incs, s, rows - (e + 1));
-      System.arraycopy(oids, e + 1, oids, s, rows - (e + 1));
-      rows -= e - s + 1;
+      final int last = e + 1;
+      final int length = rows - last;
+      System.arraycopy(pres, last, pres, s, length);
+      System.arraycopy(fids, last, fids, s, length);
+      System.arraycopy(nids, last, nids, s, length);
+      System.arraycopy(incs, last, incs, s, length);
+      System.arraycopy(oids, last, oids, s, length);
+      rows -= last - s;
     }
   }
 }
