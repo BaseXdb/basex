@@ -120,7 +120,7 @@ public class HTTPClientTest extends HTTPTest {
     Result r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertEquals(NodeType.DOC, ((ItemCache) r).item[1].type);
+    assertEquals(NodeType.DOC, ((ValueBuilder) r).item[1].type);
     qp.close();
 
     // GET2 - with override-media-type='text/plain'
@@ -130,7 +130,7 @@ public class HTTPClientTest extends HTTPTest {
     r = qp.execute();
     checkResponse(r, HttpURLConnection.HTTP_OK, 2);
 
-    assertEquals(AtomType.STR, ((ItemCache) r).item[1].type);
+    assertEquals(AtomType.STR, ((ValueBuilder) r).item[1].type);
     qp.close();
 
     // Get3 - with status-only='true'
@@ -290,7 +290,7 @@ public class HTTPClientTest extends HTTPTest {
         + "</http:multipart>" + "</http:request>";
 
     final DBNode dbNode1 = new DBNode(new IOContent(multiReq), LCONTEXT.prop);
-    final ItemCache bodies = new ItemCache();
+    final ValueBuilder bodies = new ValueBuilder();
     bodies.add(Str.get("Part1"));
     bodies.add(Str.get("Part2"));
     bodies.add(Str.get("Part3"));
@@ -669,7 +669,7 @@ public class HTTPClientTest extends HTTPTest {
         conn, Bln.FALSE.string(), null);
 
     // Construct expected result
-    final ItemCache resultIter = new ItemCache();
+    final ValueBuilder resultIter = new ValueBuilder();
     final String reqItem = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"
@@ -759,7 +759,7 @@ public class HTTPClientTest extends HTTPTest {
         conn, Bln.FALSE.string(), null);
 
     // Construct expected result
-    final ItemCache resultIter = new ItemCache();
+    final ValueBuilder resultIter = new ValueBuilder();
     final String reqItem = "<http:response "
         + "xmlns:http='http://expath.org/ns/http-client' "
         + "status='200' message='OK'>"

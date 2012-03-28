@@ -339,9 +339,9 @@ final class RestXqFunction {
     if(values == null || values.length == 0) {
       val = rxp.value;
     } else {
-      final ItemCache ic = new ItemCache();
-      for(final String s : values) ic.add(new Atm(s));
-      val = ic.value();
+      final ValueBuilder vb = new ValueBuilder();
+      for(final String s : values) vb.add(new Atm(s));
+      val = vb.value();
     }
     bind(rxp.name, val);
   }
@@ -410,9 +410,9 @@ final class RestXqFunction {
     // variable template
     final QNm qnm = checkVariable(toString(value.itemAt(1), name));
     // default value
-    final ItemCache ic = new ItemCache();
-    for(int v = 2; v < vs; v++) ic.add(value.itemAt(v));
-    return new RestXqParam(qnm, key, ic.value());
+    final ValueBuilder vb = new ValueBuilder();
+    for(int v = 2; v < vs; v++) vb.add(value.itemAt(v));
+    return new RestXqParam(qnm, key, vb.value());
   }
 
   // PRIVATE STATIC METHODS =============================================================

@@ -26,7 +26,7 @@ import org.basex.query.item.Int;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.util.Util;
 import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -309,9 +309,9 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQSequence createSequence(final Iterator it) throws XQException {
     opened();
     valid(it, Iterator.class);
-    final ItemCache ic = new ItemCache();
-    while(it.hasNext()) ic.add(create(it.next(), null));
-    return new BXQSequence(ic, this);
+    final ValueBuilder vb = new ValueBuilder();
+    while(it.hasNext()) vb.add(create(it.next(), null));
+    return new BXQSequence(vb, this);
   }
 
   @Override
