@@ -23,8 +23,7 @@ import org.basex.util.hash.*;
  */
 public final class ModuleLoader {
   /** Java modules. */
-  public final HashMap<Object, ArrayList<Method>> javaModules =
-      new HashMap<Object, ArrayList<Method>>();
+  private HashMap<Object, ArrayList<Method>> javaModules;
   /** Module URLs. */
   private final ArrayList<URL> urls = new ArrayList<URL>();
   /** Database context. */
@@ -48,15 +47,17 @@ public final class ModuleLoader {
   }
 
   /**
-   * Finds the instance of the specified Java module.
+   * Returns an instance of the specified Java module class.
    * @param clz class to be found
    * @return instance, or {@code null}
    */
   public Object findJava(final String clz) {
     // check if class was imported as Java module
-    for(final Object jm : javaModules.keySet()) {
-      final Class<?> c = jm.getClass();
-      if(c.getName().equals(clz)) return jm;
+    if(javaModules != null) {
+      for(final Object jm : javaModules.keySet()) {
+        final Class<?> c = jm.getClass();
+        if(c.getName().equals(clz)) return jm;
+      }
     }
     return null;
   }
@@ -88,7 +89,7 @@ public final class ModuleLoader {
   public boolean load(final byte[] uri, final InputInfo ii, final QueryParser qp)
       throws QueryException {
 
-    // check Java modules (inheriting {@link QueryModule})
+    // check Java modules
     if(startsWith(uri, JAVAPRE)) {
       final String path = string(substring(uri, JAVAPRE.length));
       final Class<?> clz = Reflect.find(path);
@@ -104,7 +105,9 @@ public final class ModuleLoader {
         // if class is inherited from {@link QueryModule}, no super methods are accepted
         if(!qm || m.getDeclaringClass() == clz) list.add(m);
       }
-      // put class into module cache
+
+      // add class and its methods to module cache
+      if(javaModules == null) javaModules = new HashMap<Object, ArrayList<Method>>();
       javaModules.put(jm, list);
       return true;
     }
