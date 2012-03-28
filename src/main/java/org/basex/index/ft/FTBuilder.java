@@ -122,8 +122,7 @@ public abstract class FTBuilder extends IndexBuilder {
         final byte[] tok = lex.nextToken();
         ++pos;
         // skip too long and stopword tokens
-        if(tok.length <= data.meta.maxlen &&
-            (sw.size() == 0 || sw.id(tok) == 0)) {
+        if(tok.length <= data.meta.maxlen && (sw.size() == 0 || !sw.contains(tok))) {
           // check if main memory is exhausted
           if((ntok++ & 0xFFF) == 0 && scm == 0 && memFull()) {
             // currently no frequency support for tf/idf based scoring

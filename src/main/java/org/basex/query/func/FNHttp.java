@@ -5,7 +5,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Item;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.http.HTTPClient;
 import org.basex.util.InputInfo;
@@ -38,10 +38,10 @@ public final class FNHttp extends StandardFunc {
     final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, input)) : null;
 
     // get parameter $bodies
-    ItemCache cache = null;
+    ValueBuilder cache = null;
     if(expr.length == 3) {
       final Iter bodies = expr[2].iter(ctx);
-      cache = new ItemCache();
+      cache = new ValueBuilder();
       for(Item i; (i = bodies.next()) != null;) cache.add(i);
     }
 

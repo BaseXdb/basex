@@ -13,7 +13,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
@@ -75,12 +75,12 @@ public final class FNQName extends StandardFunc {
 
     final Atts ns = node.nsScope().add(XML, XMLURI);
     final int as = ns.size();
-    final ItemCache ic = new ItemCache(as);
+    final ValueBuilder vb = new ValueBuilder(as);
     for(int a = 0; a < as; ++a) {
       final byte[] key = ns.name(a);
-      if(key.length + ns.string(a).length != 0) ic.add(Str.get(key));
+      if(key.length + ns.string(a).length != 0) vb.add(Str.get(key));
     }
-    return ic;
+    return vb;
   }
 
   /**

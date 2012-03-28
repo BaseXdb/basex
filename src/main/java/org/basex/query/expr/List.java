@@ -10,7 +10,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
@@ -90,9 +90,9 @@ public final class List extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final ItemCache ic = new ItemCache();
-    for(final Expr e : expr) ic.add(ctx.value(e));
-    return ic.value();
+    final ValueBuilder vb = new ValueBuilder();
+    for(final Expr e : expr) vb.add(ctx.value(e));
+    return vb.value();
   }
 
   @Override

@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.basex.BaseXServer;
-import org.basex.core.Command;
+import org.basex.core.*;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
@@ -94,7 +94,7 @@ public final class PermissionTest {
 
       ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
-      server.context.repo.init(REPO);
+      server.context.mprop.set(MainProp.REPOPATH, REPO);
       testSession = new ClientSession(LOCALHOST, 9999, NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);

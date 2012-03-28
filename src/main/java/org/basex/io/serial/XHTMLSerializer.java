@@ -28,7 +28,7 @@ public class XHTMLSerializer extends OutputSerializer {
   public void attribute(final byte[] n, final byte[] v) throws IOException {
     // escape URI attributes
     final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    final byte[] val = escape && URIS.id(tagatt) != 0 ? escape(v) : v;
+    final byte[] val = escape && URIS.contains(tagatt) ? escape(v) : v;
     super.attribute(n, val);
   }
 

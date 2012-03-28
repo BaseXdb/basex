@@ -18,6 +18,7 @@ import org.basex.util.hash.*;
 /**
  * Package validator. This class executes some essential checks before the
  * installation of a package.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
@@ -121,7 +122,7 @@ public final class PkgValidator {
    * Checks compatibility of dependency version with installed version.
    * @param dep dependency
    * @param currentVers current versions - either currently installed versions
-   *          for a package or current version of BaseX
+   *        for a package or current version of BaseX
    * @return available appropriate version
    */
   private static byte[] availVersion(final Dependency dep,
@@ -132,7 +133,7 @@ public final class PkgValidator {
       // get acceptable versions for secondary package/processor
       final TokenSet versList = new TokenSet(split(dep.versions, ' '));
       // check if any acceptable version is already installed
-      for(final byte[] v : versList) if(currentVers.id(v) != 0) return v;
+      for(final byte[] v : versList) if(currentVers.contains(v)) return v;
     } else if(dep.semver != null) {
       // version template - version of secondary package or BaseX version must
       // be compatible with the defined template
@@ -198,6 +199,7 @@ public final class PkgValidator {
    */
   private boolean isInstalled(final Component comp, final byte[] name)
       throws QueryException {
+
     // get packages in which the module's namespace is found
     final TokenSet pkgs = repo.nsDict().get(comp.uri);
     if(pkgs == null) return false;

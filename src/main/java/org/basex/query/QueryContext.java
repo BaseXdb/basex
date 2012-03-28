@@ -5,49 +5,32 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
+import org.basex.core.*;
 import org.basex.core.Context;
-import org.basex.core.Progress;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.FTPosData;
-import org.basex.data.Nodes;
-import org.basex.data.Result;
+import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
-import org.basex.query.func.JavaMapping;
-import org.basex.query.func.UserFuncs;
+import org.basex.io.serial.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
 import org.basex.query.item.*;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
-import org.basex.query.up.Updates;
-import org.basex.query.util.JDBCConnections;
-import org.basex.query.util.Var;
-import org.basex.query.util.VarContext;
-import org.basex.query.util.json.JsonMapConverter;
-import org.basex.util.InputInfo;
-import org.basex.util.JarLoader;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.XMLToken;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTOpt;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.list.IntList;
+import org.basex.query.iter.*;
+import org.basex.query.up.*;
+import org.basex.query.util.*;
+import org.basex.query.util.json.*;
+import org.basex.query.util.pkg.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
- * This class provides query-specific methods and properties.
+ * This class organizes both static and dynamic properties that are specific to a
+ * single query.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -132,11 +115,8 @@ public final class QueryContext extends Progress {
   SerializerProp serProp;
   /** Initial context value. */
   public Expr ctxItem;
-  /** Java modules. */
-  public final HashMap<QueryModule, ArrayList<Method>> javaModules =
-      new HashMap<QueryModule, ArrayList<Method>>();
-  /** JAR modules. */
-  public JarLoader jars;
+  /** Module loader. */
+  public ModuleLoader modules;
   /** Opened connections to relational databases. */
   JDBCConnections jdbc;
 
@@ -161,6 +141,7 @@ public final class QueryContext extends Progress {
     final String path = ctx.prop.get(Prop.QUERYPATH);
     if(!path.isEmpty()) sc.baseURI(path);
     maxCalls = ctx.prop.num(Prop.TAILCALLS);
+    modules = new ModuleLoader(ctx);
   }
 
   /**
@@ -430,7 +411,7 @@ public final class QueryContext extends Progress {
 
     // evaluates the query
     final Iter ir = iter();
-    final ItemCache ic = new ItemCache();
+    final ValueBuilder vb = new ValueBuilder();
     Item it = null;
 
     // check if all results belong to the database of the input context
@@ -446,20 +427,20 @@ public final class QueryContext extends Progress {
       final int ps = pre.size();
       if(it == null || ps == max) {
         // all nodes have been processed: return GUI-friendly nodeset
-        return ps == 0 ? ic : new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
+        return ps == 0 ? vb : new Nodes(pre.toArray(), nodes.data, ftpos).checkRoot();
       }
 
       // otherwise, add nodes to standard iterator
-      for(int p = 0; p < ps; ++p) ic.add(new DBNode(nodes.data, pre.get(p)));
-      ic.add(it);
+      for(int p = 0; p < ps; ++p) vb.add(new DBNode(nodes.data, pre.get(p)));
+      vb.add(it);
     }
 
     // use standard iterator
     while((it = ir.next()) != null) {
       checkStop();
-      if(ic.size() < max) ic.add(it);
+      if(vb.size() < max) vb.add(it);
     }
-    return ic;
+    return vb;
   }
 
   /**

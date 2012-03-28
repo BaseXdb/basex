@@ -178,9 +178,9 @@ public final class FNSeq extends StandardFunc {
       for(final byte[] c : pn.stats.cats) is.index(input, new Atm(c));
     }
     // return resulting sequence
-    final ItemCache ic = new ItemCache(is.size());
-    for(final Item i : is) ic.add(i);
-    return ic.value();
+    final ValueBuilder vb = new ValueBuilder(is.size());
+    for(final Item i : is) vb.add(i);
+    return vb.value();
   }
 
   /**

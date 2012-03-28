@@ -78,7 +78,7 @@ public final class Catch extends Single {
       final Value val = ex.value();
       for(final Value v : new Value[] { ex.qname(),
           Str.get(ex.getLocalizedMessage()), val == null ? Empty.SEQ : val,
-          Str.get(io), Int.get(ex.col()), Int.get(ex.line()), Empty.SEQ }) {
+          Str.get(io), Int.get(ex.line()), Int.get(ex.col()), Empty.SEQ }) {
         vars[i++].bind(v, ctx);
       }
       return ctx.value(expr);

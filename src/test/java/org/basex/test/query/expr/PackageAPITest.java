@@ -3,31 +3,22 @@ package org.basex.test.query.expr;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.io.File;
+import java.io.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.cmd.RepoDelete;
-import org.basex.core.cmd.RepoInstall;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.IOFile;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.util.Err;
-import org.basex.query.util.pkg.PkgParser;
-import org.basex.query.util.pkg.PkgValidator;
-import org.basex.query.util.pkg.RepoManager;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.hash.TokenSet;
-import org.junit.Before;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.query.util.pkg.*;
+import org.basex.test.query.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.junit.*;
 
 /**
  * This class tests the EXPath package API.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
@@ -44,7 +35,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       if(f.isDir() && f.name().contains(".")) f.delete();
     }
     ctx = new Context();
-    ctx.repo.init(REPO);
+    ctx.mprop.set(MainProp.REPOPATH, REPO);
   }
 
   /** Tests repository initialization. */
@@ -55,23 +46,23 @@ public final class PackageAPITest extends AdvancedQueryTest {
     final TokenMap pkgDict = ctx.repo.pkgDict();
 
     assertEquals(3, nsDict.keys().length);
-    assertNotNull(nsDict.get(token("ns1")));
-    assertNotNull(nsDict.get(token("ns2")));
-    assertNotNull(nsDict.get(token("ns3")));
+    assertTrue(nsDict.contains(token("ns1")));
+    assertTrue(nsDict.contains(token("ns2")));
+    assertTrue(nsDict.contains(token("ns3")));
     TokenSet ts = nsDict.get(token("ns1"));
     assertEquals(ts.size(), 2);
-    assertTrue(ts.id(token("http://www.pkg1.com-12.0")) != 0);
-    assertTrue(ts.id(token("http://www.pkg2.com-10.0")) != 0);
+    assertTrue(ts.contains(token("http://www.pkg1.com-12.0")));
+    assertTrue(ts.contains(token("http://www.pkg2.com-10.0")));
     ts = nsDict.get(token("ns2"));
     assertEquals(ts.size(), 1);
-    assertTrue(ts.id(token("http://www.pkg1.com-12.0")) != 0);
+    assertTrue(ts.contains(token("http://www.pkg1.com-12.0")));
     ts = nsDict.get(token("ns3"));
     assertEquals(ts.size(), 1);
-    assertTrue(ts.id(token("http://www.pkg2.com-10.0")) != 0);
+    assertTrue(ts.contains(token("http://www.pkg2.com-10.0")));
     // check package dictionary
     assertEquals(pkgDict.keys().length, 2);
-    assertNotNull(pkgDict.get(token("http://www.pkg1.com-12.0")));
-    assertNotNull(pkgDict.get(token("http://www.pkg2.com-10.0")));
+    assertTrue(pkgDict.contains(token("http://www.pkg1.com-12.0")));
+    assertTrue(pkgDict.contains(token("http://www.pkg2.com-10.0")));
     assertEquals("pkg1",
         string(pkgDict.get(token("http://www.pkg1.com-12.0"))));
     assertEquals("pkg2",
@@ -313,7 +304,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
 
     // check if pkg3 is registered in the repo
-    assertNotNull(ctx.repo.pkgDict().id(token("pkg3-10.0")) != 0);
+    assertTrue(ctx.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
 
     // check if pkg3 was correctly unzipped
     final String pkg3Dir = normalize("http://www.pkg3.com-10.0");
@@ -326,7 +317,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // install another package (pkg4) with a dependency to pkg3
     new RepoInstall(REPO + "pkg4.xar", null).execute(ctx);
     // check if pkg4 is registered in the repo
-    assertNotNull(ctx.repo.pkgDict().id(token("pkg4-2.0")) != 0);
+    assertTrue(ctx.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
     // check if pkg4 was correctly unzipped
     final String pkg4Dir = normalize("http://www.pkg4.com-2.0");
     assertTrue(dir(pkg4Dir));
@@ -345,14 +336,14 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // try to delete pkg4 (use package name)
     new RepoDelete("http://www.pkg4.com", null).execute(ctx);
     // check if pkg4 is unregistered from the repo
-    assertEquals(0, ctx.repo.pkgDict().id(token("http://www.pkg4.com-2.0")));
+    assertFalse(ctx.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
 
     // check if pkg4 directory was deleted
     assertTrue(!dir(pkg4Dir));
     // try to delete pkg3 (use package dir)
     new RepoDelete(pkg3Dir, null).execute(ctx);
     // check if pkg3 is unregistered from the repo
-    assertEquals(0, ctx.repo.pkgDict().id(token("http://www.pkg3.com-10.0")));
+    assertFalse(ctx.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
     // check if pkg3 directory was deleted
     assertTrue(!dir(pkg3Dir));
   }

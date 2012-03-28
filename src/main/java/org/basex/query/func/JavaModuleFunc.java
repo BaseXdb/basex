@@ -1,20 +1,16 @@
 package org.basex.query.func;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryModule;
 import static org.basex.query.QueryText.*;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Value;
-import static org.basex.query.util.Err.JAVAERR;
-import static org.basex.query.util.Err.JAVAMOD;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Java function binding.
@@ -24,8 +20,8 @@ import java.lang.reflect.Method;
  */
 public final class JavaModuleFunc extends JavaMapping {
   /** Java module. */
-  private final QueryModule module;
-  /** Java method. */
+  private final Object module;
+  /** Method to be called. */
   private final Method mth;
 
   /**
@@ -35,15 +31,19 @@ public final class JavaModuleFunc extends JavaMapping {
    * @param m Java method/field
    * @param a arguments
    */
-  JavaModuleFunc(final InputInfo ii, final QueryModule jm, final Method m,
-      final Expr[] a) {
+  JavaModuleFunc(final InputInfo ii, final Object jm, final Method m, final Expr[] a) {
     super(ii, a);
     module = jm;
     mth = m;
   }
 
   @Override
-  protected Object eval(final Value[] args) throws QueryException {
+  protected Object eval(final Value[] args, final QueryContext ctx)
+      throws QueryException {
+
+    // assign context if module is inheriting {@link QueryModule}
+    if(module instanceof QueryModule) ((QueryModule) module).init(ctx);
+
     try {
       try {
         return mth.invoke(module, (Object[]) args);
@@ -53,14 +53,25 @@ public final class JavaModuleFunc extends JavaMapping {
         return mth.invoke(module, ar);
       }
     } catch(final InvocationTargetException ex) {
-      throw JAVAERR.thrw(input, ex.getCause());
+      final Throwable cause = ex.getCause();
+      throw cause instanceof QueryException ? ((QueryException) cause).info(input) :
+        JAVAERR.thrw(input, cause);
     } catch(final Throwable ex) {
+      // compose expected signature
+      final TokenBuilder expect = new TokenBuilder();
+      for(final Class<?> c : mth.getParameterTypes()) {
+        if(!expect.isEmpty()) expect.add(", ");
+        expect.add(c.getSimpleName());
+      }
+      // compose found signature
       final TokenBuilder found = new TokenBuilder();
       for(final Value a : args) {
         if(!found.isEmpty()) found.add(", ");
-        found.addExt(a.type);
+        found.addExt(a.type());
       }
-      throw JAVAMOD.thrw(input, signature(), name() + '(' + found + ')');
+
+      throw JAVAMOD.thrw(input, mth.getName() + '(' + expect + ')',
+          mth.getName() + '(' + found + ')');
     }
   }
 
@@ -82,19 +93,6 @@ public final class JavaModuleFunc extends JavaMapping {
    */
   private String name() {
     return module.getClass().getSimpleName() + '.' + mth.getName();
-  }
-
-  /**
-   * Returns the function signature.
-   * @return string
-   */
-  private String signature() {
-    final TokenBuilder exp = new TokenBuilder();
-    for(final Class<?> c : mth.getParameterTypes()) {
-      if(!exp.isEmpty()) exp.add(", ");
-      exp.add(c.getSimpleName());
-    }
-    return name() + '(' + exp + ')';
   }
 
   @Override

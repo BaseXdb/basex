@@ -30,9 +30,9 @@ public abstract class ValueIter extends Iter implements Iterable<Item> {
 
   @Override
   public Value value() {
-    final ItemCache ic = new ItemCache((int) size());
-    for(Item i; (i = next()) != null;) ic.add(i);
-    return ic.value();
+    final ValueBuilder vb = new ValueBuilder((int) size());
+    for(Item i; (i = next()) != null;) vb.add(i);
+    return vb.value();
   }
 
   @Override

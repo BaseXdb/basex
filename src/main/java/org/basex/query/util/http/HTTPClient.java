@@ -52,7 +52,7 @@ public final class HTTPClient {
    * @throws QueryException query exception
    */
   public Iter sendRequest(final byte[] href, final ANode request,
-      final ItemCache bodies) throws QueryException {
+      final ValueBuilder bodies) throws QueryException {
 
     try {
       if(request == null) {
@@ -212,7 +212,7 @@ public final class HTTPClient {
    * @throws IOException I/O exception
    * @throws QueryException query exception
    */
-  private void writePayload(final ItemCache payload, final TokenMap payloadAtts,
+  private void writePayload(final ValueBuilder payload, final TokenMap payloadAtts,
       final OutputStream out) throws IOException, QueryException {
 
     final byte[] t = payloadAtts.get(MEDIA_TYPE);
@@ -259,7 +259,7 @@ public final class HTTPClient {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private void writeBase64(final ItemCache payload,
+  private void writeBase64(final ValueBuilder payload,
       final OutputStream out) throws IOException, QueryException {
 
     for(int i = 0; i < payload.size(); i++) {
@@ -279,7 +279,7 @@ public final class HTTPClient {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private void writeHex(final ItemCache payload, final OutputStream out)
+  private void writeHex(final ValueBuilder payload, final OutputStream out)
       throws IOException, QueryException {
 
     for(int i = 0; i < payload.size(); i++) {
@@ -300,7 +300,7 @@ public final class HTTPClient {
    * @param out connection output stream
    * @throws IOException I/O Exception
    */
-  private static void write(final ItemCache payload, final TokenMap attrs,
+  private static void write(final ValueBuilder payload, final TokenMap attrs,
       final byte[] method, final OutputStream out) throws IOException {
 
     // extract serialization parameters

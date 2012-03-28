@@ -18,6 +18,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public enum Err {
+  /** BASX0000: Evaluation exception. */
+  JAVACALL(BASX, 0, "%"),
   /** BASX0001: Evaluation exception. */
   NOINDEX(BASX, 1, "Database '%' has no % index."),
   /** BASX0001: Evaluation exception. */
@@ -232,13 +234,13 @@ public enum Err {
   /** FORG0006: Evaluation exception. */
   JAVAFUN(FORG, 6, "Invalid arguments: %(%) found."),
   /** FORG0006: Evaluation exception. */
-  JAVAMOD(FORG, 6, "Invalid arguments:\n% expected, % found."),
+  JAVAMOD(FORG, 6, "Invalid arguments: % expected, % found."),
   /** FORG0006: Evaluation exception. */
   INVBASE(FORG, 6, "Unsupported base: %."),
   /** FORG0006: Evaluation exception. */
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
   /** FORG0006: Evaluation exception. */
-  JAVAERR(FORG, 6, "Java call failed: %."),
+  JAVAERR(FORG, 6, "Java function call failed: %."),
   /** FORG0006: Evaluation exception. */
   ERRFORM(FORG, 6, "%: %."),
   /** FORG0008: Function exception. */
@@ -659,11 +661,9 @@ public enum Err {
   /** XQST0057: Parsing exception. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059: Parsing exception. */
-  NOCONS(XQST, 59, "% must inhert %."),
+  NOINV(XQST, 59, "Could not instantiate module '%'."),
   /** XQST0059: Parsing exception. */
-  NOINV(XQST, 59, "Could not instantiate Java class '%'."),
-  /** XQST0059: Parsing exception. */
-  NOMODULE(XQST, 59, "No module found for namespace '%'."),
+  NOMODULE(XQST, 59, "Module not found: '%'."),
   /** XQST0059: Parsing exception. */
   NOMODULEFILE(XQST, 59, "Could not retrieve module '%'."),
   /** XQST0059: Parsing exception. */

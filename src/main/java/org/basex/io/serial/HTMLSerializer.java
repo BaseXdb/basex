@@ -37,9 +37,9 @@ public class HTMLSerializer extends OutputSerializer {
   public void attribute(final byte[] n, final byte[] v) throws IOException {
     // don't append value for boolean attributes
     final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    if(BOOLEAN.id(tagatt) != 0 && eq(n, v)) return;
+    if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
     // escape URI attributes
-    final byte[] val = escape && URIS.id(tagatt) != 0 ? escape(v) : v;
+    final byte[] val = escape && URIS.contains(tagatt) ? escape(v) : v;
 
     print(' ');
     print(n);

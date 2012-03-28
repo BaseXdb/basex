@@ -11,12 +11,13 @@ import org.basex.query.item.Value;
 import org.basex.util.Util;
 
 /**
- * Item iterator.
+ * This class can be used to build new sequences. At the same time, it serves as an
+ * iterator.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ItemCache extends ValueIter implements Result {
+public final class ValueBuilder extends ValueIter implements Result {
   /** Item container. */
   public Item[] item;
   /** Number of items. */
@@ -27,7 +28,7 @@ public final class ItemCache extends ValueIter implements Result {
   /**
    * Constructor.
    */
-  public ItemCache() {
+  public ValueBuilder() {
     this(1);
   }
 
@@ -35,7 +36,7 @@ public final class ItemCache extends ValueIter implements Result {
    * Constructor.
    * @param c initial capacity
    */
-  public ItemCache(final int c) {
+  public ValueBuilder(final int c) {
     item = new Item[c];
   }
 
@@ -44,7 +45,7 @@ public final class ItemCache extends ValueIter implements Result {
    * @param it item array
    * @param s size
    */
-  public ItemCache(final Item[] it, final int s) {
+  public ValueBuilder(final Item[] it, final int s) {
     item = it;
     size = s;
   }
@@ -71,13 +72,12 @@ public final class ItemCache extends ValueIter implements Result {
 
   @Override
   public boolean sameAs(final Result v) {
-    if(!(v instanceof ItemCache)) return false;
+    if(!(v instanceof ValueBuilder)) return false;
 
-    final ItemCache ic = (ItemCache) v;
-    if(size != ic.size) return false;
+    final ValueBuilder vb = (ValueBuilder) v;
+    if(size != vb.size) return false;
     for(int i = 0; i < size; ++i) {
-      if(item[i].type != ic.item[i].type || !item[i].sameAs(ic.item[i]))
-        return false;
+      if(item[i].type != vb.item[i].type || !item[i].sameAs(vb.item[i])) return false;
     }
     return true;
   }

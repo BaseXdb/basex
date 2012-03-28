@@ -63,7 +63,7 @@ public final class NameTest extends Test {
 
     // check existence of tag/attribute names
     ok = ok && (mode != Mode.NAME || (type == NodeType.ELM ?
-        data.tagindex : data.atnindex).id(ln) != 0);
+        data.tagindex : data.atnindex).contains(ln));
 
     if(!ok) ctx.compInfo(OPTNAME, name);
     return ok;

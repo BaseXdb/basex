@@ -31,7 +31,7 @@ public abstract class Expr extends ExprInfo {
     /** Creates new fragments. Example: node constructor. */ CNS,
     /** Depends on context. Example: context node. */        CTX,
     /** Non-deterministic. Example: random(). */             NDT,
-    /** Context position. Examples: position(). */           POS,
+    /** Context position. Example: position(). */            POS,
     /** Performs updates. Example: insert expression. */     UPD,
     /** References a variable. Example: {@link VarRef}. */   VAR,
     /** Based on XQuery 3.0. Example: group by statement. */ X30,

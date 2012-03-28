@@ -16,7 +16,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Int;
 import org.basex.query.item.Str;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.test.query.simple.XQUPTest;
 import org.basex.util.Util;
 import org.junit.AfterClass;
@@ -131,8 +131,8 @@ public abstract class QueryTest {
    * Creates a container for the specified node values.
    * @return node array
    */
-  protected static ItemCache empty() {
-    return new ItemCache(new Item[] {}, 0);
+  protected static ValueBuilder empty() {
+    return new ValueBuilder(new Item[] {}, 0);
   }
 
   /**
@@ -149,8 +149,8 @@ public abstract class QueryTest {
    * @param str string
    * @return iterator
    */
-  protected static ItemCache str(final String... str) {
-    final ItemCache ii = new ItemCache();
+  protected static ValueBuilder str(final String... str) {
+    final ValueBuilder ii = new ValueBuilder();
     for(final String s : str) ii.add(Str.get(s));
     return ii;
   }
@@ -160,7 +160,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  protected static ItemCache dbl(final double d) {
+  protected static ValueBuilder dbl(final double d) {
     return item(Dbl.get(d));
   }
 
@@ -169,8 +169,8 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  protected static ItemCache itr(final long... d) {
-    final ItemCache ii = new ItemCache();
+  protected static ValueBuilder itr(final long... d) {
+    final ValueBuilder ii = new ValueBuilder();
     for(final long dd : d) ii.add(Int.get(dd));
     return ii;
   }
@@ -180,8 +180,8 @@ public abstract class QueryTest {
    * @param b boolean value
    * @return iterator
    */
-  protected static ItemCache bool(final boolean... b) {
-    final ItemCache ii = new ItemCache();
+  protected static ValueBuilder bool(final boolean... b) {
+    final ValueBuilder ii = new ValueBuilder();
     for(final boolean bb : b) ii.add(Bln.get(bb));
     return ii;
   }
@@ -191,7 +191,7 @@ public abstract class QueryTest {
    * @param i item
    * @return iterator
    */
-  private static ItemCache item(final Item i) {
-    return new ItemCache(new Item[] { i }, 1);
+  private static ValueBuilder item(final Item i) {
+    return new ValueBuilder(new Item[] { i }, 1);
   }
 }

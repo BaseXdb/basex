@@ -3,11 +3,11 @@ package org.basex.test.query.func;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.io.File;
+import java.io.*;
 
-import org.basex.test.query.AdvancedQueryTest;
-import org.junit.Before;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the functions for EXPath package management.
@@ -30,7 +30,7 @@ public class FNPRepoTest extends AdvancedQueryTest {
    */
   @Before
   public void setupBeforeClass() {
-    CONTEXT.repo.init(REPO);
+    CONTEXT.mprop.set(MainProp.REPOPATH, REPO);
   }
 
   /**

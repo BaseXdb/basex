@@ -24,7 +24,7 @@ import org.basex.util.ft.Scoring;
 import org.basex.util.list.*;
 
 /**
- * Disk-based Node item.
+ * Database nodes.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

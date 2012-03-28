@@ -257,7 +257,7 @@ public final class QueryProcessor extends Progress {
     // close JDBC connections
     if(ctx.jdbc != null) ctx.jdbc.close();
     // close dynamically loaded JAR files
-    if(ctx.jars != null) ctx.jars.close();
+    ctx.modules.close();
   }
 
   /**

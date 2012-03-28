@@ -5,47 +5,21 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
-import java.util.Map;
+import java.lang.reflect.*;
+import java.math.*;
+import java.net.*;
+import java.util.*;
 
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
+import javax.xml.datatype.*;
+import javax.xml.namespace.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.QueryModule;
-import org.basex.query.expr.Arr;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Flt;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.Int;
-import org.basex.query.item.Jav;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.item.Type;
-import org.basex.query.item.Value;
-import org.basex.query.iter.ItemCache;
-import org.basex.query.iter.Iter;
-import org.basex.util.InputInfo;
-import org.basex.util.Reflect;
-import org.basex.util.TokenBuilder;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Element;
-import org.w3c.dom.ProcessingInstruction;
-import org.w3c.dom.Text;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * This class contains common methods for executing Java code and mapping
@@ -97,16 +71,18 @@ public abstract class JavaMapping extends Arr {
       args[a] = ctx.value(expr[a]);
       if(args[a].isEmpty()) XPEMPTY.thrw(input, description());
     }
-    return toValue(eval(args));
+    return toValue(eval(args, ctx));
   }
 
   /**
    * Returns the result of the evaluated Java function.
    * @param args arguments
+   * @param ctx query context
    * @return arguments
    * @throws QueryException query exception
    */
-  protected abstract Object eval(final Value[] args) throws QueryException;
+  protected abstract Object eval(final Value[] args, final QueryContext ctx)
+      throws QueryException;
 
   /**
    * Converts the specified result to an XQuery value.
@@ -124,29 +100,29 @@ public abstract class JavaMapping extends Arr {
 
     if(!res.getClass().isArray()) return new Jav(res);
 
-    final ItemCache ic = new ItemCache();
+    final ValueBuilder vb = new ValueBuilder();
     if(res instanceof boolean[]) {
-      for(final boolean o : (boolean[]) res) ic.add(Bln.get(o));
+      for(final boolean o : (boolean[]) res) vb.add(Bln.get(o));
     } else if(res instanceof char[]) {
-      ic.add(Str.get(new String((char[]) res)));
+      vb.add(Str.get(new String((char[]) res)));
     } else if(res instanceof byte[]) {
-      for(final byte o : (byte[]) res) ic.add(new Int(o, AtomType.BYT));
+      for(final byte o : (byte[]) res) vb.add(new Int(o, AtomType.BYT));
     } else if(res instanceof short[]) {
-      for(final short o : (short[]) res) ic.add(Int.get(o));
+      for(final short o : (short[]) res) vb.add(Int.get(o));
     } else if(res instanceof int[]) {
-      for(final int o : (int[]) res) ic.add(Int.get(o));
+      for(final int o : (int[]) res) vb.add(Int.get(o));
     } else if(res instanceof long[]) {
-      for(final long o : (long[]) res) ic.add(Int.get(o));
+      for(final long o : (long[]) res) vb.add(Int.get(o));
     } else if(res instanceof float[]) {
-      for(final float o : (float[]) res) ic.add(Flt.get(o));
+      for(final float o : (float[]) res) vb.add(Flt.get(o));
     } else if(res instanceof double[]) {
-      for(final double o : (double[]) res) ic.add(Dbl.get(o));
+      for(final double o : (double[]) res) vb.add(Dbl.get(o));
     } else {
       for(final Object o : (Object[]) res) {
-        ic.add(o instanceof Value ? (Value) o : new Jav(o));
+        vb.add(o instanceof Value ? (Value) o : new Jav(o));
       }
     }
-    return ic.value();
+    return vb.value();
   }
 
   /**
@@ -158,8 +134,8 @@ public abstract class JavaMapping extends Arr {
    * @return Java function
    * @throws QueryException query exception
    */
-  static JavaMapping get(final QNm name, final Expr[] args,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
+  static JavaMapping get(final QNm name, final Expr[] args, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
     // resolve function name: convert dashes to upper-case initials
     final TokenBuilder m = new TokenBuilder();
@@ -177,22 +153,25 @@ public abstract class JavaMapping extends Arr {
     }
     final String mth = m.toString();
 
-    // check if class was imported as Java module
-    final String clz = string(substring(name.uri(), JAVAPRE.length));
-    for(final QueryModule jm : ctx.javaModules.keySet()) {
-      final Class<?> c = jm.getClass();
-      if(c.getName().equals(clz)) {
-        for(final Method meth : c.getMethods()) {
-          if(meth.getName().equals(mth))
-            return new JavaModuleFunc(ii, jm, meth, args);
-        }
-        WHICHJAVA.thrw(ii, clz + '.' + mth);
+    // class path
+    final String path = string(substring(name.uri(), JAVAPRE.length));
+
+    // finds imported Java module
+    final Object jm  = ctx.modules.findJava(path);
+    if(jm != null) {
+      for(final Method meth : jm.getClass().getMethods()) {
+        if(meth.getName().equals(mth)) return new JavaModuleFunc(ii, jm, meth, args);
       }
+      WHICHJAVA.thrw(ii, path + '.' + mth);
     }
 
-    Class<?> cls = Reflect.find(clz);
-    if(cls == null && ctx.jars != null) cls = Reflect.find(clz, ctx.jars);
-    if(cls == null) WHICHJAVA.thrw(ii, clz + '.' + mth);
+    // finds direct class reference
+    Class<?> cls = Reflect.find(path);
+    // finds reference in EXPath module
+    if(cls == null) cls = ctx.modules.find(path);
+    // return exception if none of the lookups was successful
+    if(cls == null) WHICHJAVA.thrw(ii, path + '.' + mth);
+
     return new JavaFunc(ii, cls, mth, args);
   }
 
@@ -244,5 +223,10 @@ public abstract class JavaMapping extends Arr {
       if(JAVA[j].isAssignableFrom(type)) return XQUERY[j];
     }
     return null;
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.NDT || super.uses(u);
   }
 }

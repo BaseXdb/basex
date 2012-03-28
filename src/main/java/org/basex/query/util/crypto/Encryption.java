@@ -211,8 +211,7 @@ public final class Encryption {
     byte[] hash = null;
 
     final byte[] aa = a.length == 0 ? DEFA : a;
-    if(ALGHMAC.id(lc(aa)) == 0)
-      CRYPTOINVHASH.thrw(input, aa);
+    if(!ALGHMAC.contains(lc(aa))) CRYPTOINVHASH.thrw(input, aa);
 
     final boolean b64 = eq(lc(enc), BASE64) || enc.length == 0;
     if(!b64 && !eq(lc(enc), HEX))

@@ -9,7 +9,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Node type.
+ * Main memory based node fragments.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

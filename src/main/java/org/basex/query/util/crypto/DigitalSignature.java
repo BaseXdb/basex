@@ -132,8 +132,7 @@ public final class DigitalSignature {
 
     b = t;
     if(b.length == 0) b = DEFT;
-    final int ti = TYPES.id(lc(b));
-    if(ti == 0) CRYPTOSIGTYPINV.thrw(input, t);
+    if(!TYPES.contains(lc(b))) CRYPTOSIGTYPINV.thrw(input, t);
     final byte[] type = b;
 
     Item signedNode = null;

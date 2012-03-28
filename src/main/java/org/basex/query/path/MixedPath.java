@@ -13,7 +13,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -74,7 +74,7 @@ public final class MixedPath extends Path {
       for(int ex = 0; ex < el; ex++) {
         final Expr e = steps[ex];
         final boolean last = ex + 1 == el;
-        final ItemCache ic = new ItemCache();
+        final ValueBuilder vb = new ValueBuilder();
 
         // this flag indicates if the resulting items contain nodes
         boolean nodes = false;
@@ -90,10 +90,10 @@ public final class MixedPath extends Path {
           final Iter ir = ctx.iter(e);
           for(Item i; (i = ir.next()) != null;) {
             // set node flag
-            if(ic.size() == 0) nodes = i.type.isNode();
+            if(vb.size() == 0) nodes = i.type.isNode();
             // check if both nodes and atomic values occur in last result
             else if(last && nodes != i.type.isNode()) EVALNODESVALS.thrw(input);
-            ic.add(i);
+            vb.add(i);
           }
           ctx.pos++;
         }
@@ -101,10 +101,10 @@ public final class MixedPath extends Path {
         if(nodes) {
           // remove potential duplicates from node sets
           final NodeCache nc = new NodeCache().random();
-          for(Item it; (it = ic.next()) != null;) nc.add((ANode) it);
+          for(Item it; (it = vb.next()) != null;) nc.add((ANode) it);
           res = nc.value().cache();
         } else {
-          res = ic;
+          res = vb;
         }
       }
       return res;

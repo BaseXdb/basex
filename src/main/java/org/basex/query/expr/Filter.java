@@ -10,7 +10,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -112,23 +112,23 @@ public class Filter extends Preds {
 
     try {
       // cache results to support last() function
-      final ItemCache ic = new ItemCache();
-      for(Item i; (i = iter.next()) != null;) ic.add(i);
+      final ValueBuilder vb = new ValueBuilder();
+      for(Item i; (i = iter.next()) != null;) vb.add(i);
 
       // evaluate predicates
       for(final Expr p : preds) {
-        final long is = ic.size();
+        final long is = vb.size();
         ctx.size = is;
         ctx.pos = 1;
         int c = 0;
         for(int s = 0; s < is; ++s) {
-          ctx.value = ic.get(s);
-          if(p.test(ctx, input) != null) ic.set(ic.get(s), c++);
+          ctx.value = vb.get(s);
+          if(p.test(ctx, input) != null) vb.set(vb.get(s), c++);
           ctx.pos++;
         }
-        ic.size(c);
+        vb.size(c);
       }
-      return ic;
+      return vb;
     } finally {
       ctx.value = cv;
       ctx.size = cs;

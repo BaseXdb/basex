@@ -124,6 +124,15 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
+   * Checks if the set contains the specified key.
+   * @param key key to be found
+   * @return result of check
+   */
+  public final boolean contains(final byte[] key) {
+    return id(key) != 0;
+  }
+
+  /**
    * Returns the id of the specified key or 0 if the key does not exist.
    * @param key key to be found
    * @return id or 0 if nothing was found

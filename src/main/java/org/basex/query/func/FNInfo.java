@@ -13,7 +13,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -67,11 +67,11 @@ public final class FNInfo extends StandardFunc {
           }
         };
       case AVAILABLE_ENVIRONMENT_VARIABLES:
-        final ItemCache ic = new ItemCache();
+        final ValueBuilder vb = new ValueBuilder();
         for(final Object k : System.getenv().keySet().toArray()) {
-          ic.add(Str.get(k));
+          vb.add(Str.get(k));
         }
-        return ic;
+        return vb;
       default:
         return super.iter(ctx);
     }

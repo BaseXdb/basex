@@ -1,24 +1,25 @@
 package org.basex.util;
 
 /**
- * Input information.
+ * This class contains the original query, its file reference, and line/column
+ * information.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class InputInfo {
+  /** File reference. */
+  public final String file;
   /** Input query. */
   private final String query;
-  /** Input file. */
-  public final String file;
   /** Parse position. */
   private final int pos;
   /** Line and column number. */
   private int[] lc;
 
   /**
-   * Optimizes and compiles the expression.
-   * @param p parsing position
+   * Constructor.
+   * @param p input parser, containing information on the current parsing state
    */
   public InputInfo(final InputParser p) {
     query = p.query;
@@ -27,8 +28,8 @@ public final class InputInfo {
   }
 
   /**
-   * Getter for line and column number.
-   * @return two element array of line and column number
+   * Returns an array with the line and column position of the associated expression.
+   * @return line and column position
    */
   public int[] lineCol() {
     if(lc == null) lc = lineCol(query, Math.min(pos - 1, query.length()));
@@ -42,7 +43,7 @@ public final class InputInfo {
    * @return two element array of line and column number
    */
   public static int[] lineCol(final String qu, final int qp) {
-    final int[] lc = {1, 1};
+    final int[] lc = { 1, 1 };
     for(int i = 0, ch; i < qp; i += Character.charCount(ch)) {
       ch = qu.codePointAt(i);
       if(ch == '\n') { lc[0]++; lc[1] = 1; } else if(ch != '\r') { lc[1]++; }

@@ -79,8 +79,7 @@ public class AxisStep extends Preds {
       test.mode == Mode.NAME && test.type != NodeType.ATT && axis.down &&
       data.meta.uptodate && data.nspaces.size() == 0;
     if(ctx.leaf) {
-      final Stats s =
-        data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
+      final Stats s = data.tagindex.stat(data.tagindex.id(((NameTest) test).ln));
       ctx.leaf = s != null && s.isLeaf();
     }
 

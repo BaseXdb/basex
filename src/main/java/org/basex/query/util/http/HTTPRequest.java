@@ -19,7 +19,7 @@ public final class HTTPRequest {
   /** Body or multipart attributes. */
   public final TokenMap payloadAttrs = new TokenMap();
   /** Body content. */
-  public final ItemCache bodyContent = new ItemCache();
+  public final ValueBuilder bodyContent = new ValueBuilder();
   /** Parts in case of multipart request. */
   public final ArrayList<Part> parts = new ArrayList<Part>();
   /** Indicator for multipart request. */
@@ -36,6 +36,6 @@ public final class HTTPRequest {
     /** Attributes of part body. */
     public final TokenMap bodyAttrs = new TokenMap();
     /** Content of part body. */
-    public final ItemCache bodyContent = new ItemCache();
+    public final ValueBuilder bodyContent = new ValueBuilder();
   }
 }

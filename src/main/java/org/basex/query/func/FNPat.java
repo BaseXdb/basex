@@ -16,7 +16,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.util.RegEx;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -203,18 +203,18 @@ public final class FNPat extends StandardFunc {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) REGROUP.thrw(input);
 
-    final ItemCache ic = new ItemCache();
+    final ValueBuilder vb = new ValueBuilder();
     final String str = string(val);
     if(!str.isEmpty()) {
       final Matcher m = p.matcher(str);
       int s = 0;
       while(m.find()) {
-        ic.add(Str.get(str.substring(s, m.start())));
+        vb.add(Str.get(str.substring(s, m.start())));
         s = m.end();
       }
-      ic.add(Str.get(str.substring(s, str.length())));
+      vb.add(Str.get(str.substring(s, str.length())));
     }
-    return ic;
+    return vb;
   }
 
   /**

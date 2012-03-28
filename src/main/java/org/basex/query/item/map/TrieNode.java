@@ -5,7 +5,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.util.Compare;
 import org.basex.util.InputInfo;
 
@@ -47,7 +47,7 @@ abstract class TrieNode {
     @Override
     boolean verify() { return true; }
     @Override
-    void keys(final ItemCache ks) { }
+    void keys(final ValueBuilder ks) { }
     @Override
     boolean hasType(final AtomType kt, final SeqType vt) { return true; }
     @Override
@@ -180,7 +180,7 @@ abstract class TrieNode {
    * Collects all keys in this subtree.
    * @param ks key cache
    */
-  abstract void keys(final ItemCache ks);
+  abstract void keys(final ValueBuilder ks);
 
   /**
    * Calculates the hash key for the given level.

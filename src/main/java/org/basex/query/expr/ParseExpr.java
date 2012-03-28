@@ -24,7 +24,7 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.item.Value;
 import org.basex.query.item.map.Map;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -67,12 +67,12 @@ public abstract class ParseExpr extends Expr {
     if(it == null || ir.size() == 1) return it;
     Item n = ir.next();
     if(n != null) {
-      final ItemCache ic = new ItemCache();
-      ic.add(it);
-      ic.add(n);
+      final ValueBuilder vb = new ValueBuilder();
+      vb.add(it);
+      vb.add(n);
       n = ir.next();
-      if(n != null) ic.add(Str.get("..."));
-      XPSEQ.thrw(ii, ic.value());
+      if(n != null) vb.add(Str.get("..."));
+      XPSEQ.thrw(ii, vb.value());
     }
     return it;
   }

@@ -60,9 +60,9 @@ public final class Package {
    * @author BaseX Team 2005-12, BSD License
    * @author Rositsa Shadura
    */
-  public static final class Dependency {
+  static final class Dependency {
     /** Name of package a package depends on. */
-    public byte[] pkg;
+    byte[] pkg;
     /** Name of processor a package depends on. */
     byte[] processor;
     /** Set of acceptable version. */
@@ -80,7 +80,7 @@ public final class Package {
      * @param version version
      * @return unique name
      */
-    public byte[] name(final byte[] version) {
+    byte[] name(final byte[] version) {
       return new TokenBuilder().add(pkg).add('-').add(version).finish();
     }
   }
@@ -90,11 +90,11 @@ public final class Package {
    * @author BaseX Team 2005-12, BSD License
    * @author Rositsa Shadura
    */
-  public static final class Component {
+  static final class Component {
     /** Namespace URI. */
-    public byte[] uri;
+    byte[] uri;
     /** Component file. */
-    public byte[] file;
+    byte[] file;
 
     /**
      * Extracts component's file name from component's path.

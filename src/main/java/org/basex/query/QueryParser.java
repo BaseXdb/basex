@@ -6,8 +6,6 @@ import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import java.io.*;
-import java.lang.reflect.*;
-import java.net.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -25,18 +23,12 @@ import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.item.SeqType.Occ;
-import org.basex.query.item.Type;
 import org.basex.query.iter.*;
 import org.basex.query.path.*;
 import org.basex.query.up.expr.*;
 import org.basex.query.util.*;
 import org.basex.query.util.format.*;
-import org.basex.query.util.pkg.*;
-import org.basex.query.util.pkg.Package.Component;
-import org.basex.query.util.pkg.Package.Dependency;
-import org.basex.query.util.pkg.Package;
 import org.basex.util.*;
-import org.basex.util.Array;
 import org.basex.util.ft.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
@@ -428,17 +420,17 @@ public class QueryParser extends InputParser {
    */
   private void annotation(final Ann ann) throws QueryException {
     final QNm name = eQName(QNAMEINV, ctx.sc.nsFunc);
-    final ItemCache ic = new ItemCache(1);
+    final ValueBuilder vb = new ValueBuilder(1);
     if(wsConsumeWs(PAR1)) {
       do {
         final Item it = literal();
         if(it == null) error(ANNVALUE);
-        ic.add(it);
+        vb.add(it);
       } while(wsConsumeWs(COMMA));
       wsCheck(PAR2);
     }
     skipWS();
-    addAnnotation(ann, name, ic.value());
+    addAnnotation(ann, name, vb.value());
   }
 
   /**
@@ -707,36 +699,8 @@ public class QueryParser extends InputParser {
         return;
       }
 
-      // check Java modules (inheriting {@link QueryModule})
-      if(startsWith(uri, JAVAPRE)) {
-        final String path = string(substring(uri, JAVAPRE.length));
-        final Class<?> clz = Reflect.find(path);
-        if(clz == null) error(NOMODULE, uri);
-        // class must be directly derived from JavaModule
-        if(clz.getSuperclass() != QueryModule.class)
-          error(NOCONS, path, QueryModule.class);
-        final QueryModule jm = (QueryModule) Reflect.get(clz);
-        if(jm == null) error(NOINV, uri);
-        jm.init(ctx, input());
-        // add all public methods of the class
-        final ArrayList<Method> list = new ArrayList<Method>();
-        for(final Method m : clz.getMethods()) {
-          if(m.getDeclaringClass() == clz) list.add(m);
-        }
-        // put class into module cache
-        ctx.javaModules.put(jm, list);
-        return;
-      }
-
-      // search for uri in namespace dictionary
-      final TokenSet pkgs = ctx.context.repo.nsDict().get(uri);
-      if(pkgs != null) {
-        // load packages with modules having the given uri
-        for(final byte[] pkg : pkgs) {
-          if(pkg != null) loadPackage(pkg, new TokenSet(), new TokenSet());
-        }
-        return;
-      }
+      // find statically known modules
+      if(ctx.modules.load(uri, input(), this)) return;
 
       // search for statically known modules
       boolean found = false;
@@ -758,7 +722,7 @@ public class QueryParser extends InputParser {
    * @param uri module uri
    * @throws QueryException query exception
    */
-  private void module(final byte[] path, final byte[] uri) throws QueryException {
+  public void module(final byte[] path, final byte[] uri) throws QueryException {
     final byte[] u = ctx.modParsed.get(path);
     if(u != null) {
       if(!eq(uri, u)) error(WRONGMODULE, uri, path);
@@ -780,88 +744,6 @@ public class QueryParser extends InputParser {
     ctx.sc.baseURI(io.path());
     new QueryParser(qu, ctx).parse(uri);
     ctx.sc = sc;
-  }
-
-  /**
-   * Loads a package from package repository.
-   * @param pkgName package name
-   * @param pkgsToLoad list with packages to be loaded
-   * @param pkgsLoaded already loaded packages
-   * @throws QueryException query exception
-   */
-  private void loadPackage(final byte[] pkgName, final TokenSet pkgsToLoad,
-      final TokenSet pkgsLoaded) throws QueryException {
-
-    // return if package is already loaded
-    if(pkgsLoaded.id(pkgName) != 0) return;
-
-    // find package in package dictionary
-    final byte[] pDir = ctx.context.repo.pkgDict().get(pkgName);
-    if(pDir == null) error(NECPKGNOTINST, pkgName);
-    final IOFile pkgDir = ctx.context.repo.path(string(pDir));
-
-    // parse package descriptor
-    final IO pkgDesc = new IOFile(pkgDir, PkgText.DESCRIPTOR);
-    if(!pkgDesc.exists()) Util.debug(PkgText.MISSDESC, string(pkgName));
-
-    final Package pkg = new PkgParser(ctx.context.repo, input()).parse(pkgDesc);
-    // check if package contains a jar descriptor
-    final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
-    // add jars to classpath
-    if(jarDesc.exists()) loadJars(jarDesc, pkgDir, string(pkg.abbrev));
-
-    // package has dependencies -> they have to be loaded first => put package
-    // in list with packages to be loaded
-    if(pkg.dep.size() != 0) pkgsToLoad.add(pkgName);
-    for(final Dependency d : pkg.dep) {
-      if(d.pkg != null) {
-      // we consider only package dependencies here
-      final byte[] depPkg = new PkgValidator(
-          ctx.context.repo, input()).depPkg(d);
-      if(depPkg == null) {
-        error(NECPKGNOTINST, string(d.pkg));
-      } else {
-        if(pkgsToLoad.id(depPkg) != 0) error(CIRCMODULE);
-        loadPackage(depPkg, pkgsToLoad, pkgsLoaded);
-      }
-     }
-    }
-    for(final Component comp : pkg.comps) {
-      final String path = new IOFile(new IOFile(pkgDir, string(pkg.abbrev)),
-          string(comp.file)).path();
-      module(token(path), comp.uri);
-    }
-    if(pkgsToLoad.id(pkgName) != 0) pkgsToLoad.delete(pkgName);
-    pkgsLoaded.add(pkgName);
-  }
-
-  /**
-   * Loads the jar files registered in jarDesc.
-   * @param jarDesc jar descriptor
-   * @param pkgDir package directory
-   * @param modDir module directory
-   * @throws QueryException query exception
-   */
-  private void loadJars(final IOFile jarDesc,
-      final IOFile pkgDir, final String modDir) throws QueryException {
-
-    final ArrayList<URL> urls = new ArrayList<URL>();
-    // add existing URLs
-    if(ctx.jars != null) Collections.addAll(urls, ctx.jars.getURLs());
-    // add new URLs
-    final JarDesc desc = new JarParser(ctx.context, input()).parse(jarDesc);
-    for(final byte[] u : desc.jars) {
-      // assumes that jar is in the directory containing the xquery modules
-      final IOFile path = new IOFile(new IOFile(pkgDir, modDir), string(u));
-      try {
-        urls.add(new URL(IO.FILEPREF + path));
-      } catch(final MalformedURLException ex) {
-        Util.errln(ex.getMessage());
-      }
-    }
-    // add jars to classpath
-    final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-    ctx.jars = new JarLoader(urls.toArray(new URL[urls.size()]), cl);
   }
 
   /**
@@ -1096,7 +978,7 @@ public class QueryParser extends InputParser {
       for(int i = fl.length; --i >= 0;) {
         for(final Var v : fl[i].vars()) {
           final byte[] eqn = v.name.eqname();
-          if(set.id(eqn) == 0) {
+          if(!set.contains(eqn)) {
             ng.add(v);
             set.add(eqn);
           }
@@ -3248,7 +3130,7 @@ public class QueryParser extends InputParser {
               do {
                 final byte[] sl = stringLiteral();
                 if(except) opt.sw.delete(sl);
-                else if(!union || opt.sw.id(sl) == 0) opt.sw.add(sl);
+                else if(!union || !opt.sw.contains(sl)) opt.sw.add(sl);
               } while(wsConsume(COMMA));
               wsCheck(PAR2);
             } else if(wsConsumeWs(AT)) {
@@ -3774,8 +3656,7 @@ public class QueryParser extends InputParser {
    * @return never
    * @throws QueryException query exception
    */
-  public QueryException error(final Err err, final Object... arg)
-      throws QueryException {
+  public QueryException error(final Err err, final Object... arg) throws QueryException {
     throw err.thrw(input(), arg);
   }
 

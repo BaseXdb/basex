@@ -24,7 +24,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -202,7 +202,7 @@ public final class Map extends FItem {
    */
   public Value keys() {
     if(keys == null) {
-      final ItemCache res = new ItemCache(root.size);
+      final ValueBuilder res = new ValueBuilder(root.size);
       root.keys(res);
       keys = res.value();
     }

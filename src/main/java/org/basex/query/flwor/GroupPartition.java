@@ -34,7 +34,7 @@ final class GroupPartition {
   /** Group partitioning. */
   private final ArrayList<GroupNode> part = new ArrayList<GroupNode>();
   /** Resulting sequence for non-grouping variables. */
-  private final ArrayList<ItemCache[]> items;
+  private final ArrayList<ValueBuilder[]> items;
   /** HashValue, position (with overflow bucket). */
   private final IntMap<IntList> hashes = new IntMap<IntList>();
 
@@ -51,7 +51,7 @@ final class GroupPartition {
     gv = groupby;
     ngv = ng;
     order = ob;
-    items = ngv[0].length != 0 ? new ArrayList<ItemCache[]>() : null;
+    items = ngv[0].length != 0 ? new ArrayList<ValueBuilder[]>() : null;
     input = ii;
   }
 
@@ -106,17 +106,17 @@ final class GroupPartition {
     if(ngl == 0) return;
 
     // adds the current non-grouping variable bindings to the p-th partition.
-    if(p == items.size()) items.add(new ItemCache[ngl]);
-    final ItemCache[] sq = items.get(p);
+    if(p == items.size()) items.add(new ValueBuilder[ngl]);
+    final ValueBuilder[] sq = items.get(p);
 
     for(int i = 0; i < ngl; ++i) {
-      ItemCache ic = sq[i];
+      ValueBuilder vb = sq[i];
       final Value result = ctx.value(ctx.vars.get(ngv[0][i]));
-      if(ic == null) {
-        ic = new ItemCache();
-        sq[i] = ic;
+      if(vb == null) {
+        vb = new ValueBuilder();
+        sq[i] = vb;
       }
-      ic.add(result);
+      vb.add(result);
     }
   }
 
@@ -131,7 +131,7 @@ final class GroupPartition {
    */
   Iter ret(final QueryContext ctx, final Expr ret, final ArrayList<Item[]> ks,
       final ValueList vs) throws QueryException {
-    final ItemCache ic = new ItemCache();
+    final ValueBuilder vb = new ValueBuilder();
 
     for(int i = 0; i < part.size(); ++i) {
       final GroupNode gn = part.get(i);
@@ -139,15 +139,15 @@ final class GroupPartition {
         ctx.vars.add(gv[j].grp.copy().bind(gn.vals[j], ctx));
 
       if(items != null) {
-        final ItemCache[] ii = items.get(i);
+        final ValueBuilder[] ii = items.get(i);
         for(int j = 0; j < ii.length; ++j) {
           ctx.vars.add(ngv[1][j].copy().bind(ii[j].value(), ctx));
         }
       }
       if(order != null) {
         order.add(ctx, ret, ks, vs);
-      } else ic.add(ctx.value(ret));
+      } else vb.add(ctx.value(ret));
     }
-    return order != null ? ctx.iter(order.set(ks, vs)) : ic;
+    return order != null ? ctx.iter(order.set(ks, vs)) : vb;
   }
 }

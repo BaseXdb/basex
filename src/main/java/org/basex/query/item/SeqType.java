@@ -5,7 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.map.Map;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.path.*;
 import org.basex.query.util.Err;
 import org.basex.util.*;
@@ -324,15 +324,15 @@ public final class SeqType {
     if(val.homogenous() && instance(f, ii) && checkKind(f)) return val;
 
     // no way around it...
-    final ItemCache ic = new ItemCache((int) size);
+    final ValueBuilder vb = new ValueBuilder((int) size);
     for(long i = 0; i < size; i++) {
       Item n = val.itemAt(i);
       if(!instance(n, ii)) n = type.cast(n, ctx, ii);
       if(!checkKind(n)) Err.promote(ii, this, n);
-      ic.add(n);
+      vb.add(n);
     }
 
-    return ic.value();
+    return vb.value();
   }
 
   /**

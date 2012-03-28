@@ -6,7 +6,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -129,14 +129,14 @@ public abstract class Value extends Expr implements Iterable<Item> {
   public abstract int writeTo(final Item[] arr, final int start);
 
   /**
-   * Creates an {@link ItemCache}, containing all items of this value.
+   * Creates an {@link ValueBuilder}, containing all items of this value.
    * Use with care, as compressed Values are expanded, creating many objects.
    * @return cached items
    */
-  public final ItemCache cache() {
-    final ItemCache ic = new ItemCache((int) size());
-    ic.size(writeTo(ic.item, 0));
-    return ic;
+  public final ValueBuilder cache() {
+    final ValueBuilder vb = new ValueBuilder((int) size());
+    vb.size(writeTo(vb.item, 0));
+    return vb;
   }
 
   /**

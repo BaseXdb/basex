@@ -225,12 +225,12 @@ public final class Namespaces {
    */
   private int uri(final byte[] pr, final NSNode nd) {
     if(Token.eq(Token.XML, pr)) return 0;
-    final int i = pref.id(pr);
-    if(i == 0) return 0;
+    final int id = pref.id(pr);
+    if(id == 0) return 0;
 
     NSNode n = nd;
     while(n != null) {
-      final int u = n.uri(i);
+      final int u = n.uri(id);
       if(u != 0) return u;
       n = n.par;
     }

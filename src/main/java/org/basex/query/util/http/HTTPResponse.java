@@ -59,7 +59,7 @@ public final class HTTPResponse {
     final NodeCache hdrs = extractHdrs(conn);
     final String cType = mediaTypeOvr == null ?
         extractContentType(conn.getContentType()) : string(mediaTypeOvr);
-    final ItemCache payloads = new ItemCache();
+    final ValueBuilder payloads = new ValueBuilder();
     final FNode body;
     final boolean s = status != null && Bln.parse(status, input);
 
@@ -84,7 +84,7 @@ public final class HTTPResponse {
     responseEl.add(body);
 
     // result
-    final ItemCache result = new ItemCache();
+    final ValueBuilder result = new ValueBuilder();
     result.add(responseEl);
     result.add(payloads.value());
     return result;
@@ -192,7 +192,7 @@ public final class HTTPResponse {
    * @throws QueryException query exception
    */
   private NodeCache extractParts(final InputStream io, final boolean status,
-      final ItemCache payloads, final byte[] sep) throws IOException, QueryException {
+      final ValueBuilder payloads, final byte[] sep) throws IOException, QueryException {
 
     try {
       // read first line of multipart content
@@ -226,7 +226,8 @@ public final class HTTPResponse {
    * @throws IOException I/O Exception
    */
   private FElem extractNextPart(final InputStream io, final boolean status,
-      final ItemCache payloads, final byte[] sep, final byte[] end) throws IOException {
+      final ValueBuilder payloads, final byte[] sep, final byte[] end)
+          throws IOException {
 
     // content type of part payload - if not defined by header 'Content-Type',
     // it is equal to 'text/plain' (RFC 1341)

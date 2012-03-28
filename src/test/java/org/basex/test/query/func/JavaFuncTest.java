@@ -48,4 +48,27 @@ public class JavaFuncTest extends AdvancedQueryTest {
         "rect:contains(rect:new(xs:int(2), xs:int(2)), xs:int(1), xs:int(1))",
         true);
   }
+
+  /** Tests importing a Java class. */
+  @Test
+  public void javaImport() {
+    query("import module namespace sb='java:java.lang.StringBuilder';" +
+        "let $a := (sb:append('a'), sb:append('b')) return sb:to-string()", "ab");
+
+    query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
+        "qm:fast(0)", "Apple");
+    query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
+        "qm:convenient(xs:int(1))", "Banana");
+    query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
+        "qm:functionNS()", "http://www.w3.org/2005/xpath-functions");
+  }
+
+  /** Tests importing a Java class and throwing errors. */
+  @Test
+  public void javaImportError() {
+    query("declare namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
+        "try { qm:error(qm:new()) } catch * { $err:code }", "BASX0000");
+    query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
+        "try { qm:error() } catch * { $err:code }", "BASX0000");
+  }
 }

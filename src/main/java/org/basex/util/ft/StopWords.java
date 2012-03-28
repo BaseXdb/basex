@@ -10,7 +10,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.basex.util.hash.TokenSet;
 
 /**
@@ -71,10 +71,10 @@ public final class StopWords extends TokenSet {
   public boolean read(final IO fl, final boolean e) {
     try {
       final byte[] content = norm(fl.read());
-      final int s = contains(content, ' ') ? ' ' : '\n';
+      final int s = Token.contains(content, ' ') ? ' ' : '\n';
       for(final byte[] sl : split(content, s)) {
         if(e) delete(sl);
-        else if(id(sl) == 0) add(sl);
+        else if(!contains(sl)) add(sl);
       }
       return true;
     } catch(final IOException ex) {

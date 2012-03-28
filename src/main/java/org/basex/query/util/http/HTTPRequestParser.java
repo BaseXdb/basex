@@ -38,7 +38,7 @@ public final class HTTPRequestParser {
    * @return parsed request
    * @throws QueryException query exception
    */
-  public HTTPRequest parse(final ANode request, final ItemCache bodies)
+  public HTTPRequest parse(final ANode request, final ValueBuilder bodies)
       throws QueryException {
 
     final HTTPRequest r = new HTTPRequest();
@@ -141,7 +141,7 @@ public final class HTTPRequestParser {
    * @throws QueryException query exception
    */
   private void parseBody(final ANode body, final Item contItem,
-      final TokenMap attrs, final ItemCache bodyContent) throws QueryException {
+      final TokenMap attrs, final ValueBuilder bodyContent) throws QueryException {
 
     parseAttrs(body, attrs);
     checkBody(body, attrs);
@@ -166,7 +166,7 @@ public final class HTTPRequestParser {
    * @param parts list for multipart parts
    * @throws QueryException query exception
    */
-  private void parseMultipart(final ANode multipart, final ItemCache contItems,
+  private void parseMultipart(final ANode multipart, final ValueBuilder contItems,
       final TokenMap attrs, final ArrayList<Part> parts) throws QueryException {
 
     parseAttrs(multipart, attrs);

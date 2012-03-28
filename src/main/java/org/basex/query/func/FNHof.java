@@ -7,7 +7,7 @@ import org.basex.query.QueryError;
 import org.basex.query.QueryException;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.*;
@@ -99,13 +99,13 @@ public final class FNHof extends StandardFunc {
     final Value v = expr[1].value(ctx);
     final Comparator<Item> cmp = getComp(0, ctx);
     if(v.size() < 2) return v;
-    final ItemCache ic = v.cache();
+    final ValueBuilder vb = v.cache();
     try {
-      Arrays.sort(ic.item, 0, (int) ic.size(), cmp);
+      Arrays.sort(vb.item, 0, (int) vb.size(), cmp);
     } catch(final QueryError err) {
       throw err.wrapped();
     }
-    return ic.value();
+    return vb.value();
   }
 
   /**

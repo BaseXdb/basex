@@ -5,7 +5,7 @@ import org.basex.query.item.AtomType;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
-import org.basex.query.iter.ItemCache;
+import org.basex.query.iter.ValueBuilder;
 import org.basex.util.InputInfo;
 
 /**
@@ -199,7 +199,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  void keys(final ItemCache ks) {
+  void keys(final ValueBuilder ks) {
     for(final TrieNode nd : kids) if(nd != null) nd.keys(ks);
   }
 
