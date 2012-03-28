@@ -10,7 +10,7 @@ import org.basex.query.QueryProcessor;
  *
  * @author BaseX Team 2005-12, BSD License
  */
-public final class ImportJavaModule {
+public final class FruitsExample {
   /**
    * Runs the example code.
    *
@@ -21,13 +21,13 @@ public final class ImportJavaModule {
     /** Database context. */
     Context context = new Context();
 
-    System.out.println("=== ImportJavaModule ===");
+    System.out.println("=== FruitsExample ===");
 
     // ------------------------------------------------------------------------
     // Specify query to be executed
     String query =
         "import module namespace fruits = " +
-        "'java:org.basex.examples.query.Fruits'; \n" +
+        "'java:org.basex.examples.query.FruitsModule'; \n" +
         "element convenient {\n" +
         "  for $i in 1 to 4\n" +
         "  return fruits:convenient(xs:int($i))\n" +
@@ -35,7 +35,8 @@ public final class ImportJavaModule {
         "element fast {\n" +
         "  for $i in 1 to 4\n" +
         "  return fruits:fast($i)\n" +
-        "}";
+        "},\n" +
+        "element functions { fruits:functionNamespace() }";
 
     System.out.println("\n* Query:");
     System.out.println(query);

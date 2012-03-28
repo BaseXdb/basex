@@ -3,6 +3,7 @@ package org.basex.examples.query;
 import org.basex.query.QueryModule;
 import org.basex.query.item.Int;
 import org.basex.query.item.Str;
+import org.basex.util.*;
 
 /**
  * This is a simple XQuery demo module written in Java.
@@ -10,7 +11,7 @@ import org.basex.query.item.Str;
  *
  * @author BaseX Team 2005-12, BSD License
  */
-public class Fruits extends QueryModule {
+public class FruitsModule extends QueryModule {
   /** Fruits array. */
   private static final String[] FRUITS = { "Apple", "Banana", "Cherry" };
 
@@ -35,8 +36,16 @@ public class Fruits extends QueryModule {
    * @return fruit string
    */
   public Str fast(final Int fruit) {
-    final int i = (int) fruit.itr(input);
+    final int i = (int) fruit.itr(null);
     final String f = FRUITS[i % FRUITS.length];
     return Str.get(f);
+  }
+
+  /**
+   * Context-aware function: returns the default function namespace of this query.
+   * @return function namespace
+   */
+  public String functionNamespace() {
+    return Token.string(context.sc.nsFunc);
   }
 }
