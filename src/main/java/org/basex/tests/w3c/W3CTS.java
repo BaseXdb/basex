@@ -276,7 +276,7 @@ public abstract class W3CTS {
       context.prop.set(Prop.QUERYPATH, query.path());
       final String in = read(query);
       String er = null;
-      ItemCache iter = null;
+      ValueBuilder iter = null;
 
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
@@ -408,12 +408,12 @@ public abstract class W3CTS {
           if(xml || frag) {
             iter.reset();
             try {
-              final ItemCache ic = toIter(expect.replaceAll(
+              final ValueBuilder vb = toIter(expect.replaceAll(
                   "^<\\?xml.*?\\?>", "").trim(), frag);
-              if(Compare.deep(iter, ic, null)) break;
-              ic.reset();
-              final ItemCache ia = toIter(actual, frag);
-              if(Compare.deep(ia, ic, null)) break;
+              if(Compare.deep(iter, vb, null)) break;
+              vb.reset();
+              final ValueBuilder ia = toIter(actual, frag);
+              if(Compare.deep(ia, vb, null)) break;
             } catch(final Throwable ex) {
               Util.errln('\n' + outname + ':');
               Util.stack(ex);
@@ -509,8 +509,8 @@ public abstract class W3CTS {
    * @param frag fragment flag
    * @return iterator
    */
-  private ItemCache toIter(final String xml, final boolean frag) {
-    final ItemCache it = new ItemCache();
+  private ValueBuilder toIter(final String xml, final boolean frag) {
+    final ValueBuilder it = new ValueBuilder();
     try {
       final String str = frag ? "<X>" + xml + "</X>" : xml;
       final Data d = CreateDB.mainMem(IO.get(str), context);
@@ -518,7 +518,8 @@ public abstract class W3CTS {
         it.add(new DBNode(d, p));
       }
     } catch(final IOException ex) {
-      return new ItemCache(new Item[] { Str.get(Long.toString(System.nanoTime())) }, 1);
+      return new ValueBuilder(
+          new Item[] { Str.get(Long.toString(System.nanoTime())) }, 1);
     }
     return it;
   }
