@@ -228,8 +228,11 @@ public final class Prop extends AProp {
   private static String applicationPath() {
     final ProtectionDomain pd = Prop.class.getProtectionDomain();
     if(pd == null) return null;
+    // code source (may be null)
+    final CodeSource cs = pd.getCodeSource();
+    if(cs == null) return null;
     // raw application path
-    final String path = pd.getCodeSource().getLocation().getPath();
+    final String path = cs.getLocation().getPath();
     // decode path; URLDecode returns wrong results
     final TokenBuilder tb = new TokenBuilder();
     final int pl = path.length();
