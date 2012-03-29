@@ -31,6 +31,8 @@ public final class ModuleLoader {
   private HashMap<Object, ArrayList<Method>> javaModules;
   /** Database context. */
   private final Context context;
+  /** Initialization flag. */
+  private boolean init;
 
   /**
    * Constructor.
@@ -70,6 +72,22 @@ public final class ModuleLoader {
    *   {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
   public Class<?> find(final String clz) throws Throwable {
+    if(!init) {
+      // add jar files of the repository directory to the class loader
+      init = true;
+      final ArrayList<URL> urls = new ArrayList<URL>();
+      final IOFile repo = new IOFile(context.mprop.get(MainProp.REPOPATH));
+      for(final IOFile file : repo.children()) {
+        if(file.name().endsWith(IO.JARSUFFIX)) {
+          addJar(file, urls);
+          System.out.println("?");
+        }
+      }
+      if(!urls.isEmpty()) {
+        loader = new JarLoader(urls.toArray(new URL[urls.size()]), loader);
+      }
+    }
+
     // no external classes added: use default class loader
     if(loader == LOADER) return Reflect.forName(clz);
 
@@ -162,7 +180,7 @@ public final class ModuleLoader {
     // check if package contains a jar descriptor
     final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // add jars to classpath
-    if(jarDesc.exists()) loadJars(jarDesc, pkgDir, string(pkg.abbrev), ii);
+    if(jarDesc.exists()) loadJar(jarDesc, pkgDir, string(pkg.abbrev), ii);
 
     // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
@@ -196,21 +214,28 @@ public final class ModuleLoader {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void loadJars(final IOFile jarDesc, final IOFile pkgDir, final String modDir,
+  private void loadJar(final IOFile jarDesc, final IOFile pkgDir, final String modDir,
       final InputInfo ii) throws QueryException {
 
     // add new URLs
     final ArrayList<URL> urls = new ArrayList<URL>();
     final JarDesc desc = new JarParser(context, ii).parse(jarDesc);
     for(final byte[] u : desc.jars) {
-      // assumes that jar is in the directory containing the xquery modules
-      final IOFile p = new IOFile(new IOFile(pkgDir, modDir), string(u));
-      try {
-        urls.add(new URL(IO.FILEPREF + p));
-      } catch(final MalformedURLException ex) {
-        Util.errln(ex.getMessage());
-      }
+      addJar(new IOFile(new IOFile(pkgDir, modDir), string(u)), urls);
     }
     loader = new JarLoader(urls.toArray(new URL[urls.size()]), loader);
+  }
+
+  /**
+   * Adds a jar URL to the specified list.
+   * @param jar jar file to be added
+   * @param urls urls
+   */
+  private void addJar(final IOFile jar, final ArrayList<URL> urls) {
+    try {
+      urls.add(new URL(IO.FILEPREF + jar));
+    } catch(final MalformedURLException ex) {
+      Util.errln(ex.getMessage());
+    }
   }
 }

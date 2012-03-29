@@ -30,6 +30,8 @@ public abstract class IO {
   public static final String CSVSUFFIX = ".csv";
   /** JSON file suffix. */
   public static final String JSONSUFFIX = ".json";
+  /** JAR file suffix. */
+  public static final String JARSUFFIX = ".jar";
   /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
   /** XAR file suffix. */
