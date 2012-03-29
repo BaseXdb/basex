@@ -157,22 +157,24 @@ public abstract class JavaMapping extends Arr {
     final String path = string(substring(name.uri(), JAVAPRE.length));
 
     // finds imported Java module
-    final Object jm  = ctx.modules.findJava(path);
+    final Object jm  = ctx.modules.findImported(path);
     if(jm != null) {
       for(final Method meth : jm.getClass().getMethods()) {
         if(meth.getName().equals(mth)) return new JavaModuleFunc(ii, jm, meth, args);
       }
-      WHICHJAVA.thrw(ii, path + '.' + mth);
+    } else {
+      // finds addressed class function
+      try {
+        return new JavaFunc(ii, ctx.modules.find(path), mth, args);
+      } catch(final ClassNotFoundException ex) {
+        WHICHJAVA.thrw(ii, path + '.' + mth);
+      } catch(final Throwable th) {
+        Util.debug(th);
+      }
     }
 
-    // finds direct class reference
-    Class<?> cls = Reflect.find(path);
-    // finds reference in EXPath module
-    if(cls == null) cls = ctx.modules.find(path);
-    // return exception if none of the lookups was successful
-    if(cls == null) WHICHJAVA.thrw(ii, path + '.' + mth);
-
-    return new JavaFunc(ii, cls, mth, args);
+    // no function found: return error
+    throw WHICHJAVA.thrw(ii, path + '.' + mth);
   }
 
   /**
@@ -218,11 +220,26 @@ public abstract class JavaMapping extends Arr {
    * @param type Java type
    * @return xquery type
    */
-  static Type type(final Class<?> type) {
+  protected static Type type(final Class<?> type) {
     for(int j = 0; j < JAVA.length; ++j) {
       if(JAVA[j].isAssignableFrom(type)) return XQUERY[j];
     }
     return null;
+  }
+
+  /**
+   * Returns a string representation of all found arguments.
+   * @param args array with arguments
+   * @return string representation
+   */
+  protected static String foundArgs(final Value[] args) {
+    // compose found arguments
+    final StringBuilder found = new StringBuilder();
+    for(final Value a : args) {
+      if(found.length() != 0) found.append(", ");
+      found.append(a.type());
+    }
+    return found.toString();
   }
 
   @Override

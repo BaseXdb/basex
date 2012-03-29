@@ -52,8 +52,13 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests importing a Java class. */
   @Test
   public void javaImport() {
+    /* yields unexpected results on some JVMs, as several append() methods exist
     query("import module namespace sb='java:java.lang.StringBuilder';" +
         "let $a := (sb:append('a'), sb:append('b')) return sb:to-string()", "ab");
+     */
+
+    query("import module namespace set='java:java.util.HashSet';" +
+        "let $a := (set:add('a'), set:add('b')) return set:size()", "2");
 
     query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
         "qm:fast(0)", "Apple");

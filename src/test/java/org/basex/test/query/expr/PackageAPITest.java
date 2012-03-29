@@ -265,7 +265,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
     qp.close();
 
     // delete package
-    assertTrue(new IOFile(REPO, dir).delete());
+    assertTrue("Repo directory could not be deleted.", new IOFile(REPO, dir).delete());
   }
 
   /**

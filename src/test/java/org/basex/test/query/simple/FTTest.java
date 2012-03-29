@@ -543,7 +543,7 @@ public final class FTTest extends QueryTest {
   @Test
   @Override
   public void test() throws BaseXException {
-    final Prop prop = context.prop;
+    final Prop prop = CONTEXT.prop;
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; ++a) { prop.set(Prop.FTINDEX, a == 0);
@@ -565,7 +565,7 @@ public final class FTTest extends QueryTest {
 
   @Override
   protected String details() {
-    final Prop prop = context.prop;
+    final Prop prop = CONTEXT.prop;
     final StringBuilder sb = new StringBuilder();
     sb.append(set(Prop.FTINDEX, prop)).append(';');
     sb.append(set(Prop.WILDCARDS, prop)).append(';');

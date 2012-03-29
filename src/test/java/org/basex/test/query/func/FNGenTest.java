@@ -1,14 +1,14 @@
 package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
-import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Prop;
-import org.basex.io.IOFile;
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.Test;
+import static org.junit.Assert.*;
+
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the functions of the <code>FNGen</code> class.
@@ -17,8 +17,6 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNGenTest extends AdvancedQueryTest {
-  /** Test database name. */
-  private static final String NAME = Util.name(FNGenTest.class);
   /** Text file. */
   private static final String TEXT = "src/test/resources/input.xml";
 
@@ -31,7 +29,7 @@ public final class FNGenTest extends AdvancedQueryTest {
     check(UNPARSED_TEXT);
     contains(UNPARSED_TEXT.args(TEXT), "?&gt;&lt;html");
     contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "?&gt;&lt;html");
-    final IOFile io = new IOFile(Prop.TMP, NAME);
+    final IOFile io = new IOFile(Prop.TMP, NAME + ".tmp");
     io.write(token("A\r\nB"));
     query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
     io.write(token("A\nB"));

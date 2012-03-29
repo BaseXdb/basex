@@ -3,25 +3,16 @@ package org.basex.test.query;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.Set;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests if queries are rewritten for index access.
@@ -29,12 +20,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class IndexOptimizeTest {
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
-  /** Test database name. */
-  private static final String NAME = Util.name(IndexOptimizeTest.class);
-
+public final class IndexOptimizeTest extends SandboxTest {
   /**
    * Creates a test database.
    * @throws Exception exception

@@ -10,10 +10,10 @@ import java.util.jar.*;
  * Custom class loader for loading jar files. This class is needed because JDK
  * does not offer a fine and easy way to delete open jars. The source code was
  * taken from
- * http://snipplr.com/view/24224/class-loader-which-close-opened-jar-files/ and
- * slightly modified.
+ * {@code http://snipplr.com/view/24224/class-loader-which-close-opened-jar-files/}
+ * and slightly modified.
  *
- * @author Vitali Yemialyanchyk, www.stopka.us
+ * @author Vitali Yemialyanchyk, {@code http://www.stopka.us}
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
@@ -33,8 +33,11 @@ public final class JarLoader extends URLClassLoader {
   public void close() {
     final HashSet<String> files = new HashSet<String>();
     closeClassLoader(files);
-    finalizeNativeLibs(this);
+    finalizeNativeLibs();
     cleanupJarFileFactory(files);
+
+    final ClassLoader cl = getParent();
+    if(cl instanceof JarLoader) ((JarLoader) cl).close();
   }
 
   /**
@@ -111,11 +114,10 @@ public final class JarLoader extends URLClassLoader {
 
   /**
    * Finalizes native libraries.
-   * @param cl class loader
    * @return result
    */
   @SuppressWarnings("unchecked")
-  private static boolean finalizeNativeLibs(final ClassLoader cl) {
+  private boolean finalizeNativeLibs() {
     boolean res = false;
     final Class<?> classClassLoader = ClassLoader.class;
     Field nativeLibraries = null;
@@ -130,7 +132,7 @@ public final class JarLoader extends URLClassLoader {
     nativeLibraries.setAccessible(true);
     Object obj = null;
     try {
-      obj = nativeLibraries.get(cl);
+      obj = nativeLibraries.get(this);
     } catch(final IllegalAccessException ex) {
       Util.errln(ex);
     }

@@ -10,6 +10,7 @@ import org.basex.core.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.server.*;
+import org.basex.test.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -19,7 +20,7 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class XdmInfoTest {
+public final class XdmInfoTest extends SandboxTest {
   /** Server reference. */
   private static BaseXServer server;
   /** Client session. */
@@ -31,7 +32,7 @@ public final class XdmInfoTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
+    server = createServer();
     session = new TestSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
   }
 

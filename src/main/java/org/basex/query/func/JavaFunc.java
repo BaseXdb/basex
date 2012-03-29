@@ -49,13 +49,7 @@ public final class JavaFunc extends JavaMapping {
       throw cause instanceof QueryException ? ((QueryException) cause).info(input) :
         JAVAERR.thrw(input, cause);
     } catch(final Throwable ex) {
-      // compose found arguments
-      final TokenBuilder found = new TokenBuilder();
-      for(final Value a : args) {
-        if(!found.isEmpty()) found.add(", ");
-        found.addExt(a.type);
-      }
-      throw JAVAFUN.thrw(input, name(), found);
+      throw JAVAFUN.thrw(input, name(), foundArgs(args));
     }
   }
 

@@ -3,16 +3,13 @@ package org.basex.test.query.func;
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Locale;
+import java.io.*;
+import java.util.*;
 
-import org.basex.core.Prop;
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the functions of the file library.
@@ -21,16 +18,16 @@ import org.junit.Test;
  * @author Rositsa Shadura
  */
 public final class FNFileTest extends AdvancedQueryTest {
-  /** Test name. */
-  private static final String NAME = Util.name(FNFileTest.class);
   /** Test path. */
-  private static final String PATH1 = Prop.TMP + NAME;
+  private static final String PATH = Prop.TMP + NAME + '/';
   /** Test path. */
-  private static final String PATH2 = Prop.TMP + NAME + '2';
+  private static final String PATH1 = PATH + NAME;
   /** Test path. */
-  private static final String PATH3 = Prop.TMP + NAME + "/x";
+  private static final String PATH2 = PATH + NAME + '2';
   /** Test path. */
-  private static final String PATH4 = Prop.TMP + NAME + "/x/y";
+  private static final String PATH3 = PATH + NAME + "/x";
+  /** Test path. */
+  private static final String PATH4 = PATH + NAME + "/x/y";
 
   /** Initializes the test. */
   @After
@@ -59,7 +56,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void fileIsDirectory() {
     check(_FILE_IS_DIRECTORY);
-    query(_FILE_IS_DIRECTORY.args(Prop.TMP), true);
+    query(_FILE_IS_DIRECTORY.args(PATH), true);
     query(_FILE_WRITE.args(PATH1, "()"));
     query(_FILE_IS_DIRECTORY.args(PATH1), false);
     query(_FILE_DELETE.args(PATH1));
@@ -74,7 +71,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void fileIsFile() {
     check(_FILE_IS_FILE);
-    query(_FILE_IS_FILE.args(Prop.TMP), false);
+    query(_FILE_IS_FILE.args(PATH), false);
     query(_FILE_WRITE.args(PATH1, "()"));
     query(_FILE_IS_FILE.args(PATH1), true);
     query(_FILE_DELETE.args(PATH1));
@@ -89,7 +86,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   @Test
   public void fileLastModified() {
     check(_FILE_LAST_MODIFIED);
-    assertTrue(!query(_FILE_LAST_MODIFIED.args(Prop.TMP)).isEmpty());
+    assertTrue(!query(_FILE_LAST_MODIFIED.args(PATH)).isEmpty());
   }
 
   /**
@@ -112,18 +109,17 @@ public final class FNFileTest extends AdvancedQueryTest {
     error(_FILE_LIST.args(PATH1), Err.NOTDIR);
     query(_FILE_WRITE.args(PATH1, "()"));
     error(_FILE_LIST.args(PATH1), Err.NOTDIR);
-    contains(_FILE_LIST.args(Prop.TMP), NAME);
-    contains(_FILE_LIST.args(Prop.TMP, "false()"), NAME);
-    contains(_FILE_LIST.args(Prop.TMP, "false()", "FN"), NAME);
-    contains(_FILE_LIST.args(Prop.TMP, "false()", NAME), NAME);
-    query(_FILE_LIST.args(Prop.TMP, "false()", "XXX"), "");
+    contains(_FILE_LIST.args(PATH), NAME);
+    contains(_FILE_LIST.args(PATH, "false()"), NAME);
+    contains(_FILE_LIST.args(PATH, "false()", "Sandbox"), NAME);
+    contains(_FILE_LIST.args(PATH, "false()", NAME), NAME);
+    query(_FILE_LIST.args(PATH, "false()", "XXX"), "");
     query(_FILE_DELETE.args(PATH1));
     // check recursive paths
     query(_FILE_CREATE_DIRECTORY.args(PATH1));
     query(_FILE_CREATE_DIRECTORY.args(PATH3));
     query(_FILE_WRITE.args(PATH4, "()"));
     contains(_FILE_LIST.args(PATH1, "true()"), "y");
-    //query(_FILE_DELETE.args(PATH1));
   }
 
   /**
@@ -163,7 +159,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileReadText() {
     check(_FILE_READ_TEXT);
     error(_FILE_READ_TEXT.args(PATH1), Err.PATHNOTEXISTS);
-    error(_FILE_READ_TEXT.args(Prop.TMP), Err.PATHISDIR);
+    error(_FILE_READ_TEXT.args(PATH), Err.PATHISDIR);
     query(_FILE_WRITE.args(PATH1, "a\u00e4"));
     query(_FILE_READ_TEXT.args(PATH1), "a\u00e4");
     error(_FILE_READ_TEXT.args(PATH1, "UNKNOWN"), Err.ENCNOTEXISTS);
@@ -178,7 +174,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileReadBinary() {
     check(_FILE_READ_BINARY);
     error(_FILE_READ_BINARY.args(PATH1), Err.PATHNOTEXISTS);
-    error(_FILE_READ_BINARY.args(Prop.TMP), Err.PATHISDIR);
+    error(_FILE_READ_BINARY.args(PATH), Err.PATHISDIR);
     query(_FILE_WRITE.args(PATH1, "0"));
     query(_FILE_READ_BINARY.args(PATH1), "MA==");
     query(_FILE_DELETE.args(PATH1));
@@ -191,7 +187,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileWrite() {
     check(_FILE_WRITE);
 
-    error(_FILE_WRITE.args(Prop.TMP, "()"), Err.PATHISDIR);
+    error(_FILE_WRITE.args(PATH, "()"), Err.PATHISDIR);
 
     query(_FILE_WRITE.args(PATH1, "0"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -216,7 +212,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileAppend() {
     check(_FILE_APPEND);
 
-    error(_FILE_APPEND.args(Prop.TMP, "()"), Err.PATHISDIR);
+    error(_FILE_APPEND.args(PATH, "()"), Err.PATHISDIR);
 
     query(_FILE_APPEND.args(PATH1, "0"));
     query(_FILE_SIZE.args(PATH1), "1");
@@ -243,7 +239,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_WRITE_BINARY);
 
     final String bin = "xs:base64Binary('MA==')";
-    error(_FILE_WRITE_BINARY.args(Prop.TMP, bin), Err.PATHISDIR);
+    error(_FILE_WRITE_BINARY.args(PATH, bin), Err.PATHISDIR);
     query(_FILE_WRITE_BINARY.args(PATH1, bin));
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_WRITE_BINARY.args(PATH1, bin));
@@ -259,7 +255,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_APPEND_BINARY);
 
     final String bin = "xs:base64Binary('MA==')";
-    error(_FILE_APPEND_BINARY.args(Prop.TMP, bin), Err.PATHISDIR);
+    error(_FILE_APPEND_BINARY.args(PATH, bin), Err.PATHISDIR);
     query(_FILE_APPEND_BINARY.args(PATH1, bin));
     query(_FILE_SIZE.args(PATH1), "1");
     query(_FILE_APPEND_BINARY.args(PATH1, bin));
@@ -353,7 +349,7 @@ public final class FNFileTest extends AdvancedQueryTest {
   public void fileDirName() {
     check(_FILE_DIR_NAME);
     // check with a simple path
-    assertEquals(norm(Prop.TMP),
+    assertEquals(norm(PATH),
         norm(query(_FILE_DIR_NAME.args(PATH1))).toLowerCase(Locale.ENGLISH));
     // check with an empty path
     query(_FILE_DIR_NAME.args(""), ".");
@@ -370,8 +366,8 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_PATH_TO_NATIVE);
     assertEquals(norm(new File(PATH1).getCanonicalPath()),
         norm(query(_FILE_PATH_TO_NATIVE.args(PATH1))));
-    query(_FILE_PATH_TO_NATIVE.args(Prop.TMP + ".." + "/test.xml"),
-        new File(Prop.TMP + ".." + "/test.xml").getCanonicalPath());
+    query(_FILE_PATH_TO_NATIVE.args(PATH + ".." + "/test.xml"),
+        new File(PATH + ".." + "/test.xml").getCanonicalPath());
   }
 
   /**

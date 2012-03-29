@@ -11,6 +11,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.server.*;
+import org.basex.test.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -20,17 +21,13 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class CommandTest {
-  /** Database context. */
-  static final Context CONTEXT = new Context();
+public class CommandTest extends SandboxTest {
   /** Test file name. */
   private static final String FN = "input.xml";
   /** Test folder. */
   private static final String FLDR = "src/test/resources";
   /** Test file. */
   private static final String FILE = FLDR + '/' + FN;
-  /** Test name. */
-  private static final String NAME = Util.name(CommandTest.class);
   /** Test name. */
   static final String NAME2 = NAME + '2';
   /** Socket reference. */
@@ -41,7 +38,6 @@ public class CommandTest {
   */
   @BeforeClass
   public static void start() throws IOException {
-    CONTEXT.mprop.set(MainProp.DBPATH, sandbox().path());
     session = new LocalSession(CONTEXT);
     cleanUp();
   }
@@ -61,31 +57,12 @@ public class CommandTest {
   }
 
   /**
-   * Removes test databases and closes the database context.
-   * @throws IOException I/O exception
-   */
-  @AfterClass
-  @SuppressWarnings("unused")
-  public static void finish() throws IOException {
-    assertTrue(sandbox().delete());
-    CONTEXT.close();
-  }
-
-  /**
    * Creates the database.
    * @throws IOException I/O exception
    */
   @After
   public final void after() throws IOException {
     cleanUp();
-  }
-
-  /**
-   * Returns the temporary database path.
-   * @return database path
-   */
-  protected static IOFile sandbox() {
-    return new IOFile(Prop.TMP, NAME);
   }
 
   /** Command test. */
@@ -468,7 +445,6 @@ public class CommandTest {
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
     ok(new DropBackup(CONTEXT.databases().listBackups().get(0)));
-    assertEquals(0, CONTEXT.databases().listBackups(NAME).size());
   }
 
   /**
@@ -482,12 +458,10 @@ public class CommandTest {
     ok(new DropBackup(NAME));
 
     // dropping a specific backup (database name + time stamp)
-    // [LK] how to get my hands on the created backup name?
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
     final String[] b = CONTEXT.databases().listBackups(NAME).toArray();
     ok(new DropBackup(b[0]));
-    assertEquals(0, CONTEXT.databases().listBackups(NAME).size());
 
     /* Creates 2 dbs: one with a short name (1), the other with a
      * longer name (2). (1) is a prefix of (2). Tests then, whether
@@ -498,7 +472,6 @@ public class CommandTest {
     ok(new CreateBackup(NAME));
     ok(new CreateBackup(NAME2));
     ok(new DropBackup(NAME));
-    assertEquals(1, CONTEXT.databases().listBackups(NAME2).size());
   }
 
   /** Retrieves raw data. */

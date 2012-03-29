@@ -2,17 +2,14 @@ package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
-import java.io.IOException;
-import java.util.HashSet;
-import org.basex.BaseXServer;
-import org.basex.server.ClientSession;
-import org.basex.server.EventNotifier;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import java.io.*;
+import java.util.*;
+
+import org.basex.*;
+import org.basex.server.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * This class tests the event API.
@@ -21,10 +18,7 @@ import org.junit.Test;
  * @author Roman Raedle
  * @author Andreas Weiler
  */
-public final class EventTest {
-  /** Event name. */
-  static final String NAME = Util.name(EventTest.class);
-
+public final class EventTest extends SandboxTest {
   /** Return value of function db:event. */
   private static final String RETURN = "ABCDEFGHIJKLMNOP";
   /** Event count. */
@@ -45,7 +39,7 @@ public final class EventTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
+    server = createServer();
   }
 
   /**

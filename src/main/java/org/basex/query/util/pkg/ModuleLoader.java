@@ -22,14 +22,15 @@ import org.basex.util.hash.*;
  * @author Christian Gruen
  */
 public final class ModuleLoader {
+  /** Default class loader. */
+  private static final ClassLoader LOADER =
+      Thread.currentThread().getContextClassLoader();
+  /** Current class loader. */
+  private ClassLoader loader = LOADER;
   /** Java modules. */
   private HashMap<Object, ArrayList<Method>> javaModules;
-  /** Module URLs. */
-  private final ArrayList<URL> urls = new ArrayList<URL>();
   /** Database context. */
   private final Context context;
-  /** Jar loader. */
-  private JarLoader jars;
 
   /**
    * Constructor.
@@ -43,7 +44,7 @@ public final class ModuleLoader {
    * Closes opened jar files.
    */
   public void close() {
-    if(jars != null) jars.close();
+    if(loader instanceof JarLoader) ((JarLoader) loader).close();
   }
 
   /**
@@ -51,12 +52,11 @@ public final class ModuleLoader {
    * @param clz class to be found
    * @return instance, or {@code null}
    */
-  public Object findJava(final String clz) {
+  public Object findImported(final String clz) {
     // check if class was imported as Java module
     if(javaModules != null) {
       for(final Object jm : javaModules.keySet()) {
-        final Class<?> c = jm.getClass();
-        if(c.getName().equals(clz)) return jm;
+        if(jm.getClass().getName().equals(clz)) return jm;
       }
     }
     return null;
@@ -66,16 +66,20 @@ public final class ModuleLoader {
    * Finds the specified class.
    * @param clz class to be found
    * @return found class, or {@code null}
+   * @throws Throwable any exception or error: {@link ClassNotFoundException},
+   *   {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
-  public Class<?> find(final String clz) {
-    // no modules specified
-    if(urls.size() == 0) return null;
-    // first call: create loader
-    if(jars == null) {
-      final ClassLoader cl = Thread.currentThread().getContextClassLoader();
-      jars = new JarLoader(urls.toArray(new URL[urls.size()]), cl);
+  public Class<?> find(final String clz) throws Throwable {
+    // no external classes added: use default class loader
+    if(loader == LOADER) return Reflect.forName(clz);
+
+    final Thread thread = Thread.currentThread();
+    try {
+      thread.setContextClassLoader(loader);
+      return Class.forName(clz, true, loader);
+    } finally {
+      thread.setContextClassLoader(LOADER);
     }
-    return Reflect.find(clz, jars);
   }
 
   /**
@@ -188,6 +192,7 @@ public final class ModuleLoader {
       final InputInfo ii) throws QueryException {
 
     // add new URLs
+    final ArrayList<URL> urls = new ArrayList<URL>();
     final JarDesc desc = new JarParser(context, ii).parse(jarDesc);
     for(final byte[] u : desc.jars) {
       // assumes that jar is in the directory containing the xquery modules
@@ -198,5 +203,6 @@ public final class ModuleLoader {
         Util.errln(ex.getMessage());
       }
     }
+    loader = new JarLoader(urls.toArray(new URL[urls.size()]), loader);
   }
 }

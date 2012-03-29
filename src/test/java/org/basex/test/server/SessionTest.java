@@ -9,12 +9,12 @@ import java.io.IOException;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.io.*;
 import org.basex.io.in.ArrayInput;
 import org.basex.io.out.ArrayOutput;
 import org.basex.io.serial.*;
 import org.basex.server.Query;
 import org.basex.server.Session;
+import org.basex.test.*;
 import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Test;
@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class SessionTest {
+public abstract class SessionTest extends SandboxTest {
   /** Test database name. */
   static final String DB = Util.name(SessionTest.class);
   /** Raw output method. */
@@ -609,13 +609,5 @@ public abstract class SessionTest {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));
-  }
-
-  /**
-   * Returns the temporary database path.
-   * @return database path
-   */
-  protected static IOFile sandbox() {
-    return new IOFile(Prop.TMP, DB);
   }
 }

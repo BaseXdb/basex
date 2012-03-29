@@ -3,15 +3,12 @@ package org.basex.test.server;
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.BaseXServer;
-import org.basex.core.*;
-import org.basex.server.ClientSession;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.basex.*;
+import org.basex.server.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the client/server session API.
@@ -29,8 +26,7 @@ public class ClientSessionTest extends SessionTest {
    */
   @BeforeClass
   public static void startServer() throws IOException {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
-    server.context.mprop.set(MainProp.DBPATH, sandbox().path());
+    server = createServer();
   }
 
   /**
@@ -40,7 +36,6 @@ public class ClientSessionTest extends SessionTest {
   @AfterClass
   public static void stop() throws IOException {
     server.stop();
-    assertTrue(sandbox().delete());
   }
 
   /** Starts a session. */

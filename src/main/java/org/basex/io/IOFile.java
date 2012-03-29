@@ -309,7 +309,6 @@ public final class IOFile extends IO {
       for(int i = 0; i < 5; i++) {
         if(file.delete() && !file.exists()) return ok;
         Performance.sleep(i * 10);
-        if(i != 0) System.out.println("DELETE: " + i);
       }
     }
     return false;

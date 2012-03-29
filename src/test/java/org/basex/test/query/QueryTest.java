@@ -2,26 +2,15 @@ package org.basex.test.query;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.Nodes;
-import org.basex.data.Result;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.Str;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.test.query.simple.XQUPTest;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.test.*;
+import org.basex.test.query.simple.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the database commands.
@@ -29,19 +18,16 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class QueryTest {
+public abstract class QueryTest extends SandboxTest {
   /** Document. */
   protected static String doc;
   /** Queries. */
   protected static Object[][] queries;
-  /** Database context. */
-  protected static Context context;
 
   /** Prepares the tests. */
   @BeforeClass
   public static void startTest() {
-    context = new Context();
-    context.prop.set(Prop.CACHEQUERY, true);
+    CONTEXT.prop.set(Prop.CACHEQUERY, true);
   }
 
   /**
@@ -50,8 +36,8 @@ public abstract class QueryTest {
    */
   @AfterClass
   public static void stopTest() throws BaseXException {
-    new DropDB(Util.name(QueryTest.class)).execute(context);
-    context.close();
+    new DropDB(Util.name(QueryTest.class)).execute(CONTEXT);
+    CONTEXT.close();
   }
 
   /**
@@ -63,7 +49,7 @@ public abstract class QueryTest {
     final String file = doc.replaceAll("\"", "\\\\\"");
     final String name = Util.name(QueryTest.class);
     final boolean up = this instanceof XQUPTest;
-    new CreateDB(name, file).execute(context);
+    new CreateDB(name, file).execute(CONTEXT);
 
     final StringBuilder sb = new StringBuilder();
     int fail = 0;
@@ -72,7 +58,7 @@ public abstract class QueryTest {
       // added to renew document after each update test
       final String title = (String) qu[0];
       if(up && title.startsWith("xxx")) {
-        new CreateDB(name, file).execute(context);
+        new CreateDB(name, file).execute(CONTEXT);
       }
 
       final boolean correct = qu.length == 3;
@@ -81,10 +67,10 @@ public abstract class QueryTest {
 
       final Command c = new XQuery(query);
       try {
-        c.execute(context);
+        c.execute(CONTEXT);
         final Result val = c.result();
         if(cmp instanceof Nodes) {
-          ((Nodes) cmp).data = context.data();
+          ((Nodes) cmp).data = CONTEXT.data();
         }
 
         if(!correct || !val.sameAs(cmp)) {

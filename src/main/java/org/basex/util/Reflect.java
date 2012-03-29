@@ -7,8 +7,8 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
 /**
- * This class assembles some reflection methods. If exceptions occur, a
- * {@code null} reference is returned or a runtime exception is thrown.
+ * This class assembles some reflection methods. Most exceptions are caught and replaced
+ * by a {@code null} value.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -35,51 +35,41 @@ public final class Reflect {
    */
   public static boolean available(final String pattern, final Object... ext) {
     try {
-      Class.forName(Util.info(pattern, ext));
+      forName(Util.info(pattern, ext));
       return true;
-    } catch(final ClassNotFoundException ex) {
+    } catch(final Throwable ex) {
       return false;
     }
   }
 
   /**
-   * Returns a reference to the specified class, or {@code null}.
-   * @param name class name
+   * Caches and returns a reference to the specified class, or {@code null}.
+   * @param name fully qualified class name
    * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String name) {
     final Class<?> c = CLASSES.get(name);
     if(c != null) return c;
     try {
-      return cache(name, Class.forName(name));
+      return forName(name);
     } catch(final Throwable ex) {
       return null;
     }
   }
 
   /**
-   * Returns a reference to a class located in the specified jar loader,
-   * or {@code null}.
-   * @param name class name
-   * @param jar jar loader
-   * @return reference, or {@code null} if the class is not found
+   * Caches and returns a reference to the specified class, or throws an exception.
+   * @param name fully qualified class name
+   * @return class reference
+   * @throws Throwable any exception or error
    */
-  public static Class<?> find(final String name, final JarLoader jar) {
-    final Thread ct = Thread.currentThread();
-    final ClassLoader cl = ct.getContextClassLoader();
-    try {
-      ct.setContextClassLoader(jar);
-      return cache(name, Class.forName(name, true, jar));
-    } catch(final Throwable ex) {
-      return null;
-    } finally {
-      ct.setContextClassLoader(cl);
-    }
+  public static Class<?> forName(final String name) throws Throwable {
+    return cache(name, Class.forName(name));
   }
 
   /**
    * Caches the specified class.
-   * @param name class name
+   * @param name fully qualified class name
    * @param c class
    * @return reference, or {@code null} if the class is not found
    */
@@ -92,9 +82,9 @@ public final class Reflect {
   }
 
   /**
-   * Returns a reference to the specified field, or {@code null}.
+   * Caches and returns a reference to the specified field, or {@code null}.
    * @param clazz class to search for the constructor
-   * @param name class name
+   * @param name field name
    * @return reference, or {@code null} if the field is not found
    */
   public static Field field(final Class<?> clazz, final String name) {
@@ -110,7 +100,8 @@ public final class Reflect {
   }
 
   /**
-   * Returns a reference to the class specified by the pattern, or {@code null}.
+   * Caches and returns a reference to the class specified by the pattern,
+   * or {@code null}.
    * @param pattern class pattern
    * @param ext optional extension
    * @return reference, or {@code null} if the class is not found
@@ -121,7 +112,7 @@ public final class Reflect {
 
   /**
    * Returns a class reference to one of the specified classes, or {@code null}.
-   * @param names class names
+   * @param names fully qualified class names
    * @return reference, or {@code null} if the class is not found
    */
   public static Class<?> find(final String[] names) {
@@ -133,10 +124,10 @@ public final class Reflect {
   }
 
   /**
-   * Finds a constructor by parameter types.
+   * Caches and returns a constructor by parameter types.
    * @param clazz class to search for the constructor
    * @param types constructor parameters
-   * @return {@code null} if the class is not found
+   * @return {@code null} if the constructor is not found
    */
   public static Constructor<?> find(final Class<?> clazz, final Class<?>... types) {
     if(clazz == null) return null;

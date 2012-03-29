@@ -1,15 +1,13 @@
 package org.basex.test.server;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
+import java.io.*;
+import java.util.concurrent.*;
 
-import org.basex.BaseXServer;
-import org.basex.core.Text;
-import org.basex.server.ClientSession;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.server.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * Admin stress test.
@@ -17,9 +15,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
-public final class AdminStressTest {
-  /** Test name. */
-  private static final String NAME = Util.name(AdminStressTest.class);
+public final class AdminStressTest extends SandboxTest {
   /** Number of clients/events. */
   private static final int NUM = 100;
   /** Server reference. */
@@ -31,7 +27,7 @@ public final class AdminStressTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
+    server = createServer();
   }
 
   /**

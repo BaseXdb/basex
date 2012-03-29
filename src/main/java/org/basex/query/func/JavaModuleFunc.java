@@ -63,15 +63,8 @@ public final class JavaModuleFunc extends JavaMapping {
         if(!expect.isEmpty()) expect.add(", ");
         expect.add(c.getSimpleName());
       }
-      // compose found signature
-      final TokenBuilder found = new TokenBuilder();
-      for(final Value a : args) {
-        if(!found.isEmpty()) found.add(", ");
-        found.addExt(a.type());
-      }
-
       throw JAVAMOD.thrw(input, mth.getName() + '(' + expect + ')',
-          mth.getName() + '(' + found + ')');
+          mth.getName() + '(' + foundArgs(args) + ')');
     }
   }
 

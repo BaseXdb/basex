@@ -44,6 +44,7 @@ import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.test.*;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -59,9 +60,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
-public final class PermissionTest {
-  /** Name of test database and user. */
-  private static final String NAME = Util.name(PermissionTest.class);
+public final class PermissionTest extends SandboxTest {
   /** Name of the database to be renamed. */
   private static final String RENAMED = Util.name(PermissionTest.class) + 'r';
   /** Test repository. **/
@@ -80,7 +79,16 @@ public final class PermissionTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
+    server = createServer();
+  }
+
+  /**
+   * Stops the server.
+   * @throws IOException I/O exception
+   */
+  @AfterClass
+  public static void stop() throws IOException {
+    server.stop();
   }
 
   /** Set up method. */
@@ -99,6 +107,21 @@ public final class PermissionTest {
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
       ok(new Close(), adminSession);
+    } catch(final Exception ex) {
+      fail(Util.message(ex));
+    }
+  }
+
+  /** Clean up method. */
+  @After
+  public void cleanUp() {
+    try {
+      testSession.close();
+      adminSession.execute(new DropDB(RENAMED));
+      adminSession.execute(new DropDB(NAME));
+      adminSession.close();
+      // give the server some time to clean up the sessions before next test
+      Performance.sleep(50);
     } catch(final Exception ex) {
       fail(Util.message(ex));
     }
@@ -321,30 +344,5 @@ public final class PermissionTest {
       fail("\"" + cmd + "\" was supposed to fail.");
     } catch(final IOException ex) {
     }
-  }
-
-  /** Clean up method. */
-  @After
-  public void cleanUp() {
-    try {
-      testSession.close();
-      adminSession.execute(new DropDB(RENAMED));
-      adminSession.execute(new DropDB(NAME));
-      adminSession.close();
-      // give the server some time to clean up the sessions before next test
-      Performance.sleep(50);
-    } catch(final Exception ex) {
-      fail(Util.message(ex));
-    }
-  }
-
-  /**
-   * Stops the server.
-   * @throws IOException I/O exception
-   */
-  @AfterClass
-  public static void stop() throws IOException {
-    // stop server instance
-    server.stop();
   }
 }

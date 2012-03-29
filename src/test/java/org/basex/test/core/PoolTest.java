@@ -13,6 +13,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.test.*;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -24,11 +25,9 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
-public final class PoolTest {
+public final class PoolTest extends SandboxTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
-  /** Test database name. */
-  private static final String NAME = Util.name(PoolTest.class);
 
   /** Server reference. */
   private static BaseXServer server;
@@ -43,7 +42,7 @@ public final class PoolTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
+    server = createServer();
     session1 = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
     session2 = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
   }

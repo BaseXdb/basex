@@ -7,6 +7,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.test.*;
 import org.basex.util.Util;
 import org.junit.AfterClass;
 import static org.junit.Assert.fail;
@@ -22,11 +23,9 @@ import java.util.Random;
  * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
-public final class SemaphoreTest {
+public final class SemaphoreTest extends SandboxTest {
   /** Create random number. */
   static final Random RANDOM = new Random();
-  /** Test database name. */
-  private static final String NAME = Util.name(SemaphoreTest.class);
   /** Test file. */
   private static final String FILE = "src/test/resources/factbook.zip";
   /** Test queries. */
@@ -48,7 +47,7 @@ public final class SemaphoreTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    server = new BaseXServer("-z", "-p9999", "-e9998");
+    server = createServer();
     sess = newSession();
   }
 

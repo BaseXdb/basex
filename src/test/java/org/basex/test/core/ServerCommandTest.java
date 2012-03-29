@@ -29,8 +29,7 @@ public final class ServerCommandTest extends CommandTest {
    */
   @BeforeClass
   public static void start() throws IOException {
-    CONTEXT.mprop.set(MainProp.DBPATH, sandbox().path());
-    server = new BaseXServer(CONTEXT, "-z", "-p9999", "-e9998");
+    server = createServer();
     session = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
     cleanUp();
   }
@@ -48,9 +47,6 @@ public final class ServerCommandTest extends CommandTest {
     }
     // stop server instance
     if(server != null) server.stop();
-
-    assertTrue(sandbox().delete());
-    CONTEXT.close();
   }
 
   /**
