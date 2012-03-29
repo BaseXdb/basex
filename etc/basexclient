@@ -9,9 +9,12 @@ while [ -h "$FILE" ] ; do
 done
 BX="$( cd -P "$(dirname "$FILE")/.." && pwd )"
 
-# Core classes
+# Core and library classes
 CP="$BX/target/classes"
-CP="$CP$(for JAR in "$BX"/lib/jline*.jar; do echo -n ":$JAR"; done)"
+CP="$CP$(for JAR in "$BX"/lib/*.jar; do echo -n ":$JAR"; done)"
+
+# Options for virtual machine
+VM=
 
 # Run code
-java -cp "$CP" org.basex.BaseXClient "$@"
+java -cp "$CP" $VM org.basex.BaseX "$@"
