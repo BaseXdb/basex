@@ -537,6 +537,8 @@ public enum Err {
   FUNCUNKNOWN(XPST, 17, "Unknown function '%(...)'."),
   /** XPST0017: Parsing exception. */
   WHICHJAVA(XPST, 17, "Unknown Java function '%(...)'."),
+  /** XPST0017: Parsing exception. */
+  INITJAVA(XPST, 17, "Class cannot be initialized: %."),
 
   /** XPST0051: Parsing exception. */
   TYPEUNKNOWN(XPST, 51, "Unknown type %."),
@@ -664,6 +666,8 @@ public enum Err {
   NOINV(XQST, 59, "Could not instantiate module '%'."),
   /** XQST0059: Parsing exception. */
   NOMODULE(XQST, 59, "Module not found: '%'."),
+  /** XQST0059: Parsing exception. */
+  MODINIT(XQST, 59, "Module not initialized: %."),
   /** XQST0059: Parsing exception. */
   NOMODULEFILE(XQST, 59, "Could not retrieve module '%'."),
   /** XQST0059: Parsing exception. */

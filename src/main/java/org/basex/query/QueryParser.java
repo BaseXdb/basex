@@ -712,6 +712,7 @@ public class QueryParser extends InputParser {
       else if(!found) error(NOMODULE, uri);
 
     } catch(final StackOverflowError ex) {
+      Util.debug(ex);
       error(CIRCMODULE);
     }
   }

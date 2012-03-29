@@ -162,19 +162,18 @@ public abstract class JavaMapping extends Arr {
       for(final Method meth : jm.getClass().getMethods()) {
         if(meth.getName().equals(mth)) return new JavaModuleFunc(ii, jm, meth, args);
       }
-    } else {
-      // finds addressed class function
-      try {
-        return new JavaFunc(ii, ctx.modules.find(path), mth, args);
-      } catch(final ClassNotFoundException ex) {
-        WHICHJAVA.thrw(ii, path + '.' + mth);
-      } catch(final Throwable th) {
-        Util.debug(th);
-      }
+      throw WHICHJAVA.thrw(ii, path + '.' + mth);
     }
 
-    // no function found: return error
-    throw WHICHJAVA.thrw(ii, path + '.' + mth);
+    // finds addressed class function
+    try {
+      return new JavaFunc(ii, ctx.modules.find(path), mth, args);
+    } catch(final ClassNotFoundException ex) {
+      throw WHICHJAVA.thrw(ii, path + '.' + mth);
+    } catch(final Throwable th) {
+      Util.debug(th);
+      throw INITJAVA.thrw(ii, th);
+    }
   }
 
   /**

@@ -96,12 +96,20 @@ public final class ModuleLoader {
     // check Java modules
     if(startsWith(uri, JAVAPRE)) {
       final String path = string(substring(uri, JAVAPRE.length));
-      final Class<?> clz = Reflect.find(path);
-      if(clz == null) qp.error(NOMODULE, path);
+      Class<?> clz = null;
+      try {
+        clz = find(path);
+      } catch(final ClassNotFoundException ex) {
+        NOMODULE.thrw(ii, path);
+        // expected exception
+      } catch(final Throwable th) {
+        Util.debug(th);
+        MODINIT.thrw(ii, th);
+      }
 
       final boolean qm = clz.getSuperclass() == QueryModule.class;
       final Object jm = Reflect.get(clz);
-      if(jm == null) qp.error(NOINV, path);
+      if(jm == null) NOINV.thrw(ii, path);
 
       // add all public methods of the class (ignore methods from super classes)
       final ArrayList<Method> list = new ArrayList<Method>();
@@ -143,7 +151,7 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) qp.error(NECPKGNOTINST, name);
+    if(pDir == null) NECPKGNOTINST.thrw(ii, name);
     final IOFile pkgDir = context.repo.path(string(pDir));
 
     // parse package descriptor
@@ -164,9 +172,9 @@ public final class ModuleLoader {
       // we consider only package dependencies here
       final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
       if(depPkg == null) {
-        qp.error(NECPKGNOTINST, string(d.pkg));
+        NECPKGNOTINST.thrw(ii, string(d.pkg));
       } else {
-        if(toLoad.contains(depPkg)) qp.error(CIRCMODULE);
+        if(toLoad.contains(depPkg)) CIRCMODULE.thrw(ii);
         load(depPkg, toLoad, loaded, ii, qp);
       }
      }
