@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.io.File;
+import java.net.*;
 import java.security.*;
 
 import org.basex.io.*;
@@ -231,8 +232,10 @@ public final class Prop extends AProp {
     // code source (may be null)
     final CodeSource cs = pd.getCodeSource();
     if(cs == null) return null;
-    // raw application path
-    final String path = cs.getLocation().getPath();
+    // location (may be null)
+    final URL url = cs.getLocation();
+    if(url == null) return null;
+    final String path = url.getPath();
     // decode path; URLDecode returns wrong results
     final TokenBuilder tb = new TokenBuilder();
     final int pl = path.length();
