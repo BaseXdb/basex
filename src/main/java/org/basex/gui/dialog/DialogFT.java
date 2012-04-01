@@ -113,8 +113,7 @@ final class DialogFT extends BaseXBack {
     add(check[F_STOP]);
     add(Box.createVerticalStrut(4));
     final BaseXBack b3 = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    swpath = new BaseXTextField(sw.isEmpty() ?
-        d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
+    swpath = new BaseXTextField(sw.isEmpty() ? d.gui.gprop.get(GUIProp.STOPPATH) : sw, d);
     b3.add(swpath);
 
     swbrowse = new BaseXButton(BROWSE_D, d);
@@ -147,12 +146,6 @@ final class DialogFT extends BaseXBack {
    * Reacts on user input.
    */
   void action() {
-    /*
-    for(int f = 0; f < check.length; ++f) {
-      check[f].setEnabled(ftx);
-      if(labels[f] != null) labels[f].setEnabled(ftx);
-    }
-    */
     language.setEnabled(check[F_LANG].isSelected());
     scoring.setEnabled(check[F_SCORE].isSelected());
     swbrowse.setEnabled(check[F_STOP].isSelected());

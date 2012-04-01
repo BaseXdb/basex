@@ -163,9 +163,15 @@ public final class DialogProps extends Dialog {
       for(int i = 0; i < LABELS.length; i++) {
         if(cmp != indxs[i]) continue;
         final String label = indxs[i].getText();
-        final Command cmd = label.equals(OPTIMIZE + DOTS) ?
-          new Optimize() : label.equals(DROP + DOTS) ?
-          new DropIndex(TYPES[i]) : new CreateIndex(TYPES[i]);
+        final Command cmd;
+        if(label.equals(OPTIMIZE + DOTS)) {
+          cmd = new Optimize();
+        } else if(label.equals(DROP + DOTS)) {
+          cmd = new DropIndex(TYPES[i]);
+        } else {
+          cmd = new CreateIndex(TYPES[i]);
+          ft.setOptions();
+        }
         DialogProgress.execute(this, "", cmd);
         return;
       }
