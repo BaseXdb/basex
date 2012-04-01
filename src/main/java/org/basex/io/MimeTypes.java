@@ -64,18 +64,8 @@ public final class MimeTypes {
    * @return mime-type
    */
   public static String get(final String path) {
-    final String ct = TYPES.get(suffix(path));
+    final String ct = TYPES.get(IO.suffix(path));
     return ct != null ? ct : APP_OCTET;
-  }
-
-  /**
-   * Returns the file suffix. An empty string is returned if the file has no suffix.
-   * @param path path to be checked
-   * @return mime-type
-   */
-  public static String suffix(final String path) {
-    final int i = path.lastIndexOf('.');
-    return i == -1 ? "" : path.substring(i + 1);
   }
 
   /**

@@ -13,13 +13,16 @@ import java.util.*;
 import javax.xml.datatype.*;
 import javax.xml.namespace.*;
 
+import org.basex.core.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.item.Type;
 import org.basex.query.iter.*;
+import org.basex.query.util.pkg.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
+import org.w3c.dom.Text;
 
 /**
  * This class contains common methods for executing Java code and mapping
@@ -69,7 +72,7 @@ public abstract class JavaMapping extends Arr {
     final Value[] args = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
       args[a] = ctx.value(expr[a]);
-      if(args[a].isEmpty()) XPEMPTY.thrw(input, description());
+      if(args[a].isEmpty()) XPEMPTY.thrw(info, description());
     }
     return toValue(eval(args, ctx));
   }
@@ -131,15 +134,23 @@ public abstract class JavaMapping extends Arr {
    * @param args arguments
    * @param ctx query context
    * @param ii input info
-   * @return Java function
+   * @return Java function, or {@code null}
    * @throws QueryException query exception
    */
   static JavaMapping get(final QNm name, final Expr[] args, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
-    // resolve function name: convert dashes to upper-case initials
-    final TokenBuilder m = new TokenBuilder();
+    // only allowed with administrator permissions
+    if(!ctx.context.user.perm(User.ADMIN)) return null;
+
+    // check for "java:" prefix
+    final byte[] uri = name.uri();
     final byte[] ln = name.local();
+    final boolean java = startsWith(uri, JAVAPREF);
+    final QNm nm = new QNm(ln, java ? substring(uri, JAVAPREF.length) : uri);
+
+    // rewrite function name: convert dashes to upper-case initials
+    final TokenBuilder m = new TokenBuilder();
     boolean dash = false;
     for(int p = 0; p < ln.length; p += cl(ln, p)) {
       final int ch = cp(ln, p);
@@ -153,27 +164,33 @@ public abstract class JavaMapping extends Arr {
     }
     final String mth = m.toString();
 
-    // class path
-    final String path = string(substring(name.uri(), JAVAPRE.length));
+    // check imported Java modules
+    String path = string(nm.uri());
+    final String p = ModuleLoader.uri2path(path);
+    if(p != null) path = p;
+    path = path.replace("/", ".").substring(1);
 
-    // finds imported Java module
-    final Object jm  = ctx.modules.findImported(path);
+    final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
       for(final Method meth : jm.getClass().getMethods()) {
         if(meth.getName().equals(mth)) return new JavaModuleFunc(ii, jm, meth, args);
       }
-      throw WHICHJAVA.thrw(ii, path + '.' + mth);
+      throw WHICHJAVA.thrw(ii, path + ':' + mth);
     }
 
-    // finds addressed class function
+    // check addressed class
     try {
-      return new JavaFunc(ii, ctx.modules.find(path), mth, args);
+      return new JavaFunc(ii, ctx.modules.findClass(path), mth, args);
     } catch(final ClassNotFoundException ex) {
-      throw WHICHJAVA.thrw(ii, path + '.' + mth);
+      // only throw exception if "java:" prefix was explicitly specified
+      if(java) throw WHICHJAVA.thrw(ii, uri);
     } catch(final Throwable th) {
       Util.debug(th);
       throw INITJAVA.thrw(ii, th);
     }
+
+    // no function found
+    return null;
   }
 
   /**

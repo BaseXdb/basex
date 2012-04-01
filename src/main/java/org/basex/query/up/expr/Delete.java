@@ -35,12 +35,12 @@ public final class Delete extends Update {
 
     final Iter t = ctx.iter(expr[0]);
     for(Item i; (i = t.next()) != null;) {
-      if(!(i instanceof ANode)) UPTRGDELEMPT.thrw(input);
+      if(!(i instanceof ANode)) UPTRGDELEMPT.thrw(info);
       final ANode n = (ANode) i;
       // nodes without parents are ignored
       if(n.parent() == null) continue;
       final DBNode dbn = ctx.updates.determineDataRef(n, ctx);
-      ctx.updates.add(new DeleteNode(dbn.pre, dbn.data, input), ctx);
+      ctx.updates.add(new DeleteNode(dbn.pre, dbn.data, info), ctx);
     }
     return null;
   }

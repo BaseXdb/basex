@@ -26,7 +26,7 @@ public final class PkgValidator {
   /** Repository context. */
   private final Repo repo;
   /** Input info. */
-  private final InputInfo input;
+  private final InputInfo info;
 
   /**
    * Constructor.
@@ -35,7 +35,7 @@ public final class PkgValidator {
    */
   public PkgValidator(final Repo r, final InputInfo ii) {
     repo = r;
-    input = ii;
+    info = ii;
   }
 
   /**
@@ -47,7 +47,7 @@ public final class PkgValidator {
   public void check(final Package pkg) throws QueryException {
     // check if package is already installed
     final byte[] name = pkg.uniqueName();
-    if(repo.pkgDict().get(name) != null) PKGINST.thrw(input, name);
+    if(repo.pkgDict().get(name) != null) PKGINST.thrw(info, name);
     // check package dependencies
     checkDepends(pkg);
     // check package components
@@ -66,11 +66,11 @@ public final class PkgValidator {
       // first check of dependency elements are consistently defined in the
       // descriptor
       if(dep.pkg == null && dep.processor == null)
-        PKGDESCINV.thrw(input, MISSSECOND);
+        PKGDESCINV.thrw(info, MISSSECOND);
       // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
       if(dep.pkg != null && depPkg(dep) == null)
-        NECPKGNOTINST.thrw(input, dep.pkg);
+        NECPKGNOTINST.thrw(info, dep.pkg);
       // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);
@@ -115,7 +115,7 @@ public final class PkgValidator {
       // check if current version is acceptable for the dependency
       supported = availVersion(d, new TokenSet(token(v))) != null;
     }
-    if(!supported) PKGNOTSUPP.thrw(input);
+    if(!supported) PKGNOTSUPP.thrw(info);
   }
 
   /**
@@ -185,7 +185,7 @@ public final class PkgValidator {
   private void checkComps(final Package pkg) throws QueryException {
     // modules other than xquery could be supported in future
     for(final Component comp : pkg.comps) {
-      if(isInstalled(comp, pkg.name)) MODISTALLED.thrw(input, comp.name());
+      if(isInstalled(comp, pkg.name)) MODISTALLED.thrw(info, comp.name());
     }
   }
 
@@ -210,7 +210,7 @@ public final class PkgValidator {
         // of the current one
         final String pkgDir = string(repo.pkgDict().get(nextPkg));
         final IO pkgDesc = new IOFile(repo.path(pkgDir), DESCRIPTOR);
-        final Package pkg = new PkgParser(repo, input).parse(pkgDesc);
+        final Package pkg = new PkgParser(repo, info).parse(pkgDesc);
         for(final Component nextComp : pkg.comps) {
           if(nextComp.name().equals(comp.name())) return true;
         }

@@ -35,14 +35,14 @@ public final class FNNum extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Item it = expr[0].item(ctx, input);
+    final Item it = expr[0].item(ctx, info);
     if(it == null) return null;
 
     final Type ip = it.type;
     if(!ip.isUntyped() && !ip.isNumber()) Err.number(this, it);
-    final double d = it.dbl(input);
+    final double d = it.dbl(info);
     switch(sig) {
-      case ABS:                return abs(it, input);
+      case ABS:                return abs(it, info);
       case CEILING:            return num(it, d, StrictMath.ceil(d));
       case FLOOR:              return num(it, d, StrictMath.floor(d));
       case ROUND:              return rnd(it, d, false, ctx);
@@ -64,7 +64,7 @@ public final class FNNum extends StandardFunc {
       final QueryContext ctx) throws QueryException {
 
     final int p = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
-    return round(it, d, p, h2e, input);
+    return round(it, d, p, h2e, info);
   }
 
   /**

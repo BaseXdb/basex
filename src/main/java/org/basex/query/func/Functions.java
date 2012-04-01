@@ -4,21 +4,16 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.core.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.expr.Expr.Use;
 import org.basex.query.item.*;
-import org.basex.query.item.SeqType.*;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.query.util.*;
-import org.basex.util.InputInfo;
-import org.basex.util.Levenshtein;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class provides access to statically available functions.
@@ -30,7 +25,7 @@ public final class Functions extends TokenSet {
   /** Singleton instance. */
   private static final Functions INSTANCE = new Functions();
   /** Function classes. */
-  private Function[] funcs;
+  private Function[] funcs = new Function[CAP];
 
   /**
    * Returns the singleton instance.
@@ -44,11 +39,10 @@ public final class Functions extends TokenSet {
    * Constructor, registering statically available XQuery functions.
    */
   private Functions() {
-    funcs = new Function[CAP];
     for(final Function def : Function.values()) {
       final String dsc = def.desc;
       final byte[] ln = token(dsc.substring(0, dsc.indexOf(PAR1)));
-      final int i = add(full(def.uri(), ln));
+      final int i = add(new QNm(ln, def.uri()).eqname());
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
@@ -56,23 +50,22 @@ public final class Functions extends TokenSet {
 
   /**
    * Returns the specified function.
-   * @param name function name
-   * @param uri function uri
+   * @param name function qname
    * @param args optional arguments
    * @param ctx query context
    * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
-  public StandardFunc get(final byte[] name, final byte[] uri, final Expr[] args,
+  public StandardFunc get(final QNm name, final Expr[] args,
       final QueryContext ctx, final InputInfo ii) throws QueryException {
 
-    final int id = id(full(uri, name));
+    final int id = id(name.eqname());
     if(id == 0) return null;
 
     // create function
     final Function fl = funcs[id];
-    if(!eq(fl.uri(), uri)) return null;
+    if(!eq(fl.uri(), name.uri())) return null;
 
     final StandardFunc f = fl.get(ii, args);
     if(!ctx.xquery3 && f.uses(Use.X30)) FEATURE30.thrw(ii);
@@ -118,7 +111,8 @@ public final class Functions extends TokenSet {
   }
 
   /**
-   * Returns an instance of the specified function, or {@code null}.
+   * Returns an instance of a with the specified name and number of arguments,
+   * or {@code null}.
    * @param name name of the function
    * @param args optional arguments
    * @param dyn compile-/run-time flag
@@ -131,11 +125,9 @@ public final class Functions extends TokenSet {
       final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     // get namespace and local name
-    final byte[] uri = name.uri();
-    final byte[] ln = name.local();
-
     // parse data type constructors
-    if(eq(uri, XSURI)) {
+    if(eq(name.uri(), XSURI)) {
+      final byte[] ln = name.local();
       final AtomType type = AtomType.find(name, false);
       if(type == null) {
         final Levenshtein ls = new Levenshtein();
@@ -155,13 +147,8 @@ public final class Functions extends TokenSet {
       return TypedFunc.constr(new Cast(ii, args[0], to), to);
     }
 
-    // Java function (only allowed with administrator permissions)
-    if(startsWith(uri, JAVAPRE) && ctx.context.user.perm(User.ADMIN)) {
-      return TypedFunc.java(JavaMapping.get(name, args, ctx, ii));
-    }
-
     // pre-defined functions
-    final StandardFunc fun = Functions.get().get(ln, uri, args, ctx, ii);
+    final StandardFunc fun = Functions.get().get(name, args, ctx, ii);
     if(fun != null) {
       for(final Function f : Function.UPDATING) {
         if(fun.sig == f) {
@@ -173,7 +160,18 @@ public final class Functions extends TokenSet {
     }
 
     // user-defined function
-    return ctx.funcs.get(name, args, dyn, ii);
+    final TypedFunc tf = ctx.funcs.get(name, args, ii);
+    if(tf != null) return tf;
+
+    // Java function (only allowed with administrator permissions)
+    final JavaMapping jf = JavaMapping.get(name, args, ctx, ii);
+    if(jf != null) return TypedFunc.java(jf);
+
+    // add user-defined function that has not been declared yet
+    if(!dyn && FuncType.find(name) == null) return ctx.funcs.add(name, args, ii);
+
+    // no function found
+    return null;
   }
 
   /**
@@ -200,17 +198,6 @@ public final class Functions extends TokenSet {
         FUNSIMILAR.thrw(ii, name.string(), l);
       }
     }
-  }
-
-  /**
-   * Returns a unique name representation of the function,
-   * including the URI and function name.
-   * @param uri namespace uri
-   * @param ln local name
-   * @return full name
-   */
-  private static byte[] full(final byte[] uri, final byte[] ln) {
-    return new TokenBuilder().add('{').add(uri).add('}').add(ln).finish();
   }
 
   @Override

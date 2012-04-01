@@ -79,18 +79,18 @@ public final class CmpR extends Single {
     if(!it.type.isNumber()) return ex;
 
     final Expr e = ex.expr[0];
-    final double d = it.dbl(ex.input);
+    final double d = it.dbl(ex.info);
     switch(ex.op.op) {
       case EQ:
-        return new CmpR(ex.input, e, d, true, d, true);
+        return new CmpR(ex.info, e, d, true, d, true);
       case GE:
-        return new CmpR(ex.input, e, d, true, Double.POSITIVE_INFINITY, true);
+        return new CmpR(ex.info, e, d, true, Double.POSITIVE_INFINITY, true);
       case GT:
-        return new CmpR(ex.input, e, d, false, Double.POSITIVE_INFINITY, true);
+        return new CmpR(ex.info, e, d, false, Double.POSITIVE_INFINITY, true);
       case LE:
-        return new CmpR(ex.input, e, Double.NEGATIVE_INFINITY, true, d, true);
+        return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, true);
       case LT:
-        return new CmpR(ex.input, e, Double.NEGATIVE_INFINITY, true, d, false);
+        return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, false);
       default:
         return ex;
     }
@@ -102,16 +102,16 @@ public final class CmpR extends Single {
 
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it = expr.item(ctx, input);
+      final Item it = expr.item(ctx, info);
       if(it == null) return Bln.FALSE;
-      final double d = it.dbl(input);
+      final double d = it.dbl(info);
       return Bln.get((mni ? d >= min : d > min) && (mxi ? d <= max : d < max));
     }
 
     // iterative evaluation
     final Iter ir = ctx.iter(expr);
     for(Item it; (it = ir.next()) != null;) {
-      final double d = it.dbl(input);
+      final double d = it.dbl(info);
       if((mni ? d >= min : d > min) && (mxi ? d <= max : d < max))
         return Bln.TRUE;
     }
@@ -128,7 +128,7 @@ public final class CmpR extends Single {
     final double mn = Math.max(min, c.min);
     final double mx = Math.min(max, c.max);
     return mn > mx ? Bln.FALSE :
-      new CmpR(input, c.expr, mn, mni && c.mni, mx, mxi && c.mxi);
+      new CmpR(info, c.expr, mn, mni && c.mni, mx, mxi && c.mxi);
   }
 
   @Override
@@ -160,7 +160,7 @@ public final class CmpR extends Single {
   public Expr indexEquivalent(final IndexContext ic) {
     final boolean text = rt.type() == IndexType.TEXT;
     ic.ctx.compInfo(OPTRNGINDEX);
-    return ic.invert(expr, new RangeAccess(input, rt, ic), text);
+    return ic.invert(expr, new RangeAccess(info, rt, ic), text);
   }
 
   /**

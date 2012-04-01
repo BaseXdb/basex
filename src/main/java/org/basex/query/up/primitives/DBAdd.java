@@ -96,14 +96,14 @@ public final class DBAdd extends InsertBase {
 
     final MemData mdata;
     String name = string(pth);
-    if(name.endsWith(".")) RESINV.thrw(input, pth);
+    if(name.endsWith(".")) RESINV.thrw(info, pth);
 
     // add slash to the target if the addressed file is an archive or directory
     IO io = null;
     final Type dt = doc.type;
     if(dt.isString()) {
-      io = IO.get(string(doc.string(input)));
-      if(!io.exists()) RESFNF.thrw(input, pth);
+      io = IO.get(string(doc.string(info)));
+      if(!io.exists()) RESFNF.thrw(info, pth);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
     }
 
@@ -122,12 +122,12 @@ public final class DBAdd extends InsertBase {
     }
 
     // ensure that the final name is not empty
-    if(name.isEmpty()) RESINV.thrw(input, pth);
+    if(name.isEmpty()) RESINV.thrw(info, pth);
 
     if(dt.isNode()) {
       // adding a document node
       final ANode nd = (ANode) doc;
-      if(nd.type != NodeType.DOC) UPDOCTYPE.thrw(input, nd);
+      if(nd.type != NodeType.DOC) UPDOCTYPE.thrw(info, nd);
       mdata = new MemData(data);
       new DataBuilder(mdata).build(nd);
       mdata.update(0, Data.DOC, pth);
@@ -137,10 +137,10 @@ public final class DBAdd extends InsertBase {
       try {
         mdata = b.build();
       } catch(final IOException ex) {
-        throw IOERR.thrw(input, ex);
+        throw IOERR.thrw(info, ex);
       }
     } else {
-      throw STRNODTYPE.thrw(input, this, doc.type);
+      throw STRNODTYPE.thrw(info, this, doc.type);
     }
     return mdata;
   }

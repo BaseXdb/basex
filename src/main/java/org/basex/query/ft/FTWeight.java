@@ -45,7 +45,7 @@ public final class FTWeight extends FTExpr {
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return weight(expr[0].item(ctx, input), ctx);
+    return weight(expr[0].item(ctx, info), ctx);
   }
 
   // called by index variant
@@ -72,7 +72,7 @@ public final class FTWeight extends FTExpr {
     // evaluate weight
     if(item == null) return null;
     final double d = checkDbl(weight, ctx);
-    if(Math.abs(d) > 1000) FTWEIGHT.thrw(input, d);
+    if(Math.abs(d) > 1000) FTWEIGHT.thrw(info, d);
     if(d == 0) item.all.size = 0;
     item.score(item.score() * d);
     return item;

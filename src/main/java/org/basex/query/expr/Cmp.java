@@ -67,7 +67,7 @@ public abstract class Cmp extends Arr {
     final Type ip = it.type;
     if(!ip.isNumber() && !ip.isUntyped()) return this;
 
-    final double v = it.dbl(input);
+    final double v = it.dbl(info);
     // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
     if((o == OpV.GT || o == OpV.NE) && v < 0 || o == OpV.GE && v <= 0 ||
        o == OpV.NE && v != (int) v) return Bln.TRUE;
@@ -76,10 +76,10 @@ public abstract class Cmp extends Arr {
        o == OpV.EQ && v != (int) v) return Bln.FALSE;
     // EXISTS: c > (v<1), c >= (v<=1), c != (v=0)
     if(o == OpV.GT && v < 1 || o == OpV.GE && v <= 1 || o == OpV.NE && v == 0)
-      return Function.EXISTS.get(input, ((StandardFunc) expr[0]).expr);
+      return Function.EXISTS.get(info, ((StandardFunc) expr[0]).expr);
     // EMPTY: c < (v<=1), c <= (v<1), c = (v=0)
     if(o == OpV.LT && v <= 1 || o == OpV.LE && v < 1 || o == OpV.EQ && v == 0)
-      return Function.EMPTY.get(input, ((StandardFunc) expr[0]).expr);
+      return Function.EMPTY.get(info, ((StandardFunc) expr[0]).expr);
 
     return this;
   }

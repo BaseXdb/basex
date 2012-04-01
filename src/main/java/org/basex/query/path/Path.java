@@ -191,12 +191,12 @@ public abstract class Path extends ParseExpr {
       if(l == 0) {
         if(root instanceof CAttr) {
           // @.../child:: / @.../descendant::
-          if(sa == CHILD || sa == DESC) ATTDESC.thrw(input, root);
+          if(sa == CHILD || sa == DESC) ATTDESC.thrw(info, root);
         } else if(root instanceof Root || root instanceof Value &&
             ((Value) root).type == NodeType.DOC || root instanceof CDoc) {
           if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
             (sa != SELF && sa != ANCORSELF ||
-            s.test != Test.NOD && s.test != Test.DOC)) DOCAXES.thrw(input, root, sa);
+            s.test != Test.NOD && s.test != Test.DOC)) DOCAXES.thrw(info, root, sa);
         }
       } else {
         final AxisStep ls = axisStep(l - 1);
@@ -279,10 +279,10 @@ public abstract class Path extends ParseExpr {
         final QNm nm = qnm.get(ts - t - 1);
         final NameTest nt = nm == null ? new NameTest(false) :
           new NameTest(nm, Mode.NAME, false);
-        stps[t] = AxisStep.get(input, CHILD, nt, preds);
+        stps[t] = AxisStep.get(info, CHILD, nt, preds);
       }
       while(++s < steps.length) stps[ts++] = steps[s];
-      path = get(input, root, stps);
+      path = get(info, root, stps);
       break;
     }
 
@@ -360,7 +360,7 @@ public abstract class Path extends ParseExpr {
    */
   public final Path addPreds(final Expr... pred) {
     steps[steps.length - 1] = axisStep(steps.length - 1).addPreds(pred);
-    return get(input, root, steps);
+    return get(info, root, steps);
   }
 
   @Override

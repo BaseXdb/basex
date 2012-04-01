@@ -110,7 +110,7 @@ public final class Var extends ParseExpr {
    * @throws QueryException query exception
    */
   public void checkUp() throws QueryException {
-    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(input, description());
+    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(info, description());
   }
 
   @Override
@@ -131,7 +131,7 @@ public final class Var extends ParseExpr {
     type = t;
     if(value != null && !value.type.instanceOf(t.type) &&
         value instanceof Item) {
-      value = type.type.cast((Item) value, ctx, input);
+      value = type.type.cast((Item) value, ctx, info);
     }
   }
 
@@ -182,7 +182,7 @@ public final class Var extends ParseExpr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     if(value == null) {
-      if(expr == null) VAREMPTY.thrw(input, this);
+      if(expr == null) VAREMPTY.thrw(info, this);
       final Value v = ctx.value;
       ctx.value = null;
       try {
@@ -213,7 +213,7 @@ public final class Var extends ParseExpr {
    */
   private Value cast(final Value v, final QueryContext ctx)
       throws QueryException {
-    return type == null ? v : type.promote(v, ctx, input);
+    return type == null ? v : type.promote(v, ctx, info);
   }
 
   /**
@@ -221,7 +221,7 @@ public final class Var extends ParseExpr {
    * @return copy
    */
   public Var copy() {
-    final Var v = new Var(input, name, type, id, ann);
+    final Var v = new Var(info, name, type, id, ann);
     v.global = global;
     v.value = value;
     v.expr = expr;

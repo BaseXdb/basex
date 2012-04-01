@@ -45,7 +45,7 @@ public final class Group extends ParseExpr {
    * @param ob order by specifier
    */
   void init(final Order ob) {
-    gp = new GroupPartition(groupby, nongroup, ob, input);
+    gp = new GroupPartition(groupby, nongroup, ob, info);
   }
 
   @Override
@@ -148,8 +148,8 @@ public final class Group extends ParseExpr {
     @Override
     public Value value(final QueryContext ctx) throws QueryException {
       final Value val = expr.value(ctx);
-      if(val.size() > 1) throw Err.XGRP.thrw(input);
-      return val.isEmpty() ? val : StandardFunc.atom(val.itemAt(0), input);
+      if(val.size() > 1) throw Err.XGRP.thrw(info);
+      return val.isEmpty() ? val : StandardFunc.atom(val.itemAt(0), info);
     }
   }
 }

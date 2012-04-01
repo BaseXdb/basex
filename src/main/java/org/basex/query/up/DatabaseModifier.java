@@ -24,6 +24,6 @@ final class DatabaseModifier extends ContextModifier {
     add(p);
     // check permissions
     if(!ctx.context.perm(User.WRITE, p.data.meta))
-      PERMNO.thrw(p.input, CmdPerm.WRITE);
+      PERMNO.thrw(p.info, CmdPerm.WRITE);
   }
 }

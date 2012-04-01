@@ -46,7 +46,7 @@ public abstract class Preds extends ParseExpr {
 
     for(int p = 0; p < preds.length; ++p) {
       Expr pr = preds[p].comp(ctx).compEbv(ctx);
-      pr = Pos.get(OpV.EQ, pr, pr, input);
+      pr = Pos.get(OpV.EQ, pr, pr, info);
 
       // position() = last() -> last()
       if(pr instanceof CmpG || pr instanceof CmpV) {
@@ -62,7 +62,7 @@ public abstract class Preds extends ParseExpr {
       }
 
       if(pr.isValue()) {
-        if(!pr.ebv(ctx, input).bool(input)) {
+        if(!pr.ebv(ctx, info).bool(info)) {
           ctx.compInfo(OPTREMOVE, description(), pr);
           return Empty.SEQ;
         }
@@ -77,7 +77,7 @@ public abstract class Preds extends ParseExpr {
         tmp.addAll(Arrays.asList(preds).subList(0, p));
         for(final Expr a : and) {
           // wrap test with boolean() if the result is numeric
-          tmp.add(Function.BOOLEAN.get(input, a).compEbv(ctx));
+          tmp.add(Function.BOOLEAN.get(info, a).compEbv(ctx));
         }
         tmp.addAll(Arrays.asList(preds).subList(p + 1, preds.length));
         preds = tmp.toArray(new Expr[tmp.size()]);
@@ -126,7 +126,7 @@ public abstract class Preds extends ParseExpr {
     Item i = null;
     for(final Expr p : preds) {
       ctx.value = it;
-      i = p.test(ctx, input);
+      i = p.test(ctx, info);
       if(i == null) return false;
     }
     // item accepted.. adopt last scoring value

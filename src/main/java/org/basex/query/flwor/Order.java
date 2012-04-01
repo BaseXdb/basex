@@ -237,7 +237,7 @@ public final class Order extends ParseExpr {
         final OrderBy or = ob[k];
         final Item m = sa[k], n = sb[k];
         final int c = m == null ? n == null ? 0 : or.lst ? -1 : 1 :
-          n == null ? or.lst ? 1 : -1 : m.diff(input, n);
+          n == null ? or.lst ? 1 : -1 : m.diff(info, n);
         if(c != 0) return or.desc ? -c : c;
       }
       return 0;

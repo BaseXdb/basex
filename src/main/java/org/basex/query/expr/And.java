@@ -41,7 +41,7 @@ public final class And extends Logical {
       Expr tmp = null;
       if(e instanceof Pos) {
         // merge numeric predicates
-        tmp = ps == null ? e : ps.intersect((Pos) e, input);
+        tmp = ps == null ? e : ps.intersect((Pos) e, info);
         if(!(tmp instanceof Pos)) return tmp;
         ps = (Pos) tmp;
       } else if(e instanceof CmpR) {
@@ -68,8 +68,8 @@ public final class And extends Logical {
       throws QueryException {
     double s = 0;
     for(final Expr e : expr) {
-      final Item it = e.ebv(ctx, input);
-      if(!it.bool(input)) return Bln.FALSE;
+      final Item it = e.ebv(ctx, info);
+      if(!it.bool(info)) return Bln.FALSE;
       s = Scoring.and(s, it.score());
     }
     // no scoring - return default boolean
@@ -108,7 +108,7 @@ public final class And extends Logical {
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new InterSect(input, expr);
+    return new InterSect(info, expr);
   }
 
   @Override

@@ -29,12 +29,10 @@ public final class DBStore extends UpdatePrimitive {
    * @param d data
    * @param path target path
    * @param it item to be stored
-   * @param info input info
+   * @param ii input info
    */
-  public DBStore(final Data d, final byte[] path, final Item it,
-      final InputInfo info) {
-
-    super(PrimitiveType.DBSTORE, -1, d, info);
+  public DBStore(final Data d, final byte[] path, final Item it, final InputInfo ii) {
+    super(PrimitiveType.DBSTORE, -1, d, ii);
     map.add(path, it);
   }
 
@@ -51,12 +49,12 @@ public final class DBStore extends UpdatePrimitive {
     for(final byte[] path : map) {
       try {
         final IOFile file = data.meta.binary(string(path));
-        if(file == null) UPDBPUTERR.thrw(input, path);
+        if(file == null) UPDBPUTERR.thrw(info, path);
         new IOFile(file.dir()).md();
-        file.write(map.get(path).input(input));
+        file.write(map.get(path).input(info));
       } catch(final IOException ex) {
         Util.debug(ex);
-        UPDBPUTERR.thrw(input, path);
+        UPDBPUTERR.thrw(info, path);
       }
     }
   }

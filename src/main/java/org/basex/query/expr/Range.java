@@ -81,9 +81,9 @@ public final class Range extends Arr {
    * @throws QueryException query exception
    */
   private long[] rng(final QueryContext ctx) throws QueryException {
-    final Item a = expr[0].item(ctx, input);
+    final Item a = expr[0].item(ctx, info);
     if(a == null) return null;
-    final Item b = expr[1].item(ctx, input);
+    final Item b = expr[1].item(ctx, info);
     if(b == null) return null;
     return new long[] { checkItr(a), checkItr(b) };
   }

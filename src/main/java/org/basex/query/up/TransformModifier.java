@@ -42,6 +42,6 @@ public final class TransformModifier extends ContextModifier {
     add(p);
     /* check if the target node of the given primitive has been copied in the
      * 'copy' statement of this transform expression. */
-    if(!refs.contains(p.data)) UPNOTCOPIED.thrw(p.input, p.targetNode());
+    if(!refs.contains(p.data)) UPNOTCOPIED.thrw(p.info, p.targetNode());
   }
 }

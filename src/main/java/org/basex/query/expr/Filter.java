@@ -123,7 +123,7 @@ public class Filter extends Preds {
         int c = 0;
         for(int s = 0; s < is; ++s) {
           ctx.value = vb.get(s);
-          if(p.test(ctx, input) != null) vb.set(vb.get(s), c++);
+          if(p.test(ctx, info) != null) vb.set(vb.get(s), c++);
           ctx.pos++;
         }
         vb.size(c);

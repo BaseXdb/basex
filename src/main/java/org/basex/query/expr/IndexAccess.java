@@ -60,10 +60,10 @@ public final class IndexAccess extends Single {
       final NodeIter[] tmp = new NodeIter[s + 1];
       System.arraycopy(iter, 0, tmp, 0, s);
       iter = tmp;
-      iter[s] = index(it.string(input));
+      iter[s] = index(it.string(info));
     }
     return iter.length == 0 ? new NodeCache() : iter.length == 1 ? iter[0] :
-      new Union(input, expr).eval(iter);
+      new Union(info, expr).eval(iter);
   }
 
   /**
@@ -143,7 +143,7 @@ public final class IndexAccess extends Single {
   @Override
   public String toString() {
     return (itype == IndexType.TEXT ?
-        Function._DB_TEXT : Function._DB_ATTRIBUTE).get(input,
+        Function._DB_TEXT : Function._DB_ATTRIBUTE).get(info,
             Str.get(ictx.data.meta.name), expr).toString();
   }
 }

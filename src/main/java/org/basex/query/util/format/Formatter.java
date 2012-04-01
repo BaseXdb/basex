@@ -219,7 +219,7 @@ public abstract class Formatter extends FormatUtil {
         }
         if(err) PICCOMP.thrw(ii, pic);
 
-        final FormatParser fp = new FormatParser(ii, p, pres);
+        final FormatParser fp = new FormatParser(p, pres, ii);
         if(max) {
           // limit maximum length of numeric output
           int mx = 0;

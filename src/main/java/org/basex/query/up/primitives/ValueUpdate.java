@@ -16,10 +16,9 @@ abstract class ValueUpdate extends UpdatePrimitive {
    * @param t type
    * @param p pre
    * @param d data
-   * @param info input info
+   * @param ii input info
    */
-  ValueUpdate(final PrimitiveType t, final int p, final Data d,
-              final InputInfo info) {
-    super(t, p, d, info);
+  ValueUpdate(final PrimitiveType t, final int p, final Data d, final InputInfo ii) {
+    super(t, p, d, ii);
   }
 }

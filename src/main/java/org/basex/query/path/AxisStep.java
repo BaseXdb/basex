@@ -35,7 +35,7 @@ public class AxisStep extends Preds {
    * @return step
    */
   public static AxisStep get(final AxisStep s) {
-    return get(s.input, s.axis, s.test, s.preds);
+    return get(s.info, s.axis, s.test, s.preds);
   }
 
   /**
@@ -95,7 +95,7 @@ public class AxisStep extends Preds {
     if(e != this || e instanceof IterStep) return e;
 
     // no numeric predicates.. use simple iterator
-    if(!uses(Use.POS)) return new IterStep(input, axis, test, preds);
+    if(!uses(Use.POS)) return new IterStep(info, axis, test, preds);
 
     // don't re-optimize step
     if(this instanceof IterPosStep) return this;
@@ -107,7 +107,7 @@ public class AxisStep extends Preds {
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Value v = checkCtx(ctx);
-    if(!v.type.isNode()) NODESPATH.thrw(input, this, v.type);
+    if(!v.type.isNode()) NODESPATH.thrw(info, this, v.type);
     final AxisIter ai = axis.iter((ANode) v);
 
     final NodeCache nc = new NodeCache();
@@ -120,7 +120,7 @@ public class AxisStep extends Preds {
       int c = 0;
       for(int n = 0; n < nc.size(); ++n) {
         ctx.value = nc.get(n);
-        final Item i = p.test(ctx, input);
+        final Item i = p.test(ctx, info);
         if(i != null) {
           // assign score value
           nc.get(n).score(i.score());
@@ -214,7 +214,7 @@ public class AxisStep extends Preds {
    */
   final AxisStep addPreds(final Expr... prds) {
     for(final Expr p : prds) preds = Array.add(preds, p);
-    return get(input, axis, test, preds);
+    return get(info, axis, test, preds);
   }
 
   @Override

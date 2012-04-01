@@ -195,7 +195,7 @@ final class FTTrie extends FTIndex {
   }
 
   /**
-   * Called by {@link #info}. Collects all tokens and their sizes found
+   * Called by {@link #info()}. Collects all tokens and their sizes found
    * in the index structure.
    * @param token current token
    * @param id on node array (in main memory)

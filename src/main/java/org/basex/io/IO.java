@@ -2,6 +2,7 @@ package org.basex.io;
 
 import java.io.*;
 import java.text.*;
+import java.util.*;
 
 import org.basex.data.*;
 import org.basex.util.*;
@@ -98,8 +99,7 @@ public abstract class IO {
     path = p;
     final String n = p.substring(p.lastIndexOf('/') + 1);
     // use current time if no name is given
-    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) +
-        XMLSUFFIX : n;
+    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) + XMLSUFFIX : n;
   }
 
   /**
@@ -153,6 +153,19 @@ public abstract class IO {
   }
 
   /**
+   * Tests if the file suffix matches the specified suffixes.
+   * @param suffixes suffixes to compare with
+   * @return result of check
+   */
+  public boolean hasSuffix(final String... suffixes) {
+    final int i = path.lastIndexOf('.');
+    if(i == -1) return false;
+    final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
+    for(final String z : suffixes) if(suf.equals(z)) return true;
+    return false;
+  }
+
+  /**
    * Returns the modification date of this file.
    * @return modification date
    */
@@ -201,16 +214,16 @@ public abstract class IO {
    * Checks if this file is an archive.
    * @return result of check
    */
-  public boolean isArchive() {
-    return false;
+  public final boolean isArchive() {
+    return hasSuffix(ZIPSUFFIXES);
   }
 
   /**
    * Checks if this file contains XML.
    * @return result of check
    */
-  public boolean isXML() {
-    return false;
+  public final boolean isXML() {
+    return hasSuffix(XMLSUFFIXES);
   }
 
   /**
@@ -278,5 +291,17 @@ public abstract class IO {
   @Override
   public String toString() {
     return path;
+  }
+
+  /**
+   * Returns the suffix of the specified path. An empty string is returned if the last
+   * path segment has no suffix.
+   * @param path path to be checked
+   * @return mime-type
+   */
+  public static String suffix(final String path) {
+    final int s = path.lastIndexOf('/');
+    final int d = path.lastIndexOf('.');
+    return d <= s ? "" : path.substring(d + 1);
   }
 }

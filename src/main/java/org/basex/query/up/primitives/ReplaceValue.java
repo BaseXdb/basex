@@ -43,7 +43,7 @@ public final class ReplaceValue extends ValueUpdate {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPV.thrw(input, targetNode());
+    UPMULTREPV.thrw(info, targetNode());
   }
 
   @Override

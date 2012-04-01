@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  */
 final class GroupPartition {
   /** Input information. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Order by specifier. */
   private final Order order;
 
@@ -52,7 +52,7 @@ final class GroupPartition {
     ngv = ng;
     order = ob;
     items = ngv[0].length != 0 ? new ArrayList<ValueBuilder[]>() : null;
-    input = ii;
+    info = ii;
   }
 
   /**
@@ -71,11 +71,11 @@ final class GroupPartition {
     final Value[] vals = new Value[gl];
     for(int i = 0; i < gl; i++) {
       final Value val = ctx.value(gv[i]);
-      if(val.size() > 1) XGRP.thrw(input);
+      if(val.size() > 1) XGRP.thrw(info);
       vals[i] = val;
     }
 
-    final GroupNode gn = new GroupNode(input, vals);
+    final GroupNode gn = new GroupNode(info, vals);
     final int h = gn.hash();
     final IntList ps = hashes.get(h);
     int p = -1;

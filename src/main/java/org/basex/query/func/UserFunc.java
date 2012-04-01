@@ -89,11 +89,11 @@ public class UserFunc extends Single {
     final boolean u = expr.uses(Use.UPD);
     if(updating) {
       // updating function
-      if(ret != null) UPFUNCTYPE.thrw(input);
-      if(!u && !expr.isVacuous()) UPEXPECTF.thrw(input);
+      if(ret != null) UPFUNCTYPE.thrw(info);
+      if(!u && !expr.isVacuous()) UPEXPECTF.thrw(info);
     } else if(u) {
       // uses updates, but is not declared as such
-      UPNOT.thrw(input, description());
+      UPNOT.thrw(info, description());
     }
   }
 
@@ -146,7 +146,7 @@ public class UserFunc extends Single {
     try {
       final Item it = expr.item(ctx, ii);
       // optionally promote return value to target type
-      return cast ? ret.cast(it, false, ctx, input, this) : it;
+      return cast ? ret.cast(it, false, ctx, info, this) : it;
     } finally {
       ctx.value = cv;
       ctx.sc.ns.stack(ns);
@@ -162,7 +162,7 @@ public class UserFunc extends Single {
     try {
       final Value v = ctx.value(expr);
       // optionally promote return value to target type
-      return cast ? ret.promote(v, ctx, input) : v;
+      return cast ? ret.promote(v, ctx, info) : v;
     } finally {
       ctx.value = cv;
       ctx.sc.ns.stack(ns);

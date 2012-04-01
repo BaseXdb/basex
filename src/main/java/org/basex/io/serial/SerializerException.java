@@ -32,11 +32,11 @@ public final class SerializerException extends IOException {
 
   /**
    * Returns the query exception.
-   * @param input input info
+   * @param info input info
    * @return query exception
    */
-  public QueryException getCause(final InputInfo input) {
-    if(input != null) exception.info(input);
+  public QueryException getCause(final InputInfo info) {
+    if(info != null) exception.info(info);
     return exception;
   }
 

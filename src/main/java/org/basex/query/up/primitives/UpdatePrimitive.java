@@ -20,20 +20,19 @@ public abstract class UpdatePrimitive implements Comparable<UpdatePrimitive> {
   /** Target data reference. */
   public final Data data;
   /** Input info. */
-  public final InputInfo input;
+  public final InputInfo info;
 
   /**
    * Constructor.
    * @param t primitive type
    * @param p target pre value
    * @param d target data reference
-   * @param info input info
+   * @param ii input info
    */
-  UpdatePrimitive(final PrimitiveType t, final int p, final Data d,
-                  final InputInfo info) {
+  UpdatePrimitive(final PrimitiveType t, final int p, final Data d, final InputInfo ii) {
     pre = p;
     data = d;
-    input = info;
+    info = ii;
     type = t;
   }
 

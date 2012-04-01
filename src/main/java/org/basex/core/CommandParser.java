@@ -97,8 +97,8 @@ public final class CommandParser extends InputParser {
   private boolean suggest;
 
   /**
-   * Constructor, parsing the input queries.
-   * @param in query input
+   * Constructor.
+   * @param in input
    * @param c context
    */
   public CommandParser(final String in, final Context c) {
@@ -225,8 +225,8 @@ public final class CommandParser extends InputParser {
       case CLOSE:
         return new Close();
       case LIST:
-        final String input = string(null);
-        return input == null ? new List() : new ListDB(input);
+        final String in = string(null);
+        return in == null ? new List() : new ListDB(in);
       case DROP:
         switch(consume(CmdDrop.class, cmd)) {
           case DATABASE: case DB:
@@ -273,7 +273,7 @@ public final class CommandParser extends InputParser {
             form = hc;
             hc = null;
           } else {
-            qp = qm;
+            ip = im;
             hc = consume(Cmd.class, cmd).toString();
             form = name(null);
           }
@@ -375,11 +375,11 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final StringBuilder sb = new StringBuilder();
     if(more() && !curr(';')) {
-      final QueryParser p = new QueryParser(query, new QueryContext(ctx));
-      p.qp = qp;
+      final QueryParser p = new QueryParser(input, new QueryContext(ctx));
+      p.ip = ip;
       p.parse(null);
-      sb.append(query.substring(qp, p.qp));
-      qp = p.qp;
+      sb.append(input.substring(ip, p.ip));
+      ip = p.ip;
     }
     return finish(cmd, sb);
   }
@@ -437,11 +437,11 @@ public final class CommandParser extends InputParser {
    */
   private boolean key(final String key, final Cmd cmd) throws QueryException {
     consumeWS();
-    final int p = qp;
+    final int p = ip;
     final boolean ok = (consume(key) ||
         consume(key.toLowerCase(Locale.ENGLISH))) && (curr(0) || ws(curr()));
     if(!ok) {
-      qp = p;
+      ip = p;
       if(cmd != null) throw help(null, cmd);
     }
     return ok;
@@ -479,8 +479,8 @@ public final class CommandParser extends InputParser {
    * query.
    */
   private void consumeWS() {
-    while(qp < ql && query.charAt(qp) <= ' ') ++qp;
-    qm = qp - 1;
+    while(ip < il && input.charAt(ip) <= ' ') ++ip;
+    im = ip - 1;
   }
 
   /**
@@ -567,7 +567,7 @@ public final class CommandParser extends InputParser {
    * @return query exception
    */
   private QueryException error(final StringList comp, final String m, final Object... e) {
-    return new QueryException(input(), new QNm(), m, e).suggest(this, comp);
+    return new QueryException(info(), new QNm(), m, e).suggest(this, comp);
   }
 
   /**

@@ -81,7 +81,7 @@ final class DatabaseUpdates {
         /* check if the identity of all target nodes of fn:put operations is
            still available after the execution of updates. that includes parent
            nodes as well */
-        if(p.type == PUT && ancestorDeleted(nodes.get(i))) UPFOTYPE.thrw(p.input, p);
+        if(p.type == PUT && ancestorDeleted(nodes.get(i))) UPFOTYPE.thrw(p.info, p);
       }
     }
 

@@ -38,7 +38,7 @@ public final class CComm extends CFrag {
       tb.add(it.string(ii));
       more = true;
     }
-    return new FComm(FComm.parse(tb.finish(), input));
+    return new FComm(FComm.parse(tb.finish(), info));
   }
 
   @Override

@@ -39,7 +39,7 @@ public final class FNNode extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (expr.length != 0 ? expr[0] : checkCtx(ctx)).item(ctx, input);
+    final Item it = (expr.length != 0 ? expr[0] : checkCtx(ctx)).item(ctx, info);
 
     switch(sig) {
       case NODE_NAME:
@@ -135,7 +135,7 @@ public final class FNNode extends StandardFunc {
       tl.add(tb.finish());
       n = n.parent();
     }
-    if(n.type != NodeType.DOC) IDDOC.thrw(input);
+    if(n.type != NodeType.DOC) IDDOC.thrw(info);
 
     final TokenBuilder tb = new TokenBuilder();
     for(int i = tl.size() - 1; i >= 0; --i) tb.add('/').add(tl.get(i));

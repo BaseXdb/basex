@@ -54,8 +54,8 @@ public final class JavaModuleFunc extends JavaMapping {
       }
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
-      throw cause instanceof QueryException ? ((QueryException) cause).info(input) :
-        JAVAERR.thrw(input, cause);
+      throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
+        JAVAERR.thrw(info, cause);
     } catch(final Throwable ex) {
       // compose expected signature
       final TokenBuilder expect = new TokenBuilder();
@@ -63,7 +63,7 @@ public final class JavaModuleFunc extends JavaMapping {
         if(!expect.isEmpty()) expect.add(", ");
         expect.add(c.getSimpleName());
       }
-      throw JAVAMOD.thrw(input, mth.getName() + '(' + expect + ')',
+      throw JAVAMOD.thrw(info, mth.getName() + '(' + expect + ')',
           mth.getName() + '(' + foundArgs(args) + ')');
     }
   }

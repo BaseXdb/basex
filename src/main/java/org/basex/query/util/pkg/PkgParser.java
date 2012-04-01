@@ -4,20 +4,15 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.IO;
-import org.basex.query.QueryException;
-import org.basex.query.QueryText;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.iter.AxisIter;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 import org.basex.query.util.pkg.Package.Component;
 import org.basex.query.util.pkg.Package.Dependency;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Parses the package descriptors and performs schema checks.
@@ -29,7 +24,7 @@ public final class PkgParser {
   /** Repository context. */
   private final Repo repo;
   /** Input info. */
-  private final InputInfo input;
+  private final InputInfo info;
 
   /**
    * Constructor.
@@ -38,7 +33,7 @@ public final class PkgParser {
    */
   public PkgParser(final Repo r, final InputInfo ii) {
     repo = r;
-    input = ii;
+    info = ii;
   }
 
   /**
@@ -50,18 +45,20 @@ public final class PkgParser {
   public Package parse(final IO io) throws QueryException {
     final Package pkg = new Package();
     try {
-      final DBNode doc = new DBNode(io, repo.context.prop);
+      final byte[] content = io.read();
+
+      final DBNode doc = new DBNode(new IOContent(content), repo.context.prop);
       final ANode node = childElements(doc).next();
 
       // checks root node
       if(!eqNS(PACKAGE, node.qname()))
-        PKGDESCINV.thrw(input, Util.info(WHICHELEM, node.qname()));
+        PKGDESCINV.thrw(info, Util.info(WHICHELEM, node.qname()));
 
       parseAttributes(node, pkg, PACKAGE);
       parseChildren(node, pkg);
       return pkg;
     } catch(final IOException ex) {
-      throw PKGREADFAIL.thrw(input, io.name(), ex.getMessage());
+      throw PKGREADFAIL.thrw(info, io.name(), ex.getMessage());
     }
   }
 
@@ -72,8 +69,8 @@ public final class PkgParser {
    * @param root root node
    * @throws QueryException query exception
    */
-  private void parseAttributes(final ANode node, final Package p,
-      final byte[] root) throws QueryException {
+  private void parseAttributes(final ANode node, final Package p, final byte[] root)
+      throws QueryException {
 
     final AxisIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
@@ -82,18 +79,18 @@ public final class PkgParser {
       else if(eq(ABBREV, name))  p.abbrev = next.string();
       else if(eq(VERSION, name)) p.version = next.string();
       else if(eq(SPEC, name))    p.spec = next.string();
-      else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
+      else PKGDESCINV.thrw(info, Util.info(WHICHATTR, name));
     }
 
     // check mandatory attributes
     if(p.name == null)
-      PKGDESCINV.thrw(input, Util.info(MISSATTR, NAME, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, NAME, root));
     if(p.version == null)
-      PKGDESCINV.thrw(input, Util.info(MISSATTR, VERSION, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, VERSION, root));
     if(p.abbrev == null)
-      PKGDESCINV.thrw(input, Util.info(MISSATTR, ABBREV, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, ABBREV, root));
     if(p.spec == null)
-      PKGDESCINV.thrw(input, Util.info(MISSATTR, SPEC, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, SPEC, root));
   }
 
   /**
@@ -130,7 +127,7 @@ public final class PkgParser {
       else if(eq(SEMVER, name))    d.semver = next.string();
       else if(eq(SEMVERMIN, name)) d.semverMin = next.string();
       else if(eq(SEMVERMAX, name)) d.semverMax = next.string();
-      else PKGDESCINV.thrw(input, Util.info(WHICHATTR, name));
+      else PKGDESCINV.thrw(info, Util.info(WHICHATTR, name));
     }
     return d;
   }
@@ -148,12 +145,12 @@ public final class PkgParser {
       final QNm name = next.qname();
       if(eqNS(NSPC, name)) c.uri = next.string();
       else if(eqNS(FILE, name)) c.file = next.string();
-      else PKGDESCINV.thrw(input, Util.info(WHICHELEM, name));
+      else PKGDESCINV.thrw(info, Util.info(WHICHELEM, name));
     }
 
     // check mandatory children
-    if(c.uri == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, NSPC));
-    if(c.file == null) PKGDESCINV.thrw(input, Util.info(MISSCOMP, FILE));
+    if(c.uri == null) PKGDESCINV.thrw(info, Util.info(MISSCOMP, NSPC));
+    if(c.file == null) PKGDESCINV.thrw(info, Util.info(MISSCOMP, FILE));
     return c;
   }
 

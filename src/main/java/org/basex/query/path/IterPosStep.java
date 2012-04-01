@@ -20,7 +20,7 @@ final class IterPosStep extends AxisStep {
    * @param s step reference
    */
   IterPosStep(final AxisStep s) {
-    super(s.input, s.axis, s.test, s.preds);
+    super(s.info, s.axis, s.test, s.preds);
     last = s.last;
     pos = s.pos;
   }
@@ -38,7 +38,7 @@ final class IterPosStep extends AxisStep {
 
         if(ai == null) {
           final Value v = checkCtx(ctx);
-          if(!v.type.isNode()) NODESPATH.thrw(input, IterPosStep.this, v.type);
+          if(!v.type.isNode()) NODESPATH.thrw(info, IterPosStep.this, v.type);
           ai = axis.iter((ANode) v);
         }
 

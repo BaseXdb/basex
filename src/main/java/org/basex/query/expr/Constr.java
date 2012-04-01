@@ -44,7 +44,7 @@ public final class Constr {
   /** Query context. */
   private final QueryContext ctx;
   /** Input information. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Text cache. */
   private final TokenBuilder text = new TokenBuilder();
   /** Space separator flag. */
@@ -56,7 +56,7 @@ public final class Constr {
    * @param qc query context
    */
   public Constr(final InputInfo ii, final QueryContext qc) {
-    input = ii;
+    info = ii;
     ctx = qc;
   }
 
@@ -90,12 +90,12 @@ public final class Constr {
    */
   private boolean add(final Item it) throws QueryException {
     final Type ip = it.type;
-    if(ip.isFunction()) CONSFUNC.thrw(input, it);
+    if(ip.isFunction()) CONSFUNC.thrw(info, it);
 
     if(!ip.isNode()) {
       // type: atomic value
       if(more) text.add(' ');
-      text.add(it.string(input));
+      text.add(it.string(info));
       more = true;
 
     } else {

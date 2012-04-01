@@ -66,7 +66,7 @@ public final class ReplaceElementContent extends StructuralUpdate {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREPV.thrw(input, targetNode());
+    UPMULTREPV.thrw(info, targetNode());
   }
 
   @Override

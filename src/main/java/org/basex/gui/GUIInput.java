@@ -203,7 +203,7 @@ public final class GUIInput extends BaseXTextField {
           new QueryContext(gui.context), data);
       qs.parse(null);
       sl = qs.complete();
-      pre = query.substring(0, qs.qm);
+      pre = query.substring(0, qs.im);
     } catch(final QueryException ex) {
       sl = ex.suggest();
       pre = query.substring(0, ex.col() - (ex.col() == 1 ? 1 : 0));

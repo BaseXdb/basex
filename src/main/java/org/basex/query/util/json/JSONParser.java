@@ -23,16 +23,16 @@ final class JSONParser extends InputParser {
   /** Token builder. */
   private final TokenBuilder tb = new TokenBuilder();
   /** Input info. */
-  private final InputInfo input;
+  private final InputInfo info;
 
   /**
    * Constructor.
-   * @param q query
-   * @param ii input info
+   * @param in input
+   * @param inf input info
    */
-  public JSONParser(final byte[] q, final InputInfo ii) {
-    super(string(q));
-    input = ii;
+  public JSONParser(final byte[] in, final InputInfo inf) {
+    super(string(in));
+    info = inf;
   }
 
   /**
@@ -218,7 +218,7 @@ final class JSONParser extends InputParser {
     while(more()) {
       final int c = curr();
       if(c == 0 || c > ' ') break;
-      ++qp;
+      ++ip;
     }
   }
 
@@ -254,6 +254,6 @@ final class JSONParser extends InputParser {
       throws QueryException {
 
     final int[] lc = new InputInfo(this).lineCol();
-    throw JSONPARSE.thrw(input, lc[0], lc[1], Util.inf(msg, ext));
+    throw JSONPARSE.thrw(info, lc[0], lc[1], Util.inf(msg, ext));
   }
 }

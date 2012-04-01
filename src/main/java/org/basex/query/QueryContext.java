@@ -156,10 +156,11 @@ public final class QueryContext extends Progress {
   /**
    * Parses the specified module.
    * @param qu input query
+   * @return name of module
    * @throws QueryException query exception
    */
-  public void module(final String qu) throws QueryException {
-    new QueryParser(qu, this).parse(EMPTY);
+  public QNm module(final String qu) throws QueryException {
+    return (QNm) new QueryParser(qu, this).parse(EMPTY);
   }
 
   /**
@@ -184,7 +185,7 @@ public final class QueryContext extends Progress {
       } catch(final QueryException ex) {
         if(ex.err() != XPNOCTX) throw ex;
         // only {@link ParseExpr} instances may cause this error
-        CTXINIT.thrw(((ParseExpr) ctxItem).input, ex.getMessage());
+        CTXINIT.thrw(((ParseExpr) ctxItem).info, ex.getMessage());
       }
     } else if(nodes != null) {
       // add full-text container reference

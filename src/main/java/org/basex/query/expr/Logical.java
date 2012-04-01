@@ -36,7 +36,7 @@ public abstract class Logical extends Arr {
 
       // atomic items can be pre-evaluated
       ctx.compInfo(OPTREMOVE, description(), expr[e]);
-      if(expr[e].ebv(ctx, input).bool(input) ^ and) return Bln.get(!and);
+      if(expr[e].ebv(ctx, info).bool(info) ^ and) return Bln.get(!and);
       expr = Array.delete(expr, e--);
     }
     return expr.length == 0 ? Bln.get(and) : this;

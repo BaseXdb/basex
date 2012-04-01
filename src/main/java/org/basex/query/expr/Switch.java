@@ -51,7 +51,7 @@ public final class Switch extends ParseExpr {
     // check if expression can be pre-evaluated
     Expr ex = this;
     if(cond.isValue()) {
-      final Item it = cond.item(ctx, input);
+      final Item it = cond.item(ctx, info);
       LOOP:
       for(final SwitchCase sc : cases) {
         final int sl = sc.expr.length;
@@ -59,8 +59,8 @@ public final class Switch extends ParseExpr {
           if(!sc.expr[e].isValue()) break LOOP;
 
           // includes check for empty sequence (null reference)
-          final Item cs = sc.expr[e].item(ctx, input);
-          if(it == cs || cs != null && it != null && it.equiv(input, cs)) {
+          final Item cs = sc.expr[e].item(ctx, info);
+          if(it == cs || cs != null && it != null && it.equiv(info, cs)) {
             ex = sc.expr[0];
             break LOOP;
           }
@@ -127,13 +127,13 @@ public final class Switch extends ParseExpr {
    * @throws QueryException query exception
    */
   private Expr getCase(final QueryContext ctx) throws QueryException {
-    final Item it = cond.item(ctx, input);
+    final Item it = cond.item(ctx, info);
     for(final SwitchCase sc : cases) {
       final int sl = sc.expr.length;
       for(int e = 1; e < sl; e++) {
         // includes check for empty sequence (null reference)
-        final Item cs = sc.expr[e].item(ctx, input);
-        if(it == cs || it != null && cs != null && it.equiv(input, cs))
+        final Item cs = sc.expr[e].item(ctx, info);
+        if(it == cs || it != null && cs != null && it.equiv(info, cs))
           return sc.expr[0];
       }
       if(sl == 1) return sc.expr[0];

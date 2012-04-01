@@ -24,7 +24,7 @@ public final class JarParser {
   /** Context. */
   private final Context context;
   /** Input info. */
-  private final InputInfo input;
+  private final InputInfo info;
 
   /**
    * Constructor.
@@ -33,7 +33,7 @@ public final class JarParser {
    */
   public JarParser(final Context ctx, final InputInfo ii) {
     context = ctx;
-    input = ii;
+    info = ii;
   }
 
   /**
@@ -53,11 +53,11 @@ public final class JarParser {
         else if(eq(CLASS, name.local())) desc.classes.add(next.string());
         // [CG] Packaging: add warning if unknown elements are encountered
       }
-      if(desc.jars.size() == 0) JARDESCINV.thrw(input, NOJARS);
-      else if(desc.classes.size() == 0) JARDESCINV.thrw(input, NOCLASS);
+      if(desc.jars.size() == 0) JARDESCINV.thrw(info, NOJARS);
+      else if(desc.classes.size() == 0) JARDESCINV.thrw(info, NOCLASS);
       return desc;
     } catch(final IOException ex) {
-      throw JARREADFAIL.thrw(input, ex.getMessage());
+      throw JARREADFAIL.thrw(info, ex.getMessage());
     }
   }
 }

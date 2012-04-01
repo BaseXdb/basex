@@ -76,6 +76,6 @@ public final class BaseFuncCall extends UserFuncCall {
 
   @Override
   public Expr markTailCalls() {
-    return new TailFuncCall(input, name, func, expr);
+    return new TailFuncCall(info, name, func, expr);
   }
 }

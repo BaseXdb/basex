@@ -98,7 +98,7 @@ public final class FNPat extends StandardFunc {
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) REGROUP.thrw(input);
+    if(p.matcher("").matches()) REGROUP.thrw(info);
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
@@ -169,7 +169,7 @@ public final class FNPat extends StandardFunc {
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          FUNREGREP.thrw(input);
+          FUNREGREP.thrw(info);
         ++i;
       }
     }
@@ -185,8 +185,8 @@ public final class FNPat extends StandardFunc {
       return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
       final String m = ex.getMessage();
-      if(m.contains("No group")) REGROUP.thrw(input);
-      throw REGERR.thrw(input, m);
+      if(m.contains("No group")) REGROUP.thrw(info);
+      throw REGERR.thrw(info, m);
     }
   }
 
@@ -201,7 +201,7 @@ public final class FNPat extends StandardFunc {
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) REGROUP.thrw(input);
+    if(p.matcher("").matches()) REGROUP.thrw(info);
 
     final ValueBuilder vb = new ValueBuilder();
     final String str = string(val);
@@ -228,7 +228,7 @@ public final class FNPat extends StandardFunc {
   private Pattern pattern(final Expr pattern, final Expr mod,
       final QueryContext ctx) throws QueryException {
 
-    return new RegEx(string(checkStr(pattern, ctx)), input).pattern(
+    return new RegEx(string(checkStr(pattern, ctx)), info).pattern(
         mod != null ? checkStr(mod, ctx) : null, ctx.xquery3);
   }
 

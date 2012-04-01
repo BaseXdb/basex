@@ -36,7 +36,7 @@ public final class FTExtensionSelection extends FTExpr {
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return expr[0].item(ctx, input);
+    return expr[0].item(ctx, info);
   }
 
   @Override

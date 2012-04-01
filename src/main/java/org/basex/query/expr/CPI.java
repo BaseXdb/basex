@@ -37,16 +37,16 @@ public final class CPI extends CName {
     final Item it = checkItem(name, ctx);
     final Type ip = it.type;
     if(!ip.isUntyped() && !ip.isString() && ip != AtomType.QNM)
-      CPIWRONG.thrw(input, it);
+      CPIWRONG.thrw(info, it);
 
     final byte[] nm = trim(it.string(ii));
-    if(eq(lc(nm), XML)) CPIXML.thrw(input, nm);
-    if(!XMLToken.isNCName(nm)) CPIINVAL.thrw(input, nm);
+    if(eq(lc(nm), XML)) CPIXML.thrw(info, nm);
+    if(!XMLToken.isNCName(nm)) CPIINVAL.thrw(info, nm);
 
     byte[] v = value(ctx, ii);
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
-    return new FPI(new QNm(nm), FPI.parse(v, input));
+    return new FPI(new QNm(nm), FPI.parse(v, info));
   }
 }

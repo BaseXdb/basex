@@ -143,12 +143,12 @@ public final class QueryException extends Exception {
    * @param parser parser
    */
   void pos(final InputParser parser) {
-    markedCol = parser.qm;
+    markedCol = parser.im;
     // check if line/column information has already been added
     if(lineCol != null) return;
 
     file = parser.file;
-    lineCol = InputInfo.lineCol(parser.query, Math.min(parser.qm, parser.ql));
+    lineCol = InputInfo.lineCol(parser.input, Math.min(parser.im, parser.il));
   }
 
   /**

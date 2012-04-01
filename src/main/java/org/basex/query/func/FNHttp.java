@@ -31,11 +31,11 @@ public final class FNHttp extends StandardFunc {
     checkCreate(ctx);
 
     // get request node
-    final ANode request = expr[0].item(ctx, input) == null ? null :
-      checkNode(expr[0].item(ctx, input));
+    final ANode request = expr[0].item(ctx, info) == null ? null :
+      checkNode(expr[0].item(ctx, info));
 
     // get HTTP URI
-    final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, input)) : null;
+    final byte[] href = expr.length >= 2 ? checkEStr(expr[1].item(ctx, info)) : null;
 
     // get parameter $bodies
     ValueBuilder cache = null;
@@ -46,7 +46,7 @@ public final class FNHttp extends StandardFunc {
     }
 
     // send HTTP request
-    return new HTTPClient(input, ctx.context.prop).sendRequest(href, request, cache);
+    return new HTTPClient(info, ctx.context.prop).sendRequest(href, request, cache);
   }
 
   @Override

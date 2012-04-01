@@ -64,25 +64,25 @@ public final class Insert extends Update {
     final Constr c = new Constr(ii, ctx).add(expr[1]);
     final NodeCache cList = c.children;
     final NodeCache aList = c.atts;
-    if(c.errAtt) UPNOATTRPER.thrw(input);
-    if(c.duplAtt != null) UPATTDUPL.thrw(input, c.duplAtt);
+    if(c.errAtt) UPNOATTRPER.thrw(info);
+    if(c.duplAtt != null) UPATTDUPL.thrw(info, c.duplAtt);
 
     // check target constraints
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
-    if(i == null) UPSEQEMP.thrw(input, Util.name(this));
+    if(i == null) UPSEQEMP.thrw(info, Util.name(this));
     if(!(i instanceof ANode) || t.next() != null)
-      (before || after ? UPTRGTYP2 : UPTRGTYP).thrw(input);
+      (before || after ? UPTRGTYP2 : UPTRGTYP).thrw(info);
 
     final ANode n = (ANode) i;
     final ANode par = n.parent();
     if(before || after) {
       if(n.type == NodeType.ATT || n.type == NodeType.DOC)
-        UPTRGTYP2.thrw(input);
-      if(par == null) UPPAREMPTY.thrw(input);
+        UPTRGTYP2.thrw(info);
+      if(par == null) UPPAREMPTY.thrw(info);
     } else {
       if(n.type != NodeType.ELM && n.type != NodeType.DOC)
-        UPTRGTYP.thrw(input);
+        UPTRGTYP.thrw(info);
     }
 
     UpdatePrimitive up;
@@ -91,10 +91,10 @@ public final class Insert extends Update {
     if(aList.size() > 0) {
       final ANode targ = before || after ? par : n;
       if(targ.type != NodeType.ELM)
-        (before || after ? UPATTELM : UPATTELM2).thrw(input);
+        (before || after ? UPATTELM : UPATTELM2).thrw(info);
 
       dbn = ctx.updates.determineDataRef(targ, ctx);
-      up = new InsertAttribute(dbn.pre, dbn.data, input,
+      up = new InsertAttribute(dbn.pre, dbn.data, info,
           checkNS(aList, targ, ctx));
       ctx.updates.add(up, ctx);
     }
@@ -102,10 +102,10 @@ public final class Insert extends Update {
     // no update primitive is created if node list is empty
     if(cList.size() > 0) {
       dbn = ctx.updates.determineDataRef(n, ctx);
-      if(before) up = new InsertBefore(dbn.pre, dbn.data, input, cList);
-      else if(after) up = new InsertAfter(dbn.pre, dbn.data, input, cList);
-      else if(first) up = new InsertIntoFirst(dbn.pre, dbn.data, input, cList);
-      else up = new InsertInto(dbn.pre, dbn.data, input, cList, last);
+      if(before) up = new InsertBefore(dbn.pre, dbn.data, info, cList);
+      else if(after) up = new InsertAfter(dbn.pre, dbn.data, info, cList);
+      else if(first) up = new InsertIntoFirst(dbn.pre, dbn.data, info, cList);
+      else up = new InsertInto(dbn.pre, dbn.data, info, cList, last);
       ctx.updates.add(up, ctx);
     }
     return null;

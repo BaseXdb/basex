@@ -25,7 +25,7 @@ public final class RegEx {
   private static final Pattern EXCLUDE =
     Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\].*");
   /** Input info. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Input pattern. */
   private String pattern;
 
@@ -36,7 +36,7 @@ public final class RegEx {
    */
   public RegEx(final String pat, final InputInfo ii) {
     pattern = pat;
-    input = ii;
+    info = ii;
   }
 
   /**
@@ -68,7 +68,7 @@ public final class RegEx {
           }
           pattern = sb.toString();
         } else {
-          REGMOD.thrw(input, (char) b);
+          REGMOD.thrw(info, (char) b);
         }
       }
     }
@@ -86,16 +86,16 @@ public final class RegEx {
       // character class
       if(c != 'p' && c != 'P') {
         if("0123456789cCdDniIrsStwW|.-^$?*+{}()[]\\".indexOf(c) == -1)
-          REGESC.thrw(input, c);
+          REGESC.thrw(info, c);
         bl.append(b);
         bl.append(c);
       } else {
         b = next(++i);
-        if(b != '{') REGCC.thrw(input, b);
+        if(b != '{') REGCC.thrw(info, b);
         final StringBuilder tmp = new StringBuilder();
         while(true) {
           b = next(++i);
-          if(b == 0) REGCC.thrw(input, b);
+          if(b == 0) REGCC.thrw(info, b);
           if(b == '}') {
             bl.append(replace(tmp.toString(), c));
             break;
@@ -136,7 +136,7 @@ public final class RegEx {
       }
       return Pattern.compile(pattern, m);
     } catch(final Exception ex) {
-      throw REGINV.thrw(input, pattern);
+      throw REGINV.thrw(info, pattern);
     }
   }
 

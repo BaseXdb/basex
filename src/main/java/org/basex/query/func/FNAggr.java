@@ -48,7 +48,7 @@ public final class FNAggr extends StandardFunc {
       case SUM:
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
-          expr.length == 2 ? expr[1].item(ctx, input) : Int.get(0);
+          expr.length == 2 ? expr[1].item(ctx, info) : Int.get(0);
       case AVG:
         it = iter.next();
         return it == null ? null : sum(iter, it, true);
@@ -84,22 +84,22 @@ public final class FNAggr extends StandardFunc {
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
 
-    Item res = it.type.isUntyped() ? Dbl.get(it.string(input), input) : it;
+    Item res = it.type.isUntyped() ? Dbl.get(it.string(info), info) : it;
     Type t = res.type;
     if(!t.isNumber() && (!t.isDuration() || t == DUR))
-      SUMTYPE.thrw(input, this, t);
+      SUMTYPE.thrw(info, this, t);
     final boolean n = t.isNumber();
 
     int c = 1;
     for(Item i; (i = iter.next()) != null;) {
       t = i.type;
       final boolean un = t.isUntyped() || t.isNumber();
-      if(n && !un) FUNNUM.thrw(input, this, t);
-      if(!n && un) FUNDUR.thrw(input, this, t);
-      res = Calc.PLUS.ev(input, res, i);
+      if(n && !un) FUNNUM.thrw(info, this, t);
+      if(!n && un) FUNDUR.thrw(info, this, t);
+      res = Calc.PLUS.ev(info, res, i);
       ++c;
     }
-    return avg ? Calc.DIV.ev(input, res, Int.get(c)) : res;
+    return avg ? Calc.DIV.ev(info, res, Int.get(c)) : res;
   }
 
   /**
@@ -119,29 +119,29 @@ public final class FNAggr extends StandardFunc {
     if(res == null) return null;
 
     // check if first item is comparable
-    cmp.eval(input, res, res);
+    cmp.eval(info, res, res);
 
     // strings or dates
     if(!res.type.isUntyped() && res.type.isString() || res.type.isDate()) {
       for(Item it; (it = iter.next()) != null;) {
         if(it.type != res.type) {
-          FUNCMP.thrw(input, description(), res.type, it.type);
+          FUNCMP.thrw(info, description(), res.type, it.type);
         }
-        if(cmp.eval(input, res, it)) res = it;
+        if(cmp.eval(info, res, it)) res = it;
       }
       return res;
     }
 
     // durations or numbers
     Type t = res.type.isUntyped() ? DBL : res.type;
-    if(res.type != t) res = t.cast(res, ctx, input);
+    if(res.type != t) res = t.cast(res, ctx, info);
 
     for(Item it; (it = iter.next()) != null;) {
       t = type(res, it);
-      if(!it.type.isDuration() && Double.isNaN(it.dbl(input)) ||
-          cmp.eval(input, res, it))
+      if(!it.type.isDuration() && Double.isNaN(it.dbl(info)) ||
+          cmp.eval(info, res, it))
         res = it;
-      if(res.type != t) res = t.cast(res, ctx, input);
+      if(res.type != t) res = t.cast(res, ctx, info);
     }
     return res;
   }
@@ -156,18 +156,18 @@ public final class FNAggr extends StandardFunc {
   private Type type(final Item a, final Item b) throws QueryException {
     final Type ta = a.type, tb = b.type;
     if(tb.isUntyped()) {
-      if(!ta.isNumber()) FUNCMP.thrw(input, this, ta, tb);
+      if(!ta.isNumber()) FUNCMP.thrw(info, this, ta, tb);
       return DBL;
     }
     if(ta.isNumber() && !tb.isUntyped() && tb.isString())
-      FUNCMP.thrw(input, this, ta, tb);
+      FUNCMP.thrw(info, this, ta, tb);
 
     if(ta == tb) return ta;
     if(ta == DBL || tb == DBL) return DBL;
     if(ta == FLT || tb == FLT) return FLT;
     if(ta == DEC || tb == DEC) return DEC;
     if(ta == BLN || ta.isNumber() && !tb.isNumber() ||
-        tb.isNumber() && !ta.isNumber()) FUNCMP.thrw(input, this, ta, tb);
+        tb.isNumber() && !ta.isNumber()) FUNCMP.thrw(info, this, ta, tb);
     return ta.isNumber() || tb.isNumber() ? ITR : ta;
   }
 }

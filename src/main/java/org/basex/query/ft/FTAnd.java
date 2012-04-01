@@ -39,7 +39,7 @@ public final class FTAnd extends FTExpr {
     if(not) {
       // convert (!A and !B and ...) to !(A or B or ...)
       for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].expr[0];
-      return new FTNot(input, new FTOr(input, expr));
+      return new FTNot(info, new FTOr(info, expr));
     }
     return this;
   }
@@ -47,9 +47,9 @@ public final class FTAnd extends FTExpr {
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FTNode item = expr[0].item(ctx, input);
+    final FTNode item = expr[0].item(ctx, info);
     for(int e = 1; e < expr.length; ++e) {
-      and(item, expr[e].item(ctx, input));
+      and(item, expr[e].item(ctx, info));
     }
     return item;
   }

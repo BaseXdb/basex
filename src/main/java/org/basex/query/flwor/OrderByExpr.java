@@ -47,10 +47,10 @@ public final class OrderByExpr extends OrderBy {
 
   @Override
   Item key(final QueryContext ctx, final int i) throws QueryException {
-    Item it = expr.item(ctx, input);
+    Item it = expr.item(ctx, info);
     if(it != null) {
-      if(it.type.isNode()) it = Str.get(it.string(input));
-      else if(it.type.isNumber() && Double.isNaN(it.dbl(input))) it = null;
+      if(it.type.isNode()) it = Str.get(it.string(info));
+      else if(it.type.isNumber() && Double.isNaN(it.dbl(info))) it = null;
     }
     return it;
   }

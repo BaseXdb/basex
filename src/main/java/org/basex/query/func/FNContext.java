@@ -103,9 +103,9 @@ public final class FNContext extends StandardFunc {
     final String ymd = new SimpleDateFormat("yyyy-MM-dd").format(d);
     final String hms = new SimpleDateFormat("HH:mm:ss.S").format(d);
     final String zone = zon.substring(0, 3) + ':' + zon.substring(3);
-    ctx.date = new Dat(token(ymd + zone), input);
-    ctx.time = new Tim(token(hms + zone), input);
-    ctx.dtm = new Dtm(token(ymd + 'T' + hms + zone), input);
+    ctx.date = new Dat(token(ymd + zone), info);
+    ctx.time = new Tim(token(hms + zone), info);
+    ctx.dtm = new Dtm(token(ymd + 'T' + hms + zone), info);
   }
 
   /**

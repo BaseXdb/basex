@@ -11,7 +11,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Repository context.
+ * EXPath repository context.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
@@ -126,29 +126,26 @@ public final class Repo {
    */
   private void readPkg(final IOFile dir) {
     final IOFile desc = new IOFile(dir, DESCRIPTOR);
-    if(desc.exists()) {
-      try {
-        final Package pkg = new PkgParser(context.repo, null).parse(desc);
-        final byte[] name = pkg.uniqueName();
-        // read package components
-        for(final Component comp : pkg.comps) {
-          // add component's namespace to namespace dictionary
-          if(comp.uri != null) {
-            final TokenSet ts = nsDict.get(comp.uri);
-            if(ts != null) {
-              ts.add(name);
-            } else {
-              nsDict.add(comp.uri, new TokenSet(name));
-            }
+    if(!desc.exists()) return;
+    try {
+      final Package pkg = new PkgParser(context.repo, null).parse(desc);
+      final byte[] name = pkg.uniqueName();
+      // read package components
+      for(final Component comp : pkg.comps) {
+        // add component's namespace to namespace dictionary
+        if(comp.uri != null) {
+          final TokenSet ts = nsDict.get(comp.uri);
+          if(ts != null) {
+            ts.add(name);
+          } else {
+            nsDict.add(comp.uri, new TokenSet(name));
           }
         }
-        // add package to package dictionary
-        pkgDict.add(name, token(dir.name()));
-      } catch(final QueryException ex) {
-        Util.errln(ex.getMessage());
       }
-    } else {
-      Util.errln(MISSDESC, dir);
+      // add package to package dictionary
+      pkgDict.add(name, token(dir.name()));
+    } catch(final QueryException ex) {
+      Util.errln(ex.getMessage());
     }
   }
 }

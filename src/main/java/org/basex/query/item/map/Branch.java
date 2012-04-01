@@ -35,9 +35,8 @@ final class Branch extends TrieNode {
 
   /**
    * Copies the children array.
-   * This is faster than {@code kids.clone()} according to <a
-   * href="http://www.javaspecialists.eu/archive/Issue124.html">Heinz M.
-   * Kabutz</a>.
+   * This is faster than {@code kids.clone()} according to
+   * <a href="http://www.javaspecialists.eu/archive/Issue124.html">Heinz M. Kabutz</a>.
    * @return copy of the child array
    */
   TrieNode[] copyKids() {

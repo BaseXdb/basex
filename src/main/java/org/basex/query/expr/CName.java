@@ -89,11 +89,11 @@ public abstract class CName extends CFrag {
 
     final byte[] str = it.string(ii);
     if(!XMLToken.isQName(str)) {
-      (ip.isString() || ip.isUntyped() ? INVNAME : INVQNAME).thrw(input, str);
+      (ip.isString() || ip.isUntyped() ? INVNAME : INVQNAME).thrw(info, str);
     }
     // create and update namespace
     final QNm nm = new QNm(str, ctx);
-    if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(input, nm);
+    if(!nm.hasURI() && nm.hasPrefix()) INVPREF.thrw(info, nm);
     return nm;
 
   }

@@ -540,13 +540,12 @@ public interface QueryText {
   byte[] REPOURI = token(BXMODULES + "repo");
 
   /** Java prefix. */
-  byte[] JAVAPRE = token("java:");
+  byte[] JAVAPREF = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
 
   /** Static modules. */
-  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI, SQLURI,
-      CRYPTOURI);
+  TokenSet MODULES = new TokenSet(FILEURI, HTTPURI, PKGURI, ZIPURI, SQLURI, CRYPTOURI);
 
   // QUERY PLAN ===============================================================
 

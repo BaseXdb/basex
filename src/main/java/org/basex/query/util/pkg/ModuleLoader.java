@@ -11,7 +11,8 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
-import org.basex.query.util.pkg.Package.*;
+import org.basex.query.util.pkg.Package.Component;
+import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -25,14 +26,14 @@ public final class ModuleLoader {
   /** Default class loader. */
   private static final ClassLoader LOADER =
       Thread.currentThread().getContextClassLoader();
+  /** Cached URLs to be added to the class loader. */
+  private ArrayList<URL> urls = new ArrayList<URL>();
   /** Current class loader. */
   private ClassLoader loader = LOADER;
   /** Java modules. */
   private HashMap<Object, ArrayList<Method>> javaModules;
   /** Database context. */
   private final Context context;
-  /** Initialization flag. */
-  private boolean init;
 
   /**
    * Constructor.
@@ -50,42 +51,66 @@ public final class ModuleLoader {
   }
 
   /**
-   * Returns an instance of the specified Java module class.
-   * @param clz class to be found
-   * @return instance, or {@code null}
+   * Adds a package from the repository or a Java class.
+   * @param uri module uri
+   * @param ii input info
+   * @param qp query parser
+   * @return if the package has been found
+   * @throws QueryException query exception
    */
-  public Object findImported(final String clz) {
-    // check if class was imported as Java module
-    if(javaModules != null) {
-      for(final Object jm : javaModules.keySet()) {
-        if(jm.getClass().getName().equals(clz)) return jm;
+  public boolean addImport(final byte[] uri, final InputInfo ii, final QueryParser qp)
+      throws QueryException {
+
+    // add EXPath package
+    final TokenSet pkgs = context.repo.nsDict().get(uri);
+    if(pkgs != null) {
+      for(final byte[] name : pkgs) {
+        if(name != null) addRepo(name, new TokenSet(), new TokenSet(), ii, qp);
       }
+      return true;
     }
-    return null;
+
+    // search module in repository: normalize path
+    final boolean java = startsWith(uri, JAVAPREF);
+    final String uriPath = uri2path(string(java ? substring(uri, JAVAPREF.length) : uri));
+    final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
+
+    // no file suffix specified: try different ones
+    if(IO.suffix(path).isEmpty()) {
+      // no "java:" prefix: try different XQuery file suffixes
+      if(!java) {
+        for(final String suf : IO.XQSUFFIXES) {
+          if(addModule(new IOFile(path + suf), uri, qp)) return true;
+        }
+      }
+      // always check for Java module
+      addJar(new IOFile(path + IO.JARSUFFIX));
+    } else {
+      final IOFile file = new IOFile(path);
+      // no "java:" prefix: check if file has XQuery suffix
+      if(!java && file.hasSuffix(IO.XQSUFFIXES)) return addModule(file, uri, qp);
+      // always check for Java module
+      if(file.hasSuffix(IO.JARSUFFIX)) addJar(file);
+    }
+
+    // Java class was successfully imported: create instance
+    addJava(uriPath.replace("/", ".").substring(1), ii);
+    return true;
   }
 
   /**
-   * Finds the specified class.
-   * @param clz class to be found
+   * Returns a reference to the specified class.
+   * @param clz fully classified class name
    * @return found class, or {@code null}
    * @throws Throwable any exception or error: {@link ClassNotFoundException},
    *   {@link LinkageError} or {@link ExceptionInInitializerError}.
    */
-  public Class<?> find(final String clz) throws Throwable {
-    if(!init) {
-      // add jar files of the repository directory to the class loader
-      init = true;
-      final ArrayList<URL> urls = new ArrayList<URL>();
-      final IOFile repo = new IOFile(context.mprop.get(MainProp.REPOPATH));
-      for(final IOFile file : repo.children()) {
-        if(file.name().endsWith(IO.JARSUFFIX)) {
-          addJar(file, urls);
-          System.out.println("?");
-        }
-      }
-      if(!urls.isEmpty()) {
-        loader = new JarLoader(urls.toArray(new URL[urls.size()]), loader);
-      }
+  public Class<?> findClass(final String clz) throws Throwable {
+    // add cached URLs to class loader
+    final int us = urls.size();
+    if(us != 0) {
+      loader = new JarLoader(urls.toArray(new URL[us]), loader);
+      urls.clear();
     }
 
     // no external classes added: use default class loader
@@ -101,59 +126,127 @@ public final class ModuleLoader {
   }
 
   /**
-   * Loads a package from the package repository.
-   * @param uri module uri
-   * @param ii input info
-   * @param qp query parser
-   * @return if the package has been found
-   * @throws QueryException query exception
+   * Returns an instance of the specified Java module class.
+   * @param clz class to be found
+   * @return instance, or {@code null}
    */
-  public boolean load(final byte[] uri, final InputInfo ii, final QueryParser qp)
-      throws QueryException {
+  public Object findImport(final String clz) {
+    // check if class was imported as Java module
+    if(javaModules != null) {
+      for(final Object jm : javaModules.keySet()) {
+        if(jm.getClass().getName().equals(clz)) return jm;
+      }
+    }
+    return null;
+  }
 
-    // check Java modules
-    if(startsWith(uri, JAVAPRE)) {
-      final String path = string(substring(uri, JAVAPRE.length));
-      Class<?> clz = null;
-      try {
-        clz = find(path);
-      } catch(final ClassNotFoundException ex) {
-        NOMODULE.thrw(ii, path);
-        // expected exception
-      } catch(final Throwable th) {
-        Util.debug(th);
-        MODINIT.thrw(ii, th);
+  // STATIC METHODS =====================================================================
+
+  /**
+   * <p>Converts a URI to a directory path. The conversion is inspired by Zorba's
+   * URI transformation
+   * (http://www.zorba-xquery.com/html/documentation/2.2.0/zorba/uriresolvers):</p>
+   * <ul>
+   * <li>The URI authority is reversed, and dots are replaced by slashes.</li>
+   * <li>The URI path is appended. If no path exists, a slash is appended.</li>
+   * <li>If the resulting string ends with a slash, "index" is appended.</li>
+   * <li>{@code null} is returned if the URI has an invalid syntax.</li>
+   * </ul>
+   * @param uri namespace uri
+   * @return path, or {@code null}
+   */
+  public static String uri2path(final String uri) {
+    try {
+      final URI u = new URI(uri);
+      final TokenBuilder tb = new TokenBuilder();
+      final String auth = u.getAuthority();
+      if(auth != null) {
+        // reverse authority, replace dots by slashes
+        final String[] comp = auth.split("\\.");
+        for(int c = comp.length - 1; c >= 0; c--) tb.add('/').add(comp[c]);
+      } else {
+        tb.add('/');
       }
 
-      final boolean qm = clz.getSuperclass() == QueryModule.class;
-      final Object jm = Reflect.get(clz);
-      if(jm == null) NOINV.thrw(ii, path);
-
-      // add all public methods of the class (ignore methods from super classes)
-      final ArrayList<Method> list = new ArrayList<Method>();
-      for(final Method m : clz.getMethods()) {
-        // if class is inherited from {@link QueryModule}, no super methods are accepted
-        if(!qm || m.getDeclaringClass() == clz) list.add(m);
-      }
-
-      // add class and its methods to module cache
-      if(javaModules == null) javaModules = new HashMap<Object, ArrayList<Method>>();
-      javaModules.put(jm, list);
-      return true;
+      // add remaining path
+      final String path = u.getPath().replace('.', '/');
+      // add slash or path
+      tb.add(path.isEmpty() ? "/" : path);
+      String pth = tb.toString();
+      // add "index" string
+      if(pth.endsWith("/")) pth += "index";
+      return pth;
+    } catch(final URISyntaxException ex) {
+      Util.debug(ex);
+      return null;
     }
+  }
 
-    final TokenSet pkgs = context.repo.nsDict().get(uri);
-    if(pkgs == null) return false;
+  // PRIVATE METHODS ====================================================================
 
-    // load packages with modules having the given uri
-    for(final byte[] name : pkgs) {
-      if(name != null) load(name, new TokenSet(), new TokenSet(), ii, qp);
-    }
+  /**
+   * Adds the specified file to the class loader if it exists.
+   * @param file file to be added
+   * @return {@code true} if file exists
+   */
+  private boolean addJar(final IOFile file) {
+    if(!file.exists()) return false;
+    addURL(file);
     return true;
   }
 
   /**
-   * Recursively loads a package from the package repository.
+   * Parses the specified file as module if it exists.
+   * @param file file to be added
+   * @param uri namespace uri
+   * @param qp query parser
+   * @return {@code true} if file exists and was successfully parsed
+   * @throws QueryException query exception
+   */
+  private boolean addModule(final IOFile file, final byte[] uri, final QueryParser qp)
+      throws QueryException {
+
+    if(!file.exists()) return false;
+    qp.module(token(file.path()), uri);
+    return true;
+  }
+
+  /**
+   * Loads a Java class.
+   * @param path class path
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  private void addJava(final String path, final InputInfo ii) throws QueryException {
+    Class<?> clz = null;
+    try {
+      clz = findClass(path);
+    } catch(final ClassNotFoundException ex) {
+      NOMODULE.thrw(ii, path);
+      // expected exception
+    } catch(final Throwable th) {
+      Util.debug(th);
+      MODINIT.thrw(ii, th);
+    }
+
+    final boolean qm = clz.getSuperclass() == QueryModule.class;
+    final Object jm = Reflect.get(clz);
+    if(jm == null) NOINV.thrw(ii, path);
+
+    // add all public methods of the class (ignore methods from super classes)
+    final ArrayList<Method> list = new ArrayList<Method>();
+    for(final Method m : clz.getMethods()) {
+      // if class is inherited from {@link QueryModule}, no super methods are accepted
+      if(!qm || m.getDeclaringClass() == clz) list.add(m);
+    }
+
+    // add class and its methods to module cache
+    if(javaModules == null) javaModules = new HashMap<Object, ArrayList<Method>>();
+    javaModules.put(jm, list);
+  }
+
+  /**
+   * Adds a package from the package repository.
    * @param name package name
    * @param toLoad list with packages to be loaded
    * @param loaded already loaded packages
@@ -161,7 +254,7 @@ public final class ModuleLoader {
    * @param qp query parser
    * @throws QueryException query exception
    */
-  private void load(final byte[] name, final TokenSet toLoad, final TokenSet loaded,
+  private void addRepo(final byte[] name, final TokenSet toLoad, final TokenSet loaded,
       final InputInfo ii, final QueryParser qp) throws QueryException {
 
     // return if package is already loaded
@@ -180,7 +273,7 @@ public final class ModuleLoader {
     // check if package contains a jar descriptor
     final IOFile jarDesc = new IOFile(pkgDir, PkgText.JARDESC);
     // add jars to classpath
-    if(jarDesc.exists()) loadJar(jarDesc, pkgDir, string(pkg.abbrev), ii);
+    if(jarDesc.exists()) addJar(jarDesc, pkgDir, string(pkg.abbrev), ii);
 
     // package has dependencies -> they have to be loaded first => put package
     // in list with packages to be loaded
@@ -193,7 +286,7 @@ public final class ModuleLoader {
         NECPKGNOTINST.thrw(ii, string(d.pkg));
       } else {
         if(toLoad.contains(depPkg)) CIRCMODULE.thrw(ii);
-        load(depPkg, toLoad, loaded, ii, qp);
+        addRepo(depPkg, toLoad, loaded, ii, qp);
       }
      }
     }
@@ -214,26 +307,23 @@ public final class ModuleLoader {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void loadJar(final IOFile jarDesc, final IOFile pkgDir, final String modDir,
+  private void addJar(final IOFile jarDesc, final IOFile pkgDir, final String modDir,
       final InputInfo ii) throws QueryException {
 
     // add new URLs
-    final ArrayList<URL> urls = new ArrayList<URL>();
     final JarDesc desc = new JarParser(context, ii).parse(jarDesc);
     for(final byte[] u : desc.jars) {
-      addJar(new IOFile(new IOFile(pkgDir, modDir), string(u)), urls);
+      addURL(new IOFile(new IOFile(pkgDir, modDir), string(u)));
     }
-    loader = new JarLoader(urls.toArray(new URL[urls.size()]), loader);
   }
 
   /**
-   * Adds a jar URL to the specified list.
+   * Adds a URL to the cache.
    * @param jar jar file to be added
-   * @param urls urls
    */
-  private void addJar(final IOFile jar, final ArrayList<URL> urls) {
+  private void addURL(final IOFile jar) {
     try {
-      urls.add(new URL(IO.FILEPREF + jar));
+      urls.add(new URL(jar.url()));
     } catch(final MalformedURLException ex) {
       Util.errln(ex.getMessage());
     }

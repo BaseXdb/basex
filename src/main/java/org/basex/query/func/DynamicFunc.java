@@ -46,7 +46,7 @@ public final class DynamicFunc extends Arr {
     if(t instanceof FuncType) {
       final FuncType ft = (FuncType) t;
       if(ft.args != null && ft.args.length != ar)
-        throw INVARITY.thrw(input, f, ar);
+        throw INVARITY.thrw(info, f, ar);
       if(ft.ret != null) type = ft.ret;
     }
 
@@ -62,12 +62,12 @@ public final class DynamicFunc extends Arr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    return getFun(ctx).invValue(ctx, input, argv(ctx));
+    return getFun(ctx).invValue(ctx, info, argv(ctx));
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return getFun(ctx).invIter(ctx, input, argv(ctx));
+    return getFun(ctx).invIter(ctx, info, argv(ctx));
   }
 
   /**
@@ -93,7 +93,7 @@ public final class DynamicFunc extends Arr {
     final Item it = checkItem(expr[ar], ctx);
     if(!it.type.isFunction()) throw Err.type(this, FuncType.arity(ar), it);
     final FItem fit = (FItem) it;
-    if(fit.arity() != ar) throw INVARITY.thrw(input, fit, ar);
+    if(fit.arity() != ar) throw INVARITY.thrw(info, fit, ar);
     return fit;
   }
 

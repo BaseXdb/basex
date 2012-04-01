@@ -101,7 +101,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return Function._DB_FULLTEXT.get(input, Str.get(ictx.data.meta.name),
+    return Function._DB_FULLTEXT.get(info, Str.get(ictx.data.meta.name),
         ftexpr).toString();
   }
 }

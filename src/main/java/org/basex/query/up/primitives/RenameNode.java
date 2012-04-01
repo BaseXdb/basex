@@ -40,7 +40,7 @@ public final class RenameNode extends ValueUpdate {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    UPMULTREN.thrw(input, targetNode());
+    UPMULTREN.thrw(info, targetNode());
   }
 
   @Override

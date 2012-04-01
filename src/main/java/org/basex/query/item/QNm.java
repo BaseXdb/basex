@@ -155,8 +155,7 @@ public final class QNm extends Item {
    * @return result of check
    */
   public boolean eq(final QNm n) {
-    return n == this || Token.eq(local(), n.local()) &&
-        Token.eq(uri(), n.uri());
+    return n == this || Token.eq(local(), n.local()) && Token.eq(uri(), n.uri());
   }
 
   @Override

@@ -100,7 +100,7 @@ public final class FNFt extends StandardFunc {
     if(expr.length > 1) {
       // name of the marker element; default is <mark/>
       m = checkStr(expr[1], ctx);
-      if(!XMLToken.isQName(m)) Err.value(input, AtomType.QNM, m);
+      if(!XMLToken.isQName(m)) Err.value(info, AtomType.QNM, m);
     }
     if(expr.length > 2) {
       l = (int) checkItr(expr[2], ctx);
@@ -185,13 +185,13 @@ public final class FNFt extends StandardFunc {
       final StandardFunc fun, final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    if(!data.meta.ftxtindex) NOINDEX.thrw(fun.input, data.meta.name, fun);
+    if(!data.meta.ftxtindex) NOINDEX.thrw(fun.info, data.meta.name, fun);
 
     final FTOpt tmp = ctx.ftOpt();
     ctx.ftOpt(new FTOpt().copy(data.meta));
-    final FTWords words = new FTWords(fun.input, ic.data, Str.get(str), ctx);
+    final FTWords words = new FTWords(fun.info, ic.data, Str.get(str), ctx);
     ctx.ftOpt(tmp);
-    return new FTIndexAccess(fun.input, words, ic).iter(ctx);
+    return new FTIndexAccess(fun.info, words, ic).iter(ctx);
   }
 
   /**

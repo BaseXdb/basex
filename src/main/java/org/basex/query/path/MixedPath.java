@@ -38,7 +38,7 @@ public final class MixedPath extends Path {
   protected Expr compPath(final QueryContext ctx) throws QueryException {
     for(final Expr s : steps) checkUp(s, ctx);
     final AxisStep v = voidStep(steps);
-    if(v != null) COMPSELF.thrw(input, v);
+    if(v != null) COMPSELF.thrw(info, v);
 
     for(int s = 0; s != steps.length; ++s) {
       steps[s] = steps[s].comp(ctx);
@@ -83,7 +83,7 @@ public final class MixedPath extends Path {
 
         // loop through all input items
         for(Item it; (it = res.next()) != null;) {
-          if(!it.type.isNode()) NODESPATH.thrw(input, this, it.type);
+          if(!it.type.isNode()) NODESPATH.thrw(info, this, it.type);
           ctx.value = it;
 
           // loop through all resulting items
@@ -92,7 +92,7 @@ public final class MixedPath extends Path {
             // set node flag
             if(vb.size() == 0) nodes = i.type.isNode();
             // check if both nodes and atomic values occur in last result
-            else if(last && nodes != i.type.isNode()) EVALNODESVALS.thrw(input);
+            else if(last && nodes != i.type.isNode()) EVALNODESVALS.thrw(info);
             vb.add(i);
           }
           ctx.pos++;

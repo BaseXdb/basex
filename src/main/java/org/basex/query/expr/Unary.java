@@ -54,20 +54,20 @@ public final class Unary extends Single {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item it = expr.item(ctx, input);
+    final Item it = expr.item(ctx, info);
     if(it == null) return null;
     final Type ip = it.type;
 
     if(!ip.isUntyped() && !ip.isNumber()) Err.number(this, it);
-    final double d = it.dbl(input);
+    final double d = it.dbl(info);
     if(ip.isUntyped()) return Dbl.get(minus ? -d : d);
 
     if(!minus) return it;
     switch((AtomType) ip) {
       case DBL: return Dbl.get(-d);
-      case FLT: return Flt.get(-it.flt(input));
-      case DEC: return Dec.get(it.dec(input).negate());
-      default:  return Int.get(-it.itr(input));
+      case FLT: return Flt.get(-it.flt(info));
+      case DEC: return Dec.get(it.dec(info).negate());
+      default:  return Int.get(-it.itr(info));
     }
   }
 

@@ -187,7 +187,7 @@ public final class FTLexer extends FTIterator implements IndexToken {
 
   /**
    * Gets full-text info for the specified token; needed for visualizations.
-   * See {@link Tokenizer#info} for more info.
+   * See {@link Tokenizer#info()} for more info.
    * @return int arrays or empty array if not implemented
    */
   public int[][] info() {

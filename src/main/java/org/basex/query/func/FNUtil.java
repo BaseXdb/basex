@@ -128,7 +128,7 @@ public final class FNUtil extends StandardFunc {
     try {
       return eval(ctx, io.read());
     } catch(final IOException ex) {
-      throw IOERR.thrw(input, ex);
+      throw IOERR.thrw(info, ex);
     }
   }
 
@@ -153,12 +153,12 @@ public final class FNUtil extends StandardFunc {
     final String form = string(checkStr(expr[0], ctx));
     final Object[] args = new Object[expr.length - 1];
     for(int e = 1; e < expr.length; e++) {
-      args[e - 1] = expr[e].item(ctx, input).toJava();
+      args[e - 1] = expr[e].item(ctx, info).toJava();
     }
     try {
       return Str.get(String.format(form, args));
     } catch(final RuntimeException ex) {
-      throw ERRFORM.thrw(input, Util.name(ex), ex.getMessage());
+      throw ERRFORM.thrw(info, Util.name(ex), ex.getMessage());
     }
   }
 
@@ -376,7 +376,7 @@ public final class FNUtil extends StandardFunc {
   private Iter toBytes(final QueryContext ctx) throws QueryException {
     final Item it = checkItem(expr[0], ctx);
     final ByteList bl = new ByteList();
-    final InputStream is = it.input(input);
+    final InputStream is = it.input(info);
     try {
       try {
         for(int ch; (ch = is.read()) != -1;) bl.add(ch);
@@ -384,7 +384,7 @@ public final class FNUtil extends StandardFunc {
         is.close();
       }
     } catch(final IOException ex) {
-      CONVERT.thrw(input, ex);
+      CONVERT.thrw(info, ex);
     }
 
     return new ValueIter() {
@@ -420,14 +420,14 @@ public final class FNUtil extends StandardFunc {
     final Item it = checkItem(expr[0], ctx);
     final String enc = expr.length == 2 ? string(checkStr(expr[1], ctx)) : UTF8;
     try {
-      final InputStream is = it.input(input);
+      final InputStream is = it.input(info);
       try {
         return Str.get(new NewlineInput(is).encoding(enc).content());
       } finally {
         is.close();
       }
     } catch(final IOException ex) {
-      throw CONVERT.thrw(input, ex);
+      throw CONVERT.thrw(info, ex);
     }
   }
 
@@ -446,7 +446,7 @@ public final class FNUtil extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item deep(final QueryContext ctx) throws QueryException {
-    final Compare cmp = new Compare(input);
+    final Compare cmp = new Compare(info);
     final Flag[] flags = Flag.values();
     if(expr.length == 3) {
       final Iter ir = expr[2].iter(ctx);
@@ -460,7 +460,7 @@ public final class FNUtil extends StandardFunc {
             break;
           }
         }
-        if(!found) INVFLAG.thrw(input, key);
+        if(!found) INVFLAG.thrw(info, key);
       }
     }
     return Bln.get(cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1])));

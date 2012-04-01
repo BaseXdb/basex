@@ -66,8 +66,8 @@ public final class FNFormat extends StandardFunc {
     if(expr[0].isEmpty()) return Str.ZERO;
     final long num = checkItr(expr[0], ctx);
 
-    if(pic.length == 0) WRONGINT.thrw(input, pic);
-    final FormatParser fp = new FormatParser(input, pic, null);
+    if(pic.length == 0) WRONGINT.thrw(info, pic);
+    final FormatParser fp = new FormatParser(pic, null, info);
     return Str.get(Formatter.get(string(lng)).formatInt(num, fp));
   }
 
@@ -79,7 +79,7 @@ public final class FNFormat extends StandardFunc {
    */
   private Str formatNumber(final QueryContext ctx) throws QueryException {
     // evaluate arguments
-    Item it = expr[0].item(ctx, input);
+    Item it = expr[0].item(ctx, info);
     if(it == null) it = Dbl.NAN;
     else if(!it.type.isUntyped() && !it.type.isNumber()) number(this, it);
 
@@ -88,8 +88,8 @@ public final class FNFormat extends StandardFunc {
         checkStr(expr[2], ctx) : EMPTY, ctx);
 
     final DecFormatter df = ctx.sc.decFormats.get(frm.eqname());
-    if(df == null) throw FORMNUM.thrw(input, frm);
-    return Str.get(df.format(input, it, pic));
+    if(df == null) throw FORMNUM.thrw(info, frm);
+    return Str.get(df.format(info, it, pic));
   }
 
   /**
@@ -102,7 +102,7 @@ public final class FNFormat extends StandardFunc {
   private Item formatDate(final Type tp, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = expr[0].item(ctx, input);
+    final Item it = expr[0].item(ctx, info);
     final byte[] pic = checkEStr(expr[1], ctx);
     final byte[] lng = expr.length == 5 ? checkEStr(expr[2], ctx) : EMPTY;
     final byte[] cal = expr.length == 5 ? checkEStr(expr[3], ctx) : EMPTY;
@@ -111,6 +111,6 @@ public final class FNFormat extends StandardFunc {
     final Date date = (Date) checkType(it, tp);
 
     final Formatter form = Formatter.get(string(lng));
-    return Str.get(form.formatDate(date, pic, cal, plc, input));
+    return Str.get(form.formatDate(date, pic, cal, plc, info));
   }
 }

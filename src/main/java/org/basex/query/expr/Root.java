@@ -34,7 +34,7 @@ public final class Root extends Simple {
     final NodeCache nc = new NodeCache().random();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
-      if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(input);
+      if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(info);
       nc.add(n);
     }
     return nc;

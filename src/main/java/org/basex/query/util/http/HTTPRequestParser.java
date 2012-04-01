@@ -21,14 +21,14 @@ import org.basex.util.hash.*;
  */
 public final class HTTPRequestParser {
   /** Input information. */
-  private final InputInfo input;
+  private final InputInfo info;
 
   /**
    * Constructor.
    * @param ii input info
    */
   public HTTPRequestParser(final InputInfo ii) {
-    input = ii;
+    info = ii;
   }
 
   /**
@@ -50,7 +50,7 @@ public final class HTTPRequestParser {
 
     // it is an error if content is set for HTTP verbs which must be empty
     if(eq(method, TRACE, DELETE) && (payload != null || bodies != null))
-      REQINV.thrw(input, "Body not expected for method " + string(method));
+      REQINV.thrw(info, "Body not expected for method " + string(method));
 
     if(payload != null) {
       final QNm pl = payload.qname();
@@ -59,7 +59,7 @@ public final class HTTPRequestParser {
         Item it = null;
         if(bodies != null) {
           // $bodies must contain exactly one item
-          if(bodies.size() != 1) REQINV.thrw(input,
+          if(bodies.size() != 1) REQINV.thrw(info,
               "Number of items with request body content differs "
                   + "from number of body descriptors.");
           it = bodies.next();
@@ -74,13 +74,13 @@ public final class HTTPRequestParser {
           i++;
         // number of items in $bodies must be equal to number of body
         // descriptors
-        if(bodies != null && bodies.size() != i) REQINV.thrw(input,
+        if(bodies != null && bodies.size() != i) REQINV.thrw(info,
             "Number of items with request body content differs "
                 + "from number of body descriptors.");
         parseMultipart(payload, bodies, r.payloadAttrs, r.parts);
         r.isMultipart = true;
       } else {
-        REQINV.thrw(input, "Unknown payload element " + pl);
+        REQINV.thrw(info, "Unknown payload element " + pl);
       }
     }
     return r;
@@ -171,7 +171,7 @@ public final class HTTPRequestParser {
 
     parseAttrs(multipart, attrs);
     if(attrs.get(MEDIA_TYPE) == null)
-      REQINV.thrw(input, "Attribute media-type of http:multipart is mandatory");
+      REQINV.thrw(info, "Attribute media-type of http:multipart is mandatory");
 
     final AxisMoreIter i = multipart.children();
     if(contItems == null) {
@@ -208,7 +208,7 @@ public final class HTTPRequestParser {
    */
   private void checkRequest(final HTTPRequest r) throws QueryException {
     // @method denotes the HTTP verb and is mandatory
-    if(r.attrs.get(METHOD) == null) REQINV.thrw(input, "Attribute method is mandatory");
+    if(r.attrs.get(METHOD) == null) REQINV.thrw(info, "Attribute method is mandatory");
 
     // check parameters needed in case of authorization
     final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
@@ -216,7 +216,7 @@ public final class HTTPRequestParser {
       final byte[] un = r.attrs.get(USERNAME);
       final byte[] pw = r.attrs.get(PASSWORD);
       if(un == null && pw != null || un != null && pw == null || un == null && pw == null)
-        REQINV.thrw(input, "Provided credentials are invalid");
+        REQINV.thrw(info, "Provided credentials are invalid");
     }
   }
 
@@ -231,12 +231,12 @@ public final class HTTPRequestParser {
 
     // @media-type is mandatory
     if(bodyAttrs.get(MEDIA_TYPE) == null)
-      REQINV.thrw(input, "Attribute media-type of http:body is mandatory");
+      REQINV.thrw(info, "Attribute media-type of http:body is mandatory");
 
     // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present
     if(bodyAttrs.get(SRC) != null &&
-        (bodyAttrs.size() > 2 || body.children().more())) SRCATTR.thrw(input);
+        (bodyAttrs.size() > 2 || body.children().more())) SRCATTR.thrw(info);
 
   }
 }

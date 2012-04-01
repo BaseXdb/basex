@@ -28,11 +28,10 @@ public final class DBOptimize extends UpdatePrimitive {
    * @param d data
    * @param c database context
    * @param a optimize all database structures flag
-   * @param info input info
+   * @param ii input info
    */
-  public DBOptimize(final Data d, final Context c, final boolean a,
-      final InputInfo info) {
-    super(PrimitiveType.DBOPTIMIZE, -1, d, info);
+  public DBOptimize(final Data d, final Context c, final boolean a, final InputInfo ii) {
+    super(PrimitiveType.DBOPTIMIZE, -1, d, ii);
     ctx = c;
     all = a;
   }
@@ -49,7 +48,7 @@ public final class DBOptimize extends UpdatePrimitive {
       if(all) OptimizeAll.optimizeAll(data, ctx, null);
       else Optimize.optimize(data, null);
     } catch(final IOException ex) {
-      DBERR.thrw(input, ex);
+      DBERR.thrw(info, ex);
     }
   }
 

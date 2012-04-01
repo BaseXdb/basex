@@ -43,7 +43,7 @@ public abstract class StandardFunc extends Arr {
     if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues())
       return optPre(cmp(ctx), ctx);
     // pre-evaluate function
-    return optPre(sig.ret.zeroOrOne() ? item(ctx, input) : value(ctx), ctx);
+    return optPre(sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
 
   /**
@@ -102,14 +102,14 @@ public abstract class StandardFunc extends Arr {
    * @throws QueryException query exception
    */
   Data data(final int i, final QueryContext ctx) throws QueryException {
-    final Item it = checkNoEmpty(expr[i].item(ctx, input));
+    final Item it = checkNoEmpty(expr[i].item(ctx, info));
     final Type ip = it.type;
     if(ip.isNode()) return checkDBNode(it).data;
     if(ip.isString())  {
-      final String name = string(it.string(input));
-      if(!MetaData.validName(name, false)) INVDB.thrw(input, name);
-      return ctx.resource.data(name, input);
+      final String name = string(it.string(info));
+      if(!MetaData.validName(name, false)) INVDB.thrw(info, name);
+      return ctx.resource.data(name, info);
     }
-    throw STRNODTYPE.thrw(input, this, ip);
+    throw STRNODTYPE.thrw(info, this, ip);
   }
 }

@@ -58,7 +58,7 @@ public final class PartFunc extends UserFunc {
   public Expr comp(final QueryContext ctx) throws QueryException {
     comp(ctx, false);
     // defer creation of function item because of closure
-    return new InlineFunc(input, ret, args, expr, ann).comp(ctx);
+    return new InlineFunc(info, ret, args, expr, ann).comp(ctx);
   }
 
   @Override

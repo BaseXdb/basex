@@ -50,7 +50,7 @@ abstract class Update extends Arr {
       if(pref.length == 0) continue;
       // check if attribute and target have the same namespace
       final byte[] uri = targ.uri(pref, ctx);
-      if(uri != null && !eq(name.uri(), uri)) UPNSCONFL.thrw(input);
+      if(uri != null && !eq(name.uri(), uri)) UPNSCONFL.thrw(info);
     }
     return list;
   }

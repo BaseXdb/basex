@@ -20,7 +20,7 @@ public final class FormatParser extends FormatUtil {
       Pattern.compile("(\\*|\\d+)(-(\\*|\\d+))?");
 
   /** Input information. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Input to be parsed. */
   private final byte[] pic;
   /** Default modifier. */
@@ -43,15 +43,15 @@ public final class FormatParser extends FormatUtil {
 
   /**
    * Constructor.
-   * @param ii input info
    * @param p info picture
    * @param df default presentation modifier (may be {@code null})
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public FormatParser(final InputInfo ii, final byte[] p, final byte[] df)
+  public FormatParser(final byte[] p, final byte[] df, final InputInfo ii)
       throws QueryException {
 
-    input = ii;
+    info = ii;
     pic = p.length != 0 ? p : df;
     ext = df != null;
     def = ext ? df : ONE;
@@ -128,8 +128,8 @@ public final class FormatParser extends FormatUtil {
             pos += cl(pic, pos);
             break;
           } else {
-            if(pos == 0) GROUPSTART.thrw(input, pic);
-            if(group) GROUPADJ.thrw(input, pic);
+            if(pos == 0) GROUPSTART.thrw(info, pic);
+            if(group) GROUPADJ.thrw(info, pic);
             group = true;
           }
         } else {
@@ -139,15 +139,15 @@ public final class FormatParser extends FormatUtil {
           } else if(ch >= z && ch <= z + 9) {
             group = false;
           } else {
-            if(zeroes(ch) != -1) DIFFMAND.thrw(input, pic);
-            if(ch == '#') OPTAFTER.thrw(input, pic);
-            if(group) GROUPADJ.thrw(input, pic);
+            if(zeroes(ch) != -1) DIFFMAND.thrw(info, pic);
+            if(ch == '#') OPTAFTER.thrw(info, pic);
+            if(group) GROUPADJ.thrw(info, pic);
             group = true;
           }
         }
       }
-      if(z == -1) NOMAND.thrw(input, pic);
-      if(group) GROUPEND.thrw(input, pic);
+      if(z == -1) NOMAND.thrw(info, pic);
+      if(group) GROUPEND.thrw(info, pic);
     }
 
     // if necessary, extract primary format token from the original string
@@ -160,7 +160,7 @@ public final class FormatParser extends FormatUtil {
         if(ch(pic, ++pos) == '(') {
           while(ch(pic, ++pos) != ')') {
             // ordinal isn't closed by a parenthesis
-            if(pos == l) ORDCLOSED.thrw(input, pic);
+            if(pos == l) ORDCLOSED.thrw(info, pic);
             tb.add(ch(pic, pos));
           }
           ++pos;
@@ -174,7 +174,7 @@ public final class FormatParser extends FormatUtil {
       // check for optional format modifier
       if(pos < l) {
         // invalid remaining input
-        if(ch(pic, pos) != ',') PICCOMP.thrw(input, pic);
+        if(ch(pic, pos) != ',') PICCOMP.thrw(info, pic);
         pm = concat(pm, substring(pic, pos));
       }
     }

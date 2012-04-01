@@ -32,14 +32,14 @@ public final class CNSpace extends CName {
   public FNames item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item it = name.item(ctx, input);
+    final Item it = name.item(ctx, info);
     final byte[] cp = checkEStr(it);
-    if(cp.length != 0 && !XMLToken.isNCName(cp)) INVNAME.thrw(input, expr[0]);
+    if(cp.length != 0 && !XMLToken.isNCName(cp)) INVNAME.thrw(info, expr[0]);
 
     final byte[] cu = trim(value(ctx, ii));
-    if(eq(cp, XML) ^ eq(cu, XMLURI)) CNXML.thrw(input);
-    if(eq(cp, XMLNS)) CNINV.thrw(input, cp);
-    if(eq(cu, XMLNSURI) || cu.length == 0) CNINV.thrw(input, cu);
+    if(eq(cp, XML) ^ eq(cu, XMLURI)) CNXML.thrw(info);
+    if(eq(cp, XMLNS)) CNINV.thrw(info, cp);
+    if(eq(cu, XMLNSURI) || cu.length == 0) CNINV.thrw(info, cu);
 
     return new FNames(cp, cu);
   }

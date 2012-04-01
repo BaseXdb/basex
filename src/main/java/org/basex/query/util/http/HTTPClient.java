@@ -29,7 +29,7 @@ import org.basex.util.hash.*;
  */
 public final class HTTPClient {
   /** Input information. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Database properties. */
   private final Prop prop;
 
@@ -39,7 +39,7 @@ public final class HTTPClient {
    * @param pr database properties
    */
   public HTTPClient(final InputInfo ii, final Prop pr) {
-    input = ii;
+    info = ii;
     prop = pr;
   }
 
@@ -56,19 +56,19 @@ public final class HTTPClient {
 
     try {
       if(request == null) {
-        if(href == null || href.length == 0) NOPARAMS.thrw(input);
+        if(href == null || href.length == 0) NOPARAMS.thrw(info);
         final HttpURLConnection conn = openConnection(string(href));
         try {
-          return new HTTPResponse(input, prop).getResponse(
+          return new HTTPResponse(info, prop).getResponse(
               conn, Bln.FALSE.string(), null);
         } finally {
           conn.disconnect();
         }
       }
 
-      final HTTPRequest r = new HTTPRequestParser(input).parse(request, bodies);
+      final HTTPRequest r = new HTTPRequestParser(info).parse(request, bodies);
       final byte[] dest = href == null ? r.attrs.get(HREF) : href;
-      if(dest == null) NOURL.thrw(input);
+      if(dest == null) NOURL.thrw(info);
 
       final HttpURLConnection conn = openConnection(string(dest));
       try {
@@ -79,18 +79,18 @@ public final class HTTPClient {
           setContentType(conn, r);
           setRequestContent(conn.getOutputStream(), r);
         }
-        return new HTTPResponse(input, prop).getResponse(
+        return new HTTPResponse(info, prop).getResponse(
             conn, r.attrs.get(STATUS_ONLY), r.attrs.get(OVERRIDE_MEDIA_TYPE));
       } finally {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      throw HTTPERR.thrw(input, "Invalid URL");
+      throw HTTPERR.thrw(info, "Invalid URL");
     } catch(final ProtocolException ex) {
-      throw HTTPERR.thrw(input, "Invalid HTTP method");
+      throw HTTPERR.thrw(info, "Invalid HTTP method");
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw HTTPERR.thrw(input, ex);
+      throw HTTPERR.thrw(info, ex);
     }
   }
 
@@ -107,7 +107,7 @@ public final class HTTPClient {
 
     final URL url = new URL(dest);
     if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
-      HTTPERR.thrw(input, "Invalid URL");
+      HTTPERR.thrw(info, "Invalid URL");
     return (HttpURLConnection) url.openConnection();
   }
 
@@ -126,7 +126,7 @@ public final class HTTPClient {
     final byte[] timeout = r.attrs.get(TIMEOUT);
     if(timeout != null) conn.setConnectTimeout(parseInt(string(timeout)));
     final byte[] redirect = r.attrs.get(FOLLOW_REDIRECT);
-    if(redirect != null) setFollowRedirects(Bln.parse(redirect, input));
+    if(redirect != null) setFollowRedirects(Bln.parse(redirect, info));
   }
 
   /**
@@ -169,7 +169,7 @@ public final class HTTPClient {
           string(r.headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
-    if(sendAuth != null && Bln.parse(sendAuth, input))
+    if(sendAuth != null && Bln.parse(sendAuth, info))
       conn.setRequestProperty(AUTHORIZATION,
         encodeCredentials(string(r.attrs.get(USERNAME)),
             string(r.attrs.get(PASSWORD))));
@@ -267,7 +267,7 @@ public final class HTTPClient {
       if(item instanceof B64) {
         out.write(((B64) item).toJava());
       } else {
-        out.write(new B64(item.string(input)).toJava());
+        out.write(new B64(item.string(info)).toJava());
       }
     }
   }
@@ -287,7 +287,7 @@ public final class HTTPClient {
       if(item instanceof Hex) {
         out.write(((Hex) item).toJava());
       } else {
-        out.write(new Hex(item.string(input)).toJava());
+        out.write(new Hex(item.string(info)).toJava());
       }
     }
   }

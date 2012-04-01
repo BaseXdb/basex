@@ -29,31 +29,36 @@ public final class UserFuncs extends ExprInfo {
    * Returns the specified function.
    * @param name name of the function
    * @param args optional arguments
-   * @param dyn compile-/run-time flag
+   * @param ii input info
+   * @return function instance
+   */
+  TypedFunc get(final QNm name, final Expr[] args, final InputInfo ii) {
+
+    final int id = indexOf(name, args);
+    if(id == -1) return null;
+
+    // function has already been declared
+    final UserFuncCall call = add(ii, funcs[id].name, id, args);
+    final FuncType type = FuncType.get(funcs[id]);
+    return new TypedFunc(call, type);
+  }
+
+  /**
+   * Adds and returns a user-defined function that has not been defined yet.
+   * @param name name of the function
+   * @param args optional arguments
    * @param ii input info
    * @return function instance
    * @throws QueryException query exception
    */
-  TypedFunc get(final QNm name, final Expr[] args, final boolean dyn, final InputInfo ii)
+  TypedFunc add(final QNm name, final Expr[] args, final InputInfo ii)
       throws QueryException {
 
-    final UserFuncCall call;
-    final FuncType type;
-
+    // add function call for function that has not been declared yet
     final int al = args.length;
-    final int id = indexOf(name, args);
-    if(id != -1) {
-      // function has already been defined
-      call = add(ii, funcs[id].name, id, args);
-      type = FuncType.get(funcs[id]);
-    } else if(!dyn && FuncType.find(name) == null) {
-      // add function call for function that has not been defined yet
-      final UserFunc uf = new UserFunc(ii, name, new Var[al], null, null, false);
-      call = add(ii, name, add(uf, ii), args);
-      type = FuncType.arity(al);
-    } else {
-      return null;
-    }
+    final UserFunc uf = new UserFunc(ii, name, new Var[al], null, null, false);
+    final UserFuncCall call = add(ii, name, add(uf, ii), args);
+    final FuncType type = FuncType.arity(al);
     return new TypedFunc(call, type);
   }
 
@@ -151,11 +156,11 @@ public final class UserFuncs extends ExprInfo {
         for(final UserFunc uf : funcs) {
           // check if another function with same name exists
           if(f != uf && f.name.eq(uf.name)) {
-            FUNCTYPE.thrw(f.input, uf.name.string());
+            FUNCTYPE.thrw(f.info, uf.name.string());
           }
         }
         // if not, indicate that function is unknown
-        FUNCUNKNOWN.thrw(f.input, f.name.string());
+        FUNCUNKNOWN.thrw(f.info, f.name.string());
       }
       f.checkUp();
     }

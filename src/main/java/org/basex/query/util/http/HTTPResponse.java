@@ -28,7 +28,7 @@ import org.basex.util.list.*;
  */
 public final class HTTPResponse {
   /** Input information. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Database properties. */
   private final Prop prop;
 
@@ -38,7 +38,7 @@ public final class HTTPResponse {
    * @param pr database properties
    */
   public HTTPResponse(final InputInfo ii, final Prop pr) {
-    input = ii;
+    info = ii;
     prop = pr;
   }
 
@@ -61,7 +61,7 @@ public final class HTTPResponse {
         extractContentType(conn.getContentType()) : string(mediaTypeOvr);
     final ValueBuilder payloads = new ValueBuilder();
     final FNode body;
-    final boolean s = status != null && Bln.parse(status, input);
+    final boolean s = status != null && Bln.parse(status, info);
 
     // multipart response
     if(cType.startsWith(MULTIPART)) {
@@ -200,7 +200,7 @@ public final class HTTPResponse {
       // RFC 1341: Preamble shall be ignored -> read till 1st boundary
       while(next != null && !eq(sep, next))
         next = readLine(io);
-      if(next == null) REQINV.thrw(input, "No body specified for http:part");
+      if(next == null) REQINV.thrw(info, "No body specified for http:part");
 
       final byte[] end = concat(sep, token("--"));
       FElem nextPart = extractNextPart(io, status, payloads, sep, end);
@@ -355,7 +355,7 @@ public final class HTTPResponse {
    */
   private byte[] extractBoundary(final String c) throws QueryException {
     int index = c.toLowerCase(Locale.ENGLISH).lastIndexOf("boundary=");
-    if(index == -1) REQINV.thrw(input, "No separation boundary specified");
+    if(index == -1) REQINV.thrw(info, "No separation boundary specified");
     String b = c.substring(index + 9); // 9 for "boundary="
     if(b.charAt(0) == '"') {
       // if the boundary is enclosed in quotes, strip them

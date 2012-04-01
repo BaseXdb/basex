@@ -52,7 +52,7 @@ public final class FNAcc extends StandardFunc {
       case NORMALIZE_SPACE:
         return Str.get(norm(checkEStr(e, ctx)));
       case NAMESPACE_URI_FROM_QNAME:
-        final Item it = e.item(ctx, input);
+        final Item it = e.item(ctx, info);
         return it == null ? null : Uri.uri(((QNm) checkType(it, AtomType.QNM)).uri());
       default:
         return super.item(ctx, ii);
@@ -70,7 +70,7 @@ public final class FNAcc extends StandardFunc {
   private Item string(final Expr e, final InputInfo ii,
       final QueryContext ctx) throws QueryException {
 
-    final Item it = e.item(ctx, input);
+    final Item it = e.item(ctx, info);
     if(it == null) return Str.ZERO;
     final Type t = it.type;
     if(t.isFunction()) FNSTR.thrw(ii, this);
@@ -90,9 +90,9 @@ public final class FNAcc extends StandardFunc {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
     final Type t = it.type;
-    if(t.isFunction()) FNATM.thrw(input, this);
+    if(t.isFunction()) FNATM.thrw(info, this);
     try {
-      return t == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, input);
+      return t == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, info);
     } catch(final QueryException ex) {
       return Dbl.NAN;
     }

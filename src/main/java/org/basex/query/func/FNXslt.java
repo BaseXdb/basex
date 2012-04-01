@@ -103,7 +103,7 @@ public final class FNXslt extends StandardFunc {
     } catch(final Exception ex) {
       Util.debug(ex);
       // return cause of reflection error, or error itself
-      throw IOERR.thrw(input, ex instanceof InvocationTargetException ?
+      throw IOERR.thrw(info, ex instanceof InvocationTargetException ?
           ex.getCause() : ex);
     }
   }
@@ -125,23 +125,23 @@ public final class FNXslt extends StandardFunc {
     if(arg >= expr.length) return tm;
 
     // empty sequence...
-    final Item it = expr[arg].item(ctx, input);
+    final Item it = expr[arg].item(ctx, info);
     if(it == null) return tm;
 
     // XQuery map: convert to internal map
-    if(it instanceof Map) return ((Map) it).tokenJavaMap(input);
+    if(it instanceof Map) return ((Map) it).tokenJavaMap(info);
     // no element: convert XQuery map to internal map
-    if(!it.type().eq(SeqType.ELM)) throw NODFUNTYPE.thrw(input, this, it.type);
+    if(!it.type().eq(SeqType.ELM)) throw NODFUNTYPE.thrw(info, this, it.type);
 
     // parse nodes
     ANode node = (ANode) it;
-    if(!node.qname().eq(root)) PARWHICH.thrw(input, node.qname());
+    if(!node.qname().eq(root)) PARWHICH.thrw(info, node.qname());
 
     // interpret query parameters
     final AxisIter ai = node.children();
     while((node = ai.next()) != null) {
       final QNm qn = node.qname();
-      if(!eq(qn.uri(), XSLTURI)) PARWHICH.thrw(input, qn);
+      if(!eq(qn.uri(), XSLTURI)) PARWHICH.thrw(info, qn);
       tm.add(qn.local(), node.children().next());
     }
     return tm;
@@ -156,7 +156,7 @@ public final class FNXslt extends StandardFunc {
    * @throws Exception exception
    */
   private IO read(final Expr e, final QueryContext ctx) throws Exception {
-    final Item it = checkNoEmpty(e.item(ctx, input));
+    final Item it = checkNoEmpty(e.item(ctx, info));
     final Type ip = it.type;
     if(ip.isNode()) {
       final ArrayOutput ao = new ArrayOutput();
@@ -165,8 +165,8 @@ public final class FNXslt extends StandardFunc {
       ser.close();
       return new IOContent(ao.toArray());
     }
-    if(ip.isString()) return IO.get(string(it.string(input)));
-    throw STRNODTYPE.thrw(input, this, ip);
+    if(ip.isString()) return IO.get(string(it.string(info)));
+    throw STRNODTYPE.thrw(info, this, ip);
   }
 
   @Override

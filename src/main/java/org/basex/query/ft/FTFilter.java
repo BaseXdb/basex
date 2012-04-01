@@ -35,7 +35,7 @@ public abstract class FTFilter extends FTExpr {
   @Override
   public final FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FTNode it = expr[0].item(ctx, input);
+    final FTNode it = expr[0].item(ctx, info);
     filter(ctx, it, ctx.fttoken);
     return it;
   }
@@ -50,7 +50,7 @@ public abstract class FTFilter extends FTExpr {
         FTNode it;
         while((it = ir.next()) != null) {
           if(filter(ctx, it, content() ?
-              new FTLexer().init(it.string(input)) : null)) break;
+              new FTLexer().init(it.string(info)) : null)) break;
         }
         return it;
       }

@@ -60,8 +60,8 @@ public final class Or extends Logical {
     double d = 0;
     boolean f = false;
     for(final Expr e : expr) {
-      final Item it = e.ebv(ctx, input);
-      if(it.bool(input)) {
+      final Item it = e.ebv(ctx, info);
+      if(it.bool(info)) {
         final double s = it.score();
         if(s == 0) return Bln.TRUE;
         d = Scoring.or(d, s);
@@ -94,7 +94,7 @@ public final class Or extends Logical {
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new Union(input, expr);
+    return new Union(info, expr);
   }
 
   @Override

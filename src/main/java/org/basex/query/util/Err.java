@@ -176,6 +176,8 @@ public enum Err {
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
   PKGINST(PACK, 2, "Package '%' is already installed."),
+  /** PACK0002: Evaluation exception. */
+  MODINST(PACK, 2, "Module '%' is already installed."),
   /** PACK0003: Evaluation exception. */
   NECPKGNOTINST(PACK, 3, "Required package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
@@ -232,7 +234,7 @@ public enum Err {
   /** FORG0006: Evaluation exception. */
   TYPECMP(FORG, 6, "% is not comparable."),
   /** FORG0006: Evaluation exception. */
-  JAVAFUN(FORG, 6, "Invalid arguments: %(%) found."),
+  JAVAFUN(FORG, 6, "Invalid call of Java function: %(%)."),
   /** FORG0006: Evaluation exception. */
   JAVAMOD(FORG, 6, "Invalid arguments: % expected, % found."),
   /** FORG0006: Evaluation exception. */
@@ -1058,7 +1060,7 @@ public enum Err {
    */
   public static QueryException type(final ParseExpr e, final Type t, final Item it)
       throws QueryException {
-    throw XPTYPE.thrw(e.input, e.description(), t, it.type);
+    throw XPTYPE.thrw(e.info, e.description(), t, it.type);
   }
 
   /**
@@ -1070,7 +1072,7 @@ public enum Err {
    */
   public static QueryException number(final ParseExpr e, final Item it)
       throws QueryException {
-    throw XPTYPENUM.thrw(e.input, e.description(), it.type);
+    throw XPTYPENUM.thrw(e.info, e.description(), it.type);
   }
 
   /**

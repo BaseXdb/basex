@@ -22,9 +22,9 @@ public final class InputInfo {
    * @param p input parser, containing information on the current parsing state
    */
   public InputInfo(final InputParser p) {
-    query = p.query;
+    query = p.input;
     file = p.file;
-    pos = p.qp;
+    pos = p.ip;
   }
 
   /**

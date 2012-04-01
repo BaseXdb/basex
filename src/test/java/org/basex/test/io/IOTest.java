@@ -2,10 +2,8 @@ package org.basex.test.io;
 
 import static org.junit.Assert.*;
 
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.IOUrl;
-import org.junit.Test;
+import org.basex.io.*;
+import org.junit.*;
 
 /**
  * Test class for IO methods.
@@ -28,7 +26,7 @@ public final class IOTest {
   @Test
   public void fileToURL() {
     final String url = new IOFile("X Y").url();
-    assertTrue(url.startsWith(IO.FILEPREF + '/'));
+    assertTrue(url.startsWith("file:/"));
     assertTrue(url.endsWith("X%20Y"));
   }
 }

@@ -67,8 +67,8 @@ public final class If extends Arr {
     // if A then B else true() -> not(A) or B
     if(expr[1].type().eq(SeqType.BLN) && expr[2] == Bln.TRUE) {
       ctx.compInfo(OPTWRITE, this);
-      final Expr e = Function.NOT.get(input, expr[0]);
-      return expr[1] == Bln.FALSE ? e : new Or(input, e, expr[1]);
+      final Expr e = Function.NOT.get(info, expr[0]);
+      return expr[1] == Bln.FALSE ? e : new Or(info, e, expr[1]);
     }
 
     type = expr[1].type().intersect(expr[2].type());
@@ -88,7 +88,7 @@ public final class If extends Arr {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return eval(ctx).item(ctx, input);
+    return eval(ctx).item(ctx, info);
   }
 
   /**
@@ -98,7 +98,7 @@ public final class If extends Arr {
    * @throws QueryException query exception
    */
   private Expr eval(final QueryContext ctx) throws QueryException {
-    return expr[expr[0].ebv(ctx, input).bool(input) ? 1 : 2];
+    return expr[expr[0].ebv(ctx, info).bool(info) ? 1 : 2];
   }
 
   @Override

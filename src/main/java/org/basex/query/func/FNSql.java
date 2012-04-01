@@ -136,7 +136,7 @@ public final class FNSql extends StandardFunc {
    */
   private Item init(final QueryContext ctx) throws QueryException {
     final String driver = string(checkStr(expr[0], ctx));
-    if(Reflect.find(driver) == null) SQLINIT.thrw(input, driver);
+    if(Reflect.find(driver) == null) SQLINIT.thrw(info, driver);
     return null;
   }
 
@@ -178,7 +178,7 @@ public final class FNSql extends StandardFunc {
       }
       return Int.get(ctx.jdbc().add(getConnection(url)));
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     }
   }
 
@@ -211,7 +211,7 @@ public final class FNSql extends StandardFunc {
       final PreparedStatement prep = conn.prepareStatement(string(prepStmt));
       return Int.get(ctx.jdbc().add(prep));
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     }
   }
 
@@ -222,9 +222,9 @@ public final class FNSql extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter execute(final QueryContext ctx) throws QueryException {
-    final int id = (int) checkItr(expr[0].item(ctx, input));
+    final int id = (int) checkItr(expr[0].item(ctx, info));
     final Object obj = ctx.jdbc().get(id);
-    if(obj == null) throw NOCONN.thrw(input, id);
+    if(obj == null) throw NOCONN.thrw(info, id);
     // Execute query or prepared statement
     return obj instanceof Connection ? executeQuery((Connection) obj, ctx)
         : executePrepStmt((PreparedStatement) obj, ctx);
@@ -247,7 +247,7 @@ public final class FNSql extends StandardFunc {
       final boolean result = stmt.execute(query);
       return result ? buildResult(stmt.getResultSet()) : new NodeCache();
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     } finally {
       if(stmt != null) try { stmt.close(); } catch(final SQLException ex) { }
     }
@@ -263,18 +263,18 @@ public final class FNSql extends StandardFunc {
   private NodeCache executePrepStmt(final PreparedStatement stmt,
       final QueryContext ctx) throws QueryException {
     // Get parameters for prepared statement
-    final ANode params = (ANode) checkType(expr[1].item(ctx, input),
+    final ANode params = (ANode) checkType(expr[1].item(ctx, info),
         NodeType.ELM);
-    if(!params.qname().eq(E_PARAMS)) PARWHICH.thrw(input, params.qname());
+    if(!params.qname().eq(E_PARAMS)) PARWHICH.thrw(info, params.qname());
     try {
       final int placeCount = stmt.getParameterMetaData().getParameterCount();
       // Check if number of parameters equals number of place holders
-      if(placeCount != countParams(params)) PARAMS.thrw(input);
+      if(placeCount != countParams(params)) PARAMS.thrw(info);
       else setParameters(params.children(), stmt);
       final boolean result = stmt.execute();
       return result ? buildResult(stmt.getResultSet()) : new NodeCache();
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     }
   }
 
@@ -303,7 +303,7 @@ public final class FNSql extends StandardFunc {
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       // Check name
-      if(!next.qname().eq(E_PARAM)) PARWHICH.thrw(input, next.qname());
+      if(!next.qname().eq(E_PARAM)) PARWHICH.thrw(info, next.qname());
       final AxisIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;
@@ -312,11 +312,11 @@ public final class FNSql extends StandardFunc {
         if(eq(attr.name(), TYPE)) paramType = attr.string();
         // Attribute "null"
         else if(eq(attr.name(), NULL))
-          isNull = attr.string() != null && Bln.parse(attr.string(), input);
+          isNull = attr.string() != null && Bln.parse(attr.string(), info);
         // Not expected attribute
-        else throw NOTEXPATTR.thrw(input, string(attr.name()));
+        else throw NOTEXPATTR.thrw(info, string(attr.name()));
       }
-      if(paramType == null) NOPARAMTYPE.thrw(input);
+      if(paramType == null) NOPARAMTYPE.thrw(info);
       final byte[] v = next.string();
       isNull |= v.length == 0;
       setParam(++i, stmt, paramType, isNull ? null : string(v), isNull);
@@ -364,12 +364,12 @@ public final class FNSql extends StandardFunc {
         if(isNull) stmt.setNull(index, Types.TIMESTAMP);
         else stmt.setTimestamp(index, Timestamp.valueOf(value));
       } else {
-        throw SQLEXC.thrw(input, "unsupported type: " + string(paramType));
+        throw SQLEXC.thrw(info, "unsupported type: " + string(paramType));
       }
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     } catch(final IllegalArgumentException ex) {
-      throw ILLFORMAT.thrw(input, string(paramType));
+      throw ILLFORMAT.thrw(info, string(paramType));
     }
   }
 
@@ -409,7 +409,7 @@ public final class FNSql extends StandardFunc {
       }
       return rows;
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     }
   }
 
@@ -424,7 +424,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, true).close();
       return null;
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     }
   }
 
@@ -439,7 +439,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, false).commit();
       return null;
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     }
   }
 
@@ -454,7 +454,7 @@ public final class FNSql extends StandardFunc {
       connection(ctx, false).rollback();
       return null;
     } catch(final SQLException ex) {
-      throw SQLEXC.thrw(input, ex.getMessage());
+      throw SQLEXC.thrw(info, ex.getMessage());
     }
   }
 
@@ -468,9 +468,9 @@ public final class FNSql extends StandardFunc {
    */
   private Connection connection(final QueryContext ctx, final boolean del)
       throws QueryException {
-    final int id = (int) checkItr(expr[0].item(ctx, input));
+    final int id = (int) checkItr(expr[0].item(ctx, info));
     final Object obj = ctx.jdbc().get(id);
-    if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(input, id);
+    if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(info, id);
     if(del) ctx.jdbc().remove(id);
     return (Connection) obj;
   }
@@ -491,23 +491,23 @@ public final class FNSql extends StandardFunc {
     if(arg >= expr.length) return tm;
 
     // empty sequence...
-    final Item it = expr[arg].item(ctx, input);
+    final Item it = expr[arg].item(ctx, info);
     if(it == null) return tm;
 
     // XQuery map: convert to internal map
-    if(it instanceof Map) return ((Map) it).tokenJavaMap(input);
+    if(it instanceof Map) return ((Map) it).tokenJavaMap(info);
     // no element: convert XQuery map to internal map
-    if(!it.type().eq(SeqType.ELM)) throw NODFUNTYPE.thrw(input, this, it.type);
+    if(!it.type().eq(SeqType.ELM)) throw NODFUNTYPE.thrw(info, this, it.type);
 
     // parse nodes
     ANode node = (ANode) it;
-    if(!node.qname().eq(root)) PARWHICH.thrw(input, node.qname());
+    if(!node.qname().eq(root)) PARWHICH.thrw(info, node.qname());
 
     // interpret query parameters
     final AxisIter ai = node.children();
     while((node = ai.next()) != null) {
       final QNm qn = node.qname();
-      if(!eq(qn.uri(), SQLURI)) PARWHICH.thrw(input, qn);
+      if(!eq(qn.uri(), SQLURI)) PARWHICH.thrw(info, qn);
       tm.add(qn.local(), node.children().next());
     }
     return tm;

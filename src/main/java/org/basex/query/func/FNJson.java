@@ -43,9 +43,9 @@ public final class FNJson extends StandardFunc {
       throws QueryException {
     switch(sig) {
       case _JSON_PARSE:
-        return new JSONConverter(input).parse(checkStr(expr[0], ctx));
+        return new JSONConverter(info).parse(checkStr(expr[0], ctx));
       case _JSON_PARSE_ML:
-        return new JsonMLConverter(input).parse(checkStr(expr[0], ctx));
+        return new JsonMLConverter(info).parse(checkStr(expr[0], ctx));
       case _JSON_SERIALIZE:
         return serialize(false, ctx);
       case _JSON_SERIALIZE_ML:
@@ -75,9 +75,9 @@ public final class FNJson extends StandardFunc {
       node.serialize(json);
       json.close();
     } catch(final SerializerException ex) {
-      throw ex.getCause(input);
+      throw ex.getCause(info);
     } catch(final IOException ex) {
-      SERANY.thrw(input, ex);
+      SERANY.thrw(info, ex);
     }
     return Str.get(delete(ao.toArray(), '\r'));
   }

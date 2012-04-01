@@ -109,7 +109,7 @@ public final class FNMap extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value get(final QueryContext ctx) throws QueryException {
-    return map(ctx).get(expr[1].item(ctx, input), input);
+    return map(ctx).get(expr[1].item(ctx, info), info);
   }
 
   /**

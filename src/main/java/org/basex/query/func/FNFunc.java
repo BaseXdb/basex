@@ -132,7 +132,7 @@ public final class FNFunc extends StandardFunc {
           if(it != null) return it;
           final Item x = xs.next();
           if(x == null) return null;
-          ys = f.invIter(ctx, input, x);
+          ys = f.invIter(ctx, info, x);
         } while(true);
       }
     };
@@ -153,7 +153,7 @@ public final class FNFunc extends StandardFunc {
         do {
           final Item it = xs.next();
           if(it == null) return null;
-          if(checkBln(checkNoEmpty(f.invItem(ctx, input, it)), ctx)) return it;
+          if(checkBln(checkNoEmpty(f.invItem(ctx, info, it)), ctx)) return it;
         } while(true);
       }
     };
@@ -180,7 +180,7 @@ public final class FNFunc extends StandardFunc {
           if(it != null) return it;
           final Item x = xs.next(), y = ys.next();
           if(x == null || y == null) return null;
-          zs = zipper.invIter(ctx, input, x, y);
+          zs = zipper.invIter(ctx, info, x, y);
         } while(true);
       }
     };
@@ -201,7 +201,7 @@ public final class FNFunc extends StandardFunc {
     if(x == null) return expr[1].iter(ctx);
 
     Value sum = ctx.value(expr[1]);
-    do sum = f.invValue(ctx, input, sum, x);
+    do sum = f.invValue(ctx, info, sum, x);
     while((x = xs.next()) != null);
 
     return sum.iter();
@@ -221,7 +221,7 @@ public final class FNFunc extends StandardFunc {
 
     Value res = ctx.value(expr[1]);
     for(long i = xs.size(); --i >= 0;)
-      res = f.invValue(ctx, input, xs.itemAt(i), res);
+      res = f.invValue(ctx, info, xs.itemAt(i), res);
 
     return res.iter();
   }

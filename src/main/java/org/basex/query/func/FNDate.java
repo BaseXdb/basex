@@ -41,10 +41,10 @@ public final class FNDate extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr[0].item(ctx, input);
+    final Item it = expr[0].item(ctx, info);
     if(it == null) return null;
     final boolean d = expr.length == 2;
-    final Item zon = d ? expr[1].item(ctx, input) : null;
+    final Item zon = d ? expr[1].item(ctx, info) : null;
 
     switch(sig) {
       case YEARS_FROM_DURATION:
@@ -185,7 +185,7 @@ public final class FNDate extends StandardFunc {
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.type.isUntyped() ? t.cast(it, ctx, input) : checkType(it, t);
+    return it.type.isUntyped() ? t.cast(it, ctx, info) : checkType(it, t);
   }
 
   /**
@@ -197,7 +197,7 @@ public final class FNDate extends StandardFunc {
    */
   private Item checkDur(final Item it) throws QueryException {
     final Type ip = it.type;
-    if(ip.isUntyped()) return new Dur(it.string(input), input);
+    if(ip.isUntyped()) return new Dur(it.string(info), info);
     if(!ip.isDuration()) Err.type(this, AtomType.DUR, it);
     return it;
   }
@@ -213,7 +213,7 @@ public final class FNDate extends StandardFunc {
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.type.isUntyped() ? new Dat(it.string(input), input) :
+    final Item i = it.type.isUntyped() ? new Dat(it.string(info), info) :
       checkType(it, AtomType.DAT);
     return adjust((Date) i, zon, d);
   }
@@ -229,7 +229,7 @@ public final class FNDate extends StandardFunc {
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.type.isUntyped() ? new Dtm(it.string(input), input) :
+    final Item i = it.type.isUntyped() ? new Dtm(it.string(info), info) :
       checkType(it, AtomType.DTM);
     return adjust((Date) i, zon, d);
   }
@@ -245,7 +245,7 @@ public final class FNDate extends StandardFunc {
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.type.isUntyped() ? new Tim(it.string(input), input) :
+    final Item i = it.type.isUntyped() ? new Tim(it.string(info), info) :
       checkType(it, AtomType.TIM);
     return adjust((Date) i, zon, d);
   }
@@ -261,9 +261,9 @@ public final class FNDate extends StandardFunc {
     if(tm == null) return null;
 
     final Item d = date.type.isUntyped() ?
-        new Dat(date.string(input), input) : date;
+        new Dat(date.string(info), info) : date;
     final Item t = tm.type.isUntyped() ?
-        new Tim(tm.string(input), input) : tm;
+        new Tim(tm.string(info), info) : tm;
 
     final Dtm dtm = new Dtm((Dat) checkType(d, AtomType.DAT));
     final Tim tim = (Tim) checkType(t, AtomType.TIM);
@@ -275,7 +275,7 @@ public final class FNDate extends StandardFunc {
     if(dtm.xc.getTimezone() == Item.UNDEF) {
       dtm.xc.setTimezone(zone);
     } else if(dtm.xc.getTimezone() != zone && zone != Item.UNDEF) {
-      FUNZONE.thrw(input, dtm, tim);
+      FUNZONE.thrw(info, dtm, tim);
     }
     return dtm;
   }
@@ -305,7 +305,7 @@ public final class FNDate extends StandardFunc {
       final DTd dtd = (DTd) checkType(zon, AtomType.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
       if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) {
-        INVALZONE.thrw(input, zon);
+        INVALZONE.thrw(info, zon);
       }
     }
     if(zn != Item.UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));

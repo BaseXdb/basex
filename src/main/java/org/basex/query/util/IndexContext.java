@@ -64,8 +64,8 @@ public final class IndexContext {
       if(text) return root;
       // add attribute step
       if(step.test.name == null) return root;
-      return Path.get(root.input, root,
-          AxisStep.get(step.input, Axis.SELF, step.test));
+      return Path.get(root.info, root,
+          AxisStep.get(step.info, Axis.SELF, step.test));
     }
 
     final AxisPath orig = (AxisPath) ex;
@@ -74,7 +74,7 @@ public final class IndexContext {
       // add attribute step
       final AxisStep s = orig.step(orig.steps.length - 1);
       if(s.test.name != null) {
-        Expr[] steps = { AxisStep.get(s.input, Axis.SELF, s.test) };
+        Expr[] steps = { AxisStep.get(s.info, Axis.SELF, s.test) };
         for(final Expr e : path.steps) steps = Array.add(steps, e);
         path.steps = steps;
       }

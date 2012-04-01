@@ -64,7 +64,7 @@ public final class FLWR extends GFLWOR {
             while(iter[p].next() != null) {
               if(p + 1 != fl.length) {
                 ++p;
-              } else if(where == null || where.ebv(ctx, input).bool(input)) {
+              } else if(where == null || where.ebv(ctx, info).bool(info)) {
                 rtrn = ctx.iter(ret);
                 break;
               }

@@ -82,8 +82,8 @@ public final class JSONConverter extends XMLConverter {
   }
 
   @Override
-  public ANode parse(final byte[] q) throws QueryException {
-    final JStruct node = new JSONParser(q, input).parse();
+  public ANode parse(final byte[] in) throws QueryException {
+    final JStruct node = new JSONParser(in, info).parse();
     // find unique data types
     types.add(T_JSON, node.getClass());
     analyze(node);

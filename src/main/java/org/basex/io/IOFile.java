@@ -164,29 +164,6 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public boolean isArchive() {
-    return isSuffix(ZIPSUFFIXES);
-  }
-
-  @Override
-  public boolean isXML() {
-    return isSuffix(XMLSUFFIXES);
-  }
-
-  /**
-   * Tests if the file suffix matches the specified suffixes.
-   * @param suffixes suffixes to compare with
-   * @return result of check
-   */
-  private boolean isSuffix(final String[] suffixes) {
-    final int i = path.lastIndexOf('.');
-    if(i == -1) return false;
-    final String suf = path.substring(i).toLowerCase(Locale.ENGLISH);
-    for(final String z : suffixes) if(suf.equals(z)) return true;
-    return false;
-  }
-
-  @Override
   public InputSource inputSource() {
     return is == null ? new InputSource(path) : new InputSource(is);
   }

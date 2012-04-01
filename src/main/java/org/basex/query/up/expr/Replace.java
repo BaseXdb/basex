@@ -51,16 +51,16 @@ public final class Replace extends Update {
       throws QueryException {
 
     final Constr c = new Constr(ii, ctx).add(expr[1]);
-    if(c.errAtt) UPNOATTRPER.thrw(input);
-    if(c.duplAtt != null) UPATTDUPL.thrw(input, c.duplAtt);
+    if(c.errAtt) UPNOATTRPER.thrw(info);
+    if(c.duplAtt != null) UPATTDUPL.thrw(info, c.duplAtt);
 
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     // check target constraints
-    if(i == null) throw UPSEQEMP.thrw(input, Util.name(this));
+    if(i == null) throw UPSEQEMP.thrw(info, Util.name(this));
     final Type tp = i.type;
     if(!(i instanceof ANode) || tp == NodeType.DOC || t.next() != null)
-      UPTRGMULT.thrw(input);
+      UPTRGMULT.thrw(info);
     final ANode targ = (ANode) i;
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
 
@@ -70,25 +70,25 @@ public final class Replace extends Update {
     if(value) {
       // replace value of node
       final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).string();
-      if(tp == NodeType.COM) FComm.parse(txt, input);
-      if(tp == NodeType.PI) FPI.parse(txt, input);
+      if(tp == NodeType.COM) FComm.parse(txt, info);
+      if(tp == NodeType.PI) FPI.parse(txt, info);
 
       ctx.updates.add(tp == NodeType.ELM ?
-          new ReplaceElementContent(dbn.pre, dbn.data, input, txt) :
-          new ReplaceValue(dbn.pre, dbn.data, input, txt), ctx);
+          new ReplaceElementContent(dbn.pre, dbn.data, info, txt) :
+          new ReplaceValue(dbn.pre, dbn.data, info, txt), ctx);
     } else {
       final ANode par = targ.parent();
-      if(par == null) UPNOPAR.thrw(input, i);
+      if(par == null) UPNOPAR.thrw(info, i);
       if(tp == NodeType.ATT) {
         // replace attribute node
-        if(list.size() > 0) UPWRATTR.thrw(input);
+        if(list.size() > 0) UPWRATTR.thrw(info);
         list = checkNS(aList, par, ctx);
       } else {
         // replace non-attribute node
-        if(aList.size() > 0) UPWRELM.thrw(input);
+        if(aList.size() > 0) UPWRELM.thrw(info);
       }
       // conforms to specification: insertion sequence may be empty
-      ctx.updates.add(new ReplaceNode(dbn.pre, dbn.data, input, list), ctx);
+      ctx.updates.add(new ReplaceNode(dbn.pre, dbn.data, info, list), ctx);
     }
     return null;
   }

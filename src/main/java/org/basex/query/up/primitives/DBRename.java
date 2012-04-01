@@ -26,12 +26,10 @@ public final class DBRename extends UpdatePrimitive {
    * @param d data
    * @param src source path
    * @param trg target path
-   * @param info input info
+   * @param ii input info
    */
-  public DBRename(final Data d, final String src, final String trg,
-      final InputInfo info) {
-
-    super(PrimitiveType.DBRENAME, -1, d, info);
+  public DBRename(final Data d, final String src, final String trg, final InputInfo ii) {
+    super(PrimitiveType.DBRENAME, -1, d, ii);
     map.put(src, trg);
   }
 
@@ -39,7 +37,7 @@ public final class DBRename extends UpdatePrimitive {
   public void merge(final UpdatePrimitive p) throws QueryException {
     for(final Entry<String, String> e : ((DBRename) p).map.entrySet()) {
       final String src = e.getKey();
-      if(map.containsKey(src)) UPPATHREN.thrw(input, src);
+      if(map.containsKey(src)) UPPATHREN.thrw(info, src);
       map.put(src, e.getValue());
     }
   }

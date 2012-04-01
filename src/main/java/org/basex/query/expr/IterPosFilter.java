@@ -21,7 +21,7 @@ final class IterPosFilter extends Filter {
    * @param o offset flag
    */
   IterPosFilter(final Filter f, final boolean o) {
-    super(f.input, f.root, f.preds);
+    super(f.info, f.root, f.preds);
     off = o;
     type = f.type;
     last = f.last;
@@ -44,11 +44,11 @@ final class IterPosFilter extends Filter {
         if(iter == null) {
           if(off) {
             // evaluate offset and create position expression
-            final Item it = preds[0].ebv(ctx, input);
-            final long l = it.itr(input);
-            final Expr e = Pos.get(l, l, input);
+            final Item it = preds[0].ebv(ctx, info);
+            final long l = it.itr(info);
+            final Expr e = Pos.get(l, l, info);
             // don't accept fractional numbers
-            if(l != it.dbl(input) || !(e instanceof Pos)) return null;
+            if(l != it.dbl(info) || !(e instanceof Pos)) return null;
             pos = (Pos) e;
           }
 

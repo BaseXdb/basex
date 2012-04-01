@@ -71,8 +71,8 @@ public class FTContains extends ParseExpr {
 
     ctx.fttoken = lex;
     for(Item it; (it = iter.next()) != null;) {
-      lex.init(it.string(input));
-      final FTNode item = ftexpr.item(ctx, input);
+      lex.init(it.string(info));
+      final FTNode item = ftexpr.item(ctx, info);
       double d = 0;
       if(item.all.matches()) {
         d = item.score();
@@ -112,10 +112,10 @@ public class FTContains extends ParseExpr {
 
     // sequential evaluation with index access
     final FTExpr ie = ftexpr.indexEquivalent(ic);
-    if(ic.seq) return new FTContainsIndex(input, expr, ie, ic);
+    if(ic.seq) return new FTContainsIndex(info, expr, ie, ic);
 
     // standard index evaluation; first expression will always be an axis path
-    final FTIndexAccess root = new FTIndexAccess(input, ie, ic);
+    final FTIndexAccess root = new FTIndexAccess(info, ie, ic);
     return expr instanceof Context ? root :
       ((AxisPath) expr).invertPath(root, ic.step);
   }

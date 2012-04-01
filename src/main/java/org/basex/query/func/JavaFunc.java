@@ -46,10 +46,10 @@ public final class JavaFunc extends JavaMapping {
       return mth.equals(NEW) ? constructor(args) : method(args, ctx);
     } catch(final InvocationTargetException ex) {
       final Throwable cause = ex.getCause();
-      throw cause instanceof QueryException ? ((QueryException) cause).info(input) :
-        JAVAERR.thrw(input, cause);
+      throw cause instanceof QueryException ? ((QueryException) cause).info(info) :
+        JAVAERR.thrw(info, cause);
     } catch(final Throwable ex) {
-      throw JAVAFUN.thrw(input, name(), foundArgs(args));
+      throw JAVAFUN.thrw(info, name(), foundArgs(args));
     }
   }
 
@@ -132,7 +132,6 @@ public final class JavaFunc extends JavaMapping {
 
     for(final Class<?> par : params) {
       final Value arg = args[s + a];
-
       final Object next;
       if(par.isInstance(arg)) {
         next = arg;

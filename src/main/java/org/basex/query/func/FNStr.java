@@ -44,7 +44,7 @@ public final class FNStr extends StandardFunc {
 
     switch(sig) {
       case STRING_TO_CODEPOINTS:
-        return str2cp(e.item(ctx, input));
+        return str2cp(e.item(ctx, info));
       default:
         return super.iter(ctx);
     }
@@ -73,14 +73,14 @@ public final class FNStr extends StandardFunc {
         return cp2str(ctx.iter(e));
       case COMPARE:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        Item it1 = e.item(ctx, input);
-        Item it2 = expr[1].item(ctx, input);
+        Item it1 = e.item(ctx, info);
+        Item it2 = expr[1].item(ctx, info);
         if(it1 == null || it2 == null) return null;
         final int d = diff(checkEStr(it1), checkEStr(it2));
         return Int.get(Math.max(-1, Math.min(1, d)));
       case CODEPOINT_EQUAL:
-        it1 = e.item(ctx, input);
-        it2 = expr[1].item(ctx, input);
+        it1 = e.item(ctx, info);
+        it2 = expr[1].item(ctx, info);
         if(it1 == null || it2 == null) return null;
         return Bln.get(eq(checkEStr(it1), checkEStr(it2)));
       case STRING_JOIN:
@@ -105,17 +105,17 @@ public final class FNStr extends StandardFunc {
         return concat(ctx);
       case CONTAINS:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        Item it = expr[1].item(ctx, input);
+        Item it = expr[1].item(ctx, info);
         if(it == null) return Bln.TRUE;
         return Bln.get(contains(checkEStr(e, ctx), checkEStr(it)));
       case STARTS_WITH:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        it = expr[1].item(ctx, input);
+        it = expr[1].item(ctx, info);
         if(it == null) return Bln.TRUE;
         return Bln.get(startsWith(checkEStr(e, ctx), checkEStr(it)));
       case ENDS_WITH:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        it = expr[1].item(ctx, input);
+        it = expr[1].item(ctx, info);
         if(it == null) return Bln.TRUE;
         return Bln.get(endsWith(checkEStr(e, ctx), checkEStr(it)));
       case SUBSTRING_AFTER:
@@ -147,7 +147,7 @@ public final class FNStr extends StandardFunc {
       final long n = checkItr(i);
       // check int boundaries before casting
       if(n < Integer.MIN_VALUE || n > Integer.MAX_VALUE
-          || !XMLToken.valid((int) n)) INVCODE.thrw(input, i);
+          || !XMLToken.valid((int) n)) INVCODE.thrw(info, i);
       tb.add((int) n);
     }
     return Str.get(tb.finish());
@@ -188,9 +188,9 @@ public final class FNStr extends StandardFunc {
     final Item is = checkItem(expr[1], ctx);
     int s;
     if(is instanceof Int) {
-      s = (int) is.itr(input) - 1;
+      s = (int) is.itr(info) - 1;
     } else {
-      final double ds = is.dbl(input);
+      final double ds = is.dbl(info);
       if(Double.isNaN(ds)) return Str.ZERO;
       s = subPos(ds);
     }
@@ -200,7 +200,7 @@ public final class FNStr extends StandardFunc {
     int e = l;
     if(end) {
       final Item ie = checkItem(expr[2], ctx);
-      e = ie instanceof Int ? (int) ie.itr(input) : subPos(ie.dbl(input) + 1);
+      e = ie instanceof Int ? (int) ie.itr(info) : subPos(ie.dbl(info) + 1);
     }
     if(s < 0) {
       e += s;
@@ -293,7 +293,7 @@ public final class FNStr extends StandardFunc {
       try {
         form = Form.valueOf(string(n));
       } catch(final IllegalArgumentException ex) {
-        NORMUNI.thrw(input, n);
+        NORMUNI.thrw(info, n);
       }
     }
     return ascii(str) ? Str.get(str) :
@@ -309,8 +309,8 @@ public final class FNStr extends StandardFunc {
   private Item concat(final QueryContext ctx) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
-      final Item it = a.item(ctx, input);
-      if(it != null) tb.add(it.string(input));
+      final Item it = a.item(ctx, info);
+      if(it != null) tb.add(it.string(info));
     }
     return Str.get(tb.finish());
   }

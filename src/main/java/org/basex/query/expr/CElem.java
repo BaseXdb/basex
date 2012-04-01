@@ -65,9 +65,9 @@ public final class CElem extends CName {
       // create and check QName
       final QNm nm = qname(ctx, ii);
       final byte[] cp = nm.prefix(), cu = nm.uri();
-      if(eq(cp, XML) ^ eq(cu, XMLURI)) CEXML.thrw(input, cu, cp);
-      if(eq(cu, XMLNSURI)) CEINV.thrw(input, cu);
-      if(eq(cp, XMLNS)) CEINV.thrw(input, cp);
+      if(eq(cp, XML) ^ eq(cu, XMLURI)) CEXML.thrw(info, cu, cp);
+      if(eq(cu, XMLNSURI)) CEINV.thrw(info, cu);
+      if(eq(cp, XMLNS)) CEINV.thrw(info, cp);
 
       // analyze element namespace unless it is "xml"
       if(!eq(cp, XML)) {
@@ -88,10 +88,10 @@ public final class CElem extends CName {
 
       // create child and attribute nodes
       final Constr constr = new Constr(ii, ctx).add(expr);
-      if(constr.errAtt) NOATTALL.thrw(input);
-      if(constr.errNS) NONSALL.thrw(input);
-      if(constr.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(input, constr.duplAtt);
-      if(constr.duplNS != null) DUPLNSCONS.thrw(input, constr.duplNS);
+      if(constr.errAtt) NOATTALL.thrw(info);
+      if(constr.errNS) NONSALL.thrw(info);
+      if(constr.duplAtt != null) (comp ? CATTDUPL : ATTDUPL).thrw(info, constr.duplAtt);
+      if(constr.duplNS != null) DUPLNSCONS.thrw(info, constr.duplNS);
 
       // create node
       final FElem node = new FElem(nm, constr.children, constr.atts, ns);

@@ -184,12 +184,12 @@ public final class CmpV extends Cmp {
       if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
     } else if(e1.isFunction(Function.POSITION)) {
       // position() CMP number
-      e = Pos.get(op, e2, e, input);
+      e = Pos.get(op, e2, e, info);
       if(e != this) ctx.compInfo(OPTWRITE, this);
     } else if(e1.type().eq(SeqType.BLN) && (op == OpV.EQ && e2 == Bln.FALSE ||
         op == OpV.NE && e2 == Bln.TRUE)) {
       // (A eq false()) -> not(A)
-      e = Function.NOT.get(input, e1);
+      e = Function.NOT.get(info, e1);
     }
     return e;
   }
@@ -207,21 +207,21 @@ public final class CmpV extends Cmp {
   public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item a = expr[0].item(ctx, input);
+    final Item a = expr[0].item(ctx, info);
     if(a == null) return null;
-    final Item b = expr[1].item(ctx, input);
+    final Item b = expr[1].item(ctx, info);
     if(b == null) return null;
-    if(a.comparable(b)) return Bln.get(op.eval(input, a, b));
+    if(a.comparable(b)) return Bln.get(op.eval(info, a, b));
 
-    if(a.type.isFunction()) FNEQ.thrw(input, a);
-    if(b.type.isFunction()) FNEQ.thrw(input, b);
-    throw XPTYPECMP.thrw(input, a.type, b.type);
+    if(a.type.isFunction()) FNEQ.thrw(info, a);
+    if(b.type.isFunction()) FNEQ.thrw(info, b);
+    throw XPTYPECMP.thrw(info, a.type, b.type);
   }
 
   @Override
   public CmpV invert() {
     return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpV(input, expr[0], expr[1], op.invert());
+      new CmpV(info, expr[0], expr[1], op.invert());
   }
 
   @Override

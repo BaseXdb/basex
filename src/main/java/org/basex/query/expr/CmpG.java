@@ -159,16 +159,16 @@ public final class CmpG extends Cmp {
       if(e2 instanceof Range && op.op == OpV.EQ) {
         // position() CMP range
         final long[] rng = ((Range) e2).range(ctx);
-        e = rng == null ? this : Pos.get(rng[0], rng[1], input);
+        e = rng == null ? this : Pos.get(rng[0], rng[1], info);
       } else {
         // position() CMP number
-        e = Pos.get(op.op, e2, e, input);
+        e = Pos.get(op.op, e2, e, info);
       }
       if(e != this) ctx.compInfo(OPTWRITE, this);
     } else if(e1.type().eq(SeqType.BLN) && (op == OpG.EQ && e2 == Bln.FALSE ||
         op == OpG.NE && e2 == Bln.TRUE)) {
       // (A = false()) -> not(A)
-      e = Function.NOT.get(input, e1);
+      e = Function.NOT.get(info, e1);
     } else {
       // rewrite path CMP number
       e = CmpR.get(this);
@@ -196,9 +196,9 @@ public final class CmpG extends Cmp {
 
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it1 = expr[0].item(ctx, input);
+      final Item it1 = expr[0].item(ctx, info);
       if(it1 == null) return Bln.FALSE;
-      final Item it2 = expr[1].item(ctx, input);
+      final Item it2 = expr[1].item(ctx, info);
       if(it2 == null) return Bln.FALSE;
       return Bln.get(eval(it1, it2));
     }
@@ -212,7 +212,7 @@ public final class CmpG extends Cmp {
 
     // evaluate single items
     if(s1 && expr[1].size() == 1)
-      return Bln.get(eval(ir1.next(), expr[1].item(ctx, input)));
+      return Bln.get(eval(ir1.next(), expr[1].item(ctx, info)));
 
     Iter ir2 = ctx.iter(expr[1]);
     final long is2 = ir2.size();
@@ -266,14 +266,14 @@ public final class CmpG extends Cmp {
         tb.isString()) && !(ta.isNumber() && tb.isNumber()) &&
         !ta.isFunction() && !tb.isFunction() ||
         ta == AtomType.QNM || tb == AtomType.QNM))
-      XPTYPECMP.thrw(input, ta, tb);
-    return op.op.eval(input, a, b);
+      XPTYPECMP.thrw(info, ta, tb);
+    return op.op.eval(info, a, b);
   }
 
   @Override
   public CmpG invert() {
     return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpG(input, expr[0], expr[1], op.invert());
+      new CmpG(info, expr[0], expr[1], op.invert());
   }
 
   /**
@@ -285,7 +285,7 @@ public final class CmpG extends Cmp {
    */
   boolean union(final CmpG g, final QueryContext ctx) throws QueryException {
     if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
-    expr[1] = new List(input, expr[1], g.expr[1]).comp(ctx);
+    expr[1] = new List(info, expr[1], g.expr[1]).comp(ctx);
     atomic = atomic && expr[1].type().zeroOrOne();
     return true;
   }
@@ -318,7 +318,7 @@ public final class CmpG extends Cmp {
           arg.uses(Use.CTX) || arg.uses(Use.NDT)) return false;
 
       ic.addCosts(ic.data.meta.size / 10);
-      iacc = Array.add(iacc, new IndexAccess(input, arg, ind, ic));
+      iacc = Array.add(iacc, new IndexAccess(info, arg, ind, ic));
       return true;
     }
 
@@ -330,10 +330,10 @@ public final class CmpG extends Cmp {
       final SeqType t = it.type();
       if(!(t.type.isString() || t.type.isNode())) return false;
 
-      final int is = ic.data.count(new ValuesToken(ind, it.string(input)));
+      final int is = ic.data.count(new ValuesToken(ind, it.string(info)));
       // add only expressions that yield results
       if(is != 0) {
-        iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
+        iacc = Array.add(iacc, new IndexAccess(info, it, ind, ic));
         ic.addCosts(is);
       }
     }
@@ -346,7 +346,7 @@ public final class CmpG extends Cmp {
     final boolean text = iacc[0].itype == IndexType.TEXT;
     ic.ctx.compInfo(text ? OPTTXTINDEX : OPTATVINDEX);
     // more than one string - merge index results
-    final ParseExpr root = iacc.length == 1 ? iacc[0] : new Union(input, iacc);
+    final ParseExpr root = iacc.length == 1 ? iacc[0] : new Union(info, iacc);
     return ic.invert(expr[0], root, text);
   }
 

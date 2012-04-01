@@ -85,7 +85,7 @@ public final class FNHof extends StandardFunc {
     final Iter xs = expr[1].iter(ctx);
 
     Value sum = checkNoEmpty(xs.next());
-    for(Item x; (x = xs.next()) != null;) sum = f.invValue(ctx, input, sum, x);
+    for(Item x; (x = xs.next()) != null;) sum = f.invValue(ctx, info, sum, x);
     return sum;
   }
 
@@ -118,8 +118,8 @@ public final class FNHof extends StandardFunc {
     final FItem pred = withArity(0, 1, ctx);
     final FItem fun = withArity(1, 1, ctx);
     Value v = ctx.value(expr[2]);
-    while(!checkBln(checkNoEmpty(pred.invItem(ctx, input, v)), ctx)) {
-      v = fun.invValue(ctx, input, v);
+    while(!checkBln(checkNoEmpty(pred.invItem(ctx, info, v)), ctx)) {
+      v = fun.invValue(ctx, info, v);
     }
     return v;
   }
@@ -141,7 +141,7 @@ public final class FNHof extends StandardFunc {
       @Override
       public int compare(final Item it1, final Item it2) {
         try {
-          return CmpV.OpV.LT.eval(input, it1, it2) ? -1 : 1;
+          return CmpV.OpV.LT.eval(info, it1, it2) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryError(qe);
         }
@@ -150,7 +150,7 @@ public final class FNHof extends StandardFunc {
 
     try {
       for(Item it; (it = iter.next()) != null;) {
-        heap.insert(checkNoEmpty(getKey.invItem(ctx, input, it)), it);
+        heap.insert(checkNoEmpty(getKey.invItem(ctx, info, it)), it);
         if(heap.size() > k) heap.removeMin();
       }
     } catch(final QueryError e) { throw e.wrapped(); }
@@ -202,8 +202,8 @@ public final class FNHof extends StandardFunc {
       @Override
       public int compare(final Item a, final Item b) {
         try {
-          return checkType(lt.invItem(ctx, input, a == null ? Empty.SEQ : a,
-              b == null ? Empty.SEQ : b), AtomType.BLN).bool(input) ? -1 : 1;
+          return checkType(lt.invItem(ctx, info, a == null ? Empty.SEQ : a,
+              b == null ? Empty.SEQ : b), AtomType.BLN).bool(info) ? -1 : 1;
         } catch(final QueryException qe) {
           throw new QueryError(qe);
         }

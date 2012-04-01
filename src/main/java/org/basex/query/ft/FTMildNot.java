@@ -28,13 +28,13 @@ public final class FTMildNot extends FTExpr {
   public FTMildNot(final InputInfo ii, final FTExpr e1, final FTExpr e2)
       throws QueryException {
     super(ii, e1, e2);
-    if(usesExclude()) FTMILD.thrw(input);
+    if(usesExclude()) FTMILD.thrw(info);
   }
 
   @Override
   public FTNode item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return mildnot(expr[0].item(ctx, input), expr[1].item(ctx, input));
+    return mildnot(expr[0].item(ctx, info), expr[1].item(ctx, info));
   }
 
   @Override

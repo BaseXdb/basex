@@ -135,7 +135,7 @@ public final class Updates {
     if(up instanceof Put) {
       final Put put = (Put) up;
       if(putUris.add(token(put.path(0))) < 0)
-        UPURIDUP.thrw(put.input, put.path(0));
+        UPURIDUP.thrw(put.info, put.path(0));
     }
 
     mod.add(up, ctx);

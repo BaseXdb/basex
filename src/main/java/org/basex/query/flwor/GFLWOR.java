@@ -100,7 +100,7 @@ public class GFLWOR extends ParseExpr {
       where = checkUp(where, ctx).comp(ctx).compEbv(ctx);
       if(where.isValue()) {
         // test is always false: no results
-        empty = !where.ebv(ctx, input).bool(input);
+        empty = !where.ebv(ctx, info).bool(info);
         if(!empty) {
           // always true: test can be skipped
           ctx.compInfo(OPTREMOVE, description(), where);
@@ -144,7 +144,7 @@ public class GFLWOR extends ParseExpr {
       // if where clause exists: where A return B -> if A then B else ()
       // otherwise: return B -> B
       ctx.compInfo(OPTFLWOR);
-      return where != null ? new If(input, where, ret, Empty.SEQ) : ret;
+      return where != null ? new If(info, where, ret, Empty.SEQ) : ret;
     }
 
     // remove FLWOR expression if a FOR clause yields an empty sequence
@@ -253,14 +253,14 @@ public class GFLWOR extends ParseExpr {
       final ForLet f = fl[tar[t]];
       // remove variable reference and optionally wrap test with boolean()
       Expr e = tests[t].remove(f.var);
-      e = Function.BOOLEAN.get(input, e).compEbv(ctx);
+      e = Function.BOOLEAN.get(info, e).compEbv(ctx);
       // attach predicates to axis path or filter, or create a new filter
       if(f.expr instanceof AxisPath) {
         f.expr = ((AxisPath) f.expr).addPreds(e);
       } else if(f.expr instanceof Filter) {
         f.expr = ((Filter) f.expr).addPred(e);
       } else {
-        f.expr = new Filter(input, f.expr, e);
+        f.expr = new Filter(info, f.expr, e);
       }
     }
     // eliminate where clause
@@ -309,7 +309,7 @@ public class GFLWOR extends ParseExpr {
     while(it[p].next() != null) {
       if(more) {
         iter(ctx, it, p + 1, ks, vs);
-      } else if(where == null || where.ebv(ctx, input).bool(input)) {
+      } else if(where == null || where.ebv(ctx, info).bool(info)) {
         if(group != null) {
           group.gp.add(ctx);
         } else if(order != null) {

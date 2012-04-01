@@ -45,12 +45,12 @@ public final class Treat extends Single {
     final Item it = iter.next();
     if(it == null) {
       if(type.mayBeZero()) return Empty.ITER;
-      throw XPEMPTY.thrw(input, description());
+      throw XPEMPTY.thrw(info, description());
     }
     if(type.zeroOrOne()) {
-      if(iter.next() != null) NOTREATS.thrw(input, description(), type);
+      if(iter.next() != null) NOTREATS.thrw(info, description(), type);
       if(!it.type.instanceOf(type.type))
-        NOTREAT.thrw(input, description(), it.type, type);
+        NOTREAT.thrw(info, description(), it.type, type);
       return it.iter();
     }
 
@@ -61,7 +61,7 @@ public final class Treat extends Single {
       public Item next() throws QueryException {
         if(i == null) return null;
         if(!i.type.instanceOf(type.type))
-          NOTREAT.thrw(input, description(), i.type, type);
+          NOTREAT.thrw(info, description(), i.type, type);
         final Item ii = i;
         i = iter.next();
         return ii;
@@ -76,20 +76,20 @@ public final class Treat extends Single {
     final long len = val.size();
     if(len == 0) {
       if(type.mayBeZero()) return val;
-      throw XPEMPTY.thrw(input, description());
+      throw XPEMPTY.thrw(info, description());
     }
     if(type.zeroOrOne()) {
-      if(len > 1) throw NOTREATS.thrw(input, description(), type);
+      if(len > 1) throw NOTREATS.thrw(info, description(), type);
       final Item it = val.itemAt(0);
       if(!it.type.instanceOf(type.type))
-        NOTREAT.thrw(input, description(), it.type, type);
+        NOTREAT.thrw(info, description(), it.type, type);
       return it;
     }
 
     for(long i = 0; i < len; i++) {
       final Item it = val.itemAt(i);
       if(!it.type.instanceOf(type.type))
-        NOTREAT.thrw(input, description(), it.type, type);
+        NOTREAT.thrw(info, description(), it.type, type);
     }
 
     return val;

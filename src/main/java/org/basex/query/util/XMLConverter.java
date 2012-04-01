@@ -12,21 +12,21 @@ import org.basex.util.*;
  */
 public abstract class XMLConverter {
   /** Input info. */
-  protected final InputInfo input;
+  protected final InputInfo info;
 
   /**
    * Constructor.
    * @param ii input info
    */
   public XMLConverter(final InputInfo ii) {
-    input = ii;
+    info = ii;
   }
 
   /**
    * Parses the input.
-   * @param q query
+   * @param in input
    * @return resulting node
    * @throws QueryException query exception
    */
-  public abstract ANode parse(final byte[] q) throws QueryException;
+  public abstract ANode parse(final byte[] in) throws QueryException;
 }

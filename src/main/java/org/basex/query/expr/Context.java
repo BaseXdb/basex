@@ -50,7 +50,7 @@ public final class Context extends Simple {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return checkCtx(ctx).item(ctx, input);
+    return checkCtx(ctx).item(ctx, info);
   }
 
   @Override
@@ -63,7 +63,7 @@ public final class Context extends Simple {
     // replacing context node with text() node to facilitate index rewritings
     if(!ctx.leaf) return this;
     ctx.compInfo(OPTTEXT);
-    return Path.get(input, null, AxisStep.get(input, Axis.CHILD, Test.TXT));
+    return Path.get(info, null, AxisStep.get(info, Axis.CHILD, Test.TXT));
   }
 
   @Override

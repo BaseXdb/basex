@@ -38,7 +38,7 @@ public final class FNId extends StandardFunc {
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = checkNoEmpty((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).item(ctx, input));
+      checkCtx(ctx)).item(ctx, info));
 
     final ANode node = checkNode(it);
     switch(sig) {
@@ -54,7 +54,7 @@ public final class FNId extends StandardFunc {
       throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = checkNoEmpty((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).item(ctx, input));
+      checkCtx(ctx)).item(ctx, info));
 
     switch(sig) {
       case LANG:  return lang(lc(checkEStr(expr[0], ctx)), checkNode(it));
@@ -198,7 +198,7 @@ public final class FNId extends StandardFunc {
       ANode n = node;
       while(n.type != NodeType.DOC) {
         n = n.parent();
-        if(n == null) throw IDDOC.thrw(input);
+        if(n == null) throw IDDOC.thrw(info);
       }
     }
     return node;

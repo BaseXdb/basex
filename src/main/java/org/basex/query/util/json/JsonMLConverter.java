@@ -38,9 +38,9 @@ public final class JsonMLConverter extends XMLConverter {
   }
 
   @Override
-  public ANode parse(final byte[] q) throws QueryException {
+  public ANode parse(final byte[] in) throws QueryException {
     // create and return XML fragment
-    return create(new JSONParser(q, input).parse());
+    return create(new JSONParser(in, info).parse());
   }
 
   /**
@@ -140,6 +140,6 @@ public final class JsonMLConverter extends XMLConverter {
    */
   private void error(final String msg, final Object... ext)
       throws QueryException {
-    throw JSONMLPARSE.thrw(input, Util.inf(msg, ext));
+    throw JSONMLPARSE.thrw(info, Util.inf(msg, ext));
   }
 }

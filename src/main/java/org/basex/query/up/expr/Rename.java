@@ -47,21 +47,21 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) throw UPSEQEMP.thrw(input, Util.name(this));
-    if(t.next() != null) UPWRTRGTYP.thrw(input);
+    if(i == null) throw UPSEQEMP.thrw(info, Util.name(this));
+    if(t.next() != null) UPWRTRGTYP.thrw(info);
 
     final CFrag ex;
     if(i.type == NodeType.ELM) {
-      ex = new CElem(input, expr[1], null);
+      ex = new CElem(info, expr[1], null);
     } else if(i.type == NodeType.ATT) {
-      ex = new CAttr(input, false, expr[1], Empty.SEQ);
+      ex = new CAttr(info, false, expr[1], Empty.SEQ);
     } else if(i.type == NodeType.PI) {
-      ex = new CPI(input, expr[1], Empty.SEQ);
+      ex = new CPI(info, expr[1], Empty.SEQ);
     } else {
-      throw UPWRTRGTYP.thrw(input);
+      throw UPWRTRGTYP.thrw(info);
     }
 
-    final QNm rename = ex.item(ctx, input).qname();
+    final QNm rename = ex.item(ctx, info).qname();
     final ANode targ = (ANode) i;
 
     // check namespace conflicts...
@@ -70,12 +70,12 @@ public final class Rename extends Update {
       final byte[] ru = rename.uri();
       final Atts at = targ.nsScope();
       for(int a = 0, as = at.size(); a < as; a++) {
-        if(eq(at.name(a), rp) && !eq(at.string(a), ru)) UPNSCONFL.thrw(input);
+        if(eq(at.name(a), rp) && !eq(at.string(a), ru)) UPNSCONFL.thrw(info);
       }
     }
 
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
-    ctx.updates.add(new RenameNode(dbn.pre, dbn.data, input, rename), ctx);
+    ctx.updates.add(new RenameNode(dbn.pre, dbn.data, info, rename), ctx);
     return null;
   }
 

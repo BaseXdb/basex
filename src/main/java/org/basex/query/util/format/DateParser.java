@@ -14,7 +14,7 @@ import org.basex.util.TokenBuilder;
  */
 final class DateParser {
   /** Input information. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Picture string. */
   private final byte[] pic;
   /** Position. */
@@ -26,7 +26,7 @@ final class DateParser {
    * @param p picture
    */
   DateParser(final InputInfo ii, final byte[] p) {
-    input = ii;
+    info = ii;
     pic = p;
   }
 
@@ -47,9 +47,9 @@ final class DateParser {
     final int ch = cp(pic, pos);
     pos += cl(pic, pos);
     if(ch == '[' || ch == ']') {
-      if(!more()) PICDATE.thrw(input, pic);
+      if(!more()) PICDATE.thrw(info, pic);
       if(cp(pic, pos) != ch) {
-        if(ch == ']') PICDATE.thrw(input, pic);
+        if(ch == ']') PICDATE.thrw(info, pic);
         return 0;
       }
       pos += cl(pic, pos);
@@ -70,6 +70,6 @@ final class DateParser {
       if(ch == ']') return tb.finish();
       if(!Character.isWhitespace(ch)) tb.add(ch);
     }
-    throw PICDATE.thrw(input, pic);
+    throw PICDATE.thrw(info, pic);
   }
 }

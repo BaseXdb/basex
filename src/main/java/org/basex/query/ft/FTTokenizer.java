@@ -56,7 +56,7 @@ final class FTTokenizer {
         if(opt.is(WC)) {
           ftw = wcCache.get(qu);
           if(ftw == null) {
-            ftw = new FTWildcard(qu, words.input);
+            ftw = new FTWildcard(qu, words.info);
             wcCache.add(qu, ftw);
           }
         }
@@ -112,7 +112,7 @@ final class FTTokenizer {
 
       // if thesaurus is required, add the terms which extend the query:
       if(opt.th != null) {
-        for(final byte[] ext : opt.th.find(words.input, query)) {
+        for(final byte[] ext : opt.th.find(words.info, query)) {
           // parse each extension term to a set of tokens:
           final TokenList tl = new TokenList(1);
           quLex.init(ext);

@@ -3,21 +3,13 @@ package org.basex.query.util;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.EnumSet;
-import java.util.Stack;
+import java.util.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
-import org.basex.query.item.Value;
+import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.item.map.Map;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.Iter;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Utility class for comparing XQuery values.
@@ -33,7 +25,7 @@ public final class Compare {
   }
 
   /** Input info. */
-  private final InputInfo input;
+  private final InputInfo info;
   /** Flag values. */
   private final EnumSet<Flag> flags = EnumSet.noneOf(Flag.class);
 
@@ -42,7 +34,7 @@ public final class Compare {
    * @param ii input info
    */
   public Compare(final InputInfo ii) {
-    input = ii;
+    info = ii;
   }
 
   /**
@@ -59,26 +51,26 @@ public final class Compare {
    * Checks items for deep equality.
    * @param val1 first value
    * @param val2 second value
-   * @param input input info
+   * @param info input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean deep(final Value val1, final Value val2,
-      final InputInfo input) throws QueryException {
-    return new Compare(input).deep(val1.iter(), val2.iter());
+  public static boolean deep(final Value val1, final Value val2, final InputInfo info)
+      throws QueryException {
+    return new Compare(info).deep(val1.iter(), val2.iter());
   }
 
   /**
    * Checks items for deep equality.
    * @param iter1 first iterator
    * @param iter2 second iterator
-   * @param input input info
+   * @param info input info
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean deep(final Iter iter1, final Iter iter2,
-      final InputInfo input) throws QueryException {
-    return new Compare(input).deep(iter1, iter2);
+  public static boolean deep(final Iter iter1, final Iter iter2, final InputInfo info)
+      throws QueryException {
+    return new Compare(info).deep(iter1, iter2);
   }
 
   /**
@@ -88,9 +80,7 @@ public final class Compare {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean deep(final Iter iter1, final Iter iter2)
-      throws QueryException {
-
+  public boolean deep(final Iter iter1, final Iter iter2) throws QueryException {
     while(true) {
       // check if one or both iterators are exhausted
       final Item it1 = iter1.next(), it2 = iter2.next();
@@ -102,15 +92,15 @@ public final class Compare {
         // maps are functions but have a defined deep-equality
         if(t1.isMap() && t2.isMap()) {
           final Map map1 = (Map) it1, map2 = (Map) it2;
-          if(!map1.deep(input, map2)) return false;
+          if(!map1.deep(info, map2)) return false;
           continue;
         }
-        FNCMP.thrw(input, t1.isFunction() ? it1 : it2);
+        FNCMP.thrw(info, t1.isFunction() ? it1 : it2);
       }
 
       // check atomic values
       if(!t1.isNode() && !t2.isNode()) {
-        if(!it1.equiv(input, it2)) return false;
+        if(!it1.equiv(info, it2)) return false;
         continue;
       }
 

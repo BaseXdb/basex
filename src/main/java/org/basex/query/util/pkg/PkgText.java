@@ -12,6 +12,9 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public interface PkgText {
+  /** JAR manifest file. */
+  String MANIFEST_MF = "META-INF/MANIFEST.MF";
+
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
   /**Jar descriptor. */

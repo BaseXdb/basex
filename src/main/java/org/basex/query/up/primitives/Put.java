@@ -55,7 +55,7 @@ public final class Put extends UpdatePrimitive {
         pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
         node.serialize(Serializer.get(po, pr));
       } catch(final IOException ex) {
-        UPPUTERR.thrw(input, path(i));
+        UPPUTERR.thrw(info, path(i));
       } finally {
         if(po != null) try { po.close(); } catch(final IOException ex) { }
       }
