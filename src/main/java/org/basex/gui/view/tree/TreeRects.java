@@ -1,11 +1,11 @@
 package org.basex.gui.view.tree;
 
-import java.awt.Graphics;
+import java.awt.*;
 
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.ViewData;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
 
 /**
  * This class stores the rectangles.
@@ -60,7 +60,7 @@ final class TreeRects implements TreeConstants {
       final Graphics g, final int rn, final int ds, final double dw,
       final boolean slim) {
 
-    final int h = sub.getSubtreeHeight(rn);
+    final int h = sub.subtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
 
     for(int lv = 0; lv < h; ++lv) {
@@ -113,7 +113,7 @@ final class TreeRects implements TreeConstants {
 
       if(slim) {
         final double boxMiddle = xx + ww / 2f;
-        final byte[] b = getText(c, rn, sub.getPrePerIndex(rn, lv, i));
+        final byte[] b = getText(c, rn, sub.prePerIndex(rn, lv, i));
         int o = calcOptimalRectWidth(g, b) + 10;
         if(o < MIN_TXT_SPACE) o = MIN_TXT_SPACE;
         if(w > o) {
@@ -196,7 +196,7 @@ final class TreeRects implements TreeConstants {
     final TreeRect r = getTreeRectsPerLevel(rn, lv)[0];
     final double ratio = (x - r.x) / (double) r.w;
     final int idx = (int) (ratio * sub.levelSize(rn, lv));
-    return sub.getPrePerIndex(rn, lv, idx);
+    return sub.prePerIndex(rn, lv, idx);
   }
 
   /**

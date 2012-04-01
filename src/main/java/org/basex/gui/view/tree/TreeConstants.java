@@ -1,6 +1,6 @@
 package org.basex.gui.view.tree;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * This interface contains tree view constants.

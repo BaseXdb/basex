@@ -1,7 +1,7 @@
 package org.basex.gui.view.tree;
 
-import org.basex.core.Context;
-import org.basex.data.Data;
+import org.basex.core.*;
+import org.basex.data.*;
 
 /**
  * This class stores the subtrees.
@@ -47,8 +47,8 @@ final class TreeSubtree {
    * @param ix index
    * @return pre
    */
-  int getPrePerIndex(final int rn, final int lv, final int ix) {
-    return getPrePerIndex(getTreeBorder(rn, lv), ix);
+  int prePerIndex(final int rn, final int lv, final int ix) {
+    return prePerIndex(treeBorder(rn, lv), ix);
   }
 
   /**
@@ -57,7 +57,7 @@ final class TreeSubtree {
    * @param ix index
    * @return pre
    */
-  private int getPrePerIndex(final TreeBorder bo, final int ix) {
+  private int prePerIndex(final TreeBorder bo, final int ix) {
     final int start = bo.start + ix;
     if(start < 0) return -1;
     return nc.getPrePerLevelAndIndex(bo.level, start);
@@ -70,8 +70,8 @@ final class TreeSubtree {
    * @param pre pre
    * @return index
    */
-  int getPreIndex(final int rn, final int lv, final int pre) {
-    return getPreIndex(getTreeBorder(rn, lv), pre);
+  int preIndex(final int rn, final int lv, final int pre) {
+    return preIndex(treeBorder(rn, lv), pre);
   }
 
   /**
@@ -80,9 +80,8 @@ final class TreeSubtree {
    * @param pre pre
    * @return index
    */
-  private int getPreIndex(final TreeBorder bo, final int pre) {
-    return nc.searchPreIndex(bo.level, pre, pre, bo.start, bo.getEnd())
-        - bo.start;
+  private int preIndex(final TreeBorder bo, final int pre) {
+    return nc.searchPreIndex(bo.level, pre, pre, bo.start, bo.getEnd()) - bo.start;
   }
 
   /**
@@ -92,7 +91,7 @@ final class TreeSubtree {
    * @return size
    */
   int levelSize(final int rn, final int lv) {
-    return getTreeBorder(rn, lv).size;
+    return treeBorder(rn, lv).size;
   }
 
   /**
@@ -101,7 +100,7 @@ final class TreeSubtree {
    * @param lv level
    * @return TreeBorder
    */
-  TreeBorder getTreeBorder(final int rn, final int lv) {
+  TreeBorder treeBorder(final int rn, final int lv) {
     return border[rn][lv];
   }
 
@@ -110,15 +109,15 @@ final class TreeSubtree {
    * @param rn root
    * @return height
    */
-  int getSubtreeHeight(final int rn) {
-    return border.length > rn ? border[rn].length : -1;
+  int subtreeHeight(final int rn) {
+    return rn >= 0 && rn < border.length ? border[rn].length : -1;
   }
 
   /**
    * Returns maximum subtree height.
    * @return max height
    */
-  int getMaxSubtreeHeight() {
+  int maxSubtreeHeight() {
     int h = 0;
     for(final TreeBorder[] b : border) {
       final int hh = b.length;
@@ -135,7 +134,7 @@ final class TreeSubtree {
    * @return the determined index position
    */
   int searchPreArrayPos(final int rn, final int lv, final int pre) {
-    return searchPreArrayPos(getTreeBorder(rn, lv), pre);
+    return searchPreArrayPos(treeBorder(rn, lv), pre);
   }
 
   /**
@@ -145,8 +144,7 @@ final class TreeSubtree {
    * @return the determined index position
    */
   private int searchPreArrayPos(final TreeBorder bo, final int pre) {
-    return nc.searchPreArrayPos(bo.level, bo.start, bo.getEnd(), pre)
-        - bo.start;
+    return nc.searchPreArrayPos(bo.level, bo.start, bo.getEnd(), pre) - bo.start;
   }
 
   /**

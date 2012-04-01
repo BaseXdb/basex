@@ -1,6 +1,6 @@
 package org.basex.gui.view.tree;
 
-import org.basex.data.Data;
+import org.basex.data.*;
 
 /**
  * Offers an iterator for the children of a node. Could as well be
