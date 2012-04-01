@@ -3,10 +3,8 @@ package org.basex;
 import static org.basex.core.Text.*;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -176,10 +174,11 @@ public final class BaseXServer extends Main implements Runnable {
           }
           new ClientListener(s, context, log, this).start();
         }
+      } catch(final SocketException ex) {
+        break;
       } catch(final Throwable ex) {
-        // socket was closed..
+        // socket may have been unexpectedly closed
         if(log != null) log.error(ex);
-        // socket was closed..
         break;
       }
     }
