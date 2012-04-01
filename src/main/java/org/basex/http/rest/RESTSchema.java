@@ -10,7 +10,7 @@ import org.basex.util.*;
  */
 interface RESTSchema {
   /** Post Schema. */
-  byte[] POST = Token.token(
+  byte[] SCHEMA = Token.token(
     "<?xml version='1.0' encoding='UTF-8'?>" +
     "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'" +
     " xmlns='http://basex.org/rest'" +

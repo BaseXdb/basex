@@ -237,7 +237,7 @@ final class RestXqFunction {
    * @throws QueryException query exception
    */
   QueryException error(final String msg, final Object... ext) throws QueryException {
-    throw new QueryException(function.input, Err.REXQERROR, Util.info(msg, ext));
+    throw new QueryException(function.info, Err.REXQERROR, Util.info(msg, ext));
   }
 
   // PRIVATE METHODS ====================================================================

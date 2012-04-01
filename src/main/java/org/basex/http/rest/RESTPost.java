@@ -39,7 +39,7 @@ public class RESTPost extends RESTCode {
     Validator v = null;
     try {
       v = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).
-          newSchema(new StreamSource(new ArrayInput(POST))).newValidator();
+          newSchema(new StreamSource(new ArrayInput(SCHEMA))).newValidator();
     } catch(final SAXException ex) {
       Util.notexpected(ex);
     }
