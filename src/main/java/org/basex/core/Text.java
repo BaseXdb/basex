@@ -1016,21 +1016,23 @@ public interface Text {
   /** Target path. */
   String TARGET_PATH = lang("target_path");
 
-  /** XML file description. */
+  /** File description: XML Documents. */
   String XML_DOCUMENTS = "XML Documents";
-  /** JSON file description. */
+  /** File description: JSON Documents. */
   String JSON_DOCUMENTS = "JSON Documents";
-  /** HTML file description. */
+  /** File description: HTML Documents. */
   String HTML_DOCUMENTS = "HTML Documents";
-  /** CSV file description. */
+  /** File description: Comma-Separated Values. */
   String CSV_DOCUMENTS = "Comma-Separated Values";
-  /** TXT file description. */
+  /** File description: Plain Text. */
   String PLAIN_TEXT = "Plain Text";
-  /** ZIP file description. */
+  /** File description: ZIP Archives. */
   String ZIP_ARCHIVES = "ZIP Archives";
-  /** XAR file description. */
+  /** File description: XML Archives. */
   String XML_ARCHIVES = "XML Archives";
-  /** XQuery file extensions description. */
+  /** File description: Java archives. */
+  String JAVA_ARCHIVES = "Java Archives";
+  /** File description: XQuery files. */
   String XQUERY_FILES = "XQuery Files";
 
   /** Dialog title for database options. */

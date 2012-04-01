@@ -75,22 +75,22 @@ public final class PkgParser {
     final AxisIter atts = node.attributes();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
-      if(eq(NAME, name))         p.name = next.string();
-      else if(eq(ABBREV, name))  p.abbrev = next.string();
-      else if(eq(VERSION, name)) p.version = next.string();
-      else if(eq(SPEC, name))    p.spec = next.string();
+      if(eq(A_NAME, name))         p.name = next.string();
+      else if(eq(A_ABBREV, name))  p.abbrev = next.string();
+      else if(eq(A_VERSION, name)) p.version = next.string();
+      else if(eq(A_SPEC, name))    p.spec = next.string();
       else PKGDESCINV.thrw(info, Util.info(WHICHATTR, name));
     }
 
     // check mandatory attributes
     if(p.name == null)
-      PKGDESCINV.thrw(info, Util.info(MISSATTR, NAME, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, A_NAME, root));
     if(p.version == null)
-      PKGDESCINV.thrw(info, Util.info(MISSATTR, VERSION, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, A_VERSION, root));
     if(p.abbrev == null)
-      PKGDESCINV.thrw(info, Util.info(MISSATTR, ABBREV, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, A_ABBREV, root));
     if(p.spec == null)
-      PKGDESCINV.thrw(info, Util.info(MISSATTR, SPEC, root));
+      PKGDESCINV.thrw(info, Util.info(MISSATTR, A_SPEC, root));
   }
 
   /**
@@ -121,12 +121,12 @@ public final class PkgParser {
     final Dependency d = new Dependency();
     for(ANode next; (next = atts.next()) != null;) {
       final byte[] name = next.name();
-      if(eq(PKG, name))            d.pkg = next.string();
-      else if(eq(PROC, name))      d.processor = next.string();
-      else if(eq(VERS, name))      d.versions = next.string();
-      else if(eq(SEMVER, name))    d.semver = next.string();
-      else if(eq(SEMVERMIN, name)) d.semverMin = next.string();
-      else if(eq(SEMVERMAX, name)) d.semverMax = next.string();
+      if(eq(A_PACKAGE, name))            d.pkg = next.string();
+      else if(eq(A_PROCESSOR, name))      d.processor = next.string();
+      else if(eq(A_VERSIONS, name))      d.versions = next.string();
+      else if(eq(A_SEMVER, name))    d.semver = next.string();
+      else if(eq(A_SEMVER_MIN, name)) d.semverMin = next.string();
+      else if(eq(A_SEMVER_MAX, name)) d.semverMax = next.string();
       else PKGDESCINV.thrw(info, Util.info(WHICHATTR, name));
     }
     return d;
@@ -143,14 +143,14 @@ public final class PkgParser {
     final Component c = new Component();
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();
-      if(eqNS(NSPC, name)) c.uri = next.string();
-      else if(eqNS(FILE, name)) c.file = next.string();
+      if(eqNS(A_NAMESPACE, name)) c.uri = next.string();
+      else if(eqNS(A_FILE, name)) c.file = next.string();
       else PKGDESCINV.thrw(info, Util.info(WHICHELEM, name));
     }
 
     // check mandatory children
-    if(c.uri == null) PKGDESCINV.thrw(info, Util.info(MISSCOMP, NSPC));
-    if(c.file == null) PKGDESCINV.thrw(info, Util.info(MISSCOMP, FILE));
+    if(c.uri == null) PKGDESCINV.thrw(info, Util.info(MISSCOMP, A_NAMESPACE));
+    if(c.file == null) PKGDESCINV.thrw(info, Util.info(MISSCOMP, A_FILE));
     return c;
   }
 

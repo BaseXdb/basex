@@ -70,12 +70,13 @@ public final class ModuleLoader {
       return true;
     }
 
-    // search module in repository: normalize path
+    // search module in repository: rewrite URI to file path
     final boolean java = startsWith(uri, JAVAPREF);
     final String uriPath = uri2path(string(java ? substring(uri, JAVAPREF.length) : uri));
-    final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
+    if(uriPath == null) return false;
 
     // no file suffix specified: try different ones
+    final String path = context.mprop.get(MainProp.REPOPATH) + uriPath;
     if(IO.suffix(path).isEmpty()) {
       // no "java:" prefix: try different XQuery file suffixes
       if(!java) {
@@ -94,7 +95,7 @@ public final class ModuleLoader {
     }
 
     // Java class was successfully imported: create instance
-    addJava(uriPath.replace("/", ".").substring(1), ii);
+    addJava(uriPath, uri, ii);
     return true;
   }
 
@@ -213,16 +214,20 @@ public final class ModuleLoader {
 
   /**
    * Loads a Java class.
-   * @param path class path
+   * @param path file path
+   * @param uri original URI
    * @param ii input info
    * @throws QueryException query exception
    */
-  private void addJava(final String path, final InputInfo ii) throws QueryException {
+  private void addJava(final String path, final byte[] uri, final InputInfo ii)
+      throws QueryException {
+
+    final String cp = path.replace('/', '.').substring(1);
     Class<?> clz = null;
     try {
-      clz = findClass(path);
+      clz = findClass(cp);
     } catch(final ClassNotFoundException ex) {
-      NOMODULE.thrw(ii, path);
+      NOMODULE.thrw(ii, uri);
       // expected exception
     } catch(final Throwable th) {
       Util.debug(th);
@@ -231,7 +236,7 @@ public final class ModuleLoader {
 
     final boolean qm = clz.getSuperclass() == QueryModule.class;
     final Object jm = Reflect.get(clz);
-    if(jm == null) NOINV.thrw(ii, path);
+    if(jm == null) NOINST.thrw(ii, cp);
 
     // add all public methods of the class (ignore methods from super classes)
     final ArrayList<Method> list = new ArrayList<Method>();

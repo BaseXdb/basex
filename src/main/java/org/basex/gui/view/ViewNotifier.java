@@ -202,6 +202,7 @@ public final class ViewNotifier {
    */
   public void update() {
     final Data data = initHistory(gui.context);
+    if(data == null) return;
     gui.context.marked = new Nodes(data);
     for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();

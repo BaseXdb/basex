@@ -22,7 +22,7 @@ import org.basex.util.Util;
  */
 public final class RepoInstall extends Command {
   /** Input info. */
-  private final InputInfo ii;
+  private final InputInfo info;
 
   /**
    * Constructor.
@@ -31,13 +31,13 @@ public final class RepoInstall extends Command {
    */
   public RepoInstall(final String p, final InputInfo i) {
     super(User.CREATE, p);
-    ii = i;
+    info = i;
   }
 
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context.repo).install(args[0], ii);
+      new RepoManager(context, info).install(args[0]);
       return info(PKG_INSTALLED_X, args[0], perf);
     } catch(final QueryException ex) {
       Util.debug(ex);

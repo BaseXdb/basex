@@ -37,6 +37,14 @@ public final class Repo {
   }
 
   /**
+   * Returns the path to the repository.
+   * @return dictionary
+   */
+  public IOFile path() {
+    return init().path;
+  }
+
+  /**
    * Returns the namespace dictionary.
    * @return dictionary
    */

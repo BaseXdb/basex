@@ -17,22 +17,17 @@ public interface PkgText {
 
   /** Package descriptor. */
   String DESCRIPTOR = "expath-pkg" + IO.XMLSUFFIX;
-  /**Jar descriptor. */
+  /** Jar descriptor. */
   String JARDESC = Text.NAMELC + IO.XMLSUFFIX;
+
+  /** EXPath type. */
+  String EXPATH = "EXPath";
+  /** Internal type. */
+  String INTERNAL = "Internal";
 
   /** <package/> root element. */
   /** Element package. */
   byte[] PACKAGE = token("package");
-
-  /** <package/> attributes. */
-  /** Attribute name. */
-  byte[] NAME = token("name");
-  /** Attribute abbrev. */
-  byte[] ABBREV = token("abbrev");
-  /** Attribute version. */
-  byte[] VERSION = token("version");
-  /** Attribute spec. */
-  byte[] SPEC = token("spec");
 
   /** <package/> children. */
   /** Element dependency. */
@@ -40,31 +35,41 @@ public interface PkgText {
   /** Element xquery. */
   byte[] XQUERY = token("xquery");
 
-  /** <dependency/> attributes. */
-  /** Attribute package. */
-  byte[] PKG = token("package");
-  /** Attribute processor. */
-  byte[] PROC = token("processor");
-  /** Attribute versions. */
-  byte[] VERS = token("versions");
-  /** Attribute semver. */
-  byte[] SEMVER = token("semver");
-  /** Attribute semver-min. */
-  byte[] SEMVERMIN = token("semver-min");
-  /** Attribute semver-max. */
-  byte[] SEMVERMAX = token("semver-max");
-
   /** <xquery/> children. */
   /** Attribute namespace. */
-  byte[] NSPC = token("namespace");
+  byte[] A_NAMESPACE = token("namespace");
   /** Attribute file. */
-  byte[] FILE = token("file");
+  byte[] A_FILE = token("file");
 
   /** Jar descriptor children. */
   /** <jar/> element. */
   byte[] JAR = token("jar");
   /** <class/> element. */
   byte[] CLASS = token("class");
+
+  /** <package/> attributes. */
+  /** Attribute name. */
+  byte[] A_NAME = token("name");
+  /** Attribute abbrev. */
+  byte[] A_ABBREV = token("abbrev");
+  /** Attribute version. */
+  byte[] A_VERSION = token("version");
+  /** Attribute spec. */
+  byte[] A_SPEC = token("spec");
+
+  /** <dependency/> attributes. */
+  /** Attribute package. */
+  byte[] A_PACKAGE = token("package");
+  /** Attribute processor. */
+  byte[] A_PROCESSOR = token("processor");
+  /** Attribute versions. */
+  byte[] A_VERSIONS = token("versions");
+  /** Attribute semver. */
+  byte[] A_SEMVER = token("semver");
+  /** Attribute semver-min. */
+  byte[] A_SEMVER_MIN = token("semver-min");
+  /** Attribute semver-max. */
+  byte[] A_SEMVER_MAX = token("semver-max");
 
   /** Not expected initialization error. */
   String MISSDESC = "Missing package descriptor for package '%'";

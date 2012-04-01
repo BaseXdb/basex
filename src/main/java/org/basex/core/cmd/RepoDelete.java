@@ -21,7 +21,7 @@ import org.basex.util.Util;
  */
 public final class RepoDelete extends Command {
   /** Input info. */
-  private final InputInfo ii;
+  private final InputInfo info;
 
   /**
    * Constructor.
@@ -30,13 +30,13 @@ public final class RepoDelete extends Command {
    */
   public RepoDelete(final String p, final InputInfo i) {
     super(User.CREATE, p);
-    ii = i;
+    info = i;
   }
 
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context.repo).delete(args[0], ii);
+      new RepoManager(context, info).delete(args[0]);
       return info(PKG_DELETED_X, args[0]);
     } catch(final QueryException ex) {
       Util.debug(ex);

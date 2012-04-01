@@ -47,15 +47,15 @@ public final class FNRepo extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
 
-    final RepoManager rm = new RepoManager(ctx.context.repo);
+    final RepoManager rm = new RepoManager(ctx.context, ii);
     // either path to package or package name
     final String pkg = expr.length == 0 ? null : string(checkStr(expr[0], ctx));
     switch(sig) {
       case _REPO_INSTALL:
-        rm.install(pkg, ii);
+        rm.install(pkg);
         return null;
       case _REPO_DELETE:
-        rm.delete(pkg, ii);
+        rm.delete(pkg);
         return null;
       default:
         return super.item(ctx, ii);

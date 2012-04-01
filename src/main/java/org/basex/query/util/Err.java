@@ -178,6 +178,8 @@ public enum Err {
   PKGINST(PACK, 2, "Package '%' is already installed."),
   /** PACK0002: Evaluation exception. */
   MODINST(PACK, 2, "Module '%' is already installed."),
+  /** PACK0002: Evaluation exception. */
+  INSTERR(PACK, 2, "Namespace URI is invalid: '%'."),
   /** PACK0003: Evaluation exception. */
   NECPKGNOTINST(PACK, 3, "Required package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
@@ -189,7 +191,7 @@ public enum Err {
   /** PACK0006: Evaluation exception. */
   PKGREADFNF(PACK, 6, "Package '%' could not be parsed: '%' not found."),
   /** PACK0007: Evaluation exception. */
-  CANNOTDELPKG(PACK, 7, "Package cannot be deleted."),
+  PKGDEL(PACK, 7, "File '%' could not be deleted."),
   /** PACK0008: Evaluation exception. */
   PKGDEP(PACK, 8, "Package '%' depends on package '%'."),
   /** PACK0009: Evaluation exception. */
@@ -665,11 +667,11 @@ public enum Err {
   /** XQST0057: Parsing exception. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
   /** XQST0059: Parsing exception. */
-  NOINV(XQST, 59, "Could not instantiate module '%'."),
+  NOINST(XQST, 59, "Could not instantiate module '%'."),
   /** XQST0059: Parsing exception. */
-  NOMODULE(XQST, 59, "Module not found: '%'."),
+  NOMODULE(XQST, 59, "Module \"%\" not found."),
   /** XQST0059: Parsing exception. */
-  MODINIT(XQST, 59, "Module not initialized: %."),
+  MODINIT(XQST, 59, "Module '%' not initialized."),
   /** XQST0059: Parsing exception. */
   NOMODULEFILE(XQST, 59, "Could not retrieve module '%'."),
   /** XQST0059: Parsing exception. */
