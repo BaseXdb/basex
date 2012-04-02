@@ -49,8 +49,8 @@ public final class Context {
   /** Focused node. */
   public int focused = -1;
 
-  /** Database path. */
-  private String path;
+  /** Document path. */
+  private String docpath;
   /** Node context. */
   private Nodes current;
   /** Process locking. */
@@ -149,8 +149,9 @@ public final class Context {
   public Nodes current() {
     if(current == null && data != null) {
       final Resources res = data.resources;
-      current = new Nodes((path == null ? res.docs() : res.docs(path)).toArray(), data);
-      current.root = path == null;
+      current = new Nodes((docpath == null ? res.docs() :
+        res.docs(docpath)).toArray(), data);
+      current.root = docpath == null;
     }
     return current;
   }
@@ -179,7 +180,7 @@ public final class Context {
    */
   public void openDB(final Data d, final String p) {
     data = d;
-    path = p;
+    docpath = p;
     copied = null;
     set(null, new Nodes(d));
   }
@@ -299,7 +300,9 @@ public final class Context {
    * @return the databases
    */
   public Databases databases() {
-    if(null == databases) databases = new Databases(this);
+    // renew database list if path changes
+    if(databases == null || !(databases.dbpath.equals(mprop.dbpath().path())))
+      databases = new Databases(this);
     return databases;
   }
 }

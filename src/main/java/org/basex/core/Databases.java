@@ -26,11 +26,15 @@ public final class Databases {
   /** Available backups. */
   private final TwoWayTokenMap backups = new TwoWayTokenMap();
 
+  /** Databases path. */
+  public final String dbpath;
+
   /**
    * Creates a new instance and loads available databases.
    * @param c Database context
    */
   Databases(final Context c) {
+    dbpath = c.mprop.dbpath().path();
     for(final IOFile f : c.mprop.dbpath().children()) {
       final String name = f.name();
       if(name.endsWith(IO.ZIPSUFFIX)) {
