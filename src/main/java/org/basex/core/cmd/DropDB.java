@@ -39,7 +39,7 @@ public final class DropDB extends ACreate {
       // close database if it's currently opened
       close(context, db);
       // check if database is still pinned
-      if(context.pinned(db) || pinned(context, db)) {
+      if(context.pinned(db) || !writeLock(db, true, context)) {
         info(DB_PINNED_X, db);
         ok = false;
       } else if(!drop(db, context)) {
@@ -54,7 +54,7 @@ public final class DropDB extends ACreate {
   }
 
   @Override
-  public String pinned(final Context ctx) {
+  public String writeLock(final boolean lock, final Context ctx) {
     return null;
   }
 

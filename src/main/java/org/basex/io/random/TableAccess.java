@@ -2,7 +2,7 @@ package org.basex.io.random;
 
 import java.io.IOException;
 import org.basex.data.MetaData;
-import org.basex.io.IO;
+import org.basex.io.*;
 
 /**
  * This abstract class defines the methods for accessing the
@@ -36,6 +36,13 @@ public abstract class TableAccess {
    * @throws IOException I/O exception
    */
   public abstract void close() throws IOException;
+
+  /**
+   * Locks or unlocks the table for write operations.
+   * @param yes lock or unlock file
+   * @return success flag
+   */
+  public abstract boolean writeLock(final boolean yes);
 
   /**
    * Reads a byte value and returns it as an integer value.

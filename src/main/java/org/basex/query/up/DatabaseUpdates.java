@@ -64,9 +64,6 @@ final class DatabaseUpdates {
    * @throws QueryException query exception
    */
   void check() throws QueryException {
-    // check if database is locked by another process
-    if(data.pinned()) OPENED.thrw(null, data.meta.name);
-
     // get and sort keys (pre/id values)
     final int s = updatePrimitives.size();
     nodes = new IntList(s);
@@ -114,6 +111,16 @@ final class DatabaseUpdates {
   }
 
   /**
+   * Locks or unlocks the database for write operations.
+   * @param yes lock or unlock file
+   * @throws QueryException query exception
+   */
+  void writeLock(final boolean yes) throws QueryException {
+    if(!data.writeLock(yes)) OPENED.thrw(null, data.meta.name);
+    if(!data.markUpdating(yes)) (yes ? LOCK : UNLOCK).thrw(null, data.meta.name);
+  }
+
+  /**
    * Applies all updates for this specific database.
    * @throws QueryException query exception
    */
@@ -121,7 +128,7 @@ final class DatabaseUpdates {
     optimize();
 
     // mark disk database instances as updating
-    if(!data.update(true)) LOCK.thrw(null, data.meta.name);
+    if(!data.markUpdating(true)) LOCK.thrw(null, data.meta.name);
 
     /*
      * For each target node, the update primitives in the corresponding
@@ -153,8 +160,6 @@ final class DatabaseUpdates {
       recent.resolveExternalTextNodeAdjacency(0);
     } finally {
       data.flush();
-      // mark disk database instances as updating
-      if(!data.update(false)) UNLOCK.thrw(null, data.meta.name);
     }
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {

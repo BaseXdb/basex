@@ -342,7 +342,7 @@ public abstract class Builder extends Progress {
         tags.stat(tstack.get(level - 1)).setLeaf(false);
       } else if(inDoc) {
         // don't allow more than one root node
-        error(MOREROOTS, parser.detail(), nm);
+        //error(MOREROOTS, parser.detail(), nm);
       }
     }
     if(meta.size != 1) inDoc = true;

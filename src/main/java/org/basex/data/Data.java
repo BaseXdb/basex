@@ -18,7 +18,7 @@ import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Names;
 import org.basex.index.Resources;
 import org.basex.index.path.PathSummary;
-import org.basex.io.IO;
+import org.basex.io.*;
 import org.basex.io.random.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
@@ -154,16 +154,26 @@ public abstract class Data {
 
   /**
    * Marks a database as updating.
-   * @param updating updating flag (start/stop updating process)
+   * @param start updating flag (start/stop updating process)
    * @return success flag
    */
-  public abstract boolean update(final boolean updating);
+  public abstract boolean markUpdating(final boolean start);
 
   /**
    * Checks if this database is also opened (pinned) by other instances.
    * @return result of check
    */
-  public abstract boolean pinned();
+  @Deprecated
+  public boolean pinned() {
+    return false;
+  }
+
+  /**
+   * Locks or unlocks the database for write operations.
+   * @param yes lock or unlock file
+   * @return success flag
+   */
+  public abstract boolean writeLock(final boolean yes);
 
   /**
    * Returns the indexed pre references for the specified token.

@@ -117,7 +117,7 @@ public abstract class ACreate extends Command {
    * @return success flag
    */
   protected boolean startUpdate(final Data data) {
-    return data.update(true) || error(LOCK_X, data.meta.name);
+    return data.markUpdating(true) || error(LOCK_X, data.meta.name);
   }
 
   /**
@@ -126,7 +126,7 @@ public abstract class ACreate extends Command {
    * @return success flag
    */
   protected boolean stopUpdate(final Data data) {
-    return data.update(false) || error(UNLOCK_X, data.meta.name);
+    return data.markUpdating(false) || error(UNLOCK_X, data.meta.name);
   }
 
   /**
@@ -207,18 +207,27 @@ public abstract class ACreate extends Command {
   }
 
   /**
-   * Checks if the addressed database is pinned by this or another process.
+   * Tries to (un)lock the specified database for exclusive write operations.
    * @param name name of database
+   * @param lock lock or unlock database
    * @param ctx database context
    * @return result of check
    */
-  protected static boolean pinned(final Context ctx, final String name) {
+  protected static boolean writeLock(final String name, final boolean lock,
+      final Context ctx) {
+
+    // release lock: no operation needed
+    if(!lock) return true;
+
     // check if name is not valid or if db will be created in main memory
     if(!MetaData.validName(name, false)) return false;
-    // check if db is already pinned
+
+    // check if the opened database can be locked and unlocked
     final Data data = ctx.data();
-    // check if name of opened and specified database are identical
-    return data != null && data.meta.name.equals(name) ?
-        data.pinned() : DiskData.pinned(ctx.mprop.dbpath(name), "");
+    if(data != null && data.meta.name.equals(name))
+      return data.writeLock(true) && data.writeLock(false);
+
+    // check if the specified database can be locked
+    return DiskData.writeLock(ctx.mprop.dbpath(name));
   }
 }

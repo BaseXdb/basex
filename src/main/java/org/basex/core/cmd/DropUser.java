@@ -56,16 +56,17 @@ public final class DropUser extends AUser {
     // drop local user
     try {
       final Data data = Open.open(db, context);
-      if(data.pinned()) return !info(DB_PINNED_X, db);
-
-      if(data.meta.users.drop(data.meta.users.get(user))) {
+      final boolean ok = data.writeLock(true);
+      if(!ok) {
+        error(DB_PINNED_X, db);
+      } else if(data.meta.users.drop(data.meta.users.get(user))) {
         info(USER_DROPPED_X_X, user, db);
         data.meta.dirty = true;
+        data.writeLock(false);
         data.flush();
       }
       Close.close(data, context);
-      return true;
-
+      return ok;
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();

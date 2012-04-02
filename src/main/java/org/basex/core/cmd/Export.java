@@ -46,7 +46,7 @@ public final class Export extends Command {
   }
 
   @Override
-  public String pinned(final Context ctx) {
+  public String writeLock(final boolean lock, final Context ctx) {
     return null;
   }
 

@@ -143,13 +143,14 @@ public abstract class Command extends Progress {
   }
 
   /**
-   * Checks if the database to be updated is opened (pinned) by a process in another JVM.
+   * Tries to (un)lock the database for exclusive write operations.
+   * @param yes lock or unlock database
    * @param ctx database context
    * @return name of pinned database
    */
-  public String pinned(final Context ctx) {
+  public String writeLock(final boolean yes, final Context ctx) {
     final Data data = ctx.data();
-    return createWrite() && data != null && data.pinned() ? data.meta.name : null;
+    return data != null && createWrite() && !data.writeLock(yes) ? data.meta.name : null;
   }
 
   /**
@@ -311,7 +312,7 @@ public abstract class Command extends Progress {
     }
 
     // check if database is locked by a process in another JVM
-    final String pin = pinned(ctx);
+    final String pin = writeLock(true, ctx);
     if(pin != null) return error(DB_PINNED_X, pin);
 
     // set updating flag
@@ -325,6 +326,8 @@ public abstract class Command extends Progress {
     } finally {
       // guarantee that process will be unregistered
       ctx.unregister(this);
+      // unlock process
+      writeLock(false, ctx);
     }
   }
 

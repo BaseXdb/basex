@@ -86,8 +86,8 @@ public final class CreateDB extends ACreate {
   }
 
   @Override
-  public String pinned(final Context ctx) {
-    return ctx.prop.is(Prop.MAINMEM) || !pinned(ctx, args[0]) ? null : args[0];
+  public String writeLock(final boolean lock, final Context ctx) {
+    return ctx.prop.is(Prop.MAINMEM) || writeLock(args[0], lock, ctx) ? null : args[0];
   }
 
   /**

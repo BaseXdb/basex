@@ -32,6 +32,11 @@ public final class TableMemAccess extends TableAccess {
   public void close() throws IOException { }
 
   @Override
+  public boolean writeLock(final boolean yes) {
+    return true;
+  }
+
+  @Override
   public int read1(final int p, final int o) {
     return (int) ((o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 7 : 15) - o << 3) & 0xFF);

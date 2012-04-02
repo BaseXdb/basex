@@ -2,33 +2,25 @@ package org.basex.data;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import java.util.*;
 
-import org.basex.build.DiskBuilder;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.Text;
-import org.basex.core.cmd.Open;
-import org.basex.index.IdPreMap;
-import org.basex.index.Index;
+import java.io.*;
+import java.nio.channels.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.ft.FTIndex;
-import org.basex.index.path.PathSummary;
-import org.basex.index.value.DiskValues;
-import org.basex.index.value.UpdatableDiskValues;
-import org.basex.index.Names;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
+import org.basex.index.ft.*;
+import org.basex.index.path.*;
+import org.basex.index.value.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.io.random.DataAccess;
-import org.basex.io.random.TableDiskAccess;
+import org.basex.io.random.*;
 import org.basex.util.*;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.list.IntList;
-import org.basex.util.Util;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class stores and organizes the database table and the index structures
@@ -40,8 +32,6 @@ import org.basex.util.Util;
  * @author Tim Petrowsky
  */
 public final class DiskData extends Data {
-  /** ID of data instance. */
-  private final String uuid = UUID.randomUUID().toString();
   /** Text compressor. */
   private final Compress comp = new Compress();
   /** Texts access file. */
@@ -124,10 +114,9 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   public void init() throws IOException {
-    table = new TableDiskAccess(meta, DATATBL);
+    table = new TableDiskAccess(meta);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));
-    pinFile().touch();
   }
 
   /**
@@ -177,7 +166,6 @@ public final class DiskData extends Data {
     closeIndex(IndexType.TEXT);
     closeIndex(IndexType.ATTRIBUTE);
     closeIndex(IndexType.FULLTEXT);
-    pinFile().delete();
   }
 
   @Override
@@ -208,7 +196,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public boolean update(final boolean updating) {
+  public boolean markUpdating(final boolean updating) {
     final IOFile upd = updateFile();
     return updating ? upd.touch() : upd.delete();
   }
@@ -221,34 +209,30 @@ public final class DiskData extends Data {
     return meta.dbfile(DATAUPD);
   }
 
-  /**
-   * Returns a pin file specific to this instance.
-   * @return lock file
-   */
-  private IOFile pinFile() {
-    return meta.dbfile(DATAPIN + uuid);
-  }
-
   @Override
-  public boolean pinned() {
-    return pinned(meta.path, uuid);
+  public boolean writeLock(final boolean yes) {
+    return table.writeLock(yes);
   }
 
   /**
-   * Checks if a database is pinned by processes that have a UUID different to the
-   * specified one.
+   * Checks if the specified database can be exclusively locked.
    * @param dbpath database path
-   * @param uuid unique id
    * @return result of check
    */
-  public static boolean pinned(final IOFile dbpath, final String uuid) {
-    final int s = DATAPIN.length();
-    final int e = IO.BASEXSUFFIX.length();
-    for(final IOFile f : dbpath.children(DATAPIN + ".*" + IO.BASEXSUFFIX)) {
-      final String n = f.name();
-      if(n.startsWith(DATAPIN)) {
-        if(!n.substring(s, n.length() - e).equals(uuid)) return true;
-      }
+  public static boolean writeLock(final IOFile dbpath) {
+    final IOFile io = new IOFile(dbpath, DATATBL + IO.BASEXSUFFIX);
+    if(!io.exists()) return true;
+
+    RandomAccessFile file = null;
+    try {
+      file = new RandomAccessFile(io.file(), "rw");
+      final FileLock lock = file.getChannel().tryLock();
+      if(lock != null) lock.release();
+      return true;
+    } catch(final IOException ex) {
+      ex.printStackTrace();
+    } finally {
+      if(file != null) try { file.close(); } catch(final IOException ex) { }
     }
     return false;
   }

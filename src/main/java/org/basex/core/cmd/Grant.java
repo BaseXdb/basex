@@ -73,20 +73,24 @@ public final class Grant extends AUser {
     // set local permissions
     try {
       final Data data = Open.open(db, context);
-      if(data.pinned()) return !info(DB_PINNED_X, db);
-
-      User u = data.meta.users.get(user);
-      // add local user reference
-      if(u == null) {
-        u = context.users.get(user).copy();
-        data.meta.users.create(u);
+      final boolean ok = data.writeLock(true);
+      if(!ok) {
+        error(DB_PINNED_X, db);
+      } else if(data.meta.users.drop(data.meta.users.get(user))) {
+        info(GRANTED_ON_X_X_X, args[0], user, db);
+        User u = data.meta.users.get(user);
+        // add local user reference
+        if(u == null) {
+          u = context.users.get(user).copy();
+          data.meta.users.create(u);
+        }
+        u.perm = prm;
+        data.meta.dirty = true;
+        data.writeLock(false);
+        data.flush();
       }
-      u.perm = prm;
-      data.meta.dirty = true;
-      data.flush();
       Close.close(data, context);
-      return info(GRANTED_ON_X_X_X, args[0], user, db);
-
+      return ok;
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();

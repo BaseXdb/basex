@@ -18,7 +18,6 @@ import org.basex.io.IO;
 import org.basex.io.random.TableDiskAccess;
 import org.basex.util.Util;
 import static org.junit.Assert.*;
-import static org.basex.data.DataText.*;
 
 /**
  * This class tests the update functionality of the block storage.
@@ -66,7 +65,7 @@ public final class DiskTableTest {
       data = new DiskBuilder(DB, parser, CONTEXT).build();
       size = data.meta.size;
       data.close();
-      tda = new TableDiskAccess(data.meta, DATATBL);
+      tda = new TableDiskAccess(data.meta);
     } catch(final Exception ex) {
       Util.stack(ex);
     }
@@ -99,7 +98,7 @@ public final class DiskTableTest {
   private void closeAndReload() {
     try {
       tda.close();
-      tda = new TableDiskAccess(data.meta, DATATBL);
+      tda = new TableDiskAccess(data.meta);
     } catch(final IOException ex) {
       fail(Util.message(ex));
     }

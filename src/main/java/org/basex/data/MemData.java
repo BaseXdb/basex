@@ -1,15 +1,12 @@
 package org.basex.data;
 
-import org.basex.core.Prop;
-import org.basex.index.IdPreMap;
-import org.basex.index.Index;
+import org.basex.core.*;
+import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.path.PathSummary;
-import org.basex.index.value.MemValues;
-import org.basex.index.value.UpdatableMemValues;
-import org.basex.index.Names;
-import org.basex.io.random.TableMemAccess;
-import org.basex.util.Token;
+import org.basex.index.path.*;
+import org.basex.index.value.*;
+import org.basex.io.random.*;
+import org.basex.util.*;
 
 /**
  * This class stores and organizes the database table and the index structures
@@ -77,13 +74,13 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
-  public boolean update(final boolean updating) {
+  public boolean markUpdating(final boolean updating) {
     return true;
   }
 
   @Override
-  public boolean pinned() {
-    return false;
+  public boolean writeLock(final boolean yes) {
+    return true;
   }
 
   @Override

@@ -51,8 +51,8 @@ public final class AlterDB extends ACreate {
   }
 
   @Override
-  public String pinned(final Context ctx) {
-    return pinned(ctx, args[0]) ? args[0] : null;
+  public String writeLock(final boolean lock, final Context ctx) {
+    return writeLock(args[0], lock, ctx) ? args[0] : null;
   }
 
   /**

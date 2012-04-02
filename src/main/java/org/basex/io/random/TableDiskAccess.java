@@ -1,16 +1,16 @@
 package org.basex.io.random;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.util.Arrays;
+import static org.basex.data.DataText.*;
 
-import org.basex.data.MetaData;
-import org.basex.io.IO;
+import java.io.*;
+import java.nio.channels.*;
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Array;
-import org.basex.util.BitArray;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * This class stores the table on disk and reads it block-wise.
@@ -24,8 +24,8 @@ public final class TableDiskAccess extends TableAccess {
   private final Buffers bm = new Buffers();
   /** File storing all blocks. */
   private final RandomAccessFile file;
-  /** Filename prefix. */
-  private final String pref;
+  /** File lock. */
+  private FileLock lock;
 
   /** FirstPre values (sorted ascending; length={@link #allBlocks}). */
   private int[] fpres;
@@ -49,17 +49,13 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Constructor.
    * @param md meta data
-   * @param pf file prefix
    * @throws IOException I/O exception
    */
-  public TableDiskAccess(final MetaData md, final String pf)
-      throws IOException {
-
+  public TableDiskAccess(final MetaData md) throws IOException {
     super(md);
-    pref = pf;
 
     // read meta and index data
-    final DataInput in = new DataInput(meta.dbfile(pf + 'i'));
+    final DataInput in = new DataInput(meta.dbfile(DATATBL + 'i'));
     allBlocks  = in.readNum();
     blocks     = in.readNum();
     fpres      = in.readNums();
@@ -78,7 +74,8 @@ public final class TableDiskAccess extends TableAccess {
     in.close();
 
     // initialize data file
-    file = new RandomAccessFile(meta.dbfile(pf).file(), "rw");
+    file = new RandomAccessFile(meta.dbfile(DATATBL).file(), "rw");
+    lock = file.getChannel().tryLock(0, Long.MAX_VALUE, true);
     readIndex(0);
   }
 
@@ -86,7 +83,7 @@ public final class TableDiskAccess extends TableAccess {
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
     if(!dirty) return;
-    final DataOutput out = new DataOutput(meta.dbfile(pref + 'i'));
+    final DataOutput out = new DataOutput(meta.dbfile(DATATBL + 'i'));
     out.writeNum(allBlocks);
     out.writeNum(blocks);
 
@@ -95,9 +92,6 @@ public final class TableDiskAccess extends TableAccess {
     for(int a = 0; a < allBlocks; a++) out.writeNum(fpres[a]);
     out.writeNum(allBlocks);
     for(int a = 0; a < allBlocks; a++) out.writeNum(pages[a]);
-
-    //out.writeNums(fpres);
-    //out.writeNums(pages);
 
     out.writeLongs(pagemap.toArray());
     out.close();
@@ -108,6 +102,22 @@ public final class TableDiskAccess extends TableAccess {
   public synchronized void close() throws IOException {
     flush();
     file.close();
+  }
+
+  @Override
+  public boolean writeLock(final boolean yes) {
+    try {
+      lock.release();
+      final FileChannel fc = file.getChannel();
+      lock = fc.tryLock(0, Long.MAX_VALUE, !yes);
+      if(lock != null) return true;
+      if(yes) lock = fc.tryLock(0, Long.MAX_VALUE, false);
+      if(lock != null) return false;
+    } catch(final IOException ex) {
+      Util.errln(ex);
+    }
+    throw Util.notexpected((yes ? "Exclusive" : "Shared") +
+        " lock could not be acquired.");
   }
 
   @Override
