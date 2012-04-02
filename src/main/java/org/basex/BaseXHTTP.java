@@ -133,6 +133,9 @@ public final class BaseXHTTP {
     if(restxq) jctx.addServlet(RestXqServlet.class, "/restxq/*");
     if(webdav) jctx.addServlet(WebDAVServlet.class, "/webdav/*");
 
+    jctx.addFilter("org.mortbay.servlet.GzipFilter", "/rest/*", Handler.ALL);
+    jctx.addFilter("org.mortbay.servlet.GzipFilter", "/restxq/*", Handler.ALL);
+
     final ResourceHandler rh = new ResourceHandler();
     rh.setWelcomeFiles(new String[] { "index.xml", "index.xhtml", "index.html" });
     rh.setResourceBase(context.mprop.get(MainProp.HTTPPATH));
