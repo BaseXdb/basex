@@ -11,11 +11,10 @@ import org.basex.server.*;
 
 /**
  * This class serves as a central database context.
- * It references the currently opened database. Moreover, it provides
- * references to the currently used, marked and copied node sets.
- *
- * This class should only be instantiated once in a project; otherwise,
- * database updates may lead to conflicts.
+ * It references the currently opened database, properties, client sessions,
+ * users and other meta data. Next, the instance of this class will be passed on to
+ * all operations, as it organizes concurrent data access, ensuring that no
+ * process will concurrently write to the same data instances.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -61,14 +60,14 @@ public final class Context {
   private Databases databases;
 
   /**
-   * Default constructor, which should only be called once in a project.
+   * Default constructor, which is only called once in a project.
    */
   public Context() {
     this(new MainProp());
   }
 
   /**
-   * Default constructor, which should only be called once in a project.
+   * Default constructor, which is only called once in a project.
    * @param props initial properties
    */
   public Context(final HashMap<String, String> props) {
@@ -76,9 +75,9 @@ public final class Context {
   }
 
   /**
-   * Constructor, passing on the main context.
+   * Constructor, called by clients, and adopting the variables of the main process.
    * The {@link #user} reference must be set after calling this method.
-   * @param ctx parent database context
+   * @param ctx context of the main process
    * @param cl client listener
    */
   public Context(final Context ctx, final ClientListener cl) {
@@ -89,7 +88,7 @@ public final class Context {
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
-    databases = ctx.databases();
+    databases = ctx.databases;
     listener = cl;
   }
 
@@ -105,12 +104,13 @@ public final class Context {
     lock = new Lock(this);
     users = new Users(true);
     repo = new Repo(this);
+    databases = new Databases(this);
     user = users.get(ADMIN);
     listener = null;
   }
 
   /**
-   * Closes the database context.
+   * Closes the database context. Should only be called from the main context instance.
    */
   public synchronized void close() {
     while(!sessions.isEmpty()) sessions.get(0).quit();
@@ -185,7 +185,7 @@ public final class Context {
   }
 
   /**
-   * Resets the current database context.
+   * Closes the current database context.
    */
   public void closeDB() {
     data = null;
@@ -295,11 +295,10 @@ public final class Context {
   }
 
   /**
-   * Get list of currently available databases.
-   * @return the databases
+   * Returns a reference to currently available databases.
+   * @return available databases
    */
   public Databases databases() {
-    if(null == databases) databases = new Databases(this);
     return databases;
   }
 }
