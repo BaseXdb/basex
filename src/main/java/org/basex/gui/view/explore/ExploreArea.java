@@ -76,7 +76,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     });
     add(all, BorderLayout.NORTH);
 
-    panel = new BaseXBack(Fill.NONE).layout(new TableLayout(20, 2, 10, 5));
+    panel = new BaseXBack(Fill.NONE).layout(new TableLayout(32, 2, 10, 5));
     add(panel, BorderLayout.CENTER);
   }
 
@@ -241,10 +241,8 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       final BaseXCombo com = (BaseXCombo) panel.getComponent(c);
       final int k = com.getSelectedIndex();
       if(k <= 0) continue;
-      String key = com.getSelectedItem().toString();
+      String key = com.getSelectedItem().toString().replaceAll("^(@?)(.*):", "$1*:");
       final boolean attr = key.startsWith("@");
-      if(key.contains(":")) key = key.replaceFirst("^.*:", "");
-      key = "*:" + key;
 
       final Component comp = panel.getComponent(c + 1);
       String pattern = "";
