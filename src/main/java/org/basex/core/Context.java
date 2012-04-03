@@ -88,7 +88,7 @@ public final class Context {
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
-    databases = ctx.databases;
+    databases = ctx.databases();
     listener = cl;
   }
 
@@ -104,7 +104,6 @@ public final class Context {
     lock = new Lock(this);
     users = new Users(true);
     repo = new Repo(this);
-    databases = new Databases(this);
     user = users.get(ADMIN);
     listener = null;
   }
@@ -299,6 +298,7 @@ public final class Context {
    * @return available databases
    */
   public Databases databases() {
+    if(databases == null) databases = new Databases(this);
     return databases;
   }
 }
