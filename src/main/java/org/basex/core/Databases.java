@@ -21,6 +21,9 @@ public final class Databases {
   public static final Pattern ZIPPATTERN =
       Pattern.compile(IO.DATEPATTERN + IO.ZIPSUFFIX + '$');
 
+  /** Database path. */
+  final IOFile dbpath;
+
   /** Available databases. */
   private final TwoWayTokenMap databases = new TwoWayTokenMap();
   /** Available backups. */
@@ -31,7 +34,8 @@ public final class Databases {
    * @param c Database context
    */
   Databases(final Context c) {
-    for(final IOFile f : c.mprop.dbpath().children()) {
+    dbpath = c.mprop.dbpath();
+    for(final IOFile f : dbpath.children()) {
       final String name = f.name();
       if(name.endsWith(IO.ZIPSUFFIX)) {
         add(ZIPPATTERN.split(name)[0], true);
