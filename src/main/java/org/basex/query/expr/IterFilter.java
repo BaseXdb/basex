@@ -38,12 +38,11 @@ final class IterFilter extends Filter {
         final long cp = ctx.pos;
         final long cs = ctx.size;
         try {
-          while(true) {
+          for(Item it; (it = iter.next()) != null;) {
             ctx.checkStop();
-            final Item it = iter.next();
-            if(it == null) return null;
             if(preds(it, ctx)) return it;
           }
+          return null;
         } finally {
           ctx.value = cv;
           ctx.pos = cp;

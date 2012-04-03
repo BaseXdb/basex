@@ -53,7 +53,7 @@ public final class MainProp extends AProp {
   /** Server: non-proxy host. */
   public static final Object[] NONPROXYHOSTS = { "NONPROXYHOSTS", "" };
 
-  /** Timeout for processing client requests; deactivated if set to 0. */
+  /** Timeout (seconds) for processing client requests; deactivated if set to 0. */
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
   /** Keep alive time of clients; deactivated if set to 0. */
   public static final Object[] KEEPALIVE = { "KEEPALIVE", 0 };
