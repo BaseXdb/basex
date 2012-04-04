@@ -20,9 +20,6 @@ import org.basex.util.*;
  * @author Dimitar Popov
  */
 public abstract class BaseXServlet extends HttpServlet {
-  /** HTTP context. */
-  protected HTTPContext http;
-
   @Override
   public final void init(final ServletConfig config) throws ServletException {
     HTTPContext.init(config.getServletContext());
@@ -32,10 +29,9 @@ public abstract class BaseXServlet extends HttpServlet {
   public final void service(final HttpServletRequest req, final HttpServletResponse res)
       throws IOException {
 
-    http = new HTTPContext(req, res);
-
+    final HTTPContext http = new HTTPContext(req, res);
     try {
-      run();
+      run(http);
     } catch(final HTTPException ex) {
       http.status(ex.getStatus(), ex.getMessage());
     } catch(final LoginException ex) {
@@ -58,7 +54,8 @@ public abstract class BaseXServlet extends HttpServlet {
 
   /**
    * Runs the code.
+   * @param http HTTP context
    * @throws Exception exception
    */
-  protected abstract void run() throws Exception;
+  protected abstract void run(final HTTPContext http) throws Exception;
 }

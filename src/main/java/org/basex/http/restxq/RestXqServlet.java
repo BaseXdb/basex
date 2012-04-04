@@ -16,7 +16,7 @@ import org.basex.http.*;
  */
 public final class RestXqServlet extends BaseXServlet {
   @Override
-  protected void run() throws Exception {
+  protected void run(final HTTPContext http) throws Exception {
     // authenticate user
     http.session();
 

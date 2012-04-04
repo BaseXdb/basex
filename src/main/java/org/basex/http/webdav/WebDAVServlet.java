@@ -14,7 +14,7 @@ import com.bradmcevoy.http.*;
  */
 public final class WebDAVServlet extends BaseXServlet {
   @Override
-  protected void run() throws IOException {
+  protected void run(final HTTPContext http) throws IOException {
     final HttpManager manager = new HttpManager(new BXResourceFactory(http));
     final Request request = new BXServletRequest(http.req);
     final Response response = new BXServletResponse(http.res);

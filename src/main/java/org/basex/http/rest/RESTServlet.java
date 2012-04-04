@@ -10,17 +10,18 @@ import org.basex.http.*;
  */
 public final class RESTServlet extends BaseXServlet {
   @Override
-  protected void run() throws Exception {
-    code(http.method).run(http);
+  protected void run(final HTTPContext http) throws Exception {
+    code(http).run(http);
   }
 
   /**
    * Returns the correct code for the specified HTTP method, or an exception.
-   * @param mth HTTP method
+   * @param http HTTP method
    * @return code
    * @throws HTTPException HTTP exception
    */
-  private RESTCode code(final HTTPMethod mth) throws HTTPException {
+  private RESTCode code(final HTTPContext http) throws HTTPException {
+    final HTTPMethod mth = http.method;
     if(mth == HTTPMethod.GET)    return new RESTGet();
     if(mth == HTTPMethod.POST)   return new RESTPost();
     if(mth == HTTPMethod.PUT)    return new RESTPut();
