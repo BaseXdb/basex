@@ -2,11 +2,11 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 
-import org.basex.data.Data;
-import org.basex.query.QueryException;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.up.NamePool;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.*;
+import org.basex.util.*;
 
 /**
  * Replace node primitive.
@@ -22,8 +22,7 @@ public final class ReplaceNode extends NodeCopy {
    * @param i input info
    * @param c node copy
    */
-  public ReplaceNode(final int p, final Data d, final InputInfo i,
-      final NodeCache c) {
+  public ReplaceNode(final int p, final Data d, final InputInfo i, final NodeCache c) {
     super(PrimitiveType.REPLACENODE, p, d, i, c);
   }
 

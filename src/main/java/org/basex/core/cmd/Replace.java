@@ -2,11 +2,9 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.

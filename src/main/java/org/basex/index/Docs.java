@@ -261,8 +261,7 @@ final class Docs {
     if(sort) {
       final int[] order = order();
       final int p = find(exct);
-      return p > -1 && p < ts && eq(paths.get(order[p]), exct) ?
-          docs.get(order[p]) : -1;
+      return p > -1 && p < ts && eq(paths.get(order[p]), exct) ? docs.get(order[p]) : -1;
     }
     for(int t = 0; t < ts; t++) {
       if(eq(paths.get(t), exct)) return docs.get(t);
