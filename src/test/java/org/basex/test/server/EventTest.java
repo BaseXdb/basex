@@ -9,6 +9,7 @@ import java.util.*;
 import org.basex.*;
 import org.basex.server.*;
 import org.basex.test.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -266,7 +267,7 @@ public final class EventTest extends SandboxTest {
         cs.query("db:event('" + name + "', '" + value + "')").execute();
         cs.close();
       } catch(final Exception ex) {
-        ex.printStackTrace();
+        Util.stack(ex);
       }
     }
   }

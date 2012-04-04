@@ -112,12 +112,12 @@ final class DatabaseUpdates {
 
   /**
    * Locks or unlocks the database for write operations.
-   * @param yes lock or unlock file
+   * @param lock lock or unlock database
    * @throws QueryException query exception
    */
-  void writeLock(final boolean yes) throws QueryException {
-    if(!data.writeLock(yes)) OPENED.thrw(null, data.meta.name);
-    if(yes && !data.startUpdate()) LOCK.thrw(null, data.meta.name);
+  void writeLock(final boolean lock) throws QueryException {
+    if(!data.writeLock(lock)) OPENED.thrw(null, data.meta.name);
+    if(lock && !data.startUpdate()) LOCK.thrw(null, data.meta.name);
   }
 
   /**
@@ -126,9 +126,6 @@ final class DatabaseUpdates {
    */
   void apply() throws QueryException {
     optimize();
-
-    // mark disk database instances as updating
-    if(!data.startUpdate()) LOCK.thrw(null, data.meta.name);
 
     /*
      * For each target node, the update primitives in the corresponding

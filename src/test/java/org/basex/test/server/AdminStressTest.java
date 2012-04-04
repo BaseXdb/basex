@@ -7,6 +7,7 @@ import org.basex.*;
 import org.basex.core.*;
 import org.basex.server.*;
 import org.basex.test.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -110,7 +111,7 @@ public final class AdminStressTest extends SandboxTest {
         session.execute(cmd);
         session.close();
       } catch(final Exception ex) {
-        ex.printStackTrace();
+        Util.stack(ex);
       } finally {
         stopSignal.countDown();
       }

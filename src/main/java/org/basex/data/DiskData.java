@@ -236,10 +236,12 @@ public final class DiskData extends Data {
     try {
       file = new RandomAccessFile(io.file(), "rw");
       final FileLock lock = file.getChannel().tryLock();
-      if(lock != null) lock.release();
-      return true;
+      if(lock != null) {
+        lock.release();
+        return true;
+      }
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     } finally {
       if(file != null) try { file.close(); } catch(final IOException ex) { }
     }

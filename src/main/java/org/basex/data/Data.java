@@ -150,10 +150,10 @@ public abstract class Data {
 
   /**
    * Locks or unlocks the database for write operations.
-   * @param yes lock or unlock file
+   * @param lock lock or unlock database
    * @return success flag
    */
-  public abstract boolean writeLock(final boolean yes);
+  public abstract boolean writeLock(final boolean lock);
 
   /**
    * Returns the indexed pre references for the specified token.

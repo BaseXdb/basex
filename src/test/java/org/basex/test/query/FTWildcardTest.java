@@ -59,7 +59,6 @@ public class FTWildcardTest {
       try {
         new FTWildcard(token(wc), null);
       } catch(final Exception ex) {
-        ex.printStackTrace();
         fail("Parsing failed: " + wc);
       }
 
@@ -69,7 +68,6 @@ public class FTWildcardTest {
         fail("Parsing did NOT fail: " + wc);
       } catch(final QueryException ex) {
       } catch(final Exception ex) {
-        ex.printStackTrace();
         fail("Error while parsing: " + wc);
       }
   }

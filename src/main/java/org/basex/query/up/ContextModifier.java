@@ -70,8 +70,8 @@ public abstract class ContextModifier {
     } finally {
       // remove write locks and updating files
       for(final DatabaseUpdates c : updates) {
-        c.writeLock(false);
         if(i-- == 0) break;
+        c.writeLock(false);
       }
     }
   }

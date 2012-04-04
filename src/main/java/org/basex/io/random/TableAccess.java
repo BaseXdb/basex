@@ -39,10 +39,10 @@ public abstract class TableAccess {
 
   /**
    * Locks or unlocks the table for write operations.
-   * @param yes lock or unlock file
+   * @param lock lock/unlock table
    * @return success flag
    */
-  public abstract boolean writeLock(final boolean yes);
+  public abstract boolean writeLock(final boolean lock);
 
   /**
    * Reads a byte value and returns it as an integer value.

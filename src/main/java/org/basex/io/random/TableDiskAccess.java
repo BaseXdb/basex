@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.channels.*;
 import java.util.*;
 
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
@@ -25,7 +26,7 @@ public final class TableDiskAccess extends TableAccess {
   /** File storing all blocks. */
   private final RandomAccessFile file;
   /** File lock. */
-  private FileLock lock;
+  private FileLock fl;
 
   /** FirstPre values (sorted ascending; length={@link #allBlocks}). */
   private int[] fpres;
@@ -75,7 +76,9 @@ public final class TableDiskAccess extends TableAccess {
 
     // initialize data file
     file = new RandomAccessFile(meta.dbfile(DATATBL).file(), "rw");
-    lock = file.getChannel().tryLock(0, Long.MAX_VALUE, true);
+    sharedLock();
+    if(fl == null) throw new BaseXException(Text.DB_PINNED_X, md.name);
+
     readIndex(0);
   }
 
@@ -105,19 +108,39 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public boolean writeLock(final boolean yes) {
+  public boolean writeLock(final boolean lock) {
     try {
-      lock.release();
-      final FileChannel fc = file.getChannel();
-      lock = fc.tryLock(0, Long.MAX_VALUE, !yes);
-      if(lock != null) return true;
-      if(yes) lock = fc.tryLock(0, Long.MAX_VALUE, false);
-      if(lock != null) return false;
+      fl.release();
+      if(lock) {
+        exclusiveLock();
+        if(fl != null) return true;
+        sharedLock();
+        if(fl != null) return false;
+      } else {
+        sharedLock();
+        return fl != null;
+      }
     } catch(final IOException ex) {
-      Util.errln(ex);
+      Util.stack(ex);
     }
-    throw Util.notexpected((yes ? "Exclusive" : "Shared") +
+    throw Util.notexpected((lock ? "Exclusive" : "Shared") +
         " lock could not be acquired.");
+  }
+
+  /**
+   * Acquires an exclusive lock on the file.
+   * @throws IOException I/O exception
+   */
+  private void exclusiveLock() throws IOException {
+    fl = file.getChannel().tryLock();
+  }
+
+  /**
+   * Acquires a shared lock on the file.
+   * @throws IOException I/O exception
+   */
+  private void sharedLock() throws IOException {
+    fl = file.getChannel().tryLock(0, Long.MAX_VALUE, true);
   }
 
   @Override

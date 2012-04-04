@@ -144,13 +144,13 @@ public abstract class Command extends Progress {
 
   /**
    * Tries to (un)lock the database for exclusive write operations.
-   * @param yes lock or unlock database
+   * @param lock lock or unlock database
    * @param ctx database context
    * @return name of pinned database
    */
-  public String writeLock(final boolean yes, final Context ctx) {
+  public String writeLock(final boolean lock, final Context ctx) {
     final Data data = ctx.data();
-    return data != null && createWrite() && !data.writeLock(yes) ? data.meta.name : null;
+    return data != null && createWrite() && !data.writeLock(lock) ? data.meta.name : null;
   }
 
   /**

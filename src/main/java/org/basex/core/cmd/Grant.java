@@ -81,12 +81,11 @@ public final class Grant extends AUser {
     }
 
     // database is currently opened by another process
-    if(data.writeLock(true)) return !info(DB_PINNED_X, db);
+    if(!data.writeLock(true)) return !info(DB_PINNED_X, db);
 
     // database cannot be locked for updating
     if(!data.startUpdate()) return !info(LOCK_X, data.meta.name);
 
-    //if(data.meta.users.drop(data.meta.users.get(user))) {
     User u = data.meta.users.get(user);
     // add local user reference
     if(u == null) {
