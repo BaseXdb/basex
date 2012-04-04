@@ -117,7 +117,7 @@ final class DatabaseUpdates {
    */
   void writeLock(final boolean yes) throws QueryException {
     if(!data.writeLock(yes)) OPENED.thrw(null, data.meta.name);
-    if(!data.markUpdating(yes)) (yes ? LOCK : UNLOCK).thrw(null, data.meta.name);
+    if(yes && !data.startUpdate()) LOCK.thrw(null, data.meta.name);
   }
 
   /**
@@ -128,7 +128,7 @@ final class DatabaseUpdates {
     optimize();
 
     // mark disk database instances as updating
-    if(!data.markUpdating(true)) LOCK.thrw(null, data.meta.name);
+    if(!data.startUpdate()) LOCK.thrw(null, data.meta.name);
 
     /*
      * For each target node, the update primitives in the corresponding
@@ -159,7 +159,7 @@ final class DatabaseUpdates {
       // resolve text adjacency issues of the last container
       recent.resolveExternalTextNodeAdjacency(0);
     } finally {
-      data.flush();
+      data.finishUpdate();
     }
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {

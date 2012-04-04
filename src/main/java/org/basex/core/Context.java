@@ -48,8 +48,8 @@ public final class Context {
   /** Focused node. */
   public int focused = -1;
 
-  /** Database path. */
-  private String path;
+  /** Path to the documents in the database. */
+  private String docpath;
   /** Node context. */
   private Nodes current;
   /** Process locking. */
@@ -88,7 +88,7 @@ public final class Context {
     lock = ctx.lock;
     users = ctx.users;
     repo = ctx.repo;
-    databases = ctx.databases;
+    databases = ctx.databases();
     listener = cl;
   }
 
@@ -104,7 +104,6 @@ public final class Context {
     lock = new Lock(this);
     users = new Users(true);
     repo = new Repo(this);
-    databases = new Databases(this);
     user = users.get(ADMIN);
     listener = null;
   }
@@ -149,8 +148,9 @@ public final class Context {
   public Nodes current() {
     if(current == null && data != null) {
       final Resources res = data.resources;
-      current = new Nodes((path == null ? res.docs() : res.docs(path)).toArray(), data);
-      current.root = path == null;
+      current = new Nodes((docpath == null ? res.docs() :
+        res.docs(docpath)).toArray(), data);
+      current.root = docpath == null;
     }
     return current;
   }
@@ -179,7 +179,7 @@ public final class Context {
    */
   public void openDB(final Data d, final String p) {
     data = d;
-    path = p;
+    docpath = p;
     copied = null;
     set(null, new Nodes(d));
   }
@@ -299,6 +299,8 @@ public final class Context {
    * @return available databases
    */
   public Databases databases() {
+    if(databases == null || !(databases.dbpath.eq(mprop.dbpath())))
+      databases = new Databases(this);
     return databases;
   }
 }

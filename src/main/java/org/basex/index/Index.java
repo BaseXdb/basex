@@ -1,7 +1,5 @@
 package org.basex.index;
 
-import java.io.IOException;
-
 /**
  * This interface defines the methods which have to be implemented
  * by an index structure.
@@ -39,7 +37,6 @@ public interface Index {
 
   /**
    * Closes the index.
-   * @throws IOException I/O exception
    */
-  void close() throws IOException;
+  void close();
 }

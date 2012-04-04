@@ -52,9 +52,8 @@ public final class DiskData extends Data {
   public DiskData(final String db, final Context ctx) throws IOException {
     meta = new MetaData(db, ctx);
 
-    // don't allow to open locked databases
-    if(updateFile().exists())
-      throw new BaseXException(Text.DB_UPDATED_X, meta.name);
+    // don't open databases marked as updating
+    if(updateFile().exists()) throw new BaseXException(Text.DB_UPDATED_X, meta.name);
 
     final DataInput in = new DataInput(meta.dbfile(DATAINF));
     try {
@@ -69,21 +68,21 @@ public final class DiskData extends Data {
         else if(k.equals(DBNS))   nspaces = new Namespaces(in);
         else if(k.equals(DBDOCS)) resources.read(in);
       }
-      // open data and indexes
-      if(meta.updindex) {
-        idmap = new IdPreMap(meta.dbfile(DATAIDP));
-        if(meta.textindex) txtindex = new UpdatableDiskValues(this, true);
-        if(meta.attrindex) atvindex = new UpdatableDiskValues(this, false);
-      } else {
-        if(meta.textindex) txtindex = new DiskValues(this, true);
-        if(meta.attrindex) atvindex = new DiskValues(this, false);
-      }
-      if(meta.ftxtindex) ftxindex = FTIndex.get(this, meta.wildcards);
-      init();
-
     } finally {
       in.close();
     }
+
+    // open data and indexes
+    if(meta.updindex) {
+      idmap = new IdPreMap(meta.dbfile(DATAIDP));
+      if(meta.textindex) txtindex = new UpdatableDiskValues(this, true);
+      if(meta.attrindex) atvindex = new UpdatableDiskValues(this, false);
+    } else {
+      if(meta.textindex) txtindex = new DiskValues(this, true);
+      if(meta.attrindex) atvindex = new DiskValues(this, false);
+    }
+    if(meta.ftxtindex) ftxindex = FTIndex.get(this, meta.wildcards);
+    init();
   }
 
   /**
@@ -106,7 +105,6 @@ public final class DiskData extends Data {
     nspaces = n;
     if(meta.updindex) idmap = new IdPreMap(meta.lastid);
     init();
-    flush();
   }
 
   /**
@@ -124,61 +122,73 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
-    final DataOutput out = new DataOutput(meta.dbfile(DATAINF));
-    meta.write(out);
-    out.writeToken(token(DBTAGS));
-    tagindex.write(out);
-    out.writeToken(token(DBATTS));
-    atnindex.write(out);
-    out.writeToken(token(DBPATH));
-    paths.write(out);
-    out.writeToken(token(DBNS));
-    nspaces.write(out);
-    out.writeToken(token(DBDOCS));
-    resources.write(out);
-    out.write(0);
-    out.close();
-    if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
+    if(meta.dirty) {
+      final DataOutput out = new DataOutput(meta.dbfile(DATAINF));
+      meta.write(out);
+      out.writeToken(token(DBTAGS));
+      tagindex.write(out);
+      out.writeToken(token(DBATTS));
+      atnindex.write(out);
+      out.writeToken(token(DBPATH));
+      paths.write(out);
+      out.writeToken(token(DBNS));
+      nspaces.write(out);
+      out.writeToken(token(DBDOCS));
+      resources.write(out);
+      out.write(0);
+      out.close();
+      if(idmap != null) idmap.write(meta.dbfile(DATAIDP));
+      meta.dirty = false;
+    }
+    // in all cases, remove updating file
+    updateFile().delete();
   }
 
   @Override
-  public synchronized void flush() {
+  public synchronized void finishUpdate() {
+    // skip all flush operations if auto flush is turned off
     if(!meta.prop.is(Prop.AUTOFLUSH)) return;
+
     try {
-      if(meta.dirty) write();
+      write();
       table.flush();
       texts.flush();
       values.flush();
       if(txtindex != null) ((DiskValues) txtindex).flush();
       if(atvindex != null) ((DiskValues) atvindex).flush();
-      meta.dirty = false;
     } catch(final IOException ex) {
       Util.stack(ex);
     }
   }
 
   @Override
-  public synchronized void close() throws IOException {
-    if(meta.dirty) write();
-    table.close();
-    texts.close();
-    values.close();
-    closeIndex(IndexType.TEXT);
-    closeIndex(IndexType.ATTRIBUTE);
-    closeIndex(IndexType.FULLTEXT);
+  public synchronized void close() {
+    try {
+      write();
+      table.close();
+      texts.close();
+      values.close();
+      closeIndex(IndexType.TEXT);
+      closeIndex(IndexType.ATTRIBUTE);
+      closeIndex(IndexType.FULLTEXT);
+    } catch(final IOException ex) {
+      Util.stack(ex);
+    }
   }
 
   @Override
-  public synchronized void closeIndex(final IndexType type) throws IOException {
+  public synchronized void closeIndex(final IndexType type) {
+    // close existing index
     final Index index = index(type);
     if(index == null) return;
-
     index.close();
+
+    // invalidate index reference
+    meta.dirty = true;
     switch(type) {
       case TEXT:      txtindex = null; break;
       case ATTRIBUTE: atvindex = null; break;
       case FULLTEXT:  ftxindex = null; break;
-      case PATH:      paths.close(); break;
       default:        break;
     }
   }
@@ -190,15 +200,14 @@ public final class DiskData extends Data {
       case TEXT:      txtindex = index; break;
       case ATTRIBUTE: atvindex = index; break;
       case FULLTEXT:  ftxindex = index; break;
-      case PATH:      paths = (PathSummary) index; break;
       default:        break;
     }
   }
 
   @Override
-  public boolean markUpdating(final boolean updating) {
-    final IOFile upd = updateFile();
-    return updating ? upd.touch() : upd.delete();
+  public boolean startUpdate() {
+    final IOFile uf = updateFile();
+    return uf.exists() || uf.touch();
   }
 
   /**
@@ -377,9 +386,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  protected long index(final int pre, final int id, final byte[] value,
-      final int kind) {
-
+  protected long index(final int pre, final int id, final byte[] value, final int kind) {
     final DataAccess store;
     final TokenObjMap<IntList> m;
 

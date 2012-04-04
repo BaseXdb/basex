@@ -39,23 +39,29 @@ public final class DataAccess {
 
   /**
    * Flushes the buffered data.
-   * @throws IOException I/O exception
    */
-  public synchronized void flush() throws IOException {
-    for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
-    if(changed) {
-      file.setLength(len);
-      changed = false;
+  public synchronized void flush() {
+    try {
+      for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
+      if(changed) {
+        file.setLength(len);
+        changed = false;
+      }
+    } catch(final IOException ex) {
+      Util.stack(ex);
     }
   }
 
   /**
    * Closes the data access.
-   * @throws IOException I/O exception
    */
-  public synchronized void close() throws IOException {
+  public synchronized void close() {
     flush();
-    file.close();
+    try {
+      file.close();
+    } catch(final IOException ex) {
+      Util.stack(ex);
+    }
   }
 
   /**

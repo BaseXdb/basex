@@ -60,17 +60,17 @@ public final class Copy extends Command {
    * @return success flag
    */
   private boolean copy(final String source, final String target) {
-    final File src = mprop.dbpath(source).file();
-    final File trg = mprop.dbpath(target).file();
+    final IOFile src = mprop.dbpath(source);
+    final IOFile trg = mprop.dbpath(target);
 
     // return false if source cannot be opened, or target cannot be created
-    final StringList files = new IOFile(src).descendants();
+    final StringList files = src.descendants();
     tf = files.size();
     boolean ok = true;
     try {
       for(final String file : files) {
         if(Databases.FILES.matcher(file).matches()) {
-          copy(new File(src, file), new File(trg, file));
+          new IOFile(src, file).copyTo(new IOFile(trg, file));
         }
         of++;
       }
@@ -82,35 +82,6 @@ public final class Copy extends Command {
     if(!ok) DropDB.drop(target, context);
     else context.databases().add(target);
     return ok;
-  }
-
-  /**
-   * Copies the specified file.
-   * @param src source file
-   * @param trg target file
-   * @throws IOException I/O exception
-   */
-  public static synchronized void copy(final File src, final File trg)
-      throws IOException {
-
-    // optimize buffer size
-    final int bsize = (int) Math.max(1, Math.min(src.length(), 1 << 22));
-    final byte[] buf = new byte[bsize];
-
-    FileInputStream fis = null;
-    FileOutputStream fos = null;
-    try {
-      // create parent directory of target file
-      trg.getParentFile().mkdirs();
-      fis = new FileInputStream(src);
-      fos = new FileOutputStream(trg);
-      // copy file buffer by buffer
-      for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
-    } finally {
-      // close file references
-      if(fis != null) try { fis.close(); } catch(final IOException ex) { }
-      if(fos != null) try { fos.close(); } catch(final IOException ex) { }
-    }
   }
 
   @Override

@@ -87,10 +87,13 @@ public abstract class ACreate extends Command {
         final Open open = new Open(db);
         if(!open.run(context)) return error(open.info());
         final Data data = context.data();
-        if(data.meta.createtext) create(IndexType.TEXT,      data, this);
-        if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
-        if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
-        data.flush();
+        try {
+          if(data.meta.createtext) create(IndexType.TEXT,      data, this);
+          if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
+          if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
+        } finally {
+          data.finishUpdate();
+        }
         context.databases().add(db);
       }
       return info(parser.info() + DB_CREATED_X_X, db, perf);
@@ -109,24 +112,6 @@ public abstract class ACreate extends Command {
       abort();
       return error(Util.info(NOT_PARSED_X, parser.src));
     }
-  }
-
-  /**
-   * Starts an update by marking the database as 'updating'.
-   * @param data data reference
-   * @return success flag
-   */
-  protected boolean startUpdate(final Data data) {
-    return data.markUpdating(true) || error(LOCK_X, data.meta.name);
-  }
-
-  /**
-   * Finalizes an update by removing 'updating' flag.
-   * @param data data reference
-   * @return success flag
-   */
-  protected boolean stopUpdate(final Data data) {
-    return data.markUpdating(false) || error(UNLOCK_X, data.meta.name);
   }
 
   /**
@@ -163,6 +148,7 @@ public abstract class ACreate extends Command {
       throws IOException {
 
     if(data instanceof MemData) return;
+
     final IndexBuilder ib;
     switch(index) {
       case TEXT:      ib = new ValueBuilder(data, true); break;
@@ -179,11 +165,8 @@ public abstract class ACreate extends Command {
    * @param index index type
    * @param data data reference
    * @return success of operation
-   * @throws IOException I/O exception
    */
-  protected static boolean drop(final IndexType index, final Data data)
-      throws IOException {
-
+  protected static boolean drop(final IndexType index, final Data data) {
     String pat = null;
     switch(index) {
       case TEXT:
@@ -202,7 +185,6 @@ public abstract class ACreate extends Command {
     }
     data.closeIndex(index);
     data.meta.dirty = true;
-    data.flush();
     return pat == null || data.meta.drop(pat + '.');
   }
 

@@ -74,7 +74,6 @@ db_exists_%          = Basis data '%' telah ada.
 db_exported_%        = Basis data '%' telah diekspor di %.
 db_flushed_%         = Basis data '%' telah dialirkan ke %.
 db_not_backup_%      = Cadangan basis data '%' tidak dapat dibuat.
-db_not_closed_%      = Basis data '%' tidak dapat ditutup.
 db_not_copied_%      = Salinan dari '%' tidak dapat dibuat.
 db_not_dropped_%     = Basis data '%' tidak dapat dihapus.
 db_not_found_%       = Basis data '%' tidak ditemukan.

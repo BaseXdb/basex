@@ -2,20 +2,16 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
+import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
-import org.basex.data.Data;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'export' command and saves the currently opened database
@@ -91,7 +87,7 @@ public final class Export extends Command {
     final IOFile bin = data.meta.binaries();
     for(final String s : bin.descendants()) {
       final String u = unique(exported, new IOFile(root.path(), s).path());
-      Copy.copy(new File(bin.path(), s), new File(u));
+      new IOFile(bin.path(), s).copyTo(new IOFile(u));
     }
   }
 

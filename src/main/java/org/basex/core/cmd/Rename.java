@@ -35,8 +35,8 @@ public final class Rename extends ACreate {
     final String trg = MetaData.normPath(args[1]);
     if(trg == null) return error(NAME_INVALID_X, args[1]);
 
-    // set updating flag
-    if(!startUpdate(data)) return false;
+    // start update
+    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
 
     boolean ok = true;
     int c = 0;
@@ -51,8 +51,6 @@ public final class Rename extends ACreate {
         c++;
       }
     }
-    // data was changed: update context
-    if(c != 0) data.flush();
 
     final IOFile file = data.meta.binary(src);
     if(file != null && file.exists()) {
@@ -63,9 +61,11 @@ public final class Rename extends ACreate {
       }
       c++;
     }
+    // finish update
+    data.finishUpdate();
 
-    // remove updating flag and return error or info message
-    return stopUpdate(data) && info(DOCS_RENAMED_X_X, c, perf) && ok;
+    // return info message
+    return info(DOCS_RENAMED_X_X, c, perf) && ok;
   }
 
   /**

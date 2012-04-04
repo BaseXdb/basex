@@ -48,7 +48,7 @@ final class FTFuzzyList extends FTList {
   }
 
   @Override
-  void close() throws IOException {
+  void close() {
     super.close();
     sizes.delete();
   }

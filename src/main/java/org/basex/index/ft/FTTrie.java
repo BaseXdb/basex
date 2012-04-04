@@ -117,7 +117,7 @@ final class FTTrie extends FTIndex {
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public synchronized void close() {
     inB.close();
     inC.close();
     inA.close();

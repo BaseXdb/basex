@@ -172,7 +172,7 @@ final class QueryListener extends Progress {
       }
     } finally {
       // close processor and stop monitoring
-      try { qp.close(); } catch(final QueryException ex) { }
+      qp.close();
     }
   }
 
