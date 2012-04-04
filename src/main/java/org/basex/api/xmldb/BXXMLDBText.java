@@ -42,5 +42,6 @@ interface BXXMLDBText {
   String ERR_ITER = "Resource pointer out of range.";
   /** Error message. */
   String ERR_DOC = "Document ID cannot be retrieved from query result.";
+  /** Error message. */
+  String ERR_LOCK = "Database cannot be marked as 'updating'.";
 }
-

@@ -1,25 +1,21 @@
 package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import org.w3c.dom.Document;
+
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.basex.build.*;
+import org.basex.build.xml.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.w3c.dom.*;
 import org.xmldb.api.base.*;
-import org.xmldb.api.modules.BinaryResource;
-import org.xmldb.api.modules.XMLResource;
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
-import org.basex.build.xml.DOMWrapper;
-import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.Open;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IOContent;
-import org.basex.util.Token;
-import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
+import org.xmldb.api.modules.*;
 
 /**
  * Implementation of the Collection Interface for the XMLDB:API.
@@ -152,10 +148,10 @@ public final class BXCollection implements Collection, BXXMLDBText {
     if(del.data != data && del.data != null) throw new XMLDBException(
         ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + data.meta.name);
 
-    // find correct value and remove the node
-    final IntList il = new IntList();
-    il.add(getResource(del.getId()).pre);
-    Delete.delete(ctx, il);
+    if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
+    data.delete(getResource(del.getId()).pre);
+    ctx.update();
+    data.finishUpdate();
   }
 
   @Override
@@ -179,18 +175,21 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final Object cont = xml.content;
 
     // insert document
+    final Data md;
     try {
       final Parser p = cont instanceof Document ?
         new DOMWrapper((Document) cont, id, ctx.prop) :
         Parser.singleParser(new IOContent((byte[]) cont, id), ctx.prop, "");
-
-      final Data data = ctx.data();
-      data.insert(data.meta.size, -1, MemBuilder.build(id, p));
-      ctx.update();
-      data.flush();
+      md = MemBuilder.build(id, p);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.INVALID_RESOURCE, ex.getMessage());
     }
+
+    final Data data = ctx.data();
+    if(!data.startUpdate()) throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_LOCK);
+    data.insert(data.meta.size, -1, md);
+    ctx.update();
+    data.finishUpdate();
   }
 
   @Override

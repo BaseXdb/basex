@@ -275,11 +275,7 @@ abstract class BXQDynamicContext extends BXQAbstract
 
   @Override
   public final void close() throws XQException {
-    try {
-      if(!closed) qp.close();
-    } catch(final QueryException ex) {
-      throw new XQQueryException(ex.getMessage());
-    }
+    if(!closed) qp.close();
     super.close();
   }
 }
