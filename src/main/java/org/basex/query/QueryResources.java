@@ -79,18 +79,12 @@ public final class QueryResources {
 
   /**
    * Closes the opened data references.
-   * @throws QueryException query exception
    */
-  void close() throws QueryException {
-    try {
-      for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
-        Close.close(data[d], ctx.context);
-      }
-    } catch(final IOException ex) {
-      throw DBCLOSE.thrw(null);
-    } finally {
-      datas = 0;
+  void close() {
+    for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
+      Close.close(data[d], ctx.context);
     }
+    datas = 0;
   }
 
   /**

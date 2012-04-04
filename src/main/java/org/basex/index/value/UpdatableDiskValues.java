@@ -93,7 +93,7 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  public void flush() throws IOException {
+  public void flush() {
     idxl.write4(0, size);
     super.flush();
   }

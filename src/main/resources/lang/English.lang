@@ -74,7 +74,6 @@ db_exists_%          = Database '%' exists already.
 db_exported_%        = Database '%' was exported in %.
 db_flushed_%         = Database '%' was flushed in %.
 db_not_backup_%      = Backup of database '%' could not be created.
-db_not_closed_%      = Database '%' could not be closed.
 db_not_copied_%      = Copy of '%' could not be created.
 db_not_dropped_%     = Database '%' could not be dropped.
 db_not_found_%       = Database '%' was not found.

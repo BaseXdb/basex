@@ -54,23 +54,28 @@ public final class DropUser extends AUser {
     }
 
     // drop local user
+    final Data data;
     try {
-      final Data data = Open.open(db, context);
-      if(data.pinned()) return !info(DB_PINNED_X, db);
-
-      if(data.meta.users.drop(data.meta.users.get(user))) {
-        info(USER_DROPPED_X_X, user, db);
-        data.meta.dirty = true;
-        data.flush();
-      }
-      Close.close(data, context);
-      return true;
-
+      data = Open.open(db, context);
     } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();
       return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
     }
+
+    // database is currently opened by another process
+    if(data.pinned()) return !info(DB_PINNED_X, db);
+
+    // database cannot be locked for updating
+    if(!data.startUpdate()) return !info(LOCK_X, data.meta.name);
+
+    if(data.meta.users.drop(data.meta.users.get(user))) {
+      info(USER_DROPPED_X_X, user, db);
+      data.meta.dirty = true;
+    }
+    data.finishUpdate();
+    Close.close(data, context);
+    return true;
   }
 
   @Override

@@ -1,19 +1,16 @@
 package org.basex.test.query.ast;
 
-import java.io.IOException;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
-import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.Data;
-import org.basex.io.serial.BuilderSerializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.QueryText;
-
+import static org.basex.core.Prop.*;
 import static org.junit.Assert.*;
-import static org.basex.core.Prop.NL;
+
+import java.io.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
 
 /**
  * Abstract test class for properties on the Query Plan.
@@ -60,7 +57,7 @@ public abstract class QueryPlanTest {
     } catch(final Exception ex) {
       throw new Error(ex.getMessage(), ex);
     } finally {
-      try { qp.close(); } catch(final QueryException ex) { }
+      qp.close();
     }
   }
 }

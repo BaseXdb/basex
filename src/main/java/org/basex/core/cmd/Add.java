@@ -117,21 +117,6 @@ public final class Add extends ACreate {
     Data tmp = null;
     try {
       tmp = build.build();
-      // ignore empty fragments
-      if(tmp.meta.size > 1) {
-        // set updating flag
-        if(!startUpdate(data)) return false;
-
-        data.insert(data.meta.size, -1, tmp);
-        context.update();
-        data.flush();
-
-        // remove updating flag
-        if(!stopUpdate(data)) return false;
-      }
-      // return info message
-      return info(parser.info() + PATH_ADDED_X_X, name, perf);
-
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(Util.message(ex));
@@ -139,10 +124,21 @@ public final class Add extends ACreate {
     } finally {
       // close and drop intermediary database instance
       try { build.close(); } catch(final IOException e) { }
-      if(tmp != null) try { tmp.close(); } catch(final IOException e) { }
+      if(tmp != null) tmp.close();
       // drop temporary database instance
       if(large) DropDB.drop(db, context);
     }
+
+    // skip update if fragment is empty
+    if(tmp.meta.size > 1) {
+      if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+      data.insert(data.meta.size, -1, tmp);
+      context.update();
+      data.finishUpdate();
+    }
+    // return info message
+    return info(parser.info() + PATH_ADDED_X_X, name, perf);
+
   }
 
   @Override

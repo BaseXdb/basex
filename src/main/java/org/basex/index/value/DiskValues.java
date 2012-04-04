@@ -282,15 +282,14 @@ public class DiskValues implements Index {
 
   /**
    * Flushes the buffered data.
-   * @throws IOException I/O exception
    */
-  public void flush() throws IOException {
+  public void flush() {
     idxl.flush();
     idxr.flush();
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public synchronized void close() {
     idxl.close();
     idxr.close();
   }

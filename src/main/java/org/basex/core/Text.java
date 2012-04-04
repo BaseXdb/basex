@@ -500,8 +500,6 @@ public interface Text {
 
   /** Updating error. */
   String LOCK_X = "Database '%' cannot be marked as 'updating'.";
-  /** Updating error. */
-  String UNLOCK_X = "Database '%' is still marked as 'updating'.";
 
   /** File not found. */
   String FILE_NOT_FOUND_X = lang("file_not_found_%");
@@ -532,8 +530,6 @@ public interface Text {
   String DB_UPDATED_X = lang("db_updated_%");
   /** Database closed. */
   String DB_CLOSED_X = lang("db_closed_%");
-  /** Database not closed. */
-  String DB_NOT_CLOSED_X = lang("db_not_closed_%");
   /** Database optimized. */
   String DB_OPTIMIZED_X = lang("db_optimized_%");
   /** Database dropped. */

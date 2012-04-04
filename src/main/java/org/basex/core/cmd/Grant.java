@@ -2,12 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.User;
+import org.basex.core.*;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.data.Data;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'grant' command and grants permissions to users.
@@ -71,27 +69,31 @@ public final class Grant extends AUser {
     }
 
     // set local permissions
+    final Data data;
     try {
-      final Data data = Open.open(db, context);
-      if(data.pinned()) return !info(DB_PINNED_X, db);
-
-      User u = data.meta.users.get(user);
-      // add local user reference
-      if(u == null) {
-        u = context.users.get(user).copy();
-        data.meta.users.create(u);
-      }
-      u.perm = prm;
-      data.meta.dirty = true;
-      data.flush();
-      Close.close(data, context);
-      return info(GRANTED_ON_X_X_X, args[0], user, db);
-
-    } catch(final IOException ex) {
+      data = Open.open(db, context);
+    } catch(final Exception ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();
       return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
     }
+
+    // database is currently opened by another process
+    if(data.pinned()) return !info(DB_PINNED_X, db);
+
+    // database cannot be locked for updating
+    if(!data.startUpdate()) return !info(LOCK_X, data.meta.name);
+    User u = data.meta.users.get(user);
+    // add local user reference
+    if(u == null) {
+      u = context.users.get(user).copy();
+      data.meta.users.create(u);
+    }
+    u.perm = prm;
+    data.meta.dirty = true;
+    data.finishUpdate();
+    Close.close(data, context);
+    return info(GRANTED_ON_X_X_X, args[0], user, db);
   }
 
   @Override

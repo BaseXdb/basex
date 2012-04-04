@@ -241,9 +241,8 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Closes the processor.
-   * @throws QueryException query exception
    */
-  public void close() throws QueryException {
+  public void close() {
     // close only once
     if(closed) return;
     closed = true;

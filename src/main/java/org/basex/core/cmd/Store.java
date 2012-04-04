@@ -60,18 +60,17 @@ public final class Store extends ACreate {
     if(path.isEmpty() || path.endsWith(".") || file == null || file.isDir())
       return error(NAME_INVALID_X, create ? path : args[0]);
 
-    // set updating flag
-    if(!startUpdate(data)) return false;
+    // start update
+    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
 
-    boolean ok = true;
     try {
       store(in, file);
+      return info(QUERY_EXECUTED_X, perf);
     } catch(final IOException ex) {
-      ok = error(FILE_NOT_STORED_X, ex.getMessage());
+      return error(FILE_NOT_STORED_X, ex.getMessage());
+    } finally {
+      data.finishUpdate();
     }
-
-    // remove updating flag and return error or info message
-    return stopUpdate(data) && ok && info(QUERY_EXECUTED_X, perf);
   }
 
   /**

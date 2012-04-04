@@ -32,8 +32,6 @@ public enum Err {
   IDINVALID(BASX, 4, "%: value '%' out of range."),
   /** BASX0005: Evaluation exception. */
   PERMNO(BASX, 5, Text.PERM_NEEDED_X),
-  /** BASX0006: Evaluation exception. */
-  DBCLOSE(BASX, 6, "Not all databases properly closed."),
   /** BASX0007: Evaluation exception. */
   QUERYNODES(BASX, 7, Text.NO_DB_NODES),
   /** BASX0008: Evaluation exception. */
@@ -66,8 +64,6 @@ public enum Err {
   OPENED(BASX, 20, "Database '%' is opened by another process."),
   /** BASX0020: Evaluation exception. */
   LOCK(BASX, 20, "Database '%' cannot be marked as 'updating'."),
-  /** BASX0020: Evaluation exception. */
-  UNLOCK(BASX, 20, "The 'updating' flag of '%' could not be removed."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

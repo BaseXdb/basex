@@ -3,7 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 
 import org.basex.core.*;
-import org.basex.data.Data;
+import org.basex.data.*;
 
 /**
  * Evaluates the 'flush' command and flushes the database buffers.
@@ -24,7 +24,7 @@ public final class Flush extends Command {
     final Data data = context.data();
     final boolean af = prop.is(Prop.AUTOFLUSH);
     prop.set(Prop.AUTOFLUSH, true);
-    data.flush();
+    data.finishUpdate();
     prop.set(Prop.AUTOFLUSH, af);
     return info(DB_FLUSHED_X, data.meta.name, perf);
   }

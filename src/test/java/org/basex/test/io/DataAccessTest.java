@@ -91,10 +91,9 @@ public class DataAccessTest {
 
   /**
    * Tear down method.
-   * @throws IOException I/O exception
    */
   @After
-  public void tearDown() throws IOException {
+  public void tearDown() {
     da.close();
     file.delete();
   }

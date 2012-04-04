@@ -74,7 +74,6 @@ db_exists_%          = La base de données '%' existe déjà.
 db_exported_%        = Base de données '%' exportée en %.
 db_flushed_%         = La base de données '%' a été nettoyée (flush) en %.
 db_not_backup_%      = La sauvegarde de la base de données '%' n'a pas pu être créée.
-db_not_closed_%      = Impossible de fermer la base de données '%'.
 db_not_copied_%      = La copie de '%' n'a pas pu être créée.
 db_not_dropped_%     = Impossible d'effacer la base de données '%'.
 db_not_found_%       = La base de données '%' est introuvable.

@@ -2,7 +2,6 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
@@ -94,9 +93,7 @@ public final class Datas {
    * Closes all data references.
    */
   synchronized void close() {
-    for(final Data d : list) {
-      try { d.close(); } catch(final IOException ex) { Util.debug(ex); }
-    }
+    for(final Data d : list) d.close();
     list.clear();
   }
 

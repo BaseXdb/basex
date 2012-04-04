@@ -29,7 +29,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       fail("Query failed:\n" + query + "\nMessage: " + ex.getMessage());
       return null;
     } finally {
-      try { qp.close(); } catch(final QueryException ex) { }
+      qp.close();
     }
   }
 
@@ -72,7 +72,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     } catch(final QueryException ex) {
       check(ex, error);
     } finally {
-      try { qp.close(); } catch(final QueryException ex) { }
+      qp.close();
     }
   }
 

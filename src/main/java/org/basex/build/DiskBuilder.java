@@ -86,7 +86,9 @@ public final class DiskBuilder extends Builder {
     md.dbfile(DATATMP).delete();
 
     // return database instance
-    return new DiskData(md, tags, atts, path, ns);
+    final DiskData data = new DiskData(md, tags, atts, path, ns);
+    data.finishUpdate();
+    return data;
   }
 
   @Override

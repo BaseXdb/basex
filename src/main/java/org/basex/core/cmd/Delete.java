@@ -27,34 +27,23 @@ public final class Delete extends ACreate {
     final Data data = context.data();
     final String target = args[0];
 
-    // set updating flag
-    if(!startUpdate(data)) return false;
+    // start update
+    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
 
-    // delete documents
+    // delete all documents in reverse order (faster)
     final IntList docs = data.resources.docs(target);
-    delete(context, docs);
+    for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
+    if(docs.size() != 0) context.update();
+
     // delete binaries
     final TokenList bins = data.resources.binaries(target);
     delete(data, target);
 
-    // remove updating flag and return info message
-    return stopUpdate(data) && info(DOCS_DELETED_X_X, docs.size() + bins.size(), perf);
-  }
+    // finish update
+    data.finishUpdate();
 
-  /**
-   * Deletes the specified nodes.
-   * @param ctx database context
-   * @param docs pre values of documents to be deleted
-   */
-  public static void delete(final Context ctx, final IntList docs) {
-    // data was changed: update context
-    if(docs.size() == 0) return;
-
-    // loop through all documents in reverse order
-    final Data data = ctx.data();
-    for(int d = docs.size() - 1; d >= 0; d--) data.delete(docs.get(d));
-    ctx.update();
-    data.flush();
+    // return info message
+    return info(DOCS_DELETED_X_X, docs.size() + bins.size(), perf);
   }
 
   /**

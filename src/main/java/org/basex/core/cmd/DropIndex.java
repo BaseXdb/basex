@@ -1,15 +1,13 @@
 package org.basex.core.cmd;
 
-import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-import java.io.IOException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.User;
+
+import org.basex.core.*;
+import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.data.Data;
-import org.basex.data.MemData;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.util.Util;
 
 /**
  * Evaluates the 'drop index' command and deletes indexes in the currently
@@ -33,33 +31,30 @@ public final class DropIndex extends ACreate {
     if(data instanceof MemData) return error(NO_MAINMEM);
 
     final CmdIndex ci = getOption(CmdIndex.class);
+    final IndexType it;
     switch(ci) {
       case TEXT:
         data.meta.createtext = false;
-        return drop(IndexType.TEXT);
+        it = IndexType.TEXT;
+        break;
       case ATTRIBUTE:
         data.meta.createattr = false;
-        return drop(IndexType.ATTRIBUTE);
+        it = IndexType.ATTRIBUTE;
+        break;
       case FULLTEXT:
         data.meta.createftxt = false;
-        return drop(IndexType.FULLTEXT);
+        it = IndexType.FULLTEXT;
+        break;
       default:
         return error(UNKNOWN_CMD_X, this);
     }
-  }
 
-  /**
-   * Drops the specified index.
-   * @param idx index type
-   * @return success of operation
-   */
-  private boolean drop(final IndexType idx) {
+    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
     try {
-      return drop(idx, context.data()) ? info(INDEX_DROPPED_X_X, idx, perf) :
-        error(INDEX_NOT_DROPPED_X, idx);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return error(ex.getMessage());
+      return drop(it, context.data()) ? info(INDEX_DROPPED_X_X, it, perf) :
+        error(INDEX_NOT_DROPPED_X, it);
+    } finally {
+      data.finishUpdate();
     }
   }
 

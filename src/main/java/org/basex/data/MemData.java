@@ -65,9 +65,6 @@ public final class MemData extends Data {
   }
 
   @Override
-  public void flush() { }
-
-  @Override
   public void close() { }
 
   @Override
@@ -77,14 +74,13 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
-  public boolean update(final boolean updating) {
-    return true;
-  }
+  public boolean startUpdate() { return true; }
 
   @Override
-  public boolean pinned() {
-    return false;
-  }
+  public void finishUpdate() { }
+
+  @Override
+  public boolean pinned() { return false; }
 
   @Override
   public byte[] text(final int pre, final boolean text) {
@@ -109,8 +105,7 @@ public final class MemData extends Data {
   // UPDATE OPERATIONS ========================================================
 
   @Override
-  protected void delete(final int pre, final boolean text) {
-  }
+  protected void delete(final int pre, final boolean text) { }
 
   @Override
   public void updateText(final int pre, final byte[] val, final int kind) {

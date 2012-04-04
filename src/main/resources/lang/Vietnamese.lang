@@ -74,7 +74,6 @@ db_exists_%          = Cơ sở dữ liệu '%' đã có rồi
 db_exported_%        = Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
 db_flushed_%         = Database '%' was flushed in %.
 db_not_backup_%      = Backup of database '%' could not be created.
-db_not_closed_%      = Cơ sở dữ liệu '%' không đóng được.
 db_not_copied_%      = Copy of '%' could not be created.
 db_not_dropped_%     = Cơ sở dữ liệu '%' không xóa bỏ được.
 db_not_found_%       = Cơ sở dữ liệu '%' không tìm thấy.

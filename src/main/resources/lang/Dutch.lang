@@ -74,7 +74,6 @@ db_exists_%          = Database bestaat '%' al.
 db_exported_%        = Database '%' geëxporteerd in %.
 db_flushed_%         = Database '%' geflushed in %.
 db_not_backup_%      = Backup van database '%' kon niet gemaakt worden.
-db_not_closed_%      = Database '%' kon niet gesloten worden.
 db_not_copied_%      = Kopie van '%' kon niet gemaakt worden.
 db_not_dropped_%     = Database '%' kon niet verwijderd worden.
 db_not_found_%       = Database '%' is niet gevonden.

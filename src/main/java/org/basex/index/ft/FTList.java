@@ -54,9 +54,8 @@ abstract class FTList {
 
   /**
    * Checks if more tokens are found.
-   * @throws IOException I/O exception
    */
-  final void next() throws IOException {
+  final void next() {
     if(wasted) return;
 
     tok = token();
@@ -77,9 +76,8 @@ abstract class FTList {
 
   /**
    * Closes and deletes the input files.
-   * @throws IOException I/O exception
    */
-  void close() throws IOException {
+  void close() {
     str.close();
     dat.close();
     files.delete();

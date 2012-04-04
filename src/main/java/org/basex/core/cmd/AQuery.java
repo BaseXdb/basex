@@ -136,7 +136,7 @@ abstract class AQuery extends Command {
         err = XPSTACK.desc;
       } finally {
         // close processor after exceptions
-        if(qp != null) try { qp.close(); } catch(final QueryException ex) { }
+        if(qp != null) qp.close();
       }
     }
 
@@ -167,7 +167,7 @@ abstract class AQuery extends Command {
     } catch(final QueryException ex) {
       Util.debug(ex);
       qe = ex;
-      if(qp != null) try { qp.close(); } catch(final QueryException e) { }
+      if(qp != null) qp.close();
       return false;
     }
   }

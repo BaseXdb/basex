@@ -2,38 +2,26 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 import java.util.Set;
 
-import org.basex.core.cmd.InfoStorage;
-import org.basex.index.IdPreMap;
-import org.basex.index.Index;
-import org.basex.index.IndexIterator;
-import org.basex.index.IndexToken;
+import org.basex.core.cmd.*;
+import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.Names;
-import org.basex.index.Resources;
-import org.basex.index.path.PathSummary;
-import org.basex.io.IO;
-import org.basex.io.random.TableAccess;
-import org.basex.util.Atts;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.list.IntList;
+import org.basex.index.path.*;
+import org.basex.io.*;
+import org.basex.io.random.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
- * This class provides access to the database storage.
- * Note that the methods of this class are optimized for performance.
- * They will not check if correct data is requested, i.e. if a text is
- * requested, a pre value must points to a text node.
+ * This class represents a database instance. It provides low-level access to all
+ * properties and values stored in a single database.
  *
- * All nodes in the table are accessed by their
- * implicit pre value. The following restrictions are imposed on the data:
+ * An XML node is accessed by its {@code pre} value, which is not stored itself, but
+ * given by the table position. The following restrictions are imposed on the data:
  * <ul>
  * <li>The table is limited to 2^31 entries (pre values are signed int's)</li>
  * <li>A maximum of 2^15 different tag and attribute names is allowed</li>
@@ -67,21 +55,25 @@ import org.basex.util.list.IntList;
  * - Byte    11:  NURI: Namespace (bits: 7-3)
  * </pre>
  *
+ * As all methods of this class are optimized for performance, no checks are
+ * performed on the arguments (e.g.: if the string value of a text node is
+ * requested, the specified pre value must point to a text node).
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public abstract class Data {
-  /** Node kind: Document. */
+  /** Node kind: document (code: {@code 0}). */
   public static final byte DOC = 0x00;
-  /** Node kind: Element. */
+  /** Node kind: element (code: {@code 1}). */
   public static final byte ELEM = 0x01;
-  /** Node kind: Text. */
+  /** Node kind: text (code: {@code 2}). */
   public static final byte TEXT = 0x02;
-  /** Node kind: Attribute. */
+  /** Node kind: attribute (code: {@code 3}). */
   public static final byte ATTR = 0x03;
-  /** Node kind: Comment. */
+  /** Node kind: comment (code: {@code 4}). */
   public static final byte COMM = 0x04;
-  /** Node kind: Processing Instruction. */
+  /** Node kind: processing instruction (code: {@code 5}). */
   public static final byte PI = 0x05;
 
   /** Resource index. */
@@ -111,15 +103,9 @@ public abstract class Data {
   IdPreMap idmap;
 
   /**
-   * Closes the current database.
-   * @throws IOException I/O exception
+   * Closes the database.
    */
-  public abstract void close() throws IOException;
-
-  /**
-   * Flushes the database.
-   */
-  public abstract void flush();
+  public abstract void close();
 
   /**
    * Checks if the database contains no documents.
@@ -141,9 +127,8 @@ public abstract class Data {
   /**
    * Closes the specified index.
    * @param type index to be closed
-   * @throws IOException I/O exception
    */
-  public abstract void closeIndex(IndexType type) throws IOException;
+  public abstract void closeIndex(IndexType type);
 
   /**
    * Assigns the specified index.
@@ -153,11 +138,15 @@ public abstract class Data {
   public abstract void setIndex(IndexType type, Index index);
 
   /**
-   * Marks a database as updating.
-   * @param updating updating flag (start/stop updating process)
+   * Starts an update operation.
    * @return success flag
    */
-  public abstract boolean update(final boolean updating);
+  public abstract boolean startUpdate();
+
+  /**
+   * Finishes an update operation.
+   */
+  public abstract void finishUpdate();
 
   /**
    * Checks if this database is also opened (pinned) by other instances.
@@ -301,7 +290,8 @@ public abstract class Data {
   }
 
   /**
-   * Returns a node kind.
+   * Returns the node kind, which may be {@link #DOC}, {@link #ELEM}, {@link #TEXT},
+   * {@link #ATTR}, {@link #COMM} or {@link #PI}.
    * @param pre pre value
    * @return node kind
    */
