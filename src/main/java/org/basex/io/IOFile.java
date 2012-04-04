@@ -300,6 +300,32 @@ public final class IOFile extends IO {
     return file.renameTo(trg.file);
   }
 
+  /**
+   * Copies a file to another destination.
+   * @param trg target
+   * @throws IOException I/O exception
+   */
+  public void copyTo(final IOFile trg) throws IOException {
+    // optimize buffer size
+    final int bsize = (int) Math.max(1, Math.min(length(), 1 << 22));
+    final byte[] buf = new byte[bsize];
+
+    FileInputStream fis = null;
+    FileOutputStream fos = null;
+    try {
+      // create parent directory of target file
+      new IOFile(trg.dir()).md();
+      fis = new FileInputStream(file);
+      fos = new FileOutputStream(trg.file);
+      // copy file buffer by buffer
+      for(int i; (i = fis.read(buf)) != -1;) fos.write(buf, 0, i);
+    } finally {
+      // close file references
+      if(fis != null) try { fis.close(); } catch(final IOException ex) { }
+      if(fos != null) try { fos.close(); } catch(final IOException ex) { }
+    }
+  }
+
   @Override
   public String url() {
     final TokenBuilder tb = new TokenBuilder(FILEPREF);

@@ -3,34 +3,20 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.nio.charset.*;
+import java.util.regex.*;
 
-import org.basex.core.Prop;
-import org.basex.core.cmd.Copy;
-import org.basex.io.IOFile;
-import org.basex.io.out.BufferOutput;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.B64Stream;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Dtm;
-import org.basex.query.item.Int;
-import org.basex.query.item.Item;
-import org.basex.query.item.Str;
-import org.basex.query.item.StrStream;
-import org.basex.query.item.Uri;
-import org.basex.query.iter.Iter;
-import org.basex.util.InputInfo;
-import org.basex.util.list.StringList;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Functions on files and directories.
@@ -456,7 +442,7 @@ public final class FNFile extends StandardFunc {
       for(final File f : files) copy(f, new File(trg, f.getName()));
     } else {
       try {
-        Copy.copy(src, trg);
+        new IOFile(src).copyTo(new IOFile(trg));
       } catch(final IOException ex) {
         FILEERROR.thrw(info, ex);
       }
