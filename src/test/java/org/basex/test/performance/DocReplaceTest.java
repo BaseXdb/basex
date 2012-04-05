@@ -4,7 +4,6 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.test.*;
-import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -30,24 +29,15 @@ public final class DocReplaceTest extends SandboxTest {
     // create test database
     new CreateDB(NAME).execute(CONTEXT);
 
-    // add nodes
-    Performance p = new Performance();
+    // replace nodes
     for(int i = 0; i < NQUERIES; i++) {
       new Add(i + IO.XMLSUFFIX, "<a/>").execute(CONTEXT);
     }
-    System.out.println(p);
 
     // replace nodes with same content
-    for(int i = NQUERIES; i >= 0; i--) {
+    for(int i = 0; i < NQUERIES; i++) {
       new Replace(i + IO.XMLSUFFIX, "<a/>").execute(CONTEXT);
     }
-    System.out.println(p);
-
-    // replace nodes with same content
-    for(int i = NQUERIES; i >= 0; i--) {
-      new Replace(i + IO.XMLSUFFIX, "<a/>").execute(CONTEXT);
-    }
-    System.out.println(p);
 
     // Drop database
     new DropDB(NAME).execute(CONTEXT);
