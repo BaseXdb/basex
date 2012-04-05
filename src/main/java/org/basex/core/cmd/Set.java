@@ -44,10 +44,4 @@ public final class Set extends AGet {
       return error(INVALID_VALUE_X_X, key, val);
     }
   }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    // command may set options that influence other commands
-    return true;
-  }
 }
