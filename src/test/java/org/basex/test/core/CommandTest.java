@@ -441,10 +441,6 @@ public class CommandTest extends SandboxTest {
     no(new Restore("test"));
     ok(new DropBackup("test-1"));
     ok(new DropDB("test-1"));
-    // deleting a backup passing the exact backup name as argument
-    ok(new CreateDB(NAME));
-    ok(new CreateBackup(NAME));
-    ok(new DropBackup(CONTEXT.databases().listBackups().get(0)));
   }
 
   /**
@@ -457,16 +453,9 @@ public class CommandTest extends SandboxTest {
     ok(new CreateBackup(NAME));
     ok(new DropBackup(NAME));
 
-    // dropping a specific backup (database name + time stamp)
-    ok(new CreateDB(NAME));
-    ok(new CreateBackup(NAME));
-    final String[] b = CONTEXT.databases().listBackups(NAME).toArray();
-    ok(new DropBackup(b[0]));
-
     /* Creates 2 dbs: one with a short name (1), the other with a
      * longer name (2). (1) is a prefix of (2). Tests then, whether
-     * backups of both dbs are deleted, when we drop backups of (1).
-     */
+     * backups of both dbs are deleted, when we drop backups of (1). */
     ok(new CreateDB(NAME));
     ok(new CreateDB(NAME2));
     ok(new CreateBackup(NAME));

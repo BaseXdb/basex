@@ -20,7 +20,9 @@ public final class UpdateTestDeletes extends UpdateTest {
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParSize = data.size(2, Data.ELEM);
+    data.startUpdate();
     data.delete(3);
+    data.finishUpdate();
     assertEquals(size - 1, data.meta.size);
     assertArraysEquals(PARENTNODE, data.name(3, Data.ELEM));
     assertEquals(oldDocSize - 1, data.size(0, Data.DOC));
@@ -44,7 +46,9 @@ public final class UpdateTestDeletes extends UpdateTest {
     final Data data = CONTEXT.data();
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
+    data.startUpdate();
     data.delete(2);
+    data.finishUpdate();
     assertEquals(size - 2, data.meta.size);
     assertArraysEquals(PARENTNODE, data.name(2, Data.ELEM));
     assertEquals(oldDocSize - 2, data.size(0, Data.DOC));
@@ -67,7 +71,9 @@ public final class UpdateTestDeletes extends UpdateTest {
     final int oldDocSize = data.size(0, Data.DOC);
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(4, Data.ELEM);
+    data.startUpdate();
     data.delete(6);
+    data.finishUpdate();
     assertEquals(size - 5, data.meta.size);
     assertArraysEquals(B, data.name(6, Data.ELEM));
     assertEquals(oldDocSize - 5, data.size(0, Data.DOC));
@@ -91,7 +97,9 @@ public final class UpdateTestDeletes extends UpdateTest {
     final Data data = CONTEXT.data();
     final int oldRootSize = data.size(1, Data.ELEM);
     final int oldParentSize = data.size(6, Data.ELEM);
+    data.startUpdate();
     data.delete(7);
+    data.finishUpdate();
     assertEquals(size - 1, data.meta.size);
     assertArraysEquals(CONTEXTNODE, data.name(6, Data.ELEM));
     assertArraysEquals(ID, data.name(7, Data.ATTR));
@@ -116,7 +124,9 @@ public final class UpdateTestDeletes extends UpdateTest {
   @Test
   public void deleteText() {
     final Data data = CONTEXT.data();
+    data.startUpdate();
     data.delete(10);
+    data.finishUpdate();
     assertEquals(size - 1, data.meta.size);
     reload();
     assertEquals(size - 1, data.meta.size);

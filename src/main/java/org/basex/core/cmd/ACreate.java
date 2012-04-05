@@ -187,29 +187,4 @@ public abstract class ACreate extends Command {
     data.meta.dirty = true;
     return pat == null || data.meta.drop(pat + '.');
   }
-
-  /**
-   * Tries to (un)lock the specified database for exclusive write operations.
-   * @param name name of database
-   * @param lock lock or unlock database
-   * @param ctx database context
-   * @return result of check
-   */
-  protected static boolean writeLock(final String name, final boolean lock,
-      final Context ctx) {
-
-    // release lock: no operation needed
-    if(!lock) return true;
-
-    // check if name is not valid or if db will be created in main memory
-    if(!MetaData.validName(name, false)) return false;
-
-    // check if the opened database can be locked and unlocked
-    final Data data = ctx.data();
-    if(data != null && data.meta.name.equals(name))
-      return data.writeLock(true) && data.writeLock(false);
-
-    // check if the specified database can be locked
-    return DiskData.writeLock(ctx.mprop.dbpath(name));
-  }
 }

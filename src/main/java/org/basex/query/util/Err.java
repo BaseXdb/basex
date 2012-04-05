@@ -61,9 +61,7 @@ public enum Err {
   /** BASX0019: Evaluation exception. */
   INVFLAG(BASX, 19, "Unknown flag: %."),
   /** BASX0020: Evaluation exception. */
-  OPENED(BASX, 20, "Database '%' is opened by another process."),
-  /** BASX0020: Evaluation exception. */
-  LOCK(BASX, 20, "Database '%' cannot be marked as 'updating'."),
+  PINNED(BASX, 20, "Database '%' is opened by another process."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),

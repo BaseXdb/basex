@@ -49,7 +49,7 @@ public final class DropIndex extends ACreate {
         return error(UNKNOWN_CMD_X, this);
     }
 
-    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
     try {
       return drop(it, context.data()) ? info(INDEX_DROPPED_X_X, it, perf) :
         error(INDEX_NOT_DROPPED_X, it);

@@ -28,9 +28,4 @@ public final class Flush extends Command {
     prop.set(Prop.AUTOFLUSH, af);
     return info(DB_FLUSHED_X, data.meta.name, perf);
   }
-
-  @Override
-  public String writeLock(final boolean lock, final Context ctx) {
-    return null;
-  }
 }

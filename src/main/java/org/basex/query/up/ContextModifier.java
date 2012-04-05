@@ -49,7 +49,7 @@ public abstract class ContextModifier {
    * no constraints are hurt.
    * @throws QueryException query exception
    */
-  final void applyUpdates() throws QueryException {
+  final void apply() throws QueryException {
     // checked constraints
     final Collection<DatabaseUpdates> updates = pendingUpdates.values();
     for(final DatabaseUpdates c : updates) c.check();
@@ -58,7 +58,7 @@ public abstract class ContextModifier {
     try {
       // mark disk database instances as updating
       for(final DatabaseUpdates c : updates) {
-        c.writeLock(true);
+        c.startUpdate();
         i++;
       }
 
@@ -71,7 +71,7 @@ public abstract class ContextModifier {
       // remove write locks and updating files
       for(final DatabaseUpdates c : updates) {
         if(i-- == 0) break;
-        c.writeLock(false);
+        c.finishUpdate();
       }
     }
   }

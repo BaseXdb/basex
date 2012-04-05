@@ -49,9 +49,9 @@ public final class Util {
    * @return runtime exception (indicates that an error is raised)
    */
   public static RuntimeException notexpected(final Object... ext) {
-    final TokenBuilder tb = new TokenBuilder("Not expected");
-    if(ext.length != 0) tb.addExt(": %", ext);
-    throw new RuntimeException(tb.add('.').toString());
+    final TokenBuilder tb = new TokenBuilder();
+    tb.addExt("%", ext.length == 0 ? "Not Expected." : ext[0]);
+    throw new RuntimeException(tb.toString());
   }
 
   /**

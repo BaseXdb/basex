@@ -48,7 +48,7 @@ public final class Replace extends ACreate {
     if(pre != -1 && data.resources.docs(path).size() != 1)
       return error(NO_DIR_ALLOWED_X, path);
 
-    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
 
     try {
       boolean ok = true;
@@ -62,6 +62,7 @@ public final class Replace extends ACreate {
         // otherwise, add new document as xml
         final Add add = new Add(path);
         add.setInput(in);
+        add.lock = false;
         ok = add.run(context) || error(add.info());
         // delete old documents if addition was successful
         if(ok && pre != -1) data.delete(pre);

@@ -209,7 +209,9 @@ public final class UpdateTestText extends UpdateTest {
   @Test
   public void updateText() {
     final Data data = CONTEXT.data();
+    data.startUpdate();
     data.update(10, Data.TEXT, JUNIT);
+    data.finishUpdate();
     assertEquals(Data.TEXT, data.kind(10));
     assertArraysEquals(JUNIT, data.text(10, true));
     reload();
@@ -246,6 +248,8 @@ public final class UpdateTestText extends UpdateTest {
     final MemData md = new MemData(CONTEXT.data());
     md.text(0, pre - par, val, kind);
     md.insert(0);
+    data.startUpdate();
     data.insert(pre, par, md);
+    data.finishUpdate();
   }
 }

@@ -126,15 +126,6 @@ public final class Databases {
   }
 
   /**
-   * Lists all available backups.
-   * @param name backup name, glob patterns allowed
-   * @return backup list
-   */
-  public StringList listBackups(final String name) {
-    return list(false, true, name);
-  }
-
-  /**
    * Returns the sorted names of all available databases and, optionally, backups.
    * Filters for {@code name} if not null with glob support.
    * @param db return databases?

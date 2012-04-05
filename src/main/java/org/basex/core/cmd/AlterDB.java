@@ -50,11 +50,6 @@ public final class AlterDB extends ACreate {
         info(DB_RENAMED_X, src, trg) : error(DB_NOT_RENAMED_X, src);
   }
 
-  @Override
-  public String writeLock(final boolean lock, final Context ctx) {
-    return writeLock(args[0], lock, ctx) ? args[0] : null;
-  }
-
   /**
    * Renames the specified database.
    * @param source name of the existing database

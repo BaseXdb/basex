@@ -111,13 +111,18 @@ final class DatabaseUpdates {
   }
 
   /**
-   * Locks or unlocks the database for write operations.
-   * @param lock lock or unlock database
+   * Locks the database for write operations.
    * @throws QueryException query exception
    */
-  void writeLock(final boolean lock) throws QueryException {
-    if(!data.writeLock(lock)) OPENED.thrw(null, data.meta.name);
-    if(lock && !data.startUpdate()) LOCK.thrw(null, data.meta.name);
+  void startUpdate() throws QueryException {
+    if(!data.startUpdate()) PINNED.thrw(null, data.meta.name);
+  }
+
+  /**
+   * Locks the database for write operations.
+   */
+  void finishUpdate() {
+    data.finishUpdate();
   }
 
   /**
@@ -139,25 +144,20 @@ final class DatabaseUpdates {
      * and resolve text adjacency issues after the next container on the
      * preceding axis has been executed.
      */
-    try {
-      NodeUpdates recent = null;
-      // apply updates from the highest to the lowest pre value
-      for(int i = nodes.size() - 1; i >= 0; i--) {
-        final NodeUpdates current = updatePrimitives.get(nodes.get(i));
-        // first run, no recent container
-        if(recent == null)
-          current.makePrimitivesEffective();
-        else
-          recent.resolveExternalTextNodeAdjacency(
-              current.makePrimitivesEffective());
-
-        recent = current;
+    NodeUpdates recent = null;
+    // apply updates from the highest to the lowest pre value
+    for(int i = nodes.size() - 1; i >= 0; i--) {
+      final NodeUpdates current = updatePrimitives.get(nodes.get(i));
+      // first run, no recent container
+      if(recent == null) {
+        current.makePrimitivesEffective();
+      } else {
+        recent.resolveExternalTextNodeAdjacency(current.makePrimitivesEffective());
       }
-      // resolve text adjacency issues of the last container
-      recent.resolveExternalTextNodeAdjacency(0);
-    } finally {
-      data.finishUpdate();
+      recent = current;
     }
+    // resolve text adjacency issues of the last container
+    recent.resolveExternalTextNodeAdjacency(0);
 
     if(data.meta.prop.is(Prop.WRITEBACK) && !data.meta.original.isEmpty()) {
       try {

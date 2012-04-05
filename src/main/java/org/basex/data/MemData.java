@@ -71,11 +71,6 @@ public final class MemData extends Data {
   public void setIndex(final IndexType type, final Index index) { }
 
   @Override
-  public boolean writeLock(final boolean yes) {
-    return true;
-  }
-
-  @Override
   public boolean startUpdate() { return true; }
 
   @Override

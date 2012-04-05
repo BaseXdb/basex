@@ -117,7 +117,6 @@ public final class OptimizeAll extends ACreate {
       // move binary files
       final IOFile bin = data.meta.binaries();
       if(bin.exists()) bin.rename(d.meta.binaries());
-
       final IOFile upd = old.updateFile();
       if(upd.exists()) upd.copyTo(d.updateFile());
       d.close();
@@ -131,7 +130,6 @@ public final class OptimizeAll extends ACreate {
     Close.close(data, ctx);
 
     // drop old database and rename temporary to final name
-    // usually, no exceptions should be thrown here anymore
     if(!DropDB.drop(m.name, ctx))
       throw new BaseXException(DB_NOT_DROPPED_X, m.name);
     if(!AlterDB.alter(tname, m.name, ctx))

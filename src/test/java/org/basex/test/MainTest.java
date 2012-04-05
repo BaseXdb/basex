@@ -53,8 +53,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  final void equals(final String exp, final String... args)
-      throws IOException {
+  final void equals(final String exp, final String... args) throws IOException {
     assertEquals(exp, run(args));
   }
 
@@ -65,9 +64,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  final void contains(final String exp, final String... args)
-      throws IOException {
-
+  final void contains(final String exp, final String... args) throws IOException {
     final String result = run(args);
     if(!result.contains(exp)) {
       fail('\'' + exp + "' not contained in '" + result + "'.");

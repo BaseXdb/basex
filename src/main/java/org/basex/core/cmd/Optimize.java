@@ -38,7 +38,7 @@ public final class Optimize extends ACreate {
     final MetaData m = data.meta;
     size = m.size;
 
-    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
     try {
       optimize(data, this);
       return info(DB_OPTIMIZED_X, m.name, perf);

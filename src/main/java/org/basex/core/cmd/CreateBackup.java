@@ -53,11 +53,6 @@ public final class CreateBackup extends Command {
     return ok;
   }
 
-  @Override
-  public String writeLock(final boolean lock, final Context ctx) {
-    return null;
-  }
-
   /**
    * Backups the specified database.
    * @param db name of the database

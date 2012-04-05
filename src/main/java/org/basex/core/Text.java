@@ -498,9 +498,6 @@ public interface Text {
   /** Parse error. */
   String NOT_PARSED_X = lang("not_parsed_%");
 
-  /** Updating error. */
-  String LOCK_X = "Database '%' cannot be marked as 'updating'.";
-
   /** File not found. */
   String FILE_NOT_FOUND_X = lang("file_not_found_%");
   /** Path not found. */

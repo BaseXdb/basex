@@ -59,21 +59,9 @@ public final class PinTest extends SandboxTest {
     cleanUp();
   }
 
-  /**
-   * Deletes the potentially already existing DBs.
-   * DBs & User {@link #NAME} and {@link #NAME2}
-   */
-  static void cleanUp() {
-    ok(new Close(), CONTEXT);
-    ok(new Close(), CONTEXT2);
-    ok(new DropDB(NAME), CONTEXT);
-    ok(new DropDB(NAME2), CONTEXT);
-    ok(new DropUser(NAME), CONTEXT);
-    ok(new DropUser(NAME2), CONTEXT);
-  }
-
   /** Test ADD, DELETE, RENAME, REPLACE and STORE. */
   @Test
+  @Ignore("OverlappingLocking")
   public void update() {
     // create database and perform update
     ok(new CreateDB(NAME), CONTEXT);
@@ -97,6 +85,7 @@ public final class PinTest extends SandboxTest {
 
   /** Test COPY. */
   @Test
+  @Ignore("OverlappingLocking")
   public void copy() {
     // create databases and open by second context
     ok(new CreateDB(NAME), CONTEXT);
@@ -114,6 +103,7 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE BACKUP and RESTORE. */
   @Test
+  @Ignore("OverlappingLocking")
   public void backupRestore() {
     // create databases and open by second context
     ok(new CreateDB(NAME), CONTEXT);
@@ -128,6 +118,7 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE DB, DROP DB and ALTER DB. */
   @Test
+  @Ignore("OverlappingLocking")
   public void createDropAlterDB() {
     // create database
     ok(new CreateDB(NAME), CONTEXT);
@@ -163,6 +154,7 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE USER, DROP USER and ALTER USER. */
   @Test
+  @Ignore("OverlappingLocking")
   public void createDropAlterUser() {
     // create and alter users (open issue: allow this if other instances are opened?)
     ok(new CreateUser(NAME, Token.md5("admin")), CONTEXT);
@@ -176,6 +168,7 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE INDEX and DROP INDEX. */
   @Test
+  @Ignore("OverlappingLocking")
   public void createDropIndex() {
     // create databases and open by second context
     ok(new CreateDB(NAME), CONTEXT);
@@ -189,6 +182,7 @@ public final class PinTest extends SandboxTest {
 
   /** Test XQUERY. */
   @Test
+  @Ignore("OverlappingLocking")
   public void xquery() {
     // create databases and open by second context
     ok(new CreateDB(NAME, FILE), CONTEXT);
@@ -240,5 +234,18 @@ public final class PinTest extends SandboxTest {
       fail("\"" + cmd + "\" was supposed to fail.");
     } catch(final IOException ex) {
     }
+  }
+
+  /**
+   * Deletes the potentially already existing DBs.
+   * DBs & User {@link #NAME} and {@link #NAME2}
+   */
+  private static void cleanUp() {
+    ok(new Close(), CONTEXT);
+    ok(new Close(), CONTEXT2);
+    ok(new DropDB(NAME), CONTEXT);
+    ok(new DropDB(NAME2), CONTEXT);
+    ok(new DropUser(NAME), CONTEXT);
+    ok(new DropUser(NAME2), CONTEXT);
   }
 }

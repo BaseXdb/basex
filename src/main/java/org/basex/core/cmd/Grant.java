@@ -80,11 +80,8 @@ public final class Grant extends AUser {
       return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
     }
 
-    // database is currently opened by another process
-    if(!data.writeLock(true)) return !info(DB_PINNED_X, db);
-
-    // database cannot be locked for updating
-    if(!data.startUpdate()) return !info(LOCK_X, data.meta.name);
+    // try to lock database
+    if(!data.startUpdate()) return !info(DB_PINNED_X, data.meta.name);
 
     User u = data.meta.users.get(user);
     // add local user reference
@@ -94,7 +91,6 @@ public final class Grant extends AUser {
     }
     u.perm = prm;
     data.meta.dirty = true;
-    data.writeLock(false);
     data.finishUpdate();
     Close.close(data, context);
     return info(GRANTED_ON_X_X_X, args[0], user, db);

@@ -85,11 +85,6 @@ public final class CreateDB extends ACreate {
     return build(parser, name);
   }
 
-  @Override
-  public String writeLock(final boolean lock, final Context ctx) {
-    return ctx.prop.is(Prop.MAINMEM) || writeLock(args[0], lock, ctx) ? null : args[0];
-  }
-
   /**
    * Returns a database instance from the specified parser.
    * @param name name of the database

@@ -131,7 +131,6 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
@@ -173,7 +172,9 @@ public final class UpdateTestTags extends UpdateTest {
   @Test
   public void updateTagName() {
     final Data data = CONTEXT.data();
+    data.startUpdate();
     data.update(6, Data.ELEM, JUNIT, Token.EMPTY);
+    data.finishUpdate();
     assertEquals(Data.ELEM, data.kind(6));
     assertArraysEquals(JUNIT, data.name(6, Data.ELEM));
     reload();
@@ -188,8 +189,8 @@ public final class UpdateTestTags extends UpdateTest {
    * @param name tag name
    * @param kind node kind
    */
-  private static void insertTag(final int par, final int pos,
-      final byte[] name, final int kind) {
+  private static void insertTag(final int par, final int pos, final byte[] name,
+      final int kind) {
 
     int root;
     final Data data = CONTEXT.data();
@@ -208,6 +209,8 @@ public final class UpdateTestTags extends UpdateTest {
     final MemData md = new MemData(data);
     md.elem(1, data.tagindex.index(name, null, false), 1, 1, 0, false);
     md.insert(0);
+    data.startUpdate();
     data.insert(root, par, md);
+    data.finishUpdate();
   }
 }

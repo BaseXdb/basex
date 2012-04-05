@@ -38,11 +38,11 @@ public abstract class TableAccess {
   public abstract void close() throws IOException;
 
   /**
-   * Locks or unlocks the table for write operations.
-   * @param lock lock/unlock table
+   * Tries to acquires a lock on the table. If a lock exists, it is first released.
+   * @param excl exclusive/shared lock
    * @return success flag
    */
-  public abstract boolean writeLock(final boolean lock);
+  public abstract boolean lock(final boolean excl);
 
   /**
    * Reads a byte value and returns it as an integer value.

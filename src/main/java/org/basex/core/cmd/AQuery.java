@@ -178,11 +178,6 @@ abstract class AQuery extends Command {
   }
 
   @Override
-  public String writeLock(final boolean lock, final Context ctx) {
-    return null;
-  }
-
-  @Override
   public boolean updated() {
     return qp == null || qp.updates() != 0;
   }

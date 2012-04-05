@@ -19,8 +19,10 @@ public final class UpdateTestAttributes extends UpdateTest {
   @Test
   public void updateAttribute() {
     final Data data = CONTEXT.data();
+    data.startUpdate();
     data.update(7, Data.ATTR, NAME, Token.EMPTY);
     data.update(7, Data.ATTR, JUNIT);
+    data.finishUpdate();
     assertEquals(size, data.meta.size);
     assertArraysEquals(NAME, data.name(7, Data.ATTR));
     assertArraysEquals(JUNIT, data.text(7, false));
@@ -36,8 +38,10 @@ public final class UpdateTestAttributes extends UpdateTest {
   @Test
   public void updateAttribute2() {
     final Data data = CONTEXT.data();
+    data.startUpdate();
     data.update(8, Data.ATTR, NAME, Token.EMPTY);
     data.update(8, Data.ATTR, JUNIT);
+    data.finishUpdate();
     assertEquals(size, data.meta.size);
     assertArraysEquals(JUNIT, data.text(8, false));
     reload();
@@ -56,7 +60,9 @@ public final class UpdateTestAttributes extends UpdateTest {
     final MemData md = new MemData(CONTEXT.data());
     md.attr(0, 1, data.atnindex.index(FOO, null, false), JUNIT, 0, false);
     md.insert(0);
+    data.startUpdate();
     data.insertAttr(9, 6, md);
+    data.finishUpdate();
     assertEquals(size + 1, data.meta.size);
     assertEquals(size + 1, data.size(0, Data.DOC));
     assertEquals(Data.ATTR, data.kind(9));

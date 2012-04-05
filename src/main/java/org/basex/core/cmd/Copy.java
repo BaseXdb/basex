@@ -48,11 +48,6 @@ public final class Copy extends Command {
     return copy(src, trg) ? info(DB_COPIED_X, src, perf) : error(DB_NOT_COPIED_X, src);
   }
 
-  @Override
-  public String writeLock(final boolean lock, final Context ctx) {
-    return null;
-  }
-
   /**
    * Copies the specified database.
    * @param source name of the database

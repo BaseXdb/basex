@@ -6,7 +6,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 
 import org.basex.core.*;
-import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.*;
 import org.junit.After;
 import org.junit.Test;
 
@@ -82,6 +82,7 @@ public abstract class BaseXTest extends MainTest {
     final String in = "<a/>";
     final Context ctx = new Context();
     new CreateDB(NAME, in).execute(ctx);
+    new Close().execute(ctx);
     equals(in, "-i" + NAME, "-q.");
     ctx.close();
   }

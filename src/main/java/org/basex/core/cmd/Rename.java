@@ -36,7 +36,7 @@ public final class Rename extends ACreate {
     if(trg == null) return error(NAME_INVALID_X, args[1]);
 
     // start update
-    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
 
     boolean ok = true;
     int c = 0;

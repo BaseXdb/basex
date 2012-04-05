@@ -42,6 +42,8 @@ public final class DiskData extends Data {
   private TokenObjMap<IntList> txts;
   /** Attribute values buffered for subsequent index updates. */
   private TokenObjMap<IntList> atvs;
+  /** Closed flag. */
+  private boolean closed;
 
   /**
    * Default constructor, called from {@link Open#open}.
@@ -112,7 +114,7 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   public void init() throws IOException {
-    table = new TableDiskAccess(meta);
+    table = new TableDiskAccess(meta, false);
     texts = new DataAccess(meta.dbfile(DATATXT));
     values = new DataAccess(meta.dbfile(DATAATV));
   }
@@ -145,24 +147,9 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public synchronized void finishUpdate() {
-    // skip all flush operations if auto flush is turned off
-    if(!meta.prop.is(Prop.AUTOFLUSH)) return;
-
-    try {
-      write();
-      table.flush();
-      texts.flush();
-      values.flush();
-      if(txtindex != null) ((DiskValues) txtindex).flush();
-      if(atvindex != null) ((DiskValues) atvindex).flush();
-    } catch(final IOException ex) {
-      Util.stack(ex);
-    }
-  }
-
-  @Override
   public synchronized void close() {
+    if(closed) return;
+    closed = true;
     try {
       write();
       table.close();
@@ -207,20 +194,26 @@ public final class DiskData extends Data {
   @Override
   public boolean startUpdate() {
     final IOFile uf = updateFile();
-    return uf.exists() || uf.touch();
-  }
-
-  /**
-   * Returns a file that indicates ongoing updates.
-   * @return updating file
-   */
-  public IOFile updateFile() {
-    return meta.dbfile(DATAUPD);
+    return (uf.exists() || uf.touch()) && table.lock(true);
   }
 
   @Override
-  public boolean writeLock(final boolean yes) {
-    return table.writeLock(yes);
+  public synchronized void finishUpdate() {
+    // skip all flush operations if auto flush is off, or file has already been closed
+    if(!meta.prop.is(Prop.AUTOFLUSH) || closed) return;
+
+    try {
+      write();
+      table.flush();
+      texts.flush();
+      values.flush();
+      if(txtindex != null) ((DiskValues) txtindex).flush();
+      if(atvindex != null) ((DiskValues) atvindex).flush();
+    } catch(final IOException ex) {
+      Util.stack(ex);
+    } finally {
+      table.lock(false);
+    }
   }
 
   /**
@@ -246,6 +239,14 @@ public final class DiskData extends Data {
       if(file != null) try { file.close(); } catch(final IOException ex) { }
     }
     return false;
+  }
+
+  /**
+   * Returns a file that indicates ongoing updates.
+   * @return updating file
+   */
+  public IOFile updateFile() {
+    return meta.dbfile(DATAUPD);
   }
 
   @Override

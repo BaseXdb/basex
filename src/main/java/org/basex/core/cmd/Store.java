@@ -61,7 +61,7 @@ public final class Store extends ACreate {
       return error(NAME_INVALID_X, create ? path : args[0]);
 
     // start update
-    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
 
     try {
       store(in, file);

@@ -208,8 +208,7 @@ public final class FNDb extends StandardFunc {
     final TokenList tl = new TokenList();
     final int el = expr.length;
     if(el == 0) {
-      for(final String s : ctx.context.databases().listDBs())
-        tl.add(s);
+      for(final String s : ctx.context.databases().listDBs()) tl.add(s);
     } else {
       final Data data = data(0, ctx);
       final String path = string(el == 1 ? EMPTY : checkStr(expr[1], ctx));

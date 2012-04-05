@@ -65,7 +65,7 @@ public final class DiskTableTest {
       data = new DiskBuilder(DB, parser, CONTEXT).build();
       size = data.meta.size;
       data.close();
-      tda = new TableDiskAccess(data.meta);
+      tda = new TableDiskAccess(data.meta, true);
     } catch(final Exception ex) {
       Util.stack(ex);
     }
@@ -98,7 +98,7 @@ public final class DiskTableTest {
   private void closeAndReload() {
     try {
       tda.close();
-      tda = new TableDiskAccess(data.meta);
+      tda = new TableDiskAccess(data.meta, true);
     } catch(final IOException ex) {
       fail(Util.message(ex));
     }

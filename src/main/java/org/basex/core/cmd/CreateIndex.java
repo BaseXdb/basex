@@ -60,7 +60,7 @@ public final class CreateIndex extends ACreate {
         return error(UNKNOWN_CMD_X, this);
     }
 
-    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
     try {
       create(index, data, this);
       return info(INDEX_CREATED_X_X, index, perf);

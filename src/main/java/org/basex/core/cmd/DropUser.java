@@ -62,18 +62,14 @@ public final class DropUser extends AUser {
       return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
     }
 
-    // database is currently opened by another process
-    if(!data.writeLock(true)) return error(DB_PINNED_X, db);
-
-    // database cannot be locked for updating
-    if(!data.startUpdate()) return !info(LOCK_X, data.meta.name);
+    // try to lock database
+    if(!data.startUpdate()) return !info(DB_PINNED_X, data.meta.name);
 
     // drop local user
     if(data.meta.users.drop(data.meta.users.get(user))) {
       info(USER_DROPPED_X_X, user, db);
       data.meta.dirty = true;
     }
-    data.writeLock(false);
     data.finishUpdate();
     Close.close(data, context);
     return true;

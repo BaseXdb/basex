@@ -16,8 +16,7 @@ import org.basex.server.Query;
 import org.basex.server.Session;
 import org.basex.test.*;
 import org.basex.util.Util;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * This class tests the client/server query API.
@@ -162,6 +161,7 @@ public abstract class SessionTest extends SandboxTest {
    * @throws IOException I/O exception
    */
   @Test
+  @Ignore("OverlappingLocking")
   public final void replace() throws IOException {
     session.execute("create db " + DB);
     check("0", session.query("count(" + _DB_OPEN.args(DB) + ')').execute());

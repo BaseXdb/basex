@@ -72,8 +72,8 @@ public final class BaseXClientTest extends BaseXTest {
    * @param sargs server arguments
    * @throws IOException I/O exception
    */
-  private static void equals(final String exp, final String[] args,
-      final String[] sargs) throws IOException {
+  private static void equals(final String exp, final String[] args, final String[] sargs)
+      throws IOException {
     assertEquals(exp, run(args, sargs));
   }
 

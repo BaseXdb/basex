@@ -41,11 +41,6 @@ public final class Export extends Command {
     }
   }
 
-  @Override
-  public String writeLock(final boolean lock, final Context ctx) {
-    return null;
-  }
-
   /**
    * Exports the current database to the specified path.
    * Files and directories in {@code path} will be possibly overwritten.

@@ -28,7 +28,7 @@ public final class Delete extends ACreate {
     final String target = args[0];
 
     // start update
-    if(!data.startUpdate()) return error(LOCK_X, data.meta.name);
+    if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
 
     // delete all documents in reverse order (faster)
     final IntList docs = data.resources.docs(target);

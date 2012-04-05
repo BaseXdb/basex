@@ -32,7 +32,7 @@ public final class TableMemAccess extends TableAccess {
   public void close() throws IOException { }
 
   @Override
-  public boolean writeLock(final boolean yes) {
+  public boolean lock(final boolean lock) {
     return true;
   }
 

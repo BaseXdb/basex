@@ -138,22 +138,16 @@ public abstract class Data {
   public abstract void setIndex(IndexType type, Index index);
 
   /**
-   * Starts an update operation.
+   * Starts an update operation: writes a file to disk to indicate that an update is
+   * going on, and exclusively locks the table.
    * @return success flag
    */
   public abstract boolean startUpdate();
 
   /**
-   * Finishes an update operation.
+   * Finishes an update operation: removes the update file and the exclusive lock.
    */
   public abstract void finishUpdate();
-
-  /**
-   * Locks or unlocks the database for write operations.
-   * @param lock lock or unlock database
-   * @return success flag
-   */
-  public abstract boolean writeLock(final boolean lock);
 
   /**
    * Returns the indexed pre references for the specified token.
