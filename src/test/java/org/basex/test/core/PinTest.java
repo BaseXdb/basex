@@ -22,6 +22,7 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
+@Ignore("OverlappingLocking")
 public final class PinTest extends SandboxTest {
   /** Second database context. */
   private static final Context CONTEXT2 = new Context();
@@ -61,7 +62,6 @@ public final class PinTest extends SandboxTest {
 
   /** Test ADD, DELETE, RENAME, REPLACE and STORE. */
   @Test
-  @Ignore("OverlappingLocking")
   public void update() {
     // create database and perform update
     ok(new CreateDB(NAME), CONTEXT);
@@ -85,7 +85,6 @@ public final class PinTest extends SandboxTest {
 
   /** Test COPY. */
   @Test
-  @Ignore("OverlappingLocking")
   public void copy() {
     // create databases and open by second context
     ok(new CreateDB(NAME), CONTEXT);
@@ -103,7 +102,6 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE BACKUP and RESTORE. */
   @Test
-  @Ignore("OverlappingLocking")
   public void backupRestore() {
     // create databases and open by second context
     ok(new CreateDB(NAME), CONTEXT);
@@ -118,7 +116,6 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE DB, DROP DB and ALTER DB. */
   @Test
-  @Ignore("OverlappingLocking")
   public void createDropAlterDB() {
     // create database
     ok(new CreateDB(NAME), CONTEXT);
@@ -154,7 +151,6 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE USER, DROP USER and ALTER USER. */
   @Test
-  @Ignore("OverlappingLocking")
   public void createDropAlterUser() {
     // create and alter users (open issue: allow this if other instances are opened?)
     ok(new CreateUser(NAME, Token.md5("admin")), CONTEXT);
@@ -168,7 +164,6 @@ public final class PinTest extends SandboxTest {
 
   /** Test CREATE INDEX and DROP INDEX. */
   @Test
-  @Ignore("OverlappingLocking")
   public void createDropIndex() {
     // create databases and open by second context
     ok(new CreateDB(NAME), CONTEXT);
@@ -182,7 +177,6 @@ public final class PinTest extends SandboxTest {
 
   /** Test XQUERY. */
   @Test
-  @Ignore("OverlappingLocking")
   public void xquery() {
     // create databases and open by second context
     ok(new CreateDB(NAME, FILE), CONTEXT);
