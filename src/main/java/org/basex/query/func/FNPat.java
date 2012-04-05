@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryContext;
@@ -17,7 +18,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ValueBuilder;
-import org.basex.query.util.RegEx;
+import org.basex.query.regex.parse.*;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 
@@ -227,9 +228,8 @@ public final class FNPat extends StandardFunc {
    */
   private Pattern pattern(final Expr pattern, final Expr mod,
       final QueryContext ctx) throws QueryException {
-
-    return new RegEx(string(checkStr(pattern, ctx)), info).pattern(
-        mod != null ? checkStr(mod, ctx) : null, ctx.xquery3);
+    return RegExParser.parse(checkStr(pattern, ctx),
+        mod != null ? checkStr(mod, ctx) : null, ctx.xquery3, info);
   }
 
   @Override
