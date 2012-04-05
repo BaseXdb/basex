@@ -172,7 +172,7 @@ public final class IncUpdateTest {
     try {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
     } finally {
-      try { qp.close(); } catch(final QueryException ex) { }
+      qp.close();
     }
   }
 

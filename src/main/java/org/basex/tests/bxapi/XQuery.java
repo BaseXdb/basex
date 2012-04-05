@@ -162,11 +162,7 @@ public final class XQuery implements Iterable<XdmItem> {
    * @throws XQueryException exception
    */
   public void close() {
-    try {
-      qp.close();
-    } catch(final QueryException ex) {
-      throw new XQueryException(ex);
-    }
+    qp.close();
   }
 
   @Override
