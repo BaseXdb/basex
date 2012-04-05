@@ -91,7 +91,7 @@ public final class Log {
    * Creates a log file.
    * @param d date, used for file name
    */
-  private synchronized void create(final Date d) {
+  private void create(final Date d) {
     dir.md();
     start = DATE.format(d);
     try {
@@ -104,10 +104,10 @@ public final class Log {
   /**
    * Closes the log file.
    */
-  public synchronized void close() {
-    if(quiet) return;
+  private void close() {
     try {
       fos.close();
+      fos = null;
     } catch(final IOException ex) {
       Util.stack(ex);
     }

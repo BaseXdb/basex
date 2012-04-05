@@ -134,7 +134,7 @@ public final class BaseXServer extends Main implements Runnable {
         @Override
         public void run() {
           log.write(SRV_STOPPED);
-          log.close();
+          log = null;
           Util.outln(SRV_STOPPED);
         }
       });
