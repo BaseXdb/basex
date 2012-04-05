@@ -1,5 +1,7 @@
 package org.basex.core.cmd;
 
+import org.basex.core.*;
+
 /**
  * Evaluates the 'xquery' command and processes an XQuery request.
  *
@@ -12,7 +14,7 @@ public final class XQuery extends AQuery {
    * @param query query to evaluate
    */
   public XQuery(final String query) {
-    super(STANDARD, query);
+    super(Perm.NONE, false, query);
   }
 
   @Override

@@ -26,7 +26,7 @@ public final class DropUser extends AUser {
   }
 
   /**
-   * Default constructor.
+   * Constructor, specifying a database.
    * @param name name of user
    * @param db database
    */

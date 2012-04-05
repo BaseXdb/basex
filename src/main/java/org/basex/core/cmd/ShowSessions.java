@@ -1,9 +1,8 @@
 package org.basex.core.cmd;
 
-import java.io.IOException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.Command;
-import org.basex.core.User;
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
 
@@ -18,7 +17,7 @@ public final class ShowSessions extends Command {
    * Default constructor.
    */
   public ShowSessions() {
-    super(User.ADMIN);
+    super(Perm.ADMIN);
   }
 
   @Override

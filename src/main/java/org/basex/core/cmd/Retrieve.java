@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 
+import org.basex.core.*;
 import org.basex.data.MetaData;
 import org.basex.io.IOFile;
 import org.basex.io.in.BufferInput;
@@ -20,7 +21,7 @@ public final class Retrieve extends ACreate {
    * @param path source path
    */
   public Retrieve(final String path) {
-    super(DATAREF, path);
+    super(Perm.NONE, true, path);
   }
 
   @Override

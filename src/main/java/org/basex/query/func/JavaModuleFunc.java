@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryModule.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
@@ -42,7 +43,7 @@ public final class JavaModuleFunc extends JavaMapping {
       throws QueryException {
 
     // assign context if module is inheriting {@link QueryModule}
-    if(module instanceof QueryModule) ((QueryModule) module).init(ctx);
+    if(module instanceof QueryModule) ((QueryModule) module).context = ctx;
 
     try {
       try {
@@ -85,11 +86,18 @@ public final class JavaModuleFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return module.getClass().getSimpleName() + '.' + mth.getName();
+    return module.getClass().getSimpleName() + ':' + mth.getName();
   }
 
   @Override
   public String toString() {
     return name() + PAR1 + toString(SEP) + PAR2;
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.NDT && mth.getAnnotation(Deterministic.class) == null ||
+      (u == Use.CTX || u == Use.POS) && mth.getAnnotation(FocusDependent.class) == null ||
+      super.uses(u);
   }
 }

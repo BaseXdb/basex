@@ -2,8 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
-import org.basex.core.Prop;
-import org.basex.core.User;
+
+import org.basex.core.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -120,7 +120,7 @@ public final class FNInfo extends StandardFunc {
     tb.add(value);
 
     // if GUI is used, or if user is no admin, trace info is cached
-    if(Prop.gui || !ctx.context.user.perm(User.ADMIN)) {
+    if(Prop.gui || !ctx.context.user.has(Perm.ADMIN)) {
       ctx.evalInfo(tb.finish());
     } else {
       Util.errln(tb.toString());

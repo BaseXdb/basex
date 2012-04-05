@@ -14,11 +14,12 @@ import org.basex.util.*;
 abstract class AInfo extends Command {
   /**
    * Protected constructor.
-   * @param p properties
+   * @param p permissions
+   * @param d requires opened database
    * @param a arguments
    */
-  AInfo(final int p, final String... a) {
-    super(p, a);
+  AInfo(final Perm p, final boolean d, final String... a) {
+    super(p, d, a);
   }
 
   /**

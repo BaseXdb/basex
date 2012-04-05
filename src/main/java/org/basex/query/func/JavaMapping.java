@@ -140,9 +140,6 @@ public abstract class JavaMapping extends Arr {
   static JavaMapping get(final QNm name, final Expr[] args, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
-    // only allowed with administrator permissions
-    if(!ctx.context.user.perm(User.ADMIN)) return null;
-
     // check for "java:" prefix
     final byte[] uri = name.uri();
     final byte[] ln = name.local();
@@ -173,10 +170,20 @@ public abstract class JavaMapping extends Arr {
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
       for(final Method meth : jm.getClass().getMethods()) {
-        if(meth.getName().equals(mth)) return new JavaModuleFunc(ii, jm, meth, args);
+        if(meth.getName().equals(mth)) {
+          // check if user has sufficient permissions to call the function
+          Perm perm = Perm.ADMIN;
+          final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
+          if(req != null) perm = Perm.get(req.value().name());
+          if(!ctx.context.user.has(perm)) return null;
+          return new JavaModuleFunc(ii, jm, meth, args);
+        }
       }
       throw WHICHJAVA.thrw(ii, path + ':' + mth);
     }
+
+    // only allowed with administrator permissions
+    if(!ctx.context.user.has(Perm.ADMIN)) return null;
 
     // check addressed class
     try {

@@ -1,16 +1,16 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.User;
+
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
-import org.basex.data.Data;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'info index' command and returns information on the indexes
@@ -32,7 +32,7 @@ public final class InfoIndex extends AInfo {
    * @param type optional index type, defined in {@link CmdIndexInfo}
    */
   public InfoIndex(final Object type) {
-    super(DATAREF | User.READ, type != null && type != CmdIndexInfo.NULL ?
+    super(Perm.READ, true, type != null && type != CmdIndexInfo.NULL ?
         type.toString() : null);
   }
 

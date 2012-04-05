@@ -1,9 +1,7 @@
 package org.basex.core.cmd;
 
 import java.io.IOException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.Command;
-import org.basex.core.User;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
 
@@ -18,7 +16,7 @@ public final class ShowDatabases extends Command {
    * Default constructor.
    */
   public ShowDatabases() {
-    super(User.ADMIN);
+    super(Perm.ADMIN);
   }
 
   @Override

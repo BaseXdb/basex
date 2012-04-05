@@ -15,10 +15,8 @@ public class JavaFuncTest extends AdvancedQueryTest {
   @Test
   public void constr() {
     query("Q{java:java.lang.Integer}new('123')", 123);
-    query("declare namespace rand='java:java.util.Random';" +
-        "rand:nextInt(rand:new())");
-    query("declare namespace ctx='java:org.basex.core.Context';" +
-        "ctx:new()");
+    query("declare namespace rand='java:java.util.Random'; rand:nextInt(rand:new())");
+    query("declare namespace ctx='java:org.basex.core.Context'; ctx:new()");
   }
 
   /** Tests calling some Java static fields from XQuery. */
@@ -31,8 +29,7 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests calling some Java object fields from XQuery. */
   @Test
   public void field() {
-    query("declare namespace point='java:java.awt.Point';" +
-        "point:x(point:new())", 0);
+    query("declare namespace point='java:java.awt.Point'; point:x(point:new())", 0);
   }
 
   /** Tests calling some Java static methods from XQuery. */
@@ -45,18 +42,12 @@ public class JavaFuncTest extends AdvancedQueryTest {
   @Test
   public void method() {
     query("declare namespace rect = 'java:java.awt.Rectangle';" +
-        "rect:contains(rect:new(xs:int(2), xs:int(2)), xs:int(1), xs:int(1))",
-        true);
+        "rect:contains(rect:new(xs:int(2), xs:int(2)), xs:int(1), xs:int(1))", true);
   }
 
   /** Tests importing a Java class. */
   @Test
   public void javaImport() {
-    /* yields unexpected results on some JVMs, as several append() methods exist
-    query("import module namespace sb='java:java.lang.StringBuilder';" +
-        "let $a := (sb:append('a'), sb:append('b')) return sb:to-string()", "ab");
-     */
-
     query("import module namespace set='java:java.util.HashSet';" +
         "let $a := (set:add('a'), set:add('b')) return set:size()", "2");
 

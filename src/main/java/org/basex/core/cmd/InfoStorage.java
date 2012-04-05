@@ -3,16 +3,15 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.User;
+
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.util.Table;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.TokenList;
+import org.basex.data.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'info storage' command and returns the table representation
@@ -27,7 +26,7 @@ public final class InfoStorage extends AQuery {
    * @param arg optional arguments
    */
   public InfoStorage(final String... arg) {
-    super(DATAREF | User.READ, arg);
+    super(Perm.READ, true, arg);
   }
 
   @Override

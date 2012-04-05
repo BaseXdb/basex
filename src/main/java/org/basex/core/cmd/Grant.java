@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.*;
@@ -15,25 +17,25 @@ import org.basex.util.*;
  */
 public final class Grant extends AUser {
   /** Permission. */
-  private int prm = -1;
+  private Perm perm;
 
   /**
    * Default constructor.
-   * @param perm permission
+   * @param permission permission
    * @param user user name
    */
-  public Grant(final Object perm, final String user) {
-    this(perm, user, null);
+  public Grant(final Object permission, final String user) {
+    this(permission, user, null);
   }
 
   /**
-   * Constructor, specifying a certain database.
-   * @param perm permission
+   * Constructor, specifying a database.
+   * @param permission permission
    * @param user user name
    * @param db database
    */
-  public Grant(final Object perm, final String user, final String db) {
-    super(perm.toString(), user, db);
+  public Grant(final Object permission, final String user, final String db) {
+    super(permission.toString(), user, db);
   }
 
   @Override
@@ -41,17 +43,17 @@ public final class Grant extends AUser {
     // find permission
     final CmdPerm cmd = getOption(CmdPerm.class);
     if(cmd == CmdPerm.NONE) {
-      prm = User.NONE;
+      perm = Perm.NONE;
     } else if(cmd == CmdPerm.READ) {
-      prm = User.READ;
+      perm = Perm.READ;
     } else if(cmd == CmdPerm.WRITE) {
-      prm = User.WRITE;
+      perm = Perm.WRITE;
     } else if(cmd == CmdPerm.CREATE && args[2] == null) {
-      prm = User.CREATE;
+      perm = Perm.CREATE;
     } else if(cmd == CmdPerm.ADMIN && args[2] == null) {
-      prm = User.ADMIN;
+      perm = Perm.ADMIN;
     }
-    if(prm == -1) return error(PERM_UNKNOWN_X, args[0]);
+    if(perm == null) return error(PERM_UNKNOWN_X, args[0]);
 
     return run(1, false);
   }
@@ -63,7 +65,7 @@ public final class Grant extends AUser {
 
     // set global permissions
     if(db == null) {
-      context.users.get(user).perm = prm;
+      context.users.get(user).perm = perm;
       context.users.write();
       return info(GRANTED_X_X, args[0], user);
     }
@@ -72,7 +74,7 @@ public final class Grant extends AUser {
     final Data data;
     try {
       data = Open.open(db, context);
-    } catch(final Exception ex) {
+    } catch(final IOException ex) {
       Util.debug(ex);
       final String msg = ex.getMessage();
       return !info(msg.isEmpty() ? DB_NOT_OPENED_X : msg, db);
@@ -89,7 +91,7 @@ public final class Grant extends AUser {
       u = context.users.get(user).copy();
       data.meta.users.create(u);
     }
-    u.perm = prm;
+    u.perm = perm;
     data.meta.dirty = true;
     data.finishUpdate();
     Close.close(data, context);

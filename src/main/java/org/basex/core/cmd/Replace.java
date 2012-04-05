@@ -2,11 +2,9 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
 
 /**
  * Evaluates the 'replace' command and replaces documents in a collection.
@@ -16,12 +14,12 @@ import org.basex.io.IOFile;
  */
 public final class Replace extends ACreate {
   /**
-   * Default constructor.
+   * Constructor.
    * @param path resource path
    * @param input input file or XML string
    */
   public Replace(final String path, final String input) {
-    super(DATAREF | User.WRITE, path, input);
+    super(Perm.WRITE, true, path, input);
   }
 
   /**
@@ -29,7 +27,7 @@ public final class Replace extends ACreate {
    * @param path resource path
    */
   public Replace(final String path) {
-    super(DATAREF | User.WRITE, path);
+    super(Perm.WRITE, true, path);
   }
 
   @Override

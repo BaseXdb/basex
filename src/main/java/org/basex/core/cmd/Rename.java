@@ -3,12 +3,10 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IOFile;
-import org.basex.util.list.IntList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'rename' command and renames resources or directories
@@ -24,7 +22,7 @@ public final class Rename extends ACreate {
    * @param target target path
    */
   public Rename(final String source, final String target) {
-    super(DATAREF | User.WRITE, source, target);
+    super(Perm.WRITE, true, source, target);
   }
 
   @Override

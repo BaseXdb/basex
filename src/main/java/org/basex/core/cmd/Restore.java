@@ -27,7 +27,7 @@ public final class Restore extends Command {
    * @param arg optional argument
    */
   public Restore(final String arg) {
-    super(User.CREATE, arg);
+    super(Perm.CREATE, arg);
   }
 
   @Override

@@ -26,7 +26,7 @@ public final class Export extends Command {
    * @param path export path
    */
   public Export(final String path) {
-    super(DATAREF | User.CREATE, path);
+    super(Perm.CREATE, true, path);
   }
 
   @Override

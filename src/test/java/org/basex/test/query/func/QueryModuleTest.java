@@ -20,6 +20,8 @@ public class QueryModuleTest extends QueryModule {
    * @param fruit index of fruit to be returned
    * @return fruit string
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public String convenient(final int fruit) {
     final int i = fruit;
     final String f = FRUITS[i % FRUITS.length];
@@ -33,6 +35,8 @@ public class QueryModuleTest extends QueryModule {
    * @param fruit index of fruit to be returned
    * @return fruit string
    */
+  @Requires(Permission.NONE)
+  @Deterministic
   public Str fast(final Int fruit) {
     final int i = (int) fruit.itr(null);
     final String f = FRUITS[i % FRUITS.length];
@@ -43,6 +47,8 @@ public class QueryModuleTest extends QueryModule {
    * Returns the default function namespace.
    * @return default function namespace
    */
+  @Requires(Permission.NONE)
+  @ContextDependent
   public Str functionNS() {
     return Str.get(context.sc.nsFunc);
   }

@@ -19,7 +19,7 @@ public final class Delete extends ACreate {
    * @param target target to delete
    */
   public Delete(final String target) {
-    super(DATAREF | User.WRITE, target);
+    super(Perm.WRITE, true, target);
   }
 
   @Override

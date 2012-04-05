@@ -26,7 +26,7 @@ public final class CreateBackup extends Command {
    * @param arg optional argument
    */
   public CreateBackup(final String arg) {
-    super(User.CREATE, arg);
+    super(Perm.CREATE, arg);
   }
 
   @Override

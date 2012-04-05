@@ -1,12 +1,10 @@
 package org.basex.core.cmd;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Command;
-import org.basex.core.CommandBuilder;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
-import org.basex.core.User;
 
 /**
  * Evaluates the 'show events' command and lists all existing events.
@@ -20,7 +18,7 @@ public final class ShowEvents extends Command {
    * Default constructor.
    */
   public ShowEvents() {
-    super(User.ADMIN);
+    super(Perm.ADMIN);
   }
 
   @Override

@@ -47,12 +47,12 @@ public final class Add extends ACreate {
    * @param input input file or XML string
    */
   public Add(final String path, final String input) {
-    super(DATAREF | User.WRITE, path == null ? "" : path, input);
+    super(Perm.WRITE, true, path == null ? "" : path, input);
   }
 
   @Override
   protected boolean run() {
-    final boolean create = context.user.perm(User.CREATE);
+    final boolean create = context.user.has(Perm.CREATE);
     String name = MetaData.normPath(args[0]);
     if(name == null || name.endsWith(".")) return error(NAME_INVALID_X, args[0]);
 

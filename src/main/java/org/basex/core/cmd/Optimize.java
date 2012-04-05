@@ -2,14 +2,13 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
+import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'optimize' command and optimizes the data structures of
@@ -29,7 +28,7 @@ public final class Optimize extends ACreate {
    * Default constructor.
    */
   public Optimize() {
-    super(DATAREF | User.WRITE);
+    super(Perm.WRITE, true);
   }
 
   @Override

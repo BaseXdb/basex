@@ -5,8 +5,7 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 
-import org.basex.core.Command;
-import org.basex.core.CommandBuilder;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.data.DataText;
@@ -30,7 +29,7 @@ public final class ListDB extends Command {
    * @param path database name and optional path
    */
   public ListDB(final String path) {
-    super(STANDARD, path);
+    super(Perm.NONE, path);
   }
 
   @Override

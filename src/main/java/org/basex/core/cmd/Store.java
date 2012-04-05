@@ -32,12 +32,12 @@ public final class Store extends ACreate {
    * @param input input file
    */
   public Store(final String path, final String input) {
-    super(DATAREF | User.WRITE, path == null ? "" : path, input);
+    super(Perm.WRITE, true, path == null ? "" : path, input);
   }
 
   @Override
   protected boolean run() {
-    final boolean create = context.user.perm(User.CREATE);
+    final boolean create = context.user.has(Perm.CREATE);
     String path = MetaData.normPath(args[0]);
     if(path == null || path.endsWith(".")) return error(NAME_INVALID_X, args[0]);
 

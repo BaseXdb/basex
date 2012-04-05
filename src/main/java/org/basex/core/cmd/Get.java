@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.Locale;
 
-import org.basex.core.User;
+import org.basex.core.*;
 
 /**
  * Evaluates the 'get' command and return the value of a database property.
@@ -18,7 +18,8 @@ public final class Get extends AGet {
    * @param key property
    */
   public Get(final Object key) {
-    super(User.READ, (key instanceof Object[] ? ((Object[]) key)[0] : key).toString());
+    super(Perm.READ,
+        (key instanceof Object[] ? ((Object[]) key)[0] : key).toString());
   }
 
   @Override

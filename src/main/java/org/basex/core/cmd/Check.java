@@ -2,20 +2,14 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.build.DirParser;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Command;
-import org.basex.core.Prop;
-import org.basex.core.User;
+import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'checks' command, opens an existing database or
@@ -30,7 +24,7 @@ public final class Check extends Command {
    * @param path file path
    */
   public Check(final String path) {
-    super(STANDARD, path);
+    super(Perm.NONE, path);
   }
 
   @Override
@@ -43,7 +37,7 @@ public final class Check extends Command {
     final String name = IO.get(path).dbname();
 
     // choose OPEN if user has no create permissions, or if database exists
-    final boolean create = context.user.perm(User.CREATE);
+    final boolean create = context.user.has(Perm.CREATE);
     final Command cmd = !create || MetaData.found(path, name, mprop) ?
       new Open(name) : new CreateDB(name, path);
 
@@ -64,7 +58,7 @@ public final class Check extends Command {
       throws IOException {
 
     // don't create new database if user has insufficient permissions
-    final boolean create = ctx.user.perm(User.CREATE);
+    final boolean create = ctx.user.has(Perm.CREATE);
 
     final IO io = IO.get(path);
     final String name = io.dbname();
@@ -75,7 +69,7 @@ public final class Check extends Command {
       final IO in = IO.get(data.meta.original);
       final boolean found = !data.meta.original.isEmpty() && in.eq(io) &&
         io.timeStamp() == in.timeStamp();
-      if(found && ctx.perm(User.READ, data.meta)) return data;
+      if(found && ctx.perm(Perm.READ, data.meta)) return data;
       Close.close(data, ctx);
       if(found) throw new BaseXException(PERM_NEEDED_X, CmdPerm.READ);
     }

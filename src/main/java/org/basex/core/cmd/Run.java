@@ -2,16 +2,11 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.User;
-import org.basex.io.IO;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'run' command and processes a query file as XQuery.
@@ -28,7 +23,7 @@ public final class Run extends AQuery {
    * @param file query file
    */
   public Run(final String file) {
-    super(STANDARD, file);
+    super(Perm.NONE, false, file);
   }
 
   @Override
@@ -60,7 +55,7 @@ public final class Run extends AQuery {
     if(query == null) {
       final IO io = IO.get(args[0]);
       if(!io.exists()) throw new BaseXException(
-          FILE_NOT_FOUND_X, ctx.user.perm(User.CREATE) ? io : args[0]);
+          FILE_NOT_FOUND_X, ctx.user.has(Perm.CREATE) ? io : args[0]);
       query = Token.string(io.read());
       ctx.prop.set(Prop.QUERYPATH, io.path());
     }

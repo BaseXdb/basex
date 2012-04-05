@@ -48,11 +48,12 @@ abstract class AQuery extends Command {
 
   /**
    * Protected constructor.
-   * @param flags command flags
+   * @param p required permission
+   * @param d requires opened database
    * @param arg arguments
    */
-  AQuery(final int flags, final String... arg) {
-    super(flags, arg);
+  AQuery(final Perm p, final boolean d, final String... arg) {
+    super(p, d, arg);
   }
 
   /**

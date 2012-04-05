@@ -1,14 +1,13 @@
 package org.basex.core.cmd;
 
-import org.basex.core.Command;
-import org.basex.core.Prop;
 import static org.basex.core.Text.*;
-import org.basex.core.User;
-import org.basex.data.MetaData;
-import org.basex.io.IOFile;
-import org.basex.util.list.StringList;
 
-import java.util.regex.Pattern;
+import java.util.regex.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract class for user commands.
@@ -19,11 +18,11 @@ import java.util.regex.Pattern;
 abstract class AUser extends Command {
   /**
    * Protected constructor, specifying command arguments.
-   * @param f command flags
+   * @param p required permission
    * @param a arguments
    */
-  AUser(final int f, final String... a) {
-    super(f, a);
+  AUser(final Perm p, final String... a) {
+    super(p, a);
   }
 
   /**
@@ -31,7 +30,7 @@ abstract class AUser extends Command {
    * @param a arguments
    */
   AUser(final String... a) {
-    this(User.ADMIN, a);
+    this(Perm.ADMIN, a);
   }
 
   /**

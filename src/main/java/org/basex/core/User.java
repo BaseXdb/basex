@@ -7,23 +7,12 @@ package org.basex.core;
  * @author Christian Gruen
  */
 public final class User {
-  /** No permissions. */
-  public static final byte NONE = 0;
-  /** Read permission (local+global). */
-  public static final byte READ = 1;
-  /** Write permission (local+global). */
-  public static final byte WRITE = 2;
-  /** Create permission (global). */
-  public static final byte CREATE = 4;
-  /** Admin permission (global). */
-  public static final byte ADMIN = 8;
-
   /** User name. */
   public final String name;
   /** Password. */
   public String password;
   /** Permission. */
-  public int perm;
+  public Perm perm;
 
   /**
    * Constructor.
@@ -31,19 +20,19 @@ public final class User {
    * @param p password
    * @param r rights
    */
-  User(final String n, final String p, final int r) {
+  User(final String n, final String p, final Perm r) {
     name = n;
     password = p;
     perm = r;
   }
 
   /**
-   * Tests if the specified permission is set.
-   * @param flag flag to be checked
+   * Tests if the user has the specified permission.
+   * @param p permission to be checked
    * @return result of check
    */
-  public boolean perm(final int flag) {
-    return perm >= flag;
+  public boolean has(final Perm p) {
+    return perm.num >= p.num;
   }
 
   /**
@@ -51,6 +40,6 @@ public final class User {
    * @return user copy
    */
   public User copy() {
-    return new User(name, password, Math.min(perm, WRITE));
+    return new User(name, password, perm.min(Perm.WRITE));
   }
 }
