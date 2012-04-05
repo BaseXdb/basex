@@ -1,6 +1,6 @@
 package org.basex.examples.query;
 
-import org.basex.query.QueryModule;
+import org.basex.query.*;
 import org.basex.query.item.Int;
 import org.basex.query.item.Str;
 import org.basex.util.*;
@@ -22,6 +22,8 @@ public class FruitsModule extends QueryModule {
    * @param fruit index of fruit to be returned
    * @return fruit string
    */
+  @Deterministic
+  @Requires(Permission.READ)
   public String convenient(final int fruit) {
     final int i = fruit;
     final String f = FRUITS[i % FRUITS.length];
@@ -35,6 +37,8 @@ public class FruitsModule extends QueryModule {
    * @param fruit index of fruit to be returned
    * @return fruit string
    */
+  @Deterministic
+  @Requires(Permission.READ)
   public Str fast(final Int fruit) {
     final int i = (int) fruit.itr(null);
     final String f = FRUITS[i % FRUITS.length];
