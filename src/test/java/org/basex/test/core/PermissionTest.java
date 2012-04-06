@@ -102,7 +102,8 @@ public final class PermissionTest extends SandboxTest {
     no(new InfoIndex(), testSession);
     no(new InfoStorage(), testSession);
     no(new Get("DBPATH"), testSession);
-    no(new Set(Prop.QUERYINFO, false), testSession);
+    ok(new Get(Prop.QUERYINFO), testSession);
+    ok(new Set(Prop.QUERYINFO, false), testSession);
 
     // repo Stuff
     no(new RepoInstall(REPO + "/pkg3.xar", null), testSession);
@@ -140,6 +141,7 @@ public final class PermissionTest extends SandboxTest {
     ok(new ListDB(NAME), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoStorage("1", "2"), testSession);
+    no(new Get("DBPATH"), testSession);
     ok(new Get(Prop.QUERYINFO), testSession);
     ok(new Set(Prop.QUERYINFO, false), testSession);
     // XQuery read

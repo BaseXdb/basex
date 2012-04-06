@@ -20,7 +20,7 @@ public final class Set extends AGet {
    * @param value value to set (optional, depending on the property)
    */
   public Set(final Object key, final Object value) {
-    super(Perm.READ, (key instanceof Object[] ?
+    super(Perm.NONE, (key instanceof Object[] ?
         ((Object[]) key)[0] : key).toString(), value == null ? "" : value.toString());
   }
 
