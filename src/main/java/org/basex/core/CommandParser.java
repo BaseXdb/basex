@@ -403,7 +403,7 @@ public final class CommandParser extends InputParser {
    * @return password string
    * @throws QueryException query exception
    */
-  String password() throws QueryException {
+  private String password() throws QueryException {
     final String pw = string(null);
     return pw != null ? pw : passwords == null ? "" : passwords.password();
   }
