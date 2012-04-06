@@ -46,7 +46,7 @@ public class XMLParser extends SingleParser {
     while(true) {
       if(scanner.type == Type.TEXT) {
         final byte[] text = scanner.token.finish();
-        builder.text(text);
+        if(!tags.isEmpty() || !ws(text)) builder.text(scanner.token.finish());
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token.finish());
       } else if(scanner.type == Type.PI) {

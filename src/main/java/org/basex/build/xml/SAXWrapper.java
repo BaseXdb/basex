@@ -100,7 +100,7 @@ public final class SAXWrapper extends SingleParser {
         r = f.newSAXParser().getXMLReader();
       }
 
-      saxh = new SAXHandler(builder);
+      saxh = new SAXHandler(builder, prop.is(Prop.CHOP));
       final String cat = prop.get(Prop.CATFILE);
       if(!cat.isEmpty()) CatalogWrapper.set(r, cat);
 
@@ -199,7 +199,7 @@ public final class SAXWrapper extends SingleParser {
 
   @Override
   public double prog() {
-    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000d % 1
-        : (double) counter / length;
+    return length == 0 ? saxh == null ? 0 : saxh.nodes / 3000000d % 1 :
+      (double) counter / length;
   }
 }
