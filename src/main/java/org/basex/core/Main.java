@@ -78,8 +78,10 @@ public abstract class Main {
       // skip empty lines
       if(in.isEmpty()) continue;
       try {
-        // show goodbye message if method returns false
-        if(!execute(in)) {
+        final CommandParser parser = new CommandParser(in, context);
+        parser.password(cr.getPasswordReader());
+        if(!execute(parser)) {
+          // show goodbye message if method returns false
           Util.outln(BYE[new Random().nextInt(4)]);
           return;
         }
@@ -114,10 +116,18 @@ public abstract class Main {
         return md5(Util.password());
       }
     };
-    final CommandParser cp = new CommandParser(in, context).password(pr);
+    return execute(new CommandParser(in, context).password(pr));
+  }
 
+  /**
+   * Execute the commands from the given command parser.
+   * @param parser command parser
+   * @return {@code false} if the exit command was sent
+   * @throws IOException database exception
+   */
+  private boolean execute(final CommandParser parser) throws IOException {
     try {
-      for(final Command cmd : cp.parse()) {
+      for(final Command cmd : parser.parse()) {
         if(cmd instanceof Exit) return false;
         execute(cmd, verbose);
       }
