@@ -10,15 +10,6 @@ import static org.basex.util.Token.*;
  */
 public interface BuildText {
   /** Builder error. */
-  String BEFOREROOT = "%: No text allowed before root element.";
-  /** Builder error. */
-  String AFTERROOT = "%: No text allowed after closed root element.";
-  /** Builder error: Tag Mismatch. */
-  String MOREROOTS = "%: More than one root node: '<%>'";
-  /** Builder error. */
-  String DOCOPEN = "%: Closing tag </%> expected.";
-
-  /** Builder error. */
   String LIMITNS = "%: Too many different namespaces (limit: %).";
   /** Builder error. */
   String LIMITRANGE = "%: Input is too large for a single database.";
@@ -29,8 +20,17 @@ public interface BuildText {
 
   /** Parser error. */
   String PARSEINV = "%: % expected, % found.";
-  /** Parser error: Tag Mismatch. */
+  /** Parser error. */
   String CLOSINGTAG = "%: </%> found, </%> expected.";
+  /** Parser error. */
+  String DOCOPEN = "%: Closing element </%> expected.";
+  /** Parser error. */
+  String MOREROOTS = "%: No elements allowed after closed root element.";
+
+  /** Scanner error. */
+  String BEFOREROOT = "No text allowed before root element.";
+  /** Scanner error. */
+  String AFTERROOT = "No text allowed after closed root element.";
 
   /** Scanner error. */
   String DOCEMPTY = "Document is empty.";
