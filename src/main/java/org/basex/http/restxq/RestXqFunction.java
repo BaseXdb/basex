@@ -428,7 +428,7 @@ final class RestXqFunction {
       throws IOException {
 
     if(cache != null) return cache;
-    final BufferInput bi = new BufferInput(http.in);
+    final BufferInput bi = new BufferInput(http.req.getInputStream());
     final IOContent io = new IOContent(bi.content());
     io.name(http.method + IO.XMLSUFFIX);
     return io;

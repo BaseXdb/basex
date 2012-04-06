@@ -36,10 +36,6 @@ public final class HTTPContext {
   public final HttpServletResponse res;
   /** Request method. */
   public final HTTPMethod method;
-  /** Output stream. */
-  public final OutputStream out;
-  /** Input stream. */
-  public final InputStream in;
 
   /** Serialization parameters. */
   public String serialization = "";
@@ -69,9 +65,6 @@ public final class HTTPContext {
     req = rq;
     res = rs;
     method = HTTPMethod.get(rq.getMethod());
-
-    in = req.getInputStream();
-    out = res.getOutputStream();
 
     // set UTF8 as default encoding (can be overwritten)
     res.setCharacterEncoding(UTF8);
@@ -215,7 +208,7 @@ public final class HTTPContext {
     if(session != null) session.close();
     res.setStatus(code);
     if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
-    if(message != null) out.write(token(message));
+    if(message != null) res.getOutputStream().write(token(message));
   }
 
   /**

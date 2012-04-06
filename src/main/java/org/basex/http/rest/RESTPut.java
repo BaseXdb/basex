@@ -26,7 +26,7 @@ public class RESTPut extends RESTCode {
     if(http.depth() == 0) HTTPErr.NO_PATH.thrw();
 
     boolean xml = true;
-    final InputStream in = http.in;
+    final InputStream in = http.req.getInputStream();
     final String ct = http.contentType();
     // choose correct importer
     if(APP_JSON.equals(ct)) {
