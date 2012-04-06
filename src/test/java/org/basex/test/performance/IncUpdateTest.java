@@ -2,23 +2,17 @@ package org.basex.test.performance;
 
 import static org.junit.Assert.*;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.core.cmd.Set;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.basex.query.*;
+import org.basex.test.*;
+import org.junit.*;
+import org.junit.runner.*;
+import org.junit.runners.*;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
@@ -28,7 +22,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Christian Gruen
  */
 @RunWith(Parameterized.class)
-public final class IncUpdateTest {
+public final class IncUpdateTest extends SandboxTest {
   /**
    * Test parameters.
    * @return parameters
@@ -38,10 +32,6 @@ public final class IncUpdateTest {
     return Arrays.asList(new Object[][] { {false}, {true} });
   }
 
-  /** Test database name. */
-  private static final String DB = Util.name(IncUpdateTest.class);
-  /** Database context. */
-  protected static final Context CONTEXT = new Context();
   /** Number of steps. */
   private static final int STEPS = 10;
   /** Maximum number of entries. */
@@ -64,9 +54,9 @@ public final class IncUpdateTest {
    */
   @Before
   public void init() throws Exception {
-    new Set(Prop.UPDINDEX, ixupdate).execute(CONTEXT);
-    new CreateDB(DB, "<xml/>").execute(CONTEXT);
-    new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
+    new Set(Prop.UPDINDEX, ixupdate).execute(context);
+    new CreateDB(NAME, "<xml/>").execute(context);
+    new Set(Prop.AUTOFLUSH, false).execute(context);
   }
 
   /**
@@ -75,7 +65,7 @@ public final class IncUpdateTest {
    */
   @After
   public void finish() throws Exception {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -168,7 +158,7 @@ public final class IncUpdateTest {
    * @throws QueryException database exception
    */
   protected static String query(final String query) throws QueryException {
-    final QueryProcessor qp = new QueryProcessor(query, CONTEXT);
+    final QueryProcessor qp = new QueryProcessor(query, context);
     try {
       return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
     } finally {

@@ -21,9 +21,6 @@ public abstract class Compare {
   /** Verbose mode. */
   private static final boolean VERBOSE = true;
 
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
-
   /** XSLT skeleton. */
   private static final String XSLT =
     "<xsl:stylesheet version='2.0' " +
@@ -58,6 +55,9 @@ public abstract class Compare {
   /** Selected processors. */
   private static final String[][] PROCS = xsltMode ? XSLTPROCS : XQUERYPROCS;
 
+  /** Database context. */
+  private static Context context = new Context();
+
   /**
    * Main method of the test class.
    * @param args command-line arguments
@@ -87,11 +87,11 @@ public abstract class Compare {
    * @param query query input
    * @throws Exception exception
    */
-  public static void query(final String query) throws Exception {
+  private static void query(final String query) throws Exception {
     final StringList sl = new StringList();
     String result = "";
     try {
-      result = new XQuery(query).execute(CONTEXT);
+      result = new XQuery(query).execute(context);
     } catch(final BaseXException ex) {
       result = ex.getMessage().replaceAll("[\\r\\n]+", " ");
     }
@@ -126,7 +126,7 @@ public abstract class Compare {
    * @param proc query processor
    * @return string result
    */
-  public static String execute(final String[] proc) {
+  private static String execute(final String[] proc) {
     try {
       final ArrayList<String> al = new ArrayList<String>();
       al.addAll(Arrays.asList(proc).subList(1, proc.length));

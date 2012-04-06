@@ -1,15 +1,12 @@
 package org.basex.test.performance;
 
-import java.util.Random;
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.XQuery;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.junit.Test;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class performs a local stress tests with a specified
@@ -18,9 +15,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class LocalStressTest {
-  /** Test database name. */
-  private static final String DB = Util.name(LocalStressTest.class);
+public final class LocalStressTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
@@ -28,8 +23,6 @@ public final class LocalStressTest {
   /** Maximum position to retrieve. */
   private static final int MAX = 1000;
 
-  /** Global context. */
-  static final Context CONTEXT = new Context();
   /** Random number generator. */
   static final Random RND = new Random();
   /** Result counter. */
@@ -79,8 +72,8 @@ public final class LocalStressTest {
    */
   private static void run(final int clients, final int runs) throws Exception {
     // Create test database
-    Command cmd = new CreateDB(DB, INPUT);
-    cmd.execute(CONTEXT);
+    Command cmd = new CreateDB(NAME, INPUT);
+    cmd.execute(context);
 
     // Start clients
     final Client[] cl = new Client[clients];
@@ -88,8 +81,8 @@ public final class LocalStressTest {
     for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     // Drop database
-    cmd = new DropDB(DB);
-    cmd.execute(CONTEXT);
+    cmd = new DropDB(NAME);
+    cmd.execute(context);
   }
 
   /** Single client. */
@@ -113,7 +106,7 @@ public final class LocalStressTest {
           // Return nth text of the database
           final int n = RND.nextInt() % MAX + 1;
           final String qu = Util.info(QUERY, n);
-          new XQuery(qu).execute(CONTEXT);
+          new XQuery(qu).execute(context);
         }
       } catch(final BaseXException ex) {
         ex.printStackTrace();

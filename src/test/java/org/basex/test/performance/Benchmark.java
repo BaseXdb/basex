@@ -2,20 +2,14 @@ package org.basex.test.performance;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.BaseXServer;
-import org.basex.core.MainProp;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Check;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
-import org.basex.server.ClientSession;
-import org.basex.server.LocalSession;
-import org.basex.server.Session;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.server.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * This class offers utility methods to perform simple benchmarks.
@@ -23,11 +17,9 @@ import org.junit.BeforeClass;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class Benchmark {
+public abstract class Benchmark extends SandboxTest {
   /** Test document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
-  /** Global context. */
-  private static final Context CONTEXT = new Context();
   /** Server reference. */
   private static BaseXServer server;
   /** Session. */
@@ -41,15 +33,12 @@ public abstract class Benchmark {
    */
   @BeforeClass
   public static void init() throws IOException {
-    // Check if server is (not) running
-    server = !local && !BaseXServer.ping(LOCALHOST,
-        CONTEXT.mprop.num(MainProp.SERVERPORT)) ?
-        new BaseXServer("-z", "-p9999", "-e9998") : null;
+    // check if server is (not) running
+    final int sp = context.mprop.num(MainProp.SERVERPORT);
+    server = local || BaseXServer.ping(LOCALHOST, sp) ? null : createServer();
+    session = local ? new LocalSession(context) : createClient();
 
-    session = local ? new LocalSession(CONTEXT) :
-      new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
-
-    // Create test database
+    // create test database
     session.execute(new Set(Prop.QUERYINFO, true));
   }
 

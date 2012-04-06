@@ -1,10 +1,9 @@
 package org.basex.test.performance;
 
-import java.util.Random;
-import org.basex.BaseXServer;
-import org.basex.core.Text;
-import org.basex.server.ClientSession;
-import org.junit.Test;
+import org.basex.*;
+import org.basex.server.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * This class performs a client/server memory stress tests with a specified
@@ -13,15 +12,13 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ServerMemTest {
+public final class ServerMemTest extends SandboxTest {
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
   private static final String QUERY =
     "(for $i in 1 to 50000 order by $i return $i)[1]";
 
   /** Server reference. */
-  static BaseXServer server;
-  /** Random number generator. */
-  static final Random RND = new Random();
+  BaseXServer server;
 
   /**
    * Runs the test.
@@ -65,12 +62,9 @@ public final class ServerMemTest {
    * @param parallel number of parallel runs
    * @throws Exception exception
    */
-  private static void run(final int clients, final int parallel)
-      throws Exception {
-
+  private void run(final int clients, final int parallel) throws Exception {
     // Run server instance
-    server = new BaseXServer("-p9999", "-e9998", "-z",
-        "-cset parallel " + parallel);
+    server = createServer("-c", "set parallel " + parallel);
 
     // Run clients
     final Client[] cl = new Client[clients];
@@ -92,7 +86,7 @@ public final class ServerMemTest {
      * @throws Exception exception
      */
     public Client() throws Exception {
-      session = new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
+      session = createClient();
     }
 
     @Override

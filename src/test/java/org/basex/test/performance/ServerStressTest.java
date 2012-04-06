@@ -1,10 +1,9 @@
 package org.basex.test.performance;
 
-import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
-import org.basex.core.Text;
 import org.basex.server.ClientSession;
+import org.basex.test.*;
 import org.basex.util.Performance;
 import org.basex.util.Util;
 import org.junit.Test;
@@ -16,7 +15,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ServerStressTest {
+public final class ServerStressTest extends SandboxTest {
   /** Input document. */
   private static final String INPUT = "src/test/resources/factbook.zip";
   /** Query to be run ("%" may be used as placeholder for dynamic content). */
@@ -24,12 +23,12 @@ public final class ServerStressTest {
   /** Maximum position to retrieve. */
   private static final int MAX = 1000;
 
-  /** Server reference. */
-  static BaseXServer server;
   /** Random number generator. */
   static final Random RND = new Random();
+  /** Server reference. */
+  BaseXServer server;
   /** Result counter. */
-  static int counter;
+  int counter;
 
   /**
    * Runs the test.
@@ -73,12 +72,12 @@ public final class ServerStressTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private static void run(final int clients, final int runs) throws Exception {
+  private void run(final int clients, final int runs) throws Exception {
     // Run server instance
-    server = new BaseXServer("-p9999", "-e9998", "-z");
+    server = createServer();
 
     // Create test database
-    final ClientSession cs = newSession();
+    final ClientSession cs = createClient();
     cs.execute("create db test " + INPUT);
 
     // Run clients
@@ -91,15 +90,6 @@ public final class ServerStressTest {
     cs.execute("drop db test");
     cs.close();
     server.stop();
-  }
-
-  /**
-   * Returns a session instance.
-   * @return session
-   * @throws IOException exception
-   */
-  static ClientSession newSession() throws IOException {
-    return new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
   }
 
   /** Single client. */
@@ -116,7 +106,7 @@ public final class ServerStressTest {
      */
     public Client(final int r) throws Exception {
       runs = r;
-      session = newSession();
+      session = createClient();
     }
 
     @Override

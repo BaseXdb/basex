@@ -1,14 +1,11 @@
 package org.basex.test.performance;
 
-import org.basex.BaseXServer;
-import org.basex.core.Text;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.XQuery;
-import org.basex.server.ClientSession;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.junit.Test;
+import org.basex.*;
+import org.basex.core.cmd.*;
+import org.basex.server.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Testing concurrent XQUF statements on a single database.
@@ -16,10 +13,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class XQUFServerStressTest {
-  /** Database name. */
-  private static final String DB = Util.name(XQUFServerStressTest.class);
-
+public final class XQUFServerStressTest extends SandboxTest {
   /**
    * Runs the test.
    * @throws Exception exception
@@ -62,14 +56,14 @@ public final class XQUFServerStressTest {
    * @param runs number of runs per client
    * @throws Exception exception
    */
-  private static void run(final int clients, final int runs) throws Exception {
+  private void run(final int clients, final int runs) throws Exception {
     // Run server instance
     /* Server. */
-    final BaseXServer server = new BaseXServer("-p9999", "-e9998", "-z");
+    final BaseXServer server = createServer();
     insert(clients, runs);
     delete(clients, runs);
-    final ClientSession s = newSession();
-    s.execute(new DropDB(DB));
+    final ClientSession s = createClient();
+    s.execute(new DropDB(NAME));
     s.close();
     server.stop();
   }
@@ -83,10 +77,10 @@ public final class XQUFServerStressTest {
   private static void insert(final int clients, final int runs)
       throws Exception {
 
-    final ClientSession s = newSession();
-    s.execute(new CreateDB(DB, "<doc/>"));
+    final ClientSession s = createClient();
+    s.execute(new CreateDB(NAME, "<doc/>"));
     s.close();
-    run("insert node <node/> into doc('" + DB + "')/doc", clients, runs);
+    run("insert node <node/> into doc('" + NAME + "')/doc", clients, runs);
   }
 
   /**
@@ -98,13 +92,13 @@ public final class XQUFServerStressTest {
   private static void delete(final int clients, final int runs)
       throws Exception {
 
-    final ClientSession s = newSession();
-    s.execute(new CreateDB(DB, "<doc/>"));
+    final ClientSession s = createClient();
+    s.execute(new CreateDB(NAME, "<doc/>"));
     final int c = 100 + clients * clients;
     s.execute(new XQuery("for $i in 1 to " + c +
-        " return insert node <node/> into doc('" + DB + "')/doc"));
+        " return insert node <node/> into doc('" + NAME + "')/doc"));
     s.close();
-    run("delete nodes (doc('" + DB + "')/doc/node)[1]", clients, runs);
+    run("delete nodes (doc('" + NAME + "')/doc/node)[1]", clients, runs);
   }
 
   /**
@@ -123,15 +117,6 @@ public final class XQUFServerStressTest {
     for(final Client c : cl) c.join();
   }
 
-  /**
-   * Returns a session instance.
-   * @return session
-   * @throws Exception exception
-   */
-  static ClientSession newSession() throws Exception {
-    return new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
-  }
-
   /** Single client. */
   static final class Client extends Thread {
     /** Client session. */
@@ -148,7 +133,7 @@ public final class XQUFServerStressTest {
      * @throws Exception exception
      */
     Client(final String qu, final int r) throws Exception {
-      session = newSession();
+      session = createClient();
       query = qu;
       runs = r;
     }

@@ -1,18 +1,9 @@
 package org.basex.test.performance;
 
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * This class adds and retrieves documents in a collection.
@@ -20,11 +11,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CollStressTest {
-  /** Test database name. */
-  private static final String DB = Util.name(CollStressTest.class);
-  /** Global context. */
-  private static final Context CONTEXT = new Context();
+public final class CollStressTest extends SandboxTest {
   /** Number of documents to be added. */
   private static final int SIZE = 4000;
 
@@ -34,15 +21,15 @@ public final class CollStressTest {
    */
   @BeforeClass
   public static void init() throws Exception {
-    final CreateDB cmd = new CreateDB(DB);
-    cmd.execute(CONTEXT);
+    final CreateDB cmd = new CreateDB(NAME);
+    cmd.execute(context);
     // Speed up updates and add documents
-    new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
-    new Set(Prop.INTPARSE, true).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, false).execute(context);
+    new Set(Prop.INTPARSE, true).execute(context);
     for(int i = 0; i < SIZE; i++) {
-      new Add(Integer.toString(i), "<xml/>").execute(CONTEXT);
+      new Add(Integer.toString(i), "<xml/>").execute(context);
     }
-    new Set(Prop.AUTOFLUSH, true).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, true).execute(context);
   }
 
   /**
@@ -51,7 +38,7 @@ public final class CollStressTest {
    */
   @AfterClass
   public static void finish() throws Exception {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -60,9 +47,9 @@ public final class CollStressTest {
    */
   @Test
   public void specificOpened() throws Exception {
-    new Open(DB).execute(CONTEXT);
+    new Open(NAME).execute(context);
     for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + DB + '/' + i + "')").execute(CONTEXT);
+      new XQuery("collection('" + NAME + '/' + i + "')").execute(context);
     }
   }
 
@@ -72,9 +59,9 @@ public final class CollStressTest {
    */
   @Test
   public void specificClosed() throws Exception {
-    new Close().execute(CONTEXT);
+    new Close().execute(context);
     for(int i = 0; i < SIZE; i++) {
-      new XQuery("collection('" + DB + '/' + i + "')").execute(CONTEXT);
+      new XQuery("collection('" + NAME + '/' + i + "')").execute(context);
     }
   }
 
@@ -84,9 +71,9 @@ public final class CollStressTest {
    */
   @Test
   public void allOpened() throws Exception {
-    new Open(DB).execute(CONTEXT);
+    new Open(NAME).execute(context);
     new XQuery("for $i in 0 to " + (SIZE - 1) + ' ' +
-      "return collection(concat('" + DB + "/', $i))").execute(CONTEXT);
+      "return collection(concat('" + NAME + "/', $i))").execute(context);
   }
 
   /**
@@ -95,8 +82,8 @@ public final class CollStressTest {
    */
   @Test
   public void allClosed() throws Exception {
-    new Close().execute(CONTEXT);
+    new Close().execute(context);
     new XQuery("for $i in 0 to " + (SIZE - 1) + ' ' +
-      "return collection(concat('" + DB + "/', $i))").execute(CONTEXT);
+      "return collection(concat('" + NAME + "/', $i))").execute(context);
   }
 }

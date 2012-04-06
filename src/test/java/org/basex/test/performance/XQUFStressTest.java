@@ -1,11 +1,8 @@
 package org.basex.test.performance;
 
-import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.XQuery;
-import org.basex.util.Util;
-import org.junit.Test;
+import org.basex.core.cmd.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * Performs bulk updates with standalone version.
@@ -13,14 +10,9 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class XQUFStressTest {
-  /** Basic database name for each test. */
-  private static final String DB = Util.name(XQUFStressTest.class);
+public final class XQUFStressTest extends SandboxTest {
   /** Number of node updates. */
   private static final int NRNODES = 100;
-
-  /** Current context. */
-  private final Context ctx = new Context();
 
   /**
    * Tests the insert statement.
@@ -56,17 +48,17 @@ public final class XQUFStressTest {
    */
   private void insert(final int runs) throws Exception {
     for(int r = 0; r < runs; r++) {
-      new CreateDB(DB, "<doc/>").execute(ctx);
+      new CreateDB(NAME, "<doc/>").execute(context);
       // insert query
       new XQuery("for $i in 1 to " + NRNODES + " return insert node " +
-          "<section><page/></section> into /doc").execute(ctx);
+          "<section><page/></section> into /doc").execute(context);
       // actual query
       new XQuery(
         "for $page in //page " +
         "let $par := $page/.. " +
         "return (delete node $page, insert node $page before $par)").
-        execute(ctx);
-      new DropDB(DB).execute(ctx);
+        execute(context);
+      new DropDB(NAME).execute(context);
     }
   }
 
@@ -103,12 +95,12 @@ public final class XQUFStressTest {
    * @throws Exception exception
    */
   private void delete(final int runs) throws Exception {
-    new CreateDB(DB, "<doc/>").execute(ctx);
+    new CreateDB(NAME, "<doc/>").execute(context);
     for(int r = 0; r < runs; r++) {
       new XQuery("for $i in 1 to " + NRNODES +
-          " return insert node <node/> into /doc").execute(ctx);
-      new XQuery("delete nodes //node").execute(ctx);
+          " return insert node <node/> into /doc").execute(context);
+      new XQuery("delete nodes //node").execute(context);
     }
-    new DropDB(DB).execute(ctx);
+    new DropDB(NAME).execute(context);
   }
 }

@@ -28,14 +28,14 @@ public final class ReplaceInPlaceTest extends SandboxTest {
    */
   @Test
   public void run() throws Exception {
-    CONTEXT.prop.set(Prop.TEXTINDEX, false);
-    CONTEXT.prop.set(Prop.ATTRINDEX, false);
-    CONTEXT.prop.set(Prop.AUTOFLUSH, false);
+    context.prop.set(Prop.TEXTINDEX, false);
+    context.prop.set(Prop.ATTRINDEX, false);
+    context.prop.set(Prop.AUTOFLUSH, false);
 
     // create test database
     new CreateDB(NAME, "<X>" +
         "<A>x.xxxxxxxxxxxxxxxxxx</A>" +
-        "<A>x.xxxxxxxxxxxxxxxxxx</A></X>").execute(CONTEXT);
+        "<A>x.xxxxxxxxxxxxxxxxxx</A></X>").execute(context);
 
     //final long len1 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
 
@@ -44,16 +44,16 @@ public final class ReplaceInPlaceTest extends SandboxTest {
     for(int i = 0; i < NQUERIES; i++) {
       final double d = rnd.nextDouble();
       final String qu = "for $a in //A return replace node $a/text() with " + d;
-      new XQuery(qu).execute(CONTEXT);
+      new XQuery(qu).execute(context);
     }
 
     // perform final, flushed replacement
-    new Flush().execute(CONTEXT);
+    new Flush().execute(context);
 
     //final long len2 = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
     //assertEquals(len1, len2);
 
     // Drop database
-    new DropDB(NAME).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 }

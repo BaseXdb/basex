@@ -1,15 +1,9 @@
 package org.basex.test.performance;
 
-import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
-import org.basex.util.Util;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * This class adds and retrieves documents in a collection.
@@ -17,19 +11,14 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CollAddTest {
-  /** Test database name. */
-  private static final String DB = Util.name(CollAddTest.class);
-  /** Global context. */
-  private static final Context CONTEXT = new Context();
-
+public final class CollAddTest extends SandboxTest {
   /**
    * Initializes the tests.
    * @throws Exception exception
    */
   @BeforeClass
   public static void init() throws Exception {
-    new Set(Prop.INTPARSE, true).execute(CONTEXT);
+    new Set(Prop.INTPARSE, true).execute(context);
   }
 
   /**
@@ -102,16 +91,16 @@ public final class CollAddTest {
    * @throws Exception exception
    */
   private static void add(final int n, final boolean flush) throws Exception {
-    new Set(Prop.AUTOFLUSH, flush).execute(CONTEXT);
+    new Set(Prop.AUTOFLUSH, flush).execute(context);
 
     // Create test database
-    final Command cmd = new CreateDB(DB);
-    cmd.execute(CONTEXT);
+    final Command cmd = new CreateDB(NAME);
+    cmd.execute(context);
     // Add documents
     for(int i = 0; i < n; i++) {
-      new Add(Integer.toString(i), "<xml/>").execute(CONTEXT);
+      new Add(Integer.toString(i), "<xml/>").execute(context);
     }
     // Close database
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 }
