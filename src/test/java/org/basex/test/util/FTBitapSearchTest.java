@@ -3,17 +3,15 @@ package org.basex.test.util;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.util.NoSuchElementException;
-import org.basex.query.QueryException;
-import org.basex.query.ft.FTTokens;
-import org.basex.util.Util;
-import org.basex.util.ft.FTBitapSearch;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.ft.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
-import org.basex.util.ft.FTIterator;
-import org.basex.util.ft.FTSpan;
-import org.basex.util.list.TokenList;
-import org.junit.Before;
-import org.junit.Test;
+import org.basex.util.list.*;
+import org.junit.*;
 
 /**
  * Test {@link FTBitapSearch} methods.

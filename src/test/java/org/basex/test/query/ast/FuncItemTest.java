@@ -1,6 +1,6 @@
 package org.basex.test.query.ast;
 
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * Tests for compiling function items.

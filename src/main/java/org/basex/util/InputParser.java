@@ -43,7 +43,8 @@ public abstract class InputParser {
    * @param c database context
    */
   protected void file(final IO f, final Context c) {
-    file = f == null || f.isDir() ? null : c.user.perm(User.ADMIN) ? f.path() : f.name();
+    file = f == null || f.isDir() ? null : c.user.has(Perm.ADMIN) ?
+        f.path() : f.name();
   }
 
   /**

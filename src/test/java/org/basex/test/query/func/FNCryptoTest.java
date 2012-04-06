@@ -1,11 +1,9 @@
 package org.basex.test.query.func;
 
-import org.basex.core.cmd.DropDB;
 import static org.basex.query.func.Function.*;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.Test;
+
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the functions of the EXPath Cryptographic module.
@@ -14,10 +12,6 @@ import org.junit.Test;
  * @author Lukas Kircher
  */
 public class FNCryptoTest extends AdvancedQueryTest {
-
-  /** Test database name. */
-  private static final String DB = Util.name(FNCryptoTest.class);
-
   /**
    * Checks FNCrypto functions for correct argument handling.
    */
@@ -398,20 +392,9 @@ public class FNCryptoTest extends AdvancedQueryTest {
    */
   @Test
   public void validateSignatureFullySpecified() {
-
     query("declare namespace c = 'http://expath.org/ns/crypto';" +
         "c:validate-signature(c:generate-signature(<a><n/></a>," +
         "'exclusive','SHA512','RSA_SHA1','myPrefix','enveloped','/a/n'))",
         "true");
-  }
-
-  /**
-   * Deletes the test db.
-   * @throws Exception exception
-   */
-  @AfterClass
-  public static void end() throws Exception {
-    new DropDB(DB).execute(CONTEXT);
-    CONTEXT.close();
   }
 }

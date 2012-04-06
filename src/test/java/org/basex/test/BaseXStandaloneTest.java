@@ -3,12 +3,11 @@ package org.basex.test;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 
-import org.basex.BaseX;
-import org.basex.io.out.ArrayOutput;
-import org.junit.Test;
+import org.basex.*;
+import org.basex.io.out.*;
+import org.junit.*;
 
 /**
  * Tests the command-line arguments of the standalone starter class.
@@ -23,9 +22,9 @@ public final class BaseXStandaloneTest extends BaseXTest {
    */
   @Test
   public void writeBack() throws IOException {
-    IN.write(token("<a>X</a>"));
-    run("-i", IN.toString(), "-u", "-q", "delete node //text()");
-    assertEquals("<a/>", string(IN.read()));
+    INPUT.write(token("<a>X</a>"));
+    run("-i", INPUT.toString(), "-u", "-q", "delete node //text()");
+    assertEquals("<a/>", string(INPUT.read()));
   }
 
   @Override

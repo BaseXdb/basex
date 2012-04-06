@@ -1,9 +1,9 @@
 package org.basex.test.util;
 
 import static org.junit.Assert.*;
-import org.basex.util.BitArray;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Tests for {@link BitArray}.

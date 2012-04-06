@@ -2,17 +2,12 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Command;
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.DiskData;
-import org.basex.data.MetaData;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'open' command and opens a database.
@@ -26,7 +21,7 @@ public final class Open extends Command {
    * @param path database name and optional path
    */
   public Open(final String path) {
-    super(STANDARD, path);
+    super(Perm.NONE, path);
   }
 
   @Override
@@ -80,7 +75,7 @@ public final class Open extends Command {
       ctx.pin(data);
     }
     // check permissions
-    if(ctx.perm(User.READ, data.meta)) return data;
+    if(ctx.perm(Perm.READ, data.meta)) return data;
 
     Close.close(data, ctx);
     throw new BaseXException(PERM_NEEDED_X, CmdPerm.READ);

@@ -2,15 +2,14 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
-import org.basex.core.Command;
-import org.basex.core.CommandBuilder;
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
-import org.basex.core.User;
-import org.basex.io.IO;
-import org.basex.util.Table;
-import org.basex.util.list.TokenList;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'show backups' command and shows available backups.
@@ -23,7 +22,7 @@ public final class ShowBackups extends Command {
    * Default constructor.
    */
   public ShowBackups() {
-    super(User.CREATE);
+    super(Perm.CREATE);
   }
 
   @Override

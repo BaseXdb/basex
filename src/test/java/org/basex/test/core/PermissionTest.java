@@ -3,56 +3,16 @@ package org.basex.test.core;
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.BaseXServer;
+import org.basex.*;
 import org.basex.core.*;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateIndex;
-import org.basex.core.cmd.CreateUser;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.DropIndex;
-import org.basex.core.cmd.DropUser;
-import org.basex.core.cmd.Exit;
-import org.basex.core.cmd.Export;
-import org.basex.core.cmd.Find;
-import org.basex.core.cmd.Flush;
-import org.basex.core.cmd.Get;
-import org.basex.core.cmd.Grant;
-import org.basex.core.cmd.Help;
-import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.InfoIndex;
-import org.basex.core.cmd.InfoStorage;
-import org.basex.core.cmd.Kill;
-import org.basex.core.cmd.List;
-import org.basex.core.cmd.ListDB;
-import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.Password;
-import org.basex.core.cmd.Rename;
-import org.basex.core.cmd.Replace;
-import org.basex.core.cmd.RepoDelete;
-import org.basex.core.cmd.RepoInstall;
-import org.basex.core.cmd.RepoList;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.ShowUsers;
-import org.basex.core.cmd.XQuery;
-import org.basex.server.ClientSession;
-import org.basex.server.Session;
+import org.basex.core.cmd.*;
+import org.basex.server.*;
 import org.basex.test.*;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests user permissions.
@@ -95,7 +55,7 @@ public final class PermissionTest extends SandboxTest {
   @Before
   public void setUp() {
     try {
-      adminSession = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
+      adminSession = createClient();
       if(server.context.users.get(NAME) != null) {
         ok(new DropUser(NAME), adminSession);
       }
@@ -103,7 +63,7 @@ public final class PermissionTest extends SandboxTest {
       ok(new CreateUser(NAME, Token.md5(NAME)), adminSession);
       ok(new CreateDB(RENAMED), adminSession);
       server.context.mprop.set(MainProp.REPOPATH, REPO);
-      testSession = new ClientSession(LOCALHOST, 9999, NAME, NAME);
+      testSession = createClient(NAME, NAME);
 
       ok(new CreateDB(NAME, "<xml/>"), adminSession);
       ok(new Close(), adminSession);

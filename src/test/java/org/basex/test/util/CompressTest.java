@@ -1,16 +1,17 @@
 package org.basex.test.util;
 
-import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
-import java.util.Arrays;
-import org.basex.core.Context;
-import org.basex.query.QueryProcessor;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
-import org.basex.util.Compress;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.TokenList;
-import org.junit.Test;
+import static org.junit.Assert.*;
+
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.junit.*;
 
 /**
  * Class for testing the {@link Compress} methods.
@@ -18,7 +19,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CompressTest {
+public final class CompressTest extends SandboxTest {
   /** Test. */
   @Test
   public void test1() {
@@ -82,13 +83,12 @@ public final class CompressTest {
    * @throws Exception exception
    */
   private static void texts(final String file) throws Exception {
-    final Context ctx = new Context();
     final String query = "let $doc := doc('" + file + "')" +
       "for $i in $doc//(@hohoho | text()) return data($i)";
 
     final TokenList tl = new TokenList();
     final TokenBuilder tb = new TokenBuilder();
-    final QueryProcessor qp = new QueryProcessor(query, ctx);
+    final QueryProcessor qp = new QueryProcessor(query, context);
     final Iter ir = qp.iter();
     for(Item it; (it = ir.next()) != null;) {
       final byte[] token = it.string(null);
@@ -99,7 +99,6 @@ public final class CompressTest {
 
     run(tl.toArray());
     run(tb.finish());
-    ctx.close();
   }
 
   /**

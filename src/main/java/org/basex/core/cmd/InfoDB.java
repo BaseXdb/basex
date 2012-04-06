@@ -2,18 +2,15 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 
-import org.basex.core.CommandBuilder;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
-import org.basex.core.User;
-import org.basex.data.MetaData;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'info database' command and returns information on the
@@ -31,12 +28,12 @@ public final class InfoDB extends AInfo {
    * Default constructor.
    */
   public InfoDB() {
-    super(DATAREF | User.READ);
+    super(Perm.READ, true);
   }
 
   @Override
   protected boolean run() throws IOException {
-    final boolean create = context.user.perm(User.CREATE);
+    final boolean create = context.user.has(Perm.CREATE);
     out.print(db(context.data().meta, false, true, create));
     return true;
   }

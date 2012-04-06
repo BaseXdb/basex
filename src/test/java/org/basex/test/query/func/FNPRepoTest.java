@@ -30,7 +30,7 @@ public class FNPRepoTest extends AdvancedQueryTest {
    */
   @Before
   public void setupBeforeClass() {
-    CONTEXT.mprop.set(MainProp.REPOPATH, REPO);
+    context.mprop.set(MainProp.REPOPATH, REPO);
   }
 
   /**

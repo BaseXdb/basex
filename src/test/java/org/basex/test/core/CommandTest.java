@@ -38,7 +38,7 @@ public class CommandTest extends SandboxTest {
   */
   @BeforeClass
   public static void start() throws IOException {
-    session = new LocalSession(CONTEXT);
+    session = new LocalSession(context);
     cleanUp();
   }
 
@@ -171,11 +171,11 @@ public class CommandTest extends SandboxTest {
     no(new Cs("//li"));
     ok(new CreateDB(NAME, FILE));
     ok(new Cs("//  li"));
-    ok(CONTEXT.current(), 2);
+    ok(context.current(), 2);
     ok(new Cs("."));
-    ok(CONTEXT.current(), 2);
+    ok(context.current(), 2);
     ok(new Cs("/"));
-    ok(CONTEXT.current(), 1);
+    ok(context.current(), 1);
   }
 
   /** Command test. */

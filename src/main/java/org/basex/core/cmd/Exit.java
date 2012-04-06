@@ -1,6 +1,6 @@
 package org.basex.core.cmd;
 
-import org.basex.core.Command;
+import org.basex.core.*;
 
 /**
  * Evaluates the 'exit' command and quits the console.
@@ -11,7 +11,7 @@ import org.basex.core.Command;
 public final class Exit extends Command {
   /** Constructor. */
   public Exit() {
-    super(STANDARD);
+    super(Perm.NONE);
   }
 
   @Override

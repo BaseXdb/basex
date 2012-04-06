@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.concurrent.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.server.*;
 import org.basex.test.*;
 import org.basex.util.*;
@@ -57,8 +56,7 @@ public final class AdminStressTest extends SandboxTest {
     start.countDown(); // start all clients
     stop.await();
 
-    final ClientSession cs = new ClientSession(
-        Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
+    final ClientSession cs = createClient();
     for(int i = 0; i < NUM; ++i) cs.execute("drop event " + NAME + i);
     cs.close();
   }
@@ -95,9 +93,10 @@ public final class AdminStressTest extends SandboxTest {
      * @param stop stop signal
      * @throws IOException I/O exception while establishing the session
      */
-    public Client(final String c, final CountDownLatch start,
-        final CountDownLatch stop) throws IOException {
-      session = new ClientSession(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
+    public Client(final String c, final CountDownLatch start, final CountDownLatch stop)
+        throws IOException {
+
+      session = createClient();
       cmd = c;
       startSignal = start;
       stopSignal = stop;

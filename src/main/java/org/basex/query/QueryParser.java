@@ -744,7 +744,8 @@ public class QueryParser extends InputParser {
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      error(NOMODULEFILE, ctx.context.user.perm(User.ADMIN) ? io.path() : io.name());
+      error(NOMODULEFILE, ctx.context.user.has(Perm.ADMIN) ?
+          io.path() : io.name());
     }
 
     final StaticContext sc = ctx.sc;

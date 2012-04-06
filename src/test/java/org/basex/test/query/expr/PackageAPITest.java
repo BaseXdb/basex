@@ -25,8 +25,6 @@ import org.junit.*;
 public final class PackageAPITest extends AdvancedQueryTest {
   /** Test repository. */
   private static final String REPO = "src/test/resources/repo/";
-  /** Context. */
-  private Context ctx;
 
   /** Prepare test. */
   @Before
@@ -34,16 +32,16 @@ public final class PackageAPITest extends AdvancedQueryTest {
     for(final IOFile f : new IOFile(REPO).children()) {
       if(f.isDir() && f.name().contains(".")) f.delete();
     }
-    ctx = new Context();
-    ctx.mprop.set(MainProp.REPOPATH, REPO);
+    context = new Context();
+    context.mprop.set(MainProp.REPOPATH, REPO);
   }
 
   /** Tests repository initialization. */
   @Test
   public void repoInit() {
     // check namespace dictionary
-    final TokenObjMap<TokenSet> nsDict = ctx.repo.nsDict();
-    final TokenMap pkgDict = ctx.repo.pkgDict();
+    final TokenObjMap<TokenSet> nsDict = context.repo.nsDict();
+    final TokenMap pkgDict = context.repo.pkgDict();
 
     assertEquals(3, nsDict.keys().length);
     assertTrue(nsDict.contains(token("ns1")));
@@ -210,7 +208,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
       "import module namespace ns1='ns1';" +
       "import module namespace ns3='ns3';" +
       "(ns1:test2() eq 'pkg2mod1') and (ns3:test() eq 'pkg2mod2')",
-      ctx);
+      context);
     assertEquals(qp.execute().toString(), "true");
     qp.execute();
   }
@@ -223,13 +221,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void repoInstall() throws BaseXException {
     // try to install non-existing package
     try {
-      new RepoManager(ctx).install("src/test/resources/pkg");
+      new RepoManager(context).install("src/test/resources/pkg");
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGNOTEXIST);
     }
     // try to install a package
-    new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
+    new RepoInstall(REPO + "pkg3.xar", null).execute(context);
     final String dirName = normalize("http://www.pkg3.com-10.0");
     assertTrue(dir(dirName));
     assertTrue(file(dirName + "/expath-pkg.xml"));
@@ -247,7 +245,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void installJar() throws BaseXException, QueryException {
     // install package
-    new RepoInstall(REPO + "testJar.xar", null).execute(ctx);
+    new RepoInstall(REPO + "testJar.xar", null).execute(context);
 
     // ensure package was properly installed
     final String dir = normalize("jarPkg-1.0.0");
@@ -260,7 +258,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // use package
     final QueryProcessor qp = new QueryProcessor(
-        "import module namespace j='jar'; j:print('test')", ctx);
+        "import module namespace j='jar'; j:print('test')", context);
     assertEquals(qp.execute().toString(), "test");
     qp.close();
 
@@ -276,13 +274,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void importPkg() throws QueryException {
     // try with a package without dependencies
     final QueryProcessor qp1 = new QueryProcessor(
-        "import module namespace ns3='ns3'; ns3:test()", ctx);
+        "import module namespace ns3='ns3'; ns3:test()", context);
     assertEquals(qp1.execute().toString(), "pkg2mod2");
     qp1.execute();
 
     // try with a package with dependencies
     final QueryProcessor qp2 = new QueryProcessor(
-        "import module namespace ns2='ns2'; ns2:test()", ctx);
+        "import module namespace ns2='ns2'; ns2:test()", context);
     assertEquals(qp2.execute().toString(), "pkg2mod2");
     qp2.execute();
   }
@@ -295,16 +293,16 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void delete() throws BaseXException {
     // try to delete a package which is not installed
     try {
-      new RepoManager(ctx).delete("xyz");
+      new RepoManager(context).delete("xyz");
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGNOTEXIST);
     }
     // install a package without dependencies (pkg3)
-    new RepoInstall(REPO + "pkg3.xar", null).execute(ctx);
+    new RepoInstall(REPO + "pkg3.xar", null).execute(context);
 
     // check if pkg3 is registered in the repo
-    assertTrue(ctx.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
+    assertTrue(context.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
 
     // check if pkg3 was correctly unzipped
     final String pkg3Dir = normalize("http://www.pkg3.com-10.0");
@@ -315,9 +313,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(file(pkg3Dir + "/pkg3/mod/pkg3mod1.xql"));
 
     // install another package (pkg4) with a dependency to pkg3
-    new RepoInstall(REPO + "pkg4.xar", null).execute(ctx);
+    new RepoInstall(REPO + "pkg4.xar", null).execute(context);
     // check if pkg4 is registered in the repo
-    assertTrue(ctx.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
+    assertTrue(context.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
     // check if pkg4 was correctly unzipped
     final String pkg4Dir = normalize("http://www.pkg4.com-2.0");
     assertTrue(dir(pkg4Dir));
@@ -328,22 +326,22 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // try to delete pkg3
     try {
-      new RepoManager(ctx).delete(pkg3Dir);
+      new RepoManager(context).delete(pkg3Dir);
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGDEP);
     }
     // try to delete pkg4 (use package name)
-    new RepoDelete("http://www.pkg4.com", null).execute(ctx);
+    new RepoDelete("http://www.pkg4.com", null).execute(context);
     // check if pkg4 is unregistered from the repo
-    assertFalse(ctx.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
+    assertFalse(context.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
 
     // check if pkg4 directory was deleted
     assertTrue(!dir(pkg4Dir));
     // try to delete pkg3 (use package dir)
-    new RepoDelete(pkg3Dir, null).execute(ctx);
+    new RepoDelete(pkg3Dir, null).execute(context);
     // check if pkg3 is unregistered from the repo
-    assertFalse(ctx.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
+    assertFalse(context.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
     // check if pkg3 directory was deleted
     assertTrue(!dir(pkg3Dir));
   }
@@ -378,8 +376,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   private void ok(final IO desc) {
     try {
-      new PkgValidator(ctx.repo, null).check(
-         new PkgParser(ctx.repo, null).parse(desc));
+      new PkgValidator(context.repo, null).check(
+         new PkgParser(context.repo, null).parse(desc));
     } catch(final QueryException ex) {
       fail("Unexpected exception thrown: " + ex);
     }
@@ -393,8 +391,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   private void error(final IO desc, final Err err, final String exp) {
     try {
-      new PkgValidator(ctx.repo, null).check(
-         new PkgParser(ctx.repo, null).parse(desc));
+      new PkgValidator(context.repo, null).check(
+         new PkgParser(context.repo, null).parse(desc));
       fail(exp);
     } catch(final QueryException ex) {
       check(ex, err);

@@ -2,11 +2,11 @@ package org.basex.test.query.expr;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.cmd.XQuery;
-import org.basex.util.Util;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Test cases for FLWOR expressions.
@@ -14,10 +14,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public final class FLWORTest {
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
-
+public final class FLWORTest extends SandboxTest {
   /** Tests shadowing of outer variables. */
   @Test
   public void shadowTest() {
@@ -33,7 +30,7 @@ public final class FLWORTest {
    */
   private static void query(final String query, final String expected) {
     try {
-      final String result = new XQuery(query).execute(CONTEXT);
+      final String result = new XQuery(query).execute(context);
       // quotes are replaced by apostrophes to simplify comparison
       assertEquals(expected.replaceAll("\"", "'"),
           result.replaceAll("\"", "'"));

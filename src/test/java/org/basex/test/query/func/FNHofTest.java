@@ -3,8 +3,8 @@ package org.basex.test.query.func;
 import static org.basex.query.func.Function.*;
 
 import org.basex.query.util.*;
-import org.basex.test.query.AdvancedQueryTest;
-import org.junit.Test;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the functions of the {@link org.basex.query.func.FNHof} class.

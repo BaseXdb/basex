@@ -2,18 +2,16 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
-import org.basex.core.CommandBuilder;
-import org.basex.core.Prop;
-import org.basex.core.User;
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.data.Data;
-import org.basex.data.MemData;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.util.Util;
-import org.basex.util.ft.Language;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * Evaluates the 'create db' command and creates a new index.
@@ -27,7 +25,7 @@ public final class CreateIndex extends ACreate {
    * @param type index type, defined in {@link CmdIndex}
    */
   public CreateIndex(final Object type) {
-    super(DATAREF | User.WRITE, type != null ? type.toString() : null);
+    super(Perm.WRITE, true, type != null ? type.toString() : null);
   }
 
   @Override

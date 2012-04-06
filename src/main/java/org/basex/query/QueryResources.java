@@ -6,7 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import org.basex.core.User;
+
+import org.basex.core.*;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
@@ -62,7 +63,7 @@ public final class QueryResources {
    */
   void compile(final Nodes nodes) throws QueryException {
     final Data d = nodes.data;
-    if(!ctx.context.perm(User.READ, d.meta)) PERMNO.thrw(null, CmdPerm.READ);
+    if(!ctx.context.perm(Perm.READ, d.meta)) PERMNO.thrw(null, CmdPerm.READ);
 
     // assign initial context value
     // (if database only contains an empty root node, assign empty sequence)

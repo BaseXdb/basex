@@ -1,8 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import org.basex.core.Context;
-import org.basex.core.Command;
+import org.basex.core.*;
 import org.basex.data.Data;
 
 /**
@@ -16,7 +15,7 @@ public final class Close extends Command {
    * Default constructor.
    */
   public Close() {
-    super(STANDARD);
+    super(Perm.NONE);
   }
 
   @Override

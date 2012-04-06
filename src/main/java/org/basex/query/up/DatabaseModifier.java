@@ -2,7 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.query.util.Err.*;
 
-import org.basex.core.User;
+import org.basex.core.*;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -23,7 +23,7 @@ final class DatabaseModifier extends ContextModifier {
 
     add(p);
     // check permissions
-    if(!ctx.context.perm(User.WRITE, p.data.meta))
+    if(!ctx.context.perm(Perm.WRITE, p.data.meta))
       PERMNO.thrw(p.info, CmdPerm.WRITE);
   }
 }

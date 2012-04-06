@@ -119,7 +119,7 @@ public final class ClientListener extends Thread {
     }
     if(!running) return;
 
-    // authentification done, start command loop
+    // authentication done, start command loop
     ServerCmd sc = null;
     String cmd = null;
 
@@ -219,6 +219,8 @@ public final class ClientListener extends Thread {
    * Exits the session.
    */
   public synchronized void quit() {
+    if(!running) return;
+
     running = false;
     if(log != null) log.write(this, "LOGOUT " + context.user.name, OK);
 

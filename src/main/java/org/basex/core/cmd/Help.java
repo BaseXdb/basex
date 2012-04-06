@@ -3,7 +3,7 @@ package org.basex.core.cmd;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import org.basex.core.Command;
+import org.basex.core.*;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.
@@ -26,7 +26,7 @@ public final class Help extends Command {
    * @param format optional format (e.g., Wiki)
    */
   public Help(final String arg, final String format) {
-    super(STANDARD, arg, format);
+    super(Perm.NONE, arg, format);
   }
 
   @Override

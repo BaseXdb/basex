@@ -2,26 +2,17 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.build.Builder;
-import org.basex.build.DiskBuilder;
-import org.basex.build.Parser;
-import org.basex.core.BaseXException;
-import org.basex.core.CommandBuilder;
+import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
-import org.basex.core.Context;
-import org.basex.core.User;
-import org.basex.data.Data;
-import org.basex.data.DiskData;
-import org.basex.data.MetaData;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.serial.BuilderSerializer;
-import org.basex.io.serial.Serializer;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.io.*;
+import org.basex.io.serial.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'optimize all' command and rebuilds all data structures of
@@ -41,7 +32,7 @@ public final class OptimizeAll extends ACreate {
    * Default constructor.
    */
   public OptimizeAll() {
-    super(DATAREF | User.WRITE);
+    super(Perm.WRITE, true);
   }
 
   @Override

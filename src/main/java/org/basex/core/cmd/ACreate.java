@@ -31,17 +31,18 @@ public abstract class ACreate extends Command {
    * @param arg arguments
    */
   ACreate(final String... arg) {
-    this(User.CREATE, arg);
+    this(Perm.CREATE, false, arg);
     closing = true;
   }
 
   /**
    * Protected constructor, specifying command flags and arguments.
-   * @param flags command flags
+   * @param p required permission
+   * @param d requires opened database
    * @param arg arguments
    */
-  ACreate(final int flags, final String... arg) {
-    super(flags, arg);
+  ACreate(final Perm p, final boolean d, final String... arg) {
+    super(p, d, arg);
   }
 
   @Override

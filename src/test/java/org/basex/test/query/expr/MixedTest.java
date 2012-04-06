@@ -1,13 +1,10 @@
 package org.basex.test.query.expr;
 
-import org.basex.core.BaseXException;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * Mixed XQuery tests.
@@ -16,8 +13,6 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class MixedTest extends AdvancedQueryTest {
-  /** Default database name. */
-  private static final String DB = Util.name(MixedTest.class);
   /** Test XQuery module file. */
   private static final String XQMFILE = "src/test/resources/hello.xqm";
 
@@ -27,7 +22,7 @@ public final class MixedTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void after() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /** Catches duplicate module import. */
@@ -52,7 +47,7 @@ public final class MixedTest extends AdvancedQueryTest {
    */
   @Test
   public void emptyAttValues() throws BaseXException {
-    new CreateDB(DB, "<A a='' b=''/>").execute(CONTEXT);
+    new CreateDB(NAME, "<A a='' b=''/>").execute(context);
     query("replace value of node /A/@a with 'A'");
     query("/", "<A a=\"A\" b=\"\"/>");
   }

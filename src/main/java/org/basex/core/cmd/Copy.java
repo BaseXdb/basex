@@ -28,7 +28,7 @@ public final class Copy extends Command {
    * @param newdb new db name
    */
   public Copy(final String db, final String newdb) {
-    super(User.CREATE, db, newdb);
+    super(Perm.CREATE, db, newdb);
   }
 
   @Override

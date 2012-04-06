@@ -13,6 +13,6 @@ public class LocalSessionTest extends SessionTest {
   /** Starts a session. */
   @Before
   public void startSession() {
-    session = new LocalSession(CONTEXT, out);
+    session = new LocalSession(context, out);
   }
 }

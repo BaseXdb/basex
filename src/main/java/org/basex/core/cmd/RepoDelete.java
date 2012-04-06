@@ -1,17 +1,15 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
 
-import org.basex.core.Command;
-import org.basex.core.CommandBuilder;
-import org.basex.core.User;
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdRepo;
-import org.basex.query.QueryException;
-import org.basex.query.util.pkg.RepoManager;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.query.*;
+import org.basex.query.util.pkg.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'repo delete' command.
@@ -29,7 +27,7 @@ public final class RepoDelete extends Command {
    * @param i input info
    */
   public RepoDelete(final String p, final InputInfo i) {
-    super(User.CREATE, p);
+    super(Perm.CREATE, p);
     info = i;
   }
 

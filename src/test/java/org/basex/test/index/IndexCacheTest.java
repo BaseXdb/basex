@@ -9,7 +9,12 @@ import org.basex.index.*;
 import org.basex.index.IndexCache.CacheEntry;
 import org.junit.*;
 
-/** Tests for {@link IndexCache}. */
+/**
+ * Tests for {@link IndexCache}.
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Dimitar Popov
+ */
 public final class IndexCacheTest {
   /** Test instance. */
   private IndexCache cache;

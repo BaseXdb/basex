@@ -3,21 +3,12 @@ package org.basex.test.data;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Open;
-import org.basex.data.Data;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the update features of the {@link Data} class.
@@ -25,30 +16,26 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Tim Petrowsky
  */
-public abstract class UpdateTest {
-  /** Test database name. */
-  private static final String DB = Util.name(UpdateTest.class);
+public abstract class UpdateTest extends SandboxTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "src/test/resources/test.xml";
   /** Main memory flag. */
   private static boolean mainmem;
 
   /** JUnit tag. */
-  static final byte[] JUNIT = token("junit");
+  static final byte[] T_JUNIT = token("junit");
   /** JUnit tag. */
-  static final byte[] FOO = token("foo");
+  static final byte[] T_FOO = token("foo");
   /** JUnit tag. */
-  static final byte[] NAME = token("name");
+  static final byte[] T_NAME = token("name");
   /** JUnit tag. */
-  static final byte[] PARENTNODE = token("parentnode");
+  static final byte[] T_PARENTNODE = token("parentnode");
   /** JUnit tag. */
-  static final byte[] CONTEXTNODE = token("contextnode");
+  static final byte[] T_CONTEXTNODE = token("contextnode");
   /** JUnit tag. */
-  static final byte[] ID = token("id");
+  static final byte[] T_ID = token("id");
   /** JUnit tag. */
-  static final byte[] B = token("b");
-  /** Database context. */
-  static final Context CONTEXT = new Context();
+  static final byte[] T_B = token("b");
   /** Test file size in nodes. */
   int size;
 
@@ -57,18 +44,10 @@ public abstract class UpdateTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    final Prop prop = CONTEXT.prop;
+    final Prop prop = context.prop;
     prop.set(Prop.TEXTINDEX, false);
     prop.set(Prop.ATTRINDEX, false);
     prop.set(Prop.MAINMEM, mainmem);
-  }
-
-  /**
-   * Closes the test database.
-   */
-  @AfterClass
-  public static void finish() {
-    CONTEXT.close();
   }
 
   /**
@@ -76,8 +55,8 @@ public abstract class UpdateTest {
    */
   @Before
   public final void setUp() {
-    exec(new CreateDB(DB, TESTFILE));
-    size = CONTEXT.data().meta.size;
+    exec(new CreateDB(NAME, TESTFILE));
+    size = context.data().meta.size;
   }
 
   /**
@@ -87,7 +66,7 @@ public abstract class UpdateTest {
   public final void tearDown() {
     if(mainmem) return;
     exec(new Close());
-    exec(new DropDB(DB));
+    exec(new DropDB(NAME));
   }
 
   /**
@@ -96,7 +75,7 @@ public abstract class UpdateTest {
   static final void reload() {
     if(mainmem) return;
     exec(new Close());
-    exec(new Open(DB));
+    exec(new Open(NAME));
   }
 
   /**
@@ -114,9 +93,9 @@ public abstract class UpdateTest {
    */
   @Test
   public final void size() {
-    assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);
+    assertEquals("Unexpected size!", size, context.data().meta.size);
     reload();
-    assertEquals("Unexpected size!", size, CONTEXT.data().meta.size);
+    assertEquals("Unexpected size!", size, context.data().meta.size);
   }
 
   /**
@@ -126,7 +105,7 @@ public abstract class UpdateTest {
    */
   private static void exec(final Command cmd) {
     try {
-      cmd.execute(CONTEXT);
+      cmd.execute(context);
     } catch(final BaseXException ex) {
       Util.errln(ex.getMessage());
     }

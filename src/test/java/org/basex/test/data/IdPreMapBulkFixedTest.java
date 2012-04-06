@@ -1,7 +1,6 @@
 package org.basex.test.data;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * Fixed ID -> PRE mapping tests.

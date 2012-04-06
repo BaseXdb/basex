@@ -2,14 +2,9 @@ package org.basex.test.query.up;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.basex.core.cmd.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * Stress Testing the fast replace feature where blocks on disk are directly
@@ -19,8 +14,6 @@ import org.junit.Test;
  * @author Lukas Kircher
  */
 public final class FastReplaceTest extends AdvancedQueryTest {
-  /** Test database name. */
-  private static final String DB = Util.name(FastReplaceTest.class);
   /** Test document. */
   private static final String DOC = "src/test/resources/xmark.xml";
 
@@ -30,7 +23,7 @@ public final class FastReplaceTest extends AdvancedQueryTest {
    */
   @Before
   public void setUp() throws Exception {
-    new CreateDB(DB, DOC).execute(CONTEXT);
+    new CreateDB(NAME, DOC).execute(context);
     query("let $items := /site/regions//item " +
       "for $i in 1 to 10 " +
       "return (insert node $items into /site/regions, " +
@@ -147,15 +140,5 @@ public final class FastReplaceTest extends AdvancedQueryTest {
     query("for $i in //item return replace node $i/attribute() with " +
     "(attribute att1 {'0'}, attribute att2 {'1'})");
     query("//item/attribute()");
-  }
-
-  /**
-   * Deletes the test db.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void end() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
-    CONTEXT.close();
   }
 }

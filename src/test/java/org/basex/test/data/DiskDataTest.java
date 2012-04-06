@@ -1,12 +1,10 @@
 package org.basex.test.data;
 
-import org.basex.core.BaseXException;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.data.DiskData;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.Before;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Test index updates when using disk storage ({@link DiskData}).
@@ -21,7 +19,7 @@ public class DiskDataTest extends MemDataTest {
   @Override
   @Before
   public void setUp() throws BaseXException {
-    new CreateDB(dbname, XMLSTR).execute(CTX);
+    new CreateDB(dbname, XMLSTR).execute(context);
   }
 
   /**
@@ -30,6 +28,6 @@ public class DiskDataTest extends MemDataTest {
    */
   @After
   public void cleanUp() throws BaseXException {
-    new DropDB(dbname).execute(CTX);
+    new DropDB(dbname).execute(context);
   }
 }

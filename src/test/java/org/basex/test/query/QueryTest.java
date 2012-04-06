@@ -27,17 +27,7 @@ public abstract class QueryTest extends SandboxTest {
   /** Prepares the tests. */
   @BeforeClass
   public static void startTest() {
-    CONTEXT.prop.set(Prop.CACHEQUERY, true);
-  }
-
-  /**
-   * Finish the tests.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void stopTest() throws BaseXException {
-    new DropDB(Util.name(QueryTest.class)).execute(CONTEXT);
-    CONTEXT.close();
+    context.prop.set(Prop.CACHEQUERY, true);
   }
 
   /**
@@ -49,7 +39,7 @@ public abstract class QueryTest extends SandboxTest {
     final String file = doc.replaceAll("\"", "\\\\\"");
     final String name = Util.name(QueryTest.class);
     final boolean up = this instanceof XQUPTest;
-    new CreateDB(name, file).execute(CONTEXT);
+    new CreateDB(name, file).execute(context);
 
     final StringBuilder sb = new StringBuilder();
     int fail = 0;
@@ -58,7 +48,7 @@ public abstract class QueryTest extends SandboxTest {
       // added to renew document after each update test
       final String title = (String) qu[0];
       if(up && title.startsWith("xxx")) {
-        new CreateDB(name, file).execute(CONTEXT);
+        new CreateDB(name, file).execute(context);
       }
 
       final boolean correct = qu.length == 3;
@@ -67,10 +57,10 @@ public abstract class QueryTest extends SandboxTest {
 
       final Command c = new XQuery(query);
       try {
-        c.execute(CONTEXT);
+        c.execute(context);
         final Result val = c.result();
         if(cmp instanceof Nodes) {
-          ((Nodes) cmp).data = CONTEXT.data();
+          ((Nodes) cmp).data = context.data();
         }
 
         if(!correct || !val.sameAs(cmp)) {

@@ -109,6 +109,22 @@
     <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>javacc</id>
+            <goals>
+              <goal>javacc</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <outputDirectory>src/main/java</outputDirectory>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
@@ -249,6 +265,7 @@
           <configLocation>.settings/checkstyle.xml</configLocation>
           <failsOnError>true</failsOnError>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <excludes>org/basex/query/regex/parse/**.java</excludes>
           <linkXRef>false</linkXRef>
           <consoleOutput>true</consoleOutput>
           <violationSeverity>warning</violationSeverity>
@@ -273,6 +290,19 @@
                    <versionRange>[2.0,)</versionRange>
                    <goals>
                      <goal>copy-dependencies</goal>
+                   </goals>
+                 </pluginExecutionFilter>
+                 <action>
+                   <ignore />
+                 </action>
+               </pluginExecution>
+               <pluginExecution>
+                 <pluginExecutionFilter>
+                   <groupId>org.codehaus.mojo</groupId>
+                   <artifactId>javacc-maven-plugin</artifactId>
+                   <versionRange>[2.6,)</versionRange>
+                   <goals>
+                     <goal>javacc</goal>
                    </goals>
                  </pluginExecutionFilter>
                  <action>

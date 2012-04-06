@@ -19,7 +19,7 @@ public final class Info extends AInfo {
    * Default constructor.
    */
   public Info() {
-    super(User.READ);
+    super(Perm.READ, false);
   }
 
   @Override
@@ -37,11 +37,11 @@ public final class Info extends AInfo {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(GENERAL_INFO + NL);
     format(tb, VERSINFO, Prop.VERSION);
-    if(context.user.perm(User.CREATE)) {
+    if(context.user.has(Perm.CREATE)) {
       Performance.gc(3);
       format(tb, USED_MEM, Performance.getMemory());
     }
-    if(context.user.perm(User.ADMIN)) {
+    if(context.user.has(Perm.ADMIN)) {
       final AProp prop = context.mprop;
       tb.add(NL + MAIN_OPTIONS + NL);
       for(final String s : prop) format(tb, s, prop.get(s).toString());

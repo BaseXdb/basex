@@ -1,8 +1,8 @@
 package org.basex.test.query.expr;
 
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.junit.Test;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * Annotations tests.

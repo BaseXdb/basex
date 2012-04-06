@@ -1,13 +1,10 @@
 package org.basex.test.query.up;
 
-import org.basex.core.BaseXException;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * General tests of the XQuery Update Facility implementation.
@@ -16,8 +13,6 @@ import org.junit.Test;
  * @author Lukas Kircher
  */
 public final class UpdateTest extends AdvancedQueryTest {
-  /** Test database name. */
-  private static final String DB = Util.name(UpdateTest.class);
   /** Test document. */
   private static final String DOC = "src/test/resources/xmark.xml";
 
@@ -27,7 +22,7 @@ public final class UpdateTest extends AdvancedQueryTest {
    * @throws BaseXException database exception
    */
   private static void createDB(final String input) throws BaseXException {
-    new CreateDB(DB, input == null ? DOC : input).execute(CONTEXT);
+    new CreateDB(NAME, input == null ? DOC : input).execute(context);
   }
 
   /**
@@ -250,7 +245,7 @@ public final class UpdateTest extends AdvancedQueryTest {
   public void emptyInsert3() throws BaseXException {
     createDB("<a/>");
     query("delete node /a");
-    query("insert nodes <X/> into doc('" + DB + "')");
+    query("insert nodes <X/> into doc('" + NAME + "')");
     query("/", "<X/>");
   }
 
@@ -263,7 +258,7 @@ public final class UpdateTest extends AdvancedQueryTest {
     createDB(null);
     query("let $w := //item[@id = 'item0'] " +
       "return (if($w/@id) " +
-      "then (delete node $w/@id, db:optimize('" + DB + "')) else ())");
+      "then (delete node $w/@id, db:optimize('" + NAME + "')) else ())");
   }
 
   /** Variable from the inner scope shouldn't be visible. */
@@ -306,15 +301,5 @@ public final class UpdateTest extends AdvancedQueryTest {
       "copy $x := <x><a/></x> " +
       "modify insert node attribute x:x {} into $x/a return $x/a",
       "<a xmlns:x=\"x\" x:x=\"\"/>");
-  }
-
-  /**
-   * Deletes the test db.
-   * @throws Exception exception
-   */
-  @AfterClass
-  public static void end() throws Exception {
-    new DropDB(DB).execute(CONTEXT);
-    CONTEXT.close();
   }
 }

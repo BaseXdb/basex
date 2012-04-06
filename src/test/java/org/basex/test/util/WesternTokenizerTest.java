@@ -1,13 +1,10 @@
 package org.basex.test.util;
 
+import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import static org.basex.util.Token.*;
-
-import org.basex.util.ft.FTFlag;
-import org.basex.util.ft.FTOpt;
-import org.basex.util.ft.WesternTokenizer;
-import org.junit.Test;
+import org.basex.util.ft.*;
+import org.junit.*;
 
 /**
  * Tests for {@link WesternTokenizer}.

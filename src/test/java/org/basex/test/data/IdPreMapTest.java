@@ -1,15 +1,13 @@
 package org.basex.test.data;
 
-import org.basex.index.IdPreMap;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
-import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+
+import org.basex.index.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.junit.*;
 
 /**
  * ID -> PRE mapping test.

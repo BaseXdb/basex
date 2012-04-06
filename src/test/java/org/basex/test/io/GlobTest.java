@@ -1,8 +1,9 @@
 package org.basex.test.io;
 
 import static org.junit.Assert.*;
-import org.basex.io.IOFile;
-import org.junit.Test;
+
+import org.basex.io.*;
+import org.junit.*;
 
 /**
  * Test class for glob patterns.

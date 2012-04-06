@@ -253,7 +253,7 @@ public final class Context {
    */
   public void register(final Progress pr) {
     // administrators will not be affected by the timeout
-    pr.startTimeout(user.perm(User.ADMIN) ? 0 : mprop.num(MainProp.TIMEOUT));
+    pr.startTimeout(user.has(Perm.ADMIN) ? 0 : mprop.num(MainProp.TIMEOUT));
     lock.lock(pr);
   }
 
@@ -288,10 +288,10 @@ public final class Context {
    * @param md optional meta data reference
    * @return result of check
    */
-  public boolean perm(final int p, final MetaData md) {
-    final User us = md == null || p == User.CREATE || p == User.ADMIN ? null :
-        md.users.get(user.name);
-    return (us == null ? user : us).perm(p);
+  public boolean perm(final Perm p, final MetaData md) {
+    final User us = md == null || p == Perm.CREATE || p == Perm.ADMIN ?
+        null : md.users.get(user.name);
+    return (us == null ? user : us).has(p);
   }
 
   /**

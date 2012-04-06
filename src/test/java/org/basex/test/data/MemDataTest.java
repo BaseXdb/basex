@@ -1,18 +1,16 @@
 package org.basex.test.data;
 
 import static org.junit.Assert.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import java.io.IOException;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.io.IOContent;
-import org.basex.util.Token;
+
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Test index updates when using memory storage ({@link MemData}).
@@ -20,13 +18,11 @@ import org.basex.util.Token;
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
-public class MemDataTest {
+public class MemDataTest extends SandboxTest {
   /** XML document. */
   static final String XMLSTR = "<a><b>test</b><c/><f>test1</f><f>test3</f></a>";
   /** XML document. */
   private static final byte[] XML = Token.token(XMLSTR);
-  /** Database context. */
-  static final Context CTX = new Context();
   /** Tested {@link MemData} instance. */
   private Data data;
 
@@ -36,14 +32,14 @@ public class MemDataTest {
    */
   @Before
   public void setUp() throws IOException {
-    data = CreateDB.mainMem(new IOContent(XML), CTX);
-    CTX.openDB(data);
+    data = CreateDB.mainMem(new IOContent(XML), context);
+    context.openDB(data);
   }
 
   /** Clean up method; executed after each test. */
   @After
   public void end() {
-    CTX.closeDB();
+    context.closeDB();
     data = null;
   }
 
@@ -53,10 +49,10 @@ public class MemDataTest {
    */
   @Test
   public void replaceValue() throws BaseXException {
-    new XQuery("replace value of node /a/b with 'test2'").execute(CTX);
-    final String o = new XQuery("/a/b[text() = 'test']").execute(CTX);
+    new XQuery("replace value of node /a/b with 'test2'").execute(context);
+    final String o = new XQuery("/a/b[text() = 'test']").execute(context);
     assertTrue("Old node found", o.isEmpty());
-    final String n = new XQuery("/a/b[text() = 'test2']").execute(CTX);
+    final String n = new XQuery("/a/b[text() = 'test2']").execute(context);
     assertTrue("New node not found", !n.isEmpty());
   }
 
@@ -66,10 +62,10 @@ public class MemDataTest {
    */
   @Test
   public void replaceNode() throws BaseXException {
-    new XQuery("replace node /a/b with <d f='test2'/>").execute(CTX);
-    final String o = new XQuery("/a/b").execute(CTX);
+    new XQuery("replace node /a/b with <d f='test2'/>").execute(context);
+    final String o = new XQuery("/a/b").execute(context);
     assertTrue("Old node found", o.isEmpty());
-    final String n = new XQuery("//d[@f = 'test2']").execute(CTX);
+    final String n = new XQuery("//d[@f = 'test2']").execute(context);
     assertTrue("New node not found", !n.isEmpty());
   }
 
@@ -79,11 +75,11 @@ public class MemDataTest {
    */
   @Test
   public void insertNode() throws BaseXException {
-    new XQuery("insert node <d>test2</d> as first into /a").execute(CTX);
-    final String r = new XQuery("//d[text() = 'test2']").execute(CTX);
+    new XQuery("insert node <d>test2</d> as first into /a").execute(context);
+    final String r = new XQuery("//d[text() = 'test2']").execute(context);
     assertTrue("Node not found", !r.isEmpty());
-    new XQuery("insert node <d>test2</d> as first into /a").execute(CTX);
-    final String c = new XQuery("count(//d[text() = 'test2'])").execute(CTX);
+    new XQuery("insert node <d>test2</d> as first into /a").execute(context);
+    final String c = new XQuery("count(//d[text() = 'test2'])").execute(context);
     assertEquals("Second node not found", 2, Integer.parseInt(c));
   }
 
@@ -94,10 +90,10 @@ public class MemDataTest {
    */
   @Test
   public void insertDuplicateNode() throws BaseXException {
-    new XQuery("insert node <d>test</d> as first into /a").execute(CTX);
-    final String r = new XQuery("//d[text() = 'test']").execute(CTX);
+    new XQuery("insert node <d>test</d> as first into /a").execute(context);
+    final String r = new XQuery("//d[text() = 'test']").execute(context);
     assertTrue("Node not found", !r.isEmpty());
-    final String c = new XQuery("count(//*[text() = 'test'])").execute(CTX);
+    final String c = new XQuery("count(//*[text() = 'test'])").execute(context);
     assertEquals("Second node not found", 2, Integer.parseInt(c));
   }
 
@@ -107,8 +103,8 @@ public class MemDataTest {
    */
   @Test
   public void deleteNode() throws BaseXException {
-    new XQuery("delete node //b").execute(CTX);
-    final String r = new XQuery("//*[text() = 'test']").execute(CTX);
+    new XQuery("delete node //b").execute(context);
+    final String r = new XQuery("//*[text() = 'test']").execute(context);
     assertTrue("Node not deleted", r.isEmpty());
   }
 
@@ -118,7 +114,7 @@ public class MemDataTest {
    */
   @Test
   public void findNonexistingNode() throws BaseXException {
-    final String r = new XQuery("//*[text() = 'test0']").execute(CTX);
+    final String r = new XQuery("//*[text() = 'test0']").execute(context);
     assertTrue("Found non-existing node", r.isEmpty());
   }
 }

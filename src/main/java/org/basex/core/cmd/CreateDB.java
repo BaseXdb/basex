@@ -97,7 +97,7 @@ public final class CreateDB extends ACreate {
       final Context ctx) throws IOException {
 
     // check permissions
-    if(!ctx.user.perm(User.CREATE))
+    if(!ctx.user.has(Perm.CREATE))
       throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);
 
     // create main memory database instance
@@ -137,7 +137,7 @@ public final class CreateDB extends ACreate {
   public static synchronized MemData mainMem(final Parser parser, final Context ctx)
       throws IOException {
 
-    if(ctx.user.perm(User.CREATE)) return MemBuilder.build(parser);
+    if(ctx.user.has(Perm.CREATE)) return MemBuilder.build(parser);
     throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);
   }
 

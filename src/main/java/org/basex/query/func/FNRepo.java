@@ -2,13 +2,14 @@ package org.basex.query.func;
 
 import static org.basex.util.Token.*;
 
+import org.basex.io.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
+import org.basex.query.util.pkg.*;
 import org.basex.query.util.pkg.Package;
-import org.basex.query.util.pkg.RepoManager;
 import org.basex.util.InputInfo;
 
 /**
@@ -22,7 +23,9 @@ public final class FNRepo extends StandardFunc {
   private static final QNm PACKAGE = new QNm("package");
   /** Header attribute: name. */
   private static final QNm NAME = new QNm("name");
-  /** Header attribute: name. */
+  /** Header attribute: type. */
+  private static final QNm TYPE = new QNm("type");
+  /** Header attribute: version. */
   private static final QNm VERSION = new QNm("version");
 
   /**
@@ -74,7 +77,19 @@ public final class FNRepo extends StandardFunc {
       final FElem elem = new FElem(PACKAGE);
       elem.add(new FAttr(NAME, Package.name(p)));
       elem.add(new FAttr(VERSION, Package.version(p)));
+      elem.add(new FAttr(TYPE, token(PkgText.EXPATH)));
       cache.add(elem);
+    }
+    // traverse all directories, ignore root entries with dashes
+    for(final IOFile dir : ctx.context.repo.path().children()) {
+      if(dir.name().indexOf('-') != -1) continue;
+      for(final String s : dir.descendants()) {
+        final FElem elem = new FElem(PACKAGE);
+        final String n = dir.name() + '.' + s.replaceAll("\\..*", "").replace('/', '.');
+        elem.add(new FAttr(NAME, token(n)));
+        elem.add(new FAttr(TYPE, token(PkgText.INTERNAL)));
+        cache.add(elem);
+      }
     }
     return cache;
   }

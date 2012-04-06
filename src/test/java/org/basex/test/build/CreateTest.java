@@ -1,17 +1,13 @@
 package org.basex.test.build;
 
 import static org.junit.Assert.*;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.Test;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Tests for creating databases and adding documents.
@@ -19,11 +15,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CreateTest {
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
-  /** Test database name. */
-  private static final String DB = Util.name(CreateTest.class);
+public final class CreateTest extends SandboxTest {
   /** Test document name. */
   private static final String DOCNAME = "t.xml";
   /** Target. */
@@ -52,7 +44,7 @@ public final class CreateTest {
   private static final String[] INPUTS = { PATH, FOLDER, FRAG };
   /** Names of test inputs (path, folder, fragment). */
   private static final String[] NAMES = {
-    PATH.replaceAll(".*/", ""), FOLDERFILE, DB + IO.XMLSUFFIX
+    PATH.replaceAll(".*/", ""), FOLDERFILE, NAME + IO.XMLSUFFIX
   };
 
   /**
@@ -61,7 +53,7 @@ public final class CreateTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -70,9 +62,9 @@ public final class CreateTest {
    */
   @Test
   public void createDB() throws BaseXException {
-    new CreateDB(DB).execute(CONTEXT);
+    new CreateDB(NAME).execute(context);
     // check if database name equals argument of create command
-    assertEquals(db(), DB);
+    assertEquals(db(), NAME);
   }
 
   /**
@@ -82,9 +74,9 @@ public final class CreateTest {
   @Test
   public void createDBWithInput() throws BaseXException {
     for(int i = 0; i < INPUTS.length; ++i) {
-      new CreateDB(DB, INPUTS[i]).execute(CONTEXT);
+      new CreateDB(NAME, INPUTS[i]).execute(context);
       // check name of database
-      assertEquals(DB, db());
+      assertEquals(NAME, db());
       // check name of document
       assertEquals(NAMES[i], docName());
     }
@@ -98,8 +90,8 @@ public final class CreateTest {
   public void createDBandAdd() throws BaseXException {
     // add file and folder, skip fragment
     for(int i = 0; i < INPUTS.length - 1; i++) {
-      new CreateDB(DB).execute(CONTEXT);
-      new Add("", INPUTS[i]).execute(CONTEXT);
+      new CreateDB(NAME).execute(context);
+      new Add("", INPUTS[i]).execute(context);
       assertEquals(NAMES[i], docName());
     }
   }
@@ -112,8 +104,8 @@ public final class CreateTest {
   public void createDBandAddToName() throws BaseXException {
     // add file and fragment, skip folder
     for(int i = 0; i < INPUTS.length; i += 2) {
-      new CreateDB(DB).execute(CONTEXT);
-      new Add(DOCNAME, INPUTS[i]).execute(CONTEXT);
+      new CreateDB(NAME).execute(context);
+      new Add(DOCNAME, INPUTS[i]).execute(context);
       assertEquals(DOCNAME, docName());
     }
   }
@@ -126,8 +118,8 @@ public final class CreateTest {
   public void createDBandAddToTarget() throws BaseXException {
     // add file and folder, skip fragment
     for(int i = 0; i < INPUTS.length - 1; i++) {
-      new CreateDB(DB).execute(CONTEXT);
-      new Add(TARGET, INPUTS[i]).execute(CONTEXT);
+      new CreateDB(NAME).execute(context);
+      new Add(TARGET, INPUTS[i]).execute(context);
       assertEquals(TARGET + NAMES[i], docName());
     }
   }
@@ -140,8 +132,8 @@ public final class CreateTest {
   public void createDBandAddToTargetName() throws BaseXException {
     // add file and fragment, skip folder
     for(int i = 0; i < INPUTS.length; i += 2) {
-      new CreateDB(DB).execute(CONTEXT);
-      new Add(TARGET + DOCNAME, INPUTS[i]).execute(CONTEXT);
+      new CreateDB(NAME).execute(context);
+      new Add(TARGET + DOCNAME, INPUTS[i]).execute(context);
       assertEquals(TARGET + DOCNAME, docName());
     }
   }
@@ -151,7 +143,7 @@ public final class CreateTest {
    * @return database name
    */
   private static String db() {
-    return CONTEXT.data().meta.name;
+    return context.data().meta.name;
   }
 
   /**
@@ -159,6 +151,6 @@ public final class CreateTest {
    * @return first document name
    */
   private static String docName() {
-    return Token.string(CONTEXT.data().text(CONTEXT.current().list[0], true));
+    return Token.string(context.data().text(context.current().list[0], true));
   }
 }

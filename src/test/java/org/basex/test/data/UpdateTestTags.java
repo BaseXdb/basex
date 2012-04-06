@@ -1,10 +1,10 @@
 package org.basex.test.data;
 
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.util.Token;
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.basex.data.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the update features of the {@link Data} class.
@@ -18,9 +18,9 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void insertTagAsOnly1() {
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(3, 0, JUNIT, Data.ELEM);
+    insertTag(3, 0, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
@@ -28,7 +28,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertArraysEquals(JUNIT, data.name(4, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
@@ -36,7 +36,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertArraysEquals(JUNIT, data.name(4, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
   }
 
   /**
@@ -44,9 +44,9 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void insertTagAsOnly2() {
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(3, 1, JUNIT, Data.ELEM);
+    insertTag(3, 1, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
@@ -54,7 +54,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertArraysEquals(JUNIT, data.name(4, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
@@ -62,7 +62,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertArraysEquals(JUNIT, data.name(4, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
   }
 
   /**
@@ -70,9 +70,9 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void insertTagAsOnly3() {
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(3, 2, JUNIT, Data.ELEM);
+    insertTag(3, 2, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
     assertEquals(Data.ATTR, data.kind(9));
@@ -80,7 +80,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertArraysEquals(JUNIT, data.name(4, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
@@ -88,7 +88,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertArraysEquals(JUNIT, data.name(4, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(4, Data.ELEM));
   }
 
   /**
@@ -96,13 +96,13 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void insertTagAfterAttsAsFirst() {
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(6, 1, JUNIT, Data.ELEM);
+    insertTag(6, 1, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
-    assertArraysEquals(JUNIT, data.name(9, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(9, Data.ELEM));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
@@ -110,7 +110,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
-    assertArraysEquals(JUNIT, data.name(9, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(9, Data.ELEM));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
@@ -121,12 +121,12 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void insertTagAfterAttsAsSecond() {
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(6, 2, JUNIT, Data.ELEM);
+    insertTag(6, 2, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertArraysEquals(JUNIT, data.name(11, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -134,7 +134,7 @@ public final class UpdateTestTags extends UpdateTest {
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertArraysEquals(JUNIT, data.name(11, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -146,12 +146,12 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void insertTagAfterAttsAsLast() {
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     final long nextid = data.meta.lastid;
-    insertTag(6, 0, JUNIT, Data.ELEM);
+    insertTag(6, 0, T_JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertArraysEquals(JUNIT, data.name(11, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -159,7 +159,7 @@ public final class UpdateTestTags extends UpdateTest {
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertArraysEquals(JUNIT, data.name(11, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(11, Data.ELEM));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -171,15 +171,15 @@ public final class UpdateTestTags extends UpdateTest {
    */
   @Test
   public void updateTagName() {
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     data.startUpdate();
-    data.update(6, Data.ELEM, JUNIT, Token.EMPTY);
+    data.update(6, Data.ELEM, T_JUNIT, Token.EMPTY);
     data.finishUpdate();
     assertEquals(Data.ELEM, data.kind(6));
-    assertArraysEquals(JUNIT, data.name(6, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(6, Data.ELEM));
     reload();
     assertEquals(Data.ELEM, data.kind(6));
-    assertArraysEquals(JUNIT, data.name(6, Data.ELEM));
+    assertArraysEquals(T_JUNIT, data.name(6, Data.ELEM));
   }
 
   /**
@@ -193,7 +193,7 @@ public final class UpdateTestTags extends UpdateTest {
       final int kind) {
 
     int root;
-    final Data data = CONTEXT.data();
+    final Data data = context.data();
     if(pos == 0) {
       root = par + data.size(par, kind);
     } else {

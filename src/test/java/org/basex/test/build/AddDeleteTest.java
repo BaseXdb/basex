@@ -1,21 +1,13 @@
 package org.basex.test.build;
 
 import static org.junit.Assert.*;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Tests adding files/folders/zip files/urls to collections.
@@ -23,12 +15,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Michael Seiferle
  */
-public final class AddDeleteTest {
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
-
-  /** Test database name. */
-  private static final String DB = Util.name(AddDeleteTest.class);
+public final class AddDeleteTest extends SandboxTest {
   /** Test file. */
   private static final String DIR = "src/test/resources/";
   /** Test file. */
@@ -43,6 +30,8 @@ public final class AddDeleteTest {
   private static final String GZIPFILE = DIR + "xml.gz";
   /** Test XML fragment. */
   private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
+  /** Temporary XML file. */
+  private static final String TEMP = NAME + IO.XMLSUFFIX;
 
   /** Number of XML files for folder. */
   private static final int NFLDR;
@@ -61,7 +50,7 @@ public final class AddDeleteTest {
    */
   @Before
   public void setUp() throws BaseXException {
-    new CreateDB(DB).execute(CONTEXT);
+    new CreateDB(NAME).execute(context);
   }
 
   /**
@@ -70,7 +59,7 @@ public final class AddDeleteTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -82,11 +71,11 @@ public final class AddDeleteTest {
    */
   @Test
   public void addXMLString() throws BaseXException {
-    new Add("index.xml", XMLFRAG).execute(CONTEXT);
+    new Add("index.xml", XMLFRAG).execute(context);
     assertEquals(1, docs());
-    new Add("a/b/c/index2.xml", XMLFRAG).execute(CONTEXT);
+    new Add("a/b/c/index2.xml", XMLFRAG).execute(context);
     assertEquals(2, docs());
-    new Add("a/d/c", XMLFRAG).execute(CONTEXT);
+    new Add("a/d/c", XMLFRAG).execute(context);
     assertEquals(3, docs());
   }
 
@@ -96,7 +85,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void addFile() throws BaseXException {
-    new Add(null, FILE).execute(CONTEXT);
+    new Add(null, FILE).execute(context);
     assertEquals(1, docs());
   }
 
@@ -106,13 +95,13 @@ public final class AddDeleteTest {
    */
   @Test
   public void addZip() throws BaseXException {
-    new Add("target", ZIPFILE).execute(CONTEXT);
+    new Add("target", ZIPFILE).execute(context);
     assertEquals(4, docs());
     // do not add archives
-    new Set(Prop.ADDARCHIVES, false).execute(CONTEXT);
-    new Add("", ZIPFILE).execute(CONTEXT);
+    new Set(Prop.ADDARCHIVES, false).execute(context);
+    new Add("", ZIPFILE).execute(context);
     assertEquals(4, docs());
-    new Set(Prop.ADDARCHIVES, true).execute(CONTEXT);
+    new Set(Prop.ADDARCHIVES, true).execute(context);
   }
 
   /**
@@ -121,9 +110,9 @@ public final class AddDeleteTest {
    */
   @Test
   public void addGzip() throws BaseXException {
-    new Add("", GZIPFILE).execute(CONTEXT);
-    new Add("bar", GZIPFILE).execute(CONTEXT);
-    new Delete("bar").execute(CONTEXT);
+    new Add("", GZIPFILE).execute(context);
+    new Add("bar", GZIPFILE).execute(context);
+    new Delete("bar").execute(context);
     assertEquals(1, docs());
   }
 
@@ -133,7 +122,7 @@ public final class AddDeleteTest {
    */
   @Test
   public void addFolder() throws BaseXException {
-    new Add("", FLDR).execute(CONTEXT);
+    new Add("", FLDR).execute(context);
     assertEquals(NFLDR, docs());
   }
 
@@ -143,13 +132,13 @@ public final class AddDeleteTest {
    */
   @Test
   public void deletePath() throws BaseXException {
-    new Add("foo/pub", FLDR).execute(CONTEXT);
+    new Add("foo/pub", FLDR).execute(context);
     assertEquals(NFLDR, docs());
-    new Delete("foo").execute(CONTEXT);
+    new Delete("foo").execute(context);
     assertEquals(0, docs());
-    new Add("/foo///bar////", FILE).execute(CONTEXT);
-    new Add("foobar", FLDR).execute(CONTEXT);
-    new Delete("foo").execute(CONTEXT);
+    new Add("/foo///bar////", FILE).execute(context);
+    new Add("foobar", FLDR).execute(context);
+    new Delete("foo").execute(context);
     assertEquals(NFLDR, docs());
   }
 
@@ -159,10 +148,10 @@ public final class AddDeleteTest {
    */
   @Test
   public void addFoldersDeleteFiles() throws BaseXException {
-    new Add("folder", FLDR).execute(CONTEXT);
-    new Add("", FILE).execute(CONTEXT);
-    new Delete("input.xml").execute(CONTEXT);
-    new Delete("folder/input.xml").execute(CONTEXT);
+    new Add("folder", FLDR).execute(context);
+    new Add("", FILE).execute(context);
+    new Delete("input.xml").execute(context);
+    new Delete("folder/input.xml").execute(context);
     assertEquals(NFLDR - 1, docs());
   }
 
@@ -172,7 +161,7 @@ public final class AddDeleteTest {
    */
   @Test(expected = BaseXException.class)
   public void addFileFail() throws BaseXException {
-    new Add("", FILE + "/doesnotexist").execute(CONTEXT);
+    new Add("", FILE + "/doesnotexist").execute(context);
   }
 
   /**
@@ -182,10 +171,10 @@ public final class AddDeleteTest {
    */
   @Test
   public void addCorrupt() throws Exception {
-    final IOFile io = new IOFile(Prop.TMP, DB);
+    final IOFile io = new IOFile(TEMP);
     io.write(Token.token("<x"));
     try {
-      new Add("", io.path()).execute(CONTEXT);
+      new Add("", io.path()).execute(context);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
 
@@ -200,14 +189,14 @@ public final class AddDeleteTest {
   @Test
   public void createCorrupt() throws Exception {
     try {
-      new CreateDB(DB, "<x").execute(CONTEXT);
+      new CreateDB(NAME, "<x").execute(context);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
 
-    final IOFile io = new IOFile(Prop.TMP, DB);
+    final IOFile io = new IOFile(TEMP);
     io.write(Token.token("<x"));
     try {
-      new CreateDB(DB, io.path()).execute(CONTEXT);
+      new CreateDB(NAME, io.path()).execute(context);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
     assertTrue(io.delete());
@@ -219,18 +208,18 @@ public final class AddDeleteTest {
    */
   @Test
   public void skipCorrupt() throws Exception {
-    final IOFile io = new IOFile(Prop.TMP, DB);
+    final IOFile io = new IOFile(TEMP);
     io.write(Token.token("<x"));
 
-    new Set(Prop.SKIPCORRUPT, true).execute(CONTEXT);
-    assertEquals(0, CONTEXT.data().resources.docs("").size());
-    new Add("x", "<x").execute(CONTEXT);
-    new Add("x", CORRUPT).execute(CONTEXT);
-    assertEquals(0, CONTEXT.data().resources.docs("").size());
-    new Set(Prop.SKIPCORRUPT, false).execute(CONTEXT);
+    new Set(Prop.SKIPCORRUPT, true).execute(context);
+    assertEquals(0, context.data().resources.docs("").size());
+    new Add("x", "<x").execute(context);
+    new Add("x", CORRUPT).execute(context);
+    assertEquals(0, context.data().resources.docs("").size());
+    new Set(Prop.SKIPCORRUPT, false).execute(context);
 
     try {
-      new Add("", "<x").execute(CONTEXT);
+      new Add("", "<x").execute(context);
       fail("Broken file was added to the database.");
     } catch(final Exception ex) { }
 
@@ -242,6 +231,6 @@ public final class AddDeleteTest {
    * @return number of documents
    */
   private static int docs() {
-    return CONTEXT.data().resources.docs("").size();
+    return context.data().resources.docs("").size();
   }
 }

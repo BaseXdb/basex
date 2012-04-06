@@ -92,7 +92,7 @@ public final class JavaFunc extends JavaMapping {
         Object inst = null;
         if(!st) {
           inst = instObj(ar[0]);
-          if(inst instanceof QueryModule) ((QueryModule) inst).init(ctx);
+          if(inst instanceof QueryModule) ((QueryModule) inst).context = ctx;
         }
         return meth.invoke(inst, arg);
       }
@@ -163,7 +163,7 @@ public final class JavaFunc extends JavaMapping {
    * @return string
    */
   private String name() {
-    return cls.getSimpleName() + '.' + mth;
+    return cls.getSimpleName() + ':' + mth;
   }
 
   @Override

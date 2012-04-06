@@ -1,25 +1,17 @@
 package org.basex.test.query;
 
 import static org.basex.query.func.Function.*;
-import static org.basex.util.Util.name;
 import static org.junit.Assert.*;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.test.*;
 import org.basex.test.query.simple.*;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.MethodRule;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
+import org.junit.*;
+import org.junit.rules.*;
+import org.junit.runners.model.*;
 
 /**
  * Test if index and non-index full-text queries behave the same way.
@@ -28,38 +20,31 @@ import org.junit.runners.model.Statement;
  * @author Dimitar Popov
  */
 @InputData("<x>A x B</x>")
-public class FTIndexQueryTest {
-  /** Context of database without full-text index. */
-  private static final Context CTX = new Context();
+public class FTIndexQueryTest extends SandboxTest {
+  /** Name of database with full-text index. */
+  private static final String NAME_IX = NAME + "ix";
   /** Context of database with full-text index. */
   private static final Context CTX_IX = new Context();
-  /** Name of database without full-text index. */
-  private static final String DBNAME = name(FTIndexQueryTest.class);
-  /** Name of database with full-text index. */
-  private static final String DBNAME_IX = name(FTIndexQueryTest.class) + "ix";
 
   /** Rule to create database without full-text index. */
   @Rule
-  public final CreateDBRule createdb = new CreateDBRule(DBNAME, CTX);
+  public final CreateDBRule createdb = new CreateDBRule(NAME, context);
 
   /** Rule to create database with full-text index. */
   @Rule
-  public final CreateDBRule createdbix = new CreateDBRule(DBNAME_IX, CTX_IX);
+  public final CreateDBRule createdbix = new CreateDBRule(NAME_IX, CTX_IX);
 
-  /**
-   * Static initialization.
-   * @throws BaseXException if initialization fails
-   */
+  /** Static initialization. */
   @BeforeClass
-  public static void setUpClass() throws BaseXException {
-    new Set(Prop.FTINDEX, false).execute(CTX);
-    new Set(Prop.FTINDEX, true).execute(CTX_IX);
+  public static void setUpClass() {
+    context.prop.set(Prop.FTINDEX, false);
+    CTX_IX.prop.set(Prop.FTINDEX, true);
+    CTX_IX.mprop.set(MainProp.DBPATH, sandbox().path());
   }
 
   /** Static clean-up. */
   @AfterClass
   public static void cleanUpClass() {
-    CTX.close();
     CTX_IX.close();
   }
 
@@ -108,7 +93,7 @@ public class FTIndexQueryTest {
   private static void assertQuery(final String q) {
     try {
       assertEquals("Query failed:\n" + q + '\n',
-          new XQuery(q).execute(CTX), new XQuery(q).execute(CTX_IX));
+          new XQuery(q).execute(context), new XQuery(q).execute(CTX_IX));
       // [DP]: assert that index was really used
     } catch (final BaseXException e) {
       fail("Query failed:\n" + q + "\nMessage: " + e.getMessage());

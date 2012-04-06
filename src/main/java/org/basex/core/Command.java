@@ -1,23 +1,15 @@
 package org.basex.core;
 
-import org.basex.core.Commands.CmdPerm;
 import static org.basex.core.Text.*;
 
-import org.basex.core.cmd.Close;
-import org.basex.data.Data;
-import org.basex.data.Result;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.out.NullOutput;
-import org.basex.io.out.PrintOutput;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.xml.sax.InputSource;
+import java.io.*;
+import java.util.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Locale;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.out.*;
+import org.basex.util.*;
+import org.xml.sax.*;
 
 /**
  * This class provides the architecture for all internal command
@@ -28,11 +20,6 @@ import java.util.Locale;
  * @author Christian Gruen
  */
 public abstract class Command extends Progress {
-  /** Commands flag: standard. */
-  protected static final int STANDARD = 256;
-  /** Commands flag: data reference needed. */
-  protected static final int DATAREF = 512;
-
   /** Container for query information. */
   private final TokenBuilder info = new TokenBuilder();
   /** Command arguments. */
@@ -51,16 +38,29 @@ public abstract class Command extends Progress {
   /** Main properties. */
   protected MainProp mprop;
 
-  /** Flags for controlling command processing. */
-  private final int flags;
+  /** Permission required to execute this command. */
+  private final Perm perm;
+  /** Indicates if command requires opened database. */
+  private final boolean data;
+
+  /**
+   * Constructor for commands requiring no opened database.
+   * @param p required permission
+   * @param arg arguments
+   */
+  protected Command(final Perm p, final String... arg) {
+    this(p, false, arg);
+  }
 
   /**
    * Constructor.
-   * @param flag command flags
+   * @param p required permission
+   * @param d requires opened database
    * @param arg arguments
    */
-  protected Command(final int flag, final String... arg) {
-    flags = flag;
+  protected Command(final Perm p, final boolean d, final String... arg) {
+    perm = p;
+    data = d;
     args = arg;
   }
 
@@ -275,7 +275,7 @@ public abstract class Command extends Progress {
    * @return result of check
    */
   private boolean createWrite() {
-    return (flags & (User.CREATE | User.WRITE)) != 0;
+    return perm == Perm.CREATE || perm == Perm.WRITE;
   }
 
   /**
@@ -288,17 +288,11 @@ public abstract class Command extends Progress {
    */
   private boolean exec(final Context ctx, final OutputStream os) {
     // check if data reference is available
-    final Data data = ctx.data();
-    if(data == null && (flags & DATAREF) != 0) return error(NO_DB_OPENED);
+    final Data d = ctx.data();
+    if(d == null && data) return error(NO_DB_OPENED);
 
     // check permissions
-    if(!ctx.perm(flags & 0xFF, data != null ? data.meta : null)) {
-      final CmdPerm[] perms = CmdPerm.values();
-      int i = perms.length;
-      final int f = flags & 0xFF;
-      while(--i >= 0 && (1 << i & f) == 0);
-      return error(PERM_NEEDED_X, perms[i + 1]);
-    }
+    if(!ctx.perm(perm, d != null ? d.meta : null)) return error(PERM_NEEDED_X, perm);
 
     // set updating flag
     updating = updating(ctx);

@@ -299,7 +299,7 @@ public final class FNDb extends StandardFunc {
           res.add(new FAttr(RESOURCES, token(meta.ndocs)));
           final String tstamp = Dtm.FORMAT.format(new Date(meta.dbtime()));
           res.add(new FAttr(MDATE, token(tstamp)));
-          if(ctx.context.perm(User.CREATE, meta))
+          if(ctx.context.perm(Perm.CREATE, meta))
             res.add(new FAttr(PATH, token(meta.original)));
           res.add(new FTxt(token(name)));
         } catch(final IOException ex) {
@@ -419,7 +419,7 @@ public final class FNDb extends StandardFunc {
    */
   private ANode info(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-    final boolean create = ctx.context.user.perm(User.CREATE);
+    final boolean create = ctx.context.user.has(Perm.CREATE);
     return toNode(InfoDB.db(data.meta, false, true, create), DATABASE);
   }
 

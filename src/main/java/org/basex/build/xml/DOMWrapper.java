@@ -29,6 +29,8 @@ public final class DOMWrapper extends Parser {
   private final String filename;
   /** Root document. */
   private final Node root;
+  /** Chop whitespaces. */
+  private final boolean chop;
   /** Element counter. */
   private int nodes;
 
@@ -42,6 +44,7 @@ public final class DOMWrapper extends Parser {
     super(fn, pr);
     root = doc;
     filename = fn;
+    chop = pr.is(Prop.CHOP);
   }
 
   @Override
@@ -73,7 +76,8 @@ public final class DOMWrapper extends Parser {
           }
           builder.startElem(token(n.getNodeName()), atts);
         } else if(n instanceof Text) {
-          builder.text(token(n.getNodeValue()));
+          final String s = n.getNodeValue();
+          builder.text(token(chop ? s.trim() : s));
         } else if(n instanceof Comment) {
           builder.comment(token(n.getNodeValue()));
         } else if(n instanceof ProcessingInstruction) {

@@ -22,7 +22,7 @@ public final class DropIndex extends ACreate {
    * @param type index type, defined in {@link CmdIndex}
    */
   public DropIndex(final Object type) {
-    super(DATAREF | User.WRITE, type.toString());
+    super(Perm.WRITE, true, type.toString());
   }
 
   @Override

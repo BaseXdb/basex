@@ -1,6 +1,6 @@
 package org.basex.test.query.simple;
 
-import org.basex.test.query.QueryTest;
+import org.basex.test.query.*;
 
 /**
  * XQuery 3.0 tests (former: 1.1).

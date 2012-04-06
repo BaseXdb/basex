@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import org.basex.core.*;
+
 /**
  * Evaluates the 'password' command and alters the user's password.
  *
@@ -14,7 +16,7 @@ public final class Password extends AUser {
    * @param pw password
    */
   public Password(final String pw) {
-    super(STANDARD, pw);
+    super(Perm.NONE, pw);
   }
 
   @Override

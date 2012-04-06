@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.core.Commands.CmdPerm;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.query.*;
@@ -403,7 +402,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final void checkCreate(final QueryContext ctx) throws QueryException {
-    checkPerm(ctx, User.CREATE);
+    checkPerm(ctx, Perm.CREATE);
   }
 
   /**
@@ -413,7 +412,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final void checkWrite(final QueryContext ctx) throws QueryException {
-    checkPerm(ctx, User.WRITE);
+    checkPerm(ctx, Perm.WRITE);
   }
 
   /**
@@ -423,15 +422,9 @@ public abstract class ParseExpr extends Expr {
    * @param p permission
    * @throws QueryException query exception
    */
-  private void checkPerm(final QueryContext ctx, final byte p) throws QueryException {
-    if(ctx.context.user.perm(p)) return;
-    // dump error output
-    final CmdPerm perm;
-    if(p == User.ADMIN) perm = CmdPerm.ADMIN;
-    else if(p == User.CREATE) perm = CmdPerm.CREATE;
-    else if(p == User.WRITE) perm = CmdPerm.WRITE;
-    else perm = CmdPerm.READ;
-    throw PERMNO.thrw(info, perm);
+  private void checkPerm(final QueryContext ctx, final Perm p)
+      throws QueryException {
+    if(!ctx.context.user.has(p)) throw PERMNO.thrw(info, p);
   }
 
   /**

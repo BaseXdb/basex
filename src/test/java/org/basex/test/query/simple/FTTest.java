@@ -1,10 +1,8 @@
 package org.basex.test.query.simple;
 
-import org.basex.core.AProp;
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
-import org.basex.test.query.QueryTest;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * Full-text test queries.
@@ -543,7 +541,7 @@ public final class FTTest extends QueryTest {
   @Test
   @Override
   public void test() throws BaseXException {
-    final Prop prop = CONTEXT.prop;
+    final Prop prop = context.prop;
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; ++a) { prop.set(Prop.FTINDEX, a == 0);
@@ -565,7 +563,7 @@ public final class FTTest extends QueryTest {
 
   @Override
   protected String details() {
-    final Prop prop = CONTEXT.prop;
+    final Prop prop = context.prop;
     final StringBuilder sb = new StringBuilder();
     sb.append(set(Prop.FTINDEX, prop)).append(';');
     sb.append(set(Prop.WILDCARDS, prop)).append(';');

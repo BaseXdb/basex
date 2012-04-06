@@ -49,8 +49,6 @@ public abstract class Builder extends Progress {
   private final IntList pstack = new IntList();
   /** Tag stack. */
   private final IntList tstack = new IntList();
-  /** Size stack. */
-  private boolean inDoc;
   /** Current tree height. */
   private int level;
   /** Element counter. */
@@ -87,7 +85,6 @@ public abstract class Builder extends Progress {
 
     // add document node and parse document
     parser.parse(this);
-    if(level != 0) error(DOCOPEN, parser.detail(), tags.key(tstack.get(level)));
 
     // no nodes inserted: add default document node
     if(meta.size == 0) {
@@ -122,7 +119,6 @@ public abstract class Builder extends Progress {
     setSize(pre, meta.size - pre);
     meta.ndocs++;
     ns.close(meta.size);
-    inDoc = false;
   }
 
   /**
@@ -141,9 +137,7 @@ public abstract class Builder extends Progress {
    * @param att attributes
    * @throws IOException I/O exception
    */
-  public final void startElem(final byte[] nm, final Atts att)
-      throws IOException {
-
+  public final void startElem(final byte[] nm, final Atts att) throws IOException {
     addElem(nm, att);
     ++level;
   }
@@ -154,9 +148,7 @@ public abstract class Builder extends Progress {
    * @param att attributes
    * @throws IOException I/O exception
    */
-  public final void emptyElem(final byte[] nm, final Atts att)
-      throws IOException {
-
+  public final void emptyElem(final byte[] nm, final Atts att) throws IOException {
     addElem(nm, att);
     final int pre = pstack.get(level);
     ns.close(pre);
@@ -181,15 +173,8 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void text(final byte[] value) throws IOException {
-    // chop whitespaces in text nodes
     final byte[] t = meta.chop ? trim(value) : value;
-
-    // check if text appears before or after root node
-    final boolean ignore = !inDoc || level == 1;
-    if((meta.chop && t.length != 0 || !ws(t)) && ignore)
-      error(inDoc ? AFTERROOT : BEFOREROOT, parser.detail());
-
-    if(t.length != 0 && !ignore) addText(t, Data.TEXT);
+    if(t.length != 0) addText(t, Data.TEXT);
   }
 
   /**
@@ -268,8 +253,8 @@ public abstract class Builder extends Progress {
    * @param ne namespace flag
    * @throws IOException I/O exception
    */
-  protected abstract void addElem(int dist, int nm, int asize,
-      int uri, boolean ne) throws IOException;
+  protected abstract void addElem(int dist, int nm, int asize, int uri, boolean ne)
+      throws IOException;
 
   /**
    * Adds an attribute to the database.
@@ -280,7 +265,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   protected abstract void addAttr(int nm, byte[] value, int dist, int uri)
-    throws IOException;
+      throws IOException;
 
   /**
    * Adds a text node to the database.
@@ -289,8 +274,7 @@ public abstract class Builder extends Progress {
    * @param kind the node kind
    * @throws IOException I/O exception
    */
-  protected abstract void addText(byte[] value, int dist, byte kind)
-    throws IOException;
+  protected abstract void addText(byte[] value, int dist, byte kind) throws IOException;
 
   /**
    * Stores a size value to the specified table position.
@@ -336,16 +320,8 @@ public abstract class Builder extends Progress {
       addAttr(n, att.string(a), Math.min(IO.MAXATTS, a + 1), u);
     }
 
-    if(level != 0) {
-      if(level > 1) {
-        // set leaf node information in index
-        tags.stat(tstack.get(level - 1)).setLeaf(false);
-      } else if(inDoc) {
-        // don't allow more than one root node
-        error(MOREROOTS, parser.detail(), nm);
-      }
-    }
-    if(meta.size != 1) inDoc = true;
+    // set leaf node information in index
+    if(level > 1) tags.stat(tstack.get(level - 1)).setLeaf(false);
 
     if(Prop.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
 
@@ -375,9 +351,7 @@ public abstract class Builder extends Progress {
    * @param kind the node type
    * @throws IOException I/O exception
    */
-  private void addText(final byte[] value, final byte kind)
-      throws IOException {
-
+  private void addText(final byte[] value, final byte kind) throws IOException {
     final int l = level;
     if(l > 1) {
       final int tag = tstack.get(l - 1);
@@ -397,8 +371,7 @@ public abstract class Builder extends Progress {
    * @param ext message extension
    * @throws IOException I/O exception
    */
-  private static void error(final String msg, final Object... ext)
-      throws IOException {
+  private static void error(final String msg, final Object... ext) throws IOException {
     throw new BuildException(msg, ext);
   }
 }

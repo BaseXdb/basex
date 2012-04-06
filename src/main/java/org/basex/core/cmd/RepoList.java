@@ -17,7 +17,7 @@ public final class RepoList extends Command {
    * Constructor.
    */
   public RepoList() {
-    super(STANDARD);
+    super(Perm.NONE);
   }
 
   @Override

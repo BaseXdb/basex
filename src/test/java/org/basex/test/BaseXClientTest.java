@@ -2,17 +2,14 @@ package org.basex.test;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 
-import org.basex.BaseXClient;
-import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
-import org.basex.core.Text;
-import org.basex.io.out.ArrayOutput;
-import org.basex.util.Token;
-import org.basex.util.list.StringList;
-import org.junit.Test;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.io.out.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.junit.*;
 
 /**
  * Tests the command-line arguments of the client starter class.
@@ -89,14 +86,14 @@ public final class BaseXClientTest extends BaseXTest {
 
     System.setOut(NULL);
     System.setErr(NULL);
-    final StringList sl =
-        new StringList().add("-z").add("-p9999").add("-e9998").add(sargs);
-    final BaseXServer bxs = new BaseXServer(sl.toArray());
+    final BaseXServer bxs = createServer(sargs);
     final ArrayOutput ao = new ArrayOutput();
     System.setOut(new PrintStream(ao));
+
+    final StringList sl = new StringList();
+    sl.reset();
+    sl.add("-p9999").add("-U" + Text.ADMIN).add("-P" + Text.ADMIN).add(args);
     try {
-      sl.reset();
-      sl.add("-p9999").add("-U" + Text.ADMIN).add("-P" + Text.ADMIN).add(args);
       new BaseXClient(sl.toArray());
       return ao.toString();
     } finally {

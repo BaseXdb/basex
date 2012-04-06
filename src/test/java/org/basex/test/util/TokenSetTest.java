@@ -2,11 +2,9 @@ package org.basex.test.util;
 
 import static org.junit.Assert.*;
 
-import org.basex.util.hash.TokenSet;
-import org.basex.util.list.TokenList;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
+import org.junit.*;
 
 /**
  * Token set tests.

@@ -16,7 +16,7 @@ public final class Flush extends Command {
    * Default constructor.
    */
   public Flush() {
-    super(User.WRITE | DATAREF);
+    super(Perm.WRITE, true);
   }
 
   @Override

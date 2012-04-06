@@ -7,4 +7,7 @@
   <fileset name="all" enabled="true" check-config-name="BaseX Checkstyle" local="true">
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
+  <filter name="FilesFromPackage" enabled="true">
+    <filter-data value="src/main/java/org/basex/query/regex/parse"/>
+  </filter>
 </fileset-config>

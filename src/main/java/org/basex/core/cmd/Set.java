@@ -20,9 +20,8 @@ public final class Set extends AGet {
    * @param value value to set (optional, depending on the property)
    */
   public Set(final Object key, final Object value) {
-    super(User.READ, (key instanceof Object[] ?
-        ((Object[]) key)[0] : key).toString(),
-        value == null ? "" : value.toString());
+    super(Perm.READ, (key instanceof Object[] ?
+        ((Object[]) key)[0] : key).toString(), value == null ? "" : value.toString());
   }
 
   @Override
@@ -43,11 +42,5 @@ public final class Set extends AGet {
       Util.debug(ex);
       return error(INVALID_VALUE_X_X, key, val);
     }
-  }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    // command may set options that influence other commands
-    return true;
   }
 }

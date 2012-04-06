@@ -1,12 +1,10 @@
 package org.basex.test.server;
 
-import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
 
 import org.basex.*;
-import org.basex.server.*;
 import org.basex.util.*;
 import org.junit.*;
 
@@ -42,7 +40,8 @@ public class ClientSessionTest extends SessionTest {
   @Before
   public void startSession() {
     try {
-      session = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN, out);
+      session = createClient();
+      session.setOutputStream(out);
     } catch(final IOException ex) {
       fail(Util.message(ex));
     }

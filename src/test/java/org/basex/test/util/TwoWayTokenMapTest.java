@@ -1,13 +1,11 @@
 package org.basex.test.util;
 
-import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
+import static org.junit.Assert.*;
 
-import org.basex.util.BitArray;
-import org.basex.util.list.TokenList;
-import org.basex.util.list.TwoWayTokenMap;
-import org.junit.Before;
-import org.junit.Test;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.junit.*;
 
 
 /**

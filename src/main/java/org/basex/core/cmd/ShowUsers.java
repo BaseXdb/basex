@@ -1,16 +1,14 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
 
-import org.basex.core.CommandBuilder;
-import org.basex.core.Command;
-import org.basex.core.User;
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'show users' command and shows existing users.
@@ -31,7 +29,7 @@ public final class ShowUsers extends Command {
    * @param db database (for showing users)
    */
   public ShowUsers(final String db) {
-    super(User.ADMIN, db);
+    super(Perm.ADMIN, db);
   }
 
   @Override

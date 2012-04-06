@@ -19,7 +19,7 @@ public final class Find extends AQuery {
    * @param query simplified query
    */
   public Find(final String query) {
-    super(DATAREF, query);
+    super(Perm.NONE, true, query);
   }
 
   @Override

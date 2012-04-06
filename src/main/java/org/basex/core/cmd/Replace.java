@@ -14,12 +14,12 @@ import org.basex.io.*;
  */
 public final class Replace extends ACreate {
   /**
-   * Default constructor.
+   * Constructor.
    * @param path resource path
    * @param input input file or XML string
    */
   public Replace(final String path, final String input) {
-    super(DATAREF | User.WRITE, path, input);
+    super(Perm.WRITE, true, path, input);
   }
 
   /**
@@ -27,7 +27,7 @@ public final class Replace extends ACreate {
    * @param path resource path
    */
   public Replace(final String path) {
-    super(DATAREF | User.WRITE, path);
+    super(Perm.WRITE, true, path);
   }
 
   @Override

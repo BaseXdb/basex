@@ -1,7 +1,7 @@
 package org.basex.test.server;
 
-import org.basex.io.out.ArrayOutput;
-import org.junit.Before;
+import org.basex.io.out.*;
+import org.junit.*;
 
 /**
  * This class tests the client/server session API with an output stream.
