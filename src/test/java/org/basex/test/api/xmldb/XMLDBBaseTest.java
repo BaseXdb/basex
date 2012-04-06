@@ -2,15 +2,10 @@ package org.basex.test.api.xmldb;
 
 import static org.basex.core.Text.*;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.api.xmldb.BXDatabase;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
+import org.basex.api.xmldb.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 
 /**
@@ -42,15 +37,15 @@ public abstract class XMLDBBaseTest {
   protected static final String DOC3 = "third.xml";
 
   /** Context. */
-  private static final Context CTX = new Context();
+  private static Context context = new Context();
 
   /**
    * Create XMLDB database.
    * @throws BaseXException exception during database create
    */
   protected static void createDB() throws BaseXException {
-    new CreateDB(COLL, DOCPATH + DOC1).execute(CTX);
-    new Close().execute(CTX);
+    new CreateDB(COLL, DOCPATH + DOC1).execute(context);
+    new Close().execute(context);
   }
 
   /**
@@ -58,7 +53,7 @@ public abstract class XMLDBBaseTest {
    * @throws BaseXException exception during database drop
    */
   protected static void dropDB() throws BaseXException {
-    new DropDB(COLL).execute(CTX);
+    new DropDB(COLL).execute(context);
   }
 
   /**

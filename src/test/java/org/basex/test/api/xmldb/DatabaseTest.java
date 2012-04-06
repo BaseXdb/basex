@@ -2,14 +2,9 @@ package org.basex.test.api.xmldb;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.xmldb.api.DatabaseManager;
-import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.Database;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.XMLDBException;
+import org.junit.*;
+import org.xmldb.api.*;
+import org.xmldb.api.base.*;
 
 /**
  * This class tests the XMLDB/API Database implementation.

@@ -1,33 +1,18 @@
 // Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.api.xqj.testcases;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItem;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQSequence;
-import javax.xml.xquery.XQSequenceType;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import java.io.*;
+import java.util.*;
+
+import javax.xml.namespace.*;
+import javax.xml.parsers.*;
+import javax.xml.stream.*;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;
+import javax.xml.xquery.*;
+
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
 @SuppressWarnings("all")
 public class XQDataFactoryTest extends XQJTestCase {

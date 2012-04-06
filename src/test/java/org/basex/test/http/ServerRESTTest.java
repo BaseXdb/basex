@@ -1,6 +1,6 @@
 package org.basex.test.http;
 
-import org.junit.BeforeClass;
+import org.junit.*;
 
 /**
  * This class tests the server-based REST API.

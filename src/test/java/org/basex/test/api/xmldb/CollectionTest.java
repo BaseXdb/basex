@@ -2,27 +2,16 @@ package org.basex.test.api.xmldb;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
+import java.io.*;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.*;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.XMLReaderFactory;
-import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.Database;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.Resource;
-import org.xmldb.api.base.Service;
-import org.xmldb.api.base.XMLDBException;
-import org.xmldb.api.modules.BinaryResource;
-import org.xmldb.api.modules.XMLResource;
-import org.xmldb.api.modules.XPathQueryService;
+import org.junit.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
+import org.xmldb.api.base.*;
+import org.xmldb.api.modules.*;
 
 /**
  * This class tests the XMLDB/API Collection implementation.

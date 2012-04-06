@@ -1,10 +1,12 @@
 // Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.api.xqj.testcases;
 
-import java.io.FileInputStream;
-import java.util.Properties;
-import junit.framework.TestCase;
+import java.io.*;
+import java.util.*;
+
 import javax.xml.xquery.*;
+
+import junit.framework.*;
 
 @SuppressWarnings("all")
 public class XQJTestCase extends TestCase {

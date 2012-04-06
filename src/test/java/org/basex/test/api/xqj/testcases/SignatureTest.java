@@ -1,16 +1,9 @@
 // Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.api.xqj.testcases;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 
 @SuppressWarnings("all")
 public class SignatureTest extends XQJTestCase {

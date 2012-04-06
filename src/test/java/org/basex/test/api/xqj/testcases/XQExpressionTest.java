@@ -1,11 +1,8 @@
 // Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.api.xqj.testcases;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+
 import javax.xml.xquery.*;
 
 @SuppressWarnings("all")

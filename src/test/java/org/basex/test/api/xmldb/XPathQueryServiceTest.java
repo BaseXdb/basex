@@ -2,15 +2,9 @@ package org.basex.test.api.xmldb;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.Database;
-import org.xmldb.api.base.Resource;
-import org.xmldb.api.base.XMLDBException;
-import org.xmldb.api.modules.XMLResource;
-import org.xmldb.api.modules.XPathQueryService;
+import org.junit.*;
+import org.xmldb.api.base.*;
+import org.xmldb.api.modules.*;
 
 /**
  * This class tests the XMLDB/API XPathQueryService implementation.

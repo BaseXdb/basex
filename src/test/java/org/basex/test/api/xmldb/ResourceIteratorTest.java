@@ -2,16 +2,9 @@ package org.basex.test.api.xmldb;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.Database;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.ResourceIterator;
-import org.xmldb.api.base.ResourceSet;
-import org.xmldb.api.base.XMLDBException;
-import org.xmldb.api.modules.XPathQueryService;
+import org.junit.*;
+import org.xmldb.api.base.*;
+import org.xmldb.api.modules.*;
 
 /**
  * This class tests the XMLDB/API ResourceIterator implementation.

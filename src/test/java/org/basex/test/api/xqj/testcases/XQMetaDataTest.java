@@ -1,13 +1,7 @@
 // Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.api.xqj.testcases;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQConstants;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQMetaData;
-import javax.xml.xquery.XQSequence;
-import javax.xml.xquery.XQStaticContext;
+import javax.xml.xquery.*;
 
 @SuppressWarnings("all")
 public class XQMetaDataTest extends XQJTestCase {

@@ -1,5 +1,6 @@
 package org.basex.test.http;
 
+import org.basex.core.*;
 import org.junit.*;
 
 /**
@@ -16,5 +17,6 @@ public class ServerHTTPClientTest extends HTTPClientTest {
   @BeforeClass
   public static void start() throws Exception {
     init(RESTURL, false);
+    lcontext = new Context();
   }
 }

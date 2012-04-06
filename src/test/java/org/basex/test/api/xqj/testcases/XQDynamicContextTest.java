@@ -1,23 +1,17 @@
 // Copyright (c) 2003, 2006, 2007, 2008 Oracle. All rights reserved.
 package org.basex.test.api.xqj.testcases;
 
-import org.w3c.dom.*;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import java.io.*;
+import java.math.*;
+import java.util.*;
 
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.namespace.*;
+import javax.xml.parsers.*;
+import javax.xml.transform.stream.*;
 import javax.xml.xquery.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.SimpleTimeZone;
+
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
 @SuppressWarnings("all")
 public class XQDynamicContextTest extends XQJTestCase {
