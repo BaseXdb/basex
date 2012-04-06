@@ -74,7 +74,7 @@ class RESTQuery extends RESTCode {
 
     // send serialization options to the server
     session.execute(new Set(Prop.SERIALIZER, serial(http)));
-    session.setOutputStream(http.out);
+    session.setOutputStream(http.res.getOutputStream());
 
     // set absolute path to http directory
     if(path) {

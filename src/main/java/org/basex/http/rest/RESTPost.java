@@ -54,7 +54,7 @@ public class RESTPost extends RESTCode {
     if(enc == null) enc = Token.UTF8;
 
     // perform queries
-    final byte[] in = new NewlineInput(http.in).encoding(enc).content();
+    final byte[] in = new NewlineInput(http.req.getInputStream()).encoding(enc).content();
     validate(in);
 
     final Context ctx = http.context();

@@ -31,6 +31,6 @@ public class RESTDelete extends RESTCode {
       session.execute(new Delete(http.dbpath()));
     }
     // return command info
-    http.out.write(token(session.info()));
+    http.res.getOutputStream().write(token(session.info()));
   }
 }

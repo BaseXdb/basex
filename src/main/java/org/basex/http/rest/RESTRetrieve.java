@@ -45,7 +45,7 @@ final class RESTRetrieve extends RESTQuery {
       // list databases
       final Table table = new Table(session.execute(new List()));
       final SerializerProp sprop = new SerializerProp(http.serialization);
-      final Serializer ser = Serializer.get(http.out, sprop);
+      final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
       http.initResponse(sprop);
       ser.openElement(DATABASES, RESOURCES, token(table.contents.size()));
       ser.namespace(REST, RESTURI);
@@ -59,7 +59,7 @@ final class RESTRetrieve extends RESTQuery {
 
       final String serial = http.serialization;
       final SerializerProp sprop = new SerializerProp(serial);
-      final Serializer ser = Serializer.get(http.out, sprop);
+      final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
       http.initResponse(sprop);
 
       ser.openElement(DATABASE, DataText.T_NAME, token(http.db()),
@@ -72,13 +72,13 @@ final class RESTRetrieve extends RESTQuery {
       // retrieve raw file; prefix user parameters with media type
       final String ct = SerializerProp.S_MEDIA_TYPE[0] + "=" + contentType(http);
       http.initResponse(new SerializerProp(ct + ',' + http.serialization));
-      session.setOutputStream(http.out);
+      session.setOutputStream(http.res.getOutputStream());
       session.execute(new Retrieve(http.dbpath()));
     } else {
       // retrieve xml file
       http.initResponse(new SerializerProp(http.serialization));
       session.execute(new Set(Prop.SERIALIZER, serial(http)));
-      session.setOutputStream(http.out);
+      session.setOutputStream(http.res.getOutputStream());
       session.query(".").execute();
     }
   }

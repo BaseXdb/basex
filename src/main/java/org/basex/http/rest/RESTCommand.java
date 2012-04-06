@@ -36,7 +36,7 @@ public class RESTCommand extends RESTCode {
 
     // perform command
     final Session session = http.session();
-    session.setOutputStream(http.out);
+    session.setOutputStream(http.res.getOutputStream());
     session.execute(input);
   }
 }
