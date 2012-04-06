@@ -1,24 +1,20 @@
 package org.basex.test.data;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.basex.build.DiskBuilder;
-import org.basex.build.Parser;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.DropDB;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.io.random.TableDiskAccess;
-import org.basex.util.Util;
-import static org.junit.Assert.*;
 import static org.basex.data.DataText.*;
+import static org.junit.Assert.*;
+
+import java.io.*;
+import java.lang.reflect.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.random.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the update functionality of the block storage.
@@ -26,13 +22,9 @@ import static org.basex.data.DataText.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Tim Petrowsky
  */
-public final class DiskTableTest {
+public final class DiskTableTest extends SandboxTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "src/test/resources/xmark.xml";
-  /** Test database name. */
-  private static final String DB = Util.name(DiskTableTest.class);
-  /** Test file we do updates with. */
-  private static final Context CONTEXT = new Context();
 
   /** BlockStorage. */
   private TableDiskAccess tda;
@@ -52,8 +44,8 @@ public final class DiskTableTest {
    */
   @BeforeClass
   public static void setUpBeforeClass() {
-    CONTEXT.prop.set(Prop.TEXTINDEX, false);
-    CONTEXT.prop.set(Prop.ATTRINDEX, false);
+    context.prop.set(Prop.TEXTINDEX, false);
+    context.prop.set(Prop.ATTRINDEX, false);
   }
 
   /**
@@ -62,8 +54,8 @@ public final class DiskTableTest {
   @Before
   public void setUp() {
     try {
-      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), CONTEXT.prop);
-      data = new DiskBuilder(DB, parser, CONTEXT).build();
+      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), context.prop);
+      data = new DiskBuilder(NAME, parser, context).build();
       size = data.meta.size;
       data.close();
       tda = new TableDiskAccess(data.meta, DATATBL);
@@ -87,7 +79,7 @@ public final class DiskTableTest {
   public void tearDown() {
     try {
       if(tda != null) tda.close();
-      DropDB.drop(DB, CONTEXT);
+      DropDB.drop(NAME, context);
     } catch(final Exception ex) {
       Util.stack(ex);
     }

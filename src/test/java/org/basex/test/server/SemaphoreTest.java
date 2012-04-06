@@ -1,21 +1,16 @@
 package org.basex.test.server;
 
-import org.basex.BaseXServer;
-import static org.basex.core.Text.ADMIN;
-import static org.basex.core.Text.LOCALHOST;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.server.ClientSession;
-import org.basex.server.Session;
-import org.basex.test.*;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import static org.junit.Assert.fail;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.util.Random;
+import java.io.*;
+import java.util.*;
+
+import org.basex.*;
+import org.basex.core.cmd.*;
+import org.basex.server.*;
+import org.basex.test.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the order of incoming commands.
@@ -48,7 +43,7 @@ public final class SemaphoreTest extends SandboxTest {
   @BeforeClass
   public static void start() throws IOException {
     server = createServer();
-    sess = newSession();
+    sess = createClient();
   }
 
   /**
@@ -87,15 +82,6 @@ public final class SemaphoreTest extends SandboxTest {
     for(final Client c : cl) c.session.close();
   }
 
-  /**
-   * Returns a session instance.
-   * @return session
-   * @throws IOException exception
-   */
-  static ClientSession newSession() throws IOException {
-    return new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
-  }
-
   /** Single client. */
   static class Client extends Thread {
     /** Client session. */
@@ -106,7 +92,7 @@ public final class SemaphoreTest extends SandboxTest {
      */
     public Client() {
       try {
-        session = newSession();
+        session = createClient();
       } catch(final IOException ex) {
         fail(Util.message(ex));
       }

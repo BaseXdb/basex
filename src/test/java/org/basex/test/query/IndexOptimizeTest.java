@@ -27,9 +27,9 @@ public final class IndexOptimizeTest extends SandboxTest {
    */
   @BeforeClass
   public static void start() throws Exception {
-    new DropDB(NAME).execute(CONTEXT);
-    new Set(Prop.FTINDEX, true).execute(CONTEXT);
-    new Set(Prop.QUERYINFO, true).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
+    new Set(Prop.FTINDEX, true).execute(context);
+    new Set(Prop.QUERYINFO, true).execute(context);
   }
 
   /**
@@ -38,7 +38,7 @@ public final class IndexOptimizeTest extends SandboxTest {
    */
   @AfterClass
   public static void stop() throws Exception {
-    new DropDB(NAME).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -49,7 +49,7 @@ public final class IndexOptimizeTest extends SandboxTest {
   @Test
   public void openDocTest() throws Exception {
     createDoc();
-    new Open(NAME).execute(CONTEXT);
+    new Open(NAME).execute(context);
     check("//*[text() = '1']");
     check("data(//*[@* = 'y'])", "1");
     check("data(//@*[. = 'y'])", "y");
@@ -64,7 +64,7 @@ public final class IndexOptimizeTest extends SandboxTest {
   @Test
   public void openCollTest() throws Exception {
     createColl();
-    new Open(NAME).execute(CONTEXT);
+    new Open(NAME).execute(context);
     check("//*[text() = '1']");
     check("//*[text() contains text '1']");
   }
@@ -124,7 +124,7 @@ public final class IndexOptimizeTest extends SandboxTest {
   @Test
   public void ftTest() throws Exception {
     createDoc();
-    new Open(NAME).execute(CONTEXT);
+    new Open(NAME).execute(context);
     check("data(//*[text() <- '1'])", "1");
     check("data(//*[text() <- '1 2' any word])", "1 2 3");
     check("//*[text() <- {'2','4'} all]", "");
@@ -138,9 +138,9 @@ public final class IndexOptimizeTest extends SandboxTest {
    */
   @Test
   public void ftTestLang() throws Exception {
-    new Set(Prop.LANGUAGE, "de").execute(CONTEXT);
+    new Set(Prop.LANGUAGE, "de").execute(context);
     createDoc();
-    new Open(NAME).execute(CONTEXT);
+    new Open(NAME).execute(context);
     check("//text()[. contains text 'test' using language 'de']");
     check("//text()[. contains text 'test' using language 'German']");
   }
@@ -170,8 +170,8 @@ public final class IndexOptimizeTest extends SandboxTest {
    * @throws Exception exception
    */
   private static void createDoc() throws Exception {
-    new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a></xml>").execute(CONTEXT);
-    new Close().execute(CONTEXT);
+    new CreateDB(NAME, "<xml><a x='y'>1</a><a>2 3</a></xml>").execute(context);
+    new Close().execute(context);
   }
 
   /**
@@ -179,11 +179,11 @@ public final class IndexOptimizeTest extends SandboxTest {
    * @throws Exception exception
    */
   private static void createColl() throws Exception {
-    new CreateDB(NAME).execute(CONTEXT);
-    new Add("one", "<xml><a>1</a><a>2 3</a></xml>").execute(CONTEXT);
-    new Add("two", "<xml><a>4</a><a>5 6</a></xml>").execute(CONTEXT);
-    new Optimize().execute(CONTEXT);
-    new Close().execute(CONTEXT);
+    new CreateDB(NAME).execute(context);
+    new Add("one", "<xml><a>1</a><a>2 3</a></xml>").execute(context);
+    new Add("two", "<xml><a>4</a><a>5 6</a></xml>").execute(context);
+    new Optimize().execute(context);
+    new Close().execute(context);
   }
 
   /**
@@ -203,7 +203,7 @@ public final class IndexOptimizeTest extends SandboxTest {
   private static void check(final String query, final String result) {
     // compile query
     ArrayOutput plan = null;
-    QueryProcessor qp = new QueryProcessor(query, CONTEXT);
+    QueryProcessor qp = new QueryProcessor(query, context);
     try {
       ArrayOutput ao = new ArrayOutput();
       Serializer ser = qp.getSerializer(ao);
@@ -218,7 +218,7 @@ public final class IndexOptimizeTest extends SandboxTest {
       qp.plan(Serializer.get(plan));
 
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
-          "[self::IndexAccess|self::FTIndexAccess]", CONTEXT);
+          "[self::IndexAccess|self::FTIndexAccess]", context);
       ao = new ArrayOutput();
       ser = qp.getSerializer(ao);
       qp.execute().serialize(ser);

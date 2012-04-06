@@ -1,10 +1,11 @@
 package org.basex.test.data;
 
-import org.basex.index.IdPreMap;
-import static org.junit.Assert.fail;
-import org.junit.Before;
+import static org.junit.Assert.*;
 
-import java.util.ArrayList;
+import java.util.*;
+
+import org.basex.index.*;
+import org.junit.*;
 
 /**
  * Base class with common functionality for all ID -> PRE mapping tests.

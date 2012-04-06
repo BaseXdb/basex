@@ -6,7 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.index.IndexToken.*;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.test.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -64,19 +64,19 @@ public final class PinTest extends SandboxTest {
    * DBs & User {@link #NAME} and {@link #NAME2}
    */
   static void cleanUp() {
-    ok(new Close(), CONTEXT);
+    ok(new Close(), context);
     ok(new Close(), CONTEXT2);
-    ok(new DropDB(NAME), CONTEXT);
-    ok(new DropDB(NAME2), CONTEXT);
-    ok(new DropUser(NAME), CONTEXT);
-    ok(new DropUser(NAME2), CONTEXT);
+    ok(new DropDB(NAME), context);
+    ok(new DropDB(NAME2), context);
+    ok(new DropUser(NAME), context);
+    ok(new DropUser(NAME2), context);
   }
 
   /** Test ADD, DELETE, RENAME, REPLACE and STORE. */
   @Test
   public void update() {
     // create database and perform update
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     // open database by second process
     ok(new Check(NAME), CONTEXT2);
     // fail, close database and succeed
@@ -99,45 +99,45 @@ public final class PinTest extends SandboxTest {
   @Test
   public void copy() {
     // create databases and open by second context
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     ok(new Check(NAME), CONTEXT2);
     // copy database (may be opened by multiple databases)
-    ok(new Copy(NAME, NAME2), CONTEXT);
+    ok(new Copy(NAME, NAME2), context);
     // open second database and run update operation
-    ok(new Open(NAME2), CONTEXT);
-    ok(new Add(FN, FILE), CONTEXT);
+    ok(new Open(NAME2), context);
+    ok(new Add(FN, FILE), context);
     // drop first database and copy back
     ok(new Close(), CONTEXT2);
-    ok(new DropDB(NAME), CONTEXT);
-    ok(new Copy(NAME2, NAME), CONTEXT);
+    ok(new DropDB(NAME), context);
+    ok(new Copy(NAME2, NAME), context);
   }
 
   /** Test CREATE BACKUP and RESTORE. */
   @Test
   public void backupRestore() {
     // create databases and open by second context
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     ok(new Check(NAME), CONTEXT2);
     // copy database (may be opened by multiple databases)
-    ok(new CreateBackup(NAME), CONTEXT);
+    ok(new CreateBackup(NAME), context);
     // fail, close database and succeed
     noCloseOk(new Restore(NAME));
     // run update operation to ensure that no pin files were zipped
-    ok(new Add(FN, FILE), CONTEXT);
+    ok(new Add(FN, FILE), context);
   }
 
   /** Test CREATE DB, DROP DB and ALTER DB. */
   @Test
   public void createDropAlterDB() {
     // create database
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     // create database with same name
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     // block second process
     no(new CreateDB(NAME), CONTEXT2);
     no(new CreateDB(NAME), CONTEXT2);
     // create database with different name
-    ok(new CreateDB(NAME2), CONTEXT);
+    ok(new CreateDB(NAME2), context);
     // allow second process
     ok(new CreateDB(NAME), CONTEXT2);
     ok(new CreateDB(NAME), CONTEXT2);
@@ -154,10 +154,10 @@ public final class PinTest extends SandboxTest {
     ok(new CreateDB(NAME), CONTEXT2);
     ok(new DropDB(NAME), CONTEXT2);
     // create databases and open by second context
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     ok(new Check(NAME), CONTEXT2);
     // fail, close database and succeed
-    ok(new DropDB(NAME2), CONTEXT);
+    ok(new DropDB(NAME2), context);
     noCloseOk(new AlterDB(NAME, NAME2));
   }
 
@@ -165,20 +165,20 @@ public final class PinTest extends SandboxTest {
   @Test
   public void createDropAlterUser() {
     // create and alter users (open issue: allow this if other instances are opened?)
-    ok(new CreateUser(NAME, Token.md5("admin")), CONTEXT);
-    ok(new AlterUser(NAME, Token.md5("abc")), CONTEXT);
+    ok(new CreateUser(NAME, Token.md5("admin")), context);
+    ok(new AlterUser(NAME, Token.md5("abc")), context);
     // create databases and open by second context
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     ok(new Check(NAME), CONTEXT2);
     // create databases and open by second context
-    ok(new AlterUser(NAME, Token.md5("abc")), CONTEXT);
+    ok(new AlterUser(NAME, Token.md5("abc")), context);
   }
 
   /** Test CREATE INDEX and DROP INDEX. */
   @Test
   public void createDropIndex() {
     // create databases and open by second context
-    ok(new CreateDB(NAME), CONTEXT);
+    ok(new CreateDB(NAME), context);
     ok(new Check(NAME), CONTEXT2);
     // fail, close database and succeed
     noCloseOk(new CreateIndex(IndexType.TEXT));
@@ -191,10 +191,10 @@ public final class PinTest extends SandboxTest {
   @Test
   public void xquery() {
     // create databases and open by second context
-    ok(new CreateDB(NAME, FILE), CONTEXT);
+    ok(new CreateDB(NAME, FILE), context);
     ok(new Check(NAME), CONTEXT2);
     // perform read-only queries
-    ok(new XQuery("."), CONTEXT);
+    ok(new XQuery("."), context);
     ok(new XQuery("."), CONTEXT2);
     // perform updating query: fail, close database and succeed
     noCloseOk(new XQuery("delete node /*"));
@@ -207,11 +207,11 @@ public final class PinTest extends SandboxTest {
    */
   private static void noCloseOk(final Command cmd) {
     // command is supposed to fail, because database is opened by two contexts
-    no(cmd, CONTEXT);
+    no(cmd, context);
     // close database in second context
     ok(new Close(), CONTEXT2);
     // command should now succeed
-    ok(cmd, CONTEXT);
+    ok(cmd, context);
   }
 
   /**

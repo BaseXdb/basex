@@ -2,12 +2,12 @@ package org.basex.test.io;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.io.*;
 
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * Test class for the BufferInput method.

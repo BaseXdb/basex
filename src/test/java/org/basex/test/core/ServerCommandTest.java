@@ -30,7 +30,7 @@ public final class ServerCommandTest extends CommandTest {
   @BeforeClass
   public static void start() throws IOException {
     server = createServer();
-    session = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
+    session = createClient();
     cleanUp();
   }
 
@@ -58,8 +58,8 @@ public final class ServerCommandTest extends CommandTest {
     ok(new Kill(ADMIN));
     ok(new Kill(ADMIN + '2'));
     ok(new Kill(Prop.NAME + '*'));
-    ok(new CreateUser(NAME2, Token.md5("test")));
-    final ClientSession cs = new ClientSession(LOCALHOST, 9999, NAME2, "test");
+    ok(new CreateUser(NAME2, Token.md5(NAME2)));
+    final ClientSession cs = createClient(NAME2, NAME2);
     ok(new Kill(NAME2));
     ok(new Kill(NAME2 + '?'));
     cs.close();

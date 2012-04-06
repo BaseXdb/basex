@@ -1,11 +1,10 @@
 package org.basex.test.util;
 
-import org.basex.util.Version;
-
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import org.junit.Test;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * EXPath package API: Version tests.

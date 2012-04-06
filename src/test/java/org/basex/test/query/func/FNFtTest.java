@@ -2,18 +2,11 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateIndex;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the XQuery full-text extensions.
@@ -22,8 +15,6 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public final class FNFtTest extends AdvancedQueryTest {
-  /** Name of test database. */
-  private static final String DB = Util.name(FNFtTest.class);
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
 
@@ -33,8 +24,8 @@ public final class FNFtTest extends AdvancedQueryTest {
    */
   @Before
   public void initTest() throws BaseXException {
-    new CreateDB(DB, FILE).execute(CONTEXT);
-    new CreateIndex("fulltext").execute(CONTEXT);
+    new CreateDB(NAME, FILE).execute(context);
+    new CreateIndex("fulltext").execute(context);
   }
 
   /**
@@ -50,12 +41,12 @@ public final class FNFtTest extends AdvancedQueryTest {
     query(_FT_SEARCH.args(" . ", "XXX"), "");
 
     // apply index options to query term
-    new Set(Prop.STEMMING, true).execute(CONTEXT);
-    new CreateIndex("fulltext").execute(CONTEXT);
+    new Set(Prop.STEMMING, true).execute(context);
+    new CreateIndex("fulltext").execute(context);
     contains(_FT_SEARCH.args(" . ", "Exercises") + "/..",
         "<li>Exercise 1</li>");
-    new Set(Prop.STEMMING, false).execute(CONTEXT);
-    new CreateIndex("fulltext").execute(CONTEXT);
+    new Set(Prop.STEMMING, false).execute(context);
+    new CreateIndex("fulltext").execute(context);
   }
 
   /**
@@ -124,16 +115,16 @@ public final class FNFtTest extends AdvancedQueryTest {
   @Test
   public void ftTokens() throws BaseXException {
     check(_FT_TOKENS);
-    new CreateIndex(IndexType.FULLTEXT).execute(CONTEXT);
+    new CreateIndex(IndexType.FULLTEXT).execute(context);
 
-    String entries = _FT_TOKENS.args(DB);
+    String entries = _FT_TOKENS.args(NAME);
     query("count(" + entries + ')', 6);
     query("exists(" + entries + "/self::value)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count = 2", "true");
     query(entries + "/@count = 3", "false");
 
-    entries = _FT_TOKENS.args(DB, "a");
+    entries = _FT_TOKENS.args(NAME, "a");
     query("count(" + entries + ')', 1);
   }
 
@@ -144,18 +135,8 @@ public final class FNFtTest extends AdvancedQueryTest {
   public void ftTokenize() {
     check(_FT_TOKENIZE);
     query(_FT_TOKENIZE.args("A bc"), "a bc");
-    query("declare ft-option using stemming; " +
-        _FT_TOKENIZE.args("Gifts"), "gift");
+    query("declare ft-option using stemming; " + _FT_TOKENIZE.args("Gifts"), "gift");
     query("count(" + _FT_TOKENIZE.args("") + ')', "0");
     query("count(" + _FT_TOKENIZE.args("a!b:c") + ')', "3");
-  }
-
-  /**
-   * Finishes the code.
-   * @throws BaseXException database exception
-   */
-  @AfterClass
-  public static void finish() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
   }
 }

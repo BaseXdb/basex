@@ -10,7 +10,6 @@ import org.basex.core.cmd.*;
 import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
-import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -20,8 +19,6 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public final class FNDbTest extends AdvancedQueryTest {
-  /** Name of test database. */
-  private static final String DB = Util.name(FNDbTest.class);
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** Test folder. */
@@ -43,7 +40,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Before
   public void initTest() throws BaseXException {
-    new CreateDB(DB, FILE).execute(CONTEXT);
+    new CreateDB(NAME, FILE).execute(context);
   }
 
   /**
@@ -52,7 +49,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -62,18 +59,18 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOpen() throws BaseXException {
     check(_DB_OPEN);
-    query(COUNT.args(_DB_OPEN.args(DB)), "1");
-    query(COUNT.args(_DB_OPEN.args(DB, "")), "1");
-    query(COUNT.args(_DB_OPEN.args(DB, "unknown")), "0");
+    query(COUNT.args(_DB_OPEN.args(NAME)), "1");
+    query(COUNT.args(_DB_OPEN.args(NAME, "")), "1");
+    query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
 
     // close database instance
-    new Close().execute(CONTEXT);
-    query(COUNT.args(_DB_OPEN.args(DB, "unknown")), "0");
-    query(_DB_OPEN.args(DB) + "//title/text()", "XML");
+    new Close().execute(context);
+    query(COUNT.args(_DB_OPEN.args(NAME, "unknown")), "0");
+    query(_DB_OPEN.args(NAME) + "//title/text()", "XML");
 
     // run function on non-existing database
-    new DropDB(DB).execute(CONTEXT);
-    error(_DB_OPEN.args(DB), Err.NODB);
+    new DropDB(NAME).execute(context);
+    error(_DB_OPEN.args(NAME), Err.NODB);
   }
 
   /**
@@ -82,8 +79,8 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOpenPre() {
     check(_DB_OPEN_PRE);
-    query(_DB_OPEN_PRE.args(DB, 0) + "//title/text()", "XML");
-    error(_DB_OPEN_PRE.args(DB, -1), Err.IDINVALID);
+    query(_DB_OPEN_PRE.args(NAME, 0) + "//title/text()", "XML");
+    error(_DB_OPEN_PRE.args(NAME, -1), Err.IDINVALID);
   }
 
   /**
@@ -92,8 +89,8 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOpenId() {
     check(_DB_OPEN_ID);
-    query(_DB_OPEN_ID.args(DB, 0) + "//title/text()", "XML");
-    error(_DB_OPEN_ID.args(DB, -1), Err.IDINVALID);
+    query(_DB_OPEN_ID.args(NAME, 0) + "//title/text()", "XML");
+    error(_DB_OPEN_ID.args(NAME, -1), Err.IDINVALID);
   }
 
   /**
@@ -104,11 +101,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbText() throws BaseXException {
     check(_DB_TEXT);
     // run function without and with index
-    new DropIndex("text").execute(CONTEXT);
-    query(_DB_TEXT.args(DB, "XML"), "XML");
-    new CreateIndex("text").execute(CONTEXT);
-    query(_DB_TEXT.args(DB, "XML"), "XML");
-    query(_DB_TEXT.args(DB, "XXX"), "");
+    new DropIndex("text").execute(context);
+    query(_DB_TEXT.args(NAME, "XML"), "XML");
+    new CreateIndex("text").execute(context);
+    query(_DB_TEXT.args(NAME, "XML"), "XML");
+    query(_DB_TEXT.args(NAME, "XXX"), "");
   }
 
   /**
@@ -119,13 +116,13 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbAttribute() throws BaseXException {
     check(_DB_ATTRIBUTE);
     // run function without and with index
-    new DropIndex("attribute").execute(CONTEXT);
-    query(DATA.args(_DB_ATTRIBUTE.args(DB, "0")), "0");
-    new CreateIndex("attribute").execute(CONTEXT);
-    query(DATA.args(_DB_ATTRIBUTE.args(DB, "0")), "0");
-    query(DATA.args(_DB_ATTRIBUTE.args(DB, "0", "id")), "0");
-    query(DATA.args(_DB_ATTRIBUTE.args(DB, "0", "XXX")), "");
-    query(DATA.args(_DB_ATTRIBUTE.args(DB, "XXX")), "");
+    new DropIndex("attribute").execute(context);
+    query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
+    new CreateIndex("attribute").execute(context);
+    query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
+    query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "id")), "0");
+    query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "XXX")), "");
+    query(DATA.args(_DB_ATTRIBUTE.args(NAME, "XXX")), "");
   }
 
   /**
@@ -136,11 +133,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbFulltext() throws BaseXException {
     check(_DB_FULLTEXT);
     // run function without and with index
-    new DropIndex("fulltext").execute(CONTEXT);
-    error(_DB_FULLTEXT.args(DB, "assignments"), Err.NOINDEX);
-    new CreateIndex("fulltext").execute(CONTEXT);
-    query(_DB_FULLTEXT.args(DB, "assignments"), "Assignments");
-    query(_DB_FULLTEXT.args(DB, "XXX"), "");
+    new DropIndex("fulltext").execute(context);
+    error(_DB_FULLTEXT.args(NAME, "assignments"), Err.NOINDEX);
+    new CreateIndex("fulltext").execute(context);
+    query(_DB_FULLTEXT.args(NAME, "assignments"), "Assignments");
+    query(_DB_FULLTEXT.args(NAME, "XXX"), "");
   }
 
   /**
@@ -151,14 +148,14 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbList() throws BaseXException {
     check(_DB_LIST);
     // add documents
-    new Add("test/docs", FLDR).execute(CONTEXT);
-    contains(_DB_LIST.args(DB), "test/");
+    new Add("test/docs", FLDR).execute(context);
+    contains(_DB_LIST.args(NAME), "test/");
     // create two other database and compare substring
-    new CreateDB(DB + 1).execute(CONTEXT);
-    new CreateDB(DB + 2).execute(CONTEXT);
-    contains(_DB_LIST.args(), DB + 1 + ' ' + DB + 2);
-    new DropDB(DB + 1).execute(CONTEXT);
-    new DropDB(DB + 2).execute(CONTEXT);
+    new CreateDB(NAME + 1).execute(context);
+    new CreateDB(NAME + 2).execute(context);
+    contains(_DB_LIST.args(), NAME + 1 + ' ' + NAME + 2);
+    new DropDB(NAME + 1).execute(context);
+    new DropDB(NAME + 2).execute(context);
   }
 
   /**
@@ -167,17 +164,17 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbListDetails() {
     check(_DB_LIST_DETAILS);
-    query(_DB_ADD.args(DB, "\"<a/>\"", "xml"));
-    query(_DB_STORE.args(DB, "raw", "bla"));
+    query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
 
-    final String xmlCall = _DB_LIST_DETAILS.args(DB, "xml");
+    final String xmlCall = _DB_LIST_DETAILS.args(NAME, "xml");
     query(xmlCall + "/@raw/data()", "false");
     query(xmlCall + "/@content-type/data()", MimeTypes.APP_XML);
     query(xmlCall + "/@modified-date/xs:dateTime(.)");
     query(xmlCall + "/@size/data()", "");
     query(xmlCall + "/text()", "xml");
 
-    final String rawCall = _DB_LIST_DETAILS.args(DB, "raw");
+    final String rawCall = _DB_LIST_DETAILS.args(NAME, "raw");
     query(rawCall + "/@raw/data()", "true");
     query(rawCall + "/@content-type/data()", MimeTypes.APP_OCTET);
     query(rawCall + "/@modified-date/xs:dateTime(.) > " +
@@ -185,7 +182,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(rawCall + "/@size/data()", "3");
     query(rawCall + "/text()", "raw");
 
-    query(_DB_LIST_DETAILS.args(DB, "test"), "");
+    query(_DB_LIST_DETAILS.args(NAME, "test"), "");
     error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), Err.NODB);
   }
 
@@ -204,7 +201,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbInfo() {
     check(_DB_INFO);
-    query("count(" + _DB_INFO.args(DB) + "//" +
+    query("count(" + _DB_INFO.args(NAME) + "//" +
         SIZE.replaceAll(" |-", "").toLowerCase(Locale.ENGLISH) + ')', 1);
   }
 
@@ -243,32 +240,32 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbAdd() {
     check(_DB_ADD);
-    query(_DB_ADD.args(DB, "\"<root/>\"", "t1.xml"));
-    query(COUNT.args(COLLECTION.args(DB + "/t1.xml") + "/root"), "1");
+    query(_DB_ADD.args(NAME, "\"<root/>\"", "t1.xml"));
+    query(COUNT.args(COLLECTION.args(NAME + "/t1.xml") + "/root"), "1");
 
-    query(_DB_ADD.args(DB, " document { <root/> }", "t2.xml"));
-    query(COUNT.args(COLLECTION.args(DB + "/t2.xml") + "/root"), "1");
+    query(_DB_ADD.args(NAME, " document { <root/> }", "t2.xml"));
+    query(COUNT.args(COLLECTION.args(NAME + "/t2.xml") + "/root"), "1");
 
-    query(_DB_ADD.args(DB, " document { <root/> }", "test/t3.xml"));
-    query(COUNT.args(COLLECTION.args(DB + "/test/t3.xml") + "/root"), "1");
+    query(_DB_ADD.args(NAME, " document { <root/> }", "test/t3.xml"));
+    query(COUNT.args(COLLECTION.args(NAME + "/test/t3.xml") + "/root"), "1");
 
-    query(_DB_ADD.args(DB, FILE, "in/"));
-    query(COUNT.args(COLLECTION.args(DB + "/in/input.xml") + "/html"), "1");
+    query(_DB_ADD.args(NAME, FILE, "in/"));
+    query(COUNT.args(COLLECTION.args(NAME + "/in/input.xml") + "/html"), "1");
 
-    query(_DB_ADD.args(DB, FILE, "test/t4.xml"));
-    query(COUNT.args(COLLECTION.args(DB + "/test/t4.xml") + "/html"), "1");
+    query(_DB_ADD.args(NAME, FILE, "test/t4.xml"));
+    query(COUNT.args(COLLECTION.args(NAME + "/test/t4.xml") + "/html"), "1");
 
-    query(_DB_ADD.args(DB, FLDR, "test/dir"));
-    query(COUNT.args(COLLECTION.args(DB + "/test/dir")), NFLDR);
+    query(_DB_ADD.args(NAME, FLDR, "test/dir"));
+    query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), NFLDR);
 
     query("for $f in " + _FILE_LIST.args(FLDR, "true()", "*.xml") +
-        " return " + _DB_ADD.args(DB, "$f", "dir"));
-    query(COUNT.args(COLLECTION.args(DB + "/dir")), NFLDR);
+        " return " + _DB_ADD.args(NAME, "$f", "dir"));
+    query(COUNT.args(COLLECTION.args(NAME + "/dir")), NFLDR);
 
     query("for $i in 1 to 3 return " +
-        _DB_ADD.args(DB, "\"<root/>\"", "\"doc\" || $i"));
+        _DB_ADD.args(NAME, "\"<root/>\"", "\"doc\" || $i"));
     query(COUNT.args(" for $i in 1 to 3 return " +
-        COLLECTION.args('"' + DB + "/doc\" || $i")), 3);
+        COLLECTION.args('"' + NAME + "/doc\" || $i")), 3);
   }
 
   /**
@@ -276,7 +273,7 @@ public final class FNDbTest extends AdvancedQueryTest {
    */
   @Test
   public void dbAddWithNS() {
-    query(_DB_ADD.args(DB, " document { <x xmlns:a='a' a:y='' /> }", "x"));
+    query(_DB_ADD.args(NAME, " document { <x xmlns:a='a' a:y='' /> }", "x"));
   }
 
   /**
@@ -286,9 +283,9 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbDelete() throws BaseXException {
     check(_DB_DELETE);
-    new Add("test/docs", FLDR).execute(CONTEXT);
-    query(_DB_DELETE.args(DB, "test"));
-    query(COUNT.args(COLLECTION.args(DB + "/test")), 0);
+    new Add("test/docs", FLDR).execute(context);
+    query(_DB_DELETE.args(NAME, "test"));
+    query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
   }
 
   /**
@@ -299,19 +296,19 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbRename() throws BaseXException {
     check(_DB_RENAME);
 
-    new Add("test/docs", FLDR).execute(CONTEXT);
-    query(COUNT.args(COLLECTION.args(DB + "/test")), NFLDR);
+    new Add("test/docs", FLDR).execute(context);
+    query(COUNT.args(COLLECTION.args(NAME + "/test")), NFLDR);
 
     // rename document
-    query(_DB_RENAME.args(DB, "test", "newtest"));
-    query(COUNT.args(COLLECTION.args(DB + "/test")), 0);
-    query(COUNT.args(COLLECTION.args(DB + "/newtest")), NFLDR);
+    query(_DB_RENAME.args(NAME, "test", "newtest"));
+    query(COUNT.args(COLLECTION.args(NAME + "/test")), 0);
+    query(COUNT.args(COLLECTION.args(NAME + "/newtest")), NFLDR);
 
     // rename binary file
-    query(_DB_STORE.args(DB, "one", ""));
-    query(_DB_RENAME.args(DB, "one", "two"));
-    query(_DB_RETRIEVE.args(DB, "two"));
-    error(_DB_RETRIEVE.args(DB, "one"), Err.RESFNF);
+    query(_DB_STORE.args(NAME, "one", ""));
+    query(_DB_RENAME.args(NAME, "one", "two"));
+    query(_DB_RETRIEVE.args(NAME, "two"));
+    error(_DB_RETRIEVE.args(NAME, "one"), Err.RESFNF);
   }
 
   /**
@@ -322,20 +319,20 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbReplace() throws BaseXException {
     check(_DB_REPLACE);
 
-    new Add("test", FILE).execute(CONTEXT);
+    new Add("test", FILE).execute(context);
 
-    query(_DB_REPLACE.args(DB, FILE, "\"<R1/>\""));
-    query(COUNT.args(COLLECTION.args(DB + '/' + FILE) + "/R1"), 1);
-    query(COUNT.args(COLLECTION.args(DB + '/' + FILE) + "/R2"), 0);
+    query(_DB_REPLACE.args(NAME, FILE, "\"<R1/>\""));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 1);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 0);
 
-    query(_DB_REPLACE.args(DB, FILE, " document { <R2/> }"));
-    query(COUNT.args(COLLECTION.args(DB + '/' + FILE) + "/R1"), 0);
-    query(COUNT.args(COLLECTION.args(DB + '/' + FILE) + "/R2"), 1);
+    query(_DB_REPLACE.args(NAME, FILE, " document { <R2/> }"));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 1);
 
-    query(_DB_REPLACE.args(DB, FILE, FILE));
-    query(COUNT.args(COLLECTION.args(DB + '/' + FILE) + "/R1"), 0);
-    query(COUNT.args(COLLECTION.args(DB + '/' + FILE) + "/R2"), 0);
-    query(COUNT.args(COLLECTION.args(DB + '/' + FILE) + "/html"), 1);
+    query(_DB_REPLACE.args(NAME, FILE, FILE));
+    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R1"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/R2"), 0);
+    query(COUNT.args(COLLECTION.args(NAME + '/' + FILE) + "/html"), 1);
   }
 
   /**
@@ -344,9 +341,9 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbOptimize() {
     check(_DB_OPTIMIZE);
-    query(_DB_OPTIMIZE.args(DB));
-    query(_DB_OPTIMIZE.args(DB));
-    query(_DB_OPTIMIZE.args(DB, "true()"));
+    query(_DB_OPTIMIZE.args(NAME));
+    query(_DB_OPTIMIZE.args(NAME));
+    query(_DB_OPTIMIZE.args(NAME, "true()"));
   }
 
   /**
@@ -355,11 +352,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbRetrieve() {
     check(_DB_RETRIEVE);
-    error(_DB_RETRIEVE.args(DB, "raw"), Err.RESFNF);
-    query(_DB_STORE.args(DB, "raw", "xs:hexBinary('41')"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw") + ')', "41");
-    query(_DB_DELETE.args(DB, "raw"));
-    error(_DB_RETRIEVE.args(DB, "raw"), Err.RESFNF);
+    error(_DB_RETRIEVE.args(NAME, "raw"), Err.RESFNF);
+    query(_DB_STORE.args(NAME, "raw", "xs:hexBinary('41')"));
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw") + ')', "41");
+    query(_DB_DELETE.args(NAME, "raw"));
+    error(_DB_RETRIEVE.args(NAME, "raw"), Err.RESFNF);
   }
 
   /**
@@ -368,11 +365,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbStore() {
     check(_DB_STORE);
-    query(_DB_STORE.args(DB, "raw1", "xs:hexBinary('41')"));
-    query(_DB_STORE.args(DB, "raw2", "b"));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw2") + ')', "62");
-    query(_DB_STORE.args(DB, "raw3", 123));
-    query("xs:hexBinary(" + _DB_RETRIEVE.args(DB, "raw3") + ')', "313233");
+    query(_DB_STORE.args(NAME, "raw1", "xs:hexBinary('41')"));
+    query(_DB_STORE.args(NAME, "raw2", "b"));
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw2") + ')', "62");
+    query(_DB_STORE.args(NAME, "raw3", 123));
+    query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw3") + ')', "313233");
   }
 
   /**
@@ -381,11 +378,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbIsRaw() {
     check(_DB_IS_RAW);
-    query(_DB_ADD.args(DB, "\"<a/>\"", "xml"));
-    query(_DB_STORE.args(DB, "raw", "bla"));
-    query(_DB_IS_RAW.args(DB, "xml"), "false");
-    query(_DB_IS_RAW.args(DB, "raw"), "true");
-    query(_DB_IS_RAW.args(DB, "xxx"), "false");
+    query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(_DB_IS_RAW.args(NAME, "xml"), "false");
+    query(_DB_IS_RAW.args(NAME, "raw"), "true");
+    query(_DB_IS_RAW.args(NAME, "xxx"), "false");
   }
 
   /**
@@ -395,18 +392,18 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbExists() throws BaseXException {
     check(_DB_EXISTS);
-    query(_DB_ADD.args(DB, "\"<a/>\"", "x/xml"));
-    query(_DB_STORE.args(DB, "x/raw", "bla"));
+    query(_DB_ADD.args(NAME, "\"<a/>\"", "x/xml"));
+    query(_DB_STORE.args(NAME, "x/raw", "bla"));
     // checks if the specified resources exist (false expected for directories)
-    query(_DB_EXISTS.args(DB), "true");
-    query(_DB_EXISTS.args(DB, "x/xml"), "true");
-    query(_DB_EXISTS.args(DB, "x/raw"), "true");
-    query(_DB_EXISTS.args(DB, "xxx"), "false");
-    query(_DB_EXISTS.args(DB, "x"), "false");
-    query(_DB_EXISTS.args(DB, ""), "false");
+    query(_DB_EXISTS.args(NAME), "true");
+    query(_DB_EXISTS.args(NAME, "x/xml"), "true");
+    query(_DB_EXISTS.args(NAME, "x/raw"), "true");
+    query(_DB_EXISTS.args(NAME, "xxx"), "false");
+    query(_DB_EXISTS.args(NAME, "x"), "false");
+    query(_DB_EXISTS.args(NAME, ""), "false");
     // false expected for missing database
-    new DropDB(DB).execute(CONTEXT);
-    query(_DB_EXISTS.args(DB), "false");
+    new DropDB(NAME).execute(context);
+    query(_DB_EXISTS.args(NAME), "false");
   }
 
   /**
@@ -415,11 +412,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbIsXML() {
     check(_DB_IS_XML);
-    query(_DB_ADD.args(DB, "\"<a/>\"", "xml"));
-    query(_DB_STORE.args(DB, "raw", "bla"));
-    query(_DB_IS_XML.args(DB, "xml"), "true");
-    query(_DB_IS_XML.args(DB, "raw"), "false");
-    query(_DB_IS_XML.args(DB, "xxx"), "false");
+    query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(_DB_IS_XML.args(NAME, "xml"), "true");
+    query(_DB_IS_XML.args(NAME, "raw"), "false");
+    query(_DB_IS_XML.args(NAME, "xxx"), "false");
   }
 
   /**
@@ -428,10 +425,10 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbContentType() {
     check(_DB_CONTENT_TYPE);
-    query(_DB_ADD.args(DB, "\"<a/>\"", "xml"));
-    query(_DB_STORE.args(DB, "raw", "bla"));
-    query(_DB_CONTENT_TYPE.args(DB, "xml"), MimeTypes.APP_XML);
-    query(_DB_CONTENT_TYPE.args(DB, "raw"), MimeTypes.APP_OCTET);
-    error(_DB_CONTENT_TYPE.args(DB, "test"), Err.RESFNF);
+    query(_DB_ADD.args(NAME, "\"<a/>\"", "xml"));
+    query(_DB_STORE.args(NAME, "raw", "bla"));
+    query(_DB_CONTENT_TYPE.args(NAME, "xml"), MimeTypes.APP_XML);
+    query(_DB_CONTENT_TYPE.args(NAME, "raw"), MimeTypes.APP_OCTET);
+    error(_DB_CONTENT_TYPE.args(NAME, "test"), Err.RESFNF);
   }
 }

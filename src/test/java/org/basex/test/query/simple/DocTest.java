@@ -1,6 +1,6 @@
 package org.basex.test.query.simple;
 
-import org.basex.test.query.QueryTest;
+import org.basex.test.query.*;
 
 /**
  * Simple document tests.

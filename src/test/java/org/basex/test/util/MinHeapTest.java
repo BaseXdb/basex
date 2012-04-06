@@ -1,9 +1,11 @@
 package org.basex.test.util;
 
+import static org.junit.Assert.*;
+
 import java.util.*;
+
 import org.basex.util.*;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  * Tests for the {@link MinHeap} implementation.

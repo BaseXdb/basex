@@ -1,7 +1,7 @@
 package org.basex.test.query.func;
 
-import org.basex.test.query.AdvancedQueryTest;
-import org.junit.Test;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the Java bindings.

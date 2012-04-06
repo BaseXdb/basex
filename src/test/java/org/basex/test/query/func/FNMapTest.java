@@ -2,11 +2,11 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
-import org.basex.query.QueryText;
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.basex.util.Token;
-import org.junit.Test;
+import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests the XQuery functions prefixed with "map".

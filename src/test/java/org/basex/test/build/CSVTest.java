@@ -1,22 +1,15 @@
 package org.basex.test.build;
 
-import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
-import org.basex.io.IOFile;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.*;
+
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * CSV Parser Test.
@@ -24,13 +17,11 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class CSVTest {
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
-  /** Test database name. */
-  private static final String NAME = Util.name(CSVTest.class);
+public final class CSVTest extends SandboxTest {
   /** Test CSV file. */
   private static final String FILE = "src/test/resources/input.csv";
+  /** Temporary CSV file. */
+  private static final String TEMP = Prop.TMP + NAME + IO.CSVSUFFIX;
 
   /**
    * Creates the initial database.
@@ -38,7 +29,7 @@ public final class CSVTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new Set(Prop.PARSER, "csv").execute(CONTEXT);
+    new Set(Prop.PARSER, "csv").execute(context);
   }
 
   /**
@@ -46,7 +37,7 @@ public final class CSVTest {
    */
   @AfterClass
   public static void after() {
-    new IOFile(Prop.TMP, NAME).delete();
+    new IOFile(TEMP).delete();
   }
 
   /**
@@ -55,7 +46,7 @@ public final class CSVTest {
    */
   @Before
   public void init() throws BaseXException {
-    new Set(Prop.PARSEROPT, "header=true").execute(CONTEXT);
+    new Set(Prop.PARSEROPT, "header=true").execute(context);
   }
 
   /**
@@ -64,7 +55,7 @@ public final class CSVTest {
    */
   @After
   public void finish() throws BaseXException {
-    new DropDB(NAME).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -74,8 +65,8 @@ public final class CSVTest {
   @Test
   public void empty() throws Exception {
     write("");
-    new CreateDB(NAME, Prop.TMP + NAME).execute(CONTEXT);
-    assertEquals("<csv/>", new XQuery(".").execute(CONTEXT));
+    new CreateDB(NAME, TEMP).execute(context);
+    assertEquals("<csv/>", new XQuery(".").execute(context));
   }
 
   /**
@@ -84,13 +75,13 @@ public final class CSVTest {
    */
   @Test
   public void one() throws Exception {
-    new CreateDB(NAME, FILE).execute(CONTEXT);
-    assertEquals("3", new XQuery("count(//Name)").execute(CONTEXT));
-    assertEquals("2", new XQuery("count(//Email)").execute(CONTEXT));
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("3", new XQuery("count(//Name)").execute(context));
+    assertEquals("2", new XQuery("count(//Email)").execute(context));
 
-    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(CONTEXT);
-    new CreateDB(NAME, FILE).execute(CONTEXT);
-    assertEquals("3", new XQuery("count(//record)").execute(CONTEXT));
+    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(context);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("3", new XQuery("count(//record)").execute(context));
   }
 
   /**
@@ -99,9 +90,9 @@ public final class CSVTest {
    */
   @Test
   public void simple() throws Exception {
-    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(CONTEXT);
-    new CreateDB(NAME, FILE).execute(CONTEXT);
-    assertEquals("3", new XQuery("count(//record)").execute(CONTEXT));
+    new Set(Prop.PARSEROPT, "format=simple,header=true").execute(context);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("3", new XQuery("count(//record)").execute(context));
   }
 
   /**
@@ -110,9 +101,9 @@ public final class CSVTest {
    */
   @Test
   public void sep() throws Exception {
-    new Set(Prop.PARSEROPT, "separator=tab,header=true").execute(CONTEXT);
-    new CreateDB(NAME, FILE).execute(CONTEXT);
-    assertEquals("0", new XQuery("count(//Name)").execute(CONTEXT));
+    new Set(Prop.PARSEROPT, "separator=tab,header=true").execute(context);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("0", new XQuery("count(//Name)").execute(context));
   }
 
   /**
@@ -121,6 +112,6 @@ public final class CSVTest {
    * @throws IOException I/O exception
    */
   private static void write(final String data) throws IOException {
-    new IOFile(Prop.TMP, NAME).write(token(data));
+    new IOFile(TEMP).write(token(data));
   }
 }

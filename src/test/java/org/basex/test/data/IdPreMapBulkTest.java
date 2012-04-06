@@ -1,9 +1,8 @@
 package org.basex.test.data;
 
-import java.util.Random;
+import java.util.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * ID -> PRE mapping test.
@@ -15,9 +14,9 @@ public final class IdPreMapBulkTest extends IdPreMapBulkTestBase {
   /** Random number generator. */
   private static final Random RANDOM = new Random();
   /** Maximal number of bulk inserted/deleted records. */
-  private static final int BULK = 30;
+  private static final int BULK = 20;
   /** Number of times to repeat each test. */
-  private static final int ITER = 30;
+  private static final int ITER = 20;
 
   /** Set-up method. */
   @Before

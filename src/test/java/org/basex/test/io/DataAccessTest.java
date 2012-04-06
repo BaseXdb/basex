@@ -1,17 +1,13 @@
 package org.basex.test.io;
 
 import static org.junit.Assert.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+
+import java.io.*;
 
 import org.basex.io.*;
-import org.basex.io.random.DataAccess;
-import org.basex.util.Token;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.basex.io.random.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Tests for class {@link DataAccess}.

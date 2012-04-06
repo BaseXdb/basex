@@ -2,15 +2,11 @@ package org.basex.test;
 
 import static org.junit.Assert.*;
 
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.*;
-import org.basex.io.IOFile;
-import org.basex.io.out.NullOutput;
-import org.basex.util.Util;
-import org.junit.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
 
 /**
  * Tests the command-line arguments of the starter classes.
@@ -18,26 +14,11 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class MainTest {
+public abstract class MainTest extends SandboxTest {
   /** Null output stream. */
   static final PrintStream NULL = new PrintStream(new NullOutput());
-  /** Test database name. */
-  static final String NAME = Util.name(MainTest.class);
   /** Input file. */
-  static final IOFile IN = new IOFile(Prop.TMP + NAME + ".in");
-
-  /** Drop test database. */
-  @AfterClass
-  public static void cleanUp() {
-    final Context ctx = new Context();
-    try {
-      new DropDB(NAME).execute(ctx);
-    } catch(final BaseXException ex) {
-      Util.debug(ex);
-    } finally {
-      ctx.close();
-    }
-  }
+  static final IOFile INPUT = new IOFile(Prop.TMP + NAME + ".in");
 
   /**
    * Runs a request with the specified arguments.
@@ -53,8 +34,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  final void equals(final String exp, final String... args)
-      throws IOException {
+  final void equals(final String exp, final String... args) throws IOException {
     assertEquals(exp, run(args));
   }
 
@@ -65,9 +45,7 @@ public abstract class MainTest {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  final void contains(final String exp, final String... args)
-      throws IOException {
-
+  final void contains(final String exp, final String... args) throws IOException {
     final String result = run(args);
     if(!result.contains(exp)) {
       fail('\'' + exp + "' not contained in '" + result + "'.");

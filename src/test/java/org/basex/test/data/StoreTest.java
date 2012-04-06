@@ -2,18 +2,11 @@ package org.basex.test.data;
 
 import static org.junit.Assert.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.DataText;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * This class tests the stability of the database text store.
@@ -21,11 +14,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class StoreTest {
-  /** Test database name. */
-  private static final String DB = Util.name(StoreTest.class);
-  /** Global context. */
-  private static final Context CONTEXT = new Context();
+public final class StoreTest extends SandboxTest {
   /** Number of runs per client. */
   private static final int NQUERIES = 100;
 
@@ -36,9 +25,9 @@ public final class StoreTest {
   @BeforeClass
   public static void init() throws Exception {
     // speed up updates and create initial database
-    new Set(Prop.TEXTINDEX, false).execute(CONTEXT);
-    new Set(Prop.ATTRINDEX, false).execute(CONTEXT);
-    new Set(Prop.AUTOFLUSH, false).execute(CONTEXT);
+    new Set(Prop.TEXTINDEX, false).execute(context);
+    new Set(Prop.ATTRINDEX, false).execute(context);
+    new Set(Prop.AUTOFLUSH, false).execute(context);
   }
 
   /**
@@ -47,7 +36,7 @@ public final class StoreTest {
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -56,14 +45,14 @@ public final class StoreTest {
    */
   @Test
   public void replace() throws BaseXException {
-    new CreateDB(DB, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
-    final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
+    new CreateDB(NAME, "<X><A>q</A><A>q</A></X>").execute(context);
+    final long size = context.data().meta.dbfile(DataText.DATATXT).length();
     for(int n = 0; n < NQUERIES; n++) {
       final String qu =
           "for $a in //text() " +
           "let $d := math:random() " +
           "return replace node $a with $d";
-      new XQuery(qu).execute(CONTEXT);
+      new XQuery(qu).execute(context);
     }
     check(size);
   }
@@ -74,16 +63,16 @@ public final class StoreTest {
    */
   @Test
   public void deleteInsertTwo() throws BaseXException {
-    new CreateDB(DB, "<X><A>q</A><A>q</A></X>").execute(CONTEXT);
-    final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
+    new CreateDB(NAME, "<X><A>q</A><A>q</A></X>").execute(context);
+    final long size = context.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int n = 0; n < NQUERIES; n++) {
       String qu = "for $a in //text() return delete node $a";
-      new XQuery(qu).execute(CONTEXT);
+      new XQuery(qu).execute(context);
       qu = "for $a in //text() " +
           "let $d := xs:integer(math:random() * " + Integer.MAX_VALUE + ") " +
           "return insert node $a into $d";
-      new XQuery(qu).execute(CONTEXT);
+      new XQuery(qu).execute(context);
     }
     check(size);
   }
@@ -94,12 +83,12 @@ public final class StoreTest {
    */
   @Test
   public void deleteInsert() throws BaseXException {
-    new CreateDB(DB, "<X>abc</X>").execute(CONTEXT);
-    final long size = CONTEXT.data().meta.dbfile(DataText.DATATXT).length();
+    new CreateDB(NAME, "<X>abc</X>").execute(context);
+    final long size = context.data().meta.dbfile(DataText.DATATXT).length();
 
     for(int i = 0; i < NQUERIES; i++) {
-      new XQuery("delete node //text()").execute(CONTEXT);
-      new XQuery("insert node 'abc' into /X").execute(CONTEXT);
+      new XQuery("delete node //text()").execute(context);
+      new XQuery("insert node 'abc' into /X").execute(context);
     }
     check(size);
   }
@@ -109,6 +98,6 @@ public final class StoreTest {
    * @param old old size
    */
   private static void check(final long old) {
-    assertEquals(old, CONTEXT.data().meta.dbfile(DataText.DATATXT).length());
+    assertEquals(old, context.data().meta.dbfile(DataText.DATATXT).length());
   }
 }

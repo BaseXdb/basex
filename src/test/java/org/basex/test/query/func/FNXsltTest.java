@@ -2,9 +2,10 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 import static org.junit.Assert.*;
-import org.basex.query.func.Variable;
-import org.basex.test.query.AdvancedQueryTest;
-import org.junit.Test;
+
+import org.basex.query.func.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the XQuery utility functions prefixed with "xslt".

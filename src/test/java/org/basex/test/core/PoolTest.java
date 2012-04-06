@@ -1,23 +1,16 @@
 package org.basex.test.core;
 
-import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.BaseXServer;
-import org.basex.core.Command;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Open;
-import org.basex.server.ClientSession;
-import org.basex.server.Session;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.server.*;
 import org.basex.test.*;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class tests transaction and locking cases.
@@ -43,8 +36,8 @@ public final class PoolTest extends SandboxTest {
   @BeforeClass
   public static void start() throws Exception {
     server = createServer();
-    session1 = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
-    session2 = new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
+    session1 = createClient();
+    session2 = createClient();
   }
 
   /** Create and Drop Tests. */

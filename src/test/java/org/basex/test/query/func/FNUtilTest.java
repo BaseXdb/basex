@@ -6,9 +6,9 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.io.out.*;
-import org.basex.query.util.Err;
-import org.basex.test.query.AdvancedQueryTest;
-import org.junit.Test;
+import org.basex.query.util.*;
+import org.basex.test.query.*;
+import org.junit.*;
 
 /**
  * This class tests the XQuery utility functions prefixed with "util".

@@ -1,16 +1,12 @@
 package org.basex.test.build;
 
 import static org.junit.Assert.*;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.query.QueryProcessor;
-import org.basex.util.Util;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.query.*;
+import org.basex.test.*;
+import org.junit.*;
 
 /**
  * Tests queries on collections.
@@ -18,11 +14,7 @@ import org.junit.Test;
  * @author BaseX Team 2005-12, BSD License
  * @author Michael Seiferle
  */
-public final class CollectionPathTest {
-  /** Database context. */
-  private static final Context CONTEXT = new Context();
-  /** Test database name. */
-  private static final String DB = Util.name(CollectionPathTest.class);
+public final class CollectionPathTest extends SandboxTest {
   /** Test files directory. */
   private static final String DIR = "src/test/resources/";
   /** Test files. */
@@ -38,11 +30,11 @@ public final class CollectionPathTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new CreateDB(DB).execute(CONTEXT);
+    new CreateDB(NAME).execute(context);
     for(final String file : FILES) {
-      new Add(DIR, file).execute(CONTEXT);
+      new Add(DIR, file).execute(context);
     }
-    new Add("test/zipped", ZIP).execute(CONTEXT);
+    new Add("test/zipped", ZIP).execute(context);
   }
 
   /**
@@ -51,7 +43,7 @@ public final class CollectionPathTest {
    */
   @AfterClass
   public static void after() throws BaseXException {
-    new DropDB(DB).execute(CONTEXT);
+    new DropDB(NAME).execute(context);
   }
 
   /**
@@ -61,10 +53,10 @@ public final class CollectionPathTest {
   @Test
   public void findDoc() throws Exception {
     final String find =
-      "for $x in collection('" + DB + '/' + DIR + "xmark.xml') " +
+      "for $x in collection('" + NAME + '/' + DIR + "xmark.xml') " +
       "where $x//location contains text 'uzbekistan' " +
       "return $x";
-    final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
+    final QueryProcessor qp = new QueryProcessor(find, context);
     assertEquals(1, qp.execute().size());
     qp.close();
   }
@@ -75,8 +67,8 @@ public final class CollectionPathTest {
    */
   @Test
   public void findDocs() throws Exception {
-    final String find = "collection('" + DB + "/test/zipped') ";
-    final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
+    final String find = "collection('" + NAME + "/test/zipped') ";
+    final QueryProcessor qp = new QueryProcessor(find, context);
     assertEquals(4, qp.execute().size());
     qp.close();
   }
@@ -88,9 +80,9 @@ public final class CollectionPathTest {
   @Test
   public void baseUri() throws Exception {
     final String find =
-      "for $x in collection('" + DB + '/' + DIR + "xmark.xml') " +
+      "for $x in collection('" + NAME + '/' + DIR + "xmark.xml') " +
       "return base-uri($x)";
-    final QueryProcessor qp = new QueryProcessor(find, CONTEXT);
+    final QueryProcessor qp = new QueryProcessor(find, context);
     assertEquals(FILES[1], qp.iter().next().toJava());
     qp.close();
   }

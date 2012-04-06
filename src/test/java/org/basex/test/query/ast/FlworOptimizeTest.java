@@ -1,7 +1,8 @@
 package org.basex.test.query.ast;
 
-import static org.basex.core.Prop.NL;
-import org.junit.Test;
+import static org.basex.core.Prop.*;
+
+import org.junit.*;
 
 /**
  * Tests for rewritings of FLWOR-expressions.

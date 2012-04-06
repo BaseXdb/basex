@@ -3,9 +3,9 @@ package org.basex.test.query;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.ft.FTWildcard;
-import org.junit.Test;
+import org.basex.query.*;
+import org.basex.query.ft.*;
+import org.junit.*;
 
 /**
  * Wild-card parsing and matching tests.

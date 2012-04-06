@@ -38,7 +38,7 @@ public class CommandTest extends SandboxTest {
   */
   @BeforeClass
   public static void start() throws IOException {
-    session = new LocalSession(CONTEXT);
+    session = new LocalSession(context);
     cleanUp();
   }
 
@@ -171,11 +171,11 @@ public class CommandTest extends SandboxTest {
     no(new Cs("//li"));
     ok(new CreateDB(NAME, FILE));
     ok(new Cs("//  li"));
-    ok(CONTEXT.current(), 2);
+    ok(context.current(), 2);
     ok(new Cs("."));
-    ok(CONTEXT.current(), 2);
+    ok(context.current(), 2);
     ok(new Cs("/"));
-    ok(CONTEXT.current(), 1);
+    ok(context.current(), 1);
   }
 
   /** Command test. */
@@ -444,7 +444,7 @@ public class CommandTest extends SandboxTest {
     // deleting a backup passing the exact backup name as argument
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    ok(new DropBackup(CONTEXT.databases().listBackups().get(0)));
+    ok(new DropBackup(context.databases().listBackups().get(0)));
   }
 
   /**
@@ -460,7 +460,7 @@ public class CommandTest extends SandboxTest {
     // dropping a specific backup (database name + time stamp)
     ok(new CreateDB(NAME));
     ok(new CreateBackup(NAME));
-    final String[] b = CONTEXT.databases().listBackups(NAME).toArray();
+    final String[] b = context.databases().listBackups(NAME).toArray();
     ok(new DropBackup(b[0]));
 
     /* Creates 2 dbs: one with a short name (1), the other with a

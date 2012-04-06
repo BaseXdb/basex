@@ -1,6 +1,5 @@
 package org.basex.test.server;
 
-import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -48,13 +47,13 @@ public final class EventTest extends SandboxTest {
    */
   @Before
   public void startSessions() throws IOException {
-    session = newSession();
+    session = createClient();
     // drop event, if not done yet
     try {
       session.execute("drop event " + NAME);
     } catch(final IOException ex) { }
 
-    for(int i = 0; i < sessions.length; i++) sessions[i] = newSession();
+    for(int i = 0; i < sessions.length; i++) sessions[i] = createClient();
   }
 
   /**
@@ -228,15 +227,6 @@ public final class EventTest extends SandboxTest {
     session.execute("drop event " + NAME + 1);
   }
 
-  /**
-   * Returns a session instance.
-   * @return session
-   * @throws IOException exception
-   */
-  static ClientSession newSession() throws IOException {
-    return new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
-  }
-
   /** Single client. */
   static final class Client extends Thread {
     /** Client session. */
@@ -253,7 +243,7 @@ public final class EventTest extends SandboxTest {
      * @throws IOException I/O exception
      */
     public Client(final boolean f, final String v) throws IOException {
-      cs = newSession();
+      cs = createClient();
       first = f;
       value = v;
     }
