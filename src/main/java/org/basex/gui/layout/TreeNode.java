@@ -36,8 +36,7 @@ public abstract class TreeNode extends DefaultMutableTreeNode
    * @param bxt tree reference
    * @param d data reference
    */
-  TreeNode(final byte[] nm, final byte[] pth, final BaseXTree bxt,
-           final Data d) {
+  TreeNode(final byte[] nm, final byte[] pth, final BaseXTree bxt, final Data d) {
     name = nm;
     path = pth;
     tree = bxt;
@@ -75,8 +74,7 @@ public abstract class TreeNode extends DefaultMutableTreeNode
   abstract void load();
 
   @Override
-  public void treeWillExpand(final TreeExpansionEvent e)
-      throws ExpandVetoException {
+  public void treeWillExpand(final TreeExpansionEvent e) throws ExpandVetoException {
     if(equals(e.getPath().getLastPathComponent())) load();
   }
 
