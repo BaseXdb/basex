@@ -214,7 +214,7 @@ public final class FNDate extends StandardFunc {
       throws QueryException {
 
     final Item i = it.type.isUntyped() ? new Dat(it.string(info), info) :
-      checkType(it, AtomType.DAT);
+      new Dat((Date) checkType(it, AtomType.DAT));
     return adjust((Date) i, zon, d);
   }
 
@@ -230,7 +230,7 @@ public final class FNDate extends StandardFunc {
       throws QueryException {
 
     final Item i = it.type.isUntyped() ? new Dtm(it.string(info), info) :
-      checkType(it, AtomType.DTM);
+      new Dtm((Date) checkType(it, AtomType.DTM));
     return adjust((Date) i, zon, d);
   }
 
@@ -246,7 +246,7 @@ public final class FNDate extends StandardFunc {
       throws QueryException {
 
     final Item i = it.type.isUntyped() ? new Tim(it.string(info), info) :
-      checkType(it, AtomType.TIM);
+      new Tim((Date) checkType(it, AtomType.TIM));
     return adjust((Date) i, zon, d);
   }
 
