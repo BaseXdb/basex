@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -15,22 +16,24 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */
-public class FNPRepoTest extends AdvancedQueryTest {
+public class FNRepoTest extends AdvancedQueryTest {
   /** Test repository. */
   private static final String REPO = "src/test/resources/repo/";
-  /** Pkg3 directory. */
-  private static final String PKGDIR = normalize("http://www.pkg3.com-10.0");
   /** Pkg3 name. */
-  private static final String PKG3NAME = "http://www.pkg3.com";
+  private static final String PKG3 = "http://www.pkg3.com";
   /** Pkg4 name. */
-  private static final String PKG4NAME = "http://www.pkg4.com";
+  private static final String PKG4 = "http://www.pkg4.com";
+  /** Pkg3 directory. */
+  private static final String PKG3ID = PKG3 + "-10.0";
 
   /**
    * Prepare test.
    */
   @Before
-  public void setupBeforeClass() {
+  public void setupTest() {
+    context = new Context();
     context.mprop.set(MainProp.REPOPATH, REPO);
+    new IOFile(REPO, PKG3ID).delete();
   }
 
   /**
@@ -40,12 +43,13 @@ public class FNPRepoTest extends AdvancedQueryTest {
   public void install() {
     check(_REPO_INSTALL);
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
-    assertTrue(dir(PKGDIR));
-    assertTrue(file(PKGDIR + "/expath-pkg.xml"));
-    assertTrue(dir(PKGDIR + "/pkg3"));
-    assertTrue(dir(PKGDIR + "/pkg3/mod"));
-    assertTrue(file(PKGDIR + "/pkg3/mod/pkg3mod1.xql"));
-    query(_REPO_DELETE.args(PKGDIR));
+    final String dir = normalize(PKG3ID);
+    assertTrue(dir(dir));
+    assertTrue(file(dir + "/expath-pkg.xml"));
+    assertTrue(dir(dir + "/pkg3"));
+    assertTrue(dir(dir + "/pkg3/mod"));
+    assertTrue(file(dir + "/pkg3/mod/pkg3mod1.xql"));
+    query(_REPO_DELETE.args(PKG3));
   }
 
   /**
@@ -54,16 +58,19 @@ public class FNPRepoTest extends AdvancedQueryTest {
   @Test
   public void delete() {
     check(_REPO_DELETE);
-    // Install
+    // install
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
-    // Delete by directory name
-    query(_REPO_DELETE.args(PKGDIR));
-    assertTrue(!dir(PKGDIR));
-    // Install again
+    // delete by package name
+    final String dir = normalize(PKG3ID);
+    assertTrue("Directory not found: " + dir, dir(dir));
+    query(_REPO_DELETE.args(PKG3));
+    assertFalse("Directory still exists: " + dir, dir(dir));
+
+    // install again
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
-    // Delete by package name
-    query(_REPO_DELETE.args("http://www.pkg3.com"));
-    assertTrue(!dir(PKGDIR));
+    // delete by name and version
+    query(_REPO_DELETE.args(PKG3ID));
+    assertTrue(!dir(dir));
   }
 
   /**
@@ -72,14 +79,14 @@ public class FNPRepoTest extends AdvancedQueryTest {
   @Test
   public void list() {
     check(_REPO_LIST);
-    // Install pkg3
+    // install pkg3
     query(_REPO_INSTALL.args(REPO + "pkg3.xar"));
-    // Install pkg4
+    // install pkg4
     query(_REPO_INSTALL.args(REPO + "pkg4.xar"));
-    contains(_REPO_LIST.toString(), PKG3NAME);
-    contains(_REPO_LIST.toString(), PKG4NAME);
-    query(_REPO_DELETE.args(PKG4NAME));
-    query(_REPO_DELETE.args(PKG3NAME));
+    contains(_REPO_LIST.toString(), PKG3);
+    contains(_REPO_LIST.toString(), PKG4);
+    query(_REPO_DELETE.args(PKG4));
+    query(_REPO_DELETE.args(PKG3));
   }
 
   /**

@@ -175,8 +175,8 @@ public class DiskValues implements Index {
 
     // check if min and max are positive integers with the same number of digits
     final int len = max > 0 && (long) max == max ? token(max).length : 0;
-    final boolean simple = len != 0 && min > 0 && (long) min == min
-        && token(min).length == len;
+    final boolean simple = len != 0 && min > 0 && (long) min == min &&
+        token(min).length == len;
 
     final IntList pres = new IntList();
     for(int l = 0; l < size; ++l) {

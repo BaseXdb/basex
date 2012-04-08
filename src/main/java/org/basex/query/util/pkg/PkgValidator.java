@@ -70,7 +70,7 @@ public final class PkgValidator {
       // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
       if(dep.pkg != null && depPkg(dep) == null)
-        NECPKGNOTINST.thrw(info, dep.pkg);
+        PKGNOTINST.thrw(info, dep.pkg);
       // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);

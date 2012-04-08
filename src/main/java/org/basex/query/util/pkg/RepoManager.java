@@ -99,6 +99,7 @@ public final class RepoManager {
     for(final byte[] p : pkg) {
       if(p == null) continue;
       final TokenList tl = new TokenList();
+      System.out.println("- " + string(p));
       tl.add(Package.name(p));
       tl.add(Package.version(p));
       tl.add(EXPATH);
@@ -152,22 +153,20 @@ public final class RepoManager {
    * @throws QueryException query exception
    */
   public void delete(final String pkg) throws QueryException {
+    final byte[] pk = token(pkg);
     boolean found = false;
     final TokenMap dict = repo.pkgDict();
     for(final byte[] nextPkg : dict) {
       if(nextPkg == null) continue;
-      final byte[] dir = dict.get(nextPkg);
-
-      // a package can be deleted either by its name or by its directory name
-      if(eq(Package.name(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
+      // a package can be deleted by its name or the name suffixed with its version
+      if(eq(nextPkg, pk) || eq(Package.name(nextPkg), pk)) {
         // check if package to be deleted participates in a dependency
         final byte[] primPkg = primary(nextPkg);
         if(primPkg != null) PKGDEP.thrw(info, string(primPkg), pkg);
 
         // clean package repository
-        final IOFile f = repo.path(string(dir));
-        final IOFile desc = new IOFile(f, DESCRIPTOR);
-        repo.remove(new PkgParser(repo, info).parse(desc));
+        final IOFile f = repo.path(string(dict.get(nextPkg)));
+        repo.delete(new PkgParser(repo, info).parse(new IOFile(f, DESCRIPTOR)));
         // package does not participate in a dependency => delete it
         if(!f.delete()) PKGDEL.thrw(info, f);
         found = true;
@@ -185,7 +184,7 @@ public final class RepoManager {
   }
 
   /**
-   * Looks for a file for the specified name.
+   * Looks for a file with the specified name.
    * @param name name
    * @param repo repository
    * @return file, or {@code null}

@@ -177,7 +177,7 @@ public enum Err {
   /** PACK0002: Evaluation exception. */
   INSTERR(PACK, 2, "Namespace URI is invalid: '%'."),
   /** PACK0003: Evaluation exception. */
-  NECPKGNOTINST(PACK, 3, "Required package '%' is not installed."),
+  PKGNOTINST(PACK, 3, "Required package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
   /** PACK0004: Evaluation exception. */

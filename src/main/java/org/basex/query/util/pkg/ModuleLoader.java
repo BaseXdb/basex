@@ -267,7 +267,7 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) NECPKGNOTINST.thrw(ii, name);
+    if(pDir == null) PKGNOTINST.thrw(ii, name);
     final IOFile pkgDir = context.repo.path(string(pDir));
 
     // parse package descriptor
@@ -288,7 +288,7 @@ public final class ModuleLoader {
       // we consider only package dependencies here
       final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
       if(depPkg == null) {
-        NECPKGNOTINST.thrw(ii, string(d.pkg));
+        PKGNOTINST.thrw(ii, string(d.pkg));
       } else {
         if(toLoad.contains(depPkg)) CIRCMODULE.thrw(ii);
         addRepo(depPkg, toLoad, loaded, ii, qp);
