@@ -36,8 +36,19 @@ public abstract class SandboxTest {
     sb.delete();
     assertTrue("Sandbox could not be created.", sb.md());
     context = new Context();
-    context.mprop.set(MainProp.DBPATH, sb.path());
+    initContext(context);
     cleanup = true;
+  }
+
+  /**
+   * Initializes the specified context.
+   * @param ctx context
+   */
+  protected static void initContext(final Context ctx) {
+    final IOFile sb = sandbox();
+    ctx.mprop.set(MainProp.DBPATH, sb.path() + "/data");
+    ctx.mprop.set(MainProp.HTTPPATH, sb.path() + "/http");
+    ctx.mprop.set(MainProp.REPOPATH, sb.path() + "/repo");
   }
 
   /**
@@ -67,11 +78,14 @@ public abstract class SandboxTest {
 
   /**
    * Creates a client instance.
+   * @param login optional login data
    * @return client instance
    * @throws IOException I/O exception
    */
-  public static ClientSession createClient() throws IOException {
-    return new ClientSession(LOCALHOST, 9999, ADMIN, ADMIN);
+  public static ClientSession createClient(final String... login) throws IOException {
+    final String user = login.length > 0 ? login[0] : ADMIN;
+    final String pass = login.length > 1 ? login[1] : ADMIN;
+    return new ClientSession(LOCALHOST, 9999, user, pass);
   }
 
   /**
