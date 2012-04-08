@@ -39,7 +39,7 @@ public class FTIndexQueryTest extends SandboxTest {
   public static void setUpClass() {
     context.prop.set(Prop.FTINDEX, false);
     CTX_IX.prop.set(Prop.FTINDEX, true);
-    CTX_IX.mprop.set(MainProp.DBPATH, sandbox().path());
+    initContext(CTX_IX);
   }
 
   /** Static clean-up. */

@@ -26,6 +26,25 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /** Test repository. */
   private static final String REPO = "src/test/resources/repo/";
 
+  /** Pkg1 URI. */
+  private static final String PKG1 = "http://www.pkg1.com";
+  /** Pkg1 URI. */
+  private static final String PKG2 = "http://www.pkg2.com";
+  /** Pkg1 URI. */
+  private static final String PKG3 = "http://www.pkg3.com";
+  /** Pkg4 URI. */
+  private static final String PKG4 = "http://www.pkg4.com";
+  /** Pkg5 URI. */
+  private static final String PKG5 = "http://www.pkg5.com";
+  /** Pkg1 identifier. */
+  private static final String PKG1ID = PKG1 + "-12.0";
+  /** Pkg2 identifier. */
+  private static final String PKG2ID = PKG2 + "-10.0";
+  /** Pkg3 identifier. */
+  private static final String PKG3ID = PKG3 + "-10.0";
+  /** Pkg1 identifier. */
+  private static final String PKG4ID = PKG4 + "-2.0";
+
   /** Prepare test. */
   @Before
   public void setUpBeforeClass() {
@@ -49,22 +68,22 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertTrue(nsDict.contains(token("ns3")));
     TokenSet ts = nsDict.get(token("ns1"));
     assertEquals(ts.size(), 2);
-    assertTrue(ts.contains(token("http://www.pkg1.com-12.0")));
-    assertTrue(ts.contains(token("http://www.pkg2.com-10.0")));
+    assertTrue(ts.contains(token(PKG1ID)));
+    assertTrue(ts.contains(token(PKG2ID)));
     ts = nsDict.get(token("ns2"));
     assertEquals(ts.size(), 1);
-    assertTrue(ts.contains(token("http://www.pkg1.com-12.0")));
+    assertTrue(ts.contains(token(PKG1ID)));
     ts = nsDict.get(token("ns3"));
     assertEquals(ts.size(), 1);
-    assertTrue(ts.contains(token("http://www.pkg2.com-10.0")));
+    assertTrue(ts.contains(token(PKG2ID)));
     // check package dictionary
     assertEquals(pkgDict.keys().length, 2);
-    assertTrue(pkgDict.contains(token("http://www.pkg1.com-12.0")));
-    assertTrue(pkgDict.contains(token("http://www.pkg2.com-10.0")));
+    assertTrue(pkgDict.contains(token(PKG1ID)));
+    assertTrue(pkgDict.contains(token(PKG2ID)));
     assertEquals("pkg1",
-        string(pkgDict.get(token("http://www.pkg1.com-12.0"))));
+        string(pkgDict.get(token(PKG1ID))));
     assertEquals("pkg2",
-        string(pkgDict.get(token("http://www.pkg2.com-10.0"))));
+        string(pkgDict.get(token(PKG2ID))));
   }
 
   /** Test for missing mandatory attributes. */
@@ -77,7 +96,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   /** Test for already installed package. */
   @Test
   public void alreadyInstalled() {
-    error(desc("http://www.pkg1.com", "pkg1", "12.0", ""), Err.PKGINST,
+    error(desc(PKG1, "pkg1", "12.0", ""), Err.PKGINST,
         "Installed package not detected.");
   }
 
@@ -88,9 +107,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void notInstalledDeps() {
     error(
-        desc("http://www.pkg5.com", "pkg5", "12.0",
-            "<dependency package='http://www.pkg4.com'/>"),
-        Err.NECPKGNOTINST, "Missing dependency not detected.");
+        desc(PKG5, "pkg5", "12.0",
+            "<dependency package='" + PKG4 + "'/>"),
+        Err.PKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -100,9 +119,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void notInstalledDepVersion() {
     error(
-        desc("http://www.pkg5.com", "pkg5", "12.0",
-            "<dependency package='http://www.pkg1.com' versions='1.0 7.0'/>"),
-        Err.NECPKGNOTINST, "Missing dependency not detected.");
+        desc(PKG5, "pkg5", "12.0",
+            "<dependency package='" + PKG1 + "' versions='1.0 7.0'/>"),
+        Err.PKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -112,9 +131,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void notInstalledDepTemp() {
     error(
-        desc("http://www.pkg5.com", "pkg5", "12.0",
-            "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
-        Err.NECPKGNOTINST, "Missing dependency not detected.");
+        desc(PKG5, "pkg5", "12.0",
+            "<dependency package='" + PKG1 + "' versions='12.7'/>"),
+        Err.PKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -124,9 +143,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void notInstalledMin() {
     error(
-        desc("http://www.pkg5.com", "pkg5", "12.0",
-            "<dependency package='http://www.pkg1.com' versions='12.7'/>"),
-        Err.NECPKGNOTINST, "Missing dependency not detected.");
+        desc(PKG5, "pkg5", "12.0",
+            "<dependency package='" + PKG1 + "' versions='12.7'/>"),
+        Err.PKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -136,9 +155,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
   @Test
   public void notInstalledMax() {
     error(
-        desc("http://www.pkg5.com", "pkg5", "12.0",
-            "<dependency package='http://www.pkg1.com' semver-max='11'/>"),
-        Err.NECPKGNOTINST, "Missing dependency not detected.");
+        desc(PKG5, "pkg5", "12.0",
+            "<dependency package='" + PKG1 + "' semver-max='11'/>"),
+        Err.PKGNOTINST, "Missing dependency not detected.");
   }
 
   /**
@@ -147,9 +166,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void notInstalledMinMax() {
-    error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency package='http://www.pkg1.com' semver-min='5.7' "
-            + "semver-max='11'/>"), Err.NECPKGNOTINST,
+    error(desc(PKG5, "pkg5", "12.0",
+        "<dependency package='" + PKG1 + "' semver-min='5.7' "
+            + "semver-max='11'/>"), Err.PKGNOTINST,
         "Missing dependency not detected.");
   }
 
@@ -159,8 +178,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void alreadyAnotherInstalled() {
-    error(
-        desc("http://www.pkg5.com", "pkg5", "12.0",
+    error(desc(PKG5, "pkg5", "12.0",
         "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"),
         Err.MODISTALLED, "Already installed component not detected.");
   }
@@ -170,9 +188,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void notSupported() {
-    error(desc("http://www.pkg5.com", "pkg5", "12.0",
-        "<dependency processor='basex' "
-            + "semver='5.0'/>"), Err.PKGNOTSUPP,
+    error(desc(PKG5, "pkg5", "12.0",
+        "<dependency processor='basex' semver='5.0'/>"), Err.PKGNOTSUPP,
         "Unsupported package not detected.");
   }
 
@@ -182,9 +199,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void alreadyAnotherSame() {
-    ok(desc("http://www.pkg1.com", "pkg1", "10.0",
-        "<xquery><namespace>ns1</namespace>"
-            + "<file>pkg1mod1.xql</file></xquery>"));
+    ok(desc(PKG1, "pkg1", "10.0",
+        "<xquery><namespace>ns1</namespace><file>pkg1mod1.xql</file></xquery>"));
   }
 
   /**
@@ -192,10 +208,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
    */
   @Test
   public void valid() {
-    ok(desc("http://www.pkg1.com", "pkg1", "10.0",
-        "<dependency package='http://www.pkg1.com' semver-min='11'/>"
-            + "<xquery><namespace>ns3</namespace>"
-            + "<file>pkg5mod1.xql</file></xquery>"));
+    ok(desc(PKG1, "pkg1", "10.0", "<dependency package='" + PKG1 + "' semver-min='11'/>"
+        + "<xquery><namespace>ns3</namespace>"
+        + "<file>pkg5mod1.xql</file></xquery>"));
   }
 
   /**
@@ -228,13 +243,13 @@ public final class PackageAPITest extends AdvancedQueryTest {
     }
     // try to install a package
     new RepoInstall(REPO + "pkg3.xar", null).execute(context);
-    final String dirName = normalize("http://www.pkg3.com-10.0");
-    assertTrue(dir(dirName));
-    assertTrue(file(dirName + "/expath-pkg.xml"));
-    assertTrue(dir(dirName + "/pkg3"));
-    assertTrue(dir(dirName + "/pkg3/mod"));
-    assertTrue(file(dirName + "/pkg3/mod/pkg3mod1.xql"));
-    assertTrue(new IOFile(REPO, dirName).delete());
+    final String dir = normalize(PKG3ID);
+    assertTrue(dir(dir));
+    assertTrue(file(dir + "/expath-pkg.xml"));
+    assertTrue(dir(dir + "/pkg3"));
+    assertTrue(dir(dir + "/pkg3/mod"));
+    assertTrue(file(dir + "/pkg3/mod/pkg3mod1.xql"));
+    assertTrue(new IOFile(REPO, dir).delete());
   }
 
   /**
@@ -302,10 +317,10 @@ public final class PackageAPITest extends AdvancedQueryTest {
     new RepoInstall(REPO + "pkg3.xar", null).execute(context);
 
     // check if pkg3 is registered in the repo
-    assertTrue(context.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
+    assertTrue(context.repo.pkgDict().contains(token(PKG3ID)));
 
     // check if pkg3 was correctly unzipped
-    final String pkg3Dir = normalize("http://www.pkg3.com-10.0");
+    final String pkg3Dir = normalize(PKG3ID);
     assertTrue(dir(pkg3Dir));
     assertTrue(file(pkg3Dir + "/expath-pkg.xml"));
     assertTrue(dir(pkg3Dir + "/pkg3"));
@@ -315,9 +330,9 @@ public final class PackageAPITest extends AdvancedQueryTest {
     // install another package (pkg4) with a dependency to pkg3
     new RepoInstall(REPO + "pkg4.xar", null).execute(context);
     // check if pkg4 is registered in the repo
-    assertTrue(context.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
+    assertTrue(context.repo.pkgDict().contains(token(PKG4ID)));
     // check if pkg4 was correctly unzipped
-    final String pkg4Dir = normalize("http://www.pkg4.com-2.0");
+    final String pkg4Dir = normalize(PKG4ID);
     assertTrue(dir(pkg4Dir));
     assertTrue(file(pkg4Dir + "/expath-pkg.xml"));
     assertTrue(dir(pkg4Dir + "/pkg4"));
@@ -326,22 +341,22 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // try to delete pkg3
     try {
-      new RepoManager(context).delete(pkg3Dir);
+      new RepoManager(context).delete(PKG3ID);
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGDEP);
     }
     // try to delete pkg4 (use package name)
-    new RepoDelete("http://www.pkg4.com", null).execute(context);
+    new RepoDelete(PKG4, null).execute(context);
     // check if pkg4 is unregistered from the repo
-    assertFalse(context.repo.pkgDict().contains(token("http://www.pkg4.com-2.0")));
+    assertFalse(context.repo.pkgDict().contains(token(PKG4ID)));
 
     // check if pkg4 directory was deleted
     assertTrue(!dir(pkg4Dir));
     // try to delete pkg3 (use package dir)
-    new RepoDelete(pkg3Dir, null).execute(context);
+    new RepoDelete(PKG3ID, null).execute(context);
     // check if pkg3 is unregistered from the repo
-    assertFalse(context.repo.pkgDict().contains(token("http://www.pkg3.com-10.0")));
+    assertFalse(context.repo.pkgDict().contains(token(PKG3ID)));
     // check if pkg3 directory was deleted
     assertTrue(!dir(pkg3Dir));
   }
