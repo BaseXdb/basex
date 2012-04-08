@@ -60,7 +60,7 @@ public final class FNFile extends StandardFunc {
       case _FILE_APPEND_BINARY:    return writeBinary(path, ctx, true);
       case _FILE_COPY:             return copy(path, ctx, true);
       case _FILE_CREATE_DIRECTORY: return createDirectory(path);
-      case _FILE_DELETE:           return del(path);
+      case _FILE_DELETE:           return delete(path, ctx);
       case _FILE_MOVE:             return copy(path, ctx, false);
       case _FILE_READ_BINARY:      return readBinary(path);
       case _FILE_READ_TEXT:        return readText(path, ctx);
@@ -161,9 +161,7 @@ public final class FNFile extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter list(final File path, final QueryContext ctx)
-      throws QueryException {
-
+  private Iter list(final File path, final QueryContext ctx) throws QueryException {
     // get canonical representation to resolve symbolic links
     final File dir;
     try {
@@ -268,12 +266,14 @@ public final class FNFile extends StandardFunc {
   /**
    * Deletes a file or directory.
    * @param path file to be deleted
+   * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private Item del(final File path) throws QueryException {
+  private Item delete(final File path, final QueryContext ctx) throws QueryException {
     if(!path.exists()) PATHNOTEXISTS.thrw(info, path.getAbsolutePath());
-    deleteRec(path);
+    if(optionalBool(1, ctx)) deleteRec(path);
+    else if(!path.delete()) CANNOTDEL.thrw(info, path);
     return null;
   }
 
@@ -337,8 +337,8 @@ public final class FNFile extends StandardFunc {
    * @return true if file was successfully written
    * @throws QueryException query exception
    */
-  private Item write(final File path, final QueryContext ctx,
-      final boolean append) throws QueryException {
+  private Item write(final File path, final QueryContext ctx, final boolean append)
+      throws QueryException {
 
     if(path.isDirectory()) PATHISDIR.thrw(info, path);
 
@@ -369,8 +369,8 @@ public final class FNFile extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Item writeBinary(final File path, final QueryContext ctx,
-      final boolean append) throws QueryException {
+  private Item writeBinary(final File path, final QueryContext ctx, final boolean append)
+      throws QueryException {
 
     if(path.isDirectory()) PATHISDIR.thrw(info, path);
     try {
@@ -403,8 +403,8 @@ public final class FNFile extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Item copy(final File src, final QueryContext ctx,
-      final boolean copy) throws QueryException {
+  private Item copy(final File src, final QueryContext ctx, final boolean copy)
+      throws QueryException {
 
     File trg = new File(string(checkStr(expr[1], ctx))).getAbsoluteFile();
     if(!src.exists()) PATHNOTEXISTS.thrw(info, src.getAbsolutePath());

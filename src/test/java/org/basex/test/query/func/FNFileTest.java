@@ -131,7 +131,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_CREATE_DIRECTORY.args(PATH1));
     query(_FILE_CREATE_DIRECTORY.args(PATH1));
     query(_FILE_CREATE_DIRECTORY.args(PATH3));
-    query(_FILE_DELETE.args(PATH1));
+    query(_FILE_DELETE.args(PATH1, "true()"));
     query(_FILE_WRITE.args(PATH1, "()"));
     error(_FILE_CREATE_DIRECTORY.args(PATH1), Err.FILEEXISTS);
     error(_FILE_CREATE_DIRECTORY.args(PATH3), Err.FILEEXISTS);
@@ -148,7 +148,7 @@ public final class FNFileTest extends AdvancedQueryTest {
     query(_FILE_DELETE.args(PATH3));
     query(_FILE_CREATE_DIRECTORY.args(PATH3));
     query(_FILE_WRITE.args(PATH4, "()"));
-    query(_FILE_DELETE.args(PATH1));
+    query(_FILE_DELETE.args(PATH1, "true()"));
     error(_FILE_DELETE.args(PATH1), Err.PATHNOTEXISTS);
   }
 
