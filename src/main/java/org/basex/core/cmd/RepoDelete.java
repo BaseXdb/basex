@@ -34,7 +34,7 @@ public final class RepoDelete extends Command {
   @Override
   protected boolean run() throws IOException {
     try {
-      new RepoManager(context, info).delete(args[0]);
+      new RepoManager(context, info).delete(Token.token(args[0]));
       return info(PKG_DELETED_X, args[0]);
     } catch(final QueryException ex) {
       Util.debug(ex);

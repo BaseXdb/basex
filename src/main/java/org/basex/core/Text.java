@@ -715,7 +715,9 @@ public interface Text {
   /** Package deleted. */
   String PKG_DELETED_X = lang("pkg_deleted_%");
   /** Package installed. */
-  String PKG_INSTALLED_X = lang("pkg_installed_%");
+  String PKG_INSTALLED_X_X = lang("pkg_installed_%_%");
+  /** Package replaced. */
+  String PKG_REPLACED_X_X = lang("pkg_replaced_%_%");
 
   // GENERAL COMMANDS =========================================================
 

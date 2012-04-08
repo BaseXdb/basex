@@ -93,13 +93,6 @@ public final class PackageAPITest extends AdvancedQueryTest {
         Err.PKGDESCINV, "Missing mandatory attribute not detected.");
   }
 
-  /** Test for already installed package. */
-  @Test
-  public void alreadyInstalled() {
-    error(desc(PKG1, "pkg1", "12.0", ""), Err.PKGINST,
-        "Installed package not detected.");
-  }
-
   /**
    * Tests package with not installed dependencies - dependency is defined with
    * no specific versions.
@@ -236,7 +229,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void repoInstall() throws BaseXException {
     // try to install non-existing package
     try {
-      new RepoManager(context).install("src/test/resources/pkg");
+      new RepoManager(context).install(token("src/test/resources/pkg"));
       fail("Not existing package not detected.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGNOTEXIST);
@@ -308,7 +301,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
   public void delete() throws BaseXException {
     // try to delete a package which is not installed
     try {
-      new RepoManager(context).delete("xyz");
+      new RepoManager(context).delete(token("xyz"));
       fail("Not installed package not detected.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGNOTEXIST);
@@ -341,7 +334,7 @@ public final class PackageAPITest extends AdvancedQueryTest {
 
     // try to delete pkg3
     try {
-      new RepoManager(context).delete(PKG3ID);
+      new RepoManager(context).delete(token(PKG3ID));
       fail("Package involved in a dependency was deleted.");
     } catch(final QueryException ex) {
       check(ex, Err.PKGDEP);

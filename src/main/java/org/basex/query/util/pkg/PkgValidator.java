@@ -45,9 +45,6 @@ public final class PkgValidator {
    * @throws QueryException query exception
    */
   public void check(final Package pkg) throws QueryException {
-    // check if package is already installed
-    final byte[] name = pkg.uniqueName();
-    if(repo.pkgDict().get(name) != null) PKGINST.thrw(info, name);
     // check package dependencies
     checkDepends(pkg);
     // check package components
@@ -65,12 +62,10 @@ public final class PkgValidator {
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
-      if(dep.pkg == null && dep.processor == null)
-        PKGDESCINV.thrw(info, MISSSECOND);
+      if(dep.pkg == null && dep.processor == null) PKGDESCINV.thrw(info, MISSSECOND);
       // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
-      if(dep.pkg != null && depPkg(dep) == null)
-        PKGNOTINST.thrw(info, dep.pkg);
+      if(dep.pkg != null && depPkg(dep) == null) PKGNOTINST.thrw(info, dep.pkg);
       // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);
@@ -87,9 +82,9 @@ public final class PkgValidator {
   public byte[] depPkg(final Dependency dep) {
     // get installed versions of secondary package
     final TokenSet instVers = new TokenSet();
-    for(final byte[] nextPkg : repo.pkgDict().keys())
-      if(nextPkg != null && startsWith(nextPkg, dep.pkg))
-        instVers.add(version(nextPkg));
+    for(final byte[] nextPkg : repo.pkgDict().keys()) {
+      if(nextPkg != null && startsWith(nextPkg, dep.pkg)) instVers.add(version(nextPkg));
+    }
     // check if an appropriate version is already installed
     final byte[] version = availVersion(dep, instVers);
     return version == null ? null : dep.name(version);

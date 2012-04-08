@@ -171,10 +171,6 @@ public enum Err {
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
-  PKGINST(PACK, 2, "Package '%' is already installed."),
-  /** PACK0002: Evaluation exception. */
-  MODINST(PACK, 2, "Module '%' is already installed."),
-  /** PACK0002: Evaluation exception. */
   INSTERR(PACK, 2, "Namespace URI is invalid: '%'."),
   /** PACK0003: Evaluation exception. */
   PKGNOTINST(PACK, 3, "Required package '%' is not installed."),
