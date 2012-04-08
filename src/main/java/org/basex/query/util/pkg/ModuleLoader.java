@@ -27,7 +27,7 @@ public final class ModuleLoader {
   private static final ClassLoader LOADER =
       Thread.currentThread().getContextClassLoader();
   /** Cached URLs to be added to the class loader. */
-  private ArrayList<URL> urls = new ArrayList<URL>();
+  private final ArrayList<URL> urls = new ArrayList<URL>();
   /** Current class loader. */
   private ClassLoader loader = LOADER;
   /** Java modules. */
@@ -64,10 +64,19 @@ public final class ModuleLoader {
     // add EXPath package
     final TokenSet pkgs = context.repo.nsDict().get(uri);
     if(pkgs != null) {
+      Version ver = null;
+      byte[] nm = null;
       for(final byte[] name : pkgs) {
-        if(name != null) addRepo(name, new TokenSet(), new TokenSet(), ii, qp);
+        final Version v = new Version(Package.version(name));
+        if(ver == null || v.compareTo(ver) > 0) {
+          ver = v;
+          nm = name;
+        }
       }
-      return true;
+      if(nm != null) {
+        addRepo(nm, new TokenSet(), new TokenSet(), ii, qp);
+        return true;
+      }
     }
 
     // search module in repository: rewrite URI to file path
