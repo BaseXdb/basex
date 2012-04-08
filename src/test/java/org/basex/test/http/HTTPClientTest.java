@@ -34,7 +34,7 @@ public class HTTPClientTest extends HTTPTest {
   /** Example url. */
   static final String ROOT = "http://" + LOCALHOST + ":9998/rest/";
   /** Example url. */
-  static final String RESTURL = ROOT + DB;
+  static final String RESTURL = ROOT + NAME;
 
   /** Status code. */
   private static final byte[] STATUS = token("status");

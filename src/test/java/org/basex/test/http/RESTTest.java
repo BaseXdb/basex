@@ -24,15 +24,15 @@ import org.junit.*;
  */
 public class RESTTest extends HTTPTest {
   /** REST identifier. */
-  private static final String NAME = "rest";
+  private static final String REST = "rest";
   /** Root path. */
-  protected static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + NAME + '/';
+  protected static final String ROOT = "http://" + Text.LOCALHOST + ":9998/" + REST + '/';
 
   /** REST URI. */
   private static final String URI = string(RESTText.RESTURI);
   /** Opening result. */
   private static final String WRAP =
-      '<' + NAME + ":results xmlns:" + NAME + "=\"" + URI + "\"/>";
+      '<' + REST + ":results xmlns:" + REST + "=\"" + URI + "\"/>";
   /** Input file. */
   private static final String FILE = "src/test/resources/input.xml";
 
@@ -82,11 +82,11 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void get3() throws IOException {
-    put(DB, new ArrayInput("<a/>"));
-    put(DB + "/raw", new ArrayInput("XXX"), APP_OCTET);
-    assertEquals("<a/>", get(DB + '/' + DB + ".xml"));
-    assertEquals("XXX", get(DB + "/raw"));
-    delete(DB);
+    put(NAME, new ArrayInput("<a/>"));
+    put(NAME + "/raw", new ArrayInput("XXX"), APP_OCTET);
+    assertEquals("<a/>", get(NAME + '/' + NAME + ".xml"));
+    assertEquals("XXX", get(NAME + "/raw"));
+    delete(NAME);
   }
 
   /**
@@ -342,9 +342,9 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put1() throws IOException {
-    put(DB, null);
-    assertEquals("0", get(DB + "?query=count(/)"));
-    delete(DB);
+    put(NAME, null);
+    assertEquals("0", get(NAME + "?query=count(/)"));
+    delete(NAME);
   }
 
   /**
@@ -353,9 +353,9 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put2() throws IOException {
-    put(DB, new ArrayInput(token("<a>A</a>")));
-    assertEquals("A", get(DB + "?query=/*/text()"));
-    delete(DB);
+    put(NAME, new ArrayInput(token("<a>A</a>")));
+    assertEquals("A", get(NAME + "?query=/*/text()"));
+    delete(NAME);
   }
 
   /**
@@ -364,10 +364,10 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put3() throws IOException {
-    put(DB, new FileInputStream(FILE));
-    put(DB, new FileInputStream(FILE));
-    assertEquals("XML", get(DB + "?query=//title/text()"));
-    delete(DB);
+    put(NAME, new FileInputStream(FILE));
+    put(NAME, new FileInputStream(FILE));
+    assertEquals("XML", get(NAME + "?query=//title/text()"));
+    delete(NAME);
   }
 
   /**
@@ -376,13 +376,13 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void put4() throws IOException {
-    put(DB, null);
-    put(DB + "/a", new ArrayInput(token("<a>A</a>")));
-    put(DB + "/b", new ArrayInput(token("<b>B</b>")));
-    assertEquals("2", get(DB + "?query=count(//text())"));
-    assertEquals("2", get("?query=count(" + Function._DB_OPEN.args(DB) + "//text())"));
-    assertEquals("1", get("?query=count(" + Function._DB_OPEN.args(DB, "b") + "/*)"));
-    delete(DB);
+    put(NAME, null);
+    put(NAME + "/a", new ArrayInput(token("<a>A</a>")));
+    put(NAME + "/b", new ArrayInput(token("<b>B</b>")));
+    assertEquals("2", get(NAME + "?query=count(//text())"));
+    assertEquals("2", get("?query=count(" + Function._DB_OPEN.args(NAME) + "//text())"));
+    assertEquals("1", get("?query=count(" + Function._DB_OPEN.args(NAME, "b") + "/*)"));
+    delete(NAME);
   }
 
   /**
@@ -391,13 +391,13 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void putOption() throws IOException {
-    put(DB + "?" + Prop.CHOP[0] + "=true", new FileInputStream(FILE));
-    assertEquals("5", get(DB + "?query=count(//text())"));
-    put(DB + "?" + Prop.CHOP[0] + "=false", new FileInputStream(FILE));
-    assertEquals("22", get(DB + "?query=count(//text())"));
+    put(NAME + "?" + Prop.CHOP[0] + "=true", new FileInputStream(FILE));
+    assertEquals("5", get(NAME + "?query=count(//text())"));
+    put(NAME + "?" + Prop.CHOP[0] + "=false", new FileInputStream(FILE));
+    assertEquals("22", get(NAME + "?query=count(//text())"));
 
     try {
-      put(DB + "?xxx=yyy", new FileInputStream(FILE));
+      put(NAME + "?xxx=yyy", new FileInputStream(FILE));
       fail("Error expected.");
     } catch(final IOException ex) {
     }
@@ -409,12 +409,12 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void delete1() throws IOException {
-    put(DB, new FileInputStream(FILE));
+    put(NAME, new FileInputStream(FILE));
     // delete database
-    assertEquals(delete(DB).trim(), Util.info(Text.DB_DROPPED_X, DB));
+    assertEquals(delete(NAME).trim(), Util.info(Text.DB_DROPPED_X, NAME));
     try {
       // no database left
-      delete(DB);
+      delete(NAME);
       fail("Error expected.");
     } catch(final BaseXException ex) {
     }
@@ -426,20 +426,20 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void delete2() throws IOException {
-    put(DB, null);
-    put(DB + "/a", new ArrayInput(token("<a/>")));
-    put(DB + "/b", new ArrayInput(token("<b/>")));
+    put(NAME, null);
+    put(NAME + "/a", new ArrayInput(token("<a/>")));
+    put(NAME + "/b", new ArrayInput(token("<b/>")));
     // delete 'a' directory
-    assertContains(delete(DB + "/a"), "1 document");
+    assertContains(delete(NAME + "/a"), "1 document");
     // delete 'b' directory
-    assertContains(delete(DB + "/b"), "1 document");
+    assertContains(delete(NAME + "/b"), "1 document");
     // no 'b' directory left
-    assertContains(delete(DB + "/b"), "0 document");
+    assertContains(delete(NAME + "/b"), "0 document");
     // delete database
-    assertEquals(delete(DB).trim(), Util.info(Text.DB_DROPPED_X, DB));
+    assertEquals(delete(NAME).trim(), Util.info(Text.DB_DROPPED_X, NAME));
     try {
       // no database left
-      delete(DB);
+      delete(NAME);
       fail("Error expected.");
     } catch(final BaseXException ex) {
     }
@@ -451,10 +451,10 @@ public class RESTTest extends HTTPTest {
    */
   @Test
   public void deleteOption() throws IOException {
-    put(DB, null);
-    delete(DB + "/a?" + Prop.CHOP[0] + "=true");
+    put(NAME, null);
+    delete(NAME + "/a?" + Prop.CHOP[0] + "=true");
     try {
-      delete(DB + "/a?xxx=true");
+      delete(NAME + "/a?xxx=true");
       fail("Error expected.");
     } catch(final IOException ex) {
     }

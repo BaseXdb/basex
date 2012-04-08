@@ -13,6 +13,7 @@ import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.io.out.*;
+import org.basex.test.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.junit.*;
@@ -23,11 +24,9 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class HTTPTest {
+public abstract class HTTPTest extends SandboxTest {
   /** Database context. */
   protected static final Context CONTEXT = HTTPContext.init();
-  /** Class name. */
-  protected static final String DB = Util.name(HTTPTest.class);
   /** Start servers. */
   private static BaseXHTTP http;
   /** Root path. */
@@ -42,13 +41,8 @@ public abstract class HTTPTest {
    * @throws Exception exception
    */
   protected static void init(final String rt, final boolean local) throws Exception {
-    final IOFile sb = sandbox();
-    final IOFile dbPath = new IOFile(sb, "data");
-    dbPath.md();
-    CONTEXT.mprop.set(MainProp.DBPATH, dbPath.path());
-    final IOFile httpPath = new IOFile(sb, "http");
-    httpPath.md();
-    CONTEXT.mprop.set(MainProp.HTTPPATH, httpPath.path());
+    initContext(CONTEXT);
+    assertTrue(new IOFile(CONTEXT.mprop.get(MainProp.HTTPPATH)).md());
     root = rt;
 
     final StringList sl = new StringList();
@@ -65,7 +59,6 @@ public abstract class HTTPTest {
   @AfterClass
   public static void stop() throws Exception {
     http.stop();
-    assertTrue("Sandbox could not be deleted.", sandbox().delete());
   }
 
   // PROTECTED METHODS ==================================================================
@@ -184,15 +177,5 @@ public abstract class HTTPTest {
       bi.close();
     }
     return ao.toString();
-  }
-
-  // PRIVATE METHODS ====================================================================
-
-  /**
-   * Returns the temporary database path.
-   * @return database path
-   */
-  private static IOFile sandbox() {
-    return new IOFile(Prop.TMP, DB);
   }
 }

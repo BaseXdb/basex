@@ -365,6 +365,6 @@ public final class RestXqTest extends HTTPTest {
    */
   private static IOFile module() {
     final String path = CONTEXT.mprop.get(MainProp.HTTPPATH);
-    return new IOFile(path, DB + count++ + IO.XQMSUFFIX);
+    return new IOFile(path, NAME + count++ + IO.XQMSUFFIX);
   }
 }
