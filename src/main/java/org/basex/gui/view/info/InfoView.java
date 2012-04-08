@@ -150,7 +150,7 @@ public final class InfoView extends View {
       } else if(line.startsWith(RESULT_C)) {
         res = line.substring(s + 1).trim();
       } else if(line.startsWith(EVALUATING_C)) {
-        while(split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
+        while(++i < split.length && split[i].startsWith(QUERYSEP)) eval.add(split[i]);
         --i;
       } else if(!ok) {
         err += line + NL;
