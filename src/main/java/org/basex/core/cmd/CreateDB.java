@@ -12,7 +12,6 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.*;
@@ -29,6 +28,9 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
+  /** Parser instance. */
+  private Parser parser;
+
   /**
    * Default constructor.
    * @param name name of database
@@ -46,12 +48,21 @@ public final class CreateDB extends ACreate {
     super(name, input);
   }
 
+  /**
+   * Attaches a parser.
+   * @param p input parser
+   */
+  public void setParser(final Parser p) {
+    parser = p;
+  }
+
   @Override
   protected boolean run() {
     final String name = args[0];
-    IO io = null;
+    if(!MetaData.validName(name, false)) return error(NAME_INVALID_X, name);
 
-    Parser parser = Parser.emptyParser(context.prop);
+    // choose parser and input
+    IO io = null;
     final String format = prop.get(Prop.PARSER);
     if(args.length < 1 || args[1] == null) {
       if(in != null && in.getByteStream() != null) {
@@ -82,7 +93,51 @@ public final class CreateDB extends ACreate {
       if(io instanceof IOContent) io.name(name + '.' + format);
       parser = new DirParser(io, prop, mprop.dbpath(name));
     }
-    return build(parser, name);
+    if(parser == null) parser = Parser.emptyParser(context.prop);
+
+    // close open database
+    new Close().run(context);
+
+    try {
+      if(prop.is(Prop.MAINMEM)) {
+        // create main memory instance
+        final Data data = progress(new MemBuilder(name, parser)).build();
+        context.openDB(data);
+        context.pin(data);
+      } else {
+        if(context.pinned(name)) return error(DB_PINNED_X, name);
+
+        // create disk-based instance
+        progress(new DiskBuilder(name, parser, context)).build().close();
+        // second step: open database and create index structures
+        final Open open = new Open(name);
+        if(!open.run(context)) return error(open.info());
+        final Data data = context.data();
+        try {
+          if(data.meta.createtext) create(IndexType.TEXT,      data, this);
+          if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
+          if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
+        } finally {
+          data.finishUpdate();
+        }
+        context.databases().add(name);
+      }
+      return info(parser.info() + DB_CREATED_X_X, name, perf);
+    } catch(final ProgressException ex) {
+      throw ex;
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      abort();
+      final String msg = ex.getMessage();
+      return error(msg != null && !msg.isEmpty() ? msg :
+        Util.info(NOT_PARSED_X, parser.src));
+    } catch(final Exception ex) {
+      // known exceptions:
+      // - IllegalArgumentException (UTF8, zip files)
+      Util.debug(ex);
+      abort();
+      return error(Util.info(NOT_PARSED_X, parser.src));
+    }
   }
 
   /**
@@ -97,8 +152,7 @@ public final class CreateDB extends ACreate {
       final Context ctx) throws IOException {
 
     // check permissions
-    if(!ctx.user.has(Perm.CREATE))
-      throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);
+    if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_NEEDED_X, Perm.CREATE);
 
     // create main memory database instance
     final Prop prop = ctx.prop;
@@ -138,7 +192,7 @@ public final class CreateDB extends ACreate {
       throws IOException {
 
     if(ctx.user.has(Perm.CREATE)) return MemBuilder.build(parser);
-    throw new BaseXException(PERM_NEEDED_X, CmdPerm.CREATE);
+    throw new BaseXException(PERM_NEEDED_X, Perm.CREATE);
   }
 
   /**

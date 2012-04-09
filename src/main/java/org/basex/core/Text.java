@@ -561,7 +561,7 @@ public interface Text {
   String DB_EXPORTED_X = lang("db_exported_%");
   /** Database not deleted. */
   String FILE_NOT_DELETED_X = lang("file_not_deleted_%");
-  /** Database exists already. */
+  /** Database already exists. */
   String DB_EXISTS_X = lang("db_exists_%");
   /** Database was dropped. */
   String BACKUP_DROPPED_X = lang("backup_dropped_%");

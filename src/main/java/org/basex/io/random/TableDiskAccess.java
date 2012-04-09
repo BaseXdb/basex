@@ -84,6 +84,29 @@ public final class TableDiskAccess extends TableAccess {
     readIndex(0);
   }
 
+  /**
+   * Checks if the table of the specified database is locked.
+   * @param db name of database
+   * @param ctx database context
+   * @return result of check
+   */
+  public static boolean locked(final String db, final Context ctx) {
+    final IOFile table = MetaData.file(ctx.mprop.dbpath(db), DATATBL);
+    if(!table.exists()) return false;
+
+    RandomAccessFile file = null;
+    try {
+      file = new RandomAccessFile(table.file(), "rw");
+      try {
+        return file.getChannel().tryLock() == null;
+      } finally {
+        file.close();
+      }
+    } catch(final IOException ex) {
+      return true;
+    }
+  }
+
   @Override
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);

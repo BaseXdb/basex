@@ -19,6 +19,9 @@ import org.junit.*;
  * opened in other instances, this pinning concept prevents users from performing
  * updates in one instance that will not be reflected in another instance.
  *
+ * Currently, all tests are disabled, as the concurrent process instances would have
+ * to run in different JVMs.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */

@@ -51,9 +51,6 @@ public final class DiskBuilder extends Builder {
 
   @Override
   public DiskData build() throws IOException {
-    DropDB.drop(name, context);
-    context.mprop.dbpath(name).md();
-
     final IO file = parser.src;
     final MetaData md = new MetaData(name, context);
     md.original = file != null ? file.path() : "";
@@ -66,6 +63,10 @@ public final class DiskBuilder extends Builder {
     int bs = (int) Math.min(md.filesize, Math.min(1 << 22,
         rt.maxMemory() - rt.freeMemory() >> 2));
     bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
+
+    // drop old database (if available) and create new one
+    DropDB.drop(name, context);
+    context.mprop.dbpath(name).md();
 
     tout = new DataOutput(new TableOutput(md, DATATBL));
     xout = new DataOutput(md.dbfile(DATATXT), bs);

@@ -67,15 +67,13 @@ public abstract class Builder extends Progress {
   // PUBLIC METHODS ===========================================================
 
   /**
-   * Builds the database.
+   * Parses the given input source and builds the database.
    * @param md meta data
    * @param ta tag index
    * @param at attribute name index
    * @throws IOException I/O exception
    */
-  final void parse(final MetaData md, final Names ta, final Names at)
-      throws IOException {
-
+  final void parse(final MetaData md, final Names ta, final Names at) throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(tit() + DOTS);
 
@@ -222,7 +220,7 @@ public abstract class Builder extends Progress {
   // ABSTRACT METHODS =========================================================
 
   /**
-   * Builds the database by running the specified parser.
+   * Builds the database.
    * @return data database instance
    * @throws IOException I/O exception
    */

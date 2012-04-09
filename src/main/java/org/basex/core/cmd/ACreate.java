@@ -1,11 +1,9 @@
 package org.basex.core.cmd;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.*;
 
-import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
@@ -23,8 +21,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public abstract class ACreate extends Command {
-  /** Flag for creating new data instances. */
-  private boolean closing;
+  /** Flag for closing a data instances before executing the command. */
+  private boolean newData;
 
   /**
    * Protected constructor, specifying command arguments.
@@ -32,7 +30,7 @@ public abstract class ACreate extends Command {
    */
   ACreate(final String... arg) {
     this(Perm.CREATE, false, arg);
-    closing = true;
+    newData = true;
   }
 
   /**
@@ -47,8 +45,8 @@ public abstract class ACreate extends Command {
 
   @Override
   public boolean newData(final Context ctx) {
-    if(closing) new Close().run(ctx);
-    return closing;
+    if(newData) new Close().run(ctx);
+    return newData;
   }
 
   @Override
@@ -59,60 +57,6 @@ public abstract class ACreate extends Command {
   @Override
   public boolean stoppable() {
     return true;
-  }
-
-  /**
-   * Builds and creates a new database instance.
-   * @param parser parser instance
-   * @param db name of database
-   * @return success of operation
-   */
-  protected final boolean build(final Parser parser, final String db) {
-    if(!MetaData.validName(db, false)) return error(NAME_INVALID_X, db);
-
-    // close open database
-    new Close().run(context);
-
-    try {
-      if(context.pinned(db)) return error(DB_PINNED_X, db);
-
-      // database builder instance.
-      if(prop.is(Prop.MAINMEM)) {
-        final Data data = progress(new MemBuilder(db, parser)).build();
-        context.openDB(data);
-        context.pin(data);
-      } else {
-        // first step: create database
-        progress(new DiskBuilder(db, parser, context)).build().close();
-        // second step: open database and create index structures
-        final Open open = new Open(db);
-        if(!open.run(context)) return error(open.info());
-        final Data data = context.data();
-        try {
-          if(data.meta.createtext) create(IndexType.TEXT,      data, this);
-          if(data.meta.createattr) create(IndexType.ATTRIBUTE, data, this);
-          if(data.meta.createftxt) create(IndexType.FULLTEXT,  data, this);
-        } finally {
-          data.finishUpdate();
-        }
-        context.databases().add(db);
-      }
-      return info(parser.info() + DB_CREATED_X_X, db, perf);
-    } catch(final ProgressException ex) {
-      throw ex;
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      abort();
-      final String msg = ex.getMessage();
-      return error(msg != null && !msg.isEmpty() ? msg :
-        Util.info(NOT_PARSED_X, parser.src));
-    } catch(final Exception ex) {
-      // known exceptions:
-      // - IllegalArgumentException (UTF8, zip files)
-      Util.debug(ex);
-      abort();
-      return error(Util.info(NOT_PARSED_X, parser.src));
-    }
   }
 
   /**

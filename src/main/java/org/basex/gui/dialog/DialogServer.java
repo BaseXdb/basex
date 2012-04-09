@@ -2,40 +2,21 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.event.*;
 
-import org.basex.BaseXServer;
-import org.basex.core.Commands.CmdPerm;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.core.cmd.Exit;
-import org.basex.core.cmd.ShowDatabases;
-import org.basex.core.cmd.ShowSessions;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPassword;
-import org.basex.gui.layout.BaseXTabs;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.io.IOFile;
-import org.basex.server.ClientSession;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import org.basex.gui.layout.*;
+import org.basex.io.*;
+import org.basex.server.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Dialog window for displaying information about the server.
@@ -366,7 +347,7 @@ public final class DialogServer extends Dialog {
     } catch(final Exception ex) {
       icon = Msg.ERROR;
       msg = Util.message(ex);
-      if(msg.equals(Util.info(PERM_NEEDED_X, CmdPerm.values()[4]))) {
+      if(msg.equals(Util.info(PERM_NEEDED_X, Perm.ADMIN))) {
         try {
           cs.execute(new Exit());
         } catch(final IOException exx) {

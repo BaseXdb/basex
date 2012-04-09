@@ -3,10 +3,8 @@ package org.basex.query.up;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.CmdPerm;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.*;
+import org.basex.query.up.primitives.*;
 
 /**
  * The database modifier holds all database updates during a snapshot.
@@ -18,12 +16,9 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  */
 final class DatabaseModifier extends ContextModifier {
   @Override
-  void add(final UpdatePrimitive p, final QueryContext ctx)
-    throws QueryException {
-
+  void add(final UpdatePrimitive p, final QueryContext ctx) throws QueryException {
     add(p);
     // check permissions
-    if(!ctx.context.perm(Perm.WRITE, p.data.meta))
-      PERMNO.thrw(p.info, CmdPerm.WRITE);
+    if(!ctx.context.perm(Perm.WRITE, p.data.meta)) PERMNO.thrw(p.info, Perm.WRITE);
   }
 }

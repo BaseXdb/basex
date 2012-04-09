@@ -6,10 +6,8 @@ import java.io.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.util.*;
 
 /**
  * Evaluates the 'checks' command, opens an existing database or
@@ -73,7 +71,7 @@ public final class Check extends Command {
         io.timeStamp() == in.timeStamp();
       if(found && ctx.perm(Perm.READ, data.meta)) return data;
       Close.close(data, ctx);
-      if(found) throw new BaseXException(PERM_NEEDED_X, CmdPerm.READ);
+      if(found) throw new BaseXException(PERM_NEEDED_X, Perm.READ);
     }
 
     // choose OPEN if user has no create permissions, or if database exists
@@ -82,7 +80,7 @@ public final class Check extends Command {
     // check if input is an existing file
     if(path != null) io = IO.get(io + "/" + path);
     if(!io.exists() || path == null && io.isDir())
-      throw new BaseXException(Util.info(RESOURCE_NOT_FOUND_X, io));
+      throw new BaseXException(RESOURCE_NOT_FOUND_X, io);
 
     // if force flag is set to false, create a main memory instance
     if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(io, ctx);

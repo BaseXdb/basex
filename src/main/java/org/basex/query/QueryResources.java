@@ -6,7 +6,6 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
-import org.basex.core.Commands.CmdPerm;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -53,7 +52,7 @@ public final class QueryResources {
    */
   void compile(final Nodes nodes) throws QueryException {
     final Data d = nodes.data;
-    if(!ctx.context.perm(Perm.READ, d.meta)) PERMNO.thrw(null, CmdPerm.READ);
+    if(!ctx.context.perm(Perm.READ, d.meta)) PERMNO.thrw(null, Perm.READ);
 
     // assign initial context value
     // (if database only contains an empty root node, assign empty sequence)

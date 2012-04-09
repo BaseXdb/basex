@@ -2,35 +2,19 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
 
-import javax.swing.JScrollPane;
+import javax.swing.*;
 
-import org.basex.core.Commands.CmdPerm;
-import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.CreateUser;
-import org.basex.core.cmd.DropUser;
-import org.basex.core.cmd.Grant;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.core.cmd.List;
-import org.basex.core.cmd.ShowUsers;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPassword;
-import org.basex.gui.layout.BaseXTable;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.server.Session;
-import org.basex.util.Table;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+import org.basex.gui.layout.*;
+import org.basex.server.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Panel for displaying information about global/local users.
@@ -156,9 +140,8 @@ final class DialogUser extends BaseXBack {
       if(cmp instanceof Object[]) {
         final Object[] o = (Object[]) cmp;
         final boolean g = o[0] == Boolean.TRUE;
-        final CmdPerm perm = CmdPerm.values()[(Integer) o[2] - (g ? 0 : 1)];
-        final String uname = table.getModel().getValueAt(
-            (Integer) o[1], 0).toString();
+        final Perm perm = Perm.values()[(Integer) o[2] - (g ? 0 : 1)];
+        final String uname = table.getModel().getValueAt((Integer) o[1], 0).toString();
 
         final boolean confirm = !g && uname.equals(dia.loguser.getText());
         if(confirm && !Dialog.confirm(dia.gui, Util.info(S_DBREVOKE))) return;
@@ -166,7 +149,7 @@ final class DialogUser extends BaseXBack {
         sess.execute(new Grant(perm, uname, db));
         msg = sess.info();
         if(confirm) {
-          if(perm == CmdPerm.ADMIN) {
+          if(perm == Perm.ADMIN) {
             dia.tabs.setSelectedIndex(0);
             dia.action(dia.disconnect);
           } else {
@@ -214,7 +197,7 @@ final class DialogUser extends BaseXBack {
           if(!users.value(r, 0).equals(us)) continue;
           int c = 3;
           while(--c >= 0 && users.value(r, c).isEmpty());
-          final String perm = CmdPerm.values()[c].toString();
+          final String perm = Perm.values()[c].toString();
           sess.execute(new Grant(perm, us, db));
           msg = sess.info();
           if(!ok) break;

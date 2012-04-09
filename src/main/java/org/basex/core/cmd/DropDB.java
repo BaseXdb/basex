@@ -5,10 +5,9 @@ import static org.basex.core.Text.*;
 import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdDrop;
-import org.basex.core.Context;
 import org.basex.data.*;
-import org.basex.util.list.StringList;
-import org.basex.io.IOFile;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.

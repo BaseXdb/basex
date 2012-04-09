@@ -422,8 +422,7 @@ public abstract class ParseExpr extends Expr {
    * @param p permission
    * @throws QueryException query exception
    */
-  private void checkPerm(final QueryContext ctx, final Perm p)
-      throws QueryException {
+  private void checkPerm(final QueryContext ctx, final Perm p) throws QueryException {
     if(!ctx.context.user.has(p)) throw PERMNO.thrw(info, p);
   }
 

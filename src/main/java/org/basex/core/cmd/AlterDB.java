@@ -2,10 +2,9 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.CommandBuilder;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
-import org.basex.core.Context;
 import org.basex.data.*;
 
 /**
@@ -15,7 +14,7 @@ import org.basex.data.*;
  * @author Christian Gruen
  */
 public final class AlterDB extends ACreate {
-  /** States if current database was closed. */
+  /** Indicates if current database was closed. */
   private boolean closed;
 
   /**
@@ -37,12 +36,12 @@ public final class AlterDB extends ACreate {
 
     // database does not exist
     if(!mprop.dbexists(src)) return error(DB_NOT_FOUND_X, src);
-    // target database exists already
+    // target database already exists
     if(mprop.dbexists(trg)) return error(DB_EXISTS_X, trg);
 
     // close database if it's currently opened and not opened by others
     if(!closed) closed = close(context, src);
-    // check if database is still pinned
+    // check if source database is still opened
     if(context.pinned(src)) return error(DB_PINNED_X, src);
 
     // try to alter database

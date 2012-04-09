@@ -236,6 +236,31 @@ public final class MetaData {
     return nl != 0;
   }
 
+  /**
+   * Calculates the database size.
+   * @param io current file
+   * @return file length
+   */
+  private static long dbsize(final IOFile io) {
+    long s = 0;
+    if(io.isDir()) {
+      for(final IOFile f : io.children()) s += dbsize(f);
+    } else {
+      s += io.length();
+    }
+    return s;
+  }
+
+  /**
+   * Creates a database file.
+   * @param path database path
+   * @param fn filename
+   * @return database filename
+   */
+  public static IOFile file(final IOFile path, final String fn) {
+    return new IOFile(path, fn + IO.BASEXSUFFIX);
+  }
+
   // PUBLIC METHODS ===========================================================
 
   /**
@@ -252,21 +277,6 @@ public final class MetaData {
    */
   public long dbtime() {
     return path != null ? path.timeStamp() : 0;
-  }
-
-  /**
-   * Calculates the database size.
-   * @param io current file
-   * @return file length
-   */
-  private static long dbsize(final IOFile io) {
-    long s = 0;
-    if(io.isDir()) {
-      for(final IOFile f : io.children()) s += dbsize(f);
-    } else {
-      s += io.length();
-    }
-    return s;
   }
 
   /**
@@ -466,15 +476,5 @@ public final class MetaData {
       final String v) throws IOException {
     out.writeToken(token(k));
     out.writeToken(token(v));
-  }
-
-  /**
-   * Creates a database file instance.
-   * @param path database path
-   * @param fn filename
-   * @return database filename
-   */
-  private static IOFile file(final IOFile path, final String fn) {
-    return new IOFile(path, fn + IO.BASEXSUFFIX);
   }
 }

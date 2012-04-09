@@ -6,6 +6,7 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;
 
@@ -244,7 +245,7 @@ public final class Context {
    * @return result of check
    */
   public boolean pinned(final String db) {
-    return datas.pinned(db);
+    return datas.pinned(db) || TableDiskAccess.locked(db, this);
   }
 
   /**

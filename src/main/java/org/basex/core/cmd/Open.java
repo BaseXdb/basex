@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.io.*;
 
 import org.basex.core.*;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.data.*;
 import org.basex.util.*;
 
@@ -68,8 +67,7 @@ public final class Open extends Command {
     Data data = ctx.pin(name);
     if(data == null) {
       // check if document exists
-      if(!ctx.mprop.dbexists(name))
-        throw new BaseXException(Util.info(DB_NOT_FOUND_X, name));
+      if(!ctx.mprop.dbexists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
 
       data = new DiskData(name, ctx);
       ctx.pin(data);
@@ -78,6 +76,6 @@ public final class Open extends Command {
     if(ctx.perm(Perm.READ, data.meta)) return data;
 
     Close.close(data, ctx);
-    throw new BaseXException(PERM_NEEDED_X, CmdPerm.READ);
+    throw new BaseXException(PERM_NEEDED_X, Perm.READ);
   }
 }

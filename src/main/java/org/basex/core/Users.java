@@ -87,7 +87,7 @@ public final class Users {
    * @return success of operation
    */
   public synchronized boolean create(final String usern, final String pass) {
-    // check if user exists already
+    // check if user already exists
     return get(usern) == null && create(new User(usern, pass, Perm.NONE));
   }
 
@@ -109,7 +109,7 @@ public final class Users {
    * @return success of operation
    */
   public synchronized boolean alter(final String usern, final String pass) {
-    // check if user exists already
+    // check if user already exists
     final User user = get(usern);
     if(user == null) return false;
 
