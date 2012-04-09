@@ -50,17 +50,19 @@ public final class Check extends Command {
   /**
    * Opens the specified database; create a new one if it does not exist.
    * @param ctx database context
-   * @param path document path
+   * @param input document path
+   * @param path optional path to the addressed sub-directory. Set to {@code null}
+   *        if a single document is addressed
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static synchronized Data check(final Context ctx, final String path)
-      throws IOException {
+  public static synchronized Data check(final Context ctx, final String input,
+      final String path) throws IOException {
 
     // don't create new database if user has insufficient permissions
     final boolean create = ctx.user.has(Perm.CREATE);
 
-    final IO io = IO.get(path);
+    IO io = IO.get(input);
     final String name = io.dbname();
 
     // check if database is already opened
@@ -75,12 +77,12 @@ public final class Check extends Command {
     }
 
     // choose OPEN if user has no create permissions, or if database exists
-    if(!create || MetaData.found(path, name, ctx.mprop))
-      return Open.open(name, ctx);
+    if(!create || MetaData.found(input, name, ctx.mprop)) return Open.open(name, ctx);
 
     // check if input is an existing file
-    if(!io.exists() || io.isDir()) throw new FileNotFoundException(
-        Util.info(FILE_NOT_FOUND_X, io));
+    if(path != null) io = IO.get(io + "/" + path);
+    if(!io.exists() || path == null && io.isDir())
+      throw new BaseXException(Util.info(RESOURCE_NOT_FOUND_X, io));
 
     // if force flag is set to false, create a main memory instance
     if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(io, ctx);

@@ -78,7 +78,7 @@ public final class CreateDB extends ACreate {
     }
 
     if(io != null) {
-      if(!io.exists()) return error(FILE_NOT_FOUND_X, io);
+      if(!io.exists()) return error(RESOURCE_NOT_FOUND_X, io);
       if(io instanceof IOContent) io.name(name + '.' + format);
       parser = new DirParser(io, prop, mprop.dbpath(name));
     }
@@ -157,7 +157,7 @@ public final class CreateDB extends ACreate {
       throws IOException {
 
     if(!source.exists()) throw new FileNotFoundException(
-        Util.info(FILE_NOT_FOUND_X, source));
+        Util.info(RESOURCE_NOT_FOUND_X, source));
     return mainMem(new DirParser(source, ctx.prop, null), ctx);
   }
 

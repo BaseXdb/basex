@@ -125,7 +125,7 @@ public final class DialogNew extends Dialog {
     final String nm = target.getText().trim();
     ok = valid && !nm.isEmpty();
 
-    String inf = !valid ? FILE_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
+    String inf = !valid ? RESOURCE_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
     Msg icon = Msg.ERROR;
     if(ok) {
       ok = MetaData.validName(nm, false);

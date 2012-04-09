@@ -126,6 +126,13 @@ public final class FuncTest extends QueryTest {
       { "substring 2", str("foo"), "substring('foobar', 1, 3)" },
       { "substring 3", str(""), "substring('foobar', xs:double('NaN'), 3)" },
       { "substring 4", str("foo"), "substring('foobar', -1, 5)" },
+
+      { "collection 1", bool(false), "not(collection('src/test/resources/dir/'))" },
+      { "collection 2", bool(false), "not(collection('src/test/resources/input.xml'))" },
+
+      { "doc 1", bool(false), "not(doc('src/test/resources/input.xml'))" },
+      { "doc 2", "not(doc('src/test/resources/dir/'))" },
+
     };
   }
 

@@ -35,7 +35,7 @@ public final class Replace extends ACreate {
     // check if the input source has already been initialized
     if(in == null) {
       final IO io = IO.get(args[1]);
-      if(!io.exists()) return error(FILE_NOT_FOUND_X, io);
+      if(!io.exists()) return error(RESOURCE_NOT_FOUND_X, io);
       in = io.inputSource();
     }
 

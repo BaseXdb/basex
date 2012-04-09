@@ -69,7 +69,7 @@ public final class Open extends Command {
     if(data == null) {
       // check if document exists
       if(!ctx.mprop.dbexists(name))
-        throw new FileNotFoundException(Util.info(DB_NOT_FOUND_X, name));
+        throw new BaseXException(Util.info(DB_NOT_FOUND_X, name));
 
       data = new DiskData(name, ctx);
       ctx.pin(data);

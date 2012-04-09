@@ -10,12 +10,7 @@ import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
- * <p>This index organizes all database resources.</p>
- *
- * <p>If updates are performed, the path order is discarded, as its continuous
- * update would be more expensive in some cases (e.g. when bulk insertions of
- * new documents are performed). A tree structure could be introduced to
- * offer better general performance.</p>
+ * <p>This index organizes the resources of a database (XML documents and raw files).</p>
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

@@ -501,10 +501,10 @@ public interface Text {
   /** Updating error. */
   String LOCK_X = "Database '%' cannot be marked as 'updating'.";
 
-  /** File not found. */
-  String FILE_NOT_FOUND_X = lang("file_not_found_%");
-  /** Path not found. */
-  String FILE_NOT_FOUND = lang("file_not_found");
+  /** Resource not found. */
+  String RESOURCE_NOT_FOUND_X = lang("resource_not_found_%");
+  /** Resource "%" not found. */
+  String RESOURCE_NOT_FOUND = lang("resource_not_found");
   /** Skipped corrupt files. */
   String SKIPPED = lang("skipped");
   /** Info on skipped corrupt files. */

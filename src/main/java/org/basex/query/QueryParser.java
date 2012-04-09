@@ -1114,7 +1114,7 @@ public class QueryParser extends InputParser {
     }
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
-      if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
+      if(!eq(URLCOLL, coll)) error(WHICHCOLL, coll);
     }
     if(e.isEmpty()) return order;
     final OrderBy ord = new OrderByExpr(info(), e, desc, least);
@@ -1156,7 +1156,7 @@ public class QueryParser extends InputParser {
 
     if(wsConsumeWs(COLLATION)) {
       final byte[] coll = stringLiteral();
-      if(!eq(URLCOLL, coll)) throw error(INVCOLL, coll);
+      if(!eq(URLCOLL, coll)) throw error(WHICHCOLL, coll);
     }
 
     // add the new grouping var
