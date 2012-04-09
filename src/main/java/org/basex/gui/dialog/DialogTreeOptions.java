@@ -1,12 +1,11 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-import java.awt.BorderLayout;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.TableLayout;
+
+import java.awt.*;
+
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 
 /**
  * Dialog window for specifying the TreeMap layout.

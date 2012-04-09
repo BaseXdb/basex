@@ -305,7 +305,7 @@ public class DialogResources extends BaseXBack {
       final TreeNode n = selection();
       if(n == null) return;
 
-      final DialogInput d = new DialogInput(n.path(), RENAME, dialog.gui, 0);
+      final DialogInput d = new DialogInput(n.path(), RENAME, dialog, 0);
       if(!d.ok()) return;
 
       final String p = string(TreeNode.preparePath(token(d.input())));

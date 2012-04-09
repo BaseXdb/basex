@@ -1,16 +1,16 @@
 package org.basex.gui.dialog;
 
-import org.basex.core.Command;
 import static org.basex.core.Text.*;
-import org.basex.gui.GUI;
-import org.basex.gui.layout.*;
-import org.basex.util.Performance;
-import org.basex.util.Util;
+
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import org.basex.core.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * Dialog window for displaying the progress of a command execution.
@@ -24,13 +24,13 @@ public final class DialogProgress extends Dialog implements ActionListener {
   /** Refresh action. */
   private final Timer timer = new Timer(100, this);
    /** Information label. */
-  private final BaseXLabel info;
+  private BaseXLabel info;
   /** Memory usage. */
-  private final BaseXMem mem;
+  private BaseXMem mem;
   /** Executed command. */
-  private final Command command;
+  private Command command;
   /** Progress bar. */
-  private final JProgressBar bar;
+  private JProgressBar bar;
 
   /**
    * Default constructor.
@@ -38,9 +38,28 @@ public final class DialogProgress extends Dialog implements ActionListener {
    * @param title dialog title
    * @param cmd progress reference
    */
-  DialogProgress(final GUI main, final String title, final Command cmd) {
-    super(main, title, false);
+  private DialogProgress(final GUI main, final String title, final Command cmd) {
+    super(main, title);
+    init(main, cmd);
+  }
 
+  /**
+   * Default constructor.
+   * @param dialog dialog window
+   * @param title dialog title
+   * @param cmd progress reference
+   */
+  private DialogProgress(final Dialog dialog, final String title, final Command cmd) {
+    super(dialog, title);
+    init(dialog, cmd);
+  }
+
+  /**
+   * Initializes all components.
+   * @param parent parent component
+   * @param cmd progress reference
+   */
+  private void init(final Component parent, final Command cmd) {
     info = new BaseXLabel(" ", true, true);
     set(info, BorderLayout.NORTH);
 
@@ -67,7 +86,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
     command = cmd;
     timer.start();
-    finish(null);
+    pack();
+    setLocationRelativeTo(parent);
   }
 
   @Override
@@ -99,42 +119,44 @@ public final class DialogProgress extends Dialog implements ActionListener {
   /**
    * Runs the specified commands, decorated by a progress dialog, and
    * calls {@link Dialog#action} if the dialog is closed.
-   * @param d reference to the dialog window
-   * @param t dialog title (may be an empty string)
+   * @param dialog reference to the dialog window
+   * @param title dialog title (may be an empty string)
    * @param cmds commands to be run
    */
-  public static void execute(final Dialog d, final String t,
+  public static void execute(final Dialog dialog, final String title,
       final Command... cmds) {
-    execute(d, t, null, cmds);
+    execute(dialog, title, null, cmds);
   }
 
   /**
    * Runs the specified commands, decorated by a progress dialog, and
    * calls {@link Dialog#action} if the dialog is closed.
-   * @param d reference to the dialog window
-   * @param t dialog title (may be an empty string)
+   * @param dialog reference to the dialog window
+   * @param title dialog title (may be an empty string)
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  public static void execute(final Dialog d, final String t,
-      final Runnable post, final Command... cmds) {
+  public static void execute(final Dialog dialog, final String title, final Runnable post,
+      final Command... cmds) {
 
-    // start database creation thread
-    new Thread() {
-      @Override
-      public void run() {
-        d.setEnabled(false);
+    final GUI gui = dialog.gui;
+    for(final Command cmd : cmds) {
+      // reset views
+      final boolean newData = cmd.newData(gui.context);
+      if(newData) gui.notify.init();
 
-        final GUI gui = d.gui;
-        for(final Command cmd : cmds) {
-          // reset views
-          final boolean newData = cmd.newData(gui.context);
-          if(newData) gui.notify.init();
+      // create wait dialog
+      final DialogProgress wait;
+      if(dialog.isVisible()) {
+        wait = new DialogProgress(dialog, title, cmd);
+      } else {
+        wait = new DialogProgress(gui, title, cmd);
+      }
 
-          // open wait dialog
-          final DialogProgress wait = new DialogProgress(gui, t, cmd);
-          wait.setAlwaysOnTop(true);
-
+      // start command thread
+      new Thread() {
+        @Override
+        public void run() {
           // execute command
           final Performance perf = new Performance();
           gui.updating = cmd.updating(gui.context);
@@ -151,16 +173,19 @@ public final class DialogProgress extends Dialog implements ActionListener {
           // close progress window and show error if command failed
           wait.dispose();
           if(!ok) Dialog.error(gui, info.equals(INTERRUPTED) ? CREATION_CANCELED : info);
-
-          // initialize views if database was closed before
-          if(newData) gui.notify.init();
-          else if(cmd.updating(gui.context)) gui.notify.update();
         }
+      }.start();
 
-        d.setEnabled(true);
-        d.action(d);
-        if(post != null) post.run();
-      }
-    }.start();
+      // show progress windows until being disposed
+      wait.setVisible(true);
+
+      // initialize views if database was closed before
+      if(newData) gui.notify.init();
+      else if(cmd.updating(gui.context)) gui.notify.update();
+    }
+
+    dialog.setEnabled(true);
+    dialog.action(dialog);
+    if(post != null) post.run();
   }
 }

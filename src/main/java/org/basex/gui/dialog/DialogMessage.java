@@ -1,13 +1,13 @@
 package org.basex.gui.dialog;
 
-import org.basex.core.Text;
-import org.basex.gui.GUI;
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.core.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.*;
-import org.basex.util.Token;
-
-import javax.swing.*;
-import java.awt.*;
+import org.basex.util.*;
 
 /**
  * Dialog window for messages.
@@ -62,12 +62,13 @@ final class DialogMessage extends Dialog {
     }
     set(buttons, BorderLayout.SOUTH);
 
-    SwingUtilities.invokeLater(new Thread() {
+    addWindowListener(new WindowAdapter() {
       @Override
-      public void run() {
+      public void windowOpened(final WindowEvent e) {
         yes.requestFocusInWindow();
       }
     });
+
     finish(null);
   }
 

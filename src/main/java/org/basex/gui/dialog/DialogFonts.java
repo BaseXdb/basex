@@ -2,14 +2,10 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.awt.BorderLayout;
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 
-import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXList;
-import org.basex.gui.layout.TableLayout;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 
 /**
  * Dialog window for changing the used fonts.

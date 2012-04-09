@@ -2,17 +2,15 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.BorderLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import org.basex.data.MetaData;
-import org.basex.gui.GUI;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.data.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Rename database/drop documents dialog.
@@ -38,15 +36,13 @@ public final class DialogInput extends Dialog {
    * Default constructor.
    * @param o old input
    * @param tit title string
-   * @param main reference to the main window
+   * @param d dialog window
    * @param t type of dialog (rename database/copy database/drop documents)
    */
-  public DialogInput(final String o, final String tit, final GUI main,
-       final int t) {
-
-    super(main, tit);
+  public DialogInput(final String o, final String tit, final Dialog d, final int t) {
+    super(d, tit);
     old = o;
-    db = main.context.databases().listDBs();
+    db = d.gui.context.databases().listDBs();
     type = t;
 
     String title = "";

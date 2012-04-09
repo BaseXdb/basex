@@ -39,7 +39,7 @@ public class XMLInput extends InputStream {
    * @throws IOException I/O exception
    */
   public XMLInput(final IO io) throws IOException {
-    inputs[0] = new TextInput(io.inputStream());
+    inputs[0] = new TextInput(io);
     input = io;
   }
 

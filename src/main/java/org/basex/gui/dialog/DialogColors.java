@@ -2,15 +2,10 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.awt.BorderLayout;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXSlider;
-import org.basex.gui.layout.TableLayout;
+import java.awt.*;
+
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 
 /**
  * Dialog window for changing the used colors.

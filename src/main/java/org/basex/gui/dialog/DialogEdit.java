@@ -2,20 +2,16 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.gui.GUI;
+
+import java.awt.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.util.Util;
-import org.basex.util.XMLToken;
-import org.basex.util.list.StringList;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Dialog window for editing XML nodes.

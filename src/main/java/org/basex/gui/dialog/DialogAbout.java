@@ -2,25 +2,16 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.Box;
-import javax.swing.SwingConstants;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
+import javax.swing.*;
+import javax.swing.border.*;
 
-import org.basex.core.MainProp;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
+import org.basex.core.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.*;
 
 /**
  * Dialog window for displaying information about the project.

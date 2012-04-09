@@ -16,7 +16,7 @@ import org.basex.gui.layout.*;
 import org.basex.util.*;
 
 /**
- * This class provides the architecture for consistent dialog windows.
+ * This superclass in inherited by all dialog windows.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -25,9 +25,9 @@ public abstract class Dialog extends JDialog {
   /** Used mnemonics. */
   public final StringBuilder mnem = new StringBuilder();
   /** Reference to main window. */
-  public final GUI gui;
+  public GUI gui;
   /** Reference to the root panel. */
-  final BaseXBack panel;
+  BaseXBack panel;
   /** Remembers if the window was correctly closed. */
   boolean ok;
   /** Dialog position. */
@@ -43,7 +43,17 @@ public abstract class Dialog extends JDialog {
   };
 
   /**
-   * Default constructor.
+   * Constructor, called from a dialog window.
+   * @param d calling dialog
+   * @param title dialog title
+   */
+  Dialog(final Dialog d, final String title) {
+    super(d, title, true);
+    init(d.gui);
+  }
+
+  /**
+   * Constructor, called from the main window.
    * @param main reference to main window
    * @param title dialog title
    */
@@ -52,13 +62,21 @@ public abstract class Dialog extends JDialog {
   }
 
   /**
-   * Default constructor.
+   * Constructor, called from the main window.
    * @param main reference to the main window
    * @param title dialog title
    * @param modal modal flag
    */
   Dialog(final GUI main, final String title, final boolean modal) {
     super(main, title, modal);
+    init(main);
+  }
+
+  /**
+   * Initializes the dialog.
+   * @param main reference to the main window
+   */
+  void init(final GUI main) {
     gui = main;
     panel = new BaseXBack(new BorderLayout()).border(10, 10, 10, 10);
     add(panel, BorderLayout.CENTER);

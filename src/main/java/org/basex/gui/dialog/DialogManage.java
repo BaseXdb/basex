@@ -3,29 +3,15 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
-import java.awt.BorderLayout;
-import java.io.IOException;
-
-import org.basex.core.*;
-import org.basex.core.cmd.AlterDB;
-import org.basex.core.cmd.Copy;
-import org.basex.core.cmd.CreateBackup;
-import org.basex.core.cmd.DropBackup;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.Open;
-import org.basex.core.cmd.Restore;
-import org.basex.data.MetaData;
-import org.basex.gui.GUI;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXList;
-import org.basex.gui.layout.BaseXTabs;
+import java.awt.*;
+import java.io.*;
 import java.util.*;
 
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 import org.basex.io.in.DataInput;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -164,13 +150,13 @@ public final class DialogManage extends Dialog {
       refresh = true;
 
     } else if(cmp == rename) {
-      final DialogInput dr = new DialogInput(db, RENAME_DB, gui, 1);
+      final DialogInput dr = new DialogInput(db, RENAME_DB, this, 1);
       if(!dr.ok() || dr.input().equals(db)) return;
       cmds.add(new AlterDB(db, dr.input()));
       refresh = true;
 
     } else if(cmp == copy) {
-      final DialogInput dc = new DialogInput(db, COPY_DB, gui, 2);
+      final DialogInput dc = new DialogInput(db, COPY_DB, this, 2);
       if(!dc.ok() || dc.input().equals(db)) return;
       cmds.add(new Copy(db, dc.input()));
       refresh = true;
