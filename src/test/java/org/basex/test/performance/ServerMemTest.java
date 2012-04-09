@@ -25,8 +25,8 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients20parallel20() throws Exception {
-    run(20, 20);
+  public void clients10parallel10() throws Exception {
+    run(10, 10);
   }
 
   /**
@@ -34,8 +34,8 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients20parallel200() throws Exception {
-    run(20, 200);
+  public void clients10parallel100() throws Exception {
+    run(10, 100);
   }
 
   /**
@@ -43,8 +43,8 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients200parallel20() throws Exception {
-    run(200, 20);
+  public void clients100parallel10() throws Exception {
+    run(100, 10);
   }
 
   /**
@@ -52,8 +52,8 @@ public final class ServerMemTest extends SandboxTest {
    * @throws Exception exception
    */
   @Test
-  public void clients200parallel200() throws Exception {
-    run(200, 200);
+  public void clients100parallel100() throws Exception {
+    run(100, 100);
   }
 
   /**
