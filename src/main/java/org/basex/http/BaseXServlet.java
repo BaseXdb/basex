@@ -33,12 +33,16 @@ public abstract class BaseXServlet extends HttpServlet {
     try {
       run(http);
     } catch(final HTTPException ex) {
+      Util.debug(ex);
       http.status(ex.getStatus(), ex.getMessage());
     } catch(final LoginException ex) {
+      Util.debug(ex);
       http.status(SC_UNAUTHORIZED, ex.getMessage());
     } catch(final IOException ex) {
+      Util.debug(ex);
       http.status(SC_BAD_REQUEST, Util.message(ex));
     } catch(final QueryException ex) {
+      Util.debug(ex);
       http.status(SC_BAD_REQUEST, ex.getMessage());
     } catch(final Exception ex) {
       Util.errln(Util.bug(ex));

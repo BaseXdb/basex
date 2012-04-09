@@ -291,7 +291,9 @@ public abstract class BXResource implements Resource {
     q.bind("p", db);
     try {
       // retrieve and parse timestamp
-      return InfoDB.DATE.parse(q.execute()).getTime();
+      synchronized(InfoDB.DATE) {
+        return InfoDB.DATE.parse(q.execute()).getTime();
+      }
     } catch(final Exception ex) {
       Util.errln(ex);
       return 0;

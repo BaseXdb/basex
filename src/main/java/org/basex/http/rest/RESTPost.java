@@ -1,16 +1,12 @@
 package org.basex.http.rest;
 
-import static org.basex.http.rest.RESTSchema.*;
 import static org.basex.http.rest.RESTText.*;
 
 import java.io.*;
 import java.util.*;
 
-import javax.xml.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import javax.xml.validation.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.Set;
@@ -23,7 +19,6 @@ import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
-import org.xml.sax.*;
 
 /**
  * REST-based evaluation of POST operations.
@@ -32,20 +27,6 @@ import org.xml.sax.*;
  * @author Christian Gruen
  */
 public class RESTPost extends RESTCode {
-  /** Validator for POST schemas. */
-  private static final Validator VALIDATOR;
-
-  static {
-    Validator v = null;
-    try {
-      v = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).
-          newSchema(new StreamSource(new ArrayInput(SCHEMA))).newValidator();
-    } catch(final SAXException ex) {
-      Util.notexpected(ex);
-    }
-    VALIDATOR = v;
-  }
-
   @Override
   void run(final HTTPContext http) throws HTTPException, IOException {
     parseOptions(http);
@@ -158,8 +139,10 @@ public class RESTPost extends RESTCode {
       final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setNamespaceAware(true);
       final DocumentBuilder db = dbf.newDocumentBuilder();
-      VALIDATOR.validate(new DOMSource(db.parse(new ArrayInput(input))));
+      RESTSchema.newValidator().validate(new DOMSource(db.parse(new ArrayInput(input))));
     } catch(final Exception ex) {
+      Util.debug("Error while validating \"" + Token.string(input) + "\"");
+      Util.debug(ex);
       // validation fails
       HTTPErr.BAD_REQUEST_X.thrw(ex);
     }
