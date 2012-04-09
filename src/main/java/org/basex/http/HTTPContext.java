@@ -260,7 +260,7 @@ public final class HTTPContext {
    * Initializes the HTTP context.
    * @return context;
    */
-  public static Context init() {
+  public static synchronized Context init() {
     if(context == null) context = new Context();
     return context;
   }
