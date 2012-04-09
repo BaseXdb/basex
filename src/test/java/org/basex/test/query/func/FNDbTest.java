@@ -22,7 +22,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   /** Test file. */
   private static final String FILE = "src/test/resources/input.xml";
   /** Test folder. */
-  private static final String FLDR = "src/test/resources/dir";
+  private static final String FLDR = "src/test/resources/dir/";
   /** Number of XML files for folder. */
   private static final int NFLDR;
 
@@ -259,7 +259,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(COUNT.args(COLLECTION.args(NAME + "/test/dir")), NFLDR);
 
     query("for $f in " + _FILE_LIST.args(FLDR, "true()", "*.xml") +
-        " return " + _DB_ADD.args(NAME, "$f", "dir"));
+        " return " + _DB_ADD.args(NAME, " '" + FLDR + "' || $f", "dir"));
     query(COUNT.args(COLLECTION.args(NAME + "/dir")), NFLDR);
 
     query("for $i in 1 to 3 return " +

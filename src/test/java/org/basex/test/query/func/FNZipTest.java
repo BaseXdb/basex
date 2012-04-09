@@ -144,7 +144,7 @@ public final class FNZipTest extends AdvancedQueryTest {
     checkZipEntry("2", token("<a b=\"c\"/>"));
     // ZIP namespace must be removed from zipped node and its descendants
     query(_ZIP_ZIP_FILE.args(zipParams("<entry name='3'><a><b/></a></entry>")));
-    checkZipEntry("3", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
+    checkZipEntry("3", token("<a><b/></a>"));
     // ZIP namespace must be removed from zipped entry
     query(_ZIP_ZIP_FILE.args(
         zipParams("<entry name='4'><a xmlns=''/></entry>")));
@@ -154,7 +154,7 @@ public final class FNZipTest extends AdvancedQueryTest {
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("5", "<a/>")));
     checkZipEntry("5", token("<a/>"));
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("6", "<a><b/></a>")));
-    checkZipEntry("6", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
+    checkZipEntry("6", token("<a><b/></a>"));
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("7", "<z:a xmlns:z='z'/>")));
     checkZipEntry("7", token("<z:a xmlns:z=\"z\"/>"));
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("8", "<zip:a xmlns:zip='z'/>")));

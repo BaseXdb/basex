@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -46,8 +47,10 @@ public final class FNFileTest extends AdvancedQueryTest {
     check(_FILE_EXISTS);
     query(_FILE_WRITE.args(PATH1, "()"));
     query(_FILE_EXISTS.args(PATH1), true);
+    query(_FILE_EXISTS.args(IO.FILEPREF + "//" + PATH1), true);
     query(_FILE_DELETE.args(PATH1));
     query(_FILE_EXISTS.args(PATH1), false);
+    query(_FILE_EXISTS.args(IO.FILEPREF + "//" + PATH1), false);
   }
 
   /**

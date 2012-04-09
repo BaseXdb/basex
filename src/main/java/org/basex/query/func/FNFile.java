@@ -39,8 +39,7 @@ public final class FNFile extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkCreate(ctx);
-    final File path = new File(string(checkStr(expr[0], ctx)));
-
+    final File path = file(0, ctx);
     switch(sig) {
       case _FILE_LIST:            return list(path, ctx);
       case _FILE_READ_TEXT_LINES: return readTextLines(path, ctx);
@@ -49,12 +48,9 @@ public final class FNFile extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
-    final File path = expr.length == 0 ? null : new File(string(checkStr(expr[0], ctx)));
-
+    final File path = file(0, ctx);
     switch(sig) {
       case _FILE_APPEND:           return write(path, ctx, true);
       case _FILE_APPEND_BINARY:    return writeBinary(path, ctx, true);
@@ -165,7 +161,7 @@ public final class FNFile extends StandardFunc {
     // get canonical representation to resolve symbolic links
     final File dir;
     try {
-      dir = path.getCanonicalFile();
+      dir = new File(path.getCanonicalPath().replace("[\\/]$", ""));
     } catch(final IOException ex) {
       throw PATHINVALID.thrw(info, path);
     }
@@ -179,13 +175,13 @@ public final class FNFile extends StandardFunc {
         Prop.WIN ? Pattern.CASE_INSENSITIVE : 0);
 
     final StringList list = new StringList();
-    list(dir.getPath().length(), dir, list, rec, pat);
+    list(dir.getPath().length() + 1, dir, list, rec, pat);
 
     return new Iter() {
       int c;
       @Override
       public Item next() {
-        return c < list.size() ? Str.get(path + list.get(c++)) : null;
+        return c < list.size() ? Str.get(list.get(c++)) : null;
       }
     };
   }
@@ -214,8 +210,9 @@ public final class FNFile extends StandardFunc {
     }
     // parse files. ignore directories if a pattern is specified
     for(final File f : ch) {
-      if(pat == null || pat.matcher(f.getName()).matches() && !f.isDirectory())
+      if(pat == null || pat.matcher(f.getName()).matches() && !f.isDirectory()) {
         list.add(f.getPath().substring(root));
+      }
     }
   }
 
@@ -406,7 +403,7 @@ public final class FNFile extends StandardFunc {
   private Item copy(final File src, final QueryContext ctx, final boolean copy)
       throws QueryException {
 
-    File trg = new File(string(checkStr(expr[1], ctx))).getAbsoluteFile();
+    File trg = file(1, ctx).getAbsoluteFile();
     if(!src.exists()) PATHNOTEXISTS.thrw(info, src.getAbsolutePath());
 
     if(trg.isDirectory()) {
@@ -458,7 +455,19 @@ public final class FNFile extends StandardFunc {
    */
   private boolean optionalBool(final int i, final QueryContext ctx)
       throws QueryException {
-    return expr.length > i && checkBln(expr[i], ctx);
+    return i < expr.length && checkBln(expr[i], ctx);
+  }
+
+  /**
+   * Converts the specified argument to a file instance.
+   * @param i argument index
+   * @param ctx query context
+   * @return file instance
+   * @throws QueryException query exception
+   */
+  private File file(final int i, final QueryContext ctx) throws QueryException {
+    return i >= expr.length ? null :
+      new IOFile(IOUrl.file(string(checkStr(expr[i], ctx)))).file();
   }
 
   @Override
