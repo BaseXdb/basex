@@ -7,7 +7,6 @@ import java.util.*;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.dom.*;
-import javax.xml.validation.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.Set;
@@ -140,8 +139,7 @@ public class RESTPost extends RESTCode {
       final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setNamespaceAware(true);
       final DocumentBuilder db = dbf.newDocumentBuilder();
-      final Validator v = RESTSchema.INSTANCE.newValidator();
-      v.validate(new DOMSource(db.parse(new ArrayInput(input))));
+      RESTSchema.newValidator().validate(new DOMSource(db.parse(new ArrayInput(input))));
     } catch(final Exception ex) {
       Util.debug("Error while validating \"" + Token.string(input) + "\"");
       Util.debug(ex);

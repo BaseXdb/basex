@@ -14,7 +14,7 @@ import org.xml.sax.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public enum RESTSchema {
+enum RESTSchema {
   /** Single instance. */
   INSTANCE;
 
@@ -37,8 +37,8 @@ public enum RESTSchema {
    * Create a new validator against the schema.
    * @return a new validator
    */
-  public Validator newValidator() {
-    return schema.newValidator();
+  public static Validator newValidator() {
+    return INSTANCE.schema.newValidator();
   }
 
   /** Post Schema. */
