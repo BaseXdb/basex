@@ -27,7 +27,7 @@ public final class ModuleLoader {
   private static final ClassLoader LOADER =
       Thread.currentThread().getContextClassLoader();
   /** Cached URLs to be added to the class loader. */
-  private ArrayList<URL> urls = new ArrayList<URL>();
+  private final ArrayList<URL> urls = new ArrayList<URL>();
   /** Current class loader. */
   private ClassLoader loader = LOADER;
   /** Java modules. */
@@ -64,10 +64,19 @@ public final class ModuleLoader {
     // add EXPath package
     final TokenSet pkgs = context.repo.nsDict().get(uri);
     if(pkgs != null) {
+      Version ver = null;
+      byte[] nm = null;
       for(final byte[] name : pkgs) {
-        if(name != null) addRepo(name, new TokenSet(), new TokenSet(), ii, qp);
+        final Version v = new Version(Package.version(name));
+        if(ver == null || v.compareTo(ver) > 0) {
+          ver = v;
+          nm = name;
+        }
       }
-      return true;
+      if(nm != null) {
+        addRepo(nm, new TokenSet(), new TokenSet(), ii, qp);
+        return true;
+      }
     }
 
     // search module in repository: rewrite URI to file path
@@ -267,7 +276,7 @@ public final class ModuleLoader {
 
     // find package in package dictionary
     final byte[] pDir = context.repo.pkgDict().get(name);
-    if(pDir == null) NECPKGNOTINST.thrw(ii, name);
+    if(pDir == null) PKGNOTINST.thrw(ii, name);
     final IOFile pkgDir = context.repo.path(string(pDir));
 
     // parse package descriptor
@@ -288,7 +297,7 @@ public final class ModuleLoader {
       // we consider only package dependencies here
       final byte[] depPkg = new PkgValidator(context.repo, ii).depPkg(d);
       if(depPkg == null) {
-        NECPKGNOTINST.thrw(ii, string(d.pkg));
+        PKGNOTINST.thrw(ii, string(d.pkg));
       } else {
         if(toLoad.contains(depPkg)) CIRCMODULE.thrw(ii);
         addRepo(depPkg, toLoad, loaded, ii, qp);

@@ -28,7 +28,7 @@ public final class Create extends ACreate {
   @Override
   protected boolean run() {
     // check if file exists
-    if(!parser.src.exists()) return error(FILE_NOT_FOUND_X, parser.src);
+    if(!parser.src.exists()) return error(RESOURCE_NOT_FOUND_X, parser.src);
     // run the build process
     return build(parser, args[0]);
   }

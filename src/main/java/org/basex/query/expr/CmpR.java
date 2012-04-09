@@ -28,7 +28,7 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
- * Range comparison expression.
+ * Numeric range expression.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -56,8 +56,9 @@ public final class CmpR extends Single {
    * @param mx maximum value
    * @param ix include maximum value
    */
-  private CmpR(final InputInfo ii, final Expr e, final double mn,
-      final boolean in, final double mx, final boolean ix) {
+  private CmpR(final InputInfo ii, final Expr e, final double mn, final boolean in,
+      final double mx, final boolean ix) {
+
     super(ii, e);
     min = mn;
     mni = in;
@@ -81,25 +82,17 @@ public final class CmpR extends Single {
     final Expr e = ex.expr[0];
     final double d = it.dbl(ex.info);
     switch(ex.op.op) {
-      case EQ:
-        return new CmpR(ex.info, e, d, true, d, true);
-      case GE:
-        return new CmpR(ex.info, e, d, true, Double.POSITIVE_INFINITY, true);
-      case GT:
-        return new CmpR(ex.info, e, d, false, Double.POSITIVE_INFINITY, true);
-      case LE:
-        return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, true);
-      case LT:
-        return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, false);
-      default:
-        return ex;
+      case EQ: return new CmpR(ex.info, e, d, true, d, true);
+      case GE: return new CmpR(ex.info, e, d, true, Double.POSITIVE_INFINITY, true);
+      case GT: return new CmpR(ex.info, e, d, false, Double.POSITIVE_INFINITY, true);
+      case LE: return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, true);
+      case LT: return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, false);
+      default: return ex;
     }
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(atomic) {
       final Item it = expr.item(ctx, info);
@@ -112,8 +105,7 @@ public final class CmpR extends Single {
     final Iter ir = ctx.iter(expr);
     for(Item it; (it = ir.next()) != null;) {
       final double d = it.dbl(info);
-      if((mni ? d >= min : d > min) && (mxi ? d <= max : d < max))
-        return Bln.TRUE;
+      if((mni ? d >= min : d > min) && (mxi ? d <= max : d < max)) return Bln.TRUE;
     }
     return Bln.FALSE;
   }
@@ -201,11 +193,9 @@ public final class CmpR extends Single {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(min != Double.NEGATIVE_INFINITY)
-      sb.append(min).append(mni ? " <= " : " < ");
+    if(min != Double.NEGATIVE_INFINITY) sb.append(min).append(mni ? " <= " : " < ");
     sb.append(expr);
-    if(max != Double.POSITIVE_INFINITY)
-      sb.append(mxi ? " <= " : " < ").append(max);
+    if(max != Double.POSITIVE_INFINITY) sb.append(mxi ? " <= " : " < ").append(max);
     return sb.toString();
   }
 }

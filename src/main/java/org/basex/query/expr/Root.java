@@ -1,16 +1,11 @@
 package org.basex.query.expr;
 
 import static org.basex.query.util.Err.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Root node.
@@ -25,7 +20,12 @@ public final class Root extends Simple {
    */
   public Root(final InputInfo ii) {
     super(ii);
-    type = SeqType.NOD_ZM;
+    type = SeqType.DOC_ZM;
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) {
+    return ctx.value != null && ctx.value.type == NodeType.DOC ? ctx.value : this;
   }
 
   @Override

@@ -15,10 +15,14 @@ import org.junit.*;
  * @author Christian Gruen
  */
 public abstract class BaseXTest extends MainTest {
-  /** Delete the test files. */
+  /**
+   * Deletes the test files.
+   * @throws IOException I/O exception
+   */
   @After
-  public void clean() {
+  public void clean() throws IOException {
     assertTrue("Could not delete input file.", !INPUT.exists() || INPUT.delete());
+    run("-cdrop db " + NAME);
   }
 
   /**

@@ -18,7 +18,7 @@ public final class Get extends AGet {
    * @param key property
    */
   public Get(final Object key) {
-    super(Perm.READ,
+    super(Perm.NONE,
         (key instanceof Object[] ? ((Object[]) key)[0] : key).toString());
   }
 

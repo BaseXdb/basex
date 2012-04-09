@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
 import java.awt.*;
@@ -30,19 +31,18 @@ public class DialogResources extends BaseXBack {
   final TreeFolder root;
   /** Dialog reference. */
   final Dialog dialog;
-
   /** Resource tree. */
-  private final BaseXTree tree;
+  final BaseXTree tree;
   /** Filter button. */
-  private final BaseXButton filter;
+  final BaseXButton filter;
   /** Clear button. */
-  private final BaseXButton clear;
+  final BaseXButton clear;
 
   /**
    * Constructor.
    * @param dp dialog reference
    */
-  public DialogResources(final DialogProps dp) {
+  DialogResources(final DialogProps dp) {
     setLayout(new BorderLayout(0, 5));
     dialog = dp;
 
@@ -79,10 +79,11 @@ public class DialogResources extends BaseXBack {
     final String label = data.meta.name + " (/)";
     root = new TreeRootFolder(token(label), token("/"), tree, data);
     ((DefaultTreeModel) tree.getModel()).insertNodeInto(root, rootNode, 0);
-    tree.expandPath(new TreePath(root.getPath()));
 
     filter = new BaseXButton(FILTER, dp);
     clear = new BaseXButton(CLEAR, dp);
+    filter.setEnabled(false);
+    clear.setEnabled(false);
 
     // popup menu for node interaction
     new BaseXPopup(tree, dp.gui, new DeleteCmd(), new RenameCmd());
@@ -94,7 +95,8 @@ public class DialogResources extends BaseXBack {
     final BaseXBack btn = new BaseXBack().layout(new BorderLayout());
     btn.add(buttons, BorderLayout.EAST);
 
-    filterText = new BaseXTextField("/", dp);
+    filterText = new BaseXTextField(PLEASE_WAIT_D, dp);
+    filterText.setEnabled(false);
     BaseXLayout.setWidth(filterText, 250);
 
     // left panel
@@ -104,9 +106,21 @@ public class DialogResources extends BaseXBack {
 
     final JScrollPane sp = new JScrollPane(tree);
     BaseXLayout.setWidth(sp, 250);
-    //sp.setSize(190, 500);
     add(sp, BorderLayout.CENTER);
     add(panel, BorderLayout.SOUTH);
+
+    new Thread() {
+      @Override
+      public void run() {
+        tree.setCursor(CURSORWAIT);
+        tree.expandPath(new TreePath(root.getPath()));
+        filterText.setText("/");
+        filterText.setEnabled(true);
+        tree.setCursor(CURSORARROW);
+        filter.setEnabled(true);
+        clear.setEnabled(true);
+      }
+    }.start();
   }
 
   /**
@@ -162,8 +176,7 @@ public class DialogResources extends BaseXBack {
     // check if there's a directory
     // create a folder if there's either a raw or document folder
     if(data.resources.isDir(path)) {
-      root.add(new TreeFolder(TreeFolder.name(path),
-          TreeFolder.path(path), tree, data));
+      root.add(new TreeFolder(TreeFolder.name(path), TreeFolder.path(path), tree, data));
     }
 
     // now add the actual files (if there are any)

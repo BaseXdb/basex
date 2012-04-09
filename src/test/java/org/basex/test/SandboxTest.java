@@ -25,7 +25,7 @@ public abstract class SandboxTest {
   /** Database context. */
   public static Context context;
   /** Clean up files. */
-  public static boolean cleanup;
+  public static boolean cleanup = true;
 
   /**
    * Creates the sandbox.
@@ -36,8 +36,18 @@ public abstract class SandboxTest {
     sb.delete();
     assertTrue("Sandbox could not be created.", sb.md());
     context = new Context();
-    context.mprop.set(MainProp.DBPATH, sb.path());
-    cleanup = true;
+    initContext(context);
+  }
+
+  /**
+   * Initializes the specified context.
+   * @param ctx context
+   */
+  protected static void initContext(final Context ctx) {
+    final IOFile sb = sandbox();
+    ctx.mprop.set(MainProp.DBPATH, sb.path() + "/data");
+    ctx.mprop.set(MainProp.HTTPPATH, sb.path() + "/http");
+    ctx.mprop.set(MainProp.REPOPATH, sb.path() + "/repo");
   }
 
   /**

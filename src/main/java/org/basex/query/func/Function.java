@@ -537,7 +537,7 @@ public enum Function {
   /** XQuery function */
   _FILE_CREATE_DIRECTORY(FNFile.class, "create-directory(path)", EMP, STR),
   /** XQuery function */
-  _FILE_DELETE(FNFile.class, "delete(path)", EMP, STR),
+  _FILE_DELETE(FNFile.class, "delete(path)", EMP, 1, STR, BLN),
   /** XQuery function */
   _FILE_READ_TEXT(FNFile.class, "read-text(path[,encoding])", STR, 1, STR, STR),
   /** XQuery function */

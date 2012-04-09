@@ -27,12 +27,11 @@ public class TreeFolder extends TreeNode {
    * Constructor.
    * @param nm displayed node name
    * @param pth folder path
-   * @param bxt tree reference
+   * @param t tree reference
    * @param d data reference
    */
-  public TreeFolder(final byte[] nm, final byte[] pth, final BaseXTree bxt,
-      final Data d) {
-    super(nm, pth, bxt, d);
+  public TreeFolder(final byte[] nm, final byte[] pth, final BaseXTree t, final Data d) {
+    super(nm, pth, t, d);
   }
 
   @Override
@@ -40,9 +39,7 @@ public class TreeFolder extends TreeNode {
     if(loaded) return;
 
     // append new child nodes, folders first ...
-    for(final byte[] b : folders(this)) {
-      add(new TreeFolder(b, subfolder(), tree, data));
-    }
+    for(final byte[] b : folders(this)) add(new TreeFolder(b, subfolder(), tree, data));
     // ... then leaves.
     for(final TreeLeaf l : leaves(this)) add(l);
 

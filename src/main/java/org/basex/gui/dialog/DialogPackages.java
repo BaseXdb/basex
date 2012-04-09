@@ -132,8 +132,8 @@ public final class DialogPackages extends Dialog {
         type.setText(PkgText.EXPATH);
         directory.setText(Token.string(pkg.get(key)));
       } else {
+        final IOFile file = RepoManager.file(key, ctx.repo);
         final String path = Token.string(key);
-        final IOFile file = RepoManager.file(path, ctx.repo);
         title.setText(key.length == 0 ? DOTS : path);
         name.setText(file != null ? file.name() : "-");
         version.setText("-");

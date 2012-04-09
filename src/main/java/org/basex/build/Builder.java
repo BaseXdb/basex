@@ -173,8 +173,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void text(final byte[] value) throws IOException {
-    final byte[] t = meta.chop ? trim(value) : value;
-    if(t.length != 0) addText(t, Data.TEXT);
+    if(value.length != 0) addText(value, Data.TEXT);
   }
 
   /**

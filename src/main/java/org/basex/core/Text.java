@@ -498,10 +498,10 @@ public interface Text {
   /** Parse error. */
   String NOT_PARSED_X = lang("not_parsed_%");
 
-  /** File not found. */
-  String FILE_NOT_FOUND_X = lang("file_not_found_%");
-  /** Path not found. */
-  String FILE_NOT_FOUND = lang("file_not_found");
+  /** Resource not found. */
+  String RESOURCE_NOT_FOUND_X = lang("resource_not_found_%");
+  /** Resource "%" not found. */
+  String RESOURCE_NOT_FOUND = lang("resource_not_found");
   /** Skipped corrupt files. */
   String SKIPPED = lang("skipped");
   /** Info on skipped corrupt files. */
@@ -712,7 +712,9 @@ public interface Text {
   /** Package deleted. */
   String PKG_DELETED_X = lang("pkg_deleted_%");
   /** Package installed. */
-  String PKG_INSTALLED_X = lang("pkg_installed_%");
+  String PKG_INSTALLED_X_X = lang("pkg_installed_%_%");
+  /** Package replaced. */
+  String PKG_REPLACED_X_X = lang("pkg_replaced_%_%");
 
   // GENERAL COMMANDS =========================================================
 

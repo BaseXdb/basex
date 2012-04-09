@@ -155,7 +155,7 @@ public final class Util {
   public static String message(final Throwable ex) {
     final String msg = ex.getMessage();
     if(ex instanceof BindException) return SRV_RUNNING;
-    else if(ex instanceof FileNotFoundException) return info(FILE_NOT_FOUND_X, msg);
+    else if(ex instanceof FileNotFoundException) return info(RESOURCE_NOT_FOUND_X, msg);
     else if(ex instanceof LoginException) return ACCESS_DENIED;
     else if(ex instanceof ConnectException) return CONNECTION_ERROR;
     else if(ex instanceof SocketTimeoutException) return TIMEOUT_EXCEEDED;

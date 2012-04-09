@@ -73,7 +73,7 @@ public final class Add extends ACreate {
     }
 
     if(io != null) {
-      if(!io.exists()) return error(FILE_NOT_FOUND_X, create ? io : args[1]);
+      if(!io.exists()) return error(RESOURCE_NOT_FOUND_X, create ? io : args[1]);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
     }
 

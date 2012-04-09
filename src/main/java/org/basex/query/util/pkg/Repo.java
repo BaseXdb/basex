@@ -70,29 +70,6 @@ public final class Repo {
   }
 
   /**
-   * Removes a package from the namespace and package dictionaries when it is
-   * deleted.
-   * @param pkg deleted package
-   */
-  synchronized void remove(final Package pkg) {
-    init();
-
-    final byte[] name = pkg.uniqueName();
-    // delete package from namespace dictionary
-    for(final Component comp : pkg.comps) {
-      final byte[] uri = comp.uri;
-      final TokenSet pkgs = nsDict.get(uri);
-      if(pkgs.size() > 1) {
-        pkgs.delete(name);
-      } else {
-        nsDict.delete(uri);
-      }
-    }
-    // delete package from package dictionary
-    pkgDict.delete(name);
-  }
-
-  /**
    * Adds a newly installed package to the namespace and package dictionaries.
    * @param pkg new package
    * @param dir new package directory
@@ -111,6 +88,28 @@ public final class Repo {
     }
     // update package dictionary
     pkgDict.add(name, token(dir));
+  }
+
+  /**
+   * Deletes a package from the namespace and package dictionaries when it is deleted.
+   * @param pkg deleted package
+   */
+  synchronized void delete(final Package pkg) {
+    init();
+
+    final byte[] name = pkg.uniqueName();
+    // delete package from namespace dictionary
+    for(final Component comp : pkg.comps) {
+      final byte[] uri = comp.uri;
+      final TokenSet pkgs = nsDict.get(uri);
+      if(pkgs.size() > 1) {
+        pkgs.delete(name);
+      } else {
+        nsDict.delete(uri);
+      }
+    }
+    // delete package from package dictionary
+    pkgDict.delete(name);
   }
 
   /**

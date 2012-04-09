@@ -39,7 +39,7 @@ public final class PinTest extends SandboxTest {
   /** Creates new database contexts. */
   @BeforeClass
   public static void start() {
-    CONTEXT2.mprop.set(MainProp.DBPATH, sandbox().path());
+    initContext(CONTEXT2);
   }
 
   /** Closes the database contexts. */

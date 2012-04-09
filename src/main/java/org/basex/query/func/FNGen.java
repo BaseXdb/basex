@@ -119,8 +119,7 @@ public final class FNGen extends StandardFunc {
    */
   private Value collection(final QueryContext ctx) throws QueryException {
     final Item it = expr.length != 0 ? expr[0].item(ctx, info) : null;
-    return ctx.resource.collection(
-        it != null ? string(checkEStr(it)) : null, info);
+    return ctx.resource.collection(it != null ? string(checkEStr(it)) : null, info);
   }
 
   /**
@@ -174,7 +173,7 @@ public final class FNGen extends StandardFunc {
     if(it == null) return null;
 
     final String in = string(checkEStr(it));
-    final Data d = ctx.resource.data(in, false, info);
+    final Data d = ctx.resource.data(in, null, info);
     if(!d.single()) EXPSINGLE.thrw(info, in);
     return new DBNode(d, 0, Data.DOC);
   }

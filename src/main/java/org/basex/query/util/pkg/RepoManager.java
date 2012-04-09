@@ -12,6 +12,7 @@ import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.query.util.pkg.Package.Dependency;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -50,13 +51,14 @@ public final class RepoManager {
   }
 
   /**
-   * Installs a new package.
+   * Installs a package.
    * @param path package path
+   * @return {@code true} if package was replaced
    * @throws QueryException query exception
    */
-  public void install(final String path) throws QueryException {
+  public boolean install(final byte[] path) throws QueryException {
     // check if package exists, and cache contents
-    final IO io = IO.get(path);
+    final IO io = IO.get(string(path));
     byte[] cont = null;
     try {
       cont = io.read();
@@ -66,19 +68,13 @@ public final class RepoManager {
     }
 
     try {
-      if(io.hasSuffix(IO.XQSUFFIXES)) {
-        installXQ(cont);
-      } else if(io.hasSuffix(IO.JARSUFFIX)) {
-        installJAR(cont);
-      } else {
-        installXAR(cont);
-      }
-    } catch(final FileNotFoundException ex) {
-      Util.debug(ex);
-      PKGREADFNF.thrw(info, io.name(), ex.getMessage());
+      if(io.hasSuffix(IO.XQSUFFIXES)) return installXQ(cont);
+      if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont);
+      return installXAR(cont);
     } catch(final IOException ex) {
+      final Err err = ex instanceof FileNotFoundException ? PKGREADFNF : PKGREADFAIL;
       Util.debug(ex);
-      PKGREADFAIL.thrw(info, io.name(), ex.getMessage());
+      throw err.thrw(info, io.name(), ex.getMessage());
     }
   }
 
@@ -99,6 +95,7 @@ public final class RepoManager {
     for(final byte[] p : pkg) {
       if(p == null) continue;
       final TokenList tl = new TokenList();
+      System.out.println("- " + string(p));
       tl.add(Package.name(p));
       tl.add(Package.version(p));
       tl.add(EXPATH);
@@ -151,23 +148,20 @@ public final class RepoManager {
    * @param pkg package
    * @throws QueryException query exception
    */
-  public void delete(final String pkg) throws QueryException {
+  public void delete(final byte[] pkg) throws QueryException {
     boolean found = false;
     final TokenMap dict = repo.pkgDict();
     for(final byte[] nextPkg : dict) {
       if(nextPkg == null) continue;
-      final byte[] dir = dict.get(nextPkg);
-
-      // a package can be deleted either by its name or by its directory name
-      if(eq(Package.name(nextPkg), token(pkg)) || eq(dir, token(pkg))) {
+      // a package can be deleted by its name or the name suffixed with its version
+      if(eq(nextPkg, pkg) || eq(Package.name(nextPkg), pkg)) {
         // check if package to be deleted participates in a dependency
         final byte[] primPkg = primary(nextPkg);
         if(primPkg != null) PKGDEP.thrw(info, string(primPkg), pkg);
 
         // clean package repository
-        final IOFile f = repo.path(string(dir));
-        final IOFile desc = new IOFile(f, DESCRIPTOR);
-        repo.remove(new PkgParser(repo, info).parse(desc));
+        final IOFile f = repo.path(string(dict.get(nextPkg)));
+        repo.delete(new PkgParser(repo, info).parse(new IOFile(f, DESCRIPTOR)));
         // package does not participate in a dependency => delete it
         if(!f.delete()) PKGDEL.thrw(info, f);
         found = true;
@@ -185,19 +179,20 @@ public final class RepoManager {
   }
 
   /**
-   * Looks for a file for the specified name.
+   * Looks for a file with the specified name.
    * @param name name
    * @param repo repository
    * @return file, or {@code null}
    */
-  public static IOFile file(final String name, final Repo repo) {
+  public static IOFile file(final byte[] name, final Repo repo) {
     // traverse all files, find exact matches
-    IOFile path = new IOFile(repo.path(), name);
+    final String nm = string(name);
+    IOFile path = new IOFile(repo.path(), nm);
     for(final IOFile ch : new IOFile(path.dir()).children()) {
       if(ch.name().equals(path.name())) return ch;
     }
     // traverse all files, find prefix matches
-    path = new IOFile(repo.path(), name.replace('.', '/'));
+    path = new IOFile(repo.path(), nm.replace('.', '/'));
     String start = path.name() + '.';
     for(final IOFile ch : new IOFile(path.dir()).children()) {
       if(ch.name().startsWith(start)) return ch;
@@ -210,10 +205,11 @@ public final class RepoManager {
   /**
    * Installs an XQuery module.
    * @param cont package content
+   * @return {@code true} if existing package was replaced
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void installXQ(final byte[] cont) throws QueryException, IOException {
+  private boolean installXQ(final byte[] cont) throws QueryException, IOException {
     // parse module to find namespace uri
     final Context ctx = repo.context;
     final byte[] uri = new QueryContext(ctx).module(string(cont)).uri();
@@ -223,17 +219,18 @@ public final class RepoManager {
     if(path == null) INSTERR.thrw(info, uri);
 
     final IOFile rp = new IOFile(ctx.mprop.get(MainProp.REPOPATH));
-    checkInstall(rp, path, uri);
+    final boolean exists = md(rp, path);
     new IOFile(rp, path + IO.XQMSUFFIX).write(cont);
+    return exists;
   }
 
   /**
    * Installs a JAR package.
    * @param cont package content
-   * @throws QueryException query exception
+   * @return {@code true} if existing package was replaced
    * @throws IOException I/O exception
    */
-  private void installJAR(final byte[] cont) throws QueryException, IOException {
+  private boolean installJAR(final byte[] cont) throws IOException {
     final Zip zip = new Zip(new IOContent(cont));
     final IOContent mf = new IOContent(zip.read(MANIFEST_MF));
     final NewlineInput nli = new NewlineInput(mf);
@@ -244,44 +241,52 @@ public final class RepoManager {
       // copy file to rewritten file path
       final IOFile rp = new IOFile(repo.context.mprop.get(MainProp.REPOPATH));
       final String path = m.group(1).replace('.', '/');
-      checkInstall(rp, path, token(path));
+      final boolean exists = md(rp, path);
       new IOFile(rp, path + IO.JARSUFFIX).write(cont);
+      return exists;
     }
+    return false;
   }
 
   /**
-   * Checks if a package has already been installed.
+   * Creates the package directory and deletes existing packages.
    * @param rp path to the repository
    * @param path file path
-   * @param uri original URI
-   * @throws QueryException query exception
+   * @return {@code true} if a package already existed
    */
-  private void checkInstall(final IOFile rp, final String path, final byte[] uri)
-      throws QueryException {
-
+  private boolean md(final IOFile rp, final String path) {
     final IOFile target = new IOFile(rp, path);
     final IOFile dir = new IOFile(target.dir());
     dir.md();
-    if(dir.children(target.name() + ".*").length != 0) MODINST.thrw(info, uri);
+    final IOFile[] ch = dir.children(target.name() + ".*");
+    for(final IOFile c : ch) c.delete();
+    return ch.length != 0;
   }
 
   /**
    * Installs a XAR package.
    * @param cont package content
+   * @return {@code true} if existing package was replaced
    * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private void installXAR(final byte[] cont) throws QueryException, IOException {
+  private boolean installXAR(final byte[] cont) throws QueryException, IOException {
     final Zip zip = new Zip(new IOContent(cont));
     // parse and validate descriptor file
     final IOContent dsc = new IOContent(zip.read(DESCRIPTOR));
     final Package pkg = new PkgParser(repo, info).parse(dsc);
+
+    // remove existing package
+    final byte[] name = pkg.uniqueName();
+    final boolean exists = repo.pkgDict().get(name) != null;
+    if(exists) delete(name);
     new PkgValidator(repo, info).check(pkg);
 
     // choose unique directory, unzip files and register repository
-    final IOFile file = uniqueDir(string(pkg.uniqueName()).replaceAll("[^\\w.-]+", "-"));
+    final IOFile file = uniqueDir(string(name).replaceAll("[^\\w.-]+", "-"));
     zip.unzip(file);
     repo.add(pkg, file.name());
+    return exists;
   }
 
   /**

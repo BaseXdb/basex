@@ -882,6 +882,7 @@ public abstract class Data {
     int p = pre;
     while(p < meta.size) {
       final int k = kind(p);
+      if(k == DOC) break;
       dist(p, k, dist(p, k) + size);
       p += size(p, k);
     }

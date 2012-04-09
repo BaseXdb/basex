@@ -89,15 +89,13 @@ public enum Err {
   /** FODC0002: Evaluation exception. */
   UNDOC(FODC, 2, "Document node could not be created (%)."),
   /** FODC0002: Evaluation exception. */
-  COLLINV(FODC, 2, "Invalid collection '%'."),
-  /** FODC0002: Evaluation exception. */
   NODEFCOLL(FODC, 2, "No default collection available."),
   /** FODC0002: Evaluation exception. */
   IOERR(FODC, 2, "%"),
   /** FODC0002: Evaluation exception. */
   RESFNF(FODC, 2, "Resource '%' does not exist."),
   /** FODC0004: Evaluation exception. */
-  NOCOLL(FODC, 4, "%"),
+  INVCOLL(FODC, 4, "Invalid collection '%'."),
   /** FODC0006: Evaluation exception. */
   SAXERR(FODC, 6, "SAX: %."),
   /** FODC0007: Evaluation exception. */
@@ -169,13 +167,9 @@ public enum Err {
   /** PACK0001: Evaluation exception. */
   PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
   /** PACK0002: Evaluation exception. */
-  PKGINST(PACK, 2, "Package '%' is already installed."),
-  /** PACK0002: Evaluation exception. */
-  MODINST(PACK, 2, "Module '%' is already installed."),
-  /** PACK0002: Evaluation exception. */
   INSTERR(PACK, 2, "Namespace URI is invalid: '%'."),
   /** PACK0003: Evaluation exception. */
-  NECPKGNOTINST(PACK, 3, "Required package '%' is not installed."),
+  PKGNOTINST(PACK, 3, "Required package '%' is not installed."),
   /** PACK0004: Evaluation exception. */
   PKGDESCINV(PACK, 4, "Package descriptor: %."),
   /** PACK0004: Evaluation exception. */
@@ -691,7 +685,7 @@ public enum Err {
   /** XQST0075: Parsing exception. */
   IMPLVAL(XQST, 75, "Validation not supported yet."),
   /** XQST0076: Parsing exception. */
-  INVCOLL(XQST, 76, "Unknown collation '%'."),
+  WHICHCOLL(XQST, 76, "Unknown collation '%'."),
   /** XQST0079: Parsing exception. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
   /** XQST0085: Parsing exception. */
@@ -843,18 +837,8 @@ public enum Err {
   CRYPTOXPINV(FOCX, 4, "XPath expression is invalid."),
   /** FOCX03: Crypto Exception. */
   CRYPTOINVNM(FOCX, 5, "Invalid name for $digital-certificate root."),
-  /* FOCX03: Crypto Exception.
-  CRYPTOINVCH(FOCX, 6, "Invalid child element of $digital-certificate."), */
   /** FOCX03: Crypto Exception. */
   CRYPTOKSNULL(FOCX, 7, "Key store is null."),
-  /* FOCX03: Crypto Exception.
-  CRYPTOIOERR(FOCX, 8, "I/O error while reading keystore."), */
-  /* FOCX03: Crypto Exception.
-  CRYPTOPERMDEN(FOCX, 9, "Permission denied to read keystore."), */
-  /* FOCX03: Crypto Exception.
-  CRYPTOKSURLINV(FOCX, 10, "Keystore URL is invalid."), */
-  /* FOCX03: Crypto Exception.
-  CRYPTOKSTYPE(FOCX, 11, "Keystore type is not supported."), */
   /** FOCX03: Crypto Exception. */
   CRYPTONOKEY(FOCX, 12, "Cannot find key for alias in given keystore."),
   /** FOCX13: Crypto Exception. */

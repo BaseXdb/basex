@@ -294,8 +294,7 @@ public final class CmpG extends Cmp {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
     if(op != OpG.EQ) return false;
-    final AxisStep s = expr[0] instanceof Context ?
-        ic.step : indexStep(expr[0]);
+    final AxisStep s = expr[0] instanceof Context ? ic.step : indexStep(expr[0]);
     if(s == null) return false;
 
     // check which index applies

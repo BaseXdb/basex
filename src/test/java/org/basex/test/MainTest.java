@@ -47,8 +47,6 @@ public abstract class MainTest extends SandboxTest {
    */
   final void contains(final String exp, final String... args) throws IOException {
     final String result = run(args);
-    if(!result.contains(exp)) {
-      fail('\'' + exp + "' not contained in '" + result + "'.");
-    }
+    if(!result.contains(exp)) fail('\'' + exp + "' not contained in '" + result + "'.");
   }
 }

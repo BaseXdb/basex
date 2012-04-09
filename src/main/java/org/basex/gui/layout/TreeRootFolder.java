@@ -19,8 +19,8 @@ public class TreeRootFolder extends TreeFolder {
    * @param bxt tree reference
    * @param d data reference
    */
-  public TreeRootFolder(final byte[] nm, final byte[] pth,
-      final BaseXTree bxt, final Data d) {
+  public TreeRootFolder(final byte[] nm, final byte[] pth, final BaseXTree bxt,
+      final Data d) {
     super(nm, pth, bxt, d);
   }
 

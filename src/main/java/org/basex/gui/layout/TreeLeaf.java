@@ -22,8 +22,8 @@ public final class TreeLeaf extends TreeNode {
    * @param bxt tree reference
    * @param d data reference
    */
-  TreeLeaf(final byte[] nm, final byte[] pth, final boolean rw,
-      final BaseXTree bxt, final Data d) {
+  TreeLeaf(final byte[] nm, final byte[] pth, final boolean rw, final BaseXTree bxt,
+      final Data d) {
     super(nm, pth, bxt, d);
     raw = rw;
   }

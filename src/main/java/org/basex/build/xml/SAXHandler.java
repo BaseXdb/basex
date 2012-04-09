@@ -22,6 +22,8 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   private final Builder builder;
   /** DTD flag. */
   private boolean dtd;
+  /** Whitespace chopping. */
+  private boolean chop;
   /** Element counter. */
   int nodes;
 
@@ -35,9 +37,11 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /**
    * Constructor.
    * @param build builder reference
+   * @param ch chopping flag
    */
-  SAXHandler(final Builder build) {
+  SAXHandler(final Builder build, final boolean ch) {
     builder = build;
+    chop = ch;
   }
 
   @Override
@@ -89,9 +93,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void comment(final char[] ch, final int s, final int l)
-      throws SAXException {
-
+  public void comment(final char[] ch, final int s, final int l) throws SAXException {
     if(dtd) return;
     try {
       finishText();
@@ -101,9 +103,6 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
     }
   }
 
-  /** Temporary token builder.
-  private final TokenBuilder tb = new TokenBuilder();
-   */
   /** Temporary string builder for high surrogates. */
   private final StringBuilder sb = new StringBuilder();
   /** Temporary namespaces. */
@@ -114,9 +113,9 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @throws IOException I/O exception
    */
   private void finishText() throws IOException {
-    final boolean sur = sb.length() != 0;
-    if(sb.length() != 0 || sur) {
-      builder.text(token(sb.toString()));
+    if(sb.length() != 0) {
+      final String s = sb.toString();
+      builder.text(token(chop ? s.trim() : s));
       sb.setLength(0);
     }
     for(int i = 0; i < ns.size(); ++i) {

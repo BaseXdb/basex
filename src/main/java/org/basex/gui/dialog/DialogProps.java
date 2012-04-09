@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 
@@ -56,6 +57,8 @@ public final class DialogProps extends Dialog {
    */
   public DialogProps(final GUI main) {
     super(main, DB_PROPS);
+    main.setCursor(CURSORWAIT);
+
     panel.setLayout(new BorderLayout(5, 0));
 
     // resource tree
@@ -66,7 +69,7 @@ public final class DialogProps extends Dialog {
     ft = new DialogFT(this, false);
     final BaseXBack tabRes = add.border(8);
 
-    final Data data = gui.context.data();
+    final Data data = main.context.data();
     for(int i = 0; i < LABELS.length; ++i) {
       labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
@@ -127,6 +130,8 @@ public final class DialogProps extends Dialog {
     action(this);
     setResizable(true);
     setMinimumSize(getPreferredSize());
+
+    main.setCursor(CURSORARROW);
     finish(null);
   }
 
