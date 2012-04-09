@@ -77,7 +77,7 @@ public class StringList extends ElementList implements Iterable<String> {
    * Deletes the specified element.
    * @param i element to be deleted
    */
-  public final void delete(final int i) {
+  public final void deleteAt(final int i) {
     Array.move(list, i + 1, -1, --size - i);
   }
 

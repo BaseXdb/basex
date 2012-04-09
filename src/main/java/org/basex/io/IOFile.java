@@ -442,7 +442,7 @@ public final class IOFile extends IO {
       }
       if(s.equals("..") && size > 0) {
         // parent step
-        if(list[size - 1].indexOf(':') == -1) delete(size - 1);
+        if(list[size - 1].indexOf(':') == -1) deleteAt(size - 1);
       } else if(!s.equals(".") && !s.isEmpty()) {
         // skip self and empty steps
         add(s);

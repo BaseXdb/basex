@@ -169,7 +169,7 @@ final class Docs {
     int i = docs.sortedIndexOf(pre);
     final boolean found = i >= 0;
     if(i < 0) i = -i - 1;
-    else docs.delete(i);
+    else docs.deleteAt(i);
     docs.move(-size, i);
 
     if(!found) return;

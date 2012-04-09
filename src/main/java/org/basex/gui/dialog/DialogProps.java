@@ -5,6 +5,8 @@ import static org.basex.gui.GUIConstants.*;
 
 import java.awt.*;
 
+import javax.swing.event.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
@@ -12,6 +14,7 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Database properties dialog.
@@ -21,11 +24,11 @@ import org.basex.util.*;
  */
 public final class DialogProps extends Dialog {
   /** Index types. */
-  private static final String[] HELP = {
+  static final String[] HELP = {
     "", "", H_PATH_INDEX, H_TEXT_INDEX, H_ATTR_INDEX, ""
   };
   /** Index types. */
-  private static final IndexType[] TYPES = {
+  static final IndexType[] TYPES = {
     IndexType.TAG, IndexType.ATTNAME, IndexType.PATH,
     IndexType.TEXT, IndexType.ATTRIBUTE, IndexType.FULLTEXT
   };
@@ -33,23 +36,34 @@ public final class DialogProps extends Dialog {
   private static final String[] LABELS = {
     ELEMENTS, ATTRIBUTES, PATH_INDEX, TEXT_INDEX, ATTRIBUTE_INDEX, FULLTEXT_INDEX
   };
-  /** Index labels. */
-  private final BaseXLabel[] labels = new BaseXLabel[LABELS.length];
-  /** Index buttons. */
-  private final BaseXButton[] indxs = new BaseXButton[LABELS.length];
-  /** Index information. */
-  private final BaseXEditor[] infos = new BaseXEditor[LABELS.length];
-  /** Index panels. */
-  private final BaseXBack[] panels = new BaseXBack[LABELS.length];
-  /** Full-text tab. */
-  private final BaseXBack tabFT;
-  /** Editable full-text options. */
-  private final DialogFT ft;
 
+  /** Full-text tab. */
+  final BaseXBack tabFT;
+  /** Name tab. */
+  final BaseXBack tabNames;
+  /** Name tab. */
+  final BaseXBack tabPath;
+  /** Name tab. */
+  final BaseXBack tabValues;
+  /** Contains the panels that are currently being updated. */
+  final IntList updated = new IntList();
+  /** Tabs. */
+  final BaseXTabs tabs;
   /** Resource panel. */
   final DialogResources resources;
   /** Add panel. */
   final DialogAdd add;
+  /** Index information. */
+  final BaseXEditor[] infos = new BaseXEditor[LABELS.length];
+
+  /** Index labels. */
+  private final BaseXLabel[] labels = new BaseXLabel[LABELS.length];
+  /** Index buttons. */
+  private final BaseXButton[] indxs = new BaseXButton[LABELS.length];
+  /** Index panels. */
+  private final BaseXBack[] panels = new BaseXBack[LABELS.length];
+  /** Editable full-text options. */
+  private final DialogFT ft;
 
   /**
    * Default constructor.
@@ -74,6 +88,7 @@ public final class DialogProps extends Dialog {
       labels[i] = new BaseXLabel(LABELS[i]).large();
       panels[i] = new BaseXBack(new BorderLayout(0, 4));
       infos[i] = new BaseXEditor(false, this);
+      infos[i].setText(Token.token(PLEASE_WAIT_D));
       BaseXLayout.setHeight(infos[i], 200);
       if(i != 1) {
         indxs[i] = new BaseXButton(" ", this);
@@ -82,16 +97,16 @@ public final class DialogProps extends Dialog {
     }
 
     // tab: name indexes
-    final BaseXBack tabNames = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
+    tabNames = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
     add(0, tabNames, null);
     add(1, tabNames, null);
 
     // tab: path index
-    final BaseXBack tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
+    tabPath = new BaseXBack(new GridLayout(1, 1)).border(8);
     add(2, tabPath, null);
 
     // tab: value indexes
-    final BaseXBack tabValues = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
+    tabValues = new BaseXBack(new GridLayout(2, 1, 0, 8)).border(8);
     add(3, tabValues, null);
     add(4, tabValues, null);
 
@@ -116,13 +131,20 @@ public final class DialogProps extends Dialog {
     text.setFont(f);
     tabGeneral.add(text, BorderLayout.CENTER);
 
-    final BaseXTabs tabs = new BaseXTabs(this);
+    tabs = new BaseXTabs(this);
     tabs.addTab(RESOURCES, tabRes);
     tabs.addTab(NAMES, tabNames);
     tabs.addTab(PATH_INDEX, tabPath);
     tabs.addTab(INDEXES, tabValues);
     tabs.addTab(FULLTEXT, tabFT);
     tabs.addTab(GENERAL, tabGeneral);
+
+    tabs.addChangeListener(new ChangeListener() {
+      @Override
+      public synchronized void stateChanged(final ChangeEvent evt) {
+        updateInfo();
+      }
+    });
 
     set(resources, BorderLayout.WEST);
     set(tabs, BorderLayout.CENTER);
@@ -133,6 +155,41 @@ public final class DialogProps extends Dialog {
 
     main.setCursor(CURSORARROW);
     finish(null);
+  }
+
+  /**
+   * Updates the currently visible index panel.
+   */
+  void updateInfo() {
+    final Object o = tabs.getSelectedComponent();
+    final IntList il = new IntList();
+    if(o == tabNames) {
+      il.add(0);
+      il.add(1);
+    } else if(o == tabPath) {
+      il.add(2);
+    } else if(o == tabValues) {
+      il.add(3);
+      il.add(4);
+    } else if(o == tabFT) {
+      il.add(5);
+    }
+
+    final Data data = gui.context.data();
+    final boolean[] val = { true, true, true, data.meta.textindex,
+        data.meta.attrindex, data.meta.ftxtindex };
+    for(int i = 0; i < il.size(); i++) {
+      final int idx = il.get(i);
+      if(updated.contains(idx)) continue;
+      updated.add(idx);
+      new Thread() {
+        @Override
+        public void run() {
+          infos[idx].setText(val[idx] ? data.info(TYPES[idx]) : Token.token(HELP[idx]));
+          updated.delete(idx);
+        };
+      }.start();
+    }
   }
 
   /**
@@ -177,6 +234,7 @@ public final class DialogProps extends Dialog {
           cmd = new CreateIndex(TYPES[i]);
           ft.setOptions();
         }
+        infos[i].setText(Token.token(PLEASE_WAIT_D));
         DialogProgress.execute(this, "", cmd);
         return;
       }
@@ -199,7 +257,7 @@ public final class DialogProps extends Dialog {
         if(struct && !utd) lbl += " (" + OUT_OF_DATE + ')';
         // updates labels and infos
         labels[i].setText(lbl);
-        infos[i].setText(val[i] ? data.info(TYPES[i]) : Token.token(HELP[i]));
+        infos[i].setText(Token.token(PLEASE_WAIT_D));
         // update button (label, disable/enable)
         if(indxs[i] != null) {
           indxs[i].setText((struct ? OPTIMIZE : val[i] ? DROP : CREATE) + DOTS);
@@ -213,6 +271,7 @@ public final class DialogProps extends Dialog {
       add(f, tabFT, val[f] ? null : ft);
       panels[f].revalidate();
       panels[f].repaint();
+      updateInfo();
     }
 
     ft.action();

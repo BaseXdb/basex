@@ -104,10 +104,22 @@ public class IntList extends ElementList {
   }
 
   /**
+   * Removes the specified element from the list.
+   * @param e element to be removed
+   */
+  public final void delete(final int e) {
+    int s = 0;
+    for(int i = 0; i < size; ++i) {
+      if(list[i] != e) list[s++] = list[i];
+    }
+    size = s;
+  }
+
+  /**
    * Deletes the element at the specified position.
    * @param i position to delete
    */
-  public final void delete(final int i) {
+  public final void deleteAt(final int i) {
     Array.move(list, i + 1, -1, --size - i);
   }
 
