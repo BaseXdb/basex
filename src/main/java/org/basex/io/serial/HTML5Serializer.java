@@ -10,7 +10,7 @@ import java.io.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class HTML5Serializer extends OutputSerializer {
+public class HTML5Serializer extends HTMLSerializer {
   /**
    * Constructor, specifying serialization options.
    * @param os output stream reference
