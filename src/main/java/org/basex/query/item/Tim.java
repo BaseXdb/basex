@@ -15,7 +15,7 @@ public final class Tim extends Date {
    * Constructor.
    * @param d date
    */
-  Tim(final Date d) {
+  public Tim(final Date d) {
     super(AtomType.TIM, d);
     xc.setYear(UNDEF);
     xc.setMonth(UNDEF);
