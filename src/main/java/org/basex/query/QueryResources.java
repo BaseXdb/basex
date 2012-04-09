@@ -2,27 +2,18 @@ package org.basex.query;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
 
-import org.basex.core.*;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.core.cmd.Check;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.Open;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.io.IO;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.DBNodeSeq;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Seq;
-import org.basex.query.item.Value;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.io.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class provides access to resources used by an XQuery expression.
@@ -197,7 +188,7 @@ public final class QueryResources {
         String root = SLASHES.matcher(input).replaceFirst("");
         String path = "";
         final int s = root.indexOf('/');
-        if(s != -1) {
+        if(s > 0 && root.indexOf(':') == -1) {
           path = root.substring(s + 1);
           root = root.substring(0, s);
         }
