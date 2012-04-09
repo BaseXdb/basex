@@ -300,7 +300,7 @@ public final class Context {
    * @return available databases
    */
   public Databases databases() {
-    if(databases == null || !(databases.dbpath.eq(mprop.dbpath())))
+    if(databases == null || !databases.dbpath.eq(mprop.dbpath()))
       databases = new Databases(this);
     return databases;
   }

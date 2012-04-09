@@ -357,7 +357,6 @@ public abstract class OutputSerializer extends Serializer {
     if(sep) indent();
     print(ELEM_O);
     print(t);
-    sep = indent;
   }
 
   /**
@@ -365,7 +364,7 @@ public abstract class OutputSerializer extends Serializer {
    * @param dt document type, or {@code null} for html type
    * @throws IOException I/O exception
    */
-  void doctype(final byte[] dt) throws IOException {
+  protected void doctype(final byte[] dt) throws IOException {
     if(level != 0 || docsys == null) return;
     if(sep) indent();
     print(DOCTYPE);
@@ -390,6 +389,7 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   protected void finishEmpty() throws IOException {
     print(ELEM_SC);
+    sep = false;
   }
 
   @Override
@@ -398,7 +398,7 @@ public abstract class OutputSerializer extends Serializer {
     print(ELEM_OS);
     print(tag);
     print(ELEM_C);
-    sep = indent;
+    sep = false;
   }
 
   /**

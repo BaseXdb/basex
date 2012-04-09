@@ -20,7 +20,7 @@ public class Branch extends RegExp {
 
   @Override
   StringBuilder toRegEx(final StringBuilder sb) {
-    for(int i = 0; i < pieces.length; i++) pieces[i].toRegEx(sb);
+    for(final RegExp piece : pieces) piece.toRegEx(sb);
     return sb;
   }
 }

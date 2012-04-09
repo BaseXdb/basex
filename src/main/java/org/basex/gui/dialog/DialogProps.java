@@ -47,7 +47,7 @@ public final class DialogProps extends Dialog {
   final BaseXBack tabValues;
   /** Contains the panels that are currently being updated. */
   final IntList updated = new IntList();
-  /** Tabs. */
+  /** Tabbed pane. */
   final BaseXTabs tabs;
   /** Resource panel. */
   final DialogResources resources;
@@ -160,7 +160,7 @@ public final class DialogProps extends Dialog {
   /**
    * Updates the currently visible index panel.
    */
-  void updateInfo() {
+  synchronized void updateInfo() {
     final Object o = tabs.getSelectedComponent();
     final IntList il = new IntList();
     if(o == tabNames) {
@@ -257,7 +257,6 @@ public final class DialogProps extends Dialog {
         if(struct && !utd) lbl += " (" + OUT_OF_DATE + ')';
         // updates labels and infos
         labels[i].setText(lbl);
-        infos[i].setText(Token.token(PLEASE_WAIT_D));
         // update button (label, disable/enable)
         if(indxs[i] != null) {
           indxs[i].setText((struct ? OPTIMIZE : val[i] ? DROP : CREATE) + DOTS);

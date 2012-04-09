@@ -23,7 +23,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** DTD flag. */
   private boolean dtd;
   /** Whitespace chopping. */
-  private boolean chop;
+  private final boolean chop;
   /** Element counter. */
   int nodes;
 

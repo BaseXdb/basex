@@ -22,7 +22,7 @@ public class HTML5Serializer extends HTMLSerializer {
   }
 
   @Override
-  void doctype(final byte[] dt) throws IOException {
+  protected void doctype(final byte[] dt) throws IOException {
     if(level != 0) return;
     if(sep) indent();
     print(DOCTYPE);

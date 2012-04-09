@@ -193,7 +193,7 @@ public final class RepoManager {
     }
     // traverse all files, find prefix matches
     path = new IOFile(repo.path(), nm.replace('.', '/'));
-    String start = path.name() + '.';
+    final String start = path.name() + '.';
     for(final IOFile ch : new IOFile(path.dir()).children()) {
       if(ch.name().startsWith(start)) return ch;
     }

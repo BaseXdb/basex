@@ -171,9 +171,9 @@ public abstract class ConsoleReader {
 
     @Override
     public String readPassword() {
-      String password = (String) invoke(readEcho, reader, PASSWORD_PROMPT, PASSWORD_ECHO);
+      final String pw = (String) invoke(readEcho, reader, PASSWORD_PROMPT, PASSWORD_ECHO);
       restoreDefaultPrompt();
-      return password;
+      return pw;
     }
   }
 }
