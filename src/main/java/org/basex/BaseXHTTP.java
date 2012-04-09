@@ -352,9 +352,9 @@ public final class BaseXHTTP {
         while(true) {
           ss.accept().close();
           if(stop.exists()) {
+            ss.close();
             stop.delete();
             jetty.stop();
-            ss.close();
             break;
           }
         }
