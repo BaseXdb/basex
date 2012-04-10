@@ -122,8 +122,7 @@ public final class HTTPRequestParser {
         if(qn.eq(Q_NAME)) name = attr.string();
         if(qn.eq(Q_VALUE)) value = attr.string();
 
-        if(name != null && name.length != 0 && value != null
-            && value.length != 0) {
+        if(name != null && name.length != 0 && value != null && value.length != 0) {
           hdrs.add(name, value);
           break;
         }
@@ -140,8 +139,8 @@ public final class HTTPRequestParser {
    * @param bodyContent item cache for parsed body content
    * @throws QueryException query exception
    */
-  private void parseBody(final ANode body, final Item contItem,
-      final TokenMap attrs, final ValueBuilder bodyContent) throws QueryException {
+  private void parseBody(final ANode body, final Item contItem, final TokenMap attrs,
+      final ValueBuilder bodyContent) throws QueryException {
 
     parseAttrs(body, attrs);
     checkBody(body, attrs);
@@ -192,9 +191,7 @@ public final class HTTPRequestParser {
    * @return structure representing the part
    * @throws QueryException query exception
    */
-  private Part parsePart(final ANode part, final Item contItem)
-      throws QueryException {
-
+  private Part parsePart(final ANode part, final Item contItem) throws QueryException {
     final Part p = new Part();
     final ANode partBody = parseHdrs(part.children(), p.headers);
     parseBody(partBody, contItem, p.bodyAttrs, p.bodyContent);
@@ -235,8 +232,8 @@ public final class HTTPRequestParser {
 
     // if src attribute is used to set the content of the body, no
     // other attributes must be specified and no content must be present
-    if(bodyAttrs.get(SRC) != null &&
-        (bodyAttrs.size() > 2 || body.children().more())) SRCATTR.thrw(info);
+    if(bodyAttrs.get(SRC) != null && (bodyAttrs.size() > 2 || body.children().more()))
+      SRCATTR.thrw(info);
 
   }
 }

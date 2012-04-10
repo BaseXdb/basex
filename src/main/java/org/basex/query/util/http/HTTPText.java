@@ -47,6 +47,8 @@ public interface HTTPText {
   byte[] MEDIA_TYPE = token("media-type");
   /** boundary marker. */
   byte[] BOUNDARY = token("boundary");
+  /** equal character. */
+  byte[] EQ = token("=");
 
   /** HTTP method TRACE. */
   byte[] TRACE = token("trace");

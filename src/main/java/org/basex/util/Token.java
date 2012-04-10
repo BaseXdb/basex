@@ -909,7 +909,7 @@ public final class Token {
   }
 
   /**
-   * Splits the token at all whitespaces and returns an array with all tokens.
+   * Splits a token around matches of the given separator.
    * @param token token to be split
    * @param sep separation character
    * @return array
