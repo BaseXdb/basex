@@ -15,6 +15,7 @@ import org.basex.util.*;
 import org.mortbay.jetty.*;
 import org.mortbay.jetty.handler.*;
 import org.mortbay.jetty.nio.*;
+import org.mortbay.servlet.*;
 
 /**
  * This is the main class for the starting the database HTTP services.
@@ -129,12 +130,17 @@ public final class BaseXHTTP {
         new org.mortbay.jetty.servlet.Context(jetty, "/",
             org.mortbay.jetty.servlet.Context.SESSIONS);
 
-    if(rest)   jctx.addServlet(RESTServlet.class, "/rest/*");
-    if(restxq) jctx.addServlet(RestXqServlet.class, "/restxq/*");
-    if(webdav) jctx.addServlet(WebDAVServlet.class, "/webdav/*");
-
-    jctx.addFilter("org.mortbay.servlet.GzipFilter", "/rest/*", Handler.ALL);
-    jctx.addFilter("org.mortbay.servlet.GzipFilter", "/restxq/*", Handler.ALL);
+    if(rest) {
+      jctx.addServlet(RESTServlet.class, "/rest/*");
+      jctx.addFilter(GzipFilter.class, "/rest/*", Handler.ALL);
+    }
+    if(restxq) {
+      jctx.addServlet(RestXqServlet.class, "/restxq/*");
+      jctx.addFilter(GzipFilter.class, "/restxq/*", Handler.ALL);
+    }
+    if(webdav) {
+      jctx.addServlet(WebDAVServlet.class, "/webdav/*");
+    }
 
     final ResourceHandler rh = new ResourceHandler();
     rh.setWelcomeFiles(new String[] { "index.xml", "index.xhtml", "index.html" });
