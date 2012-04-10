@@ -295,6 +295,21 @@ public abstract class Serializer {
   // OVERWRITABLE PUBLIC METHODS ==============================================
 
   /**
+   * Opens a document.
+   * @param n name
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  public void openDoc(final byte[] n) throws IOException { }
+
+  /**
+   * Closes a document.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  public void closeDoc() throws IOException { }
+
+  /**
    * Starts a result.
    * @throws IOException I/O exception
    */
@@ -401,8 +416,7 @@ public abstract class Serializer {
    * @param v value
    * @throws IOException I/O exception
    */
-  protected abstract void finishPi(final byte[] n, final byte[] v)
-      throws IOException;
+  protected abstract void finishPi(final byte[] n, final byte[] v) throws IOException;
 
   /**
    * Serializes an item.
@@ -418,25 +432,9 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   @SuppressWarnings("unused")
-  void finishText(final byte[] v, final FTPos ftp)
-      throws IOException {
+  void finishText(final byte[] v, final FTPos ftp) throws IOException {
     text(v);
   }
-
-  /**
-   * Opens a document.
-   * @param n name
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void openDoc(final byte[] n) throws IOException { }
-
-  /**
-   * Closes a document.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void closeDoc() throws IOException { }
 
   /**
    * Returns the name of the specified expression.

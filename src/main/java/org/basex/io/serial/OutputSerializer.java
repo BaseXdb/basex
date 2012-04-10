@@ -179,7 +179,6 @@ public abstract class OutputSerializer extends Serializer {
         }
         print(ATT2);
         print(PI_C);
-        sep = indent;
       } else if(!sa.equals(OMIT) || !ver.equals(V10) && docsys != null) {
         SERSTAND.thrwSerial();
       }
@@ -206,10 +205,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void openResult() throws IOException {
-    if(wrap) {
-      openElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
-      sep = false;
-    }
+    if(wrap) openElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
   }
 
   @Override
@@ -267,8 +263,7 @@ public abstract class OutputSerializer extends Serializer {
     final FTLexer lex = new FTLexer().sc().init(b);
     while(lex.hasNext()) {
       final FTSpan span = lex.next();
-      if(!span.special && ftp.contains(span.pos))
-        print((char) TokenBuilder.MARK);
+      if(!span.special && ftp.contains(span.pos)) print((char) TokenBuilder.MARK);
       final byte[] t = span.text;
       for(int k = 0; k < t.length; k += cl(t, k)) code(cp(t, k));
     }
@@ -281,6 +276,7 @@ public abstract class OutputSerializer extends Serializer {
     print(COMM_O);
     print(n);
     print(COMM_C);
+    sep = false;
   }
 
   @Override
@@ -291,6 +287,7 @@ public abstract class OutputSerializer extends Serializer {
     print(' ');
     print(v);
     print(PI_C);
+    sep = false;
   }
 
   @Override
@@ -325,8 +322,13 @@ public abstract class OutputSerializer extends Serializer {
     item = true;
   }
 
+  @Override
+  public void openDoc(final byte[] n) throws IOException {
+    sep = false;
+  }
+
   /**
-   * Encode the specified character before printing it.
+   * Encodes the specified character before printing it.
    * @param ch character to be encoded and printed
    * @throws IOException I/O exception
    */

@@ -37,8 +37,7 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void finishPi(final byte[] n, final byte[] v)
-      throws IOException {
+  public final void finishPi(final byte[] n, final byte[] v) throws IOException {
     build.pi(concat(n, SPACE, v));
   }
 
@@ -70,26 +69,27 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void attribute(final byte[] n, final byte[] v)
-      throws IOException {
+  public final void attribute(final byte[] n, final byte[] v) throws IOException {
     if(startsWith(n, XMLNS)) {
       if(n.length == 5) {
         build.startNS(EMPTY, v);
       } else if(n[5] == ':') {
         build.startNS(substring(n, 6), v);
-      } else att.add(n, v);
+      } else {
+        att.add(n, v);
+      }
     } else {
       att.add(n, v);
     }
   }
 
   @Override
-  protected void openDoc(final byte[] name) throws IOException {
+  public void openDoc(final byte[] name) throws IOException {
     build.startDoc(name);
   }
 
   @Override
-  protected final void closeDoc() throws IOException {
+  public final void closeDoc() throws IOException {
     build.endDoc();
   }
 }

@@ -160,7 +160,7 @@ public final class OptimizeAll extends ACreate {
         }
 
         @Override
-        protected void openDoc(final byte[] name) throws IOException {
+        public void openDoc(final byte[] name) throws IOException {
           super.openDoc(name);
           if(cmd != null) cmd.pre++;
         }

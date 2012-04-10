@@ -74,7 +74,9 @@ public final class FDoc extends FNode {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
+    ser.openDoc(base);
     for(int c = 0; c < children.size(); ++c) children.get(c).serialize(ser);
+    ser.closeDoc();
   }
 
   @Override
