@@ -37,12 +37,12 @@ enum RESTSchema {
    * Create a new validator against the schema.
    * @return a new validator
    */
-  public static Validator newValidator() {
+  static Validator newValidator() {
     return INSTANCE.schema.newValidator();
   }
 
   /** Post Schema. */
-  public static final String SCHEMA_CONTENT =
+  private static final String SCHEMA_CONTENT =
     "<?xml version='1.0' encoding='UTF-8'?>" +
     "<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'" +
     " xmlns='http://basex.org/rest'" +

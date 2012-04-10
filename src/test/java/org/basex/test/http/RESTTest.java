@@ -255,7 +255,7 @@ public class RESTTest extends HTTPTest {
   @Test
   public void post3() throws IOException {
     assertEquals(
-        "<?xml version=\"1.0\" encoding=\"UTF-8\"?> 123",
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>123",
         post("", "<query xmlns=\"" + URI + "\">" +
           "<text>123</text><parameter name='wrap' value='no'/>" +
           "<parameter name='omit-xml-declaration' value='no'/></query>", APP_XML));

@@ -481,7 +481,7 @@ public class HTTPClientTest extends HTTPTest {
     req1.bodyContent.add(Str.get("<b>b</b>"));
     HTTPClient hc = new HTTPClient(null, lcontext.prop);
     hc.setRequestContent(fakeConn1.getOutputStream(), req1);
-    assertEquals("<a>a</a> &lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
+    assertEquals("<a>a</a>&lt;b&gt;b&lt;/b&gt;", fakeConn1.out.toString());
 
     // Case 2: No method, media-type='text/plain'
     final HTTPRequest req2 = new HTTPRequest();
