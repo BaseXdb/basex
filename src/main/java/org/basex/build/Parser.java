@@ -155,21 +155,21 @@ public abstract class Parser extends Progress {
   public static Item item(final IO in, final Prop prop, final String type)
       throws IOException {
 
-    final Item it;
-    if(Token.eq(type, APP_JSON, APP_JSONML)) {
-      final String options = ParserProp.JSONML[0] + "=" + eq(type, APP_JSONML);
-      it = new DBNode(new JSONParser(in, prop, options));
-    } else if(TEXT_CSV.equals(type)) {
-      it = new DBNode(new CSVParser(in, prop));
-    } else if(TEXT_HTML.equals(type)) {
-      it = new DBNode(new HTMLParser(in, prop));
-    } else if(MimeTypes.isXML(type)) {
-      it = new DBNode(in, prop);
-    } else if(MimeTypes.isText(type)) {
-      it = Str.get(new TextInput(in).content());
-    } else {
-      it = new B64(in.read());
+    Item it = null;
+    if(type != null) {
+      if(Token.eq(type, APP_JSON, APP_JSONML)) {
+        final String options = ParserProp.JSONML[0] + "=" + eq(type, APP_JSONML);
+        it = new DBNode(new JSONParser(in, prop, options));
+      } else if(TEXT_CSV.equals(type)) {
+        it = new DBNode(new CSVParser(in, prop));
+      } else if(TEXT_HTML.equals(type)) {
+        it = new DBNode(new HTMLParser(in, prop));
+      } else if(MimeTypes.isXML(type)) {
+        it = new DBNode(in, prop);
+      } else if(MimeTypes.isText(type)) {
+        it = Str.get(new TextInput(in).content());
+      }
     }
-    return it;
+    return it == null ? new B64(in.read()) : it;
   }
 }
