@@ -107,9 +107,9 @@ public final class Catch extends Single {
   private boolean find(final Err err, final QNm code) {
     for(final QNm c : codes) {
       if(c != null) {
-        final byte[] cu = c.uri();
-        if(err == null || cu.length != 0 &&
-            !eq(err.qname().uri(), cu)) continue;
+        final byte[] cu = c.uri(), eu = err != null ? err.qname().uri() :
+          code.hasURI() ? code.uri() : null;
+        if(eu == null || cu.length != 0 && !eq(eu, cu)) continue;
         final byte[] nm = c.local();
         if(nm.length != 0 && !eq(code.local(), nm)) continue;
       }
