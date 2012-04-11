@@ -112,8 +112,7 @@ public final class FNZipTest extends AdvancedQueryTest {
         zipParams("<entry name='three' encoding='UTF-16'>!</entry>")));
     checkZipEntry("three", new byte[] { '\0', '!' });
     // check fourth file
-    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='four' src='" +
-        TMPFILE + "'/>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='four' src='" + TMPFILE + "'/>")));
     checkZipEntry("four", new byte[] { '!' });
     // check fifth file
     query(_ZIP_ZIP_FILE.args(zipParams("<entry src='" + TMPFILE + "'/>")));
@@ -144,17 +143,16 @@ public final class FNZipTest extends AdvancedQueryTest {
     checkZipEntry("2", token("<a b=\"c\"/>"));
     // ZIP namespace must be removed from zipped node and its descendants
     query(_ZIP_ZIP_FILE.args(zipParams("<entry name='3'><a><b/></a></entry>")));
-    checkZipEntry("3", token("<a><b/></a>"));
+    checkZipEntry("3", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
     // ZIP namespace must be removed from zipped entry
-    query(_ZIP_ZIP_FILE.args(
-        zipParams("<entry name='4'><a xmlns=''/></entry>")));
+    query(_ZIP_ZIP_FILE.args(zipParams("<entry name='4'><a xmlns=''/></entry>")));
     checkZipEntry("4", token("<a/>"));
 
     // ZIP namespace must be removed from zipped entry
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("5", "<a/>")));
     checkZipEntry("5", token("<a/>"));
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("6", "<a><b/></a>")));
-    checkZipEntry("6", token("<a><b/></a>"));
+    checkZipEntry("6", token("<a>" + Prop.NL + "  <b/>" + Prop.NL + "</a>"));
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("7", "<z:a xmlns:z='z'/>")));
     checkZipEntry("7", token("<z:a xmlns:z=\"z\"/>"));
     query(_ZIP_ZIP_FILE.args(zipParamsPrefix("8", "<zip:a xmlns:zip='z'/>")));
@@ -170,8 +168,8 @@ public final class FNZipTest extends AdvancedQueryTest {
    * @return parameter string
    * @throws IOException I/O Exception
    */
-  private static String zipParamsPrefix(final String name,
-      final String entry) throws IOException {
+  private static String zipParamsPrefix(final String name, final String entry)
+      throws IOException {
     return "<zip:file xmlns:zip='http://expath.org/ns/zip' href='" +
         new File(TMPZIP).getCanonicalPath() + "'>" +
         "<zip:entry name='" + name + "'>" + entry + "</zip:entry></zip:file>";

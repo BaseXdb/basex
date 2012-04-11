@@ -33,6 +33,8 @@ public abstract class Serializer {
   protected byte[] tag;
   /** Declare namespaces flag. */
   protected boolean undecl;
+  /** Indicates the currently output node is untyped. */
+  protected boolean untyped;
 
   /** Currently available namespaces. */
   private final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
@@ -187,6 +189,7 @@ public abstract class Serializer {
   public final void node(final Data data, final int pre, final FTPosData ft)
       throws IOException {
 
+    untyped = data.meta.chop;
     boolean doc = false;
     final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
     final IntList pars = new IntList();
@@ -267,6 +270,7 @@ public abstract class Serializer {
     // process remaining elements...
     while(--l >= 0) closeElement();
     if(doc) closeDoc();
+    untyped = false;
   }
 
   /**

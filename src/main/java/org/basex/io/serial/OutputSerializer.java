@@ -179,6 +179,7 @@ public abstract class OutputSerializer extends Serializer {
         }
         print(ATT2);
         print(PI_C);
+        sep = untyped;
       } else if(!sa.equals(OMIT) || !ver.equals(V10) && docsys != null) {
         SERSTAND.thrwSerial();
       }
@@ -205,7 +206,10 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void openResult() throws IOException {
-    if(wrap) openElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
+    if(wrap) {
+      openElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
+      sep = false;
+    }
   }
 
   @Override
@@ -276,7 +280,7 @@ public abstract class OutputSerializer extends Serializer {
     print(COMM_O);
     print(n);
     print(COMM_C);
-    sep = false;
+    sep = untyped;
   }
 
   @Override
@@ -287,7 +291,7 @@ public abstract class OutputSerializer extends Serializer {
     print(' ');
     print(v);
     print(PI_C);
-    sep = false;
+    sep = untyped;
   }
 
   @Override
@@ -318,7 +322,7 @@ public abstract class OutputSerializer extends Serializer {
       throw new SerializerException(ex);
     }
 
-    sep = format;
+    sep = true;
     item = true;
   }
 
@@ -359,6 +363,7 @@ public abstract class OutputSerializer extends Serializer {
     if(sep) indent();
     print(ELEM_O);
     print(t);
+    sep = untyped;
   }
 
   /**
@@ -391,7 +396,6 @@ public abstract class OutputSerializer extends Serializer {
   @Override
   protected void finishEmpty() throws IOException {
     print(ELEM_SC);
-    sep = false;
   }
 
   @Override
@@ -400,7 +404,7 @@ public abstract class OutputSerializer extends Serializer {
     print(ELEM_OS);
     print(tag);
     print(ELEM_C);
-    sep = false;
+    sep = untyped;
   }
 
   /**
