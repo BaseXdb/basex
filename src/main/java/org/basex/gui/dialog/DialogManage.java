@@ -12,6 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -166,8 +167,7 @@ public final class DialogManage extends Dialog {
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.mprop.dbexists(db) ||
-          Dialog.confirm(gui, OVERWRITE_DB_QUESTION))
+      if(!gui.context.mprop.dbexists(db) || Dialog.confirm(gui, OVERWRITE_DB_QUESTION))
         cmds.add(new Restore(db));
 
     } else if(cmp == backups) {
@@ -205,8 +205,7 @@ public final class DialogManage extends Dialog {
           if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
       } else {
-        detail.setText(dbs.size() == 1 ?
-            Token.token(ONLY_BACKUP) : Token.EMPTY);
+        detail.setText(dbs.size() == 1 ? Token.token(ONLY_BACKUP) : Token.EMPTY);
       }
 
       // enable or disable buttons
@@ -222,6 +221,11 @@ public final class DialogManage extends Dialog {
 
       // enable/disable backup buttons
       final String[] back = Databases.backupPaths(db, ctx).toArray();
+      for(int b = 0; b < back.length; b++) {
+        final String n = new IOFile(back[b]).name();
+        back[b] = n.substring(0, n.lastIndexOf('.'));
+      }
+
       active = back.length > 0;
       backups.setData(back);
       backups.setEnabled(active);
