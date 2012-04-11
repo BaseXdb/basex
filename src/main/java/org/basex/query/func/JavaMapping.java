@@ -170,7 +170,8 @@ public abstract class JavaMapping extends Arr {
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
       for(final Method meth : jm.getClass().getMethods()) {
-        if(meth.getName().equals(mth)) {
+        // accept any method with identical name and arity
+        if(meth.getName().equals(mth) && meth.getParameterTypes().length == args.length) {
           // check if user has sufficient permissions to call the function
           Perm perm = Perm.ADMIN;
           final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
