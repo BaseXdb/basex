@@ -226,7 +226,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
         throw new BXQException(ex);
       }
     } else {
-      Util.notimplemented();
+      throw Util.notimplemented();
     }
   }
 

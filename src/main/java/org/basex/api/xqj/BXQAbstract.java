@@ -205,8 +205,7 @@ abstract class BXQAbstract {
       if(r != null) return createNode(r);
       return createNode(IO.get(ss.getSystemId()));
     }
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   /**

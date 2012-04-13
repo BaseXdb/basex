@@ -349,7 +349,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       ser.setLexicalHandler(sax.getLexicalHandler());
       while(next()) serialize(item().it, ser);
     } else {
-      Util.notimplemented();
+      throw Util.notimplemented();
     }
   }
 
