@@ -87,7 +87,7 @@
     <dependency>
       <groupId>com.ettrema</groupId>
       <artifactId>milton-api</artifactId>
-      <version>1.6.5</version>
+      <version>1.7.2</version>
       <exclusions>
         <exclusion>
           <artifactId>commons-logging</artifactId>
