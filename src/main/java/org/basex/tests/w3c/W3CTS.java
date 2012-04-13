@@ -398,8 +398,7 @@ public abstract class W3CTS {
         final int rs = result.size();
 
         while(!ignore && ++s < rs) {
-          inspect |= s < cmpFiles.list.length &&
-            eq(data.atom(cmpFiles.list[s]), INSPECT);
+          inspect |= s < cmpFiles.list.length && eq(data.atom(cmpFiles.list[s]), INSPECT);
 
           final String expect = string(result.get(s));
           final String actual = ao.toString();
