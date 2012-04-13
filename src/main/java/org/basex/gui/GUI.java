@@ -431,7 +431,7 @@ public final class GUI extends AGUI {
         // get query result
         final Result result = c.result();
         final Nodes nodes = result instanceof Nodes &&
-          result.size() != 0 ? (Nodes) result : null;
+            result.size() != 0 ? (Nodes) result : null;
 
         // treat text view different to other views
         if(nodes == null) {

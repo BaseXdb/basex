@@ -116,7 +116,7 @@ final class TableData {
     last = "";
     rowH = 1;
 
-    if(r == -1 && roots.size() == 0) return;
+    if(r == -1 && roots.isEmpty()) return;
     if(root == -1) root = data.tagindex.id(roots.get(0));
     for(final byte[] k : data.paths.desc(
         data.tagindex.key(root), true, true)) {

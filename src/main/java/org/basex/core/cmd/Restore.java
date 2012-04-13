@@ -39,7 +39,7 @@ public final class Restore extends Command {
     IOFile file = mprop.dbpath(db + IO.ZIPSUFFIX);
     if(!file.exists()) {
       final StringList list = Databases.backupPaths(db, context);
-      if(list.size() != 0) file = new IOFile(list.get(0));
+      if(!list.isEmpty()) file = new IOFile(list.get(0));
     } else {
       // db is already the name of a backup -> extract db name
       db = Pattern.compile(IO.DATEPATTERN + '$').split(db)[0];

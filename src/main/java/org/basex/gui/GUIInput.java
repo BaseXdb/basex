@@ -217,7 +217,7 @@ public final class GUIInput extends BaseXTextField {
    * @param sl strings to be added
    */
   private void createCombo(final StringList sl) {
-    if(sl == null || sl.size() == 0) {
+    if(sl == null || sl.isEmpty()) {
       pop.setVisible(false);
       return;
     }

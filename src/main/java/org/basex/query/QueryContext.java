@@ -172,7 +172,7 @@ public final class QueryContext extends Progress {
     if(inf) compInfo(NL + COMPILING_C);
 
     // temporarily set database values (size check added for better performance)
-    if(dbOptions.size() != 0) {
+    if(!dbOptions.isEmpty()) {
       for(final Entry<String, String> e : dbOptions.entrySet()) {
         context.prop.set(e.getKey(), e.getValue());
       }

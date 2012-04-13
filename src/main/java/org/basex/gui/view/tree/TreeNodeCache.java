@@ -32,7 +32,7 @@ final class TreeNodeCache implements TreeConstants {
         int l = 0;
         while(true) {
           parList = getNextNodeLine(parList, data);
-          if(parList.size() == 0) break;
+          if(parList.isEmpty()) break;
           alil.add(parList);
           ++l;
         }

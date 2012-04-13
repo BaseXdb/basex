@@ -342,7 +342,7 @@ public final class DecFormatter extends FormatUtil {
 
     final TokenBuilder res = new TokenBuilder(pic.fix[0].finish());
     res.add(pre.finish());
-    if(suf.size() != 0) res.add(decimal).add(suf.finish());
+    if(!suf.isEmpty()) res.add(decimal).add(suf.finish());
     return res.add(pic.fix[1].finish()).toString();
   }
 

@@ -114,7 +114,7 @@ public final class DialogManage extends Dialog {
     set(tabs, BorderLayout.EAST);
 
     action(null);
-    if(dbs.size() != 0) finish(null);
+    if(!dbs.isEmpty()) finish(null);
   }
 
   /**
@@ -236,7 +236,7 @@ public final class DialogManage extends Dialog {
     }
 
     // run all commands
-    if(cmds.size() != 0) {
+    if(!cmds.isEmpty()) {
       DialogProgress.execute(this, "", cmds.toArray(new Command[cmds.size()]));
     }
   }

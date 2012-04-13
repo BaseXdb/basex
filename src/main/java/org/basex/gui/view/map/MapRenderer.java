@@ -697,7 +697,7 @@ final class MapRenderer {
   static void drawToolTip(final Graphics g, final int x, final int y,
       final MapRect mr, final TokenList tl, final int fs) {
 
-    if(tl == null || tl.size() == 0) return;
+    if(tl == null || tl.isEmpty()) return;
     final int[] cw = fontWidths(g.getFont());
     final int sw = BaseXLayout.width(g, cw, ' ');
     int wl = 0;

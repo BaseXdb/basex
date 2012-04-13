@@ -775,8 +775,7 @@ public abstract class Data {
         nspaces.setNearestRoot(cn, par);
       }
 
-      while(preStack.size() != 0 && preStack.peek() > par)
-        nspaces.close(preStack.pop());
+      while(!preStack.isEmpty() && preStack.peek() > par) nspaces.close(preStack.pop());
 
       switch(dkind) {
         case DOC:
@@ -839,7 +838,7 @@ public abstract class Data {
       }
     }
 
-    while(preStack.size() != 0) nspaces.close(preStack.pop());
+    while(!preStack.isEmpty()) nspaces.close(preStack.pop());
     nspaces.setRoot(t);
 
     if(bp != 0) insert(ipre + dpre - 1 - (dpre - 1) % buf);

@@ -53,8 +53,8 @@ public final class JarParser {
         else if(eq(CLASS, name.local())) desc.classes.add(next.string());
         // [CG] Packaging: add warning if unknown elements are encountered
       }
-      if(desc.jars.size() == 0) JARDESCINV.thrw(info, NOJARS);
-      else if(desc.classes.size() == 0) JARDESCINV.thrw(info, NOCLASS);
+      if(desc.jars.isEmpty()) JARDESCINV.thrw(info, NOJARS);
+      else if(desc.classes.isEmpty()) JARDESCINV.thrw(info, NOCLASS);
       return desc;
     } catch(final IOException ex) {
       throw JARREADFAIL.thrw(info, ex.getMessage());

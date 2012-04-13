@@ -99,7 +99,7 @@ final class FTFuzzyBuilder extends FTBuilder {
         }
       }
 
-      if(ind.size() == 0 || ind.get(ind.size() - 2) < v[min].tok.length) {
+      if(ind.isEmpty() || ind.get(ind.size() - 2) < v[min].tok.length) {
         ind.add(v[min].tok.length);
         ind.add((int) outY.size());
       }

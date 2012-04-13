@@ -173,6 +173,14 @@ public class TokenSet implements Iterable<byte[]> {
   }
 
   /**
+   * Tests is the container has no elements.
+   * @return result of check
+   */
+  public final boolean isEmpty() {
+    return size == 1;
+  }
+
+  /**
    * Resizes the hash table.
    */
   protected void rehash() {

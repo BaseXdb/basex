@@ -222,7 +222,7 @@ public class BaseX extends Main {
         ops.add("f").add(arg.string());
       }
     }
-    console = ops.size() == 0;
+    console = ops.isEmpty();
 
     // set cached options
     if(serial.length() != 0) options.put(Prop.SERIALIZER, serial);

@@ -233,8 +233,7 @@ public final class FNGen extends StandardFunc {
       public Item next() {
         final ByteList bl = new ByteList();
         while(++p < str.length && str[p] != '\n') bl.add(str[p]);
-        return p + 1 < str.length || bl.size() != 0 ?
-            Str.get(bl.toArray()) : null;
+        return p + 1 < str.length || !bl.isEmpty() ? Str.get(bl.toArray()) : null;
       }
     };
   }

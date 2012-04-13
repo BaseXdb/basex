@@ -81,7 +81,6 @@ public final class Find extends AQuery {
 
     // create final string
     final TokenBuilder tb = new TokenBuilder();
-    //if(opt.size() != 0) tb.add("declare ft-option" + opt + "; ");
     tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds);
     return tb.toString();
   }

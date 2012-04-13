@@ -101,7 +101,7 @@ final class FTTrieBuilder extends FTBuilder {
       }
 
       // collect each child of the root node
-      if(ind.size() == 0 || ind.get(ind.size() - 1) != v[min].tok[0]) {
+      if(ind.isEmpty() || ind.get(ind.size() - 1) != v[min].tok[0]) {
         ind.add(v[min].tok[0]);
       }
 

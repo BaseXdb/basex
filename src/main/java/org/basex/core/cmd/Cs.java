@@ -22,9 +22,7 @@ public final class Cs extends AQuery {
   protected boolean run() {
     queryNodes();
     if(result == null) return false;
-    if(result.size() != 0) {
-      context.current(((Nodes) result).checkRoot());
-    }
+    if(result.size() != 0) context.current(((Nodes) result).checkRoot());
     return true;
   }
 }

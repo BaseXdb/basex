@@ -145,7 +145,7 @@ public final class DialogPackages extends Dialog {
     }
 
     // run all commands
-    if(cmds.size() != 0) {
+    if(!cmds.isEmpty()) {
       DialogProgress.execute(this, "", cmds.toArray(new Command[cmds.size()]));
     }
   }

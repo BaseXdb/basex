@@ -69,7 +69,7 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public final void commandSerial2() throws IOException {
     check("<db:results xmlns:db=\"ns\">" +
-          "<db:result>1</db:result>" +
+          "  <db:result>1</db:result>" +
           "</db:results>",
           session.execute("xquery " + WRAPPER + '1'));
   }
@@ -403,8 +403,8 @@ public abstract class SessionTest extends SandboxTest {
   public void querySerial2() throws IOException {
     final Query query = session.query(WRAPPER + "1 to 2");
     assertTrue("Result expected.", query.more());
-    check("<db:results xmlns:db=\"ns\"><db:result>1</db:result>" +
-        "<db:result>2</db:result></db:results>", query.next());
+    check("<db:results xmlns:db=\"ns\">  <db:result>1</db:result>" +
+        "  <db:result>2</db:result></db:results>", query.next());
   }
 
   /** Runs a query with an external variable declaration.

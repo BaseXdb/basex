@@ -343,7 +343,7 @@ public abstract class Path extends ParseExpr {
       for(final PathNode pn : PathSummary.desc(in, desc)) {
         if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels
-          if(al.size() != 0 && al.get(0).level() != pn.level()) return null;
+          if(!al.isEmpty() && al.get(0).level() != pn.level()) return null;
           al.add(pn);
         }
       }

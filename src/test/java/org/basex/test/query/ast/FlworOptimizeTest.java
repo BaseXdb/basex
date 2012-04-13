@@ -1,5 +1,6 @@
 package org.basex.test.query.ast;
 
+import org.basex.core.*;
 import org.junit.*;
 
 /**
@@ -56,7 +57,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "for $b in $x " +
         "return $b",
 
-        "<x/><x/>",
+        "<x/>" + Prop.NL + "<x/>",
         "//For[@var eq '$b'] << //For[@var eq '$a']",
         "every $for in //For satisfies exactly-one(//Let) << $for"
     );

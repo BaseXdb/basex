@@ -3,8 +3,7 @@ package org.basex.io.serial;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * This class serializes data as XHTML.
@@ -28,7 +27,7 @@ public class XHTMLSerializer extends OutputSerializer {
   public void attribute(final byte[] n, final byte[] v) throws IOException {
     // escape URI attributes
     final byte[] tagatt = concat(lc(tag), COLON, lc(n));
-    final byte[] val = escape && URIS.contains(tagatt) ? escape(v) : v;
+    final byte[] val = escape && HTMLSerializer.URIS.contains(tagatt) ? escape(v) : v;
     super.attribute(n, val);
   }
 
@@ -47,7 +46,7 @@ public class XHTMLSerializer extends OutputSerializer {
   @Override
   protected void finishEmpty() throws IOException {
     if(ct(true, false)) return;
-    if(EMPTIES.contains(lc(tag))) {
+    if(HTMLSerializer.EMPTIES.contains(lc(tag))) {
       print(' ');
       print(ELEM_SC);
     } else {
@@ -55,5 +54,9 @@ public class XHTMLSerializer extends OutputSerializer {
       sep = false;
       finishClose();
     }
+  }
+
+  // HTML Serializer: cache elements
+  static {
   }
 }

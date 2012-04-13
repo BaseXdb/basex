@@ -173,7 +173,7 @@ public final class DirParser extends Parser {
   @Override
   public String info() {
     final TokenBuilder tb = new TokenBuilder();
-    if(skipped.size() != 0) {
+    if(!skipped.isEmpty()) {
       tb.add(SKIPPED).add(COL).add(NL);
       final int s = skipped.size();
       for(int i = 0; i < s && i < SKIPLOG; i++) {

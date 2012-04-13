@@ -33,15 +33,13 @@ public abstract class Serializer {
   protected byte[] tag;
   /** Declare namespaces flag. */
   protected boolean undecl;
-  /** Indicates the currently output node is untyped. */
-  protected boolean untyped;
 
   /** Currently available namespaces. */
   private final Atts ns = new Atts(XML, XMLURI).add(EMPTY, EMPTY);
   /** Namespace stack. */
   private final IntList nsl = new IntList();
   /** Indicates if an element has not been completely opened yet. */
-  private boolean elem;
+  private boolean opening;
 
   /**
    * Returns an XML serializer.
@@ -88,7 +86,7 @@ public abstract class Serializer {
 
     finishElement();
     nsl.push(ns.size());
-    elem = true;
+    opening = true;
     tag = name;
     startOpen(name);
     for(int i = 0; i < atts.length; i += 2) attribute(atts[i], atts[i + 1]);
@@ -100,9 +98,9 @@ public abstract class Serializer {
    */
   public final void closeElement() throws IOException {
     ns.size(nsl.pop());
-    if(elem) {
+    if(opening) {
       finishEmpty();
-      elem = false;
+      opening = false;
     } else {
       tag = tags.pop();
       level--;
@@ -150,8 +148,7 @@ public abstract class Serializer {
    * @param value value
    * @throws IOException I/O exception
    */
-  public final void pi(final byte[] name, final byte[] value)
-      throws IOException {
+  public final void pi(final byte[] name, final byte[] value) throws IOException {
     finishElement();
     finishPi(name, value);
   }
@@ -189,7 +186,6 @@ public abstract class Serializer {
   public final void node(final Data data, final int pre, final FTPosData ft)
       throws IOException {
 
-    untyped = data.meta.chop;
     boolean doc = false;
     final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
     final IntList pars = new IntList();
@@ -270,7 +266,6 @@ public abstract class Serializer {
     // process remaining elements...
     while(--l >= 0) closeElement();
     if(doc) closeDoc();
-    untyped = false;
   }
 
   /**
@@ -340,9 +335,7 @@ public abstract class Serializer {
    * @param uri URI
    * @throws IOException I/O exception
    */
-  public void namespace(final byte[] pref, final byte[] uri)
-      throws IOException {
-
+  public void namespace(final byte[] pref, final byte[] uri) throws IOException {
     if(!undecl && pref.length != 0 && uri.length == 0) return;
     final byte[] u = ns(pref);
     if(u == null || !eq(u, uri)) {
@@ -478,8 +471,8 @@ public abstract class Serializer {
    * @throws IOException I/O exception
    */
   private void finishElement() throws IOException {
-    if(!elem) return;
-    elem = false;
+    if(!opening) return;
+    opening = false;
     finishOpen();
     tags.push(tag);
     level++;

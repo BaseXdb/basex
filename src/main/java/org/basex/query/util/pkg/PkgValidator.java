@@ -120,10 +120,8 @@ public final class PkgValidator {
    *        for a package or current version of BaseX
    * @return available appropriate version
    */
-  private static byte[] availVersion(final Dependency dep,
-      final TokenSet currentVers) {
-
-    if(currentVers.size() == 0) return null;
+  private static byte[] availVersion(final Dependency dep, final TokenSet currentVers) {
+    if(currentVers.isEmpty()) return null;
     if(dep.versions != null) {
       // get acceptable versions for secondary package/processor
       final TokenSet versList = new TokenSet(split(dep.versions, ' '));

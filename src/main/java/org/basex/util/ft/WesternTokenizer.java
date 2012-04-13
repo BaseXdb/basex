@@ -279,7 +279,7 @@ public final class WesternTokenizer extends Tokenizer {
 
     // if necessary, calculate sentences and paragraphs
     final IntList il = u == FTUnit.SENTENCE ? sen : par;
-    if(sen.size() == 0) {
+    if(sen.isEmpty()) {
       init();
       while(more()) {
         sen.add(sent);

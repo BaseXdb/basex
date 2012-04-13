@@ -139,7 +139,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final BaseXCombo cm = new BaseXCombo(gui, keys);
     cm.addActionListener(this);
     cm.addKeyListener(main);
-    if(tmp.size() == 0) cm.setEnabled(false);
+    if(tmp.isEmpty()) cm.setEnabled(false);
     panel.add(cm);
     panel.add(new BaseXLabel(""));
   }

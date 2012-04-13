@@ -1630,7 +1630,7 @@ public class QueryParser extends InputParser {
 
     // if no location steps have been added, add trailing self::node() step as
     // replacement for context node to bring results in order
-    if(el.size() == 0) add(el, AxisStep.get(info(), Axis.SELF, Test.NOD));
+    if(el.isEmpty()) add(el, AxisStep.get(info(), Axis.SELF, Test.NOD));
 
     return Path.get(info(), root, el.finish());
   }
@@ -2221,7 +2221,7 @@ public class QueryParser extends InputParser {
       if(pr || eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);
         final byte[] pref = pr ? local(atn) : EMPTY;
-        final byte[] uri = attv.size() == 0 ? EMPTY :
+        final byte[] uri = attv.isEmpty() ? EMPTY :
           ((Str) attv.get(0)).string();
         if(eq(pref, XML) && eq(uri, XMLURI)) {
           if(xmlDecl) error(DUPLNSDEF, XML);
