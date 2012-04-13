@@ -70,8 +70,8 @@ public final class Var extends ParseExpr {
    * @param a annotations
    * @return variable
    */
-  public static Var create(final QueryContext ctx, final InputInfo ii,
-      final QNm n, final SeqType t, final Ann a) {
+  public static Var create(final QueryContext ctx, final InputInfo ii, final QNm n,
+      final SeqType t, final Ann a) {
     return new Var(ii, n, t, ctx.varIDs++, a);
   }
 
@@ -83,8 +83,8 @@ public final class Var extends ParseExpr {
    * @param a annotations
    * @return variable
    */
-  public static Var create(final QueryContext ctx, final InputInfo ii,
-      final QNm n, final Ann a) {
+  public static Var create(final QueryContext ctx, final InputInfo ii, final QNm n,
+      final Ann a) {
     return create(ctx, ii, n, (SeqType) null, a);
   }
 
@@ -97,8 +97,8 @@ public final class Var extends ParseExpr {
    * @param a annotations
    * @return variable
    */
-  public static Var create(final QueryContext ctx, final InputInfo ii,
-      final QNm n, final Value v, final Ann a) {
+  public static Var create(final QueryContext ctx, final InputInfo ii, final QNm n,
+      final Value v, final Ann a) {
     final Var var = create(ctx, ii, n, v.type(), a);
     var.expr = v;
     var.value = v;
@@ -125,12 +125,9 @@ public final class Var extends ParseExpr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void reset(final SeqType t, final QueryContext ctx)
-      throws QueryException {
-
+  public void reset(final SeqType t, final QueryContext ctx) throws QueryException {
     type = t;
-    if(value != null && !value.type.instanceOf(t.type) &&
-        value instanceof Item) {
+    if(value != null && !value.type.instanceOf(t.type) && value instanceof Item) {
       value = type.type.cast((Item) value, ctx, info);
     }
   }
@@ -169,8 +166,7 @@ public final class Var extends ParseExpr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return value(ctx).item(ctx, ii);
   }
 
@@ -211,8 +207,7 @@ public final class Var extends ParseExpr {
    * @return cast value
    * @throws QueryException query exception
    */
-  private Value cast(final Value v, final QueryContext ctx)
-      throws QueryException {
+  private Value cast(final Value v, final QueryContext ctx) throws QueryException {
     return type == null ? v : type.promote(v, ctx, info);
   }
 

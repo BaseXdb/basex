@@ -104,27 +104,27 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void setDTDHandler(final DTDHandler h) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public void setEntityResolver(final EntityResolver resolver) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public void setErrorHandler(final ErrorHandler h) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public void setFeature(final String name, final boolean value) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override

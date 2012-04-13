@@ -41,6 +41,6 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
 
   @Override
   public void setData(final String dat) {
-    readOnly();
+    throw readOnly();
   }
 }

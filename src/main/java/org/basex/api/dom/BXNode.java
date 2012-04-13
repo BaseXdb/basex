@@ -31,7 +31,7 @@ public abstract class BXNode implements Node {
     "#document", null, "#text", null, "#comment", null, "#cdata-section",
     "#document-fragment"
   };
-  /** Data reference. */
+  /** Node reference. */
   final ANode node;
 
   /**
@@ -39,7 +39,7 @@ public abstract class BXNode implements Node {
    * @param n node reference
    */
   BXNode(final ANode n) {
-    node = n;
+    node = n.deepCopy();
   }
 
   @Override
@@ -98,14 +98,14 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getFirstChild() {
-    return toJava(node.children().next());
+    return toJava(node.children().next().finish());
   }
 
   @Override
   public final BXNode getLastChild() {
     ANode n = null;
     for(final ANode t : node.children()) n = t;
-    return toJava(n);
+    return toJava(n.finish());
   }
 
   @Override
@@ -115,12 +115,12 @@ public abstract class BXNode implements Node {
 
   @Override
   public BXNode getNextSibling() {
-    return toJava(node.followingSibling().next());
+    return toJava(node.followingSibling().next().finish());
   }
 
   @Override
   public BXNode getPreviousSibling() {
-    return toJava(node.precedingSibling().next());
+    return toJava(node.precedingSibling().next().finish());
   }
 
   @Override
@@ -176,8 +176,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode appendChild(final Node newChild) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
@@ -192,71 +191,63 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode insertBefore(final Node newChild, final Node refChild) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public final boolean isDefaultNamespace(final String namespaceURI) {
-    Util.notimplemented();
-    return false;
+    throw Util.notimplemented();
   }
 
   @Override
   public final boolean isEqualNode(final Node cmp) {
-    Util.notimplemented();
-    return false;
+    throw Util.notimplemented();
   }
 
   @Override
   public final String lookupNamespaceURI(final String prefix) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public final String lookupPrefix(final String namespaceURI) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public final void normalize() {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public final BXNode removeChild(final Node oldChild) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public final BXNode replaceChild(final Node newChild, final Node oldChild) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public final void setNodeValue(final String nodeValue) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public final void setPrefix(final String prefix) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public final void setTextContent(final String textContent) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public final Object setUserData(final String key, final Object dat,
       final UserDataHandler handler) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
@@ -274,8 +265,7 @@ public abstract class BXNode implements Node {
     final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
     for(ANode n; (n = ai.next()) != null;) {
-      if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name())))
-        nb.add(n.copy());
+      if(n.type == NodeType.ELM && (nm == null || eq(nm, n.name()))) nb.add(n.finish());
     }
     return new BXNList(nb);
   }
@@ -301,8 +291,9 @@ public abstract class BXNode implements Node {
 
   /**
    * Throws a DOM modification exception.
+   * @return DOM exception
    */
-  static final void readOnly() {
+  static final DOMException readOnly() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

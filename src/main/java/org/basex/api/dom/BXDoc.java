@@ -39,8 +39,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNode adoptNode(final Node source) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
@@ -80,8 +79,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public EntityReference createEntityReference(final String name) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
@@ -116,14 +114,12 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public DOMConfiguration getDomConfig() {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public BXElem getElementById(final String elementId) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
@@ -134,8 +130,7 @@ public final class BXDoc extends BXNode implements Document {
   @Override
   public BXNList getElementsByTagNameNS(final String namespaceURI,
       final String localName) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
@@ -150,8 +145,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public boolean getStrictErrorChecking() {
-    Util.notimplemented();
-    return false;
+    throw Util.notimplemented();
   }
 
   @Override
@@ -171,39 +165,37 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNode importNode(final Node importedNode, final boolean deep) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public void normalizeDocument() {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public BXNode renameNode(final Node n, final String namespaceURI,
       final String qualifiedName) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public void setDocumentURI(final String documentURI) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public void setStrictErrorChecking(final boolean strictErrorChecking) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public void setXmlStandalone(final boolean xmlStandalone) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public void setXmlVersion(final String xmlVersion) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 }

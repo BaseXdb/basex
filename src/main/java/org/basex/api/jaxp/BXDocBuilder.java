@@ -64,8 +64,7 @@ final class BXDocBuilder extends DocumentBuilder {
 
   @Override
   public Document newDocument() {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override

@@ -29,7 +29,7 @@ final class BXPath implements XPath {
   @Override
   public void setXPathVariableResolver(final XPathVariableResolver var) {
     variables = var;
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
@@ -40,7 +40,7 @@ final class BXPath implements XPath {
   @Override
   public void setXPathFunctionResolver(final XPathFunctionResolver fun) {
     functions = fun;
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
@@ -50,7 +50,7 @@ final class BXPath implements XPath {
 
   @Override
   public void setNamespaceContext(final NamespaceContext ns) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override

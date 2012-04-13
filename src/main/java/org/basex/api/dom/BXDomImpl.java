@@ -26,15 +26,13 @@ public final class BXDomImpl implements DOMImplementation {
   @Override
   public BXDoc createDocument(final String nsURI, final String qn,
       final DocumentType doctype) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public DocumentType createDocumentType(final String qn, final String pid,
       final String sid) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override

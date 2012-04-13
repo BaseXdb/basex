@@ -31,13 +31,11 @@ public class BXText extends BXChar implements Text {
 
   @Override
   public BXText replaceWholeText(final String content) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public BXText splitText(final int off) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 }

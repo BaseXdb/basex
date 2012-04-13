@@ -26,46 +26,42 @@ final class BXDocBuilderFactory extends DocumentBuilderFactory {
 
   @Override
   public void setAttribute(final String name, final Object value) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public Object getAttribute(final String name) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public Schema getSchema() {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public void setSchema(final Schema grammar) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public boolean isXIncludeAware() {
-    Util.notimplemented();
-    return false;
+    throw Util.notimplemented();
   }
 
   @Override
   public void setXIncludeAware(final boolean state) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   @Override
   public boolean getFeature(final String name) {
-    Util.notimplemented();
-    return false;
+    throw Util.notimplemented();
   }
 
   @Override
   public void setFeature(final String name, final boolean value) {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 
   // doesn't overwrite its ancestor method..

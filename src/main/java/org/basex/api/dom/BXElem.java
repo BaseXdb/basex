@@ -52,8 +52,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public String getAttributeNS(final String uri, final String ln) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
@@ -64,8 +63,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXAttr getAttributeNodeNS(final String uri, final String ln) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
@@ -75,14 +73,12 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXNList getElementsByTagNameNS(final String uri, final String ln) {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
   public TypeInfo getSchemaTypeInfo() {
-    Util.notimplemented();
-    return null;
+    throw Util.notimplemented();
   }
 
   @Override
@@ -97,63 +93,57 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public boolean hasAttributeNS(final String uri, final String ln) {
-    Util.notimplemented();
-    return false;
+    throw Util.notimplemented();
   }
 
   @Override
   public void removeAttribute(final String name) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public void removeAttributeNS(final String uri, final String ln) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
   public BXAttr removeAttributeNode(final Attr oldAttr) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public void setAttribute(final String name, final String value) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
-  public void setAttributeNS(final String uri, final String qn,
-      final String value) {
-    readOnly();
+  public void setAttributeNS(final String uri, final String qn, final String value) {
+    throw readOnly();
   }
 
   @Override
   public BXAttr setAttributeNode(final Attr at) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public BXAttr setAttributeNodeNS(final Attr at) {
-    readOnly();
-    return null;
+    throw readOnly();
   }
 
   @Override
   public void setIdAttribute(final String name, final boolean isId) {
-    readOnly();
+    throw readOnly();
   }
 
   @Override
-  public void setIdAttributeNS(final String uri, final String ln,
-      final boolean isId) {
-    readOnly();
+  public void setIdAttributeNS(final String uri, final String ln, final boolean isId) {
+    throw readOnly();
   }
 
   @Override
   public void setIdAttributeNode(final Attr at, final boolean isId) {
-    readOnly();
+    throw readOnly();
   }
 
   /**
@@ -164,9 +154,7 @@ public final class BXElem extends BXNode implements Element {
   private ANode attribute(final String name) {
     final AxisIter ai = node.attributes();
     final byte[] nm = Token.token(name);
-    for(ANode n; (n = ai.next()) != null;) {
-      if(Token.eq(nm, n.name())) return n;
-    }
+    for(ANode n; (n = ai.next()) != null;) if(Token.eq(nm, n.name())) return n.finish();
     return null;
   }
 }

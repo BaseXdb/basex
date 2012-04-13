@@ -26,6 +26,6 @@ public abstract class FTIterator implements Iterator<FTSpan> {
 
   @Override
   public final void remove() {
-    Util.notimplemented();
+    throw Util.notimplemented();
   }
 }
