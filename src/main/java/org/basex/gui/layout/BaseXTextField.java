@@ -4,9 +4,11 @@ import static org.basex.gui.layout.BaseXKeys.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 import javax.swing.*;
 
+import org.basex.gui.*;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
 
 /**
@@ -20,7 +22,7 @@ public class BaseXTextField extends JTextField {
   public static final int DWIDTH = 350;
   /** Last input. */
   String last = "";
-  /** Text area to search in. */
+  /** Attached text area to search in. */
   BaseXEditor area;
 
   /**
@@ -48,7 +50,10 @@ public class BaseXTextField extends JTextField {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        if(area != null) selectAll();
+        if(area != null) {
+          selectAll();
+          find();
+        }
       }
     });
 
@@ -60,26 +65,27 @@ public class BaseXTextField extends JTextField {
           setText(last);
           last = t;
         }
-        // check search area
+        // attached text area
         if(area == null) return;
-        final String text = getText();
-        final boolean enter = ENTER.is(e);
-        if(ESCAPE.is(e) || enter && text.isEmpty()) {
+        if(ESCAPE.is(e) || ENTER.is(e) && getText().trim().isEmpty()) {
           area.requestFocusInWindow();
-        } else if(enter || FINDNEXT.is(e) || FINDPREV.is(e) ||
-            FINDNEXT2.is(e) || FINDPREV2.is(e)) {
-          area.find(text, FINDPREV.is(e) || FINDPREV2.is(e) || e.isShiftDown());
+          setBackground(GUIConstants.WHITE);
+        } else if(FINDPREV.is(e) || FINDPREV2.is(e) || ENTER.is(e) && e.isShiftDown()) {
+          area.find(false);
+        } else if(FINDNEXT.is(e) || FINDNEXT2.is(e) || ENTER.is(e)) {
+          area.find(true);
         }
       }
 
       @Override
       public void keyReleased(final KeyEvent e) {
         if(area == null) return;
-        final String text = getText();
-        final char ch = e.getKeyChar();
-        if(!control(e) && Character.isDefined(ch) && !ENTER.is(e))
-          area.find(text, false);
-        repaint();
+        if(!control(e) && Character.isDefined(e.getKeyChar()) && !ENTER.is(e)) {
+          final String text = getText().trim().toLowerCase(Locale.ENGLISH);
+          final String old = area.keyword(text);
+          if(text.equals(old)) return;
+          find();
+        }
       }
     });
 
@@ -93,12 +99,20 @@ public class BaseXTextField extends JTextField {
   }
 
   /**
+   * Finds the specified keyword in the attached editor.
+   */
+  void find() {
+    setBackground(area.find() || getText().trim().isEmpty() ?
+        GUIConstants.WHITE : GUIConstants.LRED);
+  }
+
+  /**
    * Activates search functionality to the text field.
    * @param a text area to search
    */
   public final void setSearch(final BaseXEditor a) {
     area = a;
-    BaseXLayout.setWidth(this, 120);
+    BaseXLayout.setWidth(this, 100);
   }
 
   @Override

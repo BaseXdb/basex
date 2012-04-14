@@ -1,15 +1,10 @@
 package org.basex.gui.layout;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.util.Locale;
+import java.awt.*;
 
-import org.basex.gui.GUIConstants;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 
 /**
  * Efficient Text Editor and Renderer, supporting syntax highlighting and
@@ -39,8 +34,8 @@ final class BaseXTextRenderer extends BaseXBack {
 
   /** Width of current word. */
   private int wordW;
-  /** Search term. */
-  private String search;
+  /** Search keyword. */
+  private String keyword = "";
 
   /** Border offset. */
   private int off;
@@ -93,61 +88,57 @@ final class BaseXTextRenderer extends BaseXBack {
   }
 
   /**
-   * Finds the search term.
-   * @param s search term
-   * @param b backward browsing
-   * @return new position
+   * Sets a new keyword.
+   * @param key new keyword
+   * @return old keyword
    */
-  int find(final String s, final boolean b) {
-    final int os = search == null ? 0 : search.length();
-    final int ns = s.length();
-    search = ns != 0 ? s.toLowerCase(Locale.ENGLISH) : null;
-    return ns < os ? 0 : find(b, ns == os);
+  String keyword(final String key) {
+    final String k = keyword;
+    keyword = key;
+    return k;
   }
 
   /**
-   * Finds the search term.
-   * @param b backward browsing
-   * @param s string is the same as last time
+   * Finds the current keyword and returns the text position.
+   * @param forward backward browsing
+   * @param same string is the same as last time
    * @return new position
    */
-  int find(final boolean b, final boolean s) {
-    if(search == null) return 0;
+  int find(final boolean forward, final boolean same) {
+    if(keyword.isEmpty()) return 0;
 
-    final int hh = h;
-    int lp = 0;
-    int ly = 0;
-    int sp = text.cursor();
+    while(true) {
+      final int hh = h;
+      int lp = 0;
+      int ly = 0;
+      int cp = text.cursor();
 
-    h = Integer.MAX_VALUE;
-    final Graphics g = getGraphics();
-    init(g, 0);
-    while(more(g)) {
-      if(searched()) {
+      h = Integer.MAX_VALUE;
+      final Graphics g = getGraphics();
+      for(init(g, 0); more(g); next()) {
+        if(!found()) continue;
+
         final int np = text.pos();
         final int ny = y - fontH;
-        if(np >= sp && (np > sp || !s || b)) {
-          if(b && lp == 0 && np >= sp) {
-            sp = Integer.MAX_VALUE;
-          } else {
+        if(np >= cp && (np > cp || !same || !forward)) {
+          if(forward || lp != 0) {
             h = hh;
-            text.setCaret(b ? lp : np);
-            return b ? ly : ny;
+            text.setCaret(forward ? np : lp);
+            return forward ? ny : ly;
           }
+          cp = Integer.MAX_VALUE;
         }
         lp = np;
         ly = ny;
       }
-      next();
-    }
 
-    h = hh;
-    if(sp == 0 || sp == Integer.MAX_VALUE) {
-      text.setCaret(lp);
-      return ly;
+      h = hh;
+      if(cp == 0 || cp == Integer.MAX_VALUE) {
+        text.setCaret(lp);
+        return ly;
+      }
+      text.setCaret(0);
     }
-    text.setCaret(0);
-    return find(b, s);
   }
 
   /**
@@ -349,10 +340,10 @@ final class BaseXTextRenderer extends BaseXBack {
         }
         text.pos(p);
       }
-      if(search != null && searched()) {
+      if(found()) {
         int cw = 0;
-        for(int c = 0; c < search.length(); ++c) {
-          cw += charW(g, search.charAt(c));
+        for(int c = 0; c < keyword.length(); ++c) {
+          cw += charW(g, keyword.charAt(c));
         }
         g.setColor(GUIConstants.color(text.cursor() == text.pos() ? 5 : 2));
         g.fillRect(x, y - fontH + 4, cw, fontH);
@@ -394,17 +385,19 @@ final class BaseXTextRenderer extends BaseXBack {
   }
 
   /**
-   * Returns true if the searched term is found.
+   * Returns true if the keyword is found.
    * @return result of check
    */
-  private boolean searched() {
-    final int sl = search.length();
+  private boolean found() {
+    if(keyword.isEmpty()) return false;
+
+    final int sl = keyword.length();
     final int wl = text.length();
     if(wl < sl) return false;
     final int p = text.pos();
     int s = -1;
     while(++s != sl) {
-      if(Character.toLowerCase(text.next()) != search.charAt(s)) break;
+      if(Character.toLowerCase(text.next()) != keyword.charAt(s)) break;
     }
     text.pos(p);
     return s == sl;

@@ -18,7 +18,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.util.Arrays;
+import java.util.*;
+
 import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -134,12 +135,30 @@ public class BaseXEditor extends BaseXPanel {
   }
 
   /**
-   * Finds the specified term.
-   * @param t output text
-   * @param b backward browsing
+   * Finds the next/previous occurrence of the current keyword.
+   * @param forward forward search
    */
-  final void find(final String t, final boolean b) {
-    scroll(rend.find(t, b));
+  final void find(final boolean forward) {
+    scroll(rend.find(forward, true));
+  }
+
+  /**
+   * Sets a new keyword.
+   * @param key new keyword
+   * @return old keyword
+   */
+  String keyword(final String key) {
+    return rend.keyword(key);
+  }
+
+  /**
+   * Finds the current keyword.
+   * @return {@code true} if the keyword was found
+   */
+  final boolean find() {
+    final int p = rend.find(true, false);
+    scroll(p);
+    return p != 0;
   }
 
   /**
