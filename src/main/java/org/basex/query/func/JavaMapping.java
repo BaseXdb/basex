@@ -40,8 +40,8 @@ public abstract class JavaMapping extends Arr {
     Byte.class,       short.class,    Short.class,        int.class,
     Integer.class,    long.class,     Long.class,         float.class,
     Float.class,      double.class,   Double.class,       BigDecimal.class,
-    BigInteger.class, QName.class,    CharSequence.class, char.class,
-    Character.class,  URI.class,      URL.class,          Map.class
+    BigInteger.class, QName.class,    char.class,         Character.class,
+    URI.class,        URL.class,      Map.class
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
@@ -50,7 +50,7 @@ public abstract class JavaMapping extends Arr {
     AtomType.INT, AtomType.LNG, AtomType.LNG, AtomType.FLT,
     AtomType.FLT, AtomType.DBL, AtomType.DBL, AtomType.DEC,
     AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.STR,
-    AtomType.STR, AtomType.URI, AtomType.URI, FuncType.ANY_FUN
+    AtomType.URI, AtomType.URI, FuncType.ANY_FUN
   };
 
   /**
@@ -111,9 +111,9 @@ public abstract class JavaMapping extends Arr {
     } else if(res instanceof byte[]) {
       for(final byte o : (byte[]) res) vb.add(new Int(o, AtomType.BYT));
     } else if(res instanceof short[]) {
-      for(final short o : (short[]) res) vb.add(Int.get(o));
+      for(final short o : (short[]) res) vb.add(new Int(o, AtomType.SHR));
     } else if(res instanceof int[]) {
-      for(final int o : (int[]) res) vb.add(Int.get(o));
+      for(final int o : (int[]) res) vb.add(new Int(o, AtomType.INT));
     } else if(res instanceof long[]) {
       for(final long o : (long[]) res) vb.add(Int.get(o));
     } else if(res instanceof float[]) {
@@ -130,36 +130,36 @@ public abstract class JavaMapping extends Arr {
 
   /**
    * Returns a new Java function instance.
-   * @param name function name
+   * @param qname function name
    * @param args arguments
    * @param ctx query context
    * @param ii input info
    * @return Java function, or {@code null}
    * @throws QueryException query exception
    */
-  static JavaMapping get(final QNm name, final Expr[] args, final QueryContext ctx,
+  static JavaMapping get(final QNm qname, final Expr[] args, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
-    // check for "java:" prefix
-    final byte[] uri = name.uri();
-    final byte[] ln = name.local();
+    final byte[] uri = qname.uri();
+    final byte[] ln = qname.local();
+    // check if URI starts with "java:" prefix (if yes, module must be Java code)
     final boolean java = startsWith(uri, JAVAPREF);
     final QNm nm = new QNm(ln, java ? substring(uri, JAVAPREF.length) : uri);
 
     // rewrite function name: convert dashes to upper-case initials
-    final TokenBuilder m = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     boolean dash = false;
     for(int p = 0; p < ln.length; p += cl(ln, p)) {
       final int ch = cp(ln, p);
       if(dash) {
-        m.add(Character.toUpperCase(ch));
+        tb.add(Character.toUpperCase(ch));
         dash = false;
       } else {
         dash = ch == '-';
-        if(!dash) m.add(ch);
+        if(!dash) tb.add(ch);
       }
     }
-    final String mth = m.toString();
+    final String name = tb.toString();
 
     // check imported Java modules
     String path = string(nm.uri());
@@ -169,18 +169,24 @@ public abstract class JavaMapping extends Arr {
 
     final Object jm  = ctx.modules.findImport(path);
     if(jm != null) {
-      for(final Method meth : jm.getClass().getMethods()) {
-        // accept any method with identical name and arity
-        if(meth.getName().equals(mth) && meth.getParameterTypes().length == args.length) {
-          // check if user has sufficient permissions to call the function
-          Perm perm = Perm.ADMIN;
-          final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
-          if(req != null) perm = Perm.get(req.value().name());
-          if(!ctx.context.user.has(perm)) return null;
-          return new JavaModuleFunc(ii, jm, meth, args);
+      // find method with identical name and arity
+      Method meth = null;
+      for(final Method m : jm.getClass().getMethods()) {
+        if(m.getName().equals(name) && m.getParameterTypes().length == args.length) {
+          if(meth != null) JAVAAMB.thrw(ii, path + ':' + name);
+          meth = m;
         }
       }
-      throw WHICHJAVA.thrw(ii, path + ':' + mth);
+
+      if(meth != null) {
+        // check if user has sufficient permissions to call the function
+        Perm perm = Perm.ADMIN;
+        final QueryModule.Requires req = meth.getAnnotation(QueryModule.Requires.class);
+        if(req != null) perm = Perm.get(req.value().name());
+        if(!ctx.context.user.has(perm)) return null;
+        return new JavaModuleFunc(ii, jm, meth, args);
+      }
+      WHICHJAVA.thrw(ii, path + ':' + name);
     }
 
     // only allowed with administrator permissions
@@ -188,7 +194,7 @@ public abstract class JavaMapping extends Arr {
 
     // check addressed class
     try {
-      return new JavaFunc(ii, ctx.modules.findClass(path), mth, args);
+      return new JavaFunc(ii, ctx.modules.findClass(path), name, args);
     } catch(final ClassNotFoundException ex) {
       // only throw exception if "java:" prefix was explicitly specified
       if(java) throw WHICHJAVA.thrw(ii, uri);

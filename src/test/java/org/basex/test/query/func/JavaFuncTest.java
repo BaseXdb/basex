@@ -1,5 +1,6 @@
 package org.basex.test.query.func;
 
+import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -35,20 +36,20 @@ public class JavaFuncTest extends AdvancedQueryTest {
   /** Tests calling some Java static methods from XQuery. */
   @Test
   public void staticMethod() {
-    query("Q{java:java.lang.Math}sqrt(xs:double(9.0))", 3);
+    query("Q{java.lang.Math}sqrt(xs:double(9.0))", 3);
   }
 
   /** Tests calling some Java static methods from XQuery. */
   @Test
   public void method() {
-    query("declare namespace rect = 'java:java.awt.Rectangle';" +
+    query("declare namespace rect = 'java.awt.Rectangle';" +
         "rect:contains(rect:new(xs:int(2), xs:int(2)), xs:int(1), xs:int(1))", true);
   }
 
   /** Tests importing a Java class. */
   @Test
-  public void javaImport() {
-    query("import module namespace set='java:java.util.HashSet';" +
+  public void importClass() {
+    query("import module namespace set='java.util.HashSet';" +
         "let $a := (set:add('a'), set:add('b')) return set:size()", "2");
 
     query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
@@ -61,10 +62,17 @@ public class JavaFuncTest extends AdvancedQueryTest {
 
   /** Tests importing a Java class and throwing errors. */
   @Test
-  public void javaImportError() {
+  public void importError() {
     query("declare namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
         "try { qm:error(qm:new()) } catch * { $err:code }", "BASX0000");
     query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
         "try { qm:error() } catch * { $err:code }", "BASX0000");
+  }
+
+  /** Tests ambiguous function signatures. */
+  @Test
+  public void ambiguousSignature() {
+    error("import module namespace n='java:java.lang.StringBuilder'; n:append('x')",
+        Err.JAVAAMB);
   }
 }

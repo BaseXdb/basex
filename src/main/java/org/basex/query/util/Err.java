@@ -528,7 +528,9 @@ public enum Err {
   /** XPST0017: Parsing exception. */
   FUNCUNKNOWN(XPST, 17, "Unknown function '%(...)'."),
   /** XPST0017: Parsing exception. */
-  WHICHJAVA(XPST, 17, "Unknown Java function '%(...)'."),
+  WHICHJAVA(XPST, 17, "Java function '%(...)' not found."),
+  /** XPST0017: Parsing exception. */
+  JAVAAMB(XPST, 17, "Signature is ambiguous: '%(...)'."),
   /** XPST0017: Parsing exception. */
   INITJAVA(XPST, 17, "Class cannot be initialized: %."),
 
