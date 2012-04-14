@@ -1,6 +1,8 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+import static org.basex.util.Util.*;
 
 import java.text.*;
 import java.util.*;
@@ -58,7 +60,7 @@ public final class Dtm extends Date {
    * @throws QueryException query exception
    */
   Dtm(final Int tm, final InputInfo ii) throws QueryException {
-    this(Token.token(FORMAT.format(new java.util.Date(tm.itr(ii)))), ii);
+    this(token(formatDate(new java.util.Date(tm.itr(ii)), FORMAT)), ii);
   }
 
   /**
@@ -68,7 +70,7 @@ public final class Dtm extends Date {
    * @throws QueryException query exception
    */
   public Dtm(final long tm, final InputInfo ii) throws QueryException {
-    this(Token.token(FORMAT.format(new java.util.Date(tm))), ii);
+    this(token(formatDate(new java.util.Date(tm), FORMAT)), ii);
   }
 
   /**
@@ -100,7 +102,7 @@ public final class Dtm extends Date {
    */
   public static long parse(final String date) {
     try {
-      return Dtm.FORMAT.parse(date).getTime();
+      return parseDate(date, FORMAT).getTime();
     } catch(final ParseException ex) {
       Util.errln(ex);
       return 0;
