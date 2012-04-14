@@ -1,0 +1,27 @@
+<employees>
+  <employee>
+    <location>Boston</location>
+    <salary>60000</salary>
+    <deptno>1</deptno>
+  </employee>
+  <employee>
+    <location>Denver</location>
+    <salary>60000</salary>
+    <deptno>1</deptno>
+  </employee>
+  <employee>
+    <location>Denver</location>
+    <salary>70000</salary>
+    <deptno>1</deptno>
+  </employee>
+  <employee>
+    <location>Denver</location>
+    <salary>80000</salary>
+    <deptno>2</deptno>
+  </employee>
+  <employee>
+    <location>Boston</location>
+    <salary>70000</salary>
+    <deptno>1</deptno>
+  </employee>
+</employees>

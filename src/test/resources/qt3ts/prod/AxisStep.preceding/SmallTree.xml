@@ -1,0 +1,15 @@
+<documentElement xml:lang="en">
+    <section1 noValue="">
+        text1
+        <?target1 data1?>
+        <?target2 data2?>
+        <?target3 data3?>
+    </section1>
+    <section2 attr1="1" attr2="2"/>
+    <!-- comment1 -->
+    <section3/>
+    <!-- comment2 -->
+    <!-- comment3 -->
+    <noChildren/>
+    <oneTextChild>theTextChild2</oneTextChild>
+</documentElement>

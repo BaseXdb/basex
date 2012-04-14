@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding = "UTF-8"?>
+<root>
+  <duration>P1Y2M3DT10H30M</duration>
+  <dateTime>2002-04-02T12:00:00Z</dateTime>
+  <time>13:20:10.5Z</time>
+  <date>2000-01-01+05:00</date> 
+  <gYearMonth>2001-12</gYearMonth> 
+  <gYear>2001</gYear>
+  <gMonthDay>--12-17</gMonthDay>  
+  <gDay>---17</gDay>  
+  <gMonth>--12--</gMonth>  
+  <boolean>true</boolean>  
+  <base64Binary>R0lGODlhcgGSALMAAAQCAEMmCZtuMFQxDS8b</base64Binary>  
+  <hexBinary>A9FD64E12C</hexBinary>    
+  <float>1267.43233E12</float> 
+  <double>1267.43233E12</double>   
+  <anyURI>http://www.example.com</anyURI>   
+  <QName>aQname</QName>      
+  <string>A String Function</string>   
+  <normalizedString>aNormalizedString</normalizedString>   
+  <language>EN</language>  
+  <decimal attr="12678967.543233">12678967.543233</decimal>   
+  <integer>12678967543233</integer>   
+  <nonPositiveInteger>-1</nonPositiveInteger>
+  <long>12678967543233</long>      
+  <nonNegativeInteger>12678967543233</nonNegativeInteger>   
+  <negativeInteger>-12678967543233</negativeInteger>   
+  <int>126789675</int>   
+  <unsignedLong>12678967543233</unsignedLong>   
+  <positiveInteger>12678967543233</positiveInteger>   
+  <short>12678</short>   
+  <unsignedInt>1267896754</unsignedInt>   
+  <byte>126</byte>   
+  <unsignedShort>12678</unsignedShort>   
+  <unsignedByte>126</unsignedByte>   
+</root>

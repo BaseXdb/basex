@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<reviews>
+    <entry>
+        <title>Data on the Web</title>
+        <price>34.95</price>
+        <review>
+               A very good discussion of semi-structured database
+               systems and XML.
+        </review>
+    </entry>
+    <entry>
+        <title>Advanced Programming in the Unix environment</title>
+        <price>65.95</price>
+        <review>
+               A clear and detailed discussion of UNIX programming.
+        </review>
+    </entry>
+    <entry>
+        <title>TCP/IP Illustrated</title>
+        <price>65.95</price>
+        <review>
+               One of the best books on TCP/IP.
+        </review>
+    </entry>
+</reviews>
+

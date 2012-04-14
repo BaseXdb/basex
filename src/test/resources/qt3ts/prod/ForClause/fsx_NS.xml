@@ -1,0 +1,2753 @@
+<?xml version='1.0' encoding='UTF-8' ?><?FileSystem scale='-3'?><?FileSystem maxDepth='64'?><!-- This is an official fsx file --><fs:MyComputer xmlns:fs='http://www.example.com/filesystem'>
+	<fs:Drive fs:id="FS0" fs:type='DriveType' fs:name='Drive1'>
+		<fs:Folder fs:creation_date="1700-01-01" fs:creator='Mani' fs:name='Folder00000000000' fs:type='FolderType' fs:idref="FS0" fs:id="FS1">
+			<fs:FolderName>Folder00000000000</fs:FolderName>
+			<?filesystem compressionUtil='foozip.exe'?>
+			<fs:description> marries inflamed apprehended beseeming bustle harried devour consented glimpses fost youtli thoughts hereupon leicester temples reporter harp petruchio godhead obloquy fedary evidence apprehension flout contemptuous capable popilius sensibly heritage thereat giver implorators rid stow unloads attend swords dutchman berwick consented unknowing servant greetings dilated safeguard weighing ashford traders enanmour myrtle demean alliance noted florizel wheaten interlaces accepted martext agrees exalted solely leers tremble taxes meddler thrasonical compasses snakes timon ruddiness nether indulgent cades untruths unfold territory treat batters cloy gibber proselytes crossly brothers crannies miserable engrave abides fullest charms aprons batter perspective brags yesterday honor bluest dolour wills crimeful calm lobby truer miser perseus take cross undid tapers owe ceas rhyme mindful surly suspect fantasticoes spirits supervise unthrifty legitimation holofernes portraiture trouts suffocating deed strides ithaca its smiles sunshine loud right disdainfully figs searching oracles accusing curl reins humble nurture hue doom hidden abridgement seein unpriz learned invisible authentic shapes quae several reaches howled earns factions merry purpos howl burneth scholars untreasur maidenliest dealing toaze swiftest glist bundle hujus endowments accommodation proportionable willow stale away rejoicing unsway divert behind</fs:description>
+			<fs:SecurityObject fs:name='so00000000000'>
+				<fs:Denies>
+					<fs:Deny>
+						<fs:security>
+							<fs:right>Read</fs:right>
+						</fs:security>
+						<fs:user>system\Saman</fs:user>
+					</fs:Deny>
+					<fs:Deny>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Kunitoshi</fs:user>
+					</fs:Deny>
+				</fs:Denies>
+				<fs:Allows>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Adib</fs:user>
+					</fs:Allow>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Abigail</fs:user>
+					</fs:Allow>
+				</fs:Allows>
+			</fs:SecurityObject>
+			<fs:MetaData>
+				<fs:DecimalData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:DecimalData>
+				<fs:IntegerData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:IntegerData>
+				<fs:LongData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:LongData>
+				<fs:IntData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:IntData>
+				<fs:ShortData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:ShortData>
+				<fs:ByteData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:ByteData>
+				<fs:DoubleData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:DoubleData>
+				<fs:BooleanData fs:value='false'>
+					<fs:Value>false</fs:Value>
+				</fs:BooleanData>
+				<fs:Base64Data fs:value='SuWsxxJQzrp7H8bmkZ+MGcNezeH3DINSfmL7J9aDdfl4W8LUT7F1cKJNgyubAuQaS924e2yJtcJ9EyUPrQmAy3wE2ih7hdRiwafL5CZKsJdyZF+AyApVTMJq/Wn/t+WUDmOchJXv'>
+					<fs:Value>SuWsxxJQzrp7H8bmkZ+MGcNezeH3DINSfmL7J9aDdfl4W8LUT7F1cKJNgyubAuQaS924e2yJtcJ9EyUPrQmAy3wE2ih7hdRiwafL5CZKsJdyZF+AyApVTMJq/Wn/t+WUDmOchJXv</fs:Value>
+				</fs:Base64Data>
+				<fs:HexData fs:value='7B93678B0CC09EA71C14D6328C3568ED9EFE83EECC9FD96ED27A30F9AF47B25198E1BEAAF587D51FA29CEE4C8FB802F3D0E490381E211A44040287B5832EDF5CFE6F822DAFF51173703473CA43E2B2F35BEA2BF4306B61157FB95BF438AB01429EFCD3142AFB63B2880B86ABC9B356CF2F1E3304043CBDC23490AC879EC03903'>
+					<fs:Value>7B93678B0CC09EA71C14D6328C3568ED9EFE83EECC9FD96ED27A30F9AF47B25198E1BEAAF587D51FA29CEE4C8FB802F3D0E490381E211A44040287B5832EDF5CFE6F822DAFF51173703473CA43E2B2F35BEA2BF4306B61157FB95BF438AB01429EFCD3142AFB63B2880B86ABC9B356CF2F1E3304043CBDC23490AC879EC03903</fs:Value>
+				</fs:HexData>
+				<fs:FloatData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:FloatData>
+				<fs:NonPosIntData fs:value="-0">
+					<fs:Value>-0</fs:Value>
+				</fs:NonPosIntData>
+				<fs:NegIntData fs:value="-1">
+					<fs:Value>-1</fs:Value>
+				</fs:NegIntData>
+				<fs:NonNegData fs:value="0">
+					<fs:Value>0</fs:Value>
+				</fs:NonNegData>
+				<fs:PosIntData fs:value="1">
+					<fs:Value>1</fs:Value>
+				</fs:PosIntData>
+				<fs:ULongData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:ULongData>
+				<fs:UIntData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:UIntData>
+				<fs:UShortData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:UShortData>
+				<fs:UByteData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:UByteData>
+				<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+					<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+				</fs:StringData>
+				<fs:NormStringData fs:value='This is a normalized string'>
+					<fs:Value>This is a normalized string</fs:Value>
+				</fs:NormStringData>
+				<fs:TokenData fs:value='TheFirst'>
+					<fs:Value>TheFirst</fs:Value>
+				</fs:TokenData>
+				<fs:NameData fs:value='EN_3.EV8'>
+					<fs:Value>EN_3.EV8</fs:Value>
+				</fs:NameData>
+				<fs:NCNameData fs:value='TheFirst'>
+					<fs:Value>TheFirst</fs:Value>
+				</fs:NCNameData>
+				<fs:NMTokenData fs:value='X.IE'>
+					<fs:Value>X.IE</fs:Value>
+				</fs:NMTokenData>
+				<fs:NMTokensData fs:value='Token1 Token2 Token3'>
+					<fs:Value>Token1 Token2 Token3</fs:Value>
+				</fs:NMTokensData>
+				<fs:EntityData fs:value='::ReplaceWithEntity::'>
+					<fs:Value>::ReplaceWithEntity::</fs:Value>
+				</fs:EntityData>
+				<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+					<fs:Value>::ReplaceWithEntities::</fs:Value>
+				</fs:EntitiesData>
+				<fs:AnyURIData fs:value='http://www.microsoft.com'>
+					<fs:Value>http://www.microsoft.com</fs:Value>
+				</fs:AnyURIData>
+				<fs:QNameData fs:value='fs:foo'>
+					<fs:Value>fs:foo</fs:Value>
+				</fs:QNameData>
+				<fs:NotationData>
+					<fs:Value fs:value='fs:jpeg'>SuWsxxJQzrp7H8bmkZ+MGcNezeH3DINSfmL7J9aDdfl4W8LUT7F1cKJNgyubAuQaS924e2yJtcJ9EyUPrQmAy3wE2ih7hdRiwafL5CZKsJdyZF+AyApVTMJq/Wn/t+WUDmOchJXv</fs:Value>
+				</fs:NotationData>
+				<fs:DurationData fs:value="P45Y12M14D">
+					<fs:Value>P45Y12M14D</fs:Value>
+				</fs:DurationData>
+				<fs:DateTimeData fs:value="2334-01-11T15:40:52">
+					<fs:Value>2334-01-11T15:40:52</fs:Value>
+				</fs:DateTimeData>
+				<fs:TimeData fs:value="00:35:10">
+					<fs:Value>00:35:10</fs:Value>
+				</fs:TimeData>
+				<fs:DateData fs:value="1010-07-09">
+					<fs:Value>1010-07-09</fs:Value>
+				</fs:DateData>
+				<fs:GYearMonthData fs:value="2258-08">
+					<fs:Value>2258-08</fs:Value>
+				</fs:GYearMonthData>
+				<fs:GYearData fs:value="2382">
+					<fs:Value>2382</fs:Value>
+				</fs:GYearData>
+				<fs:GMonthDayData fs:value="--10-16">
+					<fs:Value>--10-16</fs:Value>
+				</fs:GMonthDayData>
+				<fs:GMonthData fs:value="--03--">
+					<fs:Value>--03--</fs:Value>
+				</fs:GMonthData>
+				<fs:GDayData fs:value="---10">
+					<fs:Value>---10</fs:Value>
+				</fs:GDayData>
+				<fs:GuidData fs:value="{3A721AF6-6F68-634F-7CB8-15FD00000000}">
+					<fs:Value>{3A721AF6-6F68-634F-7CB8-15FD00000000}</fs:Value>
+				</fs:GuidData>
+				<fs:LanguageData fs:value='en-US'>
+					<fs:Value>en-US</fs:Value>
+				</fs:LanguageData>
+			</fs:MetaData>
+			<!-- This is a comment for File00000000000 -->
+			<fs:File fs:creation_date="1065-10-08" fs:creator='Zane' fs:name='File00000000000' fs:type='FileType' fs:uniform='0' fs:idref="FS1" fs:id="FS2">
+				<fs:FileName>File00000000000</fs:FileName>
+				<fs:description>
+					<fs:b> gorg mine nemean halcyon vagram searce contumelious stithied unhappily rivality colbrand livelong reconciled knightly potato writer forspoke unlov wings betrayed excitements starting society sometime formal opposer hereabout beast hilding snarling
+</fs:b>
+				</fs:description>
+				<fs:SecurityObject fs:name='so00000000001'>
+					<fs:Denies></fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Shigeharu</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Sinikka</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='-9.99999999999999999'>
+						<fs:Value>-9.99999999999999999</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='-999999999999999999'>
+						<fs:Value>-999999999999999999</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='-9223372036854775808'>
+						<fs:Value>-9223372036854775808</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='-2147483648'>
+						<fs:Value>-2147483648</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='-32768'>
+						<fs:Value>-32768</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='-128'>
+						<fs:Value>-128</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='10E-10'>
+						<fs:Value>10E-10</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='true'>
+						<fs:Value>true</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='m06ELzTmeQhLMDsM0FmztqOxKwVPdY/n50NU8CZnN4BcjgHMHm4kawMVZtONgx9ntAxenpBIfVlBVfYk+mACEhRMPzvTDATzK+vKTPVvaOVhqnl+htH20ml+ypAJNsJ0WXPBIdbGILYmrh4B5iSoxnQUN4IXGdpSbyZpP6c0w143f1XVNtsADLZ0lIRl3952g4Vr'>
+						<fs:Value>m06ELzTmeQhLMDsM0FmztqOxKwVPdY/n50NU8CZnN4BcjgHMHm4kawMVZtONgx9ntAxenpBIfVlBVfYk+mACEhRMPzvTDATzK+vKTPVvaOVhqnl+htH20ml+ypAJNsJ0WXPBIdbGILYmrh4B5iSoxnQUN4IXGdpSbyZpP6c0w143f1XVNtsADLZ0lIRl3952g4Vr</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='689AC5E519441F165C540EABA1BDF8A489D9AA94DB250423B1836B2B88E726DBD49A1197793A2D1693798E338F6ACC2CE05792568BCDE2778B9D005A3DBD522F3586A668'>
+						<fs:Value>689AC5E519441F165C540EABA1BDF8A489D9AA94DB250423B1836B2B88E726DBD49A1197793A2D1693798E338F6ACC2CE05792568BCDE2778B9D005A3DBD522F3586A668</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='10E-10'>
+						<fs:Value>10E-10</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-1">
+						<fs:Value>-1</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-1">
+						<fs:Value>-1</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="1">
+						<fs:Value>1</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="1">
+						<fs:Value>1</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='18446744073709551615'>
+						<fs:Value>18446744073709551615</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='G'>
+						<fs:Value>G</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='QU394X'>
+						<fs:Value>QU394X</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='P.7'>
+						<fs:Value>P.7</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='VE4OWQCUD'>
+						<fs:Value>VE4OWQCUD</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='SR7ZJA Z2.1LLCH. HB122KI.4W ZOB4WYBXDU UNF SK S5SR.T64 MQDC.YZ.J '>
+						<fs:Value>SR7ZJA Z2.1LLCH. HB122KI.4W ZOB4WYBXDU UNF SK S5SR.T64 MQDC.YZ.J </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:bmp'>m06ELzTmeQhLMDsM0FmztqOxKwVPdY/n50NU8CZnN4BcjgHMHm4kawMVZtONgx9ntAxenpBIfVlBVfYk+mACEhRMPzvTDATzK+vKTPVvaOVhqnl+htH20ml+ypAJNsJ0WXPBIdbGILYmrh4B5iSoxnQUN4IXGdpSbyZpP6c0w143f1XVNtsADLZ0lIRl3952g4Vr</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P33Y02M14D">
+						<fs:Value>P33Y02M14D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="1195-11-02T10:48:49">
+						<fs:Value>1195-11-02T10:48:49</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="01:51:23">
+						<fs:Value>01:51:23</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="2220-03-18">
+						<fs:Value>2220-03-18</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="1008-04">
+						<fs:Value>1008-04</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="1003">
+						<fs:Value>1003</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--08-15">
+						<fs:Value>--08-15</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--10--">
+						<fs:Value>--10--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---17">
+						<fs:Value>---17</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{7AE5190A-4A5D-1732-31B2-15D500000001}">
+						<fs:Value>{7AE5190A-4A5D-1732-31B2-15D500000001}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-AT'>
+						<fs:Value>en-AT</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<fs:Stream fs:binary="false"  fs:streamid='1' fs:content-type='text/xml' fs:size="1001.33"  fs:name='sample.xml' fs:type='StreamType'>
+					<fs:StreamType>StreamType</fs:StreamType>
+					<fs:StreamSize>1001.33</fs:StreamSize>
+					<fs:StreamID>1</fs:StreamID>
+					<fs:Binary>false</fs:Binary>
+					<fs:Summary>This value is constant</fs:Summary>
+					<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+					</fs:StreamData>
+				</fs:Stream>
+			</fs:File>
+			<!-- This is a comment for File00000000001 -->
+			<fs:File fs:creation_date="2281-06-07" fs:creator='Niklas' fs:name='File00000000001' fs:type='FileType' fs:idref="FS1" fs:id="FS3">
+				<fs:FileName>File00000000001</fs:FileName>
+				<fs:description></fs:description>
+				<fs:SecurityObject fs:name='so00000000002'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Walcelio</fs:user>
+						</fs:Deny>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Yongwha</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Yuzou</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Karine</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Kaihiro</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='99999999999999999.9'>
+						<fs:Value>99999999999999999.9</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='999999999999999999'>
+						<fs:Value>999999999999999999</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='9223372036854775807'>
+						<fs:Value>9223372036854775807</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='2147483647'>
+						<fs:Value>2147483647</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='32767'>
+						<fs:Value>32767</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='127'>
+						<fs:Value>127</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='10E10'>
+						<fs:Value>10E10</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='false'>
+						<fs:Value>false</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='s6FpXNYTfaHriyoEGkmVNf38qWPDUpUhYBREz7uNgKgcvWdPXpTFNMZoVtmqZEAO434rg6Vtf6Oc288hwBOFxu/9SpFksGLHzjimGQ05E05ygstC40BeiLQDISW331cTyO3+MGy72+JmVtY6XKSXIs2Cgw/ufbc6dAf6bk56dhmA8IlS3Kr4KZYDCKqOP+xEbBDjayw/il4J9F8R9+zKQZeN'>
+						<fs:Value>s6FpXNYTfaHriyoEGkmVNf38qWPDUpUhYBREz7uNgKgcvWdPXpTFNMZoVtmqZEAO434rg6Vtf6Oc288hwBOFxu/9SpFksGLHzjimGQ05E05ygstC40BeiLQDISW331cTyO3+MGy72+JmVtY6XKSXIs2Cgw/ufbc6dAf6bk56dhmA8IlS3Kr4KZYDCKqOP+xEbBDjayw/il4J9F8R9+zKQZeN</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='4E38971EBE332C29A7B2EC6F3E6C9D0ADBFD2B772B94F478FF968AE38C698500190A0E4E6469354F4DF7BC18E92E29C291E998EC00385616186ED857DE12E2C8CA0170E7'>
+						<fs:Value>4E38971EBE332C29A7B2EC6F3E6C9D0ADBFD2B772B94F478FF968AE38C698500190A0E4E6469354F4DF7BC18E92E29C291E998EC00385616186ED857DE12E2C8CA0170E7</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='10E10'>
+						<fs:Value>10E10</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-2">
+						<fs:Value>-2</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-2">
+						<fs:Value>-2</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="2">
+						<fs:Value>2</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="2">
+						<fs:Value>2</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='2'>
+						<fs:Value>2</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='65535'>
+						<fs:Value>65535</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='255'>
+						<fs:Value>255</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='IQF_LDUU'>
+						<fs:Value>IQF_LDUU</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='FV4-ZWYV'>
+						<fs:Value>FV4-ZWYV</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='HN0'>
+						<fs:Value>HN0</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='GF61L'>
+						<fs:Value>GF61L</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='F.N.JH6 I0UC.ZF S.2UI34BU RI8.4 T.BR8 CUY80 B1C.VK. '>
+						<fs:Value>F.N.JH6 I0UC.ZF S.2UI34BU RI8.4 T.BR8 CUY80 B1C.VK. </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:jpeg'>s6FpXNYTfaHriyoEGkmVNf38qWPDUpUhYBREz7uNgKgcvWdPXpTFNMZoVtmqZEAO434rg6Vtf6Oc288hwBOFxu/9SpFksGLHzjimGQ05E05ygstC40BeiLQDISW331cTyO3+MGy72+JmVtY6XKSXIs2Cgw/ufbc6dAf6bk56dhmA8IlS3Kr4KZYDCKqOP+xEbBDjayw/il4J9F8R9+zKQZeN</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P97Y12M22D">
+						<fs:Value>P97Y12M22D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="1493-10-22T17:13:47">
+						<fs:Value>1493-10-22T17:13:47</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="17:02:01">
+						<fs:Value>17:02:01</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="2472-09-15">
+						<fs:Value>2472-09-15</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="2202-07">
+						<fs:Value>2202-07</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="1090">
+						<fs:Value>1090</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--02-18">
+						<fs:Value>--02-18</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--12--">
+						<fs:Value>--12--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---08">
+						<fs:Value>---08</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{250F1EF6-2B32-6E16-7A4E-2F0A00000002}">
+						<fs:Value>{250F1EF6-2B32-6E16-7A4E-2F0A00000002}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-CU'>
+						<fs:Value>en-CU</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<fs:Stream fs:binary="true"  fs:streamid='2' fs:content-type='text/xml' fs:size="1002.33"  fs:name='sample.xml' fs:type='StreamType'>
+					<fs:StreamType>StreamType</fs:StreamType>
+					<fs:StreamSize>1002.33</fs:StreamSize>
+					<fs:StreamID>2</fs:StreamID>
+					<fs:Binary>true</fs:Binary>
+					<fs:Summary>This value is constant</fs:Summary>
+					<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+					</fs:StreamData>
+				</fs:Stream>
+			</fs:File>
+			<!-- This is a comment for File00000000002 -->
+			<fs:File fs:creation_date="1237-10-04" fs:creator='Jinshi' fs:name='File00000000002' fs:type='FileType' fs:idref="FS1" fs:id="FS4">
+				<fs:FileName>File00000000002</fs:FileName>
+				<fs:description> hurl leets author comforting shrub queen distracted surveyor coram perfectly attend moat suggest pleaseth video fairly moiety craves choice geffrey earnest norwegian impetuous helms consummate beteem received wearisome steep conveyers duke matches hunts crest southward lobby directly unconsidered skyish coupled dominical particulars whitsters frush villain reform vex budge niggardly weed mote doers inflict rescal checking untried pharaoh easing flout loathes vizard losses smallest parts blazes luccicos riseth impair scraping acknowledg prompts courtly loggets nice quail cabin ought fought uncle float reveal disputed volquessen berattle doublets imparteth tapp prattle procreation crimson figuring bedchamber adopted rite whereat sulphur falser objections jar priz loss sumptuous arouse hyperion deceptious blurs tubs manual hungarian jewel valueless promis halls forswear invested allusion shell gossiping corinth naples reechy bellow shears harried warp botchy doubled purposed libya threatening mortal flecked slain voluntary solicitings manus thickens under spilling darts goffe drench constable rewarding</fs:description>
+				<fs:SecurityObject fs:name='so00000000003'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Shigehito</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Yizheng</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security></fs:security>
+							<fs:user>system\Kiichi</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Veronik</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='3.3'>
+						<fs:Value>3.3</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='-10.10E-10'>
+						<fs:Value>-10.10E-10</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='true'>
+						<fs:Value>true</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='4i2muRCY6hTvGepZPlqmh2H0iLdrSoZqR0gAiHuguE9PMpog/kQiAo/Y/BLpkk9ZaLz4OADZ03hGMgDyj9DvcxEiwaYz0hhJaQ317jKtUhJ9OsC5CXK285f5/AMwKHNgaq0fwZLDUr7aa1sckcudonYHzYuIu9IIhCxe1JOD+8AH5iLCRx3Opk2zVNIjprco3/4aTcaVZ+gqyclVSAtvFXDlsEgpC6Pn'>
+						<fs:Value>4i2muRCY6hTvGepZPlqmh2H0iLdrSoZqR0gAiHuguE9PMpog/kQiAo/Y/BLpkk9ZaLz4OADZ03hGMgDyj9DvcxEiwaYz0hhJaQ317jKtUhJ9OsC5CXK285f5/AMwKHNgaq0fwZLDUr7aa1sckcudonYHzYuIu9IIhCxe1JOD+8AH5iLCRx3Opk2zVNIjprco3/4aTcaVZ+gqyclVSAtvFXDlsEgpC6Pn</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='BE497B33680C475DF8B1C03F9A293CC49B59114B9E8A0C0768691EBF14977A4F1F3A98E50D8A54F4A32580251BBC7E51C37397B83D85A7BE417EAEF9172FC0740D8E863EA7E39BCBCAEC00B29039F90E68F1EDDDD25C9A94B7F60FE92F8260B87935352F47372BB17F1642F62B92BDEA9AD2F5AA7D1DC79A'>
+						<fs:Value>BE497B33680C475DF8B1C03F9A293CC49B59114B9E8A0C0768691EBF14977A4F1F3A98E50D8A54F4A32580251BBC7E51C37397B83D85A7BE417EAEF9172FC0740D8E863EA7E39BCBCAEC00B29039F90E68F1EDDDD25C9A94B7F60FE92F8260B87935352F47372BB17F1642F62B92BDEA9AD2F5AA7D1DC79A</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='-10.10E-10'>
+						<fs:Value>-10.10E-10</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-3">
+						<fs:Value>-3</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-3">
+						<fs:Value>-3</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="3">
+						<fs:Value>3</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="3">
+						<fs:Value>3</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='3'>
+						<fs:Value>3</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='I3'>
+						<fs:Value>I3</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='YD:S-G_'>
+						<fs:Value>YD:S-G_</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='K3D8...'>
+						<fs:Value>K3D8...</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='E2'>
+						<fs:Value>E2</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='H...SJAF BTL KM1Q R M. '>
+						<fs:Value>H...SJAF BTL KM1Q R M. </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:bmp'>4i2muRCY6hTvGepZPlqmh2H0iLdrSoZqR0gAiHuguE9PMpog/kQiAo/Y/BLpkk9ZaLz4OADZ03hGMgDyj9DvcxEiwaYz0hhJaQ317jKtUhJ9OsC5CXK285f5/AMwKHNgaq0fwZLDUr7aa1sckcudonYHzYuIu9IIhCxe1JOD+8AH5iLCRx3Opk2zVNIjprco3/4aTcaVZ+gqyclVSAtvFXDlsEgpC6Pn</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P43Y03M24D">
+						<fs:Value>P43Y03M24D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="2213-12-19T23:55:49">
+						<fs:Value>2213-12-19T23:55:49</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="17:01:11">
+						<fs:Value>17:01:11</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="1199-08-17">
+						<fs:Value>1199-08-17</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="1033-06">
+						<fs:Value>1033-06</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="1042">
+						<fs:Value>1042</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--04-13">
+						<fs:Value>--04-13</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--07--">
+						<fs:Value>--07--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---23">
+						<fs:Value>---23</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{3A9D7706-12A1-49B0-50AC-1C3D00000003}">
+						<fs:Value>{3A9D7706-12A1-49B0-50AC-1C3D00000003}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-CG'>
+						<fs:Value>en-CG</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<fs:Stream fs:binary="false"  fs:streamid='3' fs:content-type='text/xml' fs:size="1003.33"  fs:name='sample.xml' fs:type='StreamType'>
+					<fs:StreamType>StreamType</fs:StreamType>
+					<fs:StreamSize>1003.33</fs:StreamSize>
+					<fs:StreamID>3</fs:StreamID>
+					<fs:Binary>false</fs:Binary>
+					<fs:Summary>This value is constant</fs:Summary>
+					<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+					</fs:StreamData>
+				</fs:Stream>
+			</fs:File>
+		</fs:Folder>
+		<fs:Stats fs:uniformFSItemRef="FS0" fs:lastID="FS4" fs:firstID="FS0" fs:lastUniform='0' fs:firstUniform='0'></fs:Stats>
+	</fs:Drive>
+	<fs:Drive fs:id="FS5" fs:type='DriveType' fs:name='Drive2'>
+		<fs:Folder fs:creation_date="2083-05-12" fs:creator='Vincente' fs:name='Folder00000000001' fs:type='FolderType' fs:idref="FS5" fs:id="FS6">
+			<fs:FolderName>Folder00000000001</fs:FolderName>
+			<?filesystem compressionUtil='foozip.exe'?>
+			<fs:description>
+				<fs:b> cares malefactors broke snaffle rood fling hoping faultful lecherous songs palaces conspirant booties flee bowl scarecrow rancour hare proceeding lied defiler unbraced tongue perfections forerun beliest quantity assailing falliable scal parcels maudlin unstain presumption crescent lances fretted knowest thrives aquilon tomb season unvex wart mantua residue bestows misgoverned
+</fs:b>
+				<fs:b> knit unconfinable ipse whelm qualified geminy helping midst rat overgorg
+</fs:b>
+				<fs:b> instigator bodes untuned affianced gloss countervail carbuncles repeat year warren gotten affordeth valuing interpreters cannibals tortures spit singularities sours phebes broader moons plagues watchful beginners clammer mayday criminal deliverance wainscot ascend britain scholar godliness blanks titan wringer marted cosmo unnoted clapping hastily sisters evil blocks bed bunting blot positively ilium wilful trim uneath demesnes osric
+</fs:b>
+			</fs:description>
+			<fs:SecurityObject fs:name='so00000000004'>
+				<fs:Denies>
+					<fs:Deny>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Asger</fs:user>
+					</fs:Deny>
+					<fs:Deny>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Ingolf</fs:user>
+					</fs:Deny>
+				</fs:Denies>
+				<fs:Allows>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Jem</fs:user>
+					</fs:Allow>
+				</fs:Allows>
+			</fs:SecurityObject>
+			<fs:MetaData>
+				<fs:DecimalData fs:value='4.4'>
+					<fs:Value>4.4</fs:Value>
+				</fs:DecimalData>
+				<fs:IntegerData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:IntegerData>
+				<fs:LongData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:LongData>
+				<fs:IntData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:IntData>
+				<fs:ShortData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:ShortData>
+				<fs:ByteData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:ByteData>
+				<fs:DoubleData fs:value='-10.10E10'>
+					<fs:Value>-10.10E10</fs:Value>
+				</fs:DoubleData>
+				<fs:BooleanData fs:value='false'>
+					<fs:Value>false</fs:Value>
+				</fs:BooleanData>
+				<fs:Base64Data fs:value='GM2/2lZXyTlXnOOLop8/G5DHh5VC+t3fZGxf8GKdQkzM0yDBM9jx'>
+					<fs:Value>GM2/2lZXyTlXnOOLop8/G5DHh5VC+t3fZGxf8GKdQkzM0yDBM9jx</fs:Value>
+				</fs:Base64Data>
+				<fs:HexData fs:value='35F5CF77E8F9B119249CFD885CA4B96C47684C9FFF584302B315BE28F6A4A3898D206AF15515B07EBB1665652237AD5E6094C31371A871C5931799A758E53F51684CDC9FDC990D8FD49FA2770144E0FC1CBF20DCFD60FD350518495BC5AD29C6D45715616D96A94D9F19C6BCFBB8814759CB43C894A1C850'>
+					<fs:Value>35F5CF77E8F9B119249CFD885CA4B96C47684C9FFF584302B315BE28F6A4A3898D206AF15515B07EBB1665652237AD5E6094C31371A871C5931799A758E53F51684CDC9FDC990D8FD49FA2770144E0FC1CBF20DCFD60FD350518495BC5AD29C6D45715616D96A94D9F19C6BCFBB8814759CB43C894A1C850</fs:Value>
+				</fs:HexData>
+				<fs:FloatData fs:value='-10.10E10'>
+					<fs:Value>-10.10E10</fs:Value>
+				</fs:FloatData>
+				<fs:NonPosIntData fs:value="-4">
+					<fs:Value>-4</fs:Value>
+				</fs:NonPosIntData>
+				<fs:NegIntData fs:value="-4">
+					<fs:Value>-4</fs:Value>
+				</fs:NegIntData>
+				<fs:NonNegData fs:value="4">
+					<fs:Value>4</fs:Value>
+				</fs:NonNegData>
+				<fs:PosIntData fs:value="4">
+					<fs:Value>4</fs:Value>
+				</fs:PosIntData>
+				<fs:ULongData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:ULongData>
+				<fs:UIntData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:UIntData>
+				<fs:UShortData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:UShortData>
+				<fs:UByteData fs:value='4'>
+					<fs:Value>4</fs:Value>
+				</fs:UByteData>
+				<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+					<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+				</fs:StringData>
+				<fs:NormStringData fs:value='This is a normalized string'>
+					<fs:Value>This is a normalized string</fs:Value>
+				</fs:NormStringData>
+				<fs:TokenData fs:value='VFP-E-_9.'>
+					<fs:Value>VFP-E-_9.</fs:Value>
+				</fs:TokenData>
+				<fs:NameData fs:value='U2VZ8:LY:'>
+					<fs:Value>U2VZ8:LY:</fs:Value>
+				</fs:NameData>
+				<fs:NCNameData fs:value='WBO'>
+					<fs:Value>WBO</fs:Value>
+				</fs:NCNameData>
+				<fs:NMTokenData fs:value='W8MB..VBH5'>
+					<fs:Value>W8MB..VBH5</fs:Value>
+				</fs:NMTokenData>
+				<fs:NMTokensData fs:value='R IF20Q72E S. K6.83.0S4V N.0N2A7 X WHG1I B6592.OPQ FOVIUS8QFQ '>
+					<fs:Value>R IF20Q72E S. K6.83.0S4V N.0N2A7 X WHG1I B6592.OPQ FOVIUS8QFQ </fs:Value>
+				</fs:NMTokensData>
+				<fs:EntityData fs:value='::ReplaceWithEntity::'>
+					<fs:Value>::ReplaceWithEntity::</fs:Value>
+				</fs:EntityData>
+				<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+					<fs:Value>::ReplaceWithEntities::</fs:Value>
+				</fs:EntitiesData>
+				<fs:AnyURIData fs:value='http://www.microsoft.com'>
+					<fs:Value>http://www.microsoft.com</fs:Value>
+				</fs:AnyURIData>
+				<fs:QNameData fs:value='fs:foo'>
+					<fs:Value>fs:foo</fs:Value>
+				</fs:QNameData>
+				<fs:NotationData>
+					<fs:Value fs:value='fs:mpeg'>GM2/2lZXyTlXnOOLop8/G5DHh5VC+t3fZGxf8GKdQkzM0yDBM9jx</fs:Value>
+				</fs:NotationData>
+				<fs:DurationData fs:value="P88Y03M12D">
+					<fs:Value>P88Y03M12D</fs:Value>
+				</fs:DurationData>
+				<fs:DateTimeData fs:value="1276-07-02T21:52:23">
+					<fs:Value>1276-07-02T21:52:23</fs:Value>
+				</fs:DateTimeData>
+				<fs:TimeData fs:value="10:58:49">
+					<fs:Value>10:58:49</fs:Value>
+				</fs:TimeData>
+				<fs:DateData fs:value="1247-08-19">
+					<fs:Value>1247-08-19</fs:Value>
+				</fs:DateData>
+				<fs:GYearMonthData fs:value="1179-05">
+					<fs:Value>1179-05</fs:Value>
+				</fs:GYearMonthData>
+				<fs:GYearData fs:value="2022">
+					<fs:Value>2022</fs:Value>
+				</fs:GYearData>
+				<fs:GMonthDayData fs:value="--12-20">
+					<fs:Value>--12-20</fs:Value>
+				</fs:GMonthDayData>
+				<fs:GMonthData fs:value="--07--">
+					<fs:Value>--07--</fs:Value>
+				</fs:GMonthData>
+				<fs:GDayData fs:value="---23">
+					<fs:Value>---23</fs:Value>
+				</fs:GDayData>
+				<fs:GuidData fs:value="{74B46BE0-3C75-6FA4-1613-251400000004}">
+					<fs:Value>{74B46BE0-3C75-6FA4-1613-251400000004}</fs:Value>
+				</fs:GuidData>
+				<fs:LanguageData fs:value='en-IN'>
+					<fs:Value>en-IN</fs:Value>
+				</fs:LanguageData>
+			</fs:MetaData>
+			<!-- This is a comment for File00000000003 -->
+			<fs:File fs:creation_date="2063-05-16" fs:creator='Dharmaraja' fs:name='File00000000003' fs:type='FileType' fs:uniform='0' fs:idref="FS6" fs:id="FS7">
+				<fs:FileName>File00000000003</fs:FileName>
+				<fs:description></fs:description>
+				<fs:SecurityObject fs:name='so00000000005'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Ognian</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Deirdre</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Sanko</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='5.5'>
+						<fs:Value>5.5</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='5.5'>
+						<fs:Value>5.5</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='true'>
+						<fs:Value>true</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='W+DZO6cmYOx5CklNVBlDTRTU9HkKYkGwxUHHfBy6Ij7UmVdxLuByjOi163vF+fwNFDtTR9LiTZ5IvlKC'>
+						<fs:Value>W+DZO6cmYOx5CklNVBlDTRTU9HkKYkGwxUHHfBy6Ij7UmVdxLuByjOi163vF+fwNFDtTR9LiTZ5IvlKC</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='991D64D2707C056E14A8790B4C3EDE4022DF393814B023E393FB68D4A74DD7913857D516C74DBA93E34A526954FA9D40541ECF0421BB41E46C1BDE42FDCB87D5FD8C8F8AAA72306FB7D874F6F9292DD88B389E00CB1A2F8B4B079DEFD19CF7C1A79C720D0B0A77D28030D0A3'>
+						<fs:Value>991D64D2707C056E14A8790B4C3EDE4022DF393814B023E393FB68D4A74DD7913857D516C74DBA93E34A526954FA9D40541ECF0421BB41E46C1BDE42FDCB87D5FD8C8F8AAA72306FB7D874F6F9292DD88B389E00CB1A2F8B4B079DEFD19CF7C1A79C720D0B0A77D28030D0A3</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='5.5'>
+						<fs:Value>5.5</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-5">
+						<fs:Value>-5</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-5">
+						<fs:Value>-5</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="5">
+						<fs:Value>5</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="5">
+						<fs:Value>5</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='5'>
+						<fs:Value>5</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='QN.-'>
+						<fs:Value>QN.-</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='A'>
+						<fs:Value>A</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='MLOW1JB4.'>
+						<fs:Value>MLOW1JB4.</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='NV'>
+						<fs:Value>NV</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='Y VWTGT OQ.9 M4 '>
+						<fs:Value>Y VWTGT OQ.9 M4 </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:bmp'>W+DZO6cmYOx5CklNVBlDTRTU9HkKYkGwxUHHfBy6Ij7UmVdxLuByjOi163vF+fwNFDtTR9LiTZ5IvlKC</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P09Y05M28D">
+						<fs:Value>P09Y05M28D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="1298-04-28T11:01:49">
+						<fs:Value>1298-04-28T11:01:49</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="05:12:40">
+						<fs:Value>05:12:40</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="1457-09-04">
+						<fs:Value>1457-09-04</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="1448-10">
+						<fs:Value>1448-10</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="2224">
+						<fs:Value>2224</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--03-22">
+						<fs:Value>--03-22</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--03--">
+						<fs:Value>--03--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---10">
+						<fs:Value>---10</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{69CD1B0B-3A1E-2E85-13DC-7F7500000005}">
+						<fs:Value>{69CD1B0B-3A1E-2E85-13DC-7F7500000005}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-UQ'>
+						<fs:Value>en-UQ</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<fs:Stream fs:binary="true"  fs:streamid='1' fs:content-type='text/xml' fs:size="1001.33"  fs:name='sample.xml' fs:type='StreamType'>
+					<fs:StreamType>StreamType</fs:StreamType>
+					<fs:StreamSize>1001.33</fs:StreamSize>
+					<fs:StreamID>1</fs:StreamID>
+					<fs:Binary>true</fs:Binary>
+					<fs:Summary>This value is constant</fs:Summary>
+					<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+					</fs:StreamData>
+				</fs:Stream>
+			</fs:File>
+			<fs:Folder fs:creation_date="1274-03-03" fs:creator='Kerima' fs:name='Folder00000000002' fs:type='FolderType' fs:idref="FS6" fs:id="FS8">
+				<fs:FolderName>Folder00000000002</fs:FolderName>
+				<?filesystem compressionUtil='foozip.exe'?>
+				<fs:description> frush trophies damnable colour pandulph dismask crest agate evermore rheumy oldest misbecom poorly tithed breakers acquaintance phaethon tawny due levies expressed daw healths braggards merchandise trib unpregnant contriving stonish cordelia slide feigned fantastic chamberers lincoln milkmaid losers enterprises shiver replying pregnantly erect word feverous perjury stops angle ennoble esteem plummet restrain gossamer affray gracing south paint distains unattainted superscription jointly approaches neighbour priests bedrid felon displeasure news subtilly publisher knight holds laertes accepts cursy lineal russian map unsinew indifferent revolve sepulchred defiance uncaught tutors musicians lopp erebus discandy dominations dissuade peck minces education learning temp justice brute whipt sakes coragio copulation childish signiory bring obsequies scoured publicly unworthiness pity</fs:description>
+				<fs:SecurityObject fs:name='so00000000006'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Masashi</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Jacky</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Paige</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='6.6'>
+						<fs:Value>6.6</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='+0'>
+						<fs:Value>+0</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='false'>
+						<fs:Value>false</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='AY1vtLqG+mWlFSGO+AFYN/8lGOeUyuD4'>
+						<fs:Value>AY1vtLqG+mWlFSGO+AFYN/8lGOeUyuD4</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='2A6D1580456448BE42B4637AE8FB648B41EB'>
+						<fs:Value>2A6D1580456448BE42B4637AE8FB648B41EB</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='+0'>
+						<fs:Value>+0</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-6">
+						<fs:Value>-6</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-6">
+						<fs:Value>-6</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="6">
+						<fs:Value>6</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="6">
+						<fs:Value>6</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='6'>
+						<fs:Value>6</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='BSD'>
+						<fs:Value>BSD</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='R-J-3_PG.'>
+						<fs:Value>R-J-3_PG.</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='QHKF'>
+						<fs:Value>QHKF</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='SG4'>
+						<fs:Value>SG4</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='CM8F4.SF. RFQ GVP83 OR. PJ.F..Z... '>
+						<fs:Value>CM8F4.SF. RFQ GVP83 OR. PJ.F..Z... </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:mpeg'>AY1vtLqG+mWlFSGO+AFYN/8lGOeUyuD4</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P54Y06M26D">
+						<fs:Value>P54Y06M26D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="1412-08-03T01:54:07">
+						<fs:Value>1412-08-03T01:54:07</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="16:38:47">
+						<fs:Value>16:38:47</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="1262-08-21">
+						<fs:Value>1262-08-21</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="1154-12">
+						<fs:Value>1154-12</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="1023">
+						<fs:Value>1023</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--07-12">
+						<fs:Value>--07-12</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--09--">
+						<fs:Value>--09--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---24">
+						<fs:Value>---24</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{44911FE0-1C73-214A-50BA-648B00000006}">
+						<fs:Value>{44911FE0-1C73-214A-50BA-648B00000006}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-OU'>
+						<fs:Value>en-OU</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<!-- This is a comment for File00000000004 -->
+				<fs:File fs:creation_date="2489-05-23" fs:creator='Lorcan' fs:name='File00000000004' fs:type='FileType' fs:idref="FS8" fs:id="FS9">
+					<fs:FileName>File00000000004</fs:FileName>
+					<fs:description> jour commandments apprenticehood foe glouceste abraham panting unsafe aeacida yongrey rider defies undertakeing credulity enterprise combination failing applause praised blasphemy passing tightly bullets sermon mannerly accusers turneth reg happ englishman skills foulness hateful stages worth notorious execute insinuateth lena blisters peloponnesus sneaping presumptuous divert ceremonious tithing limit enchantingly steeled strikes scurril treatise ecstasy logotype offer solemnly gauntlet beasts round relics warwickshire beholders regiments hang lives prophesy waggling jealousies enernies volley bail groan empale forefathers wrinkle juliet evans</fs:description>
+					<fs:SecurityObject fs:name='so00000000007'>
+						<fs:Denies>
+							<fs:Deny>
+								<fs:security>
+									<fs:right>Read</fs:right>
+									<fs:right>Write</fs:right>
+								</fs:security>
+								<fs:user>system\Khosrow</fs:user>
+							</fs:Deny>
+						</fs:Denies>
+						<fs:Allows>
+							<fs:Allow>
+								<fs:security>
+									<fs:right>Read</fs:right>
+									<fs:right>Write</fs:right>
+								</fs:security>
+								<fs:user>system\Beng</fs:user>
+							</fs:Allow>
+							<fs:Allow>
+								<fs:security>
+									<fs:right>Read</fs:right>
+									<fs:right>Write</fs:right>
+									<fs:right>Change</fs:right>
+								</fs:security>
+								<fs:user>system\Dallan</fs:user>
+							</fs:Allow>
+						</fs:Allows>
+					</fs:SecurityObject>
+					<fs:MetaData>
+						<fs:DecimalData fs:value='7.7'>
+							<fs:Value>7.7</fs:Value>
+						</fs:DecimalData>
+						<fs:IntegerData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:IntegerData>
+						<fs:LongData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:LongData>
+						<fs:IntData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:IntData>
+						<fs:ShortData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:ShortData>
+						<fs:ByteData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:ByteData>
+						<fs:DoubleData fs:value='-0'>
+							<fs:Value>-0</fs:Value>
+						</fs:DoubleData>
+						<fs:BooleanData fs:value='true'>
+							<fs:Value>true</fs:Value>
+						</fs:BooleanData>
+						<fs:Base64Data fs:value='MEdd5CSsSfnw6qwTVH9APC6YhjUnQDdW2dyiEobMIlySs0If/rE/5pNV5oqQQSobDW9UN6qAkzm99z43SClfjQLZ7KN10rwh9VFdbgJvuyJX2PJFVznKXe8NvwD/D19RrCUk2B+AvJkKeyEwRnTnc8nXeCVUGZWRWGwQnFSdth/8'>
+							<fs:Value>MEdd5CSsSfnw6qwTVH9APC6YhjUnQDdW2dyiEobMIlySs0If/rE/5pNV5oqQQSobDW9UN6qAkzm99z43SClfjQLZ7KN10rwh9VFdbgJvuyJX2PJFVznKXe8NvwD/D19RrCUk2B+AvJkKeyEwRnTnc8nXeCVUGZWRWGwQnFSdth/8</fs:Value>
+						</fs:Base64Data>
+						<fs:HexData fs:value='87B8A6FB84C049355E9F7F3C1F077DBC061CBA03E319F4766F8A2ACBB23090CE3B41AFBD7CD522FC5C9A0A31E3318A6881CE1B91D79C7A4DAB3795251960C2027D2C'>
+							<fs:Value>87B8A6FB84C049355E9F7F3C1F077DBC061CBA03E319F4766F8A2ACBB23090CE3B41AFBD7CD522FC5C9A0A31E3318A6881CE1B91D79C7A4DAB3795251960C2027D2C</fs:Value>
+						</fs:HexData>
+						<fs:FloatData fs:value='-0'>
+							<fs:Value>-0</fs:Value>
+						</fs:FloatData>
+						<fs:NonPosIntData fs:value="-7">
+							<fs:Value>-7</fs:Value>
+						</fs:NonPosIntData>
+						<fs:NegIntData fs:value="-7">
+							<fs:Value>-7</fs:Value>
+						</fs:NegIntData>
+						<fs:NonNegData fs:value="7">
+							<fs:Value>7</fs:Value>
+						</fs:NonNegData>
+						<fs:PosIntData fs:value="7">
+							<fs:Value>7</fs:Value>
+						</fs:PosIntData>
+						<fs:ULongData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:ULongData>
+						<fs:UIntData fs:value='0'>
+							<fs:Value>0</fs:Value>
+						</fs:UIntData>
+						<fs:UShortData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:UShortData>
+						<fs:UByteData fs:value='7'>
+							<fs:Value>7</fs:Value>
+						</fs:UByteData>
+						<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+							<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+						</fs:StringData>
+						<fs:NormStringData fs:value='This is a normalized string'>
+							<fs:Value>This is a normalized string</fs:Value>
+						</fs:NormStringData>
+						<fs:TokenData fs:value='F61AT9B'>
+							<fs:Value>F61AT9B</fs:Value>
+						</fs:TokenData>
+						<fs:NameData fs:value='EQI_OZP4F'>
+							<fs:Value>EQI_OZP4F</fs:Value>
+						</fs:NameData>
+						<fs:NCNameData fs:value='V7'>
+							<fs:Value>V7</fs:Value>
+						</fs:NCNameData>
+						<fs:NMTokenData fs:value='QMV3XK'>
+							<fs:Value>QMV3XK</fs:Value>
+						</fs:NMTokenData>
+						<fs:NMTokensData fs:value='IF.N9Y1W J.SJ. A....32 AU. XP.A1 N A..2XJ. D9.ZUHN '>
+							<fs:Value>IF.N9Y1W J.SJ. A....32 AU. XP.A1 N A..2XJ. D9.ZUHN </fs:Value>
+						</fs:NMTokensData>
+						<fs:EntityData fs:value='::ReplaceWithEntity::'>
+							<fs:Value>::ReplaceWithEntity::</fs:Value>
+						</fs:EntityData>
+						<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+							<fs:Value>::ReplaceWithEntities::</fs:Value>
+						</fs:EntitiesData>
+						<fs:AnyURIData fs:value='http://www.microsoft.com'>
+							<fs:Value>http://www.microsoft.com</fs:Value>
+						</fs:AnyURIData>
+						<fs:QNameData fs:value='fs:foo'>
+							<fs:Value>fs:foo</fs:Value>
+						</fs:QNameData>
+						<fs:NotationData>
+							<fs:Value fs:value='fs:jpeg'>MEdd5CSsSfnw6qwTVH9APC6YhjUnQDdW2dyiEobMIlySs0If/rE/5pNV5oqQQSobDW9UN6qAkzm99z43SClfjQLZ7KN10rwh9VFdbgJvuyJX2PJFVznKXe8NvwD/D19RrCUk2B+AvJkKeyEwRnTnc8nXeCVUGZWRWGwQnFSdth/8</fs:Value>
+						</fs:NotationData>
+						<fs:DurationData fs:value="P69Y07M28D">
+							<fs:Value>P69Y07M28D</fs:Value>
+						</fs:DurationData>
+						<fs:DateTimeData fs:value="1187-07-25T18:29:19">
+							<fs:Value>1187-07-25T18:29:19</fs:Value>
+						</fs:DateTimeData>
+						<fs:TimeData fs:value="19:12:15">
+							<fs:Value>19:12:15</fs:Value>
+						</fs:TimeData>
+						<fs:DateData fs:value="2337-02-08">
+							<fs:Value>2337-02-08</fs:Value>
+						</fs:DateData>
+						<fs:GYearMonthData fs:value="1323-01">
+							<fs:Value>1323-01</fs:Value>
+						</fs:GYearMonthData>
+						<fs:GYearData fs:value="1395">
+							<fs:Value>1395</fs:Value>
+						</fs:GYearData>
+						<fs:GMonthDayData fs:value="--01-17">
+							<fs:Value>--01-17</fs:Value>
+						</fs:GMonthDayData>
+						<fs:GMonthData fs:value="--02--">
+							<fs:Value>--02--</fs:Value>
+						</fs:GMonthData>
+						<fs:GDayData fs:value="---24">
+							<fs:Value>---24</fs:Value>
+						</fs:GDayData>
+						<fs:GuidData fs:value="{23056C39-6A78-60FC-44CA-0C8200000007}">
+							<fs:Value>{23056C39-6A78-60FC-44CA-0C8200000007}</fs:Value>
+						</fs:GuidData>
+						<fs:LanguageData fs:value='en-ZF'>
+							<fs:Value>en-ZF</fs:Value>
+						</fs:LanguageData>
+					</fs:MetaData>
+					<fs:Stream fs:binary="false"  fs:streamid='2' fs:content-type='text/xml' fs:size="1002.33"  fs:name='sample.xml' fs:type='StreamType'>
+						<fs:StreamType>StreamType</fs:StreamType>
+						<fs:StreamSize>1002.33</fs:StreamSize>
+						<fs:StreamID>2</fs:StreamID>
+						<fs:Binary>false</fs:Binary>
+						<fs:Summary>This value is constant</fs:Summary>
+						<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+						</fs:StreamData>
+					</fs:Stream>
+				</fs:File>
+			</fs:Folder>
+		</fs:Folder>
+		<fs:Stats fs:uniformFSItemRef="FS8" fs:lastID="FS9" fs:firstID="FS5" fs:lastUniform='0' fs:firstUniform='0'></fs:Stats>
+	</fs:Drive>
+	<fs:Drive fs:id="FS10" fs:type='DriveType' fs:name='Drive3'>
+		<fs:Folder fs:creation_date="2008-10-14" fs:creator='Avner' fs:name='Folder00000000003' fs:type='FolderType' fs:idref="FS10" fs:id="FS11">
+			<fs:FolderName>Folder00000000003</fs:FolderName>
+			<?filesystem compressionUtil='foozip.exe'?>
+			<fs:description> banners woodstock either sixteen cognizance instructions federary vault crickets deficient engend plough wales hoo brabant</fs:description>
+			<fs:SecurityObject fs:name='so00000000008'>
+				<fs:Denies></fs:Denies>
+				<fs:Allows>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Seungyup</fs:user>
+					</fs:Allow>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+							<fs:right>Change</fs:right>
+						</fs:security>
+						<fs:user>system\Siddharthan</fs:user>
+					</fs:Allow>
+				</fs:Allows>
+			</fs:SecurityObject>
+			<fs:MetaData>
+				<fs:DecimalData fs:value='8.8'>
+					<fs:Value>8.8</fs:Value>
+				</fs:DecimalData>
+				<fs:IntegerData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:IntegerData>
+				<fs:LongData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:LongData>
+				<fs:IntData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:IntData>
+				<fs:ShortData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:ShortData>
+				<fs:ByteData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:ByteData>
+				<fs:DoubleData fs:value='8.8'>
+					<fs:Value>8.8</fs:Value>
+				</fs:DoubleData>
+				<fs:BooleanData fs:value='false'>
+					<fs:Value>false</fs:Value>
+				</fs:BooleanData>
+				<fs:Base64Data fs:value='VBQR56YUwpc9W4WAELSdXhXXzbJoHbOzSRw6mSCRsrHSo0PT+ojV1zj+8NuKqHC9KjlcXpDcE3Yb/ZQO3Zt6cZqomeeTYvijGf2fVnheC4Y+lOhZ3J41T5y753grY82NNstrnzl9tTPli8KcHeMsi7Eh+A96'>
+					<fs:Value>VBQR56YUwpc9W4WAELSdXhXXzbJoHbOzSRw6mSCRsrHSo0PT+ojV1zj+8NuKqHC9KjlcXpDcE3Yb/ZQO3Zt6cZqomeeTYvijGf2fVnheC4Y+lOhZ3J41T5y753grY82NNstrnzl9tTPli8KcHeMsi7Eh+A96</fs:Value>
+				</fs:Base64Data>
+				<fs:HexData fs:value='2DF0D1DA0F01A7DF365DA8AB2B2286A88AD307525219558BD7CDCE28732FE5A2F183A077519E0867C74D7C87BBCF9E10FA7614A174FA48097C45593E6B88F8891E25FC7753C37EEA'>
+					<fs:Value>2DF0D1DA0F01A7DF365DA8AB2B2286A88AD307525219558BD7CDCE28732FE5A2F183A077519E0867C74D7C87BBCF9E10FA7614A174FA48097C45593E6B88F8891E25FC7753C37EEA</fs:Value>
+				</fs:HexData>
+				<fs:FloatData fs:value='8.8'>
+					<fs:Value>8.8</fs:Value>
+				</fs:FloatData>
+				<fs:NonPosIntData fs:value="-8">
+					<fs:Value>-8</fs:Value>
+				</fs:NonPosIntData>
+				<fs:NegIntData fs:value="-8">
+					<fs:Value>-8</fs:Value>
+				</fs:NegIntData>
+				<fs:NonNegData fs:value="8">
+					<fs:Value>8</fs:Value>
+				</fs:NonNegData>
+				<fs:PosIntData fs:value="8">
+					<fs:Value>8</fs:Value>
+				</fs:PosIntData>
+				<fs:ULongData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:ULongData>
+				<fs:UIntData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:UIntData>
+				<fs:UShortData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:UShortData>
+				<fs:UByteData fs:value='8'>
+					<fs:Value>8</fs:Value>
+				</fs:UByteData>
+				<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+					<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+				</fs:StringData>
+				<fs:NormStringData fs:value='This is a normalized string'>
+					<fs:Value>This is a normalized string</fs:Value>
+				</fs:NormStringData>
+				<fs:TokenData fs:value='AU0'>
+					<fs:Value>AU0</fs:Value>
+				</fs:TokenData>
+				<fs:NameData fs:value='N'>
+					<fs:Value>N</fs:Value>
+				</fs:NameData>
+				<fs:NCNameData fs:value='M.N5MS6A'>
+					<fs:Value>M.N5MS6A</fs:Value>
+				</fs:NCNameData>
+				<fs:NMTokenData fs:value='OMUYJ.'>
+					<fs:Value>OMUYJ.</fs:Value>
+				</fs:NMTokenData>
+				<fs:NMTokensData fs:value='M1 T3.. Z0 NOTL.S '>
+					<fs:Value>M1 T3.. Z0 NOTL.S </fs:Value>
+				</fs:NMTokensData>
+				<fs:EntityData fs:value='::ReplaceWithEntity::'>
+					<fs:Value>::ReplaceWithEntity::</fs:Value>
+				</fs:EntityData>
+				<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+					<fs:Value>::ReplaceWithEntities::</fs:Value>
+				</fs:EntitiesData>
+				<fs:AnyURIData fs:value='http://www.microsoft.com'>
+					<fs:Value>http://www.microsoft.com</fs:Value>
+				</fs:AnyURIData>
+				<fs:QNameData fs:value='fs:foo'>
+					<fs:Value>fs:foo</fs:Value>
+				</fs:QNameData>
+				<fs:NotationData>
+					<fs:Value fs:value='fs:bmp'>VBQR56YUwpc9W4WAELSdXhXXzbJoHbOzSRw6mSCRsrHSo0PT+ojV1zj+8NuKqHC9KjlcXpDcE3Yb/ZQO3Zt6cZqomeeTYvijGf2fVnheC4Y+lOhZ3J41T5y753grY82NNstrnzl9tTPli8KcHeMsi7Eh+A96</fs:Value>
+				</fs:NotationData>
+				<fs:DurationData fs:value="P01Y10M12D">
+					<fs:Value>P01Y10M12D</fs:Value>
+				</fs:DurationData>
+				<fs:DateTimeData fs:value="2305-01-19T17:08:26">
+					<fs:Value>2305-01-19T17:08:26</fs:Value>
+				</fs:DateTimeData>
+				<fs:TimeData fs:value="00:45:20">
+					<fs:Value>00:45:20</fs:Value>
+				</fs:TimeData>
+				<fs:DateData fs:value="1447-08-01">
+					<fs:Value>1447-08-01</fs:Value>
+				</fs:DateData>
+				<fs:GYearMonthData fs:value="1219-11">
+					<fs:Value>1219-11</fs:Value>
+				</fs:GYearMonthData>
+				<fs:GYearData fs:value="1047">
+					<fs:Value>1047</fs:Value>
+				</fs:GYearData>
+				<fs:GMonthDayData fs:value="--04-07">
+					<fs:Value>--04-07</fs:Value>
+				</fs:GMonthDayData>
+				<fs:GMonthData fs:value="--07--">
+					<fs:Value>--07--</fs:Value>
+				</fs:GMonthData>
+				<fs:GDayData fs:value="---05">
+					<fs:Value>---05</fs:Value>
+				</fs:GDayData>
+				<fs:GuidData fs:value="{55643E90-3499-3E49-5795-6D3400000008}">
+					<fs:Value>{55643E90-3499-3E49-5795-6D3400000008}</fs:Value>
+				</fs:GuidData>
+				<fs:LanguageData fs:value='en-VF'>
+					<fs:Value>en-VF</fs:Value>
+				</fs:LanguageData>
+			</fs:MetaData>
+			<!-- This is a comment for File00000000005 -->
+			<fs:File fs:creation_date="2231-06-10" fs:creator='Angelo' fs:name='File00000000005' fs:type='FileType' fs:uniform='0' fs:idref="FS11" fs:id="FS12">
+				<fs:FileName>File00000000005</fs:FileName>
+				<fs:description> dizy little canary eyelids race insatiate diablo weasels profan ports foining ashy halting wheels cromer seditious lovers ordered beseem ungart marcade delights vor devoutly dews nobleness tail cheerful chitopher beginning strut traces divert ransoms express poison dexter falsehood apparel mutualities scourg stuffs untreasur rubbish modesties excrement unknown quay doers topful purposeth sleeve medlars indiscretion quinces sulphurous brag subduements handled pest caret forty whenas rubbing people toys primroses frog lapis unpossessing defence embrac prain parentage ceremonies lated lamely addle weights combine stopping smok crouching shivered madmen daintiness promised containing drown bunting ranting backward uncharitably shambles hildings shy orts inconvenient whinid hovering monstruosity dullest tremble morton flame lady adulterates vales destroy flower unexpected evilly cassio conjecture waywardnes begun spilled relier distilment farm mortal
+<fs:b> augmenting first taffety squabble pashed barons gave intermix beast trophies galen single extreme visit very scope craving felony engaged oblique tester vesture rather corn assign lasses frights pawned denoted fat argus hereford fathered buy tucket heavens noon andromache turban gliding encompass safeguard penitence cut grace ulysses readily plague professors plunged disvouch committed marbled birdlime peasant victory tenderness clo climbing produce
+</fs:b></fs:description>
+				<fs:SecurityObject fs:name='so00000000009'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Elif</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Meilir</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Yacov</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Serafim</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='9.9'>
+						<fs:Value>9.9</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='9.9'>
+						<fs:Value>9.9</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='true'>
+						<fs:Value>true</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='hXzcS7HShqYlOo/or1Xs1twGktITB3364YpxuIRDURcQ9zkVsIntyk3Y3/z8'>
+						<fs:Value>hXzcS7HShqYlOo/or1Xs1twGktITB3364YpxuIRDURcQ9zkVsIntyk3Y3/z8</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='B00F28872F582AA28B10CAE308FFD073FEBF34C1FA61469E0D6879CF3C3B938EDEB89F69A1FCCBF2854CAA4D7F2FF365F782B0E8AB7220666A25D6D65A427870D2A410B4815CFE42459C9400441CA948E7984766'>
+						<fs:Value>B00F28872F582AA28B10CAE308FFD073FEBF34C1FA61469E0D6879CF3C3B938EDEB89F69A1FCCBF2854CAA4D7F2FF365F782B0E8AB7220666A25D6D65A427870D2A410B4815CFE42459C9400441CA948E7984766</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='9.9'>
+						<fs:Value>9.9</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-9">
+						<fs:Value>-9</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-9">
+						<fs:Value>-9</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="9">
+						<fs:Value>9</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="9">
+						<fs:Value>9</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='9'>
+						<fs:Value>9</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='J'>
+						<fs:Value>J</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='G24'>
+						<fs:Value>G24</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='NJUW50'>
+						<fs:Value>NJUW50</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='IG9.8'>
+						<fs:Value>IG9.8</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='Y.X6. Q2YX.C SZP.O05 WJD1..1T BSCIEDP8 W9A6I '>
+						<fs:Value>Y.X6. Q2YX.C SZP.O05 WJD1..1T BSCIEDP8 W9A6I </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:bmp'>hXzcS7HShqYlOo/or1Xs1twGktITB3364YpxuIRDURcQ9zkVsIntyk3Y3/z8</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P43Y02M11D">
+						<fs:Value>P43Y02M11D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="1049-04-06T17:31:47">
+						<fs:Value>1049-04-06T17:31:47</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="17:09:19">
+						<fs:Value>17:09:19</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="2316-09-23">
+						<fs:Value>2316-09-23</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="1271-08">
+						<fs:Value>1271-08</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="2038">
+						<fs:Value>2038</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--09-04">
+						<fs:Value>--09-04</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--11--">
+						<fs:Value>--11--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---10">
+						<fs:Value>---10</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{4FC05FDD-6F6A-19C3-6C01-6C4200000009}">
+						<fs:Value>{4FC05FDD-6F6A-19C3-6C01-6C4200000009}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-FN'>
+						<fs:Value>en-FN</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<fs:Stream fs:binary="true"  fs:streamid='1' fs:content-type='text/xml' fs:size="1001.33"  fs:name='sample.xml' fs:type='StreamType'>
+					<fs:StreamType>StreamType</fs:StreamType>
+					<fs:StreamSize>1001.33</fs:StreamSize>
+					<fs:StreamID>1</fs:StreamID>
+					<fs:Binary>true</fs:Binary>
+					<fs:Summary>This value is constant</fs:Summary>
+					<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+					</fs:StreamData>
+				</fs:Stream>
+			</fs:File>
+		</fs:Folder>
+		<fs:Folder fs:creation_date="1184-06-20" fs:creator='Beat' fs:name='Folder00000000004' fs:type='FolderType' fs:idref="FS10" fs:id="FS13">
+			<fs:FolderName>Folder00000000004</fs:FolderName>
+			<?filesystem compressionUtil='foozip.exe'?>
+			<fs:description>
+				<fs:b> usher prepare bites impugns milan scaled given eyelids daintiness approachers purged magnus extremes brac narrowly gros winking advancing pella uneath trash salutation umpires ingenious planks almighty mild osiers belike person dominions thirst strawberries mischief sainted fram henceforward sear smoothing infernal despair regress
+</fs:b>
+			</fs:description>
+			<fs:SecurityObject fs:name='so00000000010'>
+				<fs:Denies>
+					<fs:Deny>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Wafaa</fs:user>
+					</fs:Deny>
+				</fs:Denies>
+				<fs:Allows>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Read</fs:right>
+						</fs:security>
+						<fs:user>system\Shiho</fs:user>
+					</fs:Allow>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\Liujian</fs:user>
+					</fs:Allow>
+				</fs:Allows>
+			</fs:SecurityObject>
+			<fs:MetaData>
+				<fs:DecimalData fs:value='10.10'>
+					<fs:Value>10.10</fs:Value>
+				</fs:DecimalData>
+				<fs:IntegerData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:IntegerData>
+				<fs:LongData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:LongData>
+				<fs:IntData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:IntData>
+				<fs:ShortData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:ShortData>
+				<fs:ByteData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:ByteData>
+				<fs:DoubleData fs:value='10.10'>
+					<fs:Value>10.10</fs:Value>
+				</fs:DoubleData>
+				<fs:BooleanData fs:value='false'>
+					<fs:Value>false</fs:Value>
+				</fs:BooleanData>
+				<fs:Base64Data fs:value='uYbP04x3oRo6RoGcixpZO0+nd208AWwQi1Dk/ZZD5UzHogXgyOFRdgu7gzheAhGdalOB7AqB4c7B8wKYcj6Wx07GmZAwQmyi+xmwR0M6OyqtyeJNG4vxz5MPWx45Xvdo3hx5p8o1jenV0y7FYVLpK2LeZDzC+Cw2'>
+					<fs:Value>uYbP04x3oRo6RoGcixpZO0+nd208AWwQi1Dk/ZZD5UzHogXgyOFRdgu7gzheAhGdalOB7AqB4c7B8wKYcj6Wx07GmZAwQmyi+xmwR0M6OyqtyeJNG4vxz5MPWx45Xvdo3hx5p8o1jenV0y7FYVLpK2LeZDzC+Cw2</fs:Value>
+				</fs:Base64Data>
+				<fs:HexData fs:value='4763A4BE5824040255B2C9F9E112F72BC16F1754E225B5A291F7B36A51E94534E816B3CA42FCBA3DBD3B1BF1CBDA1A6C2402017AE1218B4C41F87904B87D005A1CBA880B563C'>
+					<fs:Value>4763A4BE5824040255B2C9F9E112F72BC16F1754E225B5A291F7B36A51E94534E816B3CA42FCBA3DBD3B1BF1CBDA1A6C2402017AE1218B4C41F87904B87D005A1CBA880B563C</fs:Value>
+				</fs:HexData>
+				<fs:FloatData fs:value='10.10'>
+					<fs:Value>10.10</fs:Value>
+				</fs:FloatData>
+				<fs:NonPosIntData fs:value="-10">
+					<fs:Value>-10</fs:Value>
+				</fs:NonPosIntData>
+				<fs:NegIntData fs:value="-10">
+					<fs:Value>-10</fs:Value>
+				</fs:NegIntData>
+				<fs:NonNegData fs:value="10">
+					<fs:Value>10</fs:Value>
+				</fs:NonNegData>
+				<fs:PosIntData fs:value="10">
+					<fs:Value>10</fs:Value>
+				</fs:PosIntData>
+				<fs:ULongData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:ULongData>
+				<fs:UIntData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:UIntData>
+				<fs:UShortData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:UShortData>
+				<fs:UByteData fs:value='10'>
+					<fs:Value>10</fs:Value>
+				</fs:UByteData>
+				<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+					<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+				</fs:StringData>
+				<fs:NormStringData fs:value='This is a normalized string'>
+					<fs:Value>This is a normalized string</fs:Value>
+				</fs:NormStringData>
+				<fs:TokenData fs:value='Z003QRVLW'>
+					<fs:Value>Z003QRVLW</fs:Value>
+				</fs:TokenData>
+				<fs:NameData fs:value='T.'>
+					<fs:Value>T.</fs:Value>
+				</fs:NameData>
+				<fs:NCNameData fs:value='V7CDZ53.P'>
+					<fs:Value>V7CDZ53.P</fs:Value>
+				</fs:NCNameData>
+				<fs:NMTokenData fs:value='TK.8WQQ.T2'>
+					<fs:Value>TK.8WQQ.T2</fs:Value>
+				</fs:NMTokenData>
+				<fs:NMTokensData fs:value='H.Q LS. R1...4 H8 GZ.RIOQ.RQ E5 '>
+					<fs:Value>H.Q LS. R1...4 H8 GZ.RIOQ.RQ E5 </fs:Value>
+				</fs:NMTokensData>
+				<fs:EntityData fs:value='::ReplaceWithEntity::'>
+					<fs:Value>::ReplaceWithEntity::</fs:Value>
+				</fs:EntityData>
+				<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+					<fs:Value>::ReplaceWithEntities::</fs:Value>
+				</fs:EntitiesData>
+				<fs:AnyURIData fs:value='http://www.microsoft.com'>
+					<fs:Value>http://www.microsoft.com</fs:Value>
+				</fs:AnyURIData>
+				<fs:QNameData fs:value='fs:foo'>
+					<fs:Value>fs:foo</fs:Value>
+				</fs:QNameData>
+				<fs:NotationData>
+					<fs:Value fs:value='fs:jpeg'>uYbP04x3oRo6RoGcixpZO0+nd208AWwQi1Dk/ZZD5UzHogXgyOFRdgu7gzheAhGdalOB7AqB4c7B8wKYcj6Wx07GmZAwQmyi+xmwR0M6OyqtyeJNG4vxz5MPWx45Xvdo3hx5p8o1jenV0y7FYVLpK2LeZDzC+Cw2</fs:Value>
+				</fs:NotationData>
+				<fs:DurationData fs:value="P15Y08M06D">
+					<fs:Value>P15Y08M06D</fs:Value>
+				</fs:DurationData>
+				<fs:DateTimeData fs:value="2138-06-14T02:43:55">
+					<fs:Value>2138-06-14T02:43:55</fs:Value>
+				</fs:DateTimeData>
+				<fs:TimeData fs:value="22:20:41">
+					<fs:Value>22:20:41</fs:Value>
+				</fs:TimeData>
+				<fs:DateData fs:value="2085-09-25">
+					<fs:Value>2085-09-25</fs:Value>
+				</fs:DateData>
+				<fs:GYearMonthData fs:value="2419-09">
+					<fs:Value>2419-09</fs:Value>
+				</fs:GYearMonthData>
+				<fs:GYearData fs:value="2065">
+					<fs:Value>2065</fs:Value>
+				</fs:GYearData>
+				<fs:GMonthDayData fs:value="--09-01">
+					<fs:Value>--09-01</fs:Value>
+				</fs:GMonthDayData>
+				<fs:GMonthData fs:value="--12--">
+					<fs:Value>--12--</fs:Value>
+				</fs:GMonthData>
+				<fs:GDayData fs:value="---11">
+					<fs:Value>---11</fs:Value>
+				</fs:GDayData>
+				<fs:GuidData fs:value="{7B336F94-1A2E-1C4D-5AA2-2F590000000A}">
+					<fs:Value>{7B336F94-1A2E-1C4D-5AA2-2F590000000A}</fs:Value>
+				</fs:GuidData>
+				<fs:LanguageData fs:value='en-ML'>
+					<fs:Value>en-ML</fs:Value>
+				</fs:LanguageData>
+			</fs:MetaData>
+			<!-- This is a comment for File00000000006 -->
+			<fs:File fs:creation_date="2198-09-16" fs:creator='Flaminio' fs:name='File00000000006' fs:type='FileType' fs:idref="FS13" fs:id="FS14">
+				<fs:FileName>File00000000006</fs:FileName>
+				<fs:description> severals replied continent prime addressed hardest generation unknowing maidenhead glover nuns grounded chorus manus war fashion vengeance should shown featur inch helenus attorneys look shiver mus wranglers meteors gratulate detesting hovers portends greetings bandy welshmen patchery knaves spring hater dishclout urgest inequality wedding unpurged quasi east darker neighbourly guiltless emulous sinews reapers respects advantaging gainsay unforc words fardel viper crutches incurr weep wager orts embodied reverend
+<fs:b> tires bereft nominativo murder dealing quenchless babes chollors memories bids invocate curled captive deity together nose rhym reserve braggart reformed dragonish dungeon confines charity odd muskos ghostly influences paltry singleness bird venturous repeats puzzle immortal troops creditor flea cloy load shapes name unnaturalness breathless fighter congealment machination alexander mated lousy vexes dry intermix vows proportionable powers incorps sliding choleric wishes solemn squire swore slandered mahu severe rumble dardanius song comforted audacious greek honourably influences alone sceptre produce afoot
+</fs:b></fs:description>
+				<fs:SecurityObject fs:name='so00000000011'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Changsheng</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Zhouhui</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Clenn</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='11.11'>
+						<fs:Value>11.11</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='11.11'>
+						<fs:Value>11.11</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='true'>
+						<fs:Value>true</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='uYfCLRLX+vjofwYo2rneqYuH8S+10cx9ci+Q'>
+						<fs:Value>uYfCLRLX+vjofwYo2rneqYuH8S+10cx9ci+Q</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='07C4315BBFF0E9B1BBCFE75C4756F513CE1D24E0E491D8029DD387FB13D81D83D4079BA3811E53BB11DEDE1DBB6A0790D03BED3D2FEFD445AE455439889349C12911A206448BE237EEB282D810DC4CAE5930'>
+						<fs:Value>07C4315BBFF0E9B1BBCFE75C4756F513CE1D24E0E491D8029DD387FB13D81D83D4079BA3811E53BB11DEDE1DBB6A0790D03BED3D2FEFD445AE455439889349C12911A206448BE237EEB282D810DC4CAE5930</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='11.11'>
+						<fs:Value>11.11</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-11">
+						<fs:Value>-11</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-11">
+						<fs:Value>-11</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="11">
+						<fs:Value>11</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="11">
+						<fs:Value>11</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='11'>
+						<fs:Value>11</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='GRG3FNY_Y'>
+						<fs:Value>GRG3FNY_Y</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='HUJ90M8GOF'>
+						<fs:Value>HUJ90M8GOF</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='IU2.YV0AI5'>
+						<fs:Value>IU2.YV0AI5</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='K.6F9UW.ZK'>
+						<fs:Value>K.6F9UW.ZK</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='FSH8C.X HUU8YH.TG DG LFC2E13.UT O.E U9.F5..DA. XP7BSY W5TP.0JN GJNC5... '>
+						<fs:Value>FSH8C.X HUU8YH.TG DG LFC2E13.UT O.E U9.F5..DA. XP7BSY W5TP.0JN GJNC5... </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:jpeg'>uYfCLRLX+vjofwYo2rneqYuH8S+10cx9ci+Q</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P48Y09M19D">
+						<fs:Value>P48Y09M19D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="1154-10-25T17:12:04">
+						<fs:Value>1154-10-25T17:12:04</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="17:16:55">
+						<fs:Value>17:16:55</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="2082-03-17">
+						<fs:Value>2082-03-17</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="1255-04">
+						<fs:Value>1255-04</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="1054">
+						<fs:Value>1054</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--09-21">
+						<fs:Value>--09-21</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--02--">
+						<fs:Value>--02--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---03">
+						<fs:Value>---03</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{237279C7-2F1C-5571-3DB1-4DCD0000000B}">
+						<fs:Value>{237279C7-2F1C-5571-3DB1-4DCD0000000B}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-VY'>
+						<fs:Value>en-VY</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<fs:Stream fs:binary="false"  fs:streamid='2' fs:content-type='text/xml' fs:size="1002.33"  fs:name='sample.xml' fs:type='StreamType'>
+					<fs:StreamType>StreamType</fs:StreamType>
+					<fs:StreamSize>1002.33</fs:StreamSize>
+					<fs:StreamID>2</fs:StreamID>
+					<fs:Binary>false</fs:Binary>
+					<fs:Summary>This value is constant</fs:Summary>
+					<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+					</fs:StreamData>
+				</fs:Stream>
+			</fs:File>
+		</fs:Folder>
+		<fs:Stats fs:uniformFSItemRef="FS12" fs:lastID="FS14" fs:firstID="FS10" fs:lastUniform='0' fs:firstUniform='0'></fs:Stats>
+	</fs:Drive>
+	<fs:Drive fs:id="FS15" fs:type='DriveType' fs:name='Drive4'>
+		<fs:Folder fs:creation_date="1324-02-26" fs:creator='Didar' fs:name='Folder00000000005' fs:type='FolderType' fs:idref="FS15" fs:id="FS16">
+			<fs:FolderName>Folder00000000005</fs:FolderName>
+			<?filesystem compressionUtil='foozip.exe'?>
+			<fs:description> julius purifying rebukes sources sod admonition taffety penalties coursing admittance tokens shrimp fleec bleed ashford conspirator rises standards invasive stains fairness fooling increaseth thorns slower praetors reasoned cop bon throngs remain carnations fearfulness unperceived raze misshapen meads nubibus hearsay notest shuffling nutshell reveal soil port fusty drops courtesan lacks worry dearly leopard floods entail mas abominations penthouse laurel irons herdsmen tom tuning ally rubies troop flesh saint swiftly ferryman betossed toy conspirator lightning tradesman tipp flavio these hidden nightcap thine cancel ear isle prefixed myrtle retreat pester graves escap fury,exceeds fumes ninth inevitable deliciousness foppish parching remain tidings scanted inwardly awooing vacancy inflaming describes unfriended cank glorious ise cerements creatures musty reserve infused deservest sewing maggots reverted unkennel rapes lighter prolong stithy chok basin painted roll majesties april primroses chastise flask overbulk praised dares finch bemet misbegotten lasts bards clawed source romano film throw prescribe concord gins badge bunting smilets couched chronicle opulency wolves persecutions artificer rivet nob feel</fs:description>
+			<fs:SecurityObject fs:name='so00000000012'>
+				<fs:Denies>
+					<fs:Deny>
+						<fs:security>
+							<fs:right>Read</fs:right>
+							<fs:right>Change</fs:right>
+						</fs:security>
+						<fs:user>system\Steen</fs:user>
+					</fs:Deny>
+				</fs:Denies>
+				<fs:Allows>
+					<fs:Allow>
+						<fs:security>
+							<fs:right>Write</fs:right>
+						</fs:security>
+						<fs:user>system\SangKeun</fs:user>
+					</fs:Allow>
+				</fs:Allows>
+			</fs:SecurityObject>
+			<fs:MetaData>
+				<fs:DecimalData fs:value='12.12'>
+					<fs:Value>12.12</fs:Value>
+				</fs:DecimalData>
+				<fs:IntegerData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:IntegerData>
+				<fs:LongData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:LongData>
+				<fs:IntData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:IntData>
+				<fs:ShortData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:ShortData>
+				<fs:ByteData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:ByteData>
+				<fs:DoubleData fs:value='12.12'>
+					<fs:Value>12.12</fs:Value>
+				</fs:DoubleData>
+				<fs:BooleanData fs:value='false'>
+					<fs:Value>false</fs:Value>
+				</fs:BooleanData>
+				<fs:Base64Data fs:value='wx0zeIRBghcaBoiriDbl+hS2yWG58mPqDfFcXtdu7oV7gwTR08IlbvbE8sENAs1eWOAM7u1X44Kcs+BNLJEfntUCvgiW1N9c0jurRzgkh6Fns70HwSX8pEEYQaq9iwvMiJXg'>
+					<fs:Value>wx0zeIRBghcaBoiriDbl+hS2yWG58mPqDfFcXtdu7oV7gwTR08IlbvbE8sENAs1eWOAM7u1X44Kcs+BNLJEfntUCvgiW1N9c0jurRzgkh6Fns70HwSX8pEEYQaq9iwvMiJXg</fs:Value>
+				</fs:Base64Data>
+				<fs:HexData fs:value='DBF22706E2908482235F03BCF98D440D2E6D0ED1A2B86CFBAA57DB8EBE8ADDC48A94493A0F3D59B28F6F3A306439AF0D7A1F7FB8A0B8B3102BFFC93B820233427356F8D2ED8112CC249EEF06918D10F90FE06D016F50FF20F4B6343B2732AF9BA53735DD9C8CE1B202DD21409F8886CFEDE1D8CDFF9F400BF79C2DAE'>
+					<fs:Value>DBF22706E2908482235F03BCF98D440D2E6D0ED1A2B86CFBAA57DB8EBE8ADDC48A94493A0F3D59B28F6F3A306439AF0D7A1F7FB8A0B8B3102BFFC93B820233427356F8D2ED8112CC249EEF06918D10F90FE06D016F50FF20F4B6343B2732AF9BA53735DD9C8CE1B202DD21409F8886CFEDE1D8CDFF9F400BF79C2DAE</fs:Value>
+				</fs:HexData>
+				<fs:FloatData fs:value='12.12'>
+					<fs:Value>12.12</fs:Value>
+				</fs:FloatData>
+				<fs:NonPosIntData fs:value="-12">
+					<fs:Value>-12</fs:Value>
+				</fs:NonPosIntData>
+				<fs:NegIntData fs:value="-12">
+					<fs:Value>-12</fs:Value>
+				</fs:NegIntData>
+				<fs:NonNegData fs:value="12">
+					<fs:Value>12</fs:Value>
+				</fs:NonNegData>
+				<fs:PosIntData fs:value="12">
+					<fs:Value>12</fs:Value>
+				</fs:PosIntData>
+				<fs:ULongData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:ULongData>
+				<fs:UIntData fs:value='0'>
+					<fs:Value>0</fs:Value>
+				</fs:UIntData>
+				<fs:UShortData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:UShortData>
+				<fs:UByteData fs:value='12'>
+					<fs:Value>12</fs:Value>
+				</fs:UByteData>
+				<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+					<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+				</fs:StringData>
+				<fs:NormStringData fs:value='This is a normalized string'>
+					<fs:Value>This is a normalized string</fs:Value>
+				</fs:NormStringData>
+				<fs:TokenData fs:value='H6B.'>
+					<fs:Value>H6B.</fs:Value>
+				</fs:TokenData>
+				<fs:NameData fs:value='S8:E5-L'>
+					<fs:Value>S8:E5-L</fs:Value>
+				</fs:NameData>
+				<fs:NCNameData fs:value='C7KAG18S'>
+					<fs:Value>C7KAG18S</fs:Value>
+				</fs:NCNameData>
+				<fs:NMTokenData fs:value='CF0..X'>
+					<fs:Value>CF0..X</fs:Value>
+				</fs:NMTokenData>
+				<fs:NMTokensData fs:value='MF46WI N2J L24.JT RXH66H9. V.94.P..46 J8IWWS.T N8.UI QUB5.6U2 '>
+					<fs:Value>MF46WI N2J L24.JT RXH66H9. V.94.P..46 J8IWWS.T N8.UI QUB5.6U2 </fs:Value>
+				</fs:NMTokensData>
+				<fs:EntityData fs:value='::ReplaceWithEntity::'>
+					<fs:Value>::ReplaceWithEntity::</fs:Value>
+				</fs:EntityData>
+				<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+					<fs:Value>::ReplaceWithEntities::</fs:Value>
+				</fs:EntitiesData>
+				<fs:AnyURIData fs:value='http://www.microsoft.com'>
+					<fs:Value>http://www.microsoft.com</fs:Value>
+				</fs:AnyURIData>
+				<fs:QNameData fs:value='fs:foo'>
+					<fs:Value>fs:foo</fs:Value>
+				</fs:QNameData>
+				<fs:NotationData>
+					<fs:Value fs:value='fs:mpeg'>wx0zeIRBghcaBoiriDbl+hS2yWG58mPqDfFcXtdu7oV7gwTR08IlbvbE8sENAs1eWOAM7u1X44Kcs+BNLJEfntUCvgiW1N9c0jurRzgkh6Fns70HwSX8pEEYQaq9iwvMiJXg</fs:Value>
+				</fs:NotationData>
+				<fs:DurationData fs:value="P20Y09M11D">
+					<fs:Value>P20Y09M11D</fs:Value>
+				</fs:DurationData>
+				<fs:DateTimeData fs:value="2395-01-07T18:40:54">
+					<fs:Value>2395-01-07T18:40:54</fs:Value>
+				</fs:DateTimeData>
+				<fs:TimeData fs:value="16:57:07">
+					<fs:Value>16:57:07</fs:Value>
+				</fs:TimeData>
+				<fs:DateData fs:value="1008-01-11">
+					<fs:Value>1008-01-11</fs:Value>
+				</fs:DateData>
+				<fs:GYearMonthData fs:value="2080-08">
+					<fs:Value>2080-08</fs:Value>
+				</fs:GYearMonthData>
+				<fs:GYearData fs:value="2412">
+					<fs:Value>2412</fs:Value>
+				</fs:GYearData>
+				<fs:GMonthDayData fs:value="--03-07">
+					<fs:Value>--03-07</fs:Value>
+				</fs:GMonthDayData>
+				<fs:GMonthData fs:value="--03--">
+					<fs:Value>--03--</fs:Value>
+				</fs:GMonthData>
+				<fs:GDayData fs:value="---09">
+					<fs:Value>---09</fs:Value>
+				</fs:GDayData>
+				<fs:GuidData fs:value="{2D4843D6-4034-5D12-21C4-268C0000000C}">
+					<fs:Value>{2D4843D6-4034-5D12-21C4-268C0000000C}</fs:Value>
+				</fs:GuidData>
+				<fs:LanguageData fs:value='en-BF'>
+					<fs:Value>en-BF</fs:Value>
+				</fs:LanguageData>
+			</fs:MetaData>
+			<fs:Folder fs:creation_date="1064-08-03" fs:creator='Rae' fs:name='Folder00000000006' fs:type='FolderType' fs:idref="FS16" fs:id="FS17">
+				<fs:FolderName>Folder00000000006</fs:FolderName>
+				<?filesystem compressionUtil='foozip.exe'?>
+				<fs:description>
+					<fs:b> exhalation vicar strutting first rhetoric reach acres sund rheum bouge talk fertility copperspur clouded freshest worthiest embrace uncle possess redeeming quit transgression lying verity opposeless long instantly lovely verg gertrude affright devotion churches fir chiefly daintier untangled spectacles
+</fs:b>
+					<fs:b> commanders gory reach postern filth practis briareus prief uncleanly buck bacchus quintain unweeded challenger assails mumbling foining smilingly vain harper manslaughter ugly strives dispraise imitate coats inflamed desperation rip untuneable pinch reigns berhym warn rome cneius amazedness foully scambling thievish albans milch gush pad draweth israel sakes unexamin oppresseth strengthless heartstrings easeth blessings coasting lass shov greeting absolute snipe contribution
+</fs:b> constrained glose augury slippers provocation nineteen pendant glister papist absent majestic outstrip disquiet interpret temporizer guardian marked impertinency approved chime partners defunct fiddler values revolving embroidery wheat partizan sated easy claims implements stomach waywardnes drains phebe beastliest taffeta limps pots intrusion owed canst grasp weed rake legions canopy liking murtherer vizard underneath</fs:description>
+				<fs:SecurityObject fs:name='so00000000013'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+							</fs:security>
+							<fs:user>system\Orli</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Write</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Godehard</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Ewgeni</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Martin</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='13.13'>
+						<fs:Value>13.13</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='13.13'>
+						<fs:Value>13.13</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='true'>
+						<fs:Value>true</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='mILc+Kq5ysVZgVDu+iwrnPNFyb22JnkI4gkQFdH5AKcDaHbK'>
+						<fs:Value>mILc+Kq5ysVZgVDu+iwrnPNFyb22JnkI4gkQFdH5AKcDaHbK</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='055D88710AEE93707375411270A464CA94821FF19337CC927B22'>
+						<fs:Value>055D88710AEE93707375411270A464CA94821FF19337CC927B22</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='13.13'>
+						<fs:Value>13.13</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-13">
+						<fs:Value>-13</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-13">
+						<fs:Value>-13</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="13">
+						<fs:Value>13</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="13">
+						<fs:Value>13</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='13'>
+						<fs:Value>13</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='G:3F:5IO'>
+						<fs:Value>G:3F:5IO</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='V05O:NO'>
+						<fs:Value>V05O:NO</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='WDRNL'>
+						<fs:Value>WDRNL</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='RN'>
+						<fs:Value>RN</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='F.1.1FH. V6X.1U2 JW OC YH7Q1Z.11 T..9RRRL56 TCH FNCTP03NA WON0D..W0 '>
+						<fs:Value>F.1.1FH. V6X.1U2 JW OC YH7Q1Z.11 T..9RRRL56 TCH FNCTP03NA WON0D..W0 </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:mpeg'>mILc+Kq5ysVZgVDu+iwrnPNFyb22JnkI4gkQFdH5AKcDaHbK</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P74Y09M18D">
+						<fs:Value>P74Y09M18D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="2447-03-14T10:21:47">
+						<fs:Value>2447-03-14T10:21:47</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="18:51:23">
+						<fs:Value>18:51:23</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="1320-06-11">
+						<fs:Value>1320-06-11</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="1071-01">
+						<fs:Value>1071-01</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="2430">
+						<fs:Value>2430</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--10-11">
+						<fs:Value>--10-11</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--12--">
+						<fs:Value>--12--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---03">
+						<fs:Value>---03</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{46192EB8-45BF-6264-460D-26360000000D}">
+						<fs:Value>{46192EB8-45BF-6264-460D-26360000000D}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-OC'>
+						<fs:Value>en-OC</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+				<!-- This is a comment for File00000000007 -->
+				<fs:File fs:creation_date="2122-05-15" fs:creator='Marinette' fs:name='File00000000007' fs:type='FileType' fs:uniform='0' fs:idref="FS17" fs:id="FS18">
+					<fs:FileName>File00000000007</fs:FileName>
+					<fs:description></fs:description>
+					<fs:SecurityObject fs:name='so00000000014'>
+						<fs:Denies>
+							<fs:Deny>
+								<fs:security>
+									<fs:right>Read</fs:right>
+								</fs:security>
+								<fs:user>system\Betty</fs:user>
+							</fs:Deny>
+							<fs:Deny>
+								<fs:security>
+									<fs:right>Read</fs:right>
+								</fs:security>
+								<fs:user>system\Karabi</fs:user>
+							</fs:Deny>
+						</fs:Denies>
+						<fs:Allows>
+							<fs:Allow>
+								<fs:security>
+									<fs:right>Read</fs:right>
+									<fs:right>Write</fs:right>
+									<fs:right>Change</fs:right>
+								</fs:security>
+								<fs:user>system\Jingwen</fs:user>
+							</fs:Allow>
+						</fs:Allows>
+					</fs:SecurityObject>
+					<fs:MetaData>
+						<fs:DecimalData fs:value='14.14'>
+							<fs:Value>14.14</fs:Value>
+						</fs:DecimalData>
+						<fs:IntegerData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:IntegerData>
+						<fs:LongData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:LongData>
+						<fs:IntData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:IntData>
+						<fs:ShortData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:ShortData>
+						<fs:ByteData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:ByteData>
+						<fs:DoubleData fs:value='14.14'>
+							<fs:Value>14.14</fs:Value>
+						</fs:DoubleData>
+						<fs:BooleanData fs:value='false'>
+							<fs:Value>false</fs:Value>
+						</fs:BooleanData>
+						<fs:Base64Data fs:value='+c0NVDX4nWXMAW42A9BkujxHPiuX35+Ygu5d54+KAbmeTV2wD5Z4raNSAqc/pjOtQmd45ipwS4tdMdyAq/CcXrg19u2YT6Pb3MGm'>
+							<fs:Value>+c0NVDX4nWXMAW42A9BkujxHPiuX35+Ygu5d54+KAbmeTV2wD5Z4raNSAqc/pjOtQmd45ipwS4tdMdyAq/CcXrg19u2YT6Pb3MGm</fs:Value>
+						</fs:Base64Data>
+						<fs:HexData fs:value='B6689FFE1DFC3510469C69FEAA133628D571EA3EB91AE825798517397F9E62B54865167DD23DA76545ADEAA7F772DCB186CCAA34E2ECF7372F6D6AD2A8281D83271D2FFC6EA13323926B0E401A168DB394D21D3CD1F310B024004F6BC6D6D3C95582DB7BC14A'>
+							<fs:Value>B6689FFE1DFC3510469C69FEAA133628D571EA3EB91AE825798517397F9E62B54865167DD23DA76545ADEAA7F772DCB186CCAA34E2ECF7372F6D6AD2A8281D83271D2FFC6EA13323926B0E401A168DB394D21D3CD1F310B024004F6BC6D6D3C95582DB7BC14A</fs:Value>
+						</fs:HexData>
+						<fs:FloatData fs:value='14.14'>
+							<fs:Value>14.14</fs:Value>
+						</fs:FloatData>
+						<fs:NonPosIntData fs:value="-14">
+							<fs:Value>-14</fs:Value>
+						</fs:NonPosIntData>
+						<fs:NegIntData fs:value="-14">
+							<fs:Value>-14</fs:Value>
+						</fs:NegIntData>
+						<fs:NonNegData fs:value="14">
+							<fs:Value>14</fs:Value>
+						</fs:NonNegData>
+						<fs:PosIntData fs:value="14">
+							<fs:Value>14</fs:Value>
+						</fs:PosIntData>
+						<fs:ULongData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:ULongData>
+						<fs:UIntData fs:value='0'>
+							<fs:Value>0</fs:Value>
+						</fs:UIntData>
+						<fs:UShortData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:UShortData>
+						<fs:UByteData fs:value='14'>
+							<fs:Value>14</fs:Value>
+						</fs:UByteData>
+						<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+							<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+						</fs:StringData>
+						<fs:NormStringData fs:value='This is a normalized string'>
+							<fs:Value>This is a normalized string</fs:Value>
+						</fs:NormStringData>
+						<fs:TokenData fs:value='AS-1_0:D'>
+							<fs:Value>AS-1_0:D</fs:Value>
+						</fs:TokenData>
+						<fs:NameData fs:value='A_45.Q:J5R'>
+							<fs:Value>A_45.Q:J5R</fs:Value>
+						</fs:NameData>
+						<fs:NCNameData fs:value='L12LD'>
+							<fs:Value>L12LD</fs:Value>
+						</fs:NCNameData>
+						<fs:NMTokenData fs:value='R2Y'>
+							<fs:Value>R2Y</fs:Value>
+						</fs:NMTokenData>
+						<fs:NMTokensData fs:value='KF.Z1A2I E.N AT31WX CL048 LN..C8 Q.P.98. N0QLN '>
+							<fs:Value>KF.Z1A2I E.N AT31WX CL048 LN..C8 Q.P.98. N0QLN </fs:Value>
+						</fs:NMTokensData>
+						<fs:EntityData fs:value='::ReplaceWithEntity::'>
+							<fs:Value>::ReplaceWithEntity::</fs:Value>
+						</fs:EntityData>
+						<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+							<fs:Value>::ReplaceWithEntities::</fs:Value>
+						</fs:EntitiesData>
+						<fs:AnyURIData fs:value='http://www.microsoft.com'>
+							<fs:Value>http://www.microsoft.com</fs:Value>
+						</fs:AnyURIData>
+						<fs:QNameData fs:value='fs:foo'>
+							<fs:Value>fs:foo</fs:Value>
+						</fs:QNameData>
+						<fs:NotationData>
+							<fs:Value fs:value='fs:bmp'>+c0NVDX4nWXMAW42A9BkujxHPiuX35+Ygu5d54+KAbmeTV2wD5Z4raNSAqc/pjOtQmd45ipwS4tdMdyAq/CcXrg19u2YT6Pb3MGm</fs:Value>
+						</fs:NotationData>
+						<fs:DurationData fs:value="P55Y08M16D">
+							<fs:Value>P55Y08M16D</fs:Value>
+						</fs:DurationData>
+						<fs:DateTimeData fs:value="1443-06-02T07:59:41">
+							<fs:Value>1443-06-02T07:59:41</fs:Value>
+						</fs:DateTimeData>
+						<fs:TimeData fs:value="16:29:07">
+							<fs:Value>16:29:07</fs:Value>
+						</fs:TimeData>
+						<fs:DateData fs:value="2295-10-17">
+							<fs:Value>2295-10-17</fs:Value>
+						</fs:DateData>
+						<fs:GYearMonthData fs:value="1248-07">
+							<fs:Value>1248-07</fs:Value>
+						</fs:GYearMonthData>
+						<fs:GYearData fs:value="1047">
+							<fs:Value>1047</fs:Value>
+						</fs:GYearData>
+						<fs:GMonthDayData fs:value="--04-04">
+							<fs:Value>--04-04</fs:Value>
+						</fs:GMonthDayData>
+						<fs:GMonthData fs:value="--10--">
+							<fs:Value>--10--</fs:Value>
+						</fs:GMonthData>
+						<fs:GDayData fs:value="---26">
+							<fs:Value>---26</fs:Value>
+						</fs:GDayData>
+						<fs:GuidData fs:value="{61952B94-337A-6D94-2240-65C50000000E}">
+							<fs:Value>{61952B94-337A-6D94-2240-65C50000000E}</fs:Value>
+						</fs:GuidData>
+						<fs:LanguageData fs:value='en-SR'>
+							<fs:Value>en-SR</fs:Value>
+						</fs:LanguageData>
+					</fs:MetaData>
+					<fs:Stream fs:binary="true"  fs:streamid='1' fs:content-type='text/xml' fs:size="1001.33"  fs:name='sample.xml' fs:type='StreamType'>
+						<fs:StreamType>StreamType</fs:StreamType>
+						<fs:StreamSize>1001.33</fs:StreamSize>
+						<fs:StreamID>1</fs:StreamID>
+						<fs:Binary>true</fs:Binary>
+						<fs:Summary>This value is constant</fs:Summary>
+						<fs:StreamData><![CDATA[ <!-- --> </<<< &&&& CDATA CONTENT &&&& >>>/> <-- <!-- ]]>
+						</fs:StreamData>
+					</fs:Stream>
+				</fs:File>
+			</fs:Folder>
+			<fs:Folder fs:creation_date="1465-04-19" fs:creator='Rae' fs:name='Folder00000000007' fs:type='FolderType' fs:idref="FS16" fs:id="FS19">
+				<fs:FolderName>Folder00000000007</fs:FolderName>
+				<?filesystem compressionUtil='foozip.exe'?>
+				<fs:description> bean article grinning eaten dogs dout repeal misconstruction colliers spleenful beau demonstrate exampl connive perjured defects tar persever defile earls fry knot</fs:description>
+				<fs:SecurityObject fs:name='so00000000015'>
+					<fs:Denies>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Glynn</fs:user>
+						</fs:Deny>
+						<fs:Deny>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Gardner</fs:user>
+						</fs:Deny>
+					</fs:Denies>
+					<fs:Allows>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Nechama</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Read</fs:right>
+								<fs:right>Write</fs:right>
+								<fs:right>Change</fs:right>
+							</fs:security>
+							<fs:user>system\Wernhuar</fs:user>
+						</fs:Allow>
+						<fs:Allow>
+							<fs:security>
+								<fs:right>Write</fs:right>
+							</fs:security>
+							<fs:user>system\Duncan</fs:user>
+						</fs:Allow>
+					</fs:Allows>
+				</fs:SecurityObject>
+				<fs:MetaData>
+					<fs:DecimalData fs:value='15.15'>
+						<fs:Value>15.15</fs:Value>
+					</fs:DecimalData>
+					<fs:IntegerData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:IntegerData>
+					<fs:LongData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:LongData>
+					<fs:IntData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:IntData>
+					<fs:ShortData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:ShortData>
+					<fs:ByteData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:ByteData>
+					<fs:DoubleData fs:value='15.15'>
+						<fs:Value>15.15</fs:Value>
+					</fs:DoubleData>
+					<fs:BooleanData fs:value='true'>
+						<fs:Value>true</fs:Value>
+					</fs:BooleanData>
+					<fs:Base64Data fs:value='OOWhr4wEu33jHt7Tz1NU78kE+T/TxCM3keJhHepvsq5jP1DUTNyjOw4xIitPA852wHz5SJK3jflVnMGrtR0+U+ZvOHpxkaEA7weRVjdEa/ChZbMCKqZNWNPmZr6imE2+LCQRXRo/axawsKdAx/q4aFh+v2pIMhXWqlShg+0OqezooAANq5vnqQZfaP/NhavygAsp'>
+						<fs:Value>OOWhr4wEu33jHt7Tz1NU78kE+T/TxCM3keJhHepvsq5jP1DUTNyjOw4xIitPA852wHz5SJK3jflVnMGrtR0+U+ZvOHpxkaEA7weRVjdEa/ChZbMCKqZNWNPmZr6imE2+LCQRXRo/axawsKdAx/q4aFh+v2pIMhXWqlShg+0OqezooAANq5vnqQZfaP/NhavygAsp</fs:Value>
+					</fs:Base64Data>
+					<fs:HexData fs:value='D3A3BC80D0F8B79A18D72C9BB4007D5F1398E425C7C96D4EA630C774CB8E57A182E795E370952DBF88161FCBC74A9FE28916265471D47F73'>
+						<fs:Value>D3A3BC80D0F8B79A18D72C9BB4007D5F1398E425C7C96D4EA630C774CB8E57A182E795E370952DBF88161FCBC74A9FE28916265471D47F73</fs:Value>
+					</fs:HexData>
+					<fs:FloatData fs:value='15.15'>
+						<fs:Value>15.15</fs:Value>
+					</fs:FloatData>
+					<fs:NonPosIntData fs:value="-15">
+						<fs:Value>-15</fs:Value>
+					</fs:NonPosIntData>
+					<fs:NegIntData fs:value="-15">
+						<fs:Value>-15</fs:Value>
+					</fs:NegIntData>
+					<fs:NonNegData fs:value="15">
+						<fs:Value>15</fs:Value>
+					</fs:NonNegData>
+					<fs:PosIntData fs:value="15">
+						<fs:Value>15</fs:Value>
+					</fs:PosIntData>
+					<fs:ULongData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:ULongData>
+					<fs:UIntData fs:value='0'>
+						<fs:Value>0</fs:Value>
+					</fs:UIntData>
+					<fs:UShortData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:UShortData>
+					<fs:UByteData fs:value='15'>
+						<fs:Value>15</fs:Value>
+					</fs:UByteData>
+					<fs:StringData fs:value='	
+ This is a non-normalized string 
+	'>
+						<fs:Value>	
+ This is a non-normalized string 
+	</fs:Value>
+					</fs:StringData>
+					<fs:NormStringData fs:value='This is a normalized string'>
+						<fs:Value>This is a normalized string</fs:Value>
+					</fs:NormStringData>
+					<fs:TokenData fs:value='AG9_G'>
+						<fs:Value>AG9_G</fs:Value>
+					</fs:TokenData>
+					<fs:NameData fs:value='J.Y'>
+						<fs:Value>J.Y</fs:Value>
+					</fs:NameData>
+					<fs:NCNameData fs:value='K5..D'>
+						<fs:Value>K5..D</fs:Value>
+					</fs:NCNameData>
+					<fs:NMTokenData fs:value='V9L'>
+						<fs:Value>V9L</fs:Value>
+					</fs:NMTokenData>
+					<fs:NMTokensData fs:value='KDFR5RX9 ST.C.4R SXGYWFN1C. B K5M.ESU58 '>
+						<fs:Value>KDFR5RX9 ST.C.4R SXGYWFN1C. B K5M.ESU58 </fs:Value>
+					</fs:NMTokensData>
+					<fs:EntityData fs:value='::ReplaceWithEntity::'>
+						<fs:Value>::ReplaceWithEntity::</fs:Value>
+					</fs:EntityData>
+					<fs:EntitiesData fs:value='::ReplaceWithEntities::'>
+						<fs:Value>::ReplaceWithEntities::</fs:Value>
+					</fs:EntitiesData>
+					<fs:AnyURIData fs:value='http://www.microsoft.com'>
+						<fs:Value>http://www.microsoft.com</fs:Value>
+					</fs:AnyURIData>
+					<fs:QNameData fs:value='fs:foo'>
+						<fs:Value>fs:foo</fs:Value>
+					</fs:QNameData>
+					<fs:NotationData>
+						<fs:Value fs:value='fs:bmp'>OOWhr4wEu33jHt7Tz1NU78kE+T/TxCM3keJhHepvsq5jP1DUTNyjOw4xIitPA852wHz5SJK3jflVnMGrtR0+U+ZvOHpxkaEA7weRVjdEa/ChZbMCKqZNWNPmZr6imE2+LCQRXRo/axawsKdAx/q4aFh+v2pIMhXWqlShg+0OqezooAANq5vnqQZfaP/NhavygAsp</fs:Value>
+					</fs:NotationData>
+					<fs:DurationData fs:value="P66Y12M14D">
+						<fs:Value>P66Y12M14D</fs:Value>
+					</fs:DurationData>
+					<fs:DateTimeData fs:value="1278-11-10T02:06:00">
+						<fs:Value>1278-11-10T02:06:00</fs:Value>
+					</fs:DateTimeData>
+					<fs:TimeData fs:value="13:54:46">
+						<fs:Value>13:54:46</fs:Value>
+					</fs:TimeData>
+					<fs:DateData fs:value="1271-03-21">
+						<fs:Value>1271-03-21</fs:Value>
+					</fs:DateData>
+					<fs:GYearMonthData fs:value="2327-10">
+						<fs:Value>2327-10</fs:Value>
+					</fs:GYearMonthData>
+					<fs:GYearData fs:value="2281">
+						<fs:Value>2281</fs:Value>
+					</fs:GYearData>
+					<fs:GMonthDayData fs:value="--05-01">
+						<fs:Value>--05-01</fs:Value>
+					</fs:GMonthDayData>
+					<fs:GMonthData fs:value="--07--">
+						<fs:Value>--07--</fs:Value>
+					</fs:GMonthData>
+					<fs:GDayData fs:value="---15">
+						<fs:Value>---15</fs:Value>
+					</fs:GDayData>
+					<fs:GuidData fs:value="{1E5833B7-3A23-0CA0-3018-3A5F0000000F}">
+						<fs:Value>{1E5833B7-3A23-0CA0-3018-3A5F0000000F}</fs:Value>
+					</fs:GuidData>
+					<fs:LanguageData fs:value='en-KH'>
+						<fs:Value>en-KH</fs:Value>
+					</fs:LanguageData>
+				</fs:MetaData>
+			</fs:Folder>
+		</fs:Folder>
+		<fs:Stats fs:uniformFSItemRef="FS16" fs:lastID="FS19" fs:firstID="FS15" fs:lastUniform='0' fs:firstUniform='0'></fs:Stats>
+	</fs:Drive>
+</fs:MyComputer><?FileSystem defragutil='barfrag.exe'?><!--This is the end-->

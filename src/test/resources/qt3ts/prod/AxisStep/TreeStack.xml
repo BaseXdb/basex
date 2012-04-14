@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<far-north>
+  <north>
+    <near-north>
+      <far-west/>
+      <west/>
+      <near-west/>
+      <center mark="c0" center-attr-1="c1" center-attr-2="c2" center-attr-3="c3">
+        <south-west mark="1sw"/>
+        <south mark="s1a">
+          <south mark="s1b"/>
+        </south>
+        <south-west mark="2sw"/>
+        <south mark="s2a">
+          <south mark="s2b">
+            <intermediate>
+              <south mark="s2c"/>
+            </intermediate>
+          </south>
+        </south>
+        <south-east mark="1se"/>
+        <south mark="s3a">
+          <south mark="s3b">
+            <south mark="s3c"/>
+          </south>
+        </south>
+        <south-east mark="2se"/>
+      </center>
+      <near-east/>
+      <east/>
+      <far-east/>
+    </near-north>
+  </north>
+</far-north>

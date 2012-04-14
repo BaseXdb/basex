@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE IDS [
+<!ELEMENT IDS (elementwithid-1+, elementwithid-2+, elementwithid-3+, elementwithid-4+,elementwithid-5+,elementwithid-6+,
+               elementwithidrefattr-1+,elementwithidrefattr-2+,elementwithidrefattr-3+,elementwithidrefattr-4+,elementwithidrefattr-5+,elementwithidrefattr-6+)>
+<!ELEMENT elementwithid-1 (#PCDATA)>
+<!ELEMENT elementwithid-2 (#PCDATA)>
+<!ELEMENT elementwithid-3 (#PCDATA)>
+<!ELEMENT elementwithid-4 (#PCDATA)>
+<!ELEMENT elementwithid-5 (#PCDATA)>
+<!ELEMENT elementwithid-6 (#PCDATA)>
+<!ELEMENT elementwithidrefattr-1 (#PCDATA)>
+<!ELEMENT elementwithidrefattr-2 (#PCDATA)>
+<!ELEMENT elementwithidrefattr-3 (#PCDATA)>
+<!ELEMENT elementwithidrefattr-4 (#PCDATA)>
+<!ELEMENT elementwithidrefattr-5 (#PCDATA)>
+<!ELEMENT elementwithidrefattr-6 (#PCDATA)>
+<!ATTLIST elementwithid-1 anId  ID #REQUIRED>
+<!ATTLIST elementwithid-2 anId  ID #REQUIRED>
+<!ATTLIST elementwithid-3 anId  ID #REQUIRED>
+<!ATTLIST elementwithid-4 anId  ID #REQUIRED>
+<!ATTLIST elementwithid-5 anId  ID #REQUIRED>
+<!ATTLIST elementwithid-6 anId  ID #REQUIRED>
+<!ATTLIST elementwithidrefattr-1 anIdRef IDREF #REQUIRED>  
+<!ATTLIST elementwithidrefattr-2 anIdRef IDREF #REQUIRED>
+<!ATTLIST elementwithidrefattr-3 anIdRef IDREF #REQUIRED>
+<!ATTLIST elementwithidrefattr-4 anIdRef IDREF #REQUIRED>
+<!ATTLIST elementwithidrefattr-5 anIdRef IDREF #REQUIRED>
+<!ATTLIST elementwithidrefattr-6 anIdRef IDREF #REQUIRED>
+]>
+ <IDS>
+  <elementwithid-1 anId = "id1"/>
+  <elementwithid-2 anId = "id2"/>
+  <elementwithid-3 anId = "id3"/>
+  <elementwithid-4 anId = "id4"/> 
+  <elementwithid-5 anId = "id5"/> 
+  <elementwithid-6 anId = "ID5"/>
+  <elementwithidrefattr-1 anIdRef = "id1"/>
+  <elementwithidrefattr-2 anIdRef = "id2"/> 
+  <elementwithidrefattr-3 anIdRef = "id3"/> 
+  <elementwithidrefattr-4 anIdRef = "id4"/>
+  <elementwithidrefattr-5 anIdRef = "id5"/> 
+  <elementwithidrefattr-6 anIdRef = "ID5"/> 
+ </IDS>

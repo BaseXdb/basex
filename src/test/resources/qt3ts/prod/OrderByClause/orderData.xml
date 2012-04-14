@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding = "UTF-8"?>
+<DataValues xmlns="http://www.w3.org/XQueryTestOrderBy">
+ <Strings>
+  <orderData>A String</orderData>
+  <orderData>B String</orderData>  
+  <orderData>C String</orderData>  
+  <orderData>D String</orderData>
+  <orderData>E String</orderData>
+  <orderData>F String</orderData>
+  <orderData>G String</orderData>
+  <orderData>H String</orderData>
+  <orderData>I String</orderData>
+  <orderData>J String</orderData>  
+  <orderData>K String</orderData>  
+  <orderData>L String</orderData>
+  <orderData>M String</orderData>
+  <orderData>N String</orderData>
+  <orderData>O String</orderData>
+  <orderData>P String</orderData>  
+  <orderData>R String</orderData>
+  <orderData>S String</orderData>  
+  <orderData>T String</orderData>  
+  <orderData>U String</orderData>
+  <orderData>V String</orderData>
+  <orderData>W String</orderData>
+  <orderData>X String</orderData>
+  <orderData>Y String</orderData>
+  <orderData>Z String</orderData>
+ </Strings>
+ <NegativeNumbers>
+  <orderData>-100000000000000000</orderData>                   
+  <orderData>-10000000000000000</orderData>  
+  <orderData>-1000000000000000</orderData>                 
+  <orderData>-100000000000000</orderData> 
+  <orderData>-10000000000000</orderData> 
+  <orderData>-1000000000000</orderData> 
+  <orderData>-100000000000</orderData>
+  <orderData>-10000000000</orderData>
+  <orderData>-1000000000</orderData>  
+  <orderData>-100000000</orderData>  
+  <orderData>-10000000</orderData>  
+  <orderData>-1000000</orderData>  
+  <orderData>-100000</orderData>  
+  <orderData>-10000</orderData>  
+  <orderData>-1000</orderData>  
+  <orderData>-100</orderData>  
+  <orderData>-10</orderData>  
+  <orderData>-1</orderData>
+  <orderData>-0</orderData>  
+ </NegativeNumbers>
+ <PositiveNumbers>
+  <orderData>100000000000000000</orderData>                   
+  <orderData>10000000000000000</orderData>  
+  <orderData>1000000000000000</orderData>                 
+  <orderData>100000000000000</orderData> 
+  <orderData>10000000000000</orderData> 
+  <orderData>1000000000000</orderData> 
+  <orderData>100000000000</orderData>
+  <orderData>10000000000</orderData>
+  <orderData>1000000000</orderData>  
+  <orderData>100000000</orderData>  
+  <orderData>10000000</orderData>  
+  <orderData>1000000</orderData>  
+  <orderData>100000</orderData>  
+  <orderData>10000</orderData>  
+  <orderData>1000</orderData>  
+  <orderData>100</orderData>  
+  <orderData>10</orderData>  
+  <orderData>1</orderData>
+  <orderData>0</orderData>  
+ </PositiveNumbers>
+ <SmallNegativeNumbers>
+  <orderData>-0.000000000000000001</orderData>                   
+  <orderData>-0.00000000000000001</orderData>  
+  <orderData>-0.0000000000000001</orderData>                 
+  <orderData>-0.000000000000001</orderData> 
+  <orderData>-0.00000000000001</orderData> 
+  <orderData>-0.0000000000001</orderData> 
+  <orderData>-0.000000000001</orderData>
+  <orderData>-0.00000000001</orderData>
+  <orderData>-0.0000000001</orderData>  
+  <orderData>-0.000000001</orderData>  
+  <orderData>-0.00000001</orderData>  
+  <orderData>-0.0000001</orderData>  
+  <orderData>-0.000001</orderData>  
+  <orderData>-0.00001</orderData>  
+  <orderData>-0.0001</orderData>  
+  <orderData>-0.001</orderData>  
+  <orderData>-0.01</orderData>  
+  <orderData>-0.0</orderData>
+  <orderData>-0.1</orderData>  
+ </SmallNegativeNumbers>  
+ <SmallPositiveNumbers>
+  <orderData>0.000000000000000001</orderData>                   
+  <orderData>0.00000000000000001</orderData>  
+  <orderData>0.0000000000000001</orderData>                 
+  <orderData>0.000000000000001</orderData> 
+  <orderData>0.00000000000001</orderData> 
+  <orderData>0.0000000000001</orderData> 
+  <orderData>0.000000000001</orderData>
+  <orderData>0.00000000001</orderData>
+  <orderData>0.0000000001</orderData>  
+  <orderData>0.000000001</orderData>  
+  <orderData>0.00000001</orderData>  
+  <orderData>0.0000001</orderData>  
+  <orderData>0.000001</orderData>  
+  <orderData>0.00001</orderData>  
+  <orderData>0.0001</orderData>  
+  <orderData>0.001</orderData>  
+  <orderData>0.01</orderData>  
+  <orderData>0.1</orderData>
+  <orderData>0.0</orderData>  
+ </SmallPositiveNumbers> 
+</DataValues>

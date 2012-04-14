@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<doc>
+  <part name="frammis" discounted="10">
+    <retail>62.50 USD</retail>
+    <wholesale>55.00 USD</wholesale>
+    <internal>31.25 USD</internal>
+  </part>
+</doc>

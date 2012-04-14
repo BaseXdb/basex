@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report>
+  <section>
+    <section.title>Procedure</section.title>
+     <section.content>
+      The patient was taken to the operating room where she was placed
+      in supine position and
+      <anesthesia>induced under general anesthesia.</anesthesia>
+      <prep> 
+        <action>A Foley catheter was placed to decompress the bladder</action>
+        and the abdomen was then prepped and draped in sterile fashion.
+      </prep>  
+      <incision>
+        A curvilinear incision was made
+        <geography>in the midline immediately infraumbilical</geography>
+        and the subcutaneous tissue was divided
+        <instrument>using electrocautery.</instrument>
+      </incision>
+      The fascia was identified and
+      <action>#2 0 Maxon stay sutures were placed on each side of the midline.
+      </action>
+      <incision>
+        The fascia was divided using
+        <instrument>electrocautery</instrument>
+        and the peritoneum was entered.
+      </incision>
+      <observation>The small bowel was identified.</observation>
+      and
+      <action>
+        the
+        <instrument>Hasson trocar</instrument>
+        was placed under direct visualization.
+      </action>
+      <action>
+        The
+        <instrument>trocar</instrument>
+        was secured to the fascia using the stay sutures.
+      </action>
+     </section.content>
+  </section>
+</report>

@@ -1,0 +1,9 @@
+<catalogs>
+  <catalog name="ACC" xml:base="http://example.org/ACC/">
+    <product number="443" href="prod443.html"/>
+    <product number="563" href="prod563.html"/>
+  </catalog>
+  <catalog name="WMN" xml:base="http://example.org/WMN/">
+    <product number="557" href="prod557.html"/>
+  </catalog>
+</catalogs>

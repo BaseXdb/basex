@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<langs>
+ <para xml:lang="en"/>
+ <div xml:lang="en"><para>And now, and forever!</para></div>
+ <para xml:lang="EN"/>
+ <para xml:lang="en-us"/>
+</langs>

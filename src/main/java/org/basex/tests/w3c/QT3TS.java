@@ -29,7 +29,7 @@ import org.basex.util.*;
  */
 public final class QT3TS {
   /** Default path to the test suite. */
-  protected static final String PATH = "g:/XML/w3c/qt3ts/";
+  protected static String qt3tsPath = "g:/XML/w3c/qt3ts/";
 
   /** Maximum length of result output. */
   private int maxout = 2000;
@@ -94,8 +94,9 @@ public final class QT3TS {
     final Performance perf = new Performance();
     new Set(Prop.CHOP, false).execute(ctx);
     new Set(Prop.INTPARSE, false).execute(ctx);
+    new Set(Prop.QUERYPATH, qt3tsPath).execute(ctx);
 
-    final XQuery qdoc = new XQuery("doc(' " + PATH + '/' + CATALOG + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + qt3tsPath + '/' + CATALOG + "')", ctx);
     final XdmValue doc = qdoc.value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
@@ -118,8 +119,9 @@ public final class QT3TS {
     result.append(" Total   : ").append(total).append(NL);
     result.append(" Ignored : ").append(ignored).append(NL);
 
-    Util.outln(NL + "Writing log file..." + NL);
-    final PrintOutput po = new PrintOutput(PATH + "qt3ts.log");
+    final String path = new File(qt3tsPath, "qt3ts.log").getCanonicalPath();
+    Util.outln(NL + "Writing log file '" + path + "'..." + NL);
+    final PrintOutput po = new PrintOutput(path);
     po.println("QT3TS RESULTS __________________________" + NL);
     po.println(result.toString());
     po.println("WRONG __________________________________" + NL);
@@ -144,7 +146,7 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    final XQuery qdoc = new XQuery("doc(' " + PATH + '/' + name + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + qt3tsPath + '/' + name + "')", ctx);
     final XdmValue doc = qdoc.value();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XdmValue set = qset.value();
@@ -774,6 +776,7 @@ public final class QT3TS {
         " -d  debugging mode" + NL +
         " -e  check error codes" + NL +
         " -i  also save ignored files" + NL +
+        " -p  path to the QT3 test suite" + NL +
         " -v  verbose output",
         Util.info(Text.CONSOLE, Util.name(this)));
 
@@ -790,6 +793,8 @@ public final class QT3TS {
           ignoring = true;
         } else if(c == 'e') {
           errors = true;
+        } else if(c == 'p') {
+          qt3tsPath = arg.string();
         } else {
           arg.usage();
         }

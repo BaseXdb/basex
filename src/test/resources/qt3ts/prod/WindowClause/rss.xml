@@ -1,0 +1,44 @@
+<rss>
+  <channel>
+    <title>DBIS RSS</title>
+    <link>http://www.dbis.ethz.ch</link>
+    <description>The windowing dummy RSS.</description>
+    <language>en-us</language>
+    <item>
+      <title>Why use cases are important Part 1.</title>
+      <category>Workshop</category>
+      <author>rokas@e-mail.de</author>
+      <pubDate>2003-06-03T09:00:00</pubDate>
+    </item>
+    <item>
+      <title>Why use cases are important Part 2.</title>
+      <category>Workshop</category>
+      <author>rokas@e-mail.de</author>
+      <pubDate>2003-06-03T09:00:00</pubDate>
+    </item>
+    <item>
+      <title>Why use cases are important Part 3.</title>
+      <category>Workshop</category>
+      <author>rokas@e-mail.de</author>
+      <pubDate>2003-06-03T10:00:00</pubDate>
+    </item>
+    <item>
+      <title>Extending XQuery with Window Functions</title>
+      <category>Talk</category>
+      <author>tim@e-mail.de</author>
+      <pubDate>2003-06-03T11:00:00</pubDate>
+    </item>
+    <item>
+      <title>XQueryP: A new programming language is born</title>
+      <category>Talk</category>
+      <author>david@e-mail.de</author>
+      <pubDate>2003-06-03T12:00:00</pubDate>
+    </item>
+    <item>
+      <title>Why use cases are annoying to write.</title>
+      <category>Talk</category>
+      <author>rokas@e-mail.de</author>
+      <pubDate>2003-06-04T10:00:00</pubDate>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,6 @@
+<employees> 
+  <emp name="john" salary="120"/> 
+  <emp name="mary" salary="310"/> 
+  <emp name="anne" salary="250"/>
+  <emp name="kumar" salary="290"/> 
+</employees>
