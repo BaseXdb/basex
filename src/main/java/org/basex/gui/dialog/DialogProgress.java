@@ -172,7 +172,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
           // close progress window and show error if command failed
           wait.dispose();
-          if(!ok) Dialog.error(gui, info.equals(INTERRUPTED) ? CREATION_CANCELED : info);
+          if(!ok) Dialog.error(gui, info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
         }
       }.start();
 

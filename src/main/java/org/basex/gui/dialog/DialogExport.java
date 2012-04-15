@@ -61,8 +61,7 @@ public final class DialogExport extends Dialog {
     // output label
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
-    final String dir = new IOFile(gui.context.data().meta.original).dir();
-    path = new BaseXTextField(dir, this);
+    path = new BaseXTextField(main.gprop.get(GUIProp.CREATEPATH), this);
     path.addKeyListener(keys);
     pp.add(path);
 
@@ -183,17 +182,23 @@ public final class DialogExport extends Dialog {
       params.setText(sb.toString());
     }
 
-    final IOFile io = new IOFile(path());
+    final String pth = path();
+    final IOFile io = new IOFile(pth);
     String inf = io.isDir() && io.children().length > 0 ? DIR_NOT_EMPTY : null;
-    ok = !path().isEmpty();
+    ok = !pth.isEmpty();
 
-    if(ok && comp == params) {
-      // validate serialization parameters
-      try {
-        Serializer.get(new ArrayOutput(), new SerializerProp(params.getText()));
-      } catch(final IOException ex) {
-        ok = false;
-        inf = ex.getLocalizedMessage();
+    if(ok) {
+      gui.gprop.set(GUIProp.CREATEPATH, pth);
+      if(comp == params) {
+        // validate serialization parameters
+        try {
+          final String par = params.getText();
+          Serializer.get(new ArrayOutput(), new SerializerProp(par));
+          gui.set(Prop.EXPORTER, par);
+        } catch(final IOException ex) {
+          ok = false;
+          inf = ex.getLocalizedMessage();
+        }
       }
     }
 
@@ -219,8 +224,6 @@ public final class DialogExport extends Dialog {
 
   @Override
   public void close() {
-    if(!ok) return;
-    super.close();
-    gui.set(Prop.EXPORTER, params.getText());
+    if(ok) super.close();
   }
 }

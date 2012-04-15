@@ -21,6 +21,13 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class Export extends Command {
+  /** Currently exported file. */
+  private IO progFile;
+  /** Current number of exported file. */
+  private int progPos;
+  /** Total number of files to be exported. */
+  private int progSize;
+
   /**
    * Default constructor, specifying a target path.
    * @param path export path
@@ -33,7 +40,7 @@ public final class Export extends Command {
   protected boolean run() {
     try {
       final Data data = context.data();
-      export(data, args[0]);
+      export(data, args[0], this);
       return info(DB_EXPORTED_X, data.meta.name, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
@@ -46,10 +53,11 @@ public final class Export extends Command {
    * Files and directories in {@code path} will be possibly overwritten.
    * @param data data reference
    * @param target directory
+   * @param e calling instance
    * @throws IOException I/O exception
    */
-  public static void export(final Data data, final String target)
-      throws IOException {
+  public static void export(final Data data, final String target,
+      final Export e) throws IOException {
 
     final String exp = data.meta.prop.get(Prop.EXPORTER);
     final SerializerProp sp = new SerializerProp(exp);
@@ -58,19 +66,33 @@ public final class Export extends Command {
 
     final HashSet<String> exported = new HashSet<String>();
 
-    // export XML documents
+    // XML documents
     final IntList il = data.resources.docs();
+    // raw files
+    final IOFile bin = data.meta.binaries();
+    final StringList desc = bin.descendants();
+    if(e != null) {
+      e.progPos = 0;
+      e.progSize = il.size() + desc.size();
+    }
+
+    // XML documents
     if(!data.isEmpty()) {
       for(int i = 0, is = il.size(); i < is; i++) {
         final int pre = il.get(i);
         // create file path
-        final IO file = root.merge(Token.string(data.text(pre, true)));
+        final IO f = root.merge(Token.string(data.text(pre, true)));
+        if(e != null) {
+          e.checkStop();
+          e.progFile = f;
+          e.progPos++;
+        }
         // create dir if necessary
-        final IOFile dir = new IOFile(file.dir());
+        final IOFile dir = new IOFile(f.dir());
         if(!dir.exists()) dir.md();
 
         // serialize file
-        final PrintOutput po = new PrintOutput(unique(exported, file.path()));
+        final PrintOutput po = new PrintOutput(unique(exported, f.path()));
         final Serializer ser = Serializer.get(po, sp);
         ser.node(data, pre);
         ser.close();
@@ -79,11 +101,36 @@ public final class Export extends Command {
     }
 
     // export raw files
-    final IOFile bin = data.meta.binaries();
-    for(final String s : bin.descendants()) {
-      final String u = unique(exported, new IOFile(root.path(), s).path());
+    for(final String s : desc) {
+      final IOFile f = new IOFile(root.path(), s);
+      if(e != null) {
+        e.checkStop();
+        e.progFile = f;
+        e.progPos++;
+      }
+      final String u = unique(exported, f.path());
       new IOFile(bin.path(), s).copyTo(new IOFile(u));
     }
+  }
+
+  @Override
+  public double prog() {
+    return progSize == 0 ? 0 : (double) progPos / progSize;
+  }
+
+  @Override
+  public boolean stoppable() {
+    return true;
+  }
+
+  @Override
+  public boolean supportsProg() {
+    return true;
+  }
+
+  @Override
+  public String det() {
+    return progFile == null ? EXPORT : progFile.path();
   }
 
   /**

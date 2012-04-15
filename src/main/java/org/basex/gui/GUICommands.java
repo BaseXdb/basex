@@ -95,7 +95,8 @@ public enum GUICommands implements GUICommand {
           if(!Dialog.confirm(gui, Util.info(msg, file))) return;
         }
       }
-      gui.execute(new Export(root.path()));
+
+      DialogProgress.execute(dialog, EXPORT, new Export(root.path()));
     }
 
     @Override

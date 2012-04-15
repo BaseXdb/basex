@@ -469,8 +469,8 @@ public interface Text {
   String CREATING_INDEXES = lang("creating_indexes");
   /** Possible corruption. */
   String DB_CORRUPT = lang("db_corrupt");
-  /** Builder error. */
-  String CREATION_CANCELED = lang("creation_canceled");
+  /** "Command was canceled". */
+  String COMMAND_CANCELED = lang("command_canceled");
   /** Create database information. */
   String NODES_PARSED_X = " \"%\" (" + lang("nodes_parsed_%") + ')';
   /** Scanner position. */
