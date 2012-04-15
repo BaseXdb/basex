@@ -261,16 +261,18 @@ public final class Util {
    * Starts the specified class in a separate process.
    * @param clz class to start
    * @param args command-line arguments
+   * @return reference to a {@link Process} instance representing the started process
    */
-  public static void start(final Class<?> clz, final String... args) {
+  public static Process start(final Class<?> clz, final String... args) {
     final String[] largs = { "java", "-Xmx" + Runtime.getRuntime().maxMemory(),
         "-cp", System.getProperty("java.class.path"), clz.getName(), "-D", };
     final StringList sl = new StringList().add(largs).add(args);
 
     try {
-      new ProcessBuilder(sl.toArray()).start();
+      return new ProcessBuilder(sl.toArray()).start();
     } catch(final IOException ex) {
       notexpected(ex);
+      return null;
     }
   }
 
