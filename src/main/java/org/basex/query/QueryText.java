@@ -467,6 +467,8 @@ public interface QueryText {
   byte[] CRYPTO = token("crytpo");
   /** Repo token. */
   byte[] REPO = token("repo");
+  /** Rest token. */
+  byte[] REST = token("rest");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
