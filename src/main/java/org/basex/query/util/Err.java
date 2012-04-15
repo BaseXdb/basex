@@ -2,10 +2,9 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.ErrType.*;
-import java.util.EnumMap;
 import org.basex.core.Text;
 import org.basex.io.serial.SerializerException;
-import org.basex.query.QueryException;
+import org.basex.query.*;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.*;
 import org.basex.util.InputInfo;
@@ -924,21 +923,14 @@ public enum Err {
   }
 
   /**
-   * Mapping between function classes and namespace URIs.
-   * If no mapping exists, {@link #FNURI} will be assumed as default mapping.
-   */
-  private static final EnumMap<ErrType, byte[]> URIS =
-      new EnumMap<ErrType, byte[]>(ErrType.class);
-
-  /**
    * Error types.
    *
    * @author BaseX Team 2005-12, BSD License
    * @author Leo Woerteler
    */
   public enum ErrType {
-    /** BASX Error type. */ BASX,
-    /** FOCX Error type. */ FOCX,
+    /** BASX Error type. */ BASX(BASEX, BASEXURI),
+    /** FOCX Error type. */ FOCX(CRYPTO, CRYPTOURI),
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,
@@ -956,11 +948,11 @@ public enum Err {
     /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
     /** FOFD Error type. */ FOUT,
-    /** FOZP Error type. */ FOZP,
+    /** FOZP Error type. */ FOZP(ZIP, ZIPURI),
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
-    /** PACK Error type. */ PACK,
-    /** REXQ Error type. */ REXQ,
+    /** PACK Error type. */ PACK(PKG, PKGURI),
+    /** REXQ Error type. */ REXQ(REST, RESTXQURI),
     /** SEPM Error type. */ SEPM,
     /** SERE Error type. */ SERE,
     /** SEPM Error type. */ SESU,
@@ -972,16 +964,39 @@ public enum Err {
     /** XQTY Error type. */ XQTY,
     /** XUDY Error type. */ XUDY,
     /** XUST Error type. */ XUST,
-    /** XUTY Error type. */ XUTY
-  }
+    /** XUTY Error type. */ XUTY;
 
-  // initialization of error/uri mappings
-  static {
-    URIS.put(BASX,  BASEXURI);
-    URIS.put(FOCX,  CRYPTOURI);
-    URIS.put(PACK,  PKGURI);
-    URIS.put(REXQ,  RESTXQURI);
-    URIS.put(FOZP,  ZIPURI);
+    /** This error type's prefix. */
+    public final String prefix;
+    /** This error type's URI. */
+    public final byte[] uri;
+
+    /**
+     * Constructor for non-standard errors.
+     * @param pref QName prefix
+     * @param euri error URI
+     */
+    ErrType(final byte[] pref, final byte[] euri) {
+      prefix = Token.string(pref);
+      uri = euri;
+    }
+
+    /**
+     * Constructor for standard XQuery errors. The prefix is {@code err}, the URI is
+     * {@code http://www.w3.org/2005/xqt-errors}.
+     */
+    ErrType() {
+      this(ERR, ERRORURI);
+    }
+
+    /**
+     * Creates a QName for the given error number.
+     * @param num error number
+     * @return constructed QName
+     */
+    public final QNm qname(final int num) {
+      return new QNm(String.format("%s:%s%04d", prefix, name(), num), uri);
+    }
   }
 
   /**
@@ -989,8 +1004,7 @@ public enum Err {
    * @return function
    */
   public final QNm qname() {
-    final byte[] u = URIS.get(type);
-    return new QNm(Token.token(toString()), u == null ? ERRORURI : u);
+    return type.qname(num);
   }
 
   /**
