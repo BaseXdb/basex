@@ -94,7 +94,7 @@ public final class TableDiskAccess extends TableAccess {
     final IOFile table = MetaData.file(ctx.mprop.dbpath(db), DATATBL);
     if(!table.exists()) return false;
 
-    RandomAccessFile file = null;
+    final RandomAccessFile file;
     try {
       file = new RandomAccessFile(table.file(), "rw");
       try {
@@ -102,8 +102,12 @@ public final class TableDiskAccess extends TableAccess {
       } finally {
         file.close();
       }
-    } catch(final IOException ex) {
+    } catch(final OverlappingFileLockException ex) {
       return true;
+    } catch(final ClosedChannelException ex) {
+      return false;
+    } catch(final IOException ex) {
+      return true; // [CG] why do we return true when IO error occurs?
     }
   }
 

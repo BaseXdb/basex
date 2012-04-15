@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
+import java.text.*;
 import java.util.*;
 
 import org.basex.core.*;
@@ -298,5 +299,27 @@ public final class Util {
    */
   public static String flag(final boolean flag) {
     return flag ? INFOON : INFOOFF;
+  }
+
+  /**
+   * Thread-safe method to create a string from a given date in a given format.
+   * @param format date format
+   * @param date date
+   * @return string with the formatted date
+   */
+  public static String formatDate(final Date date, final DateFormat format) {
+    synchronized(format) { return format.format(date); }
+  }
+
+  /**
+   * Thread-safe method to parse a date from a string in a given format.
+   * @param date string represnting a date
+   * @param format date format
+   * @return parsed date
+   * @throws ParseException if the string cannot be parsed
+   */
+  public static Date parseDate(final String date, final DateFormat format)
+      throws ParseException {
+    synchronized(format) { return format.parse(date); }
   }
 }
