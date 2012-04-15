@@ -16,13 +16,13 @@ CP="$CP$(for JAR in "$BX"/lib/*.jar; do echo -n ":$JAR"; done)"
 general_args=( )
 vm_args=( )
 while (( $# )) ; do
-	if [[ $1 = "-X" ]] ; then
-		vm_args+=( "$2" )
-		shift 2
-	else
-		general_args+=( "$1" )
-		shift
-	fi
+  if [[ $1 = "-X" ]] ; then
+    vm_args+=( "$2" )
+    shift 2
+  else
+    general_args+=( "$1" )
+    shift
+  fi
 done
 
 # Options for virtual machine
