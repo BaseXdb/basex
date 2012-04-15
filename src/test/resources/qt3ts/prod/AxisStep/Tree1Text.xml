@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<far-north>
+  <north>
+    <near-north>
+      <far-west/>
+      <west mark="w0"/>
+      <near-west/>
+      <center mark="c0">Text in center</center>
+      <near-east/>
+      <east mark="e0">Text in east</east>
+      <far-east/>
+    </near-north>
+  </north>
+</far-north>

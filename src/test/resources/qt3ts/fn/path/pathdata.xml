@@ -1,0 +1,2321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="nowhere.xsl" media-type="text.xsl"?>
+<!-- Yes, this is a test-set, but we're simply using it as data! -->
+<test-set xmlns="http://www.w3.org/2010/09/qt-fots-catalog" name="fn-abs">
+   <description/>
+   <link type="spec" document="http://www.w3.org/TR/xpath-functions-11/" idref="func-abs"/>
+   <environment name="e0">
+      <source role="." file="abs/e0.xml">
+         <description last-mod="2010-12-08">A simple file containing <![CDATA[<e>0</e>]]></description>
+         <created by="Michael Kay" on="2010-12-08"/>
+      </source>
+   </environment>
+   <environment name="e1">
+      <source role="." file="abs/e1.xml">
+         <description last-mod="2010-12-08">A simple file containing <![CDATA[<e>1</e>]]></description>
+         <created by="Michael Kay" on="2010-12-08"/>
+      </source>
+   </environment>
+   <environment name="e-1">
+      <source xml:id="e-1" role="." file="abs/e-1.xml">
+         <description last-mod="2010-12-08">A simple file containing <![CDATA[<e>-1</e>]]></description>
+         <created by="Michael Kay" on="2010-12-08"/>
+      </source>
+   </environment>
+   <test-case name="fn-absint1args-1">
+      <description> ******************************************************* Test: absint1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:int(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("-2147483648"))</test>
+      <result>
+         <all-of>
+            <assert-eq>2147483648</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absint1args-2">
+      <description> ******************************************************* Test: absint1args-2
+         Written By: Carmelo Montanez <!--Date: Wed Dec 15 10:05:43 GMT-05:00 2004--> Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:int(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("-1873914410"))</test>
+      <result>
+         <all-of>
+            <assert-eq>1873914410</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absint1args-3">
+      <description> ******************************************************* Test: absint1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:int(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("2147483647"))</test>
+      <result>
+         <all-of>
+            <assert-eq>2147483647</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absintg1args-1">
+      <description> ******************************************************* Test: absintg1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:integer(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("-999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absintg1args-2">
+      <description> ******************************************************* Test: absintg1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:integer(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("830993497117024304"))</test>
+      <result>
+         <all-of>
+            <assert-eq>830993497117024304</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absintg1args-3">
+      <description> ******************************************************* Test: absintg1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:integer(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absdec1args-1">
+      <description> ******************************************************* Test: absdec1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:decimal(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("-999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:decimal</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absdec1args-2">
+      <description> ******************************************************* Test: absdec1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:decimal(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("617375191608514839"))</test>
+      <result>
+         <all-of>
+            <assert-eq>617375191608514839</assert-eq>
+            <assert-type>xs:decimal</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absdec1args-3">
+      <description> ******************************************************* Test: absdec1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:decimal(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:decimal</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absdbl1args-1">
+      <description> ******************************************************* Test: absdbl1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:double(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("-1.7976931348623157E308"))</test>
+      <result>
+         <all-of>
+            <assert-eq>1.7976931348623157E308</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absdbl1args-2">
+      <description> ******************************************************* Test: absdbl1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:double(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0.0e0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absdbl1args-3">
+      <description> ******************************************************* Test: absdbl1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:double(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("1.7976931348623157E308"))</test>
+      <result>
+         <all-of>
+            <assert-eq>1.7976931348623157E308</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absflt1args-1">
+      <description> ******************************************************* Test: absflt1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:float(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("-3.4028235E38"))</test>
+      <result>
+         <all-of>
+            <assert-eq>xs:float(3.4028235E38)</assert-eq>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absflt1args-2">
+      <description> ******************************************************* Test: absflt1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:float(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0.0e0</assert-eq>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absflt1args-3">
+      <description> ******************************************************* Test: absflt1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:float(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("3.4028235E38"))</test>
+      <result>
+         <all-of>
+            <assert-eq>xs:float(3.4028235E38)</assert-eq>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abslng1args-1">
+      <description> ******************************************************* Test: abslng1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:long(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("-92233720368547758"))</test>
+      <result>
+         <all-of>
+            <assert-eq>92233720368547758</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abslng1args-2">
+      <description> ******************************************************* Test: abslng1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:long(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("-47175562203048468"))</test>
+      <result>
+         <all-of>
+            <assert-eq>47175562203048468</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abslng1args-3">
+      <description> ******************************************************* Test: abslng1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:long(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("92233720368547758"))</test>
+      <result>
+         <all-of>
+            <assert-eq>92233720368547758</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absusht1args-1">
+      <description> ******************************************************* Test: absusht1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:unsignedShort(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absusht1args-2">
+      <description> ******************************************************* Test: absusht1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:unsignedShort(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("44633"))</test>
+      <result>
+         <all-of>
+            <assert-eq>44633</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absusht1args-3">
+      <description> ******************************************************* Test: absusht1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:unsignedShort(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("65535"))</test>
+      <result>
+         <all-of>
+            <assert-eq>65535</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnint1args-1">
+      <description> ******************************************************* Test: absnint1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:negativeInteger(lower
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("-999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnint1args-2">
+      <description> ******************************************************* Test: absnint1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:negativeInteger(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("-297014075999096793"))</test>
+      <result>
+         <all-of>
+            <assert-eq>297014075999096793</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnint1args-3">
+      <description> ******************************************************* Test: absnint1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:negativeInteger(upper
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("-1"))</test>
+      <result>
+         <all-of>
+            <assert-eq>1</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abspint1args-1">
+      <description> ******************************************************* Test: abspint1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:positiveInteger(lower
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("1"))</test>
+      <result>
+         <all-of>
+            <assert-eq>1</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abspint1args-2">
+      <description> ******************************************************* Test: abspint1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:positiveInteger(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("52704602390610033"))</test>
+      <result>
+         <all-of>
+            <assert-eq>52704602390610033</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abspint1args-3">
+      <description> ******************************************************* Test: abspint1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:positiveInteger(upper
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absulng1args-1">
+      <description> ******************************************************* Test: absulng1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:unsignedLong(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absulng1args-2">
+      <description> ******************************************************* Test: absulng1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:unsignedLong(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("130747108607674654"))</test>
+      <result>
+         <all-of>
+            <assert-eq>130747108607674654</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absulng1args-3">
+      <description> ******************************************************* Test: absulng1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:unsignedLong(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("184467440737095516"))</test>
+      <result>
+         <all-of>
+            <assert-eq>184467440737095516</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnpi1args-1">
+      <description> ******************************************************* Test: absnpi1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:nonPositiveInteger(lower
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("-999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnpi1args-2">
+      <description> ******************************************************* Test: absnpi1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:nonPositiveInteger(mid
+         range) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("-475688437271870490"))</test>
+      <result>
+         <all-of>
+            <assert-eq>475688437271870490</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnpi1args-3">
+      <description> ******************************************************* Test: absnpi1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:nonPositiveInteger(upper
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnni1args-1">
+      <description> ******************************************************* Test: absnni1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:nonNegativeInteger(lower
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnni1args-2">
+      <description> ******************************************************* Test: absnni1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:nonNegativeInteger(mid
+         range) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("303884545991464527"))</test>
+      <result>
+         <all-of>
+            <assert-eq>303884545991464527</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-absnni1args-3">
+      <description> ******************************************************* Test: absnni1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:nonNegativeInteger(upper
+         bound) ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("999999999999999999"))</test>
+      <result>
+         <all-of>
+            <assert-eq>999999999999999999</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abssht1args-1">
+      <description> ******************************************************* Test: abssht1args-1
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:short(lower bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("-32768"))</test>
+      <result>
+         <all-of>
+            <assert-eq>32768</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abssht1args-2">
+      <description> ******************************************************* Test: abssht1args-2
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:short(mid range)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("-5324"))</test>
+      <result>
+         <all-of>
+            <assert-eq>5324</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abssht1args-3">
+      <description> ******************************************************* Test: abssht1args-3
+         Written By: Carmelo Montanez Date: Wed Dec 15 10:05:43 GMT-05:00 2004 Purpose: Evaluates
+         The "abs" function with the arguments set as follows: $arg = xs:short(upper bound)
+         ******************************************************* </description>
+      <created by="Carmelo Montanez" on="2004-12-13"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("32767"))</test>
+      <result>
+         <all-of>
+            <assert-eq>32767</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-001">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-001.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: double ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-002">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-002.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: double ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("-INF"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>INF</assert-string-value>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-003">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-003.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: double ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("INF"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>INF</assert-string-value>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-004">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-004.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: double ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("NaN"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>NaN</assert-string-value>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-005">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-005.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: double ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("NaN"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>NaN</assert-string-value>
+            <assert-type>xs:double</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-006">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-006.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: decimal ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:decimal</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-007">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-007.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: decimal ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:decimal</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-008">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-008.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: float ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-009">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-009.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: float ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("-INF"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>INF</assert-string-value>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-010">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-010.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: float ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("INF"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>INF</assert-string-value>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-011">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-011.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: float ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("NaN"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>NaN</assert-string-value>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-012">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-012.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: float ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("NaN"))</test>
+      <result>
+         <all-of>
+            <assert-string-value>NaN</assert-string-value>
+            <assert-type>xs:float</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-013">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-013.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: int ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-014">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-014.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: int ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-015">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-015.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: integer ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-016">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-016.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: integer ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-017">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-017.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: long ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-018">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-018.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: long ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-019">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-019.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: nonNegativeInteger ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-020">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-020.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: nonPositiveIntege ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-021">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-021.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: short ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-022">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-022.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: short ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-023">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-023.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: unsignedLong ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-024">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-024.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         arg: unsignedShort ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("-0"))</test>
+      <result>
+         <all-of>
+            <assert-eq>0</assert-eq>
+            <assert-type>xs:integer</assert-type>
+         </all-of>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-025">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-025.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-026">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-026.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-027">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-027.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-028">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-028.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:decimal("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-029">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-029.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-030">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-030.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-031">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-031.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-032">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-032.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-033">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-033.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-034">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-034.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-035">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-035.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-036">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-036.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-037">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-037.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-038">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-038.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-039">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-039.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-040">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-040.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-041">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-041.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("-0"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-042">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-042.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("0"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-043">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-043.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("2"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-044">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-044.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-045">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-045.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-046">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-046.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-047">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-047.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-048">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-048.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("-2"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-049">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-049.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-050">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-050.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-051">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-051.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-052">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-052.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-053">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-053.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("2"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-054">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-054.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-055">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-055.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-056">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-056.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-057">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-057.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-058">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-058.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("0"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-059">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-059.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("-0"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-060">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-060.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("-2"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-061">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-061.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-062">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-062.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-063">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-063.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-064">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-064.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-065">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-065.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-066">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-066.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-067">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-067.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-068">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-068.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-069">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-069.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-070">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-070.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-071">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-071.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-072">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-072.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-073">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-073.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("-INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-074">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-074.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("INF"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-075">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-075.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("-NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-076">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-076.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives FORG0001 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort("NaN"))</test>
+      <result>
+         <error code="FORG0001"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-077">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-077.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:string("1"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-078">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-078.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:string("hello"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-079">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-079.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:boolean("1"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-080">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-080.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:boolean("0"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-081">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-081.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:boolean(fn:true()))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-082">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-082.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:boolean(fn:false()))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-083">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-083.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:date("2002-10-09"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-084">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-084.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:time("13:20:00-05:00"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-085">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-085.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:dateTime("2002-10-10T12:00:00-05:00"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-more-args-086">
+      <description> ******************************************************* Test:
+         fn-abs-more-args-086.xq Written By: Pulkita Tyagi Date: Thu Oct 27 03:56:31 2005 Purpose:
+         Negative Test gives XPTY0004 ******************************************************* </description>
+      <created by="Pulkita Tyagi" on="2005-05-19"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:anyURI("www.examples.org"))</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="K-ABSFunc-1">
+      <description> ******************************************************* Test: K-ABSFunc-1
+         Written by: Frans Englich Date: 2007-11-22T11:31:22+01:00 Purpose: A test whose essence is:
+         `abs()`. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>abs()</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+   <test-case name="K-ABSFunc-2">
+      <description> ******************************************************* Test: K-ABSFunc-2
+         Written by: Frans Englich Date: 2007-11-22T11:31:22+01:00 Purpose: A test whose essence is:
+         `abs(1, 2)`. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>abs(1, 2)</test>
+      <result>
+         <error code="XPST0017"/>
+      </result>
+   </test-case>
+   <test-case name="K-ABSFunc-3">
+      <description> ******************************************************* Test: K-ABSFunc-3
+         Written by: Frans Englich Date: 2007-11-22T11:31:22+01:00 Purpose: A test whose essence is:
+         `empty(abs(()))`. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>empty(abs(()))</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K-ABSFunc-4">
+      <description> ******************************************************* Test: K-ABSFunc-4
+         Written by: Frans Englich Date: 2007-11-22T11:31:22+01:00 Purpose: A test whose essence is:
+         `abs(10.5) eq 10.5`. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>abs(10.5) eq 10.5</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K-ABSFunc-5">
+      <description> ******************************************************* Test: K-ABSFunc-5
+         Written by: Frans Englich Date: 2007-11-22T11:31:22+01:00 Purpose: A test whose essence is:
+         `abs(-10.5) eq 10.5`. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>abs(-10.5) eq 10.5</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K-ABSFunc-6">
+      <description> ******************************************************* Test: K-ABSFunc-6
+         Written by: Frans Englich Date: 2007-11-22T11:31:22+01:00 Purpose: A test whose essence is:
+         `abs("a string")`. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>abs("a string")</test>
+      <result>
+         <error code="XPTY0004"/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-1">
+      <description> ******************************************************* Test: K2-ABSFunc-1
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on -4 of
+         type xs:integer. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer(-4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-2">
+      <description> ******************************************************* Test: K2-ABSFunc-2
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on -4 of
+         type xs:nonPositiveInteger. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger(-4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-3">
+      <description> ******************************************************* Test: K2-ABSFunc-3
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on -4 of
+         type xs:negativeInteger. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger(-4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-4">
+      <description> ******************************************************* Test: K2-ABSFunc-4
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on -4 of
+         type xs:long. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long(-4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-5">
+      <description> ******************************************************* Test: K2-ABSFunc-5
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on -4 of
+         type xs:int. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int(-4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-6">
+      <description> ******************************************************* Test: K2-ABSFunc-6
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on -4 of
+         type xs:short. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short(-4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-7">
+      <description> ******************************************************* Test: K2-ABSFunc-7
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on -4 of
+         type xs:byte. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:byte(-4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-8">
+      <description> ******************************************************* Test: K2-ABSFunc-8
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on 4 of
+         type xs:nonNegativeInteger. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger(4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-9">
+      <description> ******************************************************* Test: K2-ABSFunc-9
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on 4 of
+         type xs:unsignedLong. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong(4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-10">
+      <description> ******************************************************* Test: K2-ABSFunc-10
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on 4 of
+         type xs:unsignedInt. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedInt(4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-11">
+      <description> ******************************************************* Test: K2-ABSFunc-11
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on 4 of
+         type xs:unsignedShort. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort(4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-12">
+      <description> ******************************************************* Test: K2-ABSFunc-12
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on 4 of
+         type xs:unsignedByte. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedByte(4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-13">
+      <description> ******************************************************* Test: K2-ABSFunc-13
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on 4 of
+         type xs:positiveInteger. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger(4))</test>
+      <result>
+         <assert-string-value>4</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-14">
+      <description> ******************************************************* Test: K2-ABSFunc-14
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:integer and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer(-4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-15">
+      <description> ******************************************************* Test: K2-ABSFunc-15
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:nonPositiveInteger and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonPositiveInteger(-4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-16">
+      <description> ******************************************************* Test: K2-ABSFunc-16
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:negativeInteger and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:negativeInteger(-4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-17">
+      <description> ******************************************************* Test: K2-ABSFunc-17
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:long and check the return type. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:long(-4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-18">
+      <description> ******************************************************* Test: K2-ABSFunc-18
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:int and check the return type. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:int(-4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-19">
+      <description> ******************************************************* Test: K2-ABSFunc-19
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:short and check the return type. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:short(-4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-20">
+      <description> ******************************************************* Test: K2-ABSFunc-20
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:byte and check the return type. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:byte(-4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-21">
+      <description> ******************************************************* Test: K2-ABSFunc-21
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:nonNegativeInteger and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:nonNegativeInteger(4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-22">
+      <description> ******************************************************* Test: K2-ABSFunc-22
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:unsignedLong and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedLong(4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-23">
+      <description> ******************************************************* Test: K2-ABSFunc-23
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:unsignedInt and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedInt(4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-24">
+      <description> ******************************************************* Test: K2-ABSFunc-24
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:unsignedShort and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedShort(4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-25">
+      <description> ******************************************************* Test: K2-ABSFunc-25
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:unsignedByte and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:unsignedByte(4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-26">
+      <description> ******************************************************* Test: K2-ABSFunc-26
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:positiveInteger and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:positiveInteger(4)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-27">
+      <description> ******************************************************* Test: K2-ABSFunc-27
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:decimal and check the return type(negative test).
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(1.1) instance of xs:integer</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-28">
+      <description> ******************************************************* Test: K2-ABSFunc-28
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:double and check the return type(negative test).
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(1e1) instance of xs:integer</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-29">
+      <description> ******************************************************* Test: K2-ABSFunc-29
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:float and check the return type(negative test).
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float(1)) instance of xs:double</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-30">
+      <description> ******************************************************* Test: K2-ABSFunc-30
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:integer and check the return type(negative test).
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float(1)) instance of xs:double</test>
+      <result>
+         <assert-false/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-31">
+      <description> ******************************************************* Test: K2-ABSFunc-31
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:decimal and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(1.1) instance of xs:decimal</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-32">
+      <description> ******************************************************* Test: K2-ABSFunc-32
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:double and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(1e1) instance of xs:double</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-33">
+      <description> ******************************************************* Test: K2-ABSFunc-33
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:float and check the return type. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float(1)) instance of xs:float</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-34">
+      <description> ******************************************************* Test: K2-ABSFunc-34
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke fn:abs() on
+         xs:integer and check the return type.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:integer(1)) instance of xs:integer</test>
+      <result>
+         <assert-true/>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-35">
+      <description> ******************************************************* Test: K2-ABSFunc-35
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for unsignedShort.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:unsignedShort(.)) instance of xs:unsignedShort</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-36">
+      <description> ******************************************************* Test: K2-ABSFunc-36
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for unsignedLong.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:unsignedLong(.)) instance of xs:unsignedLong</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-37">
+      <description> ******************************************************* Test: K2-ABSFunc-37
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for unsignedInt.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:unsignedInt(.)) instance of xs:unsignedInt</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-38">
+      <description> ******************************************************* Test: K2-ABSFunc-38
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for unsignedByte.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:unsignedByte(.)) instance of xs:unsignedByte</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-39">
+      <description> ******************************************************* Test: K2-ABSFunc-39
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for positiveInteger.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e1"/>
+      <test>abs(xs:positiveInteger(.)) instance of xs:positiveInteger</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-40">
+      <description> ******************************************************* Test: K2-ABSFunc-40
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for nonPositiveInteger.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:nonPositiveInteger(.)) instance of
+         xs:nonPositiveInteger</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-41">
+      <description> ******************************************************* Test: K2-ABSFunc-41
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for nonNegativeInteger.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:nonNegativeInteger(.)) instance of
+         xs:nonNegativeInteger</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-42">
+      <description> ******************************************************* Test: K2-ABSFunc-42
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for negativeInteger.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e-1"/>
+      <test>abs(xs:negativeInteger(.)) instance of xs:negativeInteger</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-43">
+      <description> ******************************************************* Test: K2-ABSFunc-43
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for long. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:long(.)) instance of xs:long</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-44">
+      <description> ******************************************************* Test: K2-ABSFunc-44
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for int. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:int(.)) instance of xs:int</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-45">
+      <description> ******************************************************* Test: K2-ABSFunc-45
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for short. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:short(.)) instance of xs:short</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-46">
+      <description> ******************************************************* Test: K2-ABSFunc-46
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Ensure the return type
+         is properly inferred for byte. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="e0"/>
+      <test>abs(xs:byte(.)) instance of xs:byte</test>
+      <result>
+         <any-of>
+            <assert-false/>
+            <assert-true/>
+         </any-of>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-47">
+      <description> ******************************************************* Test: K2-ABSFunc-47
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke on -INF/xs:float.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("-INF"))</test>
+      <result>
+         <assert-string-value>INF</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-48">
+      <description> ******************************************************* Test: K2-ABSFunc-48
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke on
+         -INF/xs:double. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("-INF"))</test>
+      <result>
+         <assert-string-value>INF</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-49">
+      <description> ******************************************************* Test: K2-ABSFunc-49
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke on INF/xs:float.
+         ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:float("INF"))</test>
+      <result>
+         <assert-string-value>INF</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="K2-ABSFunc-50">
+      <description> ******************************************************* Test: K2-ABSFunc-50
+         Written by: Frans Englich Date: 2007-11-22T11:31:21+01:00 Purpose: Invoke on
+         -INF/xs:double. ******************************************************* </description>
+      <created by="Frans Englich" on="2007-11-26+01:00"/>
+      <environment ref="empty"/>
+      <test>fn:abs(xs:double("INF"))</test>
+      <result>
+         <assert-string-value>INF</assert-string-value>
+      </result>
+   </test-case>
+   <test-case name="fn-abs-1">
+      <description> Test: fn-abs-1 Purpose: check dynamic type of fn:abs on argument of union of
+         numeric types. Author: Oliver Hallam Date: 2010-03-15 </description>
+      <created by="Oliver Hallam" on="2010-03-15"/>
+      <environment ref="empty"/>
+      <test>string-join(for $x in (1, xs:decimal(2), xs:float(3), xs:double(4)) return 
+           if ((abs($x)) instance of xs:integer) then "integer" 
+           else if ((abs($x)) instance of xs:decimal) then "decimal" 
+           else if ((abs($x)) instance of xs:float) then "float"
+           else if ((abs($x)) instance of xs:double) then "double" else error(), " ")</test>
+      <result>
+         <assert-eq>"integer decimal float double"</assert-eq>
+      </result>
+   </test-case>
+   <p xmlns=""/>
+</test-set>

@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<book>
+  <title>Data on the Web</title>
+  <author>Serge Abiteboul</author>
+  <author>Peter Buneman</author>
+  <author>Dan Suciu</author>
+  <section id="intro" difficulty="easy" >
+    <title>Introduction</title>
+    <p>Text ... </p>
+    <section>
+      <title>Audience</title>
+      <p>Text ... </p>
+    </section>
+    <section>
+      <title>Web Data and the Two Cultures</title>
+      <p>Text ... </p>
+      <figure height="400" width="400">
+        <title>Traditional client/server architecture</title>
+        <image source="csarch.gif"/>
+      </figure>
+      <p>Text ... </p>
+    </section>
+  </section>
+  <section id="syntax" difficulty="medium" >
+    <title>A Syntax For Data</title>
+    <p>Text ... </p>
+    <figure height="200" width="500">
+      <title>Graph representations of structures</title>
+      <image source="graphs.gif"/>
+    </figure>
+    <p>Text ... </p>
+    <section>
+      <title>Base Types</title>
+      <p>Text ... </p>
+    </section>
+    <section>
+      <title>Representing Relational Databases</title>
+      <p>Text ... </p>
+      <figure height="250" width="400">
+        <title>Examples of Relations</title>
+        <image source="relations.gif"/>
+      </figure>
+    </section>
+    <section>
+      <title>Representing Object Databases</title>
+      <p>Text ... </p>
+    </section>       
+  </section>
+</book> 

@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+ <works>
+  <employee name="Jane Doe 1" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name = "John Doe 2" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P2</pnum>
+   <hours>70</hours>
+   <hours>20</hours>Text data from Employee[2]
+  </employee>
+  <employee name = "Jane Doe 3" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P3</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "John Doe 4" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P4</pnum>
+   <hours>20</hours>
+   <hours>40</hours>
+  </employee>
+  <employee name= "Jane Doe 5" gender="female">
+   <empnum>E1</empnum>
+   <pnum>P5</pnum>
+   <hours>20</hours>
+   <hours>30</hours>   
+  </employee>
+  <employee name= "John Doe 6" gender="male">
+   <empnum>E1</empnum>
+   <pnum>P6</pnum>
+   <hours>12</hours>
+  </employee>
+  <employee name= "Jane Doe 7" gender="female">
+   <empnum>E2</empnum>
+   <pnum>P1</pnum>
+   <hours>40</hours>
+  </employee>
+  <employee name= "John Doe 8" gender="male">
+   <empnum>E2</empnum>
+   <pnum>P2</pnum>
+   <hours>80</hours>
+  </employee>
+  <employee name= "Jane Doe 9" gender="female">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 10" gender="male">
+   <empnum>E3</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "Jane Doe 11" gender="female">
+   <empnum>E4</empnum>
+   <pnum>P2</pnum>
+   <hours>20</hours>
+  </employee>
+  <employee name= "John Doe 12" gender="male">
+   <empnum>E4</empnum>
+   <pnum>P4</pnum>
+   <hours>40</hours>
+   <overtime>
+     <day>Monday</day>
+     <day>Tuesday</day>
+   </overtime>
+  </employee>
+  <employee name= "Jane Doe 13" gender="female" type="FT">
+   <empnum>E4</empnum>
+   <pnum>P5</pnum>
+   <hours>80</hours>
+   <status>active</status>
+  </employee>
+ </works>

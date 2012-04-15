@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<prices>
+    <book>
+        <title>Advanced Programming in the Unix environment</title>
+        <source>bstore2.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>Advanced Programming in the Unix environment</title>
+        <source>bstore1.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>TCP/IP Illustrated</title>
+        <source>bstore2.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>TCP/IP Illustrated</title>
+        <source>bstore1.example.com</source>
+        <price>65.95</price>
+    </book>
+    <book>
+        <title>Data on the Web</title>
+        <source>bstore2.example.com</source>
+        <price>34.95</price>
+    </book>
+    <book>
+        <title>Data on the Web</title>
+        <source>bstore1.example.com</source>
+        <price>39.95</price>
+    </book>
+</prices>
+

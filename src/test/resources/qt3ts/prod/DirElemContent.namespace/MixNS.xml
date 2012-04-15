@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a xmlns:cm="http://www.example.com" xmlns:ed="http://www.example.edu">
+  <b index="1">
+    <cm:c index="11">Z</cm:c>
+    <c index="12">Y</c>
+    <ed:c index="13">X</ed:c>
+    <gv:c xmlns:gv="http://www.example.gov" index="14">W</gv:c>
+  </b>
+  <cm:b index="2">
+    <cm:c index="21">V</cm:c>
+    <c index="22">U</c>
+    <ed:c index="23">T</ed:c>
+    <gv:c xmlns:gv="http://www.example.gov" index="24">S</gv:c>
+  </cm:b>
+  <ed:b index="3">
+    <cm:c index="31">R</cm:c>
+    <c index="32">Q</c>
+    <ed:c index="33">P</ed:c>
+    <gv:c xmlns:gv="http://www.example.gov" index="34">O</gv:c>
+  </ed:b>
+  <gv:b xmlns:gv="http://www.example.gov" index="4">
+    <cm:c index="41">N</cm:c>
+    <c index="42">M</c>
+    <ed:c index="43">L</ed:c>
+    <gv:c xmlns:gv="http://www.example.gov" index="44">K</gv:c>
+  </gv:b>
+</a>

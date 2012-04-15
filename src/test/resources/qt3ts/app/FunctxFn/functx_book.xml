@@ -1,0 +1,24 @@
+<!DOCTYPE book [
+  <!ELEMENT book ((fn|section)*) >
+  <!ELEMENT section ANY >
+  <!ATTLIST section id ID #REQUIRED >
+  <!ELEMENT fn ANY >
+  <!ATTLIST fn fnid ID #REQUIRED >
+  <!ELEMENT fnref EMPTY >
+  <!ATTLIST fnref ref IDREF #REQUIRED >
+  <!ELEMENT secRef EMPTY >
+  <!ATTLIST secRef refs IDREFS #REQUIRED >
+]>
+<book>
+  <section id='preface'>This book introduces XQuery...
+    The examples are downloadable<fnref ref="fn1"/>...
+  </section>
+  <section id='context'>...</section>
+  <section id='language'>...Expressions, introduced
+   in <secRef refs='context'/>, are...
+  </section>
+  <section id='types'>...As described in
+    <secRef refs='context language'/>, you can...
+  </section>
+  <fn fnid='fn1'>See http://datypic.com.</fn>
+</book>

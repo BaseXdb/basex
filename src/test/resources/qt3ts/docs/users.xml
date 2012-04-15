@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<users>
+ <user_tuple>
+  <userid>U01</userid>
+  <name>Tom Jones</name>
+  <rating>B</rating>
+ </user_tuple>
+ <user_tuple>
+  <userid>U02</userid>
+  <name>Mary Doe</name>
+  <rating>A</rating>
+ </user_tuple>
+ <user_tuple>
+  <userid>U03</userid>
+  <name>Dee Linquent</name>
+  <rating>D</rating>
+ </user_tuple>
+ <user_tuple>
+  <userid>U04</userid>
+  <name>Roger Smith</name>
+  <rating>C</rating>
+ </user_tuple>
+ <user_tuple>
+  <userid>U05</userid>
+  <name>Jack Sprat</name>
+  <rating>B</rating>
+ </user_tuple>
+ <user_tuple>
+  <userid>U06</userid>
+  <name>Rip Van Winkle</name>
+  <rating>B</rating>
+ </user_tuple>
+</users>

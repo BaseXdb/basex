@@ -1,0 +1,7 @@
+<!DOCTYPE svg[
+<!ELEMENT svg EMPTY> 
+<!ATTLIST svg
+          xmlns CDATA #IMPLIED
+          xmlns:xlink CDATA #FIXED "http://www.w3.org/1999/xlink">
+]>
+<svg xmlns="http://www.w3.org/2000/svg"/>
