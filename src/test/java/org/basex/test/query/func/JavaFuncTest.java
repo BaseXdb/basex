@@ -64,9 +64,9 @@ public class JavaFuncTest extends AdvancedQueryTest {
   @Test
   public void importError() {
     query("declare namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
-        "try { qm:error(qm:new()) } catch * { $err:code }", "BASX0000");
+        "try{qm:error(qm:new())} catch * {local-name-from-QName($err:code)}", "BASX0000");
     query("import module namespace qm='java:org.basex.test.query.func.QueryModuleTest';" +
-        "try { qm:error() } catch * { $err:code }", "BASX0000");
+        "try { qm:error() } catch * { local-name-from-QName($err:code) }", "BASX0000");
   }
 
   /** Tests ambiguous function signatures. */

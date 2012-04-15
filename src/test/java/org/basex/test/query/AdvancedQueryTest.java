@@ -85,7 +85,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
     if(error.length == 0) Util.notexpected("No error code specified");
     final byte[] msg = Token.token(ex.getMessage());
     boolean found = false;
-    for(final Err e : error) found |= Token.contains(msg, e.qname().string());
+    for(final Err e : error) found |= Token.contains(msg, e.qname().local());
     if(!found) fail('\'' + Token.string(error[0].qname().string()) +
         "' not contained in '" + Token.string(msg) + "'.");
   }

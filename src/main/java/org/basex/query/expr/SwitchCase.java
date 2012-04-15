@@ -36,7 +36,7 @@ public class SwitchCase extends Arr {
     final int el = expr.length;
     for(int e = 1; e < el; ++e) sb.append(' ' + CASE + ' ' + expr[e]);
     if(el == 1) sb.append(' ' + DEFAULT);
-    sb.append(' ' + RETURN + ' ' + 0);
+    sb.append(' ' + RETURN + ' ' + expr[0]);
     return sb.toString();
   }
 }
