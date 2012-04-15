@@ -51,7 +51,6 @@ public final class PackageAPITest extends AdvancedQueryTest {
     for(final IOFile f : new IOFile(REPO).children()) {
       if(f.isDir() && f.name().contains(".")) f.delete();
     }
-    context = new Context();
     context.mprop.set(MainProp.REPOPATH, REPO);
   }
 

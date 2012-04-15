@@ -2,6 +2,8 @@ package org.basex.test.build;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.io.*;
@@ -182,24 +184,27 @@ public final class AddDeleteTest extends SandboxTest {
   }
 
   /**
-   * Creates a database from a broken input file and checks if the file can be
-   * deleted afterwards.
-   * @throws Exception exception
+   * Creates a database from a broken input.
+   * @throws BaseXException exception
    */
-  @Test
-  public void createCorrupt() throws Exception {
-    try {
-      new CreateDB(NAME, "<x").execute(context);
-      fail("Broken file was added to the database.");
-    } catch(final Exception ex) { }
+  @Test(expected = BaseXException.class)
+  public void createCorrupt() throws BaseXException {
+    new CreateDB(NAME, "<x").execute(context);
+  }
 
+  /**
+   * Creates a database from a broken input file.
+   * @throws IOException exception
+   */
+  @Test(expected = BaseXException.class)
+  public void createCorruptFromFile() throws IOException {
     final IOFile io = new IOFile(TEMP);
     io.write(Token.token("<x"));
     try {
       new CreateDB(NAME, io.path()).execute(context);
-      fail("Broken file was added to the database.");
-    } catch(final Exception ex) { }
-    assertTrue(io.delete());
+    } finally {
+      io.delete();
+    }
   }
 
   /**

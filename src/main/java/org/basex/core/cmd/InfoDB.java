@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Util.*;
 
 import java.io.*;
 import java.text.*;
@@ -21,8 +22,7 @@ import org.basex.util.*;
  */
 public final class InfoDB extends AInfo {
   /** Date format. */
-  public static final SimpleDateFormat DATE =
-    new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+  public static final SimpleDateFormat DATE = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
   /**
    * Default constructor.
@@ -61,7 +61,7 @@ public final class InfoDB extends AInfo {
     final int bin = meta.binaries().descendants().size();
     format(tb, DOCUMENTS, Integer.toString(meta.ndocs));
     format(tb, BINARIES, Integer.toString(bin));
-    format(tb, TIMESTAMP, DATE.format(new Date(meta.dbtime())));
+    format(tb, TIMESTAMP, formatDate(new Date(meta.dbtime()), DATE));
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
     tb.add(NL).addExt(header, RESOURCE_PROPS);
@@ -69,7 +69,7 @@ public final class InfoDB extends AInfo {
       format(tb, INPUT_PATH, meta.original);
     if(meta.filesize != 0)
       format(tb, INPUT_SIZE, Performance.format(meta.filesize));
-    format(tb, TIMESTAMP, DATE.format(new Date(meta.time)));
+    format(tb, TIMESTAMP, formatDate(new Date(meta.time), DATE));
     format(tb, ENCODING, meta.encoding);
     format(tb, WS_CHOPPING, Util.flag(meta.chop));
 

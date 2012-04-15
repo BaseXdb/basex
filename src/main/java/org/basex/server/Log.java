@@ -93,7 +93,7 @@ public final class Log {
    */
   private void create(final Date d) {
     dir.md();
-    start = DATE.format(d);
+    synchronized(DATE) { start = DATE.format(d); }
     try {
       fos = new FileOutputStream(new IOFile(dir, start + ".log").file(), true);
     } catch(final IOException ex) {
