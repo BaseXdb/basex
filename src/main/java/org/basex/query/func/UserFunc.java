@@ -115,10 +115,13 @@ public class UserFunc extends Single {
 
     final int vs = ctx.vars.size();
     final VarStack vl = cache ? ctx.vars.cache(args.length) : null;
-    for(final Var v : args) ctx.vars.add(v);
-    expr = expr.comp(ctx);
-    if(cache) ctx.vars.reset(vl);
-    else ctx.vars.size(vs);
+    try {
+      for(final Var v : args) ctx.vars.add(v);
+      expr = expr.comp(ctx);
+    } finally {
+      if(cache) ctx.vars.reset(vl);
+      else ctx.vars.size(vs);
+    }
 
     // convert all function calls in tail position to proper tail calls
     if(tco()) expr = expr.markTailCalls();

@@ -79,6 +79,10 @@ public final class XQuery30Test extends QueryTest {
       { "Try/catch 4", itr(42), "try { error(xs:QName('local:error')) } " +
           "catch Q{http://www.w3.org/2005/xquery-local-functions}error { 42 }" },
       { "Try/catch 5", itr(42), "try { error() } catch err:FOER0000 { 42 }" },
+      { "Try/catch 6", itr(42),
+          "declare function local:a($n) { try { local:b() } catch * { $n } };" +
+          "declare function local:b() { (: fails at compile-time :) xs:QName('b:b') };" +
+          "local:a(42)" },
     };
   }
 }
