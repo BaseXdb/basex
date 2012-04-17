@@ -17,7 +17,7 @@ import org.basex.util.InputInfo;
  */
 public final class Extension extends Single {
   /** Pragmas of the ExtensionExpression. */
-  private final Expr[] pragmas;
+  private final Pragma[] pragmas;
 
   /**
    * Constructor.
@@ -25,7 +25,7 @@ public final class Extension extends Single {
    * @param prag pragmas
    * @param e enclosed expression
    */
-  public Extension(final InputInfo ii, final Expr[] prag, final Expr e) {
+  public Extension(final InputInfo ii, final Pragma[] prag, final Expr e) {
     super(ii, e);
     pragmas = prag;
   }
@@ -45,7 +45,7 @@ public final class Extension extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(final Expr p : pragmas) p.plan(ser);
+    for(final Pragma p : pragmas) p.plan(ser);
     expr.plan(ser);
     ser.closeElement();
   }
@@ -53,7 +53,7 @@ public final class Extension extends Single {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Expr p : pragmas) sb.append(p).append(' ');
+    for(final Pragma p : pragmas) sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr + ' ' + BRACE2).toString();
   }
 
