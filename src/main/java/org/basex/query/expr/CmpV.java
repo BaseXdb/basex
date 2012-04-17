@@ -148,12 +148,12 @@ public final class CmpV extends Cmp {
 
   /**
    * Constructor.
-   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    * @param o operator
+   * @param ii input info
    */
-  public CmpV(final InputInfo ii, final Expr e1, final Expr e2, final OpV o) {
+  public CmpV(final Expr e1, final Expr e2, final OpV o, final InputInfo ii) {
     super(ii, e1, e2);
     op = o;
   }
@@ -221,7 +221,7 @@ public final class CmpV extends Cmp {
   @Override
   public CmpV invert() {
     return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpV(info, expr[0], expr[1], op.invert());
+      new CmpV(expr[0], expr[1], op.invert(), info);
   }
 
   @Override

@@ -1,5 +1,8 @@
 package org.basex.test.query.ast;
 
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -14,7 +17,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void idTest() {
     check("function($x) { $x }(42)",
         "42",
-        "exists(//FuncItem)"
+        "exists(//" + Util.name(FuncItem.class) + ")"
     );
   }
 
@@ -23,7 +26,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void literalTest() {
     check("lower-case#1('FooBar')",
         "foobar",
-        "exists(//FuncItem)"
+        "exists(//" + Util.name(FuncItem.class) + ")"
     );
   }
 
@@ -32,7 +35,7 @@ public final class FuncItemTest extends QueryPlanTest {
   public void partAppTest() {
     check("starts-with('foobar', ?)('foo')",
         "true",
-        "exists(//FuncItem)"
+        "exists(//" + Util.name(FuncItem.class) + ")"
     );
   }
 
@@ -42,8 +45,8 @@ public final class FuncItemTest extends QueryPlanTest {
     check("for $sub in ('foo', 'bar')" +
         "return starts-with(?, $sub)('foobar')",
         "true false",
-        "empty(//FuncItem)",
-        "exists(//InlineFunc)"
+        "empty(//" + Util.name(FuncItem.class) + ")",
+        "exists(//" + Util.name(InlineFunc.class) + ")"
     );
   }
 
@@ -56,9 +59,9 @@ public final class FuncItemTest extends QueryPlanTest {
         "}(function($f) { 42 })",
         "42",
         // both outer inline functions are pre-compiled
-        "exists(//DynamicFunc)",
-        "every $f in outermost(//DynFuncCall)/* satisfies" +
-        "  $f instance of element(FuncItem)"
+        "exists(//" + Util.name(DynamicFunc.class) + ")",
+        "every $f in outermost(//" + Util.name(DynamicFunc.class) + ")/* satisfies" +
+        "  $f instance of element(" + Util.name(FuncItem.class) + ")"
     );
   }
 
@@ -76,7 +79,7 @@ public final class FuncItemTest extends QueryPlanTest {
     check("declare function local:foo() { abs(?) };" +
         "function-lookup(xs:QName('local:foo'), 0)()(-42)",
         "42",
-        "exists(//PartFunc)"
+        "exists(//" + Util.name(PartFunc.class) + ")"
     );
   }
 
@@ -90,7 +93,7 @@ public final class FuncItemTest extends QueryPlanTest {
         "declare function local:b() { 42 };" +
         "local:a#0()",
         "42",
-        "exists(//FuncItem)"
+        "exists(//" + Util.name(FuncItem.class) + ")"
     );
   }
 }

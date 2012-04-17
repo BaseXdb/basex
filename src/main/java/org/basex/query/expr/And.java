@@ -37,6 +37,7 @@ public final class And extends Logical {
     Expr[] ex = {};
     Pos ps = null;
     CmpR cr = null;
+    CmpSR cs = null;
     for(final Expr e : expr) {
       Expr tmp = null;
       if(e instanceof Pos) {
@@ -49,6 +50,11 @@ public final class And extends Logical {
         tmp = cr == null ? e : cr.intersect((CmpR) e);
         if(tmp instanceof CmpR) cr = (CmpR) tmp;
         else if(tmp != null) return tmp;
+      } else if(e instanceof CmpSR) {
+        // merge comparisons
+        tmp = cs == null ? e : cs.intersect((CmpSR) e);
+        if(tmp instanceof CmpSR) cs = (CmpSR) tmp;
+        else if(tmp != null) return tmp;
       }
       // no optimization found; add original expression
       if(tmp == null) ex = Array.add(ex, e);
@@ -56,6 +62,7 @@ public final class And extends Logical {
     expr = ex;
     if(ps != null) expr = Array.add(expr, ps);
     if(cr != null) expr = Array.add(expr, cr);
+    if(cs != null) expr = Array.add(expr, cs);
     if(ex.length != expr.length) ctx.compInfo(OPTWRITE, this);
     compFlatten(ctx);
 

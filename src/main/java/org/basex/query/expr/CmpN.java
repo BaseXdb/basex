@@ -76,12 +76,12 @@ public final class CmpN extends Arr {
 
   /**
    * Constructor.
-   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    * @param o comparator
+   * @param ii input info
    */
-  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final OpN o) {
+  public CmpN(final Expr e1, final Expr e2, final OpN o, final InputInfo ii) {
     super(ii, e1, e2);
     op = o;
     type = SeqType.BLN_ZO;

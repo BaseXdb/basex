@@ -61,8 +61,7 @@ public class AxisStep extends Preds {
    * @param t node test
    * @param p predicates
    */
-  AxisStep(final InputInfo ii, final Axis a, final Test t,
-           final Expr... p) {
+  AxisStep(final InputInfo ii, final Axis a, final Test t, final Expr... p) {
     super(ii, p);
     axis = a;
     test = t;
@@ -221,8 +220,8 @@ public class AxisStep extends Preds {
   public final boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof AxisStep)) return false;
     final AxisStep st = (AxisStep) cmp;
-    if(preds.length != st.preds.length || axis != st.axis ||
-        !test.sameAs(st.test)) return false;
+    if(preds.length != st.preds.length || axis != st.axis || !test.sameAs(st.test))
+      return false;
     for(int p = 0; p < preds.length; ++p) {
       if(!preds[p].sameAs(st.preds[p])) return false;
     }

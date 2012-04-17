@@ -42,8 +42,8 @@ public class GFLWOR extends ParseExpr {
    * @param r return expression
    * @param ii input info
    */
-  GFLWOR(final ForLet[] f, final Expr w, final Order o, final Group g,
-      final Expr r, final InputInfo ii) {
+  GFLWOR(final ForLet[] f, final Expr w, final Order o, final Group g, final Expr r,
+      final InputInfo ii) {
 
     super(ii);
     ret = r;
@@ -217,13 +217,11 @@ public class GFLWOR extends ParseExpr {
 
     // check if all clauses are simple, and if variables are removable
     for(final ForLet f : fl) {
-      if(f instanceof For && (!f.simple(false) || !where.removable(f.var)))
-        return;
+      if(f instanceof For && (!f.simple(false) || !where.removable(f.var))) return;
     }
 
     // create array with tests
-    final Expr[] tests = where instanceof And ? ((And) where).expr :
-      new Expr[] { where };
+    final Expr[] tests = where instanceof And ? ((And) where).expr : new Expr[] { where };
 
     // find which tests access which variables. if a test will not use any of
     // the variables defined in the local context, they will be added to the
@@ -248,19 +246,34 @@ public class GFLWOR extends ParseExpr {
     // convert where clause to predicate(s)
     ctx.compInfo(OPTWHERE);
 
-    // bind tests to the corresponding variables
-    for(int t = 0; t < tests.length; ++t) {
-      final ForLet f = fl[tar[t]];
-      // remove variable reference and optionally wrap test with boolean()
-      Expr e = tests[t].remove(f.var);
-      e = Function.BOOLEAN.get(info, e).compEbv(ctx);
+    for(int f = 0; f < fl.length; ++f) {
+      final ForLet c = fl[f];
+      final ExprList el = new ExprList();
+      // find all tests that will be bound to the current clause
+      for(int t = 0; t < tests.length; ++t) {
+        if(tar[t] == f) el.add(tests[t].remove(c.var));
+      }
+      // none found: continue
+      if(el.isEmpty()) continue;
+
       // attach predicates to axis path or filter, or create a new filter
-      if(f.expr instanceof AxisPath) {
-        f.expr = ((AxisPath) f.expr).addPreds(e);
-      } else if(f.expr instanceof Filter) {
-        f.expr = ((Filter) f.expr).addPred(e);
+      final Expr a;
+      if(el.size() == 1) {
+        // one found: wrap with boolean function if value may be numeric
+        final Expr e = el.get(0);
+        a = e.type().mayBeNumber() ? Function.BOOLEAN.get(info, e) : e;
       } else {
-        f.expr = new Filter(info, f.expr, e);
+        // more found: wrap with and expression
+        a = new And(info, el.finish());
+      }
+
+      // add to clause expression
+      if(c.expr instanceof AxisPath) {
+        c.expr = ((AxisPath) c.expr).addPreds(a);
+      } else if(c.expr instanceof Filter) {
+        c.expr = ((Filter) c.expr).addPred(a);
+      } else {
+        c.expr = new Filter(info, c.expr, a);
       }
     }
     // eliminate where clause

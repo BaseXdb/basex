@@ -718,6 +718,26 @@ public final class Token {
   }
 
   /**
+   * Returns the smaller token.
+   * @param token first token
+   * @param compare token to be compared
+   * @return smaller token
+   */
+  public static byte[] min(final byte[] token, final byte[] compare) {
+    return diff(token, compare) < 0 ? token : compare;
+  }
+
+  /**
+   * Returns the bigger token.
+   * @param token first token
+   * @param compare token to be compared
+   * @return bigger token
+   */
+  public static byte[] max(final byte[] token, final byte[] compare) {
+    return diff(token, compare) > 0 ? token : compare;
+  }
+
+  /**
    * Calculates the difference of two characters.
    * @param char1 first character
    * @param char2 character to be compared

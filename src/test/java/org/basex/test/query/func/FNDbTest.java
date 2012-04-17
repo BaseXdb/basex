@@ -101,11 +101,26 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbText() throws BaseXException {
     check(_DB_TEXT);
     // run function without and with index
-    new DropIndex("text").execute(context);
+    new DropIndex(Commands.CmdIndex.TEXT).execute(context);
     query(_DB_TEXT.args(NAME, "XML"), "XML");
-    new CreateIndex("text").execute(context);
+    new CreateIndex(Commands.CmdIndex.TEXT).execute(context);
     query(_DB_TEXT.args(NAME, "XML"), "XML");
     query(_DB_TEXT.args(NAME, "XXX"), "");
+  }
+
+  /**
+   * Test method for the db:text-range() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void dbTextRange() throws BaseXException {
+    check(_DB_TEXT_RANGE);
+    // run function without and with index
+    new DropIndex(Commands.CmdIndex.TEXT).execute(context);
+    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1Exercise 2");
+    new CreateIndex(Commands.CmdIndex.TEXT).execute(context);
+    query(_DB_TEXT_RANGE.args(NAME, "Exercise", "Fun"), "Exercise 1Exercise 2");
+    query(_DB_TEXT_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
   /**
@@ -116,13 +131,28 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbAttribute() throws BaseXException {
     check(_DB_ATTRIBUTE);
     // run function without and with index
-    new DropIndex("attribute").execute(context);
+    new DropIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
-    new CreateIndex("attribute").execute(context);
+    new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "id")), "0");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "0", "XXX")), "");
     query(DATA.args(_DB_ATTRIBUTE.args(NAME, "XXX")), "");
+  }
+
+  /**
+   * Test method for the db:attribute-range() function.
+   * @throws BaseXException database exception
+   */
+  @Test
+  public void dbAttributeRange() throws BaseXException {
+    check(_DB_ATTRIBUTE_RANGE);
+    // run function without and with index
+    new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
+    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0 1");
+    new CreateIndex(Commands.CmdIndex.ATTRIBUTE).execute(context);
+    query(_DB_ATTRIBUTE_RANGE.args(NAME, "0", "9") + "/data()", "0 1");
+    query(_DB_ATTRIBUTE_RANGE.args(NAME, "XXX", "XXX"), "");
   }
 
   /**
@@ -133,9 +163,9 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbFulltext() throws BaseXException {
     check(_DB_FULLTEXT);
     // run function without and with index
-    new DropIndex("fulltext").execute(context);
+    new DropIndex(Commands.CmdIndex.FULLTEXT).execute(context);
     error(_DB_FULLTEXT.args(NAME, "assignments"), Err.NOINDEX);
-    new CreateIndex("fulltext").execute(context);
+    new CreateIndex(Commands.CmdIndex.FULLTEXT).execute(context);
     query(_DB_FULLTEXT.args(NAME, "assignments"), "Assignments");
     query(_DB_FULLTEXT.args(NAME, "XXX"), "");
   }

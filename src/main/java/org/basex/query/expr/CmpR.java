@@ -2,30 +2,19 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.data.MemData;
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.index.StatsType;
-import org.basex.index.Names;
-import org.basex.index.RangeToken;
-import org.basex.index.Stats;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.SeqType;
-import org.basex.query.iter.Iter;
-import org.basex.query.path.Axis;
-import org.basex.query.path.AxisPath;
-import org.basex.query.path.AxisStep;
-import org.basex.query.path.NameTest;
+import org.basex.index.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.*;
 import org.basex.query.path.Test.Mode;
-import org.basex.query.util.IndexContext;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Numeric range expression.
@@ -43,21 +32,21 @@ public final class CmpR extends Single {
   /** Include maximum value. */
   private final boolean mxi;
   /** Index container. */
-  private RangeToken rt;
+  private NumericRange rt;
   /** Flag for atomic evaluation. */
   private final boolean atomic;
 
   /**
    * Constructor.
-   * @param ii input info
    * @param e (compiled) expression
    * @param mn minimum value
    * @param in include minimum value
    * @param mx maximum value
    * @param ix include maximum value
+   * @param ii input info
    */
-  private CmpR(final InputInfo ii, final Expr e, final double mn, final boolean in,
-      final double mx, final boolean ix) {
+  private CmpR(final Expr e, final double mn, final boolean in, final double mx,
+      final boolean ix, final InputInfo ii) {
 
     super(ii, e);
     min = mn;
@@ -70,8 +59,8 @@ public final class CmpR extends Single {
 
   /**
    * Tries to convert the specified expression into a range expression.
-   * @param ex expression
-   * @return resulting or specified expression
+   * @param ex expression to be converted
+   * @return new or original expression
    * @throws QueryException query exception
    */
   static Expr get(final CmpG ex) throws QueryException {
@@ -82,11 +71,10 @@ public final class CmpR extends Single {
     final Expr e = ex.expr[0];
     final double d = it.dbl(ex.info);
     switch(ex.op.op) {
-      case EQ: return new CmpR(ex.info, e, d, true, d, true);
-      case GE: return new CmpR(ex.info, e, d, true, Double.POSITIVE_INFINITY, true);
-      case GT: return new CmpR(ex.info, e, d, false, Double.POSITIVE_INFINITY, true);
-      case LE: return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, true);
-      case LT: return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, false);
+      case GE: return new CmpR(e, d, true, Double.POSITIVE_INFINITY, true, ex.info);
+      case GT: return new CmpR(e, d, false, Double.POSITIVE_INFINITY, true, ex.info);
+      case LE: return new CmpR(e, Double.NEGATIVE_INFINITY, true, d, true, ex.info);
+      case LT: return new CmpR(e, Double.NEGATIVE_INFINITY, true, d, false, ex.info);
       default: return ex;
     }
   }
@@ -116,18 +104,28 @@ public final class CmpR extends Single {
    * @return resulting expression or {@code null}
    */
   Expr intersect(final CmpR c) {
+    // skip intersection if expressions to be compared are different
     if(!c.expr.sameAs(expr)) return null;
+
+    // find common minimum and maximum value
     final double mn = Math.max(min, c.min);
     final double mx = Math.min(max, c.max);
-    return mn > mx ? Bln.FALSE :
-      new CmpR(info, c.expr, mn, mni && c.mni, mx, mxi && c.mxi);
+
+    // remove comparisons that will never yield results
+    if(mn > mx) return Bln.FALSE;
+    if(mn == mx) {
+      // return simplified comparison for exact hit, or false if value is not included
+      return mni && mxi ? new CmpG(expr, Dbl.get(mn), CmpG.OpG.EQ, info) : Bln.FALSE;
+    }
+
+    return new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);
   }
 
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
     final AxisStep s = CmpG.indexStep(expr);
-    // sequential main memory is assumed to be faster than range index access
+    // no range index support in main-memory index structures
     if(s == null || ic.data instanceof MemData) return false;
 
     // check which index applies
@@ -139,13 +137,14 @@ public final class CmpR extends Single {
     if(key == null) return false;
 
     // estimate costs for range access; all values out of range: no results
-    rt = new RangeToken(text, Math.max(min, key.min), Math.min(max, key.max));
+    rt = new NumericRange(text ? IndexType.TEXT : IndexType.ATTRIBUTE,
+        Math.max(min, key.min), Math.min(max, key.max));
     ic.costs(rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
       Math.max(1, ic.data.meta.size / 5));
 
     // use index if costs are zero, or if min/max is not infinite
     return ic.costs() == 0 || min != Double.NEGATIVE_INFINITY &&
-      max != Double.POSITIVE_INFINITY;
+        max != Double.POSITIVE_INFINITY;
   }
 
   @Override

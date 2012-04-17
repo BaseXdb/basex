@@ -20,7 +20,7 @@ import org.junit.runners.model.*;
  * @author Dimitar Popov
  */
 @InputData("<x>A x B</x>")
-public class FTIndexQueryTest extends SandboxTest {
+public final class FTIndexQueryTest extends SandboxTest {
   /** Name of database with full-text index. */
   private static final String NAME_IX = NAME + "ix";
   /** Context of database with full-text index. */
@@ -134,13 +134,13 @@ class CreateDBRule implements MethodRule {
   @Override
   public Statement apply(final Statement base, final FrameworkMethod method,
       final Object target) {
+
     return new Statement() {
       @Override
       public void evaluate() throws Throwable {
         InputData input = method.getAnnotation(InputData.class);
         if(input == null) {
-          input = method.getMethod().getDeclaringClass().getAnnotation(
-              InputData.class);
+          input = method.getMethod().getDeclaringClass().getAnnotation(InputData.class);
         }
         if(input != null) new CreateDB(db, input.value()).execute(ctx);
         base.evaluate();

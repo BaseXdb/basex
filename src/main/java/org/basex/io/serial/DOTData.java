@@ -1,50 +1,15 @@
 package org.basex.io.serial;
 
 import static org.basex.core.Text.*;
-import org.basex.data.ExprInfo;
-import org.basex.query.expr.And;
-import org.basex.query.expr.Arith;
-import org.basex.query.expr.CFrag;
-import org.basex.query.expr.Cast;
-import org.basex.query.expr.Catch;
-import org.basex.query.expr.CmpG;
-import org.basex.query.expr.CmpN;
-import org.basex.query.expr.CmpR;
-import org.basex.query.expr.CmpV;
-import org.basex.query.expr.Context;
-import org.basex.query.expr.Except;
-import org.basex.query.expr.If;
-import org.basex.query.expr.IndexAccess;
-import org.basex.query.expr.InterSect;
-import org.basex.query.expr.List;
-import org.basex.query.expr.Or;
-import org.basex.query.expr.Pos;
-import org.basex.query.expr.Preds;
-import org.basex.query.expr.Quantifier;
-import org.basex.query.expr.Range;
-import org.basex.query.expr.RangeAccess;
-import org.basex.query.expr.Root;
-import org.basex.query.expr.Try;
-import org.basex.query.expr.Union;
-import org.basex.query.expr.VarRef;
-import org.basex.query.flwor.FLWR;
-import org.basex.query.flwor.ForLet;
-import org.basex.query.flwor.GFLWOR;
-import org.basex.query.flwor.Order;
-import org.basex.query.flwor.OrderBy;
-import org.basex.query.flwor.OrderByExpr;
-import org.basex.query.ft.FTContains;
-import org.basex.query.ft.FTExpr;
-import org.basex.query.ft.FTIndexAccess;
-import org.basex.query.func.StandardFunc;
-import org.basex.query.func.UserFunc;
-import org.basex.query.func.UserFuncCall;
-import org.basex.query.func.UserFuncs;
-import org.basex.query.path.AxisStep;
-import org.basex.query.path.Path;
-import org.basex.query.util.Var;
-import org.basex.query.util.VarStack;
-import org.basex.util.Util;
+
+import org.basex.data.*;
+import org.basex.query.expr.*;
+import org.basex.query.flwor.*;
+import org.basex.query.ft.*;
+import org.basex.query.func.*;
+import org.basex.query.path.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * This class contains formatting information for the DOT output.
@@ -138,8 +103,9 @@ final class DOTData {
     { "00BBBB", StandardFunc.class },
     { "00BBBB", Root.class },
     { "00BBBB", VarRef.class },
-    { "00BBBB", IndexAccess.class },
+    { "00BBBB", ValueAccess.class },
     { "00BBBB", RangeAccess.class },
+    { "00BBBB", StringRangeAccess.class },
     { "00BBBB", FTIndexAccess.class },
   };
 

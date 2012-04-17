@@ -114,8 +114,7 @@ public abstract class Path extends ParseExpr {
     boolean opt = false;
     Expr[] st = steps;
     for(int l = 1; l < st.length; ++l) {
-      if(!(st[l - 1] instanceof AxisStep &&
-           st[l] instanceof AxisStep)) continue;
+      if(!(st[l - 1] instanceof AxisStep && st[l] instanceof AxisStep)) continue;
 
       final AxisStep prev = (AxisStep) st[l - 1];
       final AxisStep curr = (AxisStep) st[l];
@@ -141,8 +140,7 @@ public abstract class Path extends ParseExpr {
     // set atomic type for single attribute steps to speedup predicate tests
     if(root == null && st.length == 1 && st[0] instanceof AxisStep) {
       final AxisStep curr = (AxisStep) st[0];
-      if(curr.axis == ATTR && curr.test.mode == Mode.STD)
-        curr.type = SeqType.NOD_ZO;
+      if(curr.axis == ATTR && curr.test.mode == Mode.STD) curr.type = SeqType.NOD_ZO;
     }
     steps = st;
   }

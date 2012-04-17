@@ -1309,11 +1309,11 @@ public class QueryParser extends InputParser {
     final Expr e = ftContains();
     if(e != null) {
       for(final OpV c : OpV.values()) if(wsConsumeWs(c.name))
-        return new CmpV(info(), e, check(ftContains(), CMPEXPR), c);
+        return new CmpV(e, check(ftContains(), CMPEXPR), c, info());
       for(final OpN c : OpN.values()) if(wsConsumeWs(c.name))
-        return new CmpN(info(), e, check(ftContains(), CMPEXPR), c);
+        return new CmpN(e, check(ftContains(), CMPEXPR), c, info());
       for(final OpG c : OpG.values()) if(wsConsumeWs(c.name))
-        return new CmpG(info(), e, check(ftContains(), CMPEXPR), c);
+        return new CmpG(e, check(ftContains(), CMPEXPR), c, info());
     }
     return e;
   }

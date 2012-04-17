@@ -118,20 +118,21 @@ public final class CmpG extends Cmp {
   /** Comparator. */
   OpG op;
   /** Index expression. */
-  private IndexAccess[] iacc = {};
+  private ValueAccess[] va = {};
   /** Flag for atomic evaluation. */
   private boolean atomic;
 
   /**
    * Constructor.
-   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    * @param o operator
+   * @param ii input info
    */
-  public CmpG(final InputInfo ii, final Expr e1, final Expr e2, final OpG o) {
+  public CmpG(final Expr e1, final Expr e2, final OpG o, final InputInfo ii) {
     super(ii, e1, e2);
     op = o;
+    type = SeqType.BLN;
   }
 
   @Override
@@ -172,12 +173,12 @@ public final class CmpG extends Cmp {
     } else {
       // rewrite path CMP number
       e = CmpR.get(this);
+      if(e == this) e = CmpSR.get(this);
       if(e != this) ctx.compInfo(OPTWRITE, this);
     }
 
     // check if both arguments will always yield one result
     atomic = e1.type().zeroOrOne() && e2.type().zeroOrOne();
-    type = SeqType.BLN;
     return e;
   }
 
@@ -273,7 +274,7 @@ public final class CmpG extends Cmp {
   @Override
   public CmpG invert() {
     return expr[0].size() != 1 || expr[1].size() != 1 ? this :
-      new CmpG(info, expr[0], expr[1], op.invert());
+      new CmpG(expr[0], expr[1], op.invert(), info);
   }
 
   /**
@@ -313,11 +314,11 @@ public final class CmpG extends Cmp {
          //*[text() = .]
          //*[text() = (if(math:random() < .5) then 'X' else 'Y')]
        */
-      if(!t.type.isString() && !t.type.isNode() ||
-          arg.uses(Use.CTX) || arg.uses(Use.NDT)) return false;
+      if(!t.type.isString() && !t.type.isNode() || arg.uses(Use.CTX) || arg.uses(Use.NDT))
+        return false;
 
       ic.addCosts(ic.data.meta.size / 10);
-      iacc = Array.add(iacc, new IndexAccess(info, arg, ind, ic));
+      va = Array.add(va, new ValueAccess(info, arg, ind, ic));
       return true;
     }
 
@@ -332,7 +333,7 @@ public final class CmpG extends Cmp {
       final int is = ic.data.count(new ValuesToken(ind, it.string(info)));
       // add only expressions that yield results
       if(is != 0) {
-        iacc = Array.add(iacc, new IndexAccess(info, it, ind, ic));
+        va = Array.add(va, new ValueAccess(info, it, ind, ic));
         ic.addCosts(is);
       }
     }
@@ -342,10 +343,10 @@ public final class CmpG extends Cmp {
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
     // will only be called for costs != 0
-    final boolean text = iacc[0].itype == IndexType.TEXT;
+    final boolean text = va[0].itype == IndexType.TEXT;
     ic.ctx.compInfo(text ? OPTTXTINDEX : OPTATVINDEX);
     // more than one string - merge index results
-    final ParseExpr root = iacc.length == 1 ? iacc[0] : new Union(info, iacc);
+    final ParseExpr root = va.length == 1 ? va[0] : new Union(info, va);
     return ic.invert(expr[0], root, text);
   }
 

@@ -69,15 +69,17 @@ public final class FNDb extends StandardFunc {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(sig) {
-      case _DB_OPEN:         return open(ctx).iter();
-      case _DB_TEXT:         return text(ctx);
-      case _DB_ATTRIBUTE:    return attribute(ctx);
-      case _DB_FULLTEXT:     return fulltext(ctx);
-      case _DB_LIST:         return list(ctx);
-      case _DB_LIST_DETAILS: return listDetails(ctx);
-      case _DB_NODE_ID:      return node(ctx, true);
-      case _DB_NODE_PRE:     return node(ctx, false);
-      default:               return super.iter(ctx);
+      case _DB_OPEN:            return open(ctx).iter();
+      case _DB_TEXT:            return valueAccess(true, ctx).iter(ctx);
+      case _DB_TEXT_RANGE:      return rangeAccess(true, ctx).iter(ctx);
+      case _DB_ATTRIBUTE:       return attribute(valueAccess(false, ctx), ctx, 2);
+      case _DB_ATTRIBUTE_RANGE: return attribute(rangeAccess(false, ctx), ctx, 3);
+      case _DB_FULLTEXT:        return fulltext(ctx);
+      case _DB_LIST:            return list(ctx);
+      case _DB_LIST_DETAILS:    return listDetails(ctx);
+      case _DB_NODE_ID:         return node(ctx, true);
+      case _DB_NODE_PRE   :     return node(ctx, false);
+      default:                  return super.iter(ctx);
     }
   }
 
@@ -90,9 +92,7 @@ public final class FNDb extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _DB_EVENT:        return event(ctx);
       case _DB_OPEN_ID:      return open(ctx, true);
@@ -133,9 +133,7 @@ public final class FNDb extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private DBNode open(final QueryContext ctx, final boolean id)
-      throws QueryException {
-
+  private DBNode open(final QueryContext ctx, final boolean id) throws QueryException {
     final Data data = data(0, ctx);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? data.pre(v) : v;
@@ -144,32 +142,52 @@ public final class FNDb extends StandardFunc {
   }
 
   /**
-   * Performs the text function.
+   * Returns an index accessor.
+   * @param text text/attribute flag
+   * @param ctx query context
+   * @return index accessor
+   * @throws QueryException query exception
+   */
+  private ValueAccess valueAccess(final boolean text, final QueryContext ctx)
+      throws QueryException {
+    final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
+    final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
+    return new ValueAccess(info, expr[1], it, ic);
+  }
+
+  /**
+   * Returns a range index accessor.
+   * @param text text/attribute flag
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter text(final QueryContext ctx) throws QueryException {
+  private StringRangeAccess rangeAccess(final boolean text, final QueryContext ctx)
+      throws QueryException {
     final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
-    return new IndexAccess(info, expr[1], IndexType.TEXT, ic).iter(ctx);
+    final byte[] min = checkStr(expr[1], ctx);
+    final byte[] max = checkStr(expr[2], ctx);
+    final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
+    final StringRange sr = new StringRange(it, min, true, max, true);
+    return new StringRangeAccess(info, sr, ic);
   }
 
   /**
    * Performs the attribute function.
+   * @param ia index access
    * @param ctx query context
+   * @param a index of attribute argument
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter attribute(final QueryContext ctx) throws QueryException {
-    final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
-    final IndexAccess ia = new IndexAccess(
-        info, expr[1], IndexType.ATTRIBUTE, ic);
+  private Iter attribute(final IndexAccess ia, final QueryContext ctx, final int a)
+      throws QueryException {
 
-    // return iterator if no name test is specified
-    if(expr.length < 3) return ia.iter(ctx);
+    // no attribute specified
+    if(expr.length <= a) return ia.iter(ctx);
 
     // parse and compile the name test
-    final Item name = checkNoEmpty(expr[2].item(ctx, info));
+    final Item name = checkNoEmpty(expr[a].item(ctx, info));
     final QNm nm = new QNm(checkStr(name, ctx), ctx);
     if(!nm.hasPrefix()) nm.uri(ctx.sc.ns.uri(EMPTY));
 
@@ -178,7 +196,7 @@ public final class FNDb extends StandardFunc {
     if(!nt.comp(ctx)) return Empty.ITER;
 
     // wrap iterator with name test
-    return new Iter() {
+    return new NodeIter() {
       final NodeIter ir = ia.iter(ctx);
       @Override
       public ANode next() throws QueryException {
@@ -609,9 +627,7 @@ public final class FNDb extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter node(final QueryContext ctx, final boolean id)
-      throws QueryException {
-
+  private Iter node(final QueryContext ctx, final boolean id) throws QueryException {
     return new Iter() {
       final Iter ir = ctx.iter(expr[0]);
 
@@ -665,8 +681,9 @@ public final class FNDb extends StandardFunc {
       sig == Function._DB_OPTIMIZE || sig == Function._DB_STORE;
     return
       // skip evaluation at compile time
-      u == Use.CTX && (
+      u == Use.NDT && (
         sig == Function._DB_TEXT || sig == Function._DB_ATTRIBUTE ||
+        sig == Function._DB_TEXT_RANGE || sig == Function._DB_ATTRIBUTE_RANGE ||
         sig == Function._DB_FULLTEXT || sig == Function._DB_EVENT || up) ||
       u == Use.UPD && up ||
       super.uses(u);
@@ -688,9 +705,7 @@ public final class FNDb extends StandardFunc {
    * @return normalized path
    * @throws QueryException query exception
    */
-  private String path(final int i, final QueryContext ctx)
-      throws QueryException {
-
+  private String path(final int i, final QueryContext ctx) throws QueryException {
     final String path = string(checkStr(expr[i], ctx));
     final String norm = MetaData.normPath(path);
     if(norm == null) RESINV.thrw(info, path);

@@ -16,7 +16,7 @@ import org.basex.util.InputInfo;
  * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-final class TailFuncCall extends UserFuncCall {
+public final class TailFuncCall extends UserFuncCall {
   /**
    * Constructor.
    * @param ii input info

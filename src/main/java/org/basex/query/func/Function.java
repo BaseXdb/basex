@@ -455,9 +455,14 @@ public enum Function {
   _DB_OPEN_ID(FNDb.class, "open-id(database,id)", NOD_ZM, STR, ITR),
   /** Database function: searches the text index. */
   _DB_TEXT(FNDb.class, "text(database,string)", NOD_ZM, STR, ITEM),
+  /** Database function: searches the text index. */
+  _DB_TEXT_RANGE(FNDb.class, "text-range(database,from,to)", NOD_ZM, STR, ITEM, ITEM),
   /** Database function: searches the attribute index. */
   _DB_ATTRIBUTE(FNDb.class, "attribute(database,string[,name])",
       NOD_ZM, 2, STR, ITEM, STR),
+  /** Database function: searches the attribute index. */
+  _DB_ATTRIBUTE_RANGE(FNDb.class, "attribute-range(database,from,to[,name])",
+      NOD_ZM, 3, STR, ITEM, ITEM, STR),
   /** Database function: searches the full-text index. */
   _DB_FULLTEXT(FNDb.class, "fulltext(database,string)", NOD_ZM, STR, STR),
   /** Database function: lists all databases or documents in a database. */

@@ -13,7 +13,7 @@ import org.junit.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Dimitar Popov
  */
-public class FTWildcardTest {
+public final class FTWildcardTest {
   /** Sample texts which should be matched. */
   private static final String[][] TEXTS_GOOD = {
     { "well", "wall", "will", "w.ll", "w\u00fcll" },

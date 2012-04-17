@@ -1,5 +1,7 @@
 package org.basex.test.query.ast;
 
+import org.basex.query.func.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -23,7 +25,7 @@ public class TCOTest extends QueryPlanTest {
         "14721860295199062616467307339074198149529600000000000000000000000000" +
         "00",
 
-        "exists(//TailFuncCall)"
+        "exists(//" + Util.name(TailFuncCall.class) + ")"
     );
   }
 
@@ -42,7 +44,7 @@ public class TCOTest extends QueryPlanTest {
 
         "true",
 
-        "count(//TailFuncCall) eq 2"
+        "count(//" + Util.name(TailFuncCall.class) + ") eq 2"
     );
   }
 
@@ -58,8 +60,8 @@ public class TCOTest extends QueryPlanTest {
 
         "1024",
 
-        "exists(//TailFuncCall)",
-        "count(//BaseFuncCall) eq 2"
+        "exists(//" + Util.name(TailFuncCall.class) + ")",
+        "count(//" + Util.name(BaseFuncCall.class) + ") eq 2"
     );
   }
 
@@ -70,8 +72,9 @@ public class TCOTest extends QueryPlanTest {
 
         null,
 
-        "exists(//UserFunc/TailFuncCall)",
-        "exists(//BaseFuncCall)"
+        "exists(//" + Util.name(UserFunc.class) + "/" +
+        Util.name(TailFuncCall.class) + ")",
+        "exists(//" + Util.name(BaseFuncCall.class) + ")"
     );
   }
 }

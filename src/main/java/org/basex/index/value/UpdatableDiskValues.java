@@ -55,22 +55,44 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  protected IndexIterator idRange(final RangeToken tok) {
+  IndexIterator idRange(final StringRange tok) {
+    // check if min and max are positive integers with the same number of digits
+    final IntList pres = new IntList();
+    final int i = get(tok.min);
+    for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < size; l++) {
+      final int ps = idxl.readNum(idxr.read5(l * 5L));
+      int id = idxl.readNum();
+      final int pre = data.pre(id);
+
+      // value is too large: skip traversal
+      final int d = diff(data.text(pre, text), tok.max);
+      if(d > 0 || !tok.mxi && d == 0) break;
+      // add pre values
+      for(int p = 0; p < ps; ++p) {
+        pres.add(data.pre(id));
+        id += idxl.readNum();
+      }
+    }
+    return iter(pres.sort());
+  }
+
+  @Override
+  protected IndexIterator idRange(final NumericRange tok) {
     final double min = tok.min;
     final double max = tok.max;
 
     // check if min and max are positive integers with the same number of digits
     final int len = max > 0 && (long) max == max ? token(max).length : 0;
-    final boolean simple = len != 0 && min > 0 && (long) min == min
-        && token(min).length == len;
+    final boolean simple = len != 0 && min > 0 && (long) min == min &&
+        token(min).length == len;
 
     final IntList pres = new IntList();
     for(int l = 0; l < size; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int id = idxl.readNum();
       final int pre = data.pre(id);
-      final double v = data.textDbl(pre, text);
 
+      final double v = data.textDbl(pre, text);
       if(v >= min && v <= max) {
         // value is in range
         for(int d = 0; d < ds; ++d) {

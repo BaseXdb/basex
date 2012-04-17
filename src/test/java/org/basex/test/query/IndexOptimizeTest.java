@@ -218,7 +218,7 @@ public final class IndexOptimizeTest extends SandboxTest {
       qp.plan(Serializer.get(plan));
 
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
-          "[self::IndexAccess|self::FTIndexAccess]", context);
+          "[self::ValueAccess|self::FTIndexAccess]", context);
       ao = new ArrayOutput();
       ser = qp.getSerializer(ao);
       qp.execute().serialize(ser);

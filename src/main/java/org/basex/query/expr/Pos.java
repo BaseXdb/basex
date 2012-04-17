@@ -61,8 +61,8 @@ public final class Pos extends Simple {
    * @return resulting expression, or {@code null}
    * @throws QueryException query exception
    */
-  public static Expr get(final OpV cmp, final Expr a, final Expr o,
-      final InputInfo ii) throws QueryException {
+  public static Expr get(final OpV cmp, final Expr a, final Expr o, final InputInfo ii)
+      throws QueryException {
 
     if(a.isItem()) {
       final Item it = (Item) a;
@@ -83,8 +83,7 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCtx(ctx);
     return Bln.get(ctx.pos >= min && ctx.pos <= max);
   }

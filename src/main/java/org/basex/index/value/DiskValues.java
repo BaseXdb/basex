@@ -79,11 +79,11 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public synchronized IndexIterator iter(final IndexToken tok) {
-    if(tok instanceof RangeToken) return idRange((RangeToken) tok);
+  public synchronized IndexIterator iter(final IndexToken it) {
+    if(it instanceof StringRange) return idRange((StringRange) it);
+    if(it instanceof NumericRange) return idRange((NumericRange) it);
 
-    final byte[] key = tok.get();
-
+    final byte[] key = it.get();
     final CacheEntry e = cache.get(key);
     if(e != null) return iter(e.size, e.pointer);
 
@@ -95,7 +95,8 @@ public class DiskValues implements Index {
 
   @Override
   public synchronized int count(final IndexToken it) {
-    if(it instanceof RangeToken) return idRange((RangeToken) it).size();
+    if(it instanceof StringRange) return idRange((StringRange) it).size();
+    if(it instanceof NumericRange) return idRange((NumericRange) it).size();
 
     final byte[] key = it.get();
     if(key.length > data.meta.maxlen) return Integer.MAX_VALUE;
@@ -143,8 +144,8 @@ public class DiskValues implements Index {
    * @return compressed values
    */
   byte[] nextValues() {
-    return idxr.cursor() >= idxr.length() ? EMPTY : idxl.readBytes(
-        idxr.read5(), idxl.read4());
+    return idxr.cursor() >= idxr.length() ? EMPTY :
+      idxl.readBytes(idxr.read5(), idxl.read4());
   }
 
   /**
@@ -156,12 +157,36 @@ public class DiskValues implements Index {
   IndexIterator iter(final int s, final long ps) {
     final IntList pres = new IntList(s);
     long p = ps;
-    for(int l = 0, v = 0; l < s; ++l) {
-      v += idxl.readNum(p);
+    for(int i = 0, pre = 0; i < s; i++) {
+      pre += idxl.readNum(p);
       p = idxl.cursor();
-      pres.add(v);
+      pres.add(pre);
     }
     return iter(pres);
+  }
+
+  /**
+   * Performs a string-based range query.
+   * @param tok index term
+   * @return results
+   */
+  IndexIterator idRange(final StringRange tok) {
+    // check if min and max are positive integers with the same number of digits
+    final IntList pres = new IntList();
+    final int i = get(tok.min);
+    for(int l = i < 0 ? -i - 1 : tok.mni ? i : i + 1; l < size; l++) {
+      final int ps = idxl.readNum(idxr.read5(l * 5L));
+      int pre = idxl.readNum();
+      // value is too large: skip traversal
+      final int d = diff(data.text(pre, text), tok.max);
+      if(d > 0 || !tok.mxi && d == 0) break;
+      // add pre values
+      for(int p = 0; p < ps; ++p) {
+        pres.add(pre);
+        pre += idxl.readNum();
+      }
+    }
+    return iter(pres.sort());
   }
 
   /**
@@ -169,7 +194,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  IndexIterator idRange(final RangeToken tok) {
+  IndexIterator idRange(final NumericRange tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -184,7 +209,6 @@ public class DiskValues implements Index {
       int pre = idxl.readNum();
 
       final double v = data.textDbl(pre, text);
-
       if(v >= min && v <= max) {
         // value is in range
         for(int d = 0; d < ds; ++d) {
@@ -256,8 +280,7 @@ public class DiskValues implements Index {
   /**
    * Binary search for key in the {@link #idxr}.
    * <em>Important:</em> This method has to be called while being in the monitor
-   * of this instance, e.g. from a {@code synchronized}
-   * method.
+   * of this instance, e.g. from a {@code synchronized} method.
    * @param key token to be found
    * @param first begin of the search interval
    * @param last end of the search interval

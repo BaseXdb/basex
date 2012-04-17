@@ -131,9 +131,7 @@ public class AxisPath extends Path {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  private Expr index(final QueryContext ctx, final Data data)
-      throws QueryException {
-
+  private Expr index(final QueryContext ctx, final Data data) throws QueryException {
     // disallow relative paths and numeric predicates
     if(root == null || uses(Use.POS)) return this;
 

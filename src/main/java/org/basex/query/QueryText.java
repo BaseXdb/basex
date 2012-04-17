@@ -680,6 +680,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTRNGINDEX = "applying range index";
   /** Optimization info. */
+  String OPTSRNGINDEX = "applying string range index";
+  /** Optimization info. */
   String OPTNOINDEX = "removing path with no index results";
   /** Optimization info. */
   String OPTBIND = "binding static variable %";

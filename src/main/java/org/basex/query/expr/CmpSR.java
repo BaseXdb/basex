@@ -1,0 +1,170 @@
+package org.basex.query.expr;
+
+import static org.basex.query.QueryText.*;
+
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.index.IndexToken.IndexType;
+import org.basex.index.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+
+/**
+ * String range expression.
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Christian Gruen
+ */
+public final class CmpSR extends Single {
+  /** Minimum. */
+  private final byte[] min;
+  /** Include minimum value. */
+  private final boolean mni;
+  /** Maximum. */
+  private final byte[] max;
+  /** Include maximum value. */
+  private final boolean mxi;
+  /** Index container. */
+  private StringRange rt;
+  /** Flag for atomic evaluation. */
+  private final boolean atomic;
+
+  /**
+   * Constructor.
+   * @param e (compiled) expression
+   * @param mn minimum value
+   * @param in include minimum value
+   * @param mx maximum value
+   * @param ix include maximum value
+   * @param ii input info
+   */
+  private CmpSR(final Expr e, final byte[] mn, final boolean in, final byte[] mx,
+      final boolean ix, final InputInfo ii) {
+
+    super(ii, e);
+    min = mn;
+    mni = in;
+    max = mx;
+    mxi = ix;
+    type = SeqType.BLN;
+    atomic = e.type().zeroOrOne();
+  }
+
+  /**
+   * Tries to convert the specified expression into a range expression.
+   * @param ex expression to be converted
+   * @return new or original expression
+   * @throws QueryException query exception
+   */
+  static Expr get(final CmpG ex) throws QueryException {
+    if(!ex.expr[1].isItem()) return ex;
+    final Item it = (Item) ex.expr[1];
+    if(!it.type.isString()) return ex;
+
+    final Expr e = ex.expr[0];
+    final byte[] d = it.string(ex.info);
+    switch(ex.op.op) {
+      case GE: return new CmpSR(e, d, true, null, true, ex.info);
+      case GT: return new CmpSR(e, d, false, null, true, ex.info);
+      case LE: return new CmpSR(e, null, true, d, true, ex.info);
+      case LT: return new CmpSR(e, null, true, d, false, ex.info);
+      default: return ex;
+    }
+  }
+
+  @Override
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
+    // atomic evaluation of arguments (faster)
+    if(atomic) {
+      final Item it = expr.item(ctx, info);
+      if(it == null) return Bln.FALSE;
+      final byte[] s = it.string(info);
+      final int mn = min == null ? 1 : Token.diff(s, min);
+      final int mx = max == null ? -1 : Token.diff(s, max);
+      return Bln.get((mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0));
+    }
+
+    // iterative evaluation
+    final Iter ir = ctx.iter(expr);
+    for(Item it; (it = ir.next()) != null;) {
+      final byte[] s = it.string(info);
+      final int mn = min == null ? 1 : Token.diff(s, min);
+      final int mx = max == null ? -1 : Token.diff(s, max);
+      if((mni ? mn >= 0 : mn > 0) && (mxi ? mx <= 0 : mx < 0)) return Bln.TRUE;
+    }
+    return Bln.FALSE;
+  }
+
+  /**
+   * Creates an intersection of the existing and the specified expressions.
+   * @param c range comparison
+   * @return resulting expression or {@code null}
+   */
+  Expr intersect(final CmpSR c) {
+    // skip intersection if expressions to be compared are different
+    if(!c.expr.sameAs(expr)) return null;
+
+    // find common minimum and maximum value
+    final byte[] mn = min == null ? c.min : c.min == null ? min : Token.max(min, c.min);
+    final byte[] mx = max == null ? c.max : c.max == null ? max : Token.min(max, c.max);
+
+    if(mn != null && mx != null) {
+      final int d = Token.diff(mn, mx);
+      // remove comparisons that will never yield results
+      if(d > 0) return Bln.FALSE;
+      if(d == 0) {
+        // return simplified comparison for exact hit, or false if value is not included
+        return mni && mxi ? new CmpG(expr, Str.get(mn), CmpG.OpG.EQ, info) : Bln.FALSE;
+      }
+    }
+    return new CmpSR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi, info);
+  }
+
+  @Override
+  public boolean indexAccessible(final IndexContext ic) {
+    // accept only location path, string and equality expressions
+    final AxisStep s = CmpG.indexStep(expr);
+    // no range index support in main-memory index structures
+    if(s == null || ic.data instanceof MemData) return false;
+
+    // check which index applies
+    final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;
+    final boolean attr = s.test.type == NodeType.ATT && ic.data.meta.attrindex;
+    if(!text && !attr || min == null || max == null) return false;
+
+    // create range access
+    rt = new StringRange(text ? IndexType.TEXT : IndexType.ATTRIBUTE, min, mni, max, mxi);
+    ic.costs(Math.max(1, ic.data.meta.size / 10));
+    return true;
+  }
+
+  @Override
+  public Expr indexEquivalent(final IndexContext ic) {
+    final boolean text = rt.type() == IndexType.TEXT;
+    ic.ctx.compInfo(OPTSRNGINDEX);
+    return ic.invert(expr, new StringRangeAccess(info, rt, ic), text);
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, MIN, min != null ? min : Token.EMPTY, MAX,
+        max != null ? max : Token.EMPTY);
+    expr.plan(ser);
+    ser.closeElement();
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    if(min != null) tb.add('"').add(min).add('"').add(mni ? " <= " : " < ");
+    tb.addExt(expr);
+    if(max != null) tb.add(mxi ? " <= " : " < ").add('"').add(max).add('"');
+    return tb.toString();
+  }
+}

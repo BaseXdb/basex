@@ -3,14 +3,14 @@ package org.basex.index;
 import org.basex.util.Token;
 
 /**
- * This class defines access to index text tokens.
+ * This class stores a numeric range for index access.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class RangeToken implements IndexToken {
+public final class NumericRange implements IndexToken {
   /** Index type. */
-  public final IndexType ind;
+  public final IndexType type;
   /** Minimum value. */
   public final double min;
   /** Maximum value. */
@@ -18,19 +18,19 @@ public final class RangeToken implements IndexToken {
 
   /**
    * Constructor.
-   * @param i index type
+   * @param it index type
    * @param mn minimum value
    * @param mx maximum value
    */
-  public RangeToken(final boolean i, final double mn, final double mx) {
-    ind = i ? IndexType.TEXT : IndexType.ATTRIBUTE;
+  public NumericRange(final IndexType it, final double mn, final double mx) {
+    type = it;
     min = mn;
     max = mx;
   }
 
   @Override
   public IndexType type() {
-    return ind;
+    return type;
   }
 
   @Override
