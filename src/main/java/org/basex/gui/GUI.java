@@ -434,7 +434,7 @@ public final class GUI extends AGUI {
             result.size() != 0 ? (Nodes) result : null;
 
         // treat text view different to other views
-        if(nodes == null) {
+        if(nodes == null && !interrupted) {
           // display text view
           if(!text.visible()) GUICommands.C_SHOWTEXT.execute(this);
           text.setText(ao, c);
