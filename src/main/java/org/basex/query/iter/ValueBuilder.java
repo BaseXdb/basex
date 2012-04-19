@@ -100,14 +100,6 @@ public final class ValueBuilder extends ValueIter implements Result {
   }
 
   /**
-   * Sets the iterator position.
-   * @param p position
-   */
-  public void pos(final int p) {
-    pos = p;
-  }
-
-  /**
    * Sets the iterator size.
    * @param s size
    */

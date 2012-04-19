@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.nio.channels.*;
 
 import org.basex.build.*;
 import org.basex.core.*;
@@ -214,31 +213,6 @@ public final class DiskData extends Data {
     } finally {
       table.lock(false);
     }
-  }
-
-  /**
-   * Checks if the specified database can be exclusively locked.
-   * @param dbpath database path
-   * @return result of check
-   */
-  public static boolean writeLock(final IOFile dbpath) {
-    final IOFile io = new IOFile(dbpath, DATATBL + IO.BASEXSUFFIX);
-    if(!io.exists()) return true;
-
-    RandomAccessFile file = null;
-    try {
-      file = new RandomAccessFile(io.file(), "rw");
-      final FileLock lock = file.getChannel().tryLock();
-      if(lock != null) {
-        lock.release();
-        return true;
-      }
-    } catch(final IOException ex) {
-      Util.stack(ex);
-    } finally {
-      if(file != null) try { file.close(); } catch(final IOException ex) { }
-    }
-    return false;
   }
 
   /**

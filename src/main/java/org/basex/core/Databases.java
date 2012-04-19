@@ -118,14 +118,6 @@ public final class Databases {
   }
 
   /**
-   * Lists all available backups.
-   * @return backup list
-   */
-  public StringList listBackups() {
-    return list(false, true, null);
-  }
-
-  /**
    * Returns the sorted names of all available databases and, optionally, backups.
    * Filters for {@code name} if not null with glob support.
    * @param db return databases?

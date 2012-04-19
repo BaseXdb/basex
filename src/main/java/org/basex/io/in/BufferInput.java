@@ -148,16 +148,6 @@ public class BufferInput extends InputStream {
     return length;
   }
 
-  /**
-   * Sets the input length.
-   * @param l input length
-   * @return self reference
-   */
-  public final BufferInput length(final long l) {
-    length = l;
-    return this;
-  }
-
   @Override
   public final boolean markSupported() {
     return true;

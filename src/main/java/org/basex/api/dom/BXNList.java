@@ -1,10 +1,8 @@
 package org.basex.api.dom;
 
-import org.basex.data.Nodes;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.ANode;
-import org.basex.query.iter.NodeCache;
-import org.w3c.dom.NodeList;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Node list implementation.
@@ -12,42 +10,28 @@ import org.w3c.dom.NodeList;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public class BXNList implements NodeList {
+class BXNList implements NodeList {
   /** XQuery node set. */
-  NodeCache xquery;
-  /** XQuery node set. */
-  Nodes nodes;
+  final NodeCache nc;
 
   /**
    * Constructor.
    * @param nb nodes
    */
   BXNList(final NodeCache nb) {
-    xquery = nb;
-    xquery.sort();
-  }
-
-  /**
-   * Constructor.
-   * @param n nodes
-   */
-  public BXNList(final Nodes n) {
-    nodes = n;
+    nc = nb;
+    nc.sort();
   }
 
   @Override
   public BXNode item(final int i) {
     ANode n = null;
-    if(xquery != null) {
-      if(i < xquery.size()) n = xquery.get(i);
-    } else {
-      if(i < nodes.size()) n = new DBNode(nodes.data, nodes.list[i]);
-    }
+    if(i < nc.size()) n = nc.get(i);
     return n != null ? n.toJava() : null;
   }
 
   @Override
   public int getLength() {
-    return (int) (xquery != null ? xquery.size() : nodes.size());
+    return (int) nc.size();
   }
 }

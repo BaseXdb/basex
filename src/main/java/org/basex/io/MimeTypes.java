@@ -37,8 +37,6 @@ public final class MimeTypes {
   public static final String APP_EXT_XML = "application/xml-external-parsed-entity";
   /** Media type: application/x-www-form-urlencoded. */
   public static final String APP_FORM = "application/x-www-form-urlencoded";
-  /** Media type: multipart/form-data. */
-  public static final String MULTIPART_FORM = "multipart/form-data";
 
   /** Media type: text/comma-separated-values. */
   public static final String TEXT_CSV = "text/comma-separated-values";

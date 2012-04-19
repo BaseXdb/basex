@@ -75,29 +75,6 @@ public final class NSContext {
   }
 
   /**
-   * Returns the prefix for the specified namespace URI.
-   * Required by the JAXP API.
-   * @param uri namespace URI
-   * @return prefix
-   */
-  public byte[] prefix(final byte[] uri) {
-    for(int s = ns.size() - 1; s >= 0; s--) {
-      if(eq(ns.string(s), uri)) return ns.name(s);
-    }
-    return NSGlobal.prefix(uri);
-  }
-
-  /**
-   * Returns all prefixes. Required by the XQJ API.
-   * @return prefixes
-   */
-  public byte[][] prefixes() {
-    final byte[][] prefs = new byte[ns.size()][];
-    for(int p = 0; p < prefs.length; ++p) prefs[p] = ns.name(p);
-    return prefs;
-  }
-
-  /**
    * Returns the number of dynamic namespaces.
    * @return namespaces
    */

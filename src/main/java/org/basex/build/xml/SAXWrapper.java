@@ -55,15 +55,6 @@ public final class SAXWrapper extends SingleParser {
   /**
    * Constructor.
    * @param source sax source
-   * @param pr Properties
-   */
-  public SAXWrapper(final SAXSource source, final Prop pr) {
-    this(source, "", pr);
-  }
-
-  /**
-   * Constructor.
-   * @param source sax source
    * @param name name
    * @param pr Properties
    */

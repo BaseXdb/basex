@@ -42,16 +42,15 @@ public final class StaticContext {
   public boolean nsPreserve = true;
   /** Copy-namespaces mode: (no-)inherit. */
   public boolean nsInherit = true;
+  /** Default collation. */
+  public Uri collation = Uri.uri(URLCOLL, false);
 
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
-  /** Default collation. */
-  private Uri collation = Uri.uri(URLCOLL, false);
 
-  /**
+  /*
    * Adopts values of the specified static context.
    * @param sc static context
-   */
   public void copy(final StaticContext sc) {
     ns = sc.ns;
     nsElem = sc.nsElem;
@@ -67,6 +66,7 @@ public final class StaticContext {
     baseURI = sc.baseURI;
     // decFormats
   }
+   */
 
   /**
    * Declares a namespace.
@@ -120,22 +120,6 @@ public final class StaticContext {
    */
   public void baseURI(final String uri) {
     baseURI = uri.length() == 0 ? Uri.EMPTY : Uri.uri(token(IO.get(uri).url()));
-  }
-
-  /**
-   * Returns the URI of the default collation.
-   * @return collation URI
-   */
-  public Uri collation() {
-    return collation;
-  }
-
-  /**
-   * Sets the collation URI.
-   * @param uri uri to be set
-   */
-  public void collation(final String uri) {
-    collation = Uri.uri(token(uri));
   }
 
   @Override

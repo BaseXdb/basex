@@ -25,7 +25,7 @@ import org.basex.util.Util;
  */
 public final class Put extends UpdatePrimitive {
   /** Put location. The same node can be stored in multiple locations. */
-  private ArrayList<Uri> uri = new ArrayList<Uri>(1);
+  private final ArrayList<Uri> uri = new ArrayList<Uri>(1);
   /** Serializer properties. */
   private final QueryContext ctx;
 

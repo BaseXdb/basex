@@ -26,7 +26,7 @@ public final class QueryProcessor extends Progress {
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
-  private String query;
+  private final String query;
   /** Parsed flag. */
   private boolean parsed;
   /** Compilation flag. */
@@ -219,16 +219,6 @@ public final class QueryProcessor extends Progress {
    */
   public void module(final String uri, final String file) {
     ctx.modDeclared.add(token(uri), token(file));
-  }
-
-  /**
-   * Sets a new query. Should be called before parsing the query.
-   * @param qu query
-   */
-  public void query(final String qu) {
-    query = qu;
-    parsed = false;
-    compiled = false;
   }
 
   /**

@@ -1,12 +1,10 @@
 package org.basex.io.in;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
-import org.basex.io.IO;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class provides methods for reading XML input and recursive entities.
@@ -130,22 +128,5 @@ public class XMLInput extends InputStream {
    */
   public long length() {
     return inputs[0].length();
-  }
-
-  /**
-   * Retrieves and returns the whole text and closes the stream.
-   * @return contents
-   * @throws IOException I/O exception
-   */
-  public byte[] content() throws IOException {
-    // guess input size
-    final int l = Math.max(32, input == null ? 0 : (int) input.length());
-    final TokenBuilder tb = new TokenBuilder(l);
-    try {
-      for(int ch; (ch = read()) != -1;) tb.add(ch);
-    } finally {
-      close();
-    }
-    return tb.finish();
   }
 }

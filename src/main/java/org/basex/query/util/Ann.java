@@ -57,19 +57,6 @@ public final class Ann extends ElementList {
     return false;
   }
 
-  /**
-   * Returns the values for the specified name.
-   * @param e element to be found
-   * @return values
-   */
-  public Value[] values(final QNm e) {
-    final ArrayList<Value> al = new ArrayList<Value>();
-    for(int i = 0; i < size; ++i) {
-      if(names[i].eq(e)) al.add(values[i]);
-    }
-    return al.toArray(new Value[al.size()]);
-  }
-
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();

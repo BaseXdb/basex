@@ -1,11 +1,8 @@
 package org.basex.api.dom;
 
-import org.basex.data.Data;
-import org.basex.query.iter.NodeCache;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Named node map implementation.
@@ -27,9 +24,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
     final byte[] nm = Token.token(name);
     final int s = getLength();
     for(int i = 0; i < s; ++i) {
-      final byte[] n = xquery != null ? xquery.get(i).name() :
-        nodes.data.name(nodes.list[i], Data.ELEM);
-      if(Token.eq(n, nm)) return item(i);
+      if(Token.eq(nc.get(i).name(), nm)) return item(i);
     }
     return null;
   }
