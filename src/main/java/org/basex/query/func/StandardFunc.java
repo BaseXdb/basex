@@ -76,6 +76,11 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
+  public final boolean isVacuous() {
+    return !uses(Use.UPD) && type == SeqType.EMP;
+  }
+
+  @Override
   public final String description() {
     return sig.toString();
   }

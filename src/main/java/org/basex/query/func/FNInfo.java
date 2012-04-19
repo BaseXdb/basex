@@ -96,11 +96,6 @@ public final class FNInfo extends StandardFunc {
   }
 
   @Override
-  public boolean isVacuous() {
-    return sig == Function.ERROR;
-  }
-
-  @Override
   public boolean uses(final Use u) {
     return u == Use.X30 && (sig == Function.ENVIRONMENT_VARIABLE ||
         sig == Function.AVAILABLE_ENVIRONMENT_VARIABLES) ||

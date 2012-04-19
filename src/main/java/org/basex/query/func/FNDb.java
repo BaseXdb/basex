@@ -669,11 +669,6 @@ public final class FNDb extends StandardFunc {
   }
 
   @Override
-  public boolean isVacuous() {
-    return sig == Function._DB_EVENT;
-  }
-
-  @Override
   public boolean uses(final Use u) {
     final boolean up =
       sig == Function._DB_ADD || sig == Function._DB_DELETE ||
