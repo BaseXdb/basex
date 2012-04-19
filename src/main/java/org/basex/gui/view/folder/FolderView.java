@@ -391,7 +391,7 @@ public final class FolderView extends View {
       gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(sc(e)) {
+    } else if(sc(e) && SwingUtilities.isLeftMouseButton(e)) {
       gui.notify.mark(2, null);
     } else if(getCursor() != CURSORHAND) {
       if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);

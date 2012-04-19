@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 
+import javax.swing.*;
+
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
@@ -475,7 +477,7 @@ public final class MapView extends View implements Runnable {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(sc(e)) {
+    } else if(sc(e) && SwingUtilities.isLeftMouseButton(e)) {
       gui.notify.mark(2, null);
     } else {
       if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);
