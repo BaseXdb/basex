@@ -103,7 +103,7 @@ public class RESTConcurrencyTest {
   public void testReaderWriter() throws Exception {
     final String readerQuery = "?query=(1%20to%20100000000000000)%5b.=1%5d";
     final String writerQuery = "/test.xml";
-    final byte[] content = "<a/>".getBytes();
+    final byte[] content = Token.token("<a/>");
 
     final Get readerAction = new Get(readerQuery);
     final Put writerAction = new Put(writerQuery, content);
@@ -159,7 +159,7 @@ public class RESTConcurrencyTest {
     // start all writers (not at the same time, but still in parallel)
     for(int i = 0; i < count; i++) {
       String command = String.format(template, i);
-      tasks[i] = exec.submit(new Post("", command.getBytes()));
+      tasks[i] = exec.submit(new Post("", Token.token(command)));
     }
 
     // check if all have finished successfully
