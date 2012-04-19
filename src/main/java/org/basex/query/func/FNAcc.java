@@ -73,7 +73,7 @@ public final class FNAcc extends StandardFunc {
     final Item it = e.item(ctx, info);
     if(it == null) return Str.ZERO;
     final Type t = it.type;
-    if(t.isFunction()) FNSTR.thrw(ii, this);
+    if(t.isFunction()) FISTR.thrw(ii, this);
     return t == AtomType.STR ? it : Str.get(it.string(ii));
   }
 
@@ -90,7 +90,7 @@ public final class FNAcc extends StandardFunc {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
     final Type t = it.type;
-    if(t.isFunction()) FNATM.thrw(info, this);
+    if(t.isFunction()) FIATOM.thrw(info, this);
     try {
       return t == AtomType.DBL ? it : AtomType.DBL.cast(it, ctx, info);
     } catch(final QueryException ex) {

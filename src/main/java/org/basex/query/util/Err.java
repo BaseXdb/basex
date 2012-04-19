@@ -268,15 +268,15 @@ public enum Err {
   SQLINIT(FOSQ, 7, "Could not initialize specified driver: '%'"),
 
   /** FOTY0012: Type exception. */
-  NOTYP(FOTY, 12, "Item has no typed value: %."),
+  FIVALUE(FOTY, 12, "Item has no typed value: %."),
   /** FOTY0013: Type exception. */
-  FNATM(FOTY, 13, "Function items cannot be atomized: %."),
+  FIATOM(FOTY, 13, "Function items cannot be atomized: %."),
   /** FOTY0013: Type exception. */
-  FNEQ(FOTY, 13, "Function items have no defined equality: %."),
+  FIEQ(FOTY, 13, "Function items have no defined equality: %."),
   /** FOTY0013: Type exception. */
-  FNSTR(FOTY, 14, "Function items have no string representation: %."),
+  FISTR(FOTY, 14, "Function items have no string representation: %."),
   /** FOTY0013: Type exception. */
-  FNCMP(FOTY, 15, "Function items cannot be compared: %."),
+  FICMP(FOTY, 15, "Function items cannot be compared: %."),
 
   /** FOUP0001: Evaluation exception. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),

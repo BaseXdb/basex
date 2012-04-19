@@ -479,6 +479,8 @@ public enum Function {
   _DB_NODE_PRE(FNDb.class, "node-pre(nodes)", ITR_ZM, NOD_ZM),
   /** Database function: sends result to connected clients. */
   _DB_EVENT(FNDb.class, "event(name,query)", EMP, STR, ITEM_ZM),
+  /** Database function: returns the result after all other operations. */
+  _DB_OUTPUT(FNDb.class, "output(expression)", EMP, ITEM_ZM),
   /** Database function: add document(s) to a database. */
   _DB_ADD(FNDb.class, "add(database,nodes[,name[,path]])", EMP, 2, STR, DOC_ZM, STR, STR),
   /** Database function: delete document(s) from a database. */
@@ -727,7 +729,7 @@ public enum Function {
 
   /** Updating functions. */
   static final Function[] UPDATING = {
-    PUT, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE, _DB_OPTIMIZE, _DB_STORE
+    PUT, _DB_ADD, _DB_DELETE, _DB_RENAME, _DB_REPLACE, _DB_OPTIMIZE, _DB_STORE, _DB_OUTPUT
   };
 
   /**

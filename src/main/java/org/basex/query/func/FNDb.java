@@ -95,6 +95,7 @@ public final class FNDb extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _DB_EVENT:        return event(ctx);
+      case _DB_OUTPUT:       return output(ctx);
       case _DB_OPEN_ID:      return open(ctx, true);
       case _DB_OPEN_PRE:     return open(ctx, false);
       case _DB_SYSTEM:       return system(ctx);
@@ -668,12 +669,35 @@ public final class FNDb extends StandardFunc {
     return null;
   }
 
+  /**
+   * Updating function: creates output which will be returned to the user after the
+   * pending update list has been processed.
+   * @param ctx query context
+   * @return event result
+   * @throws QueryException query exception
+   */
+  private Item output(final QueryContext ctx) throws QueryException {
+    final Iter ir = ctx.iter(expr[0]);
+    for(Item it; (it = ir.next()) != null;) {
+      if(it.type.isNode()) {
+        final MemData md = new MemData(ctx.context.prop);
+        new DataBuilder(md).build((ANode) it);
+        it = new DBNode(md);
+      } else if(it.type.isFunction()) {
+        FIVALUE.thrw(info, it);
+      }
+      ctx.output.add(it);
+    }
+    return null;
+  }
+
   @Override
   public boolean uses(final Use u) {
     final boolean up =
       sig == Function._DB_ADD || sig == Function._DB_DELETE ||
       sig == Function._DB_RENAME || sig == Function._DB_REPLACE ||
-      sig == Function._DB_OPTIMIZE || sig == Function._DB_STORE;
+      sig == Function._DB_OPTIMIZE || sig == Function._DB_STORE ||
+      sig == Function._DB_OUTPUT;
     return
       // skip evaluation at compile time
       u == Use.NDT && (

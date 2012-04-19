@@ -3,6 +3,7 @@ package org.basex.query.up.primitives;
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
+import java.util.*;
 
 import org.basex.data.Data;
 import org.basex.io.IOFile;
@@ -24,7 +25,7 @@ import org.basex.util.Util;
  */
 public final class Put extends UpdatePrimitive {
   /** Put location. The same node can be stored in multiple locations. */
-  private Uri[] uri = new Uri[1];
+  private ArrayList<Uri> uri = new ArrayList<Uri>(1);
   /** Serializer properties. */
   private final QueryContext ctx;
 
@@ -39,23 +40,23 @@ public final class Put extends UpdatePrimitive {
   public Put(final InputInfo i, final int p, final Data d, final Uri u,
       final QueryContext context) {
     super(PrimitiveType.PUT, p, d, i);
-    uri[0] = u;
+    uri.add(u);
     ctx = context;
   }
 
   @Override
   public void apply() throws QueryException {
-    for(int i = 0; i < uri.length; i++) {
+    for(final Uri u : uri) {
       PrintOutput po = null;
       final DBNode node = new DBNode(data, pre);
       try {
-        po = new PrintOutput(path(i));
+        po = new PrintOutput(path(u));
         final SerializerProp pr = ctx.serParams(false);
         // try to reproduce non-chopped documents correctly
         pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
         node.serialize(Serializer.get(po, pr));
       } catch(final IOException ex) {
-        UPPUTERR.thrw(info, path(i));
+        UPPUTERR.thrw(info, path(u));
       } finally {
         if(po != null) try { po.close(); } catch(final IOException ex) { }
       }
@@ -64,29 +65,34 @@ public final class Put extends UpdatePrimitive {
 
   /**
    * Returns uri as string.
+   * @param u uri
+   * @return string uri
+   */
+  private String path(final Uri u) {
+    return new IOFile(u.toJava()).path();
+  }
+
+  /**
+   * Returns uri as string.
    * @param p uri position
    * @return string uri
    */
   public String path(final int p) {
-    return new IOFile(uri[p].toJava()).path();
+    return path(uri.get(p));
   }
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    final int l = uri.length;
-    final Uri[] t = new Uri[l + 1];
-    System.arraycopy(uri, 0, t, 0, l);
-    t[l] = ((Put) p).uri[0];
-    uri = t;
+    for(final Uri u : ((Put) p).uri) uri.add(u);
   }
 
   @Override
   public int size() {
-    return uri.length;
+    return uri.size();
   }
 
   @Override
   public String toString() {
-    return Util.name(this) + '[' + targetNode() + ", " + uri[0] + ']';
+    return Util.name(this) + '[' + targetNode() + ", " + uri.get(0) + ']';
   }
 }

@@ -16,6 +16,6 @@ public final class MapTest extends AdvancedQueryTest {
     error("declare variable $m := map { 'a' := 'b' };" +
         "declare variable $q := map { $m := 'a' };" +
         "$q",
-        Err.FNATM);
+        Err.FIATOM);
   }
 }

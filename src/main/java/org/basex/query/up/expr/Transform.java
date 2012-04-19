@@ -40,8 +40,7 @@ public final class Transform extends Arr {
    * @param m modify expression
    * @param r return expression
    */
-  public Transform(final InputInfo ii, final Let[] c, final Expr m,
-      final Expr r) {
+  public Transform(final InputInfo ii, final Let[] c, final Expr m, final Expr r) {
     super(ii, m, r);
     copies = c;
   }
@@ -73,13 +72,13 @@ public final class Transform extends Arr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
+    final int o = (int) ctx.output.size();
     try {
       final TransformModifier pu = new TransformModifier();
       for(final Let fo : copies) {
         final Iter ir = ctx.iter(fo.expr);
         final Item i = ir.next();
-        if(i == null || !i.type.isNode() || ir.next() != null)
-          UPCOPYMULT.thrw(info);
+        if(i == null || !i.type.isNode() || ir.next() != null) UPCOPYMULT.thrw(info);
 
         // copy node to main memory data instance
         final MemData md = new MemData(ctx.context.prop);
@@ -99,6 +98,7 @@ public final class Transform extends Arr {
       return ctx.value(expr[1]);
     } finally {
       ctx.vars.size(s);
+      ctx.output.size(o);
     }
   }
 

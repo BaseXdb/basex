@@ -213,8 +213,8 @@ public final class CmpV extends Cmp {
     if(b == null) return null;
     if(a.comparable(b)) return Bln.get(op.eval(info, a, b));
 
-    if(a.type.isFunction()) FNEQ.thrw(info, a);
-    if(b.type.isFunction()) FNEQ.thrw(info, b);
+    if(a.type.isFunction()) FIEQ.thrw(info, a);
+    if(b.type.isFunction()) FIEQ.thrw(info, b);
     throw XPTYPECMP.thrw(info, a.type, b.type);
   }
 

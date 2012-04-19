@@ -95,7 +95,7 @@ public final class Compare {
           if(!map1.deep(info, map2)) return false;
           continue;
         }
-        FNCMP.thrw(info, t1.isFunction() ? it1 : it2);
+        FICMP.thrw(info, t1.isFunction() ? it1 : it2);
       }
 
       // check atomic values

@@ -265,6 +265,19 @@ public final class FNDbTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for db:output() function.
+   */
+  @Test
+  public void dbOutput() {
+    check(_DB_OUTPUT);
+    query(_DB_OUTPUT.args("x"), "x");
+    query(_DB_OUTPUT.args("('x','y')"), "x y");
+    query(_DB_OUTPUT.args("<a/>"), "<a/>");
+    error(_DB_OUTPUT.args("x") + ",1", Err.UPNOT);
+    error(_DB_OUTPUT.args(" count#1"), Err.FIVALUE);
+  }
+
+  /**
    * Test method for the db:add() function.
    */
   @Test

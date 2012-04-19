@@ -88,12 +88,12 @@ public abstract class FItem extends Item {
 
   @Override
   public final byte[] string(final InputInfo ii) throws QueryException {
-    throw NOTYP.thrw(ii, description());
+    throw FIVALUE.thrw(ii, description());
   }
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    throw FNEQ.thrw(ii, description());
+    throw FIEQ.thrw(ii, description());
   }
 
   @Override

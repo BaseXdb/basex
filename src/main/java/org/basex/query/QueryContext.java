@@ -93,6 +93,8 @@ public final class QueryContext extends Progress {
 
   /** Pending updates. */
   public Updates updates;
+  /** Pending output. */
+  public ValueBuilder output = new ValueBuilder();
 
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
@@ -236,10 +238,11 @@ public final class QueryContext extends Progress {
    */
   public Value value() throws QueryException {
     try {
-      final Value v = value(root);
+      Value v = value(root);
       if(updating) {
         updates.apply();
-        if(context.data() != null) context.update();
+        if(updates.size() != 0 && context.data() != null) context.update();
+        if(output.size() != 0) v = output.value();
       }
       return v;
 
