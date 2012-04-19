@@ -72,14 +72,14 @@ public class RESTConcurrencyTest {
     final Get slowAction = new Get(slowQuery);
     final Get fastAction = new Get(fastQuery);
 
-    ExecutorService exec = Executors.newFixedThreadPool(2);
+    final ExecutorService exec = Executors.newFixedThreadPool(2);
 
     exec.submit(slowAction);
     Performance.sleep(TIMEOUT); // delay in order to be sure that the reader has started
-    Future<HTTPResponse> fast = exec.submit(fastAction);
+    final Future<HTTPResponse> fast = exec.submit(fastAction);
 
     try {
-      HTTPResponse result = fast.get(TIMEOUT, TimeUnit.MILLISECONDS);
+      final HTTPResponse result = fast.get(TIMEOUT, TimeUnit.MILLISECONDS);
       assertEquals(HTTPCode.OK, result.status);
       assertEquals(number, result.data);
     } finally {
@@ -108,7 +108,7 @@ public class RESTConcurrencyTest {
     final Get readerAction = new Get(readerQuery);
     final Put writerAction = new Put(writerQuery, content);
 
-    ExecutorService exec = Executors.newFixedThreadPool(2);
+    final ExecutorService exec = Executors.newFixedThreadPool(2);
 
     // start reader
     exec.submit(readerAction);
@@ -117,11 +117,11 @@ public class RESTConcurrencyTest {
     Future<HTTPResponse> writer = exec.submit(writerAction);
 
     try {
-      HTTPResponse result = writer.get(TIMEOUT, TimeUnit.MILLISECONDS);
+      final HTTPResponse result = writer.get(TIMEOUT, TimeUnit.MILLISECONDS);
 
       if(result.status.isSuccess()) fail("Database modified while a reader is running");
       throw new Exception(result.toString());
-    } catch(TimeoutException e) {
+    } catch(final TimeoutException e) {
       // writer is blocked by the reader: stop it
       writerAction.stop = true;
     }
@@ -153,17 +153,20 @@ public class RESTConcurrencyTest {
         "]]></text></command>";
 
     @SuppressWarnings("unchecked")
+    final
     Future<HTTPResponse>[] tasks = new Future[count];
-    ExecutorService exec = Executors.newFixedThreadPool(count);
+    final ExecutorService exec = Executors.newFixedThreadPool(count);
 
     // start all writers (not at the same time, but still in parallel)
     for(int i = 0; i < count; i++) {
-      String command = String.format(template, i);
+      final String command = String.format(template, i);
       tasks[i] = exec.submit(new Post("", Token.token(command)));
     }
 
     // check if all have finished successfully
-    for(Future<HTTPResponse> task : tasks) assertEquals(HTTPCode.OK, task.get().status);
+    for(final Future<HTTPResponse> task : tasks) {
+      assertEquals(HTTPCode.OK, task.get().status);
+    }
   }
 
   // private methods
@@ -220,23 +223,23 @@ public class RESTConcurrencyTest {
 
     @Override
     public HTTPResponse call() throws Exception {
-      HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-      connection.setReadTimeout(SOCKET_TIMEOUT);
+      final HttpURLConnection hc = (HttpURLConnection) uri.toURL().openConnection();
+      hc.setReadTimeout(SOCKET_TIMEOUT);
       try {
         while(!stop) {
           try {
-            final int code = connection.getResponseCode();
+            final int code = hc.getResponseCode();
 
-            InputStream input = connection.getInputStream();
+            final InputStream input = hc.getInputStream();
             final ByteList bl = new ByteList();
             for(int i; (i = input.read()) != -1;) bl.add(i);
 
             return new HTTPResponse(code, bl.toString());
-          } catch(SocketTimeoutException e) { }
+          } catch(final SocketTimeoutException e) { }
         }
         return null;
       } finally {
-        connection.disconnect();
+        hc.disconnect();
       }
     }
   }
@@ -275,23 +278,23 @@ public class RESTConcurrencyTest {
 
     @Override
     public HTTPResponse call() throws Exception {
-      HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+      final HttpURLConnection hc = (HttpURLConnection) uri.toURL().openConnection();
       try {
-        connection.setDoOutput(true);
-        connection.setRequestMethod(method.name());
-        connection.setRequestProperty(MimeTypes.CONTENT_TYPE, MimeTypes.APP_XML);
-        connection.getOutputStream().write(content);
-        connection.getOutputStream().close();
+        hc.setDoOutput(true);
+        hc.setRequestMethod(method.name());
+        hc.setRequestProperty(MimeTypes.CONTENT_TYPE, MimeTypes.APP_XML);
+        hc.getOutputStream().write(content);
+        hc.getOutputStream().close();
 
-        connection.setReadTimeout(SOCKET_TIMEOUT);
+        hc.setReadTimeout(SOCKET_TIMEOUT);
         while(!stop) {
           try {
-            return new HTTPResponse(connection.getResponseCode());
-          } catch(SocketTimeoutException e) { }
+            return new HTTPResponse(hc.getResponseCode());
+          } catch(final SocketTimeoutException e) { }
         }
         return null;
       } finally {
-        connection.disconnect();
+        hc.disconnect();
       }
     }
   }
@@ -387,7 +390,7 @@ public class RESTConcurrencyTest {
      * @return enum value
      */
     public static HTTPCode valueOf(final int code) {
-      for(HTTPCode h : HTTPCode.values()) {
+      for(final HTTPCode h : HTTPCode.values()) {
         if(h.code == code) return h;
       }
       return null;

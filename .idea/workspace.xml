@@ -17,10 +17,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-api/src/main/java/org/basex/api/webdav/BXAbstractResource.java" afterPath="$PROJECT_DIR$/../basex-api/src/main/java/org/basex/api/webdav/BXAbstractResource.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-api/src/main/java/org/basex/api/webdav/BXCode.java" afterPath="$PROJECT_DIR$/../basex-api/src/main/java/org/basex/api/webdav/BXCode.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-api/src/main/java/org/basex/api/webdav/BXResource.java" afterPath="$PROJECT_DIR$/../basex-api/src/main/java/org/basex/api/webdav/BXResource.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-api/src/test/java/org/basex/test/xqj/testcases/XQDynamicContextTest.java" afterPath="$PROJECT_DIR$/../basex-api/src/test/java/org/basex/test/xqj/testcases/XQDynamicContextTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-examples/basex-examples.iml" afterPath="$PROJECT_DIR$/../basex-examples/basex-examples.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-examples/src/main/java/org/basex/examples/xqj/cfoster/Part4.java" afterPath="$PROJECT_DIR$/../basex-examples/src/main/java/org/basex/examples/xqj/cfoster/Part4.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-examples/src/main/java/org/basex/examples/xqj/tutorial/Part8.java" afterPath="$PROJECT_DIR$/../basex-examples/src/main/java/org/basex/examples/xqj/tutorial/Part8.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-tests/basex-tests.iml" afterPath="$PROJECT_DIR$/../basex-tests/basex-tests.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-tests/pom.xml" afterPath="$PROJECT_DIR$/../basex-tests/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../basex-tests/src/main/java/org/basex/tests/Compare.java" afterPath="$PROJECT_DIR$/../basex-tests/src/main/java/org/basex/tests/Compare.java" />
@@ -357,7 +354,6 @@
         <option value="$PROJECT_DIR$/src/main/java/org/basex/gui/view/tree/TreeConstants.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/basex/io/serial/HTMLSerializer.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/basex/query/func/JavaModuleFunc.java" />
-        <option value="$PROJECT_DIR$/../basex-api/src/test/java/org/basex/test/xqj/testcases/XQDynamicContextTest.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/basex/query/util/pkg/Repo.java" />
         <option value="$PROJECT_DIR$/src/main/java/org/basex/gui/dialog/DialogProgress.java" />
         <option value="$PROJECT_DIR$/src/main/resources/lang/English.lang" />
