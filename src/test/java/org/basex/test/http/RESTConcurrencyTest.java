@@ -165,7 +165,7 @@ public class RESTConcurrencyTest {
 
     // check if all have finished successfully
     for(final Future<HTTPResponse> task : tasks) {
-      assertEquals(HTTPCode.OK, task.get().status);
+      assertEquals(HTTPCode.OK, task.get(TIMEOUT, TimeUnit.MILLISECONDS).status);
     }
   }
 
