@@ -1,16 +1,12 @@
 package org.basex.examples.xqj.tutorial;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQConstants;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQSequence;
-import org.w3c.dom.Document;
+import java.io.*;
+
+import javax.xml.namespace.*;
+import javax.xml.parsers.*;
+import javax.xml.xquery.*;
+
+import org.w3c.dom.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -35,35 +31,36 @@ public final class Part3 extends Main {
     XQConnection xqc = connect();
 
     // Create and execute an expression
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     XQExpression xqe = xqc.createExpression();
-    String query = "doc('src/main/resources/xml/orders.xml')//order[id='174']";
+    String query = "doc('" + path + "/orders.xml')//order[id='174']";
     XQSequence xqs = xqe.executeQuery(query);
     print("Query: " + query, xqs);
 
     // Create and execute a second expression
-    query = "doc('src/main/resources/xml/orders.xml')//order[id='267']";
+    query = "doc('" + path + "/orders.xml')//order[id='267']";
     xqs = xqe.executeQuery(query);
-    print("Query: " + query, xqs);
+    if(xqs.next()) print("Query: " + query, xqs);
 
     // Prepare an expression
     query = "declare variable $id as xs:string external; " +
-      "doc('src/main/resources/xml/orders.xml')//order[id=$id]";
+      "doc('" + path + "/orders.xml')//order[id=$id]";
     XQPreparedExpression xqp = xqc.prepareExpression(query);
 
     // Bind a variable and execute the query
     xqp.bindString(new QName("id"), "174", null);
     xqs = xqp.executeQuery();
-    print("Prepared query, $id=\"174\":", xqs);
+    if(xqs.next()) print("Prepared query, $id=\"174\":", xqs);
 
     // Bind a second variable and execute the query
     xqp.bindString(new QName("id"), "267", null);
     xqs = xqp.executeQuery();
-    print("Prepared query, $id=\"267\":", xqs);
+    if(xqs.next()) print("Prepared query, $id=\"267\":", xqs);
 
     // Create {@link Document} instance
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
-    Document dom = builder.parse("src/main/resources/xml/orders.xml");
+    Document dom = builder.parse(path + "/orders.xml");
 
     // Bind document to context item
     xqe = xqc.createExpression();
@@ -72,13 +69,13 @@ public final class Part3 extends Main {
     // Execute query
     query = ".//order[id='174']";
     xqs = xqe.executeQuery(query);
-    print("Query: " + query, xqs);
+    if(xqs.next()) print("Query: " + query, xqs);
 
     // Execute a query from a file input stream
-    InputStream is = new FileInputStream("src/main/resources/xml/orders.xq");
+    InputStream is = new FileInputStream(path + "/orders.xq");
     xqs = xqe.executeQuery(is);
+    if(xqs.next()) print("Query from input stream", xqs);
     is.close();
-    print("Query from input stream", xqs);
 
     // Close the connection
     close(xqc);

@@ -26,7 +26,7 @@ public final class Part2 extends Main {
     // Set data source via property
     info("Set data source via property");
     Properties p = new Properties();
-    p.setProperty("ClassName", "org.basex.api.xqj.BXQDataSource");
+    p.setProperty("ClassName", "net.xqj.basex.BaseXXQDataSource");
 
     String xqdsClassName = p.getProperty("ClassName");
     Class<?> xqdsClass = Class.forName(xqdsClassName);

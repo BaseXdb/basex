@@ -1,10 +1,8 @@
 package org.basex.examples.xqj.tutorial;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQDataSource;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQSequence;
-import org.basex.api.xqj.BXQDataSource;
+import javax.xml.xquery.*;
+
+import net.xqj.basex.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -28,8 +26,8 @@ public final class Part1 extends Main {
     // Print 'Hello World!'
     info("Print 'Hello World'");
 
-    XQDataSource xqjd = new BXQDataSource();
-    XQConnection xqjc = xqjd.getConnection();
+    XQDataSource xqjd = new BaseXXQDataSource();
+    XQConnection xqjc = xqjd.getConnection("admin", "admin");
     XQExpression xqje = xqjc.createExpression();
     XQSequence xqjs = xqje.executeQuery("'Hello World!'");
     xqjs.writeSequence(System.out, null);

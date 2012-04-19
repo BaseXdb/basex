@@ -1,12 +1,12 @@
 package org.basex.examples.xqj.cfoster;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQResultSequence;
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
+import java.io.*;
+
+import javax.xml.stream.*;
+import javax.xml.xquery.*;
+
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -34,8 +34,9 @@ public final class Part6 extends Main {
 
     XQExpression xqe = conn.createExpression();
 
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     XQResultSequence rs = xqe.executeQuery(
-        "doc('src/main/resources/xml/books.xml')//book");
+        "doc('" + path + "/books.xml')//book");
 
     XMLStreamReader reader = rs.getSequenceAsStream();
 
@@ -48,7 +49,7 @@ public final class Part6 extends Main {
     // Streaming XQuery Result Sequences with SAX
     info("Stream XQuery Result Sequences with SAX");
 
-    rs = xqe.executeQuery("doc('src/main/resources/xml/books.xml')//book");
+    rs = xqe.executeQuery("doc('" + path + "/books.xml')//book");
     rs.writeSequenceToSAX(new MySAXHandler());
 
     // Closing connection to the Database.

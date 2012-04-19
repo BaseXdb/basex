@@ -2,7 +2,8 @@ package org.basex.examples.xqj.cfoster;
 
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
-import org.basex.api.xqj.BXQDataSource;
+
+import net.xqj.basex.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -26,7 +27,7 @@ public final class Part1 extends Main {
     info("Connect and disconnect");
 
     // Default User name and Password
-    XQDataSource xqs = new BXQDataSource();
+    XQDataSource xqs = new BaseXXQDataSource();
     XQConnection conn = xqs.getConnection("admin", "admin");
     info("Connected.");
 

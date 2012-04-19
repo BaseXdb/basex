@@ -21,7 +21,7 @@ public final class SimpleFSExample {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== CreateLST ===");
+    System.out.println("=== SimpleFSExample ===");
 
     // create database context
     final Context ctx = new Context();

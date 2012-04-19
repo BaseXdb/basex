@@ -1,16 +1,13 @@
 package org.basex.examples.xqj.tutorial;
 
-import java.io.FileInputStream;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQPreparedExpression;
-import org.w3c.dom.Document;
+import java.io.*;
+
+import javax.xml.namespace.*;
+import javax.xml.parsers.*;
+import javax.xml.stream.*;
+import javax.xml.xquery.*;
+
+import org.w3c.dom.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -32,13 +29,14 @@ public final class Part8 extends Main {
     init("8: Binding External Variables");
 
     // Create a connection
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     XQConnection xqc = connect();
     XQPreparedExpression xqp;
 
     // Bind an item to an external variable
     xqp = xqc.prepareExpression(
       "declare variable $id as xs:integer external; " +
-      "doc('src/main/resources/xml/orders.xml')//order[id=$id]");
+      "doc('" + path + "/orders.xml')//order[id=$id]");
     xqp.bindObject(new QName("id"), 174, null);
     print("Bind item to external variable", xqp);
 
@@ -98,7 +96,7 @@ public final class Part8 extends Main {
     // Bind via DOM
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     DocumentBuilder parser = dbf.newDocumentBuilder();
-    Document domDocument = parser.parse("src/main/resources/xml/orders.xml");
+    Document domDocument = parser.parse(path + "/orders.xml");
 
     xqp = xqc.prepareExpression("declare variable $e external; $e");
     xqp.bindNode(new QName("e"), domDocument, null);
@@ -106,8 +104,7 @@ public final class Part8 extends Main {
 
     // Bind via StAX
     XMLInputFactory xif = XMLInputFactory.newInstance();
-    FileInputStream fis = new FileInputStream(
-        "src/main/resources/xml/orders.xml");
+    FileInputStream fis = new FileInputStream(path + "/orders.xml");
     XMLStreamReader reader = xif.createXMLStreamReader(fis);
 
     xqp = xqc.prepareExpression("declare variable $e external; $e");
@@ -117,7 +114,7 @@ public final class Part8 extends Main {
 
     // Bind via input stream
     xqp = xqc.prepareExpression("declare variable $e external; $e");
-    fis = new FileInputStream("src/main/resources/xml/orders.xml");
+    fis = new FileInputStream(path + "/orders.xml");
     xqp.bindDocument(new QName("e"), fis, null, null);
     fis.close();
     print("Bind via input stream", xqp);

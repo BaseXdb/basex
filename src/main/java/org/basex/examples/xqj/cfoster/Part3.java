@@ -1,12 +1,9 @@
 package org.basex.examples.xqj.cfoster;
 
-import javax.xml.namespace.QName;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQResultSequence;
+import java.io.*;
+
+import javax.xml.namespace.*;
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -41,9 +38,10 @@ public final class Part3 extends Main {
     // Bind variable to expression
     xqe.bindString(new QName("userisbn"), isbnID, null);
 
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     String xqueryString =
       "declare variable $userisbn external; " +
-      "for $x in doc('src/main/resources/xml/books.xml')//book " +
+      "for $x in doc('" + path + "/books.xml')//book " +
       "where $x/@isbn = $userisbn " +
       "return $x/title/text()";
 
@@ -57,7 +55,7 @@ public final class Part3 extends Main {
     xqueryString =
       "declare variable $fromDate as xs:date external; " +
       "declare variable $toDate as xs:date external; " +
-      "for $x in doc('src/main/resources/xml/books.xml')//book " +
+      "for $x in doc('" + path + "/books.xml')//book " +
       "let $publishDate := xs:date($x/publish_date) " +
       "where $publishDate > $fromDate and $publishDate < $toDate " +
       "return $x/title/text()";

@@ -1,12 +1,10 @@
 package org.basex.examples.xqj.tutorial;
 
-import javax.xml.namespace.QName;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQConstants;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQSequence;
-import javax.xml.xquery.XQStaticContext;
+import java.io.*;
+
+import javax.xml.namespace.*;
+import javax.xml.transform.stream.*;
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -37,9 +35,10 @@ public final class Part11 extends Main {
     xqsc.setBindingMode(XQConstants.BINDING_MODE_DEFERRED);
     xqc.setStaticContext(xqsc);
 
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     XQExpression xqe = xqc.createExpression();
     XQSequence xqs = xqe.executeQuery(
-        "doc('src/main/resources/xml/orders.xml')//order");
+        "doc('" + path + "/orders.xml')//order");
     XQExpression xqe2 = xqc.createExpression();
     xqe2.bindSequence(new QName("orders"), xqs);
 
@@ -58,7 +57,7 @@ public final class Part11 extends Main {
 
     xqe = xqc.createExpression();
     xqe.bindDocument(XQConstants.CONTEXT_ITEM,
-        new StreamSource("src/main/resources/xml/orders.xml"), null);
+        new StreamSource(path + "/orders.xml"), null);
 
     xqs = xqe.executeQuery("/orders/order");
     xqs.writeSequence(System.out, null);

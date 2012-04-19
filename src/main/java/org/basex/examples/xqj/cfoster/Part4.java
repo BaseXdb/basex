@@ -1,22 +1,14 @@
 package org.basex.examples.xqj.cfoster;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItem;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQResultSequence;
-import javax.xml.xquery.XQSequence;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import java.io.*;
+import java.util.*;
+
+import javax.xml.datatype.*;
+import javax.xml.namespace.*;
+import javax.xml.parsers.*;
+import javax.xml.xquery.*;
+
+import org.w3c.dom.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -144,8 +136,9 @@ public final class Part4 extends Main {
 
     XQExpression expr = conn.createExpression();
 
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     String xqueryString =
-      "for $x in doc('src/main/resources/xml/books.xml')//book/@isbn " +
+      "for $x in doc('" + path + "/books.xml')//book/@isbn " +
       "return xs:string($x)";
 
     rs = expr.executeQuery(xqueryString);
@@ -164,7 +157,7 @@ public final class Part4 extends Main {
     info("Retrieve XML nodes");
 
     expr = conn.createExpression();
-    xqueryString = "doc('src/main/resources/xml/books.xml')//book";
+    xqueryString = "doc('" + path + "/books.xml')//book";
     rs = expr.executeQuery(xqueryString);
     while(rs.next()) {
       Node book = rs.getNode(); // org.w3c.dom.Element
@@ -192,9 +185,8 @@ public final class Part4 extends Main {
     // Retrieve date values
     info("Retrieve date values");
 
-    xqueryString =
-      "for $x in doc('src/main/resources/xml/books.xml')//publish_date " +
-      "return xs:date($x)";
+    xqueryString = "for $x in doc('" + path + "/books.xml')//publish_date " +
+        "return xs:date($x)";
 
     rs = expr.executeQuery(xqueryString);
 

@@ -1,17 +1,15 @@
 package org.basex.examples.xqj.tutorial;
 
-import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.sax.SAXTransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQSequence;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLFilter;
+import java.io.*;
+
+import javax.xml.namespace.*;
+import javax.xml.transform.*;
+import javax.xml.transform.sax.*;
+import javax.xml.transform.stream.*;
+import javax.xml.xquery.*;
+
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -36,9 +34,9 @@ public final class Part10 extends Main {
     XQConnection xqc = connect();
 
     // Pipeline XQuery expressions
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     XQExpression xqe = xqc.createExpression();
-    XQSequence xqs = xqe.executeQuery(
-        "doc('src/main/resources/xml/orders.xml')//order");
+    XQSequence xqs = xqe.executeQuery("doc('" + path + "/orders.xml')//order");
     XQExpression xqe2 = xqc.createExpression();
     xqe2.bindSequence(new QName("orders"), xqs);
 
@@ -58,12 +56,10 @@ public final class Part10 extends Main {
     // Build an XMLFilter for the XSLT transformation
     SAXTransformerFactory stf = (SAXTransformerFactory)
       TransformerFactory.newInstance();
-    XMLFilter xmlf = stf.newXMLFilter(
-        new StreamSource("src/main/resources/xml/orders.xsl"));
+    XMLFilter xmlf = stf.newXMLFilter(new StreamSource("" + path + "/orders.xsl"));
 
     // Create a SAX source, the input for the XSLT transformation
-    SAXSource saxSource = new SAXSource(xmlf,
-        new InputSource("src/main/resources/xml/orders.xml"));
+    SAXSource saxSource = new SAXSource(xmlf, new InputSource("" + path + "/orders.xml"));
 
     // Create an XQuery expression
     XQPreparedExpression xqp = xqc.prepareExpression(
@@ -77,26 +73,24 @@ public final class Part10 extends Main {
     xqs.writeSequenceToResult(new StreamResult(System.out));
     System.out.println();
 
-    /* Passing XQuery results to XSLT
-     * [CG] XQJ: to be checked
+    // Passing XQuery results to XSLT
     info("Passing XQuery results to XSLT");
 
     // Create an XQuery expression
-    xqp = xqc.prepareExpression("doc('src/main/resources/xml/orders.xml')");
+    xqp = xqc.prepareExpression("doc('" + path + "/orders.xml')");
     // Create an XQJFilter
     XQJFilter xqjf = new XQJFilter(xqp);
 
     // Create an XMLFilter for the XSLT transformation, the 2nd stage
     stf = (SAXTransformerFactory) TransformerFactory.newInstance();
     xmlf = stf.newXMLFilter(
-    new StreamSource("src/main/resources/xml/orders.xsl"));
+    new StreamSource(path + "/orders.xsl"));
     xmlf.setParent(xqjf);
 
     // Make sure to capture the SAX events as result of the pipeline
     xmlf.setContentHandler(new DefaultHandler());
     // Activate the pipeline
     xmlf.parse(new InputSource());
-    */
 
     // Close the connection
     close(xqc);
@@ -104,13 +98,15 @@ public final class Part10 extends Main {
 
   /**
    * XQuery for Java filter.
+   */
   private static class XQJFilter extends XMLFilterImpl {
-    /** Prepared expression.
+    /** Prepared expression. */
     final XQPreparedExpression expression;
 
     /**
      * Constructor.
      * @param xqp prepared expression
+     */
     public XQJFilter(final XQPreparedExpression xqp) {
       expression = xqp;
     }
@@ -127,5 +123,4 @@ public final class Part10 extends Main {
       }
     }
   }
-*/
 }

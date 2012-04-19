@@ -1,8 +1,8 @@
 package org.basex.examples.xqj.cfoster;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQException;
-import org.basex.api.xqj.BXQDataSource;
+import javax.xml.xquery.*;
+
+import net.xqj.basex.*;
 
 /**
  * XQJ Examples, derived from the XQJ Tutorial
@@ -24,10 +24,9 @@ abstract class Main {
   /**
    * Creates and returns a default connection.
    * @return connection instance
-   * @throws XQException connection exception
    */
-  static XQConnection connect() throws XQException {
-    return new BXQDataSource().getConnection();
+  static XQConnection connect() {
+    return new BaseXXQDataSource().getConnection("admin", "admin");
   }
 
   /**

@@ -6,6 +6,7 @@ import java.io.*;
  * This example shows how queries can be executed in an iterative manner.
  * Iterative evaluation will be slower, as more server requests are performed.
  *
+ * This example required a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-12, BSD License

@@ -1,8 +1,8 @@
 package org.basex.examples.xqj.cfoster;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQResultSequence;
+import java.io.*;
+
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -28,8 +28,9 @@ public final class Part2 extends Main {
     // Return book titles from 'books.xml'
     info("Return book titles from 'books.xml'");
 
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     String xqueryString =
-      "for $x in doc('src/main/resources/xml/books.xml')//book " +
+      "for $x in doc('" + path + "/books.xml')//book " +
       "return $x/title/text()";
 
     XQExpression xqe = conn.createExpression();
@@ -41,7 +42,7 @@ public final class Part2 extends Main {
     info("Get book prices");
 
     xqueryString =
-      "for $x in doc('src/main/resources/xml/books.xml')//book " +
+      "for $x in doc('" + path + "/books.xml')//book " +
       "return xs:float($x/price)";
 
     rs = xqe.executeQuery(xqueryString);

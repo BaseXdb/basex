@@ -1,13 +1,10 @@
 package org.basex.examples.xqj.tutorial;
 
-import java.math.BigDecimal;
-import javax.xml.namespace.QName;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItem;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQSequence;
+import java.io.*;
+import java.math.*;
+
+import javax.xml.namespace.*;
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial
@@ -33,6 +30,7 @@ public final class Part9 extends Main {
 
     // Test item instances
     info("Test item instances");
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     XQItemType xqt = xqc.createNodeType();
     XQExpression xqe = xqc.createExpression();
     XQSequence xqs = xqe.executeQuery("1, 'hello', <xml/>");
@@ -61,7 +59,7 @@ public final class Part9 extends Main {
 
     // Create item from query result
     info("Create item from query result");
-    xqs = xqe.executeQuery("doc('src/main/resources/xml/orders.xml')//order");
+    xqs = xqe.executeQuery("doc('" + path + "/orders.xml')//order");
     xqs.next();
     xqi = xqc.createItem(xqs.getItem());
 

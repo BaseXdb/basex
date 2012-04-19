@@ -7,6 +7,7 @@ import java.util.*;
  * This example shows how binary resource can be added to and retrieved from
  * the database.
  *
+ * This example required a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-12, BSD License

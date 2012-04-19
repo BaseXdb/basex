@@ -62,8 +62,7 @@ public final class EventGUITest extends JFrame {
     // initialization
     final ClientSession cs = new ClientSession(server.context, ADMIN, ADMIN);
     cs.execute("create event " + NAME);
-    cs.execute("create db " + NAME +
-        " <Application><Background/></Application>");
+    cs.execute("create db " + NAME + " <Application><Background/></Application>");
     cs.close();
 
     for(int i = 0; i < CLIENTS; i++) new EventGUITest(i);

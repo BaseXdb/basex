@@ -33,9 +33,10 @@ public final class Part5 extends Main {
     // Serialize output to disk
     info("Serialize output to disk");
 
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     FileOutputStream fos = new FileOutputStream("result.xml");
     XQSequence xqs = xqe.executeQuery(
-        "doc('src/main/resources/xml/orders.xml')//order[id='174']");
+        "doc('" + path + "/orders.xml')//order[id='174']");
     xqs.writeSequence(fos, new Properties());
     fos.close();
 

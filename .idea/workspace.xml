@@ -11,7 +11,6 @@
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_fileupload_commons_fileupload_1_2_2.xml" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__commons_io_commons_io_1_4.xml" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__eu_medsea_mimeutil_mime_util_2_1_3.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_xml_xquery_xqj_api_1_0.xml" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__jp_sourceforge_igo_igo_0_4_3.xml" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_8_2.xml" />
       <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_lucene_stemmers_3_4_0.xml" />
@@ -550,13 +549,6 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/org/basex/examples/api/BinaryExample.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="15" column="19" selection-start="385" selection-end="385" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../basex-api/src/test/java/org/basex/test/xqj/testcases/XQJTestCase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="32" selection-start="201" selection-end="201" vertical-scroll-proportion="0.16047297">
           <folding />
         </state>
       </provider>

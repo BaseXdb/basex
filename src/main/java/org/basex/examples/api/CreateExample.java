@@ -5,6 +5,7 @@ import java.io.*;
 /**
  * This example shows how new databases can be created.
  *
+ * This example required a running database server instance.
  * Documentation: http://docs.basex.org/wiki/Clients
  *
  * @author BaseX Team 2005-12, BSD License

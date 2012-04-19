@@ -1,5 +1,6 @@
 package org.basex.examples.xqj.tutorial;
 
+import java.io.*;
 import java.math.BigDecimal;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
@@ -36,8 +37,9 @@ public final class Part4 extends Main {
     // Iterate through query results
     info("Iterate through query results");
 
+    String path = new File("src/main/resources/xml").getAbsolutePath();
     XQSequence xqs = xqe.executeQuery(
-        "doc('src/main/resources/xml/employees.xml')//employee");
+        "doc('" + path + "/employees.xml')//employee");
     while(xqs.next()) {
       Element employee = (Element) xqs.getObject();
       System.out.println(employee);
@@ -46,8 +48,7 @@ public final class Part4 extends Main {
     // Iterate through numeric values
     info("Iterate through numeric values");
 
-    xqs = xqe.executeQuery(
-      "doc('src/main/resources/xml/orders.xml')" +
+    xqs = xqe.executeQuery("doc('" + path + "/orders.xml')" +
       "/orders/order/xs:decimal(total_price)");
     while(xqs.next()) {
       BigDecimal price = (BigDecimal) xqs.getObject();
@@ -72,7 +73,7 @@ public final class Part4 extends Main {
       }
     };
     xqs = xqe.executeQuery(
-        "doc('src/main/resources/xml/employees.xml')//employee");
+        "doc('" + path + "/employees.xml')//employee");
     while(xqs.next()) {
       xqs.writeItemToSAX(ch);
     }
@@ -80,15 +81,13 @@ public final class Part4 extends Main {
     // Return sequence via SAX
     info("Return sequence via SAX");
 
-    xqs = xqe.executeQuery(
-        "doc('src/main/resources/xml/employees.xml')//employee");
+    xqs = xqe.executeQuery("doc('" + path + "/employees.xml')//employee");
     xqs.writeSequenceToSAX(ch);
 
     // Return single items via StAX
     info("Return single items via StAX");
 
-    xqs = xqe.executeQuery(
-        "doc('src/main/resources/xml/employees.xml')//employee");
+    xqs = xqe.executeQuery("doc('" + path + "/employees.xml')//employee");
     XMLStreamReader xmlReader = xqs.getSequenceAsStream();
     while(true) {
       int type = xmlReader.next();
