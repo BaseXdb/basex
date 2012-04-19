@@ -16,7 +16,6 @@ import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.util.Compare.Flag;
 import org.basex.tests.bxapi.*;
-import org.basex.tests.bxapi.XQuery;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 
@@ -28,6 +27,8 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class QT3TS {
+  /** Test suite id. */
+  private final String testid = "qt3ts";
   /** Default path to the test suite. */
   protected static String qt3tsPath = "g:/XML/w3c/qt3ts/";
 
@@ -119,7 +120,7 @@ public final class QT3TS {
     result.append(" Total   : ").append(total).append(NL);
     result.append(" Ignored : ").append(ignored).append(NL);
 
-    final String path = new File(qt3tsPath, "qt3ts.log").getCanonicalPath();
+    final String path = new File(qt3tsPath, testid + ".log").getCanonicalPath();
     Util.outln(NL + "Writing log file '" + path + "'..." + NL);
     final PrintOutput po = new PrintOutput(path);
     po.println("QT3TS RESULTS __________________________" + NL);
@@ -138,6 +139,8 @@ public final class QT3TS {
 
     Util.out(result);
     Util.outln(" Time    : " + perf);
+
+    ctx.close();
   }
 
   /**

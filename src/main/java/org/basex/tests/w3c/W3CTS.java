@@ -120,6 +120,7 @@ public abstract class W3CTS {
     input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathlog = testid.toLowerCase(Locale.ENGLISH) + ".log";
+    context.mprop.set(MainProp.DBPATH, sandbox().path() + "/data");
   }
 
   /**
@@ -237,6 +238,7 @@ public abstract class W3CTS {
     Util.outln("Total Time: " + time);
 
     context.close();
+    sandbox().delete();
   }
 
   /**
@@ -799,5 +801,13 @@ public abstract class W3CTS {
         maxout = Integer.MAX_VALUE;
       }
     }
+  }
+
+  /**
+   * Returns the sandbox database path.
+   * @return database path
+   */
+  private IOFile sandbox() {
+    return new IOFile(Prop.TMP, testid);
   }
 }
