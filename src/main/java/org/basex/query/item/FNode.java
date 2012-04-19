@@ -1,12 +1,9 @@
 package org.basex.query.item;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.AxisMoreIter;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Main memory based node fragments.

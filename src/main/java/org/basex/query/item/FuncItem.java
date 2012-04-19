@@ -1,21 +1,17 @@
 package org.basex.query.item;
 
-import java.io.IOException;
-
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
 import static org.basex.query.QueryText.*;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.VarRef;
-import org.basex.query.func.DynamicFunc;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
-import org.basex.query.util.Var;
-import org.basex.query.util.VarStack;
-import org.basex.util.InputInfo;
 import static org.basex.util.Token.*;
-import org.basex.util.Util;
+
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Function item.

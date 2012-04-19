@@ -3,23 +3,13 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.iter.AxisMoreIter;
-import org.basex.query.iter.NodeCache;
-import org.basex.util.Atts;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.hash.TokenMap;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.ProcessingInstruction;
-import org.w3c.dom.Text;
+import org.basex.io.serial.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.w3c.dom.*;
 
 /**
  * Element node fragment.

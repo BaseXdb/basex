@@ -1,19 +1,14 @@
 package org.basex.query.item;
 
-import java.util.Arrays;
-
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.func.UserFunc;
-import org.basex.query.util.Err;
-import org.basex.query.util.Var;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * XQuery 3.0 function data types.

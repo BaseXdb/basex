@@ -1,11 +1,12 @@
 package org.basex.query.item;
 
-import java.math.BigDecimal;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import static java.lang.Double.isNaN;
+import static java.lang.Double.*;
+
+import java.math.*;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.util.*;
 
 /**
  * Double item.

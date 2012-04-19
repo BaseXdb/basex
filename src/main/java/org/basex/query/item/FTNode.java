@@ -1,8 +1,7 @@
 package org.basex.query.item;
 
-import org.basex.data.Data;
-import org.basex.data.FTMatches;
-import org.basex.util.ft.Scoring;
+import org.basex.data.*;
+import org.basex.util.ft.*;
 
 /**
  * Disk-based full-text Node item.

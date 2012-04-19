@@ -2,14 +2,12 @@ package org.basex.query.item;
 
 import java.util.*;
 
-import org.basex.data.Data;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.query.iter.ValueIter;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Abstract value.

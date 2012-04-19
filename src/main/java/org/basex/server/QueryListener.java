@@ -136,9 +136,9 @@ final class QueryListener extends Progress {
         for(Item it; (it = ir.next()) != null;) {
           if(iter && !wrap) {
             if(full) {
-              po.print(it.xdmInfo());
+              po.write(it.xdmInfo());
             } else {
-              po.write(it.type.id());
+              po.write(it.typeId());
             }
             ser.reset();
           }

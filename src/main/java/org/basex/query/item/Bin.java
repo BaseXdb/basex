@@ -1,12 +1,11 @@
 package org.basex.query.item;
 
-import java.io.InputStream;
+import java.io.*;
 
-import org.basex.io.in.ArrayInput;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import org.basex.io.in.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.util.*;
 
 /**
  * Binary item.

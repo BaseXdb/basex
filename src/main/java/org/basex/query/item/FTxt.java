@@ -1,11 +1,12 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.util.Token;
-import org.w3c.dom.Text;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * Text node fragment.

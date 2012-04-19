@@ -2,14 +2,12 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Range sequence, containing at least two integers.

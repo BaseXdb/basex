@@ -1,11 +1,11 @@
 package org.basex.query.item;
 
 import static org.basex.data.DataText.*;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.list.ByteList;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * String item.

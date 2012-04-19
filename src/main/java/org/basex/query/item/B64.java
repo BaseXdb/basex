@@ -1,11 +1,9 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-import org.basex.query.QueryException;
-import org.basex.util.Base64;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Base64 item.

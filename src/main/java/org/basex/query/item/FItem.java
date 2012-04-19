@@ -2,14 +2,12 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.iter.Iter;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Abstract super class for function items.

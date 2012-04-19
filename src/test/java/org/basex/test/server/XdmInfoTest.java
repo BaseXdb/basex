@@ -93,8 +93,8 @@ public final class XdmInfoTest extends SandboxTest {
      * @param pass password
      * @throws IOException I/O exception
      */
-    TestSession(final String host, final int port, final String user,
-        final String pass) throws IOException {
+    TestSession(final String host, final int port, final String user, final String pass)
+        throws IOException {
       super(host, port, user, pass);
     }
 
@@ -186,7 +186,15 @@ public final class XdmInfoTest extends SandboxTest {
     byte[] result;
   }
 
-  /** Examples for available data types. */
+  /**
+   * <p>Examples for available data types.</p>
+   * <ul>
+   * <li>Array position: type id</li>
+   * <li>Entry 1: node type</li>
+   * <li>Entry 2: example</li>
+   * <li>Entry 3: textual result</li>
+   * </ul>
+   */
   static final Object[][] TYPES = {
     { }, { }, { }, { }, { }, { }, { },
     // code: 7
@@ -197,7 +205,7 @@ public final class XdmInfoTest extends SandboxTest {
     { "processing-instruction()", "processing-instruction { 'a' } { 'b' }", "<?a b?>" },
     { "element()", "<a/>", "<a/>" },
     { "document-node()", "document { 'a' }", "a", "" },
-    { "document-node(element())" },
+    { "document-node(element())", "document { <a/> }", "<a/>", "" },
     { "attribute()", "attribute xml:a { 'b' }", " xml:a=\"b\"",
       "http://www.w3.org/XML/1998/namespace" },
     { "comment()", "comment { 'a' } ", "<!--a-->" },

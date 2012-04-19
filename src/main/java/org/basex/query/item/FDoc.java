@@ -1,17 +1,15 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.iter.AxisMoreIter;
-import org.basex.query.iter.NodeCache;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenMap;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 
 /**
  * Document node fragment.
@@ -111,7 +109,14 @@ public final class FDoc extends FNode {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(super.xdmInfo()).add(base).add(0).toArray();
+    return new ByteList().add(typeId()).add(base).add(0).toArray();
+  }
+
+  @Override
+  public int typeId() {
+    // check if a document has a single element as child
+    return children.size() == 1 && children.get(0).type == NodeType.ELM ?
+      NodeType.DEL.id() : type.id();
   }
 
   @Override

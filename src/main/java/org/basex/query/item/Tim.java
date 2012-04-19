@@ -1,8 +1,9 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Time item.

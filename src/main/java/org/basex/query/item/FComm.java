@@ -2,13 +2,13 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
-import org.w3c.dom.Comment;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * Comment node fragment.

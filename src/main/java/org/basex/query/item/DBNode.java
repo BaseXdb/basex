@@ -1,26 +1,20 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.io.IO;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.AxisMoreIter;
-import org.basex.query.util.DataBuilder;
-import org.basex.query.util.NSGlobal;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.ft.Scoring;
+
+import java.io.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.list.*;
 
 /**
@@ -473,10 +467,20 @@ public class DBNode extends ANode {
 
   @Override
   public byte[] xdmInfo() {
-    final ByteList bl = new ByteList().add(super.xdmInfo());
-    if(type == NodeType.DOC) bl.add(baseURI()).add(0);
-    else if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
+    final ByteList bl = new ByteList().add(typeId());
+    if(type == NodeType.ATT) bl.add(qname().uri()).add(0);
     return bl.toArray();
+  }
+
+  @Override
+  public int typeId() {
+    // check if a document has a single element as child
+    int t = type.id();
+    if(type == NodeType.DOC) {
+      final AxisMoreIter ai = children();
+      if(ai.more() && ai.next().type == NodeType.ELM && !ai.more()) t = NodeType.DEL.id();
+    }
+    return t;
   }
 
   @Override

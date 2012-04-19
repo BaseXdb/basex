@@ -1,8 +1,7 @@
 package org.basex.query.item;
 
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Untyped atomic item.

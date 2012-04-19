@@ -3,10 +3,10 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import org.basex.io.serial.Serializer;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.util.*;
 
 /**
  * Namespace node.

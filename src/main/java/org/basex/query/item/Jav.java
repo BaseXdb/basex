@@ -1,9 +1,7 @@
 package org.basex.query.item;
 
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * String item.

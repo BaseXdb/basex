@@ -2,16 +2,15 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import java.math.BigDecimal;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.xml.datatype.Duration;
-import org.basex.query.QueryException;
-import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+
+import java.math.*;
+import java.util.regex.*;
+
+import javax.xml.datatype.*;
+
+import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Duration item.

@@ -2,13 +2,12 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.basex.query.QueryException;
-import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+
+import java.util.regex.*;
+
+import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Simple date item.

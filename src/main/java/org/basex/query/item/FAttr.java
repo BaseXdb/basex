@@ -1,14 +1,14 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
-
-import org.basex.io.serial.Serializer;
-import org.basex.util.Util;
-import org.basex.util.list.*;
-
 import static org.basex.util.Token.*;
-import org.w3c.dom.Attr;
+
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
+import org.w3c.dom.*;
 
 /**
  * Attribute node fragment.
@@ -67,7 +67,7 @@ public final class FAttr extends FNode {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(super.xdmInfo()).add(name.uri()).add(0).toArray();
+    return new ByteList().add(typeId()).add(name.uri()).add(0).toArray();
   }
 
   @Override

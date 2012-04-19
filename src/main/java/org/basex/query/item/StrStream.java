@@ -1,15 +1,13 @@
 package org.basex.query.item;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.IO;
-import org.basex.io.in.NewlineInput;
-import org.basex.query.QueryException;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.query.*;
 import org.basex.query.func.*;
-import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Streamable string item.

@@ -3,14 +3,11 @@ package org.basex.query.item;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import javax.xml.namespace.QName;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import javax.xml.namespace.*;
+
+import org.basex.query.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**
@@ -219,7 +216,7 @@ public final class QNm extends Item {
 
   @Override
   public byte[] xdmInfo() {
-    return new ByteList().add(super.xdmInfo()).add(uri()).add(0).toArray();
+    return new ByteList().add(typeId()).add(uri()).add(0).toArray();
   }
 
   @Override

@@ -3,18 +3,14 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
+import java.io.*;
+import java.math.*;
 
-import org.basex.io.in.ArrayInput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.iter.ValueIter;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.io.in.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Abstract item.
@@ -279,11 +275,19 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Returns meta data on the current item.
+   * Returns data model info.
    * @return type string
    */
   public byte[] xdmInfo() {
-    return new byte[] { (byte) type.id() };
+    return new byte[] { (byte) typeId() };
+  }
+
+  /**
+   * Returns a type id.
+   * @return type string
+   */
+  public int typeId() {
+    return type.id();
   }
 
   /**

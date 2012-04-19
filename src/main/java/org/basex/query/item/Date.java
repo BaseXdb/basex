@@ -1,16 +1,14 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-import java.math.BigDecimal;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+
+import java.math.*;
+import java.util.regex.*;
+
+import javax.xml.datatype.*;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Date container.

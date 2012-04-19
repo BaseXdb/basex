@@ -1,8 +1,7 @@
 package org.basex.query.item;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * XQuery data types.

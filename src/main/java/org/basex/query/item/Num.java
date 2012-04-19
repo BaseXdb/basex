@@ -1,8 +1,8 @@
 package org.basex.query.item;
 
 import static java.lang.Float.*;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+
+import org.basex.util.*;
 
 /**
  * Superclass for all numeric items.

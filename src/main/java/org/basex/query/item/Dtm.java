@@ -7,8 +7,8 @@ import static org.basex.util.Util.*;
 import java.text.*;
 import java.util.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
+import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.util.*;
 
 /**

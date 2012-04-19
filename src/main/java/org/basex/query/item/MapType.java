@@ -2,11 +2,10 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.map.Map;
-import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.query.item.map.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Type for maps.

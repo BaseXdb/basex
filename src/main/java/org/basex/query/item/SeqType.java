@@ -1,13 +1,13 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.map.Map;
-import org.basex.query.iter.ValueBuilder;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.map.*;
+import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.util.Err;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**

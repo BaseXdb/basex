@@ -1,12 +1,12 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-import java.math.BigDecimal;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+
+import java.math.*;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.util.*;
 
 /**
  * Boolean item.

@@ -1,27 +1,18 @@
 package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
-import java.io.IOException;
-import org.basex.api.dom.BXAttr;
-import org.basex.api.dom.BXComm;
-import org.basex.api.dom.BXDoc;
-import org.basex.api.dom.BXElem;
-import org.basex.api.dom.BXPI;
-import org.basex.api.dom.BXText;
-import org.basex.build.MemBuilder;
-import org.basex.build.xml.DOMWrapper;
-import org.basex.core.Prop;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.util.Err;
+
+import java.io.*;
+
+import org.basex.api.dom.*;
+import org.basex.build.*;
+import org.basex.build.xml.*;
+import org.basex.core.*;
+import org.basex.query.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
-import org.basex.util.hash.TokenMap;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Element;
-import org.w3c.dom.ProcessingInstruction;
+import org.basex.util.hash.*;
+import org.w3c.dom.*;
 import org.w3c.dom.Text;
 
 /**
