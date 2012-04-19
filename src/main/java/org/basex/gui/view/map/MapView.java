@@ -1,29 +1,20 @@
 package org.basex.gui.view.map;
 
-import static org.basex.core.Text.DOTS;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
+import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
-import org.basex.gui.GUIProp;
 import static org.basex.gui.layout.BaseXKeys.*;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPopup;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewData;
-import org.basex.gui.view.ViewNotifier;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferedImage;
+import java.awt.event.*;
+import java.awt.image.*;
+
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * This view is a TreeMap implementation.
@@ -454,8 +445,7 @@ public final class MapView extends View implements Runnable {
    * @param rects calculated rectangles
    * @param sc scale the rectangles
    */
-  private void drawMap(final BufferedImage map, final MapRects rects,
-      final float sc) {
+  private void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
     final Graphics g = map.getGraphics();
     smooth(g);
     painter.drawRectangles(g, rects, sc);
@@ -485,7 +475,7 @@ public final class MapView extends View implements Runnable {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(sc(e) && SwingUtilities.isLeftMouseButton(e)) {
+    } else if(sc(e)) {
       gui.notify.mark(2, null);
     } else {
       if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);

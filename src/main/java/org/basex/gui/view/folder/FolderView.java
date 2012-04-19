@@ -36,6 +36,9 @@ import org.basex.gui.view.ViewNotifier;
  * @author Christian Gruen
  */
 public final class FolderView extends View {
+  /** Horizontal offset. */
+  private static final int OFFX = 8;
+
   /** References closed nodes. */
   boolean[] opened;
   /** Line Height. */
@@ -43,10 +46,10 @@ public final class FolderView extends View {
   /** Focused folder position. */
   int focusedPos;
 
-  /** Closed Box. */
-  private BufferedImage closedBox;
-  /** Opened Box. */
-  private BufferedImage openedBox;
+  /** Closed marker. */
+  private BufferedImage closedMarker;
+  /** Opened marker. */
+  private BufferedImage openedMarker;
 
   /** Scroll Bar. */
   private final BaseXBar scroll;
@@ -197,7 +200,7 @@ public final class FolderView extends View {
     while(it.more()) {
       final int kind = data.kind(it.pre);
       final boolean elem = kind == Data.ELEM || kind == Data.DOC;
-      final int x = 8 + it.level * (lineH >> 1) + (elem ? lineH : boxW);
+      final int x = OFFX + it.level * (lineH >> 1) + (elem ? lineH : boxW);
       drawString(g, it.pre, x, it.y + boxW);
     }
     gui.painting = false;
@@ -210,8 +213,7 @@ public final class FolderView extends View {
    * @param x horizontal coordinate
    * @param y vertical coordinate
    */
-  private void drawString(final Graphics g, final int pre, final int x,
-      final int y) {
+  private void drawString(final Graphics g, final int pre, final int x, final int y) {
     final Data data = gui.context.data();
     final Nodes marked = gui.context.marked;
 
@@ -239,18 +241,17 @@ public final class FolderView extends View {
       g.fillRect(0, y - boxW - boxMargin, totalW, lineH + 1);
     }
 
+    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
     if(elem) {
-      final boolean large = gui.gprop.num(GUIProp.FONTSIZE) > 20;
-      final int yy = y - boxW - (large ? 6 : 3);
-      final Image box = opened[pre] ? openedBox : closedBox;
-      g.drawImage(box, x - lineH, yy, this);
+      final int yy = y - boxW - (fsz > 20 ? 6 : 3);
+      final Image marker = opened[pre] ? openedMarker : closedMarker;
+      g.drawImage(marker, x - lineH, yy, this);
     }
 
     g.setFont(fnt);
     g.setColor(col);
 
     final int tw = totalW + 6;
-    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
     BaseXLayout.chopString(g, name, x, y - fsz, tw - x - 10, fsz);
 
     if(gui.context.focused == pre) {
@@ -269,6 +270,7 @@ public final class FolderView extends View {
   private boolean focus(final int x, final int y) {
     if(opened == null) return false;
 
+    final int fsz = gui.gprop.num(GUIProp.FONTSIZE);
     final FolderIterator it = new FolderIterator(this, startY + 3, getHeight());
     final Data data = gui.context.data();
     while(it.more()) {
@@ -277,8 +279,8 @@ public final class FolderView extends View {
         final int kind = data.kind(it.pre);
         if(kind == Data.ELEM || kind == Data.DOC) {
           // set cursor when moving over tree boxes
-          final int xx = 8 + it.level * (lineH >> 2) + lineH;
-          if(x > xx - 20 && x < xx) c = CURSORHAND;
+          final int xx = OFFX + it.level * (lineH >> 1) + lineH - 6;
+          if(x > xx - fsz && x < xx) c = CURSORHAND;
         }
         gui.cursor(c);
         gui.notify.focus(it.pre, this);
@@ -339,9 +341,9 @@ public final class FolderView extends View {
     g.setColor(color3);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
 
-    openedBox = new BufferedImage(boxW + 1, boxW + 1,
+    openedMarker = new BufferedImage(boxW + 1, boxW + 1,
         BufferedImage.TYPE_INT_ARGB);
-    g = openedBox.createGraphics();
+    g = openedMarker.createGraphics();
     smooth(g);
 
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
@@ -353,9 +355,9 @@ public final class FolderView extends View {
     g.setColor(color3);
     g.fillPolygon(p);
 
-    closedBox = new BufferedImage(boxW + 1, boxW + 1,
+    closedMarker = new BufferedImage(boxW + 1, boxW + 1,
         BufferedImage.TYPE_INT_ARGB);
-    g = closedBox.createGraphics();
+    g = closedMarker.createGraphics();
     smooth(g);
 
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
@@ -391,8 +393,7 @@ public final class FolderView extends View {
       gui.notify.mark(1, null);
     } else if(sc(e)) {
       gui.notify.mark(2, null);
-    } else if(!SwingUtilities.isLeftMouseButton(e) ||
-        getCursor() != CURSORHAND) {
+    } else if(getCursor() != CURSORHAND) {
       if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);
     } else {
       // open/close entry
