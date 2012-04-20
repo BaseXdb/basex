@@ -130,22 +130,12 @@ class Query
   end
 
   # see readme.txt
-  def bind(name, value)
-    bind(name, value, "")
-  end
-
-  # see readme.txt
-  def bind(name, value, type)
+  def bind(name, value, type="")
     exec(3.chr, @id + 0.chr + name + 0.chr + value + 0.chr + type)
   end
 
   # see readme.txt
-  def context(value)
-    context(value, "")
-  end
-
-  # see readme.txt
-  def context(value, type)
+  def context(value, type="")
     exec(14.chr, @id + 0.chr + value + 0.chr + type)
   end
 
