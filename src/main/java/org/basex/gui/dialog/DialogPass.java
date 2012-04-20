@@ -10,12 +10,12 @@ import org.basex.gui.layout.*;
 import org.basex.util.*;
 
 /**
- * Open database dialog.
+ * Password dialog.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogPass extends Dialog {
+public final class DialogPass extends BaseXDialog {
   /** New password. */
   private final BaseXPassword pass;
   /** Buttons. */
@@ -56,8 +56,7 @@ public final class DialogPass extends Dialog {
   public void action(final Object cmp) {
     final String nm = pass();
     ok = !nm.isEmpty() && nm.matches("[^ ;'\"]*");
-    info.setText(ok || nm.isEmpty() ? null :
-      Util.info(INVALID_X, PASSWORD), Msg.ERROR);
+    info.setText(ok || nm.isEmpty() ? null : Util.info(INVALID_X, PASSWORD), Msg.ERROR);
     enableOK(buttons, B_OK, ok);
   }
 

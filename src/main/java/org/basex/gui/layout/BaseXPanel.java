@@ -11,7 +11,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import org.basex.gui.GUI;
-import org.basex.gui.dialog.Dialog;
 
 /**
  * Abstract panel implementation with a number of predefined listeners.
@@ -27,10 +26,10 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
 
   /**
    * Constructor, setting default interactions.
-   * @param win parent reference, {@link Dialog} or {@link GUI} instance
+   * @param win parent reference, {@link BaseXDialog} or {@link GUI} instance
    */
   protected BaseXPanel(final Window win) {
-    gui = win instanceof GUI ? (GUI) win : ((Dialog) win).gui;
+    gui = win instanceof GUI ? (GUI) win : ((BaseXDialog) win).gui;
     BaseXLayout.addInteraction(this, win);
   }
 

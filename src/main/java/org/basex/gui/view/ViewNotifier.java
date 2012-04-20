@@ -6,7 +6,7 @@ import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
-import org.basex.gui.dialog.Dialog;
+import org.basex.gui.layout.*;
 import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -67,14 +67,14 @@ public final class ViewNotifier {
       final long size = data.meta.dbsize();
       boolean open = false;
       for(final View v : view) open |= v.visible() && v.db();
-      if(open && size > LARGEDB && Dialog.confirm(gui,
+      if(open && size > LARGEDB && BaseXDialog.confirm(gui,
           Util.info(H_LARGE_DB, Performance.format(size)))) {
         for(final View v : view) if(v.visible() && v.db()) v.visible(false);
       }
     } else {
       // database closed: close open dialogs
       for(final Window w : gui.getOwnedWindows()) {
-        if(w.isVisible() && w instanceof Dialog) ((Dialog) w).cancel();
+        if(w.isVisible() && w instanceof BaseXDialog) ((BaseXDialog) w).cancel();
       }
     }
 

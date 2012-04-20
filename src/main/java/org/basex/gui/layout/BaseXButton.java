@@ -18,7 +18,6 @@ import javax.swing.border.EmptyBorder;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
-import org.basex.gui.dialog.Dialog;
 import org.basex.util.Token;
 
 /**
@@ -36,9 +35,9 @@ public class BaseXButton extends JButton {
   public BaseXButton(final String l, final Window win) {
     super(l);
     BaseXLayout.addInteraction(this, win);
-    if(!(win instanceof Dialog)) return;
+    if(!(win instanceof BaseXDialog)) return;
 
-    final Dialog d = (Dialog) win;
+    final BaseXDialog d = (BaseXDialog) win;
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

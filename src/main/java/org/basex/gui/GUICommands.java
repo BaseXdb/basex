@@ -11,7 +11,7 @@ import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.dialog.*;
-import org.basex.gui.dialog.Dialog;
+import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
 import org.basex.io.*;
 import org.basex.query.func.*;
@@ -49,7 +49,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       if(new DialogManage(gui).nodb()) {
-        if(Dialog.confirm(gui, NEW_DB_QUESTION)) C_CREATE.execute(gui);
+        if(BaseXDialog.confirm(gui, NEW_DB_QUESTION)) C_CREATE.execute(gui);
       }
     }
   },
@@ -92,7 +92,7 @@ public enum GUICommands implements GUICommand {
           // show message for overwriting files or directories
           final String msg = file == null ? FILES_REPLACE_X : FILE_EXISTS_X;
           if(file == null) file = root;
-          if(!Dialog.confirm(gui, Util.info(msg, file))) return;
+          if(!BaseXDialog.confirm(gui, Util.info(msg, file))) return;
         }
       }
 
@@ -240,7 +240,7 @@ public enum GUICommands implements GUICommand {
   C_DELETE(DELETE + DOTS, "", H_DELETE, true, false) {
     @Override
     public void execute(final GUI gui) {
-      if(!Dialog.confirm(gui, DELETE_NODES)) return;
+      if(!BaseXDialog.confirm(gui, DELETE_NODES)) return;
       final StringBuilder sb = new StringBuilder();
       final Nodes n = gui.context.marked;
       for(int i = 0; i < n.size(); ++i) {
@@ -645,7 +645,7 @@ public enum GUICommands implements GUICommand {
   C_HELP(HELP, "F1", H_HELP, false, false) {
     @Override
     public void execute(final GUI gui) {
-      Dialog.browse(gui, DOC_URL);
+      BaseXDialog.browse(gui, DOC_URL);
     }
   },
 
@@ -653,7 +653,7 @@ public enum GUICommands implements GUICommand {
   C_COMMUNITY(COMMUNITY, null, H_COMMUNITY, false, false) {
     @Override
     public void execute(final GUI gui) {
-      Dialog.browse(gui, COMMUNITY_URL);
+      BaseXDialog.browse(gui, COMMUNITY_URL);
     }
   },
 
@@ -661,7 +661,7 @@ public enum GUICommands implements GUICommand {
   C_UPDATES(CHECK_FOR_UPDATES, null, H_UPDATES, false, false) {
     @Override
     public void execute(final GUI gui) {
-      Dialog.browse(gui, UPDATE_URL);
+      BaseXDialog.browse(gui, UPDATE_URL);
     }
   },
 

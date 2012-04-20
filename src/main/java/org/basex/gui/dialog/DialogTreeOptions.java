@@ -13,7 +13,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Wolfgang Miller
  */
-public final class DialogTreeOptions extends Dialog {
+public final class DialogTreeOptions extends BaseXDialog {
   /** Slim rectangles to text length. */
   private final BaseXCheckBox slim;
   /** Show attributes. */

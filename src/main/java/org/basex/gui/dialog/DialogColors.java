@@ -13,7 +13,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogColors extends Dialog {
+public final class DialogColors extends BaseXDialog {
   /** Maximum color range. */
   private static final int MAXCOLOR = 32;
   /** Slider reference. */

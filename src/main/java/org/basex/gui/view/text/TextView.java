@@ -16,17 +16,12 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXEditor;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.XMLSyntax;
+import org.basex.gui.layout.*;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
@@ -208,7 +203,7 @@ public final class TextView extends View implements ActionListener {
         for(final byte t : txt) if(t < 0 || t > ' ' || ws(t)) out.write(t);
       }
     } catch(final IOException ex) {
-      Dialog.error(gui, FILE_NOT_SAVED);
+      BaseXDialog.error(gui, FILE_NOT_SAVED);
     } finally {
       if(out != null) try { out.close(); } catch(final IOException ex) { }
     }

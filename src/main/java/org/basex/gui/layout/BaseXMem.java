@@ -7,7 +7,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
-import org.basex.gui.dialog.Dialog;
 import org.basex.util.Performance;
 
 /**
@@ -83,6 +82,6 @@ public final class BaseXMem extends BaseXPanel {
         + RESERVED_MEM_C + Performance.format(occ, true) + NL + MEMUSED_C
         + Performance.format(used, true) + NL + NL + H_USED_MEM;
 
-    Dialog.info(gui, inf);
+    BaseXDialog.info(gui, inf);
   }
 }

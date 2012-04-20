@@ -9,7 +9,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
-import org.basex.gui.dialog.Dialog;
 import org.basex.io.IOFile;
 import org.basex.util.Util;
 
@@ -124,7 +123,7 @@ public final class BaseXFileChooser {
       io = new IOFile(io.path() + suffix);
 
     // show replace dialog
-    return !io.exists() || Dialog.confirm(gui, Util.info(FILE_EXISTS_X, io)) ?
+    return !io.exists() || BaseXDialog.confirm(gui, Util.info(FILE_EXISTS_X, io)) ?
         io : null;
   }
 

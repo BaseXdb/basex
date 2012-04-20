@@ -25,7 +25,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogExport extends Dialog {
+public final class DialogExport extends BaseXDialog {
   /** Available encodings. */
   private static final String[] ENCODINGS;
   /** Directory path. */
@@ -62,7 +62,6 @@ public final class DialogExport extends Dialog {
     BaseXBack pp = new BaseXBack(new TableLayout(1, 2, 8, 0));
 
     path = new BaseXTextField(main.gprop.get(GUIProp.CREATEPATH), this);
-    path.addKeyListener(keys);
     pp.add(path);
 
     final BaseXButton browse = new BaseXButton(BROWSE_D, this);
@@ -103,7 +102,6 @@ public final class DialogExport extends Dialog {
     encoding.setSelectedItem(f ? enc : sp.get(SerializerProp.S_ENCODING));
 
     params = new BaseXTextField(exporter, this);
-    params.addKeyListener(keys);
 
     pp = new BaseXBack(new TableLayout(3, 2, 16, 6)).border(8, 0, 8, 0);
     pp.add(new BaseXLabel(METHOD + COL, true, true));
@@ -135,7 +133,7 @@ public final class DialogExport extends Dialog {
    * @param encoding original encoding
    * @return combo box
    */
-  static BaseXCombo encoding(final Dialog dialog, final String encoding) {
+  static BaseXCombo encoding(final BaseXDialog dialog, final String encoding) {
     final BaseXCombo cb = new BaseXCombo(dialog, ENCODINGS);
     boolean f = false;
     String enc = encoding;

@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogEdit extends Dialog {
+public final class DialogEdit extends BaseXDialog {
   /** Resulting update arguments. */
   public final StringList result = new StringList();
   /** Node kind. */
@@ -77,13 +77,11 @@ public final class DialogEdit extends Dialog {
     final BaseXBack b = new BaseXBack(new BorderLayout(0, 4));
     if(old1 != null) {
       input1 = new BaseXTextField(old1, this);
-      input1.addKeyListener(keys);
       BaseXLayout.setWidth(input1, 500);
       b.add(input1, BorderLayout.NORTH);
     }
     if(old2 != null) {
       input2 = new BaseXTextField(old2, this);
-      input2.addKeyListener(keys);
       b.add(input2, BorderLayout.CENTER);
     }
     if(old3 != null) {

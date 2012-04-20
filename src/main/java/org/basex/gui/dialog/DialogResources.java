@@ -30,7 +30,7 @@ public class DialogResources extends BaseXBack {
   /** Database/root node. */
   final TreeFolder root;
   /** Dialog reference. */
-  final Dialog dialog;
+  final BaseXDialog dialog;
   /** Resource tree. */
   final BaseXTree tree;
   /** Filter button. */
@@ -275,7 +275,7 @@ public class DialogResources extends BaseXBack {
     @Override
     public void execute(final GUI g) {
       final TreeNode n = selection();
-      if(n == null || !Dialog.confirm(dialog.gui, DELETE_NODES)) return;
+      if(n == null || !BaseXDialog.confirm(dialog.gui, DELETE_NODES)) return;
 
       final Runnable run = new Runnable() {
         @Override

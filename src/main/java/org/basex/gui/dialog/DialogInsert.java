@@ -21,7 +21,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Lukas Kircher
  */
-public final class DialogInsert extends Dialog {
+public final class DialogInsert extends BaseXDialog {
   /** Resulting update arguments. */
   public final StringList result = new StringList();
   /** Node kind. */
@@ -55,7 +55,6 @@ public final class DialogInsert extends Dialog {
     label2 = new BaseXLabel(VALUE + COLS, true, true).border(0, 0, 0, 0);
 
     input1 = new BaseXTextField(this);
-    input1.addKeyListener(keys);
     BaseXLayout.setWidth(input1, 500);
 
     input2 = new BaseXEditor(true, this);

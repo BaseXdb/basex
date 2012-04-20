@@ -15,7 +15,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogMapLayout extends Dialog {
+public final class DialogMapLayout extends BaseXDialog {
   /** Map layouts. */
   private final BaseXList algo;
   /** Layout slider. */

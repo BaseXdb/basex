@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.dialog.Dialog;
 
 /**
  * Project specific slider implementation.
@@ -23,7 +22,7 @@ public final class BaseXSlider extends BaseXPanel {
   /** Slider width. */
   private static final double SLIDERW = 20;
   /** Listener. */
-  private final Dialog dl;
+  private final BaseXDialog dl;
   /** Minimum slider value. */
   private final int min;
   /** Maximum slider value. */
@@ -64,7 +63,7 @@ public final class BaseXSlider extends BaseXPanel {
     min = mn;
     max = mx;
     curr = i;
-    dl = w instanceof Dialog ? (Dialog) w : null;
+    dl = w instanceof BaseXDialog ? (BaseXDialog) w : null;
     al = list;
     mode(Fill.NONE).setFocusable(true);
 

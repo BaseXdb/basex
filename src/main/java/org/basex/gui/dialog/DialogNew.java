@@ -19,7 +19,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogNew extends Dialog {
+public final class DialogNew extends BaseXDialog {
   /** General dialog. */
   private final DialogImport general;
   /** Database name. */
@@ -55,7 +55,6 @@ public final class DialogNew extends Dialog {
     final GUIProp gprop = main.gprop;
 
     target = new BaseXTextField(gprop.get(GUIProp.CREATENAME), this);
-    target.addKeyListener(keys);
 
     final BaseXBack pnl = new BaseXBack(new TableLayout(2, 1));
     pnl.add(new BaseXLabel(NAME_OF_DB + COLS, false, true).border(8, 0, 6, 0));
@@ -67,16 +66,13 @@ public final class DialogNew extends Dialog {
     general = new DialogImport(this, pnl, parsing);
 
     // index panel
-    final BaseXBack indexes =
-        new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
+    final BaseXBack indexes = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
 
-    pathindex = new BaseXCheckBox(PATH_INDEX,
-        prop.is(Prop.PATHINDEX), 0, this).large();;
+    pathindex = new BaseXCheckBox(PATH_INDEX, prop.is(Prop.PATHINDEX), 0, this).large();
     indexes.add(pathindex);
     indexes.add(new BaseXLabel(H_PATH_INDEX, true, false));
 
-    txtindex = new BaseXCheckBox(TEXT_INDEX,
-        prop.is(Prop.TEXTINDEX), 0, this).large();;
+    txtindex = new BaseXCheckBox(TEXT_INDEX, prop.is(Prop.TEXTINDEX), 0, this).large();
     indexes.add(txtindex);
     indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
 
@@ -86,10 +82,8 @@ public final class DialogNew extends Dialog {
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
-    final BaseXBack fulltext =
-        new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
-    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX,
-        prop.is(Prop.FTINDEX), 0, this).large();
+    final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
+    ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, prop.is(Prop.FTINDEX), 0, this).large();
     fulltext.add(ftxindex);
 
     ft = new DialogFT(this, true);
@@ -113,8 +107,7 @@ public final class DialogNew extends Dialog {
     ft.action();
 
     // ...must be located before remaining checks
-    if(comp == general.browse || comp == general.input)
-      target.setText(general.dbname);
+    if(comp == general.browse || comp == general.input) target.setText(general.dbname);
 
     final String nm = target.getText().trim();
     ok = valid && !nm.isEmpty();

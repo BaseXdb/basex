@@ -27,18 +27,36 @@ public class BaseXTextField extends JTextField {
 
   /**
    * Constructor.
-   * @param win parent window
+   * @param gui main window
    */
-  public BaseXTextField(final Window win) {
-    this(null, win);
+  public BaseXTextField(final GUI gui) {
+    this(null, gui, null);
+  }
+
+  /**
+   * Constructor.
+   * @param dialog dialog window
+   */
+  public BaseXTextField(final BaseXDialog dialog) {
+    this(null, dialog, dialog);
+  }
+
+  /**
+   * Constructor.
+   * @param txt input text
+   * @param dialog dialog window
+   */
+  public BaseXTextField(final String txt, final BaseXDialog dialog) {
+    this(txt, dialog, dialog);
   }
 
   /**
    * Constructor.
    * @param txt input text
    * @param win parent window
+   * @param dialog dialog reference
    */
-  public BaseXTextField(final String txt, final Window win) {
+  private BaseXTextField(final String txt, final Window win, final BaseXDialog dialog) {
     BaseXLayout.setWidth(this, DWIDTH);
     BaseXLayout.addInteraction(this, win);
 
@@ -52,7 +70,7 @@ public class BaseXTextField extends JTextField {
       public void focusGained(final FocusEvent e) {
         if(area != null) {
           selectAll();
-          find();
+          find(getText().trim());
         }
       }
     });
@@ -79,31 +97,39 @@ public class BaseXTextField extends JTextField {
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(area == null) return;
-        if(!control(e) && Character.isDefined(e.getKeyChar()) && !ENTER.is(e)) {
-          final String text = getText().trim().toLowerCase(Locale.ENGLISH);
-          final String old = area.keyword(text);
-          if(text.equals(old)) return;
-          find();
-        }
+        if(area != null) find();
       }
     });
+    if(dialog != null) addKeyListener(dialog.keys);
 
     setDragEnabled(true);
     BaseXLayout.addDrop(this, new DropHandler() {
       @Override
       public void drop(final Object object) {
-        replaceSelection(object.toString());
+        setText(object.toString());
+        find();
+        if(dialog != null) dialog.action(BaseXTextField.this);
       }
     });
   }
 
   /**
-   * Finds the specified keyword in the attached editor.
+   * Searches the current keyword if an editor is attached.
    */
   void find() {
-    setBackground(area.find() || getText().trim().isEmpty() ?
-        GUIConstants.WHITE : GUIConstants.LRED);
+    if(area == null) return;
+    final String text = getText().trim().toLowerCase(Locale.ENGLISH);
+    final String old = area.keyword(text);
+    if(text.equals(old)) return;
+    find(text);
+  }
+
+  /**
+   * Finds the specified keyword in the attached editor.
+   * @param t current text
+   */
+  void find(final String t) {
+    setBackground(area.find() || t.isEmpty() ? GUIConstants.WHITE : GUIConstants.LRED);
   }
 
   /**

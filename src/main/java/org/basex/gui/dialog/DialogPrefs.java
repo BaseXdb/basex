@@ -20,7 +20,7 @@ import org.basex.io.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogPrefs extends Dialog {
+public final class DialogPrefs extends BaseXDialog {
   /** Information on available languages. */
   private static final int[] HITS = {
     10, 25, 100, 250, 1000, 2500, 10000, 25000, 100000, 250000, 1000000, -1

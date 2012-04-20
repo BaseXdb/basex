@@ -17,7 +17,6 @@ import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.BaseXLayout.DropHandler;
@@ -348,7 +347,7 @@ public final class EditorView extends View {
       if(gui.gprop.is(GUIProp.EXECRT)) edit.query();
 
     } catch(final IOException ex) {
-      Dialog.error(gui, FILE_NOT_OPENED);
+      BaseXDialog.error(gui, FILE_NOT_OPENED);
     }
     return edit;
   }
@@ -526,7 +525,7 @@ public final class EditorView extends View {
       gui.gprop.recent(file);
       refresh(false, true);
     } catch(final IOException ex) {
-      Dialog.error(gui, FILE_NOT_SAVED);
+      BaseXDialog.error(gui, FILE_NOT_SAVED);
     }
   }
 
@@ -612,7 +611,7 @@ public final class EditorView extends View {
    */
   private boolean confirm(final EditorArea edit) {
     if(edit.modified) {
-      final Boolean ok = Dialog.yesNoCancel(gui,
+      final Boolean ok = BaseXDialog.yesNoCancel(gui,
           Util.info(CLOSE_FILE_X, edit.file().name()));
       if(ok == null || ok && !save()) return false;
     }

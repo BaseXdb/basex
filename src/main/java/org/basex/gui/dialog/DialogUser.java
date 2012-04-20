@@ -67,11 +67,9 @@ final class DialogUser extends BaseXBack {
     layout(new TableLayout(7, 1, 0, 4)).border(8);
 
     user = new BaseXTextField("", dia);
-    user.addKeyListener(dia.keys);
     BaseXLayout.setWidth(user, 100);
     create = new BaseXButton(CREATE, dia);
     pass = new BaseXPassword(dia.gui);
-    pass.addKeyListener(dia.keys);
     BaseXLayout.setWidth(pass, 100);
     alter = new BaseXButton(S_ALTER, dia);
     drop = new BaseXButton(DROP + DOTS, dia);
@@ -144,7 +142,7 @@ final class DialogUser extends BaseXBack {
         final String uname = table.getModel().getValueAt((Integer) o[1], 0).toString();
 
         final boolean confirm = !g && uname.equals(dia.loguser.getText());
-        if(confirm && !Dialog.confirm(dia.gui, Util.info(S_DBREVOKE))) return;
+        if(confirm && !BaseXDialog.confirm(dia.gui, Util.info(S_DBREVOKE))) return;
 
         sess.execute(new Grant(perm, uname, db));
         msg = sess.info();
@@ -174,7 +172,7 @@ final class DialogUser extends BaseXBack {
       } else if(cmp == drop) {
         String msg2 = "";
         final int[] rows = table.getSelectedRows();
-        if(Dialog.confirm(dia.gui, Util.info(S_DRQUESTION, rows.length))) {
+        if(BaseXDialog.confirm(dia.gui, Util.info(S_DRQUESTION, rows.length))) {
           for(final int r : rows) {
             sess.execute(new DropUser(table.data.value(r, 0), db));
             if(msg == null) msg = sess.info();

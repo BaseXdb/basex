@@ -14,7 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.MouseInputAdapter;
 
-import org.basex.gui.dialog.Dialog;
 import org.basex.io.IOFile;
 import org.basex.util.Token;
 import org.basex.util.list.IntList;
@@ -49,7 +48,7 @@ public final class BaseXList extends BaseXBack {
    * @param choice the input values for the list
    * @param d dialog reference
    */
-  public BaseXList(final String[] choice, final Dialog d) {
+  public BaseXList(final String[] choice, final BaseXDialog d) {
     this(choice, d, true);
   }
 
@@ -59,7 +58,7 @@ public final class BaseXList extends BaseXBack {
    * @param d dialog reference
    * @param s only allow single choices
    */
-  public BaseXList(final String[] choice, final Dialog d, final boolean s) {
+  public BaseXList(final String[] choice, final BaseXDialog d, final boolean s) {
     // cache list values
     values = choice.clone();
     single = s;

@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogPackages extends Dialog {
+public final class DialogPackages extends BaseXDialog {
   /** List of available packages. */
   private final BaseXList packages;
   /** Title of package. */
@@ -118,7 +118,7 @@ public final class DialogPackages extends Dialog {
       cmds.add(new RepoInstall(file.path(), null));
 
     } else if(cmp == delete) {
-      if(!Dialog.confirm(gui, Util.info(DELETE_PACKAGES_X, pkgs.size()))) return;
+      if(!BaseXDialog.confirm(gui, Util.info(DELETE_PACKAGES_X, pkgs.size()))) return;
       refresh = true;
       for(final String p : pkgs) cmds.add(new RepoDelete(p, null));
 

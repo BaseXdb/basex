@@ -87,7 +87,7 @@ final class DialogParsing extends BaseXBack {
    * @param d dialog reference
    * @param t tabs
    */
-  public DialogParsing(final Dialog d, final BaseXTabs t) {
+  public DialogParsing(final BaseXDialog d, final BaseXTabs t) {
     main = new BaseXBack(new TableLayout(2, 1)).border(8);
     gui = d.gui;
     tabs = t;

@@ -19,7 +19,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogAbout extends Dialog {
+public final class DialogAbout extends BaseXDialog {
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -46,7 +46,7 @@ public final class DialogAbout extends Dialog {
     url.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
-        Dialog.browse(gui, URL);
+        BaseXDialog.browse(gui, URL);
       }
     });
 

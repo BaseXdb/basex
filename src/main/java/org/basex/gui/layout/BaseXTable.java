@@ -9,7 +9,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
-import org.basex.gui.dialog.Dialog;
 import org.basex.util.Table;
 import org.basex.util.Token;
 
@@ -23,7 +22,7 @@ public final class BaseXTable extends JTable {
   /** Table data. */
   public Table data;
   /** Dialog instance. */
-  final Dialog dialog;
+  final BaseXDialog dialog;
   /** Table model. */
   private final TableModel model;
 
@@ -32,7 +31,7 @@ public final class BaseXTable extends JTable {
    * @param t table input
    * @param d dialog reference
    */
-  public BaseXTable(final Table t, final Dialog d) {
+  public BaseXTable(final Table t, final BaseXDialog d) {
     data = t;
     dialog = d;
     model = new TableModel();

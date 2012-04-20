@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
-import org.basex.gui.dialog.Dialog;
 
 /**
  * Project specific RadioButton implementation.
@@ -26,11 +25,11 @@ public final class BaseXRadio extends JRadioButton {
     setBorder(new EmptyBorder(0, 0, 0, 16));
     BaseXLayout.addInteraction(this, win);
 
-    if(!(win instanceof Dialog)) return;
+    if(!(win instanceof BaseXDialog)) return;
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        ((Dialog) win).action(e.getSource());
+        ((BaseXDialog) win).action(e.getSource());
       }
     });
   }

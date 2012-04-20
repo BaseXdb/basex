@@ -39,7 +39,7 @@ final class DialogFT extends BaseXBack {
   private static final int FLAGS = 7;
 
   /** Dialog reference. */
-  private final Dialog dialog;
+  private final BaseXDialog dialog;
   /** Full-text indexing. */
   private final BaseXCheckBox[] check = new BaseXCheckBox[FLAGS];
   /** Full-text labels. */
@@ -58,7 +58,7 @@ final class DialogFT extends BaseXBack {
    * @param d dialog reference
    * @param create create dialog
    */
-  DialogFT(final Dialog d, final boolean create) {
+  DialogFT(final BaseXDialog d, final boolean create) {
     dialog = d;
     layout(new TableLayout(create ? 10 : 17, 1));
 

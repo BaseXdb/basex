@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.*;
 
 import org.basex.gui.*;
-import org.basex.gui.dialog.Dialog;
 import org.basex.util.*;
 
 /**
@@ -148,9 +147,9 @@ public final class BaseXLayout {
       }
     });
 
-    if(win instanceof Dialog) {
+    if(win instanceof BaseXDialog) {
       // add default keys
-      final Dialog d = (Dialog) win;
+      final BaseXDialog d = (BaseXDialog) win;
       comp.addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(final KeyEvent e) {

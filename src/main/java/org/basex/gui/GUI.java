@@ -11,7 +11,6 @@ import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import static org.basex.gui.GUIConstants.*;
-import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogPass;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.ViewContainer;
@@ -482,7 +481,7 @@ public final class GUI extends AGUI {
     } catch(final Exception ex) {
       // unexpected error
       Util.stack(ex);
-      Dialog.error(this, Util.info(EXEC_ERROR, c,
+      BaseXDialog.error(this, Util.info(EXEC_ERROR, c,
           !ex.toString().isEmpty() ? ex.toString() : ex.getMessage()));
       updating = false;
     }
@@ -706,9 +705,9 @@ public final class GUI extends AGUI {
             Pattern.DOTALL).matcher(page);
         if(m.matches()) {
           final Version latest = new Version(m.group(2));
-          if(disk.compareTo(latest) < 0 && Dialog.confirm(this,
+          if(disk.compareTo(latest) < 0 && BaseXDialog.confirm(this,
               Util.info(H_NEW_VERSION, Prop.NAME, latest))) {
-            Dialog.browse(this, UPDATE_URL);
+            BaseXDialog.browse(this, UPDATE_URL);
           } else {
             // don't show update dialog anymore if it has been rejected once
             gprop.set(GUIProp.UPDATEVERSION, latest.toString());

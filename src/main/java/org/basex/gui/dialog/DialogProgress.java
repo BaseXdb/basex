@@ -18,7 +18,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogProgress extends Dialog implements ActionListener {
+public final class DialogProgress extends BaseXDialog implements ActionListener {
   /** Maximum value of progress bar. */
   private static final int MAX = 600;
   /** Refresh action. */
@@ -49,7 +49,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
    * @param title dialog title
    * @param cmd progress reference
    */
-  private DialogProgress(final Dialog dialog, final String title, final Command cmd) {
+  private DialogProgress(final BaseXDialog dialog, final String title,
+      final Command cmd) {
     super(dialog, title);
     init(dialog, cmd);
   }
@@ -118,26 +119,26 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
   /**
    * Runs the specified commands, decorated by a progress dialog, and
-   * calls {@link Dialog#action} if the dialog is closed.
+   * calls {@link BaseXDialog#action} if the dialog is closed.
    * @param dialog reference to the dialog window
    * @param title dialog title (may be an empty string)
    * @param cmds commands to be run
    */
-  public static void execute(final Dialog dialog, final String title,
+  public static void execute(final BaseXDialog dialog, final String title,
       final Command... cmds) {
     execute(dialog, title, null, cmds);
   }
 
   /**
    * Runs the specified commands, decorated by a progress dialog, and
-   * calls {@link Dialog#action} if the dialog is closed.
+   * calls {@link BaseXDialog#action} if the dialog is closed.
    * @param dialog reference to the dialog window
    * @param title dialog title (may be an empty string)
    * @param post post-processing step
    * @param cmds commands to be run
    */
-  public static void execute(final Dialog dialog, final String title, final Runnable post,
-      final Command... cmds) {
+  public static void execute(final BaseXDialog dialog, final String title,
+      final Runnable post, final Command... cmds) {
 
     final GUI gui = dialog.gui;
     for(final Command cmd : cmds) {
@@ -172,7 +173,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
           // close progress window and show error if command failed
           wait.dispose();
-          if(!ok) Dialog.error(gui, info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
+          if(!ok) BaseXDialog.error(gui,
+              info.equals(INTERRUPTED) ? COMMAND_CANCELED : info);
         }
       }.start();
 

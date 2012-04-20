@@ -1,4 +1,4 @@
-package org.basex.gui.dialog;
+package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
@@ -12,7 +12,7 @@ import javax.swing.*;
 import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.GUIConstants.Msg;
-import org.basex.gui.layout.*;
+import org.basex.gui.dialog.*;
 import org.basex.util.*;
 
 /**
@@ -21,20 +21,21 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class Dialog extends JDialog {
+public abstract class BaseXDialog extends JDialog {
   /** Used mnemonics. */
   public final StringBuilder mnem = new StringBuilder();
   /** Reference to main window. */
   public GUI gui;
-  /** Reference to the root panel. */
-  BaseXBack panel;
   /** Remembers if the window was correctly closed. */
-  boolean ok;
+  public boolean ok;
+  /** Reference to the root panel. */
+  public BaseXBack panel;
+
   /** Dialog position. */
   private int[] loc;
 
   /** Key listener, triggering an action with each click. */
-  final KeyAdapter keys = new KeyAdapter() {
+  public final KeyAdapter keys = new KeyAdapter() {
     @Override
     public void keyReleased(final KeyEvent e) {
       // don't trigger any action for modifier keys
@@ -47,7 +48,7 @@ public abstract class Dialog extends JDialog {
    * @param d calling dialog
    * @param title dialog title
    */
-  Dialog(final Dialog d, final String title) {
+  public BaseXDialog(final BaseXDialog d, final String title) {
     super(d, title, true);
     init(d.gui);
   }
@@ -57,7 +58,7 @@ public abstract class Dialog extends JDialog {
    * @param main reference to main window
    * @param title dialog title
    */
-  Dialog(final GUI main, final String title) {
+  public BaseXDialog(final GUI main, final String title) {
     this(main, title, true);
   }
 
@@ -67,7 +68,7 @@ public abstract class Dialog extends JDialog {
    * @param title dialog title
    * @param modal modal flag
    */
-  Dialog(final GUI main, final String title, final boolean modal) {
+  public BaseXDialog(final GUI main, final String title, final boolean modal) {
     super(main, title, modal);
     init(main);
   }
@@ -94,7 +95,7 @@ public abstract class Dialog extends JDialog {
    * @param comp component to be added
    * @param pos layout position
    */
-  final void set(final Component comp, final String pos) {
+  public final void set(final Component comp, final String pos) {
     panel.add(comp, pos);
   }
 
@@ -102,7 +103,7 @@ public abstract class Dialog extends JDialog {
    * Finalizes the dialog layout and sets it visible.
    * @param l optional dialog location, relative to main window
    */
-  final void finish(final int[] l) {
+  public final void finish(final int[] l) {
     pack();
     if(l == null) setLocationRelativeTo(gui);
     else setLocation(gui.getX() + l[0], gui.getY() + l[1]);
@@ -165,7 +166,7 @@ public abstract class Dialog extends JDialog {
    * Creates a OK and CANCEL button.
    * @return button list
    */
-  BaseXBack okCancel() {
+  public BaseXBack okCancel() {
     return newButtons(B_OK, B_CANCEL);
   }
 
@@ -174,7 +175,7 @@ public abstract class Dialog extends JDialog {
    * @param buttons button names or objects
    * @return button list
    */
-  BaseXBack newButtons(final Object... buttons) {
+  public BaseXBack newButtons(final Object... buttons) {
     // horizontal/vertical layout
     final BaseXBack pnl = new BaseXBack(Fill.NONE).
       border(12, 0, 0, 0).layout(new TableLayout(1, buttons.length, 8, 0));
@@ -200,7 +201,7 @@ public abstract class Dialog extends JDialog {
    * @param label button label
    * @param enabled enabled/disabled
    */
-  static void enableOK(final JComponent panel, final String label,
+  public static void enableOK(final JComponent panel, final String label,
       final boolean enabled) {
 
     for(final Component c : panel.getComponents()) {
@@ -222,8 +223,7 @@ public abstract class Dialog extends JDialog {
    * @return true if dialog was confirmed
    */
   public static Boolean yesNoCancel(final GUI gui, final String text) {
-    final DialogMessage msg =
-      new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL);
+    final DialogMessage msg = new DialogMessage(gui, text.trim(), Msg.YESNOCANCEL);
     return msg.canceled() ? null : msg.ok();
   }
 

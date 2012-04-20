@@ -13,7 +13,7 @@ import org.basex.gui.layout.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogFonts extends Dialog {
+public final class DialogFonts extends BaseXDialog {
   /** Predefined font sizes. */
   private static final String[] FTSZ =
     { "8", "10", "12", "14", "16", "18", "20", "22", "24", "32" };

@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
-import org.basex.gui.dialog.Dialog;
 
 /**
  * Project specific CheckBox implementation.
@@ -38,12 +37,12 @@ public final class BaseXCheckBox extends JCheckBox {
     setMargin(new Insets(0, 0, dist, 0));
     if(dist == 0) setFont(getFont().deriveFont(1));
     BaseXLayout.addInteraction(this, win);
-    if(!(win instanceof Dialog)) return;
+    if(!(win instanceof BaseXDialog)) return;
 
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        ((Dialog) win).action(e.getSource());
+        ((BaseXDialog) win).action(e.getSource());
       }
     });
   }

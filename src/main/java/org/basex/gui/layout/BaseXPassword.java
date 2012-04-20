@@ -5,7 +5,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.basex.gui.dialog.Dialog;
 
 /**
  * Project specific password field implementation.
@@ -22,7 +21,7 @@ public final class BaseXPassword extends JPasswordField {
     BaseXLayout.setWidth(this, BaseXTextField.DWIDTH);
     BaseXLayout.addInteraction(this, win);
 
-    if(!(win instanceof Dialog)) return;
+    if(!(win instanceof BaseXDialog)) return;
 
     addMouseListener(new MouseAdapter() {
       @Override

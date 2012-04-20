@@ -22,7 +22,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogProps extends Dialog {
+public final class DialogProps extends BaseXDialog {
   /** Index types. */
   static final String[] HELP = {
     "", "", H_PATH_INDEX, H_TEXT_INDEX, H_ATTR_INDEX, ""

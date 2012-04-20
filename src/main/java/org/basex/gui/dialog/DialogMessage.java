@@ -15,7 +15,7 @@ import org.basex.util.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class DialogMessage extends Dialog {
+public final class DialogMessage extends BaseXDialog {
   /** Ok/yes button. */
   final BaseXButton yes;
 
@@ -30,7 +30,7 @@ final class DialogMessage extends Dialog {
    * @param txt message text
    * @param ic message type
    */
-  DialogMessage(final GUI main, final String txt, final Msg ic) {
+  public DialogMessage(final GUI main, final String txt, final Msg ic) {
     super(main, ic == Msg.ERROR ? Text.ERROR : Text.INFORMATION);
 
     panel.setLayout(new BorderLayout());

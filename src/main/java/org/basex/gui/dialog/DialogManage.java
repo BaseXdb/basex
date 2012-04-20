@@ -23,7 +23,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class DialogManage extends Dialog {
+public final class DialogManage extends BaseXDialog {
   /** List of currently available databases. */
   private final BaseXList choice;
   /** Name of current database. */
@@ -147,7 +147,7 @@ public final class DialogManage extends Dialog {
       for(final String s : dbs) {
         if(ctx.mprop.dbexists(s)) cmds.add(new DropDB(s));
       }
-      if(!Dialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
+      if(!BaseXDialog.confirm(gui, Util.info(DROPPING_DB_X, cmds.size()))) return;
       refresh = true;
 
     } else if(cmp == rename) {
@@ -167,8 +167,8 @@ public final class DialogManage extends Dialog {
 
     } else if(cmp == restore) {
       // show warning if existing database would be overwritten
-      if(!gui.context.mprop.dbexists(db) || Dialog.confirm(gui, OVERWRITE_DB_QUESTION))
-        cmds.add(new Restore(db));
+      if(!gui.context.mprop.dbexists(db) ||
+          BaseXDialog.confirm(gui, OVERWRITE_DB_QUESTION)) cmds.add(new Restore(db));
 
     } else if(cmp == backups) {
       // don't reset the combo box after selecting an item
@@ -181,7 +181,7 @@ public final class DialogManage extends Dialog {
 
     } else if(cmp == deleteAll) {
       final String[] back = backups.getList();
-      if(!Dialog.confirm(gui, Util.info(DROP_BACKUPS_X, back.length))) return;
+      if(!BaseXDialog.confirm(gui, Util.info(DROP_BACKUPS_X, back.length))) return;
       for(final String b : back) cmds.add(new DropBackup(b));
       refresh = true;
 

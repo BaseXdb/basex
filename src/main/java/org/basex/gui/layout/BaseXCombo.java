@@ -5,7 +5,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import org.basex.gui.dialog.Dialog;
 
 /**
  * Project specific ComboBox implementation.
@@ -23,13 +22,13 @@ public final class BaseXCombo extends JComboBox {
     super(ch);
     BaseXLayout.addInteraction(this, win);
 
-    if(!(win instanceof Dialog)) return;
+    if(!(win instanceof BaseXDialog)) return;
 
     addItemListener(new ItemListener() {
       @Override
       public void itemStateChanged(final ItemEvent ie) {
         if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
-          ((Dialog) win).action(ie.getSource());
+          ((BaseXDialog) win).action(ie.getSource());
         }
       }
     });

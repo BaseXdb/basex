@@ -24,7 +24,7 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Andreas Weiler
  */
-public final class DialogServer extends Dialog {
+public final class DialogServer extends BaseXDialog {
   /** Password textfield. */
   private final BaseXPassword logpass;
 
@@ -107,15 +107,10 @@ public final class DialogServer extends Dialog {
 
     final MainProp mprop = ctx.mprop;
     host = new BaseXTextField(mprop.get(MainProp.HOST), this);
-    host.addKeyListener(keys);
     ports = new BaseXTextField(Integer.toString(mprop.num(MainProp.SERVERPORT)), this);
-    ports.addKeyListener(keys);
     portc = new BaseXTextField(Integer.toString(mprop.num(MainProp.PORT)), this);
-    portc.addKeyListener(keys);
     loguser = new BaseXTextField(gui.gprop.get(GUIProp.SERVERUSER), this);
-    loguser.addKeyListener(keys);
     logpass = new BaseXPassword(this);
-    logpass.addKeyListener(keys);
     infoC = new BaseXLabel(" ").border(12, 0, 0, 0);
 
     // local server panel

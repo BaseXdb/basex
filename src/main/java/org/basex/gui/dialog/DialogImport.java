@@ -61,7 +61,7 @@ public final class DialogImport extends BaseXBack {
    * @param panel feature panel
    * @param parse parsing dialog
    */
-  public DialogImport(final Dialog dial, final BaseXBack panel,
+  public DialogImport(final BaseXDialog dial, final BaseXBack panel,
       final DialogParsing parse) {
 
     gui = dial.gui;
@@ -75,7 +75,6 @@ public final class DialogImport extends BaseXBack {
 
     final String in = gui.gprop.get(GUIProp.CREATEPATH);
     input = new BaseXTextField(gui.gprop.get(GUIProp.CREATEPATH), dial);
-    input.addKeyListener(dial.keys);
 
     final IO io = IO.get(in);
     if(io instanceof IOFile && !in.isEmpty()) dbname = io.dbname();
