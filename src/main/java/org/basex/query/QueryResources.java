@@ -70,7 +70,7 @@ public final class QueryResources {
   /**
    * Closes the opened data references.
    */
-  void close() {
+  public void close() {
     for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
       Close.close(data[d], ctx.context);
     }

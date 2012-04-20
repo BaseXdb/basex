@@ -130,6 +130,8 @@ public final class QueryContext extends Progress {
   private boolean firstOpt = true;
   /** Evaluation flag. */
   private boolean firstEval = true;
+  /** Closed flag. */
+  private boolean closed;
 
   /**
    * Constructor.
@@ -383,6 +385,26 @@ public final class QueryContext extends Progress {
     // initializes the update container
     if(up && updates == null) updates = new Updates();
     updating = up;
+  }
+
+  /**
+   * Closes the query context.
+   */
+  public void close() {
+    // close only once
+    if(closed) return;
+    closed = true;
+
+    // reset database properties to initial value
+    for(final Entry<String, Object> e : globalOpt.entrySet()) {
+      context.prop.setObject(e.getKey(), e.getValue());
+    }
+    // close database connections
+    resource.close();
+    // close JDBC connections
+    if(jdbc != null) jdbc.close();
+    // close dynamically loaded JAR files
+    modules.close();
   }
 
   @Override

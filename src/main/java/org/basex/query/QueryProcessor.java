@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.Map.Entry;
 
 import org.basex.core.*;
 import org.basex.core.Context;
@@ -31,8 +30,6 @@ public final class QueryProcessor extends Progress {
   private boolean parsed;
   /** Compilation flag. */
   private boolean compiled;
-  /** Closed flag. */
-  private boolean closed;
 
   /**
    * Default constructor.
@@ -233,20 +230,7 @@ public final class QueryProcessor extends Progress {
    * Closes the processor.
    */
   public void close() {
-    // close only once
-    if(closed) return;
-    closed = true;
-
-    // reset database properties to initial value
-    for(final Entry<String, Object> e : ctx.globalOpt.entrySet()) {
-      ctx.context.prop.setObject(e.getKey(), e.getValue());
-    }
-    // close database connections
-    ctx.resource.close();
-    // close JDBC connections
-    if(ctx.jdbc != null) ctx.jdbc.close();
-    // close dynamically loaded JAR files
-    ctx.modules.close();
+    ctx.close();
   }
 
   /**
