@@ -219,14 +219,6 @@ public abstract class IO {
   }
 
   /**
-   * Checks if this file contains XML.
-   * @return result of check
-   */
-  public final boolean isXML() {
-    return hasSuffix(XMLSUFFIXES);
-  }
-
-  /**
    * Chops the path and the file suffix of the specified filename
    * and returns the database name.
    * @return database name

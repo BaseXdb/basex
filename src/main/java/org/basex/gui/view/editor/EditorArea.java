@@ -7,7 +7,7 @@ import org.basex.gui.layout.BaseXEditor;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.io.IOFile;
+import org.basex.io.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -78,7 +78,7 @@ final class EditorArea extends BaseXEditor {
 
   /**
    * Returns {@code true} if a file has been opened from disk
-   * (i.e., has a valid timestamp).
+   * (i.e., has a valid timestamp and filename).
    * @return result of check
    */
   boolean opened() {
@@ -125,7 +125,7 @@ final class EditorArea extends BaseXEditor {
     view.pos.setText(pos());
     gui.context.prop.set(Prop.QUERYPATH, file.path());
 
-    if(file.isXML()) {
+    if(opened() && !file.hasSuffix(IO.XQSUFFIXES)) {
       // non-executable input
       view.info(OK, true);
       executable = false;
