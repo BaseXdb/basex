@@ -65,32 +65,35 @@ final class RestXqResponse {
     function.bind(http);
 
     // compile and evaluate function
-    final Value result = bfc.comp(qc).value(qc);
-    final int rs = (int) result.size();
+    try {
+      final Value result = bfc.comp(qc).value(qc);
+      final int rs = (int) result.size();
+      // execute updates
+      if(qc.updating()) qc.updates.apply();
 
-    // execute updates
-    if(qc.updating()) qc.updates.apply();
+      final Item item = rs > 0 ? result.itemAt(0) : null;
+      final SeqType st = SeqType.get(REST_RESPONSE.type, Occ.ONE, REST_RESPONSE);
+      final ANode response = item != null && st.instance(item) ? (ANode) item : null;
 
-    final Item item = rs > 0 ? result.itemAt(0) : null;
-    final SeqType st = SeqType.get(REST_RESPONSE.type, Occ.ONE, REST_RESPONSE);
-    final ANode response = item != null && st.instance(item) ? (ANode) item : null;
+      // HEAD method may only return a single response element
+      if(function.methods.size() == 1 && function.methods.contains(HTTPMethod.HEAD)) {
+        if(rs != 1 || response == null) function.error(HEAD_METHOD);
+      }
 
-    // HEAD method may only return a single response element
-    if(function.methods.size() == 1 && function.methods.contains(HTTPMethod.HEAD)) {
-      if(rs != 1 || response == null) function.error(HEAD_METHOD);
+      // process rest:response element and set serializer
+      SerializerProp sp = response != null ? process(response) : null;
+      if(sp == null) sp = function.output;
+
+      // initialize response and serialize result
+      http.initResponse(sp);
+      final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
+      for(int v = response != null ? 1 : 0; v < rs; v++) {
+        result.itemAt(v).serialize(ser);
+      }
+      ser.close();
+    } finally {
+      qc.close();
     }
-
-    // process rest:response element and set serializer
-    SerializerProp sp = response != null ? process(response) : null;
-    if(sp == null) sp = function.output;
-
-    // initialize response and serialize result
-    http.initResponse(sp);
-    final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
-    for(int v = response != null ? 1 : 0; v < rs; v++) {
-      result.itemAt(v).serialize(ser);
-    }
-    ser.close();
   }
 
   /**
