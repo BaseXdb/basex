@@ -424,8 +424,12 @@ public class BaseXEditor extends BaseXPanel {
     text.pos(text.cursor());
     if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
-    if(FINDNEXT.is(e) || FINDPREV.is(e) || FINDNEXT2.is(e) || FINDPREV2.is(e)) {
-      scroll(rend.find(FINDPREV.is(e) || FINDPREV2.is(e), true));
+    if(FINDNEXT.is(e) || FINDNEXT2.is(e)) {
+      scroll(rend.find(true, true));
+      return;
+    }
+    if(FINDPREV.is(e) || FINDPREV2.is(e)) {
+      scroll(rend.find(false, true));
       return;
     }
     if(SELECTALL.is(e)) {
