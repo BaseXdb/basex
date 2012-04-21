@@ -198,9 +198,11 @@ final class RestXqFunction {
     // bind form parameters
     if(formParams.size() != 0) {
       if(MimeTypes.APP_FORM.equals(ct)) {
-        // convert POST-encoded parameters
+        // convert parameters encoded in a form
         body = cache(http, body);
-        params = convert(body.toString());
+        for(final Map.Entry<String, String[]> e : convert(body.toString()).entrySet()) {
+          params.put(e.getKey(), e.getValue());
+        }
       }
       for(final RestXqParam rxp : formParams) bind(rxp, params.get(rxp.key));
     }

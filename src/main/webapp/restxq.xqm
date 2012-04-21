@@ -35,7 +35,7 @@ declare %rest:path("")
       <p>The next example processes a simple form via POST:</p>
       <form method="post" action="form">
         <p>Your message:<br />
-        <input name="content" size="50"></input>
+        <input name="message" size="50"></input>
         <input type="submit" /></p>
       </form>
       <p>The source of this file is shown below:</p>
@@ -60,7 +60,7 @@ declare %rest:path("hello/{$world}")
 
 declare %rest:path("form/")
         %rest:POST
-        %rest:form-param("content","{$message}", "'no message delivered'")
+        %rest:form-param("message","{$message}", "'no message delivered'")
         function page:hello-postman($message as xs:string) {
   <response>
     <title>Hello!</title>
