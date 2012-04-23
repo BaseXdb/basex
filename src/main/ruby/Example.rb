@@ -10,7 +10,7 @@ begin
   start_time = Time.now
 
   # create session
-  session = Session.new("localhost", 1984, "admin", "admin")
+  session = BaseXClient::Session.new("localhost", 1984, "admin", "admin")
 
   # perform command and print returned string
   print session.execute("xquery 1 to 10")

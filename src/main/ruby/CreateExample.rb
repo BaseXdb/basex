@@ -8,7 +8,7 @@ require 'BaseXClient.rb'
 begin
 
   # create session
-  session = Session.new("localhost", 1984, "admin", "admin")
+  session = BaseXClient::Session.new("localhost", 1984, "admin", "admin")
   
   # create new database
   session.create("database", "<x>Hello World!</x>")

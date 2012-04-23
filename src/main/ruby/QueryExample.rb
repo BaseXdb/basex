@@ -7,7 +7,7 @@ require 'BaseXClient.rb'
 
 begin
   # create session
-  session = Session.new("localhost", 1984, "admin", "admin")
+  session = BaseXClient::Session.new("localhost", 1984, "admin", "admin")
 
   begin
     # create query instance
