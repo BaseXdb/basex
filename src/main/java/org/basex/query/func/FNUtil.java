@@ -77,6 +77,7 @@ public final class FNUtil extends StandardFunc {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(sig) {
+      case _UTIL_SLEEP:             return sleep(ctx);
       case _UTIL_FORMAT:            return format(ctx);
       case _UTIL_INTEGER_FROM_BASE: return fromBase(ctx, ii);
       case _UTIL_INTEGER_TO_BASE:   return toBase(ctx, ii);
@@ -236,6 +237,18 @@ public final class FNUtil extends StandardFunc {
         return i;
       }
     };
+  }
+
+  /**
+   * Sleeps for the specified number of milliseconds.
+   * @param ctx query context
+   * @return {@code null}
+   * @throws QueryException query exception
+   */
+  private Item sleep(final QueryContext ctx) throws QueryException {
+    final long ms = checkItr(expr[0], ctx);
+    Performance.sleep(ms);
+    return null;
   }
 
   /** Digits used in base conversion. */

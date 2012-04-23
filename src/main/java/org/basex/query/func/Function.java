@@ -679,6 +679,8 @@ public enum Function {
   _UTIL_MEM(FNUtil.class, "mem(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
   /** Utility function: dumps the execution time of an expression. */
   _UTIL_TIME(FNUtil.class, "time(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
+  /** Utility function: sleeps for the specified number of milliseconds. */
+  _UTIL_SLEEP(FNUtil.class, "sleep(ms)", EMP, ITR),
   /** Utility function: converts a number to a given base. */
   _UTIL_INTEGER_TO_BASE(FNUtil.class, "integer-to-base(num,base)", STR, ITR, ITR),
   /** Utility function: decodes a number from a given base. */

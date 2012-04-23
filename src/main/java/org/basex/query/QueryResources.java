@@ -192,18 +192,15 @@ public final class QueryResources {
           root = root.substring(0, s);
         }
         final Data d = data(root, path, ii);
-        final String p = d instanceof MemData ? "" : path;
-        addCollection(DBNodeSeq.get(d.resources.docs(p), d, true,
-            path.isEmpty()), d.meta.name);
+        final IntList docs = d.resources.docs(d.inMemory() ? "" : path);
+        addCollection(DBNodeSeq.get(docs, d, true, path.isEmpty()), d.meta.name);
       }
     }
     return coll[c];
   }
 
-  // API METHODS ==============================================================
-
   /**
-   * Adds a document with the specified path.
+   * Adds a document with the specified path. Only called from the test APIs.
    * @param name name of document, or {@code null}
    * @param path documents path
    * @throws QueryException query exception
@@ -214,7 +211,7 @@ public final class QueryResources {
   }
 
   /**
-   * Adds a collection with the specified paths.
+   * Adds a collection with the specified paths. Only called from the test APIs.
    * @param name name of collection
    * @param paths documents paths
    * @throws QueryException query exception

@@ -26,7 +26,6 @@ import org.basex.util.list.*;
  * <li>The table is limited to 2^31 entries (pre values are signed int's)</li>
  * <li>A maximum of 2^15 different tag and attribute names is allowed</li>
  * <li>A maximum of 2^8 different namespaces is allowed</li>
- * <li>A tag can have a maximum of 32 attributes</li>
  * </ul>
  * Each node occupies 128 bits. The current storage layout looks as follows:
  *
@@ -1115,6 +1114,16 @@ public abstract class Data {
    */
   protected abstract void indexDelete(final int pre, final int size);
 
+  // HELPER FUNCTIONS ===================================================================
+
+  /**
+   * Indicates if this data instance is in main memory or on disk.
+   * @return result of check
+   */
+  public final boolean inMemory() {
+    return this instanceof MemData;
+  }
+
   /**
    * Returns a string representation of the specified table range. Can be called
    * for debugging.
@@ -1128,6 +1137,7 @@ public abstract class Data {
 
   @Override
   public final String toString() {
-    return toString(0, meta.size);
+    final int max = 20;
+    return meta.size > max ? toString(0, max) + "..." : toString(0, meta.size);
   }
 }

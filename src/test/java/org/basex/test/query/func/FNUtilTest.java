@@ -74,6 +74,18 @@ public final class FNUtilTest extends AdvancedQueryTest {
   }
 
   /**
+   * Test method for the util:sleep() function.
+   */
+  @Test
+  public void utilSleep() {
+    check(_UTIL_SLEEP);
+    query(_UTIL_SLEEP.args(" 10"));
+    query(_UTIL_SLEEP.args(" 1"));
+    query(_UTIL_SLEEP.args(" 0"));
+    query(_UTIL_SLEEP.args(" -1"));
+  }
+
+  /**
    * Test method for the util:integer-to-base() function.
    */
   @Test
