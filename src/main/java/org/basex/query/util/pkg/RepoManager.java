@@ -95,7 +95,6 @@ public final class RepoManager {
     for(final byte[] p : pkg) {
       if(p == null) continue;
       final TokenList tl = new TokenList();
-      System.out.println("- " + string(p));
       tl.add(Package.name(p));
       tl.add(Package.version(p));
       tl.add(EXPATH);
