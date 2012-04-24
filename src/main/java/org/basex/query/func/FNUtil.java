@@ -246,8 +246,7 @@ public final class FNUtil extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item sleep(final QueryContext ctx) throws QueryException {
-    final long ms = checkItr(expr[0], ctx);
-    Performance.sleep(ms);
+    Performance.sleep(checkItr(expr[0], ctx));
     return null;
   }
 
@@ -491,7 +490,7 @@ public final class FNUtil extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.NDT && (sig == Function._UTIL_EVAL ||
+    return u == Use.NDT && (sig == Function._UTIL_EVAL || sig == Function._UTIL_SLEEP ||
         sig == Function._UTIL_RUN || sig == Function._UTIL_MEM ||
         sig == Function._UTIL_TIME || sig == Function._UTIL_UUID) ||
       super.uses(u);
