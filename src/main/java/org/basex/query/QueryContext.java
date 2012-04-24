@@ -240,18 +240,27 @@ public final class QueryContext extends Progress {
    */
   public Value value() throws QueryException {
     try {
-      Value v = value(root);
-      if(updating) {
-        updates.apply();
-        if(updates.size() != 0 && context.data() != null) context.update();
-        if(output.size() != 0) v = output.value();
-      }
-      return v;
-
+      final Value v = value(root);
+      final Value u = update();
+      return u != null ? u : v;
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
       throw XPSTACK.thrw(null);
     }
+  }
+
+  /**
+   * Performs updates.
+   * @return resulting value
+   * @throws QueryException query exception
+   */
+  public Value update() throws QueryException {
+    if(updating) {
+      updates.apply();
+      if(updates.size() != 0 && context.data() != null) context.update();
+      if(output.size() != 0) return output.value();
+    }
+    return null;
   }
 
 
