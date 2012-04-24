@@ -47,8 +47,6 @@ public final class TextView extends View implements ActionListener {
   private Command cmd;
   /** Result nodes. */
   private Nodes ns;
-  /** Refresh flag. */
-  private boolean refresh;
 
   /**
    * Default constructor.
@@ -104,8 +102,7 @@ public final class TextView extends View implements ActionListener {
 
   @Override
   public void refreshMark() {
-    if(refresh) refresh = false;
-    else setText(gui.context.marked);
+    setText(gui.context.marked);
   }
 
   @Override
@@ -150,7 +147,6 @@ public final class TextView extends View implements ActionListener {
         final ArrayOutput ao = new ArrayOutput().max(gui.gprop.num(GUIProp.MAXTEXT));
         if(n != null) n.serialize(Serializer.get(ao));
         setText(ao, null);
-        refresh = false;
       } catch(final IOException ex) {
         Util.debug(ex);
       }
@@ -174,7 +170,6 @@ public final class TextView extends View implements ActionListener {
     area.setText(buf, size);
     header.setText(TEXT + (out.finished() ? CHOPPED : ""));
     home.setEnabled(gui.context.data() != null);
-    refresh = true;
     if(!out.finished()) {
       cmd = null;
       ns = null;

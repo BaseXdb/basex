@@ -387,8 +387,7 @@ public final class GUI extends AGUI {
 
       // execute command and cache result
       final ArrayOutput ao = new ArrayOutput().max(gprop.num(GUIProp.MAXTEXT));
-      final boolean up = c.updating(context);
-      updating = up;
+      updating = c.updating(context);
 
       // updates the query editor
       if(edit) {
@@ -432,22 +431,16 @@ public final class GUI extends AGUI {
         final Nodes nodes = result instanceof Nodes &&
             result.size() != 0 ? (Nodes) result : null;
 
-        // treat text view different to other views
-        if(nodes == null && !interrupted) {
-          // display text view
-          if(!text.visible()) GUICommands.C_SHOWTEXT.execute(this);
-          text.setText(ao, c);
-        }
-
         final Data ndata = context.data();
         Nodes marked = context.marked;
 
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
-        } else if(up && c.updated()) {
+        } else if(c.updated()) {
           // data has been updated
           notify.update();
+          //if(ao.size() != 0) text.setText(ao, c);
         } else if(result != null) {
           final Nodes nd = context.current();
           // check if result has changed
@@ -466,17 +459,20 @@ public final class GUI extends AGUI {
             }
             // refresh views
             notify.mark(marked, null);
-            if(thread != threadID) {
-              command = null;
-              return true;
-            }
           }
         }
-        // show number of hits
-        if(!interrupted) setResults(result == null ? 0 : result.size());
 
-        // show status info
-        status.setText(Util.info(TIME_NEEDED_X, time));
+        if(thread == threadID && !interrupted) {
+          // assign textual output if no node result was created
+          if(nodes == null) {
+            if(!text.visible()) GUICommands.C_SHOWTEXT.execute(this);
+            text.setText(ao, c);
+          }
+          // show status info
+          status.setText(Util.info(TIME_NEEDED_X, time));
+          // show number of hits
+          if(result != null) setResults(result.size());
+        }
       }
     } catch(final Exception ex) {
       // unexpected error
