@@ -66,11 +66,11 @@ final class RestXqResponse {
 
     // compile and evaluate function
     try {
-      final Value result = bfc.comp(qc).value(qc);
-      final int rs = (int) result.size();
-      // execute updates
-      if(qc.updating()) qc.updates.apply();
+      Value result = qc.value(bfc.comp(qc));
+      final Value update = qc.update();
+      if(update != null) result = update;
 
+      final int rs = (int) result.size();
       final Item item = rs > 0 ? result.itemAt(0) : null;
       final SeqType st = SeqType.get(REST_RESPONSE.type, Occ.ONE, REST_RESPONSE);
       final ANode response = item != null && st.instance(item) ? (ANode) item : null;
