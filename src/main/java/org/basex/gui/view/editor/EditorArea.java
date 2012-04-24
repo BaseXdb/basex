@@ -57,7 +57,7 @@ final class EditorArea extends BaseXEditor {
     view = v;
     file = f;
     label = new BaseXLabel(f.name());
-    setSyntax(f);
+    setSyntax(f, false);
 
     addFocusListener(new FocusAdapter() {
       @Override
@@ -172,7 +172,7 @@ final class EditorArea extends BaseXEditor {
   void file(final IOFile f) {
     file = f;
     tstamp = f.timeStamp();
-    setSyntax(file);
+    setSyntax(file, true);
   }
 
   /**

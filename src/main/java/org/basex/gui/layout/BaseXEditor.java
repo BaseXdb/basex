@@ -207,12 +207,14 @@ public class BaseXEditor extends BaseXPanel {
   /**
    * Sets a syntax highlighter, based on the file format.
    * @param file file reference
+   * @param opened indicates if file was opened from disk
    */
-  protected final void setSyntax(final IO file) {
+  protected final void setSyntax(final IO file, final boolean opened) {
     setSyntax(
       file.hasSuffix(IO.JSONSUFFIX) ? new JSONSyntax() :
       file.hasSuffix(IO.XMLSUFFIXES) ? new XMLSyntax() :
-      file.hasSuffix(IO.XQSUFFIXES) ? new XQuerySyntax() : BaseXSyntax.SIMPLE);
+      !opened || file.hasSuffix(IO.XQSUFFIXES) ? new XQuerySyntax() :
+      BaseXSyntax.SIMPLE);
   }
 
   /**
