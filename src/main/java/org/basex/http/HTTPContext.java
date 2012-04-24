@@ -206,6 +206,7 @@ public final class HTTPContext {
    */
   public void status(final int code, final String message) throws IOException {
     if(session != null) session.close();
+    res.resetBuffer();
     res.setStatus(code);
     if(code == SC_UNAUTHORIZED) res.setHeader(WWW_AUTHENTICATE, BASIC);
     if(message != null) res.getOutputStream().write(token(message));
