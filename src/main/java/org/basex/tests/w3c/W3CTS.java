@@ -284,7 +284,7 @@ public abstract class W3CTS {
       Nodes curr = null;
       if(cont.size() != 0) {
         final String p = srcs.get(string(data.atom(cont.list[0])));
-        final Data d = Check.check(context, p, null);
+        final Data d = CreateDB.mainMem(IO.get(p), context);
         curr = new Nodes(d.resources.docs().toArray(), d);
         curr.root = true;
       }
@@ -571,7 +571,7 @@ public abstract class W3CTS {
             src = dbname;
           }
         }
-        expr = def.get(null, Str.get(src));
+        expr = def.get(Str.get(src));
       }
       if(var != null) qp.bind(string(data.atom(var.list[c])), expr);
     }
@@ -591,7 +591,6 @@ public abstract class W3CTS {
     for(int c = 0; c < nod.size(); ++c) {
       final byte[] nm = data.atom(nod.list[c]);
       final String src = srcs.get(string(nm));
-
       final Item it = src == null ? coll(nm, qp) : Str.get(src);
       qp.bind(string(data.atom(var.list[c])), it);
     }

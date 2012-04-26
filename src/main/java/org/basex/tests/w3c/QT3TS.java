@@ -90,6 +90,7 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void run(final String[] args) throws Exception {
+    ctx.mprop.set(MainProp.DBPATH, sandbox().path() + "/data");
     parseArguments(args);
 
     final Performance perf = new Performance();
@@ -141,6 +142,7 @@ public final class QT3TS {
     Util.outln(" Time    : " + perf);
 
     ctx.close();
+    sandbox().delete();
   }
 
   /**
@@ -253,8 +255,8 @@ public final class QT3TS {
     if(b != null) query.baseURI(b);
 
     // add modules
-    final XQuery qmod = new XQuery(
-        "for $m in *:module return ($m/@uri, $m/@file)", ctx).context(test);
+    final String qm = "for $m in *:module return ($m/@uri, $m/@file)";
+    final XQuery qmod = new XQuery(qm, ctx).context(test);
     while(true) {
       final XdmItem uri = qmod.next();
       if(uri == null) break;
@@ -277,17 +279,18 @@ public final class QT3TS {
         // bind documents
         for(final HashMap<String, String> src : e.sources) {
           // add document reference
-          query.addDocument(src.get(URI), src.get(FILE));
+          final String file = (b != null ? b : "") + src.get(FILE);
+          query.addDocument(src.get(URI), file);
           final String role = src.get(ROLE);
           if(role == null) continue;
-          final Object call = Function.DOC.get(null, Str.get(src.get(FILE)));
+          final Object call = Function.DOC.get(Str.get(file));
           if(role.equals(".")) query.context(call);
           else query.bind(role, call);
         }
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
         if(e.collContext) {
-          query.context(Function.COLLECTION.get(null, Str.get(e.collURI)));
+          query.context(Function.COLLECTION.get(Str.get(e.collURI)));
         }
         // set base uri
         if(e.baseURI != null) query.baseURI(e.baseURI);
@@ -818,5 +821,13 @@ public final class QT3TS {
     XQueryException exc;
     /** Query error. */
     Throwable error;
+  }
+
+  /**
+   * Returns the sandbox database path.
+   * @return database path
+   */
+  private IOFile sandbox() {
+    return new IOFile(Prop.TMP, testid);
   }
 }
