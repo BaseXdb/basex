@@ -4,7 +4,6 @@ import org.basex.test.query.*;
 
 /**
  * XQuery functions tests.
- * Most tests verify if queries are correctly optimized.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -127,12 +126,11 @@ public final class FuncTest extends QueryTest {
       { "substring 3", str(""), "substring('foobar', xs:double('NaN'), 3)" },
       { "substring 4", str("foo"), "substring('foobar', -1, 5)" },
 
-      { "collection 1", bool(false), "not(collection('src/test/resources/dir/'))" },
-      { "collection 2", bool(false), "not(collection('src/test/resources/input.xml'))" },
+      { "coll 1", bool(true), "exists(collection('src/test/resources/dir/'))" },
+      { "coll 2", bool(true), "exists(collection('src/test/resources/input.xml'))" },
 
-      { "doc 1", bool(false), "not(doc('src/test/resources/input.xml'))" },
-      { "doc 2", "not(doc('src/test/resources/dir/'))" },
-
+      { "doc 1", bool(true), "exists(doc('src/test/resources/input.xml'))" },
+      { "doc 2", "exists(doc('src/test/resources/dir/'))" },
     };
   }
 

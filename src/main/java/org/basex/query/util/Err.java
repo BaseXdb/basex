@@ -26,7 +26,7 @@ public enum Err {
   /** BASX0002: Evaluation exception. */
   NODBCTX(BASX, 2, "%: database context needed."),
   /** BASX0003: Evaluation exception. */
-  NODB(BASX, 3, "Database '%' not found."),
+  NODB(BASX, 3, "%"),
   /** BASX0004: Evaluation exception. */
   IDINVALID(BASX, 4, "%: value '%' out of range."),
   /** BASX0005: Evaluation exception. */
@@ -34,7 +34,7 @@ public enum Err {
   /** BASX0007: Evaluation exception. */
   QUERYNODES(BASX, 7, Text.NO_DB_NODES),
   /** BASX0008: Evaluation exception. */
-  EXPSINGLE(BASX, 8, "Database '%' contains more than one document."),
+  EXPSINGLE(BASX, 8, "Database path '%' must point to a single document."),
   /** BASX0009: Evaluation exception. */
   NOEVENT(BASX, 9, "Event '%' is unknown."),
   /** BASX0010: Parsing exception. */
@@ -94,7 +94,9 @@ public enum Err {
   /** FODC0002: Evaluation exception. */
   RESFNF(FODC, 2, "Resource '%' does not exist."),
   /** FODC0004: Evaluation exception. */
-  INVCOLL(FODC, 4, "Invalid collection '%'."),
+  INVCOLL(FODC, 4, "Invalid collection URI '%'."),
+  /** FODC0005: Evaluation exception. */
+  INVDOC(FODC, 5, "Invalid document URI '%'."),
   /** FODC0006: Evaluation exception. */
   SAXERR(FODC, 6, "SAX: %."),
   /** FODC0007: Evaluation exception. */

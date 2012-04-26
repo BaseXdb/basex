@@ -2,16 +2,16 @@ package org.basex.util.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
+
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.hash.*;
 
 /**
  * Simple stop words set for full-text requests.
@@ -45,7 +45,7 @@ public final class StopWords extends TokenSet {
    */
   public void comp(final Data data) {
     // no data reference, or stop words have already been defined..
-    if(data == null || size() != 0 || data instanceof MemData) return;
+    if(data == null || size() != 0 || data.inMemory()) return;
 
     // try to parse the stop words file of the current database
     try {

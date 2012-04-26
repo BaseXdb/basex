@@ -53,8 +53,8 @@ final class InvDocTest extends Test {
 
   @Override
   public boolean eq(final ANode node) {
-    // no document node, or no database instance
-    if(node.type != type || !(node instanceof DBNode)) return false;
+    // no database node
+    if(!(node instanceof DBNode)) return false;
     // ensure that the pre value is contained in the target documents
     final DBNode db = (DBNode) node;
     return nodes.data == db.data && nodes.contains(db.pre);

@@ -58,7 +58,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
   }
 
   /**
-   * Returns the data reference (if) attached to this value.
+   * Returns the data reference (if) attached to this value. This method is overwritten
+   * by {@link DBNode} and {@link DBNodeSeq}.
    * @return data reference
    */
   public Data data() {

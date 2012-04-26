@@ -205,9 +205,32 @@ public final class CreateDB extends ACreate {
   public static synchronized MemData mainMem(final IO source, final Context ctx)
       throws IOException {
 
-    if(!source.exists()) throw new FileNotFoundException(
-        Util.info(RESOURCE_NOT_FOUND_X, source));
+    if(!source.exists()) throw new BaseXException(RESOURCE_NOT_FOUND_X, source);
     return mainMem(new DirParser(source, ctx.prop, null), ctx);
+  }
+
+  /**
+   * Creates a new database if a valid path was specified.
+   * @param source document source
+   * @param single expect single document
+   * @param ctx database context
+   * @return data reference
+   * @throws IOException I/O exception
+   */
+  public static synchronized Data create(final IO source, final boolean single,
+      final Context ctx) throws IOException {
+
+    // check if input is an existing file
+    if(!source.exists() || single && source.isDir())
+      throw new BaseXException(RESOURCE_NOT_FOUND_X, source);
+
+    // default: create a main memory instance
+    if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(source, ctx);
+
+    // otherwise, create a persistent database instance
+    final String nm = source.dbname();
+    final DirParser dp = new DirParser(source, ctx.prop, ctx.mprop.dbpath(nm));
+    return CreateDB.create(nm, dp, ctx);
   }
 
   @Override

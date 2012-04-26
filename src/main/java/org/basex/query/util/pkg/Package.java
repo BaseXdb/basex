@@ -33,7 +33,7 @@ public final class Package {
    * @return result
    */
   byte[] uniqueName() {
-    return new TokenBuilder().add(name).add('-').add(version).finish();
+    return new TokenBuilder(name).add('-').add(version).finish();
   }
 
   /**
@@ -82,7 +82,7 @@ public final class Package {
      * @return unique name
      */
     byte[] name(final byte[] version) {
-      return new TokenBuilder().add(pkg).add('-').add(version).finish();
+      return new TokenBuilder(pkg).add('-').add(version).finish();
     }
   }
 

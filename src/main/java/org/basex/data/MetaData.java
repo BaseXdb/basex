@@ -4,20 +4,16 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.build.BuildException;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.core.Prop;
-import org.basex.core.Users;
-import org.basex.core.cmd.DropDB;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
-import org.basex.util.ft.Language;
+import org.basex.util.ft.*;
 
 /**
  * This class provides meta information on a database.
@@ -149,38 +145,34 @@ public final class MetaData {
 
   /**
    * Checks if the specified file path refers to the specified database.
-   * @param path file path
-   * @param db name of the database
+   * @param input query input
    * @param mprop main properties
    * @return result of check
    */
-  public static boolean found(final String path, final String db, final MainProp mprop) {
-    // return true if the database exists and if the
-    // specified path and database name equal each other
-    final IOFile file = mprop.dbpath(db);
-    final boolean exists = file.exists();
-    if(!exists || path.equals(db)) return exists;
+  public static boolean found(final QueryInput input, final MainProp mprop) {
+    // specified database does not exist
+    final IOFile dbdir = mprop.dbpath(input.db);
+    if(!dbdir.exists()) return false;
 
-    final IO io = IO.get(path);
+    // otherwise, check timestamp and storage
     DataInput in = null;
     try {
       // return true if the storage version is up-to-date and
       // if the original and the specified file path and date are equal
-      in = new DataInput(file(file, DATAINF));
+      in = new DataInput(file(dbdir, DATAINF));
       boolean ok = true;
       int i = 3;
       String k;
       while(i != 0 && !(k = string(in.readToken())).isEmpty()) {
         final String v = string(in.readToken());
         if(k.equals(DBSTR)) {
-          ok &= STORAGE.equals(v) || new Version(STORAGE).compareTo(
-              new Version(v)) > 0;
+          ok &= STORAGE.equals(v) || new Version(STORAGE).compareTo(new Version(v)) > 0;
           i--;
         } else if(k.equals(DBFNAME)) {
-          ok &= io.eq(IO.get(v));
+          ok &= input.io.eq(IO.get(v));
           i--;
         } else if(k.equals(DBTIME)) {
-          ok &= io.timeStamp() == toLong(v);
+          ok &= input.io.timeStamp() == toLong(v);
           i--;
         }
       }

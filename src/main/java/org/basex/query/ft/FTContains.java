@@ -1,30 +1,18 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.CmpG;
-import org.basex.query.expr.Context;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
-import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.FTNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.SeqType;
-import org.basex.query.iter.Iter;
-import org.basex.query.path.AxisPath;
-import org.basex.query.path.AxisStep;
-import org.basex.query.util.IndexContext;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTOpt;
-import org.basex.util.ft.Scoring;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * FTContains expression.

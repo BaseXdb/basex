@@ -73,7 +73,7 @@ public final class ValueAccess extends IndexAccess {
 
     return new AxisIter() {
       final byte kind = itype == IndexType.TEXT ? Data.TEXT : Data.ATTR;
-      final boolean mem = data instanceof MemData;
+      final boolean mem = data.inMemory();
 
       @Override
       public ANode next() {

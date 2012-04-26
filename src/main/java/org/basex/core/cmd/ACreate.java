@@ -92,7 +92,7 @@ public abstract class ACreate extends Command {
   protected static void create(final IndexType index, final Data data, final ACreate cmd)
       throws IOException {
 
-    if(data instanceof MemData) return;
+    if(data.inMemory()) return;
 
     final IndexBuilder ib;
     switch(index) {

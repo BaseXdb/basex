@@ -197,7 +197,7 @@ public enum NodeType implements Type {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(string).add("()").toString();
+    return new TokenBuilder(string).add("()").toString();
   }
 
   /**

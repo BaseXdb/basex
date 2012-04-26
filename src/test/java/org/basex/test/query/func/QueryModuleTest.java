@@ -8,6 +8,7 @@ import org.basex.query.item.*;
  * It is derived from the abstract {@link QueryModule} class.
  *
  * @author BaseX Team 2005-12, BSD License
+ * @author Christian Gruen
  */
 public class QueryModuleTest extends QueryModule {
   /** Fruits array. */

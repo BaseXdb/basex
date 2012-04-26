@@ -40,8 +40,7 @@ public abstract class StandardFunc extends Arr {
     // compile all arguments
     super.comp(ctx);
     // skip context-based or non-deterministic functions, and non-values
-    if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues())
-      return optPre(cmp(ctx), ctx);
+    if(uses(Use.CTX) || uses(Use.NDT) || !allAreValues()) return optPre(cmp(ctx), ctx);
     // pre-evaluate function
     return optPre(sig.ret.zeroOrOne() ? item(ctx, info) : value(ctx), ctx);
   }
@@ -95,12 +94,12 @@ public abstract class StandardFunc extends Arr {
   @Override
   public final String toString() {
     final String desc = sig.toString();
-    return new TokenBuilder().add(desc.substring(0,
+    return new TokenBuilder(desc.substring(0,
         desc.indexOf('(') + 1)).addSep(expr, SEP).add(PAR2).toString();
   }
 
   /**
-   * Returns the data instance for the specified argument.
+   * Returns a data instance for the specified argument.
    * @param i index of argument
    * @param ctx query context
    * @return data instance

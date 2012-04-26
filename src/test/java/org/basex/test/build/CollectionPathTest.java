@@ -83,7 +83,7 @@ public final class CollectionPathTest extends SandboxTest {
       "for $x in collection('" + NAME + '/' + DIR + "xmark.xml') " +
       "return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, context);
-    assertEquals(FILES[1], qp.iter().next().toJava());
+    assertEquals(NAME + '/' + FILES[1], qp.iter().next().toJava());
     qp.close();
   }
 }

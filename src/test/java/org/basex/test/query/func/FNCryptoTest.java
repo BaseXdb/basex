@@ -34,8 +34,7 @@ public class FNCryptoTest extends AdvancedQueryTest {
     query(pl + "c:encrypt('msg','','keykeyke','')");
     query(pl + "c:decrypt(c:encrypt('msg','','keykeyke',''),'','keykeyke','')");
     query(pl + "c:generate-signature(<a/>,'','','','','')");
-    query(pl +
-        "c:validate-signature(c:generate-signature(<a/>,'','','','',''))");
+    query(pl + "c:validate-signature(c:generate-signature(<a/>,'','','','',''))");
   }
 
   /**

@@ -455,7 +455,7 @@ public final class QueryContext extends Progress {
 
       while((it = ir.next()) != null) {
         checkStop();
-        if(!(it instanceof DBNode) || it.data() != nodes.data) break;
+        if(it.data() != nodes.data) break;
         if(pre.size() < max) pre.add(((DBNode) it).pre);
       }
 

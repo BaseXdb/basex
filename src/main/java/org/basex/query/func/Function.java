@@ -812,6 +812,15 @@ public enum Function {
 
   /**
    * Creates a new instance of the function.
+   * @param arg arguments
+   * @return function
+   */
+  public StandardFunc get(final Expr... arg) {
+    return get(null, arg);
+  }
+
+  /**
+   * Creates a new instance of the function.
    * @param ii input info
    * @param arg arguments
    * @return function

@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 
 import java.io.*;
 
-import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.*;
 import org.basex.io.serial.*;
@@ -125,8 +124,8 @@ public final class CmpR extends Single {
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
     final AxisStep s = CmpG.indexStep(expr);
-    // no range index support in main-memory index structures
-    if(s == null || ic.data instanceof MemData) return false;
+    // sequential main memory is assumed to be faster than range index access
+    if(s == null || ic.data.inMemory()) return false;
 
     // check which index applies
     final boolean text = s.test.type == NodeType.TXT && ic.data.meta.textindex;

@@ -1,15 +1,13 @@
 package org.basex.query.ft;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
-import org.basex.query.iter.FTIter;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
-import org.basex.util.ft.FTOpt;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * FTOptions expression.

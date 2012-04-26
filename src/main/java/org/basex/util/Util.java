@@ -118,7 +118,7 @@ public final class Util {
    * @param ext text optional extensions
    */
   public static void outln(final Object str, final Object... ext) {
-    out(str + NL, ext);
+    out((str instanceof byte[] ? Token.string((byte[]) str) : str) + NL, ext);
   }
 
   /**

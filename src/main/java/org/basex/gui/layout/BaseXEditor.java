@@ -211,10 +211,9 @@ public class BaseXEditor extends BaseXPanel {
    */
   protected final void setSyntax(final IO file, final boolean opened) {
     setSyntax(
-      file.hasSuffix(IO.JSONSUFFIX) ? new JSONSyntax() :
-      file.hasSuffix(IO.XMLSUFFIXES) ? new XMLSyntax() :
       !opened || file.hasSuffix(IO.XQSUFFIXES) ? new XQuerySyntax() :
-      BaseXSyntax.SIMPLE);
+      file.hasSuffix(IO.JSONSUFFIX) ? new JSONSyntax() :
+      file.hasSuffix(IO.XMLSUFFIXES) ? new XMLSyntax() : BaseXSyntax.SIMPLE);
   }
 
   /**

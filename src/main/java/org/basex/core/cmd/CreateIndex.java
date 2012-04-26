@@ -31,7 +31,7 @@ public final class CreateIndex extends ACreate {
   @Override
   protected boolean run() {
     final Data data = context.data();
-    if(data instanceof MemData) return error(NO_MAINMEM);
+    if(data.inMemory()) return error(NO_MAINMEM);
 
     final IndexType index;
     final CmdIndex ci = getOption(CmdIndex.class);

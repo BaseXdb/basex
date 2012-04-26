@@ -4,7 +4,6 @@ import static org.basex.query.util.Err.*;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -18,10 +17,9 @@ import org.basex.util.list.*;
  * This class provides access to resources used by an XQuery expression.
  *
  * @author BaseX Team 2005-12, BSD License
+ * @author Christian Gruen
  */
 public final class QueryResources {
-  /** Slash pattern. */
-  private static final Pattern SLASHES = Pattern.compile("^/+|/+$");
   /** Database context. */
   private final QueryContext ctx;
 
@@ -70,7 +68,7 @@ public final class QueryResources {
   /**
    * Closes the opened data references.
    */
-  public void close() {
+  void close() {
     for(int d = ctx.nodes != null ? 1 : 0; d < datas; ++d) {
       Close.close(data[d], ctx.context);
     }
@@ -80,14 +78,14 @@ public final class QueryResources {
   /**
    * Opens a new database or returns a reference to an already opened database.
    * @param name name of database
-   * @param ii input info
+   * @param info input info
    * @return database instance
    * @throws QueryException query exception
    */
-  public Data data(final String name, final InputInfo ii) throws QueryException {
+  public Data data(final String name, final InputInfo info) throws QueryException {
     // check if a database with the same name has already been opened
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.name.equals(name)) return data[d];
+      if(data[d].meta.name.equalsIgnoreCase(name)) return data[d];
     }
 
     try {
@@ -96,118 +94,94 @@ public final class QueryResources {
       addData(d);
       return d;
     } catch(final IOException ex) {
-      throw NODB.thrw(ii, name);
+      throw NODB.thrw(info, ex);
     }
   }
 
   /**
-   * Creates a new data reference for the specified input, or returns a
-   * reference to an already opened file or database.
-   * @param input file path or name of database
-   * @param path optional path to the addressed sub-directory. Set to {@code null}
-   *        if a single document is addressed
-   * @param ii input info
-   * @return data reference
+   * Evaluates {@code fn:doc()}: opens an existing database document, or creates a new
+   * database and node.
+   * @param input document path
+   * @param info input info
+   * @return document
    * @throws QueryException query exception
    */
-  public Data data(final String input, final String path, final InputInfo ii)
-      throws QueryException {
+  public DBNode doc(final String input, final InputInfo info) throws QueryException {
+    final QueryInput qi = new QueryInput(input);
 
-    // check if an opened database with the same name exists
     for(int d = 0; d < datas; ++d) {
-      if(data[d].meta.name.equals(input)) return data[d];
+      final Data dt = data[d];
+      // return node if single document in a database contains points to the same path
+      if(dt.single() && IO.get(dt.meta.original).eq(qi.io))
+        return new DBNode(dt, 0, Data.DOC);
+
+      // return database instance with the same name
+      if(dt.meta.name.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
     }
 
-    // check if an opened database with the same file path exists
-    final IO io = IO.get(input);
-    for(int d = 0; d < datas; ++d) {
-      if(IO.get(data[d].meta.original).eq(io)) return data[d];
-    }
-
-    IOException ex = null;
-    Data d = null;
-    try {
-      // try to retrieve data reference
-      d = Check.check(ctx.context, input, path);
-    } catch(final IOException e) {
-      ex = e;
-      // try to retrieve data reference relative to base uri
-      final IO base = ctx.sc.baseIO();
-      if(base != null) {
-        try {
-          final String p = base.merge(input).path();
-          if(!p.equals(input)) d = Check.check(ctx.context, p, path);
-        } catch(final IOException exc) { /* ignore exception */ }
-      }
-    }
-
-    if(d == null) {
-      // handle first exception
-      Util.debug(ex);
-      if(ex instanceof FileNotFoundException) RESFNF.thrw(ii, input);
-      IOERR.thrw(ii, ex);
-    }
-
-    // add reference to pool of opened databases
-    addData(d);
-    return d;
+    // open database or create new instance
+    Data dt = open(qi);
+    if(dt == null) dt = create(qi, true, info);
+    return doc(dt, qi, info);
   }
 
   /**
-   * Adds a collection instance or returns an existing one.
-   * @param input name of the collection to be returned
-   * @param ii input info
+   * Returns the default collection.
+   * @param info input info
    * @return collection
    * @throws QueryException query exception
    */
-  public Value collection(final String input, final InputInfo ii) throws QueryException {
-    int c = 0;
-    // no collection specified.. return default collection/current context set
-    if(input == null) {
-      // no default collection was defined
-      if(colls == 0) NODEFCOLL.thrw(ii);
-    } else {
-      // invalid collection reference
-      if(input.contains("<") || input.contains("\\")) INVCOLL.thrw(ii, input);
+  public Value collection(final InputInfo info) throws QueryException {
+    if(colls == 0) NODEFCOLL.thrw(info);
+    return coll[0];
+  }
 
-      // find specified collection
-      while(c < colls && !collName[c].equals(input)) ++c;
-      // unknown collection
-      if(c == colls) {
-        final IO base = ctx.sc.baseIO();
-        if(base != null) {
-          c = 0;
-          final String in = base.merge(input).path();
-          while(c < colls && !collName[c].equals(in)) ++c;
-        }
-      }
+  /**
+   * Evaluates {@code fn:collection()}: opens an existing database collection, or creates
+   * a new data reference.
+   * @param input collection path
+   * @param info input info
+   * @return collection
+   * @throws QueryException query exception
+   */
+  public Value collection(final String input, final InputInfo info)
+      throws QueryException {
 
-      // add new collection if not found
-      if(c == colls) {
-        String root = SLASHES.matcher(input).replaceFirst("");
-        String path = "";
-        final int s = root.indexOf('/');
-        if(s > 0 && root.indexOf(':') == -1) {
-          path = root.substring(s + 1);
-          root = root.substring(0, s);
-        }
-        final Data d = data(root, path, ii);
-        final IntList docs = d.resources.docs(d.inMemory() ? "" : path);
-        addCollection(DBNodeSeq.get(docs, d, true, path.isEmpty()), d.meta.name);
+    // find specified collection
+    final IO base = ctx.sc.baseIO();
+    final String in = base != null ? base.merge(input).path() : null;
+    for(int c = 0; c < colls; c++) {
+      if(in != null && collName[c].equalsIgnoreCase(in) ||
+          collName[c].equalsIgnoreCase(input)) return coll[c];
+    }
+
+    // return database instance with the same name or file path
+    final QueryInput qi = new QueryInput(input);
+
+    Data dt = null;
+    for(int d = 0; d < datas; ++d) {
+      if(qi.db != null && data[d].meta.name.equalsIgnoreCase(qi.db) ||
+          IO.get(data[d].meta.original).eq(qi.io)) {
+        dt = data[d];
+        break;
       }
     }
-    return coll[c];
+    // open database or create new instance
+    if(dt == null) dt = open(qi);
+    if(dt == null) dt = create(qi, false, info);
+    return DBNodeSeq.get(dt.resources.docs(qi.path), dt, true, qi.path.isEmpty());
   }
 
   /**
    * Adds a document with the specified path. Only called from the test APIs.
-   * @param name name of document, or {@code null}
+   * @param name document identifier (may be {@code null})
    * @param path documents path
    * @throws QueryException query exception
    */
   public void addDoc(final String name, final String path) throws QueryException {
-    final Data d = data(path, null, null);
-    if(name != null) d.meta.name = name;
+    final QueryInput qi = new QueryInput(path);
+    final Data d = create(qi, true, null);
+    if(name != null) d.meta.original = name;
   }
 
   /**
@@ -222,12 +196,91 @@ public final class QueryResources {
     final int ns = paths.length;
     final DBNode[] nodes = new DBNode[ns];
     for(int n = 0; n < ns; n++) {
-      nodes[n] = new DBNode(data(paths[n], null, null), 0, Data.DOC);
+      final QueryInput qi = new QueryInput(paths[n]);
+      nodes[n] = new DBNode(create(qi, true, null), 0, Data.DOC);
     }
     addCollection(Seq.get(nodes, ns), name);
   }
 
-  // PRIVATE METHODS ==========================================================
+  // PRIVATE METHODS ====================================================================
+
+  /**
+   * Opens an existing database, or returns {@code null}.
+   * @param input query input
+   * @return data reference
+   */
+  private Data open(final QueryInput input) {
+    if(input.db != null) {
+      try {
+        // try to open database
+        final Data d = Open.open(input.db, ctx.context);
+        addData(d);
+        return d;
+      } catch(final IOException ex) {
+        /* ignored */
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Creates a new database instance.
+   * @param input query input
+   * @param single expect single document
+   * @param info input info
+   * @return data reference
+   * @throws QueryException query exception
+   */
+  private Data create(final QueryInput input, final boolean single, final InputInfo info)
+      throws QueryException {
+
+    Data d = null;
+    try {
+      // try to create database with original path
+      d = CreateDB.create(input.io, single, ctx.context);
+    } catch(final IOException ex) {
+      // try to create database with path relative to base uri
+      final IO base = ctx.sc.baseIO();
+      if(base != null) {
+        try {
+          final String in = base.merge(input.original).path();
+          if(!in.equals(input.original))
+            d = CreateDB.create(IO.get(in), single, ctx.context);
+        } catch(final IOException exc) { /* ignore exception */ }
+      }
+
+      if(d == null) {
+        // handle exception
+        Util.debug(ex);
+        IOERR.thrw(info, ex);
+      }
+    }
+
+    input.path = "";
+    addData(d);
+    return d;
+  }
+
+  /**
+   * Returns a single document node for the specified data reference.
+   * @param dt data reference
+   * @param qi query input
+   * @param info input info
+   * @return document node
+   * @throws QueryException query exception
+   */
+  private DBNode doc(final Data dt, final QueryInput qi, final InputInfo info)
+      throws QueryException {
+
+    // database contains a single document and no database path is specified
+    if(dt.single() && qi.path.isEmpty()) return new DBNode(dt, 0, Data.DOC);
+
+    // check if the database contains exactly one relevant document
+    final IntList docs = dt.resources.docs(qi.path);
+    if(docs.isEmpty()) RESFNF.thrw(info, qi.original);
+    if(docs.size() != 1) EXPSINGLE.thrw(info, qi.original);
+    return new DBNode(dt, docs.get(0), Data.DOC);
+  }
 
   /**
    * Adds a data reference to the global list.

@@ -354,8 +354,7 @@ public final class HTTPClient {
 
     final byte[] boundary = r.payloadAttrs.get(BOUNDARY);
     for(final Part part : r.parts) writePart(part, out, boundary);
-    out.write(new TokenBuilder().add("--").
-        add(boundary).add("--").add(CRLF).finish());
+    out.write(new TokenBuilder("--").add(boundary).add("--").add(CRLF).finish());
   }
 
   /**

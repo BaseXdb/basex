@@ -190,7 +190,7 @@ public class UserFunc extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder().add(DECLARE).add(' ').addExt(ann);
+    final TokenBuilder tb = new TokenBuilder(DECLARE).add(' ').addExt(ann);
     if(updating) tb.add(UPDATING).add(' ');
     tb.add(FUNCTION).add(' ').add(name.string());
     tb.add(PAR1).addSep(args, SEP).add(PAR2);

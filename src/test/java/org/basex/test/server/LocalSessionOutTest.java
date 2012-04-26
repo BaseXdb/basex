@@ -1,5 +1,8 @@
 package org.basex.test.server;
 
+import java.io.*;
+
+import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.junit.*;
 
@@ -16,5 +19,14 @@ public final class LocalSessionOutTest extends LocalSessionTest {
   public void startSession() {
     out = new ArrayOutput();
     super.startSession();
+  }
+  /**
+   * Creates new databases.
+   * @throws IOException I/O exception
+   */
+  @Test
+  public void ccreate() throws IOException {
+    session.create(NAME, new ArrayInput(""));
+    assertEqual("", session.query("doc('" + NAME + "')").execute());
   }
 }

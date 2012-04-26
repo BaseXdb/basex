@@ -136,8 +136,7 @@ public final class NodeCache extends AxisIter {
   }
 
   /**
-   * Checks if the iterator contains a database node with the specified
-   * pre value.
+   * Checks if the iterator contains a database node with the specified pre value.
    * @param node node to be found
    * @param db indicates if all nodes are sorted {@link DBNode} references
    * @return position, or {@code -1}

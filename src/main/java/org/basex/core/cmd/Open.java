@@ -70,15 +70,17 @@ public final class Open extends Command {
       if(data == null) {
         // check if document exists
         if(!ctx.mprop.dbexists(name)) throw new BaseXException(DB_NOT_FOUND_X, name);
-
         data = new DiskData(name, ctx);
         ctx.pin(data);
       }
     }
-    // check permissions
-    if(ctx.perm(Perm.READ, data.meta)) return data;
 
-    Close.close(data, ctx);
-    throw new BaseXException(PERM_NEEDED_X, Perm.READ);
+    // check permissions
+    if(!ctx.perm(Perm.READ, data.meta)) {
+      Close.close(data, ctx);
+      throw new BaseXException(PERM_NEEDED_X, Perm.READ);
+    }
+
+    return data;
   }
 }

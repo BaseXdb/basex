@@ -4,28 +4,25 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.*;
+import java.nio.charset.*;
 
-import org.basex.data.Data;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.in.NewlineInput;
-import org.basex.io.out.ArrayOutput;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
+import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.item.map.*;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.*;
 import org.basex.query.path.*;
-import org.basex.query.up.primitives.Put;
-import org.basex.query.util.Err;
+import org.basex.query.up.primitives.*;
+import org.basex.query.util.*;
 import org.basex.query.util.Err.ErrType;
 import org.basex.util.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.ByteList;
+import org.basex.util.list.*;
 
 /**
  * Generating functions.
@@ -63,8 +60,7 @@ public final class FNGen extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case DOC:                     return doc(ctx);
       case DOC_AVAILABLE:           return docAvailable(ctx);
@@ -118,8 +114,13 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value collection(final QueryContext ctx) throws QueryException {
-    final Item it = expr.length != 0 ? expr[0].item(ctx, info) : null;
-    return ctx.resource.collection(it != null ? string(checkEStr(it)) : null, info);
+    // return default collection
+    if(expr.length == 0) return ctx.resource.collection(info);
+
+    // check if reference is valid
+    final byte[] in = checkEStr(expr[0].item(ctx, info));
+    if(!Uri.uri(in).isValid()) INVCOLL.thrw(info, in);
+    return ctx.resource.collection(string(in), info);
   }
 
   /**
@@ -171,11 +172,9 @@ public final class FNGen extends StandardFunc {
   private ANode doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, info);
     if(it == null) return null;
-
-    final String in = string(checkEStr(it));
-    final Data d = ctx.resource.data(in, null, info);
-    if(!d.single()) EXPSINGLE.thrw(info, in);
-    return new DBNode(d, 0, Data.DOC);
+    final byte[] in = checkEStr(it);
+    if(!Uri.uri(in).isValid()) INVDOC.thrw(info, in);
+    return ctx.resource.doc(string(in), info);
   }
 
   /**

@@ -82,9 +82,9 @@ public final class MainProp extends AProp {
   }
 
   /**
-   * Returns a file instance for the specified database.
+   * Returns a reference to a database directory.
    * @param db name of the database
-   * @return database filename
+   * @return database directory
    */
   public IOFile dbpath(final String db) {
     return new IOFile(get(DBPATH), db);

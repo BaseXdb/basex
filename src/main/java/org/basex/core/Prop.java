@@ -1,6 +1,6 @@
 package org.basex.core;
 
-import java.io.File;
+import java.io.*;
 import java.net.*;
 import java.security.*;
 

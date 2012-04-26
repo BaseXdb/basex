@@ -323,7 +323,7 @@ public final class FNDb extends StandardFunc {
             res.add(new FAttr(PATH, token(meta.original)));
           res.add(new FTxt(token(name)));
         } catch(final IOException ex) {
-          NODB.thrw(info, name);
+          NODB.thrw(info, ex);
         } finally {
           if(di != null) try { di.close(); } catch(final IOException ex) { }
         }

@@ -3,19 +3,13 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Bln;
-import org.basex.query.item.FNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.AxisIter;
-import org.basex.util.InputInfo;
-import org.basex.util.list.TokenList;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * ID functions.
@@ -170,8 +164,8 @@ public final class FNId extends StandardFunc {
    * @param node node
    * @throws QueryException query exception
    */
-  private static void addRef(final byte[][] ids, final NodeCache nc,
-      final ANode node) throws QueryException {
+  private static void addRef(final byte[][] ids, final NodeCache nc, final ANode node)
+      throws QueryException {
 
     AxisIter ai = node.attributes();
     for(ANode at; (at = ai.next()) != null;) {

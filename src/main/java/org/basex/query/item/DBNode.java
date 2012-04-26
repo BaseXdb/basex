@@ -181,9 +181,13 @@ public class DBNode extends ANode {
   @Override
   public final byte[] baseURI() {
     if(type == NodeType.DOC) {
-      final String dir = data.meta.original;
-      final String name = Token.string(data.text(pre, true));
-      return Token.token(dir.isEmpty() ? name : IO.get(dir).merge(name).url());
+      final byte[] base = data.text(pre, true);
+      if(data.inMemory()) {
+        final String dir = data.meta.original;
+        final String bs = Token.string(base);
+        return Token.token(dir.isEmpty() ? bs : IO.get(dir).merge(bs).url());
+      }
+      return new TokenBuilder(data.meta.name).add('/').add(base).finish();
     }
     final byte[] b = attribute(new QNm(BASE, XMLURI));
     return b != null ? b : Token.EMPTY;
@@ -192,13 +196,13 @@ public class DBNode extends ANode {
   @Override
   public final boolean is(final ANode node) {
     return node == this || node instanceof DBNode &&
-            data == node.data() && pre == ((DBNode) node).pre;
+        data == node.data() && pre == ((DBNode) node).pre;
   }
 
   @Override
   public final int diff(final ANode node) {
     return !(node instanceof DBNode) || data != node.data() ?
-      id - node.id : pre - ((DBNode) node).pre;
+        id - node.id : pre - ((DBNode) node).pre;
   }
 
   @Override
@@ -210,15 +214,14 @@ public class DBNode extends ANode {
 
   @Override
   public final ANode deepCopy() {
-    // adopt index structures if database is a main-memory instance
-    final MemData md = data instanceof MemData ?
-        new MemData(data) : new MemData(data.meta.prop);
+    // adopt meta data and index structures if database is a main-memory instance
+    final MemData md = data.inMemory() ? new MemData(data) : new MemData(data.meta.prop);
     new DataBuilder(md).build(this);
     return new DBNode(md);
 
     /*if(hasChildren()) {
       // adopt index structures if database is a main-memory instance
-      final MemData md = data instanceof MemData ?
+      final MemData md = data.inMemory() ?
           new MemData(data) : new MemData(data.meta.prop);
       new DataBuilder(md).build(this);
       return new DBNode(md, 0);

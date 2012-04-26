@@ -82,7 +82,7 @@ public final class OptimizeAll extends ACreate {
   public static void optimizeAll(final Data data, final Context ctx,
       final OptimizeAll cmd) throws IOException {
 
-    if(!(data instanceof DiskData)) throw new BaseXException(NO_MAINMEM);
+    if(data.inMemory()) throw new BaseXException(NO_MAINMEM);
 
     final DiskData old = (DiskData) data;
     final MetaData m = old.meta;

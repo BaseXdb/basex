@@ -92,7 +92,7 @@ public final class DialogProps extends BaseXDialog {
       BaseXLayout.setHeight(infos[i], 200);
       if(i != 1) {
         indxs[i] = new BaseXButton(" ", this);
-        indxs[i].setEnabled(data instanceof DiskData);
+        indxs[i].setEnabled(!data.inMemory());
       }
     }
 

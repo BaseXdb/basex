@@ -27,17 +27,17 @@ public final class MemBuilder extends Builder {
   }
 
   /**
-   * Builds the main memory database instance without database name.
+   * Builds a main memory database instance.
    * @param parser parser
    * @return data database instance
    * @throws IOException I/O exception
    */
   public static MemData build(final Parser parser) throws IOException {
-    return build(parser.src.name(), parser);
+    return build(parser.src.dbname(), parser);
   }
 
   /**
-   * Builds a main memory database instance.
+   * Builds a main memory database instance with the specified name.
    * @param name name of database
    * @param parser parser
    * @return data database instance

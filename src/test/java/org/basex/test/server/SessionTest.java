@@ -39,7 +39,7 @@ public abstract class SessionTest extends SandboxTest {
   @After
   public final void stopSession() {
     try {
-      session.execute(new DropDB(NAME));
+      if(cleanup) session.execute(new DropDB(NAME));
       session.close();
     } catch(final IOException ex) {
       fail(Util.message(ex));
@@ -53,7 +53,7 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public final void command() throws IOException {
     session.execute("set serializer wrap-prefix=,wrap-uri=");
-    check("A", session.execute("xquery 'A'"));
+    assertEqual("A", session.execute("xquery 'A'"));
   }
 
   /** Runs a query command and wraps the result.
@@ -61,14 +61,14 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public final void commandSerial1() throws IOException {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
-    check("<db:results xmlns:db=\"ns\"/>", session.execute("xquery ()"));
+    assertEqual("<db:results xmlns:db=\"ns\"/>", session.execute("xquery ()"));
   }
 
   /** Runs a query command and wraps the result.
    * @throws IOException I/O exception */
   @Test
   public final void commandSerial2() throws IOException {
-    check("<db:results xmlns:db=\"ns\">" +
+    assertEqual("<db:results xmlns:db=\"ns\">" +
           "  <db:result>1</db:result>" +
           "</db:results>",
           session.execute("xquery " + WRAPPER + '1'));
@@ -97,9 +97,9 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public final void create() throws IOException {
     session.create(NAME, new ArrayInput(""));
-    check("", session.query("doc('" + NAME + "')").execute());
+    assertEqual("", session.query("doc('" + NAME + "')").execute());
     session.create(NAME, new ArrayInput("<X/>"));
-    check("<X/>", session.query("doc('" + NAME + "')").execute());
+    assertEqual("<X/>", session.query("doc('" + NAME + "')").execute());
   }
 
   /**
@@ -128,9 +128,9 @@ public abstract class SessionTest extends SandboxTest {
   public final void add() throws IOException {
     session.execute("create db " + NAME);
     session.add(NAME, new ArrayInput("<X/>"));
-    check("1", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("1", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
     for(int i = 0; i < 9; i++) session.add(NAME, new ArrayInput("<X/>"));
-    check("10", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("10", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
   }
 
   /**
@@ -161,13 +161,13 @@ public abstract class SessionTest extends SandboxTest {
   @Ignore("OverlappingLocking")
   public final void replace() throws IOException {
     session.execute("create db " + NAME);
-    check("0", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("0", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
     session.replace(NAME, new ArrayInput("<X/>"));
-    check("1", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("1", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
     session.replace(NAME + '2', new ArrayInput("<X/>"));
-    check("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
     session.replace(NAME + '2', new ArrayInput("<X/>"));
-    check("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
+    assertEqual("2", session.query("count(" + _DB_OPEN.args(NAME) + ')').execute());
   }
 
   /**
@@ -198,11 +198,11 @@ public abstract class SessionTest extends SandboxTest {
   public final void store() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput("!"));
-    check("true", session.query(_DB_IS_RAW.args(NAME, "X")).execute());
+    assertEqual("true", session.query(_DB_IS_RAW.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(""));
-    check("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
+    assertEqual("", session.query(_DB_RETRIEVE.args(NAME, "X")).execute());
     session.store("X", new ArrayInput(new byte[] { 0, 1, -1 }));
-    check("0001FF", session.query(
+    assertEqual("0001FF", session.query(
         "xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "X") + ')').execute());
     session.execute("drop db " + NAME);
   }
@@ -213,7 +213,7 @@ public abstract class SessionTest extends SandboxTest {
   public void storeBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(new byte[] { -128, -2, -1, 0, 1, 127 }));
-    check("-128 -2 -1 0 1 127", session.query(
+    assertEqual("-128 -2 -1 0 1 127", session.query(
         _UTIL_TO_BYTES.args(_DB_RETRIEVE.args(NAME, "X"))).execute());
   }
 
@@ -242,7 +242,7 @@ public abstract class SessionTest extends SandboxTest {
   public void retrieveBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput("\0"));
-    check("\0", session.execute("retrieve X"));
+    assertEqual("\0", session.execute("retrieve X"));
   }
 
   /** Retrieves empty content.
@@ -251,7 +251,7 @@ public abstract class SessionTest extends SandboxTest {
   public void retrieveEmpty() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(""));
-    check("", session.execute("retrieve X"));
+    assertEqual("", session.execute("retrieve X"));
   }
 
   /** Runs a query and retrieves the result as string.
@@ -259,7 +259,7 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public void query() throws IOException {
     final Query query = session.query("1");
-    check("1", query.execute());
+    assertEqual("1", query.execute());
   }
 
   /** Runs a query and retrieves the result as string.
@@ -268,7 +268,7 @@ public abstract class SessionTest extends SandboxTest {
   public void query2() throws IOException {
     final Query query = session.query("1");
     if(!query.more()) fail("No result returned");
-    check("1", query.next());
+    assertEqual("1", query.next());
   }
 
   /** Runs a query and retrieves the empty result as string.
@@ -303,7 +303,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryMore() throws IOException {
     final Query query = session.query("1 to 3");
     int c = 0;
-    while(query.more()) check(++c, query.next());
+    while(query.more()) assertEqual(++c, query.next());
     query.close();
   }
 
@@ -313,11 +313,11 @@ public abstract class SessionTest extends SandboxTest {
   public void queryNullBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput("\0"));
-    check("\0", session.execute("xquery " + RAW + _DB_RETRIEVE.args(NAME, "X")));
-    check("\0", session.query(RAW + _DB_RETRIEVE.args(NAME, "X")).execute());
+    assertEqual("\0", session.execute("xquery " + RAW + _DB_RETRIEVE.args(NAME, "X")));
+    assertEqual("\0", session.query(RAW + _DB_RETRIEVE.args(NAME, "X")).execute());
     final Query q = session.query(RAW + _DB_RETRIEVE.args(NAME, "X"));
     assertTrue(q.more());
-    check("\0", q.next());
+    assertEqual("\0", q.next());
     assertFalse(q.more());
     assertNull(q.next());
   }
@@ -328,11 +328,11 @@ public abstract class SessionTest extends SandboxTest {
   public void queryEmptyBinary() throws IOException {
     session.execute("create db " + NAME);
     session.store("X", new ArrayInput(""));
-    check("", session.execute("xquery " + RAW + _DB_RETRIEVE.args(NAME, "X")));
-    check("", session.query(RAW + _DB_RETRIEVE.args(NAME, "X")).execute());
+    assertEqual("", session.execute("xquery " + RAW + _DB_RETRIEVE.args(NAME, "X")));
+    assertEqual("", session.query(RAW + _DB_RETRIEVE.args(NAME, "X")).execute());
     final Query q = session.query(RAW + _DB_RETRIEVE.args(NAME, "X"));
     assertTrue(q.more());
-    check("", q.next());
+    assertEqual("", q.next());
     assertNull(q.next());
   }
 
@@ -342,9 +342,9 @@ public abstract class SessionTest extends SandboxTest {
   public void queryEmptyString() throws IOException {
     final Query q = session.query("'',1");
     assertTrue(q.more());
-    check("", q.next());
+    assertEqual("", q.next());
     assertTrue(q.more());
-    check("1", q.next());
+    assertEqual("1", q.next());
     assertNull(q.next());
   }
 
@@ -380,8 +380,8 @@ public abstract class SessionTest extends SandboxTest {
   @Test
   public void queryNoMore() throws IOException {
     final Query query = session.query("1 to 2");
-    check("1", query.next());
-    check("2", query.next());
+    assertEqual("1", query.next());
+    assertEqual("2", query.next());
     assertNull(query.next());
     query.close();
   }
@@ -393,7 +393,7 @@ public abstract class SessionTest extends SandboxTest {
     session.execute("set serializer wrap-prefix=db,wrap-uri=ns");
     final Query query = session.query(WRAPPER + "()");
     assertTrue("Result expected.", query.more());
-    check("<db:results xmlns:db=\"ns\"/>", query.next());
+    assertEqual("<db:results xmlns:db=\"ns\"/>", query.next());
     assertFalse("No result expected.", query.more());
   }
 
@@ -403,7 +403,7 @@ public abstract class SessionTest extends SandboxTest {
   public void querySerial2() throws IOException {
     final Query query = session.query(WRAPPER + "1 to 2");
     assertTrue("Result expected.", query.more());
-    check("<db:results xmlns:db=\"ns\">  <db:result>1</db:result>" +
+    assertEqual("<db:results xmlns:db=\"ns\">  <db:result>1</db:result>" +
         "  <db:result>2</db:result></db:results>", query.next());
   }
 
@@ -413,7 +413,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryBind() throws IOException {
     final Query query = session.query("declare variable $a external; $a");
     query.bind("$a", "5");
-    check("5", query.next());
+    assertEqual("5", query.next());
     query.close();
   }
 
@@ -431,7 +431,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryBindURI() throws IOException {
     final Query query = session.query("declare variable $a external; $a");
     query.bind("$a", "X", "xs:anyURI");
-    check("X", query.next());
+    assertEqual("X", query.next());
     query.close();
   }
 
@@ -441,7 +441,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryBindInt() throws IOException {
     final Query query = session.query("declare variable $a as xs:integer external; $a");
     query.bind("a", "5", "xs:integer");
-    check("5", query.next());
+    assertEqual("5", query.next());
     query.close();
   }
 
@@ -451,7 +451,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryBindDynamic() throws IOException {
     final Query query = session.query("declare variable $a as xs:integer external; $a");
     query.bind("a", "1");
-    check("1", query.execute());
+    assertEqual("1", query.execute());
     query.close();
   }
 
@@ -461,7 +461,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryBindXML() throws IOException {
     final Query query = session.query("declare variable $a external; $a//text()");
     query.bind("$a", "<a>XML</a>", "xml");
-    check("XML", query.execute());
+    assertEqual("XML", query.execute());
   }
 
 
@@ -471,7 +471,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryContext() throws IOException {
     final Query query = session.query(".");
     query.context("5");
-    check("5", query.next());
+    assertEqual("5", query.next());
     query.close();
   }
 
@@ -481,7 +481,7 @@ public abstract class SessionTest extends SandboxTest {
   public void queryContextInt() throws IOException {
     final Query query = session.query(". * 2");
     query.context("6", "xs:integer");
-    check("12", query.next());
+    assertEqual("12", query.next());
     query.close();
   }
 
@@ -514,14 +514,14 @@ public abstract class SessionTest extends SandboxTest {
     // test non-updating query
     Query query = session.query("12345678");
     assertFalse(query.updating());
-    check("12345678", query.execute());
+    assertEqual("12345678", query.execute());
     assertFalse(query.updating());
     query.close();
 
     // test updating query
     query = session.query("insert node <a/> into <b/>");
     assertTrue(query.updating());
-    check("", query.execute());
+    assertEqual("", query.execute());
     assertTrue(query.updating());
     query.close();
   }
@@ -545,7 +545,7 @@ public abstract class SessionTest extends SandboxTest {
   @Test(expected = BaseXException.class)
   public void queryError3() throws IOException {
     final Query query = session.query("(1,'a')[. eq 1]");
-    check("1", query.next());
+    assertEqual("1", query.next());
     query.next();
   }
 
@@ -555,10 +555,10 @@ public abstract class SessionTest extends SandboxTest {
   public void queryParallel() throws IOException {
     final Query query1 = session.query("1 to 2");
     final Query query2 = session.query("reverse(3 to 4)");
-    check("1", query1.next());
-    check("4", query2.next());
-    check("2", query1.next());
-    check("3", query2.next());
+    assertEqual("1", query1.next());
+    assertEqual("4", query2.next());
+    assertEqual("2", query1.next());
+    assertEqual("3", query2.next());
     assertNull(query1.next());
     assertNull(query2.next());
     query1.close();
@@ -572,7 +572,7 @@ public abstract class SessionTest extends SandboxTest {
     final int size = 8;
     final Query[] cqs = new Query[size];
     for(int q = 0; q < size; q++) cqs[q] = session.query(Integer.toString(q));
-    for(int q = 0; q < size; q++) check(q, cqs[q].next());
+    for(int q = 0; q < size; q++) assertEqual(q, cqs[q].next());
     for(final Query query : cqs) query.close();
   }
 
@@ -592,7 +592,7 @@ public abstract class SessionTest extends SandboxTest {
       final Query q = session.query(var + test[0]);
       try {
         q.bind("$x", map, "json");
-        check(test[1], q.execute());
+        assertEqual(test[1], q.execute());
       } finally { q.close(); }
     }
   }
@@ -602,7 +602,7 @@ public abstract class SessionTest extends SandboxTest {
    * @param exp expected string
    * @param ret string returned from the client API
    */
-  protected final void check(final Object exp, final Object ret) {
+  protected final void assertEqual(final Object exp, final Object ret) {
     final String result = (out != null ? out : ret).toString();
     if(out != null) out.reset();
     assertEquals(exp.toString(), result.replaceAll("\\r|\\n", ""));

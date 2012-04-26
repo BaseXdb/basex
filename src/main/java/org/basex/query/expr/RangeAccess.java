@@ -60,7 +60,7 @@ public final class RangeAccess extends IndexAccess {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(DB).add(':').
+    return new TokenBuilder(DB).add(':').
       add(ind.type().toString().toLowerCase(Locale.ENGLISH)).add("-range(").
       addExt(ind.min).add(SEP).addExt(ind.max).add(')').toString();
   }

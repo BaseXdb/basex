@@ -45,19 +45,20 @@ public final class TokenBuilder {
 
   /**
    * Constructor, specifying an initial string.
-   * @param str initial string
+   * @param s initial string
    */
-  public TokenBuilder(final String str) {
-    this(token(str));
+  public TokenBuilder(final String s) {
+    this(token(s));
   }
 
   /**
-   * Constructor, specifying an initial array.
-   * @param str initial string
+   * Constructor, specifying an initial token.
+   * @param t initial token
    */
-  public TokenBuilder(final byte[] str) {
-    chars = str;
-    size = str.length;
+  public TokenBuilder(final byte[] t) {
+    this(t.length + ElementList.CAP);
+    size = t.length;
+    System.arraycopy(t, 0, chars, 0, size);
   }
 
   /**
