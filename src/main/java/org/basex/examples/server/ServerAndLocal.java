@@ -1,14 +1,12 @@
 package org.basex.examples.server;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.BaseXServer;
-import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.XQuery;
-import org.basex.examples.query.RunQueries;
-import org.basex.server.ClientSession;
+import org.basex.*;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.examples.query.*;
+import org.basex.server.*;
 
 /**
  * This class sends a query to a database server instance.

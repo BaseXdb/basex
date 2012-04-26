@@ -1,8 +1,7 @@
 package org.basex.examples.server;
 
-import org.basex.BaseXServer;
-import org.basex.server.ClientSession;
-import org.basex.server.ClientQuery;
+import org.basex.*;
+import org.basex.server.*;
 
 /**
  * This class demonstrates query execution via the client/server architecture.

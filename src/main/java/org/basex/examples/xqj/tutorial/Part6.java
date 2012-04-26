@@ -1,9 +1,6 @@
 package org.basex.examples.xqj.tutorial;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQConstants;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQStaticContext;
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial

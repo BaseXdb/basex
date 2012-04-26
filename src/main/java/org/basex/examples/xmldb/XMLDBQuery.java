@@ -1,8 +1,8 @@
 package org.basex.examples.xmldb;
 
+import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
-import org.xmldb.api.*;
 
 /**
  * This class serves as an example for executing XPath requests with the XML:DB

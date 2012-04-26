@@ -1,9 +1,6 @@
 package org.basex.examples.xqj;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQDataSource;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQResultSequence;
+import javax.xml.xquery.*;
 
 /**
  * This class serves as an example for executing XQuery requests

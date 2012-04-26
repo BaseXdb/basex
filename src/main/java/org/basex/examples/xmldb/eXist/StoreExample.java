@@ -1,9 +1,10 @@
 package org.basex.examples.xmldb.eXist;
 
-import java.io.File;
-import org.basex.api.xmldb.BXCollection;
-import org.xmldb.api.base.*;
+import java.io.*;
+
+import org.basex.api.xmldb.*;
 import org.xmldb.api.*;
+import org.xmldb.api.base.*;
 
 /**
  * XML:DB Example, derived from the eXist documentation

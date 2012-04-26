@@ -1,12 +1,7 @@
 package org.basex.examples.xqj.tutorial;
 
-import javax.xml.namespace.QName;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQItemType;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQSequence;
-import javax.xml.xquery.XQSequenceType;
+import javax.xml.namespace.*;
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial

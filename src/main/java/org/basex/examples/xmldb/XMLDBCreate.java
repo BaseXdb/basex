@@ -1,8 +1,8 @@
 package org.basex.examples.xmldb;
 
-import org.basex.api.xmldb.BXCollection;
-import org.xmldb.api.base.*;
+import org.basex.api.xmldb.*;
 import org.xmldb.api.*;
+import org.xmldb.api.base.*;
 
 /**
  * This class serves as an example for creating a database with the XML:DB API.

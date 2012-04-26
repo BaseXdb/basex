@@ -1,15 +1,14 @@
 package org.basex.examples.xqj.tutorial;
 
 import java.io.*;
-import java.math.BigDecimal;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQSequence;
-import org.w3c.dom.Element;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.helpers.DefaultHandler;
+import java.math.*;
+
+import javax.xml.stream.*;
+import javax.xml.xquery.*;
+
+import org.w3c.dom.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial

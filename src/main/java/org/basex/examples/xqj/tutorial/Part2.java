@@ -1,8 +1,8 @@
 package org.basex.examples.xqj.tutorial;
 
-import java.util.Properties;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQDataSource;
+import java.util.*;
+
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial

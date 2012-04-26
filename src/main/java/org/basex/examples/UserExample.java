@@ -1,7 +1,6 @@
 package org.basex.examples;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 
 /**

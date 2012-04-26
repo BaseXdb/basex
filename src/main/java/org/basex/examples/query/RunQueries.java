@@ -1,17 +1,14 @@
 package org.basex.examples.query;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.Result;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.XMLSerializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 
 /**
  * This example demonstrates three variants how XQuery expressions can be

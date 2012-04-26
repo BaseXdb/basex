@@ -1,9 +1,10 @@
 package org.basex.examples.server;
 
-import java.io.IOException;
-import java.util.Random;
-import org.basex.BaseXServer;
-import org.basex.server.ClientSession;
+import java.io.*;
+import java.util.*;
+
+import org.basex.*;
+import org.basex.server.*;
 
 /**
  * This class connects multiple clients to one server instance.

@@ -1,9 +1,8 @@
 package org.basex.examples.query;
 
-import org.basex.core.Context;
-import org.basex.data.Result;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.query.*;
 
 /**
  * This example demonstrates how items can be bound as context item of

@@ -1,8 +1,8 @@
 package org.basex.examples.xmldb.eXist;
 
+import org.xmldb.api.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.*;
-import org.xmldb.api.*;
 
 /**
  * XML:DB Example, derived from the eXist documentation

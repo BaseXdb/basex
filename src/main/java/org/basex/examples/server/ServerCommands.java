@@ -1,9 +1,9 @@
 package org.basex.examples.server;
 
-import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
+import org.basex.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.server.ClientSession;
+import org.basex.server.*;
 
 /**
  * This class demonstrates database access via the client/server architecture.

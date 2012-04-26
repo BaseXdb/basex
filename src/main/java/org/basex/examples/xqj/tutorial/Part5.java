@@ -1,11 +1,9 @@
 package org.basex.examples.xqj.tutorial;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Properties;
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQExpression;
-import javax.xml.xquery.XQSequence;
+import java.io.*;
+import java.util.*;
+
+import javax.xml.xquery.*;
 
 /**
  * XQJ Example, derived from the XQJ Tutorial

@@ -1,7 +1,6 @@
 package org.basex.examples.xqj.cfoster;
 
-import javax.xml.xquery.XQConnection;
-import javax.xml.xquery.XQDataSource;
+import javax.xml.xquery.*;
 
 import net.xqj.basex.*;
 

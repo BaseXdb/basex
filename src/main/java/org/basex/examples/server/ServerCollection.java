@@ -1,12 +1,11 @@
 package org.basex.examples.server;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.BaseXServer;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.XQuery;
-import org.basex.examples.query.QueryCollection;
-import org.basex.server.ClientSession;
+import org.basex.*;
+import org.basex.core.cmd.*;
+import org.basex.examples.query.*;
+import org.basex.server.*;
 
 /**
  * This class demonstrates database access via the client/server architecture.

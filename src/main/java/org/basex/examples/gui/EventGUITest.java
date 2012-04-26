@@ -2,27 +2,16 @@ package org.basex.examples.gui;
 
 import static org.basex.core.Text.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
+import javax.swing.*;
+import javax.swing.border.*;
 
-import org.basex.BaseXServer;
-import org.basex.server.ClientSession;
-import org.basex.server.EventNotifier;
-import org.basex.util.Util;
+import org.basex.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * This class tests the event mechanism with a gui.

@@ -1,6 +1,6 @@
 package org.basex.examples.query;
 
-import org.basex.query.QueryModule;
+import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.util.*;

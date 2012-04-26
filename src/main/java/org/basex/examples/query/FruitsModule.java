@@ -1,8 +1,7 @@
 package org.basex.examples.query;
 
 import org.basex.query.*;
-import org.basex.query.item.Int;
-import org.basex.query.item.Str;
+import org.basex.query.item.*;
 import org.basex.util.*;
 
 /**

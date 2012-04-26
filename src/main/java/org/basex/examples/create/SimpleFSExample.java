@@ -1,7 +1,7 @@
 package org.basex.examples.create;
 
-import org.basex.build.Parser;
-import org.basex.core.Context;
+import org.basex.build.*;
+import org.basex.core.*;
 import org.basex.core.cmd.*;
 
 /**

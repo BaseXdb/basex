@@ -1,10 +1,10 @@
 package org.basex.examples.create;
 
 import static org.basex.util.Token.*;
-import java.io.File;
-import java.io.IOException;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
+
+import java.io.*;
+
+import org.basex.build.*;
 import org.basex.core.*;
 
 /**
