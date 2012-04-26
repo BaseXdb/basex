@@ -1,10 +1,9 @@
 package org.basex.tests.bxapi.xdm;
 
-import java.util.Iterator;
-import org.basex.query.item.Seq;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.util.Util;
+import java.util.*;
+
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery values.

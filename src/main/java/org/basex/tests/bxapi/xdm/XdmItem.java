@@ -1,12 +1,11 @@
 package org.basex.tests.bxapi.xdm;
 
-import java.util.Iterator;
+import java.util.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Item;
+import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.tests.bxapi.*;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery items.

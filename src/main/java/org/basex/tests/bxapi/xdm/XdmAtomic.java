@@ -1,10 +1,9 @@
 package org.basex.tests.bxapi.xdm;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
+import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.tests.bxapi.*;
-import org.basex.util.Token;
+import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery items.

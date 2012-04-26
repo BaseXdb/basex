@@ -1,14 +1,10 @@
 package org.basex.tests.bxapi.xdm;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.util.Compare;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
 import org.basex.tests.bxapi.*;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Wrapper for representing XQuery values.

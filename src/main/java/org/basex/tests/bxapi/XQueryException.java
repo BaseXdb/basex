@@ -1,7 +1,7 @@
 package org.basex.tests.bxapi;
 
-import org.basex.query.QueryException;
-import org.basex.util.Token;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * XQuery error. Inherited from {@link RuntimeException} to provide

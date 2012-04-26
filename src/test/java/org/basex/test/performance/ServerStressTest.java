@@ -1,12 +1,12 @@
 package org.basex.test.performance;
 
-import java.util.Random;
-import org.basex.BaseXServer;
-import org.basex.server.ClientSession;
+import java.util.*;
+
+import org.basex.*;
+import org.basex.server.*;
 import org.basex.test.*;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.junit.Test;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * This class performs a client/server stress tests with a specified

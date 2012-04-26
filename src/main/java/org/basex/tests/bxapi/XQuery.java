@@ -1,14 +1,13 @@
 package org.basex.tests.bxapi;
 
-import java.util.Iterator;
+import java.util.*;
 
-import org.basex.core.Context;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.iter.Iter;
+import org.basex.core.*;
+import org.basex.query.*;
+import org.basex.query.iter.*;
 import org.basex.tests.bxapi.xdm.*;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Wrapper for evaluating XQuery expressions.

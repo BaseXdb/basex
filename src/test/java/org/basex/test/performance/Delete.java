@@ -1,6 +1,6 @@
 package org.basex.test.performance;
 
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * This class benchmarks delete operations.

@@ -1,11 +1,9 @@
 package org.basex.tests.bxapi.xdm;
 
-import java.util.Iterator;
+import java.util.*;
 
-import org.basex.query.item.Empty;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.util.Util;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Wrapper for representing an empty sequence.

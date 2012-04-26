@@ -16,6 +16,7 @@ import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.util.Compare.Flag;
 import org.basex.tests.bxapi.*;
+import org.basex.tests.bxapi.XQuery;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 

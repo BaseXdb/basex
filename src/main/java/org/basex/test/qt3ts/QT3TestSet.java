@@ -3,36 +3,19 @@ package org.basex.test.qt3ts;
 import static org.basex.core.Prop.*;
 import static org.basex.util.Token.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.io.*;
+import java.util.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
+import org.basex.core.*;
 import org.basex.core.cmd.Set;
-import org.basex.query.QueryException;
-import org.basex.query.QueryText;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Streamable;
-import org.basex.query.item.Value;
+import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.util.Compare.Flag;
+import org.basex.tests.bxapi.*;
 import org.basex.tests.bxapi.XQuery;
-import org.basex.tests.bxapi.XQueryException;
-import org.basex.tests.bxapi.xdm.XdmEmpty;
-import org.basex.tests.bxapi.xdm.XdmItem;
-import org.basex.tests.bxapi.xdm.XdmValue;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
+import org.basex.tests.bxapi.xdm.*;
+import org.basex.util.*;
+import org.junit.*;
 
 /**
  * Base class for generated QT3TS test sets.

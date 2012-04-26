@@ -1,13 +1,11 @@
 package org.basex.tests.bxapi.xdm;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.item.ANode;
-import org.basex.query.item.SeqType;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Wrapper for representing an XQuery node.
