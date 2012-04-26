@@ -8,6 +8,7 @@ import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.ANode;
 import org.basex.query.item.Bln;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.NodeType;
 import org.basex.query.item.QNm;
@@ -59,15 +60,14 @@ public final class FNNode extends StandardFunc {
         ANode n = checkNode(it);
         if(n.type != NodeType.ELM && n.type != NodeType.DOC && n.parent() == null)
           return null;
+
         Uri base = Uri.EMPTY;
-        while(!base.isAbsolute()) {
-          if(n == null) {
-            base = ctx.sc.baseURI().resolve(base);
-            break;
-          }
+        do {
+          if(n == null) return ctx.sc.baseURI().resolve(base);
           base = Uri.uri(n.baseURI(), false).resolve(base);
+          if(n.type == NodeType.DOC && n instanceof DBNode) return base;
           n = n.parent();
-        }
+        } while(!base.isAbsolute());
         return base;
       case NAME:
         qname = it != null ? checkNode(it).qname() : null;
