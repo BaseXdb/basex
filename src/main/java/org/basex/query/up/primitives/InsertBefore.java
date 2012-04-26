@@ -11,6 +11,11 @@ import org.basex.util.InputInfo;
  * @author Lukas Kircher
  */
 public final class InsertBefore extends InsertBase {
+  /** Parent of node to be inserted. Need to cache this as delete and replace
+   * primitives (which are executed before insert before) mess with parent
+   * values.
+   */
+  private final int par;
   /**
    * Constructor.
    * @param p pre
@@ -21,12 +26,13 @@ public final class InsertBefore extends InsertBase {
   public InsertBefore(final int p, final Data d, final InputInfo i,
       final NodeCache c) {
     super(PrimitiveType.INSERTBEFORE, p, d, i, c);
+    par = d.parent(p, d.kind(p));
   }
 
   @Override
   public void apply() {
     super.apply();
-    data.insert(pre, data.parent(pre, data.kind(pre)), md);
+    data.insert(pre, par, md);
   }
 
   @Override
