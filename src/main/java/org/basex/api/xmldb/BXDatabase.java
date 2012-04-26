@@ -2,17 +2,12 @@ package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
 
-import java.util.Locale;
+import java.util.*;
 
-import org.basex.core.MainProp;
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
+import org.basex.core.*;
 import org.basex.core.cmd.Set;
+import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.Database;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.XMLDBException;
 
 /**
  * Implementation of the Database Interface for the XMLDB:API.

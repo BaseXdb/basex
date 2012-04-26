@@ -1,11 +1,8 @@
 package org.basex.api.xmldb;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.Resource;
-import org.xmldb.api.base.ResourceIterator;
-import org.xmldb.api.base.XMLDBException;
+import java.util.*;
+
+import org.xmldb.api.base.*;
 
 /**
  * Implementation of the ResourceIterator Interface for the XMLDB:API.

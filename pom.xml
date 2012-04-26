@@ -29,6 +29,11 @@
       <name>BaseX Maven Repository</name>
       <url>http://files.basex.org/maven</url>
     </repository>
+    <!--<repository>
+      <id>xqj</id>
+      <name>XQJ Maven Repository</name>
+      <url>http://xqj.net/maven</url>
+    </repository>-->
     <repository>
       <id>milton</id>
       <name>Milton Maven Repository</name>
@@ -66,7 +71,7 @@
     <dependency>
       <groupId>net.xqj</groupId>
       <artifactId>basex-xqj</artifactId>
-      <version>0.9.2</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.xqj2</groupId>

@@ -1,14 +1,14 @@
 package org.basex.api.xmldb;
 
 import static org.basex.util.Token.*;
-import java.util.HashMap;
-import org.basex.data.Nodes;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
+
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.query.*;
+import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.XMLDBException;
-import org.xmldb.api.modules.XPathQueryService;
+import org.xmldb.api.modules.*;
 
 /**
  * Abstract QueryService definition for the XMLDB:API.

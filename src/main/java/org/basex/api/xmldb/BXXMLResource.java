@@ -2,34 +2,25 @@ package org.basex.api.xmldb;
 
 import static org.basex.util.Token.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
 
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.*;
 
-import org.basex.api.dom.BXDoc;
-import org.basex.data.Data;
-import org.basex.data.Result;
-import org.basex.io.IOFile;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.item.DBNode;
-import org.basex.util.TokenBuilder;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
+import org.basex.api.dom.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
+import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.XMLDBException;
-import org.xmldb.api.modules.XMLResource;
+import org.xmldb.api.modules.*;
 
 /**
  * Implementation of the XMLResource Interface for the XMLDB:API.

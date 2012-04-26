@@ -1,17 +1,14 @@
 package org.basex.api.xmldb;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
+import java.util.*;
 
-import org.basex.data.Result;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.util.Token;
+import org.basex.data.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.util.*;
+import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
-import org.xmldb.api.base.ErrorCodes;
-import org.xmldb.api.base.Resource;
-import org.xmldb.api.base.ResourceSet;
-import org.xmldb.api.base.XMLDBException;
 
 /**
  * Implementation of the ResourceSet Interface for the XMLDB:API.
