@@ -1,23 +1,14 @@
 package org.basex.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
-import org.basex.core.Context;
-import org.basex.core.MainProp;
-import org.basex.io.in.BufferInput;
-import org.basex.io.in.DecodingInput;
+import org.basex.io.in.*;
 import org.basex.io.out.*;
-import org.basex.util.Token;
+import org.basex.util.*;
 
 /**
  * This class offers methods to execute database commands via the

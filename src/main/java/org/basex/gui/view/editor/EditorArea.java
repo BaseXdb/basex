@@ -1,25 +1,19 @@
 package org.basex.gui.view.editor;
 
-import org.basex.core.Prop;
-import org.basex.core.cmd.XQuery;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXEditor;
-
-import static org.basex.gui.layout.BaseXKeys.*;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.io.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.util.Performance;
-import static org.basex.util.Token.*;
 import static org.basex.core.Text.*;
+import static org.basex.gui.layout.BaseXKeys.*;
+import static org.basex.util.Token.*;
 
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
+import java.awt.event.*;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class extends the text editor by XQuery features.

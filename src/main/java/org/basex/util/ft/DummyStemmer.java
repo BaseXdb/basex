@@ -1,6 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Dummy stemmer for languages that do not require stemming.

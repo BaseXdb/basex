@@ -1,14 +1,12 @@
 package org.basex.query.iter;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.data.Result;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
-import org.basex.query.item.Value;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * This class can be used to build new sequences. At the same time, it serves as an

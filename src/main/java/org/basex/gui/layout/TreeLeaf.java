@@ -1,6 +1,6 @@
 package org.basex.gui.layout;
 
-import org.basex.data.Data;
+import org.basex.data.*;
 
 
 /**

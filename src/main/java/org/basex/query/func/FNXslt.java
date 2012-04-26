@@ -5,32 +5,23 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Reflect.*;
 import static org.basex.util.Token.*;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.InvocationTargetException;
+import java.io.*;
+import java.lang.reflect.*;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.*;
+import javax.xml.transform.stream.*;
 
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.item.Type;
-import org.basex.query.item.map.Map;
-import org.basex.query.iter.AxisIter;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenObjMap;
+import org.basex.query.item.map.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Project specific functions.

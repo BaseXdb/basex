@@ -4,17 +4,13 @@ import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.basex.query.item.Item;
-import org.basex.query.util.json.JSONConverter;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.hash.TokenSet;
-import org.basex.util.list.BoolList;
-import org.basex.util.list.TokenList;
+import org.basex.query.item.*;
+import org.basex.query.util.json.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class serializes data as JSON. The input must conform to the rules

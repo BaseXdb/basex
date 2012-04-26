@@ -1,9 +1,6 @@
 package org.basex.query.iter;
 
-import org.basex.query.item.ANode;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.Value;
+import org.basex.query.item.*;
 
 /**
  * Iterator interface, extending the default iterator with a {@link #more}

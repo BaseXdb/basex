@@ -2,10 +2,10 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.StringList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class organizes all currently opened database sessions.

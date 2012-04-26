@@ -1,10 +1,9 @@
 package org.basex.build;
 
-import java.io.IOException;
-import org.basex.data.Data;
-import org.basex.data.MemData;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.io.*;
 
 /**
  * This class creates a database instance in main memory.

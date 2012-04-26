@@ -2,16 +2,14 @@ package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
-import org.basex.core.Prop;
-import org.basex.query.QueryException;
-import org.basex.util.Levenshtein;
-import org.basex.util.ft.FTBitapSearch;
+
+import org.basex.core.*;
+import org.basex.query.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 import org.basex.util.ft.FTBitapSearch.TokenComparator;
-import org.basex.util.ft.FTIterator;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTOpt;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.list.TokenList;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class performs the full-text tokenization.

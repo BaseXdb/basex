@@ -1,10 +1,11 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import org.basex.core.CommandBuilder;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
-import org.basex.data.MetaData;
+import org.basex.data.*;
 
 /**
  * Evaluates the 'alter user' command and alters the password of a user.

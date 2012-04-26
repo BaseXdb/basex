@@ -1,9 +1,9 @@
 package org.basex.gui.view;
 
-import java.awt.BorderLayout;
-import java.util.Locale;
+import java.awt.*;
+import java.util.*;
 
-import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.*;
 
 /**
  * This class contains a view reference and adds a {@link ViewMover}

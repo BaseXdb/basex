@@ -2,7 +2,8 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import org.basex.util.Atts;
+
+import org.basex.util.*;
 
 /**
  * Global namespaces.

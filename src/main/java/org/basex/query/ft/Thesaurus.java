@@ -2,20 +2,18 @@ package org.basex.query.ft;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import java.util.Arrays;
-import org.basex.build.MemBuilder;
-import org.basex.build.Parser;
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.io.IO;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.util.InputInfo;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.list.TokenList;
+
+import java.io.*;
+import java.util.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Simple Thesaurus for full-text requests.

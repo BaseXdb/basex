@@ -2,10 +2,9 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 
-import org.basex.data.Data;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Replace value primitive.

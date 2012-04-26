@@ -2,9 +2,9 @@ package org.basex.query.util.format;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Parser for formatting dates.

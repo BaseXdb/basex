@@ -1,12 +1,10 @@
 package org.basex.io.serial;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.basex.io.out.PrintOutput;
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
+import org.basex.io.out.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
 
 /**
  * This class serializes data in its internal format: no indentation and entity

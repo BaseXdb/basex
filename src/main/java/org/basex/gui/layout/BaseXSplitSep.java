@@ -1,11 +1,11 @@
 package org.basex.gui.layout;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import javax.swing.event.MouseInputAdapter;
-import org.basex.gui.GUIConstants;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.event.*;
+
+import org.basex.gui.*;
 
 /**
  * This separator splits several panels and allows panel resizing.

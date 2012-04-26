@@ -1,8 +1,8 @@
 package org.basex.data;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import org.basex.util.Util;
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * Match full-text container,

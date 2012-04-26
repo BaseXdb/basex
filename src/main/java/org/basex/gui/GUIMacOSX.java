@@ -1,12 +1,10 @@
 package org.basex.gui;
 
-import java.awt.Image;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.awt.*;
+import java.lang.reflect.*;
 
-import org.basex.core.Prop;
-import org.basex.gui.layout.BaseXLayout;
+import org.basex.core.*;
+import org.basex.gui.layout.*;
 
 /**
  * Sets some Mac OS X specific interface options.

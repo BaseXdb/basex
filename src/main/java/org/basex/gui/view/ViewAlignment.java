@@ -1,8 +1,7 @@
 package org.basex.gui.view;
 
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXSplit;
-import org.basex.util.Array;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * Layout class.

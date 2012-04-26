@@ -2,19 +2,16 @@ package org.basex.query.util.format;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Locale;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.query.QueryException;
-import org.basex.query.item.AtomType;
+import java.util.*;
+
+import javax.xml.datatype.*;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.item.Date;
-import org.basex.util.InputInfo;
-import org.basex.util.Reflect;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Abstract class for formatting data in different languages.

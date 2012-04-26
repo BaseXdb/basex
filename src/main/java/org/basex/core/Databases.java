@@ -1,12 +1,11 @@
 package org.basex.core;
 
-import java.util.regex.Pattern;
-
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TwoWayTokenMap;
 import static org.basex.util.Token.*;
+
+import java.util.regex.*;
+
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * Manages a two-way-map of all available databases and backups. Used for locking.

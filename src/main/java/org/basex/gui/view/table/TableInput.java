@@ -1,13 +1,13 @@
 package org.basex.gui.view.table;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPanel;
-import org.basex.util.Performance;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * This class allows simple text input for the table headers.

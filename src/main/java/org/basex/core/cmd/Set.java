@@ -2,10 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.util.Locale;
+import java.util.*;
 
 import org.basex.core.*;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'set' command and modifies database properties.

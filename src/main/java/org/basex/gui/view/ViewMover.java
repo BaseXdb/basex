@@ -1,14 +1,10 @@
 package org.basex.gui.view;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import org.basex.gui.AGUI;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPanel;
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 
 /**
  * This panel is added to each view to allow drag and drop operations.

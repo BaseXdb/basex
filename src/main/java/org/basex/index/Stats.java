@@ -2,12 +2,12 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.data.MetaData;
+import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.hash.TokenIntMap;
+import org.basex.util.hash.*;
 
 /**
  * This class provides statistical data for an indexed node.

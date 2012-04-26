@@ -4,17 +4,11 @@ import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.QNm;
+import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.util.*;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
-import org.basex.util.XMLToken;
-import org.basex.util.hash.TokenObjMap;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * <p>This class converts a <a href="http://jsonml.org">JsonML</a>

@@ -4,37 +4,20 @@ import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Transparency;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
+import java.util.*;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
-import org.basex.data.Data;
-import org.basex.data.Nodes;
+import org.basex.data.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPopup;
-import org.basex.gui.layout.BaseXSlider;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
-import org.basex.index.StatsType;
-import org.basex.util.list.IntList;
+import org.basex.index.*;
+import org.basex.util.list.*;
 
 /**
  * A scatter plot visualization of the database.

@@ -2,8 +2,7 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.server.ClientListener;
-import org.basex.server.Sessions;
+import org.basex.server.*;
 
 /**
  * Evaluates the 'kill' command and stops user sessions.

@@ -2,10 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import org.basex.core.CommandBuilder;
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
-import org.basex.data.MetaData;
+import org.basex.data.*;
 
 /**
  * Evaluates the 'create user' command and creates a new user.

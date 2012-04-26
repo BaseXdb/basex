@@ -1,11 +1,12 @@
 package org.basex.io.serial;
 
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.build.Builder;
-import org.basex.query.item.Item;
-import org.basex.util.Atts;
-import org.basex.util.Util;
+
+import java.io.*;
+
+import org.basex.build.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * A serializer that pipes the events directly through to a builder.

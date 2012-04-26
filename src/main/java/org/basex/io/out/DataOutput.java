@@ -1,15 +1,10 @@
 package org.basex.io.out;
 
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.Num;
-import org.basex.util.Token;
-import org.basex.util.list.IntList;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is an output stream for project specific data types.

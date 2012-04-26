@@ -3,19 +3,15 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
-import org.basex.data.Data;
-import org.basex.data.DataText;
-import org.basex.data.MetaData;
-import org.basex.index.Resources;
-import org.basex.io.MimeTypes;
-import org.basex.util.Table;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'list' command and shows all documents in a database.

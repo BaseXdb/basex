@@ -1,6 +1,6 @@
 package org.basex.util.list;
 
-import org.basex.util.Array;
+import org.basex.util.*;
 
 /**
  * This is an abstract class for storing elements of any kind in an array-based

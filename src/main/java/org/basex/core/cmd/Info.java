@@ -2,11 +2,10 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 
 import org.basex.core.*;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'info' command and returns general database information.

@@ -1,18 +1,16 @@
 package org.basex.gui;
 
+import static org.basex.gui.GUICommand.*;
 import static org.basex.gui.GUICommands.*;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Event;
-import java.awt.Font;
-import javax.swing.Icon;
-import javax.swing.UIManager;
-import org.basex.core.Prop;
-import org.basex.core.Text;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.View;
-import org.basex.gui.view.map.MapView;
+
+import java.awt.*;
+
+import javax.swing.*;
+
+import org.basex.core.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
+import org.basex.gui.view.map.*;
 
 /**
  * GUI Constants used in different views.

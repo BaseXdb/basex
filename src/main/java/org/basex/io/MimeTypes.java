@@ -2,12 +2,11 @@ package org.basex.io;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 
 import org.basex.io.in.*;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * This class returns the mime types of a file, which is either dynamically

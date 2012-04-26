@@ -1,10 +1,6 @@
 package org.basex.gui.layout;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Insets;
-import java.awt.LayoutManager;
+import java.awt.*;
 
 /**
  * This LayoutManager is similar to the GridLayout. The added components

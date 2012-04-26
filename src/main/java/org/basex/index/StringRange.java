@@ -1,6 +1,6 @@
 package org.basex.index;
 
-import org.basex.util.Token;
+import org.basex.util.*;
 
 /**
  * This class stores a string range for index access.

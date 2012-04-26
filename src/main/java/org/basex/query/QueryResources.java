@@ -109,17 +109,18 @@ public final class QueryResources {
   public DBNode doc(final String input, final InputInfo info) throws QueryException {
     final QueryInput qi = new QueryInput(input);
 
+    // check currently opened databases
     for(int d = 0; d < datas; ++d) {
       final Data dt = data[d];
-      // return node if single document in a database contains points to the same path
+      // database has a single document, input paths are matching
       if(dt.single() && IO.get(dt.meta.original).eq(qi.io))
         return new DBNode(dt, 0, Data.DOC);
 
-      // return database instance with the same name
+      // database instance has same name as input path
       if(dt.meta.name.equalsIgnoreCase(qi.db)) return doc(dt, qi, info);
     }
 
-    // open database or create new instance
+    // open new database, or create new instance
     Data dt = open(qi);
     if(dt == null) dt = create(qi, true, info);
     return doc(dt, qi, info);
@@ -147,26 +148,29 @@ public final class QueryResources {
   public Value collection(final String input, final InputInfo info)
       throws QueryException {
 
-    // find specified collection
+    // merge input with base directory
     final IO base = ctx.sc.baseIO();
     final String in = base != null ? base.merge(input).path() : null;
+
+    // check currently opened collections
     for(int c = 0; c < colls; c++) {
       if(in != null && collName[c].equalsIgnoreCase(in) ||
           collName[c].equalsIgnoreCase(input)) return coll[c];
     }
 
-    // return database instance with the same name or file path
+    // check currently opened databases
     final QueryInput qi = new QueryInput(input);
-
     Data dt = null;
     for(int d = 0; d < datas; ++d) {
+      // return database instance with the same name or file path
       if(qi.db != null && data[d].meta.name.equalsIgnoreCase(qi.db) ||
           IO.get(data[d].meta.original).eq(qi.io)) {
         dt = data[d];
         break;
       }
     }
-    // open database or create new instance
+
+    // open new database, or create new instance
     if(dt == null) dt = open(qi);
     if(dt == null) dt = create(qi, false, info);
     return DBNodeSeq.get(dt.resources.docs(qi.path), dt, true, qi.path.isEmpty());
@@ -205,7 +209,7 @@ public final class QueryResources {
   // PRIVATE METHODS ====================================================================
 
   /**
-   * Opens an existing database, or returns {@code null}.
+   * Tries to open the addressed database, or returns {@code null}.
    * @param input query input
    * @return data reference
    */

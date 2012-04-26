@@ -3,33 +3,15 @@ package org.basex.query.item.map;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Empty;
-import org.basex.query.item.FItem;
-import org.basex.query.item.Flt;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.MapType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Str;
-import org.basex.query.item.Type;
-import org.basex.query.item.Value;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.query.iter.ValueIter;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenObjMap;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * The map item.

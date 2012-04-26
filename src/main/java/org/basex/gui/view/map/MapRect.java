@@ -1,7 +1,7 @@
 package org.basex.gui.view.map;
 
-import org.basex.data.FTPos;
-import org.basex.gui.view.ViewRect;
+import org.basex.data.*;
+import org.basex.gui.view.*;
 
 /**
  * View rectangle.

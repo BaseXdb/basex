@@ -2,8 +2,8 @@ package org.basex.query.up.primitives;
 
 import static org.basex.util.Token.*;
 
-import org.basex.data.Data;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * Base class for all update primitives that lead to structural changes /

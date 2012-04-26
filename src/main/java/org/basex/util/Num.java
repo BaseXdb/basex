@@ -1,6 +1,6 @@
 package org.basex.util;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * <p>This class provides operations to compress and decompress 4-byte integer

@@ -1,6 +1,6 @@
 package org.basex.gui.view;
 
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * View rectangle.

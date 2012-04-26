@@ -4,27 +4,16 @@ import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUIProp;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+
+import org.basex.data.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.BaseXBar;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPanel;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
 import org.basex.gui.view.table.TableData.TableCol;
 
 /**

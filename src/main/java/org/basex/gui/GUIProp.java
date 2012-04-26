@@ -1,11 +1,10 @@
 package org.basex.gui;
 
-import java.awt.Font;
-import org.basex.core.AProp;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.list.StringList;
+import java.awt.*;
+
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains properties which are used in the GUI.

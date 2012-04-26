@@ -1,7 +1,9 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+
 import java.util.*;
+
 import org.basex.util.list.*;
 
 /**

@@ -1,11 +1,9 @@
 package org.basex.io.out;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import org.basex.core.Prop;
-import org.basex.util.Token;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * This class is a stream-wrapper for textual data. Note that the internal

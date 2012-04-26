@@ -3,22 +3,17 @@ package org.basex.build.file;
 import static org.basex.build.file.MAB2.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
-import org.basex.build.BuildException;
-import org.basex.build.SingleParser;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.random.DataAccess;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenMap;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.list.ByteList;
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.random.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class parses files in the MAB2 format

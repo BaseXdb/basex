@@ -3,9 +3,9 @@ package org.basex.query.util;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import org.basex.query.QueryException;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class references all statically known namespaces.

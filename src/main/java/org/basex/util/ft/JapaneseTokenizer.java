@@ -1,19 +1,14 @@
 package org.basex.util.ft;
 
-import org.basex.core.Prop;
-import org.basex.util.Reflect;
 import static org.basex.util.Token.*;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.util.*;
 
 /**
  * Japanese lexer using igo (http://igo.sourceforge.jp/).

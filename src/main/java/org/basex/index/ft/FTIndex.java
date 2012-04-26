@@ -1,14 +1,12 @@
 package org.basex.index.ft;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.data.Data;
-import org.basex.data.FTMatches;
-import org.basex.index.Index;
-import org.basex.index.IndexCache;
-import org.basex.io.random.DataAccess;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.io.random.*;
 import org.basex.util.hash.*;
-import org.basex.util.list.IntList;
+import org.basex.util.list.*;
 
 /**
  * This abstract class defines methods for the available full-text indexes.

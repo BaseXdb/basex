@@ -1,9 +1,10 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
 
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.util.*;
 
 /**
  * This exception is thrown if a wrong user/password combination was specified.

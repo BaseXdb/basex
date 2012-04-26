@@ -2,37 +2,21 @@ package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.Window;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import static org.basex.util.Token.*;
+
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
 import java.util.*;
 
-import javax.swing.AbstractButton;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.border.MatteBorder;
-import org.basex.gui.GUI;
-import org.basex.gui.GUICommand;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.Fill;
-import org.basex.io.IO;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Undo;
+import javax.swing.border.*;
 
-import static org.basex.util.Token.*;
+import org.basex.gui.*;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class provides a text viewer and editor, using the

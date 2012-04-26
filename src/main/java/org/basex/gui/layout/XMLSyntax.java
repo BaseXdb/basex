@@ -2,7 +2,8 @@ package org.basex.gui.layout;
 
 import static org.basex.data.DataText.*;
 import static org.basex.gui.GUIConstants.*;
-import java.awt.Color;
+
+import java.awt.*;
 
 /**
  * This class defines syntax highlighting for XML files.

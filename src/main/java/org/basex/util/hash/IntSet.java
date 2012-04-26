@@ -1,6 +1,6 @@
 package org.basex.util.hash;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * This is an efficient hash set, storing keys in a simple integer array.

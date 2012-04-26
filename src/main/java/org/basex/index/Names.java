@@ -1,16 +1,14 @@
 package org.basex.index;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
-import org.basex.core.Text;
-import org.basex.data.MetaData;
+import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Array;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class indexes and organizes the tags or attribute names,

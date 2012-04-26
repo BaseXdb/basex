@@ -1,9 +1,9 @@
 package org.basex.server;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.BaseXServer;
-import org.basex.util.Performance;
+import org.basex.*;
+import org.basex.util.*;
 
 /**
  * This class delays the response to the specified client.

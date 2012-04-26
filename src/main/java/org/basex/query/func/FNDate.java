@@ -1,24 +1,16 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
-import java.math.BigDecimal;
-import java.util.Calendar;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.DTd;
-import org.basex.query.item.Dat;
+
+import java.math.*;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.item.Date;
-import org.basex.query.item.Dec;
-import org.basex.query.item.Dtm;
-import org.basex.query.item.Dur;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Tim;
-import org.basex.query.item.Type;
-import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Date functions.

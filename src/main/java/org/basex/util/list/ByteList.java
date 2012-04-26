@@ -1,7 +1,8 @@
 package org.basex.util.list;
 
 import static org.basex.util.Token.*;
-import java.util.Arrays;
+
+import java.util.*;
 
 /**
  * This is a simple container for byte values.

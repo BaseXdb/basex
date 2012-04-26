@@ -2,14 +2,12 @@ package org.basex.gui.view;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import org.basex.gui.GUICommands;
-import org.basex.gui.GUIConstants;
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXPanel;
+import org.basex.gui.layout.*;
 
 /**
  * View observer pattern. All inheriting classes are attached to the

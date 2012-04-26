@@ -1,24 +1,18 @@
 package org.basex.gui;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
-import javax.swing.plaf.basic.BasicComboPopup;
-import org.basex.core.CommandParser;
-import org.basex.data.Data;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.QuerySuggest;
-import org.basex.util.list.StringList;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.plaf.basic.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.layout.*;
+import org.basex.query.*;
+import org.basex.util.list.*;
 
 /**
  * This class offers a text field for keyword and XQuery input.

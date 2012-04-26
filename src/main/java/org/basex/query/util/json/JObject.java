@@ -2,7 +2,7 @@ package org.basex.query.util.json;
 
 import static org.basex.data.DataText.*;
 
-import org.basex.util.list.TokenList;
+import org.basex.util.list.*;
 
 /**
  * JSON object.

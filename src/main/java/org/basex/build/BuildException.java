@@ -1,7 +1,8 @@
 package org.basex.build;
 
-import java.io.IOException;
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.util.*;
 
 /**
  * This class indicates building exceptions.

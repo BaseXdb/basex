@@ -1,9 +1,7 @@
 package org.basex.api.dom;
 
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.DocumentType;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - implementation.

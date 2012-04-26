@@ -1,7 +1,8 @@
 package org.basex.gui.layout;
 
-import java.awt.Color;
-import org.basex.gui.GUIConstants;
+import java.awt.*;
+
+import org.basex.gui.*;
 
 /**
  * This class defines syntax highlighting for JSON files.

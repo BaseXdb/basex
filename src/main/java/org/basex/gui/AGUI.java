@@ -1,11 +1,13 @@
 package org.basex.gui;
 
 import static org.basex.gui.GUIConstants.*;
-import java.awt.Cursor;
-import javax.swing.JFrame;
-import org.basex.core.Context;
-import org.basex.core.Text;
-import org.basex.gui.layout.BaseXLayout;
+
+import java.awt.*;
+
+import javax.swing.*;
+
+import org.basex.core.*;
+import org.basex.gui.layout.*;
 
 /**
  * Abstract class for GUI windows.

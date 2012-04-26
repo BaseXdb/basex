@@ -3,25 +3,18 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
-import org.basex.data.MemData;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Arr;
-import org.basex.query.expr.Expr;
-import org.basex.query.flwor.Let;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.ValueIter;
-import org.basex.query.up.ContextModifier;
-import org.basex.query.up.TransformModifier;
-import org.basex.query.util.DataBuilder;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.flwor.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Transform expression.

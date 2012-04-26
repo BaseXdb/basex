@@ -1,7 +1,7 @@
 package org.basex.query.iter;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
+import org.basex.query.*;
+import org.basex.query.item.*;
 
 /**
  * Node iterator interface.

@@ -1,8 +1,8 @@
 package org.basex.io.serial;
 
 import static org.basex.data.DataText.*;
-import java.io.IOException;
-import java.io.OutputStream;
+
+import java.io.*;
 
 /**
  * This class serializes data as XML.

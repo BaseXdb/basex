@@ -1,47 +1,35 @@
 package org.basex.gui;
 
-import org.basex.core.*;
-
 import static org.basex.core.Text.*;
-import org.basex.core.cmd.Find;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
-import org.basex.data.Data;
-import org.basex.data.Namespaces;
-import org.basex.data.Nodes;
-import org.basex.data.Result;
 import static org.basex.gui.GUIConstants.*;
-import org.basex.gui.dialog.DialogPass;
-import org.basex.gui.layout.*;
-import org.basex.gui.view.ViewContainer;
-import org.basex.gui.view.ViewNotifier;
-import org.basex.gui.view.editor.EditorView;
-import org.basex.gui.view.explore.ExploreView;
-import org.basex.gui.view.folder.FolderView;
-import org.basex.gui.view.info.InfoView;
-import org.basex.gui.view.map.MapView;
-import org.basex.gui.view.plot.PlotView;
-import org.basex.gui.view.table.TableView;
-import org.basex.gui.view.text.TextView;
-import org.basex.gui.view.tree.TreeView;
-import org.basex.io.IOUrl;
-import org.basex.io.out.ArrayOutput;
-import org.basex.query.QueryException;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import static org.basex.util.Token.token;
-import org.basex.util.Util;
-import org.basex.util.Version;
+import static org.basex.util.Token.*;
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.regex.*;
 
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.EtchedBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import javax.swing.border.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.gui.dialog.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
+import org.basex.gui.view.editor.*;
+import org.basex.gui.view.explore.*;
+import org.basex.gui.view.folder.*;
+import org.basex.gui.view.info.*;
+import org.basex.gui.view.map.*;
+import org.basex.gui.view.plot.*;
+import org.basex.gui.view.table.*;
+import org.basex.gui.view.text.*;
+import org.basex.gui.view.tree.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class is the main window of the GUI. It is the central instance

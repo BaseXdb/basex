@@ -1,7 +1,8 @@
 package org.basex.util.ft;
 
-import java.util.Collection;
-import org.basex.util.TokenBuilder;
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * Indonesian stemming algorithm, derrived from Lucene 3.3.0 Indonesian stemmer

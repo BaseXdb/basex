@@ -3,21 +3,14 @@ package org.basex.gui.view.table;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXBar;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.util.TokenBuilder;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * This is the content area of the table view.

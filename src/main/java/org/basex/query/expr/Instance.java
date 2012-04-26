@@ -1,16 +1,13 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Bln;
-import org.basex.query.item.SeqType;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Instance test.

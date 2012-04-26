@@ -1,9 +1,9 @@
 package org.basex.query.up.primitives;
 
-import org.basex.data.Data;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.up.NamePool;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.*;
+import org.basex.util.*;
 
 /**
  * Insert attribute primitive.

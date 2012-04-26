@@ -1,7 +1,8 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import org.basex.util.Util;
+
+import org.basex.util.*;
 
 /**
  * This class contains a single full-text token.

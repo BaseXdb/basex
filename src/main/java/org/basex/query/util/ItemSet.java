@@ -1,12 +1,10 @@
 package org.basex.query.util;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Set for quickly indexing items.

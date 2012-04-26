@@ -1,6 +1,6 @@
 package org.basex.io.random;
 
-import org.basex.io.IO;
+import org.basex.io.*;
 
 /**
  * This class represents a simple buffer.

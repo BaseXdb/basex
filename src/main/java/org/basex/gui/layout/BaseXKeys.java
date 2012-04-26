@@ -4,8 +4,7 @@ import static java.awt.event.KeyEvent.*;
 import static org.basex.core.Prop.*;
 import static org.basex.gui.GUIConstants.*;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 /**
  * This class offers system-dependent key mappings.

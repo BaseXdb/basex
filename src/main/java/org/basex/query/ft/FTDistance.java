@@ -2,17 +2,16 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.data.FTMatch;
-import org.basex.data.FTStringMatch;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTUnit;
+
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * FTDistance expression.

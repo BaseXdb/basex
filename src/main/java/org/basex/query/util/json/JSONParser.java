@@ -2,11 +2,9 @@ package org.basex.query.util.json;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.InputParser;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * <p>This class converts a JSON document to a tree representation.</p>

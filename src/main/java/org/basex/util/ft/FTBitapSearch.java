@@ -1,10 +1,10 @@
 package org.basex.util.ft;
 
-import java.util.BitSet;
-import java.util.NoSuchElementException;
-import org.basex.query.QueryException;
-import org.basex.query.ft.FTTokens;
-import org.basex.util.list.TokenList;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.ft.*;
+import org.basex.util.list.*;
 
 /**
  * Generalized search algorithm based on the Bitap string matching algorithm.

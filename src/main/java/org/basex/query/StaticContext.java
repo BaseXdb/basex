@@ -3,13 +3,12 @@ package org.basex.query;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.io.IO;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Uri;
-import org.basex.query.util.NSContext;
-import org.basex.query.util.format.DecFormatter;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenObjMap;
+import org.basex.io.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.query.util.format.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class contains the static context of an expression.

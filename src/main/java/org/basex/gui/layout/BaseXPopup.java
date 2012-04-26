@@ -1,19 +1,13 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import org.basex.gui.GUI;
-import org.basex.gui.GUICommand;
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+
+import org.basex.gui.*;
 
 /**
  * Project specific Popup menu implementation.

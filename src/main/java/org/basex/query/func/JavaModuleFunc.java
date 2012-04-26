@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryModule.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
@@ -9,6 +8,8 @@ import java.lang.reflect.*;
 
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.QueryModule.Deterministic;
+import org.basex.query.QueryModule.FocusDependent;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.util.*;

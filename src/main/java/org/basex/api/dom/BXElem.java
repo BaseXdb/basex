@@ -1,12 +1,9 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.ANode;
-import org.basex.query.iter.AxisIter;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.TypeInfo;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Element implementation.

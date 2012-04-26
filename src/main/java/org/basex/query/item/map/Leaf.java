@@ -1,14 +1,11 @@
 package org.basex.query.item.map;
 
-import org.basex.query.QueryException;
 import static org.basex.query.QueryText.*;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * A single binding of a {@link Map}.

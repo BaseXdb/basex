@@ -1,13 +1,11 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import org.basex.gui.GUIConstants;
+import java.awt.event.*;
+
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 
 /**

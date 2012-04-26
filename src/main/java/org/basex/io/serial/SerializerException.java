@@ -1,8 +1,9 @@
 package org.basex.io.serial;
 
-import java.io.IOException;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
+import java.io.*;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class indicates exceptions during the serialization of a query.

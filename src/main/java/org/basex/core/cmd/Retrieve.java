@@ -2,12 +2,12 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 
 import org.basex.core.*;
-import org.basex.data.MetaData;
-import org.basex.io.IOFile;
-import org.basex.io.in.BufferInput;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
 
 /**
  * Evaluates the 'retrieve' command and retrieves binary content.

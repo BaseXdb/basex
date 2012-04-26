@@ -2,8 +2,7 @@ package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * English stemming algorithm, based on the publication from

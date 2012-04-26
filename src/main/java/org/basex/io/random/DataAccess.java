@@ -1,12 +1,9 @@
 package org.basex.io.random;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.Num;
-import org.basex.util.Util;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class allows positional read and write access to a database file.

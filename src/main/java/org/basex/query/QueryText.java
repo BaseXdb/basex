@@ -2,8 +2,8 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 
-import org.basex.core.Text;
-import org.basex.util.hash.TokenSet;
+import org.basex.core.*;
+import org.basex.util.hash.*;
 
 /**
  * This class assembles text string and tokens required by the XQuery processor

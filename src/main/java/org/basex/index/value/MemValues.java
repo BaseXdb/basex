@@ -3,13 +3,12 @@ package org.basex.index.value;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.data.Data;
+import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.util.Array;
-import org.basex.util.TokenBuilder;
-import org.basex.util.hash.TokenSet;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class provides a main memory access to attribute values and

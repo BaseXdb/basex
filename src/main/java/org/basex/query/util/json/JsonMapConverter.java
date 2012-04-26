@@ -1,15 +1,10 @@
 package org.basex.query.util.json;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Int;
-import org.basex.query.item.Str;
-import org.basex.query.item.Value;
-import org.basex.query.item.map.Map;
-import org.basex.util.InputInfo;
-import org.basex.util.list.TokenList;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.item.map.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * <p>Provides a method for parsing a JSON string and converting it to an XQuery

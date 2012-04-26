@@ -1,8 +1,8 @@
 package org.basex.util;
 
-import java.util.Locale;
-import java.util.Scanner;
-import org.basex.core.BaseXException;
+import java.util.*;
+
+import org.basex.core.*;
 
 /**
  * This class parses command-line arguments.

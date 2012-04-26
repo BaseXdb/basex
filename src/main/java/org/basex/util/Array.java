@@ -1,8 +1,8 @@
 package org.basex.util;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.util.list.IntList;
+import org.basex.util.list.*;
 
 /**
  * This class provides convenience methods for handling arrays

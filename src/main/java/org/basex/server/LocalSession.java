@@ -1,20 +1,11 @@
 package org.basex.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import org.basex.core.BaseXException;
-import org.basex.core.Command;
-import org.basex.core.CommandParser;
-import org.basex.core.Context;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Exit;
-import org.basex.core.cmd.Replace;
-import org.basex.core.cmd.Store;
-import org.basex.query.QueryException;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * This class offers methods to locally execute database commands.

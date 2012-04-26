@@ -1,11 +1,10 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
-import java.awt.BorderLayout;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXMem;
-import org.basex.gui.layout.BaseXPanel;
+
+import java.awt.*;
+
+import org.basex.gui.layout.*;
 
 /**
  * This is the status bar of the main window. It displays progress information

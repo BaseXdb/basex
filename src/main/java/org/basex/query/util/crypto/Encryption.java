@@ -3,26 +3,15 @@ package org.basex.query.util.crypto;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.security.*;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.*;
+import javax.crypto.spec.*;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.Str;
-import org.basex.util.Base64;
-import org.basex.util.InputInfo;
-import org.basex.util.hash.TokenMap;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class encrypts and decrypts textual inputs.

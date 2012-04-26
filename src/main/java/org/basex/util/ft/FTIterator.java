@@ -1,7 +1,8 @@
 package org.basex.util.ft;
 
-import java.util.Iterator;
-import org.basex.util.Util;
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * Full-text iterator.

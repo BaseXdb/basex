@@ -1,13 +1,13 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.iter.Iter;
-import org.basex.util.InputInfo;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Pragma extension.

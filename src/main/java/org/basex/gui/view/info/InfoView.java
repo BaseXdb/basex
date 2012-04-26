@@ -2,23 +2,18 @@ package org.basex.gui.view.info;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
-import java.awt.BorderLayout;
-import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-import org.basex.core.Command;
-import org.basex.core.Prop;
-import org.basex.core.cmd.XQuery;
-import org.basex.gui.GUIProp;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewNotifier;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This view displays query information.

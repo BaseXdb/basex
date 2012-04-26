@@ -2,13 +2,11 @@ package org.basex.query.up;
 
 import static org.basex.query.util.Err.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import org.basex.data.Data;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.up.primitives.*;
 
 /**
  * The Transform context modifier carries out updates of a single transform

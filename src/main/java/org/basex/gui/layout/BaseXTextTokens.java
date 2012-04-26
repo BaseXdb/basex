@@ -1,8 +1,10 @@
 package org.basex.gui.layout;
 
-import java.util.Arrays;
-import org.basex.util.TokenBuilder;
 import static org.basex.util.Token.*;
+
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * This class allows the iteration on tokens.

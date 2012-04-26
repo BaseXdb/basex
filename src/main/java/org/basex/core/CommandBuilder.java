@@ -1,9 +1,8 @@
 package org.basex.core;
 
-import java.util.Locale;
+import java.util.*;
 
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * This class simplifies the composition of the string representation of

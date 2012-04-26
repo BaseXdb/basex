@@ -1,26 +1,17 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Bln;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.ValueBuilder;
+import java.util.regex.*;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 import org.basex.query.regex.parse.*;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
 
 /**
  * String pattern functions.

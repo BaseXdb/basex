@@ -2,10 +2,10 @@ package org.basex.util.list;
 
 import static org.basex.util.Token.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 import org.basex.util.*;
-import org.basex.util.hash.TokenIntMap;
+import org.basex.util.hash.*;
 
 /**
  * <p>Two-way Token Map allows efficient key->value and value->key lookups.

@@ -1,15 +1,10 @@
 package org.basex.query.util;
 
-import org.basex.data.Data;
-import org.basex.query.QueryContext;
-import org.basex.query.expr.Context;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
-import org.basex.query.path.Axis;
-import org.basex.query.path.AxisPath;
-import org.basex.query.path.AxisStep;
-import org.basex.query.path.Path;
-import org.basex.util.Array;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.path.*;
+import org.basex.util.*;
 
 /**
  * Container for all information needed to determine whether an index is

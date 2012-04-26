@@ -2,20 +2,17 @@ package org.basex.query.up.primitives;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
-import java.io.IOException;
+
+import java.io.*;
 import java.util.*;
 
-import org.basex.data.Data;
-import org.basex.io.IOFile;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Uri;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Update primitive for the fn:put() function.

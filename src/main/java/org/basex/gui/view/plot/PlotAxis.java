@@ -2,11 +2,10 @@ package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
 
-import org.basex.data.Data;
-import org.basex.index.StatsType;
-import org.basex.index.Stats;
-import org.basex.util.Array;
-import org.basex.util.hash.TokenSet;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Axis component of the scatter plot visualization.

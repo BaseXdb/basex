@@ -1,10 +1,10 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * This class assembles some index statistics.

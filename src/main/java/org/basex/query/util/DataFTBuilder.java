@@ -1,16 +1,13 @@
 package org.basex.query.util;
 
 import static org.basex.util.Token.*;
-import org.basex.core.Text;
-import org.basex.data.Data;
-import org.basex.data.FTPos;
-import org.basex.data.FTPosData;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.ANode;
-import org.basex.util.TokenBuilder;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTSpan;
-import org.basex.util.list.TokenList;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * Class for constructing decorated full-text nodes.

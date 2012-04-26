@@ -1,9 +1,9 @@
 package org.basex.data;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.util.Util;
+import org.basex.io.serial.*;
+import org.basex.util.*;
 
 /**
  * Expression information, used for debugging and logging.

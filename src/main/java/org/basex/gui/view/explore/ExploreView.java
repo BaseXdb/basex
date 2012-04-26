@@ -2,15 +2,15 @@ package org.basex.gui.view.explore;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
-import java.awt.BorderLayout;
-import java.awt.event.KeyEvent;
-import org.basex.data.Nodes;
-import org.basex.gui.GUICommands;
-import org.basex.gui.GUIProp;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.*;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewNotifier;
+import org.basex.gui.view.*;
 
 /**
  * This view allows the input of database queries.

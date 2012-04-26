@@ -1,15 +1,12 @@
 package org.basex.query.func;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryError;
-import org.basex.query.QueryException;
+import java.util.*;
+
+import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 
 /**

@@ -1,23 +1,13 @@
 package org.basex.query.expr;
 
 import static org.basex.query.item.AtomType.*;
-import java.math.BigDecimal;
-import org.basex.query.QueryException;
-import org.basex.query.item.DTd;
-import org.basex.query.item.Dat;
-import org.basex.query.item.Date;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Dec;
-import org.basex.query.item.Dtm;
-import org.basex.query.item.Dur;
-import org.basex.query.item.Flt;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.Tim;
-import org.basex.query.item.Type;
-import org.basex.query.item.YMd;
 import static org.basex.query.util.Err.*;
-import org.basex.util.InputInfo;
+
+import java.math.*;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Calculation.

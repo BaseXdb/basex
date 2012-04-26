@@ -2,18 +2,15 @@ package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.util.Arrays;
 
-import org.basex.core.Text;
-import org.basex.data.FTPos;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTSpan;
-import org.basex.util.list.BoolList;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import java.awt.*;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.layout.*;
+import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * This class assembles utility methods for painting rectangle contents.

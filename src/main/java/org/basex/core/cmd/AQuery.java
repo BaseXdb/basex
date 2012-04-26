@@ -1,25 +1,19 @@
 package org.basex.core.cmd;
 
-import org.basex.core.*;
-
 import static org.basex.core.Text.*;
-import org.basex.data.Result;
-import org.basex.io.IOFile;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.out.BufferOutput;
-import org.basex.io.out.NullOutput;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.DOTSerializer;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
-import static org.basex.query.util.Err.XPSTACK;
-import org.basex.util.Performance;
-import org.basex.util.Util;
+import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Abstract class for database queries.

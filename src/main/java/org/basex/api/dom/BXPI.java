@@ -1,8 +1,8 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.ANode;
-import org.basex.util.Token;
-import org.w3c.dom.ProcessingInstruction;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Processing instruction implementation.

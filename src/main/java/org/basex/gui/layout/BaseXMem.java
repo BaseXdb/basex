@@ -2,12 +2,11 @@ package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Window;
-import java.awt.event.MouseEvent;
-import org.basex.util.Performance;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.util.*;
 
 /**
  * This component visualizes the current memory consumption.

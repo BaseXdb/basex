@@ -3,19 +3,17 @@ package org.basex.query.util.format;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.util.HashMap;
+
+import java.util.*;
 import java.util.Map.Entry;
 
-import org.basex.query.QueryException;
-import org.basex.query.expr.Calc;
-import org.basex.query.func.FNNum;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.hash.IntSet;
-import org.basex.util.list.TokenList;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * Formatter for decimal numbers.

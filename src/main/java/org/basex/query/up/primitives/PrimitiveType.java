@@ -1,6 +1,6 @@
 package org.basex.query.up.primitives;
 
-import org.basex.data.Data;
+import org.basex.data.*;
 
 /**
  * <p>Update primitive type enumeration.</p>

@@ -1,11 +1,11 @@
 package org.basex.query.regex.parse;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static org.basex.util.Token.*;
+
+import java.util.regex.*;
 
 import org.basex.util.*;
-import static org.basex.util.Token.*;
-import org.basex.util.list.IntList;
+import org.basex.util.list.*;
 
 /**
  * A simple lexer for XML Schema regular expressions.

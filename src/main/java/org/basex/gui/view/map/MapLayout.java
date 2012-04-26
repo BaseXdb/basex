@@ -1,8 +1,8 @@
 package org.basex.gui.view.map;
 
-import org.basex.data.Data;
-import org.basex.gui.GUIProp;
-import org.basex.gui.view.ViewData;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.view.*;
 
 /**
  * Defines shared things of TreeMap layout algorithms.

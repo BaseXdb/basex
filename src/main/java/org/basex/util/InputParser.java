@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
-import org.basex.io.IO;
+import org.basex.io.*;
 
 /**
  * Abstract class for parsing various inputs, such as database commands or queries.

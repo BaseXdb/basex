@@ -3,14 +3,13 @@ package org.basex.query.func;
 import static org.basex.util.Token.*;
 
 import org.basex.io.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
+import org.basex.query.*;
+import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.query.util.pkg.*;
 import org.basex.query.util.pkg.Package;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
 
 /**
  * Functions on EXPath packages.

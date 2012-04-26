@@ -1,6 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Full-text units.

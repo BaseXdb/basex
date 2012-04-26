@@ -1,10 +1,9 @@
 package org.basex.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import org.basex.core.Command;
-import org.basex.io.out.ArrayOutput;
+import java.io.*;
+
+import org.basex.core.*;
+import org.basex.io.out.*;
 
 /**
  * <p>This class defines methods for evaluating commands, either locally or

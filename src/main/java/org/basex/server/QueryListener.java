@@ -3,20 +3,15 @@ package org.basex.server;
 import static org.basex.core.Text.*;
 import static org.basex.io.serial.SerializerProp.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 import org.basex.core.*;
-import org.basex.io.out.EncodingOutput;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Server-side query session in the client-server architecture.

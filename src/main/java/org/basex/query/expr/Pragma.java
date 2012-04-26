@@ -1,11 +1,13 @@
 package org.basex.query.expr;
 
-import java.io.IOException;
 import static org.basex.query.QueryText.*;
+
+import java.io.*;
+
 import org.basex.data.*;
-import org.basex.io.serial.Serializer;
-import org.basex.query.item.QNm;
-import org.basex.util.TokenBuilder;
+import org.basex.io.serial.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Pragma.

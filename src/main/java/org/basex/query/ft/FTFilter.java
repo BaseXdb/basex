@@ -1,17 +1,15 @@
 package org.basex.query.ft;
 
-import java.io.IOException;
-import org.basex.data.FTMatch;
-import org.basex.data.FTMatches;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
-import org.basex.query.iter.FTIter;
-import org.basex.query.util.IndexContext;
-import org.basex.util.InputInfo;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTUnit;
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * Abstract FTFilter expression.

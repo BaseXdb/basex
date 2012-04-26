@@ -1,9 +1,8 @@
 package org.basex.util.hash;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * This is an efficient hash map, extending the {@link IntSet hash set}.

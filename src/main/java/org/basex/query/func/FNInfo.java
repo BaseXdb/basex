@@ -4,20 +4,11 @@ import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Str;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Info functions.

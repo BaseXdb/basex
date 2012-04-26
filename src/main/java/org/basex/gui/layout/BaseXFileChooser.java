@@ -1,16 +1,17 @@
 package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
-import java.awt.FileDialog;
-import java.io.File;
-import java.util.Locale;
 
-import javax.swing.JFileChooser;
+import java.awt.*;
+import java.io.*;
+import java.util.*;
+
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
-import org.basex.io.IOFile;
-import org.basex.util.Util;
+
+import org.basex.gui.*;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * Project specific File Chooser implementation.

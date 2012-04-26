@@ -1,13 +1,14 @@
 package org.basex.gui.layout;
 
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.Fill;
-import org.basex.util.Util;
+import java.awt.*;
+import java.util.*;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.util.Map;
+import javax.swing.border.*;
+
+import org.basex.gui.*;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.util.*;
 
 /**
  * Panel background, extending the {@link JPanel}.

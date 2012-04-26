@@ -2,11 +2,11 @@ package org.basex.query.util.format;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
+
+import java.util.regex.*;
+
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Format parser for integers and dates.

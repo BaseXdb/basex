@@ -1,8 +1,9 @@
 package org.basex.io.out;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-import org.basex.util.Token;
+import java.io.*;
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * This class caches the output bytes in an array, similar to the

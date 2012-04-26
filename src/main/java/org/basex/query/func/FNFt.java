@@ -2,31 +2,18 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import org.basex.data.Data;
-import org.basex.data.FTPosData;
-import org.basex.data.MemData;
+
+import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.ft.FTIndexAccess;
-import org.basex.query.ft.FTWords;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.DBNodeSeq;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.Str;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.ValueIter;
-import org.basex.query.util.DataBuilder;
-import org.basex.query.util.Err;
-import org.basex.query.util.IndexContext;
-import org.basex.util.InputInfo;
-import org.basex.util.XMLToken;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTOpt;
-import org.basex.util.list.IntList;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.ft.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * Full-text functions.

@@ -1,6 +1,6 @@
 package org.basex.gui.view;
 
-import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.*;
 
 /**
  * This is an interface for view layout components.

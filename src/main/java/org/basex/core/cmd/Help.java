@@ -1,9 +1,11 @@
 package org.basex.core.cmd;
 
-import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-import java.io.IOException;
+
+import java.io.*;
+
 import org.basex.core.*;
+import org.basex.core.Commands.Cmd;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.

@@ -1,9 +1,8 @@
 package org.basex.util.ft;
 
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Implementation of common stemmer methods.

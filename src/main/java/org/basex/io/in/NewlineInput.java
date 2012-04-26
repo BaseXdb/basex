@@ -1,9 +1,8 @@
 package org.basex.io.in;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
-import org.basex.io.IO;
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**

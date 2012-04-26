@@ -2,19 +2,16 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
-import org.basex.io.IO;
-import org.basex.io.IOFile;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
+
+import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Table;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class organizes all users.

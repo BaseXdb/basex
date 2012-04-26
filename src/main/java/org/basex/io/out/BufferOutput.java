@@ -1,10 +1,8 @@
 package org.basex.io.out;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.basex.io.IO;
+import org.basex.io.*;
 
 /**
  * This class uses a byte buffer to speed up output stream processing.

@@ -1,9 +1,8 @@
 package org.basex.query.flwor;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.Value;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * GroupNode defines one valid partitioning setting.

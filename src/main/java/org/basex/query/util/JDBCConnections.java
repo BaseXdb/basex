@@ -1,11 +1,9 @@
 package org.basex.query.util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
-import org.basex.util.Util;
-import org.basex.util.hash.IntMap;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Opened JDBC connections.

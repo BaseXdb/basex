@@ -2,24 +2,16 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import java.text.Normalizer;
+
+import java.text.*;
 import java.text.Normalizer.Form;
-import java.util.Arrays;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.IntSeq;
-import org.basex.query.item.Str;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.util.InputInfo;
-import org.basex.util.TokenBuilder;
-import org.basex.util.XMLToken;
+import java.util.*;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * String functions.

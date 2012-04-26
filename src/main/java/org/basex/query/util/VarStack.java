@@ -1,13 +1,14 @@
 package org.basex.query.util;
 
-import java.io.IOException;
-import java.util.Arrays;
-import org.basex.core.Text;
-import org.basex.data.ExprInfo;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.item.QNm;
-import org.basex.util.Array;
+import java.io.*;
+import java.util.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Variable stack.

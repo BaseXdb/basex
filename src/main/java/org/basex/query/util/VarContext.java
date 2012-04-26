@@ -1,11 +1,11 @@
 package org.basex.query.util;
 
-import java.io.IOException;
-import org.basex.data.ExprInfo;
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryException;
-import org.basex.query.QueryParser;
-import org.basex.query.item.QNm;
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
 
 /**
  * This class references all in-scope variables.

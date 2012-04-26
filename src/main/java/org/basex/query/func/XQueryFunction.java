@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.*;
 
 /**
  * Java module signature.

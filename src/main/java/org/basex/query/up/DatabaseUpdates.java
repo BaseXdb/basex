@@ -3,18 +3,16 @@ package org.basex.query.up;
 import static org.basex.query.up.primitives.PrimitiveType.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Prop;
-import org.basex.core.cmd.Export;
-import org.basex.data.Data;
-import org.basex.query.QueryException;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.up.primitives.NodeCopy;
-import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.util.hash.IntMap;
-import org.basex.util.list.IntList;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.up.primitives.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class holds all updates for a specific database. Before applied,

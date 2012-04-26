@@ -1,7 +1,7 @@
 package org.basex.query.up.primitives;
 
-import org.basex.data.Data;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.util.*;
 
 /**
  * Base class for update primitives that only affect values of database nodes

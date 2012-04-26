@@ -1,16 +1,13 @@
 package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
-import org.basex.data.Data;
-import org.basex.io.IO;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.AxisIter;
-import org.basex.util.Util;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Node;
-import org.w3c.dom.UserDataHandler;
+
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Node implementation.

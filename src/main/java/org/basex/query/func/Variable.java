@@ -2,15 +2,12 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.File;
+import java.io.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
-import org.basex.query.item.Value;
-import org.basex.query.util.NSGlobal;
-import org.basex.query.util.Var;
-import org.basex.util.TokenBuilder;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Statically available XQuery variables.

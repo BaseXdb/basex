@@ -1,16 +1,12 @@
 package org.basex.query.path;
 
 import static org.basex.query.util.Err.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeIter;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Iterative path expression for location paths which return sorted and

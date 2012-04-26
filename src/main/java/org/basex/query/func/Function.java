@@ -3,15 +3,12 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.item.SeqType.*;
 
-import java.util.HashMap;
+import java.util.*;
 
-import org.basex.query.expr.Expr;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.SeqType;
-import org.basex.query.util.NSGlobal;
-import org.basex.util.InputInfo;
-import org.basex.util.Reflect;
-import org.basex.util.TokenBuilder;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Definitions of all built-in XQuery functions.

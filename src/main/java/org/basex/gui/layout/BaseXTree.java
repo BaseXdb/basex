@@ -1,13 +1,11 @@
 package org.basex.gui.layout;
 
-import java.awt.Window;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.JTree;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.*;
 
 /**
  * Project specific tree implementation.

@@ -3,34 +3,23 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
-import java.util.zip.CRC32;
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.util.*;
+import java.util.zip.*;
 
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.in.NewlineInput;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Hex;
-import org.basex.query.item.Int;
-import org.basex.query.item.IntSeq;
-import org.basex.query.item.Item;
-import org.basex.query.item.Str;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.ValueIter;
-import org.basex.query.util.Compare;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.query.util.Compare.Flag;
 import org.basex.util.*;
-import org.basex.util.list.ByteList;
+import org.basex.util.list.*;
 
 /**
  * Project specific functions.

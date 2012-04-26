@@ -1,12 +1,9 @@
 package org.basex.util;
 
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Comparator;
+import java.nio.charset.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
 
 /**
  * <p>This class provides convenience operations for handling 'Tokens'.

@@ -1,12 +1,10 @@
 package org.basex.gui.view.map;
 
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIProp;
-import org.basex.gui.view.ViewData;
-
 import java.awt.*;
+
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.view.*;
 
 /**
  * Provides an interface for data specific TreeMap visualizations.

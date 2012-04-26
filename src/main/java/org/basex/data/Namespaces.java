@@ -3,19 +3,14 @@ package org.basex.data;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Table;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.hash.TokenObjMap;
-import org.basex.util.hash.TokenSet;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains the namespaces of a database.

@@ -1,6 +1,6 @@
 package org.basex.gui;
 
-import javax.swing.AbstractButton;
+import javax.swing.*;
 
 /**
  * This interface defines GUI command methods.

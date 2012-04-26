@@ -2,13 +2,14 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
-import org.basex.core.CommandBuilder;
+import java.io.*;
+
+import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdDrop;
-import org.basex.data.Data;
-import org.basex.server.ClientListener;
-import org.basex.util.Util;
+import org.basex.data.*;
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * Evaluates the 'drop user' command and drops a user.

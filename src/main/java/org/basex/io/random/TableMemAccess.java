@@ -1,9 +1,10 @@
 package org.basex.io.random;
 
-import java.io.IOException;
-import java.util.Arrays;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
+import java.io.*;
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.io.*;
 
 /**
  * This class allows main memory access to the database table representation.

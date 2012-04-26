@@ -1,15 +1,14 @@
 package org.basex.query.ft;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
-import org.basex.data.FTMatch;
-import org.basex.data.FTMatches;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.FTNode;
-import org.basex.query.iter.FTIter;
-import org.basex.query.util.IndexContext;
-import org.basex.util.InputInfo;
+import static org.basex.query.util.Err.*;
+
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * FTMildnot expression.

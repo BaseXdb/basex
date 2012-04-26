@@ -1,10 +1,9 @@
 package org.basex.index.ft;
 
-import org.basex.index.IndexTree;
-import org.basex.util.Num;
-import org.basex.util.hash.TokenIntMap;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.index.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class indexes full-text tokens in a balanced binary tree, including

@@ -1,8 +1,6 @@
 package org.basex.io.out;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * This server-side class wraps an {@link InputStream} filled by a database

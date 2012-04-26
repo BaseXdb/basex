@@ -2,17 +2,15 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
+import org.basex.core.*;
+import org.basex.data.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Array;
-import org.basex.util.hash.TokenBoolMap;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This data structure contains references to all document nodes in a

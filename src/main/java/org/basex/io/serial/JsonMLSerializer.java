@@ -3,11 +3,10 @@ package org.basex.io.serial;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.basex.query.item.Item;
-import org.basex.util.Util;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * This class serializes data as described in the

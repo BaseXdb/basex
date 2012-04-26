@@ -1,16 +1,14 @@
 package org.basex.gui.view;
 
 import static org.basex.core.Text.*;
-import java.awt.Window;
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUI;
+
+import java.awt.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.util.Array;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * This class serves as a container for all existing views. The observer pattern

@@ -1,12 +1,12 @@
 package org.basex.gui.view;
 
 import static org.basex.data.DataText.*;
+
 import org.basex.data.*;
-import org.basex.gui.GUIProp;
-import org.basex.query.func.Function;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.IntList;
+import org.basex.gui.*;
+import org.basex.query.func.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class assembles some database access methods which are used

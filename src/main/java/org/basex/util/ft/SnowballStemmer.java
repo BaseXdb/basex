@@ -2,12 +2,10 @@ package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
+import java.lang.reflect.*;
+import java.util.*;
 
-import org.basex.util.Reflect;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Stemmer implementation using the Snowball stemmer.

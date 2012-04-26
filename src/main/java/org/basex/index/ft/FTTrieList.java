@@ -1,7 +1,8 @@
 package org.basex.index.ft;
 
-import java.io.IOException;
-import org.basex.data.Data;
+import java.io.*;
+
+import org.basex.data.*;
 
 /**
  * This class provides access to a sorted token list.

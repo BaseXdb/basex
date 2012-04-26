@@ -3,17 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Int;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Str;
-import org.basex.query.item.Value;
-import org.basex.query.util.Err;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Catch clause.

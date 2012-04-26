@@ -1,10 +1,10 @@
 package org.basex.index.ft;
 
-import java.util.Arrays;
-import org.basex.util.Array;
-import org.basex.util.Num;
-import org.basex.util.hash.TokenSet;
-import org.basex.util.list.IntList;
+import java.util.*;
+
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class indexes the tokens in a hash structure.

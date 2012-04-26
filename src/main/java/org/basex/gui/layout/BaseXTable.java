@@ -1,16 +1,12 @@
 package org.basex.gui.layout;
 
-import java.awt.Component;
-import javax.swing.JCheckBox;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
-import org.basex.util.Table;
-import org.basex.util.Token;
+import java.awt.*;
+
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
+
+import org.basex.util.*;
 
 /**
  * Project specific CheckBox implementation.

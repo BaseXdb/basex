@@ -2,23 +2,12 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.QueryText;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
-import org.basex.query.item.Uri;
-import org.basex.query.iter.AxisIter;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.TokenList;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Node functions.

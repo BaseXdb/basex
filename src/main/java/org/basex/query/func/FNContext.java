@@ -2,21 +2,15 @@ package org.basex.query.func;
 
 import static org.basex.util.Token.*;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.text.*;
+import java.util.*;
 import java.util.Date;
 
-import org.basex.io.IO;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.DTd;
-import org.basex.query.item.Dat;
-import org.basex.query.item.Dtm;
-import org.basex.query.item.Item;
-import org.basex.query.item.Tim;
-import org.basex.query.item.Uri;
-import org.basex.util.InputInfo;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Context functions.

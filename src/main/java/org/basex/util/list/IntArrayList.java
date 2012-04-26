@@ -1,9 +1,8 @@
 package org.basex.util.list;
 
-import java.util.Iterator;
+import java.util.*;
 
-import org.basex.util.Array;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * This is a simple container for native integer arrays.

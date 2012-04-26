@@ -3,24 +3,18 @@ package org.basex.gui.view.table;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 
-import java.awt.BorderLayout;
-import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBar;
-import org.basex.gui.layout.BaseXPopup;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewNotifier;
-import org.basex.util.Performance;
-import org.basex.util.list.IntList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This view creates a flat table view on the database contents.

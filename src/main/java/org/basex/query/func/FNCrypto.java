@@ -1,15 +1,11 @@
 package org.basex.query.func;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Item;
-import org.basex.query.util.Err;
-import org.basex.query.util.crypto.DigitalSignature;
-import org.basex.query.util.crypto.Encryption;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.query.util.crypto.*;
+import org.basex.util.*;
 
 /**
  * EXPath Cryptographic Module.

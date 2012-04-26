@@ -2,7 +2,7 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 
-import org.basex.util.list.ByteList;
+import org.basex.util.list.*;
 
 /**
  * This class provides functions for encoding and decoding Base64 strings.

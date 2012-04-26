@@ -1,20 +1,16 @@
 package org.basex.io.serial;
 
-import org.basex.data.Data;
 import static org.basex.data.DataText.*;
-import org.basex.data.ExprInfo;
-import org.basex.data.FTPos;
-import org.basex.data.FTPosData;
-import static org.basex.io.serial.SerializerProp.S_METHOD;
-import static org.basex.query.QueryText.XMLURI;
-import org.basex.query.item.Item;
-import org.basex.util.Atts;
+import static org.basex.io.serial.SerializerProp.*;
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is an interface for serializing trees.

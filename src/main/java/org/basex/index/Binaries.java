@@ -2,14 +2,13 @@ package org.basex.index;
 
 import static org.basex.util.Token.*;
 
-import java.util.Locale;
+import java.util.*;
 
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.io.IOFile;
-import org.basex.util.hash.TokenBoolMap;
-import org.basex.util.list.TokenList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This index organizes binary files in a database.</p>

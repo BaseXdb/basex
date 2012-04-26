@@ -2,14 +2,14 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map.Entry;
 
-import org.basex.data.Data;
-import org.basex.io.IOFile;
-import org.basex.query.QueryException;
-import org.basex.query.func.Function;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.util.*;
 
 /**
  * Update primitive for the {@link Function#_DB_RENAME} function.

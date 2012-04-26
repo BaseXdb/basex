@@ -1,8 +1,7 @@
 package org.basex.index.ft;
 
-import org.basex.util.Token;
-import org.basex.util.list.IntArrayList;
-import org.basex.util.list.TokenList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class is used for temporarily storing data on full-text trie nodes.

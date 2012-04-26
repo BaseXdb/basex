@@ -3,18 +3,13 @@ package org.basex.query.up;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.data.MemData;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.up.primitives.PrimitiveType;
-import org.basex.query.up.primitives.Put;
-import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.DataBuilder;
-import org.basex.util.hash.IntMap;
-import org.basex.util.hash.TokenSet;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.primitives.*;
+import org.basex.query.util.*;
+import org.basex.util.hash.*;
 
 /**
  * ***** Implementation of the W3C XQUERY UPDATE FACILITY 1.0 *****

@@ -2,20 +2,12 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Date;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Item;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Str;
-import org.basex.query.item.Type;
-import org.basex.query.util.format.FormatParser;
-import org.basex.query.util.format.Formatter;
-import org.basex.query.util.format.DecFormatter;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.util.format.*;
+import org.basex.util.*;
 
 /**
  * Formatting functions.

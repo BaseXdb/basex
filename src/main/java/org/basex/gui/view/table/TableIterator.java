@@ -1,6 +1,6 @@
 package org.basex.gui.view.table;
 
-import org.basex.data.Data;
+import org.basex.data.*;
 
 /**
  * This is an iterator for parsing the rows' contents.

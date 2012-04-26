@@ -2,17 +2,15 @@ package org.basex.index.path;
 
 import static org.basex.data.DataText.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
-import org.basex.core.Text;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
-import org.basex.index.Stats;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 
 /**
  * This class represents a node of the path summary.

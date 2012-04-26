@@ -2,18 +2,14 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Treat as expression.

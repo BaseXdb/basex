@@ -1,7 +1,6 @@
 package org.basex.io.in;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
  * This input stream allows a lookup of the next byte to be returned

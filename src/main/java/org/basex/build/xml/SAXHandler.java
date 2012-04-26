@@ -1,13 +1,14 @@
 package org.basex.build.xml;
 
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.build.Builder;
+
+import java.io.*;
+
+import org.basex.build.*;
 import org.basex.util.*;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.*;
+import org.xml.sax.ext.*;
+import org.xml.sax.helpers.*;
 
 /**
  * SAX Parser wrapper.

@@ -1,6 +1,6 @@
 package org.basex.io.in;
 
-import org.basex.util.Token;
+import org.basex.util.*;
 
 /**
  * This class allows reading from a cached byte array.

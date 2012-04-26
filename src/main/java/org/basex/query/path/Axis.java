@@ -1,7 +1,7 @@
 package org.basex.query.path;
 
-import org.basex.query.item.ANode;
-import org.basex.query.iter.AxisIter;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 
 /**
  * XPath axes.

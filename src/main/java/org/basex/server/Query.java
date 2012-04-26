@@ -1,13 +1,10 @@
 package org.basex.server;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.basex.io.in.DecodingInput;
-import org.basex.util.Token;
-import org.basex.util.list.ByteList;
-import org.basex.util.list.TokenList;
+import org.basex.io.in.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class defines methods for executing queries.

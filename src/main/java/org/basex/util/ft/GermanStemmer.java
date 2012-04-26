@@ -1,8 +1,8 @@
 package org.basex.util.ft;
 
-import java.util.Collection;
+import java.util.*;
 
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 
 /**
  * German stemming algorithm, derived from the Apache Lucene project and the

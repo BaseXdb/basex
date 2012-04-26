@@ -1,22 +1,13 @@
 package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.VarRef;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Empty;
-import org.basex.query.item.FItem;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Functions on functions.

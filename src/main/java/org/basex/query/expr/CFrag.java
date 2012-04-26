@@ -2,11 +2,9 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.SeqType;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Fragment constructor.

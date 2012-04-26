@@ -1,14 +1,12 @@
 package org.basex.gui.view.map;
 
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.view.ViewData;
-
 import java.awt.*;
+
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
 
 /**
  * Adds default paint operations to TreeMap.

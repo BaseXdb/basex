@@ -2,10 +2,12 @@ package org.basex.index.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.data.Data;
+
+import java.io.*;
+
+import org.basex.data.*;
 import org.basex.io.out.DataOutput;
-import org.basex.util.list.IntList;
+import org.basex.util.list.*;
 
 /**
  * <p>This class builds an index for text contents, optimized for fuzzy search,

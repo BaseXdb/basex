@@ -1,7 +1,8 @@
 package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
-import org.basex.util.TokenBuilder;
+
+import org.basex.util.*;
 
 /**
  * English language formatter. Can be instantiated via {@link Formatter#get}.

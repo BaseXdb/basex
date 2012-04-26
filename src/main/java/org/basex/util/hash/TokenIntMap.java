@@ -1,7 +1,7 @@
 package org.basex.util.hash;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;

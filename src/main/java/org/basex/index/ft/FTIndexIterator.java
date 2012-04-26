@@ -1,9 +1,8 @@
 package org.basex.index.ft;
 
-import org.basex.data.FTMatch;
-import org.basex.data.FTMatches;
-import org.basex.index.IndexIterator;
-import org.basex.util.ft.Scoring;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.util.ft.*;
 
 /**
  * This interface provides methods for returning index results.

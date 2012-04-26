@@ -1,21 +1,14 @@
 package org.basex.query.path;
 
 import static org.basex.query.util.Err.*;
-import org.basex.data.Data;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
+
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Mixed path expression.

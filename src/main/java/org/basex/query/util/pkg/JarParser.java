@@ -4,15 +4,13 @@ import static org.basex.query.util.Err.*;
 import static org.basex.query.util.pkg.PkgText.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.Context;
-import org.basex.io.IO;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.QNm;
-import org.basex.util.InputInfo;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Parses the jar descriptors and performs schema checks.

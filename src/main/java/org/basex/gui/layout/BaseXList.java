@@ -2,22 +2,15 @@ package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
 
-import java.awt.Font;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.MouseInputAdapter;
+import javax.swing.*;
+import javax.swing.event.*;
 
-import org.basex.io.IOFile;
-import org.basex.util.Token;
-import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Combination of text field and a list, communicating with each other.

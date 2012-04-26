@@ -1,12 +1,9 @@
 package org.basex.query.item.map;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.ValueBuilder;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Inner node of a {@link Map}.

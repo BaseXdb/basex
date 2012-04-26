@@ -2,13 +2,13 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.ErrType.*;
-import org.basex.core.Text;
-import org.basex.io.serial.SerializerException;
+
+import org.basex.core.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.ParseExpr;
+import org.basex.query.expr.*;
 import org.basex.query.item.*;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import org.basex.util.*;
 
 /**
  * This class contains all query error messages.

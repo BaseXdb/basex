@@ -1,10 +1,9 @@
 package org.basex.gui.view.map;
 
-import org.basex.data.Data;
-import org.basex.gui.view.ViewData;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.data.*;
+import org.basex.gui.view.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Stores an integer array of pre values and their corresponding weights.

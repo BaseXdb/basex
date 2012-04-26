@@ -3,23 +3,15 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.JSONSerializer;
-import org.basex.io.serial.JsonMLSerializer;
-import org.basex.io.serial.Serializer;
-import org.basex.io.serial.SerializerException;
-import org.basex.io.serial.SerializerProp;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Item;
-import org.basex.query.item.Str;
-import org.basex.query.util.json.JSONConverter;
-import org.basex.query.util.json.JsonMLConverter;
-import org.basex.util.InputInfo;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.util.json.*;
+import org.basex.util.*;
 
 /**
  * Project specific functions.

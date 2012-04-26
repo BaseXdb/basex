@@ -1,6 +1,6 @@
 package org.basex.util.list;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * This is a simple container for native booleans.

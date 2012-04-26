@@ -1,22 +1,14 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Dec;
-import org.basex.query.item.Flt;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
-import org.basex.query.util.Err;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Unary expression.

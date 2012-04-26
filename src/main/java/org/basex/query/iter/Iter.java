@@ -1,11 +1,8 @@
 package org.basex.query.iter;
 
-import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
-import org.basex.query.item.Value;
-import org.basex.util.Array;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Iterator interface.

@@ -5,41 +5,17 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.util.Properties;
+import java.util.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.AtomType;
-import org.basex.query.item.Bln;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.Item;
-import org.basex.query.item.Int;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.item.map.Map;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.AxisMoreIter;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.util.Atts;
-import org.basex.util.InputInfo;
-import org.basex.util.Reflect;
-import org.basex.util.hash.TokenObjMap;
+import org.basex.query.iter.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Functions on relational databases.

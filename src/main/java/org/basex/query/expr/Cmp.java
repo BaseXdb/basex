@@ -1,14 +1,11 @@
 package org.basex.query.expr;
 
-import org.basex.query.QueryException;
+import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
-import org.basex.query.func.StandardFunc;
-import org.basex.query.func.Function;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Item;
-import org.basex.query.item.Type;
-import org.basex.query.path.AxisPath;
-import org.basex.util.InputInfo;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.query.path.*;
+import org.basex.util.*;
 
 /**
  * Abstract comparison.

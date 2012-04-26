@@ -1,6 +1,6 @@
 package org.basex.query.util.pkg;
 
-import org.basex.util.list.TokenList;
+import org.basex.util.list.*;
 
 /**
  * Jar descriptor.

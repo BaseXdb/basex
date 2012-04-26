@@ -4,31 +4,23 @@ import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
 
-import javax.swing.Box;
+import javax.swing.*;
 
-import org.basex.core.Command;
-import org.basex.data.Nodes;
-import org.basex.gui.GUICommands;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXEditor;
-import org.basex.gui.layout.BaseXFileChooser;
-import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.gui.layout.*;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewNotifier;
-import org.basex.io.IO;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.out.PrintOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.util.Util;
+import org.basex.gui.layout.BaseXFileChooser.Mode;
+import org.basex.gui.view.*;
+import org.basex.io.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.util.*;
 
 /**
  * This class offers a fast text view, using the {@link BaseXEditor} class.

@@ -1,12 +1,11 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
-import java.util.Arrays;
-import org.basex.query.item.ANode;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
-import org.basex.util.Atts;
+
+import java.util.*;
+
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * This class serves as a container for updated names.

@@ -2,11 +2,12 @@ package org.basex.build.file;
 
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
-import org.basex.build.SingleParser;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.in.NewlineInput;
+import java.io.*;
+
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.util.*;
 
 /**

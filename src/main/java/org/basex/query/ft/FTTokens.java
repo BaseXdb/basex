@@ -1,9 +1,8 @@
 package org.basex.query.ft;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.util.list.ElementList;
-import org.basex.util.list.TokenList;
+import org.basex.util.list.*;
 
 /**
  * This is a container for full-text tokens.

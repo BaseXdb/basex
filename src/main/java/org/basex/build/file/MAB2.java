@@ -1,6 +1,6 @@
 package org.basex.build.file;
 
-import static org.basex.util.Token.token;
+import static org.basex.util.Token.*;
 
 /**
  * MAB2 Fields, needed for importing MAB2 data as XML.

@@ -2,13 +2,10 @@ package org.basex.gui.layout;
 
 import static org.basex.util.Token.*;
 
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeWillExpandListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.ExpandVetoException;
+import javax.swing.event.*;
+import javax.swing.tree.*;
 
-import org.basex.data.Data;
-import org.basex.data.MetaData;
+import org.basex.data.*;
 
 /**
  * JTree node for representing database content (raw files / documents).

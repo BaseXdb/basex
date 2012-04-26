@@ -1,7 +1,7 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
-import org.basex.data.Nodes;
+import org.basex.data.*;
 
 /**
  * Evaluates the 'cs' command and sets a new initial context set.

@@ -1,10 +1,8 @@
 package org.basex.query.util;
 
-import org.basex.query.expr.Cast;
-import org.basex.query.expr.Expr;
-import org.basex.query.func.JavaMapping;
-import org.basex.query.item.FuncType;
-import org.basex.query.item.SeqType;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
 
 /**
  * Wrapper that provides types for function expressions.

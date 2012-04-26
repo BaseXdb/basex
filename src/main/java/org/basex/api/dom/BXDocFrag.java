@@ -1,7 +1,7 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.ANode;
-import org.w3c.dom.DocumentFragment;
+import org.basex.query.item.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Document fragment implementation.

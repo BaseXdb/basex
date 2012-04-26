@@ -2,20 +2,14 @@ package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import java.util.Stack;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
+
+import java.io.*;
+import java.util.*;
+
+import org.basex.build.*;
 import org.basex.core.*;
-import org.basex.util.Util;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.ProcessingInstruction;
+import org.basex.util.*;
+import org.w3c.dom.*;
 import org.w3c.dom.Text;
 
 /**

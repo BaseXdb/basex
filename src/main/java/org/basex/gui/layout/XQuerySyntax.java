@@ -1,15 +1,15 @@
 package org.basex.gui.layout;
 
 import static org.basex.data.DataText.*;
-import java.awt.Color;
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashSet;
-import org.basex.gui.GUIConstants;
-import org.basex.query.QueryText;
-import org.basex.query.func.Function;
-import org.basex.util.Util;
-import org.basex.util.XMLToken;
+
+import java.awt.*;
+import java.lang.reflect.*;
+import java.util.*;
+
+import org.basex.gui.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.util.*;
 
 /**
  * This class defines syntax highlighting for XQuery files.

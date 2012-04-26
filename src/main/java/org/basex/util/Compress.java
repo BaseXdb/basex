@@ -1,6 +1,6 @@
 package org.basex.util;
 
-import org.basex.util.list.ByteList;
+import org.basex.util.list.*;
 
 /**
  * This class compresses and decompresses tokens. It is inspired by the

@@ -1,8 +1,9 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
-import java.util.Locale;
+
+import java.io.*;
+import java.util.*;
 
 import org.basex.core.*;
 

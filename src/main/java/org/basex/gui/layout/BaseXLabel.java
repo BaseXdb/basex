@@ -2,8 +2,9 @@ package org.basex.gui.layout;
 
 import java.awt.*;
 
-import javax.swing.JLabel;
-import javax.swing.border.EmptyBorder;
+import javax.swing.*;
+import javax.swing.border.*;
+
 import org.basex.gui.GUIConstants.Msg;
 
 /**

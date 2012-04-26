@@ -4,24 +4,12 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Constr;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.ANode;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.FComm;
-import org.basex.query.item.FPI;
-import org.basex.query.item.Item;
-import org.basex.query.item.NodeType;
-import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.up.primitives.ReplaceElementContent;
-import org.basex.query.up.primitives.ReplaceNode;
-import org.basex.query.up.primitives.ReplaceValue;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.up.primitives.*;
+import org.basex.util.*;
 
 /**
  * Replace expression.

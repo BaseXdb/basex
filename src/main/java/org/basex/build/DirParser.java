@@ -3,19 +3,16 @@ package org.basex.build;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
-import java.io.IOException;
-import java.util.Locale;
-import java.util.regex.Pattern;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
 
-import org.basex.core.Prop;
-import org.basex.core.cmd.Store;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.IOFile;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class recursively scans files and directories and parses all

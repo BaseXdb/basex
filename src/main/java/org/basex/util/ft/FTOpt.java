@@ -1,17 +1,16 @@
 package org.basex.util.ft;
 
-import org.basex.data.ExprInfo;
-import org.basex.data.MetaData;
-import org.basex.io.serial.Serializer;
 import static org.basex.query.QueryText.*;
-import org.basex.query.ft.ThesQuery;
-import static org.basex.util.Token.TRUE;
-import static org.basex.util.Token.token;
+import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.IOException;
-import java.util.EnumMap;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
+
+import org.basex.data.*;
+import org.basex.io.serial.*;
+import org.basex.query.ft.*;
 
 /**
  * This class contains all full-text options.

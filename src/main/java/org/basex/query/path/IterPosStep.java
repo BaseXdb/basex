@@ -1,12 +1,10 @@
 package org.basex.query.path;
 
 import static org.basex.query.util.Err.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Value;
-import org.basex.query.iter.AxisIter;
-import org.basex.query.iter.NodeIter;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
 
 /**
  * Iterative step expression with numeric predicates.

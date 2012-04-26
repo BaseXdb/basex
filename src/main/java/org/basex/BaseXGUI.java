@@ -1,23 +1,18 @@
 package org.basex;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Prop;
 import static org.basex.core.Text.*;
-import org.basex.core.cmd.Check;
-import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIMacOSX;
-import org.basex.gui.GUIProp;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.util.Args;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+
+import java.awt.*;
+import java.util.*;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.Enumeration;
+
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.gui.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is the starter class for the graphical frontend.

@@ -2,22 +2,17 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.Simple;
-import org.basex.query.func.Function;
-import org.basex.query.item.FTNode;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Str;
-import org.basex.query.iter.FTIter;
-import org.basex.query.iter.NodeIter;
-import org.basex.query.util.IndexContext;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * FTContains expression with index access.

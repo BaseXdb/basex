@@ -1,33 +1,18 @@
 package org.basex.gui.view.explore;
 
 import static org.basex.core.Text.*;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import org.basex.core.cmd.Find;
-import org.basex.data.Data;
-import org.basex.gui.GUIProp;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.core.cmd.*;
+import org.basex.data.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXDSlider;
-import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPanel;
-import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
-import org.basex.index.Names;
-import org.basex.index.Stats;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.index.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is a simple user search panel.

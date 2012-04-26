@@ -1,18 +1,14 @@
 package org.basex.query.ft;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
-import org.basex.query.item.FTNode;
-import org.basex.query.item.SeqType;
-import org.basex.query.iter.FTIter;
-import org.basex.query.util.IndexContext;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * This class defines is an abstract class for full-text expressions.

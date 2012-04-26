@@ -1,10 +1,10 @@
 package org.basex.query.up.primitives;
 
-import org.basex.core.cmd.Delete;
-import org.basex.data.Data;
-import org.basex.query.func.Function;
-import org.basex.util.InputInfo;
-import org.basex.util.list.StringList;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.query.func.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Update primitive for the {@link Function#_DB_DELETE} function.

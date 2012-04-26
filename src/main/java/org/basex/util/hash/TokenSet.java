@@ -1,13 +1,13 @@
 package org.basex.util.hash;
 
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Iterator;
+
+import java.io.*;
+import java.util.*;
+
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.util.*;
 import org.basex.util.list.*;
 
 /**

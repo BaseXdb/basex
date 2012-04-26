@@ -2,18 +2,13 @@ package org.basex.gui.view.table;
 
 import static org.basex.util.Token.*;
 
-import org.basex.core.Context;
-import org.basex.core.cmd.Find;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUIProp;
-import org.basex.index.StatsType;
-import org.basex.index.Names;
-import org.basex.util.Array;
-import org.basex.util.list.BoolList;
-import org.basex.util.list.IntList;
-import org.basex.util.list.StringList;
-import org.basex.util.list.TokenList;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.index.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This is a container for the table data.

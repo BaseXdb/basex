@@ -1,7 +1,6 @@
 package org.basex.util.hash;
 
-import org.basex.util.Array;
-import org.basex.util.TokenBuilder;
+import org.basex.util.*;
 
 /**
  * This is an efficient hash map for tokens,

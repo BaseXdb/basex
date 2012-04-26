@@ -1,8 +1,8 @@
 package org.basex.gui.view.map;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import org.basex.util.Util;
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * This class organizes all map rectangles in a simple list.

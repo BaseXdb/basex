@@ -1,9 +1,11 @@
 package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.io.IO;
-import org.basex.util.hash.TokenMap;
+
+import java.io.*;
+
+import org.basex.io.*;
+import org.basex.util.hash.*;
 
 /**
  * Simple stemming directory for full-text requests.

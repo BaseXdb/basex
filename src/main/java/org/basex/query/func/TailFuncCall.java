@@ -1,14 +1,11 @@
 package org.basex.query.func;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.VarStack;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * A tail-recursive function call.

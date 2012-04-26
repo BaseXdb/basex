@@ -1,19 +1,14 @@
 package org.basex.gui;
 
-import java.awt.Event;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
-import org.basex.gui.layout.BaseXButton;
-import org.basex.util.Util;
 import static org.basex.gui.GUIConstants.*;
+
+import java.awt.*;
+import java.awt.event.*;
+
+import javax.swing.*;
+
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * This is the menu bar of the main window.

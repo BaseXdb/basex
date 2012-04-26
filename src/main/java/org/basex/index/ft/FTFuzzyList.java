@@ -2,10 +2,12 @@ package org.basex.index.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.data.Data;
-import org.basex.io.IOFile;
-import org.basex.io.random.DataAccess;
+
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.io.random.*;
 
 /**
  * This class provides access to a sorted token list.

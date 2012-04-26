@@ -1,8 +1,9 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import org.basex.core.*;
-import org.basex.data.Data;
+import org.basex.data.*;
 
 /**
  * Evaluates the 'close' command and closes the current database.

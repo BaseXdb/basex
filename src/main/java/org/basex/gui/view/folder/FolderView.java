@@ -3,31 +3,17 @@ package org.basex.gui.view.folder;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Polygon;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.image.BufferedImage;
-import java.util.Arrays;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.*;
+import java.util.*;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBar;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.gui.layout.BaseXPopup;
-import org.basex.gui.view.View;
-import org.basex.gui.view.ViewData;
-import org.basex.gui.view.ViewNotifier;
+import org.basex.data.*;
+import org.basex.gui.*;
+import org.basex.gui.layout.*;
+import org.basex.gui.view.*;
 
 /**
  * This view offers a folder visualization of the database contents.

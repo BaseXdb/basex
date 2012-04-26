@@ -1,10 +1,9 @@
 package org.basex.server;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
-import org.basex.core.BaseXException;
-import org.basex.io.in.BufferInput;
+import org.basex.core.*;
+import org.basex.io.in.*;
 
 /**
  * This class defines all methods for iteratively evaluating queries with the

@@ -1,7 +1,8 @@
 package org.basex.gui;
 
-import javax.swing.JToolBar;
-import org.basex.gui.layout.BaseXButton;
+import javax.swing.*;
+
+import org.basex.gui.layout.*;
 
 /**
  * This is the toolbar of the main window.

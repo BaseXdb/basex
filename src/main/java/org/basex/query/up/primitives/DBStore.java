@@ -3,16 +3,15 @@ package org.basex.query.up.primitives;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.data.Data;
-import org.basex.io.IOFile;
-import org.basex.query.QueryException;
-import org.basex.query.func.Function;
-import org.basex.query.item.Item;
-import org.basex.util.InputInfo;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenObjMap;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.query.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * Update primitive for the {@link Function#_DB_STORE} function.

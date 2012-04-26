@@ -1,7 +1,7 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.ANode;
-import org.w3c.dom.CDATASection;
+import org.basex.query.item.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - CData implementation.

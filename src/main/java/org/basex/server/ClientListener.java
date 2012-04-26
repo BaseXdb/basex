@@ -2,25 +2,19 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.HashMap;
-import org.basex.BaseXServer;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+import org.basex.*;
 import org.basex.core.*;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.Close;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Exit;
-import org.basex.core.cmd.Replace;
-import org.basex.core.cmd.Store;
-import org.basex.io.in.BufferInput;
-import org.basex.io.in.DecodingInput;
-import org.basex.io.out.EncodingOutput;
-import org.basex.io.out.PrintOutput;
-import org.basex.query.QueryException;
-import org.basex.util.Performance;
-import org.basex.util.Util;
-import org.basex.util.list.ByteList;
+import org.basex.core.cmd.*;
+import org.basex.io.in.*;
+import org.basex.io.out.*;
+import org.basex.query.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Server-side client session in the client-server architecture.

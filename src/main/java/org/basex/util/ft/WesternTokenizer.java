@@ -3,13 +3,10 @@ package org.basex.util.ft;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Full-text tokenizer.

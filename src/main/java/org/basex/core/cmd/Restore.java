@@ -1,16 +1,15 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
-import java.util.regex.Pattern;
+
+import java.io.*;
+import java.util.regex.*;
 
 import org.basex.core.*;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.io.IOFile;
-import org.basex.io.Zip;
-import org.basex.util.Util;
-import org.basex.util.list.StringList;
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Evaluates the 'restore' command and restores a backup of a database.

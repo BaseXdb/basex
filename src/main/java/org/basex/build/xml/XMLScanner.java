@@ -4,18 +4,17 @@ import static org.basex.build.BuildText.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.XMLToken.*;
-import java.io.IOException;
-import java.util.Arrays;
-import org.basex.build.BuildException;
+
+import java.io.*;
+import java.util.*;
+
+import org.basex.build.*;
 import org.basex.build.BuildText.Type;
-import org.basex.core.Progress;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
+import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenMap;
+import org.basex.util.*;
+import org.basex.util.hash.*;
 
 /**
  * This class scans an XML document and creates atomic tokens.

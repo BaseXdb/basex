@@ -1,10 +1,8 @@
 package org.basex.api.dom;
 
-import org.basex.query.item.ANode;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.w3c.dom.CharacterData;
-import org.w3c.dom.DOMException;
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Character data implementation.

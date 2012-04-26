@@ -2,26 +2,16 @@ package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.sax.SAXSource;
+import javax.xml.parsers.*;
+import javax.xml.transform.sax.*;
 
-import org.basex.build.SingleParser;
-import org.basex.core.ProgressException;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.IOFile;
-import org.basex.util.Util;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.XMLReader;
+import org.basex.build.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.util.*;
+import org.xml.sax.*;
 
 /**
  * This class parses an XML document with Java's internal SAX parser. Note that

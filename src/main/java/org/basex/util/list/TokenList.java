@@ -1,11 +1,10 @@
 package org.basex.util.list;
 
 import static org.basex.util.Token.*;
-import java.util.Arrays;
-import java.util.Iterator;
-import org.basex.util.Array;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * This is a simple container for tokens (byte arrays).

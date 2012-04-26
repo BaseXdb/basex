@@ -1,7 +1,8 @@
 package org.basex.gui.layout;
 
 import static org.basex.util.Token.*;
-import java.awt.Color;
+
+import java.awt.*;
 
 /**
  * This abstract class defines a framework for a simple syntax

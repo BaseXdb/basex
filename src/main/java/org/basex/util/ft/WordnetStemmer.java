@@ -2,14 +2,11 @@ package org.basex.util.ft;
 
 import static org.basex.util.Token.*;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.lang.reflect.*;
+import java.net.*;
+import java.util.*;
 
-import org.basex.util.Reflect;
+import org.basex.util.*;
 
 /**
  * Stemmer implementation using the WordNet stemmer.

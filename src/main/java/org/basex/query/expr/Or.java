@@ -1,14 +1,12 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Item;
-import org.basex.query.util.IndexContext;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.ft.Scoring;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * Or expression.

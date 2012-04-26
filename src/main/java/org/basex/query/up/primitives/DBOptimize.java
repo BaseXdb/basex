@@ -4,12 +4,11 @@ import static org.basex.query.util.Err.*;
 
 import java.io.*;
 
-import org.basex.core.Context;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.OptimizeAll;
-import org.basex.data.Data;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
+import org.basex.core.*;
+import org.basex.core.cmd.*;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Update primitive for the optimize function.

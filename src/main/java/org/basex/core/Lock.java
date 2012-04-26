@@ -1,7 +1,8 @@
 package org.basex.core;
 
-import java.util.LinkedList;
-import org.basex.util.Util;
+import java.util.*;
+
+import org.basex.util.*;
 
 /**
  * Management of executing read/write processes.

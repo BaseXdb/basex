@@ -1,13 +1,13 @@
 package org.basex.util.ft;
 
 import java.util.Map.Entry;
-import java.util.TreeMap;
+import java.util.*;
 
-import org.basex.index.IndexToken;
-import org.basex.io.serial.XMLSerializer;
-import org.basex.query.ft.FTFilter;
-import org.basex.util.Token;
-import org.basex.util.list.StringList;
+import org.basex.index.*;
+import org.basex.io.serial.*;
+import org.basex.query.ft.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Performs full-text lexing on token. Calls tokenizers, stemmers matching to

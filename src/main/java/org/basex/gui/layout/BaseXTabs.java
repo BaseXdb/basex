@@ -1,8 +1,8 @@
 package org.basex.gui.layout;
 
-import java.awt.Component;
-import java.awt.Window;
-import javax.swing.JTabbedPane;
+import java.awt.*;
+
+import javax.swing.*;
 
 /**
  * Project specific TabbedPane implementation.

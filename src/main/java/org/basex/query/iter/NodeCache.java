@@ -1,13 +1,10 @@
 package org.basex.query.iter;
 
-import java.util.Arrays;
-import org.basex.data.Data;
-import org.basex.query.item.DBNode;
-import org.basex.query.item.ANode;
-import org.basex.query.item.Seq;
-import org.basex.query.item.Value;
-import org.basex.util.Array;
-import org.basex.util.Util;
+import java.util.*;
+
+import org.basex.data.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Caching node iterator, returning sorted nodes.

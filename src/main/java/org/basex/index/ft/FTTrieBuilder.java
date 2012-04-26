@@ -2,14 +2,13 @@ package org.basex.index.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
-import org.basex.data.Data;
-import org.basex.data.MetaData;
+
+import java.io.*;
+
+import org.basex.data.*;
 import org.basex.io.out.DataOutput;
-import org.basex.io.random.DataAccess;
-import org.basex.util.list.IntArrayList;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.io.random.*;
+import org.basex.util.list.*;
 
 /**
  * <p>This class builds an index for text contents in a compressed trie:</p>

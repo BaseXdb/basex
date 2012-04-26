@@ -1,15 +1,11 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.ANode;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodeCache;
-import org.basex.query.iter.NodeIter;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.util.*;
 
 /**
  * Except expression.

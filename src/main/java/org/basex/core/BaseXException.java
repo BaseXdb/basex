@@ -2,8 +2,7 @@ package org.basex.core;
 
 import java.io.*;
 
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.util.*;
 
 /**
  * Database exception, extending the {@link IOException}.

@@ -1,8 +1,8 @@
 package org.basex.query.util.http;
 
 import static org.basex.query.util.Err.*;
-import static org.basex.util.Token.*;
 import static org.basex.query.util.http.HTTPText.*;
+import static org.basex.util.Token.*;
 
 import java.util.*;
 

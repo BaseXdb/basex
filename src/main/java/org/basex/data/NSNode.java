@@ -1,13 +1,14 @@
 package org.basex.data;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
-import java.util.Arrays;
+
+import java.io.*;
+import java.util.*;
 
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
-import org.basex.util.TokenBuilder;
-import org.basex.util.list.IntList;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class stores a single namespace node.

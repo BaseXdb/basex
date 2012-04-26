@@ -1,8 +1,10 @@
 package org.basex.index.value;
 
 import static org.basex.data.DataText.*;
-import java.io.IOException;
-import org.basex.data.Data;
+
+import java.io.*;
+
+import org.basex.data.*;
 import org.basex.io.in.DataInput;
 
 /**

@@ -2,21 +2,17 @@ package org.basex.query.flwor;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Bln;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.util.Var;
-import org.basex.util.InputInfo;
-import org.basex.util.ft.Scoring;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
+import org.basex.util.ft.*;
 
 /**
  * Let clause.

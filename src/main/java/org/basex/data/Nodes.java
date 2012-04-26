@@ -1,14 +1,13 @@
 package org.basex.data;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.io.*;
+import java.util.*;
 
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.io.out.ArrayOutput;
-import org.basex.io.serial.Serializer;
-import org.basex.util.Util;
-import org.basex.util.list.IntList;
+import org.basex.core.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * This class stores node references of a database in an ascending order.

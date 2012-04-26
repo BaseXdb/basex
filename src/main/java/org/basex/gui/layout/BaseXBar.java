@@ -1,11 +1,11 @@
 package org.basex.gui.layout;
 
-import org.basex.gui.GUIConstants;
-import org.basex.gui.GUIConstants.Fill;
-import org.basex.util.Performance;
-
 import java.awt.*;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
+
+import org.basex.gui.*;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.util.*;
 
 /**
  * This is a scrollbar implementation, supporting arbitrary

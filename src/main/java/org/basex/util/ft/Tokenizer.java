@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Abstract tokenizer.

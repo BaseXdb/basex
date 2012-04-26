@@ -3,29 +3,14 @@ package org.basex.gui.view;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
-import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.StringTokenizer;
+import java.awt.*;
+import java.util.*;
 
 import org.basex.core.*;
-import org.basex.gui.AGUI;
-import org.basex.gui.GUIConstants;
+import org.basex.gui.*;
 import org.basex.gui.GUIConstants.Fill;
-import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXBack;
-import org.basex.gui.layout.BaseXLayout;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.Util;
+import org.basex.gui.layout.*;
+import org.basex.util.*;
 
 /**
  * This class manages all visible and invisible views and allows drag and

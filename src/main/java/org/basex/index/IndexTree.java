@@ -1,11 +1,8 @@
 package org.basex.index;
 
-import org.basex.util.Num;
-import org.basex.util.Token;
-import org.basex.util.hash.TokenIntMap;
-import org.basex.util.list.BoolList;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This class indexes keys in a balanced binary tree, including their id

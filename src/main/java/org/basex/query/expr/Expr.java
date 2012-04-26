@@ -1,22 +1,14 @@
 package org.basex.query.expr;
 
-import org.basex.data.ExprInfo;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.flwor.GFLWOR;
-import org.basex.query.flwor.Group;
-import org.basex.query.func.Function;
-import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Value;
-import org.basex.query.iter.Iter;
-import org.basex.query.path.AxisPath;
-import org.basex.query.path.MixedPath;
-import org.basex.query.util.IndexContext;
-import org.basex.query.util.Var;
-import org.basex.query.util.VarStack;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.flwor.*;
+import org.basex.query.func.*;
+import org.basex.query.item.*;
+import org.basex.query.iter.*;
+import org.basex.query.path.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Abstract class for representing XQuery expressions.

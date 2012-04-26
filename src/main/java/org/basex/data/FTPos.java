@@ -1,6 +1,6 @@
 package org.basex.data;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * This class contains full-text positions.

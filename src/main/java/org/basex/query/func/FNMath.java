@@ -1,12 +1,11 @@
 package org.basex.query.func;
 
 import static java.lang.StrictMath.*;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.Dbl;
-import org.basex.query.item.Item;
-import org.basex.util.InputInfo;
+
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.util.*;
 
 /**
  * Math functions.

@@ -1,9 +1,10 @@
 package org.basex.build.xml;
 
 import static org.basex.util.Reflect.*;
-import java.lang.reflect.Constructor;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.XMLReader;
+
+import java.lang.reflect.*;
+
+import org.xml.sax.*;
 
 /**
  * Wraps the CatalogResolver object.

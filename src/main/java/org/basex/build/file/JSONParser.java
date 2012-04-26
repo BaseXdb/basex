@@ -1,19 +1,17 @@
 package org.basex.build.file;
 
-import java.io.IOException;
-import org.basex.build.xml.XMLParser;
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
-import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.io.in.NewlineInput;
+import java.io.*;
+
+import org.basex.build.xml.*;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.io.in.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
-import org.basex.query.QueryException;
-import org.basex.query.item.ANode;
+import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.util.*;
-import org.basex.query.util.json.JSONConverter;
-import org.basex.query.util.json.JsonMLConverter;
+import org.basex.query.util.json.*;
 
 /**
  * This class parses files in the JSON format

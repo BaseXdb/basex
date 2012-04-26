@@ -1,7 +1,6 @@
 package org.basex.util.ft;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * Abstract class for stemmer and tokenizer implementations.

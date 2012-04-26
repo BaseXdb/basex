@@ -1,10 +1,11 @@
 package org.basex.build;
 
 import static org.basex.util.Token.*;
-import java.io.IOException;
+
+import java.io.*;
 
 import org.basex.core.*;
-import org.basex.io.IO;
+import org.basex.io.*;
 
 /**
  * This class defines an abstract parser for single resources.

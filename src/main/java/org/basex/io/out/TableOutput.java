@@ -1,11 +1,10 @@
 package org.basex.io.out;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import org.basex.data.MetaData;
-import org.basex.io.IO;
-import org.basex.util.list.IntList;
+import java.io.*;
+
+import org.basex.data.*;
+import org.basex.io.*;
+import org.basex.util.list.*;
 
 /**
  * This class allows a blockwise output of the database table.

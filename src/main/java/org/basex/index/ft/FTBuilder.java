@@ -3,26 +3,15 @@ package org.basex.index.ft;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
-import java.io.IOException;
+import java.io.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.index.IndexBuilder;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
 import org.basex.io.out.DataOutput;
-import org.basex.util.Num;
-import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
-import org.basex.util.ft.FTFlag;
-import org.basex.util.ft.FTLexer;
-import org.basex.util.ft.FTOpt;
-import org.basex.util.ft.Language;
-import org.basex.util.ft.Scoring;
-import org.basex.util.ft.Stemmer;
-import org.basex.util.ft.StopWords;
-import org.basex.util.ft.Tokenizer;
-import org.basex.util.list.IntList;
-import org.basex.util.Util;
+import org.basex.util.*;
+import org.basex.util.ft.*;
+import org.basex.util.list.*;
 
 /**
  * This class contains common methods for full-text index builders.

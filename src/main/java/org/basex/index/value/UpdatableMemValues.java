@@ -1,12 +1,10 @@
 package org.basex.index.value;
 
 import static org.basex.core.Text.*;
-import org.basex.data.Data;
-import org.basex.index.IndexIterator;
-import org.basex.index.IndexStats;
-import org.basex.index.IndexToken;
-import org.basex.util.Array;
-import org.basex.util.TokenBuilder;
+
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.util.*;
 
 /**
  * This class provides a main memory access to attribute values and

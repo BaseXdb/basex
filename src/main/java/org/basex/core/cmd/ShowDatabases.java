@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
-import java.io.IOException;
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;

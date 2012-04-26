@@ -2,9 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.util.InputInfo;
+import org.basex.query.*;
+import org.basex.util.*;
 
 /**
  * Single case of a switch expression.

@@ -1,7 +1,8 @@
 package org.basex.io.random;
 
-import java.io.IOException;
-import org.basex.data.MetaData;
+import java.io.*;
+
+import org.basex.data.*;
 import org.basex.io.*;
 
 /**

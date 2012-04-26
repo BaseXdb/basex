@@ -1,11 +1,11 @@
 package org.basex;
 
 import static org.basex.core.Text.*;
-import java.io.IOException;
 
-import org.basex.server.ClientSession;
-import org.basex.server.Session;
-import org.basex.util.Util;
+import java.io.*;
+
+import org.basex.server.*;
+import org.basex.util.*;
 
 /**
  * This is the starter class for the client console mode.

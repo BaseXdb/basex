@@ -2,15 +2,12 @@ package org.basex.gui.view.plot;
 
 import static org.basex.util.Token.*;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.core.Context;
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.index.StatsType;
-import org.basex.index.Names;
-import org.basex.util.list.IntList;
-import org.basex.util.list.TokenList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.util.list.*;
 
 /**
  * An additional layer which prepares the data for the scatter plot.

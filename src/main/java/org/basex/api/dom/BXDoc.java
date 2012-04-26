@@ -1,21 +1,10 @@
 package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
-import org.basex.query.item.FAttr;
-import org.basex.query.item.FComm;
-import org.basex.query.item.FDoc;
-import org.basex.query.item.FElem;
-import org.basex.query.item.FPI;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.ANode;
-import org.basex.query.item.QNm;
-import org.basex.util.Util;
-import org.w3c.dom.DOMConfiguration;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
-import org.w3c.dom.DocumentType;
-import org.w3c.dom.EntityReference;
-import org.w3c.dom.Node;
+
+import org.basex.query.item.*;
+import org.basex.util.*;
+import org.w3c.dom.*;
 
 /**
  * DOM - Document implementation.

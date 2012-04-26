@@ -3,11 +3,11 @@ package org.basex.query.ft;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.basex.query.QueryException;
+import org.basex.query.*;
 import org.basex.query.util.*;
-import org.basex.util.InputInfo;
+import org.basex.util.*;
 
 /**
  * Wild-card expression.

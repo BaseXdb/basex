@@ -1,7 +1,8 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-import org.basex.util.Performance;
+
+import org.basex.util.*;
 
 /**
  * This class is implemented by all kinds of processes.

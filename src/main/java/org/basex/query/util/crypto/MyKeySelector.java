@@ -1,21 +1,12 @@
 package org.basex.query.util.crypto;
 
-import java.security.Key;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.util.List;
+import java.security.*;
+import java.util.*;
 
-import javax.security.cert.X509Certificate;
-import javax.xml.crypto.AlgorithmMethod;
-import javax.xml.crypto.KeySelector;
-import javax.xml.crypto.KeySelectorException;
-import javax.xml.crypto.KeySelectorResult;
-import javax.xml.crypto.XMLCryptoContext;
-import javax.xml.crypto.XMLStructure;
-import javax.xml.crypto.dsig.SignatureMethod;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.security.cert.*;
+import javax.xml.crypto.*;
+import javax.xml.crypto.dsig.*;
+import javax.xml.crypto.dsig.keyinfo.*;
 
 /**
  * Extracts a key from a given {@link KeyInfo} object.

@@ -1,20 +1,11 @@
 package org.basex.io;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.regex.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import java.util.zip.*;
 
 import org.basex.core.*;
-import org.basex.util.list.ByteList;
-import org.basex.util.list.StringList;
+import org.basex.util.list.*;
 
 /**
  * Contains methods for zipping and unzipping archives.

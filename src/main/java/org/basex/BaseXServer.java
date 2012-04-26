@@ -2,28 +2,16 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 
-import org.basex.core.BaseXException;
-import org.basex.core.Context;
-import org.basex.core.Main;
-import org.basex.core.MainProp;
-import org.basex.core.Prop;
+import org.basex.core.*;
 import org.basex.io.*;
-import org.basex.io.in.BufferInput;
-import org.basex.server.ClientListener;
-import org.basex.server.ClientSession;
-import org.basex.server.LocalSession;
-import org.basex.server.Log;
-import org.basex.server.LoginException;
-import org.basex.server.Session;
-import org.basex.util.Args;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.Util;
-import org.basex.util.hash.TokenIntMap;
-import org.basex.util.list.StringList;
+import org.basex.io.in.*;
+import org.basex.server.*;
+import org.basex.util.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * This is the starter class for running the database server. It handles

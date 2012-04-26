@@ -1,18 +1,15 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
 
-import org.basex.io.serial.Serializer;
-import org.basex.query.QueryContext;
-import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
-import org.basex.query.item.QNm;
-import org.basex.query.util.TypedFunc;
-import org.basex.query.util.Var;
-import org.basex.util.Array;
-import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import java.io.*;
+
+import org.basex.io.serial.*;
+import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.item.*;
+import org.basex.query.util.*;
+import org.basex.util.*;
 
 /**
  * Partial function application.

@@ -1,9 +1,9 @@
 package org.basex.gui.layout;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JCheckBox;
+import java.awt.event.*;
+
+import javax.swing.*;
 
 /**
  * Project specific CheckBox implementation.

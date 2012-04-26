@@ -1,10 +1,10 @@
 package org.basex.query.up.primitives;
 
-import org.basex.data.Data;
-import org.basex.query.QueryException;
-import org.basex.query.item.DBNode;
-import org.basex.query.up.NamePool;
-import org.basex.util.InputInfo;
+import org.basex.data.*;
+import org.basex.query.*;
+import org.basex.query.item.*;
+import org.basex.query.up.*;
+import org.basex.util.*;
 
 /**
  * Base class for all update primitives.

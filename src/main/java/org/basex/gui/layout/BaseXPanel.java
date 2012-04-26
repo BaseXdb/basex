@@ -1,16 +1,9 @@
 package org.basex.gui.layout;
 
-import java.awt.Window;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import org.basex.gui.GUI;
+import java.awt.*;
+import java.awt.event.*;
+
+import org.basex.gui.*;
 
 /**
  * Abstract panel implementation with a number of predefined listeners.

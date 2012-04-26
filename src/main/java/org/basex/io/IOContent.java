@@ -1,8 +1,8 @@
 package org.basex.io;
 
-import org.basex.io.in.ArrayInput;
-import org.basex.util.Token;
-import org.xml.sax.InputSource;
+import org.basex.io.in.*;
+import org.basex.util.*;
+import org.xml.sax.*;
 
 /**
  * {@link IO} reference, representing a byte array.

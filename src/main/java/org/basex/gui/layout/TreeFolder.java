@@ -2,16 +2,15 @@ package org.basex.gui.layout;
 
 import static org.basex.util.Token.*;
 
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.*;
 
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.index.Resources;
-import org.basex.util.hash.TokenBoolMap;
-import org.basex.util.list.TokenList;
+import org.basex.core.*;
+import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.util.hash.*;
+import org.basex.util.list.*;
 
 /**
  * JTree node which represents a folder.

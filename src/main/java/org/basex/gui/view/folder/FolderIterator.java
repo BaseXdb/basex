@@ -1,8 +1,7 @@
 package org.basex.gui.view.folder;
 
-import org.basex.data.Data;
-import org.basex.data.Nodes;
-import org.basex.util.list.IntList;
+import org.basex.data.*;
+import org.basex.util.list.*;
 
 /**
  * This is an iterator for the folder nodes.

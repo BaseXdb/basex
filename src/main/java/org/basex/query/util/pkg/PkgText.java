@@ -2,8 +2,8 @@ package org.basex.query.util.pkg;
 
 import static org.basex.util.Token.*;
 
-import org.basex.core.Text;
-import org.basex.io.IO;
+import org.basex.core.*;
+import org.basex.io.*;
 
 /**
  * This class assembles textual information for package handling.

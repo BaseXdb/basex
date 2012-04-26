@@ -2,17 +2,13 @@ package org.basex.server;
 
 import static org.basex.util.Token.*;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.*;
+import java.text.*;
 import java.util.*;
 
-import org.basex.core.Context;
-import org.basex.core.Prop;
-import org.basex.io.IOFile;
-import org.basex.util.TokenBuilder;
-import org.basex.util.Util;
+import org.basex.core.*;
+import org.basex.io.*;
+import org.basex.util.*;
 
 /**
  * This class writes logging information to disk.
