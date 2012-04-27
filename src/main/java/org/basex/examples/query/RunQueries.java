@@ -155,7 +155,7 @@ public final class RunQueries {
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
     for(Item item; (item = iter.next()) != null;) {
-      ser.item(item);
+      ser.serialize(item);
     }
 
     // ------------------------------------------------------------------------
