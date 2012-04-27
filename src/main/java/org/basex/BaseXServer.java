@@ -270,9 +270,7 @@ public final class BaseXServer extends Main implements Runnable {
    * @param args command-line arguments
    * @throws BaseXException database exception
    */
-  public static void start(final int port, final String... args)
-      throws BaseXException {
-
+  public static void start(final int port, final String... args) throws BaseXException {
     // check if server is already running (needs some time)
     if(ping(LOCALHOST, port)) throw new BaseXException(SRV_RUNNING);
 

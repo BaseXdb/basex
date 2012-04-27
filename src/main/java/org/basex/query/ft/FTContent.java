@@ -3,11 +3,9 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -64,9 +62,8 @@ public final class FTContent extends FTFilter {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(start ? START : end ? END : CONTENT), TRUE);
-    super.plan(ser);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(start ? START : end ? END : CONTENT, TRUE), expr);
   }
 
   @Override

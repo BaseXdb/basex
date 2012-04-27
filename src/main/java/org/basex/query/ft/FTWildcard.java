@@ -33,9 +33,7 @@ public class FTWildcard {
    * @throws QueryException {@link Err#FTREG}, if the wild
    * card expression is not valid
    */
-  public FTWildcard(final byte[] query, final InputInfo ii)
-      throws QueryException {
-
+  public FTWildcard(final byte[] query, final InputInfo ii) throws QueryException {
     final int[] q = cps(query);
     final int[] tmpwc = new int[q.length];
     final int[] tmpmin = new int[q.length];

@@ -2,11 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -151,11 +148,9 @@ public final class CmpSR extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, MIN, min != null ? min : Token.EMPTY, MAX,
-        max != null ? max : Token.EMPTY);
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(MIN, min != null ? min : "",
+      MAX, max != null ? max : ""), expr);
   }
 
   @Override

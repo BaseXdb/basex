@@ -2,10 +2,8 @@ package org.basex.query.flwor;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -380,20 +378,13 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(final ForLet f : fl) f.plan(ser);
-    if(where != null) {
-      ser.openElement(WHR);
-      where.plan(ser);
-      ser.closeElement();
-    }
-    if(group != null) group.plan(ser);
-    if(order != null) order.plan(ser);
-    ser.openElement(RET);
-    ret.plan(ser);
-    ser.closeElement();
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, fl);
+    if(where != null) addPlan(el, new FElem(WHR), where);
+    if(group != null) group.plan(el);
+    if(order != null) order.plan(el);
+    addPlan(el, new FElem(RET), ret);
   }
 
   @Override

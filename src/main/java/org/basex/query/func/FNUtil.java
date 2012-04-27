@@ -63,8 +63,7 @@ public final class FNUtil extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _UTIL_SLEEP:             return sleep(ctx);
       case _UTIL_FORMAT:            return format(ctx);
@@ -275,9 +274,7 @@ public final class FNUtil extends StandardFunc {
    * @return string representation of the given number
    * @throws QueryException query exception
    */
-  private Str toBase(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  private Str toBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final long num = checkItr(expr[0], ctx), base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) INVBASE.thrw(ii, base);
 
@@ -315,9 +312,7 @@ public final class FNUtil extends StandardFunc {
    * @return read integer
    * @throws QueryException exception
    */
-  private Int fromBase(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  private Int fromBase(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
     final long base = checkItr(expr[1], ctx);
     if(base < 2 || base > 36) INVBASE.thrw(ii, base);
@@ -342,9 +337,7 @@ public final class FNUtil extends StandardFunc {
    * @return xs:hexBinary instance containing the hash
    * @throws QueryException exception
    */
-  private Hex hash(final QueryContext ctx, final String algo)
-      throws QueryException {
-
+  private Hex hash(final QueryContext ctx, final String algo) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
     try {
       return new Hex(MessageDigest.getInstance(algo).digest(str));

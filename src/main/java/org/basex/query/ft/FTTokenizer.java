@@ -47,9 +47,7 @@ final class FTTokenizer {
 
     cmp = new TokenComparator() {
       @Override
-      public boolean equal(final byte[] in, final byte[] qu)
-        throws QueryException {
-
+      public boolean equal(final byte[] in, final byte[] qu) throws QueryException {
         FTWildcard ftw = null;
         if(opt.is(WC)) {
           ftw = wcCache.get(qu);
@@ -130,9 +128,7 @@ final class FTTokenizer {
    * @return number of occurrences
    * @throws QueryException query exception
    */
-  int contains(final FTTokens query, final FTLexer input)
-      throws QueryException {
-
+  int contains(final FTTokens query, final FTLexer input) throws QueryException {
     input.init();
     final FTBitapSearch bs = new FTBitapSearch(input, query, cmp);
     int c = 0;

@@ -126,8 +126,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Leaf o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final Leaf o, final int l, final InputInfo ii) throws QueryException {
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     if(ch != null) {
@@ -144,8 +143,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final List o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final List o, final int l, final InputInfo ii) throws QueryException {
     final int k = key(o.hash, l);
     final TrieNode ch = kids[k], nw;
     int n = o.size;
@@ -164,8 +162,7 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Branch o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final Branch o, final int l, final InputInfo ii) throws QueryException {
     TrieNode[] ch = null;
     int nu = used, ns = size;
     for(int i = 0; i < kids.length; i++) {

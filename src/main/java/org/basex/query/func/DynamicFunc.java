@@ -2,9 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -48,8 +45,7 @@ public final class DynamicFunc extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return getFun(ctx).invItem(ctx, ii, argv(ctx));
   }
 
@@ -91,11 +87,10 @@ public final class DynamicFunc extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    expr[expr.length - 1].plan(ser);
-    for(int i = 0; i < expr.length - 1; i++) expr[i].plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, expr[expr.length - 1]);
+    for(int i = 0; i < expr.length - 1; i++) expr[i].plan(el);
   }
 
   @Override

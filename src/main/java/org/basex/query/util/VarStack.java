@@ -1,11 +1,9 @@
 package org.basex.query.util;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
@@ -105,11 +103,11 @@ public final class VarStack extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public void plan(final FElem plan) {
     if(size == 0) return;
-    ser.openElement(this);
-    for(int i = 0; i < size; ++i) vars[i].plan(ser);
-    ser.closeElement();
+    final FElem e = planElem();
+    for(int i = 0; i < size; ++i) vars[i].plan(e);
+    addPlan(plan, e);
   }
 
   @Override

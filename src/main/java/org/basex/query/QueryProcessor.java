@@ -284,12 +284,13 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Returns the query plan in the dot notation.
-   * @param ser serializer
-   * @throws IOException I/O exception
+   * Returns a tree representation of the query plan.
+   * @return root node
    */
-  public void plan(final Serializer ser) throws IOException {
-    ctx.plan(ser);
+  public FDoc plan() {
+    final FDoc doc = new FDoc(EMPTY);
+    ctx.plan(doc);
+    return doc;
   }
 
   @Override

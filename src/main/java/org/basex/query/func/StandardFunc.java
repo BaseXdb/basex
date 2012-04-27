@@ -4,10 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -85,10 +82,8 @@ public abstract class StandardFunc extends Arr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, token(sig.desc));
-    for(final Expr arg : expr) arg.plan(ser);
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, sig.desc), expr);
   }
 
   @Override

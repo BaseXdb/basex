@@ -1,11 +1,7 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.SeqType.Occ;
@@ -54,22 +50,13 @@ public final class IntSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
     throw CONDTYPE.thrw(ii, this);
   }
 
   @Override
   public SeqType type() {
     return SeqType.get(type, Occ.ONE_MORE);
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
-    for(int v = 0; v != Math.min(size, 5); ++v)
-      ser.emptyElement(ITM, VAL, Token.token(vals[v]), TYP, type.string());
-    ser.closeElement();
   }
 
   /**

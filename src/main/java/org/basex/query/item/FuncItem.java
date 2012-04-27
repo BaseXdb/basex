@@ -1,11 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -40,8 +36,8 @@ public final class FuncItem extends FItem {
    * @param t function type
    * @param cst cast flag
    */
-  public FuncItem(final QNm n, final Var[] arg, final Expr body,
-      final FuncType t, final boolean cst) {
+  public FuncItem(final QNm n, final Var[] arg, final Expr body, final FuncType t,
+      final boolean cst) {
     super(t);
     name = n;
     vars = arg;
@@ -57,8 +53,8 @@ public final class FuncItem extends FItem {
    * @param cl variables in the closure
    * @param cst cast flag
    */
-  public FuncItem(final Var[] arg, final Expr body, final FuncType t,
-      final VarStack cl, final boolean cst) {
+  public FuncItem(final Var[] arg, final Expr body, final FuncType t, final VarStack cl,
+      final boolean cst) {
 
     this(null, arg, body, t, cst);
     if(cl != null) {
@@ -87,6 +83,7 @@ public final class FuncItem extends FItem {
    */
   private void bindVars(final QueryContext ctx, final Value[] args)
       throws QueryException {
+
     for(int v = closure.size; --v >= 0;)
       ctx.vars.add(closure.vars[v].copy());
     for(int v = vars.length; --v >= 0;)
@@ -94,8 +91,8 @@ public final class FuncItem extends FItem {
   }
 
   @Override
-  public Value invValue(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Value invValue(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
     final VarStack cs = ctx.vars.cache(args.length);
@@ -121,8 +118,8 @@ public final class FuncItem extends FItem {
   }
 
   @Override
-  public Item invItem(final QueryContext ctx, final InputInfo ii,
-      final Value... args) throws QueryException {
+  public Item invItem(final QueryContext ctx, final InputInfo ii, final Value... args)
+      throws QueryException {
 
     // bind variables and cache context
     final VarStack cs = ctx.vars.cache(args.length);
@@ -181,19 +178,15 @@ public final class FuncItem extends FItem {
   }
 
   @Override
-  public FItem coerceTo(final FuncType ft, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  public FItem coerceTo(final FuncType ft, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
 
     if(vars.length != ft.args.length) throw Err.cast(ii, ft, this);
     return type.instanceOf(ft) ? this : coerce(ctx, ii, this, ft);
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(token(Util.name(this)), token(TYPE),
-        token(type.toString()));
-    for(final Var v : vars) v.plan(ser);
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(TYPE, type), vars, expr);
   }
 }

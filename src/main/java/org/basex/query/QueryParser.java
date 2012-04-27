@@ -3481,8 +3481,7 @@ public class QueryParser extends InputParser {
    * @return expression
    * @throws QueryException query exception
    */
-  private <E extends Expr> E check(final E expr, final Err err)
-      throws QueryException {
+  private <E extends Expr> E check(final E expr, final Err err) throws QueryException {
     if(expr == null) error(err);
     return expr;
   }

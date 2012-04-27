@@ -655,7 +655,7 @@ public final class FNDb extends StandardFunc {
       // run serialization
       final Serializer ser = Serializer.get(ao, ctx.serParams(true));
       final ValueIter ir = ctx.value(expr[1]).iter();
-      for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+      for(Item it; (it = ir.next()) != null;) ser.item(it);
       ser.close();
     } catch(final SerializerException ex) {
       throw ex.getCause(info);

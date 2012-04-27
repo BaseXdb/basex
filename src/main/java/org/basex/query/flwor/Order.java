@@ -3,10 +3,8 @@ package org.basex.query.flwor;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Array.*;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -104,10 +102,10 @@ public final class Order extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(int o = 0; o != ob.length - 1; ++o) ob[o].plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    for(int o = 0; o != ob.length - 1; ++o) ob[o].plan(el);
+    addPlan(plan, el);
   }
 
   @Override
@@ -251,8 +249,7 @@ public final class Order extends ParseExpr {
      * @return result
      * @throws QueryException query exception
      */
-    private int d(final int[] o, final int a, final int b)
-        throws QueryException {
+    private int d(final int[] o, final int a, final int b) throws QueryException {
       return d(kl.get(o[a]), kl.get(o[b]));
     }
 

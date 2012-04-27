@@ -252,8 +252,7 @@ abstract class TrieNode {
    * @return result of check
    * @throws QueryException query exception
    */
-  abstract boolean deep(final InputInfo ii, final TrieNode o)
-      throws QueryException;
+  abstract boolean deep(final InputInfo ii, final TrieNode o) throws QueryException;
 
   /**
    * Recursive helper for {@link Map#toString()}.

@@ -25,9 +25,7 @@ public class FNCrypto extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _CRYPTO_HMAC:
         return new Encryption(ii).hmac(checkStr(expr[0], ctx), checkStr(expr[1],

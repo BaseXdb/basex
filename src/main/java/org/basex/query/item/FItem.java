@@ -2,9 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.util.*;
@@ -100,5 +97,5 @@ public abstract class FItem extends Item {
   }
 
   @Override
-  public abstract void plan(Serializer ser) throws IOException;
+  public abstract void plan(final FElem root);
 }

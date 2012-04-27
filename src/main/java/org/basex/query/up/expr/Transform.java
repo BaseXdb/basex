@@ -3,10 +3,7 @@ package org.basex.query.up.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.flwor.*;
@@ -120,11 +117,8 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(final Expr c : copies) c.plan(ser);
-    for(final Expr e : expr) e.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), copies, expr);
   }
 
   @Override

@@ -37,9 +37,7 @@ public final class FNQName extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = expr[0].item(ctx, info);
     final Item it2 = expr.length == 2 ? expr[1].item(ctx, info) : null;
@@ -100,9 +98,7 @@ public final class FNQName extends StandardFunc {
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item lnFromQName(final QueryContext ctx, final Item it)
-      throws QueryException {
-
+  private Item lnFromQName(final QueryContext ctx, final Item it) throws QueryException {
     if(it == null) return null;
     final QNm nm = (QNm) checkType(it, AtomType.QNM);
     return AtomType.NCN.cast(Str.get(nm.local()), ctx, info);
@@ -156,9 +152,7 @@ public final class FNQName extends StandardFunc {
    * @return prefix sequence
    * @throws QueryException query exception
    */
-  private Item nsUriForPrefix(final Item it, final Item it2)
-      throws QueryException {
-
+  private Item nsUriForPrefix(final Item it, final Item it2) throws QueryException {
     final byte[] pref = checkEStr(it);
     final ANode an = (ANode) checkType(it2, NodeType.ELM);
     if(eq(pref, XML)) return Uri.uri(XMLURI, false);

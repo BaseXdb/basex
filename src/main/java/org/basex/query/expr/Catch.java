@@ -59,9 +59,7 @@ public final class Catch extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  Value value(final QueryContext ctx, final QueryException ex)
-      throws QueryException {
-
+  Value value(final QueryContext ctx, final QueryException ex) throws QueryException {
     if(!find(ex.err(), ex.qname())) return null;
 
     final int s = prepare(ctx);

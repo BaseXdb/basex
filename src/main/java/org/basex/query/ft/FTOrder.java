@@ -2,11 +2,9 @@ package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -45,9 +43,8 @@ public final class FTOrder extends FTFilter {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(QueryText.ORDERED), TRUE);
-    super.plan(ser);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(QueryText.ORDERED, TRUE), expr);
   }
 
   @Override

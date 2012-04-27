@@ -9,6 +9,7 @@ import java.io.*;
 
 import org.basex.data.*;
 import org.basex.query.item.*;
+import org.basex.query.iter.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -26,7 +27,7 @@ public abstract class Serializer {
   /** Current level. */
   protected int level;
   /** Current tag. */
-  protected byte[] tag;
+  protected byte[] elem;
   /** Declare namespaces flag. */
   protected boolean undecl;
 
@@ -54,8 +55,8 @@ public abstract class Serializer {
    * @return serializer
    * @throws IOException I/O exception
    */
-  public static Serializer get(final OutputStream os,
-      final SerializerProp props) throws IOException {
+  public static Serializer get(final OutputStream os, final SerializerProp props)
+      throws IOException {
 
     if(props == null) return get(os);
     final String m = props.check(S_METHOD, METHODS);
@@ -69,100 +70,67 @@ public abstract class Serializer {
     return new XMLSerializer(os, props);
   }
 
-  // FINAL PUBLIC METHODS =====================================================
+  // PUBLIC METHODS =====================================================================
 
   /**
-   * Opens an element.
-   * @param name tag name
-   * @param atts attributes
+   * Serializes the specified item.
+   * @param item item to be serialized
    * @throws IOException I/O exception
    */
-  public final void openElement(final byte[] name, final byte[]... atts)
-      throws IOException {
-
-    finishElement();
-    nsl.push(ns.size());
-    opening = true;
-    tag = name;
-    startOpen(name);
-    for(int i = 0; i < atts.length; i += 2) attribute(atts[i], atts[i + 1]);
-  }
-
-  /**
-   * Closes an element.
-   * @throws IOException I/O exception
-   */
-  public final void closeElement() throws IOException {
-    ns.size(nsl.pop());
-    if(opening) {
-      finishEmpty();
-      opening = false;
+  public final void item(final Item item) throws IOException {
+    if(item.type.isNode()) {
+      node((ANode) item);
     } else {
-      tag = tags.pop();
-      level--;
-      finishClose();
+      finishElement();
+      atomic(item);
     }
   }
 
   /**
-   * Opens and closes an empty element.
-   * @param name tag name
-   * @param atts attributes
+   * Serializes the specified node.
+   * @param node node to be serialized
    * @throws IOException I/O exception
    */
-  public final void emptyElement(final byte[] name, final byte[]... atts)
-      throws IOException {
+  public void node(final ANode node) throws IOException {
+    if(node instanceof DBNode) {
+      final DBNode n = (DBNode) node;
+      node(n.data, n.pre);
+    } else {
+      if(node.type == NodeType.COM) {
+        comment(node.string());
+      } else if(node.type == NodeType.ATT) {
+        attribute(node.name(), node.string());
+      } else if(node.type == NodeType.TXT) {
+        text(node.string());
+      } else if(node.type == NodeType.PI) {
+        pi(node.name(), node.string());
+      } else if(node.type == NodeType.NSP) {
+        namespace(node.name(), node.string());
+      } else if(node.type == NodeType.DOC) {
+        openDoc(node.baseURI());
+        for(final ANode n : node.children()) item(n);
+        closeDoc();
+      } else {
+        startElement(node.name());
 
-    openElement(name, atts);
-    closeElement();
-  }
-
-
-  /**
-   * Serializes a text.
-   * @param value text bytes
-   * @throws IOException I/O exception
-   */
-  public final void text(final byte[] value) throws IOException {
-    finishElement();
-    finishText(value);
-  }
-
-  /**
-   * Serializes a comment.
-   * @param value value
-   * @throws IOException I/O exception
-   */
-  public final void comment(final byte[] value) throws IOException {
-    finishElement();
-    finishComment(value);
-  }
-
-  /**
-   * Serializes a processing instruction.
-   * @param name name
-   * @param value value
-   * @throws IOException I/O exception
-   */
-  public final void pi(final byte[] name, final byte[] value) throws IOException {
-    finishElement();
-    finishPi(name, value);
-  }
-
-  /**
-   * Serializes an atomic value. This method is used internally;
-   * call {@link Item#serialize} to serialize nodes.
-   * @param item text bytes
-   * @throws IOException I/O exception
-   */
-  public final void atomic(final Item item) throws IOException {
-    finishElement();
-    finishAtomic(item);
+        // serialize namespaces
+        final Atts nsp = node.namespaces();
+        for(int p = nsp.size() - 1; p >= 0; p--) {
+          namespace(nsp.name(p), nsp.string(p));
+        }
+        // serialize attributes
+        AxisIter ai = node.attributes();
+        for(ANode n; (n = ai.next()) != null;) attribute(n.name(), n.string());
+        // serialize children
+        ai = node.children();
+        for(ANode n; (n = ai.next()) != null;) item(n);
+        closeElement();
+      }
+    }
   }
 
   /**
    * Serializes a node of the specified data reference.
-   *
    * @param data data reference
    * @param pre pre value to start from
    * @throws IOException I/O exception
@@ -173,7 +141,6 @@ public abstract class Serializer {
 
   /**
    * Serializes a node of the specified data reference.
-   *
    * @param data data reference
    * @param pre pre value to start from
    * @param ft full-text data
@@ -217,7 +184,7 @@ public abstract class Serializer {
       } else {
         // add element node
         final byte[] name = data.name(p, k);
-        openElement(name);
+        startElement(name);
 
         // add namespace definitions
         if(nsp != null) {
@@ -265,46 +232,6 @@ public abstract class Serializer {
   }
 
   /**
-   * Opens an element, adopting the expression name as element name.
-   * @param expr expression info
-   * @param atts attributes
-   * @throws IOException I/O exception
-   */
-  public final void openElement(final ExprInfo expr, final byte[]... atts)
-      throws IOException {
-    openElement(info(expr), atts);
-  }
-
-  /**
-   * Opens and closes an empty element, adopting the expression name as
-   * element name.
-   * @param expr expression info
-   * @param atts attributes
-   * @throws IOException I/O exception
-   */
-  public final void emptyElement(final ExprInfo expr, final byte[]... atts)
-      throws IOException {
-    emptyElement(info(expr), atts);
-  }
-
-  // OVERWRITABLE PUBLIC METHODS ==============================================
-
-  /**
-   * Opens a document.
-   * @param n name
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void openDoc(final byte[] n) throws IOException { }
-
-  /**
-   * Closes a document.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void closeDoc() throws IOException { }
-
-  /**
    * Starts a result.
    * @throws IOException I/O exception
    */
@@ -326,21 +253,6 @@ public abstract class Serializer {
   public void close() throws IOException { }
 
   /**
-   * Serializes a namespace if it has not been serialized by an ancestor yet.
-   * @param pref prefix
-   * @param uri URI
-   * @throws IOException I/O exception
-   */
-  public void namespace(final byte[] pref, final byte[] uri) throws IOException {
-    if(!undecl && pref.length != 0 && uri.length == 0) return;
-    final byte[] u = ns(pref);
-    if(u == null || !eq(u, uri)) {
-      attribute(pref.length == 0 ? XMLNS : concat(XMLNSC, pref), uri);
-      ns.add(pref, uri);
-    }
-  }
-
-  /**
    * Tests if the serialization was interrupted.
    * @return result of check
    */
@@ -353,16 +265,90 @@ public abstract class Serializer {
    */
   public void reset() { }
 
+  // PROTECTED METHODS ==================================================================
+
+  /**
+   * Opens an element.
+   * @param name tag name
+   * @param atts attributes
+   * @throws IOException I/O exception
+   */
+  protected final void startElement(final byte[] name, final byte[]... atts)
+      throws IOException {
+
+    finishElement();
+    nsl.push(ns.size());
+    opening = true;
+    elem = name;
+    startOpen(name);
+    for(int i = 0; i < atts.length; i += 2) attribute(atts[i], atts[i + 1]);
+  }
+
+  /**
+   * Closes an element.
+   * @throws IOException I/O exception
+   */
+  protected final void closeElement() throws IOException {
+    ns.size(nsl.pop());
+    if(opening) {
+      finishEmpty();
+      opening = false;
+    } else {
+      elem = tags.pop();
+      level--;
+      finishClose();
+    }
+  }
+
+  /**
+   * Serializes a text.
+   * @param v value
+   * @param ftp full-text positions, used for visualization highlighting
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void finishText(final byte[] v, final FTPos ftp) throws IOException {
+    text(v);
+  }
+
+  /**
+   * Serializes a namespace if it has not been serialized by an ancestor yet.
+   * @param pref prefix
+   * @param uri URI
+   * @throws IOException I/O exception
+   */
+  protected void namespace(final byte[] pref, final byte[] uri) throws IOException {
+    if(!undecl && pref.length != 0 && uri.length == 0) return;
+    final byte[] u = ns(pref);
+    if(u == null || !eq(u, uri)) {
+      attribute(pref.length == 0 ? XMLNS : concat(XMLNSC, pref), uri);
+      ns.add(pref, uri);
+    }
+  }
+
+  /**
+   * Opens a document.
+   * @param n name
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void openDoc(final byte[] n) throws IOException { }
+
+  /**
+   * Closes a document.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void closeDoc() throws IOException { }
+
   /**
    * Serializes an attribute.
    * @param name name
    * @param value value
    * @throws IOException I/O exception
    */
-  public abstract void attribute(final byte[] name, final byte[] value)
+  protected abstract void attribute(final byte[] name, final byte[] value)
       throws IOException;
-
-  // PROTECTED METHODS ========================================================
 
   /**
    * Starts an element.
@@ -412,31 +398,11 @@ public abstract class Serializer {
   protected abstract void finishPi(final byte[] n, final byte[] v) throws IOException;
 
   /**
-   * Serializes an item.
+   * Serializes an atomic value.
    * @param i item
    * @throws IOException I/O exception
    */
-  protected abstract void finishAtomic(final Item i) throws IOException;
-
-  /**
-   * Serializes a text.
-   * @param v value
-   * @param ftp full-text positions, used for visualization highlighting
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  void finishText(final byte[] v, final FTPos ftp) throws IOException {
-    text(v);
-  }
-
-  /**
-   * Returns the name of the specified expression.
-   * @param expr expression
-   * @return name
-   */
-  byte[] info(final ExprInfo expr) {
-    return token(expr.info());
-  }
+  protected abstract void atomic(final Item i) throws IOException;
 
   // PRIVATE METHODS ==========================================================
 
@@ -446,8 +412,9 @@ public abstract class Serializer {
    * @return URI if found, {@code null} otherwise
    */
   private byte[] ns(final byte[] pref) {
-    for(int i = ns.size() - 1; i >= 0; i--)
+    for(int i = ns.size() - 1; i >= 0; i--) {
       if(eq(ns.name(i), pref)) return ns.string(i);
+    }
     return null;
   }
 
@@ -463,6 +430,37 @@ public abstract class Serializer {
   }
 
   /**
+   * Serializes a comment.
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  private void comment(final byte[] value) throws IOException {
+    finishElement();
+    finishComment(value);
+  }
+
+  /**
+   * Serializes a text.
+   * @param value text bytes
+   * @throws IOException I/O exception
+   */
+  private void text(final byte[] value) throws IOException {
+    finishElement();
+    finishText(value);
+  }
+
+  /**
+   * Serializes a processing instruction.
+   * @param name name
+   * @param value value
+   * @throws IOException I/O exception
+   */
+  private void pi(final byte[] name, final byte[] value) throws IOException {
+    finishElement();
+    finishPi(name, value);
+  }
+
+  /**
    * Finishes an opening element node if necessary.
    * @throws IOException I/O exception
    */
@@ -470,7 +468,7 @@ public abstract class Serializer {
     if(!opening) return;
     opening = false;
     finishOpen();
-    tags.push(tag);
+    tags.push(elem);
     level++;
   }
 }

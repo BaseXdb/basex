@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
@@ -86,14 +83,11 @@ public final class CmpN extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return optPre(oneIsEmpty() ? null : allAreValues() ?
-        item(ctx, info) : this, ctx);
+    return optPre(oneIsEmpty() ? null : allAreValues() ? item(ctx, info) : this, ctx);
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item a = expr[0].item(ctx, info);
     if(a == null) return null;
     final Item b = expr[1].item(ctx, info);
@@ -102,10 +96,8 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, OP, Token.token(op.name));
-    for(final Expr e : expr) e.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(OP, op.name), expr);
   }
 
   @Override

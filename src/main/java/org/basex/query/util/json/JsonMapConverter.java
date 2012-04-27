@@ -38,8 +38,7 @@ public final class JsonMapConverter {
    * @return XQuery item
    * @throws QueryException exception
    */
-  public static Value parse(final byte[] json, final InputInfo ii)
-      throws QueryException {
+  public static Value parse(final byte[] json, final InputInfo ii) throws QueryException {
     return convert(new JSONParser(json, ii).parse());
   }
 

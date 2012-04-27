@@ -3,12 +3,9 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
@@ -139,10 +136,8 @@ public final class ValueAccess extends IndexAccess {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, DATA, token(ictx.data.meta.name), TYP, token(itype.toString()));
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(DATA, ictx.data.meta.name, TYP, itype), expr);
   }
 
   @Override

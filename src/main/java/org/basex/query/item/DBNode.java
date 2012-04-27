@@ -8,7 +8,6 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -133,11 +132,6 @@ public class DBNode extends ANode {
       if(!Double.isNaN(d)) return d;
     }
     return Dbl.parse(data.atom(pre), ii);
-  }
-
-  @Override
-  public final void serialize(final Serializer ser) throws IOException {
-    ser.node(data, pre);
   }
 
   @Override
@@ -462,10 +456,8 @@ public class DBNode extends ANode {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(Util.name(this)), NAM, Token.token(data.meta.name));
-    if(pre != 0) ser.attribute(PRE, Token.token(pre));
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, data.meta.name, PRE, pre));
   }
 
   @Override

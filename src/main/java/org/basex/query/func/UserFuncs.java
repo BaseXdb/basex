@@ -3,10 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -199,11 +196,8 @@ public final class UserFuncs extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    if(funcs.length == 0) return;
-    ser.openElement(this);
-    for(final UserFunc f : funcs) f.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    if(funcs.length != 0) addPlan(plan, planElem(), funcs);
   }
 
   @Override

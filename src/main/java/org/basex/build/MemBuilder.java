@@ -14,7 +14,7 @@ import org.basex.io.*;
  */
 public final class MemBuilder extends Builder {
   /** Data reference. */
-  private MemData data;
+  public MemData data;
 
   /**
    * Constructor.
@@ -48,6 +48,15 @@ public final class MemBuilder extends Builder {
 
   @Override
   public MemData build() throws IOException {
+    init();
+    parse();
+    return data;
+  }
+
+  /**
+   * Initializes the builder.
+   */
+  public void init() {
     data = new MemData(null, null, path, ns, parser.prop);
 
     final MetaData md = data.meta;
@@ -61,10 +70,10 @@ public final class MemBuilder extends Builder {
     md.original = file != null ? file.path() : "";
     md.filesize = file != null ? file.length() : 0;
     md.time = file != null ? file.timeStamp() : System.currentTimeMillis();
-
-    parse(md, data.tagindex, data.atnindex);
+    meta = data.meta;
+    tags = data.tagindex;
+    atts = data.atnindex;
     path.finish(data);
-    return data;
   }
 
   @Override

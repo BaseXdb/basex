@@ -4,9 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
@@ -55,18 +52,13 @@ public final class FPI extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
-    ser.pi(name.string(), val);
-  }
-
-  @Override
   public FNode copy() {
     return new FPI(name, val).parent(par);
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.string(), VAL, val);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, name.string(), VAL, val));
   }
 
   @Override

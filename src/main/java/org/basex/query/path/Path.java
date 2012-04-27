@@ -4,12 +4,10 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.path.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -77,8 +75,7 @@ public abstract class Path extends ParseExpr {
    * @return optimized expression
    * @throws QueryException query exception
    */
-  protected abstract Expr compPath(final QueryContext ctx)
-    throws QueryException;
+  protected abstract Expr compPath(final QueryContext ctx) throws QueryException;
 
   /**
    * Returns the root of the current context or {@code null}.
@@ -379,11 +376,8 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    if(root != null) root.plan(ser);
-    for(final Expr s : steps) s.plan(ser);
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(), root, steps);
   }
 
   @Override

@@ -2,9 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.iter.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -71,13 +68,6 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
-    ser.openDoc(base);
-    for(int c = 0; c < children.size(); ++c) children.get(c).serialize(ser);
-    ser.closeDoc();
-  }
-
-  @Override
   public byte[] string() {
     return string(children);
   }
@@ -103,8 +93,8 @@ public final class FDoc extends FNode {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, BASE, base);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(BASE, base));
   }
 
   @Override
@@ -121,6 +111,6 @@ public final class FDoc extends FNode {
 
   @Override
   public String toString() {
-    return Util.info("%(%)", info(), base);
+    return Util.info("%(%)", type, base);
   }
 }

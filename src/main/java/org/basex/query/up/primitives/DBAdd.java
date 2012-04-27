@@ -91,9 +91,7 @@ public final class DBAdd extends InsertBase {
    * @return {@link Data} instance from the parsed document(s)
    * @throws QueryException if {@code doc} does not represent valid document(s)
    */
-  private Data docData(final Item doc, final byte[] pth)
-      throws QueryException {
-
+  private Data docData(final Item doc, final byte[] pth) throws QueryException {
     final MemData mdata;
     String name = string(pth);
     if(name.endsWith(".")) RESINV.thrw(info, pth);

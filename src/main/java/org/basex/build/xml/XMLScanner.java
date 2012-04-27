@@ -670,9 +670,7 @@ final class XMLScanner extends Progress {
    * @return id
    * @throws IOException I/O exception
    */
-  private byte[] externalID(final boolean f, final boolean r)
-      throws IOException {
-
+  private byte[] externalID(final boolean f, final boolean r) throws IOException {
     byte[] cont = null;
     final boolean pub = consume(PUBLIC);
     if(pub || consume(SYSTEM)) {

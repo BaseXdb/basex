@@ -100,15 +100,12 @@ public class Int extends Num {
   }
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
+  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
     return it instanceof Int ? val == ((Int) it).val : val == it.dbl(ii);
   }
 
   @Override
-  public final int diff(final InputInfo ii, final Item it)
-      throws QueryException {
-
+  public final int diff(final InputInfo ii, final Item it) throws QueryException {
     if(it instanceof Int) {
       final long i = ((Int) it).val;
       return val < i ? -1 : val > i ? 1 : 0;
@@ -145,9 +142,7 @@ public class Int extends Num {
    * @return long value
    * @throws QueryException query exception
    */
-  static long parse(final byte[] val, final InputInfo ii)
-      throws QueryException {
-
+  static long parse(final byte[] val, final InputInfo ii) throws QueryException {
     // try fast conversion
     final long l = Token.toLong(val);
     if(l != Long.MIN_VALUE) return l;

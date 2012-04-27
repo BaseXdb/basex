@@ -1,15 +1,12 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -52,10 +49,9 @@ public final class RangeAccess extends IndexAccess {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, DATA, token(ictx.data.meta.name),
-        MIN, token(ind.min), MAX, token(ind.max),
-        TYP, token(ind.type.toString()));
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(DATA, ictx.data.meta.name,
+        MIN, ind.min, MAX, ind.max, TYP, ind.type));
   }
 
   @Override

@@ -28,9 +28,7 @@ public final class FNAggr extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
     switch(sig) {
       case COUNT:

@@ -561,6 +561,7 @@ public interface QueryText {
   String FUNC = "Function";
   /** Query Plan. */
   String VARBL = "Variable";
+
   /** Query Info: Plan. */
   byte[] PLAN = token("QueryPlan");
   /** Query Plan. */
@@ -580,12 +581,6 @@ public interface QueryText {
   /** Query Plan. */
   byte[] RET = token("Return");
   /** Query Plan. */
-  byte[] ITM = token("Item");
-  /** Query Plan. */
-  byte[] THN = token("Then");
-  /** Query Plan. */
-  byte[] ELS = token("Else");
-  /** Query Plan. */
   byte[] DIR = token("dir");
   /** Query Plan. */
   byte[] PRE = token("pre");
@@ -603,10 +598,6 @@ public interface QueryText {
   byte[] MAX = token("max");
   /** Minimum . */
   byte[] INF = token("inf");
-  /** Query Plan. */
-  byte[] ENTRY = token("entry");
-  /** Query Plan. */
-  byte[] KEY = token("key");
   /** Query Plan. */
   byte[] COUNT = token("count");
 

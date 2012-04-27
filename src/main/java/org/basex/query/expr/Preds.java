@@ -2,10 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpV.OpV;
@@ -117,9 +115,7 @@ public abstract class Preds extends ParseExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  public boolean preds(final Item it, final QueryContext ctx)
-      throws QueryException {
-
+  public boolean preds(final Item it, final QueryContext ctx) throws QueryException {
     if(preds.length == 0) return true;
 
     // set context item and position
@@ -162,8 +158,8 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    for(final Expr p : preds) p.plan(ser);
+  public void plan(final FElem plan) {
+    for(final Expr p : preds) p.plan(plan);
   }
 
   @Override

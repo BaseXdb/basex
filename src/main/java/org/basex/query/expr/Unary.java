@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.util.*;
@@ -43,8 +40,7 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
 
     final Item it = expr.item(ctx, info);
     if(it == null) return null;
@@ -64,10 +60,8 @@ public final class Unary extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAL, Token.token(minus));
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(VAL, minus), expr);
   }
 
   @Override

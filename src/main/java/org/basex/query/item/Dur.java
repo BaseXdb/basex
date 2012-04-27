@@ -75,8 +75,7 @@ public class Dur extends Item {
    * @param ii input info
    * @throws QueryException query exception
    */
-  private Dur(final byte[] v, final Type t, final InputInfo ii)
-      throws QueryException {
+  private Dur(final byte[] v, final Type t, final InputInfo ii) throws QueryException {
     this(t);
 
     final String val = Token.string(v).trim();
@@ -182,8 +181,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
+  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
     final Dur d = (Dur) (!it.type.isDuration() ? type.cast(it, null, ii) : it);
     final double s1 = sc == null ? 0 : sc.doubleValue();
     final double s2 = d.sc == null ? 0 : d.sc.doubleValue();

@@ -2,9 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.util.*;
@@ -85,8 +82,8 @@ public final class Empty extends Value {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(AtomType.SEQ.string(), SIZE, Token.ZERO);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(SIZE, 0));
   }
 
   @Override

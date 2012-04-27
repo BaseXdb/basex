@@ -2,9 +2,6 @@ package org.basex.query.ft;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -41,8 +38,7 @@ public final class FTWeight extends FTExpr {
 
   // called by sequential variant
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return weight(expr[0].item(ctx, info), ctx);
   }
 
@@ -64,9 +60,7 @@ public final class FTWeight extends FTExpr {
    * @return item
    * @throws QueryException query exception
    */
-  FTNode weight(final FTNode item, final QueryContext ctx)
-      throws QueryException {
-
+  FTNode weight(final FTNode item, final QueryContext ctx) throws QueryException {
     // evaluate weight
     if(item == null) return null;
     final double d = checkDbl(weight, ctx);
@@ -104,11 +98,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    weight.plan(ser);
-    expr[0].plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), weight, expr[0]);
   }
 
   @Override

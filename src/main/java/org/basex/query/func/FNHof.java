@@ -55,8 +55,7 @@ public final class FNHof extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _HOF_ID:
       case _HOF_CONST: return expr[0].item(ctx, ii);

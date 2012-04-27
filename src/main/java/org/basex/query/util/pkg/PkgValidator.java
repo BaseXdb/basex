@@ -95,9 +95,7 @@ public final class PkgValidator {
    * @param procs processor dependencies
    * @throws QueryException query exception
    */
-  private void checkProcs(final ArrayList<Dependency> procs)
-      throws QueryException {
-
+  private void checkProcs(final ArrayList<Dependency> procs) throws QueryException {
     boolean supported = false;
     for(final Dependency d : procs) {
       if(!eq(lc(d.processor), token(Text.NAMELC))) {

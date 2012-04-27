@@ -1,14 +1,11 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
-import java.io.*;
 
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -100,10 +97,8 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(DISTANCE),
-        token(dist[0] + "-" + dist[1] + ' ' + unit));
-    super.plan(ser);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(DISTANCE, dist[0] + "-" + dist[1] + ' ' + unit), expr);
   }
 
   @Override

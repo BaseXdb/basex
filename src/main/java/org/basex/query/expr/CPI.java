@@ -26,9 +26,7 @@ public final class CPI extends CName {
   }
 
   @Override
-  public FPI item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public FPI item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = checkItem(name, ctx);
     final Type ip = it.type;
     if(!ip.isUntyped() && !ip.isString() && ip != AtomType.QNM)

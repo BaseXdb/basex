@@ -2,10 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.iter.*;
 import org.basex.util.*;
 
@@ -43,11 +41,8 @@ public final class Extension extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(final Pragma p : pragmas) p.plan(ser);
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), pragmas, expr);
   }
 
   @Override

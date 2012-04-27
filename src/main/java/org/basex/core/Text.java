@@ -1239,11 +1239,11 @@ public interface Text {
   /** Developer info. */
   String CHIEF_ARCHITECT = lang("chief_architect") + ": Christian Gr\u00FCn";
   /** Contributors info. */
-  String TEAM1 = lang("team") + ": Michael Seiferle, Alexander Holupirek,";
+  String TEAM1 = lang("team") + ": Alexander Holupirek, Michael Seiferle,";
   /** Developer names. */
-  String TEAM2 = "Dimitar Popov, Rositsa Shadura, Lukas Kircher,";
+  String TEAM2 = "Dimitar Popov, Leo W\u00F6rteler, Lukas Kircher";
   /** Developer names. */
-  String TEAM3 = "Leo W\u00F6rteler " + lang("and_others");
+  String TEAM3 = lang("and_others");
   /** Translation. */
   String TRANSLATION = lang("translation");
 

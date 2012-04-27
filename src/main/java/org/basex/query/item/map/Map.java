@@ -3,10 +3,8 @@ package org.basex.query.item.map;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.util.*;
 
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -85,8 +83,7 @@ public final class Map extends FItem {
    * @return updated map if changed, {@code this} otherwise
    * @throws QueryException query exception
    */
-  public Map delete(final Item key, final InputInfo ii)
-      throws QueryException {
+  public Map delete(final Item key, final InputInfo ii) throws QueryException {
     final Item k = key(key, ii);
     if(k == null) return this;
 
@@ -248,22 +245,21 @@ public final class Map extends FItem {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public void plan(final FElem plan) {
     final long s = mapSize().itr(null);
-    ser.openElement(MAP, SIZE, Token.token(s));
+    final FElem el = planElem(SIZE, s);
     final Value ks = keys();
     try {
       for(long i = 0, max = Math.min(s, 5); i < max; i++) {
         final Item key = ks.itemAt(i);
         final Value val = get(key, null);
-        ser.openElement(ENTRY, KEY, key.string(null));
-        val.plan(ser);
-        ser.closeElement();
+        key.plan(el);
+        val.plan(el);
       }
     } catch(final QueryException ex) {
       Util.notexpected(ex);
     }
-    ser.closeElement();
+    addPlan(plan, el);
   }
 
   @Override

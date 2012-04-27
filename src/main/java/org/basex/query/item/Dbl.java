@@ -50,8 +50,7 @@ public final class Dbl extends Num {
    * @return instance
    * @throws QueryException query exception
    */
-  public static Dbl get(final byte[] v, final InputInfo ii)
-      throws QueryException {
+  public static Dbl get(final byte[] v, final InputInfo ii) throws QueryException {
     return get(parse(v, ii));
   }
 
@@ -115,9 +114,7 @@ public final class Dbl extends Num {
    * @return double value
    * @throws QueryException query exception
    */
-  static double parse(final byte[] val, final InputInfo ii)
-      throws QueryException {
-
+  static double parse(final byte[] val, final InputInfo ii) throws QueryException {
     try {
       return Double.parseDouble(Token.string(val));
     } catch(final NumberFormatException ex) {

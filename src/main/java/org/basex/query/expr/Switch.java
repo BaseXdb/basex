@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -87,8 +84,7 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return getCase(ctx).item(ctx, ii);
   }
 
@@ -141,11 +137,8 @@ public final class Switch extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    cond.plan(ser);
-    for(final SwitchCase sc : cases) sc.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), cond, cases);
   }
 
   @Override

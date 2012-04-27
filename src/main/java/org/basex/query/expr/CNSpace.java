@@ -26,9 +26,7 @@ public final class CNSpace extends CName {
   }
 
   @Override
-  public FNames item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public FNames item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = name.item(ctx, info);
     final byte[] cp = checkEStr(it);
     if(cp.length != 0 && !XMLToken.isNCName(cp)) INVNAME.thrw(info, expr[0]);

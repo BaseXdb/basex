@@ -1,9 +1,7 @@
 package org.basex.query.expr;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 
@@ -55,9 +53,7 @@ public abstract class Single extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), expr);
   }
 }

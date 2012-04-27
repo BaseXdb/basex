@@ -27,9 +27,7 @@ public final class FNAcc extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
     switch(sig) {
       case POSITION:
@@ -77,9 +75,7 @@ public final class FNAcc extends StandardFunc {
    * @return double iterator
    * @throws QueryException query exception
    */
-  private Item number(final Iter ir, final QueryContext ctx)
-      throws QueryException {
-
+  private Item number(final Iter ir, final QueryContext ctx) throws QueryException {
     final Item it = ir.next();
     if(it == null || ir.next() != null) return Dbl.NAN;
     final Type t = it.type;

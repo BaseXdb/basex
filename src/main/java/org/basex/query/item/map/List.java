@@ -136,8 +136,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Leaf o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final Leaf o, final int l, final InputInfo ii) throws QueryException {
     if(hash == o.hash) {
       for(final Item k : keys) if(eq(k, o.key, ii)) return this;
       return new List(hash, Array.add(keys, o.key), Array.add(values, o.value));
@@ -161,8 +160,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode add(final List o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final List o, final int l, final InputInfo ii) throws QueryException {
     if(hash == o.hash) {
       Item[] ks = keys;
       Value[] vs = values;
@@ -196,8 +194,7 @@ final class List extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Branch o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final Branch o, final int l, final InputInfo ii) throws QueryException {
     final int k = key(hash, l);
     final TrieNode[] ch = o.copyKids();
     final TrieNode old = ch[k];

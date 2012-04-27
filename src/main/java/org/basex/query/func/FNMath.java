@@ -25,9 +25,7 @@ public final class FNMath extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     double d = 0;
     if(expr.length > 0) {
       if(expr[0].isEmpty()) return null;

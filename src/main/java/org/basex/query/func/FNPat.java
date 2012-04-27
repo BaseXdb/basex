@@ -55,8 +55,7 @@ public final class FNPat extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case MATCHES:        return matches(checkEStr(expr[0], ctx), ctx);
       case REPLACE:        return replace(checkEStr(expr[0], ctx), ctx);
@@ -72,9 +71,7 @@ public final class FNPat extends StandardFunc {
    * @return function result
    * @throws org.basex.query.QueryException query exception
    */
-  private Item matches(final byte[] val, final QueryContext ctx)
-      throws QueryException {
-
+  private Item matches(final byte[] val, final QueryContext ctx) throws QueryException {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     return Bln.get(p.matcher(string(val)).find());
   }
@@ -154,9 +151,7 @@ public final class FNPat extends StandardFunc {
    * @return function result
    * @throws org.basex.query.QueryException query exception
    */
-  private Item replace(final byte[] val, final QueryContext ctx)
-      throws QueryException {
-
+  private Item replace(final byte[] val, final QueryContext ctx) throws QueryException {
     final byte[] rep = checkStr(expr[2], ctx);
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
@@ -189,9 +184,7 @@ public final class FNPat extends StandardFunc {
    * @return function result
    * @throws org.basex.query.QueryException query exception
    */
-  private Iter tokenize(final byte[] val, final QueryContext ctx)
-      throws QueryException {
-
+  private Iter tokenize(final byte[] val, final QueryContext ctx) throws QueryException {
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) REGROUP.thrw(info);
 

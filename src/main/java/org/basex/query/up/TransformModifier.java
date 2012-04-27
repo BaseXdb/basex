@@ -34,8 +34,7 @@ public final class TransformModifier extends ContextModifier {
   }
 
   @Override
-  void add(final UpdatePrimitive p, final QueryContext ctx)
-      throws QueryException {
+  void add(final UpdatePrimitive p, final QueryContext ctx) throws QueryException {
 
     add(p);
     /* check if the target node of the given primitive has been copied in the

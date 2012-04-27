@@ -76,8 +76,7 @@ public abstract class TreeNode extends DefaultMutableTreeNode
   }
 
   @Override
-  public void treeWillCollapse(final TreeExpansionEvent e)
-      throws ExpandVetoException { }
+  public void treeWillCollapse(final TreeExpansionEvent e) throws ExpandVetoException { }
 
   @Override
   public String toString() {

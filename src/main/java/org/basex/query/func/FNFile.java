@@ -106,9 +106,7 @@ public final class FNFile extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private Str baseName(final File path, final QueryContext ctx)
-      throws QueryException {
-
+  private Str baseName(final File path, final QueryContext ctx) throws QueryException {
     if(path.getPath().isEmpty()) return Str.get(".");
     final String suf = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     String pth = path.getName();
@@ -345,7 +343,7 @@ public final class FNFile extends StandardFunc {
           new FileOutputStream(path, append));
       try {
         final Serializer ser = Serializer.get(out, FNGen.serialPar(this, 2, ctx));
-        for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+        for(Item it; (it = ir.next()) != null;) ser.item(it);
         ser.close();
       } catch(final SerializerException ex) {
         throw ex.getCause(info);

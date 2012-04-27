@@ -122,8 +122,7 @@ public final class Dec extends Num {
    * @return double value
    * @throws QueryException query exception
    */
-  static BigDecimal parse(final double val, final InputInfo ii)
-      throws QueryException {
+  static BigDecimal parse(final double val, final InputInfo ii) throws QueryException {
     if(Double.isNaN(val) || val == 1 / 0d || val == -1 / 0d)
       Err.value(ii, AtomType.DEC, val);
     return BigDecimal.valueOf(val);
@@ -136,11 +135,8 @@ public final class Dec extends Num {
    * @return double value
    * @throws QueryException query exception
    */
-  static BigDecimal parse(final byte[] val, final InputInfo ii)
-      throws QueryException {
-
-    if(contains(val, 'e') || contains(val, 'E'))
-      FUNCAST.thrw(ii, AtomType.DEC, val);
+  static BigDecimal parse(final byte[] val, final InputInfo ii) throws QueryException {
+    if(contains(val, 'e') || contains(val, 'E')) FUNCAST.thrw(ii, AtomType.DEC, val);
 
     try {
       return new BigDecimal(Token.string(val).trim());

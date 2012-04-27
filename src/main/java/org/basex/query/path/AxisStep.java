@@ -3,13 +3,11 @@ package org.basex.query.path;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.path.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -229,12 +227,10 @@ public class AxisStep extends Preds {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    ser.attribute(AXIS, Token.token(axis.name));
-    ser.attribute(TEST, Token.token(test.toString()));
-    super.plan(ser);
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    final FElem el = planElem(AXIS, axis.name, TEST, test);
+    addPlan(plan, el);
+    super.plan(el);
   }
 
   @Override

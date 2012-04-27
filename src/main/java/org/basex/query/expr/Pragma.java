@@ -2,10 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
 
@@ -32,10 +29,8 @@ public final class Pragma extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAL, pContent);
-    qName.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(VAL, pContent), qName);
   }
 
   @Override

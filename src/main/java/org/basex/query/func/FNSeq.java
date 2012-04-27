@@ -33,8 +33,7 @@ public final class FNSeq extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case HEAD: return head(ctx);
       default:   return super.item(ctx, ii);
@@ -65,8 +64,7 @@ public final class FNSeq extends StandardFunc {
    * @return outermost/innermost nodes
    * @throws QueryException exception
    */
-  private Iter most(final QueryContext ctx, final boolean outer)
-      throws QueryException {
+  private Iter most(final QueryContext ctx, final boolean outer) throws QueryException {
     final Iter iter = expr[0].iter(ctx);
     final NodeCache nc = new NodeCache().random();
     for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));

@@ -4,13 +4,12 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.ft.*;
+import org.basex.query.item.*;
 
 /**
  * This class contains all full-text options.
@@ -94,15 +93,15 @@ public final class FTOpt extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    if(is(WC)) ser.attribute(token(WILDCARDS), TRUE);
-    if(is(FZ)) ser.attribute(token(FUZZY), TRUE);
-    if(is(UC)) ser.attribute(token(UPPERCASE), TRUE);
-    if(is(LC)) ser.attribute(token(LOWERCASE), TRUE);
-    if(is(DC)) ser.attribute(token(DIACRITICS), TRUE);
-    if(is(ST)) ser.attribute(token(STEMMING), TRUE);
-    if(ln != null) ser.attribute(token(LANGUAGE), token(ln.toString()));
-    if(th != null) ser.attribute(token(THESAURUS), TRUE);
+  public void plan(final FElem plan) {
+    if(is(WC)) plan.add(planAttr(WILDCARDS, TRUE));
+    if(is(FZ)) plan.add(planAttr(FUZZY, TRUE));
+    if(is(UC)) plan.add(planAttr(UPPERCASE, TRUE));
+    if(is(LC)) plan.add(planAttr(LOWERCASE, TRUE));
+    if(is(DC)) plan.add(planAttr(DIACRITICS, TRUE));
+    if(is(ST)) plan.add(planAttr(STEMMING, TRUE));
+    if(ln != null) plan.add(planAttr(LANGUAGE, ln));
+    if(th != null) plan.add(planAttr(THESAURUS, TRUE));
   }
 
   @Override

@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.item.*;
@@ -118,9 +115,8 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, MIN, Token.token(min), MAX,
-        max == Long.MAX_VALUE ? INF : Token.token(max));
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(MIN, min, MAX, max == Long.MAX_VALUE ? INF : max));
   }
 
   @Override

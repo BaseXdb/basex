@@ -41,9 +41,9 @@ public abstract class Builder extends Progress {
   /** Meta data on built database. */
   MetaData meta;
   /** Tag name index. */
-  private Names tags;
+  Names tags;
   /** Attribute name index. */
-  private Names atts;
+  Names atts;
 
   /** Parent stack. */
   private final IntList pstack = new IntList();
@@ -68,18 +68,11 @@ public abstract class Builder extends Progress {
 
   /**
    * Parses the given input source and builds the database.
-   * @param md meta data
-   * @param ta tag index
-   * @param at attribute name index
    * @throws IOException I/O exception
    */
-  final void parse(final MetaData md, final Names ta, final Names at) throws IOException {
+  final void parse() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
     Util.debug(tit() + DOTS);
-
-    meta = md;
-    tags = ta;
-    atts = at;
 
     // add document node and parse document
     parser.parse(this);

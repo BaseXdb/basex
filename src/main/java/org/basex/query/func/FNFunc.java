@@ -39,8 +39,7 @@ public final class FNFunc extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case FUNCTION_ARITY:
         return Int.get(getFun(0, FuncType.ANY_FUN, ctx).arity());
@@ -62,8 +61,7 @@ public final class FNFunc extends StandardFunc {
    * @return function item
    * @throws QueryException query exception
    */
-  private Item lookup(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private Item lookup(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final QNm name = (QNm) checkType(expr[0].item(ctx, ii), AtomType.QNM);
     final long arity = checkItr(expr[1], ctx);
     try {
@@ -81,13 +79,12 @@ public final class FNFunc extends StandardFunc {
    * @return function item
    * @throws QueryException query exception
    */
-  private Item partApp(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private Item partApp(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FItem f = getFun(0, FuncType.ANY_FUN, ctx);
     final long pos = expr.length == 2 ? 0 : checkItr(expr[2], ctx) - 1;
 
     final int arity = f.arity();
-    if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.info(), pos + 1);
+    if(pos < 0 || pos >= arity) INVPOS.thrw(ii, f.description(), pos + 1);
 
     final FuncType ft = (FuncType) f.type;
     final Var[] vars = new Var[arity - 1];

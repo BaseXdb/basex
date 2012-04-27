@@ -112,9 +112,8 @@ public abstract class Formatter extends FormatUtil {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public final byte[] formatDate(final Date date, final byte[] pic,
-      final byte[] cal, final byte[] plc, final InputInfo ii)
-      throws QueryException {
+  public final byte[] formatDate(final Date date, final byte[] pic, final byte[] cal,
+      final byte[] plc, final InputInfo ii) throws QueryException {
 
     // [CG] XQuery/Formatter: currently, calendars and places are ignored
     if(cal != null || plc != null);

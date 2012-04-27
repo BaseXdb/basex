@@ -99,9 +99,7 @@ public final class PkgParser {
    * @param p package container
    * @throws QueryException query exception
    */
-  private void parseChildren(final ANode node, final Package p)
-      throws QueryException {
-
+  private void parseChildren(final ANode node, final Package p) throws QueryException {
     final AxisIter ch = childElements(node);
     for(ANode next; (next = ch.next()) != null;) {
       final QNm name = next.qname();

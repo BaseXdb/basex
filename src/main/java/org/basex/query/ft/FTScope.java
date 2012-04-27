@@ -1,13 +1,10 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
-import java.io.*;
 
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.item.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 import org.basex.util.list.*;
@@ -64,10 +61,8 @@ public final class FTScope extends FTFilter {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(same ? SAME : DIFFERENT),
-        token(unit.toString()));
-    super.plan(ser);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(same ? SAME : DIFFERENT, unit), expr);
   }
 
   @Override

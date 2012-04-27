@@ -44,8 +44,7 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final FTNode item = expr[0].item(ctx, info);
     for(int e = 1; e < expr.length; ++e) {
       and(item, expr[e].item(ctx, info));

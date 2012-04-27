@@ -58,9 +58,7 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  public void attribute(final byte[] name, final byte[] value)
-      throws IOException {
-
+  public void attribute(final byte[] name, final byte[] value) throws IOException {
     if(level == 0) {
       final int tl = typeCache.length;
       for(int t = 0; t < tl; t++) {
@@ -73,9 +71,9 @@ public final class JSONSerializer extends OutputSerializer {
     if(eq(name, T_TYPE)) {
       types.set(level, value);
       if(!eq(value, TYPES))
-        error("Element <%> has invalid type \"%\"", tag, value);
+        error("Element <%> has invalid type \"%\"", elem, value);
     } else {
-      error("Element <%> has invalid attribute \"%\"", tag, name);
+      error("Element <%> has invalid attribute \"%\"", elem, name);
     }
   }
 
@@ -89,7 +87,7 @@ public final class JSONSerializer extends OutputSerializer {
       final byte[] par = types.get(level - 1);
       if(eq(par, T_OBJECT)) {
         print('"');
-        print(name(tag));
+        print(name(elem));
         print("\": ");
       } else if(!eq(par, T_ARRAY)) {
         error("Element <%> is typed as \"%\" and cannot be nested",
@@ -101,7 +99,7 @@ public final class JSONSerializer extends OutputSerializer {
     if(type == null) {
       int t = -1;
       final int tl = typeCache.length;
-      while(++t < tl && !typeCache[t].contains(tag));
+      while(++t < tl && !typeCache[t].contains(elem));
       if(t != tl) type = TYPES[t];
       else type = T_STRING;
       types.set(level,  type);
@@ -179,13 +177,12 @@ public final class JSONSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishPi(final byte[] name, final byte[] value)
-      throws IOException {
+  public void finishPi(final byte[] name, final byte[] value) throws IOException {
     error("Processing instructions cannot be serialized");
   }
 
   @Override
-  public void finishAtomic(final Item value) throws IOException {
+  public void atomic(final Item value) throws IOException {
     error("Atomic values cannot be serialized");
   }
 
@@ -256,8 +253,7 @@ public final class JSONSerializer extends OutputSerializer {
    * @param ext error details
    * @throws IOException I/O exception
    */
-  private static void error(final String msg, final Object... ext)
-      throws IOException {
+  private static void error(final String msg, final Object... ext) throws IOException {
     throw JSONSER.thrwSerial(Util.inf(msg, ext));
   }
 }

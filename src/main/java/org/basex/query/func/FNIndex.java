@@ -54,9 +54,7 @@ public final class FNIndex extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _INDEX_FACETS: return facets(ctx);
       default: return super.item(ctx, ii);
@@ -93,9 +91,7 @@ public final class FNIndex extends StandardFunc {
    * @return text entries
    * @throws QueryException query exception
    */
-  private Iter values(final QueryContext ctx, final IndexType it)
-      throws QueryException {
-
+  private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
     final byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
     return entries(data, prefix, it, this);
@@ -137,9 +133,7 @@ public final class FNIndex extends StandardFunc {
    * @return text entries
    * @throws QueryException query exception
    */
-  private Iter names(final QueryContext ctx, final IndexType it)
-      throws QueryException {
-
+  private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
     return entries(it == IndexType.TAG ? data.tagindex : data.atnindex, EMPTY);
   }
@@ -183,9 +177,7 @@ public final class FNIndex extends StandardFunc {
    * @param name element name
    * @param root root node
    */
-  private static void index(final Names names, final QNm name,
-      final FElem root) {
-
+  private static void index(final Names names, final QNm name, final FElem root) {
     for(int i = 0; i < names.size(); ++i) {
       final FElem sub = new FElem(name);
       sub.add(new FAttr(Q_NAME, names.key(i + 1)));
