@@ -10,6 +10,8 @@ import org.basex.core.cmd.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
+import org.basex.query.expr.*;
+import org.basex.query.ft.*;
 import org.basex.test.*;
 import org.basex.util.*;
 import org.junit.*;
@@ -217,7 +219,8 @@ public final class IndexOptimizeTest extends SandboxTest {
       plan = qp.plan().serialize().toString();
 
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
-          "[self::ValueAccess|self::FTIndexAccess]", context);
+          "[self::" + Util.name(ValueAccess.class) +
+          "|self::" + Util.name(FTIndexAccess.class) + "]", context);
       ao = new ArrayOutput();
       ser = qp.getSerializer(ao);
       qp.execute().serialize(ser);

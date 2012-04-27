@@ -324,7 +324,7 @@ public final class FNZip extends StandardFunc {
               try {
                 final Serializer ser = Serializer.get(zos, serPar(node, ctx));
                 do {
-                  ser.item(DataBuilder.stripNS(n, ZIPURI, ctx.context));
+                  ser.serialize(DataBuilder.stripNS(n, ZIPURI, ctx.context));
                 } while((n = ch.next()) != null);
                 ser.close();
               } catch(final SerializerException ex) {

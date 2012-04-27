@@ -146,7 +146,8 @@ public abstract class Value extends Expr implements Iterable<Item> {
     final ArrayOutput ao = new ArrayOutput();
     final Serializer ser = Serializer.get(ao);
     final ValueIter vi = iter();
-    for(Item it; (it = vi.next()) != null;) ser.item(it);
+    for(Item it; (it = vi.next()) != null;) ser.serialize(it);
+    ser.close();
     return ao;
   }
 

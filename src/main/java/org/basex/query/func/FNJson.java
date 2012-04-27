@@ -61,7 +61,7 @@ public final class FNJson extends StandardFunc {
       final SerializerProp props = ctx.serParams(false);
       final Serializer json = ml ? new JsonMLSerializer(ao, props) :
           new JSONSerializer(ao, props);
-      json.item(node);
+      json.serialize(node);
       json.close();
     } catch(final SerializerException ex) {
       throw ex.getCause(info);

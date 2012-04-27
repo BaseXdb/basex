@@ -11,6 +11,7 @@ import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.*;
 import org.basex.io.serial.*;
+import org.basex.query.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -168,7 +169,7 @@ public final class OptimizeAll extends ACreate {
 
       final IntList il = data.resources.docs();
       for(int i = 0, is = il.size(); i < is; i++) {
-        ser.node(data, il.get(i));
+        ser.serialize(new DBNode(data, il.get(i)));
       }
     }
   }

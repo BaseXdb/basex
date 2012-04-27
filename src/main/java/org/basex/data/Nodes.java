@@ -6,6 +6,7 @@ import java.util.*;
 import org.basex.core.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -224,9 +225,7 @@ public final class Nodes implements Result {
 
   @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
-    ser.openResult();
-    ser.node(data, list[n], ftpos);
-    ser.closeResult();
+    ser.serialize(new FTPosNode(data, list[n], ftpos));
   }
 
   @Override

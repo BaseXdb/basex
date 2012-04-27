@@ -650,18 +650,15 @@ public final class FNDb extends StandardFunc {
    */
   private Item event(final QueryContext ctx) throws QueryException {
     final byte[] name = checkStr(expr[0], ctx);
-    final ArrayOutput ao = new ArrayOutput();
+    final ArrayOutput ao;
     try {
-      // run serialization
-      final Serializer ser = Serializer.get(ao, ctx.serParams(true));
-      final ValueIter ir = ctx.value(expr[1]).iter();
-      for(Item it; (it = ir.next()) != null;) ser.item(it);
-      ser.close();
+      ao = ctx.value(expr[1]).serialize();
     } catch(final SerializerException ex) {
       throw ex.getCause(info);
     } catch(final IOException ex) {
-      SERANY.thrw(info, ex);
+      throw SERANY.thrw(info, ex);
     }
+
     // throw exception if event is unknown
     if(!ctx.context.events.notify(ctx.context, name, ao.toArray())) {
       NOEVENT.thrw(info, name);

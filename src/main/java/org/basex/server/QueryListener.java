@@ -137,9 +137,7 @@ final class QueryListener extends Progress {
             }
             ser.reset();
           }
-          ser.openResult();
-          ser.item(it);
-          ser.closeResult();
+          ser.serialize(it);
           if(iter && !wrap) {
             po.flush();
             out.write(0);

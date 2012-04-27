@@ -96,9 +96,7 @@ abstract class AQuery extends Command {
             ser = qp.getSerializer(po);
             while(it != null) {
               checkStop();
-              ser.openResult();
-              ser.item(it);
-              ser.closeResult();
+              ser.serialize(it);
               it = ir.next();
               ++hits;
             }
@@ -249,7 +247,7 @@ abstract class AQuery extends Command {
 
         bo = new BufferOutput(dot);
         final DOTSerializer d = new DOTSerializer(bo, prop.is(Prop.DOTCOMPACT));
-        d.node(qp.plan());
+        d.serialize(qp.plan());
         d.close();
 
         if(prop.is(Prop.DOTDISPLAY))

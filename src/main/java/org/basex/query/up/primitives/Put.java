@@ -51,7 +51,9 @@ public final class Put extends UpdatePrimitive {
         final SerializerProp pr = ctx.serParams(false);
         // try to reproduce non-chopped documents correctly
         pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
-        Serializer.get(po, pr).item(node);
+        final Serializer ser = Serializer.get(po, pr);
+        ser.serialize(node);
+        ser.close();
       } catch(final IOException ex) {
         UPPUTERR.thrw(info, path(u));
       } finally {

@@ -73,17 +73,19 @@ public abstract class Serializer {
   // PUBLIC METHODS =====================================================================
 
   /**
-   * Serializes the specified item.
+   * Serializes the specified item, which may be a node or an atomic value.
    * @param item item to be serialized
    * @throws IOException I/O exception
    */
-  public final void item(final Item item) throws IOException {
+  public final void serialize(final Item item) throws IOException {
+    openResult();
     if(item.type.isNode()) {
-      node((ANode) item);
+      serialize((ANode) item);
     } else {
       finishElement();
       atomic(item);
     }
+    closeResult();
   }
 
   /**
@@ -91,10 +93,9 @@ public abstract class Serializer {
    * @param node node to be serialized
    * @throws IOException I/O exception
    */
-  public void node(final ANode node) throws IOException {
+  public void serialize(final ANode node) throws IOException {
     if(node instanceof DBNode) {
-      final DBNode n = (DBNode) node;
-      node(n.data, n.pre);
+      node((DBNode) node);
     } else {
       if(node.type == NodeType.COM) {
         comment(node.string());
@@ -108,7 +109,7 @@ public abstract class Serializer {
         namespace(node.name(), node.string());
       } else if(node.type == NodeType.DOC) {
         openDoc(node.baseURI());
-        for(final ANode n : node.children()) item(n);
+        for(final ANode n : node.children()) serialize(n);
         closeDoc();
       } else {
         startElement(node.name());
@@ -123,127 +124,11 @@ public abstract class Serializer {
         for(ANode n; (n = ai.next()) != null;) attribute(n.name(), n.string());
         // serialize children
         ai = node.children();
-        for(ANode n; (n = ai.next()) != null;) item(n);
+        for(ANode n; (n = ai.next()) != null;) serialize(n);
         closeElement();
       }
     }
   }
-
-  /**
-   * Serializes a node of the specified data reference.
-   * @param data data reference
-   * @param pre pre value to start from
-   * @throws IOException I/O exception
-   */
-  public final void node(final Data data, final int pre) throws IOException {
-    node(data, pre, null);
-  }
-
-  /**
-   * Serializes a node of the specified data reference.
-   * @param data data reference
-   * @param pre pre value to start from
-   * @param ft full-text data
-   * @throws IOException I/O exception
-   */
-  public final void node(final Data data, final int pre, final FTPosData ft)
-      throws IOException {
-
-    boolean doc = false;
-    final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
-    final IntList pars = new IntList();
-    int l = 0;
-    int p = pre;
-
-    // loop through all table entries
-    final int s = pre + data.size(pre, data.kind(p));
-    while(p < s && !finished()) {
-      final int k = data.kind(p);
-      final int r = data.parent(p, k);
-
-      // close opened elements...
-      while(l > 0 && pars.get(l - 1) >= r) {
-        closeElement();
-        --l;
-      }
-
-      if(k == Data.DOC) {
-        if(doc) closeDoc();
-        openDoc(data.text(p++, true));
-        doc = true;
-      } else if(k == Data.TEXT) {
-        final FTPos ftd = ft != null ? ft.get(data, p) : null;
-        if(ftd != null) text(data.text(p++, true), ftd);
-        else text(data.text(p++, true));
-      } else if(k == Data.COMM) {
-        comment(data.text(p++, true));
-      } else if(k == Data.ATTR) {
-        attribute(data.name(p, k), data.text(p++, false));
-      } else if(k == Data.PI) {
-        pi(data.name(p, k), data.atom(p++));
-      } else {
-        // add element node
-        final byte[] name = data.name(p, k);
-        startElement(name);
-
-        // add namespace definitions
-        if(nsp != null) {
-          // add namespaces from database
-          nsp.reset();
-          int pp = p;
-
-          // check namespace of current element
-          byte[] key = prefix(name);
-          byte[] val = data.nspaces.uri(data.uri(p, k));
-          if(val == null) val = EMPTY;
-          // add new or updated namespace
-          final byte[] old = ns(key);
-          if(old == null || !eq(old, val)) namespace(key, val);
-
-          do {
-            final Atts atn = data.ns(pp);
-            for(int n = 0; n < atn.size(); ++n) {
-              key = atn.name(n);
-              val = atn.string(n);
-              if(!nsp.contains(key)) {
-                nsp.add(key);
-                namespace(key, val);
-              }
-            }
-            // check ancestors only on top level
-            if(level != 0 || l != 0) break;
-
-            pp = data.parent(pp, data.kind(pp));
-          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
-        }
-
-        // serialize attributes
-        final int as = p + data.attSize(p, k);
-        while(++p != as) {
-          attribute(data.name(p, Data.ATTR), data.text(p, false));
-        }
-        pars.set(l++, r);
-      }
-    }
-
-    // process remaining elements...
-    while(--l >= 0) closeElement();
-    if(doc) closeDoc();
-  }
-
-  /**
-   * Starts a result.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void openResult() throws IOException { }
-
-  /**
-   * Closes a result.
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public void closeResult() throws IOException { }
 
   /**
    * Closes the serializer.
@@ -327,6 +212,20 @@ public abstract class Serializer {
   }
 
   /**
+   * Starts a result.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void openResult() throws IOException { }
+
+  /**
+   * Closes a result.
+   * @throws IOException I/O exception
+   */
+  @SuppressWarnings("unused")
+  protected void closeResult() throws IOException { }
+
+  /**
    * Opens a document.
    * @param n name
    * @throws IOException I/O exception
@@ -405,6 +304,97 @@ public abstract class Serializer {
   protected abstract void atomic(final Item i) throws IOException;
 
   // PRIVATE METHODS ==========================================================
+
+  /**
+   * Serializes a node of the specified data reference.
+   * @param node database node
+   * @throws IOException I/O exception
+   */
+  private void node(final DBNode node) throws IOException {
+    final FTPosData ft = node instanceof FTPosNode ? ((FTPosNode) node).ft : null;
+    final Data data = node.data;
+
+    boolean doc = false;
+    final TokenList nsp = data.nspaces.size() != 0 ? new TokenList() : null;
+    final IntList pars = new IntList();
+    int l = 0;
+    int p = node.pre;
+
+    // loop through all table entries
+    final int s = p + data.size(p, data.kind(p));
+    while(p < s && !finished()) {
+      final int k = data.kind(p);
+      final int r = data.parent(p, k);
+
+      // close opened elements...
+      while(l > 0 && pars.get(l - 1) >= r) {
+        closeElement();
+        --l;
+      }
+
+      if(k == Data.DOC) {
+        if(doc) closeDoc();
+        openDoc(data.text(p++, true));
+        doc = true;
+      } else if(k == Data.TEXT) {
+        final FTPos ftd = ft != null ? ft.get(data, p) : null;
+        if(ftd != null) text(data.text(p++, true), ftd);
+        else text(data.text(p++, true));
+      } else if(k == Data.COMM) {
+        comment(data.text(p++, true));
+      } else if(k == Data.ATTR) {
+        attribute(data.name(p, k), data.text(p++, false));
+      } else if(k == Data.PI) {
+        pi(data.name(p, k), data.atom(p++));
+      } else {
+        // add element node
+        final byte[] name = data.name(p, k);
+        startElement(name);
+
+        // add namespace definitions
+        if(nsp != null) {
+          // add namespaces from database
+          nsp.reset();
+          int pp = p;
+
+          // check namespace of current element
+          byte[] key = prefix(name);
+          byte[] val = data.nspaces.uri(data.uri(p, k));
+          if(val == null) val = EMPTY;
+          // add new or updated namespace
+          final byte[] old = ns(key);
+          if(old == null || !eq(old, val)) namespace(key, val);
+
+          do {
+            final Atts atn = data.ns(pp);
+            for(int n = 0; n < atn.size(); ++n) {
+              key = atn.name(n);
+              val = atn.string(n);
+              if(!nsp.contains(key)) {
+                nsp.add(key);
+                namespace(key, val);
+              }
+            }
+            // check ancestors only on top level
+            if(level != 0 || l != 0) break;
+
+            pp = data.parent(pp, data.kind(pp));
+          } while(pp >= 0 && data.kind(pp) == Data.ELEM);
+        }
+
+        // serialize attributes
+        final int as = p + data.attSize(p, k);
+        while(++p != as) {
+          attribute(data.name(p, Data.ATTR), data.text(p, false));
+        }
+        pars.set(l++, r);
+      }
+    }
+
+    // process remaining elements...
+    while(--l >= 0) closeElement();
+    if(doc) closeDoc();
+  }
 
   /**
    * Gets the URI currently bound by the given prefix.

@@ -10,6 +10,7 @@ import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
+import org.basex.query.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -94,7 +95,7 @@ public final class Export extends Command {
         // serialize file
         final PrintOutput po = new PrintOutput(unique(exported, f.path()));
         final Serializer ser = Serializer.get(po, sp);
-        ser.node(data, pre);
+        ser.serialize(new DBNode(data, pre));
         ser.close();
         po.close();
       }

@@ -210,14 +210,12 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Serializes the item. This method is deprecated since Version 7.2.1;
-   * please use {@link Serializer#item(Item)} instead.
+   * Serializes the item. This method calls {@link Serializer#serialize(Item)}.
    * @param ser serializer
    * @throws IOException I/O exception
    */
-  @Deprecated
   public final void serialize(final Serializer ser) throws IOException {
-    ser.item(this);
+    ser.serialize(this);
   }
 
   /**

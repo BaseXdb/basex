@@ -17,6 +17,7 @@ import javax.xml.crypto.dsig.spec.*;
 import javax.xml.parsers.*;
 import javax.xml.xpath.*;
 
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
@@ -361,11 +362,11 @@ public final class DigitalSignature {
    * @throws IOException exception
    */
   private static byte[] nodeToBytes(final ANode n) throws IOException {
-    final ByteArrayOutputStream b = new ByteArrayOutputStream();
-    final Serializer s = Serializer.get(b, new SerializerProp("format=no"));
-    s.item(n);
-    s.close();
-    return b.toByteArray();
+    final ArrayOutput ao = new ArrayOutput();
+    final Serializer ser = Serializer.get(ao, new SerializerProp("format=no"));
+    ser.serialize(n);
+    ser.close();
+    return ao.toArray();
   }
 
   /**
@@ -381,7 +382,6 @@ public final class DigitalSignature {
 
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     dbf.setNamespaceAware(true);
-    return dbf.newDocumentBuilder().parse(
-        new ByteArrayInputStream(nodeToBytes(n)));
+    return dbf.newDocumentBuilder().parse(new ByteArrayInputStream(nodeToBytes(n)));
   }
 }
