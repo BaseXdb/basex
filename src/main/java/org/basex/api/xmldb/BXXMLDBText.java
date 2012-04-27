@@ -11,10 +11,12 @@ import static org.basex.core.Text.*;
 interface BXXMLDBText {
   /** DB URI. */
   String DBURI = NAMELC + "://";
+  /** XMLDB Prefix. */
+  String XMLDB = "xmldb";
+  /** XMLDB with colon. */
+  String XMLDBC = XMLDB + ':';
   /** XMLDB URI. */
-  String XMLDB = "xmldb:";
-  /** XMLDB URI. */
-  String XMLDBURI = XMLDB + DBURI;
+  String XMLDBURI = XMLDBC + DBURI;
   /** Conformance level of the implementation. */
   String CONFORMANCE_LEVEL = "0";
 

@@ -68,9 +68,7 @@ public class BXFolder extends BXAbstractResource implements FolderResource,
   }
 
   @Override
-  public BXFolder createCollection(final String folder)
-      throws BadRequestException {
-
+  public BXFolder createCollection(final String folder) throws BadRequestException {
     return new BXCode<BXFolder>(this) {
       @Override
       public BXFolder get() throws IOException {

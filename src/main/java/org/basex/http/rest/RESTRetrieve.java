@@ -13,6 +13,7 @@ import org.basex.core.cmd.Set;
 import org.basex.data.*;
 import org.basex.http.*;
 import org.basex.io.serial.*;
+import org.basex.query.item.*;
 import org.basex.server.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
@@ -47,10 +48,11 @@ final class RESTRetrieve extends RESTQuery {
       final SerializerProp sprop = new SerializerProp(http.serialization);
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
       http.initResponse(sprop);
-      ser.openElement(DATABASES, RESOURCES, token(table.contents.size()));
-      ser.namespace(REST, RESTURI);
-      list(table, ser, DATABASE, 1);
-      ser.closeElement();
+
+      final FElem el = new FElem(DATABASES, new Atts(REST, RESTURI));
+      el.add(new FAttr(RESOURCES, token(table.contents.size())));
+      list(table, el, DATABASE, 1);
+      ser.item(el);
       ser.close();
     } else if(!exists(http)) {
       // list database resources
@@ -62,11 +64,11 @@ final class RESTRetrieve extends RESTQuery {
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sprop);
       http.initResponse(sprop);
 
-      ser.openElement(DATABASE, DataText.T_NAME, token(http.db()),
-        RESOURCES, token(table.contents.size()));
-      ser.namespace(REST, RESTURI);
-      list(table, ser, RESOURCE, 0);
-      ser.closeElement();
+      final FElem el = new FElem(DATABASE, new Atts(REST, RESTURI));
+      el.add(new FAttr(DataText.T_NAME, token(http.db())));
+      el.add(new FAttr(RESOURCES, token(table.contents.size())));
+      list(table, el, RESOURCE, 0);
+      ser.item(el);
       ser.close();
     } else if(isRaw(http)) {
       // retrieve raw file; prefix user parameters with media type
@@ -86,22 +88,21 @@ final class RESTRetrieve extends RESTQuery {
   /**
    * Lists the table contents.
    * @param table table reference
-   * @param ser serializer
+   * @param root root node
    * @param header table header
    * @param skip number of columns to skip
-   * @throws IOException I/O exceptions
    */
-  private static void list(final Table table, final Serializer ser,
-      final byte[] header, final int skip) throws IOException {
+  private static void list(final Table table, final FElem root,
+      final byte[] header, final int skip) {
 
     for(final TokenList l : table.contents) {
-      ser.openElement(header);
+      final FElem el = new FElem(header);
       // don't show last attribute (input path)
       for(int i = 1; i < l.size() - skip; i++) {
-        ser.attribute(lc(table.header.get(i)), l.get(i));
+        el.add(new FAttr(lc(table.header.get(i)), l.get(i)));
       }
-      ser.text(l.get(0));
-      ser.closeElement();
+      el.add(new FTxt(l.get(0)));
+      root.add(el);
     }
   }
 }

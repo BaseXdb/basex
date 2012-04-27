@@ -85,6 +85,7 @@ public class ResourceSetTest extends XMLDBBaseTest {
     final ResourceSet set = serv.query("1");
     final Resource res = set.getMembersAsResource();
     assertNull("No ID expected.", res.getId());
+    assertEquals("Wrong result.", "<xmldb>1</xmldb>", res.getContent());
     assertSame("Wrong collection reference.", res.getParentCollection(), coll);
   }
 

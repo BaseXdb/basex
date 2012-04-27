@@ -13,7 +13,6 @@ import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
@@ -91,10 +90,7 @@ public class RESTPost extends RESTCode {
       for(final Item it : qp.value()) {
         if(item != null) HTTPErr.MULTIPLE_CONTEXT_X.thrw();
         // create main memory instance of the specified node
-        final Item n = DataBuilder.stripNS((ANode) it, RESTURI, ctx);
-        final ArrayOutput ao = new ArrayOutput();
-        n.serialize(Serializer.get(ao));
-        item = ao.toArray();
+        item = DataBuilder.stripNS((ANode) it, RESTURI, ctx).serialize().toArray();
       }
 
       // handle request

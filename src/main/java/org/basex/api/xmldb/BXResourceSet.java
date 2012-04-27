@@ -1,11 +1,8 @@
 package org.basex.api.xmldb;
 
-import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.xmldb.api.base.*;
 import org.xmldb.api.base.Collection;
@@ -57,18 +54,11 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
 
   @Override
   public Resource getMembersAsResource() throws XMLDBException {
-    final ArrayOutput ao = new ArrayOutput();
-    try {
-      final Serializer ser = Serializer.get(ao);
-      for(final Resource r : getIterator()) {
-        ser.openResult();
-        ser.text(Token.token(r.getContent().toString()));
-        ser.closeResult();
-      }
-    } catch(final IOException ex) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
+    final TokenBuilder tb = new TokenBuilder().add('<').add(XMLDB).add('>');
+    for(final Resource r : getIterator()) {
+      tb.add(r.getContent().toString());
     }
-    return new BXXMLResource(ao.toArray(), coll);
+    return new BXXMLResource(tb.add('<').add('/').add(XMLDB).add('>').finish(), coll);
   }
 
   @Override

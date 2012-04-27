@@ -798,7 +798,7 @@ public class HTTPClientTest extends HTTPTest {
    * @param itemsCount expected number of items
    * @throws QueryException query exception
    */
-  private static void checkResponse(final Result r, final int expStatus,
+  static void checkResponse(final Result r, final int expStatus,
       final int itemsCount) throws QueryException {
 
     assertTrue(r instanceof Iter);

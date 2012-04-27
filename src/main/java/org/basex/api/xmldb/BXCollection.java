@@ -64,9 +64,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   @Override
-  public Service getService(final String nm, final String ver)
-      throws XMLDBException {
-
+  public Service getService(final String nm, final String ver) throws XMLDBException {
     check();
     if(ver.equals("1.0")) {
       if(Token.eq(nm, BXQueryService.XPATH, BXQueryService.XQUERY))
@@ -84,8 +82,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   @Override
-  public Collection getChildCollection(final String name)
-      throws XMLDBException {
+  public Collection getChildCollection(final String name) throws XMLDBException {
     check();
     return null;
   }
@@ -233,8 +230,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   @Override
-  public void setProperty(final String key, final String val)
-      throws XMLDBException {
+  public void setProperty(final String key, final String val) throws XMLDBException {
     check();
     try {
       final MetaData md = ctx.data().meta;
@@ -281,9 +277,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
    * @return xml resource
    * @throws XMLDBException exception
    */
-  private static BXXMLResource checkXML(final Resource res)
-      throws XMLDBException {
-
+  private static BXXMLResource checkXML(final Resource res) throws XMLDBException {
     if(!(res instanceof BXXMLResource)) {
       throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_UNKNOWN + res);
     }

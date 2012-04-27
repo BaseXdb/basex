@@ -192,7 +192,7 @@ final class RestXqFunction {
     }
 
     // bind query parameters
-    Map<String, String[]> params = http.params();
+    final Map<String, String[]> params = http.params();
     for(final RestXqParam rxp : queryParams) bind(rxp, params.get(rxp.key));
 
     // bind form parameters
@@ -200,9 +200,7 @@ final class RestXqFunction {
       if(MimeTypes.APP_FORM.equals(ct)) {
         // convert parameters encoded in a form
         body = cache(http, body);
-        for(final Map.Entry<String, String[]> e : convert(body.toString()).entrySet()) {
-          params.put(e.getKey(), e.getValue());
-        }
+        addParams(body.toString(), params);
       }
       for(final RestXqParam rxp : formParams) bind(rxp, params.get(rxp.key));
     }
@@ -437,21 +435,19 @@ final class RestXqFunction {
   }
 
   /**
-   * Converts the passed on request body to query parameters.
+   * Adds parameters from the passed on request body.
    * @param body request body
-   * @return map
+   * @param params map parameters
    */
-  private static Map<String, String[]> convert(final String body) {
-    final Map<String, String[]> map = new HashMap<String, String[]>();
+  private static void addParams(final String body, final Map<String, String[]> params) {
     for(final String nv : body.split("&")) {
       final String[] parts = nv.split("=", 2);
       if(parts.length < 2) continue;
       try {
-        map.put(parts[0], new String[] { URLDecoder.decode(parts[1], Token.UTF8) });
+        params.put(parts[0], new String[] { URLDecoder.decode(parts[1], Token.UTF8) });
       } catch(final Exception ex) {
         Util.notexpected(ex);
       }
     }
-    return map;
   }
 }

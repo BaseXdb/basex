@@ -44,9 +44,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   }
 
   @Override
-  public void setNamespace(final String pre, final String uri)
-      throws XMLDBException {
-
+  public void setNamespace(final String pre, final String uri) throws XMLDBException {
     if(uri != null && !uri.isEmpty()) ns.put(pre == null ? "" : pre, uri);
     else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + pre);
   }
@@ -102,8 +100,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
   }
 
   @Override
-  public void setProperty(final String nm, final String value)
-      throws XMLDBException {
+  public void setProperty(final String nm, final String value) throws XMLDBException {
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + nm);
   }
 

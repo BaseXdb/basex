@@ -73,7 +73,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
   private String getCollectionName(final String uri) throws XMLDBException {
     // try to extract name of collection; otherwise, throw exception
     if(uri != null) {
-      final String main = uri.startsWith(XMLDB) ? uri : XMLDB + uri;
+      final String main = uri.startsWith(XMLDBC) ? uri : XMLDBC + uri;
       if(main.startsWith(XMLDBURI)) {
         final String host = main.substring(XMLDBURI.length());
         final String lh = "localhost:" +

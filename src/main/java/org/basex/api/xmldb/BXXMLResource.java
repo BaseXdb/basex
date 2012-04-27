@@ -3,23 +3,22 @@ package org.basex.api.xmldb;
 import static org.basex.util.Token.*;
 
 import java.io.*;
-import java.util.*;
-import java.util.Map.Entry;
 
 import javax.xml.parsers.*;
 
 import org.basex.api.dom.*;
+import org.basex.build.*;
+import org.basex.build.Parser;
+import org.basex.build.xml.*;
+import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.io.serial.*;
 import org.basex.query.item.*;
-import org.basex.util.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
-import org.xml.sax.helpers.*;
 import org.xmldb.api.base.*;
-import org.xmldb.api.base.Collection;
 import org.xmldb.api.modules.*;
 
 /**
@@ -101,7 +100,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         final ArrayOutput ao = new ArrayOutput();
         final Serializer ser = Serializer.get(ao);
         if(data != null) {
-          new DBNode(data, pre).serialize(ser);
+          ser.node(data, pre);
         } else if(result != null) {
           result.serialize(ser, pre);
         } else {
@@ -168,9 +167,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   }
 
   @Override
-  public void getContentAsSAX(final ContentHandler handler)
-      throws XMLDBException {
-
+  public void getContentAsSAX(final ContentHandler handler) throws XMLDBException {
     if(handler == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
 
     final SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -188,101 +185,34 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   @Override
   public ContentHandler setContentAsSAX() throws XMLDBException {
-    try {
-      // ..might be replaced by a custom SAX content handler in future
-      return new BXSAXContentHandler(this);
-    } catch(final IOException ex) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
-    }
+    // ..might be replaced by a custom SAX content handler in future
+    final MemBuilder mb = new MemBuilder("", Parser.emptyParser(new Prop()));
+    mb.init();
+    return new BXSAXContentHandler(this, mb);
   }
 
   /** SAX parser. */
-  private static final class BXSAXContentHandler extends DefaultHandler {
-    /** HashMap. */
-    private final HashMap<String, String> ns = new HashMap<String, String>();
-    /** Cached output. */
-    private final ArrayOutput out = new ArrayOutput();
-    /** Serializer. */
-    private final Serializer ser;
+  private static final class BXSAXContentHandler extends SAXHandler {
     /** XMLResource. */
     private final BXXMLResource res;
 
     /**
      * Default constructor.
+     * @param mb memory builder
      * @param r resource
-     * @throws IOException I/O exception
      */
-    BXSAXContentHandler(final BXXMLResource r) throws IOException {
-      ser = Serializer.get(out);
+    BXSAXContentHandler(final BXXMLResource r, final MemBuilder mb) {
+      super(mb, false);
       res = r;
     }
 
     @Override
-    public void characters(final char[] ac, final int i, final int j)
-        throws SAXException {
+    public void endDocument() throws SAXException {
       try {
-        final TokenBuilder tb = new TokenBuilder();
-        for(int k = 0; k < j; ++k) tb.add(ac[i + k]);
-        ser.text(tb.finish());
+        res.content = new DBNode(((MemBuilder) builder).data).serialize().toArray();
       } catch(final IOException ex) {
-        throw new SAXException(ex);
+        error(ex);
       }
-    }
-
-    @Override
-    public void endDocument() {
-      res.content = out.toArray();
-    }
-
-    @Override
-    public void endElement(final String s, final String s1, final String s2)
-        throws SAXException {
-      try {
-        ser.closeElement();
-      } catch(final IOException ex) {
-        throw new SAXException(ex);
-      }
-    }
-
-    @Override
-    public void ignorableWhitespace(final char[] ac, final int i, final int j)
-        throws SAXException {
-      characters(ac, i, j);
-    }
-
-    @Override
-    public void processingInstruction(final String s, final String s1)
-        throws SAXException {
-      try {
-        ser.pi(token(s), s1 != null ? token(s1) : EMPTY);
-      } catch(final IOException ex)  {
-        throw new SAXException(ex);
-      }
-    }
-
-    @Override
-    public void startElement(final String s, final String s1, final String s2,
-        final Attributes atts) throws SAXException {
-
-      try {
-        ser.openElement(token(s2));
-        for(int i = 0; i < atts.getLength(); ++i)
-          ser.attribute(token(atts.getQName(i)), token(atts.getValue(i)));
-        for(final Entry<String, String> e : ns.entrySet())
-          ser.attribute(concat(XMLNSC, token(e.getKey())), token(e.getValue()));
-      } catch(final IOException ex)  {
-        throw new SAXException(ex);
-      }
-    }
-
-    @Override
-    public void startPrefixMapping(final String s, final String s1) {
-      ns.put(s, s1);
-    }
-
-    @Override
-    public void endPrefixMapping(final String s) {
-      ns.remove(s);
     }
   }
 }
