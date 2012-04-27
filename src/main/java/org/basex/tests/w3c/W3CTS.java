@@ -319,7 +319,7 @@ public abstract class W3CTS {
         final SerializerProp sp = new SerializerProp();
         sp.set(SerializerProp.S_INDENT, NO);
         final Serializer ser = Serializer.get(ao, sp);
-        for(Item it; (it = iter.next()) != null;) ser.item(it);
+        for(Item it; (it = iter.next()) != null;) ser.serialize(it);
         ser.close();
 
       } catch(final Exception ex) {
