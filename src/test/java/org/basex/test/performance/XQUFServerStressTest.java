@@ -74,9 +74,7 @@ public final class XQUFServerStressTest extends SandboxTest {
    * @param runs number of runs
    * @throws Exception exception
    */
-  private static void insert(final int clients, final int runs)
-      throws Exception {
-
+  private static void insert(final int clients, final int runs) throws Exception {
     final ClientSession s = createClient();
     s.execute(new CreateDB(NAME, "<doc/>"));
     s.close();
@@ -89,9 +87,7 @@ public final class XQUFServerStressTest extends SandboxTest {
    * @param runs number of runs
    * @throws Exception exception
    */
-  private static void delete(final int clients, final int runs)
-      throws Exception {
-
+  private static void delete(final int clients, final int runs) throws Exception {
     final ClientSession s = createClient();
     s.execute(new CreateDB(NAME, "<doc/>"));
     final int c = 100 + clients * clients;

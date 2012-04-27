@@ -2,8 +2,6 @@ package org.basex.tests.bxapi.xdm;
 
 import java.io.*;
 
-import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
 
@@ -50,11 +48,7 @@ final class XdmNode extends XdmItem {
   @Override
   public String toString() {
     try {
-      final ArrayOutput ao = new ArrayOutput();
-      final Serializer ser = Serializer.get(ao);
-      node.serialize(ser);
-      ser.close();
-      return ao.toString();
+      return node.serialize().toString();
     } catch(final IOException ex) {
       throw Util.notexpected(ex.getMessage());
     }

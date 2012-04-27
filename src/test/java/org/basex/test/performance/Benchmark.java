@@ -67,9 +67,7 @@ public abstract class Benchmark extends SandboxTest {
    * @param r runs the number for the specified number of time
    * @throws IOException I/O exception
    */
-  protected static void update(final int r, final String query)
-      throws IOException {
-
+  protected static void update(final int r, final String query) throws IOException {
     // loop through number of runs for a single query
     check();
     for(int rn = 0; rn < r; ++rn) session.execute(new XQuery(query));
