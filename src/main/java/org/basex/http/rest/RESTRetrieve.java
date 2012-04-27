@@ -52,7 +52,7 @@ final class RESTRetrieve extends RESTQuery {
       final FElem el = new FElem(DATABASES, new Atts(REST, RESTURI));
       el.add(new FAttr(RESOURCES, token(table.contents.size())));
       list(table, el, DATABASE, 1);
-      ser.item(el);
+      ser.serialize(el);
       ser.close();
     } else if(!exists(http)) {
       // list database resources
@@ -68,7 +68,7 @@ final class RESTRetrieve extends RESTQuery {
       el.add(new FAttr(DataText.T_NAME, token(http.db())));
       el.add(new FAttr(RESOURCES, token(table.contents.size())));
       list(table, el, RESOURCE, 0);
-      ser.item(el);
+      ser.serialize(el);
       ser.close();
     } else if(isRaw(http)) {
       // retrieve raw file; prefix user parameters with media type

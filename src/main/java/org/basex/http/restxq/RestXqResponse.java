@@ -88,7 +88,7 @@ final class RestXqResponse {
       http.initResponse(sp);
       final Serializer ser = Serializer.get(http.res.getOutputStream(), sp);
       for(int v = response != null ? 1 : 0; v < rs; v++) {
-        ser.item(result.itemAt(v));
+        ser.serialize(result.itemAt(v));
       }
       ser.close();
     } finally {

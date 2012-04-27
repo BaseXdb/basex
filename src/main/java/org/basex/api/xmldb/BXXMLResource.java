@@ -100,7 +100,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         final ArrayOutput ao = new ArrayOutput();
         final Serializer ser = Serializer.get(ao);
         if(data != null) {
-          ser.node(data, pre);
+          ser.serialize(new DBNode(data, pre));
         } else if(result != null) {
           result.serialize(ser, pre);
         } else {
