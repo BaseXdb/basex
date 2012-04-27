@@ -16,8 +16,7 @@ public final class BindVariables {
    * @param args (ignored) command-line arguments
    * @throws QueryException if an error occurs while evaluating the query
    */
-  public static void main(final String[] args)
-      throws QueryException {
+  public static void main(final String[] args) throws QueryException {
 
     /** Database context. */
     Context context = new Context();

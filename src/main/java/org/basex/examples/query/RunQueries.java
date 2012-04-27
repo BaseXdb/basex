@@ -27,8 +27,7 @@ public final class RunQueries {
    * @throws QueryException if an error occurs while evaluating the query
    * @throws BaseXException if a database command fails
    */
-  public static void main(final String[] args)
-      throws IOException, QueryException {
+  public static void main(final String[] args) throws IOException, QueryException {
 
     System.out.println("=== RunQueries ===");
 
@@ -156,7 +155,7 @@ public final class RunQueries {
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
     for(Item item; (item = iter.next()) != null;) {
-      item.serialize(ser);
+      ser.item(item);
     }
 
     // ------------------------------------------------------------------------

@@ -107,8 +107,7 @@ public final class ServerConcurrency {
    * @param cs client session reference
    * @throws IOException I/O exception
    */
-  static void send(final String cmd, final ClientSession cs)
-      throws IOException {
+  static void send(final String cmd, final ClientSession cs) throws IOException {
     // ------------------------------------------------------------------------
     // Execute the command
     cs.execute(cmd);

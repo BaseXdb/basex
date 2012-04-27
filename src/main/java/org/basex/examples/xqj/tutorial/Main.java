@@ -53,9 +53,7 @@ abstract class Main {
    * @param xqs sequence
    * @throws XQException query exception
    */
-  static void print(final String info, final XQSequence xqs)
-      throws XQException {
-
+  static void print(final String info, final XQSequence xqs) throws XQException {
     info(info);
     xqs.writeSequence(System.out, null);
     System.out.println();

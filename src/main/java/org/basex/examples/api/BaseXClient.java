@@ -451,8 +451,7 @@ public class BaseXClient {
      * @return resulting string
      * @throws IOException I/O exception
      */
-    private String exec(final int cmd, final String arg)
-        throws IOException {
+    private String exec(final int cmd, final String arg) throws IOException {
       out.write(cmd);
       send(arg);
       final String s = receive();
