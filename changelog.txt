@@ -3,6 +3,27 @@
  Welcome to the changelog. This file contains all code changes since
  BaseX 6.5:
 
+VERSION 7.2.1 (April 27, 2012) -----------------------------------------
+
+  - Our value indexes now support string-based range queries:
+    http://docs.basex.org/wiki/Indexes#Value_Indexes
+  - Our new XQJ API is based on Charles Foster's implementation.
+    It fully utilizes the client/server architecture:
+    http://xqj.net/basex
+  - Import of XQuery modules has been simplified:
+    http://docs.basex.org/wiki/Repository
+  - Better Java code integration:
+    http://docs.basex.org/wiki/Java_Bindings
+  - Full support for the XQuery 3.0 Regular Expressions syntax:
+    http://www.w3.org/TR/xpath-functions-30/#regex-syntax
+  - Updating functions can now return values:
+    http://docs.basex.org/wiki/Database_Module#db:output
+  - Unified handling of document and database URIs:
+    http://docs.basex.org/wiki/Databases#Access_Resources
+  - Pinning of opened database replaced by filesystem locking:
+    http://docs.basex.org/wiki/Transaction_Management#Locking
+  - REST, RESTXQ, WebDav: concurrency issues fixed
+
 VERSION 7.2 (March 24, 2012) -------------------------------------------
 
   - support for the new RESTXQ API for building XQuery web services
