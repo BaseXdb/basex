@@ -251,7 +251,6 @@ pi                   = PI
 pkg_deleted_%        = パッケージ '%' が削除されました。
 pkg_installed_%_%    = パッケージ '%' は % にインストールされました。
 pkg_replaced_%_%     = Package '%' replaced in %.
-docs_replaced_%_%    = % ドキュメントが % で置換されました。
 please_wait          = お待ち下さい
 plot                 = プロット
 port_twice_%         = ポート番号 '%' に対する指定が重複しています。
