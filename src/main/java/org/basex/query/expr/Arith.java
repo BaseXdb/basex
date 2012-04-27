@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
@@ -49,9 +46,7 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item a = expr[0].item(ctx, info);
     if(a == null) return null;
     final Item b = expr[1].item(ctx, info);
@@ -60,10 +55,8 @@ public final class Arith extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, OP, Token.token(calc.name));
-    for(final Expr e : expr) e.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(OP, calc.name), expr);
   }
 
   @Override

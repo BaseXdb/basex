@@ -1,9 +1,6 @@
 package org.basex.query.util;
 
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 
@@ -101,8 +98,8 @@ public final class VarContext extends ExprInfo {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    global.plan(ser);
+  public void plan(final FElem plan) {
+    global.plan(plan);
   }
 
   /**

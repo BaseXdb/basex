@@ -1,11 +1,6 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
-
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.util.*;
@@ -103,12 +98,5 @@ public final class DBNodeSeq extends Seq {
   @Override
   public boolean homogenous() {
     return false;
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
-    for(int v = 0; v != Math.min(size, 5); ++v) itemAt(v).plan(ser);
-    ser.closeElement();
   }
 }

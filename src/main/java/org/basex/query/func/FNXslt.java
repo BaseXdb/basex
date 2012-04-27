@@ -13,7 +13,6 @@ import javax.xml.transform.stream.*;
 
 import org.basex.io.*;
 import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -149,13 +148,7 @@ public final class FNXslt extends StandardFunc {
   private IO read(final Expr e, final QueryContext ctx) throws Exception {
     final Item it = checkNoEmpty(e.item(ctx, info));
     final Type ip = it.type;
-    if(ip.isNode()) {
-      final ArrayOutput ao = new ArrayOutput();
-      final Serializer ser = Serializer.get(ao);
-      it.serialize(ser);
-      ser.close();
-      return new IOContent(ao.toArray());
-    }
+    if(ip.isNode()) return new IOContent(it.serialize().toArray());
     if(ip.isString()) return IO.get(string(it.string(info)));
     throw STRNODTYPE.thrw(info, this, ip);
   }

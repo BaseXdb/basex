@@ -3,9 +3,6 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.util.*;
 
 /**
@@ -45,13 +42,8 @@ public final class FNames extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
-    ser.namespace(name, val);
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name, VAL, val);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, name, VAL, val));
   }
 
   @Override

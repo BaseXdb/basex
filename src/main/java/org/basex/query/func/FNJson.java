@@ -31,8 +31,7 @@ public final class FNJson extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _JSON_PARSE:
         return new JSONConverter(info).parse(checkStr(expr[0], ctx));
@@ -54,9 +53,7 @@ public final class FNJson extends StandardFunc {
    * @return serialized document
    * @throws QueryException query exception
    */
-  private Str serialize(final boolean ml, final QueryContext ctx)
-      throws QueryException {
-
+  private Str serialize(final boolean ml, final QueryContext ctx) throws QueryException {
     final ANode node = checkNode(checkItem(expr[0], ctx));
     final ArrayOutput ao = new ArrayOutput();
     try {
@@ -64,7 +61,7 @@ public final class FNJson extends StandardFunc {
       final SerializerProp props = ctx.serParams(false);
       final Serializer json = ml ? new JsonMLSerializer(ao, props) :
           new JSONSerializer(ao, props);
-      node.serialize(json);
+      json.item(node);
       json.close();
     } catch(final SerializerException ex) {
       throw ex.getCause(info);

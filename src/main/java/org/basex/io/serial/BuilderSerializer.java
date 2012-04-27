@@ -43,19 +43,19 @@ public class BuilderSerializer extends Serializer {
   }
 
   @Override
-  public final void finishAtomic(final Item b) throws IOException {
+  public final void atomic(final Item b) throws IOException {
     Util.notexpected();
   }
 
   @Override
   protected final void finishOpen() throws IOException {
-    build.startElem(tag, att);
+    build.startElem(elem, att);
     att.reset();
   }
 
   @Override
   protected void finishEmpty() throws IOException {
-    build.emptyElem(tag, att);
+    build.emptyElem(elem, att);
     att.reset();
   }
 

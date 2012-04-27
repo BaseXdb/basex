@@ -2,9 +2,6 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -27,15 +24,13 @@ public final class FTExtensionSelection extends FTExpr {
    * @param prag pragmas
    * @param e enclosed FTSelection
    */
-  public FTExtensionSelection(final InputInfo ii, final Pragma[] prag,
-      final FTExpr e) {
+  public FTExtensionSelection(final InputInfo ii, final Pragma[] prag, final FTExpr e) {
     super(ii, e);
     pragmas = prag;
   }
 
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return expr[0].item(ctx, info);
   }
 
@@ -45,11 +40,8 @@ public final class FTExtensionSelection extends FTExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(final Pragma e : pragmas) e.plan(ser);
-    expr[0].plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), pragmas, expr);
   }
 
   @Override

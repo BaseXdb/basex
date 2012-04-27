@@ -43,8 +43,7 @@ public final class FNMap extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _MAP_NEW:       return newMap(ctx, ii);
       case _MAP_ENTRY:     return entry(ctx, ii);
@@ -63,8 +62,7 @@ public final class FNMap extends StandardFunc {
    * @return new map with key removed from it
    * @throws QueryException query exception
    */
-  private Map remove(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private Map remove(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return map(ctx).delete(expr[1].item(ctx, ii), ii);
   }
 
@@ -75,8 +73,7 @@ public final class FNMap extends StandardFunc {
    * @return the singleton map
    * @throws QueryException query exception
    */
-  private Map entry(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private Map entry(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return Map.EMPTY.insert(expr[0].item(ctx, ii), ctx.value(expr[1]), ii);
   }
 
@@ -87,8 +84,7 @@ public final class FNMap extends StandardFunc {
    * @return new map
    * @throws QueryException query exception
    */
-  private Map newMap(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private Map newMap(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(expr.length == 0) return Map.EMPTY;
     if(expr.length == 2) checkColl(expr[1], ctx);
 
@@ -116,8 +112,7 @@ public final class FNMap extends StandardFunc {
    * @return result of check
    * @throws QueryException query exception
    */
-  private Bln contains(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  private Bln contains(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return map(ctx).contains(expr[1].item(ctx, ii), ii);
   }
 

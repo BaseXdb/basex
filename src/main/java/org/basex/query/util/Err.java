@@ -919,8 +919,7 @@ public enum Err {
    * @return serializer exception (indicates that an error is raised)
    * @throws SerializerException serializer exception
    */
-  public SerializerException thrwSerial(final Object... ext)
-      throws SerializerException {
+  public SerializerException thrwSerial(final Object... ext) throws SerializerException {
     throw new SerializerException(new QueryException(null, this, ext));
   }
 

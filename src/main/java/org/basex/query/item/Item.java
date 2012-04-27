@@ -210,13 +210,14 @@ public abstract class Item extends Value {
   }
 
   /**
-   * Serializes the item.
+   * Serializes the item. This method is deprecated since Version 7.2.1;
+   * please use {@link Serializer#item(Item)} instead.
    * @param ser serializer
    * @throws IOException I/O exception
    */
-  public void serialize(final Serializer ser) throws IOException {
-    // this method is overwritten by some data types
-    ser.atomic(this);
+  @Deprecated
+  public final void serialize(final Serializer ser) throws IOException {
+    ser.item(this);
   }
 
   /**
@@ -245,9 +246,9 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
+  public void plan(final FElem plan) {
     try {
-      ser.emptyElement(ITM, VAL, string(null), TYP, Token.token(info()));
+      addPlan(plan, planElem(VAL, string(null), TYP, type));
     } catch(final QueryException ex) {
       // only function items throw exceptions in atomization, and they should
       // override plan(Serializer) sensibly

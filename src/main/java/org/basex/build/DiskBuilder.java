@@ -73,9 +73,10 @@ public final class DiskBuilder extends Builder {
     vout = new DataOutput(md.dbfile(DATAATV), bs);
     sout = new DataOutput(md.dbfile(DATATMP), bs);
 
-    final Names tags = new Names(md);
-    final Names atts = new Names(md);
-    parse(md, tags, atts);
+    meta = md;
+    tags = new Names(md);
+    atts = new Names(md);
+    parse();
     close();
 
     // copy temporary values into database table
@@ -172,9 +173,7 @@ public final class DiskBuilder extends Builder {
    * @return inline value or text position
    * @throws IOException I/O exception
    */
-  private long textOff(final byte[] value, final boolean text)
-      throws IOException {
-
+  private long textOff(final byte[] value, final boolean text) throws IOException {
     // inline integer values...
     final long v = Token.toSimpleInt(value);
     if(v != Integer.MIN_VALUE) return v | IO.OFFNUM;

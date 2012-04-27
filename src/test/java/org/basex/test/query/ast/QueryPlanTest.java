@@ -3,12 +3,6 @@ package org.basex.test.query.ast;
 import static org.basex.core.Prop.*;
 import static org.junit.Assert.*;
 
-import java.io.*;
-
-import org.basex.build.*;
-import org.basex.core.cmd.*;
-import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.test.query.*;
@@ -31,29 +25,17 @@ public abstract class QueryPlanTest extends AdvancedQueryTest {
 
     final QueryProcessor qp = new QueryProcessor(qu, context);
     try {
-      // parse compiled query plan
+      // parse and compile query plan
       qp.compile();
-      final Data plan = CreateDB.mainMem(new Parser("", context.prop) {
-        @Override
-        public void parse(final Builder build) throws IOException {
-          build.startDoc(QueryText.PLAN);
-          qp.plan(new BuilderSerializer(build));
-          build.endDoc();
-        }
-      }, context);
-
+      // retrieve compiled query plan
+      final FDoc plan = qp.plan();
       // compare results
-      if(res != null) {
-        assertEquals(res, qp.execute().toString());
-      }
+      if(res != null) assertEquals(res, qp.execute().toString());
 
-      final Nodes in = new Nodes(0, plan);
       for(final String p : pr) {
-        QueryProcessor query = new QueryProcessor(p, context).context(in);
-        if(query.value() != Bln.TRUE) {
-          query = new QueryProcessor("/*", context).context(in);
+        if(new QueryProcessor(p, context).context(plan).value() != Bln.TRUE) {
           fail(NL + "- Query: " + qu + NL + "- Check: " + p + NL +
-              "- Plan: " + query.execute().toString());
+              "- Plan: " + plan.serialize());
         }
       }
     } catch(final Exception ex) {

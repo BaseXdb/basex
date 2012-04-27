@@ -39,7 +39,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException {
     // don't append value for boolean attributes
-    final byte[] tagatt = concat(lc(tag), COLON, lc(n));
+    final byte[] tagatt = concat(lc(elem), COLON, lc(n));
     if(BOOLEAN.contains(tagatt) && eq(n, v)) return;
     // escape URI attributes
     final byte[] val = escape && URIS.contains(tagatt) ? escape(v) : v;
@@ -98,7 +98,7 @@ public class HTMLSerializer extends OutputSerializer {
     print(t);
     sep = indent;
     script = SCRIPTS.contains(lc(t));
-    if(content && eq(lc(tag), HEAD)) ct++;
+    if(content && eq(lc(elem), HEAD)) ct++;
   }
 
   @Override
@@ -111,7 +111,7 @@ public class HTMLSerializer extends OutputSerializer {
   protected void finishEmpty() throws IOException {
     if(ct(true, true)) return;
     print(ELEM_C);
-    if(EMPTIES.contains(lc(tag))) return;
+    if(EMPTIES.contains(lc(elem))) return;
     sep = false;
     finishClose();
   }
@@ -119,7 +119,7 @@ public class HTMLSerializer extends OutputSerializer {
   @Override
   protected void finishClose() throws IOException {
     super.finishClose();
-    script = script && !SCRIPTS.contains(lc(tag));
+    script = script && !SCRIPTS.contains(lc(elem));
   }
 
   // HTML Serializer: cache elements

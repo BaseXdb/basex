@@ -69,9 +69,7 @@ public final class FNSimple extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Expr e = expr.length == 1 ? expr[0] : null;
     switch(sig) {
       case FALSE:

@@ -185,8 +185,7 @@ public final class GUIMacOSX {
    * @return return value of the method
    * @throws Exception if any error occurs.
    */
-  static Object invoke(final Object obj, final String method)
-      throws Exception {
+  static Object invoke(final Object obj, final String method) throws Exception {
     return invoke(obj.getClass(), obj, method, EC, EO);
   }
 

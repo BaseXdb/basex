@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -30,8 +27,7 @@ public abstract class CName extends CFrag {
    * @param n name
    * @param v attribute values
    */
-  CName(final String d, final InputInfo ii, final Expr n,
-        final Expr... v) {
+  CName(final String d, final InputInfo ii, final Expr n, final Expr... v) {
     super(ii, v);
     name = n;
     desc = d;
@@ -51,9 +47,7 @@ public abstract class CName extends CFrag {
    * @return resulting value
    * @throws QueryException query exception
    */
-  final byte[] value(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  final byte[] value(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) {
       final Iter ir = ctx.iter(e);
@@ -74,9 +68,7 @@ public abstract class CName extends CFrag {
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  final QNm qname(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = checkItem(name, ctx);
     final Type ip = it.type;
     if(ip == AtomType.QNM) return (QNm) it;
@@ -109,11 +101,8 @@ public abstract class CName extends CFrag {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    name.plan(ser);
-    for(final Expr e : expr) e.plan(ser);
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(), name, expr);
   }
 
   @Override

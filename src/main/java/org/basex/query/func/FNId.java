@@ -44,8 +44,7 @@ public final class FNId extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = checkNoEmpty((expr.length == 2 ? expr[1] :
       checkCtx(ctx)).item(ctx, info));

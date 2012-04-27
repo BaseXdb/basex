@@ -25,9 +25,7 @@ public final class CTxt extends CFrag {
   }
 
   @Override
-  public FTxt item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public FTxt item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
     Item it = iter.next();
     if(it == null) return null;

@@ -297,23 +297,41 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds the string representation of an object to the token:
+   * Adds the string representation of an object:
    * <ul>
-   * <li> If extensions are specified, all characters {@code "%"} in the object
-   *      string are replaced by the specified extensions.</li>
-   * <li> Extensions can either be tokens (byte arrays) or any other objects,
-   *      which will be represented as strings.</li>
-   * <li> If a digit is found after the character {@code "%"}, it is interpreted
-   *      as insertion position.</li>
+   * <li> objects of type {@link Throwable} are converted to a string representation
+   *      via {@link Util#message}.</li>
+   * <li> objects of type {@link Class} are converted via {@link Util#name(Class)}.</li>
+   * <li> {@code null} references are replaced by the string {@code "null"}.</li>
+   * <li> byte arrays are directly inserted as tokens.</li>
+   * <li> for all other typed, {@link Object#toString} is called.</li>
    * </ul>
+   * The specified string may contain {@code "%"} characters as place holders.
+   * All place holders will be replaced by the specified extensions. If a digit is
+   * specified after the place holder character, it will be interpreted as insertion
+   * position.
+   *
    * @param str string to be extended
    * @param ext optional extensions
    * @return self reference
    */
   public TokenBuilder addExt(final Object str, final Object... ext) {
-    final byte[] t = str instanceof byte[] ? (byte[]) str :
-      token(str instanceof Throwable ? Util.message((Throwable) str) :
-          str == null ? "null" : str.toString());
+    final byte[] t;
+    if(str instanceof byte[]) {
+      t = (byte[]) str;
+    } else {
+      final String s;
+      if(str == null) {
+        s = "null";
+      } else if(str instanceof Throwable) {
+        s = Util.message((Throwable) str);
+      } else if(str instanceof Class<?>) {
+        s = Util.name((Class<?>) str);
+      } else {
+        s = str.toString();
+      }
+      t = token(s);
+    }
 
     for(int i = 0, e = 0; i < t.length; ++i) {
       if(t[i] != '%' || e == ext.length) {
@@ -324,8 +342,7 @@ public final class TokenBuilder {
         if(d) ++i;
         final int n = d ? c - '1' : e++;
         final Object o = n < ext.length ? ext[n] : null;
-        addExt(o instanceof byte[] ? (byte[]) o :
-          o == null ? null : o.toString());
+        addExt(o);
       }
     }
     return this;

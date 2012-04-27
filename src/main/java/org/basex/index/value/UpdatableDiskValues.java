@@ -25,8 +25,7 @@ public final class UpdatableDiskValues extends DiskValues {
    * @param txt value type (texts/attributes)
    * @throws IOException I/O Exception
    */
-  public UpdatableDiskValues(final Data d, final boolean txt)
-      throws IOException {
+  public UpdatableDiskValues(final Data d, final boolean txt) throws IOException {
     this(d, txt, txt ? DATATXT : DATAATV);
   }
 

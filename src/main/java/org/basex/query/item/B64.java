@@ -53,8 +53,7 @@ public class B64 extends Bin {
   }
 
   @Override
-  public boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
     return Token.eq(val(ii), it instanceof Bin ? ((Bin) it).val(ii) :
       decode(it.string(ii), ii));
   }
@@ -66,8 +65,7 @@ public class B64 extends Bin {
    * @return decoded string
    * @throws QueryException query exception
    */
-  private static byte[] decode(final byte[] d, final InputInfo ii)
-      throws QueryException {
+  private static byte[] decode(final byte[] d, final InputInfo ii) throws QueryException {
     try {
       return Base64.decode(d);
     } catch(final IllegalArgumentException ex) {

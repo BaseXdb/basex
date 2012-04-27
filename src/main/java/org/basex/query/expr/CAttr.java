@@ -27,16 +27,13 @@ public final class CAttr extends CName {
    * @param n name
    * @param v attribute values
    */
-  public CAttr(final InputInfo ii, final boolean c, final Expr n,
-      final Expr... v) {
+  public CAttr(final InputInfo ii, final boolean c, final Expr n, final Expr... v) {
     super(ATTRIBUTE, ii, n, v);
     comp = c;
   }
 
   @Override
-  public FAttr item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public FAttr item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     QNm nm = qname(ctx, ii);
     final byte[] cp = nm.prefix();
     if(comp) {

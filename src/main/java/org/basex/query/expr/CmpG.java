@@ -3,11 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
@@ -182,9 +179,7 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // atomic evaluation of arguments (faster)
     if(atomic) {
       final Item it1 = expr[0].item(ctx, info);
@@ -355,10 +350,8 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, OP, Token.token(op.name));
-    for(final Expr e : expr) e.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(OP, op.name), expr);
   }
 
   @Override

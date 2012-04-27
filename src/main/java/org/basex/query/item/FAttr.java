@@ -3,9 +3,6 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 import org.w3c.dom.*;
@@ -19,6 +16,15 @@ import org.w3c.dom.*;
 public final class FAttr extends FNode {
   /** Attribute name. */
   private final QNm name;
+
+  /**
+   * Convenience constructor.
+   * @param n name
+   * @param v value
+   */
+  public FAttr(final byte[] n, final byte[] v) {
+    this(new QNm(n), v);
+  }
 
   /**
    * Default constructor.
@@ -56,13 +62,8 @@ public final class FAttr extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
-    ser.attribute(name.string(), val);
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.string(), VAL, val);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, name.string(), VAL, val));
   }
 
   @Override

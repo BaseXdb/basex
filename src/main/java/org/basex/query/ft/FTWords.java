@@ -3,11 +3,8 @@ package org.basex.query.ft;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.ft.FTFlag.*;
 
-import java.io.*;
-
 import org.basex.data.*;
 import org.basex.index.ft.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -106,9 +103,7 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTNode item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public FTNode item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(tokNum == 0) tokNum = ++ctx.ftoknum;
     matches.reset(tokNum);
 
@@ -428,22 +423,15 @@ public final class FTWords extends FTExpr {
   @Override
   public FTExpr remove(final Var v) {
     if(occ != null) {
-      for(int o = 0; o < occ.length; ++o)
-        occ[o] = occ[o].remove(v);
+      for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].remove(v);
     }
     query = query.remove(v);
     return this;
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    if(occ != null) {
-      occ[0].plan(ser);
-      occ[1].plan(ser);
-    }
-    query.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), occ, query);
   }
 
   @Override

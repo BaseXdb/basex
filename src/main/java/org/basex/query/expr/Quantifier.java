@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.flwor.*;
 import org.basex.query.item.*;
@@ -33,8 +30,7 @@ public final class Quantifier extends ParseExpr {
    * @param s satisfier
    * @param e every flag
    */
-  public Quantifier(final InputInfo ii, final For[] f, final Expr s,
-      final boolean e) {
+  public Quantifier(final InputInfo ii, final For[] f, final Expr s, final boolean e) {
     super(ii);
     sat = s;
     fl = f;
@@ -51,7 +47,7 @@ public final class Quantifier extends ParseExpr {
     ctx.vars.size(vs);
 
     // find empty sequences
-    boolean empty = sat.isEmpty();
+    boolean empty = false;
     for(final For f : fl) empty |= f.isEmpty();
 
     // return pre-evaluated result
@@ -59,9 +55,7 @@ public final class Quantifier extends ParseExpr {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
     return Bln.get(iter(ctx, iter, 0));
@@ -75,8 +69,8 @@ public final class Quantifier extends ParseExpr {
    * @return satisfied flag
    * @throws QueryException query exception
    */
-  private boolean iter(final QueryContext ctx, final Iter[] it,
-      final int p) throws QueryException {
+  private boolean iter(final QueryContext ctx, final Iter[] it, final int p)
+      throws QueryException {
 
     final boolean last = p + 1 == fl.length;
     while(it[p].next() != null) {
@@ -115,11 +109,8 @@ public final class Quantifier extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYP, Token.token(every ? EVERY : SOME));
-    for(final Expr f : fl) f.plan(ser);
-    sat.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(TYP, every ? EVERY : SOME), fl, sat);
   }
 
   @Override

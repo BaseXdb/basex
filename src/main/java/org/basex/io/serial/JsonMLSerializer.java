@@ -48,9 +48,7 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void attribute(final byte[] name, final byte[] value)
-      throws IOException {
-
+  public void attribute(final byte[] name, final byte[] value) throws IOException {
     print(", ");
     if(!att) {
       print("{");
@@ -108,16 +106,13 @@ public final class JsonMLSerializer extends OutputSerializer {
   }
 
   @Override
-  public void finishComment(final byte[] value) throws IOException {
-  }
+  public void finishComment(final byte[] value) throws IOException { }
 
   @Override
-  public void finishPi(final byte[] name, final byte[] value)
-      throws IOException {
-  }
+  public void finishPi(final byte[] name, final byte[] value) throws IOException { }
 
   @Override
-  public void finishAtomic(final Item value) throws IOException {
+  public void atomic(final Item value) throws IOException {
     error("Atomic values cannot be serialized");
   }
 
@@ -127,8 +122,7 @@ public final class JsonMLSerializer extends OutputSerializer {
    * @param ext error details
    * @throws IOException I/O exception
    */
-  private static void error(final String msg, final Object... ext)
-      throws IOException {
+  private static void error(final String msg, final Object... ext) throws IOException {
     throw JSONSER.thrwSerial(Util.inf(msg, ext));
   }
 }

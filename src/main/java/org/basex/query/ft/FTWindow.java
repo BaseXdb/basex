@@ -1,13 +1,9 @@
 package org.basex.query.ft;
 
-import static org.basex.util.Token.*;
-
-import java.io.*;
-
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
+import org.basex.query.item.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
@@ -97,10 +93,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(QueryText.WINDOW), token(unit.toString()));
-    win.plan(ser);
-    super.plan(ser);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(QueryText.WINDOW, unit), win, expr);
   }
 
   @Override

@@ -45,9 +45,7 @@ public final class CElem extends CName {
   }
 
   @Override
-  public FElem item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public FElem item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final int s = prepare(ctx);
     try {
       // adds in-scope namespaces

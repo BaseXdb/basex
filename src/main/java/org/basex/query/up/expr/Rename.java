@@ -29,9 +29,7 @@ public final class Rename extends Update {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
 

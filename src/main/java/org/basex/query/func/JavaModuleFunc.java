@@ -3,10 +3,8 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
 import java.lang.reflect.*;
 
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.QueryModule.Deterministic;
 import org.basex.query.QueryModule.FocusDependent;
@@ -71,10 +69,8 @@ public final class JavaModuleFunc extends JavaMapping {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(name()));
-    for(final Expr arg : expr) arg.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, name()), expr);
   }
 
   @Override

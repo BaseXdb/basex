@@ -3,9 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -131,9 +128,7 @@ public class UserFunc extends Single {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // reset context and evaluate function
     final Value cv = ctx.value;
     final Atts ns = ctx.sc.ns.reset();
@@ -170,14 +165,12 @@ public class UserFunc extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    ser.attribute(NAM, name.string());
+  public void plan(final FElem plan) {
+    final FElem el = planElem(NAM, name.string());
+    addPlan(plan, el, expr);
     for(int i = 0; i < args.length; ++i) {
-      ser.attribute(Token.token(ARG + i), args[i].name.string());
+      el.add(planAttr(ARG + i, args[i].name.string()));
     }
-    expr.plan(ser);
-    ser.closeElement();
   }
 
   @Override

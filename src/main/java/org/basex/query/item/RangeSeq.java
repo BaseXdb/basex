@@ -3,9 +3,6 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.util.*;
 
@@ -37,8 +34,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
     throw CONDTYPE.thrw(ii, this);
   }
 
@@ -69,9 +65,8 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(Token.token(Util.name(this)),
-        MIN, Token.token(start), MAX, Token.token(start + size - 1));
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(MIN, start, MAX, start + size - 1));
   }
 
   @Override

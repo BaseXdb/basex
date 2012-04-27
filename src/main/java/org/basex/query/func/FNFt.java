@@ -36,8 +36,7 @@ public final class FNFt extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case _FT_COUNT: return count(ctx);
       default:        return super.item(ctx, ii);

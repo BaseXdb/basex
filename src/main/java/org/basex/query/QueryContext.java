@@ -510,18 +510,16 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Recursively serializes the query plan.
-   * @param ser serializer
-   * @throws IOException I/O exception
+   * Recursively builds a query plan.
+   * @param doc root node
    */
-  void plan(final Serializer ser) throws IOException {
+  void plan(final FDoc doc) {
     // only show root node if functions or variables exist
-    final boolean r = funcs.funcs().length != 0 || vars.globals().size != 0;
-    if(r) ser.openElement(PLAN);
-    funcs.plan(ser);
-    vars.plan(ser);
-    root.plan(ser);
-    if(r) ser.closeElement();
+    final FElem e = new FElem(PLAN);
+    funcs.plan(e);
+    vars.plan(e);
+    root.plan(e);
+    doc.add(e);
   }
 
   // PRIVATE METHODS ====================================================================

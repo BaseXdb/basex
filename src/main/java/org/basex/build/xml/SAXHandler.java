@@ -16,11 +16,12 @@ import org.xml.sax.helpers.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-final class SAXHandler extends DefaultHandler implements LexicalHandler {
+public class SAXHandler extends DefaultHandler implements LexicalHandler {
+  /** Builder reference. */
+  protected final Builder builder;
+
   /** Temporary attribute array. */
   private final Atts atts = new Atts();
-  /** Builder reference. */
-  private final Builder builder;
   /** DTD flag. */
   private boolean dtd;
   /** Whitespace chopping. */
@@ -40,7 +41,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @param build builder reference
    * @param ch chopping flag
    */
-  SAXHandler(final Builder build, final boolean ch) {
+  public SAXHandler(final Builder build, final boolean ch) {
     builder = build;
     chop = ch;
   }
@@ -130,7 +131,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @param ex exception
    * @throws SAXException SAX exception
    */
-  private static void error(final IOException ex) throws SAXException {
+  protected static void error(final IOException ex) throws SAXException {
     final SAXException ioe = new SAXException(Util.message(ex));
     ioe.setStackTrace(ex.getStackTrace());
     throw ioe;

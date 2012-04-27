@@ -1,6 +1,8 @@
 package org.basex.test.query.ast;
 
 import org.basex.core.*;
+import org.basex.query.flwor.*;
+import org.basex.util.*;
 import org.junit.*;
 
 /**
@@ -12,14 +14,13 @@ import org.junit.*;
 public final class FlworOptimizeTest extends QueryPlanTest {
   /** Tests the relocation of a static let clause. */
   @Test public void moveTopTest() {
-    check("let $seq := ('a', 'b', 'c') " +
-        "for $i in 1 to count($seq) " +
-        "for $j in $i + 1 to count($seq) " +
-        "let $m := $seq[(count($seq) + 1) idiv 2] " +
-        "return concat($i, $j, $m)",
+    check("let $b := <x>a</x> " +
+        "for $i in 1 to 2 " +
+        "let $m := $b " +
+        "return $m/text()",
 
-        "12b 13b 23b",
-        "every $for in //For satisfies //Let[@var eq '$m'] << $for"
+        "aa",
+        Util.info("every $l in //% satisfies $l << //%", Let.class, For.class)
     );
   }
 
@@ -33,7 +34,7 @@ public final class FlworOptimizeTest extends QueryPlanTest {
 
         "12a 13a 23b",
         "let $a := //Let[@var = '$a'] return " +
-          "//For[@var eq '$i'] << $a and $a << //For[@var eq '$j']"
+        "//For[@var eq '$i'] << $a and $a << //For[@var eq '$j']"
     );
   }
 
@@ -46,7 +47,8 @@ public final class FlworOptimizeTest extends QueryPlanTest {
         "return concat($i, $j, $b)",
 
         "12b 13c 23c",
-        "every $for in //For satisfies $for << //Let[@var eq '$b']"
+        Util.info("every $f in //% satisfies $f << //%[@var eq '$b']",
+            For.class, Let.class)
     );
   }
 

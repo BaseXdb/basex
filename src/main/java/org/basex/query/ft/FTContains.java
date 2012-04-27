@@ -2,9 +2,6 @@ package org.basex.query.ft;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -50,9 +47,7 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter iter = expr.iter(ctx);
     final FTLexer tmp = ctx.fttoken;
     double s = 0;
@@ -81,9 +76,7 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final boolean indexAccessible(final IndexContext ic)
-      throws QueryException {
-
+  public final boolean indexAccessible(final IndexContext ic) throws QueryException {
     // return if step is no text node, or if no index is available
     final AxisStep s = expr instanceof Context ? ic.step : CmpG.indexStep(expr);
     final boolean ok = s != null && ic.data.meta.ftxtindex &&
@@ -93,9 +86,7 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final Expr indexEquivalent(final IndexContext ic)
-      throws QueryException {
-
+  public final Expr indexEquivalent(final IndexContext ic) throws QueryException {
     ic.ctx.compInfo(OPTFTXINDEX);
 
     // sequential evaluation with index access
@@ -131,11 +122,8 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    expr.plan(ser);
-    ftexpr.plan(ser);
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(), expr, ftexpr);
   }
 
   @Override

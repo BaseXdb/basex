@@ -125,8 +125,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  public QueryException error(final Err err, final Object... arg)
-      throws QueryException {
+  public QueryException error(final Err err, final Object... arg) throws QueryException {
     throw new QueryException(info(), err, arg).suggest(this, complete());
   }
 }

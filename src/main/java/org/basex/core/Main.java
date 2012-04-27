@@ -162,6 +162,5 @@ public abstract class Main {
    * @param args command-line arguments
    * @throws IOException I/O exception
    */
-  protected abstract void parseArguments(final String[] args)
-      throws IOException;
+  protected abstract void parseArguments(final String[] args) throws IOException;
 }

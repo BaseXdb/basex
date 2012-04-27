@@ -2,9 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -145,10 +142,8 @@ public abstract class UserFuncCall extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(toString()));
-    for(final Expr e : expr) e.plan(ser);
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, this), expr);
   }
 
   @Override

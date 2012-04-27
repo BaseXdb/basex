@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -69,8 +66,7 @@ public final class TypeCase extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  Iter iter(final QueryContext ctx, final Value seq)
-      throws QueryException {
+  Iter iter(final QueryContext ctx, final Value seq) throws QueryException {
     if(var.type != null && !var.type.instance(seq)) return null;
     if(var.name == null) return ctx.iter(expr);
 
@@ -82,11 +78,8 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAR, var.name != null ? var.name.string() :
-      Token.EMPTY);
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(VAR, var.name != null ? var.name.string() : ""), expr);
   }
 
   @Override

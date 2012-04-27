@@ -30,9 +30,7 @@ public final class FNContext extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case CURRENT_DATE:
         return currDate(ctx);

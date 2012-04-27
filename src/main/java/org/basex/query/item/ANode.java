@@ -1,10 +1,7 @@
 package org.basex.query.item;
 
-import java.io.*;
-
 import org.basex.api.dom.*;
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.iter.*;
 import org.basex.util.*;
@@ -173,9 +170,6 @@ public abstract class ANode extends Item {
   public byte[] baseURI() {
     return Token.EMPTY;
   }
-
-  @Override
-  public abstract void serialize(final Serializer ser) throws IOException;
 
   /**
    * Compares the identity of two nodes.

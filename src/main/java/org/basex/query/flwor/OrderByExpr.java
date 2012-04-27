@@ -1,11 +1,7 @@
 package org.basex.query.flwor;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -76,11 +72,9 @@ public final class OrderByExpr extends OrderBy {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, DIR, token(desc ? DESCENDING : ASCENDING),
-        token(EMPTYORD), token(lst ? LEAST : GREATEST));
-    expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(DIR, desc ? DESCENDING : ASCENDING,
+        EMPTYORD, lst ? LEAST : GREATEST), expr);
   }
 
   @Override

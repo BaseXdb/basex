@@ -26,8 +26,7 @@ public final class FNNum extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Item it = expr[0].item(ctx, info);
     if(it == null) return null;
 
@@ -67,9 +66,7 @@ public final class FNNum extends StandardFunc {
    * @return absolute item
    * @throws QueryException query exception
    */
-  private static Item abs(final Item it, final InputInfo ii)
-      throws QueryException {
-
+  private static Item abs(final Item it, final InputInfo ii) throws QueryException {
     final double d = it.dbl(ii);
     final boolean s = d > 0d || 1 / d > 0;
 

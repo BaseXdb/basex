@@ -3,9 +3,6 @@ package org.basex.query.util;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -254,10 +251,8 @@ public final class Var extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(toString()), ID, Token.token(id));
-    if(expr != null) expr.plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, this, ID, id), expr);
   }
 
   @Override

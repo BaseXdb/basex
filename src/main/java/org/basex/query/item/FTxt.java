@@ -2,9 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
 
@@ -34,18 +31,13 @@ public final class FTxt extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
-    ser.text(val);
-  }
-
-  @Override
   public FNode copy() {
     return new FTxt(val).parent(par);
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, VAL, val);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(VAL, val));
   }
 
   @Override

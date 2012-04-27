@@ -3,9 +3,6 @@ package org.basex.query.item;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.util.*;
 import org.w3c.dom.*;
@@ -39,11 +36,6 @@ public final class FComm extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
-    ser.comment(val);
-  }
-
-  @Override
   public FNode copy() {
     return new FComm(val).parent(par);
   }
@@ -60,9 +52,7 @@ public final class FComm extends FNode {
    * @return token
    * @throws QueryException query exception
    */
-  public static byte[] parse(final byte[] str, final InputInfo ii)
-      throws QueryException {
-
+  public static byte[] parse(final byte[] str, final InputInfo ii) throws QueryException {
     if(contains(str, DASHES) || endsWith(str, '-')) COMINVALID.thrw(ii, str);
     return str;
   }

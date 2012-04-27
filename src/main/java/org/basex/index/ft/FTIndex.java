@@ -35,8 +35,7 @@ public abstract class FTIndex implements Index {
    * @return index instance
    * @throws IOException IOException
    */
-  public static FTIndex get(final Data d, final boolean wild)
-      throws IOException {
+  public static FTIndex get(final Data d, final boolean wild) throws IOException {
     return wild ? new FTTrie(d) : new FTFuzzy(d);
   }
 

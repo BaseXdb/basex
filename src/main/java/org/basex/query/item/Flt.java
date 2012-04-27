@@ -100,9 +100,7 @@ public final class Flt extends Num {
    * @return double value
    * @throws QueryException query exception
    */
-  static float parse(final byte[] val, final InputInfo ii)
-      throws QueryException {
-
+  static float parse(final byte[] val, final InputInfo ii) throws QueryException {
     try {
       return Float.parseFloat(Token.string(val));
     } catch(final NumberFormatException ex) {

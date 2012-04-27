@@ -181,7 +181,7 @@ public abstract class OutputSerializer extends Serializer {
 
     // open results element
     if(wrap) {
-      openElement(concat(wPre, COLON, T_RESULTS));
+      startElement(concat(wPre, COLON, T_RESULTS));
       namespace(wPre, token(p.get(S_WRAP_URI)));
     }
   }
@@ -200,7 +200,7 @@ public abstract class OutputSerializer extends Serializer {
 
   @Override
   public void openResult() throws IOException {
-    if(wrap) openElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
+    if(wrap) startElement(wPre.length != 0 ? concat(wPre, COLON, T_RESULT) : T_RESULT);
   }
 
   @Override
@@ -286,7 +286,7 @@ public abstract class OutputSerializer extends Serializer {
   }
 
   @Override
-  public void finishAtomic(final Item it) throws IOException {
+  public void atomic(final Item it) throws IOException {
     if(sep && item) {
       final byte[] sp = separator;
       final int sl = sp.length;
@@ -349,7 +349,7 @@ public abstract class OutputSerializer extends Serializer {
   protected void finishClose() throws IOException {
     if(sep) indent();
     print(ELEM_OS);
-    print(tag);
+    print(elem);
     print(ELEM_C);
     sep = true;
   }

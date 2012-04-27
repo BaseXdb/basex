@@ -1,9 +1,7 @@
 package org.basex.query.ft;
 
-import java.io.*;
 
 import org.basex.data.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -105,15 +103,8 @@ public abstract class FTFilter extends FTExpr {
   }
 
   @Override
-  public final boolean indexAccessible(final IndexContext ic)
-      throws QueryException {
+  public final boolean indexAccessible(final IndexContext ic) throws QueryException {
     return expr[0].indexAccessible(ic);
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    expr[0].plan(ser);
-    ser.closeElement();
   }
 
   @Override

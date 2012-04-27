@@ -25,9 +25,7 @@ public final class BaseFuncCall extends UserFuncCall {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     Expr fun = func;
     Var[] args = args(ctx);
     do {

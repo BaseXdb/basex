@@ -2,9 +2,6 @@ package org.basex.query.flwor;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.func.*;
@@ -93,10 +90,8 @@ public final class Group extends ParseExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(int o = 0; o != groupby.length; ++o) groupby[o].plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), groupby);
   }
 
   @Override
@@ -127,11 +122,8 @@ public final class Group extends ParseExpr {
     }
 
     @Override
-    public void plan(final Serializer ser) throws IOException {
-      ser.openElement(this);
-      grp.plan(ser);
-      expr.plan(ser);
-      ser.closeElement();
+    public void plan(final FElem plan) {
+      addPlan(plan, planElem(), grp, expr);
     }
 
     @Override

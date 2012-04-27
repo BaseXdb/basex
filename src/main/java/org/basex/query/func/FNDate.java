@@ -30,8 +30,7 @@ public final class FNDate extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = expr[0].item(ctx, info);
     if(it == null) return null;

@@ -88,7 +88,7 @@ public final class ValueBuilder extends ValueIter implements Result {
   @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    item[n].serialize(ser);
+    ser.item(item[n]);
     ser.closeResult();
   }
 

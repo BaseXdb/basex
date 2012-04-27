@@ -23,8 +23,7 @@ public final class LitMap extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     Map map = Map.EMPTY;
     for(int i = 0; i < expr.length; i++) {
       map = map.insert(checkItem(expr[i], ctx), ctx.value(expr[++i]), ii);

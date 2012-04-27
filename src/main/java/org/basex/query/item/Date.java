@@ -154,8 +154,7 @@ public abstract class Date extends Item {
   }
 
   @Override
-  public final boolean eq(final InputInfo ii, final Item it)
-      throws QueryException {
+  public final boolean eq(final InputInfo ii, final Item it) throws QueryException {
     final long d1 = days();
     final Date d = (Date) (it.type.isDate() ? it : type.cast(it, null, ii));
     final long d2 = d.days();

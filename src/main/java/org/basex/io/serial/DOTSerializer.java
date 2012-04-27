@@ -7,7 +7,6 @@ import static org.basex.util.Token.*;
 import java.io.*;
 import java.util.*;
 
-import org.basex.data.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
@@ -29,9 +28,6 @@ public final class DOTSerializer extends OutputSerializer {
   private final TokenBuilder tb = new TokenBuilder();
   /** Cached nodes. */
   private final IntList nodes = new IntList();
-
-  /** Current color. */
-  private String color;
   /** Node counter. */
   private int count;
 
@@ -41,9 +37,7 @@ public final class DOTSerializer extends OutputSerializer {
    * @param c compact representation
    * @throws IOException I/O exception
    */
-  public DOTSerializer(final OutputStream os, final boolean c)
-      throws IOException {
-
+  public DOTSerializer(final OutputStream os, final boolean c) throws IOException {
     super(os, PROPS);
     compact = c;
     print(HEADER);
@@ -56,15 +50,15 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    tb.addExt(DOTATTR, name(string(n)), v);
+    tb.addExt(DOTATTR, n, v);
   }
 
   @Override
   protected void finishOpen() throws IOException {
     final byte[] attr = tb.finish();
-    if(color == null) color = color(string(tag));
+    String color = color(elem);
     if(color == null) color = attr.length == 0 ? ELEM1 : ELEM2;
-    print(concat(tag, attr), color);
+    print(concat(elem, attr), color);
   }
 
   @Override
@@ -82,7 +76,6 @@ public final class DOTSerializer extends OutputSerializer {
       indent();
       print(Util.info(DOTLINK, c, il.get(i)));
     }
-    color = null;
     il.reset();
   }
 
@@ -93,18 +86,16 @@ public final class DOTSerializer extends OutputSerializer {
 
   @Override
   public void finishComment(final byte[] t) throws IOException {
-    print(new TokenBuilder(COMM_O).add(norm(t)).add(COMM_C).finish(),
-        DOTData.COMM);
+    print(new TokenBuilder(COMM_O).add(norm(t)).add(COMM_C).finish(), DOTData.COMM);
   }
 
   @Override
   public void finishPi(final byte[] n, final byte[] v) throws IOException {
-    print(new TokenBuilder(PI_O).add(n).add(SPACE).add(v).add(PI_C).finish(),
-        DOTData.PI);
+    print(new TokenBuilder(PI_O).add(n).add(SPACE).add(v).add(PI_C).finish(), DOTData.PI);
   }
 
   @Override
-  public void finishAtomic(final Item it) throws IOException {
+  public void atomic(final Item it) throws IOException {
     try {
       print(norm(it.string(null)), ITEM);
     } catch(final QueryException ex) {
@@ -144,9 +135,11 @@ public final class DOTSerializer extends OutputSerializer {
     return children.get(i);
   }
 
+  /**
   @Override
   protected byte[] info(final ExprInfo expr) {
     color = color(expr);
     return token(name(expr));
   }
+  */
 }

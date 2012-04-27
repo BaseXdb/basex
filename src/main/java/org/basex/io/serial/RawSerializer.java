@@ -21,13 +21,12 @@ public final class RawSerializer extends TextSerializer {
    * @param sp serialization properties
    * @throws IOException I/O exception
    */
-  RawSerializer(final OutputStream os, final SerializerProp sp)
-      throws IOException {
+  RawSerializer(final OutputStream os, final SerializerProp sp) throws IOException {
     super(os, sp);
   }
 
   @Override
-  public void finishAtomic(final Item it) throws IOException {
+  public void atomic(final Item it) throws IOException {
     try {
       final InputStream is = it.input(null);
       try {

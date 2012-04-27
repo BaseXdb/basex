@@ -39,7 +39,6 @@ public final class MapType extends FuncType {
 
   @Override
   public FItem cast(final Item it, final QueryContext ctx, final InputInfo ii)
-
       throws QueryException {
     if(!it.type.isMap() || !((Map) it).hasType(this)) Err.cast(ii, this, it);
     return (Map) it;

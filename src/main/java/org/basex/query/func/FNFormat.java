@@ -27,9 +27,7 @@ public final class FNFormat extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case FORMAT_INTEGER:  return formatInteger(ctx);
       case FORMAT_NUMBER:   return formatNumber(ctx);
@@ -91,9 +89,7 @@ public final class FNFormat extends StandardFunc {
    * @return string
    * @throws QueryException query exception
    */
-  private Item formatDate(final Type tp, final QueryContext ctx)
-      throws QueryException {
-
+  private Item formatDate(final Type tp, final QueryContext ctx) throws QueryException {
     final Item it = expr[0].item(ctx, info);
     final byte[] pic = checkEStr(expr[1], ctx);
     final byte[] lng = expr.length == 5 ? checkEStr(expr[2], ctx) : EMPTY;

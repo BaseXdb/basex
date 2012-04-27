@@ -1,10 +1,5 @@
 package org.basex.query.flwor;
 
-import static org.basex.query.QueryText.*;
-
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -53,8 +48,8 @@ public final class OrderByStable extends OrderBy {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, DIR);
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem());
   }
 
   @Override

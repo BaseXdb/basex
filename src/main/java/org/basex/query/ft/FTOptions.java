@@ -1,8 +1,5 @@
 package org.basex.query.ft;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
@@ -42,11 +39,8 @@ public final class FTOptions extends FTExpr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    opt.plan(ser);
-    expr[0].plan(ser);
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), opt, expr[0]);
   }
 
   @Override

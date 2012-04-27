@@ -3,9 +3,6 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.iter.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -18,7 +15,7 @@ import org.w3c.dom.*;
  * @author Christian Gruen
  */
 public final class FElem extends FNode {
-  /** Tag name. */
+  /** Element name. */
   private final QNm name;
 
   /** Child nodes. */
@@ -29,16 +26,33 @@ public final class FElem extends FNode {
   private Atts ns;
 
   /**
+   * Convenience constructor.
+   * @param n element name
+   */
+  public FElem(final byte[] n) {
+    this(new QNm(n));
+  }
+
+  /**
    * Constructor.
-   * @param n tag name
+   * @param n element name
    */
   public FElem(final QNm n) {
     this(n, null);
   }
 
   /**
+   * Convenience constructor.
+   * @param n element name
+   * @param nsp namespaces
+   */
+  public FElem(final byte[] n, final Atts nsp) {
+    this(new QNm(n), nsp);
+  }
+
+  /**
    * Constructor.
-   * @param n tag name
+   * @param n element name
    * @param nsp namespaces
    */
   public FElem(final QNm n, final Atts nsp) {
@@ -244,30 +258,6 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public void serialize(final Serializer ser) throws IOException {
-    ser.openElement(name.string());
-
-    // serialize namespaces
-    if(ns != null) {
-      for(int p = ns.size() - 1; p >= 0; p--) {
-        ser.namespace(ns.name(p), ns.string(p));
-      }
-    }
-    // serialize attributes
-    if(atts != null) {
-      for(int n = 0; n < atts.size(); ++n) {
-        final ANode node = atts.get(n);
-        ser.attribute(node.name(), node.string());
-      }
-    }
-    // serialize children
-    if(children != null) {
-      for(int n = 0; n < children.size(); ++n) children.get(n).serialize(ser);
-    }
-    ser.closeElement();
-  }
-
-  @Override
   public FNode copy() {
     final FElem node = new FElem(name);
     if(ns != null) {
@@ -284,8 +274,8 @@ public final class FElem extends FNode {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.string());
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(NAM, name.string()));
   }
 
   @Override

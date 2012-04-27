@@ -88,8 +88,7 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Leaf o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final Leaf o, final int l, final InputInfo ii) throws QueryException {
     if(hash == o.hash) return eq(key, o.key, ii) ?
         this : new List(hash, key, value, o.key, o.value);
 
@@ -111,8 +110,7 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  TrieNode add(final List o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final List o, final int l, final InputInfo ii) throws QueryException {
 
     // same hash? insert binding
     if(hash == o.hash) {
@@ -146,8 +144,7 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  TrieNode add(final Branch o, final int l, final InputInfo ii)
-      throws QueryException {
+  TrieNode add(final Branch o, final int l, final InputInfo ii) throws QueryException {
     final int k = key(hash, l);
     final TrieNode[] ch = o.copyKids();
     final TrieNode old = ch[k];

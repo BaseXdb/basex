@@ -97,7 +97,7 @@ abstract class AQuery extends Command {
             while(it != null) {
               checkStop();
               ser.openResult();
-              it.serialize(ser);
+              ser.item(it);
               ser.closeResult();
               it = ir.next();
               ++hits;
@@ -249,7 +249,7 @@ abstract class AQuery extends Command {
 
         bo = new BufferOutput(dot);
         final DOTSerializer d = new DOTSerializer(bo, prop.is(Prop.DOTCOMPACT));
-        qp.plan(d);
+        d.node(qp.plan());
         d.close();
 
         if(prop.is(Prop.DOTDISPLAY))
@@ -257,10 +257,8 @@ abstract class AQuery extends Command {
       }
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
-        final ArrayOutput ao = new ArrayOutput();
-        qp.plan(Serializer.get(ao));
         info(NL + QUERY_PLAN_C);
-        info(ao.toString());
+        info(qp.plan().serialize().toString());
       }
     } catch(final Exception ex) {
       Util.stack(ex);

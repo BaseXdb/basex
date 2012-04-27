@@ -2,9 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
@@ -82,8 +79,7 @@ public final class If extends Arr {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return eval(ctx).item(ctx, info);
   }
 
@@ -103,22 +99,13 @@ public final class If extends Arr {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    expr[0].plan(ser);
-    ser.openElement(THN);
-    expr[1].plan(ser);
-    ser.closeElement();
-    ser.openElement(ELS);
-    expr[2].plan(ser);
-    ser.closeElement();
-    ser.closeElement();
+  public void plan(final FElem plan) {
+    addPlan(plan, planElem(), expr);
   }
 
   @Override
   public String toString() {
-    return IF + '(' + expr[0] + ") " + THEN + ' ' + expr[1] + ' ' +
-      ELSE + ' ' + expr[2];
+    return IF + '(' + expr[0] + ") " + THEN + ' ' + expr[1] + ' ' + ELSE + ' ' + expr[2];
   }
 
   @Override

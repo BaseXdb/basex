@@ -293,7 +293,7 @@ public final class FNGen extends StandardFunc {
       // run serialization
       final Serializer ser = Serializer.get(ao, serialPar(this, 1, ctx));
       final Iter ir = expr[0].iter(ctx);
-      for(Item it; (it = ir.next()) != null;) it.serialize(ser);
+      for(Item it; (it = ir.next()) != null;) ser.item(it);
       ser.close();
     } catch(final SerializerException ex) {
       throw ex.getCause(info);

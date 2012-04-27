@@ -69,8 +69,7 @@ public final class FNInfo extends StandardFunc {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     switch(sig) {
       case ENVIRONMENT_VARIABLE:
         final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));

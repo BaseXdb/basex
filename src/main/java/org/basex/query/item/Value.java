@@ -1,8 +1,11 @@
 package org.basex.query.item;
 
+import java.io.*;
 import java.util.*;
 
 import org.basex.data.*;
+import org.basex.io.out.*;
+import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.iter.*;
@@ -103,11 +106,6 @@ public abstract class Value extends Expr implements Iterable<Item> {
 
   @Override
   public String description() {
-    return info();
-  }
-
-  @Override
-  public final String info() {
     return type.toString();
   }
 
@@ -136,6 +134,20 @@ public abstract class Value extends Expr implements Iterable<Item> {
     final ValueBuilder vb = new ValueBuilder((int) size());
     vb.size(writeTo(vb.item, 0));
     return vb;
+  }
+
+  /**
+   * Serializes the value, using the standard XML serializer,
+   * and returns the cached result.
+   * @return serialized value
+   * @throws IOException I/O exception
+   */
+  public final ArrayOutput serialize() throws IOException {
+    final ArrayOutput ao = new ArrayOutput();
+    final Serializer ser = Serializer.get(ao);
+    final ValueIter vi = iter();
+    for(Item it; (it = vi.next()) != null;) ser.item(it);
+    return ao;
   }
 
   /**

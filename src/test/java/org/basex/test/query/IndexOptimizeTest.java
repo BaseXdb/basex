@@ -202,7 +202,7 @@ public final class IndexOptimizeTest extends SandboxTest {
    */
   private static void check(final String query, final String result) {
     // compile query
-    ArrayOutput plan = null;
+    String plan = null;
     QueryProcessor qp = new QueryProcessor(query, context);
     try {
       ArrayOutput ao = new ArrayOutput();
@@ -214,8 +214,7 @@ public final class IndexOptimizeTest extends SandboxTest {
         assertEquals(result, ao.toString().replaceAll("\\r?\\n", ""));
 
       // fetch query plan
-      plan = new ArrayOutput();
-      qp.plan(Serializer.get(plan));
+      plan = qp.plan().serialize().toString();
 
       qp = new QueryProcessor(plan + "/descendant-or-self::*" +
           "[self::ValueAccess|self::FTIndexAccess]", context);

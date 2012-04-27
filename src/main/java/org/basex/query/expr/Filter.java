@@ -1,8 +1,5 @@
 package org.basex.query.expr;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.item.SeqType.Occ;
@@ -163,11 +160,10 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    root.plan(ser);
-    super.plan(ser);
-    ser.closeElement();
+  public final void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, root);
+    super.plan(el);
   }
 
   @Override

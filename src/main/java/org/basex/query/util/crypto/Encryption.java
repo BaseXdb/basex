@@ -74,9 +74,8 @@ public final class Encryption {
    * @return encrypted or decrypted input
    * @throws QueryException query exception
    */
-  public Str encryption(final byte[] in, final byte[] s,
-      final byte[] k, final byte[] a, final boolean ec)
-          throws QueryException {
+  public Str encryption(final byte[] in, final byte[] s, final byte[] k, final byte[] a,
+      final boolean ec) throws QueryException {
 
     final boolean symmetric = eq(lc(s), SYM) || s.length == 0;
     final byte[] aa = a.length == 0 ? DES : a;
@@ -128,11 +127,10 @@ public final class Encryption {
    * @throws IllegalBlockSizeException ex
    * @throws BadPaddingException ex
    */
-  static byte[] encrypt(final byte[] in, final byte[] k,
-      final byte[] a, final int ivl)
-          throws InvalidKeyException, InvalidAlgorithmParameterException,
-          NoSuchAlgorithmException, NoSuchPaddingException,
-          IllegalBlockSizeException, BadPaddingException {
+  static byte[] encrypt(final byte[] in, final byte[] k, final byte[] a, final int ivl)
+      throws InvalidKeyException, InvalidAlgorithmParameterException,
+      NoSuchAlgorithmException, NoSuchPaddingException,
+      IllegalBlockSizeException, BadPaddingException {
 
     final Cipher cipher = Cipher.getInstance(string(ALGN.get(lc(a))));
     final SecretKeySpec kspec = new SecretKeySpec(k, string(a));

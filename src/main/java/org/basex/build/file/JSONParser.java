@@ -6,8 +6,6 @@ import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
-import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.util.*;
@@ -86,12 +84,8 @@ public final class JSONParser extends XMLParser {
       throw new BaseXException(ex.getLocalizedMessage());
     }
 
-    // serialize node
-    final ArrayOutput ao = new ArrayOutput();
-    node.serialize(Serializer.get(ao));
-
-    // create XML input container
-    final IOContent xml = new IOContent(ao.toArray());
+    // create XML input container from serialized node
+    final IOContent xml = new IOContent(node.serialize().toArray());
     xml.name(io.name());
     return xml;
   }

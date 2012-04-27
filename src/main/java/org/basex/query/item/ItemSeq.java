@@ -1,11 +1,7 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.SeqType.Occ;
@@ -41,8 +37,7 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Item ebv(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(!item[0].type.isNode()) CONDTYPE.thrw(ii, this);
     return item[0];
   }
@@ -86,12 +81,5 @@ public final class ItemSeq extends Seq {
   public boolean homogenous() {
     // [LW] really check it?
     return false;
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(Util.name(this)), SIZE, Token.token(size));
-    for(int v = 0; v != Math.min(size, 5); ++v) item[v].plan(ser);
-    ser.closeElement();
   }
 }

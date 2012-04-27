@@ -2,9 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 
-import java.io.*;
-
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -73,13 +70,12 @@ public final class InlineFunc extends UserFunc {
   }
 
   @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
+  public void plan(final FElem plan) {
+    final FElem el = planElem();
+    addPlan(plan, el, expr);
     for(int i = 0; i < args.length; ++i) {
-      ser.attribute(Token.token(ARG + i), args[i].name.string());
+      el.add(planAttr(ARG + i, args[i].name.string()));
     }
-    expr.plan(ser);
-    ser.closeElement();
   }
 
   @Override

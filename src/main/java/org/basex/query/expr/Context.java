@@ -44,8 +44,7 @@ public final class Context extends Simple {
   }
 
   @Override
-  public Item item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     return checkCtx(ctx).item(ctx, info);
   }
 

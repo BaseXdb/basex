@@ -38,8 +38,7 @@ final class FTContainsIndex extends FTContains {
   }
 
   @Override
-  public Bln item(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Bln item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Iter ir = expr.iter(ctx);
     final FTLexer tmp = ctx.fttoken;
     ctx.fttoken = lex;

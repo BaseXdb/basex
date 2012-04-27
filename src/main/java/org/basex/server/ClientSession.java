@@ -153,16 +153,14 @@ public class ClientSession extends Session {
   }
 
   @Override
-  protected void execute(final String cmd, final OutputStream os)
-      throws IOException {
+  protected void execute(final String cmd, final OutputStream os) throws IOException {
     send(cmd);
     sout.flush();
     receive(os);
   }
 
   @Override
-  protected void execute(final Command cmd, final OutputStream os)
-      throws IOException {
+  protected void execute(final Command cmd, final OutputStream os) throws IOException {
     execute(cmd.toString(), os);
   }
 

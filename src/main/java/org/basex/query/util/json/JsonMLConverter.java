@@ -84,12 +84,9 @@ public final class JsonMLConverter extends XMLConverter {
    * @param attr attributes
    * @throws QueryException query exception
    */
-  private void attr(final FElem elem, final JObject attr)
-      throws QueryException {
-
+  private void attr(final FElem elem, final JObject attr) throws QueryException {
     for(int s = 0; s < attr.size(); s++) {
-      final JString v = (JString) check(attr.value(s), T_STRING,
-          "attribute value");
+      final JString v = (JString) check(attr.value(s), T_STRING, "attribute value");
       elem.add(new FAttr(qname(attr.name(s)), v.value));
     }
   }
@@ -132,8 +129,7 @@ public final class JsonMLConverter extends XMLConverter {
    * @param ext error details
    * @throws QueryException query exception
    */
-  private void error(final String msg, final Object... ext)
-      throws QueryException {
+  private void error(final String msg, final Object... ext) throws QueryException {
     throw JSONMLPARSE.thrw(info, Util.inf(msg, ext));
   }
 }
