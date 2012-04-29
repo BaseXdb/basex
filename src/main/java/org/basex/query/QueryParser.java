@@ -15,6 +15,7 @@ import org.basex.query.expr.*;
 import org.basex.query.expr.CmpG.OpG;
 import org.basex.query.expr.CmpN.OpN;
 import org.basex.query.expr.CmpV.OpV;
+import org.basex.query.expr.Expr.*;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
 import org.basex.query.flwor.*;
@@ -771,6 +772,7 @@ public class QueryParser extends InputParser {
     if(!wsConsumeWs(EXTERNAL)) wsCheck(ASSIGN);
     else if(!wsConsumeWs(ASSIGN)) return;
     ctx.ctxItem = check(single(), NOVARDECL);
+    if(ctx.ctxItem.uses(Use.UPD)) UPCTX.thrw(info(), ctx.ctxItem);
   }
 
   /**

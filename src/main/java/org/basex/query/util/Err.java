@@ -793,6 +793,8 @@ public enum Err {
 
   /** XUST0001: Parsing exception. */
   UPNOT(XUST, 1, "%: no updating expression allowed."),
+  /** XUST0001: Parsing exception. */
+  UPCTX(XUST, 1, "Context item may not declare an updating expression."),
   /** XUST0002: Parsing exception. */
   UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
   /** XUST0002: Parsing exception. */
