@@ -229,13 +229,18 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public String toString() {
+  public ArrayOutput serialize() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
+    serialize(Serializer.get(ao));
+    return ao;
+  }
+
+  @Override
+  public String toString() {
     try {
-      serialize(Serializer.get(ao));
+      return serialize().toString();
     } catch(final IOException ex) {
-      Util.notexpected(ex);
+      throw Util.notexpected(ex);
     }
-    return ao.toString();
   }
 }

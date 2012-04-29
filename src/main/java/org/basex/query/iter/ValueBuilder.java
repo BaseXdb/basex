@@ -134,14 +134,18 @@ public final class ValueBuilder extends ValueIter implements Result {
   }
 
   @Override
-  public String toString() {
+  public ArrayOutput serialize() throws IOException {
     final ArrayOutput ao = new ArrayOutput();
+    serialize(Serializer.get(ao));
+    return ao;
+  }
+
+  @Override
+  public String toString() {
     try {
-      serialize(Serializer.get(ao));
+      return serialize().toString();
     } catch(final IOException ex) {
-      // [LW] is that OK? Example: (1, 2, upper-case#1)
-      Util.notexpected(ex);
+      throw Util.notexpected(ex);
     }
-    return ao.toString();
   }
 }

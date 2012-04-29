@@ -2,6 +2,7 @@ package org.basex.data;
 
 import java.io.*;
 
+import org.basex.io.out.*;
 import org.basex.io.serial.*;
 
 /**
@@ -23,6 +24,14 @@ public interface Result {
    * @return true if results are equal
    */
   boolean sameAs(Result r);
+
+  /**
+   * Serializes the result, using the standard XML serializer,
+   * and returns the cached result.
+   * @return serialized value
+   * @throws IOException I/O exception
+   */
+  ArrayOutput serialize() throws IOException;
 
   /**
    * Serializes the complete result.
