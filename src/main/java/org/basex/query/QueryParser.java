@@ -1585,56 +1585,81 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the "PathExpr" rule.
-   * Parses the "RelativePathExpr" rule.
    * @return query expression
    * @throws QueryException query exception
    */
   private Expr path() throws QueryException {
-    // XQuery30: bang operator (still to be parsed and implemented)
-
     checkInit();
-    final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
-    if(s > 0) checkAxis(s == 2 ? Axis.DESC : Axis.CHILD);
-    im = ip;
 
-    final Expr ex = step();
-    if(ex == null) {
-      if(s == 2) {
-        if(more()) checkInit();
-        error(PATHMISS, found());
+    final ExprList el;
+    Expr root = null;
+    if(consume('/')) {
+      root = new Root(info());
+      el = new ExprList();
+      final Expr ex;
+      if(consume('/')) {
+        // two slashes: absolute descendant path
+        checkAxis(Axis.DESC);
+        add(el, descOrSelf());
+        mark();
+        ex = step();
+        if(ex == null) {
+          // two slashes, but no following step: error
+          if(more()) checkInit();
+          error(PATHMISS, found());
+        }
+      } else {
+        // one slash: absolute child path
+        checkAxis(Axis.CHILD);
+        mark();
+        ex = step();
+        // no more steps: return root expression
+        if(ex == null) return root;
       }
-      return s == 1 ? new Root(info()) : null;
+      add(el, ex);
+      relativePath(el);
+    } else {
+      // relative path (no preceding slash)
+      mark();
+      final Expr ex = step();
+      if(ex == null) return null;
+      // return non-step expression if no path or map operator follows
+      final boolean nostep = curr() != '/' && (curr() != '!' || next() == '=');
+      if(nostep && !(ex instanceof AxisStep)) return ex;
+      el = new ExprList();
+      if(ex instanceof AxisStep) add(el, ex);
+      else root = ex;
+      relativePath(el);
     }
-
-    final boolean slash = consume('/');
-    final boolean step = ex instanceof AxisStep;
-    if(!slash && s == 0 && !step) return ex;
-
-    final ExprList el = new ExprList();
-    if(s == 2) add(el, descOrSelf());
-
-    final Expr root = s > 0 ? new Root(info()) : !step ? ex : null;
-    if(root != ex) add(el, ex);
-
-    if(slash) {
-      do {
-        final boolean desc = consume('/');
-        im = ip;
-        if(desc) add(el, descOrSelf());
-        checkAxis(desc ? Axis.DESC : Axis.CHILD);
-
-        final Expr st = step();
-        if(st == null) error(PATHMISS, found());
-        // skip context nodes
-        if(!(st instanceof Context)) add(el, st);
-      } while(consume('/'));
-    }
-
-    // if no location steps have been added, add trailing self::node() step as
-    // replacement for context node to bring results in order
-    if(el.isEmpty()) add(el, AxisStep.get(info(), Axis.SELF, Test.NOD));
-
     return Path.get(info(), root, el.finish());
+  }
+
+  /**
+   * Parses the "RelativePathExpr" rule.
+   * @param el expression list
+   * @throws QueryException query exception
+   */
+  void relativePath(final ExprList el) throws QueryException {
+    while(true) {
+      boolean b = false;
+      if(consume('/')) {
+        if(consume('/')) {
+          add(el, descOrSelf());
+          checkAxis(Axis.DESC);
+        } else {
+          checkAxis(Axis.CHILD);
+        }
+      } else if(next() != '=' && consume('!')) {
+        b = true;
+      } else {
+        return;
+      }
+      mark();
+      Expr st = step();
+      if(st == null) error(PATHMISS, found());
+      if(b) st = new Bang(info(), st);
+      add(el, st);
+    }
   }
 
   /**

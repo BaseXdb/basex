@@ -211,19 +211,7 @@ public final class CommandParser extends InputParser {
       case PASSWORD:
         return new Password(password());
       case HELP:
-        String hc = name(null);
-        String form = null;
-        if(hc != null) {
-          if(hc.equalsIgnoreCase("wiki")) {
-            form = hc;
-            hc = null;
-          } else {
-            ip = im;
-            hc = consume(Cmd.class, cmd).toString();
-            form = name(null);
-          }
-        }
-        return new Help(hc, form);
+        return new Help(name(null));
       case EXIT:
         return new Exit();
       case FLUSH:
@@ -479,7 +467,7 @@ public final class CommandParser extends InputParser {
    * @return QueryException query exception
    */
   private QueryException help(final StringList alt, final Cmd cmd) {
-    return error(alt, SYNTAX_X, cmd.help(true, false));
+    return error(alt, SYNTAX_X, cmd.help(true));
   }
 
   /**

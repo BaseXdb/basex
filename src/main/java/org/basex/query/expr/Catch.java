@@ -40,8 +40,8 @@ public final class Catch extends Single {
   public Catch(final InputInfo ii, final QNm[] c, final QueryContext ctx) {
     super(ii, null);
     codes = c;
-    for(int i = 0; i < QNM.length; i++) vars[i] =
-      Var.create(ctx, null, QNM[i], TYPES[i], null);
+    for(int i = 0; i < QNM.length; i++)
+      vars[i] = Var.create(ctx, null, QNM[i], TYPES[i], null);
   }
 
   @Override

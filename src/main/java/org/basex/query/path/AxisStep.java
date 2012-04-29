@@ -16,7 +16,7 @@ import org.basex.query.path.Test.Mode;
 import org.basex.util.*;
 
 /**
- * Location Step expression.
+ * Axis step expression.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

@@ -57,44 +57,17 @@ public interface Commands {
     /**
      * Returns a help string.
      * @param detail show details
-     * @param wiki print wiki format
      * @return string
      */
-    public final String help(final boolean detail, final boolean wiki) {
+    public final String help(final boolean detail) {
       final StringBuilder sb = new StringBuilder();
-      if(wiki) {
-        wiki(sb);
+      if(help == null) {
+        if(detail) sb.append(NOHELP).append(NL);
       } else {
-        if(help == null) {
-          if(detail) sb.append(NOHELP).append(NL);
-        } else {
-          sb.append(this + " " + help[0] + NL + "  " + help[1] + NL);
-          if(detail) sb.append(NL + help[2] + NL);
-        }
+        sb.append(this + " " + help[0] + NL + "  " + help[1] + NL);
+        if(detail) sb.append(NL + help[2] + NL);
       }
       return sb.toString();
-    }
-
-    /**
-     * Returns a help string in the Wiki format.
-     * @param sb string builder
-     */
-    private void wiki(final StringBuilder sb) {
-      if(help == null) return;
-
-      sb.append("===" + this + "===" + NL + NL);
-      sb.append("'''<code>" + this + ' ' + help[0] + "</code>'''" + NL + NL);
-
-      for(String s : help[2].split(NL)) {
-        if(s.startsWith("- ")) {
-          s = s.replaceAll("^- (.*?)(:|$)", "* <code>$1</code>$2");
-        } else {
-          s = s.replaceAll("^ ", ":");
-          s = s.replaceAll("\\[", "<code>[").replaceAll("\\]", "]</code>");
-        }
-        sb.append(s).append(NL);
-      }
-      sb.append(NL);
     }
   }
 }
