@@ -145,8 +145,8 @@ public final class Compare {
               flags.contains(Flag.NAMESPACES) && !eq(n1.prefix(), n2.prefix())))
             return false;
 
-          if(t1 == NodeType.TXT || t1 == NodeType.ATT ||
-             t1 == NodeType.COM || t1 == NodeType.PI) {
+          if(t1 == NodeType.TXT || t1 == NodeType.ATT || t1 == NodeType.COM ||
+             t1 == NodeType.PI || t1 == NodeType.NSP) {
             // compare string values
             if(!eq(s1.string(), s2.string())) return false;
           } else if(t1 == NodeType.ELM) {
