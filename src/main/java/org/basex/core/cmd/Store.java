@@ -20,6 +20,7 @@ import org.xml.sax.*;
 public final class Store extends ACreate {
   /**
    * Constructor, specifying a target path.
+   * The input needs to be set via {@link #setInput(InputStream)}.
    * @param path target path
    */
   public Store(final String path) {

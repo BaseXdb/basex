@@ -60,12 +60,12 @@ public abstract class ACreate extends Command {
   }
 
   /**
-   * Returns cached input if the input is streamed and a data format different
-   * than XML has been chosen.
+   * Caches the input if an input source has been specified,
+   * and if a data format different to XML has been chosen.
    * @return cached input
    * @throws IOException I/O exception
    */
-  protected IOContent cache() throws IOException {
+  protected IOContent cacheRaw() throws IOException {
     if(in == null || prop.get(Prop.PARSER).equals(DataText.M_XML)) return null;
 
     final InputStream is = in.getByteStream();

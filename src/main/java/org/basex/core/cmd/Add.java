@@ -30,6 +30,7 @@ public final class Add extends ACreate {
 
   /**
    * Constructor, specifying a target path.
+   * The input needs to be set via {@link #setInput(InputStream)}.
    * Note that the constructors of this class have changed with Version 7.0:
    * the target path and file name have been merged and are now specified
    * as first argument.
@@ -66,7 +67,7 @@ public final class Add extends ACreate {
       io = IO.get(in.getSystemId());
     } else if(in.getByteStream() != null) {
       try {
-        io = cache();
+        io = cacheRaw();
       } catch(final IOException ex) {
         return error(Util.message(ex));
       }

@@ -33,6 +33,7 @@ public final class CreateDB extends ACreate {
 
   /**
    * Default constructor.
+   * Input can be set via {@link #setInput(InputStream)}.
    * @param name name of database
    */
   public CreateDB(final String name) {
@@ -67,7 +68,7 @@ public final class CreateDB extends ACreate {
     if(args.length < 1 || args[1] == null) {
       if(in != null && in.getByteStream() != null) {
         try {
-          io = cache();
+          io = cacheRaw();
           if(io == null) {
             InputStream is = in.getByteStream();
             if(!(is instanceof BufferedInputStream ||

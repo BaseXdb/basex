@@ -2,6 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.*;
+
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -13,6 +15,16 @@ import org.basex.io.*;
  * @author Christian Gruen
  */
 public final class Replace extends ACreate {
+
+  /**
+   * Constructor.
+   * The input needs to be set via {@link #setInput(InputStream)}.
+   * @param path resource path
+   */
+  public Replace(final String path) {
+    super(Perm.WRITE, true, path);
+  }
+
   /**
    * Constructor.
    * @param path resource path
@@ -20,14 +32,6 @@ public final class Replace extends ACreate {
    */
   public Replace(final String path, final String input) {
     super(Perm.WRITE, true, path, input);
-  }
-
-  /**
-   * Constructor.
-   * @param path resource path
-   */
-  public Replace(final String path) {
-    super(Perm.WRITE, true, path);
   }
 
   @Override
