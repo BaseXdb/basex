@@ -335,7 +335,7 @@ public abstract class Command extends Progress {
         Util.debug(ex);
         return error(OUT_OF_MEM + (createWrite() ? H_OUT_OF_MEM : ""));
       }
-      return error(Util.bug(ex));
+      return error(Util.bug(ex) + NL + info.toString());
     } finally {
       // flushes the output
       try { if(out != null) out.flush(); } catch(final IOException ex) { }
