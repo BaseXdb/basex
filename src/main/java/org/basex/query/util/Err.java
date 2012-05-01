@@ -25,6 +25,8 @@ public enum Err {
   INDEXENT(BASX, 1, "Not supported by chosen full-text index."),
   /** BASX0002: Evaluation exception. */
   NODBCTX(BASX, 2, "%: database context needed."),
+  /** BASX0002: Evaluation exception. */
+  DBMEM(BASX, 2, "Not supported on main-memory databases."),
   /** BASX0003: Evaluation exception. */
   NODB(BASX, 3, "%"),
   /** BASX0004: Evaluation exception. */

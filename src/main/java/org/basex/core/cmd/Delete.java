@@ -52,6 +52,7 @@ public final class Delete extends ACreate {
    * @param res resource to be deleted
    */
   public static void delete(final Data data, final String res) {
+    if(data.inMemory()) return;
     final IOFile file = data.meta.binary(res);
     if(file != null) file.delete();
   }

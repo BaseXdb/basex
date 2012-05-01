@@ -38,8 +38,8 @@ public final class DBAdd extends InsertBase {
    * @param p document(s) path
    * @param c database context
    */
-  public DBAdd(final Data d, final InputInfo i, final Item it,
-      final String p, final Context c) {
+  public DBAdd(final Data d, final InputInfo i, final Item it, final String p,
+      final Context c) {
 
     super(PrimitiveType.INSERTAFTER, -1, d, i, null);
     docs.add(it);

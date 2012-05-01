@@ -21,13 +21,13 @@ public final class DBDelete extends UpdatePrimitive {
   /**
    * Constructor.
    * @param d data
-   * @param k entries to be deleted
+   * @param p entries to be deleted
    * @param ii input info
    */
-  public DBDelete(final Data d, final String k, final InputInfo ii) {
+  public DBDelete(final Data d, final String p, final InputInfo ii) {
     super(PrimitiveType.DBDELETE, -1, d, ii);
-    paths.add(k);
-    size = d.resources.binaries(k).size();
+    paths.add(p);
+    size = d.resources.binaries(p).size();
   }
 
   @Override

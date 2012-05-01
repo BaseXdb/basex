@@ -56,6 +56,8 @@ public final class Store extends ACreate {
 
     // ensure that the name is not empty and contains no trailing dots
     final Data data = context.data();
+    if(data.inMemory()) return error(NO_MAINMEM);
+
     final IOFile file = data.meta.binary(path);
     if(path.isEmpty() || path.endsWith(".") || file == null || file.isDir())
       return error(NAME_INVALID_X, create ? path : args[0]);

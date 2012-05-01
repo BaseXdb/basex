@@ -30,9 +30,9 @@ public final class DBStore extends UpdatePrimitive {
    * @param it item to be stored
    * @param ii input info
    */
-  public DBStore(final Data d, final byte[] path, final Item it, final InputInfo ii) {
+  public DBStore(final Data d, final String path, final Item it, final InputInfo ii) {
     super(PrimitiveType.DBSTORE, -1, d, ii);
-    map.add(path, it);
+    map.add(token(path), it);
   }
 
   @Override

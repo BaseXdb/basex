@@ -70,8 +70,16 @@ public final class Export extends Command {
     // XML documents
     final IntList il = data.resources.docs();
     // raw files
-    final IOFile bin = data.meta.binaries();
-    final StringList desc = bin.descendants();
+    final IOFile bin;
+    final StringList desc;
+    if(data.inMemory()) {
+      bin = null;
+      desc = new StringList();
+    } else {
+      bin = data.meta.binaries();
+      desc = bin.descendants();
+    }
+
     if(e != null) {
       e.progPos = 0;
       e.progSize = il.size() + desc.size();
@@ -110,7 +118,7 @@ public final class Export extends Command {
         e.progPos++;
       }
       final String u = unique(exported, f.path());
-      new IOFile(bin.path(), s).copyTo(new IOFile(u));
+      new IOFile(bin, s).copyTo(new IOFile(u));
     }
   }
 

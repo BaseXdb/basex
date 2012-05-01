@@ -37,7 +37,7 @@ final class Binaries {
   synchronized TokenList bins(final String path) {
     final TokenList tl = new TokenList();
     final String np = MetaData.normPath(path);
-    if(np == null) return tl;
+    if(np == null || data.inMemory()) return tl;
 
     final String exct = Prop.WIN ? np.toLowerCase(Locale.ENGLISH) : np;
     final String pref = exct + '/';
@@ -58,6 +58,7 @@ final class Binaries {
   synchronized void children(final byte[] path, final boolean dir,
       final TokenBoolMap tbm) {
 
+    if(data.inMemory()) return;
     final IOFile file = data.meta.binary(string(path));
     if(file == null) return;
 
@@ -73,6 +74,7 @@ final class Binaries {
    * @return path to a directory or not
    */
   synchronized boolean isDir(final String path) {
+    if(data.inMemory()) return false;
     final IOFile bin = data.meta.binary(path);
     return bin != null && bin.isDir();
   }
