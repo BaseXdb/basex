@@ -8,7 +8,6 @@ import static org.basex.util.Token.*;
 import java.lang.reflect.*;
 import java.math.*;
 import java.net.*;
-import java.util.*;
 
 import javax.xml.datatype.*;
 import javax.xml.namespace.*;
@@ -41,7 +40,7 @@ public abstract class JavaMapping extends Arr {
     Integer.class,    long.class,     Long.class,         float.class,
     Float.class,      double.class,   Double.class,       BigDecimal.class,
     BigInteger.class, QName.class,    char.class,         Character.class,
-    URI.class,        URL.class,      Map.class
+    URI.class,        URL.class
   };
   /** Resulting XQuery types. */
   private static final Type[] XQUERY = {
@@ -50,7 +49,7 @@ public abstract class JavaMapping extends Arr {
     AtomType.INT, AtomType.LNG, AtomType.LNG, AtomType.FLT,
     AtomType.FLT, AtomType.DBL, AtomType.DBL, AtomType.DEC,
     AtomType.ITR, AtomType.QNM, AtomType.STR, AtomType.STR,
-    AtomType.URI, AtomType.URI, FuncType.ANY_FUN
+    AtomType.URI, AtomType.URI
   };
 
   /**
