@@ -65,8 +65,9 @@ public abstract class Date extends Item {
    * @param ii input info
    * @throws org.basex.query.QueryException query exception
    */
-  Date(final Type typ, final byte[] d, final String e,
-       final InputInfo ii) throws QueryException {
+  Date(final Type typ, final byte[] d, final String e, final InputInfo ii)
+      throws QueryException {
+
     super(typ);
     try {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());

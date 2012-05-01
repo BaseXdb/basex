@@ -23,8 +23,7 @@ public abstract class StructuralUpdate extends UpdatePrimitive {
    * @param d data
    * @param i input info
    */
-  StructuralUpdate(final PrimitiveType t, final int p,
-                   final Data d, final InputInfo i) {
+  StructuralUpdate(final PrimitiveType t, final int p, final Data d, final InputInfo i) {
     super(t, p, d, i);
   }
 

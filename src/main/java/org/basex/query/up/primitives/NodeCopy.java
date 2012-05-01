@@ -32,8 +32,8 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @param i input info
    * @param nc node copy
    */
-  NodeCopy(final PrimitiveType t, final int p, final Data d,
-           final InputInfo i, final NodeCache nc) {
+  NodeCopy(final PrimitiveType t, final int p, final Data d, final InputInfo i,
+      final NodeCache nc) {
     super(t, p, d, i);
     insert.add(nc);
   }

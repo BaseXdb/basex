@@ -210,8 +210,8 @@ public final class FNPat extends StandardFunc {
    * @return modified pattern
    * @throws org.basex.query.QueryException query exception
    */
-  private Pattern pattern(final Expr pattern, final Expr mod,
-      final QueryContext ctx) throws QueryException {
+  private Pattern pattern(final Expr pattern, final Expr mod, final QueryContext ctx)
+      throws QueryException {
     return RegExParser.parse(checkStr(pattern, ctx),
         mod != null ? checkStr(mod, ctx) : null, ctx.xquery3, info);
   }

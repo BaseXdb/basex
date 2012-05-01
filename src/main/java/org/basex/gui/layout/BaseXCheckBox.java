@@ -29,8 +29,8 @@ public final class BaseXCheckBox extends JCheckBox {
    * @param dist distance to next component
    * @param win parent window
    */
-  public BaseXCheckBox(final String label, final boolean sel,
-      final int dist, final Window win) {
+  public BaseXCheckBox(final String label, final boolean sel, final int dist,
+      final Window win) {
 
     super(label, sel);
     setOpaque(false);

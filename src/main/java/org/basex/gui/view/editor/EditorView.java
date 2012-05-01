@@ -77,8 +77,7 @@ public final class EditorView extends View {
 
     final BaseXButton openB = BaseXButton.command(GUICommands.C_EDITOPEN, gui);
     final BaseXButton saveB = new BaseXButton(gui, "editsave", token(H_SAVE));
-    final BaseXButton hist = new BaseXButton(gui, "hist",
-        token(H_RECENTLY_OPEN));
+    final BaseXButton hist = new BaseXButton(gui, "hist", token(H_RECENTLY_OPEN));
 
     find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) openB.getPreferredSize().getHeight());

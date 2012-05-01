@@ -193,8 +193,7 @@ public final class DigitalSignature {
         kiCont.add(keyValue);
         final List<Object> x509Content = new ArrayList<Object>();
         final X509IssuerSerial issuer = kifactory.newX509IssuerSerial(x509ce.
-            getIssuerX500Principal().getName(),
-            x509ce.getSerialNumber());
+            getIssuerX500Principal().getName(), x509ce.getSerialNumber());
         x509Content.add(x509ce.getSubjectX500Principal().getName());
         x509Content.add(issuer);
         x509Content.add(x509ce);

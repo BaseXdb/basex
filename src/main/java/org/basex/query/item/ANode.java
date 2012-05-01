@@ -15,8 +15,7 @@ import org.basex.util.*;
 public abstract class ANode extends Item {
   /** Node Types. */
   private static final NodeType[] TYPES = {
-    NodeType.DOC, NodeType.ELM, NodeType.TXT, NodeType.ATT,
-    NodeType.COM, NodeType.PI
+    NodeType.DOC, NodeType.ELM, NodeType.TXT, NodeType.ATT, NodeType.COM, NodeType.PI
   };
   /** Static node counter. */
   // [CG] XQuery/ID:

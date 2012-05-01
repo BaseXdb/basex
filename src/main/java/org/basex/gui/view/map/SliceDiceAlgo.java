@@ -8,9 +8,7 @@ package org.basex.gui.view.map;
  */
 final class SliceDiceAlgo extends MapAlgo {
   @Override
-  MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne) {
-
+  MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne) {
     // setting initial proportions
     double xx = r.x;
     double yy = r.y;

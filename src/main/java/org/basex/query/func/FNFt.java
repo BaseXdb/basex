@@ -167,8 +167,8 @@ public final class FNFt extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  static Iter search(final Data data, final byte[] str,
-      final StandardFunc fun, final QueryContext ctx) throws QueryException {
+  static Iter search(final Data data, final byte[] str, final StandardFunc fun,
+      final QueryContext ctx) throws QueryException {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     if(!data.meta.ftxtindex) NOINDEX.thrw(fun.info, data.meta.name, fun);

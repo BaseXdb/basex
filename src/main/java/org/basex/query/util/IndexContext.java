@@ -59,8 +59,7 @@ public final class IndexContext {
       if(text) return root;
       // add attribute step
       if(step.test.name == null) return root;
-      return Path.get(root.info, root,
-          AxisStep.get(step.info, Axis.SELF, step.test));
+      return Path.get(root.info, root, AxisStep.get(step.info, Axis.SELF, step.test));
     }
 
     final AxisPath orig = (AxisPath) ex;

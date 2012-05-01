@@ -220,8 +220,7 @@ public class AxisPath extends Path {
           if(ax == null) break;
           if(j != 0) {
             final AxisStep prev = step(j - 1);
-            invSteps = Array.add(invSteps,
-                AxisStep.get(info, ax, prev.test, prev.preds));
+            invSteps = Array.add(invSteps, AxisStep.get(info, ax, prev.test, prev.preds));
           } else {
             // add document test for collections and axes other than ancestors
             if(test != Test.DOC || ax != Axis.ANC && ax != Axis.ANCORSELF)
@@ -336,8 +335,7 @@ public class AxisPath extends Path {
     // add inverted steps in a backward manner
     int c = 0;
     while(--s >= 0) {
-      e[c++] = AxisStep.get(info, step(s + 1).axis.invert(),
-          step(s).test, step(s).preds);
+      e[c++] = AxisStep.get(info, step(s + 1).axis.invert(), step(s).test, step(s).preds);
     }
     e[c] = AxisStep.get(info, step(s + 1).axis.invert(), curr.test);
     return new AxisPath(info, rt, e);

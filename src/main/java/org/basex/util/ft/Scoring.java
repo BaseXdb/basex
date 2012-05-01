@@ -97,8 +97,8 @@ public final class Scoring {
    * @param tl text length
    * @return score value
    */
-  public static double textNode(final int npv, final int is,
-      final int tokl, final int tl) {
+  public static double textNode(final int npv, final int is, final int tokl,
+      final int tl) {
     return max((double) npv / is, log(tokl * npv + 1) / log(tl + 1));
   }
 

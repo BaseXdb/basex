@@ -64,8 +64,8 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  TrieNode delete(final int h, final Item k, final int l,
-      final InputInfo ii) throws QueryException {
+  TrieNode delete(final int h, final Item k, final int l, final InputInfo ii)
+      throws QueryException {
     final int key = key(h, l);
     final TrieNode sub = kids[key];
     if(sub == null) return this;
@@ -96,8 +96,8 @@ final class Branch extends TrieNode {
   }
 
   @Override
-  boolean contains(final int h, final Item k, final int l,
-      final InputInfo ii) throws QueryException {
+  boolean contains(final int h, final Item k, final int l, final InputInfo ii)
+      throws QueryException {
     final int key = key(h, l);
     final TrieNode sub = kids[key];
     return sub != null && sub.contains(h, k, l + 1, ii);

@@ -31,8 +31,7 @@ public interface GUICommand {
   void execute(final GUI gui);
 
   /**
-   * Enables or disables the specified button,
-   * depending on the command properties.
+   * Enables or disables the specified button, depending on the command properties.
    * @param gui reference to the main window
    * @param button button to be modified
    */

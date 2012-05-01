@@ -407,8 +407,8 @@ final class FTTrie extends FTIndex {
    * @param fast fast evaluation
    * @return result iterator
    */
-  private FTIndexIterator wc(final int id, final byte[] tok,
-      final int posw, final boolean first, final boolean fast) {
+  private FTIndexIterator wc(final int id, final byte[] tok, final int posw,
+      final boolean first, final boolean fast) {
 
     byte[] aw = null;
     byte[] bw = null;
@@ -454,8 +454,7 @@ final class FTTrie extends FTIndex {
         sc[bw.length] = '.';
 
         // copy part after wildcard
-        System.arraycopy(tok, posw + 2, sc, bw.length + 1,
-            sc.length - bw.length - 1);
+        System.arraycopy(tok, posw + 2, sc, bw.length + 1, sc.length - bw.length - 1);
       } else {
         // copy unprocessed part before wildcard
         sc[0] = '.';
@@ -472,24 +471,22 @@ final class FTTrie extends FTIndex {
       // valueSearchNode == .*
       if(!(posw == 0 && tok.length == 2)) {
         // lookup in trie without wildcard
-        final byte[] searchChar = new byte[tok.length - 2 - currentLength];
+        final byte[] sc = new byte[tok.length - 2 - currentLength];
         // copy unprocessed part before wildcard
         if(bw != null) {
-          System.arraycopy(bw, 0, searchChar, 0, bw.length);
+          System.arraycopy(bw, 0, sc, 0, bw.length);
         }
         // copy part after wildcard
         if(bw == null) {
-          aw = new byte[searchChar.length];
-          System.arraycopy(tok, posw + 2, searchChar, 0, searchChar.length);
-          System.arraycopy(tok, posw + 2, aw, 0, searchChar.length);
+          aw = new byte[sc.length];
+          System.arraycopy(tok, posw + 2, sc, 0, sc.length);
+          System.arraycopy(tok, posw + 2, aw, 0, sc.length);
         } else {
-          aw = new byte[searchChar.length - bw.length];
-          System.arraycopy(tok, posw + 2, searchChar,
-              bw.length, searchChar.length - bw.length);
-          System.arraycopy(tok, posw + 2, aw,
-              0, searchChar.length - bw.length);
+          aw = new byte[sc.length - bw.length];
+          System.arraycopy(tok, posw + 2, sc, bw.length, sc.length - bw.length);
+          System.arraycopy(tok, posw + 2, aw, 0, sc.length - bw.length);
         }
-        d = iter(0, searchChar, fast);
+        d = iter(0, sc, fast);
         // all chars from valueSearchNode are contained in trie
         if(bw != null && counter[1] != bw.length) return d;
       }
@@ -749,15 +746,13 @@ final class FTTrie extends FTIndex {
           System.arraycopy(vsn, 0, b, 0, vsn.length);
 
           b[i] = (byte) cne[i + 1];
-          ld = FTIndexIterator.union(fuzzy(id, cne, cdid,
-              b, d, p, r + 1, c, f), ld);
+          ld = FTIndexIterator.union(fuzzy(id, cne, cdid, b, d, p, r + 1, c, f), ld);
           if(vsn.length > 1) {
             // delete char
             b = new byte[vsn.length - 1];
             System.arraycopy(vsn, 0, b, 0, i);
             System.arraycopy(vsn, i + 1, b, i, vsn.length - i - 1);
-            ld = FTIndexIterator.union(fuzzy(id, cne, cdid,
-                b, d + 1, p, r, c, f), ld);
+            ld = FTIndexIterator.union(fuzzy(id, cne, cdid, b, d + 1, p, r, c, f), ld);
           }
         }
       }
@@ -787,16 +782,14 @@ final class FTTrie extends FTIndex {
         b = new byte[vsn.length + 1];
         b[0] = (byte) ne[1];
         System.arraycopy(vsn, 0, b, 1, vsn.length);
-        ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
-            b, d, p + 1, r, c, f), ld);
+        ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid, b, d, p + 1, r, c, f), ld);
 
         if(vsn.length > 0) {
           // delete char
           b = new byte[vsn.length - 1];
           System.arraycopy(vsn, 1, b, 0, b.length);
-          ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid,
-              b, d + 1, p, r, c, f), ld);
-            // replace
+          ld = FTIndexIterator.union(fuzzy(cne[k], ne, tdid, b, d + 1, p, r, c, f), ld);
+          // replace
           b = new byte[vsn.length];
           System.arraycopy(vsn, 1, b, 1, vsn.length - 1);
             b[0] = (byte) ne[1];

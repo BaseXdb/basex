@@ -57,8 +57,8 @@ public final class Functions extends TokenSet {
    * @return function instance
    * @throws QueryException query exception
    */
-  public StandardFunc get(final QNm name, final Expr[] args,
-      final QueryContext ctx, final InputInfo ii) throws QueryException {
+  public StandardFunc get(final QNm name, final Expr[] args, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
     final int id = id(name.eqname());
     if(id == 0) return null;

@@ -110,8 +110,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     final Insets i = getInsets();
 
     if(gui.gprop.is(GUIProp.GRADIENT)) {
-      BaseXLayout.fill(g, WHITE, color1,
-          i.left, i.top, w - i.right, h - i.bottom);
+      BaseXLayout.fill(g, WHITE, color1, i.left, i.top, w - i.right, h - i.bottom);
     }
     if(w < 150 || h < 160) return;
 
@@ -303,8 +302,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
 
     // paint panel which is currently moved somewhere else
     if(target != null && target != source) {
-      final Rectangle tr = new Rectangle(absLoc(target),
-          target.getSize());
+      final Rectangle tr = new Rectangle(absLoc(target), target.getSize());
       final int minx = tr.width >> 1;
       final int miny = tr.height >> 1;
 

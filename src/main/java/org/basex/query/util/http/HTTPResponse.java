@@ -79,8 +79,8 @@ public final class HTTPResponse {
     }
 
     // construct <http:response/>
-    final FElem responseEl = new FElem(HTTP_RESPONSE,
-        hdrs, attrs, new Atts(HTTP, HTTPURI));
+    final FElem responseEl = new FElem(HTTP_RESPONSE, hdrs, attrs,
+        new Atts(HTTP, HTTPURI));
     responseEl.add(body);
 
     // result

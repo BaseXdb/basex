@@ -1009,7 +1009,7 @@ public class QueryParser extends InputParser {
       }
 
       group = new Group(grp[0].info, grp,
-          new Var[][]{ ng.toArray(new Var[ng.size()]), ngrp });
+          new Var[][] { ng.toArray(new Var[ng.size()]), ngrp });
       alter = GRPBY;
     }
 
@@ -2481,8 +2481,7 @@ public class QueryParser extends InputParser {
     if(!wsConsume(BRACE1)) return null;
     final Expr e = expr();
     wsCheck(BRACE2);
-    return new CElem(info(), name, null,
-        e == null ? new Expr[0] : new Expr[] { e });
+    return new CElem(info(), name, null, e == null ? new Expr[0] : new Expr[] { e });
   }
 
   /**
@@ -2990,8 +2989,7 @@ public class QueryParser extends InputParser {
       error(FTNOSTEM, fto.ln);
 
     // consume weight option
-    if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr,
-        enclosed(NOENCLEXPR));
+    if(wsConsumeWs(WEIGHT)) expr = new FTWeight(info(), expr, enclosed(NOENCLEXPR));
 
     // skip options if none were specified...
     return found ? new FTOptions(info(), expr, fto) : expr;

@@ -8,8 +8,7 @@ package org.basex.gui.view.map;
  */
 final class BinaryAlgo extends MapAlgo {
   @Override
-  MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne) {
+  MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne) {
     return calcMap(r, ml, ns, ne, 1);
   }
 

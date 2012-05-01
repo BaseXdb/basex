@@ -80,8 +80,7 @@ public final class Insert extends Update {
         (before || after ? UPATTELM : UPATTELM2).thrw(info);
 
       dbn = ctx.updates.determineDataRef(targ, ctx);
-      up = new InsertAttribute(dbn.pre, dbn.data, info,
-          checkNS(aList, targ, ctx));
+      up = new InsertAttribute(dbn.pre, dbn.data, info, checkNS(aList, targ, ctx));
       ctx.updates.add(up, ctx);
     }
 

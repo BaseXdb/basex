@@ -222,14 +222,12 @@ public final class PlotView extends View {
    * @param markedSub child node of marked node
    * @return item image
    */
-  private BufferedImage itemImage(final boolean focus,
-      final boolean marked, final boolean markedSub) {
+  private BufferedImage itemImage(final boolean focus, final boolean marked,
+      final boolean markedSub) {
 
     final int size = Math.max(1, gui.gprop.num(GUIProp.FONTSIZE) +
-        gui.gprop.num(GUIProp.PLOTDOTS) - (focus ? 2 :
-          marked || markedSub ? 4 : 6));
-    final BufferedImage img = new BufferedImage(size, size,
-        Transparency.TRANSLUCENT);
+        gui.gprop.num(GUIProp.PLOTDOTS) - (focus ? 2 : marked || markedSub ? 4 : 6));
+    final BufferedImage img = new BufferedImage(size, size, Transparency.TRANSLUCENT);
 
     final Graphics g = img.getGraphics();
     smooth(g);
@@ -248,8 +246,7 @@ public final class PlotView extends View {
    * Precalculates the plot and returns the result as buffered image.
    */
   private void createPlotImage() {
-    plotImg = new BufferedImage(getWidth(), getHeight(),
-        Transparency.BITMASK);
+    plotImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
     final Graphics g = plotImg.getGraphics();
     smooth(g);
 
@@ -260,8 +257,7 @@ public final class PlotView extends View {
     // draw items
     g.setColor(color4);
     for(int i = 0; i < plotData.pres.length; ++i) {
-      drawItem(g, plotData.xAxis.co[i],
-          plotData.yAxis.co[i], false, false, false);
+      drawItem(g, plotData.xAxis.co[i], plotData.yAxis.co[i], false, false, false);
     }
   }
 
@@ -389,8 +385,7 @@ public final class PlotView extends View {
    */
   private void createMarkedNodes() {
     final Data data = gui.context.data();
-    markedImg = new BufferedImage(getWidth(), getHeight(),
-        Transparency.BITMASK);
+    markedImg = new BufferedImage(getWidth(), getHeight(), Transparency.BITMASK);
     final Graphics gi = markedImg.getGraphics();
     smooth(gi);
 
@@ -403,8 +398,8 @@ public final class PlotView extends View {
     if(!drawSubNodes) {
       while(i < m.length) {
         final int pi = plotData.findPre(m[i]);
-        if(pi > -1) drawItem(gi, plotData.xAxis.co[pi],
-            plotData.yAxis.co[pi], false, true, false);
+        if(pi > -1) drawItem(gi, plotData.xAxis.co[pi], plotData.yAxis.co[pi],
+            false, true, false);
         ++i;
       }
       return;
@@ -555,8 +550,7 @@ public final class PlotView extends View {
         int j = 0;
         // find value for given plot position
         while(j < axis.co.length && axis.co[j] != op) ++j;
-        drawCaptionAndGrid(g, drawX,
-            string(axis.getValue(plotData.pres[j])), op);
+        drawCaptionAndGrid(g, drawX, string(axis.getValue(plotData.pres[j])), op);
       }
       // axis is drawn for numerical data, type INT/DBL
     } else {
@@ -612,8 +606,7 @@ public final class PlotView extends View {
 
         // draw 0 label if necessary
         if(0 >= axis.min && 0 <= axis.max)
-          drawCaptionAndGrid(g, drawX, BaseXLayout.value(0),
-              axis.calcPosition(0));
+          drawCaptionAndGrid(g, drawX, BaseXLayout.value(0), axis.calcPosition(0));
 
         // draw labels > 0
         if(axis.max > 0) {
@@ -721,16 +714,16 @@ public final class PlotView extends View {
    * @param imgW image width
    * @return buffered image
    */
-  private BufferedImage createCaptionImage(final Graphics g,
-      final String caption, final boolean im, final int imgW) {
+  private BufferedImage createCaptionImage(final Graphics g, final String caption,
+      final boolean im, final int imgW) {
+
     final int textH = g.getFontMetrics().getHeight();
     final int fs = gui.gprop.num(GUIProp.FONTSIZE);
 
     // caption labels are rotated, for both x and y axis. first a buffered
     // image is created which displays the rotated label ...
     final int imgH = 160;
-    final BufferedImage img = new BufferedImage(imgW, imgH,
-        Transparency.BITMASK);
+    final BufferedImage img = new BufferedImage(imgW, imgH, Transparency.BITMASK);
     final Graphics2D g2d = img.createGraphics();
     smooth(g2d);
     g2d.rotate(ROTATE, imgW, textH);

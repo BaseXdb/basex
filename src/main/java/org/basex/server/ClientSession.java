@@ -18,8 +18,7 @@ import org.basex.util.*;
  * <li> A socket instance is created by the constructor.</li>
  * <li> The {@link #execute} method sends database commands to the server.
  * All strings are encoded as UTF8 and suffixed by a zero byte.</li>
- * <li> If the command has been successfully executed,
- * the result string is read.</li>
+ * <li> If the command has been successfully executed, the result string is read.</li>
  * <li> Next, the command info string is read.</li>
  * <li> A last byte is next sent to indicate if command execution
  * was successful (0) or not (1).</li>

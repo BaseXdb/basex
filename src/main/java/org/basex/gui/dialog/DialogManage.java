@@ -100,8 +100,7 @@ public final class DialogManage extends BaseXDialog {
     final BaseXBack tab2 = new BaseXBack(new BorderLayout(0, 8)).border(8);
     tab2.add(doc2, BorderLayout.NORTH);
     tab2.add(backups, BorderLayout.CENTER);
-    tab2.add(newButtons(backup, restore, delete, deleteAll),
-        BorderLayout.SOUTH);
+    tab2.add(newButtons(backup, restore, delete, deleteAll), BorderLayout.SOUTH);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(INFORMATION, tab1);

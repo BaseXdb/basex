@@ -19,8 +19,8 @@ public final class InsertAttribute extends InsertBase {
    * @param i input info
    * @param c node copy
    */
-  public InsertAttribute(final int p, final Data d,
-      final InputInfo i, final NodeCache c) {
+  public InsertAttribute(final int p, final Data d, final InputInfo i,
+      final NodeCache c) {
     super(PrimitiveType.INSERTATTR, p, d, i, c);
   }
 

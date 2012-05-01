@@ -267,8 +267,8 @@ public final class BaseXLayout {
    * @param xe horizontal end position
    * @param ye vertical end position
    */
-  public static void fill(final Graphics gg, final Color c1,
-      final Color c2, final int xs, final int ys, final int xe, final int ye) {
+  public static void fill(final Graphics gg, final Color c1, final Color c2, final int xs,
+      final int ys, final int xe, final int ye) {
 
     final int w = xe - xs;
     final int h = ye - ys;
@@ -308,16 +308,15 @@ public final class BaseXLayout {
    * @param ye vertical end position
    * @param focus highlighting flag
    */
-  public static void drawCell(final Graphics g, final int xs,
-      final int xe, final int ys, final int ye, final boolean focus) {
+  public static void drawCell(final Graphics g, final int xs, final int xe, final int ys,
+      final int ye, final boolean focus) {
 
     g.setColor(GRAY);
     g.drawRect(xs, ys, xe - xs - 1, ye - ys - 1);
     g.setColor(Color.white);
     g.drawRect(xs + 1, ys + 1, xe - xs - 3, ye - ys - 3);
 
-    fill(g, focus ? LGRAY : Color.white, LGRAY,
-        xs + 2, ys + 2, xe - 1, ye - 1);
+    fill(g, focus ? LGRAY : Color.white, LGRAY, xs + 2, ys + 2, xe - 1, ye - 1);
   }
 
   /**

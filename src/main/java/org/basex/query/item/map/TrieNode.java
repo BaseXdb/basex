@@ -30,8 +30,8 @@ abstract class TrieNode {
     Value get(final int h, final Item k, final int l, final InputInfo i) {
       return null; }
     @Override
-    boolean contains(final int h, final Item k, final int l,
-        final InputInfo ii) { return false; }
+    boolean contains(final int h, final Item k, final int l, final InputInfo ii) {
+      return false; }
     @Override
     TrieNode addAll(final TrieNode o, final int l, final InputInfo ii) {
       return o; }

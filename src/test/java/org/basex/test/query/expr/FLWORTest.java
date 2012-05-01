@@ -32,8 +32,7 @@ public final class FLWORTest extends SandboxTest {
     try {
       final String result = new XQuery(query).execute(context);
       // quotes are replaced by apostrophes to simplify comparison
-      assertEquals(expected.replaceAll("\"", "'"),
-          result.replaceAll("\"", "'"));
+      assertEquals(expected.replaceAll("\"", "'"), result.replaceAll("\"", "'"));
     } catch(final BaseXException ex) {
       fail(Util.message(ex));
     }

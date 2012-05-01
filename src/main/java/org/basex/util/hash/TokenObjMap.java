@@ -3,8 +3,8 @@ package org.basex.util.hash;
 import java.util.*;
 
 /**
- * This is an efficient hash map for generic objects,
- * extending the {@link TokenSet hash set}.
+ * This is an efficient hash map for generic objects, extending the
+ * {@link TokenSet hash set}.
  * @param <E> generic value type
  *
  * @author BaseX Team 2005-12, BSD License

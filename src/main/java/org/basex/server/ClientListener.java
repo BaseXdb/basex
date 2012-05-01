@@ -200,8 +200,7 @@ public final class ClientListener extends Thread {
         }
       }
     } catch(final IOException ex) {
-      log.write(this, sc == ServerCmd.COMMAND ? cmd : sc,
-          ERROR_C + ex.getMessage());
+      log.write(this, sc == ServerCmd.COMMAND ? cmd : sc, ERROR_C + ex.getMessage());
       Util.debug(ex);
       command = null;
       quit();

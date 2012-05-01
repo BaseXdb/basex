@@ -3,8 +3,7 @@ package org.basex.util.hash;
 import java.util.*;
 
 /**
- * This is an efficient hash map for booleans,
- * extending the {@link TokenSet hash set}.
+ * This is an efficient hash map for booleans, extending the {@link TokenSet hash set}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

@@ -106,6 +106,7 @@ public final class StringRangeTest extends QueryPlanTest {
    */
   public void test(final String query, final String result,
       final Class<? extends Expr> expr) throws BaseXException {
+
     new CreateIndex(CmdIndex.TEXT).execute(context);
     check(query, result, "exists(//" + expr.getSimpleName() + ")");
     new DropIndex(CmdIndex.TEXT).execute(context);

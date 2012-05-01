@@ -113,8 +113,9 @@ public final class InfoView extends View {
    * @param time time needed
    * @param ok flag indicating if command execution was successful
    */
-  public void setInfo(final String info, final Command cmd,
-      final String time, final boolean ok) {
+  public void setInfo(final String info, final Command cmd, final String time,
+      final boolean ok) {
+
     final StringList eval = new StringList();
     final StringList comp = new StringList();
     final StringList plan = new StringList();

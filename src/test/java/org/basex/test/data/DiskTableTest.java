@@ -102,8 +102,9 @@ public final class DiskTableTest extends SandboxTest {
    * @param currentNodeNumber first new entry to compare
    * @param count number of entries to compare
    */
-  private void assertEntrysEqual(final int startNodeNumber,
-      final int currentNodeNumber, final int count) {
+  private void assertEntrysEqual(final int startNodeNumber, final int currentNodeNumber,
+      final int count) {
+
     final int startOffset = startNodeNumber << IO.NODEPOWER;
     final int currentOffset = currentNodeNumber << IO.NODEPOWER;
     for(int i = 0; i < count << IO.NODEPOWER; ++i) {

@@ -143,8 +143,7 @@ public final class MAB2Parser extends SingleParser {
       }
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem();
     }
-    if(Prop.debug) Util.err("\nCreate Titles: %/%\n", p,
-        Performance.getMemory());
+    if(Prop.debug) Util.err("\nCreate Titles: %/%\n", p, Performance.getMemory());
     builder.endElem();
 
     // write the mediovis ids back to disk

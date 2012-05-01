@@ -669,8 +669,7 @@ public enum AtomType implements Type {
   /** Java type. */
   JAVA("java", null, EMPTY, true, true, true, false, false, 86) {
     @Override
-    public Item cast(final Item it, final QueryContext ctx,
-        final InputInfo ii) {
+    public Item cast(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Jav(it);
     }
     @Override

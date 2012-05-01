@@ -7,8 +7,7 @@ import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 
 /**
- * This is an efficient hash map for integers,
- * extending the {@link TokenSet hash set}.
+ * This is an efficient hash map for integers, extending the {@link TokenSet hash set}.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

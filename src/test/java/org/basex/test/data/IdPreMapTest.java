@@ -150,8 +150,7 @@ public final class IdPreMapTest {
    * @param m tested map
    * @param b base map
    */
-  private static void deletePerformance(final IdPreMap m,
-      final DummyIdPreMap b) {
+  private static void deletePerformance(final IdPreMap m, final DummyIdPreMap b) {
     // prepare <pre, id> pairs:
     final int[][] d = new int[BASEID + 1][2];
     for(int i = 0, id = BASEID + 1; i < d.length; --id, ++i) {

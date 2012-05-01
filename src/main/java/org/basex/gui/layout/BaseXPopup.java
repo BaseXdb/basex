@@ -38,9 +38,7 @@ public final class BaseXPopup extends JPopupMenu {
    * @param g gui reference
    * @param pop popup reference
    */
-  public BaseXPopup(final JComponent comp, final GUI g,
-      final GUICommand... pop) {
-
+  public BaseXPopup(final JComponent comp, final GUI g, final GUICommand... pop) {
     popup = pop;
     gui = g;
 

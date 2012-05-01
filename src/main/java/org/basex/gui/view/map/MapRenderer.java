@@ -283,8 +283,8 @@ final class MapRenderer {
    * @param mh maximum height
    * @return height
    */
-  private static int drawSentence(final Graphics g,
-      final MapRect r, final int[][] data, final boolean draw, final int mh) {
+  private static int drawSentence(final Graphics g, final MapRect r, final int[][] data,
+      final boolean draw, final int mh) {
 
     final boolean sen = r.thumbal == 1;
     final FTPos ftp = r.pos;

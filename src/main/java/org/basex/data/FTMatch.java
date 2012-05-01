@@ -5,8 +5,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * Match full-text container,
- * referencing several {@link FTStringMatch} instances.
+ * Match full-text container, referencing several {@link FTStringMatch} instances.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

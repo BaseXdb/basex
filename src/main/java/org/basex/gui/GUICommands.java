@@ -631,8 +631,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows a preference dialog. */
-  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% P",
-      H_PREFERENCES, false, false) {
+  C_PREFS(PREFERENCES + DOTS, Prop.MAC ? "% COMMA" : "% P", H_PREFERENCES, false, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);

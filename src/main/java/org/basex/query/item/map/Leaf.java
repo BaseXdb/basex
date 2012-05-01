@@ -70,8 +70,8 @@ final class Leaf extends TrieNode {
   }
 
   @Override
-  boolean contains(final int h, final Item k, final int l,
-      final InputInfo ii) throws QueryException {
+  boolean contains(final int h, final Item k, final int l, final InputInfo ii)
+      throws QueryException {
     return h == hash && eq(key, k, ii);
   }
 

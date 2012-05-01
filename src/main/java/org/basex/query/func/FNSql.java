@@ -166,8 +166,7 @@ public final class FNSql extends StandardFunc {
   private static Properties connProps(final TokenObjMap<Object> options) {
     final Properties props = new Properties();
     for(final byte[] next : options.keys()) {
-      if(next != null) props.setProperty(string(next),
-          options.get(next).toString());
+      if(next != null) props.setProperty(string(next), options.get(next).toString());
     }
     return props;
   }

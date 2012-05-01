@@ -43,9 +43,7 @@ public final class FTBitapSearch {
    *          searched for)
    * @param c comparator for comparing two elements for equality
    */
-  public FTBitapSearch(final FTIterator h, final FTTokens n,
-      final TokenComparator c) {
-
+  public FTBitapSearch(final FTIterator h, final FTTokens n, final TokenComparator c) {
     haystack = h;
     cmp = c;
     needles = n;

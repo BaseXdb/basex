@@ -28,9 +28,7 @@ public final class FTIndexAccess extends Simple {
    * @param ex contains, select and optional ignore expression
    * @param ic index context
    */
-  public FTIndexAccess(final InputInfo ii, final FTExpr ex,
-      final IndexContext ic) {
-
+  public FTIndexAccess(final InputInfo ii, final FTExpr ex, final IndexContext ic) {
     super(ii);
     ftexpr = ex;
     ictx = ic;

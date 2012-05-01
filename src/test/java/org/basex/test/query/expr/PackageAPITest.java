@@ -80,10 +80,8 @@ public final class PackageAPITest extends AdvancedQueryTest {
     assertEquals(pkgDict.keys().length, 2);
     assertTrue(pkgDict.contains(token(PKG1ID)));
     assertTrue(pkgDict.contains(token(PKG2ID)));
-    assertEquals("pkg1",
-        string(pkgDict.get(token(PKG1ID))));
-    assertEquals("pkg2",
-        string(pkgDict.get(token(PKG2ID))));
+    assertEquals("pkg1", string(pkgDict.get(token(PKG1ID))));
+    assertEquals("pkg2", string(pkgDict.get(token(PKG2ID))));
   }
 
   /** Test for missing mandatory attributes. */

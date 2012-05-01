@@ -45,14 +45,14 @@ final class List extends TrieNode {
    * @param k2 second key
    * @param v2 second value
    */
-  List(final int h, final Item k1, final Value v1,
-      final Item k2, final Value v2) {
+  List(final int h, final Item k1, final Value v1, final Item k2, final Value v2) {
     this(h, new Item[]{ k1, k2 }, new Value[]{ v1, v2 });
   }
 
   @Override
-  TrieNode delete(final int h, final Item k, final int l,
-      final InputInfo ii) throws QueryException {
+  TrieNode delete(final int h, final Item k, final int l, final InputInfo ii)
+      throws QueryException {
+
     if(h == hash) {
       for(int i = size; i-- > 0;) {
         if(eq(k, keys[i], ii)) {
@@ -199,8 +199,7 @@ final class List extends TrieNode {
     final TrieNode[] ch = o.copyKids();
     final TrieNode old = ch[k];
     ch[k] = old == null ? this : old.addAll(this, l + 1, ii);
-    return new Branch(ch, o.used | 1 << k,
-        o.size + size - (old != null ? old.size : 0));
+    return new Branch(ch, o.used | 1 << k, o.size + size - (old != null ? old.size : 0));
   }
 
   @Override

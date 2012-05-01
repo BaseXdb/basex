@@ -73,8 +73,7 @@ public final class ValueBuilder extends IndexBuilder {
       }
       // skip too long values
       if(data.kind(pre) == k && data.textLen(pre, text) <= data.meta.maxlen)
-        index.index(data.text(pre, text),
-            data.meta.updindex ? data.id(pre) : pre);
+        index.index(data.text(pre, text), data.meta.updindex ? data.id(pre) : pre);
     }
 
     if(merge) {

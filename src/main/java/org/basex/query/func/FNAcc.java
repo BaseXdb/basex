@@ -58,8 +58,8 @@ public final class FNAcc extends StandardFunc {
    * @return double iterator
    * @throws QueryException query exception
    */
-  private Item string(final Expr e, final InputInfo ii,
-      final QueryContext ctx) throws QueryException {
+  private Item string(final Expr e, final InputInfo ii, final QueryContext ctx)
+      throws QueryException {
 
     final Item it = e.item(ctx, info);
     if(it == null) return Str.ZERO;

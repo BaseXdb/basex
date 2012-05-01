@@ -66,8 +66,7 @@ public final class GUIMacOSX {
 
       final Class<?> alc = Class.forName(C_APPLICATION_LISTENER);
       final Object listener = Proxy.newProxyInstance(
-          getClass().getClassLoader(), new Class[] { alc},
-          new AppInvocationHandler());
+          getClass().getClassLoader(), new Class[] { alc}, new AppInvocationHandler());
       invoke(appObj, "addApplicationListener", alc, listener);
     }
   }
@@ -198,8 +197,8 @@ public final class GUIMacOSX {
    * @return return value of the method
    * @throws Exception if any error occurs.
    */
-  static Object invoke(final Object obj, final String method,
-      final boolean arg) throws Exception {
+  static Object invoke(final Object obj, final String method, final boolean arg)
+      throws Exception {
     return invoke(obj, method, Boolean.TYPE, arg);
   }
 
@@ -212,8 +211,8 @@ public final class GUIMacOSX {
    * @return return value of the method
    * @throws Exception if any error occurs
    */
-  static Object invoke(final Object obj, final String method,
-      final Class<?> argClass, final Object argObject) throws Exception {
+  static Object invoke(final Object obj, final String method, final Class<?> argClass,
+      final Object argObject) throws Exception {
     final Class<?>[] argClasses = { argClass };
     final Object[] argObjects = { argObject };
     return invoke(obj.getClass(), obj, method, argClasses, argObjects);
@@ -231,8 +230,8 @@ public final class GUIMacOSX {
    * @throws Exception if any error occurs
    */
   private static Object invoke(final Class<?> clazz, final Object obj,
-      final String method, final Class<?>[] argClasses,
-      final Object[] argObjects) throws Exception {
+      final String method, final Class<?>[] argClasses, final Object[] argObjects)
+      throws Exception {
     return clazz.getMethod(method, argClasses).invoke(obj, argObjects);
   }
 }

@@ -47,28 +47,25 @@ final class EnglishStemmer extends InternalStemmer {
 
   /** Step 2. */
   private static final byte[][][] ST2 = {
-      tokens("abli", "able"), tokens("alism", "al"), tokens("aliti", "al"),
-      tokens("alli", "al"), tokens("anci", "ance"), tokens("ation", "ate"),
-      tokens("ational", "ate"), tokens("ator", "ate"), tokens("biliti", "ble"),
-      tokens("eli", "e"), tokens("enci", "ence"), tokens("entli", "ent"),
-      tokens("fulness", "ful"), tokens("iveness", "ive"),
-      tokens("iviti", "ive"),
-      tokens("ization", "ize"), tokens("ization", "ize"),
-      tokens("izer", "ize"),
-      tokens("izer", "ize"), tokens("ousli", "ous"), tokens("ousness", "ous"),
-      tokens("tional", "tion"),
+    tokens("abli", "able"), tokens("alism", "al"), tokens("aliti", "al"),
+    tokens("alli", "al"), tokens("anci", "ance"), tokens("ation", "ate"),
+    tokens("ational", "ate"), tokens("ator", "ate"), tokens("biliti", "ble"),
+    tokens("eli", "e"), tokens("enci", "ence"), tokens("entli", "ent"),
+    tokens("fulness", "ful"), tokens("iveness", "ive"), tokens("iviti", "ive"),
+    tokens("ization", "ize"), tokens("ization", "ize"), tokens("izer", "ize"),
+    tokens("izer", "ize"), tokens("ousli", "ous"), tokens("ousness", "ous"),
+    tokens("tional", "tion"),
   };
   /** Step 3. */
   private static final byte[][][] ST3 = {
-      tokens("alize", "al"), tokens("alize", "al"), tokens("ative", ""),
-      tokens("ful", ""), tokens("ical", "ic"), tokens("icate", "ic"),
-      tokens("iciti", "ic"), tokens("ness", "")
+    tokens("alize", "al"), tokens("alize", "al"), tokens("ative", ""), tokens("ful", ""),
+    tokens("ical", "ic"), tokens("icate", "ic"), tokens("iciti", "ic"), tokens("ness", "")
   };
   /** Step 4. */
   private static final byte[][] ST4 = tokens(
-      "able", "al", "ance", "ant", "ate", "ement", "ence", "ent", "er", "ible",
-      "ic", "ism", "iti", "ive", "ize", "ment", "ou", "ous", "sion", "tion"
-      );
+    "able", "al", "ance", "ant", "ate", "ement", "ence", "ent", "er", "ible", "ic", "ism",
+    "iti", "ive", "ize", "ment", "ou", "ous", "sion", "tion"
+  );
 
   /** Token to be stemmed. */
   private byte[] tok;

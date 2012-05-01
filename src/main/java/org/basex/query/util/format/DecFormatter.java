@@ -118,8 +118,8 @@ public final class DecFormatter extends FormatUtil {
    * @return string representation
    * @throws QueryException query exception
    */
-  public byte[] format(final InputInfo ii, final Item number,
-      final String picture) throws QueryException {
+  public byte[] format(final InputInfo ii, final Item number, final String picture)
+      throws QueryException {
 
     // find pattern separator and sub-patterns
     final TokenList tl = new TokenList();
@@ -277,8 +277,8 @@ public final class DecFormatter extends FormatUtil {
    * @return picture variables
    * @throws QueryException query exception
    */
-  private String format(final Item it, final Picture[] pics,
-      final InputInfo ii) throws QueryException {
+  private String format(final Item it, final Picture[] pics, final InputInfo ii)
+      throws QueryException {
 
     // return results for NaN
     final double d = it.dbl(ii);

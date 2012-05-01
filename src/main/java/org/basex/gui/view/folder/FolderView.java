@@ -327,8 +327,7 @@ public final class FolderView extends View {
     g.setColor(color3);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
 
-    openedMarker = new BufferedImage(boxW + 1, boxW + 1,
-        BufferedImage.TYPE_INT_ARGB);
+    openedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
     g = openedMarker.createGraphics();
     smooth(g);
 
@@ -341,8 +340,7 @@ public final class FolderView extends View {
     g.setColor(color3);
     g.fillPolygon(p);
 
-    closedMarker = new BufferedImage(boxW + 1, boxW + 1,
-        BufferedImage.TYPE_INT_ARGB);
+    closedMarker = new BufferedImage(boxW + 1, boxW + 1, BufferedImage.TYPE_INT_ARGB);
     g = closedMarker.createGraphics();
     smooth(g);
 

@@ -5,8 +5,7 @@ import java.util.*;
 import org.basex.util.*;
 
 /**
- * AllMatches full-text container,
- * referencing several {@link FTMatch} instances.
+ * AllMatches full-text container, referencing several {@link FTMatch} instances.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

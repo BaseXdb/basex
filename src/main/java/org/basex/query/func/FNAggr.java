@@ -104,8 +104,8 @@ public final class FNAggr extends StandardFunc {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item minmax(final Iter iter, final OpV cmp,
-      final QueryContext ctx) throws QueryException {
+  private Item minmax(final Iter iter, final OpV cmp, final QueryContext ctx)
+      throws QueryException {
 
     if(expr.length == 2) checkColl(expr[1], ctx);
 

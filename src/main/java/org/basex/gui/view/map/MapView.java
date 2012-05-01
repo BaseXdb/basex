@@ -151,8 +151,8 @@ public final class MapView extends View implements Runnable {
     if(painter == null) return;
 
     // calculate map
-    calc(new MapRect(0, 0, getWidth(), getHeight(), 0, 0),
-        gui.context.current(), mainMap);
+    final Nodes curr = gui.context.current();
+    calc(new MapRect(0, 0, getWidth(), getHeight(), 0, 0), curr, mainMap);
     repaint();
   }
 
@@ -375,12 +375,11 @@ public final class MapView extends View implements Runnable {
         final byte[] text = MapPainter.content(data, f);
         // calculate tooltip
         final int[][] info = new FTLexer().init(text).info();
-        final TokenList tl = MapRenderer.calculateToolTip(f,
-            info, mouseX, mouseY, getWidth(), g);
+        final TokenList tl = MapRenderer.calculateToolTip(f, info, mouseX, mouseY,
+            getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         // draw calculated tooltip
-        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl,
-            gprop.num(GUIProp.FONTSIZE));
+        MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl, gprop.num(GUIProp.FONTSIZE));
         f.x -= 3;
         f.w += 3;
       }

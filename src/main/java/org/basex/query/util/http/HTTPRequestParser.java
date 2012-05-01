@@ -60,8 +60,8 @@ public final class HTTPRequestParser {
         if(bodies != null) {
           // $bodies must contain exactly one item
           if(bodies.size() != 1) REQINV.thrw(info,
-              "Number of items with request body content differs "
-                  + "from number of body descriptors.");
+              "Number of items with request body content differs " +
+              "from number of body descriptors.");
           it = bodies.next();
         }
         parseBody(payload, it, r.payloadAttrs, r.bodyContent);
@@ -75,8 +75,8 @@ public final class HTTPRequestParser {
         // number of items in $bodies must be equal to number of body
         // descriptors
         if(bodies != null && bodies.size() != i) REQINV.thrw(info,
-            "Number of items with request body content differs "
-                + "from number of body descriptors.");
+            "Number of items with request body content differs " +
+            "from number of body descriptors.");
         parseMultipart(payload, bodies, r.payloadAttrs, r.parts);
         r.isMultipart = true;
       } else {

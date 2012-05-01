@@ -410,8 +410,8 @@ public final class FNDb extends StandardFunc {
    * @param mdate modified date
    * @return <code>&lt;resource/&gt;</code> node
    */
-  static FNode resource(final byte[] path, final boolean raw,
-      final long size, final byte[] ctype, final long mdate) {
+  static FNode resource(final byte[] path, final boolean raw, final long size,
+      final byte[] ctype, final long mdate) {
 
     final String tstamp = formatDate(new Date(mdate), Dtm.FORMAT);
     final FElem res = new FElem(RESOURCE).

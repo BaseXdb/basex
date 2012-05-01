@@ -165,14 +165,12 @@ public final class HTTPClient {
 
     final byte[][] headerNames = r.headers.keys();
     for(final byte[] headerName : headerNames)
-      conn.addRequestProperty(string(headerName),
-          string(r.headers.get(headerName)));
+      conn.addRequestProperty(string(headerName), string(r.headers.get(headerName)));
     // HTTP Basic Authentication
     final byte[] sendAuth = r.attrs.get(SEND_AUTHORIZATION);
     if(sendAuth != null && Bln.parse(sendAuth, info))
       conn.setRequestProperty(AUTHORIZATION,
-        encodeCredentials(string(r.attrs.get(USERNAME)),
-            string(r.attrs.get(PASSWORD))));
+      encodeCredentials(string(r.attrs.get(USERNAME)), string(r.attrs.get(PASSWORD))));
   }
 
   /**
@@ -259,8 +257,8 @@ public final class HTTPClient {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private void writeBase64(final ValueBuilder payload,
-      final OutputStream out) throws IOException, QueryException {
+  private void writeBase64(final ValueBuilder payload, final OutputStream out)
+      throws IOException, QueryException {
 
     for(int i = 0; i < payload.size(); i++) {
       final Item item = payload.get(i);

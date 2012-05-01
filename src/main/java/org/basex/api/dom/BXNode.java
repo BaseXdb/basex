@@ -18,10 +18,9 @@ import org.w3c.dom.*;
 public abstract class BXNode implements Node {
   /** Node type mapping (see {@link Data} interface). */
   private static final short[] TYPES = {
-    Node.DOCUMENT_NODE, Node.ELEMENT_NODE,
-    Node.TEXT_NODE, Node.ATTRIBUTE_NODE,
-    Node.COMMENT_NODE, Node.PROCESSING_INSTRUCTION_NODE,
-    Node.CDATA_SECTION_NODE, Node.DOCUMENT_FRAGMENT_NODE
+    Node.DOCUMENT_NODE, Node.ELEMENT_NODE, Node.TEXT_NODE, Node.ATTRIBUTE_NODE,
+    Node.COMMENT_NODE, Node.PROCESSING_INSTRUCTION_NODE, Node.CDATA_SECTION_NODE,
+    Node.DOCUMENT_FRAGMENT_NODE
   };
   /** Node name mapping (see {@link Data} interface). */
   private static final String[] NAMES = {

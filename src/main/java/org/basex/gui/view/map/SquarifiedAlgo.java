@@ -9,9 +9,7 @@ package org.basex.gui.view.map;
 final class SquarifiedAlgo extends MapAlgo {
 
   @Override
-  MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne) {
-
+  MapRects calcMap(final MapRect r, final MapList ml, final int ns, final int ne) {
     ml.sort();
 
     final MapRects rects = new MapRects();
