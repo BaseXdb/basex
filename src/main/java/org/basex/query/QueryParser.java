@@ -1353,7 +1353,7 @@ public class QueryParser extends InputParser {
    */
   private Expr stringConcat() throws QueryException {
     final Expr e = range();
-    if(!consume(CONCAT)) return e;
+    if(e == null || !consume(CONCAT)) return e;
 
     final ExprList el = new ExprList(e);
     do add(el, range()); while(wsConsume(CONCAT));
@@ -1378,9 +1378,8 @@ public class QueryParser extends InputParser {
    */
   private Expr additive() throws QueryException {
     Expr e = multiplicative();
-    while(true) {
-      final Calc c = consume('+') ? Calc.PLUS : consume('-') ? Calc.MINUS
-          : null;
+    while(e != null) {
+      final Calc c = consume('+') ? Calc.PLUS : consume('-') ? Calc.MINUS : null;
       if(c == null) break;
       e = new Arith(info(), e, check(multiplicative(), CALCEXPR), c);
     }
