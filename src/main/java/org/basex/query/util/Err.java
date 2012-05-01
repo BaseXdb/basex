@@ -44,7 +44,7 @@ public enum Err {
   /** BASX0011: Parsing exception. */
   PARWHICH(BASX, 11, "Unknown element: %."),
   /** BASX0012: Evaluation exception. */
-  DOCTRGMULT(BASX, 12, "Single document is expected as replace target."),
+  DOCTRGMULT(BASX, 12, "Single resource is expected as replace target."),
   /** BASX0013: Evaluation exception. */
   EMPTYPATH(BASX, 13, "%: Empty path specified."),
   /** BASX0014: Evaluation exception. */

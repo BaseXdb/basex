@@ -53,7 +53,6 @@ public final class Replace extends ACreate {
       return error(NO_DIR_ALLOWED_X, path);
 
     if(!data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
-
     try {
       boolean ok = true;
       final IOFile file = data.meta.binary(path);

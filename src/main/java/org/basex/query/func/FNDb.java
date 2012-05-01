@@ -513,15 +513,13 @@ public final class FNDb extends StandardFunc {
       ctx.updates.add(new DeleteNode(pre, data, info), ctx);
     }
     // delete binary resources
-    if(!data.inMemory()) {
-      final IOFile bin = data.meta.binary(path);
-      if(bin != null) {
-        if(bin.exists() && !bin.isDir()) {
-          ctx.updates.add(new DBDelete(data, path, info), ctx);
-          ctx.updates.add(new DBStore(data, path, doc, info), ctx);
-        } else {
-          ctx.updates.add(new DBAdd(data, info, doc, path, ctx.context), ctx);
-        }
+    final IOFile bin = data.inMemory() ? null : data.meta.binary(path);
+    if(bin != null) {
+      if(bin.exists()) {
+        if(bin.isDir()) DOCTRGMULT.thrw(info);
+        ctx.updates.add(new DBStore(data, path, doc, info), ctx);
+      } else {
+        ctx.updates.add(new DBAdd(data, info, doc, path, ctx.context), ctx);
       }
     }
     return null;
