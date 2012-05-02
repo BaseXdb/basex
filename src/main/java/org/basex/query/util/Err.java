@@ -65,10 +65,10 @@ public enum Err {
   PINNED(BASX, 20, "Database '%' is opened by another process."),
   /** BASX0021: Evaluation exception. */
   FTOPT(BASX, 21, "Invalid full-text option: '%'."),
+  /** BASX0021: Parsing exception. */
+  FTMODE(BASX, 21, "Unknown search mode: '%'."),
   /** BASX0022: Parsing exception. */
-  FTMODE(BASX, 22, "Unknown search mode: '%'."),
-  /** BASX00023: Parsing exception. */
-  FTFZWC(BASX, 23, "Either wildcards or fuzzy search supported."),
+  FTFZWC(BASX, 22, "Either wildcards or fuzzy search supported."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
