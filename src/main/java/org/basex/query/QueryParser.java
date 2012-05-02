@@ -1328,7 +1328,7 @@ public class QueryParser extends InputParser {
     final Expr e = stringConcat();
 
     final int i = ip;
-    // use "=>" and "<-" as unofficial shortcuts for full-text expressions
+    // extensions to the official extension: "=>" and "<-"
     if(consume('=') && consume('>') || consume('<') && consume('-')) {
       skipWS();
     } else if(!wsConsumeWs(CONTAINS) || !wsConsumeWs(TEXT)) {
@@ -3183,6 +3183,7 @@ public class QueryParser extends InputParser {
         if(opt.is(FZ)) error(FTFZWC);
         opt.set(WC, using);
       } else if(wsConsumeWs(FUZZY)) {
+        // extension to the official extension: "using fuzzy"
         if(opt.isSet(FZ)) error(FTDUP, FUZZY);
         if(opt.is(WC)) error(FTFZWC);
         opt.set(FZ, using);
