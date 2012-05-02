@@ -178,7 +178,7 @@ public enum Function {
   /** XQuery function. */
   DOC_AVAILABLE(FNGen.class, "doc-available(uri)", BLN, STR_ZO),
   /** XQuery function. */
-  PUT(FNGen.class, "put(node,path)", EMP, NOD, STR_ZO),
+  PUT(FNGen.class, "put(node,uri)", EMP, NOD, STR_ZO),
   /** XQuery function. */
   UNPARSED_TEXT(FNGen.class, "unparsed-text(uri[,encoding])", STR_ZO, 1, STR_ZO, STR),
   /** XQuery function. */
@@ -592,7 +592,7 @@ public enum Function {
   /* FNFt functions. */
 
   /** Full-text function: searches the full-text index. */
-  _FT_SEARCH(FNFt.class, "search(node,string)", NOD_ZM, NOD, STR),
+  _FT_SEARCH(FNFt.class, "search(node,terms[,options])", NOD_ZM, 2, NOD, ITEM_ZM, ITEM),
   /** Full-text function: counts the hits of a full-text request. */
   _FT_COUNT(FNFt.class, "count(nodes)", ITR, NOD_ZM),
   /** Full-text function: marks the hits of a full-text request. */

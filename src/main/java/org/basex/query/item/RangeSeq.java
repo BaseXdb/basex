@@ -28,8 +28,8 @@ public final class RangeSeq extends Seq {
 
   @Override
   public Object toJava() {
-    final Object[] obj = new Object[(int) size];
-    for(int s = 0; s < size; ++s) obj[s] = Int.get(start + s);
+    final long[] obj = new long[(int) size];
+    for(int s = 0; s < size; ++s) obj[s] = start + s;
     return obj;
   }
 

@@ -20,7 +20,6 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.List;
 import org.basex.query.flwor.*;
 import org.basex.query.ft.*;
-import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.item.SeqType.Occ;
@@ -3022,13 +3021,13 @@ public class QueryParser extends InputParser {
     if(e == null) error(prg ? NOPRAGMA : NOENCLEXPR);
 
     // FTAnyAllOption
-    FTMode mode = FTMode.M_ANY;
+    FTMode mode = FTMode.ANY;
     if(wsConsumeWs(ALL)) {
-      mode = wsConsumeWs(WORDS) ? FTMode.M_ALLWORDS : FTMode.M_ALL;
+      mode = wsConsumeWs(WORDS) ? FTMode.ALL_WORDS : FTMode.ALL;
     } else if(wsConsumeWs(ANY)) {
-      mode = wsConsumeWs(WORD) ? FTMode.M_ANYWORD : FTMode.M_ANY;
+      mode = wsConsumeWs(WORD) ? FTMode.ANY_WORD : FTMode.ANY;
     } else if(wsConsumeWs(PHRASE)) {
-      mode = FTMode.M_PHRASE;
+      mode = FTMode.PHRASE;
     }
 
     // FTTimes

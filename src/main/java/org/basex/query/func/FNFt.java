@@ -2,6 +2,9 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+import static org.basex.util.ft.FTFlag.*;
+
+import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.IndexToken.IndexType;
@@ -13,6 +16,7 @@ import org.basex.query.iter.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
+import org.basex.util.hash.*;
 import org.basex.util.list.*;
 
 /**
@@ -22,8 +26,16 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNFt extends StandardFunc {
+  /** Element: full-text-options. */
+  private static final QNm Q_FTOPTIONS = new QNm("full-text-options");
   /** Marker element. */
   private static final byte[] MARK = token("mark");
+  /** Fuzzy option. */
+  private static final byte[] FUZZY = token("fuzzy");
+  /** Wildcards option. */
+  private static final byte[] WILDCARDS = token("wildcards");
+  /** Search mode. */
+  private static final byte[] MODE = token("mode");
 
   /**
    * Constructor.
@@ -154,30 +166,63 @@ public final class FNFt extends StandardFunc {
    * @return iterator
    * @throws QueryException query exception
    */
-  Iter search(final QueryContext ctx) throws QueryException {
-    return search(data(0, ctx), checkStr(expr[1], ctx), this, ctx);
+  private Iter search(final QueryContext ctx) throws QueryException {
+    final Data data = data(0, ctx);
+    final Value terms = ctx.value(expr[1]);
+    final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
+    try {
+      final TokenMap tm = new FuncParams(Q_FTOPTIONS, this).parse(opt);
+      return search(data, terms, tm, this, ctx);
+    } catch(final QueryException ex) {
+      throw ex.err() == Err.GENERR ? FTOPT.thrw(info, ex) : ex;
+    }
   }
 
   /**
    * Performs an index-based search.
    * @param data data reference
-   * @param str search string
+   * @param terms query terms
+   * @param map map with full-text options
    * @param fun calling function
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  static Iter search(final Data data, final byte[] str, final StandardFunc fun,
-      final QueryContext ctx) throws QueryException {
+  static Iter search(final Data data, final Value terms, final TokenMap map,
+      final StandardFunc fun, final QueryContext ctx) throws QueryException {
 
+    final InputInfo info = fun.info;
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    if(!data.meta.ftxtindex) NOINDEX.thrw(fun.info, data.meta.name, fun);
+    if(!data.meta.ftxtindex) NOINDEX.thrw(info, data.meta.name,
+        IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
     final FTOpt tmp = ctx.ftOpt();
-    ctx.ftOpt(new FTOpt().copy(data.meta));
-    final FTWords words = new FTWords(fun.info, ic.data, Str.get(str), ctx);
+    final FTOpt opt = new FTOpt().copy(data.meta);
+    FTMode m = FTMode.ANY;
+    if(map != null) {
+      for(final byte[] k : map) {
+        final byte[] v = map.get(k);
+        if(eq(k, FUZZY)) {
+          final boolean t = v.length == 0 || Util.yes(string(v));
+          opt.set(FZ, t);
+          if(t && data.meta.wildcards) INDEXENT.thrw(info);
+        } else if(eq(k, WILDCARDS)) {
+          final boolean t = v.length == 0 || Util.yes(string(v));
+          opt.set(WC, t);
+          if(t && !data.meta.wildcards) INDEXENT.thrw(info);
+        } else if(eq(k, MODE)) {
+          m = FTMode.get(v);
+          if(m == null) FTMODE.thrw(info, v);
+        } else {
+          FTOPT.thrw(info, k);
+        }
+      }
+    }
+
+    ctx.ftOpt(opt);
+    final FTWords words = new FTWords(info, ic.data, terms, m, ctx).comp(ctx);
     ctx.ftOpt(tmp);
-    return new FTIndexAccess(fun.info, words, ic).iter(ctx);
+    return new FTIndexAccess(info, words, ic).iter(ctx);
   }
 
   /**

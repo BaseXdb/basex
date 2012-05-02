@@ -122,7 +122,8 @@ public final class FNIndex extends StandardFunc {
       avl = data.meta.ftxtindex;
       if(avl && data.meta.wildcards) INDEXENT.thrw(call.info);
     }
-    if(!avl) NOINDEX.thrw(call.info, data.meta.name, it);
+    if(!avl) NOINDEX.thrw(call.info, data.meta.name,
+        it.toString().toLowerCase(Locale.ENGLISH));
     return entries(index, prefix);
   }
 

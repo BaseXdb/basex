@@ -17,8 +17,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.item.Type;
-import org.basex.query.item.map.*;
-import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -86,55 +85,18 @@ public final class FNXslt extends StandardFunc {
     try {
       final IO in = read(expr[0], ctx);
       final IO xsl = read(expr[1], ctx);
-      final TokenObjMap<Object> map = xsltParams(2, E_PARAM, ctx);
-
+      final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
+      final TokenMap map = new FuncParams(E_PARAM, this).parse(opt);
       final byte[] result = transform(in, xsl, map);
       return new DBNode(new IOContent(result), ctx.context.prop);
+    } catch(final QueryException ex) {
+      throw ex.err() == Err.GENERR ? PARWHICH.thrw(info, ex.getLocalizedMessage()) : ex;
     } catch(final Exception ex) {
       Util.debug(ex);
       // return cause of reflection error, or error itself
       throw IOERR.thrw(info, ex instanceof InvocationTargetException ?
           ex.getCause() : ex);
     }
-  }
-
-  /**
-   * Creates serializer properties.
-   * @param arg argument with parameters
-   * @param root expected root element
-   * @param ctx query context
-   * @return serialization parameters
-   * @throws QueryException query exception
-   */
-  private TokenObjMap<Object> xsltParams(final int arg, final QNm root,
-      final QueryContext ctx) throws QueryException {
-
-    // initialize token map
-    final TokenObjMap<Object> tm = new TokenObjMap<Object>();
-    // argument does not exist...
-    if(arg >= expr.length) return tm;
-
-    // empty sequence...
-    final Item it = expr[arg].item(ctx, info);
-    if(it == null) return tm;
-
-    // XQuery map: convert to internal map
-    if(it instanceof Map) return ((Map) it).tokenJavaMap(info);
-    // no element: convert XQuery map to internal map
-    if(!it.type().eq(SeqType.ELM)) throw NODFUNTYPE.thrw(info, this, it.type);
-
-    // parse nodes
-    ANode node = (ANode) it;
-    if(!node.qname().eq(root)) PARWHICH.thrw(info, node.qname());
-
-    // interpret query parameters
-    final AxisIter ai = node.children();
-    while((node = ai.next()) != null) {
-      final QNm qn = node.qname();
-      if(!eq(qn.uri(), XSLTURI)) PARWHICH.thrw(info, qn);
-      tm.add(qn.local(), node.children().next());
-    }
-    return tm;
   }
 
   /**
@@ -166,8 +128,8 @@ public final class FNXslt extends StandardFunc {
    * @return transformed result
    * @throws Exception exception
    */
-  private static byte[] transform(final IO in, final IO xsl,
-      final TokenObjMap<Object> par) throws Exception {
+  private static byte[] transform(final IO in, final IO xsl, final TokenMap par)
+      throws Exception {
 
     // create transformer
     final TransformerFactory tc = TransformerFactory.newInstance();
@@ -175,7 +137,7 @@ public final class FNXslt extends StandardFunc {
         new StreamSource(new ByteArrayInputStream(xsl.read())));
 
     // bind parameters
-    for(final byte[] key : par) tr.setParameter(string(key), par.get(key));
+    for(final byte[] key : par) tr.setParameter(string(key), string(par.get(key)));
 
     // create serializer
     final ArrayOutput ao = new ArrayOutput();

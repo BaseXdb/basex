@@ -18,11 +18,11 @@ import org.basex.util.*;
  */
 public enum Err {
   /** BASX0000: Evaluation exception. */
-  JAVACALL(BASX, 0, "%"),
+  GENERR(BASX, 0, "%"),
   /** BASX0001: Evaluation exception. */
   NOINDEX(BASX, 1, "Database '%' has no % index."),
   /** BASX0001: Evaluation exception. */
-  INDEXENT(BASX, 1, "Not supported by chosen full-text index."),
+  INDEXENT(BASX, 1, "Not supported by existing full-text index."),
   /** BASX0002: Evaluation exception. */
   NODBCTX(BASX, 2, "%: database context needed."),
   /** BASX0002: Evaluation exception. */
@@ -63,6 +63,12 @@ public enum Err {
   INVFLAG(BASX, 19, "Unknown flag: %."),
   /** BASX0020: Evaluation exception. */
   PINNED(BASX, 20, "Database '%' is opened by another process."),
+  /** BASX0021: Evaluation exception. */
+  FTOPT(BASX, 21, "Invalid full-text option: '%'."),
+  /** BASX0022: Parsing exception. */
+  FTMODE(BASX, 22, "Unknown search mode: '%'."),
+  /** BASX00023: Parsing exception. */
+  FTFZWC(BASX, 23, "Either wildcards or fuzzy search supported."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -304,8 +310,6 @@ public enum Err {
   /** FTDY0020: Evaluation exception. */
   FTREG(FTDY, 20, "Invalid wildcard syntax: '%'."),
 
-  /** FTST0000: Parsing exception. */
-  FTFZWC(FTST, 0, "Either wildcards or fuzzy search supported."),
   /** FTST0007: Parsing exception. */
   FTIGNORE(FTST, 7, "Ignore option not supported."),
   /** FTST0008: Parsing exception. */
@@ -339,7 +343,7 @@ public enum Err {
   /** SEPM0016: Serialization exception. */
   SERANY(SEPM, 16, "%."),
   /** SEPM0017: Serialization exception. */
-  SERUNKNOWN(SEPM, 17, "Serialization: unknown element %."),
+  SERUNKNOWN(SEPM, 17, "Serialization: unknown %."),
   /** SEPM0017: Serialization exception. */
   SERNOVAL(SEPM, 17, "Serialization: missing 'value' attribute."),
 

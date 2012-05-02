@@ -12,8 +12,8 @@ import java.util.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
-import org.basex.query.item.map.Map;
 import org.basex.query.iter.*;
+import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -127,32 +127,36 @@ public final class FNSql extends StandardFunc {
     final String url = string(checkStr(expr[0], ctx));
     try {
       if(expr.length > 2) {
-        // Credentials
+        // credentials
         final String user = string(checkStr(expr[1], ctx));
         final String pass = string(checkStr(expr[2], ctx));
         if(expr.length == 4) {
-          // Connection options
-          final TokenObjMap<Object> options = options(3, E_OPS, ctx);
-          boolean autoCommit = true;
-          final Object commit = options.get(AUTO_COMM);
+          // connection options
+          final Item opt = expr[3].item(ctx, info);
+          final TokenMap options = new FuncParams(E_OPS, this).parse(opt);
+          // extract auto-commit mode from options
+          boolean ac = true;
+          final byte[] commit = options.get(AUTO_COMM);
           if(commit != null) {
-            // Extract auto-commit mode from options
-            autoCommit = Boolean.parseBoolean(commit.toString());
+            ac = eq(commit, TRUE);
             options.delete(AUTO_COMM);
           }
-          // Connection properties
-          final Properties props = connProps(options(3, E_OPS, ctx));
+          // connection properties
+          final Properties props = connProps(options);
           props.setProperty(USER, user);
           props.setProperty(PASS, pass);
-          // Open connection
+
+          // open connection
           final Connection conn = getConnection(url, props);
-          // Set auto/commit mode
-          conn.setAutoCommit(autoCommit);
+          // set auto/commit mode
+          conn.setAutoCommit(ac);
           return Int.get(ctx.jdbc().add(conn));
         }
         return Int.get(ctx.jdbc().add(getConnection(url, user, pass)));
       }
       return Int.get(ctx.jdbc().add(getConnection(url)));
+    } catch(final QueryException ex) {
+      throw ex.err() == Err.GENERR ? PARWHICH.thrw(info, ex) : ex;
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(info, ex.getMessage());
     }
@@ -163,10 +167,10 @@ public final class FNSql extends StandardFunc {
    * @param options options
    * @return connection properties
    */
-  private static Properties connProps(final TokenObjMap<Object> options) {
+  private static Properties connProps(final TokenMap options) {
     final Properties props = new Properties();
     for(final byte[] next : options.keys()) {
-      if(next != null) props.setProperty(string(next), options.get(next).toString());
+      if(next != null) props.setProperty(string(next), string(options.get(next)));
     }
     return props;
   }
@@ -238,8 +242,7 @@ public final class FNSql extends StandardFunc {
   private NodeCache executePrepStmt(final PreparedStatement stmt,
       final QueryContext ctx) throws QueryException {
     // Get parameters for prepared statement
-    final ANode params = (ANode) checkType(expr[1].item(ctx, info),
-        NodeType.ELM);
+    final ANode params = (ANode) checkType(expr[1].item(ctx, info), NodeType.ELM);
     if(!params.qname().eq(E_PARAMS)) PARWHICH.thrw(info, params.qname());
     try {
       final int placeCount = stmt.getParameterMetaData().getParameterCount();
@@ -448,44 +451,6 @@ public final class FNSql extends StandardFunc {
     if(obj == null || !(obj instanceof Connection)) NOCONN.thrw(info, id);
     if(del) ctx.jdbc().remove(id);
     return (Connection) obj;
-  }
-
-  /**
-   * Extracts connection options.
-   * @param arg argument with options
-   * @param root expected root element
-   * @param ctx query context
-   * @return options
-   * @throws QueryException query exception
-   */
-  private TokenObjMap<Object> options(final int arg, final QNm root,
-      final QueryContext ctx) throws QueryException {
-    // initialize token map
-    final TokenObjMap<Object> tm = new TokenObjMap<Object>();
-    // argument does not exist...
-    if(arg >= expr.length) return tm;
-
-    // empty sequence...
-    final Item it = expr[arg].item(ctx, info);
-    if(it == null) return tm;
-
-    // XQuery map: convert to internal map
-    if(it instanceof Map) return ((Map) it).tokenJavaMap(info);
-    // no element: convert XQuery map to internal map
-    if(!it.type().eq(SeqType.ELM)) throw NODFUNTYPE.thrw(info, this, it.type);
-
-    // parse nodes
-    ANode node = (ANode) it;
-    if(!node.qname().eq(root)) PARWHICH.thrw(info, node.qname());
-
-    // interpret query parameters
-    final AxisIter ai = node.children();
-    while((node = ai.next()) != null) {
-      final QNm qn = node.qname();
-      if(!eq(qn.uri(), SQLURI)) PARWHICH.thrw(info, qn);
-      tm.add(qn.local(), node.children().next());
-    }
-    return tm;
   }
 
   @Override

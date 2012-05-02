@@ -30,13 +30,6 @@ public final class ItemSeq extends Seq {
   }
 
   @Override
-  public Object toJava() throws QueryException {
-    final Object[] obj = new Object[(int) size];
-    for(int s = 0; s != size; ++s) obj[s] = item[s].toJava();
-    return obj;
-  }
-
-  @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) throws QueryException {
     if(!item[0].type.isNode()) CONDTYPE.thrw(ii, this);
     return item[0];

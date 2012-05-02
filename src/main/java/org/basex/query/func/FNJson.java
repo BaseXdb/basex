@@ -58,7 +58,7 @@ public final class FNJson extends StandardFunc {
     final ArrayOutput ao = new ArrayOutput();
     try {
       // run serialization
-      final SerializerProp props = ctx.serParams(false);
+      final SerializerProp props = new SerializerProp();
       final Serializer json = ml ? new JsonMLSerializer(ao, props) :
           new JSONSerializer(ao, props);
       json.serialize(node);

@@ -46,6 +46,13 @@ public abstract class Seq extends Value {
   }
 
   @Override
+  public Object toJava() throws QueryException {
+    final Object[] obj = new Object[(int) size];
+    for(int s = 0; s < size; s++) obj[s] = itemAt(s).toJava();
+    return obj;
+  }
+
+  @Override
   public final long size() {
     return size;
   }

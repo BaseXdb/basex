@@ -31,12 +31,12 @@ public final class QueryException extends Exception {
   private int markedCol;
 
   /**
-   * Constructor, specifying a simple error message. {@link Err#JAVACALL} will be set
+   * Constructor, specifying a simple error message. {@link Err#GENERR} will be set
    * as error code.
    * @param msg error message
    */
   public QueryException(final String msg) {
-    this(null, Err.JAVACALL, msg);
+    this(null, Err.GENERR, msg);
   }
 
   /**

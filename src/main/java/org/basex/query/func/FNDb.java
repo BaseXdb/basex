@@ -53,8 +53,6 @@ public final class FNDb extends StandardFunc {
   static final QNm CTYPE = new QNm("content-type");
   /** Modified date element name. */
   static final QNm MDATE = new QNm("modified-date");
-  /** MIME type application/xml. */
-  static final byte[] APP_XML = token(MimeTypes.APP_XML);
 
   /**
    * Constructor.
@@ -151,6 +149,7 @@ public final class FNDb extends StandardFunc {
    */
   private ValueAccess valueAccess(final boolean text, final QueryContext ctx)
       throws QueryException {
+
     final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
     final IndexType it = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     return new ValueAccess(info, expr[1], it, ic);
@@ -165,6 +164,7 @@ public final class FNDb extends StandardFunc {
    */
   private StringRangeAccess rangeAccess(final boolean text, final QueryContext ctx)
       throws QueryException {
+
     final IndexContext ic = new IndexContext(ctx, data(0, ctx), null, true);
     final byte[] min = checkStr(expr[1], ctx);
     final byte[] max = checkStr(expr[2], ctx);
@@ -215,7 +215,7 @@ public final class FNDb extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter fulltext(final QueryContext ctx) throws QueryException {
-    return FNFt.search(data(0, ctx), checkStr(expr[1], ctx), this, ctx);
+    return FNFt.search(data(0, ctx), ctx.value(expr[1]), null, this, ctx);
   }
 
   /**
@@ -276,7 +276,7 @@ public final class FNDb extends StandardFunc {
       public ANode get(final long i) throws QueryException {
         if(i < is) {
           final byte[] pt = data.text(il.get((int) i), true);
-          return resource(pt, false, 0, APP_XML, data.meta.time);
+          return resource(pt, false, 0, token(MimeTypes.APP_XML), data.meta.time);
         }
         if(i < is + ts) {
           final byte[] pt = tl.get((int) i - is);

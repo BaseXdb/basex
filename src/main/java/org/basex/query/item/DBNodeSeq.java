@@ -56,13 +56,6 @@ public final class DBNodeSeq extends Seq {
   }
 
   @Override
-  public Object toJava() {
-    final Object[] obj = new Object[(int) size];
-    for(int s = 0; s != size; ++s) obj[s] = itemAt(s).toJava();
-    return obj;
-  }
-
-  @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii) {
     return itemAt(0);
   }

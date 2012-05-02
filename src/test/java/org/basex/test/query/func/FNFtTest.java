@@ -5,6 +5,7 @@ import static org.basex.query.func.Function.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -38,6 +39,9 @@ public final class FNFtTest extends AdvancedQueryTest {
 
     // check index results
     query(_FT_SEARCH.args(" . ", "assignments"), "Assignments");
+    query(_FT_SEARCH.args(" . ", " ('exercise',1)"), "Exercise 1Exercise 2");
+    query(_FT_SEARCH.args(" . ", "<x>1</x>"), "Exercise 1");
+    query(_FT_SEARCH.args(" . ", " 1"), "Exercise 1");
     query(_FT_SEARCH.args(" . ", "XXX"), "");
 
     // apply index options to query term
@@ -47,6 +51,25 @@ public final class FNFtTest extends AdvancedQueryTest {
         "<li>Exercise 1</li>");
     new Set(Prop.STEMMING, false).execute(context);
     new CreateIndex("fulltext").execute(context);
+
+    // check match options
+    query(_FT_SEARCH.args(" .", "Assignments", " map {}"), "Assignments");
+    query(_FT_SEARCH.args(" .", "Azzignments", " map { 'fuzzy':='' }"), "Assignments");
+    query(_FT_SEARCH.args(" .", "Azzignments", " map { 'fuzzy':='no' }"), "");
+    // check search modes
+    query(_FT_SEARCH.args(" .", "1 Exercise", " map { 'mode':='phrase' }"), "");
+    query(_FT_SEARCH.args(" .", "1 Exercise", " map { 'mode':='all' }"), "");
+    query(_FT_SEARCH.args(" .", "1 Exercise", " map { 'mode':='any' }"), "");
+    query(_FT_SEARCH.args(" .", "1 Exercise", " map { 'mode':='any word' }"),
+        "Exercise 1Exercise 2");
+    query(_FT_SEARCH.args(" .", "1 Exercise", " map { 'mode':='all words' }"),
+        "Exercise 1");
+
+    // check buggy options
+    error(_FT_SEARCH.args(" .", "x", " map { 'x':='y' }"), Err.FTOPT);
+    error(_FT_SEARCH.args(" .", "x", " map { 'wildcards':='' }"), Err.INDEXENT);
+    error(_FT_SEARCH.args(" .", "x", " map { 'mode':='' }"), Err.FTMODE);
+    error(_FT_SEARCH.args(" .", "x", " 1"), Err.NODFUNTYPE);
   }
 
   /**

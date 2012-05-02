@@ -1123,8 +1123,7 @@ public final class Token {
    * @return result of check
    */
   public static boolean ftChar(final int ch) {
-    return ch >= '0' && (ch < 0x80 ? LOD[ch - '0'] :
-      Character.isLetterOrDigit(ch));
+    return ch >= '0' && (ch < 0x80 ? LOD[ch - '0'] : Character.isLetterOrDigit(ch));
   }
 
   /** Letter-or-digit table for ASCII codes larger than '0'. */

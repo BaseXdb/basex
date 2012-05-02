@@ -322,7 +322,7 @@ public final class FNZip extends StandardFunc {
             } else {
               // serialize new nodes
               try {
-                final Serializer ser = Serializer.get(zos, serPar(node, ctx));
+                final Serializer ser = Serializer.get(zos, serPar(node));
                 do {
                   ser.serialize(DataBuilder.stripNS(n, ZIPURI, ctx.context));
                 } while((n = ch.next()) != null);
@@ -341,13 +341,10 @@ public final class FNZip extends StandardFunc {
   /**
    * Returns serialization parameters.
    * @param node node with parameters
-   * @param ctx query context
    * @return properties
    * @throws SerializerException serializer exception
    */
-  private static SerializerProp serPar(final ANode node, final QueryContext ctx)
-      throws SerializerException {
-
+  private static SerializerProp serPar(final ANode node) throws SerializerException {
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
     final AxisIter ati = node.attributes();
@@ -357,7 +354,7 @@ public final class FNZip extends StandardFunc {
       if(!tb.isEmpty()) tb.add(',');
       tb.add(name.local()).add('=').add(at.string());
     }
-    return tb.isEmpty() ? ctx.serParams(true) : new SerializerProp(tb.toString());
+    return new SerializerProp(tb.toString());
   }
 
   /**

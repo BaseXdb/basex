@@ -208,18 +208,20 @@ public final class Map extends FItem {
   }
 
   /**
-   * Converts the map to a map with tokens as keys and java objects as values.
+   * Converts the map to a map with keys and values represented as tokens.
    * @param ii input info
    * @return token map
    * @throws QueryException query exception
    */
-  public TokenObjMap<Object> tokenJavaMap(final InputInfo ii) throws QueryException {
-    final TokenObjMap<Object> tm = new TokenObjMap<Object>();
+  public TokenMap tokenJavaMap(final InputInfo ii) throws QueryException {
+    final TokenMap tm = new TokenMap();
     final ValueIter vi = keys().iter();
     for(Item k; (k = vi.next()) != null;) {
       final Type kt = k.type;
       if(!kt.isString()) FUNCMP.thrw(ii, description(), AtomType.STR, kt);
-      tm.add(k.string(null), get(k, ii).toJava());
+      final Value v = get(k, ii);
+      if(!v.isItem()) FUNCMP.thrw(ii, description(), AtomType.ITEM, v);
+      tm.add(k.string(null), ((Item) v).string(ii));
     }
     return tm;
   }

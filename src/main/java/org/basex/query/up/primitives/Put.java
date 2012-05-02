@@ -23,8 +23,6 @@ import org.basex.util.*;
 public final class Put extends UpdatePrimitive {
   /** Put location. The same node can be stored in multiple locations. */
   private final ArrayList<Uri> uri = new ArrayList<Uri>(1);
-  /** Serializer properties. */
-  private final QueryContext ctx;
 
   /**
    * Constructor.
@@ -32,13 +30,10 @@ public final class Put extends UpdatePrimitive {
    * @param p pre
    * @param d data
    * @param u uri
-   * @param context query context
    */
-  public Put(final InputInfo i, final int p, final Data d, final Uri u,
-      final QueryContext context) {
+  public Put(final InputInfo i, final int p, final Data d, final Uri u) {
     super(PrimitiveType.PUT, p, d, i);
     uri.add(u);
-    ctx = context;
   }
 
   @Override
@@ -48,7 +43,7 @@ public final class Put extends UpdatePrimitive {
       final DBNode node = new DBNode(data, pre);
       try {
         po = new PrintOutput(path(u));
-        final SerializerProp pr = ctx.serParams(false);
+        final SerializerProp pr = new SerializerProp();
         // try to reproduce non-chopped documents correctly
         pr.set(SerializerProp.S_INDENT, node.data.meta.chop ? YES : NO);
         final Serializer ser = Serializer.get(po, pr);
