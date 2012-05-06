@@ -216,16 +216,16 @@ final class RestXqFunction {
     }
 
     // bind cookie parameters
-    final Cookie[] cookies = http.req.getCookies();
-    if(cookies != null) {
-      for(final RestXqParam rxp : cookieParams) {
-        for(final Cookie c : cookies) {
-          if(!rxp.key.equals(c.getName())) continue;
-          final String v = c.getValue();
-          if(v == null) bind(rxp);
-          else bind(rxp, c.getValue());
+    final Cookie[] ck = http.req.getCookies();
+    for(final RestXqParam rxp : cookieParams) {
+      String v = null;
+      if(ck != null) {
+        for(final Cookie c : ck) {
+          if(rxp.key.equals(c.getName())) v = c.getValue();
         }
       }
+      if(v == null) bind(rxp);
+      else bind(rxp, v);
     }
   }
 
