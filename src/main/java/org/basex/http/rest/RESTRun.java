@@ -7,7 +7,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.Set;
 import org.basex.http.*;
 import org.basex.io.*;
 
@@ -39,10 +38,7 @@ public class RESTRun extends RESTQuery {
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
       HTTPErr.NOT_FOUND_X.thrw(RESOURCE_NOT_FOUND_X, input);
 
-    // set query path
-    http.session().execute(new Set(Prop.QUERYPATH, io.path()));
-
     // perform query
-    query(string(io.read()), http, false);
+    query(string(io.read()), http, io.path());
   }
 }

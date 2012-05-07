@@ -45,7 +45,8 @@ class RESTQuery extends RESTCode {
 
   @Override
   void run(final HTTPContext http) throws HTTPException, IOException {
-    query(input, http, true);
+    final String path = new IOFile(http.context().mprop.get(MainProp.HTTPPATH)).path();
+    query(input, http, path);
   }
 
   /**
@@ -56,7 +57,7 @@ class RESTQuery extends RESTCode {
    * @throws HTTPException REST exception
    * @throws IOException I/O exception
    */
-  protected void query(final String in, final HTTPContext http, final boolean path)
+  protected void query(final String in, final HTTPContext http, final String path)
       throws HTTPException, IOException {
 
     final Session session = http.session();
@@ -75,12 +76,8 @@ class RESTQuery extends RESTCode {
     // send serialization options to the server
     session.execute(new Set(Prop.SERIALIZER, serial(http)));
     session.setOutputStream(http.res.getOutputStream());
-
-    // set absolute path to http directory
-    if(path) {
-      final String pth = http.context().mprop.get(MainProp.HTTPPATH);
-      session.execute(new Set(Prop.QUERYPATH, new IOFile(pth).path()));
-    }
+    // set base path to correctly resolve local references
+    session.execute(new Set(Prop.QUERYPATH, path));
 
     // create query instance
     final Query qu = session.query(in);
