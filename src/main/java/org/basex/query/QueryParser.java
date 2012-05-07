@@ -1554,8 +1554,7 @@ public class QueryParser extends InputParser {
    */
   private Expr extension() throws QueryException {
     final Pragma[] pragmas = pragma();
-    return pragmas.length == 0 ? null : new Extension(info(), pragmas,
-        enclosed(NOPRAGMA));
+    return pragmas == null ? null : new Extension(info(), pragmas, enclosed(NOPRAGMA));
   }
 
   /**
@@ -1564,8 +1563,10 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Pragma[] pragma() throws QueryException {
+    if(!wsConsumeWs(PRAGMA)) return null;
+
     final ArrayList<Pragma> el = new ArrayList<Pragma>();
-    while(wsConsumeWs(PRAGMA)) {
+    do {
       final QNm name = eQName(QNAMEINV, URICHECK);
       char c = curr();
       if(c != '#' && !ws(c)) error(PRAGMAINV);
@@ -1577,7 +1578,7 @@ public class QueryParser extends InputParser {
       }
       el.add(new Pragma(name, tok.trim().finish()));
       ip += 2;
-    }
+    } while(wsConsumeWs(PRAGMA));
     return el.toArray(new Pragma[el.size()]);
   }
 
@@ -3002,7 +3003,7 @@ public class QueryParser extends InputParser {
    */
   private FTExpr ftPrimary(final boolean prg) throws QueryException {
     final Pragma[] pragmas = pragma();
-    if(pragmas.length != 0) {
+    if(pragmas != null) {
       wsCheck(BRACE1);
       final FTExpr e = ftSelection(true);
       wsCheck(BRACE2);

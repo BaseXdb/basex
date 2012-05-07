@@ -14,18 +14,8 @@ import static org.basex.util.Token.*;
 public final class Levenshtein {
   /** Maximum token size. */
   private static final int MAX = 50;
-  /** Static matrix for Levenshtein distance. */
-  private final int[][] m = new int[MAX + 2][MAX + 2];
-
-  /**
-   * Constructor.
-   */
-  public Levenshtein() {
-    for(int i = 0; i < m.length; ++i) {
-      m[0][i] = i;
-      m[i][0] = i;
-    }
-  }
+  /** Matrix for calculating Levenshtein distance. */
+  private int[][] matrix;
 
   /**
    * Compares two character arrays for similarity.
@@ -57,8 +47,19 @@ public final class Levenshtein {
    * @param k maximum number of accepted errors
    * @return true if the arrays are similar
    */
-  private boolean ls(final byte[] tk, final int tl, final byte[] sb,
-      final int sl, final int k) {
+  private boolean ls(final byte[] tk, final int tl, final byte[] sb, final int sl,
+      final int k) {
+
+    int[][] m = matrix;
+    if(m == null) {
+      m = new int[MAX + 2][MAX + 2];
+      for(int i = 0; i < m.length; ++i) {
+        m[0][i] = i;
+        m[i][0] = i;
+      }
+      matrix = m;
+    }
+
     int e2 = -1, f2 = -1;
     for(int t = 0; t < tl; t += cl(tk, t)) {
       final int e = norm(lc(cp(tk, t)));
