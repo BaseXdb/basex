@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
-import java.util.regex.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
@@ -64,11 +63,6 @@ public final class IOUrl extends IO {
     return IO.get((path.endsWith("/") ? path : path.replace("^(.*/).*", "$1")) + f);
   }
 
-  /** Pattern for duplicate slashes. */
-  private static final Pattern DUPLSLASH = Pattern.compile("//+");
-  /** Pattern for leading slash in Windows paths. */
-  private static final Pattern LEADSLASH = Pattern.compile("^/([A-Za-z]:)");
-
   /**
    * Creates a file path from the specified URL.
    * @param url url to be converted
@@ -81,8 +75,30 @@ public final class IOUrl extends IO {
     } catch(final Exception ex) { /* ignored. */ }
     // remove file scheme
     if(file.startsWith(FILEPREF)) file = file.substring(FILEPREF.length());
-    // remove duplicate slashes and leading slash in Windows paths
-    if(file.contains("//")) file = DUPLSLASH.matcher(file).replaceAll("/");
-    return LEADSLASH.matcher(file).replaceFirst("$1");
+    // remove duplicate slashes
+    file = normSlashes(file);
+    // remove leading slash from Windows paths
+    if(file.length() > 2 && file.charAt(0) == '/' && file.charAt(2) == ':' &&
+        Token.letter(file.charAt(1))) file = file.substring(1);
+
+    return file;
+  }
+
+  /**
+   * Normalize slashes in the specified path.
+   * @param path path to be normalized
+   * @return normalized path
+   */
+  private static String normSlashes(final String path) {
+    boolean a = true;
+    final StringBuilder sb = new StringBuilder(path.length());
+    final int pl = path.length();
+    for(int p = 0; p < pl; p++) {
+      final char c = path.charAt(p);
+      final boolean b = c != '/';
+      if(a || b) sb.append(c);
+      a = b;
+    }
+    return sb.toString();
   }
 }

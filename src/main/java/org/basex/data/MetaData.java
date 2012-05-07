@@ -144,48 +144,6 @@ public final class MetaData {
   // STATIC METHODS ==========================================================
 
   /**
-   * Checks if the specified file path refers to the specified database.
-   * @param input query input
-   * @param mprop main properties
-   * @return result of check
-   */
-  public static boolean found(final QueryInput input, final MainProp mprop) {
-    // specified database does not exist
-    final IOFile dbdir = mprop.dbpath(input.db);
-    if(!dbdir.exists()) return false;
-
-    // otherwise, check timestamp and storage
-    DataInput in = null;
-    try {
-      // return true if the storage version is up-to-date and
-      // if the original and the specified file path and date are equal
-      in = new DataInput(file(dbdir, DATAINF));
-      boolean ok = true;
-      int i = 3;
-      String k;
-      while(i != 0 && !(k = string(in.readToken())).isEmpty()) {
-        final String v = string(in.readToken());
-        if(k.equals(DBSTR)) {
-          ok &= STORAGE.equals(v) || new Version(STORAGE).compareTo(new Version(v)) > 0;
-          i--;
-        } else if(k.equals(DBFNAME)) {
-          ok &= input.io.eq(IO.get(v));
-          i--;
-        } else if(k.equals(DBTIME)) {
-          ok &= input.io.timeStamp() == toLong(v);
-          i--;
-        }
-      }
-      return i == 0 && ok;
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      return false;
-    } finally {
-      if(in != null) try { in.close(); } catch(final IOException ex) { }
-    }
-  }
-
-  /**
    * Normalizes a database path. Converts backslashes and
    * removes duplicate and leading slashes.
    * Returns {@code null} if the path contains invalid characters.

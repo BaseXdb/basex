@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import org.basex.core.*;
-import org.basex.data.*;
 import org.basex.io.*;
 
 /**
@@ -31,7 +30,7 @@ public final class Check extends Command {
 
     // choose OPEN if user has no create permissions, or if database exists
     final boolean create = context.user.has(Perm.CREATE);
-    final Command cmd = !create || MetaData.found(input, mprop) ?
+    final Command cmd = !create || mprop.dbpath(input.db).exists() ?
       new Open(input.db) : new CreateDB(input.db, input.original);
 
     // execute command

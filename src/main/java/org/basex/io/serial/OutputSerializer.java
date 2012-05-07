@@ -112,7 +112,9 @@ public abstract class OutputSerializer extends Serializer {
     wrap    = wPre.length != 0;
     final String eol = p.check(S_NEWLINE, S_NL, S_CR, S_CRNL);
     nl = utf8(token(eol.equals(S_NL) ? "\n" : eol.equals(S_CR) ? "\r" : "\r\n"), enc);
-    separator = token(p.get(S_SEPARATOR).replaceAll("\\\\n", "\n"));
+    final String s = p.get(S_SEPARATOR);
+    separator = token(s.indexOf('\\') != -1 ?
+      s.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t") : s);
 
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
