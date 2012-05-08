@@ -20,11 +20,6 @@
   </licenses>
   <repositories>
     <repository>
-      <id>central</id>
-      <name>Central Maven Repository</name>
-      <url>http://repo2.maven.org/maven2/</url>
-    </repository>
-    <repository>
       <id>basex</id>
       <name>BaseX Maven Repository</name>
       <url>http://files.basex.org/maven</url>
@@ -33,6 +28,11 @@
       <id>karatachi</id>
       <name>Karatachi Maven Repository</name>
       <url>http://repo.karatachi.org/mvn/</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo2.maven.org/maven2/</url>
     </repository>
   </repositories>
   <organization>
