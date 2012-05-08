@@ -126,7 +126,7 @@ final class QueryListener extends Progress {
         final PrintOutput po = PrintOutput.get(enc ? new EncodingOutput(out) : out);
         if(iter && wrap) po.write(1);
 
-        final Serializer ser = Serializer.get(po, options);
+        final Serializer ser = Serializer.get(po, full ? null : options);
         int c = 0;
         for(Item it; (it = ir.next()) != null;) {
           if(iter && !wrap) {
