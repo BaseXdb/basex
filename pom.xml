@@ -17,6 +17,11 @@
       <url>http://files.basex.org/maven</url>
     </repository>
     <repository>
+      <id>xqj</id>
+      <name>XQJ Maven Repository</name>
+      <url>http://xqj.net/maven</url>
+    </repository> 
+    <repository>
       <id>central</id>
       <name>Central Maven Repository</name>
       <url>http://repo2.maven.org/maven2/</url>
@@ -26,7 +31,7 @@
     <dependency>
       <groupId>net.xqj</groupId>
       <artifactId>basex-xqj</artifactId>
-      <version>0.9.2</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.xqj2</groupId>
@@ -64,6 +69,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3.2</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
