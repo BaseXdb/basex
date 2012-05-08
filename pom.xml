@@ -20,24 +20,24 @@
   </licenses>
   <repositories>
     <repository>
-      <id>central</id>
-      <name>Central Maven Repository</name>
-      <url>http://repo2.maven.org/maven2/</url>
-    </repository>
-    <repository>
       <id>basex</id>
       <name>BaseX Maven Repository</name>
       <url>http://files.basex.org/maven</url>
     </repository>
-    <!--<repository>
+    <repository>
       <id>xqj</id>
       <name>XQJ Maven Repository</name>
       <url>http://xqj.net/maven</url>
-    </repository>-->
+    </repository>
     <repository>
       <id>milton</id>
       <name>Milton Maven Repository</name>
       <url>http://www.ettrema.com/maven2</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo2.maven.org/maven2/</url>
     </repository>
   </repositories>
   <organization>
