@@ -30,6 +30,8 @@ module BaseXClient
         raise "Access denied."
       end
 
+      @char_lead_byte = "\xFF"
+      @char_lead_byte.force_encoding('ASCII-8BIT')
     end
 
     def execute(com)
@@ -78,6 +80,9 @@ module BaseXClient
     def receive()
       complete = ""
       while (t = read) != 0.chr
+        if t == @char_lead_byte then
+          t = read
+        end
         complete << t
       end
       return complete
