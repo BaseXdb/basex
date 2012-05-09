@@ -199,21 +199,6 @@
           <webAppConfig>
             <contextPath>/</contextPath>
           </webAppConfig>
-          <systemProperties>
-            <!-- System properties: check out web.xml for more details. -->
-            <systemProperty>
-              <name>org.basex.mode</name>
-              <value>local</value>
-            </systemProperty>
-            <systemProperty>
-              <name>org.basex.user</name>
-              <value></value>
-            </systemProperty>
-            <systemProperty>
-              <name>org.basex.password</name>
-              <value></value>
-            </systemProperty>
-          </systemProperties>
           <!-- Key and port for stopping Jetty
           <stopKey>keyToStopJetty</stopKey> 
           <stopPort>8985</stopPort> -->
