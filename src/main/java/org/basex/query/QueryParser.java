@@ -731,21 +731,25 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   public void module(final byte[] path, final byte[] uri) throws QueryException {
-    final byte[] u = ctx.modParsed.get(path);
+    // get absolute path
+    final IO io = ctx.sc.io(string(path));
+    final byte[] p = token(io.path());
+
+    // check if module has already been parsed
+    final byte[] u = ctx.modParsed.get(p);
     if(u != null) {
-      if(!eq(uri, u)) error(WRONGMODULE, uri, path);
+      if(!eq(uri, u)) error(WRONGMODULE, uri,
+          ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
       return;
     }
-    ctx.modParsed.add(path, uri);
+    ctx.modParsed.add(p, uri);
 
-    // check specified path and path relative to query file
-    final IO io = ctx.sc.io(string(path));
+    // read module
     String qu = null;
     try {
       qu = string(io.read());
     } catch(final IOException ex) {
-      error(NOMODULEFILE, ctx.context.user.has(Perm.ADMIN) ?
-          io.path() : io.name());
+      error(NOMODULEFILE, ctx.context.user.has(Perm.ADMIN) ? io.path() : io.name());
     }
 
     final StaticContext sc = ctx.sc;
