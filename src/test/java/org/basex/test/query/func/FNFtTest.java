@@ -39,9 +39,9 @@ public final class FNFtTest extends AdvancedQueryTest {
 
     // check index results
     query(_FT_SEARCH.args(" . ", "assignments"), "Assignments");
-    query(_FT_SEARCH.args(" . ", " ('exercise',1)"), "Exercise 1Exercise 2");
+    query(_FT_SEARCH.args(" . ", " ('exercise','1')"), "Exercise 1Exercise 2");
     query(_FT_SEARCH.args(" . ", "<x>1</x>"), "Exercise 1");
-    query(_FT_SEARCH.args(" . ", " 1"), "Exercise 1");
+    query(_FT_SEARCH.args(" . ", "1"), "Exercise 1");
     query(_FT_SEARCH.args(" . ", "XXX"), "");
 
     // apply index options to query term

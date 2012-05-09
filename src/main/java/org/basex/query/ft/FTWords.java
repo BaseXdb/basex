@@ -310,7 +310,7 @@ public final class FTWords extends FTExpr {
    */
   byte[] nextToken(final Iter iter) throws QueryException {
     final Item it = iter.next();
-    return it == null ? null : it.string(info);
+    return it == null ? null : checkEStr(it);
   }
 
   /**
