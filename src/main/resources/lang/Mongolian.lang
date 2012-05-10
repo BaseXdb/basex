@@ -309,7 +309,6 @@ stemming             = Зогсоолт
 stop                 = Зогсоох
 stopped_at           = дээр зогссон
 stopword_list        = Үгийн зогсолт бүрийн тухайн жагсаалт
-support_wildcards    = Хөрвөх тэмдгүүдээр хангах
 syntax               = Өгүүлбэрийн бүтэц
 table                = Хүснэгт
 target_path          = Байршил тодорхойлох
@@ -354,7 +353,6 @@ value                = Хэмжээ
 version              = Хувилбар
 view                 = Харагдах байдал
 watching_event_%     = Үйл ажиллагаа(event) '%' хянах.
-wildcards            = Хөрвөх тэмдэг
 ws_chopping          = Сул зайг хасах
 xml_format           = XML формат
 xquery               = XQuery
@@ -432,7 +430,6 @@ h_tree               = Мод бүтцээр харах.
 h_tree_options       = Мод бүтцээр харагдах тохиргоонууд
 h_updates            = Цахим хуудас дээрх шинэчлэлтүүд.
 h_used_mem           = Хэрвээ санах ой багасвал, \nBaseX-г Java шинж тэмдэг -Xmx<size> тусламжтай ажиллуулна уу.
-h_wildcards          = Уг тохиргоо тэмдгүүдйиг ялгах замаар хайлт хийхэд хурдан ажиллагаатай болгоно.
 
 # Commands
 

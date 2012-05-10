@@ -308,7 +308,6 @@ stemming             = Stam zoeken
 stop                 = Stop
 stopped_at           = Gestopt bij
 stopword_list        = Stopword lijst
-support_wildcards    = Ondersteun wildcards
 syntax               = Syntax
 table                = Table
 target_path          = Target path
@@ -353,7 +352,6 @@ value                = Waarde
 version              = Versie
 view                 = View
 watching_event_%     = Bekijk event '%'.
-wildcards            = jokers
 ws_chopping          = Whitespace afkappen
 xml_format           = XML formaat
 xquery               = XQuery
@@ -431,7 +429,6 @@ h_tree               = Toon de tree visualisatie.
 h_tree_options       = Opties voor de treeView.
 h_updates            = Toon de webpagina met updates.
 h_used_mem           = Als er weinig geheugen beschikbaar is, start\nBaseX dan met de Java vlag -Xmx<size>.
-h_wildcards          = Deze optie versnelt wildcard zoekopdrachten.
 
 # Commands
 

@@ -60,8 +60,6 @@ public final class MetaData {
   /** Indicates if full-text index is to be recreated. */
   public boolean createftxt;
 
-  /** Flag for wildcard indexing. */
-  public boolean wildcards;
   /** Flag for full-text stemming. */
   public boolean stemming;
   /** Flag for full-text case sensitivity. */
@@ -121,7 +119,7 @@ public final class MetaData {
    * @param pr database properties
    * @param mprop main properties
    */
-  public MetaData(final String db, final Prop pr, final MainProp mprop) {
+  private MetaData(final String db, final Prop pr, final MainProp mprop) {
     path = mprop != null ? mprop.dbpath(db) : null;
     prop = pr;
     name = db;
@@ -130,7 +128,6 @@ public final class MetaData {
     createattr = prop.is(Prop.ATTRINDEX);
     createftxt = prop.is(Prop.FTINDEX);
     diacritics = prop.is(Prop.DIACRITICS);
-    wildcards = prop.is(Prop.WILDCARDS);
     stemming = prop.is(Prop.STEMMING);
     casesens = prop.is(Prop.CASESENS);
     updindex = prop.is(Prop.UPDINDEX);
@@ -276,6 +273,7 @@ public final class MetaData {
    */
   public void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
+    boolean wcidx = false;
     while(true) {
       final String k = string(in.readToken());
       if(k.isEmpty()) break;
@@ -306,7 +304,7 @@ public final class MetaData {
         else if(k.equals(DBCRTTXT))   createtext = toBool(v);
         else if(k.equals(DBCRTATV))   createattr = toBool(v);
         else if(k.equals(DBCRTFTX))   createftxt = toBool(v);
-        else if(k.equals(DBWCIDX))    wildcards  = toBool(v);
+        else if(k.equals(DBWCIDX))    wcidx      = toBool(v);
         else if(k.equals(DBFTST))     stemming   = toBool(v);
         else if(k.equals(DBFTCS))     casesens   = toBool(v);
         else if(k.equals(DBFTDC))     diacritics = toBool(v);
@@ -324,6 +322,8 @@ public final class MetaData {
     oldindex = !istorage.equals(ISTORAGE) &&
         new Version(istorage).compareTo(new Version(ISTORAGE)) > 0;
     corrupt = dbfile(DATAUPD).exists();
+    // deactivate full-text index if obsolete trie structure was used
+    ftxtindex &= !wcidx;
   }
 
   /**
@@ -348,7 +348,6 @@ public final class MetaData {
     writeInfo(out, DBCRTTXT,   createtext);
     writeInfo(out, DBCRTATV,   createattr);
     writeInfo(out, DBCRTFTX,   createftxt);
-    writeInfo(out, DBWCIDX,    wildcards);
     writeInfo(out, DBFTST,     stemming);
     writeInfo(out, DBFTCS,     casesens);
     writeInfo(out, DBFTDC,     diacritics);

@@ -23,20 +23,18 @@ import org.basex.util.list.*;
 final class DialogFT extends BaseXBack {
   /** Language flag. */
   private static final int F_LANG = 0;
-  /** Wildcards flag. */
-  private static final int F_WILD = 1;
   /** Stemming flag. */
-  private static final int F_STEM = 2;
+  private static final int F_STEM = 1;
   /** Case flag. */
-  private static final int F_CASE = 3;
+  private static final int F_CASE = 2;
   /** Diacritics flag. */
-  private static final int F_DIA = 4;
+  private static final int F_DIA = 3;
   /** Scoring flag. */
-  private static final int F_SCORE = 5;
+  private static final int F_SCORE = 4;
   /** Stopwords flag. */
-  private static final int F_STOP = 6;
+  private static final int F_STOP = 5;
   /** Number of flags. */
-  private static final int FLAGS = 7;
+  private static final int FLAGS = 6;
 
   /** Dialog reference. */
   private final BaseXDialog dialog;
@@ -66,14 +64,13 @@ final class DialogFT extends BaseXBack {
     add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 12, 0));
 
     final String sw = prop.get(Prop.STOPWORDS);
-    final String[] cb = { LANGUAGE, SUPPORT_WILDCARDS, STEMMING,
-        CASE_SENSITIVITY, DIACRITICS, TFIDF_SCORING, STOPWORD_LIST };
-    final String[] desc = { H_LANGUAGE, H_WILDCARD, H_STEMMING, H_CASE,
-        H_DIACRITICS, H_SCORING, H_STOPWORDS };
-    final boolean[] val = {
-        !prop.get(Prop.LANGUAGE).isEmpty(), prop.is(Prop.WILDCARDS),
-        prop.is(Prop.STEMMING), prop.is(Prop.CASESENS),
-        prop.is(Prop.DIACRITICS), prop.num(Prop.SCORING) > 0, !sw.isEmpty() };
+    final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS,
+        TFIDF_SCORING, STOPWORD_LIST };
+    final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS,
+        H_SCORING, H_STOPWORDS };
+    final boolean[] val = { !prop.get(Prop.LANGUAGE).isEmpty(), prop.is(Prop.STEMMING),
+        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS), prop.num(Prop.SCORING) > 0,
+        !sw.isEmpty() };
 
     for(int f = 0; f < check.length; ++f) {
       check[f] = new BaseXCheckBox(cb[f], val[f], create ? 1 : 0, d);
@@ -168,7 +165,6 @@ final class DialogFT extends BaseXBack {
     gui.set(Prop.STEMMING, check[F_STEM].isSelected());
     gui.set(Prop.CASESENS, check[F_CASE].isSelected());
     gui.set(Prop.DIACRITICS, check[F_DIA].isSelected());
-    gui.set(Prop.WILDCARDS, check[F_WILD].isSelected());
     gui.set(Prop.SCORING, check[F_SCORE].isSelected() ?
         scoring.getSelectedIndex() + 1 : 0);
     gui.set(Prop.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");

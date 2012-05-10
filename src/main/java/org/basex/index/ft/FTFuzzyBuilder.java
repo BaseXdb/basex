@@ -25,7 +25,7 @@ import org.basex.util.list.*;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-final class FTFuzzyBuilder extends FTBuilder {
+public final class FTFuzzyBuilder extends FTBuilder {
   /** Value trees. */
   private final FTIndexTrees tree;
 
@@ -34,7 +34,7 @@ final class FTFuzzyBuilder extends FTBuilder {
    * @param d data reference
    * @throws IOException IOException
    */
-  FTFuzzyBuilder(final Data d) throws IOException {
+  public FTFuzzyBuilder(final Data d) throws IOException {
     super(d);
     tree = new FTIndexTrees(d.meta.maxlen);
   }

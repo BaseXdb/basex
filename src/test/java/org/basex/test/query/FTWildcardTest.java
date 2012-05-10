@@ -3,7 +3,6 @@ package org.basex.test.query;
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 
-import org.basex.query.*;
 import org.basex.query.ft.*;
 import org.junit.*;
 
@@ -48,7 +47,12 @@ public final class FTWildcardTest {
 
   /** Valid wild card expressions. */
   private static final String[] INVALIDWC = new String[] {
-    "wi.{5,7]",
+    ".{5,7]",
+    ".{2,1}",
+    ".{,}",
+    ".{0,}",
+    ".{,0}",
+    ".{-1,0}",
     "will\\"
   };
 
@@ -56,32 +60,21 @@ public final class FTWildcardTest {
   @Test
   public void testParse() {
     for(final String wc : VALIDWC)
-      try {
-        new FTWildcard(token(wc), null);
-      } catch(final Exception ex) {
-        fail("Parsing failed: " + wc);
-      }
+      assertTrue(new FTWildcard().parse(token(wc)));
 
     for(final String wc : INVALIDWC)
-      try {
-        new FTWildcard(token(wc), null);
-        fail("Parsing did NOT fail: " + wc);
-      } catch(final QueryException ex) {
-      } catch(final Exception ex) {
-        fail("Error while parsing: " + wc);
-      }
+      assertFalse(new FTWildcard().parse(token(wc)));
   }
 
   /**
    * Test wild-card matching.
-   * @throws QueryException wild-card expression is not parsed
    */
   @Test
-  public void testMatch() throws QueryException {
+  public void testMatch() {
     for(int i = 0; i < VALIDWC.length; i++) {
-
       final String q = VALIDWC[i];
-      final FTWildcard wc = new FTWildcard(token(q), null);
+      final FTWildcard wc = new FTWildcard();
+      assertTrue(wc.parse(token(q)));
 
       final String[] good = TEXTS_GOOD[i];
       for(final String element : good) {

@@ -98,7 +98,7 @@ public abstract class ACreate extends Command {
     switch(index) {
       case TEXT:      ib = new ValueBuilder(data, true); break;
       case ATTRIBUTE: ib = new ValueBuilder(data, false); break;
-      case FULLTEXT:  ib = FTBuilder.get(data); break;
+      case FULLTEXT:  ib = new FTFuzzyBuilder(data); break;
       default:        throw Util.notexpected();
     }
     data.closeIndex(index);

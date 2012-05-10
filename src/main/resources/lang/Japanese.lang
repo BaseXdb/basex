@@ -308,7 +308,6 @@ stemming             = 語幹処理
 stop                 = 終了
 stopped_at           = 停止しました
 stopword_list        = ストップワードリスト
-support_wildcards    = ワイルドカードのサポート
 syntax               = 文法
 table                = テーブル
 target_path          = ターゲットパス
@@ -353,7 +352,6 @@ value                = 値
 version              = バージョン
 view                 = ビュー
 watching_event_%     = イベント '%' を監視しています.
-wildcards            = ワイルドカード
 ws_chopping          = 空白の除去
 xml_format           = XML フォーマット
 xquery               = XQuery
@@ -431,7 +429,6 @@ h_tree               = 視覚化されたツリーを表示します。
 h_tree_options       = ツリービューのオプション。
 h_updates            = 更新情報を開きます。
 h_used_mem           = メモリが少ない場合はBaseXを起動する際に、\nJavaのコマンドライン引数 -Xmx <サイズ> を付けて下さい。
-h_wildcards          = このオプションはワイルドカード検索を高速化します。
 
 # Commands
 

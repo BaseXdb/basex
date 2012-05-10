@@ -65,10 +65,8 @@ public final class InfoDB extends AInfo {
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
     tb.add(NL).addExt(header, RESOURCE_PROPS);
-    if(create && !meta.original.isEmpty())
-      format(tb, INPUT_PATH, meta.original);
-    if(meta.filesize != 0)
-      format(tb, INPUT_SIZE, Performance.format(meta.filesize));
+    if(create && !meta.original.isEmpty()) format(tb, INPUT_PATH, meta.original);
+    if(meta.filesize != 0) format(tb, INPUT_SIZE, Performance.format(meta.filesize));
     format(tb, TIMESTAMP, formatDate(new Date(meta.time), DATE));
     format(tb, ENCODING, meta.encoding);
     format(tb, WS_CHOPPING, Util.flag(meta.chop));
@@ -81,8 +79,7 @@ public final class InfoDB extends AInfo {
         format(tb, UP_TO_DATE, String.valueOf(meta.uptodate));
         format(tb, TEXT_INDEX, Util.flag(meta.textindex));
         format(tb, ATTRIBUTE_INDEX, Util.flag(meta.attrindex));
-        format(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex) +
-            (meta.ftxtindex && meta.wildcards ? " (" + WILDCARDS + ')' : ""));
+        format(tb, FULLTEXT_INDEX, Util.flag(meta.ftxtindex));
       }
     }
     return tb.toString();

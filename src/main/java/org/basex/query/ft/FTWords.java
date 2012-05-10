@@ -333,10 +333,6 @@ public final class FTWords extends FTExpr {
     final MetaData md = ic.data.meta;
     final FTOpt fto = ftt.opt;
 
-    // skip index access if index does not support wildcards
-    final boolean wc = fto.is(WC);
-    if(wc && !md.wildcards) return false;
-
     /* Index will be applied if no explicit match options have been set
      * that conflict with the index options. As a consequence, though, index-
      * based querying might yield other results than sequential scanning. */
@@ -364,7 +360,7 @@ public final class FTWords extends FTExpr {
         final byte[] tok = ft.nextToken();
         if(fto.sw != null && fto.sw.id(tok) != 0) continue;
 
-        if(wc) {
+        if(fto.is(WC)) {
           // don't use index if one of the terms starts with a wildcard
           t = ft.get();
           if(t[0] == '.') return false;

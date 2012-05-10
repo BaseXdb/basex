@@ -781,8 +781,6 @@ public interface Text {
   String ATTRIBUTES = lang("attributes");
   /** Info on namespaces. */
   String NAMESPACES = lang("namespaces");
-  /** Info on wildcard indexing. */
-  String WILDCARDS = lang("wildcards");
   /** Info on index. */
   String OUT_OF_DATE = lang("out_of_date");
 
@@ -1049,8 +1047,6 @@ public interface Text {
   /** SAX parsing information. */
   String INPUT_FORMAT = lang("input_format") + COLS;
 
-  /** Full-text index information. */
-  String SUPPORT_WILDCARDS = lang("support_wildcards");
   /** Full-text index information. */
   String STEMMING = lang("stemming");
   /** Full-text index information. */
@@ -1368,8 +1364,6 @@ public interface Text {
   String H_ATTR_INDEX = lang("h_attr_index");
   /** Full-text index information. */
   String H_FULLTEXT_INDEX = lang("h_fulltext_index");
-  /** Full-text index information. */
-  String H_WILDCARD = lang("h_wildcards");
   /** Full-text index information. */
   String H_STEMMING = lang("h_stemming");
   /** Full-text index information. */

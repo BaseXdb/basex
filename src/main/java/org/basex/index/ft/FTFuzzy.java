@@ -12,6 +12,7 @@ import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.index.IndexCache.CacheEntry;
 import org.basex.io.random.*;
+import org.basex.query.ft.*;
 import org.basex.util.*;
 import org.basex.util.ft.*;
 
@@ -43,7 +44,7 @@ import org.basex.util.ft.*;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-final class FTFuzzy extends FTIndex {
+public final class FTFuzzy extends FTIndex {
   /** Entry size. */
   private static final int ENTRY = 9;
   /** Token positions. */
@@ -64,7 +65,7 @@ final class FTFuzzy extends FTIndex {
    * @param d data reference
    * @throws IOException I/O Exception
    */
-  FTFuzzy(final Data d) throws IOException {
+  public FTFuzzy(final Data d) throws IOException {
     super(d);
 
     // cache token length index
@@ -117,20 +118,23 @@ final class FTFuzzy extends FTIndex {
   public synchronized IndexIterator iter(final IndexToken ind) {
     final byte[] tok = ind.get();
 
+    // support wildcard search
+    final FTOpt opt = ((FTLexer) ind).ftOpt();
+    if(opt.is(WC)) return wc(tok);
+
     // support fuzzy search
-    if(((FTLexer) ind).ftOpt().is(FZ)) {
-      int k = data.meta.prop.num(Prop.LSERROR);
-      if(k == 0) k = tok.length >> 2;
-      return fuzzy(tok, k, false);
+    if(opt.is(FZ)) {
+      final int k = data.meta.prop.num(Prop.LSERROR);
+      return fuzzy(tok, k == 0 ? tok.length >> 2 : k);
     }
 
     // return cached or new result
     final CacheEntry e = cache.get(tok);
-    if(e != null) return iter(e.pointer, e.size, inZ, false);
+    if(e != null) return iter(e.pointer, e.size, inZ);
 
     final int p = token(tok);
     return p > -1 ? iter(pointer(p, tok.length),
-        size(p, tok.length), inZ, false) : FTIndexIterator.FTEMPTY;
+        size(p, tok.length), inZ) : FTIndexIterator.FTEMPTY;
   }
 
   @Override
@@ -302,14 +306,12 @@ final class FTFuzzy extends FTIndex {
   }
 
   /**
-   * Performs a fuzzy search for token, with e maximal number
-   * of errors e.
-   * @param tok token looking for
+   * Performs a fuzzy search for the specified token with a maximum number of errors.
+   * @param tok token to look for
    * @param k number of errors allowed
-   * @param f fast evaluation
    * @return iterator
    */
-  private IndexIterator fuzzy(final byte[] tok, final int k, final boolean f) {
+  private IndexIterator fuzzy(final byte[] tok, final int k) {
     FTIndexIterator it = FTIndexIterator.FTEMPTY;
     final int tl = tok.length;
     final int e = Math.min(tp.length - 1, tl + k);
@@ -323,8 +325,33 @@ final class FTFuzzy extends FTIndex {
       while(i < tp.length && r == -1) r = tp[i++];
       while(p < r) {
         if(ls.similar(inY.readBytes(p, s), tok, k)) {
-          it = FTIndexIterator.union(
-              iter(pointer(p, s), size(p, s), inZ, f), it);
+          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ), it);
+        }
+        p += s + ENTRY;
+      }
+    }
+    return it;
+  }
+
+  /**
+   * Performs a wildcard search for the specified token.
+   * @param tok token to look for
+   * @return iterator
+   */
+  private IndexIterator wc(final byte[] tok) {
+    FTIndexIterator it = FTIndexIterator.FTEMPTY;
+    final FTWildcard wc = new FTWildcard();
+    if(!wc.parse(tok)) return it;
+    final int e = Math.min(tp.length - 1, wc.max());
+    for(int s = wc.min(); s <= e; s++) {
+      int p = tp[s];
+      if(p == -1) continue;
+      int i = s + 1;
+      int r = -1;
+      while(i < tp.length && r == -1) r = tp[i++];
+      while(p < r) {
+        if(wc.match(inY.readBytes(p, s))) {
+          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ), it);
         }
         p += s + ENTRY;
       }

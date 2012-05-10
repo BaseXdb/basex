@@ -308,7 +308,6 @@ stemming             = Nhét đầy
 stop                 = Stop
 stopped_at           = Stopped at
 stopword_list        = Stopword List
-support_wildcards    = Support Wildcards
 syntax               = Cú pháp
 table                = Bản
 target_path          = Target Path
@@ -353,7 +352,6 @@ value                = Giá trị
 version              = Phiên bản
 view                 = Xem nhìn
 watching_event_%     = Watching event '%'.
-wildcards            = wildcards
 ws_chopping          = Cắt khỏng trắng
 xml_format           = XML format
 xquery               = XQuery
@@ -431,7 +429,6 @@ h_tree               = Show the tree visualization.
 h_tree_options       = Options for the TreeView.
 h_updates            = Show the update web page.
 h_used_mem           = Nếu ít bộ nhớ, xin chạy \nBasex với cờ Java -Xmx<size>.
-h_wildcards          = This option speeds up wildcard searches.
 
 # Commands
 

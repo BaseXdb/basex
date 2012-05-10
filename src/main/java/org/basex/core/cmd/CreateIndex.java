@@ -46,7 +46,6 @@ public final class CreateIndex extends ACreate {
         break;
       case FULLTEXT:
         data.meta.createftxt = true;
-        data.meta.wildcards = prop.is(Prop.WILDCARDS);
         data.meta.stemming = prop.is(Prop.STEMMING);
         data.meta.casesens = prop.is(Prop.CASESENS);
         data.meta.diacritics = prop.is(Prop.DIACRITICS);

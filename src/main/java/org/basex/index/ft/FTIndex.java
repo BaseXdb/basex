@@ -1,7 +1,5 @@
 package org.basex.index.ft;
 
-import java.io.*;
-
 import org.basex.data.*;
 import org.basex.index.*;
 import org.basex.io.random.*;
@@ -29,17 +27,6 @@ public abstract class FTIndex implements Index {
   final double min;
 
   /**
-   * Returns a new full-text index instance.
-   * @param d data reference
-   * @param wild wildcard index
-   * @return index instance
-   * @throws IOException IOException
-   */
-  public static FTIndex get(final Data d, final boolean wild) throws IOException {
-    return wild ? new FTTrie(d) : new FTFuzzy(d);
-  }
-
-  /**
    * Constructor.
    * @param d data reference
    */
@@ -55,11 +42,10 @@ public abstract class FTIndex implements Index {
    * @param off offset on entries
    * @param size number of pre/pos entries
    * @param da data source
-   * @param fast fast evaluation
    * @return iterator
    */
   final synchronized FTIndexIterator iter(final long off, final int size,
-      final DataAccess da, final boolean fast) {
+      final DataAccess da) {
 
     // cache results
     da.cursor(off);
@@ -98,8 +84,7 @@ public abstract class FTIndex implements Index {
         all.or(vals.get(c++));
 
         while(c < vals.size() && (lpre = vals.get(c++)) == pre) {
-          final int n = vals.get(c++);
-          if(!fast) all.or(n);
+          all.or(vals.get(c++));
         }
         return true;
       }

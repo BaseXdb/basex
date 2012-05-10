@@ -308,7 +308,6 @@ stemming             = Radice linguistica (Inglese)
 stop                 = Fine
 stopped_at           = Fermato a
 stopword_list        = Lista parole irrilevanti (stopwords)
-support_wildcards    = Supporta caratteri jolly
 syntax               = Sintassi
 table                = Tabella
 target_path          = Target Path
@@ -353,7 +352,6 @@ value                = Valore
 version              = Versione
 view                 = Visualizza
 watching_event_%     = Guarda l'evento '%'.
-wildcards            = caratteri jolly
 ws_chopping          = Rimozione spazi
 xml_format           = Formato XML
 xquery               = XQuery
@@ -431,7 +429,6 @@ h_tree               = Mostra la visualizzazione ad albero.
 h_tree_options       = Opzioni per la visualizzazione ad albero.
 h_updates            = Mostra la pagina web degli aggiornamenti.
 h_used_mem           = Se la memoria è insufficiente, avviare\nBaseX con l'opzione Java -Xmx<size>.
-h_wildcards          = Questa opzione velocizza le ricerche che usano caratteri jolly.
 
 # Commands
 

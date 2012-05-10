@@ -205,11 +205,9 @@ public final class FNFt extends StandardFunc {
         if(eq(k, FUZZY)) {
           final boolean t = v.length == 0 || Util.yes(string(v));
           opt.set(FZ, t);
-          if(t && data.meta.wildcards) INDEXENT.thrw(info);
         } else if(eq(k, WILDCARDS)) {
           final boolean t = v.length == 0 || Util.yes(string(v));
           opt.set(WC, t);
-          if(t && !data.meta.wildcards) INDEXENT.thrw(info);
         } else if(eq(k, MODE)) {
           m = FTMode.get(v);
           if(m == null) FTMODE.thrw(info, v);

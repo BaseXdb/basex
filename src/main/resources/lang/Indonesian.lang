@@ -308,7 +308,6 @@ stemming             = Memotong
 stop                 = Henti
 stopped_at           = Berhenti pada
 stopword_list        = Daftar kata henti
-support_wildcards    = Dukung wildcards
 syntax               = Sintaks
 table                = Tabel
 target_path          = Jejak tujuan
@@ -353,7 +352,6 @@ value                = Nilai
 version              = Versi
 view                 = Lihat
 watching_event_%     = Amati kejadian '%'.
-wildcards            = wildcards
 ws_chopping          = Pemotongan spasi
 xml_format           = Bentuk XML
 xquery               = XQuery
@@ -431,7 +429,6 @@ h_tree               = Tampilkan visualisasi pohon.
 h_tree_options       = Pilihan untuk visualisasi pohon.
 h_updates            = Tampilkan halaman web pemutakhiran.
 h_used_mem           = Jika memori kurang, mohon jalankan\nBaseX dengan penanda Java -Xmx<size>.
-h_wildcards          = Pilihan ini mempercepat pencarian wildcard.
 
 # Commands
 

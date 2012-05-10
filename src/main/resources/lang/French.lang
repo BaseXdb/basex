@@ -308,7 +308,6 @@ stemming             = Stemming
 stop                 = Arrêter
 stopped_at           = Arrêté à
 stopword_list        = Liste des mots vides
-support_wildcards    = Accepter les jockers
 syntax               = Syntaxe
 table                = Tableau
 target_path          = Chemin cible
@@ -353,7 +352,6 @@ value                = Valeur
 version              = Version
 view                 = Affichage
 watching_event_%     = Observation de l'évènement '%'.
-wildcards            = jockers
 ws_chopping          = Suppression des espaces
 xml_format           = Format XML
 xquery               = XQuery
@@ -431,7 +429,6 @@ h_tree               = Afficher la visualiaation en arbre.
 h_tree_options       = Options de la vue en arbre.
 h_updates            = Afficher la page de mise à jour.
 h_used_mem           = Si la mémoire est insuffisante, lancez\nBaseX avec le paramètre Java -Xmx<size>.
-h_wildcards          = Cette option accélère les recherches avec jockers.
 
 # Commands
 

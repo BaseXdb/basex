@@ -173,7 +173,7 @@ public final class CreateDB extends ACreate {
       if(data.meta.createattr) data.setIndex(IndexType.ATTRIBUTE,
         new ValueBuilder(data, false).build());
       if(data.meta.createftxt) data.setIndex(IndexType.FULLTEXT,
-        FTBuilder.get(data).build());
+        new FTFuzzyBuilder(data).build());
       data.close();
     } finally {
       try { builder.close(); } catch(final IOException exx) { Util.debug(exx); }

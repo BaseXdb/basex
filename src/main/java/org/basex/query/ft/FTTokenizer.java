@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import static org.basex.util.ft.FTFlag.*;
 
@@ -52,7 +53,8 @@ final class FTTokenizer {
         if(opt.is(WC)) {
           ftw = wcCache.get(qu);
           if(ftw == null) {
-            ftw = new FTWildcard(qu, words.info);
+            ftw = new FTWildcard();
+            if(!ftw.parse(qu)) FTREG.thrw(words.info, qu);
             wcCache.add(qu, ftw);
           }
         }

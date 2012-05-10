@@ -308,7 +308,6 @@ stemming             = Stemming
 stop                 = Stopp
 stopped_at           = Gestoppt in
 stopword_list        = Stoppwort-Liste
-support_wildcards    = Unterstützung von Wildcards
 syntax               = Syntax
 table                = Tabelle
 target_path          = Zielpfad
@@ -353,7 +352,6 @@ value                = Wert
 version              = Version
 view                 = Ansicht
 watching_event_%     = Beobachte Event '%'.
-wildcards            = Wildcards
 ws_chopping          = Entfernung von Leerzeichen
 xml_format           = XML format
 xquery               = XQuery
@@ -431,7 +429,6 @@ h_tree               = Zeigt die Baum-Ansicht an.
 h_tree_options       = Options für die TreeView.
 h_updates            = Zeigt die Update-Webseite.
 h_used_mem           = Der verfügbare Speicher kann mit dem Java-Flag -Xmx<size> erhöht werden.
-h_wildcards          = Diese Option beschleunigt Wildcard-Suchen.
 
 # Commands
 

@@ -122,8 +122,6 @@ public final class Prop extends AProp {
   /** Flag for tail-call optimization. */
   public static final Object[] TAILCALLS = { "TAILCALLS", 42 };
 
-  /** Flag for creating a wildcard index. */
-  public static final Object[] WILDCARDS = { "WILDCARDS", false };
   /** Flag for full-text stemming. */
   public static final Object[] STEMMING = { "STEMMING", false };
   /** Flag for full-text case sensitivity. */

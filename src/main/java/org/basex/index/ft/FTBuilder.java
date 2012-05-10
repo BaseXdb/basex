@@ -47,21 +47,11 @@ public abstract class FTBuilder extends IndexBuilder {
   private int fc;
 
   /**
-   * Returns a new full-text index builder.
-   * @param d data reference
-   * @return index builder
-   * @throws IOException IOException
-   */
-  public static FTBuilder get(final Data d) throws IOException {
-    return d.meta.wildcards ? new FTTrieBuilder(d) : new FTFuzzyBuilder(d);
-  }
-
-  /**
    * Constructor.
    * @param d data reference
    * @throws IOException IOException
    */
-  FTBuilder(final Data d) throws IOException {
+  protected FTBuilder(final Data d) throws IOException {
     super(d);
 
     final Prop prop = d.meta.prop;

@@ -545,15 +545,12 @@ public final class FTTest extends QueryTest {
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; ++a) { prop.set(Prop.FTINDEX, a == 0);
-        for(int b = 0; b < 2; ++b) { prop.set(Prop.WILDCARDS, b == 0);
-          super.test();
-        }
+        super.test();
       }
     } else {
       // single test
       //prop.set(Prop.MAINMEM, true);
       prop.set(Prop.FTINDEX, true);
-      prop.set(Prop.WILDCARDS, true);
       prop.set(Prop.STEMMING, true);
       prop.set(Prop.DIACRITICS, true);
       prop.set(Prop.CASESENS, true);
@@ -566,7 +563,6 @@ public final class FTTest extends QueryTest {
     final Prop prop = context.prop;
     final StringBuilder sb = new StringBuilder();
     sb.append(set(Prop.FTINDEX, prop)).append(';');
-    sb.append(set(Prop.WILDCARDS, prop)).append(';');
     sb.append(set(Prop.STEMMING, prop)).append(';');
     sb.append(set(Prop.DIACRITICS, prop)).append(';');
     sb.append(set(Prop.CASESENS, prop));
