@@ -587,48 +587,59 @@ public class BaseXEditor extends BaseXPanel {
 
   @Override
   public final void keyTyped(final KeyEvent e) {
-    if(undo == null || control(e) || DELNEXT.is(e) || DELPREV.is(e) ||
-        ESCAPE.is(e)) return;
+    if(undo == null || control(e) || DELNEXT.is(e) || DELPREV.is(e) || ESCAPE.is(e))
+      return;
 
     text.pos(text.cursor());
+    // string to be added
+    String ch = String.valueOf(e.getKeyChar());
 
-    boolean indent = false;
-    if(text.marked()) {
-      // count number of lines to indent
-      if(TAB.is(e)) {
+    // remember if marked text is to be deleted
+    boolean del = true;
+    if(TAB.is(e)) {
+      if(text.marked()) {
+        // check if lines are to be indented
         final int s = Math.min(text.pos(), text.start());
         final int l = Math.max(text.pos(), text.start()) - 1;
-        for(int p = s; p <= l && p < text.size(); p++) {
-          indent |= text.text[p] == '\n';
+        for(int p = s; p <= l && p < text.size(); p++) del &= text.text[p] != '\n';
+        if(!del) {
+          text.indent(s, l, e.isShiftDown());
+          ch = null;
         }
-        if(indent) text.indent(s, l, e.isShiftDown());
+      } else {
+        boolean c = true;
+        for(int p = text.pos() - 1; p >= 0 && c; p--) {
+          final byte b = text.text[p];
+          c = ws(b);
+          if(b == '\n') break;
+        }
+        if(c) ch = "  ";
       }
-      if(!indent) text.delete();
     }
+
+    // delete marked text
+    if(text.marked() && del) text.delete();
 
     if(ENTER.is(e)) {
       // adopt indentation from previous line
       final StringBuilder sb = new StringBuilder(1).append(e.getKeyChar());
-      int s = 0, t = 0;
+      int s = 0;
       for(int p = text.pos() - 1; p >= 0; p--) {
         final byte b = text.text[p];
-        if(b == '\n') {
-          break;
-        } else if(b == '\t') {
-          t++;
+        if(b == '\n') break;
+        if(b == '\t') {
+          s += 2;
         } else if(b == ' ') {
           s++;
         } else {
-          t = 0;
           s = 0;
         }
       }
-      for(int p = 0; p < t; p++) sb.append('\t');
       for(int p = 0; p < s; p++) sb.append(' ');
-      text.add(sb.toString());
-    } else if(!indent) {
-      text.add(String.valueOf(e.getKeyChar()));
+      ch = sb.toString();
     }
+
+    if(ch != null) text.add(ch);
     text.setCaret();
     rend.calc();
     showCursor(2);
