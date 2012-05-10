@@ -82,7 +82,7 @@ public final class DiskData extends Data {
       if(meta.textindex) txtindex = new DiskValues(this, true);
       if(meta.attrindex) atvindex = new DiskValues(this, false);
     }
-    if(meta.ftxtindex) ftxindex = new FTFuzzy(this);
+    if(meta.ftxtindex) ftxindex = new FTIndex(this);
     init();
   }
 

@@ -14,7 +14,7 @@ import org.basex.util.list.*;
  */
 public final class IndexCache {
   /** Queue used to collect unused keys. */
-  private final ReferenceQueue<CacheEntry> queue = new ReferenceQueue<CacheEntry>();
+  private final ReferenceQueue<IndexEntry> queue = new ReferenceQueue<IndexEntry>();
   /** Hash table buckets. */
   private BucketEntry[] bucket = new BucketEntry[ElementList.CAP];
   /** Number of entries in the cache. */
@@ -25,7 +25,7 @@ public final class IndexCache {
    * @param key key
    * @return cached entry or {@code null} if the entry is stale
    */
-  public CacheEntry get(final byte[] key) {
+  public IndexEntry get(final byte[] key) {
     purge();
 
     final int hash = hash(key);
@@ -35,7 +35,7 @@ public final class IndexCache {
     BucketEntry prev = e;
     while(e != null) {
       final BucketEntry next = e.next;
-      final CacheEntry entry = e.get();
+      final IndexEntry entry = e.get();
       if(entry == null) {
         delete(i, e, prev, next);
       } else if(e.hash == hash && eq(entry.key, key)) {
@@ -53,8 +53,9 @@ public final class IndexCache {
    * @param key key
    * @param s number of index hits
    * @param p pointer to id list
+   * @return cache entry
    */
-  public void add(final byte[] key, final int s, final long p) {
+  public IndexEntry add(final byte[] key, final int s, final long p) {
     purge();
 
     final int hash = hash(key);
@@ -64,21 +65,23 @@ public final class IndexCache {
     BucketEntry prev = e;
     while(e != null) {
       final BucketEntry next = e.next;
-      final CacheEntry entry = e.get();
-      if(entry == null) {
+      final IndexEntry ce = e.get();
+      if(ce == null) {
         delete(i, e, prev, next);
-      } else if(e.hash == hash && eq(entry.key, key)) {
-        entry.size = s;
-        entry.pointer = p;
-        return;
+      } else if(e.hash == hash && eq(ce.key, key)) {
+        ce.size = s;
+        ce.pointer = p;
+        return ce;
       }
       prev = e;
       e = next;
     }
 
     e = bucket[i];
-    bucket[i] = new BucketEntry(hash, e, new CacheEntry(key, s, p), queue);
+    final IndexEntry ce = new IndexEntry(key, s, p);
+    bucket[i] = new BucketEntry(hash, e, ce, queue);
     if(++size == bucket.length) rehash();
+    return ce;
   }
 
   /**
@@ -95,7 +98,7 @@ public final class IndexCache {
     BucketEntry prev = e;
     while(e != null) {
       final BucketEntry next = e.next;
-      final CacheEntry entry = e.get();
+      final IndexEntry entry = e.get();
       if(entry == null) {
         delete(i, e, prev, next);
       } else if(e.hash == hash && eq(entry.key, key)) {
@@ -184,34 +187,12 @@ public final class IndexCache {
     bucket = tmp;
   }
 
-  /** Cache entry data. */
-  public static class CacheEntry {
-    /** Entry key. */
-    public byte[] key;
-    /** Number of index hits for the key. */
-    public int size;
-    /** Pointer to the id list for the key. */
-    public long pointer;
-
-    /**
-     * Constructor.
-     * @param k key
-     * @param s number of hits
-     * @param p pointer to the id list
-     */
-    CacheEntry(final byte[] k, final int s, final long p) {
-      key = k;
-      size = s;
-      pointer = p;
-    }
-  }
-
   /**
    * Cache bucket entry. Used to implement a linked list of cache entries for
    * each bucket. It also stores the hash of the current entry for better
    * performance.
    */
-  private static class BucketEntry extends SoftReference<CacheEntry> {
+  private static class BucketEntry extends SoftReference<IndexEntry> {
     /** Hash code of the stored cache entry key. */
     final int hash;
     /** Next bucket entry or {@code null} if the last one for this bucket. */
@@ -224,8 +205,8 @@ public final class IndexCache {
      * @param v stored cache entry
      * @param rq reference queue
      */
-    public BucketEntry(final int h, final BucketEntry n, final CacheEntry v,
-        final ReferenceQueue<CacheEntry> rq) {
+    public BucketEntry(final int h, final BucketEntry n, final IndexEntry v,
+        final ReferenceQueue<IndexEntry> rq) {
       super(v, rq);
       hash = h;
       next = n;

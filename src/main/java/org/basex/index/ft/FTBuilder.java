@@ -2,6 +2,7 @@ package org.basex.index.ft;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -19,7 +20,9 @@ import org.basex.util.list.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public abstract class FTBuilder extends IndexBuilder {
+public final class FTBuilder extends IndexBuilder {
+  /** Value trees. */
+  private final FTIndexTrees tree;
   /** Word parser. */
   private final FTLexer lex;
   /** Current lexer position. */
@@ -51,8 +54,9 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param d data reference
    * @throws IOException IOException
    */
-  protected FTBuilder(final Data d) throws IOException {
+  public FTBuilder(final Data d) throws IOException {
     super(d);
+    tree = new FTIndexTrees(d.meta.maxlen);
 
     final Prop prop = d.meta.prop;
     final FTOpt fto = new FTOpt();
@@ -77,7 +81,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * Extracts and indexes words from the specified data reference.
    * @throws IOException I/O Exception
    */
-  final void index() throws IOException {
+  private void index() throws IOException {
     // delete old index
     abort();
 
@@ -134,11 +138,170 @@ public abstract class FTBuilder extends IndexBuilder {
     Util.memory(perf);
   }
 
+  @Override
+  public FTIndex build() throws IOException {
+    index();
+    return new FTIndex(data);
+  }
+
+  /**
+   * Indexes a single token.
+   * @param tok token to be indexed
+   */
+  void index(final byte[] tok) {
+    tree.index(tok, pre, pos, csize);
+  }
+
+  /**
+   * Returns the number of disjunct tokens.
+   * @return number of tokens
+   */
+  int nrTokens() {
+    int l = 0;
+    for(final FTIndexTree t : tree.trees) if(t != null) l += t.size();
+    return l;
+  }
+
+  /**
+   * Evaluates the maximum frequencies for tfidf.
+   */
+  void calcFreq() {
+    tree.init();
+    while(tree.more(0)) {
+      final FTIndexTree t = tree.nextTree();
+      t.next();
+      calcFreq(t.nextPres());
+    }
+  }
+
+  /**
+   * Writes the index data to disk.
+   * @throws IOException I/O exception
+   */
+  public void write() throws IOException {
+    writeIndex(csize++);
+    if(!merge) return;
+
+    // merges temporary index files
+    final DataOutput outX = new DataOutput(data.meta.dbfile(DATAFTX + 'x'));
+    final DataOutput outY = new DataOutput(data.meta.dbfile(DATAFTX + 'y'));
+    final DataOutput outZ = new DataOutput(data.meta.dbfile(DATAFTX + 'z'));
+    final IntList ind = new IntList();
+
+    // open all temporary sorted lists
+    final FTList[] v = new FTList[csize];
+    for(int b = 0; b < csize; ++b) v[b] = new FTList(data, b);
+
+    final IntList il = new IntList();
+    while(check(v)) {
+      int m = 0;
+      il.reset();
+      il.add(m);
+      // find next token to write on disk
+      for(int i = 0; i < csize; ++i) {
+        if(m == i || v[i].tok.length == 0) continue;
+        final int l = v[i].tok.length - v[m].tok.length;
+        final int d = diff(v[m].tok, v[i].tok);
+        if(l < 0 || l == 0 && d > 0 || v[m].tok.length == 0) {
+          m = i;
+          il.reset();
+          il.add(m);
+        } else if(d == 0 && v[i].tok.length > 0) {
+          il.add(i);
+        }
+      }
+
+      if(ind.isEmpty() || ind.get(ind.size() - 2) < v[m].tok.length) {
+        ind.add(v[m].tok.length);
+        ind.add((int) outY.size());
+      }
+
+      // write token
+      outY.writeBytes(v[m].tok);
+      // pointer on full-text data
+      outY.write5(outZ.size());
+      // merge and write data size
+      outY.write4(merge(outZ, il, v));
+    }
+    writeInd(outX, ind, ind.get(ind.size() - 2) + 1, (int) outY.size());
+
+    outX.close();
+    outY.close();
+    outZ.close();
+  }
+
+  /**
+   * Writes the token length index to disk.
+   * @param outX output
+   * @param il token length and offsets
+   * @param ls last token length
+   * @param lp last offset
+   * @throws IOException I/O exception
+   */
+  private static void writeInd(final DataOutput outX, final IntList il,
+      final int ls, final int lp) throws IOException {
+
+    final int is = il.size();
+    outX.writeNum(is >> 1);
+    for(int i = 0; i < is; i += 2) {
+      outX.writeNum(il.get(i));
+      outX.write4(il.get(i + 1));
+    }
+    outX.writeNum(ls);
+    outX.write4(lp);
+  }
+
+  /**
+   * Writes the current index to disk.
+   * @param cs current file pointer
+   * @throws IOException I/O exception
+   */
+  protected void writeIndex(final int cs) throws IOException {
+    final String s = DATAFTX + (merge ? cs : "");
+    final DataOutput outX = new DataOutput(data.meta.dbfile(s + 'x'));
+    final DataOutput outY = new DataOutput(data.meta.dbfile(s + 'y'));
+    final DataOutput outZ = new DataOutput(data.meta.dbfile(s + 'z'));
+
+    final IntList ind = new IntList();
+    long dr = 0;
+    int tr = 0;
+    int j = 0;
+    tree.init();
+    while(tree.more(cs)) {
+      final FTIndexTree t = tree.nextTree();
+      t.next();
+      final byte[] key = t.nextTok();
+
+      if(j < key.length) {
+        j = key.length;
+        // write index and pointer on first token
+        ind.add(j);
+        ind.add(tr);
+      }
+      for(int i = 0; i < j; ++i) outY.write1(key[i]);
+      // write pointer on full-text data
+      outY.write5(dr);
+      // write full-text data size (number of pre values)
+      outY.write4(t.nextNumPre());
+      // write compressed pre and pos arrays
+      writeFTData(outZ, t.nextPres(), t.nextPoss());
+
+      dr = outZ.size();
+      tr = (int) outY.size();
+    }
+    writeInd(outX, ind, ++j, tr);
+
+    outX.close();
+    outY.close();
+    outZ.close();
+    tree.initFT();
+  }
+
   /**
    * Calculates the tf-idf data for a single token.
    * @param vpre pre values for a token
    */
-  final void calcFreq(final byte[] vpre) {
+  private void calcFreq(final byte[] vpre) {
     int np = 4;
     int nl = Num.length(vpre, np);
     int p = Num.get(vpre, np);
@@ -165,13 +328,6 @@ public abstract class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Writes the current index to disk.
-   * @param cs current file pointer
-   * @throws IOException I/O exception
-   */
-  protected abstract void writeIndex(final int cs) throws IOException;
-
-  /**
    * Merges temporary indexes for the current token.
    * @param out full-text data
    * @param il array mapping
@@ -179,7 +335,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * @return written size
    * @throws IOException I/O exception
    */
-  final int merge(final DataOutput out, final IntList il, final FTList[] v)
+  private int merge(final DataOutput out, final IntList il, final FTList[] v)
       throws IOException {
 
     int s = 0;
@@ -214,7 +370,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param vpos compressed pos values
    * @throws IOException IOException
    */
-  final void writeFTData(final DataOutput out, final byte[] vpre,
+  private void writeFTData(final DataOutput out, final byte[] vpre,
       final byte[] vpos) throws IOException {
 
     int np = 4, pp = 4, lp = -1, lu = -1;
@@ -255,42 +411,19 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param lists lists
    * @return boolean
    */
-  static final boolean check(final FTList[] lists) {
+  private static boolean check(final FTList[] lists) {
     for(final FTList l : lists) if(l.tok.length > 0) return true;
     return false;
   }
 
-  /**
-   * Indexes a single token.
-   * @param tok token to be indexed
-   */
-  abstract void index(final byte[] tok);
-
-  /**
-   * Returns the number of disjunct tokens.
-   * @return number of tokens
-   */
-  abstract int nrTokens();
-
-  /**
-   * Evaluates the maximum frequencies for tfidf.
-   */
-  abstract void calcFreq();
-
-  /**
-   * Writes the index data to disk.
-   * @throws IOException I/O exception
-   */
-  abstract void write() throws IOException;
-
   @Override
-  public final void abort() {
+  public void abort() {
     data.meta.drop(DATAFTX + ".*");
     data.meta.ftxtindex = false;
   }
 
   @Override
-  protected final String det() {
+  protected String det() {
     return INDEX_FULLTEXT_D;
   }
 }

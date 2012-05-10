@@ -8,7 +8,6 @@ import java.io.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.IndexCache.CacheEntry;
 import org.basex.io.random.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -79,21 +78,6 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public synchronized IndexIterator iter(final IndexToken it) {
-    if(it instanceof StringRange) return idRange((StringRange) it);
-    if(it instanceof NumericRange) return idRange((NumericRange) it);
-
-    final byte[] key = it.get();
-    final CacheEntry e = cache.get(key);
-    if(e != null) return iter(e.size, e.pointer);
-
-    final int ix = get(key);
-    if(ix < 0) return IndexIterator.EMPTY;
-    final long pos = idxr.read5(ix * 5L);
-    return iter(idxl.readNum(pos), idxl.cursor());
-  }
-
-  @Override
   public synchronized int count(final IndexToken it) {
     if(it instanceof StringRange) return idRange((StringRange) it).size();
     if(it instanceof NumericRange) return idRange((NumericRange) it).size();
@@ -101,17 +85,34 @@ public class DiskValues implements Index {
     final byte[] key = it.get();
     if(key.length > data.meta.maxlen) return Integer.MAX_VALUE;
 
-    final CacheEntry e = cache.get(key);
-    if(e != null) return e.size;
+    return entry(key).size;
+  }
 
-    final int ix = get(key);
-    if(ix < 0) return 0;
+  @Override
+  public synchronized IndexIterator iter(final IndexToken it) {
+    if(it instanceof StringRange) return idRange((StringRange) it);
+    if(it instanceof NumericRange) return idRange((NumericRange) it);
+
+    final IndexEntry e = entry(it.get());
+    return iter(e.size, e.pointer);
+  }
+
+  /**
+   * Returns a cache entry.
+   * @param tok token to be found or cached
+   * @return cache entry
+   */
+  private IndexEntry entry(final byte[] tok) {
+    final IndexEntry e = cache.get(tok);
+    if(e != null) return e;
+
+    final long p = get(tok);
+    if(p < 0) return new IndexEntry(tok, 0, 0);
+
     // get position in heap file
-    final long pos = idxr.read5(ix * 5L);
+    final long pos = idxr.read5(p * 5L);
     // the first heap entry represents the number of hits
-    final int nr = idxl.readNum(pos);
-    cache.add(key, nr, pos + Num.length(nr));
-    return nr;
+    return cache.add(tok, idxl.readNum(pos), idxl.cursor());
   }
 
   @Override
