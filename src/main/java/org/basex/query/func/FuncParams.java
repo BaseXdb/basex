@@ -61,6 +61,7 @@ public final class FuncParams {
     // interpret query parameters
     final AxisIter ai = n.children();
     while((n = ai.next()) != null) {
+      if(n.type != NodeType.ELM) continue;
       final QNm qn = n.qname();
       if(!eq(qn.uri(), root.uri())) GENERR.thrw(info, n);
       final byte[] val = n.attribute(A_VALUE);
