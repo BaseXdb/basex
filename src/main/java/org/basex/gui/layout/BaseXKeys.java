@@ -60,6 +60,7 @@ public enum BaseXKeys {
   /** Delete word.           */ DELNEXTWORD(MAC ? ALT : SC, VK_DELETE, true),
   /** Delete line to begin.  */ DELLINESTART(SC | (MAC ? 0 : SHF), VK_BACK_SPACE, true),
   /** Delete line to end.    */ DELLINEEND(SC | (MAC ? 0 : SHF), VK_DELETE, true),
+  /** Delete complete line.  */ DELLINE(SC | SHF, VK_D, true),
 
   /** (Un)comment.           */ COMMENT(SC, VK_K, false),
   /** Execute.               */ EXEC(SC, VK_ENTER, true),

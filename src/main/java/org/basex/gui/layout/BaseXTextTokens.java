@@ -211,6 +211,14 @@ public final class BaseXTextTokens {
   }
 
   /**
+   * Moves to the end of the line.
+   * @param mark mark flag
+   */
+  void eol(final boolean mark) {
+    forward(Integer.MAX_VALUE, mark);
+  }
+
+  /**
    * Moves one character back and returns the found character.
    * @param mark mark flag
    * @return character
@@ -388,6 +396,18 @@ public final class BaseXTextTokens {
     noMark();
   }
 
+  /**
+   * Deletes the current line.
+   */
+  void deleteLine() {
+    bol(false);
+    startMark();
+    eol(true);
+    next(true);
+    endMark();
+    delete();
+  }
+
   // TEXT MARKING =============================================================
 
   /**
@@ -482,6 +502,47 @@ public final class BaseXTextTokens {
       if(t < 0 || t >= ' ' || t == 0x0A || t == 0x09) tb.add(t);
     }
     return tb.toString();
+  }
+
+  /**
+   * Selects the word at the cursor position.
+   */
+  void selectWord() {
+    pos(cursor());
+    final boolean ch = ftChar(prev(true));
+    while(pos() > 0) {
+      final int c = prev(true);
+      if(c == '\n' || ch != ftChar(c)) break;
+    }
+    if(pos() != 0) next(true);
+    startMark();
+    while(pos() < size()) {
+      final int c = curr();
+      if(c == '\n' || ch != ftChar(c)) break;
+      next(true);
+    }
+    endMark();
+  }
+
+  /**
+   * Selects the word at the cursor position.
+   */
+  void selectLine() {
+    pos(cursor());
+    bol(true);
+    startMark();
+    eol(true);
+    endMark();
+  }
+
+  /**
+   * Selects the whole text.
+   */
+  void selectAll() {
+    pos(0);
+    startMark();
+    pos(size());
+    endMark();
   }
 
   // ERROR MARK ===============================================================

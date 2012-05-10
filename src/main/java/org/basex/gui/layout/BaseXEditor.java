@@ -271,10 +271,8 @@ public class BaseXEditor extends BaseXPanel {
    * Selects the whole text.
    */
   final void selectAll() {
-    text.pos(0);
-    text.startMark();
-    text.pos(text.size());
-    text.endMark();
+    text.selectAll();
+    text.setCaret();
     rend.repaint();
   }
 
@@ -328,44 +326,13 @@ public class BaseXEditor extends BaseXPanel {
         // selection mode
         rend.select(scroll.pos(), e.getPoint(), false);
       } else if(c == 2) {
-        selectWord();
+        text.selectWord();
       } else {
-        selectLine();
+        text.selectLine();
       }
     } else if(!text.marked()) {
       rend.select(scroll.pos(), e.getPoint(), false);
     }
-  }
-
-  /**
-   * Selects the word at the cursor position.
-   */
-  private void selectWord() {
-    text.pos(text.cursor());
-    final boolean ch = ftChar(text.prev(true));
-    while(text.pos() > 0) {
-      final int c = text.prev(true);
-      if(c == '\n' || ch != ftChar(c)) break;
-    }
-    if(text.pos() != 0) text.next(true);
-    text.startMark();
-    while(text.pos() < text.size()) {
-      final int c = text.curr();
-      if(c == '\n' || ch != ftChar(c)) break;
-      text.next(true);
-    }
-    text.endMark();
-  }
-
-  /**
-   * Selects the word at the cursor position.
-   */
-  private void selectLine() {
-    text.pos(text.cursor());
-    text.bol(true);
-    text.startMark();
-    text.forward(Integer.MAX_VALUE, true);
-    text.endMark();
   }
 
   // KEY INTERACTIONS =======================================================
@@ -420,14 +387,13 @@ public class BaseXEditor extends BaseXPanel {
     }
     if(SELECTALL.is(e)) {
       selectAll();
-      text.setCaret();
       return;
     }
 
+    // necessary on Macs as the shift button is pressed for REDO
     final boolean marking = e.isShiftDown() &&
-      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e)
-      // necessary on Macs as the shift button is pressed for REDO
-      && !REDOSTEP.is(e);
+      !DELNEXT.is(e) && !DELPREV.is(e) && !PASTE2.is(e) && !COMMENT.is(e) &&
+      !DELLINE.is(e) && !REDOSTEP.is(e);
     final boolean nomark = !text.marked();
     if(marking && nomark) text.startMark();
     boolean down = true;
@@ -451,7 +417,7 @@ public class BaseXEditor extends BaseXPanel {
       text.bol(marking);
       down = false;
     } else if(LINEEND.is(e)) {
-      text.forward(Integer.MAX_VALUE, marking);
+      text.eol(marking);
     } else if(NEXTPAGE.is(e)) {
       down(getHeight() / fh, marking);
     } else if(PREVPAGE.is(e)) {
@@ -487,6 +453,8 @@ public class BaseXEditor extends BaseXPanel {
         redo();
       } else if(COMMENT.is(e)) {
         text.comment(rend.getSyntax());
+      } else if(DELLINE.is(e)) {
+        text.deleteLine();
       } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELNEXT.is(e)) {
         if(nomark) {
           if(text.pos() == text.size()) return;
@@ -494,7 +462,7 @@ public class BaseXEditor extends BaseXPanel {
           if(DELNEXTWORD.is(e)) {
             text.nextToken(true);
           } else if(DELLINEEND.is(e)) {
-            text.forward(Integer.MAX_VALUE, true);
+            text.eol(true);
           } else {
             text.next(true);
           }
@@ -555,7 +523,7 @@ public class BaseXEditor extends BaseXPanel {
     final int x = text.bol(mark);
     if(lastCol == -1) lastCol = x;
     for(int i = 0; i < l; ++i) {
-      text.forward(Integer.MAX_VALUE, mark);
+      text.eol(mark);
       text.next(mark);
     }
     text.forward(lastCol, mark);
