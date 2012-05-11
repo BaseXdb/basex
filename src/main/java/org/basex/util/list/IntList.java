@@ -188,8 +188,7 @@ public class IntList extends ElementList {
    * @param num numeric sort
    * @param asc ascending
    */
-  public final void sort(final byte[][] tok, final boolean num,
-      final boolean asc) {
+  public final void sort(final byte[][] tok, final boolean num, final boolean asc) {
     sort(0, size, num, asc, tok);
   }
 
@@ -223,8 +222,8 @@ public class IntList extends ElementList {
    * @param f ascending/descending sort
    * @param t sort tokens
    */
-  private void sort(final int s, final int e, final boolean g,
-      final boolean f, final byte[][] t) {
+  private void sort(final int s, final int e, final boolean g, final boolean f,
+      final byte[][] t) {
 
     if(e < 7) {
       for(int i = s; i < e + s; ++i) {
@@ -287,9 +286,7 @@ public class IntList extends ElementList {
    * @param f ascending/descending sort
    * @param t sort tokens
    */
-  private void sort(final int s, final int e, final boolean f,
-      final double[] t) {
-
+  private void sort(final int s, final int e, final boolean f, final double[] t) {
     if(e < 7) {
       for(int i = s; i < e + s; ++i) {
         for(int j = i; j > s; j--) {

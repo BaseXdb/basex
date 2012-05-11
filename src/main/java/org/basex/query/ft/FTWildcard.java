@@ -2,6 +2,8 @@ package org.basex.query.ft;
 
 import static org.basex.util.Token.*;
 
+import org.basex.util.*;
+
 /**
  * Wildcard expression.
  *
@@ -12,6 +14,8 @@ import static org.basex.util.Token.*;
 public final class FTWildcard {
   /** Value encoding the wildcard dot. */
   private static final int DOT = -1;
+  /** Original query. */
+  private byte[] query;
   /** Characters. */
   private int[] wc;
   /** Minimum number of occurrence. */
@@ -22,11 +26,18 @@ public final class FTWildcard {
   private int size;
 
   /**
+   * Constructor.
+   * @param qu query
+   */
+  public FTWildcard(final byte[] qu) {
+    query = qu;
+  }
+
+  /**
    * Parses and constructs a new wildcard expression.
-   * @param query input wildcard expression
    * @return success flag
    */
-  public boolean parse(final byte[] query) {
+  public boolean parse() {
     final int[] q = cps(query);
     wc = new int[q.length];
     min = new int[q.length];
@@ -88,16 +99,6 @@ public final class FTWildcard {
   }
 
   /**
-   * Returns the minimum length of a potential match.
-   * @return {@code true} if a match is found
-   */
-  public int min() {
-    int c = 0;
-    for(int s = 0; s < size; s++) c += min[s];
-    return c;
-  }
-
-  /**
    * Returns the maximum length of a potential match.
    * @return {@code true} if a match is found
    */
@@ -109,6 +110,16 @@ public final class FTWildcard {
       c += m;
     }
     return c;
+  }
+
+  /**
+   * Returns the wildcard prefix, which is the same for all matches.
+   * @return prefix
+   */
+  public byte[] prefix() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(int s = 0; s < size && wc[s] != DOT; s++) tb.add(wc[s]);
+    return tb.finish();
   }
 
   /**

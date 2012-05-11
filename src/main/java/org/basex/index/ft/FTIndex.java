@@ -36,7 +36,7 @@ import org.basex.util.list.*;
  * {@code z} is the pointer on the data entries of the token [long]<br/>
  * {@code s} is the number of pre values, saved in data [int]
  * </li>
- * <li>File <b>z</b> contains the {@code pre/pos} references.
+ * <li>File <b>z</b> contains the {@code id/pos} references.
  *   The values are ordered, but not distinct:<br/>
  *   {@code pre1/pos1, pre2/pos2, pre3/pos3, ...} [{@link Num}]</li>
  * </ul>
@@ -110,14 +110,14 @@ public final class FTIndex implements Index {
 
   @Override
   public synchronized int count(final IndexToken it) {
-    final byte[] key = it.get();
-    if(key.length > data.meta.maxlen) return Integer.MAX_VALUE;
+    final byte[] tok = it.get();
+    if(tok.length > data.meta.maxlen) return Integer.MAX_VALUE;
 
     // estimate costs for queries which stretch over multiple index entries
     final FTOpt opt = ((FTLexer) it).ftOpt();
     if(opt.is(FZ) || opt.is(WC)) return Math.max(1, data.meta.size / 10);
 
-    return entry(key).size;
+    return entry(tok).size;
   }
 
   @Override
@@ -141,16 +141,16 @@ public final class FTIndex implements Index {
 
   /**
    * Returns a cache entry.
-   * @param tok token to be found or cached
+   * @param token token to be found or cached
    * @return cache entry
    */
-  private IndexEntry entry(final byte[] tok) {
-    final IndexEntry e = cache.get(tok);
+  private IndexEntry entry(final byte[] token) {
+    final IndexEntry e = cache.get(token);
     if(e != null) return e;
 
-    final long p = token(tok);
-    return p == -1 ? new IndexEntry(tok, 0, 0) :
-      cache.add(tok, size(p, tok.length), pointer(p, tok.length));
+    final long p = token(token);
+    return p == -1 ? new IndexEntry(token, 0, 0) :
+      cache.add(token, size(p, token.length), pointer(p, token.length));
   }
 
   @Override
@@ -177,16 +177,15 @@ public final class FTIndex implements Index {
         // find next available entry group
         while(++ti < tp.length - 1) {
           i = tp[ti];
-          if(i != -1) {
-            int c = ti + 1;
-            do e = tp[c++]; while(e == -1);
-            nr = 0;
-            inner = true;
-            i = find(prefix, i, e, ti);
-            // jump to inner loop
-            final byte[] n = next();
-            if(n != null) return n;
-          }
+          if(i == -1) continue;
+          int c = ti + 1;
+          do e = tp[c++]; while(e == -1);
+          nr = 0;
+          inner = true;
+          i = find(prefix, i, e, ti);
+          // jump to inner loop
+          final byte[] n = next();
+          if(n != null) return n;
         }
         // all entries processed: return null
         return null;
@@ -200,13 +199,13 @@ public final class FTIndex implements Index {
 
   /**
    * Binary search.
-   * @param key key to be found
+   * @param token token to look for
    * @param i start position
    * @param e end position
    * @param ti entry length
    * @return position where the key was found, or would have been found
    */
-  int find(final byte[] key, final int i, final int e, final int ti) {
+  int find(final byte[] token, final int i, final int e, final int ti) {
     final int tl = ti + ENTRY;
     int l = 0, h = (e - i) / tl;
     while(l <= h) {
@@ -217,8 +216,8 @@ public final class FTIndex implements Index {
         txt = inY.readBytes(p, ti);
         ctext.add(p, txt);
       }
-      final int d = diff(txt, key);
-      if(d == 0) return i + m + tl;
+      final int d = diff(txt, token);
+      if(d == 0) return i + m * tl;
       if(d < 0) l = m + 1;
       else h = m - 1;
     }
@@ -252,11 +251,11 @@ public final class FTIndex implements Index {
 
   /**
    * Determines the pointer on a token.
-   * @param tok token looking for
+   * @param token token looking for
    * @return int pointer or {@code -1} if token was not found
    */
-  private int token(final byte[] tok) {
-    final int tl = tok.length;
+  private int token(final byte[] token) {
+    final int tl = token.length;
     // left limit
     int l = tp[tl];
     if(l == -1) return -1;
@@ -271,13 +270,13 @@ public final class FTIndex implements Index {
     final int o = tl + ENTRY;
     while(l < r) {
       final int m = l + (r - l >> 1) / o * o;
-      final int c = diff(inY.readBytes(m, tl), tok);
+      final int c = diff(inY.readBytes(m, tl), token);
       if(c == 0) return m;
       if(c < 0) l = m + o;
       else r = m - o;
     }
     // accept entry if pointer is inside relevant tokens
-    return r != x && l == r && eq(inY.readBytes(l, tl), tok) ? l : -1;
+    return r != x && l == r && eq(inY.readBytes(l, tl), token) ? l : -1;
   }
 
   /**
@@ -323,13 +322,13 @@ public final class FTIndex implements Index {
 
   /**
    * Performs a fuzzy search for the specified token with a maximum number of errors.
-   * @param tok token to look for
+   * @param token token to look for
    * @param k number of errors allowed
    * @return iterator
    */
-  private IndexIterator fuzzy(final byte[] tok, final int k) {
+  private synchronized IndexIterator fuzzy(final byte[] token, final int k) {
     FTIndexIterator it = FTIndexIterator.FTEMPTY;
-    final int tl = tok.length;
+    final int tl = token.length;
     final int e = Math.min(tp.length - 1, tl + k);
     int s = Math.max(1, tl - k) - 1;
 
@@ -340,7 +339,7 @@ public final class FTIndex implements Index {
       int r = -1;
       while(i < tp.length && r == -1) r = tp[i++];
       while(p < r) {
-        if(ls.similar(inY.readBytes(p, s), tok, k)) {
+        if(ls.similar(inY.readBytes(p, s), token, k)) {
           it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ), it);
         }
         p += s + ENTRY;
@@ -351,78 +350,87 @@ public final class FTIndex implements Index {
 
   /**
    * Performs a wildcard search for the specified token.
-   * @param tok token to look for
+   * @param token token to look for
    * @return iterator
    */
-  private IndexIterator wc(final byte[] tok) {
-    FTIndexIterator it = FTIndexIterator.FTEMPTY;
-    final FTWildcard wc = new FTWildcard();
-    if(!wc.parse(tok)) return it;
-    final int e = Math.min(tp.length - 1, wc.max());
-    for(int s = wc.min(); s <= e; s++) {
-      int p = tp[s];
-      if(p == -1) continue;
-      int i = s + 1;
-      int r = -1;
-      while(i < tp.length && r == -1) r = tp[i++];
-      while(p < r) {
-        if(wc.match(inY.readBytes(p, s))) {
-          it = FTIndexIterator.union(iter(pointer(p, s), size(p, s), inZ), it);
+  private synchronized IndexIterator wc(final byte[] token) {
+    final FTIndexIterator it = FTIndexIterator.FTEMPTY;
+    final FTWildcard wc = new FTWildcard(token);
+    if(!wc.parse()) return it;
+
+    final IntList pr = new IntList();
+    final IntList ps = new IntList();
+    int sc = 0, sz = 0;
+
+    final byte[] pref = wc.prefix();
+    final int l = Math.min(tp.length - 1, wc.max());
+    for(int ti = pref.length; ti <= l; ti++) {
+      int i = tp[ti];
+      if(i == -1) continue;
+      int c = ti + 1;
+      int e = -1;
+      while(c < tp.length && e == -1) e = tp[c++];
+      i = find(pref, i, e, ti);
+
+      while(i < e) {
+        final byte[] t = inY.readBytes(i, ti);
+        if(!startsWith(t, pref)) break;
+        if(wc.match(t)) {
+          inZ.cursor(pointer(i, ti));
+          final int s = size(i, ti);
+          if(scm > 0) sc += inZ.readNum();
+          for(int d = 0; d < s; d++) {
+            pr.add(inZ.readNum());
+            ps.add(inZ.readNum());
+          }
+          sz++;
         }
-        p += s + ENTRY;
+        i += ti + ENTRY;
       }
     }
-    return it;
+    return iter(new FTCache(pr, ps, sz == 0 ? 0 : sc / sz));
   }
 
   /**
    * Returns an iterator for an index entry.
    * @param off offset on entries
-   * @param size number of pre/pos entries
+   * @param size number of id/pos entries
    * @param da data source
    * @return iterator
    */
-  private synchronized FTIndexIterator iter(final long off, final int size,
-      final DataAccess da) {
-
-    // cache results
+  private FTIndexIterator iter(final long off, final int size, final DataAccess da) {
     da.cursor(off);
-    final IntList vals = new IntList();
-    for(int c = 0, lp = 0; c < size;) {
-      if(lp == 0) {
-        if(scm > 0) vals.add(da.readNum());
-        lp = da.readNum();
-        vals.add(lp);
-      }
-      final int pr = lp;
-      vals.add(da.readNum());
-      while(++c < size) {
-        lp = da.readNum();
-        vals.add(lp);
-        if(lp != pr) break;
-        vals.add(da.readNum());
-      }
+    final int sc = scm > 0 ? da.readNum() : 0;
+    final IntList pr = new IntList(size);
+    final IntList ps = new IntList(size);
+    for(int c = 0; c < size; c++) {
+      pr.add(da.readNum());
+      ps.add(da.readNum());
     }
+    return iter(new FTCache(pr, ps, sc));
+  }
+
+  /**
+   * Returns an iterator for an index entry.
+   * @param ftc id cache
+   * @return iterator
+   */
+  private synchronized FTIndexIterator iter(final FTCache ftc) {
+    final double sc = scm > 0 ? (Math.log(ftc.score) - min) / (max - min) : -1;
+    final int size = ftc.pre.size();
 
     return new FTIndexIterator() {
       final FTMatches all = new FTMatches(toknum);
-      int c, pre, lpre;
-      double sc = -1;
+      int pre, c;
 
       @Override
       public synchronized boolean more() {
-        if(c == vals.size()) return false;
-        if(lpre == 0) {
-          if(scm > 0) sc = (Math.log(vals.get(c++)) - min) / (max - min);
-          lpre = vals.get(c++);
-        }
-        pre = lpre;
-
+        if(c == size) return false;
         all.reset(toknum);
-        all.or(vals.get(c++));
-
-        while(c < vals.size() && (lpre = vals.get(c++)) == pre) {
-          all.or(vals.get(c++));
+        pre = ftc.pre.get(ftc.order[c]);
+        all.or(ftc.pos.get(ftc.order[c++]));
+        while(c < size && pre == ftc.pre.get(ftc.order[c])) {
+          all.or(ftc.pos.get(ftc.order[c++]));
         }
         return true;
       }
@@ -452,5 +460,35 @@ public final class FTIndex implements Index {
         return Integer.toString(size);
       }
     };
+  }
+
+  /**
+   * Full-text cache.
+   */
+  static final class FTCache {
+    /** Score value. */
+    int score;
+    /** Order. */
+    int[] order;
+    /** Pre values. */
+    IntList pre;
+    /** Pos values. */
+    IntList pos;
+
+    /**
+     * Constructor.
+     * @param pr pre values
+     * @param ps positions
+     * @param sc score
+     */
+    FTCache(final IntList pr, final IntList ps, final int sc) {
+      final int s = pr.size();
+      final double[] v = new double[s];
+      for(int i = 0; i < s; i++) v[i] = (long) pr.get(i) << 32 | ps.get(i);
+      order = Array.createOrder(v, true);
+      pre = pr;
+      pos = ps;
+      score = sc;
+    }
   }
 }

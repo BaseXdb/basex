@@ -53,8 +53,8 @@ final class FTTokenizer {
         if(opt.is(WC)) {
           ftw = wcCache.get(qu);
           if(ftw == null) {
-            ftw = new FTWildcard();
-            if(!ftw.parse(qu)) FTREG.thrw(words.info, qu);
+            ftw = new FTWildcard(qu);
+            if(!ftw.parse()) FTREG.thrw(words.info, qu);
             wcCache.add(qu, ftw);
           }
         }
