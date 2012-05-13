@@ -264,18 +264,22 @@ public class AxisPath extends Path {
     final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
+    Value r = root != null ? ctx.value(root) : cv;
 
     try {
-      Value r = root != null ? ctx.value(root) : cv;
-
-      if(!cache || citer == null || lvalue.type != NodeType.DOC ||
-          r.type != NodeType.DOC || !((ANode) lvalue).is((ANode) r)) {
+      /* cache values if:
+       * - caching is desirable
+       * - the code is called for the first time
+       * - the value has changed and the underlying node is not the same
+       */
+      if(!cache || citer == null || lvalue != r && !(r instanceof ANode &&
+          lvalue instanceof ANode && ((ANode) lvalue).is((ANode) r))) {
         lvalue = r;
-        citer = new NodeCache().random();
+        citer = new NodeCache().check();
         if(r != null) {
           final Iter ir = ctx.iter(r);
-          while((r = ir.next()) != null) {
-            ctx.value = r;
+          for(Item it; (it = ir.next()) != null;) {
+            ctx.value = it;
             iter(0, citer, ctx);
           }
         } else {

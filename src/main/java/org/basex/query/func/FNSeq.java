@@ -66,7 +66,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter most(final QueryContext ctx, final boolean outer) throws QueryException {
     final Iter iter = expr[0].iter(ctx);
-    final NodeCache nc = new NodeCache().random();
+    final NodeCache nc = new NodeCache().check();
     for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));
     final int len = (int) nc.size();
 

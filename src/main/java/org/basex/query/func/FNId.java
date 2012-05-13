@@ -80,7 +80,7 @@ public final class FNId extends StandardFunc {
    * @throws QueryException query exception
    */
   private NodeCache id(final Iter it, final ANode node) throws QueryException {
-    final NodeCache nc = new NodeCache().random();
+    final NodeCache nc = new NodeCache().check();
     add(ids(it), nc, checkRoot(node));
     return nc;
   }
@@ -93,7 +93,7 @@ public final class FNId extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter idref(final Iter it, final ANode node) throws QueryException {
-    final NodeCache nb = new NodeCache().random();
+    final NodeCache nb = new NodeCache().check();
     addRef(ids(it), nb, checkRoot(node));
     return nb;
   }

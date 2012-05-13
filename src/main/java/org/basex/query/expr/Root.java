@@ -31,7 +31,7 @@ public final class Root extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter iter = checkCtx(ctx).iter();
-    final NodeCache nc = new NodeCache().random();
+    final NodeCache nc = new NodeCache().check();
     for(Item i; (i = iter.next()) != null;) {
       final ANode n = root(i);
       if(n == null || n.type != NodeType.DOC) CTXNODE.thrw(info);
