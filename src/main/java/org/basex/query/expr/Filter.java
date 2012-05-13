@@ -31,19 +31,26 @@ public class Filter extends Preds {
 
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
-    root = checkUp(root, ctx).comp(ctx);
-    // return empty root
-    if(root.isEmpty()) return optPre(null, ctx);
-    // convert filters without numeric predicates to axis paths
-    if(root instanceof AxisPath && !super.uses(Use.POS))
-      return ((AxisPath) root).copy().addPreds(preds).comp(ctx);
+    // invalidate current context value (will be overwritten by filter)
+    final Value cv = ctx.value;
+    ctx.value = null;
+    try {
+      root = checkUp(root, ctx).comp(ctx);
+      // return empty root
+      if(root.isEmpty()) return optPre(null, ctx);
+      // convert filters without numeric predicates to axis paths
+      if(root instanceof AxisPath && !super.uses(Use.POS))
+        return ((AxisPath) root).copy().addPreds(preds).comp(ctx);
 
-    // optimize filter expressions
-    final Expr e = super.comp(ctx);
-    if(e != this) return e;
+      // optimize filter expressions
+      final Expr e = super.comp(ctx);
+      if(e != this) return e;
 
-    // no predicates.. return root; otherwise, do some advanced compilations
-    return preds.length == 0 ? root : comp2(ctx);
+      // no predicates.. return root; otherwise, do some advanced compilations
+      return preds.length == 0 ? root : comp2(ctx);
+    } finally {
+      ctx.value = cv;
+    }
   }
 
   /**
