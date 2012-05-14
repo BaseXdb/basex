@@ -104,6 +104,9 @@ public final class CSVTest extends SandboxTest {
     new Set(Prop.PARSEROPT, "separator=tab,header=true").execute(context);
     new CreateDB(NAME, FILE).execute(context);
     assertEquals("0", new XQuery("count(//Name)").execute(context));
+    new Set(Prop.PARSEROPT, "separator=9,header=true").execute(context);
+    new CreateDB(NAME, FILE).execute(context);
+    assertEquals("0", new XQuery("count(//Name)").execute(context));
   }
 
   /**

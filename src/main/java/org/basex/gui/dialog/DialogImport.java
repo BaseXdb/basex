@@ -155,7 +155,7 @@ public final class DialogImport extends BaseXBack {
    * @return success flag, or {@code false} if specified input is not found
    */
   boolean action(final Object comp, final boolean empty) {
-    parsing.action();
+    boolean ok = parsing.action();
 
     final String in = input.getText().trim();
     final IO io = IO.get(in);
@@ -169,9 +169,7 @@ public final class DialogImport extends BaseXBack {
       if(dir) filter.setText(r ? "*" : "*." + type);
     }
 
-    final boolean ok = empty ? in.isEmpty() || io.exists() :
-      !in.isEmpty() && io.exists();
-
+    ok &= empty ? in.isEmpty() || io.exists() : !in.isEmpty() && io.exists();
     if(ok && comp == input) setType(in);
 
     info.setText(null, null);

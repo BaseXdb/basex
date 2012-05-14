@@ -12,7 +12,7 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public final class ParserProp extends AProp {
-  /** Parser option: column separator (0 = comma, 1 = semicolon, 2 = tab). */
+  /** Parser option: column separator. */
   public static final Object[] SEPARATOR = { "separator", "comma" };
   /** Parser option: header line. */
   public static final Object[] HEADER = { "header", false };
