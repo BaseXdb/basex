@@ -86,6 +86,8 @@ public final class MetaData {
   public boolean uptodate = true;
   /** Flag for out-of-date indexes. */
   public boolean oldindex;
+  /** Flag for out-of-date wildcard index. */
+  public boolean wcindex;
   /** Flag to indicate possible corruption. */
   public boolean corrupt;
   /** Dirty flag. */
@@ -273,7 +275,6 @@ public final class MetaData {
    */
   public void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
-    boolean wcidx = false;
     while(true) {
       final String k = string(in.readToken());
       if(k.isEmpty()) break;
@@ -304,7 +305,7 @@ public final class MetaData {
         else if(k.equals(DBCRTTXT))   createtext = toBool(v);
         else if(k.equals(DBCRTATV))   createattr = toBool(v);
         else if(k.equals(DBCRTFTX))   createftxt = toBool(v);
-        else if(k.equals(DBWCIDX))    wcidx      = toBool(v);
+        else if(k.equals(DBWCIDX))    wcindex    = toBool(v);
         else if(k.equals(DBFTST))     stemming   = toBool(v);
         else if(k.equals(DBFTCS))     casesens   = toBool(v);
         else if(k.equals(DBFTDC))     diacritics = toBool(v);
@@ -323,7 +324,7 @@ public final class MetaData {
         new Version(istorage).compareTo(new Version(ISTORAGE)) > 0;
     corrupt = dbfile(DATAUPD).exists();
     // deactivate full-text index if obsolete trie structure was used
-    ftxtindex &= !wcidx;
+    if(wcindex) ftxtindex = false;
   }
 
   /**

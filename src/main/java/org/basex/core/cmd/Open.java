@@ -41,7 +41,7 @@ public final class Open extends Command {
     try {
       final Data data = open(db, context);
       context.openDB(data, path);
-      if(data.meta.oldindex) info(H_INDEX_FORMAT);
+      if(data.meta.oldindex || data.meta.wcindex) info(H_INDEX_FORMAT);
       if(data.meta.corrupt)  info(DB_CORRUPT);
       return info(DB_OPENED_X, db, perf);
     } catch(final IOException ex) {
