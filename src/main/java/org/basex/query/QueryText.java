@@ -659,7 +659,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTPREF = "skipping namespace test for \"%\"";
   /** Optimization info. */
-  String OPTNAME = "removing unknown tag/attribute %";
+  String OPTNAME = "removing unknown element/attribute %";
   /** Optimization info. */
   String OPTPATH = "removing non-existing path %";
   /** Optimization info. */

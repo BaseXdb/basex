@@ -42,7 +42,7 @@ public final class Union extends Set {
 
   @Override
   protected NodeCache eval(final Iter[] iter) throws QueryException {
-    final NodeCache nc = new NodeCache().random();
+    final NodeCache nc = new NodeCache().check();
     for(final Iter ir : iter) {
       for(Item it; (it = ir.next()) != null;) nc.add(checkNode(it));
     }

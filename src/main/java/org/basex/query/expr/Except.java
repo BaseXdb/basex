@@ -40,7 +40,7 @@ public final class Except extends Set {
 
   @Override
   protected NodeCache eval(final Iter[] iter) throws QueryException {
-    final NodeCache nc = new NodeCache().random();
+    final NodeCache nc = new NodeCache().check();
 
     for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
     final boolean db = nc.dbnodes();

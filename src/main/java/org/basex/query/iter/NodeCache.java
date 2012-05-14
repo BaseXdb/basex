@@ -21,8 +21,8 @@ public final class NodeCache extends AxisIter {
   private int pos = -1;
   /** Sort flag. */
   private boolean sort;
-  /** Flag for potential duplicates and unsorted entries. */
-  private boolean random;
+  /** Check incoming nodes for potential duplicates and unsorted entries. */
+  private boolean check;
 
   /**
    * Constructor.
@@ -42,12 +42,11 @@ public final class NodeCache extends AxisIter {
   }
 
   /**
-   * Sets the internal duplicate flag, which indicates that duplicate and
-   * unordered nodes might be added to this iterator.
+   * Checks all nodes for potential duplicates and their orderedness.
    * @return self reference
    */
-  public NodeCache random() {
-    random = true;
+  public NodeCache check() {
+    check = true;
     return this;
   }
 
@@ -78,7 +77,7 @@ public final class NodeCache extends AxisIter {
       System.arraycopy(item, 0, tmp, 0, size);
       item = tmp;
     }
-    if(random && !sort && size != 0) sort = item[size - 1].diff(n) > 0;
+    if(check && !sort && size != 0) sort = item[size - 1].diff(n) > 0;
     item[size++] = n;
   }
 
@@ -90,7 +89,7 @@ public final class NodeCache extends AxisIter {
 
   @Override
   public ANode next() {
-    if(random) sort(sort);
+    if(check) sort(sort);
     return ++pos < size ? item[pos] : null;
   }
 
@@ -114,7 +113,7 @@ public final class NodeCache extends AxisIter {
 
   @Override
   public Value value() {
-    if(random) sort(sort);
+    if(check) sort(sort);
     return Seq.get(item, size);
   }
 
@@ -124,7 +123,7 @@ public final class NodeCache extends AxisIter {
    * @return result of check
    */
   public boolean dbnodes() {
-    if(random) sort(sort);
+    if(check) sort(sort);
 
     final Data data = size > 0 ? item[0].data() : null;
     if(data == null) return false;
@@ -172,7 +171,7 @@ public final class NodeCache extends AxisIter {
    * @return self reference
    */
   public NodeCache sort() {
-    if(random) sort(sort);
+    if(check) sort(sort);
     return this;
   }
 
@@ -181,7 +180,7 @@ public final class NodeCache extends AxisIter {
    * @param force force sort
    */
   private void sort(final boolean force) {
-    random = false;
+    check = false;
     if(size > 1) {
       // sort arrays and remove duplicates
       if(force) sort(0, size);
