@@ -67,12 +67,6 @@ public final class MetaData {
   /** Flag for full-text diacritics removal. */
   public boolean diacritics;
 
-  /** Maximal indexed full-text score. */
-  public int maxscore;
-  /** Minimal indexed full-text score. */
-  public int minscore;
-  /** Scoring mode: see {@link Prop#SCORING}. */
-  public int scoring;
   /** Maximum number of categories. */
   public int maxcats;
   /** Maximum token length. */
@@ -84,10 +78,6 @@ public final class MetaData {
   /** Flag for out-of-date index structures.
    *  Will be removed as soon as all indexes support updates. */
   public boolean uptodate = true;
-  /** Flag for out-of-date indexes. */
-  public boolean oldindex;
-  /** Flag for out-of-date wildcard index. */
-  public boolean wcindex;
   /** Flag to indicate possible corruption. */
   public boolean corrupt;
   /** Dirty flag. */
@@ -97,6 +87,13 @@ public final class MetaData {
   public int size;
   /** Last (highest) id assigned to a node. */
   public int lastid = -1;
+
+  /** Flag for out-of-date indexes. */
+  private boolean oldindex;
+  /** Flag for out-of-date wildcard index (legacy, deprecated). */
+  public boolean wcindex;
+  /** Scoring mode (legacy, deprecated). */
+  public int scoring;
 
   /**
    * Constructor, specifying the database properties.
@@ -133,7 +130,6 @@ public final class MetaData {
     stemming = prop.is(Prop.STEMMING);
     casesens = prop.is(Prop.CASESENS);
     updindex = prop.is(Prop.UPDINDEX);
-    scoring = prop.num(Prop.SCORING);
     maxlen = prop.num(Prop.MAXLEN);
     maxcats = prop.num(Prop.MAXCATS);
     language = Language.get(prop);
@@ -213,6 +209,14 @@ public final class MetaData {
   // PUBLIC METHODS ===========================================================
 
   /**
+   * Returns true if the indexes need to be updated.
+   * @return result of check
+   */
+  public boolean oldindex() {
+    return oldindex || wcindex || scoring != 0;
+  }
+
+  /**
    * Returns the disk size of the database.
    * @return database size
    */
@@ -288,8 +292,6 @@ public final class MetaData {
         else if(k.equals(DBENC))      encoding   = v;
         else if(k.equals(DBSIZE))     size       = toInt(v);
         else if(k.equals(DBNDOCS))    ndocs      = toInt(v);
-        else if(k.equals(DBSCMAX))    maxscore   = toInt(v);
-        else if(k.equals(DBSCMIN))    minscore   = toInt(v);
         else if(k.equals(DBSCTYPE))   scoring    = toInt(v);
         else if(k.equals(DBMAXLEN))   maxlen     = toInt(v);
         else if(k.equals(DBMAXCATS))  maxcats    = toInt(v);
@@ -352,9 +354,6 @@ public final class MetaData {
     writeInfo(out, DBFTST,     stemming);
     writeInfo(out, DBFTCS,     casesens);
     writeInfo(out, DBFTDC,     diacritics);
-    writeInfo(out, DBSCMAX,    maxscore);
-    writeInfo(out, DBSCMIN,    minscore);
-    writeInfo(out, DBSCTYPE,   scoring);
     writeInfo(out, DBMAXLEN,   maxlen);
     writeInfo(out, DBMAXCATS,  maxcats);
     writeInfo(out, DBUPTODATE, uptodate);

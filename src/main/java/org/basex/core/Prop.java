@@ -92,8 +92,6 @@ public final class Prop extends AProp {
     "nodefaults=false,nocolons=false,norestart=false,ignorable=false,emptybogons=false," +
     "any=false,norootbogons=false,nocdata=false,lexical=false,encoding=utf-8" };
 
-  /** Flag for creating a path summary. */
-  public static final Object[] PATHINDEX = { "PATHINDEX", true };
   /** Flag for creating a text index. */
   public static final Object[] TEXTINDEX = { "TEXTINDEX", true };
   /** Flag for creating an attribute value index. */
@@ -130,9 +128,6 @@ public final class Prop extends AProp {
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Language for full-text search index. */
   public static final Object[] LANGUAGE = { "LANGUAGE", "en" };
-  /** Flag for full-text scoring algorithm.
-      Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
-  public static final Object[] SCORING = { "SCORING", 0 };
   /** Path to full-text stopword list. */
   public static final Object[] STOPWORDS = { "STOPWORDS", "" };
   /** Levenshtein default error. */

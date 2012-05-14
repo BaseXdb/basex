@@ -1057,10 +1057,6 @@ public interface Text {
   String DIACRITICS = lang("diacritics");
   /** Full-text index using stopword list. */
   String STOPWORD_LIST = lang("stopword_list");
-  /** Full-text scoring type. */
-  String TFIDF_SCORING = lang("tfidf_scoring");
-  /** Full-text, document-based. */
-  String TEXT_NODES = lang("text_nodes");
 
   /** JsonML information. */
   String PARSE_AS_JSONML = lang("parse_as_jsonml");
@@ -1372,8 +1368,6 @@ public interface Text {
   String H_CASE = lang("h_case");
   /** Full-text index information. */
   String H_DIACRITICS = lang("h_diacritics");
-  /** Full-text index information. */
-  String H_SCORING = lang("h_scoring");
   /** Full-text index information. */
   String H_STOPWORDS = lang("h_stopwords");
 

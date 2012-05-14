@@ -163,8 +163,9 @@ public final class FTWords extends FTExpr {
             iat.tokenNum(++ctx.ftoknum);
           }
         }
+        // [CG] XQuery, Full-Text: check scoring in index-based model
         return iat == null || !iat.more() ? null : new FTNode(iat.matches(),
-            data, iat.next(), len, iat.size(), iat.score());
+            data, iat.next(), len, iat.size(), -1);
       }
     };
   }
@@ -198,10 +199,6 @@ public final class FTWords extends FTExpr {
           }
         }
         return false;
-      }
-      @Override
-      public double score() {
-        return -1;
       }
       @Override
       public FTMatches matches() {

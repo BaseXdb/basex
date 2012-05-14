@@ -14,8 +14,6 @@ public abstract class IndexIterator {
     @Override
     public int next() { return 0; }
     @Override
-    public double score() { return -1; }
-    @Override
     public int size() { return 0; }
   };
 
@@ -30,13 +28,6 @@ public abstract class IndexIterator {
    * @return result
    */
   public abstract int next();
-
-  /**
-   * Returns the score value.
-   * {@code -1} is returned if no scoring is available.
-   * @return score value
-   */
-  public abstract double score();
 
   /**
    * Returns the total number of index results.

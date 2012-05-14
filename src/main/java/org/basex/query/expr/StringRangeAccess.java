@@ -63,10 +63,6 @@ public final class StringRangeAccess extends IndexAccess {
       int pre = -1;
 
       @Override
-      public double score() {
-        return -1;
-      }
-      @Override
       public int next() {
         return pre;
       }

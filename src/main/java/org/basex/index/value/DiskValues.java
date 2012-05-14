@@ -247,11 +247,6 @@ public class DiskValues implements Index {
       }
 
       @Override
-      public double score() {
-        return -1;
-      }
-
-      @Override
       public int size() {
         return s;
       }

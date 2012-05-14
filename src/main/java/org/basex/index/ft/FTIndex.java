@@ -65,12 +65,6 @@ public final class FTIndex implements Index {
 
   /** Cache for number of hits and data reference per token. */
   final IndexCache cache = new IndexCache();
-  /** Scoring mode. 1 = document based, 2 = text-node based .*/
-  final int scm;
-  /** Minimum scoring value. */
-  final double max;
-  /** Minimum scoring value. */
-  final double min;
   /** Token positions. */
   final int[] tp;
 
@@ -81,9 +75,6 @@ public final class FTIndex implements Index {
    */
   public FTIndex(final Data d) throws IOException {
     data = d;
-    scm = d.meta.scoring;
-    max = Math.log(data.meta.maxscore + 1);
-    min = Math.log(data.meta.minscore - 1);
 
     // cache token length index
     inY = new DataAccess(d.meta.dbfile(DATAFTX + 'y'));
@@ -360,8 +351,6 @@ public final class FTIndex implements Index {
 
     final IntList pr = new IntList();
     final IntList ps = new IntList();
-    int sc = 0, sz = 0;
-
     final byte[] pref = wc.prefix();
     final int l = Math.min(tp.length - 1, wc.max());
     for(int ti = pref.length; ti <= l; ti++) {
@@ -378,17 +367,15 @@ public final class FTIndex implements Index {
         if(wc.match(t)) {
           inZ.cursor(pointer(i, ti));
           final int s = size(i, ti);
-          if(scm > 0) sc += inZ.readNum();
           for(int d = 0; d < s; d++) {
             pr.add(inZ.readNum());
             ps.add(inZ.readNum());
           }
-          sz++;
         }
         i += ti + ENTRY;
       }
     }
-    return iter(new FTCache(pr, ps, sz == 0 ? 0 : sc / sz));
+    return iter(new FTCache(pr, ps));
   }
 
   /**
@@ -400,14 +387,13 @@ public final class FTIndex implements Index {
    */
   private FTIndexIterator iter(final long off, final int size, final DataAccess da) {
     da.cursor(off);
-    final int sc = scm > 0 ? da.readNum() : 0;
     final IntList pr = new IntList(size);
     final IntList ps = new IntList(size);
     for(int c = 0; c < size; c++) {
       pr.add(da.readNum());
       ps.add(da.readNum());
     }
-    return iter(new FTCache(pr, ps, sc));
+    return iter(new FTCache(pr, ps));
   }
 
   /**
@@ -416,7 +402,6 @@ public final class FTIndex implements Index {
    * @return iterator
    */
   private synchronized FTIndexIterator iter(final FTCache ftc) {
-    final double sc = scm > 0 ? (Math.log(ftc.score) - min) / (max - min) : -1;
     final int size = ftc.pre.size();
 
     return new FTIndexIterator() {
@@ -451,11 +436,6 @@ public final class FTIndex implements Index {
       }
 
       @Override
-      public synchronized double score() {
-        return sc;
-      }
-
-      @Override
       public String toString() {
         return Integer.toString(size);
       }
@@ -466,8 +446,6 @@ public final class FTIndex implements Index {
    * Full-text cache.
    */
   static final class FTCache {
-    /** Score value. */
-    int score;
     /** Order. */
     int[] order;
     /** Pre values. */
@@ -479,16 +457,14 @@ public final class FTIndex implements Index {
      * Constructor.
      * @param pr pre values
      * @param ps positions
-     * @param sc score
      */
-    FTCache(final IntList pr, final IntList ps, final int sc) {
+    FTCache(final IntList pr, final IntList ps) {
       final int s = pr.size();
       final double[] v = new double[s];
       for(int i = 0; i < s; i++) v[i] = (long) pr.get(i) << 32 | ps.get(i);
       order = Array.createOrder(v, true);
       pre = pr;
       pos = ps;
-      score = sc;
     }
   }
 }

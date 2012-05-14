@@ -46,8 +46,6 @@ public interface DataText {
   String DBATVIDX = "ATVINDEX";
   /** Full-text indexing. */
   String DBFTXIDX = "FTXINDEX";
-  /** Full-text wildcards indexing. */
-  String DBWCIDX = "WCINDEX";
   /** Full-text stemming. */
   String DBFTST = "FTSTEM";
   /** Full-text language. */
@@ -56,12 +54,6 @@ public interface DataText {
   String DBFTCS = "FTCS";
   /** Full-text diacritics removal. */
   String DBFTDC = "FTDC";
-  /** Maximum scoring value. */
-  String DBSCMAX = "FTSCMAX";
-  /** Minimum scoring value. */
-  String DBSCMIN = "FTSCMIN";
-  /** Maximum indexed full-text score. */
-  String DBSCTYPE = "FTSCTYPE";
   /** Maximum token length. */
   String DBMAXLEN = "MAXLEN";
   /** Maximum number of categories. */
@@ -80,6 +72,11 @@ public interface DataText {
   String DBCRTATV = "CRTATV";
   /** Full-text indexing. */
   String DBCRTFTX = "CRTFTX";
+
+  /** Full-text wildcards indexing (legacy, obsolete). */
+  String DBWCIDX = "WCINDEX";
+  /** Scoring type (legacy, obsolete). */
+  String DBSCTYPE = "FTSCTYPE";
 
   /** Tags. */
   String DBTAGS = "TAGS";

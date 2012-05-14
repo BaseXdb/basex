@@ -49,8 +49,6 @@ public final class UpdatableMemValues extends MemValues {
           @Override
           public int next() { return pres[p++]; }
           @Override
-          public double score() { return -1; }
-          @Override
           public int size() { return pres.length; }
         };
       }

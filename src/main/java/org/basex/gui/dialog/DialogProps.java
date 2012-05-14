@@ -273,7 +273,7 @@ public final class DialogProps extends BaseXDialog {
       updateInfo();
     }
 
-    ft.action();
+    ft.action(true);
   }
 
   @Override

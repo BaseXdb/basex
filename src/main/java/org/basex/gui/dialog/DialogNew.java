@@ -27,8 +27,6 @@ public final class DialogNew extends BaseXDialog {
   /** Buttons. */
   private final BaseXBack buttons;
 
-  /** Path summary flag. */
-  private final BaseXCheckBox pathindex;
   /** Text index flag. */
   private final BaseXCheckBox txtindex;
   /** Attribute value index flag. */
@@ -68,10 +66,6 @@ public final class DialogNew extends BaseXDialog {
     // index panel
     final BaseXBack indexes = new BaseXBack(new TableLayout(6, 1, 0, 0)).border(8);
 
-    pathindex = new BaseXCheckBox(PATH_INDEX, prop.is(Prop.PATHINDEX), 0, this).large();
-    indexes.add(pathindex);
-    indexes.add(new BaseXLabel(H_PATH_INDEX, true, false));
-
     txtindex = new BaseXCheckBox(TEXT_INDEX, prop.is(Prop.TEXTINDEX), 0, this).large();
     indexes.add(txtindex);
     indexes.add(new BaseXLabel(H_TEXT_INDEX, true, false));
@@ -82,17 +76,16 @@ public final class DialogNew extends BaseXDialog {
     indexes.add(new BaseXLabel(H_ATTR_INDEX, true, false));
 
     // full-text panel
-    final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
+    //final BaseXBack fulltext = new BaseXBack(new TableLayout(2, 1, 0, 0)).border(8);
     ftxindex = new BaseXCheckBox(FULLTEXT_INDEX, prop.is(Prop.FTINDEX), 0, this).large();
-    fulltext.add(ftxindex);
+    indexes.add(ftxindex);
 
     ft = new DialogFT(this, true);
-    fulltext.add(ft);
+    indexes.add(ft);
 
     tabs.addTab(GENERAL, general);
     tabs.addTab(PARSING, parsing);
     tabs.addTab(INDEXES, indexes);
-    tabs.addTab(FULLTEXT, fulltext);
     set(tabs, BorderLayout.CENTER);
 
     set(buttons, BorderLayout.SOUTH);
@@ -104,7 +97,7 @@ public final class DialogNew extends BaseXDialog {
   @Override
   public void action(final Object comp) {
     final boolean valid = general.action(comp, true);
-    ft.action();
+    ft.action(ftxindex.isSelected());
 
     // ...must be located before remaining checks
     if(comp == general.browse || comp == general.input) target.setText(general.dbname);
@@ -141,7 +134,6 @@ public final class DialogNew extends BaseXDialog {
     if(!ok) return;
     super.close();
 
-    gui.set(Prop.PATHINDEX, pathindex.isSelected());
     gui.set(Prop.TEXTINDEX, txtindex.isSelected());
     gui.set(Prop.ATTRINDEX, atvindex.isSelected());
     gui.set(Prop.FTINDEX,   ftxindex.isSelected());

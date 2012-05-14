@@ -37,6 +37,7 @@ public final class FTNode extends DBNode {
    */
   public FTNode(final FTMatches a, final Data d, final int p, final int tol,
       final int tis, final double s) {
+
     super(d, p, null, NodeType.TXT);
     all = a;
     tl = tol;

@@ -29,12 +29,10 @@ final class DialogFT extends BaseXBack {
   private static final int F_CASE = 2;
   /** Diacritics flag. */
   private static final int F_DIA = 3;
-  /** Scoring flag. */
-  private static final int F_SCORE = 4;
   /** Stopwords flag. */
-  private static final int F_STOP = 5;
+  private static final int F_STOP = 4;
   /** Number of flags. */
-  private static final int FLAGS = 6;
+  private static final int FLAGS = 5;
 
   /** Dialog reference. */
   private final BaseXDialog dialog;
@@ -44,8 +42,6 @@ final class DialogFT extends BaseXBack {
   private final BaseXLabel[] labels = new BaseXLabel[FLAGS];
   /** Full-text language. */
   private final BaseXCombo language;
-  /** Full-text scoring type. */
-  private final BaseXCombo scoring;
   /** Path for Full-text stopword list. */
   private final BaseXTextField swpath;
   /** Path button for full-text stopword list path. */
@@ -58,19 +54,17 @@ final class DialogFT extends BaseXBack {
    */
   DialogFT(final BaseXDialog d, final boolean create) {
     dialog = d;
-    layout(new TableLayout(create ? 10 : 17, 1));
+    layout(new TableLayout(create ? 9 : 15, 1));
 
     final Prop prop = d.gui.context.prop;
-    add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 12, 0));
+    add(new BaseXLabel(H_FULLTEXT_INDEX, true, false).border(0, 0, 6, 0));
 
     final String sw = prop.get(Prop.STOPWORDS);
     final String[] cb = { LANGUAGE, STEMMING, CASE_SENSITIVITY, DIACRITICS,
-        TFIDF_SCORING, STOPWORD_LIST };
-    final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS,
-        H_SCORING, H_STOPWORDS };
+        STOPWORD_LIST };
+    final String[] desc = { H_LANGUAGE, H_STEMMING, H_CASE, H_DIACRITICS, H_STOPWORDS };
     final boolean[] val = { !prop.get(Prop.LANGUAGE).isEmpty(), prop.is(Prop.STEMMING),
-        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS), prop.num(Prop.SCORING) > 0,
-        !sw.isEmpty() };
+        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS), !sw.isEmpty() };
 
     for(int f = 0; f < check.length; ++f) {
       check[f] = new BaseXCheckBox(cb[f], val[f], create ? 1 : 0, d);
@@ -95,17 +89,10 @@ final class DialogFT extends BaseXBack {
     add(b1);
     if(!create) add(labels[F_LANG]);
 
-    for(int f = 1; f < F_SCORE; ++f) {
+    for(int f = 1; f < F_STOP; ++f) {
       add(check[f]);
       if(!create) add(labels[f]);
     }
-
-    final BaseXBack b2 = new BaseXBack(new TableLayout(1, 2, 8, 0));
-    b2.add(check[F_SCORE]);
-    scoring = new BaseXCombo(d, DOCUMENTS, TEXT_NODES);
-    b2.add(scoring);
-    add(b2);
-    if(!create) add(labels[F_SCORE]);
 
     add(check[F_STOP]);
     add(Box.createVerticalStrut(4));
@@ -141,12 +128,14 @@ final class DialogFT extends BaseXBack {
 
   /**
    * Reacts on user input.
+   * @param enabled enabled flag
    */
-  void action() {
-    language.setEnabled(check[F_LANG].isSelected());
-    scoring.setEnabled(check[F_SCORE].isSelected());
-    swbrowse.setEnabled(check[F_STOP].isSelected());
-    swpath.setEnabled(check[F_STOP].isSelected());
+  void action(final boolean enabled) {
+    for(BaseXCheckBox c : check) c.setEnabled(enabled);
+
+    language.setEnabled(enabled && check[F_LANG].isSelected());
+    swbrowse.setEnabled(enabled && check[F_STOP].isSelected());
+    swpath.setEnabled(enabled && check[F_STOP].isSelected());
 
     final String sw = swpath.getText().trim();
     final IO file = IO.get(sw);
@@ -165,8 +154,6 @@ final class DialogFT extends BaseXBack {
     gui.set(Prop.STEMMING, check[F_STEM].isSelected());
     gui.set(Prop.CASESENS, check[F_CASE].isSelected());
     gui.set(Prop.DIACRITICS, check[F_DIA].isSelected());
-    gui.set(Prop.SCORING, check[F_SCORE].isSelected() ?
-        scoring.getSelectedIndex() + 1 : 0);
     gui.set(Prop.STOPWORDS, check[F_STOP].isSelected() ? swpath.getText() : "");
   }
 }

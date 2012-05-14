@@ -73,7 +73,7 @@ public final class InfoDB extends AInfo {
 
     if(index) {
       tb.add(NL).addExt(header, INDEXES);
-      if(meta.oldindex || meta.wcindex) {
+      if(meta.oldindex()) {
         tb.add(' ' + H_INDEX_FORMAT + NL);
       } else {
         format(tb, UP_TO_DATE, String.valueOf(meta.uptodate));

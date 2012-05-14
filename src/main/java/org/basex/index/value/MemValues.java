@@ -75,8 +75,6 @@ public class MemValues extends TokenSet implements Index {
           @Override
           public int next() { return pres[p++]; }
           @Override
-          public double score() { return -1; }
-          @Override
           public int size() { return cnt; }
         };
       }

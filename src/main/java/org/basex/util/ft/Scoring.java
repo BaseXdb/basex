@@ -9,8 +9,6 @@ import static java.lang.StrictMath.*;
  * @author Christian Gruen
  */
 public final class Scoring {
-  /** Scoring multiplier to store values as integers. */
-  private static final int MP = 1000;
   /** Logarithmic base for calculating the score value. */
   private static final double LOG = Math.E - 1;
   /** Scoring step. */
@@ -67,25 +65,6 @@ public final class Scoring {
    */
   public static double let(final double s, final int c) {
     return s / c;
-  }
-
-  /**
-   * <p>Calculates a TF-IDF value for the specified values.
-   * Used definition:</p>
-   * <p>{@code freq(i, j) / max(l, freq(l, j)) * log(1 + N / n(i))}</p>
-   * <p>The result is multiplied with the {@link #MP} constant to yield
-   * integer values. The value {@code 2} is used as minimum score,
-   * as the total minimum value will be subtracted by 1 to avoid eventual
-   * {@code 0} scores.</p>
-   * @param freq frequency of the token. TF: freq(i, j)
-   * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))
-   * @param docs number of documents in the collection. IDF: N
-   * @param tokens number of documents containing the token. IDF: n(i)
-   * @return score value
-   */
-  public static int tfIDF(final double freq, final double mfreq,
-      final double docs, final double tokens) {
-    return (int) max(2, MP * freq / mfreq * log(1 + docs / tokens));
   }
 
   /**

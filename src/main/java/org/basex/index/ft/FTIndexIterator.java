@@ -2,7 +2,6 @@ package org.basex.index.ft;
 
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.util.ft.*;
 
 /**
  * This interface provides methods for returning index results.
@@ -22,8 +21,6 @@ public abstract class FTIndexIterator extends IndexIterator {
     public int next() { return 0; }
     @Override
     public FTMatches matches() { return null; }
-    @Override
-    public double score() { return -1; }
     @Override
     public int size() { return 0; }
   };
@@ -88,11 +85,6 @@ public abstract class FTIndexIterator extends IndexIterator {
       }
 
       @Override
-      public double score() {
-        return Scoring.union(i1.score(), i2.score());
-      }
-
-      @Override
       public String toString() {
         return "(" + i1 + " | " + i2 + ')';
       }
@@ -144,11 +136,6 @@ public abstract class FTIndexIterator extends IndexIterator {
       @Override
       public synchronized int size() {
         return Math.min(i1.size(), i2.size());
-      }
-
-      @Override
-      public double score() {
-        return Scoring.intersect(i1.score(), i2.score());
       }
 
       @Override
