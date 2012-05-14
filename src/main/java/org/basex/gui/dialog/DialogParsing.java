@@ -14,6 +14,8 @@ import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.layout.BaseXFileChooser.Mode;
 import org.basex.io.*;
+import org.basex.util.*;
+import org.basex.util.list.*;
 
 /**
  * Parsing options dialog.
@@ -57,7 +59,11 @@ final class DialogParsing extends BaseXBack {
   /** CSV: Use header. */
   private final BaseXCheckBox header;
   /** CSV: Separator. */
-  private final BaseXCombo separator;
+  private final BaseXBack separator;
+  /** CSV: Separator. */
+  private final BaseXCombo sepcombo;
+  /** CSV: Separator (numeric). */
+  private final BaseXTextField sepchar;
   /** CSV: Format. */
   private final BaseXCombo format;
   /** CSV: encoding. */
@@ -114,8 +120,26 @@ final class DialogParsing extends BaseXBack {
 
     lines = new BaseXCheckBox(SPLIT_INPUT_LINES, props.is(ParserProp.LINES), 0, d);
     header = new BaseXCheckBox(FIRST_LINE_HEADER, props.is(ParserProp.HEADER), 0, d);
-    separator = new BaseXCombo(d, CSVParser.SEPARATORS);
-    separator.setSelectedItem(props.get(ParserProp.SEPARATOR));
+
+    separator = new BaseXBack().layout(new TableLayout(1, 2, 6, 0));
+    final StringList sl = new StringList();
+    sl.add(CSVParser.SEPARATORS).add("");
+    sepcombo = new BaseXCombo(d, sl.toArray());
+    separator.add(sepcombo);
+
+    String f = "";
+    final String s = props.get(ParserProp.SEPARATOR);
+    if(Token.eq(s, CSVParser.SEPARATORS)) {
+      sepcombo.setSelectedItem(s);
+    } else {
+      sepcombo.setSelectedIndex(CSVParser.SEPARATORS.length);
+      final int ch = Token.toInt(s);
+      f = XMLToken.valid(ch) ? String.valueOf((char) ch) : "";
+    }
+    sepchar = new BaseXTextField(f, d);
+    separator.add(sepchar);
+    BaseXLayout.setWidth(sepchar, 35);
+
     format = new BaseXCombo(d, CSVParser.FORMATS);
     format.setSelectedItem(props.get(ParserProp.FORMAT));
 
@@ -250,14 +274,22 @@ final class DialogParsing extends BaseXBack {
 
   /**
    * Reacts on user input.
+   * @return result of check
    */
-  void action() {
+  boolean action() {
     final boolean ip = intparse.isSelected();
     final boolean uc = usecat.isSelected();
     intparse.setEnabled(!uc);
     usecat.setEnabled(!ip && CatalogWrapper.available());
     cfile.setEnabled(uc);
     browsec.setEnabled(uc);
+
+    final int s = sepcombo.getSelectedIndex();
+    final boolean customsep = s == CSVParser.SEPARATORS.length;
+    sepchar.setEnabled(customsep);
+
+    final String t = sepchar.getText();
+    return !customsep || t.length() == 1 && XMLToken.valid(t.charAt(0));
   }
 
   /**
@@ -270,9 +302,12 @@ final class DialogParsing extends BaseXBack {
     props.set(ParserProp.ENCODING, cb.getSelectedItem().toString());
     props.set(ParserProp.FORMAT, format.getSelectedItem().toString());
     props.set(ParserProp.HEADER, header.isSelected());
-    props.set(ParserProp.SEPARATOR, separator.getSelectedItem().toString());
     props.set(ParserProp.LINES, lines.isSelected());
     props.set(ParserProp.JSONML, jsonml.isSelected());
+    props.set(ParserProp.SEPARATOR, sepcombo.getSelectedIndex() <
+      CSVParser.SEPARATORS.length ? sepcombo.getSelectedItem().toString() :
+      String.valueOf((int) sepchar.getText().charAt(0)));
+
     gui.set(Prop.PARSER, type);
     gui.set(Prop.PARSEROPT, props.toString());
     gui.set(Prop.CHOP, chop.isSelected());

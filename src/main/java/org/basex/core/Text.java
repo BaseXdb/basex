@@ -1235,7 +1235,7 @@ public interface Text {
   /** Developer names. */
   String TEAM2 = "Dimitar Popov, Leo W\u00F6rteler, Lukas Kircher";
   /** Developer names. */
-  String TEAM3 = lang("and_others");
+  String AND_OTHERS = lang("and_others");
   /** Translation. */
   String TRANSLATION = lang("translation");
 

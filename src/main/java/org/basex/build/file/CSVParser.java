@@ -46,7 +46,9 @@ import org.basex.util.list.*;
  */
 public final class CSVParser extends SingleParser {
   /** Separators. */
-  public static final String[] SEPARATORS = { "comma", "semicolon", "tab" };
+  public static final String[] SEPARATORS = { "comma", "semicolon", "tab", "space" };
+  /** Separator mappings. */
+  public static final char[] SEPMAPPINGS = { ',', ';', '\t', ' ' };
   /** Formats. */
   public static final String[] FORMATS = { "simple", "verbose" };
 
@@ -61,14 +63,14 @@ public final class CSVParser extends SingleParser {
   /** CSV column attribute. */
   private static final byte[] COLUMN = token("col");
 
-  /** Column separator (see {@link ParserProp#SEPARATOR}). */
-  private final int separator;
   /** Headers. */
   private final TokenList headers = new TokenList();
   /** Simple format. */
   private final boolean simple;
   /** Encoding. */
   private final String encoding;
+  /** Column separator (see {@link ParserProp#SEPARATOR}). */
+  private int separator;
 
   /** Current row. */
   private int row;
@@ -89,18 +91,23 @@ public final class CSVParser extends SingleParser {
     row = props.is(ParserProp.HEADER) ? 0 : 1;
 
     // set separator
-    String s = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
-    separator = s.equals(SEPARATORS[0]) ? ',' : s.equals(SEPARATORS[1]) ? ';' :
-      s.equals(SEPARATORS[2]) ? '\t' : -1;
-
-    if(separator == -1) throw new BaseXException(INVALID_VALUE_X_X,
-        ParserProp.SEPARATOR[0], s);
+    String val = props.get(ParserProp.SEPARATOR).toLowerCase(Locale.ENGLISH);
+    int s = -1;
+    for(int i = 0; i < SEPARATORS.length && s == -1; i++) {
+      if(val.equals(SEPARATORS[i])) s = SEPMAPPINGS[i];
+    }
+    if(s == -1) {
+      final int i = toInt(token(val));
+      if(XMLToken.valid(i)) s = i;
+      else throw new BaseXException(INVALID_VALUE_X_X, ParserProp.SEPARATOR[0], val);
+    }
+    separator = s;
 
     // set XML format
-    s = props.get(ParserProp.FORMAT).toLowerCase(Locale.ENGLISH);
-    simple = s.equals(FORMATS[0]);
-    if(!simple && !s.equals(FORMATS[1])) throw new BaseXException(
-        INVALID_VALUE_X_X, ParserProp.FORMAT[0], s);
+    val = props.get(ParserProp.FORMAT).toLowerCase(Locale.ENGLISH);
+    simple = val.equals(FORMATS[0]);
+    if(!simple && !val.equals(FORMATS[1])) throw new BaseXException(
+        INVALID_VALUE_X_X, ParserProp.FORMAT[0], val);
     encoding = props.get(ParserProp.ENCODING);
   }
 
