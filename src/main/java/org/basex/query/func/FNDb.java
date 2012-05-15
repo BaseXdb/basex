@@ -709,7 +709,7 @@ public final class FNDb extends StandardFunc {
       sig == Function._DB_OUTPUT;
     return
       // skip evaluation at compile time
-      u == Use.NDT && (
+      u == Use.CTX && (
         sig == Function._DB_TEXT || sig == Function._DB_ATTRIBUTE ||
         sig == Function._DB_TEXT_RANGE || sig == Function._DB_ATTRIBUTE_RANGE ||
         sig == Function._DB_FULLTEXT || sig == Function._DB_EVENT || up) ||
