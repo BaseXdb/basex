@@ -24,20 +24,24 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ClientListener extends Thread {
+  /** Timestamp of last interaction. */
+  public long last;
+  /** Log reference. */
+  final Log log;
+
   /** Active queries. */
   private final HashMap<String, QueryListener> queries =
     new HashMap<String, QueryListener>();
   /** Performance measurement. */
   private final Performance perf = new Performance();
-
+  /** Timer for authentication time out. */
+  private final Timer auth = new Timer();
   /** Database context. */
   private final Context context;
-  /** Socket reference. */
-  private final Socket socket;
   /** Server reference. */
   private final BaseXServer server;
-  /** Log reference. */
-  final Log log;
+  /** Socket reference. */
+  private final Socket socket;
 
   /** Socket for events. */
   private Socket esocket;
@@ -55,13 +59,6 @@ public final class ClientListener extends Thread {
   private int id;
   /** Indicates if the server thread is running. */
   private boolean running;
-  /** Indicates if the client successfully authenticated. */
-  boolean authenticated;
-  /** Timer for authentication time out. */
-  private Timer timer = new java.util.Timer();
-
-  /** Timestamp of last interaction. */
-  public long last;
 
   /**
    * Constructor.
@@ -72,6 +69,7 @@ public final class ClientListener extends Thread {
    */
   public ClientListener(final Socket s, final Context c, final Log l,
       final BaseXServer srv) {
+
     context = new Context(c, this);
     socket = s;
     log = l;
@@ -81,19 +79,17 @@ public final class ClientListener extends Thread {
 
   @Override
   public void run() {
-    // Start keep-alive timeout
-    if(context.mprop.num(MainProp.KEEPALIVE) > 0) {
-      timer.schedule(
-          new java.util.TimerTask() {
-            @Override
-            public void run() {
-              if(!authenticated) {
-                if(log != null) log.write(this, "AUTHENTIFICATION TIMED OUT");
-                quit();
-              }
-            }
-          }, context.mprop.num(MainProp.KEEPALIVE) * 1000L);
+    // start authentication timeout
+    final int to = context.mprop.num(MainProp.AUTHTIMEOUT);
+    if(to > 0) {
+      auth.schedule(new TimerTask() {
+        @Override
+        public void run() {
+          quitAuth();
+        }
+      }, to * 1000L);
     }
+
     // initialize the session via cram-md5 authentication
     try {
       final String ts = Long.toString(System.nanoTime());
@@ -127,11 +123,11 @@ public final class ClientListener extends Thread {
       if(running) {
         Util.stack(ex);
         log.write(ex.getMessage());
+        running = false;
       }
-      return;
     }
+    auth.cancel();
     if(!running) return;
-    authenticated = true;
 
     // authentication done, start command loop
     ServerCmd sc = null;
@@ -232,12 +228,11 @@ public final class ClientListener extends Thread {
    * Exits the session.
    */
   public synchronized void quit() {
-    if (!running && authenticated) return;
+    if(!running) return;
 
-    timer.cancel();
     running = false;
-    if(log != null) log.write(this, "LOGOUT "
-        + (null != context.user ? context.user.name : ""), OK);
+    if(log != null) log.write(this, "LOGOUT " +
+        (null != context.user ? context.user.name : ""), OK);
 
     // wait until running command was stopped
     if(command != null) {
@@ -247,16 +242,28 @@ public final class ClientListener extends Thread {
     context.delete(this);
 
     try {
-      if(null != context.data()) new Close().execute(context);
+      new Close().execute(context);
       socket.close();
       if(events) {
         esocket.close();
         // remove this session from all events in pool
         for(final Sessions s : context.events.values()) s.remove(this);
       }
-    } catch(final Exception ex) {
-      if(log != null) log.write(ex.getMessage());
+    } catch(final Throwable ex) {
+      if(log != null) log.write(this, ex.getMessage());
       Util.stack(ex);
+    }
+  }
+
+  /**
+   * Quits the authentication.
+   */
+  synchronized void quitAuth() {
+    try {
+      socket.close();
+      log.write(this, ERROR_C + TIMEOUT_EXCEEDED);
+    } catch(final Throwable ex) {
+      log.write(this, ex.getMessage());
     }
   }
 
@@ -506,7 +513,7 @@ public final class ClientListener extends Thread {
       if(sc != ServerCmd.BIND && sc != ServerCmd.CONTEXT) {
         log.write(this, sc + "(" + arg + ')', OK, perf);
       }
-    } catch(final Exception ex) {
+    } catch(final Throwable ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
       log.write(this, sc + "(" + arg + ')', ERROR_C + err);

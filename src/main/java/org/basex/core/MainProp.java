@@ -57,6 +57,8 @@ public final class MainProp extends AProp {
   public static final Object[] TIMEOUT = { "TIMEOUT", 0 };
   /** Keep alive time of clients; deactivated if set to 0. */
   public static final Object[] KEEPALIVE = { "KEEPALIVE", 0 };
+  /** Authentication timeout (seconds); deactivated if set to 0. */
+  public static final Object[] AUTHTIMEOUT = { "AUTHTIMEOUT", 10 };
   /** Debug mode. */
   public static final Object[] DEBUG = { "DEBUG", false };
   /** Defines the number of parallel readers. */
@@ -126,12 +128,8 @@ public final class MainProp extends AProp {
     Prop.language = get(LANG);
     Prop.langkeys = is(LANGKEYS);
     Prop.debug = is(DEBUG);
-    final String ph = get(PROXYHOST);
-    final String pp = Integer.toString(num(PROXYPORT));
-    System.setProperty("http.proxyHost", ph);
-    System.setProperty("http.proxyPort", pp);
-    System.setProperty("https.proxyHost", ph);
-    System.setProperty("https.proxyPort", pp);
+    System.setProperty("http.proxyHost", get(PROXYHOST));
+    System.setProperty("http.proxyPort", Integer.toString(num(PROXYPORT)));
     System.setProperty("http.nonProxyHosts", get(NONPROXYHOSTS));
   }
 }
