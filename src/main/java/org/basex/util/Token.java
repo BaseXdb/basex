@@ -1052,6 +1052,9 @@ public final class Token {
    * @return resulting token
    */
   public static byte[] delete(final byte[] token, final int ch) {
+    // skip step if specified ascii character is not contained
+    if(ch < 0x80 && !contains(token, ch)) return token;
+    // remove character
     final TokenBuilder tb = new TokenBuilder(token.length);
     final int tl = token.length;
     for(int i = 0; i < tl; i += cl(token, i)) {

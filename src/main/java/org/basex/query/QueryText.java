@@ -461,6 +461,8 @@ public interface QueryText {
   byte[] MAP = token(MAPSTR);
   /** Package token. */
   byte[] PKG = token("pkg");
+  /** Process token. */
+  byte[] PROC = token("proc");
   /** SQL token. */
   byte[] SQL = token("sql");
   /** Crypto token. */
@@ -532,6 +534,8 @@ public interface QueryText {
   byte[] INDEXURI = token(BXMODULES + "index");
   /** JSON URI. */
   byte[] JSONURI = token(BXMODULES + "json");
+  /** PROC URI. */
+  byte[] PROCURI = token(BXMODULES + "proc");
   /** Utility module URI. */
   byte[] UTILURI = token(BXMODULES + "util");
   /** XSLT module URI. */

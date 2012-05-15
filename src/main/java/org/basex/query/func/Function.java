@@ -562,6 +562,15 @@ public enum Function {
   /** XQuery function */
   _FILE_MOVE(FNFile.class, "move(source,target)", EMP, STR, STR),
 
+  /* FNProc functions. */
+
+  /** XQuery function. */
+  _PROC_SYSTEM(FNProc.class, "system(command[,args[,encoding]])",
+      STR, 1, STR, STR_ZM, STR),
+  /** XQuery function. */
+  _PROC_EXECUTE(FNProc.class, "execute(command[,args[,encoding]]])",
+      ELM, 1, STR, STR_ZM, STR),
+
   /* FNSql functions. */
 
   /** XQuery function */
@@ -755,6 +764,7 @@ public enum Function {
     URIS.put(FNHof.class,   HOFURI);
     URIS.put(FNIndex.class, INDEXURI);
     URIS.put(FNJson.class,  JSONURI);
+    URIS.put(FNProc.class,  PROCURI);
     URIS.put(FNSql.class,   SQLURI);
     URIS.put(FNUtil.class,  UTILURI);
     URIS.put(FNXslt.class,  XSLTURI);

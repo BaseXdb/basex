@@ -153,7 +153,7 @@ public final class FNIndex extends StandardFunc {
         if(token == null) return null;
         final FElem elem = new FElem(Q_VALUE);
         elem.add(new FAttr(Q_COUNT, token(ei.count())));
-        elem.add(new FTxt(token));
+        elem.add(token);
         return elem;
       }
     };
@@ -217,8 +217,7 @@ public final class FNIndex extends StandardFunc {
       case CATEGORY:
         for(final byte[] c : stats.cats) {
           final FElem sub = new FElem(Q_VALUE);
-          sub.add(new FAttr(Q_COUNT, token(stats.cats.value(c))));
-          sub.add(new FTxt(c));
+          sub.add(new FAttr(Q_COUNT, token(stats.cats.value(c)))).add(c);
           elem.add(sub);
         }
         break;

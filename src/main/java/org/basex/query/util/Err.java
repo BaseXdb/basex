@@ -1,6 +1,5 @@
 package org.basex.query.util;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.ErrType.*;
 
 import org.basex.core.*;
@@ -67,6 +66,9 @@ public enum Err {
   FTMODE(BASX, 21, "Unknown search mode: '%'."),
   /** BASX0022: Parsing exception. */
   FTFZWC(BASX, 22, "Either wildcards or fuzzy search supported."),
+
+  /** PROC9999: Encoding. */
+  PROCENC(PROC, 9999, "Encoding not supported: '%'."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -936,8 +938,9 @@ public enum Err {
    * @author Leo Woerteler
    */
   public enum ErrType {
-    /** BASX Error type. */ BASX(BASEX, BASEXURI),
-    /** FOCX Error type. */ FOCX(CRYPTO, CRYPTOURI),
+    /** BASX Error type. */ BASX(QueryText.BASEX, QueryText.BASEXURI),
+    /** BASX Error type. */ PROC(QueryText.PROC, QueryText.PROCURI),
+    /** FOCX Error type. */ FOCX(QueryText.CRYPTO, QueryText.CRYPTOURI),
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,
@@ -955,11 +958,11 @@ public enum Err {
     /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
     /** FOFD Error type. */ FOUT,
-    /** FOZP Error type. */ FOZP(ZIP, ZIPURI),
+    /** FOZP Error type. */ FOZP(QueryText.ZIP, QueryText.ZIPURI),
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
-    /** PACK Error type. */ PACK(PKG, PKGURI),
-    /** REXQ Error type. */ REXQ(REST, RESTXQURI),
+    /** PACK Error type. */ PACK(QueryText.PKG, QueryText.PKGURI),
+    /** REXQ Error type. */ REXQ(QueryText.REST, QueryText.RESTXQURI),
     /** SEPM Error type. */ SEPM,
     /** SERE Error type. */ SERE,
     /** SEPM Error type. */ SESU,
@@ -993,7 +996,7 @@ public enum Err {
      * {@code http://www.w3.org/2005/xqt-errors}.
      */
     ErrType() {
-      this(ERR, ERRORURI);
+      this(QueryText.ERR, QueryText.ERRORURI);
     }
 
     /**

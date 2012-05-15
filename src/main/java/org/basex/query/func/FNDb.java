@@ -321,7 +321,7 @@ public final class FNDb extends StandardFunc {
           res.add(new FAttr(MDATE, token(tstamp)));
           if(ctx.context.perm(Perm.CREATE, meta))
             res.add(new FAttr(PATH, token(meta.original)));
-          res.add(new FTxt(token(name)));
+          res.add(token(name));
         } catch(final IOException ex) {
           NODB.thrw(info, ex);
         } finally {
@@ -420,8 +420,7 @@ public final class FNDb extends StandardFunc {
       final byte[] ctype, final long mdate) {
 
     final String tstamp = formatDate(new Date(mdate), Dtm.FORMAT);
-    final FElem res = new FElem(RESOURCE).
-        add(new FTxt(path)).
+    final FElem res = new FElem(RESOURCE).add(path).
         add(new FAttr(RAW, token(raw))).
         add(new FAttr(CTYPE, ctype)).
         add(new FAttr(MDATE, token(tstamp)));
@@ -466,7 +465,7 @@ public final class FNDb extends StandardFunc {
       final FElem n = new FElem(new QNm(lc(token(name))));
       if(cols[0].startsWith(" ")) {
         if(node != null) node.add(n);
-        if(!cols[1].isEmpty()) n.add(new FTxt(token(cols[1])));
+        if(!cols[1].isEmpty()) n.add(token(cols[1]));
       } else {
         node = n;
         top.add(n);

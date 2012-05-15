@@ -69,7 +69,7 @@ public final class JsonMLConverter extends XMLConverter {
       } else if(val instanceof JString) {
         if(txt) error("No subsequent texts allowed");
         txt = true;
-        elem.add(new FTxt(((JString) val).value));
+        elem.add(((JString) val).value);
       } else {
         error("No % allowed at this stage", val.type());
       }

@@ -135,7 +135,7 @@ public final class JSONConverter extends XMLConverter {
       final JAtom a = (JAtom) value;
       if(type && !(a instanceof JString)) root.add(new FAttr(Q_TYPE, a.type()));
       final byte[] v = a.value();
-      if(v != null && v.length != 0) root.add(new FTxt(v));
+      if(v != null) root.add(v);
     }
     return root;
   }

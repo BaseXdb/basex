@@ -39,6 +39,7 @@ public final class NSGlobal {
     NS.add(HOF, HOFURI);
     NS.add(INDEX, INDEXURI);
     NS.add(JSON, JSONURI);
+    NS.add(PROC, PROCURI);
     NS.add(SQL, SQLURI);
     NS.add(UTIL, UTILURI);
     NS.add(XSLT, XSLTURI);

@@ -215,6 +215,21 @@ public final class FElem extends FNode {
     return this;
   }
 
+  /**
+   * Creates and adds a text node, if the specified value is not empty.
+   * @param text value of text node
+   * @return self reference
+   */
+  public FElem add(final byte[] text) {
+    if(text.length != 0) {
+      if(children == null) children = new NodeCache();
+      final FTxt txt = new FTxt(text);
+      children.add(txt);
+      txt.parent(this);
+    }
+    return this;
+  }
+
   @Override
   public Atts namespaces() {
     if(ns == null) ns = new Atts();
