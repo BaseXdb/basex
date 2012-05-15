@@ -37,7 +37,7 @@ public final class ClientListener extends Thread {
   /** Server reference. */
   private final BaseXServer server;
   /** Log reference. */
-  private final Log log;
+  final Log log;
 
   /** Socket for events. */
   private Socket esocket;
@@ -55,6 +55,10 @@ public final class ClientListener extends Thread {
   private int id;
   /** Indicates if the server thread is running. */
   private boolean running;
+  /** Indicates if the client successfully authenticated. */
+  boolean authenticated;
+  /** Timer for authentication time out. */
+  private Timer timer = new java.util.Timer();
 
   /** Timestamp of last interaction. */
   public long last;
@@ -77,6 +81,19 @@ public final class ClientListener extends Thread {
 
   @Override
   public void run() {
+    // Start keep-alive timeout
+    if(context.mprop.num(MainProp.KEEPALIVE) > 0) {
+      timer.schedule(
+          new java.util.TimerTask() {
+            @Override
+            public void run() {
+              if(!authenticated) {
+                if(log != null) log.write(this, "AUTHENTIFICATION TIMED OUT");
+                quit();
+              }
+            }
+          }, context.mprop.num(MainProp.KEEPALIVE) * 1000L);
+    }
     // initialize the session via cram-md5 authentication
     try {
       final String ts = Long.toString(System.nanoTime());
@@ -107,11 +124,14 @@ public final class ClientListener extends Thread {
         new ClientDelayer(server.block(address), this, server).start();
       }
     } catch(final IOException ex) {
-      Util.stack(ex);
-      log.write(ex.getMessage());
+      if(running) {
+        Util.stack(ex);
+        log.write(ex.getMessage());
+      }
       return;
     }
     if(!running) return;
+    authenticated = true;
 
     // authentication done, start command loop
     ServerCmd sc = null;
@@ -212,10 +232,12 @@ public final class ClientListener extends Thread {
    * Exits the session.
    */
   public synchronized void quit() {
-    if(!running) return;
+    if (!running && authenticated) return;
 
+    timer.cancel();
     running = false;
-    if(log != null) log.write(this, "LOGOUT " + context.user.name, OK);
+    if(log != null) log.write(this, "LOGOUT "
+        + (null != context.user ? context.user.name : ""), OK);
 
     // wait until running command was stopped
     if(command != null) {
@@ -225,7 +247,7 @@ public final class ClientListener extends Thread {
     context.delete(this);
 
     try {
-      new Close().execute(context);
+      if(null != context.data()) new Close().execute(context);
       socket.close();
       if(events) {
         esocket.close();
