@@ -395,7 +395,6 @@ public abstract class OutputSerializer extends Serializer {
     }
     print(" \"" + docsys + '"');
     print(ELEM_C);
-    print(nl);
     docsys = null;
     sep = true;
   }
