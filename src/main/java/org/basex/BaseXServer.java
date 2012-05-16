@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 import org.basex.core.*;
 import org.basex.io.*;
@@ -35,6 +36,8 @@ public final class BaseXServer extends Main implements Runnable {
   private EventListener events;
   /** Temporarily blocked clients. */
   private final TokenIntMap blocked = new TokenIntMap();
+  /** New sessions. */
+  private final HashSet<ClientListener> auth = new HashSet<ClientListener>();
 
   /** Quiet mode (no logging). */
   private boolean quiet;
@@ -160,7 +163,19 @@ public final class BaseXServer extends Main implements Runnable {
               if(ms - cs.last > ka) cs.quit();
             }
           }
-          new ClientListener(s, context, log, this).start();
+          final ClientListener cl = new ClientListener(s, context, log, this);
+          // start authentication timeout
+          final long to = context.mprop.num(MainProp.AUTHTIMEOUT) * 1000L;
+          if(to > 0) {
+            cl.auth.schedule(new TimerTask() {
+              @Override
+              public void run() {
+                cl.quitAuth();
+              }
+            }, to);
+            auth.add(cl);
+          }
+          cl.start();
         }
       } catch(final SocketException ex) {
         break;
@@ -182,10 +197,17 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  protected void quit() throws IOException {
+  protected synchronized void quit() throws IOException {
     if(!running) return;
     running = false;
-    for(final ClientListener cs : context.sessions) cs.quit();
+
+    for(final ClientListener cs : auth) {
+      remove(cs);
+      cs.quitAuth();
+    }
+    for(final ClientListener cs : context.sessions) {
+      cs.quit();
+    }
     super.quit();
     context.close();
 
@@ -343,6 +365,17 @@ public final class BaseXServer extends Main implements Runnable {
   public void unblock(final byte[] client) {
     synchronized(blocked) {
       blocked.delete(client);
+    }
+  }
+
+  /**
+   * Removes an authenticated session.
+   * @param client client to be removed
+   */
+  public void remove(final ClientListener client) {
+    synchronized(auth) {
+      auth.remove(client);
+      client.auth.cancel();
     }
   }
 

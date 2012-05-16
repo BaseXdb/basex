@@ -24,6 +24,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class ClientListener extends Thread {
+  /** Timer for authentication time out. */
+  public final Timer auth = new Timer();
   /** Timestamp of last interaction. */
   public long last;
   /** Log reference. */
@@ -34,8 +36,6 @@ public final class ClientListener extends Thread {
     new HashMap<String, QueryListener>();
   /** Performance measurement. */
   private final Performance perf = new Performance();
-  /** Timer for authentication time out. */
-  private final Timer auth = new Timer();
   /** Database context. */
   private final Context context;
   /** Server reference. */
@@ -79,60 +79,10 @@ public final class ClientListener extends Thread {
 
   @Override
   public void run() {
-    // start authentication timeout
-    final int to = context.mprop.num(MainProp.AUTHTIMEOUT);
-    if(to > 0) {
-      auth.schedule(new TimerTask() {
-        @Override
-        public void run() {
-          quitAuth();
-        }
-      }, to * 1000L);
-    }
+    if(!authenticate()) return;
 
-    // initialize the session via cram-md5 authentication
-    try {
-      final String ts = Long.toString(System.nanoTime());
-      final byte[] address = socket.getInetAddress().getAddress();
-
-      // send {TIMESTAMP}0
-      out = PrintOutput.get(socket.getOutputStream());
-      out.print(ts);
-      send(true);
-
-      // evaluate login data
-      in = new BufferInput(socket.getInputStream());
-      // receive {USER}0{PASSWORD}0
-      final String us = in.readString();
-      final String pw = in.readString();
-      context.user = context.users.get(us);
-      running = context.user != null && md5(context.user.password + ts).equals(pw);
-
-      // write log information
-      if(running) {
-        log.write(this, "LOGIN " + context.user.name, OK);
-        // send {OK}
-        send(true);
-        server.unblock(address);
-        context.add(this);
-      } else {
-        if(!us.isEmpty()) log.write(this, ACCESS_DENIED + COLS + us);
-        new ClientDelayer(server.block(address), this, server).start();
-      }
-    } catch(final IOException ex) {
-      if(running) {
-        Util.stack(ex);
-        log.write(ex.getMessage());
-        running = false;
-      }
-    }
-    auth.cancel();
-    if(!running) return;
-
-    // authentication done, start command loop
     ServerCmd sc = null;
     String cmd = null;
-
     try {
       while(running) {
         command = null;
@@ -225,6 +175,63 @@ public final class ClientListener extends Thread {
   }
 
   /**
+   * Initializes a session via cram-md5.
+   * @return success flag
+   */
+  private boolean authenticate() {
+    try {
+      final String ts = Long.toString(System.nanoTime());
+      final byte[] address = socket.getInetAddress().getAddress();
+
+      // send {TIMESTAMP}0
+      out = PrintOutput.get(socket.getOutputStream());
+      out.print(ts);
+      send(true);
+
+      // evaluate login data
+      in = new BufferInput(socket.getInputStream());
+      // receive {USER}0{PASSWORD}0
+      final String us = in.readString();
+      final String pw = in.readString();
+      context.user = context.users.get(us);
+      running = context.user != null && md5(context.user.password + ts).equals(pw);
+
+      // write log information
+      if(running) {
+        log.write(this, "LOGIN " + context.user.name, OK);
+        // send {OK}
+        send(true);
+        server.unblock(address);
+        context.add(this);
+      } else {
+        if(!us.isEmpty()) log.write(this, ACCESS_DENIED + COLS + us);
+        new ClientDelayer(server.block(address), this, server).start();
+      }
+    } catch(final IOException ex) {
+      if(running) {
+        Util.stack(ex);
+        log.write(ex.getMessage());
+        running = false;
+      }
+    }
+
+    server.remove(this);
+    return running;
+  }
+
+  /**
+   * Quits the authentication.
+   */
+  public synchronized void quitAuth() {
+    try {
+      socket.close();
+      log.write(this, ERROR_C + TIMEOUT_EXCEEDED);
+    } catch(final Throwable ex) {
+      log.write(this, ex.getMessage());
+    }
+  }
+
+  /**
    * Exits the session.
    */
   public synchronized void quit() {
@@ -252,18 +259,6 @@ public final class ClientListener extends Thread {
     } catch(final Throwable ex) {
       if(log != null) log.write(this, ex.getMessage());
       Util.stack(ex);
-    }
-  }
-
-  /**
-   * Quits the authentication.
-   */
-  synchronized void quitAuth() {
-    try {
-      socket.close();
-      log.write(this, ERROR_C + TIMEOUT_EXCEEDED);
-    } catch(final Throwable ex) {
-      log.write(this, ex.getMessage());
     }
   }
 
