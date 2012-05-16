@@ -49,7 +49,11 @@ public final class MemBuilder extends Builder {
   @Override
   public MemData build() throws IOException {
     init();
-    parse();
+    try {
+      parse();
+    } finally {
+      parser.close();
+    }
     return data;
   }
 

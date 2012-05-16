@@ -78,38 +78,43 @@ final class XMLScanner extends Progress {
    * @throws IOException I/O exception
    */
   XMLScanner(final IO f, final Prop pr) throws IOException {
-    input = new XMLInput(f);
-    for(int e = 0; e < ENTITIES.length; e += 2) {
-      ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
-    }
-    dtd = pr.is(Prop.DTD);
-    chop = pr.is(Prop.CHOP);
-
-    String enc = null;
-    // process document declaration...
-    if(consume(DOCDECL)) {
-      if(s()) {
-        if(!version()) error(DECLSTART);
-        boolean s = s();
-        enc = encoding();
-        if(enc != null) {
-          if(!s) error(WSERROR);
-          s = s();
-        }
-        if(sddecl() != null && !s) error(WSERROR);
-        s();
-        final int ch = nextChar();
-        if(ch != '?' || nextChar() != '>') error(DECLWRONG);
-      } else {
-        prev(5);
+    try {
+      input = new XMLInput(f);
+      for(int e = 0; e < ENTITIES.length; e += 2) {
+        ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
       }
-    }
-    encoding = enc == null ? UTF8 : enc;
+      dtd = pr.is(Prop.DTD);
+      chop = pr.is(Prop.CHOP);
 
-    final int n = consume();
-    if(!s(n)) {
-      if(n != '<') error(BEFOREROOT);
-      prev(1);
+      String enc = null;
+      // process document declaration...
+      if(consume(DOCDECL)) {
+        if(s()) {
+          if(!version()) error(DECLSTART);
+          boolean s = s();
+          enc = encoding();
+          if(enc != null) {
+            if(!s) error(WSERROR);
+            s = s();
+          }
+          if(sddecl() != null && !s) error(WSERROR);
+          s();
+          final int ch = nextChar();
+          if(ch != '?' || nextChar() != '>') error(DECLWRONG);
+        } else {
+          prev(5);
+        }
+      }
+      encoding = enc == null ? UTF8 : enc;
+
+      final int n = consume();
+      if(!s(n)) {
+        if(n != '<') error(BEFOREROOT);
+        prev(1);
+      }
+    } catch(final IOException ex) {
+      input.close();
+      throw ex;
     }
   }
 

@@ -163,7 +163,7 @@ public final class CreateDB extends ACreate {
     if(ctx.pinned(name)) throw new BaseXException(DB_PINNED_X, name);
 
     // create disk builder, set database path
-    final Builder builder = new DiskBuilder(name, parser, ctx);
+    final DiskBuilder builder = new DiskBuilder(name, parser, ctx);
 
     // build database and index structures
     try {
@@ -176,7 +176,7 @@ public final class CreateDB extends ACreate {
         new FTBuilder(data).build());
       data.close();
     } finally {
-      try { builder.close(); } catch(final IOException exx) { Util.debug(exx); }
+      builder.close();
     }
     ctx.databases().add(name);
     return Open.open(name, ctx);
