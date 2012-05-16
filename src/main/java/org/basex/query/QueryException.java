@@ -31,6 +31,15 @@ public final class QueryException extends Exception {
   private int markedCol;
 
   /**
+   * Constructor, specifying an exception or error. {@link Err#GENERR} will be set
+   * as error code.
+   * @param th exception or error
+   */
+  public QueryException(final Throwable th) {
+    this(Util.message(th));
+  }
+
+  /**
    * Constructor, specifying a simple error message. {@link Err#GENERR} will be set
    * as error code.
    * @param msg error message
