@@ -18,7 +18,7 @@ public class XMLInput extends InputStream {
   private final IO input;
 
   /** Input streams. */
-  private TextInput[] inputs = new TextInput[1];
+  private NewlineInput[] inputs = new NewlineInput[1];
   /** Input pointer. */
   private int ip;
   /** Current line. */
@@ -37,7 +37,7 @@ public class XMLInput extends InputStream {
    * @throws IOException I/O exception
    */
   public XMLInput(final IO io) throws IOException {
-    inputs[0] = new TextInput(io);
+    inputs[0] = new NewlineInput(io);
     input = io;
   }
 
@@ -86,9 +86,9 @@ public class XMLInput extends InputStream {
    * @throws IOException I/O exception
    */
   public boolean add(final byte[] val, final boolean s) throws IOException {
-    if(s) add(new TextInput(new ArrayInput(Token.SPACE)));
-    add(new TextInput(new ArrayInput(val)));
-    if(s) add(new TextInput(new ArrayInput(Token.SPACE)));
+    if(s) add(new NewlineInput(new ArrayInput(Token.SPACE)));
+    add(new NewlineInput(new ArrayInput(val)));
+    if(s) add(new NewlineInput(new ArrayInput(Token.SPACE)));
     return ip < 32;
   }
 
@@ -96,7 +96,7 @@ public class XMLInput extends InputStream {
    * Inserts a cached input buffer.
    * @param ti buffer to be added
    */
-  private void add(final TextInput ti) {
+  private void add(final NewlineInput ti) {
     if(++ip == inputs.length) inputs = Arrays.copyOf(inputs, ip << 1);
     inputs[ip] = ti;
   }

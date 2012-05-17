@@ -78,8 +78,8 @@ final class XMLScanner extends Progress {
    * @throws IOException I/O exception
    */
   XMLScanner(final IO f, final Prop pr) throws IOException {
+    input = new XMLInput(f);
     try {
-      input = new XMLInput(f);
       for(int e = 0; e < ENTITIES.length; e += 2) {
         ents.add(token(ENTITIES[e]), token(ENTITIES[e + 1]));
       }
@@ -583,7 +583,7 @@ final class XMLScanner extends Progress {
         if(val == null) error(UNKNOWNPE, key);
         check(';');
         input.add(val, true);
-      } else if(ch != 0x0D) {
+      } else {
         return ch;
       }
     }
