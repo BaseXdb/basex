@@ -22,7 +22,8 @@ import org.basex.util.*;
 
 /**
  * Driver for the XQuery/XPath/XSLT 3.* Test Suite, located at
- * {@code http://dev.w3.org/2011/QT3-test-suite/}.
+ * {@code http://dev.w3.org/2011/QT3-test-suite/}. The driver needs to be
+ * executed from the test suite directory.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
@@ -30,8 +31,6 @@ import org.basex.util.*;
 public final class QT3TS {
   /** Test suite id. */
   private final String testid = "qt3ts";
-  /** Default path to the test suite. */
-  protected static String qt3tsPath = "g:/XML/w3c/qt3ts/";
 
   /** Maximum length of result output. */
   private int maxout = 2000;
@@ -98,7 +97,7 @@ public final class QT3TS {
     new Set(Prop.CHOP, false).execute(ctx);
     new Set(Prop.INTPARSE, false).execute(ctx);
 
-    final XQuery qdoc = new XQuery("doc(' " + qt3tsPath + '/' + CATALOG + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + CATALOG + "')", ctx);
     final XdmValue doc = qdoc.value();
     final String version = asString("*:catalog/@version", doc);
     Util.outln(NL + "QT3 Test Suite " + version);
@@ -121,7 +120,7 @@ public final class QT3TS {
     result.append(" Total   : ").append(total).append(NL);
     result.append(" Ignored : ").append(ignored).append(NL);
 
-    final String path = new File(qt3tsPath, testid + ".log").getCanonicalPath();
+    final String path = new File(testid + ".log").getCanonicalPath();
     Util.outln(NL + "Writing log file '" + path + "'..." + NL);
     final PrintOutput po = new PrintOutput(path);
     po.println("QT3TS RESULTS __________________________" + NL);
@@ -151,7 +150,7 @@ public final class QT3TS {
    * @throws Exception exception
    */
   private void testSet(final String name) throws Exception {
-    final XQuery qdoc = new XQuery("doc(' " + qt3tsPath + '/' + name + "')", ctx);
+    final XQuery qdoc = new XQuery("doc(' " + name + "')", ctx);
     final XdmValue doc = qdoc.value();
     final XQuery qset = new XQuery("*:test-set", ctx).context(doc);
     final XdmValue set = qset.value();
@@ -782,7 +781,6 @@ public final class QT3TS {
         " -d  debugging mode" + NL +
         " -e  check error codes" + NL +
         " -i  also save ignored files" + NL +
-        " -p  path to the QT3 test suite" + NL +
         " -v  verbose output",
         Util.info(Text.CONSOLE, Util.name(this)));
 
@@ -799,8 +797,6 @@ public final class QT3TS {
           ignoring = true;
         } else if(c == 'e') {
           errors = true;
-        } else if(c == 'p') {
-          qt3tsPath = arg.string();
         } else {
           arg.usage();
         }
