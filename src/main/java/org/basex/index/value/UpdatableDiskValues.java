@@ -54,7 +54,7 @@ public final class UpdatableDiskValues extends DiskValues {
   }
 
   @Override
-  IndexIterator idRange(final StringRange tok) {
+  protected IndexIterator idRange(final StringRange tok) {
     // check if min and max are positive integers with the same number of digits
     final IntList pres = new IntList();
     final int i = get(tok.min);

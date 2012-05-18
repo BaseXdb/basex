@@ -1,6 +1,7 @@
 package org.basex.index.value;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 
 import java.io.*;
 
@@ -49,7 +50,7 @@ final class ValueMerger {
    * @throws IOException I/O exception
    */
   void next() throws IOException {
-    values = dv.nextValues();
+    values = nextValues();
     if(values.length != 0) {
       key = dk.readToken();
     } else {
@@ -57,5 +58,14 @@ final class ValueMerger {
       dk.close();
       data.meta.drop(pref + '.');
     }
+  }
+
+  /**
+   * Returns next values. Called by the {@link ValueBuilder}.
+   * @return compressed values
+   */
+  private byte[] nextValues() {
+    return dv.idxr.cursor() >= dv.idxr.length() ? EMPTY :
+      dv.idxl.readBytes(dv.idxr.read5(), dv.idxl.read4());
   }
 }

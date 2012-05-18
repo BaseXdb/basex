@@ -22,19 +22,19 @@ import org.basex.util.list.*;
  */
 public class DiskValues implements Index {
   /** Number of index entries. */
-  int size;
+  protected int size;
   /** ID references. */
-  final DataAccess idxr;
+  protected final DataAccess idxr;
   /** ID lists. */
-  final DataAccess idxl;
+  protected final DataAccess idxl;
   /** Value type (texts/attributes). */
-  final boolean text;
+  protected final boolean text;
   /** Data reference. */
-  final Data data;
+  protected final Data data;
   /** Cached tokens. */
-  final IndexCache cache = new IndexCache();
+  protected final IndexCache cache = new IndexCache();
   /** Cached texts. Increases used memory, but speeds up repeated queries. */
-  final IntMap<byte[]> ctext = new IntMap<byte[]>();
+  protected final IntMap<byte[]> ctext = new IntMap<byte[]>();
 
   /**
    * Constructor, initializing the index structure.
@@ -53,7 +53,8 @@ public class DiskValues implements Index {
    * @param pref file prefix
    * @throws IOException I/O Exception
    */
-  DiskValues(final Data d, final boolean txt, final String pref) throws IOException {
+  protected DiskValues(final Data d, final boolean txt, final String pref)
+      throws IOException {
     data = d;
     text = txt;
     idxl = new DataAccess(d.meta.dbfile(pref + 'l'));
@@ -141,15 +142,6 @@ public class DiskValues implements Index {
   }
 
   /**
-   * Returns next values. Called by the {@link ValueBuilder}.
-   * @return compressed values
-   */
-  byte[] nextValues() {
-    return idxr.cursor() >= idxr.length() ? EMPTY :
-      idxl.readBytes(idxr.read5(), idxl.read4());
-  }
-
-  /**
    * Iterator method.
    * @param s number of values
    * @param ps offset
@@ -171,7 +163,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  IndexIterator idRange(final StringRange tok) {
+  protected IndexIterator idRange(final StringRange tok) {
     // check if min and max are positive integers with the same number of digits
     final IntList pres = new IntList();
     final int i = get(tok.min);
@@ -195,7 +187,7 @@ public class DiskValues implements Index {
    * @param tok index term
    * @return results
    */
-  IndexIterator idRange(final NumericRange tok) {
+  protected IndexIterator idRange(final NumericRange tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -231,7 +223,7 @@ public class DiskValues implements Index {
    * @param ids id list
    * @return iterator
    */
-  static IndexIterator iter(final IntList ids) {
+  protected static IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
       final int s = ids.size();
       int p = -1;
@@ -258,7 +250,7 @@ public class DiskValues implements Index {
    * @param pos position of the id-list in {@link #idxl}
    * @return pre value
    */
-  int firstpre(final long pos) {
+  protected int firstpre(final long pos) {
     // read the number of ids in the list
     idxl.readNum(pos);
     return idxl.readNum();
@@ -269,7 +261,7 @@ public class DiskValues implements Index {
    * @param key token to be found
    * @return if the key is found: index of the key else: -(insertion point - 1)
    */
-  int get(final byte[] key) {
+  protected int get(final byte[] key) {
     return get(key, 0, size - 1);
   }
 
@@ -282,7 +274,7 @@ public class DiskValues implements Index {
    * @param last end of the search interval
    * @return if the key is found: index of the key else: -(insertion point - 1)
    */
-  int get(final byte[] key, final int first, final int last) {
+  protected int get(final byte[] key, final int first, final int last) {
     int l = first, h = last;
     while(l <= h) {
       final int m = l + h >>> 1;
