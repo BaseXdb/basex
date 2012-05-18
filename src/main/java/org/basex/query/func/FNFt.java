@@ -26,8 +26,8 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class FNFt extends StandardFunc {
-  /** Element: full-text-options. */
-  private static final QNm Q_FTOPTIONS = new QNm("full-text-options");
+  /** Element: options. */
+  private static final QNm Q_FTOPTIONS = new QNm("options");
   /** Marker element. */
   private static final byte[] MARK = token("mark");
   /** Fuzzy option. */

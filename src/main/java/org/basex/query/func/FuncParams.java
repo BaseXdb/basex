@@ -53,14 +53,13 @@ public final class FuncParams {
     // initialize token map
     final TokenMap tm = new TokenMap();
     if(it == null) return tm;
-    if(!it.type.isNode()) NODFUNTYPE.thrw(info, it, it.type);
 
-    ANode n = (ANode) it;
-    if(!test.eq(n)) GENERR.thrw(info, n);
+    if(it.type != NodeType.ELM || !test.eq((ANode) it))
+      ELMMAPTYPE.thrw(info, it, root, it.type);
 
     // interpret query parameters
-    final AxisIter ai = n.children();
-    while((n = ai.next()) != null) {
+    final AxisIter ai = ((ANode) it).children();
+    for(ANode n; (n = ai.next()) != null;) {
       if(n.type != NodeType.ELM) continue;
       final QNm qn = n.qname();
       if(!eq(qn.uri(), root.uri())) GENERR.thrw(info, n);

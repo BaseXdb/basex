@@ -563,7 +563,7 @@ public enum Err {
   /** XPTY0004: Typing Exception. */
   STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
   /** XPTY0004: Typing Exception. */
-  NODFUNTYPE(XPTY, 4, "%: node() or map expected, % found."),
+  ELMMAPTYPE(XPTY, 4, "%: element(%) or map expected, % found."),
   /** XPTY0004: Typing Exception. */
   SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004: Typing exception. */

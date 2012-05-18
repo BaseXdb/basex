@@ -68,7 +68,7 @@ public final class FNFtTest extends AdvancedQueryTest {
     // check buggy options
     error(_FT_SEARCH.args(" .", "x", " map { 'x':='y' }"), Err.FTOPT);
     error(_FT_SEARCH.args(" .", "x", " map { 'mode':='' }"), Err.FTMODE);
-    error(_FT_SEARCH.args(" .", "x", " 1"), Err.NODFUNTYPE);
+    error(_FT_SEARCH.args(" .", "x", " 1"), Err.ELMMAPTYPE);
   }
 
   /**
