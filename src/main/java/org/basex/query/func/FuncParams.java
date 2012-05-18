@@ -3,8 +3,8 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import org.basex.io.serial.*;
 import org.basex.query.*;
-import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.item.map.*;
 import org.basex.query.iter.*;
@@ -13,30 +13,34 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * This class parses function parameters for the specified argument.
+ * This class parses parameters specified in function arguments.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
 public final class FuncParams {
+  /** Element: output:serialization-parameters. */
+  public static final QNm Q_SPARAM = new QNm("serialization-parameters",
+      QueryText.OUTPUTURI);
   /** Attribute: value. */
   private static final QNm A_VALUE = new QNm("value");
+
   /** Root element. */
   private final QNm root;
-  /** Node test. */
+  /** Root node test. */
   private final ExtTest test;
-  /** Calling expression (may be {@code null}). */
-  private final ParseExpr expr;
+  /** Input info. */
+  private final InputInfo info;
 
   /**
    * Constructor.
    * @param name name of root node
-   * @param e calling expression
+   * @param ii input info
    */
-  public FuncParams(final QNm name, final ParseExpr e) {
+  public FuncParams(final QNm name, final InputInfo ii) {
     test = new ExtTest(NodeType.ELM, name);
     root = name;
-    expr = e;
+    info = ii;
   }
 
   /**
@@ -47,22 +51,19 @@ public final class FuncParams {
    */
   public TokenMap parse(final Item it) throws QueryException {
     // XQuery map: convert to internal map
-    final InputInfo info = expr == null ? null : expr.info;
     if(it instanceof Map) return ((Map) it).tokenJavaMap(info);
 
     // initialize token map
     final TokenMap tm = new TokenMap();
     if(it == null) return tm;
+    if(it.type != NodeType.ELM || !test.eq((ANode) it)) ELMMAPTYPE.thrw(info, root, it);
 
-    if(it.type != NodeType.ELM || !test.eq((ANode) it))
-      ELMMAPTYPE.thrw(info, it, root, it.type);
-
-    // interpret query parameters
+    // interpret options
     final AxisIter ai = ((ANode) it).children();
     for(ANode n; (n = ai.next()) != null;) {
       if(n.type != NodeType.ELM) continue;
       final QNm qn = n.qname();
-      if(!eq(qn.uri(), root.uri())) GENERR.thrw(info, n);
+      if(!eq(qn.uri(), root.uri())) ELMOPTION.thrw(info, n);
       // retrieve key from element name and value from "value" attribute or text node
       final byte[] key = qn.local();
       byte[] val = n.attribute(A_VALUE);
@@ -73,5 +74,23 @@ public final class FuncParams {
       tm.add(key, val);
     }
     return tm;
+  }
+
+  /**
+   * Converts the specified parameters to serialization properties.
+   * @param it input item
+   * @return serialization string
+   * @throws QueryException query exception
+   * @throws SerializerException serializer exception
+   */
+  public static SerializerProp serializerProp(final Item it)
+      throws QueryException, SerializerException {
+
+    final TokenBuilder tb = new TokenBuilder();
+    if(it != null) {
+      final TokenMap map = new FuncParams(Q_SPARAM, null).parse(it);
+      for(final byte[] key : map) tb.add(key).add('=').add(map.get(key)).add(',');
+    }
+    return new SerializerProp(tb.toString());
   }
 }

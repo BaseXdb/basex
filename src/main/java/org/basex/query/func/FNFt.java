@@ -170,12 +170,8 @@ public final class FNFt extends StandardFunc {
     final Data data = data(0, ctx);
     final Value terms = ctx.value(expr[1]);
     final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-    try {
-      final TokenMap tm = new FuncParams(Q_FTOPTIONS, this).parse(opt);
-      return search(data, terms, tm, this, ctx);
-    } catch(final QueryException ex) {
-      throw ex.err() == Err.GENERR ? FTOPT.thrw(info, ex) : ex;
-    }
+    final TokenMap tm = new FuncParams(Q_FTOPTIONS, info).parse(opt);
+    return search(data, terms, tm, this, ctx);
   }
 
   /**
@@ -212,7 +208,7 @@ public final class FNFt extends StandardFunc {
           m = FTMode.get(v);
           if(m == null) FTMODE.thrw(info, v);
         } else {
-          FTOPT.thrw(info, k);
+          ELMOPTION.thrw(info, k);
         }
       }
     }

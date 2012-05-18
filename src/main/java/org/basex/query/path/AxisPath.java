@@ -264,7 +264,7 @@ public class AxisPath extends Path {
     final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    Value r = root != null ? ctx.value(root) : cv;
+    final Value r = root != null ? ctx.value(root) : cv;
 
     try {
       /* cache values if:

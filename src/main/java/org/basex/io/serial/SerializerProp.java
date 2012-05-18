@@ -5,11 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
-import org.basex.query.*;
-import org.basex.query.func.*;
-import org.basex.query.item.*;
 import org.basex.util.*;
-import org.basex.util.hash.*;
 
 /**
  * This class defines all available serialization parameters.
@@ -95,24 +91,11 @@ public final class SerializerProp extends AProp {
   public static final Object[] S_TEMPLATE = {
     "template", "" };
 
-  /** Element: output:serialization-parameters. */
-  public static final QNm Q_SPARAM = new QNm("serialization-parameters",
-      QueryText.OUTPUTURI);
-
   /**
    * Constructor.
    */
   public SerializerProp() {
     super();
-  }
-
-  /**
-   * Converts the specified parameters to a serialization property instance.
-   * @param it input item
-   * @throws SerializerException serializer exception
-   */
-  public SerializerProp(final Item it) throws SerializerException {
-    this(get(it));
   }
 
   /**
@@ -180,27 +163,5 @@ public final class SerializerProp extends AProp {
     for(int a = 1; a < allowed.length; ++a) tb.addExt(SERVAL2, allowed[a]);
     tb.addExt(SERVAL3, found);
     throw SERANY.thrwSerial(tb);
-  }
-
-  /**
-   * Converts the specified parameters to a serialization property instance.
-   * @param it input item
-   * @return serialization string
-   * @throws SerializerException serializer exception
-   */
-  private static String get(final Item it) throws SerializerException {
-    try {
-      final TokenBuilder tb = new TokenBuilder();
-      if(it != null) {
-        final TokenMap map = new FuncParams(Q_SPARAM, null).parse(it);
-        for(final byte[] key : map) {
-          if(!tb.isEmpty()) tb.add(',');
-          tb.add(key).add('=').add(map.get(key));
-        }
-      }
-      return tb.toString();
-    } catch(final QueryException ex) {
-      throw SERUNKNOWN.thrwSerial(ex.getLocalizedMessage());
-    }
   }
 }

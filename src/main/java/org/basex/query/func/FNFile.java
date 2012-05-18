@@ -343,7 +343,7 @@ public final class FNFile extends StandardFunc {
           new FileOutputStream(path, append));
       try {
         Item it = expr.length > 2 ? expr[2].item(ctx, info) : null;
-        final Serializer ser = Serializer.get(out, new SerializerProp(it));
+        final Serializer ser = Serializer.get(out, FuncParams.serializerProp(it));
         while((it = ir.next()) != null) ser.serialize(it);
         ser.close();
       } catch(final SerializerException ex) {

@@ -281,7 +281,7 @@ public final class FNGen extends StandardFunc {
     try {
       // run serialization
       Item it = expr.length > 1 ? expr[1].item(ctx, info) : null;
-      final Serializer ser = Serializer.get(ao, new SerializerProp(it));
+      final Serializer ser = Serializer.get(ao, FuncParams.serializerProp(it));
       final Iter ir = expr[0].iter(ctx);
       while((it = ir.next()) != null) ser.serialize(it);
       ser.close();

@@ -70,7 +70,7 @@ public final class CSVParser extends SingleParser {
   /** Encoding. */
   private final String encoding;
   /** Column separator (see {@link ParserProp#SEPARATOR}). */
-  private int separator;
+  private final int separator;
 
   /** Current row. */
   private int row;

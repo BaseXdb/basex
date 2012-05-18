@@ -15,7 +15,7 @@ public final class FTWildcard {
   /** Value encoding the wildcard dot. */
   private static final int DOT = -1;
   /** Original query. */
-  private byte[] query;
+  private final byte[] query;
   /** Characters. */
   private int[] wc;
   /** Minimum number of occurrence. */

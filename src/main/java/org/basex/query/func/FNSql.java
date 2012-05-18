@@ -13,7 +13,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -133,7 +132,7 @@ public final class FNSql extends StandardFunc {
         if(expr.length == 4) {
           // connection options
           final Item opt = expr[3].item(ctx, info);
-          final TokenMap options = new FuncParams(E_OPS, this).parse(opt);
+          final TokenMap options = new FuncParams(E_OPS, info).parse(opt);
           // extract auto-commit mode from options
           boolean ac = true;
           final byte[] commit = options.get(AUTO_COMM);
@@ -155,8 +154,6 @@ public final class FNSql extends StandardFunc {
         return Int.get(ctx.jdbc().add(getConnection(url, user, pass)));
       }
       return Int.get(ctx.jdbc().add(getConnection(url)));
-    } catch(final QueryException ex) {
-      throw ex.err() == Err.GENERR ? PARWHICH.thrw(info, ex) : ex;
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(info, ex.getMessage());
     }
@@ -243,7 +240,7 @@ public final class FNSql extends StandardFunc {
       final QueryContext ctx) throws QueryException {
     // Get parameters for prepared statement
     final ANode params = (ANode) checkType(expr[1].item(ctx, info), NodeType.ELM);
-    if(!params.qname().eq(E_PARAMS)) PARWHICH.thrw(info, params.qname());
+    if(!params.qname().eq(E_PARAMS)) ELMOPTION.thrw(info, params.qname());
     try {
       final int placeCount = stmt.getParameterMetaData().getParameterCount();
       // Check if number of parameters equals number of place holders
@@ -281,7 +278,7 @@ public final class FNSql extends StandardFunc {
     int i = 0;
     for(ANode next; (next = params.next()) != null;) {
       // Check name
-      if(!next.qname().eq(E_PARAM)) PARWHICH.thrw(info, next.qname());
+      if(!next.qname().eq(E_PARAM)) ELMOPTION.thrw(info, next.qname());
       final AxisIter attrs = next.attributes();
       byte[] paramType = null;
       boolean isNull = false;

@@ -17,7 +17,6 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.item.Type;
-import org.basex.query.util.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -82,16 +81,16 @@ public final class FNXslt extends StandardFunc {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     checkCreate(ctx);
+
     try {
       final IO in = read(expr[0], ctx);
       final IO xsl = read(expr[1], ctx);
       final Item opt = expr.length > 2 ? expr[2].item(ctx, info) : null;
-      final TokenMap map = new FuncParams(E_PARAM, this).parse(opt);
+      final TokenMap map = new FuncParams(E_PARAM, info).parse(opt);
       final byte[] result = transform(in, xsl, map);
       return new DBNode(new IOContent(result), ctx.context.prop);
-    } catch(final QueryException ex) {
-      throw ex.err() == Err.GENERR ? PARWHICH.thrw(info, ex.getLocalizedMessage()) : ex;
     } catch(final Exception ex) {
+      if(ex instanceof QueryException) throw (QueryException) ex;
       Util.debug(ex);
       // return cause of reflection error, or error itself
       throw IOERR.thrw(info, ex instanceof InvocationTargetException ?
@@ -105,9 +104,11 @@ public final class FNXslt extends StandardFunc {
    * @param ctx query context
    * @return item
    * @throws QueryException query exception
-   * @throws Exception exception
+   * @throws IOException I/O exception
    */
-  private IO read(final Expr e, final QueryContext ctx) throws Exception {
+  private IO read(final Expr e, final QueryContext ctx)
+      throws QueryException, IOException  {
+
     final Item it = checkNoEmpty(e.item(ctx, info));
     final Type ip = it.type;
     if(ip.isNode()) return new IOContent(it.serialize().toArray());
@@ -126,10 +127,11 @@ public final class FNXslt extends StandardFunc {
    * @param xsl style sheet
    * @param par parameters
    * @return transformed result
-   * @throws Exception exception
+   * @throws TransformerException transformer exception
+   * @throws IOException I/O exception
    */
   private static byte[] transform(final IO in, final IO xsl, final TokenMap par)
-      throws Exception {
+      throws TransformerException, IOException {
 
     // create transformer
     final TransformerFactory tc = TransformerFactory.newInstance();

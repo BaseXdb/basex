@@ -131,7 +131,7 @@ final class DialogFT extends BaseXBack {
    * @param enabled enabled flag
    */
   void action(final boolean enabled) {
-    for(BaseXCheckBox c : check) c.setEnabled(enabled);
+    for(final BaseXCheckBox c : check) c.setEnabled(enabled);
 
     language.setEnabled(enabled && check[F_LANG].isSelected());
     swbrowse.setEnabled(enabled && check[F_STOP].isSelected());

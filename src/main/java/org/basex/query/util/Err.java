@@ -38,8 +38,6 @@ public enum Err {
   NOEVENT(BASX, 9, "Event '%' is unknown."),
   /** BASX0010: Parsing exception. */
   NOOPTION(BASX, 10, "Unknown database option '%'."),
-  /** BASX0011: Parsing exception. */
-  PARWHICH(BASX, 11, "Unknown element: %."),
   /** BASX0012: Evaluation exception. */
   DOCTRGMULT(BASX, 12, "Single resource is expected as replace target."),
   /** BASX0013: Evaluation exception. */
@@ -60,8 +58,6 @@ public enum Err {
   INVFLAG(BASX, 19, "Unknown flag: %."),
   /** BASX0020: Evaluation exception. */
   PINNED(BASX, 20, "Database '%' is opened by another process."),
-  /** BASX0021: Evaluation exception. */
-  FTOPT(BASX, 21, "Invalid full-text option: '%'."),
   /** BASX0021: Parsing exception. */
   FTMODE(BASX, 21, "Unknown search mode: '%'."),
   /** BASX0022: Parsing exception. */
@@ -343,9 +339,7 @@ public enum Err {
   /** SEPM0016: Serialization exception. */
   SERANY(SEPM, 16, "%."),
   /** SEPM0017: Serialization exception. */
-  SERUNKNOWN(SEPM, 17, "Serialization: unknown %."),
-  /** SEPM0017: Serialization exception. */
-  SERNOVAL(SEPM, 17, "Serialization: missing 'value' attribute."),
+  SEROPTION(SEPM, 17, "%."),
 
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
@@ -563,7 +557,10 @@ public enum Err {
   /** XPTY0004: Typing Exception. */
   STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
   /** XPTY0004: Typing Exception. */
-  ELMMAPTYPE(XPTY, 4, "%: element(%) or map expected, % found."),
+  ELMMAPTYPE(XPTY, 4, "element(%) or map expected, % found"),
+  /** XPTY0004: Serialization exception. */
+  ELMOPTION(XPTY, 4, "Unknown option: %."),
+
   /** XPTY0004: Typing Exception. */
   SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
   /** XPTY0004: Typing exception. */
