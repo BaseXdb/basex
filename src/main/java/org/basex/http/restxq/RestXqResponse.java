@@ -23,7 +23,7 @@ import org.basex.query.path.*;
 final class RestXqResponse {
   /** Serializer node test. */
   private static final ExtTest OUTPUT_SERIAL = new ExtTest(NodeType.ELM,
-      SerializerProp.Q_SPARAM);
+      FuncParams.Q_SPARAM);
   /** HTTP Response test. */
   private static final ExtTest HTTP_RESPONSE = new ExtTest(NodeType.ELM,
       new QNm(RESPONSE, QueryText.HTTPURI));
@@ -103,9 +103,12 @@ final class RestXqResponse {
    * Processes the response element and creates the serialization parameters.
    * @param response response element
    * @return serialization properties
+   * @throws QueryException query exception
    * @throws IOException I/O exception
    */
-  private SerializerProp process(final ANode response) throws IOException {
+  private SerializerProp process(final ANode response)
+      throws QueryException, IOException {
+
     SerializerProp sp = null;
     String cType = null;
     for(final ANode n : response.children()) {
@@ -133,7 +136,7 @@ final class RestXqResponse {
         }
       }
       // process output:serialization-parameters
-      if(OUTPUT_SERIAL.eq(n)) sp = new SerializerProp(n);
+      if(OUTPUT_SERIAL.eq(n)) sp = FuncParams.serializerProp(n);
     }
 
     // set content type
