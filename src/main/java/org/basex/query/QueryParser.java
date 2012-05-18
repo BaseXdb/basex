@@ -1964,7 +1964,7 @@ public class QueryParser extends InputParser {
     ip = pos;
     final QNm name = eQName(null, ctx.sc.nsFunc);
     if(name != null && consume('#')) {
-      final long card = ((Int) numericLiteral(true)).itr(null);
+      final long card = ((Int) numericLiteral(true)).itr();
       if(card < 0 || card > Integer.MAX_VALUE) error(FUNCUNKNOWN, name);
       return Functions.get(name, card, false, ctx, info());
     }
@@ -3218,8 +3218,8 @@ public class QueryParser extends InputParser {
     if(range != null) {
       wsCheck(LEVELS);
       // values will always be integer instances
-      min = ((Int) range[0]).itr(info());
-      max = ((Int) range[1]).itr(info());
+      min = ((Int) range[0]).itr();
+      max = ((Int) range[1]).itr();
     }
     thes.add(new Thesaurus(fl, rel, min, max, ctx.context));
   }

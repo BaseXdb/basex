@@ -64,8 +64,14 @@ public final class FuncParams {
       if(n.type != NodeType.ELM) continue;
       final QNm qn = n.qname();
       if(!eq(qn.uri(), root.uri())) GENERR.thrw(info, n);
-      final byte[] val = n.attribute(A_VALUE);
-      tm.add(qn.local(), val == null ? n.string() : val);
+      // retrieve key from element name and value from "value" attribute or text node
+      final byte[] key = qn.local();
+      byte[] val = n.attribute(A_VALUE);
+      if(val == null) val = n.string();
+      // separate multiple entries with ","
+      final byte[] o = tm.get(key);
+      if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
+      tm.add(key, val);
     }
     return tm;
   }

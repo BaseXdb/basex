@@ -32,13 +32,21 @@ abstract class Num extends Item {
   @Override
   public abstract long itr(InputInfo ii);
 
+  /**
+   * Returns an integer (long) representation of the value.
+   * @return long value
+   */
+  public final long itr() {
+    return itr(null);
+  }
+
   @Override
   public abstract float flt(InputInfo ii);
 
   @Override
   public final int hash(final InputInfo ii) {
     // makes sure the hashing is good for very small and very big numbers
-    final long l = itr(ii);
+    final long l = itr();
     final float f = flt(ii);
 
     // extract fractional part from a finite float

@@ -60,7 +60,7 @@ public final class Dtm extends Date {
    * @throws QueryException query exception
    */
   Dtm(final Int tm, final InputInfo ii) throws QueryException {
-    this(token(formatDate(new java.util.Date(tm.itr(ii)), FORMAT)), ii);
+    this(token(formatDate(new java.util.Date(tm.itr()), FORMAT)), ii);
   }
 
   /**

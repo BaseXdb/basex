@@ -221,7 +221,11 @@ public final class Map extends FItem {
       if(!kt.isString()) FUNCMP.thrw(ii, description(), AtomType.STR, kt);
       final Value v = get(k, ii);
       if(!v.isItem()) FUNCMP.thrw(ii, description(), AtomType.ITEM, v);
-      tm.add(k.string(null), ((Item) v).string(ii));
+      final byte[] key = k.string(null);
+      byte[] val = ((Item) v).string(ii);
+      final byte[] o = tm.get(key);
+      if(o != null) val = new TokenBuilder(o).add(',').add(val).finish();
+      tm.add(key, val);
     }
     return tm;
   }
@@ -248,7 +252,7 @@ public final class Map extends FItem {
 
   @Override
   public void plan(final FElem plan) {
-    final long s = mapSize().itr(null);
+    final long s = mapSize().itr();
     final FElem el = planElem(SIZE, s);
     final Value ks = keys();
     try {
