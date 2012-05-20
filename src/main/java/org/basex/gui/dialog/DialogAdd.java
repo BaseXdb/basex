@@ -88,7 +88,7 @@ class DialogAdd extends BaseXBack {
       if(comp == general.browse || comp == general.input)
         target.setText(general.dbname);
 
-      String inf = !ok ? RESOURCE_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
+      String inf = !ok ? RES_NOT_FOUND : !ok ? ENTER_DB_NAME : null;
       final Msg icon = Msg.ERROR;
       if(ok) {
         // check if target path is valid

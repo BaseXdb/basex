@@ -63,7 +63,7 @@ public final class Rename extends ACreate {
     data.finishUpdate();
 
     // return info message
-    return info(DOCS_RENAMED_X_X, c, perf) && ok;
+    return info(RES_RENAMED_X_X, c, perf) && ok;
   }
 
   /**

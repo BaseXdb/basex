@@ -31,7 +31,7 @@ public final class Retrieve extends ACreate {
 
     final IOFile bin = context.data().meta.binary(path);
     if(bin == null || !bin.exists() || bin.isDir())
-      return error(RESOURCE_NOT_FOUND_X, path);
+      return error(RES_NOT_FOUND_X, path);
 
     try {
       final BufferInput bi = new BufferInput(bin);

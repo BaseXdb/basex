@@ -489,19 +489,22 @@ public interface Text {
   String DB_CREATED_X_X = lang("db_created_%_%");
   /** Path added. */
   String PATH_ADDED_X_X = lang("path_added_%_%");
-  /** Path deleted. */
-  String DOCS_DELETED_X_X = lang("docs_deleted_%_%");
-  /** Path renamed. */
-  String DOCS_RENAMED_X_X = lang("docs_renamed_%_%");
-  /** Path replaced. */
-  String DOCS_REPLACED_X_X = lang("docs_replaced_%_%");
   /** Parse error. */
   String NOT_PARSED_X = lang("not_parsed_%");
 
   /** Resource not found. */
-  String RESOURCE_NOT_FOUND_X = lang("resource_not_found_%");
+  String RES_NOT_FOUND_X = lang("res_not_found_%");
   /** Resource "%" not found. */
-  String RESOURCE_NOT_FOUND = lang("resource_not_found");
+  String RES_NOT_FOUND = lang("res_not_found");
+  /** Resource deleted. */
+  String RES_DELETED_X_X = lang("res_deleted_%_%");
+  /** Resource renamed. */
+  String RES_RENAMED_X_X = lang("res_renamed_%_%");
+  /** Resource replaced. */
+  String RES_REPLACED_X_X = lang("res_replaced_%_%");
+  /** "Resource Properties". */
+  String RES_PROPS = lang("res_props");
+
   /** Skipped corrupt files. */
   String SKIPPED = lang("skipped");
   /** Info on skipped corrupt files. */
@@ -786,8 +789,6 @@ public interface Text {
 
   /** "Database Properties". */
   String DB_PROPS = lang("db_props");
-  /** "Resource Properties". */
-  String RESOURCE_PROPS = lang("resource_props");
   /** "General Information". */
   String GENERAL_INFO = lang("general_info");
   /** "Main Options". */

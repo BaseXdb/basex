@@ -64,7 +64,7 @@ public final class InfoDB extends AInfo {
     format(tb, TIMESTAMP, formatDate(new Date(meta.dbtime()), DATE));
     if(meta.corrupt) tb.add(' ' + DB_CORRUPT + NL);
 
-    tb.add(NL).addExt(header, RESOURCE_PROPS);
+    tb.add(NL).addExt(header, RES_PROPS);
     if(create && !meta.original.isEmpty()) format(tb, INPUT_PATH, meta.original);
     if(meta.filesize != 0) format(tb, INPUT_SIZE, Performance.format(meta.filesize));
     format(tb, TIMESTAMP, formatDate(new Date(meta.time), DATE));

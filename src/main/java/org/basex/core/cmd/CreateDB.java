@@ -90,7 +90,7 @@ public final class CreateDB extends ACreate {
     }
 
     if(io != null) {
-      if(!io.exists()) return error(RESOURCE_NOT_FOUND_X, io);
+      if(!io.exists()) return error(RES_NOT_FOUND_X, io);
       if(io instanceof IOContent) io.name(name + '.' + format);
       parser = new DirParser(io, prop, mprop.dbpath(name));
     }
@@ -206,7 +206,7 @@ public final class CreateDB extends ACreate {
   public static synchronized MemData mainMem(final IO source, final Context ctx)
       throws IOException {
 
-    if(!source.exists()) throw new BaseXException(RESOURCE_NOT_FOUND_X, source);
+    if(!source.exists()) throw new BaseXException(RES_NOT_FOUND_X, source);
     return mainMem(new DirParser(source, ctx.prop, null), ctx);
   }
 
@@ -223,7 +223,7 @@ public final class CreateDB extends ACreate {
 
     // check if input is an existing file
     if(!source.exists() || single && source.isDir())
-      throw new BaseXException(RESOURCE_NOT_FOUND_X, source);
+      throw new BaseXException(RES_NOT_FOUND_X, source);
 
     // default: create a main memory instance
     if(!ctx.prop.is(Prop.FORCECREATE)) return CreateDB.mainMem(source, ctx);

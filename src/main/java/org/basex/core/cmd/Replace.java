@@ -39,7 +39,7 @@ public final class Replace extends ACreate {
     // check if the input source has already been initialized
     if(in == null) {
       final IO io = IO.get(args[1]);
-      if(!io.exists()) return error(RESOURCE_NOT_FOUND_X, io);
+      if(!io.exists()) return error(RES_NOT_FOUND_X, io);
       in = io.inputSource();
     }
 
@@ -70,7 +70,7 @@ public final class Replace extends ACreate {
         // delete old documents if addition was successful
         if(ok && pre != -1) data.delete(pre);
       }
-      return ok && info(DOCS_REPLACED_X_X, 1, perf);
+      return ok && info(RES_REPLACED_X_X, 1, perf);
     } finally {
       data.finishUpdate();
     }

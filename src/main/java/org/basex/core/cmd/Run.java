@@ -55,7 +55,7 @@ public final class Run extends AQuery {
     if(query == null) {
       final IO io = IO.get(args[0]);
       if(!io.exists() || io.isDir()) throw new BaseXException(
-          RESOURCE_NOT_FOUND_X, ctx.user.has(Perm.CREATE) ? io : args[0]);
+          RES_NOT_FOUND_X, ctx.user.has(Perm.CREATE) ? io : args[0]);
       query = Token.string(io.read());
       ctx.prop.set(Prop.QUERYPATH, io.path());
     }
