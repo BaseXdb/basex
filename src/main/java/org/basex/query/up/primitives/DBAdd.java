@@ -101,7 +101,7 @@ public final class DBAdd extends InsertBase {
     final Type dt = doc.type;
     if(dt.isString()) {
       io = IO.get(string(doc.string(info)));
-      if(!io.exists()) RESFNF.thrw(info, pth);
+      if(!io.exists()) WHICHRES.thrw(info, pth);
       if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += "/";
     }
 

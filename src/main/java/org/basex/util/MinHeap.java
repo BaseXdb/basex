@@ -4,10 +4,11 @@ import java.util.*;
 
 /**
  * A min-heap.
- * @author Leo Woerteler
  *
  * @param <K> key type
  * @param <V> value type
+ * @author BaseX Team 2005-12, BSD License
+ * @author Leo Woerteler
  */
 public final class MinHeap<K, V> {
   /** value array. */

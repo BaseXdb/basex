@@ -389,7 +389,7 @@ public abstract class ParseExpr extends Expr {
       final IO iob = ctx.sc.baseIO();
       if(iob != null) {
         io = new IOFile(iob.path(), name);
-        if(!io.exists()) RESFNF.thrw(info, name);
+        if(!io.exists()) WHICHRES.thrw(info, name);
       }
     }
     return io;

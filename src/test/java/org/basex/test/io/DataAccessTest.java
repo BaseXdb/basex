@@ -21,10 +21,13 @@ import org.junit.*;
  * <br/>
  * <p>Write operations are tested by writing a value at a specified random
  * position.</p>
+ *
+ * @author BaseX Team 2005-12, BSD License
+ * @author Dimitar Popov
  */
 public class DataAccessTest {
   /** String. */
-  private static final String STR = "string with characters: öäü10";
+  private static final String STR = "string with characters: 10";
   /** Long string. */
   private static final String STR_LONG = repeat(STR, 1000);
   /** Byte. */
@@ -343,7 +346,6 @@ public class DataAccessTest {
   @Ignore
   @Test
   public final void testFree() {
-    // TODO: the method is too complex
     fail("Not yet implemented");
   }
 

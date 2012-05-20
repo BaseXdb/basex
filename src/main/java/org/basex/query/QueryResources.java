@@ -281,7 +281,7 @@ public final class QueryResources {
 
     // check if the database contains exactly one relevant document
     final IntList docs = dt.resources.docs(qi.path);
-    if(docs.isEmpty()) RESFNF.thrw(info, qi.original);
+    if(docs.isEmpty()) WHICHRES.thrw(info, qi.original);
     if(docs.size() != 1) EXPSINGLE.thrw(info, qi.original);
     return new DBNode(dt, docs.get(0), Data.DOC);
   }

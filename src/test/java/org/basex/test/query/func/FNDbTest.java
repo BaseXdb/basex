@@ -351,7 +351,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_STORE.args(NAME, "one", ""));
     query(_DB_RENAME.args(NAME, "one", "two"));
     query(_DB_RETRIEVE.args(NAME, "two"));
-    error(_DB_RETRIEVE.args(NAME, "one"), Err.RESFNF);
+    error(_DB_RETRIEVE.args(NAME, "one"), Err.WHICHRES);
   }
 
   /**
@@ -395,11 +395,11 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbRetrieve() {
     check(_DB_RETRIEVE);
-    error(_DB_RETRIEVE.args(NAME, "raw"), Err.RESFNF);
+    error(_DB_RETRIEVE.args(NAME, "raw"), Err.WHICHRES);
     query(_DB_STORE.args(NAME, "raw", "xs:hexBinary('41')"));
     query("xs:hexBinary(" + _DB_RETRIEVE.args(NAME, "raw") + ')', "41");
     query(_DB_DELETE.args(NAME, "raw"));
-    error(_DB_RETRIEVE.args(NAME, "raw"), Err.RESFNF);
+    error(_DB_RETRIEVE.args(NAME, "raw"), Err.WHICHRES);
   }
 
   /**
@@ -472,6 +472,6 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(_DB_STORE.args(NAME, "raw", "bla"));
     query(_DB_CONTENT_TYPE.args(NAME, "xml"), MimeTypes.APP_XML);
     query(_DB_CONTENT_TYPE.args(NAME, "raw"), MimeTypes.APP_OCTET);
-    error(_DB_CONTENT_TYPE.args(NAME, "test"), Err.RESFNF);
+    error(_DB_CONTENT_TYPE.args(NAME, "test"), Err.WHICHRES);
   }
 }

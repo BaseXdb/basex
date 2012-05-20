@@ -90,7 +90,7 @@ public final class Store extends ACreate {
     try {
       final Reader r = in.getCharacterStream();
       final InputStream is = in.getByteStream();
-      final String  id = in.getSystemId();
+      final String id = in.getSystemId();
       if(r != null) {
         for(int c; (c = r.read()) != -1;) po.utf8(c);
       } else if(is != null) {

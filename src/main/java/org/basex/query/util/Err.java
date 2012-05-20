@@ -63,7 +63,7 @@ public enum Err {
   /** BASX0022: Parsing exception. */
   FTFZWC(BASX, 22, "Either wildcards or fuzzy search supported."),
   /** BASX0023: Evaluation exception. */
-  DOCVAL(BASX, 23, "Validation failed: %"),
+  VALFAIL(BASX, 23, "Validation failed: %"),
 
   /** PROC9999: Encoding. */
   PROCENC(PROC, 9999, "Encoding not supported: '%'."),
@@ -98,7 +98,7 @@ public enum Err {
   /** FODC0002: Evaluation exception. */
   IOERR(FODC, 2, "%"),
   /** FODC0002: Evaluation exception. */
-  RESFNF(FODC, 2, "Resource '%' does not exist."),
+  WHICHRES(FODC, 2, "Resource '%' does not exist."),
   /** FODC0004: Evaluation exception. */
   INVCOLL(FODC, 4, "Invalid collection URI '%'."),
   /** FODC0005: Evaluation exception. */

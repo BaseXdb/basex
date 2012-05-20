@@ -65,14 +65,19 @@ public class FNValidate extends StandardFunc {
         schema = sf.newSchema();
       } else {
         final IO sc = IO.get(string(checkStr(expr[1], ctx)));
-        if(!sc.exists()) RESFNF.thrw(info, sc);
+        if(!sc.exists()) WHICHRES.thrw(info, sc);
         schema = sf.newSchema(new URL(sc.url()));
       }
-      schema.newValidator().validate(new StreamSource(in.inputStream()));
+      final Validator v = schema.newValidator();
+      v.setErrorHandler(new SchemaHandler());
+      v.validate(new StreamSource(in.inputStream()));
       return null;
     } catch(final Exception ex) {
-      // may be IOException, SAXException
-      throw DOCVAL.thrw(info, ex.getMessage());
+      if(ex instanceof QueryException) throw (QueryException) ex;
+      // may be IOException, SAXException; get original exception
+      Throwable e = ex;
+      while(e.getCause() != null) e = e.getCause();
+      throw VALFAIL.thrw(info, e.getMessage());
     }
   }
 
@@ -89,7 +94,7 @@ public class FNValidate extends StandardFunc {
         // integrate doctype declaration via serialization properties
         final SerializerProp sp = new SerializerProp();
         final String dtd = string(checkStr(expr[1], ctx));
-        if(!IO.get(dtd).exists()) RESFNF.thrw(info, dtd);
+        if(!IO.get(dtd).exists()) WHICHRES.thrw(info, dtd);
         sp.set(SerializerProp.S_DOCTYPE_SYSTEM, dtd);
         in = read(ctx, sp);
       } else {
@@ -99,18 +104,18 @@ public class FNValidate extends StandardFunc {
       final SAXParserFactory sf = SAXParserFactory.newInstance();
       sf.setValidating(true);
       final InputSource is = in.inputSource();
-      sf.newSAXParser().parse(is, new DTDHandler());
+      sf.newSAXParser().parse(is, new SchemaHandler());
       return null;
     } catch(final Exception ex) {
       if(ex instanceof QueryException) throw (QueryException) ex;
       // may be IOException, SAXException, ParserConfigurationException
       Util.debug(ex);
-      throw DOCVAL.thrw(info, ex.getMessage());
+      throw VALFAIL.thrw(info, ex.getMessage());
     }
   }
 
-  /** DTD handler. */
-  static class DTDHandler extends DefaultHandler {
+  /** Schema error handler. */
+  static class SchemaHandler extends DefaultHandler {
     @Override
     public void fatalError(final SAXParseException ex) throws SAXException {
       error(ex);
@@ -121,10 +126,19 @@ public class FNValidate extends StandardFunc {
     }
     @Override
     public void error(final SAXParseException ex) throws SAXException {
+      // may be recursively called if external validator (e.g. Saxon) is used
+      final String msg = ex.getMessage();
+      if(msg.contains("Exception:")) {
+        Throwable e = ex;
+        while(e.getCause() != null) e = e.getCause();
+        throw e instanceof SAXException ? (SAXException) e : new SAXException(msg);
+      }
+
       final TokenBuilder report = new TokenBuilder();
-      if(ex.getSystemId() != null) report.add(IO.get(ex.getSystemId()).name()).add(", ");
+      final String id = ex.getSystemId();
+      if(id != null) report.add(IO.get(id).name()).add(", ");
       report.addExt(ex.getLineNumber()).add(':').addExt(ex.getColumnNumber());
-      report.add(": ").add(ex.getMessage());
+      report.add(": ").add(msg);
       throw new SAXException(report.toString());
     }
   }
@@ -153,7 +167,7 @@ public class FNValidate extends StandardFunc {
     if(ip.isString()) {
       final String path = string(it.string(info));
       IO io = IO.get(path);
-      if(!io.exists()) RESFNF.thrw(info, path);
+      if(!io.exists()) WHICHRES.thrw(info, path);
 
       if(sp != null) {
         // add doctype declaration if specified

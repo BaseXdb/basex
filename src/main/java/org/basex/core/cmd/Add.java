@@ -60,11 +60,11 @@ public final class Add extends ACreate {
     IO io = null;
     if(in == null) {
       io = IO.get(args[1]);
-    } else if(in.getSystemId() != null) {
-      io = IO.get(in.getSystemId());
     } else if(in.getByteStream() != null) {
       io = new IOStream(in.getByteStream());
       io.name(name);
+    } else if(in.getSystemId() != null) {
+      io = IO.get(in.getSystemId());
     }
 
     if(!io.exists()) return error(RES_NOT_FOUND_X, create ? io : args[1]);

@@ -404,7 +404,7 @@ public final class FNDb extends StandardFunc {
       final IOFile io = data.meta.binary(path);
       if(io.exists() && !io.isDir()) return Str.get(MimeTypes.get(path));
     }
-    throw RESFNF.thrw(info, path);
+    throw WHICHRES.thrw(info, path);
   }
 
   /**
@@ -628,7 +628,7 @@ public final class FNDb extends StandardFunc {
     if(data.inMemory()) DBMEM.thrw(info);
 
     final IOFile file = data.meta.binary(path);
-    if(file == null || !file.exists() || file.isDir()) RESFNF.thrw(info, path);
+    if(file == null || !file.exists() || file.isDir()) WHICHRES.thrw(info, path);
     return new B64Stream(file, DBERR);
   }
 

@@ -9,9 +9,11 @@ import org.junit.*;
 
 /**
  * Tests for the {@link MinHeap} implementation.
+ *
+ * @author BaseX Team 2005-12, BSD License
  * @author Leo Woerteler
  */
-public class MinHeapTest {
+public final class MinHeapTest {
   /** Checks if the heap can be used for sorting. */
   @Test
   public void heapSort() {
