@@ -123,12 +123,9 @@ public final class Add extends ACreate {
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(Util.message(ex));
-
     } finally {
       // close and drop intermediary database instance
-      try { build.close(); } catch(final IOException e) { }
       if(tmp != null) tmp.close();
-      // drop temporary database instance
       if(large) DropDB.drop(db, context);
     }
 

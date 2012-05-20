@@ -52,7 +52,7 @@ public final class MemBuilder extends Builder {
     try {
       parse();
     } finally {
-      parser.close();
+      close();
     }
     return data;
   }

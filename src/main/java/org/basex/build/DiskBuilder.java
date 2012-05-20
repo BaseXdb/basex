@@ -68,16 +68,18 @@ public final class DiskBuilder extends Builder {
     DropDB.drop(name, context);
     context.mprop.dbpath(name).md();
 
-    tout = new DataOutput(new TableOutput(md, DATATBL));
-    xout = new DataOutput(md.dbfile(DATATXT), bs);
-    vout = new DataOutput(md.dbfile(DATAATV), bs);
-    sout = new DataOutput(md.dbfile(DATATMP), bs);
-
     meta = md;
     tags = new Names(md);
     atts = new Names(md);
-    parse();
-    close();
+    try {
+      tout = new DataOutput(new TableOutput(md, DATATBL));
+      xout = new DataOutput(md.dbfile(DATATXT), bs);
+      vout = new DataOutput(md.dbfile(DATAATV), bs);
+      sout = new DataOutput(md.dbfile(DATATMP), bs);
+      parse();
+    } finally {
+      close();
+    }
 
     // copy temporary values into database table
     final TableAccess ta = new TableDiskAccess(md, true);
