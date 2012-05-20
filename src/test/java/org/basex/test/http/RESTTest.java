@@ -430,11 +430,11 @@ public class RESTTest extends HTTPTest {
     put(NAME + "/a", new ArrayInput(token("<a/>")));
     put(NAME + "/b", new ArrayInput(token("<b/>")));
     // delete 'a' directory
-    assertContains(delete(NAME + "/a"), "1 document");
+    assertStartsWith(delete(NAME + "/a"), "1 ");
     // delete 'b' directory
-    assertContains(delete(NAME + "/b"), "1 document");
+    assertStartsWith(delete(NAME + "/b"), "1 ");
     // no 'b' directory left
-    assertContains(delete(NAME + "/b"), "0 document");
+    assertStartsWith(delete(NAME + "/b"), "0 ");
     // delete database
     assertEquals(delete(NAME).trim(), Util.info(Text.DB_DROPPED_X, NAME));
     try {
