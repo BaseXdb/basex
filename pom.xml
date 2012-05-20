@@ -74,11 +74,6 @@
       <version>1.0.0</version>
     </dependency>
     <dependency>
-      <groupId>com.xqj2</groupId>
-      <artifactId>xqj2</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-    <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex</artifactId>
       <version>7.2.2-SNAPSHOT</version>
@@ -235,6 +230,7 @@
             <configuration>
               <outputDirectory>${project.lib.directory}</outputDirectory>
               <includeScope>compile</includeScope>
+              <excludeArtifactIds>xstream</excludeArtifactIds>
             </configuration>
           </execution>
         </executions>
