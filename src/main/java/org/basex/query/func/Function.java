@@ -711,6 +711,13 @@ public enum Function {
   /** Utility function: passes type information to {@code fn:trace()}. */
   _UTIL_TYPE(FNUtil.class, "type(expr)", ITEM_ZM, ITEM_ZM),
 
+  /* FNValidate functions. */
+
+  /** Validate Query function */
+  _VALIDATE_XSD(FNValidate.class, "xsd(input[,schema])", EMP, 1, ITEM, ITEM),
+  /** Validate function */
+  _VALIDATE_DTD(FNValidate.class, "dtd(input[,schema])", EMP, 1, ITEM, ITEM),
+
   /* FNXslt functions. */
 
   /** XSLT function: performs an XSLT transformation. */
@@ -759,15 +766,16 @@ public enum Function {
     URIS.put(FNZip.class,    ZIPURI);
     URIS.put(FNRepo.class,   REPOURI);
     // internal functions
-    URIS.put(FNDb.class,    DBURI);
-    URIS.put(FNFt.class,    FTURI);
-    URIS.put(FNHof.class,   HOFURI);
-    URIS.put(FNIndex.class, INDEXURI);
-    URIS.put(FNJson.class,  JSONURI);
-    URIS.put(FNProc.class,  PROCURI);
-    URIS.put(FNSql.class,   SQLURI);
-    URIS.put(FNUtil.class,  UTILURI);
-    URIS.put(FNXslt.class,  XSLTURI);
+    URIS.put(FNDb.class,       DBURI);
+    URIS.put(FNFt.class,       FTURI);
+    URIS.put(FNHof.class,      HOFURI);
+    URIS.put(FNIndex.class,    INDEXURI);
+    URIS.put(FNJson.class,     JSONURI);
+    URIS.put(FNProc.class,     PROCURI);
+    URIS.put(FNSql.class,      SQLURI);
+    URIS.put(FNUtil.class,     UTILURI);
+    URIS.put(FNValidate.class, VALIDATEURI);
+    URIS.put(FNXslt.class,     XSLTURI);
   }
 
   /** Minimum number of arguments. */

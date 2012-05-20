@@ -62,6 +62,8 @@ public enum Err {
   FTMODE(BASX, 21, "Unknown search mode: '%'."),
   /** BASX0022: Parsing exception. */
   FTFZWC(BASX, 22, "Either wildcards or fuzzy search supported."),
+  /** BASX0023: Evaluation exception. */
+  DOCVAL(BASX, 23, "Document validation failed."),
 
   /** PROC9999: Encoding. */
   PROCENC(PROC, 9999, "Encoding not supported: '%'."),

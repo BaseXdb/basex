@@ -8,7 +8,7 @@ import org.basex.test.query.*;
 import org.junit.*;
 
 /**
- * This class tests the XQuery utility functions prefixed with "xslt".
+ * This class tests the XQuery functions prefixed with "xslt".
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

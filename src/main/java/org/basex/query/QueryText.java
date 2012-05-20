@@ -471,6 +471,8 @@ public interface QueryText {
   byte[] REPO = token("repo");
   /** Rest token. */
   byte[] REST = token("rest");
+  /** Val token. */
+  byte[] VLDT = token("validate");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -544,6 +546,8 @@ public interface QueryText {
   byte[] SQLURI = token(BXMODULES + "sql");
   /** Repo URI. */
   byte[] REPOURI = token(BXMODULES + "repo");
+  /** Validate URI. */
+  byte[] VALIDATEURI = token(BXMODULES + "validate");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");

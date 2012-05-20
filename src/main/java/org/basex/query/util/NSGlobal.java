@@ -32,6 +32,12 @@ public final class NSGlobal {
     NS.add(LOCAL, LOCALURI);
     NS.add(OUTPUT, OUTPUTURI);
     NS.add(ERR, ERRORURI);
+    // EXPath namespaces
+    NS.add(CRYPTO, CRYPTOURI);
+    NS.add(FILE, FILEURI);
+    NS.add(HTTP, HTTPURI);
+    NS.add(ZIP, ZIPURI);
+    NS.add(PKG, PKGURI);
     // BaseX namespaces
     NS.add(BASEX, BASEXURI);
     NS.add(DB, DBURI);
@@ -44,12 +50,7 @@ public final class NSGlobal {
     NS.add(UTIL, UTILURI);
     NS.add(XSLT, XSLTURI);
     NS.add(REPO, REPOURI);
-    // EXPath namespaces
-    NS.add(CRYPTO, CRYPTOURI);
-    NS.add(FILE, FILEURI);
-    NS.add(HTTP, HTTPURI);
-    NS.add(ZIP, ZIPURI);
-    NS.add(PKG, PKGURI);
+    NS.add(VLDT, VALIDATEURI);
   }
 
   /** Private constructor. */

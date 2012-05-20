@@ -21,7 +21,7 @@ import org.basex.util.*;
 import org.basex.util.hash.*;
 
 /**
- * Project specific functions.
+ * Functions for performing XSLT transformations.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

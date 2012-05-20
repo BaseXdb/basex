@@ -1538,17 +1538,21 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void validate() throws QueryException {
+    final int i = ip;
     if(wsConsumeWs(VALIDATE)) {
-      if(!wsConsumeWs(STRICT) && !wsConsumeWs(LAX) && wsConsumeWs(TYPE)) {
+      if(wsConsumeWs(TYPE)) {
         final QNm qnm = eQName(QNAMEINV, SKIPCHECK);
         names.add(new QNmCheck(qnm));
         error(NOSCHEMA, qnm);
       }
-      wsCheck(BRACE1);
-      check(single(), NOVALIDATE);
-      wsCheck(BRACE2);
-      error(IMPLVAL);
+      if(wsConsumeWs(STRICT) || wsConsumeWs(LAX)) {
+        wsCheck(BRACE1);
+        check(single(), NOVALIDATE);
+        wsCheck(BRACE2);
+        error(IMPLVAL);
+      }
     }
+    ip = i;
   }
 
   /**
