@@ -54,7 +54,7 @@ public final class Context {
   /** Node context. */
   private Nodes current;
   /** Process locking. */
-  private final Lock lock;
+  private final Locking locks;
   /** Data reference. */
   private Data data;
   /** Databases list. */
@@ -86,7 +86,7 @@ public final class Context {
     datas = ctx.datas;
     events = ctx.events;
     sessions = ctx.sessions;
-    lock = ctx.lock;
+    locks = ctx.locks;
     users = ctx.users;
     repo = ctx.repo;
     databases = ctx.databases();
@@ -102,7 +102,7 @@ public final class Context {
     datas = new Datas();
     events = new Events();
     sessions = new Sessions();
-    lock = new Lock(this);
+    locks = new Locking(this.mprop);
     users = new Users(true);
     repo = new Repo(this);
     user = users.get(ADMIN);
@@ -255,7 +255,7 @@ public final class Context {
   public void register(final Progress pr) {
     // administrators will not be affected by the timeout
     if(!user.has(Perm.ADMIN)) pr.startTimeout(mprop.num(MainProp.TIMEOUT));
-    lock.lock(pr);
+    locks.acquire(pr.updating, new String[] { "".intern() });
   }
 
   /**
@@ -263,7 +263,7 @@ public final class Context {
    * @param pr process
    */
   public void unregister(final Progress pr) {
-    lock.unlock(pr);
+    locks.release();
     pr.stopTimeout();
   }
 
