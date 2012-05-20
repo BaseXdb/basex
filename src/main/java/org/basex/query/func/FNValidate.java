@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
+import java.io.*;
 import java.net.*;
 
 import javax.xml.*;
@@ -17,6 +18,7 @@ import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.util.*;
+import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 /**
@@ -58,13 +60,18 @@ public class FNValidate extends StandardFunc {
       final IO in = read(ctx, null);
       final SchemaFactory sf = SchemaFactory.newInstance(
           XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      final Schema s = expr.length < 2 ? sf.newSchema() :
-        sf.newSchema(new URL(string(checkStr(expr[1], ctx))));
-
-      s.newValidator().validate(new StreamSource(in.inputStream()));
+      final Schema schema;
+      if(expr.length < 2) {
+        schema = sf.newSchema();
+      } else {
+        final IO sc = IO.get(string(checkStr(expr[1], ctx)));
+        if(!sc.exists()) RESFNF.thrw(info, sc);
+        schema = sf.newSchema(new URL(sc.url()));
+      }
+      schema.newValidator().validate(new StreamSource(in.inputStream()));
       return null;
     } catch(final Exception ex) {
-      System.out.println("? " + ex.getClass());
+      // may be IOException, SAXException
       throw DOCVAL.thrw(info, ex.getMessage());
     }
   }
@@ -79,19 +86,46 @@ public class FNValidate extends StandardFunc {
     try {
       final IO in;
       if(expr.length == 2) {
-        // include doctype declaration via serialization properties
+        // integrate doctype declaration via serialization properties
         final SerializerProp sp = new SerializerProp();
-        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, string(checkStr(expr[1], ctx)));
+        final String dtd = string(checkStr(expr[1], ctx));
+        if(!IO.get(dtd).exists()) RESFNF.thrw(info, dtd);
+        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, dtd);
         in = read(ctx, sp);
       } else {
+        // assume that doctype declaration is included in document
         in = read(ctx, null);
       }
       final SAXParserFactory sf = SAXParserFactory.newInstance();
       sf.setValidating(true);
-      sf.newSAXParser().parse(in.inputStream(), new DefaultHandler());
+      final InputSource is = in.inputSource();
+      sf.newSAXParser().parse(is, new DTDHandler());
       return null;
     } catch(final Exception ex) {
+      if(ex instanceof QueryException) throw (QueryException) ex;
+      // may be IOException, SAXException, ParserConfigurationException
+      Util.debug(ex);
       throw DOCVAL.thrw(info, ex.getMessage());
+    }
+  }
+
+  /** DTD handler. */
+  static class DTDHandler extends DefaultHandler {
+    @Override
+    public void fatalError(final SAXParseException ex) throws SAXException {
+      error(ex);
+    }
+    @Override
+    public void warning(final SAXParseException ex) throws SAXException {
+      error(ex);
+    }
+    @Override
+    public void error(final SAXParseException ex) throws SAXException {
+      final TokenBuilder report = new TokenBuilder();
+      if(ex.getSystemId() != null) report.add(IO.get(ex.getSystemId()).name()).add(", ");
+      report.addExt(ex.getLineNumber()).add(':').addExt(ex.getColumnNumber());
+      report.add(": ").add(ex.getMessage());
+      throw new SAXException(report.toString());
     }
   }
 
@@ -101,11 +135,13 @@ public class FNValidate extends StandardFunc {
    * @param sp serializer properties
    * @return item
    * @throws QueryException query exception
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  private IO read(final QueryContext ctx, final SerializerProp sp) throws Exception {
+  private IO read(final QueryContext ctx, final SerializerProp sp)
+      throws QueryException, IOException {
+
     final Item it = checkItem(expr[0], ctx);
-    if(it.isEmpty()) throw STRNODTYPE.thrw(info, this);
+    if(it.isEmpty()) STRNODTYPE.thrw(info, this);
     final Type ip = it.type;
 
     final ArrayOutput ao = new ArrayOutput();
@@ -115,11 +151,15 @@ public class FNValidate extends StandardFunc {
       return new IOContent(ao.toArray());
     }
     if(ip.isString()) {
-      IO io = IO.get(string(it.string(info)));
+      final String path = string(it.string(info));
+      IO io = IO.get(path);
+      if(!io.exists()) RESFNF.thrw(info, path);
+
       if(sp != null) {
         // add doctype declaration if specified
         Serializer.get(ao, sp).serialize(new DBNode(io, ctx.context.prop));
-        io = IO.get(ao.toString());
+        io = new IOContent(ao.toArray());
+        io.name(path);
       }
       return io;
     }

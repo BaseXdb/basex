@@ -48,7 +48,9 @@ public final class IOContent extends IO {
 
   @Override
   public InputSource inputSource() {
-    return new InputSource(inputStream());
+    final InputSource is = new InputSource(inputStream());
+    is.setSystemId(name());
+    return is;
   }
 
   @Override
