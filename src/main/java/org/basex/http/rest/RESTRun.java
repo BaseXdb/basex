@@ -36,7 +36,7 @@ public class RESTRun extends RESTQuery {
     final IOFile root = new IOFile(path);
     final IOFile io = new IOFile(path, input);
     if(!io.exists() || io.isDir() || !io.path().startsWith(root.path()))
-      HTTPErr.NOT_FOUND_X.thrw(RESOURCE_NOT_FOUND_X, input);
+      HTTPErr.NOT_FOUND_X.thrw(RES_NOT_FOUND_X, input);
 
     // perform query
     query(string(io.read()), http, io.path());
