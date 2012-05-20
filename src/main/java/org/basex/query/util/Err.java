@@ -63,7 +63,7 @@ public enum Err {
   /** BASX0022: Parsing exception. */
   FTFZWC(BASX, 22, "Either wildcards or fuzzy search supported."),
   /** BASX0023: Evaluation exception. */
-  DOCVAL(BASX, 23, "Document validation failed."),
+  DOCVAL(BASX, 23, "Validation failed: %"),
 
   /** PROC9999: Encoding. */
   PROCENC(PROC, 9999, "Encoding not supported: '%'."),

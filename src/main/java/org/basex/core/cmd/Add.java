@@ -4,10 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import javax.xml.transform.sax.*;
-
 import org.basex.build.*;
-import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.io.*;
@@ -66,17 +63,12 @@ public final class Add extends ACreate {
     } else if(in.getSystemId() != null) {
       io = IO.get(in.getSystemId());
     } else if(in.getByteStream() != null) {
-      try {
-        io = cacheRaw();
-      } catch(final IOException ex) {
-        return error(Util.message(ex));
-      }
+      io = new IOStream(in.getByteStream());
+      io.name(name);
     }
 
-    if(io != null) {
-      if(!io.exists()) return error(RES_NOT_FOUND_X, create ? io : args[1]);
-      if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
-    }
+    if(!io.exists()) return error(RES_NOT_FOUND_X, create ? io : args[1]);
+    if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
 
     String target = "";
     final int s = name.lastIndexOf('/');
@@ -87,15 +79,12 @@ public final class Add extends ACreate {
 
     final Data data = context.data();
     final Parser parser;
-    if(io != null) {
-      // set name of document
-      if(!name.isEmpty()) io.name(name);
-      // get name from io reference
-      else if(!(io instanceof IOContent)) name = io.name();
-      parser = new DirParser(io, prop, data.meta.path);
-    } else {
-      parser = new SAXWrapper(new SAXSource(in), name, context.prop);
-    }
+
+    // set name of document
+    if(!name.isEmpty()) io.name(name);
+    // get name from io reference
+    else if(!(io instanceof IOContent)) name = io.name();
+    parser = new DirParser(io, prop, data.meta.path);
     parser.target(target);
 
     // ensure that the final name is not empty

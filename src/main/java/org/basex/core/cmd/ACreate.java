@@ -10,9 +10,7 @@ import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.*;
 import org.basex.index.value.*;
-import org.basex.io.*;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Abstract class for database creation commands.
@@ -57,29 +55,6 @@ public abstract class ACreate extends Command {
   @Override
   public boolean stoppable() {
     return true;
-  }
-
-  /**
-   * Caches the input if an input source has been specified,
-   * and if a data format different to XML has been chosen.
-   * @return cached input
-   * @throws IOException I/O exception
-   */
-  protected IOContent cacheRaw() throws IOException {
-    if(in == null || prop.get(Prop.PARSER).equals(DataText.M_XML)) return null;
-
-    final InputStream is = in.getByteStream();
-    final BufferedInputStream bis = new BufferedInputStream(is);
-    final ByteList ao = new ByteList();
-    try {
-      for(int b; (b = bis.read()) != -1;) ao.add(b);
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      throw ex;
-    } finally {
-      try { bis.close(); } catch(final IOException ex) { /* ignored */ }
-    }
-    return new IOContent(ao.toArray());
   }
 
   /**

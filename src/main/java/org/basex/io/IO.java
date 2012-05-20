@@ -78,10 +78,10 @@ public abstract class IO {
 
   /** File path. The path uses forward slashes, no matter which OS is used. */
   String path;
-  /** First call. */
-  private boolean more;
   /** File name. */
   String name;
+  /** File length. */
+  long len = -1;
 
   /**
    * Protected constructor.
@@ -107,8 +107,8 @@ public abstract class IO {
    * returned instance depends on the string value:</p>
    * <ul>
    * <li>{@link IOContent}: if the string starts with an angle bracket (&lt;)
-   *   or if it is a {@code null} reference, it is interpreted as XML fragment
-   *   and handled as byte array</li>
+   *   or if it is {@code null} it is interpreted as XML fragment and internally
+   *   represented as byte array</li>
    * <li>{@link IOFile}: if the string starts with <code>file:</code>, or if it
    *   does not contain the substring <code>://</code>, it is interpreted as
    *   local file instance</li>
@@ -123,10 +123,21 @@ public abstract class IO {
   public static IO get(final String source) {
     if(source == null) return new IOContent(Token.EMPTY);
     final String s = source.trim();
-    if(s.startsWith("<"))      return new IOContent(Token.token(s));
+    if(s.startsWith("<"))      return new IOContent(s);
     if(s.startsWith(FILEPREF)) return new IOFile(IOUrl.file(s));
-    if(IOFile.valid(s))        return new IOFile(s);
+    if(IO.isFile(s))           return new IOFile(s);
     return new IOUrl(s);
+  }
+
+  /**
+   * Checks if the specified string is a valid file reference.
+   * @param s source
+   * @return result of check
+   */
+  private static boolean isFile(final String s) {
+    if(s.length() < 3 || s.indexOf(':') == -1) return true;
+    final char c = Character.toLowerCase(s.charAt(0));
+    return c >= 'a' && c <= 'z' && s.charAt(1) == ':';
   }
 
   /**
@@ -137,7 +148,8 @@ public abstract class IO {
   public abstract byte[] read() throws IOException;
 
   /**
-   * Tests if the file exists. Returns {@code true} by default.
+   * Tests if the file exists.
+   * Returns {@code true} for IO instances other than {@link IOFile}.
    * @return result of check
    */
   public boolean exists() {
@@ -146,6 +158,7 @@ public abstract class IO {
 
   /**
    * Tests if this is a directory instance.
+   * Returns {@code false} for IO instances other than {@link IOFile}.
    * @return result of check
    */
   public boolean isDir() {
@@ -166,28 +179,28 @@ public abstract class IO {
   }
 
   /**
-   * Returns the modification date of this file.
-   * @return modification date
+   * Returns the time stamp (modification date) of this file.
+   * Returns the current time for IO instances other than {@link IOFile}.
+   * @return time stamp
    */
   public long timeStamp() {
     return System.currentTimeMillis();
   }
 
   /**
+   * Sets the input length.
+   * @param l length
+   */
+  public void length(final long l) {
+    len = l;
+  }
+
+  /**
    * Returns the file length.
    * @return file length
    */
-  public abstract long length();
-
-  /**
-   * Checks if more input streams are found.
-   * @param archive parse archives
-   * @return result of check
-   * @throws IOException I/O exception
-   */
-  @SuppressWarnings("unused")
-  public boolean more(final boolean archive) throws IOException {
-    return more ^= true;
+  public long length() {
+    return len;
   }
 
   /**
@@ -204,11 +217,14 @@ public abstract class IO {
   public abstract InputStream inputStream() throws IOException;
 
   /**
-   * Merges two filenames.
-   * @param fn file name/path to be appended
+   * Merges two paths. Returns the new specified path for {@link IOContent} and
+   * {@link IOStream} instances.
+   * @param in name/path to be appended
    * @return resulting reference
    */
-  public abstract IO merge(final String fn);
+  public IO merge(final String in) {
+    return IO.get(in);
+  }
 
   /**
    * Checks if this file is an archive.
@@ -286,14 +302,14 @@ public abstract class IO {
   }
 
   /**
-   * Returns the suffix of the specified path. An empty string is returned if the last
-   * path segment has no suffix.
+   * Returns the suffix of the specified path in lower case.
+   * An empty string is returned if the last path segment has no suffix.
    * @param path path to be checked
    * @return mime-type
    */
   public static String suffix(final String path) {
     final int s = path.lastIndexOf('/');
     final int d = path.lastIndexOf('.');
-    return d <= s ? "" : path.substring(d + 1);
+    return d <= s ? "" : path.substring(d + 1).toLowerCase(Locale.ENGLISH);
   }
 }

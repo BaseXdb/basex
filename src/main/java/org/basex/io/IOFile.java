@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
-import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.io.in.*;
@@ -21,13 +20,6 @@ import org.xml.sax.*;
 public final class IOFile extends IO {
   /** File reference. */
   private final File file;
-
-  /** Input stream reference to archived contents. */
-  private InputStream is;
-  /** Expected size of a stream input. */
-  private long isSize = -1;
-  /** Zip entry. */
-  ZipEntry zip;
 
   /**
    * Constructor.
@@ -111,66 +103,17 @@ public final class IOFile extends IO {
 
   @Override
   public long length() {
-    return isSize != -1 ? isSize : file.length();
-  }
-
-  @Override
-  public boolean more(final boolean archives) throws IOException {
-    if(archives) {
-      if(is == null) {
-        // process gzip files; assume input to be XML
-        if(path.toLowerCase(Locale.ENGLISH).endsWith(GZSUFFIX)) {
-          is = new GZIPInputStream(new FileInputStream(file));
-          init(name + XMLSUFFIX);
-          isSize = -1;
-          return true;
-        }
-        // process zip archives
-        if(isArchive()) {
-          is = new ZipInputStream(new FileInputStream(file)) {
-            @Override
-            public void close() throws IOException {
-              if(zip == null) super.close();
-            }
-          };
-        }
-      }
-      // check if stream returns more items
-      if(is != null) {
-        if(is instanceof ZipInputStream && moreZIP()) return true;
-        is.close();
-        is = null;
-        return false;
-      }
-
-    }
-    // work on normal files
-    return super.more(archives);
-  }
-
-  /**
-   * Checks if a ZIP stream contains more entries.
-   * @return result of check
-   * @throws IOException I/O exception
-   */
-  private boolean moreZIP() throws IOException {
-    while(true) {
-      zip = ((ZipInputStream) is).getNextEntry();
-      isSize = zip == null ? -1 : zip.getSize();
-      if(zip == null) return false;
-      init(zip.getName());
-      if(!zip.isDirectory()) return true;
-    }
+    return file.length();
   }
 
   @Override
   public InputSource inputSource() {
-    return is == null ? new InputSource(path) : new InputSource(is);
+    return new InputSource(path);
   }
 
   @Override
   public InputStream inputStream() throws IOException {
-    return is != null ? is : new FileInputStream(file);
+    return new FileInputStream(file);
   }
 
   @Override
@@ -347,17 +290,6 @@ public final class IOFile extends IO {
    */
   public static String regex(final String glob) {
     return regex(glob, true);
-  }
-
-  /**
-   * Checks if the specified string is a valid file reference.
-   * @param s source
-   * @return result of check
-   */
-  static boolean valid(final String s) {
-    if(s.length() < 3 || s.indexOf(':') == -1) return true;
-    final char c = Character.toLowerCase(s.charAt(0));
-    return c >= 'a' && c <= 'z' && s.charAt(1) == ':';
   }
 
   /**

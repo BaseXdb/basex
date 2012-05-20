@@ -6,6 +6,7 @@ import static org.basex.data.DataText.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
+import java.util.zip.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
@@ -87,82 +88,103 @@ public final class DirParser extends Parser {
    * @throws IOException I/O exception
    */
   private void parse(final Builder b, final IO io) throws IOException {
-    if(io.isDir()) {
-      // only {@link IOFile} instances can have children
+    if(io instanceof IOFile && io.isDir()) {
       for(final IO f : ((IOFile) io).children()) parse(b, f);
+    } else if(archives && io.name().toLowerCase(Locale.ENGLISH).endsWith(IO.GZSUFFIX)) {
+      // process GZIP archive
+      final GZIPInputStream is = new GZIPInputStream(io.inputStream());
+      src = new IOStream(is, io.name().replaceAll("\\..*", IO.XMLSUFFIX));
+      parseResource(b);
+      is.close();
+    } else if(archives && io.isArchive()) {
+      // process ZIP archive
+      final ZipInputStream is = new ZipInputStream(io.inputStream());
+      for(ZipEntry ze; (ze = is.getNextEntry()) != null;) {
+        if(ze.isDirectory()) continue;
+        src = new IOStream(is, ze.getName());
+        src.length(ze.getSize());
+        parseResource(b);
+      }
+      is.close();
     } else {
+      // process regular file
       src = io;
+      parseResource(b);
+    }
+  }
 
-      // loop through all (potentially zipped) files
-      while(io.more(archives)) {
-        b.checkStop();
+  /**
+   * Parses the current source.
+   * @param b builder instance
+   * @throws IOException I/O exception
+   */
+  private void parseResource(final Builder b) throws IOException {
+    b.checkStop();
 
-        // add file size for database meta information
-        final long l = io.length();
-        if(l != -1) b.meta.filesize += l;
+    // add file size for database meta information
+    final long l = src.length();
+    if(l != -1) b.meta.filesize += l;
 
-        // use global target as path prefix
-        String targ = target;
-        String path = io.path();
+    // use global target as path prefix
+    String targ = target;
+    String path = src.path();
 
-        // add relative path without root (prefix) and file name (suffix)
-        final String name = io.name();
-        if(path.endsWith('/' + name)) {
-          path = path.substring(0, path.length() - name.length());
-          if(path.startsWith(root)) path = path.substring(root.length());
-          targ = (targ + path).replace("//", "/");
+    // add relative path without root (prefix) and file name (suffix)
+    final String name = src.name();
+    if(path.endsWith('/' + name)) {
+      path = path.substring(0, path.length() - name.length());
+      if(path.startsWith(root)) path = path.substring(root.length());
+      targ = (targ + path).replace("//", "/");
+    }
+
+    // check if file passes the name filter pattern
+    boolean exclude = false;
+    if(filter != null) {
+      String nm = src.name();
+      if(Prop.WIN) nm = name.toLowerCase(Locale.ENGLISH);
+      exclude = !filter.matcher(nm).matches();
+    }
+
+    if(exclude) {
+      // exclude file: check if will be added as raw file
+      if(addRaw && rawPath != null) {
+        Store.store(src.inputSource(), new IOFile(rawPath, targ + name));
+      }
+    } else {
+      if(rawParser) {
+        // store input in raw format if database path is known
+        if(rawPath != null) {
+          Store.store(src.inputSource(), new IOFile(rawPath, targ + name));
         }
-
-        // check if file passes the name filter pattern
-        boolean exclude = false;
-        if(filter != null) {
-          String nm = io.name();
-          if(Prop.WIN) nm = name.toLowerCase(Locale.ENGLISH);
-          exclude = !filter.matcher(nm).matches();
-        }
-
-        if(exclude) {
-          // exclude file: check if will be added as raw file
-          if(addRaw && rawPath != null) {
-            Store.store(io.inputSource(), new IOFile(rawPath, targ + name));
-          }
-        } else {
-          if(rawParser) {
-            // store input in raw format if database path is known
-            if(rawPath != null) {
-              Store.store(io.inputSource(), new IOFile(rawPath, targ + name));
+      } else {
+        // store input as XML
+        boolean ok = true;
+        IO in = src;
+        if(skipCorrupt) {
+          // parse file twice to ensure that it is well-formed
+          try {
+            // cache file contents to allow or speed up a second run
+            if(!(src instanceof IOContent)) {
+              in = new IOContent(src.read());
+              in.name(src.name());
             }
-          } else {
-            // store input as XML
-            boolean ok = true;
-            IO in = io;
-            if(skipCorrupt) {
-              // parse file twice to ensure that it is well-formed
-              try {
-                // cache file contents to allow or speed up a second run
-                if(!(io instanceof IOContent)) {
-                  in = new IOContent(io.read());
-                  in.name(io.name());
-                }
-                parser = Parser.singleParser(in, prop, targ);
-                MemBuilder.build("", parser);
-              } catch(final IOException ex) {
-                Util.debug(ex.getMessage());
-                skipped.add(io.path());
-                ok = false;
-              }
-            }
-
-            // parse file
-            if(ok) {
-              parser = Parser.singleParser(in, prop, targ);
-              parser.parse(b);
-            }
-            parser = null;
-            // dump debug data
-            if(Prop.debug && (++c & 0x3FF) == 0) Util.err(";");
+            parser = Parser.singleParser(in, prop, targ);
+            MemBuilder.build("", parser);
+          } catch(final IOException ex) {
+            Util.debug(ex.getMessage());
+            skipped.add(src.path());
+            ok = false;
           }
         }
+
+        // parse file
+        if(ok) {
+          parser = Parser.singleParser(in, prop, targ);
+          parser.parse(b);
+        }
+        parser = null;
+        // dump debug data
+        if(Prop.debug && (++c & 0x3FF) == 0) Util.err(";");
       }
     }
   }

@@ -19,12 +19,12 @@ public class BufferInput extends InputStream {
   int bpos;
   /** Current buffer size. */
   int bsize;
-  /** Total length of input to be processed (may be {@code 0}). */
+  /** Total length of input to be processed ({@code -1} if unknown). */
   long length;
 
   /** Reference to the data input stream. */
   private final InputStream in;
-  /** Buffer marker to jump back (not available when set to {@code -1}. */
+  /** Buffer marker to jump back ({@code -1} if not available). */
   private int bmark;
   /** Number of read bytes. */
   private int read;
@@ -141,7 +141,7 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the input length.
+   * Returns the input length (may be {@code -1}).
    * @return input length
    */
   public final long length() {

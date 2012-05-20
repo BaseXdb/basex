@@ -45,18 +45,6 @@ public final class SAXWrapper extends SingleParser {
   /**
    * Constructor.
    * @param source sax source
-   * @param name name
-   * @param pr Properties
-   */
-  public SAXWrapper(final SAXSource source, final String name, final Prop pr) {
-    super(IO.get(source.getSystemId()), pr);
-    if(!name.isEmpty()) src.name(name);
-    saxs = source;
-  }
-
-  /**
-   * Constructor.
-   * @param source sax source
    * @param pr Properties
    */
   public SAXWrapper(final IO source, final Prop pr) {

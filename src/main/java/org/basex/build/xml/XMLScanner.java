@@ -1019,7 +1019,8 @@ final class XMLScanner extends Progress {
 
   @Override
   public double prog() {
-    return (double) input.pos() / input.length();
+    final double l = input.length();
+    return l <= 0 ? 0 : input.pos() / l;
   }
 
   /** Index for all HTML entities. */

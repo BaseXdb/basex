@@ -38,16 +38,12 @@ public final class IOContent extends IO {
   public IOContent(final byte[] c, final String p) {
     super(p);
     cont = c;
+    len = cont.length;
   }
 
   @Override
   public byte[] read() {
     return cont;
-  }
-
-  @Override
-  public long length() {
-    return cont.length;
   }
 
   @Override
@@ -58,11 +54,6 @@ public final class IOContent extends IO {
   @Override
   public ArrayInput inputStream() {
     return new ArrayInput(cont);
-  }
-
-  @Override
-  public IO merge(final String f) {
-    return IO.get(f);
   }
 
   @Override

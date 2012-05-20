@@ -4,11 +4,7 @@ import static org.basex.core.Text.*;
 
 import java.io.*;
 
-import javax.xml.transform.sax.*;
-
 import org.basex.build.*;
-import org.basex.build.Parser;
-import org.basex.build.xml.*;
 import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
@@ -19,7 +15,6 @@ import org.basex.index.value.*;
 import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.util.*;
-import org.xml.sax.*;
 
 /**
  * Evaluates the 'create db' command and creates a new database.
@@ -68,18 +63,8 @@ public final class CreateDB extends ACreate {
     if(args.length < 1 || args[1] == null) {
       if(in != null && in.getByteStream() != null) {
         try {
-          io = cacheRaw();
-          if(io == null) {
-            InputStream is = in.getByteStream();
-            if(!(is instanceof BufferedInputStream ||
-                is instanceof BufferInput)) is = new BufferedInputStream(is);
-
-            final LookupInput li = new LookupInput(is);
-            if(li.lookup() != -1) {
-              parser = new SAXWrapper(new SAXSource(new InputSource(li)),
-                  name + '.' + format, context.prop);
-            }
-          }
+          final LookupInput li = new LookupInput(in.getByteStream());
+          if(li.lookup() != -1) io = new IOStream(li, name + '.' + format);
         } catch(final IOException ex) {
           Util.debug(ex);
           return error(Util.message(ex));
@@ -94,7 +79,9 @@ public final class CreateDB extends ACreate {
       if(io instanceof IOContent) io.name(name + '.' + format);
       parser = new DirParser(io, prop, mprop.dbpath(name));
     }
-    if(parser == null) parser = Parser.emptyParser(context.prop);
+    if(parser == null) {
+      parser = Parser.emptyParser(context.prop);
+    }
 
     // close open database
     new Close().run(context);

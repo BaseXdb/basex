@@ -85,8 +85,7 @@ public class BaseX extends Main {
         } else if(key.equals("f")) {
           // query file
           final IO io = IO.get(val);
-          if(!io.exists() || io.isDir())
-            throw new BaseXException(RES_NOT_FOUND_X, val);
+          if(!io.exists() || io.isDir()) throw new BaseXException(RES_NOT_FOUND_X, val);
           final String query = Token.string(new TextInput(io).content());
           execute(new Set(Prop.QUERYPATH, io.path()), false);
           execute(new XQuery(query), verbose);
