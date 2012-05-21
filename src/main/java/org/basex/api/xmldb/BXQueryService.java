@@ -74,7 +74,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
       throws XMLDBException {
 
     final BXXMLResource xml = coll.getResource(id);
-    if(xml != null) return query(new Nodes(xml.pre, xml.data), query);
+    if(xml != null) return query(new Nodes(xml.pos, xml.data), query);
     // throw exception if id was not found...
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_RES + id);
   }
