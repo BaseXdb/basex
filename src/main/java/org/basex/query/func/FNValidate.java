@@ -102,6 +102,23 @@ public class FNValidate extends StandardFunc {
 
   /**
    * Validates a document against a DTD.
+   * There exist two variants:
+   *
+   * <ul>{@code validate:dtd($doc)}
+   *  <li>Looks for the document type declaration in {@code $doc} and
+   *    uses it for validation.</li>
+   *  <li>{@code $doc} must contain a DTD for this to work.</li>
+   *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
+   *    xs:string} pointing to an URL or a local file that will then be parsed
+   *    and validated.</li>
+   *  </ul>
+   *  <ul>{@code validate:dtd($doc, $dtd)}
+   *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
+   *    xs:string} pointing to an URL or a local file</li>
+   *  <li>{@code $dtd as xs:string} is expected to point to an URL or a local
+   *  file containing the document type definitions. </li>
+   *  </ul>
+
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
