@@ -156,28 +156,28 @@ public abstract class W3CTS {
         text("/*:test-suite/@version", root));
 
     Util.outln("Caching Sources...");
-    for(final int s : nodes("//*:source", root).list) {
+    for(final int s : nodes("//*:source", root).pres) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       srcs.put(text("@ID", srcRoot), val);
     }
 
     Util.outln("Caching Modules...");
-    for(final int s : nodes("//*:module", root).list) {
+    for(final int s : nodes("//*:module", root).pres) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       mods.put(text("@ID", srcRoot), val);
     }
 
     Util.outln("Caching Collections...");
-    for(final int c : nodes("//*:collection", root).list) {
+    for(final int c : nodes("//*:collection", root).pres) {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
 
       final StringList dl = new StringList();
       final Nodes doc = nodes("*:input-document", nodes);
       for(int d = 0; d < doc.size(); ++d) {
-        dl.add(sources + string(data.atom(doc.list[d])) + IO.XMLSUFFIX);
+        dl.add(sources + string(data.atom(doc.pres[d])) + IO.XMLSUFFIX);
       }
       colls.put(cname, dl.toArray());
     }
@@ -197,7 +197,7 @@ public abstract class W3CTS {
     long total = nodes.size();
     Util.out("Parsing " + total + " Queries");
     for(int t = 0; t < total; ++t) {
-      if(!parse(new Nodes(nodes.list[t], data))) break;
+      if(!parse(new Nodes(nodes.pres[t], data))) break;
       if(!verbose && t % 500 == 0) Util.out(".");
     }
     Util.outln();
@@ -271,7 +271,7 @@ public abstract class W3CTS {
 
     final Nodes nodes = states(root);
     for(int n = 0; n < nodes.size(); ++n) {
-      final Nodes state = new Nodes(nodes.list[n], nodes.data);
+      final Nodes state = new Nodes(nodes.pres[n], nodes.data);
 
       final String inname = text("*:query/@name", state);
       final IOFile query = new IOFile(queries + pth + inname + IO.XQSUFFIX);
@@ -283,7 +283,7 @@ public abstract class W3CTS {
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
       if(cont.size() != 0) {
-        final String p = srcs.get(string(data.atom(cont.list[0])));
+        final String p = srcs.get(string(data.atom(cont.pres[0])));
         final Data d = CreateDB.mainMem(IO.get(p), context);
         curr = new Nodes(d.resources.docs().toArray(), d);
         curr.root = true;
@@ -306,7 +306,7 @@ public abstract class W3CTS {
 
         parse(xq, state);
 
-        for(final int p : nodes("*:module", root).list) {
+        for(final int p : nodes("*:module", root).pres) {
           final String uri = text("@namespace", new Nodes(p, data));
           final String file = IO.get(mods.get(string(data.atom(p))) + IO.XQSUFFIX).path();
           xq.module(uri, file);
@@ -345,7 +345,7 @@ public abstract class W3CTS {
       final Nodes expOut = nodes("*:output-file/text()", state);
       final TokenList result = new TokenList();
       for(int o = 0; o < expOut.size(); ++o) {
-        final String resFile = string(data.atom(expOut.list[o]));
+        final String resFile = string(data.atom(expOut.pres[o]));
         final IOFile exp = new IOFile(expected + pth + resFile);
         result.add(read(exp).replaceAll("\r\n|\r|\n", Prop.NL));
       }
@@ -355,7 +355,7 @@ public abstract class W3CTS {
       boolean frag = false;
       boolean ignore = false;
       for(int o = 0; o < cmpFiles.size(); ++o) {
-        final byte[] type = data.atom(cmpFiles.list[o]);
+        final byte[] type = data.atom(cmpFiles.pres[o]);
         xml |= eq(type, XML);
         frag |= eq(type, FRAGMENT);
         ignore |= eq(type, IGNORE);
@@ -400,7 +400,7 @@ public abstract class W3CTS {
         final int rs = result.size();
 
         while(!ignore && ++s < rs) {
-          inspect |= s < cmpFiles.list.length && eq(data.atom(cmpFiles.list[s]), INSPECT);
+          inspect |= s < cmpFiles.pres.length && eq(data.atom(cmpFiles.pres[s]), INSPECT);
 
           final String expect = string(result.get(s));
           final String actual = ao.toString();
@@ -549,7 +549,7 @@ public abstract class W3CTS {
 
     final TokenBuilder tb = new TokenBuilder();
     for(int c = 0; c < nod.size(); ++c) {
-      final byte[] nm = data.atom(nod.list[c]);
+      final byte[] nm = data.atom(nod.pres[c]);
       String src = srcs.get(string(nm));
       if(!tb.isEmpty()) tb.add(", ");
       tb.add(nm);
@@ -573,7 +573,7 @@ public abstract class W3CTS {
         }
         expr = def.get(Str.get(src));
       }
-      if(var != null) qp.bind(string(data.atom(var.list[c])), expr);
+      if(var != null) qp.bind(string(data.atom(var.pres[c])), expr);
     }
     return tb.finish();
   }
@@ -589,10 +589,10 @@ public abstract class W3CTS {
       throws QueryException {
 
     for(int c = 0; c < nod.size(); ++c) {
-      final byte[] nm = data.atom(nod.list[c]);
+      final byte[] nm = data.atom(nod.pres[c]);
       final String src = srcs.get(string(nm));
       final Item it = src == null ? coll(nm, qp) : Str.get(src);
-      qp.bind(string(data.atom(var.list[c])), it);
+      qp.bind(string(data.atom(var.pres[c])), it);
     }
   }
 
@@ -621,11 +621,11 @@ public abstract class W3CTS {
       final QueryProcessor qp) throws QueryException {
 
     for(int c = 0; c < nod.size(); ++c) {
-      final String file = pth + string(data.atom(nod.list[c])) + IO.XQSUFFIX;
+      final String file = pth + string(data.atom(nod.pres[c])) + IO.XQSUFFIX;
       final String in = read(new IOFile(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
       final Value val = xq.value();
-      qp.bind(string(data.atom(var.list[c])), val);
+      qp.bind(string(data.atom(var.pres[c])), val);
       xq.close();
     }
   }
@@ -674,7 +674,7 @@ public abstract class W3CTS {
     final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < n.size(); ++i) {
       if(i != 0) tb.add('/');
-      tb.add(data.atom(n.list[i]));
+      tb.add(data.atom(n.pres[i]));
     }
     return tb.toString();
   }
