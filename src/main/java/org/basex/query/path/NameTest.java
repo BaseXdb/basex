@@ -53,10 +53,11 @@ public final class NameTest extends Test {
 
     if(mode == Mode.STD && !name.hasPrefix()) {
       // no results if default and database namespaces of elements are different
-      ok = type == NodeType.ATT || ctx.sc.nsElem == null || Token.eq(ns, ctx.sc.nsElem);
+      final byte[] nse = ctx.sc.nsElem != null ? ctx.sc.nsElem : Token.EMPTY;
+      ok = type == NodeType.ATT || Token.eq(ns, nse);
       if(ok) {
         // namespace is irrelevant or identical: ignore prefix to speed up test
-        if(ns.length != 0) ctx.compInfo(OPTPREF, ln);
+        ctx.compInfo(OPTPREF, this);
         mode = Mode.NAME;
       }
     }

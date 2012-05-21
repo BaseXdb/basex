@@ -635,7 +635,7 @@ public interface QueryText {
   // OPTIMIZATIONS
 
   /** Optimization info. */
-  String OPTDESC = "optimizing descendant-or-self step(s)";
+  String OPTDESC = "simplifying descendant-or-self step(s)";
   /** Optimization info. */
   String OPTMERGE = "merging axis paths";
   /** Optimization info. */
@@ -649,7 +649,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTFORLET = "moving for/let clauses";
   /** Optimization info. */
-  String OPTSWAP = "operands swapped: %";
+  String OPTSWAP = "swapping operands: %";
   /** Optimization info. */
   String OPTTEXT = "adding text() step";
   /** Optimization info. */
@@ -665,7 +665,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTVAR = "removing variable %";
   /** Optimization info. */
-  String OPTPREF = "skipping namespace test for \"%\"";
+  String OPTPREF = "removing namespace test for \"%\"";
   /** Optimization info. */
   String OPTNAME = "removing unknown element/attribute %";
   /** Optimization info. */
