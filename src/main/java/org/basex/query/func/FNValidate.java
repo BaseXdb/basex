@@ -156,10 +156,7 @@ public class FNValidate extends StandardFunc {
     public void fatalError(final SAXParseException ex) throws SAXException {
       error(ex);
     }
-    @Override
-    public void warning(final SAXParseException ex) throws SAXException {
-      error(ex);
-    }
+
     @Override
     public void error(final SAXParseException ex) throws SAXException {
       // may be recursively called if external validator (e.g. Saxon) is used
