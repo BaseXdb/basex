@@ -396,7 +396,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the current user has admin permissions. If negative, an
+   * Checks if the current user has create permissions. If negative, an
    * exception is thrown.
    * @param ctx query context
    * @throws QueryException query exception
