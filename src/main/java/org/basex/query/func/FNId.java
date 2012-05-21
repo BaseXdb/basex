@@ -79,8 +79,8 @@ public final class FNId extends StandardFunc {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  private NodeCache id(final Iter it, final ANode node) throws QueryException {
-    final NodeCache nc = new NodeCache().check();
+  private NodeSeqBuilder id(final Iter it, final ANode node) throws QueryException {
+    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     add(ids(it), nc, checkRoot(node));
     return nc;
   }
@@ -93,7 +93,7 @@ public final class FNId extends StandardFunc {
    * @throws QueryException query exception
    */
   private Iter idref(final Iter it, final ANode node) throws QueryException {
-    final NodeCache nb = new NodeCache().check();
+    final NodeSeqBuilder nb = new NodeSeqBuilder().check();
     addRef(ids(it), nb, checkRoot(node));
     return nb;
   }
@@ -139,7 +139,7 @@ public final class FNId extends StandardFunc {
    * @param node node
    * @throws QueryException query exception
    */
-  private static void add(final byte[][] ids, final NodeCache nc,
+  private static void add(final byte[][] ids, final NodeSeqBuilder nc,
       final ANode node) throws QueryException {
 
     AxisIter ai = node.attributes();
@@ -163,8 +163,8 @@ public final class FNId extends StandardFunc {
    * @param node node
    * @throws QueryException query exception
    */
-  private static void addRef(final byte[][] ids, final NodeCache nc, final ANode node)
-      throws QueryException {
+  private static void addRef(final byte[][] ids, final NodeSeqBuilder nc,
+      final ANode node) throws QueryException {
 
     AxisIter ai = node.attributes();
     for(ANode at; (at = ai.next()) != null;) {

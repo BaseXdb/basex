@@ -247,12 +247,6 @@ public enum Err {
 
   /** FORX0001: Evaluation exception. */
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
-  /** FORX0002: Evaluation exception. */
-  REGINV(FORX, 2, "Invalid regular expression: '%'."),
-  /** FORX0002: Evaluation exception. */
-  REGESC(FORX, 2, "Invalid escape character: '\\%'."),
-  /** FORX0002: Evaluation exception. */
-  REGCC(FORX, 2, "Invalid character class: '\\%'."),
   /** FORX0003: Evaluation exception. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
   /** FORX0004: Evaluation exception. */
@@ -340,8 +334,6 @@ public enum Err {
   SERMAP(SEPM, 16, "Character map '%' is not defined."),
   /** SEPM0016: Serialization exception. */
   SERANY(SEPM, 16, "%."),
-  /** SEPM0017: Serialization exception. */
-  SEROPTION(SEPM, 17, "%."),
 
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),

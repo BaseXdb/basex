@@ -50,7 +50,7 @@ public final class ValueAccess extends IndexAccess {
       iter = tmp;
       iter[s] = index(it.string(info));
     }
-    return iter.length == 0 ? new NodeCache() : iter.length == 1 ? iter[0] :
+    return iter.length == 0 ? new NodeSeqBuilder() : iter.length == 1 ? iter[0] :
       new Union(info, expr).eval(iter);
   }
 

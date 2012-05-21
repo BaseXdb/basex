@@ -30,7 +30,7 @@ final class TreeSubtree {
    */
   void generateBorders(final Context ctx) {
     final Data d = ctx.data();
-    final int[] roots = ctx.current().list;
+    final int[] roots = ctx.current().pres;
     final int rl = roots.length;
     if(rl == 0) return;
     border = new TreeBorder[rl][];

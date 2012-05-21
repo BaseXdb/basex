@@ -9,8 +9,8 @@ import org.basex.query.item.*;
 import org.basex.util.*;
 
 /**
- * This class can be used to build new sequences. At the same time, it serves as an
- * iterator.
+ * This class can be used to build new sequences.
+ * At the same time, it serves as an iterator.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen

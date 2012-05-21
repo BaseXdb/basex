@@ -22,7 +22,8 @@ public final class ReplaceNode extends NodeCopy {
    * @param i input info
    * @param c node copy
    */
-  public ReplaceNode(final int p, final Data d, final InputInfo i, final NodeCache c) {
+  public ReplaceNode(final int p, final Data d, final InputInfo i,
+      final NodeSeqBuilder c) {
     super(PrimitiveType.REPLACENODE, p, d, i, c);
   }
 

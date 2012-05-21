@@ -50,14 +50,14 @@ public final class DataBuilder {
    * @param n node
    */
   public void build(final ANode n) {
-    build(new NodeCache(new ANode[] { n }, 1));
+    build(new NodeSeqBuilder(new ANode[] { n }, 1));
   }
 
   /**
    * Fills the data instance with the specified nodes.
    * @param nc node iterator
    */
-  public void build(final NodeCache nc) {
+  public void build(final NodeSeqBuilder nc) {
     int pre = 1;
     for(ANode n; (n = nc.next()) != null;) pre = addNode(n, pre, 0, null);
   }

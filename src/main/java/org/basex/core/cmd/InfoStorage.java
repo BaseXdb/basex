@@ -44,7 +44,7 @@ public final class InfoStorage extends AQuery {
     final Data data = context.data();
     if(result != null) {
       final Table table = th();
-      for(final int n : ((Nodes) result).list) table(table, data, n);
+      for(final int n : ((Nodes) result).pres) table(table, data, n);
       out.print(table.finish());
       result = null;
     } else {

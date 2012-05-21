@@ -113,7 +113,7 @@ public final class Thesaurus {
       final Data data = MemBuilder.build(Parser.xmlParser(file, ctx.prop));
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); ++n) {
-        build(new Nodes(result.list[n], data));
+        build(new Nodes(result.pres[n], data));
       }
     } catch(final IOException ex) {
       NOTHES.thrw(ii, file);
@@ -131,7 +131,7 @@ public final class Thesaurus {
 
     final ThesNode node = node(text("*:term", in));
     for(int n = 0; n < sub.size(); ++n) {
-      final Nodes tmp = new Nodes(sub.list[n], sub.data);
+      final Nodes tmp = new Nodes(sub.pres[n], sub.data);
       final ThesNode snode = node(text("*:term", tmp));
       final byte[] rs = text("*:relationship", tmp);
       node.add(snode, rs);

@@ -16,7 +16,7 @@ import org.w3c.dom.*;
  */
 public final class FDoc extends FNode {
   /** Child nodes. */
-  private final NodeCache children;
+  private final NodeSeqBuilder children;
   /** Base URI. */
   private final byte[] base;
 
@@ -25,7 +25,7 @@ public final class FDoc extends FNode {
    * @param b base uri
    */
   public FDoc(final byte[] b) {
-    this(new NodeCache(), b);
+    this(new NodeSeqBuilder(), b);
   }
 
   /**
@@ -33,7 +33,7 @@ public final class FDoc extends FNode {
    * @param ch children
    * @param b base uri
    */
-  public FDoc(final NodeCache ch, final byte[] b) {
+  public FDoc(final NodeSeqBuilder ch, final byte[] b) {
     super(NodeType.DOC);
     children = ch;
     base = b;

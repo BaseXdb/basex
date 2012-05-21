@@ -7,8 +7,8 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
+import org.basex.core.cmd.Set;
 import org.basex.io.out.*;
-import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.ft.*;
@@ -205,27 +205,22 @@ public final class IndexOptimizeTest extends SandboxTest {
   private static void check(final String query, final String result) {
     // compile query
     String plan = null;
-    QueryProcessor qp = new QueryProcessor(query, context);
+    final QueryProcessor qp = new QueryProcessor(query, context);
     try {
-      ArrayOutput ao = new ArrayOutput();
-      Serializer ser = qp.getSerializer(ao);
-      qp.execute().serialize(ser);
-      qp.close();
+      ArrayOutput ao = qp.execute().serialize();
       final String info = qp.info();
+      qp.close();
       if(result != null)
         assertEquals(result, ao.toString().replaceAll("\\r?\\n", ""));
 
       // fetch query plan
       plan = qp.plan().serialize().toString();
 
-      qp = new QueryProcessor(plan + "/descendant-or-self::*" +
+      // check if index is used
+      ao = new QueryProcessor(plan + "/descendant-or-self::*" +
           "[self::" + Util.name(ValueAccess.class) +
-          "|self::" + Util.name(FTIndexAccess.class) + "]", context);
-      ao = new ArrayOutput();
-      ser = qp.getSerializer(ao);
-      qp.execute().serialize(ser);
-
-      // check if IndexAccess is used
+          "|self::" + Util.name(FTIndexAccess.class) + "]",
+          context).execute().serialize();
       assertTrue("No index used:\nQuery: " + query + "\nInfo: " + info +
           "\nPlan: " + plan, !ao.toString().isEmpty());
     } catch(final QueryException ex) {

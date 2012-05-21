@@ -38,7 +38,7 @@ abstract class Update extends Arr {
    * @throws QueryException query exception
    * @return specified node list
    */
-  final NodeCache checkNS(final NodeCache list, final ANode targ,
+  final NodeSeqBuilder checkNS(final NodeSeqBuilder list, final ANode targ,
       final QueryContext ctx) throws QueryException {
 
     for(int a = 0; a < list.size(); ++a) {

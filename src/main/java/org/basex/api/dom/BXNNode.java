@@ -15,7 +15,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
    * Constructor.
    * @param nb nodes
    */
-  public BXNNode(final NodeCache nb) {
+  public BXNNode(final NodeSeqBuilder nb) {
     super(nb);
   }
 

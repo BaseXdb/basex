@@ -28,14 +28,14 @@ public final class InterSect extends Set {
   }
 
   @Override
-  protected NodeCache eval(final Iter[] iter) throws QueryException {
-    NodeCache nc = new NodeCache();
+  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
+    NodeSeqBuilder nc = new NodeSeqBuilder();
 
     for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
     final boolean db = nc.dbnodes();
 
     for(int e = 1; e != expr.length && nc.size() != 0; ++e) {
-      final NodeCache nt = new NodeCache().check();
+      final NodeSeqBuilder nt = new NodeSeqBuilder().check();
       final Iter ir = iter[e];
       for(Item it; (it = ir.next()) != null;) {
         final ANode n = checkNode(it);

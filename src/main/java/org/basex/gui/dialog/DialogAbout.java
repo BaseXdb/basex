@@ -37,7 +37,7 @@ public final class DialogAbout extends BaseXDialog {
 
     p.add(label, BorderLayout.WEST);
 
-    final BaseXBack pp = new BaseXBack(Fill.NONE).layout(new TableLayout(16, 1));
+    final BaseXBack pp = new BaseXBack(Fill.NONE).layout(new TableLayout(17, 1));
 
     pp.add(new BaseXLabel(TITLE, false, true));
     final BaseXLabel url = new BaseXLabel("<html><u>" + URL + "</u></html>");
@@ -59,7 +59,7 @@ public final class DialogAbout extends BaseXDialog {
     pp.add(Box.createVerticalStrut(7));
     pp.add(new BaseXLabel(TEAM1));
     pp.add(new BaseXLabel(TEAM2));
-    //pp.add(new BaseXLabel(TEAM3));
+    pp.add(new BaseXLabel(AND_OTHERS));
     pp.add(Box.createVerticalStrut(7));
     final String lang = main.context.mprop.get(MainProp.LANG);
     pp.add(new BaseXLabel(TRANSLATION + " (" + lang + "): " + DialogPrefs.creds(lang)));

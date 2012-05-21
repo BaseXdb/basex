@@ -112,16 +112,6 @@ public final class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Returns the number of disjunct tokens.
-   * @return number of tokens
-   */
-  int nrTokens() {
-    int l = 0;
-    for(final FTIndexTree t : tree.trees) if(t != null) l += t.size();
-    return l;
-  }
-
-  /**
    * Writes the index data to disk.
    * @throws IOException I/O exception
    */

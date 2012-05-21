@@ -257,7 +257,7 @@ public abstract class BXNode implements Node {
    * @return nodes
    */
   final BXNList getElements(final String tag) {
-    final NodeCache nb = new NodeCache();
+    final NodeSeqBuilder nb = new NodeSeqBuilder();
     final AxisIter ai = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
     for(ANode n; (n = ai.next()) != null;) {
@@ -271,8 +271,8 @@ public abstract class BXNode implements Node {
    * @param ai axis iterator
    * @return node cache
    */
-  static NodeCache finish(final AxisIter ai) {
-    final NodeCache nc = new NodeCache();
+  static NodeSeqBuilder finish(final AxisIter ai) {
+    final NodeSeqBuilder nc = new NodeSeqBuilder();
     for(ANode n; (n = ai.next()) != null;) nc.add(n.finish());
     return nc;
   }

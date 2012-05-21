@@ -140,7 +140,7 @@ public final class MapView extends View implements Runnable {
     final int hist = gui.notify.hist;
     final boolean page = !more && rectHist[hist + 1] != null &&
       rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
-      focused == null || context.list[0] != focused.pre);
+      focused == null || context.pres[0] != focused.pre);
     if(page) focused = new MapRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
@@ -281,7 +281,7 @@ public final class MapView extends View implements Runnable {
 
     initLen();
     layout = new MapLayout(nodes.data, textLen, gui.gprop);
-    layout.makeMap(rect, new MapList(nodes.list.clone()), 0, (int) nodes.size() - 1);
+    layout.makeMap(rect, new MapList(nodes.pres.clone()), 0, (int) nodes.size() - 1);
     // rectangles are copied to avoid synchronization issues
     mainRects = layout.rectangles.copy();
 

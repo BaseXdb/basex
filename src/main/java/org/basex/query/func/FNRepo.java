@@ -70,7 +70,7 @@ public final class FNRepo extends StandardFunc {
    * @return iterator
    */
   private static Iter list(final QueryContext ctx) {
-    final NodeCache cache = new NodeCache();
+    final NodeSeqBuilder cache = new NodeSeqBuilder();
     for(final byte[] p : ctx.context.repo.pkgDict()) {
       if(p == null) continue;
       final FElem elem = new FElem(PACKAGE);

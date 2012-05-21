@@ -18,7 +18,7 @@ import org.basex.util.*;
  */
 public abstract class NodeCopy extends StructuralUpdate {
   /** Nodes to be inserted. */
-  ArrayList<NodeCache> insert = new ArrayList<NodeCache>(1);
+  ArrayList<NodeSeqBuilder> insert = new ArrayList<NodeSeqBuilder>(1);
   /** Final copy of insertion nodes. */
   MemData md;
   /** Number of insert operations (initialized by {@link #prepare}). */
@@ -33,7 +33,7 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @param nc node copy
    */
   NodeCopy(final PrimitiveType t, final int p, final Data d, final InputInfo i,
-      final NodeCache nc) {
+      final NodeSeqBuilder nc) {
     super(t, p, d, i);
     insert.add(nc);
   }
@@ -47,9 +47,9 @@ public abstract class NodeCopy extends StructuralUpdate {
   public void prepare() throws QueryException {
     // build main memory representation of nodes to be copied
     md = new MemData(data);
-    final NodeCache seq = new NodeCache();
+    final NodeSeqBuilder seq = new NodeSeqBuilder();
     for(int i = 0; i < insert.size(); i++) {
-      final NodeCache nc = insert.get(i);
+      final NodeSeqBuilder nc = insert.get(i);
       for(ANode n; (n = nc.next()) != null;) {
         seq.add(n);
         size++;
@@ -85,8 +85,8 @@ public abstract class NodeCopy extends StructuralUpdate {
    * @param n iterator
    * @return iterator with merged text nodes
    */
-  private static NodeCache mergeNodeCacheText(final NodeCache n) {
-    final NodeCache s = new NodeCache();
+  private static NodeSeqBuilder mergeNodeCacheText(final NodeSeqBuilder n) {
+    final NodeSeqBuilder s = new NodeSeqBuilder();
     ANode i = n.next();
     while(i != null) {
       if(i.type == NodeType.TXT) {

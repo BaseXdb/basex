@@ -29,7 +29,7 @@ final class TreeRects implements TreeConstants {
    */
   double generateRects(final TreeSubtree sub, final Graphics g,
       final Context c, final int ds, final int dw, final boolean slim) {
-    final int[] roots = c.current().list;
+    final int[] roots = c.current().pres;
     final int rl = roots.length;
     if(rl == 0) return 0;
     final double w = (dw - BORDER_PADDING - ds) / (double) rl;
@@ -158,7 +158,7 @@ final class TreeRects implements TreeConstants {
    */
   static byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data();
-    if(pre == c.current().list[rn]) return ViewData.path(d, pre);
+    if(pre == c.current().pres[rn]) return ViewData.path(d, pre);
     return ViewData.content(d, pre, false);
   }
 

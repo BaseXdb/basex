@@ -24,7 +24,7 @@ public final class InsertBefore extends InsertBase {
    * @param c node copy
    */
   public InsertBefore(final int p, final Data d, final InputInfo i,
-      final NodeCache c) {
+      final NodeSeqBuilder c) {
     super(PrimitiveType.INSERTBEFORE, p, d, i, c);
     par = d.parent(p, d.kind(p));
   }

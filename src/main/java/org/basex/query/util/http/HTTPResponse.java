@@ -55,8 +55,8 @@ public final class HTTPResponse {
   public ValueIter getResponse(final HttpURLConnection conn, final byte[] status,
       final byte[] mediaTypeOvr) throws IOException, QueryException {
 
-    final NodeCache attrs = extractAttrs(conn);
-    final NodeCache hdrs = extractHdrs(conn);
+    final NodeSeqBuilder attrs = extractAttrs(conn);
+    final NodeSeqBuilder hdrs = extractHdrs(conn);
     final String cType = mediaTypeOvr == null ?
         extractContentType(conn.getContentType()) : string(mediaTypeOvr);
     final ValueBuilder payloads = new ValueBuilder();
@@ -66,7 +66,7 @@ public final class HTTPResponse {
     // multipart response
     if(cType.startsWith(MULTIPART)) {
       final byte[] boundary = extractBoundary(conn.getContentType());
-      final NodeCache a = new NodeCache();
+      final NodeSeqBuilder a = new NodeSeqBuilder();
       a.add(new FAttr(Q_MEDIA_TYPE, token(cType)));
       a.add(new FAttr(Q_BOUNDARY, boundary));
       body = new FElem(HTTP_MULTIPART, extractParts(conn.getInputStream(), s,
@@ -97,8 +97,10 @@ public final class HTTPResponse {
    * @return node cache with attributes
    * @throws IOException I/O Exception
    */
-  private static NodeCache extractAttrs(final HttpURLConnection conn) throws IOException {
-    final NodeCache a = new NodeCache();
+  private static NodeSeqBuilder extractAttrs(final HttpURLConnection conn)
+      throws IOException {
+
+    final NodeSeqBuilder a = new NodeSeqBuilder();
     a.add(new FAttr(Q_STATUS, token(conn.getResponseCode())));
     a.add(new FAttr(Q_MESSAGE, token(conn.getResponseMessage())));
     return a;
@@ -110,8 +112,8 @@ public final class HTTPResponse {
    * @param conn HTTP connection
    * @return node cache with http:header elements
    */
-  private static NodeCache extractHdrs(final HttpURLConnection conn) {
-    final NodeCache h = new NodeCache();
+  private static NodeSeqBuilder extractHdrs(final HttpURLConnection conn) {
+    final NodeSeqBuilder h = new NodeSeqBuilder();
     for(final String headerName : conn.getHeaderFields().keySet()) {
       if(headerName != null) {
         final FElem hdr = new FElem(HTTP_HEADER, new Atts(HTTP, HTTPURI));
@@ -191,7 +193,7 @@ public final class HTTPResponse {
    * @throws IOException I/O Exception
    * @throws QueryException query exception
    */
-  private NodeCache extractParts(final InputStream io, final boolean status,
+  private NodeSeqBuilder extractParts(final InputStream io, final boolean status,
       final ValueBuilder payloads, final byte[] sep) throws IOException, QueryException {
 
     try {
@@ -204,7 +206,7 @@ public final class HTTPResponse {
 
       final byte[] end = concat(sep, token("--"));
       FElem nextPart = extractNextPart(io, status, payloads, sep, end);
-      final NodeCache p = new NodeCache();
+      final NodeSeqBuilder p = new NodeSeqBuilder();
       while(nextPart != null) {
         p.add(nextPart);
         nextPart = extractNextPart(io, status, payloads, sep, end);

@@ -163,7 +163,7 @@ final class TableData {
    */
   private void createRows() {
     final Data data = context.data();
-    final int[] n = context.current().list;
+    final int[] n = context.current().pres;
 
     rows = new IntList();
     for(int p : n) {

@@ -15,9 +15,9 @@ import org.basex.util.*;
  */
 public final class Constr {
   /** Node array. */
-  public final NodeCache children = new NodeCache();
+  public final NodeSeqBuilder children = new NodeSeqBuilder();
   /** Attribute array. */
-  public final NodeCache atts = new NodeCache();
+  public final NodeSeqBuilder atts = new NodeSeqBuilder();
   /** Namespace array. */
   public final Atts nspaces = new Atts();
   /** Error: attribute position. */

@@ -735,17 +735,6 @@ public final class Token {
   }
 
   /**
-   * Calculates the difference of two characters.
-   * @param char1 first character
-   * @param char2 character to be compared
-   * @return 0 if characters are equal, negative if first token is smaller,
-   *   positive if first character is bigger
-   */
-  public static int diff(final byte char1, final byte char2) {
-    return (char1 & 0xFF) - (char2 & 0xFF);
-  }
-
-  /**
    * Checks if the first token contains the second token.
    * @param token token
    * @param sub token to be found

@@ -20,7 +20,7 @@ public final class InsertInto extends InsertBase {
    * @param l insert into as last
    */
   public InsertInto(final int p, final Data d, final InputInfo i,
-      final NodeCache nc, final boolean l) {
+      final NodeSeqBuilder nc, final boolean l) {
     super(l ? PrimitiveType.INSERTINTOLAST :
       PrimitiveType.INSERTINTO, p, d, i, nc);
   }

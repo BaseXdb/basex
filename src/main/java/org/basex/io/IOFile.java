@@ -203,17 +203,18 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Writes the specified input.
+   * Writes the specified input. The specified stream is eventually closed.
    * @param in input stream
    * @throws IOException I/O exception
    */
   public void write(final InputStream in) throws IOException {
-    final BufferOutput out = new BufferOutput(path);
+    BufferOutput out = null;
     try {
+      out = new BufferOutput(path);
       for(int i; (i = in.read()) != -1;) out.write(i);
     } finally {
       try { in.close(); } catch(final IOException ex) { }
-      out.close();
+      if(out != null) out.close();
     }
   }
 

@@ -183,7 +183,7 @@ public enum GUICommands implements GUICommand {
   C_COPYPATH(COPY_PATH, "% shift C", H_CPPATH, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final int pre = gui.context.marked.list[0];
+      final int pre = gui.context.marked.pres[0];
       final byte[] txt = ViewData.path(gui.context.data(), pre);
       // copy path to clipboard
       final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -204,7 +204,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
       final Nodes n = ctx.marked;
-      ctx.copied = new Nodes(n.list, n.data);
+      ctx.copied = new Nodes(n.pres, n.data);
     }
 
     @Override
@@ -296,7 +296,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked;
-      final DialogEdit edit = new DialogEdit(gui, n.list[0]);
+      final DialogEdit edit = new DialogEdit(gui, n.pres[0]);
       if(!edit.ok()) return;
 
       String rename = null;
@@ -715,7 +715,7 @@ public enum GUICommands implements GUICommand {
       // check if all nodes are document nodes
       boolean doc = true;
       final Data data = ctx.data();
-      for(final int pre : ctx.current().list) doc &= data.kind(pre) == Data.DOC;
+      for(final int pre : ctx.current().pres) doc &= data.kind(pre) == Data.DOC;
       if(doc) {
         // if yes, jump to database root
         ctx.update();
@@ -816,7 +816,7 @@ public enum GUICommands implements GUICommand {
     if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1))
       return false;
 
-    final int k = n.data.kind(n.list[0]);
+    final int k = n.data.kind(n.pres[0]);
     for(final int i : no) if(k == i) return false;
     return true;
   }
@@ -838,6 +838,6 @@ public enum GUICommands implements GUICommand {
    */
   static String openPre(final Nodes n, final int i) {
     return Function._DB_OPEN_PRE.get(Str.get(n.data.meta.name),
-        Int.get(n.list[i])).toString();
+        Int.get(n.pres[i])).toString();
   }
 }

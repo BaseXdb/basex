@@ -97,7 +97,7 @@ public final class MixedPath extends Path {
 
         if(nodes && path) {
           // remove potential duplicates from node sets
-          final NodeCache nc = new NodeCache().check();
+          final NodeSeqBuilder nc = new NodeSeqBuilder().check();
           for(Item it; (it = vb.next()) != null;) nc.add((ANode) it);
           res = nc.value().cache();
         } else {

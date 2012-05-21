@@ -26,7 +26,7 @@ public final class Nodes implements Result {
   /** Root node. */
   public Data data;
   /** Pre values container. */
-  public int[] list;
+  public int[] pres;
   /** Sorted pre values. */
   public int[] sorted;
 
@@ -76,22 +76,22 @@ public final class Nodes implements Result {
    * @param n node set
    */
   public Nodes(final int[] n) {
-    list = n;
+    pres = n;
     ftpos = null;
   }
 
   @Override
   public long size() {
-    return list.length;
+    return pres.length;
   }
 
   @Override
   public boolean sameAs(final Result r) {
-    final int s = list.length;
+    final int s = pres.length;
     if(!(r instanceof Nodes) || r.size() != s) return false;
     final Nodes n = (Nodes) r;
     if(data != n.data) return false;
-    for(int c = 0; c < s; ++c) if(n.list[c] != list[c]) return false;
+    for(int c = 0; c < s; ++c) if(n.pres[c] != pres[c]) return false;
     return ftpos == null || ftpos.sameAs(n.ftpos);
   }
 
@@ -102,12 +102,12 @@ public final class Nodes implements Result {
    */
   public Nodes checkRoot() {
     final IntList docs = data.resources.docs();
-    if(list.length != docs.size()) {
+    if(pres.length != docs.size()) {
       root = false;
     } else {
       int c = -1;
-      while(++c < list.length && list[c] == docs.get(c));
-      root = c == list.length;
+      while(++c < pres.length && pres[c] == docs.get(c));
+      root = c == pres.length;
     }
     return this;
   }
@@ -138,7 +138,7 @@ public final class Nodes implements Result {
    */
   public void toggle(final int p) {
     final int[] n = new int[] { p };
-    set(contains(p) ? except(list, n) : union(list, n));
+    set(contains(p) ? except(pres, n) : union(pres, n));
   }
 
   /**
@@ -146,7 +146,7 @@ public final class Nodes implements Result {
    * @param p pre value
    */
   public void union(final int[] p) {
-    set(union(list, p));
+    set(union(pres, p));
   }
 
   /**
@@ -196,7 +196,7 @@ public final class Nodes implements Result {
    * @param n values
    */
   private void set(final int[] n) {
-    list = n;
+    pres = n;
     sorted = null;
   }
 
@@ -207,25 +207,25 @@ public final class Nodes implements Result {
   private void sort() {
     if(sorted != null) return;
     int i = Integer.MIN_VALUE;
-    for(final int n : list) {
+    for(final int n : pres) {
       if(i > n) {
-        sorted = Arrays.copyOf(list, list.length);
+        sorted = Arrays.copyOf(pres, pres.length);
         Arrays.sort(sorted);
         return;
       }
       i = n;
     }
-    sorted = list;
+    sorted = pres;
   }
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < list.length && !ser.finished(); ++c) serialize(ser, c);
+    for(int c = 0; c < pres.length && !ser.finished(); ++c) serialize(ser, c);
   }
 
   @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
-    ser.serialize(new FTPosNode(data, list[n], ftpos));
+    ser.serialize(new FTPosNode(data, pres[n], ftpos));
   }
 
   @Override

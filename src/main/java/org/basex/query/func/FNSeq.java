@@ -66,7 +66,7 @@ public final class FNSeq extends StandardFunc {
    */
   private Iter most(final QueryContext ctx, final boolean outer) throws QueryException {
     final Iter iter = expr[0].iter(ctx);
-    final NodeCache nc = new NodeCache().check();
+    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
     for(Item it; (it = iter.next()) != null;) nc.add(checkNode(it));
     final int len = (int) nc.size();
 
@@ -85,7 +85,7 @@ public final class FNSeq extends StandardFunc {
         // skip the subtree of the last added node
         nc.size(0);
         final DBNode dummy = new DBNode(fst.data);
-        final NodeCache src = new NodeCache(nodes, len);
+        final NodeSeqBuilder src = new NodeSeqBuilder(nodes, len);
         for(int next = 0, p; next < len; next = p < 0 ? -p - 1 : p) {
           final DBNode nd = (DBNode) nodes[next];
           dummy.pre = nd.pre + data.size(nd.pre, data.kind(nd.pre));
@@ -113,7 +113,7 @@ public final class FNSeq extends StandardFunc {
     }
 
     // multiple documents and/or constructed fragments
-    final NodeCache out = new NodeCache(new ANode[len], 0);
+    final NodeSeqBuilder out = new NodeSeqBuilder(new ANode[len], 0);
     OUTER: for(int i = 0; i < len; i++) {
       final ANode nd = nc.item[i];
       final AxisIter ax = outer ? nd.ancestor() : nd.descendant();

@@ -19,9 +19,9 @@ public final class FElem extends FNode {
   private final QNm name;
 
   /** Child nodes. */
-  private NodeCache children;
+  private NodeSeqBuilder children;
   /** Attributes. */
-  private NodeCache atts;
+  private NodeSeqBuilder atts;
   /** Namespaces. */
   private Atts ns;
 
@@ -66,7 +66,8 @@ public final class FElem extends FNode {
    * @param at attributes; can be {@code null}
    * @param nsp namespaces; can be {@code null}
    */
-  public FElem(final QNm nm, final NodeCache ch, final NodeCache at, final Atts nsp) {
+  public FElem(final QNm nm, final NodeSeqBuilder ch, final NodeSeqBuilder at,
+      final Atts nsp) {
     super(NodeType.ELM);
     name = nm;
     children = ch;
@@ -202,12 +203,12 @@ public final class FElem extends FNode {
    * @return self reference
    */
   public FElem add(final ANode node) {
-    final NodeCache nc;
+    final NodeSeqBuilder nc;
     if(node.type == NodeType.ATT) {
-      if(atts == null) atts = new NodeCache();
+      if(atts == null) atts = new NodeSeqBuilder();
       nc = atts;
     } else {
-      if(children == null) children = new NodeCache();
+      if(children == null) children = new NodeSeqBuilder();
       nc = children;
     }
     nc.add(node);
@@ -222,7 +223,7 @@ public final class FElem extends FNode {
    */
   public FElem add(final byte[] text) {
     if(text.length != 0) {
-      if(children == null) children = new NodeCache();
+      if(children == null) children = new NodeSeqBuilder();
       final FTxt txt = new FTxt(text);
       children.add(txt);
       txt.parent(this);

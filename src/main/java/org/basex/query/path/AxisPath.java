@@ -26,7 +26,7 @@ public class AxisPath extends Path {
   /** Flag for result caching. */
   private boolean cache;
   /** Cached result. */
-  private NodeCache citer;
+  private NodeSeqBuilder citer;
   /** Last visited item. */
   private Value lvalue;
 
@@ -275,7 +275,7 @@ public class AxisPath extends Path {
       if(!cache || citer == null || lvalue != r && !(r instanceof ANode &&
           lvalue instanceof ANode && ((ANode) lvalue).is((ANode) r))) {
         lvalue = r;
-        citer = new NodeCache().check();
+        citer = new NodeSeqBuilder().check();
         if(r != null) {
           final Iter ir = ctx.iter(r);
           for(Item it; (it = ir.next()) != null;) {
@@ -305,7 +305,7 @@ public class AxisPath extends Path {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  private void iter(final int l, final NodeCache nc, final QueryContext ctx)
+  private void iter(final int l, final NodeSeqBuilder nc, final QueryContext ctx)
       throws QueryException {
 
     // cast is safe (steps will always return a {@link NodIter} instance

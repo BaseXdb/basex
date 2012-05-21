@@ -26,7 +26,7 @@ public interface Result {
   boolean sameAs(Result r);
 
   /**
-   * Serializes the result, using the standard XML serializer,
+   * Serializes the result, using the standard serializer,
    * and returns the cached result.
    * @return serialized value
    * @throws IOException I/O exception
@@ -43,7 +43,7 @@ public interface Result {
   /**
    * Serializes the specified result.
    * @param ser serializer
-   * @param n results offset to serialize
+   * @param n offset of result to serialize
    * @throws IOException I/O exception
    */
   void serialize(Serializer ser, int n) throws IOException;

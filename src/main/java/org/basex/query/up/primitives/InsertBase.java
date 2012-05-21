@@ -20,7 +20,7 @@ abstract class InsertBase extends NodeCopy {
    * @param nc node copy
    */
   InsertBase(final PrimitiveType t, final int p, final Data d,
-             final InputInfo i, final NodeCache nc) {
+             final InputInfo i, final NodeSeqBuilder nc) {
     super(t, p, d, i, nc);
   }
 

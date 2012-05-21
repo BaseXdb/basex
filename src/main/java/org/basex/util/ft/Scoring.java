@@ -82,26 +82,6 @@ public final class Scoring {
   }
 
   /**
-   * Returns the scoring value for a phrase.
-   * @param w1 score of word1
-   * @param w2 score of word2
-   * @return score of the phrase
-   */
-  public static double intersect(final double w1, final double w2) {
-    return (w1 + w2) / 2;
-  }
-
-  /**
-   * Returns the union value.
-   * @param w1 score of word1
-   * @param w2 score of word2
-   * @return score of the phrase
-   */
-  public static double union(final double w1, final double w2) {
-    return max(w1, w2);
-  }
-
-  /**
    * Returns a score for a single step.
    * @param sc current score value
    * @return new score value

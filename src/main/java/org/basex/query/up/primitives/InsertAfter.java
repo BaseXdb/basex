@@ -19,7 +19,7 @@ public final class InsertAfter extends InsertBase {
    * @param c insert copy
    */
   public InsertAfter(final int p, final Data d, final InputInfo i,
-      final NodeCache c) {
+      final NodeSeqBuilder c) {
     super(PrimitiveType.INSERTAFTER, p, d, i, c);
   }
 

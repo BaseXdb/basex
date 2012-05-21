@@ -39,8 +39,8 @@ public final class Except extends Set {
   }
 
   @Override
-  protected NodeCache eval(final Iter[] iter) throws QueryException {
-    final NodeCache nc = new NodeCache().check();
+  protected NodeSeqBuilder eval(final Iter[] iter) throws QueryException {
+    final NodeSeqBuilder nc = new NodeSeqBuilder().check();
 
     for(Item it; (it = iter[0].next()) != null;) nc.add(checkNode(it));
     final boolean db = nc.dbnodes();

@@ -53,7 +53,7 @@ abstract class Set extends Arr {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  protected abstract NodeCache eval(final Iter[] iter) throws QueryException;
+  protected abstract NodeSeqBuilder eval(final Iter[] iter) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.

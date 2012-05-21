@@ -19,7 +19,7 @@ public final class InsertIntoFirst extends InsertBase {
    * @param c node copy
    */
   public InsertIntoFirst(final int p, final Data d, final InputInfo i,
-      final NodeCache c) {
+      final NodeSeqBuilder c) {
     super(PrimitiveType.INSERTINTOFIRST, p, d, i, c);
   }
 

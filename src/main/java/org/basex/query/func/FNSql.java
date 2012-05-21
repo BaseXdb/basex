@@ -213,7 +213,7 @@ public final class FNSql extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private NodeCache executeQuery(final Connection conn, final QueryContext ctx)
+  private NodeSeqBuilder executeQuery(final Connection conn, final QueryContext ctx)
       throws QueryException {
 
     final String query = string(checkStr(ctx.iter(expr[1]).next(), ctx));
@@ -221,7 +221,7 @@ public final class FNSql extends StandardFunc {
     try {
       stmt = conn.createStatement();
       final boolean result = stmt.execute(query);
-      return result ? buildResult(stmt.getResultSet()) : new NodeCache();
+      return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(info, ex.getMessage());
     } finally {
@@ -236,7 +236,7 @@ public final class FNSql extends StandardFunc {
    * @return result
    * @throws QueryException query exception
    */
-  private NodeCache executePrepStmt(final PreparedStatement stmt,
+  private NodeSeqBuilder executePrepStmt(final PreparedStatement stmt,
       final QueryContext ctx) throws QueryException {
     // Get parameters for prepared statement
     final ANode params = (ANode) checkType(expr[1].item(ctx, info), NodeType.ELM);
@@ -247,7 +247,7 @@ public final class FNSql extends StandardFunc {
       if(placeCount != countParams(params)) PARAMS.thrw(info);
       else setParameters(params.children(), stmt);
       final boolean result = stmt.execute();
-      return result ? buildResult(stmt.getResultSet()) : new NodeCache();
+      return result ? buildResult(stmt.getResultSet()) : new NodeSeqBuilder();
     } catch(final SQLException ex) {
       throw SQLEXC.thrw(info, ex.getMessage());
     }
@@ -355,13 +355,13 @@ public final class FNSql extends StandardFunc {
    *         the result set
    * @throws QueryException query exception
    */
-  private NodeCache buildResult(final ResultSet rs) throws QueryException {
+  private NodeSeqBuilder buildResult(final ResultSet rs) throws QueryException {
     try {
       final ResultSetMetaData metadata = rs.getMetaData();
       final int columnCount = metadata.getColumnCount();
-      final NodeCache rows = new NodeCache();
+      final NodeSeqBuilder rows = new NodeSeqBuilder();
       while(rs.next()) {
-        final NodeCache columns = new NodeCache();
+        final NodeSeqBuilder columns = new NodeSeqBuilder();
         for(int k = 1; k <= columnCount; k++) {
           // For each row add column values as children
           final String label = metadata.getColumnLabel(k);
@@ -370,11 +370,11 @@ public final class FNSql extends StandardFunc {
           if(value != null) {
             // Column name
             final FAttr columnName = new FAttr(Q_NAME, token(label));
-            final NodeCache attr = new NodeCache();
+            final NodeSeqBuilder attr = new NodeSeqBuilder();
             attr.add(columnName);
             // Column value
             final FTxt columnValue = new FTxt(token(value.toString()));
-            final NodeCache ch = new NodeCache();
+            final NodeSeqBuilder ch = new NodeSeqBuilder();
             ch.add(columnValue);
             // Element <sql:column name='...'>...</sql:column>
             columns.add(new FElem(Q_COLUMN, ch, attr, NS_SQL));

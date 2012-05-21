@@ -81,7 +81,7 @@ final class TableContent extends BaseXBack {
       posY += rowH;
 
       final int pre = tdata.rows.get(l);
-      while(mpos < marked.size() && marked.list[mpos] < pre) ++mpos;
+      while(mpos < marked.size() && marked.pres[mpos] < pre) ++mpos;
 
       // draw line
       g.setColor(GUIConstants.color2);
@@ -90,7 +90,7 @@ final class TableContent extends BaseXBack {
       g.drawLine(0, posY + rowH, w, posY + rowH);
 
       // verify if current node is marked or focused
-      final boolean rm = mpos < marked.size() && marked.list[mpos] == pre;
+      final boolean rm = mpos < marked.size() && marked.pres[mpos] == pre;
       final boolean rf = pre == rfocus;
       final int col = rm ? rf ? 5 : 4 : 3;
       if(rm || rf) {

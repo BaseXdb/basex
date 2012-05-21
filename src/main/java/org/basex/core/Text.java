@@ -592,8 +592,6 @@ public interface Text {
   String LI_ENTRIES = LI + "Entries: ";
 
   /** Index info. */
-  String TRIE = "Trie";
-  /** Index info. */
   String HASH = "Hash";
   /** Index info. */
   String FUZZY = "Fuzzy";
@@ -1234,7 +1232,7 @@ public interface Text {
   /** Contributors info. */
   String TEAM1 = lang("team") + ": Alexander Holupirek, Michael Seiferle,";
   /** Developer names. */
-  String TEAM2 = "Dimitar Popov, Leo W\u00F6rteler, Lukas Kircher";
+  String TEAM2 = "Leo W\u00F6rteler, Lukas Kircher, Dimitar Popov";
   /** Developer names. */
   String AND_OTHERS = lang("and_others");
   /** Translation. */

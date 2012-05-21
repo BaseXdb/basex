@@ -93,7 +93,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public BXNList getChildNodes() {
-    final NodeCache nb = new NodeCache();
+    final NodeSeqBuilder nb = new NodeSeqBuilder();
     nb.add(text());
     return new BXNList(nb);
   }

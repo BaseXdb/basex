@@ -160,7 +160,7 @@ public final class TreeView extends View implements TreeConstants {
     super.paintComponent(g);
     gui.painting = true;
 
-    roots = gui.context.current().list;
+    roots = gui.context.current().pres;
     if(roots.length == 0) return;
 
     for(int i = 0; !showAtts && i < roots.length; ++i) {
@@ -551,7 +551,7 @@ public final class TreeView extends View implements TreeConstants {
     smooth(mg);
     mg.setFont(font);
 
-    final int[] mark = gui.context.marked.list;
+    final int[] mark = gui.context.marked.pres;
     if(mark.length == 0) return;
 
     int rn = 0;

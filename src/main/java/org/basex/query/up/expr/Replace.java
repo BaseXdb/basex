@@ -51,8 +51,8 @@ public final class Replace extends Update {
     final DBNode dbn = ctx.updates.determineDataRef(targ, ctx);
 
     // replace node
-    final NodeCache aList = c.atts;
-    NodeCache list = c.children;
+    final NodeSeqBuilder aList = c.atts;
+    NodeSeqBuilder list = c.children;
     if(value) {
       // replace value of node
       final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).string();

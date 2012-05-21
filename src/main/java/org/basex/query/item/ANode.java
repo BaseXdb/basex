@@ -288,17 +288,17 @@ public abstract class ANode extends Item {
   public final AxisIter preceding() {
     return new AxisIter() {
       /** Iterator. */
-      private NodeCache nc;
+      private NodeSeqBuilder nc;
 
       @Override
       public ANode next() {
         if(nc == null) {
-          nc = new NodeCache();
+          nc = new NodeSeqBuilder();
           ANode n = ANode.this;
           ANode p = n.parent();
           while(p != null) {
             if(n.type != NodeType.ATT) {
-              final NodeCache tmp = new NodeCache();
+              final NodeSeqBuilder tmp = new NodeSeqBuilder();
               final AxisIter ai = p.children();
               for(ANode c; (c = ai.next()) != null && !c.is(n);) {
                 tmp.add(c.finish());
@@ -322,7 +322,7 @@ public abstract class ANode extends Item {
   public final AxisIter precedingSibling() {
     return new AxisIter() {
       /** Child nodes. */
-      private NodeCache nc;
+      private NodeSeqBuilder nc;
       /** Counter. */
       private long c;
 
@@ -332,7 +332,7 @@ public abstract class ANode extends Item {
           final ANode r = parent();
           if(r == null) return null;
 
-          nc = new NodeCache();
+          nc = new NodeSeqBuilder();
           final AxisIter ai = r.children();
           for(ANode n; (n = ai.next()) != null && !n.is(ANode.this);) {
             nc.add(n.finish());
@@ -369,7 +369,7 @@ public abstract class ANode extends Item {
    * @param ch child nodes
    * @param nc node cache
    */
-  static final void addDesc(final AxisMoreIter ch, final NodeCache nc) {
+  static final void addDesc(final AxisMoreIter ch, final NodeSeqBuilder nc) {
     for(ANode n; (n = ch.next()) != null;) {
       nc.add(n.finish());
       addDesc(n.children(), nc);

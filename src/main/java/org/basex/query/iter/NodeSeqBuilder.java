@@ -7,12 +7,13 @@ import org.basex.query.item.*;
 import org.basex.util.*;
 
 /**
- * Caching node iterator, returning sorted nodes.
+ * This class can be used to build new node sequences.
+ * At the same time, it serves as an iterator.
  *
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class NodeCache extends AxisIter {
+public final class NodeSeqBuilder extends AxisIter {
   /** Node container. */
   public ANode[] item;
   /** Number of nodes. */
@@ -27,7 +28,7 @@ public final class NodeCache extends AxisIter {
   /**
    * Constructor.
    */
-  public NodeCache() {
+  public NodeSeqBuilder() {
     item = new ANode[1];
   }
 
@@ -36,7 +37,7 @@ public final class NodeCache extends AxisIter {
    * @param it node array
    * @param s size
    */
-  public NodeCache(final ANode[] it, final int s) {
+  public NodeSeqBuilder(final ANode[] it, final int s) {
     item = it;
     size = s;
   }
@@ -45,7 +46,7 @@ public final class NodeCache extends AxisIter {
    * Checks all nodes for potential duplicates and their orderedness.
    * @return self reference
    */
-  public NodeCache check() {
+  public NodeSeqBuilder check() {
     check = true;
     return this;
   }
@@ -170,7 +171,7 @@ public final class NodeCache extends AxisIter {
    * Sorts the nodes, if necessary.
    * @return self reference
    */
-  public NodeCache sort() {
+  public NodeSeqBuilder sort() {
     if(check) sort(sort);
     return this;
   }

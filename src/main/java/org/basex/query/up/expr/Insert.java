@@ -48,8 +48,8 @@ public final class Insert extends Update {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii) throws QueryException {
     final Constr c = new Constr(ii, ctx).add(expr[1]);
-    final NodeCache cList = c.children;
-    final NodeCache aList = c.atts;
+    final NodeSeqBuilder cList = c.children;
+    final NodeSeqBuilder aList = c.atts;
     if(c.errAtt) UPNOATTRPER.thrw(info);
     if(c.duplAtt != null) UPATTDUPL.thrw(info, c.duplAtt);
 

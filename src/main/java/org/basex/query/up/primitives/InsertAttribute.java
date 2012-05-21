@@ -20,7 +20,7 @@ public final class InsertAttribute extends InsertBase {
    * @param c node copy
    */
   public InsertAttribute(final int p, final Data d, final InputInfo i,
-      final NodeCache c) {
+      final NodeSeqBuilder c) {
     super(PrimitiveType.INSERTATTR, p, d, i, c);
   }
 

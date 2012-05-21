@@ -107,7 +107,7 @@ public class AxisStep extends Preds {
     if(!v.type.isNode()) NODESPATH.thrw(info, this, v.type);
     final AxisIter ai = axis.iter((ANode) v);
 
-    final NodeCache nc = new NodeCache();
+    final NodeSeqBuilder nc = new NodeSeqBuilder();
     for(ANode n; (n = ai.next()) != null;) if(test.eq(n)) nc.add(n.finish());
 
     // evaluate predicates

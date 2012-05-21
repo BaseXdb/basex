@@ -131,7 +131,7 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  static final AxisMoreIter iter(final NodeCache iter) {
+  static final AxisMoreIter iter(final NodeSeqBuilder iter) {
     return new AxisMoreIter() {
       /** Child counter. */ int c;
       @Override
@@ -154,7 +154,7 @@ public abstract class FNode extends ANode {
    * @param iter iterator
    * @return node iterator
    */
-  final byte[] string(final NodeCache iter) {
+  final byte[] string(final NodeSeqBuilder iter) {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < iter.size(); ++c) {
@@ -235,12 +235,12 @@ public abstract class FNode extends ANode {
   public final AxisIter following() {
     return new AxisIter() {
       /** Iterator. */
-      private NodeCache nc;
+      private NodeSeqBuilder nc;
 
       @Override
       public ANode next() {
         if(nc == null) {
-          nc = new NodeCache();
+          nc = new NodeSeqBuilder();
           ANode n = FNode.this;
           ANode p = n.parent();
           while(p != null) {
