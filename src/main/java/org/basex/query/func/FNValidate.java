@@ -49,8 +49,27 @@ public class FNValidate extends StandardFunc {
   }
 
   /**
-   * Validates a documents against a given XML Schema.
-   * {@code xsi:(noNamespace)schemaLocation} will be ignored.
+   * Validates a document against a XML Schema.
+   * There exist two variants:
+   *
+   * <ul>{@code validate:xsd($doc)}
+   *  <li>Looks for {@code xsi:(noNamespace)schemaLocation} in {@code $doc} and
+   *    uses this schema for validation.</li>
+   *  <li>{@code $doc} must contain a schemaLocation declaration for validation
+   *  to work.</li>
+   *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
+   *    xs:string} pointing to an URL or a local file that will then be parsed
+   *    and validated.</li>
+   *  </ul>
+   *  <ul>{@code validate:xsd($doc, $schema)}
+   *  <li>if {@code $doc} contains an {@code xsi:(noNamespace)schemaLocation} it
+   *  will be ignored.</li>
+   *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
+   *    xs:string} pointing to an URL or a local file</li>
+   *  <li>{@code $schema as xs:string} is expected to point to an URL or a local
+   *  file containing the schema definitions. </li>
+   *  </ul>
+   *
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
@@ -61,9 +80,9 @@ public class FNValidate extends StandardFunc {
       final SchemaFactory sf = SchemaFactory.newInstance(
           XMLConstants.W3C_XML_SCHEMA_NS_URI);
       final Schema schema;
-      if(expr.length < 2) {
+      if(expr.length < 2) { // the schema location is computed at runtime
         schema = sf.newSchema();
-      } else {
+      } else { // schema explicitly given and passed to the SchemaFactory
         final IO sc = IO.get(string(checkStr(expr[1], ctx)));
         if(!sc.exists()) WHICHRES.thrw(info, sc);
         schema = sf.newSchema(new URL(sc.url()));
@@ -83,6 +102,23 @@ public class FNValidate extends StandardFunc {
 
   /**
    * Validates a document against a DTD.
+   * There exist two variants:
+   *
+   * <ul>{@code validate:dtd($doc)}
+   *  <li>Looks for the document type declaration in {@code $doc} and
+   *    uses it for validation.</li>
+   *  <li>{@code $doc} must contain a DTD for this to work.</li>
+   *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
+   *    xs:string} pointing to an URL or a local file that will then be parsed
+   *    and validated.</li>
+   *  </ul>
+   *  <ul>{@code validate:dtd($doc, $dtd)}
+   *  <li>{@code $doc} is allowed to be either a {@code XML node} or a {@code
+   *    xs:string} pointing to an URL or a local file</li>
+   *  <li>{@code $dtd as xs:string} is expected to point to an URL or a local
+   *  file containing the document type definitions. </li>
+   *  </ul>
+
    * @param ctx query context
    * @return {@code null}
    * @throws QueryException query exception
@@ -120,10 +156,7 @@ public class FNValidate extends StandardFunc {
     public void fatalError(final SAXParseException ex) throws SAXException {
       error(ex);
     }
-    @Override
-    public void warning(final SAXParseException ex) throws SAXException {
-      error(ex);
-    }
+
     @Override
     public void error(final SAXParseException ex) throws SAXException {
       // may be recursively called if external validator (e.g. Saxon) is used
