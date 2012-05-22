@@ -12,6 +12,8 @@ interface QT3Constants {
   /** QT3TS String. */
   String SOURCE = "source";
   /** QT3TS String. */
+  String RESOURCE = "resource";
+  /** QT3TS String. */
   String PARAM = "param";
   /** QT3TS String. */
   String NAMESPACE = "namespace";

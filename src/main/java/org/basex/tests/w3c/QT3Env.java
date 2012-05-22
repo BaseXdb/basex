@@ -20,6 +20,8 @@ final class QT3Env {
   final ArrayList<HashMap<String, String>> namespaces;
   /** Sources: role, file, validation, uri, xml:id. */
   final ArrayList<HashMap<String, String>> sources;
+  /** Resources. */
+  final ArrayList<HashMap<String, String>> resources;
   /** Parameters: name, as, select, declared. */
   final ArrayList<HashMap<String, String>> params;
   /** Decimal Formats: decimal-separator, grouping-separator,
@@ -50,6 +52,7 @@ final class QT3Env {
   QT3Env(final Context ctx, final XdmValue env) {
     name = XQuery.string('@' + NNAME, env, ctx);
     sources = list(ctx, env, SOURCE);
+    resources = list(ctx, env, RESOURCE);
     params = list(ctx, env, PARAM);
     namespaces = list(ctx, env, NAMESPACE);
     formats = list(ctx, env, DECIMAL_FORMAT);

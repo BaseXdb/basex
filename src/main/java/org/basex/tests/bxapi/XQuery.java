@@ -108,6 +108,16 @@ public final class XQuery implements Iterable<XdmItem> {
   }
 
   /**
+   * Adds a resource.
+   * @param name name of the collection
+   * @param path document path
+   * @throws XQueryException exception
+   */
+  public void addResource(final String name, final String path) {
+    qp.ctx.resource.addResource(name, path);
+  }
+
+  /**
    * Adds a module.
    * @param uri module uri
    * @param file file reference

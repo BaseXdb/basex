@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
-import org.basex.core.cmd.Set;
 import org.basex.io.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
@@ -16,7 +15,6 @@ import org.basex.query.func.*;
 import org.basex.query.item.*;
 import org.basex.query.util.Compare.Flag;
 import org.basex.tests.bxapi.*;
-import org.basex.tests.bxapi.XQuery;
 import org.basex.tests.bxapi.xdm.*;
 import org.basex.util.*;
 
@@ -94,8 +92,8 @@ public final class QT3TS {
     parseArguments(args);
 
     final Performance perf = new Performance();
-    new Set(Prop.CHOP, false).execute(ctx);
-    new Set(Prop.INTPARSE, false).execute(ctx);
+    ctx.prop.set(Prop.CHOP, false);
+    ctx.prop.set(Prop.INTPARSE, false);
 
     final XQuery qdoc = new XQuery("doc(' " + CATALOG + "')", ctx);
     final XdmValue doc = qdoc.value();
@@ -285,6 +283,10 @@ public final class QT3TS {
           final Object call = Function.DOC.get(Str.get(file));
           if(role.equals(".")) query.context(call);
           else query.bind(role, call);
+        }
+        // bind resources
+        for(final HashMap<String, String> src : e.resources) {
+          query.addResource(src.get(URI), (b != null ? b : "") + src.get(FILE));
         }
         // bind collections
         query.addCollection(e.collURI, e.collSources.toArray());
@@ -616,9 +618,7 @@ public final class QT3TS {
    * @param expect expected result
    * @return optional expected test suite result
    */
-  private String assertSerialization(final XdmValue value,
-      final XdmValue expect) {
-
+  private String assertSerialization(final XdmValue value, final XdmValue expect) {
     final String file = asString("@file", expect);
     final boolean norm = asBoolean("@normalize-space=('true','1')", expect);
     final boolean pref = asBoolean("@ignore-prefixes=('true','1')", expect);
@@ -628,9 +628,11 @@ public final class QT3TS {
           expect.getString() : string(new IOFile(base, file).read()));
       if(norm) exp = string(norm(token(exp)));
 
-      final String res = normNL(asString(
-          "serialize(.,map{'indent':='no'})", value));
+      final String res = normNL(asString("serialize(., map{ 'indent':='no' })", value));
       if(exp.equals(res)) return null;
+      final String r = normNL(asString(
+          "serialize(., map{ 'indent':='no', 'omit-xml-declaration':='no' })", value));
+      if(exp.equals(r)) return null;
 
       // include check for comments, processing instructions and namespaces
       String flags = "'" + Flag.ALLNODES + '\'';
@@ -761,7 +763,7 @@ public final class QT3TS {
   }
 
   /**
-   * Removes comments from the specified string.
+   * Normalizes newline characters.
    * @param in input string
    * @return result
    */
