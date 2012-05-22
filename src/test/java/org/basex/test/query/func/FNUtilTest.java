@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.io.out.*;
+import org.basex.query.func.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -19,6 +20,23 @@ import org.junit.*;
 public final class FNUtilTest extends AdvancedQueryTest {
   /** Null output stream. */
   static final PrintStream NULL = new PrintStream(new NullOutput());
+
+  /**
+   * Test method for the util:nl() function.
+   */
+  @Test
+  public void utilNl() {
+    // compared with empty string, because query() removes all newlines
+    query(Variable._UTIL_NL.toString(), "");
+  }
+
+  /**
+   * Test method for the util:tab() function.
+   */
+  @Test
+  public void utilTab() {
+    query(Variable._UTIL_TAB.toString(), "\t");
+  }
 
   /**
    * Test method for the util:eval() function.

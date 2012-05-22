@@ -19,7 +19,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    */
   @Test
   public void xsltProcessor() {
-    assertTrue(!query(Variable.XSLTPROC.toString()).isEmpty());
+    assertTrue(!query(Variable._XSLT_PROCESSOR.toString()).isEmpty());
   }
 
   /**
@@ -27,7 +27,7 @@ public final class FNXsltTest extends AdvancedQueryTest {
    */
   @Test
   public void xsltVersion() {
-    assertTrue(!query(Variable.XSLTVERSION.toString()).isEmpty());
+    assertTrue(!query(Variable._XSLT_VERSION.toString()).isEmpty());
   }
 
   /**

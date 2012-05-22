@@ -18,14 +18,19 @@ import org.basex.util.*;
 public enum Variable {
 
   /** File variable. */
-  FILEDIRSEP(FILEURI, "directory-separator", Str.get(File.separator)),
+  _FILE_DIRECTORY_SEPARATOR(FILEURI, "directory-separator", Str.get(File.separator)),
   /** File variable. */
-  FILEPATHSEP(FILEURI, "path-separator", Str.get(File.pathSeparator)),
+  _FILE_PATH_SEPARATOR(FILEURI, "path-separator", Str.get(File.pathSeparator)),
 
   /** XSLT variable. */
-  XSLTPROC(XSLTURI, "processor", Str.get(FNXslt.get(true))),
+  _XSLT_PROCESSOR(XSLTURI, "processor", Str.get(FNXslt.get(true))),
   /** XSLT variable. */
-  XSLTVERSION(XSLTURI, "version", Str.get(FNXslt.get(false)));
+  _XSLT_VERSION(XSLTURI, "version", Str.get(FNXslt.get(false))),
+
+  /** Util variable. */
+  _UTIL_NL(UTILURI, "nl", Str.get("\n")),
+  /** Util variable. */
+  _UTIL_TAB(UTILURI, "tab", Str.get("\t"));
 
   /** Variable name. */
   private final QNm qname;
