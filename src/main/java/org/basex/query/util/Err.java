@@ -683,7 +683,7 @@ public enum Err {
   /** XQST0071: Parsing exception. */
   DUPLNSDEF(XQST, 71, "Duplicate declaration of prefix '%'."),
   /** XQST0075: Parsing exception. */
-  IMPLVAL(XQST, 75, "Validation not supported yet."),
+  IMPLVAL(XQST, 75, "Validation not supported."),
   /** XQST0076: Parsing exception. */
   WHICHCOLL(XQST, 76, "Unknown collation '%'."),
   /** XQST0079: Parsing exception. */
@@ -708,8 +708,6 @@ public enum Err {
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
   /** XQST0099: Parsing exception. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
-  /** XPST0104: Parsing exception. */
-  NOSCHEMA(XQST, 104, "Unknown schema type: %."),
   /** XQST0106: Parsing exception. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
   /** XQST0106: Parsing exception. */
