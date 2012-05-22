@@ -52,22 +52,23 @@ public final class Add extends ACreate {
 
   @Override
   protected boolean run() {
-    final boolean create = context.user.has(Perm.CREATE);
     String name = MetaData.normPath(args[0]);
     if(name == null || name.endsWith(".")) return error(NAME_INVALID_X, args[0]);
 
-    // add slash to the target if the addressed file is an archive or directory
-    IO io = null;
-    if(in == null) {
-      io = IO.get(args[1]);
-    } else if(in.getByteStream() != null) {
-      io = new IOStream(in.getByteStream());
-      io.name(name);
-    } else if(in.getSystemId() != null) {
-      io = IO.get(in.getSystemId());
+    // retrieve input
+    final IO io;
+    try {
+      io = sourceToIO(name);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return error(Util.message(ex));
     }
 
-    if(!io.exists()) return error(RES_NOT_FOUND_X, create ? io : args[1]);
+    // check if resource exists
+    if(io == null) return error(RES_NOT_FOUND);
+    if(!io.exists()) return in != null ? error(RES_NOT_FOUND) :
+        error(RES_NOT_FOUND_X, context.user.has(Perm.CREATE) ? io : args[1]);
+
     if(!name.endsWith("/") && (io.isDir() || io.isArchive())) name += '/';
 
     String target = "";
@@ -83,7 +84,8 @@ public final class Add extends ACreate {
     // set name of document
     if(!name.isEmpty()) io.name(name);
     // get name from io reference
-    else if(!(io instanceof IOContent)) name = io.name();
+    else name = io.name();
+
     parser = new DirParser(io, prop, data.meta.path);
     parser.target(target);
 
@@ -106,27 +108,24 @@ public final class Add extends ACreate {
     final String db = large ? context.mprop.random(data.meta.name) : name;
     build = large ? new DiskBuilder(db, parser, context) : new MemBuilder(db, parser);
 
-    Data tmp = null;
     try {
-      tmp = build.build();
+      final Data tmp = build.build();
+      // skip update if fragment is empty
+      if(tmp.meta.size > 1) {
+        if(lock && !data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
+        data.insert(data.meta.size, -1, tmp);
+        context.update();
+        if(lock) data.finishUpdate();
+      }
+      // return info message
+      return info(parser.info() + PATH_ADDED_X_X, name, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(Util.message(ex));
     } finally {
       // close and drop intermediary database instance
-      if(tmp != null) tmp.close();
       if(large) DropDB.drop(db, context);
     }
-
-    // skip update if fragment is empty
-    if(tmp.meta.size > 1) {
-      if(lock && !data.startUpdate()) return error(DB_PINNED_X, data.meta.name);
-      data.insert(data.meta.size, -1, tmp);
-      context.update();
-      if(lock) data.finishUpdate();
-    }
-    // return info message
-    return info(parser.info() + PATH_ADDED_X_X, name, perf);
   }
 
   @Override

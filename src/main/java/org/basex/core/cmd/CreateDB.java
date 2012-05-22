@@ -59,27 +59,22 @@ public final class CreateDB extends ACreate {
 
     // choose parser and input
     IO io = null;
-    final String format = prop.get(Prop.PARSER);
-    if(args.length < 1 || args[1] == null) {
-      if(in != null && in.getByteStream() != null) {
-        try {
-          final LookupInput li = new LookupInput(in.getByteStream());
-          if(li.lookup() != -1) io = new IOStream(li, name + '.' + format);
-        } catch(final IOException ex) {
-          Util.debug(ex);
-          return error(Util.message(ex));
-        }
+    try {
+      io = sourceToIO(name);
+      if(in != null) {
+        final LookupInput li = new LookupInput(io.inputStream());
+        io = li.lookup() == -1 ? null : new IOStream(li, io.name());
       }
-    } else {
-      io = IO.get(args[1]);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      return error(Util.message(ex));
     }
 
+    // create parser instance
     if(io != null) {
       if(!io.exists()) return error(RES_NOT_FOUND_X, io);
-      if(io instanceof IOContent) io.name(name + '.' + format);
       parser = new DirParser(io, prop, mprop.dbpath(name));
-    }
-    if(parser == null) {
+    } else if(parser == null) {
       parser = Parser.emptyParser(context.prop);
     }
 

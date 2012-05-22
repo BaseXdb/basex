@@ -10,6 +10,7 @@ import org.basex.index.*;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.*;
 import org.basex.index.value.*;
+import org.basex.io.*;
 import org.basex.util.*;
 
 /**
@@ -55,6 +56,39 @@ public abstract class ACreate extends Command {
   @Override
   public boolean stoppable() {
     return true;
+  }
+
+  /**
+   * Converts the input source to an {@link IO} reference.
+   * @param name name of source
+   * @return IO reference
+   * @throws IOException I/O exception
+   */
+  protected IO sourceToIO(final String name) throws IOException {
+    IO io = null;
+    if(args[1] != null) {
+      io = IO.get(args[1]);
+    } else if(in != null) {
+      if(in.getCharacterStream() != null) {
+        final Reader r = in.getCharacterStream();
+        final TokenBuilder tb = new TokenBuilder();
+        try {
+          for(int c; (c = r.read()) != -1;) tb.add(c);
+        } finally {
+          r.close();
+        }
+        io = new IOContent(tb.finish());
+      } else if(in.getByteStream() != null) {
+        io = new IOStream(in.getByteStream());
+      } else if(in.getSystemId() != null) {
+        io = IO.get(in.getSystemId());
+      }
+    }
+    // update name if not given by the IO reference anyway
+    if(io instanceof IOContent || io instanceof IOStream) {
+      io.name(name.isEmpty() ? "" : name + '.' + prop.get(Prop.PARSER));
+    }
+    return io;
   }
 
   /**
