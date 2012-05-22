@@ -10,7 +10,6 @@ import java.util.*;
 import java.util.zip.*;
 
 import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.io.in.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -113,9 +112,8 @@ public final class FNUtil extends StandardFunc {
    * @throws QueryException query exception
    */
   private Value run(final QueryContext ctx) throws QueryException {
-    final IO io = checkIO(expr[0], ctx);
     try {
-      return eval(ctx, io.read());
+      return eval(ctx, checkIO(checkStr(expr[0], ctx), ctx).read());
     } catch(final IOException ex) {
       throw IOERR.thrw(info, ex);
     }

@@ -349,9 +349,8 @@ public final class QueryContext extends Progress {
    * @param optional if {@code true}, a {@code null} reference is returned if no
    *   parameters have been specified
    * @return serialization parameters
-   * @throws SerializerException serializer exception
    */
-  public SerializerProp serParams(final boolean optional) throws SerializerException {
+  public SerializerProp serParams(final boolean optional) {
     // if available, return parameters specified by the query
     if(serProp != null) return serProp;
     // retrieve global parameters

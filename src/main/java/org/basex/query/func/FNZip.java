@@ -342,9 +342,8 @@ public final class FNZip extends StandardFunc {
    * Returns serialization parameters.
    * @param node node with parameters
    * @return properties
-   * @throws SerializerException serializer exception
    */
-  private static SerializerProp serPar(final ANode node) throws SerializerException {
+  private static SerializerProp serPar(final ANode node) {
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
     final AxisIter ati = node.attributes();

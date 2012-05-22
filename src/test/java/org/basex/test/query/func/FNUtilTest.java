@@ -58,7 +58,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   public void utilRun() {
     check(_UTIL_RUN);
     query(_UTIL_RUN.args("src/test/resources/input.xq"), "XML");
-    error(_UTIL_RUN.args("src/test/resources/xxx.xq"), Err.UNDOC);
+    error(_UTIL_RUN.args("src/test/resources/xxx.xq"), Err.RESNF);
   }
 
   /**

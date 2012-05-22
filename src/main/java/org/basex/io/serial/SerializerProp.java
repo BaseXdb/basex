@@ -102,15 +102,12 @@ public final class SerializerProp extends AProp {
    * Constructor, specifying initial properties.
    * @param s property string. Properties are separated with commas ({@code ,}),
    * key/values with the equality character ({@code =}).
-   * @throws SerializerException serializer exception
    */
-  public SerializerProp(final String s) throws SerializerException {
+  public SerializerProp(final String s) {
     for(final String ser : s.trim().split(",")) {
       if(ser.isEmpty()) continue;
       final String[] sprop = ser.split("=", 2);
-      final String key = sprop[0].trim();
-      final String val = set(key, sprop.length < 2 ? "" : sprop[1].trim());
-      if(val == null) SERINVALID.thrwSerial(key);
+      set(sprop[0].trim(), sprop.length < 2 ? "" : sprop[1].trim());
     }
   }
 

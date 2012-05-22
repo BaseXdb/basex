@@ -81,11 +81,8 @@ public final class FuncParams {
    * @param it input item
    * @return serialization string
    * @throws QueryException query exception
-   * @throws SerializerException serializer exception
    */
-  public static SerializerProp serializerProp(final Item it)
-      throws QueryException, SerializerException {
-
+  public static SerializerProp serializerProp(final Item it) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     if(it != null) {
       final TokenMap map = new FuncParams(Q_SPARAM, null).parse(it);

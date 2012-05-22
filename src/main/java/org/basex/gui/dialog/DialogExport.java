@@ -75,13 +75,7 @@ public final class DialogExport extends BaseXDialog {
     // encoding
     final Prop prop = gui.context.prop;
     final String exporter = prop.get(Prop.EXPORTER);
-    SerializerProp sp;
-    try {
-      sp = new SerializerProp(exporter);
-    } catch(final IOException ex) {
-      // ignore invalid serialization parameters
-      sp = new SerializerProp();
-    }
+    final SerializerProp sp = new SerializerProp(exporter);
 
     // encoding and method
     final String[] methods = new String[DataText.METHODS.length - 1];

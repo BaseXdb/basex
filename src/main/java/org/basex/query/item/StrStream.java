@@ -44,7 +44,7 @@ public final class StrStream extends Item implements Streamable {
       try {
         val = input(ii).content();
       } catch(final IOException ex) {
-        throw error.thrw(ii, ex);
+        throw error.thrw(ii, input);
       }
     }
     return val;
@@ -75,7 +75,7 @@ public final class StrStream extends Item implements Streamable {
     try {
       return new NewlineInput(input).encoding(encoding);
     } catch(final IOException ex) {
-      throw error.thrw(ii, ex);
+      throw error.thrw(ii, input);
     }
   }
 
