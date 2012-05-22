@@ -137,7 +137,7 @@ public enum Err {
   ENCNOTEXISTS(FOFL, 5, "Encoding '%' is not supported."),
 
   /** FOFL9999: Evaluation exception. */
-  FILEERROR(FOFL, 9999, "Operation failed: %."),
+  FILEERROR(FOFL, 9999, "Resource cannot be retrieved: %."),
   /** FOFL9999: Evaluation exception. */
   CANNOTCREATE(FOFL, 9999, "Directory '%' cannot be created."),
   /** FOFL9999: Evaluation exception. */
@@ -755,7 +755,11 @@ public enum Err {
   /** FOFD1350: Evaluation exception. */
   PICCOMP(FOFD, 1350, "Invalid component in string: '%'."),
   /** FOUT1170: Parsing exception. */
-  WRONGINPUT(FOUT, 1170, "%"),
+  RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
+  /** FOUT1170: Parsing exception. */
+  FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
+  /** FOUT1170: Parsing exception. */
+  INVURL(FOUT, 1170, "URI is invalid: %"),
   /** FOUT1190: Evaluation exception. */
   WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
 

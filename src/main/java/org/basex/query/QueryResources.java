@@ -20,9 +20,11 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public final class QueryResources {
+  /** Resources. */
+  public HashMap<String, String> resources = new HashMap<String, String>();
+
   /** Database context. */
   private final QueryContext ctx;
-
   /** Opened databases. */
   private Data[] data = new Data[1];
   /** Number of databases. */
@@ -186,6 +188,15 @@ public final class QueryResources {
     final QueryInput qi = new QueryInput(path);
     final Data d = create(qi, true, null);
     if(name != null) d.meta.original = name;
+  }
+
+  /**
+   * Adds a resource with the specified path. Only called from the test APIs.
+   * @param uri resource uri
+   * @param path resource path
+   */
+  public void addResource(final String uri, final String path) {
+    resources.put(uri, path);
   }
 
   /**

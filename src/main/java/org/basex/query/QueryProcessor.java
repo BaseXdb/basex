@@ -210,7 +210,7 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Adds a module reference.
+   * Adds a module reference. Only called from the test APIs.
    * @param uri module uri
    * @param file file name
    */

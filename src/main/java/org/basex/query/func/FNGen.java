@@ -190,10 +190,10 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private StrStream unparsedText(final QueryContext ctx) throws QueryException {
-    final IO io = checkIO(expr[0], ctx);
+    final IO io = checkIO(checkStr(expr[0], ctx), ctx);
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
     if(enc != null && !Charset.isSupported(enc)) WHICHENC.thrw(info, enc);
-    return new StrStream(io, enc, WRONGINPUT);
+    return new StrStream(io, enc, RESNF);
   }
 
   /**
@@ -233,9 +233,10 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   private Bln unparsedTextAvailable(final QueryContext ctx) throws QueryException {
-    final IO io = checkIO(expr[0], ctx);
+    final byte[] path = checkStr(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
+      final IO io = checkIO(path, ctx);
       final NewlineInput nli = new NewlineInput(io).encoding(enc);
       try {
         while(nli.read() != -1);
@@ -244,6 +245,8 @@ public final class FNGen extends StandardFunc {
       }
       return Bln.TRUE;
     } catch(final IOException ex) {
+      return Bln.FALSE;
+    } catch(final QueryException ex) {
       return Bln.FALSE;
     }
   }

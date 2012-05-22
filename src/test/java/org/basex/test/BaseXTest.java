@@ -181,15 +181,6 @@ public abstract class BaseXTest extends MainTest {
   }
 
   /**
-   * Test serialization parameters.
-   * @throws IOException I/O exception
-   */
-  @Test(expected = BaseXException.class)
-  public void serialErr() throws IOException {
-    run("-sm=x", "-q2");
-  }
-
-  /**
    * Turn off whitespace chopping.
    * @throws IOException I/O exception
    */
