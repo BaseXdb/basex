@@ -23,8 +23,9 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    */
   protected static String query(final String query) {
     final QueryProcessor qp = new QueryProcessor(query, context);
+    qp.ctx.sc.baseURI(".");
     try {
-      return qp.execute().toString().replaceAll("(\\r|\\n) *", "");
+      return qp.execute().toString().replaceAll("(\\r|\\n)+ *", "");
     } catch(final QueryException ex) {
       fail("Query failed:\n" + query + "\nMessage: " + ex.getMessage());
       return null;
@@ -65,6 +66,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
    */
   protected static void error(final String query, final Err... error) {
     final QueryProcessor qp = new QueryProcessor(query, context);
+    qp.ctx.sc.baseURI(".");
     try {
       final String res = qp.execute().toString().replaceAll("(\\r|\\n) *", "");
       fail("Query did not fail:\n" + query + "\n[E] " +

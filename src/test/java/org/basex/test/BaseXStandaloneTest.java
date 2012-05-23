@@ -6,7 +6,6 @@ import static org.junit.Assert.*;
 import java.io.*;
 
 import org.basex.*;
-import org.basex.core.*;
 import org.basex.io.out.*;
 import org.junit.*;
 
@@ -35,14 +34,5 @@ public final class BaseXStandaloneTest extends BaseXTest {
     System.setOut(new PrintStream(ao));
     new BaseX(args);
     return ao.toString();
-  }
-
-  /**
-   * Test serialization parameters.
-   * @throws IOException I/O exception
-   */
-  @Test(expected = BaseXException.class)
-  public void xx() throws IOException {
-    run("-sm=x", "-q2");
   }
 }

@@ -113,7 +113,8 @@ public final class MimeTypes {
         Util.errln(file + " not found.");
       } else {
         nli = new NewlineInput(is);
-        for(String line; (line = nli.readLine()) != null;) {
+        for(TokenBuilder tb; (tb = nli.readLine()) != null;) {
+          final String line = tb.toString();
           final int i = line.indexOf('\t');
           if(i == -1 || line.startsWith("#")) continue;
           TYPES.put(line.substring(0, i), line.substring(i + 1));

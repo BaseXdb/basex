@@ -47,26 +47,6 @@ public final class StaticContext {
   /** Static Base URI. */
   private Uri baseURI = Uri.EMPTY;
 
-  /*
-   * Adopts values of the specified static context.
-   * @param sc static context
-  public void copy(final StaticContext sc) {
-    ns = sc.ns;
-    nsElem = sc.nsElem;
-    nsFunc = sc.nsFunc;
-    // vars, ctxItem, funcs
-    collation = sc.collation;
-    strip = sc.strip;
-    ordered = sc.ordered;
-    orderGreatest = sc.orderGreatest;
-    spaces = sc.spaces;
-    nsPreserve = sc.nsPreserve;
-    nsInherit = sc.nsInherit;
-    baseURI = sc.baseURI;
-    // decFormats
-  }
-   */
-
   /**
    * Declares a namespace.
    * A namespace is undeclared if the specified URI is an empty string.
@@ -94,7 +74,7 @@ public final class StaticContext {
   }
 
   /**
-   * Returns an IO references for the specified filename.
+   * Returns an IO reference for the specified filename.
    * If a base URI exists, it is merged with the specified filename.
    * Otherwise, a plain reference is returned.
    * @param fn filename

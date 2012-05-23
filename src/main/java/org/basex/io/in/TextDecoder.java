@@ -27,7 +27,7 @@ abstract class TextDecoder {
    * Returns a decoder for the specified encoding.
    * @param enc encoding
    * @return decoder
-     * @throws IOException I/O exception
+   * @throws IOException I/O exception
    */
   static TextDecoder get(final String enc) throws IOException {
     if(enc == UTF8)    return new TextDecoder.UTF8();
@@ -37,6 +37,15 @@ abstract class TextDecoder {
     return new TextDecoder.Generic(enc);
   }
 
+  /**
+   * Processes an invalid character.
+   * @throws IOException I/O exception
+   * @return exception
+   */
+  MalformedInputException invalid() throws IOException {
+    throw new MalformedInputException(0);
+  }
+
   /** UTF8 Decoder. */
   static class UTF8 extends TextDecoder {
     /** UTF8 cache. */
@@ -44,11 +53,15 @@ abstract class TextDecoder {
 
     @Override
     int read(final TextInput ti) throws IOException {
-      final int ch = ti.next();
+      int ch = ti.next();
       if(ch < 0x80) return ch;
       cache[0] = (byte) ch;
       final int cl = cl((byte) ch);
-      for(int c = 1; c < cl; ++c) cache[c] = (byte) ti.next();
+      for(int c = 1; c < cl; ++c) {
+        ch = ti.next();
+        if(ch < 0) invalid();
+        cache[c] = (byte) ch;
+      }
       return cp(cache, 0);
     }
   }
@@ -57,7 +70,11 @@ abstract class TextDecoder {
   static class UTF16LE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      return ti.next() | ti.next() << 8;
+      final int a = ti.next();
+      if(a < 0) return a;
+      final int b = ti.next();
+      if(b < 0) invalid();
+      return a | b << 8;
     }
   }
 
@@ -65,7 +82,11 @@ abstract class TextDecoder {
   static class UTF16BE extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      return ti.next() << 8 | ti.next();
+      final int a = ti.next();
+      if(a < 0) return a;
+      final int b = ti.next();
+      if(b < 0) invalid();
+      return a << 8 | b;
     }
   }
 
@@ -73,7 +94,15 @@ abstract class TextDecoder {
   static class UTF32 extends TextDecoder {
     @Override
     int read(final TextInput ti) throws IOException {
-      return ti.next() << 24 | ti.next() << 16 | ti.next() << 8 | ti.next();
+      final int a = ti.next();
+      if(a < 0) return a;
+      final int b = ti.next();
+      if(b < 0) invalid();
+      final int c = ti.next();
+      if(c < 0) invalid();
+      final int d = ti.next();
+      if(d < 0) invalid();
+      return a << 24 | b << 16 | c << 8 | d;
     }
   }
 
@@ -119,8 +148,7 @@ abstract class TextDecoder {
         for(int o = 0; o < os; ++o) i |= outc.get(o) << (o << 3);
         return i;
       }
-      // ignore malformed characters
-      return '?';
+      throw invalid();
     }
   }
 }

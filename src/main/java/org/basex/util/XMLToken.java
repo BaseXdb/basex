@@ -14,13 +14,13 @@ public final class XMLToken {
   private XMLToken() { }
 
   /**
-   * Checks if the specified character is a valid XML character.
+   * Checks if the specified character is a valid XML 1.0 character.
    * @param ch the letter to be checked
    * @return result of comparison
    */
   public static boolean valid(final int ch) {
-    return ch >= 0x20 && ch <= 0xD7FF || ch == 0xA || ch == 0x9 || ch == 0xD ||
-      ch >= 0xE000 && ch <= 0xFFFD || ch >= 0x10000 && ch <= 0x10ffff;
+    return ch < 0xD800 ? (ch >= 0x20 || ch == 0xA || ch == 0x9 || ch == 0xD) :
+      (ch >= 0xE000 && ch <= 0xFFFD || ch >= 0x10000 && ch <= 0x10ffff);
   }
 
   /**

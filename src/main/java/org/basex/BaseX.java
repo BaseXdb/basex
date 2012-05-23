@@ -74,8 +74,8 @@ public class BaseX extends Main {
           if(!io.exists()) throw new BaseXException(RES_NOT_FOUND_X, val);
           final NewlineInput nli = new NewlineInput(io);
           try {
-            for(String line; (line = nli.readLine()) != null;) {
-              final String l = line.trim();
+            for(TokenBuilder line; (line = nli.readLine()) != null;) {
+              final String l = line.toString().trim();
               // ignore empty lines and comments
               if(!l.isEmpty() && !l.startsWith("#")) execute(l);
             }

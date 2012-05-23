@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.core.Text.*;
 import static org.basex.query.util.Err.*;
 
 import org.basex.core.*;
@@ -101,7 +100,7 @@ public final class FNInfo extends StandardFunc {
    */
   static void dump(final byte[] value, final byte[] label, final QueryContext ctx) {
     final TokenBuilder tb = new TokenBuilder();
-    if(label != null) tb.add(label).add(COLS);
+    if(label != null) tb.add(label);
     tb.add(value);
 
     // if GUI is used, or if user is no admin, trace info is cached

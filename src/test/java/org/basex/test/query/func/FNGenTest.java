@@ -1,11 +1,7 @@
 package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
-import static org.basex.util.Token.*;
-import static org.junit.Assert.*;
 
-import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
@@ -22,23 +18,12 @@ public final class FNGenTest extends AdvancedQueryTest {
 
   /**
    * Test method for the fn:unparsed-text() function.
-   * @throws Exception exception
    */
   @Test
-  public void fnUnparsedText() throws Exception {
+  public void fnUnparsedText() {
     check(UNPARSED_TEXT);
-    contains(UNPARSED_TEXT.args(TEXT), "?&gt;&lt;html");
-    contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "?&gt;&lt;html");
-    final IOFile io = new IOFile(Prop.TMP, NAME + ".tmp");
-    io.write(token("A\r\nB"));
-    query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
-    io.write(token("A\nB"));
-    query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
-    io.write(token("A\rB"));
-    query(STRING_LENGTH.args(UNPARSED_TEXT.args(io.path())), 3);
-    io.write(token("A\r\nB\rC\nD"));
-    query(_UTIL_TO_BYTES.args(UNPARSED_TEXT.args(io.path())), "65 10 66 10 67 10 68");
-    assertTrue(io.delete());
+    contains(UNPARSED_TEXT.args(TEXT), "&lt;html");
+    contains(UNPARSED_TEXT.args(TEXT, "US-ASCII"), "&lt;html");
     error(UNPARSED_TEXT.args(TEXT, "xyz"), Err.WHICHENC);
   }
 

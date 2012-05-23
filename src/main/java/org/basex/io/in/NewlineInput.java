@@ -61,12 +61,12 @@ public final class NewlineInput extends TextInput {
    * @return line
    * @throws IOException I/O exception
    */
-  public String readLine() throws IOException {
+  public TokenBuilder readLine() throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     while(true) {
       final int ch = read();
-      if(ch == -1) return tb.isEmpty() ? null : tb.toString();
-      if(ch == '\n') return tb.toString();
+      if(ch == -1) return tb.isEmpty() ? null : tb;
+      if(ch == '\n') return tb;
       tb.add(ch);
     }
   }

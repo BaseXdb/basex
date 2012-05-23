@@ -116,7 +116,7 @@ abstract class AQuery extends Command {
         err = ex.getMessage();
       } catch(final IOException ex) {
         Util.debug(ex);
-        err = ex.getMessage();
+        err = Util.message(ex);
       } catch(final ProgressException ex) {
         err = INTERRUPTED;
         // store any useful info (e.g. query plan):

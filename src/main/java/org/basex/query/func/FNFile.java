@@ -321,7 +321,7 @@ public final class FNFile extends StandardFunc {
    */
   private Iter readTextLines(final File path, final QueryContext ctx)
       throws QueryException {
-    return FNGen.textIter(readText(path, ctx), info);
+    return FNGen.textIter(readText(path, ctx).string(info));
   }
 
   /**

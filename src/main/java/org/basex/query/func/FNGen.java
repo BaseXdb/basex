@@ -18,7 +18,6 @@ import org.basex.query.up.primitives.*;
 import org.basex.query.util.*;
 import org.basex.query.util.Err.ErrType;
 import org.basex.util.*;
-import org.basex.util.list.*;
 
 /**
  * Generating functions.
@@ -53,8 +52,8 @@ public final class FNGen extends StandardFunc {
     switch(sig) {
       case DOC:                     return doc(ctx);
       case DOC_AVAILABLE:           return docAvailable(ctx);
-      case UNPARSED_TEXT:           return unparsedText(ctx);
-      case UNPARSED_TEXT_AVAILABLE: return unparsedTextAvailable(ctx);
+      case UNPARSED_TEXT:           return unparsedText(ctx, true);
+      case UNPARSED_TEXT_AVAILABLE: return unparsedText(ctx, false);
       case PUT:                     return put(ctx);
       case PARSE_XML:               return parseXml(ctx);
       case SERIALIZE:               return serialize(ctx);
@@ -186,14 +185,50 @@ public final class FNGen extends StandardFunc {
   /**
    * Performs the unparsed-text function.
    * @param ctx query context
-   * @return result
+   * @param full return text (otherwise: check if text is available)
+   * @return lines
    * @throws QueryException query exception
    */
-  private StrStream unparsedText(final QueryContext ctx) throws QueryException {
-    final IO io = checkIO(checkStr(expr[0], ctx), ctx);
+  private Item unparsedText(final QueryContext ctx, final boolean full)
+      throws QueryException {
+
+    checkCreate(ctx);
+    final byte[] path = checkStr(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
-    if(enc != null && !Charset.isSupported(enc)) WHICHENC.thrw(info, enc);
-    return new StrStream(io, enc, RESNF);
+    final IO base = ctx.sc.baseIO();
+    if(base == null) throw STBASEURI.thrw(info);
+
+    try {
+      if(enc != null && !Charset.isSupported(enc)) WHICHENC.thrw(info, enc);
+
+      final String p = string(path);
+      if(p.indexOf('#') != -1) FRAGID.thrw(info, p);
+      if(!Uri.uri(token(p)).isValid()) INVURL.thrw(info, p);
+
+      IO io = base.merge(p);
+      final String rp = ctx.resource.resources.get(io.path());
+      if(rp != null) io = IO.get(rp);
+      if(!io.exists()) throw RESNF.thrw(info, p);
+
+      final InputStream is = io.inputStream();
+      try {
+        final TextInput ti = new TextInput(io);
+        if(enc != null) ti.encoding(enc);
+        if(full) return Str.get(ti.content());
+        while(ti.read() != -1);
+        return Bln.TRUE;
+      } finally {
+        is.close();
+      }
+    } catch(final QueryException ex) {
+      if(!full) return Bln.FALSE;
+      throw ex;
+    } catch(final IOException ex) {
+      if(!full) return Bln.FALSE;
+      if(ex instanceof MalformedInputException && enc == null) WHICHCHARS.thrw(info);
+      if(ex instanceof EncodingException) INVCHARS.thrw(info, ex.getMessage());
+      throw SERANY.thrw(info, ex);
+    }
   }
 
   /**
@@ -203,51 +238,30 @@ public final class FNGen extends StandardFunc {
    * @throws QueryException query exception
    */
   Iter unparsedTextLines(final QueryContext ctx) throws QueryException {
-    return textIter(unparsedText(ctx), info);
+    return textIter(unparsedText(ctx, true).string(info));
   }
 
   /**
    * Returns the specified text as lines.
-   * @param si text input
-   * @param ii input info
+   * @param str text input
    * @return result
-   * @throws QueryException query exception
    */
-  static Iter textIter(final StrStream si, final InputInfo ii) throws QueryException {
-    final byte[] str = si.string(ii);
-    return new Iter() {
-      int p = -1;
-      @Override
-      public Item next() {
-        final ByteList bl = new ByteList();
-        while(++p < str.length && str[p] != '\n') bl.add(str[p]);
-        return p + 1 < str.length || !bl.isEmpty() ? Str.get(bl.toArray()) : null;
-      }
-    };
-  }
-
-  /**
-   * Performs the unparsed-text-available function.
-   * @param ctx query context
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Bln unparsedTextAvailable(final QueryContext ctx) throws QueryException {
-    final byte[] path = checkStr(expr[0], ctx);
-    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
+  static Iter textIter(final byte[] str) {
     try {
-      final IO io = checkIO(path, ctx);
-      final NewlineInput nli = new NewlineInput(io).encoding(enc);
-      try {
-        while(nli.read() != -1);
-      } finally {
-        nli.close();
-      }
-      return Bln.TRUE;
+      final NewlineInput nli = new NewlineInput(new ArrayInput(str));
+      return new Iter() {
+        @Override
+        public Item next() {
+          try {
+            final TokenBuilder tb = nli.readLine();
+            return tb == null ? null : Str.get(tb.finish());
+          } catch(final IOException ex) {
+            throw Util.notexpected(ex);
+          }
+        }
+      };
     } catch(final IOException ex) {
-      return Bln.FALSE;
-    } catch(final QueryException ex) {
-      return Bln.FALSE;
+      throw Util.notexpected(ex);
     }
   }
 

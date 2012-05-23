@@ -346,6 +346,8 @@ public enum Err {
   /** XPDY0050: Evaluation exception. */
   NOTREATS(XPDY, 50, "%: % expected, sequence found."),
 
+  /** XPST0001: Parsing exception. */
+  STBASEURI(XPST, 1, "Static Base URI is undefined."),
   /** XPST0003: Parsing exception. */
   QUERYEMPTY(XPST, 3, "Empty query."),
   /** XPST0003: Parsing exception. */
@@ -762,6 +764,10 @@ public enum Err {
   INVURL(FOUT, 1170, "URI is invalid: %"),
   /** FOUT1190: Evaluation exception. */
   WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
+  /** FOUT1190: Evaluation exception. */
+  INVCHARS(FOUT, 1190, "%."),
+  /** FOUT1200: Evaluation exception. */
+  WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
 
   /** XUDY0009: XQuery Update dynamic exception. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),

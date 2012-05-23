@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.*;
 
 import org.basex.io.*;
+import org.basex.io.serial.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -80,20 +81,25 @@ public class TextInput extends BufferInput {
   }
 
   /**
-   * Explicitly sets a new encoding.
-   * @param enc encoding (ignored if set to {@code null})
+   * Sets a new encoding if none has been set yet, or if specified encoding is not UTF-8.
+   * @param enc encoding
    * @return self reference
    * @throws IOException I/O Exception
    */
   public TextInput encoding(final String enc) throws IOException {
-    encoding = normEncoding(enc, encoding);
-    decoder = TextDecoder.get(encoding);
+    final String e = normEncoding(enc, encoding);
+    if(encoding == null || e != UTF8) {
+      encoding = e;
+      decoder = TextDecoder.get(e);
+    }
     return this;
   }
 
   @Override
   public int read() throws IOException {
-    return decoder.read(this);
+    final int ch = decoder.read(this);
+    if(ch != -1 && !XMLToken.valid(ch)) throw new EncodingException(ch);
+    return ch;
   }
 
   @Override

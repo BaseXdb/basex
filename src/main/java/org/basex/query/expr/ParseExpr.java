@@ -5,7 +5,6 @@ import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 
 import org.basex.core.*;
-import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
@@ -371,35 +370,6 @@ public abstract class ParseExpr extends Expr {
   public final byte[] checkEStr(final Expr e, final QueryContext ctx)
       throws QueryException {
     return checkEStr(e.item(ctx, info));
-  }
-
-  /**
-   * Checks if the specified resource is valid and exists.
-   * Returns the instance or an exception.
-   * @param path input path
-   * @param ctx query context
-   * @return io instance
-   * @throws QueryException query exception
-   */
-  public final IO checkIO(final byte[] path, final QueryContext ctx)
-      throws QueryException {
-
-    checkCreate(ctx);
-    final String p = string(path);
-    if(p.indexOf('#') != -1) FRAGID.thrw(info, p);
-    if(!Uri.uri(token(p)).isValid()) INVURL.thrw(info, p);
-
-    IO io = IO.get(p);
-    if(io.exists()) return io;
-    // merge with base uri
-    final IO base = ctx.sc.baseIO();
-    if(base != null) {
-      io = base.merge(p);
-      final String rp = ctx.resource.resources.get(io.path());
-      if(rp != null) return IO.get(rp);
-      if(io.exists()) return io;
-    }
-    throw RESNF.thrw(info, p);
   }
 
   /**
