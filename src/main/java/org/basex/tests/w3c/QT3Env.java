@@ -60,7 +60,8 @@ final class QT3Env {
     schemas = al.isEmpty() ? null : al.get(0);
     al = list(ctx, env, COLLATION);
     collations = al.isEmpty() ? null : al.get(0);
-    baseURI = string(STATIC_BASE_URI, ctx, env);
+    final String uri = string(STATIC_BASE_URI, ctx, env);
+    baseURI = "#UNDEFINED".equals(uri) ? "" : uri;
 
     // collections
     collURI = XQuery.string("*:collection/@uri", env, ctx);
@@ -84,8 +85,8 @@ final class QT3Env {
    * @param elem element to be parsed
    * @return map list
    */
-  static ArrayList<HashMap<String, String>> list(final Context ctx,
-      final XdmValue env, final String elem) {
+  static ArrayList<HashMap<String, String>> list(final Context ctx, final XdmValue env,
+      final String elem) {
 
     final ArrayList<HashMap<String, String>> list =
         new ArrayList<HashMap<String, String>>();
