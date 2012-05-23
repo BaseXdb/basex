@@ -82,7 +82,7 @@ public enum PrimitiveType {
   /** Replace node.            */ REPLACENODE,
   /** Delete.                  */ DELETENODE,
   /** Insert before.           */ INSERTBEFORE,
-  /** DBSTORE.                 */ DBSTORE,
+  /** DBStore.                 */ DBSTORE,
   /** DBRename.                */ DBRENAME,
   /** DBDelete.                */ DBDELETE,
   /** DBOptimize.              */ DBOPTIMIZE

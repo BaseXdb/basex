@@ -78,7 +78,7 @@ public class DataAccessTest {
    */
   @Before
   public void setUp() throws IOException {
-    file = new IOFile(File.createTempFile("page", ".basex"));
+    file = new IOFile(File.createTempFile("page", IO.BASEXSUFFIX));
     final RandomAccessFile f = new RandomAccessFile(file.file(), "rw");
     try {
       initialContent(f);

@@ -49,7 +49,7 @@ public class FNValidate extends StandardFunc {
   }
 
   /**
-   * Validates a document against a XML Schema.
+   * Validates a document against an XML Schema.
    * There exist two variants:
    *
    * <ul>{@code validate:xsd($doc)}
@@ -75,16 +75,19 @@ public class FNValidate extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item xsd(final QueryContext ctx) throws QueryException {
+    IOFile tmp = null;
     try {
-      final IO in = read(ctx, null);
+      final IO in = read(0, ctx, null);
       final SchemaFactory sf = SchemaFactory.newInstance(
           XMLConstants.W3C_XML_SCHEMA_NS_URI);
       final Schema schema;
       if(expr.length < 2) { // the schema location is computed at runtime
         schema = sf.newSchema();
       } else { // schema explicitly given and passed to the SchemaFactory
-        final IO sc = IO.get(string(checkStr(expr[1], ctx)));
+        IO sc = read(1, ctx, null);
         if(!sc.exists()) WHICHRES.thrw(info, sc);
+        tmp = createTmp(sc);
+        if(tmp != null) sc = tmp;
         schema = sf.newSchema(new URL(sc.url()));
       }
       final Validator v = schema.newValidator();
@@ -94,9 +97,12 @@ public class FNValidate extends StandardFunc {
     } catch(final Exception ex) {
       if(ex instanceof QueryException) throw (QueryException) ex;
       // may be IOException, SAXException; get original exception
+      Util.debug(ex);
       Throwable e = ex;
       while(e.getCause() != null) e = e.getCause();
       throw VALFAIL.thrw(info, e.getMessage());
+    } finally {
+      if(tmp != null) tmp.delete();
     }
   }
 
@@ -124,18 +130,22 @@ public class FNValidate extends StandardFunc {
    * @throws QueryException query exception
    */
   private Item dtd(final QueryContext ctx) throws QueryException {
+    IOFile tmp = null;
     try {
       final IO in;
-      if(expr.length == 2) {
+      if(expr.length < 2) {
+        // assume that doctype declaration is included in document
+        in = read(0, ctx, null);
+      } else {
         // integrate doctype declaration via serialization properties
         final SerializerProp sp = new SerializerProp();
         final String dtd = string(checkStr(expr[1], ctx));
-        if(!IO.get(dtd).exists()) WHICHRES.thrw(info, dtd);
-        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, dtd);
-        in = read(ctx, sp);
-      } else {
-        // assume that doctype declaration is included in document
-        in = read(ctx, null);
+        IO sc = IO.get(dtd);
+        if(!sc.exists()) WHICHRES.thrw(info, dtd);
+        tmp = createTmp(sc);
+        if(tmp != null) sc = tmp;
+        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, tmp.path());
+        in = read(0, ctx, sp);
       }
       final SAXParserFactory sf = SAXParserFactory.newInstance();
       sf.setValidating(true);
@@ -147,7 +157,23 @@ public class FNValidate extends StandardFunc {
       // may be IOException, SAXException, ParserConfigurationException
       Util.debug(ex);
       throw VALFAIL.thrw(info, ex.getMessage());
+    } finally {
+      if(tmp != null) tmp.delete();
     }
+  }
+
+  /**
+   * Creates a temporary file with the contents of the specified IO reference.
+   * {@code null} is returned if the IO reference refers to an existing file.
+   * @param in input file
+   * @return resulting file
+   * @throws IOException I/O exception
+   */
+  private IOFile createTmp(final IO in) throws IOException {
+    if(!(in instanceof IOContent || in instanceof IOStream)) return null;
+    final IOFile tmp = new IOFile(File.createTempFile("validate", IO.BASEXSUFFIX));
+    tmp.write(in.read());
+    return tmp;
   }
 
   /** Schema error handler. */
@@ -178,17 +204,18 @@ public class FNValidate extends StandardFunc {
 
   /**
    * Returns an input reference (possibly cached) to the first argument.
+   * @param i argument index
    * @param ctx query context
    * @param sp serializer properties
    * @return item
    * @throws QueryException query exception
    * @throws IOException exception
    */
-  private IO read(final QueryContext ctx, final SerializerProp sp)
+  private IO read(final int i, final QueryContext ctx, final SerializerProp sp)
       throws QueryException, IOException {
 
-    final Item it = checkItem(expr[0], ctx);
-    if(it.isEmpty()) STRNODTYPE.thrw(info, this);
+    final Item it = checkItem(expr[i], ctx);
+    if(it.isEmpty()) STRNODTYPE.thrw(info, this, it);
     final Type ip = it.type;
 
     final ArrayOutput ao = new ArrayOutput();

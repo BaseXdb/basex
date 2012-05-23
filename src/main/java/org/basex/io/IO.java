@@ -273,6 +273,7 @@ public abstract class IO {
 
   /**
    * Creates a URL from the specified path.
+   * Returns the original path for IO instances other than {@link IOFile}.
    * @return URL
    */
   public String url() {
