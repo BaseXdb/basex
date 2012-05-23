@@ -62,7 +62,7 @@ public final class XMLDBInsert {
 
     } catch(final XMLDBException ex) {
       // Handle exceptions
-      System.err.println("XML:DB Exception occured " + ex.errorCode);
+      System.err.println("XML:DB Exception occurred " + ex.errorCode);
       ex.printStackTrace();
     } finally {
       // Close the collection

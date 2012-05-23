@@ -62,7 +62,7 @@ public final class XMLDBQuery {
       }
     } catch(final XMLDBException ex) {
       // Handle exceptions
-      System.err.println("XML:DB Exception occured " + ex.errorCode);
+      System.err.println("XML:DB Exception occurred " + ex.errorCode);
     } finally {
       // Close the collection
       if(coll != null) coll.close();
