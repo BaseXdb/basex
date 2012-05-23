@@ -44,11 +44,11 @@ public enum Err {
   EMPTYPATH(BASX, 13, "%: Empty path specified."),
   /** BASX0014: Evaluation exception. */
   DBERR(BASX, 14, "%"),
-  /** BASEX0015: Evaluation exception. */
+  /** BASX0015: Evaluation exception. */
   JSONPARSE(BASX, 15, "JSON parser (%:%): %."),
-  /** BASEX0015: Evaluation exception. */
+  /** BASX0015: Evaluation exception. */
   JSONMLPARSE(BASX, 15, "JsonML converter: %."),
-  /** BASEX0016: Serialization exception. */
+  /** BASX0016: Serialization exception. */
   JSONSER(BASX, 16, "JSON serialization: %."),
   /** BASX0017: Invalid value of $argNum in call to fn:partial-apply. */
   INVPOS(BASX, 17, "Illegal argument position for %: %."),
