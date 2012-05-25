@@ -62,8 +62,6 @@ public enum Err {
   FTMODE(BASX, 21, "Unknown search mode: '%'."),
   /** BASX0022: Parsing exception. */
   FTFZWC(BASX, 22, "Either wildcards or fuzzy search supported."),
-  /** BASX0023: Evaluation exception. */
-  VALFAIL(BASX, 23, "Validation failed: %"),
 
   /** BXCL0001: Evaluation exception. */
   CLCONN(BXCL, 1, "Connection failed: %"),
@@ -71,6 +69,9 @@ public enum Err {
   CLWHICH(BXCL, 2, "Session not available: %"),
   /** BXCL0003: Evaluation exception. */
   CLERR(BXCL, 3, "Session error: %"),
+
+  /** BXVA: Evaluation exception. */
+  VALFAIL(BXVA, 1, "Validation failed: %"),
 
   /** PROC9999: Encoding. */
   PROCENC(PROC, 9999, "Encoding not supported: '%'."),
@@ -946,6 +947,7 @@ public enum Err {
   public enum ErrType {
     /** BASX Error type. */ BASX(QueryText.BASEX, QueryText.BXERRORS),
     /** BASX Error type. */ BXCL(QueryText.BASEX, QueryText.BXERRORS),
+    /** BASX Error type. */ BXVA(QueryText.BASEX, QueryText.BXERRORS),
     /** BASX Error type. */ PROC(QueryText.PROC, QueryText.PROCURI),
     /** FOCX Error type. */ FOCX(QueryText.CRYPTO, QueryText.CRYPTOURI),
     /** FOAR Error type. */ FOAR,

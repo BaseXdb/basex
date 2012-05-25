@@ -144,7 +144,7 @@ public class FNValidate extends StandardFunc {
         if(!sc.exists()) WHICHRES.thrw(info, dtd);
         tmp = createTmp(sc);
         if(tmp != null) sc = tmp;
-        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, tmp.path());
+        sp.set(SerializerProp.S_DOCTYPE_SYSTEM, sc.path());
         in = read(0, ctx, sp);
       }
       final SAXParserFactory sf = SAXParserFactory.newInstance();
@@ -152,11 +152,12 @@ public class FNValidate extends StandardFunc {
       final InputSource is = in.inputSource();
       sf.newSAXParser().parse(is, new SchemaHandler());
       return null;
+    } catch(final QueryException ex) {
+      throw ex;
     } catch(final Exception ex) {
-      if(ex instanceof QueryException) throw (QueryException) ex;
       // may be IOException, SAXException, ParserConfigurationException
       Util.debug(ex);
-      throw VALFAIL.thrw(info, ex.getMessage());
+      throw VALFAIL.thrw(info, ex);
     } finally {
       if(tmp != null) tmp.delete();
     }
