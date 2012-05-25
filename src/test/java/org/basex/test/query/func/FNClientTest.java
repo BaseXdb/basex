@@ -48,7 +48,7 @@ public final class FNClientTest extends AdvancedQueryTest {
     check(_CLIENT_CONNECT);
     query(connect());
     query(EXISTS.args(" " + connect()));
-    error(_CLIENT_CONNECT.args(Text.LOCALHOST, 1984, Text.ADMIN, ""), Err.CLCONN);
+    error(_CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, ""), Err.CLCONN);
   }
 
   /**
@@ -102,6 +102,6 @@ public final class FNClientTest extends AdvancedQueryTest {
    * @return connect string
    */
   private static String connect() {
-    return _CLIENT_CONNECT.args(Text.LOCALHOST, 1984, Text.ADMIN, Text.ADMIN);
+    return _CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, Text.ADMIN);
   }
 }
