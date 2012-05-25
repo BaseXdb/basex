@@ -124,15 +124,7 @@ public final class ModuleLoader {
     }
 
     // no external classes added: use default class loader
-    if(loader == LOADER) return Reflect.forName(clz);
-
-    final Thread thread = Thread.currentThread();
-    try {
-      thread.setContextClassLoader(loader);
-      return Class.forName(clz, true, loader);
-    } finally {
-      thread.setContextClassLoader(LOADER);
-    }
+    return loader == LOADER ? Reflect.forName(clz) : Class.forName(clz, true, loader);
   }
 
   /**
