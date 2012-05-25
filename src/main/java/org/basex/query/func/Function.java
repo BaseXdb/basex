@@ -571,6 +571,17 @@ public enum Function {
   _PROC_EXECUTE(FNProc.class, "execute(command[,args[,encoding]]])",
       ELM, 1, STR, STR_ZM, STR),
 
+  /* FNClient functions. */
+
+  /** XQuery function. */
+  _CLIENT_CONNECT(FNClient.class, "connect(url,port,user,pass)", URI, STR, ITR, STR, STR),
+  /** XQuery function. */
+  _CLIENT_EXECUTE(FNClient.class, "execute(id,command)", STR, URI, STR),
+  /** XQuery function. */
+  _CLIENT_QUERY(FNClient.class, "query(id,query)", ITEM_ZO, URI, STR),
+  /** XQuery function. */
+  _CLIENT_CLOSE(FNClient.class, "close(id)", EMP, URI),
+
   /* FNSql functions. */
 
   /** XQuery function */
@@ -766,6 +777,7 @@ public enum Function {
     URIS.put(FNZip.class,    ZIPURI);
     URIS.put(FNRepo.class,   REPOURI);
     // internal functions
+    URIS.put(FNClient.class,   CLIENTURI);
     URIS.put(FNDb.class,       DBURI);
     URIS.put(FNFt.class,       FTURI);
     URIS.put(FNHof.class,      HOFURI);

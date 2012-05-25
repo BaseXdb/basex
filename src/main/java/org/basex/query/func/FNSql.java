@@ -18,6 +18,7 @@ import org.basex.util.hash.*;
 
 /**
  * Functions on relational databases.
+ *
  * @author BaseX Team 2005-12, BSD License
  * @author Rositsa Shadura
  */

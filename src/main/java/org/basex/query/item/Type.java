@@ -31,6 +31,15 @@ public interface Type {
   Item cast(final Object o, final InputInfo ii) throws QueryException;
 
   /**
+   * Casts the specified string to the XQuery data type.
+   * @param s string object
+   * @param ii input info
+   * @return new item
+   * @throws QueryException query exception
+   */
+  Item castString(final String s, final InputInfo ii) throws QueryException;
+
+  /**
    * Returns the sequence type of this data type.
    * @return sequence type
    */

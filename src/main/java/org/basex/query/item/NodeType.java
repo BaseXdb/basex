@@ -3,11 +3,13 @@ package org.basex.query.item;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.regex.*;
 
 import org.basex.api.dom.*;
 import org.basex.build.*;
 import org.basex.build.xml.*;
 import org.basex.core.*;
+import org.basex.io.*;
 import org.basex.query.*;
 import org.basex.query.util.*;
 import org.basex.util.*;
@@ -29,25 +31,39 @@ public enum NodeType implements Type {
   TXT("text", NOD, 9) {
     @Override
     public ANode cast(final Object o, final InputInfo ii) {
-      return o instanceof BXText ? ((BXText) o).getNod() : new FTxt((Text) o);
+      if(o instanceof BXText) return ((BXText) o).getNod();
+      if(o instanceof Text) return new FTxt((Text) o);
+      return new FTxt(Token.token(o.toString()));
     }
   },
 
   /** PI type. */
   PI("processing-instruction", NOD, 10) {
     @Override
-    public ANode cast(final Object o, final InputInfo ii) {
-      return o instanceof BXPI ? ((BXPI) o).getNod() :
-        new FPI((ProcessingInstruction) o);
+    public ANode cast(final Object o, final InputInfo ii) throws QueryException {
+      if(o instanceof BXPI) return ((BXPI) o).getNod();
+      if(o instanceof ProcessingInstruction) return new FPI((ProcessingInstruction) o);
+      final Matcher m = Pattern.compile("<\\?(.*?) (.*)\\?>").matcher(o.toString());
+      if(m.find()) {
+        return new FPI(new QNm(m.group(1)), Token.token(m.group(2)));
+      }
+      throw NODEERR.thrw(ii, this, o);
     }
   },
 
   /** Element type. */
   ELM("element", NOD, 11) {
     @Override
-    public ANode cast(final Object o, final InputInfo ii) {
-      return o instanceof BXElem ? ((BXElem) o).getNod() :
-        new FElem((Element) o, null, new TokenMap());
+    public ANode cast(final Object o, final InputInfo ii) throws QueryException {
+      if(o instanceof BXElem)  return ((BXElem) o).getNod();
+      if(o instanceof Element) return new FElem((Element) o, null, new TokenMap());
+      try {
+        final DBNode db = new DBNode(new IOContent(o.toString()), new Prop());
+        return db.children().next();
+      } catch(final IOException ex) {
+        NODEERR.thrw(ii, this, ex);
+      }
+      return null;
     }
   },
 
@@ -56,38 +72,55 @@ public enum NodeType implements Type {
     @Override
     public ANode cast(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
-      if(o instanceof Document) {
-        try {
+      try {
+        if(o instanceof Document) {
           final DOMWrapper p = new DOMWrapper((Document) o, "", new Prop());
           return new DBNode(MemBuilder.build(p));
-        } catch(final IOException ex) {
-          UNDOC.thrw(ii, ex);
         }
+        if(o instanceof DocumentFragment) {
+          // document fragment
+          final DocumentFragment df = (DocumentFragment) o;
+          final String bu = df.getBaseURI();
+          return new FDoc(df, bu != null ? Token.token(bu) : Token.EMPTY);
+        }
+        final String c = o.toString();
+        if(c.startsWith("<")) return new DBNode(new IOContent(c), new Prop());
+        return new FDoc(Token.EMPTY).add(new FTxt(Token.token(c)));
+      } catch(final IOException ex) {
+        throw NODEERR.thrw(ii, this, ex);
       }
-      // document fragment
-      final DocumentFragment df = (DocumentFragment) o;
-      final String bu = df.getBaseURI();
-      return new FDoc(df, bu != null ? Token.token(bu) : Token.EMPTY);
     }
   },
 
   /** Document element type. */
-  DEL("document-node(element())", NOD, 13),
+  DEL("document-node(element())", NOD, 13) {
+    @Override
+    public Item cast(final Object o, final InputInfo ii) throws QueryException {
+      return DOC.cast(o, ii);
+    }
+  },
 
   /** Attribute type. */
   ATT("attribute", NOD, 14) {
     @Override
-    public ANode cast(final Object o, final InputInfo ii) {
-      return o instanceof BXAttr ? ((BXAttr) o).getNod() : new FAttr((Attr) o);
+    public ANode cast(final Object o, final InputInfo ii) throws QueryException {
+      if(o instanceof BXAttr) return ((BXAttr) o).getNod();
+      if(o instanceof Attr) return new FAttr((Attr) o);
+      final Matcher m = Pattern.compile(" (.*?)=\"(.*)\"").matcher(o.toString());
+      if(m.find()) return new FAttr(Token.token(m.group(1)), Token.token(m.group(2)));
+      throw NODEERR.thrw(ii, this, o);
     }
   },
 
   /** Comment type. */
   COM("comment", NOD, 15) {
     @Override
-    public ANode cast(final Object o, final InputInfo ii) {
-      return o instanceof BXComm ? ((BXComm) o).getNod() :
-        new FComm((Comment) o);
+    public ANode cast(final Object o, final InputInfo ii) throws QueryException {
+      if(o instanceof BXComm) return ((BXComm) o).getNod();
+      if(o instanceof FComm) return new FComm((Comment) o);
+      final Matcher m = Pattern.compile("<!--(.*?)-->").matcher(o.toString());
+      if(m.find()) return new FComm(Token.token(m.group(1)));
+      throw NODEERR.thrw(ii, this, o);
     }
   },
 
@@ -171,6 +204,11 @@ public enum NodeType implements Type {
   public Item cast(final Object o, final InputInfo ii) throws QueryException {
     Util.notexpected(o);
     return null;
+  }
+
+  @Override
+  public Item castString(final String o, final InputInfo ii) throws QueryException {
+    return cast(o, ii);
   }
 
   @Override

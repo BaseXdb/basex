@@ -89,6 +89,11 @@ public class FuncType implements Type {
   }
 
   @Override
+  public final Item castString(final String s, final InputInfo ii) {
+    throw Util.notexpected(s);
+  }
+
+  @Override
   public final boolean instanceOf(final Type t) {
     // the only non-function super-type of function is item()
     if(!(t instanceof FuncType)) return t == AtomType.ITEM;

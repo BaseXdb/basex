@@ -121,6 +121,8 @@ public final class QueryContext extends Progress {
   public ModuleLoader modules;
   /** Opened connections to relational databases. */
   JDBCConnections jdbc;
+  /** Opened connections to relational databases. */
+  ClientSessions sessions;
 
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
@@ -345,6 +347,15 @@ public final class QueryContext extends Progress {
   }
 
   /**
+   * Returns client sessions.
+   * @return client session
+   */
+  public ClientSessions sessions() {
+    if(sessions == null) sessions = new ClientSessions();
+    return sessions;
+  }
+
+  /**
    * Returns the serialization parameters used for and specified by this query.
    * @param optional if {@code true}, a {@code null} reference is returned if no
    *   parameters have been specified
@@ -411,6 +422,8 @@ public final class QueryContext extends Progress {
     resource.close();
     // close JDBC connections
     if(jdbc != null) jdbc.close();
+    // close client sessions
+    if(sessions != null) sessions.close();
     // close dynamically loaded JAR files
     modules.close();
   }

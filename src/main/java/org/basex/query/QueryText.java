@@ -431,6 +431,8 @@ public interface QueryText {
   byte[] OUTPUT = token("output");
   /** BaseX token. */
   byte[] BASEX = token("basex");
+  /** Client token. */
+  byte[] CLIENT = token("client");
   /** DB token. */
   byte[] DB = token("db");
   /** Index token. */
@@ -522,10 +524,14 @@ public interface QueryText {
   /** ZIP URI.*/
   byte[] ZIPURI = token(EXPATH + "zip");
 
-  /** Database URI. */
+  /** Project URI. */
   byte[] BASEXURI = token(Text.URL);
-  /** EXPath URI. */
+  /** Project modules. */
   String BXMODULES = Text.URL + "/modules/";
+  /** Project errors. */
+  byte[] BXERRORS = token(Text.URL + "/error/");
+  /** Client module URI. */
+  byte[] CLIENTURI = token(BXMODULES + "client");
   /** Database module URI. */
   byte[] DBURI = token(BXMODULES + "db");
   /** Full-text module URI. */

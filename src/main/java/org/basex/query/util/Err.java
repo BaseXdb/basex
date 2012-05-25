@@ -65,6 +65,13 @@ public enum Err {
   /** BASX0023: Evaluation exception. */
   VALFAIL(BASX, 23, "Validation failed: %"),
 
+  /** BXCL0001: Evaluation exception. */
+  CLCONN(BXCL, 1, "Connection failed: %"),
+  /** BXCL0002: Evaluation exception. */
+  CLWHICH(BXCL, 2, "Session not available: %"),
+  /** BXCL0003: Evaluation exception. */
+  CLERR(BXCL, 3, "Session error: %"),
+
   /** PROC9999: Encoding. */
   PROCENC(PROC, 9999, "Encoding not supported: '%'."),
 
@@ -92,7 +99,7 @@ public enum Err {
   /** FODC0001: Evaluation exception. */
   IDDOC(FODC, 1, "Root must be a document node."),
   /** FODC0002: Evaluation exception. */
-  UNDOC(FODC, 2, "Document node could not be created (%)."),
+  NODEERR(FODC, 2, "% could not be created (%)."),
   /** FODC0002: Evaluation exception. */
   NODEFCOLL(FODC, 2, "No default collection available."),
   /** FODC0002: Evaluation exception. */
@@ -937,7 +944,8 @@ public enum Err {
    * @author Leo Woerteler
    */
   public enum ErrType {
-    /** BASX Error type. */ BASX(QueryText.BASEX, QueryText.BASEXURI),
+    /** BASX Error type. */ BASX(QueryText.BASEX, QueryText.BXERRORS),
+    /** BASX Error type. */ BXCL(QueryText.BASEX, QueryText.BXERRORS),
     /** BASX Error type. */ PROC(QueryText.PROC, QueryText.PROCURI),
     /** FOCX Error type. */ FOCX(QueryText.CRYPTO, QueryText.CRYPTOURI),
     /** FOAR Error type. */ FOAR,

@@ -584,8 +584,9 @@ public enum AtomType implements Type {
           Bln.get(Bln.parse(it.string(ii), ii)) : error(it, ii);
     }
     @Override
-    public Item cast(final Object o, final InputInfo ii) {
-      return Bln.get((Boolean) o);
+    public Bln cast(final Object o, final InputInfo ii) {
+      return o instanceof Boolean ? Bln.get((Boolean) o) :
+        Bln.get(Boolean.parseBoolean(o.toString()));
     }
   },
 
@@ -602,7 +603,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return new B64((byte[]) o, ii);
+      return new B64(o instanceof byte[] ? (byte[]) o : Token.token(o.toString()), ii);
     }
   },
 
@@ -616,7 +617,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) throws QueryException {
-      return new Hex((byte[]) o, ii);
+      return new Hex(o instanceof byte[] ? (byte[]) o : Token.token(o.toString()), ii);
     }
   },
 
@@ -653,7 +654,7 @@ public enum AtomType implements Type {
     }
     @Override
     public Item cast(final Object o, final InputInfo ii) {
-      return new QNm((QName) o);
+      return o instanceof QName ? new QNm((QName) o) : new QNm(o.toString());
     }
   },
 
@@ -776,6 +777,11 @@ public enum AtomType implements Type {
   public Item cast(final Object o, final InputInfo ii) throws QueryException {
     Util.notexpected(o);
     return null;
+  }
+
+  @Override
+  public Item castString(final String o, final InputInfo ii) throws QueryException {
+    return cast(o, ii);
   }
 
   @Override

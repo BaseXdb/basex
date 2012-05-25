@@ -40,6 +40,7 @@ public final class NSGlobal {
     NS.add(PKG, PKGURI);
     // BaseX namespaces
     NS.add(BASEX, BASEXURI);
+    NS.add(CLIENT, CLIENTURI);
     NS.add(DB, DBURI);
     NS.add(FT, FTURI);
     NS.add(HOF, HOFURI);

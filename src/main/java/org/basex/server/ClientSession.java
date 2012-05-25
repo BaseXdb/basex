@@ -322,4 +322,9 @@ public class ClientSession extends Session {
     if(!ClientSession.ok(bi)) throw new BaseXException(bi.readString());
     return o.toString();
   }
+
+  @Override
+  public String toString() {
+     return ehost + ':' + socket.getPort();
+  }
 }

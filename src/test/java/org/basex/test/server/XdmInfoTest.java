@@ -195,7 +195,7 @@ public final class XdmInfoTest extends SandboxTest {
    * <li>Entry 3: textual result</li>
    * </ul>
    */
-  static final Object[][] TYPES = {
+  public static final Object[][] TYPES = {
     { }, { }, { }, { }, { }, { }, { },
     // code: 7
     { "function item" },

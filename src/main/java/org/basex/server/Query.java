@@ -3,6 +3,7 @@ package org.basex.server;
 import java.io.*;
 
 import org.basex.io.in.*;
+import org.basex.query.item.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 
@@ -21,6 +22,8 @@ public abstract class Query {
   protected OutputStream out;
   /** Cached results. */
   protected TokenList cache;
+  /** Cached result types. */
+  protected IntList types;
   /** Cache pointer. */
   protected int pos;
 
@@ -68,7 +71,10 @@ public abstract class Query {
    */
   public boolean more() throws IOException {
     if(cache == null) cache();
-    return pos < cache.size();
+    if(pos < cache.size()) return true;
+    cache = null;
+    types = null;
+    return false;
   }
 
   /**
@@ -92,17 +98,30 @@ public abstract class Query {
   }
 
   /**
+   * Returns the current XQuery type (must be called after {@link #next()}.
+   * @return item type
+   */
+  public final Type type() {
+    final int id = types.get(pos - 1);
+    for(final AtomType t : AtomType.values()) if(t.id() == id) return t;
+    for(final NodeType t : NodeType.values()) if(t.id() == id) return t;
+    return null;
+  }
+
+  /**
    * Caches the incoming input.
    * @param is input stream
    * @throws IOException I/O exception
    */
   protected void cache(final InputStream is) throws IOException {
     cache = new TokenList();
+    types = new IntList();
     final ByteList bl = new ByteList();
-    while(is.read() > 0) {
+    for(int t; (t = is.read()) > 0;) {
       final DecodingInput di = new DecodingInput(is);
       for(int b; (b = di.read()) != -1;) bl.add(b);
       cache.add(bl.toArray());
+      types.add(t);
       bl.reset();
     }
   }

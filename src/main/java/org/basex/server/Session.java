@@ -107,10 +107,18 @@ public abstract class Session {
   /**
    * Specifies an output stream. The output stream can be invalidated by
    * passing on {@code null} as argument.
-   * @param output client output stream.
+   * @param output client output stream
    */
   public final void setOutputStream(final OutputStream output) {
     out = output;
+  }
+
+  /**
+   * Returns the assigned output stream.
+   * @return client output stream
+   */
+  public OutputStream getOutputStream() {
+    return out;
   }
 
   /**
@@ -124,7 +132,7 @@ public abstract class Session {
   /**
    * Constructor.
    * @param output client output stream; if set to {@code null}, all
-   * results will be returned as strings.
+   * results will be returned as strings
    */
   Session(final OutputStream output) {
     out = output;
