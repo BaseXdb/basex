@@ -90,7 +90,7 @@ public final class Catch extends Single {
   }
 
   /**
-   * Checks if one defined error matches the thrown error.
+   * Checks if one of the specified errors matches the thrown error.
    * @param err error reference
    * @param code error code
    * @return result of check
@@ -98,9 +98,10 @@ public final class Catch extends Single {
   private boolean find(final Err err, final QNm code) {
     for(final QNm c : codes) {
       if(c != null) {
-        final byte[] cu = c.uri(), eu = err != null ? err.qname().uri() :
-          code.hasURI() ? code.uri() : null;
-        if(eu == null || cu.length != 0 && !eq(eu, cu)) continue;
+        final byte[] cu = c.uri();
+        final byte[] eu = err != null ? err.qname().uri() :
+          code.hasURI() ? code.uri() : EMPTY;
+        if(cu.length != 0 && !eq(eu, cu)) continue;
         final byte[] nm = c.local();
         if(nm.length != 0 && !eq(code.local(), nm)) continue;
       }
