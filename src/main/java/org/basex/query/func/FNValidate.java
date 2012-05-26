@@ -100,7 +100,7 @@ public class FNValidate extends StandardFunc {
       Util.debug(ex);
       Throwable e = ex;
       while(e.getCause() != null) e = e.getCause();
-      throw VALFAIL.thrw(info, e.getMessage());
+      throw BXVA_FAIL.thrw(info, e.getMessage());
     } finally {
       if(tmp != null) tmp.delete();
     }
@@ -157,7 +157,7 @@ public class FNValidate extends StandardFunc {
     } catch(final Exception ex) {
       // may be IOException, SAXException, ParserConfigurationException
       Util.debug(ex);
-      throw VALFAIL.thrw(info, ex);
+      throw BXVA_FAIL.thrw(info, ex);
     } finally {
       if(tmp != null) tmp.delete();
     }

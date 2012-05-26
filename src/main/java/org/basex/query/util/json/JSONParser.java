@@ -252,6 +252,6 @@ final class JSONParser extends InputParser {
       throws QueryException {
 
     final int[] lc = new InputInfo(this).lineCol();
-    throw JSONPARSE.thrw(info, lc[0], lc[1], Util.inf(msg, ext));
+    throw BXJS_PARSE.thrw(info, lc[0], lc[1], Util.inf(msg, ext));
   }
 }

@@ -113,7 +113,7 @@ final class DatabaseUpdates {
    * @throws QueryException query exception
    */
   void startUpdate() throws QueryException {
-    if(!data.startUpdate()) PINNED.thrw(null, data.meta.name);
+    if(!data.startUpdate()) BXDB_OPENED.thrw(null, data.meta.name);
   }
 
   /**

@@ -70,7 +70,7 @@ public final class FNDbTest extends AdvancedQueryTest {
 
     // run function on non-existing database
     new DropDB(NAME).execute(context);
-    error(_DB_OPEN.args(NAME), Err.NODB);
+    error(_DB_OPEN.args(NAME), Err.BXDB_OPEN);
   }
 
   /**
@@ -80,7 +80,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbOpenPre() {
     check(_DB_OPEN_PRE);
     query(_DB_OPEN_PRE.args(NAME, 0) + "//title/text()", "XML");
-    error(_DB_OPEN_PRE.args(NAME, -1), Err.IDINVALID);
+    error(_DB_OPEN_PRE.args(NAME, -1), Err.BXDB_RANGE);
   }
 
   /**
@@ -90,7 +90,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   public void dbOpenId() {
     check(_DB_OPEN_ID);
     query(_DB_OPEN_ID.args(NAME, 0) + "//title/text()", "XML");
-    error(_DB_OPEN_ID.args(NAME, -1), Err.IDINVALID);
+    error(_DB_OPEN_ID.args(NAME, -1), Err.BXDB_RANGE);
   }
 
   /**
@@ -164,7 +164,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     check(_DB_FULLTEXT);
     // run function without and with index
     new DropIndex(Commands.CmdIndex.FULLTEXT).execute(context);
-    error(_DB_FULLTEXT.args(NAME, "assignments"), Err.NOINDEX);
+    error(_DB_FULLTEXT.args(NAME, "assignments"), Err.BXDB_INDEX);
     new CreateIndex(Commands.CmdIndex.FULLTEXT).execute(context);
     query(_DB_FULLTEXT.args(NAME, "assignments"), "Assignments");
     query(_DB_FULLTEXT.args(NAME, "XXX"), "");
@@ -213,7 +213,7 @@ public final class FNDbTest extends AdvancedQueryTest {
     query(rawCall + "/text()", "raw");
 
     query(_DB_LIST_DETAILS.args(NAME, "test"), "");
-    error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), Err.NODB);
+    error(_DB_LIST_DETAILS.args("mostProbablyNotAvailable"), Err.BXDB_OPEN);
   }
 
   /**
@@ -261,7 +261,7 @@ public final class FNDbTest extends AdvancedQueryTest {
   @Test
   public void dbEvent() {
     check(_DB_EVENT);
-    error(_DB_EVENT.args("X", "Y"), Err.NOEVENT);
+    error(_DB_EVENT.args("X", "Y"), Err.BXDB_EVENT);
   }
 
   /**

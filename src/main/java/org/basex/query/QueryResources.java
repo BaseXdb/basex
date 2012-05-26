@@ -52,7 +52,7 @@ public final class QueryResources {
    */
   void compile(final Nodes nodes) throws QueryException {
     final Data d = nodes.data;
-    if(!ctx.context.perm(Perm.READ, d.meta)) PERMNO.thrw(null, Perm.READ);
+    if(!ctx.context.perm(Perm.READ, d.meta)) BASX_PERM.thrw(null, Perm.READ);
 
     // assign initial context value
     // (if database only contains an empty root node, assign empty sequence)
@@ -96,7 +96,7 @@ public final class QueryResources {
       addData(d);
       return d;
     } catch(final IOException ex) {
-      throw NODB.thrw(info, ex);
+      throw BXDB_OPEN.thrw(info, ex);
     }
   }
 
@@ -293,7 +293,7 @@ public final class QueryResources {
     // check if the database contains exactly one relevant document
     final IntList docs = dt.resources.docs(qi.path);
     if(docs.isEmpty()) WHICHRES.thrw(info, qi.original);
-    if(docs.size() != 1) EXPSINGLE.thrw(info, qi.original);
+    if(docs.size() != 1) BXDB_SINGLE.thrw(info, qi.original);
     return new DBNode(dt, docs.get(0), Data.DOC);
   }
 

@@ -58,7 +58,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
   public void utilRun() {
     check(_UTIL_RUN);
     query(_UTIL_RUN.args("src/test/resources/input.xq"), "XML");
-    error(_UTIL_RUN.args("src/test/resources/xxx.xq"), Err.FILEERROR);
+    error(_UTIL_RUN.args("src/test/resources/xxx.xq"), Err.FL_FILE);
   }
 
   /**
@@ -197,7 +197,7 @@ public final class FNUtilTest extends AdvancedQueryTest {
     query(_UTIL_TO_STRING.args("xs:base64Binary(xs:hexBinary('41'))"), "A");
     query(_UTIL_TO_STRING.args("xs:hexBinary('41')"), "A");
     query(_UTIL_TO_STRING.args("xs:hexBinary('41')", "CP1252"), "A");
-    error(_UTIL_TO_STRING.args("xs:hexBinary('41')", "X"), Err.CONVERT);
+    error(_UTIL_TO_STRING.args("xs:hexBinary('41')", "X"), Err.BXCO_STRING);
   }
 
   /**

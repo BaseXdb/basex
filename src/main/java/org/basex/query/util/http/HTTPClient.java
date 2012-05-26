@@ -56,7 +56,7 @@ public final class HTTPClient {
 
     try {
       if(request == null) {
-        if(href == null || href.length == 0) NOPARAMS.thrw(info);
+        if(href == null || href.length == 0) HC_PARAMS.thrw(info);
         final HttpURLConnection conn = openConnection(string(href));
         try {
           return new HTTPResponse(info, prop).getResponse(
@@ -68,7 +68,7 @@ public final class HTTPClient {
 
       final HTTPRequest r = new HTTPRequestParser(info).parse(request, bodies);
       final byte[] dest = href == null ? r.attrs.get(HREF) : href;
-      if(dest == null) NOURL.thrw(info);
+      if(dest == null) HC_URL.thrw(info);
 
       final HttpURLConnection conn = openConnection(string(dest));
       try {
@@ -85,12 +85,12 @@ public final class HTTPClient {
         conn.disconnect();
       }
     } catch(final MalformedURLException ex) {
-      throw HTTPERR.thrw(info, "Invalid URL");
+      throw HC_ERROR.thrw(info, "Invalid URL");
     } catch(final ProtocolException ex) {
-      throw HTTPERR.thrw(info, "Invalid HTTP method");
+      throw HC_ERROR.thrw(info, "Invalid HTTP method");
     } catch(final IOException ex) {
       Util.debug(ex);
-      throw HTTPERR.thrw(info, ex);
+      throw HC_ERROR.thrw(info, ex);
     }
   }
 
@@ -107,7 +107,7 @@ public final class HTTPClient {
 
     final URL url = new URL(dest);
     if(!eqic(url.getProtocol(), "HTTP", "HTTPS"))
-      HTTPERR.thrw(info, "Invalid URL");
+      HC_ERROR.thrw(info, "Invalid URL");
     return (HttpURLConnection) url.openConnection();
   }
 

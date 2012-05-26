@@ -342,7 +342,7 @@ public final class DialogServer extends BaseXDialog {
     } catch(final Exception ex) {
       icon = Msg.ERROR;
       msg = Util.message(ex);
-      if(msg.equals(Util.info(PERM_NEEDED_X, Perm.ADMIN))) {
+      if(msg.equals(Util.info(PERM_REQUIRED_X, Perm.ADMIN))) {
         try {
           cs.execute(new Exit());
         } catch(final IOException exx) {

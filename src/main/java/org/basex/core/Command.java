@@ -292,7 +292,7 @@ public abstract class Command extends Progress {
     if(d == null && data) return error(NO_DB_OPENED);
 
     // check permissions
-    if(!ctx.perm(perm, d != null ? d.meta : null)) return error(PERM_NEEDED_X, perm);
+    if(!ctx.perm(perm, d != null ? d.meta : null)) return error(PERM_REQUIRED_X, perm);
 
     // set updating flag
     updating = updating(ctx);

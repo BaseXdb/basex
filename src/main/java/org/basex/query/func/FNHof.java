@@ -226,7 +226,6 @@ public final class FNHof extends StandardFunc {
 
   @Override
   public boolean uses(final Use u) {
-    return sig == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 ||
-        super.uses(u);
+    return sig == Function.PARTIAL_APPLY && u == Use.CTX || u == Use.X30 || super.uses(u);
   }
 }

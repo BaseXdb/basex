@@ -2,7 +2,6 @@ package org.basex.query.util;
 
 import static org.basex.query.util.Err.ErrType.*;
 
-import org.basex.core.*;
 import org.basex.io.serial.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
@@ -16,885 +15,898 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public enum Err {
-  /** BASX0000: Evaluation exception. */
-  GENERR(BASX, 0, "%"),
-  /** BASX0001: Evaluation exception. */
-  NOINDEX(BASX, 1, "Database '%' has no % index."),
-  /** BASX0002: Evaluation exception. */
-  NODBCTX(BASX, 2, "%: database context needed."),
-  /** BASX0002: Evaluation exception. */
-  DBMEM(BASX, 2, "Not supported on main-memory databases."),
-  /** BASX0003: Evaluation exception. */
-  NODB(BASX, 3, "%"),
-  /** BASX0004: Evaluation exception. */
-  IDINVALID(BASX, 4, "%: value '%' out of range."),
-  /** BASX0005: Evaluation exception. */
-  PERMNO(BASX, 5, Text.PERM_NEEDED_X),
-  /** BASX0007: Evaluation exception. */
-  QUERYNODES(BASX, 7, Text.NO_DB_NODES),
-  /** BASX0008: Evaluation exception. */
-  EXPSINGLE(BASX, 8, "Database path '%' must point to a single document."),
-  /** BASX0009: Evaluation exception. */
-  NOEVENT(BASX, 9, "Event '%' is unknown."),
-  /** BASX0010: Parsing exception. */
-  NOOPTION(BASX, 10, "Unknown database option '%'."),
-  /** BASX0012: Evaluation exception. */
-  DOCTRGMULT(BASX, 12, "Single resource is expected as replace target."),
-  /** BASX0013: Evaluation exception. */
-  EMPTYPATH(BASX, 13, "%: Empty path specified."),
-  /** BASX0014: Evaluation exception. */
-  DBERR(BASX, 14, "%"),
-  /** BASX0015: Evaluation exception. */
-  JSONPARSE(BASX, 15, "JSON parser (%:%): %."),
-  /** BASX0015: Evaluation exception. */
-  JSONMLPARSE(BASX, 15, "JsonML converter: %."),
-  /** BASX0016: Serialization exception. */
-  JSONSER(BASX, 16, "JSON serialization: %."),
-  /** BASX0017: Invalid value of $argNum in call to fn:partial-apply. */
-  INVPOS(BASX, 17, "Illegal argument position for %: %."),
-  /** BASX0018: Evaluation exception. */
-  CONVERT(BASX, 18, "String conversion: %."),
-  /** BASX0019: Evaluation exception. */
-  INVFLAG(BASX, 19, "Unknown flag: %."),
-  /** BASX0020: Evaluation exception. */
-  PINNED(BASX, 20, "Database '%' is opened by another process."),
-  /** BASX0021: Parsing exception. */
-  FTMODE(BASX, 21, "Unknown search mode: '%'."),
-  /** BASX0022: Parsing exception. */
-  FTFZWC(BASX, 22, "Either wildcards or fuzzy search supported."),
 
-  /** BXCL0001: Evaluation exception. */
-  CLCONN(BXCL, 1, "Connection failed: %"),
-  /** BXCL0002: Evaluation exception. */
-  CLWHICH(BXCL, 2, "Session not available: %"),
-  /** BXCL0003: Evaluation exception. */
-  CLERR(BXCL, 3, "Session error: %"),
+  // General errors
 
-  /** BXVA: Evaluation exception. */
-  VALFAIL(BXVA, 1, "Validation failed: %"),
+  /** BASX0000. */
+  BASX_GENERIC(BASX, 0, "%"),
+  /** BASX0001. */
+  BASX_PERM(BASX, 1, "% permission required."),
+  /** BASX0002. */
+  BASX_OPTIONS(BASX, 2, "Unknown database option '%'."),
+  /** BASX0003. */
+  BASX_RESTXQ(BASX, 3, "%"),
 
-  /** PROC9999: Encoding. */
-  PROCENC(PROC, 9999, "Encoding not supported: '%'."),
+  // Client module
 
-  /** FOAR0001: Evaluation exception. */
+  /** BXCL0001. */
+  BXCL_CONN(BXCL, 1, "Connection failed: %"),
+  /** BXCL0002. */
+  BXCL_NOTAVL(BXCL, 2, "Session is not available or has already been closed: %"),
+  /** BXCL0003. */
+  BXCL_COMM(BXCL, 3, "An error occurred: %"),
+  /** BXCL0004. */
+  BXCL_COMMAND(BXCL, 4, "Command could not be executed: %"),
+  /** BXCL0005. */
+  BXCL_QUERY(BXCL, 5, "Query could not be executed: %"),
+
+  // Convert module (to be moved from Utility module)
+
+  /** BXCO0001. */
+  BXCO_STRING(BXCO, 1, "String conversion: %."),
+
+  // Database module
+
+  /** BXDB0001. */
+  BXDB_NODB(BXDB, 1, "%: database node expected."),
+  /** BXDB0002. */
+  BXDB_OPEN(BXDB, 2, "%"),
+  /** BXDB0003. */
+  BXDB_MEM(BXDB, 3, "Database '%' is not persistent."),
+  /** BXDB0004. */
+  BXDB_INDEX(BXDB, 4, "Database '%' has no % index."),
+  /** BXDB0005. */
+  BXDB_DBRETURN(BXDB, 5, "Query must yield database nodes."),
+  /** BXDB0006. */
+  BXDB_SINGLE(BXDB, 6, "Database path '%' must point to a single document."),
+  /** BXDB0007. */
+  BXDB_OPENED(BXDB, 7, "Database '%' is opened by another process."),
+  /** BXDB0008. */
+  BXDB_EMPTY(BXDB, 8, "%: Database paths must not be empty."),
+  /** BXDB0009. */
+  BXDB_RANGE(BXDB, 9, "%: value '%' is out of range."),
+  /** BXDB0010. */
+  BXDB_EVENT(BXDB, 10, "Event '%' is unknown."),
+
+  // Fulltext module
+
+  /** BXFT0001. */
+  BXFT_MATCH(BXFT, 1, "Either wildcards or fuzzy search supported."),
+
+  // JSON module
+
+  /** BXJS0001. */
+  BXJS_PARSE(BXJS, 1, "JSON parser (%:%): %."),
+  /** BXJS0001. */
+  BXJS_PARSEML(BXJS, 1, "JsonML parser: %."),
+  /** BXJS0002. */
+  BXJS_SER(BXJS, 1, "JSON serialization: %."),
+
+  /// Process module
+
+  /** BXPR9999. */
+  BXPR_ENC(BXPR, 9999, "Encoding not supported: '%'."),
+
+  // Repository module
+
+  /** BXRE0001. */
+  BXRE_WHICH(BXRE, 1, "Package '%' does not exist."),
+  /** BXRE0002. */
+  BXRE_URI(BXRE, 2, "Namespace URI is invalid: '%'."),
+  /** BXRE0003. */
+  BXRE_NOTINST(BXRE, 3, "Required package '%' is not installed."),
+  /** BXRE0004. */
+  BXRE_DESC(BXRE, 4, "Package descriptor: %."),
+  /** BXRE0005. */
+  BXRE_INST(BXRE, 5, "Module % is already installed within another package."),
+  /** BXRE0006. */
+  BXRE_PARSE(BXRE, 6, "Package '%' could not be parsed: %."),
+  /** BXRE0006. */
+  BXRE_PARSENF(BXRE, 6, "Package '%' could not be parsed: '%' not found."),
+  /** BXRE0007. */
+  BXRE_DELETE(BXRE, 7, "File '%' could not be deleted."),
+  /** BXRE0008. */
+  BXRE_DEP(BXRE, 8, "Package '%' depends on package '%'."),
+  /** BXRE0009. */
+  BXRE_VERSION(BXRE, 9, "Package version is not supported."),
+  /** BXRE0010. */
+  BXRE_JARDESC(BXRE, 10, "JAR descriptor: %."),
+  /** BXRE0011. */
+  BXRE_JARFAIL(BXRE, 11, "Reading JAR descriptor failed: %."),
+
+  // SQL module
+
+  /** BXSQ0001. */
+  BXSQ_ERROR(BXSQ, 1, "An SQL exception occurred: '%'"),
+  /** BXSQ0002. */
+  BXSQ_CONN(BXSQ, 2, "No opened connection with id %"),
+  /** BXSQ0003. */
+  BXSQ_PARAMS(BXSQ, 3, "Number of parameters differs from number of placeholders"),
+  /** BXSQ0004. */
+  BXSQ_TYPE(BXSQ, 4, "No parameter type specified."),
+  /** BXSQ0005. */
+  BXSQ_ATTR(BXSQ, 5, "Not expected attribute: %"),
+  /** BXSQ0006. */
+  BXSQ_FORMAT(BXSQ, 6, "Illegal % format"),
+  /** BXSQ0007. */
+  BXSQ_DRIVER(BXSQ, 7, "Could not initialize specified driver: '%'"),
+
+  // Validation module
+
+  /** BXVA0001. */
+  BXVA_FAIL(BXVA, 1, "Validation failed: %"),
+
+  // EXPath modules
+
+  /** FOCX0001. */
+  CRYPTO_CANINV(FOCX, 1, "Canonicalization algorithm is not supported."),
+  /** FOCX0002. */
+  CRYPTO_DIGINV(FOCX, 2, "Digest algorithm is not supported."),
+  /** FOCX0003. */
+  CRYPTO_SIGINV(FOCX, 3, "Signature algorithm is not supported."),
+  /** FOCX0004. */
+  CRYPTO_XPINV(FOCX, 4, "XPath expression is invalid."),
+  /** FOCX0005. */
+  CRYPTO_INVNM(FOCX, 5, "Invalid name for $digital-certificate root."),
+  /** FOCX0007. */
+  CRYPTO_KSNULL(FOCX, 7, "Key store is null."),
+  /** FOCX0012. */
+  CRYPTO_NOKEY(FOCX, 12, "Cannot find key for alias in given keystore."),
+  /** FOCX0013. */
+  CRYPTO_INVHASH(FOCX, 13, "Hashing algorithm is not supported."),
+  /** FOCX0014. */
+  CRYPTO_ENC(FOCX, 14, "The encoding method is not supported."),
+  /** FOCX0015. */
+  CRYPTO_NOSIG(FOCX, 15, "Cannot find signature element."),
+  /** FOCX0016. */
+  CRYPTO_NOPAD(FOCX, 16, "No such padding."),
+  /** FOCX0017. */
+  CRYPTO_BADPAD(FOCX, 17, "Incorrect padding."),
+  /** FOCX0018. */
+  CRYPTO_ENCTYP(FOCX, 18, "Encryption type is not supported."),
+  /** FOCX0019. */
+  CRYPTO_KEYINV(FOCX, 19, "Secret key is invalid."),
+  /** FOCX0020. */
+  CRYPTO_ILLBLO(FOCX, 20, "Illegal block size."),
+  /** FOCX0021. */
+  CRYPTO_INVALGO(FOCX, 21, "Algorithm is not supported."),
+  /** FOCX0023. */
+  CRYPTO_ALINV(FOCX, 23, "Invalid certificate alias %."),
+  /** FOCX0024. */
+  CRYPTO_ALGEXC(FOCX, 24, "Invalid algorithm."),
+  /** FOCX0025. */
+  CRYPTO_IOEXC(FOCX, 25, "IO Exception."),
+  /** FOCX0026. */
+  CRYPTO_KSEXC(FOCX, 26, "Keystore exception."),
+  /** FOCX0027. */
+  CRYPTO_SIGEXC(FOCX, 27, "Signature exception."),
+  /** FOCX0028. */
+  CRYPTO_SIGTYPINV(FOCX, 28, "Signature type is not supported."),
+
+  /** FOFL0001. */
+  FL_WHICH(FOFL, 1, "Path '%' does not exist."),
+  /** FOFL0002. */
+  FL_EXISTS(FOFL, 2, "File '%' already exists."),
+  /** FOFL0003. */
+  FL_NODIR(FOFL, 3, "Path '%' is not a directory."),
+  /** FOFL0004. */
+  FL_DIR(FOFL, 4, "Path '%' is a directory."),
+  /** FOFL0007. */
+  FL_ENCODING(FOFL, 5, "Encoding '%' is not supported."),
+  /** FOFL9999. */
+  FL_FILE(FOFL, 9999, "Resource cannot be retrieved: %."),
+  /** FOFL9999. */
+  FL_CREATE(FOFL, 9999, "Directory '%' cannot be created."),
+  /** FOFL9999. */
+  FL_DEL(FOFL, 9999, "Path '%' cannot be deleted."),
+  /** FOFL9999. */
+  FL_MOVE(FOFL, 9999, "Moving '%' to '%' failed."),
+  /** FOFL9999. */
+  FL_LIST(FOFL, 9999, "Files of '%' cannot be accessed."),
+  /** FOFL9999. */
+  FL_PATH(FOFL, 9999, "Invalid file path: '%'."),
+
+  /** FOHC0001. */
+  HC_ERROR(FOHC, 1, "An HTTP error occurred: %."),
+  /** FOHC003. */
+  HC_ATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
+  /** FOHC0004. */
+  HC_REQ(FOHC, 4, "Invalid request element: %."),
+  /** FOHC005. */
+  HC_URL(FOHC, 5, "No URL specified."),
+  /** FOHC006. */
+  HC_PARAMS(FOHC, 6, "Specify request element or HTTP URI."),
+
+  /** FOZP0001. */
+  ZIP_NOTFOUND(FOZP, 1, "Path '%' is not found."),
+  /** FOZP0002. */
+  ZIP_INVALID(FOZP, 2, "% element: % attribute expected."),
+  /** FOZP0002. */
+  ZIP_UNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
+  /** FOZP0003. */
+  ZIP_FAIL(FOZP, 3, "Operation failed: %."),
+
+  // W3 Functions
+
+  /** FOAR0001. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
-  /** FOAR0002: Evaluation exception. */
+  /** FOAR0002. */
   DIVFLOW(FOAR, 2, "Invalid division result: % / %."),
-  /** FOAR0002: Evaluation exception. */
+  /** FOAR0002. */
   RANGE(FOAR, 2, "Value out of range: %."),
 
-  /** FOCA0002: Evaluation exception. */
+  /** FOCA0002. */
   INVALUE(FOCA, 2, "Invalid value for %: %."),
-  /** FOCA0003: Evaluation exception. */
+  /** FOCA0003. */
   INTRANGE(FOCA, 3, "Integer value out of range: %."),
-  /** FOCA0005: Evaluation exception. */
+  /** FOCA0005. */
   DATECALC(FOCA, 5, "Invalid % calculation: %."),
 
-  /** FOCH0001: Evaluation exception. */
+  /** FOCH0001. */
   INVCODE(FOCH, 1, "Invalid codepoint '%'."),
-  /** FOCH0002: Evaluation exception. */
+  /** FOCH0002. */
   IMPLCOL(FOCH, 2, "Unknown collation %."),
-  /** FOCH0003: Evaluation exception. */
+  /** FOCH0003. */
   NORMUNI(FOCH, 3, "Unsupported normalization form (%)."),
 
-  /** FODC0001: Evaluation exception. */
+  /** FODC0001. */
   IDDOC(FODC, 1, "Root must be a document node."),
-  /** FODC0002: Evaluation exception. */
+  /** FODC0002. */
   NODEERR(FODC, 2, "% could not be created (%)."),
-  /** FODC0002: Evaluation exception. */
+  /** FODC0002. */
   NODEFCOLL(FODC, 2, "No default collection available."),
-  /** FODC0002: Evaluation exception. */
+  /** FODC0002. */
   IOERR(FODC, 2, "%"),
-  /** FODC0002: Evaluation exception. */
+  /** FODC0002. */
   WHICHRES(FODC, 2, "Resource '%' does not exist."),
-  /** FODC0004: Evaluation exception. */
+  /** FODC0004. */
   INVCOLL(FODC, 4, "Invalid collection URI '%'."),
-  /** FODC0005: Evaluation exception. */
+  /** FODC0005. */
   INVDOC(FODC, 5, "Invalid document URI '%'."),
-  /** FODC0006: Evaluation exception. */
+  /** FODC0006. */
   SAXERR(FODC, 6, "SAX: %."),
-  /** FODC0007: Evaluation exception. */
+  /** FODC0007. */
   BASEINV(FODC, 7, "Base URI % is invalid."),
-  /** FODC0007: Evaluation exception. */
+  /** FODC0007. */
   RESINV(FODC, 7, "Resource path '%' is invalid."),
-  /** FODC0007: Typing Exception. */
+  /** FODC0007. */
   INVDB(FODC, 7, "Invalid database name: '%'."),
 
-  /** FODF1280: Evaluation exception. */
+  /** FODF1280. */
   FORMNUM(FODF, 1280, "Unknown decimal format: %."),
-  /** FODF1310: Evaluation exception. */
+  /** FODF1310. */
   PICNUM(FODF, 1310, "Invalid picture string: '%'."),
 
-  /** FODT0002: Evaluation exception. */
+  /** FODT0002. */
   DATEZERO(FODT, 2, "Invalid % calculation: infinity/zero."),
-  /** FODT0003: Evaluation exception. */
+  /** FODT0003. */
   INVALZONE(FODT, 3, "Invalid timezone: %."),
 
-  /** FOER0000: Evaluation exception. */
+  /** FOER0000. */
   FUNERR1(FOER, 0, "Halted on error()."),
 
-  /** FOFL0001: Evaluation exception. */
-  PATHNOTEXISTS(FOFL, 1, "Path '%' does not exist."),
-  /** FOFL0002: Evaluation exception. */
-  FILEEXISTS(FOFL, 2, "File '%' already exists."),
-  /** FOFL0003: Evaluation exception. */
-  NOTDIR(FOFL, 3, "Path '%' is not a directory."),
-  /** FOFL0004: Evaluation exception. */
-  PATHISDIR(FOFL, 4, "Path '%' is a directory."),
-  /** FOFL0007: Evaluation exception. */
-  ENCNOTEXISTS(FOFL, 5, "Encoding '%' is not supported."),
 
-  /** FOFL9999: Evaluation exception. */
-  FILEERROR(FOFL, 9999, "Resource cannot be retrieved: %."),
-  /** FOFL9999: Evaluation exception. */
-  CANNOTCREATE(FOFL, 9999, "Directory '%' cannot be created."),
-  /** FOFL9999: Evaluation exception. */
-  CANNOTDEL(FOFL, 9999, "Path '%' cannot be deleted."),
-  /** FOFL9999: Evaluation exception. */
-  CANNOTMOVE(FOFL, 9999, "Moving '%' to '%' failed."),
-  /** FOFL9999: Evaluation exception. */
-  CANNOTLIST(FOFL, 9999, "Files of '%' cannot be accessed."),
-  /** FOFL9999: Evaluation exception. */
-  PATHINVALID(FOFL, 9999, "Invalid file path: '%'."),
-
-  /** FOZP0001: Evaluation exception. */
-  ZIPNOTFOUND(FOZP, 1, "Path '%' is not found."),
-  /** FOZP0002: Evaluation exception. */
-  ZIPINVALID(FOZP, 2, "% element: % attribute expected."),
-  /** FOZP0002: Evaluation exception. */
-  ZIPUNKNOWN(FOZP, 2, "ZIP Definition: unknown element %."),
-  /** FOZP0003: Evaluation exception. */
-  ZIPFAIL(FOZP, 3, "Operation failed: %."),
-
-  /** FOHC0001: Evaluation exception. */
-  HTTPERR(FOHC, 1, "An HTTP error occurred: %."),
-  /** FOHC0002: Evaluation exception.
-  HTMLERR(FOHC, 2, "Error parsing entity as XML or HTML."), */
-  /** FOHC003: Evaluation exception. */
-  SRCATTR(FOHC, 3, "No attribute beside 'src' and 'media-type' allowed."),
-  /** FOHC0004: Evaluation exception. */
-  REQINV(FOHC, 4, "Invalid request element: %."),
-  /** FOHC005: Evaluation exception. */
-  NOURL(FOHC, 5, "No URL specified."),
-  /** FOHC006: Evaluation exception. */
-  NOPARAMS(FOHC, 6, "Specify request element or HTTP URI."),
-
-  /** PACK0001: Evaluation exception. */
-  PKGNOTEXIST(PACK, 1, "Package '%' does not exist."),
-  /** PACK0002: Evaluation exception. */
-  INSTERR(PACK, 2, "Namespace URI is invalid: '%'."),
-  /** PACK0003: Evaluation exception. */
-  PKGNOTINST(PACK, 3, "Required package '%' is not installed."),
-  /** PACK0004: Evaluation exception. */
-  PKGDESCINV(PACK, 4, "Package descriptor: %."),
-  /** PACK0004: Evaluation exception. */
-  MODISTALLED(PACK, 5, "Module % is already installed within another package."),
-  /** PACK0006: Evaluation exception. */
-  PKGREADFAIL(PACK, 6, "Package '%' could not be parsed: %."),
-  /** PACK0006: Evaluation exception. */
-  PKGREADFNF(PACK, 6, "Package '%' could not be parsed: '%' not found."),
-  /** PACK0007: Evaluation exception. */
-  PKGDEL(PACK, 7, "File '%' could not be deleted."),
-  /** PACK0008: Evaluation exception. */
-  PKGDEP(PACK, 8, "Package '%' depends on package '%'."),
-  /** PACK0009: Evaluation exception. */
-  PKGNOTSUPP(PACK, 9, "Package version is not supported."),
-  /** PACK0010: Evaluation exception. */
-  JARDESCINV(PACK, 10, "JAR descriptor: %."),
-  /** PACK0011: Evaluation exception. */
-  JARREADFAIL(PACK, 11, "Reading JAR descriptor failed: %."),
-
-  /** FONS0004: Evaluation exception. */
+  /** FONS0004. */
   NSDECL(FONS, 4, "No namespace declared for prefix '%'."),
 
-  /** FORG0001: Evaluation exception. */
+  /** FORG0001. */
   INVALIDZONE(FORG, 1, "Invalid timezone: %."),
-  /** FORG0001: Evaluation exception. */
+  /** FORG0001. */
   FUNCAST(FORG, 1, "Invalid % cast: %."),
-  /** FORG0001: Evaluation exception. */
+  /** FORG0001. */
   DATERANGE(FORG, 1, "%('%') out of range."),
-  /** FORG0001: Evaluation exception. */
+  /** FORG0001. */
   DATEFORMAT(FORG, 1, "Wrong % format: '%' (try: '%')."),
-  /** FORG0002: Evaluation exception. */
+  /** FORG0002. */
   URIINV(FORG, 2, "Invalid URI: %."),
-  /** FORG0002: Evaluation exception. */
+  /** FORG0002. */
   URIABS(FORG, 2, "Base URI % is not absolute."),
 
-  /** FORG0003: Evaluation exception. */
+  /** FORG0003. */
   EXPECTZ0(FORG, 3, "Zero or one value expected."),
-  /** FORG0004: Evaluation exception. */
+  /** FORG0004. */
   EXPECTOM(FORG, 4, "One or more values expected."),
-  /** FORG0005: Evaluation exception. */
+  /** FORG0005. */
   EXPECTO(FORG, 5, "Exactly one value expected."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   FUNCMP(FORG, 6, "%: % expected, % found."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   CONDTYPE(FORG, 6, "% not allowed as condition type."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   SUMTYPE(FORG, 6, "%: % not allowed as input type."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   FUNNUM(FORG, 6, "%: number expected, % found."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   FUNDUR(FORG, 6, "%: duration expected, % found."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   TYPECMP(FORG, 6, "% is not comparable."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   JAVAFUN(FORG, 6, "Invalid call of Java function: %(%)."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   JAVAMOD(FORG, 6, "Invalid arguments: % expected, % found."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   INVBASE(FORG, 6, "Unsupported base: %."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   INVDIG(FORG, 6, "Invalid digit for base %: %."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   JAVAERR(FORG, 6, "Java function call failed: %."),
-  /** FORG0006: Evaluation exception. */
+  /** FORG0006. */
   ERRFORM(FORG, 6, "%: %."),
-  /** FORG0008: Function exception. */
+  /** FORG0008. */
   FUNZONE(FORG, 8, "% and % have different timezones."),
 
-  /** FORX0001: Evaluation exception. */
+  /** FORX0001. */
   REGMOD(FORX, 1, "Invalid regular modifier: '%'."),
-  /** FORX0003: Evaluation exception. */
+  /** FORX0003. */
   REGROUP(FORX, 3, "Pattern matches empty string."),
-  /** FORX0004: Evaluation exception. */
+  /** FORX0004. */
   FUNREGREP(FORX, 4, "Invalid replacement expression."),
-  /** FORX0004: Evaluation exception. */
+  /** FORX0004. */
   REGERR(FORX, 4, "Regular expression: '%'."),
 
-  /** FOSQ0001: Evaluation exception. */
-  SQLEXC(FOSQ, 1, "An SQL exception occurred: '%'"),
-  /** FOSQ0002: Evaluation exception. */
-  NOCONN(FOSQ, 2, "No opened connection with id %"),
-  /** FOSQ0003: Evaluation exception. */
-  PARAMS(FOSQ, 3, "Number of parameters differs from number of placeholders"),
-  /** FOSQ0004: Evaluation exception. */
-  NOPARAMTYPE(FOSQ, 4, "No parameter type specified."),
-  /** FOSQ0005: Evaluation exception. */
-  NOTEXPATTR(FOSQ, 5, "Not expected attribute: %"),
-  /** FOSQ0006: Evaluation exception. */
-  ILLFORMAT(FOSQ, 6, "Illegal % format"),
-  /** FOSQ0007: Evaluation exception. */
-  SQLINIT(FOSQ, 7, "Could not initialize specified driver: '%'"),
-
-  /** FOTY0012: Type exception. */
+  /** FOTY0012. */
   FIVALUE(FOTY, 12, "Item has no typed value: %."),
-  /** FOTY0013: Type exception. */
+  /** FOTY0013. */
   FIATOM(FOTY, 13, "Function items cannot be atomized: %."),
-  /** FOTY0013: Type exception. */
+  /** FOTY0013. */
   FIEQ(FOTY, 13, "Function items have no defined equality: %."),
-  /** FOTY0013: Type exception. */
+  /** FOTY0013. */
   FISTR(FOTY, 14, "Function items have no string representation: %."),
-  /** FOTY0013: Type exception. */
+  /** FOTY0013. */
   FICMP(FOTY, 15, "Function items cannot be compared: %."),
 
-  /** FOUP0001: Evaluation exception. */
+  /** FOUP0001. */
   UPFOTYPE(FOUP, 1, "Document or element expected, % found."),
-  /** FOUP0001: Evaluation exception. */
+  /** FOUP0001. */
   UPDOCTYPE(FOUP, 1, "Document expected, % found."),
-  /** FOUP0002: Evaluation exception. */
+  /** FOUP0002. */
   UPFOURI(FOUP, 2, "No valid URI: \"%\"."),
-  /** FOUP0002: Evaluation exception. */
+  /** FOUP0002. */
   UPPUTERR(FOUP, 2, "\"%\" could not be written."),
-  /** FOUP0002: Evaluation exception. */
+  /** FOUP0002. */
   UPDBPUTERR(FOUP, 2, "Resource \"%\" could not be written."),
-  /** FOUP0002: Evaluation exception. */
+  /** FOUP0002. */
   UPDBDELERR(FOUP, 2, "Resource \"%\" could not be deleted."),
-  /** FOUP0002: Evaluation exception. */
+  /** FOUP0002. */
   UPDBRENAMEERR(FOUP, 2, "Resource \"%\" could not be renamed."),
+  /** FOUP0002. */
+  UPDBOPTERR(FOUP, 2, "Resource \"%\" could not be optimized."),
 
-  /** FTDY0016: Evaluation exception. */
+  /** FTDY0016. */
   FTWEIGHT(FTDY, 16, "Weight value out of range: %."),
-  /** FTDY0017: Evaluation exception. */
+  /** FTDY0017. */
   FTMILD(FTDY, 17, "Invalid 'mild not' selection."),
-  /** FTDY0020: Evaluation exception. */
+  /** FTDY0020. */
   FTREG(FTDY, 20, "Invalid wildcard syntax: '%'."),
 
-  /** FTST0007: Parsing exception. */
+  /** FTST0007. */
   FTIGNORE(FTST, 7, "Ignore option not supported."),
-  /** FTST0008: Parsing exception. */
+  /** FTST0008. */
   NOSTOPFILE(FTST, 8, "Stop word file not found: '%'."),
-  /** FTST0009: Parsing exception. */
+  /** FTST0009. */
   FTNOSTEM(FTST, 9, "No stemmer available for language '%'."),
-  /** FTST0009: Parsing exception. */
+  /** FTST0009. */
   FTNOTOK(FTST, 9, "No tokenizer available for language '%'."),
-  /** FTST0018: Parsing exception. */
+  /** FTST0018. */
   NOTHES(FTST, 18, "Thesaurus not found: '%'."),
-  /** FTST0019: Parsing exception. */
+  /** FTST0019. */
   FTDUP(FTST, 19, "Match option '%' was declared twice."),
 
-  /** REXQ9999: Evaluation exception. */
-  REXQERROR(REXQ, 9999, "%"),
-
-  /** SESU0007: Serialization exception. */
+  /** SESU0007. */
   SERENCODING(SESU, 7, "Encoding not supported: '%'."),
-  /** SEPM0009: Serialization exception. */
+  /** SEPM0009. */
   SERSTAND(SEPM, 9, "Invalid combination of 'omit-xml-declaration'."),
-  /** SEPM0010: Serialization exception. */
+  /** SEPM0010. */
   SERUNDECL(SEPM, 10, "XML 1.0: undeclaring prefixes not allowed."),
-  /** SERE0014: Serialization exception. */
+  /** SERE0014. */
   SERILL(SERE, 14, "Illegal HTML character found: #x%."),
-  /** SERE0015: Serialization exception. */
+  /** SERE0015. */
   SERPI(SERE, 15, "Processing construction contains '>'."),
-  /** SEPM0016: Serialization exception. */
+  /** SEPM0016. */
   SERINVALID(SEPM, 16, "Parameter '%' is unknown."),
-  /** SEPM0016: Serialization exception. */
+  /** SEPM0016. */
   SERMAP(SEPM, 16, "Character map '%' is not defined."),
-  /** SEPM0016: Serialization exception. */
+  /** SEPM0016. */
   SERANY(SEPM, 16, "%."),
 
-  /** XPDY0002: Parsing exception. */
+  /** XPDY0002. */
   VAREMPTY(XPDY, 2, "No value assigned to %."),
-  /** XPDY0002: Evaluation Exception. */
+  /** XPDY0002. */
   XPNOCTX(XPDY, 2, "No context item set to process '%'."),
-  /** XPDY0050: Evaluation exception. */
+  /** XPDY0050. */
   CTXNODE(XPDY, 50, "Root of the context item must be a document node."),
-  /** XPDY0050: Evaluation exception. */
+  /** XPDY0050. */
   NOTREAT(XPDY, 50, "%: % cannot be treated as %."),
-  /** XPDY0050: Evaluation exception. */
+  /** XPDY0050. */
   NOTREATS(XPDY, 50, "%: % expected, sequence found."),
 
-  /** XPST0001: Parsing exception. */
+  /** XPST0001. */
   STBASEURI(XPST, 1, "Static Base URI is undefined."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   QUERYEMPTY(XPST, 3, "Empty query."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   QUERYINV(XPST, 3, "Query contains an illegal character (#%)."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOQUOTE(XPST, 3, "Expecting quote%."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOVALIDATE(XPST, 3, "Invalid validation expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NUMBERWS(XPST, 3, "Expecting separator after number."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NUMBERINC(XPST, 3, "Incomplete double value: '%'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NUMBERITR(XPST, 3, "Unexpected decimal point."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   QUERYEND(XPST, 3, "Unexpected end of query: '%'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   MODEXPR(XPST, 3, "No expression allowed in a library module."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   MAINMOD(XPST, 3, "Library modules cannot be evaluated."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   CMPEXPR(XPST, 3, "Comparison is incomplete."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOTAG(XPST, 3, "Expecting tag name."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   TAGNAME(XPST, 3, "Expecting tag name, '<%' found."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOATTNAME(XPST, 3, "Expecting attribute name."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOLOCSTEP(XPST, 3, "Incomplete location step."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOEXPR(XPST, 3, "Expecting expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   WRONGCHAR(XPST, 3, "Expecting '%'%."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   INVENTITY(XPST, 3, "Invalid entity '%'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   INCOMPLETE(XPST, 3, "Incomplete expression."),
-  /** XPST0003: Evaluation exception. */
+  /** XPST0003. */
   EVALUNARY(XPST, 3, "Unary operator expects a numeric value."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   PATHMISS(XPST, 3, "Expecting location path%."),
-  /** XPST0003: Parsing exception. */
-  DECLINCOMPLETE(XPST, 3, "Incomplete declaration; expecting "
-      + "'function', 'variable', ..."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
+  DECLINCOMPLETE(XPST, 3, "Expecting 'function', 'variable', ..."),
+  /** XPST0003. */
   FUNCNAME(XPST, 3, "Expecting function name."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   RESERVED(XPST, 3, "% is a reserved function name."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   PREDMISSING(XPST, 3, "Expecting expression before predicate."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOVARNAME(XPST, 3, "Expecting variable name."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOVARDECL(XPST, 3, "Expecting variable declaration."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   TAGWRONG(XPST, 3, "Start and end tag are different: <%>...</%>."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   PIWRONG(XPST, 3, "Expecting name of processing-instruction."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NSWRONG(XPST, 3, "Expecting namespace prefix."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOENCLEXPR(XPST, 3, "Expecting valid expression after '{'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NODOCCONS(XPST, 3, "Expecting expression in document constructor."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOTXTCONS(XPST, 3, "Expecting expression in text constructor."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOCOMCONS(XPST, 3, "Expecting expression in comment constructor."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOFUNBODY(XPST, 3, "Expecting function body."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FUNCMISS(XPST, 3, "Expecting closing bracket for '%(...'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   MAPTAAT(XPST, 3, "Expecting atomic key type for map(...), found '%'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   TYPEINVALID(XPST, 3, "Expecting type declaration."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NODECLFORM(XPST, 3, "Unknown decimal-format property: '%'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOTYPESWITCH(XPST, 3, "Incomplete typeswitch expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOSWITCH(XPST, 3, "Incomplete switch expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   TYPEPAR(XPST, 3, "Expecting '(' after 'switch' or 'typeswitch'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   PRAGMAINV(XPST, 3, "Invalid pragma expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   CALCEXPR(XPST, 3, "Calculation is incomplete."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   INVMAPKEY(XPST, 3, "Invalid key, simple expression expected."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   INVMAPVAL(XPST, 3, "Invalid value, simple expression expected."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NORETURN(XPST, 3, "Expecting return value."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOWHERE(XPST, 3, "Expecting valid expression after 'where'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   ORDERBY(XPST, 3, "Expecting valid expression after 'order by'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   GRPBY(XPST, 3, "Expecting valid expression after 'group by'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FLWORWHERE(XPST, 3, "Expecting 'where', 'order' or 'return' expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FLWORORD(XPST, 3, "Expecting 'order' or 'return' expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FLWORRET(XPST, 3, "Expecting 'return' expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOSOME(XPST, 3, "Incomplete quantifier expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   IFPAR(XPST, 3, "Expecting '(' after 'if' expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOIF(XPST, 3, "Incomplete 'if' expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOFOR(XPST, 3, "Incomplete 'for' expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOLET(XPST, 3, "Incomplete 'let' expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOCLOSING(XPST, 3, "Expecting closing tag </%>."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   COMCLOSE(XPST, 3, "Unclosed XQuery comment (: ..."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   EXPREMPTY(XPST, 3, "Unknown function or expression."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOTYPE(XPST, 3, "Unknown type '%'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   PIXML(XPST, 3, "Processing instruction has illegal name: '%'."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   QNAMEINV(XPST, 3, "Expecting QName, '%' found."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   PROLOGORDER(XPST, 3, "Default declarations must be declared first."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FTRANGE(XPST, 3, "Expecting full-text range."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FTSTOP(XPST, 3, "Stop words expected."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FTMATCH(XPST, 3, "Unknown match option '%...'."),
-  /** XPST0003: Evaluation exception. */
+  /** XPST0003. */
   INVALPI(XPST, 3, "Processing instruction has invalid name."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   INTEXP(XPST, 3, "Integer expected."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   VARFUNC(XPST, 3, "Variable or function declaration expected."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOANN(XPST, 3, "No annotation allowed here."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   NOCATCH(XPST, 3, "Expecting catch clause."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   ANNVALUE(XPST, 3, "Literal expected after annotation."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   UPDATINGVAR(XPST, 3, "Variable cannot be updating."),
 
-  /** XPST0005: Parsing exception. */
+  /** XPST0005. */
   COMPSELF(XPST, 5, "Warning: '%' will never yield results."),
-  /** XPST0005: Parsing exception. */
+  /** XPST0005. */
   ATTDESC(XPST, 5, "Warning: '%' cannot have descendants."),
-  /** XPST0005: Parsing exception. */
+  /** XPST0005. */
   DOCAXES(XPST, 5, "Warning: '%' cannot have % nodes."),
 
-  /** XPST0008: Parsing exception. */
+  /** XPST0008. */
   VARUNDEF(XPST, 8, "Undefined variable %."),
-  /** XPST0008: Parsing exception. */
+  /** XPST0008. */
   TYPEUNDEF(XPST, 8, "Undefined type '%'."),
-  /** XPST0008: Parsing exception. */
+  /** XPST0008. */
   SCHEMAINV(XPST, 8, "Undefined schema name '%'."),
 
-  /** XPST0017: Parsing Exception. */
+  /** XPST0017. */
   XPARGS(XPST, 17, "%: wrong number of arguments."),
-  /** XPST0017: Parsing exception. */
+  /** XPST0017. */
   FUNSIMILAR(XPST, 17, "Unknown function '%'; similar: '%'."),
-  /** XPST0017: Parsing Exception. */
+  /** XPST0017. */
   FUNCTYPE(XPST, 17, "%(...): wrong number of arguments."),
-  /** XPST0003: Parsing exception. */
+  /** XPST0003. */
   FEATURE30(XPST, 17, "Feature not available in XQuery 1.0."),
-  /** XPST0017: Parsing exception. */
+  /** XPST0017. */
   FUNCUNKNOWN(XPST, 17, "Unknown function '%(...)'."),
-  /** XPST0017: Parsing exception. */
+  /** XPST0017. */
   WHICHJAVA(XPST, 17, "Java function '%(...)' not found."),
-  /** XPST0017: Parsing exception. */
+  /** XPST0017. */
   JAVAAMB(XPST, 17, "Signature is ambiguous: '%(...)'."),
-  /** XPST0017: Parsing exception. */
+  /** XPST0017. */
   INITJAVA(XPST, 17, "Class cannot be initialized: %."),
 
-  /** XPST0051: Parsing exception. */
+  /** XPST0051. */
   TYPEUNKNOWN(XPST, 51, "Unknown type %."),
-  /** XPST0080: Parsing exception. */
+  /** XPST0080. */
   CASTUNKNOWN(XPST, 80, "Invalid cast type %."),
-  /** XPST0081: Parsing exception. */
+  /** XPST0081. */
   NOURI(XPST, 81, "No namespace declared for %."),
-  /** XPST0081: Parsing exception. */
+  /** XPST0081. */
   NSMISS(XPST, 81, "QName % has no namespace."),
 
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPSEQ(XPTY, 4, "Single item expected, % found."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
-  /** XPTY0004: Promoting exception. */
+  /** XPTY0004. */
   XPINVPROM(XPTY, 4, "Cannot treat % as %: %."),
-  /** XPTY0004: Typing Exception. */
+  /** XPTY0004. */
   XPTYPE(XPTY, 4, "%: % expected, % found."),
-  /** XPTY0004: Typing Exception. */
+  /** XPTY0004. */
   CALCTYPE(XPTY, 4, "% not defined for % and %."),
-  /** XPTY0004: Typing Exception. */
+  /** XPTY0004. */
   STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
-  /** XPTY0004: Typing Exception. */
+  /** XPTY0004. */
   ELMMAPTYPE(XPTY, 4, "element(%) or map expected, % found"),
-  /** XPTY0004: Serialization exception. */
+  /** XPTY0004. */
   ELMOPTION(XPTY, 4, "Unknown option: %."),
 
-  /** XPTY0004: Typing Exception. */
+  /** XPTY0004. */
   SIMPLDUR(XPTY, 4, "%: only supported on subtypes of xs:duration, not %."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPEMPTY(XPTY, 4, "%: no empty sequence allowed."),
-  /** XPTY0004: Typing Exception. */
+  /** XPTY0004. */
   XPEMPTYPE(XPTY, 4, "%: % expected, empty sequence found."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPDUR(XPTY, 4, "%: duration expected, % found."),
-  /** XPTY0004: Typing Exception. */
+  /** XPTY0004. */
   XPTYPECMP(XPTY, 4, "% and % cannot be compared."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPTYPENUM(XPTY, 4, "%: number expected, % found."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPNAME(XPTY, 4, "Expecting name."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPATT(XPTY, 4, "Cannot add attributes to a document node."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   XPNS(XPTY, 4, "Cannot add namespaces to a document node."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   CPIWRONG(XPTY, 4, "Name has invalid type: '%'."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   INVQNAME(XPTY, 4, "Invalid QName: '%'."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   INVARITY(XPTY, 4, "Wrong number of arguments in %, expected %."),
-  /** XPTY0004: Typing exception. */
+  /** XPTY0004. */
   INVNCNAME(XPTY, 4, "Invalid NCName: '%'."),
+  /** XPTY0004. */
+  INVPOS(XPTY, 4, "Illegal argument position for %: %."),
 
-  /** XPTY0018: Typing exception. */
+  /** XPTY0018. */
   EVALNODESVALS(XPTY, 18, "Result yields both nodes and atomic values."),
-  /** XPTY0019: Typing exception. */
+  /** XPTY0019. */
   NODESPATH(XPTY, 19, "Context node required for %; % found."),
 
-  /** XQDY0025: Evaluation exception. */
+  /** XQDY0025. */
   CATTDUPL(XQDY, 25, "Duplicate attribute '%'."),
-  /** XQDY0026: Evaluation exception. */
+  /** XQDY0026. */
   CPICONT(XQDY, 26, "Processing instruction has invalid content: '%'."),
-  /** XQDY0041: Evaluation exception. */
+  /** XQDY0041. */
   CPIINVAL(XQDY, 41, "Processing instruction has invalid name: '%'."),
-  /** XQDY0044: Evaluation exception. */
+  /** XQDY0044. */
   CAXML(XQDY, 44, "XML prefix and namespace cannot be rebound."),
-  /** XQDY0044: Evaluation exception. */
+  /** XQDY0044. */
   CAINV(XQDY, 44, "Invalid attribute prefix/namespace '%'."),
-  /** XQDY0064: Evaluation exception. */
+  /** XQDY0064. */
   CPIXML(XQDY, 64, "Processing instruction has illegal name: '%'."),
-  /** XQDY0072: Evaluation exception. */
+  /** XQDY0072. */
   COMINVALID(XQDY, 72, "Invalid comment."),
-  /** XQDY0074: Evaluation exception. */
+  /** XQDY0074. */
   INVNAME(XQDY, 74, "Invalid name: '%'."),
-  /** XQDY0074: Dynamic exception. */
+  /** XQDY0074. */
   INVPREF(XQDY, 74, "No namespace declared for %."),
-  /** XQDY0095: resulting value for any grouping variable >> 1 item. */
+  /** XQDY0095. */
   XGRP(XQDY, 95, "No sequence allowed as grouping variable."),
-  /** XQDY0096: Evaluation exception. */
+  /** XQDY0096. */
   CEXML(XQDY, 96, "XML prefix and namespace cannot be rebound."),
-  /** XQDY0096: Evaluation exception. */
+  /** XQDY0096. */
   CEINV(XQDY, 96, "Invalid element prefix/namespace '%'."),
-  /** XQDY0101: Evaluation exception. */
+  /** XQDY0101. */
   CNXML(XQDY, 101, "XML prefix and namespace cannot be rebound."),
-  /** XQDY0101: Evaluation exception. */
+  /** XQDY0101. */
   CNINV(XQDY, 101, "Invalid prefix/namespace '%'."),
-  /** XQDY0102: Dynamic exception. */
+  /** XQDY0102. */
   DUPLNSCONS(XQDY, 102, "Duplicate namespace declaration: '%'."),
 
-  /** XQST0009: Parsing exception. */
+  /** XQST0009. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
-  /** XQST0022: Parsing exception. */
+  /** XQST0022. */
   NSCONS(XQST, 22, "Constant namespace value expected."),
-  /** XQST0031: Parsing exception. */
+  /** XQST0031. */
   XQUERYVER(XQST, 31, "XQuery version '%' not supported."),
-  /** XQST0032: Parsing exception. */
+  /** XQST0032. */
   DUPLBASE(XQST, 32, "Duplicate 'base-uri' declaration."),
-  /** XQST0033: Parsing exception. */
+  /** XQST0033. */
   DUPLNSDECL(XQST, 33, "Duplicate declaration of prefix '%'."),
-  /** XQST0034: Parsing exception. */
+  /** XQST0034. */
   FUNCDEFINED(XQST, 34, "Duplicate declaration of function %(...)."),
-  /** XQST0038: Parsing exception. */
+  /** XQST0038. */
   DUPLCOLL(XQST, 38, "Duplicate 'collation' declaration."),
-  /** XQST0076: Parsing exception. */
+  /** XQST0076. */
   COLLWHICH(XQST, 38, "Unknown collation '%'."),
-  /** XQST0039: Parsing exception. */
+  /** XQST0039. */
   FUNCDUPL(XQST, 39, "Duplicate function argument %."),
-  /** XQST0040: Parsing exception. */
+  /** XQST0040. */
   ATTDUPL(XQST, 40, "Duplicate attribute '%'."),
-  /** XQST0045: Parsing exception. */
+  /** XQST0045. */
   NAMERES(XQST, 45, "Function %(...) uses reserved namespace."),
-  /** XQST0045: Parsing exception. */
+  /** XQST0045. */
   ANNRES(XQST, 45, "Annotation % uses reserved namespace."),
-  /** XQST0047: Parsing exception. */
+  /** XQST0047. */
   DUPLMODULE(XQST, 47, "Module is declared twice: '%'."),
-  /** XQST0047: Parsing exception. */
+  /** XQST0047. */
   MODNS(XQST, 48, "Declaration % does not match the module namespace."),
-  /** XQST0049: Parsing exception. */
+  /** XQST0049. */
   VARDEFINE(XQST, 49, "Duplicate declaration of %."),
-  /** XQST0054: Parsing exception. */
+  /** XQST0054. */
   XPSTACK(XQST, 54, "Stack Overflow: circular variable declaration?"),
-  /** XQST0055: Parsing exception. */
+  /** XQST0055. */
   DUPLCOPYNS(XQST, 55, "Duplicate 'copy-namespace' declaration."),
-  /** XQST0057: Parsing exception. */
+  /** XQST0057. */
   NSEMPTY(XQST, 57, "Namespace URI cannot be empty."),
-  /** XQST0059: Parsing exception. */
+  /** XQST0059. */
   NOINST(XQST, 59, "Could not instantiate module '%'."),
-  /** XQST0059: Parsing exception. */
+  /** XQST0059. */
   NOMODULE(XQST, 59, "Module \"%\" not found."),
-  /** XQST0059: Parsing exception. */
+  /** XQST0059. */
   MODINIT(XQST, 59, "Module '%' not initialized."),
-  /** XQST0059: Parsing exception. */
+  /** XQST0059. */
   NOMODULEFILE(XQST, 59, "Could not retrieve module '%'."),
-  /** XQST0059: Parsing exception. */
+  /** XQST0059. */
   WRONGMODULE(XQST, 59, "Wrong URI '%' in imported module '%'."),
-  /** XQST0060: Parsing exception. */
+  /** XQST0060. */
   FUNNONS(XQST, 60, "Namespace needed for function %(...)."),
-  /** XQST0065: Parsing exception. */
+  /** XQST0065. */
   DUPLORD(XQST, 65, "Duplicate 'ordering' declaration."),
-  /** XQST0066: Parsing exception. */
+  /** XQST0066. */
   DUPLNS(XQST, 66, "Duplicate 'default namespace' declaration."),
-  /** XQST0067: Parsing exception. */
+  /** XQST0067. */
   DUPLCONS(XQST, 67, "Duplicate 'construction' declaration."),
-  /** XQST0068: Parsing exception. */
+  /** XQST0068. */
   DUPLBOUND(XQST, 68, "Duplicate 'boundary-space' declaration."),
-  /** XQST0069: Parsing exception. */
+  /** XQST0069. */
   DUPLORDEMP(XQST, 69, "Duplicate 'order empty' declaration."),
-  /** XQST0070: Parsing exception. */
+  /** XQST0070. */
   BINDXML(XQST, 70, "Prefix '%' cannot be rebound."),
-  /** XQST0070: Parsing exception. */
+  /** XQST0070. */
   BINDXMLURI(XQST, 70, "'%' can only be bound to '%'."),
-  /** XQST0071: Parsing exception. */
+  /** XQST0071. */
   DUPLNSDEF(XQST, 71, "Duplicate declaration of prefix '%'."),
-  /** XQST0075: Parsing exception. */
+  /** XQST0075. */
   IMPLVAL(XQST, 75, "Validation not supported."),
-  /** XQST0076: Parsing exception. */
+  /** XQST0076. */
   WHICHCOLL(XQST, 76, "Unknown collation '%'."),
-  /** XQST0079: Parsing exception. */
+  /** XQST0079. */
   NOPRAGMA(XQST, 79, "Expecting pragma expression."),
-  /** XQST0085: Parsing exception. */
+  /** XQST0085. */
   NSEMPTYURI(XQST, 85, "Namespace URI cannot be empty."),
-  /** XQST0087: Parsing exception. */
+  /** XQST0087. */
   XQUERYENC2(XQST, 87, "Unknown encoding '%'."),
-  /** XQST0088: Parsing exception. */
+  /** XQST0088. */
   NSMODURI(XQST, 88, "Module namespace cannot be empty."),
-  /** XQST0089: Parsing exception. */
+  /** XQST0089. */
   DUPLVAR(XQST, 89, "Duplicate declaration of %."),
-  /** XQST0090: Parsing exception. */
+  /** XQST0090. */
   INVCHARREF(XQST, 90, "Invalid character reference '%'."),
-  /** XQST0093: Parsing exception. */
+  /** XQST0093. */
   CIRCMODULE(XQST, 93, "Circular module declaration."),
-  /** XPST0094: Parsing exception. */
+  /** XPST0094. */
   GVARNOTDEFINED(XQST, 94, "Undeclared grouping variable '%'."),
-  /** XPST0097: Parsing exception. */
+  /** XPST0097. */
   INVDECFORM(XQST, 97, "Invalid decimal-format property: %='%'."),
-  /** XPST0098: Parsing exception. */
+  /** XPST0098. */
   DUPLDECFORM(XQST, 98, "Duplicate use of decimal-format '%'."),
-  /** XQST0099: Parsing exception. */
+  /** XQST0099. */
   DUPLITEM(XQST, 99, "Duplicate declaration of context item."),
-  /** XQST0106: Parsing exception. */
+  /** XQST0106. */
   DUPLUPD(XQST, 106, "More than one updating annotation declared."),
-  /** XQST0106: Parsing exception. */
+  /** XQST0106. */
   DUPLVIS(XQST, 106, "More than one visibility annotation declared."),
-  /** XQST0107: Parsing exception. */
+  /** XQST0107. */
   CTXINIT(XQST, 107, "Context item depends on itself."),
-  /** XQST0108: Parsing exception. */
+  /** XQST0108. */
   MODOUT(XQST, 108, "No output declarations allowed in modules."),
-  /** XPST0109: Parsing exception. */
+  /** XPST0109. */
   OUTWHICH(XQST, 109, "Unknown serialization parameter: '%'."),
-  /** XPST0110: Parsing exception. */
+  /** XPST0110. */
   OUTDUPL(XQST, 110, "Duplicate declaration of 'output:%'."),
-  /** XPST0111: Parsing exception. */
+  /** XPST0111. */
   DECDUPL(XQST, 111, "Duplicate decimal-format declaration."),
-  /** XQST0113: Parsing exception. */
+  /** XQST0113. */
   DECITEM(XQST, 113, "Context item cannot be specified in module."),
-  /** XPST0111: Parsing exception. */
+  /** XPST0111. */
   DECDUPLPROP(XQST, 114, "Duplicate decimal-format property '%'."),
 
-  /** XQTY0024: Parsing exception. */
+  /** XQTY0024. */
   NOATTALL(XQTY, 24, "Attribute must follow the root element."),
-  /** XQTY0024: Parsing exception. */
+  /** XQTY0024. */
   NONSALL(XQTY, 24, "Namespaces must follow the root element."),
-  /** XQTY0105: Parsing exception. */
+  /** XQTY0105. */
   CONSFUNC(XQTY, 105, "Invalid content: %."),
 
-  /** FOFD1340: Parsing exception. */
+  /** FOFD1340. */
   WRONGINT(FOFD, 1340, "Wrong integer format: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   OPTAFTER(FOFD, 1340, "Optional digit follows mandatory digits: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   DIFFMAND(FOFD, 1340, "Mandatory digits must be of the same group: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   GROUPADJ(FOFD, 1340, "Adjacent grouping separators: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   GROUPSTART(FOFD, 1340, "Picture begins with grouping separator: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   GROUPEND(FOFD, 1340, "Picture ends with grouping separator: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   NOMAND(FOFD, 1340, "No mandatory digit specified: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   PICDATE(FOFD, 1340, "Invalid picture string: '%'."),
-  /** FOFD1340: Evaluation exception. */
+  /** FOFD1340. */
   ORDCLOSED(FOFD, 1340, "Ordinal is not closed: '%'."),
-  /** FOFD1350: Evaluation exception. */
+  /** FOFD1350. */
   PICCOMP(FOFD, 1350, "Invalid component in string: '%'."),
-  /** FOUT1170: Parsing exception. */
+  /** FOUT1170. */
   RESNF(FOUT, 1170, "Resource '%' cannot be retrieved."),
-  /** FOUT1170: Parsing exception. */
+  /** FOUT1170. */
   FRAGID(FOUT, 1170, "URI contains a fragment identifier: %"),
-  /** FOUT1170: Parsing exception. */
+  /** FOUT1170. */
   INVURL(FOUT, 1170, "URI is invalid: %"),
-  /** FOUT1190: Evaluation exception. */
+  /** FOUT1190. */
   WHICHENC(FOUT, 1190, "Encoding '%' is not supported."),
-  /** FOUT1190: Evaluation exception. */
+  /** FOUT1190. */
   INVCHARS(FOUT, 1190, "%."),
-  /** FOUT1200: Evaluation exception. */
+  /** FOUT1200. */
   WHICHCHARS(FOUT, 1200, "Resource contains invalid input."),
 
-  /** XUDY0009: XQuery Update dynamic exception. */
+  /** XUDY0009. */
   UPNOPAR(XUDY, 9, "Target % has no parent."),
-  /** XUDY0014: XQuery Update dynamic exception. */
+  /** XUDY0014. */
   UPNOTCOPIED(XUDY, 14, "% was not copied by copy clause."),
-  /** XUDY0015: XQuery Update dynamic exception. */
+  /** XUDY0015. */
   UPMULTREN(XUDY, 15, "Node can only be renamed once: %."),
-  /** XUDY0015: XQuery Update dynamic exception. */
+  /** XUDY0015. */
   UPPATHREN(XUDY, 15, "Path can only be renamed once: '%'."),
-  /** XUDY0016: XQuery Update dynamic exception. */
+  /** XUDY0016. */
   UPMULTREPL(XUDY, 16, "Node can only be replaced once: %."),
-  /** XUDY0017: XQuery Update dynamic exception. */
+  /** XUDY0017. */
   UPMULTREPV(XUDY, 17, "Node can only be replaced once: %"),
-  /** XUDY0021: XQuery Update dynamic exception. */
+  /** XUDY0021. */
   UPATTDUPL(XUDY, 21, "Duplicate attribute %."),
-  /** XUDY0023: XQuery Update dynamic exception. */
+  /** XUDY0023. */
   UPNSCONFL(XUDY, 23, "Conflicts with existing namespaces."),
-  /** XUDY0024: XQuery Update dynamic exception. */
+  /** XUDY0024. */
   UPNSCONFL2(XUDY, 24, "New namespaces conflict with each other."),
-  /** XUDY0027: XQuery Update dynamic exception. */
+  /** XUDY0027. */
   UPSEQEMP(XUDY, 27, "% target must not be empty."),
-  /** XUDY0029: XQuery Update dynamic exception. */
+  /** XUDY0029. */
   UPPAREMPTY(XUDY, 29, "Target has no parent node."),
-  /** XUDY0030: XQuery Update dynamic exception. */
+  /** XUDY0030. */
   UPATTELM(XUDY, 30, "Attributes cannot be inserted as child of a document."),
-  /** XUDY0031: XQuery Update dynamic exception. */
+  /** XUDY0031. */
   UPURIDUP(XUDY, 31, "URI '%' is addressed multiple times."),
 
-  /** XUST0001: Parsing exception. */
+  /** XUST0001. */
   UPNOT(XUST, 1, "%: no updating expression allowed."),
-  /** XUST0001: Parsing exception. */
+  /** XUST0001. */
   UPCTX(XUST, 1, "Context item may not declare an updating expression."),
-  /** XUST0002: Parsing exception. */
+  /** XUST0002. */
   UPEXPECTT(XUST, 2, "Updating expression expected in modify clause."),
-  /** XUST0002: Parsing exception. */
+  /** XUST0002. */
   UPEXPECTF(XUST, 2, "Updating expression expected in function declaration."),
-  /** XUST0003: Parsing exception. */
+  /** XUST0003. */
   DUPLREVAL(XUST, 3, "Duplicate 'revalidation' declaration."),
-  /** XUST0026: Parsing exception. */
+  /** XUST0026. */
   NOREVAL(XUST, 26, "Revalidation mode not supported."),
-  /** XUST0028: Parsing exception. */
+  /** XUST0028. */
   UPFUNCTYPE(XUST, 28, "No return type allowed in updating functions."),
 
-  /** XUTY0004: XQuery Update type exception. */
+  /** XUTY0004. */
   UPNOATTRPER(XUTY, 4, "Attribute must follow the root element."),
-  /** XUTY0005: XQuery Update type exception. */
+  /** XUTY0005. */
   UPTRGTYP(XUTY, 5, "Single element or document expected as insert target."),
-  /** XUTY0006: XQuery Update type exception. */
-  UPTRGTYP2(XUTY, 6,
-      "Single element, text, comment or pi expected as insert target."),
-  /** XUTY0007: XQuery Update type exception. */
+  /** XUTY0006. */
+  UPTRGTYP2(XUTY, 6, "Single element, text, comment or pi expected as insert target."),
+  /** XUTY0007. */
   UPTRGDELEMPT(XUTY, 7, "Only nodes can be deleted."),
-  /** XUTY0008: XQuery Update type exception. */
+  /** XUTY0008. */
   UPTRGMULT(XUTY, 8, "Single element, text, attribute, comment or pi expected"
       + " as replace target."),
-  /** XUTY0010: XQuery Update type exception. */
+  /** XUTY0010. */
   UPWRELM(XUTY, 10, "Replacing nodes must be no attribute nodes."),
-  /** XUTY0011: XQuery Update type exception. */
+  /** XUTY0011. */
   UPWRATTR(XUTY, 11, "Replacing nodes must be attribute nodes."),
-  /** XUTY0012: XQuery Update type exception. */
-  UPWRTRGTYP(XUTY, 12,
-      "Single element, attribute or pi expected as rename target."),
-  /** XUTY0013: XQuery Update type exception. */
-  UPCOPYMULT(XUTY, 13,
-      "Source expression in copy clause must return a single node."),
-  /** XUTY0022: XQuery Update type exception. */
-  UPATTELM2(XUTY, 22, "Insert target must be an element."),
-
-  /* EXPath Cryptographic Module Errors */
-  /** FOCX01: Crypto Exception. */
-  CRYPTOCANINV(FOCX, 1, "Canonicalization algorithm is not supported."),
-  /** FOCX02: Crypto Exception. */
-  CRYPTODIGINV(FOCX, 2, "Digest algorithm is not supported."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOSIGINV(FOCX, 3, "Signature algorithm is not supported."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOXPINV(FOCX, 4, "XPath expression is invalid."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOINVNM(FOCX, 5, "Invalid name for $digital-certificate root."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTOKSNULL(FOCX, 7, "Key store is null."),
-  /** FOCX03: Crypto Exception. */
-  CRYPTONOKEY(FOCX, 12, "Cannot find key for alias in given keystore."),
-  /** FOCX13: Crypto Exception. */
-  CRYPTOINVHASH(FOCX, 13, "Hashing algorithm is not supported."),
-  /** FOCX14: Crypto Exception. */
-  CRYPTOENC(FOCX, 14, "The encoding method is not supported."),
-  /** FOCX15: Crypto Exception. */
-  CRYPTONOSIG(FOCX, 15, "Cannot find signature element."),
-  /** FOCX16: Crypto Exception. */
-  CRYPTONOPAD(FOCX, 16, "No such padding."),
-  /** FOCX17: Crypto Exception. */
-  CRYPTOBADPAD(FOCX, 17, "Incorrect padding."),
-  /** FOCX18: Crypto Exception. */
-  CRYPTOENCTYP(FOCX, 18, "Encryption type is not supported."),
-  /** FOCX19: Crypto Exception. */
-  CRYPTOKEYINV(FOCX, 19, "Secret key is invalid."),
-  /** FOCX20: Crypto Exception. */
-  CRYPTOILLBLO(FOCX, 20, "Illegal block size."),
-  /** FOCX21: Crypto Exception. */
-  CRYPTOINVALGO(FOCX, 21, "Algorithm is not supported."),
-  /* FOCX22: Crypto Exception.
-  CRYPTODECTYP(FOCX, 22, "Decryption type is not supported."), */
-  /** FOCX999: Crypto Exception. */
-  CRYPTOSIGTYPINV(FOCX, 9999, "Signature type is not supported."),
-  /** FOCX998: Crypto Exception.
-  CRYPTONOTSUPP(FOCX, 9998, "Not (yet) supported."), */
-  /* FOCX997: Crypto Exception.
-  CRYPTOSYMERR(FOCX, 9997, "Algorithm not compatible with encryption type."), */
-  /** FOCX996: Crypto Exception. */
-  CRYPTOIOEXC(FOCX, 9996, "IO Exception."),
-  /** FOCX995: Crypto Exception. */
-  CRYPTOKSEXC(FOCX, 9995, "Keystore exception."),
-  /** FOCX994: Crypto Exception. */
-  CRYPTOSIGEXC(FOCX, 9994, "Signature exception."),
-  /** FOCX993: Crypto Exception. */
-  CRYPTOALGEXC(FOCX, 9993, "Invalid algorithm."),
-  /** FOCX992: Crypto Exception. */
-  CRYPTOALINV(FOCX, 9992, "Invalid certificate alias %.");
+  /** XUTY0012. */
+  UPWRTRGTYP(XUTY, 12, "Single element, attribute or pi expected as rename target."),
+  /** XUTY0013. */
+  UPCOPYMULT(XUTY, 13, "Source expression in copy clause must return a single node."),
+  /** XUTY0022. */
+  UPATTELM2(XUTY, 22, "Insert target must be an element.");
 
   /** Error type. */
   public final ErrType type;
@@ -945,11 +957,29 @@ public enum Err {
    * @author Leo Woerteler
    */
   public enum ErrType {
-    /** BASX Error type. */ BASX(QueryText.BASEX, QueryText.BXERRORS),
-    /** BASX Error type. */ BXCL(QueryText.BASEX, QueryText.BXERRORS),
-    /** BASX Error type. */ BXVA(QueryText.BASEX, QueryText.BXERRORS),
-    /** BASX Error type. */ PROC(QueryText.PROC, QueryText.PROCURI),
-    /** FOCX Error type. */ FOCX(QueryText.CRYPTO, QueryText.CRYPTOURI),
+    // Project errors
+
+    /** BASX Error type. */ BASX(QueryText.BXERR, QueryText.BXERRORS),
+
+    /** BXCL Error type. */ BXCL(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXCO Error type. */ BXCO(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXDB Error type. */ BXDB(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXFT Error type. */ BXFT(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXJS Error type. */ BXJS(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXPR Error type. */ BXPR(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXRE Error type. */ BXRE(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXSQ Error type. */ BXSQ(QueryText.BXERR, QueryText.BXERRORS),
+    /** BXVA Error type. */ BXVA(QueryText.BXERR, QueryText.BXERRORS),
+
+    // EXPath errors
+
+    /** FOCX Error type. */ FOCX(QueryText.EXPERR, QueryText.EXPERROR),
+    /** FOFL Error type. */ FOFL(QueryText.EXPERR, QueryText.EXPERROR),
+    /** FOHC Error type. */ FOHC(QueryText.EXPERR, QueryText.EXPERROR),
+    /** FOZP Error type. */ FOZP(QueryText.EXPERR, QueryText.EXPERROR),
+
+    // W3 errors
+
     /** FOAR Error type. */ FOAR,
     /** FOCA Error type. */ FOCA,
     /** FOCH Error type. */ FOCH,
@@ -958,20 +988,14 @@ public enum Err {
     /** FODT Error type. */ FODT,
     /** FOFD Error type. */ FOFD,
     /** FOER Error type. */ FOER,
-    /** FOFL Error type. */ FOFL,
-    /** FOHP Error type. */ FOHC,
     /** FONS Error type. */ FONS,
     /** FORG Error type. */ FORG,
     /** FORX Error type. */ FORX,
-    /** FOSQ Error type. */ FOSQ,
     /** FOTY Error type. */ FOTY,
     /** FOUP Error type. */ FOUP,
     /** FOFD Error type. */ FOUT,
-    /** FOZP Error type. */ FOZP(QueryText.ZIP, QueryText.ZIPURI),
     /** FTDY Error type. */ FTDY,
     /** FTST Error type. */ FTST,
-    /** PACK Error type. */ PACK(QueryText.PKG, QueryText.PKGURI),
-    /** REXQ Error type. */ REXQ(QueryText.REST, QueryText.RESTXQURI),
     /** SEPM Error type. */ SEPM,
     /** SERE Error type. */ SERE,
     /** SEPM Error type. */ SESU,

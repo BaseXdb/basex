@@ -136,7 +136,7 @@ public final class FNDb extends StandardFunc {
     final Data data = data(0, ctx);
     final int v = (int) checkItr(expr[1], ctx);
     final int pre = id ? data.pre(v) : v;
-    if(pre < 0 || pre >= data.meta.size) IDINVALID.thrw(info, this, v);
+    if(pre < 0 || pre >= data.meta.size) BXDB_RANGE.thrw(info, this, v);
     return new DBNode(data, pre);
   }
 
@@ -323,7 +323,7 @@ public final class FNDb extends StandardFunc {
             res.add(new FAttr(PATH, token(meta.original)));
           res.add(token(name));
         } catch(final IOException ex) {
-          NODB.thrw(info, ex);
+          BXDB_OPEN.thrw(info, ex);
         } finally {
           if(di != null) try { di.close(); } catch(final IOException ex) { }
         }
@@ -373,7 +373,7 @@ public final class FNDb extends StandardFunc {
       }
       return Bln.get(raw || data.resources.doc(path) != -1);
     } catch(final QueryException ex) {
-      if(ex.err() == NODB) return Bln.FALSE;
+      if(ex.err() == BXDB_OPEN) return Bln.FALSE;
       throw ex;
     }
   }
@@ -508,14 +508,14 @@ public final class FNDb extends StandardFunc {
     final Resources res = data.resources;
     final int pre = res.doc(path);
     if(pre != -1) {
-      if(res.docs(path).size() != 1) DOCTRGMULT.thrw(info);
+      if(res.docs(path).size() != 1) BXDB_SINGLE.thrw(info);
       ctx.updates.add(new DeleteNode(pre, data, info), ctx);
     }
     // delete binary resources
     final IOFile bin = data.inMemory() ? null : data.meta.binary(path);
     if(bin != null) {
       if(bin.exists()) {
-        if(bin.isDir()) DOCTRGMULT.thrw(info);
+        if(bin.isDir()) BXDB_SINGLE.thrw(info);
         ctx.updates.add(new DBStore(data, path, doc, info), ctx);
       } else {
         ctx.updates.add(new DBAdd(data, info, doc, path, ctx.context), ctx);
@@ -568,7 +568,7 @@ public final class FNDb extends StandardFunc {
     for(int i = 0, is = il.size(); i < is; i++) {
       final int pre = il.get(i);
       final String trg = Rename.target(data, pre, source, target);
-      if(trg.isEmpty()) EMPTYPATH.thrw(info, this);
+      if(trg.isEmpty()) BXDB_EMPTY.thrw(info, this);
       ctx.updates.add(new ReplaceValue(pre, data, info, token(trg)), ctx);
     }
     // rename files
@@ -607,7 +607,7 @@ public final class FNDb extends StandardFunc {
 
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
-    if(data.inMemory()) DBMEM.thrw(info);
+    if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
     final IOFile file = data.meta.binary(path);
     if(file == null || file.isDir()) RESINV.thrw(info, path);
 
@@ -625,11 +625,11 @@ public final class FNDb extends StandardFunc {
   private B64Stream retrieve(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
     final String path = path(1, ctx);
-    if(data.inMemory()) DBMEM.thrw(info);
+    if(data.inMemory()) BXDB_MEM.thrw(info, data.meta.name);
 
     final IOFile file = data.meta.binary(path);
     if(file == null || !file.exists() || file.isDir()) WHICHRES.thrw(info, path);
-    return new B64Stream(file, DBERR);
+    return new B64Stream(file, IOERR);
   }
 
   /**
@@ -672,7 +672,7 @@ public final class FNDb extends StandardFunc {
 
     // throw exception if event is unknown
     if(!ctx.context.events.notify(ctx.context, name, ao.toArray())) {
-      NOEVENT.thrw(info, name);
+      BXDB_EVENT.thrw(info, name);
     }
     return null;
   }

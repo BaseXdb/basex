@@ -48,7 +48,9 @@ public final class FNClientTest extends AdvancedQueryTest {
     check(_CLIENT_CONNECT);
     query(connect());
     query(EXISTS.args(" " + connect()));
-    error(_CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, ""), Err.CLCONN);
+    // BXCL0001: connection errors
+    error(_CLIENT_CONNECT.args(Text.LOCALHOST, 9999, Text.ADMIN, ""), Err.BXCL_CONN);
+    error(_CLIENT_CONNECT.args("xxx", 9999, Text.ADMIN, Text.ADMIN), Err.BXCL_CONN);
   }
 
   /**
@@ -61,6 +63,8 @@ public final class FNClientTest extends AdvancedQueryTest {
     query("let $a := " + connect() + ", $b := " + connect() + " return (" +
         _CLIENT_EXECUTE.args("$a", new XQuery("1")) + "," +
         _CLIENT_EXECUTE.args("$b", new XQuery("2")) + ")", "1 2");
+    // BXCL0004: connection errors
+    error(_CLIENT_EXECUTE.args(connect(), "x"), Err.BXCL_COMMAND);
   }
 
   /**
@@ -72,6 +76,8 @@ public final class FNClientTest extends AdvancedQueryTest {
     contains(_CLIENT_EXECUTE.args(connect(), new ShowUsers()), Text.USERHEAD[0]);
     query("let $a := " + connect() + ", $b := " + connect() + " return " +
         _CLIENT_QUERY.args("$a", "1") + "+" + _CLIENT_QUERY.args("$b", "2"), "3");
+    // query errors
+    error(_CLIENT_QUERY.args(connect(), "x"), Err.XPNOCTX);
   }
 
   /**
@@ -79,7 +85,6 @@ public final class FNClientTest extends AdvancedQueryTest {
    */
   @Test
   public void clientQueryTypes() {
-    // check data types
     final Object[][] types = XdmInfoTest.TYPES;
     for(int t = 0; t < types.length; t++) {
       if(types[t] == null || types[t].length < 3) continue;
@@ -94,7 +99,11 @@ public final class FNClientTest extends AdvancedQueryTest {
   public void clientClose() {
     check(_CLIENT_CLOSE);
     query(connect() + " ! " + _CLIENT_CLOSE.args(" ."));
-    error(_CLIENT_CLOSE.args("xs:anyURI('unknown')"), Err.CLWHICH);
+    // BXCL0002: session not available
+    error(_CLIENT_CLOSE.args("xs:anyURI('unknown')"), Err.BXCL_NOTAVL);
+    // BXCL0002: session has already been closed
+    error(connect() + " ! (" + _CLIENT_CLOSE.args(" .") + ", " +
+        _CLIENT_CLOSE.args(" .") + ")", Err.BXCL_NOTAVL);
   }
 
   /**

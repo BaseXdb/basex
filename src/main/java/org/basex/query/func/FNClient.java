@@ -3,13 +3,14 @@ package org.basex.query.func;
 import static org.basex.query.util.Err.*;
 
 import java.io.*;
+import java.util.regex.*;
 
+import org.basex.core.*;
 import org.basex.io.out.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;
-import org.basex.query.util.*;
 import org.basex.server.*;
 import org.basex.util.*;
 
@@ -20,6 +21,9 @@ import org.basex.util.*;
  * @author Christian Gruen
  */
 public class FNClient extends StandardFunc {
+  /** Query pattern. */
+  static final Pattern QUERYPAT = Pattern.compile("\\[(.*?)\\] (.*)", Pattern.MULTILINE);
+
   /**
    * Constructor.
    * @param ii input info
@@ -72,7 +76,7 @@ public class FNClient extends StandardFunc {
     try {
       return ctx.sessions().add(new ClientSession(host, port, user, pass));
     } catch(final IOException ex) {
-      throw Err.CLCONN.thrw(info, ex);
+      throw BXCL_CONN.thrw(info, ex);
     }
   }
 
@@ -93,8 +97,10 @@ public class FNClient extends StandardFunc {
       final byte[] result = ao.toArray();
       cs.setOutputStream(null);
       return Str.get(result);
+    } catch(final BaseXException ex) {
+      throw BXCL_COMMAND.thrw(info, ex.getMessage());
     } catch(final IOException ex) {
-      throw CLERR.thrw(info, ex.getMessage());
+      throw BXCL_COMM.thrw(info, ex.getMessage());
     }
   }
 
@@ -115,8 +121,12 @@ public class FNClient extends StandardFunc {
         vb.add(cq.type().castString(result, info));
       }
       return vb.value();
+    } catch(final BaseXException ex) {
+      final Matcher m = QUERYPAT.matcher(ex.getMessage());
+      if(m.find()) throw new QueryException(info, new QNm(m.group(1)), m.group(2));
+      throw BXCL_QUERY.thrw(info, ex.getMessage());
     } catch(final IOException ex) {
-      throw CLERR.thrw(info, ex.getMessage());
+      throw BXCL_COMM.thrw(info, ex.getMessage());
     }
   }
 
@@ -131,7 +141,7 @@ public class FNClient extends StandardFunc {
       session(ctx, true).close();
       return null;
     } catch(final IOException ex) {
-      throw CLERR.thrw(info, ex.getMessage());
+      throw BXCL_COMMAND.thrw(info, ex.getMessage());
     }
   }
 
@@ -148,7 +158,7 @@ public class FNClient extends StandardFunc {
 
     final Uri id = (Uri) checkType(expr[0].item(ctx, info), AtomType.URI);
     final ClientSession cs = ctx.sessions().get(id);
-    if(cs == null) CLWHICH.thrw(info, id);
+    if(cs == null) BXCL_NOTAVL.thrw(info, id);
     if(del) ctx.sessions().remove(id);
     return cs;
   }

@@ -58,8 +58,8 @@ public final class FNZipTest extends AdvancedQueryTest {
     query(_ZIP_BINARY_ENTRY.args(ZIP, ENTRY1));
     contains("xs:hexBinary(" + _ZIP_BINARY_ENTRY.args(ZIP, ENTRY1) + ")", "610A61626F");
 
-    error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), Err.ZIPNOTFOUND);
-    error(_ZIP_BINARY_ENTRY.args(ZIP, ""), Err.ZIPNOTFOUND);
+    error(_ZIP_BINARY_ENTRY.args("abc", "xyz"), Err.ZIP_NOTFOUND);
+    error(_ZIP_BINARY_ENTRY.args(ZIP, ""), Err.ZIP_NOTFOUND);
   }
 
   /**
@@ -70,7 +70,7 @@ public final class FNZipTest extends AdvancedQueryTest {
     check(_ZIP_TEXT_ENTRY);
     query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1));
     query(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "US-ASCII"));
-    error(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "xyz"), Err.ZIPFAIL);
+    error(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1, "xyz"), Err.ZIP_FAIL);
     // newlines are removed from the result..
     contains(_ZIP_TEXT_ENTRY.args(ZIP, ENTRY1), "aaboutab");
   }
@@ -123,10 +123,10 @@ public final class FNZipTest extends AdvancedQueryTest {
     checkZipEntry("a/b", new byte[] { '!' });
 
     // error: no entry specified
-    error(_ZIP_ZIP_FILE.args(zipParams("")), Err.ZIPFAIL);
+    error(_ZIP_ZIP_FILE.args(zipParams("")), Err.ZIP_FAIL);
     // error: duplicate entry specified
     error(_ZIP_ZIP_FILE.args(zipParams("<entry src='" + TMPFILE + "'/>" +
-        "<entry src='" + TMPFILE + "'/>")), Err.ZIPFAIL);
+        "<entry src='" + TMPFILE + "'/>")), Err.ZIP_FAIL);
   }
 
   /**
@@ -209,7 +209,7 @@ public final class FNZipTest extends AdvancedQueryTest {
     // new file has no entries
     list = list.replaceAll("<zip:dir.*</zip:dir>", "");
     error(_ZIP_UPDATE_ENTRIES.args(list,
-        new File(TMPZIP).getCanonicalPath()), Err.ZIPFAIL);
+        new File(TMPZIP).getCanonicalPath()), Err.ZIP_FAIL);
   }
 
   /**

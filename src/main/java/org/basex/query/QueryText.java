@@ -431,6 +431,8 @@ public interface QueryText {
   byte[] OUTPUT = token("output");
   /** BaseX token. */
   byte[] BASEX = token("basex");
+  /** BXErr token. */
+  byte[] BXERR = token("bxerr");
   /** Client token. */
   byte[] CLIENT = token("client");
   /** DB token. */
@@ -475,6 +477,8 @@ public interface QueryText {
   byte[] REST = token("rest");
   /** Val token. */
   byte[] VLDT = token("validate");
+  /** EXErr token. */
+  byte[] EXPERR = token("experr");
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
@@ -523,13 +527,15 @@ public interface QueryText {
   byte[] PKGURI = token(EXPATH + "pkg");
   /** ZIP URI.*/
   byte[] ZIPURI = token(EXPATH + "zip");
+  /** EXPath Error URI. */
+  byte[] EXPERROR = token(EXPATH + "error");
 
   /** Project URI. */
   byte[] BASEXURI = token(Text.URL);
   /** Project modules. */
   String BXMODULES = Text.URL + "/modules/";
   /** Project errors. */
-  byte[] BXERRORS = token(Text.URL + "/error/");
+  byte[] BXERRORS = token(Text.URL + "/errors");
   /** Client module URI. */
   byte[] CLIENTURI = token(BXMODULES + "client");
   /** Database module URI. */

@@ -202,7 +202,7 @@ public final class HTTPResponse {
       // RFC 1341: Preamble shall be ignored -> read till 1st boundary
       while(next != null && !eq(sep, next))
         next = readLine(io);
-      if(next == null) REQINV.thrw(info, "No body specified for http:part");
+      if(next == null) HC_REQ.thrw(info, "No body specified for http:part");
 
       final byte[] end = concat(sep, token("--"));
       FElem nextPart = extractNextPart(io, status, payloads, sep, end);
@@ -357,7 +357,7 @@ public final class HTTPResponse {
    */
   private byte[] extractBoundary(final String c) throws QueryException {
     int index = c.toLowerCase(Locale.ENGLISH).lastIndexOf("boundary=");
-    if(index == -1) REQINV.thrw(info, "No separation boundary specified");
+    if(index == -1) HC_REQ.thrw(info, "No separation boundary specified");
     String b = c.substring(index + 9); // 9 for "boundary="
     if(b.charAt(0) == '"') {
       // if the boundary is enclosed in quotes, strip them

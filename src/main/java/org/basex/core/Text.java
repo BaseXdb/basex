@@ -635,8 +635,6 @@ public interface Text {
   String PRINTED_CC = lang("printed") + COLS;
   /** "Results: %". */
   String RESULTS_X = lang("results_%");
-  /** "Query must yield database nodes.". */
-  String NO_DB_NODES = lang("no_db_nodes");
   /** "Query executed in %". */
   String QUERY_EXECUTED_X = lang("query_executed_%");
 
@@ -664,8 +662,8 @@ public interface Text {
   String EVENTS_X = lang("events_%");
   /** Show packages. */
   String PACKAGES_X = lang("packages_%");
-  /** Permission needed. */
-  String PERM_NEEDED_X = lang("perm_needed_%");
+  /** Permission required. */
+  String PERM_REQUIRED_X = lang("perm_required_%");
   /** Invalid permissions. */
   String PERM_UNKNOWN_X = lang("perm_unknown_%");
   /** Permission granted. */

@@ -83,7 +83,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
     for(final String[] f : TOXML) {
       final String qu = _JSON_PARSE.args(f[0]);
       if(f.length == 1) {
-        error(qu, Err.JSONPARSE);
+        error(qu, Err.BXJS_PARSE);
       } else if(f[1].startsWith("...")) {
         contains(qu, f[1].substring(3));
       } else {
@@ -101,7 +101,7 @@ public final class FNJsonTest extends AdvancedQueryTest {
     for(final String[] f : TOJSON) {
       final String qu = _JSON_SERIALIZE.args(f[0]);
       if(f.length == 1) {
-        error(qu, Err.JSONSER);
+        error(qu, Err.BXJS_SER);
       } else if(f[1].startsWith("...")) {
         contains(qu, f[1].substring(3));
       } else {

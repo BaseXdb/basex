@@ -2,6 +2,7 @@ package org.basex.test.query.func;
 
 import static org.basex.query.func.Function.*;
 
+import org.basex.query.util.*;
 import org.basex.test.query.*;
 import org.junit.*;
 
@@ -19,6 +20,7 @@ public final class FNProcTest extends AdvancedQueryTest {
   public void procSystem() {
     check(_PROC_SYSTEM);
     query(_PROC_SYSTEM.args("java", "-version"), "");
+    error(_PROC_SYSTEM.args("java", "-version", "xx"), Err.BXPR_ENC);
   }
 
   /**

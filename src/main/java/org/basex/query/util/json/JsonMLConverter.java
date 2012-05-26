@@ -130,6 +130,6 @@ public final class JsonMLConverter extends XMLConverter {
    * @throws QueryException query exception
    */
   private void error(final String msg, final Object... ext) throws QueryException {
-    throw JSONMLPARSE.thrw(info, Util.inf(msg, ext));
+    throw BXJS_PARSEML.thrw(info, Util.inf(msg, ext));
   }
 }

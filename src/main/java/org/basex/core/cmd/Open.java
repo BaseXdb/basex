@@ -78,7 +78,7 @@ public final class Open extends Command {
     // check permissions
     if(!ctx.perm(Perm.READ, data.meta)) {
       Close.close(data, ctx);
-      throw new BaseXException(PERM_NEEDED_X, Perm.READ);
+      throw new BaseXException(PERM_REQUIRED_X, Perm.READ);
     }
 
     return data;

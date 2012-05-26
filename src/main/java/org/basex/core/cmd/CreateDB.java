@@ -135,7 +135,7 @@ public final class CreateDB extends ACreate {
       final Context ctx) throws IOException {
 
     // check permissions
-    if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_NEEDED_X, Perm.CREATE);
+    if(!ctx.user.has(Perm.CREATE)) throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
 
     // create main memory database instance
     final Prop prop = ctx.prop;
@@ -175,7 +175,7 @@ public final class CreateDB extends ACreate {
       throws IOException {
 
     if(ctx.user.has(Perm.CREATE)) return MemBuilder.build(parser);
-    throw new BaseXException(PERM_NEEDED_X, Perm.CREATE);
+    throw new BaseXException(PERM_REQUIRED_X, Perm.CREATE);
   }
 
   /**

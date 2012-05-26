@@ -19,6 +19,6 @@ final class DatabaseModifier extends ContextModifier {
   void add(final UpdatePrimitive p, final QueryContext ctx) throws QueryException {
     add(p);
     // check permissions
-    if(!ctx.context.perm(Perm.WRITE, p.data.meta)) PERMNO.thrw(p.info, Perm.WRITE);
+    if(!ctx.context.perm(Perm.WRITE, p.data.meta)) BASX_PERM.thrw(p.info, Perm.WRITE);
   }
 }

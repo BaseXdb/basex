@@ -38,8 +38,10 @@ public final class NSGlobal {
     NS.add(HTTP, HTTPURI);
     NS.add(ZIP, ZIPURI);
     NS.add(PKG, PKGURI);
+    NS.add(EXPERR, EXPERROR);
     // BaseX namespaces
     NS.add(BASEX, BASEXURI);
+    NS.add(BXERR, BXERRORS);
     NS.add(CLIENT, CLIENTURI);
     NS.add(DB, DBURI);
     NS.add(FT, FTURI);

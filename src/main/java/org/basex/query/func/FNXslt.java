@@ -89,8 +89,9 @@ public final class FNXslt extends StandardFunc {
       final TokenMap map = new FuncParams(E_PARAM, info).parse(opt);
       final byte[] result = transform(in, xsl, map);
       return new DBNode(new IOContent(result), ctx.context.prop);
+    } catch(final QueryException ex) {
+      throw ex;
     } catch(final Exception ex) {
-      if(ex instanceof QueryException) throw (QueryException) ex;
       Util.debug(ex);
       // return cause of reflection error, or error itself
       throw IOERR.thrw(info, ex instanceof InvocationTargetException ?

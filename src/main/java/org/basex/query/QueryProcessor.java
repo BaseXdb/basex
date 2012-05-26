@@ -204,7 +204,7 @@ public final class QueryProcessor extends Progress {
       // convert empty result to node set
       if(res.size() == 0) return new Nodes(ctx.nodes.data);
       // otherwise, throw error
-      QUERYNODES.thrw(null);
+      BXDB_DBRETURN.thrw(null);
     }
     return (Nodes) res;
   }

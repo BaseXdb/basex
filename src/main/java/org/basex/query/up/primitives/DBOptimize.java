@@ -47,7 +47,7 @@ public final class DBOptimize extends UpdatePrimitive {
       if(all) OptimizeAll.optimizeAll(data, ctx, null);
       else Optimize.optimize(data, null);
     } catch(final IOException ex) {
-      DBERR.thrw(info, ex);
+      UPDBOPTERR.thrw(info, ex);
     }
   }
 

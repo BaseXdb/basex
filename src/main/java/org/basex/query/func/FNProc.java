@@ -58,7 +58,7 @@ public final class FNProc extends StandardFunc {
     try {
       cs = Charset.forName(c);
     } catch(final Exception ex) {
-      PROCENC.thrw(info, c);
+      BXPR_ENC.thrw(info, c);
     }
 
     final String[] args = tl.toStringArray();

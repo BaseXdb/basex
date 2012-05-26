@@ -62,10 +62,10 @@ public final class PkgValidator {
     for(final Dependency dep : pkg.dep) {
       // first check of dependency elements are consistently defined in the
       // descriptor
-      if(dep.pkg == null && dep.processor == null) PKGDESCINV.thrw(info, MISSSECOND);
+      if(dep.pkg == null && dep.processor == null) BXRE_DESC.thrw(info, MISSSECOND);
       // if dependency involves a package, check if this package or an
       // appropriate version of it is installed
-      if(dep.pkg != null && depPkg(dep) == null) PKGNOTINST.thrw(info, dep.pkg);
+      if(dep.pkg != null && depPkg(dep) == null) BXRE_NOTINST.thrw(info, dep.pkg);
       // if dependency involves a processor, add it to the list with processor
       // dependencies
       if(dep.processor != null) procs.add(dep);
@@ -108,7 +108,7 @@ public final class PkgValidator {
       // check if current version is acceptable for the dependency
       supported = availVersion(d, new TokenSet(token(v))) != null;
     }
-    if(!supported) PKGNOTSUPP.thrw(info);
+    if(!supported) BXRE_VERSION.thrw(info);
   }
 
   /**
@@ -176,7 +176,7 @@ public final class PkgValidator {
   private void checkComps(final Package pkg) throws QueryException {
     // modules other than xquery could be supported in future
     for(final Component comp : pkg.comps) {
-      if(isInstalled(comp, pkg.name)) MODISTALLED.thrw(info, comp.name());
+      if(isInstalled(comp, pkg.name)) BXRE_INST.thrw(info, comp.name());
     }
   }
 

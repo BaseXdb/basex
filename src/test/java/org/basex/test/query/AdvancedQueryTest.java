@@ -125,7 +125,7 @@ public abstract class AdvancedQueryTest extends SandboxTest {
       // skip test if all types are arbitrary
       if((def.min > 0 || al != 0) && (any == 0 || any != al)) {
         final String query = qu.append(')').toString();
-        if(in) error(query, Err.XPTYPE, Err.NODBCTX, Err.NODB);
+        if(in) error(query, Err.XPTYPE, Err.BXDB_NODB, Err.BXDB_OPEN);
         else error(query, Err.XPARGS);
       }
     }

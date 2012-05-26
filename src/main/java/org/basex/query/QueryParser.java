@@ -541,7 +541,7 @@ public class QueryParser extends InputParser {
       // project-specific declaration
       final String key = string(uc(name.local()));
       final Object obj = ctx.context.prop.get(key);
-      if(obj == null) error(NOOPTION, key);
+      if(obj == null) error(BASX_OPTIONS, key);
       // cache old value (to be reset after query evaluation)
       ctx.globalOpt.put(key, obj);
       ctx.dbOptions.put(key, string(val));
@@ -3192,12 +3192,12 @@ public class QueryParser extends InputParser {
         }
       } else if(wsConsumeWs(WILDCARDS)) {
         if(opt.isSet(WC)) error(FTDUP, WILDCARDS);
-        if(opt.is(FZ)) error(FTFZWC);
+        if(opt.is(FZ)) error(BXFT_MATCH);
         opt.set(WC, using);
       } else if(wsConsumeWs(FUZZY)) {
         // extension to the official extension: "using fuzzy"
         if(opt.isSet(FZ)) error(FTDUP, FUZZY);
-        if(opt.is(WC)) error(FTFZWC);
+        if(opt.is(WC)) error(BXFT_MATCH);
         opt.set(FZ, using);
       } else {
         error(FTMATCH, consume());

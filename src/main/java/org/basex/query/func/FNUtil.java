@@ -116,7 +116,7 @@ public final class FNUtil extends StandardFunc {
     checkCreate(ctx);
     final String path = string(checkStr(expr[0], ctx));
     final IO io = IO.get(path);
-    if(!io.exists()) FILEERROR.thrw(info, path);
+    if(!io.exists()) FL_FILE.thrw(info, path);
     try {
       return eval(ctx, io.read());
     } catch(final IOException ex) {
@@ -381,7 +381,7 @@ public final class FNUtil extends StandardFunc {
         is.close();
       }
     } catch(final IOException ex) {
-      CONVERT.thrw(info, ex);
+      BXCO_STRING.thrw(info, ex);
     }
 
     return new ValueIter() {
@@ -424,7 +424,7 @@ public final class FNUtil extends StandardFunc {
         is.close();
       }
     } catch(final IOException ex) {
-      throw CONVERT.thrw(info, ex);
+      throw BXCO_STRING.thrw(info, ex);
     }
   }
 
@@ -457,7 +457,7 @@ public final class FNUtil extends StandardFunc {
             break;
           }
         }
-        if(!found) INVFLAG.thrw(info, key);
+        if(!found) ELMOPTION.thrw(info, key);
       }
     }
     return Bln.get(cmp.deep(ctx.iter(expr[0]), ctx.iter(expr[1])));

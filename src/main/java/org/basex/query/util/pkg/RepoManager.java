@@ -64,7 +64,7 @@ public final class RepoManager {
       cont = io.read();
     } catch(final IOException ex) {
       Util.debug(ex);
-      PKGNOTEXIST.thrw(info, path);
+      BXRE_WHICH.thrw(info, path);
     }
 
     try {
@@ -72,7 +72,7 @@ public final class RepoManager {
       if(io.hasSuffix(IO.JARSUFFIX)) return installJAR(cont);
       return installXAR(cont);
     } catch(final IOException ex) {
-      final Err err = ex instanceof FileNotFoundException ? PKGREADFNF : PKGREADFAIL;
+      final Err err = ex instanceof FileNotFoundException ? BXRE_PARSENF : BXRE_PARSE;
       Util.debug(ex);
       throw err.thrw(info, io.name(), ex.getMessage());
     }
@@ -156,13 +156,13 @@ public final class RepoManager {
       if(eq(nextPkg, pkg) || eq(Package.name(nextPkg), pkg)) {
         // check if package to be deleted participates in a dependency
         final byte[] primPkg = primary(nextPkg);
-        if(primPkg != null) PKGDEP.thrw(info, string(primPkg), pkg);
+        if(primPkg != null) BXRE_DEP.thrw(info, string(primPkg), pkg);
 
         // clean package repository
         final IOFile f = repo.path(string(dict.get(nextPkg)));
         repo.delete(new PkgParser(repo, info).parse(new IOFile(f, DESCRIPTOR)));
         // package does not participate in a dependency => delete it
-        if(!f.delete()) PKGDEL.thrw(info, f);
+        if(!f.delete()) BXRE_DELETE.thrw(info, f);
         found = true;
       }
     }
@@ -170,11 +170,11 @@ public final class RepoManager {
     // traverse all files
     final IOFile file = file(pkg, repo);
     if(file != null) {
-      if(!file.delete()) PKGDEL.thrw(info, file);
+      if(!file.delete()) BXRE_DELETE.thrw(info, file);
       return;
     }
 
-    if(!found) PKGNOTEXIST.thrw(info, pkg);
+    if(!found) BXRE_WHICH.thrw(info, pkg);
   }
 
   /**
@@ -215,7 +215,7 @@ public final class RepoManager {
 
     // copy file to rewritten URI file path
     final String path = ModuleLoader.uri2path(string(uri));
-    if(path == null) INSTERR.thrw(info, uri);
+    if(path == null) BXRE_URI.thrw(info, uri);
 
     final IOFile rp = new IOFile(ctx.mprop.get(MainProp.REPOPATH));
     final boolean exists = md(rp, path);

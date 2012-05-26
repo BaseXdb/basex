@@ -31,7 +31,7 @@ public final class QueryException extends Exception {
   private int markedCol;
 
   /**
-   * Constructor, specifying an exception or error. {@link Err#GENERR} will be set
+   * Constructor, specifying an exception or error. {@link Err#BASX_GENERIC} will be set
    * as error code.
    * @param th exception or error
    */
@@ -41,12 +41,12 @@ public final class QueryException extends Exception {
   }
 
   /**
-   * Constructor, specifying a simple error message. {@link Err#GENERR} will be set
+   * Constructor, specifying a simple error message. {@link Err#BASX_GENERIC} will be set
    * as error code.
    * @param msg error message
    */
   public QueryException(final String msg) {
-    this(null, Err.GENERR, msg);
+    this(null, Err.BASX_GENERIC, msg);
   }
 
   /**

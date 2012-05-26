@@ -254,6 +254,6 @@ public final class JSONSerializer extends OutputSerializer {
    * @throws IOException I/O exception
    */
   private static void error(final String msg, final Object... ext) throws IOException {
-    throw JSONSER.thrwSerial(Util.inf(msg, ext));
+    throw BXJS_SER.thrwSerial(Util.inf(msg, ext));
   }
 }

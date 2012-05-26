@@ -248,7 +248,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final DBNode checkDBNode(final Item it) throws QueryException {
-    if(!(it instanceof DBNode)) NODBCTX.thrw(info, this);
+    if(!(it instanceof DBNode)) BXDB_NODB.thrw(info, this);
     return (DBNode) it;
   }
 
@@ -400,7 +400,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   private void checkPerm(final QueryContext ctx, final Perm p) throws QueryException {
-    if(!ctx.context.user.has(p)) throw PERMNO.thrw(info, p);
+    if(!ctx.context.user.has(p)) throw BASX_PERM.thrw(info, p);
   }
 
   /**

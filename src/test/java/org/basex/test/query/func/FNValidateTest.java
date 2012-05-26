@@ -45,13 +45,13 @@ public final class FNValidateTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_XSD.args("unknown"), Err.WHICHRES);
     error(_VALIDATE_XSD.args(FILE, "unknown.xsd"), Err.WHICHRES);
-    error(_VALIDATE_XSD.args(FILE), Err.VALFAIL);
+    error(_VALIDATE_XSD.args(FILE), Err.BXVA_FAIL);
     error(
         "let $doc := <root/> " +
         "let $schema := <xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'> " +
         "<xs:element name='unknown'/> " +
         "</xs:schema> " +
-        "return validate:xsd($doc, $schema)", Err.VALFAIL);
+        "return validate:xsd($doc, $schema)", Err.BXVA_FAIL);
   }
 
   /**
@@ -75,10 +75,10 @@ public final class FNValidateTest extends AdvancedQueryTest {
     // invalid arguments
     error(_VALIDATE_DTD.args("unknown"), Err.WHICHRES);
     error(_VALIDATE_DTD.args(FILE, "unknown.dtd"), Err.WHICHRES);
-    error(_VALIDATE_DTD.args(FILE), Err.VALFAIL);
+    error(_VALIDATE_DTD.args(FILE), Err.BXVA_FAIL);
     error(
         "let $doc := <root/> " +
         "let $dtd := '<!ELEMENT unknown (#PCDATA)>' " +
-        "return validate:dtd($doc, $dtd) ", Err.VALFAIL);
+        "return validate:dtd($doc, $dtd) ", Err.BXVA_FAIL);
   }
 }

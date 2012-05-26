@@ -121,7 +121,7 @@ public final class FNIndex extends StandardFunc {
       index = data.ftxindex;
       avl = data.meta.ftxtindex;
     }
-    if(!avl) NOINDEX.thrw(call.info, data.meta.name,
+    if(!avl) BXDB_INDEX.thrw(call.info, data.meta.name,
         it.toString().toLowerCase(Locale.ENGLISH));
     return entries(index, prefix);
   }

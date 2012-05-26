@@ -189,7 +189,7 @@ public final class FNFt extends StandardFunc {
 
     final InputInfo info = fun.info;
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    if(!data.meta.ftxtindex) NOINDEX.thrw(info, data.meta.name,
+    if(!data.meta.ftxtindex) BXDB_INDEX.thrw(info, data.meta.name,
         IndexType.FULLTEXT.toString().toLowerCase(Locale.ENGLISH));
 
     final FTOpt tmp = ctx.ftOpt();
@@ -206,7 +206,7 @@ public final class FNFt extends StandardFunc {
           opt.set(WC, t);
         } else if(eq(k, MODE)) {
           m = FTMode.get(v);
-          if(m == null) FTMODE.thrw(info, v);
+          if(m == null) ELMOPTION.thrw(info, v);
         } else {
           ELMOPTION.thrw(info, k);
         }
