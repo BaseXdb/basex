@@ -437,7 +437,7 @@ public final class QT3TS {
           msg = assertBoolean(value, false);
         } else if(type.equals("assert-permutation")) {
           msg = assertPermutation(value, expected);
-        } else if(type.equals("assert-serialization")) {
+        } else if(type.equals("assert-xml")) {
           msg = assertSerialization(value, expected);
         } else if(type.equals("assert-serialization-error")) {
           msg = assertSerialError(value, expected);
