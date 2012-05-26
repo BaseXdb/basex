@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.basex</groupId>
   <artifactId>basex-tests</artifactId>
-  <version>7.2.2-SNAPSHOT</version>
+  <version>7.3-SNAPSHOT</version>
   <properties>
     <compileSource>1.6</compileSource>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,7 +38,7 @@
 
       <groupId>org.basex</groupId>
       <artifactId>basex-api</artifactId>
-      <version>7.2.2-SNAPSHOT</version>
+      <version>7.3-SNAPSHOT</version>
     </dependency>
       <dependency>
           <groupId>junit</groupId>
