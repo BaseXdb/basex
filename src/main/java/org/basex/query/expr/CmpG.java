@@ -3,8 +3,8 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.util.Err.*;
 
-import org.basex.index.IndexToken.IndexType;
 import org.basex.index.*;
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.func.*;
@@ -315,7 +315,7 @@ public final class CmpG extends Cmp {
       final SeqType t = it.type();
       if(!(t.type.isString() || t.type.isNode())) return false;
 
-      final int is = ic.data.count(new ValuesToken(ind, it.string(info)));
+      final int is = ic.data.count(new StringToken(ind, it.string(info)));
       // add only expressions that yield results
       if(is != 0) {
         va = Array.add(va, new ValueAccess(info, it, ind, ic));

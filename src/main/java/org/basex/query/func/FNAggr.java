@@ -33,7 +33,12 @@ public final class FNAggr extends StandardFunc {
     switch(sig) {
       case COUNT:
         long c = iter.size();
-        if(c == -1) do ++c; while(iter.next() != null);
+        if(c == -1) {
+          do {
+            ctx.checkStop();
+            ++c;
+          } while(iter.next() != null);
+        }
         return Int.get(c);
       case MIN:
         return minmax(iter, OpV.GT, ctx);

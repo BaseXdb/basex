@@ -1,4 +1,6 @@
-package org.basex.index;
+package org.basex.index.query;
+
+import org.basex.index.*;
 
 /**
  * This class defines access to index text tokens.
@@ -6,7 +8,7 @@ package org.basex.index;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class ValuesToken implements IndexToken {
+public final class StringToken implements IndexToken {
   /** Index type. */
   private final IndexType type;
   /** Text. */
@@ -17,7 +19,7 @@ public final class ValuesToken implements IndexToken {
    * @param it index type
    * @param tok token
    */
-  public ValuesToken(final IndexType it, final byte[] tok) {
+  public StringToken(final IndexType it, final byte[] tok) {
     type = it;
     text = tok;
   }

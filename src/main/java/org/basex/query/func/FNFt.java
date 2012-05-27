@@ -7,7 +7,8 @@ import static org.basex.util.ft.FTFlag.*;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.*;
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.ft.*;
@@ -227,14 +228,13 @@ public final class FNFt extends StandardFunc {
    */
   private Iter tokens(final QueryContext ctx) throws QueryException {
     final Data data = data(0, ctx);
-
-    byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
-    if(prefix.length != 0) {
+    byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    if(entry.length != 0) {
       final FTLexer ftl = new FTLexer(new FTOpt().copy(data.meta));
-      ftl.init(prefix);
-      prefix = ftl.nextToken();
+      ftl.init(entry);
+      entry = ftl.nextToken();
     }
-    return FNIndex.entries(data, prefix, IndexType.FULLTEXT, this);
+    return FNIndex.entries(data, new IndexEntries(entry), IndexType.FULLTEXT, this);
   }
 
   /**

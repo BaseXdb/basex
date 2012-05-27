@@ -522,11 +522,12 @@ public enum Function {
   /* FNIndex functions. */
 
   /** Index function: returns index facet information. */
-  _INDEX_FACETS(FNIndex.class, "facets(database, format)", DOC_O, 1, STR, STR),
+  _INDEX_FACETS(FNIndex.class, "facets(database,format)", DOC_O, 1, STR, STR),
   /** Index function: returns texts. */
-  _INDEX_TEXTS(FNIndex.class, "texts(database, prefix)", NOD_ZM, 1, STR, STR),
+  _INDEX_TEXTS(FNIndex.class, "texts(database,entry[,order])", NOD_ZM, 1, STR, STR, BLN),
   /** Index function: returns attribute values. */
-  _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database, prefix)", NOD_ZM, 1, STR, STR),
+  _INDEX_ATTRIBUTES(FNIndex.class, "attributes(database,prefix[,order])",
+      NOD_ZM, 1, STR, STR, BLN),
   /** Index function: returns element names. */
   _INDEX_ELEMENT_NAMES(FNIndex.class, "element-names(database)", NOD_ZM, STR),
   /** Index function: returns attribute names. */
@@ -640,7 +641,7 @@ public enum Function {
   /** Full-text function: returns the full-text score. */
   _FT_SCORE(FNFt.class, "score(items)", DBL_ZM, ITEM_ZM),
   /** Full-text function: returns indexed tokens. */
-  _FT_TOKENS(FNFt.class, "tokens(database, prefix)", ITEM_ZM, 1, STR, STR),
+  _FT_TOKENS(FNFt.class, "tokens(database,entry[,order])", ITEM_ZM, 1, STR, STR, BLN),
   /** Full-text function: tokenizes the specified string. */
   _FT_TOKENIZE(FNFt.class, "tokenize(string)", STR_ZM, STR),
 
@@ -673,10 +674,10 @@ public enum Function {
   _CRYPTO_HMAC(FNCrypto.class, "hmac(string,string,string[,string])",
       STR, 3, STR, STR, STR, STR_ZO),
   /** Encrypt message. */
-  _CRYPTO_ENCRYPT(FNCrypto.class, "encrypt(string, string, string, string)",
+  _CRYPTO_ENCRYPT(FNCrypto.class, "encrypt(string,string,string,string)",
       STR, STR, STR, STR, STR),
   /** Decrypt message. */
-  _CRYPTO_DECRYPT(FNCrypto.class, "decrypt(string, string, string, string)",
+  _CRYPTO_DECRYPT(FNCrypto.class, "decrypt(string,string,string,string)",
       STR, STR, STR, STR, STR),
   /** Generate signature. */
   _CRYPTO_GENERATE_SIGNATURE(FNCrypto.class, "generate-signature" +

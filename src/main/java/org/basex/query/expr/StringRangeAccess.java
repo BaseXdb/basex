@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;

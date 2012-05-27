@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.ft.FTFlag.*;
 
 import org.basex.data.*;
-import org.basex.index.ft.*;
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;

@@ -1,5 +1,6 @@
-package org.basex.index;
+package org.basex.index.query;
 
+import org.basex.index.*;
 import org.basex.util.*;
 
 /**

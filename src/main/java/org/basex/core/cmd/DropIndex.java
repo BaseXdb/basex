@@ -7,7 +7,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.*;
 
 /**
  * Evaluates the 'drop index' command and deletes indexes in the currently

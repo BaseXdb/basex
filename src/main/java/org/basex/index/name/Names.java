@@ -1,10 +1,13 @@
-package org.basex.index;
+package org.basex.index.name;
 
 import java.io.*;
 import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
@@ -130,7 +133,7 @@ public final class Names extends TokenSet implements Index {
   }
 
   @Override
-  public EntryIterator entries(final byte[] prefix) {
+  public EntryIterator entries(final IndexEntries entries) {
     return new EntryIterator() {
       int c;
       @Override public byte[] next() { return ++c < size ? keys[c] : null; }

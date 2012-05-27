@@ -8,7 +8,7 @@ import javax.swing.tree.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.index.*;
+import org.basex.index.resource.*;
 import org.basex.util.hash.*;
 import org.basex.util.list.*;
 

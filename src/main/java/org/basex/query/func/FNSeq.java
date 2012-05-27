@@ -3,8 +3,8 @@ package org.basex.query.func;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.index.*;
 import org.basex.index.path.*;
+import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.CmpV.OpV;
 import org.basex.query.expr.*;

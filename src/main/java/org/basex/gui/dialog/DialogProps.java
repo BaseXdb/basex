@@ -12,7 +12,7 @@ import org.basex.core.cmd.*;
 import org.basex.data.*;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

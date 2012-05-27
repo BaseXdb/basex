@@ -1,4 +1,4 @@
-package org.basex.index;
+package org.basex.index.stats;
 
 /**
  * Content types, used for index statistics.

@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.func.*;
 import org.basex.query.item.*;
@@ -66,7 +66,7 @@ public final class ValueAccess extends IndexAccess {
     // otherwise, scan data sequentially
     final IndexIterator ii = term.length <= data.meta.maxlen &&
       (itype == IndexType.TEXT ? data.meta.textindex : data.meta.attrindex) ?
-      data.iter(new ValuesToken(itype, term)) : scan(term);
+      data.iter(new StringToken(itype, term)) : scan(term);
 
     return new AxisIter() {
       final byte kind = itype == IndexType.TEXT ? Data.TEXT : Data.ATTR;

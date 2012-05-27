@@ -7,7 +7,7 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.core.cmd.*;
 import org.basex.data.*;
-import org.basex.index.*;
+import org.basex.index.name.*;
 import org.basex.io.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.*;

@@ -5,7 +5,7 @@ import static org.basex.core.Text.*;
 import java.util.*;
 
 import org.basex.data.*;
-import org.basex.index.*;
+import org.basex.index.resource.*;
 import org.basex.io.random.*;
 import org.basex.query.util.pkg.*;
 import org.basex.server.*;

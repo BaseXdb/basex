@@ -6,7 +6,8 @@ import java.util.*;
 
 import org.basex.core.*;
 import org.basex.data.*;
-import org.basex.index.*;
+import org.basex.index.name.*;
+import org.basex.index.stats.*;
 import org.basex.util.list.*;
 
 /**

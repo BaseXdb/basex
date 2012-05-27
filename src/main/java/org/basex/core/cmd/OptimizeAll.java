@@ -8,7 +8,7 @@ import org.basex.build.*;
 import org.basex.core.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.*;
 import org.basex.io.*;
 import org.basex.io.serial.*;
 import org.basex.query.item.*;

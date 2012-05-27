@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 import java.util.*;
 
 import org.basex.index.*;
+import org.basex.index.query.*;
 import org.basex.io.serial.*;
 import org.basex.query.ft.*;
 import org.basex.util.*;

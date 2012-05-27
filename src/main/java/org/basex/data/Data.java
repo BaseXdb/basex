@@ -8,8 +8,10 @@ import java.util.Set;
 
 import org.basex.core.cmd.*;
 import org.basex.index.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.name.*;
 import org.basex.index.path.*;
+import org.basex.index.query.*;
+import org.basex.index.resource.*;
 import org.basex.io.*;
 import org.basex.io.random.*;
 import org.basex.util.*;

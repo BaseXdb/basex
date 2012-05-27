@@ -2,7 +2,7 @@ package org.basex.data;
 
 import org.basex.core.*;
 import org.basex.index.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.name.*;
 import org.basex.index.path.*;
 import org.basex.index.value.*;
 import org.basex.io.random.*;

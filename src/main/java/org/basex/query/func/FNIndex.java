@@ -8,8 +8,10 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.name.*;
 import org.basex.index.path.*;
+import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.query.*;
 import org.basex.query.expr.*;
 import org.basex.query.item.*;
@@ -93,20 +95,22 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter values(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
-    final byte[] prefix = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
-    return entries(data, prefix, it, this);
+    final byte[] entry = expr.length < 2 ? EMPTY : checkStr(expr[1], ctx);
+    final IndexEntries et = expr.length < 3 ? new IndexEntries(entry) :
+      new IndexEntries(entry, checkBln(expr[2], ctx));
+    return entries(data, et, it, this);
   }
 
   /**
    * Returns all entries of the specified value index.
    * @param data data reference
-   * @param prefix prefix
+   * @param entries container for returning index entries
    * @param it index type
    * @param call calling function
    * @return text entries
    * @throws QueryException query exception
    */
-  static Iter entries(final Data data, final byte[] prefix, final IndexType it,
+  static Iter entries(final Data data, final IndexEntries entries, final IndexType it,
       final StandardFunc call) throws QueryException {
 
     final Index index;
@@ -123,7 +127,7 @@ public final class FNIndex extends StandardFunc {
     }
     if(!avl) BXDB_INDEX.thrw(call.info, data.meta.name,
         it.toString().toLowerCase(Locale.ENGLISH));
-    return entries(index, prefix);
+    return entries(index, entries);
   }
 
   /**
@@ -135,18 +139,19 @@ public final class FNIndex extends StandardFunc {
    */
   private Iter names(final QueryContext ctx, final IndexType it) throws QueryException {
     final Data data = data(0, ctx);
-    return entries(it == IndexType.TAG ? data.tagindex : data.atnindex, EMPTY);
+    return entries(it == IndexType.TAG ? data.tagindex : data.atnindex,
+      new IndexEntries(EMPTY));
   }
 
   /**
    * Returns all entries of the specified index.
    * @param index index
-   * @param prefix prefix
+   * @param entries entries token
    * @return entry iterator
    */
-  private static Iter entries(final Index index, final byte[] prefix) {
+  private static Iter entries(final Index index, final IndexEntries entries) {
     return new Iter() {
-      final EntryIterator ei = index.entries(prefix);
+      final EntryIterator ei = index.entries(entries);
       @Override
       public ANode next() {
         final byte[] token = ei.next();

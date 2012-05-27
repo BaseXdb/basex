@@ -7,6 +7,8 @@ import java.util.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
 
@@ -89,7 +91,8 @@ public class MemValues extends TokenSet implements Index {
   }
 
   @Override
-  public EntryIterator entries(final byte[] prefix) {
+  public EntryIterator entries(final IndexEntries entries) {
+    final byte[] prefix = entries.get();
     return new EntryIterator() {
       int c;
       @Override

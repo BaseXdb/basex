@@ -16,7 +16,7 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
 import org.basex.gui.view.*;
-import org.basex.index.*;
+import org.basex.index.stats.*;
 import org.basex.util.list.*;
 
 /**

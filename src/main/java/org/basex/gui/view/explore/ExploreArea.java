@@ -10,7 +10,8 @@ import org.basex.data.*;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.*;
 import org.basex.gui.layout.*;
-import org.basex.index.*;
+import org.basex.index.name.*;
+import org.basex.index.stats.*;
 import org.basex.util.*;
 import org.basex.util.list.*;
 

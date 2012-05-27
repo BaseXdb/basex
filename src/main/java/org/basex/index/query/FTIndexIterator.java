@@ -1,7 +1,6 @@
-package org.basex.index.ft;
+package org.basex.index.query;
 
 import org.basex.data.*;
-import org.basex.index.*;
 
 /**
  * This interface provides methods for returning index results.
@@ -11,10 +10,10 @@ import org.basex.index.*;
  */
 public abstract class FTIndexIterator extends IndexIterator {
   /** Each token in the query has a number. */
-  int toknum;
+  public int toknum;
 
   /** Empty iterator. */
-  static final FTIndexIterator FTEMPTY = new FTIndexIterator() {
+  public static final FTIndexIterator FTEMPTY = new FTIndexIterator() {
     @Override
     public boolean more() { return false; }
     @Override

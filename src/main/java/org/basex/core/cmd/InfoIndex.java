@@ -9,7 +9,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.*;
 import org.basex.util.*;
 
 /**

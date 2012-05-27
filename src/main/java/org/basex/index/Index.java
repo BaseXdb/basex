@@ -1,5 +1,7 @@
 package org.basex.index;
 
+import org.basex.index.query.*;
+
 /**
  * This interface defines the methods which have to be implemented
  * by an index structure.
@@ -15,11 +17,11 @@ public interface Index {
   byte[] info();
 
   /**
-   * Returns all entries that start with the specified prefix.
-   * @param prefix prefix
+   * Returns all entries that match the specified token.
+   * @param token entries token
    * @return entries
    */
-  EntryIterator entries(final byte[] prefix);
+  EntryIterator entries(final IndexEntries token);
 
   /**
    * Returns an iterator for the index results.

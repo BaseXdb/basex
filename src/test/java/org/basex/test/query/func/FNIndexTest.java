@@ -59,15 +59,18 @@ public final class FNIndexTest extends AdvancedQueryTest {
   @Test
   public void indexTexts() {
     check(_INDEX_TEXTS);
-
-    String entries = _INDEX_TEXTS.args(NAME);
+    // complete search
+    final String entries = _INDEX_TEXTS.args(NAME);
     query("count(" + entries + ')', 5);
     query("exists(" + entries + "/self::value)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count != 1", "false");
-
-    entries = _INDEX_TEXTS.args(NAME, "X");
-    query("count(" + entries + ')', 1);
+    // prefix search
+    query(COUNT.args(_INDEX_TEXTS.args(NAME, "X")), 1);
+    // ascending traversal
+    query(COUNT.args(_INDEX_TEXTS.args(NAME, "X", "true()")), 1);
+    // descending traversal
+    query(_INDEX_TEXTS.args(NAME, "B", "false()") + "/text()", "Assignments");
   }
 
   /**
@@ -76,15 +79,18 @@ public final class FNIndexTest extends AdvancedQueryTest {
   @Test
   public void indexAttributes() {
     check(_INDEX_ATTRIBUTES);
-
-    String entries = _INDEX_ATTRIBUTES.args(NAME);
+    // complete search
+    final String entries = _INDEX_ATTRIBUTES.args(NAME);
     query("count(" + entries + ')', 6);
     query("exists(" + entries + "/self::value)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count != 1", "false");
-
-    entries = _INDEX_ATTRIBUTES.args(NAME, "1");
-    query("count(" + entries + ')', 1);
+    // prefix search
+    query(_INDEX_ATTRIBUTES.args(NAME, "1") + "/text()", "1");
+    // ascending traversal
+    query(_INDEX_ATTRIBUTES.args(NAME, "X", "true()") + "/text()", "right");
+    // descending traversal
+    query(_INDEX_ATTRIBUTES.args(NAME, "#000099", "false()") + "/text()", "#000000");
   }
 
   /**

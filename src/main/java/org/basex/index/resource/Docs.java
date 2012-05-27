@@ -1,4 +1,4 @@
-package org.basex.index;
+package org.basex.index.resource;
 
 import static org.basex.util.Token.*;
 

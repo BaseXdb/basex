@@ -10,6 +10,8 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.io.random.*;
 import org.basex.query.ft.*;
 import org.basex.util.*;
@@ -145,7 +147,8 @@ public final class FTIndex implements Index {
   }
 
   @Override
-  public EntryIterator entries(final byte[] prefix) {
+  public EntryIterator entries(final IndexEntries entries) {
+    final byte[] prefix = entries.get();
     return new EntryIterator() {
       int ti = prefix.length - 1, i, e, nr;
       boolean inner;

@@ -3,7 +3,8 @@ package org.basex.index.value;
 import static org.basex.core.Text.*;
 
 import org.basex.data.*;
-import org.basex.index.*;
+import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.util.*;
 
 /**

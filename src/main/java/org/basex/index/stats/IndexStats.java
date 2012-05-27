@@ -1,4 +1,4 @@
-package org.basex.index;
+package org.basex.index.stats;
 
 import static org.basex.core.Text.*;
 

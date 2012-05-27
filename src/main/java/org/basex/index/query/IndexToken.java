@@ -1,4 +1,6 @@
-package org.basex.index;
+package org.basex.index.query;
+
+import org.basex.index.*;
 
 /**
  * This class defines access to index tokens.
@@ -7,16 +9,6 @@ package org.basex.index;
  * @author Christian Gruen
  */
 public interface IndexToken {
-  /** Index types. */
-  enum IndexType {
-    /** Attribute names. */ ATTNAME,
-    /** Tag index.       */ TAG,
-    /** Text index.      */ TEXT,
-    /** Attribute index. */ ATTRIBUTE,
-    /** Full-text index. */ FULLTEXT,
-    /** Path index. */      PATH
-  }
-
   /**
    * Returns the index type.
    * @return type

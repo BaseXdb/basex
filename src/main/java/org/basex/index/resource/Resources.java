@@ -1,8 +1,10 @@
-package org.basex.index;
+package org.basex.index.resource;
 
 import java.io.*;
 
 import org.basex.data.*;
+import org.basex.index.*;
+import org.basex.index.query.*;
 import org.basex.io.in.DataInput;
 import org.basex.io.out.DataOutput;
 import org.basex.util.*;
@@ -187,7 +189,7 @@ public final class Resources implements Index {
   }
 
   @Override
-  public EntryIterator entries(final byte[] prefix) {
+  public EntryIterator entries(final IndexEntries entries) {
     throw Util.notexpected();
   }
 }

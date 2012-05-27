@@ -2,8 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 
-import org.basex.index.IndexToken.IndexType;
 import org.basex.index.*;
+import org.basex.index.query.*;
 import org.basex.query.*;
 import org.basex.query.item.*;
 import org.basex.query.iter.*;

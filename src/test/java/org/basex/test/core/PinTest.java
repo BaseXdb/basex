@@ -6,7 +6,7 @@ import java.io.*;
 
 import org.basex.core.*;
 import org.basex.core.cmd.*;
-import org.basex.index.IndexToken.IndexType;
+import org.basex.index.*;
 import org.basex.test.*;
 import org.basex.util.*;
 import org.junit.*;

@@ -8,6 +8,8 @@ import java.io.*;
 
 import org.basex.data.*;
 import org.basex.index.*;
+import org.basex.index.query.*;
+import org.basex.index.stats.*;
 import org.basex.io.random.*;
 import org.basex.util.*;
 import org.basex.util.hash.*;
@@ -117,18 +119,22 @@ public class DiskValues implements Index {
   }
 
   @Override
-  public EntryIterator entries(final byte[] prefix) {
+  public EntryIterator entries(final IndexEntries token) {
+    final byte[] prefix = token.get();
     final int i = get(prefix);
     return new EntryIterator() {
-      int ix = (i < 0 ? -i - 1 : i) - 1;
+      int ix = (i >= 0 ? i : token.prefix ? (-i - 1) :
+        token.descending ? (-i - 2) : (-i - 1)) + (token.descending ? 1 : -1);
       int nr;
+
       @Override
       public synchronized byte[] next() {
-        while(++ix < size) {
+        while(true) {
+          if(token.descending ? --ix < 0 : ++ix == size) break;
           final long pos = idxr.read5(ix * 5l);
           nr = idxl.readNum(pos);
           final byte[] key = data.text(idxl.readNum(), text);
-          if(!startsWith(key, prefix)) break;
+          if(token.prefix && !startsWith(key, prefix)) break;
           if(prefix.length != 0) cache.add(key, nr, pos + Num.length(nr));
           return key;
         }

@@ -7,7 +7,6 @@ import java.io.*;
 import org.basex.core.*;
 import org.basex.data.*;
 import org.basex.index.*;
-import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ft.*;
 import org.basex.index.value.*;
 import org.basex.io.*;
