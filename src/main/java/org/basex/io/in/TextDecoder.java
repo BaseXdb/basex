@@ -6,6 +6,9 @@ import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
 
+import org.basex.io.serial.*;
+import org.basex.util.*;
+
 /**
  * This abstract class specifies a single method for decoding input to UTF-8.
  * The inheriting classes are optimized for performance and faster than Java's
@@ -15,6 +18,9 @@ import java.nio.charset.*;
  * @author Christian Gruen
  */
 abstract class TextDecoder {
+  /** Encoding. */
+  String encoding;
+
   /**
    * Returns the next character.
    * @param ti text input
@@ -30,11 +36,14 @@ abstract class TextDecoder {
    * @throws IOException I/O exception
    */
   static TextDecoder get(final String enc) throws IOException {
-    if(enc == UTF8)    return new TextDecoder.UTF8();
-    if(enc == UTF32)   return new TextDecoder.UTF32();
-    if(enc == UTF16LE) return new TextDecoder.UTF16LE();
-    if(enc == UTF16BE) return new TextDecoder.UTF16BE();
-    return new TextDecoder.Generic(enc);
+    final TextDecoder td;
+    if(enc == UTF8) td = new TextDecoder.UTF8();
+    else if(enc == UTF32) td = new TextDecoder.UTF32();
+    else if(enc == UTF16LE) td = new TextDecoder.UTF16LE();
+    else if(enc == UTF16BE) td = new TextDecoder.UTF16BE();
+    else td = new TextDecoder.Generic(enc);
+    td.encoding = enc;
+    return td;
   }
 
   /**
@@ -42,8 +51,8 @@ abstract class TextDecoder {
    * @throws IOException I/O exception
    * @return exception
    */
-  MalformedInputException invalid() throws IOException {
-    throw new MalformedInputException(0);
+  static InputException invalid() throws IOException {
+    throw new InputException();
   }
 
   /** UTF8 Decoder. */
@@ -126,15 +135,17 @@ abstract class TextDecoder {
       try {
         csd = Charset.forName(enc).newDecoder();
       } catch(final Exception ex) {
+        Util.debug(ex);
         throw new IOException(ex.toString());
       }
     }
 
     @Override
     int read(final TextInput ti) throws IOException {
-      for(int c = 0; c < 4; c++) {
+      int c = -1;
+      while(++c < 4) {
         final int ch = ti.next();
-        if(ch < 0) return ch;
+        if(ch < 0) break;
         cache[c] = (byte) ch;
         outc.position(0);
         inc.position(0);
@@ -148,6 +159,7 @@ abstract class TextDecoder {
         for(int o = 0; o < os; ++o) i |= outc.get(o) << (o << 3);
         return i;
       }
+      if(c == 0) return -1;
       throw invalid();
     }
   }

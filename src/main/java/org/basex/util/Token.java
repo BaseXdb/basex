@@ -233,6 +233,15 @@ public final class Token {
   /**
    * Returns a unified representation of the specified encoding.
    * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
+   * @return encoding
+   */
+  public static String normEncoding(final String encoding) {
+    return normEncoding(encoding, null);
+  }
+
+  /**
+   * Returns a unified representation of the specified encoding.
+   * @param encoding input encoding (UTF-8 is returned for a {@code null} reference)
    * @param old previous encoding (optional)
    * @return encoding
    */

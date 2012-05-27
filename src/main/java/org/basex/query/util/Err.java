@@ -44,6 +44,10 @@ public enum Err {
 
   /** BXCO0001. */
   BXCO_STRING(BXCO, 1, "String conversion: %."),
+  /** BXCO0001. */
+  BXCO_BASE64(BXCO, 1, "String cannot be converted to the specified encoding."),
+  /** BXCO0002. */
+  BXCO_ENCODING(BXCO, 2, "Encoding '%' is not supported."),
 
   // Database module
 
@@ -627,6 +631,8 @@ public enum Err {
   STRNODTYPE(XPTY, 4, "%: xs:string or node() expected, % found."),
   /** XPTY0004. */
   ELMMAPTYPE(XPTY, 4, "element(%) or map expected, % found"),
+  /** XPTY0004. */
+  BINARYTYPE(XPTY, 4, "Binary type expected, % found"),
   /** XPTY0004. */
   ELMOPTION(XPTY, 4, "Unknown option: %."),
 

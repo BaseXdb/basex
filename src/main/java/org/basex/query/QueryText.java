@@ -435,6 +435,8 @@ public interface QueryText {
   byte[] BXERR = token("bxerr");
   /** Client token. */
   byte[] CLIENT = token("client");
+  /** Convert token. */
+  byte[] CONVERT = token("convert");
   /** DB token. */
   byte[] DB = token("db");
   /** Index token. */
@@ -538,6 +540,8 @@ public interface QueryText {
   byte[] BXERRORS = token(Text.URL + "/errors");
   /** Client module URI. */
   byte[] CLIENTURI = token(BXMODULES + "client");
+  /** Convert module URI. */
+  byte[] CONVERTURI = token(BXMODULES + "convert");
   /** Database module URI. */
   byte[] DBURI = token(BXMODULES + "db");
   /** Full-text module URI. */

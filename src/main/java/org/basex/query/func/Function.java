@@ -442,6 +442,24 @@ public enum Function {
   /** XQuery math function (project specific). */
   _MATH_TANH(FNMath.class, "tanh(number)", DBL_ZO, DBL_ZO),
 
+  /* FNConvert functions. */
+
+  /** Conversion function. */
+  _CONVERT_INTEGER_TO_BASE(FNConvert.class, "integer-to-base(num,base)", STR, ITR, ITR),
+  /** Conversion function. */
+  _CONVERT_INTEGER_FROM_BASE(FNConvert.class, "integer-from-base(str,base)",
+      ITR, STR, ITR),
+  /** Conversion function. */
+  _CONVERT_TO_BYTES(FNConvert.class, "to-bytes(binary)", BYT_ZM, ITEM),
+  /** Conversion function. */
+  _CONVERT_TO_STRING(FNConvert.class, "to-string(binary[,encoding])", STR, 1, ITEM, STR),
+  /** Conversion function. */
+  _CONVERT_TO_BASE64BINARY(FNConvert.class, "to-base64Binary(string[,encoding])",
+      B64, 1, STR, STR),
+  /** Conversion function. */
+  _CONVERT_TO_HEXBINARY(FNConvert.class, "to-hexBinary(string[,encoding])",
+      HEX, 1, STR, STR),
+
   /* FNDb functions. */
 
   /** Database function: opens a database. */
@@ -698,20 +716,12 @@ public enum Function {
   _UTIL_TIME(FNUtil.class, "time(expr[,cache[,label]])", ITEM_ZM, 1, ITEM_ZM, BLN, STR),
   /** Utility function: sleeps for the specified number of milliseconds. */
   _UTIL_SLEEP(FNUtil.class, "sleep(ms)", EMP, ITR),
-  /** Utility function: converts a number to a given base. */
-  _UTIL_INTEGER_TO_BASE(FNUtil.class, "integer-to-base(num,base)", STR, ITR, ITR),
-  /** Utility function: decodes a number from a given base. */
-  _UTIL_INTEGER_FROM_BASE(FNUtil.class, "integer-from-base(str,base)", ITR, STR, ITR),
   /** Utility function: calculates the MD5 hash of the given string. */
   _UTIL_MD5(FNUtil.class, "md5(str)", HEX, STR),
   /** Utility function: calculates the SHA1 hash of the given string. */
   _UTIL_SHA1(FNUtil.class, "sha1(str)", HEX, STR),
   /** Utility function: calculates the CRC32 hash of the given string. */
   _UTIL_CRC32(FNUtil.class, "crc32(str)", HEX, STR),
-  /** Utility function: gets the bytes from the given data data. */
-  _UTIL_TO_BYTES(FNUtil.class, "to-bytes(item)", BYT_ZM, ITEM),
-  /** Utility function: converts the specified bytes to a string. */
-  _UTIL_TO_STRING(FNUtil.class, "to-string(item[,encoding])", STR, 1, ITEM, STR),
   /** Utility function: returns a random unique id. */
   _UTIL_UUID(FNUtil.class, "uuid()", STR),
   /** Utility function: compares items in depth and offers some more options. */
@@ -778,6 +788,7 @@ public enum Function {
     URIS.put(FNRepo.class,   REPOURI);
     // internal functions
     URIS.put(FNClient.class,   CLIENTURI);
+    URIS.put(FNConvert.class,  CONVERTURI);
     URIS.put(FNDb.class,       DBURI);
     URIS.put(FNFt.class,       FTURI);
     URIS.put(FNHof.class,      HOFURI);

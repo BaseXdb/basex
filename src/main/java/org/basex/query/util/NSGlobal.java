@@ -43,6 +43,7 @@ public final class NSGlobal {
     NS.add(BASEX, BASEXURI);
     NS.add(BXERR, BXERRORS);
     NS.add(CLIENT, CLIENTURI);
+    NS.add(CONVERT, CONVERTURI);
     NS.add(DB, DBURI);
     NS.add(FT, FTURI);
     NS.add(HOF, HOFURI);

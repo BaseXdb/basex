@@ -8,12 +8,11 @@ import java.io.*;
  * @author BaseX Team 2005-12, BSD License
  * @author Christian Gruen
  */
-public final class EncodingException extends IOException {
+public final class InputException extends IOException {
   /**
    * Constructor.
-   * @param cp code points
    */
-  public EncodingException(final int cp) {
-    super("Invalid XML character (#" + cp + ")");
+  public InputException() {
+    super("Invalid input, or wrong encoding specified");
   }
 }

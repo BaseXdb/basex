@@ -324,6 +324,21 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
+   * Checks if the specified expression yields a binary item.
+   * @param e expression to be evaluated
+   * @param ctx query context
+   * @return binary item
+   * @throws QueryException query exception
+   */
+  public final Bin checkBinary(final Expr e, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = checkItem(e, ctx);
+    if(!(it instanceof Bin)) BINARYTYPE.thrw(info, it.type);
+    return (Bin) it;
+  }
+
+  /**
    * Checks if the specified expression is an empty sequence; if yes, throws
    * an exception.
    * @param it item to be checked

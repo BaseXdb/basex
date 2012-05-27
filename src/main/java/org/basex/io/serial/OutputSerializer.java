@@ -96,7 +96,7 @@ public abstract class OutputSerializer extends Serializer {
     p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
-    final String enc = normEncoding(p.get(S_ENCODING), null);
+    final String enc = normEncoding(p.get(S_ENCODING));
     try {
       encoding = Charset.forName(enc);
     } catch(final Exception ex) {

@@ -80,9 +80,9 @@ public class BufferInput extends InputStream {
   }
 
   /**
-   * Returns the next byte (see {@link InputStream#read}.
+   * Returns the next unsigned byte (see {@link InputStream#read}.
    * {@code -1} is returned if all bytes have been read.
-   * @return next byte
+   * @return next unsigned byte
    * @throws IOException I/O exception
    */
   protected int next() throws IOException {

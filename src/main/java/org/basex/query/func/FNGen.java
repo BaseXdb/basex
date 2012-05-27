@@ -225,7 +225,7 @@ public final class FNGen extends StandardFunc {
       throw ex;
     } catch(final IOException ex) {
       if(!full) return Bln.FALSE;
-      if(ex instanceof MalformedInputException && enc == null) WHICHCHARS.thrw(info);
+      if(ex instanceof InputException && enc == null) WHICHCHARS.thrw(info);
       if(ex instanceof EncodingException) INVCHARS.thrw(info, ex.getMessage());
       throw SERANY.thrw(info, ex);
     }

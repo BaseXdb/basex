@@ -17,8 +17,6 @@ import org.basex.util.list.*;
  * @author Christian Gruen
  */
 public class TextInput extends BufferInput {
-  /** Encoding. */
-  private String encoding;
   /** Decoder. */
   private TextDecoder decoder;
 
@@ -68,16 +66,15 @@ public class TextInput extends BufferInput {
     }
     reset();
     for(int s = 0; s < skip; s++) next();
-    encoding(e);
+    decoder = TextDecoder.get(normEncoding(e));
   }
 
   /**
    * Returns the encoding.
-   * Sets a new encoding.
    * @return encoding
    */
   public String encoding() {
-    return encoding;
+    return decoder.encoding;
   }
 
   /**
@@ -87,11 +84,8 @@ public class TextInput extends BufferInput {
    * @throws IOException I/O Exception
    */
   public TextInput encoding(final String enc) throws IOException {
-    final String e = normEncoding(enc, encoding);
-    if(encoding == null || e != UTF8) {
-      encoding = e;
-      decoder = TextDecoder.get(e);
-    }
+    final String e = normEncoding(enc, decoder.encoding);
+    if(e != UTF8) decoder = TextDecoder.get(e);
     return this;
   }
 
