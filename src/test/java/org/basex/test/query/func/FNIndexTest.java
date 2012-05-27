@@ -62,7 +62,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
     // complete search
     final String entries = _INDEX_TEXTS.args(NAME);
     query("count(" + entries + ')', 5);
-    query("exists(" + entries + "/self::value)", "true");
+    query("exists(" + entries + "/self::entry)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count != 1", "false");
     // prefix search
@@ -82,7 +82,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
     // complete search
     final String entries = _INDEX_ATTRIBUTES.args(NAME);
     query("count(" + entries + ')', 6);
-    query("exists(" + entries + "/self::value)", "true");
+    query("exists(" + entries + "/self::entry)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count != 1", "false");
     // prefix search
@@ -102,7 +102,7 @@ public final class FNIndexTest extends AdvancedQueryTest {
 
     final String entries = _INDEX_ELEMENT_NAMES.args(NAME);
     query("count(" + entries + ')', 9);
-    query("exists(" + entries + "/self::value)", "true");
+    query("exists(" + entries + "/self::entry)", "true");
   }
 
   /**
@@ -114,6 +114,6 @@ public final class FNIndexTest extends AdvancedQueryTest {
 
     final String entries = _INDEX_ATTRIBUTE_NAMES.args(NAME);
     query("count(" + entries + ')', 5);
-    query("exists(" + entries + "/self::value)", "true");
+    query("exists(" + entries + "/self::entry)", "true");
   }
 }

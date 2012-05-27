@@ -33,7 +33,7 @@ public final class FNIndex extends StandardFunc {
   /** Name: type. */
   static final QNm Q_TYPE = new QNm(TYP);
   /** Name: value. */
-  static final QNm Q_VALUE = new QNm(VAL);
+  static final QNm Q_ENTRY = new QNm("entry");
   /** Name: min. */
   static final QNm Q_MIN = new QNm(MIN);
   /** Name: max. */
@@ -156,7 +156,7 @@ public final class FNIndex extends StandardFunc {
       public ANode next() {
         final byte[] token = ei.next();
         if(token == null) return null;
-        final FElem elem = new FElem(Q_VALUE);
+        final FElem elem = new FElem(Q_ENTRY);
         elem.add(new FAttr(Q_COUNT, token(ei.count())));
         elem.add(token);
         return elem;
@@ -221,7 +221,7 @@ public final class FNIndex extends StandardFunc {
     switch(stats.type) {
       case CATEGORY:
         for(final byte[] c : stats.cats) {
-          final FElem sub = new FElem(Q_VALUE);
+          final FElem sub = new FElem(Q_ENTRY);
           sub.add(new FAttr(Q_COUNT, token(stats.cats.value(c)))).add(c);
           elem.add(sub);
         }

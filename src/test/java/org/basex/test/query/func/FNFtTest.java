@@ -141,7 +141,7 @@ public final class FNFtTest extends AdvancedQueryTest {
 
     String entries = _FT_TOKENS.args(NAME);
     query("count(" + entries + ')', 6);
-    query("exists(" + entries + "/self::value)", "true");
+    query("exists(" + entries + "/self::entry)", "true");
     query(entries + "/@count = 1", "true");
     query(entries + "/@count = 2", "true");
     query(entries + "/@count = 3", "false");
