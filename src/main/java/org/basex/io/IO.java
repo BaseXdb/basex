@@ -52,7 +52,7 @@ public abstract class IO {
     { ZIPSUFFIX, GZSUFFIX, XARSUFFIX, ".docx", ".pptx", ".xslx", ".odt", ".odp", ".ods" };
   /** XML suffixes. */
   public static final String[] XMLSUFFIXES =
-    { XMLSUFFIX, ".xsd", ".xsl", ".xslt", ".svg", ".rdf", ".rss" };
+    { XMLSUFFIX, ".xsd", ".xsl", ".xslt", ".svg", ".rdf", ".rss", ".rng", ".sch" };
   /** HTML suffixes. */
   public static final String[] HTMLSUFFIXES =
     { ".xhtml", ".html", ".htm" };
