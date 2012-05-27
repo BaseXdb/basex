@@ -205,6 +205,8 @@ public final class GUIConstants {
   public static final Color GREEN = new Color(0, 176, 0);
   /** Color for highlighting quotes. */
   public static final Color BLUE = new Color(0, 64, 192);
+  /** Color for highlighting quotes. */
+  public static final Color LBLUE = new Color(128, 160, 224);
   /** Color for control characters. */
   public static final Color PINK = new Color(160, 0, 160);
 

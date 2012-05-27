@@ -16,6 +16,8 @@ public final class XMLSyntax extends BaseXSyntax {
   private int quote;
   /** Tag flag. */
   private boolean tag;
+  /** Comment flag. */
+  private int comm;
   /** Flag for printing element name. */
   private boolean elem;
 
@@ -28,6 +30,15 @@ public final class XMLSyntax extends BaseXSyntax {
   @Override
   public Color getColor(final BaseXTextTokens text) {
     final int ch = text.curr();
+    if(comm > 0) {
+      if(ch == '<') {
+        comm++;
+      } else if(ch == '>') {
+        comm--;
+      }
+      return comm > 0 ? LBLUE : BLUE;
+    }
+
     if(tag) {
       if(quote != 0) {
         if(quote == ch) quote = 0;
@@ -37,9 +48,19 @@ public final class XMLSyntax extends BaseXSyntax {
         quote = ch;
         return RED;
       }
-      if(ch == '>') tag = false;
+      if(ch == '>') {
+        tag = false;
+        return BLUE;
+      }
+      if(ch == '=' || ch == '/') {
+        return BLUE;
+      }
+      if(ch == '!') {
+        comm++;
+        tag = false;
+        return LBLUE;
+      }
 
-      if(ch == '=' || ch == '>' || ch == '/') return BLUE;
       if(elem) {
         if(ch <= ' ') elem = false;
         return BLUE;
