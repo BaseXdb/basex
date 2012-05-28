@@ -530,8 +530,6 @@ public interface QueryText {
   byte[] PKGURI = token(EXPATH + "pkg");
   /** ZIP URI.*/
   byte[] ZIPURI = token(EXPATH + "zip");
-  /** ZIP2 URI.*/
-  byte[] ZIP2URI = token(EXPATH + "zip2");
   /** EXPath Error URI. */
   byte[] EXPERROR = token(EXPATH + "error");
 
@@ -567,6 +565,8 @@ public interface QueryText {
   byte[] REPOURI = token(BXMODULES + "repo");
   /** Validate URI. */
   byte[] VALIDATEURI = token(BXMODULES + "validate");
+  /** ZIP2 URI.*/
+  byte[] ZIP2URI = token(BXMODULES + "zip2");
 
   /** Java prefix. */
   byte[] JAVAPREF = token("java:");

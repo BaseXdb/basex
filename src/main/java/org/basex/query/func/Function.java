@@ -803,7 +803,6 @@ public enum Function {
     URIS.put(FNFile.class,   FILEURI);
     URIS.put(FNHttp.class,   HTTPURI);
     URIS.put(FNZip.class,    ZIPURI);
-    URIS.put(FNZip2.class,   ZIP2URI);
     URIS.put(FNRepo.class,   REPOURI);
     // internal functions
     URIS.put(FNClient.class,   CLIENTURI);
@@ -818,6 +817,7 @@ public enum Function {
     URIS.put(FNUtil.class,     UTILURI);
     URIS.put(FNValidate.class, VALIDATEURI);
     URIS.put(FNXslt.class,     XSLTURI);
+    URIS.put(FNZip2.class,     ZIP2URI);
   }
 
   /** Minimum number of arguments. */
